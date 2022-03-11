@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  *
  */
 
-#include <iostream>
-#include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <stdlib.h>
+#include <iostream>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -36,7 +36,6 @@ void dali_slider_cleanup(void)
 
 namespace
 {
-
 static bool gObjectCreatedCallBackCalled;
 
 static void TestCallback(BaseHandle handle)
@@ -44,7 +43,7 @@ static void TestCallback(BaseHandle handle)
   gObjectCreatedCallBackCalled = true;
 }
 
-}
+} // namespace
 
 int UtcDaliSliderNew(void)
 {
@@ -54,26 +53,26 @@ int UtcDaliSliderNew(void)
   // Create the Slider actor
   Slider slider;
 
-  DALI_TEST_CHECK( !slider );
+  DALI_TEST_CHECK(!slider);
 
   slider = Slider::New();
 
-  DALI_TEST_CHECK( slider );
+  DALI_TEST_CHECK(slider);
 
   Slider slider2(slider);
 
-  DALI_TEST_CHECK( slider2 == slider );
+  DALI_TEST_CHECK(slider2 == slider);
 
   //Additional check to ensure object is created by checking if it's registered
   ObjectRegistry registry = application.GetCore().GetObjectRegistry();
-  DALI_TEST_CHECK( registry );
+  DALI_TEST_CHECK(registry);
 
   gObjectCreatedCallBackCalled = false;
-  registry.ObjectCreatedSignal().Connect( &TestCallback );
+  registry.ObjectCreatedSignal().Connect(&TestCallback);
   {
     Slider slider = Slider::New();
   }
-  DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
+  DALI_TEST_CHECK(gObjectCreatedCallBackCalled);
   END_TEST;
 }
 
@@ -82,10 +81,10 @@ int UtcDaliSliderCopyConstructor(void)
   ToolkitTestApplication application;
 
   Slider slider = Slider::New();
-  DALI_TEST_CHECK( slider );
+  DALI_TEST_CHECK(slider);
 
-  Slider copy( slider );
-  DALI_TEST_CHECK( copy );
+  Slider copy(slider);
+  DALI_TEST_CHECK(copy);
 
   END_TEST;
 }
@@ -95,12 +94,12 @@ int UtcDaliSliderCopyAssignment(void)
   ToolkitTestApplication application;
 
   Slider slider = Slider::New();
-  DALI_TEST_CHECK( slider );
+  DALI_TEST_CHECK(slider);
 
   Slider copy;
   copy = slider;
-  DALI_TEST_CHECK( copy );
-  DALI_TEST_EQUALS( slider, copy, TEST_LOCATION );
+  DALI_TEST_CHECK(copy);
+  DALI_TEST_EQUALS(slider, copy, TEST_LOCATION);
 
   END_TEST;
 }
@@ -110,15 +109,15 @@ int UtcDaliSliderMoveConstructor(void)
   ToolkitTestApplication application;
 
   Slider slider = Slider::New();
-  DALI_TEST_EQUALS( 1, slider.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  slider.SetProperty( Actor::Property::SENSITIVE, false );
-  DALI_TEST_CHECK( false == slider.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_EQUALS(1, slider.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  slider.SetProperty(Actor::Property::SENSITIVE, false);
+  DALI_TEST_CHECK(false == slider.GetProperty<bool>(Actor::Property::SENSITIVE));
 
-  Slider moved = std::move( slider );
-  DALI_TEST_CHECK( moved );
-  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
-  DALI_TEST_CHECK( !slider );
+  Slider moved = std::move(slider);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_EQUALS(1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(false == moved.GetProperty<bool>(Actor::Property::SENSITIVE));
+  DALI_TEST_CHECK(!slider);
 
   END_TEST;
 }
@@ -128,16 +127,16 @@ int UtcDaliSliderMoveAssignment(void)
   ToolkitTestApplication application;
 
   Slider slider = Slider::New();
-  DALI_TEST_EQUALS( 1, slider.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  slider.SetProperty( Actor::Property::SENSITIVE, false );
-  DALI_TEST_CHECK( false == slider.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_EQUALS(1, slider.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  slider.SetProperty(Actor::Property::SENSITIVE, false);
+  DALI_TEST_CHECK(false == slider.GetProperty<bool>(Actor::Property::SENSITIVE));
 
   Slider moved;
-  moved = std::move( slider );
-  DALI_TEST_CHECK( moved );
-  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
-  DALI_TEST_CHECK( !slider );
+  moved = std::move(slider);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_EQUALS(1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(false == moved.GetProperty<bool>(Actor::Property::SENSITIVE));
+  DALI_TEST_CHECK(!slider);
 
   END_TEST;
 }
@@ -149,7 +148,7 @@ int UtcDaliSliderDestructor(void)
   Slider* slider = new Slider();
   delete slider;
 
-  DALI_TEST_CHECK( true );
+  DALI_TEST_CHECK(true);
   END_TEST;
 }
 
@@ -159,28 +158,28 @@ int UtcDaliSliderDownCast(void)
 
   Handle handle = Slider::New();
 
-  Slider slider = Slider::DownCast( handle );
+  Slider slider = Slider::DownCast(handle);
 
-  DALI_TEST_CHECK( slider == handle );
+  DALI_TEST_CHECK(slider == handle);
   END_TEST;
 }
 
-static bool gSliderValueChangedCallBackCalled=false;
-static bool OnSliderValueChanged( Slider slider, float value )
+static bool gSliderValueChangedCallBackCalled = false;
+static bool OnSliderValueChanged(Slider slider, float value)
 {
   gSliderValueChangedCallBackCalled = true;
   return true;
 }
 
-static bool gSliderMarkCallBackCalled=false;
-static bool OnSliderMark( Slider slider, int value )
+static bool gSliderMarkCallBackCalled = false;
+static bool OnSliderMark(Slider slider, int value)
 {
   gSliderMarkCallBackCalled = true;
   return true;
 }
 
-static bool gSliderSlidingFinishedCallBackCalled=false;
-static bool OnSlidingFinished( Slider slider, float value )
+static bool gSliderSlidingFinishedCallBackCalled = false;
+static bool OnSlidingFinished(Slider slider, float value)
 {
   gSliderSlidingFinishedCallBackCalled = true;
   return true;
@@ -188,72 +187,72 @@ static bool OnSlidingFinished( Slider slider, float value )
 
 int UtcDaliSliderSignals1(void)
 {
-  ToolkitTestApplication application;  // Exceptions require ToolkitTestApplication
+  ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
   tet_infoline(" UtcDaliSliderSignals1");
 
   // Create the Popup actor
   Slider slider = Slider::New();
-  application.GetScene().Add( slider );
-  slider.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  slider.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  slider.SetProperty( Actor::Property::SIZE, Vector2( application.GetScene().GetSize().x, 20.0f ) );
-  slider.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
+  application.GetScene().Add(slider);
+  slider.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  slider.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  slider.SetProperty(Actor::Property::SIZE, Vector2(application.GetScene().GetSize().x, 20.0f));
+  slider.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
 
-  const float MIN_BOUND = 0.0f;
-  const float MAX_BOUND = 1.0f;
-  const int NUM_MARKS = 5;
+  const float     MIN_BOUND = 0.0f;
+  const float     MAX_BOUND = 1.0f;
+  const int       NUM_MARKS = 5;
   Property::Array marks;
-  for( int i = 0; i < NUM_MARKS; ++i )
+  for(int i = 0; i < NUM_MARKS; ++i)
   {
-    marks.PushBack( MIN_BOUND + ( static_cast<float>(i) / ( NUM_MARKS - 1) ) * ( MAX_BOUND - MIN_BOUND ) );
+    marks.PushBack(MIN_BOUND + (static_cast<float>(i) / (NUM_MARKS - 1)) * (MAX_BOUND - MIN_BOUND));
   }
-  slider.SetProperty( Slider::Property::MARKS, marks );
-  slider.SetProperty( Slider::Property::MARK_TOLERANCE, 0.1f );
+  slider.SetProperty(Slider::Property::MARKS, marks);
+  slider.SetProperty(Slider::Property::MARK_TOLERANCE, 0.1f);
 
-  slider.ValueChangedSignal().Connect( &OnSliderValueChanged );
-  slider.MarkReachedSignal().Connect( &OnSliderMark );
-  slider.SlidingFinishedSignal().Connect( &OnSlidingFinished );
+  slider.ValueChangedSignal().Connect(&OnSliderValueChanged);
+  slider.MarkReachedSignal().Connect(&OnSliderMark);
+  slider.SlidingFinishedSignal().Connect(&OnSlidingFinished);
 
   application.SendNotification();
   application.Render();
 
-  gSliderValueChangedCallBackCalled = false;
-  gSliderMarkCallBackCalled = false;
+  gSliderValueChangedCallBackCalled    = false;
+  gSliderMarkCallBackCalled            = false;
   gSliderSlidingFinishedCallBackCalled = false;
 
   {
     Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
-    Integration::Point pointDown;
-    pointDown.SetState( PointState::DOWN );
-    pointDown.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
-    event.AddPoint( pointDown );
+    Integration::Point            pointDown;
+    pointDown.SetState(PointState::DOWN);
+    pointDown.SetScreenPosition(Vector2(10.0f, 10.0f));
+    event.AddPoint(pointDown);
 
-    application.ProcessEvent( event );
+    application.ProcessEvent(event);
     application.SendNotification();
     application.Render();
   }
 
-  for( int i = 0; i < 5; ++i )
+  for(int i = 0; i < 5; ++i)
   {
     Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
-    Integration::Point pointMotion;
-    pointMotion.SetState( PointState::MOTION );
-    pointMotion.SetScreenPosition( Vector2( 10.0f + i * 10.0f, 10.0f ) );
-    event.AddPoint( pointMotion );
+    Integration::Point            pointMotion;
+    pointMotion.SetState(PointState::MOTION);
+    pointMotion.SetScreenPosition(Vector2(10.0f + i * 10.0f, 10.0f));
+    event.AddPoint(pointMotion);
 
-    application.ProcessEvent( event );
+    application.ProcessEvent(event);
     application.SendNotification();
     application.Render();
   }
 
   {
     Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
-    Integration::Point pointUp;
-    pointUp.SetState( PointState::UP );
-    pointUp.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
-    event.AddPoint( pointUp );
+    Integration::Point            pointUp;
+    pointUp.SetState(PointState::UP);
+    pointUp.SetScreenPosition(Vector2(10.0f, 10.0f));
+    event.AddPoint(pointUp);
 
-    application.ProcessEvent( event );
+    application.ProcessEvent(event);
     application.SendNotification();
     application.Render();
   }
@@ -266,10 +265,9 @@ int UtcDaliSliderSignals1(void)
   END_TEST;
 }
 
-
 namespace
 {
-bool gSliderSignal=false;
+bool gSliderSignal = false;
 struct SliderSignalFunctor
 {
   SliderSignalFunctor()
@@ -281,67 +279,65 @@ struct SliderSignalFunctor
     gSliderSignal = true;
   }
 };
-} // anonymous
-
-
+} // namespace
 
 int UtcDaliSliderSignals2(void)
 {
-  ToolkitTestApplication application;  // Exceptions require ToolkitTestApplication
+  ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
   tet_infoline(" UtcDaliSliderSignals1");
 
   // Create the Popup actor
   Slider slider = Slider::New();
-  application.GetScene().Add( slider );
-  slider.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  slider.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  slider.SetProperty( Actor::Property::SIZE, Vector2( application.GetScene().GetSize().x, 20.0f ) );
-  slider.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
+  application.GetScene().Add(slider);
+  slider.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  slider.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  slider.SetProperty(Actor::Property::SIZE, Vector2(application.GetScene().GetSize().x, 20.0f));
+  slider.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
 
-  const float MIN_BOUND = 0.0f;
-  const float MAX_BOUND = 1.0f;
-  const int NUM_MARKS = 5;
+  const float     MIN_BOUND = 0.0f;
+  const float     MAX_BOUND = 1.0f;
+  const int       NUM_MARKS = 5;
   Property::Array marks;
-  for( int i = 0; i < NUM_MARKS; ++i )
+  for(int i = 0; i < NUM_MARKS; ++i)
   {
-    marks.PushBack( MIN_BOUND + ( static_cast<float>(i) / ( NUM_MARKS - 1) ) * ( MAX_BOUND - MIN_BOUND ) );
+    marks.PushBack(MIN_BOUND + (static_cast<float>(i) / (NUM_MARKS - 1)) * (MAX_BOUND - MIN_BOUND));
   }
-  slider.SetProperty( Slider::Property::MARKS, marks );
-  slider.SetProperty( Slider::Property::MARK_TOLERANCE, 0.1f );
+  slider.SetProperty(Slider::Property::MARKS, marks);
+  slider.SetProperty(Slider::Property::MARK_TOLERANCE, 0.1f);
 
-  gSliderSignal = false;
+  gSliderSignal                  = false;
   ConnectionTracker* testTracker = new ConnectionTracker();
-  slider.ConnectSignal( testTracker, "valueChanged",   SliderSignalFunctor() );
+  slider.ConnectSignal(testTracker, "valueChanged", SliderSignalFunctor());
 
   application.SendNotification();
   application.Render();
 
   gSliderValueChangedCallBackCalled = false;
-  gSliderMarkCallBackCalled = false;
+  gSliderMarkCallBackCalled         = false;
 
   Dali::Integration::TouchEvent event;
 
   event = Dali::Integration::TouchEvent();
 
   Integration::Point pointDown;
-  pointDown.SetState( PointState::DOWN );
-  pointDown.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
-  event.AddPoint( pointDown );
+  pointDown.SetState(PointState::DOWN);
+  pointDown.SetScreenPosition(Vector2(10.0f, 10.0f));
+  event.AddPoint(pointDown);
 
-  for( int i = 0; i < 5; ++i )
+  for(int i = 0; i < 5; ++i)
   {
     Integration::Point pointMotion;
-    pointMotion.SetState( PointState::MOTION );
-    pointMotion.SetScreenPosition( Vector2( 10.0f + i * 10.0f, 10.0f ) );
-    event.AddPoint( pointMotion );
+    pointMotion.SetState(PointState::MOTION);
+    pointMotion.SetScreenPosition(Vector2(10.0f + i * 10.0f, 10.0f));
+    event.AddPoint(pointMotion);
   }
 
   Integration::Point pointUp;
-  pointUp.SetState( PointState::UP );
-  pointUp.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
-  event.AddPoint( pointUp );
+  pointUp.SetState(PointState::UP);
+  pointUp.SetScreenPosition(Vector2(10.0f, 10.0f));
+  event.AddPoint(pointUp);
 
-  application.ProcessEvent( event );
+  application.ProcessEvent(event);
 
   application.SendNotification();
   application.Render();
@@ -353,28 +349,28 @@ int UtcDaliSliderSignals2(void)
 int UtcDaliSetPropertyP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliSetPropertyP" );
+  tet_infoline("UtcDaliSetPropertyP");
 
   Slider slider = Slider::New();
-  slider.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  slider.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  slider.SetProperty( Actor::Property::SIZE, Vector2( application.GetScene().GetSize().x, 20.0f ) );
-  slider.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
+  slider.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  slider.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  slider.SetProperty(Actor::Property::SIZE, Vector2(application.GetScene().GetSize().x, 20.0f));
+  slider.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
 
   application.GetScene().Add(slider);
   application.SendNotification();
   application.Render();
 
-  slider.SetProperty(Slider::Property::LOWER_BOUND,        1.0f);
-  slider.SetProperty(Slider::Property::UPPER_BOUND,        5.0f);
-  slider.SetProperty(Slider::Property::VALUE,              3.0f);
-  slider.SetProperty(Slider::Property::DISABLED_COLOR,     Color::BLACK);
-  slider.SetProperty(Slider::Property::VALUE_PRECISION,    4);
-  slider.SetProperty(Slider::Property::SHOW_POPUP,         true);
-  slider.SetProperty(Slider::Property::SHOW_VALUE,         true);
-  slider.SetProperty(Slider::Property::MARKS,              false);
-  slider.SetProperty(Slider::Property::SNAP_TO_MARKS,      false);
-  slider.SetProperty(Slider::Property::MARK_TOLERANCE,     0.5f);
+  slider.SetProperty(Slider::Property::LOWER_BOUND, 1.0f);
+  slider.SetProperty(Slider::Property::UPPER_BOUND, 5.0f);
+  slider.SetProperty(Slider::Property::VALUE, 3.0f);
+  slider.SetProperty(Slider::Property::DISABLED_COLOR, Color::BLACK);
+  slider.SetProperty(Slider::Property::VALUE_PRECISION, 4);
+  slider.SetProperty(Slider::Property::SHOW_POPUP, true);
+  slider.SetProperty(Slider::Property::SHOW_VALUE, true);
+  slider.SetProperty(Slider::Property::MARKS, false);
+  slider.SetProperty(Slider::Property::SNAP_TO_MARKS, false);
+  slider.SetProperty(Slider::Property::MARK_TOLERANCE, 0.5f);
 
   float lb = slider.GetProperty<float>(Slider::Property::LOWER_BOUND);
   DALI_TEST_EQUALS(lb, 1.0f, TEST_LOCATION);
@@ -383,75 +379,74 @@ int UtcDaliSetPropertyP(void)
   float val = slider.GetProperty<float>(Slider::Property::VALUE);
   DALI_TEST_EQUALS(val, 3.0f, TEST_LOCATION);
   Vector4 color = slider.GetProperty<Vector4>(Slider::Property::DISABLED_COLOR);
-  DALI_TEST_EQUALS( color, Color::BLACK, TEST_LOCATION );
+  DALI_TEST_EQUALS(color, Color::BLACK, TEST_LOCATION);
   int precision = slider.GetProperty<int>(Slider::Property::VALUE_PRECISION);
-  DALI_TEST_EQUALS( precision, 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(precision, 4, TEST_LOCATION);
   bool showPopup = slider.GetProperty<bool>(Slider::Property::SHOW_POPUP);
-  DALI_TEST_EQUALS( showPopup, true , TEST_LOCATION);
+  DALI_TEST_EQUALS(showPopup, true, TEST_LOCATION);
   bool showValue = slider.GetProperty<bool>(Slider::Property::SHOW_VALUE);
-  DALI_TEST_EQUALS( showValue, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(showValue, true, TEST_LOCATION);
   bool marks = slider.GetProperty<bool>(Slider::Property::MARKS);
-  DALI_TEST_EQUALS( marks, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(marks, false, TEST_LOCATION);
   bool snapToMarks = slider.GetProperty<bool>(Slider::Property::SNAP_TO_MARKS);
-  DALI_TEST_EQUALS( snapToMarks, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(snapToMarks, false, TEST_LOCATION);
   float tolerance = slider.GetProperty<float>(Slider::Property::MARK_TOLERANCE);
-  DALI_TEST_EQUALS( tolerance, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(tolerance, 0.5f, TEST_LOCATION);
 
   {
     Property::Map map;
     map["visualType"] = "IMAGE";
-    map["size"] = Vector2(200, 200);
-    map["url"] = "track2.png";
-    slider.SetProperty(Slider::Property::TRACK_VISUAL,       map);
+    map["size"]       = Vector2(200, 200);
+    map["url"]        = "track2.png";
+    slider.SetProperty(Slider::Property::TRACK_VISUAL, map);
     map["url"] = "handle2.png";
-    slider.SetProperty(Slider::Property::HANDLE_VISUAL,      map);
+    slider.SetProperty(Slider::Property::HANDLE_VISUAL, map);
     map["url"] = "progress2.png";
-    slider.SetProperty(Slider::Property::PROGRESS_VISUAL,    map);
+    slider.SetProperty(Slider::Property::PROGRESS_VISUAL, map);
     map["url"] = "popup2.png";
-    slider.SetProperty(Slider::Property::POPUP_VISUAL,       map);
+    slider.SetProperty(Slider::Property::POPUP_VISUAL, map);
     map["url"] = "popupArrow2.png";
     slider.SetProperty(Slider::Property::POPUP_ARROW_VISUAL, map);
 
-    Property::Value value = slider.GetProperty(Slider::Property::TRACK_VISUAL);
-    Property::Map* resultMap = value.GetMap();
-    DALI_TEST_CHECK( resultMap );
+    Property::Value value     = slider.GetProperty(Slider::Property::TRACK_VISUAL);
+    Property::Map*  resultMap = value.GetMap();
+    DALI_TEST_CHECK(resultMap);
     Property::Value* url = resultMap->Find("url");
-    DALI_TEST_CHECK( url ) ;
-    DALI_TEST_EQUALS( *url, "track2.png", TEST_LOCATION );
+    DALI_TEST_CHECK(url);
+    DALI_TEST_EQUALS(*url, "track2.png", TEST_LOCATION);
 
-    value = slider.GetProperty(Slider::Property::HANDLE_VISUAL);
+    value     = slider.GetProperty(Slider::Property::HANDLE_VISUAL);
     resultMap = value.GetMap();
-    DALI_TEST_CHECK( resultMap );
+    DALI_TEST_CHECK(resultMap);
     url = resultMap->Find("url");
-    DALI_TEST_CHECK( url ) ;
-    DALI_TEST_EQUALS( *url, "handle2.png", TEST_LOCATION );
+    DALI_TEST_CHECK(url);
+    DALI_TEST_EQUALS(*url, "handle2.png", TEST_LOCATION);
 
-    value = slider.GetProperty(Slider::Property::PROGRESS_VISUAL);
+    value     = slider.GetProperty(Slider::Property::PROGRESS_VISUAL);
     resultMap = value.GetMap();
-    DALI_TEST_CHECK( resultMap );
+    DALI_TEST_CHECK(resultMap);
     url = resultMap->Find("url");
-    DALI_TEST_CHECK( url ) ;
-    DALI_TEST_EQUALS( *url, "progress2.png", TEST_LOCATION );
+    DALI_TEST_CHECK(url);
+    DALI_TEST_EQUALS(*url, "progress2.png", TEST_LOCATION);
 
-    value = slider.GetProperty(Slider::Property::POPUP_VISUAL);
+    value     = slider.GetProperty(Slider::Property::POPUP_VISUAL);
     resultMap = value.GetMap();
-    DALI_TEST_CHECK( resultMap );
+    DALI_TEST_CHECK(resultMap);
     url = resultMap->Find("url");
-    DALI_TEST_CHECK( url ) ;
-    DALI_TEST_EQUALS( *url, "popup2.png", TEST_LOCATION );
+    DALI_TEST_CHECK(url);
+    DALI_TEST_EQUALS(*url, "popup2.png", TEST_LOCATION);
 
-    value = slider.GetProperty(Slider::Property::POPUP_ARROW_VISUAL);
+    value     = slider.GetProperty(Slider::Property::POPUP_ARROW_VISUAL);
     resultMap = value.GetMap();
-    DALI_TEST_CHECK( resultMap );
+    DALI_TEST_CHECK(resultMap);
     url = resultMap->Find("url");
-    DALI_TEST_CHECK( url ) ;
-    DALI_TEST_EQUALS( *url, "popupArrow2.png", TEST_LOCATION );
+    DALI_TEST_CHECK(url);
+    DALI_TEST_EQUALS(*url, "popupArrow2.png", TEST_LOCATION);
   }
 
   UnparentAndReset(slider);
   END_TEST;
 }
-
 
 // DestroyHandleVisualDisplay
 // CreateValueDisplay

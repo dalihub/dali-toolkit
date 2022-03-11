@@ -46,7 +46,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(8); // 5 transform properties + ltr, wrap, pixel area,
+const int CUSTOM_PROPERTY_COUNT(3); // ltr, wrap, pixel area,
 
 // stop behavior
 DALI_ENUM_TO_STRING_TABLE_BEGIN(STOP_BEHAVIOR)
@@ -533,7 +533,7 @@ void AnimatedImageVisual::OnSetTransform()
 {
   if(mImpl->mRenderer)
   {
-    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 
@@ -553,11 +553,11 @@ void AnimatedImageVisual::OnInitialize()
 
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 
-  mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   // Register transform properties
-  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 
   if(!defaultWrapMode) // custom wrap mode
   {

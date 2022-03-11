@@ -23,6 +23,7 @@
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/rendering/visual-renderer.h>
 
 //INTERNAL HEARDER
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
@@ -40,7 +41,9 @@ namespace
 Debug::Filter* gVisualBaseLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VISUAL_BASE");
 #endif
 
-const char* const PRE_MULTIPLIED_ALPHA_PROPERTY("preMultipliedAlpha");
+// visual string constants contains OFFSET_SIZE_MODE instead
+const char* const OFFSET_POLICY("offsetPolicy");
+const char* const SIZE_POLICY("sizePolicy");
 
 } // namespace
 
@@ -563,16 +566,12 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
   if(mImpl->mRenderer)
   {
     // Update values from Renderer
-    mImpl->mMixColor   = mImpl->mRenderer.GetProperty<Vector3>(mImpl->mMixColorIndex);
+    mImpl->mMixColor   = mImpl->mRenderer.GetProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR);
     mImpl->mMixColor.a = mImpl->mRenderer.GetProperty<float>(DevelRenderer::Property::OPACITY);
-    if(mImpl->mTransform.mOffsetIndex != Property::INVALID_INDEX)
-    {
-      mImpl->mTransform.mOffset = mImpl->mRenderer.GetProperty<Vector2>(mImpl->mTransform.mOffsetIndex);
-    }
-    if(mImpl->mTransform.mSizeIndex != Property::INVALID_INDEX)
-    {
-      mImpl->mTransform.mSize = mImpl->mRenderer.GetProperty<Vector2>(mImpl->mTransform.mSizeIndex);
-    }
+
+    mImpl->mTransform.mOffset = mImpl->mRenderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET);
+    mImpl->mTransform.mSize   = mImpl->mRenderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE);
+
     if(mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
     {
       mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<Vector4>(mImpl->mCornerRadiusIndex);
@@ -606,7 +605,7 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::Visual::Property::PREMULTIPLIED_ALPHA, premultipliedAlpha);
 
   // Note, Color and Primitive will also insert their own mix color into the map
-  // which is ok, because they have a different key value range.
+  // which is ok, because they have a different key value range, but uses same cached value anyway.
   map.Insert(Toolkit::Visual::Property::MIX_COLOR, mImpl->mMixColor); // vec4
   map.Insert(Toolkit::Visual::Property::OPACITY, mImpl->mMixColor.a);
 
@@ -646,7 +645,7 @@ void Visual::Base::EnablePreMultipliedAlpha(bool preMultiplied)
   if(mImpl->mRenderer)
   {
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, preMultiplied);
-    mImpl->mRenderer.RegisterProperty(PRE_MULTIPLIED_ALPHA_PROPERTY, static_cast<float>(preMultiplied));
+    mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, preMultiplied);
   }
 }
 
@@ -702,24 +701,19 @@ void Visual::Base::OnDoAction(const Property::Index actionId, const Property::Va
 
 void Visual::Base::RegisterMixColor()
 {
-  // Only register if not already registered.
-  // (Color and Primitive visuals will register their own and save to this index)
-  if(mImpl->mMixColorIndex == Property::INVALID_INDEX)
+  if(mImpl->mRenderer)
   {
-    mImpl->mMixColorIndex = mImpl->mRenderer.RegisterUniqueProperty(
-      Toolkit::Visual::Property::MIX_COLOR,
-      MIX_COLOR,
-      Vector3(mImpl->mMixColor));
-  }
+    // All visual renderers now use same mix color / opacity properties.
+    mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, Vector3(mImpl->mMixColor));
+    mImpl->mRenderer.SetProperty(DevelRenderer::Property::OPACITY, mImpl->mMixColor.a);
 
-  mImpl->mRenderer.SetProperty(DevelRenderer::Property::OPACITY, mImpl->mMixColor.a);
-
-  float preMultipliedAlpha = 0.0f;
-  if(IsPreMultipliedAlphaEnabled())
-  {
-    preMultipliedAlpha = 1.0f;
+    float preMultipliedAlpha = 0.0f;
+    if(IsPreMultipliedAlphaEnabled())
+    {
+      preMultipliedAlpha = 1.0f;
+    }
+    mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, preMultipliedAlpha);
   }
-  mImpl->mRenderer.RegisterProperty(PRE_MULTIPLIED_ALPHA_PROPERTY, preMultipliedAlpha);
 }
 
 void Visual::Base::SetMixColor(const Vector4& color)
@@ -728,7 +722,7 @@ void Visual::Base::SetMixColor(const Vector4& color)
 
   if(mImpl->mRenderer)
   {
-    mImpl->mRenderer.SetProperty(mImpl->mMixColorIndex, Vector3(color));
+    mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, Vector3(color));
     mImpl->mRenderer.SetProperty(DevelRenderer::Property::OPACITY, color.a);
   }
 }
@@ -741,7 +735,7 @@ void Visual::Base::SetMixColor(const Vector3& color)
 
   if(mImpl->mRenderer)
   {
-    mImpl->mRenderer.SetProperty(mImpl->mMixColorIndex, color);
+    mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, color);
   }
 }
 
@@ -804,8 +798,123 @@ Renderer Visual::Base::GetRenderer()
   return mImpl->mRenderer;
 }
 
+Property::Index Visual::Base::GetIntKey(Property::Key key)
+{
+  if(key.type == Property::Key::INDEX)
+  {
+    return key.indexKey;
+  }
+
+  if(key.stringKey == ANCHOR_POINT)
+  {
+    return Toolkit::Visual::Transform::Property::ANCHOR_POINT;
+  }
+  else if(key.stringKey == EXTRA_SIZE)
+  {
+    return Toolkit::DevelVisual::Transform::Property::EXTRA_SIZE;
+  }
+  else if(key.stringKey == MIX_COLOR)
+  {
+    return Toolkit::Visual::Property::MIX_COLOR;
+  }
+  else if(key.stringKey == OPACITY)
+  {
+    return Toolkit::Visual::Property::OPACITY;
+  }
+  else if(key.stringKey == OFFSET)
+  {
+    return Toolkit::Visual::Transform::Property::OFFSET;
+  }
+  else if(key.stringKey == OFFSET_POLICY)
+  {
+    return Toolkit::Visual::Transform::Property::OFFSET_POLICY;
+  }
+  else if(key.stringKey == ORIGIN)
+  {
+    return Toolkit::Visual::Transform::Property::ORIGIN;
+  }
+  else if(key.stringKey == PREMULTIPLIED_ALPHA)
+  {
+    return Toolkit::Visual::Property::PREMULTIPLIED_ALPHA;
+  }
+  else if(key.stringKey == CUSTOM_SHADER)
+  {
+    return Toolkit::Visual::Property::SHADER;
+  }
+  else if(key.stringKey == SIZE)
+  {
+    return Toolkit::Visual::Transform::Property::SIZE;
+  }
+  else if(key.stringKey == SIZE_POLICY)
+  {
+    return Toolkit::Visual::Transform::Property::SIZE_POLICY;
+  }
+  else if(key.stringKey == TRANSFORM)
+  {
+    return Toolkit::Visual::Property::TRANSFORM;
+  }
+  else if(key.stringKey == VISUAL_FITTING_MODE)
+  {
+    return Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE;
+  }
+  else if(key.stringKey == CORNER_RADIUS)
+  {
+    return Toolkit::DevelVisual::Property::CORNER_RADIUS;
+  }
+  else if(key.stringKey == CORNER_RADIUS_POLICY)
+  {
+    return Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY;
+  }
+  else if(key.stringKey == BORDERLINE_WIDTH)
+  {
+    return Toolkit::DevelVisual::Property::BORDERLINE_WIDTH;
+  }
+  else if(key.stringKey == BORDERLINE_COLOR)
+  {
+    return Toolkit::DevelVisual::Property::BORDERLINE_COLOR;
+  }
+  else if(key.stringKey == BORDERLINE_OFFSET)
+  {
+    return Toolkit::DevelVisual::Property::BORDERLINE_OFFSET;
+  }
+
+  return Property::INVALID_INDEX;
+}
+
 Property::Index Visual::Base::GetPropertyIndex(Property::Key key)
 {
+  switch(GetIntKey(key))
+  {
+    case Dali::Toolkit::Visual::Transform::Property::OFFSET:
+    {
+      return VisualRenderer::Property::TRANSFORM_OFFSET;
+    }
+    case Dali::Toolkit::Visual::Transform::Property::SIZE:
+    {
+      return VisualRenderer::Property::TRANSFORM_SIZE;
+    }
+    case Dali::Toolkit::Visual::Transform::Property::ORIGIN:
+    {
+      return VisualRenderer::Property::TRANSFORM_ORIGIN;
+    }
+    case Dali::Toolkit::Visual::Transform::Property::ANCHOR_POINT:
+    {
+      return VisualRenderer::Property::TRANSFORM_ANCHOR_POINT;
+    }
+    case Dali::Toolkit::Visual::Property::MIX_COLOR:
+    {
+      return VisualRenderer::Property::VISUAL_MIX_COLOR;
+    }
+    case Dali::Toolkit::Visual::Property::OPACITY:
+    {
+      return DevelRenderer::Property::OPACITY;
+    }
+    case Dali::Toolkit::Visual::Property::PREMULTIPLIED_ALPHA:
+    {
+      return VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA;
+    }
+  }
+
   Property::Index index = mImpl->mRenderer.GetPropertyIndex(key);
 
   if(index == Property::INVALID_INDEX)
@@ -924,7 +1033,9 @@ void Visual::Base::AnimateRendererProperty(
   Dali::Animation&                    transition,
   Internal::TransitionData::Animator& animator)
 {
+  // Get actual renderer index (will convert transform keys into visualproperty indices)
   Property::Index index = GetPropertyIndex(animator.propertyKey);
+
   if(index != Property::INVALID_INDEX)
   {
     if(animator.targetValue.GetType() != Property::NONE)
@@ -943,7 +1054,6 @@ void Visual::Base::AnimateRendererProperty(
 
       mImpl->mTransform.UpdatePropertyMap(map);
     }
-
     SetupTransition(transition, animator, index, animator.initialValue, animator.targetValue);
   }
 }
@@ -952,50 +1062,47 @@ void Visual::Base::AnimateMixColorProperty(
   Dali::Animation&                    transition,
   Internal::TransitionData::Animator& animator)
 {
-  Property::Index index          = mImpl->mMixColorIndex;
-  bool            animateOpacity = false;
+  bool animateOpacity = false;
 
   Property::Value initialOpacity;
   Property::Value targetOpacity;
   Property::Value initialMixColor;
   Property::Value targetMixColor;
 
-  if(index != Property::INVALID_INDEX)
+  Vector4 initialColor;
+  if(animator.initialValue.Get(initialColor))
   {
-    Vector4 initialColor;
-    if(animator.initialValue.Get(initialColor))
+    if(animator.initialValue.GetType() == Property::VECTOR4)
     {
-      if(animator.initialValue.GetType() == Property::VECTOR4)
-      {
-        // if there is an initial color specifying alpha, test it
-        initialOpacity = initialColor.a;
-      }
-      initialMixColor = Vector3(initialColor);
+      // if there is an initial color specifying alpha, test it
+      initialOpacity = initialColor.a;
+    }
+    initialMixColor = Vector3(initialColor);
+  }
+
+  // Set target value into data store
+  if(animator.targetValue.GetType() != Property::NONE)
+  {
+    Vector4 mixColor;
+    animator.targetValue.Get(mixColor);
+    if(animator.targetValue.GetType() == Property::VECTOR4)
+    {
+      mImpl->mMixColor.a = mixColor.a;
+      targetOpacity      = mixColor.a;
+      animateOpacity     = true;
     }
 
-    // Set target value into data store
-    if(animator.targetValue.GetType() != Property::NONE)
-    {
-      Vector4 mixColor;
-      animator.targetValue.Get(mixColor);
-      if(animator.targetValue.GetType() == Property::VECTOR4)
-      {
-        mImpl->mMixColor.a = mixColor.a;
-        targetOpacity      = mixColor.a;
-        animateOpacity     = true;
-      }
+    mImpl->mMixColor.r = mixColor.r;
+    mImpl->mMixColor.g = mixColor.g;
+    mImpl->mMixColor.b = mixColor.b;
+    targetMixColor     = Vector3(mixColor);
+  }
 
-      mImpl->mMixColor.r = mixColor.r;
-      mImpl->mMixColor.g = mixColor.g;
-      mImpl->mMixColor.b = mixColor.b;
-      targetMixColor     = Vector3(mixColor);
-    }
+  SetupTransition(transition, animator, VisualRenderer::Property::VISUAL_MIX_COLOR, initialMixColor, targetMixColor);
 
-    SetupTransition(transition, animator, index, initialMixColor, targetMixColor);
-    if(animateOpacity)
-    {
-      SetupTransition(transition, animator, DevelRenderer::Property::OPACITY, initialOpacity, targetOpacity);
-    }
+  if(animateOpacity)
+  {
+    SetupTransition(transition, animator, DevelRenderer::Property::OPACITY, initialOpacity, targetOpacity);
   }
 }
 
@@ -1007,43 +1114,33 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     return Dali::Property(handle, Property::INVALID_INDEX);
   }
 
-  // Mix color or opacity cases
-  if(key.type == Property::Key::INDEX)
+  // Default animatable properties from VisualRenderer
+  switch(GetIntKey(key))
   {
-    if(key.indexKey == Toolkit::Visual::Property::MIX_COLOR || (mImpl->mType == Toolkit::Visual::COLOR && key.indexKey == ColorVisual::Property::MIX_COLOR) || (mImpl->mType == Toolkit::Visual::PRIMITIVE && key.indexKey == PrimitiveVisual::Property::MIX_COLOR))
+    case Toolkit::Visual::Property::MIX_COLOR:
     {
-      return Dali::Property(mImpl->mRenderer, mImpl->mMixColorIndex);
+      return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::VISUAL_MIX_COLOR);
     }
-    else if(key.indexKey == Toolkit::Visual::Property::OPACITY)
+    case Toolkit::Visual::Property::OPACITY:
     {
       return Dali::Property(mImpl->mRenderer, DevelRenderer::Property::OPACITY);
     }
-    else if(key.indexKey == Toolkit::Visual::Transform::Property::OFFSET)
+    case Toolkit::Visual::Transform::Property::OFFSET:
     {
-      return Dali::Property(mImpl->mRenderer, OFFSET);
+      return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::TRANSFORM_OFFSET);
     }
-    else if(key.indexKey == Toolkit::Visual::Transform::Property::SIZE)
+    case Toolkit::Visual::Transform::Property::SIZE:
     {
-      return Dali::Property(mImpl->mRenderer, SIZE);
+      return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::TRANSFORM_SIZE);
     }
-  }
-  else
-  {
-    if(key.stringKey == MIX_COLOR)
+    default:
     {
-      return Dali::Property(mImpl->mRenderer, mImpl->mMixColorIndex);
-    }
-    else if(key.stringKey == OPACITY)
-    {
-      return Dali::Property(mImpl->mRenderer, DevelRenderer::Property::OPACITY);
-    }
-    else if(key.stringKey == OFFSET)
-    {
-      return Dali::Property(mImpl->mRenderer, OFFSET);
-    }
-    else if(key.stringKey == SIZE)
-    {
-      return Dali::Property(mImpl->mRenderer, SIZE);
+      if(key.type == Property::Key::INDEX &&
+         ((mImpl->mType == Toolkit::Visual::COLOR && key.indexKey == ColorVisual::Property::MIX_COLOR) ||
+          (mImpl->mType == Toolkit::Visual::PRIMITIVE && key.indexKey == PrimitiveVisual::Property::MIX_COLOR)))
+      {
+        return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::VISUAL_MIX_COLOR);
+      }
     }
   }
 

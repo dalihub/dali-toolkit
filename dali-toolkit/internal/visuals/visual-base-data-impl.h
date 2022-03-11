@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/math/vector2.h>
-#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/rendering/visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -96,14 +96,9 @@ struct Base::Impl
     void UpdatePropertyMap(const Property::Map& map);
 
     /**
-     * Register the uniform properties onto the renderer
-     */
-    void RegisterUniforms(Renderer renderer, Toolkit::Direction::Type direction);
-
-    /**
      * Set the uniform properties onto the renderer
      */
-    void SetUniforms(Renderer renderer, Toolkit::Direction::Type direction);
+    void SetUniforms(VisualRenderer renderer, Toolkit::Direction::Type direction);
 
     /**
      * Convert the control size and the transform attributes into the actual
@@ -117,11 +112,9 @@ struct Base::Impl
     Vector4              mOffsetSizeMode;
     Toolkit::Align::Type mOrigin;
     Toolkit::Align::Type mAnchorPoint;
-    Property::Index      mOffsetIndex{Property::INVALID_INDEX};
-    Property::Index      mSizeIndex{Property::INVALID_INDEX};
   };
 
-  Renderer                        mRenderer;
+  VisualRenderer                  mRenderer;
   CustomShader*                   mCustomShader;
   EventObserver*                  mEventObserver; ///< Allows controls to observe when the visual has events to notify
   std::string                     mName;
@@ -134,7 +127,6 @@ struct Base::Impl
   Vector4                         mCornerRadius;
   float                           mCornerRadiusPolicy;
   int                             mDepthIndex;
-  Property::Index                 mMixColorIndex;
   Property::Index                 mBorderlineWidthIndex;
   Property::Index                 mBorderlineColorIndex;
   Property::Index                 mBorderlineOffsetIndex;

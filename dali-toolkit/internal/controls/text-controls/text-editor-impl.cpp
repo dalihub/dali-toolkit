@@ -1537,6 +1537,24 @@ bool TextEditor::AccessibleImpl::SetRangeOfSelection(size_t selectionIndex, size
   return true;
 }
 
+Rect<> TextEditor::AccessibleImpl::GetRangeExtents(size_t startOffset, size_t endOffset, Accessibility::CoordinateType type)
+{
+  if (endOffset <= startOffset || endOffset <= 0)
+  {
+    return {0, 0, 0, 0};
+  }
+
+  auto self = Toolkit::TextEditor::DownCast(Self());
+  auto rect = Dali::Toolkit::GetImpl(self).GetTextController()->GetTextBoundingRectangle(startOffset, endOffset - 1);
+
+  auto componentExtents = this->GetExtents(type);
+
+  rect.x += componentExtents.x;
+  rect.y += componentExtents.y;
+
+  return rect;
+}
+
 bool TextEditor::AccessibleImpl::CopyText(size_t startPosition, size_t endPosition)
 {
   if(endPosition <= startPosition)

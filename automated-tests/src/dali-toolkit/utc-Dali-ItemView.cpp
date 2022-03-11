@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  *
  */
 
-#include <iostream>
+#include <float.h> // for FLT_MAX
 #include <stdlib.h>
-#include <float.h>       // for FLT_MAX
+#include <iostream>
 
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
@@ -41,16 +41,15 @@ void utc_dali_toolkit_item_view_cleanup(void)
 
 namespace
 {
+const unsigned int TOTAL_ITEM_NUMBER    = 400;
+const char*        TEST_IMAGE_FILE_NAME = "gallery_image_01.jpg";
 
-const unsigned int TOTAL_ITEM_NUMBER = 400;
-const char* TEST_IMAGE_FILE_NAME = "gallery_image_01.jpg";
-
-const int RENDER_FRAME_INTERVAL = 16;                     ///< Duration of each frame in ms. (at approx 60FPS)
+const int RENDER_FRAME_INTERVAL = 16; ///< Duration of each frame in ms. (at approx 60FPS)
 
 static bool gObjectCreatedCallBackCalled;
-static bool gOnLayoutActivatedCalled;                     ///< Whether the LayoutActivated signal was invoked.
+static bool gOnLayoutActivatedCalled; ///< Whether the LayoutActivated signal was invoked.
 static bool gOnScrollUpdateCalled;
-static bool gOnWheelEventCalled;                          ///< Whether the WheelEventSignal signal was invoked.
+static bool gOnWheelEventCalled; ///< Whether the WheelEventSignal signal was invoked.
 
 static void TestCallback(BaseHandle handle)
 {
@@ -62,27 +61,27 @@ static void OnLayoutActivated()
   gOnLayoutActivatedCalled = true;
 }
 
-static void OnScrollUpdate( const Vector2& position )
+static void OnScrollUpdate(const Vector2& position)
 {
   gOnScrollUpdateCalled = true;
 }
 
-static bool OnWheelEvent( Actor actor, const Dali::WheelEvent& wheelEvent )
+static bool OnWheelEvent(Actor actor, const Dali::WheelEvent& wheelEvent)
 {
   gOnWheelEventCalled = true;
   return false;
 }
 
-Integration::TouchEvent GenerateSingleTouch( PointState::Type state, const Vector2& screenPosition, uint32_t time )
+Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
 {
   Integration::TouchEvent touchEvent;
-  Integration::Point point;
-  point.SetState( state );
+  Integration::Point      point;
+  point.SetState(state);
   point.SetDeviceId(4);
-  point.SetScreenPosition( screenPosition );
-  point.SetDeviceClass( Device::Class::TOUCH );
-  point.SetDeviceSubclass( Device::Subclass::NONE );
-  touchEvent.points.push_back( point );
+  point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
   touchEvent.time = time;
   return touchEvent;
 }
@@ -100,7 +99,7 @@ int Wait(ToolkitTestApplication& application, int duration = 0)
 {
   int time = 0;
 
-  for(int i = 0; i <= ( duration / RENDER_FRAME_INTERVAL); i++)
+  for(int i = 0; i <= (duration / RENDER_FRAME_INTERVAL); i++)
   {
     application.SendNotification();
     application.Render(RENDER_FRAME_INTERVAL);
@@ -114,7 +113,6 @@ int Wait(ToolkitTestApplication& application, int duration = 0)
 class TestItemFactory : public ItemFactory
 {
 public:
-
   /**
    * Constructor
    * @param application class, stored as reference
@@ -124,7 +122,6 @@ public:
   }
 
 public: // From ItemFactory
-
   /**
    * Query the number of items available from the factory.
    * The maximum available item has an ID of GetNumberOfItems() - 1.
@@ -142,12 +139,11 @@ public: // From ItemFactory
   virtual Actor NewItem(unsigned int itemId)
   {
     // Create a renderable actor for this item
-    return ImageView::New( TEST_IMAGE_FILE_NAME );
+    return ImageView::New(TEST_IMAGE_FILE_NAME);
   }
 };
 
 } // namespace
-
 
 int UtcDaliItemViewNew(void)
 {
@@ -155,21 +151,21 @@ int UtcDaliItemViewNew(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   DALI_TEST_CHECK(view);
 
   //Additional check to ensure object is created by checking if it's registered
   ObjectRegistry registry = application.GetCore().GetObjectRegistry();
-  DALI_TEST_CHECK( registry );
+  DALI_TEST_CHECK(registry);
 
   gObjectCreatedCallBackCalled = false;
   registry.ObjectCreatedSignal().Connect(&TestCallback);
   {
     TestItemFactory factory;
-    ItemView view = ItemView::New(factory);
+    ItemView        view = ItemView::New(factory);
   }
-  DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
+  DALI_TEST_CHECK(gObjectCreatedCallBackCalled);
   END_TEST;
 }
 
@@ -178,11 +174,11 @@ int UtcDaliItemViewCopyConstructor(void)
   ToolkitTestApplication application;
 
   TestItemFactory factory;
-  ItemView itemView = ItemView::New( factory );
-  DALI_TEST_CHECK( itemView );
+  ItemView        itemView = ItemView::New(factory);
+  DALI_TEST_CHECK(itemView);
 
-  ItemView copy( itemView );
-  DALI_TEST_CHECK( copy );
+  ItemView copy(itemView);
+  DALI_TEST_CHECK(copy);
 
   END_TEST;
 }
@@ -192,13 +188,13 @@ int UtcDaliItemViewCopyAssignment(void)
   ToolkitTestApplication application;
 
   TestItemFactory factory;
-  ItemView itemView = ItemView::New( factory );
-  DALI_TEST_CHECK( itemView );
+  ItemView        itemView = ItemView::New(factory);
+  DALI_TEST_CHECK(itemView);
 
   ItemView copy;
   copy = itemView;
-  DALI_TEST_CHECK( copy );
-  DALI_TEST_EQUALS( itemView, copy, TEST_LOCATION );
+  DALI_TEST_CHECK(copy);
+  DALI_TEST_EQUALS(itemView, copy, TEST_LOCATION);
 
   END_TEST;
 }
@@ -208,16 +204,16 @@ int UtcDaliItemViewMoveConstructor(void)
   ToolkitTestApplication application;
 
   TestItemFactory factory;
-  ItemView itemView = ItemView::New( factory );
-  DALI_TEST_EQUALS( 1, itemView.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  itemView.SetProperty( Actor::Property::SENSITIVE, false );
-  DALI_TEST_CHECK( false == itemView.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  ItemView        itemView = ItemView::New(factory);
+  DALI_TEST_EQUALS(1, itemView.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  itemView.SetProperty(Actor::Property::SENSITIVE, false);
+  DALI_TEST_CHECK(false == itemView.GetProperty<bool>(Actor::Property::SENSITIVE));
 
-  ItemView moved = std::move( itemView );
-  DALI_TEST_CHECK( moved );
-  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
-  DALI_TEST_CHECK( !itemView );
+  ItemView moved = std::move(itemView);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_EQUALS(1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(false == moved.GetProperty<bool>(Actor::Property::SENSITIVE));
+  DALI_TEST_CHECK(!itemView);
 
   END_TEST;
 }
@@ -227,17 +223,17 @@ int UtcDaliItemViewMoveAssignment(void)
   ToolkitTestApplication application;
 
   TestItemFactory factory;
-  ItemView itemView = ItemView::New( factory );
-  DALI_TEST_EQUALS( 1, itemView.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  itemView.SetProperty( Actor::Property::SENSITIVE, false );
-  DALI_TEST_CHECK( false == itemView.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  ItemView        itemView = ItemView::New(factory);
+  DALI_TEST_EQUALS(1, itemView.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  itemView.SetProperty(Actor::Property::SENSITIVE, false);
+  DALI_TEST_CHECK(false == itemView.GetProperty<bool>(Actor::Property::SENSITIVE));
 
   ItemView moved;
-  moved = std::move( itemView );
-  DALI_TEST_CHECK( moved );
-  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
-  DALI_TEST_CHECK( !itemView );
+  moved = std::move(itemView);
+  DALI_TEST_CHECK(moved);
+  DALI_TEST_EQUALS(1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(false == moved.GetProperty<bool>(Actor::Property::SENSITIVE));
+  DALI_TEST_CHECK(!itemView);
 
   END_TEST;
 }
@@ -248,14 +244,14 @@ int UtcDaliItemViewDownCast(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  const ItemView itemViewConst = ItemView::New(factory);
-  ItemView itemView(itemViewConst);
+  const ItemView  itemViewConst = ItemView::New(factory);
+  ItemView        itemView(itemViewConst);
 
   BaseHandle handle(itemView);
 
-  ItemView newItemView = ItemView::DownCast( handle );
-  DALI_TEST_CHECK( itemView );
-  DALI_TEST_CHECK( newItemView == itemView );
+  ItemView newItemView = ItemView::DownCast(handle);
+  DALI_TEST_CHECK(itemView);
+  DALI_TEST_CHECK(newItemView == itemView);
   END_TEST;
 }
 
@@ -265,24 +261,24 @@ int UtcDaliItemViewAddAndGetLayout(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
   view.AddLayout(*gridLayout);
 
   // As we have added one layout, check the number of layout is now 1
   DALI_TEST_CHECK(view.GetLayoutCount() == 1);
 
   // Create a depth layout and add it to ItemView
-  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New(DefaultItemLayout::DEPTH);
   view.AddLayout(*depthLayout);
 
   // As we have added another layout, check the number of layout is now 2
   DALI_TEST_CHECK(view.GetLayoutCount() == 2);
 
   // Create a spiral layout and add it to ItemView
-  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New(DefaultItemLayout::SPIRAL);
   view.AddLayout(*spiralLayout);
 
   // As we have added another layout, check the number of layout is now 3
@@ -301,17 +297,17 @@ int UtcDaliItemViewAddAndRemoveLayout(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
   view.AddLayout(*gridLayout);
 
   // As we have added one layout, check the number of layout is now 1
   DALI_TEST_CHECK(view.GetLayoutCount() == 1);
 
   // Create a depth layout and add it to ItemView
-  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New(DefaultItemLayout::DEPTH);
   view.AddLayout(*depthLayout);
 
   // As we have added another layout, check the number of layout is now 2
@@ -344,18 +340,18 @@ int UtcDaliItemViewActivateLayoutAndGetActiveLayout(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
   view.AddLayout(*gridLayout);
 
   // Create a depth layout and add it to ItemView
-  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New(DefaultItemLayout::DEPTH);
   view.AddLayout(*depthLayout);
 
   // Create a spiral layout and add it to ItemView
-  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New(DefaultItemLayout::SPIRAL);
   view.AddLayout(*spiralLayout);
 
   // As we have added three layouts, check the number of layout is now 3
@@ -391,10 +387,10 @@ int UtcDaliItemViewDeactivateCurrentLayout(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
   gridLayout->SetOrientation(ControlOrientation::Down);
   view.AddLayout(*gridLayout);
 
@@ -422,10 +418,10 @@ int UtcDaliItemViewGetItemAndGetItemId(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
   gridLayout->SetOrientation(ControlOrientation::Left);
   view.AddLayout(*gridLayout);
 
@@ -447,10 +443,10 @@ int UtcDaliItemViewRemoveItem(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
   gridLayout->SetOrientation(ControlOrientation::Right);
   view.AddLayout(*gridLayout);
 
@@ -502,10 +498,10 @@ int UtcDaliItemViewGetCurrentLayoutPosition(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a depth layout and add it to ItemView
-  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New(DefaultItemLayout::DEPTH);
   depthLayout->SetOrientation(ControlOrientation::Up);
   view.AddLayout(*depthLayout);
 
@@ -514,7 +510,7 @@ int UtcDaliItemViewGetCurrentLayoutPosition(void)
   view.ActivateLayout(0, stageSize, 0.0f);
 
   // Check the current layout position for the 10th items is 9.0f
-  DALI_TEST_EQUALS(view.GetCurrentLayoutPosition(9), 9.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetCurrentLayoutPosition(9), 9.0f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -524,13 +520,13 @@ int UtcDaliItemViewSetAndGetMinimumSwipeSpeed(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Set the minimum swipe speed to be 1.5f
   view.SetMinimumSwipeSpeed(1.5f);
 
   // Check the minimum swipe speed is 1.5f
-  DALI_TEST_EQUALS(view.GetMinimumSwipeSpeed(), 1.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetMinimumSwipeSpeed(), 1.5f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -540,13 +536,13 @@ int UtcDaliItemViewSetAndGetMinimumSwipeDistance(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Set the minimum swipe distance to be 2.5f
   view.SetMinimumSwipeDistance(2.5f);
 
   // Check the minimum swipe distance is 2.5f
-  DALI_TEST_EQUALS(view.GetMinimumSwipeDistance(), 2.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetMinimumSwipeDistance(), 2.5f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -556,7 +552,7 @@ int UtcDaliItemViewSetAndGetAnchoring(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Disable the anchor animation
   view.SetAnchoring(false);
@@ -572,13 +568,13 @@ int UtcDaliItemViewSetAndGetAnchoringDuration(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Set the duration of anchor animation to be 1.5f
   view.SetAnchoringDuration(1.5f);
 
   // Check the duration of anchor animation is 1.5f
-  DALI_TEST_EQUALS(view.GetAnchoringDuration(), 1.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetAnchoringDuration(), 1.5f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -588,7 +584,7 @@ int UtcDaliItemViewSetAndGetRefreshInterval(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Set the interval between refreshes to be 20
   view.SetRefreshInterval(20);
@@ -606,13 +602,13 @@ int UtcDaliItemViewScrollToItem(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
-  Vector3 vec(480.0f, 800.0f, 0.0f);
-  ItemLayoutPtr layout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
+  ItemView        view = ItemView::New(factory);
+  Vector3         vec(480.0f, 800.0f, 0.0f);
+  ItemLayoutPtr   layout = DefaultItemLayout::New(DefaultItemLayout::DEPTH);
 
-  view.SetProperty( Dali::Actor::Property::NAME,"view actor");
+  view.SetProperty(Dali::Actor::Property::NAME, "view actor");
   view.AddLayout(*layout);
-  view.SetProperty( Actor::Property::SIZE, vec );
+  view.SetProperty(Actor::Property::SIZE, vec);
 
   application.GetScene().Add(view);
   layout->SetOrientation(ControlOrientation::Down);
@@ -632,7 +628,7 @@ int UtcDaliItemViewScrollToItem(void)
   for(unsigned int i = 0; i < 10; i++)
   {
     Actor testActor = view.GetItem(i);
-    if (testActor)
+    if(testActor)
     {
       indices.push_back(i);
     }
@@ -640,9 +636,9 @@ int UtcDaliItemViewScrollToItem(void)
 
   try
   {
-    if (!indices.empty())
+    if(!indices.empty())
     {
-      const unsigned int firstTargetIndex = indices[indices.size()-1];
+      const unsigned int firstTargetIndex = indices[indices.size() - 1];
       // scroll to last item
       view.ScrollToItem(firstTargetIndex, 0.00f);
       for(int i = 0; i < 10; ++i)
@@ -657,7 +653,7 @@ int UtcDaliItemViewScrollToItem(void)
         view.ScrollToItem(indices[i], 0.0f);
         float layoutPosAfter = view.GetCurrentLayoutPosition(i);
 
-        if (fabs(layoutPosBefore-layoutPosAfter) <= FLT_EPSILON)
+        if(fabs(layoutPosBefore - layoutPosAfter) <= FLT_EPSILON)
         {
           ++moveCount;
         }
@@ -681,13 +677,13 @@ int UtcDaliItemViewSetAndGetWheelScrollDistanceStep(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Set the scroll distance step for the wheel event to be 100.0f
   view.SetWheelScrollDistanceStep(100.0f);
 
   // Check the scroll distance step is 100.0f
-  DALI_TEST_EQUALS(view.GetWheelScrollDistanceStep(), 100.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetWheelScrollDistanceStep(), 100.0f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -697,10 +693,10 @@ int UtcDaliItemViewInsertItemP(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID);
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
   gridLayout->SetOrientation(ControlOrientation::Left);
   view.AddLayout(*gridLayout);
 
@@ -711,7 +707,7 @@ int UtcDaliItemViewInsertItemP(void)
   // Get the specified item where new item to be inserted before that
   Actor itemActor = view.GetItem(2);
 
-  ItemId id = view.GetItemId( itemActor );
+  ItemId id = view.GetItemId(itemActor);
 
   // Check we are getting the correct Item ID given the specified actor
   DALI_TEST_CHECK(view.GetItemId(itemActor) == 2);
@@ -754,10 +750,10 @@ int UtcDaliItemViewInsertItemsP(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a depth layout and add it to ItemView
-  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH);
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New(DefaultItemLayout::DEPTH);
   depthLayout->SetOrientation(ControlOrientation::Right);
   view.AddLayout(*depthLayout);
 
@@ -775,17 +771,17 @@ int UtcDaliItemViewInsertItemsP(void)
 
   ItemContainer insertList;
 
-  for( unsigned int i = 1u; i < 11; ++i )
+  for(unsigned int i = 1u; i < 11; ++i)
   {
-    Actor child = view.GetChildAt( i );
+    Actor child    = view.GetChildAt(i);
     Actor newActor = Actor::New();
-    newActor.SetProperty( Dali::Actor::Property::NAME,"Inserted");
-    insertList.push_back( Item( view.GetItemId(child), newActor ) );
+    newActor.SetProperty(Dali::Actor::Property::NAME, "Inserted");
+    insertList.push_back(Item(view.GetItemId(child), newActor));
   }
 
-  if( !insertList.empty() )
+  if(!insertList.empty())
   {
-    view.InsertItems( insertList, 0.5f );
+    view.InsertItems(insertList, 0.5f);
   }
 
   DALI_TEST_CHECK(view.GetChildCount() == itemCount + 10);
@@ -796,19 +792,19 @@ int UtcDaliItemViewInsertItemsP(void)
 
   ItemIdContainer removeList;
 
-  for( unsigned int i = 0u; i < view.GetChildCount(); ++i )
+  for(unsigned int i = 0u; i < view.GetChildCount(); ++i)
   {
-    Actor child = view.GetChildAt( i );
+    Actor child = view.GetChildAt(i);
 
-    if( child.GetProperty< std::string >( Dali::Actor::Property::NAME ) == "Inserted" )
+    if(child.GetProperty<std::string>(Dali::Actor::Property::NAME) == "Inserted")
     {
-      removeList.push_back( view.GetItemId(child) );
+      removeList.push_back(view.GetItemId(child));
     }
   }
 
-  if( ! removeList.empty() )
+  if(!removeList.empty())
   {
-    view.RemoveItems( removeList, 0.5f );
+    view.RemoveItems(removeList, 0.5f);
   }
 
   DALI_TEST_CHECK(view.GetChildCount() == itemCount);
@@ -826,10 +822,10 @@ int UtcDaliItemViewReplaceItemP(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a spiral layout and add it to ItemView
-  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New(DefaultItemLayout::SPIRAL);
   view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -838,7 +834,7 @@ int UtcDaliItemViewReplaceItemP(void)
 
   Actor newActor = Actor::New();
 
-  view.ReplaceItem( Item( 5, newActor ), 0.5f );
+  view.ReplaceItem(Item(5, newActor), 0.5f);
 
   DALI_TEST_CHECK(view.GetItem(5) == newActor);
 
@@ -851,11 +847,11 @@ int UtcDaliItemViewReplaceItemsP(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a spiral layout and add it to ItemView
-  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
-  spiralLayout->SetOrientation( ControlOrientation::Down );
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New(DefaultItemLayout::SPIRAL);
+  spiralLayout->SetOrientation(ControlOrientation::Down);
   view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -864,22 +860,22 @@ int UtcDaliItemViewReplaceItemsP(void)
 
   ItemContainer replaceList;
 
-  for( unsigned int i = 0u; i < 10; ++i )
+  for(unsigned int i = 0u; i < 10; ++i)
   {
-    Actor child = view.GetItem( i );
+    Actor child    = view.GetItem(i);
     Actor newActor = Actor::New();
-    newActor.SetProperty( Dali::Actor::Property::NAME,"Replaced");
+    newActor.SetProperty(Dali::Actor::Property::NAME, "Replaced");
 
-    replaceList.push_back( Item( i, newActor ) );
+    replaceList.push_back(Item(i, newActor));
   }
 
-  if( !replaceList.empty() )
+  if(!replaceList.empty())
   {
-    view.ReplaceItems( replaceList, 0.5f );
+    view.ReplaceItems(replaceList, 0.5f);
   }
 
-  DALI_TEST_CHECK(view.GetItem(0).GetProperty< std::string >( Dali::Actor::Property::NAME ) == "Replaced");
-  DALI_TEST_CHECK(view.GetItem(8).GetProperty< std::string >( Dali::Actor::Property::NAME ) == "Replaced");
+  DALI_TEST_CHECK(view.GetItem(0).GetProperty<std::string>(Dali::Actor::Property::NAME) == "Replaced");
+  DALI_TEST_CHECK(view.GetItem(8).GetProperty<std::string>(Dali::Actor::Property::NAME) == "Replaced");
   END_TEST;
 }
 
@@ -889,11 +885,11 @@ int UtcDaliItemViewGetItemsRangeP(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a spiral layout and add it to ItemView
-  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
-  spiralLayout->SetOrientation( ControlOrientation::Left );
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New(DefaultItemLayout::SPIRAL);
+  spiralLayout->SetOrientation(ControlOrientation::Left);
   view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -914,11 +910,11 @@ int UtcDaliItemViewSetItemsAnchorPointP(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a spiral layout and add it to ItemView
-  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
-  spiralLayout->SetOrientation( ControlOrientation::Right );
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New(DefaultItemLayout::SPIRAL);
+  spiralLayout->SetOrientation(ControlOrientation::Right);
   view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -930,7 +926,7 @@ int UtcDaliItemViewSetItemsAnchorPointP(void)
   view.SetItemsAnchorPoint(anchorPoint);
 
   DALI_TEST_CHECK(view.GetItemsAnchorPoint() == anchorPoint);
-  DALI_TEST_CHECK(view.GetItem(0).GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ) == anchorPoint);
+  DALI_TEST_CHECK(view.GetItem(0).GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) == anchorPoint);
   END_TEST;
 }
 
@@ -940,10 +936,10 @@ int UtcDaliItemViewSetItemsParentOriginP(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -955,15 +951,15 @@ int UtcDaliItemViewSetItemsParentOriginP(void)
   view.SetItemsParentOrigin(parentOrigin);
 
   DALI_TEST_CHECK(view.GetItemsParentOrigin() == parentOrigin);
-  DALI_TEST_CHECK(view.GetItem(0).GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ) == parentOrigin);
+  DALI_TEST_CHECK(view.GetItem(0).GetCurrentProperty<Vector3>(Actor::Property::PARENT_ORIGIN) == parentOrigin);
   END_TEST;
 }
 
 int UtcDaliItemFactoryGetExtention(void)
 {
   ToolkitTestApplication application;
-  TestItemFactory factory;
-  DALI_TEST_CHECK( factory.GetExtension() == NULL );
+  TestItemFactory        factory;
+  DALI_TEST_CHECK(factory.GetExtension() == NULL);
   END_TEST;
 }
 
@@ -973,16 +969,16 @@ int UtcDaliItemViewLayoutActivatedSignalP(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
   view.AddLayout(*gridLayout);
 
-  application.GetScene().Add( view );
+  application.GetScene().Add(view);
 
   // Connect the layout activated signal
-  view.LayoutActivatedSignal().Connect( &OnLayoutActivated );
+  view.LayoutActivatedSignal().Connect(&OnLayoutActivated);
 
   gOnLayoutActivatedCalled = false;
 
@@ -997,7 +993,7 @@ int UtcDaliItemViewLayoutActivatedSignalP(void)
   // Wait for 0.1 second
   Wait(application, 100);
 
-  DALI_TEST_EQUALS( gOnLayoutActivatedCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(gOnLayoutActivatedCalled, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1008,63 +1004,62 @@ int UtcDaliItemViewSetGetProperty(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
   DALI_TEST_CHECK(view);
 
   // Event side properties
 
   // Test "minimumSwipeSpeed" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("minimumSwipeSpeed") == ItemView::Property::MINIMUM_SWIPE_SPEED  );
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::MINIMUM_SWIPE_SPEED).Get<float>(), view.GetMinimumSwipeSpeed(), TEST_LOCATION );
-  view.SetProperty( ItemView::Property::MINIMUM_SWIPE_SPEED, 2.5f );
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::MINIMUM_SWIPE_SPEED).Get<float>(), 2.5f, TEST_LOCATION );
+  DALI_TEST_CHECK(view.GetPropertyIndex("minimumSwipeSpeed") == ItemView::Property::MINIMUM_SWIPE_SPEED);
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::MINIMUM_SWIPE_SPEED).Get<float>(), view.GetMinimumSwipeSpeed(), TEST_LOCATION);
+  view.SetProperty(ItemView::Property::MINIMUM_SWIPE_SPEED, 2.5f);
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::MINIMUM_SWIPE_SPEED).Get<float>(), 2.5f, TEST_LOCATION);
 
   // Test "minimumSwipeDistance" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("minimumSwipeDistance") == ItemView::Property::MINIMUM_SWIPE_DISTANCE  );
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::MINIMUM_SWIPE_DISTANCE).Get<float>(), view.GetMinimumSwipeDistance(), TEST_LOCATION );
-  view.SetProperty( ItemView::Property::MINIMUM_SWIPE_DISTANCE, 8.725f );
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::MINIMUM_SWIPE_DISTANCE).Get<float>(), 8.725f, TEST_LOCATION );
+  DALI_TEST_CHECK(view.GetPropertyIndex("minimumSwipeDistance") == ItemView::Property::MINIMUM_SWIPE_DISTANCE);
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::MINIMUM_SWIPE_DISTANCE).Get<float>(), view.GetMinimumSwipeDistance(), TEST_LOCATION);
+  view.SetProperty(ItemView::Property::MINIMUM_SWIPE_DISTANCE, 8.725f);
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::MINIMUM_SWIPE_DISTANCE).Get<float>(), 8.725f, TEST_LOCATION);
 
   // Test "wheelScrollDistanceStep" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("wheelScrollDistanceStep") == ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP  );
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP).Get<float>(), view.GetWheelScrollDistanceStep(), TEST_LOCATION );
-  view.SetProperty( ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP, 5.0f );
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP).Get<float>(), 5.0f, TEST_LOCATION );
+  DALI_TEST_CHECK(view.GetPropertyIndex("wheelScrollDistanceStep") == ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP);
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP).Get<float>(), view.GetWheelScrollDistanceStep(), TEST_LOCATION);
+  view.SetProperty(ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP, 5.0f);
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP).Get<float>(), 5.0f, TEST_LOCATION);
 
   // Test "snapToItemEnabled" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("snapToItemEnabled") == ItemView::Property::SNAP_TO_ITEM_ENABLED  );
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::SNAP_TO_ITEM_ENABLED).Get<bool>(), view.GetAnchoring(), TEST_LOCATION );
-  view.SetProperty( ItemView::Property::SNAP_TO_ITEM_ENABLED, true );
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::SNAP_TO_ITEM_ENABLED).Get<bool>(), true, TEST_LOCATION );
+  DALI_TEST_CHECK(view.GetPropertyIndex("snapToItemEnabled") == ItemView::Property::SNAP_TO_ITEM_ENABLED);
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::SNAP_TO_ITEM_ENABLED).Get<bool>(), view.GetAnchoring(), TEST_LOCATION);
+  view.SetProperty(ItemView::Property::SNAP_TO_ITEM_ENABLED, true);
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::SNAP_TO_ITEM_ENABLED).Get<bool>(), true, TEST_LOCATION);
 
   // Test "refreshInterval" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("refreshInterval") == ItemView::Property::REFRESH_INTERVAL  );
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::REFRESH_INTERVAL).Get<float>(), view.GetRefreshInterval(), TEST_LOCATION );
-  view.SetProperty( ItemView::Property::REFRESH_INTERVAL, 11.0f );
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::REFRESH_INTERVAL).Get<float>(), 11.0f, TEST_LOCATION );
+  DALI_TEST_CHECK(view.GetPropertyIndex("refreshInterval") == ItemView::Property::REFRESH_INTERVAL);
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::REFRESH_INTERVAL).Get<float>(), view.GetRefreshInterval(), TEST_LOCATION);
+  view.SetProperty(ItemView::Property::REFRESH_INTERVAL, 11.0f);
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::REFRESH_INTERVAL).Get<float>(), 11.0f, TEST_LOCATION);
 
   // Test "layout" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("layout") == ItemView::Property::LAYOUT  );
+  DALI_TEST_CHECK(view.GetPropertyIndex("layout") == ItemView::Property::LAYOUT);
   Property::Map gridLayoutProperty;
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::GRID) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::ITEM_SIZE, Dali::Property::Value(Vector3(200, 200,50)) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_ROW_SPACING, Dali::Property::Value(50.0f) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_COLUMN_NUMBER, Dali::Property::Value(4) );
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::GRID));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::ITEM_SIZE, Dali::Property::Value(Vector3(200, 200, 50)));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::GRID_ROW_SPACING, Dali::Property::Value(50.0f));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::GRID_COLUMN_NUMBER, Dali::Property::Value(4));
 
   Property::Map depthLayoutProperty;
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::DEPTH) );
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::DEPTH_COLUMN_NUMBER, Dali::Property::Value(3) );
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::DEPTH_ROW_NUMBER, Dali::Property::Value(26.0f) );
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::DEPTH));
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::DEPTH_COLUMN_NUMBER, Dali::Property::Value(3));
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::DEPTH_ROW_NUMBER, Dali::Property::Value(26.0f));
 
   Property::Map spiralLayoutPrperty;
-  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::SPIRAL) );
-  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::SPIRAL_ITEM_SPACING, Dali::Property::Value((Math::PI*2.0f)/9.5f) );
-  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::SPIRAL_TOP_ITEM_ALIGNMENT, Dali::Property::Value(-0.125f) );
+  spiralLayoutPrperty.Insert(DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::SPIRAL));
+  spiralLayoutPrperty.Insert(DefaultItemLayoutProperty::SPIRAL_ITEM_SPACING, Dali::Property::Value((Math::PI * 2.0f) / 9.5f));
+  spiralLayoutPrperty.Insert(DefaultItemLayoutProperty::SPIRAL_TOP_ITEM_ALIGNMENT, Dali::Property::Value(-0.125f));
 
   Property::Map listLayoutPrperty;
-  listLayoutPrperty.Insert( DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::LIST) );
-  listLayoutPrperty.Insert( DefaultItemLayoutProperty::ITEM_SIZE, Dali::Property::Value(Vector3(100, 100,50)) );
-
+  listLayoutPrperty.Insert(DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::LIST));
+  listLayoutPrperty.Insert(DefaultItemLayoutProperty::ITEM_SIZE, Dali::Property::Value(Vector3(100, 100, 50)));
 
   Property::Array layoutArray;
   layoutArray.PushBack(gridLayoutProperty);
@@ -1072,107 +1067,105 @@ int UtcDaliItemViewSetGetProperty(void)
   layoutArray.PushBack(spiralLayoutPrperty);
   layoutArray.PushBack(listLayoutPrperty);
 
-  view.SetProperty( ItemView::Property::LAYOUT, layoutArray);
+  view.SetProperty(ItemView::Property::LAYOUT, layoutArray);
 
   Property::Array getLayoutArray;
-  DALI_TEST_CHECK( view.GetProperty( ItemView::Property::LAYOUT ).Get( getLayoutArray ) );
+  DALI_TEST_CHECK(view.GetProperty(ItemView::Property::LAYOUT).Get(getLayoutArray));
 
   //Check that the result is the same as
-  DALI_TEST_EQUALS( layoutArray.Count(), getLayoutArray.Count(), TEST_LOCATION );
-  Property::Map firstLayout = *((getLayoutArray.GetElementAt( 0 )).GetMap());
+  DALI_TEST_EQUALS(layoutArray.Count(), getLayoutArray.Count(), TEST_LOCATION);
+  Property::Map firstLayout = *((getLayoutArray.GetElementAt(0)).GetMap());
 
-  for( unsigned int mapIdx = 0, mapCount = firstLayout.Count(); mapIdx < mapCount; ++mapIdx )
+  for(unsigned int mapIdx = 0, mapCount = firstLayout.Count(); mapIdx < mapCount; ++mapIdx)
   {
-    KeyValuePair propertyPair( firstLayout.GetKeyValue( mapIdx ) );
+    KeyValuePair propertyPair(firstLayout.GetKeyValue(mapIdx));
     if(propertyPair.first == DefaultItemLayoutProperty::TYPE)
     {
       int layoutType = propertyPair.second.Get<int>();
-      DALI_TEST_EQUALS( layoutType, (int)DefaultItemLayout::GRID, TEST_LOCATION );
+      DALI_TEST_EQUALS(layoutType, (int)DefaultItemLayout::GRID, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::ITEM_SIZE)
     {
       Vector3 size = propertyPair.second.Get<Vector3>();
-      DALI_TEST_EQUALS( size, Vector3(200, 200,50), TEST_LOCATION );
+      DALI_TEST_EQUALS(size, Vector3(200, 200, 50), TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::GRID_ROW_SPACING)
     {
       float spacing = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS( spacing, 50.0f, TEST_LOCATION );
+      DALI_TEST_EQUALS(spacing, 50.0f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::GRID_COLUMN_NUMBER)
     {
       int number = propertyPair.second.Get<int>();
-      DALI_TEST_EQUALS(number, 4, TEST_LOCATION );
+      DALI_TEST_EQUALS(number, 4, TEST_LOCATION);
     }
   }
-  view.SetProperty( ItemView::Property::LAYOUT, layoutArray);
-
+  view.SetProperty(ItemView::Property::LAYOUT, layoutArray);
 
   // Test "overshootEnabled" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("overshootEnabled") == Scrollable::Property::OVERSHOOT_ENABLED  );
-  DALI_TEST_EQUALS( view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), view.IsOvershootEnabled(), TEST_LOCATION );
-  view.SetProperty( Scrollable::Property::OVERSHOOT_ENABLED, false );
-  DALI_TEST_EQUALS( view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), false, TEST_LOCATION );
+  DALI_TEST_CHECK(view.GetPropertyIndex("overshootEnabled") == Scrollable::Property::OVERSHOOT_ENABLED);
+  DALI_TEST_EQUALS(view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), view.IsOvershootEnabled(), TEST_LOCATION);
+  view.SetProperty(Scrollable::Property::OVERSHOOT_ENABLED, false);
+  DALI_TEST_EQUALS(view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), false, TEST_LOCATION);
 
   // Test "overshootSize" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("overshootSize") == Scrollable::Property::OVERSHOOT_SIZE  );
-  Vector2 overshootSize = Vector2(100.0f,100.0f);
-  view.SetProperty( Scrollable::Property::OVERSHOOT_SIZE, overshootSize );
-  DALI_TEST_EQUALS( view.GetProperty(Scrollable::Property::OVERSHOOT_SIZE).Get<Vector2>(), overshootSize, TEST_LOCATION );
+  DALI_TEST_CHECK(view.GetPropertyIndex("overshootSize") == Scrollable::Property::OVERSHOOT_SIZE);
+  Vector2 overshootSize = Vector2(100.0f, 100.0f);
+  view.SetProperty(Scrollable::Property::OVERSHOOT_SIZE, overshootSize);
+  DALI_TEST_EQUALS(view.GetProperty(Scrollable::Property::OVERSHOOT_SIZE).Get<Vector2>(), overshootSize, TEST_LOCATION);
 
   // Animatable properties
 
   // Test "layoutPosition" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("layoutPosition") == ItemView::Property::LAYOUT_POSITION  );
-  view.SetProperty( ItemView::Property::LAYOUT_POSITION, 20.5f );
+  DALI_TEST_CHECK(view.GetPropertyIndex("layoutPosition") == ItemView::Property::LAYOUT_POSITION);
+  view.SetProperty(ItemView::Property::LAYOUT_POSITION, 20.5f);
   Wait(application);
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::LAYOUT_POSITION).Get<float>(), 20.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::LAYOUT_POSITION).Get<float>(), 20.5f, TEST_LOCATION);
 
   // Test "scrollSpeed" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("scrollSpeed") == ItemView::Property::SCROLL_SPEED  );
-  view.SetProperty( ItemView::Property::SCROLL_SPEED, 3.35f );
+  DALI_TEST_CHECK(view.GetPropertyIndex("scrollSpeed") == ItemView::Property::SCROLL_SPEED);
+  view.SetProperty(ItemView::Property::SCROLL_SPEED, 3.35f);
   Wait(application);
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::SCROLL_SPEED).Get<float>(), 3.35f, TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::SCROLL_SPEED).Get<float>(), 3.35f, TEST_LOCATION);
 
   // Test "overshoot" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("overshoot") == ItemView::Property::OVERSHOOT  );
-  view.SetProperty( ItemView::Property::OVERSHOOT, 0.15f );
+  DALI_TEST_CHECK(view.GetPropertyIndex("overshoot") == ItemView::Property::OVERSHOOT);
+  view.SetProperty(ItemView::Property::OVERSHOOT, 0.15f);
   Wait(application);
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::OVERSHOOT).Get<float>(), 0.15f, TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::OVERSHOOT).Get<float>(), 0.15f, TEST_LOCATION);
 
   // Test "scrollDirection" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("scrollDirection") == ItemView::Property::SCROLL_DIRECTION  );
-  view.SetProperty( ItemView::Property::SCROLL_DIRECTION, Vector2(0.85f, 0.5f) );
+  DALI_TEST_CHECK(view.GetPropertyIndex("scrollDirection") == ItemView::Property::SCROLL_DIRECTION);
+  view.SetProperty(ItemView::Property::SCROLL_DIRECTION, Vector2(0.85f, 0.5f));
   Wait(application);
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::SCROLL_DIRECTION).Get<Vector2>(), Vector2(0.85f, 0.5f), TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::SCROLL_DIRECTION).Get<Vector2>(), Vector2(0.85f, 0.5f), TEST_LOCATION);
 
   // Test "layoutOrientation" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("layoutOrientation") == ItemView::Property::LAYOUT_ORIENTATION  );
-  view.SetProperty( ItemView::Property::LAYOUT_ORIENTATION, 2 );
+  DALI_TEST_CHECK(view.GetPropertyIndex("layoutOrientation") == ItemView::Property::LAYOUT_ORIENTATION);
+  view.SetProperty(ItemView::Property::LAYOUT_ORIENTATION, 2);
   Wait(application);
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::LAYOUT_ORIENTATION).Get<int>(), 2, TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::LAYOUT_ORIENTATION).Get<int>(), 2, TEST_LOCATION);
 
   // Test "scrollContentSize" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("scrollContentSize") == ItemView::Property::SCROLL_CONTENT_SIZE  );
-  view.SetProperty( ItemView::Property::SCROLL_CONTENT_SIZE, 250.0f );
+  DALI_TEST_CHECK(view.GetPropertyIndex("scrollContentSize") == ItemView::Property::SCROLL_CONTENT_SIZE);
+  view.SetProperty(ItemView::Property::SCROLL_CONTENT_SIZE, 250.0f);
   Wait(application);
-  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::SCROLL_CONTENT_SIZE).Get<float>(), 250.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetProperty(ItemView::Property::SCROLL_CONTENT_SIZE).Get<float>(), 250.0f, TEST_LOCATION);
 
   END_TEST;
 }
 
-
 int UtcDaliItemViewOvershootVertical(void)
 {
-  ToolkitTestApplication application;
+  ToolkitTestApplication   application;
   Dali::Integration::Scene stage = application.GetScene();
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
   view.AddLayout(*gridLayout);
   stage.Add(view);
 
@@ -1180,65 +1173,65 @@ int UtcDaliItemViewOvershootVertical(void)
   Vector3 stageSize(stage.GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
-  view.SetProperty( Scrollable::Property::OVERSHOOT_ENABLED, true );
-  DALI_TEST_EQUALS( view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), true, TEST_LOCATION );
+  view.SetProperty(Scrollable::Property::OVERSHOOT_ENABLED, true);
+  DALI_TEST_EQUALS(view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), true, TEST_LOCATION);
 
-  view.SetProperty( Scrollable::Property::OVERSHOOT_SIZE, Vector2(30, 30) );
+  view.SetProperty(Scrollable::Property::OVERSHOOT_SIZE, Vector2(30, 30));
 
   Wait(application);
 
   // Do a pan starting from 100,100 and moving down
   Vector2 pos(100.0f, 100.0f);
 
-  application.ProcessEvent( GenerateSingleTouch(PointState::DOWN, pos, 100 ) );
-  application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, pos, 100));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, pos, 100));
 
   pos.y += 5.0f;
   Wait(application, 100);
 
-  for(int i = 0;i<200;i++)
+  for(int i = 0; i < 200; i++)
   {
-    application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
+    application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, pos, 100));
     pos.y += 5.0f;
     Wait(application);
   }
 
-  application.ProcessEvent( GenerateSingleTouch(PointState::UP, pos, 100 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, pos, 100));
 
   Wait(application, 100);
 
   // Do a pan starting from 100,100 and moving up
   pos = Vector2(100.0f, 300.0f);
 
-  application.ProcessEvent( GenerateSingleTouch(PointState::DOWN, pos, 100 ) );
-  application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, pos, 100));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, pos, 100));
 
   pos.y -= 5.0f;
   Wait(application, 100);
 
-  for(int i = 0;i<200;i++)
+  for(int i = 0; i < 200; i++)
   {
-    application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
+    application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, pos, 100));
     pos.y -= 5.0f;
     Wait(application);
   }
 
-  application.ProcessEvent( GenerateSingleTouch(PointState::UP, pos, 100 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, pos, 100));
   Wait(application, 100);
   END_TEST;
 }
 
 int UtcDaliItemViewOvershootHorizontal(void)
 {
-  ToolkitTestApplication application;
+  ToolkitTestApplication   application;
   Dali::Integration::Scene stage = application.GetScene();
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::SPIRAL);
   view.AddLayout(*gridLayout);
   stage.Add(view);
 
@@ -1246,45 +1239,45 @@ int UtcDaliItemViewOvershootHorizontal(void)
   Vector3 stageSize(stage.GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
-  view.SetProperty( Scrollable::Property::OVERSHOOT_ENABLED, true );
-  DALI_TEST_EQUALS( view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), true, TEST_LOCATION );
+  view.SetProperty(Scrollable::Property::OVERSHOOT_ENABLED, true);
+  DALI_TEST_EQUALS(view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), true, TEST_LOCATION);
 
-  view.SetProperty( Scrollable::Property::OVERSHOOT_SIZE, Vector2(30, 30) );
+  view.SetProperty(Scrollable::Property::OVERSHOOT_SIZE, Vector2(30, 30));
 
   Wait(application);
 
   // Do a pan starting from 100,100 and moving left
   Vector2 pos(100.0f, 100.0f);
-  application.ProcessEvent( GenerateSingleTouch(PointState::DOWN, pos, 100 ));
-  application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ));
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, pos, 100));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, pos, 100));
   pos.x -= 5.0f;
   Wait(application, 100);
 
-  for(int i = 0;i<200;i++)
+  for(int i = 0; i < 200; i++)
   {
-    application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
+    application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, pos, 100));
     pos.x -= 5.0f;
     Wait(application);
   }
 
-  application.ProcessEvent( GenerateSingleTouch(PointState::UP, pos, 100 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, pos, 100));
   Wait(application, 100);
 
   // Do a pan starting from 100,100 and moving right
   pos = Vector2(100.0f, 100.0f);
-  application.ProcessEvent( GenerateSingleTouch(PointState::DOWN, pos, 100 ) );
-  application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, pos, 100));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, pos, 100));
   pos.x += 5.0f;
   Wait(application, 100);
 
-  for(int i = 0;i<200;i++)
+  for(int i = 0; i < 200; i++)
   {
-    application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
+    application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, pos, 100));
     pos.x += 5.0f;
     Wait(application);
   }
 
-  application.ProcessEvent( GenerateSingleTouch(PointState::UP, pos, 100 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, pos, 100));
   Wait(application, 100);
 
   END_TEST;
@@ -1292,15 +1285,15 @@ int UtcDaliItemViewOvershootHorizontal(void)
 
 int UtcDaliItemEnableDisableRefresh(void)
 {
-  ToolkitTestApplication application;
+  ToolkitTestApplication   application;
   Dali::Integration::Scene stage = application.GetScene();
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
   view.AddLayout(*gridLayout);
   stage.Add(view);
 
@@ -1309,50 +1302,49 @@ int UtcDaliItemEnableDisableRefresh(void)
   view.ActivateLayout(0, stageSize, 0.5f);
 
   //Connect to signal scroll updated
-  view.ScrollUpdatedSignal().Connect( &OnScrollUpdate );
+  view.ScrollUpdatedSignal().Connect(&OnScrollUpdate);
 
   Property::Map attributes;
-  view.DoAction("enableRefresh", attributes );
+  view.DoAction("enableRefresh", attributes);
   gOnScrollUpdateCalled = true;
-  view.SetProperty( ItemView::Property::LAYOUT_POSITION, 100.0f );
+  view.SetProperty(ItemView::Property::LAYOUT_POSITION, 100.0f);
   application.SendNotification();
   application.Render(1000);
-  DALI_TEST_EQUALS( gOnScrollUpdateCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(gOnScrollUpdateCalled, true, TEST_LOCATION);
 
-
-  view.DoAction("disableRefresh", attributes );
+  view.DoAction("disableRefresh", attributes);
   gOnScrollUpdateCalled = false;
-  view.SetProperty( ItemView::Property::LAYOUT_POSITION, 100.0f );
+  view.SetProperty(ItemView::Property::LAYOUT_POSITION, 100.0f);
   application.SendNotification();
   application.Render(1000);
 
-  DALI_TEST_EQUALS( gOnScrollUpdateCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(gOnScrollUpdateCalled, false, TEST_LOCATION);
 
   END_TEST;
 }
 
 int UtcDaliItemViewWheelEvent(void)
 {
-  ToolkitTestApplication application;
+  ToolkitTestApplication   application;
   Dali::Integration::Scene stage = application.GetScene();
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New( factory );
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout( *gridLayout );
-  stage.Add( view );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
+  view.AddLayout(*gridLayout);
+  stage.Add(view);
 
   // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize( stage.GetSize() );
-  view.ActivateLayout (0, stageSize, 0.5f );
+  Vector3 stageSize(stage.GetSize());
+  view.ActivateLayout(0, stageSize, 0.5f);
 
   //Connect to wheel event signal
-  view.WheelEventSignal().Connect( &OnWheelEvent );
+  view.WheelEventSignal().Connect(&OnWheelEvent);
 
-  DALI_TEST_CHECK( !gOnWheelEventCalled );
+  DALI_TEST_CHECK(!gOnWheelEventCalled);
 
   // Render and notify
   application.Render();
@@ -1361,9 +1353,9 @@ int UtcDaliItemViewWheelEvent(void)
   application.SendNotification();
 
   // Perform a wheel event
-  Dali::Integration::WheelEvent wheelEvent( Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, Vector2( 10.0f, 10.0f ), 1, 1000u );
-  application.ProcessEvent( wheelEvent );
-  DALI_TEST_CHECK( gOnWheelEventCalled );
+  Dali::Integration::WheelEvent wheelEvent(Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, Vector2(10.0f, 10.0f), 1, 1000u);
+  application.ProcessEvent(wheelEvent);
+  DALI_TEST_CHECK(gOnWheelEventCalled);
 
   END_TEST;
 }

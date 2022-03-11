@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
  */
 
-#include <iostream>
 #include <stdlib.h>
+#include <iostream>
 
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
@@ -40,57 +40,57 @@ void utc_dali_toolkit_drag_drop_detector_cleanup(void)
 
 namespace
 {
-  const int RENDER_FRAME_INTERVAL = 16;
-  struct SignalData
-  {
-    SignalData()
-    :functorCalled(false),
+const int RENDER_FRAME_INTERVAL = 16;
+struct SignalData
+{
+  SignalData()
+  : functorCalled(false),
     control(),
     detector()
-    {
-    }
-
-    void Reset()
-    {
-      functorCalled = false;
-      control.Reset();
-    }
-
-    bool functorCalled;
-    Control control;
-    Dali::Toolkit::DragAndDropDetector detector;
-  };
-
-  struct DragSignalFunctor
   {
-    DragSignalFunctor(SignalData& data, bool returnValue = true)
-    :signalData(data),
-    returnValue(returnValue)
-    {
-    }
-
-    bool operator()(Control control, Dali::Toolkit::DragAndDropDetector detector)
-    {
-      signalData.functorCalled = true;
-      signalData.control = control;
-      signalData.detector = detector;
-      return returnValue;
-    }
-
-    SignalData& signalData;
-    bool returnValue;
-    };
-
-  Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition)
-  {
-    Integration::TouchEvent touchEvent;
-    Integration::Point point;
-    point.SetState(static_cast<PointState::Type>(state));
-    point.SetScreenPosition(screenPosition);
-    touchEvent.points.push_back(point);
-    return touchEvent;
   }
+
+  void Reset()
+  {
+    functorCalled = false;
+    control.Reset();
+  }
+
+  bool                               functorCalled;
+  Control                            control;
+  Dali::Toolkit::DragAndDropDetector detector;
+};
+
+struct DragSignalFunctor
+{
+  DragSignalFunctor(SignalData& data, bool returnValue = true)
+  : signalData(data),
+    returnValue(returnValue)
+  {
+  }
+
+  bool operator()(Control control, Dali::Toolkit::DragAndDropDetector detector)
+  {
+    signalData.functorCalled = true;
+    signalData.control       = control;
+    signalData.detector      = detector;
+    return returnValue;
+  }
+
+  SignalData& signalData;
+  bool        returnValue;
+};
+
+Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition)
+{
+  Integration::TouchEvent touchEvent;
+  Integration::Point      point;
+  point.SetState(static_cast<PointState::Type>(state));
+  point.SetScreenPosition(screenPosition);
+  touchEvent.points.push_back(point);
+  return touchEvent;
 }
+} // namespace
 
 int UtcDaliDragAndDropDetectorConstructorN(void)
 {
@@ -117,7 +117,7 @@ int UtcDaliDragAndDropDetectorAttachN(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control;
+  Control                            control;
   detector.Attach(control);
 
   DALI_TEST_EQUALS(0, detector.GetAttachedControlCount(), TEST_LOCATION);
@@ -134,7 +134,7 @@ int UtcDaliDragAndDropDetectorAttachP(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control = Control::New();
+  Control                            control  = Control::New();
 
   detector.Attach(control);
   DALI_TEST_EQUALS(1, detector.GetAttachedControlCount(), TEST_LOCATION);
@@ -143,12 +143,12 @@ int UtcDaliDragAndDropDetectorAttachP(void)
 }
 
 int UtcDaliDragAndDropDetectorDetachN(void)
-  {
+{
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control1;
-  Control control2 = Control::New();
+  Control                            control1;
+  Control                            control2 = Control::New();
 
   detector.Attach(control1);
   detector.Attach(control2);
@@ -161,7 +161,6 @@ int UtcDaliDragAndDropDetectorDetachN(void)
   DALI_TEST_EQUALS(0, detector.GetAttachedControlCount(), TEST_LOCATION);
 
   END_TEST;
-
 }
 
 int UtcDaliDragAndDropDetectorDetachP(void)
@@ -169,9 +168,9 @@ int UtcDaliDragAndDropDetectorDetachP(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control1 = Control::New();
-  Control control2 = Control::New();
-  Control control3;
+  Control                            control1 = Control::New();
+  Control                            control2 = Control::New();
+  Control                            control3;
 
   detector.Attach(control1);
   detector.Attach(control2);
@@ -205,8 +204,8 @@ int UtcDaliDragAndDropDetectorDetachAllP(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control1 = Control::New();
-  Control control2 = Control::New();
+  Control                            control1 = Control::New();
+  Control                            control2 = Control::New();
 
   detector.Attach(control1);
   detector.Attach(control2);
@@ -221,8 +220,8 @@ int UtcDaliDragAndDropDetectorGetAttachedControlCountP(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control1 = Control::New();
-  Control control2 = Control::New();
+  Control                            control1 = Control::New();
+  Control                            control2 = Control::New();
 
   detector.Attach(control1);
   detector.Attach(control2);
@@ -236,8 +235,8 @@ int UtcDaliDragAndDropDetectorGetAttachedControlN(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control1 = Control::New();
-  Control control2 = Control::New();
+  Control                            control1 = Control::New();
+  Control                            control2 = Control::New();
 
   detector.Attach(control1);
 
@@ -252,8 +251,8 @@ int UtcDaliDragAndDropDetectorGetAttachedControlP(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control1 = Control::New();
-  Control control2 = Control::New();
+  Control                            control1 = Control::New();
+  Control                            control2 = Control::New();
 
   detector.Attach(control1);
   detector.Attach(control2);
@@ -269,9 +268,9 @@ int UtcDaliDragAndDropDetectorStartSignal(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control = Control::New();
-  control.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
-  control.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  Control                            control  = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(control);
   detector.Attach(control);
 
@@ -281,7 +280,7 @@ int UtcDaliDragAndDropDetectorStartSignal(void)
   DALI_TEST_CHECK(detector);
   DALI_TEST_CHECK(control);
 
-  SignalData data;
+  SignalData        data;
   DragSignalFunctor functor(data);
   detector.StartedSignal().Connect(&application, functor);
 
@@ -300,16 +299,16 @@ int UtcDaliDragAndDropDetectorEnteredSignal(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control1 = Control::New();
-  Control control2 = Control::New();
-  control1.SetProperty( Actor::Property::SIZE, Vector2(100.0f,100.0f) );
-  control2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
-  control1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  control2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  control1.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-  control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
+  Control                            control1 = Control::New();
+  Control                            control2 = Control::New();
+  control1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control1.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  control2.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
   application.GetScene().Add(control1);
   application.GetScene().Add(control2);
@@ -320,7 +319,7 @@ int UtcDaliDragAndDropDetectorEnteredSignal(void)
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
 
-  SignalData data;
+  SignalData        data;
   DragSignalFunctor functor(data);
   detector.EnteredSignal().Connect(&application, functor);
 
@@ -335,7 +334,6 @@ int UtcDaliDragAndDropDetectorEnteredSignal(void)
   data.Reset();
 
   END_TEST;
-
 }
 
 int UtcDaliDragAndDropDetectorMovedSignal(void)
@@ -343,16 +341,16 @@ int UtcDaliDragAndDropDetectorMovedSignal(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control1 = Control::New();
-  Control control2 = Control::New();
-  control1.SetProperty( Actor::Property::SIZE, Vector2(100.0f,100.0f) );
-  control2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
-  control1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  control2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  control1.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-  control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
+  Control                            control1 = Control::New();
+  Control                            control2 = Control::New();
+  control1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control1.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  control2.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
   application.GetScene().Add(control1);
   application.GetScene().Add(control2);
@@ -363,7 +361,7 @@ int UtcDaliDragAndDropDetectorMovedSignal(void)
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
 
-  SignalData data;
+  SignalData        data;
   DragSignalFunctor functor(data);
   detector.MovedSignal().Connect(&application, functor);
 
@@ -390,19 +388,19 @@ int UtcDaliDragAndDropDetectorExitedSignal(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control1 = Control::New();
-  Control control2 = Control::New();
-  control1.SetProperty( Actor::Property::SIZE, Vector2(100.0f,100.0f) );
-  control2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
-  control1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  control2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  control1.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-  control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
+  Control                            control1 = Control::New();
+  Control                            control2 = Control::New();
+  control1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control1.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  control2.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
-  control1.SetProperty( Actor::Property::LEAVE_REQUIRED,true);
-  control2.SetProperty( Actor::Property::LEAVE_REQUIRED,true);
+  control1.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
+  control2.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
   application.GetScene().Add(control1);
   application.GetScene().Add(control2);
@@ -413,7 +411,7 @@ int UtcDaliDragAndDropDetectorExitedSignal(void)
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
 
-  SignalData data;
+  SignalData        data;
   DragSignalFunctor functor(data);
   detector.ExitedSignal().Connect(&application, functor);
 
@@ -438,16 +436,16 @@ int UtcDaliDragAndDropDetectorDroppedSignal(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control1 = Control::New();
-  Control control2 = Control::New();
-  control1.SetProperty( Actor::Property::SIZE, Vector2(100.0f,100.0f) );
-  control2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
-  control1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  control2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  control1.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-  control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
+  Control                            control1 = Control::New();
+  Control                            control2 = Control::New();
+  control1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control1.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  control2.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
   application.GetScene().Add(control1);
   application.GetScene().Add(control2);
@@ -458,7 +456,7 @@ int UtcDaliDragAndDropDetectorDroppedSignal(void)
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
 
-  SignalData data;
+  SignalData        data;
   DragSignalFunctor functor(data);
   detector.DroppedSignal().Connect(&application, functor);
 
@@ -486,16 +484,16 @@ int UtcDaliDragAndDropDetectorEndedSignal(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control1 = Control::New();
-  Control control2 = Control::New();
-  control1.SetProperty( Actor::Property::SIZE, Vector2(100.0f,100.0f) );
-  control2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
-  control1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  control2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  control1.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-  control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
+  Control                            control1 = Control::New();
+  Control                            control2 = Control::New();
+  control1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control1.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  control2.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
   application.GetScene().Add(control1);
   application.GetScene().Add(control2);
@@ -506,7 +504,7 @@ int UtcDaliDragAndDropDetectorEndedSignal(void)
   detector.Attach(control1);
   detector.Attach(control2);
 
-  SignalData data;
+  SignalData        data;
   DragSignalFunctor functor(data);
   detector.EndedSignal().Connect(&application, functor);
 
@@ -526,18 +524,18 @@ int UtcDaliDragAndDropDetectorGetContent(void)
   ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
-  Control control1 = Control::New();
-  Control control2 = Control::New();
-  control1.SetProperty( Dali::Actor::Property::NAME,"control1");
-  control2.SetProperty( Dali::Actor::Property::NAME,"control2");
-  control1.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
-  control2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
-  control1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  control2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  control1.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-  control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
+  Control                            control1 = Control::New();
+  Control                            control2 = Control::New();
+  control1.SetProperty(Dali::Actor::Property::NAME, "control1");
+  control2.SetProperty(Dali::Actor::Property::NAME, "control2");
+  control1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control1.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  control2.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
   application.GetScene().Add(control1);
   application.GetScene().Add(control2);
@@ -548,7 +546,7 @@ int UtcDaliDragAndDropDetectorGetContent(void)
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
 
-  SignalData data;
+  SignalData        data;
   DragSignalFunctor functor(data);
   detector.DroppedSignal().Connect(&application, functor);
 

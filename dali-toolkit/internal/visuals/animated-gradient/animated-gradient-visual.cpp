@@ -463,7 +463,7 @@ void AnimatedGradientVisual::OnSetTransform()
 {
   if(mImpl->mRenderer)
   {
-    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 
@@ -664,7 +664,7 @@ void AnimatedGradientVisual::OnInitialize()
     mFactoryCache.SaveShader(shaderType, shader);
   }
 
-  mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_START_POINT_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::START_POSITION, START_POSITION_NAME));
@@ -676,7 +676,7 @@ void AnimatedGradientVisual::OnInitialize()
   mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_OFFSET_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::OFFSET, OFFSET_NAME));
 
   //Register transform properties
-  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 } //namespace Internal

@@ -1696,6 +1696,15 @@ public: // Queries & retrieves.
   Vector<Vector2> GetTextPosition(CharacterIndex startIndex, CharacterIndex endIndex);
 
   /**
+   * @brief Gets the bounding box of a specific text range.
+   *
+   * @param[in] startIndex start index of the text requested to get bounding box to.
+   * @param[in] endIndex end index(included) of the text requested to get bounding box to.
+   * @return bounding box of the requested text.
+   */
+  Rect<> GetTextBoundingRectangle(CharacterIndex startIndex, CharacterIndex endIndex);
+
+  /**
    * @brief Sets the layout direction changed.
    */
   void ChangedLayoutDirection();

@@ -1404,6 +1404,24 @@ bool TextField::AccessibleImpl::SetRangeOfSelection(size_t selectionIndex, size_
   return true;
 }
 
+Rect<> TextField::AccessibleImpl::GetRangeExtents(size_t startOffset, size_t endOffset, Accessibility::CoordinateType type)
+{
+  if (endOffset <= startOffset || endOffset <= 0)
+  {
+    return {0, 0, 0, 0};
+  }
+
+  auto self = Toolkit::TextField::DownCast(Self());
+  auto rect = Dali::Toolkit::GetImpl(self).GetTextController()->GetTextBoundingRectangle(startOffset, endOffset - 1);
+
+  auto componentExtents = this->GetExtents(type);
+
+  rect.x += componentExtents.x;
+  rect.y += componentExtents.y;
+
+  return rect;
+}
+
 bool TextField::AccessibleImpl::CopyText(size_t startPosition, size_t endPosition)
 {
   if(endPosition <= startPosition)

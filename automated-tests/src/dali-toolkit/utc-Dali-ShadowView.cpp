@@ -15,12 +15,11 @@
  *
  */
 
-#include <iostream>
-#include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/shadow-view/shadow-view.h>
-
+#include <stdlib.h>
+#include <iostream>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -35,7 +34,6 @@ void shadow_view_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-
 // Negative test case for a method
 int UtcDaliShadowViewUninitialized(void)
 {
@@ -47,13 +45,13 @@ int UtcDaliShadowViewUninitialized(void)
   {
     // New() must be called to create a GaussianBlurView or it wont be valid.
     Actor a = Actor::New();
-    view.Add( a );
-    DALI_TEST_CHECK( false );
+    view.Add(a);
+    DALI_TEST_CHECK(false);
   }
-  catch (Dali::DaliException& e)
+  catch(Dali::DaliException& e)
   {
     // Tests that a negative test of an assertion succeeds
-    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_PRINT_ASSERT(e);
     DALI_TEST_CHECK(!view);
   }
   END_TEST;
@@ -66,10 +64,10 @@ int UtcDaliShadowViewNew(void)
   tet_infoline("UtcDaliShadowViewNew");
 
   Toolkit::ShadowView view = Toolkit::ShadowView::New();
-  DALI_TEST_CHECK( view );
+  DALI_TEST_CHECK(view);
 
   Toolkit::ShadowView view2 = Toolkit::ShadowView::New(1.0f, 1.0f);
-  DALI_TEST_CHECK( view2 );
+  DALI_TEST_CHECK(view2);
   END_TEST;
 }
 
@@ -80,12 +78,12 @@ int UtcDaliShadowViewDownCast(void)
   tet_infoline("UtcDaliShadowViewDownCast");
 
   Toolkit::ShadowView view = Toolkit::ShadowView::New();
-  BaseHandle handle(view);
+  BaseHandle          handle(view);
 
-  Toolkit::ShadowView shadowView = Toolkit::ShadowView::DownCast( handle );
-  DALI_TEST_CHECK( view );
-  DALI_TEST_CHECK( shadowView );
-  DALI_TEST_CHECK( shadowView == view );
+  Toolkit::ShadowView shadowView = Toolkit::ShadowView::DownCast(handle);
+  DALI_TEST_CHECK(view);
+  DALI_TEST_CHECK(shadowView);
+  DALI_TEST_CHECK(shadowView == view);
   END_TEST;
 }
 
@@ -96,12 +94,12 @@ int UtcDaliShadowViewPropertyNames(void)
   tet_infoline("UtcDaliShadowViewPropertyNames");
 
   Toolkit::ShadowView view = Toolkit::ShadowView::New();
-  DALI_TEST_CHECK( view );
+  DALI_TEST_CHECK(view);
 
   // Check the names, this names are used in the shader code,
   // if they change in the shader code, then it has to be updated here.
-  DALI_TEST_EQUALS( view.GetBlurStrengthPropertyIndex(), view.GetPropertyIndex("BlurStrengthProperty"), TEST_LOCATION );
-  DALI_TEST_EQUALS( view.GetShadowColorPropertyIndex(), view.GetPropertyIndex("ShadowColorProperty"), TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetBlurStrengthPropertyIndex(), view.GetPropertyIndex("BlurStrengthProperty"), TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetShadowColorPropertyIndex(), view.GetPropertyIndex("ShadowColorProperty"), TEST_LOCATION);
   END_TEST;
 }
 
@@ -112,22 +110,21 @@ int UtcDaliShadowViewAddRemove(void)
   tet_infoline("UtcDaliShadowViewAddRemove");
 
   Toolkit::ShadowView view = Toolkit::ShadowView::New();
-  DALI_TEST_CHECK( view );
+  DALI_TEST_CHECK(view);
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
+  DALI_TEST_CHECK(!actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
 
-
-  view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  view.SetProperty( Actor::Property::SIZE, application.GetScene().GetSize());
+  view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  view.SetProperty(Actor::Property::SIZE, application.GetScene().GetSize());
   view.Add(actor);
   application.GetScene().Add(view);
 
-  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
 
   view.Remove(actor);
 
-  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
+  DALI_TEST_CHECK(!actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
   END_TEST;
 }
 
@@ -138,23 +135,23 @@ int UtcDaliShadowViewActivateDeactivate(void)
   tet_infoline("UtcDaliShadowViewActivateDeactivate");
 
   Toolkit::ShadowView view = Toolkit::ShadowView::New();
-  DALI_TEST_CHECK( view );
+  DALI_TEST_CHECK(view);
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
-  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
 
-  view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  view.SetProperty( Actor::Property::SIZE, application.GetScene().GetSize());
+  view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  view.SetProperty(Actor::Property::SIZE, application.GetScene().GetSize());
   view.Add(Actor::New());
   application.GetScene().Add(view);
   view.Activate();
 
   RenderTaskList taskList2 = application.GetScene().GetRenderTaskList();
-  DALI_TEST_CHECK( 1u != taskList2.GetTaskCount() );
+  DALI_TEST_CHECK(1u != taskList2.GetTaskCount());
 
   view.Deactivate();
 
   RenderTaskList taskList3 = application.GetScene().GetRenderTaskList();
-  DALI_TEST_CHECK( 1u == taskList3.GetTaskCount() );
+  DALI_TEST_CHECK(1u == taskList3.GetTaskCount());
   END_TEST;
 }

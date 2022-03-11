@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,16 @@
  *
  */
 
-#include <iostream>
 #include <stdlib.h>
-
+#include <iostream>
 
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/alignment/alignment.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali-toolkit/devel-api/controls/alignment/alignment.h>
-#include <dali-toolkit/dali-toolkit.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -43,9 +42,9 @@ void utc_dali_toolkit_alignment_cleanup(void)
 namespace
 {
 /// Compare an int (Or'd Alignment::Type) with an Alignment::Type value
-void DALI_TEST_EQUALS( int value1, Alignment::Type value2, const char* location )
+void DALI_TEST_EQUALS(int value1, Alignment::Type value2, const char* location)
 {
-  ::DALI_TEST_EQUALS< Alignment::Type >( static_cast< Alignment::Type >( value1 ), value2, location );
+  ::DALI_TEST_EQUALS<Alignment::Type>(static_cast<Alignment::Type>(value1), value2, location);
 }
 
 static bool gObjectCreatedCallBackCalled;
@@ -55,7 +54,6 @@ static void TestCallback(BaseHandle handle)
   gObjectCreatedCallBackCalled = true;
 }
 } // namespace
-
 
 int UtcDaliAlignmentConstructorNegative(void)
 {
@@ -69,9 +67,9 @@ int UtcDaliAlignmentConstructorNegative(void)
     alignment.SetPadding(padding);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_ASSERT(e, "alignment", TEST_LOCATION );
+    DALI_TEST_ASSERT(e, "alignment", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -88,15 +86,15 @@ int UtcDaliAlignmentConstructorPositive(void)
     alignment.SetPadding(padding);
     tet_result(TET_PASS);
   }
-  catch (DaliException& exception)
+  catch(DaliException& exception)
   {
     tet_result(TET_FAIL);
   }
 
   Actor actor = alignment;
-  alignment = Alignment::DownCast( actor );
+  alignment   = Alignment::DownCast(actor);
 
-  DALI_TEST_CHECK( alignment );
+  DALI_TEST_CHECK(alignment);
   END_TEST;
 }
 
@@ -106,14 +104,14 @@ int UtcDaliAlignmentConstructorRegister(void)
 
   //To ensure the object is registered after creation
   ObjectRegistry registry = application.GetCore().GetObjectRegistry();
-  DALI_TEST_CHECK( registry );
+  DALI_TEST_CHECK(registry);
 
   gObjectCreatedCallBackCalled = false;
   registry.ObjectCreatedSignal().Connect(&TestCallback);
   {
     Alignment alignment = Alignment::New();
   }
-  DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
+  DALI_TEST_CHECK(gObjectCreatedCallBackCalled);
   END_TEST;
 }
 
@@ -423,43 +421,43 @@ int UtcDaliAlignmentSetAlignmentTypeNegative(void)
 
   // Setting HORIZONTAL_LEFT, HORIZONTAL_CENTER
   {
-    Alignment alignment = Alignment::New();
+    Alignment       alignment = Alignment::New();
     Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_LEFT | Alignment::HORIZONTAL_CENTER));
     alignment.SetAlignmentType(type);
     // center will prevail in conflict
-    DALI_TEST_CHECK( Alignment::HORIZONTAL_CENTER & alignment.GetAlignmentType() );
-    DALI_TEST_CHECK( !(Alignment::HORIZONTAL_LEFT & alignment.GetAlignmentType()) );
+    DALI_TEST_CHECK(Alignment::HORIZONTAL_CENTER & alignment.GetAlignmentType());
+    DALI_TEST_CHECK(!(Alignment::HORIZONTAL_LEFT & alignment.GetAlignmentType()));
   }
 
   // Setting HORIZONTAL_CENTER, HORIZONTAL_RIGHT
   {
-    Alignment alignment = Alignment::New();
+    Alignment       alignment = Alignment::New();
     Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_CENTER | Alignment::HORIZONTAL_RIGHT));
 
     alignment.SetAlignmentType(type);
     // center will prevail in conflict
-    DALI_TEST_CHECK( Alignment::HORIZONTAL_CENTER & alignment.GetAlignmentType() );
-    DALI_TEST_CHECK( !(Alignment::HORIZONTAL_RIGHT & alignment.GetAlignmentType()) );
+    DALI_TEST_CHECK(Alignment::HORIZONTAL_CENTER & alignment.GetAlignmentType());
+    DALI_TEST_CHECK(!(Alignment::HORIZONTAL_RIGHT & alignment.GetAlignmentType()));
   }
 
   // Setting VERTICAL_TOP, VERTICAL_CENTER
   {
-    Alignment alignment = Alignment::New();
+    Alignment       alignment = Alignment::New();
     Alignment::Type type(Alignment::Type(Alignment::VERTICAL_TOP | Alignment::VERTICAL_CENTER));
     alignment.SetAlignmentType(type);
     // center will prevail in conflict
-    DALI_TEST_CHECK( Alignment::VERTICAL_CENTER & alignment.GetAlignmentType() );
-    DALI_TEST_CHECK( !(Alignment::VERTICAL_TOP & alignment.GetAlignmentType()) );
+    DALI_TEST_CHECK(Alignment::VERTICAL_CENTER & alignment.GetAlignmentType());
+    DALI_TEST_CHECK(!(Alignment::VERTICAL_TOP & alignment.GetAlignmentType()));
   }
 
   // Setting VERTICAL_CENTER, VERTICAL_BOTTOM
   {
-    Alignment alignment = Alignment::New();
+    Alignment       alignment = Alignment::New();
     Alignment::Type type(Alignment::Type(Alignment::VERTICAL_TOP | Alignment::VERTICAL_BOTTOM));
     alignment.SetAlignmentType(type);
     // top will prevail in conflict
-    DALI_TEST_CHECK( Alignment::VERTICAL_TOP & alignment.GetAlignmentType() );
-    DALI_TEST_CHECK( !(Alignment::VERTICAL_BOTTOM & alignment.GetAlignmentType()) );
+    DALI_TEST_CHECK(Alignment::VERTICAL_TOP & alignment.GetAlignmentType());
+    DALI_TEST_CHECK(!(Alignment::VERTICAL_BOTTOM & alignment.GetAlignmentType()));
   }
   END_TEST;
 }
@@ -817,16 +815,16 @@ int UtcDaliAlignmentSetPaddingPositive(void)
   Alignment alignment = Alignment::New();
 
   Alignment::Padding padding(1.0f, 1.5f, 2.f, 0.5f);
-  DALI_TEST_CHECK( fabs( padding.left - alignment.GetPadding().left ) > GetRangedEpsilon( padding.left, alignment.GetPadding().left ) );
-  DALI_TEST_CHECK( fabs( padding.right - alignment.GetPadding().right ) > GetRangedEpsilon( padding.right, alignment.GetPadding().right ) );
-  DALI_TEST_CHECK( fabs( padding.top - alignment.GetPadding().top ) > GetRangedEpsilon( padding.top, alignment.GetPadding().top ) );
-  DALI_TEST_CHECK( fabs( padding.bottom - alignment.GetPadding().bottom ) > GetRangedEpsilon( padding.bottom, alignment.GetPadding().bottom ) );
+  DALI_TEST_CHECK(fabs(padding.left - alignment.GetPadding().left) > GetRangedEpsilon(padding.left, alignment.GetPadding().left));
+  DALI_TEST_CHECK(fabs(padding.right - alignment.GetPadding().right) > GetRangedEpsilon(padding.right, alignment.GetPadding().right));
+  DALI_TEST_CHECK(fabs(padding.top - alignment.GetPadding().top) > GetRangedEpsilon(padding.top, alignment.GetPadding().top));
+  DALI_TEST_CHECK(fabs(padding.bottom - alignment.GetPadding().bottom) > GetRangedEpsilon(padding.bottom, alignment.GetPadding().bottom));
 
   alignment.SetPadding(padding);
-  DALI_TEST_CHECK( fabs( padding.left - alignment.GetPadding().left ) < GetRangedEpsilon( padding.left, alignment.GetPadding().left ) );
-  DALI_TEST_CHECK( fabs( padding.right - alignment.GetPadding().right ) < GetRangedEpsilon( padding.right, alignment.GetPadding().right ) );
-  DALI_TEST_CHECK( fabs( padding.top - alignment.GetPadding().top ) < GetRangedEpsilon( padding.top, alignment.GetPadding().top ) );
-  DALI_TEST_CHECK( fabs( padding.bottom - alignment.GetPadding().bottom ) < GetRangedEpsilon( padding.bottom, alignment.GetPadding().bottom ) );
+  DALI_TEST_CHECK(fabs(padding.left - alignment.GetPadding().left) < GetRangedEpsilon(padding.left, alignment.GetPadding().left));
+  DALI_TEST_CHECK(fabs(padding.right - alignment.GetPadding().right) < GetRangedEpsilon(padding.right, alignment.GetPadding().right));
+  DALI_TEST_CHECK(fabs(padding.top - alignment.GetPadding().top) < GetRangedEpsilon(padding.top, alignment.GetPadding().top));
+  DALI_TEST_CHECK(fabs(padding.bottom - alignment.GetPadding().bottom) < GetRangedEpsilon(padding.bottom, alignment.GetPadding().bottom));
   END_TEST;
 }
 
@@ -842,9 +840,9 @@ int UtcDaliAlignmentSetPaddingNegative(void)
     alignment.SetPadding(padding);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_ASSERT(e, "(padding.left >= 0.f) && (padding.top >= 0.f) && (padding.right >= 0.f) && (padding.bottom >= 0.f)", TEST_LOCATION );
+    DALI_TEST_ASSERT(e, "(padding.left >= 0.f) && (padding.top >= 0.f) && (padding.right >= 0.f) && (padding.bottom >= 0.f)", TEST_LOCATION);
   }
 
   try
@@ -853,9 +851,9 @@ int UtcDaliAlignmentSetPaddingNegative(void)
     alignment.SetPadding(padding);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_ASSERT(e, "(padding.left >= 0.f) && (padding.top >= 0.f) && (padding.right >= 0.f) && (padding.bottom >= 0.f)", TEST_LOCATION );
+    DALI_TEST_ASSERT(e, "(padding.left >= 0.f) && (padding.top >= 0.f) && (padding.right >= 0.f) && (padding.bottom >= 0.f)", TEST_LOCATION);
   }
 
   try
@@ -864,9 +862,9 @@ int UtcDaliAlignmentSetPaddingNegative(void)
     alignment.SetPadding(padding);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_ASSERT(e, "(padding.left >= 0.f) && (padding.top >= 0.f) && (padding.right >= 0.f) && (padding.bottom >= 0.f)", TEST_LOCATION );
+    DALI_TEST_ASSERT(e, "(padding.left >= 0.f) && (padding.top >= 0.f) && (padding.right >= 0.f) && (padding.bottom >= 0.f)", TEST_LOCATION);
   }
 
   try
@@ -875,9 +873,9 @@ int UtcDaliAlignmentSetPaddingNegative(void)
     alignment.SetPadding(padding);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_ASSERT(e, "(padding.left >= 0.f) && (padding.top >= 0.f) && (padding.right >= 0.f) && (padding.bottom >= 0.f)", TEST_LOCATION );
+    DALI_TEST_ASSERT(e, "(padding.left >= 0.f) && (padding.top >= 0.f) && (padding.right >= 0.f) && (padding.bottom >= 0.f)", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -887,17 +885,17 @@ int UtcDaliAlignmentGetPadding(void)
   ToolkitTestApplication application;
 
   Alignment alignment = Alignment::New();
-  DALI_TEST_CHECK( fabs( alignment.GetPadding().left ) < GetRangedEpsilon( 0.f, alignment.GetPadding().left ) );
-  DALI_TEST_CHECK( fabs( alignment.GetPadding().right ) < GetRangedEpsilon( 0.f, alignment.GetPadding().right ) );
-  DALI_TEST_CHECK( fabs( alignment.GetPadding().top ) < GetRangedEpsilon( 0.f, alignment.GetPadding().top ) );
-  DALI_TEST_CHECK( fabs( alignment.GetPadding().bottom ) < GetRangedEpsilon( 0.f, alignment.GetPadding().bottom ) );
+  DALI_TEST_CHECK(fabs(alignment.GetPadding().left) < GetRangedEpsilon(0.f, alignment.GetPadding().left));
+  DALI_TEST_CHECK(fabs(alignment.GetPadding().right) < GetRangedEpsilon(0.f, alignment.GetPadding().right));
+  DALI_TEST_CHECK(fabs(alignment.GetPadding().top) < GetRangedEpsilon(0.f, alignment.GetPadding().top));
+  DALI_TEST_CHECK(fabs(alignment.GetPadding().bottom) < GetRangedEpsilon(0.f, alignment.GetPadding().bottom));
 
   Alignment::Padding padding(1.0f, 1.5f, 2.f, 0.f);
   alignment.SetPadding(padding);
-  DALI_TEST_CHECK( fabs( padding.left - alignment.GetPadding().left ) < GetRangedEpsilon( padding.left, alignment.GetPadding().left ) );
-  DALI_TEST_CHECK( fabs( padding.right - alignment.GetPadding().right ) < GetRangedEpsilon( padding.right, alignment.GetPadding().right ) );
-  DALI_TEST_CHECK( fabs( padding.top - alignment.GetPadding().top ) < GetRangedEpsilon( padding.top, alignment.GetPadding().top ) );
-  DALI_TEST_CHECK( fabs( padding.bottom - alignment.GetPadding().bottom ) < GetRangedEpsilon( padding.bottom, alignment.GetPadding().bottom ) );
+  DALI_TEST_CHECK(fabs(padding.left - alignment.GetPadding().left) < GetRangedEpsilon(padding.left, alignment.GetPadding().left));
+  DALI_TEST_CHECK(fabs(padding.right - alignment.GetPadding().right) < GetRangedEpsilon(padding.right, alignment.GetPadding().right));
+  DALI_TEST_CHECK(fabs(padding.top - alignment.GetPadding().top) < GetRangedEpsilon(padding.top, alignment.GetPadding().top));
+  DALI_TEST_CHECK(fabs(padding.bottom - alignment.GetPadding().bottom) < GetRangedEpsilon(padding.bottom, alignment.GetPadding().bottom));
   END_TEST;
 }
 
@@ -940,8 +938,8 @@ int UtcDaliAlignmentSizeSetP(void)
   application.Render();
   application.SendNotification();
 
-  Vector2 size( 100.0f, 200.0f );
-  alignment.SetProperty( Actor::Property::SIZE, size);
+  Vector2 size(100.0f, 200.0f);
+  alignment.SetProperty(Actor::Property::SIZE, size);
 
   application.Render();
   application.SendNotification();
@@ -967,8 +965,8 @@ int UtcDaliAlignmentOnTouchEvent(void)
   ToolkitTestApplication application;
 
   Alignment alignment = Alignment::New();
-  alignment.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  alignment.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  alignment.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  alignment.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(alignment);
 
   alignment.TouchedSignal().Connect(&TouchCallback);
@@ -979,10 +977,10 @@ int UtcDaliAlignmentOnTouchEvent(void)
   application.SendNotification();
 
   Integration::TouchEvent touchEvent(1);
-  Integration::Point point;
-  point.SetDeviceId( 1 );
-  point.SetState( PointState::DOWN);
-  point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
+  Integration::Point      point;
+  point.SetDeviceId(1);
+  point.SetState(PointState::DOWN);
+  point.SetScreenPosition(Vector2(20.0f, 20.0f));
   touchEvent.AddPoint(point);
   application.ProcessEvent(touchEvent);
 
@@ -1019,7 +1017,7 @@ int UtcDaliAlignmentOnSizeAnimation(void)
   application.GetScene().Add(alignment);
 
   Animation animation = Animation::New(100.0f);
-  animation.AnimateTo( Property( alignment, Actor::Property::SIZE ), Vector3( 100.0f, 150.0f, 200.0f ) );
+  animation.AnimateTo(Property(alignment, Actor::Property::SIZE), Vector3(100.0f, 150.0f, 200.0f));
   animation.Play();
 
   application.Render();
@@ -1042,20 +1040,20 @@ int UtcDaliAlignmentCopyAndAssignment(void)
   alignment.SetPadding(padding);
 
   Alignment alignmentCopy(alignment);
-  DALI_TEST_CHECK( fabs( padding.left - alignmentCopy.GetPadding().left ) < GetRangedEpsilon( padding.left, alignmentCopy.GetPadding().left ) );
-  DALI_TEST_CHECK( fabs( padding.right - alignmentCopy.GetPadding().right ) < GetRangedEpsilon( padding.right, alignmentCopy.GetPadding().right ) );
-  DALI_TEST_CHECK( fabs( padding.top - alignmentCopy.GetPadding().top ) < GetRangedEpsilon( padding.top, alignmentCopy.GetPadding().top ) );
-  DALI_TEST_CHECK( fabs( padding.bottom - alignmentCopy.GetPadding().bottom ) < GetRangedEpsilon( padding.bottom, alignmentCopy.GetPadding().bottom ) );
+  DALI_TEST_CHECK(fabs(padding.left - alignmentCopy.GetPadding().left) < GetRangedEpsilon(padding.left, alignmentCopy.GetPadding().left));
+  DALI_TEST_CHECK(fabs(padding.right - alignmentCopy.GetPadding().right) < GetRangedEpsilon(padding.right, alignmentCopy.GetPadding().right));
+  DALI_TEST_CHECK(fabs(padding.top - alignmentCopy.GetPadding().top) < GetRangedEpsilon(padding.top, alignmentCopy.GetPadding().top));
+  DALI_TEST_CHECK(fabs(padding.bottom - alignmentCopy.GetPadding().bottom) < GetRangedEpsilon(padding.bottom, alignmentCopy.GetPadding().bottom));
 
   Alignment alignmentEmptyCopy(emptyAlignment);
   DALI_TEST_CHECK(emptyAlignment == alignmentEmptyCopy);
 
   Alignment alignmentEquals;
   alignmentEquals = alignment;
-  DALI_TEST_CHECK( fabs( padding.left - alignmentEquals.GetPadding().left ) < GetRangedEpsilon( padding.left, alignmentEquals.GetPadding().left ) );
-  DALI_TEST_CHECK( fabs( padding.right - alignmentEquals.GetPadding().right ) < GetRangedEpsilon( padding.right, alignmentEquals.GetPadding().right ) );
-  DALI_TEST_CHECK( fabs( padding.top - alignmentEquals.GetPadding().top ) < GetRangedEpsilon( padding.top, alignmentEquals.GetPadding().top ) );
-  DALI_TEST_CHECK( fabs( padding.bottom - alignmentEquals.GetPadding().bottom ) < GetRangedEpsilon( padding.bottom, alignmentEquals.GetPadding().bottom ) );
+  DALI_TEST_CHECK(fabs(padding.left - alignmentEquals.GetPadding().left) < GetRangedEpsilon(padding.left, alignmentEquals.GetPadding().left));
+  DALI_TEST_CHECK(fabs(padding.right - alignmentEquals.GetPadding().right) < GetRangedEpsilon(padding.right, alignmentEquals.GetPadding().right));
+  DALI_TEST_CHECK(fabs(padding.top - alignmentEquals.GetPadding().top) < GetRangedEpsilon(padding.top, alignmentEquals.GetPadding().top));
+  DALI_TEST_CHECK(fabs(padding.bottom - alignmentEquals.GetPadding().bottom) < GetRangedEpsilon(padding.bottom, alignmentEquals.GetPadding().bottom));
 
   Alignment alignmentEmptyEquals;
   alignmentEmptyEquals = emptyAlignment;

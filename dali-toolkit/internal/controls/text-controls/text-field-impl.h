@@ -578,6 +578,11 @@ protected:
     bool SetRangeOfSelection(size_t selectionIndex, size_t startOffset, size_t endOffset) override;
 
     /**
+     * @copydoc Dali::Accessibility::Text::GetRangeExtents()
+     */
+    Rect<> GetRangeExtents(size_t startOffset, size_t endOffset, Accessibility::CoordinateType type) override;
+
+    /**
      * @copydoc Dali::Accessibility::EditableText::CopyText()
      */
     bool CopyText(size_t startPosition, size_t endPosition) override;

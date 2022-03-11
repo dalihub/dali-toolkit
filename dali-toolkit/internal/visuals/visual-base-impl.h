@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,6 +184,13 @@ public:
    * Gets currently staged renderer, or an empty handle if not staged
    */
   Renderer GetRenderer();
+
+  /**
+   * Convert all string keys to int keys
+   * @param[in] key The key to convert
+   * @return the index key supplied or matching, or INVALID_INDEX if no match
+   */
+  static Property::Index GetIntKey(Property::Key key);
 
   /**
    * Sets the mix color ( including opacity )  of the visual.

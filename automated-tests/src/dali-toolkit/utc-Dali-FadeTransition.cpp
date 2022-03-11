@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,17 @@
  *
  */
 
-#include <iostream>
 #include <stdlib.h>
+#include <iostream>
+
 #include <dali-toolkit-test-suite-utils.h>
+
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali/devel-api/actors/actor-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/public-api/transition/transition-set.h>
-#include <dali-toolkit/public-api/transition/transition-base.h>
 #include <dali-toolkit/public-api/transition/fade-transition.h>
+#include <dali-toolkit/public-api/transition/transition-base.h>
+#include <dali-toolkit/public-api/transition/transition-set.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -118,7 +120,7 @@ int UtcDaliFadeTransitionWithOffScene(void)
   transitionSet.AddTransition(fade);
   transitionSet.Play();
 
-  bool signalReceived(false);
+  bool                  signalReceived(false);
   TransitionFinishCheck finishCheck(signalReceived);
   transitionSet.FinishedSignal().Connect(&application, finishCheck);
 
@@ -130,7 +132,7 @@ int UtcDaliFadeTransitionWithOffScene(void)
   finishCheck.CheckSignalNotReceived();
 
   DALI_TEST_EQUALS(1.0f, control.GetCurrentProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
-  
+
   application.SendNotification();
   application.Render(200);
 
@@ -175,7 +177,7 @@ int UtcDaliFadeTransitionDisappearing(void)
   transitionSet.AddTransition(fade);
   transitionSet.Play();
 
-  bool signalReceived(false);
+  bool                  signalReceived(false);
   TransitionFinishCheck finishCheck(signalReceived);
   transitionSet.FinishedSignal().Connect(&application, finishCheck);
 
@@ -188,7 +190,7 @@ int UtcDaliFadeTransitionDisappearing(void)
 
   float currentOpacity = control.GetCurrentProperty<float>(Actor::Property::OPACITY);
   DALI_TEST_CHECK(currentOpacity <= 0.7 && currentOpacity >= 0.5);
-  
+
   application.SendNotification();
   application.Render(200);
 
@@ -234,7 +236,7 @@ int UtcDaliFadeTransitionAppearing(void)
   transitionSet.AddTransition(fade);
   transitionSet.Play();
 
-  bool signalReceived(false);
+  bool                  signalReceived(false);
   TransitionFinishCheck finishCheck(signalReceived);
   transitionSet.FinishedSignal().Connect(&application, finishCheck);
 
@@ -247,7 +249,7 @@ int UtcDaliFadeTransitionAppearing(void)
 
   float currentOpacity = control.GetCurrentProperty<float>(Actor::Property::OPACITY);
   DALI_TEST_CHECK(currentOpacity <= 1.0 && currentOpacity >= 0.8);
-  
+
   application.SendNotification();
   application.Render(200);
 
@@ -262,7 +264,6 @@ int UtcDaliFadeTransitionAppearing(void)
 
   END_TEST;
 }
-
 
 int UtcDaliFadeTransitionAppearingWithDelay(void)
 {
@@ -293,7 +294,7 @@ int UtcDaliFadeTransitionAppearingWithDelay(void)
   transitionSet.AddTransition(fade);
   transitionSet.Play();
 
-  bool signalReceived(false);
+  bool                  signalReceived(false);
   TransitionFinishCheck finishCheck(signalReceived);
   transitionSet.FinishedSignal().Connect(&application, finishCheck);
 

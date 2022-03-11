@@ -49,7 +49,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(10); // 5 transform properties + anim,premul,size,offset,multicol
+const int CUSTOM_PROPERTY_COUNT(5); // anim,premul,size,offset,multicol
 
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
@@ -258,7 +258,7 @@ void TextVisual::OnInitialize()
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
   Shader   shader   = GetTextShader(mFactoryCache, TextType::SINGLE_COLOR_TEXT, TextType::NO_EMOJI, TextType::NO_STYLES);
 
-  mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 }
 
@@ -323,6 +323,7 @@ void TextVisual::DoSetOnScene(Actor& actor)
     // Make zero if the alpha value of text color is zero to skip rendering text
     if(!mOpacityConstraint)
     {
+      // VisualRenderer::Property::OPACITY uses same animatable property internally.
       mOpacityConstraint = Constraint::New<float>(mImpl->mRenderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint);
       mOpacityConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
     }
@@ -596,7 +597,7 @@ PixelData TextVisual::ConvertToPixelData(unsigned char* buffer, int width, int h
   return pixelData;
 }
 
-void TextVisual::CreateTextureSet(TilingInfo& info, Renderer& renderer, Sampler& sampler, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle)
+void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sampler& sampler, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle)
 {
   TextureSet   textureSet      = TextureSet::New();
   unsigned int textureSetIndex = 0u;
@@ -633,17 +634,17 @@ void TextVisual::CreateTextureSet(TilingInfo& info, Renderer& renderer, Sampler&
   renderer.SetTextures(textureSet);
 
   //Register transform properties
-  mImpl->mTransform.RegisterUniforms(renderer, Direction::LEFT_TO_RIGHT);
+  mImpl->mTransform.SetUniforms(renderer, Direction::LEFT_TO_RIGHT);
 
   // Enable the pre-multiplied alpha to improve the text quality
   renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
   renderer.RegisterProperty(PREMULTIPLIED_ALPHA, 1.0f);
 
   // Set size and offset for the tiling.
-  renderer.RegisterProperty(SIZE, Vector2(info.width, info.height));
-  renderer.RegisterProperty(OFFSET, Vector2(info.offSet.x, info.offSet.y));
-  renderer.RegisterProperty("uHasMultipleTextColors", static_cast<float>(hasMultipleTextColors));
+  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, Vector2(info.width, info.height));
+  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET, Vector2(info.offSet.x, info.offSet.y));
   renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+  renderer.RegisterProperty("uHasMultipleTextColors", static_cast<float>(hasMultipleTextColors));
 
   mRendererList.push_back(renderer);
 }
@@ -663,7 +664,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
 
     mImpl->mRenderer.SetTextures(textureSet);
     //Register transform properties
-    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
     mImpl->mRenderer.RegisterProperty("uHasMultipleTextColors", static_cast<float>(hasMultipleTextColors));
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
 
@@ -731,7 +732,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     // Create a renderer by cutting maxTextureSize.
     while(verifiedHeight > 0)
     {
-      Renderer tilingRenderer = Renderer::New(geometry, shader);
+      VisualRenderer tilingRenderer = VisualRenderer::New(geometry, shader);
       tilingRenderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT);
       // New offset position of buffer for tiling.
       info.offsetPosition += offsetPosition;
