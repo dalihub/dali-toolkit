@@ -592,6 +592,37 @@ int UtcDaliTextLabelBackgroundTag(void)
   END_TEST;
 }
 
+int UtcDaliTextLabelSpanBackgroundTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextLabelSpanBackgroundTag\n");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  label.SetProperty(TextLabel ::Property::ENABLE_MARKUP, true);
+  label.SetProperty(TextLabel::Property::TEXT, "H<span background-color='red'>e</span> Worl<span background-color='yellow'>d</span>");
+  application.GetScene().Add(label);
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextLabel& labelImpl                    = GetImpl(label);
+  const ColorIndex* const       backgroundColorIndicesBuffer = labelImpl.GetTextController()->GetTextModel()->GetBackgroundColorIndices();
+
+  DALI_TEST_CHECK(backgroundColorIndicesBuffer);
+
+  //default color
+  DALI_TEST_EQUALS(backgroundColorIndicesBuffer[0], 0u, TEST_LOCATION);
+
+  //red color
+  DALI_TEST_EQUALS(backgroundColorIndicesBuffer[1], 1u, TEST_LOCATION);
+
+  //yellow color
+  DALI_TEST_EQUALS(backgroundColorIndicesBuffer[7], 2u, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextlabelEllipsisInternalAPIs(void)
 {
   ToolkitTestApplication application;

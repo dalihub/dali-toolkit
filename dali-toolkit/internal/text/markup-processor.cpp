@@ -141,9 +141,11 @@ struct Span
   RunIndex colorRunIndex;
   RunIndex fontRunIndex;
   RunIndex underlinedCharacterRunIndex;
+  RunIndex backgroundColorRunIndex;
   bool     isColorDefined;
   bool     isFontDefined;
   bool     isUnderlinedCharacterDefined;
+  bool     isBackgroundColorDefined;
 };
 
 /**
@@ -203,6 +205,8 @@ void Initialize(Span& span)
   span.isFontDefined                = false;
   span.underlinedCharacterRunIndex  = 0u;
   span.isUnderlinedCharacterDefined = false;
+  span.backgroundColorRunIndex      = 0u;
+  span.isBackgroundColorDefined     = false;
 }
 
 /**
@@ -728,9 +732,11 @@ void ProcessSpanForRun(
   Vector<ColorRun>&               colorRuns,
   Vector<FontDescriptionRun>&     fontRuns,
   Vector<UnderlinedCharacterRun>& underlinedCharacterRuns,
+  Vector<ColorRun>&               backgroundColorRuns,
   RunIndex&                       colorRunIndex,
   RunIndex&                       fontRunIndex,
   RunIndex&                       underlinedCharacterRunIndex,
+  RunIndex&                       backgroundColorRunIndex,
   const CharacterIndex            characterIndex,
   int&                            tagReference)
 {
@@ -746,6 +752,9 @@ void ProcessSpanForRun(
     UnderlinedCharacterRun underlinedCharacterRun;
     Initialize(underlinedCharacterRun);
 
+    ColorRun backgroundColorRun;
+    Initialize(backgroundColorRun);
+
     Span span;
     Initialize(span);
 
@@ -753,12 +762,14 @@ void ProcessSpanForRun(
     colorRun.characterRun.characterIndex               = characterIndex;
     fontRun.characterRun.characterIndex                = characterIndex;
     underlinedCharacterRun.characterRun.characterIndex = characterIndex;
+    backgroundColorRun.characterRun.characterIndex     = characterIndex;
 
     span.colorRunIndex               = colorRunIndex;
     span.fontRunIndex                = fontRunIndex;
     span.underlinedCharacterRunIndex = underlinedCharacterRunIndex;
+    span.backgroundColorRunIndex     = backgroundColorRunIndex;
 
-    ProcessSpanTag(spanTag, colorRun, fontRun, underlinedCharacterRun, span.isColorDefined, span.isFontDefined, span.isUnderlinedCharacterDefined);
+    ProcessSpanTag(spanTag, colorRun, fontRun, underlinedCharacterRun, backgroundColorRun, span.isColorDefined, span.isFontDefined, span.isUnderlinedCharacterDefined, span.isBackgroundColorDefined);
 
     // Push the span into the stack.
     spanStack.Push(span);
@@ -783,6 +794,13 @@ void ProcessSpanForRun(
       // Push the run in the logical model.
       underlinedCharacterRuns.PushBack(underlinedCharacterRun);
       ++underlinedCharacterRunIndex;
+    }
+
+    if(span.isBackgroundColorDefined)
+    {
+      // Push the run in the logical model.
+      backgroundColorRuns.PushBack(backgroundColorRun);
+      ++backgroundColorRunIndex;
     }
 
     // Increase reference
@@ -811,6 +829,12 @@ void ProcessSpanForRun(
       {
         UnderlinedCharacterRun& underlinedCharacterRun         = *(underlinedCharacterRuns.Begin() + span.underlinedCharacterRunIndex);
         underlinedCharacterRun.characterRun.numberOfCharacters = characterIndex - underlinedCharacterRun.characterRun.characterIndex;
+      }
+
+      if(span.isBackgroundColorDefined)
+      {
+        ColorRun& backgroundColorRun                       = *(backgroundColorRuns.Begin() + span.backgroundColorRunIndex);
+        backgroundColorRun.characterRun.numberOfCharacters = characterIndex - backgroundColorRun.characterRun.characterIndex;
       }
 
       --tagReference;
@@ -1072,7 +1096,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
       }
       else if(TokenComparison(XHTML_SPAN_TAG, tag.buffer, tag.length))
       {
-        ProcessSpanForRun(tag, spanStack, markupProcessData.colorRuns, markupProcessData.fontRuns, markupProcessData.underlinedCharacterRuns, colorRunIndex, fontRunIndex, underlinedCharacterRunIndex, characterIndex, spanTagReference);
+        ProcessSpanForRun(tag, spanStack, markupProcessData.colorRuns, markupProcessData.fontRuns, markupProcessData.underlinedCharacterRuns, markupProcessData.backgroundColorRuns, colorRunIndex, fontRunIndex, underlinedCharacterRunIndex, backgroundRunIndex, characterIndex, spanTagReference);
       }
       else if(TokenComparison(XHTML_STRIKETHROUGH_TAG, tag.buffer, tag.length))
       {

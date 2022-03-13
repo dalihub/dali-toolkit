@@ -43,6 +43,7 @@ const std::string XHTML_WIDTH_ATTRIBUTE("font-width");
 const std::string XHTML_SLANT_ATTRIBUTE("font-slant");
 
 const std::string XHTML_COLOR_ATTRIBUTE("text-color");
+const std::string XHTML_BACKGROUND_COLOR_ATTRIBUTE("background-color");
 
 //the underlined character's attributes
 const std::string XHTML_UNDERLINE_COLOR_ATTRIBUTE("u-color");
@@ -56,9 +57,11 @@ void ProcessSpanTag(const Tag&              tag,
                     ColorRun&               colorRun,
                     FontDescriptionRun&     fontRun,
                     UnderlinedCharacterRun& underlinedCharacterRun,
+                    ColorRun&               backgroundColorRun,
                     bool&                   isColorDefined,
                     bool&                   isFontDefined,
-                    bool&                   isUnderlinedCharacterDefined)
+                    bool&                   isUnderlinedCharacterDefined,
+                    bool&                   isBackgroundColorDefined)
 {
   for(Vector<Attribute>::ConstIterator it    = tag.attributes.Begin(),
                                        endIt = tag.attributes.End();
@@ -71,6 +74,11 @@ void ProcessSpanTag(const Tag&              tag,
     {
       isColorDefined = true;
       ProcessColor(attribute, colorRun);
+    }
+    else if(TokenComparison(XHTML_BACKGROUND_COLOR_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    {
+      isBackgroundColorDefined = true;
+      ProcessColor(attribute, backgroundColorRun);
     }
     else if(TokenComparison(XHTML_FAMILY_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
     {
