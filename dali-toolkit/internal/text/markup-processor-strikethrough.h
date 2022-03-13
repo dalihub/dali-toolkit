@@ -37,6 +37,14 @@ struct StrikethroughCharacterRun;
 void ProcessColorAttribute(const Attribute& attribute, StrikethroughCharacterRun& strikethroughCharacterRun);
 
 /**
+ * @brief Fill the strikethrough character run with the height attribute value.
+ *
+ * @param[in] attribute the height attribute.
+ * @param[out] strikethroughRun The strikethrough character run
+ */
+void ProcessHeightAttribute(const Attribute& attribute, StrikethroughCharacterRun& strikethroughRun);
+
+/**
  * @brief Retrieves the strikethrough run info from the tag and sets it to the strikethrough run.
  *
  * @param[in] tag The strikethrough tag and its attributes.

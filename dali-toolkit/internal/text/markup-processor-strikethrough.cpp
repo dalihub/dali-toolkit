@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/markup-processor-attribute-helper-functions.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/strikethrough-character-run.h>
 
@@ -34,13 +35,20 @@ namespace Text
 namespace
 {
 const std::string XHTML_COLOR_ATTRIBUTE("color");
-}
+const std::string XHTML_HEIGHT_ATTRIBUTE("height");
+} // namespace
 
 void ProcessColorAttribute(const Attribute& attribute, StrikethroughCharacterRun& strikethroughRun)
 
 {
   ColorStringToVector4(attribute.valueBuffer, attribute.valueLength, strikethroughRun.properties.color);
   strikethroughRun.properties.colorDefined = true;
+}
+
+void ProcessHeightAttribute(const Attribute& attribute, StrikethroughCharacterRun& strikethroughRun)
+{
+  strikethroughRun.properties.height        = ProcessFloatAttribute(attribute);
+  strikethroughRun.properties.heightDefined = true;
 }
 
 void ProcessStrikethroughTag(const Tag& tag, StrikethroughCharacterRun& strikethroughRun)
@@ -51,9 +59,14 @@ void ProcessStrikethroughTag(const Tag& tag, StrikethroughCharacterRun& striketh
       ++it)
   {
     const Attribute& attribute(*it);
+
     if(TokenComparison(XHTML_COLOR_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessColorAttribute(attribute, strikethroughRun);
+    }
+    else if(TokenComparison(XHTML_HEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    {
+      ProcessHeightAttribute(attribute, strikethroughRun);
     }
   }
 }

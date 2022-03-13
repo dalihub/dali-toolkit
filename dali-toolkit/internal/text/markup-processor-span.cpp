@@ -55,6 +55,7 @@ const std::string XHTML_UNDERLINE_DASH_WIDTH_ATTRIBUTE("u-dash-width");
 
 //the strikethroughed character's attributes
 const std::string XHTML_STRIKETHROUGH_COLOR_ATTRIBUTE("s-color");
+const std::string XHTML_STRIKETHROUGH_HEIGHT_ATTRIBUTE("s-height");
 
 } // namespace
 
@@ -142,6 +143,11 @@ void ProcessSpanTag(const Tag&                 tag,
     {
       isStrikethroughDefined = true;
       ProcessColorAttribute(attribute, strikethroughRun);
+    }
+    else if(TokenComparison(XHTML_STRIKETHROUGH_HEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    {
+      isStrikethroughDefined = true;
+      ProcessHeightAttribute(attribute, strikethroughRun);
     }
   }
 }

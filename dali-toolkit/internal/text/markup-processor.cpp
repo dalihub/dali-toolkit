@@ -83,7 +83,7 @@ const char NEW_LINE    = 0x0A; // ASCII value of the newline.
 // Range 3 0x10000u < XHTML_DECIMAL_ENTITY_RANGE <= 0x10FFFFu
 const unsigned long XHTML_DECIMAL_ENTITY_RANGE[] = {0x0u, 0xD7FFu, 0xE000u, 0xFFFDu, 0x10000u, 0x10FFFFu};
 
-const unsigned int MAX_NUM_OF_ATTRIBUTES = 12u; ///< The span tag has the 'font-family', 'font-size' 'font-weight', 'font-width', 'font-slant','text-color', 'u-color', 'u-height','u-type','u-dash-gap', 'u-dash-width' and 's-color' attrubutes.
+const unsigned int MAX_NUM_OF_ATTRIBUTES = 13u; ///< The span tag has the 'font-family', 'font-size' 'font-weight', 'font-width', 'font-slant','text-color', 'u-color', 'u-height','u-type','u-dash-gap', 'u-dash-width', 's-color' and 's-height' attrubutes.
 const unsigned int DEFAULT_VECTOR_SIZE   = 16u; ///< Default size of run vectors.
 
 #if defined(DEBUG_ENABLED)

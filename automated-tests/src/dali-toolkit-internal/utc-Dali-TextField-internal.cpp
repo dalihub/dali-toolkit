@@ -684,6 +684,93 @@ int UtcDaliTextFieldMarkupNestedUnderlineTags(void)
   END_TEST;
 }
 
+int UtcDaliTextFieldMarkupStrikethroughAttributes(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldMarkupStrikethroughAttributes ");
+
+  TextField textField = TextField::New();
+
+  application.GetScene().Add(textField);
+
+  std::string testText =
+    "start<s>ABC1</s>then"
+    "<s color='green'>ABC2</s>then"
+    "<s height='5.0f'>ABC3</s>then"
+    "<s color='blue' height='4.0f' >ABC4</s>end";
+
+  textField.SetProperty(TextField::Property::TEXT, testText);
+  textField.SetProperty(TextField ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  const uint32_t expectedNumberOfStrikethroughRuns = 4u;
+
+  Toolkit::Internal::TextField& textFieldImpl             = GetImpl(textField);
+  const Text::Length            numberOfStrikethroughRuns = textFieldImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
+
+  DALI_TEST_EQUALS(numberOfStrikethroughRuns, expectedNumberOfStrikethroughRuns, TEST_LOCATION);
+
+  Vector<StrikethroughGlyphRun> strikethroughRuns;
+  strikethroughRuns.Resize(numberOfStrikethroughRuns);
+  textFieldImpl.GetTextController()->GetTextModel()->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
+
+  struct DataOfCase
+  {
+    std::string                  title;
+    GlyphIndex                   glyphIndex;
+    Length                       numberOfGlyphs;
+    StrikethroughStyleProperties properties;
+  };
+  DataOfCase data[] =
+    {
+
+      {"<s>ABC1</s>",
+       5u,
+       4u,
+       {Color::BLACK,
+        0.0f,
+        false,
+        false}},
+
+      {"<s color='green'>ABC2</s>",
+       13u,
+       4u,
+       {Color::GREEN,
+        0.0f,
+        true,
+        false}},
+
+      {"<s height='5.0f'>ABC3</s>",
+       21u,
+       4u,
+       {Color::BLACK,
+        5.0f,
+        false,
+        true}},
+
+      {"<s color='blue' height='4.0f' >ABC4</s>",
+       29u,
+       4u,
+       {Color::BLUE,
+        4.0f,
+        true,
+        true}},
+
+    };
+
+  for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
+  {
+    tet_infoline(data[i].title.c_str());
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
+    DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliTextFieldMarkupSpanStrikethrough(void)
 {
   ToolkitTestApplication application;
@@ -696,7 +783,8 @@ int UtcDaliTextFieldMarkupSpanStrikethrough(void)
   std::string testText =
     "start<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ABC1</span>then"
     "<span s-color='blue'>ABC2</span>then"
-    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' s-color='green'>ABC3</span>end";
+    "<span s-height='2.0f'>ABC3</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' s-color='green' s-height='5.0f'>ABC4</span>end";
 
   textField.SetProperty(TextField::Property::TEXT, testText);
   textField.SetProperty(TextField ::Property::ENABLE_MARKUP, true);
@@ -704,7 +792,7 @@ int UtcDaliTextFieldMarkupSpanStrikethrough(void)
   application.SendNotification();
   application.Render();
 
-  const uint32_t expectedNumberOfStrikethroughRuns = 2u;
+  const uint32_t expectedNumberOfStrikethroughRuns = 3u;
 
   Toolkit::Internal::TextField& textFieldImpl             = GetImpl(textField);
   const Text::Length            numberOfStrikethroughRuns = textFieldImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
@@ -729,17 +817,25 @@ int UtcDaliTextFieldMarkupSpanStrikethrough(void)
        13u,
        4u,
        {Color::BLUE,
-        0u,
+        0.0f,
         true,
         false}},
 
-      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' s-color='green'>ABC3</span>",
+      {"<span s-height='2.0f'>ABC3</span>then",
        21u,
        4u,
+       {Color::BLACK,
+        2.0f,
+        false,
+        true}},
+
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' s-color='green' s-height='5.0f'>ABC4</span>",
+       29u,
+       4u,
        {Color::GREEN,
-        0u,
+        5.0f,
         true,
-        false}},
+        true}},
 
     };
 
