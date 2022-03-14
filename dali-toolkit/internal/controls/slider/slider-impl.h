@@ -749,15 +749,35 @@ private:
     mSnapToMarks : 1;  ///< Turn on or off snapping to marks
 
 protected:
-  struct AccessibleImpl : public DevelControl::ControlAccessible,
-                          public virtual Dali::Accessibility::Value
+  class SliderAccessible : public DevelControl::ControlAccessible,
+                           public virtual Dali::Accessibility::Value
   {
+  public:
     using DevelControl::ControlAccessible::ControlAccessible;
 
+    /**
+     * @copydoc Dali::Accessibility::Value::GetMinimum()
+     */
     double GetMinimum() const override;
+
+    /**
+     * @copydoc Dali::Accessibility::Value::GetCurrent()
+     */
     double GetCurrent() const override;
+
+    /**
+     * @copydoc Dali::Accessibility::Value::GetMaximum()
+     */
     double GetMaximum() const override;
-    bool   SetCurrent(double) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Value::SetCurrent()
+     */
+    bool SetCurrent(double) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Value::GetMinimumIncrement()
+     */
     double GetMinimumIncrement() const override;
   };
 };

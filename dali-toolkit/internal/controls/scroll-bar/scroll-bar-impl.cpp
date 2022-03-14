@@ -213,8 +213,7 @@ void ScrollBar::OnInitialize()
   Self().SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::SCROLL_BAR));
+    return std::make_unique<ScrollBarAccessible>(actor, Dali::Accessibility::Role::SCROLL_BAR);
   });
 }
 
@@ -861,28 +860,28 @@ Toolkit::ScrollBar ScrollBar::New(Toolkit::ScrollBar::Direction direction)
   return handle;
 }
 
-double ScrollBar::AccessibleImpl::GetMinimum() const
+double ScrollBar::ScrollBarAccessible::GetMinimum() const
 {
   auto self = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(self).mScrollableObject.GetHandle();
   return scrollableHandle ? scrollableHandle.GetCurrentProperty<float>(GetImpl(self).mPropertyMinScrollPosition) : 0.0f;
 }
 
-double ScrollBar::AccessibleImpl::GetCurrent() const
+double ScrollBar::ScrollBarAccessible::GetCurrent() const
 {
   auto self = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(self).mScrollableObject.GetHandle();
   return scrollableHandle ? scrollableHandle.GetCurrentProperty<float>(GetImpl(self).mPropertyScrollPosition) : 0.0f;
 }
 
-double ScrollBar::AccessibleImpl::GetMaximum() const
+double ScrollBar::ScrollBarAccessible::GetMaximum() const
 {
   auto self = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(self).mScrollableObject.GetHandle();
   return scrollableHandle ? scrollableHandle.GetCurrentProperty<float>(GetImpl(self).mPropertyMaxScrollPosition) : 1.0f;
 }
 
-bool ScrollBar::AccessibleImpl::SetCurrent(double current)
+bool ScrollBar::ScrollBarAccessible::SetCurrent(double current)
 {
   if(current < GetMinimum() || current > GetMaximum())
   {
@@ -910,7 +909,7 @@ bool ScrollBar::AccessibleImpl::SetCurrent(double current)
   return true;
 }
 
-double ScrollBar::AccessibleImpl::GetMinimumIncrement() const
+double ScrollBar::ScrollBarAccessible::GetMinimumIncrement() const
 {
   return 1.0;
 }

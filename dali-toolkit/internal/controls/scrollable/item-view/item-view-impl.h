@@ -434,10 +434,14 @@ private: // From Control
   void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor) override;
 
 protected:
-  struct AccessibleImpl : public Scrollable::AccessibleImpl
+  class ItemViewAccessible : public Scrollable::ScrollableAccessible
   {
-    using Scrollable::AccessibleImpl::AccessibleImpl;
+  public:
+    using Scrollable::ScrollableAccessible::ScrollableAccessible;
 
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::ScrollToChild()
+     */
     bool ScrollToChild(Actor child) override;
   };
 

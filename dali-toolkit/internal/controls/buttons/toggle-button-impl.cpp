@@ -107,8 +107,7 @@ void ToggleButton::OnInitialize()
   self.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::TOGGLE_BUTTON));
+    return std::make_unique<ToggleButtonAccessible>(actor, Dali::Accessibility::Role::TOGGLE_BUTTON);
   });
 }
 
@@ -372,9 +371,9 @@ void ToggleButton::OnPressed()
   RelayoutRequest();
 }
 
-Dali::Accessibility::States ToggleButton::AccessibleImpl::CalculateStates()
+Dali::Accessibility::States ToggleButton::ToggleButtonAccessible::CalculateStates()
 {
-  auto states = Button::AccessibleImpl::CalculateStates();
+  auto states = Button::ButtonAccessible::CalculateStates();
   auto button = Toolkit::ToggleButton::DownCast(Self());
   if(button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX))
   {
@@ -383,7 +382,7 @@ Dali::Accessibility::States ToggleButton::AccessibleImpl::CalculateStates()
   return states;
 }
 
-std::string ToggleButton::AccessibleImpl::GetDescriptionRaw() const
+std::string ToggleButton::ToggleButtonAccessible::GetDescriptionRaw() const
 {
   auto button   = Toolkit::ToggleButton::DownCast(Self());
   auto index    = button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX);
@@ -392,7 +391,7 @@ std::string ToggleButton::AccessibleImpl::GetDescriptionRaw() const
   return tooltips[index].Get<std::string>();
 }
 
-Property::Index ToggleButton::AccessibleImpl::GetDescriptionPropertyIndex()
+Property::Index ToggleButton::ToggleButtonAccessible::GetDescriptionPropertyIndex()
 {
   return Toolkit::ToggleButton::Property::TOOLTIPS;
 }

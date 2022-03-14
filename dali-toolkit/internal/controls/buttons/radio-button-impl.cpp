@@ -72,8 +72,7 @@ void RadioButton::OnInitialize()
   Button::OnInitialize();
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::RADIO_BUTTON));
+    return std::make_unique<RadioButtonAccessible>(actor, Dali::Accessibility::Role::RADIO_BUTTON);
   });
 }
 
@@ -112,9 +111,9 @@ void RadioButton::OnStateChange(State newState)
   }
 }
 
-Dali::Accessibility::States RadioButton::AccessibleImpl::CalculateStates()
+Dali::Accessibility::States RadioButton::RadioButtonAccessible::CalculateStates()
 {
-  auto state = Button::AccessibleImpl::CalculateStates();
+  auto state = Button::ButtonAccessible::CalculateStates();
   auto self = Toolkit::Button::DownCast(Self());
 
   if(self.GetProperty<bool>(Toolkit::Button::Property::SELECTED))

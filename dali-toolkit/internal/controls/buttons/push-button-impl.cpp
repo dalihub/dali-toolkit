@@ -96,8 +96,7 @@ void PushButton::OnInitialize()
   self.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::PUSH_BUTTON));
+    return std::make_unique<PushButtonAccessible>(actor, Dali::Accessibility::Role::PUSH_BUTTON);
   });
 }
 
@@ -194,9 +193,9 @@ Property::Value PushButton::GetProperty(BaseObject* object, Property::Index prop
   return value;
 }
 
-Dali::Accessibility::States PushButton::AccessibleImpl::CalculateStates()
+Dali::Accessibility::States PushButton::PushButtonAccessible::CalculateStates()
 {
-  auto state = Button::AccessibleImpl::CalculateStates();
+  auto state = Button::ButtonAccessible::CalculateStates();
   auto self = Toolkit::Button::DownCast(Self());
   state[Dali::Accessibility::State::PRESSED] = self.GetProperty<bool>(Toolkit::Button::Property::SELECTED);
   return state;

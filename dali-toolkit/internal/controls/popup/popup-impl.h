@@ -241,11 +241,19 @@ public:
   static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
 
 protected:
-  struct AccessibleImpl : public DevelControl::ControlAccessible
+  class PopupAccessible : public DevelControl::ControlAccessible
   {
+  public:
     using DevelControl::ControlAccessible::ControlAccessible;
 
-    std::string                 GetNameRaw() const override;
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::GetNameRaw()
+     */
+    std::string GetNameRaw() const override;
+
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::CalculateStates()
+     */
     Dali::Accessibility::States CalculateStates() override;
   };
 

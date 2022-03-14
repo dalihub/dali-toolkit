@@ -604,8 +604,7 @@ void TextEditor::OnInitialize()
   self.Add(mStencil);
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::ENTRY));
+    return std::make_unique<TextEditorAccessible>(actor, Dali::Accessibility::Role::ENTRY);
   });
 
   Accessibility::Bridge::EnabledSignal().Connect(this, &TextEditor::OnAccessibilityStatusChanged);
@@ -1349,13 +1348,13 @@ TextEditor::~TextEditor()
   }
 }
 
-std::string TextEditor::AccessibleImpl::GetName() const
+std::string TextEditor::TextEditorAccessible::GetName() const
 {
   auto self = Toolkit::TextEditor::DownCast(Self());
   return self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
 }
 
-std::string TextEditor::AccessibleImpl::GetText(size_t startOffset, size_t endOffset) const
+std::string TextEditor::TextEditorAccessible::GetText(size_t startOffset, size_t endOffset) const
 {
   if(endOffset <= startOffset)
   {
@@ -1373,7 +1372,7 @@ std::string TextEditor::AccessibleImpl::GetText(size_t startOffset, size_t endOf
   return text.substr(startOffset, endOffset - startOffset);
 }
 
-size_t TextEditor::AccessibleImpl::GetCharacterCount() const
+size_t TextEditor::TextEditorAccessible::GetCharacterCount() const
 {
   auto self = Toolkit::TextEditor::DownCast(Self());
   auto text = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
@@ -1381,13 +1380,13 @@ size_t TextEditor::AccessibleImpl::GetCharacterCount() const
   return text.size();
 }
 
-size_t TextEditor::AccessibleImpl::GetCursorOffset() const
+size_t TextEditor::TextEditorAccessible::GetCursorOffset() const
 {
   auto slf = Toolkit::TextEditor::DownCast(Self());
   return Dali::Toolkit::GetImpl(slf).GetTextController()->GetCursorPosition();
 }
 
-bool TextEditor::AccessibleImpl::SetCursorOffset(size_t offset)
+bool TextEditor::TextEditorAccessible::SetCursorOffset(size_t offset)
 {
   auto slf = Toolkit::TextEditor::DownCast(Self());
   auto txt = slf.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
@@ -1403,7 +1402,7 @@ bool TextEditor::AccessibleImpl::SetCursorOffset(size_t offset)
   return true;
 }
 
-Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary) const
+Dali::Accessibility::Range TextEditor::TextEditorAccessible::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary) const
 {
   auto self     = Toolkit::TextEditor::DownCast(Self());
   auto text     = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
@@ -1494,7 +1493,7 @@ Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(size_t of
   return range;
 }
 
-Dali::Accessibility::Range TextEditor::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex) const
+Dali::Accessibility::Range TextEditor::TextEditorAccessible::GetRangeOfSelection(size_t selectionIndex) const
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
   if(selectionIndex > 0)
@@ -1511,7 +1510,7 @@ Dali::Accessibility::Range TextEditor::AccessibleImpl::GetRangeOfSelection(size_
   return {static_cast<size_t>(indices.first), static_cast<size_t>(indices.second), value};
 }
 
-bool TextEditor::AccessibleImpl::RemoveSelection(size_t selectionIndex)
+bool TextEditor::TextEditorAccessible::RemoveSelection(size_t selectionIndex)
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
   if(selectionIndex > 0)
@@ -1524,7 +1523,7 @@ bool TextEditor::AccessibleImpl::RemoveSelection(size_t selectionIndex)
   return true;
 }
 
-bool TextEditor::AccessibleImpl::SetRangeOfSelection(size_t selectionIndex, size_t startOffset, size_t endOffset)
+bool TextEditor::TextEditorAccessible::SetRangeOfSelection(size_t selectionIndex, size_t startOffset, size_t endOffset)
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
   if(selectionIndex > 0)
@@ -1537,7 +1536,7 @@ bool TextEditor::AccessibleImpl::SetRangeOfSelection(size_t selectionIndex, size
   return true;
 }
 
-Rect<> TextEditor::AccessibleImpl::GetRangeExtents(size_t startOffset, size_t endOffset, Accessibility::CoordinateType type)
+Rect<> TextEditor::TextEditorAccessible::GetRangeExtents(size_t startOffset, size_t endOffset, Accessibility::CoordinateType type)
 {
   if (endOffset <= startOffset || endOffset <= 0)
   {
@@ -1555,7 +1554,7 @@ Rect<> TextEditor::AccessibleImpl::GetRangeExtents(size_t startOffset, size_t en
   return rect;
 }
 
-bool TextEditor::AccessibleImpl::CopyText(size_t startPosition, size_t endPosition)
+bool TextEditor::TextEditorAccessible::CopyText(size_t startPosition, size_t endPosition)
 {
   if(endPosition <= startPosition)
   {
@@ -1569,7 +1568,7 @@ bool TextEditor::AccessibleImpl::CopyText(size_t startPosition, size_t endPositi
   return true;
 }
 
-bool TextEditor::AccessibleImpl::CutText(size_t startPosition, size_t endPosition)
+bool TextEditor::TextEditorAccessible::CutText(size_t startPosition, size_t endPosition)
 {
   if(endPosition <= startPosition)
   {
@@ -1585,7 +1584,7 @@ bool TextEditor::AccessibleImpl::CutText(size_t startPosition, size_t endPositio
   return true;
 }
 
-bool TextEditor::AccessibleImpl::DeleteText(size_t startPosition, size_t endPosition)
+bool TextEditor::TextEditorAccessible::DeleteText(size_t startPosition, size_t endPosition)
 {
   if(endPosition <= startPosition)
   {
@@ -1600,7 +1599,7 @@ bool TextEditor::AccessibleImpl::DeleteText(size_t startPosition, size_t endPosi
   return true;
 }
 
-Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
+Dali::Accessibility::States TextEditor::TextEditorAccessible::CalculateStates()
 {
   using namespace Dali::Accessibility;
 
@@ -1617,7 +1616,7 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
   return states;
 }
 
-bool TextEditor::AccessibleImpl::InsertText(size_t startPosition, std::string text)
+bool TextEditor::TextEditorAccessible::InsertText(size_t startPosition, std::string text)
 {
   auto self         = Toolkit::TextEditor::DownCast(Self());
   auto insertedText = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
@@ -1629,20 +1628,20 @@ bool TextEditor::AccessibleImpl::InsertText(size_t startPosition, std::string te
   return true;
 }
 
-bool TextEditor::AccessibleImpl::SetTextContents(std::string newContents)
+bool TextEditor::TextEditorAccessible::SetTextContents(std::string newContents)
 {
   auto self = Toolkit::TextEditor::DownCast(Self());
   self.SetProperty(Toolkit::TextEditor::Property::TEXT, std::move(newContents));
   return true;
 }
 
-int32_t TextEditor::AccessibleImpl::GetLinkCount() const
+int32_t TextEditor::TextEditorAccessible::GetLinkCount() const
 {
   auto self = Toolkit::TextEditor::DownCast(Self());
   return Dali::Toolkit::GetImpl(self).mAnchorActors.size();
 }
 
-Accessibility::Hyperlink* TextEditor::AccessibleImpl::GetLink(int32_t linkIndex) const
+Accessibility::Hyperlink* TextEditor::TextEditorAccessible::GetLink(int32_t linkIndex) const
 {
   if(linkIndex < 0 || linkIndex >= GetLinkCount())
   {
@@ -1653,7 +1652,7 @@ Accessibility::Hyperlink* TextEditor::AccessibleImpl::GetLink(int32_t linkIndex)
   return dynamic_cast<Accessibility::Hyperlink*>(Dali::Accessibility::Accessible::Get(anchorActor));
 }
 
-int32_t TextEditor::AccessibleImpl::GetLinkIndex(int32_t characterOffset) const
+int32_t TextEditor::TextEditorAccessible::GetLinkIndex(int32_t characterOffset) const
 {
   auto self       = Toolkit::TextEditor::DownCast(Self());
   auto controller = Dali::Toolkit::GetImpl(self).GetTextController();

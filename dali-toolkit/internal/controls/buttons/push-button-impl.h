@@ -119,12 +119,17 @@ private:
   IconAlignment mIconAlignment; ///< The alignment of the icon against the label.
 
 protected:
-  struct AccessibleImpl : public Button::AccessibleImpl
+  class PushButtonAccessible : public Button::ButtonAccessible
   {
-    using Button::AccessibleImpl::AccessibleImpl;
+  public:
+    using Button::ButtonAccessible::ButtonAccessible;
 
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::CalculateStates()
+     */
     Dali::Accessibility::States CalculateStates() override;
   };
+
   void OnStateChange(State newState) override;
 };
 

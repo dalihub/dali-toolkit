@@ -117,10 +117,14 @@ public:
   virtual void SetOvershootSize(const Vector2& size) = 0;
 
 protected: // From Control
-  struct AccessibleImpl : public DevelControl::ControlAccessible
+  class ScrollableAccessible : public DevelControl::ControlAccessible
   {
+  public:
     using DevelControl::ControlAccessible::ControlAccessible;
 
+    /**
+     * @copydoc Dali::Accessibility::Component::IsScrollable()
+     */
     bool IsScrollable() const override;
   };
 

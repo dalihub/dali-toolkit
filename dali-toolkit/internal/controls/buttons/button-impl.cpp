@@ -1303,7 +1303,7 @@ Padding Button::GetForegroundPadding()
   return mForegroundPadding;
 }
 
-std::string Button::AccessibleImpl::GetNameRaw() const
+std::string Button::ButtonAccessible::GetNameRaw() const
 {
   std::string   labelText;
   auto          slf      = Toolkit::Button::DownCast(Self());
@@ -1318,7 +1318,7 @@ std::string Button::AccessibleImpl::GetNameRaw() const
   return labelText;
 }
 
-Property::Index Button::AccessibleImpl::GetNamePropertyIndex()
+Property::Index Button::ButtonAccessible::GetNamePropertyIndex()
 {
   Property::Index label    = Toolkit::Button::Property::LABEL;
   Property::Map   labelMap = Self().GetProperty<Property::Map>(label);
@@ -1333,7 +1333,7 @@ Property::Index Button::AccessibleImpl::GetNamePropertyIndex()
   }
 }
 
-Dali::Accessibility::States Button::AccessibleImpl::CalculateStates()
+Dali::Accessibility::States Button::ButtonAccessible::CalculateStates()
 {
   auto tmp                                    = DevelControl::ControlAccessible::CalculateStates();
   tmp[Dali::Accessibility::State::SELECTABLE] = true;

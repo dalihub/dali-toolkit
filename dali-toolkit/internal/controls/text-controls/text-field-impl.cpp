@@ -561,8 +561,7 @@ void TextField::OnInitialize()
   }
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::ENTRY));
+    return std::make_unique<TextFieldAccessible>(actor, Dali::Accessibility::Role::ENTRY);
   });
 
   Accessibility::Bridge::EnabledSignal().Connect(this, &TextField::OnAccessibilityStatusChanged);
@@ -1192,7 +1191,7 @@ Vector<Vector2> TextField::GetTextPosition(const uint32_t startIndex, const uint
   return mController->GetTextPosition(startIndex, endIndex);
 }
 
-std::string TextField::AccessibleImpl::GetName() const
+std::string TextField::TextFieldAccessible::GetName() const
 {
   auto self = Toolkit::TextField::DownCast(Self());
   if(IsHiddenInput(self))
@@ -1203,7 +1202,7 @@ std::string TextField::AccessibleImpl::GetName() const
   return self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
 }
 
-std::string TextField::AccessibleImpl::GetText(size_t startOffset, size_t endOffset) const
+std::string TextField::TextFieldAccessible::GetText(size_t startOffset, size_t endOffset) const
 {
   if(endOffset <= startOffset)
   {
@@ -1224,7 +1223,7 @@ std::string TextField::AccessibleImpl::GetText(size_t startOffset, size_t endOff
   return text.substr(startOffset, endOffset - startOffset);
 }
 
-size_t TextField::AccessibleImpl::GetCharacterCount() const
+size_t TextField::TextFieldAccessible::GetCharacterCount() const
 {
   auto self = Toolkit::TextField::DownCast(Self());
   auto text = self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
@@ -1232,13 +1231,13 @@ size_t TextField::AccessibleImpl::GetCharacterCount() const
   return text.size();
 }
 
-size_t TextField::AccessibleImpl::GetCursorOffset() const
+size_t TextField::TextFieldAccessible::GetCursorOffset() const
 {
   auto self = Toolkit::TextField::DownCast(Self());
   return Dali::Toolkit::GetImpl(self).GetTextController()->GetCursorPosition();
 }
 
-bool TextField::AccessibleImpl::SetCursorOffset(size_t offset)
+bool TextField::TextFieldAccessible::SetCursorOffset(size_t offset)
 {
   auto self = Toolkit::TextField::DownCast(Self());
   auto text = self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
@@ -1254,7 +1253,7 @@ bool TextField::AccessibleImpl::SetCursorOffset(size_t offset)
   return true;
 }
 
-Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
+Dali::Accessibility::Range TextField::TextFieldAccessible::GetTextAtOffset(
   size_t offset, Dali::Accessibility::TextBoundary boundary) const
 {
   auto self  = Toolkit::TextField::DownCast(Self());
@@ -1353,7 +1352,7 @@ Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
   return range;
 }
 
-Dali::Accessibility::Range TextField::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex) const
+Dali::Accessibility::Range TextField::TextFieldAccessible::GetRangeOfSelection(size_t selectionIndex) const
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
   if(selectionIndex > 0)
@@ -1378,7 +1377,7 @@ Dali::Accessibility::Range TextField::AccessibleImpl::GetRangeOfSelection(size_t
   return {startOffset, endOffset, value};
 }
 
-bool TextField::AccessibleImpl::RemoveSelection(size_t selectionIndex)
+bool TextField::TextFieldAccessible::RemoveSelection(size_t selectionIndex)
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
   if(selectionIndex > 0)
@@ -1391,7 +1390,7 @@ bool TextField::AccessibleImpl::RemoveSelection(size_t selectionIndex)
   return true;
 }
 
-bool TextField::AccessibleImpl::SetRangeOfSelection(size_t selectionIndex, size_t startOffset, size_t endOffset)
+bool TextField::TextFieldAccessible::SetRangeOfSelection(size_t selectionIndex, size_t startOffset, size_t endOffset)
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
   if(selectionIndex > 0)
@@ -1404,7 +1403,7 @@ bool TextField::AccessibleImpl::SetRangeOfSelection(size_t selectionIndex, size_
   return true;
 }
 
-Rect<> TextField::AccessibleImpl::GetRangeExtents(size_t startOffset, size_t endOffset, Accessibility::CoordinateType type)
+Rect<> TextField::TextFieldAccessible::GetRangeExtents(size_t startOffset, size_t endOffset, Accessibility::CoordinateType type)
 {
   if (endOffset <= startOffset || endOffset <= 0)
   {
@@ -1422,7 +1421,7 @@ Rect<> TextField::AccessibleImpl::GetRangeExtents(size_t startOffset, size_t end
   return rect;
 }
 
-bool TextField::AccessibleImpl::CopyText(size_t startPosition, size_t endPosition)
+bool TextField::TextFieldAccessible::CopyText(size_t startPosition, size_t endPosition)
 {
   if(endPosition <= startPosition)
   {
@@ -1436,7 +1435,7 @@ bool TextField::AccessibleImpl::CopyText(size_t startPosition, size_t endPositio
   return true;
 }
 
-bool TextField::AccessibleImpl::CutText(size_t startPosition, size_t endPosition)
+bool TextField::TextFieldAccessible::CutText(size_t startPosition, size_t endPosition)
 {
   if(endPosition <= startPosition)
   {
@@ -1452,7 +1451,7 @@ bool TextField::AccessibleImpl::CutText(size_t startPosition, size_t endPosition
   return true;
 }
 
-bool TextField::AccessibleImpl::DeleteText(size_t startPosition, size_t endPosition)
+bool TextField::TextFieldAccessible::DeleteText(size_t startPosition, size_t endPosition)
 {
   if(endPosition <= startPosition)
   {
@@ -1467,7 +1466,7 @@ bool TextField::AccessibleImpl::DeleteText(size_t startPosition, size_t endPosit
   return true;
 }
 
-Dali::Accessibility::States TextField::AccessibleImpl::CalculateStates()
+Dali::Accessibility::States TextField::TextFieldAccessible::CalculateStates()
 {
   using namespace Dali::Accessibility;
 
@@ -1485,7 +1484,7 @@ Dali::Accessibility::States TextField::AccessibleImpl::CalculateStates()
   return states;
 }
 
-bool TextField::AccessibleImpl::InsertText(size_t startPosition, std::string text)
+bool TextField::TextFieldAccessible::InsertText(size_t startPosition, std::string text)
 {
   auto self         = Toolkit::TextField::DownCast(Self());
   auto insertedText = self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
@@ -1497,20 +1496,20 @@ bool TextField::AccessibleImpl::InsertText(size_t startPosition, std::string tex
   return true;
 }
 
-bool TextField::AccessibleImpl::SetTextContents(std::string newContents)
+bool TextField::TextFieldAccessible::SetTextContents(std::string newContents)
 {
   auto self = Toolkit::TextField::DownCast(Self());
   self.SetProperty(Toolkit::TextField::Property::TEXT, std::move(newContents));
   return true;
 }
 
-int32_t TextField::AccessibleImpl::GetLinkCount() const
+int32_t TextField::TextFieldAccessible::GetLinkCount() const
 {
   auto self = Toolkit::TextField::DownCast(Self());
   return Dali::Toolkit::GetImpl(self).mAnchorActors.size();
 }
 
-Accessibility::Hyperlink* TextField::AccessibleImpl::GetLink(int32_t linkIndex) const
+Accessibility::Hyperlink* TextField::TextFieldAccessible::GetLink(int32_t linkIndex) const
 {
   if(linkIndex < 0 || linkIndex >= GetLinkCount())
   {
@@ -1521,7 +1520,7 @@ Accessibility::Hyperlink* TextField::AccessibleImpl::GetLink(int32_t linkIndex) 
   return dynamic_cast<Accessibility::Hyperlink*>(Dali::Accessibility::Accessible::Get(anchorActor));
 }
 
-int32_t TextField::AccessibleImpl::GetLinkIndex(int32_t characterOffset) const
+int32_t TextField::TextFieldAccessible::GetLinkIndex(int32_t characterOffset) const
 {
   auto self       = Toolkit::TextField::DownCast(Self());
   auto controller = Dali::Toolkit::GetImpl(self).GetTextController();

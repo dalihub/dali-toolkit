@@ -246,10 +246,11 @@ protected:
   /**
    * @brief This structure is to connect TextLabel with Accessible functions.
    */
-  struct AccessibleImpl : public DevelControl::ControlAccessible,
-                          public virtual Dali::Accessibility::Text,
-                          public virtual Dali::Accessibility::Hypertext
+  class TextLabelAccessible : public DevelControl::ControlAccessible,
+                              public virtual Dali::Accessibility::Text,
+                              public virtual Dali::Accessibility::Hypertext
   {
+  public:
     using DevelControl::ControlAccessible::ControlAccessible;
 
     /**

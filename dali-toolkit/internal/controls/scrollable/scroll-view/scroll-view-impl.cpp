@@ -681,8 +681,7 @@ void ScrollView::OnInitialize()
   self.WheelEventSignal().Connect(this, &ScrollView::OnWheelEvent);
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::SCROLL_PANE));
+    return std::make_unique<ScrollViewAccessible>(actor, Dali::Accessibility::Role::SCROLL_PANE);
   });
 }
 
@@ -1262,7 +1261,7 @@ Toolkit::ScrollView::SnapStartedSignalType& ScrollView::SnapStartedSignal()
   return mSnapStartedSignal;
 }
 
-bool ScrollView::AccessibleImpl::ScrollToChild(Actor child)
+bool ScrollView::ScrollViewAccessible::ScrollToChild(Actor child)
 {
   auto scrollView = Dali::Toolkit::ScrollView::DownCast(Self());
   if(Toolkit::GetImpl(scrollView).FindClosestActor() == child)

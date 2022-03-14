@@ -577,10 +577,11 @@ private: // Data
   /**
    * @brief This structure is to connect TextEditor with Accessible functions.
    */
-  struct AccessibleImpl : public DevelControl::ControlAccessible,
-                          public virtual Dali::Accessibility::EditableText,
-                          public virtual Dali::Accessibility::Hypertext
+  class TextEditorAccessible : public DevelControl::ControlAccessible,
+                               public virtual Dali::Accessibility::EditableText,
+                               public virtual Dali::Accessibility::Hypertext
   {
+  public:
     using DevelControl::ControlAccessible::ControlAccessible;
 
     /**

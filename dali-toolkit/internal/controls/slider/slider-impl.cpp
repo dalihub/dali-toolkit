@@ -209,8 +209,7 @@ void Slider::OnInitialize()
   self.TouchedSignal().Connect(this, &Slider::OnTouch);
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::SLIDER));
+    return std::make_unique<SliderAccessible>(actor, Dali::Accessibility::Role::SLIDER);
   });
 }
 
@@ -1411,25 +1410,25 @@ Property::Value Slider::GetProperty(BaseObject* object, Property::Index property
   return value;
 }
 
-double Slider::AccessibleImpl::GetMinimum() const
+double Slider::SliderAccessible::GetMinimum() const
 {
   auto self = Toolkit::Slider::DownCast(Self());
   return self.GetProperty(Toolkit::Slider::Property::LOWER_BOUND).Get<float>();
 }
 
-double Slider::AccessibleImpl::GetCurrent() const
+double Slider::SliderAccessible::GetCurrent() const
 {
   auto self = Toolkit::Slider::DownCast(Self());
   return self.GetProperty(Toolkit::Slider::Property::VALUE).Get<float>();
 }
 
-double Slider::AccessibleImpl::GetMaximum() const
+double Slider::SliderAccessible::GetMaximum() const
 {
   auto self = Toolkit::Slider::DownCast(Self());
   return self.GetProperty(Toolkit::Slider::Property::UPPER_BOUND).Get<float>();
 }
 
-bool Slider::AccessibleImpl::SetCurrent(double current)
+bool Slider::SliderAccessible::SetCurrent(double current)
 {
   if(current < GetMinimum() || current > GetMaximum())
     return false;
@@ -1477,7 +1476,7 @@ bool Slider::AccessibleImpl::SetCurrent(double current)
   return true;
 }
 
-double Slider::AccessibleImpl::GetMinimumIncrement() const
+double Slider::SliderAccessible::GetMinimumIncrement() const
 {
   auto self = Toolkit::Slider::DownCast(Self());
 

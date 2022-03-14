@@ -82,10 +82,14 @@ private:
   RadioButton& operator=(const RadioButton& origin);
 
 protected:
-  struct AccessibleImpl : public Button::AccessibleImpl
+  class RadioButtonAccessible : public Button::ButtonAccessible
   {
-    using Button::AccessibleImpl::AccessibleImpl;
+  public:
+    using Button::ButtonAccessible::ButtonAccessible;
 
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::CalculateStates()
+     */
     Dali::Accessibility::States CalculateStates() override;
   };
 };

@@ -526,10 +526,11 @@ protected:
   /**
    * @brief This structure is to connect TextField with Accessible functions.
    */
-  struct AccessibleImpl : public DevelControl::ControlAccessible,
-                          public virtual Dali::Accessibility::EditableText,
-                          public virtual Dali::Accessibility::Hypertext
+  class TextFieldAccessible : public DevelControl::ControlAccessible,
+                              public virtual Dali::Accessibility::EditableText,
+                              public virtual Dali::Accessibility::Hypertext
   {
+  public:
     using DevelControl::ControlAccessible::ControlAccessible;
 
     /**

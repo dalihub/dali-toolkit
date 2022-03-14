@@ -841,10 +841,14 @@ private:
   void WrapPosition(Vector2& position) const;
 
 protected:
-  struct AccessibleImpl : public Scrollable::AccessibleImpl
+  class ScrollViewAccessible : public Scrollable::ScrollableAccessible
   {
-    using Scrollable::AccessibleImpl::AccessibleImpl;
+  public:
+    using Scrollable::ScrollableAccessible::ScrollableAccessible;
 
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::ScrollToChild()
+     */
     bool ScrollToChild(Actor child) override;
   };
 

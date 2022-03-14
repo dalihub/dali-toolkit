@@ -149,8 +149,7 @@ void TextAnchor::OnInitialize()
   self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::LINK));
+    return std::make_unique<TextAnchorAccessible>(actor, Dali::Accessibility::Role::LINK);
   });
 }
 
@@ -166,35 +165,35 @@ TextAnchor::~TextAnchor()
 {
 }
 
-int32_t TextAnchor::AccessibleImpl::GetEndIndex() const
+int32_t TextAnchor::TextAnchorAccessible::GetEndIndex() const
 {
   auto self = Toolkit::TextAnchor::DownCast(Self());
   return self.GetProperty(Toolkit::TextAnchor::Property::END_CHARACTER_INDEX).Get<int>();
 }
 
-int32_t TextAnchor::AccessibleImpl::GetStartIndex() const
+int32_t TextAnchor::TextAnchorAccessible::GetStartIndex() const
 {
   auto self = Toolkit::TextAnchor::DownCast(Self());
   return self.GetProperty(Toolkit::TextAnchor::Property::START_CHARACTER_INDEX).Get<int>();
 }
 
-int32_t TextAnchor::AccessibleImpl::GetAnchorCount() const
+int32_t TextAnchor::TextAnchorAccessible::GetAnchorCount() const
 {
   return 1;
 }
 
-Dali::Accessibility::Accessible* TextAnchor::AccessibleImpl::GetAnchorAccessible(int32_t anchorIndex) const
+Dali::Accessibility::Accessible* TextAnchor::TextAnchorAccessible::GetAnchorAccessible(int32_t anchorIndex) const
 {
   return Control::Impl::GetAccessibilityObject(Self());
 }
 
-std::string TextAnchor::AccessibleImpl::GetAnchorUri(int32_t anchorIndex) const
+std::string TextAnchor::TextAnchorAccessible::GetAnchorUri(int32_t anchorIndex) const
 {
   auto self = Toolkit::TextAnchor::DownCast(Self());
   return self.GetProperty(Toolkit::TextAnchor::Property::URI).Get<std::string>();
 }
 
-bool TextAnchor::AccessibleImpl::IsValid() const
+bool TextAnchor::TextAnchorAccessible::IsValid() const
 {
   return !GetAnchorUri(0).empty();
 }
