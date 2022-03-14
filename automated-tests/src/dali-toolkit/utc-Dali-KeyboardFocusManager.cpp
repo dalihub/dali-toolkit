@@ -1959,6 +1959,8 @@ int UtcDaliKeyboardFocusManagerEnableDefaultAlgorithm(void)
   // button1 -- button2
   button1.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   button2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 0.0f));
+  button1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  button2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
 
   // flush the queue and render once
   application.SendNotification();
@@ -2003,12 +2005,30 @@ int UtcDaliKeyboardFocusManagerEnableDefaultAlgorithm(void)
   // Move the focus towards left, The focus move will success because the default algorithm is enabled.
   // [button1] -- button2
   DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::LEFT) == true);
-  // Confirm whether focus is moved to button2
+  // Confirm whether focus is moved to button1
   DALI_TEST_EQUALS(button1.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == button2);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button1);
   focusChangedCallback.Reset();
+
+  // Clears focus.
+  manager.ClearFocus();
+  // There is no actor focused.
+  // button1 -- button2
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
+  // Move the focus towards right, The focus is on the actor closest to the top left of the window.
+  // [button1] -- button2
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == true);
+
+  // Confirm whether focus is moved to button1
+  DALI_TEST_EQUALS(button1.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == Actor());
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button1);
+  focusChangedCallback.Reset();
+
 
   END_TEST;
 }

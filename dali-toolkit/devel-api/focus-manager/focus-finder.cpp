@@ -385,12 +385,23 @@ Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect,
 Actor GetNearestFocusableActor(Actor rootActor, Actor focusedActor, Toolkit::Control::KeyboardFocus::Direction direction)
 {
   Actor nearestActor;
-  if(!focusedActor || !rootActor)
+  if(!rootActor)
   {
     return nearestActor;
   }
 
-  Rect<float> focusedRect = DevelActor::CalculateScreenExtents(focusedActor);
+  Rect<float> focusedRect;
+  if (!focusedActor)
+  {
+    // If there is no currently focused actor, it is searched based on the upper left corner of the current window.
+    Rect<float> rootRect = DevelActor::CalculateScreenExtents(rootActor);
+    focusedRect = Rect<float>(rootRect.x, rootRect.y, 0.f, 0.f);
+  }
+  else
+  {
+    focusedRect = DevelActor::CalculateScreenExtents(focusedActor);
+  }
+
 
   // initialize the best candidate to something impossible
   // (so the first plausible actor will become the best choice)
