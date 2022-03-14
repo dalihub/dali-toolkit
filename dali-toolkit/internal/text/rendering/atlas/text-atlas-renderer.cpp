@@ -554,8 +554,8 @@ struct AtlasRenderer::Impl
 
       Vector<StrikethroughGlyphRun>::ConstIterator currentStrikethroughGlyphRunIt = strikethroughRuns.End();
       const bool                                   isGlyphStrikethrough           = strikethroughEnabled || IsGlyphStrikethrough(i, strikethroughRuns, currentStrikethroughGlyphRunIt);
-      const StrikethroughStyleProperties           currentStrikethroughProperties = GetCurrentStrikethroughProperties(isGlyphStrikethrough, strikethroughRuns, currentStrikethroughGlyphRunIt, viewStrikethroughProperties);
-      float                                        currentStrikethroughHeight     = GetCurrentStrikethroughHeight(strikethroughRuns, currentStrikethroughGlyphRunIt, viewStrikethroughProperties.height);
+      const StrikethroughStyleProperties           currentStrikethroughProperties = GetCurrentStrikethroughProperties(i, isGlyphStrikethrough, strikethroughRuns, currentStrikethroughGlyphRunIt, viewStrikethroughProperties);
+      float                                        currentStrikethroughHeight     = currentStrikethroughProperties.height;
       thereAreStrikethroughGlyphs                                                 = thereAreStrikethroughGlyphs || isGlyphStrikethrough;
 
       // No operation for white space

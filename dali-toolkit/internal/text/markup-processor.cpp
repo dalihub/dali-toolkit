@@ -1179,6 +1179,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
 
   // Handle the nested tags
   OverrideNestedUnderlinedCharacterRuns(markupProcessData.underlinedCharacterRuns);
+  OverrideNestedStrikethroughCharacterRuns(markupProcessData.strikethroughCharacterRuns);
 }
 
 } // namespace Text

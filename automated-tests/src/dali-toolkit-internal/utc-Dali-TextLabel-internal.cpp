@@ -561,6 +561,78 @@ int UtcDaliTextLabelMarkupNestedUnderlineTags(void)
   END_TEST;
 }
 
+int UtcDaliTextLabelMarkupNestedStrikethroughTags(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLabelMarkupNestedStrikethroughTags ");
+
+  TextLabel textLabel = TextLabel::New();
+
+  application.GetScene().Add(textLabel);
+
+  std::string testText = "start<s height='5.0f' color='green' >AB<s color='blue' >XYZ</s>CDE</s>end";
+
+  textLabel.SetProperty(TextLabel::Property::TEXT, testText);
+  textLabel.SetProperty(TextLabel ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  const uint32_t expectedNumberOfStrikethroughRuns = 2u;
+
+  Toolkit::Internal::TextLabel& textLabelImpl             = GetImpl(textLabel);
+  const Text::Length            numberOfStrikethroughRuns = textLabelImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
+
+  DALI_TEST_EQUALS(numberOfStrikethroughRuns, expectedNumberOfStrikethroughRuns, TEST_LOCATION);
+
+  Vector<StrikethroughGlyphRun> strikethroughRuns;
+  strikethroughRuns.Resize(numberOfStrikethroughRuns);
+  textLabelImpl.GetTextController()->GetTextModel()->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
+
+  struct DataOfCase
+  {
+    std::string                  title;
+    GlyphIndex                   glyphIndex;
+    Length                       numberOfGlyphs;
+    StrikethroughStyleProperties properties;
+  };
+  DataOfCase data[] =
+    {
+      //Outter
+      {"<s height='5.0f' color='green' >AB<s color='blue' >XYZ</s>CDE</s>",
+       5u,
+       8u,
+       {
+         Color::GREEN,
+         5.0f,
+         true,
+         true,
+       }},
+
+      //Inner
+      {"<s color='blue' >XYZ</s>",
+       7u,
+       3u,
+       {
+         Color::BLUE,
+         5.0f,
+         true,
+         true,
+       }},
+
+    };
+
+  for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
+  {
+    tet_infoline(data[i].title.c_str());
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
+    DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliTextLabelMarkupStrikethroughAttributes(void)
 {
   ToolkitTestApplication application;

@@ -71,6 +71,44 @@ void ProcessStrikethroughTag(const Tag& tag, StrikethroughCharacterRun& striketh
   }
 }
 
+void OverrideNestedStrikethroughCharacterRuns(Vector<StrikethroughCharacterRun>& strikethroughCharacterRuns)
+{
+  // Handle nested tags
+  // The inner tag inherit the attributes of the outer tag and override them when defined in the inner tag.
+  // Example:
+  // <s height='5.0f' color='blue'> outer tag before  <s color='green'> inner tag </s> outer tag after </s>
+  // "outer tag before" and  "outer tag after" have height = 5.0f and color = 'blue'
+  // "inner tag" has height = 5.0f and color = 'green'
+
+  if(strikethroughCharacterRuns.Count() > 0u)
+  {
+    Vector<StrikethroughCharacterRun>::ConstIterator preIt = strikethroughCharacterRuns.Begin();
+
+    Vector<StrikethroughCharacterRun>::Iterator      it    = strikethroughCharacterRuns.Begin() + 1;
+    Vector<StrikethroughCharacterRun>::ConstIterator endIt = strikethroughCharacterRuns.End();
+
+    while(it != endIt)
+    {
+      const StrikethroughCharacterRun& run                = *it;
+      const CharacterIndex&            characterIndex     = run.characterRun.characterIndex;
+      const Length&                    numberOfCharacters = run.characterRun.numberOfCharacters;
+
+      const StrikethroughCharacterRun& preRun                = *preIt;
+      const CharacterIndex&            preCharacterIndex     = preRun.characterRun.characterIndex;
+      const Length&                    preNumberOfCharacters = preRun.characterRun.numberOfCharacters;
+
+      if((preCharacterIndex <= characterIndex) &&
+         ((characterIndex + numberOfCharacters) <= (preCharacterIndex + preNumberOfCharacters)))
+      {
+        it->properties.CopyIfNotDefined(preIt->properties);
+      }
+
+      it++;
+      preIt++;
+    }
+  }
+}
+
 } // namespace Text
 
 } // namespace Toolkit

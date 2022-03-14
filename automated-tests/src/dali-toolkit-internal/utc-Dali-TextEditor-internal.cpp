@@ -600,6 +600,78 @@ int UtcDaliTextEditorMarkupNestedUnderlineTags(void)
   END_TEST;
 }
 
+int UtcDaliTextEditorMarkupNestedStrikethroughTags(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorMarkupNestedStrikethroughTags ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  application.GetScene().Add(textEditor);
+
+  std::string testText = "start<s height='5.0f' color='green' >AB<s color='blue' >XYZ</s>CDE</s>end";
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, testText);
+  textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  const uint32_t expectedNumberOfStrikethroughRuns = 2u;
+
+  Toolkit::Internal::TextEditor& textEditorImpl            = GetImpl(textEditor);
+  const Text::Length             numberOfStrikethroughRuns = textEditorImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
+
+  DALI_TEST_EQUALS(numberOfStrikethroughRuns, expectedNumberOfStrikethroughRuns, TEST_LOCATION);
+
+  Vector<StrikethroughGlyphRun> strikethroughRuns;
+  strikethroughRuns.Resize(numberOfStrikethroughRuns);
+  textEditorImpl.GetTextController()->GetTextModel()->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
+
+  struct DataOfCase
+  {
+    std::string                  title;
+    GlyphIndex                   glyphIndex;
+    Length                       numberOfGlyphs;
+    StrikethroughStyleProperties properties;
+  };
+  DataOfCase data[] =
+    {
+      //Outter
+      {"<s height='5.0f' color='green' >AB<s color='blue' >XYZ</s>CDE</s>",
+       5u,
+       8u,
+       {
+         Color::GREEN,
+         5.0f,
+         true,
+         true,
+       }},
+
+      //Inner
+      {"<s color='blue' >XYZ</s>",
+       7u,
+       3u,
+       {
+         Color::BLUE,
+         5.0f,
+         true,
+         true,
+       }},
+
+    };
+
+  for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
+  {
+    tet_infoline(data[i].title.c_str());
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
+    DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliTextEditorMarkupStrikethroughAttributes(void)
 {
   ToolkitTestApplication application;

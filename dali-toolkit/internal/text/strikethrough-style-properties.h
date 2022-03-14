@@ -76,6 +76,46 @@ struct StrikethroughStyleProperties
     return ((!heightDefined && !other.heightDefined) || ((heightDefined && other.heightDefined) && (height == other.height)));
   }
 
+  StrikethroughStyleProperties& CopyIfNotDefined(const StrikethroughStyleProperties& other)
+  {
+    //Copy only the defined properties in other and not defined in this from other to this
+
+    if(!heightDefined && other.heightDefined)
+    {
+      height        = other.height;
+      heightDefined = true;
+    }
+
+    if(!colorDefined && other.colorDefined)
+    {
+      color        = other.color;
+      colorDefined = true;
+    }
+
+    // to chain this method
+    return *this;
+  }
+
+  StrikethroughStyleProperties& OverrideByDefinedProperties(const StrikethroughStyleProperties& other)
+  {
+    //Copy only the defined properties in other from other to this
+
+    if(other.heightDefined)
+    {
+      height        = other.height;
+      heightDefined = true;
+    }
+
+    if(other.colorDefined)
+    {
+      color        = other.color;
+      colorDefined = true;
+    }
+
+    // to chain this method
+    return *this;
+  }
+
   //Attributes
   Vector4 color;  ///< The color of strikethrough.
   float   height; ///< The height of strikethrough.

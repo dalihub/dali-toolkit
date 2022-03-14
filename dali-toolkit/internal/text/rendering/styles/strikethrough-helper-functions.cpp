@@ -45,27 +45,34 @@ bool IsGlyphStrikethrough(GlyphIndex                                    index,
   return false;
 }
 
-float GetCurrentStrikethroughHeight(const Vector<StrikethroughGlyphRun>&         strikethroughRuns,
-                                    Vector<StrikethroughGlyphRun>::ConstIterator currentStrikethroughGlyphRunIt,
-                                    const float                                  strikethroughHeight)
+StrikethroughStyleProperties GetCurrentStrikethroughProperties(GlyphIndex                                    index,
+                                                               const bool&                                   isGlyphStrikethrough,
+                                                               const Vector<StrikethroughGlyphRun>&          strikethroughRuns,
+                                                               Vector<StrikethroughGlyphRun>::ConstIterator& currentStrikethroughGlyphRunIt,
+                                                               const StrikethroughStyleProperties&           commonStrikethroughProperties)
 {
-  if(currentStrikethroughGlyphRunIt == strikethroughRuns.End())
+  StrikethroughStyleProperties currentStrikethroughStyleProperties = commonStrikethroughProperties;
+
+  if(isGlyphStrikethrough && (currentStrikethroughGlyphRunIt != strikethroughRuns.End()))
   {
-    return strikethroughHeight;
+    // Retrieve the latest run to handle the nested case.
+    for(Vector<StrikethroughGlyphRun>::ConstIterator it    = currentStrikethroughGlyphRunIt + 1,
+                                                     endIt = strikethroughRuns.End();
+        it != endIt;
+        ++it)
+    {
+      const StrikethroughGlyphRun& run = *it;
+
+      if((run.glyphRun.glyphIndex <= index) && (index < (run.glyphRun.glyphIndex + run.glyphRun.numberOfGlyphs)))
+      {
+        currentStrikethroughGlyphRunIt = it;
+      }
+    }
+
+    currentStrikethroughStyleProperties.OverrideByDefinedProperties(currentStrikethroughGlyphRunIt->properties);
   }
 
-  const StrikethroughGlyphRun& strikethroughGlyphRun = *currentStrikethroughGlyphRunIt;
-  return (strikethroughGlyphRun.properties.heightDefined ? strikethroughGlyphRun.properties.height : strikethroughHeight);
-}
-
-StrikethroughStyleProperties GetCurrentStrikethroughProperties(const bool&                                  isGlyphStrikethrough,
-                                                               const Vector<StrikethroughGlyphRun>&         strikethroughRuns,
-                                                               Vector<StrikethroughGlyphRun>::ConstIterator currentStrikethroughGlyphRunIt,
-                                                               const StrikethroughStyleProperties&          commonStrikethroughProperties)
-{
-  return (isGlyphStrikethrough && (currentStrikethroughGlyphRunIt != strikethroughRuns.End()))
-           ? currentStrikethroughGlyphRunIt->properties
-           : commonStrikethroughProperties;
+  return currentStrikethroughStyleProperties;
 }
 
 /// Helper method to fetch the strikethrough metrics for the specified font glyph

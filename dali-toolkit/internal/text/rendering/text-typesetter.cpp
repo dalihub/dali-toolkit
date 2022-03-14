@@ -991,8 +991,8 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
 
       Vector<StrikethroughGlyphRun>::ConstIterator currentStrikethroughGlyphRunIt = strikethroughRuns.End();
       const bool                                   strikethroughGlyph             = strikethroughEnabled || IsGlyphStrikethrough(glyphIndex, strikethroughRuns, currentStrikethroughGlyphRunIt);
-      currentStrikethroughProperties                                              = GetCurrentStrikethroughProperties(strikethroughGlyph, strikethroughRuns, currentStrikethroughGlyphRunIt, modelStrikethroughProperties);
-      currentStrikethroughHeight                                                  = GetCurrentStrikethroughHeight(strikethroughRuns, currentStrikethroughGlyphRunIt, modelStrikethroughProperties.height);
+      currentStrikethroughProperties                                              = GetCurrentStrikethroughProperties(glyphIndex, strikethroughGlyph, strikethroughRuns, currentStrikethroughGlyphRunIt, modelStrikethroughProperties);
+      currentStrikethroughHeight                                                  = currentStrikethroughProperties.height;
       thereAreStrikethroughGlyphs                                                 = thereAreStrikethroughGlyphs || strikethroughGlyph;
 
       // Are we still using the same fontId as previous

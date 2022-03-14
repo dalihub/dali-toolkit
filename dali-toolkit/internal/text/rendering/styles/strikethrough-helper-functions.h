@@ -46,21 +46,9 @@ bool IsGlyphStrikethrough(GlyphIndex                                    index,
                           Vector<StrikethroughGlyphRun>::ConstIterator& currentStrikethroughGlyphRunIt);
 
 /**
- * @brief Check the current strikethrough glyph run iterator if not empty and its height is defined then return ts height. Otherwise return the common strikethrough height.
- *
- * @param[in] strikethroughRuns the strikethrough runs.
- * @param[in] currentStrikethroughGlyphRunIt the iterator of current strikethrough glyph run.
- * @param[in] strikethroughHeight the common strikethrough height.
- *
- * @return the determined strikethrough height
- */
-float GetCurrentStrikethroughHeight(const Vector<StrikethroughGlyphRun>&         strikethroughRuns,
-                                    Vector<StrikethroughGlyphRun>::ConstIterator currentStrikethroughGlyphRunIt,
-                                    const float                                  strikethroughHeight);
-
-/**
  * @brief Check the current strikethrough glyph run iterator if not empty and isGlyphStrikethrough is true then return its StrikethroughProperties. Otherwise return the common strikethrough properties.
  *
+ * @param[in] index the index of glyph.
  * @param[in] isGlyphStrikethrough whether the glyph is strikethrough.
  * @param[in] strikethroughRuns the strikethrough runs.
  * @param[in] currentStrikethroughGlyphRunIt the iterator of current strikethrough glyph run.
@@ -68,10 +56,11 @@ float GetCurrentStrikethroughHeight(const Vector<StrikethroughGlyphRun>&        
  *
  * @return the determined strikethrough properties
  */
-StrikethroughStyleProperties GetCurrentStrikethroughProperties(const bool&                                  isGlyphStrikethrough,
-                                                               const Vector<StrikethroughGlyphRun>&         strikethroughRuns,
-                                                               Vector<StrikethroughGlyphRun>::ConstIterator currentStrikethroughGlyphRunIt,
-                                                               const StrikethroughStyleProperties&          commonStrikethroughProperties);
+StrikethroughStyleProperties GetCurrentStrikethroughProperties(GlyphIndex                                    index,
+                                                               const bool&                                   isGlyphStrikethrough,
+                                                               const Vector<StrikethroughGlyphRun>&          strikethroughRuns,
+                                                               Vector<StrikethroughGlyphRun>::ConstIterator& currentStrikethroughGlyphRunIt,
+                                                               const StrikethroughStyleProperties&           commonStrikethroughProperties);
 
 /**
  * @brief Calculate the current strikethrough height and update maximum strikethrough height
