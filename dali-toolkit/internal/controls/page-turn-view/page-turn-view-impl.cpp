@@ -414,9 +414,7 @@ void PageTurnView::OnInitialize()
   // enable the pan gesture which is attached to the control
   EnableGestureDetection(GestureType::Value(GestureType::PAN));
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::PAGE_TAB_LIST);
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::PAGE_TAB_LIST);
 }
 
 Shader PageTurnView::CreateShader(const Property::Map& shaderMap)

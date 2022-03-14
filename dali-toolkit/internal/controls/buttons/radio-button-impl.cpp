@@ -71,9 +71,12 @@ void RadioButton::OnInitialize()
 {
   Button::OnInitialize();
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::make_unique<RadioButtonAccessible>(actor, Dali::Accessibility::Role::RADIO_BUTTON);
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::RADIO_BUTTON);
+}
+
+DevelControl::ControlAccessible* RadioButton::CreateAccessibleObject()
+{
+  return new RadioButtonAccessible(Self());
 }
 
 bool RadioButton::OnToggleReleased()

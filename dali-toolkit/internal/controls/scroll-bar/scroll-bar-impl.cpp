@@ -209,12 +209,17 @@ ScrollBar::~ScrollBar()
 
 void ScrollBar::OnInitialize()
 {
-  CreateDefaultIndicatorActor();
-  Self().SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
+  auto self = Self();
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::make_unique<ScrollBarAccessible>(actor, Dali::Accessibility::Role::SCROLL_BAR);
-  });
+  CreateDefaultIndicatorActor();
+  self.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
+
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::SCROLL_BAR);
+}
+
+DevelControl::ControlAccessible* ScrollBar::CreateAccessibleObject()
+{
+  return new ScrollBarAccessible(Self());
 }
 
 void ScrollBar::SetScrollPropertySource(Handle handle, Property::Index propertyScrollPosition, Property::Index propertyMinScrollPosition, Property::Index propertyMaxScrollPosition, Property::Index propertyScrollContentSize)

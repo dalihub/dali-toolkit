@@ -165,11 +165,14 @@ ProgressBar::~ProgressBar()
 
 void ProgressBar::OnInitialize()
 {
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::make_unique<ProgressBarAccessible>(actor, Dali::Accessibility::Role::PROGRESS_BAR);
-  });
-  //Enable highightability
-  Self().SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
+  // Accessibility
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::PROGRESS_BAR);
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
+}
+
+DevelControl::ControlAccessible* ProgressBar::CreateAccessibleObject()
+{
+  return new ProgressBarAccessible(Self());
 }
 
 void ProgressBar::OnRelayout(const Vector2& size, RelayoutContainer& container)

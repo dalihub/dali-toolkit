@@ -345,6 +345,11 @@ bool Control::OnAccessibilityZoom()
   return false; // Accessibility zoom action is not handled by default
 }
 
+DevelControl::ControlAccessible* Control::CreateAccessibleObject()
+{
+  return new DevelControl::ControlAccessible(Self());
+}
+
 Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
   return Actor();

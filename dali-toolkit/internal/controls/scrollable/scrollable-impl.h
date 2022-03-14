@@ -133,6 +133,11 @@ protected: // From Control
    */
   virtual void OnInitialize() override;
 
+  /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
 private:
   /**
    * Temporary function to override EnableScrollOvershoot functionality for overshoot

@@ -161,6 +161,11 @@ private: // From Control
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc Control::OnStyleChange()
    */
   void OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change) override;

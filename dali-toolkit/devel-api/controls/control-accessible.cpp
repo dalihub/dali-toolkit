@@ -66,20 +66,15 @@ static Dali::Actor CreateHighlightIndicatorActor()
 }
 } // unnamed namespace
 
-ControlAccessible::ControlAccessible(Dali::Actor self, Dali::Accessibility::Role role, bool modal)
-: ActorAccessible(self),
-  mIsModal(modal)
+ControlAccessible::ControlAccessible(Dali::Actor self)
+: ActorAccessible(self)
 {
-  auto control = Dali::Toolkit::Control::DownCast(Self());
+  auto control = Toolkit::Control::DownCast(self);
 
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
-  if(controlImpl.mAccessibilityRole == Dali::Accessibility::Role::UNKNOWN)
-  {
-    controlImpl.mAccessibilityRole = role;
-  }
 
-  Self().PropertySetSignal().Connect(&controlImpl, [this, &controlImpl](Dali::Handle& handle, Dali::Property::Index index, Dali::Property::Value value) {
+  self.PropertySetSignal().Connect(&controlImpl, [this, &controlImpl](Dali::Handle& handle, Dali::Property::Index index, Dali::Property::Value value) {
     if(this->Self() != Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
     {
       return;
@@ -222,32 +217,22 @@ bool ControlAccessible::IsShowing()
 
 Dali::Accessibility::States ControlAccessible::CalculateStates()
 {
+  using Dali::Accessibility::State;
+
   Dali::Actor self = Self();
-  Dali::Accessibility::States state;
-  state[Dali::Accessibility::State::FOCUSABLE] = self.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE);
-  state[Dali::Accessibility::State::FOCUSED]   = Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor() == self;
+  Dali::Accessibility::States states;
 
-  if(self.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).GetType() == Dali::Property::NONE)
-  {
-    state[Dali::Accessibility::State::HIGHLIGHTABLE] = false;
-  }
-  else
-  {
-    state[Dali::Accessibility::State::HIGHLIGHTABLE] = self.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).Get<bool>();
-  }
+  states[State::FOCUSABLE]     = self.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE);
+  states[State::FOCUSED]       = Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor() == self;
+  states[State::HIGHLIGHTABLE] = self.GetProperty<bool>(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE);
+  states[State::HIGHLIGHTED]   = GetCurrentlyHighlightedActor() == self;
+  states[State::ENABLED]       = true;
+  states[State::SENSITIVE]     = true;
+  states[State::VISIBLE]       = self.GetProperty<bool>(Actor::Property::VISIBLE);
+  states[State::SHOWING]       = IsShowing();
+  states[State::DEFUNCT]       = !self.GetProperty(Dali::DevelActor::Property::CONNECTED_TO_SCENE).Get<bool>();
 
-  state[Dali::Accessibility::State::HIGHLIGHTED] = GetCurrentlyHighlightedActor() == self;
-  state[Dali::Accessibility::State::ENABLED]     = true;
-  state[Dali::Accessibility::State::SENSITIVE]   = true;
-  state[Dali::Accessibility::State::VISIBLE]     = self.GetProperty<bool>(Actor::Property::VISIBLE);
-
-  if(mIsModal)
-  {
-    state[Dali::Accessibility::State::MODAL] = true;
-  }
-  state[Dali::Accessibility::State::SHOWING] = IsShowing();
-  state[Dali::Accessibility::State::DEFUNCT] = !self.GetProperty(Dali::DevelActor::Property::CONNECTED_TO_SCENE).Get<bool>();
-  return state;
+  return states;
 }
 
 Dali::Accessibility::States ControlAccessible::GetStates()

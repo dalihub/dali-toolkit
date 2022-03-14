@@ -201,6 +201,11 @@ private:
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * Get the range of the valid values the ProgressBar handle can move between
    *
    * @param[in] currentSize The current size of the ProgressBar

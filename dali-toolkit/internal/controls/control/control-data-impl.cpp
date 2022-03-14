@@ -522,10 +522,6 @@ Control::Impl::Impl(Control& controlImpl)
   mDispatchKeyEvents(true)
 {
   Dali::Accessibility::Accessible::RegisterExternalAccessibleGetter(&ExternalAccessibleGetter);
-
-  mAccessibilityConstructor = [](Dali::Actor actor) {
-    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::UNKNOWN);
-  };
 }
 
 Control::Impl::~Impl()
@@ -2059,7 +2055,7 @@ Toolkit::DevelControl::ControlAccessible* Control::Impl::GetAccessibleObject()
 {
   if(!mAccessibleObject)
   {
-    mAccessibleObject = mAccessibilityConstructor(mControlImpl.Self());
+    mAccessibleObject.reset(mControlImpl.CreateAccessibleObject());
   }
 
   return mAccessibleObject.get();

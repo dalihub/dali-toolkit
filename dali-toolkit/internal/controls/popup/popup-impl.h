@@ -437,6 +437,11 @@ private:
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * Called whenever the popup layout is re-set up.
    * Normally due to a change in contents.
    * Note: This is only done when the popup is shown.

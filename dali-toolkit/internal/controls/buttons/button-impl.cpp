@@ -620,6 +620,11 @@ bool Button::OnAccessibilityActivated()
   return OnKeyboardEnter();
 }
 
+DevelControl::ControlAccessible* Button::CreateAccessibleObject()
+{
+  return new ButtonAccessible(Self());
+}
+
 bool Button::OnTouch(Actor actor, const TouchEvent& touch)
 {
   if(!IsDisabled() && (actor == touch.GetHitActor(0)))

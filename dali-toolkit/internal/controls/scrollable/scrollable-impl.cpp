@@ -99,9 +99,12 @@ bool Scrollable::ScrollableAccessible::IsScrollable() const
 
 void Scrollable::OnInitialize()
 {
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::make_unique<ScrollableAccessible>(actor, Dali::Accessibility::Role::SCROLL_PANE);
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::SCROLL_PANE);
+}
+
+DevelControl::ControlAccessible* Scrollable::CreateAccessibleObject()
+{
+  return new ScrollableAccessible(Self());
 }
 
 bool Scrollable::IsOvershootEnabled() const

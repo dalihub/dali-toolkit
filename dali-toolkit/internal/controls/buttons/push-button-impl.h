@@ -93,6 +93,11 @@ private: // From Button
    */
   void OnInitialize() override;
 
+  /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
 private:
   /**
    * @brief Sets the alignment mode to use to align the icon to the label.

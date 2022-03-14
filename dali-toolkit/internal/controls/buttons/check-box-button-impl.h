@@ -63,6 +63,11 @@ private: // From Button
    */
   void OnInitialize() override;
 
+  /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
 private:
   // Undefined
   CheckBoxButton(const CheckBoxButton&);

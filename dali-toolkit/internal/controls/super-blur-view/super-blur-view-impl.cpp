@@ -149,9 +149,7 @@ void SuperBlurView::OnInitialize()
 
   mBlurStrengthPropertyIndex = self.RegisterUniqueProperty("blurStrength", 0.f);
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::FILLER);
-  });
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
 }
 
 void SuperBlurView::SetTexture(Texture texture)

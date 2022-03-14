@@ -835,9 +835,7 @@ void FlexContainer::OnInitialize()
   self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
   SetAsKeyboardFocusGroup(true);
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::FILLER);
-  });
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
 }
 
 } // namespace Internal

@@ -224,11 +224,6 @@ void ClearAccessibilityRelations(Toolkit::Control control)
   GetControlImplementation(control).mAccessibilityRelations.clear();
 }
 
-void SetAccessibilityConstructor(Dali::Actor control, std::function<std::unique_ptr<Toolkit::DevelControl::ControlAccessible>(Dali::Actor)> constructor)
-{
-  GetControlImplementation(Toolkit::Control::DownCast(control)).mAccessibilityConstructor = constructor;
-}
-
 void AppendAccessibilityAttribute(Toolkit::Control control, const std::string& key, const std::string& value)
 {
   GetControlImplementation(control).AppendAccessibilityAttribute(key, value);

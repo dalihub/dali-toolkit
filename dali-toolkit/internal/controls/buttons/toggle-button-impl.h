@@ -128,6 +128,11 @@ private: // From Button
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc Toolkit::Internal::Button::OnRelayout
    */
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;

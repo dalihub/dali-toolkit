@@ -883,9 +883,6 @@ void TextLabel::OnInitialize()
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
   self.SetResizePolicy(ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
 
-  // Enable highlightability
-  self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
-
   // Enable the text ellipsis.
   mController->SetTextElideEnabled(true); // If false then text larger than control will overflow
 
@@ -899,12 +896,17 @@ void TextLabel::OnInitialize()
   Layout::Engine& engine = mController->GetLayoutEngine();
   engine.SetCursorWidth(0u); // Do not layout space for the cursor.
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::make_unique<TextLabelAccessible>(actor, Dali::Accessibility::Role::LABEL);
-  });
+  // Accessibility
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::LABEL);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
 
   Accessibility::Bridge::EnabledSignal().Connect(this, &TextLabel::OnAccessibilityStatusChanged);
   Accessibility::Bridge::DisabledSignal().Connect(this, &TextLabel::OnAccessibilityStatusChanged);
+}
+
+DevelControl::ControlAccessible* TextLabel::CreateAccessibleObject()
+{
+  return new TextLabelAccessible(Self());
 }
 
 void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)

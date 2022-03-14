@@ -561,24 +561,6 @@ DALI_TOOLKIT_API Dali::Accessibility::States GetAccessibilityStates(Toolkit::Con
  */
 DALI_TOOLKIT_API void NotifyAccessibilityStateChange(Toolkit::Control control, Dali::Accessibility::States states, bool recurse);
 
-/**
- * The method allows to set specific constructor for creating accessibility structure
- *
- * Thank to this method hierarchy of accessibility objects can be based on internal hierarchy of Actors.
- * It prevents from necessity of keeping two trees synchronized.
- * The method should be called inside OnInitialize method of all classes inheriting from Control.
- *
- * Possible usage can be as follows:
- * @code
- *   SetAccessibilityConstructor([](Dali::Actor actor) {
-       return std::make_unique<ControlAccessible>(actor, Dali::Accessibility::Role::DIALOG, true));
-      });
-  * @endcode
-  *
-  * param constructor callback creating Accessible object
-  */
-DALI_TOOLKIT_API void SetAccessibilityConstructor(Dali::Actor control, std::function<std::unique_ptr<Toolkit::DevelControl::ControlAccessible>(Dali::Actor)> constructor);
-
 } // namespace DevelControl
 
 } // namespace Toolkit

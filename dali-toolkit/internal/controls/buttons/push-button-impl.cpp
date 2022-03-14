@@ -95,9 +95,12 @@ void PushButton::OnInitialize()
   Actor self = Self();
   self.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::make_unique<PushButtonAccessible>(actor, Dali::Accessibility::Role::PUSH_BUTTON);
-  });
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::PUSH_BUTTON);
+}
+
+DevelControl::ControlAccessible* PushButton::CreateAccessibleObject()
+{
+  return new PushButtonAccessible(Self());
 }
 
 void PushButton::SetIconAlignment(const PushButton::IconAlignment iconAlignment)

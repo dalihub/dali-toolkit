@@ -77,9 +77,12 @@ void CheckBoxButton::OnInitialize()
 {
   Button::OnInitialize();
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::make_unique<CheckBoxButtonAccessible>(actor, Dali::Accessibility::Role::CHECK_BOX);
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::CHECK_BOX);
+}
+
+DevelControl::ControlAccessible* CheckBoxButton::CreateAccessibleObject()
+{
+  return new CheckBoxButton::CheckBoxButtonAccessible(Self());
 }
 
 Dali::Accessibility::States CheckBoxButton::CheckBoxButtonAccessible::CalculateStates()

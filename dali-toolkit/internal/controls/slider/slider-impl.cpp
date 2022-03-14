@@ -202,15 +202,17 @@ void Slider::OnInitialize()
   // Size the Slider actor to a default
   self.SetProperty(Actor::Property::SIZE, Vector2(DEFAULT_HIT_REGION.x, DEFAULT_HIT_REGION.y));
 
-  // Set the Slider to be highlightable in Screen Reader mode
-  self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
-
   // Connect to the touch signal
   self.TouchedSignal().Connect(this, &Slider::OnTouch);
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::make_unique<SliderAccessible>(actor, Dali::Accessibility::Role::SLIDER);
-  });
+  // Accessibility
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::SLIDER);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
+}
+
+DevelControl::ControlAccessible* Slider::CreateAccessibleObject()
+{
+  return new SliderAccessible(Self());
 }
 
 void Slider::OnRelayout(const Vector2& size, RelayoutContainer& container)

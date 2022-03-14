@@ -322,6 +322,11 @@ protected: // From Control
   bool OnAccessibilityActivated() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc Toolkit::Control::OnKeyboardEnter()
    */
   bool OnKeyboardEnter() override;

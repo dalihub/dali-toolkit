@@ -367,9 +367,12 @@ void ItemView::OnInitialize()
   // Connect wheel event
   self.WheelEventSignal().Connect(this, &ItemView::OnWheelEvent);
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::make_unique<ItemViewAccessible>(actor, Dali::Accessibility::Role::SCROLL_PANE);
-  });
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::SCROLL_PANE);
+}
+
+DevelControl::ControlAccessible* ItemView::CreateAccessibleObject()
+{
+  return new ItemViewAccessible(Self());
 }
 
 ItemView::~ItemView()

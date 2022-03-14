@@ -535,7 +535,6 @@ public:
   Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
 
   std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> mAccessibilityRelations;
-  std::function<std::unique_ptr<Toolkit::DevelControl::ControlAccessible>(Actor)>   mAccessibilityConstructor;
   std::unique_ptr<Toolkit::DevelControl::ControlAccessible>                         mAccessibleObject;
 
   // Gesture Detection

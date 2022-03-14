@@ -319,6 +319,11 @@ private:
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * Hit region touch
    *
    * @param[in] actor The actor the event is raised for

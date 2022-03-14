@@ -256,9 +256,7 @@ void ShadowView::OnInitialize()
   blurStrengthConstraint.AddSource(Source(self, mBlurStrengthPropertyIndex));
   blurStrengthConstraint.Apply();
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::FILLER);
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
 }
 
 void ShadowView::OnChildAdd(Actor& child)

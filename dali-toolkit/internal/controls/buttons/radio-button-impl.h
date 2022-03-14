@@ -65,6 +65,11 @@ private: // From Button
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc Toolkit::Internal::Button::OnStateChange
    */
   void OnStateChange(State newState) override;

@@ -280,9 +280,7 @@ void Model3dView::OnInitialize()
   Shader   shader = Shader::New(SHADER_MODEL3D_VIEW_SIMPLE_SHADER_VERT, SHADER_MODEL3D_VIEW_SIMPLE_SHADER_FRAG);
   mRenderer       = Renderer::New(mesh, shader);
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::IMAGE);
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::IMAGE);
 }
 
 void Model3dView::LoadGeometry()

@@ -311,9 +311,7 @@ void ToolBar::OnInitialize()
   mLayout.SetRelativeWidth(0, mLeftRelativeSpace);
   mLayout.SetRelativeWidth(1, mRightRelativeSpace);
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::TOOL_BAR);
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::TOOL_BAR);
 }
 
 void ToolBar::OnChildAdd(Actor& child)

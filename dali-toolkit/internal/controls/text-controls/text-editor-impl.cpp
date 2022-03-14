@@ -582,9 +582,6 @@ void TextEditor::OnInitialize()
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
   self.OnSceneSignal().Connect(this, &TextEditor::OnSceneConnect);
 
-  //Enable highightability
-  self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
-
   DevelControl::SetInputMethodContext(*this, mInputMethodContext);
 
   // Creates an extra control to be used as stencil buffer.
@@ -602,12 +599,17 @@ void TextEditor::OnInitialize()
 
   self.Add(mStencil);
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::make_unique<TextEditorAccessible>(actor, Dali::Accessibility::Role::ENTRY);
-  });
+  // Accessibility
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::ENTRY);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
 
   Accessibility::Bridge::EnabledSignal().Connect(this, &TextEditor::OnAccessibilityStatusChanged);
   Accessibility::Bridge::DisabledSignal().Connect(this, &TextEditor::OnAccessibilityStatusChanged);
+}
+
+DevelControl::ControlAccessible* TextEditor::CreateAccessibleObject()
+{
+  return new TextEditorAccessible(Self());
 }
 
 void TextEditor::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)

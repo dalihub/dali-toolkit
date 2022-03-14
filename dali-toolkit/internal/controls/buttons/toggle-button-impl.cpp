@@ -106,9 +106,12 @@ void ToggleButton::OnInitialize()
   Actor self = Self();
   self.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::make_unique<ToggleButtonAccessible>(actor, Dali::Accessibility::Role::TOGGLE_BUTTON);
-  });
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::TOGGLE_BUTTON);
+}
+
+DevelControl::ControlAccessible* ToggleButton::CreateAccessibleObject()
+{
+  return new ToggleButtonAccessible(Self());
 }
 
 void ToggleButton::SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value)

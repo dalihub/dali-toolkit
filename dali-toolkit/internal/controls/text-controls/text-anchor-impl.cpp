@@ -145,12 +145,14 @@ void TextAnchor::OnInitialize()
 {
   Actor self = Self();
 
-  // Enable highlightability
-  self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
+  // Accessibility
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::LINK);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
+}
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::make_unique<TextAnchorAccessible>(actor, Dali::Accessibility::Role::LINK);
-  });
+DevelControl::ControlAccessible* TextAnchor::CreateAccessibleObject()
+{
+  return new TextAnchorAccessible(Self());
 }
 
 TextAnchor::TextAnchor()

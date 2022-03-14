@@ -527,9 +527,6 @@ void TextField::OnInitialize()
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
   self.OnSceneSignal().Connect(this, &TextField::OnSceneConnect);
 
-  //Enable highightability
-  self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
-
   DevelControl::SetInputMethodContext(*this, mInputMethodContext);
 
   if(Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy)
@@ -537,12 +534,17 @@ void TextField::OnInitialize()
     EnableClipping();
   }
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::make_unique<TextFieldAccessible>(actor, Dali::Accessibility::Role::ENTRY);
-  });
+  // Accessibility
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::ENTRY);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
 
   Accessibility::Bridge::EnabledSignal().Connect(this, &TextField::OnAccessibilityStatusChanged);
   Accessibility::Bridge::DisabledSignal().Connect(this, &TextField::OnAccessibilityStatusChanged);
+}
+
+DevelControl::ControlAccessible* TextField::CreateAccessibleObject()
+{
+  return new TextFieldAccessible(Self());
 }
 
 void TextField::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)

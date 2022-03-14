@@ -661,6 +661,11 @@ private: // private overridden functions from CustomActorImpl and Controls
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
   void OnSceneConnection(int depth) override;

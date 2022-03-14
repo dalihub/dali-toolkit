@@ -71,6 +71,11 @@ private: // From Control
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc Control::OnPropertySet()
    */
   // void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override;

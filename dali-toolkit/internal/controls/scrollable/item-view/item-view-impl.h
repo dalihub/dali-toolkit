@@ -419,6 +419,11 @@ private: // From Control
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc Toolkit::Control::OnAccessibilityPan()
    */
   bool OnAccessibilityPan(PanGesture gesture) override;
