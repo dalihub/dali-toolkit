@@ -184,7 +184,7 @@ int32_t TextAnchor::TextAnchorAccessible::GetAnchorCount() const
 
 Dali::Accessibility::Accessible* TextAnchor::TextAnchorAccessible::GetAnchorAccessible(int32_t anchorIndex) const
 {
-  return Control::Impl::GetAccessibilityObject(Self());
+  return const_cast<TextAnchorAccessible*>(this);
 }
 
 std::string TextAnchor::TextAnchorAccessible::GetAnchorUri(int32_t anchorIndex) const

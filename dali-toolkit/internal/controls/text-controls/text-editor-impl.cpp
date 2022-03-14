@@ -907,26 +907,17 @@ void TextEditor::RequestTextRelayout()
 
 void TextEditor::TextInserted(unsigned int position, unsigned int length, const std::string& content)
 {
-  if(Accessibility::IsUp())
-  {
-    Control::Impl::GetAccessibilityObject(Self())->EmitTextInserted(position, length, content);
-  }
+  GetAccessibleObject()->EmitTextInserted(position, length, content);
 }
 
 void TextEditor::TextDeleted(unsigned int position, unsigned int length, const std::string& content)
 {
-  if(Accessibility::IsUp())
-  {
-    Control::Impl::GetAccessibilityObject(Self())->EmitTextDeleted(position, length, content);
-  }
+  GetAccessibleObject()->EmitTextDeleted(position, length, content);
 }
 
 void TextEditor::CursorPositionChanged(unsigned int oldPosition, unsigned int newPosition)
 {
-  if(Accessibility::IsUp())
-  {
-    Control::Impl::GetAccessibilityObject(Self())->EmitTextCursorMoved(newPosition);
-  }
+  GetAccessibleObject()->EmitTextCursorMoved(newPosition);
 
   if((oldPosition != newPosition) && !mCursorPositionChanged)
   {

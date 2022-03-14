@@ -165,8 +165,7 @@ void TextSelectionToolbar::OnInitialize()
   SetUp();
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::TOOL_BAR));
+    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::TOOL_BAR);
   });
 }
 

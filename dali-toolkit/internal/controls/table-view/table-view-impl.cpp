@@ -1120,8 +1120,7 @@ void TableView::OnInitialize()
   SetAsKeyboardFocusGroup(true);
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::TABLE));
+    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::TABLE);
   });
 }
 

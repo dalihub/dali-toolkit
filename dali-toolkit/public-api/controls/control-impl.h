@@ -43,6 +43,12 @@ namespace Toolkit
 
 class StyleManager;
 
+namespace DevelControl
+{
+class ControlAccessible;
+
+} // namespace DevelControl
+
 namespace Internal
 {
 
@@ -108,6 +114,17 @@ public:
    * @copydoc Dali::Toolkit::Control::ClearBackground
    */
   void ClearBackground();
+
+  // Accessibility
+
+  /**
+   * @brief Gets the Accessible object that represents this control.
+   *
+   * This method creates the Accessible object if necessary, so a non-null return is expected.
+   *
+   * @return The Accessible object
+   */
+  Toolkit::DevelControl::ControlAccessible* GetAccessibleObject();
 
   // Gesture Detection
 

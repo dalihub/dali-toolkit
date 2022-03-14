@@ -119,8 +119,7 @@ void VideoView::OnInitialize()
   mVideoPlayer.FinishedSignal().Connect(this, &VideoView::EmitSignalFinish);
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::VIDEO));
+    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::VIDEO);
   });
 
   //Enable highightability

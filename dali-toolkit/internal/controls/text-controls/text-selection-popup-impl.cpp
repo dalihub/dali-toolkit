@@ -398,8 +398,7 @@ void TextSelectionPopup::OnInitialize()
   self.SetProperty(Actor::Property::COLOR_ALPHA, 0.0f);
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::DIALOG, true));
+    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::DIALOG, true);
   });
 
   //Enable highightability

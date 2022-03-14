@@ -281,8 +281,7 @@ void Model3dView::OnInitialize()
   mRenderer       = Renderer::New(mesh, shader);
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::IMAGE));
+    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::IMAGE);
   });
 }
 

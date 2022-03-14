@@ -348,10 +348,10 @@ bool ControlAccessible::GrabHighlight()
   // Clear the old highlight.
   if(oldHighlightedActor)
   {
-    auto oldHighlightObject = dynamic_cast<Dali::Accessibility::Component*>(Internal::Control::Impl::GetAccessibilityObject(oldHighlightedActor));
-    if(oldHighlightObject)
+    auto oldHighlightedObject = Dali::Accessibility::Component::DownCast(Accessible::Get(oldHighlightedActor));
+    if(oldHighlightedObject)
     {
-      oldHighlightObject->ClearHighlight();
+      oldHighlightedObject->ClearHighlight();
     }
   }
 

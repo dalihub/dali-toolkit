@@ -570,15 +570,14 @@ DALI_TOOLKIT_API void NotifyAccessibilityStateChange(Toolkit::Control control, D
  *
  * Possible usage can be as follows:
  * @code
- *   SetAccessibilityConstructor( []( Dali::Actor actor ) {
-       return std::unique_ptr< Dali::Accessibility::Accessible >(
-       new ControlAccessible( actor, Dali::Accessibility::Role::DIALOG, true ) );
-      } );
+ *   SetAccessibilityConstructor([](Dali::Actor actor) {
+       return std::make_unique<ControlAccessible>(actor, Dali::Accessibility::Role::DIALOG, true));
+      });
   * @endcode
   *
   * param constructor callback creating Accessible object
   */
-DALI_TOOLKIT_API void SetAccessibilityConstructor(Dali::Actor control, std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Dali::Actor)> constructor);
+DALI_TOOLKIT_API void SetAccessibilityConstructor(Dali::Actor control, std::function<std::unique_ptr<Toolkit::DevelControl::ControlAccessible>(Dali::Actor)> constructor);
 
 } // namespace DevelControl
 

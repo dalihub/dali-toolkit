@@ -218,8 +218,7 @@ void BloomView::OnInitialize()
   SetupProperties();
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::ANIMATION));
+    return std::make_unique<DevelControl::ControlAccessible>(actor, Dali::Accessibility::Role::ANIMATION);
   });
 }
 
