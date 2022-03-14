@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-anchor-control-interface.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
@@ -246,57 +247,10 @@ protected:
   /**
    * @brief This structure is to connect TextLabel with Accessible functions.
    */
-  class TextLabelAccessible : public DevelControl::ControlAccessible,
-                              public virtual Dali::Accessibility::Text,
-                              public virtual Dali::Accessibility::Hypertext
+  class TextLabelAccessible : public TextControlAccessible
   {
   public:
-    using DevelControl::ControlAccessible::ControlAccessible;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::GetText()
-     */
-    std::string GetText(size_t startOffset, size_t endOffset) const override;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::GetCharacterCount()
-     */
-    size_t GetCharacterCount() const override;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::GetCursorOffset()
-     */
-    size_t GetCursorOffset() const override;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::SetCursorOffset()
-     */
-    bool SetCursorOffset(size_t offset) override;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::GetTextAtOffset()
-     */
-    Accessibility::Range GetTextAtOffset(size_t offset, Accessibility::TextBoundary boundary) const override;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::GetRangeOfSelection()
-     */
-    Accessibility::Range GetRangeOfSelection(size_t selectionIndex) const override;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::RemoveSelection()
-     */
-    bool RemoveSelection(size_t selectionIndex) override;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::SetRangeOfSelection()
-     */
-    bool SetRangeOfSelection(size_t selectionIndex, size_t startOffset, size_t endOffset) override;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::GetRangeExtents()
-     */
-    Rect<> GetRangeExtents(size_t startOffset, size_t endOffset, Accessibility::CoordinateType type) override;
+    using TextControlAccessible::TextControlAccessible;
 
     /**
      * @copydoc Dali::Accessibility::Text::GetNameRaw()
@@ -308,20 +262,16 @@ protected:
      */
     Property::Index GetNamePropertyIndex() override;
 
+  protected:
     /**
-     * @copydoc Dali::Accessibility::Hypertext::GetLink()
+     * @copydoc Dali::Toolkit::Internal::TextControlAccessible::GetTextAnchors()
      */
-    Accessibility::Hyperlink* GetLink(int32_t linkIndex) const override;
+    const std::vector<Toolkit::TextAnchor>& GetTextAnchors() const override;
 
     /**
-     * @copydoc Dali::Accessibility::Hypertext::GetLinkIndex()
+     * @copydoc Dali::Toolkit::Internal::TextControlAccessible::GetTextController()
      */
-    int32_t GetLinkIndex(int32_t characterOffset) const override;
-
-    /**
-     * @copydoc Dali::Accessibility::Hypertext::GetLinkCount()
-     */
-    int32_t GetLinkCount() const override;
+    Toolkit::Text::ControllerPtr GetTextController() const override;
   };
 };
 
