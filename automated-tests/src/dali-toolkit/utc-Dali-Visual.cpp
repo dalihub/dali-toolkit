@@ -2051,7 +2051,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
 
     DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
-    Renderer renderer = actor.GetRendererAt(0);
+    Renderer        renderer = actor.GetRendererAt(0);
 
     const Vector4 INITIAL_MIX_COLOR(1.0f, 0.0f, 1.0f, 0.5f); // Magenta with half alpha
     const Vector4 TARGET_MIX_COLOR(Color::RED);
@@ -3743,11 +3743,9 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
     // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
-#endif
   }
 
   // color visual 2
@@ -3778,11 +3776,9 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
     // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", cornerRadius), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE), true, TEST_LOCATION);
-#endif
   }
 
   // color visual 3 - invalid value
@@ -3813,12 +3809,10 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
     // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", cornerRadius), true, TEST_LOCATION);
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
-#endif
   }
 
   // gradient visual
@@ -3863,12 +3857,9 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
-    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius)), true, TEST_LOCATION);
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
-#endif
   }
 
   // animated image visual
@@ -3902,11 +3893,8 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
-    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", cornerRadius), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
-#endif
   }
 
   // vector image visual
@@ -3938,12 +3926,9 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
-    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", cornerRadius), true, TEST_LOCATION);
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
-#endif
   }
 
   // animated vector image visual
@@ -3977,11 +3962,8 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
-    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE), true, TEST_LOCATION);
-#endif
   }
 
   END_TEST;
@@ -4080,13 +4062,10 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
-    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", cornerRadius), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", borderlineWidth), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", borderlineColor), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", borderlineOffset), true, TEST_LOCATION);
-#endif
   }
 
   // color visual 2, default color, default offset
@@ -4116,14 +4095,11 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
-    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", borderlineWidth), true, TEST_LOCATION);
     // Default borderline color is BLACK.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", Color::BLACK), true, TEST_LOCATION);
     // Default borderline offset is 0.0f.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", 0.0f), true, TEST_LOCATION);
-#endif
   }
 
   // color visual 3, offset not [-1.0 ~ 1.0], but uniform value is same anyway
@@ -4157,13 +4133,10 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
-    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", borderlineWidth), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", borderlineColor), true, TEST_LOCATION);
     // NOTE : borderlineOffset will clamp in fragment shader. not visual itself
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", borderlineOffset), true, TEST_LOCATION);
-#endif
   }
 
   // gradient visual
@@ -4210,8 +4183,6 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
-    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius)), true, TEST_LOCATION);
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
@@ -4220,7 +4191,6 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", Color::BLACK), true, TEST_LOCATION);
     // Default borderline offset is 0.0f.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", 0.0f), true, TEST_LOCATION);
-#endif
   }
 
   // animated image visual
@@ -4255,13 +4225,10 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
-    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", borderlineWidth), true, TEST_LOCATION);
     // Default borderline color is BLACK.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", Color::BLACK), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", borderlineOffset), true, TEST_LOCATION);
-#endif
   }
 
   // vector image visual
@@ -4297,8 +4264,6 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
-    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", cornerRadius), true, TEST_LOCATION);
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
@@ -4306,7 +4271,6 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", borderlineColor), true, TEST_LOCATION);
     // Default borderline offset is 0.0.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", 0.0f), true, TEST_LOCATION);
-#endif
   }
 
   // animated vector image visual
@@ -4345,14 +4309,11 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
-#ifdef OLD_GRAPHICS_TEST
-    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", cornerRadius), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", borderlineWidth), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", borderlineColor), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", borderlineOffset), true, TEST_LOCATION);
-#endif
   }
 
   END_TEST;
@@ -4824,7 +4785,7 @@ int UtcDaliVisualGetVisualProperty01(void)
   float   targetBlurRadius      = 10.0f;
   float   targetBorderlineWidth = 25.0f;
   Vector4 targetBorderlineColor(1.0f, 1.0f, 1.0f, 1.0f);
-  float   targetBorderlineOffset   = -1.0f;
+  float targetBorderlineOffset = -1.0f;
   float   targetPreMultipliedAlpha = 1.0f;
 
   Animation animation = Animation::New(1.0f);
@@ -5007,15 +4968,12 @@ int UtcDaliVisualGetVisualProperty02(void)
   DALI_TEST_CHECK(blurRadiusValue);
   DALI_TEST_EQUALS(blurRadiusValue->Get<float>(), targetBlurRadius, TEST_LOCATION);
 
-#ifdef OLD_GRAPHICS_TEST
-  // Currently test with multiple program doesn't work well. will fix another day
   // Test uniform values
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", targetColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("offset", targetOffset), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("size", targetSize), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("blurRadius", targetBlurRadius), true, TEST_LOCATION);
-#endif
 
   END_TEST;
 }
@@ -5097,14 +5055,11 @@ int UtcDaliVisualGetVisualProperty03(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
-#ifdef OLD_GRAPHICS_TEST
-  // Currently test with multiple program doesn't work well. will fix another day
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
-#endif
 
   END_TEST;
 }
@@ -5171,11 +5126,8 @@ int UtcDaliVisualGetVisualProperty04(void)
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
 
-#ifdef OLD_GRAPHICS_TEST
-  // Currently test with multiple program doesn't work well. will fix another day
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
-#endif
 
   END_TEST;
 }
@@ -5260,14 +5212,12 @@ int UtcDaliVisualGetVisualProperty05(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
-#ifdef OLD_GRAPHICS_TEST
   // Currently test with multiple program doesn't work well. will fix another day
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
-#endif
 
   END_TEST;
 }
@@ -5352,14 +5302,12 @@ int UtcDaliVisualGetVisualProperty06(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
-#ifdef OLD_GRAPHICS_TEST
   // Currently test with multiple program doesn't work well. will fix another day
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
-#endif
 
   END_TEST;
 }
@@ -5444,14 +5392,12 @@ int UtcDaliVisualGetVisualProperty07(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
-#ifdef OLD_GRAPHICS_TEST
   // Currently test with multiple program doesn't work well. will fix another day
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
-#endif
 
   END_TEST;
 }
