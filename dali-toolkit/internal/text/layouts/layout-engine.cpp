@@ -1306,6 +1306,15 @@ struct Engine::Impl
       {
         layoutSize.height += GetLineHeight(*lineRun, true);
       }
+      else
+      {
+        //when we apply ellipsis, the last line should not take negative linespacing into account for layoutSize.height calculation
+        //usually we don't includ it in normal cases using GetLineHeight()
+        if(lineRun->lineSpacing < 0)
+        {
+          layoutSize.height -= lineRun->lineSpacing;
+        }
+      }
 
       const Vector<BidirectionalLineInfoRun>& bidirectionalLinesInfo = layoutParameters.textModel->mLogicalModel->mBidirectionalLineInfo;
 
