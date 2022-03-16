@@ -5320,3 +5320,82 @@ int UtcDaliToolkitTextfieldParagraphTag(void)
 
   END_TEST;
 }
+
+//Handle Emoji clustering for cursor handling
+int utcDaliTextFieldClusteredEmojiDeletionBackSpaceKey(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldClusteredEmojiDeletionBackSpaceKey ");
+  TextField textField = TextField::New();
+  DALI_TEST_CHECK(textField);
+
+  application.GetScene().Add(textField);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  textField.SetProperty(TextField::Property::TEXT, "ABC&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F466;XY");
+  textField.SetProperty(Dali::Toolkit::TextField::Property::ENABLE_MARKUP, true);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Set currsor
+  textField.SetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION, 10);
+  application.SendNotification();
+  application.Render();
+
+  // Set focus and remove Emoji
+  textField.SetKeyInputFocus();
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  //Check the changed text and cursor position
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "ABCXY", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 3, TEST_LOCATION);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int utcDaliTextFieldClusteredEmojiDeletionDeleteKey(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldClusteredEmojiDeletionDeleteKey ");
+  TextField textField = TextField::New();
+  DALI_TEST_CHECK(textField);
+
+  application.GetScene().Add(textField);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  textField.SetProperty(TextField::Property::TEXT, "ABC&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F466;XY");
+  textField.SetProperty(Dali::Toolkit::TextField::Property::ENABLE_MARKUP, true);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Set currsor
+  textField.SetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION, 3);
+  application.SendNotification();
+  application.Render();
+
+  // Set focus and remove Emoji
+  textField.SetKeyInputFocus();
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  //Check the changed text and cursor position
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "ABCXY", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 3, TEST_LOCATION);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}

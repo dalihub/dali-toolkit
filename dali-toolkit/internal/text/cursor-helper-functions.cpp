@@ -22,6 +22,8 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/characters-helper-functions.h>
+#include <dali-toolkit/internal/text/emoji-helper.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 
 namespace
@@ -457,6 +459,19 @@ CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
   }
 
   logicalIndex = (bidiLineFetched ? logicalModel->GetLogicalCursorIndex(visualIndex) : visualIndex);
+
+  // Handle Emoji clustering for cursor handling:
+  // Fixing this case:
+  // - When there is Emoji contains multi unicodes and it is layoutted at the end of line (LineWrap case , is not new line case)
+  // - Try to click at the center or at the end of Emoji then the cursor appears inside Emoji
+  // - Example:"FamilyManWomanGirlBoy &#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F466;"
+  const Script script = logicalModel->GetScript(logicalIndex);
+  if(IsOneOfEmojiScripts(script))
+  {
+    //TODO: Use this clustering for Emoji cases only. This needs more testing to generalize to all scripts.
+    CharacterRun emojiClusteredCharacters = RetrieveClusteredCharactersOfCharacterIndex(visualModel, logicalModel, logicalIndex);
+    logicalIndex                          = emojiClusteredCharacters.characterIndex;
+  }
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "closest visualIndex %d logicalIndex %d\n", visualIndex, logicalIndex);
 
