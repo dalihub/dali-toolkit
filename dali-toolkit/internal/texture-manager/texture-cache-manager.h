@@ -184,6 +184,7 @@ public:
    * @param[in] samplingMode     The SamplingMode to use
    * @param[in] useAtlas         True if atlased
    * @param[in] maskTextureId    The masking texture id (or INVALID_TEXTURE_ID)
+   * @param[in] cropToMask       True if crop to mask
    * @return                     A hash of the provided data for caching.
    */
   TextureCacheManager::TextureHash GenerateHash(
@@ -192,7 +193,8 @@ public:
     const Dali::FittingMode::Type&        fittingMode,
     const Dali::SamplingMode::Type&       samplingMode,
     const TextureCacheManager::UseAtlas&  useAtlas,
-    const TextureCacheManager::TextureId& maskTextureId);
+    const TextureCacheManager::TextureId& maskTextureId,
+    const bool&                           cropToMask);
 
   /**
    * @brief Looks up a cached texture by its hash.
@@ -206,6 +208,7 @@ public:
    * @param[in] maskTextureId     Optional texture ID to use to mask this image
    * @param[in] preMultiplyOnLoad If the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    * @param[in] isAnimatedImage   True if the texture is from animated image.
+   * @param[in] cropToMask        True if crop to mask
    * @return                      A TextureCacheId of a cached Texture if found. Or INVALID_CACHE_INDEX if not found.
    */
   TextureCacheManager::TextureCacheIndex FindCachedTexture(
@@ -217,7 +220,8 @@ public:
     const TextureCacheManager::UseAtlas&       useAtlas,
     const TextureCacheManager::TextureId&      maskTextureId,
     const TextureCacheManager::MultiplyOnLoad& preMultiplyOnLoad,
-    bool                                       isAnimatedImage);
+    bool                                       isAnimatedImage,
+    const bool&                                cropToMask);
 
   /**
    * @brief Append a Texture to the TextureCacheManager.

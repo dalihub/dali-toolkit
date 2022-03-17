@@ -326,7 +326,8 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
   const Dali::FittingMode::Type&        fittingMode,
   const Dali::SamplingMode::Type&       samplingMode,
   const TextureCacheManager::UseAtlas&  useAtlas,
-  const TextureCacheManager::TextureId& maskTextureId)
+  const TextureCacheManager::TextureId& maskTextureId,
+  const bool&                           cropToMask)
 {
   std::vector<std::uint8_t> hashTarget(url.begin(), url.end());
   const size_t              urlLength = url.length();
@@ -374,7 +375,7 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
   if(maskTextureId != INVALID_TEXTURE_ID)
   {
     auto textureIdIndex = hashTarget.size();
-    hashTarget.resize(hashTarget.size() + sizeof(TextureId));
+    hashTarget.resize(hashTarget.size() + sizeof(TextureId) + 1u);
     std::uint8_t* hashTargetPtr = reinterpret_cast<std::uint8_t*>(&(hashTarget[textureIdIndex]));
 
     // Append the texture id to the end of the URL byte by byte:
@@ -385,6 +386,7 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
       *hashTargetPtr++ = saltedMaskTextureId & 0xff;
       saltedMaskTextureId >>= 8u;
     }
+    *hashTargetPtr++ = (cropToMask ? 'C' : 'M');
   }
 
   return Dali::CalculateHash(hashTarget);
@@ -399,7 +401,8 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
   const TextureCacheManager::UseAtlas&       useAtlas,
   const TextureCacheManager::TextureId&      maskTextureId,
   const TextureCacheManager::MultiplyOnLoad& preMultiplyOnLoad,
-  bool                                       isAnimatedImage)
+  bool                                       isAnimatedImage,
+  const bool&                                cropToMask)
 {
   // Default to an invalid ID, in case we do not find a match.
   TextureCacheIndex cacheIndex = INVALID_CACHE_INDEX;
@@ -416,6 +419,7 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
       if((url == textureInfo.url.GetUrl()) &&
          (useAtlas == textureInfo.useAtlas) &&
          (maskTextureId == textureInfo.maskTextureId) &&
+         (cropToMask == textureInfo.cropToMask) &&
          (size == textureInfo.desiredSize) &&
          (isAnimatedImage == textureInfo.isAnimatedImageFormat) &&
          ((size.GetWidth() == 0 && size.GetHeight() == 0) ||
