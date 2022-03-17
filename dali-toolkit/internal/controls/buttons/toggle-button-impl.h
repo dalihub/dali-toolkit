@@ -128,6 +128,11 @@ private: // From Button
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc Toolkit::Internal::Button::OnRelayout
    */
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
@@ -152,15 +157,29 @@ private:
   std::vector<Toolkit::Visual::Base> mToggleDisabledSelectedVisuals; ///< Save all disabled selected visuals.
   std::vector<std::string>           mToggleTooltips;                ///< Toggle tooltips.
   unsigned int                       mCurrentToggleIndex;            ///< The index of state.
-protected:
-  struct AccessibleImpl : public Button::AccessibleImpl
-  {
-    using Button::AccessibleImpl::AccessibleImpl;
 
+protected:
+  class ToggleButtonAccessible : public Button::ButtonAccessible
+  {
+  public:
+    using Button::ButtonAccessible::ButtonAccessible;
+
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::CalculateStates()
+     */
     Dali::Accessibility::States CalculateStates() override;
-    std::string                 GetDescriptionRaw() const override;
-    Property::Index             GetDescriptionPropertyIndex() override;
+
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::GetDescriptionRaw()
+     */
+    std::string GetDescriptionRaw() const override;
+
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::GetDescriptionPropertyIndex()
+     */
+    Property::Index GetDescriptionPropertyIndex() override;
   };
+
   void OnStateChange(State newState) override;
 };
 

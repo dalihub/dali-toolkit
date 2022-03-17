@@ -43,6 +43,12 @@ namespace Toolkit
 
 class StyleManager;
 
+namespace DevelControl
+{
+class ControlAccessible;
+
+} // namespace DevelControl
+
 namespace Internal
 {
 
@@ -108,6 +114,19 @@ public:
    * @copydoc Dali::Toolkit::Control::ClearBackground
    */
   void ClearBackground();
+
+  // Accessibility
+
+  /**
+   * @brief Gets the Accessible object that represents this control.
+   *
+   * This method calls CreateAccessibleObject() if necessary, so a non-null return is expected.
+   *
+   * @return The Accessible object
+   *
+   * @see CreateAccessibleObject()
+   */
+  Toolkit::DevelControl::ControlAccessible* GetAccessibleObject();
 
   // Gesture Detection
 
@@ -487,6 +506,24 @@ public: // API for derived classes to override
    * @return true if the zoom action has been consumed by this control
    */
   virtual bool OnAccessibilityZoom();
+
+  /**
+   * @brief This method should be overriden by deriving classes when they wish to be
+   * represented by a custom Accessible object implementation.
+   *
+   * The AT-SPI infrastructure is responsible for destroying the returned object.
+   *
+   * Currently, this method is called at most once in a given Control's lifetime, when
+   * GetAccessibleObject() is called for the first time. A future version of the
+   * AT-SPI infrastructure, however, may delete the Accessible object and request a new
+   * one to be created (by calling this method) multiple times, for example during
+   * scene connection and disconnection.
+   *
+   * @return The newly created Accessible object
+   *
+   * @see GetAccessibleObject()
+   */
+  virtual DevelControl::ControlAccessible* CreateAccessibleObject();
 
   // Keyboard focus
 

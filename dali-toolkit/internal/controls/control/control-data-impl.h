@@ -423,20 +423,9 @@ public:
   void UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties);
 
   /**
-   * @brief Gets the current control's accessible object.
-   *
-   * @return The handle to Accessible object
+   * @copydoc Dali::Toolkit::Internal::Control::GetAccessibleObject()
    */
-  Dali::Accessibility::Accessible* GetAccessibilityObject();
-
-  /**
-   * @brief Gets Accessible object handle.
-   *
-   * The method acquires Accessible handle from Actor object
-   * @param  actor Actor object
-   * @return The handle to Accessible object
-   */
-  static Dali::Accessibility::Accessible* GetAccessibilityObject(Dali::Actor actor);
+  Toolkit::DevelControl::ControlAccessible* GetAccessibleObject();
 
 private:
   /**
@@ -546,8 +535,7 @@ public:
   Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
 
   std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> mAccessibilityRelations;
-  std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Actor)>            mAccessibilityConstructor;
-  std::unique_ptr<Dali::Accessibility::Accessible>                                  mAccessibilityObject;
+  std::unique_ptr<Toolkit::DevelControl::ControlAccessible>                         mAccessibleObject;
 
   // Gesture Detection
   PinchGestureDetector     mPinchGestureDetector;

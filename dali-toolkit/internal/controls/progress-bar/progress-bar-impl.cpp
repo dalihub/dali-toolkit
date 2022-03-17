@@ -165,12 +165,14 @@ ProgressBar::~ProgressBar()
 
 void ProgressBar::OnInitialize()
 {
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::PROGRESS_BAR));
-  });
-  //Enable highightability
-  Self().SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
+  // Accessibility
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::PROGRESS_BAR);
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
+}
+
+DevelControl::ControlAccessible* ProgressBar::CreateAccessibleObject()
+{
+  return new ProgressBarAccessible(Self());
 }
 
 void ProgressBar::OnRelayout(const Vector2& size, RelayoutContainer& container)
@@ -271,7 +273,7 @@ void ProgressBar::SetProgressValue(float value)
     mValueChangedSignal.Emit(self, mProgressValue, mSecondaryProgressValue);
     if(Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
     {
-      Control::Impl::GetAccessibilityObject(Self())->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
+      GetAccessibleObject()->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
     }
     RelayoutRequest();
   }
@@ -676,23 +678,23 @@ void ProgressBar::OnSceneConnection(int depth)
   }
 }
 
-double ProgressBar::AccessibleImpl::GetMinimum() const
+double ProgressBar::ProgressBarAccessible::GetMinimum() const
 {
   return DEFAULT_LOWER_BOUND;
 }
 
-double ProgressBar::AccessibleImpl::GetCurrent() const
+double ProgressBar::ProgressBarAccessible::GetCurrent() const
 {
   auto self = Toolkit::ProgressBar::DownCast(Self());
   return self.GetProperty(Toolkit::ProgressBar::Property::PROGRESS_VALUE).Get<float>();
 }
 
-double ProgressBar::AccessibleImpl::GetMaximum() const
+double ProgressBar::ProgressBarAccessible::GetMaximum() const
 {
   return DEFAULT_UPPER_BOUND;
 }
 
-bool ProgressBar::AccessibleImpl::SetCurrent(double current)
+bool ProgressBar::ProgressBarAccessible::SetCurrent(double current)
 {
   if(current < GetMinimum() || current > GetMaximum())
   {
@@ -704,7 +706,7 @@ bool ProgressBar::AccessibleImpl::SetCurrent(double current)
   return true;
 }
 
-double ProgressBar::AccessibleImpl::GetMinimumIncrement() const
+double ProgressBar::ProgressBarAccessible::GetMinimumIncrement() const
 {
   return 0.0;
 }

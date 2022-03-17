@@ -95,10 +95,12 @@ void PushButton::OnInitialize()
   Actor self = Self();
   self.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::PUSH_BUTTON));
-  });
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::PUSH_BUTTON);
+}
+
+DevelControl::ControlAccessible* PushButton::CreateAccessibleObject()
+{
+  return new PushButtonAccessible(Self());
 }
 
 void PushButton::SetIconAlignment(const PushButton::IconAlignment iconAlignment)
@@ -194,9 +196,9 @@ Property::Value PushButton::GetProperty(BaseObject* object, Property::Index prop
   return value;
 }
 
-Dali::Accessibility::States PushButton::AccessibleImpl::CalculateStates()
+Dali::Accessibility::States PushButton::PushButtonAccessible::CalculateStates()
 {
-  auto state = Button::AccessibleImpl::CalculateStates();
+  auto state = Button::ButtonAccessible::CalculateStates();
   auto self = Toolkit::Button::DownCast(Self());
   state[Dali::Accessibility::State::PRESSED] = self.GetProperty<bool>(Toolkit::Button::Property::SELECTED);
   return state;
@@ -205,14 +207,15 @@ Dali::Accessibility::States PushButton::AccessibleImpl::CalculateStates()
 void PushButton::OnStateChange(State newState)
 {
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
-  if(Dali::Accessibility::IsUp() && (Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor() == Self())
-     && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  if((Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor() == Self()) && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
-    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(Dali::Accessibility::State::PRESSED, newState == SELECTED_STATE ? 1 : 0, 0);
+    auto* accessible = GetAccessibleObject();
+
+    accessible->EmitStateChanged(Dali::Accessibility::State::PRESSED, newState == SELECTED_STATE ? 1 : 0, 0);
 
     if(Self().GetProperty<bool>(Toolkit::Button::Property::TOGGLABLE))
     {
-      Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+      accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
     }
   }
 }

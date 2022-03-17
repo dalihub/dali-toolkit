@@ -224,11 +224,6 @@ void ClearAccessibilityRelations(Toolkit::Control control)
   GetControlImplementation(control).mAccessibilityRelations.clear();
 }
 
-void SetAccessibilityConstructor(Dali::Actor control, std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Dali::Actor)> constructor)
-{
-  GetControlImplementation(Toolkit::Control::DownCast(control)).mAccessibilityConstructor = constructor;
-}
-
 void AppendAccessibilityAttribute(Toolkit::Control control, const std::string& key, const std::string& value)
 {
   GetControlImplementation(control).AppendAccessibilityAttribute(key, value);
@@ -256,28 +251,22 @@ Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType(Toolkit::C
 
 bool ClearAccessibilityHighlight(Toolkit::Control control)
 {
-  auto* accessible = Dali::Accessibility::Component::DownCast(GetControlImplementation(control).GetAccessibilityObject());
-
-  return accessible ? accessible->ClearHighlight() : false;
+  return GetControlImplementation(control).GetAccessibleObject()->ClearHighlight();
 }
 
 bool GrabAccessibilityHighlight(Toolkit::Control control)
 {
-  auto* accessible = Dali::Accessibility::Component::DownCast(GetControlImplementation(control).GetAccessibilityObject());
-
-  return accessible ? accessible->GrabHighlight() : false;
+  return GetControlImplementation(control).GetAccessibleObject()->GrabHighlight();
 }
 
 Dali::Accessibility::States GetAccessibilityStates(Toolkit::Control control)
 {
-  auto* accessible = GetControlImplementation(control).GetAccessibilityObject();
-
-  return accessible->GetStates();
+  return GetControlImplementation(control).GetAccessibleObject()->GetStates();
 }
 
 void NotifyAccessibilityStateChange(Toolkit::Control control, Dali::Accessibility::States states, bool recurse)
 {
-  GetControlImplementation(control).GetAccessibilityObject()->NotifyAccessibilityStateChange(std::move(states), recurse);
+  GetControlImplementation(control).GetAccessibleObject()->NotifyAccessibilityStateChange(std::move(states), recurse);
 }
 
 } // namespace DevelControl

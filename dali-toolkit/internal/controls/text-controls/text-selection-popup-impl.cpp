@@ -397,13 +397,23 @@ void TextSelectionPopup::OnInitialize()
   self.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
   self.SetProperty(Actor::Property::COLOR_ALPHA, 0.0f);
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::DIALOG, true));
-  });
-
-  //Enable highightability
+  // Accessibility
   self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
+  self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::DIALOG);
+}
+
+DevelControl::ControlAccessible* TextSelectionPopup::CreateAccessibleObject()
+{
+  return new TextSelectionPopupAccessible(Self());
+}
+
+Dali::Accessibility::States TextSelectionPopup::TextSelectionPopupAccessible::CalculateStates()
+{
+  auto states = ControlAccessible::CalculateStates();
+
+  states[Dali::Accessibility::State::MODAL] = true;
+
+  return states;
 }
 
 void TextSelectionPopup::HideAnimationFinished(Animation& animation)

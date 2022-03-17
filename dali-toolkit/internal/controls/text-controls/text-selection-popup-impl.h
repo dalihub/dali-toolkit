@@ -24,6 +24,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
@@ -138,6 +139,11 @@ private: // From Control
    * @copydoc Control::OnInitialize()
    */
   void OnInitialize() override;
+
+  /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
 
 private: // Implementation
   void HideAnimationFinished(Animation& animation);
@@ -265,6 +271,18 @@ private: // Implementation
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~TextSelectionPopup();
+
+protected:
+  class TextSelectionPopupAccessible : public DevelControl::ControlAccessible
+  {
+  public:
+    using DevelControl::ControlAccessible::ControlAccessible;
+
+    /**
+     * @copydoc DevelControl::ControlAccessible::CalculateStates()
+     */
+    Dali::Accessibility::States CalculateStates() override;
+  };
 
 private:
   // Undefined copy constructor and assignment operators

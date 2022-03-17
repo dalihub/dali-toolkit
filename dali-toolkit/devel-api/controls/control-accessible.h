@@ -33,10 +33,9 @@ namespace Dali::Toolkit::DevelControl {
 /**
  * @brief Represents the Accessible object for Dali::Toolkit::Control and derived classes
  *
- * You can create a derived class (and register it using SetAccessibilityConstructor)
+ * You can create a derived class (and override Control::CreateAccessibleObject)
  * in order to customize Accessibility for a given control.
  *
- * @see Dali::Toolkit::DevelControl::SetAccessibilityConstructor
  * @see Dali::Accessibility::Accessible
  * @see Dali::Accessibility::Component
  * @see Dali::Accessibility::Collection
@@ -51,8 +50,6 @@ struct DALI_TOOLKIT_API ControlAccessible : public Dali::Accessibility::ActorAcc
 protected:
   Vector2                       mLastPosition{0.0f, 0.0f};
   Dali::WeakHandle<Dali::Actor> mCurrentHighlightActor;
-  bool mIsModal = false;
-  bool mIsRoot = false;
 
   void ScrollToSelf();
 
@@ -73,7 +70,7 @@ protected:
   bool IsShowing();
 
 public:
-  ControlAccessible(Dali::Actor self, Dali::Accessibility::Role role, bool modal = false);
+  ControlAccessible(Dali::Actor self);
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetName()

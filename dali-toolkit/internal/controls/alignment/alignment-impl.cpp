@@ -187,10 +187,7 @@ const Toolkit::Alignment::Padding& Alignment::GetPadding() const
 
 void Alignment::OnInitialize()
 {
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::FILLER));
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
 }
 
 void Alignment::OnRelayout(const Vector2& size, RelayoutContainer& container)

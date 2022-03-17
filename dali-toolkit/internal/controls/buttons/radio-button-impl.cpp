@@ -71,10 +71,12 @@ void RadioButton::OnInitialize()
 {
   Button::OnInitialize();
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::RADIO_BUTTON));
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::RADIO_BUTTON);
+}
+
+DevelControl::ControlAccessible* RadioButton::CreateAccessibleObject()
+{
+  return new RadioButtonAccessible(Self());
 }
 
 bool RadioButton::OnToggleReleased()
@@ -105,16 +107,15 @@ void RadioButton::OnStateChange(State newState)
   }
 
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
-  if(Dali::Accessibility::IsUp() && (Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor() == Self())
-     && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  if((Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor() == Self()) && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
-    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+    GetAccessibleObject()->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
   }
 }
 
-Dali::Accessibility::States RadioButton::AccessibleImpl::CalculateStates()
+Dali::Accessibility::States RadioButton::RadioButtonAccessible::CalculateStates()
 {
-  auto state = Button::AccessibleImpl::CalculateStates();
+  auto state = Button::ButtonAccessible::CalculateStates();
   auto self = Toolkit::Button::DownCast(Self());
 
   if(self.GetProperty<bool>(Toolkit::Button::Property::SELECTED))

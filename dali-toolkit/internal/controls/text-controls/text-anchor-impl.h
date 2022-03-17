@@ -71,6 +71,11 @@ private: // From Control
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc Control::OnPropertySet()
    */
   // void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override;
@@ -105,10 +110,12 @@ protected:
   /**
    * @brief This structure is to connect TextAnchor with Accessible functions.
    */
-  struct AccessibleImpl : public DevelControl::ControlAccessible,
-                          public virtual Dali::Accessibility::Hyperlink
+  class TextAnchorAccessible : public DevelControl::ControlAccessible,
+                               public virtual Dali::Accessibility::Hyperlink
   {
+  public:
     using DevelControl::ControlAccessible::ControlAccessible;
+
     /**
      * @copydoc Dali::Accessibility::Hyperlink::GetEndIndex()
      */

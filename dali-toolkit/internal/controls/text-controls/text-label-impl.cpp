@@ -883,9 +883,6 @@ void TextLabel::OnInitialize()
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
   self.SetResizePolicy(ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
 
-  // Enable highlightability
-  self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
-
   // Enable the text ellipsis.
   mController->SetTextElideEnabled(true); // If false then text larger than control will overflow
 
@@ -899,13 +896,17 @@ void TextLabel::OnInitialize()
   Layout::Engine& engine = mController->GetLayoutEngine();
   engine.SetCursorWidth(0u); // Do not layout space for the cursor.
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::LABEL));
-  });
+  // Accessibility
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::LABEL);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
 
   Accessibility::Bridge::EnabledSignal().Connect(this, &TextLabel::OnAccessibilityStatusChanged);
   Accessibility::Bridge::DisabledSignal().Connect(this, &TextLabel::OnAccessibilityStatusChanged);
+}
+
+DevelControl::ControlAccessible* TextLabel::CreateAccessibleObject()
+{
+  return new TextLabelAccessible(Self());
 }
 
 void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)
@@ -1198,227 +1199,28 @@ Vector<Vector2> TextLabel::GetTextPosition(const uint32_t startIndex, const uint
   return mController->GetTextPosition(startIndex, endIndex);
 }
 
-std::string TextLabel::AccessibleImpl::GetNameRaw() const
+std::string TextLabel::TextLabelAccessible::GetNameRaw() const
 {
-  auto self = Toolkit::TextLabel::DownCast(Self());
-  return self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
+  return GetWholeText();
 }
 
-Property::Index TextLabel::AccessibleImpl::GetNamePropertyIndex()
+Property::Index TextLabel::TextLabelAccessible::GetNamePropertyIndex()
 {
   return Toolkit::TextLabel::Property::TEXT;
 }
 
-std::string TextLabel::AccessibleImpl::GetText(size_t startOffset, size_t endOffset) const
-{
-  if(endOffset <= startOffset)
-  {
-    return {};
-  }
-
-  auto self = Toolkit::TextLabel::DownCast(Self());
-  auto text = self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
-
-  if(startOffset > text.size() || endOffset > text.size())
-  {
-    return {};
-  }
-
-  return text.substr(startOffset, endOffset - startOffset);
-}
-
-size_t TextLabel::AccessibleImpl::GetCharacterCount() const
+const std::vector<Toolkit::TextAnchor>& TextLabel::TextLabelAccessible::GetTextAnchors() const
 {
   auto self = Toolkit::TextLabel::DownCast(Self());
-  auto text = self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
 
-  return text.size();
+  return Toolkit::GetImpl(self).mAnchorActors;
 }
 
-size_t TextLabel::AccessibleImpl::GetCursorOffset() const
-{
-  return {};
-}
-
-bool TextLabel::AccessibleImpl::SetCursorOffset(size_t offset)
-{
-  return {};
-}
-
-Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary) const
-{
-  auto self     = Toolkit::TextLabel::DownCast(Self());
-  auto text     = self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
-  auto textSize = text.size();
-
-  auto range = Dali::Accessibility::Range{};
-
-  switch(boundary)
-  {
-    case Dali::Accessibility::TextBoundary::CHARACTER:
-    {
-      if(offset < textSize)
-      {
-        range.content     = text[offset];
-        range.startOffset = offset;
-        range.endOffset   = offset + 1;
-      }
-      break;
-    }
-    case Dali::Accessibility::TextBoundary::WORD:
-    case Dali::Accessibility::TextBoundary::LINE:
-    {
-      auto textString = text.c_str();
-      auto breaks     = std::vector<char>(textSize, 0);
-
-      if(boundary == Dali::Accessibility::TextBoundary::WORD)
-      {
-        Accessibility::Accessible::FindWordSeparationsUtf8(reinterpret_cast<const utf8_t*>(textString), textSize, "", breaks.data());
-      }
-      else
-      {
-        Accessibility::Accessible::FindLineSeparationsUtf8(reinterpret_cast<const utf8_t*>(textString), textSize, "", breaks.data());
-      }
-
-      auto index   = 0u;
-      auto counter = 0u;
-      while(index < textSize && counter <= offset)
-      {
-        auto start = index;
-        if(breaks[index])
-        {
-          while(breaks[index])
-          {
-            index++;
-          }
-          counter++;
-        }
-        else
-        {
-          if(boundary == Dali::Accessibility::TextBoundary::WORD)
-          {
-            index++;
-          }
-          if(boundary == Dali::Accessibility::TextBoundary::LINE)
-          {
-            counter++;
-          }
-        }
-
-        if((counter > 0) && ((counter - 1) == offset))
-        {
-          range.content     = text.substr(start, index - start + 1);
-          range.startOffset = start;
-          range.endOffset   = index + 1;
-        }
-
-        if(boundary == Dali::Accessibility::TextBoundary::LINE)
-        {
-          index++;
-        }
-      }
-      break;
-    }
-    case Dali::Accessibility::TextBoundary::SENTENCE:
-    {
-      /* not supported by default */
-      break;
-    }
-    case Dali::Accessibility::TextBoundary::PARAGRAPH:
-    {
-      /* Paragraph is not supported by libunibreak library */
-      break;
-    }
-    default:
-      break;
-  }
-
-  return range;
-}
-
-Dali::Accessibility::Range TextLabel::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex) const
-{
-  // Since DALi supports only one selection indexes higher than 0 are ignored
-  if(selectionIndex > 0)
-  {
-    return {};
-  }
-
-  auto        self       = Toolkit::TextLabel::DownCast(Self());
-  auto        controller = Dali::Toolkit::GetImpl(self).GetTextController();
-  std::string value{};
-  controller->RetrieveSelection(value);
-  auto indices = controller->GetSelectionIndexes();
-
-  return {static_cast<size_t>(indices.first), static_cast<size_t>(indices.second), value};
-}
-
-bool TextLabel::AccessibleImpl::RemoveSelection(size_t selectionIndex)
-{
-  // Since DALi supports only one selection indexes higher than 0 are ignored
-  if(selectionIndex > 0)
-  {
-    return false;
-  }
-
-  auto self = Toolkit::TextLabel::DownCast(Self());
-  Dali::Toolkit::GetImpl(self).GetTextController()->SetSelection(0, 0);
-  return true;
-}
-
-bool TextLabel::AccessibleImpl::SetRangeOfSelection(size_t selectionIndex, size_t startOffset, size_t endOffset)
-{
-  // Since DALi supports only one selection indexes higher than 0 are ignored
-  if(selectionIndex > 0)
-  {
-    return false;
-  }
-
-  auto self = Toolkit::TextLabel::DownCast(Self());
-  Dali::Toolkit::GetImpl(self).GetTextController()->SetSelection(startOffset, endOffset);
-  return true;
-}
-
-Rect<> TextLabel::AccessibleImpl::GetRangeExtents(size_t startOffset, size_t endOffset, Accessibility::CoordinateType type)
-{
-  if (endOffset <= startOffset || endOffset <= 0)
-  {
-    return {0, 0, 0, 0};
-  }
-
-  auto self = Toolkit::TextLabel::DownCast(Self());
-  auto rect = Dali::Toolkit::GetImpl(self).GetTextController()->GetTextBoundingRectangle(startOffset, endOffset - 1);
-
-  auto componentExtents = this->GetExtents(type);
-
-  rect.x += componentExtents.x;
-  rect.y += componentExtents.y;
-
-  return rect;
-}
-
-int32_t TextLabel::AccessibleImpl::GetLinkCount() const
+Toolkit::Text::ControllerPtr TextLabel::TextLabelAccessible::GetTextController() const
 {
   auto self = Toolkit::TextLabel::DownCast(Self());
-  return Dali::Toolkit::GetImpl(self).mAnchorActors.size();
-}
 
-Accessibility::Hyperlink* TextLabel::AccessibleImpl::GetLink(int32_t linkIndex) const
-{
-  if(linkIndex < 0 || linkIndex >= GetLinkCount())
-  {
-    return nullptr;
-  }
-  auto self        = Toolkit::TextLabel::DownCast(Self());
-  auto anchorActor = Dali::Toolkit::GetImpl(self).mAnchorActors[linkIndex];
-  return dynamic_cast<Accessibility::Hyperlink*>(Dali::Accessibility::Accessible::Get(anchorActor));
-}
-
-int32_t TextLabel::AccessibleImpl::GetLinkIndex(int32_t characterOffset) const
-{
-  auto self       = Toolkit::TextLabel::DownCast(Self());
-  auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
-  return controller->GetAnchorIndex(static_cast<size_t>(characterOffset));
+  return Toolkit::GetImpl(self).GetTextController();
 }
 
 } // namespace Internal

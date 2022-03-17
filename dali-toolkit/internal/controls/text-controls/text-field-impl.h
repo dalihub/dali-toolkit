@@ -29,6 +29,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-anchor-control-interface.h>
@@ -149,6 +150,11 @@ private: // From Control
    * @copydoc Control::OnInitialize()
    */
   void OnInitialize() override;
+
+  /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
 
   /**
    * @copydoc Control::OnStyleChange()
@@ -526,106 +532,41 @@ protected:
   /**
    * @brief This structure is to connect TextField with Accessible functions.
    */
-  struct AccessibleImpl : public DevelControl::ControlAccessible,
-                          public virtual Dali::Accessibility::EditableText,
-                          public virtual Dali::Accessibility::Hypertext
+  class TextFieldAccessible : public EditableTextControlAccessible
   {
-    using DevelControl::ControlAccessible::ControlAccessible;
+  public:
+    using EditableTextControlAccessible::EditableTextControlAccessible;
 
     /**
      * @copydoc Dali::Accessibility::Accessible::GetName()
      */
     std::string GetName() const override;
 
+  protected:
     /**
-     * @copydoc Dali::Accessibility::Text::GetText()
+     * @copydoc Dali::Toolkit::Internal::TextControlAccessible::GetTextAnchors()
      */
-    std::string GetText(size_t startOffset, size_t endOffset) const override;
+    const std::vector<Toolkit::TextAnchor>& GetTextAnchors() const override;
 
     /**
-     * @copydoc Dali::Accessibility::Text::GetCharacterCount()
+     * @copydoc Dali::Toolkit::Internal::TextControlAccessible::GetTextController()
      */
-    size_t GetCharacterCount() const override;
+    Toolkit::Text::ControllerPtr GetTextController() const override;
 
     /**
-     * @copydoc Dali::Accessibility::Text::GetCursorOffset()
+     * @copydoc Dali::Toolkit::Internal::TextControlAccessible::GetSubstituteCharacter()
      */
-    size_t GetCursorOffset() const override;
+    std::uint32_t GetSubstituteCharacter() const override;
 
     /**
-     * @copydoc Dali::Accessibility::Text::SetCursorOffset()
+     * @copydoc Dali::Toolkit::Internal::TextControlAccessible::IsHiddenInput()
      */
-    bool SetCursorOffset(size_t offset) override;
+    bool IsHiddenInput() const override;
 
     /**
-     * @copydoc Dali::Accessibility::Text::GetTextAtOffset()
+     * @copydoc Dali::Toolkit::Internal::EditableTextControlAccessible::RequestTextRelayout()
      */
-    Accessibility::Range GetTextAtOffset(size_t offset, Accessibility::TextBoundary boundary) const override;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::GetRangeOfSelection()
-     */
-    Accessibility::Range GetRangeOfSelection(size_t selectionIndex) const override;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::RemoveSelection()
-     */
-    bool RemoveSelection(size_t selectionIndex) override;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::SetRangeOfSelection()
-     */
-    bool SetRangeOfSelection(size_t selectionIndex, size_t startOffset, size_t endOffset) override;
-
-    /**
-     * @copydoc Dali::Accessibility::Text::GetRangeExtents()
-     */
-    Rect<> GetRangeExtents(size_t startOffset, size_t endOffset, Accessibility::CoordinateType type) override;
-
-    /**
-     * @copydoc Dali::Accessibility::EditableText::CopyText()
-     */
-    bool CopyText(size_t startPosition, size_t endPosition) override;
-
-    /**
-     * @copydoc Dali::Accessibility::EditableText::CutText()
-     */
-    bool CutText(size_t startPosition, size_t endPosition) override;
-
-    /**
-     * @copydoc Dali::Accessibility::Accessible::GetStates()
-     */
-    Accessibility::States CalculateStates() override;
-
-    /**
-     * @copydoc Dali::Accessibility::EditableText::InsertText()
-     */
-    bool InsertText(size_t startPosition, std::string text) override;
-
-    /**
-     * @copydoc Dali::Accessibility::EditableText::SetTextContents()
-     */
-    bool SetTextContents(std::string newContents) override;
-
-    /**
-     * @copydoc Dali::Accessibility::EditableText::DeleteText()
-     */
-    bool DeleteText(size_t startPosition, size_t endPosition) override;
-
-    /**
-     * @copydoc Dali::Accessibility::Hypertext::GetLink()
-     */
-    Accessibility::Hyperlink* GetLink(int32_t linkIndex) const override;
-
-    /**
-     * @copydoc Dali::Accessibility::Hypertext::GetLinkIndex()
-     */
-    int32_t GetLinkIndex(int32_t characterOffset) const override;
-
-    /**
-     * @copydoc Dali::Accessibility::Hypertext::GetLinkCount()
-     */
-    int32_t GetLinkCount() const override;
+    void RequestTextRelayout() override;
   };
 };
 
