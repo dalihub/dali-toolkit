@@ -12,6 +12,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
+#include <dali-toolkit/devel-api/controls/web-view/web-view.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <cstdlib>
@@ -1297,5 +1298,38 @@ int UtcDaliAccessibilityCheckHighlight(void)
   DALI_TEST_EQUALS( false, Dali::Accessibility::TestGetMoveOutedCalled(), TEST_LOCATION );
 
   Dali::Accessibility::TestEnableSC( false );
+  END_TEST;
+}
+
+int UtcDaliWebViewAccessible(void)
+{
+  ToolkitTestApplication application;
+
+  auto webView = Dali::Toolkit::WebView::New();
+  auto webViewAccessible = Dali::Accessibility::Accessible::Get(webView);
+
+  DALI_TEST_CHECK(webViewAccessible);
+
+  auto children = webViewAccessible->GetChildren();
+
+  DALI_TEST_CHECK(children.empty());
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  children = webViewAccessible->GetChildren();
+
+  DALI_TEST_EQUALS(children.size(), 1u, TEST_LOCATION);
+
+  auto address = children[0]->GetAddress();
+
+  DALI_TEST_CHECK(address);
+  DALI_TEST_NOT_EQUALS(address.GetBus(), webViewAccessible->GetAddress().GetBus(), 0.0f, TEST_LOCATION);
+
+  Dali::Accessibility::TestEnableSC(false);
+
+  children = webViewAccessible->GetChildren();
+
+  DALI_TEST_CHECK(children.empty());
+
   END_TEST;
 }
