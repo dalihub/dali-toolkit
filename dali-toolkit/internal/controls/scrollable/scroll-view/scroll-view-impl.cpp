@@ -1272,6 +1272,19 @@ bool ScrollView::ScrollViewAccessible::ScrollToChild(Actor child)
     return false;
   }
 
+  // child can be one of descendants
+  // find direct child of ScrollView to avoid the ASSERT in ScrollTo
+  auto parent = child.GetParent();
+  while (parent && parent != Self())
+  {
+    child = parent;
+    parent = child.GetParent();
+  }
+  if (!parent)
+  {
+    return false;
+  }
+
   // FIXME: ScrollTo does not work (snaps back to original position)
   scrollView.ScrollTo(child, scrollView.GetScrollFlickDuration());
   return true;
