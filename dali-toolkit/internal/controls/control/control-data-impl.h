@@ -500,6 +500,8 @@ public:
   int mRightFocusableActorId; ///< Actor ID of Right focusable control.
   int mUpFocusableActorId;    ///< Actor ID of Up focusable control.
   int mDownFocusableActorId;  ///< Actor ID of Down focusable control.
+  int mClockwiseFocusableActorId;  ///< Actor ID of Clockwise focusable control.
+  int mCounterClockwiseFocusableActorId;  ///< Actor ID of Counter clockwise focusable control.
 
   RegisteredVisualContainer                 mVisuals; ///< Stores visuals needed by the control, non trivial type so std::vector used.
   std::string                               mStyleName;
@@ -582,6 +584,8 @@ public:
   static const PropertyRegistration PROPERTY_21;
   static const PropertyRegistration PROPERTY_22;
   static const PropertyRegistration PROPERTY_23;
+  static const PropertyRegistration PROPERTY_24;
+  static const PropertyRegistration PROPERTY_25;
 
 private:
   // Accessibility - notification for highlighted object to check if it is showing.

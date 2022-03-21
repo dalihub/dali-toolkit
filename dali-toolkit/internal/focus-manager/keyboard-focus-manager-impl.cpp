@@ -29,6 +29,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -145,7 +146,8 @@ void KeyboardFocusManager::OnAdaptorInit()
     {
       (*iter).KeyEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
       (*iter).TouchedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
-      (*iter).WheelEventGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWheelEvent);
+      (*iter).WheelEventGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnCustomWheelEvent);
+      (*iter).WheelEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWheelEvent);
       Dali::Window window = DevelWindow::DownCast(*iter);
       if(window)
       {
@@ -162,7 +164,8 @@ void KeyboardFocusManager::OnSceneHolderCreated(Dali::Integration::SceneHolder& 
 {
   sceneHolder.KeyEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
   sceneHolder.TouchedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
-  sceneHolder.WheelEventGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWheelEvent);
+  sceneHolder.WheelEventGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnCustomWheelEvent);
+  sceneHolder.WheelEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWheelEvent);
   Dali::Window window = DevelWindow::DownCast(sceneHolder);
   if(window)
   {
@@ -468,6 +471,16 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
         case Toolkit::Control::KeyboardFocus::DOWN:
         {
           index = Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID;
+          break;
+        }
+        case Toolkit::Control::KeyboardFocus::CLOCKWISE:
+        {
+          index = Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID;
+          break;
+        }
+        case Toolkit::Control::KeyboardFocus::COUNTER_CLOCKWISE:
+        {
+          index = Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID;
           break;
         }
         default:
@@ -1007,19 +1020,29 @@ void KeyboardFocusManager::OnTouch(const TouchEvent& touch)
   }
 }
 
-bool KeyboardFocusManager::OnWheelEvent(const WheelEvent& event)
+void KeyboardFocusManager::OnWheelEvent(const WheelEvent& event)
+{
+  if(event.GetType() == Dali::WheelEvent::CUSTOM_WHEEL)
+  {
+    Toolkit::Control::KeyboardFocus::Direction direction = (event.GetDelta() > 0) ? Toolkit::Control::KeyboardFocus::CLOCKWISE : Toolkit::Control::KeyboardFocus::COUNTER_CLOCKWISE;
+    // Move the focus
+    MoveFocus(direction);
+  }
+}
+
+bool KeyboardFocusManager::OnCustomWheelEvent(const WheelEvent& event)
 {
   bool consumed = false;
   Actor actor = GetCurrentFocusActor();
   if(actor)
   {
     // Notify the actor about the wheel event
-    consumed = EmitWheelSignals(actor, event);
+    consumed = EmitCustomWheelSignals(actor, event);
   }
   return consumed;
 }
 
-bool KeyboardFocusManager::EmitWheelSignals(Actor actor, const WheelEvent& event)
+bool KeyboardFocusManager::EmitCustomWheelSignals(Actor actor, const WheelEvent& event)
 {
   bool consumed = false;
 
@@ -1042,7 +1065,7 @@ bool KeyboardFocusManager::EmitWheelSignals(Actor actor, const WheelEvent& event
       if(parent &&
          (parent == oldParent))
       {
-        consumed = EmitWheelSignals(parent, event);
+        consumed = EmitCustomWheelSignals(parent, event);
       }
     }
   }

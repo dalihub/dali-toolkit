@@ -269,6 +269,8 @@ int UtcDaliControlNavigationProperties(void)
   DALI_TEST_EQUALS(-1, control.GetProperty(DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
   DALI_TEST_EQUALS(-1, control.GetProperty(DevelControl::Property::UP_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
   DALI_TEST_EQUALS(-1, control.GetProperty(DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(-1, control.GetProperty( DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION);
+  DALI_TEST_EQUALS(-1, control.GetProperty( DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION);
 
   control.SetProperty(DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, 1);
   DALI_TEST_EQUALS(1, control.GetProperty(DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
@@ -287,6 +289,10 @@ int UtcDaliControlNavigationProperties(void)
   DALI_TEST_EQUALS(17, control.GetProperty(DevelControl::Property::UP_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
   control.SetProperty(DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, 18);
   DALI_TEST_EQUALS(18, control.GetProperty(DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
+  control.SetProperty(DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID, 19);
+  DALI_TEST_EQUALS(19, control.GetProperty( DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION);
+  control.SetProperty(DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID, 20);
+  DALI_TEST_EQUALS(20, control.GetProperty( DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION);
 
   END_TEST;
 }

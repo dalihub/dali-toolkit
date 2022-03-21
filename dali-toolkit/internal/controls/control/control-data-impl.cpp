@@ -483,6 +483,8 @@ const PropertyRegistration Control::Impl::PROPERTY_20(typeRegistration, "accessi
 const PropertyRegistration Control::Impl::PROPERTY_21(typeRegistration, "accessibilityAttributes",        Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES,         Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_22(typeRegistration, "dispatchKeyEvents",              Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS,              Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_23(typeRegistration, "accessibilityHidden",            Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN,             Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_24(typeRegistration, "clockwiseFocusableActorId",      Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID,     Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_25(typeRegistration, "counterClockwiseFocusableActorId", Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 // clang-format on
 
@@ -494,6 +496,8 @@ Control::Impl::Impl(Control& controlImpl)
   mRightFocusableActorId(-1),
   mUpFocusableActorId(-1),
   mDownFocusableActorId(-1),
+  mClockwiseFocusableActorId(-1),
+  mCounterClockwiseFocusableActorId(-1),
   mStyleName(""),
   mBackgroundColor(Color::TRANSPARENT),
   mStartingPinchScale(nullptr),
@@ -1367,6 +1371,24 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         }
         break;
       }
+      case Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID:
+      {
+        int focusId;
+        if(value.Get(focusId))
+        {
+          controlImpl.mImpl->mClockwiseFocusableActorId = focusId;
+        }
+        break;
+      }
+      case Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID:
+      {
+        int focusId;
+        if(value.Get(focusId))
+        {
+          controlImpl.mImpl->mCounterClockwiseFocusableActorId = focusId;
+        }
+        break;
+      }
     }
   }
 }
@@ -1525,6 +1547,18 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN:
       {
         value = controlImpl.mImpl->mAccessibilityHidden;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID:
+      {
+        value = controlImpl.mImpl->mClockwiseFocusableActorId;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID:
+      {
+        value = controlImpl.mImpl->mCounterClockwiseFocusableActorId;
         break;
       }
     }
