@@ -132,6 +132,10 @@ void CommonTextUtils::RenderText(
       {
         highlightActor = *it;
       }
+      else if(it->GetProperty<std::string>(Dali::Actor::Property::NAME) == "CursorLayerActor")
+      {
+        it->RaiseToTop();
+      }
     }
     clippingDecorationActors.clear();
 

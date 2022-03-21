@@ -746,15 +746,12 @@ struct Decorator::Impl : public ConnectionTracker
       {
         layer.SetProperty(Actor::Property::NAME, "ActiveLayerActor");
       }
-      else if(type == DecorationType::CURSOR_LAYER)
-      {
-        layer.SetProperty(Actor::Property::NAME, "CursorLayerActor");
-      }
 #endif
       bool needsClipping = false;
       if(type == DecorationType::CURSOR_LAYER)
       {
         needsClipping = true;
+        layer.SetProperty(Actor::Property::NAME, "CursorLayerActor");
       }
 
       layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
