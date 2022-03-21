@@ -420,7 +420,7 @@ Toolkit::Control KeyboardFocusManager::GetParentLayoutControl(Actor actor) const
   return Toolkit::Control::DownCast(parent);
 }
 
-bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction direction)
+bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction direction, const std::string& deviceName)
 {
   Actor currentFocusActor = GetCurrentFocusActor();
 
@@ -506,7 +506,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
       if(mCustomAlgorithmInterface)
       {
         mIsWaitingKeyboardFocusChangeCommit = true;
-        nextFocusableActor                  = mCustomAlgorithmInterface->GetNextFocusableActor(currentFocusActor, Actor(), direction);
+        nextFocusableActor                  = mCustomAlgorithmInterface->GetNextFocusableActor(currentFocusActor, Actor(), direction, deviceName);
         mIsWaitingKeyboardFocusChangeCommit = false;
       }
       else if(!mPreFocusChangeSignal.Empty())
@@ -785,7 +785,8 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
 
 void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 {
-  std::string keyName = event.GetKeyName();
+  const std::string& keyName = event.GetKeyName();
+  const std::string& deviceName = event.GetDeviceName();
 
   if(mIsFocusIndicatorShown == UNKNOWN)
   {
@@ -806,7 +807,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       else
       {
         // Move the focus towards left
-        MoveFocus(Toolkit::Control::KeyboardFocus::LEFT);
+        MoveFocus(Toolkit::Control::KeyboardFocus::LEFT, deviceName);
       }
 
       isFocusStartableKey = true;
@@ -821,7 +822,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       else
       {
         // Move the focus towards right
-        MoveFocus(Toolkit::Control::KeyboardFocus::RIGHT);
+        MoveFocus(Toolkit::Control::KeyboardFocus::RIGHT, deviceName);
       }
 
       isFocusStartableKey = true;
@@ -836,7 +837,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       else
       {
         // Move the focus towards up
-        MoveFocus(Toolkit::Control::KeyboardFocus::UP);
+        MoveFocus(Toolkit::Control::KeyboardFocus::UP, deviceName);
       }
 
       isFocusStartableKey = true;
@@ -851,7 +852,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       else
       {
         // Move the focus towards down
-        MoveFocus(Toolkit::Control::KeyboardFocus::DOWN);
+        MoveFocus(Toolkit::Control::KeyboardFocus::DOWN, deviceName);
       }
 
       isFocusStartableKey = true;
@@ -866,7 +867,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       else
       {
         // Move the focus towards the previous page
-        MoveFocus(Toolkit::Control::KeyboardFocus::PAGE_UP);
+        MoveFocus(Toolkit::Control::KeyboardFocus::PAGE_UP, deviceName);
       }
 
       isFocusStartableKey = true;
@@ -881,7 +882,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       else
       {
         // Move the focus towards the next page
-        MoveFocus(Toolkit::Control::KeyboardFocus::PAGE_DOWN);
+        MoveFocus(Toolkit::Control::KeyboardFocus::PAGE_DOWN, deviceName);
       }
 
       isFocusStartableKey = true;
@@ -900,7 +901,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
         if(!DoMoveFocusToNextFocusGroup(!event.IsShiftModifier()))
         {
           // If the focus group is not changed, Move the focus towards forward, "Shift-Tap" key moves the focus towards backward.
-          MoveFocus(event.IsShiftModifier() ? Toolkit::Control::KeyboardFocus::BACKWARD : Toolkit::Control::KeyboardFocus::FORWARD);
+          MoveFocus(event.IsShiftModifier() ? Toolkit::Control::KeyboardFocus::BACKWARD : Toolkit::Control::KeyboardFocus::FORWARD, deviceName);
         }
       }
 
@@ -973,7 +974,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     {
       // No actor is focused but keyboard focus is activated by the key press
       // Let's try to move the initial focus
-      MoveFocus(Toolkit::Control::KeyboardFocus::RIGHT);
+      MoveFocus(Toolkit::Control::KeyboardFocus::RIGHT, deviceName);
     }
   }
 }

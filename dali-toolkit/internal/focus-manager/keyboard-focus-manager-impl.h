@@ -90,7 +90,7 @@ public:
   /**
    * @copydoc Toolkit::KeyboardFocusManager::MoveFocus
    */
-  bool MoveFocus(Toolkit::Control::KeyboardFocus::Direction direction);
+  bool MoveFocus(Toolkit::Control::KeyboardFocus::Direction direction, const std::string& deviceName = "");
 
   /**
    * @copydoc Toolkit::KeyboardFocusManager::ClearFocus
