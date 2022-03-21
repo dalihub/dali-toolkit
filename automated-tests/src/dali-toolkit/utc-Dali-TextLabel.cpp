@@ -2725,6 +2725,37 @@ int UtcDaliTextTextLabelSizeNegativeLineSpacing(void)
   END_TEST;
 }
 
+int UtcDaliTextLabelNegativeLineSpacingWithEllipsis(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextLabelNegativeLineSpacingWithEllipsis");
+
+  TextLabel label = TextLabel::New();
+
+  float lineSpacing = -20.f;
+
+  label.SetProperty(Actor::Property::SIZE, Vector2(480.0f, 100.f));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 11.0f);
+  label.SetProperty(DevelTextLabel::Property::LINE_SPACING, lineSpacing);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+  label.SetProperty(TextLabel::Property::ELLIPSIS, true);
+
+  application.GetScene().Add(label);
+  application.SendNotification();
+  application.Render();
+
+  Vector<Vector2> sizeList = DevelTextLabel::GetTextSize(label, 0, 123);
+
+  int lineCount = sizeList.Size();
+  DALI_TEST_EQUALS(4, lineCount, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextlabelParagraphTag(void)
 {
   ToolkitTestApplication application;

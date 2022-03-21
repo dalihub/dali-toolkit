@@ -5857,6 +5857,36 @@ int UtcDaliTextEditorTextSizeNegativeLineSpacing(void)
   END_TEST;
 }
 
+int UtcDaliTextEditorNegativeLineSpacingWithEllipsis(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextEditorNegativeLineSpacingWithEllipsis");
+
+  TextEditor editor = TextEditor::New();
+
+  float lineSpacing = -20.f;
+
+  editor.SetProperty(Actor::Property::SIZE, Vector2(480.0f, 100.f));
+  editor.SetProperty(TextEditor::Property::POINT_SIZE, 11.0f);
+  editor.SetProperty(DevelTextEditor::Property::LINE_SPACING, lineSpacing);
+  editor.SetProperty(TextEditor::Property::TEXT, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+  editor.SetProperty(DevelTextEditor::Property::ELLIPSIS, true);
+
+  application.GetScene().Add(editor);
+  application.SendNotification();
+  application.Render();
+
+  Vector<Vector2> sizeList = DevelTextEditor::GetTextSize(editor, 0, 123);
+
+  int lineCount = sizeList.Size();
+  DALI_TEST_EQUALS(4, lineCount, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTexteditorParagraphTag(void)
 {
   ToolkitTestApplication application;
