@@ -776,7 +776,7 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
 void TextEditor::RenderText(Text::Controller::UpdateTextType updateTextType)
 {
-  CommonTextUtils::RenderText(Self(), mRenderer, mController, mDecorator, mAlignmentOffset, mRenderableActor, mBackgroundActor, mStencil, mClippingDecorationActors, mAnchorActors, updateTextType);
+  CommonTextUtils::RenderText(Self(), mRenderer, mController, mDecorator, mAlignmentOffset, mRenderableActor, mBackgroundActor, mCursorLayer, mStencil, mClippingDecorationActors, mAnchorActors, updateTextType);
   if(mRenderableActor)
   {
     ApplyScrollPosition();

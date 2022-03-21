@@ -716,7 +716,7 @@ Text::ControllerPtr TextField::GetTextController()
 
 void TextField::RenderText(Text::Controller::UpdateTextType updateTextType)
 {
-  CommonTextUtils::RenderText(Self(), mRenderer, mController, mDecorator, mAlignmentOffset, mRenderableActor, mBackgroundActor, mStencil, mClippingDecorationActors, mAnchorActors, updateTextType);
+  CommonTextUtils::RenderText(Self(), mRenderer, mController, mDecorator, mAlignmentOffset, mRenderableActor, mBackgroundActor, mCursorLayer, mStencil, mClippingDecorationActors, mAnchorActors, updateTextType);
 }
 
 void TextField::OnKeyInputFocusGained()

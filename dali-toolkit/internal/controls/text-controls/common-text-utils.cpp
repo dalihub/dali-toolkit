@@ -55,6 +55,7 @@ void CommonTextUtils::RenderText(
   float&                            alignmentOffset,
   Actor&                            renderableActor,
   Actor&                            backgroundActor,
+  Actor&                            cursorLayerActor,
   Toolkit::Control&                 stencil,
   std::vector<Actor>&               clippingDecorationActors,
   std::vector<Toolkit::TextAnchor>& anchorActors,
@@ -132,10 +133,6 @@ void CommonTextUtils::RenderText(
       {
         highlightActor = *it;
       }
-      else if(it->GetProperty<std::string>(Dali::Actor::Property::NAME) == "CursorLayerActor")
-      {
-        it->RaiseToTop();
-      }
     }
     clippingDecorationActors.clear();
 
@@ -156,6 +153,12 @@ void CommonTextUtils::RenderText(
         backgroundActor.LowerToBottom();
       }
     }
+
+    if(cursorLayerActor)
+    {
+      cursorLayerActor.RaiseToTop();
+    }
+
     SynchronizeTextAnchorsInParent(textActor, controller, anchorActors);
   }
 }

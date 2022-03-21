@@ -60,6 +60,7 @@ public:
     float&                           alignmentOffset,
     Actor&                           renderableActor,
     Actor&                           backgroundActor,
+    Actor&                           cursorLayerActor,
     Toolkit::Control&                stencil,
     std::vector<Actor>&              clippingDecorationActors,
     std::vector<Toolkit::TextAnchor>& anchorActors,
