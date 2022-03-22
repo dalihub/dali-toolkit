@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,7 +178,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
         else
         {
           Property::Array* array = imageURLValue->GetArray();
-          if(array)
+          if(array && array->Count() > 0)
           {
             visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), *array, propertyMap);
           }
@@ -217,7 +217,10 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
       std::string      imageUrl;
       if(imageURLValue && imageURLValue->Get(imageUrl))
       {
-        visualPtr = NPatchVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
+        if(!imageUrl.empty())
+        {
+          visualPtr = NPatchVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
+        }
       }
       break;
     }
@@ -228,7 +231,10 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
       std::string      imageUrl;
       if(imageURLValue && imageURLValue->Get(imageUrl))
       {
-        visualPtr = SvgVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
+        if(!imageUrl.empty())
+        {
+          visualPtr = SvgVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
+        }
       }
       break;
     }
@@ -241,12 +247,15 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
       {
         if(imageURLValue->Get(imageUrl))
         {
-          visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
+          if(!imageUrl.empty())
+          {
+            visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
+          }
         }
         else
         {
           Property::Array* array = imageURLValue->GetArray();
-          if(array)
+          if(array && array->Count() > 0)
           {
             visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), *array, propertyMap);
           }
@@ -267,7 +276,10 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
       std::string      imageUrl;
       if(imageURLValue && imageURLValue->Get(imageUrl))
       {
-        visualPtr = AnimatedVectorImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
+        if(!imageUrl.empty())
+        {
+          visualPtr = AnimatedVectorImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
+        }
       }
       break;
     }
@@ -370,14 +382,14 @@ Internal::TextureManager& VisualFactory::GetTextureManager()
 
 void VisualFactory::SetBrokenImageUrl(Toolkit::StyleManager& styleManager)
 {
-  const std::string imageDirPath   = AssetManager::GetDaliImagePath();
-  std::string       brokenImageUrl = imageDirPath + BROKEN_IMAGE_FILE_NAME;
+  const std::string        imageDirPath   = AssetManager::GetDaliImagePath();
+  std::string              brokenImageUrl = imageDirPath + BROKEN_IMAGE_FILE_NAME;
   std::vector<std::string> customBrokenImageUrlList;
 
   if(styleManager)
   {
     customBrokenImageUrlList = Toolkit::DevelStyleManager::GetBrokenImageUrlList(styleManager);
-    Property::Map config = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
+    Property::Map config     = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
     config["brokenImageUrl"].Get(brokenImageUrl);
   }
 
@@ -389,7 +401,7 @@ Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
 {
   if(!mFactoryCache)
   {
-    mFactoryCache = std::unique_ptr<VisualFactoryCache>(new VisualFactoryCache(mPreMultiplyOnLoad));
+    mFactoryCache                      = std::unique_ptr<VisualFactoryCache>(new VisualFactoryCache(mPreMultiplyOnLoad));
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
     if(styleManager)
     {
