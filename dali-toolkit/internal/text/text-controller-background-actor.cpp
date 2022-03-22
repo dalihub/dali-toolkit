@@ -44,6 +44,18 @@ struct BackgroundMesh
 };
 } // unnamed namespace
 
+Length CalculateBackgroundLineHeight(LineRun lineRun)
+{
+  Length height = lineRun.ascender + -(lineRun.descender);
+
+  if(lineRun.lineSpacing > 0)
+  {
+    height += lineRun.lineSpacing;
+  }
+
+  return height;
+}
+
 Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr& textVisualModel, const LogicalModelPtr& textLogicalModel, Shader& textShaderBackground)
 {
   // NOTE: Currently we only support background color for left-to-right text.
@@ -110,11 +122,16 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
       const Vector4&   backgroundColor          = isDefaultBackgroundColor ? defaultBackgroundColor : *(backgroundColorsBuffer + backgroundColorIndex - 1u);
 
       textVisualModel->GetNumberOfLines(i, 1, lineIndex, numberOfLines);
-      Length lineHeight = lineRun[lineIndex].ascender + -(lineRun[lineIndex].descender) + lineRun[lineIndex].lineSpacing;
+      Length lineHeight = CalculateBackgroundLineHeight(lineRun[lineIndex]);
 
       if(lineIndex != prevLineIndex)
       {
-        yLineOffset += lineHeight;
+        yLineOffset += CalculateBackgroundLineHeight(lineRun[prevLineIndex]);
+
+        if(lineRun[prevLineIndex].lineSpacing < 0)
+        {
+          yLineOffset += lineRun[prevLineIndex].lineSpacing;
+        }
       }
 
       // Only create quads for glyphs with a background color

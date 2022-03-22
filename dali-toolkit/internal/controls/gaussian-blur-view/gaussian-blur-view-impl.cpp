@@ -295,10 +295,7 @@ void GaussianBlurView::OnInitialize()
   mInternalRoot.Add(mVertBlurActor);
   mInternalRoot.Add(mRenderDownsampledCamera);
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::FILLER));
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
 }
 
 void GaussianBlurView::OnSizeSet(const Vector3& targetSize)

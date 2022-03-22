@@ -63,6 +63,11 @@ private: // From Button
    */
   void OnInitialize() override;
 
+  /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
 private:
   // Undefined
   CheckBoxButton(const CheckBoxButton&);
@@ -71,12 +76,17 @@ private:
   CheckBoxButton& operator=(const CheckBoxButton&);
 
 protected:
-  struct AccessibleImpl : public Button::AccessibleImpl
+  class CheckBoxButtonAccessible : public Button::ButtonAccessible
   {
-    using Button::AccessibleImpl::AccessibleImpl;
+  public:
+    using Button::ButtonAccessible::ButtonAccessible;
 
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::CalculateStates()
+     */
     Dali::Accessibility::States CalculateStates() override;
   };
+
   void OnStateChange(State newState) override;
 };
 

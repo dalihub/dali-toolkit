@@ -367,9 +367,12 @@ void ItemView::OnInitialize()
   // Connect wheel event
   self.WheelEventSignal().Connect(this, &ItemView::OnWheelEvent);
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(new AccessibleImpl(actor, Dali::Accessibility::Role::SCROLL_PANE));
-  });
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::SCROLL_PANE);
+}
+
+DevelControl::ControlAccessible* ItemView::CreateAccessibleObject()
+{
+  return new ItemViewAccessible(Self());
 }
 
 ItemView::~ItemView()
@@ -1345,7 +1348,7 @@ void ItemView::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
   }
 }
 
-bool ItemView::AccessibleImpl::ScrollToChild(Actor child)
+bool ItemView::ItemViewAccessible::ScrollToChild(Actor child)
 {
   auto itemView = Dali::Toolkit::ItemView::DownCast(Self());
   Toolkit::GetImpl(itemView).OnKeyboardFocusChangeCommitted(child);

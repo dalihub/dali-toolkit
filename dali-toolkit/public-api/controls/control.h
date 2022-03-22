@@ -155,6 +155,8 @@ public:
       PAGE_DOWN, ///< Move keyboard focus towards the next page direction @SINCE_1_2.14
       FORWARD,   ///< Move keyboard focus towards the forward direction @SINCE_2_1.10
       BACKWARD,  ///< Move keyboard focus towards the backward direction @SINCE_2_1.10
+      CLOCKWISE,  ///< Move keyboard focus towards the clockwise direction @SINCE_2_1.14
+      COUNTER_CLOCKWISE,  ///< Move keyboard focus towards the counter clockwise direction @SINCE_2_1.14
     };
   };
 

@@ -689,6 +689,37 @@ int UtcDaliTextEditorBackgroundTag(void)
   END_TEST;
 }
 
+int UtcDaliTextEditorSpanBackgroundTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextEditorSpanBackgroundTag\n");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  editor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
+  editor.SetProperty(TextEditor::Property::TEXT, "H<span background-color='red'>e</span> Worl<span background-color='yellow'>d</span>");
+  application.GetScene().Add(editor);
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextEditor& editorImpl                   = GetImpl(editor);
+  const ColorIndex* const        backgroundColorIndicesBuffer = editorImpl.GetTextController()->GetTextModel()->GetBackgroundColorIndices();
+
+  DALI_TEST_CHECK(backgroundColorIndicesBuffer);
+
+  //default color
+  DALI_TEST_EQUALS(backgroundColorIndicesBuffer[0], 0u, TEST_LOCATION);
+
+  //red color
+  DALI_TEST_EQUALS(backgroundColorIndicesBuffer[1], 1u, TEST_LOCATION);
+
+  //yellow color
+  DALI_TEST_EQUALS(backgroundColorIndicesBuffer[7], 2u, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliTextEditorTextWithSpan(void)
 {
   ToolkitTestApplication application;

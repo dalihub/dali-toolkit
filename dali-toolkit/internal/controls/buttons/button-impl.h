@@ -322,6 +322,11 @@ protected: // From Control
   bool OnAccessibilityActivated() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc Toolkit::Control::OnKeyboardEnter()
    */
   bool OnKeyboardEnter() override;
@@ -535,13 +540,25 @@ private:
   bool mClickActionPerforming; ///< Used to manage signal emissions during action
 
 protected:
-  struct AccessibleImpl : public DevelControl::ControlAccessible
+  class ButtonAccessible : public DevelControl::ControlAccessible
   {
+  public:
     using DevelControl::ControlAccessible::ControlAccessible;
 
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::CalculateStates()
+     */
     Dali::Accessibility::States CalculateStates() override;
-    std::string                 GetNameRaw() const override;
-    Property::Index             GetNamePropertyIndex() override;
+
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::GetNameRaw()
+     */
+    std::string GetNameRaw() const override;
+
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::GetNamePropertyIndex()
+     */
+    Property::Index GetNamePropertyIndex() override;
   };
 };
 

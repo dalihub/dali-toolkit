@@ -65,6 +65,11 @@ private: // From Button
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc Toolkit::Internal::Button::OnStateChange
    */
   void OnStateChange(State newState) override;
@@ -82,10 +87,14 @@ private:
   RadioButton& operator=(const RadioButton& origin);
 
 protected:
-  struct AccessibleImpl : public Button::AccessibleImpl
+  class RadioButtonAccessible : public Button::ButtonAccessible
   {
-    using Button::AccessibleImpl::AccessibleImpl;
+  public:
+    using Button::ButtonAccessible::ButtonAccessible;
 
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::CalculateStates()
+     */
     Dali::Accessibility::States CalculateStates() override;
   };
 };

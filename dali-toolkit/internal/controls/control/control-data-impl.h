@@ -423,20 +423,9 @@ public:
   void UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties);
 
   /**
-   * @brief Gets the current control's accessible object.
-   *
-   * @return The handle to Accessible object
+   * @copydoc Dali::Toolkit::Internal::Control::GetAccessibleObject()
    */
-  Dali::Accessibility::Accessible* GetAccessibilityObject();
-
-  /**
-   * @brief Gets Accessible object handle.
-   *
-   * The method acquires Accessible handle from Actor object
-   * @param  actor Actor object
-   * @return The handle to Accessible object
-   */
-  static Dali::Accessibility::Accessible* GetAccessibilityObject(Dali::Actor actor);
+  Toolkit::DevelControl::ControlAccessible* GetAccessibleObject();
 
 private:
   /**
@@ -511,6 +500,8 @@ public:
   int mRightFocusableActorId; ///< Actor ID of Right focusable control.
   int mUpFocusableActorId;    ///< Actor ID of Up focusable control.
   int mDownFocusableActorId;  ///< Actor ID of Down focusable control.
+  int mClockwiseFocusableActorId;  ///< Actor ID of Clockwise focusable control.
+  int mCounterClockwiseFocusableActorId;  ///< Actor ID of Counter clockwise focusable control.
 
   RegisteredVisualContainer                 mVisuals; ///< Stores visuals needed by the control, non trivial type so std::vector used.
   std::string                               mStyleName;
@@ -546,8 +537,7 @@ public:
   Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
 
   std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> mAccessibilityRelations;
-  std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Actor)>            mAccessibilityConstructor;
-  std::unique_ptr<Dali::Accessibility::Accessible>                                  mAccessibilityObject;
+  std::unique_ptr<Toolkit::DevelControl::ControlAccessible>                         mAccessibleObject;
 
   // Gesture Detection
   PinchGestureDetector     mPinchGestureDetector;
@@ -594,6 +584,8 @@ public:
   static const PropertyRegistration PROPERTY_21;
   static const PropertyRegistration PROPERTY_22;
   static const PropertyRegistration PROPERTY_23;
+  static const PropertyRegistration PROPERTY_24;
+  static const PropertyRegistration PROPERTY_25;
 
 private:
   // Accessibility - notification for highlighted object to check if it is showing.

@@ -92,17 +92,19 @@ Scrollable::~Scrollable()
 {
 }
 
-bool Scrollable::AccessibleImpl::IsScrollable() const
+bool Scrollable::ScrollableAccessible::IsScrollable() const
 {
   return true;
 }
 
 void Scrollable::OnInitialize()
 {
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::SCROLL_PANE));
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::SCROLL_PANE);
+}
+
+DevelControl::ControlAccessible* Scrollable::CreateAccessibleObject()
+{
+  return new ScrollableAccessible(Self());
 }
 
 bool Scrollable::IsOvershootEnabled() const

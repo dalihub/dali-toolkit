@@ -217,10 +217,7 @@ void BloomView::OnInitialize()
   // bind properties for / set shader constants to defaults
   SetupProperties();
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::ANIMATION));
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::ANIMATION);
 }
 
 void BloomView::OnSizeSet(const Vector3& targetSize)

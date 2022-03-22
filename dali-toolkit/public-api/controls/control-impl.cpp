@@ -167,6 +167,11 @@ void Control::ClearBackground()
   RelayoutRequest();
 }
 
+Toolkit::DevelControl::ControlAccessible* Control::GetAccessibleObject()
+{
+  return mImpl->GetAccessibleObject();
+}
+
 void Control::EnableGestureDetection(GestureType::Value type)
 {
   if((type & GestureType::PINCH) && !mImpl->mPinchGestureDetector)
@@ -340,6 +345,11 @@ bool Control::OnAccessibilityZoom()
   return false; // Accessibility zoom action is not handled by default
 }
 
+DevelControl::ControlAccessible* Control::CreateAccessibleObject()
+{
+  return new DevelControl::ControlAccessible(Self());
+}
+
 Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
   return Actor();
@@ -484,7 +494,7 @@ void Control::EmitKeyInputFocusSignal(bool focusGained)
 
   if(Accessibility::IsUp())
   {
-    auto self = mImpl->GetAccessibilityObject(Self());
+    auto self = GetAccessibleObject();
     self->EmitFocused(focusGained);
     auto parent = self->GetParent();
     if(parent && !self->GetStates()[Dali::Accessibility::State::MANAGES_DESCENDANTS])
@@ -571,10 +581,7 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
     }
     case Actor::Property::VISIBLE:
     {
-      if(Dali::Accessibility::IsUp() && !Self().GetProperty<bool>(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN))
-      {
-        Dali::Accessibility::Accessible::Get(Self())->EmitVisible(Self().GetProperty(Actor::Property::VISIBLE).Get<bool>());
-      }
+      GetAccessibleObject()->EmitVisible(Self().GetProperty<bool>(Actor::Property::VISIBLE));
       break;
     }
   }

@@ -345,9 +345,12 @@ void Popup::OnInitialize()
 
   DevelControl::AppendAccessibilityAttribute(Toolkit::Control::DownCast(self), "sub-role", "Alert");
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(new AccessibleImpl(actor, Dali::Accessibility::Role::DIALOG, true));
-  });
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::DIALOG);
+}
+
+DevelControl::ControlAccessible* Popup::CreateAccessibleObject()
+{
+  return new PopupAccessible(Self());
 }
 
 Popup::~Popup()
@@ -1994,7 +1997,7 @@ void Popup::SetupTouch()
   }
 }
 
-std::string Popup::AccessibleImpl::GetNameRaw() const
+std::string Popup::PopupAccessible::GetNameRaw() const
 {
   auto        popup = Toolkit::Popup::DownCast(Self());
   std::string title;
@@ -2016,13 +2019,14 @@ std::string Popup::AccessibleImpl::GetNameRaw() const
   return title;
 }
 
-Dali::Accessibility::States Popup::AccessibleImpl::CalculateStates()
+Dali::Accessibility::States Popup::PopupAccessible::CalculateStates()
 {
   auto states       = DevelControl::ControlAccessible::CalculateStates();
   auto popup        = Toolkit::Popup::DownCast(Self());
   auto displayState = popup.GetProperty<std::string>(Toolkit::Popup::Property::DISPLAY_STATE);
 
   states[Dali::Accessibility::State::SHOWING] = (displayState == "SHOWN" || displayState == "SHOWING");
+  states[Dali::Accessibility::State::MODAL]   = true;
 
   return states;
 }

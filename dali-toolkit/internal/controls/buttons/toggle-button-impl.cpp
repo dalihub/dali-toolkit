@@ -106,10 +106,12 @@ void ToggleButton::OnInitialize()
   Actor self = Self();
   self.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::TOGGLE_BUTTON));
-  });
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::TOGGLE_BUTTON);
+}
+
+DevelControl::ControlAccessible* ToggleButton::CreateAccessibleObject()
+{
+  return new ToggleButtonAccessible(Self());
 }
 
 void ToggleButton::SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value)
@@ -372,9 +374,9 @@ void ToggleButton::OnPressed()
   RelayoutRequest();
 }
 
-Dali::Accessibility::States ToggleButton::AccessibleImpl::CalculateStates()
+Dali::Accessibility::States ToggleButton::ToggleButtonAccessible::CalculateStates()
 {
-  auto states = Button::AccessibleImpl::CalculateStates();
+  auto states = Button::ButtonAccessible::CalculateStates();
   auto button = Toolkit::ToggleButton::DownCast(Self());
   if(button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX))
   {
@@ -383,7 +385,7 @@ Dali::Accessibility::States ToggleButton::AccessibleImpl::CalculateStates()
   return states;
 }
 
-std::string ToggleButton::AccessibleImpl::GetDescriptionRaw() const
+std::string ToggleButton::ToggleButtonAccessible::GetDescriptionRaw() const
 {
   auto button   = Toolkit::ToggleButton::DownCast(Self());
   auto index    = button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX);
@@ -392,7 +394,7 @@ std::string ToggleButton::AccessibleImpl::GetDescriptionRaw() const
   return tooltips[index].Get<std::string>();
 }
 
-Property::Index ToggleButton::AccessibleImpl::GetDescriptionPropertyIndex()
+Property::Index ToggleButton::ToggleButtonAccessible::GetDescriptionPropertyIndex()
 {
   return Toolkit::ToggleButton::Property::TOOLTIPS;
 }
@@ -400,11 +402,12 @@ Property::Index ToggleButton::AccessibleImpl::GetDescriptionPropertyIndex()
 void ToggleButton::OnStateChange(State newState)
 {
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
-  if(Dali::Accessibility::IsUp() && (Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
-     && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  if((Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor()) && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
-    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);
-    Dali::Accessibility::Accessible::Get(Self())->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
+    auto* accessible = GetAccessibleObject();
+
+    accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);
+    accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
   }
 }
 

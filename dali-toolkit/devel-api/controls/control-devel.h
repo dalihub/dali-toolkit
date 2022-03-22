@@ -201,6 +201,20 @@ enum
    * @note The representative Accessible object will not appear in the AT-SPI tree.
    */
   ACCESSIBILITY_HIDDEN,
+
+  /**
+   * @brief The actor ID of the clockwise focusable control.
+   * @details Name "clockwiseFocusableActorId", type Property::INTEGER.
+   *
+   */
+  CLOCKWISE_FOCUSABLE_ACTOR_ID,
+
+  /**
+   * @brief The actor ID of the conter-clockwise focusable control.
+   * @details Name "counterClockwiseFocusableActorId", type Property::INTEGER.
+   *
+   */
+  COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID,
 };
 
 } // namespace Property
@@ -560,25 +574,6 @@ DALI_TOOLKIT_API Dali::Accessibility::States GetAccessibilityStates(Toolkit::Con
  * @param recurse flag pointing if notifications of children's state would be sent
  */
 DALI_TOOLKIT_API void NotifyAccessibilityStateChange(Toolkit::Control control, Dali::Accessibility::States states, bool recurse);
-
-/**
- * The method allows to set specific constructor for creating accessibility structure
- *
- * Thank to this method hierarchy of accessibility objects can be based on internal hierarchy of Actors.
- * It prevents from necessity of keeping two trees synchronized.
- * The method should be called inside OnInitialize method of all classes inheriting from Control.
- *
- * Possible usage can be as follows:
- * @code
- *   SetAccessibilityConstructor( []( Dali::Actor actor ) {
-       return std::unique_ptr< Dali::Accessibility::Accessible >(
-       new ControlAccessible( actor, Dali::Accessibility::Role::DIALOG, true ) );
-      } );
-  * @endcode
-  *
-  * param constructor callback creating Accessible object
-  */
-DALI_TOOLKIT_API void SetAccessibilityConstructor(Dali::Actor control, std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Dali::Actor)> constructor);
 
 } // namespace DevelControl
 

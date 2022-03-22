@@ -445,6 +445,19 @@ static bool IsShowingGeometryOnScreen(Dali::Rect<> rect)
   return rect.width > 0 && rect.height > 0;
 }
 
+Dali::Accessibility::Accessible* ExternalAccessibleGetter(Dali::Actor actor)
+{
+  auto control = Toolkit::Control::DownCast(actor);
+  if (!control)
+  {
+    return nullptr;
+  }
+
+  auto& controlImpl = Toolkit::Internal::GetImplementation(control);
+
+  return controlImpl.GetAccessibleObject();
+}
+
 } // unnamed namespace
 
 // clang-format off
@@ -470,6 +483,8 @@ const PropertyRegistration Control::Impl::PROPERTY_20(typeRegistration, "accessi
 const PropertyRegistration Control::Impl::PROPERTY_21(typeRegistration, "accessibilityAttributes",        Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES,         Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_22(typeRegistration, "dispatchKeyEvents",              Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS,              Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_23(typeRegistration, "accessibilityHidden",            Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN,             Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_24(typeRegistration, "clockwiseFocusableActorId",      Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID,     Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_25(typeRegistration, "counterClockwiseFocusableActorId", Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 // clang-format on
 
@@ -481,6 +496,8 @@ Control::Impl::Impl(Control& controlImpl)
   mRightFocusableActorId(-1),
   mUpFocusableActorId(-1),
   mDownFocusableActorId(-1),
+  mClockwiseFocusableActorId(-1),
+  mCounterClockwiseFocusableActorId(-1),
   mStyleName(""),
   mBackgroundColor(Color::TRANSPARENT),
   mStartingPinchScale(nullptr),
@@ -508,14 +525,7 @@ Control::Impl::Impl(Control& controlImpl)
   mNeedToEmitResourceReady(false),
   mDispatchKeyEvents(true)
 {
-  Dali::Accessibility::Accessible::RegisterExternalAccessibleGetter(
-    [](Dali::Actor actor) -> Dali::Accessibility::Accessible* {
-      return Control::Impl::GetAccessibilityObject(actor);
-    });
-
-  mAccessibilityConstructor = [](Dali::Actor actor) -> std::unique_ptr<Dali::Accessibility::Accessible> {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::UNKNOWN));
-  };
+  Dali::Accessibility::Accessible::RegisterExternalAccessibleGetter(&ExternalAccessibleGetter);
 }
 
 Control::Impl::~Impl()
@@ -552,13 +562,7 @@ const Control::Impl& Control::Impl::Get(const Internal::Control& internalControl
 
 void Control::Impl::CheckHighlightedObjectGeometry()
 {
-  auto accessible = dynamic_cast<Dali::Toolkit::DevelControl::ControlAccessible*>(mAccessibilityObject.get());
-  if(!accessible)
-  {
-    DALI_LOG_ERROR("accessible is not a pointer to a DevelControl::ControlAccessible type");
-    return;
-  }
-
+  auto accessible     = GetAccessibleObject();
   auto lastPosition   = accessible->GetLastPosition();
   auto accessibleRect = accessible->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
   auto rect = GetShowingGeometry(accessibleRect, accessible);
@@ -586,7 +590,7 @@ void Control::Impl::CheckHighlightedObjectGeometry()
       // notify AT-clients on outgoing moves only
       if(mAccessibilityLastScreenRelativeMoveType != Dali::Accessibility::ScreenRelativeMoveType::INSIDE)
       {
-        mAccessibilityObject.get()->EmitMovedOutOfScreen(mAccessibilityLastScreenRelativeMoveType);
+        accessible->EmitMovedOutOfScreen(mAccessibilityLastScreenRelativeMoveType);
       }
       break;
     }
@@ -1358,12 +1362,30 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         {
           controlImpl.mImpl->mAccessibilityHidden = hidden;
 
-          auto* accessible = controlImpl.mImpl->GetAccessibilityObject();
+          auto* accessible = controlImpl.GetAccessibleObject();
           auto* parent     = dynamic_cast<Dali::Accessibility::ActorAccessible*>(accessible->GetParent());
           if (parent)
           {
             parent->OnChildrenChanged();
           }
+        }
+        break;
+      }
+      case Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID:
+      {
+        int focusId;
+        if(value.Get(focusId))
+        {
+          controlImpl.mImpl->mClockwiseFocusableActorId = focusId;
+        }
+        break;
+      }
+      case Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID:
+      {
+        int focusId;
+        if(value.Get(focusId))
+        {
+          controlImpl.mImpl->mCounterClockwiseFocusableActorId = focusId;
         }
         break;
       }
@@ -1525,6 +1547,18 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN:
       {
         value = controlImpl.mImpl->mAccessibilityHidden;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID:
+      {
+        value = controlImpl.mImpl->mClockwiseFocusableActorId;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID:
+      {
+        value = controlImpl.mImpl->mCounterClockwiseFocusableActorId;
         break;
       }
     }
@@ -2051,27 +2085,14 @@ void Control::Impl::OnIdleCallback()
   mIdleCallback = nullptr;
 }
 
-Dali::Accessibility::Accessible* Control::Impl::GetAccessibilityObject()
+Toolkit::DevelControl::ControlAccessible* Control::Impl::GetAccessibleObject()
 {
-  if(!mAccessibilityObject)
+  if(!mAccessibleObject)
   {
-    mAccessibilityObject = mAccessibilityConstructor(mControlImpl.Self());
+    mAccessibleObject.reset(mControlImpl.CreateAccessibleObject());
   }
-  return mAccessibilityObject.get();
-}
 
-Dali::Accessibility::Accessible* Control::Impl::GetAccessibilityObject(Dali::Actor actor)
-{
-  if(actor)
-  {
-    auto control = Dali::Toolkit::Control::DownCast(actor);
-    if(control)
-    {
-      auto controlImpl = static_cast<Internal::Control*>(&control.GetImplementation());
-      return controlImpl->mImpl->GetAccessibilityObject();
-    }
-  }
-  return nullptr;
+  return mAccessibleObject.get();
 }
 
 } // namespace Internal

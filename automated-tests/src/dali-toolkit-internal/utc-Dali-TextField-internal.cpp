@@ -773,6 +773,37 @@ int UtcDaliTextFieldBackgroundTag(void)
   END_TEST;
 }
 
+int UtcDaliTextFieldSpanBackgroundTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextFieldSpanBackgroundTag\n");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  field.SetProperty(TextField ::Property::ENABLE_MARKUP, true);
+  field.SetProperty(TextField::Property::TEXT, "H<span background-color='red'>e</span> Worl<span background-color='yellow'>d</span>");
+  application.GetScene().Add(field);
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextField& fieldImpl                    = GetImpl(field);
+  const ColorIndex* const       backgroundColorIndicesBuffer = fieldImpl.GetTextController()->GetTextModel()->GetBackgroundColorIndices();
+
+  DALI_TEST_CHECK(backgroundColorIndicesBuffer);
+
+  //default color
+  DALI_TEST_EQUALS(backgroundColorIndicesBuffer[0], 0u, TEST_LOCATION);
+
+  //red color
+  DALI_TEST_EQUALS(backgroundColorIndicesBuffer[1], 1u, TEST_LOCATION);
+
+  //yellow color
+  DALI_TEST_EQUALS(backgroundColorIndicesBuffer[7], 2u, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextFieldEllipsisInternalAPIs(void)
 {
   ToolkitTestApplication application;

@@ -211,6 +211,11 @@ private: // from Control
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc Toolkit::Control::OnPan
    */
   void OnPan(const PanGesture& gesture) override;
@@ -314,15 +319,35 @@ private:
   bool mIndicatorFirstShow : 1; ///< True if the indicator has never been shown
 
 protected:
-  struct AccessibleImpl : public DevelControl::ControlAccessible,
-                          public virtual Dali::Accessibility::Value
+  class ScrollBarAccessible : public DevelControl::ControlAccessible,
+                              public virtual Dali::Accessibility::Value
   {
+  public:
     using DevelControl::ControlAccessible::ControlAccessible;
 
+    /**
+     * @copydoc Dali::Accessibility::Value::GetMinimum()
+     */
     double GetMinimum() const override;
+
+    /**
+     * @copydoc Dali::Accessibility::Value::GetCurrent()
+     */
     double GetCurrent() const override;
+
+    /**
+     * @copydoc Dali::Accessibility::Value::GetMaximum()
+     */
     double GetMaximum() const override;
-    bool   SetCurrent(double) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Value::SetCurrent()
+     */
+    bool SetCurrent(double) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Value::GetMinimumIncrement()
+     */
     double GetMinimumIncrement() const override;
   };
 };

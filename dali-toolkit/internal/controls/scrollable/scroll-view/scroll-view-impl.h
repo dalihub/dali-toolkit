@@ -661,6 +661,11 @@ private: // private overridden functions from CustomActorImpl and Controls
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
   void OnSceneConnection(int depth) override;
@@ -841,10 +846,14 @@ private:
   void WrapPosition(Vector2& position) const;
 
 protected:
-  struct AccessibleImpl : public Scrollable::AccessibleImpl
+  class ScrollViewAccessible : public Scrollable::ScrollableAccessible
   {
-    using Scrollable::AccessibleImpl::AccessibleImpl;
+  public:
+    using Scrollable::ScrollableAccessible::ScrollableAccessible;
 
+    /**
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::ScrollToChild()
+     */
     bool ScrollToChild(Actor child) override;
   };
 

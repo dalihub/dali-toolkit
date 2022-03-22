@@ -218,10 +218,7 @@ void Magnifier::Initialize()
   constraint.AddSource(Source(self, Actor::Property::WORLD_SCALE));
   constraint.Apply();
 
-  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::FILLER));
-  });
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
 }
 
 Magnifier::~Magnifier()

@@ -77,15 +77,17 @@ void CheckBoxButton::OnInitialize()
 {
   Button::OnInitialize();
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new AccessibleImpl(actor, Dali::Accessibility::Role::CHECK_BOX));
-  });
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::CHECK_BOX);
 }
 
-Dali::Accessibility::States CheckBoxButton::AccessibleImpl::CalculateStates()
+DevelControl::ControlAccessible* CheckBoxButton::CreateAccessibleObject()
 {
-  auto state = Button::AccessibleImpl::CalculateStates();
+  return new CheckBoxButton::CheckBoxButtonAccessible(Self());
+}
+
+Dali::Accessibility::States CheckBoxButton::CheckBoxButtonAccessible::CalculateStates()
+{
+  auto state = Button::ButtonAccessible::CalculateStates();
   auto self = Toolkit::Button::DownCast(Self());
   if(self.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
   {
@@ -97,10 +99,9 @@ Dali::Accessibility::States CheckBoxButton::AccessibleImpl::CalculateStates()
 void CheckBoxButton::OnStateChange(State newState)
 {
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
-  if(Dali::Accessibility::IsUp() && (Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor() == Self())
-     && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  if((Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor() == Self()) && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
-    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+    GetAccessibleObject()->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
   }
 }
 
