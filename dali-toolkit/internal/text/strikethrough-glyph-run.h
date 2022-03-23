@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/glyph-run.h>
+#include <dali-toolkit/internal/text/strikethrough-style-properties.h>
 
 namespace Dali
 {
@@ -35,9 +36,17 @@ namespace Text
  */
 struct StrikethroughGlyphRun
 {
-  GlyphRun glyphRun;   ///< The initial glyph index and the number of glyphs in the run.
-  Vector4  color;      ///< The color of strikethrough.
-  bool     isColorSet; ///< If the color of strikethrough is set.
+  /**
+   * Default constructor to set the default values of bitfields
+   */
+  StrikethroughGlyphRun()
+  : glyphRun{},
+    properties{}
+  {
+  }
+
+  GlyphRun                     glyphRun;   ///< The initial glyph index and the number of glyphs in the run.
+  StrikethroughStyleProperties properties; /// The properties of strikethrough style
 };
 
 } // namespace Text

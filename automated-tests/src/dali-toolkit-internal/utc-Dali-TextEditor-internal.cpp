@@ -888,12 +888,12 @@ int UtcDaliTextEditorMarkupStrikethrough(void)
   //ABC have strikethrough
   DALI_TEST_EQUALS(strikethroughRuns[0u].glyphRun.glyphIndex, 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(strikethroughRuns[0u].glyphRun.numberOfGlyphs, 3u, TEST_LOCATION);
-  DALI_TEST_CHECK(!strikethroughRuns[0u].isColorSet);
+  DALI_TEST_CHECK(!strikethroughRuns[0u].properties.colorDefined);
 
   //GH have strikethrough
   DALI_TEST_EQUALS(strikethroughRuns[1u].glyphRun.glyphIndex, 5u, TEST_LOCATION);
   DALI_TEST_EQUALS(strikethroughRuns[1u].glyphRun.numberOfGlyphs, 2u, TEST_LOCATION);
-  DALI_TEST_CHECK(strikethroughRuns[1u].isColorSet);
+  DALI_TEST_CHECK(strikethroughRuns[1u].properties.colorDefined);
 
   END_TEST;
 }

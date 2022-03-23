@@ -1679,8 +1679,7 @@ void Controller::Impl::CopyStrikethroughFromLogicalToVisualModels()
     }
 
     StrikethroughGlyphRun strikethroughGlyphRun;
-    strikethroughGlyphRun.color                   = it->color;
-    strikethroughGlyphRun.isColorSet              = it->isColorSet;
+    strikethroughGlyphRun.properties              = it->properties;
     strikethroughGlyphRun.glyphRun.glyphIndex     = charactersToGlyph[characterIndex];
     strikethroughGlyphRun.glyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex];
 

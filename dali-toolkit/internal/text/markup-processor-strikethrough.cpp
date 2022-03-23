@@ -36,6 +36,13 @@ namespace
 const std::string XHTML_COLOR_ATTRIBUTE("color");
 }
 
+void ProcessColorAttribute(const Attribute& attribute, StrikethroughCharacterRun& strikethroughRun)
+
+{
+  ColorStringToVector4(attribute.valueBuffer, attribute.valueLength, strikethroughRun.properties.color);
+  strikethroughRun.properties.colorDefined = true;
+}
+
 void ProcessStrikethroughTag(const Tag& tag, StrikethroughCharacterRun& strikethroughRun)
 {
   for(Vector<Attribute>::ConstIterator it    = tag.attributes.Begin(),
@@ -46,8 +53,7 @@ void ProcessStrikethroughTag(const Tag& tag, StrikethroughCharacterRun& striketh
     const Attribute& attribute(*it);
     if(TokenComparison(XHTML_COLOR_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
     {
-      strikethroughRun.isColorSet = true;
-      ColorStringToVector4(attribute.valueBuffer, attribute.valueLength, strikethroughRun.color);
+      ProcessColorAttribute(attribute, strikethroughRun);
     }
   }
 }
