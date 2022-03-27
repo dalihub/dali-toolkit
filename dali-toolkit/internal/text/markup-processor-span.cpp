@@ -29,6 +29,7 @@
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/markup-processor-strikethrough.h>
 #include <dali-toolkit/internal/text/markup-processor-underline.h>
+#include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 
 namespace Dali
 {
@@ -36,35 +37,6 @@ namespace Toolkit
 {
 namespace Text
 {
-namespace
-{
-const std::string XHTML_FAMILY_ATTRIBUTE("font-family");
-const std::string XHTML_SIZE_ATTRIBUTE("font-size");
-const std::string XHTML_WEIGHT_ATTRIBUTE("font-weight");
-const std::string XHTML_WIDTH_ATTRIBUTE("font-width");
-const std::string XHTML_SLANT_ATTRIBUTE("font-slant");
-
-const std::string XHTML_COLOR_ATTRIBUTE("text-color");
-const std::string XHTML_BACKGROUND_COLOR_ATTRIBUTE("background-color");
-
-//the underlined character's attributes
-const std::string XHTML_UNDERLINE_COLOR_ATTRIBUTE("u-color");
-const std::string XHTML_UNDERLINE_HEIGHT_ATTRIBUTE("u-height");
-const std::string XHTML_UNDERLINE_TYPE_ATTRIBUTE("u-type");
-const std::string XHTML_UNDERLINE_DASH_GAP_ATTRIBUTE("u-dash-gap");
-const std::string XHTML_UNDERLINE_DASH_WIDTH_ATTRIBUTE("u-dash-width");
-
-//the strikethroughed character's attributes
-const std::string XHTML_STRIKETHROUGH_COLOR_ATTRIBUTE("s-color");
-const std::string XHTML_STRIKETHROUGH_HEIGHT_ATTRIBUTE("s-height");
-
-//the character-spacing character's attributes
-const std::string XHTML_CHARACTER_SPACING_VALUE_ATTRIBUTE("char-space-value");
-
-//NOTE: the MAX_NUM_OF_ATTRIBUTES in "markup-processor.cpp" should be updated when add a new attribute for span tag.
-
-} // namespace
-
 void ProcessSpanTag(const Tag&                    tag,
                     ColorRun&                     colorRun,
                     FontDescriptionRun&           fontRun,
@@ -86,77 +58,77 @@ void ProcessSpanTag(const Tag&                    tag,
   {
     const Attribute& attribute(*it);
 
-    if(TokenComparison(XHTML_COLOR_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::TEXT_COLOR, attribute.nameBuffer, attribute.nameLength))
     {
       isColorDefined = true;
       ProcessColor(attribute, colorRun);
     }
-    else if(TokenComparison(XHTML_BACKGROUND_COLOR_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::BACKGROUND_COLOR, attribute.nameBuffer, attribute.nameLength))
     {
       isBackgroundColorDefined = true;
       ProcessColor(attribute, backgroundColorRun);
     }
-    else if(TokenComparison(XHTML_FAMILY_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::FONT_FAMILY, attribute.nameBuffer, attribute.nameLength))
     {
       isFontDefined = true;
       ProcessFontFamily(attribute, fontRun);
     }
-    else if(TokenComparison(XHTML_SIZE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::FONT_SIZE, attribute.nameBuffer, attribute.nameLength))
     {
       isFontDefined = true;
       ProcessFontSize(attribute, fontRun);
     }
-    else if(TokenComparison(XHTML_WEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::FONT_WEIGHT, attribute.nameBuffer, attribute.nameLength))
     {
       isFontDefined = true;
       ProcessFontWeight(attribute, fontRun);
     }
-    else if(TokenComparison(XHTML_WIDTH_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::FONT_WIDTH, attribute.nameBuffer, attribute.nameLength))
     {
       isFontDefined = true;
       ProcessFontWidth(attribute, fontRun);
     }
-    else if(TokenComparison(XHTML_SLANT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::FONT_SLANT, attribute.nameBuffer, attribute.nameLength))
     {
       isFontDefined = true;
       ProcessFontSlant(attribute, fontRun);
     }
-    else if(TokenComparison(XHTML_UNDERLINE_COLOR_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::UNDERLINE_COLOR, attribute.nameBuffer, attribute.nameLength))
     {
       isUnderlinedCharacterDefined = true;
       ProcessColorAttribute(attribute, underlinedCharacterRun);
     }
-    else if(TokenComparison(XHTML_UNDERLINE_HEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::UNDERLINE_HEIGHT, attribute.nameBuffer, attribute.nameLength))
     {
       isUnderlinedCharacterDefined = true;
       ProcessHeightAttribute(attribute, underlinedCharacterRun);
     }
-    else if(TokenComparison(XHTML_UNDERLINE_TYPE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::UNDERLINE_TYPE, attribute.nameBuffer, attribute.nameLength))
     {
       isUnderlinedCharacterDefined = true;
       ProcessTypeAttribute(attribute, underlinedCharacterRun);
     }
-    else if(TokenComparison(XHTML_UNDERLINE_DASH_GAP_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::UNDERLINE_DASH_GAP, attribute.nameBuffer, attribute.nameLength))
     {
       isUnderlinedCharacterDefined = true;
       ProcessDashGapAttribute(attribute, underlinedCharacterRun);
     }
-    else if(TokenComparison(XHTML_UNDERLINE_DASH_WIDTH_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::UNDERLINE_DASH_WIDTH, attribute.nameBuffer, attribute.nameLength))
     {
       isUnderlinedCharacterDefined = true;
       ProcessDashWidthAttribute(attribute, underlinedCharacterRun);
     }
-    else if(TokenComparison(XHTML_STRIKETHROUGH_COLOR_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::STRIKETHROUGH_COLOR, attribute.nameBuffer, attribute.nameLength))
     {
       isStrikethroughDefined = true;
       ProcessColorAttribute(attribute, strikethroughRun);
     }
-    else if(TokenComparison(XHTML_STRIKETHROUGH_HEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::STRIKETHROUGH_HEIGHT, attribute.nameBuffer, attribute.nameLength))
     {
       isStrikethroughDefined = true;
       ProcessHeightAttribute(attribute, strikethroughRun);
     }
-    else if(TokenComparison(XHTML_CHARACTER_SPACING_VALUE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::SPAN_ATTRIBUTES::CHARACTER_SPACING_VALUE, attribute.nameBuffer, attribute.nameLength))
     {
       isCharacterSpacingDefined = true;
       ProcessValueAttribute(attribute, characterSpacingCharacterRun);

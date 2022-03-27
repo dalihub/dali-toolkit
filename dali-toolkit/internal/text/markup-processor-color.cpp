@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 
 namespace Dali
 {
@@ -31,11 +32,6 @@ namespace Toolkit
 {
 namespace Text
 {
-namespace
-{
-const std::string XHTML_VALUE_ATTRIBUTE("value");
-}
-
 void ProcessColor(const Attribute& attribute, ColorRun& colorRun)
 {
   ColorStringToVector4(attribute.valueBuffer, attribute.valueLength, colorRun.color);
@@ -49,7 +45,7 @@ void ProcessColorTag(const Tag& tag, ColorRun& colorRun)
       ++it)
   {
     const Attribute& attribute(*it);
-    if(TokenComparison(XHTML_VALUE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    if(TokenComparison(MARKUP::COLOR_ATTRIBUTES::VALUE, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessColor(attribute, colorRun);
     }

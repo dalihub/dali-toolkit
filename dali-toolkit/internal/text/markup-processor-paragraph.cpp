@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bounded-paragraph-run.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 
 namespace Dali
 {
@@ -31,12 +32,6 @@ namespace Toolkit
 {
 namespace Text
 {
-namespace
-{
-const std::string XHTML_ALIGN_ATTRIBUTE("align");
-const std::string XHTML_RELATIVE_LINE_HEIGHT_ATTRIBUTE("rel-line-height");
-} // namespace
-
 void ProcessHorizontalAlignment(const Attribute& attribute, BoundedParagraphRun& boundedParagraphRun)
 {
   boundedParagraphRun.horizontalAlignmentDefined = HorizontalAlignmentTypeStringToTypeValue(attribute.valueBuffer,
@@ -61,11 +56,11 @@ void ProcessAttributesOfParagraphTag(const Tag& tag, BoundedParagraphRun& bounde
       ++it)
   {
     const Attribute& attribute(*it);
-    if(TokenComparison(XHTML_ALIGN_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    if(TokenComparison(MARKUP::PARAGRAPH_ATTRIBUTES::ALIGN, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessHorizontalAlignment(attribute, boundedParagraphRun);
     }
-    else if(TokenComparison(XHTML_RELATIVE_LINE_HEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::PARAGRAPH_ATTRIBUTES::RELATIVE_LINE_HEIGHT, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessRelativeLineHeight(attribute, boundedParagraphRun);
     }
