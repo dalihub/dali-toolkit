@@ -24,6 +24,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
+#include <dali-toolkit/internal/text/characters-helper-functions.h>
+#include <dali-toolkit/internal/text/emoji-helper.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 #include <dali-toolkit/internal/text/text-controller-placeholder-handler.h>
@@ -482,6 +484,7 @@ bool Controller::TextUpdater::RemoveText(
 
   ModelPtr&        model        = impl.mModel;
   LogicalModelPtr& logicalModel = model->mLogicalModel;
+  VisualModelPtr&  visualModel  = model->mVisualModel;
 
   DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::RemoveText %p mText.Count() %d cursor %d cursorOffset %d numberOfCharacters %d\n", &controller, logicalModel->mText.Count(), eventData->mPrimaryCursorPosition, cursorOffset, numberOfCharacters);
 
@@ -497,6 +500,25 @@ bool Controller::TextUpdater::RemoveText(
     if((static_cast<int>(eventData->mPrimaryCursorPosition) + cursorOffset) >= 0)
     {
       cursorIndex = eventData->mPrimaryCursorPosition + cursorOffset;
+    }
+
+    //Handle Emoji clustering for cursor handling
+    // Deletion case: this is handling the deletion cases when the cursor is before or after Emoji
+    //  - Before: when use delete key and cursor is before Emoji (cursorOffset = -1)
+    //  - After: when use backspace key and cursor is after Emoji (cursorOffset = 0)
+
+    const Script script = logicalModel->GetScript(cursorIndex);
+    if((numberOfCharacters == 1u) &&
+       (IsOneOfEmojiScripts(script)))
+    {
+      //TODO: Use this clustering for Emoji cases only. This needs more testing to generalize to all scripts.
+      CharacterRun emojiClusteredCharacters = RetrieveClusteredCharactersOfCharacterIndex(visualModel, logicalModel, cursorIndex);
+      Length       actualNumberOfCharacters = emojiClusteredCharacters.numberOfCharacters;
+
+      //Set cursorIndex at the first characterIndex of clustred Emoji
+      cursorIndex = emojiClusteredCharacters.characterIndex;
+
+      numberOfCharacters = actualNumberOfCharacters;
     }
 
     if((cursorIndex + numberOfCharacters) > currentText.Count())

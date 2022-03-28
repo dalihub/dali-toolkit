@@ -60,14 +60,15 @@ struct GetClosestLineData
 
 struct GetClosestCursorIndexData
 {
-  std::string             description;    ///< Description of the test.
-  std::string             text;           ///< Input text.
-  unsigned int            numberOfTests;  ///< The number of tests.
-  float*                  visualX;        ///< The visual 'x' position for each test.
-  float*                  visualY;        ///< The visual 'y' position for each test.
-  CharacterHitTest::Mode* mode;           ///< The type of hit test.
-  CharacterIndex*         logicalIndex;   ///< The expected logical cursor index for each test.
-  bool*                   isCharacterHit; ///< The expected character hit value for each test.
+  std::string             description;            ///< Description of the test.
+  std::string             text;                   ///< Input text.
+  unsigned int            numberOfTests;          ///< The number of tests.
+  float*                  visualX;                ///< The visual 'x' position for each test.
+  float*                  visualY;                ///< The visual 'y' position for each test.
+  CharacterHitTest::Mode* mode;                   ///< The type of hit test.
+  bool                    markupProcessorEnabled; //< Enable markup processor to use markup text.
+  CharacterIndex*         logicalIndex;           ///< The expected logical cursor index for each test.
+  bool*                   isCharacterHit;         ///< The expected character hit value for each test.
 };
 
 struct GetCursorPositionData
@@ -173,7 +174,7 @@ bool GetClosestCursorIndexTest(const GetClosestCursorIndexData& data)
                   layoutSize,
                   textModel,
                   metrics,
-                  false,
+                  data.markupProcessorEnabled,
                   LineWrap::WORD,
                   false,
                   Toolkit::DevelText::EllipsisPosition::END,
@@ -579,6 +580,12 @@ int UtcDaliGetClosestCursorIndex(void)
   CharacterIndex         logicalIndex08[]   = {1u};
   bool                   isCharacterHit08[] = {true};
 
+  float                  visualX09[]        = {9.f};
+  float                  visualY09[]        = {12.f};
+  CharacterHitTest::Mode mode09[]           = {CharacterHitTest::TAP};
+  CharacterIndex         logicalIndex09[]   = {1u};
+  bool                   isCharacterHit09[] = {true};
+
   struct GetClosestCursorIndexData data[] =
     {
       {"Void text.",
@@ -587,24 +594,30 @@ int UtcDaliGetClosestCursorIndex(void)
        visualX01,
        visualY01,
        mode01,
+       false,
        logicalIndex01,
        isCharacterHit01},
+
       {"Single line text.",
        "Hello world שלום עולם",
        7u,
        visualX02,
        visualY02,
        mode02,
+       false,
        logicalIndex02,
        isCharacterHit02},
+
       {"Single line with ligatures",
        "different الأربعاء",
        4u,
        visualX03,
        visualY03,
        mode03,
+       false,
        logicalIndex03,
        isCharacterHit03},
+
       {"Multiline. Single line paragraphs",
        "Hello world\n"
        "שלום עולם\n"
@@ -613,8 +626,10 @@ int UtcDaliGetClosestCursorIndex(void)
        visualX04,
        visualY04,
        mode04,
+       false,
        logicalIndex04,
        isCharacterHit04},
+
       {"Multiline. Single bidirectional paragraph, starts LTR, wrapped lines",
        "abcשנבdefגקכghiעיןjklחלךmnoצמםpqrפרףstuדאוvwxה"
        "סתyzטזץabcשנבdefגקכghiעיןjklחלךmnoצמםpqrפרףstuד"
@@ -626,8 +641,10 @@ int UtcDaliGetClosestCursorIndex(void)
        visualX05,
        visualY05,
        mode05,
+       false,
        logicalIndex05,
        isCharacterHit05},
+
       {"Multiline. Single bidirectional paragraph, starts RTL, wrapped lines",
        "שנבabcגקכdefעיןghiחלךjklצמםmnoפרףpqrדאוstuהסתv"
        "wxטזץyzשנבabcגקכdefעיןghiחלךjklצמםmnoפרףpqrדאוs"
@@ -639,25 +656,42 @@ int UtcDaliGetClosestCursorIndex(void)
        visualX06,
        visualY06,
        mode06,
+       false,
        logicalIndex06,
        isCharacterHit06},
+
       {"Testing complex characters. Arabic ligatures",
        "الأَبْجَدِيَّة العَرَبِيَّة",
        1u,
        visualX07,
        visualY07,
        mode07,
+       false,
        logicalIndex07,
        isCharacterHit07},
+
       {"Testing complex characters. Latin ligatures",
        "fi ligature",
        1u,
        visualX08,
        visualY08,
        mode08,
+       false,
        logicalIndex08,
-       isCharacterHit08}};
-  const unsigned int numberOfTests = 8u;
+       isCharacterHit08},
+
+      {"Testing complex characters. Emoji",
+       "A&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F466;B",
+       1u,
+       visualX09,
+       visualY09,
+       mode09,
+       true,
+       logicalIndex09,
+       isCharacterHit09}
+
+    };
+  const unsigned int numberOfTests = 9u;
 
   for(unsigned int index = 0; index < numberOfTests; ++index)
   {
