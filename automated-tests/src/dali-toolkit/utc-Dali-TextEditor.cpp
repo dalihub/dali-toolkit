@@ -5925,3 +5925,82 @@ int UtcDaliToolkitTexteditorParagraphTag(void)
 
   END_TEST;
 }
+
+//Handle Emoji clustering for cursor handling
+int utcDaliTextEditorClusteredEmojiDeletionBackSpaceKey(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorClusteredEmojiDeletionBackSpaceKey ");
+  TextEditor textEditor = TextEditor::New();
+  DALI_TEST_CHECK(textEditor);
+
+  application.GetScene().Add(textEditor);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, "ABC&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F466;XY");
+  textEditor.SetProperty(Dali::Toolkit::TextEditor::Property::ENABLE_MARKUP, true);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Set currsor
+  textEditor.SetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 10);
+  application.SendNotification();
+  application.Render();
+
+  // Set focus and remove Emoji
+  textEditor.SetKeyInputFocus();
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  //Check the changed text and cursor position
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "ABCXY", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 3, TEST_LOCATION);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int utcDaliTextEditorClusteredEmojiDeletionDeleteKey(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorClusteredEmojiDeletionDeleteKey ");
+  TextEditor textEditor = TextEditor::New();
+  DALI_TEST_CHECK(textEditor);
+
+  application.GetScene().Add(textEditor);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, "ABC&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F466;XY");
+  textEditor.SetProperty(Dali::Toolkit::TextEditor::Property::ENABLE_MARKUP, true);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Set currsor
+  textEditor.SetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 3);
+  application.SendNotification();
+  application.Render();
+
+  // Set focus and remove Emoji
+  textEditor.SetKeyInputFocus();
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  //Check the changed text and cursor position
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "ABCXY", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 3, TEST_LOCATION);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}

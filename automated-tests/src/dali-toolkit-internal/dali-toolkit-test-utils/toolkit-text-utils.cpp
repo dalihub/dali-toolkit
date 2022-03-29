@@ -116,7 +116,8 @@ void CreateTextModel(const std::string&                text,
                                       logicalModel->mUnderlinedCharacterRuns,
                                       logicalModel->mBackgroundColorRuns,
                                       logicalModel->mStrikethroughCharacterRuns,
-                                      logicalModel->mBoundedParagraphRuns);
+                                      logicalModel->mBoundedParagraphRuns,
+                                      logicalModel->mCharacterSpacingCharacterRuns);
 
   Length         textSize = 0u;
   const uint8_t* utf8     = NULL;

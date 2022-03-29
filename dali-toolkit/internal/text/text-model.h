@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bounded-paragraph-run.h>
+#include <dali-toolkit/internal/text/character-spacing-glyph-run.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
@@ -312,6 +313,16 @@ public:
    * @copydoc ModelInterface::GetBoundedParagraphRuns()
    */
   virtual const Vector<BoundedParagraphRun>& GetBoundedParagraphRuns() const override;
+
+  /**
+   * @copydoc ModelInterface::GetNumberOfCharacterSpacingGlyphRuns()
+   */
+  Length GetNumberOfCharacterSpacingGlyphRuns() const override;
+
+  /**
+   * @copydoc ModelInterface::GetCharacterSpacingGlyphRuns()
+   */
+  const Vector<CharacterSpacingGlyphRun>& GetCharacterSpacingGlyphRuns() const override;
 
 private: // Private contructors & copy operator.
   /**

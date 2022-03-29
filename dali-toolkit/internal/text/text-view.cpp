@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 
 namespace Dali
 {
@@ -107,14 +108,18 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
 {
   Length                  numberOfLaidOutGlyphs       = 0u;
   Length                  numberOfActualLaidOutGlyphs = 0u;
-  const float             characterSpacing            = mImpl->mVisualModel->GetCharacterSpacing();
+  const float             modelCharacterSpacing       = mImpl->mVisualModel->GetCharacterSpacing();
   Vector<CharacterIndex>& glyphToCharacterMap         = mImpl->mVisualModel->mGlyphsToCharacters;
   const CharacterIndex*   glyphToCharacterMapBuffer   = glyphToCharacterMap.Begin();
   float                   calculatedAdvance           = 0.f;
   const Character*        textBuffer                  = mImpl->mLogicalModel->mText.Begin();
 
+
   if(mImpl->mVisualModel)
   {
+    // Get the character-spacing runs.
+    const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = mImpl->mVisualModel->GetCharacterSpacingGlyphRuns();
+
     bool                              textElided       = false;
     DevelText::EllipsisPosition::Type ellipsisPosition = GetEllipsisPosition();
 
@@ -356,7 +361,8 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
                 firstPenSet = true;
               }
 
-              calculatedAdvance = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + indexOfEllipsis))), characterSpacing, glyphToRemove.advance);
+              const float characterSpacing = GetGlyphCharacterSpacing(indexOfEllipsis, characterSpacingGlyphRuns, modelCharacterSpacing);
+              calculatedAdvance            = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + indexOfEllipsis))), characterSpacing, glyphToRemove.advance);
               removedGlypsWidth += std::min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width));
 
               // Calculate the width of the ellipsis glyph and check if it fits.
@@ -837,6 +843,16 @@ Length View::GetNumberOfBoundedParagraphRuns() const
 const Vector<BoundedParagraphRun>& View::GetBoundedParagraphRuns() const
 {
   return mImpl->mLogicalModel->GetBoundedParagraphRuns();
+}
+
+Length View::GetNumberOfCharacterSpacingGlyphRuns() const
+{
+  return (mImpl->mVisualModel) ? mImpl->mVisualModel->GetNumberOfCharacterSpacingGlyphRuns() : 0u;
+}
+
+const Vector<CharacterSpacingGlyphRun>& View::GetCharacterSpacingGlyphRuns() const
+{
+  return (mImpl->mVisualModel) ? mImpl->mVisualModel->GetCharacterSpacingGlyphRuns() : GetEmptyCharacterSpacingGlyphRuns();
 }
 
 const float View::GetCharacterSpacing() const

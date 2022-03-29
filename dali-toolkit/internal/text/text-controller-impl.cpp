@@ -1679,8 +1679,7 @@ void Controller::Impl::CopyStrikethroughFromLogicalToVisualModels()
     }
 
     StrikethroughGlyphRun strikethroughGlyphRun;
-    strikethroughGlyphRun.color                   = it->color;
-    strikethroughGlyphRun.isColorSet              = it->isColorSet;
+    strikethroughGlyphRun.properties              = it->properties;
     strikethroughGlyphRun.glyphRun.glyphIndex     = charactersToGlyph[characterIndex];
     strikethroughGlyphRun.glyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex];
 
@@ -1690,6 +1689,39 @@ void Controller::Impl::CopyStrikethroughFromLogicalToVisualModels()
     }
 
     mModel->mVisualModel->mStrikethroughRuns.PushBack(strikethroughGlyphRun);
+  }
+}
+
+void Controller::Impl::CopyCharacterSpacingFromLogicalToVisualModels()
+{
+  //CharacterSpacing character runs from markup-processor
+  const Vector<CharacterSpacingCharacterRun>& characterSpacingCharacterRuns = mModel->mLogicalModel->mCharacterSpacingCharacterRuns;
+  const Vector<GlyphIndex>&                   charactersToGlyph             = mModel->mVisualModel->mCharactersToGlyph;
+  const Vector<Length>&                       glyphsPerCharacter            = mModel->mVisualModel->mGlyphsPerCharacter;
+
+  mModel->mVisualModel->mCharacterSpacingRuns.Clear();
+
+  for(Vector<CharacterSpacingCharacterRun>::ConstIterator it = characterSpacingCharacterRuns.Begin(), endIt = characterSpacingCharacterRuns.End(); it != endIt; ++it)
+  {
+    const CharacterIndex& characterIndex     = it->characterRun.characterIndex;
+    const Length&         numberOfCharacters = it->characterRun.numberOfCharacters;
+
+    if(numberOfCharacters == 0)
+    {
+      continue;
+    }
+
+    CharacterSpacingGlyphRun characterSpacingGlyphRun;
+    characterSpacingGlyphRun.value                   = it->value;
+    characterSpacingGlyphRun.glyphRun.glyphIndex     = charactersToGlyph[characterIndex];
+    characterSpacingGlyphRun.glyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex];
+
+    for(Length index = 1u; index < numberOfCharacters; index++)
+    {
+      characterSpacingGlyphRun.glyphRun.numberOfGlyphs += glyphsPerCharacter[characterIndex + index];
+    }
+
+    mModel->mVisualModel->mCharacterSpacingRuns.PushBack(characterSpacingGlyphRun);
   }
 }
 

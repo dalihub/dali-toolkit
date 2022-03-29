@@ -18,6 +18,12 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/strikethrough-character-run.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -25,7 +31,24 @@ namespace Toolkit
 namespace Text
 {
 struct Tag;
+struct Attribute;
 struct StrikethroughCharacterRun;
+
+/**
+ * @brief Fill the strikethrough character run with the color attribute value.
+ *
+ * @param[in] attribute the color attribute.
+ * @param[out] strikethroughCharacterRun The strikethrough character run
+ */
+void ProcessColorAttribute(const Attribute& attribute, StrikethroughCharacterRun& strikethroughCharacterRun);
+
+/**
+ * @brief Fill the strikethrough character run with the height attribute value.
+ *
+ * @param[in] attribute the height attribute.
+ * @param[out] strikethroughRun The strikethrough character run
+ */
+void ProcessHeightAttribute(const Attribute& attribute, StrikethroughCharacterRun& strikethroughRun);
 
 /**
  * @brief Retrieves the strikethrough run info from the tag and sets it to the strikethrough run.
@@ -34,6 +57,13 @@ struct StrikethroughCharacterRun;
  * @param[in,out] strikethroughRun The strikethrough run.
  */
 void ProcessStrikethroughTag(const Tag& tag, StrikethroughCharacterRun& strikethroughRun);
+
+/**
+ * @brief Override the run's attributes which contained in the previous run. This is to handle the nested tags.
+ *
+ * @param[in,out] strikethroughCharacterRun The list of strikethrough character run
+ */
+void OverrideNestedStrikethroughCharacterRuns(Vector<StrikethroughCharacterRun>& strikethroughCharacterRun);
 
 } // namespace Text
 

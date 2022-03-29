@@ -600,6 +600,244 @@ int UtcDaliTextEditorMarkupNestedUnderlineTags(void)
   END_TEST;
 }
 
+int UtcDaliTextEditorMarkupNestedStrikethroughTags(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorMarkupNestedStrikethroughTags ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  application.GetScene().Add(textEditor);
+
+  std::string testText = "start<s height='5.0f' color='green' >AB<s color='blue' >XYZ</s>CDE</s>end";
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, testText);
+  textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  const uint32_t expectedNumberOfStrikethroughRuns = 2u;
+
+  Toolkit::Internal::TextEditor& textEditorImpl            = GetImpl(textEditor);
+  const Text::Length             numberOfStrikethroughRuns = textEditorImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
+
+  DALI_TEST_EQUALS(numberOfStrikethroughRuns, expectedNumberOfStrikethroughRuns, TEST_LOCATION);
+
+  Vector<StrikethroughGlyphRun> strikethroughRuns;
+  strikethroughRuns.Resize(numberOfStrikethroughRuns);
+  textEditorImpl.GetTextController()->GetTextModel()->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
+
+  struct DataOfCase
+  {
+    std::string                  title;
+    GlyphIndex                   glyphIndex;
+    Length                       numberOfGlyphs;
+    StrikethroughStyleProperties properties;
+  };
+  DataOfCase data[] =
+    {
+      //Outter
+      {"<s height='5.0f' color='green' >AB<s color='blue' >XYZ</s>CDE</s>",
+       5u,
+       8u,
+       {
+         Color::GREEN,
+         5.0f,
+         true,
+         true,
+       }},
+
+      //Inner
+      {"<s color='blue' >XYZ</s>",
+       7u,
+       3u,
+       {
+         Color::BLUE,
+         5.0f,
+         true,
+         true,
+       }},
+
+    };
+
+  for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
+  {
+    tet_infoline(data[i].title.c_str());
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
+    DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorMarkupStrikethroughAttributes(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorMarkupStrikethroughAttributes ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  application.GetScene().Add(textEditor);
+
+  std::string testText =
+    "start<s>ABC1</s>then"
+    "<s color='green'>ABC2</s>then"
+    "<s height='5.0f'>ABC3</s>then"
+    "<s color='blue' height='4.0f' >ABC4</s>end";
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, testText);
+  textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  const uint32_t expectedNumberOfStrikethroughRuns = 4u;
+
+  Toolkit::Internal::TextEditor& textEditorImpl            = GetImpl(textEditor);
+  const Text::Length             numberOfStrikethroughRuns = textEditorImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
+
+  DALI_TEST_EQUALS(numberOfStrikethroughRuns, expectedNumberOfStrikethroughRuns, TEST_LOCATION);
+
+  Vector<StrikethroughGlyphRun> strikethroughRuns;
+  strikethroughRuns.Resize(numberOfStrikethroughRuns);
+  textEditorImpl.GetTextController()->GetTextModel()->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
+
+  struct DataOfCase
+  {
+    std::string                  title;
+    GlyphIndex                   glyphIndex;
+    Length                       numberOfGlyphs;
+    StrikethroughStyleProperties properties;
+  };
+  DataOfCase data[] =
+    {
+
+      {"<s>ABC1</s>",
+       5u,
+       4u,
+       {Color::BLACK,
+        0.0f,
+        false,
+        false}},
+
+      {"<s color='green'>ABC2</s>",
+       13u,
+       4u,
+       {Color::GREEN,
+        0.0f,
+        true,
+        false}},
+
+      {"<s height='5.0f'>ABC3</s>",
+       21u,
+       4u,
+       {Color::BLACK,
+        5.0f,
+        false,
+        true}},
+
+      {"<s color='blue' height='4.0f' >ABC4</s>",
+       29u,
+       4u,
+       {Color::BLUE,
+        4.0f,
+        true,
+        true}},
+
+    };
+
+  for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
+  {
+    tet_infoline(data[i].title.c_str());
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
+    DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorMarkupSpanStrikethrough(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorMarkupSpanStrikethrough ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  application.GetScene().Add(textEditor);
+
+  std::string testText =
+    "start<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ABC1</span>then"
+    "<span s-color='blue'>ABC2</span>then"
+    "<span s-height='2.0f'>ABC3</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' s-color='green' s-height='5.0f'>ABC4</span>end";
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, testText);
+  textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  const uint32_t expectedNumberOfStrikethroughRuns = 3u;
+
+  Toolkit::Internal::TextEditor& textEditorImpl            = GetImpl(textEditor);
+  const Text::Length             numberOfStrikethroughRuns = textEditorImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
+
+  DALI_TEST_EQUALS(numberOfStrikethroughRuns, expectedNumberOfStrikethroughRuns, TEST_LOCATION);
+
+  Vector<StrikethroughGlyphRun> strikethroughRuns;
+  strikethroughRuns.Resize(numberOfStrikethroughRuns);
+  textEditorImpl.GetTextController()->GetTextModel()->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
+
+  struct DataOfCase
+  {
+    std::string                  title;
+    GlyphIndex                   glyphIndex;
+    Length                       numberOfGlyphs;
+    StrikethroughStyleProperties properties;
+  };
+  DataOfCase data[] =
+    {
+
+      {"<span s-color='blue'>ABC2</span>then",
+       13u,
+       4u,
+       {Color::BLUE,
+        0.0f,
+        true,
+        false}},
+
+      {"<span s-height='2.0f'>ABC3</span>then",
+       21u,
+       4u,
+       {Color::BLACK,
+        2.0f,
+        false,
+        true}},
+
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' s-color='green' s-height='5.0f'>ABC4</span>",
+       29u,
+       4u,
+       {Color::GREEN,
+        5.0f,
+        true,
+        true}},
+
+    };
+
+  for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
+  {
+    tet_infoline(data[i].title.c_str());
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
+    DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliTextEditorFontPointSizeLargerThanAtlas(void)
 {
   ToolkitTestApplication application;
@@ -888,12 +1126,12 @@ int UtcDaliTextEditorMarkupStrikethrough(void)
   //ABC have strikethrough
   DALI_TEST_EQUALS(strikethroughRuns[0u].glyphRun.glyphIndex, 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(strikethroughRuns[0u].glyphRun.numberOfGlyphs, 3u, TEST_LOCATION);
-  DALI_TEST_CHECK(!strikethroughRuns[0u].isColorSet);
+  DALI_TEST_CHECK(!strikethroughRuns[0u].properties.colorDefined);
 
   //GH have strikethrough
   DALI_TEST_EQUALS(strikethroughRuns[1u].glyphRun.glyphIndex, 5u, TEST_LOCATION);
   DALI_TEST_EQUALS(strikethroughRuns[1u].glyphRun.numberOfGlyphs, 2u, TEST_LOCATION);
-  DALI_TEST_CHECK(strikethroughRuns[1u].isColorSet);
+  DALI_TEST_CHECK(strikethroughRuns[1u].properties.colorDefined);
 
   END_TEST;
 }
@@ -1086,6 +1324,121 @@ int UtcDaliTextEditorMarkupParagraphTagAlignAttribute(void)
   tet_infoline(" UtcDaliTextEditorMarkupParagraphTagAlignAttribute - <p>Paragraph property alignment</p>");
   DALI_TEST_EQUALS(lineParagraphFromMultiAlign.alignmentOffset, lineParagraphFromCenterAlign.alignmentOffset, TEST_LOCATION);
   DALI_TEST_EQUALS(lineParagraphFromMultiAlign.width, lineParagraphFromCenterAlign.width, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorMarkupCharacterSpacingTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorMarkupCharacterSpacingTag ");
+
+  const Length EXPECTED_NUMBER_OF_GLYPHS = 21u;
+
+  const float expandedCharSpacing  = 10.0f;
+  const float condensedCharSpacing = -5.0f;
+
+  TextEditor textEditor = TextEditor::New();
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, "ABC EF\n<char-spacing value='-5.0f'>ABC EF\n</char-spacing><char-spacing value='10.0f'>ABC EF\n</char-spacing>");
+  textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
+
+  application.GetScene().Add(textEditor);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextEditor& textEditorImpl = GetImpl(textEditor);
+  Text::ViewInterface&           view           = textEditorImpl.GetTextController()->GetView();
+
+  Length numberOfGlyphs = view.GetNumberOfGlyphs();
+
+  DALI_TEST_EQUALS(numberOfGlyphs, EXPECTED_NUMBER_OF_GLYPHS, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  Vector<GlyphInfo> glyphs;
+  glyphs.Resize(numberOfGlyphs);
+
+  Vector<Vector2> positions;
+  positions.Resize(numberOfGlyphs);
+
+  float alignmentOffset = 0u;
+  numberOfGlyphs        = view.GetGlyphs(glyphs.Begin(),
+                                  positions.Begin(),
+                                  alignmentOffset,
+                                  0u,
+                                  numberOfGlyphs);
+
+  const Length numberOfGlyphsOneLine = 7u;
+  for(Length i = 0; i < numberOfGlyphsOneLine - 1u; i++)
+  {
+    float diffLineNoCharSpacing = positions[i + 1].x - positions[i].x;
+
+    float diffLineCondensedCharSpacing = positions[numberOfGlyphsOneLine + i + 1].x - positions[numberOfGlyphsOneLine + i].x;
+    DALI_TEST_EQUALS(diffLineCondensedCharSpacing, diffLineNoCharSpacing + condensedCharSpacing, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+    float diffLineExpandedCharSpacing = positions[2u * numberOfGlyphsOneLine + i + 1].x - positions[2u * numberOfGlyphsOneLine + i].x;
+    DALI_TEST_EQUALS(diffLineExpandedCharSpacing, diffLineNoCharSpacing + expandedCharSpacing, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorMarkupSpanCharacterSpacing(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorMarkupSpanCharacterSpacing ");
+
+  const Length EXPECTED_NUMBER_OF_GLYPHS = 21u;
+
+  const float expandedCharSpacing  = 10.0f;
+  const float condensedCharSpacing = -5.0f;
+
+  std::string testText =
+    "<span font-size='20' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='blue' >ABC EF\n</span>"
+    "<span font-size='20' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' char-space-value='-5.0f'>ABC EF\n</span>"
+    "<span font-size='20' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='green' char-space-value='10.0f'>ABC EF\n</span>";
+
+  TextEditor textEditor = TextEditor::New();
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, testText);
+  textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
+
+  application.GetScene().Add(textEditor);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextEditor& textEditorImpl = GetImpl(textEditor);
+  Text::ViewInterface&           view           = textEditorImpl.GetTextController()->GetView();
+
+  Length numberOfGlyphs = view.GetNumberOfGlyphs();
+
+  DALI_TEST_EQUALS(numberOfGlyphs, EXPECTED_NUMBER_OF_GLYPHS, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  Vector<GlyphInfo> glyphs;
+  glyphs.Resize(numberOfGlyphs);
+
+  Vector<Vector2> positions;
+  positions.Resize(numberOfGlyphs);
+
+  float alignmentOffset = 0u;
+  numberOfGlyphs        = view.GetGlyphs(glyphs.Begin(),
+                                  positions.Begin(),
+                                  alignmentOffset,
+                                  0u,
+                                  numberOfGlyphs);
+
+  const Length numberOfGlyphsOneLine = 7u;
+  for(Length i = 0; i < numberOfGlyphsOneLine - 1u; i++)
+  {
+    float diffLineNoCharSpacing = positions[i + 1].x - positions[i].x;
+
+    float diffLineCondensedCharSpacing = positions[numberOfGlyphsOneLine + i + 1].x - positions[numberOfGlyphsOneLine + i].x;
+    DALI_TEST_EQUALS(diffLineCondensedCharSpacing, diffLineNoCharSpacing + condensedCharSpacing, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+    float diffLineExpandedCharSpacing = positions[2u * numberOfGlyphsOneLine + i + 1].x - positions[2u * numberOfGlyphsOneLine + i].x;
+    DALI_TEST_EQUALS(diffLineExpandedCharSpacing, diffLineNoCharSpacing + expandedCharSpacing, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  }
 
   END_TEST;
 }

@@ -36,6 +36,7 @@
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
+#include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
@@ -178,7 +179,8 @@ void ShapeTextPreprocess(const RendererParameters& textParameters, TextAbstracti
                                       textModel->mLogicalModel->mUnderlinedCharacterRuns,
                                       textModel->mLogicalModel->mBackgroundColorRuns,
                                       textModel->mLogicalModel->mStrikethroughCharacterRuns,
-                                      textModel->mLogicalModel->mBoundedParagraphRuns);
+                                      textModel->mLogicalModel->mBoundedParagraphRuns,
+                                      textModel->mLogicalModel->mCharacterSpacingCharacterRuns);
 
   if(textParameters.markupEnabled)
   {
@@ -819,10 +821,14 @@ void Ellipsis(const RendererParameters& textParameters, TextAbstraction::TextRen
   Vector<LineRun>&        lines                     = textModel->mVisualModel->mLines; // The laid out lines.
   Vector<bool>&           isEmoji                   = internalDataModel.isEmoji;
   const Size              textLayoutArea            = internalDataModel.textLayoutArea;
-  const float             characterSpacing          = textModel->mVisualModel->GetCharacterSpacing();
+  const float             modelCharacterSpacing     = textModel->mVisualModel->GetCharacterSpacing();
   float                   calculatedAdvance         = 0.f;
   Vector<CharacterIndex>& glyphToCharacterMap       = textModel->mVisualModel->mGlyphsToCharacters;
   const CharacterIndex*   glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
+
+  // Get the character-spacing runs.
+  const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = textModel->mVisualModel->GetCharacterSpacingGlyphRuns();
+
   ////////////////////////////////////////////////////////////////////////////////
   // Ellipsis the text.
   ////////////////////////////////////////////////////////////////////////////////
@@ -908,7 +914,8 @@ void Ellipsis(const RendererParameters& textParameters, TextAbstraction::TextRen
                 firstPenSet = true;
               }
 
-              calculatedAdvance = GetCalculatedAdvance(*(textModel->mLogicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + index))), characterSpacing, glyphToRemove.advance);
+              const float characterSpacing = GetGlyphCharacterSpacing(index, characterSpacingGlyphRuns, modelCharacterSpacing);
+              calculatedAdvance            = GetCalculatedAdvance(*(textModel->mLogicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + index))), characterSpacing, glyphToRemove.advance);
               removedGlypsWidth += std::min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width));
 
               // Calculate the width of the ellipsis glyph and check if it fits.

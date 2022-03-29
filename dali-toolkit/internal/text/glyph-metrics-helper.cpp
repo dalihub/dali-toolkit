@@ -19,6 +19,9 @@
 // FILE HEADER
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -114,7 +117,10 @@ void GetGlyphMetricsFromCharacterIndex(CharacterIndex         index,
   const GlyphInfo* const  glyphInfoBuffer           = visualModel->mGlyphs.Begin();
   Vector<CharacterIndex>& glyphToCharacterMap       = visualModel->mGlyphsToCharacters;
   const CharacterIndex*   glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
-  const float             characterSpacing          = visualModel->GetCharacterSpacing();
+  const float             modelCharacterSpacing     = visualModel->GetCharacterSpacing();
+
+  // Get the character-spacing runs.
+  const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = visualModel->GetCharacterSpacingGlyphRuns();
 
   //Takes the character index, obtains the glyph index (and the number of Glyphs) from it and finally gets the glyph metrics.
   glyphIndex     = *(charactersToGlyphBuffer + index);
@@ -122,7 +128,8 @@ void GetGlyphMetricsFromCharacterIndex(CharacterIndex         index,
 
   float calculatedAdvance = 0.f;
 
-  calculatedAdvance = GetCalculatedAdvance(*(logicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + glyphIndex))), characterSpacing, (*(visualModel->mGlyphs.Begin() + glyphIndex)).advance);
+  const float characterSpacing = GetGlyphCharacterSpacing(glyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+  calculatedAdvance            = GetCalculatedAdvance(*(logicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + glyphIndex))), characterSpacing, (*(visualModel->mGlyphs.Begin() + glyphIndex)).advance);
 
   // Get the metrics for the group of glyphs.
   GetGlyphsMetrics(glyphIndex,

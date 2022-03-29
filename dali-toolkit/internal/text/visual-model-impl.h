@@ -26,6 +26,7 @@
 #include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/character-spacing-glyph-run.h>
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/strikethrough-glyph-run.h>
@@ -596,6 +597,20 @@ public:
    */
   Length GetNumberOfStrikethroughRuns() const;
 
+  /**
+   * @brief Retrieves the number of character-spacing glyph runs.
+   *
+   * @return The number of character-spacing glyph runs.
+   */
+  Length GetNumberOfCharacterSpacingGlyphRuns() const;
+
+  /**
+   * @brief Retrieves the reference for character-spacing glyph runs.
+   *
+   * @return The reference for character-spacing glyph runs.
+   */
+  const Vector<CharacterSpacingGlyphRun>& GetCharacterSpacingGlyphRuns() const;
+
 protected:
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -615,34 +630,35 @@ private:
   VisualModel& operator=(const VisualModel& handle);
 
 public:
-  Vector<GlyphInfo>             mGlyphs;                 ///< For each glyph, the font's id, glyph's index within the font and glyph's metrics.
-  Vector<CharacterIndex>        mGlyphsToCharacters;     ///< For each glyph, the index of the first character.
-  Vector<GlyphIndex>            mCharactersToGlyph;      ///< For each character, the index of the first glyph.
-  Vector<Length>                mCharactersPerGlyph;     ///< For each glyph, the number of characters that form the glyph.
-  Vector<Length>                mGlyphsPerCharacter;     ///< For each character, the number of glyphs that are shaped.
-  Vector<Vector2>               mGlyphPositions;         ///< For each glyph, the position.
-  Vector<LineRun>               mLines;                  ///< The laid out lines.
-  Vector<UnderlinedGlyphRun>    mUnderlineRuns;          ///< Runs of glyphs that are underlined.
-  Vector<Vector4>               mColors;                 ///< Colors of the glyphs.
-  Vector<ColorIndex>            mColorIndices;           ///< Indices to the vector of colors for each glyphs.
-  Vector<Vector4>               mBackgroundColors;       ///< Background colors of the glyphs.
-  Vector<ColorIndex>            mBackgroundColorIndices; ///< Indices to the vector of background colors for each glyphs.
-  Vector4                       mTextColor;              ///< The text color
-  Vector4                       mShadowColor;            ///< Color of drop shadow
-  Vector4                       mUnderlineColor;         ///< Color of underline
-  Vector4                       mOutlineColor;           ///< Color of outline
-  Vector4                       mBackgroundColor;        ///< Color of text background
-  Vector4                       mStrikethroughColor;     ///< Color of text background
-  Size                          mControlSize;            ///< The size of the UI control.
-  Vector2                       mShadowOffset;           ///< Offset for drop shadow, 0 indicates no shadow
-  float                         mUnderlineHeight;        ///< Fixed height for underline to override font metrics.
-  float                         mStrikethroughHeight;    ///< Fixed height for strikethrough to override font metrics.
-  Text::Underline::Type         mUnderlineType;          ///< The type of the underline.
-  float                         mDashedUnderlineWidth;   ///< The width of the dashes of the dashed underline.
-  float                         mDashedUnderlineGap;     ///< The gap between the dashes of the dashed underline.
-  float                         mShadowBlurRadius;       ///< Blur radius of shadow, 0 indicates no blur.
-  uint16_t                      mOutlineWidth;           ///< Width of outline.
-  Vector<StrikethroughGlyphRun> mStrikethroughRuns;      ///< Runs of glyphs that have strikethrough.
+  Vector<GlyphInfo>                mGlyphs;                 ///< For each glyph, the font's id, glyph's index within the font and glyph's metrics.
+  Vector<CharacterIndex>           mGlyphsToCharacters;     ///< For each glyph, the index of the first character.
+  Vector<GlyphIndex>               mCharactersToGlyph;      ///< For each character, the index of the first glyph.
+  Vector<Length>                   mCharactersPerGlyph;     ///< For each glyph, the number of characters that form the glyph.
+  Vector<Length>                   mGlyphsPerCharacter;     ///< For each character, the number of glyphs that are shaped.
+  Vector<Vector2>                  mGlyphPositions;         ///< For each glyph, the position.
+  Vector<LineRun>                  mLines;                  ///< The laid out lines.
+  Vector<UnderlinedGlyphRun>       mUnderlineRuns;          ///< Runs of glyphs that are underlined.
+  Vector<Vector4>                  mColors;                 ///< Colors of the glyphs.
+  Vector<ColorIndex>               mColorIndices;           ///< Indices to the vector of colors for each glyphs.
+  Vector<Vector4>                  mBackgroundColors;       ///< Background colors of the glyphs.
+  Vector<ColorIndex>               mBackgroundColorIndices; ///< Indices to the vector of background colors for each glyphs.
+  Vector4                          mTextColor;              ///< The text color
+  Vector4                          mShadowColor;            ///< Color of drop shadow
+  Vector4                          mUnderlineColor;         ///< Color of underline
+  Vector4                          mOutlineColor;           ///< Color of outline
+  Vector4                          mBackgroundColor;        ///< Color of text background
+  Vector4                          mStrikethroughColor;     ///< Color of text background
+  Size                             mControlSize;            ///< The size of the UI control.
+  Vector2                          mShadowOffset;           ///< Offset for drop shadow, 0 indicates no shadow
+  float                            mUnderlineHeight;        ///< Fixed height for underline to override font metrics.
+  float                            mStrikethroughHeight;    ///< Fixed height for strikethrough to override font metrics.
+  Text::Underline::Type            mUnderlineType;          ///< The type of the underline.
+  float                            mDashedUnderlineWidth;   ///< The width of the dashes of the dashed underline.
+  float                            mDashedUnderlineGap;     ///< The gap between the dashes of the dashed underline.
+  float                            mShadowBlurRadius;       ///< Blur radius of shadow, 0 indicates no blur.
+  uint16_t                         mOutlineWidth;           ///< Width of outline.
+  Vector<StrikethroughGlyphRun>    mStrikethroughRuns;      ///< Runs of glyphs that have strikethrough.
+  Vector<CharacterSpacingGlyphRun> mCharacterSpacingRuns;   ///< Runs of glyphs that have character-spacing.
 
 private:
   Size mNaturalSize; ///< Size of the text with no line wrapping.

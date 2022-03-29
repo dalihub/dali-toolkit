@@ -24,7 +24,58 @@ namespace Toolkit
 {
 namespace Text
 {
-/// Helper method to fetch the underline metrics for the specified font glyph
+bool IsGlyphStrikethrough(GlyphIndex                                    index,
+                          const Vector<StrikethroughGlyphRun>&          strikethroughRuns,
+                          Vector<StrikethroughGlyphRun>::ConstIterator& currentStrikethroughGlyphRunIt)
+{
+  for(Vector<StrikethroughGlyphRun>::ConstIterator it    = strikethroughRuns.Begin(),
+                                                   endIt = strikethroughRuns.End();
+      it != endIt;
+      ++it)
+  {
+    const StrikethroughGlyphRun& run = *it;
+
+    if((run.glyphRun.glyphIndex <= index) && (index < run.glyphRun.glyphIndex + run.glyphRun.numberOfGlyphs))
+    {
+      currentStrikethroughGlyphRunIt = it;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+StrikethroughStyleProperties GetCurrentStrikethroughProperties(GlyphIndex                                    index,
+                                                               const bool&                                   isGlyphStrikethrough,
+                                                               const Vector<StrikethroughGlyphRun>&          strikethroughRuns,
+                                                               Vector<StrikethroughGlyphRun>::ConstIterator& currentStrikethroughGlyphRunIt,
+                                                               const StrikethroughStyleProperties&           commonStrikethroughProperties)
+{
+  StrikethroughStyleProperties currentStrikethroughStyleProperties = commonStrikethroughProperties;
+
+  if(isGlyphStrikethrough && (currentStrikethroughGlyphRunIt != strikethroughRuns.End()))
+  {
+    // Retrieve the latest run to handle the nested case.
+    for(Vector<StrikethroughGlyphRun>::ConstIterator it    = currentStrikethroughGlyphRunIt + 1,
+                                                     endIt = strikethroughRuns.End();
+        it != endIt;
+        ++it)
+    {
+      const StrikethroughGlyphRun& run = *it;
+
+      if((run.glyphRun.glyphIndex <= index) && (index < (run.glyphRun.glyphIndex + run.glyphRun.numberOfGlyphs)))
+      {
+        currentStrikethroughGlyphRunIt = it;
+      }
+    }
+
+    currentStrikethroughStyleProperties.OverrideByDefinedProperties(currentStrikethroughGlyphRunIt->properties);
+  }
+
+  return currentStrikethroughStyleProperties;
+}
+
+/// Helper method to fetch the strikethrough metrics for the specified font glyph
 void CalcualteStrikethroughHeight(float& currentStrikethroughHeight, float& maxStrikethroughHeight)
 {
   //Height of strikethrough represents the thickness of line.

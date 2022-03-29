@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/anchor.h>
 #include <dali-toolkit/internal/text/bounded-paragraph-run.h>
+#include <dali-toolkit/internal/text/character-spacing-character-run.h>
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/embedded-item.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
@@ -42,14 +43,15 @@ namespace Text
  */
 struct MarkupProcessData
 {
-  MarkupProcessData(Vector<ColorRun>&                  colorRuns,
-                    Vector<FontDescriptionRun>&        fontRuns,
-                    Vector<EmbeddedItem>&              items,
-                    Vector<Anchor>&                    anchors,
-                    Vector<UnderlinedCharacterRun>&    underlinedCharacterRuns,
-                    Vector<ColorRun>&                  backgroundColorRuns,
-                    Vector<StrikethroughCharacterRun>& strikethroughCharacterRuns,
-                    Vector<BoundedParagraphRun>&       boundedParagraphRuns)
+  MarkupProcessData(Vector<ColorRun>&                     colorRuns,
+                    Vector<FontDescriptionRun>&           fontRuns,
+                    Vector<EmbeddedItem>&                 items,
+                    Vector<Anchor>&                       anchors,
+                    Vector<UnderlinedCharacterRun>&       underlinedCharacterRuns,
+                    Vector<ColorRun>&                     backgroundColorRuns,
+                    Vector<StrikethroughCharacterRun>&    strikethroughCharacterRuns,
+                    Vector<BoundedParagraphRun>&          boundedParagraphRuns,
+                    Vector<CharacterSpacingCharacterRun>& characterSpacingCharacterRuns)
   : colorRuns(colorRuns),
     fontRuns(fontRuns),
     items(items),
@@ -58,19 +60,22 @@ struct MarkupProcessData
     backgroundColorRuns(backgroundColorRuns),
     strikethroughCharacterRuns(strikethroughCharacterRuns),
     boundedParagraphRuns(boundedParagraphRuns),
+    characterSpacingCharacterRuns(characterSpacingCharacterRuns),
     markupProcessedText()
   {
   }
 
-  Vector<ColorRun>&                  colorRuns;                  ///< The color runs.
-  Vector<FontDescriptionRun>&        fontRuns;                   ///< The font description runs.
-  Vector<EmbeddedItem>&              items;                      ///< The embedded items.
-  Vector<Anchor>&                    anchors;                    ///< The anchors.
-  Vector<UnderlinedCharacterRun>&    underlinedCharacterRuns;    ///< The underlined character runs.
-  Vector<ColorRun>&                  backgroundColorRuns;        ///< The background color runs.
-  Vector<StrikethroughCharacterRun>& strikethroughCharacterRuns; ///< The strikethrough character runs.
-  Vector<BoundedParagraphRun>&       boundedParagraphRuns;       ///< The bounded paragraph runs
-  std::string                        markupProcessedText;        ///< The mark-up string.
+  Vector<ColorRun>&                     colorRuns;                     ///< The color runs.
+  Vector<FontDescriptionRun>&           fontRuns;                      ///< The font description runs.
+  Vector<EmbeddedItem>&                 items;                         ///< The embedded items.
+  Vector<Anchor>&                       anchors;                       ///< The anchors.
+  Vector<UnderlinedCharacterRun>&       underlinedCharacterRuns;       ///< The underlined character runs.
+  Vector<ColorRun>&                     backgroundColorRuns;           ///< The background color runs.
+  Vector<StrikethroughCharacterRun>&    strikethroughCharacterRuns;    ///< The strikethrough character runs.
+  Vector<BoundedParagraphRun>&          boundedParagraphRuns;          ///< The bounded paragraph runs
+  Vector<CharacterSpacingCharacterRun>& characterSpacingCharacterRuns; ///< The character-spacing runs
+
+  std::string markupProcessedText; ///< The mark-up string.
 };
 
 /**

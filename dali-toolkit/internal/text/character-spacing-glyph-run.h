@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_TEXT_STRIKETHROUGH_GLYPH_RUN_H
-#define DALI_TOOLKIT_TEXT_STRIKETHROUGH_GLYPH_RUN_H
+#ifndef DALI_TOOLKIT_TEXT_CHARACTER_SPACING_GLYPH_RUN_H
+#define DALI_TOOLKIT_TEXT_CHARACTER_SPACING_GLYPH_RUN_H
 
 /*
  * Copyright (c) 2022 Samsung Electronics Co., Ltd.
@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/glyph-run.h>
-#include <dali-toolkit/internal/text/strikethrough-style-properties.h>
 
 namespace Dali
 {
@@ -32,21 +31,21 @@ namespace Toolkit
 namespace Text
 {
 /**
- * @brief Run of strikethrough glyphs with same properties.
+ * @brief Run of character-spacing glyphs with same properties.
  */
-struct StrikethroughGlyphRun
+struct CharacterSpacingGlyphRun
 {
   /**
    * Default constructor to set the default values of bitfields
    */
-  StrikethroughGlyphRun()
+  CharacterSpacingGlyphRun()
   : glyphRun{},
-    properties{}
+    value{0.f} //The default value is 0.f which does nothing.
   {
   }
 
-  GlyphRun                     glyphRun;   ///< The initial glyph index and the number of glyphs in the run.
-  StrikethroughStyleProperties properties; /// The properties of strikethrough style
+  GlyphRun glyphRun; ///< The initial glyph index and the number of glyphs in the run.
+  float    value;    ///< The spaces between characters in Pixels.
 };
 
 } // namespace Text
@@ -55,4 +54,4 @@ struct StrikethroughGlyphRun
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_TEXT_STRIKETHROUGH_GLYPH_RUN_H
+#endif // DALI_TOOLKIT_TEXT_CHARACTER_SPACING_GLYPH_RUN_H

@@ -655,6 +655,16 @@ const Vector<BoundedParagraphRun>& ViewModel::GetBoundedParagraphRuns() const
   return mModel->GetBoundedParagraphRuns();
 }
 
+Length ViewModel::GetNumberOfCharacterSpacingGlyphRuns() const
+{
+  return mModel->GetNumberOfCharacterSpacingGlyphRuns();
+}
+
+const Vector<CharacterSpacingGlyphRun>& ViewModel::GetCharacterSpacingGlyphRuns() const
+{
+  return mModel->GetCharacterSpacingGlyphRuns();
+}
+
 } // namespace Text
 
 } // namespace Toolkit

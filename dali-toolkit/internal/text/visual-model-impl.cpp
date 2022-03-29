@@ -609,6 +609,16 @@ Length VisualModel::GetNumberOfStrikethroughRuns() const
   return mStrikethroughRuns.Count();
 }
 
+Length VisualModel::GetNumberOfCharacterSpacingGlyphRuns() const
+{
+  return mCharacterSpacingRuns.Count();
+}
+
+const Vector<CharacterSpacingGlyphRun>& VisualModel::GetCharacterSpacingGlyphRuns() const
+{
+  return mCharacterSpacingRuns;
+}
+
 void VisualModel::ClearCaches()
 {
   mCachedLineIndex = 0u;

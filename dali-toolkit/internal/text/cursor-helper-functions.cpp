@@ -22,7 +22,10 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/characters-helper-functions.h>
+#include <dali-toolkit/internal/text/emoji-helper.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 
 namespace
 {
@@ -214,7 +217,10 @@ CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
   {
     return logicalIndex;
   }
-  const float characterSpacing = visualModel->GetCharacterSpacing();
+
+  // Get the character-spacing runs.
+  const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = visualModel->GetCharacterSpacingGlyphRuns();
+  const float                             modelCharacterSpacing     = visualModel->GetCharacterSpacing();
 
   // Whether there is a hit on a line.
   bool matchedLine = false;
@@ -289,7 +295,8 @@ CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
 
       // Get the metrics for the group of glyphs.
       GlyphMetrics glyphMetrics;
-      calculatedAdvance = GetCalculatedAdvance(*(logicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + firstLogicalGlyphIndex))), characterSpacing, (*(visualModel->mGlyphs.Begin() + firstLogicalGlyphIndex)).advance);
+      const float  characterSpacing = GetGlyphCharacterSpacing(firstLogicalGlyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+      calculatedAdvance             = GetCalculatedAdvance(*(logicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + firstLogicalGlyphIndex))), characterSpacing, (*(visualModel->mGlyphs.Begin() + firstLogicalGlyphIndex)).advance);
       GetGlyphsMetrics(firstLogicalGlyphIndex,
                        numberOfGlyphs,
                        glyphMetrics,
@@ -458,6 +465,19 @@ CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
 
   logicalIndex = (bidiLineFetched ? logicalModel->GetLogicalCursorIndex(visualIndex) : visualIndex);
 
+  // Handle Emoji clustering for cursor handling:
+  // Fixing this case:
+  // - When there is Emoji contains multi unicodes and it is layoutted at the end of line (LineWrap case , is not new line case)
+  // - Try to click at the center or at the end of Emoji then the cursor appears inside Emoji
+  // - Example:"FamilyManWomanGirlBoy &#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F466;"
+  const Script script = logicalModel->GetScript(logicalIndex);
+  if(IsOneOfEmojiScripts(script))
+  {
+    //TODO: Use this clustering for Emoji cases only. This needs more testing to generalize to all scripts.
+    CharacterRun emojiClusteredCharacters = RetrieveClusteredCharactersOfCharacterIndex(visualModel, logicalModel, logicalIndex);
+    logicalIndex                          = emojiClusteredCharacters.characterIndex;
+  }
+
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "closest visualIndex %d logicalIndex %d\n", visualIndex, logicalIndex);
 
   DALI_ASSERT_DEBUG((logicalIndex <= logicalModel->mText.Count() && logicalIndex >= 0) && "GetClosestCursorIndex - Out of bounds index");
@@ -606,7 +626,9 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
     const Length* const         charactersPerGlyphBuffer = parameters.visualModel->mCharactersPerGlyph.Begin();
     const CharacterIndex* const glyphsToCharactersBuffer = parameters.visualModel->mGlyphsToCharacters.Begin();
     const Vector2* const        glyphPositionsBuffer     = parameters.visualModel->mGlyphPositions.Begin();
-    const float                 characterSpacing         = parameters.visualModel->GetCharacterSpacing();
+    const float                 modelCharacterSpacing    = parameters.visualModel->GetCharacterSpacing();
+
+    const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = parameters.visualModel->GetCharacterSpacingGlyphRuns();
 
     // Get the metrics for the group of glyphs.
     GetGlyphMetricsFromCharacterIndex(index, parameters.visualModel, parameters.logicalModel, metrics, glyphMetrics, glyphIndex, numberOfGlyphs);
@@ -723,6 +745,7 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
       const bool addGlyphAdvance = ((!isFirstPositionOfLine && !isCurrentRightToLeft) ||
                                     (isFirstPositionOfLine && !isRightToLeftParagraph));
 
+      const float characterSpacing   = GetGlyphCharacterSpacing(secondaryGlyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
       cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + (addGlyphAdvance ? (glyphMetrics.advance + characterSpacing) : 0.f);
       cursorInfo.secondaryPosition.y = cursorInfo.lineOffset + cursorInfo.lineHeight - cursorInfo.secondaryCursorHeight;
 

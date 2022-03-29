@@ -572,6 +572,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
     {
       impl.CopyUnderlinedFromLogicalToVisualModels(true);
       impl.CopyStrikethroughFromLogicalToVisualModels();
+      impl.CopyCharacterSpacingFromLogicalToVisualModels();
     }
 
     updated = true;

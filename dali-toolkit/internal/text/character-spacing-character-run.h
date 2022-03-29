@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_TEXT_STRIKETHROUGH_GLYPH_RUN_H
-#define DALI_TOOLKIT_TEXT_STRIKETHROUGH_GLYPH_RUN_H
+#ifndef DALI_TOOLKIT_TEXT_CHARACTER_SPACING_CHARACTER_RUN_H
+#define DALI_TOOLKIT_TEXT_CHARACTER_SPACING_CHARACTER_RUN_H
 
 /*
  * Copyright (c) 2022 Samsung Electronics Co., Ltd.
@@ -22,8 +22,7 @@
 #include <dali/public-api/math/vector4.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/glyph-run.h>
-#include <dali-toolkit/internal/text/strikethrough-style-properties.h>
+#include <dali-toolkit/internal/text/character-run.h>
 
 namespace Dali
 {
@@ -32,21 +31,23 @@ namespace Toolkit
 namespace Text
 {
 /**
- * @brief Run of strikethrough glyphs with same properties.
+ * @brief Run of character-spacing characters with same properties.
  */
-struct StrikethroughGlyphRun
+struct CharacterSpacingCharacterRun
 {
   /**
    * Default constructor to set the default values of bitfields
    */
-  StrikethroughGlyphRun()
-  : glyphRun{},
-    properties{}
+  CharacterSpacingCharacterRun()
+  : characterRun{},
+    value{0.f} //The default value is 0.f which does nothing.
   {
   }
 
-  GlyphRun                     glyphRun;   ///< The initial glyph index and the number of glyphs in the run.
-  StrikethroughStyleProperties properties; /// The properties of strikethrough style
+  CharacterRun characterRun; ///< The initial character index and the number of characters of the run.
+  float        value;        /// The spaces between characters in Pixels. A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
+
+  //TODO: Add unit property to choose between Pixel or Scale (%)
 };
 
 } // namespace Text
@@ -55,4 +56,4 @@ struct StrikethroughGlyphRun
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_TEXT_STRIKETHROUGH_GLYPH_RUN_H
+#endif // DALI_TOOLKIT_TEXT_CHARACTER_SPACING_CHARACTER_RUN_H

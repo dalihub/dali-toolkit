@@ -35,20 +35,28 @@ struct MarkupProcessData;
  * @param[out] fontRun the font run to be filled.
  * @param[out] underlinedCharacterRun the underlined character run to be filled.
  * @param[out] backgroundColorRun the background color run to be filled.
+ * @param[out] strikethroughRun the strikethrough run to be filled.
+ * @param[out] characterSpacingCharacterRun the character-spacing run to be filled.
  * @param[out] isColorDefined if the span has color defined.
  * @param[out] isFontDefined if the span has font defined.
  * @param[out] isUnderlinedCharacterDefined if the span has underlined-character defined.
  * @param[out] isBackgroundColorDefined if the span has background color defined.
+ * @param[out] isStrikethroughDefined if the span has strikethrough defined.
+ * @param[out] isCharacterSpacingDefined if the span has character-spacing defined.
  */
-void ProcessSpanTag(const Tag&              tag,
-                    ColorRun&               colorRun,
-                    FontDescriptionRun&     fontRun,
-                    UnderlinedCharacterRun& underlinedCharacterRun,
-                    ColorRun&               backgroundColorRun,
-                    bool&                   isColorDefined,
-                    bool&                   isFontDefined,
-                    bool&                   isUnderlinedCharacterDefined,
-                    bool&                   isBackgroundColorDefined);
+void ProcessSpanTag(const Tag&                    tag,
+                    ColorRun&                     colorRun,
+                    FontDescriptionRun&           fontRun,
+                    UnderlinedCharacterRun&       underlinedCharacterRun,
+                    ColorRun&                     backgroundColorRun,
+                    StrikethroughCharacterRun&    strikethroughRun,
+                    CharacterSpacingCharacterRun& characterSpacingCharacterRun,
+                    bool&                         isColorDefined,
+                    bool&                         isFontDefined,
+                    bool&                         isUnderlinedCharacterDefined,
+                    bool&                         isBackgroundColorDefined,
+                    bool&                         isStrikethroughDefined,
+                    bool&                         isCharacterSpacingDefined);
 
 } // namespace Text
 

@@ -291,6 +291,16 @@ void Model::GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns, Strik
   mVisualModel->GetStrikethroughRuns(strikethroughRuns, index, numberOfRuns);
 }
 
+Length Model::GetNumberOfCharacterSpacingGlyphRuns() const
+{
+  return mVisualModel->GetNumberOfCharacterSpacingGlyphRuns();
+}
+
+const Vector<CharacterSpacingGlyphRun>& Model::GetCharacterSpacingGlyphRuns() const
+{
+  return mVisualModel->GetCharacterSpacingGlyphRuns();
+}
+
 const float Model::GetCharacterSpacing() const
 {
   return mVisualModel->GetCharacterSpacing();
