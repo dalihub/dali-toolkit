@@ -114,11 +114,12 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
   float                   calculatedAdvance           = 0.f;
   const Character*        textBuffer                  = mImpl->mLogicalModel->mText.Begin();
 
-  // Get the character-spacing runs.
-  const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = mImpl->mVisualModel->GetCharacterSpacingGlyphRuns();
 
   if(mImpl->mVisualModel)
   {
+    // Get the character-spacing runs.
+    const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = mImpl->mVisualModel->GetCharacterSpacingGlyphRuns();
+
     bool                              textElided       = false;
     DevelText::EllipsisPosition::Type ellipsisPosition = GetEllipsisPosition();
 
