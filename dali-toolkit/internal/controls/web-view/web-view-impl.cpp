@@ -204,6 +204,13 @@ void WebView::OnInitialize()
     mWebSettings        = std::unique_ptr<Dali::Toolkit::WebSettings>(new WebSettings(mWebEngine.GetSettings()));
     mWebBackForwardList = std::unique_ptr<Dali::Toolkit::WebBackForwardList>(new WebBackForwardList(mWebEngine.GetBackForwardList()));
   }
+
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
+}
+
+DevelControl::ControlAccessible* WebView::CreateAccessibleObject()
+{
+  return new WebViewAccessible(Self(), mWebEngine);
 }
 
 Dali::Toolkit::WebSettings* WebView::GetSettings() const
@@ -1234,6 +1241,58 @@ float WebView::GetLoadProgressPercentage() const
 bool WebView::SetVisibility(bool visible)
 {
   return mWebEngine ? mWebEngine.SetVisibility(visible) : false;
+}
+
+WebView::WebViewAccessible::WebViewAccessible(Dali::Actor self, Dali::WebEngine& webEngine)
+: ControlAccessible(self), mRemoteChild{}, mWebEngine{webEngine}
+{
+  Dali::Accessibility::Bridge::EnabledSignal().Connect(this, &WebViewAccessible::OnAccessibilityEnabled);
+  Dali::Accessibility::Bridge::DisabledSignal().Connect(this, &WebViewAccessible::OnAccessibilityDisabled);
+
+  if(Dali::Accessibility::IsUp())
+  {
+    OnAccessibilityEnabled();
+  }
+  else
+  {
+    OnAccessibilityDisabled();
+  }
+}
+
+void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::Accessible*>& children)
+{
+  if(mRemoteChild.GetAddress())
+  {
+    children.push_back(&mRemoteChild);
+  }
+}
+
+void WebView::WebViewAccessible::OnAccessibilityEnabled()
+{
+  if(!mWebEngine)
+  {
+    return;
+  }
+
+  mWebEngine.ActivateAccessibility(true);
+  SetRemoteChildAddress(mWebEngine.GetAccessibilityAddress());
+}
+
+void WebView::WebViewAccessible::OnAccessibilityDisabled()
+{
+  if(!mWebEngine)
+  {
+    return;
+  }
+
+  SetRemoteChildAddress({});
+  mWebEngine.ActivateAccessibility(false);
+}
+
+void WebView::WebViewAccessible::SetRemoteChildAddress(Dali::Accessibility::Address address)
+{
+  mRemoteChild.SetAddress(std::move(address));
+  OnChildrenChanged();
 }
 
 #undef GET_ENUM_STRING

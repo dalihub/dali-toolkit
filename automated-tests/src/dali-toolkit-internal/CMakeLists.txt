@@ -73,6 +73,7 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-tts-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-vector-animation-renderer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-vector-image-renderer.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-web-engine.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-window.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-scene-holder.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dali-test-suite-utils.cpp

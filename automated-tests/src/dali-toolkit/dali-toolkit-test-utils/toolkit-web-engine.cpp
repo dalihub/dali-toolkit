@@ -1455,6 +1455,11 @@ public:
     return mScaleFactor;
   }
 
+  Dali::Accessibility::Address GetAccessibilityAddress()
+  {
+    return {":9.99", "root"};
+  }
+
   Dali::PixelData GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
   {
     uint32_t bufferSize = viewArea.width * viewArea.height * 4 ;
@@ -2226,6 +2231,11 @@ void WebEngine::ActivateAccessibility(bool activated)
 {
 }
 
+Accessibility::Address WebEngine::GetAccessibilityAddress()
+{
+  return Internal::Adaptor::GetImplementation(*this).GetAccessibilityAddress();
+}
+
 bool WebEngine::HighlightText(const std::string& text, Dali::WebEnginePlugin::FindOption options, uint32_t maxMatchCount)
 {
   return true;
@@ -2471,4 +2481,3 @@ void WebEngine::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextRecei
 }
 
 } // namespace Dali;
-
