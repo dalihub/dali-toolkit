@@ -36,6 +36,7 @@
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/controls/text-controls/text-field-property-handler.h>
+#include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
@@ -796,6 +797,11 @@ void TextField::OnTap(const TapGesture& gesture)
   mController->TapEvent(gesture.GetNumberOfTaps(), localPoint.x - padding.start, localPoint.y - padding.top);
   mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
 
+  Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
+  if (keyboardFocusManager)
+  {
+    keyboardFocusManager.SetCurrentFocusActor(Self());
+  }
   SetKeyInputFocus();
 }
 
@@ -827,6 +833,11 @@ bool TextField::OnKeyEvent(const KeyEvent& event)
     // Make sure ClearKeyInputFocus when only key is up
     if(event.GetState() == KeyEvent::UP)
     {
+      Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
+      if (keyboardFocusManager)
+      {
+        keyboardFocusManager.ClearFocus();
+      }
       ClearKeyInputFocus();
     }
 
