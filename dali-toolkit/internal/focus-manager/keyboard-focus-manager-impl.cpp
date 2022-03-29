@@ -251,11 +251,6 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
       actor.Add(GetFocusIndicatorActor());
     }
 
-    // Send notification for the change of focus actor
-    if(!mFocusChangedSignal.Empty())
-    {
-      mFocusChangedSignal.Emit(currentFocusedActor, actor);
-    }
 
     Toolkit::Control currentlyFocusedControl = Toolkit::Control::DownCast(currentFocusedActor);
     if(currentlyFocusedControl)
@@ -264,8 +259,6 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
       currentlyFocusedControl.SetProperty(DevelControl::Property::STATE, DevelControl::NORMAL);
       currentlyFocusedControl.ClearKeyInputFocus();
     }
-
-    DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
 
     // Save the current focused actor
     mCurrentFocusActor = actor;
@@ -303,6 +296,11 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
       mFocusHistory.erase(beginPos);
     }
 
+    // Send notification for the change of focus actor
+    if(!mFocusChangedSignal.Empty())
+    {
+      mFocusChangedSignal.Emit(currentFocusedActor, actor);
+    }
     DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] SUCCEED\n", __FUNCTION__, __LINE__);
     success = true;
   }
