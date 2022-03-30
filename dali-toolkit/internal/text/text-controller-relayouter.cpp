@@ -447,7 +447,19 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
   if(!isEditable || !controller.IsMultiLineEnabled())
   {
     // After doing the text layout, the vertical offset to place the actor in the desired position can be calculated.
-    CalculateVerticalOffset(controller, size);
+    CalculateVerticalOffset(impl, size);
+  }
+  else // TextEditor
+  {
+    // If layoutSize is bigger than size, vertical align has no meaning.
+    if(layoutSize.y < size.y)
+    {
+      CalculateVerticalOffset(impl, size);
+      if(impl.mEventData)
+      {
+        impl.mEventData->mScrollAfterDelete = false;
+      }
+    }
   }
 
   if(isEditable)
@@ -769,9 +781,8 @@ void Controller::Relayouter::DoRelayoutHorizontalAlignment(Controller::Impl&    
   }
 }
 
-void Controller::Relayouter::CalculateVerticalOffset(Controller& controller, const Size& controlSize)
+void Controller::Relayouter::CalculateVerticalOffset(Controller::Impl& impl, const Size& controlSize)
 {
-  Controller::Impl& impl                  = *controller.mImpl;
   ModelPtr&         model                 = impl.mModel;
   VisualModelPtr&   visualModel           = model->mVisualModel;
   Size              layoutSize            = model->mVisualModel->GetLayoutSize();

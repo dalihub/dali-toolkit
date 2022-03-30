@@ -126,6 +126,16 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       }
       break;
     }
+    case Toolkit::DevelTextEditor::Property::VERTICAL_ALIGNMENT:
+    {
+      Toolkit::Text::VerticalAlignment::Type alignment(static_cast<Text::VerticalAlignment::Type>(-1)); // Set to invalid value to ensure a valid mode does get set
+      if(Text::GetVerticalAlignmentEnumeration(value, alignment))
+      {
+        impl.mController->SetVerticalAlignment(alignment);
+        DALI_LOG_INFO(gTextEditorLogFilter, Debug::General, "TextEditor %p VERTICAL_ALIGNMENT %d\n", impl.mController.Get(), alignment);
+      }
+      break;
+    }
     case Toolkit::TextEditor::Property::SCROLL_THRESHOLD:
     {
       const float threshold = value.Get<float>();
@@ -780,6 +790,16 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     case Toolkit::TextEditor::Property::HORIZONTAL_ALIGNMENT:
     {
       const char* name = Text::GetHorizontalAlignmentString(impl.mController->GetHorizontalAlignment());
+      if(name)
+      {
+        value = std::string(name);
+      }
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::VERTICAL_ALIGNMENT:
+    {
+      const char* name = Text::GetVerticalAlignmentString(impl.mController->GetVerticalAlignment());
+
       if(name)
       {
         value = std::string(name);
