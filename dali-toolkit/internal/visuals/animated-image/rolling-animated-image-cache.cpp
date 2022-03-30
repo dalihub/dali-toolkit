@@ -191,10 +191,11 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
   mQueue.PushBack(imageFrame);
 
   bool       loadingStatus = false;
+  TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
   TextureSet textureSet    = mTextureManager.LoadAnimatedImageTexture(mAnimatedImageLoading,
                                                                    frameIndex,
                                                                    loadingStatus,
-                                                                   mImageUrls[frameIndex].mTextureId,
+                                                                   loadTextureId,
                                                                    mMaskingData,
                                                                    mDesiredSize,
                                                                    mSamplingMode,
@@ -203,6 +204,7 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                    synchronousLoading,
                                                                    useCache,
                                                                    this);
+  mImageUrls[frameIndex].mTextureId = loadTextureId;
 
   // If textureSet is returned but loadingState is false than load state is LOAD_FINISHED. (Notification is not comming yet.)
   // If textureSet is null and the request is synchronous, load state is LOAD_FAILED.
@@ -346,7 +348,7 @@ void RollingAnimatedImageCache::AnimatedImageUploadComplete(bool loadSuccess, in
   // If it is, notify frame ready to observer.
   if(frontFrameReady == false && IsFrontReady())
   {
-    mObserver.FrameReady(GetFrontTextureSet(), interval);
+    mObserver.FrameReady(mTextureManager.GetTextureSet(textureId), interval);
   }
 
   // The frames of a single animated image can not be loaded parallelly.
