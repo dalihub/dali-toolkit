@@ -20,6 +20,8 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
@@ -3630,6 +3632,9 @@ int UtcDaliTextEditorEnableEditing(void)
   application.SendNotification();
   application.Render();
 
+  textEditor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
+  DALI_TEST_EQUALS(textEditor.GetProperty(DevelActor::Property::USER_INTERACTION_ENABLED).Get<bool>(), true, TEST_LOCATION);
+
   textEditor.SetKeyInputFocus();
   textEditor.SetProperty(DevelTextEditor::Property::ENABLE_EDITING, false);
   application.ProcessEvent(GenerateKey("D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -3651,6 +3656,24 @@ int UtcDaliTextEditorEnableEditing(void)
 
   DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "D", TEST_LOCATION);
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::ENABLE_EDITING).Get<bool>(), true, TEST_LOCATION);
+
+  // Check the user interaction enabled and for coverage
+  DevelTextEditor::SelectWholeText(textEditor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetKeyInputFocus();
+  textEditor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, false);
+  application.ProcessEvent(GenerateKey("D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "D", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(DevelActor::Property::USER_INTERACTION_ENABLED).Get<bool>(), false, TEST_LOCATION);
 
   END_TEST;
 }

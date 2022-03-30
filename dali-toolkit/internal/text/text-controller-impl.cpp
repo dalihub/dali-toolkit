@@ -909,7 +909,8 @@ void Controller::Impl::SetEditable(bool editable)
 
     if(mEventData->mDecorator)
     {
-      mEventData->mDecorator->SetEditable(editable);
+      bool decoratorEditable = editable && mIsUserInteractionEnabled;
+      mEventData->mDecorator->SetEditable(decoratorEditable);
     }
   }
 }
@@ -1871,6 +1872,17 @@ void Controller::Impl::SetDefaultColor(const Vector4& color)
     mModel->mLogicalModel->mColorRuns.Clear();
     mOperationsPending = static_cast<OperationsMask>(mOperationsPending | COLOR);
     RequestRelayout();
+  }
+}
+
+void Controller::Impl::SetUserInteractionEnabled(bool enabled)
+{
+  mIsUserInteractionEnabled = enabled;
+
+  if(mEventData && mEventData->mDecorator)
+  {
+    bool editable = mEventData->mEditingEnabled && enabled;
+    mEventData->mDecorator->SetEditable(editable);
   }
 }
 

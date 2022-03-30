@@ -41,6 +41,7 @@ const float DEFAULT_TEXTFIT_MIN     = 10.f;
 const float DEFAULT_TEXTFIT_MAX     = 100.f;
 const float DEFAULT_TEXTFIT_STEP    = 1.f;
 const float DEFAULT_FONT_SIZE_SCALE = 1.f;
+const float DEFAULT_DISABLED_COLOR_OPACITY = 0.3f;
 
 //Forward declarations
 struct CursorInfo;
@@ -358,10 +359,12 @@ struct Controller::Impl
     mTextFitMaxSize(DEFAULT_TEXTFIT_MAX),
     mTextFitStepSize(DEFAULT_TEXTFIT_STEP),
     mFontSizeScale(DEFAULT_FONT_SIZE_SCALE),
+    mDisabledColorOpacity(DEFAULT_DISABLED_COLOR_OPACITY),
     mFontSizeScaleEnabled(true),
     mTextFitEnabled(false),
     mTextFitChanged(false),
-    mIsLayoutDirectionChanged(false)
+    mIsLayoutDirectionChanged(false),
+    mIsUserInteractionEnabled(true)
   {
     mModel = Model::New();
 
@@ -874,6 +877,11 @@ struct Controller::Impl
   void SetDefaultColor(const Vector4& color);
 
   /**
+   * @copydoc Controller::SetUserInteractionEnabled()
+   */
+  void SetUserInteractionEnabled(bool enabled);
+
+  /**
    * @brief Helper to clear font-specific data (only).
    */
   void ClearFontData();
@@ -1014,10 +1022,12 @@ public:
   float mTextFitMaxSize;               ///< Maximum Font Size for text fit. Default 100
   float mTextFitStepSize;              ///< Step Size for font intervalse. Default 1
   float mFontSizeScale;                ///< Scale value for Font Size. Default 1.0
+  float mDisabledColorOpacity;         ///< Color opacity when disabled.
   bool  mFontSizeScaleEnabled : 1;     ///< Whether the font size scale is enabled.
   bool  mTextFitEnabled : 1;           ///< Whether the text's fit is enabled.
   bool  mTextFitChanged : 1;           ///< Whether the text fit property has changed.
   bool  mIsLayoutDirectionChanged : 1; ///< Whether the layout has changed.
+  bool  mIsUserInteractionEnabled : 1; ///< Whether the user interaction is enabled.
 
 private:
   friend ControllerImplEventHandler;

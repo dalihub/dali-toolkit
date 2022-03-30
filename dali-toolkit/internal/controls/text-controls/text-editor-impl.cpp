@@ -673,6 +673,31 @@ void TextEditor::ResizeActor(Actor& actor, const Vector2& size)
   }
 }
 
+void TextEditor::OnPropertySet(Property::Index index, const Property::Value& propertyValue)
+{
+  DALI_LOG_INFO(gTextEditorLogFilter, Debug::Verbose, "TextEditor::OnPropertySet index[%d]\n", index);
+
+  switch(index)
+  {
+    case DevelActor::Property::USER_INTERACTION_ENABLED:
+    {
+      const bool enabled = propertyValue.Get<bool>();
+      mController->SetUserInteractionEnabled(enabled);
+      if(mStencil)
+      {
+        float opacity = enabled ? 1.0f : mController->GetDisabledColorOpacity();
+        mStencil.SetProperty(Actor::Property::OPACITY, opacity);
+      }
+      break;
+    }
+    default:
+    {
+      Control::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
+      break;
+    }
+  }
+}
+
 void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   DALI_LOG_INFO(gTextEditorLogFilter, Debug::Verbose, "TextEditor OnRelayout\n");
@@ -811,7 +836,10 @@ void TextEditor::OnKeyInputFocusGained()
     notifier.ContentSelectedSignal().Connect(this, &TextEditor::OnClipboardTextSelected);
   }
 
-  mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
+  if(IsEditable() && mController->IsUserInteractionEnabled())
+  {
+    mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
+  }
 
   EmitKeyInputFocusSignal(true); // Calls back into the Control hence done last.
 }
