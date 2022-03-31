@@ -40,14 +40,14 @@ namespace Internal
 {
 Dali::Toolkit::GlView GlView::New(Dali::Toolkit::GlView::ColorFormat colorFormat)
 {
-  GlView*               impl   = new GlView(colorFormat);
+  auto* impl   = new Dali::Toolkit::Internal::GlView(colorFormat);
   Dali::Toolkit::GlView handle = Dali::Toolkit::GlView(*impl);
   impl->Initialize();
   return handle;
 }
 
 GlView::GlView(Dali::Toolkit::GlView::ColorFormat colorFormat)
-: Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: Dali::Toolkit::Internal::GlViewImpl( Toolkit::GlView::BackendMode::EGL_IMAGE_OFFSCREEN_RENDERING ),
   mRenderThread(nullptr),
   mNativeImageQueue(nullptr),
   mRenderingMode(Toolkit::GlView::RenderingMode::CONTINUOUS),

@@ -26,7 +26,7 @@ namespace Toolkit
 {
 namespace Internal DALI_INTERNAL
 {
-class GlView;
+class GlViewImpl;
 }
 
 /**
@@ -36,10 +36,42 @@ class GlView;
  * GlView creates a GL context, a GL surface and a render thread.
  * The render thread invokes user's callbacks.
  *
+ * @SINCE_2_0.45
  */
 class DALI_TOOLKIT_API GlView : public Dali::Toolkit::Control
 {
 public:
+
+  /**
+   * @brief Implementation backend mode
+   *
+   * @SINCE_2_1.18
+   */
+  enum class BackendMode
+  {
+    /**
+     * DIRECT_RENDERING mode executes GL code within DALi graphics
+     * pipeline. When Renderer is about to be drawn, the callback
+     * will be executed and the custom code "injected" into the pipeline.
+     * This allows rendering directly to the surface rather than offscreen.
+     */
+    DIRECT_RENDERING = 0,
+
+    /**
+     * EGL_IMAGE_OFFSCREEN_RENDERING mode executes GL code in own thread
+     * and renders to the offscreen NativeImage (EGL) buffer. This backend
+     * will render in parallel but has higher memory footprint and may suffer
+     * performance issues due to using EGL image.
+     */
+    EGL_IMAGE_OFFSCREEN_RENDERING,
+
+    /**
+     * The default mode is set to EGL_IMAGE_OFFSCREEN_RENDERING for backwards
+     * compatibility.
+     */
+    DEFAULT = EGL_IMAGE_OFFSCREEN_RENDERING
+  };
+
   /**
    * @brief Enumeration for rendering mode
    *
@@ -47,6 +79,8 @@ public:
    * It has two options.
    * One of them is continuous mode. It is rendered continuously.
    * The other is on demand mode. It is rendered by application.
+   *
+   * @SINCE_2_0.45
    */
   enum class RenderingMode
   {
@@ -58,6 +92,8 @@ public:
    * @brief Enumeration for Graphics API version
    *
    * This Enumeration is used to set a GLES version for EGL configuration.
+   *
+   * @SINCE_2_0.45
    */
   enum class GraphicsApiVersion
   {
@@ -69,6 +105,8 @@ public:
    * @brief Enumeration for color buffer format
    *
    * This Enumeration is used to set a color buffer format of GlView
+   *
+   * @SINCE_2_0.45
    */
   enum class ColorFormat
   {
@@ -78,13 +116,34 @@ public:
 
   /**
    * @brief Creates a GlView control.
+   *
+   * @note This function always creates the GlView with NativeImage backend.
+   *
    * @param[in] colorFormat the format of the color buffer.
    * @return A handle to a GlView control
+   *
+   * @SINCE_2_0.45
    */
   static GlView New(ColorFormat colorFormat);
 
   /**
+   * @brief Creates a GlView control.
+   *
+   * The new GlView will be created with specified backend.
+   * The colorFormat is ignored for DIRECT_RENDERING backend.
+   *
+   * @param[in] colorFormat the format of the color buffer.
+   * @param[in] backendMode the backend used by the GlView
+   * @return A handle to a GlView control
+   *
+   * @SINCE_2_1.18
+   */
+  static GlView New(BackendMode backendMode, ColorFormat colorFormat);
+
+  /**
    * @brief Creates an uninitialized GlView.
+   *
+   * @SINCE_2_0.45
    */
   GlView();
 
@@ -92,6 +151,8 @@ public:
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   *
+   * @SINCE_2_0.45
    */
   ~GlView();
 
@@ -99,6 +160,8 @@ public:
    * @brief Copy constructor.
    *
    * @param[in] GlView GlView to copy. The copied GlView will point at the same implementation
+   *
+   * @SINCE_2_0.45
    */
   GlView(const GlView& GlView);
 
@@ -106,6 +169,8 @@ public:
    * @brief Move constructor
    *
    * @param[in] rhs A reference to the moved handle
+   *
+   * @SINCE_2_0.45
    */
   GlView(GlView&& rhs);
 
@@ -114,6 +179,8 @@ public:
    *
    * @param[in] GlView The GlView to assign from
    * @return A reference to this
+   *
+   * @SINCE_2_0.45
    */
   GlView& operator=(const GlView& GlView);
 
@@ -122,6 +189,8 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
+   *
+   * @SINCE_2_0.45
    */
   GlView& operator=(GlView&& rhs);
 
@@ -133,6 +202,8 @@ public:
    *
    * @param[in] handle Handle to an object
    * @return Handle to a GlView or an uninitialized handle
+   *
+   * @SINCE_2_0.45
    */
   static GlView DownCast(BaseHandle handle);
 
@@ -164,6 +235,8 @@ public:
    * @note Ownership of the callbacks is passed onto this class.
    * <b>You can't call Dali APIs in your callbacks because it is invoked in GlView's own render thread.</b>
    * And this must be called before adding GlView to the scene.
+   *
+   * @SINCE_2_0.45
    */
   void RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback);
 
@@ -182,6 +255,8 @@ public:
    * @note Ownership of the callback is passed onto this class.
    * <b>You can't call Dali APIs in your callback because it is invoked in GlView's own render thread.</b>
    * And this must be called before adding GlView to the scene.
+   *
+   * @SINCE_2_0.45
    */
   void SetResizeCallback(CallbackBase* resizeCallback);
 
@@ -192,13 +267,24 @@ public:
    *
    * @note The default Rendering mode is CONTINUOUS.
    * If ON_DEMAND mode is set, it is rendered by RenderOnce()
+   *
+   * @SINCE_2_0.45
    */
   void SetRenderingMode(RenderingMode mode);
 
   /**
    * @brief Gets the rendering mode.
+   *
+   * @SINCE_2_0.45
    */
-  RenderingMode GetRenderingMode() const;
+  [[nodiscard]] RenderingMode GetRenderingMode() const;
+
+  /**
+   * @brief Gets the backend mode.
+   *
+   * @SINCE_2_1.18
+   */
+  [[nodiscard]] BackendMode GetBackendMode() const;
 
   /**
    * @brief Sets egl configuration for GlView
@@ -208,12 +294,16 @@ public:
    * @param[in] msaa the expected sampling number per pixel.
    * @param[in] version the graphics API version
    * @return True if the config exists, false otherwise.
+   *
+   * @SINCE_2_0.45
    */
   bool SetGraphicsConfig(bool depth, bool stencil, int msaa, GraphicsApiVersion version);
 
   /**
    * @brief Renders once more even if GL render functions are not added to idler.
    * @note Will not work if the window is hidden or GL render functions are added to idler
+   *
+   * @SINCE_2_0.45
    */
   void RenderOnce();
 
@@ -222,12 +312,16 @@ public: // Not intended for application developers
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @param[in] implementation The GlView implementation
+   *
+   * @SINCE_2_0.45
    */
-  DALI_INTERNAL GlView(Internal::GlView& implementation);
+  DALI_INTERNAL GlView(Internal::GlViewImpl& implementation);
 
   /**
    * @brief Allows the creation of this GlView from an Internal::CustomActor pointer.
    * @param[in] internal A pointer to the internal CustomActor
+   *
+   * @SINCE_2_0.45
    */
   DALI_INTERNAL GlView(Dali::Internal::CustomActor* internal);
   /// @endcond

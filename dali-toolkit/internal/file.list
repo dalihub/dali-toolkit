@@ -117,6 +117,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/video-view/video-view-impl.cpp
    ${toolkit_src_dir}/controls/web-view/web-view-impl.cpp
    ${toolkit_src_dir}/controls/camera-view/camera-view-impl.cpp
+   ${toolkit_src_dir}/controls/gl-view/drawable-view-impl.cpp
    ${toolkit_src_dir}/controls/gl-view/gl-view-impl.cpp
    ${toolkit_src_dir}/controls/gl-view/gl-view-render-thread.cpp
    ${toolkit_src_dir}/accessibility-manager/accessibility-manager-impl.cpp
