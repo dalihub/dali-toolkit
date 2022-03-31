@@ -5857,6 +5857,50 @@ int UtcDaliTextEditorTextSizeNegativeLineSpacing(void)
   END_TEST;
 }
 
+int UtcDaliTextEditorLineSpacingKeyArrowDown(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextEditorLineSpacingKeyArrowDown");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  application.GetScene().Add(editor);
+
+  std::string cutText    = "";
+  std::string copiedText = "";
+
+  editor.SetProperty(TextEditor::Property::TEXT, "l1\nl2\nl3\n4");
+  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
+  editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 200.f));
+  editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+  editor.SetProperty(TextEditor::Property::LINE_SPACING, -15);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  TestGenerateTap(application, 1.0f, 1.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move to second line of the text.
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(editor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 3, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliTextEditorNegativeLineSpacingWithEllipsis(void)
 {
   ToolkitTestApplication application;
