@@ -451,6 +451,32 @@ void NPatchVisual::ApplyTextureAndUniforms()
   {
     textureSet = data->GetTextures();
     NPatchHelper::ApplyTextureAndUniforms(mImpl->mRenderer, data);
+
+    if(mAuxiliaryPixelBuffer)
+    {
+      // If the auxiliary image is smaller than the un-stretched NPatch, use CPU resizing to enlarge it to the
+      // same size as the unstretched NPatch. This will give slightly higher quality results than just relying
+      // on GL interpolation alone.
+      if(mAuxiliaryPixelBuffer.GetWidth() < data->GetCroppedWidth() &&
+         mAuxiliaryPixelBuffer.GetHeight() < data->GetCroppedHeight())
+      {
+        mAuxiliaryPixelBuffer.Resize(data->GetCroppedWidth(), data->GetCroppedHeight());
+      }
+
+      // Note, this resets mAuxiliaryPixelBuffer handle
+      auto auxiliaryPixelData = Devel::PixelBuffer::Convert(mAuxiliaryPixelBuffer);
+
+      auto texture = Texture::New(TextureType::TEXTURE_2D,
+                                  auxiliaryPixelData.GetPixelFormat(),
+                                  auxiliaryPixelData.GetWidth(),
+                                  auxiliaryPixelData.GetHeight());
+      texture.Upload(auxiliaryPixelData);
+      textureSet.SetTexture(1, texture);
+      mImpl->mRenderer.RegisterProperty(DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA,
+                                        AUXILIARY_IMAGE_ALPHA_NAME,
+                                        mAuxiliaryImageAlpha);
+    }
+    mImpl->mRenderer.SetTextures(textureSet);
   }
   else
   {
@@ -463,34 +489,8 @@ void NPatchVisual::ApplyTextureAndUniforms()
     {
       imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
     }
-    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize, false);
   }
-
-  if(mAuxiliaryPixelBuffer)
-  {
-    // If the auxiliary image is smaller than the un-stretched NPatch, use CPU resizing to enlarge it to the
-    // same size as the unstretched NPatch. This will give slightly higher quality results than just relying
-    // on GL interpolation alone.
-    if(mAuxiliaryPixelBuffer.GetWidth() < data->GetCroppedWidth() &&
-       mAuxiliaryPixelBuffer.GetHeight() < data->GetCroppedHeight())
-    {
-      mAuxiliaryPixelBuffer.Resize(data->GetCroppedWidth(), data->GetCroppedHeight());
-    }
-
-    // Note, this resets mAuxiliaryPixelBuffer handle
-    auto auxiliaryPixelData = Devel::PixelBuffer::Convert(mAuxiliaryPixelBuffer);
-
-    auto texture = Texture::New(TextureType::TEXTURE_2D,
-                                auxiliaryPixelData.GetPixelFormat(),
-                                auxiliaryPixelData.GetWidth(),
-                                auxiliaryPixelData.GetHeight());
-    texture.Upload(auxiliaryPixelData);
-    textureSet.SetTexture(1, texture);
-    mImpl->mRenderer.RegisterProperty(DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA,
-                                      AUXILIARY_IMAGE_ALPHA_NAME,
-                                      mAuxiliaryImageAlpha);
-  }
-  mImpl->mRenderer.SetTextures(textureSet);
 
   // Register transform properties
   mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,13 @@
 #include <dali/devel-api/common/hash.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/utility/npatch-helper.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
-#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
-#include <dali-toolkit/devel-api/utility/npatch-helper.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -36,6 +37,10 @@ namespace Toolkit
 {
 namespace Internal
 {
+namespace
+{
+const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
+}
 
 VisualFactoryCache::VisualFactoryCache(bool preMultiplyOnLoad)
 : mSvgRasterizeThread(NULL),
@@ -221,10 +226,10 @@ Texture VisualFactoryCache::GetBrokenVisualImage(uint32_t brokenIndex)
     Devel::PixelBuffer pixelBuffer = LoadImageFromFile(mBrokenImageInfoContainer[brokenIndex].url);
     if(pixelBuffer)
     {
-      pixelData                = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
-      mBrokenImageInfoContainer[brokenIndex].texture  = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
+      pixelData                                      = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
+      mBrokenImageInfoContainer[brokenIndex].texture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
       mBrokenImageInfoContainer[brokenIndex].texture.Upload(pixelData);
-      mBrokenImageInfoContainer[brokenIndex].width = pixelData.GetWidth();
+      mBrokenImageInfoContainer[brokenIndex].width  = pixelData.GetWidth();
       mBrokenImageInfoContainer[brokenIndex].height = pixelData.GetHeight();
     }
   }
@@ -270,7 +275,7 @@ Geometry VisualFactoryCache::GetNPatchGeometry(int index)
       geometry = GetGeometry(VisualFactoryCache::NINE_PATCH_GEOMETRY);
       if(!geometry)
       {
-        geometry = NPatchHelper::CreateGridGeometry(Uint16Pair(3,3));
+        geometry = NPatchHelper::CreateGridGeometry(Uint16Pair(3, 3));
         SaveGeometry(VisualFactoryCache::NINE_PATCH_GEOMETRY, geometry);
       }
     }
@@ -286,7 +291,7 @@ Geometry VisualFactoryCache::GetNPatchGeometry(int index)
     geometry = GetGeometry(VisualFactoryCache::NINE_PATCH_GEOMETRY);
     if(!geometry)
     {
-      geometry = NPatchHelper::CreateGridGeometry(Uint16Pair(3,3));
+      geometry = NPatchHelper::CreateGridGeometry(Uint16Pair(3, 3));
       SaveGeometry(VisualFactoryCache::NINE_PATCH_GEOMETRY, geometry);
     }
   }
@@ -337,16 +342,15 @@ void VisualFactoryCache::ApplyTextureAndUniforms(Renderer& renderer, int index)
   TextureSet        textureSet;
   if(mNPatchLoader.GetNPatchData(mBrokenImageInfoContainer[index].npatchId, data) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
   {
-    textureSet = data->GetTextures();
+    textureSet                               = data->GetTextures();
     mBrokenImageInfoContainer[index].texture = textureSet.GetTexture(0);
     NPatchHelper::ApplyTextureAndUniforms(renderer, data);
     renderer.SetTextures(textureSet);
   }
 }
 
-void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size)
+void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size, const bool& rendererIsImage)
 {
-
   bool useDefaultBrokenImage = false;
   if(mBrokenImageInfoContainer.size() == 0)
   {
@@ -354,7 +358,7 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
   }
 
   // Load Information for broken image
-  for(uint32_t index = 0; (index  < mBrokenImageInfoContainer.size()) && !useDefaultBrokenImage; index++)
+  for(uint32_t index = 0; (index < mBrokenImageInfoContainer.size()) && !useDefaultBrokenImage; index++)
   {
     if(mBrokenImageInfoContainer[index].width == 0 && mBrokenImageInfoContainer[index].height == 0)
     {
@@ -365,16 +369,16 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
         if(mBrokenImageInfoContainer[index].visualType == VisualUrl::Type::N_PATCH)
         {
           const NPatchData* data;
-          Rect<int> border;
-          mBrokenImageInfoContainer[index].npatchId = mNPatchLoader.Load( mTextureManager, NULL, mBrokenImageInfoContainer[index].url, border, mPreMultiplyOnLoad, true);
+          Rect<int>         border;
+          mBrokenImageInfoContainer[index].npatchId = mNPatchLoader.Load(mTextureManager, NULL, mBrokenImageInfoContainer[index].url, border, mPreMultiplyOnLoad, true);
           if(mNPatchLoader.GetNPatchData(mBrokenImageInfoContainer[index].npatchId, data) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
           {
-            mBrokenImageInfoContainer[index].width = data->GetCroppedWidth();
+            mBrokenImageInfoContainer[index].width  = data->GetCroppedWidth();
             mBrokenImageInfoContainer[index].height = data->GetCroppedHeight();
           }
           else
           {
-            DALI_LOG_ERROR("Can't update renderer for broken image. maybe image loading is failed [index:%d] [path:%s] \n",index, mBrokenImageInfoContainer[index].url.c_str());
+            DALI_LOG_ERROR("Can't update renderer for broken image. maybe image loading is failed [index:%d] [path:%s] \n", index, mBrokenImageInfoContainer[index].url.c_str());
             useDefaultBrokenImage = true;
           }
         }
@@ -382,7 +386,7 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
         {
           if(!GetBrokenVisualImage(index))
           {
-            DALI_LOG_ERROR("Can't update renderer for broken image. maybe image loading is failed [index:%d] [path:%s] \n",index, mBrokenImageInfoContainer[index].url.c_str());
+            DALI_LOG_ERROR("Can't update renderer for broken image. maybe image loading is failed [index:%d] [path:%s] \n", index, mBrokenImageInfoContainer[index].url.c_str());
             useDefaultBrokenImage = true;
           }
         }
@@ -401,24 +405,42 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
     mBrokenImageInfoContainer[defaultBrokenIndex].url = mDefaultBrokenImageUrl;
     VisualUrl visualUrl(mBrokenImageInfoContainer[defaultBrokenIndex].url);
     mBrokenImageInfoContainer[defaultBrokenIndex].visualType = visualUrl.GetType();
-    mUseDefaultBrokenImageOnly = true;
+    mUseDefaultBrokenImageOnly                               = true;
   }
 
   // Set Texutre to renderer
   int brokenIndex = GetProperBrokenImageIndex(size);
   if(GetBrokenImageVisualType(brokenIndex) == VisualUrl::N_PATCH)
   {
+    DALI_LOG_ERROR("Broken npatch?");
     // Set geometry and shader for npatch
     Geometry geometry = GetNPatchGeometry(brokenIndex);
-    Shader shader = GetNPatchShader(brokenIndex);
+    Shader   shader   = GetNPatchShader(brokenIndex);
     renderer.SetGeometry(geometry);
     renderer.SetShader(shader);
     ApplyTextureAndUniforms(renderer, brokenIndex);
   }
   else
   {
-    Texture brokenImage = GetBrokenVisualImage(brokenIndex);
-    TextureSet textureSet = TextureSet::New();
+    DALI_LOG_ERROR("Broken single image");
+    // Create single image renderer only if rederer is not use normal ImageShader. i.e. npatch visual.
+    if(!rendererIsImage)
+    {
+      Geometry geometry = GetGeometry(QUAD_GEOMETRY);
+      Shader   shader   = GetShader(IMAGE_SHADER);
+      if(!shader)
+      {
+        std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data());
+        std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_FRAG.data());
+        shader                     = Shader::New(vertexShader, fragmentShader);
+        shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+        SaveShader(IMAGE_SHADER, shader);
+      }
+      renderer.SetGeometry(geometry);
+      renderer.SetShader(shader);
+    }
+    Texture    brokenImage = GetBrokenVisualImage(brokenIndex);
+    TextureSet textureSet  = TextureSet::New();
     textureSet.SetTexture(0u, brokenImage);
     renderer.SetTextures(textureSet);
   }
@@ -428,7 +450,7 @@ int32_t VisualFactoryCache::GetProperBrokenImageIndex(const Vector2& size)
 {
   // Sets the default broken type
   int32_t returnIndex = 0;
-  if((size.width == 0 || size.height == 0) || mUseDefaultBrokenImageOnly )
+  if((size.width == 0 || size.height == 0) || mUseDefaultBrokenImageOnly)
   {
     // To do : Need to add observer about size
     return returnIndex;

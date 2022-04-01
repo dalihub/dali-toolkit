@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
+#include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 #include <dummy-visual.h>
 #include <../dali-toolkit/dali-toolkit-test-utils/dummy-control.h>
 #include <dali-toolkit/devel-api/visuals/arc-visual-properties-devel.h>
@@ -250,6 +251,49 @@ int UtcDaliArcVisualCreateInstancePropertyMap(void)
 
   // check the property values from the returned map from a visual
   DALI_TEST_CHECK( resultMap.Empty() );   // Now the map is empty
+
+  END_TEST;
+}
+int UtcDaliVisualUpdateBrokenImageRenderer(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UpdateBrokenImageRenderer Test" );
+
+  Toolkit::Internal::VisualFactoryCache* factoryCache = new Toolkit::Internal::VisualFactoryCache(false);
+
+  std::string defaultBrokenImageUrl = "not-9patch.png";
+
+  // Set default broken image
+  factoryCache->SetBrokenImageUrl(defaultBrokenImageUrl, std::vector<std::string>());
+
+  //Created dummy renderer
+  Geometry geometry = factoryCache->GetGeometry(Toolkit::Internal::VisualFactoryCache::QUAD_GEOMETRY);
+  Shader   shader   = Shader::New("foo","bar");
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  DALI_TEST_CHECK(renderer);
+
+  // renderer doesn't changed.
+  factoryCache->UpdateBrokenImageRenderer(renderer, Vector2::ZERO, true);
+  Shader testShader1 = renderer.GetShader();
+
+  // Get default image renderer.
+  factoryCache->UpdateBrokenImageRenderer(renderer, Vector2::ZERO, false);
+  Shader testShader2 = renderer.GetShader();
+
+  // Get default image renderer but nine patch.
+  // Note : This API behavior can be changed. (DALi don't consider about default BrokenImageUrl is failed.
+  defaultBrokenImageUrl = "yes-9patch.9.png";
+  factoryCache->SetBrokenImageUrl(defaultBrokenImageUrl, std::vector<std::string>());
+  factoryCache->UpdateBrokenImageRenderer(renderer, Vector2::ZERO, false);
+  Shader testShader3 = renderer.GetShader();
+
+  DALI_TEST_CHECK(testShader1 != factoryCache->GetShader(Toolkit::Internal::VisualFactoryCache::IMAGE_SHADER));
+  DALI_TEST_CHECK(testShader1 != factoryCache->GetShader(Toolkit::Internal::VisualFactoryCache::NINE_PATCH_SHADER));
+  DALI_TEST_CHECK(testShader2 == factoryCache->GetShader(Toolkit::Internal::VisualFactoryCache::IMAGE_SHADER));
+  DALI_TEST_CHECK(testShader3 == factoryCache->GetShader(Toolkit::Internal::VisualFactoryCache::NINE_PATCH_SHADER));
+
+  delete factoryCache;
 
   END_TEST;
 }
