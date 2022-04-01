@@ -220,7 +220,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
     }
   }
 
-  if(actor && actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  if(actor && actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED) && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
     Integration::SceneHolder currentWindow = Integration::SceneHolder::Get(actor);
 
@@ -244,7 +244,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
   }
 
   // Check whether the actor is in the stage and is keyboard focusable.
-  if(actor && actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  if(actor && actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED) && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
     if((mIsFocusIndicatorShown == SHOW) && (mEnableFocusIndicator == ENABLE))
     {
@@ -552,7 +552,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
       }
     }
 
-    if(nextFocusableActor && nextFocusableActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+    if(nextFocusableActor && nextFocusableActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && nextFocusableActor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED))
     {
       // Whether the next focusable actor is a layout control
       if(IsLayoutControl(nextFocusableActor))
@@ -578,7 +578,7 @@ bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control contr
   Actor nextFocusableActor = GetImplementation(control).GetNextKeyboardFocusableActor(actor, direction, mFocusGroupLoopEnabled);
   if(nextFocusableActor)
   {
-    if(!nextFocusableActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+    if(!(nextFocusableActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) || nextFocusableActor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED)))
     {
       // If the actor is not focusable, ask the same layout control for the next actor to focus
       return DoMoveFocusWithinLayoutControl(control, nextFocusableActor, direction);
@@ -597,7 +597,7 @@ bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control contr
         mIsWaitingKeyboardFocusChangeCommit = false;
       }
 
-      if(committedFocusActor && committedFocusActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+      if(committedFocusActor && committedFocusActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && committedFocusActor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED))
       {
         // Whether the commited focusable actor is a layout control
         if(IsLayoutControl(committedFocusActor))

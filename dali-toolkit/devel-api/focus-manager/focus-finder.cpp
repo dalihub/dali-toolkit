@@ -343,6 +343,7 @@ bool IsBetterCandidate(Toolkit::Control::KeyboardFocus::Direction direction, Rec
 bool IsFocusable(Actor& actor)
 {
   return (actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) &&
+          actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED) &&
           actor.GetProperty<bool>(Actor::Property::VISIBLE) &&
           actor.GetProperty<Vector4>(Actor::Property::WORLD_COLOR).a > FULLY_TRANSPARENT);
 }

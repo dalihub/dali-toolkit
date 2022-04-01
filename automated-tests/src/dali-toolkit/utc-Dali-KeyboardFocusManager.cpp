@@ -2210,3 +2210,46 @@ int UtcDaliKeyboardFocusManagerChangeFocusDirectionByCustomWheelEvent(void)
 
   END_TEST;
 }
+
+int UtcDaliKeyboardFocusManagerWithUserInteractionEnabled(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerWithUserInteractionEnabled");
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  // Create the first actor and add it to the stage
+  Actor first = Actor::New();
+  first.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(first);
+
+  // Create the second actor and add it to the first actor.
+  Actor second = Actor::New();
+  second.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  first.Add(second);
+
+  // Check that no actor is being focused yet.
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
+  // Check that the focus is set on the first actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+
+  // Set USER_INTERACTION_ENABLED false.
+  second.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, false);
+
+  // Check that it will fail to set focus on the second actor as it's not userInteractionEnabled
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(second) == false);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+
+  // Set KeyboardFocusableChildren true.
+  second.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
+
+  // Check that the focus is set on the second actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(second) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+
+  END_TEST;
+}
