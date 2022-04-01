@@ -1410,8 +1410,12 @@ void TextureManager::NotifyObservers(TextureInfo& textureInfo, bool success)
 
   if(info->animatedImageLoading)
   {
-    info->frameCount    = info->animatedImageLoading.GetImageCount();
-    info->frameInterval = info->animatedImageLoading.GetFrameInterval(info->frameIndex);
+    // If loading failed, we don't need to get frameCount and frameInterval.
+    if(success)
+    {
+      info->frameCount    = info->animatedImageLoading.GetImageCount();
+      info->frameInterval = info->animatedImageLoading.GetFrameInterval(info->frameIndex);
+    }
     info->animatedImageLoading.Reset();
   }
 
