@@ -2632,6 +2632,58 @@ int UtcDaliToolkitTextLabelStrikethroughGeneration(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextLabelMarkupRelativeLineHeight(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelMarkupRelativeLineHeight");
+
+  TextLabel label = TextLabel::New();
+  label.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 10);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(TextLabel::Property::TEXT, "line 1\nline 2\nline 3\nline 4\nline 5");
+  label.SetProperty(DevelTextLabel::Property::RELATIVE_LINE_SIZE, 1.0f);
+  label.SetProperty(TextLabel::Property::ELLIPSIS, false);
+  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+
+  TextLabel labelSingleLineParagraph = TextLabel::New();
+  labelSingleLineParagraph.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  labelSingleLineParagraph.SetProperty(TextLabel::Property::POINT_SIZE, 10);
+  labelSingleLineParagraph.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  labelSingleLineParagraph.SetProperty(TextLabel::Property::TEXT, "<p>line 1</p><p rel-line-height=0.5>line 2</p>line 3<p rel-line-height=3>line 4</p>line 5");
+  labelSingleLineParagraph.SetProperty(DevelTextLabel::Property::RELATIVE_LINE_SIZE, 1.0f);
+  labelSingleLineParagraph.SetProperty(TextLabel::Property::ELLIPSIS, false);
+  labelSingleLineParagraph.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+
+  TextLabel labelMultiLineParagraph = TextLabel::New();
+  labelMultiLineParagraph.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  labelMultiLineParagraph.SetProperty(TextLabel::Property::POINT_SIZE, 10);
+  labelMultiLineParagraph.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  labelMultiLineParagraph.SetProperty(TextLabel::Property::TEXT, "<p>line 1</p><p rel-line-height=0.5>line\n2</p>line 3<p rel-line-height=3>line\n4</p>line 5");
+  labelMultiLineParagraph.SetProperty(DevelTextLabel::Property::RELATIVE_LINE_SIZE, 1.0f);
+  labelMultiLineParagraph.SetProperty(TextLabel::Property::ELLIPSIS, false);
+  labelMultiLineParagraph.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+
+  application.GetScene().Add(label);
+  application.GetScene().Add(labelSingleLineParagraph);
+  application.GetScene().Add(labelMultiLineParagraph);
+  application.SendNotification();
+  application.Render();
+
+  Vector3 naturalSize               = label.GetNaturalSize();
+  Vector3 relativeSingleNaturalSize = labelSingleLineParagraph.GetNaturalSize();
+  Vector3 relativeMultiNaturalSize  = labelMultiLineParagraph.GetNaturalSize();
+
+  float lineSize = naturalSize.y / 5.0f; //total size/number of lines
+
+  //no effect of relative line size for paragraph with single line
+  DALI_TEST_EQUALS(naturalSize.y, relativeSingleNaturalSize.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(lineSize*8.5f, relativeMultiNaturalSize.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextLabelRelativeLineHeight(void)
 {
   ToolkitTestApplication application;

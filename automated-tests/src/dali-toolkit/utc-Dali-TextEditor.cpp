@@ -5788,6 +5788,55 @@ int UtcDaliToolkitTextEditorUnderlineTypesGeneration3(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextEditorMarkupRelativeLineHeight(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextEditorMarkupRelativeLineHeight");
+
+  TextEditor editor = TextEditor::New();
+  editor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10);
+  editor.SetProperty(TextEditor::Property::TEXT, "line 1\nline 2\nline 3\nline 4\nline 5");
+  editor.SetProperty(DevelTextEditor::Property::RELATIVE_LINE_SIZE, 1.0f);
+  editor.SetProperty(DevelTextEditor::Property::ELLIPSIS, false);
+  editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+
+  TextEditor editorSingleLineParagraph = TextEditor::New();
+  editorSingleLineParagraph.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  editorSingleLineParagraph.SetProperty(TextEditor::Property::POINT_SIZE, 10);
+  editorSingleLineParagraph.SetProperty(TextEditor::Property::TEXT, "<p>line 1</p><p rel-line-height=0.5>line 2</p>line 3<p rel-line-height=3>line 4</p>line 5");
+  editorSingleLineParagraph.SetProperty(DevelTextEditor::Property::RELATIVE_LINE_SIZE, 1.0f);
+  editorSingleLineParagraph.SetProperty(DevelTextEditor::Property::ELLIPSIS, false);
+  editorSingleLineParagraph.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+
+  TextEditor editorMultiLineParagraph = TextEditor::New();
+  editorMultiLineParagraph.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  editorMultiLineParagraph.SetProperty(TextEditor::Property::POINT_SIZE, 10);
+  editorMultiLineParagraph.SetProperty(TextEditor::Property::TEXT, "<p>line 1</p><p rel-line-height=0.5>line\n2</p>line 3<p rel-line-height=3>line\n4</p>line 5");
+  editorMultiLineParagraph.SetProperty(DevelTextEditor::Property::RELATIVE_LINE_SIZE, 1.0f);
+  editorMultiLineParagraph.SetProperty(DevelTextEditor::Property::ELLIPSIS, false);
+  editorMultiLineParagraph.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+
+  application.GetScene().Add(editor);
+  application.GetScene().Add(editorSingleLineParagraph);
+  application.GetScene().Add(editorMultiLineParagraph);
+  application.SendNotification();
+  application.Render();
+
+  Vector3 naturalSize               = editor.GetNaturalSize();
+  Vector3 relativeSingleNaturalSize = editorSingleLineParagraph.GetNaturalSize();
+  Vector3 relativeMultiNaturalSize  = editorMultiLineParagraph.GetNaturalSize();
+
+  float lineSize = naturalSize.y / 5.0f; //total size/number of lines
+
+  //no effect of relative line size for paragraph with single line
+  DALI_TEST_EQUALS(naturalSize.y, relativeSingleNaturalSize.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(lineSize*8.5f, relativeMultiNaturalSize.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextEditorRelativeLineHeight(void)
 {
   ToolkitTestApplication application;

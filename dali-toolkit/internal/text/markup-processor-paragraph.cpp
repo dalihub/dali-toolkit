@@ -34,13 +34,20 @@ namespace Text
 namespace
 {
 const std::string XHTML_ALIGN_ATTRIBUTE("align");
-}
+const std::string XHTML_RELATIVE_LINE_HEIGHT_ATTRIBUTE("rel-line-height");
+} // namespace
 
 void ProcessHorizontalAlignment(const Attribute& attribute, BoundedParagraphRun& boundedParagraphRun)
 {
   boundedParagraphRun.horizontalAlignmentDefined = HorizontalAlignmentTypeStringToTypeValue(attribute.valueBuffer,
                                                                                             attribute.valueLength,
                                                                                             boundedParagraphRun.horizontalAlignment);
+}
+
+void ProcessRelativeLineHeight(const Attribute& attribute, BoundedParagraphRun& boundedParagraphRun)
+{
+  boundedParagraphRun.relativeLineSize        = StringToFloat(attribute.valueBuffer);
+  boundedParagraphRun.relativeLineSizeDefined = true;
 }
 
 void ProcessAttributesOfParagraphTag(const Tag& tag, BoundedParagraphRun& boundedParagraphRun)
@@ -58,9 +65,12 @@ void ProcessAttributesOfParagraphTag(const Tag& tag, BoundedParagraphRun& bounde
     {
       ProcessHorizontalAlignment(attribute, boundedParagraphRun);
     }
+    else if(TokenComparison(XHTML_RELATIVE_LINE_HEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    {
+      ProcessRelativeLineHeight(attribute, boundedParagraphRun);
+    }
   }
 }
-
 } // namespace Text
 
 } // namespace Toolkit
