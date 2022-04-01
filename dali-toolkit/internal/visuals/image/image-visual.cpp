@@ -821,12 +821,6 @@ void ImageVisual::OnSetTransform()
   }
 }
 
-bool ImageVisual::IsResourceReady() const
-{
-  return (mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY ||
-          mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED);
-}
-
 void ImageVisual::UpdateShader()
 {
   if(mImpl->mRenderer)

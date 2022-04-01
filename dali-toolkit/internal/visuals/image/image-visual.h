@@ -224,11 +224,6 @@ protected:
   void OnSetTransform() override;
 
   /**
-   * @copydoc Visual::Base::IsResourceReady
-   */
-  bool IsResourceReady() const override;
-
-  /**
    * @copydoc Visual::Base::UpdateShader
    */
   void UpdateShader() override;

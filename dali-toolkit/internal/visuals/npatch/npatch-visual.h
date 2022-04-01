@@ -137,11 +137,6 @@ protected:
    */
   void OnSetTransform() override;
 
-  /**
-   * @copydoc Visual::Base::IsResourceReady
-   */
-  bool IsResourceReady() const override;
-
 private:
   /**
    * Loads the NPatch image and the Auxiliary image if needed

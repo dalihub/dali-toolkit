@@ -765,7 +765,8 @@ void Visual::Base::ResourceReady(Toolkit::Visual::ResourceStatus resourceStatus)
 
 bool Visual::Base::IsResourceReady() const
 {
-  return (mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY);
+  return (mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY ||
+          mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED);
 }
 
 bool Visual::Base::IsSynchronousLoadingRequired() const

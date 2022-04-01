@@ -239,8 +239,8 @@ public:
   void ResourceReady(Toolkit::Visual::ResourceStatus resourceStatus);
 
   /**
-   * @brief Called when the visuals resources are loaded / ready
-   * @return true if ready, false otherwise
+   * @brief Called when the visuals resources are loaded / ready or failed (mean, broken image ready)
+   * @return true if ready or failed (mean, broken image ready), false otherwise
    */
   virtual bool IsResourceReady() const;
 
