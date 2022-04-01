@@ -1936,8 +1936,8 @@ int UtcDaliKeyboardFocusManagerSetAndGetCurrentFocusActorInTouchMode(void)
   application.SendNotification();
   application.Render();
 
-  // Check that the focus is successfully to clear
-  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+  // Since no focus has been moved, the current focus actor is the same.
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
 
   // Make the second actor focusableInTouchMode
   second.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);

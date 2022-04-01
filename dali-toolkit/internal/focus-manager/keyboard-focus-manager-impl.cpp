@@ -679,14 +679,10 @@ void KeyboardFocusManager::DoKeyboardEnter(Actor actor)
 
 void KeyboardFocusManager::ClearFocus()
 {
+  ClearFocusIndicator();
   Actor actor = GetCurrentFocusActor();
   if(actor)
   {
-    if(mFocusIndicatorActor)
-    {
-      actor.Remove(mFocusIndicatorActor);
-    }
-
     // Send notification for the change of focus actor
     if(!mFocusChangedSignal.Empty())
     {
@@ -700,8 +696,19 @@ void KeyboardFocusManager::ClearFocus()
       currentlyFocusedControl.ClearKeyInputFocus();
     }
   }
-
   mCurrentFocusActor.Reset();
+}
+
+void KeyboardFocusManager::ClearFocusIndicator()
+{
+  Actor actor = GetCurrentFocusActor();
+  if(actor)
+  {
+    if(mFocusIndicatorActor)
+    {
+      actor.Remove(mFocusIndicatorActor);
+    }
+  }
   mIsFocusIndicatorShown = (mAlwaysShowIndicator == ALWAYS_SHOW) ? SHOW : HIDE;
 }
 
@@ -1003,17 +1010,29 @@ void KeyboardFocusManager::OnTouch(const TouchEvent& touch)
   // We only do this on a Down event, otherwise the clear action may override a manually focused actor.
   if(((touch.GetPointCount() < 1) || (touch.GetState(0) == PointState::DOWN)))
   {
-    // If mClearFocusOnTouch is false, do not clear the focus even if user touch the screen.
-    if(mClearFocusOnTouch)
-    {
-      ClearFocus();
-    }
-
-    // If KEYBOARD_FOCUSABLE and TOUCH_FOCUSABLE is true, set focus actor
+    // If you touch the currently focused actor again, you don't need to do SetCurrentFocusActor again.
     Actor hitActor = touch.GetHitActor(0);
+    if(hitActor && hitActor == GetCurrentFocusActor())
+    {
+      return;
+    }
+    // If KEYBOARD_FOCUSABLE and TOUCH_FOCUSABLE is true, set focus actor
     if(hitActor && hitActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && hitActor.GetProperty<bool>(DevelActor::Property::TOUCH_FOCUSABLE))
     {
+      // If mClearFocusOnTouch is false, do not clear the focus
+      if(mClearFocusOnTouch)
+      {
+        ClearFocus();
+      }
       SetCurrentFocusActor(hitActor);
+    }
+    else
+    {
+      // If mClearFocusOnTouch is false, do not clear the focus indicator even if user touch the screen.
+      if(mClearFocusOnTouch)
+      {
+        ClearFocusIndicator();
+      }
     }
   }
 }
