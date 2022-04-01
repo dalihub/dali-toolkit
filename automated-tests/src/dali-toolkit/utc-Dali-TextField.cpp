@@ -22,6 +22,7 @@
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
@@ -3836,6 +3837,9 @@ int UtcDaliTextFieldEnableEditing(void)
   application.SendNotification();
   application.Render();
 
+  textField.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
+  DALI_TEST_EQUALS(textField.GetProperty(DevelActor::Property::USER_INTERACTION_ENABLED).Get<bool>(), true, TEST_LOCATION);
+
   textField.SetKeyInputFocus();
   textField.SetProperty(DevelTextField::Property::ENABLE_EDITING, false);
   application.ProcessEvent(GenerateKey("D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -3857,6 +3861,24 @@ int UtcDaliTextFieldEnableEditing(void)
 
   DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "D", TEST_LOCATION);
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::ENABLE_EDITING).Get<bool>(), true, TEST_LOCATION);
+
+  // Check the user interaction enabled and for coverage
+  DevelTextField::SelectWholeText(textField);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  textField.SetKeyInputFocus();
+  textField.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, false);
+  application.ProcessEvent(GenerateKey("D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "D", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(DevelActor::Property::USER_INTERACTION_ENABLED).Get<bool>(), false, TEST_LOCATION);
 
   END_TEST;
 }

@@ -221,6 +221,11 @@ private: // From Control
   void OnSceneConnection(int depth) override;
 
   /**
+   * @copydoc Control::OnPropertySet()
+   */
+  void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override;
+
+  /**
    * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)
    */
   bool OnKeyEvent(const KeyEvent& event) override;

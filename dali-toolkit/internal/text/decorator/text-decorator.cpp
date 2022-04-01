@@ -2109,6 +2109,27 @@ int Decorator::GetCursorWidth() const
 void Decorator::SetEditable(bool editable)
 {
   mImpl->mHidePrimaryCursorAndGrabHandle = !editable;
+  // If editable is false, all decorators should be disabled.
+  if(!editable)
+  {
+    if(IsHighlightActive())
+    {
+      SetHighlightActive(false);
+    }
+    if(IsHandleActive(LEFT_SELECTION_HANDLE))
+    {
+      SetHandleActive(LEFT_SELECTION_HANDLE, false);
+    }
+    if(IsHandleActive(RIGHT_SELECTION_HANDLE))
+    {
+      SetHandleActive(RIGHT_SELECTION_HANDLE, false);
+    }
+    if(IsPopupActive())
+    {
+      SetPopupActive(false);
+    }
+  }
+
   mImpl->Relayout(mImpl->mControlSize);
 }
 /** Handles **/

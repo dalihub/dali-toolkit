@@ -747,6 +747,26 @@ const Vector4& Controller::GetDefaultColor() const
   return mImpl->mTextColor;
 }
 
+void Controller::SetDisabledColorOpacity(float opacity)
+{
+  mImpl->mDisabledColorOpacity = opacity;
+}
+
+float Controller::GetDisabledColorOpacity() const
+{
+  return mImpl->mDisabledColorOpacity;
+}
+
+void Controller::SetUserInteractionEnabled(bool enabled)
+{
+  mImpl->SetUserInteractionEnabled(enabled);
+}
+
+bool Controller::IsUserInteractionEnabled() const
+{
+  return mImpl->mIsUserInteractionEnabled;
+}
+
 void Controller::SetPlaceholderTextColor(const Vector4& textColor)
 {
   PlaceholderHandler::SetPlaceholderTextColor(*this, textColor);
