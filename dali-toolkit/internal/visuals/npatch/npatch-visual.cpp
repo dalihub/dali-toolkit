@@ -90,6 +90,12 @@ void NPatchVisual::LoadImages()
     // Load the auxiliary image
     auto preMultiplyOnLoading = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
     mAuxiliaryPixelBuffer     = textureManager.LoadPixelBuffer(mAuxiliaryUrl, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, synchronousLoading, this, true, preMultiplyOnLoading);
+
+    // If synchronousLoading is true, we can check the auxiliaryResource's statue now.
+    if(synchronousLoading)
+    {
+      mAuxiliaryResourceStatus = mAuxiliaryPixelBuffer ? Toolkit::Visual::ResourceStatus::READY : Toolkit::Visual::ResourceStatus::FAILED;
+    }
   }
 }
 
@@ -202,7 +208,10 @@ void NPatchVisual::DoSetOnScene(Actor& actor)
     mImpl->mRenderer.SetShader(shader);
 
     mPlacementActor = actor;
-    if(data->GetLoadingState() != NPatchData::LoadingState::LOADING)
+    // If all reasources are already loaded, apply textures and uniforms now
+    // else, will be completed uploaded at LoadComplete function asynchronously.
+    if(data->GetLoadingState() != NPatchData::LoadingState::LOADING &&
+       (!mAuxiliaryUrl.IsValid() || mAuxiliaryResourceStatus != Toolkit::Visual::ResourceStatus::PREPARING))
     {
       if(RenderingAddOn::Get().IsValid())
       {
@@ -214,7 +223,15 @@ void NPatchVisual::DoSetOnScene(Actor& actor)
       mPlacementActor.Reset();
 
       // npatch loaded and ready to display
-      ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+      if(data->GetLoadingState() != NPatchData::LoadingState::LOAD_COMPLETE ||
+         (mAuxiliaryUrl.IsValid() && mAuxiliaryResourceStatus != Toolkit::Visual::ResourceStatus::READY))
+      {
+        ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+      }
+      else
+      {
+        ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+      }
     }
   }
 }
@@ -238,6 +255,12 @@ void NPatchVisual::OnSetTransform()
   {
     mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
+}
+
+bool NPatchVisual::IsResourceReady() const
+{
+  return (mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY ||
+          mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED);
 }
 
 void NPatchVisual::DoCreatePropertyMap(Property::Map& map) const
@@ -275,6 +298,7 @@ NPatchVisual::NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFa
   mImageUrl(),
   mAuxiliaryUrl(),
   mId(NPatchData::INVALID_NPATCH_DATA_ID),
+  mAuxiliaryResourceStatus(Toolkit::Visual::ResourceStatus::PREPARING),
   mBorderOnly(false),
   mBorder(),
   mAuxiliaryImageAlpha(0.0f),
@@ -471,7 +495,15 @@ void NPatchVisual::ApplyTextureAndUniforms()
                                   auxiliaryPixelData.GetWidth(),
                                   auxiliaryPixelData.GetHeight());
       texture.Upload(auxiliaryPixelData);
-      textureSet.SetTexture(1, texture);
+
+      // TODO : This code exist due to the texture cache manager hold TextureSet, not Texture.
+      // If we call textureSet.SetTexture(1, texture) directly, the cached TextureSet also be changed.
+      // We should make pass utc-Dali-VisualFactory.cpp UtcDaliNPatchVisualAuxiliaryImage02().
+      TextureSet tempTextureSet = TextureSet::New();
+      tempTextureSet.SetTexture(0, textureSet.GetTexture(0));
+      tempTextureSet.SetTexture(1, texture);
+      textureSet = tempTextureSet;
+
       mImpl->mRenderer.RegisterProperty(DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA,
                                         AUXILIARY_IMAGE_ALPHA_NAME,
                                         mAuxiliaryImageAlpha);
@@ -516,55 +548,60 @@ Geometry NPatchVisual::GetNinePatchGeometry(VisualFactoryCache::GeometryType sub
 
 void NPatchVisual::SetResource()
 {
-  const NPatchData* data;
-  if(mImpl->mRenderer && mLoader.GetNPatchData(mId, data))
+  Geometry geometry = CreateGeometry();
+  Shader   shader   = CreateShader();
+
+  mImpl->mRenderer.SetGeometry(geometry);
+  mImpl->mRenderer.SetShader(shader);
+
+  Actor actor = mPlacementActor.GetHandle();
+  if(actor)
   {
-    Geometry geometry = CreateGeometry();
-    Shader   shader   = CreateShader();
-
-    mImpl->mRenderer.SetGeometry(geometry);
-    mImpl->mRenderer.SetShader(shader);
-
-    Actor actor = mPlacementActor.GetHandle();
-    if(actor)
-    {
-      ApplyTextureAndUniforms();
-      actor.AddRenderer(mImpl->mRenderer);
-      mPlacementActor.Reset();
-
-      // npatch loaded and ready to display
-      ResourceReady(Toolkit::Visual::ResourceStatus::READY);
-    }
+    ApplyTextureAndUniforms();
+    actor.AddRenderer(mImpl->mRenderer);
+    mPlacementActor.Reset();
   }
 }
 
 void NPatchVisual::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
 {
-  if(textureInformation.returnType == TextureUploadObserver::ReturnType::TEXTURE)
+  if(textureInformation.returnType == TextureUploadObserver::ReturnType::TEXTURE) // For the Url.
   {
-    EnablePreMultipliedAlpha(textureInformation.preMultiplied);
-    if(!loadSuccess)
+    if(loadSuccess)
     {
-      // Image loaded and ready to display
-      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
-    }
-
-    if(mAuxiliaryPixelBuffer || !mAuxiliaryUrl.IsValid())
-    {
-      SetResource();
+      EnablePreMultipliedAlpha(textureInformation.preMultiplied);
     }
   }
-  else // for the ReturnType::PIXEL_BUFFER
+  else // For the AuxiliaryUrl : ReturnType::PIXEL_BUFFER
   {
     if(loadSuccess && textureInformation.url == mAuxiliaryUrl.GetUrl())
     {
-      mAuxiliaryPixelBuffer = textureInformation.pixelBuffer;
-      SetResource();
+      mAuxiliaryPixelBuffer    = textureInformation.pixelBuffer;
+      mAuxiliaryResourceStatus = Toolkit::Visual::ResourceStatus::READY;
     }
     else
     {
-      // Image loaded and ready to display
-      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+      mAuxiliaryResourceStatus = Toolkit::Visual::ResourceStatus::FAILED;
+    }
+  }
+  // If auxiliaryUrl didn't set || auxiliaryUrl load done.
+  if(!mAuxiliaryUrl.IsValid() || mAuxiliaryResourceStatus != Toolkit::Visual::ResourceStatus::PREPARING)
+  {
+    const NPatchData* data;
+    // and.. If Url loading done.
+    if(mImpl->mRenderer && mLoader.GetNPatchData(mId, data) && data->GetLoadingState() != NPatchData::LoadingState::LOADING)
+    {
+      SetResource();
+      // npatch loaded and ready to display
+      if(data->GetLoadingState() != NPatchData::LoadingState::LOAD_COMPLETE ||
+         (mAuxiliaryUrl.IsValid() && mAuxiliaryResourceStatus != Toolkit::Visual::ResourceStatus::READY))
+      {
+        ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+      }
+      else
+      {
+        ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+      }
     }
   }
 }

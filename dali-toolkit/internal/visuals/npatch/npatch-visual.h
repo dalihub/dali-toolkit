@@ -137,6 +137,11 @@ protected:
    */
   void OnSetTransform() override;
 
+  /**
+   * @copydoc Visual::Base::IsResourceReady
+   */
+  bool IsResourceReady() const override;
+
 private:
   /**
    * Loads the NPatch image and the Auxiliary image if needed
@@ -218,14 +223,15 @@ private:
   WeakHandle<Actor>                         mPlacementActor; ///< Weakhandle to contain Actor during texture loading
   NPatchLoader&                             mLoader;         ///< reference to N patch loader for fast access
   ImageVisualShaderFactory&                 mImageVisualShaderFactory;
-  VisualUrl                                 mImageUrl;             ///< The url to the N patch to load
-  VisualUrl                                 mAuxiliaryUrl;         ///< An auxiliary image that can be displayed on top of the N-Patch
-  NPatchData::NPatchDataId                  mId;                   ///< id of the N patch (from loader/cache)
-  Devel::PixelBuffer                        mAuxiliaryPixelBuffer; ///< pixel buffer of the auxiliary mask image
-  bool                                      mBorderOnly;           ///< if only border is desired
-  Rect<int>                                 mBorder;               ///< The size of the border
-  float                                     mAuxiliaryImageAlpha;  ///< The alpha value for the auxiliary image only
-  Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;        ///< The release policy to determine when an image should no longer be cached.
+  VisualUrl                                 mImageUrl;                ///< The url to the N patch to load
+  VisualUrl                                 mAuxiliaryUrl;            ///< An auxiliary image that can be displayed on top of the N-Patch
+  NPatchData::NPatchDataId                  mId;                      ///< id of the N patch (from loader/cache)
+  Devel::PixelBuffer                        mAuxiliaryPixelBuffer;    ///< pixel buffer of the auxiliary mask image
+  Toolkit::Visual::ResourceStatus           mAuxiliaryResourceStatus; ///< resource status for auxiliary mask image
+  bool                                      mBorderOnly;              ///< if only border is desired
+  Rect<int>                                 mBorder;                  ///< The size of the border
+  float                                     mAuxiliaryImageAlpha;     ///< The alpha value for the auxiliary image only
+  Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;           ///< The release policy to determine when an image should no longer be cached.
 };
 
 } // namespace Internal
