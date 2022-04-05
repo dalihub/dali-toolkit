@@ -19,7 +19,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
-#include <dali/devel-api/common/owner-container.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <string>
 
@@ -90,8 +89,9 @@ public:
 
   /**
    * @brief Remove a texture matching id.
-   * Erase the observer from the observer list of cache.
-   * If the observer list is empty, the textureSet will be reset.
+   * Erase the observer from the observer list of cache if we need.
+   * This API decrease cached NPatchInfo reference.
+   * If the NPatchInfo reference become 0, the textureSet will be reset.
    *
    * @param [in] id cache data id
    * @param [in] textureObserver The NPatchVisual that requested loading.
@@ -102,6 +102,60 @@ private:
   NPatchData::NPatchDataId GenerateUniqueNPatchDataId();
 
   int32_t GetCacheIndexFromId(const NPatchData::NPatchDataId id);
+
+private:
+  /**
+   * @brief Information of NPatchData
+   * It also hold ownership of NPatchData memory.
+   */
+  struct NPatchInfo
+  {
+    NPatchInfo(NPatchData* data)
+    : mData(data),
+      mReferenceCount(1u)
+    {
+    }
+    ~NPatchInfo()
+    {
+      if(mData)
+      {
+        delete mData;
+      }
+    }
+    NPatchInfo(NPatchInfo&& info) // move constructor
+    {
+      mData                = std::move(info.mData);
+      mReferenceCount      = info.mReferenceCount;
+      info.mData           = nullptr;
+      info.mReferenceCount = 0u;
+    }
+    NPatchInfo& operator=(NPatchInfo&& info) // move operator
+    {
+      mData                = std::move(info.mData);
+      mReferenceCount      = info.mReferenceCount;
+      info.mData           = nullptr;
+      info.mReferenceCount = 0u;
+      return *this;
+    }
+
+    NPatchInfo()                       = delete; // Do not use default constructor
+    NPatchInfo(const NPatchInfo& info) = delete; // Do not use copy constructor
+
+    NPatchData*  mData;
+    std::int16_t mReferenceCount; ///< The number of N-patch visuals that use this data.
+  };
+
+  /**
+   * @brief Get cached NPatchData by inputed url and border. If there is no cached data, create new one.
+   * @note This API increase cached NPatchInfo reference.
+   *
+   * @param [in] url to retrieve
+   * @param [in] border The border size of the image
+   * @param [in,out] preMultiplyOnLoad True if the image color should be multiplied by it's alpha. Set to false if the
+   *                                   image has no alpha channel
+   * @return NPatchData pointer that Load function will used.
+   */
+  NPatchData* GetNPatchData(const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad);
 
 protected:
   /**
@@ -115,8 +169,8 @@ protected:
   NPatchLoader& operator=(const NPatchLoader& rhs);
 
 private:
-  NPatchData::NPatchDataId    mCurrentNPatchDataId;
-  OwnerContainer<NPatchData*> mCache;
+  NPatchData::NPatchDataId mCurrentNPatchDataId;
+  std::vector<NPatchInfo>  mCache;
 };
 
 } // namespace Internal

@@ -412,7 +412,6 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
   int brokenIndex = GetProperBrokenImageIndex(size);
   if(GetBrokenImageVisualType(brokenIndex) == VisualUrl::N_PATCH)
   {
-    DALI_LOG_ERROR("Broken npatch?");
     // Set geometry and shader for npatch
     Geometry geometry = GetNPatchGeometry(brokenIndex);
     Shader   shader   = GetNPatchShader(brokenIndex);
@@ -422,7 +421,6 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
   }
   else
   {
-    DALI_LOG_ERROR("Broken single image");
     // Create single image renderer only if rederer is not use normal ImageShader. i.e. npatch visual.
     if(!rendererIsImage)
     {
