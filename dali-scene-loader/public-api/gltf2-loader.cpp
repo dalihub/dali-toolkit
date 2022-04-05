@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,11 @@ const std::string POSITION_PROPERTY("position");
 const std::string ORIENTATION_PROPERTY("orientation");
 const std::string SCALE_PROPERTY("scale");
 const std::string BLEND_SHAPE_WEIGHTS_UNIFORM("uBlendShapeWeight");
+
+const std::string MRENDERER_MODEL_IDENTIFICATION("M-Renderer");
+
+const std::string ROOT_NODE_NAME("RootNode");
+const Vector3     SCALE_TO_ADJUST(100.0f, 100.0f, 100.0f);
 
 const Geometry::Type GLTF2_TO_DALI_PRIMITIVES[]{
   Geometry::POINTS,
@@ -692,7 +697,7 @@ void ConvertCamera(const gt::Camera& camera, CameraParameters& camParams)
   }
 }
 
-void ConvertNode(gt::Node const& node, const Index gltfIdx, Index parentIdx, ConversionContext& cctx)
+void ConvertNode(gt::Node const& node, const Index gltfIdx, Index parentIdx, ConversionContext& cctx, bool isMRendererModel)
 {
   auto& output    = cctx.mOutput;
   auto& scene     = output.mScene;
@@ -715,6 +720,11 @@ void ConvertNode(gt::Node const& node, const Index gltfIdx, Index parentIdx, Con
       nodeDef->mPosition    = node.mTranslation;
       nodeDef->mOrientation = node.mRotation;
       nodeDef->mScale       = node.mScale;
+
+      if(isMRendererModel && node.mName == ROOT_NODE_NAME && node.mScale == SCALE_TO_ADJUST)
+      {
+        nodeDef->mScale *= 0.01f;
+      }
     }
 
     return nodeDef;
@@ -774,11 +784,11 @@ void ConvertNode(gt::Node const& node, const Index gltfIdx, Index parentIdx, Con
 
   for(auto& n : node.mChildren)
   {
-    ConvertNode(*n, n.GetIndex(), idx, cctx);
+    ConvertNode(*n, n.GetIndex(), idx, cctx, isMRendererModel);
   }
 }
 
-void ConvertSceneNodes(const gt::Scene& scene, ConversionContext& cctx)
+void ConvertSceneNodes(const gt::Scene& scene, ConversionContext& cctx, bool isMRendererModel)
 {
   auto& outScene = cctx.mOutput.mScene;
   Index rootIdx  = outScene.GetNodeCount();
@@ -788,7 +798,7 @@ void ConvertSceneNodes(const gt::Scene& scene, ConversionContext& cctx)
       break;
 
     case 1:
-      ConvertNode(*scene.mNodes[0], scene.mNodes[0].GetIndex(), INVALID_INDEX, cctx);
+      ConvertNode(*scene.mNodes[0], scene.mNodes[0].GetIndex(), INVALID_INDEX, cctx, isMRendererModel);
       outScene.AddRootNode(rootIdx);
       break;
 
@@ -802,25 +812,25 @@ void ConvertSceneNodes(const gt::Scene& scene, ConversionContext& cctx)
 
       for(auto& n : scene.mNodes)
       {
-        ConvertNode(*n, n.GetIndex(), rootIdx, cctx);
+        ConvertNode(*n, n.GetIndex(), rootIdx, cctx, isMRendererModel);
       }
       break;
     }
   }
 }
 
-void ConvertNodes(const gt::Document& doc, ConversionContext& cctx)
+void ConvertNodes(const gt::Document& doc, ConversionContext& cctx, bool isMRendererModel)
 {
-  ConvertSceneNodes(*doc.mScene, cctx);
+  ConvertSceneNodes(*doc.mScene, cctx, isMRendererModel);
 
   for(uint32_t i = 0, i1 = doc.mScene.GetIndex(); i < i1; ++i)
   {
-    ConvertSceneNodes(doc.mScenes[i], cctx);
+    ConvertSceneNodes(doc.mScenes[i], cctx, isMRendererModel);
   }
 
   for(uint32_t i = doc.mScene.GetIndex() + 1; i < doc.mScenes.size(); ++i)
   {
-    ConvertSceneNodes(doc.mScenes[i], cctx);
+    ConvertSceneNodes(doc.mScenes[i], cctx, isMRendererModel);
   }
 }
 
@@ -1155,10 +1165,23 @@ void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactor
 
   gt::Document doc;
 
-  auto& rootObj        = js::Cast<json_object_s>(*root);
-  auto  jsAsset        = js::FindObjectChild("asset", rootObj);
-  auto  jsAssetVersion = js::FindObjectChild("version", js::Cast<json_object_s>(*jsAsset));
-  doc.mAsset.mVersion  = js::Read::StringView(*jsAssetVersion);
+  auto& rootObj = js::Cast<json_object_s>(*root);
+  auto  jsAsset = js::FindObjectChild("asset", rootObj);
+
+  auto jsAssetVersion = js::FindObjectChild("version", js::Cast<json_object_s>(*jsAsset));
+  if(jsAssetVersion)
+  {
+    doc.mAsset.mVersion = js::Read::StringView(*jsAssetVersion);
+  }
+
+  bool isMRendererModel(false);
+  auto jsAssetGenerator = js::FindObjectChild("generator", js::Cast<json_object_s>(*jsAsset));
+  if(jsAssetGenerator)
+  {
+    doc.mAsset.mGenerator = js::Read::StringView(*jsAssetGenerator);
+    isMRendererModel      = (doc.mAsset.mGenerator.find(MRENDERER_MODEL_IDENTIFICATION) != std::string_view::npos);
+  }
+
 
   gt::SetRefReaderObject(doc);
   DOCUMENT_READER.Read(rootObj, doc);
@@ -1168,7 +1191,7 @@ void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactor
 
   ConvertMaterials(doc, cctx);
   ConvertMeshes(doc, cctx);
-  ConvertNodes(doc, cctx);
+  ConvertNodes(doc, cctx, isMRendererModel);
   ConvertAnimations(doc, cctx);
 
   ProcessSkins(doc, cctx);
