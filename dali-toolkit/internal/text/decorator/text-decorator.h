@@ -22,6 +22,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
@@ -556,6 +557,20 @@ public:
    * @return bitmask of TextSelectionPopup::Buttons
    */
   TextSelectionPopup::Buttons& GetEnabledPopupButtons();
+
+  /**
+   * @brief Used to set the selection popup options
+   *
+   * @param[in] options The property map of selection popup options
+   */
+  void SetSelectionPopupStyle(const Property::Map& options);
+
+  /**
+   * @brief Used to get the selection popup options
+   *
+   * @param[out] options The property map of selection popup options
+   */
+  void GetSelectionPopupStyle(Property::Map& options);
 
   /**
    * @brief Sets the scroll threshold.

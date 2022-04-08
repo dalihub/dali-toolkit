@@ -79,6 +79,16 @@ void TextSelectionPopup::HidePopup()
   GetImpl(*this).HidePopup();
 }
 
+void TextSelectionPopup::SetProperties(const Dali::Property::Map& properties)
+{
+  GetImpl(*this).SetProperties(properties);
+}
+
+void TextSelectionPopup::GetProperties(Dali::Property::Map& properties)
+{
+  GetImpl(*this).GetProperties(properties);
+}
+
 TextSelectionPopup::TextSelectionPopup(Internal::TextSelectionPopup& implementation)
 : Control(implementation)
 {

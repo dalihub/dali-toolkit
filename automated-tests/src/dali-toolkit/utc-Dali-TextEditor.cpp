@@ -20,6 +20,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/clipboard.h>
@@ -65,6 +66,7 @@ const char* const PROPERTY_NAME_CURSOR_BLINK_DURATION                = "cursorBl
 const char* const PROPERTY_NAME_CURSOR_WIDTH                         = "cursorWidth";
 const char* const PROPERTY_NAME_GRAB_HANDLE_IMAGE                    = "grabHandleImage";
 const char* const PROPERTY_NAME_GRAB_HANDLE_PRESSED_IMAGE            = "grabHandlePressedImage";
+const char* const PROPERTY_NAME_SELECTION_POPUP_STYLE                = "selectionPopupStyle";
 const char* const PROPERTY_NAME_SELECTION_HANDLE_IMAGE_LEFT          = "selectionHandleImageLeft";
 const char* const PROPERTY_NAME_SELECTION_HANDLE_IMAGE_RIGHT         = "selectionHandleImageRight";
 const char* const PROPERTY_NAME_SELECTION_HANDLE_PRESSED_IMAGE_LEFT  = "selectionHandlePressedImageLeft";
@@ -581,6 +583,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_INPUT_FILTER) == DevelTextEditor::Property::INPUT_FILTER);
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_STRIKETHROUGH) == DevelTextEditor::Property::STRIKETHROUGH);
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_INPUT_STRIKETHROUGH) == DevelTextEditor::Property::INPUT_STRIKETHROUGH);
+  DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_SELECTION_POPUP_STYLE) == DevelTextEditor::Property::SELECTION_POPUP_STYLE);
 
   END_TEST;
 }
@@ -734,6 +737,64 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_CHECK(SetPropertyMapRetrieved(editor, TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, "filename", "rightHandleImagePressed"));
   DALI_TEST_CHECK(SetPropertyMapRetrieved(editor, TextEditor::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT, "filename", "leftHandleMarkerImage"));
   DALI_TEST_CHECK(SetPropertyMapRetrieved(editor, TextEditor::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT, "filename", "rightHandleMarkerImage"));
+
+  // Check the selection popup style
+  const Vector2 popupMaxSize(200.0f, 300.0f);
+  const Vector2 optionDividerSize(30.0f, 5.0f);
+  const Vector4 optionDividerPadding(20.0f, 20.0f, 10.0f, 10.0f);
+  const Vector4 labelPadding(5.0f, 5.0f, 50.0f, 25.0f);
+
+  Property::Map selectionPopupStyle;
+  selectionPopupStyle.Insert(TextSelectionPopup::Property::POPUP_MAX_SIZE, popupMaxSize);
+  selectionPopupStyle.Insert(TextSelectionPopup::Property::OPTION_DIVIDER_SIZE, optionDividerSize);
+  selectionPopupStyle.Insert(TextSelectionPopup::Property::OPTION_DIVIDER_PADDING, optionDividerPadding);
+  selectionPopupStyle.Insert(TextSelectionPopup::Property::LABEL_PADDING, labelPadding);
+
+  editor.SetProperty(DevelTextEditor::Property::SELECTION_POPUP_STYLE, selectionPopupStyle);
+
+  Property::Map selectionPopupStyleGet;
+  selectionPopupStyleGet = editor.GetProperty<Property::Map>(DevelTextEditor::Property::SELECTION_POPUP_STYLE);
+
+  Property::Value* popupValue;
+  popupValue = selectionPopupStyleGet.Find(TextSelectionPopup::Property::POPUP_MAX_SIZE);
+  DALI_TEST_CHECK(NULL != popupValue);
+  if(popupValue)
+  {
+    Vector2 popupMaxSizeGet;
+    popupValue->Get(popupMaxSizeGet);
+    DALI_TEST_EQUALS(popupMaxSizeGet, popupMaxSize, TEST_LOCATION);
+  }
+
+  popupValue = selectionPopupStyleGet.Find(TextSelectionPopup::Property::OPTION_DIVIDER_SIZE);
+  DALI_TEST_CHECK(NULL != popupValue);
+  if(popupValue)
+  {
+    Vector2 optionDividerSizeGet;
+    popupValue->Get(optionDividerSizeGet);
+    DALI_TEST_EQUALS(optionDividerSizeGet, optionDividerSize, TEST_LOCATION);
+  }
+
+  popupValue = selectionPopupStyleGet.Find(TextSelectionPopup::Property::OPTION_DIVIDER_PADDING);
+  DALI_TEST_CHECK(NULL != popupValue);
+  if(popupValue)
+  {
+    Vector4 optionDividerPaddingGet;
+    popupValue->Get(optionDividerPaddingGet);
+    DALI_TEST_EQUALS(optionDividerPaddingGet, optionDividerPadding, TEST_LOCATION);
+  }
+
+  popupValue = selectionPopupStyleGet.Find(TextSelectionPopup::Property::LABEL_PADDING);
+  DALI_TEST_CHECK(NULL != popupValue);
+  if(popupValue)
+  {
+    Vector4 labelPaddingGet;
+    popupValue->Get(labelPaddingGet);
+    DALI_TEST_EQUALS(labelPaddingGet, labelPadding, TEST_LOCATION);
+  }
+
+  // Reset selection popup style
+  selectionPopupStyle.Clear();
+  editor.SetProperty(DevelTextEditor::Property::SELECTION_POPUP_STYLE, selectionPopupStyle);
 
   // Check the highlight color
   editor.SetProperty(TextEditor::Property::SELECTION_HIGHLIGHT_COLOR, Color::GREEN);

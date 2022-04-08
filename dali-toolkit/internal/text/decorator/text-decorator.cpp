@@ -946,6 +946,19 @@ struct Decorator::Impl : public ConnectionTracker
     }
   }
 
+  void CreateSelectionPopup()
+  {
+    if(!mCopyPastePopup.actor)
+    {
+      mCopyPastePopup.actor = TextSelectionPopup::New(&mTextSelectionPopupCallbackInterface);
+  #ifdef DECORATOR_DEBUG
+      mCopyPastePopup.actor.SetProperty(Dali::Actor::Property::NAME, "mCopyPastePopup");
+  #endif
+      mCopyPastePopup.actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+      mCopyPastePopup.actor.OnRelayoutSignal().Connect(this, &Decorator::Impl::SetPopupPosition); // Position popup after size negotiation
+    }
+  }
+
   void CalculateHandleWorldCoordinates(HandleImpl& handle, Vector2& position)
   {
     // Gets the world position of the active layer. The active layer is where the handles are added.
@@ -2302,23 +2315,27 @@ bool Decorator::IsPopupActive() const
 void Decorator::SetEnabledPopupButtons(TextSelectionPopup::Buttons& enabledButtonsBitMask)
 {
   mImpl->mEnabledPopupButtons = enabledButtonsBitMask;
-
-  if(!mImpl->mCopyPastePopup.actor)
-  {
-    mImpl->mCopyPastePopup.actor = TextSelectionPopup::New(&mImpl->mTextSelectionPopupCallbackInterface);
-#ifdef DECORATOR_DEBUG
-    mImpl->mCopyPastePopup.actor.SetProperty(Dali::Actor::Property::NAME, "mCopyPastePopup");
-#endif
-    mImpl->mCopyPastePopup.actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-    mImpl->mCopyPastePopup.actor.OnRelayoutSignal().Connect(mImpl, &Decorator::Impl::SetPopupPosition); // Position popup after size negotiation
-  }
-
+  mImpl->CreateSelectionPopup();
   mImpl->mCopyPastePopup.actor.EnableButtons(mImpl->mEnabledPopupButtons);
 }
 
 TextSelectionPopup::Buttons& Decorator::GetEnabledPopupButtons()
 {
   return mImpl->mEnabledPopupButtons;
+}
+
+void Decorator::SetSelectionPopupStyle(const Property::Map& options)
+{
+  mImpl->CreateSelectionPopup();
+  mImpl->mCopyPastePopup.actor.SetProperties(options);
+}
+
+void Decorator::GetSelectionPopupStyle(Property::Map& options)
+{
+  if(mImpl->mCopyPastePopup.actor)
+  {
+    mImpl->mCopyPastePopup.actor.GetProperties(options);
+  }
 }
 
 /** Scroll **/

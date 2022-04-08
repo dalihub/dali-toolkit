@@ -700,6 +700,15 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       impl.mController->SetCharacterSpacing(characterSpacing);
       break;
     }
+    case Toolkit::DevelTextField::Property::SELECTION_POPUP_STYLE:
+    {
+      const Property::Map* map = value.GetMap();
+      if(map)
+      {
+        impl.mDecorator->SetSelectionPopupStyle(*map);
+      }
+      break;
+    }
   }
 }
 
@@ -1078,6 +1087,13 @@ Property::Value TextField::PropertyHandler::GetProperty(Toolkit::TextField textF
     case Toolkit::DevelTextField::Property::CHARACTER_SPACING:
     {
       value = impl.mController->GetCharacterSpacing();
+      break;
+    }
+    case Toolkit::DevelTextField::Property::SELECTION_POPUP_STYLE:
+    {
+      Property::Map map;
+      impl.mDecorator->GetSelectionPopupStyle(map);
+      value = map;
       break;
     }
   } //switch

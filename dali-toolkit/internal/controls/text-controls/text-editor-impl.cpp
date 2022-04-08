@@ -160,6 +160,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputStrikethro
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "characterSpacing",                     FLOAT,     CHARACTER_SPACING                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "relativeLineSize",                     FLOAT,     RELATIVE_LINE_SIZE                  )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "verticalAlignment",                    STRING,    VERTICAL_ALIGNMENT                  )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "selectionPopupStyle",                  MAP,       SELECTION_POPUP_STYLE               )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",     SIGNAL_INPUT_STYLE_CHANGED    )
