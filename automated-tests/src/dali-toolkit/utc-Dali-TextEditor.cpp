@@ -691,6 +691,14 @@ int UtcDaliTextEditorSetPropertyP(void)
   editor.SetProperty(TextEditor::Property::HORIZONTAL_ALIGNMENT, "END");
   DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::HORIZONTAL_ALIGNMENT), "END", TEST_LOCATION);
 
+  // Check that the Alignment properties can be correctly set
+  editor.SetProperty(DevelTextEditor::Property::VERTICAL_ALIGNMENT, "BOTTOM");
+  DALI_TEST_EQUALS(editor.GetProperty<std::string>(DevelTextEditor::Property::VERTICAL_ALIGNMENT), "BOTTOM", TEST_LOCATION);
+  editor.SetProperty(DevelTextEditor::Property::VERTICAL_ALIGNMENT, "CENTER");
+  DALI_TEST_EQUALS(editor.GetProperty<std::string>(DevelTextEditor::Property::VERTICAL_ALIGNMENT), "CENTER", TEST_LOCATION);
+  editor.SetProperty(DevelTextEditor::Property::VERTICAL_ALIGNMENT, "TOP");
+  DALI_TEST_EQUALS(editor.GetProperty<std::string>(DevelTextEditor::Property::VERTICAL_ALIGNMENT), "TOP", TEST_LOCATION);
+
   // Check scroll properties.
   editor.SetProperty(TextEditor::Property::SCROLL_THRESHOLD, 1.f);
   DALI_TEST_EQUALS(editor.GetProperty<float>(TextEditor::Property::SCROLL_THRESHOLD), 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
