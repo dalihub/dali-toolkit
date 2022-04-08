@@ -238,6 +238,7 @@ int UtcDaliToolkitTextSelectionPopupIconProperties(void)
   popup.SetProperty(TextSelectionPopup::Property::POPUP_PASTE_BUTTON_ICON_IMAGE, "POPUP_PASTE_BUTTON_ICON_IMAGE");
   popup.SetProperty(TextSelectionPopup::Property::POPUP_SELECT_BUTTON_ICON_IMAGE, "POPUP_SELECT_BUTTON_ICON_IMAGE");
   popup.SetProperty(TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE, "POPUP_SELECT_ALL_BUTTON_ICON_IMAGE");
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_PRESSED_IMAGE, "POPUP_PRESSED_IMAGE");
 
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_CLIPBOARD_BUTTON_ICON_IMAGE", TEST_LOCATION);
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_CUT_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_CUT_BUTTON_ICON_IMAGE", TEST_LOCATION);
@@ -245,6 +246,7 @@ int UtcDaliToolkitTextSelectionPopupIconProperties(void)
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_PASTE_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_PASTE_BUTTON_ICON_IMAGE", TEST_LOCATION);
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_SELECT_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_SELECT_BUTTON_ICON_IMAGE", TEST_LOCATION);
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_SELECT_ALL_BUTTON_ICON_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_PRESSED_IMAGE).Get<std::string>(), "POPUP_PRESSED_IMAGE", TEST_LOCATION);
 
   END_TEST;
 }
@@ -270,6 +272,38 @@ int UtcDaliToolkitTextSelectionPopupSizeProperties(void)
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::OPTION_MIN_SIZE).Get<Vector2>(), optionMinSize, TEST_LOCATION);
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::OPTION_DIVIDER_SIZE).Get<Vector2>(), optionDividerSize, TEST_LOCATION);
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::OPTION_DIVIDER_PADDING).Get<Vector4>(), optionDividerPadding, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextSelectionPopupDurationProperties(void)
+{
+  ToolkitTestApplication application;
+  TextSelectionPopup     popup = TextSelectionPopup::New(nullptr);
+
+  const float popupFadeInDuration = 5.0f;
+  const float popupFadeOutDuration = 10.0f;
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_FADE_IN_DURATION, popupFadeInDuration);
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION, popupFadeOutDuration);
+
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_FADE_IN_DURATION).Get<float>(), popupFadeInDuration, TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION).Get<float>(), popupFadeOutDuration, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextSelectionPopupColorProperties(void)
+{
+  ToolkitTestApplication application;
+  TextSelectionPopup     popup = TextSelectionPopup::New(nullptr);
+
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_DIVIDER_COLOR, Color::RED);
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_ICON_COLOR, Color::BLUE);
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_PRESSED_COLOR, Color::BLACK);
+
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_DIVIDER_COLOR).Get<Vector4>(), Color::RED, TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_ICON_COLOR).Get<Vector4>(), Color::BLUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_PRESSED_COLOR).Get<Vector4>(), Color::BLACK, TEST_LOCATION);
 
   END_TEST;
 }

@@ -38,6 +38,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/text-controls/text-selection-popup-property-handler.h>
 #include <dali-toolkit/internal/helpers/color-conversion.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
@@ -149,104 +150,8 @@ void TextSelectionPopup::SetProperty(BaseObject* object, Property::Index index, 
 
   if(selectionPopup)
   {
-    TextSelectionPopup& impl(GetImpl(selectionPopup));
-
-    switch(index)
-    {
-      case Toolkit::TextSelectionPopup::Property::POPUP_MAX_SIZE:
-      {
-        impl.SetDimensionToCustomise(POPUP_MAXIMUM_SIZE, value.Get<Vector2>());
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::OPTION_MAX_SIZE:
-      {
-        impl.SetDimensionToCustomise(OPTION_MAXIMUM_SIZE, value.Get<Vector2>());
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::OPTION_MIN_SIZE:
-      {
-        impl.SetDimensionToCustomise(OPTION_MINIMUM_SIZE, value.Get<Vector2>());
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_SIZE:
-      {
-        impl.SetDimensionToCustomise(OPTION_DIVIDER_SIZE, value.Get<Vector2>());
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_PADDING:
-      {
-        Vector4 padding(value.Get<Vector4>());
-        impl.SetOptionDividerPadding(Padding(padding.x, padding.y, padding.z, padding.w));
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE:
-      {
-        impl.SetButtonImage(Toolkit::TextSelectionPopup::CLIPBOARD, value.Get<std::string>());
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_CUT_BUTTON_ICON_IMAGE:
-      {
-        impl.SetButtonImage(Toolkit::TextSelectionPopup::CUT, value.Get<std::string>());
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_COPY_BUTTON_ICON_IMAGE:
-      {
-        impl.SetButtonImage(Toolkit::TextSelectionPopup::COPY, value.Get<std::string>());
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_PASTE_BUTTON_ICON_IMAGE:
-      {
-        impl.SetButtonImage(Toolkit::TextSelectionPopup::PASTE, value.Get<std::string>());
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_SELECT_BUTTON_ICON_IMAGE:
-      {
-        impl.SetButtonImage(Toolkit::TextSelectionPopup::SELECT, value.Get<std::string>());
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE:
-      {
-        impl.SetButtonImage(Toolkit::TextSelectionPopup::SELECT_ALL, value.Get<std::string>());
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_DIVIDER_COLOR:
-      {
-        impl.mDividerColor = value.Get<Vector4>();
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_ICON_COLOR:
-      {
-        impl.mIconColor = value.Get<Vector4>();
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_COLOR:
-      {
-        impl.mPressedColor = value.Get<Vector4>();
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_IMAGE:
-      {
-        impl.SetPressedImage(value.Get<std::string>());
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_FADE_IN_DURATION:
-      {
-        impl.mFadeInDuration = value.Get<float>();
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION:
-      {
-        impl.mFadeOutDuration = value.Get<float>();
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER:
-      {
-        Property::Map map = value.Get<Property::Map>();
-        impl.CreateBackgroundBorder(map);
-        break;
-      }
-    } // switch
-  }   // TextSelectionPopup
+    PropertyHandler::SetProperty(selectionPopup, index, value);
+  }
 }
 
 Property::Value TextSelectionPopup::GetProperty(BaseObject* object, Property::Index index)
@@ -257,93 +162,7 @@ Property::Value TextSelectionPopup::GetProperty(BaseObject* object, Property::In
 
   if(selectionPopup)
   {
-    TextSelectionPopup& impl(GetImpl(selectionPopup));
-
-    switch(index)
-    {
-      case Toolkit::TextSelectionPopup::Property::POPUP_MAX_SIZE:
-      {
-        value = impl.GetDimensionToCustomise(POPUP_MAXIMUM_SIZE);
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::OPTION_MAX_SIZE:
-      {
-        value = impl.GetDimensionToCustomise(OPTION_MAXIMUM_SIZE);
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::OPTION_MIN_SIZE:
-      {
-        value = impl.GetDimensionToCustomise(OPTION_MINIMUM_SIZE);
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_SIZE:
-      {
-        value = impl.GetDimensionToCustomise(OPTION_DIVIDER_SIZE);
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_PADDING:
-      {
-        Padding padding = impl.GetOptionDividerPadding();
-        value           = Vector4(padding.left, padding.right, padding.top, padding.bottom);
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE:
-      {
-        value = impl.GetButtonImage(Toolkit::TextSelectionPopup::CLIPBOARD);
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_CUT_BUTTON_ICON_IMAGE:
-      {
-        value = impl.GetButtonImage(Toolkit::TextSelectionPopup::CUT);
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_COPY_BUTTON_ICON_IMAGE:
-      {
-        value = impl.GetButtonImage(Toolkit::TextSelectionPopup::COPY);
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_PASTE_BUTTON_ICON_IMAGE:
-      {
-        value = impl.GetButtonImage(Toolkit::TextSelectionPopup::PASTE);
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_SELECT_BUTTON_ICON_IMAGE:
-      {
-        value = impl.GetButtonImage(Toolkit::TextSelectionPopup::SELECT);
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE:
-      {
-        value = impl.GetButtonImage(Toolkit::TextSelectionPopup::SELECT_ALL);
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_IMAGE:
-      {
-        value = impl.GetPressedImage();
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_FADE_IN_DURATION:
-      {
-        value = impl.mFadeInDuration;
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION:
-      {
-        value = impl.mFadeOutDuration;
-        break;
-      }
-      case Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER:
-      {
-        Property::Map         map;
-        Toolkit::Visual::Base visual = DevelControl::GetVisual(impl, Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER);
-        if(visual)
-        {
-          visual.CreatePropertyMap(map);
-        }
-        value = map;
-        break;
-      }
-    } // switch
+    value = PropertyHandler::GetProperty(selectionPopup, index);
   }
   return value;
 }
