@@ -111,6 +111,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/text-controls/text-field-property-handler.cpp
    ${toolkit_src_dir}/controls/text-controls/text-label-impl.cpp
    ${toolkit_src_dir}/controls/text-controls/text-selection-popup-impl.cpp
+   ${toolkit_src_dir}/controls/text-controls/text-selection-popup-property-handler.cpp
    ${toolkit_src_dir}/controls/text-controls/text-selection-toolbar-impl.cpp
    ${toolkit_src_dir}/controls/tool-bar/tool-bar-impl.cpp
    ${toolkit_src_dir}/controls/tooltip/tooltip.cpp
