@@ -153,6 +153,8 @@ struct TextureInfo
     storageType(StorageType::UPLOAD_TO_TEXTURE),
     animatedImageLoading(animatedImageLoading),
     frameIndex(frameIndex),
+    frameCount(0u),
+    frameInterval(0u),
     useAtlas(useAtlas),
     loadSynchronously(loadSynchronously),
     cropToMask(cropToMask),
@@ -160,6 +162,7 @@ struct TextureInfo
     preMultiplyOnLoad(preMultiplyOnLoad),
     preMultiplied(false)
   {
+    isAnimatedImageFormat = (animatedImageLoading) ? true : false;
   }
 
   /**
@@ -185,7 +188,9 @@ struct TextureInfo
   Dali::SamplingMode::Type   samplingMode : 3;     ///< The requested SamplingMode
   StorageType                storageType;          ///< CPU storage / GPU upload;
   Dali::AnimatedImageLoading animatedImageLoading; ///< AnimatedImageLoading that contains animated image information.
-  std::uint32_t              frameIndex;           ///< frame index that be loaded, in case of animated image
+  uint32_t                   frameIndex;           ///< Frame index that be loaded, in case of animated image
+  uint32_t                   frameCount;           ///< Total frame count of input animated image. If this variable is not 0, this textureInfo is for animated image file format.
+  uint32_t                   frameInterval;        ///< Time interval between this frame and next frame of animated image.
   UseAtlas                   useAtlas;             ///< USE_ATLAS if an atlas was requested.
 
   bool loadSynchronously : 1;     ///< True if synchronous loading was requested
@@ -193,6 +198,7 @@ struct TextureInfo
   bool orientationCorrection : 1; ///< True if the image should be rotated to match exif orientation data
   bool preMultiplyOnLoad : 1;     ///< True if the image's color should be multiplied by it's alpha
   bool preMultiplied : 1;         ///< True if the image's color was multiplied by it's alpha
+  bool isAnimatedImageFormat : 1; ///< true if the image is requested from animated image visual.
 };
 
 } // namespace TextureManagerType
