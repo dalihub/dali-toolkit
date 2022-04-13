@@ -112,7 +112,6 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
     Length    yLineOffset   = 0;
     Length    prevLineIndex = 0;
     LineIndex lineIndex;
-    Length    numberOfLines;
 
     for(uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i)
     {
@@ -125,7 +124,7 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
       const bool       isDefaultBackgroundColor = (0u == backgroundColorIndex);
       const Vector4&   backgroundColor          = isDefaultBackgroundColor ? defaultBackgroundColor : *(backgroundColorsBuffer + backgroundColorIndex - 1u);
 
-      textVisualModel->GetNumberOfLines(i, 1, lineIndex, numberOfLines);
+      lineIndex         = textVisualModel->GetLineOfGlyph(i);
       Length lineHeight = CalculateBackgroundLineHeight(lineRun[lineIndex]);
 
       if(lineIndex != prevLineIndex)
