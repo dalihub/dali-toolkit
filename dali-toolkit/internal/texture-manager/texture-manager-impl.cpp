@@ -629,6 +629,10 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
             {
               pixelBuffer.ApplyMask(maskPixelBuffer, contentScale, cropToMask);
             }
+            else
+            {
+              DALI_LOG_ERROR("Mask image cached invalid pixel buffer!\n");
+            }
           }
           else
           {
@@ -883,6 +887,13 @@ void TextureManager::PostLoad(TextureManager::TextureInfo& textureInfo, Devel::P
             // Send New Task to Thread
             ApplyMask(textureInfo, textureInfo.maskTextureId);
           }
+          else // maskLoadState == LoadState::LOAD_FAILED
+          {
+            // Url texture load success, But alpha mask texture load failed. Run as normal image upload.
+            DALI_LOG_ERROR("Alpha mask image loading failed! Image will not be masked\n");
+            UploadTexture(pixelBuffer, textureInfo);
+            NotifyObservers(textureInfo, true);
+          }
         }
       }
       else
@@ -911,8 +922,16 @@ void TextureManager::PostLoad(TextureManager::TextureInfo& textureInfo, Devel::P
   else
   {
     textureInfo.loadState = LoadState::LOAD_FAILED;
-    CheckForWaitingTexture(textureInfo);
-    NotifyObservers(textureInfo, false);
+    if(textureInfo.storageType != StorageType::KEEP_PIXEL_BUFFER)
+    {
+      NotifyObservers(textureInfo, false);
+    }
+    else // if(textureInfo.storageType == StorageType::KEEP_PIXEL_BUFFER) // image mask case
+    {
+      // Check if there was another texture waiting for this load to complete
+      // (e.g. if this was an image mask, and its load is on a different thread)
+      CheckForWaitingTexture(textureInfo);
+    }
   }
 }
 
@@ -922,6 +941,8 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
   // maskTextureId:
   const TextureCacheIndex size = static_cast<TextureCacheIndex>(mTextureCacheManager.size());
 
+  const bool maskLoadSuccess = maskTextureInfo.loadState == LoadState::LOAD_FINISHED ? true : false;
+
   for(TextureCacheIndex cacheIndex = 0; cacheIndex < size; ++cacheIndex)
   {
     if(mTextureCacheManager[cacheIndex].maskTextureId == maskTextureInfo.textureId &&
@@ -929,16 +950,17 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
     {
       TextureInfo& textureInfo(mTextureCacheManager[cacheIndex]);
 
-      if(maskTextureInfo.loadState == LoadState::LOAD_FINISHED)
+      if(maskLoadSuccess)
       {
         // Send New Task to Thread
         ApplyMask(textureInfo, maskTextureInfo.textureId);
       }
       else
       {
-        textureInfo.pixelBuffer.Reset();
-        textureInfo.loadState = LoadState::LOAD_FAILED;
-        NotifyObservers(textureInfo, false);
+        // Url texture load success, But alpha mask texture load failed. Run as normal image upload.
+        DALI_LOG_ERROR("Alpha mask image loading failed! Image will not be masked\n");
+        UploadTexture(textureInfo.pixelBuffer, textureInfo);
+        NotifyObservers(textureInfo, true);
       }
     }
   }

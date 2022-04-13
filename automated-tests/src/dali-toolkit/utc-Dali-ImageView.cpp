@@ -3128,6 +3128,12 @@ void OnResourceReadySignal03(Control control)
   gResourceReadySignalCounter++;
 }
 
+void OnSimpleResourceReadySignal(Control control)
+{
+  // simply increate counter
+  gResourceReadySignalCounter++;
+}
+
 } // namespace
 
 int UtcDaliImageViewSetImageOnResourceReadySignal01(void)
@@ -3225,6 +3231,108 @@ int UtcDaliImageViewSetImageOnResourceReadySignal03(void)
 
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliImageViewOnResourceReadySignalWithBrokenAlphaMask01(void)
+{
+  tet_infoline("Test signal handler when image / mask image is broken.");
+
+  ToolkitTestApplication application;
+
+  auto TestResourceReadyUrl = [&application](int eventTriggerCount, bool isSynchronous, const std::string& url, const std::string& mask, const char* location) {
+    gResourceReadySignalCounter = 0;
+
+    Property::Map map;
+    map[Toolkit::ImageVisual::Property::URL] = url;
+    if(!mask.empty())
+    {
+      map[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = mask;
+    }
+    map[Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING] = isSynchronous;
+
+    ImageView imageView                            = ImageView::New();
+    imageView[Toolkit::ImageView::Property::IMAGE] = map;
+    imageView[Actor::Property::SIZE]               = Vector2(100.0f, 200.0f);
+    imageView.ResourceReadySignal().Connect(&OnSimpleResourceReadySignal);
+
+    application.GetScene().Add(imageView);
+    application.SendNotification();
+    application.Render();
+
+    if(!isSynchronous)
+    {
+      // Wait for loading
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(eventTriggerCount), true, location);
+    }
+    tet_printf("test %s [sync:%d] signal fired\n", url.c_str(), isSynchronous ? 1 : 0);
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, location);
+
+    imageView.Unparent();
+  };
+
+  for(int synchronous = 0; synchronous <= 1; synchronous++)
+  {
+    tet_printf("Test normal case (sync:%d)\n", synchronous);
+    TestResourceReadyUrl(1, synchronous, gImage_600_RGB, "", TEST_LOCATION);
+    TestResourceReadyUrl(3, synchronous, gImage_600_RGB, gImage_34_RGBA, TEST_LOCATION); // 3 event trigger required : 2 image load + 1 apply mask
+
+    tet_printf("Test broken image case (sync:%d)\n", synchronous);
+    TestResourceReadyUrl(1, synchronous, "invalid.jpg", "", TEST_LOCATION);
+    TestResourceReadyUrl(2, synchronous, "invalid.jpg", gImage_34_RGBA, TEST_LOCATION);
+
+    tet_printf("Test broken mask image case (sync:%d)\n", synchronous);
+    TestResourceReadyUrl(2, synchronous, gImage_600_RGB, "invalid.png", TEST_LOCATION);
+
+    tet_printf("Test broken both image, mask image case (sync:%d)\n", synchronous);
+    TestResourceReadyUrl(2, synchronous, "invalid.jpg", "invalid.png", TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliImageViewOnResourceReadySignalWithBrokenAlphaMask02(void)
+{
+  tet_infoline("Test signal handler when image try to use cached-and-broken mask image.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  auto TestBrokenMaskResourceReadyUrl = [&application](const std::string& url, const char* location) {
+    Property::Map map;
+    map[Toolkit::ImageVisual::Property::URL] = url;
+    // Use invalid mask url
+    map[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = "invalid.png";
+
+    ImageView imageView                            = ImageView::New();
+    imageView[Toolkit::ImageView::Property::IMAGE] = map;
+    imageView[Actor::Property::SIZE]               = Vector2(100.0f, 200.0f);
+    imageView.ResourceReadySignal().Connect(&OnSimpleResourceReadySignal);
+
+    application.GetScene().Add(imageView);
+    application.SendNotification();
+    application.Render();
+
+    // Don't unparent imageView, for keep the cache.
+  };
+
+  // Use more than 4 images (The number of LocalImageLoadThread)
+  const std::vector<std::string> testUrlList = {gImage_34_RGBA, gImage_600_RGB, "invalid.jpg" /* invalid url */, TEST_IMAGE_1, TEST_IMAGE_2, TEST_BROKEN_IMAGE_DEFAULT};
+
+  int expectResourceReadySignalCounter = 0;
+
+  for(auto& url : testUrlList)
+  {
+    TestBrokenMaskResourceReadyUrl(url, TEST_LOCATION);
+    expectResourceReadySignalCounter++;
+  }
+
+  // Remain 1 signal due to we use #URL + 1 mask image.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(expectResourceReadySignalCounter + 1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gResourceReadySignalCounter, expectResourceReadySignalCounter, TEST_LOCATION);
 
   END_TEST;
 }
