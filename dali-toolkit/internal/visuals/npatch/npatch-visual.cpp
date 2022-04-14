@@ -91,7 +91,7 @@ void NPatchVisual::LoadImages()
     auto preMultiplyOnLoading = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
     mAuxiliaryPixelBuffer     = textureManager.LoadPixelBuffer(mAuxiliaryUrl, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, synchronousLoading, this, true, preMultiplyOnLoading);
 
-    // If synchronousLoading is true, we can check the auxiliaryResource's statue now.
+    // If synchronousLoading is true, we can check the auxiliaryResource's status now.
     if(synchronousLoading)
     {
       mAuxiliaryResourceStatus = mAuxiliaryPixelBuffer ? Toolkit::Visual::ResourceStatus::READY : Toolkit::Visual::ResourceStatus::FAILED;
@@ -232,12 +232,6 @@ void NPatchVisual::OnSetTransform()
   {
     mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
-}
-
-bool NPatchVisual::IsResourceReady() const
-{
-  return (mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY ||
-          mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED);
 }
 
 void NPatchVisual::DoCreatePropertyMap(Property::Map& map) const
