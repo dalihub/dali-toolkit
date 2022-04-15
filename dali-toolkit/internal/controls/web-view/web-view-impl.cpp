@@ -1246,6 +1246,8 @@ bool WebView::SetVisibility(bool visible)
 WebView::WebViewAccessible::WebViewAccessible(Dali::Actor self, Dali::WebEngine& webEngine)
 : ControlAccessible(self), mRemoteChild{}, mWebEngine{webEngine}
 {
+  mRemoteChild.SetParent(this);
+
   Dali::Accessibility::Bridge::EnabledSignal().Connect(this, &WebViewAccessible::OnAccessibilityEnabled);
   Dali::Accessibility::Bridge::DisabledSignal().Connect(this, &WebViewAccessible::OnAccessibilityDisabled);
 
