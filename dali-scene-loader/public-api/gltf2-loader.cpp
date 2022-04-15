@@ -157,7 +157,8 @@ const auto TEXURE_READER = std::move(js::Reader<gt::Texture>()
 const auto TEXURE_INFO_READER = std::move(js::Reader<gt::TextureInfo>()
                                             .Register(*js::MakeProperty("index", gt::RefReader<gt::Document>::Read<gt::Texture, &gt::Document::mTextures>, &gt::TextureInfo::mTexture))
                                             .Register(*js::MakeProperty("texCoord", js::Read::Number<uint32_t>, &gt::TextureInfo::mTexCoord))
-                                            .Register(*js::MakeProperty("scale", js::Read::Number<float>, &gt::TextureInfo::mScale)));
+                                            .Register(*js::MakeProperty("scale", js::Read::Number<float>, &gt::TextureInfo::mScale))
+                                            .Register(*js::MakeProperty("strength", js::Read::Number<float>, &gt::TextureInfo::mStrength)));
 
 const auto MATERIAL_PBR_READER = std::move(js::Reader<gt::Material::Pbr>()
                                              .Register(*js::MakeProperty("baseColorFactor", gt::ReadDaliVector<Vector4>, &gt::Material::Pbr::mBaseColorFactor))
@@ -440,7 +441,7 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
 
   matDef.mColor = pbr.mBaseColorFactor;
 
-  matDef.mTextureStages.reserve(!!pbr.mBaseColorTexture + !!pbr.mMetallicRoughnessTexture + !!m.mNormalTexture);
+  matDef.mTextureStages.reserve(!!pbr.mBaseColorTexture + !!pbr.mMetallicRoughnessTexture + !!m.mNormalTexture + !!m.mOcclusionTexture + !!m.mEmissiveTexture);
   if(pbr.mBaseColorTexture)
   {
     const auto semantic = MaterialDefinition::ALBEDO;
@@ -470,6 +471,23 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
   }
 
   // TODO: handle doubleSided
+  if(m.mOcclusionTexture)
+  {
+    const auto semantic = MaterialDefinition::OCCLUSION;
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mOcclusionTexture)});
+    // TODO: and there had better be one
+    matDef.mFlags |= semantic;
+    matDef.mOcclusionStrength = m.mOcclusionTexture.mStrength;
+  }
+
+  if(m.mEmissiveTexture)
+  {
+    const auto semantic = MaterialDefinition::EMISSIVE;
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mEmissiveTexture)});
+    // TODO: and there had better be one
+    matDef.mFlags |= semantic;
+    matDef.mEmissiveFactor = m.mEmissiveFactor;
+  }
 
   outMaterials.emplace_back(std::move(matDef), TextureSet());
 }

@@ -219,10 +219,12 @@ struct DALI_SCENE_LOADER_API MaterialDefinition
 public: // DATA
   uint32_t mFlags = 0x0;
 
-  Index                     mEnvironmentIdx = 0;
-  Vector4                   mColor          = Color::WHITE;
-  float                     mMetallic       = 1.f;
-  float                     mRoughness      = 1.f;
+  Index                     mEnvironmentIdx    = 0;
+  Vector4                   mColor             = Color::WHITE;
+  Vector3                   mEmissiveFactor    = Vector3::ZERO;
+  float                     mMetallic          = 1.f;
+  float                     mRoughness         = 1.f;
+  float                     mOcclusionStrength = 1.f;
   std::vector<TextureStage> mTextureStages;
 };
 

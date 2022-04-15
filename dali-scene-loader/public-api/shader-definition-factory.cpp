@@ -56,8 +56,6 @@ struct ResourceReceiver : IResourceReceiver
   }
 };
 
-const std::string PBR_SHADER_NAME = "dli_pbr";
-
 void RetrieveBlendShapeComponents(const std::vector<MeshDefinition::BlendShape>& blendShapes, bool& hasPositions, bool& hasNormals, bool& hasTangents)
 {
   for(const auto& blendShape : blendShapes)
@@ -71,9 +69,6 @@ void RetrieveBlendShapeComponents(const std::vector<MeshDefinition::BlendShape>&
 uint64_t HashNode(const NodeDefinition& nodeDef, const MaterialDefinition& materialDef, const MeshDefinition& meshDef)
 {
   Hash hash;
-
-  // note: could be per vertex / fragment component - in WatchViewer, these have the same name.
-  hash.Add(PBR_SHADER_NAME);
 
   const bool hasTransparency = MaskMatch(materialDef.mFlags, MaterialDefinition::TRANSPARENCY);
   hash.Add(hasTransparency);
@@ -99,6 +94,11 @@ uint64_t HashNode(const NodeDefinition& nodeDef, const MaterialDefinition& mater
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
   {
     hash.Add("OCCL" /*USION*/);
+  }
+
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
+  {
+    hash.Add("EMIS" /*SIVE*/);
   }
 
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))
@@ -192,8 +192,7 @@ Index ShaderDefinitionFactory::ProduceShader(const NodeDefinition& nodeDef)
   }
 
   ShaderDefinition shaderDef;
-  shaderDef.mVertexShaderPath   = PBR_SHADER_NAME + ".vsh";
-  shaderDef.mFragmentShaderPath = PBR_SHADER_NAME + ".fsh";
+  shaderDef.mUseBuiltInShader = true;
   shaderDef.mRendererState      = RendererState::DEPTH_TEST | RendererState::DEPTH_WRITE | RendererState::CULL_BACK;
 
   auto&      materialDef     = *receiver.mMaterialDef;
@@ -222,12 +221,17 @@ Index ShaderDefinitionFactory::ProduceShader(const NodeDefinition& nodeDef)
     shaderDef.mDefines.push_back("SSS");
   }
 
-  if(MaskMatch(receiver.mMaterialDef->mFlags, MaterialDefinition::OCCLUSION))
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
   {
     shaderDef.mDefines.push_back("OCCLUSION");
   }
 
-  if(MaskMatch(receiver.mMaterialDef->mFlags, MaterialDefinition::GLTF_CHANNELS))
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
+  {
+    shaderDef.mDefines.push_back("EMISSIVE");
+  }
+
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))
   {
     shaderDef.mDefines.push_back("GLTF_CHANNELS");
   }

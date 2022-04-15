@@ -18,6 +18,7 @@
 // INTERNAL INCLUDES
 #include "dali-scene-loader/public-api/shader-definition.h"
 #include "dali-scene-loader/public-api/utils.h"
+#include <dali-scene-loader/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -36,7 +37,8 @@ ShaderDefinition::ShaderDefinition(const ShaderDefinition& other)
   mFragmentShaderPath(other.mFragmentShaderPath),
   mDefines(other.mDefines),
   mHints(other.mHints),
-  mUniforms(other.mUniforms)
+  mUniforms(other.mUniforms),
+  mUseBuiltInShader(false)
 {
 }
 
@@ -80,28 +82,38 @@ ShaderDefinition::LoadRaw(const std::string& shadersPath) const
 {
   RawData raw;
 
-  bool fail               = false;
-  raw.mVertexShaderSource = LoadTextFile((shadersPath + mVertexShaderPath).c_str(), &fail);
-  if(!fail)
+  bool fail = false;
+  if(!mUseBuiltInShader)
   {
-    raw.mFragmentShaderSource = LoadTextFile((shadersPath + mFragmentShaderPath).c_str(), &fail);
+    raw.mVertexShaderSource = LoadTextFile((shadersPath + mVertexShaderPath).c_str(), &fail);
     if(!fail)
     {
-      for(auto definevar : mDefines)
+      raw.mFragmentShaderSource = LoadTextFile((shadersPath + mFragmentShaderPath).c_str(), &fail);
+      if(fail)
       {
-        ApplyDefine(raw.mVertexShaderSource, definevar);
-        ApplyDefine(raw.mFragmentShaderSource, definevar);
+        ExceptionFlinger(ASSERT_LOCATION) << "Failed to load shader source from '" << shadersPath + mFragmentShaderPath << "'.";
       }
     }
     else
     {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to load shader source from '" << shadersPath + mFragmentShaderPath << "'.";
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to load shader source from '" << shadersPath + mVertexShaderPath << "'.";
     }
   }
   else
   {
-    ExceptionFlinger(ASSERT_LOCATION) << "Failed to load shader source from '" << shadersPath + mVertexShaderPath << "'.";
+    raw.mVertexShaderSource   = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_VERT.data();
+    raw.mFragmentShaderSource = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
   }
+
+  if(!fail)
+  {
+    for(auto definevar : mDefines)
+    {
+      ApplyDefine(raw.mVertexShaderSource, definevar);
+      ApplyDefine(raw.mFragmentShaderSource, definevar);
+    }
+  }
+
   return raw;
 }
 
