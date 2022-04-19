@@ -67,6 +67,8 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
                                                                         SHAPE_TEXT |
                                                                         GET_GLYPH_METRICS);
 
+  const OperationsMask sizeOperations     = static_cast<OperationsMask>(LAYOUT | ALIGN | REORDER);
+
   // Set the update info to relayout the whole text.
   TextUpdateInfo& textUpdateInfo = impl.mTextUpdateInfo;
   if((0 == textUpdateInfo.mNumberOfCharactersToAdd) &&
@@ -78,55 +80,68 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
   textUpdateInfo.mParagraphCharacterIndex     = 0u;
   textUpdateInfo.mRequestedNumberOfCharacters = model->mLogicalModel->mText.Count();
 
-  // This is to keep Index to the first character to be updated.
-  // Then restore it after calling Clear method.
-  auto updateInfoCharIndexBackup = textUpdateInfo.mCharacterIndex;
-
   // Get a reference to the pending operations member
   OperationsMask& operationsPending = impl.mOperationsPending;
-
-  // Layout the text for the new width.
-  // Apply the pending operations, requested operations and the only once operations.
-  // Then remove onlyOnceOperations
-  operationsPending = static_cast<OperationsMask>(operationsPending | requestedOperationsMask | onlyOnceOperations);
-
-  // Make sure the model is up-to-date before layouting
-  impl.UpdateModel(static_cast<OperationsMask>(operationsPending & ~UPDATE_LAYOUT_SIZE));
 
   // Store the actual control's size to restore later.
   const Size actualControlSize = visualModel->mControlSize;
 
-  DoRelayout(impl,
-             requestedControllerSize,
-             static_cast<OperationsMask>(operationsPending & ~UPDATE_LAYOUT_SIZE),
-             calculatedLayoutSize);
+  // Whether the text control is editable
+  const bool isEditable = NULL != impl.mEventData;
 
-  // Clear the update info. This info will be set the next time the text is updated.
-  textUpdateInfo.Clear();
+  if(!isEditable)
+  {
+    impl.UpdateModel(onlyOnceOperations);
 
-  //TODO: Refactor "DoRelayout" and extract common code of size calculation without modifying attributes of mVisualModel,
-  //TODO: then calculate GlyphPositions. Lines, Size, Layout for Natural-Size
-  //TODO: and utilize the values in OperationsPending and TextUpdateInfo without changing the original one.
-  //TODO: Also it will improve performance because there is no need todo FullRelyout on the next need for layouting.
+    DoRelayout(impl,
+               requestedControllerSize,
+               static_cast<OperationsMask>(onlyOnceOperations | requestedOperationsMask),
+               calculatedLayoutSize);
 
-  // FullRelayoutNeeded should be true because DoRelayout is MAX_FLOAT, MAX_FLOAT.
-  // By this no need to take backup and restore it.
-  textUpdateInfo.mFullRelayoutNeeded = true;
+    textUpdateInfo.Clear();
+    textUpdateInfo.mClearAll = true;
 
-  // Restore mCharacterIndex. Because "Clear" set it to the maximum integer.
-  // The "CalculateTextUpdateIndices" does not work proprely because the mCharacterIndex will be greater than mPreviousNumberOfCharacters.
-  // Which apply an assumption to update only the last  paragraph. That could cause many of out of index crashes.
-  textUpdateInfo.mCharacterIndex = updateInfoCharIndexBackup;
+    // Do not do again the only once operations.
+    operationsPending = static_cast<OperationsMask>(operationsPending & ~onlyOnceOperations);
+  }
+  else
+  {
+    // This is to keep Index to the first character to be updated.
+    // Then restore it after calling Clear method.
+    auto updateInfoCharIndexBackup = textUpdateInfo.mCharacterIndex;
 
-  // Do not do again the only once operations.
-  operationsPending = static_cast<OperationsMask>(operationsPending & ~onlyOnceOperations);
+    // Layout the text for the new width.
+    // Apply the pending operations, requested operations and the only once operations.
+    // Then remove onlyOnceOperations
+    operationsPending = static_cast<OperationsMask>(operationsPending | requestedOperationsMask | onlyOnceOperations);
+
+    // Make sure the model is up-to-date before layouting
+    impl.UpdateModel(static_cast<OperationsMask>(operationsPending & ~UPDATE_LAYOUT_SIZE));
+
+    DoRelayout(impl,
+               requestedControllerSize,
+               static_cast<OperationsMask>(operationsPending & ~UPDATE_LAYOUT_SIZE),
+               calculatedLayoutSize);
+
+    // Clear the update info. This info will be set the next time the text is updated.
+    textUpdateInfo.Clear();
+
+    //TODO: Refactor "DoRelayout" and extract common code of size calculation without modifying attributes of mVisualModel,
+    //TODO: then calculate GlyphPositions. Lines, Size, Layout for Natural-Size
+    //TODO: and utilize the values in OperationsPending and TextUpdateInfo without changing the original one.
+    //TODO: Also it will improve performance because there is no need todo FullRelyout on the next need for layouting.
+
+    // FullRelayoutNeeded should be true because DoRelayout is MAX_FLOAT, MAX_FLOAT.
+    // By this no need to take backup and restore it.
+    textUpdateInfo.mFullRelayoutNeeded = true;
+
+    // Restore mCharacterIndex. Because "Clear" set it to the maximum integer.
+    // The "CalculateTextUpdateIndices" does not work proprely because the mCharacterIndex will be greater than mPreviousNumberOfCharacters.
+    // Which apply an assumption to update only the last  paragraph. That could cause many of out of index crashes.
+    textUpdateInfo.mCharacterIndex = updateInfoCharIndexBackup;
+  }
 
   // Do the size related operations again.
-
-  const OperationsMask sizeOperations = static_cast<OperationsMask>(LAYOUT |
-                                                                    ALIGN |
-                                                                    REORDER);
-
   operationsPending = static_cast<OperationsMask>(operationsPending | sizeOperations);
 
   // Restore the actual control's size.
