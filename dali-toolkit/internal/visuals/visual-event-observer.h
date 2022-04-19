@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TOOLKIT_VISUAL_EVENT_OBSERVER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,12 @@ public:
    * @param[in] signalId The signal to emit. See Visual to find supported signals
    */
   virtual void NotifyVisualEvent(Visual::Base& object, Property::Index signalId) = 0;
+
+  /**
+   * Requests a relayout to the observer.
+   * @param[in] object The connection owner
+   */
+  virtual void RelayoutRequest(Visual::Base& object) = 0;
 
 protected:
   /**
