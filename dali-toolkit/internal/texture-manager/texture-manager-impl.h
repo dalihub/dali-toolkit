@@ -112,27 +112,28 @@ public:
    * The parameters are used to specify how the animated image is loaded.
    * The observer has the LoadComplete method called when the load is ready.
    *
-   * @param[in] animatedImageLoading  The AnimatedImageLoading that contain the animated image information
-   * @param[in] frameIndex            The frame index to load.
-   * @param[in] samplingMode          The SamplingMode to use
-   * @param[in] synchronousLoading    true if the frame should be loaded synchronously
-   * @param[out] textureId            The textureId of the frame
-   * @param[in] wrapModeU             Horizontal Wrap mode
-   * @param[in] wrapModeV             Vertical Wrap mode
-   * @param[in] textureObserver       The client object should inherit from this and provide the "UploadCompleted" virtual.
-   *                                  This is called when an image load completes (or fails).
+   * @param[in]  animatedImageLoading  The AnimatedImageLoading that contain the animated image information
+   * @param[in]  frameIndex            The frame index to load.
+   * @param[out] textureId             The textureId of the frame
+   * @param[in]  samplingMode          The SamplingMode to use
+   * @param[in]  wrapModeU             Horizontal Wrap mode
+   * @param[in]  wrapModeV             Vertical Wrap mode
+   * @param[in]  synchronousLoading    true if the frame should be loaded synchronously
+   * @param[in]  useCache              true if this frame loading uses cache.
+   * @param[in]  textureObserver       The client object should inherit from this and provide the "LoadCompleted" virtual.
+   *                                   This is called when an image load completes (or fails).
    *
-   * @return                          The texture set containing the frame of animated image, or empty if still loading.
+   * @return                           The texture set containing the frame of animated image, or empty if still loading.
    */
-  TextureSet LoadAnimatedImageTexture(
-    Dali::AnimatedImageLoading      animatedImageLoading,
-    const std::uint32_t&            frameIndex,
-    const Dali::SamplingMode::Type& samplingMode,
-    const bool&                     synchronousLoading,
-    TextureManager::TextureId&      textureId,
-    const Dali::WrapMode::Type&     wrapModeU,
-    const Dali::WrapMode::Type&     wrapModeV,
-    TextureUploadObserver*          textureObserver);
+  TextureSet LoadAnimatedImageTexture(Dali::AnimatedImageLoading      animatedImageLoading,
+                                      const uint32_t&                 frameIndex,
+                                      TextureManager::TextureId&      textureId,
+                                      const Dali::SamplingMode::Type& samplingMode,
+                                      const Dali::WrapMode::Type&     wrapModeU,
+                                      const Dali::WrapMode::Type&     wrapModeV,
+                                      const bool&                     synchronousLoading,
+                                      const bool&                     useCache,
+                                      TextureUploadObserver*          textureObserver);
 
   /**
    * @brief Requests an image load of the given URL to get PixelBuffer.
@@ -145,7 +146,7 @@ public:
    * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] synchronousLoading    true if the URL should be loaded synchronously
-   * @param[in] textureObserver       The client object should inherit from this and provide the "UploadCompleted" virtual.
+   * @param[in] textureObserver       The client object should inherit from this and provide the "LoadCompleted" virtual.
    *                                  This is called when an image load completes (or fails).
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
    * @param[in,out] preMultiplyOnLoad True if the image color should be multiplied by it's alpha. Set to false if the
@@ -188,10 +189,10 @@ public:
    * @param[out] loadingStatus        The loading status of the texture
    * @param[in] wrapModeU             Horizontal Wrap mode
    * @param[in] wrapModeV             Vertical Wrap mode
-   * @param[in] textureObserver       The client object should inherit from this and provide the "UploadCompleted" virtual.
+   * @param[in] textureObserver       The client object should inherit from this and provide the "LoadCompleted" virtual.
    *                                  This is called when an image load completes (or fails).
    * @param[in] atlasObserver         This is used if the texture is atlased, and will be called instead of
-   *                                  textureObserver.UploadCompleted
+   *                                  textureObserver.LoadCompleted
    * @param[in] imageAtlasManager     The atlas manager to use for atlasing textures
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
    * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
@@ -335,8 +336,8 @@ public: // Load Request API
    * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] useAtlasing           Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still be loaded, and marked successful,
-   *                                  but "useAtlasing" will be set to false in the "UploadCompleted" callback from the TextureManagerUploadObserver.
-   * @param[in] observer              The client object should inherit from this and provide the "UploadCompleted" virtual.
+   *                                  but "useAtlasing" will be set to false in the "LoadCompleted" callback from the TextureManagerUploadObserver.
+   * @param[in] observer              The client object should inherit from this and provide the "LoadCompleted" virtual.
    *                                  This is called when an image load completes (or fails).
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
    * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
@@ -345,7 +346,7 @@ public: // Load Request API
    *                                  default is false.
    * @return                          A TextureId to use as a handle to reference this Texture
    */
-  TextureManager::TextureId RequestLoad(
+  TextureId RequestLoad(
     const VisualUrl&                    url,
     const ImageDimensions&              desiredSize,
     const Dali::FittingMode::Type&      fittingMode,
@@ -376,11 +377,11 @@ public: // Load Request API
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] useAtlasing           Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still
    *                                  be loaded, and marked successful,
-   *                                  but "useAtlasing" will be set to false in the "UploadCompleted" callback from
+   *                                  but "useAtlasing" will be set to false in the "LoadCompleted" callback from
    *                                  the TextureManagerUploadObserver.
    * @param[in] cropToMask            Only used with masking, this will crop the scaled image to the mask size.
    *                                  If false, then the mask will be scaled to fit the image before being applied.
-   * @param[in] observer              The client object should inherit from this and provide the "UploadCompleted"
+   * @param[in] observer              The client object should inherit from this and provide the "LoadCompleted"
    *                                  virtual.
    *                                  This is called when an image load completes (or fails).
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
@@ -391,7 +392,7 @@ public: // Load Request API
    *                                  default is false.
    * @return                          A TextureId to use as a handle to reference this Texture
    */
-  TextureManager::TextureId RequestLoad(
+  TextureId RequestLoad(
     const VisualUrl&                    url,
     const TextureManager::TextureId&    maskTextureId,
     const float&                        contentScale,
@@ -414,7 +415,7 @@ public: // Load Request API
    *                               default is false.
    * @return                       A TextureId to use as a handle to reference this mask Texture
    */
-  TextureManager::TextureId RequestMaskLoad(
+  TextureId RequestMaskLoad(
     const VisualUrl& maskUrl,
     const bool&      synchronousLoading = false);
 
@@ -438,11 +439,11 @@ private:
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] useAtlasing           Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still be
    *                                  loaded, and marked successful, but "useAtlasing" will be set to false in the
-   *                                  "UploadCompleted" callback from the TextureManagerUploadObserver.
+   *                                  "LoadCompleted" callback from the TextureManagerUploadObserver.
    * @param[in] cropToMask            Whether to crop the target after masking, or scale the mask to the image before
    *                                  masking.
    * @param[in] storageType,          Whether the pixel data is stored in the cache or uploaded to the GPU
-   * @param[in] observer              The client object should inherit from this and provide the "UploadCompleted"
+   * @param[in] observer              The client object should inherit from this and provide the "LoadCompleted"
    *                                  virtual.
    *                                  This is called when an image load completes (or fails).
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
@@ -453,9 +454,10 @@ private:
    * @param[in] frameIndex            The frame index of a frame to be loaded frame
    * @param[in] synchronousLoading    True if the frame should be loaded synchronously. If you skip this parameter,
    *                                  default is false.
+   * @param[in] useCache              True if the texture will be cached.
    * @return                          A TextureId to use as a handle to reference this Texture
    */
-  TextureManager::TextureId RequestLoadInternal(
+  TextureId RequestLoadInternal(
     const VisualUrl&                    url,
     const TextureManager::TextureId&    maskTextureId,
     const float&                        contentScale,
@@ -471,7 +473,8 @@ private:
     TextureManager::MultiplyOnLoad&     preMultiplyOnLoad,
     Dali::AnimatedImageLoading          animatedImageLoading,
     const std::uint32_t&                frameIndex,
-    const bool&                         synchronousLoading);
+    const bool&                         synchronousLoading,
+    const bool&                         useCache);
 
   /**
    * @brief Load a new image synchronously.
@@ -579,6 +582,14 @@ private:
    * @param[in] success If the pixel data was retrieved successfully and uploaded to GPU
    */
   void NotifyObservers(TextureManager::TextureInfo& textureInfo, const bool& success);
+
+  /**
+   * Call LoadComplete to the observer.
+   * @param[in] observer    The client object should inherit from this and provide the "LoadCompleted"
+   * @param[in] textureInfo The struct associated with this Texture
+   * @param[in] success     If the pixel data was retrieved successfully and uploaded to GPU
+   */
+  void EmitLoadComplete(TextureUploadObserver* observer, TextureManager::TextureInfo& textureInfo, const bool& success);
 
 public:
   /**

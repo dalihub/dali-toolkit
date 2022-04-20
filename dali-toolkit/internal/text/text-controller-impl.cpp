@@ -362,6 +362,27 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
   }
 }
 
+void UpdateCursorPositionForAlignment(Controller::Impl& impl, bool needFullAlignment)
+{
+  EventData* eventData = impl.mEventData;
+
+  // Set the flag to redo the alignment operation
+  impl.mOperationsPending = static_cast<Controller::OperationsMask>(impl.mOperationsPending | Controller::OperationsMask::ALIGN);
+
+  if(eventData)
+  {
+    // Note: mUpdateAlignment is currently only needed for horizontal alignment
+    eventData->mUpdateAlignment = needFullAlignment;
+
+    // Update the cursor if it's in editing mode
+    if(EventData::IsEditingState(eventData->mState))
+    {
+      impl.ChangeState(EventData::EDITING);
+      eventData->mUpdateCursorPosition = true;
+    }
+  }
+}
+
 } // unnamed Namespace
 
 EventData::EventData(DecoratorPtr decorator, InputMethodContext& inputMethodContext)
@@ -909,7 +930,8 @@ void Controller::Impl::SetEditable(bool editable)
 
     if(mEventData->mDecorator)
     {
-      mEventData->mDecorator->SetEditable(editable);
+      bool decoratorEditable = editable && mIsUserInteractionEnabled;
+      mEventData->mDecorator->SetEditable(decoratorEditable);
     }
   }
 }
@@ -1439,6 +1461,10 @@ void Controller::Impl::ScrollToMakePositionVisible(const Vector2& position, floa
     {
       mModel->mScrollPosition.y = mModel->mVisualModel->mControlSize.height - positionEndY;
     }
+    else if(mModel->mLogicalModel->mText.Count() == 0u)
+    {
+      Relayouter::CalculateVerticalOffset(*this, mModel->mVisualModel->mControlSize);
+    }
   }
 }
 
@@ -1801,22 +1827,7 @@ void Controller::Impl::SetHorizontalAlignment(Text::HorizontalAlignment::Type al
   {
     // Set the alignment.
     mModel->mHorizontalAlignment = alignment;
-
-    // Set the flag to redo the alignment operation.
-    mOperationsPending = static_cast<OperationsMask>(mOperationsPending | ALIGN);
-
-    if(mEventData)
-    {
-      mEventData->mUpdateAlignment = true;
-
-      // Update the cursor if it's in editing mode
-      if(EventData::IsEditingState(mEventData->mState))
-      {
-        ChangeState(EventData::EDITING);
-        mEventData->mUpdateCursorPosition = true;
-      }
-    }
-
+    UpdateCursorPositionForAlignment(*this, true);
     RequestRelayout();
   }
 }
@@ -1827,7 +1838,7 @@ void Controller::Impl::SetVerticalAlignment(VerticalAlignment::Type alignment)
   {
     // Set the alignment.
     mModel->mVerticalAlignment = alignment;
-    mOperationsPending         = static_cast<OperationsMask>(mOperationsPending | ALIGN);
+    UpdateCursorPositionForAlignment(*this, false);
     RequestRelayout();
   }
 }
@@ -1871,6 +1882,17 @@ void Controller::Impl::SetDefaultColor(const Vector4& color)
     mModel->mLogicalModel->mColorRuns.Clear();
     mOperationsPending = static_cast<OperationsMask>(mOperationsPending | COLOR);
     RequestRelayout();
+  }
+}
+
+void Controller::Impl::SetUserInteractionEnabled(bool enabled)
+{
+  mIsUserInteractionEnabled = enabled;
+
+  if(mEventData && mEventData->mDecorator)
+  {
+    bool editable = mEventData->mEditingEnabled && enabled;
+    mEventData->mDecorator->SetEditable(editable);
   }
 }
 

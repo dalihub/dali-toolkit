@@ -37,6 +37,7 @@
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/controls/text-controls/text-editor-property-handler.h>
+#include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
@@ -158,6 +159,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "strikethrough",
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputStrikethrough",                   MAP,       INPUT_STRIKETHROUGH                 )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "characterSpacing",                     FLOAT,     CHARACTER_SPACING                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "relativeLineSize",                     FLOAT,     RELATIVE_LINE_SIZE                  )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "verticalAlignment",                    STRING,    VERTICAL_ALIGNMENT                  )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",     SIGNAL_INPUT_STYLE_CHANGED    )
@@ -672,6 +674,31 @@ void TextEditor::ResizeActor(Actor& actor, const Vector2& size)
   }
 }
 
+void TextEditor::OnPropertySet(Property::Index index, const Property::Value& propertyValue)
+{
+  DALI_LOG_INFO(gTextEditorLogFilter, Debug::Verbose, "TextEditor::OnPropertySet index[%d]\n", index);
+
+  switch(index)
+  {
+    case DevelActor::Property::USER_INTERACTION_ENABLED:
+    {
+      const bool enabled = propertyValue.Get<bool>();
+      mController->SetUserInteractionEnabled(enabled);
+      if(mStencil)
+      {
+        float opacity = enabled ? 1.0f : mController->GetDisabledColorOpacity();
+        mStencil.SetProperty(Actor::Property::OPACITY, opacity);
+      }
+      break;
+    }
+    default:
+    {
+      Control::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
+      break;
+    }
+  }
+}
+
 void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   DALI_LOG_INFO(gTextEditorLogFilter, Debug::Verbose, "TextEditor OnRelayout\n");
@@ -810,7 +837,10 @@ void TextEditor::OnKeyInputFocusGained()
     notifier.ContentSelectedSignal().Connect(this, &TextEditor::OnClipboardTextSelected);
   }
 
-  mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
+  if(IsEditable() && mController->IsUserInteractionEnabled())
+  {
+    mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
+  }
 
   EmitKeyInputFocusSignal(true); // Calls back into the Control hence done last.
 }
@@ -862,6 +892,11 @@ void TextEditor::OnTap(const TapGesture& gesture)
   mController->TapEvent(gesture.GetNumberOfTaps(), localPoint.x - padding.start, localPoint.y - padding.top);
   mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
 
+  Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
+  if (keyboardFocusManager)
+  {
+    keyboardFocusManager.SetCurrentFocusActor(Self());
+  }
   SetKeyInputFocus();
 }
 
@@ -893,6 +928,11 @@ bool TextEditor::OnKeyEvent(const KeyEvent& event)
     // Make sure ClearKeyInputFocus when only key is up
     if(event.GetState() == KeyEvent::UP)
     {
+      Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
+      if (keyboardFocusManager)
+      {
+        keyboardFocusManager.ClearFocus();
+      }
       ClearKeyInputFocus();
     }
 

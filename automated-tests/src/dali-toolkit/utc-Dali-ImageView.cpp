@@ -33,6 +33,7 @@
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/devel-api/visuals/animated-image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -76,7 +77,8 @@ static const char* gImage_600_RGB = TEST_RESOURCE_DIR "/test-image-600.jpg";
 // resolution: 50*50, frame count: 4, frame delay: 0.2 second for each frame
 const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 
-const char* TEST_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
+const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg";
+const char* TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
 
 void TestUrl(ImageView imageView, const std::string url)
 {
@@ -2359,7 +2361,7 @@ int UtcDaliImageViewFittingModesWithAnimatedVectorImageVisual(void)
   ImageView     imageView = ImageView::New();
   Property::Map imageMap;
   imageMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE);
-  imageMap.Add(Toolkit::ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME); // 249x169 image
+  imageMap.Add(Toolkit::ImageVisual::Property::URL, TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME); // 249x169 image
 
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imageMap);
   imageView.SetProperty(Actor::Property::SIZE, Vector2(600, 600));
@@ -3128,6 +3130,12 @@ void OnResourceReadySignal03(Control control)
   gResourceReadySignalCounter++;
 }
 
+void OnSimpleResourceReadySignal(Control control)
+{
+  // simply increate counter
+  gResourceReadySignalCounter++;
+}
+
 } // namespace
 
 int UtcDaliImageViewSetImageOnResourceReadySignal01(void)
@@ -3225,6 +3233,238 @@ int UtcDaliImageViewSetImageOnResourceReadySignal03(void)
 
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliImageViewOnResourceReadySignalWithBrokenAlphaMask01(void)
+{
+  tet_infoline("Test signal handler when image / mask image is broken.");
+
+  ToolkitTestApplication application;
+
+  auto TestResourceReadyUrl = [&application](int eventTriggerCount, bool isSynchronous, const std::string& url, const std::string& mask, const char* location) {
+    gResourceReadySignalCounter = 0;
+
+    Property::Map map;
+    map[Toolkit::ImageVisual::Property::URL] = url;
+    if(!mask.empty())
+    {
+      map[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = mask;
+    }
+    map[Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING] = isSynchronous;
+
+    ImageView imageView                            = ImageView::New();
+    imageView[Toolkit::ImageView::Property::IMAGE] = map;
+    imageView[Actor::Property::SIZE]               = Vector2(100.0f, 200.0f);
+    imageView.ResourceReadySignal().Connect(&OnSimpleResourceReadySignal);
+
+    application.GetScene().Add(imageView);
+    application.SendNotification();
+    application.Render();
+
+    if(!isSynchronous)
+    {
+      // Wait for loading
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(eventTriggerCount), true, location);
+    }
+    tet_printf("test %s [sync:%d] signal fired\n", url.c_str(), isSynchronous ? 1 : 0);
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, location);
+
+    imageView.Unparent();
+  };
+
+  for(int synchronous = 0; synchronous <= 1; synchronous++)
+  {
+    tet_printf("Test normal case (sync:%d)\n", synchronous);
+    TestResourceReadyUrl(1, synchronous, gImage_600_RGB, "", TEST_LOCATION);
+    TestResourceReadyUrl(3, synchronous, gImage_600_RGB, gImage_34_RGBA, TEST_LOCATION); // 3 event trigger required : 2 image load + 1 apply mask
+
+    tet_printf("Test broken image case (sync:%d)\n", synchronous);
+    TestResourceReadyUrl(1, synchronous, "invalid.jpg", "", TEST_LOCATION);
+    TestResourceReadyUrl(2, synchronous, "invalid.jpg", gImage_34_RGBA, TEST_LOCATION);
+
+    tet_printf("Test broken mask image case (sync:%d)\n", synchronous);
+    TestResourceReadyUrl(2, synchronous, gImage_600_RGB, "invalid.png", TEST_LOCATION);
+
+    tet_printf("Test broken both image, mask image case (sync:%d)\n", synchronous);
+    TestResourceReadyUrl(2, synchronous, "invalid.jpg", "invalid.png", TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliImageViewOnResourceReadySignalWithBrokenAlphaMask02(void)
+{
+  tet_infoline("Test signal handler when image try to use cached-and-broken mask image.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  auto TestBrokenMaskResourceReadyUrl = [&application](const std::string& url, const char* location) {
+    Property::Map map;
+    map[Toolkit::ImageVisual::Property::URL] = url;
+    // Use invalid mask url
+    map[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = "invalid.png";
+
+    ImageView imageView                            = ImageView::New();
+    imageView[Toolkit::ImageView::Property::IMAGE] = map;
+    imageView[Actor::Property::SIZE]               = Vector2(100.0f, 200.0f);
+    imageView.ResourceReadySignal().Connect(&OnSimpleResourceReadySignal);
+
+    application.GetScene().Add(imageView);
+    application.SendNotification();
+    application.Render();
+
+    // Don't unparent imageView, for keep the cache.
+  };
+
+  // Use more than 4 images (The number of LocalImageLoadThread)
+  const std::vector<std::string> testUrlList = {gImage_34_RGBA, gImage_600_RGB, "invalid.jpg" /* invalid url */, TEST_IMAGE_1, TEST_IMAGE_2, TEST_BROKEN_IMAGE_DEFAULT};
+
+  int expectResourceReadySignalCounter = 0;
+
+  for(auto& url : testUrlList)
+  {
+    TestBrokenMaskResourceReadyUrl(url, TEST_LOCATION);
+    expectResourceReadySignalCounter++;
+  }
+
+  // Remain 1 signal due to we use #URL + 1 mask image.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(expectResourceReadySignalCounter + 1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gResourceReadySignalCounter, expectResourceReadySignalCounter, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
+{
+  tet_infoline("Test signal handler various case.");
+
+  ToolkitTestApplication application;
+
+  auto TestResourceReadyUrl = [&application](int eventTriggerCount, bool isSynchronous, bool loadSuccess, const std::string& url, const std::string& mask, const char* location) {
+    gResourceReadySignalCounter = 0;
+
+    Property::Map map;
+    map[Toolkit::ImageVisual::Property::URL] = url;
+    if(!mask.empty())
+    {
+      map[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = mask;
+    }
+    map[Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING] = isSynchronous;
+
+    ImageView imageView                            = ImageView::New();
+    imageView[Toolkit::ImageView::Property::IMAGE] = map;
+    imageView[Actor::Property::SIZE]               = Vector2(100.0f, 200.0f);
+    imageView.ResourceReadySignal().Connect(&OnSimpleResourceReadySignal);
+
+    application.GetScene().Add(imageView);
+    application.SendNotification();
+    application.Render();
+
+    // Wait for loading
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(eventTriggerCount), true, location);
+
+    tet_printf("test %s [sync:%d] signal fired\n", url.c_str(), isSynchronous ? 1 : 0);
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, location);
+    DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(Toolkit::ImageView::Property::IMAGE), loadSuccess ? Toolkit::Visual::ResourceStatus::READY : Toolkit::Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+    imageView.Unparent();
+  };
+
+  auto TestAuxiliaryResourceReadyUrl = [&application](bool isSynchronous, bool loadSuccess, const std::string& url, const std::string& auxiliaryUrl, const char* location) {
+    gResourceReadySignalCounter = 0;
+
+    Property::Map map;
+    map[Toolkit::ImageVisual::Property::URL]                        = url;
+    map[Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE]       = auxiliaryUrl;
+    map[Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA] = 0.5f;
+    map[Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING]        = isSynchronous;
+
+    ImageView imageView = ImageView::New();
+    imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+    imageView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+    imageView.ResourceReadySignal().Connect(&OnSimpleResourceReadySignal);
+    application.GetScene().Add(imageView);
+
+    application.SendNotification();
+    application.Render();
+
+    if(!isSynchronous)
+    {
+      // Wait for loading
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, location);
+    }
+
+    tet_printf("test %s [sync:%d] signal fired\n", url.c_str(), isSynchronous ? 1 : 0);
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, location);
+    DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(Toolkit::ImageView::Property::IMAGE), loadSuccess ? Toolkit::Visual::ResourceStatus::READY : Toolkit::Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+    imageView.Unparent();
+  };
+
+  // Case 1 : asynchronous loading
+  tet_printf("Test invalid single simple image Asynchronous\n");
+
+  // Test normal case
+  TestResourceReadyUrl(1, 0, 1, gImage_600_RGB, "", TEST_LOCATION);
+  TestResourceReadyUrl(1, 0, 1, TEST_SVG_FILE_NAME, "", TEST_LOCATION); // 1 rasterize
+  TestResourceReadyUrl(1, 0, 1, TEST_BROKEN_IMAGE_L, "", TEST_LOCATION);
+
+  TestResourceReadyUrl(2, 0, 1, TEST_GIF_FILE_NAME, "", TEST_LOCATION);                   // 2 image loading - batch size
+  TestResourceReadyUrl(1, 0, 1, TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, "", TEST_LOCATION); // 1 rasterize
+
+  TestResourceReadyUrl(3, 0, 1, gImage_600_RGB, gImage_34_RGBA, TEST_LOCATION); // 2 image loading + 1 applymask
+
+  TestAuxiliaryResourceReadyUrl(0, 1, TEST_BROKEN_IMAGE_L, gImage_34_RGBA, TEST_LOCATION);
+
+  // Test broken case
+  TestResourceReadyUrl(1, 0, 0, "invalid.jpg", "", TEST_LOCATION);
+  TestResourceReadyUrl(0, 0, 0, "invalid.svg", "", TEST_LOCATION); // 0 rasterize
+  TestResourceReadyUrl(1, 0, 0, "invalid.9.png", "", TEST_LOCATION);
+  TestResourceReadyUrl(1, 0, 0, "invalid.gif", "", TEST_LOCATION);  // 1 image loading
+  TestResourceReadyUrl(0, 0, 0, "invalid.json", "", TEST_LOCATION); // 0 rasterize
+
+  TestResourceReadyUrl(2, 0, 0, "invalid.jpg", "invalid.png", TEST_LOCATION);  // 2 image loading
+  TestResourceReadyUrl(2, 0, 1, gImage_600_RGB, "invalid.png", TEST_LOCATION); // 2 image loading
+  TestResourceReadyUrl(2, 0, 0, "invalid.jpg", gImage_34_RGBA, TEST_LOCATION); // 2 image loading
+
+  TestAuxiliaryResourceReadyUrl(0, 0, "invalid.9.png", "invalid.png", TEST_LOCATION);
+  TestAuxiliaryResourceReadyUrl(0, 1, TEST_BROKEN_IMAGE_L, "invalid.png", TEST_LOCATION);
+  TestAuxiliaryResourceReadyUrl(0, 0, "invalid.9.png", gImage_34_RGBA, TEST_LOCATION);
+
+  // Case 2 : Synchronous loading
+  tet_printf("Test invalid single simple image Synchronous\n");
+
+  // Test normal case
+  TestResourceReadyUrl(0, 1, 1, gImage_600_RGB, "", TEST_LOCATION);
+  TestResourceReadyUrl(0, 1, 1, TEST_SVG_FILE_NAME, "", TEST_LOCATION); // synchronous rasterize
+  TestResourceReadyUrl(0, 1, 1, TEST_BROKEN_IMAGE_L, "", TEST_LOCATION);
+
+  TestResourceReadyUrl(1, 1, 1, TEST_GIF_FILE_NAME, "", TEST_LOCATION);                   // first frame image loading sync + second frame image loading async
+  TestResourceReadyUrl(0, 1, 1, TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, "", TEST_LOCATION); // synchronous rasterize
+
+  TestResourceReadyUrl(0, 1, 1, gImage_600_RGB, gImage_34_RGBA, TEST_LOCATION);
+
+  TestAuxiliaryResourceReadyUrl(1, 1, TEST_BROKEN_IMAGE_L, gImage_34_RGBA, TEST_LOCATION);
+
+  // Test broken case
+  TestResourceReadyUrl(0, 1, 0, "invalid.jpg", "", TEST_LOCATION);
+  TestResourceReadyUrl(0, 1, 0, "invalid.svg", "", TEST_LOCATION); // 0 rasterize
+  TestResourceReadyUrl(0, 1, 0, "invalid.9.png", "", TEST_LOCATION);
+  TestResourceReadyUrl(0, 1, 0, "invalid.gif", "", TEST_LOCATION);
+  TestResourceReadyUrl(0, 1, 0, "invalid.json", "", TEST_LOCATION); // 0 rasterize
+
+  TestResourceReadyUrl(0, 1, 0, "invalid.jpg", "invalid.png", TEST_LOCATION);
+  TestResourceReadyUrl(0, 1, 1, gImage_600_RGB, "invalid.png", TEST_LOCATION);
+  TestResourceReadyUrl(0, 1, 0, "invalid.jpg", gImage_34_RGBA, TEST_LOCATION);
+
+  TestAuxiliaryResourceReadyUrl(1, 0, "invalid.9.png", "invalid.png", TEST_LOCATION);
+  TestAuxiliaryResourceReadyUrl(1, 1, TEST_BROKEN_IMAGE_L, "invalid.png", TEST_LOCATION);
+  TestAuxiliaryResourceReadyUrl(1, 0, "invalid.9.png", gImage_34_RGBA, TEST_LOCATION);
 
   END_TEST;
 }

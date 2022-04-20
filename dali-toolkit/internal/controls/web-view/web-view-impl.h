@@ -20,12 +20,14 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/adaptor-framework/proxy-accessible.h>
 #include <dali/devel-api/adaptor-framework/web-engine.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/property-notification.h>
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-view.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -423,6 +425,11 @@ private: // From Control
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
+   */
+  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+
+  /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
   Vector3 GetNaturalSize() override;
@@ -662,6 +669,29 @@ private:
    * @param[in] pixel Pixel data of screen shot.
    */
   void OnScreenshotCaptured(Dali::PixelData pixel);
+
+protected:
+  class WebViewAccessible : public DevelControl::ControlAccessible
+  {
+  public:
+    WebViewAccessible() = delete;
+
+    WebViewAccessible(Dali::Actor self, Dali::WebEngine& webEngine);
+
+  protected:
+    /**
+     * @copydoc Dali::Accessibility::ActorAccessible::DoGetChildren()
+     */
+    void DoGetChildren(std::vector<Dali::Accessibility::Accessible*>& children) override;
+
+  private:
+    void OnAccessibilityEnabled();
+    void OnAccessibilityDisabled();
+    void SetRemoteChildAddress(Dali::Accessibility::Address address);
+
+    Dali::Accessibility::ProxyAccessible mRemoteChild;
+    Dali::WebEngine&                     mWebEngine;
+  };
 
 private:
   Dali::Toolkit::Visual::Base mVisual;

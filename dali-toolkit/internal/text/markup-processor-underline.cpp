@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/markup-processor-attribute-helper-functions.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/underlined-character-run.h>
 
@@ -35,12 +36,6 @@ namespace Text
 {
 namespace
 {
-const std::string XHTML_COLOR_ATTRIBUTE("color");
-const std::string XHTML_HEIGHT_ATTRIBUTE("height");
-const std::string XHTML_TYPE_ATTRIBUTE("type");
-const std::string XHTML_DASH_GAP_ATTRIBUTE("dash-gap");
-const std::string XHTML_DASH_WIDTH_ATTRIBUTE("dash-width");
-
 const unsigned int MAX_TYPE_ATTRIBUTE_SIZE = 7u; ///< The maximum length of any of the possible 'type' values.
 
 } // namespace
@@ -85,23 +80,23 @@ void ProcessUnderlineTag(const Tag& tag, UnderlinedCharacterRun& underlinedChara
   {
     const Attribute& attribute(*it);
 
-    if(TokenComparison(XHTML_COLOR_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    if(TokenComparison(MARKUP::UNDERLINE_ATTRIBUTES::COLOR, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessColorAttribute(attribute, underlinedCharacterRun);
     }
-    else if(TokenComparison(XHTML_HEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::UNDERLINE_ATTRIBUTES::HEIGHT, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessHeightAttribute(attribute, underlinedCharacterRun);
     }
-    else if(TokenComparison(XHTML_TYPE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::UNDERLINE_ATTRIBUTES::TYPE, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessTypeAttribute(attribute, underlinedCharacterRun);
     }
-    else if(TokenComparison(XHTML_DASH_GAP_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::UNDERLINE_ATTRIBUTES::DASH_GAP, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessDashGapAttribute(attribute, underlinedCharacterRun);
     }
-    else if(TokenComparison(XHTML_DASH_WIDTH_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::UNDERLINE_ATTRIBUTES::DASH_WIDTH, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessDashWidthAttribute(attribute, underlinedCharacterRun);
     }

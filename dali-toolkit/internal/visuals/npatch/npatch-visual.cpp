@@ -90,6 +90,12 @@ void NPatchVisual::LoadImages()
     // Load the auxiliary image
     auto preMultiplyOnLoading = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
     mAuxiliaryPixelBuffer     = textureManager.LoadPixelBuffer(mAuxiliaryUrl, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, synchronousLoading, this, true, preMultiplyOnLoading);
+
+    // If synchronousLoading is true, we can check the auxiliaryResource's status now.
+    if(synchronousLoading)
+    {
+      mAuxiliaryResourceStatus = mAuxiliaryPixelBuffer ? Toolkit::Visual::ResourceStatus::READY : Toolkit::Visual::ResourceStatus::FAILED;
+    }
   }
 }
 
@@ -192,29 +198,17 @@ void NPatchVisual::DoSetOnScene(Actor& actor)
   // load when first go on stage
   LoadImages();
 
+  // Set mPlacementActor now, because some case, LoadImages can use this information in LoadComplete API.
+  // at this case, we try to SetResouce to mPlaceActor twice. so, we should avoid that case.
+  mPlacementActor = actor;
+
   const NPatchData* data;
-  if(mLoader.GetNPatchData(mId, data))
+  if(mImpl->mRenderer && mLoader.GetNPatchData(mId, data) && data->GetLoadingState() != NPatchData::LoadingState::LOADING)
   {
-    Geometry geometry = CreateGeometry();
-    Shader   shader   = CreateShader();
-
-    mImpl->mRenderer.SetGeometry(geometry);
-    mImpl->mRenderer.SetShader(shader);
-
-    mPlacementActor = actor;
-    if(data->GetLoadingState() != NPatchData::LoadingState::LOADING)
+    // If mAuxiliaryUrl need to be loaded, we should wait it until LoadComplete called.
+    if(!mAuxiliaryUrl.IsValid() || mAuxiliaryResourceStatus != Toolkit::Visual::ResourceStatus::PREPARING)
     {
-      if(RenderingAddOn::Get().IsValid())
-      {
-        RenderingAddOn::Get().SubmitRenderTask(mImpl->mRenderer, data->GetRenderingMap());
-      }
-
-      ApplyTextureAndUniforms();
-      actor.AddRenderer(mImpl->mRenderer);
-      mPlacementActor.Reset();
-
-      // npatch loaded and ready to display
-      ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+      SetResource();
     }
   }
 }
@@ -275,6 +269,7 @@ NPatchVisual::NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFa
   mImageUrl(),
   mAuxiliaryUrl(),
   mId(NPatchData::INVALID_NPATCH_DATA_ID),
+  mAuxiliaryResourceStatus(Toolkit::Visual::ResourceStatus::PREPARING),
   mBorderOnly(false),
   mBorder(),
   mAuxiliaryImageAlpha(0.0f),
@@ -451,46 +446,52 @@ void NPatchVisual::ApplyTextureAndUniforms()
   {
     textureSet = data->GetTextures();
     NPatchHelper::ApplyTextureAndUniforms(mImpl->mRenderer, data);
+
+    if(mAuxiliaryPixelBuffer)
+    {
+      // If the auxiliary image is smaller than the un-stretched NPatch, use CPU resizing to enlarge it to the
+      // same size as the unstretched NPatch. This will give slightly higher quality results than just relying
+      // on GL interpolation alone.
+      if(mAuxiliaryPixelBuffer.GetWidth() < data->GetCroppedWidth() &&
+         mAuxiliaryPixelBuffer.GetHeight() < data->GetCroppedHeight())
+      {
+        mAuxiliaryPixelBuffer.Resize(data->GetCroppedWidth(), data->GetCroppedHeight());
+      }
+
+      // Note, this resets mAuxiliaryPixelBuffer handle
+      auto auxiliaryPixelData = Devel::PixelBuffer::Convert(mAuxiliaryPixelBuffer);
+
+      auto texture = Texture::New(TextureType::TEXTURE_2D,
+                                  auxiliaryPixelData.GetPixelFormat(),
+                                  auxiliaryPixelData.GetWidth(),
+                                  auxiliaryPixelData.GetHeight());
+      texture.Upload(auxiliaryPixelData);
+
+      // TODO : This code exist due to the texture cache manager hold TextureSet, not Texture.
+      // If we call textureSet.SetTexture(1, texture) directly, the cached TextureSet also be changed.
+      // We should make pass utc-Dali-VisualFactory.cpp UtcDaliNPatchVisualAuxiliaryImage02().
+      TextureSet tempTextureSet = TextureSet::New();
+      tempTextureSet.SetTexture(0, textureSet.GetTexture(0));
+      tempTextureSet.SetTexture(1, texture);
+      textureSet = tempTextureSet;
+
+      mImpl->mRenderer.RegisterProperty(DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA,
+                                        AUXILIARY_IMAGE_ALPHA_NAME,
+                                        mAuxiliaryImageAlpha);
+    }
+    mImpl->mRenderer.SetTextures(textureSet);
   }
   else
   {
     DALI_LOG_ERROR("The N patch image '%s' is not a valid N patch image\n", mImageUrl.GetUrl().c_str());
-    textureSet = TextureSet::New();
-
     Actor   actor     = mPlacementActor.GetHandle();
     Vector2 imageSize = Vector2::ZERO;
     if(actor)
     {
       imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
     }
-    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize, false);
   }
-
-  if(mAuxiliaryPixelBuffer)
-  {
-    // If the auxiliary image is smaller than the un-stretched NPatch, use CPU resizing to enlarge it to the
-    // same size as the unstretched NPatch. This will give slightly higher quality results than just relying
-    // on GL interpolation alone.
-    if(mAuxiliaryPixelBuffer.GetWidth() < data->GetCroppedWidth() &&
-       mAuxiliaryPixelBuffer.GetHeight() < data->GetCroppedHeight())
-    {
-      mAuxiliaryPixelBuffer.Resize(data->GetCroppedWidth(), data->GetCroppedHeight());
-    }
-
-    // Note, this resets mAuxiliaryPixelBuffer handle
-    auto auxiliaryPixelData = Devel::PixelBuffer::Convert(mAuxiliaryPixelBuffer);
-
-    auto texture = Texture::New(TextureType::TEXTURE_2D,
-                                auxiliaryPixelData.GetPixelFormat(),
-                                auxiliaryPixelData.GetWidth(),
-                                auxiliaryPixelData.GetHeight());
-    texture.Upload(auxiliaryPixelData);
-    textureSet.SetTexture(1, texture);
-    mImpl->mRenderer.RegisterProperty(DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA,
-                                      AUXILIARY_IMAGE_ALPHA_NAME,
-                                      mAuxiliaryImageAlpha);
-  }
-  mImpl->mRenderer.SetTextures(textureSet);
 
   // Register transform properties
   mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
@@ -525,14 +526,25 @@ void NPatchVisual::SetResource()
     mImpl->mRenderer.SetGeometry(geometry);
     mImpl->mRenderer.SetShader(shader);
 
+    if(RenderingAddOn::Get().IsValid())
+    {
+      RenderingAddOn::Get().SubmitRenderTask(mImpl->mRenderer, data->GetRenderingMap());
+    }
     Actor actor = mPlacementActor.GetHandle();
     if(actor)
     {
       ApplyTextureAndUniforms();
       actor.AddRenderer(mImpl->mRenderer);
       mPlacementActor.Reset();
+    }
 
-      // npatch loaded and ready to display
+    // npatch loaded and ready to display
+    if(data->GetLoadingState() != NPatchData::LoadingState::LOAD_COMPLETE)
+    {
+      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+    }
+    else
+    {
       ResourceReady(Toolkit::Visual::ResourceStatus::READY);
     }
   }
@@ -540,31 +552,42 @@ void NPatchVisual::SetResource()
 
 void NPatchVisual::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
 {
-  if(textureInformation.returnType == TextureUploadObserver::ReturnType::TEXTURE)
+  if(textureInformation.returnType == TextureUploadObserver::ReturnType::TEXTURE) // For the Url.
   {
-    EnablePreMultipliedAlpha(textureInformation.preMultiplied);
-    if(!loadSuccess)
+    if(textureInformation.textureId != TextureManager::INVALID_TEXTURE_ID)
     {
-      // Image loaded and ready to display
-      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+      if(mId == NPatchData::INVALID_NPATCH_DATA_ID)
+      {
+        // Special case when mLoader.Load call LoadComplete function before mId setup.
+        // We can overwrite mId.
+        mId = static_cast<NPatchData::NPatchDataId>(textureInformation.textureId);
+      }
     }
-
-    if(mAuxiliaryPixelBuffer || !mAuxiliaryUrl.IsValid())
+    if(loadSuccess)
     {
-      SetResource();
+      EnablePreMultipliedAlpha(textureInformation.preMultiplied);
     }
   }
-  else // for the ReturnType::PIXEL_BUFFER
+  else // For the AuxiliaryUrl : ReturnType::PIXEL_BUFFER
   {
     if(loadSuccess && textureInformation.url == mAuxiliaryUrl.GetUrl())
     {
-      mAuxiliaryPixelBuffer = textureInformation.pixelBuffer;
-      SetResource();
+      mAuxiliaryPixelBuffer    = textureInformation.pixelBuffer;
+      mAuxiliaryResourceStatus = Toolkit::Visual::ResourceStatus::READY;
     }
     else
     {
-      // Image loaded and ready to display
-      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+      mAuxiliaryResourceStatus = Toolkit::Visual::ResourceStatus::FAILED;
+    }
+  }
+  // If auxiliaryUrl didn't required OR auxiliaryUrl load done.
+  if(!mAuxiliaryUrl.IsValid() || mAuxiliaryResourceStatus != Toolkit::Visual::ResourceStatus::PREPARING)
+  {
+    const NPatchData* data;
+    // and.. If Url loading done.
+    if(mImpl->mRenderer && mLoader.GetNPatchData(mId, data) && data->GetLoadingState() != NPatchData::LoadingState::LOADING)
+    {
+      SetResource();
     }
   }
 }

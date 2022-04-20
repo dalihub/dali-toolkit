@@ -97,10 +97,10 @@ struct Controller::Relayouter
   /**
    * @brief Called by the Controller to calculate the veritcal offset give the control size.
    *
-   * @param[in] controller A reference to the controller class
+   * @param[in] impl A reference to the controller impl class
    * @param[in] controlSize The control size
    */
-  static void CalculateVerticalOffset(Controller& controller, const Size& controlSize);
+  static void CalculateVerticalOffset(Controller::Impl& impl, const Size& controlSize);
 
   /**
   * @brief Calculates the layout size of control according to @p requestedControllerSize and @p requestedOperationsMask

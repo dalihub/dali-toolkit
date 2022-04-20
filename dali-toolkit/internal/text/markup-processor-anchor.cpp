@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/anchor.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 
 namespace Dali
 {
@@ -32,18 +33,13 @@ namespace Toolkit
 {
 namespace Text
 {
-namespace
-{
-const std::string XHTML_HREF_ATTRIBUTE("href");
-} // namespace
-
 void ProcessAnchor(const Tag& tag, Anchor& anchor)
 {
   anchor.href = nullptr;
 
   for(auto&& attribute : tag.attributes)
   {
-    if(TokenComparison(XHTML_HREF_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    if(TokenComparison(MARKUP::ANCHOR_ATTRIBUTES::HREF, attribute.nameBuffer, attribute.nameLength))
     {
       Length hrefLength = attribute.valueLength + 1;
       anchor.href       = new char[hrefLength];

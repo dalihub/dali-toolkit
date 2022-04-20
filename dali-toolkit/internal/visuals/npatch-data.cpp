@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ NPatchData::NPatchData()
   mCroppedWidth(0),
   mCroppedHeight(0),
   mBorder(0, 0, 0, 0),
-  mLoadingState(LoadingState::LOADING),
+  mLoadingState(LoadingState::NOT_STARTED),
   mPreMultiplyOnLoad(false),
   mRenderingMap{nullptr}
 {
@@ -224,22 +224,49 @@ void NPatchData::SetLoadedNPatchData(Devel::PixelBuffer& pixelBuffer, bool preMu
   mLoadingState = LoadingState::LOAD_COMPLETE;
 }
 
+void NPatchData::NotifyObserver(TextureUploadObserver* observer, const bool& loadSuccess)
+{
+  observer->LoadComplete(
+    loadSuccess,
+    TextureUploadObserver::TextureInformation(
+      TextureUploadObserver::ReturnType::TEXTURE,
+      static_cast<TextureManager::TextureId>(mId), ///< Note : until end of NPatchLoader::Load, npatch-visual don't know the id of data.
+      mTextureSet,
+      false,     // UseAtlas
+      Vector4(), // AtlasRect
+      mPreMultiplyOnLoad));
+}
+
 void NPatchData::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
 {
   if(loadSuccess)
   {
-    SetLoadedNPatchData(textureInformation.pixelBuffer, textureInformation.preMultiplied);
+    if(mLoadingState != LoadingState::LOAD_COMPLETE)
+    {
+      // If mLoadingState is LOAD_FAILED, just re-set (It can be happened when sync loading is failed, but async loading is succeeded).
+      SetLoadedNPatchData(textureInformation.pixelBuffer, textureInformation.preMultiplied);
+    }
   }
   else
   {
-    mLoadingState = LoadingState::LOAD_FAILED;
+    if(mLoadingState == LoadingState::LOADING)
+    {
+      mLoadingState = LoadingState::LOAD_FAILED;
+    }
+    // If mLoadingState is already LOAD_COMPLETE, we can use uploaded texture (It can be happened when sync loading is succeeded, but async loading is failed).
+    else if(mLoadingState == LoadingState::LOAD_COMPLETE)
+    {
+      loadSuccess = true;
+    }
   }
 
   for(uint32_t index = 0; index < mObserverList.Count(); ++index)
   {
     TextureUploadObserver* observer = mObserverList[index];
-    observer->LoadComplete(loadSuccess, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::TEXTURE, TextureManager::INVALID_TEXTURE_ID, mTextureSet, false, Vector4(), textureInformation.preMultiplied));
+    NotifyObserver(observer, loadSuccess);
   }
+
+  mObserverList.Clear();
 }
 
 } // namespace Internal

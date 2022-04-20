@@ -17,8 +17,6 @@
 // CLASS HEADER
 #include "rolling-animated-image-cache.h"
 
-// EXTERNAL HEADERS
-
 // INTERNAL HEADERS
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h> // For ImageAtlasManagerPtr
@@ -45,7 +43,7 @@ Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "
 #define LOG_CACHE
 #endif
 
-const bool ENABLE_ORIENTATION_CORRECTION(true);
+static constexpr bool ENABLE_ORIENTATION_CORRECTION(true);
 
 } // namespace
 
@@ -55,32 +53,30 @@ namespace Toolkit
 {
 namespace Internal
 {
+namespace
+{
+static constexpr uint32_t SINGLE_IMAGE_COUNT = 1u;
+static constexpr uint32_t FIRST_FRAME_INDEX  = 0u;
+} // namespace
+
 RollingAnimatedImageCache::RollingAnimatedImageCache(
-  TextureManager& textureManager, AnimatedImageLoading& animatedImageLoading, uint32_t frameCount, ImageCache::FrameReadyObserver& observer, uint16_t cacheSize, uint16_t batchSize, bool isSynchronousLoading)
-: ImageCache(textureManager, observer, batchSize),
+  TextureManager& textureManager, AnimatedImageLoading& animatedImageLoading, ImageCache::FrameReadyObserver& observer, uint16_t cacheSize, uint16_t batchSize, bool isSynchronousLoading)
+: ImageCache(textureManager, observer, batchSize, 0u),
   mAnimatedImageLoading(animatedImageLoading),
-  mFrameCount(frameCount),
-  mFrameIndex(0),
+  mFrameCount(SINGLE_IMAGE_COUNT),
+  mFrameIndex(FIRST_FRAME_INDEX),
   mCacheSize(cacheSize),
   mQueue(cacheSize),
-  mIsSynchronousLoading(isSynchronousLoading),
-  mOnLoading(false)
+  mIsSynchronousLoading(isSynchronousLoading)
 {
   mImageUrls.resize(mFrameCount);
   mIntervals.assign(mFrameCount, 0);
-  LoadBatch();
 }
 
 RollingAnimatedImageCache::~RollingAnimatedImageCache()
 {
-  if(mTextureManagerAlive)
-  {
-    while(!mQueue.IsEmpty())
-    {
-      ImageFrame imageFrame = mQueue.PopFront();
-      mTextureManager.Remove(mImageUrls[imageFrame.mFrameNumber].mTextureId, this);
-    }
-  }
+  ClearCache();
+  mAnimatedImageLoading.Reset();
 }
 
 TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
@@ -95,53 +91,53 @@ TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
   }
 
   TextureSet textureSet;
+  uint32_t   batchFrameIndex = frameIndex;
   // If we need to load new frame that are not stored in queue.
   // Load the frame synchronously.
+  bool synchronouslyLoaded = false;
   if(mIsSynchronousLoading && mQueue.IsEmpty())
   {
-    bool synchronousLoading = true;
-    textureSet              = mTextureManager.LoadAnimatedImageTexture(mAnimatedImageLoading, frameIndex, SamplingMode::BOX_THEN_LINEAR, synchronousLoading, mImageUrls[frameIndex].mTextureId, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this);
-    mFrameIndex             = (frameIndex + 1) % mFrameCount;
+    textureSet          = RequestFrameLoading(frameIndex, frameIndex == FIRST_FRAME_INDEX, true);
+    batchFrameIndex     = (frameIndex + 1) % mFrameCount;
+    uint32_t interval = 0u;
+    if(textureSet)
+    {
+      synchronouslyLoaded = true;
+      interval = mAnimatedImageLoading.GetFrameInterval(mQueue.Back().mFrameNumber);
+    }
+    MakeFrameReady(synchronouslyLoaded, textureSet, interval);
   }
 
-  if(popExist || mQueue.IsEmpty())
+  if(popExist || mQueue.IsEmpty() || synchronouslyLoaded)
   {
     // If the frame of frameIndex was already loaded, load batch from the last frame of queue
     if(!mQueue.IsEmpty())
     {
       if(!mLoadWaitingQueue.empty())
       {
-        mFrameIndex = (mLoadWaitingQueue.back() + 1) % mFrameCount;
+        batchFrameIndex = (mLoadWaitingQueue.back() + 1) % mFrameCount;
       }
       else
       {
-        mFrameIndex = (mQueue.Back().mFrameNumber + 1) % mFrameCount;
+        batchFrameIndex = (mQueue.Back().mFrameNumber + 1) % mFrameCount;
       }
     }
     else
     {
-      mOnLoading = false;
       // If the request is for the first frame or a jumped frame(JUMP_TO) remove current waiting queue.
       mLoadWaitingQueue.clear();
       // If the queue is empty, and the frame of frameIndex is not loaded synchronously. load batch from the frame of frameIndex
       if(!textureSet)
       {
-        mFrameIndex = frameIndex;
+        batchFrameIndex = frameIndex;
       }
     }
-    LoadBatch();
+    LoadBatch(batchFrameIndex);
   }
 
-  if(!textureSet)
+  if(!textureSet && mLoadState != TextureManager::LoadState::LOAD_FAILED && IsFrontReady() == true)
   {
-    if(IsFrontReady() == true)
-    {
-      textureSet = GetFrontTextureSet();
-    }
-    else
-    {
-      mWaitingForReadyFrame = true;
-    }
+    textureSet = GetFrontTextureSet();
   }
 
   return textureSet;
@@ -149,32 +145,17 @@ TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
 
 TextureSet RollingAnimatedImageCache::FirstFrame()
 {
-  return Frame(0u);
-}
-
-TextureSet RollingAnimatedImageCache::NextFrame()
-{
-  TextureSet textureSet;
-  if(!mQueue.IsEmpty())
-  {
-    uint32_t frameIndex = mQueue.Front().mFrameNumber;
-    if(IsFrontReady())
-    {
-      frameIndex = (frameIndex + 1) % mFrameCount;
-    }
-    textureSet = Frame(frameIndex);
-  }
-  else
-  {
-    DALI_LOG_ERROR("Cache is empty.");
-  }
-
+  TextureSet textureSet = Frame(FIRST_FRAME_INDEX);
   return textureSet;
 }
 
 uint32_t RollingAnimatedImageCache::GetFrameInterval(uint32_t frameIndex) const
 {
-  return mAnimatedImageLoading.GetFrameInterval(frameIndex);
+  if(frameIndex >= mIntervals.size())
+  {
+    return 0u;
+  }
+  return mIntervals[frameIndex];
 }
 
 int32_t RollingAnimatedImageCache::GetCurrentFrameIndex() const
@@ -196,7 +177,7 @@ bool RollingAnimatedImageCache::IsFrontReady() const
   return (!mQueue.IsEmpty() && mQueue.Front().mReady);
 }
 
-void RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex)
+TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, bool useCache, bool synchronousLoading)
 {
   ImageFrame imageFrame;
   imageFrame.mFrameNumber = frameIndex;
@@ -204,38 +185,44 @@ void RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex)
 
   mQueue.PushBack(imageFrame);
 
-  mRequestingLoad = true;
+  mLoadState = TextureManager::LoadState::LOADING;
 
-  bool synchronousLoading = false;
-  mTextureManager.LoadAnimatedImageTexture(mAnimatedImageLoading, frameIndex, SamplingMode::BOX_THEN_LINEAR, synchronousLoading, mImageUrls[frameIndex].mTextureId, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this);
+  TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
+  TextureSet                textureSet    = mTextureManager.LoadAnimatedImageTexture(mAnimatedImageLoading,
+                                                                   frameIndex,
+                                                                   loadTextureId,
+                                                                   SamplingMode::BOX_THEN_LINEAR,
+                                                                   Dali::WrapMode::Type::DEFAULT,
+                                                                   Dali::WrapMode::Type::DEFAULT,
+                                                                   synchronousLoading,
+                                                                   useCache,
+                                                                   this);
 
-  mRequestingLoad = false;
+  mImageUrls[frameIndex].mTextureId = loadTextureId;
+
+  return textureSet;
 }
 
-void RollingAnimatedImageCache::LoadBatch()
+void RollingAnimatedImageCache::LoadBatch(uint32_t frameIndex)
 {
   // Try and load up to mBatchSize images, until the cache is filled.
   // Once the cache is filled, as frames progress, the old frame is
   // removed, and another frame is loaded
-
-  bool frontFrameReady = IsFrontReady();
-  for(unsigned int i = 0; i < mBatchSize && mQueue.Count() + mLoadWaitingQueue.size() < static_cast<uint32_t>(mCacheSize) && !mQueue.IsFull(); ++i)
+  uint32_t minimumSize = std::min(mCacheSize, mFrameCount);
+  for(uint32_t i = 0; i < mBatchSize && (mQueue.Count() + mLoadWaitingQueue.size()) < minimumSize; ++i)
   {
-    if(!mOnLoading)
+    if(mLoadState != TextureManager::LoadState::LOADING)
     {
-      mOnLoading = true;
-      RequestFrameLoading(mFrameIndex);
+      RequestFrameLoading(frameIndex, frameIndex == FIRST_FRAME_INDEX, false);
     }
     else
     {
-      mLoadWaitingQueue.push_back(mFrameIndex);
+      mLoadWaitingQueue.push_back(frameIndex);
     }
 
-    mFrameIndex++;
-    mFrameIndex %= mFrameCount;
+    frameIndex++;
+    frameIndex %= mFrameCount;
   }
-
-  CheckFrontFrame(frontFrameReady);
 
   LOG_CACHE;
 }
@@ -265,12 +252,48 @@ TextureManager::TextureId RollingAnimatedImageCache::GetCachedTextureId(int inde
   return mImageUrls[mQueue[index].mFrameNumber].mTextureId;
 }
 
-void RollingAnimatedImageCache::CheckFrontFrame(bool wasReady)
+void RollingAnimatedImageCache::ClearCache()
 {
-  if(mWaitingForReadyFrame && wasReady == false && IsFrontReady())
+  while(mTextureManagerAlive && !mQueue.IsEmpty())
   {
-    mWaitingForReadyFrame = false;
-    mObserver.FrameReady(GetFrontTextureSet());
+    ImageFrame imageFrame = mQueue.PopFront();
+    mTextureManager.Remove(mImageUrls[imageFrame.mFrameNumber].mTextureId, this);
+    mImageUrls[imageFrame.mFrameNumber].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+  }
+  mLoadWaitingQueue.clear();
+  mLoadState = TextureManager::LoadState::NOT_STARTED;
+}
+
+void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t interval)
+{
+  if(!loadSuccess)
+  {
+    mLoadState = TextureManager::LoadState::LOAD_FAILED;
+    mObserver.FrameReady(TextureSet(), 0);
+  }
+  else
+  {
+    mLoadState = TextureManager::LoadState::LOAD_FINISHED;
+
+    // Reset size of Queue according to the real frame count.
+    if(mFrameCount != mAnimatedImageLoading.GetImageCount())
+    {
+      mFrameCount = mAnimatedImageLoading.GetImageCount();
+      mImageUrls.resize(mFrameCount);
+      mIntervals.assign(mFrameCount, 0u);
+    }
+
+    bool frontFrameReady = IsFrontReady();
+    // Because only one frame is on loading and the others are in mLoadWaitingQueue,
+    // mQueue.Back() is always the frame currently loaded.
+    mQueue.Back().mReady                   = true;
+    mIntervals[mQueue.Back().mFrameNumber] = interval;
+    // Check whether currently loaded frame is front of queue or not.
+    // If it is, notify frame ready to observer.
+    if(frontFrameReady == false && IsFrontReady())
+    {
+      mObserver.FrameReady(textureSet, interval);
+    }
   }
 }
 
@@ -279,32 +302,34 @@ void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformatio
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::LoadComplete(textureId:%d) start\n", textureInformation.textureId);
   LOG_CACHE;
 
-  bool frontFrameReady = IsFrontReady();
+  MakeFrameReady(loadSuccess, mTextureManager.GetTextureSet(textureInformation.textureId), textureInformation.interval);
 
-  if(!mRequestingLoad)
+  if(loadSuccess)
   {
-    SetImageFrameReady(textureInformation.textureId);
-
-    CheckFrontFrame(frontFrameReady);
-  }
-  else
-  {
-    // LoadComplete has been called from within RequestLoad. TextureManager must
-    // therefore already have the texture cached, so make the texture ready.
-    // (Use the last texture, as the texture id hasn't been assigned yet)
-    mQueue.Back().mReady = true;
-  }
-
-  mOnLoading = false;
-  // The frames of a single animated image can not be loaded parallelly.
-  // Therefore, a frame is now loading, other orders are waiting.
-  // And, after the frame is loaded, requests load of next order.
-  if(!mLoadWaitingQueue.empty())
-  {
-    uint32_t loadingIndex = mLoadWaitingQueue.front();
-    mLoadWaitingQueue.erase(mLoadWaitingQueue.begin());
-    mOnLoading = true;
-    RequestFrameLoading(loadingIndex);
+    // The frames of a single animated image can not be loaded parallelly.
+    // Therefore, a frame is now loading, other orders are waiting.
+    // And, after the frame is loaded, requests load of next order.
+    if(!mLoadWaitingQueue.empty())
+    {
+      uint32_t loadingIndex = mLoadWaitingQueue.front();
+      mLoadWaitingQueue.erase(mLoadWaitingQueue.begin());
+      RequestFrameLoading(loadingIndex, loadingIndex == FIRST_FRAME_INDEX, false);
+    }
+    else if(mQueue.Count() == 1u && textureInformation.frameCount > SINGLE_IMAGE_COUNT)
+    {
+      // There is only an image in queue and no waiting queue.
+      // Request to load batch once again.
+      uint32_t batchFrameIndex = 0u;
+      if(!mLoadWaitingQueue.empty())
+      {
+        batchFrameIndex = (mLoadWaitingQueue.back() + 1) % mFrameCount;
+      }
+      else
+      {
+        batchFrameIndex = (mQueue.Back().mFrameNumber + 1) % mFrameCount;
+      }
+      LoadBatch(batchFrameIndex);
+    }
   }
 
   LOG_CACHE;

@@ -591,6 +591,158 @@ int UtcTextureManagerUseInvalidMask(void)
   END_TEST;
 }
 
+int UtcTextureManagerUseInvalidMaskAndMaskLoadedFirst(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcTextureManagerUseInvalidMask when normal image loaded first, and mask image loaded first");
+  tet_infoline("Try to check PostLoad works well");
+
+  TextureManager textureManager; // Create new texture manager
+
+  TestObserver                       observer;
+  std::string                        filename(TEST_IMAGE_FILE_NAME);
+  std::string                        maskname("invalid.png");
+  TextureManager::MaskingDataPointer maskInfo = nullptr;
+  maskInfo.reset(new TextureManager::MaskingData());
+  maskInfo->mAlphaMaskUrl       = maskname;
+  maskInfo->mAlphaMaskId        = TextureManager::INVALID_TEXTURE_ID;
+  maskInfo->mCropToMask         = true;
+  maskInfo->mContentScaleFactor = 1.0f;
+
+  auto                          textureId(TextureManager::INVALID_TEXTURE_ID);
+  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
+  Dali::ImageDimensions         atlasRectSize(0, 0);
+  bool                          synchronousLoading(false);
+  bool                          atlasingStatus(false);
+  bool                          loadingStatus(false);
+  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  ImageAtlasManagerPtr          atlasManager        = nullptr;
+  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+
+  textureManager.LoadTexture(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    synchronousLoading,
+    textureId,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    WrapMode::DEFAULT,
+    WrapMode::DEFAULT,
+    &observer,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  DALI_TEST_EQUALS(observer.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mObserverCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(observer.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcTextureManagerUseInvalidMaskAndMaskLoadedLater(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcTextureManagerUseInvalidMask when normal image loaded first, and mask image loaded later");
+  tet_infoline("Try to check CheckForWaitingTexture called");
+
+  TextureManager textureManager; // Create new texture manager
+
+  TestObserver                       observer;
+  std::string                        filename(TEST_IMAGE_FILE_NAME);
+  std::string                        maskname("invalid.png");
+  TextureManager::MaskingDataPointer maskInfo = nullptr;
+  maskInfo.reset(new TextureManager::MaskingData());
+  maskInfo->mAlphaMaskUrl       = maskname;
+  maskInfo->mAlphaMaskId        = TextureManager::INVALID_TEXTURE_ID;
+  maskInfo->mCropToMask         = true;
+  maskInfo->mContentScaleFactor = 1.0f;
+
+  auto                          textureId(TextureManager::INVALID_TEXTURE_ID);
+  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
+  Dali::ImageDimensions         atlasRectSize(0, 0);
+  bool                          synchronousLoading(false);
+  bool                          atlasingStatus(false);
+  bool                          loadingStatus(false);
+  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  ImageAtlasManagerPtr          atlasManager        = nullptr;
+  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+
+  textureManager.LoadTexture(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    synchronousLoading,
+    textureId,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    WrapMode::DEFAULT,
+    WrapMode::DEFAULT,
+    &observer,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  DALI_TEST_EQUALS(observer.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mObserverCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // CAPTION : HARD-CODING for coverage. If you are a good boy, Do not follow this code.
+  {
+    Dali::Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
+      filename,
+      ImageDimensions(),
+      FittingMode::SCALE_TO_FILL,
+      SamplingMode::BOX_THEN_LINEAR,
+      true, ///< synchronousLoading
+      nullptr,
+      true, ///< orientationCorrection
+      preMultiply);
+
+    textureManager.AsyncLoadComplete(textureId, pixelBuffer);
+    textureManager.AsyncLoadComplete(maskInfo->mAlphaMaskId, Dali::Devel::PixelBuffer());
+    textureManager.Remove(maskInfo->mAlphaMaskId, nullptr);
+    textureManager.Remove(textureId, &observer);
+  }
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(observer.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcTextureManagerSynchronousLoadingFail(void)
 {
   ToolkitTestApplication application;

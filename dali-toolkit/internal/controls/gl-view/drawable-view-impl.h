@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_INTERNAL_GL_VIEW_H
-#define DALI_TOOLKIT_INTERNAL_GL_VIEW_H
+#ifndef DALI_TOOLKIT_INTERNAL_DRAWABLE_VIEW_H
+#define DALI_TOOLKIT_INTERNAL_DRAWABLE_VIEW_H
 
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
@@ -24,13 +24,13 @@
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/signals/render-callback.h>
+#include "gl-view-interface-impl.h"
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/gl-view/gl-view-render-thread.h>
 #include <dali-toolkit/internal/controls/gl-view/gl-view-interface-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
-
 
 namespace Dali::Toolkit
 {
@@ -38,21 +38,21 @@ class GlView;
 
 namespace Internal
 {
-class GlView : public Dali::Toolkit::Internal::GlViewImpl
+class DrawableView : public Dali::Toolkit::Internal::GlViewImpl
 {
 protected:
-  virtual ~GlView();
+  virtual ~DrawableView();
 
 public:
   /**
    * @copydoc Dali::Toolkit::GlView::New()
    */
-  static Dali::Toolkit::GlView New(Dali::Toolkit::GlView::ColorFormat colorFormat);
+  static Dali::Toolkit::GlView New();
 
   /**
    * Construct a new GlView.
    */
-  GlView(Dali::Toolkit::GlView::ColorFormat colorFormat);
+  DrawableView();
 
   /**
    * @copydoc Dali::Toolkit::GlView::RegisterGlCallbacks()
@@ -82,7 +82,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::GlView::RenderOnce()
    */
-  void RenderOnce() override;
+  void RenderOnce();
 
 private: // From Control
   /**
@@ -107,8 +107,8 @@ private: // From Control
 
 private:
   // Undefined copy constructor and assignment operators
-  GlView(const GlView& GlView);
-  GlView& operator=(const GlView& GlView);
+  DrawableView(const DrawableView& GlView);
+  DrawableView& operator=(const DrawableView& GlView);
 
   /**
    * Callback when the visibility of the GlView is changed
@@ -121,40 +121,48 @@ private:
   void OnWindowVisibilityChanged(Dali::Window window, bool visible);
 
   /**
-   * Creates the geometry for texturing.
-   */
-  Dali::Geometry CreateTexturedQuad();
-
-  /**
    * Adds renderer to Actor.
    */
   void AddRenderer();
 
-  /**
-   * Creates shader for rendering.
-   */
-  Dali::Shader CreateShader();
+private:
 
-  /**
-   * @brief Gets the NativeImageSourceQueue's ColorFormat with the GlView's ColorFormat.
-   * @param[in] colorFormat the color format of the GlView.
-   * @return The color format of NativeImageSourceQueue
-   */
-  Dali::NativeImageSourceQueue::ColorFormat GetColorFormat(Dali::Toolkit::GlView::ColorFormat format);
+  bool OnRenderCallback( const RenderCallbackInput& renderCallbackInput );
 
 private:
-  std::unique_ptr<GlViewRenderThread>  mRenderThread;
-  Dali::NativeImageSourceQueuePtr      mNativeImageQueue;
   Dali::Toolkit::GlView::RenderingMode mRenderingMode;
-  Dali::Toolkit::GlView::ColorFormat   mColorFormat;
 
   bool mDepth;
   bool mStencil;
   int  mMSAA;
+
+  std::unique_ptr<RenderCallback> mRenderCallback;
+
+  /*
+   * Used within RenderCallback to handle the current render state
+   */
+  enum class ViewState
+  {
+    INIT,
+    RENDER,
+    TERMINATE
+  };
+
+  ViewState mCurrentViewState{ViewState::INIT}; ///< state within RenderCallback
+
+  // These callbacks are stored for GLView API compatibility
+  std::unique_ptr<CallbackBase> mOnInitCallback;
+  std::unique_ptr<CallbackBase> mOnRenderCallback;
+  std::unique_ptr<CallbackBase> mOnTerminateCallback;
+  std::unique_ptr<CallbackBase> mOnResizeCallback;
+
+  std::atomic_bool mSurfaceResized{false}; ///< Flag to invoke surface resize callback
+
+  Size mSurfaceSize{}; ///< Surface size
 };
 
 } // namespace Internal
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_INTERNAL_GL_VIEW_H
+#endif // DALI_TOOLKIT_INTERNAL_DRAWABLE_VIEW_H

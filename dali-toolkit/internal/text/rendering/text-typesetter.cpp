@@ -848,12 +848,6 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     // Increases the vertical offset with the line's ascender.
     glyphData.verticalOffset += static_cast<int>(line.ascender);
 
-    // Include line spacing after first line
-    if(lineIndex > 0u)
-    {
-      glyphData.verticalOffset += static_cast<int>(line.lineSpacing);
-    }
-
     // Retrieves the glyph's outline width
     float outlineWidth = static_cast<float>(mModel->GetOutlineWidth());
 
@@ -1158,8 +1152,8 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       DrawStrikethrough(bufferWidth, bufferHeight, glyphData, baseline, strikethroughStartingYPosition, maxStrikethroughHeight, lineExtentLeft, lineExtentRight, modelStrikethroughProperties, currentStrikethroughProperties, line);
     }
 
-    // Increases the vertical offset with the line's descender.
-    glyphData.verticalOffset += static_cast<int>(-line.descender);
+    // Increases the vertical offset with the line's descender & line spacing.
+    glyphData.verticalOffset += static_cast<int>(-line.descender+line.lineSpacing);
   }
 
   return glyphData.bitmapBuffer;

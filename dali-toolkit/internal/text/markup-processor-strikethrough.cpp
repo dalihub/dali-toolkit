@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/markup-processor-attribute-helper-functions.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 #include <dali-toolkit/internal/text/strikethrough-character-run.h>
 
 namespace Dali
@@ -32,12 +33,6 @@ namespace Toolkit
 {
 namespace Text
 {
-namespace
-{
-const std::string XHTML_COLOR_ATTRIBUTE("color");
-const std::string XHTML_HEIGHT_ATTRIBUTE("height");
-} // namespace
-
 void ProcessColorAttribute(const Attribute& attribute, StrikethroughCharacterRun& strikethroughRun)
 
 {
@@ -60,11 +55,11 @@ void ProcessStrikethroughTag(const Tag& tag, StrikethroughCharacterRun& striketh
   {
     const Attribute& attribute(*it);
 
-    if(TokenComparison(XHTML_COLOR_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    if(TokenComparison(MARKUP::STRIKETHROUGH_ATTRIBUTES::COLOR, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessColorAttribute(attribute, strikethroughRun);
     }
-    else if(TokenComparison(XHTML_HEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::STRIKETHROUGH_ATTRIBUTES::HEIGHT, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessHeightAttribute(attribute, strikethroughRun);
     }

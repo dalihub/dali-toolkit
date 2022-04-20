@@ -20,6 +20,8 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
@@ -688,6 +690,14 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Check that the Alignment properties can be correctly set
   editor.SetProperty(TextEditor::Property::HORIZONTAL_ALIGNMENT, "END");
   DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::HORIZONTAL_ALIGNMENT), "END", TEST_LOCATION);
+
+  // Check that the Alignment properties can be correctly set
+  editor.SetProperty(DevelTextEditor::Property::VERTICAL_ALIGNMENT, "BOTTOM");
+  DALI_TEST_EQUALS(editor.GetProperty<std::string>(DevelTextEditor::Property::VERTICAL_ALIGNMENT), "BOTTOM", TEST_LOCATION);
+  editor.SetProperty(DevelTextEditor::Property::VERTICAL_ALIGNMENT, "CENTER");
+  DALI_TEST_EQUALS(editor.GetProperty<std::string>(DevelTextEditor::Property::VERTICAL_ALIGNMENT), "CENTER", TEST_LOCATION);
+  editor.SetProperty(DevelTextEditor::Property::VERTICAL_ALIGNMENT, "TOP");
+  DALI_TEST_EQUALS(editor.GetProperty<std::string>(DevelTextEditor::Property::VERTICAL_ALIGNMENT), "TOP", TEST_LOCATION);
 
   // Check scroll properties.
   editor.SetProperty(TextEditor::Property::SCROLL_THRESHOLD, 1.f);
@@ -3630,6 +3640,9 @@ int UtcDaliTextEditorEnableEditing(void)
   application.SendNotification();
   application.Render();
 
+  textEditor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
+  DALI_TEST_EQUALS(textEditor.GetProperty(DevelActor::Property::USER_INTERACTION_ENABLED).Get<bool>(), true, TEST_LOCATION);
+
   textEditor.SetKeyInputFocus();
   textEditor.SetProperty(DevelTextEditor::Property::ENABLE_EDITING, false);
   application.ProcessEvent(GenerateKey("D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -3651,6 +3664,24 @@ int UtcDaliTextEditorEnableEditing(void)
 
   DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "D", TEST_LOCATION);
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::ENABLE_EDITING).Get<bool>(), true, TEST_LOCATION);
+
+  // Check the user interaction enabled and for coverage
+  DevelTextEditor::SelectWholeText(textEditor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetKeyInputFocus();
+  textEditor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, false);
+  application.ProcessEvent(GenerateKey("D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "D", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(DevelActor::Property::USER_INTERACTION_ENABLED).Get<bool>(), false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -5765,6 +5796,55 @@ int UtcDaliToolkitTextEditorUnderlineTypesGeneration3(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextEditorMarkupRelativeLineHeight(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextEditorMarkupRelativeLineHeight");
+
+  TextEditor editor = TextEditor::New();
+  editor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10);
+  editor.SetProperty(TextEditor::Property::TEXT, "line 1\nline 2\nline 3\nline 4\nline 5");
+  editor.SetProperty(DevelTextEditor::Property::RELATIVE_LINE_SIZE, 1.0f);
+  editor.SetProperty(DevelTextEditor::Property::ELLIPSIS, false);
+  editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+
+  TextEditor editorSingleLineParagraph = TextEditor::New();
+  editorSingleLineParagraph.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  editorSingleLineParagraph.SetProperty(TextEditor::Property::POINT_SIZE, 10);
+  editorSingleLineParagraph.SetProperty(TextEditor::Property::TEXT, "<p>line 1</p><p rel-line-height=0.5>line 2</p>line 3<p rel-line-height=3>line 4</p>line 5");
+  editorSingleLineParagraph.SetProperty(DevelTextEditor::Property::RELATIVE_LINE_SIZE, 1.0f);
+  editorSingleLineParagraph.SetProperty(DevelTextEditor::Property::ELLIPSIS, false);
+  editorSingleLineParagraph.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+
+  TextEditor editorMultiLineParagraph = TextEditor::New();
+  editorMultiLineParagraph.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  editorMultiLineParagraph.SetProperty(TextEditor::Property::POINT_SIZE, 10);
+  editorMultiLineParagraph.SetProperty(TextEditor::Property::TEXT, "<p>line 1</p><p rel-line-height=0.5>line\n2</p>line 3<p rel-line-height=3>line\n4</p>line 5");
+  editorMultiLineParagraph.SetProperty(DevelTextEditor::Property::RELATIVE_LINE_SIZE, 1.0f);
+  editorMultiLineParagraph.SetProperty(DevelTextEditor::Property::ELLIPSIS, false);
+  editorMultiLineParagraph.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+
+  application.GetScene().Add(editor);
+  application.GetScene().Add(editorSingleLineParagraph);
+  application.GetScene().Add(editorMultiLineParagraph);
+  application.SendNotification();
+  application.Render();
+
+  Vector3 naturalSize               = editor.GetNaturalSize();
+  Vector3 relativeSingleNaturalSize = editorSingleLineParagraph.GetNaturalSize();
+  Vector3 relativeMultiNaturalSize  = editorMultiLineParagraph.GetNaturalSize();
+
+  float lineSize = naturalSize.y / 5.0f; //total size/number of lines
+
+  //no effect of relative line size for paragraph with single line
+  DALI_TEST_EQUALS(naturalSize.y, relativeSingleNaturalSize.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(lineSize*8.5f, relativeMultiNaturalSize.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextEditorRelativeLineHeight(void)
 {
   ToolkitTestApplication application;
@@ -5853,6 +5933,50 @@ int UtcDaliTextEditorTextSizeNegativeLineSpacing(void)
 
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorLineSpacingKeyArrowDown(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextEditorLineSpacingKeyArrowDown");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  application.GetScene().Add(editor);
+
+  std::string cutText    = "";
+  std::string copiedText = "";
+
+  editor.SetProperty(TextEditor::Property::TEXT, "l1\nl2\nl3\n4");
+  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
+  editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 200.f));
+  editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+  editor.SetProperty(TextEditor::Property::LINE_SPACING, -15);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  TestGenerateTap(application, 1.0f, 1.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move to second line of the text.
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(editor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 3, TEST_LOCATION);
 
   END_TEST;
 }

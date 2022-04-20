@@ -25,6 +25,7 @@
 #include <dali-toolkit/internal/text/character-spacing-character-run.h>
 #include <dali-toolkit/internal/text/markup-processor-attribute-helper-functions.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 
 namespace Dali
 {
@@ -32,12 +33,6 @@ namespace Toolkit
 {
 namespace Text
 {
-namespace
-{
-const std::string XHTML_VALUE_ATTRIBUTE("value");
-
-} // namespace
-
 void ProcessValueAttribute(const Attribute& attribute, CharacterSpacingCharacterRun& characterSpacingCharacterRun)
 {
   characterSpacingCharacterRun.value = ProcessFloatAttribute(attribute);
@@ -52,7 +47,7 @@ void ProcessCharacterSpacingTag(const Tag& tag, CharacterSpacingCharacterRun& ch
   {
     const Attribute& attribute(*it);
 
-    if(TokenComparison(XHTML_VALUE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    if(TokenComparison(MARKUP::CHARACTER_SPACING_ATTRIBUTES::VALUE, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessValueAttribute(attribute, characterSpacingCharacterRun);
     }

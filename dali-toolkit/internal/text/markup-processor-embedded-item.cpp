@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/embedded-item.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 
 namespace Dali
 {
@@ -34,11 +35,6 @@ namespace Text
 {
 namespace
 {
-const std::string XHTML_URL_ATTRIBUTE("url");
-const std::string XHTML_WIDTH_ATTRIBUTE("width");
-const std::string XHTML_HEIGHT_ATTRIBUTE("height");
-const std::string XHTML_COLOR_BLENDING_ATTRIBUTE("color-blending");
-
 const std::string NONE("none");
 const std::string MULTIPLY("multiply");
 } // namespace
@@ -57,22 +53,22 @@ void ProcessEmbeddedItem(const Tag& tag, EmbeddedItem& embeddedItem)
       ++it)
   {
     const Attribute& attribute(*it);
-    if(TokenComparison(XHTML_URL_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    if(TokenComparison(MARKUP::EMBEDDED_ITEM_ATTRIBUTES::URL, attribute.nameBuffer, attribute.nameLength))
     {
       embeddedItem.urlLength = attribute.valueLength;
       embeddedItem.url       = new char[embeddedItem.urlLength];
       memcpy(embeddedItem.url, attribute.valueBuffer, embeddedItem.urlLength);
       // The memory is freed when the font run is removed from the logical model.
     }
-    else if(TokenComparison(XHTML_WIDTH_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::EMBEDDED_ITEM_ATTRIBUTES::WIDTH, attribute.nameBuffer, attribute.nameLength))
     {
       embeddedItem.width = StringToUint(attribute.valueBuffer);
     }
-    else if(TokenComparison(XHTML_HEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::EMBEDDED_ITEM_ATTRIBUTES::HEIGHT, attribute.nameBuffer, attribute.nameLength))
     {
       embeddedItem.height = StringToUint(attribute.valueBuffer);
     }
-    else if(TokenComparison(XHTML_COLOR_BLENDING_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::EMBEDDED_ITEM_ATTRIBUTES::COLOR_BLENDING, attribute.nameBuffer, attribute.nameLength))
     {
       if(TokenComparison(MULTIPLY, attribute.valueBuffer, attribute.valueLength))
       {

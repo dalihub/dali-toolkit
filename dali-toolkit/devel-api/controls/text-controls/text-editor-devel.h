@@ -310,6 +310,14 @@ enum Type
    * @note If the value is less than 1, the lines could to be overlapped.
    */
   RELATIVE_LINE_SIZE,
+
+  /**
+   * @brief The line vertical alignment.
+   * @details Name "verticalAlignment", type Property::STRING or type VerticalAlignment::Type (Property::INTEGER).
+   *          Values "TOP", "CENTER", "BOTTOM", default TOP.
+   * @note Return type is Property::STRING
+   */
+  VERTICAL_ALIGNMENT,
 };
 
 } // namespace Property

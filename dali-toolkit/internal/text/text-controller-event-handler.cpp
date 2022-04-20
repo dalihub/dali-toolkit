@@ -117,6 +117,7 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
 
   bool textChanged    = false;
   bool relayoutNeeded = false;
+  bool isEditable     = controller.IsEditable() && controller.IsUserInteractionEnabled();
 
   if((NULL != controller.mImpl->mEventData) &&
      (keyEvent.GetState() == KeyEvent::DOWN))
@@ -148,7 +149,7 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
             (Dali::DALI_KEY_CURSOR_DOWN == keyCode))
     {
       // If don't have any text, do nothing.
-      if(!controller.mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters)
+      if(!controller.mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters || !isEditable)
       {
         return false;
       }
@@ -207,7 +208,7 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
       // Do nothing
       return false;
     }
-    else if(keyEvent.IsCtrlModifier() && !keyEvent.IsShiftModifier())
+    else if(keyEvent.IsCtrlModifier() && !keyEvent.IsShiftModifier() && isEditable)
     {
       bool consumed = false;
       if(keyName == KEY_C_NAME || keyName == KEY_INSERT_NAME || logicalKey == KEY_C_NAME || logicalKey == KEY_INSERT_NAME)
@@ -273,7 +274,7 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
     else
     {
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::KeyEvent %p keyString %s\n", &controller, keyString.c_str());
-      if(!controller.IsEditable()) return false;
+      if(!isEditable) return false;
 
       std::string refinedKey = keyString;
       if(controller.mImpl->mInputFilter != NULL && !refinedKey.empty())

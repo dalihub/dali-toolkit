@@ -323,6 +323,11 @@ private:
    */
   bool EmitCustomWheelSignals(Actor actor, const WheelEvent& event);
 
+  /**
+   * Clear the focus indicator actor.
+   */
+  void ClearFocusIndicator();
+
 private:
   // Undefined
   KeyboardFocusManager(const KeyboardFocusManager&);

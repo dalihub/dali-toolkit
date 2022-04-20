@@ -201,8 +201,11 @@ public:
    * @brief Update the broken image Renderer object
    * @param[in,out] renderer renderer for broken image
    * @param[in] size the size of actor
+   * @param[in] rendererIsImage True if input renderer use image shader already.
+   *                            If true, we don't need to create new renderer when broken image is single image.
+   *                            Most of user experience use normal images. So It can reduce runtime.
    */
-  void UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size);
+  void UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size, const bool& rendererIsImage = true);
 
 public:
   /**

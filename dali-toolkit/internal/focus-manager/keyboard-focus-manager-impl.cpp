@@ -220,7 +220,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
     }
   }
 
-  if(actor && actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  if(actor && actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED) && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
     Integration::SceneHolder currentWindow = Integration::SceneHolder::Get(actor);
 
@@ -244,18 +244,13 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
   }
 
   // Check whether the actor is in the stage and is keyboard focusable.
-  if(actor && actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  if(actor && actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED) && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
     if((mIsFocusIndicatorShown == SHOW) && (mEnableFocusIndicator == ENABLE))
     {
       actor.Add(GetFocusIndicatorActor());
     }
 
-    // Send notification for the change of focus actor
-    if(!mFocusChangedSignal.Empty())
-    {
-      mFocusChangedSignal.Emit(currentFocusedActor, actor);
-    }
 
     Toolkit::Control currentlyFocusedControl = Toolkit::Control::DownCast(currentFocusedActor);
     if(currentlyFocusedControl)
@@ -264,8 +259,6 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
       currentlyFocusedControl.SetProperty(DevelControl::Property::STATE, DevelControl::NORMAL);
       currentlyFocusedControl.ClearKeyInputFocus();
     }
-
-    DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
 
     // Save the current focused actor
     mCurrentFocusActor = actor;
@@ -303,6 +296,11 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
       mFocusHistory.erase(beginPos);
     }
 
+    // Send notification for the change of focus actor
+    if(!mFocusChangedSignal.Empty())
+    {
+      mFocusChangedSignal.Emit(currentFocusedActor, actor);
+    }
     DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] SUCCEED\n", __FUNCTION__, __LINE__);
     success = true;
   }
@@ -554,7 +552,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
       }
     }
 
-    if(nextFocusableActor && nextFocusableActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+    if(nextFocusableActor && nextFocusableActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && nextFocusableActor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED))
     {
       // Whether the next focusable actor is a layout control
       if(IsLayoutControl(nextFocusableActor))
@@ -580,7 +578,7 @@ bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control contr
   Actor nextFocusableActor = GetImplementation(control).GetNextKeyboardFocusableActor(actor, direction, mFocusGroupLoopEnabled);
   if(nextFocusableActor)
   {
-    if(!nextFocusableActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+    if(!(nextFocusableActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) || nextFocusableActor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED)))
     {
       // If the actor is not focusable, ask the same layout control for the next actor to focus
       return DoMoveFocusWithinLayoutControl(control, nextFocusableActor, direction);
@@ -599,7 +597,7 @@ bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control contr
         mIsWaitingKeyboardFocusChangeCommit = false;
       }
 
-      if(committedFocusActor && committedFocusActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+      if(committedFocusActor && committedFocusActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && committedFocusActor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED))
       {
         // Whether the commited focusable actor is a layout control
         if(IsLayoutControl(committedFocusActor))
@@ -681,14 +679,10 @@ void KeyboardFocusManager::DoKeyboardEnter(Actor actor)
 
 void KeyboardFocusManager::ClearFocus()
 {
+  ClearFocusIndicator();
   Actor actor = GetCurrentFocusActor();
   if(actor)
   {
-    if(mFocusIndicatorActor)
-    {
-      actor.Remove(mFocusIndicatorActor);
-    }
-
     // Send notification for the change of focus actor
     if(!mFocusChangedSignal.Empty())
     {
@@ -702,8 +696,19 @@ void KeyboardFocusManager::ClearFocus()
       currentlyFocusedControl.ClearKeyInputFocus();
     }
   }
-
   mCurrentFocusActor.Reset();
+}
+
+void KeyboardFocusManager::ClearFocusIndicator()
+{
+  Actor actor = GetCurrentFocusActor();
+  if(actor)
+  {
+    if(mFocusIndicatorActor)
+    {
+      actor.Remove(mFocusIndicatorActor);
+    }
+  }
   mIsFocusIndicatorShown = (mAlwaysShowIndicator == ALWAYS_SHOW) ? SHOW : HIDE;
 }
 
@@ -1005,17 +1010,29 @@ void KeyboardFocusManager::OnTouch(const TouchEvent& touch)
   // We only do this on a Down event, otherwise the clear action may override a manually focused actor.
   if(((touch.GetPointCount() < 1) || (touch.GetState(0) == PointState::DOWN)))
   {
-    // If mClearFocusOnTouch is false, do not clear the focus even if user touch the screen.
-    if(mClearFocusOnTouch)
-    {
-      ClearFocus();
-    }
-
-    // If KEYBOARD_FOCUSABLE and TOUCH_FOCUSABLE is true, set focus actor
+    // If you touch the currently focused actor again, you don't need to do SetCurrentFocusActor again.
     Actor hitActor = touch.GetHitActor(0);
+    if(hitActor && hitActor == GetCurrentFocusActor())
+    {
+      return;
+    }
+    // If KEYBOARD_FOCUSABLE and TOUCH_FOCUSABLE is true, set focus actor
     if(hitActor && hitActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && hitActor.GetProperty<bool>(DevelActor::Property::TOUCH_FOCUSABLE))
     {
+      // If mClearFocusOnTouch is false, do not clear the focus
+      if(mClearFocusOnTouch)
+      {
+        ClearFocus();
+      }
       SetCurrentFocusActor(hitActor);
+    }
+    else
+    {
+      // If mClearFocusOnTouch is false, do not clear the focus indicator even if user touch the screen.
+      if(mClearFocusOnTouch)
+      {
+        ClearFocusIndicator();
+      }
     }
   }
 }

@@ -110,6 +110,13 @@ void TestVisualAsynchronousRender(ToolkitTestApplication& application,
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 }
 
+int gResourceReadySignalCounter;
+
+void OnResourceReadySignal(Control control)
+{
+  gResourceReadySignalCounter++;
+}
+
 } // namespace
 
 void dali_visual_factory_startup(void)
@@ -729,7 +736,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
   propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(2, 2, 2, 2));
   {
-    tet_infoline("whole grid");
+    tet_infoline("whole grid (2,2,2,2) async");
     Visual::Base visual = factory.CreateVisual(propertyMap);
     DALI_TEST_CHECK(visual);
 
@@ -770,9 +777,80 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   propertyMap.Clear();
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
   propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
+  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(2, 2, 2, 2));
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+  {
+    tet_infoline("whole grid (2,2,2,2) sync");
+    Visual::Base visual = factory.CreateVisual(propertyMap);
+    DALI_TEST_CHECK(visual);
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+    TestVisualRender(application, actor, visual);
+
+    DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+    Vector2 naturalSize(0.0f, 0.0f);
+    visual.GetNaturalSize(naturalSize);
+    DALI_TEST_EQUALS(naturalSize, Vector2(imageSize.GetWidth(), imageSize.GetHeight()), TEST_LOCATION);
+  }
+
+  propertyMap.Clear();
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
+  propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
+  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(1, 1, 1, 1));
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+  {
+    tet_infoline("whole grid (1,1,1,1) sync : for testing same image, different border");
+    Visual::Base visual = factory.CreateVisual(propertyMap);
+    DALI_TEST_CHECK(visual);
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+    TestVisualRender(application, actor, visual);
+
+    DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+    Vector2 naturalSize(0.0f, 0.0f);
+    visual.GetNaturalSize(naturalSize);
+    DALI_TEST_EQUALS(naturalSize, Vector2(imageSize.GetWidth(), imageSize.GetHeight()), TEST_LOCATION);
+  }
+
+  propertyMap.Clear();
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
+  propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
   propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(1, 1, 1, 1));
   {
-    tet_infoline("whole grid");
+    tet_infoline("whole grid (1,1,1,1) async");
+    Visual::Base visual = factory.CreateVisual(propertyMap);
+    DALI_TEST_CHECK(visual);
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+    TestVisualRender(application, actor, visual);
+
+    DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+    Vector2 naturalSize(0.0f, 0.0f);
+    visual.GetNaturalSize(naturalSize);
+    DALI_TEST_EQUALS(naturalSize, Vector2(imageSize.GetWidth(), imageSize.GetHeight()), TEST_LOCATION);
+  }
+
+  propertyMap.Clear();
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
+  propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
+  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(3, 3, 3, 3));
+  {
+    tet_infoline("whole grid (3,3,3,3) async");
     Visual::Base visual = factory.CreateVisual(propertyMap);
     DALI_TEST_CHECK(visual);
 
@@ -1098,6 +1176,169 @@ int UtcDaliVisualFactoryGetNPatchVisual8(void)
     auto     textures = renderer.GetTextures();
 
     DALI_TEST_EQUALS(textures.GetTextureCount(), 1, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetNPatchVisual9(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualFactoryGetNPatchVisual9: Request n-patch visual sync during another n-patch visual load image asynchronously");
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_NPATCH_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl actor = DummyControl::New(true);
+
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  propertyMap.Clear();
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_NPATCH_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+  Visual::Base visual2 = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual2);
+
+  DummyControl actor2 = DummyControl::New(true);
+
+  DummyControlImpl& dummyImpl2 = static_cast<DummyControlImpl&>(actor2.GetImplementation());
+  dummyImpl2.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual2);
+
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  DALI_TEST_EQUALS(actor2.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor2);
+
+  application.SendNotification();
+  application.Render();
+
+  application.SendNotification();
+  application.Render();
+
+  // Async loading is not finished yet.
+  {
+    DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  }
+  // Sync loading is finished.
+  {
+    Renderer renderer = actor2.GetRendererAt(0);
+    auto     textures = renderer.GetTextures();
+
+    DALI_TEST_EQUALS(textures.GetTextureCount(), 1, TEST_LOCATION);
+  }
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+  // Async loading is finished.
+  {
+    Renderer renderer = actor.GetRendererAt(0);
+    auto     textures = renderer.GetTextures();
+
+    DALI_TEST_EQUALS(textures.GetTextureCount(), 1, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetNPatchVisual10(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualFactoryGetNPatchVisual10: Request same 9-patch visual with a different border");
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  // Get actual size of test image
+  ImageDimensions imageSize = Dali::GetClosestImageSize(gImage_34_RGBA);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
+  propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
+  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(2, 2, 2, 2));
+  {
+    tet_infoline("whole grid (2,2,2,2) async");
+    Visual::Base visual = factory.CreateVisual(propertyMap);
+    DALI_TEST_CHECK(visual);
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+    TestVisualAsynchronousRender(application, actor, visual);
+
+    DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+    Vector2 naturalSize(0.0f, 0.0f);
+    visual.GetNaturalSize(naturalSize);
+    DALI_TEST_EQUALS(naturalSize, Vector2(imageSize.GetWidth(), imageSize.GetHeight()), TEST_LOCATION);
+  }
+
+  propertyMap.Clear();
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
+  propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
+  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(1, 1, 1, 1));
+  {
+    tet_infoline("whole grid (1,1,1,1) async. Check whether we use cached texture");
+    // We don't use dummyControl here
+
+    const int expectResourceReadySignalCounter = 10;
+    gResourceReadySignalCounter                = 0;
+
+    for(int i = 0; i < expectResourceReadySignalCounter; i++)
+    {
+      ImageView imageView                            = ImageView::New();
+      imageView[Toolkit::ImageView::Property::IMAGE] = propertyMap;
+      imageView.ResourceReadySignal().Connect(&OnResourceReadySignal);
+      application.GetScene().Add(imageView);
+    }
+
+    // Dont wait for loading. All border use cached texture.
+
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, expectResourceReadySignalCounter, TEST_LOCATION);
+  }
+
+  propertyMap.Clear();
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
+  propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
+  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(1, 2, 1, 2));
+  {
+    tet_infoline("whole grid (1,2,1,2) async. Check whether we use cached texture");
+    // We don't use dummyControl here
+
+    const int expectResourceReadySignalCounter = 10;
+    gResourceReadySignalCounter                = 0;
+
+    for(int i = 0; i < expectResourceReadySignalCounter; i++)
+    {
+      ImageView imageView                            = ImageView::New();
+      imageView[Toolkit::ImageView::Property::IMAGE] = propertyMap;
+      imageView.ResourceReadySignal().Connect(&OnResourceReadySignal);
+      application.GetScene().Add(imageView);
+    }
+
+    // Dont wait for loading. All border use cached texture.
+
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, expectResourceReadySignalCounter, TEST_LOCATION);
   }
 
   END_TEST;

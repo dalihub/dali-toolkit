@@ -398,7 +398,8 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
   const Dali::SamplingMode::Type&            samplingMode,
   const TextureCacheManager::UseAtlas&       useAtlas,
   const TextureCacheManager::TextureId&      maskTextureId,
-  const TextureCacheManager::MultiplyOnLoad& preMultiplyOnLoad)
+  const TextureCacheManager::MultiplyOnLoad& preMultiplyOnLoad,
+  bool                                       isAnimatedImage)
 {
   // Default to an invalid ID, in case we do not find a match.
   TextureCacheIndex cacheIndex = INVALID_CACHE_INDEX;
@@ -416,6 +417,7 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
          (useAtlas == textureInfo.useAtlas) &&
          (maskTextureId == textureInfo.maskTextureId) &&
          (size == textureInfo.desiredSize) &&
+         (isAnimatedImage == textureInfo.isAnimatedImageFormat) &&
          ((size.GetWidth() == 0 && size.GetHeight() == 0) ||
           (fittingMode == textureInfo.fittingMode &&
            samplingMode == textureInfo.samplingMode)))
@@ -449,7 +451,6 @@ void TextureCacheManager::RemoveCache(const TextureCacheManager::TextureId& text
   if(textureInfoIndex != INVALID_CACHE_INDEX)
   {
     TextureInfo& textureInfo(mTextureInfoContainer[textureInfoIndex]);
-
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureCacheManager::Remove(textureId:%d) url:%s\n  cacheIdx:%d loadState:%s reference count = %d\n", textureId, textureInfo.url.GetUrl().c_str(), textureInfoIndex, GET_LOAD_STATE_STRING(textureInfo.loadState), textureInfo.referenceCount);
 
     // Decrement the reference count and check if this is the last user of this Texture.

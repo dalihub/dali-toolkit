@@ -359,12 +359,6 @@ void SvgVisual::OnSetTransform()
   }
 }
 
-bool SvgVisual::IsResourceReady() const
-{
-  return (mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY ||
-          mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED);
-}
-
 void SvgVisual::UpdateShader()
 {
   if(mImpl->mRenderer)

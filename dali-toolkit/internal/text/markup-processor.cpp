@@ -36,6 +36,7 @@
 #include <dali-toolkit/internal/text/markup-processor-span.h>
 #include <dali-toolkit/internal/text/markup-processor-strikethrough.h>
 #include <dali-toolkit/internal/text/markup-processor-underline.h>
+#include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 #include <dali-toolkit/internal/text/xhtml-entities.h>
 
 namespace Dali
@@ -46,25 +47,6 @@ namespace Text
 {
 namespace
 {
-// HTML-ISH tag and attribute constants.
-// Note they must be lower case in order to make the comparison to work
-// as the parser converts all the read tags to lower case.
-const std::string XHTML_COLOR_TAG("color");
-const std::string XHTML_FONT_TAG("font");
-const std::string XHTML_B_TAG("b");
-const std::string XHTML_I_TAG("i");
-const std::string XHTML_U_TAG("u");
-const std::string XHTML_SHADOW_TAG("shadow");
-const std::string XHTML_GLOW_TAG("glow");
-const std::string XHTML_OUTLINE_TAG("outline");
-const std::string XHTML_ITEM_TAG("item");
-const std::string XHTML_ANCHOR_TAG("a");
-const std::string XHTML_BACKGROUND_TAG("background");
-const std::string XHTML_SPAN_TAG("span");
-const std::string XHTML_STRIKETHROUGH_TAG("s");
-const std::string XHTML_PARAGRAPH_TAG("p");
-const std::string XHTML_CHARACTER_SPACING_TAG("char-spacing");
-
 const char LESS_THAN      = '<';
 const char GREATER_THAN   = '>';
 const char EQUAL          = '=';
@@ -1117,12 +1099,12 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
              markupStringEndBuffer,
              tag))
     {
-      if(TokenComparison(XHTML_COLOR_TAG, tag.buffer, tag.length))
+      if(TokenComparison(MARKUP::TAG::COLOR, tag.buffer, tag.length))
       {
         ProcessTagForRun<ColorRun>(
           markupProcessData.colorRuns, styleStack, tag, characterIndex, colorRunIndex, colorTagReference, [](const Tag& tag, ColorRun& run) { ProcessColorTag(tag, run); });
       } // <color></color>
-      else if(TokenComparison(XHTML_I_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::ITALIC, tag.buffer, tag.length))
       {
         ProcessTagForRun<FontDescriptionRun>(
           markupProcessData.fontRuns, styleStack, tag, characterIndex, fontRunIndex, iTagReference, [](const Tag&, FontDescriptionRun& fontRun) {
@@ -1130,12 +1112,12 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
             fontRun.slantDefined = true;
           });
       } // <i></i>
-      else if(TokenComparison(XHTML_U_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::UNDERLINE, tag.buffer, tag.length))
       {
         ProcessTagForRun<UnderlinedCharacterRun>(
           markupProcessData.underlinedCharacterRuns, styleStack, tag, characterIndex, underlinedCharacterRunIndex, uTagReference, [](const Tag& tag, UnderlinedCharacterRun& run) { ProcessUnderlineTag(tag, run); });
       } // <u></u>
-      else if(TokenComparison(XHTML_B_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::BOLD, tag.buffer, tag.length))
       {
         ProcessTagForRun<FontDescriptionRun>(
           markupProcessData.fontRuns, styleStack, tag, characterIndex, fontRunIndex, bTagReference, [](const Tag&, FontDescriptionRun& fontRun) {
@@ -1143,12 +1125,12 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
             fontRun.weightDefined = true;
           });
       } // <b></b>
-      else if(TokenComparison(XHTML_FONT_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::FONT, tag.buffer, tag.length))
       {
         ProcessTagForRun<FontDescriptionRun>(
           markupProcessData.fontRuns, styleStack, tag, characterIndex, fontRunIndex, fontTagReference, [](const Tag& tag, FontDescriptionRun& fontRun) { ProcessFontTag(tag, fontRun); });
       } // <font></font>
-      else if(TokenComparison(XHTML_ANCHOR_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::ANCHOR, tag.buffer, tag.length))
       {
         /* Anchor */
         ProcessAnchorTag(markupProcessData, tag, characterIndex);
@@ -1166,31 +1148,31 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
             ProcessUnderlineTag(tag, run);
           });
       } // <a href=https://www.tizen.org>tizen</a>
-      else if(TokenComparison(XHTML_SHADOW_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::SHADOW, tag.buffer, tag.length))
       {
         // TODO: If !tag.isEndTag, then create a new shadow run.
         //       else Pop the top of the stack and set the number of characters of the run.
       } // <shadow></shadow>
-      else if(TokenComparison(XHTML_GLOW_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::GLOW, tag.buffer, tag.length))
       {
         // TODO: If !tag.isEndTag, then create a new glow run.
         //       else Pop the top of the stack and set the number of characters of the run.
       } // <glow></glow>
-      else if(TokenComparison(XHTML_OUTLINE_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::OUTLINE, tag.buffer, tag.length))
       {
         // TODO: If !tag.isEndTag, then create a new outline run.
         //       else Pop the top of the stack and set the number of characters of the run.
       } // <outline></outline>
-      else if(TokenComparison(XHTML_ITEM_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::EMBEDDED_ITEM, tag.buffer, tag.length))
       {
         ProcessItemTag(markupProcessData, tag, characterIndex);
       }
-      else if(TokenComparison(XHTML_BACKGROUND_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::BACKGROUND, tag.buffer, tag.length))
       {
         ProcessTagForRun<ColorRun>(
           markupProcessData.backgroundColorRuns, styleStack, tag, characterIndex, backgroundRunIndex, backgroundTagReference, [](const Tag& tag, ColorRun& run) { ProcessBackground(tag, run); });
       }
-      else if(TokenComparison(XHTML_SPAN_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::SPAN, tag.buffer, tag.length))
       {
         ProcessSpanForRun(tag,
                           spanStack,
@@ -1209,18 +1191,18 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
                           characterIndex,
                           spanTagReference);
       }
-      else if(TokenComparison(XHTML_STRIKETHROUGH_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::STRIKETHROUGH, tag.buffer, tag.length))
       {
         ProcessTagForRun<StrikethroughCharacterRun>(
           markupProcessData.strikethroughCharacterRuns, styleStack, tag, characterIndex, strikethroughCharacterRunIndex, sTagReference, [](const Tag& tag, StrikethroughCharacterRun& run) { ProcessStrikethroughTag(tag, run); });
       } // <s></s>
-      else if(TokenComparison(XHTML_PARAGRAPH_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::PARAGRAPH, tag.buffer, tag.length))
       {
         ProcessParagraphTag(markupProcessData, tag, (markupStringBuffer == markupStringEndBuffer), characterIndex);
         ProcessTagForRun<BoundedParagraphRun>(
           markupProcessData.boundedParagraphRuns, styleStack, tag, characterIndex, boundedParagraphRunIndex, pTagReference, [](const Tag& tag, BoundedParagraphRun& run) { ProcessAttributesOfParagraphTag(tag, run); });
       } // <p></p>
-      else if(TokenComparison(XHTML_CHARACTER_SPACING_TAG, tag.buffer, tag.length))
+      else if(TokenComparison(MARKUP::TAG::CHARACTER_SPACING, tag.buffer, tag.length))
       {
         ProcessTagForRun<CharacterSpacingCharacterRun>(
           markupProcessData.characterSpacingCharacterRuns, styleStack, tag, characterIndex, characterSpacingCharacterRunIndex, characterSpacingTagReference, [](const Tag& tag, CharacterSpacingCharacterRun& run) { ProcessCharacterSpacingTag(tag, run); });

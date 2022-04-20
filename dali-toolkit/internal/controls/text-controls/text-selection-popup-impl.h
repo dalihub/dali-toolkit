@@ -273,6 +273,8 @@ private: // Implementation
   virtual ~TextSelectionPopup();
 
 protected:
+  struct PropertyHandler;
+
   class TextSelectionPopupAccessible : public DevelControl::ControlAccessible
   {
   public:

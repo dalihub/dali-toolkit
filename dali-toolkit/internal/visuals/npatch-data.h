@@ -44,9 +44,10 @@ public:
    */
   enum class LoadingState
   {
-    LOADING = 0,   ///< NPatch is on loading.
-    LOAD_COMPLETE, ///< NPatch loading is completed successfully.
-    LOAD_FAILED    ///< NPatch loading is failed.
+    NOT_STARTED = 0, ///< NPatch loading is not started yet.
+    LOADING,         ///< NPatch is on loading.
+    LOAD_COMPLETE,   ///< NPatch loading is completed successfully.
+    LOAD_FAILED      ///< NPatch loading is failed.
   };
 
 public:
@@ -250,6 +251,14 @@ public:
    * @param [in] preMultiplied whether the loaded image is premultiplied or not
    */
   void SetLoadedNPatchData(Devel::PixelBuffer& pixelBuffer, bool preMultiplied);
+
+  /**
+   * @brief Send LoadComplete notify with current setuped NPatchData
+   *
+   * @param [in] observer observer who will be got LoadComplete notify
+   * @param [in] loadSuccess whether the image load success or not.
+   */
+  void NotifyObserver(TextureUploadObserver* observer, const bool& loadSuccess);
 
 private:
   /**

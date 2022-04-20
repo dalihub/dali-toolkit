@@ -44,14 +44,16 @@ public:
 
   enum class ReturnType
   {
-    TEXTURE = 0,
-    PIXEL_BUFFER
+    PIXEL_BUFFER = 0,
+    TEXTURE,
+    ANIMATED_IMAGE_TEXTURE
   };
 
   struct TextureInformation
   {
     TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied);
     TextureInformation(ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, bool preMultiplied);
+    TextureInformation(ReturnType returnType, int32_t textureId, uint32_t frameCount, uint32_t interval);
 
     TextureInformation();
 
@@ -63,6 +65,8 @@ public:
     bool               preMultiplied; ///< True if the image had pre-multiplied alpha applied
     Devel::PixelBuffer pixelBuffer;   ///< The PixelBuffer of the loaded image.
     std::string_view   url;           ///< The url address of the loaded image.
+    uint32_t           frameCount{0}; ///< The frameCount of the animated image
+    uint32_t           interval{0};   ///< Time interval between currently loaded frame and next frame.
   };
 
 public:

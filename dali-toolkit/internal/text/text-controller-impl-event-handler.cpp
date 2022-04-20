@@ -379,14 +379,15 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
       impl.GetCursorPosition(primaryCursorPosition, cursorInfo);
 
       // Get the line below.
-      const LineRun& line = *(visualModel->mLines.Begin() + lineIndex + 1u);
+      const LineRun& nextline = *(visualModel->mLines.Begin() + lineIndex + 1u);
+      const LineRun& currline = *(visualModel->mLines.Begin() + lineIndex);
 
       // Get last line index
       const LineIndex lastLineIndex = (visualModel->mLines.Size() > 0 ? visualModel->mLines.Size() - 1u : 0);
       const bool      isLastLine    = (lineIndex + 1u == lastLineIndex);
 
       // Get the next hit 'y' point.
-      const float hitPointY = cursorInfo.lineOffset + cursorInfo.lineHeight + 0.5f * GetLineHeight(line, isLastLine);
+      const float hitPointY = cursorInfo.lineOffset + GetLineHeight(currline, false) + 0.5f * GetLineHeight(nextline, isLastLine);
 
       // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
       bool matchedCharacter = false;

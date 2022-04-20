@@ -306,7 +306,9 @@ int UtcDaliAnimatedImageVisualGetPropertyMap04(void)
       .Add(ImageVisual::Property::URL, TEST_GIF_FILE_NAME)
       .Add(ImageVisual::Property::BATCH_SIZE, 1)
       .Add(ImageVisual::Property::CACHE_SIZE, 1)
-      .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false)
+      .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, true)
+      .Add(ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DETACHED)
+      .Add(ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::ATTACHED)
       .Add(DevelVisual::Property::BORDERLINE_WIDTH, 0.4f));
 
   Property::Map resultMap;
@@ -328,6 +330,18 @@ int UtcDaliAnimatedImageVisualGetPropertyMap04(void)
   value = resultMap.Find(ImageVisual::Property::CACHE_SIZE, Property::INTEGER);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<int>() == 2);
+
+  value = resultMap.Find(ImageVisual::Property::SYNCHRONOUS_LOADING, Property::BOOLEAN);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<bool>() == true);
+
+  value = resultMap.Find(ImageVisual::Property::RELEASE_POLICY, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == ImageVisual::ReleasePolicy::DETACHED);
+
+  value = resultMap.Find(ImageVisual::Property::LOAD_POLICY, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == ImageVisual::LoadPolicy::ATTACHED);
 
   value = resultMap.Find(Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, "totalFrameNumber");
   DALI_TEST_CHECK(value);
@@ -427,7 +441,8 @@ int UtcDaliAnimatedImageVisualSynchronousLoading(void)
     application.SendNotification();
     application.Render(20);
 
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+    // The first frame is loaded synchronously and load next batch.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
@@ -440,12 +455,12 @@ int UtcDaliAnimatedImageVisualSynchronousLoading(void)
     application.SendNotification();
     application.Render(20);
 
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 3, TEST_LOCATION);
+    DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 2, TEST_LOCATION);
 
     dummyControl.Unparent();
   }

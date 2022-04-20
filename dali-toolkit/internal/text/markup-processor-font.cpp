@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/text/font-description-run.h>
 #include <dali-toolkit/internal/text/markup-processor-attribute-helper-functions.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 
 namespace Dali
@@ -36,12 +37,6 @@ namespace Text
 {
 namespace
 {
-const std::string XHTML_FAMILY_ATTRIBUTE("family");
-const std::string XHTML_SIZE_ATTRIBUTE("size");
-const std::string XHTML_WEIGHT_ATTRIBUTE("weight");
-const std::string XHTML_WIDTH_ATTRIBUTE("width");
-const std::string XHTML_SLANT_ATTRIBUTE("slant");
-
 const std::string  FONT_PREFIX("font-");
 const unsigned int FONT_PREFIX_LENGTH      = 5u;
 const unsigned int MIN_FONT_ATTRIBUTE_SIZE = 4u;   ///< The minimum length of any of the possible 'weight', 'width' , 'slant' or 'size' values.
@@ -97,23 +92,23 @@ void ProcessFontTag(const Tag& tag, FontDescriptionRun& fontRun)
   {
     const Attribute& attribute(*it);
 
-    if(TokenComparison(XHTML_FAMILY_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    if(TokenComparison(MARKUP::FONT_ATTRIBUTES::FAMILY, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessFontFamily(attribute, fontRun);
     }
-    else if(TokenComparison(XHTML_SIZE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::FONT_ATTRIBUTES::SIZE, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessFontSize(attribute, fontRun);
     }
-    else if(TokenComparison(XHTML_WEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::FONT_ATTRIBUTES::WEIGHT, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessFontWeight(attribute, fontRun);
     }
-    else if(TokenComparison(XHTML_WIDTH_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::FONT_ATTRIBUTES::WIDTH, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessFontWidth(attribute, fontRun);
     }
-    else if(TokenComparison(XHTML_SLANT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    else if(TokenComparison(MARKUP::FONT_ATTRIBUTES::SLANT, attribute.nameBuffer, attribute.nameLength))
     {
       ProcessFontSlant(attribute, fontRun);
     }

@@ -504,6 +504,20 @@ public: // Configure the text controller.
   bool IsTextFitChanged() const;
 
   /**
+   * @brief Sets disabled color opacity.
+   *
+   * @param[in] opacity The color opacity value in disabled state.
+   */
+  void SetDisabledColorOpacity(float opacity);
+
+  /**
+   * @brief Retrieves the disabled color opacity.
+   *
+   * @return The disabled color opacity value for disabled state.
+   */
+  float GetDisabledColorOpacity() const;
+
+  /**
    * @brief Enable or disable the placeholder text elide.
    * @param enabled Whether to enable the placeholder text elide.
    */
@@ -1002,6 +1016,20 @@ public: // Default style & Input style
    * @return The default color.
    */
   const Vector4& GetDefaultColor() const;
+
+  /**
+   * @brief Sets the user interaction enabled.
+   *
+   * @param enabled whether to enable the user interaction.
+   */
+  void SetUserInteractionEnabled(bool enabled);
+
+  /**
+   * @brief Whether the user interaction is enabled.
+   *
+   * @return true if the user interaction is enabled, false otherwise.
+   */
+  bool IsUserInteractionEnabled() const;
 
   /**
    * @brief Set the text color
