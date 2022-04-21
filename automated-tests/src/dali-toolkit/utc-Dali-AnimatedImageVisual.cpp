@@ -525,7 +525,6 @@ int UtcDaliAnimatedImageVisualSynchronousLoading(void)
   END_TEST;
 }
 
-
 int UtcDaliAnimatedImageVisualSynchronousLoadingWithAlphaMask(void)
 {
   ToolkitTestApplication application;
@@ -789,6 +788,7 @@ int UtcDaliAnimatedImageVisualAnimatedImage01(void)
   ToolkitTestApplication application;
   TestGlAbstraction&     gl = application.GetGlAbstraction();
 
+  tet_infoline("Set cache size same as GIF frame, and try to load same image at another ImageView");
   {
     Property::Map propertyMap;
     propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
@@ -815,6 +815,7 @@ int UtcDaliAnimatedImageVisualAnimatedImage01(void)
 
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
+    // Batch 2 frames. Now frame 0, 1 cached.
     application.SendNotification();
     application.Render(20);
 
@@ -832,12 +833,54 @@ int UtcDaliAnimatedImageVisualAnimatedImage01(void)
 
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
+    // 0 frame removed. and after, batch 2 frames. Now frame 1, 2, 3 cached.
     application.SendNotification();
     application.Render(20);
 
     DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 4, TEST_LOCATION);
 
+    Visual::Base        visual2       = factory.CreateVisual(propertyMap);
+    DummyControl        dummyControl2 = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl2    = static_cast<Impl::DummyControl&>(dummyControl2.GetImplementation());
+    dummyImpl2.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual2);
+    application.GetScene().Add(dummyControl2);
+
+    tet_infoline("Add new view with same url");
+
+    application.SendNotification();
+    application.Render();
+
+    // Note that we only re-load 0 frame.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    tet_infoline("Test that we don't try to re-load new image cause it cached");
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 1), false, TEST_LOCATION);
+
+    // Batch 2 frames. Now visual frame 1, 2, 3 cached and visual2 frame 0, 1 cached.
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 5, TEST_LOCATION);
+
+    textureTrace.Reset();
+
+    tet_infoline("Load some many frames");
+
+    const int repeatCount = 10;
+    for(int repeat = 0; repeat < repeatCount; ++repeat)
+    {
+      Test::EmitGlobalTimerSignal();
+      application.SendNotification();
+      application.Render(2000);
+    }
+
+    DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION); // A new texture should NOT be generated.
+    DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 5, TEST_LOCATION);
+
+    textureTrace.Reset();
+
     dummyControl.Unparent();
+    dummyControl2.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
   application.SendNotification();
@@ -860,7 +903,6 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask01(void)
     propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 4);
     propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
     propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME);
-
 
     VisualFactory factory = VisualFactory::Get();
     Visual::Base  visual  = factory.CreateVisual(propertyMap);

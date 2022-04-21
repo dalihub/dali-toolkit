@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,13 +100,13 @@ TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
   bool synchronouslyLoaded = false;
   if(mIsSynchronousLoading && mQueue.IsEmpty())
   {
-    textureSet          = RequestFrameLoading(frameIndex, frameIndex == FIRST_FRAME_INDEX, true);
-    batchFrameIndex     = (frameIndex + 1) % mFrameCount;
+    textureSet        = RequestFrameLoading(frameIndex, true);
+    batchFrameIndex   = (frameIndex + 1) % mFrameCount;
     uint32_t interval = 0u;
     if(textureSet)
     {
       synchronouslyLoaded = true;
-      interval = mAnimatedImageLoading.GetFrameInterval(mQueue.Back().mFrameNumber);
+      interval            = mAnimatedImageLoading.GetFrameInterval(mQueue.Back().mFrameNumber);
     }
     MakeFrameReady(synchronouslyLoaded, textureSet, interval);
   }
@@ -180,7 +180,7 @@ bool RollingAnimatedImageCache::IsFrontReady() const
   return (!mQueue.IsEmpty() && mQueue.Front().mReady);
 }
 
-TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, bool useCache, bool synchronousLoading)
+TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, bool synchronousLoading)
 {
   ImageFrame imageFrame;
   imageFrame.mFrameNumber = frameIndex;
@@ -199,7 +199,6 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                    Dali::WrapMode::Type::DEFAULT,
                                                                    Dali::WrapMode::Type::DEFAULT,
                                                                    synchronousLoading,
-                                                                   useCache,
                                                                    this);
 
   mImageUrls[frameIndex].mTextureId = loadTextureId;
@@ -217,7 +216,7 @@ void RollingAnimatedImageCache::LoadBatch(uint32_t frameIndex)
   {
     if(mLoadState != TextureManager::LoadState::LOADING)
     {
-      RequestFrameLoading(frameIndex, frameIndex == FIRST_FRAME_INDEX, false);
+      RequestFrameLoading(frameIndex, false);
     }
     else
     {
@@ -331,7 +330,7 @@ void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformatio
     {
       uint32_t loadingIndex = mLoadWaitingQueue.front();
       mLoadWaitingQueue.erase(mLoadWaitingQueue.begin());
-      RequestFrameLoading(loadingIndex, loadingIndex == FIRST_FRAME_INDEX, false);
+      RequestFrameLoading(loadingIndex, false);
     }
     else if(mQueue.Count() == 1u && textureInformation.frameCount > SINGLE_IMAGE_COUNT)
     {
