@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,32 +18,30 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include "dali-scene-loader/public-api/dli-loader.h"
-#include "dali-scene-loader/public-api/resource-bundle.h"
-#include "dali-scene-loader/public-api/scene-definition.h"
-#include "dali-scene-loader/public-api/load-result.h"
-#include "dali-scene-loader/internal/json-util.h"
 #include <dali-test-suite-utils.h>
 #include <string_view>
+#include "dali-scene-loader/internal/json-util.h"
+#include "dali-scene-loader/public-api/dli-loader.h"
+#include "dali-scene-loader/public-api/load-result.h"
+#include "dali-scene-loader/public-api/resource-bundle.h"
+#include "dali-scene-loader/public-api/scene-definition.h"
 
 using namespace Dali;
 using namespace Dali::SceneLoader;
 
 namespace
 {
-
-void ConfigureBlendShapeShaders(ResourceBundle& resources, const SceneDefinition& scene, Actor root,
-  std::vector<BlendshapeShaderConfigurationRequest>&& requests)
+void ConfigureBlendShapeShaders(ResourceBundle& resources, const SceneDefinition& scene, Actor root, std::vector<BlendshapeShaderConfigurationRequest>&& requests)
 {
   std::vector<std::string> errors;
-  auto onError = [&errors](const std::string& msg) {
+  auto                     onError = [&errors](const std::string& msg) {
     errors.push_back(msg);
   };
 
-  if (!scene.ConfigureBlendshapeShaders(resources, root, std::move(requests), onError))
+  if(!scene.ConfigureBlendshapeShaders(resources, root, std::move(requests), onError))
   {
     ExceptionFlinger flinger(ASSERT_LOCATION);
-    for (auto& msg : errors)
+    for(auto& msg : errors)
     {
       flinger << msg << '\n';
     }
@@ -56,33 +54,32 @@ struct Context
     return TEST_RESOURCE_DIR "/";
   };
 
-  ResourceBundle resources;
-  SceneDefinition scene;
-  std::vector<CameraParameters> cameraParameters;
-  std::vector<LightParameters> lights;
-  std::vector<AnimationDefinition> animations;
+  ResourceBundle                        resources;
+  SceneDefinition                       scene;
+  std::vector<CameraParameters>         cameraParameters;
+  std::vector<LightParameters>          lights;
+  std::vector<AnimationDefinition>      animations;
   std::vector<AnimationGroupDefinition> animGroups;
 
-  LoadResult output {
+  LoadResult output{
     resources,
     scene,
     animations,
     animGroups,
     cameraParameters,
-    lights
-  };
+    lights};
 
-  DliLoader::InputParams input {
+  DliLoader::InputParams input{
     pathProvider(ResourceType::Mesh),
     nullptr,
     {},
     {},
     nullptr,
   };
-  DliLoader::LoadParams loadParams{ input, output };
+  DliLoader::LoadParams loadParams{input, output};
 
   std::vector<std::string> errors;
-  DliLoader loader;
+  DliLoader                loader;
 
   StringCallback onError = [this](const std::string& error) {
     errors.push_back(error);
@@ -97,7 +94,7 @@ struct Context
 
 bool StringHasTokens(const char* string, const std::vector<const char*>& tokens)
 {
-  for (auto& token: tokens)
+  for(auto& token : tokens)
   {
     auto result = strstr(string, token);
     if(nullptr == result)
@@ -109,7 +106,7 @@ bool StringHasTokens(const char* string, const std::vector<const char*>& tokens)
   return true;
 }
 
-}
+} // namespace
 
 int UtcDaliDliLoaderLoadSceneNotFound(void)
 {
@@ -118,7 +115,7 @@ int UtcDaliDliLoaderLoadSceneNotFound(void)
   DALI_TEST_EQUAL(ctx.loader.LoadScene("does_not_exist.dli", ctx.loadParams), false);
 
   auto error = ctx.loader.GetParseError();
-  DALI_TEST_CHECK(StringHasTokens(error.c_str(), { "Empty source buffer to parse." }));
+  DALI_TEST_CHECK(StringHasTokens(error.c_str(), {"Empty source buffer to parse."}));
 
   END_TEST;
 }
@@ -131,49 +128,48 @@ int UtcDaliDliLoaderLoadSceneFailParse(void)
   DALI_TEST_EQUAL(ctx.loader.LoadScene(path, ctx.loadParams), false);
 
   auto error = ctx.loader.GetParseError();
-  DALI_TEST_CHECK(StringHasTokens(error.c_str(), { "Unexpected character." }));
+  DALI_TEST_CHECK(StringHasTokens(error.c_str(), {"Unexpected character."}));
 
   END_TEST;
 }
 
 int UtcDaliDliLoaderLoadSceneAssertions(void)
 {
-  const std::pair<std::string, std::string> pathExceptionPairs[] {
-     // from RequireChild()
-    { "scenes-nodes-missing", "Failed to find child node" },
-    { "scenes-missing", "Failed to find child node" },
-    { "nodes-missing", "Failed to find child node" },
+  const std::pair<std::string, std::string> pathExceptionPairs[]{
+    // from RequireChild()
+    {"scenes-nodes-missing", "Failed to find child node"},
+    {"scenes-missing", "Failed to find child node"},
+    {"nodes-missing", "Failed to find child node"},
     // from ParseSceneInternal()
-    { "scene-out-of-bounds", "out of bounds" },
-    { "nodes-invalid-type", "invalid type; array required" },
-    { "nodes-array-empty", "must define a node id" },
-    { "root-id-invalid", "invalid value for root node index" },
-    { "root-id-out-of-bounds", "out of bounds" },
-    { "root-node-invalid-type", "invalid JSON type; object required" },
+    {"scene-out-of-bounds", "out of bounds"},
+    {"nodes-invalid-type", "invalid type; array required"},
+    {"nodes-array-empty", "must define a node id"},
+    {"root-id-invalid", "invalid value for root node index"},
+    {"root-id-out-of-bounds", "out of bounds"},
+    {"root-node-invalid-type", "invalid JSON type; object required"},
     // from ParseSkeletons()
-    { "skeleton-node-missing", "Missing required attribute" },
-    { "skeleton-root-not-found", "not defined" },
+    {"skeleton-node-missing", "Missing required attribute"},
+    {"skeleton-root-not-found", "not defined"},
     // from ParseShaders()
-    { "shader-vertex-missing", "Missing vertex / fragment shader" },
-    { "shader-fragment-missing", "Missing vertex / fragment shader" },
+    {"shader-vertex-missing", "Missing vertex / fragment shader"},
+    {"shader-fragment-missing", "Missing vertex / fragment shader"},
     // from ParseMeshes()
-    { "mesh-uri-missing", "Missing required attribute" },
-    { "mesh-indices-read-fail", "Failed to read indices" },
-    { "mesh-positions-read-fail", "Failed to read positions" },
+    {"mesh-uri-missing", "Missing required attribute"},
+    {"mesh-indices-read-fail", "Failed to read indices"},
+    {"mesh-positions-read-fail", "Failed to read positions"},
     // from ParseMaterials()
-    { "material-environment-out-of-bounds", "out of bounds" },
+    {"material-environment-out-of-bounds", "out of bounds"},
     // from ParseNodes()
-    { "node-model-mesh-missing", "Missing mesh" },
-    { "node-arc-mesh-missing", "Missing mesh" },
-    { "node-animated-image-mesh-missing", "Missing mesh" },
-    { "node-renderable-mesh-invalid-type", "Invalid Mesh index type" },
-    { "node-renderable-mesh-out-of-bounds", "out of bounds" },
-    { "node-child-invalid-type", "invalid index type" },
-    { "node-name-already-used", "name already used" },
+    {"node-model-mesh-missing", "Missing mesh"},
+    {"node-arc-mesh-missing", "Missing mesh"},
+    {"node-animated-image-mesh-missing", "Missing mesh"},
+    {"node-renderable-mesh-invalid-type", "Invalid Mesh index type"},
+    {"node-renderable-mesh-out-of-bounds", "out of bounds"},
+    {"node-child-invalid-type", "invalid index type"},
+    {"node-name-already-used", "name already used"},
     // from ParseAnimations()
-    { "animation-failed-to-open", "Failed to open animation data" }
-  };
-  for (auto& i: pathExceptionPairs)
+    {"animation-failed-to-open", "Failed to open animation data"}};
+  for(auto& i : pathExceptionPairs)
   {
     Context ctx;
 
@@ -214,10 +210,9 @@ int UtcDaliDliLoaderLoadSceneExercise(void)
   DALI_TEST_EQUAL(ctx.animGroups.size(), 16u);
 
   ViewProjection viewProjection;
-  Transforms xforms {
+  Transforms     xforms{
     MatrixStack{},
-    viewProjection
-  };
+    viewProjection};
   NodeDefinition::CreateParams nodeParams{
     resources,
     xforms,
@@ -229,13 +224,13 @@ int UtcDaliDliLoaderLoadSceneExercise(void)
 
   Actor root = Actor::New();
   SetActorCentered(root);
-  for (auto iRoot : scene.GetRoots())
+  for(auto iRoot : scene.GetRoots())
   {
     auto resourceRefs = resources.CreateRefCounter();
     scene.CountResourceRefs(iRoot, choices, resourceRefs);
     resources.CountEnvironmentReferences(resourceRefs);
     resources.LoadResources(resourceRefs, ctx.pathProvider);
-    if (auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
+    if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
       scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
       scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
@@ -257,49 +252,47 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
   Context ctx;
 
   std::vector<std::string> metadata;
-  uint32_t metadataCount = 0;
-  ctx.input.mPreNodeCategoryProcessors.push_back({ "metadata",
-    [&](const Property::Array& array, StringCallback) {
-      std::string key, value;
-      for (uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
-      {
-        auto& data = array.GetElementAt(i0);
-        DALI_TEST_EQUAL(data.GetType(), Property::MAP);
+  uint32_t                 metadataCount = 0;
+  ctx.input.mPreNodeCategoryProcessors.push_back({"metadata",
+                                                  [&](const Property::Array& array, StringCallback) {
+                                                    std::string key, value;
+                                                    for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
+                                                    {
+                                                      auto& data = array.GetElementAt(i0);
+                                                      DALI_TEST_EQUAL(data.GetType(), Property::MAP);
 
-        auto map = data.GetMap();
-        auto key = map->Find("key");
-        auto value = map->Find("value");
-        DALI_TEST_EQUAL(key->GetType(), Property::STRING);
-        DALI_TEST_EQUAL(value->GetType(), Property::STRING);
-        metadata.push_back(key->Get<std::string>() + ":" + value->Get<std::string>());
+                                                      auto map   = data.GetMap();
+                                                      auto key   = map->Find("key");
+                                                      auto value = map->Find("value");
+                                                      DALI_TEST_EQUAL(key->GetType(), Property::STRING);
+                                                      DALI_TEST_EQUAL(value->GetType(), Property::STRING);
+                                                      metadata.push_back(key->Get<std::string>() + ":" + value->Get<std::string>());
 
-        ++metadataCount;
-      }
-    }
-  });
+                                                      ++metadataCount;
+                                                    }
+                                                  }});
 
   std::vector<std::string> behaviors;
-  uint32_t behaviorCount = 0;
-  ctx.input.mPostNodeCategoryProcessors.push_back({ "behaviors",
-    [&](const Property::Array& array, StringCallback) {
-      for (uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
-      {
-        auto& data = array.GetElementAt(i0);
-        DALI_TEST_EQUAL(data.GetType(), Property::MAP);
+  uint32_t                 behaviorCount = 0;
+  ctx.input.mPostNodeCategoryProcessors.push_back({"behaviors",
+                                                   [&](const Property::Array& array, StringCallback) {
+                                                     for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
+                                                     {
+                                                       auto& data = array.GetElementAt(i0);
+                                                       DALI_TEST_EQUAL(data.GetType(), Property::MAP);
 
-        auto map = data.GetMap();
-        auto event = map->Find("event");
-        auto url = map->Find("url");
-        DALI_TEST_EQUAL(event->GetType(), Property::STRING);
-        DALI_TEST_EQUAL(url->GetType(), Property::STRING);
-        behaviors.push_back(event->Get<std::string>() + ":" + url->Get<std::string>());
+                                                       auto map   = data.GetMap();
+                                                       auto event = map->Find("event");
+                                                       auto url   = map->Find("url");
+                                                       DALI_TEST_EQUAL(event->GetType(), Property::STRING);
+                                                       DALI_TEST_EQUAL(url->GetType(), Property::STRING);
+                                                       behaviors.push_back(event->Get<std::string>() + ":" + url->Get<std::string>());
 
-        ++behaviorCount;
-      }
-    }
-  });
+                                                       ++behaviorCount;
+                                                     }
+                                                   }});
 
-  size_t numNodes = 0;
+  size_t numNodes                  = 0;
   ctx.input.mNodePropertyProcessor = [&](const NodeDefinition&, const Property::Map&, StringCallback) {
     ++numNodes;
   };
@@ -332,10 +325,9 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
   DALI_TEST_EQUAL(behaviors.size(), 1u);
 
   ViewProjection viewProjection;
-  Transforms xforms {
+  Transforms     xforms{
     MatrixStack{},
-    viewProjection
-  };
+    viewProjection};
   NodeDefinition::CreateParams nodeParams{
     resources,
     xforms,
@@ -347,13 +339,13 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
 
   Actor root = Actor::New();
   SetActorCentered(root);
-  for (auto iRoot : scene.GetRoots())
+  for(auto iRoot : scene.GetRoots())
   {
     auto resourceRefs = resources.CreateRefCounter();
     scene.CountResourceRefs(iRoot, choices, resourceRefs);
     resources.CountEnvironmentReferences(resourceRefs);
     resources.LoadResources(resourceRefs, ctx.pathProvider);
-    if (auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
+    if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
       scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
       scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
@@ -397,10 +389,9 @@ int UtcDaliDliLoaderLoadSceneArc(void)
   DALI_TEST_EQUAL(ctx.animGroups.size(), 0u);
 
   ViewProjection viewProjection;
-  Transforms xforms {
+  Transforms     xforms{
     MatrixStack{},
-    viewProjection
-  };
+    viewProjection};
   NodeDefinition::CreateParams nodeParams{
     resources,
     xforms,
@@ -412,13 +403,13 @@ int UtcDaliDliLoaderLoadSceneArc(void)
 
   Actor root = Actor::New();
   SetActorCentered(root);
-  for (auto iRoot : scene.GetRoots())
+  for(auto iRoot : scene.GetRoots())
   {
     auto resourceRefs = resources.CreateRefCounter();
     scene.CountResourceRefs(iRoot, choices, resourceRefs);
     resources.CountEnvironmentReferences(resourceRefs);
     resources.LoadResources(resourceRefs, ctx.pathProvider);
-    if (auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
+    if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
       scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
       scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
@@ -496,11 +487,10 @@ int UtcDaliDliLoaderLoadSceneExtras(void)
   DALI_TEST_EQUAL(scene.GetNodeCount(), 1u);
 
   ViewProjection viewProjection;
-  Transforms xforms {
+  Transforms     xforms{
     MatrixStack{},
-    viewProjection
-  };
-  auto& resources = ctx.resources;
+    viewProjection};
+  auto&                        resources = ctx.resources;
   NodeDefinition::CreateParams nodeParams{
     resources,
     xforms,
@@ -509,7 +499,7 @@ int UtcDaliDliLoaderLoadSceneExtras(void)
   Customization::Choices choices;
 
   TestApplication app;
-  Actor actor = scene.CreateNodes(0, choices, nodeParams);
+  Actor           actor = scene.CreateNodes(0, choices, nodeParams);
 
   DALI_TEST_EQUAL(actor.GetProperty(actor.GetPropertyIndex("fudgeFactor")).Get<float>(), 9000.1f);
   DALI_TEST_EQUAL(actor.GetProperty(actor.GetPropertyIndex("fudgeVector")).Get<Vector2>(), Vector2(-.25f, 17.f));
@@ -541,11 +531,10 @@ int UtcDaliDliLoaderLoadSceneConstraints(void)
   DALI_TEST_EQUAL(scene.GetNodeCount(), 4u);
 
   ViewProjection viewProjection;
-  Transforms xforms {
+  Transforms     xforms{
     MatrixStack{},
-    viewProjection
-  };
-  auto& resources = ctx.resources;
+    viewProjection};
+  auto&                        resources = ctx.resources;
   NodeDefinition::CreateParams nodeParams{
     resources,
     xforms,
@@ -555,9 +544,9 @@ int UtcDaliDliLoaderLoadSceneConstraints(void)
 
   TestApplication app;
 
-  Actor root = scene.CreateNodes(0, choices, nodeParams);
-  Actor alice = root.FindChildByName("Alice");
-  Actor bob = root.FindChildByName("Bob");
+  Actor root    = scene.CreateNodes(0, choices, nodeParams);
+  Actor alice   = root.FindChildByName("Alice");
+  Actor bob     = root.FindChildByName("Bob");
   Actor charlie = root.FindChildByName("Charlie");
 
   DALI_TEST_EQUAL(nodeParams.mConstrainables.size(), 3u);
@@ -636,6 +625,81 @@ int UtcDaliDliLoaderNodeProcessor(void)
 
   DALI_TEST_EQUAL(nodeMaps[1].Count(), 1u);
   DALI_TEST_EQUAL(nodeMaps[1].Find("name")->Get<std::string>(), "rootB");
+
+  END_TEST;
+}
+
+int UtcDaliDliLoaderLoadCoverageTest(void)
+{
+  Context ctx;
+
+  auto path = ctx.pathProvider(ResourceType::Mesh) + "coverageTest.dli";
+  DALI_TEST_CHECK(ctx.loader.LoadScene(path, ctx.loadParams));
+  DALI_TEST_CHECK(ctx.errors.empty());
+
+  auto& scene = ctx.scene;
+  auto& roots = scene.GetRoots();
+  DALI_TEST_EQUAL(roots.size(), 1u);
+  DALI_TEST_EQUAL(scene.GetNode(roots[0])->mName, "root");
+
+  DALI_TEST_EQUAL(scene.GetNodeCount(), 1u);
+
+  auto& resources = ctx.resources;
+  DALI_TEST_EQUAL(resources.mMeshes.size(), 1u);
+  DALI_TEST_EQUAL(resources.mShaders.size(), 1u);
+  DALI_TEST_EQUAL(resources.mEnvironmentMaps.size(), 2u);
+  DALI_TEST_EQUAL(resources.mSkeletons.size(), 0u);
+
+  auto& materials = ctx.resources.mMaterials;
+  DALI_TEST_EQUAL(2u, materials.size());
+
+  auto  iMaterial = materials.begin();
+  auto& md        = iMaterial->first;
+  DALI_TEST_EQUAL(md.mTextureStages.size(), 1u);
+
+  auto iTexture = md.mTextureStages.begin();
+  DALI_TEST_CHECK(MaskMatch(iTexture->mSemantic, MaterialDefinition::OCCLUSION));
+  DALI_TEST_EQUAL(iTexture->mTexture.mImageUri, "exercise/Icons/Icon_Idle.png");
+  ++iTexture;
+
+  DALI_TEST_EQUAL(ctx.cameraParameters.size(), 1u);
+  DALI_TEST_EQUAL(ctx.lights.size(), 1u);
+  DALI_TEST_EQUAL(ctx.animations.size(), 0u);
+  DALI_TEST_EQUAL(ctx.animGroups.size(), 0u);
+
+  ViewProjection viewProjection;
+  Transforms     xforms{
+    MatrixStack{},
+    viewProjection};
+  NodeDefinition::CreateParams nodeParams{
+    resources,
+    xforms,
+  };
+
+  Customization::Choices choices;
+
+  TestApplication app;
+
+  Actor root = Actor::New();
+  SetActorCentered(root);
+  for(auto iRoot : scene.GetRoots())
+  {
+    auto resourceRefs = resources.CreateRefCounter();
+    scene.CountResourceRefs(iRoot, choices, resourceRefs);
+    resources.CountEnvironmentReferences(resourceRefs);
+    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
+    {
+      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
+      scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
+      ConfigureBlendShapeShaders(resources, scene, actor, std::move(nodeParams.mBlendshapeRequests));
+      scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
+      root.Add(actor);
+    }
+  }
+
+  DALI_TEST_EQUAL(root.GetChildCount(), 1u);
+  DALI_TEST_EQUAL(root.GetChildAt(0).GetProperty(Actor::Property::NAME).Get<std::string>(), "root");
 
   END_TEST;
 }
