@@ -98,36 +98,35 @@
     },
     "TextSelectionPopup":
     {
-      "popupMaxSize":[656,36],
-      "optionDividerSize":[1,0],
-      "optionDividerPadding":[0.0,0.0,6.0,6.0],
-      "popupDividerColor":[1.0,1.0,1.0,1.0],
+      "popupMaxSize":[656,40],
+      "optionDividerSize":[0,0],
+      "optionDividerPadding":[0.0,0.0,0.0,0.0],
+      "popupDividerColor":[0.0,0.0,0.0,1.0],
       "popupIconColor":[1.0,1.0,1.0,1.0],
       "popupPressedColor":[0.24,0.72,0.8,0.11],
       "background": {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}IoT-selection-popup-background.9.png",
-        "mixColor":[0.0,0.05,0.17,0.9]
+        "url": "{DALI_IMAGE_DIR}IoT-selection-popup-background.9.png"
         },
       "backgroundBorder": {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}selection-popup-border.9.png",
-        "mixColor":[0.0,0.0,0.0,0.0]
+        "url": "{DALI_IMAGE_DIR}IoT-selection-popup-border.9.png",
+        "mixColor":[1.0,1.0,1.0,1.0]
         },
       "popupFadeInDuration":0.25,
       "popupFadeOutDuration":0.25
     },
     "TextSelectionPopupButton":
     {
-      "minimumSize":[0,36],
-      "labelPadding":[0.0,0.0,0.0,0.0],
+      "minimumSize":[0,40],
+      "labelPadding":[-4.0,-4.0,0.0,0.0],
       "label":
       {
         "visualType":"TEXT",
-        "pointSize":18,
-        "textColor":[1.0,1.0,1.0,1.0],
-        "fontFamily":"BreezeSans",
-        "fontStyle" : {"weight":"light"}
+        "pointSize":6.0,
+        "textColor":[0.04,0.06,0.13,1.0],
+        "fontFamily":"SamsungOneUI",
+        "fontStyle" : {"weight":"regular"}
       },
       "unselectedBackgroundVisual":
       {
