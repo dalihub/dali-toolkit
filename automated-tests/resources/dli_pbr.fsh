@@ -31,6 +31,10 @@
   uniform sampler2D sNormalRoughness;
 #endif
 
+#ifdef OCCLUSION
+  uniform sampler2D sAmbientOcclusion;
+#endif //OCCLUSION
+
 uniform samplerCube sDiffuse;
 uniform samplerCube sSpecular;
 
@@ -152,6 +156,11 @@ void main()
   vec3 finalColor = diffuseColor + specColor;
 
   finalColor = sqrt( finalColor ) * uIblIntensity;
+
+#ifdef OCCLUSION
+  finalColor *= texture(sAmbientOcclusion, vUV.st).r;
+#endif //OCCLUSION
+
 #ifdef THREE_TEX
   FragColor = vec4( finalColor, alpha );
 #else //THREE_TEX
