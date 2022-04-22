@@ -615,20 +615,6 @@ int UtcDaliVisualGetPropertyMap2(void)
   DALI_TEST_CHECK(sizeValue);
   DALI_TEST_CHECK(sizeValue->Get<float>() == 10.f);
 
-  // Get default value of borderline values here
-
-  sizeValue = resultMap.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
-  DALI_TEST_CHECK(sizeValue);
-  DALI_TEST_CHECK(sizeValue->Get<float>() == 0.0f);
-
-  colorValue = resultMap.Find(DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4);
-  DALI_TEST_CHECK(colorValue);
-  DALI_TEST_CHECK(colorValue->Get<Vector4>() == Color::BLACK);
-
-  sizeValue = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
-  DALI_TEST_CHECK(sizeValue);
-  DALI_TEST_CHECK(sizeValue->Get<float>() == 0.0f);
-
   END_TEST;
 }
 
@@ -2051,7 +2037,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
 
     DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
-    Renderer        renderer = actor.GetRendererAt(0);
+    Renderer renderer = actor.GetRendererAt(0);
 
     const Vector4 INITIAL_MIX_COLOR(1.0f, 0.0f, 1.0f, 0.5f); // Magenta with half alpha
     const Vector4 TARGET_MIX_COLOR(Color::RED);
@@ -4785,7 +4771,7 @@ int UtcDaliVisualGetVisualProperty01(void)
   float   targetBlurRadius      = 10.0f;
   float   targetBorderlineWidth = 25.0f;
   Vector4 targetBorderlineColor(1.0f, 1.0f, 1.0f, 1.0f);
-  float targetBorderlineOffset = -1.0f;
+  float   targetBorderlineOffset   = -1.0f;
   float   targetPreMultipliedAlpha = 1.0f;
 
   Animation animation = Animation::New(1.0f);
