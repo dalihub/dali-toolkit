@@ -1320,7 +1320,13 @@ int UtcDaliWebViewAccessible(void)
 
   DALI_TEST_EQUALS(children.size(), 1u, TEST_LOCATION);
 
-  auto address = children[0]->GetAddress();
+  auto* child = children[0];
+
+  DALI_TEST_CHECK(child);
+  DALI_TEST_CHECK(child->IsProxy());
+  DALI_TEST_EQUALS(child->GetParent(), webViewAccessible, TEST_LOCATION);
+
+  auto address = child->GetAddress();
 
   DALI_TEST_CHECK(address);
   DALI_TEST_NOT_EQUALS(address.GetBus(), webViewAccessible->GetAddress().GetBus(), 0.0f, TEST_LOCATION);
