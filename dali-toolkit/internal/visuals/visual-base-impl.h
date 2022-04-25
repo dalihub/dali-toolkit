@@ -155,7 +155,7 @@ public:
    *
    * @param[in] preMultiplied whether alpha is pre-multiplied.
    */
-  void EnablePreMultipliedAlpha(bool preMultiplied);
+  virtual void EnablePreMultipliedAlpha(bool preMultiplied);
 
   /**
    * @brief Query whether alpha is pre-multiplied.
