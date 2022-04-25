@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -46,7 +47,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(10); // ltr, wrap, pixel area, crop to mask, mask texture ratio + border/corner
+const int CUSTOM_PROPERTY_COUNT(5); // ltr, wrap, pixel area, crop to mask, mask texture ratio
 
 // stop behavior
 DALI_ENUM_TO_STRING_TABLE_BEGIN(STOP_BEHAVIOR)
@@ -177,7 +178,7 @@ void AnimatedImageVisual::CreateImageCache()
 
   if(mAnimatedImageLoading)
   {
-    mImageCache = new RollingAnimatedImageCache(textureManager, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, IsSynchronousLoadingRequired(),mFactoryCache.GetPreMultiplyOnLoad());
+    mImageCache = new RollingAnimatedImageCache(textureManager, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, IsSynchronousLoadingRequired(), mFactoryCache.GetPreMultiplyOnLoad());
   }
   else if(mImageUrls)
   {
@@ -730,7 +731,7 @@ void AnimatedImageVisual::OnInitialize()
 
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 
-  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
+  mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   // Register transform properties
@@ -979,8 +980,8 @@ void AnimatedImageVisual::CheckMaskTexture()
 {
   if(mMaskingData && !mMaskingData->mPreappliedMasking)
   {
-    bool maskLoadFailed = true;
-    TextureSet textures = mImpl->mRenderer.GetTextures();
+    bool       maskLoadFailed = true;
+    TextureSet textures       = mImpl->mRenderer.GetTextures();
     if(textures && textures.GetTextureCount() >= TEXTURE_COUNT_FOR_GPU_ALPHA_MASK)
     {
       maskLoadFailed = false;

@@ -127,10 +127,6 @@ struct Base::Impl
   Vector4                         mCornerRadius;
   float                           mCornerRadiusPolicy;
   int                             mDepthIndex;
-  Property::Index                 mBorderlineWidthIndex;
-  Property::Index                 mBorderlineColorIndex;
-  Property::Index                 mBorderlineOffsetIndex;
-  Property::Index                 mCornerRadiusIndex;
   FittingMode                     mFittingMode; ///< How the contents should fit the view
   int                             mFlags;
   Toolkit::Visual::ResourceStatus mResourceStatus;

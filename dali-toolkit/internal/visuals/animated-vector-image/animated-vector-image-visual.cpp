@@ -23,6 +23,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/rendering/decorated-visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-signals-devel.h>
@@ -44,7 +45,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(6); // 5 transform properties + pixel area,
+const int CUSTOM_PROPERTY_COUNT(1); // pixel area,
 
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
@@ -299,7 +300,7 @@ void AnimatedVectorImageVisual::OnInitialize(void)
 
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 
-  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
+  mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   TextureSet textureSet = TextureSet::New();
