@@ -204,11 +204,27 @@ Index ShaderDefinitionFactory::ProduceShader(const NodeDefinition& nodeDef)
   }
 
   if(hasTransparency ||
-     materialDef.CheckTextures(MaterialDefinition::ALBEDO) ||
-     materialDef.CheckTextures(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS) ||
-     materialDef.CheckTextures(MaterialDefinition::NORMAL))
+     !materialDef.CheckTextures(MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC) ||
+     !materialDef.CheckTextures(MaterialDefinition::NORMAL | MaterialDefinition::ROUGHNESS))
+
   {
     shaderDef.mDefines.push_back("THREE_TEX");
+
+    // For the glTF, each of basecolor, metallic_roughness, normal texture is not essential.
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO))
+    {
+      shaderDef.mDefines.push_back("BASECOLOR_TEX");
+    }
+
+    if(materialDef.CheckTextures(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS))
+    {
+      shaderDef.mDefines.push_back("METALLIC_ROUGHNESS_TEX");
+    }
+
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::NORMAL))
+    {
+      shaderDef.mDefines.push_back("NORMAL_TEX");
+    }
   }
 
   if(materialDef.GetAlphaCutoff() > 0.f)
@@ -278,6 +294,11 @@ Index ShaderDefinitionFactory::ProduceShader(const NodeDefinition& nodeDef)
         shaderDef.mDefines.push_back("MORPH_VERSION_2_0");
       }
     }
+  }
+
+  if(meshDef.mTangentType == Property::VECTOR4)
+  {
+    shaderDef.mDefines.push_back("VEC4_TANGENT");
   }
 
   shaderDef.mUniforms["uMaxLOD"]     = 6.f;

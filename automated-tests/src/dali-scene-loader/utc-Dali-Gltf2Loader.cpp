@@ -161,28 +161,30 @@ int UtcDaliGltfLoaderSuccess1(void)
   DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
   DALI_TEST_EQUAL(6u, ctx.scene.GetNodeCount());
 
-  DALI_TEST_EQUAL(0u, ctx.resources.mEnvironmentMaps.size());
+  // Default envmap is used
+  DALI_TEST_EQUAL(1u, ctx.resources.mEnvironmentMaps.size());
 
   auto& materials = ctx.resources.mMaterials;
   DALI_TEST_EQUAL(2u, materials.size());
   const MaterialDefinition materialGroundTruth[]{
-    {MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
-       MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
-       MaterialDefinition::NORMAL | MaterialDefinition::TRANSPARENCY | MaterialDefinition::GLTF_CHANNELS |
+    {MaterialDefinition::ALBEDO | MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
+       MaterialDefinition::NORMAL | MaterialDefinition::TRANSPARENCY |
        (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
      0,
-     Vector4(1.f, .766f, .336f, 1.f),
-     Vector3(0.2, 0.1, 0.0),
+     Color::WHITE,
      1.f,
      0.f,
+     Vector4(1.000, 0.766, 0.336, 1.0),
      1.f,
+     1.f,
+     Vector3(0.2, 0.1, 0.0),
+     true,
+     false,
+     true,
      {
        {MaterialDefinition::ALBEDO,
         {"AnimatedCube_BaseColor.png",
          SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
-       {MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS | MaterialDefinition::GLTF_CHANNELS,
-        {"AnimatedCube_MetallicRoughness.png",
-         SamplerFlags::Encode(FilterMode::NEAREST_MIPMAP_LINEAR, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::MIRRORED_REPEAT)}},
        {MaterialDefinition::NORMAL,
         {"AnimatedCube_BaseColor.png",
          SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
@@ -197,11 +199,16 @@ int UtcDaliGltfLoaderSuccess1(void)
        MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
        MaterialDefinition::NORMAL | MaterialDefinition::GLTF_CHANNELS,
      0,
-     Vector4(1.f, .766f, .336f, 1.f),
-     Vector3(0.2, 0.1, 0.0),
+     Color::WHITE,
      1.f,
      0.f,
+     Vector4(1.000, 0.766, 0.336, 1.0),
      1.f,
+     1.f,
+     Vector3(0.2, 0.1, 0.0),
+     true,
+     true,
+     true,
      {
        {MaterialDefinition::ALBEDO,
         {"AnimatedCube_BaseColor.png",
@@ -231,6 +238,13 @@ int UtcDaliGltfLoaderSuccess1(void)
     DALI_TEST_EQUAL(md.mColor, m.mColor);
     DALI_TEST_EQUAL(md.mMetallic, m.mMetallic);
     DALI_TEST_EQUAL(md.mRoughness, m.mRoughness);
+    DALI_TEST_EQUAL(md.mBaseColorFactor, m.mBaseColorFactor);
+    DALI_TEST_EQUAL(md.mNormalScale, m.mNormalScale);
+    DALI_TEST_EQUAL(md.mOcclusionStrength, m.mOcclusionStrength);
+    DALI_TEST_EQUAL(md.mEmissiveFactor, m.mEmissiveFactor);
+    DALI_TEST_EQUAL(md.mNeedAlbedoTexture, m.mNeedAlbedoTexture);
+    DALI_TEST_EQUAL(md.mNeedMetallicRoughnessTexture, m.mNeedMetallicRoughnessTexture);
+    DALI_TEST_EQUAL(md.mNeedNormalTexture, m.mNeedNormalTexture);
 
     DALI_TEST_EQUAL(md.mTextureStages.size(), m.mTextureStages.size());
     auto iTexture = md.mTextureStages.begin();
@@ -260,11 +274,13 @@ int UtcDaliGltfLoaderSuccess1(void)
       Accessor{Blob{0, 0}, {}},
       Accessor{Blob{0, 0}, {}},
       Accessor{Blob{0, 0}, {}},
+      Accessor{Blob{0, 0}, {}},
     },
     {
       0,
       Geometry::TRIANGLES,
       "AnimatedCube.bin",
+      Accessor{Blob{0, 0}, {}},
       Accessor{Blob{0, 0}, {}},
       Accessor{Blob{0, 0}, {}},
       Accessor{Blob{0, 0}, {}},
@@ -286,6 +302,7 @@ int UtcDaliGltfLoaderSuccess1(void)
           &MeshDefinition::mPositions,
           &MeshDefinition::mNormals,
           &MeshDefinition::mTexCoords,
+          &MeshDefinition::mColors,
           &MeshDefinition::mTangents,
           &MeshDefinition::mJoints0,
           &MeshDefinition::mWeights0})
@@ -333,6 +350,7 @@ int UtcDaliGltfLoaderSuccessShort(void)
         "MorphPrimitivesTest",
         "MRendererTest",
         "SimpleSparseAccessor",
+        "AnimatedCube",
       })
   {
     Context ctx;
@@ -405,7 +423,6 @@ int UtcDaliGltfLoaderMRendererTest(void)
   ShaderDefinitionFactory sdf;
   sdf.SetResources(ctx.resources);
   auto& resources = ctx.resources;
-  resources.mEnvironmentMaps.push_back({});
 
   LoadGltfScene(TEST_RESOURCE_DIR "/MRendererTest.gltf", sdf, ctx.loadResult);
 
@@ -448,8 +465,12 @@ int UtcDaliGltfLoaderMRendererTest(void)
   }
 
   DALI_TEST_EQUAL(root.GetChildCount(), 1u);
-  DALI_TEST_EQUAL(root.GetChildAt(0).GetProperty(Actor::Property::NAME).Get<std::string>(), "RootNode");
-  DALI_TEST_EQUAL(root.GetChildAt(0).GetProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3(1.0f, 1.0f, 1.0f));
+  Actor child = root.GetChildAt(0);
+
+  DALI_TEST_EQUAL(child.GetProperty(Actor::Property::NAME).Get<std::string>(), "RootNode");
+  DALI_TEST_EQUAL(child.GetProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3(1.0f, 1.0f, 1.0f));
+  DALI_TEST_EQUAL(child.GetRendererCount(), 1u);
+  DALI_TEST_EQUAL(child.GetRendererAt(0).GetTextures().GetTextureCount(), 4u);
 
   END_TEST;
 }

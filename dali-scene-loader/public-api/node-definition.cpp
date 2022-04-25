@@ -150,9 +150,13 @@ void ModelNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParam
 
   actor.SetProperty(Actor::Property::COLOR, mColor);
 
+  actor.RegisterProperty("uHasVertexColor", static_cast<float>(mesh.first.mColors.IsDefined()));
+
   auto& matDef = resources.mMaterials[mMaterialIdx].first;
+  actor.RegisterProperty("uColorFactor", matDef.mBaseColorFactor);
   actor.RegisterProperty("uMetallicFactor", matDef.mMetallic);
   actor.RegisterProperty("uRoughnessFactor", matDef.mRoughness);
+  actor.RegisterProperty("uNormalScale", matDef.mNormalScale);
   if(matDef.mFlags & MaterialDefinition::OCCLUSION)
   {
     actor.RegisterProperty("uOcclusionStrength", matDef.mOcclusionStrength);
@@ -165,11 +169,23 @@ void ModelNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParam
   Index envIdx = matDef.mEnvironmentIdx;
   actor.RegisterProperty("uIblIntensity", resources.mEnvironmentMaps[envIdx].first.mIblIntensity);
 
-  const auto alphaCutoff = matDef.GetAlphaCutoff();
-  if(alphaCutoff > 0.f)
+  float opaque = 0.0f;
+  float mask = 0.0f;
+  float alphaCutoff = matDef.GetAlphaCutoff();
+  if(!MaskMatch(matDef.mFlags, MaterialDefinition::TRANSPARENCY))
   {
-    actor.RegisterProperty("uAlphaThreshold", alphaCutoff);
+    opaque = 1.0f;
   }
+  else
+  {
+    if(alphaCutoff > 0.f)
+    {
+      mask = 1.0f;
+    }
+  }
+  actor.RegisterProperty("uOpaque", opaque);
+  actor.RegisterProperty("uMask", mask);
+  actor.RegisterProperty("uAlphaThreshold", alphaCutoff);
 }
 
 void ArcNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const

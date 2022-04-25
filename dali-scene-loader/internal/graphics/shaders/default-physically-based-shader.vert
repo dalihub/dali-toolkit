@@ -1,3 +1,7 @@
+// Original Code
+// https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/glTF-WebGL-PBR/shaders/pbr-vert.glsl
+// Commit dc84b5e374fb3d23153d2248a338ef88173f9eb6
+
 #version 300 es
 
 #ifdef HIGHP
@@ -9,23 +13,29 @@
 in vec3 aPosition;
 in vec2 aTexCoord;
 in vec3 aNormal;
+
+#ifdef VEC4_TANGENT
+in vec4 aTangent;
+#else
 in vec3 aTangent;
+#endif
+
+in vec4 aVertexColor;
 
 #ifdef MORPH
   uniform sampler2D sBlendShapeGeometry;
 #endif
 
 out vec2 vUV;
-out vec3 vNormal;
-out vec3 vTangent;
-out vec3 vViewVec;
+out lowp mat3 vTBN;
+out lowp vec4 vColor;
+out highp vec3 vPositionToCamera;
 
-uniform highp mat4 uMvpMatrix;
 uniform highp mat4 uViewMatrix;
 uniform mat3 uNormalMatrix;
 uniform mat4 uModelMatrix;
-uniform mat4 uModelView;
 uniform mat4 uProjection;
+uniform lowp float uHasVertexColor;
 
 #ifdef SKINNING
   in vec4 aJoints;
@@ -50,7 +60,7 @@ void main()
 {
   vec4 position = vec4(aPosition, 1.0);
   vec3 normal = aNormal;
-  vec3 tangent = aTangent;
+  vec3 tangent = aTangent.xyz;
 
 #ifdef MORPH
   int width = textureSize( sBlendShapeGeometry, 0 ).x;
@@ -129,15 +139,16 @@ void main()
   tangent = (bone * vec4(tangent, 0.0)).xyz;
 #endif
 
-  vec4 vPosition = uModelMatrix * position;
+  vec4 positionW = uModelMatrix * position;
+  vec4 positionV = uViewMatrix * positionW;
 
-  vNormal = normalize(uNormalMatrix * normal);
+  vPositionToCamera = transpose(mat3(uViewMatrix)) * -vec3(positionV.xyz / positionV.w);
 
-  vTangent = normalize(uNormalMatrix * tangent);
-
-
-  vec4 viewPosition = uViewMatrix * vPosition;
-  gl_Position = uProjection * viewPosition;
+  lowp vec3 bitangent = cross(normal, tangent);
+#ifdef VEC4_TANGENT
+  bitangent *= aTangent.w;
+#endif
+  vTBN = mat3(uModelMatrix) * mat3(tangent, bitangent, normal);
 
 #ifdef FLIP_V
   vUV = vec2(aTexCoord.x, 1.0 - aTexCoord.y);
@@ -145,5 +156,7 @@ void main()
   vUV = aTexCoord;
 #endif
 
-  vViewVec = viewPosition.xyz;
+  vColor = mix(vec4(1.0f), aVertexColor, uHasVertexColor);
+
+  gl_Position = uProjection * positionV;
 }

@@ -681,8 +681,9 @@ MeshDefinition::LoadRaw(const std::string& modelsPath) const
 
   if(mTangents.IsDefined())
   {
-    DALI_ASSERT_ALWAYS(((mTangents.mBlob.mLength % sizeof(Vector3) == 0) ||
-                        mTangents.mBlob.mStride >= sizeof(Vector3)) &&
+    uint32_t propertySize = (mTangentType == Property::VECTOR4) ? sizeof(Vector4) : sizeof(Vector3);
+    DALI_ASSERT_ALWAYS(((mTangents.mBlob.mLength % propertySize == 0) ||
+                        mTangents.mBlob.mStride >= propertySize) &&
                        "Tangents buffer length not a multiple of element size");
     const auto           bufferSize = mTangents.mBlob.GetBufferSize();
     std::vector<uint8_t> buffer(bufferSize);
@@ -690,15 +691,35 @@ MeshDefinition::LoadRaw(const std::string& modelsPath) const
     {
       ExceptionFlinger(ASSERT_LOCATION) << "Failed to read tangents from '" << meshPath << "'.";
     }
+    mTangents.mBlob.ApplyMinMax(bufferSize / propertySize, reinterpret_cast<float*>(buffer.data()));
 
-    mTangents.mBlob.ApplyMinMax(bufferSize / sizeof(Vector3), reinterpret_cast<float*>(buffer.data()));
-
-    raw.mAttribs.push_back({"aTangent", Property::VECTOR3, static_cast<uint32_t>(bufferSize / sizeof(Vector3)), std::move(buffer)});
+    raw.mAttribs.push_back({"aTangent", mTangentType, static_cast<uint32_t>(bufferSize / propertySize), std::move(buffer)});
   }
   else if(mTangents.mBlob.mLength != 0 && hasNormals && isTriangles)
   {
     DALI_ASSERT_DEBUG(mTangents.mBlob.mLength == mNormals.mBlob.GetBufferSize());
     hasUvs ? GenerateTangentsWithUvs(raw) : GenerateTangents(raw);
+  }
+
+  if(mColors.IsDefined())
+  {
+    uint32_t propertySize = mColors.mBlob.mElementSizeHint;
+    Property::Type propertyType = (propertySize == sizeof(Vector4)) ? Property::VECTOR4 : ((propertySize == sizeof(Vector3)) ? Property::VECTOR3 : Property::NONE);
+    if(propertyType != Property::NONE)
+    {
+      DALI_ASSERT_ALWAYS(((mColors.mBlob.mLength % propertySize == 0) ||
+                          mColors.mBlob.mStride >= propertySize) &&
+                         "Colors buffer length not a multiple of element size");
+      const auto           bufferSize = mColors.mBlob.GetBufferSize();
+      std::vector<uint8_t> buffer(bufferSize);
+      if(!ReadAccessor(mColors, binFile, buffer.data()))
+      {
+        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read colors from '" << meshPath << "'.";
+      }
+      mColors.mBlob.ApplyMinMax(bufferSize / propertySize, reinterpret_cast<float*>(buffer.data()));
+
+      raw.mAttribs.push_back({"aVertexColor", propertyType, static_cast<uint32_t>(bufferSize / propertySize), std::move(buffer)});
+    }
   }
 
   if(IsSkinned())

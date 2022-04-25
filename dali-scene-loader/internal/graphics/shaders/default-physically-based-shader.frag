@@ -1,14 +1,30 @@
+// Original Code
+// https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/glTF-WebGL-PBR/shaders/pbr-frag.glsl
+// Commit dc84b5e374fb3d23153d2248a338ef88173f9eb6
+//
+// This fragment shader defines a reference implementation for Physically Based Shading of
+// a microfacet surface material defined by a glTF model.For the DamagedHelmet.gltf and its Assets
+//
+// References:
+// [1] Real Shading in Unreal Engine 4
+//     http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
+// [2] Physically Based Shading at Disney
+//     http://blog.selfshadow.com/publications/s2012-shading-course/burley/s2012_pbs_disney_brdf_notes_v3.pdf
+// [3] README.md - Environment Maps
+//     https://github.com/KhronosGroup/glTF-Sample-Viewer/#environment-maps
+// [4] \"An Inexpensive BRDF Model for Physically based Rendering\" by Christophe Schlick
+//     https://www.cs.virginia.edu/~jdl/bib/appearance/analytic%20models/schlick94b.pdf
+
 #version 300 es
 
 #ifdef HIGHP
-  precision highp float;
+precision highp float;
 #else
-  precision mediump float;
+precision mediump float;
 #endif
 
 #ifdef THREE_TEX
 #ifdef GLTF_CHANNELS
-// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#pbrmetallicroughnessmetallicroughnesstexture
 #define METALLIC b
 #define ROUGHNESS g
 #else //GLTF_CHANNELS
@@ -17,167 +33,192 @@
 #endif //GLTF_CHANNELS
 #endif //THREE_TEX
 
+uniform lowp vec4 uColorFactor;
+uniform lowp float uMetallicFactor;
+uniform lowp float uRoughnessFactor;
+
 #ifdef THREE_TEX
-  uniform sampler2D sAlbedoAlpha;
-  uniform sampler2D sMetalRoughness;
-  uniform sampler2D sNormal;
-
-#ifdef ALPHA_TEST
-  uniform float uAlphaThreshold;
-#endif //ALPHA_TEST
-
-#else
-  uniform sampler2D sAlbedoMetal;
-  uniform sampler2D sNormalRoughness;
+#ifdef BASECOLOR_TEX
+uniform sampler2D sAlbedoAlpha;
+#endif // BASECOLOR_TEX
+#ifdef METALLIC_ROUGHNESS_TEX
+uniform sampler2D sMetalRoughness;
+#endif // METALLIC_ROUGHNESS_TEX
+#ifdef NORMAL_TEX
+uniform sampler2D sNormal;
+uniform float uNormalScale;
+#endif // NORMAL_TEX
+#else // THREE_TEX
+uniform sampler2D sAlbedoMetal;
+uniform sampler2D sNormalRoughness;
 #endif
 
 #ifdef OCCLUSION
-  uniform sampler2D sOcclusion;
-  uniform float uOcclusionStrength;
+uniform sampler2D sOcclusion;
+uniform float uOcclusionStrength;
 #endif
 
 #ifdef EMISSIVE
-  uniform sampler2D sEmissive;
-  uniform vec3 uEmissiveFactor;
+uniform sampler2D sEmissive;
+uniform vec3 uEmissiveFactor;
 #endif
 
-uniform samplerCube sDiffuse;
-uniform samplerCube sSpecular;
-
-// Number of mip map levels in the texture
-uniform float uMaxLOD;
-
-// Transformation matrix of the cubemap texture
-uniform mat4 uCubeMatrix;
-
-uniform vec4 uColor;
-uniform float uMetallicFactor;
-uniform float uRoughnessFactor;
-
-//IBL Light intensity
+//// For IBL
+uniform samplerCube sDiffuseEnvSampler;
+uniform samplerCube sSpecularEnvSampler;
+uniform sampler2D sbrdfLUT;
 uniform float uIblIntensity;
 
+// For Alpha Mode.
+uniform lowp float uOpaque;
+uniform lowp float uMask;
+uniform lowp float uAlphaThreshold;
+
 // TODO: Multiple texture coordinate will be supported.
-in vec2 vUV;
-in vec3 vNormal;
-in vec3 vTangent;
-in vec3 vViewVec;
+in lowp vec2 vUV;
+in lowp mat3 vTBN;
+in lowp vec4 vColor;
+in highp vec3 vPositionToCamera;
 
 out vec4 FragColor;
 
-// Functions for BRDF calculation come from
-// https://www.unrealengine.com/blog/physically-based-shading-on-mobile
-// Based on the paper by Dimitar Lazarov
-// http://blog.selfshadow.com/publications/s2013-shading-course/lazarov/s2013_pbs_black_ops_2_notes.pdf
-vec3 EnvBRDFApprox( vec3 SpecularColor, float Roughness, float NoV )
+struct PBRInfo
 {
-  const vec4 c0 = vec4( -1.0, -0.0275, -0.572, 0.022 );
-  const vec4 c1 = vec4( 1.0, 0.0425, 1.04, -0.04 );
-  vec4 r = Roughness * c0 + c1;
-  float a004 = min( r.x * r.x, exp2( -9.28 * NoV ) ) * r.x + r.y;
-  vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
+  mediump float NdotL;        // cos angle between normal and light direction
+  mediump float NdotV;        // cos angle between normal and view direction
+  mediump float NdotH;        // cos angle between normal and half vector
+  mediump float VdotH;        // cos angle between view direction and half vector
+  mediump vec3 reflectance0;  // full reflectance color (normal incidence angle)
+  mediump vec3 reflectance90; // reflectance color at grazing angle
+  lowp float alphaRoughness;  // roughness mapped to a more linear change in the roughness (proposed by [2])
+};
 
-  return SpecularColor * AB.x + AB.y;
+const float M_PI = 3.141592653589793;
+const float c_MinRoughness = 0.04;
+
+vec3 specularReflection(PBRInfo pbrInputs)
+{
+  return pbrInputs.reflectance0 + (pbrInputs.reflectance90 - pbrInputs.reflectance0) * pow(clamp(1.0 - pbrInputs.VdotH, 0.0, 1.0), 5.0);
+}
+
+float geometricOcclusion(PBRInfo pbrInputs)
+{
+  mediump float NdotL = pbrInputs.NdotL;
+  mediump float NdotV = pbrInputs.NdotV;
+  lowp float r = pbrInputs.alphaRoughness;
+
+  lowp float attenuationL = 2.0 * NdotL / (NdotL + sqrt(r * r + (1.0 - r * r) * (NdotL * NdotL)));
+  lowp float attenuationV = 2.0 * NdotV / (NdotV + sqrt(r * r + (1.0 - r * r) * (NdotV * NdotV)));
+  return attenuationL * attenuationV;
+}
+
+float microfacetDistribution(PBRInfo pbrInputs)
+{
+  mediump float roughnessSq = pbrInputs.alphaRoughness * pbrInputs.alphaRoughness;
+  lowp float f = (pbrInputs.NdotH * roughnessSq - pbrInputs.NdotH) * pbrInputs.NdotH + 1.0;
+  return roughnessSq / (M_PI * f * f);
+}
+
+vec3 linear(vec3 color)
+{
+  return pow(color, vec3(2.2));
 }
 
 void main()
 {
-  // We get information from the maps (albedo, normal map, roughness, metalness
-  // I access the maps in the order they will be used
+  // Metallic and Roughness material properties are packed together
+  // In glTF, these factors can be specified by fixed scalar values
+  // or from a metallic-roughness map
+  // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
+  // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
+  lowp float metallic = uMetallicFactor;
+  lowp float perceptualRoughness = uRoughnessFactor;
+  // If there isn't normal texture, use surface normal
+  mediump vec3 n = normalize(vTBN[2].xyz);
+
 #ifdef THREE_TEX
-  vec4 albedoAlpha = texture(sAlbedoAlpha, vUV.st);
-  float alpha = albedoAlpha.a;
-#ifdef ALPHA_TEST
-  if (alpha <= uAlphaThreshold)
-  {
-    discard;
-  }
-#endif	//ALPHA_TEST
-  vec3 albedoColor = albedoAlpha.rgb * uColor.rgb;
+  // The albedo may be defined from a base texture or a flat color
+#ifdef BASECOLOR_TEX
+  lowp vec4 baseColor = texture(sAlbedoAlpha, vUV);
+  baseColor = vec4(linear(baseColor.rgb), baseColor.w) * uColorFactor;
+#else // BASECOLOR_TEX
+  lowp vec4 baseColor = vColor * uColorFactor;
+#endif // BASECOLOR_TEX
 
-  vec4 metalRoughness = texture(sMetalRoughness, vUV.st);
-  float metallic = metalRoughness.METALLIC * uMetallicFactor;
-  float roughness = metalRoughness.ROUGHNESS * uRoughnessFactor;
+#ifdef METALLIC_ROUGHNESS_TEX
+  lowp vec4 metrou = texture(sMetalRoughness, vUV);
+  metallic = metrou.METALLIC * metallic;
+  perceptualRoughness = metrou.ROUGHNESS * perceptualRoughness;
+#endif // METALLIC_ROUGHNESS_TEX
 
-  vec3 normalMap = texture(sNormal, vUV.st).rgb;
-#else  //THREE_TEX
-  vec4 albedoMetal = texture(sAlbedoMetal, vUV.st);
-  vec3 albedoColor = albedoMetal.rgb * uColor.rgb;
-  float metallic = albedoMetal.a * uMetallicFactor;
+#ifdef NORMAL_TEX
+  n = texture(sNormal, vUV).rgb;
+  n = normalize(vTBN * ((2.0 * n - 1.0) * vec3(uNormalScale, uNormalScale, 1.0)));
+#endif // NORMAL_TEX
+#else // THREE_TEX
+  vec4 albedoMetal = texture(sAlbedoMetal, vUV);
+  lowp vec4 baseColor = vec4(linear(albedoMetal.rgb), 1.0) * vColor * uColorFactor;
 
-  vec4 normalRoughness = texture(sNormalRoughness, vUV.st);
-  vec3 normalMap = normalRoughness.rgb;
-  float roughness = normalRoughness.a * uRoughnessFactor;
-#endif
-  //Normalize vectors
-  vec3 normal = normalize(vNormal);
-  vec3 tangent = normalize(vTangent);
+  metallic = albedoMetal.METALLIC * metallic;
 
-  // NOTE: normal and tangent have to be orthogonal for the result of the cross()
-  // product to be a unit vector. We might find that we need to normalize().
-  vec3 bitangent = cross(normal, tangent);
+  vec4 normalRoughness = texture(sNormalRoughness, vUV);
+  perceptualRoughness = normalRoughness.ROUGHNESS * perceptualRoughness;
 
-  vec3 viewVec = normalize(vViewVec);
+  n = normalRoughness.rgb;
+  n = normalize(vTBN * ((2.0 * n - 1.0) * vec3(uNormalScale, uNormalScale, 1.0)));
+#endif // THREE_TEX
 
-  // Create Inverse Local to world matrix
-  mat3 vInvTBN = mat3(tangent, bitangent, normal);
+  // The value of uOpaque and uMask can be 0.0 or 1.0.
+  // If uOpaque is 1.0, alpha value of final color is 1.0;
+  // If uOpaque is 0.0 and uMask is 1.0, alpha value of final color is 0.0 when input alpha is lower than uAlphaThreshold or
+  // 1.0 when input alpha is larger than uAlphaThreshold.
+  // https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#_material_alphamode
+  baseColor.a = mix(baseColor.a, 1.0, uOpaque);
+  baseColor.a = min(mix(baseColor.a, floor(baseColor.a - uAlphaThreshold + 1.0), uMask), 1.0);
 
-  // Get normal map info in world space
-  normalMap = normalize(normalMap - 0.5);
-  vec3 newNormal = vInvTBN * normalMap.rgb;
+  metallic = clamp(metallic, 0.0, 1.0);
+  // Roughness is authored as perceptual roughness; as is convention,
+  // convert to material roughness by squaring the perceptual roughness [2].
+  perceptualRoughness = clamp(perceptualRoughness, c_MinRoughness, 1.0);
+  lowp float alphaRoughness = perceptualRoughness * perceptualRoughness;
 
-  // Calculate normal dot view vector
-  float NoV = max(dot(newNormal, -viewVec), 0.0);
+  lowp vec3 f0 = vec3(0.04);
+  lowp vec3 diffuseColor = baseColor.rgb * (vec3(1.0) - f0);
+  diffuseColor *= (1.0 - metallic);
+  lowp vec3 specularColor = mix(f0, baseColor.rgb, metallic);
 
-  // Reflect vector
-  vec3 reflectionVec = reflect(viewVec, newNormal);
+  // Compute reflectance.
+  lowp float reflectance = max(max(specularColor.r, specularColor.g), specularColor.b);
 
-  //transform it now to environment coordinates (used when the environment rotates)
-  vec3 reflecCube = (uCubeMatrix * vec4( reflectionVec, 0.0 ) ).xyz;
-  reflecCube = normalize( reflecCube );
+  // For typical incident reflectance range (between 4% to 100%) set the grazing reflectance to 100% for typical fresnel effect.
+  // For very low reflectance range on highly diffuse objects (below 4%), incrementally reduce grazing reflecance to 0%.
+  lowp float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);
+  lowp vec3 specularEnvironmentR0 = specularColor.rgb;
+  lowp vec3 specularEnvironmentR90 = vec3(1.0, 1.0, 1.0) * reflectance90;
 
-  //transform it now to environment coordinates
-  vec3 normalCube = ( uCubeMatrix * vec4( newNormal, 0.0 ) ).xyz;
-  normalCube = normalize( normalCube );
+  mediump vec3 v = normalize(vPositionToCamera); // Vector from surface point to camera
+  mediump float NdotV = clamp(abs(dot(n, v)), 0.001, 1.0);
+  mediump vec3 reflection = -normalize(reflect(v, n));
 
-  // Get irradiance from diffuse cubemap
-  vec3 irradiance = texture( sDiffuse, normalCube ).rgb;
+  lowp vec3 color = vec3(0.0);
+  lowp vec3 diffuseLight = linear(texture(sDiffuseEnvSampler, n).rgb);
+  lowp vec3 specularLight = linear(texture(sSpecularEnvSampler, reflection).rgb);
+  // retrieve a scale and bias to F0. See [1], Figure 3
+  lowp vec3 brdf = linear(texture(sbrdfLUT, vec2(NdotV, 1.0 - perceptualRoughness)).rgb);
 
-  // Access reflection color using roughness value
-  float finalLod = mix( 0.0, uMaxLOD - 2.0, roughness);
-  vec3 reflectionColor = textureLod(sSpecular, reflecCube, finalLod).rgb;
-
-  // We are supposed to be using DielectricColor (0.04) of a plastic (almost everything)
-  // http://blog.selfshadow.com/publications/s2014-shading-course/hoffman/s2014_pbs_physics_math_slides.pdf
-  // however that seems to prevent achieving very dark tones (i.e. get dark gray blacks).
-  vec3 DiffuseColor = albedoColor - albedoColor * metallic;  // 1 mad
-  vec3 SpecularColor = mix( vec3(0.04), albedoColor, metallic); // 2 mad
-
-  // Calculate specular color using Magic Function (takes original roughness and normal dot view).
-  vec3 specColor =  reflectionColor.rgb * EnvBRDFApprox(SpecularColor, roughness, NoV );
-
-  // Multiply the result by albedo texture and do energy conservation
-  vec3 diffuseColor = irradiance * DiffuseColor;
-
-  // Final color is the sum of the diffuse and specular term
-  vec3 finalColor = diffuseColor + specColor;
-
-  finalColor = sqrt( finalColor ) * uIblIntensity;
-
+  lowp vec3 diffuse = diffuseLight * diffuseColor;
+  lowp vec3 specular = specularLight * (specularColor * brdf.x + brdf.y);
+  color += (diffuse + specular) * uIblIntensity;
 
 #ifdef OCCLUSION
-  float ao = texture(sOcclusion, vUV.st).r;
-  finalColor = mix( finalColor, finalColor * ao, uOcclusionStrength );
-#endif
+  lowp float ao = texture(sOcclusion, vUV).r;
+  color = mix(color, color * ao, uOcclusionStrength);
+#endif // OCCLUSION
 
 #ifdef EMISSIVE
-  vec3 emissive = texture( sEmissive, vUV.st ).rgb * uEmissiveFactor;
-  finalColor += emissive;
-#endif
+  lowp vec3 emissive = linear(texture(sEmissive, vUV).rgb) * uEmissiveFactor;
+  color += emissive;
+#endif // EMISSIVE
 
-#ifdef THREE_TEX
-  FragColor = vec4( finalColor, alpha );
-#else //THREE_TEX
-  FragColor = vec4( finalColor, 1.0 );
-#endif //THREE_TEX
+  FragColor = vec4(pow(color, vec3(1.0 / 2.2)), baseColor.a);
 }

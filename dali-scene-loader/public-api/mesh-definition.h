@@ -243,9 +243,11 @@ public: // DATA
   Accessor       mPositions;
   Accessor       mNormals; // data can be generated based on positions
   Accessor       mTexCoords;
+  Accessor       mColors;
   Accessor       mTangents; // data can be generated based on normals and texCoords (the latter isn't mandatory; the results will be better if available)
   Accessor       mJoints0;
   Accessor       mWeights0;
+  Property::Type mTangentType{Property::VECTOR3};
 
   Blob                    mBlendShapeHeader;
   std::vector<BlendShape> mBlendShapes;
