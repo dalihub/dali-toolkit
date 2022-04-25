@@ -23,6 +23,7 @@
 #include <dali/devel-api/images/pixel-data-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
+#include <dali/integration-api/debug.h>
 #include <string.h>
 
 // INTERNAL HEADER
@@ -239,6 +240,15 @@ void TextVisual::DoCreateInstancePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::TextVisual::Property::TEXT, text);
 }
 
+void TextVisual::EnablePreMultipliedAlpha(bool preMultiplied)
+{
+  // Make always enable pre multiplied alpha whether preMultiplied value is false.
+  if(!preMultiplied)
+  {
+    DALI_LOG_WARNING("Note : TextVisual cannot disable PreMultipliedAlpha\n");
+  }
+}
+
 TextVisual::TextVisual(VisualFactoryCache& factoryCache)
 : Visual::Base(factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO, Toolkit::Visual::TEXT),
   mController(Text::Controller::New()),
@@ -247,6 +257,8 @@ TextVisual::TextVisual(VisualFactoryCache& factoryCache)
   mTextColorAnimatableIndex(Property::INVALID_INDEX),
   mRendererUpdateNeeded(false)
 {
+  // Enable the pre-multiplied alpha to improve the text quality
+  mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
 }
 
 TextVisual::~TextVisual()
@@ -293,9 +305,6 @@ void TextVisual::DoSetOnScene(Actor& actor)
   mControl = actor;
 
   mImpl->mRenderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT);
-
-  // Enable the pre-multiplied alpha to improve the text quality
-  EnablePreMultipliedAlpha(true);
 
   const Vector4& defaultColor = mController->GetTextModel()->GetDefaultColor();
   if(mTextColorAnimatableIndex == Property::INVALID_INDEX)

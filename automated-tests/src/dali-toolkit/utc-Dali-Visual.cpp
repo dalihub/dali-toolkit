@@ -3456,7 +3456,7 @@ int UtcDaliVisualPremultipliedAlpha(void)
     DALI_TEST_EQUALS(value->Get<bool>(), false, TEST_LOCATION);
   }
 
-  // svg visual ( premultiplied alpha by default is true )
+  // svg visual ( premultiplied alpha by default is true, and cannot change value )
   {
     Visual::Base imageVisual = factory.CreateVisual(
       Property::Map()
@@ -3470,6 +3470,149 @@ int UtcDaliVisualPremultipliedAlpha(void)
     // test values
     DALI_TEST_CHECK(value);
     DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+  }
+  {
+    Visual::Base imageVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::IMAGE)
+        .Add(ImageVisual::Property::URL, TEST_SVG_FILE_NAME)
+        .Add(Visual::Property::PREMULTIPLIED_ALPHA, false));
+
+    Dali::Property::Map visualMap;
+    imageVisual.CreatePropertyMap(visualMap);
+    Property::Value* value = visualMap.Find(Visual::Property::PREMULTIPLIED_ALPHA);
+
+    // test values
+    DALI_TEST_CHECK(value);
+    DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+  }
+
+  // animated vector visual ( premultiplied alpha by default is true, and cannot change value )
+  {
+    Visual::Base imageVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::IMAGE)
+        .Add(ImageVisual::Property::URL, "something.json"));
+
+    Dali::Property::Map visualMap;
+    imageVisual.CreatePropertyMap(visualMap);
+    Property::Value* value = visualMap.Find(Visual::Property::PREMULTIPLIED_ALPHA);
+
+    // test values
+    DALI_TEST_CHECK(value);
+    DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+  }
+  {
+    Visual::Base imageVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::IMAGE)
+        .Add(ImageVisual::Property::URL, "something.json")
+        .Add(Visual::Property::PREMULTIPLIED_ALPHA, false));
+
+    Dali::Property::Map visualMap;
+    imageVisual.CreatePropertyMap(visualMap);
+    Property::Value* value = visualMap.Find(Visual::Property::PREMULTIPLIED_ALPHA);
+
+    // test values
+    DALI_TEST_CHECK(value);
+    DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+  }
+
+  // text visual ( premultiplied alpha by default is true, and cannot change value )
+  {
+    Visual::Base textVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::TEXT)
+        .Add(TextVisual::Property::TEXT, "Text"));
+
+    Dali::Property::Map visualMap;
+    textVisual.CreatePropertyMap(visualMap);
+    Property::Value* value = visualMap.Find(Visual::Property::PREMULTIPLIED_ALPHA);
+
+    // test values
+    DALI_TEST_CHECK(value);
+    DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+  }
+  {
+    Visual::Base textVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::TEXT)
+        .Add(TextVisual::Property::TEXT, "Text")
+        .Add(Visual::Property::PREMULTIPLIED_ALPHA, false));
+
+    Dali::Property::Map visualMap;
+    textVisual.CreatePropertyMap(visualMap);
+    Property::Value* value = visualMap.Find(Visual::Property::PREMULTIPLIED_ALPHA);
+
+    // test values
+    DALI_TEST_CHECK(value);
+    DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+  }
+
+  // gradient visual ( premultiplied alpha by default is true, and cannot change value )
+  {
+    Visual::Base gradientVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::GRADIENT)
+        .Add(GradientVisual::Property::START_POSITION, Vector2(-0.5f, -0.5f))
+        .Add(GradientVisual::Property::END_POSITION, Vector2(0.5f, 0.5f))
+        .Add(GradientVisual::Property::STOP_COLOR, Property::Array().Add(Color::RED).Add(Vector4(1.0f, 1.0f, 1.0f, 0.5f))));
+
+    Dali::Property::Map visualMap;
+    gradientVisual.CreatePropertyMap(visualMap);
+    Property::Value* value = visualMap.Find(Visual::Property::PREMULTIPLIED_ALPHA);
+
+    // test values
+    DALI_TEST_CHECK(value);
+    DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+  }
+  {
+    Visual::Base gradientVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::GRADIENT)
+        .Add(GradientVisual::Property::START_POSITION, Vector2(-0.5f, -0.5f))
+        .Add(GradientVisual::Property::END_POSITION, Vector2(0.5f, 0.5f))
+        .Add(GradientVisual::Property::STOP_COLOR, Property::Array().Add(Color::RED).Add(Vector4(1.0f, 1.0f, 1.0f, 0.5f)))
+        .Add(Visual::Property::PREMULTIPLIED_ALPHA, false));
+
+    Dali::Property::Map visualMap;
+    gradientVisual.CreatePropertyMap(visualMap);
+    Property::Value* value = visualMap.Find(Visual::Property::PREMULTIPLIED_ALPHA);
+
+    // test values
+    DALI_TEST_CHECK(value);
+    DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+  }
+
+  // color visual ( premultiplied alpha by default is false, and cannot change value )
+  {
+    Visual::Base colorVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::COLOR)
+        .Add(ColorVisual::Property::MIX_COLOR, Color::AQUA));
+
+    Dali::Property::Map visualMap;
+    colorVisual.CreatePropertyMap(visualMap);
+    Property::Value* value = visualMap.Find(Visual::Property::PREMULTIPLIED_ALPHA);
+
+    // test values
+    DALI_TEST_CHECK(value);
+    DALI_TEST_EQUALS(value->Get<bool>(), false, TEST_LOCATION);
+  }
+  {
+    Visual::Base colorVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::COLOR)
+        .Add(ColorVisual::Property::MIX_COLOR, Color::AQUA)
+        .Add(Visual::Property::PREMULTIPLIED_ALPHA, true));
+
+    Dali::Property::Map visualMap;
+    colorVisual.CreatePropertyMap(visualMap);
+    Property::Value* value = visualMap.Find(Visual::Property::PREMULTIPLIED_ALPHA);
+
+    // test values
+    DALI_TEST_CHECK(value);
+    DALI_TEST_EQUALS(value->Get<bool>(), false, TEST_LOCATION);
   }
 
   END_TEST;
@@ -4735,8 +4878,7 @@ int UtcDaliVisualGetVisualProperty01(void)
       UniformData("blurRadius", Property::Type::FLOAT),
       UniformData("borderlineWidth", Property::Type::FLOAT),
       UniformData("borderlineColor", Property::Type::VECTOR4),
-      UniformData("borderlineOffset", Property::Type::FLOAT),
-      UniformData("preMultipliedAlpha", Property::Type::FLOAT)};
+      UniformData("borderlineOffset", Property::Type::FLOAT)};
 
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
@@ -4751,7 +4893,6 @@ int UtcDaliVisualGetVisualProperty01(void)
   propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, 20.0f);
   propertyMap.Insert(DevelVisual::Property::BORDERLINE_COLOR, Color::RED);
   propertyMap.Insert(DevelVisual::Property::BORDERLINE_OFFSET, 1.0f);
-  propertyMap.Insert(Visual::Property::PREMULTIPLIED_ALPHA, true);
   Visual::Base colorVisual = factory.CreateVisual(propertyMap);
 
   DummyControl        dummyControl = DummyControl::New(true);
@@ -4771,8 +4912,7 @@ int UtcDaliVisualGetVisualProperty01(void)
   float   targetBlurRadius      = 10.0f;
   float   targetBorderlineWidth = 25.0f;
   Vector4 targetBorderlineColor(1.0f, 1.0f, 1.0f, 1.0f);
-  float   targetBorderlineOffset   = -1.0f;
-  float   targetPreMultipliedAlpha = 1.0f;
+  float   targetBorderlineOffset = -1.0f;
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::MIX_COLOR), targetColor);
@@ -4830,10 +4970,6 @@ int UtcDaliVisualGetVisualProperty01(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
-  Property::Value* preMultAlphaValue = resultMap.Find(Visual::Property::PREMULTIPLIED_ALPHA, Property::BOOLEAN);
-  DALI_TEST_CHECK(preMultAlphaValue);
-  DALI_TEST_EQUALS(preMultAlphaValue->Get<bool>(), bool(targetPreMultipliedAlpha), TEST_LOCATION);
-
   // Test uniform values
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", targetColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("offset", targetOffset), true, TEST_LOCATION);
@@ -4843,7 +4979,6 @@ int UtcDaliVisualGetVisualProperty01(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("preMultipliedAlpha", targetPreMultipliedAlpha), true, TEST_LOCATION);
 
   // Test unregistered visual
   Property property3 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL2, Visual::Property::MIX_COLOR);

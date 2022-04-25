@@ -143,6 +143,11 @@ public: // from Visual::Base
    */
   void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
+  /**
+   * @copydoc Visual::Base::EnablePreMultipliedAlpha
+   */
+  void EnablePreMultipliedAlpha(bool preMultiplied) override;
+
 protected:
   /**
    * @brief Constructor.

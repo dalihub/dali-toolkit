@@ -176,6 +176,15 @@ void ColorVisual::DoCreateInstancePropertyMap(Property::Map& map) const
   // Do nothing
 }
 
+void ColorVisual::EnablePreMultipliedAlpha(bool preMultiplied)
+{
+  // Make always disable pre multiplied alpha whether preMultiplied value is true.
+  if(preMultiplied)
+  {
+    DALI_LOG_WARNING("Note : ColorVisual cannot enable PreMultipliedAlpha\n");
+  }
+}
+
 void ColorVisual::OnSetTransform()
 {
   if(mImpl->mRenderer)

@@ -190,6 +190,15 @@ void AnimatedVectorImageVisual::DoCreateInstancePropertyMap(Property::Map& map) 
   // Do nothing
 }
 
+void AnimatedVectorImageVisual::EnablePreMultipliedAlpha(bool preMultiplied)
+{
+  // Make always enable pre multiplied alpha whether preMultiplied value is false.
+  if(!preMultiplied)
+  {
+    DALI_LOG_WARNING("Note : AnimatedVectorVisual cannot disable PreMultipliedAlpha\n");
+  }
+}
+
 void AnimatedVectorImageVisual::DoSetProperties(const Property::Map& propertyMap)
 {
   // url already passed in from constructor
