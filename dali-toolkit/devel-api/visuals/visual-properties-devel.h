@@ -74,6 +74,7 @@ enum Type
   /**
    * @brief The radius for the rounded corners of the visual
    * @details Name "cornerRadius", type Property::FLOAT.
+   * @note Their may exist some alias when you use it as ClippingMode::CLIP_CHILDREN.
    * @note Optional.
    */
   CORNER_RADIUS = OPACITY + 2,

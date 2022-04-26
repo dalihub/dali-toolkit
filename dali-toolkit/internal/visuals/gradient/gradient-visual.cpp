@@ -274,8 +274,15 @@ DALI_COMPOSE_SHADER(
   void main()\n
   {\n
     mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - vCornerRadius;\n
-    gl_FragColor = texture2D( sTexture, vec2( vTexCoord.y, 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
-    gl_FragColor *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
+    if(dist > 1.0)\n
+    {\n
+      discard;\n
+    }\n
+    else\n
+    {\n
+      gl_FragColor = texture2D( sTexture, vec2( vTexCoord.y, 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
+      gl_FragColor *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
+    }\n
   }\n
 ),
 
@@ -292,8 +299,15 @@ DALI_COMPOSE_SHADER(
   void main()\n
   {\n
     mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - vCornerRadius;\n
-    gl_FragColor = texture2D( sTexture, vec2( length(vTexCoord), 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
-    gl_FragColor *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
+    if(dist > 1.0)\n
+    {\n
+      discard;\n
+    }\n
+    else\n
+    {\n
+      gl_FragColor = texture2D( sTexture, vec2( length(vTexCoord), 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
+      gl_FragColor *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
+    }\n
   }\n
 )
 };

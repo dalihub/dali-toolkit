@@ -174,10 +174,17 @@ const char* FRAGMENT_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
   void main()\n
   {\n
       mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - vCornerRadius;\n
-      mediump float opacity = 1.0 - smoothstep( -1.0, 1.0, dist );\n
-      gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * vec4( mixColor, 1.0 );\n
-      gl_FragColor.a *= opacity;\n
-      gl_FragColor.rgb *= mix( 1.0, opacity, preMultipliedAlpha );\n
+      if(dist > 1.0)\n
+      {\n
+        discard;\n
+      }\n
+      else\n
+      {\n
+        mediump float opacity = 1.0 - smoothstep( -1.0, 1.0, dist );\n
+        gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * vec4( mixColor, 1.0 );\n
+        gl_FragColor.a *= opacity;\n
+        gl_FragColor.rgb *= mix( 1.0, opacity, preMultipliedAlpha );\n
+      }\n
   }\n
 );
 

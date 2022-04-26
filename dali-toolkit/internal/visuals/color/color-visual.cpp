@@ -126,9 +126,16 @@ const char* FRAGMENT_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
   \n
   void main()\n
   {\n
-      mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - vCornerRadius;\n
+    mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - vCornerRadius;\n
+    if(dist > 1.0)\n
+    {\n
+      discard;\n
+    }\n
+    else\n
+    {\n
       gl_FragColor = uColor * vec4( mixColor, 1.0 );\n
       gl_FragColor.a *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
+    }\n
   }\n
 );
 
