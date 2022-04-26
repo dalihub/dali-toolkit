@@ -254,6 +254,12 @@ void VisualModel::GetNumberOfLines(GlyphIndex glyphIndex,
   }
 }
 
+LineIndex VisualModel::GetLineOfGlyph( GlyphIndex glyphIndex )
+{
+  const CharacterIndex characterIndex = *(mGlyphsToCharacters.Begin() + glyphIndex);
+  return GetLineOfCharacter(characterIndex);
+}
+
 void VisualModel::GetLinesOfGlyphRange(LineRun*   lines,
                                        GlyphIndex glyphIndex,
                                        Length     numberOfGlyphs) const

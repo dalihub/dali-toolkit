@@ -144,6 +144,15 @@ public:
                         Length&    numberOfLines) const;
 
   /**
+   * @brief Retrieves the line index where the glyph is laid-out.
+   *
+   * @param[in] glyphIndex The glyph's index.
+   *
+   * @return The line index.
+   */
+  LineIndex GetLineOfGlyph(GlyphIndex glyphIndex);
+
+  /**
    * @brief Retrieves the lines where the given range of glyphs is laid out.
    *
    * The size of the @p lines buffer needs to be big enough to copy the @p numberOfLines.
