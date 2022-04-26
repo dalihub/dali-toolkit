@@ -809,6 +809,21 @@ InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextE
       retrieveCursor = true;
       break;
     }
+    case InputMethodContext::SELECTION_SET:
+    {
+      uint32_t start = static_cast<uint32_t>(inputMethodContextEvent.startIndex);
+      uint32_t end = static_cast<uint32_t>(inputMethodContextEvent.endIndex);
+      if(start == end)
+      {
+        controller.SetPrimaryCursorPosition(start, true);
+      }
+      else
+      {
+        controller.SelectText(start, end);
+      }
+
+      break;
+    }
     case InputMethodContext::VOID:
     {
       // do nothing
