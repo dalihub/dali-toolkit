@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,6 +94,11 @@ uint64_t HashNode(const NodeDefinition& nodeDef, const MaterialDefinition& mater
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::SUBSURFACE))
   {
     hash.Add("SSS");
+  }
+
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
+  {
+    hash.Add("OCCL" /*USION*/);
   }
 
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))
@@ -215,6 +220,11 @@ Index ShaderDefinitionFactory::ProduceShader(const NodeDefinition& nodeDef)
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::SUBSURFACE))
   {
     shaderDef.mDefines.push_back("SSS");
+  }
+
+  if(MaskMatch(receiver.mMaterialDef->mFlags, MaterialDefinition::OCCLUSION))
+  {
+    shaderDef.mDefines.push_back("OCCLUSION");
   }
 
   if(MaskMatch(receiver.mMaterialDef->mFlags, MaterialDefinition::GLTF_CHANNELS))

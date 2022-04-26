@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,6 +212,12 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
 
   // Extra textures. TODO: emissive, occlusion etc.
   if(checkStage(SUBSURFACE))
+  {
+    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+    ++iTexture;
+  }
+
+  if(checkStage(OCCLUSION))
   {
     raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
     ++iTexture;

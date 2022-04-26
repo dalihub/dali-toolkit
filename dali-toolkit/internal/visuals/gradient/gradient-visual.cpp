@@ -238,6 +238,15 @@ void GradientVisual::DoCreateInstancePropertyMap(Property::Map& map) const
   // Do nothing
 }
 
+void GradientVisual::EnablePreMultipliedAlpha(bool preMultiplied)
+{
+  // Make always enable pre multiplied alpha whether preMultiplied value is false.
+  if(!preMultiplied)
+  {
+    DALI_LOG_WARNING("Note : GradientVisual cannot disable PreMultipliedAlpha\n");
+  }
+}
+
 void GradientVisual::OnInitialize()
 {
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);

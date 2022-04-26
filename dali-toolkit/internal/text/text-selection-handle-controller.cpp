@@ -286,12 +286,7 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
         selectionBoxInfo->maxX = MIN_FLOAT;
 
         // Update the line's vertical offset.
-        selectionBoxInfo->lineOffset = currentLineOffset + currentLineHeight;
-
-        if(currentLineSpacing < 0)
-        {
-          selectionBoxInfo->lineOffset += currentLineSpacing;
-        }
+        selectionBoxInfo->lineOffset = currentLineOffset + currentLineHeight + currentLineSpacing;
 
         // The line height is the addition of the line ascender and the line descender.
         // However, the line descender has a negative value, hence the subtraction also line spacing should not be included in selection height.

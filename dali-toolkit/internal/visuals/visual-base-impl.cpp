@@ -613,12 +613,18 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
     mImpl->mFittingMode, VISUAL_FITTING_MODE_TABLE, VISUAL_FITTING_MODE_TABLE_COUNT);
   map.Insert(Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE, fittingModeString);
 
-  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
-  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_COLOR, mImpl->mBorderlineColor);
-  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
+  if(IsTypeAvailableForBorderline(mImpl->mType))
+  {
+    map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
+    map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_COLOR, mImpl->mBorderlineColor);
+    map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
+  }
 
-  map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, mImpl->mCornerRadius);
-  map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, static_cast<int>(mImpl->mCornerRadiusPolicy));
+  if(IsTypeAvailableForCornerRadius(mImpl->mType))
+  {
+    map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, mImpl->mCornerRadius);
+    map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, static_cast<int>(mImpl->mCornerRadiusPolicy));
+  }
 }
 
 void Visual::Base::CreateInstancePropertyMap(Property::Map& map) const

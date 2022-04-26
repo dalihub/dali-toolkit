@@ -1014,6 +1014,14 @@ void DliLoader::Impl::ParseMaterials(const TreeNode* materials, ConvertColorCode
       materialDef.mFlags |= semantic;
     }
 
+    if(ReadString(node.GetChild("occlusionMap"), texturePath))
+    {
+      ToUnixFileSeparators(texturePath);
+      const auto semantic = MaterialDefinition::OCCLUSION;
+      materialDef.mTextureStages.push_back({semantic, TextureDefinition{std::move(texturePath)}});
+      materialDef.mFlags |= semantic;
+    }
+
     if(ReadColorCodeOrColor(&node, materialDef.mColor, convertColorCode) &&
        materialDef.mColor.a < 1.0f)
     {

@@ -208,6 +208,15 @@ void SvgVisual::DoCreateInstancePropertyMap(Property::Map& map) const
   // Do nothing
 }
 
+void SvgVisual::EnablePreMultipliedAlpha(bool preMultiplied)
+{
+  // Make always enable pre multiplied alpha whether preMultiplied value is false.
+  if(!preMultiplied)
+  {
+    DALI_LOG_WARNING("Note : SvgVisual cannot disable PreMultipliedAlpha\n");
+  }
+}
+
 void SvgVisual::Load()
 {
   // load remote resource on svg rasterize thread.

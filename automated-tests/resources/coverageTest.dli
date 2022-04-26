@@ -1,0 +1,82 @@
+{
+  "asset": { "version": "1.0" },
+  "scene": 0,
+  "scenes": [ { "nodes": [ 0 ] } ],
+  "nodes": [
+    {
+      "name": "root",
+      "matrix": [ 0.2, 0, 0, 0, 0, -0, 0.2, 0, 0, -0.2, -0, 0, 0, 0, 0, 1 ],
+      "model": {
+        "mesh": 0,
+        "material": 0
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "uri": "coverageTest.bin",
+      "attributes": 31,
+      "primitive": "TRIANGLES",
+      "indices": { "byteOffset": 0, "byteLength": 600 },
+      "positions": { "byteOffset": 600, "byteLength": 2364 },
+      "normals": { "byteOffset": 2964, "byteLength": 2364 },
+      "textures": { "byteOffset": 5328, "byteLength": 1576 },
+      "tangents": { "byteOffset": 6904, "byteLength": 2364 }
+    }
+  ],
+  "skeletons": [
+  ],
+  "cameras": [
+    {
+      "fov": 60,
+      "near": 0.1,
+      "far": 100,
+      "matrix": [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 3.5, 1 ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "material1",
+      "color": [ 1, 1, 0, 1 ],
+      "roughness": 0.4,
+      "metallic": 0,
+      "occlusionMap": "exercise/Icons/Icon_Idle.png",
+      "mipmap": true,
+      "environment" : 1
+    },
+    {
+      "name": "",
+      "color": [ 1, 1, 1, 1 ],
+      "roughness": 1,
+      "metallic": 1,
+      "mipmap": true
+    }
+  ],
+  "lights" : [ {
+      "matrix" : [ 0.8950600624084473, 0.0914330929517746, 0.4364715814590454, 0.0, 0.3676385283470154, 0.4026888310909271, -0.8382623195648193, 0.0, -0.25240713357925415, 0.9107588529586792, 0.3268163800239563, 0.0, 0.0, 0.0, -1.0, 1.0 ],
+      "color" : [ 0.8, 0.8, 0.8 ],
+      "intensity" : 1.0,
+      "shadowMapSize" : 256,
+      "orthographicSize" : 4.2760005,
+      "shadowIntensity" : 1.0
+    } ],
+  "environment" : [ {
+      "cubeInitialOrientation" : [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ],
+      "iblIntensity" : 1.0
+  }, {
+      "cubeSpecular" : "Studio/Radiance.ktx",
+      "cubeDiffuse" : "Studio/Irradiance.ktx",
+      "cubeInitialOrientation" : [ 0.6716271638870239, 0.07979151606559753, -0.7365801334381104, 0.0, 0.07979151606559753, 0.9806114435195923, 0.17898204922676086, 0.0, 0.7365801334381104, -0.17898204922676086, 0.6522386074066162, 0.0, 0.0, 0.0, 0.0, 1.0 ],
+      "iblIntensity" : 0.75
+  } ],
+  "shaders": [
+    {
+      "vertex": "dli_pbr.vsh",
+      "fragment": "dli_pbr.fsh",
+      "defines" : [ "OCCLUSION", "DISPLACEMENT" ],
+      "rendererState": "DEPTH_TEST|DEPTH_WRITE|CULL_BACK|DEPTH_FUNC:LESS_EQUAL",
+      "uCubeMatrix": [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ],
+      "uMaxLOD": 6
+    }
+  ]
+}
