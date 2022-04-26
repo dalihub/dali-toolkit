@@ -2525,8 +2525,53 @@ int utcDaliTextLabelGeometryGlyphMiddle(void)
   Vector<Vector2> expectedSizes;
   Vector<Vector2> expectedPositions;
 
-  expectedPositions.PushBack(Vector2(12, 0));
-  expectedSizes.PushBack(Vector2(118, 25));
+  expectedPositions.PushBack(Vector2(6, 0));
+  expectedSizes.PushBack(Vector2(124, 25));
+
+  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
+
+  END_TEST;
+}
+
+int utcDaliTextLabelGeometryOneGlyph(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextLabelGeometryOneGlyph ");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 7.f);
+  label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+  label.SetProperty(TextLabel::Property::TEXT, "H");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  unsigned int expectedCount = 1;
+  unsigned int startIndex    = 0;
+  unsigned int endIndex      = 0;
+
+  Vector<Vector2> positionsList = DevelTextLabel::GetTextPosition(label, startIndex, endIndex);
+  Vector<Vector2> sizeList      = DevelTextLabel::GetTextSize(label, startIndex, endIndex);
+
+  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
+
+  Vector<Vector2> expectedSizes;
+  Vector<Vector2> expectedPositions;
+
+  expectedPositions.PushBack(Vector2(-2, 0));
+  expectedSizes.PushBack(Vector2(16, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 
@@ -2679,7 +2724,7 @@ int UtcDaliToolkitTextLabelMarkupRelativeLineHeight(void)
   //no effect of relative line size for paragraph with single line
   DALI_TEST_EQUALS(naturalSize.y, relativeSingleNaturalSize.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(lineSize*8.5f, relativeMultiNaturalSize.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(lineSize * 8.5f, relativeMultiNaturalSize.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
   END_TEST;
 }
