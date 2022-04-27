@@ -205,52 +205,43 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
 {
   bool success = false;
 
-  // If the parent's KEYBOARD_FOCUSABLE_CHILDREN is false, it cannot have focus.
-  if(actor)
+  // Check whether the actor is in the stage and is keyboard focusable.
+  if(actor &&
+     actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) &&
+     actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED) &&
+     actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE) &&
+     actor.GetProperty<bool>(Actor::Property::VISIBLE))
   {
+    // If the parent's KEYBOARD_FOCUSABLE_CHILDREN is false or VISIBLE is false, it cannot have focus.
     Actor parent = actor.GetParent();
     while(parent)
     {
-      if(!parent.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN))
+      if(!parent.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN) || !parent.GetProperty<bool>(Actor::Property::VISIBLE))
       {
-        DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] Parent Actor has KEYBOARD_FOCUSABLE_CHILDREN false,\n", __FUNCTION__, __LINE__);
+        DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] Parent Actor has KEYBOARD_FOCUSABLE_CHILDREN false or VISIBLE false,\n", __FUNCTION__, __LINE__);
         return false;
       }
       parent = parent.GetParent();
     }
-  }
 
-  if(actor && actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED) && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
-  {
+    // If developer set focus on same actor, doing nothing
+    Actor currentFocusedActor = GetCurrentFocusActor();
+    if(actor == currentFocusedActor)
+    {
+      return true;
+    }
+
     Integration::SceneHolder currentWindow = Integration::SceneHolder::Get(actor);
-
     if(currentWindow.GetRootLayer() != mCurrentFocusedWindow.GetHandle())
     {
       Layer rootLayer       = currentWindow.GetRootLayer();
       mCurrentFocusedWindow = rootLayer;
     }
-  }
 
-  Actor currentFocusedActor = GetCurrentFocusActor();
-
-  // If developer set focus on same actor, doing nothing
-  if(actor == currentFocusedActor)
-  {
-    if(!actor)
-    {
-      return false;
-    }
-    return true;
-  }
-
-  // Check whether the actor is in the stage and is keyboard focusable.
-  if(actor && actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED) && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
-  {
     if((mIsFocusIndicatorShown == SHOW) && (mEnableFocusIndicator == ENABLE))
     {
       actor.Add(GetFocusIndicatorActor());
     }
-
 
     Toolkit::Control currentlyFocusedControl = Toolkit::Control::DownCast(currentFocusedActor);
     if(currentlyFocusedControl)
