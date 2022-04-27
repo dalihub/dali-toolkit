@@ -530,6 +530,17 @@ void SnapWithVelocity(
   }
 }
 
+Dali::Vector2 GetPosition(Dali::Actor actor)
+{
+  Vector2     screenPosition          = actor.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION);
+  Vector3     size                    = actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_SCALE);
+  bool        positionUsesAnchorPoint = actor.GetProperty<bool>(Actor::Property::POSITION_USES_ANCHOR_POINT);
+  Vector3     anchorPointOffSet       = size * (positionUsesAnchorPoint ? actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
+  Vector2     position                = Vector2(screenPosition.x - anchorPointOffSet.x, screenPosition.y - anchorPointOffSet.y);
+
+  return position;
+}
+
 } // unnamed namespace
 
 namespace Dali
@@ -1272,21 +1283,11 @@ bool ScrollView::ScrollViewAccessible::ScrollToChild(Actor child)
     return false;
   }
 
-  // child can be one of descendants
-  // find direct child of ScrollView to avoid the ASSERT in ScrollTo
-  auto parent = child.GetParent();
-  while (parent && parent != Self())
-  {
-    child = parent;
-    parent = child.GetParent();
-  }
-  if (!parent)
-  {
-    return false;
-  }
+  auto childPosition = GetPosition(child);
+  auto selfPosition  = GetPosition(Self());
 
-  // FIXME: ScrollTo does not work (snaps back to original position)
-  scrollView.ScrollTo(child, scrollView.GetScrollFlickDuration());
+  scrollView.ScrollTo(childPosition - selfPosition, scrollView.GetScrollFlickDuration());
+
   return true;
 }
 
