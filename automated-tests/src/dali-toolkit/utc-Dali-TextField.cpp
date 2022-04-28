@@ -1599,6 +1599,83 @@ int utcDaliTextFieldTextChangedWithInputMethodContext(void)
   END_TEST;
 }
 
+int utcDaliTextFieldSelectionWithInputMethodContext(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldSelectionWithInputMethodContext");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  field.SetProperty(TextField::Property::TEXT, "Hello world");
+
+  application.GetScene().Add(field);
+
+  // connect to the selection changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextField::SelectionChangedSignal(field).Connect(&TestSelectionChangedCallback);
+  bool selectionChangedSignal = false;
+  field.ConnectSignal(testTracker, "selectionChanged", CallbackFunctor(&selectionChangedSignal));
+
+  // get InputMethodContext
+  std::string                   text;
+  InputMethodContext::EventData imfEvent;
+  InputMethodContext            inputMethodContext = DevelTextField::GetInputMethodContext(field);
+
+  field.SetKeyInputFocus();
+  field.SetProperty(DevelTextField::Property::ENABLE_EDITING, true);
+
+  // input text
+  gSelectionChangedCallbackCalled = false;
+  imfEvent                        = InputMethodContext::EventData(InputMethodContext::SELECTION_SET, 1, 4);
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+
+  DALI_TEST_EQUALS(field.GetProperty(DevelTextField::Property::SELECTED_TEXT_START).Get<int>(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty(DevelTextField::Property::SELECTED_TEXT_END).Get<int>(), 4, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliTextFieldPositionWithInputMethodContext(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldPositionWithInputMethodContext");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  field.SetProperty(TextField::Property::TEXT, "Hello world");
+
+  application.GetScene().Add(field);
+
+  // connect to the selection changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextField::CursorPositionChangedSignal(field).Connect(&TestCursorPositionChangedCallback);
+  bool cursorPositionChangedSignal = false;
+  field.ConnectSignal(testTracker, "cursorPositionChanged", CallbackFunctor(&cursorPositionChangedSignal));
+
+  // get InputMethodContext
+  std::string                   text;
+  InputMethodContext::EventData imfEvent;
+  InputMethodContext            inputMethodContext = DevelTextField::GetInputMethodContext(field);
+
+  field.SetKeyInputFocus();
+  field.SetProperty(DevelTextField::Property::ENABLE_EDITING, true);
+
+  // input text
+  gCursorPositionChangedCallbackCalled = false;
+  imfEvent                             = InputMethodContext::EventData(InputMethodContext::SELECTION_SET, 2, 2);
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+
+  DALI_TEST_EQUALS(field.GetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 2, TEST_LOCATION);
+
+  END_TEST;
+}
+
 // Negative test for the textChanged signal.
 int utcDaliTextFieldTextChangedN(void)
 {
