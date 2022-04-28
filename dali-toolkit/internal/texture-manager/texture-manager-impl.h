@@ -115,6 +115,7 @@ public:
    * @param[in]  animatedImageLoading  The AnimatedImageLoading that contain the animated image information
    * @param[in]  frameIndex            The frame index to load.
    * @param[out] textureId             The textureId of the frame
+   * @param[in, out] maskInfo          Mask info structure
    * @param[in]  samplingMode          The SamplingMode to use
    * @param[in]  wrapModeU             Horizontal Wrap mode
    * @param[in]  wrapModeV             Vertical Wrap mode
@@ -128,6 +129,7 @@ public:
   TextureSet LoadAnimatedImageTexture(Dali::AnimatedImageLoading      animatedImageLoading,
                                       const uint32_t&                 frameIndex,
                                       TextureManager::TextureId&      textureId,
+                                      MaskingDataPointer&             maskInfo,
                                       const Dali::SamplingMode::Type& samplingMode,
                                       const Dali::WrapMode::Type&     wrapModeU,
                                       const Dali::WrapMode::Type&     wrapModeV,

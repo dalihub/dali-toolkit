@@ -38,21 +38,23 @@ public:
   /**
    * Constructor.
    * @param[in] textureManager The texture manager
-   * @param[in] urlList List of urls to cache
-   * @param[in] observer FrameReady observer
-   * @param[in] cacheSize The size of the cache
-   * @param[in] batchSize The size of a batch to load
-   * @param[in] interval Time interval between each frame
+   * @param[in] urlList        List of urls to cache
+   * @param[in] maskingData    Masking data to be applied.
+   * @param[in] observer       FrameReady observer
+   * @param[in] cacheSize      The size of the cache
+   * @param[in] batchSize      The size of a batch to load
+   * @param[in] interval       Time interval between each frame
    *
    * This will start loading textures immediately, according to the
    * batch and cache sizes.
    */
-  RollingImageCache(TextureManager&                 textureManager,
-                    UrlList&                        urlList,
-                    ImageCache::FrameReadyObserver& observer,
-                    uint16_t                        cacheSize,
-                    uint16_t                        batchSize,
-                    uint32_t                        interval);
+  RollingImageCache(TextureManager&                     textureManager,
+                    UrlList&                            urlList,
+                    TextureManager::MaskingDataPointer& maskingData,
+                    ImageCache::FrameReadyObserver&     observer,
+                    uint16_t                            cacheSize,
+                    uint16_t                            batchSize,
+                    uint32_t                            interval);
 
   /**
    * Destructor
@@ -119,11 +121,9 @@ private:
   TextureManager::TextureId GetCachedTextureId(int index) const;
 
   /**
-   * @brief Check if the front frame has become ready - if so, inform observer
-   *
-   * @param[in] wasReady Readiness before call.
+   * @brief Pop front entity of Cache.
    */
-  void CheckFrontFrame(bool wasReady);
+  void PopFrontCache();
 
 protected:
   /**

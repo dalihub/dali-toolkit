@@ -59,9 +59,14 @@ static constexpr uint32_t SINGLE_IMAGE_COUNT = 1u;
 static constexpr uint32_t FIRST_FRAME_INDEX  = 0u;
 } // namespace
 
-RollingAnimatedImageCache::RollingAnimatedImageCache(
-  TextureManager& textureManager, AnimatedImageLoading& animatedImageLoading, ImageCache::FrameReadyObserver& observer, uint16_t cacheSize, uint16_t batchSize, bool isSynchronousLoading)
-: ImageCache(textureManager, observer, batchSize, 0u),
+RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&                     textureManager,
+                                                     AnimatedImageLoading&               animatedImageLoading,
+                                                     TextureManager::MaskingDataPointer& maskingData,
+                                                     ImageCache::FrameReadyObserver&     observer,
+                                                     uint16_t                            cacheSize,
+                                                     uint16_t                            batchSize,
+                                                     bool                                isSynchronousLoading)
+: ImageCache(textureManager, maskingData, observer, batchSize, 0u),
   mAnimatedImageLoading(animatedImageLoading),
   mFrameCount(SINGLE_IMAGE_COUNT),
   mFrameIndex(FIRST_FRAME_INDEX),
@@ -84,10 +89,8 @@ TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
   bool popExist = false;
   while(!mQueue.IsEmpty() && mQueue.Front().mFrameNumber != frameIndex)
   {
-    ImageFrame imageFrame = mQueue.PopFront();
-    mTextureManager.Remove(mImageUrls[imageFrame.mFrameNumber].mTextureId, this);
-    mImageUrls[imageFrame.mFrameNumber].mTextureId = TextureManager::INVALID_TEXTURE_ID;
-    popExist                                       = true;
+    PopFrontCache();
+    popExist = true;
   }
 
   TextureSet textureSet;
@@ -191,6 +194,7 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
   TextureSet                textureSet    = mTextureManager.LoadAnimatedImageTexture(mAnimatedImageLoading,
                                                                    frameIndex,
                                                                    loadTextureId,
+                                                                   mMaskingData,
                                                                    SamplingMode::BOX_THEN_LINEAR,
                                                                    Dali::WrapMode::Type::DEFAULT,
                                                                    Dali::WrapMode::Type::DEFAULT,
@@ -252,13 +256,27 @@ TextureManager::TextureId RollingAnimatedImageCache::GetCachedTextureId(int inde
   return mImageUrls[mQueue[index].mFrameNumber].mTextureId;
 }
 
+void RollingAnimatedImageCache::PopFrontCache()
+{
+  ImageFrame imageFrame = mQueue.PopFront();
+  mTextureManager.Remove(mImageUrls[imageFrame.mFrameNumber].mTextureId, this);
+  mImageUrls[imageFrame.mFrameNumber].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+
+  if(mMaskingData && mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
+  {
+    mTextureManager.Remove(mMaskingData->mAlphaMaskId, this);
+    if(mQueue.IsEmpty())
+    {
+      mMaskingData->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
+    }
+  }
+}
+
 void RollingAnimatedImageCache::ClearCache()
 {
   while(mTextureManagerAlive && !mQueue.IsEmpty())
   {
-    ImageFrame imageFrame = mQueue.PopFront();
-    mTextureManager.Remove(mImageUrls[imageFrame.mFrameNumber].mTextureId, this);
-    mImageUrls[imageFrame.mFrameNumber].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+    PopFrontCache();
   }
   mLoadWaitingQueue.clear();
   mLoadState = TextureManager::LoadState::NOT_STARTED;

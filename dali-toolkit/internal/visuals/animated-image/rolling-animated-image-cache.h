@@ -41,22 +41,24 @@ class RollingAnimatedImageCache : public ImageCache, public TextureUploadObserve
 public:
   /**
    * @brief Constructor.
-   * @param[in] textureManager The texture manager
-   * @param[in] animatedImageLoader The loaded animated image
-   * @param[in] observer FrameReady observer
-   * @param[in] cacheSize The size of the cache
-   * @param[in] batchSize The size of a batch to load
+   * @param[in] textureManager       The texture manager
+   * @param[in] animatedImageLoading  The loaded animated image
+   * @param[in] maskingData          Masking data to be applied.
+   * @param[in] observer             FrameReady observer
+   * @param[in] cacheSize            The size of the cache
+   * @param[in] batchSize            The size of a batch to load
    * @param[in] isSynchronousLoading The flag to define whether to load first frame synchronously
    *
    * This will start loading textures immediately, according to the
    * batch and cache sizes.
    */
-  RollingAnimatedImageCache(TextureManager&                 textureManager,
-                            AnimatedImageLoading&           animatedImageLoader,
-                            ImageCache::FrameReadyObserver& observer,
-                            uint16_t                        cacheSize,
-                            uint16_t                        batchSize,
-                            bool                            isSynchronousLoading);
+  RollingAnimatedImageCache(TextureManager&                     textureManager,
+                            AnimatedImageLoading&               animatedImageLoading,
+                            TextureManager::MaskingDataPointer& maskingData,
+                            ImageCache::FrameReadyObserver&     observer,
+                            uint16_t                            cacheSize,
+                            uint16_t                            batchSize,
+                            bool                                isSynchronousLoading);
 
   /**
    * @brief Destructor
@@ -148,6 +150,11 @@ private:
    * @param[in] interval interval between this frame and next frame.
    */
   void MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t interval);
+
+  /**
+   * @brief Pop front entity of Cache.
+   */
+  void PopFrontCache();
 
 protected:
   /**
