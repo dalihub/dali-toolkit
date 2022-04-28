@@ -115,6 +115,21 @@ DALI_TOOLKIT_API bool IsDefaultAlgorithmEnabled(KeyboardFocusManager keyboardFoc
  */
 DALI_TOOLKIT_API bool MoveFocus(KeyboardFocusManager keyboardFocusManager, Control::KeyboardFocus::Direction direction, const std::string& deviceName);
 
+/**
+ * @brief Sets the root actor to start moving focus when DefaultAlgorithm is enabled.
+ *
+ * @param[in] keyboardFocusManager The instance of KeyboardFocusManager
+ * @param[in] actor The root actor
+ */
+DALI_TOOLKIT_API void SetFocusFinderRootActor(KeyboardFocusManager keyboardFocusManager, Actor actor);
+
+/**
+ * @brief Resets the root actor that starts moving focus when DefaultAlgorithm is enabled.
+ * When reset, the window becomes root.
+ *
+ * @param[in] keyboardFocusManager The instance of KeyboardFocusManager
+ */
+DALI_TOOLKIT_API void ResetFocusFinderRootActor(KeyboardFocusManager keyboardFocusManager);
 
 } // namespace DevelKeyboardFocusManager
 

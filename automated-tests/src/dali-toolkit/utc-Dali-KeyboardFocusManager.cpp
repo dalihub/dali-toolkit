@@ -2351,3 +2351,133 @@ int UtcDaliKeyboardFocusManagerWithVisible(void)
 
   END_TEST;
 }
+
+int UtcDaliKeyboardFocusManagerFocusFinderRootActor(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerFocusFinderRootActor");
+
+  // Register Type
+  TypeInfo type;
+  type = TypeRegistry::Get().GetTypeInfo("KeyboardFocusManager");
+  DALI_TEST_CHECK(type);
+  BaseHandle handle = type.CreateInstance();
+  DALI_TEST_CHECK(handle);
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  bool                 focusChangedSignalVerified = false;
+  FocusChangedCallback focusChangedCallback(focusChangedSignalVerified);
+  manager.FocusChangedSignal().Connect(&focusChangedCallback, &FocusChangedCallback::Callback);
+
+  PushButton button1 = PushButton::New();
+  PushButton button2 = PushButton::New();
+
+  button1.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
+  button2.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
+
+  button1.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  button2.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+
+  application.GetScene().Add(button1);
+  application.GetScene().Add(button2);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(actor);
+
+  PushButton buttonA = PushButton::New();
+  PushButton buttonB = PushButton::New();
+
+  buttonA.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
+  buttonB.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
+
+  buttonA.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  buttonB.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+
+  actor.Add(buttonA);
+  actor.Add(buttonB);
+
+  // set position
+  // button1 -- button2
+  button1.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  button2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 0.0f));
+  button1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  button2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  // buttonA -- buttonB
+  buttonA.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 50.0f));
+  buttonB.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 50.0f));
+  buttonA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Set the focus to the button1
+  // [button1] -- button2
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(button1) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == button1);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == Actor());
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button1);
+  focusChangedCallback.Reset();
+
+  // without set the navigation properties, but we can focus move
+  // enable the default algorithm
+  Dali::Toolkit::DevelKeyboardFocusManager::EnableDefaultAlgorithm(manager, true);
+  DALI_TEST_CHECK(Dali::Toolkit::DevelKeyboardFocusManager::IsDefaultAlgorithmEnabled(manager));
+
+  // Move the focus towards right
+  // button1 -- [button2]
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == true);
+
+  // Confirm whether focus is moved to button2
+  DALI_TEST_EQUALS(button2.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == button1);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button2);
+  focusChangedCallback.Reset();
+
+  // Clears focus.
+  manager.ClearFocus();
+
+  // There is no actor focused.
+  // button1 -- button2
+  // buttonA -- buttonB
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
+  // Sets the actor to root.
+  Dali::Toolkit::DevelKeyboardFocusManager::SetFocusFinderRootActor(manager, actor);
+
+  // Move the focus towards right
+  // [buttonA] -- buttonB
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == true);
+
+  // Confirm whether focus is moved to buttonA
+  // Because the root is an actor, the focus is moved to buttonA, a child of the actor.
+  DALI_TEST_EQUALS(buttonA.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == Actor());
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == buttonA);
+  focusChangedCallback.Reset();
+
+
+  // Move the focus towards right, The focus move will success.
+  // buttonA -- [buttonB]
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == true);
+  // Confirm whether focus is moved to buttonB
+  DALI_TEST_EQUALS(buttonB.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == buttonA);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == buttonB);
+  focusChangedCallback.Reset();
+
+  // reset
+  Dali::Toolkit::DevelKeyboardFocusManager::ResetFocusFinderRootActor(manager);
+
+  END_TEST;
+}

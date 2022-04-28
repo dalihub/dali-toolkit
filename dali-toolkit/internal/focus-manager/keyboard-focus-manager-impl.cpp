@@ -119,6 +119,7 @@ KeyboardFocusManager::KeyboardFocusManager()
   mFocusedActorEnterKeySignal(),
   mCurrentFocusActor(),
   mFocusIndicatorActor(),
+  mFocusFinderRootActor(),
   mFocusHistory(),
   mSlotDelegate(this),
   mCustomAlgorithmInterface(NULL),
@@ -520,25 +521,28 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
       }
       else if (mEnableDefaultAlgorithm)
       {
-        Layer rootLayer;
-        if (currentFocusActor)
+        Actor rootActor = mFocusFinderRootActor.GetHandle();
+        if(!rootActor)
         {
-          // Find the window of the focused actor.
-          Integration::SceneHolder window = Integration::SceneHolder::Get(currentFocusActor);
-          if (window)
+          if (currentFocusActor)
           {
-            rootLayer = window.GetRootLayer();
+            // Find the window of the focused actor.
+            Integration::SceneHolder window = Integration::SceneHolder::Get(currentFocusActor);
+            if (window)
+            {
+              rootActor = window.GetRootLayer();
+            }
+          }
+          else
+          {
+            // Searches from the currently focused window.
+            rootActor = mCurrentFocusedWindow.GetHandle();
           }
         }
-        else
-        {
-          // Searches from the currently focused window.
-          rootLayer = mCurrentFocusedWindow.GetHandle();
-        }
-        if (rootLayer)
+        if(rootActor)
         {
           // We should find it among the actors nearby.
-          nextFocusableActor = Toolkit::FocusFinder::GetNearestFocusableActor(rootLayer, currentFocusActor, direction);
+          nextFocusableActor = Toolkit::FocusFinder::GetNearestFocusableActor(rootActor, currentFocusActor, direction);
         }
       }
     }
@@ -1182,6 +1186,16 @@ void KeyboardFocusManager::EnableDefaultAlgorithm(bool enable)
 bool KeyboardFocusManager::IsDefaultAlgorithmEnabled() const
 {
   return mEnableDefaultAlgorithm;
+}
+
+void KeyboardFocusManager::SetFocusFinderRootActor(Actor actor)
+{
+  mFocusFinderRootActor = actor;
+}
+
+void KeyboardFocusManager::ResetFocusFinderRootActor()
+{
+  mFocusFinderRootActor.Reset();
 }
 
 } // namespace Internal
