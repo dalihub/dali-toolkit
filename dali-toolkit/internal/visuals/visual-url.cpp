@@ -105,6 +105,7 @@ VisualUrl::Type ResolveType(const std::string& url)
 {
   // if only one char in string, can only be regular image
   const std::size_t count = url.size();
+  VisualUrl::Type  returnType = VisualUrl::REGULAR_IMAGE;
   if(count > 0)
   {
     // parsing from the end for better chance of early outs
@@ -147,18 +148,18 @@ VisualUrl::Type ResolveType(const std::string& url)
       }
       if((offsetFromEnd < sizeof(GIF)) && (currentChar == GIF[offsetFromEnd]))
       {
-        // early out if GIF as can't be used in N patch for now
+        //find type, but need to be check used in N patch
         if(++gifScore == sizeof(GIF))
         {
-          return VisualUrl::GIF;
+          returnType = VisualUrl::GIF;
         }
       }
       if((offsetFromEnd < sizeof(WEBP)) && (currentChar == WEBP[offsetFromEnd]))
       {
-        // early out if WEBP as can't be used in N patch for now
         if(++webpScore == sizeof(WEBP))
         {
-          return VisualUrl::WEBP;
+          //find type, but need to be check used in N patch
+          returnType = VisualUrl::WEBP;
         }
       }
       if((offsetFromEnd < sizeof(JSON)) && (currentChar == JSON[offsetFromEnd]))
@@ -188,7 +189,7 @@ VisualUrl::Type ResolveType(const std::string& url)
           else
           {
             // early out, not a valid N/9-patch URL
-            return VisualUrl::REGULAR_IMAGE;
+            return returnType;
           }
           break;
         }
@@ -201,7 +202,7 @@ VisualUrl::Type ResolveType(const std::string& url)
           else
           {
             // early out, not a valid N/9-patch URL
-            return VisualUrl::REGULAR_IMAGE;
+            return returnType;
           }
           break;
         }
@@ -209,7 +210,7 @@ VisualUrl::Type ResolveType(const std::string& url)
     }
   }
   // if we got here it is a regular image
-  return VisualUrl::REGULAR_IMAGE;
+  return returnType;
 }
 
 } // namespace
