@@ -54,7 +54,8 @@ Scene3dView::Scene3dView()
   mAnimationArray(),
   mLightType(Toolkit::Scene3dView::LightType::NONE),
   mLightVector(Vector3::ONE),
-  mLightColor(Vector3::ONE)
+  mLightColor(Vector3::ONE),
+  mUseIBL(false)
 {
 }
 
@@ -130,20 +131,16 @@ bool Scene3dView::PlayAnimations()
 
 bool Scene3dView::SetLight(Toolkit::Scene3dView::LightType type, Vector3 lightVector, Vector3 lightColor)
 {
-  if(type > Toolkit::Scene3dView::LightType::DIRECTIONAL_LIGHT)
-  {
-    return false;
-  }
-
-  mLightType = static_cast<Toolkit::Scene3dView::LightType>(
-    (mLightType >= Toolkit::Scene3dView::LightType::IMAGE_BASED_LIGHT) ? Toolkit::Scene3dView::LightType::IMAGE_BASED_LIGHT + type : type);
-
+  mLightType = type;
   mLightVector = lightVector;
   mLightColor  = lightColor;
 
   for(auto&& shader : mShaderArray)
   {
-    shader.RegisterProperty("uLightType", (GetLightType() & ~Toolkit::Scene3dView::LightType::IMAGE_BASED_LIGHT));
+    float hasLightSource = static_cast<float>(!!(GetLightType() & (Toolkit::Scene3dView::LightType::POINT_LIGHT | Toolkit::Scene3dView::LightType::DIRECTIONAL_LIGHT)));
+    float isPointLight = static_cast<float>(!!(GetLightType() & Toolkit::Scene3dView::LightType::POINT_LIGHT));
+    shader.RegisterProperty("uHasLightSource", hasLightSource);
+    shader.RegisterProperty("uIsPointLight", isPointLight);
     shader.RegisterProperty("uLightVector", lightVector);
     shader.RegisterProperty("uLightColor", lightColor);
   }
@@ -203,8 +200,6 @@ void Scene3dView::UploadTextureFace(Texture& texture, Devel::PixelBuffer pixelBu
 
 void Scene3dView::SetCubeMap(const std::string& diffuseTexturePath, const std::string& specularTexturePath, Vector4 scaleFactor)
 {
-  mLightType = Toolkit::Scene3dView::LightType::IMAGE_BASED_LIGHT;
-
   // BRDF texture
   const std::string imageDirPath = AssetManager::GetDaliImagePath();
   const std::string imageBrdfUrl = imageDirPath + IMAGE_BRDF_FILE_NAME;
@@ -235,6 +230,7 @@ void Scene3dView::SetCubeMap(const std::string& diffuseTexturePath, const std::s
   mSpecularTexture.GenerateMipmaps();
 
   mIBLScaleFactor = scaleFactor;
+  mUseIBL = true;
 }
 
 bool Scene3dView::SetDefaultCamera(const Dali::Camera::Type type, const float nearPlane, const Vector3 cameraPosition)
@@ -316,6 +312,11 @@ Texture Scene3dView::GetBRDFTexture()
 Texture Scene3dView::GetSpecularTexture()
 {
   return mSpecularTexture;
+}
+
+bool Scene3dView::HasImageBasedLighting()
+{
+  return mUseIBL;
 }
 
 Texture Scene3dView::GetDiffuseTexture()

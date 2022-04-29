@@ -317,6 +317,7 @@ struct TextureInfo
   Ref<gltf2::Texture> mTexture;
   uint32_t            mTexCoord = 0;
   float               mScale    = 1.f;
+  float               mStrength = 1.f;
 
   operator bool() const
   {

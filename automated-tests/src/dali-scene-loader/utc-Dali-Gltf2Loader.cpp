@@ -167,12 +167,15 @@ int UtcDaliGltfLoaderSuccess1(void)
   DALI_TEST_EQUAL(2u, materials.size());
   const MaterialDefinition materialGroundTruth[]{
     {MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
+       MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
        MaterialDefinition::NORMAL | MaterialDefinition::TRANSPARENCY | MaterialDefinition::GLTF_CHANNELS |
        (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
      0,
      Vector4(1.f, .766f, .336f, 1.f),
+     Vector3(0.2, 0.1, 0.0),
      1.f,
      0.f,
+     1.f,
      {
        {MaterialDefinition::ALBEDO,
         {"AnimatedCube_BaseColor.png",
@@ -181,15 +184,24 @@ int UtcDaliGltfLoaderSuccess1(void)
         {"AnimatedCube_MetallicRoughness.png",
          SamplerFlags::Encode(FilterMode::NEAREST_MIPMAP_LINEAR, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::MIRRORED_REPEAT)}},
        {MaterialDefinition::NORMAL,
+        {"AnimatedCube_BaseColor.png",
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+       {MaterialDefinition::OCCLUSION,
+        {"AnimatedCube_BaseColor.png",
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+       {MaterialDefinition::EMISSIVE,
         {"AnimatedCube_BaseColor.png",
          SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
      }},
     {MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
+       MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
        MaterialDefinition::NORMAL | MaterialDefinition::GLTF_CHANNELS,
      0,
      Vector4(1.f, .766f, .336f, 1.f),
+     Vector3(0.2, 0.1, 0.0),
      1.f,
      0.f,
+     1.f,
      {
        {MaterialDefinition::ALBEDO,
         {"AnimatedCube_BaseColor.png",
@@ -198,6 +210,12 @@ int UtcDaliGltfLoaderSuccess1(void)
         {"AnimatedCube_MetallicRoughness.png",
          SamplerFlags::Encode(FilterMode::NEAREST_MIPMAP_LINEAR, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::MIRRORED_REPEAT)}},
        {MaterialDefinition::NORMAL,
+        {"AnimatedCube_BaseColor.png",
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+       {MaterialDefinition::OCCLUSION,
+        {"AnimatedCube_BaseColor.png",
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+       {MaterialDefinition::EMISSIVE,
         {"AnimatedCube_BaseColor.png",
          SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
      }},

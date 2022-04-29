@@ -79,8 +79,8 @@ public: // DATA
   std::string              mFragmentShaderPath;
   std::vector<std::string> mDefines;
   std::vector<std::string> mHints;
-
-  Property::Map mUniforms;
+  Property::Map            mUniforms;
+  bool                     mUseBuiltInShader;
 };
 
 } // namespace SceneLoader

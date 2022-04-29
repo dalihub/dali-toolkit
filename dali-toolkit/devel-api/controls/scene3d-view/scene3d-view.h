@@ -80,15 +80,9 @@ public:
     // Scene doesn't use both of point and directional light
     NONE = 0,
     // Scene use point light
-    POINT_LIGHT,
+    POINT_LIGHT = 1,
     // Scene use directional light
-    DIRECTIONAL_LIGHT,
-    // Scene use Image Based Lighting
-    IMAGE_BASED_LIGHT,
-    // Scene use Image Based Lighting and point light
-    IMAGE_BASED_LIGHT_AND_POINT_LIGHT,
-    // Scene use Image Based Lighting and directional light
-    IMAGE_BASED_LIGHT_AND_DIRECTIONAL_LIGHT
+    DIRECTIONAL_LIGHT = 2
   };
 
   /**

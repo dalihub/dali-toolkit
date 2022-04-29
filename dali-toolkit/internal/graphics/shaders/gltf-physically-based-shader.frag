@@ -1,13 +1,13 @@
 uniform lowp vec3 uLightColor;
 uniform lowp vec4 uBaseColorFactor;
 uniform lowp vec2 uMetallicRoughnessFactors;
-uniform lowp int alphaMode;
 uniform lowp float alphaCutoff;
+uniform lowp float uAlphaMode;
+uniform lowp float uHasLightSource;
 
 in lowp vec2 vUV[2];
 in lowp mat3 vTBN;
 in lowp vec4 vColor;
-flat in int visLight;
 in highp vec3 vLightDirection;
 in highp vec3 vPositionToCamera;
 
@@ -30,20 +30,20 @@ const float c_MinRoughness = 0.04;
 vec3 getNormal()
 {
 #ifdef TEXTURE_NORMAL
-  lowp vec3 n = texture( uNormalSampler, vUV[uNormalTexCoordIndex] ).rgb;
-  n = normalize( vTBN * ( ( 2.0 * n - 1.0 ) * vec3( uNormalScale, uNormalScale, 1.0 ) ) );
+  lowp vec3 n = texture(uNormalSampler, vUV[uNormalTexCoordIndex]).rgb;
+  n = normalize(vTBN * ((2.0 * n - 1.0) * vec3(uNormalScale, uNormalScale, 1.0)));
 #else
   lowp vec3 n = normalize( vTBN[2].xyz );
 #endif
   return n;
 }
 
-vec3 specularReflection( PBRInfo pbrInputs )
+vec3 specularReflection(PBRInfo pbrInputs)
 {
-  return pbrInputs.reflectance0 + ( pbrInputs.reflectance90 - pbrInputs.reflectance0 ) * pow( clamp( 1.0 - pbrInputs.VdotH, 0.0, 1.0 ), 5.0 );
+  return pbrInputs.reflectance0 + (pbrInputs.reflectance90 - pbrInputs.reflectance0) * pow(clamp(1.0 - pbrInputs.VdotH, 0.0, 1.0), 5.0);
 }
 
-float geometricOcclusion( PBRInfo pbrInputs )
+float geometricOcclusion(PBRInfo pbrInputs)
 {
   mediump float NdotL = pbrInputs.NdotL;
   mediump float NdotV = pbrInputs.NdotV;
@@ -61,7 +61,7 @@ float microfacetDistribution(PBRInfo pbrInputs)
   return roughnessSq / (M_PI * f * f);
 }
 
-vec3 linear( vec3 color )
+vec3 linear(vec3 color)
 {
   return pow(color,vec3(2.2));
 }
@@ -96,13 +96,13 @@ void main()
   lowp vec4 baseColor = vColor * uBaseColorFactor;
 #endif
 
-  if( alphaMode == 0 )
+  if(uAlphaMode < 0.5f)
   {
     baseColor.w = 1.0;
   }
-  else if( alphaMode == 1 )
+  else if(uAlphaMode < 1.5f)
   {
-    if( baseColor.w >= alphaCutoff )
+    if(baseColor.w >= alphaCutoff)
     {
       baseColor.w = 1.0;
     }
@@ -150,7 +150,7 @@ void main()
 
   // Calculate the shading terms for the microfacet specular shading model
   lowp vec3 color = vec3(0.0);
-  if( visLight == 1 )
+  if( uHasLightSource > 0.5f )
   {
     lowp vec3 F = specularReflection( pbrInputs );
     lowp float G = geometricOcclusion( pbrInputs );

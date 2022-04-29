@@ -31,11 +31,6 @@ using namespace Dali::SceneLoader;
 
 namespace
 {
-bool EndsWith(const std::string& str, const std::string& suffix) // ends_width() is C++20
-{
-  return str.size() >= suffix.size() && str.substr(str.size() - suffix.size()).compare(suffix) == 0;
-}
-
 MaterialDefinition& NewMaterialDefinition(ResourceBundle& resources)
 {
   resources.mMaterials.push_back({});
@@ -281,8 +276,6 @@ int UtcDaliShaderDefinitionFactoryProduceShader(void)
     DALI_TEST_EQUAL(ps.shaderIdx, shaderIdx);
 
     auto& shaderDef = ctx.resources.mShaders[shaderIdx].first;
-    DALI_TEST_CHECK(EndsWith(shaderDef.mVertexShaderPath, ".vsh"));
-    DALI_TEST_CHECK(EndsWith(shaderDef.mFragmentShaderPath, ".fsh"));
     DALI_TEST_EQUAL(shaderDef.mRendererState, rendererState);
 
     uint32_t definesUnmatched = shaderDef.mDefines.size();
