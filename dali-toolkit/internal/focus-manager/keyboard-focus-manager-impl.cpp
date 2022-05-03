@@ -420,11 +420,11 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
   bool succeed = false;
 
   // Go through the actor's hierarchy until we find a layout control that knows how to move the focus
-  Toolkit::Control parentLayoutControl = GetParentLayoutControl(currentFocusActor);
-  while(parentLayoutControl && !succeed)
+  Toolkit::Control layoutControl = IsLayoutControl(currentFocusActor) ? Toolkit::Control::DownCast(currentFocusActor) : GetParentLayoutControl(currentFocusActor);
+  while(layoutControl && !succeed)
   {
-    succeed             = DoMoveFocusWithinLayoutControl(parentLayoutControl, currentFocusActor, direction);
-    parentLayoutControl = GetParentLayoutControl(parentLayoutControl);
+    succeed       = DoMoveFocusWithinLayoutControl(layoutControl, currentFocusActor, direction);
+    layoutControl = GetParentLayoutControl(layoutControl);
   }
 
   if(!succeed)
@@ -556,9 +556,9 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
         Toolkit::Control layoutControl = Toolkit::Control::DownCast(nextFocusableActor);
         succeed                        = DoMoveFocusWithinLayoutControl(layoutControl, currentFocusActor, direction);
       }
-      else
+      if(!succeed)
       {
-        // Otherwise, just set focus to the next focusable actor
+        // Just set focus to the next focusable actor
         succeed = SetCurrentFocusActor(nextFocusableActor);
       }
     }
@@ -595,7 +595,7 @@ bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control contr
       if(committedFocusActor && committedFocusActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && committedFocusActor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED))
       {
         // Whether the commited focusable actor is a layout control
-        if(IsLayoutControl(committedFocusActor))
+        if(IsLayoutControl(committedFocusActor) && committedFocusActor != control)
         {
           // If so, move the focus inside it.
           Toolkit::Control layoutControl = Toolkit::Control::DownCast(committedFocusActor);
