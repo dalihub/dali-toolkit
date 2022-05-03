@@ -185,6 +185,11 @@ public:
    */
   Texture GetSpecularTexture();
 
+  /**
+   * @brief Get whether the scene has image based rendering or not.
+   */
+  bool HasImageBasedLighting();
+
 private:
   /**
    * @brief Get Cropped image buffer.
@@ -232,6 +237,7 @@ private:
   Texture mBRDFTexture;     // BRDF texture for the PBR rendering
   Texture mSpecularTexture; // Specular cube map texture
   Texture mDiffuseTexture;  // Diffuse cube map texture
+  bool    mUseIBL;
 
 private:
   // Undefined copy constructor.

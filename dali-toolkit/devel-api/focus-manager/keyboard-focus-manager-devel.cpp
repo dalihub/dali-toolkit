@@ -55,6 +55,16 @@ bool MoveFocus(KeyboardFocusManager keyboardFocusManager, Control::KeyboardFocus
   return GetImpl(keyboardFocusManager).MoveFocus(direction, deviceName);
 }
 
+void SetFocusFinderRootActor(KeyboardFocusManager keyboardFocusManager, Actor actor)
+{
+  GetImpl(keyboardFocusManager).SetFocusFinderRootActor(actor);
+}
+
+void ResetFocusFinderRootActor(KeyboardFocusManager keyboardFocusManager)
+{
+  GetImpl(keyboardFocusManager).ResetFocusFinderRootActor();
+}
+
 } // namespace DevelKeyboardFocusManager
 
 } // namespace Toolkit

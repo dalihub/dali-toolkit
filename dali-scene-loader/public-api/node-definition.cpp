@@ -153,6 +153,14 @@ void ModelNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParam
   auto& matDef = resources.mMaterials[mMaterialIdx].first;
   actor.RegisterProperty("uMetallicFactor", matDef.mMetallic);
   actor.RegisterProperty("uRoughnessFactor", matDef.mRoughness);
+  if(matDef.mFlags & MaterialDefinition::OCCLUSION)
+  {
+    actor.RegisterProperty("uOcclusionStrength", matDef.mOcclusionStrength);
+  }
+  if(matDef.mFlags & MaterialDefinition::EMISSIVE)
+  {
+    actor.RegisterProperty("uEmissiveFactor", matDef.mEmissiveFactor);
+  }
 
   Index envIdx = matDef.mEnvironmentIdx;
   actor.RegisterProperty("uIblIntensity", resources.mEnvironmentMaps[envIdx].first.mIblIntensity);

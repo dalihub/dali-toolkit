@@ -202,7 +202,7 @@ ImageVisual::~ImageVisual()
       else if(mImageUrl.IsBufferResource())
       {
         TextureManager& textureManager = mFactoryCache.GetTextureManager();
-        textureManager.RemoveExternalEncodedImageBuffer(mImageUrl.GetUrl());
+        textureManager.RemoveEncodedImageBuffer(mImageUrl.GetUrl());
       }
     }
 

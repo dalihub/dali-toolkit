@@ -1509,7 +1509,7 @@ Actor Loader::AddNode(Scene3dView& scene3dView, uint32_t index)
     VERTEX_SHADER += SHADER_GLTF_PHYSICALLY_BASED_SHADER_VERT.data();
     FRAGMENT_SHADER = SHADER_GLTF_GLES_VERSION_300_DEF.data();
 
-    bool useIBL = (scene3dView.GetLightType() >= Toolkit::Scene3dView::LightType::IMAGE_BASED_LIGHT);
+    bool useIBL = scene3dView.HasImageBasedLighting();
     if(isMaterial)
     {
       MaterialInfo materialInfo = mMaterialArray[meshInfo.materialsIdx];
@@ -1592,11 +1592,14 @@ Actor Loader::AddNode(Scene3dView& scene3dView, uint32_t index)
     actor.RotateBy(orientation);
     actor.SetProperty(Actor::Property::POSITION, translation);
 
-    shader.RegisterProperty("uLightType", (scene3dView.GetLightType() & ~Toolkit::Scene3dView::LightType::IMAGE_BASED_LIGHT));
+    float hasLightSource = static_cast<float>(!!(scene3dView.GetLightType() & (Toolkit::Scene3dView::LightType::POINT_LIGHT | Toolkit::Scene3dView::LightType::DIRECTIONAL_LIGHT)));
+    float isPointLight = static_cast<float>(!!(scene3dView.GetLightType() & Toolkit::Scene3dView::LightType::POINT_LIGHT));
+    shader.RegisterProperty("uHasLightSource", hasLightSource);
+    shader.RegisterProperty("uIsPointLight", isPointLight);
     shader.RegisterProperty("uLightVector", scene3dView.GetLightVector());
     shader.RegisterProperty("uLightColor", scene3dView.GetLightColor());
 
-    actor.RegisterProperty("uIsColor", meshInfo.attribute.COLOR.size() > 0);
+    actor.RegisterProperty("uHasVertexColor", meshInfo.attribute.COLOR.size() > 0 ? 1.0f : 0.0f);
     if(isMaterial)
     {
       MaterialInfo materialInfo = mMaterialArray[meshInfo.materialsIdx];
@@ -1605,15 +1608,15 @@ Actor Loader::AddNode(Scene3dView& scene3dView, uint32_t index)
 
       if(materialInfo.alphaMode == "OPAQUE")
       {
-        actor.RegisterProperty("alphaMode", 0);
+        actor.RegisterProperty("uAlphaMode", 0.0f);
       }
       else if(materialInfo.alphaMode == "MASK")
       {
-        actor.RegisterProperty("alphaMode", 1);
+        actor.RegisterProperty("uAlphaMode", 1.0f);
       }
       else
       {
-        actor.RegisterProperty("alphaMode", 2);
+        actor.RegisterProperty("uAlphaMode", 2.0f);
       }
       actor.RegisterProperty("alphaCutoff", materialInfo.alphaCutoff);
 

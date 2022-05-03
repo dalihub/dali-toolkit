@@ -110,7 +110,9 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
   RawData raw;
 
   const bool hasTransparency = MaskMatch(mFlags, TRANSPARENCY);
-  uint32_t   numBuffers      = mTextureStages.size() + (hasTransparency ? !CheckTextures(ALBEDO) + !CheckTextures(METALLIC | ROUGHNESS) + !CheckTextures(NORMAL) : !CheckTextures(ALBEDO | METALLIC) + !CheckTextures(NORMAL | ROUGHNESS));
+  // Why we add additional count here?
+  uint32_t numBuffers = mTextureStages.size() + (hasTransparency ? !CheckTextures(ALBEDO) + !CheckTextures(METALLIC | ROUGHNESS) + !CheckTextures(NORMAL)
+                                                                 : !CheckTextures(ALBEDO | METALLIC) + !CheckTextures(NORMAL | ROUGHNESS));
   if(numBuffers == 0)
   {
     return raw;
@@ -210,7 +212,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
     }
   }
 
-  // Extra textures. TODO: emissive, occlusion etc.
+  // Extra textures.
   if(checkStage(SUBSURFACE))
   {
     raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
@@ -218,6 +220,12 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
   }
 
   if(checkStage(OCCLUSION))
+  {
+    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+    ++iTexture;
+  }
+
+  if(checkStage(EMISSIVE))
   {
     raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
     ++iTexture;

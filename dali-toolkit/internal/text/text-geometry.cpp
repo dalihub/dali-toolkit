@@ -160,7 +160,7 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
       }
       else
       {
-        if((ellipsisPosition == DevelText::EllipsisPosition::END) && (index >= endIndexOfGlyphs))
+        if((ellipsisPosition == DevelText::EllipsisPosition::END) && (index > endIndexOfGlyphs))
         {
           //skip remaining elided glyphs
           break;

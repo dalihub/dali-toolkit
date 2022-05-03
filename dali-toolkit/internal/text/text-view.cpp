@@ -114,7 +114,6 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
   float                   calculatedAdvance           = 0.f;
   const Character*        textBuffer                  = mImpl->mLogicalModel->mText.Begin();
 
-
   if(mImpl->mVisualModel)
   {
     // Get the character-spacing runs.
@@ -125,7 +124,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
 
     //Reset indices of ElidedGlyphs
     mImpl->mVisualModel->SetStartIndexOfElidedGlyphs(0u);
-    mImpl->mVisualModel->SetEndIndexOfElidedGlyphs(numberOfGlyphs);
+    mImpl->mVisualModel->SetEndIndexOfElidedGlyphs(numberOfGlyphs - 1u); // Initialization is the last index of Glyphs
     mImpl->mVisualModel->SetFirstMiddleIndexOfElidedGlyphs(0u);
     mImpl->mVisualModel->SetSecondMiddleIndexOfElidedGlyphs(0u);
 

@@ -153,8 +153,7 @@ int UtcDaliVisualUrlGif(void)
 
   DALI_TEST_EQUALS( VisualUrl::GIF, VisualUrl(".GiF").GetType(), TEST_LOCATION );
 
-  // GIFs aren't N-patch
-  DALI_TEST_EQUALS( VisualUrl::GIF, VisualUrl("foobar.9.gif").GetType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::N_PATCH, VisualUrl("foobar.9.gif").GetType(), TEST_LOCATION );
 
   DALI_TEST_EQUALS( VisualUrl::REGULAR_IMAGE, VisualUrl("gif.png").GetType(), TEST_LOCATION );
   DALI_TEST_EQUALS( VisualUrl::REGULAR_IMAGE, VisualUrl("gif.gif1").GetType(), TEST_LOCATION );
