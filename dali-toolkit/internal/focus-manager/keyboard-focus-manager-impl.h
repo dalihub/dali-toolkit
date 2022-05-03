@@ -162,6 +162,16 @@ public:
    */
   bool IsDefaultAlgorithmEnabled() const;
 
+  /**
+   * @copydoc Toolkit::DevelKeyboardFocusManager::SetFocusFinderRootActor
+   */
+  void SetFocusFinderRootActor(Actor actor);
+
+  /**
+   * @copydoc Toolkit::DevelKeyboardFocusManager::ResetFocusFinderRootActor
+   */
+  void ResetFocusFinderRootActor();
+
 public:
   /**
    * @copydoc Toolkit::KeyboardFocusManager::PreFocusChangeSignal()
@@ -344,6 +354,8 @@ private:
 
   Actor mFocusIndicatorActor; ///< The focus indicator actor shared by all the keyboard focusable actors for highlight
 
+  WeakHandle<Actor> mFocusFinderRootActor; ///<The root actor from which the focus finder is started.
+
   FocusStack mFocusHistory; ///< Stack to contain pre-focused actor's BaseObject*
 
   SlotDelegate<KeyboardFocusManager> mSlotDelegate;
@@ -369,6 +381,7 @@ private:
   bool mClearFocusOnTouch : 1; ///< Whether clear focus on touch.
 
   bool mEnableDefaultAlgorithm : 1; ///< Whether use default algorithm focus
+
 };
 
 } // namespace Internal
