@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,24 +77,10 @@ void RasterizingTask::Load()
 
 void RasterizingTask::Rasterize()
 {
-  if(mWidth <= 0u || mHeight <= 0u)
+  Devel::PixelBuffer pixelBuffer = mVectorRenderer.Rasterize(mWidth, mHeight);
+  if(!pixelBuffer)
   {
-    DALI_LOG_ERROR("RasterizingTask::Rasterize: Size is zero!\n");
-    return;
-  }
-
-  Devel::PixelBuffer pixelBuffer = Devel::PixelBuffer::New(mWidth, mHeight, Dali::Pixel::RGBA8888);
-
-  uint32_t defaultWidth, defaultHeight;
-  mVectorRenderer.GetDefaultSize(defaultWidth, defaultHeight);
-
-  float scaleX = static_cast<float>(mWidth) / static_cast<float>(defaultWidth);
-  float scaleY = static_cast<float>(mHeight) / static_cast<float>(defaultHeight);
-  float scale  = scaleX < scaleY ? scaleX : scaleY;
-
-  if(!mVectorRenderer.Rasterize(pixelBuffer, scale))
-  {
-    DALI_LOG_ERROR("RasterizingTask::Rasterize: Rasterize is failed! [%s]\n", mUrl.GetUrl().c_str());
+    DALI_LOG_ERROR("Rasterize is failed! [%s]\n", mUrl.GetUrl().c_str());
     return;
   }
 

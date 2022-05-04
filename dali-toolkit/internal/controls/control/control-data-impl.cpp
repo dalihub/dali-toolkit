@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,11 +36,11 @@
 #include <limits>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -448,7 +448,7 @@ static bool IsShowingGeometryOnScreen(Dali::Rect<> rect)
 Dali::Accessibility::Accessible* ExternalAccessibleGetter(Dali::Actor actor)
 {
   auto control = Toolkit::Control::DownCast(actor);
-  if (!control)
+  if(!control)
   {
     return nullptr;
   }
@@ -565,7 +565,7 @@ void Control::Impl::CheckHighlightedObjectGeometry()
   auto accessible     = GetAccessibleObject();
   auto lastPosition   = accessible->GetLastPosition();
   auto accessibleRect = accessible->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
-  auto rect = GetShowingGeometry(accessibleRect, accessible);
+  auto rect           = GetShowingGeometry(accessibleRect, accessible);
 
   switch(mAccessibilityLastScreenRelativeMoveType)
   {
@@ -626,9 +626,9 @@ void Control::Impl::RegisterAccessibilityPositionPropertyNotification()
   mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::OUTSIDE;
   // recalculate mAccessibilityLastScreenRelativeMoveType accordingly to the initial position
   CheckHighlightedObjectGeometry();
-  mAccessibilityPositionNotification       = mControlImpl.Self().AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
+  mAccessibilityPositionNotification = mControlImpl.Self().AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
   mAccessibilityPositionNotification.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
-  mAccessibilityPositionNotification.NotifySignal().Connect(this, [this](PropertyNotification&){ CheckHighlightedObjectGeometry(); });
+  mAccessibilityPositionNotification.NotifySignal().Connect(this, [this](PropertyNotification&) { CheckHighlightedObjectGeometry(); });
   mIsAccessibilityPositionPropertyNotificationSet = true;
 }
 
@@ -965,6 +965,11 @@ void Control::Impl::NotifyVisualEvent(Visual::Base& object, Property::Index sign
       break;
     }
   }
+}
+
+void Control::Impl::RelayoutRequest(Visual::Base& object)
+{
+  mControlImpl.RelayoutRequest();
 }
 
 bool Control::Impl::IsResourceReady() const
@@ -1364,7 +1369,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
 
           auto* accessible = controlImpl.GetAccessibleObject();
           auto* parent     = dynamic_cast<Dali::Accessibility::ActorAccessible*>(accessible->GetParent());
-          if (parent)
+          if(parent)
           {
             parent->OnChildrenChanged();
           }
@@ -1993,7 +1998,8 @@ Dali::Property Control::Impl::GetVisualProperty(Dali::Property::Index index, Dal
 
 void Control::Impl::CreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
                                       std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
-                                      Dali::Toolkit::Control source, Dali::Toolkit::Control destination)
+                                      Dali::Toolkit::Control                                              source,
+                                      Dali::Toolkit::Control                                              destination)
 {
   // Retrieves background properties to be transitioned.
   Dali::Property::Map backgroundSourcePropertyMap, backgroundDestinationPropertyMap;
