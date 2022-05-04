@@ -125,7 +125,7 @@
         "visualType":"TEXT",
         "pointSize":6.0,
         "textColor":[0.04,0.06,0.13,1.0],
-        "fontFamily":"SamsungOneUI",
+        "fontFamily":"BreezeSans",
         "fontStyle" : {"weight":"regular"}
       },
       "unselectedBackgroundVisual":
