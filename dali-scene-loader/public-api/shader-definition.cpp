@@ -38,7 +38,7 @@ ShaderDefinition::ShaderDefinition(const ShaderDefinition& other)
   mDefines(other.mDefines),
   mHints(other.mHints),
   mUniforms(other.mUniforms),
-  mUseBuiltInShader(false)
+  mUseBuiltInShader(other.mUseBuiltInShader)
 {
 }
 
