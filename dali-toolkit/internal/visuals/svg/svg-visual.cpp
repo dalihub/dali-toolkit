@@ -72,7 +72,7 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
   mDefaultWidth(0),
   mDefaultHeight(0),
   mPlacementActor(),
-  mVisualSize(Vector2::ZERO),
+  mRasterizedSize(Vector2::ZERO),
   mLoadFailed(false),
   mAttemptAtlasing(false)
 {
@@ -169,8 +169,11 @@ void SvgVisual::DoSetOnScene(Actor& actor)
   }
   else
   {
-    // SVG visual needs it's size set before it can be rasterized hence set ResourceReady once on stage
-    ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+    if(mImpl->mEventObserver)
+    {
+      // SVG visual needs it's size set before it can be rasterized hence request relayout once on stage
+      mImpl->mEventObserver->RelayoutRequest(*this);
+    }
   }
 }
 
@@ -182,13 +185,31 @@ void SvgVisual::DoSetOffScene(Actor& actor)
   mPlacementActor.Reset();
 
   // Reset the visual size to zero so that when adding the actor back to stage the SVG rasterization is forced
-  mVisualSize = Vector2::ZERO;
+  mRasterizedSize = Vector2::ZERO;
 }
 
 void SvgVisual::GetNaturalSize(Vector2& naturalSize)
 {
-  naturalSize.x = mDefaultWidth;
-  naturalSize.y = mDefaultHeight;
+  if(mLoadFailed && mImpl->mRenderer)
+  {
+    // Load failed, use broken image size
+    auto textureSet = mImpl->mRenderer.GetTextures();
+    if(textureSet && textureSet.GetTextureCount())
+    {
+      auto texture = textureSet.GetTexture(0);
+      if(texture)
+      {
+        naturalSize.x = texture.GetWidth();
+        naturalSize.y = texture.GetHeight();
+        return;
+      }
+    }
+  }
+  else
+  {
+    naturalSize.x = mDefaultWidth;
+    naturalSize.y = mDefaultHeight;
+  }
 }
 
 void SvgVisual::DoCreatePropertyMap(Property::Map& map) const
@@ -273,6 +294,14 @@ void SvgVisual::ApplyRasterizedImage(VectorImageRenderer vectorRenderer, PixelDa
 {
   if(isLoaded && rasterizedPixelData && IsOnScene())
   {
+    if(mDefaultWidth == 0 || mDefaultHeight == 0)
+    {
+      mVectorRenderer.GetDefaultSize(mDefaultWidth, mDefaultHeight);
+    }
+
+    mRasterizedSize.x = static_cast<float>(rasterizedPixelData.GetWidth());
+    mRasterizedSize.y = static_cast<float>(rasterizedPixelData.GetHeight());
+
     TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
     if(mImpl->mFlags & Impl::IS_ATLASING_APPLIED)
     {
@@ -336,6 +365,8 @@ void SvgVisual::ApplyRasterizedImage(VectorImageRenderer vectorRenderer, PixelDa
   }
   else if(!isLoaded || !rasterizedPixelData)
   {
+    mLoadFailed = true;
+
     Actor actor = mPlacementActor.GetHandle();
     if(actor)
     {
@@ -355,10 +386,10 @@ void SvgVisual::OnSetTransform()
 
   if(IsOnScene() && !mLoadFailed)
   {
-    if(visualSize != mVisualSize)
+    if(visualSize != mRasterizedSize || mDefaultWidth == 0 || mDefaultHeight == 0)
     {
       AddRasterizationTask(visualSize);
-      mVisualSize = visualSize;
+      mRasterizedSize = visualSize;
     }
   }
 

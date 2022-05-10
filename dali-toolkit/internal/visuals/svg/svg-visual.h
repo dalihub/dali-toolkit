@@ -191,7 +191,7 @@ private:
   uint32_t                  mDefaultWidth;
   uint32_t                  mDefaultHeight;
   WeakHandle<Actor>         mPlacementActor;
-  Vector2                   mVisualSize;
+  Vector2                   mRasterizedSize;
   bool                      mLoadFailed;
   bool                      mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
 };

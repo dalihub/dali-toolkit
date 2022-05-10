@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DATA_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,6 +139,12 @@ public:
    * @note Overriding method in Visual::EventObserver.
    */
   void NotifyVisualEvent(Visual::Base& object, Property::Index signalId) override;
+
+  /**
+   * @brief Called when the visual needs relayout request.
+   * @param[in] object The visual who requests relayout
+   */
+  void RelayoutRequest(Visual::Base& object) override;
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
@@ -412,7 +418,8 @@ public:
    */
   void CreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
                          std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
-                         Dali::Toolkit::Control source, Dali::Toolkit::Control destination);
+                         Dali::Toolkit::Control                                              source,
+                         Dali::Toolkit::Control                                              destination);
 
   /**
    * @brief Update visual properties.
@@ -496,12 +503,12 @@ public:
   std::string         mSubStateName;
   Property::Map       mAccessibilityAttributes;
 
-  int mLeftFocusableActorId;  ///< Actor ID of Left focusable control.
-  int mRightFocusableActorId; ///< Actor ID of Right focusable control.
-  int mUpFocusableActorId;    ///< Actor ID of Up focusable control.
-  int mDownFocusableActorId;  ///< Actor ID of Down focusable control.
-  int mClockwiseFocusableActorId;  ///< Actor ID of Clockwise focusable control.
-  int mCounterClockwiseFocusableActorId;  ///< Actor ID of Counter clockwise focusable control.
+  int mLeftFocusableActorId;             ///< Actor ID of Left focusable control.
+  int mRightFocusableActorId;            ///< Actor ID of Right focusable control.
+  int mUpFocusableActorId;               ///< Actor ID of Up focusable control.
+  int mDownFocusableActorId;             ///< Actor ID of Down focusable control.
+  int mClockwiseFocusableActorId;        ///< Actor ID of Clockwise focusable control.
+  int mCounterClockwiseFocusableActorId; ///< Actor ID of Counter clockwise focusable control.
 
   RegisteredVisualContainer                 mVisuals; ///< Stores visuals needed by the control, non trivial type so std::vector used.
   std::string                               mStyleName;
