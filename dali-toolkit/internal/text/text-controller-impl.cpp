@@ -540,8 +540,7 @@ Dali::LayoutDirection::Type Controller::Impl::GetLayoutDirection(Dali::Actor& ac
   if(mModel->mMatchLayoutDirection == DevelText::MatchLayoutDirection::LOCALE ||
      (mModel->mMatchLayoutDirection == DevelText::MatchLayoutDirection::INHERIT && !mIsLayoutDirectionChanged))
   {
-    Window window = DevelWindow::Get(actor);
-    return static_cast<Dali::LayoutDirection::Type>(window ? window.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>() : LayoutDirection::LEFT_TO_RIGHT);
+    return static_cast<Dali::LayoutDirection::Type>(DevelWindow::Get(actor).GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
   }
   else
   {
