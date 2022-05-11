@@ -325,27 +325,12 @@ int UtcDaliVisualSize(void)
   DALI_TEST_EQUALS(naturalSize, Vector2::ZERO, TEST_LOCATION);
 
   // animated gradient visual
-  Vector2 animated_gradient_visual_size(10.f, 10.f);
   propertyMap.Clear();
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_GRADIENT);
   Visual::Base animatedGradientVisual = factory.CreateVisual(propertyMap);
   animatedGradientVisual.GetNaturalSize(naturalSize);
   animatedGradientVisual.SetTransformAndSize(DefaultTransform(), controlSize);
   DALI_TEST_EQUALS(naturalSize, Vector2::ZERO, TEST_LOCATION);
-
-  // svg visual
-  Visual::Base svgVisual = factory.CreateVisual(TEST_SVG_FILE_NAME, ImageDimensions());
-  svgVisual.GetNaturalSize(naturalSize);
-  // TEST_SVG_FILE:
-  //  <svg width="100" height="100">
-  //  <circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
-  //  </svg>
-  DALI_TEST_EQUALS(naturalSize, Vector2(100.f, 100.f), TEST_LOCATION);
-
-  // svg visual with a size
-  Visual::Base svgVisual2 = factory.CreateVisual(TEST_SVG_FILE_NAME, ImageDimensions(200, 200));
-  svgVisual2.GetNaturalSize(naturalSize);
-  DALI_TEST_EQUALS(naturalSize, Vector2(100.f, 100.f), TEST_LOCATION); // Natural size should still be 100, 100
 
   // Text visual.
 

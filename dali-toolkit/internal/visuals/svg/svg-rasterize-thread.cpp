@@ -33,8 +33,8 @@ namespace Toolkit
 {
 namespace Internal
 {
-RasterizingTask::RasterizingTask(SvgVisual* svgRenderer, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height)
-: mSvgVisual(svgRenderer),
+RasterizingTask::RasterizingTask(SvgVisual* svgVisual, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height)
+: mSvgVisual(svgVisual),
   mVectorRenderer(vectorRenderer),
   mUrl(url),
   mDpi(dpi),
@@ -50,29 +50,41 @@ RasterizingTask::~RasterizingTask()
 
 void RasterizingTask::Load()
 {
+  if(mVectorRenderer.IsLoaded())
+  {
+    // Already loaded
+    mLoadSuccess = true;
+    return;
+  }
+
+  Dali::Vector<uint8_t> buffer;
+
   if(!mUrl.IsLocalResource())
   {
-    Dali::Vector<uint8_t> remoteBuffer;
-    if(!Dali::FileLoader::DownloadFileSynchronously(mUrl.GetUrl(), remoteBuffer))
+    if(!Dali::FileLoader::DownloadFileSynchronously(mUrl.GetUrl(), buffer))
     {
-      DALI_LOG_ERROR("RasterizingTask::Load: Failed to download file! [%s]\n", mUrl.GetUrl().c_str());
+      DALI_LOG_ERROR("Failed to download file! [%s]\n", mUrl.GetUrl().c_str());
       return;
     }
-
-    remoteBuffer.PushBack('\0');
-
-    if(!mVectorRenderer.Load(remoteBuffer, mDpi))
-    {
-      DALI_LOG_ERROR("RasterizingTask::Load:Failed to load data! [%s]\n", mUrl.GetUrl().c_str());
-      return;
-    }
-
-    mLoadSuccess = true;
   }
   else
   {
-    mLoadSuccess = true;
+    if(!Dali::FileLoader::ReadFile(mUrl.GetUrl(), buffer))
+    {
+      DALI_LOG_ERROR("Failed to read file! [%s]\n", mUrl.GetUrl().c_str());
+      return;
+    }
   }
+
+  buffer.PushBack('\0');
+
+  if(!mVectorRenderer.Load(buffer, mDpi))
+  {
+    DALI_LOG_ERROR("Failed to load data! [%s]\n", mUrl.GetUrl().c_str());
+    return;
+  }
+
+  mLoadSuccess = true;
 }
 
 void RasterizingTask::Rasterize()
@@ -85,11 +97,6 @@ void RasterizingTask::Rasterize()
   }
 
   mPixelData = Devel::PixelBuffer::Convert(pixelBuffer);
-}
-
-VectorImageRenderer RasterizingTask::GetVectorRenderer() const
-{
-  return mVectorRenderer;
 }
 
 bool RasterizingTask::IsLoaded() const
@@ -258,7 +265,7 @@ void SvgRasterizeThread::ApplyRasterizedSVGToSampler()
 {
   while(RasterizingTaskPtr task = NextCompletedTask())
   {
-    task->GetSvgVisual()->ApplyRasterizedImage(task->GetVectorRenderer(), task->GetPixelData(), task->IsLoaded());
+    task->GetSvgVisual()->ApplyRasterizedImage(task->GetPixelData(), task->IsLoaded());
   }
 
   UnregisterProcessor();

@@ -23,6 +23,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-event-thread-callback.h>
+#include <toolkit-vector-image-renderer.h>
 #include "dummy-control.h"
 
 #include <test-encoded-image-buffer.h>
@@ -2705,12 +2706,7 @@ int UtcDaliImageViewSyncSVGLoading(void)
 
   tet_infoline("ImageView Testing SVG image sync loading");
 
-  // Sync loading, automatic atlasing for small size image
   {
-    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-    callStack.Reset();
-    callStack.Enable(true);
-
     ImageView imageView = ImageView::New();
 
     // Sync loading is used
@@ -2724,7 +2720,6 @@ int UtcDaliImageViewSyncSVGLoading(void)
     DALI_TEST_CHECK(imageView);
 
     application.SendNotification();
-    application.Render(16);
     Vector3 naturalSize = imageView.GetNaturalSize();
 
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
@@ -2739,28 +2734,27 @@ int UtcDaliImageViewAsyncSVGLoading(void)
 
   tet_infoline("ImageView Testing SVG image async loading");
 
-  // Sync loading, automatic atlasing for small size image
   {
-    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-    callStack.Reset();
-    callStack.Enable(true);
-
     ImageView imageView = ImageView::New();
 
-    // Sync loading is used
-    Property::Map syncLoadingMap;
-    syncLoadingMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
-    syncLoadingMap.Insert(Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/svg1.svg");
-    syncLoadingMap.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, false);
-    imageView.SetProperty(ImageView::Property::IMAGE, syncLoadingMap);
+    // Async loading is used - default value of SYNCHRONOUS_LOADING is false.
+    Property::Map propertyMap;
+    propertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
+    propertyMap.Insert(Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/svg1.svg");
+    imageView.SetProperty(ImageView::Property::IMAGE, propertyMap);
 
     application.GetScene().Add(imageView);
     DALI_TEST_CHECK(imageView);
 
     application.SendNotification();
-    application.Render(16);
-    Vector3 naturalSize = imageView.GetNaturalSize();
 
+    // Wait for rasterization
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(16);
+
+    Vector3 naturalSize = imageView.GetNaturalSize();
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
   }
@@ -2773,12 +2767,8 @@ int UtcDaliImageViewSVGLoadingSyncSetInvalidValue(void)
 
   tet_infoline("ImageView Testing SVG image async loading");
 
-  // Sync loading, automatic atlasing for small size image
+  // Sync loading
   {
-    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-    callStack.Reset();
-    callStack.Enable(true);
-
     ImageView imageView = ImageView::New();
 
     // Sync loading is used
@@ -2797,7 +2787,13 @@ int UtcDaliImageViewSVGLoadingSyncSetInvalidValue(void)
     DALI_TEST_CHECK(imageView);
 
     application.SendNotification();
+
+    // Wait for rasterization
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    application.SendNotification();
     application.Render(16);
+
     Vector3 naturalSize = imageView.GetNaturalSize();
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
@@ -2834,6 +2830,11 @@ int UtcDaliImageViewSvgLoadingFailure(void)
     application.GetScene().Add(imageView);
 
     application.SendNotification();
+
+    // loading started, this waits for the loader thread
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    application.SendNotification();
     application.Render(16);
 
     DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
@@ -2856,6 +2857,11 @@ int UtcDaliImageViewSvgLoadingFailure(void)
     DALI_TEST_EQUALS(imageView.IsResourceReady(), false, TEST_LOCATION);
 
     application.GetScene().Add(imageView);
+
+    application.SendNotification();
+
+    // loading started, this waits for the loader thread
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render(16);
@@ -2881,6 +2887,11 @@ int UtcDaliImageViewSvgLoadingFailure(void)
     DALI_TEST_EQUALS(imageView.IsResourceReady(), false, TEST_LOCATION);
 
     application.GetScene().Add(imageView);
+
+    application.SendNotification();
+
+    // loading started, this waits for the loader thread
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render(16);
@@ -2993,6 +3004,44 @@ int UtcDaliImageViewSvgRasterizationFailure(void)
   END_TEST;
 }
 
+int UtcDaliImageViewSvgChageSize(void)
+{
+  ToolkitTestApplication application;
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  ImageView imageView = ImageView::New(TEST_SVG_FILE_NAME);
+  application.GetScene().Add(imageView);
+
+  application.SendNotification();
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS(Test::VectorImageRenderer::GetLoadCount(), 1, TEST_LOCATION);
+
+  // Change actor size, then rasterization should be done again
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+  application.SendNotification();
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // We should not load the file again.
+  DALI_TEST_EQUALS(Test::VectorImageRenderer::GetLoadCount(), 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliImageViewTVGLoading(void)
 {
   ToolkitTestApplication application;
@@ -3000,12 +3049,17 @@ int UtcDaliImageViewTVGLoading(void)
   tet_infoline("ImageView Testing TVG image loading");
 
   {
-    ImageView imageView = ImageView::New();
-
-    imageView.SetImage(TEST_RESOURCE_DIR "/test.tvg");
-
+    ImageView imageView = ImageView::New(TEST_RESOURCE_DIR "/test.tvg");
     application.GetScene().Add(imageView);
     DALI_TEST_CHECK(imageView);
+
+    application.SendNotification();
+
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(16);
+
     Vector3 naturalSize = imageView.GetNaturalSize();
 
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
@@ -3581,7 +3635,7 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
 
   // Test broken case
   TestResourceReadyUrl(1, 0, 0, "invalid.jpg", "", TEST_LOCATION);
-  TestResourceReadyUrl(0, 0, 0, "invalid.svg", "", TEST_LOCATION); // 0 rasterize
+  TestResourceReadyUrl(1, 0, 0, "invalid.svg", "", TEST_LOCATION);
   TestResourceReadyUrl(1, 0, 0, "invalid.9.png", "", TEST_LOCATION);
   TestResourceReadyUrl(1, 0, 0, "invalid.gif", "", TEST_LOCATION);  // 1 image loading
   TestResourceReadyUrl(0, 0, 0, "invalid.json", "", TEST_LOCATION); // 0 rasterize
@@ -3611,7 +3665,7 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
 
   // Test broken case
   TestResourceReadyUrl(0, 1, 0, "invalid.jpg", "", TEST_LOCATION);
-  TestResourceReadyUrl(0, 1, 0, "invalid.svg", "", TEST_LOCATION); // 0 rasterize
+  TestResourceReadyUrl(0, 1, 0, "invalid.svg", "", TEST_LOCATION);
   TestResourceReadyUrl(0, 1, 0, "invalid.9.png", "", TEST_LOCATION);
   TestResourceReadyUrl(0, 1, 0, "invalid.gif", "", TEST_LOCATION);
   TestResourceReadyUrl(0, 1, 0, "invalid.json", "", TEST_LOCATION); // 0 rasterize

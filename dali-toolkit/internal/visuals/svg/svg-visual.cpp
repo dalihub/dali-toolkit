@@ -27,7 +27,6 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/debug.h>
 
@@ -49,7 +48,6 @@ const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 SvgVisualPtr SvgVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties)
 {
   SvgVisualPtr svgVisual(new SvgVisual(factoryCache, shaderFactory, imageUrl));
-  svgVisual->Load();
   svgVisual->SetProperties(properties);
   svgVisual->Initialize();
   return svgVisual;
@@ -58,7 +56,6 @@ SvgVisualPtr SvgVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderF
 SvgVisualPtr SvgVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl)
 {
   SvgVisualPtr svgVisual(new SvgVisual(factoryCache, shaderFactory, imageUrl));
-  svgVisual->Load();
   svgVisual->Initialize();
   return svgVisual;
 }
@@ -238,34 +235,6 @@ void SvgVisual::EnablePreMultipliedAlpha(bool preMultiplied)
   }
 }
 
-void SvgVisual::Load()
-{
-  // load remote resource on svg rasterize thread.
-  if(mImageUrl.IsLocalResource())
-  {
-    Dali::Vector<uint8_t> buffer;
-    if(Dali::FileLoader::ReadFile(mImageUrl.GetUrl(), buffer))
-    {
-      buffer.PushBack('\0');
-
-      Vector2 dpi     = Stage::GetCurrent().GetDpi();
-      float   meanDpi = (dpi.height + dpi.width) * 0.5f;
-      if(!mVectorRenderer.Load(buffer, meanDpi))
-      {
-        mLoadFailed = true;
-        DALI_LOG_ERROR("SvgVisual::Load: Failed to load file! [%s]\n", mImageUrl.GetUrl().c_str());
-        return;
-      }
-      mVectorRenderer.GetDefaultSize(mDefaultWidth, mDefaultHeight);
-    }
-    else
-    {
-      mLoadFailed = true;
-      DALI_LOG_ERROR("SvgVisual::Load: Failed to read file! [%s]\n", mImageUrl.GetUrl().c_str());
-    }
-  }
-}
-
 void SvgVisual::AddRasterizationTask(const Vector2& size)
 {
   if(mImpl->mRenderer)
@@ -277,11 +246,12 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
     float   meanDpi = (dpi.height + dpi.width) * 0.5f;
 
     RasterizingTaskPtr newTask = new RasterizingTask(this, mVectorRenderer, mImageUrl, meanDpi, width, height);
+
     if(IsSynchronousLoadingRequired() && mImageUrl.IsLocalResource())
     {
       newTask->Load();
       newTask->Rasterize();
-      ApplyRasterizedImage(newTask->GetVectorRenderer(), newTask->GetPixelData(), newTask->IsLoaded());
+      ApplyRasterizedImage(newTask->GetPixelData(), newTask->IsLoaded());
     }
     else
     {
@@ -290,7 +260,7 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
   }
 }
 
-void SvgVisual::ApplyRasterizedImage(VectorImageRenderer vectorRenderer, PixelData rasterizedPixelData, bool isLoaded)
+void SvgVisual::ApplyRasterizedImage(PixelData rasterizedPixelData, bool isLoaded)
 {
   if(isLoaded && rasterizedPixelData && IsOnScene())
   {
@@ -388,8 +358,8 @@ void SvgVisual::OnSetTransform()
   {
     if(visualSize != mRasterizedSize || mDefaultWidth == 0 || mDefaultHeight == 0)
     {
-      AddRasterizationTask(visualSize);
       mRasterizedSize = visualSize;
+      AddRasterizationTask(visualSize);
     }
   }
 

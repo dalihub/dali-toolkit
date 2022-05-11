@@ -73,7 +73,7 @@ static void TestKeyInputFocusCallback(Control control)
 
 const char* TEST_LARGE_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/tbcol.png";
 const char* TEST_IMAGE_FILE_NAME       = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
-const char* TEST_SVG_FILE_NAME         = TEST_RESOURCE_DIR "/Kid1.svg";
+const char* TEST_SVG_FILE_NAME         = TEST_RESOURCE_DIR "/svg1.svg";
 
 Vector4 GetControlBackgroundColor(Control& control)
 {
@@ -269,8 +269,8 @@ int UtcDaliControlNavigationProperties(void)
   DALI_TEST_EQUALS(-1, control.GetProperty(DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
   DALI_TEST_EQUALS(-1, control.GetProperty(DevelControl::Property::UP_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
   DALI_TEST_EQUALS(-1, control.GetProperty(DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
-  DALI_TEST_EQUALS(-1, control.GetProperty( DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION);
-  DALI_TEST_EQUALS(-1, control.GetProperty( DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION);
+  DALI_TEST_EQUALS(-1, control.GetProperty(DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(-1, control.GetProperty(DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
 
   control.SetProperty(DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, 1);
   DALI_TEST_EQUALS(1, control.GetProperty(DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
@@ -290,9 +290,9 @@ int UtcDaliControlNavigationProperties(void)
   control.SetProperty(DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, 18);
   DALI_TEST_EQUALS(18, control.GetProperty(DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
   control.SetProperty(DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID, 19);
-  DALI_TEST_EQUALS(19, control.GetProperty( DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION);
+  DALI_TEST_EQUALS(19, control.GetProperty(DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
   control.SetProperty(DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID, 20);
-  DALI_TEST_EQUALS(20, control.GetProperty( DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION);
+  DALI_TEST_EQUALS(20, control.GetProperty(DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID).Get<int>(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -1073,6 +1073,9 @@ int UtcDaliControlResourcesReady02(void)
 
   application.SendNotification();
   application.Render();
+
+  // Wait for rasterization
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(control.IsResourceReady(), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
