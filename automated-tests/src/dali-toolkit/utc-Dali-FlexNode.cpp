@@ -90,6 +90,8 @@ int UtcDaliToolkitFlexNodeAddChildWithMarginP(void)
 
   DALI_TEST_EQUALS(actorFrame, Vector4(5.0f, 5.0f, ITEM_SIZE.width + 5, ITEM_SIZE.height + 5), TEST_LOCATION);
 
+  delete flexNode;
+
   END_TEST;
 }
 
@@ -124,6 +126,8 @@ int UtcDaliToolkitFlexNodeAddChildrenRowP(void)
 
   DALI_TEST_EQUALS(actor1Frame, Vector4(0.0f, 0.0f, ITEM_SIZE.width, ITEM_SIZE.height), TEST_LOCATION);
   DALI_TEST_EQUALS(actor2Frame, Vector4(ITEM_SIZE.width, 0.0f, ITEM_SIZE.width * 2, ITEM_SIZE.height), TEST_LOCATION);
+
+  delete flexNode;
 
   END_TEST;
 }
@@ -160,6 +164,8 @@ int UtcDaliToolkitFlexNodeAddChildrenColumnP(void)
 
   DALI_TEST_EQUALS(actor1Frame, Vector4(0.0f, 0.0f, ITEM_SIZE.width, ITEM_SIZE.height), TEST_LOCATION);
   DALI_TEST_EQUALS(actor2Frame, Vector4(0.0f, ITEM_SIZE.height, ITEM_SIZE.width, ITEM_SIZE.height * 2), TEST_LOCATION);
+
+  delete flexNode;
 
   END_TEST;
 }
@@ -282,6 +288,8 @@ int UtcDaliToolkitFlexNodeAddChildrenColumnJustify(void)
   DALI_TEST_EQUALS(actor2Frame, Vector4(root.z - ITEM_SIZE.width, root.w - (ITEM_SIZE.height * 2), root.z, root.w - ITEM_SIZE.height), TEST_LOCATION);
   DALI_TEST_EQUALS(actor3Frame, Vector4(root.z - ITEM_SIZE.width, root.w - ITEM_SIZE.height, root.z, root.w), TEST_LOCATION);
 
+  delete flexNode;
+
   END_TEST;
 }
 
@@ -305,6 +313,8 @@ int UtcDaliToolkitFlexNodeSizingP(void)
 
   DALI_TEST_EQUALS(flexNode->GetFlexWidth(), 480.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(flexNode->GetFlexHeight(), 800.0f, TEST_LOCATION);
+
+  delete flexNode;
 
   END_TEST;
 }
@@ -399,6 +409,8 @@ int UtcDaliToolkitFlexNodeWrapModeP(void)
   DALI_TEST_EQUALS(actor3Frame, Vector4(ITEM_SIZE.width * 2, 0.0f, ITEM_SIZE.width * 3, ITEM_SIZE.height), TEST_LOCATION);
   DALI_TEST_EQUALS(actor4Frame, Vector4(0.0, ITEM_SIZE.height, ITEM_SIZE.width, ITEM_SIZE.height * 2), TEST_LOCATION);
 
+  delete flexNode;
+
   END_TEST;
 }
 
@@ -441,6 +453,8 @@ int UtcDaliToolkitFlexNodeRemoveChildP(void)
   tet_printf("Actor 2 frame(%f,%f,%f,%f)\n", actor2Frame.x, actor2Frame.y, actor2Frame.z, actor2Frame.w);
 
   DALI_TEST_EQUALS(actor2Frame, Vector4(0.0f, 0.0f, ITEM_SIZE.width, ITEM_SIZE.height), TEST_LOCATION);
+
+  delete flexNode;
 
   END_TEST;
 }
@@ -486,6 +500,8 @@ int UtcDaliToolkitFlexNodeRemoveAllChildrenP(void)
   DALI_TEST_NOT_EQUALS(actor1Frame, actor1FrameRemoved, 0.1, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(actor2Frame, actor2FrameRemoved, 0.1, TEST_LOCATION);
 
+  delete flexNode;
+
   END_TEST;
 }
 
@@ -528,6 +544,8 @@ int UtcDaliToolkitFlexNodePaddingMarginP(void)
   DALI_TEST_EQUALS(actor1Frame, Vector4(5.0f, 5.0f, ITEM_SIZE.width + 5, ITEM_SIZE.height + 5), TEST_LOCATION);
   DALI_TEST_EQUALS(actor2Frame, Vector4(5 + ITEM_SIZE.width, 5.0f, (ITEM_SIZE.width * 2) + 5, ITEM_SIZE.height + 5), TEST_LOCATION);
 
+  delete flexNode;
+
   END_TEST;
 }
 
@@ -566,6 +584,8 @@ int UtcDaliToolkitFlexNodeCallbackTestP(void)
 
   DALI_TEST_EQUALS(actor1Frame, Vector4(0.0f, 0.0f, ITEM_SIZE_CALLBACK_TEST.width, ITEM_SIZE_CALLBACK_TEST.height), TEST_LOCATION);
   DALI_TEST_EQUALS(actor2Frame, Vector4(0.0f, ITEM_SIZE_CALLBACK_TEST.height, ITEM_SIZE.width, ITEM_SIZE_CALLBACK_TEST.height + ITEM_SIZE.height), TEST_LOCATION);
+
+  delete flexNode;
 
   END_TEST;
 }
@@ -642,6 +662,8 @@ int UtcDaliToolkitFlexNodeFlexPositionType(void)
   DALI_TEST_EQUALS(actor1Frame, Vector4(0.0f, 0.0f, ITEM_SIZE.width, ITEM_SIZE.height), TEST_LOCATION);
   DALI_TEST_EQUALS(actor2Frame, Vector4(0.0f, 0.0f, ITEM_SIZE.width, ITEM_SIZE.height), TEST_LOCATION);
 
+  delete flexNode;
+
   END_TEST;
 }
 
@@ -709,6 +731,8 @@ int UtcDaliToolkitFlexNodeFlexAspectRatio(void)
   */
 
   DALI_TEST_EQUALS(actor1Frame, Vector4(0.0f, 0.0f, ITEM_SIZE.width * 2, ITEM_SIZE.height), TEST_LOCATION);
+
+  delete flexNode;
 
   END_TEST;
 }
@@ -802,6 +826,8 @@ int UtcDaliToolkitFlexNodeFlexBasisShrinkGrow(void)
   DALI_TEST_EQUALS(actor1Frame, Vector4(0.0f, 0.0f, basis, ITEM_SIZE.height), TEST_LOCATION);
   DALI_TEST_EQUALS(actor2Frame, Vector4(basis, 0.0f, basis + (root.z - basis) / 2, ITEM_SIZE.height), TEST_LOCATION);
   DALI_TEST_EQUALS(actor3Frame, Vector4(basis + (root.z - basis) / 2, 0.0f, root.z, ITEM_SIZE.height), TEST_LOCATION);
+
+  delete flexNode;
 
   END_TEST;
 }
