@@ -16,6 +16,7 @@ SET(TC_SOURCES
  utc-Dali-Dictionary.cpp
  utc-Dali-FeedbackStyle.cpp
  utc-Dali-ItemView-internal.cpp
+ utc-Dali-LineHelperFunctions.cpp
  utc-Dali-LogicalModel.cpp
  utc-Dali-PropertyHelper.cpp
  utc-Dali-Text-Characters.cpp

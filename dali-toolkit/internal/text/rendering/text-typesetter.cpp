@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/line-helper-functions.h>
 #include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 #include <dali-toolkit/internal/text/rendering/styles/strikethrough-helper-functions.h>
 #include <dali-toolkit/internal/text/rendering/styles/underline-helper-functions.h>
@@ -473,58 +474,6 @@ void DrawBackgroundColor(
       bitmapBuffer += glyphData.width;
     }
   }
-}
-
-float GetPreOffsetVerticalLineAlignment(LineRun line, DevelText::VerticalLineAlignment::Type verLineAlign)
-{
-  // Calculate vertical line alignment
-  float offset = 0.0f;
-
-  switch(verLineAlign)
-  {
-    case DevelText::VerticalLineAlignment::TOP:
-    {
-      break;
-    }
-    case DevelText::VerticalLineAlignment::MIDDLE:
-    {
-      offset = line.lineSpacing * 0.5f;
-      break;
-    }
-    case DevelText::VerticalLineAlignment::BOTTOM:
-    {
-      offset = line.lineSpacing;
-      break;
-    }
-  }
-
-  return offset;
-}
-
-float GetPostOffsetVerticalLineAlignment(LineRun line, DevelText::VerticalLineAlignment::Type verLineAlign)
-{
-  // Calculate vertical line alignment
-  float offset = 0.0f;
-
-  switch(verLineAlign)
-  {
-    case DevelText::VerticalLineAlignment::TOP:
-    {
-      offset = line.lineSpacing;
-      break;
-    }
-    case DevelText::VerticalLineAlignment::MIDDLE:
-    {
-      offset = line.lineSpacing * 0.5f;
-      break;
-    }
-    case DevelText::VerticalLineAlignment::BOTTOM:
-    {
-      break;
-    }
-  }
-
-  return offset;
 }
 
 Devel::PixelBuffer DrawGlyphsBackground(const ViewModel* model, Devel::PixelBuffer& buffer, const uint32_t& bufferWidth, const uint32_t& bufferHeight, bool ignoreHorizontalAlignment, int32_t horizontalOffset, int32_t verticalOffset)
