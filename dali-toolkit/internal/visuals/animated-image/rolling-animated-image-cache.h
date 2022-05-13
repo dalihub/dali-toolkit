@@ -107,12 +107,11 @@ private:
    * @brief Request to Load a frame
    *
    * @param[in] frameIndex          index of frame to be loaded.
-   * @param[in] useCache            true if this frame loading uses cache.
    * @param[in] synchronousLoading  true if the frame should be loaded synchronously
    *
    * @return the texture set currently loaded.
    */
-  TextureSet RequestFrameLoading(uint32_t frameIndex, bool useCache, bool synchronousLoading);
+  TextureSet RequestFrameLoading(uint32_t frameIndex, bool synchronousLoading);
 
   /**
    * @brief Load the next batch of images
@@ -163,7 +162,6 @@ protected:
   void LoadComplete(bool loadSuccess, TextureInformation textureInformation) override;
 
 private:
-
   /**
    * Secondary class to hold readiness and index into url
    */

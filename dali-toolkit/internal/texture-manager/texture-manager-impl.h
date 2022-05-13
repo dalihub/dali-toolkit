@@ -120,7 +120,6 @@ public:
    * @param[in]  wrapModeU             Horizontal Wrap mode
    * @param[in]  wrapModeV             Vertical Wrap mode
    * @param[in]  synchronousLoading    true if the frame should be loaded synchronously
-   * @param[in]  useCache              true if this frame loading uses cache.
    * @param[in]  textureObserver       The client object should inherit from this and provide the "LoadCompleted" virtual.
    *                                   This is called when an image load completes (or fails).
    *
@@ -134,7 +133,6 @@ public:
                                       const Dali::WrapMode::Type&     wrapModeU,
                                       const Dali::WrapMode::Type&     wrapModeV,
                                       const bool&                     synchronousLoading,
-                                      const bool&                     useCache,
                                       TextureUploadObserver*          textureObserver);
 
   /**
@@ -456,7 +454,6 @@ private:
    * @param[in] frameIndex            The frame index of a frame to be loaded frame
    * @param[in] synchronousLoading    True if the frame should be loaded synchronously. If you skip this parameter,
    *                                  default is false.
-   * @param[in] useCache              True if the texture will be cached.
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoadInternal(
@@ -475,8 +472,7 @@ private:
     TextureManager::MultiplyOnLoad&     preMultiplyOnLoad,
     Dali::AnimatedImageLoading          animatedImageLoading,
     const std::uint32_t&                frameIndex,
-    const bool&                         synchronousLoading,
-    const bool&                         useCache);
+    const bool&                         synchronousLoading);
 
   /**
    * @brief Load a new image synchronously.
