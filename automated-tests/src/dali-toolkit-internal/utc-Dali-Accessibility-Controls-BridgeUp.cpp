@@ -537,41 +537,45 @@ int UtcDaliAccessibilityRelation(void)
   Dali::Accessibility::TestEnableSC( true );
 
   auto rel = Accessibility::RelationType::FLOWS_TO;
-  auto number = static_cast< size_t >( rel );
   auto control = Control::New();
   auto destination1 = Control::New();
   auto destination2 = Control::New();
 
   DevelControl::AppendAccessibilityRelation( control, destination1, rel );
   auto relations = DevelControl::GetAccessibilityRelations(control);
-  DALI_TEST_CHECK( relations[ number ].size() == 1 );
+  DALI_TEST_EQUALS(relations.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(relations[0].mRelationType, rel, TEST_LOCATION);
+  DALI_TEST_EQUALS(relations[0].mTargets.size(), 1u, TEST_LOCATION);
 
   DevelControl::AppendAccessibilityRelation( control, destination2, rel );
   relations = DevelControl::GetAccessibilityRelations(control);
-  DALI_TEST_CHECK( relations[ number ].size() == 2 );
+  DALI_TEST_EQUALS(relations.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(relations[0].mRelationType, rel, TEST_LOCATION);
+  DALI_TEST_EQUALS(relations[0].mTargets.size(), 2u, TEST_LOCATION);
 
   auto accessible = Dali::Accessibility::Accessible::Get( control );
   auto accessible_destination1 = Dali::Accessibility::Accessible::Get( destination1 );
   auto accessible_destination2 = Dali::Accessibility::Accessible::Get( destination2 );
   auto relationset = accessible->GetRelationSet();
 
-  DALI_TEST_CHECK( relationset[0].relationType == rel );
-  DALI_TEST_CHECK( relationset[0].targets[0] == accessible_destination1->GetAddress() || relationset[0].targets[1] == accessible_destination1->GetAddress() );
-  DALI_TEST_CHECK( relationset[0].targets[0] == accessible_destination2->GetAddress() || relationset[0].targets[1] == accessible_destination2->GetAddress() );
+  DALI_TEST_CHECK( relationset[0].mRelationType == rel );
+  DALI_TEST_CHECK( relationset[0].mTargets[0] == accessible_destination1 || relationset[0].mTargets[1] == accessible_destination1 );
+  DALI_TEST_CHECK( relationset[0].mTargets[0] == accessible_destination2 || relationset[0].mTargets[1] == accessible_destination2 );
 
   auto relationset_bridge = TestGetRelationSet( accessible -> GetAddress() );
-  DALI_TEST_CHECK( static_cast< uint32_t >( relationset[0].relationType ) == std::get<0>( relationset_bridge[0] ) );
+  DALI_TEST_CHECK( static_cast< uint32_t >( relationset[0].mRelationType ) == std::get<0>( relationset_bridge[0] ) );
 
-  DALI_TEST_CHECK( relationset[0].targets[0] == std::get<1>( relationset_bridge[0] )[0] || relationset[0].targets[1] == std::get<1>( relationset_bridge[0] )[0] );
-  DALI_TEST_CHECK( relationset[0].targets[0] == std::get<1>( relationset_bridge[0] )[1] || relationset[0].targets[1] == std::get<1>( relationset_bridge[0] )[1] );
+  DALI_TEST_CHECK( relationset[0].mTargets[0]->GetAddress() == std::get<1>( relationset_bridge[0] )[0] || relationset[0].mTargets[1]->GetAddress() == std::get<1>( relationset_bridge[0] )[0] );
+  DALI_TEST_CHECK( relationset[0].mTargets[0]->GetAddress() == std::get<1>( relationset_bridge[0] )[1] || relationset[0].mTargets[1]->GetAddress() == std::get<1>( relationset_bridge[0] )[1] );
 
-  DevelControl::RemoveAccessibilityRelation(control,destination2,rel);
+  DevelControl::RemoveAccessibilityRelation(control, destination2, rel);
   relations = DevelControl::GetAccessibilityRelations(control);
-  DALI_TEST_CHECK( relations[ number ].size() == 1 );
+  DALI_TEST_EQUALS(relations.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(relations[0].mTargets.size(), 1u, TEST_LOCATION);
 
   DevelControl::ClearAccessibilityRelations(control);
   relations = DevelControl::GetAccessibilityRelations(control);
-  DALI_TEST_CHECK( relations[ number ].size() == 0 );
+  DALI_TEST_EQUALS(relations.size(), 0u, TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC( false );
 

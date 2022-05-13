@@ -201,19 +201,17 @@ void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destinati
   }
 }
 
-std::vector<std::vector<Accessibility::Address>> GetAccessibilityRelations(Toolkit::Control control)
+std::vector<Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control control)
 {
-  std::vector<std::vector<Accessibility::Address>> result(static_cast<std::size_t>(Accessibility::RelationType::MAX_COUNT));
+  const auto&                          relations = GetControlImplementation(control).mAccessibilityRelations;
+  std::vector<Accessibility::Relation> result;
 
-  // Map every Accessible* to its Address
-  for(auto& relation : GetControlImplementation(control).mAccessibilityRelations)
+  for(auto& relation : relations)
   {
-    auto  index   = static_cast<std::size_t>(relation.first);
     auto& targets = relation.second;
 
-    std::transform(targets.begin(), targets.end(), std::back_inserter(result[index]), [](auto* x) {
-      return x->GetAddress();
-    });
+    result.emplace_back(Accessibility::Relation{relation.first, {}});
+    std::copy(targets.begin(), targets.end(), std::back_inserter(result.back().mTargets));
   }
 
   return result;
