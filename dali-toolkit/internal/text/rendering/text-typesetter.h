@@ -144,39 +144,7 @@ private:
    *
    * @return An image buffer with the text.
    */
-  Devel::PixelBuffer CreateImageBuffer(const unsigned int bufferWidth, const unsigned int bufferHeight, Typesetter::Style style, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset, TextAbstraction::GlyphIndex fromGlyphIndex, TextAbstraction::GlyphIndex toGlyphIndex);
-
-  /**
-   * @brief Create an initialized image buffer.
-   *
-   * Creates the pixel data used to generate the final image with the given size.
-   *
-   * @param[in] bufferWidth The width of the image buffer.
-   * @param[in] bufferHeight The height of the image buffer.
-   * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
-   *
-   * @return An image buffer.
-   */
-  Devel::PixelBuffer CreateImageBuffer(const unsigned int bufferWidth, const unsigned int bufferHeight, Pixel::Format pixelFormat);
-
-  /**
-   * @brief Combine the two RGBA image buffers together.
-   *
-   * The top layer buffer will blend over the bottom layer buffer:
-   * - If the pixel is not fully opaque from either buffer, it will be blended with
-   *   the pixel from the other buffer and copied to the combined buffer.
-   * - If the pixels from both buffers are fully opaque, the pixels from the top layer
-   *   buffer will be copied to the combined buffer.
-   *
-   * @param[in] topPixelBuffer The top layer buffer.
-   * @param[in] bottomPixelBuffer The bottom layer buffer.
-   * @param[in] bufferWidth The width of the image buffer.
-   * @param[in] bufferHeight The height of the image buffer.
-   *
-   * @return The combined image buffer with the text.
-   *
-   */
-  Devel::PixelBuffer CombineImageBuffer(Devel::PixelBuffer topPixelBuffer, Devel::PixelBuffer bottomPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeightbool);
+  Devel::PixelBuffer CreateImageBuffer(const uint32_t& bufferWidth, const uint32_t& bufferHeight, Typesetter::Style style, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const int32_t& horizontalOffset, const int32_t& verticalOffset, TextAbstraction::GlyphIndex fromGlyphIndex, TextAbstraction::GlyphIndex toGlyphIndex);
 
   /**
    * @brief Apply behaviour of tags if the markup-processor is enabled.
@@ -191,7 +159,7 @@ private:
    *
    * @return The image buffer with the markup.
    */
-  Devel::PixelBuffer ApplyMarkupProcessorOnPixelBuffer(Devel::PixelBuffer topPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset);
+  Devel::PixelBuffer ApplyMarkupProcessorOnPixelBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t& bufferWidth, const uint32_t& bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const int32_t& horizontalOffset, const int32_t& verticalOffset);
 
   /**
    * @brief Apply markup underline tags.
@@ -212,7 +180,7 @@ private:
    *
    * @return The image buffer with the markup.
    */
-  Devel::PixelBuffer ApplyUnderlineMarkupImageBuffer(Devel::PixelBuffer topPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset);
+  Devel::PixelBuffer ApplyUnderlineMarkupImageBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t& bufferWidth, const uint32_t& bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const int32_t& horizontalOffset, const int32_t& verticalOffset);
 
   /**
    * @brief Apply markup strikethrough tags.
@@ -233,7 +201,7 @@ private:
    *
    * @return The image buffer with the markup.
    */
-  Devel::PixelBuffer ApplyStrikethroughMarkupImageBuffer(Devel::PixelBuffer topPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset);
+  Devel::PixelBuffer ApplyStrikethroughMarkupImageBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t& bufferWidth, const uint32_t& bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const int32_t& horizontalOffset, const int32_t& verticalOffset);
 
 protected:
   /**

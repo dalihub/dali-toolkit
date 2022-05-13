@@ -644,6 +644,21 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS(strikethroughMapGet.Count(), strikethroughMapSet.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(DaliTestCheckMaps(strikethroughMapGet, strikethroughMapSet), true, TEST_LOCATION);
 
+  // Check the transparent strikethrough property for coverage.
+  strikethroughMapSet.Clear();
+  strikethroughMapSet.Insert("enable", true);
+  strikethroughMapSet.Insert("color", Color::TRANSPARENT);
+  strikethroughMapSet.Insert("height", 2.0f);
+
+  label.SetProperty(DevelTextLabel::Property::STRIKETHROUGH, strikethroughMapSet);
+
+  application.SendNotification();
+  application.Render();
+
+  strikethroughMapGet = label.GetProperty<Property::Map>(DevelTextLabel::Property::STRIKETHROUGH);
+  DALI_TEST_EQUALS(strikethroughMapGet.Count(), strikethroughMapSet.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DaliTestCheckMaps(strikethroughMapGet, strikethroughMapSet), true, TEST_LOCATION);
+
   strikethroughMapSet.Clear();
   strikethroughMapSet.Insert(Toolkit::DevelText::Strikethrough::Property::ENABLE, true);
   strikethroughMapSet.Insert(Toolkit::DevelText::Strikethrough::Property::COLOR, Color::RED);
@@ -803,6 +818,24 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS(underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(DaliTestCheckMaps(underlineMapGet, underlineMapSet), true, TEST_LOCATION);
 
+  // Check the transparent double underline property for coverage.
+  underlineMapSet.Clear();
+  underlineMapSet.Insert("enable", true);
+  underlineMapSet.Insert("color", Color::TRANSPARENT);
+  underlineMapSet.Insert("height", 1);
+  underlineMapSet.Insert("type", Text::Underline::DOUBLE);
+  underlineMapSet.Insert("dashWidth", 2);
+  underlineMapSet.Insert("dashGap", 1);
+
+  label.SetProperty(TextLabel::Property::UNDERLINE, underlineMapSet);
+
+  application.SendNotification();
+  application.Render();
+
+  underlineMapGet = label.GetProperty<Property::Map>(TextLabel::Property::UNDERLINE);
+  DALI_TEST_EQUALS(underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DaliTestCheckMaps(underlineMapGet, underlineMapSet), true, TEST_LOCATION);
+
   underlineMapSet.Clear();
   underlineMapSet.Insert(Toolkit::DevelText::Underline::Property::ENABLE, true);
   underlineMapSet.Insert(Toolkit::DevelText::Underline::Property::COLOR, Color::GREEN);
@@ -926,6 +959,19 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   backgroundMapSet["enable"] = true;
   backgroundMapSet["color"]  = Color::RED;
   label.SetProperty(DevelTextLabel::Property::BACKGROUND, backgroundMapSet);
+
+  backgroundMapGet = label.GetProperty<Property::Map>(DevelTextLabel::Property::BACKGROUND);
+  DALI_TEST_EQUALS(backgroundMapGet.Count(), backgroundMapSet.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DaliTestCheckMaps(backgroundMapGet, backgroundMapSet), true, TEST_LOCATION);
+
+  // Check the transparent background property for coverage
+  backgroundMapSet.Clear();
+  backgroundMapSet["enable"] = true;
+  backgroundMapSet["color"]  = Color::TRANSPARENT;
+  label.SetProperty(DevelTextLabel::Property::BACKGROUND, backgroundMapSet);
+
+  application.SendNotification();
+  application.Render();
 
   backgroundMapGet = label.GetProperty<Property::Map>(DevelTextLabel::Property::BACKGROUND);
   DALI_TEST_EQUALS(backgroundMapGet.Count(), backgroundMapSet.Count(), TEST_LOCATION);
