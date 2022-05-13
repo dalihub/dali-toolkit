@@ -305,42 +305,47 @@ TextureSet TextureManager::LoadTexture(
   else
   {
     // For Atlas
-    if(synchronousLoading && atlasingStatus && imageAtlasManager->CheckAtlasAvailable(url, desiredSize))
+    if(synchronousLoading && atlasingStatus)
     {
-      Devel::PixelBuffer pixelBuffer = LoadImageSynchronously(url, desiredSize, fittingMode, samplingMode, orientationCorrection);
-
-      if(maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
+      const bool synchronousAtlasAvaliable = (desiredSize != ImageDimensions() || url.IsLocalResource()) ? imageAtlasManager->CheckAtlasAvailable(url, desiredSize)
+                                                                                                         : false;
+      if(synchronousAtlasAvaliable)
       {
-        Devel::PixelBuffer maskPixelBuffer = LoadImageSynchronously(maskInfo->mAlphaMaskUrl.GetUrl(), ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true);
-        if(maskPixelBuffer)
-        {
-          pixelBuffer.ApplyMask(maskPixelBuffer, maskInfo->mContentScaleFactor, maskInfo->mCropToMask);
-        }
-      }
+        Devel::PixelBuffer pixelBuffer = LoadImageSynchronously(url, desiredSize, fittingMode, samplingMode, orientationCorrection);
 
-      PixelData data;
-      if(pixelBuffer)
-      {
-        PreMultiply(pixelBuffer, preMultiplyOnLoad);
-        data = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
-
-        if(data)
+        if(pixelBuffer && maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
         {
-          textureSet = imageAtlasManager->Add(textureRect, data);
-          if(textureSet)
+          Devel::PixelBuffer maskPixelBuffer = LoadImageSynchronously(maskInfo->mAlphaMaskUrl, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true);
+          if(maskPixelBuffer)
           {
-            textureRectSize.SetWidth(data.GetWidth());
-            textureRectSize.SetHeight(data.GetHeight());
+            pixelBuffer.ApplyMask(maskPixelBuffer, maskInfo->mContentScaleFactor, maskInfo->mCropToMask);
           }
         }
-        else
+
+        PixelData data;
+        if(pixelBuffer)
         {
-          DALI_LOG_ERROR("TextureManager::LoadTexture: Synchronous Texture loading with atlasing is failed.\n");
+          PreMultiply(pixelBuffer, preMultiplyOnLoad);
+          data = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
+
+          if(data)
+          {
+            textureSet = imageAtlasManager->Add(textureRect, data);
+            if(textureSet)
+            {
+              textureRectSize.SetWidth(data.GetWidth());
+              textureRectSize.SetHeight(data.GetHeight());
+            }
+          }
+          else
+          {
+            DALI_LOG_ERROR("TextureManager::LoadTexture: Synchronous Texture loading with atlasing is failed.\n");
+          }
         }
-      }
-      if(!textureSet)
-      {
-        atlasingStatus = false;
+        if(!textureSet)
+        {
+          atlasingStatus = false;
+        }
       }
     }
 
@@ -353,7 +358,18 @@ TextureSet TextureManager::LoadTexture(
       Dali::ImageDimensions atlasDesiredSize = desiredSize;
       if(atlasingStatus)
       {
-        textureSet = imageAtlasManager->Add(textureRect, url.GetUrl(), atlasDesiredSize, fittingMode, true, atlasObserver);
+        if(url.IsBufferResource())
+        {
+          const EncodedImageBuffer& encodedImageBuffer = GetEncodedImageBuffer(url.GetUrl());
+          if(encodedImageBuffer)
+          {
+            textureSet = imageAtlasManager->Add(textureRect, encodedImageBuffer, desiredSize, fittingMode, true, atlasObserver);
+          }
+        }
+        else
+        {
+          textureSet = imageAtlasManager->Add(textureRect, url, atlasDesiredSize, fittingMode, true, atlasObserver);
+        }
       }
       if(!textureSet) // big image, no atlasing or atlasing failed
       {

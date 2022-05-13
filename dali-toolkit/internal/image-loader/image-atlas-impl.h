@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_ATLAS_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/connection-tracker.h>
@@ -26,8 +27,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
 #include <dali-toolkit/internal/image-loader/atlas-packer.h>
-#include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
+#include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 
 namespace Dali
 {
@@ -86,6 +87,32 @@ public:
               AtlasUploadObserver* atlasUploadObserver);
 
   /**
+   * @brief Upload a resource image to the atlas by encoded buffer.
+   *
+   * @note To make the atlasing efficient, a valid size should be provided.
+   *       If size is not provided, then SegFault occured.
+   *       Do not set a size that is bigger than the actual image size, as the up-scaling is not available,
+   *       the content of the area not covered by actual image is undefined, it will not be cleared.
+   *
+   * SamplingMode::BOX_THEN_LINEAR is used to sampling pixels from the input image while fitting it to desired size.
+   *
+   * @param [out] textureRect The texture area of the resource image in the atlas.
+   * @param [in] encodedImageBuffer The encoded raw buffer of the resource image file to use.
+   * @param [in] size The width and height to fit the loaded image to.
+   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
+   * @param [in] atlasUploadObserver The observer to observe the upload state inside the ImageAtlas.
+   * @return True if there is enough space to fit this image in,false otherwise.
+   * @note The valid callback function here is required to have the signature of void( void ).
+   */
+  bool Upload(Vector4&                  textureRect,
+              const EncodedImageBuffer& encodedImageBuffer,
+              ImageDimensions           size,
+              FittingMode::Type         fittingMode,
+              bool                      orientationCorrection,
+              AtlasUploadObserver*      atlasUploadObserver);
+
+  /**
    * @copydoc Toolkit::ImageAtlas::Upload( Vector4&, PixelData )
    */
   bool Upload(Vector4& textureRect, PixelData pixelData);
@@ -117,7 +144,7 @@ private:
    *
    * @param[in] area The pixel area for uploading.
    */
-  void UploadBrokenImage(const Rect<unsigned int>& area);
+  void UploadBrokenImage(const Rect<uint32_t>& area);
 
   // Undefined
   ImageAtlas(const ImageAtlas& imageAtlas);
@@ -132,11 +159,11 @@ private:
    */
   struct LoadingTaskInfo
   {
-    LoadingTaskInfo(unsigned short       loadTaskId,
-                    unsigned int         packPositionX,
-                    unsigned int         packPositionY,
-                    unsigned int         width,
-                    unsigned int         height,
+    LoadingTaskInfo(uint32_t             loadTaskId,
+                    uint32_t             packPositionX,
+                    uint32_t             packPositionY,
+                    uint32_t             width,
+                    uint32_t             height,
                     AtlasUploadObserver* observer)
     : loadTaskId(loadTaskId),
       packRect(packPositionX, packPositionY, width, height),
@@ -144,8 +171,8 @@ private:
     {
     }
 
-    unsigned short       loadTaskId;
-    Rect<unsigned int>   packRect;
+    uint32_t             loadTaskId;
+    Rect<uint32_t>       packRect;
     AtlasUploadObserver* observer;
   };
 

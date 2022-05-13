@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-typedef unsigned char PixelBuffer;
-
 Texture ImageAtlas::PackToAtlas(const std::vector<PixelData>& pixelData, Dali::Vector<Vector4>& textureRects)
 {
   // Record each block size
@@ -68,7 +66,7 @@ Texture ImageAtlas::PackToAtlas(const std::vector<PixelData>& pixelData, Dali::V
 
     // Apply the half pixel correction to avoid the color bleeding between neighbour blocks
     textureRects[index].x = (static_cast<float>(packPositionX) + 0.5f) / atlasWidth;                                 // left
-    textureRects[index].y = (static_cast<float>(packPositionY) + 0.5f) / atlasHeight;                                // right
+    textureRects[index].y = (static_cast<float>(packPositionY) + 0.5f) / atlasHeight;                                // top
     textureRects[index].z = (static_cast<float>(packPositionX + pixelData[index].GetWidth()) - 0.5f) / atlasWidth;   // right
     textureRects[index].w = (static_cast<float>(packPositionY + pixelData[index].GetHeight()) - 0.5f) / atlasHeight; // bottom
   }
@@ -158,15 +156,15 @@ bool ImageAtlas::Upload(Vector4&             textureRect,
     }
   }
 
-  unsigned int packPositionX = 0;
-  unsigned int packPositionY = 0;
+  uint32_t packPositionX = 0;
+  uint32_t packPositionY = 0;
   if(mPacker.Pack(dimensions.GetWidth(), dimensions.GetHeight(), packPositionX, packPositionY))
   {
-    unsigned short loadId = GetImplementation(mAsyncLoader).Load(url, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
+    uint32_t loadId = GetImplementation(mAsyncLoader).Load(url, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
     mLoadingTaskInfoContainer.PushBack(new LoadingTaskInfo(loadId, packPositionX, packPositionY, dimensions.GetWidth(), dimensions.GetHeight(), atlasUploadObserver));
     // apply the half pixel correction
     textureRect.x = (static_cast<float>(packPositionX) + 0.5f) / mWidth;                      // left
-    textureRect.y = (static_cast<float>(packPositionY) + 0.5f) / mHeight;                     // right
+    textureRect.y = (static_cast<float>(packPositionY) + 0.5f) / mHeight;                     // top
     textureRect.z = (static_cast<float>(packPositionX + dimensions.GetX()) - 0.5f) / mWidth;  // right
     textureRect.w = (static_cast<float>(packPositionY + dimensions.GetY()) - 0.5f) / mHeight; // bottom
 
@@ -183,17 +181,66 @@ bool ImageAtlas::Upload(Vector4&             textureRect,
   return false;
 }
 
+bool ImageAtlas::Upload(Vector4&                  textureRect,
+                        const EncodedImageBuffer& encodedImageBuffer,
+                        ImageDimensions           size,
+                        FittingMode::Type         fittingMode,
+                        bool                      orientationCorrection,
+                        AtlasUploadObserver*      atlasUploadObserver)
+{
+  ImageDimensions zero;
+  if(size == zero) // image size not provided
+  {
+    DALI_LOG_ERROR("Desired size is zero! We need to setup desired size for Atlas.\n");
+    // EncodedImageBuffer didn't support to get closest image size.
+    // Just draw broken image.
+    if(!mBrokenImageUrl.empty())
+    {
+      return Upload(textureRect, mBrokenImageUrl, mBrokenImageSize, FittingMode::DEFAULT, true, atlasUploadObserver);
+    }
+    else
+    {
+      textureRect = Vector4::ZERO;
+      return true;
+    }
+  }
+
+  uint32_t packPositionX = 0;
+  uint32_t packPositionY = 0;
+  if(mPacker.Pack(size.GetWidth(), size.GetHeight(), packPositionX, packPositionY))
+  {
+    uint32_t loadId = GetImplementation(mAsyncLoader).LoadEncodedImageBuffer(encodedImageBuffer, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
+    mLoadingTaskInfoContainer.PushBack(new LoadingTaskInfo(loadId, packPositionX, packPositionY, size.GetWidth(), size.GetHeight(), atlasUploadObserver));
+    // apply the half pixel correction
+    textureRect.x = (static_cast<float>(packPositionX) + 0.5f) / mWidth;                // left
+    textureRect.y = (static_cast<float>(packPositionY) + 0.5f) / mHeight;               // top
+    textureRect.z = (static_cast<float>(packPositionX + size.GetX()) - 0.5f) / mWidth;  // right
+    textureRect.w = (static_cast<float>(packPositionY + size.GetY()) - 0.5f) / mHeight; // bottom
+
+    if(atlasUploadObserver)
+    {
+      // register to the observer,
+      // Not that a matching unregister call should be invoked in UploadToAtlas if the observer is still alive by then.
+      atlasUploadObserver->Register(*this);
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
 bool ImageAtlas::Upload(Vector4& textureRect, PixelData pixelData)
 {
-  unsigned int packPositionX = 0;
-  unsigned int packPositionY = 0;
+  uint32_t packPositionX = 0;
+  uint32_t packPositionY = 0;
   if(mPacker.Pack(pixelData.GetWidth(), pixelData.GetHeight(), packPositionX, packPositionY))
   {
     mAtlas.Upload(pixelData, 0u, 0u, packPositionX, packPositionY, pixelData.GetWidth(), pixelData.GetHeight());
 
     // apply the half pixel correction
     textureRect.x = (static_cast<float>(packPositionX) + 0.5f) / mWidth;                          // left
-    textureRect.y = (static_cast<float>(packPositionY) + 0.5f) / mHeight;                         // right
+    textureRect.y = (static_cast<float>(packPositionY) + 0.5f) / mHeight;                         // top
     textureRect.z = (static_cast<float>(packPositionX + pixelData.GetWidth()) - 0.5f) / mWidth;   // right
     textureRect.w = (static_cast<float>(packPositionY + pixelData.GetHeight()) - 0.5f) / mHeight; // bottom
 
@@ -228,7 +275,7 @@ void ImageAtlas::UploadToAtlas(uint32_t id, PixelData pixelData)
 {
   if(mLoadingTaskInfoContainer[0]->loadTaskId == id)
   {
-    Rect<unsigned int> packRect(mLoadingTaskInfoContainer[0]->packRect);
+    Rect<uint32_t> packRect(mLoadingTaskInfoContainer[0]->packRect);
     if(!pixelData || (pixelData.GetWidth() == 0 && pixelData.GetHeight() == 0))
     {
       if(!mBrokenImageUrl.empty()) // replace with the broken image
@@ -260,7 +307,7 @@ void ImageAtlas::UploadToAtlas(uint32_t id, PixelData pixelData)
   }
 }
 
-void ImageAtlas::UploadBrokenImage(const Rect<unsigned int>& area)
+void ImageAtlas::UploadBrokenImage(const Rect<uint32_t>& area)
 {
   Devel::PixelBuffer brokenBuffer = LoadImageFromFile(mBrokenImageUrl, ImageDimensions(area.width, area.height));
   SizeType           loadedWidth  = brokenBuffer.GetWidth();
