@@ -82,6 +82,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
       .Add(ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME)
       .Add(ImageVisual::Property::MASK_CONTENT_SCALE, 1.6f)
       .Add(ImageVisual::Property::CROP_TO_MASK, true)
+      .Add(DevelImageVisual::Property::MASKING_TYPE, DevelImageVisual::MaskingType::MASKING_ON_RENDERING)
       .Add(DevelVisual::Property::CORNER_RADIUS, 22.2f)
       .Add(DevelVisual::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::ABSOLUTE)
       .Add(DevelVisual::Property::BORDERLINE_WIDTH, 33.3f)
@@ -132,6 +133,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
 
+  value = resultMap.Find(DevelImageVisual::Property::MASKING_TYPE, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+
   Vector2 naturalSize;
   animatedImageVisual.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS(naturalSize, Vector2(100, 100), TEST_LOCATION);
@@ -176,6 +181,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
       .Add("alphaMaskUrl", TEST_MASK_IMAGE_FILE_NAME)
       .Add("maskContentScale", 1.6f)
       .Add("cropToMask", true)
+      .Add(DevelImageVisual::Property::MASKING_TYPE, DevelImageVisual::MaskingType::MASKING_ON_RENDERING)
       .Add("cornerRadius", Vector4(50.0f, 25.0f, 12.5f, 33.0f))
       .Add("cornerRadiusPolicy", Visual::Transform::Policy::RELATIVE)
       .Add("borderlineWidth", 20.0f)
@@ -248,6 +254,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
 
+  value = resultMap.Find(DevelImageVisual::Property::MASKING_TYPE, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+
   END_TEST;
 }
 
@@ -275,6 +285,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
       .Add("alphaMaskUrl", TEST_MASK_IMAGE_FILE_NAME)
       .Add("maskContentScale", 1.6f)
       .Add("cropToMask", true)
+      .Add(DevelImageVisual::Property::MASKING_TYPE, DevelImageVisual::MaskingType::MASKING_ON_RENDERING)
       .Add("cornerRadius", 50.5f));
 
   Property::Map resultMap;
@@ -342,6 +353,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
   value = resultMap.Find(ImageVisual::Property::CROP_TO_MASK, "cropToMask");
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+
+  value = resultMap.Find(DevelImageVisual::Property::MASKING_TYPE, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<bool>() == DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
 
   END_TEST;
 }
@@ -525,10 +540,11 @@ int UtcDaliAnimatedImageVisualSynchronousLoading(void)
   END_TEST;
 }
 
-int UtcDaliAnimatedImageVisualSynchronousLoadingWithAlphaMask(void)
+int UtcDaliAnimatedImageVisualSynchronousLoadingWithAlphaMask01(void)
 {
   ToolkitTestApplication application;
-  TestGlAbstraction&     gl = application.GetGlAbstraction();
+  tet_infoline("UtcDaliAnimatedImageVisualSynchronousLoadingWithAlphaMask01 for CPU Alpha Masking");
+  TestGlAbstraction& gl = application.GetGlAbstraction();
 
   {
     Property::Map propertyMap;
@@ -570,6 +586,64 @@ int UtcDaliAnimatedImageVisualSynchronousLoadingWithAlphaMask(void)
 
     DALI_TEST_EQUALS(Test::GetTimerCount(), 1, TEST_LOCATION);
     DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 2, TEST_LOCATION);
+
+    dummyControl.Unparent();
+  }
+  tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualSynchronousLoadingWithAlphaMask02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualSynchronousLoadingWithAlphaMask02 for GPU Alpha Masking");
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+    propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
+    propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 2);
+    propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+    propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+    propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME);
+    propertyMap.Insert(DevelImageVisual::Property::MASKING_TYPE, DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+    propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS, 0.23f);
+    propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::ABSOLUTE);
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+    Property::Map testMap;
+    visual.CreatePropertyMap(testMap);
+    DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL), Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION);
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(dummyControl);
+
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    application.SendNotification();
+    application.Render(20);
+
+    // The first frame is loaded synchronously and load next batch with masking
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(Test::GetTimerCount(), 1, TEST_LOCATION);
+    DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 4, TEST_LOCATION);
 
     dummyControl.Unparent();
   }
@@ -894,7 +968,8 @@ int UtcDaliAnimatedImageVisualAnimatedImage01(void)
 int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask01(void)
 {
   ToolkitTestApplication application;
-  TestGlAbstraction&     gl = application.GetGlAbstraction();
+  tet_infoline("UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask01 for CPU Alpha Masking");
+  TestGlAbstraction& gl = application.GetGlAbstraction();
 
   {
     Property::Map propertyMap;
@@ -925,6 +1000,100 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask01(void)
     application.Render(20);
 
     DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 2, TEST_LOCATION);
+
+    dummyControl.Unparent();
+  }
+  tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.SendNotification();
+  application.Render(20);
+  DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask02 for GPU Alpha Masking");
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+    propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
+    propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 4);
+    propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+    propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME);
+    propertyMap.Insert(DevelImageVisual::Property::MASKING_TYPE, DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(dummyControl);
+
+    application.SendNotification();
+    application.Render();
+
+    // load two frame(batch size), load mask image, and request two masking
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 3, TEST_LOCATION);
+
+    dummyControl.Unparent();
+  }
+  tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.SendNotification();
+  application.Render(20);
+  DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask03 for GPU Alpha Masking with broken mask texture");
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+    propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
+    propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 4);
+    propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+    propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, "");
+    propertyMap.Insert(DevelImageVisual::Property::MASKING_TYPE, DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(dummyControl);
+
+    application.SendNotification();
+    application.Render();
+
+    // load two frame(batch size), load mask image, and request two masking
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 3, TEST_LOCATION);
 
     dummyControl.Unparent();
   }

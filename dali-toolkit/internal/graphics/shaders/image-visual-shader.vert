@@ -4,6 +4,9 @@
 #ifndef IS_REQUIRED_BORDERLINE
 #define IS_REQUIRED_BORDERLINE 0
 #endif
+#ifndef IS_REQUIRED_ALPHA_MASKING
+#define IS_REQUIRED_ALPHA_MASKING 0
+#endif
 
 INPUT mediump vec2 aPosition;
 OUTPUT mediump vec2 vTexCoord;
@@ -33,6 +36,11 @@ uniform mediump float borderlineOffset;
 #if IS_REQUIRED_ROUNDED_CORNER
 uniform mediump vec4 cornerRadius;
 uniform mediump float cornerRadiusPolicy;
+#endif
+#if IS_REQUIRED_ALPHA_MASKING
+OUTPUT  mediump vec2  vMaskTexCoord;
+uniform lowp    float cropToMask;
+uniform mediump vec2  maskTextureRatio;
 #endif
 uniform mediump vec2 extraSize;
 
@@ -68,7 +76,18 @@ vec4 ComputeVertexPosition()
   mediump vec2 vPosition = aPosition * visualSize;
 #endif
 
-  vTexCoord = pixelArea.xy + pixelArea.zw * (vPosition.xy / max(vec2(1.0), visualSize) + vec2(0.5));
+  vec4 finalPixelArea = pixelArea;
+#if IS_REQUIRED_ALPHA_MASKING
+  finalPixelArea = mix(pixelArea,
+                       vec4(
+                            vec2(0.5) + (pixelArea.xy - vec2(0.5)) * maskTextureRatio,
+                            pixelArea.zw * maskTextureRatio
+                       ),
+                       cropToMask);
+  vMaskTexCoord = pixelArea.xy + pixelArea.zw * (vPosition.xy / max(vec2(1.0), visualSize) + vec2(0.5));
+#endif
+  vTexCoord = finalPixelArea.xy + finalPixelArea.zw * (vPosition.xy / max(vec2(1.0), visualSize) + vec2(0.5));
+
   return vec4(vPosition + anchorPoint * visualSize + (visualOffset + origin) * uSize.xy, 0.0, 1.0);
 }
 
