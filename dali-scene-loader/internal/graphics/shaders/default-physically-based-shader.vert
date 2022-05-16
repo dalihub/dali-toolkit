@@ -58,7 +58,7 @@ uniform int uBlendShapeComponentSize;                               ///< The siz
 
 void main()
 {
-  vec4 position = vec4(aPosition, 1.0);
+  highp vec4 position = vec4(aPosition, 1.0);
   vec3 normal = aNormal;
   vec3 tangent = aTangent.xyz;
 
@@ -130,7 +130,7 @@ void main()
 #endif
 
 #ifdef SKINNING
-  mat4 bone = uBone[int(aJoints.x)] * aWeights.x +
+  highp mat4 bone = uBone[int(aJoints.x)] * aWeights.x +
     uBone[int(aJoints.y)] * aWeights.y +
     uBone[int(aJoints.z)] * aWeights.z +
     uBone[int(aJoints.w)] * aWeights.w;
@@ -139,12 +139,12 @@ void main()
   tangent = (bone * vec4(tangent, 0.0)).xyz;
 #endif
 
-  vec4 positionW = uModelMatrix * position;
-  vec4 positionV = uViewMatrix * positionW;
+  highp vec4 positionW = uModelMatrix * position;
+  highp vec4 positionV = uViewMatrix * positionW;
 
   vPositionToCamera = transpose(mat3(uViewMatrix)) * -vec3(positionV.xyz / positionV.w);
 
-  lowp vec3 bitangent = cross(normal, tangent);
+  vec3 bitangent = cross(normal, tangent);
 #ifdef VEC4_TANGENT
   bitangent *= aTangent.w;
 #endif
