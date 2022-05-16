@@ -139,6 +139,7 @@ TextureManager::~TextureManager()
 }
 
 TextureSet TextureManager::LoadAnimatedImageTexture(
+  const VisualUrl&                url,
   Dali::AnimatedImageLoading      animatedImageLoading,
   const uint32_t&                 frameIndex,
   TextureManager::TextureId&      textureId,
@@ -200,7 +201,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
     }
 
     auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-    textureId        = RequestLoadInternal(animatedImageLoading.GetUrl(), alphaMaskId, contentScaleFactor, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, UseAtlas::NO_ATLAS, cropToMask, StorageType::UPLOAD_TO_TEXTURE, textureObserver, true, TextureManager::ReloadPolicy::CACHED, preMultiply, animatedImageLoading, frameIndex, false);
+    textureId        = RequestLoadInternal(url, alphaMaskId, contentScaleFactor, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, UseAtlas::NO_ATLAS, cropToMask, StorageType::UPLOAD_TO_TEXTURE, textureObserver, true, TextureManager::ReloadPolicy::CACHED, preMultiply, animatedImageLoading, frameIndex, false);
 
     TextureManager::LoadState loadState = mTextureCacheManager.GetTextureStateInternal(textureId);
     if(loadState == TextureManager::LoadState::UPLOADED)

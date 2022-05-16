@@ -27,16 +27,16 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
 
-#define LOG_CACHE                                                                                                                 \
-  {                                                                                                                               \
-    std::ostringstream oss;                                                                                                       \
-    oss << "Size:" << mQueue.Count() << " [ ";                                                                                    \
-    for(std::size_t _i = 0; _i < mQueue.Count(); ++_i)                                                                            \
-    {                                                                                                                             \
-      oss << _i << "={ frm#: " << mQueue[_i].mFrameNumber << " tex: " << mImageUrls[mQueue[_i].mFrameNumber].mTextureId << "}, "; \
-    }                                                                                                                             \
-    oss << " ]" << std::endl;                                                                                                     \
-    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "%s", oss.str().c_str());                                                    \
+#define LOG_CACHE                                                                                                       \
+  {                                                                                                                     \
+    std::ostringstream oss;                                                                                             \
+    oss << "Size:" << mQueue.Count() << " [ ";                                                                          \
+    for(std::size_t _i = 0; _i < mQueue.Count(); ++_i)                                                                  \
+    {                                                                                                                   \
+      oss << _i << "={ frm#: " << mQueue[_i].mFrameNumber << " tex: " << mTextureIds[mQueue[_i].mFrameNumber] << "}, "; \
+    }                                                                                                                   \
+    oss << " ]" << std::endl;                                                                                           \
+    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "%s", oss.str().c_str());                                          \
   }
 
 #else
@@ -67,6 +67,7 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&            
                                                      uint16_t                            batchSize,
                                                      bool                                isSynchronousLoading)
 : ImageCache(textureManager, maskingData, observer, batchSize, 0u),
+  mImageUrl(animatedImageLoading.GetUrl()),
   mAnimatedImageLoading(animatedImageLoading),
   mFrameCount(SINGLE_IMAGE_COUNT),
   mFrameIndex(FIRST_FRAME_INDEX),
@@ -74,7 +75,7 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&            
   mQueue(cacheSize),
   mIsSynchronousLoading(isSynchronousLoading)
 {
-  mImageUrls.resize(mFrameCount);
+  mTextureIds.resize(mFrameCount);
   mIntervals.assign(mFrameCount, 0);
 }
 
@@ -191,7 +192,8 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
   mLoadState = TextureManager::LoadState::LOADING;
 
   TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
-  TextureSet                textureSet    = mTextureManager.LoadAnimatedImageTexture(mAnimatedImageLoading,
+  TextureSet                textureSet    = mTextureManager.LoadAnimatedImageTexture(mImageUrl,
+                                                                   mAnimatedImageLoading,
                                                                    frameIndex,
                                                                    loadTextureId,
                                                                    mMaskingData,
@@ -201,7 +203,7 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                    synchronousLoading,
                                                                    this);
 
-  mImageUrls[frameIndex].mTextureId = loadTextureId;
+  mTextureIds[frameIndex] = loadTextureId;
 
   return textureSet;
 }
@@ -252,14 +254,14 @@ TextureSet RollingAnimatedImageCache::GetFrontTextureSet() const
 
 TextureManager::TextureId RollingAnimatedImageCache::GetCachedTextureId(int index) const
 {
-  return mImageUrls[mQueue[index].mFrameNumber].mTextureId;
+  return mTextureIds[mQueue[index].mFrameNumber];
 }
 
 void RollingAnimatedImageCache::PopFrontCache()
 {
   ImageFrame imageFrame = mQueue.PopFront();
-  mTextureManager.Remove(mImageUrls[imageFrame.mFrameNumber].mTextureId, this);
-  mImageUrls[imageFrame.mFrameNumber].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+  mTextureManager.Remove(mTextureIds[imageFrame.mFrameNumber], this);
+  mTextureIds[imageFrame.mFrameNumber] = TextureManager::INVALID_TEXTURE_ID;
 
   if(mMaskingData && mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
   {
@@ -296,7 +298,7 @@ void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet text
     if(mFrameCount != mAnimatedImageLoading.GetImageCount())
     {
       mFrameCount = mAnimatedImageLoading.GetImageCount();
-      mImageUrls.resize(mFrameCount);
+      mTextureIds.resize(mFrameCount);
       mIntervals.assign(mFrameCount, 0u);
     }
 

@@ -170,12 +170,13 @@ private:
     uint32_t mFrameNumber = 0u;
     bool     mReady       = false;
   };
+  std::vector<TextureManager::TextureId> mTextureIds;
 
+  VisualUrl                  mImageUrl;
   Dali::AnimatedImageLoading mAnimatedImageLoading;
   uint32_t                   mFrameCount;
   uint32_t                   mFrameIndex;
   uint32_t                   mCacheSize;
-  std::vector<UrlStore>      mImageUrls;
   std::vector<int32_t>       mIntervals;
   std::vector<uint32_t>      mLoadWaitingQueue;
   CircularQueue<ImageFrame>  mQueue;

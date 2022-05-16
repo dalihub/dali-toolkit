@@ -47,7 +47,7 @@ public:
   struct UrlStore
   {
     TextureManager::TextureId mTextureId = TextureManager::INVALID_TEXTURE_ID;
-    std::string               mUrl;
+    VisualUrl                 mUrl;
   };
 
   /**

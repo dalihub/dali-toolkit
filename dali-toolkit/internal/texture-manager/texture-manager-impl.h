@@ -112,6 +112,7 @@ public:
    * The parameters are used to specify how the animated image is loaded.
    * The observer has the LoadComplete method called when the load is ready.
    *
+   * @param[in]  url                   The URL of the image to load
    * @param[in]  animatedImageLoading  The AnimatedImageLoading that contain the animated image information
    * @param[in]  frameIndex            The frame index to load.
    * @param[out] textureId             The textureId of the frame
@@ -125,7 +126,8 @@ public:
    *
    * @return                           The texture set containing the frame of animated image, or empty if still loading.
    */
-  TextureSet LoadAnimatedImageTexture(Dali::AnimatedImageLoading      animatedImageLoading,
+  TextureSet LoadAnimatedImageTexture(const VisualUrl&                url,
+                                      Dali::AnimatedImageLoading      animatedImageLoading,
                                       const uint32_t&                 frameIndex,
                                       TextureManager::TextureId&      textureId,
                                       MaskingDataPointer&             maskInfo,

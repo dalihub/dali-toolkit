@@ -484,17 +484,16 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
   const bool&                           cropToMask,
   const std::uint32_t&                  frameIndex)
 {
-  std::vector<std::uint8_t> hashTarget(url.GetUrl().begin(), url.GetUrl().end());
-  const size_t              urlLength = hashTarget.size();
-  const uint16_t            width     = size.GetWidth();
-  const uint16_t            height    = size.GetWidth();
+  std::vector<std::uint8_t> hashTarget;
+  const uint16_t            width  = size.GetWidth();
+  const uint16_t            height = size.GetWidth();
 
   // If either the width or height has been specified, include the resizing options in the hash
   if(width != 0 || height != 0)
   {
     // We are appending 5 bytes to the URL to form the hash input.
-    hashTarget.resize(urlLength + 5u);
-    std::uint8_t* hashTargetPtr = &(hashTarget[urlLength]);
+    hashTarget.resize(5u);
+    std::uint8_t* hashTargetPtr = &(hashTarget[0u]);
 
     // Pack the width and height (4 bytes total).
     *hashTargetPtr++ = size.GetWidth() & 0xff;
@@ -509,19 +508,19 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
   else
   {
     // We are not including sizing information, but we still need an extra byte for atlasing.
-    hashTarget.resize(urlLength + 1u);
+    hashTarget.resize(1u);
 
     // Add the atlasing to the hash input.
     switch(useAtlas)
     {
       case UseAtlas::NO_ATLAS:
       {
-        hashTarget[urlLength] = 'f';
+        hashTarget[0u] = 'f';
         break;
       }
       case UseAtlas::USE_ATLAS:
       {
-        hashTarget[urlLength] = 't';
+        hashTarget[0u] = 't';
         break;
       }
     }
@@ -560,7 +559,7 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
     }
   }
 
-  return Dali::CalculateHash(hashTarget);
+  return url.GetUrlHash() ^ Dali::CalculateHash(hashTarget);
 }
 
 TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(

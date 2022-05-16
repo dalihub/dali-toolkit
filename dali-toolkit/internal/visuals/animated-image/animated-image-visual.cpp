@@ -266,7 +266,7 @@ void AnimatedImageVisual::GetNaturalSize(Vector2& naturalSize)
     }
     else if(mImageUrls && mImageUrls->size() > 0)
     {
-      mImageSize = Dali::GetClosestImageSize((*mImageUrls)[0].mUrl);
+      mImageSize = Dali::GetClosestImageSize((*mImageUrls)[0].mUrl.GetUrl());
     }
   }
 
@@ -292,7 +292,7 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
     Property::Array urls;
     for(unsigned int i = 0; i < mImageUrls->size(); ++i)
     {
-      urls.Add((*mImageUrls)[i].mUrl);
+      urls.Add((*mImageUrls)[i].mUrl.GetUrl());
     }
     Property::Value value(const_cast<Property::Array&>(urls));
     map.Insert(Toolkit::ImageVisual::Property::URL, value);

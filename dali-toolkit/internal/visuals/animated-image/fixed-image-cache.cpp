@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace Internal
 {
 namespace
 {
-constexpr bool ENABLE_ORIENTATION_CORRECTION(true);
+constexpr bool     ENABLE_ORIENTATION_CORRECTION(true);
 constexpr uint32_t FIRST_FRAME_INDEX = 0u;
 } // namespace
 
@@ -112,8 +112,8 @@ void FixedImageCache::LoadBatch()
   // Once the cache is filled, no more images are loaded.
   for(unsigned int i = 0; i < mBatchSize && mReadyFlags.size() < mImageUrls.size(); ++i)
   {
-    uint32_t frameIndex = mReadyFlags.size();
-    std::string& url = mImageUrls[frameIndex].mUrl;
+    uint32_t   frameIndex = mReadyFlags.size();
+    VisualUrl& url        = mImageUrls[frameIndex].mUrl;
 
     mReadyFlags.push_back(false);
 
@@ -121,16 +121,16 @@ void FixedImageCache::LoadBatch()
     // from within this method. This means it won't yet have a texture id, so we
     // need to account for this inside the LoadComplete method using mRequestingLoad.
     mRequestingLoad = true;
-    mLoadState = TextureManager::LoadState::LOADING;
+    mLoadState      = TextureManager::LoadState::LOADING;
 
-    bool                               synchronousLoading = false;
-    bool                               atlasingStatus     = false;
-    bool                               loadingStatus      = false;
-    AtlasUploadObserver*               atlasObserver      = nullptr;
-    ImageAtlasManagerPtr               imageAtlasManager  = nullptr;
-    Vector4                            textureRect;
-    Dali::ImageDimensions              textureRectSize;
-    auto                               preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+    bool                  synchronousLoading = false;
+    bool                  atlasingStatus     = false;
+    bool                  loadingStatus      = false;
+    AtlasUploadObserver*  atlasObserver      = nullptr;
+    ImageAtlasManagerPtr  imageAtlasManager  = nullptr;
+    Vector4               textureRect;
+    Dali::ImageDimensions textureRectSize;
+    auto                  preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     mTextureManager.LoadTexture(
       url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, mMaskingData, synchronousLoading, mImageUrls[frameIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
@@ -181,7 +181,7 @@ void FixedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureI
 {
   if(loadSuccess)
   {
-    mLoadState = TextureManager::LoadState::LOAD_FINISHED;
+    mLoadState           = TextureManager::LoadState::LOAD_FINISHED;
     bool frontFrameReady = IsFrontReady();
     if(!mRequestingLoad)
     {
