@@ -18,6 +18,7 @@ SET(TC_SOURCES
  utc-Dali-ItemView-internal.cpp
  utc-Dali-LogicalModel.cpp
  utc-Dali-PropertyHelper.cpp
+ utc-Dali-Text-AbstractStyleCharacterRun.cpp
  utc-Dali-Text-Characters.cpp
  utc-Dali-Text-CharacterSetConversion.cpp
  utc-Dali-Text-Circular.cpp

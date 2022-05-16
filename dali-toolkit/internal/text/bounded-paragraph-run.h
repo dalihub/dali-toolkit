@@ -22,7 +22,7 @@
 #include <dali/public-api/math/vector2.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/character-run.h>
+#include <dali-toolkit/internal/text/abstract-style-character-run.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
 namespace Dali
@@ -40,13 +40,13 @@ namespace Text
  * Bounded-paragraph could contain multi paragraphs that have been breaked by Paragraph Separators or appropriate Newline Functions.
  * This will be used to handle information for the attributes of markup tag. Like TextAlign, TextDirection, TextIndent, LineHeight, etc.
  */
-struct BoundedParagraphRun
+struct BoundedParagraphRun : public AbstractStyleCharacterRun
 {
   /**
    * Default constructor to set the default values of bitfields
    */
   BoundedParagraphRun()
-  : characterRun{},
+  : AbstractStyleCharacterRun(),
     horizontalAlignment(Text::HorizontalAlignment::BEGIN),
     relativeLineSize(1),
     horizontalAlignmentDefined{false},
@@ -54,7 +54,6 @@ struct BoundedParagraphRun
   {
   }
 
-  CharacterRun                    characterRun;                   ///< The initial character index within the whole text and the number of characters of the run.
   Text::HorizontalAlignment::Type horizontalAlignment;            ///< The paragraph horizontal alignment. Values "BEGIN" "CENTER" "END".
   float                           relativeLineSize;               ///< The relative line height to be used for this paragaraph.
   bool                            horizontalAlignmentDefined : 1; ///< Whether the horizontal alignment is defined.
@@ -64,6 +63,16 @@ struct BoundedParagraphRun
 } // namespace Text
 
 } // namespace Toolkit
+
+// Allow BoundedParagraphRun to be treated as a POD type
+template<>
+struct TypeTraits<Dali::Toolkit::Text::BoundedParagraphRun> : public Dali::BasicTypes<Dali::Toolkit::Text::BoundedParagraphRun>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 } // namespace Dali
 

@@ -18,11 +18,8 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/math/vector4.h>
-
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/character-run.h>
+#include <dali-toolkit/internal/text/abstract-style-character-run.h>
 
 namespace Dali
 {
@@ -33,19 +30,19 @@ namespace Text
 /**
  * @brief Run of character-spacing characters with same properties.
  */
-struct CharacterSpacingCharacterRun
+struct CharacterSpacingCharacterRun : public AbstractStyleCharacterRun
 {
   /**
-   * Default constructor to set the default values of bitfields
+   * @brief Constructor.
+   * Default constructor to set the default values
    */
   CharacterSpacingCharacterRun()
-  : characterRun{},
+  : AbstractStyleCharacterRun(),
     value{0.f} //The default value is 0.f which does nothing.
   {
   }
 
-  CharacterRun characterRun; ///< The initial character index and the number of characters of the run.
-  float        value;        /// The spaces between characters in Pixels. A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
+  float value; /// The spaces between characters in Pixels. A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
 
   //TODO: Add unit property to choose between Pixel or Scale (%)
 };
@@ -53,6 +50,16 @@ struct CharacterSpacingCharacterRun
 } // namespace Text
 
 } // namespace Toolkit
+
+// Allow ColorRun to be treated as a POD type
+template<>
+struct TypeTraits<Dali::Toolkit::Text::CharacterSpacingCharacterRun> : public Dali::BasicTypes<Dali::Toolkit::Text::CharacterSpacingCharacterRun>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 } // namespace Dali
 
