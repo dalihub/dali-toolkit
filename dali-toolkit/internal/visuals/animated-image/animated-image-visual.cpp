@@ -163,7 +163,7 @@ AnimatedImageVisualPtr AnimatedImageVisual::New(VisualFactoryCache& factoryCache
 
 void AnimatedImageVisual::InitializeAnimatedImage(const VisualUrl& imageUrl)
 {
-  mImageUrl = imageUrl;
+  mImageUrl             = imageUrl;
   mAnimatedImageLoading = AnimatedImageLoading::New(imageUrl.GetUrl(), imageUrl.IsLocalResource());
 }
 
@@ -253,7 +253,7 @@ void AnimatedImageVisual::GetNaturalSize(Vector2& naturalSize)
       ImageDimensions dimensions = Dali::GetClosestImageSize(mMaskingData->mAlphaMaskUrl.GetUrl());
       if(dimensions != ImageDimensions(0, 0))
       {
-        mImageSize = dimensions;
+        mImageSize    = dimensions;
         naturalSize.x = dimensions.GetWidth();
         naturalSize.y = dimensions.GetHeight();
         return;
@@ -307,8 +307,7 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::FRAME_DELAY, static_cast<int>(mFrameDelay));
   map.Insert(Toolkit::DevelImageVisual::Property::LOOP_COUNT, static_cast<int>(mLoopCount));
   map.Insert(Toolkit::DevelImageVisual::Property::CURRENT_FRAME_NUMBER, (mImageCache) ? static_cast<int32_t>(mImageCache->GetCurrentFrameIndex()) : -1);
-  map.Insert(Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, (mImageCache) ? static_cast<int32_t>((mAnimatedImageLoading) ? mAnimatedImageLoading.GetImageCount() : 
-                                                                                                                                     mImageCache->GetTotalFrameCount()) : -1);
+  map.Insert(Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, (mImageCache) ? static_cast<int32_t>((mAnimatedImageLoading) ? mAnimatedImageLoading.GetImageCount() : mImageCache->GetTotalFrameCount()) : -1);
 
   map.Insert(Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, mStopBehavior);
 
@@ -358,7 +357,7 @@ void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const
     {
       // STOP reset functionality will actually be done in a future change
       // Stop will be executed on next timer tick
-      mActionStatus = DevelAnimatedImageVisual::Action::STOP;
+      mActionStatus     = DevelAnimatedImageVisual::Action::STOP;
       mCurrentLoopIndex = FIRST_LOOP;
       if(IsOnScene())
       {
@@ -578,11 +577,11 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
       value.Get(sync);
       if(sync)
       {
-        mImpl->mFlags |= Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+        mImpl->mFlags |= Visual::Base::Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
       }
       else
       {
-        mImpl->mFlags &= ~Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+        mImpl->mFlags &= ~Visual::Base::Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
       }
       break;
     }
@@ -640,8 +639,8 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
 
 void AnimatedImageVisual::DoSetOnScene(Actor& actor)
 {
-  mStartFirstFrame      = true;
-  mPlacementActor       = actor;
+  mStartFirstFrame = true;
+  mPlacementActor  = actor;
   PrepareTextureSet();
 }
 
@@ -666,9 +665,9 @@ void AnimatedImageVisual::DoSetOffScene(Actor& actor)
   }
 
   mPlacementActor.Reset();
-  mStartFirstFrame = false;
+  mStartFirstFrame   = false;
   mCurrentFrameIndex = FIRST_FRAME_INDEX;
-  mCurrentLoopIndex = FIRST_LOOP;
+  mCurrentLoopIndex  = FIRST_LOOP;
 }
 
 void AnimatedImageVisual::OnSetTransform()
