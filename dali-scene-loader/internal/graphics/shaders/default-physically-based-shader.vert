@@ -1,8 +1,8 @@
+#version 300 es
+
 // Original Code
 // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/glTF-WebGL-PBR/shaders/pbr-vert.glsl
 // Commit dc84b5e374fb3d23153d2248a338ef88173f9eb6
-
-#version 300 es
 
 #ifdef HIGHP
   precision highp float;
