@@ -256,18 +256,18 @@ Shader ColorVisual::GenerateShader() const
     std::string fragmentShaderPrefixList;
     if(roundedCorner)
     {
-      vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
     }
     if(blur)
     {
-      vertexShaderPrefixList += "#define IS_REQUIRED_BLUR 1\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_BLUR 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_BLUR\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_BLUR\n";
     }
     if(borderline)
     {
-      vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
     }
     shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_VERT.data(),
                          Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());

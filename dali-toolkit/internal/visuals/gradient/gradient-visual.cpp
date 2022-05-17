@@ -391,21 +391,21 @@ Shader GradientVisual::GenerateShader() const
 
     if(roundedCorner)
     {
-      vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
     }
     if(borderline)
     {
-      vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
     }
     if(radialGradient)
     {
-      fragmentShaderPrefixList += "#define RADIAL 1\n";
+      fragmentShaderPrefixList += "#define RADIAL\n";
     }
     if(userspaceUnit)
     {
-      vertexShaderPrefixList += "#define USER_SPACE 1\n";
+      vertexShaderPrefixList += "#define USER_SPACE\n";
     }
 
     shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_VERT.data(),
