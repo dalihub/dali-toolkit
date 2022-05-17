@@ -620,16 +620,16 @@ void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sa
     ++textureSetIndex;
   }
 
-  if(styleEnabled && info.styleBuffer)
+  if(styleEnabled && info.styleBuffer && info.overlayStyleBuffer)
   {
     PixelData styleData = ConvertToPixelData(info.styleBuffer, info.width, info.height, info.offsetPosition, Pixel::RGBA8888);
     AddTexture(textureSet, styleData, sampler, textureSetIndex);
     ++textureSetIndex;
-  }
 
-  if(styleEnabled && isOverlayStyle && info.styleBuffer)
-  {
-    PixelData overlayStyleData = ConvertToPixelData(info.styleBuffer, info.width, info.height, info.offsetPosition, Pixel::RGBA8888);
+    // TODO : We need to seperate whether use overlayStyle or not.
+    // Current text visual shader required both of them.
+
+    PixelData overlayStyleData = ConvertToPixelData(info.overlayStyleBuffer, info.width, info.height, info.offsetPosition, Pixel::RGBA8888);
     AddTexture(textureSet, overlayStyleData, sampler, textureSetIndex);
     ++textureSetIndex;
   }
@@ -711,6 +711,14 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
       PixelData                             styleData      = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888);
       Dali::DevelPixelData::PixelDataBuffer stylePixelData = Dali::DevelPixelData::ReleasePixelDataBuffer(styleData);
       info.styleBuffer                                     = stylePixelData.buffer;
+
+      // TODO : We need to seperate whether use overlayStyle or not.
+      // Current text visual shader required both of them.
+
+      // Create RGBA texture for all the overlay styles
+      PixelData                             overlayStyleData      = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_OVERLAY_STYLE, false, Pixel::RGBA8888);
+      Dali::DevelPixelData::PixelDataBuffer overlayStylePixelData = Dali::DevelPixelData::ReleasePixelDataBuffer(overlayStyleData);
+      info.overlayStyleBuffer                                     = overlayStylePixelData.buffer;
     }
 
     if(containsColorGlyph && !hasMultipleTextColors)
@@ -797,6 +805,10 @@ TextureSet TextVisual::GetTextTexture(const Vector2& size, bool hasMultipleTextC
     PixelData styleData = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888);
     AddTexture(textureSet, styleData, sampler, textureSetIndex);
     ++textureSetIndex;
+
+    // TODO : We need to seperate whether use overlayStyle or not.
+    // Current text visual shader required both of them.
+
     // Create RGBA texture for overlay styles such as underline and strikethrough (without the text itself)
     PixelData overlayStyleData = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_OVERLAY_STYLE, false, Pixel::RGBA8888);
     AddTexture(textureSet, overlayStyleData, sampler, textureSetIndex);
