@@ -152,9 +152,9 @@ public:
    * @bried Apply the rasterized image to the visual.
    *
    * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
-   * @param[in] bool Whether the resource is loaded
+   * @param[in] success Whether the task succeeds.
    */
-  void ApplyRasterizedImage(PixelData rasterizedPixelData, bool isLoaded);
+  void ApplyRasterizedImage(PixelData rasterizedPixelData, bool success);
 
 private:
   /**

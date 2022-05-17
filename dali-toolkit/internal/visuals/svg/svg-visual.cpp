@@ -87,6 +87,20 @@ void SvgVisual::OnInitialize()
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
   mImpl->mRenderer  = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
+
+  Vector2 dpi     = Stage::GetCurrent().GetDpi();
+  float   meanDpi = (dpi.height + dpi.width) * 0.5f;
+
+  SvgTaskPtr newTask = new SvgLoadingTask(this, mVectorRenderer, mImageUrl, meanDpi);
+
+  if(IsSynchronousLoadingRequired() && mImageUrl.IsLocalResource())
+  {
+    newTask->Process();
+  }
+  else
+  {
+    mFactoryCache.GetSVGRasterizationThread()->AddTask(newTask);
+  }
 }
 
 void SvgVisual::DoSetProperties(const Property::Map& propertyMap)
@@ -242,16 +256,12 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
     unsigned int width  = static_cast<unsigned int>(size.width);
     unsigned int height = static_cast<unsigned int>(size.height);
 
-    Vector2 dpi     = Stage::GetCurrent().GetDpi();
-    float   meanDpi = (dpi.height + dpi.width) * 0.5f;
-
-    RasterizingTaskPtr newTask = new RasterizingTask(this, mVectorRenderer, mImageUrl, meanDpi, width, height);
+    SvgTaskPtr newTask = new SvgRasterizingTask(this, mVectorRenderer, width, height);
 
     if(IsSynchronousLoadingRequired() && mImageUrl.IsLocalResource())
     {
-      newTask->Load();
-      newTask->Rasterize();
-      ApplyRasterizedImage(newTask->GetPixelData(), newTask->IsLoaded());
+      newTask->Process();
+      ApplyRasterizedImage(newTask->GetPixelData(), newTask->HasSucceeded());
     }
     else
     {
@@ -260,80 +270,84 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
   }
 }
 
-void SvgVisual::ApplyRasterizedImage(PixelData rasterizedPixelData, bool isLoaded)
+void SvgVisual::ApplyRasterizedImage(PixelData rasterizedPixelData, bool success)
 {
-  if(isLoaded && rasterizedPixelData && IsOnScene())
+  if(success)
   {
     if(mDefaultWidth == 0 || mDefaultHeight == 0)
     {
       mVectorRenderer.GetDefaultSize(mDefaultWidth, mDefaultHeight);
     }
 
-    mRasterizedSize.x = static_cast<float>(rasterizedPixelData.GetWidth());
-    mRasterizedSize.y = static_cast<float>(rasterizedPixelData.GetHeight());
-
-    TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
-    if(mImpl->mFlags & Impl::IS_ATLASING_APPLIED)
+    // Rasterization success
+    if(rasterizedPixelData && IsOnScene())
     {
-      mFactoryCache.GetAtlasManager()->Remove(currentTextureSet, mAtlasRect);
-    }
+      mRasterizedSize.x = static_cast<float>(rasterizedPixelData.GetWidth());
+      mRasterizedSize.y = static_cast<float>(rasterizedPixelData.GetHeight());
 
-    TextureSet textureSet;
-
-    if(mAttemptAtlasing && !mImpl->mCustomShader)
-    {
-      Vector4 atlasRect;
-      textureSet = mFactoryCache.GetAtlasManager()->Add(atlasRect, rasterizedPixelData);
-      if(textureSet) // atlasing
+      TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
+      if(mImpl->mFlags & Impl::IS_ATLASING_APPLIED)
       {
-        if(textureSet != currentTextureSet)
+        mFactoryCache.GetAtlasManager()->Remove(currentTextureSet, mAtlasRect);
+      }
+
+      TextureSet textureSet;
+
+      if(mAttemptAtlasing && !mImpl->mCustomShader)
+      {
+        Vector4 atlasRect;
+        textureSet = mFactoryCache.GetAtlasManager()->Add(atlasRect, rasterizedPixelData);
+        if(textureSet) // atlasing
         {
-          mImpl->mRenderer.SetTextures(textureSet);
+          if(textureSet != currentTextureSet)
+          {
+            mImpl->mRenderer.SetTextures(textureSet);
+          }
+          mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, atlasRect);
+          mAtlasRect = atlasRect;
+          mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
         }
-        mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, atlasRect);
-        mAtlasRect = atlasRect;
-        mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
       }
-    }
 
-    if(!textureSet) // no atlasing - mAttemptAtlasing is false or adding to atlas is failed
-    {
-      Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight());
-      texture.Upload(rasterizedPixelData);
-      mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
-
-      if(mAtlasRect == FULL_TEXTURE_RECT)
+      if(!textureSet) // no atlasing - mAttemptAtlasing is false or adding to atlas is failed
       {
-        textureSet = currentTextureSet;
+        Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight());
+        texture.Upload(rasterizedPixelData);
+        mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
+
+        if(mAtlasRect == FULL_TEXTURE_RECT)
+        {
+          textureSet = currentTextureSet;
+        }
+        else
+        {
+          textureSet = TextureSet::New();
+          mImpl->mRenderer.SetTextures(textureSet);
+
+          mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT);
+          mAtlasRect = FULL_TEXTURE_RECT;
+        }
+
+        if(textureSet)
+        {
+          textureSet.SetTexture(0, texture);
+        }
       }
-      else
+
+      // Rasterized pixels are uploaded to texture. If weak handle is holding a placement actor, it is the time to add the renderer to actor.
+      Actor actor = mPlacementActor.GetHandle();
+      if(actor)
       {
-        textureSet = TextureSet::New();
-        mImpl->mRenderer.SetTextures(textureSet);
-
-        mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT);
-        mAtlasRect = FULL_TEXTURE_RECT;
+        actor.AddRenderer(mImpl->mRenderer);
+        // reset the weak handle so that the renderer only get added to actor once
+        mPlacementActor.Reset();
       }
 
-      if(textureSet)
-      {
-        textureSet.SetTexture(0, texture);
-      }
+      // Svg loaded and ready to display
+      ResourceReady(Toolkit::Visual::ResourceStatus::READY);
     }
-
-    // Rasterized pixels are uploaded to texture. If weak handle is holding a placement actor, it is the time to add the renderer to actor.
-    Actor actor = mPlacementActor.GetHandle();
-    if(actor)
-    {
-      actor.AddRenderer(mImpl->mRenderer);
-      // reset the weak handle so that the renderer only get added to actor once
-      mPlacementActor.Reset();
-    }
-
-    // Svg loaded and ready to display
-    ResourceReady(Toolkit::Visual::ResourceStatus::READY);
   }
-  else if(!isLoaded || !rasterizedPixelData)
+  else if(!success && !mLoadFailed)
   {
     mLoadFailed = true;
 

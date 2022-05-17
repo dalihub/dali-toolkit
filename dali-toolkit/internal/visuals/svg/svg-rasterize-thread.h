@@ -42,8 +42,8 @@ namespace Internal
 {
 class SvgVisual;
 typedef IntrusivePtr<SvgVisual> SvgVisualPtr;
-class RasterizingTask;
-typedef IntrusivePtr<RasterizingTask> RasterizingTaskPtr;
+class SvgTask;
+typedef IntrusivePtr<SvgTask> SvgTaskPtr;
 
 /**
  * The svg rasterizing tasks to be processed in the worker thread.
@@ -54,34 +54,31 @@ typedef IntrusivePtr<RasterizingTask> RasterizingTaskPtr;
  * 3. If this task gets its turn to do the rasterization, it triggers main thread to apply the rasterized image to material then been deleted in main thread call back
  *    Or if this task is been removed ( new image/size set to the visual or actor off stage) before its turn to be processed, it then been deleted in the worker thread.
  */
-class RasterizingTask : public RefObject
+class SvgTask : public RefObject
 {
 public:
   /**
    * Constructor
    * @param[in] svgVisual The visual which the rasterized image to be applied.
    * @param[in] vectorRenderer The vector rasterizer.
-   * @param[in] url The URL to svg resource to use.
-   * @param[in] dpi The DPI of the screen.
-   * @param[in] width The rasterization width.
-   * @param[in] height The rasterization height.
    */
-  RasterizingTask(SvgVisual* svgVisual, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height);
+  SvgTask(SvgVisual* svgVisual, VectorImageRenderer vectorRenderer);
 
   /**
    * Destructor.
    */
-  ~RasterizingTask() override;
+  virtual ~SvgTask() = default;
 
   /**
-   * Load svg file
+   * Process the task
    */
-  void Load();
+  virtual void Process() = 0;
 
   /**
-   * Do the rasterization with the mRasterizer.
+   * Whether the task has succeeded.
+   * @return True if the task has succeeded.
    */
-  void Rasterize();
+  bool HasSucceeded() const;
 
   /**
    * Get the svg visual
@@ -92,30 +89,94 @@ public:
    * Get the rasterization result.
    * @return The pixel data with the rasterized pixels.
    */
-  PixelData GetPixelData() const;
-
-  /**
-   * Whether the resource is loaded.
-   * @return True if the resource is loaded.
-   */
-  bool IsLoaded() const;
+  virtual PixelData GetPixelData() const;
 
 private:
   // Undefined
-  RasterizingTask(const RasterizingTask& task);
+  SvgTask(const SvgTask& task) = delete;
 
   // Undefined
-  RasterizingTask& operator=(const RasterizingTask& task);
+  SvgTask& operator=(const SvgTask& task) = delete;
 
-private:
+protected:
   SvgVisualPtr        mSvgVisual;
   VectorImageRenderer mVectorRenderer;
-  VisualUrl           mUrl;
-  PixelData           mPixelData;
-  float               mDpi;
-  uint32_t            mWidth;
-  uint32_t            mHeight;
-  bool                mLoadSuccess;
+  bool                mHasSucceeded;
+};
+
+class SvgLoadingTask : public SvgTask
+{
+public:
+  /**
+   * Constructor
+   * @param[in] svgVisual The visual which the rasterized image to be applied.
+   * @param[in] vectorRenderer The vector rasterizer.
+   * @param[in] url The URL to svg resource to use.
+   * @param[in] dpi The DPI of the screen.
+   */
+  SvgLoadingTask(SvgVisual* svgVisual, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi);
+
+  /**
+   * Destructor.
+   */
+  ~SvgLoadingTask() override;
+
+  /**
+   * Process the task
+   */
+  void Process() override;
+
+private:
+  // Undefined
+  SvgLoadingTask(const SvgLoadingTask& task) = delete;
+
+  // Undefined
+  SvgLoadingTask& operator=(const SvgLoadingTask& task) = delete;
+
+private:
+  VisualUrl mUrl;
+  float     mDpi;
+};
+
+class SvgRasterizingTask : public SvgTask
+{
+public:
+  /**
+   * Constructor
+   * @param[in] svgVisual The visual which the rasterized image to be applied.
+   * @param[in] vectorRenderer The vector rasterizer.
+   * @param[in] width The rasterization width.
+   * @param[in] height The rasterization height.
+   */
+  SvgRasterizingTask(SvgVisual* svgVisual, VectorImageRenderer vectorRenderer, unsigned int width, unsigned int height);
+
+  /**
+   * Destructor.
+   */
+  ~SvgRasterizingTask() override;
+
+  /**
+   * Process the task accodring to the type
+   */
+  void Process() override;
+
+  /**
+   * Get the rasterization result.
+   * @return The pixel data with the rasterized pixels.
+   */
+  PixelData GetPixelData() const override;
+
+private:
+  // Undefined
+  SvgRasterizingTask(const SvgRasterizingTask& task) = delete;
+
+  // Undefined
+  SvgRasterizingTask& operator=(const SvgRasterizingTask& task) = delete;
+
+private:
+  PixelData mPixelData;
+  uint32_t  mWidth;
+  uint32_t  mHeight;
 };
 
 /**
@@ -141,14 +202,14 @@ public:
    *
    * @param[in] task The task added to the queue.
    */
-  void AddTask(RasterizingTaskPtr task);
+  void AddTask(SvgTaskPtr task);
 
   /**
    * Pop the next task out from the completed queue, called by main thread.
    *
    * @return The next task in the completed queue.
    */
-  RasterizingTaskPtr NextCompletedTask();
+  SvgTaskPtr NextCompletedTask();
 
   /**
    * Remove the task with the given visual from the waiting queue, called by main thread.
@@ -170,14 +231,14 @@ private:
    *
    * @return The next task to be processed.
    */
-  RasterizingTaskPtr NextTaskToProcess();
+  SvgTaskPtr NextTaskToProcess();
 
   /**
    * Add a task in to the queue
    *
    * @param[in] task The task added to the queue.
    */
-  void AddCompletedTask(RasterizingTaskPtr task);
+  void AddCompletedTask(SvgTaskPtr task);
 
   /**
    * Applies the rasterized image to material
@@ -210,8 +271,8 @@ private:
   SvgRasterizeThread& operator=(const SvgRasterizeThread& thread);
 
 private:
-  std::vector<RasterizingTaskPtr> mRasterizeTasks; //The queue of the tasks waiting to rasterize the SVG image
-  std::vector<RasterizingTaskPtr> mCompletedTasks; //The queue of the tasks with the SVG rasterization completed
+  std::vector<SvgTaskPtr> mRasterizeTasks; //The queue of the tasks waiting to rasterize the SVG image
+  std::vector<SvgTaskPtr> mCompletedTasks; //The queue of the tasks with the SVG rasterization completed
 
   ConditionalWait                      mConditionalWait;
   Dali::Mutex                          mMutex;

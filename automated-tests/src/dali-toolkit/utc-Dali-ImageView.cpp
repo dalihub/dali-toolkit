@@ -2686,7 +2686,8 @@ int UtcDaliImageViewLoadRemoteSVG(void)
 
     application.SendNotification();
 
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    // Wait for loading & rasterization
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
@@ -2711,7 +2712,8 @@ int UtcDaliImageViewLoadRemoteSVG(void)
 
     application.SendNotification();
 
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    // Wait for loading & rasterization
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
@@ -2770,7 +2772,7 @@ int UtcDaliImageViewAsyncSVGLoading(void)
 
     application.SendNotification();
 
-    // Wait for rasterization
+    // Wait for loading
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
@@ -2810,7 +2812,7 @@ int UtcDaliImageViewSVGLoadingSyncSetInvalidValue(void)
 
     application.SendNotification();
 
-    // Wait for rasterization
+    // Wait for loading
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
@@ -2833,14 +2835,14 @@ int UtcDaliImageViewSVGLoadingSyncSetInvalidValue(void)
 
 int UtcDaliImageViewSvgLoadingFailure(void)
 {
-  ToolkitTestApplication application;
-
-  TestGlAbstraction& gl           = application.GetGlAbstraction();
-  TraceCallStack&    textureTrace = gl.GetTextureTrace();
-  textureTrace.Enable(true);
-
   // Local svg file - invalid file path
   {
+    ToolkitTestApplication application;
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
     gResourceReadySignalFired = false;
 
     ImageView imageView = ImageView::New(TEST_RESOURCE_DIR "/foo.svg");
@@ -2853,7 +2855,7 @@ int UtcDaliImageViewSvgLoadingFailure(void)
 
     application.SendNotification();
 
-    // loading started, this waits for the loader thread
+    // loading started, this waits for the loader thread - load
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
@@ -2870,6 +2872,12 @@ int UtcDaliImageViewSvgLoadingFailure(void)
 
   // Local svg file - invalid file path without size set
   {
+    ToolkitTestApplication application;
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
     gResourceReadySignalFired = false;
     textureTrace.Reset();
 
@@ -2882,7 +2890,7 @@ int UtcDaliImageViewSvgLoadingFailure(void)
 
     application.SendNotification();
 
-    // loading started, this waits for the loader thread
+    // loading started, this waits for the loader thread - load & rasterize
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
@@ -2899,6 +2907,12 @@ int UtcDaliImageViewSvgLoadingFailure(void)
 
   // Local svg file - invalid file
   {
+    ToolkitTestApplication application;
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
     gResourceReadySignalFired = false;
     textureTrace.Reset();
 
@@ -2912,7 +2926,7 @@ int UtcDaliImageViewSvgLoadingFailure(void)
 
     application.SendNotification();
 
-    // loading started, this waits for the loader thread
+    // loading started, this waits for the loader thread - load & rasterize
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
@@ -2929,6 +2943,12 @@ int UtcDaliImageViewSvgLoadingFailure(void)
 
   // Remote svg file
   {
+    ToolkitTestApplication application;
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
     gResourceReadySignalFired = false;
     textureTrace.Reset();
 
@@ -2942,7 +2962,7 @@ int UtcDaliImageViewSvgLoadingFailure(void)
 
     application.SendNotification();
 
-    // loading started, this waits for the loader thread
+    // loading started, this waits for the loader thread - load & rasterize
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
@@ -2959,6 +2979,12 @@ int UtcDaliImageViewSvgLoadingFailure(void)
 
   // Remote svg file without size set
   {
+    ToolkitTestApplication application;
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
     gResourceReadySignalFired = false;
     textureTrace.Reset();
 
@@ -2971,7 +2997,7 @@ int UtcDaliImageViewSvgLoadingFailure(void)
 
     application.SendNotification();
 
-    // loading started, this waits for the loader thread
+    // loading started, this waits for the loader thread - load & rasterize
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
@@ -3009,8 +3035,8 @@ int UtcDaliImageViewSvgRasterizationFailure(void)
 
   application.SendNotification();
 
-  // loading started, this waits for the loader thread
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Wait for loading & rasterization
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(16);
@@ -3039,8 +3065,8 @@ int UtcDaliImageViewSvgChageSize(void)
 
   application.SendNotification();
 
-  // loading started, this waits for the loader thread
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Wait for loading & rasterization
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(16);
@@ -3052,7 +3078,7 @@ int UtcDaliImageViewSvgChageSize(void)
 
   application.SendNotification();
 
-  // loading started, this waits for the loader thread
+  // Wait for rasterization
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   application.SendNotification();
@@ -3060,6 +3086,58 @@ int UtcDaliImageViewSvgChageSize(void)
 
   // We should not load the file again.
   DALI_TEST_EQUALS(Test::VectorImageRenderer::GetLoadCount(), 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageViewSvgAtlasing(void)
+{
+  ToolkitTestApplication application;
+
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+  callStack.Reset();
+  callStack.Enable(true);
+
+  Property::Map propertyMap;
+  propertyMap["url"]      = TEST_SVG_FILE_NAME;
+  propertyMap["atlasing"] = true;
+
+  ImageView imageView = ImageView::New();
+  imageView.SetProperty(ImageView::Property::IMAGE, propertyMap);
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
+  application.GetScene().Add(imageView);
+
+  application.SendNotification();
+
+  // Wait for loading & rasterization
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // use atlas
+  TraceCallStack::NamedParams params1;
+  params1["width"] << 100;
+  params1["height"] << 100;
+  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params1), true, TEST_LOCATION);
+
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(600.f, 600.f));
+
+  application.SendNotification();
+
+  // Wait for rasterization
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  callStack.Reset();
+
+  application.SendNotification();
+  application.Render(16);
+
+  // not use atlas
+  TraceCallStack::NamedParams params2;
+  params2["width"] << 600;
+  params2["height"] << 600;
+  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexImage2D", params2), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -3645,7 +3723,7 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
 
   // Test normal case
   TestResourceReadyUrl(1, 0, 1, gImage_600_RGB, "", TEST_LOCATION);
-  TestResourceReadyUrl(1, 0, 1, TEST_SVG_FILE_NAME, "", TEST_LOCATION); // 1 rasterize
+  TestResourceReadyUrl(2, 0, 1, TEST_SVG_FILE_NAME, "", TEST_LOCATION); // load & rasterize
   TestResourceReadyUrl(1, 0, 1, TEST_BROKEN_IMAGE_L, "", TEST_LOCATION);
 
   TestResourceReadyUrl(2, 0, 1, TEST_GIF_FILE_NAME, "", TEST_LOCATION);                   // 2 image loading - batch size
