@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SVG_RASTERIZE_THREAD_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/rendering/texture-set.h>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -60,17 +59,24 @@ class RasterizingTask : public RefObject
 public:
   /**
    * Constructor
-   * @param[in] svgRenderer The renderer which the rasterized image to be applied.
+   * @param[in] svgVisual The visual which the rasterized image to be applied.
+   * @param[in] vectorRenderer The vector rasterizer.
    * @param[in] url The URL to svg resource to use.
+   * @param[in] dpi The DPI of the screen.
    * @param[in] width The rasterization width.
    * @param[in] height The rasterization height.
    */
-  RasterizingTask(SvgVisual* svgRenderer, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height);
+  RasterizingTask(SvgVisual* svgVisual, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height);
 
   /**
    * Destructor.
    */
   ~RasterizingTask() override;
+
+  /**
+   * Load svg file
+   */
+  void Load();
 
   /**
    * Do the rasterization with the mRasterizer.
@@ -89,20 +95,10 @@ public:
   PixelData GetPixelData() const;
 
   /**
-   * Get the VectorRenderer.
-   * @return VectorRenderer.
-   */
-  VectorImageRenderer GetVectorRenderer() const;
-  /**
    * Whether the resource is loaded.
    * @return True if the resource is loaded.
    */
   bool IsLoaded() const;
-
-  /**
-   * Load svg file
-   */
-  void Load();
 
 private:
   // Undefined
@@ -117,8 +113,8 @@ private:
   VisualUrl           mUrl;
   PixelData           mPixelData;
   float               mDpi;
-  unsigned int        mWidth;
-  unsigned int        mHeight;
+  uint32_t            mWidth;
+  uint32_t            mHeight;
   bool                mLoadSuccess;
 };
 

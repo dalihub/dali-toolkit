@@ -21,6 +21,7 @@
 #include <sys/stat.h>
 #include <toolkit-application.h>
 #include <toolkit-event-thread-callback.h>
+#include <toolkit-vector-image-renderer.h>
 #include <cstring>
 #include <memory>
 
@@ -30,13 +31,15 @@ namespace Internal
 {
 namespace Adaptor
 {
+namespace
+{
+Dali::Internal::Adaptor::VectorImageRenderer* gVectorImageRenderer = nullptr;
+}
+
 class VectorImageRenderer : public Dali::BaseObject
 {
 public:
   VectorImageRenderer()
-  : mWidth(0),
-    mHeight(0),
-    mRasterizeSuccess(true)
   {
   }
 
@@ -46,6 +49,7 @@ public:
 
   bool Load(const Vector<uint8_t>& data, float dpi)
   {
+    mLoadCount++;
     if(strncmp(reinterpret_cast<char*>(data.Begin()), "invalid", 7) == 0)
     {
       return false;
@@ -55,6 +59,11 @@ public:
       mRasterizeSuccess = false;
     }
     return true;
+  }
+
+  bool IsLoaded() const
+  {
+    return mLoadCount > 0 ? true : false;
   }
 
   Dali::Devel::PixelBuffer Rasterize(uint32_t width, uint32_t height)
@@ -74,9 +83,10 @@ public:
   }
 
 public:
-  uint32_t mWidth;
-  uint32_t mHeight;
-  bool     mRasterizeSuccess;
+  uint32_t mWidth{0};
+  uint32_t mHeight{0};
+  uint32_t mLoadCount{0};
+  bool     mRasterizeSuccess{true};
 };
 
 inline VectorImageRenderer& GetImplementation(Dali::VectorImageRenderer& renderer)
@@ -105,6 +115,8 @@ VectorImageRenderer VectorImageRenderer::New()
 {
   Internal::Adaptor::VectorImageRenderer* imageRenderer = new Internal::Adaptor::VectorImageRenderer();
 
+  Internal::Adaptor::gVectorImageRenderer = imageRenderer;
+
   return VectorImageRenderer(imageRenderer);
 }
 
@@ -126,6 +138,11 @@ bool VectorImageRenderer::Load(const Vector<uint8_t>& data, float dpi)
   return Internal::Adaptor::GetImplementation(*this).Load(data, dpi);
 }
 
+bool VectorImageRenderer::IsLoaded() const
+{
+  return Internal::Adaptor::GetImplementation(*this).IsLoaded();
+}
+
 Dali::Devel::PixelBuffer VectorImageRenderer::Rasterize(uint32_t width, uint32_t height)
 {
   return Internal::Adaptor::GetImplementation(*this).Rasterize(width, height);
@@ -137,3 +154,15 @@ void VectorImageRenderer::GetDefaultSize(uint32_t& width, uint32_t& height) cons
 }
 
 } // namespace Dali
+
+namespace Test
+{
+namespace VectorImageRenderer
+{
+uint32_t GetLoadCount()
+{
+  return Dali::Internal::Adaptor::gVectorImageRenderer->mLoadCount;
+}
+
+} // namespace VectorImageRenderer
+} // namespace Test
