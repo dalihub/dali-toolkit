@@ -342,8 +342,6 @@ void TextVisual::DoSetOnScene(Actor& actor)
   // Renderer needs textures and to be added to control
   mRendererUpdateNeeded = true;
 
-  mRendererList.push_back(mImpl->mRenderer);
-
   UpdateRenderer();
 }
 
@@ -766,12 +764,38 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
 
   mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
+  const Vector4& defaultColor = mController->GetTextModel()->GetDefaultColor();
+
   for(RendererContainer::iterator iter = mRendererList.begin(); iter != mRendererList.end(); ++iter)
   {
     Renderer renderer = (*iter);
     if(renderer)
     {
       actor.AddRenderer(renderer);
+
+      if(renderer != mImpl->mRenderer)
+      {
+        // Set constraint for text label's color for non-default renderers.
+        if(mAnimatableTextColorPropertyIndex != Property::INVALID_INDEX)
+        {
+          // Register unique property, or get property for default renderer.
+          Property::Index index = renderer.RegisterUniqueProperty("uTextColorAnimatable", defaultColor);
+
+          // Create constraint for the animatable text's color Property with uTextColorAnimatable in the renderer.
+          if(index != Property::INVALID_INDEX)
+          {
+            Constraint colorConstraint = Constraint::New<Vector4>(renderer, index, TextColorConstraint);
+            colorConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
+            colorConstraint.Apply();
+          }
+
+          // Make zero if the alpha value of text color is zero to skip rendering text
+          // VisualRenderer::Property::OPACITY uses same animatable property internally.
+          Constraint opacityConstraint = Constraint::New<float>(renderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint);
+          opacityConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
+          opacityConstraint.Apply();
+        }
+      }
     }
   }
 }
