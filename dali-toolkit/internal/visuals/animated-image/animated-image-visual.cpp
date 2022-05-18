@@ -83,7 +83,6 @@ static constexpr Vector4  FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 static constexpr auto     LOOP_FOREVER = -1;
 static constexpr auto     FIRST_LOOP   = 0u;
 
-const char* const MASK_TEXTURE_RATIO_NAME("maskTextureRatio");
 constexpr uint32_t TEXTURE_COUNT_FOR_GPU_ALPHA_MASK = 2u;
 
 #if defined(DEBUG_ENABLED)

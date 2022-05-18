@@ -51,7 +51,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(9); // wrap, pixel area, atlas, pixalign, + border/corner
+const int CUSTOM_PROPERTY_COUNT(12); // ltr, wrap, pixel area, atlas, pixalign, crop to mask, mask texture ratio + border/corner
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
@@ -98,6 +98,8 @@ const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 const float PIXEL_ALIGN_ON  = 1.0f;
 const float PIXEL_ALIGN_OFF = 0.0f;
+
+constexpr uint32_t TEXTURE_COUNT_FOR_GPU_ALPHA_MASK = 2u;
 
 Geometry CreateGeometry(VisualFactoryCache& factoryCache, ImageDimensions gridSize)
 {
@@ -274,6 +276,10 @@ void ImageVisual::DoSetProperties(const Property::Map& propertyMap)
       {
         DoSetProperty(Toolkit::ImageVisual::Property::CROP_TO_MASK, keyValue.second);
       }
+      else if(keyValue.first == MASKING_TYPE_NAME)
+      {
+        DoSetProperty(Toolkit::DevelImageVisual::Property::MASKING_TYPE, keyValue.second);
+      }
       else if(keyValue.first == LOAD_POLICY_NAME)
       {
         DoSetProperty(Toolkit::ImageVisual::Property::LOAD_POLICY, keyValue.second);
@@ -426,6 +432,17 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
       break;
     }
 
+    case Toolkit::DevelImageVisual::Property::MASKING_TYPE:
+    {
+      int maskingType = 0;
+      if(value.Get(maskingType))
+      {
+        AllocateMaskData();
+        mMaskingData->mPreappliedMasking = Toolkit::DevelImageVisual::MaskingType::Type(maskingType) == Toolkit::DevelImageVisual::MaskingType::MASKING_ON_LOADING ? true : false;
+      }
+      break;
+    }
+
     case Toolkit::ImageVisual::Property::RELEASE_POLICY:
     {
       int releasePolicy = 0;
@@ -481,11 +498,9 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
     auto textureSet = mImpl->mRenderer.GetTextures();
     if(textureSet && textureSet.GetTextureCount())
     {
-      auto texture = textureSet.GetTexture(0);
-      if(texture)
+      if(mTextureSize != Vector2::ZERO)
       {
-        naturalSize.x = texture.GetWidth();
-        naturalSize.y = texture.GetHeight();
+        naturalSize = mTextureSize;
         return;
       }
     }
@@ -574,6 +589,11 @@ void ImageVisual::OnInitialize()
   mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 
   EnablePreMultipliedAlpha(IsPreMultipliedAlphaEnabled());
+
+  if(mMaskingData)
+  {
+    mImpl->mRenderer.RegisterProperty(CROP_TO_MASK_NAME, static_cast<float>(mMaskingData->mCropToMask));
+  }
 }
 
 void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection, TextureManager::ReloadPolicy forceReload)
@@ -661,6 +681,8 @@ void ImageVisual::InitializeRenderer()
   if(mTextures)
   {
     mImpl->mRenderer.SetTextures(mTextures);
+    ComputeTextureSize();
+    CheckMaskTexture();
     if(DevelTexture::IsNative(mTextures.GetTexture(0)))
     {
       UpdateShader();
@@ -745,6 +767,7 @@ void ImageVisual::DoSetOffScene(Actor& actor)
 
     TextureSet textureSet = TextureSet::New();
     mImpl->mRenderer.SetTextures(textureSet);
+    ComputeTextureSize();
 
     mLoadState = TextureManager::LoadState::NOT_STARTED;
   }
@@ -780,6 +803,7 @@ void ImageVisual::DoCreatePropertyMap(Property::Map& map) const
     map.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mMaskingData->mAlphaMaskUrl.GetUrl());
     map.Insert(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, mMaskingData->mContentScaleFactor);
     map.Insert(Toolkit::ImageVisual::Property::CROP_TO_MASK, mMaskingData->mCropToMask);
+    map.Insert(Toolkit::DevelImageVisual::Property::MASKING_TYPE, mMaskingData->mPreappliedMasking ? DevelImageVisual::MaskingType::MASKING_ON_LOADING : DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
   }
 
   map.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, mLoadPolicy);
@@ -879,6 +903,8 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
       sampler.SetWrapMode(mWrapModeU, mWrapModeV);
       textureInformation.textureSet.SetSampler(0u, sampler);
       mImpl->mRenderer.SetTextures(textureInformation.textureSet);
+      ComputeTextureSize();
+      CheckMaskTexture();
     }
 
     if(actor)
@@ -967,6 +993,60 @@ void ImageVisual::RemoveTexture()
   }
 }
 
+void ImageVisual::ComputeTextureSize()
+{
+  if(mImpl->mRenderer)
+  {
+    auto textureSet = mImpl->mRenderer.GetTextures();
+    if(textureSet && textureSet.GetTextureCount())
+    {
+      auto texture = textureSet.GetTexture(0);
+      if(texture)
+      {
+        mTextureSize.x = texture.GetWidth();
+        mTextureSize.y = texture.GetHeight();
+        if(textureSet.GetTextureCount() > 1u && mMaskingData && !mMaskingData->mPreappliedMasking && mMaskingData->mCropToMask)
+        {
+          Texture maskTexture = textureSet.GetTexture(1);
+          if(maskTexture)
+          {
+            mTextureSize.x = std::min(static_cast<uint32_t>(mTextureSize.x * mMaskingData->mContentScaleFactor), maskTexture.GetWidth());
+            mTextureSize.y = std::min(static_cast<uint32_t>(mTextureSize.y * mMaskingData->mContentScaleFactor), maskTexture.GetHeight());
+          }
+        }
+      }
+    }
+  }
+}
+
+Vector2 ImageVisual::ComputeMaskTextureRatio()
+{
+  Vector2 maskTextureRatio;
+  if(mImpl->mRenderer)
+  {
+    auto textureSet = mImpl->mRenderer.GetTextures();
+    if(textureSet && textureSet.GetTextureCount())
+    {
+      auto texture = textureSet.GetTexture(0);
+      if(texture)
+      {
+        if(textureSet.GetTextureCount() > 1u && mMaskingData && !mMaskingData->mPreappliedMasking && mMaskingData->mCropToMask)
+        {
+          Texture maskTexture = textureSet.GetTexture(1);
+          if(maskTexture)
+          {
+            float textureWidth  = std::max(static_cast<float>(texture.GetWidth() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
+            float textureHeight = std::max(static_cast<float>(texture.GetHeight() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
+            maskTextureRatio    = Vector2(std::min(static_cast<float>(maskTexture.GetWidth()), textureWidth) / textureWidth,
+                                       std::min(static_cast<float>(maskTexture.GetHeight()), textureHeight) / textureHeight);
+          }
+        }
+      }
+    }
+  }
+  return maskTextureRatio;
+}
+
 Shader ImageVisual::GenerateShader() const
 {
   Shader shader;
@@ -977,6 +1057,7 @@ Shader ImageVisual::GenerateShader() const
 
   if(useStandardShader)
   {
+    bool   requiredAlphaMaskingOnRendering = (mMaskingData && !mMaskingData->mMaskImageLoadingFailed) ? !mMaskingData->mPreappliedMasking : false;
     // Create and cache the standard shader
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
@@ -985,7 +1066,8 @@ Shader ImageVisual::GenerateShader() const
         .ApplyDefaultTextureWrapMode(mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE)
         .EnableRoundedCorner(IsRoundedCornerRequired())
         .EnableBorderline(IsBorderlineRequired())
-        .SetTextureForFragmentShaderCheck(useNativeImage ? mTextures.GetTexture(0) : Dali::Texture()));
+        .SetTextureForFragmentShaderCheck(useNativeImage ? mTextures.GetTexture(0) : Dali::Texture())
+        .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering));
   }
   else
   {
@@ -1045,6 +1127,29 @@ Shader ImageVisual::GenerateShader() const
   shader.RegisterProperty(PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_OFF);
 
   return shader;
+}
+
+void ImageVisual::CheckMaskTexture()
+{
+  if(mMaskingData && !mMaskingData->mPreappliedMasking)
+  {
+    bool maskLoadFailed = true;
+    TextureSet textures = mImpl->mRenderer.GetTextures();
+    if(textures && textures.GetTextureCount() >= TEXTURE_COUNT_FOR_GPU_ALPHA_MASK)
+    {
+      if(mMaskingData->mCropToMask)
+      {
+        mImpl->mRenderer.RegisterProperty(MASK_TEXTURE_RATIO_NAME, ComputeMaskTextureRatio());
+      }
+      maskLoadFailed = false;
+    }
+
+    if(mMaskingData->mMaskImageLoadingFailed != maskLoadFailed)
+    {
+      mMaskingData->mMaskImageLoadingFailed = maskLoadFailed;
+      UpdateShader();
+    }
+  }
 }
 
 } // namespace Internal

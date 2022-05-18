@@ -402,38 +402,35 @@ TextureSet TextureManager::LoadTexture(
       if(!textureSet) // big image, no atlasing or atlasing failed
       {
         atlasingStatus = false;
-        if(!maskInfo || !maskInfo->mAlphaMaskUrl.IsValid())
-        {
-          textureId = RequestLoad(
-            url,
-            desiredSize,
-            fittingMode,
-            samplingMode,
-            UseAtlas::NO_ATLAS,
-            textureObserver,
-            orientationCorrection,
-            reloadPolicy,
-            preMultiplyOnLoad,
-            synchronousLoading);
-        }
-        else
+
+        TextureId alphaMaskId        = INVALID_TEXTURE_ID;
+        float     contentScaleFactor = 1.0f;
+        bool      cropToMask         = false;
+        if(maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
         {
           maskInfo->mAlphaMaskId = RequestMaskLoad(maskInfo->mAlphaMaskUrl, maskInfo->mPreappliedMasking ? StorageType::KEEP_PIXEL_BUFFER : StorageType::KEEP_TEXTURE, synchronousLoading);
-          textureId              = RequestLoad(
-            url,
-            maskInfo->mAlphaMaskId,
-            maskInfo->mContentScaleFactor,
-            desiredSize,
-            fittingMode,
-            samplingMode,
-            UseAtlas::NO_ATLAS,
-            maskInfo->mCropToMask,
-            textureObserver,
-            orientationCorrection,
-            reloadPolicy,
-            preMultiplyOnLoad,
-            synchronousLoading);
+          alphaMaskId            = maskInfo->mAlphaMaskId;
+          if(maskInfo && maskInfo->mPreappliedMasking)
+          {
+            contentScaleFactor = maskInfo->mContentScaleFactor;
+            cropToMask         = maskInfo->mCropToMask;
+          }
         }
+
+        textureId = RequestLoad(
+          url,
+          alphaMaskId,
+          contentScaleFactor,
+          desiredSize,
+          fittingMode,
+          samplingMode,
+          UseAtlas::NO_ATLAS,
+          cropToMask,
+          textureObserver,
+          orientationCorrection,
+          reloadPolicy,
+          preMultiplyOnLoad,
+          synchronousLoading);
 
         TextureManager::LoadState loadState = mTextureCacheManager.GetTextureStateInternal(textureId);
         if(loadState == TextureManager::LoadState::UPLOADED)
@@ -667,19 +664,31 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
       }
       else // For the image loading.
       {
+        Texture maskTexture;
         if(maskTextureId != INVALID_TEXTURE_ID)
         {
           TextureCacheIndex maskCacheIndex = mTextureCacheManager.GetCacheIndexFromId(maskTextureId);
           if(maskCacheIndex != INVALID_CACHE_INDEX)
           {
-            Devel::PixelBuffer maskPixelBuffer = mTextureCacheManager[maskCacheIndex].pixelBuffer;
-            if(maskPixelBuffer)
+            if(mTextureCacheManager[maskCacheIndex].storageType == StorageType::KEEP_TEXTURE)
             {
-              pixelBuffer.ApplyMask(maskPixelBuffer, contentScale, cropToMask);
+              TextureSet maskTextures = mTextureCacheManager[maskCacheIndex].textureSet;
+              if(maskTextures && maskTextures.GetTextureCount())
+              {
+                maskTexture = maskTextures.GetTexture(0u);
+              }
             }
-            else
+            else if(mTextureCacheManager[maskCacheIndex].storageType == StorageType::KEEP_PIXEL_BUFFER)
             {
-              DALI_LOG_ERROR("Mask image cached invalid pixel buffer!\n");
+              Devel::PixelBuffer maskPixelBuffer = mTextureCacheManager[maskCacheIndex].pixelBuffer;
+              if(maskPixelBuffer)
+              {
+                pixelBuffer.ApplyMask(maskPixelBuffer, contentScale, cropToMask);
+              }
+              else
+              {
+                DALI_LOG_ERROR("Mask image cached invalid pixel buffer!\n");
+              }
             }
           }
           else
@@ -691,6 +700,10 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 
         // Upload texture
         UploadTexture(pixelBuffer, textureInfo);
+        if(maskTexture && textureInfo.textureSet)
+        {
+          textureInfo.textureSet.SetTexture(1u, maskTexture);
+        }
       }
     }
   }

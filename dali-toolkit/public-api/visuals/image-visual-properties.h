@@ -226,7 +226,7 @@ enum
    * @details Name "cropToMask", type Property::BOOLEAN, True if the image should
    * be cropped to match the mask size, or false if the image should remain the same size.
    * @SINCE_1_2.60
-   * @note Optional.
+   * @note Optional, Default true
    * @note If this is false, then the mask is scaled to fit the image before being applied.
    */
   CROP_TO_MASK,
