@@ -307,11 +307,11 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
       {
         if(sync)
         {
-          mImpl->mFlags |= Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+          mImpl->mFlags |= Visual::Base::Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
         }
         else
         {
-          mImpl->mFlags &= ~Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+          mImpl->mFlags &= ~Visual::Base::Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
         }
       }
       else
@@ -471,7 +471,7 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
   }
   else if(mImpl->mRenderer) // Check if we have a loaded image
   {
-    if(mImpl->mFlags & Impl::IS_ATLASING_APPLIED)
+    if(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED)
     {
       naturalSize.x = mAtlasRectSize.GetWidth();
       naturalSize.y = mAtlasRectSize.GetHeight();
@@ -620,11 +620,11 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
 
   if(atlasing) // Flag needs to be set before creating renderer
   {
-    mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
+    mImpl->mFlags |= Visual::Base::Impl::IS_ATLASING_APPLIED;
   }
   else
   {
-    mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
+    mImpl->mFlags &= ~Visual::Base::Impl::IS_ATLASING_APPLIED;
   }
 }
 
@@ -981,7 +981,7 @@ Shader ImageVisual::GenerateShader() const
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
       ImageVisualShaderFeature::FeatureBuilder()
-        .EnableTextureAtlas(mImpl->mFlags & Impl::IS_ATLASING_APPLIED && !useNativeImage)
+        .EnableTextureAtlas(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED && !useNativeImage)
         .ApplyDefaultTextureWrapMode(mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE)
         .EnableRoundedCorner(IsRoundedCornerRequired())
         .EnableBorderline(IsBorderlineRequired())

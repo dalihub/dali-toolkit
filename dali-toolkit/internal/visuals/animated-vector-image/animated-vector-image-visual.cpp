@@ -99,7 +99,7 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   mRedrawInScalingDown(true)
 {
   // the rasterized image is with pre-multiplied alpha format
-  mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
+  mImpl->mFlags |= Visual::Base::Impl::IS_PREMULTIPLIED_ALPHA;
 
   if(!mVectorAnimationTask->Load(mUrl.GetUrl()))
   {
