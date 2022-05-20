@@ -31,7 +31,7 @@ namespace Toolkit
 {
 namespace Internal
 {
-LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex)
+LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 : pixelBuffer(),
   url(),
   encodedImageBuffer(),
@@ -40,7 +40,7 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
   fittingMode(),
   samplingMode(),
   orientationCorrection(),
-  preMultiplyOnLoad(DevelAsyncImageLoader::PreMultiplyOnLoad::OFF),
+  preMultiplyOnLoad(preMultiplyOnLoad),
   isMaskTask(false),
   maskPixelBuffer(),
   contentScale(1.0f),

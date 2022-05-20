@@ -65,7 +65,8 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&            
                                                      ImageCache::FrameReadyObserver&     observer,
                                                      uint16_t                            cacheSize,
                                                      uint16_t                            batchSize,
-                                                     bool                                isSynchronousLoading)
+                                                     bool                                isSynchronousLoading,
+                                                     bool                                preMultiplyOnLoad)
 : ImageCache(textureManager, maskingData, observer, batchSize, 0u),
   mImageUrl(animatedImageLoading.GetUrl()),
   mAnimatedImageLoading(animatedImageLoading),
@@ -73,7 +74,8 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&            
   mFrameIndex(FIRST_FRAME_INDEX),
   mCacheSize(cacheSize),
   mQueue(cacheSize),
-  mIsSynchronousLoading(isSynchronousLoading)
+  mIsSynchronousLoading(isSynchronousLoading),
+  mPreMultiplyOnLoad(preMultiplyOnLoad)
 {
   mTextureIds.resize(mFrameCount);
   mIntervals.assign(mFrameCount, 0);
@@ -191,6 +193,9 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
 
   mLoadState = TextureManager::LoadState::LOADING;
 
+  auto preMultiplyOnLoading = mPreMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
+                                                  : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
   TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
   TextureSet                textureSet    = mTextureManager.LoadAnimatedImageTexture(mImageUrl,
                                                                    mAnimatedImageLoading,
@@ -201,7 +206,8 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                    Dali::WrapMode::Type::DEFAULT,
                                                                    Dali::WrapMode::Type::DEFAULT,
                                                                    synchronousLoading,
-                                                                   this);
+                                                                   this,
+                                                                   preMultiplyOnLoading);
 
   mTextureIds[frameIndex] = loadTextureId;
 

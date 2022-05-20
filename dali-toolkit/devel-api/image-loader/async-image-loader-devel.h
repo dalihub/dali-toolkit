@@ -49,11 +49,13 @@ enum class PreMultiplyOnLoad
  * @param[in] asyncImageLoader The ayncImageLoader
  * @param[in] animatedImageLoading The AnimatedImageLoading to load animated image
  * @param[in] frameIndex The frame index of a frame to be loaded frame
+ * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
  * @return The loading task id
  */
-DALI_TOOLKIT_API uint32_t LoadAnimatedImage(AsyncImageLoader           asyncImageLoader,
-                                            Dali::AnimatedImageLoading animatedImageLoading,
-                                            uint32_t                   frameIndex);
+DALI_TOOLKIT_API uint32_t LoadAnimatedImage(AsyncImageLoader                         asyncImageLoader,
+                                            Dali::AnimatedImageLoading               animatedImageLoading,
+                                            uint32_t                                 frameIndex,
+                                            DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
 /**
  * @brief Starts an image loading task.

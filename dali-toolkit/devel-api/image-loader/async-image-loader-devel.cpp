@@ -23,11 +23,12 @@ namespace Toolkit
 {
 namespace DevelAsyncImageLoader
 {
-uint32_t LoadAnimatedImage(AsyncImageLoader           asyncImageLoader,
-                           Dali::AnimatedImageLoading animatedImageLoading,
-                           uint32_t                   frameIndex)
+uint32_t LoadAnimatedImage(AsyncImageLoader                         asyncImageLoader,
+                           Dali::AnimatedImageLoading               animatedImageLoading,
+                           uint32_t                                 frameIndex,
+                           DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
-  return GetImplementation(asyncImageLoader).LoadAnimatedImage(animatedImageLoading, frameIndex);
+  return GetImplementation(asyncImageLoader).LoadAnimatedImage(animatedImageLoading, frameIndex, preMultiplyOnLoad);
 }
 
 uint32_t Load(AsyncImageLoader                         asyncImageLoader,
