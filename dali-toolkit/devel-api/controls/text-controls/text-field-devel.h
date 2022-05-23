@@ -242,6 +242,13 @@ enum
   *   The default value is 0.f which does nothing.
   */
   CHARACTER_SPACING,
+
+  /**
+   * @brief Sets the selection popup style
+   * @details Name "selectionPopupStyle", type Property::MAP.
+   * @see Dali::Toolkit::TextSelectionPopup::Property
+   */
+  SELECTION_POPUP_STYLE,
 };
 
 } // namespace Property

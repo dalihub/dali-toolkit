@@ -318,6 +318,13 @@ enum Type
    * @note Return type is Property::STRING
    */
   VERTICAL_ALIGNMENT,
+
+  /**
+   * @brief Sets the selection popup style
+   * @details Name "selectionPopupStyle", type Property::MAP.
+   * @see Dali::Toolkit::TextSelectionPopup::Property
+   */
+  SELECTION_POPUP_STYLE,
 };
 
 } // namespace Property

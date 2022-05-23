@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali/public-api/object/property-map.h>
 
 namespace Dali
 {
@@ -163,6 +164,12 @@ public:
       POPUP_PRESSED_COLOR,
 
       /**
+       * @brief The corner radius of the option when pressed.
+       * @details Name "popupPressedCornerRadius", type float.
+       */
+      POPUP_PRESSED_CORNER_RADIUS,
+
+      /**
        * @brief The image to use for the option when pressed.
        * @details Name "popupPressedImage", type string.
        */
@@ -185,7 +192,42 @@ public:
        * @details Name "backgroundBorder", type Property::Map.
        * @note Optional.
        */
-      BACKGROUND_BORDER
+      BACKGROUND_BORDER,
+
+      /**
+       * @brief The popup background.
+       * @details Name "background", type Property::Map.
+       * @note Optional.
+       */
+      BACKGROUND,
+
+      /**
+       * @brief The minimum size of popup label.
+       * @details Name "labelMinimumSize", type Vector2.
+       * @note Optional.
+       */
+      LABEL_MINIMUM_SIZE,
+
+      /**
+       * @brief The padding of popup label.
+       * @details Name "labelPadding", type Vector4.
+       * @note Optional.
+       */
+      LABEL_PADDING,
+
+      /**
+       * @brief The text visual map of popup label.
+       * @details Name "labelTextVisual", type Property::Map.
+       * @note Optional.
+       */
+      LABEL_TEXT_VISUAL,
+
+      /**
+       * @brief Whether the scroll-bar is enabled.
+       * @details Name "enableScrollBar", type Property::BOOLEAN.
+       * @note Optional.
+       */
+      ENABLE_SCROLL_BAR
     };
   };
 
@@ -256,6 +298,20 @@ public:
    * @brief Hide the Popup if shown
    */
   void HidePopup();
+
+  /**
+   * @brief Used to set options of text selection popup
+   *
+   * @param[in] properties The text selection popup options
+   */
+  void SetProperties(const Dali::Property::Map& properties);
+
+  /**
+   * @brief Retrieve property map of text selection popup options
+   *
+   * @param[out] properties The text selection popup options
+   */
+  void GetProperties(Dali::Property::Map& properties);
 
 public: // Not intended for application developers
   /**

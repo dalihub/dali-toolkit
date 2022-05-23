@@ -26,7 +26,6 @@
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <string.h>
 #include <cfloat>
@@ -37,6 +36,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/text-selection-popup-property-handler.h>
 #include <dali-toolkit/internal/helpers/color-conversion.h>
@@ -59,6 +59,8 @@ namespace
 
 const std::string   TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME("TextSelectionPopupButton");
 const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR(Dali::Vector4(0.24f, 0.72f, 0.8f, 1.0f));
+const float         DEFAULT_OPTION_PRESSED_CORNER_RADIUS = 0.0f;
+const Dali::Vector4 DEFAULT_LABEL_PADDING(Dali::Vector4(24.0f, 24.0f, 14.0f, 14.0f));
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
@@ -103,25 +105,31 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN(Toolkit::TextSelectionPopup, Toolkit::Control, Create);
 
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupMaxSize", VECTOR2, POPUP_MAX_SIZE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupMinSize", VECTOR2, POPUP_MIN_SIZE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionMaxSize", VECTOR2, OPTION_MAX_SIZE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionMinSize", VECTOR2, OPTION_MIN_SIZE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionDividerSize", VECTOR2, OPTION_DIVIDER_SIZE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionDividerPadding", VECTOR4, OPTION_DIVIDER_PADDING)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupClipboardButtonImage", STRING, POPUP_CLIPBOARD_BUTTON_ICON_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupCutButtonImage", STRING, POPUP_CUT_BUTTON_ICON_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupCopyButtonImage", STRING, POPUP_COPY_BUTTON_ICON_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPasteButtonImage", STRING, POPUP_PASTE_BUTTON_ICON_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupSelectButtonImage", STRING, POPUP_SELECT_BUTTON_ICON_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupSelectAllButtonImage", STRING, POPUP_SELECT_ALL_BUTTON_ICON_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupDividerColor", VECTOR4, POPUP_DIVIDER_COLOR)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupIconColor", VECTOR4, POPUP_ICON_COLOR)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPressedColor", VECTOR4, POPUP_PRESSED_COLOR)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPressedImage", STRING, POPUP_PRESSED_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupFadeInDuration", FLOAT, POPUP_FADE_IN_DURATION)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupFadeOutDuration", FLOAT, POPUP_FADE_OUT_DURATION)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "backgroundBorder", MAP, BACKGROUND_BORDER)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupMaxSize",              VECTOR2, POPUP_MAX_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupMinSize",              VECTOR2, POPUP_MIN_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionMaxSize",             VECTOR2, OPTION_MAX_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionMinSize",             VECTOR2, OPTION_MIN_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionDividerSize",         VECTOR2, OPTION_DIVIDER_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionDividerPadding",      VECTOR4, OPTION_DIVIDER_PADDING)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupClipboardButtonImage", STRING,  POPUP_CLIPBOARD_BUTTON_ICON_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupCutButtonImage",       STRING,  POPUP_CUT_BUTTON_ICON_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupCopyButtonImage",      STRING,  POPUP_COPY_BUTTON_ICON_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPasteButtonImage",     STRING,  POPUP_PASTE_BUTTON_ICON_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupSelectButtonImage",    STRING,  POPUP_SELECT_BUTTON_ICON_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupSelectAllButtonImage", STRING,  POPUP_SELECT_ALL_BUTTON_ICON_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupDividerColor",         VECTOR4, POPUP_DIVIDER_COLOR)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupIconColor",            VECTOR4, POPUP_ICON_COLOR)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPressedColor",         VECTOR4, POPUP_PRESSED_COLOR)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPressedCornerRadius",  FLOAT,   POPUP_PRESSED_CORNER_RADIUS)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPressedImage",         STRING,  POPUP_PRESSED_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupFadeInDuration",       FLOAT,   POPUP_FADE_IN_DURATION)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupFadeOutDuration",      FLOAT,   POPUP_FADE_OUT_DURATION)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "backgroundBorder",          MAP,     BACKGROUND_BORDER)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "background",                MAP,     BACKGROUND)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "labelMinimumSize",          VECTOR2, LABEL_MINIMUM_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "labelPadding",              VECTOR4, LABEL_PADDING)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "labelTextVisual",           MAP,     LABEL_TEXT_VISUAL)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "enableScrollBar",           BOOLEAN, ENABLE_SCROLL_BAR)
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -157,7 +165,6 @@ void TextSelectionPopup::SetProperty(BaseObject* object, Property::Index index, 
 Property::Value TextSelectionPopup::GetProperty(BaseObject* object, Property::Index index)
 {
   Property::Value value;
-
   Toolkit::TextSelectionPopup selectionPopup = Toolkit::TextSelectionPopup::DownCast(Dali::BaseHandle(object));
 
   if(selectionPopup)
@@ -165,6 +172,59 @@ Property::Value TextSelectionPopup::GetProperty(BaseObject* object, Property::In
     value = PropertyHandler::GetProperty(selectionPopup, index);
   }
   return value;
+}
+
+void TextSelectionPopup::SetProperties(const Property::Map& properties)
+{
+  Toolkit::TextSelectionPopup selectionPopup = Toolkit::TextSelectionPopup::DownCast(Self());
+
+  if(selectionPopup)
+  {
+    const Property::Map::SizeType count = properties.Count();
+    for(Property::Map::SizeType position = 0; position < count; ++position)
+    {
+      KeyValuePair     keyValue = properties.GetKeyValue(position);
+      Property::Key&   key      = keyValue.first;
+      Property::Value& value    = keyValue.second;
+      PropertyHandler::SetProperty(selectionPopup, key.indexKey, value);
+    }
+  }
+}
+
+void TextSelectionPopup::GetProperties(Property::Map& properties)
+{
+  Property::Map map;
+
+  map.Insert(Toolkit::TextSelectionPopup::Property::POPUP_MAX_SIZE, GetDimensionToCustomise(POPUP_MAXIMUM_SIZE));
+  map.Insert(Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_SIZE, GetDimensionToCustomise(OPTION_DIVIDER_SIZE));
+  map.Insert(Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_PADDING, Vector4(mOptionDividerPadding.left, mOptionDividerPadding.right, mOptionDividerPadding.top, mOptionDividerPadding.bottom));
+  map.Insert(Toolkit::TextSelectionPopup::Property::LABEL_MINIMUM_SIZE, mLabelMinimumSize);
+  map.Insert(Toolkit::TextSelectionPopup::Property::LABEL_PADDING, Vector4(mLabelPadding.left, mLabelPadding.right, mLabelPadding.top, mLabelPadding.bottom));
+  map.Insert(Toolkit::TextSelectionPopup::Property::LABEL_TEXT_VISUAL, mLabelTextVisual);
+  map.Insert(Toolkit::TextSelectionPopup::Property::ENABLE_SCROLL_BAR, mEnableScrollBar);
+  map.Insert(Toolkit::TextSelectionPopup::Property::POPUP_DIVIDER_COLOR, mDividerColor);
+  map.Insert(Toolkit::TextSelectionPopup::Property::POPUP_FADE_IN_DURATION, mFadeInDuration);
+  map.Insert(Toolkit::TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION, mFadeOutDuration);
+  map.Insert(Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_COLOR, mPressedColor);
+  map.Insert(Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_CORNER_RADIUS, mPressedCornerRadius);
+
+  Property::Map backgroundMap;
+  Toolkit::Visual::Base backgroundVisual = DevelControl::GetVisual(*this, Toolkit::Control::Property::BACKGROUND);
+  if(backgroundVisual)
+  {
+    backgroundVisual.CreatePropertyMap(backgroundMap);
+  }
+  map.Insert(Toolkit::TextSelectionPopup::Property::BACKGROUND, backgroundMap);
+
+  Property::Map borderMap;
+  Toolkit::Visual::Base borderVisual = DevelControl::GetVisual(*this, Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER);
+  if(borderVisual)
+  {
+    borderVisual.CreatePropertyMap(borderMap);
+  }
+  map.Insert(Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER, borderMap);
+
+  properties = map;
 }
 
 void TextSelectionPopup::EnableButtons(Toolkit::TextSelectionPopup::Buttons buttonsToEnable)
@@ -481,6 +541,17 @@ Padding TextSelectionPopup::GetOptionDividerPadding() const
   return mOptionDividerPadding;
 }
 
+void TextSelectionPopup::SetLabelPadding(const Padding& padding)
+{
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextSelectionPopup::SetLabelPadding padding(%f,%f,%f,%f)\n", padding.left, padding.right, padding.top, padding.bottom);
+  mLabelPadding = Padding(padding.left, padding.right, padding.top, padding.bottom);
+}
+
+Padding TextSelectionPopup::GetLabelPadding() const
+{
+  return mLabelPadding;
+}
+
 void TextSelectionPopup::CreateOrderedListOfPopupOptions()
 {
   mOrderListOfButtons.clear();
@@ -506,6 +577,7 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
   Toolkit::PushButton option = Toolkit::PushButton::New();
   option.SetProperty(Dali::Actor::Property::NAME, button.name);
   option.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  option.SetProperty(Actor::Property::MINIMUM_SIZE, mLabelMinimumSize);
 
   switch(button.id)
   {
@@ -550,11 +622,14 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
   if(showCaption)
   {
     // PushButton layout properties.
-    option.SetProperty(Toolkit::PushButton::Property::LABEL_PADDING, Vector4(24.0f, 24.0f, 14.0f, 14.0f));
+    const Padding padding(mLabelPadding);
+    option.SetProperty(Toolkit::PushButton::Property::LABEL_PADDING, padding);
 
     // Label properties.
     Property::Map buttonLabelProperties;
     buttonLabelProperties.Insert(Toolkit::TextVisual::Property::TEXT, button.caption);
+    buttonLabelProperties.Merge(mLabelTextVisual);
+
     option.SetProperty(Toolkit::Button::Property::LABEL, buttonLabelProperties);
   }
   if(showIcons)
@@ -576,10 +651,16 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
   {
     // The image can be blank, the color can be used in that case.
     selectedBackgroundValue = Property::Value{{Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR},
-                                              {Toolkit::ColorVisual::Property::MIX_COLOR, mPressedColor}};
+                                              {Toolkit::ColorVisual::Property::MIX_COLOR, mPressedColor},
+                                              {Toolkit::DevelVisual::Property::CORNER_RADIUS, mPressedCornerRadius},
+                                              {Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::RELATIVE}};
   }
   option.SetProperty(Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL, selectedBackgroundValue);
-  option.SetProperty(Toolkit::Control::Property::STYLE_NAME, TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME);
+  // The value set by user takes precedence over the theme value.
+  if(mLabelTextVisual.Count() == 0)
+  {
+    option.SetProperty(Toolkit::Control::Property::STYLE_NAME, TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME);
+  }
 
   // 5 Add option to tool bar
   mToolbar.AddOption(option);
@@ -638,6 +719,7 @@ void TextSelectionPopup::AddPopupOptionsToToolbar(bool showIcons, bool showCapti
 #ifdef DECORATOR_DEBUG
     mToolbar.SetProperty(Dali::Actor::Property::NAME, "TextSelectionToolbar");
 #endif
+    mToolbar.SetProperty(Toolkit::TextSelectionToolbar::Property::ENABLE_SCROLL_BAR, mEnableScrollBar);
     self.Add(mToolbar);
   }
 
@@ -691,6 +773,22 @@ void TextSelectionPopup::CreateBackgroundBorder(Property::Map& propertyMap)
   }
 }
 
+void TextSelectionPopup::CreateBackground(Property::Map& propertyMap)
+{
+  // Removes previous image if necessary
+  DevelControl::UnregisterVisual(*this, Toolkit::Control::Property::BACKGROUND);
+
+  if(!propertyMap.Empty())
+  {
+    Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(propertyMap);
+
+    if(visual)
+    {
+      DevelControl::RegisterVisual(*this, Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND);
+    }
+  }
+}
+
 TextSelectionPopup::TextSelectionPopup(TextSelectionPopupCallbackInterface* callbackInterface)
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mToolbar(),
@@ -699,9 +797,14 @@ TextSelectionPopup::TextSelectionPopup(TextSelectionPopupCallbackInterface* call
   mOptionMinSize(),
   mOptionDividerSize(),
   mOptionDividerPadding(),
+  mLabelMinimumSize(),
+  mLabelPadding(DEFAULT_LABEL_PADDING),
+  mLabelTextVisual(),
+  mEnableScrollBar(true),
   mEnabledButtons(Toolkit::TextSelectionPopup::NONE),
   mCallbackInterface(callbackInterface),
   mPressedColor(DEFAULT_OPTION_PRESSED_COLOR),
+  mPressedCornerRadius(DEFAULT_OPTION_PRESSED_CORNER_RADIUS),
   mDividerColor(Color::WHITE),
   mIconColor(Color::WHITE),
   mSelectOptionPriority(1),
