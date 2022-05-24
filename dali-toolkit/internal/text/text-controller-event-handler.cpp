@@ -282,6 +282,15 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
       controller.mImpl->RequestRelayout();
     }
   }
+  else if((NULL != controller.mImpl->mEventData) && (keyEvent.GetState() == KeyEvent::UP))
+  {
+    // Handles specific keys that require event propagation.
+    if(Dali::DALI_KEY_BACK == keyEvent.GetKeyCode())
+    {
+      // Do nothing
+      return false;
+    }
+  }
 
   if(textChanged &&
      (NULL != controller.mImpl->mEditableControlInterface))
