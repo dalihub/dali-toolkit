@@ -271,6 +271,12 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
       mCurrentFocusActors.push_back(std::pair<WeakHandle<Layer>, WeakHandle<Actor> >(mCurrentFocusedWindow, actor));
     }
 
+    // Send notification for the change of focus actor
+    if(!mFocusChangedSignal.Empty())
+    {
+      mFocusChangedSignal.Emit(currentFocusedActor, actor);
+    }
+
     Toolkit::Control newlyFocusedControl = Toolkit::Control::DownCast(actor);
     if(newlyFocusedControl)
     {
@@ -288,11 +294,6 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
       mFocusHistory.erase(beginPos);
     }
 
-    // Send notification for the change of focus actor
-    if(!mFocusChangedSignal.Empty())
-    {
-      mFocusChangedSignal.Emit(currentFocusedActor, actor);
-    }
     DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] SUCCEED\n", __FUNCTION__, __LINE__);
     success = true;
   }
