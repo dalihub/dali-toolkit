@@ -123,6 +123,8 @@ public:
    * @param[in]  synchronousLoading    true if the frame should be loaded synchronously
    * @param[in]  textureObserver       The client object should inherit from this and provide the "LoadCompleted" virtual.
    *                                   This is called when an image load completes (or fails).
+   * @param[in,out] preMultiplyOnLoad  True if the image color should be multiplied by it's alpha. Set to false if the
+   *                                   image has no alpha channel
    *
    * @return                           The texture set containing the frame of animated image, or empty if still loading.
    */
@@ -135,7 +137,8 @@ public:
                                       const Dali::WrapMode::Type&     wrapModeU,
                                       const Dali::WrapMode::Type&     wrapModeV,
                                       const bool&                     synchronousLoading,
-                                      TextureUploadObserver*          textureObserver);
+                                      TextureUploadObserver*          textureObserver,
+                                      TextureManager::MultiplyOnLoad& preMultiplyOnLoad);
 
   /**
    * @brief Requests an image load of the given URL to get PixelBuffer.

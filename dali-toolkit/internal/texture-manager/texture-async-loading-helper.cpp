@@ -40,12 +40,13 @@ TextureAsyncLoadingHelper::TextureAsyncLoadingHelper(TextureManager& textureMana
 {
 }
 
-void TextureAsyncLoadingHelper::LoadAnimatedImage(const TextureManager::TextureId& textureId,
-                                                  Dali::AnimatedImageLoading       animatedImageLoading,
-                                                  const std::uint32_t&             frameIndex)
+void TextureAsyncLoadingHelper::LoadAnimatedImage(const TextureManager::TextureId&                textureId,
+                                                  Dali::AnimatedImageLoading                      animatedImageLoading,
+                                                  const std::uint32_t&                            frameIndex,
+                                                  const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad)
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id                             = GetImplementation(mLoader).LoadAnimatedImage(animatedImageLoading, frameIndex);
+  auto id                             = GetImplementation(mLoader).LoadAnimatedImage(animatedImageLoading, frameIndex, preMultiplyOnLoad);
   mLoadingInfoContainer.back().loadId = id;
 }
 

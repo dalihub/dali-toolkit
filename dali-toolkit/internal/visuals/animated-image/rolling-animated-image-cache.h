@@ -58,7 +58,8 @@ public:
                             ImageCache::FrameReadyObserver&     observer,
                             uint16_t                            cacheSize,
                             uint16_t                            batchSize,
-                            bool                                isSynchronousLoading);
+                            bool                                isSynchronousLoading,
+                            bool                                preMultiplyOnLoad);
 
   /**
    * @brief Destructor
@@ -181,6 +182,7 @@ private:
   std::vector<uint32_t>      mLoadWaitingQueue;
   CircularQueue<ImageFrame>  mQueue;
   bool                       mIsSynchronousLoading;
+  bool                       mPreMultiplyOnLoad;
 };
 
 } // namespace Internal

@@ -175,7 +175,7 @@ void AnimatedImageVisual::CreateImageCache()
 
   if(mAnimatedImageLoading)
   {
-    mImageCache = new RollingAnimatedImageCache(textureManager, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, IsSynchronousLoadingRequired());
+    mImageCache = new RollingAnimatedImageCache(textureManager, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, IsSynchronousLoadingRequired(),mFactoryCache.GetPreMultiplyOnLoad());
   }
   else if(mImageUrls)
   {
@@ -229,6 +229,7 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mStartFirstFrame(false),
   mIsJumpTo(false)
 {
+  EnablePreMultipliedAlpha(mFactoryCache.GetPreMultiplyOnLoad());
 }
 
 AnimatedImageVisual::~AnimatedImageVisual()
@@ -726,6 +727,12 @@ void AnimatedImageVisual::OnInitialize()
   {
     mImpl->mRenderer.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, mPixelArea);
   }
+
+  // Enable PreMultipliedAlpha if it need premultiplied
+  auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader
+                             ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
+                             : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  EnablePreMultipliedAlpha(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
 }
 
 void AnimatedImageVisual::StartFirstFrame(TextureSet& textureSet, uint32_t firstInterval)
