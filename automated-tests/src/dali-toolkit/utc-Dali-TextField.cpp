@@ -3286,6 +3286,14 @@ int utcDaliTextFieldSomeSpecialKeys(void)
   application.SendNotification();
   application.Render();
 
+  // Generate a Back key event. Nothing happens to the text field.
+  application.ProcessEvent(GenerateKey("XF86Back", "", "XF86Back", DALI_KEY_BACK, 0, 0, Integration::KeyEvent::DOWN, "XF86Back", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("XF86Back", "", "XF86Back", DALI_KEY_BACK, 0, 0, Integration::KeyEvent::UP, "XF86Back", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
   // The text shouldn't be deleted.
   DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), longText, TEST_LOCATION);
 
