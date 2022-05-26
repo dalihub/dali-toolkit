@@ -388,9 +388,13 @@ void VisualFactory::SetBrokenImageUrl(Toolkit::StyleManager& styleManager)
 
   if(styleManager)
   {
-    customBrokenImageUrlList = Toolkit::DevelStyleManager::GetBrokenImageUrlList(styleManager);
-    Property::Map config     = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
-    config["brokenImageUrl"].Get(brokenImageUrl);
+    customBrokenImageUrlList                 = Toolkit::DevelStyleManager::GetBrokenImageUrlList(styleManager);
+    const Property::Map& config              = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
+    const auto           brokenImageUrlValue = config.Find("brokenImageUrl", Property::Type::STRING);
+    if(brokenImageUrlValue)
+    {
+      brokenImageUrlValue->Get(brokenImageUrl);
+    }
   }
 
   // Add default image
