@@ -58,12 +58,13 @@ public:
     {
       mRasterizeSuccess = false;
     }
+    mLoadSuccess = true;
     return true;
   }
 
   bool IsLoaded() const
   {
-    return mLoadCount > 0 ? true : false;
+    return mLoadSuccess;
   }
 
   Dali::Devel::PixelBuffer Rasterize(uint32_t width, uint32_t height)
@@ -86,6 +87,7 @@ public:
   uint32_t mWidth{0};
   uint32_t mHeight{0};
   uint32_t mLoadCount{0};
+  bool     mLoadSuccess{false};
   bool     mRasterizeSuccess{true};
 };
 
