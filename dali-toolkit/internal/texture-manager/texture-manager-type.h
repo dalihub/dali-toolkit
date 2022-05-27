@@ -175,6 +175,7 @@ enum class StorageType
   KEEP_PIXEL_BUFFER,   ///< Keep loaded pixel buffer inside of texture manager without making texture. This could be used for inside pixel process like mask image.
   RETURN_PIXEL_BUFFER, ///< Return loaded pixel buffer without making texture.
                        ///  Because a pixel buffer cannot be used multiple texture, this pixel buffer only cached during loading, and is removed after loading is finished.
+  KEEP_TEXTURE,        ///< Keep loaded texture inside of texture manager. This could be used for pixel processing like GPU masking.
   UPLOAD_TO_TEXTURE    ///< Loaded image will be uploaded to texture and the texture will be returned.
 };
 

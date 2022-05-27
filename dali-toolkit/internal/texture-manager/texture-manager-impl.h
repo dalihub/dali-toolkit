@@ -80,6 +80,8 @@ public:
     TextureManager::TextureId mAlphaMaskId;
     float                     mContentScaleFactor;
     bool                      mCropToMask;
+    bool                      mPreappliedMasking;
+    bool                      mMaskImageLoadingFailed;
   };
   using MaskingDataPointer = std::unique_ptr<MaskingData>;
 
@@ -416,12 +418,14 @@ public: // Load Request API
    * @brief Requests a masking image to be loaded. This mask is not uploaded to GL,
    * instead, it is stored in CPU memory, and can be used for CPU blending.
    * @param[in] maskUrl            The URL of the mask image to load
+   * @param[in] storageType,       Whether the pixel data is stored in the cache or uploaded to the GPU
    * @param[in] synchronousLoading True if the frame should be loaded synchronously. If you skip this parameter,
    *                               default is false.
    * @return                       A TextureId to use as a handle to reference this mask Texture
    */
   TextureId RequestMaskLoad(
     const VisualUrl& maskUrl,
+    StorageType      storageType,
     const bool&      synchronousLoading = false);
 
 private:

@@ -247,6 +247,12 @@ private:
    */
   void AllocateMaskData();
 
+  /**
+   * @brief Check whether the mask texture is loaded or not.
+   * If MaskingType is MASKING_ON_LOADING and mask texture is failed to load, update shader.
+   */
+  void CheckMaskTexture();
+
   // Undefined
   AnimatedImageVisual(const AnimatedImageVisual& animatedImageVisual);
 

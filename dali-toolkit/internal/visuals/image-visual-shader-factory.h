@@ -96,6 +96,18 @@ enum Type
 };
 } // namespace ChangeFragmentShader
 
+namespace AlphaMaskingOnRendering
+{
+/**
+ * @brief Whether use runtime alpha masking in shader, or not
+ */
+enum Type
+{
+  DISABLED = 0, ///< Image visual doesn't use runtime alpha masking
+  ENABLED       ///< Image visual uses runtime alpha masking
+};
+} // namespace AlphaMaskingOnRendering
+
 /**
  * @brief Collection of current image visual feature. Only use for ImageVisualShaderFactory::GetShader()
  */
@@ -106,6 +118,7 @@ struct FeatureBuilder
     mDefaultTextureWrapMode(DefaultTextureWrapMode::APPLY),
     mRoundedCorner(RoundedCorner::DISABLED),
     mBorderline(Borderline::DISABLED),
+    mAlphaMaskingOnRendering(AlphaMaskingOnRendering::DISABLED),
     mTexture()
   {
   }
@@ -115,15 +128,17 @@ struct FeatureBuilder
   FeatureBuilder& EnableRoundedCorner(bool enableRoundedCorner);
   FeatureBuilder& EnableBorderline(bool enableBorderline);
   FeatureBuilder& SetTextureForFragmentShaderCheck(const Dali::Texture& texture);
+  FeatureBuilder& EnableAlphaMaskingOnRendering(bool enableAlphaMaskingOnRendering);
 
-  TextureAtlas::Type           mTextureAtlas : 2;           ///< Whether use texture with atlas, or not. default as TextureAtlas::DISABLED
-  DefaultTextureWrapMode::Type mDefaultTextureWrapMode : 2; ///< Whether apply to texture wraping in default, or not. default as DefaultTextureWrapMode::APPLY
-  RoundedCorner::Type          mRoundedCorner : 2;          ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED
-  Borderline::Type             mBorderline : 2;             ///< Whether use borderline, or not. default as Borderline::DISABLED
-  Dali::Texture                mTexture;                    ///< Texture to check whether we need to change fragment shader or not
+  TextureAtlas::Type            mTextureAtlas : 2;            ///< Whether use texture with atlas, or not. default as TextureAtlas::DISABLED
+  DefaultTextureWrapMode::Type  mDefaultTextureWrapMode : 2;  ///< Whether apply to texture wraping in default, or not. default as DefaultTextureWrapMode::APPLY
+  RoundedCorner::Type           mRoundedCorner : 2;           ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED
+  Borderline::Type              mBorderline : 2;              ///< Whether use borderline, or not. default as Borderline::DISABLED
+  AlphaMaskingOnRendering::Type mAlphaMaskingOnRendering : 2; ///< Whether use runtime alpha masking, or not. default as AlphaMaskingOnRendering::DISABLED
+  Dali::Texture                 mTexture;                     ///< Texture to check whether we need to change fragment shader or not
 };
 
-} // namespace ImageVisualShaderFactoryFeature
+} // namespace ImageVisualShaderFeature
 
 /**
  * ImageVisualShaderFactory is an object that provides and shares shaders between image visuals
