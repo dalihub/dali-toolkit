@@ -151,18 +151,12 @@ public:
   /**
    * @bried Apply the rasterized image to the visual.
    *
-   * @param[in] vectorImage The data of vector image.
    * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
-   * @param[in] bool Whether the resource is loaded
+   * @param[in] success Whether the task succeeds.
    */
-  void ApplyRasterizedImage(VectorImageRenderer vectorImage, PixelData rasterizedPixelData, bool isLoaded);
+  void ApplyRasterizedImage(PixelData rasterizedPixelData, bool success);
 
 private:
-  /**
-   * @brief Load the SVG Image from the set URL.
-   */
-  void Load();
-
   /**
    * @bried Rasterize the svg with the given size, and add it to the visual.
    *

@@ -1293,8 +1293,13 @@ void WebView::WebViewAccessible::OnAccessibilityDisabled()
 
 void WebView::WebViewAccessible::SetRemoteChildAddress(Dali::Accessibility::Address address)
 {
-  mRemoteChild.SetAddress(std::move(address));
+  mRemoteChild.SetAddress(address);
   OnChildrenChanged();
+
+  if(address)
+  {
+    Accessibility::Bridge::GetCurrentBridge()->EmbedAtkSocket(GetAddress(), address);
+  }
 }
 
 #undef GET_ENUM_STRING

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,9 +56,14 @@ namespace Toolkit
 {
 namespace Internal
 {
-RollingImageCache::RollingImageCache(
-  TextureManager& textureManager, UrlList& urlList, ImageCache::FrameReadyObserver& observer, uint16_t cacheSize, uint16_t batchSize, uint32_t interval)
-: ImageCache(textureManager, observer, batchSize, interval),
+RollingImageCache::RollingImageCache(TextureManager&                     textureManager,
+                                     UrlList&                            urlList,
+                                     TextureManager::MaskingDataPointer& maskingData,
+                                     ImageCache::FrameReadyObserver&     observer,
+                                     uint16_t                            cacheSize,
+                                     uint16_t                            batchSize,
+                                     uint32_t                            interval)
+: ImageCache(textureManager, maskingData, observer, batchSize, interval),
   mImageUrls(urlList),
   mQueue(cacheSize)
 {
@@ -75,10 +80,8 @@ TextureSet RollingImageCache::Frame(uint32_t frameIndex)
   bool popExist = false;
   while(!mQueue.IsEmpty() && mQueue.Front().mUrlIndex != frameIndex)
   {
-    ImageFrame imageFrame = mQueue.PopFront();
-    mTextureManager.Remove(mImageUrls[imageFrame.mUrlIndex].mTextureId, this);
-    mImageUrls[imageFrame.mUrlIndex].mTextureId = TextureManager::INVALID_TEXTURE_ID;
-    popExist                                    = true;
+    PopFrontCache();
+    popExist = true;
   }
 
   // TODO: synchronous loading of first frame.
@@ -141,7 +144,7 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
   {
     ImageFrame imageFrame;
 
-    std::string& url     = mImageUrls[frameIndex].mUrl;
+    VisualUrl& url       = mImageUrls[frameIndex].mUrl;
     imageFrame.mUrlIndex = frameIndex;
     imageFrame.mReady    = false;
 
@@ -151,21 +154,20 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
     // from within this method. This means it won't yet have a texture id, so we
     // need to account for this inside the LoadComplete method using mRequestingLoad.
     mRequestingLoad = true;
-    mLoadState = TextureManager::LoadState::LOADING;
+    mLoadState      = TextureManager::LoadState::LOADING;
 
-    bool                               synchronousLoading = false;
-    bool                               atlasingStatus     = false;
-    bool                               loadingStatus      = false;
-    TextureManager::MaskingDataPointer maskInfo           = nullptr;
-    AtlasUploadObserver*               atlasObserver      = nullptr;
-    ImageAtlasManagerPtr               imageAtlasManager  = nullptr;
-    Vector4                            textureRect;
-    Dali::ImageDimensions              textureRectSize;
-    auto                               preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+    bool                  synchronousLoading = false;
+    bool                  atlasingStatus     = false;
+    bool                  loadingStatus      = false;
+    AtlasUploadObserver*  atlasObserver      = nullptr;
+    ImageAtlasManagerPtr  imageAtlasManager  = nullptr;
+    Vector4               textureRect;
+    Dali::ImageDimensions textureRectSize;
+    auto                  preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
     TextureSet                textureSet    = mTextureManager.LoadTexture(
-      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, maskInfo, synchronousLoading, loadTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
+      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, mMaskingData, synchronousLoading, loadTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
     mImageUrls[imageFrame.mUrlIndex].mTextureId = loadTextureId;
 
     mRequestingLoad = false;
@@ -186,13 +188,27 @@ TextureManager::TextureId RollingImageCache::GetCachedTextureId(int index) const
   return mImageUrls[mQueue[index].mUrlIndex].mTextureId;
 }
 
+void RollingImageCache::PopFrontCache()
+{
+  ImageFrame imageFrame = mQueue.PopFront();
+  mTextureManager.Remove(mImageUrls[imageFrame.mUrlIndex].mTextureId, this);
+  mImageUrls[imageFrame.mUrlIndex].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+
+  if(mMaskingData && mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
+  {
+    mTextureManager.Remove(mMaskingData->mAlphaMaskId, this);
+    if(mQueue.IsEmpty())
+    {
+      mMaskingData->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
+    }
+  }
+}
+
 void RollingImageCache::ClearCache()
 {
   while(mTextureManagerAlive && !mQueue.IsEmpty())
   {
-    ImageFrame imageFrame = mQueue.PopFront();
-    mTextureManager.Remove(mImageUrls[imageFrame.mUrlIndex].mTextureId, this);
-    mImageUrls[imageFrame.mUrlIndex].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+    PopFrontCache();
   }
   mLoadState = TextureManager::LoadState::NOT_STARTED;
 }
@@ -204,7 +220,7 @@ void RollingImageCache::LoadComplete(bool loadSuccess, TextureInformation textur
 
   if(loadSuccess)
   {
-    mLoadState = TextureManager::LoadState::LOAD_FINISHED;
+    mLoadState           = TextureManager::LoadState::LOAD_FINISHED;
     bool frontFrameReady = IsFrontReady();
     if(!mRequestingLoad)
     {

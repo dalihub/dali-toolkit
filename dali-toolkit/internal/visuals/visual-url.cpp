@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
 // EXTERNAL HEADERS
+#include <dali/devel-api/common/hash.h>
 #include <cstring> // for toupper()
 
 namespace Dali
@@ -104,8 +105,8 @@ VisualUrl::ProtocolType ResolveLocation(const std::string& url)
 VisualUrl::Type ResolveType(const std::string& url)
 {
   // if only one char in string, can only be regular image
-  const std::size_t count = url.size();
-  VisualUrl::Type  returnType = VisualUrl::REGULAR_IMAGE;
+  const std::size_t count      = url.size();
+  VisualUrl::Type   returnType = VisualUrl::REGULAR_IMAGE;
   if(count > 0)
   {
     // parsing from the end for better chance of early outs
@@ -218,14 +219,16 @@ VisualUrl::Type ResolveType(const std::string& url)
 VisualUrl::VisualUrl()
 : mUrl(),
   mType(VisualUrl::REGULAR_IMAGE),
-  mLocation(VisualUrl::LOCAL)
+  mLocation(VisualUrl::LOCAL),
+  mUrlHash(0ull)
 {
 }
 
 VisualUrl::VisualUrl(const std::string& url)
 : mUrl(url),
   mType(VisualUrl::REGULAR_IMAGE),
-  mLocation(VisualUrl::LOCAL)
+  mLocation(VisualUrl::LOCAL),
+  mUrlHash(0ull)
 {
   if(!url.empty())
   {
@@ -241,7 +244,8 @@ VisualUrl::VisualUrl(const std::string& url)
 VisualUrl::VisualUrl(const VisualUrl& url)
 : mUrl(url.mUrl),
   mType(url.mType),
-  mLocation(url.mLocation)
+  mLocation(url.mLocation),
+  mUrlHash(url.mUrlHash)
 {
 }
 
@@ -256,6 +260,7 @@ VisualUrl& VisualUrl::operator=(const VisualUrl& url)
     mUrl      = url.mUrl;
     mType     = url.mType;
     mLocation = url.mLocation;
+    mUrlHash  = url.mUrlHash;
   }
   return *this;
 }
@@ -263,6 +268,11 @@ VisualUrl& VisualUrl::operator=(const VisualUrl& url)
 const std::string& VisualUrl::GetUrl() const
 {
   return mUrl;
+}
+
+const std::uint64_t& VisualUrl::GetUrlHash() const
+{
+  return DALI_UNLIKELY(mUrlHash == 0) ? (mUrlHash = Dali::CalculateHash(mUrl)) : mUrlHash;
 }
 
 VisualUrl::Type VisualUrl::GetType() const

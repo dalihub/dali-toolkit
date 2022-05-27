@@ -160,7 +160,7 @@ int UtcDaliDebugRenderingGetVisual1(void)
   propertyMap5.Insert(ImageVisual::Property::URL, TEST_SVG_FILE_NAME);
   Visual::Base svgVisual = factory.CreateVisual(propertyMap5);
   DALI_TEST_CHECK(svgVisual);
-  TestDebugVisual(application.GetScene(), svgVisual, Visual::SVG, Vector2(100.f, 100.f));
+  TestDebugVisual(application.GetScene(), svgVisual, Visual::SVG, Vector2::ZERO);
 
   // Test that AnimatedImageVisual is replaced with debug visual
   // TEST_GIF_FILE: anim.gif

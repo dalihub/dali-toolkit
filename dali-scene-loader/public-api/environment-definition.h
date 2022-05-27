@@ -39,6 +39,7 @@ struct DALI_SCENE_LOADER_API EnvironmentDefinition
   {
     Texture mDiffuse;  // irradiance
     Texture mSpecular; // radiance
+    Texture mBrdf;     // pre-computed brdf
 
     bool IsLoaded() const
     {
@@ -48,8 +49,9 @@ struct DALI_SCENE_LOADER_API EnvironmentDefinition
 
   struct RawData
   {
-    CubeData mDiffuse;
-    CubeData mSpecular;
+    CubeData  mDiffuse;
+    CubeData  mSpecular;
+    PixelData mBrdf;
   };
 
   using EnvironmentData = std::pair<EnvironmentDefinition, Textures>;
@@ -81,6 +83,7 @@ public: // DATA
   std::string mSpecularMapPath;
   Quaternion  mCubeOrientation = Quaternion::IDENTITY;
   float       mIblIntensity    = 1.0f;
+  bool        mUseBrdfTexture  = false;
 };
 
 } // namespace SceneLoader

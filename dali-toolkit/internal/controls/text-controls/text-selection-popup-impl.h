@@ -115,6 +115,16 @@ public:
   static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
   /**
+   * @brief Toolkit::TextSelectionPopup::SetProperties()
+   */
+  void SetProperties(const Property::Map& properties);
+
+  /**
+   * @brief Toolkit::TextSelectionPopup::GetProperties()
+   */
+  void GetProperties(Property::Map& properties);
+
+  /**
    * @copydoc Toolkit::EnableButtons
    */
   void EnableButtons(Toolkit::TextSelectionPopup::Buttons buttonsToEnable);
@@ -247,6 +257,18 @@ private: // Implementation
    */
   Padding GetOptionDividerPadding() const;
 
+  /**
+   * Set label padding
+   * @param[in] padding BEGIN END BOTTOM TOP
+   */
+  void SetLabelPadding(const Padding& padding);
+
+  /**
+   * Get label padding
+   * @return Padding
+   */
+  Padding GetLabelPadding() const;
+
   void CreateOrderedListOfPopupOptions();
 
   void AddOption(const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption);
@@ -261,6 +283,14 @@ private: // Implementation
    * @param[in] propertyMap The properties describing the background-border
    */
   void CreateBackgroundBorder(Property::Map& propertyMap);
+
+  /**
+   * Creates the background image
+   *
+   * @param[in] propertyMap The properties describing the background
+   */
+  void CreateBackground(Property::Map& propertyMap);
+
 
   /**
    * Construct a new TextField.
@@ -310,15 +340,21 @@ private: // Data
   Size    mOptionDividerSize;    // Size of divider line
   Padding mOptionDividerPadding; // Padding of divider line
 
+  Vector2       mLabelMinimumSize; // Minimum size of label
+  Padding       mLabelPadding;     // Padding of label
+  Property::Map mLabelTextVisual;  // Text visual map of label
+  bool          mEnableScrollBar;  // Enable scrollbar
+
   std::vector<ButtonRequirement> mOrderListOfButtons; // List of buttons in the order to be displayed and a flag to indicate if needed.
 
   Toolkit::TextSelectionPopup::Buttons          mEnabledButtons; // stores enabled buttons
   Toolkit::TextSelectionPopupCallbackInterface* mCallbackInterface;
 
-  std::string mPressedImage; // Image used for the popup option when pressed.
-  Vector4     mPressedColor; // Color of the popup option when pressed.
-  Vector4     mDividerColor; // Color of the divider between buttons
-  Vector4     mIconColor;    // Color of the popup icon.
+  std::string mPressedImage;        // Image used for the popup option when pressed.
+  Vector4     mPressedColor;        // Color of the popup option when pressed.
+  float       mPressedCornerRadius; // Corner radius of the popup option when pressed.
+  Vector4     mDividerColor;        // Color of the divider between buttons
+  Vector4     mIconColor;           // Color of the popup icon.
 
   // Priority of Options/Buttons in the Cut and Paste pop-up, higher priority buttons are displayed first, left to right.
   std::size_t mSelectOptionPriority;    // Position of Select Button

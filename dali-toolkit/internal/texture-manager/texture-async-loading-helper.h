@@ -64,10 +64,12 @@ public:
    * @param[in] textureId             TextureId to reference the texture that will be loaded
    * @param[in] animatedImageLoading  The AnimatedImageLoading to load animated image
    * @param[in] frameIndex            The frame index of a frame to be loaded frame
+   * @param[in] preMultiplyOnLoad     if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
    */
-  void LoadAnimatedImage(const TextureManager::TextureId& textureId,
-                         Dali::AnimatedImageLoading       animatedImageLoading,
-                         const std::uint32_t&             frameIndex);
+  void LoadAnimatedImage(const TextureManager::TextureId&                textureId,
+                         Dali::AnimatedImageLoading                      animatedImageLoading,
+                         const std::uint32_t&                            frameIndex,
+                         const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad);
 
   /**
    * @brief Load a new texture.

@@ -213,13 +213,13 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
      actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE) &&
      actor.GetProperty<bool>(Actor::Property::VISIBLE))
   {
-    // If the parent's KEYBOARD_FOCUSABLE_CHILDREN is false or VISIBLE is false, it cannot have focus.
+    // If the parent's KEYBOARD_FOCUSABLE_CHILDREN is false, it cannot have focus.
     Actor parent = actor.GetParent();
     while(parent)
     {
-      if(!parent.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN) || !parent.GetProperty<bool>(Actor::Property::VISIBLE))
+      if(!parent.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN))
       {
-        DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] Parent Actor has KEYBOARD_FOCUSABLE_CHILDREN false or VISIBLE false,\n", __FUNCTION__, __LINE__);
+        DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] Parent Actor has KEYBOARD_FOCUSABLE_CHILDREN false\n", __FUNCTION__, __LINE__);
         return false;
       }
       parent = parent.GetParent();
@@ -271,6 +271,12 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
       mCurrentFocusActors.push_back(std::pair<WeakHandle<Layer>, WeakHandle<Actor> >(mCurrentFocusedWindow, actor));
     }
 
+    // Send notification for the change of focus actor
+    if(!mFocusChangedSignal.Empty())
+    {
+      mFocusChangedSignal.Emit(currentFocusedActor, actor);
+    }
+
     Toolkit::Control newlyFocusedControl = Toolkit::Control::DownCast(actor);
     if(newlyFocusedControl)
     {
@@ -288,11 +294,6 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
       mFocusHistory.erase(beginPos);
     }
 
-    // Send notification for the change of focus actor
-    if(!mFocusChangedSignal.Empty())
-    {
-      mFocusChangedSignal.Emit(currentFocusedActor, actor);
-    }
     DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] SUCCEED\n", __FUNCTION__, __LINE__);
     success = true;
   }
@@ -420,11 +421,11 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
   bool succeed = false;
 
   // Go through the actor's hierarchy until we find a layout control that knows how to move the focus
-  Toolkit::Control parentLayoutControl = GetParentLayoutControl(currentFocusActor);
-  while(parentLayoutControl && !succeed)
+  Toolkit::Control layoutControl = IsLayoutControl(currentFocusActor) ? Toolkit::Control::DownCast(currentFocusActor) : GetParentLayoutControl(currentFocusActor);
+  while(layoutControl && !succeed)
   {
-    succeed             = DoMoveFocusWithinLayoutControl(parentLayoutControl, currentFocusActor, direction);
-    parentLayoutControl = GetParentLayoutControl(parentLayoutControl);
+    succeed       = DoMoveFocusWithinLayoutControl(layoutControl, currentFocusActor, direction);
+    layoutControl = GetParentLayoutControl(layoutControl);
   }
 
   if(!succeed)
@@ -556,9 +557,9 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
         Toolkit::Control layoutControl = Toolkit::Control::DownCast(nextFocusableActor);
         succeed                        = DoMoveFocusWithinLayoutControl(layoutControl, currentFocusActor, direction);
       }
-      else
+      if(!succeed)
       {
-        // Otherwise, just set focus to the next focusable actor
+        // Just set focus to the next focusable actor
         succeed = SetCurrentFocusActor(nextFocusableActor);
       }
     }
@@ -595,7 +596,7 @@ bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control contr
       if(committedFocusActor && committedFocusActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && committedFocusActor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED))
       {
         // Whether the commited focusable actor is a layout control
-        if(IsLayoutControl(committedFocusActor))
+        if(IsLayoutControl(committedFocusActor) && committedFocusActor != control)
         {
           // If so, move the focus inside it.
           Toolkit::Control layoutControl = Toolkit::Control::DownCast(committedFocusActor);

@@ -488,12 +488,14 @@ DALI_TOOLKIT_API void AppendAccessibilityRelation(Toolkit::Control control, Dali
 DALI_TOOLKIT_API void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation);
 
 /**
- * @brief The method returns collection accessibility addresses representing objects connected with current object
+ * @brief Returns a collection of Accessible objects related to current object and grouped by relation type.
  *
- * @param control object to append attribute to
- * @return std::vector, where index is casted value of Accessibility::RelationType and value is std::vector of type Accessibility::Address
+ * @param control object to query
+ * @return collection of relations
+ *
+ * @see Dali::Accessibility::Accessible::GetRelationSet()
  */
-DALI_TOOLKIT_API std::vector<std::vector<Accessibility::Address>> GetAccessibilityRelations(Toolkit::Control control);
+DALI_TOOLKIT_API std::vector<Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control control);
 
 /**
  * @brief The method removes all previously appended relations

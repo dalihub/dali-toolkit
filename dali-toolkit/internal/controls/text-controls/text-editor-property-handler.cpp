@@ -742,6 +742,15 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       impl.mRenderer.Reset();
       break;
     }
+    case Toolkit::DevelTextEditor::Property::SELECTION_POPUP_STYLE:
+    {
+      const Property::Map* map = value.GetMap();
+      if(map)
+      {
+        impl.mDecorator->SetSelectionPopupStyle(*map);
+      }
+      break;
+    }
   }
 }
 
@@ -1162,6 +1171,13 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     case Toolkit::DevelTextEditor::Property::RELATIVE_LINE_SIZE:
     {
       value = impl.mController->GetRelativeLineSize();
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::SELECTION_POPUP_STYLE:
+    {
+      Property::Map map;
+      impl.mDecorator->GetSelectionPopupStyle(map);
+      value = map;
       break;
     }
   } //switch

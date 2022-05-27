@@ -208,6 +208,7 @@ public:
    * @param[in] useAtlas         True if atlased
    * @param[in] maskTextureId    The masking texture id (or INVALID_TEXTURE_ID)
    * @param[in] cropToMask       True if crop to mask
+   * @param[in] frameIndex       The frame index to use
    * @return                     A hash of the provided data for caching.
    */
   TextureCacheManager::TextureHash GenerateHash(
@@ -217,7 +218,8 @@ public:
     const Dali::SamplingMode::Type&       samplingMode,
     const TextureCacheManager::UseAtlas&  useAtlas,
     const TextureCacheManager::TextureId& maskTextureId,
-    const bool&                           cropToMask);
+    const bool&                           cropToMask,
+    const std::uint32_t&                  frameIndex);
 
   /**
    * @brief Looks up a cached texture by its hash.
@@ -229,9 +231,10 @@ public:
    * @param[in] samplingMode      The SamplingMode to use
    * @param[in] useAtlas          True if atlased
    * @param[in] maskTextureId     Optional texture ID to use to mask this image
+   * @param[in] cropToMask        True if crop to mask
    * @param[in] preMultiplyOnLoad if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    * @param[in] isAnimatedImage   True if the texture is from animated image.
-   * @param[in] cropToMask        True if crop to mask
+   * @param[in] frameIndex        The frame index to use
    * @return                      A TextureCacheIndex of a cached Texture if found. Or INVALID_CACHE_INDEX if not found.
    */
   TextureCacheManager::TextureCacheIndex FindCachedTexture(
@@ -244,7 +247,8 @@ public:
     const TextureCacheManager::TextureId&      maskTextureId,
     const bool&                                cropToMask,
     const TextureCacheManager::MultiplyOnLoad& preMultiplyOnLoad,
-    const bool&                                isAnimatedImage);
+    const bool&                                isAnimatedImage,
+    const std::uint32_t&                       frameIndex);
 
   /**
    * @brief Append a Texture to the TextureCacheManager.

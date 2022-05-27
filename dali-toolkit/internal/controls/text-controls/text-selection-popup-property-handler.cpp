@@ -100,6 +100,11 @@ void TextSelectionPopup::PropertyHandler::SetProperty(Toolkit::TextSelectionPopu
       impl.mPressedColor = value.Get<Vector4>();
       break;
     }
+    case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_CORNER_RADIUS:
+    {
+      impl.mPressedCornerRadius = value.Get<float>();
+      break;
+    }
     case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_IMAGE:
     {
       impl.SetPressedImage(value.Get<std::string>());
@@ -119,6 +124,33 @@ void TextSelectionPopup::PropertyHandler::SetProperty(Toolkit::TextSelectionPopu
     {
       Property::Map map = value.Get<Property::Map>();
       impl.CreateBackgroundBorder(map);
+      break;
+    }
+    case Toolkit::TextSelectionPopup::Property::BACKGROUND:
+    {
+      Property::Map map = value.Get<Property::Map>();
+      impl.CreateBackground(map);
+      break;
+    }
+    case Toolkit::TextSelectionPopup::Property::LABEL_MINIMUM_SIZE:
+    {
+      impl.mLabelMinimumSize = value.Get<Vector2>();
+      break;
+    }
+    case Toolkit::TextSelectionPopup::Property::LABEL_PADDING:
+    {
+      Vector4 padding(value.Get<Vector4>());
+      impl.SetLabelPadding(Padding(padding.x, padding.y, padding.z, padding.w));
+      break;
+    }
+    case Toolkit::TextSelectionPopup::Property::LABEL_TEXT_VISUAL:
+    {
+      impl.mLabelTextVisual = value.Get<Property::Map>();
+      break;
+    }
+    case Toolkit::TextSelectionPopup::Property::ENABLE_SCROLL_BAR:
+    {
+      impl.mEnableScrollBar = value.Get<bool>();
       break;
     }
   }
@@ -202,6 +234,11 @@ Property::Value TextSelectionPopup::PropertyHandler::GetProperty(Toolkit::TextSe
       value = impl.mPressedColor;
       break;
     }
+    case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_CORNER_RADIUS:
+    {
+      value = impl.mPressedCornerRadius;
+      break;
+    }
     case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_IMAGE:
     {
       value = impl.GetPressedImage();
@@ -226,6 +263,38 @@ Property::Value TextSelectionPopup::PropertyHandler::GetProperty(Toolkit::TextSe
         visual.CreatePropertyMap(map);
       }
       value = map;
+      break;
+    }
+    case Toolkit::TextSelectionPopup::Property::BACKGROUND:
+    {
+      Property::Map         map;
+      Toolkit::Visual::Base visual = DevelControl::GetVisual(impl, Toolkit::Control::Property::BACKGROUND);
+      if(visual)
+      {
+        visual.CreatePropertyMap(map);
+      }
+      value = map;
+      break;
+    }
+    case Toolkit::TextSelectionPopup::Property::LABEL_MINIMUM_SIZE:
+    {
+      value = impl.mLabelMinimumSize;
+      break;
+    }
+    case Toolkit::TextSelectionPopup::Property::LABEL_PADDING:
+    {
+      Padding padding = impl.GetLabelPadding();
+      value           = Vector4(padding.left, padding.right, padding.top, padding.bottom);
+      break;
+    }
+    case Toolkit::TextSelectionPopup::Property::LABEL_TEXT_VISUAL:
+    {
+      value = impl.mLabelTextVisual;
+      break;
+    }
+    case Toolkit::TextSelectionPopup::Property::ENABLE_SCROLL_BAR:
+    {
+      value = impl.mEnableScrollBar;
       break;
     }
   }

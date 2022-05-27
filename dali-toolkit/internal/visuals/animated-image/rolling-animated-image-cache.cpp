@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,16 +27,16 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
 
-#define LOG_CACHE                                                                                                                 \
-  {                                                                                                                               \
-    std::ostringstream oss;                                                                                                       \
-    oss << "Size:" << mQueue.Count() << " [ ";                                                                                    \
-    for(std::size_t _i = 0; _i < mQueue.Count(); ++_i)                                                                            \
-    {                                                                                                                             \
-      oss << _i << "={ frm#: " << mQueue[_i].mFrameNumber << " tex: " << mImageUrls[mQueue[_i].mFrameNumber].mTextureId << "}, "; \
-    }                                                                                                                             \
-    oss << " ]" << std::endl;                                                                                                     \
-    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "%s", oss.str().c_str());                                                    \
+#define LOG_CACHE                                                                                                       \
+  {                                                                                                                     \
+    std::ostringstream oss;                                                                                             \
+    oss << "Size:" << mQueue.Count() << " [ ";                                                                          \
+    for(std::size_t _i = 0; _i < mQueue.Count(); ++_i)                                                                  \
+    {                                                                                                                   \
+      oss << _i << "={ frm#: " << mQueue[_i].mFrameNumber << " tex: " << mTextureIds[mQueue[_i].mFrameNumber] << "}, "; \
+    }                                                                                                                   \
+    oss << " ]" << std::endl;                                                                                           \
+    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "%s", oss.str().c_str());                                          \
   }
 
 #else
@@ -59,17 +59,25 @@ static constexpr uint32_t SINGLE_IMAGE_COUNT = 1u;
 static constexpr uint32_t FIRST_FRAME_INDEX  = 0u;
 } // namespace
 
-RollingAnimatedImageCache::RollingAnimatedImageCache(
-  TextureManager& textureManager, AnimatedImageLoading& animatedImageLoading, ImageCache::FrameReadyObserver& observer, uint16_t cacheSize, uint16_t batchSize, bool isSynchronousLoading)
-: ImageCache(textureManager, observer, batchSize, 0u),
+RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&                     textureManager,
+                                                     AnimatedImageLoading&               animatedImageLoading,
+                                                     TextureManager::MaskingDataPointer& maskingData,
+                                                     ImageCache::FrameReadyObserver&     observer,
+                                                     uint16_t                            cacheSize,
+                                                     uint16_t                            batchSize,
+                                                     bool                                isSynchronousLoading,
+                                                     bool                                preMultiplyOnLoad)
+: ImageCache(textureManager, maskingData, observer, batchSize, 0u),
+  mImageUrl(animatedImageLoading.GetUrl()),
   mAnimatedImageLoading(animatedImageLoading),
   mFrameCount(SINGLE_IMAGE_COUNT),
   mFrameIndex(FIRST_FRAME_INDEX),
   mCacheSize(cacheSize),
   mQueue(cacheSize),
-  mIsSynchronousLoading(isSynchronousLoading)
+  mIsSynchronousLoading(isSynchronousLoading),
+  mPreMultiplyOnLoad(preMultiplyOnLoad)
 {
-  mImageUrls.resize(mFrameCount);
+  mTextureIds.resize(mFrameCount);
   mIntervals.assign(mFrameCount, 0);
 }
 
@@ -84,10 +92,8 @@ TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
   bool popExist = false;
   while(!mQueue.IsEmpty() && mQueue.Front().mFrameNumber != frameIndex)
   {
-    ImageFrame imageFrame = mQueue.PopFront();
-    mTextureManager.Remove(mImageUrls[imageFrame.mFrameNumber].mTextureId, this);
-    mImageUrls[imageFrame.mFrameNumber].mTextureId = TextureManager::INVALID_TEXTURE_ID;
-    popExist                                       = true;
+    PopFrontCache();
+    popExist = true;
   }
 
   TextureSet textureSet;
@@ -97,13 +103,13 @@ TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
   bool synchronouslyLoaded = false;
   if(mIsSynchronousLoading && mQueue.IsEmpty())
   {
-    textureSet          = RequestFrameLoading(frameIndex, frameIndex == FIRST_FRAME_INDEX, true);
-    batchFrameIndex     = (frameIndex + 1) % mFrameCount;
+    textureSet        = RequestFrameLoading(frameIndex, true);
+    batchFrameIndex   = (frameIndex + 1) % mFrameCount;
     uint32_t interval = 0u;
     if(textureSet)
     {
       synchronouslyLoaded = true;
-      interval = mAnimatedImageLoading.GetFrameInterval(mQueue.Back().mFrameNumber);
+      interval            = mAnimatedImageLoading.GetFrameInterval(mQueue.Back().mFrameNumber);
     }
     MakeFrameReady(synchronouslyLoaded, textureSet, interval);
   }
@@ -177,7 +183,7 @@ bool RollingAnimatedImageCache::IsFrontReady() const
   return (!mQueue.IsEmpty() && mQueue.Front().mReady);
 }
 
-TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, bool useCache, bool synchronousLoading)
+TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, bool synchronousLoading)
 {
   ImageFrame imageFrame;
   imageFrame.mFrameNumber = frameIndex;
@@ -187,18 +193,23 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
 
   mLoadState = TextureManager::LoadState::LOADING;
 
+  auto preMultiplyOnLoading = mPreMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
+                                                  : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
   TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
-  TextureSet                textureSet    = mTextureManager.LoadAnimatedImageTexture(mAnimatedImageLoading,
+  TextureSet                textureSet    = mTextureManager.LoadAnimatedImageTexture(mImageUrl,
+                                                                   mAnimatedImageLoading,
                                                                    frameIndex,
                                                                    loadTextureId,
+                                                                   mMaskingData,
                                                                    SamplingMode::BOX_THEN_LINEAR,
                                                                    Dali::WrapMode::Type::DEFAULT,
                                                                    Dali::WrapMode::Type::DEFAULT,
                                                                    synchronousLoading,
-                                                                   useCache,
-                                                                   this);
+                                                                   this,
+                                                                   preMultiplyOnLoading);
 
-  mImageUrls[frameIndex].mTextureId = loadTextureId;
+  mTextureIds[frameIndex] = loadTextureId;
 
   return textureSet;
 }
@@ -213,7 +224,7 @@ void RollingAnimatedImageCache::LoadBatch(uint32_t frameIndex)
   {
     if(mLoadState != TextureManager::LoadState::LOADING)
     {
-      RequestFrameLoading(frameIndex, frameIndex == FIRST_FRAME_INDEX, false);
+      RequestFrameLoading(frameIndex, false);
     }
     else
     {
@@ -249,16 +260,30 @@ TextureSet RollingAnimatedImageCache::GetFrontTextureSet() const
 
 TextureManager::TextureId RollingAnimatedImageCache::GetCachedTextureId(int index) const
 {
-  return mImageUrls[mQueue[index].mFrameNumber].mTextureId;
+  return mTextureIds[mQueue[index].mFrameNumber];
+}
+
+void RollingAnimatedImageCache::PopFrontCache()
+{
+  ImageFrame imageFrame = mQueue.PopFront();
+  mTextureManager.Remove(mTextureIds[imageFrame.mFrameNumber], this);
+  mTextureIds[imageFrame.mFrameNumber] = TextureManager::INVALID_TEXTURE_ID;
+
+  if(mMaskingData && mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
+  {
+    mTextureManager.Remove(mMaskingData->mAlphaMaskId, this);
+    if(mQueue.IsEmpty())
+    {
+      mMaskingData->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
+    }
+  }
 }
 
 void RollingAnimatedImageCache::ClearCache()
 {
   while(mTextureManagerAlive && !mQueue.IsEmpty())
   {
-    ImageFrame imageFrame = mQueue.PopFront();
-    mTextureManager.Remove(mImageUrls[imageFrame.mFrameNumber].mTextureId, this);
-    mImageUrls[imageFrame.mFrameNumber].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+    PopFrontCache();
   }
   mLoadWaitingQueue.clear();
   mLoadState = TextureManager::LoadState::NOT_STARTED;
@@ -279,7 +304,7 @@ void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet text
     if(mFrameCount != mAnimatedImageLoading.GetImageCount())
     {
       mFrameCount = mAnimatedImageLoading.GetImageCount();
-      mImageUrls.resize(mFrameCount);
+      mTextureIds.resize(mFrameCount);
       mIntervals.assign(mFrameCount, 0u);
     }
 
@@ -313,7 +338,7 @@ void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformatio
     {
       uint32_t loadingIndex = mLoadWaitingQueue.front();
       mLoadWaitingQueue.erase(mLoadWaitingQueue.begin());
-      RequestFrameLoading(loadingIndex, loadingIndex == FIRST_FRAME_INDEX, false);
+      RequestFrameLoading(loadingIndex, false);
     }
     else if(mQueue.Count() == 1u && textureInformation.frameCount > SINGLE_IMAGE_COUNT)
     {

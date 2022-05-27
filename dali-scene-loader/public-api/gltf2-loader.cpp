@@ -42,11 +42,11 @@ const std::string POSITION_PROPERTY("position");
 const std::string ORIENTATION_PROPERTY("orientation");
 const std::string SCALE_PROPERTY("scale");
 const std::string BLEND_SHAPE_WEIGHTS_UNIFORM("uBlendShapeWeight");
-
 const std::string MRENDERER_MODEL_IDENTIFICATION("M-Renderer");
-
 const std::string ROOT_NODE_NAME("RootNode");
 const Vector3     SCALE_TO_ADJUST(100.0f, 100.0f, 100.0f);
+
+constexpr float DEFAULT_INTENSITY = 0.5f;
 
 const Geometry::Type GLTF2_TO_DALI_PRIMITIVES[]{
   Geometry::POINTS,
@@ -66,6 +66,7 @@ struct AttributeMapping
   {gt::Attribute::NORMAL, &MeshDefinition::mNormals, sizeof(Vector3)},
   {gt::Attribute::TANGENT, &MeshDefinition::mTangents, sizeof(Vector3)},
   {gt::Attribute::TEXCOORD_0, &MeshDefinition::mTexCoords, sizeof(Vector2)},
+  {gt::Attribute::COLOR_0, &MeshDefinition::mColors, sizeof(Vector4)},
   {gt::Attribute::JOINTS_0, &MeshDefinition::mJoints0, sizeof(Vector4)},
   {gt::Attribute::WEIGHTS_0, &MeshDefinition::mWeights0, sizeof(Vector4)},
 };
@@ -439,7 +440,7 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
     matDef.SetAlphaCutoff(std::min(1.f, std::max(0.f, m.mAlphaCutoff)));
   }
 
-  matDef.mColor = pbr.mBaseColorFactor;
+  matDef.mBaseColorFactor = pbr.mBaseColorFactor;
 
   matDef.mTextureStages.reserve(!!pbr.mBaseColorTexture + !!pbr.mMetallicRoughnessTexture + !!m.mNormalTexture + !!m.mOcclusionTexture + !!m.mEmissiveTexture);
   if(pbr.mBaseColorTexture)
@@ -448,6 +449,10 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
     matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mBaseColorTexture)});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
+  }
+  else
+  {
+    matDef.mNeedAlbedoTexture = false;
   }
 
   matDef.mMetallic  = pbr.mMetallicFactor;
@@ -461,13 +466,22 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
+  else
+  {
+    matDef.mNeedMetallicRoughnessTexture = false;
+  }
 
+  matDef.mNormalScale = m.mNormalTexture.mScale;
   if(m.mNormalTexture)
   {
     const auto semantic = MaterialDefinition::NORMAL;
     matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mNormalTexture)});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
+  }
+  else
+  {
+    matDef.mNeedNormalTexture = false;
   }
 
   // TODO: handle doubleSided
@@ -580,6 +594,9 @@ void ConvertMeshes(const gt::Document& doc, ConversionContext& cctx)
 
       auto& accPositions = *attribs.find(gt::Attribute::POSITION)->second;
       meshDef.mPositions = ConvertMeshPrimitiveAccessor(accPositions);
+      // glTF2 support vector4 tangent for mesh.
+      // https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#meshes-overview
+      meshDef.mTangentType = Property::VECTOR4;
 
       const bool needNormalsTangents = accPositions.mType == gt::AccessorType::VEC3;
       for(auto& am : ATTRIBUTE_MAPPINGS)
@@ -590,14 +607,6 @@ void ConvertMeshes(const gt::Document& doc, ConversionContext& cctx)
           DALI_ASSERT_DEBUG(iFind->second->mBufferView->mBuffer->mUri.compare(meshDef.mUri) == 0);
           auto& accessor = meshDef.*(am.mAccessor);
           accessor       = ConvertMeshPrimitiveAccessor(*iFind->second);
-
-          // Fixing up -- a few of glTF2 sample models have VEC4 tangents; we need VEC3s.
-          if(iFind->first == gt::Attribute::TANGENT && (accessor.mBlob.mElementSizeHint > am.mElementSizeRequired))
-          {
-            accessor.mBlob.mStride          = std::max(static_cast<uint16_t>(accessor.mBlob.mStride + accessor.mBlob.mElementSizeHint - am.mElementSizeRequired),
-                                              accessor.mBlob.mElementSizeHint);
-            accessor.mBlob.mElementSizeHint = am.mElementSizeRequired;
-          }
 
           if(iFind->first == gt::Attribute::JOINTS_0)
           {
@@ -1156,6 +1165,14 @@ void SetObjectReaders()
   js::SetObjectReader(SCENE_READER);
 }
 
+void SetDefaultEnvironmentMap(const gt::Document& doc, ConversionContext& cctx)
+{
+  EnvironmentDefinition envDef;
+  envDef.mUseBrdfTexture = true;
+  envDef.mIblIntensity = DEFAULT_INTENSITY;
+  cctx.mOutput.mResources.mEnvironmentMaps.push_back({std::move(envDef), EnvironmentDefinition::Textures()});
+}
+
 } // namespace
 
 void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactory, LoadResult& params)
@@ -1211,11 +1228,12 @@ void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactor
   ConvertMeshes(doc, cctx);
   ConvertNodes(doc, cctx, isMRendererModel);
   ConvertAnimations(doc, cctx);
-
   ProcessSkins(doc, cctx);
-
   ProduceShaders(shaderFactory, params.mScene);
   params.mScene.EnsureUniqueSkinningShaderInstances(params.mResources);
+
+  // Set Default Environment map
+  SetDefaultEnvironmentMap(doc, cctx);
 }
 
 } // namespace SceneLoader

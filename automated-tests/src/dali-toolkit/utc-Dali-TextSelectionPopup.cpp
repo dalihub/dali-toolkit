@@ -28,7 +28,7 @@ using namespace Toolkit;
 namespace
 {
 const char* TEST_IMAGE_FILE_NAME = "selection-popup-border.9.png";
-
+const char* TEST_FONT_FAMILY = "BreezeSans";
 }
 
 void dali_textselectionpopup_startup(void)
@@ -122,6 +122,33 @@ int UtcDaliToolkitTextSelectionPopupBackgroundBorderP(void)
                                  Property::Map().Add(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME));
 
   Property::Value value = textSelectionPopup.GetProperty(TextSelectionPopup::Property::BACKGROUND_BORDER);
+
+  Property::Map map;
+  value.Get(map);
+
+  Property::Value* returnValue = map.Find(Dali::Toolkit::ImageVisual::Property::URL);
+  DALI_TEST_CHECK(NULL != returnValue);
+
+  if(returnValue)
+  {
+    std::string url;
+    returnValue->Get(url);
+    DALI_TEST_EQUALS(TEST_IMAGE_FILE_NAME, url, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextSelectionPopupBackgroundP(void)
+{
+  ToolkitTestApplication application;
+  TextSelectionPopup     textSelectionPopup;
+  textSelectionPopup = TextSelectionPopup::New(NULL);
+
+  textSelectionPopup.SetProperty(TextSelectionPopup::Property::BACKGROUND,
+                                 Property::Map().Add(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME));
+
+  Property::Value value = textSelectionPopup.GetProperty(TextSelectionPopup::Property::BACKGROUND);
 
   Property::Map map;
   value.Get(map);
@@ -276,18 +303,21 @@ int UtcDaliToolkitTextSelectionPopupSizeProperties(void)
   END_TEST;
 }
 
-int UtcDaliToolkitTextSelectionPopupDurationProperties(void)
+int UtcDaliToolkitTextSelectionPopupFloatProperties(void)
 {
   ToolkitTestApplication application;
   TextSelectionPopup     popup = TextSelectionPopup::New(nullptr);
 
   const float popupFadeInDuration = 5.0f;
   const float popupFadeOutDuration = 10.0f;
+  const float popupPressedCornerRadius = 15.0f;
   popup.SetProperty(TextSelectionPopup::Property::POPUP_FADE_IN_DURATION, popupFadeInDuration);
   popup.SetProperty(TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION, popupFadeOutDuration);
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_PRESSED_CORNER_RADIUS, popupPressedCornerRadius);
 
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_FADE_IN_DURATION).Get<float>(), popupFadeInDuration, TEST_LOCATION);
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION).Get<float>(), popupFadeOutDuration, TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_PRESSED_CORNER_RADIUS).Get<float>(), popupPressedCornerRadius, TEST_LOCATION);
 
   END_TEST;
 }
@@ -304,6 +334,94 @@ int UtcDaliToolkitTextSelectionPopupColorProperties(void)
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_DIVIDER_COLOR).Get<Vector4>(), Color::RED, TEST_LOCATION);
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_ICON_COLOR).Get<Vector4>(), Color::BLUE, TEST_LOCATION);
   DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_PRESSED_COLOR).Get<Vector4>(), Color::BLACK, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextSelectionPopupScrollBarP(void)
+{
+  ToolkitTestApplication application;
+  TextSelectionPopup     popup = TextSelectionPopup::New(nullptr);
+  DALI_TEST_CHECK(popup);
+
+  popup.SetProperty(TextSelectionPopup::Property::ENABLE_SCROLL_BAR, true);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::ENABLE_SCROLL_BAR).Get<bool>(), true, TEST_LOCATION);
+
+  popup.SetProperty(TextSelectionPopup::Property::ENABLE_SCROLL_BAR, false);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::ENABLE_SCROLL_BAR).Get<bool>(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextSelectionPopupLabelTextVisualP(void)
+{
+  ToolkitTestApplication application;
+  TextSelectionPopup     popup = TextSelectionPopup::New(nullptr);
+  DALI_TEST_CHECK(popup);
+
+  Property::Map textVisualMapSet;
+
+  textVisualMapSet.Insert(TextVisual::Property::FONT_FAMILY, TEST_FONT_FAMILY);
+  textVisualMapSet.Insert(TextVisual::Property::POINT_SIZE, 50.f);
+  textVisualMapSet.Insert(TextVisual::Property::TEXT_COLOR, Color::RED);
+
+  popup.SetProperty(TextSelectionPopup::Property::LABEL_TEXT_VISUAL, textVisualMapSet);
+
+  Property::Map textVisualMapGet;
+  Property::Map styleMapGet;
+
+  textVisualMapGet = popup.GetProperty(TextSelectionPopup::Property::LABEL_TEXT_VISUAL).Get<Property::Map>();
+  DALI_TEST_EQUALS(textVisualMapGet.Count(), 3u, TEST_LOCATION);
+
+  Property::Value* returnValue;
+
+  returnValue = textVisualMapGet.Find(TextVisual::Property::FONT_FAMILY);
+  DALI_TEST_CHECK(NULL != returnValue);
+
+  if(returnValue)
+  {
+    std::string fontFamily;
+    returnValue->Get(fontFamily);
+    DALI_TEST_EQUALS(fontFamily, TEST_FONT_FAMILY, TEST_LOCATION);
+  }
+
+  returnValue = textVisualMapGet.Find(TextVisual::Property::POINT_SIZE);
+  DALI_TEST_CHECK(NULL != returnValue);
+
+  if(returnValue)
+  {
+    float pointSize;
+    returnValue->Get(pointSize);
+    DALI_TEST_EQUALS(pointSize, 50.0f, TEST_LOCATION);
+  }
+
+  returnValue = textVisualMapGet.Find(TextVisual::Property::TEXT_COLOR);
+  DALI_TEST_CHECK(NULL != returnValue);
+
+  if(returnValue)
+  {
+    Vector4 textColor;
+    returnValue->Get(textColor);
+    DALI_TEST_EQUALS(textColor, Color::RED, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextSelectionPopupLabelProperties(void)
+{
+  ToolkitTestApplication application;
+  TextSelectionPopup     popup = TextSelectionPopup::New(nullptr);
+  DALI_TEST_CHECK(popup);
+
+  const Vector2 labelMinimumSize(100.0f, 50.0f);
+  const Vector4 labelPadding(10.0f, 20.0f, 30.0f, 40.0f);
+
+  popup.SetProperty(TextSelectionPopup::Property::LABEL_MINIMUM_SIZE, labelMinimumSize);
+  popup.SetProperty(TextSelectionPopup::Property::LABEL_PADDING, labelPadding);
+
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::LABEL_MINIMUM_SIZE).Get<Vector2>(), labelMinimumSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::LABEL_PADDING).Get<Vector4>(), labelPadding, TEST_LOCATION);
 
   END_TEST;
 }

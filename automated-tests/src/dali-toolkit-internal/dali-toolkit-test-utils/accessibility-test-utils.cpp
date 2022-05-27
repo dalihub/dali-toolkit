@@ -52,6 +52,12 @@ namespace Accessibility
           wr->Encode(reply, std::tuple<Address>{ {"bus", "root"} });
           return reply;
       };
+      wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible/root", "org.a11y.atspi.Socket", "Unembed", MethodType::Method}] = [wr](const MessagePtr &m) -> MessagePtr {
+          return wr->newReplyMessage(m);
+      };
+      wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible/root", "org.a11y.atspi.Socket", "Embedded", MethodType::Method}] = [wr](const MessagePtr &m) -> MessagePtr {
+          return wr->newReplyMessage(m);
+      };
       wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "PropertyChange", MethodType::Method}] =
       [wr](const MessagePtr &m) -> MessagePtr {
           return wr->newReplyMessage(m);

@@ -46,15 +46,16 @@ IntrusivePtr<AsyncImageLoader> AsyncImageLoader::New()
   return internal;
 }
 
-uint32_t AsyncImageLoader::LoadAnimatedImage(Dali::AnimatedImageLoading animatedImageLoading,
-                                             uint32_t                   frameIndex)
+uint32_t AsyncImageLoader::LoadAnimatedImage(Dali::AnimatedImageLoading               animatedImageLoading,
+                                             uint32_t                                 frameIndex,
+                                             DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
   if(!mIsLoadThreadStarted)
   {
     mLoadThread.Start();
     mIsLoadThreadStarted = true;
   }
-  mLoadThread.AddTask(new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex));
+  mLoadThread.AddTask(new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, preMultiplyOnLoad));
 
   return mLoadTaskId;
 }

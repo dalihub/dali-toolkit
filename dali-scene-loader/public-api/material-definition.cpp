@@ -150,7 +150,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
       raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
-    else // single value albedo, albedo-alpha or albedo-metallic
+    else if(mNeedAlbedoTexture) // single value albedo, albedo-alpha or albedo-metallic
     {
       uint32_t bufferSize = 4;
       uint8_t* buffer     = nullptr;
@@ -184,7 +184,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
       raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
-    else if(createMetallicRoughnessAndNormal)
+    else if(createMetallicRoughnessAndNormal && mNeedMetallicRoughnessTexture)
     {
       // NOTE: we want to set both metallic and roughness to 1.0; dli uses the R & A channels,
       // glTF2 uses B & G, so we might as well just set all components to 1.0.
@@ -198,17 +198,20 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
       raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
-    else if(createMetallicRoughnessAndNormal)
+    else if(mNeedNormalTexture)
     {
-      const auto bufferSize = 3;
-      uint8_t*   buffer     = new uint8_t[bufferSize]{0x7f, 0x7f, 0xff}; // normal of (0, 0, 1)
-      raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY), SINGLE_VALUE_SAMPLER});
-    }
-    else // single-value normal-roughness
-    {
-      const auto bufferSize = 4;
-      uint8_t*   buffer     = new uint8_t[bufferSize]{0x7f, 0x7f, 0xff, 0xff}; // normal of (0, 0, 1), roughness of 1.0
-      raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY), SINGLE_VALUE_SAMPLER});
+      if(createMetallicRoughnessAndNormal)
+      {
+        const auto bufferSize = 3;
+        uint8_t*   buffer     = new uint8_t[bufferSize]{0x7f, 0x7f, 0xff}; // normal of (0, 0, 1)
+        raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY), SINGLE_VALUE_SAMPLER});
+      }
+      else // single-value normal-roughness
+      {
+        const auto bufferSize = 4;
+        uint8_t*   buffer     = new uint8_t[bufferSize]{0x7f, 0x7f, 0xff, 0xff}; // normal of (0, 0, 1), roughness of 1.0
+        raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY), SINGLE_VALUE_SAMPLER});
+      }
     }
   }
 
@@ -273,6 +276,13 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
 
       textureSet.SetTexture(n, envTextures.mSpecular);
       textureSet.SetSampler(n, specularSampler);
+      ++n;
+    }
+
+    // If pre-computed brdf texture is defined, set the texture.
+    if(envTextures.mBrdf)
+    {
+      textureSet.SetTexture(n, envTextures.mBrdf);
     }
   }
   else

@@ -112,28 +112,33 @@ public:
    * The parameters are used to specify how the animated image is loaded.
    * The observer has the LoadComplete method called when the load is ready.
    *
+   * @param[in]  url                   The URL of the image to load
    * @param[in]  animatedImageLoading  The AnimatedImageLoading that contain the animated image information
    * @param[in]  frameIndex            The frame index to load.
    * @param[out] textureId             The textureId of the frame
+   * @param[in, out] maskInfo          Mask info structure
    * @param[in]  samplingMode          The SamplingMode to use
    * @param[in]  wrapModeU             Horizontal Wrap mode
    * @param[in]  wrapModeV             Vertical Wrap mode
    * @param[in]  synchronousLoading    true if the frame should be loaded synchronously
-   * @param[in]  useCache              true if this frame loading uses cache.
    * @param[in]  textureObserver       The client object should inherit from this and provide the "LoadCompleted" virtual.
    *                                   This is called when an image load completes (or fails).
+   * @param[in,out] preMultiplyOnLoad  True if the image color should be multiplied by it's alpha. Set to false if the
+   *                                   image has no alpha channel
    *
    * @return                           The texture set containing the frame of animated image, or empty if still loading.
    */
-  TextureSet LoadAnimatedImageTexture(Dali::AnimatedImageLoading      animatedImageLoading,
+  TextureSet LoadAnimatedImageTexture(const VisualUrl&                url,
+                                      Dali::AnimatedImageLoading      animatedImageLoading,
                                       const uint32_t&                 frameIndex,
                                       TextureManager::TextureId&      textureId,
+                                      MaskingDataPointer&             maskInfo,
                                       const Dali::SamplingMode::Type& samplingMode,
                                       const Dali::WrapMode::Type&     wrapModeU,
                                       const Dali::WrapMode::Type&     wrapModeV,
                                       const bool&                     synchronousLoading,
-                                      const bool&                     useCache,
-                                      TextureUploadObserver*          textureObserver);
+                                      TextureUploadObserver*          textureObserver,
+                                      TextureManager::MultiplyOnLoad& preMultiplyOnLoad);
 
   /**
    * @brief Requests an image load of the given URL to get PixelBuffer.
@@ -454,7 +459,6 @@ private:
    * @param[in] frameIndex            The frame index of a frame to be loaded frame
    * @param[in] synchronousLoading    True if the frame should be loaded synchronously. If you skip this parameter,
    *                                  default is false.
-   * @param[in] useCache              True if the texture will be cached.
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoadInternal(
@@ -473,8 +477,7 @@ private:
     TextureManager::MultiplyOnLoad&     preMultiplyOnLoad,
     Dali::AnimatedImageLoading          animatedImageLoading,
     const std::uint32_t&                frameIndex,
-    const bool&                         synchronousLoading,
-    const bool&                         useCache);
+    const bool&                         synchronousLoading);
 
   /**
    * @brief Load a new image synchronously.

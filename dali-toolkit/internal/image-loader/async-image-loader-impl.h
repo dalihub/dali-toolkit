@@ -46,10 +46,11 @@ public:
   static IntrusivePtr<AsyncImageLoader> New();
 
   /**
-   * @copydoc Toolkit::AsyncImageLoader::LoadAnimatedImage( Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex )
+   * @copydoc Toolkit::AsyncImageLoader::LoadAnimatedImage( Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
    */
-  uint32_t LoadAnimatedImage(Dali::AnimatedImageLoading animatedImageLoading,
-                             uint32_t                   frameIndex);
+  uint32_t LoadAnimatedImage(Dali::AnimatedImageLoading               animatedImageLoading,
+                             uint32_t                                 frameIndex,
+                             DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
   /**
    * @copydoc Toolkit::AsyncImageLoader::Load( const std::string&, ImageDimensions, FittingMode::Type, SamplingMode::Type, bool , DevelAsyncImageLoader::PreMultiplyOnLoad )

@@ -145,6 +145,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "ellipsisPosition
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "strikethrough",                    MAP,       STRIKETHROUGH                       )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "inputStrikethrough",               MAP,       INPUT_STRIKETHROUGH                 )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "characterSpacing",                 FLOAT,     CHARACTER_SPACING                   )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "selectionPopupStyle",              MAP,       SELECTION_POPUP_STYLE               )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "maxLengthReached",      SIGNAL_MAX_LENGTH_REACHED     )

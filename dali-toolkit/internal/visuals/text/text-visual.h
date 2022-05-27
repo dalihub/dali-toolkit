@@ -193,6 +193,7 @@ private:
   {
     unsigned char* textBuffer;
     unsigned char* styleBuffer;
+    unsigned char* overlayStyleBuffer;
     unsigned char* maskBuffer;
     int            width;
     int            height;
@@ -203,6 +204,7 @@ private:
     TilingInfo(int width, int height, Pixel::Format textPixelFormat)
     : textBuffer(NULL),
       styleBuffer(NULL),
+      overlayStyleBuffer(NULL),
       maskBuffer(NULL),
       width(width),
       height(height),
@@ -221,6 +223,10 @@ private:
       if(styleBuffer)
       {
         free(styleBuffer);
+      }
+      if(overlayStyleBuffer)
+      {
+        free(overlayStyleBuffer);
       }
       if(maskBuffer)
       {

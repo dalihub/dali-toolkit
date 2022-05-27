@@ -457,24 +457,7 @@ std::vector<Dali::Accessibility::Relation> ControlAccessible::GetRelationSet()
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
-
-  std::vector<Dali::Accessibility::Relation> ret;
-
-  for(auto& relation : controlImpl.mAccessibilityRelations)
-  {
-    auto& targets = relation.second;
-
-    ret.emplace_back(Accessibility::Relation{relation.first, {}});
-
-    // Map every Accessible* to its Address
-    std::transform(targets.begin(), targets.end(), std::back_inserter(ret.back().targets), [](auto* x) {
-      return x->GetAddress();
-    });
-  }
-
-  return ret;
+  return DevelControl::GetAccessibilityRelations(control);
 }
 
 bool ControlAccessible::ScrollToChild(Actor child)

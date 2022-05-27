@@ -108,7 +108,7 @@ int UtcDaliShaderDefinitionFactoryProduceShader(void)
   Permutation permutations[]{
     {
       [](ShaderParameters& p) {},
-      {},
+      {"THREE_TEX"},
       RendererState::DEPTH_TEST | RendererState::DEPTH_WRITE | RendererState::CULL_BACK,
     },
     {
@@ -250,8 +250,6 @@ int UtcDaliShaderDefinitionFactoryProduceShader(void)
 
   for(auto& ps : permSets)
   {
-    printf("%ld\n", &ps - permSets);
-
     auto modelNode          = new ModelNode();
     modelNode->mMeshIdx     = 0;
     modelNode->mMaterialIdx = 0;
@@ -279,9 +277,9 @@ int UtcDaliShaderDefinitionFactoryProduceShader(void)
     DALI_TEST_EQUAL(shaderDef.mRendererState, rendererState);
 
     uint32_t definesUnmatched = shaderDef.mDefines.size();
-    for(auto& d : shaderDef.mDefines)
+    for(auto& define : shaderDef.mDefines)
     {
-      auto iFind = defines.find(d);
+      auto iFind = defines.find(define);
       if(iFind != defines.end())
       {
         defines.erase(iFind);
@@ -289,15 +287,12 @@ int UtcDaliShaderDefinitionFactoryProduceShader(void)
       }
       else
       {
-        printf("mismatched: %s\n", d.c_str());
         break;
       }
     }
 
     DALI_TEST_CHECK(defines.empty());
     DALI_TEST_EQUAL(0, definesUnmatched);
-
-    printf("defines OK\n");
 
     auto uMaxLOD = shaderDef.mUniforms["uMaxLOD"];
     DALI_TEST_EQUAL(uMaxLOD.GetType(), Property::FLOAT);

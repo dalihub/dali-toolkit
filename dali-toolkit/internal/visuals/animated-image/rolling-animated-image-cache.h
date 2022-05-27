@@ -41,22 +41,25 @@ class RollingAnimatedImageCache : public ImageCache, public TextureUploadObserve
 public:
   /**
    * @brief Constructor.
-   * @param[in] textureManager The texture manager
-   * @param[in] animatedImageLoader The loaded animated image
-   * @param[in] observer FrameReady observer
-   * @param[in] cacheSize The size of the cache
-   * @param[in] batchSize The size of a batch to load
+   * @param[in] textureManager       The texture manager
+   * @param[in] animatedImageLoading  The loaded animated image
+   * @param[in] maskingData          Masking data to be applied.
+   * @param[in] observer             FrameReady observer
+   * @param[in] cacheSize            The size of the cache
+   * @param[in] batchSize            The size of a batch to load
    * @param[in] isSynchronousLoading The flag to define whether to load first frame synchronously
    *
    * This will start loading textures immediately, according to the
    * batch and cache sizes.
    */
-  RollingAnimatedImageCache(TextureManager&                 textureManager,
-                            AnimatedImageLoading&           animatedImageLoader,
-                            ImageCache::FrameReadyObserver& observer,
-                            uint16_t                        cacheSize,
-                            uint16_t                        batchSize,
-                            bool                            isSynchronousLoading);
+  RollingAnimatedImageCache(TextureManager&                     textureManager,
+                            AnimatedImageLoading&               animatedImageLoading,
+                            TextureManager::MaskingDataPointer& maskingData,
+                            ImageCache::FrameReadyObserver&     observer,
+                            uint16_t                            cacheSize,
+                            uint16_t                            batchSize,
+                            bool                                isSynchronousLoading,
+                            bool                                preMultiplyOnLoad);
 
   /**
    * @brief Destructor
@@ -105,12 +108,11 @@ private:
    * @brief Request to Load a frame
    *
    * @param[in] frameIndex          index of frame to be loaded.
-   * @param[in] useCache            true if this frame loading uses cache.
    * @param[in] synchronousLoading  true if the frame should be loaded synchronously
    *
    * @return the texture set currently loaded.
    */
-  TextureSet RequestFrameLoading(uint32_t frameIndex, bool useCache, bool synchronousLoading);
+  TextureSet RequestFrameLoading(uint32_t frameIndex, bool synchronousLoading);
 
   /**
    * @brief Load the next batch of images
@@ -149,6 +151,11 @@ private:
    */
   void MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t interval);
 
+  /**
+   * @brief Pop front entity of Cache.
+   */
+  void PopFrontCache();
+
 protected:
   /**
    * @copydoc Toolkit::TextureUploadObserver::LoadComplete()
@@ -156,7 +163,6 @@ protected:
   void LoadComplete(bool loadSuccess, TextureInformation textureInformation) override;
 
 private:
-
   /**
    * Secondary class to hold readiness and index into url
    */
@@ -165,16 +171,18 @@ private:
     uint32_t mFrameNumber = 0u;
     bool     mReady       = false;
   };
+  std::vector<TextureManager::TextureId> mTextureIds;
 
+  VisualUrl                  mImageUrl;
   Dali::AnimatedImageLoading mAnimatedImageLoading;
   uint32_t                   mFrameCount;
   uint32_t                   mFrameIndex;
   uint32_t                   mCacheSize;
-  std::vector<UrlStore>      mImageUrls;
   std::vector<int32_t>       mIntervals;
   std::vector<uint32_t>      mLoadWaitingQueue;
   CircularQueue<ImageFrame>  mQueue;
   bool                       mIsSynchronousLoading;
+  bool                       mPreMultiplyOnLoad;
 };
 
 } // namespace Internal

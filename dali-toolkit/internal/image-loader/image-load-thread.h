@@ -47,10 +47,12 @@ struct LoadingTask
    * @param [in] id of the task
    * @param [in] animatedImageLoading The AnimatedImageLoading to load animated image
    * @param [in] frameIndex The frame index of a frame to be loaded frame
+   * @param [in] preMultiplyOnLoad ON if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
    */
-  LoadingTask(uint32_t                   id,
-              Dali::AnimatedImageLoading animatedImageLoading,
-              uint32_t                   frameIndex);
+  LoadingTask(uint32_t                                 id,
+              Dali::AnimatedImageLoading               animatedImageLoading,
+              uint32_t                                 frameIndex,
+              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
   /**
    * Constructor.
