@@ -1529,7 +1529,9 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   // Either application.SendNotification() or the trigger can now complete the task.
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Wait for loading & rasterization
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -1565,7 +1567,9 @@ int UtcDaliVisualFactoryGetSvgVisualLarge(void)
   // Either application.SendNotification() or the trigger can now complete the task.
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Wait for loading & rasterization
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -1609,7 +1613,9 @@ int UtcDaliVisualFactoryGetSvgVisualAtlas(void)
   DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Wait for loading & rasterization
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);

@@ -3655,9 +3655,9 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
 {
   tet_infoline("Test signal handler various case.");
 
-  ToolkitTestApplication application;
+  auto TestResourceReadyUrl = [](int eventTriggerCount, bool isSynchronous, bool loadSuccess, const std::string& url, const std::string& mask, const char* location) {
+    ToolkitTestApplication application;
 
-  auto TestResourceReadyUrl = [&application](int eventTriggerCount, bool isSynchronous, bool loadSuccess, const std::string& url, const std::string& mask, const char* location) {
     gResourceReadySignalCounter = 0;
 
     Property::Map map;
@@ -3687,7 +3687,9 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
     imageView.Unparent();
   };
 
-  auto TestAuxiliaryResourceReadyUrl = [&application](bool isSynchronous, bool loadSuccess, const std::string& url, const std::string& auxiliaryUrl, const char* location) {
+  auto TestAuxiliaryResourceReadyUrl = [](bool isSynchronous, bool loadSuccess, const std::string& url, const std::string& auxiliaryUrl, const char* location) {
+    ToolkitTestApplication application;
+
     gResourceReadySignalCounter = 0;
 
     Property::Map map;
