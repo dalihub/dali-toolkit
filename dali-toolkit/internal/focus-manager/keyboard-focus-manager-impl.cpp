@@ -213,13 +213,13 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
      actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE) &&
      actor.GetProperty<bool>(Actor::Property::VISIBLE))
   {
-    // If the parent's KEYBOARD_FOCUSABLE_CHILDREN is false, it cannot have focus.
+    // If the parent's KEYBOARD_FOCUSABLE_CHILDREN is false or VISIBLE is false, it cannot have focus.
     Actor parent = actor.GetParent();
     while(parent)
     {
-      if(!parent.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN))
+      if(!parent.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN) || !parent.GetProperty<bool>(Actor::Property::VISIBLE))
       {
-        DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] Parent Actor has KEYBOARD_FOCUSABLE_CHILDREN false\n", __FUNCTION__, __LINE__);
+        DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] Parent Actor has KEYBOARD_FOCUSABLE_CHILDREN false or VISIBLE false,\n", __FUNCTION__, __LINE__);
         return false;
       }
       parent = parent.GetParent();
