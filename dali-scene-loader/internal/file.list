@@ -5,4 +5,5 @@ set(scene_loader_src_files ${scene_loader_src_files}
 	${scene_loader_internal_dir}/hash.cpp
 	${scene_loader_internal_dir}/json-reader.cpp
 	${scene_loader_internal_dir}/json-util.cpp
+	${scene_loader_internal_dir}/controls/model-view/model-view-impl.cpp
 )

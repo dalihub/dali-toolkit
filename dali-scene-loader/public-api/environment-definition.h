@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_ENVIRONMENT_DEFINITION_H
 #define DALI_SCENE_LOADER_ENVIRONMENT_DEFINITION_H
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,7 @@ public: // DATA
   std::string mDiffuseMapPath;
   std::string mSpecularMapPath;
   Quaternion  mCubeOrientation = Quaternion::IDENTITY;
+  Vector3     mYDirection      = Vector3::ONE;
   float       mIblIntensity    = 1.0f;
   bool        mUseBrdfTexture  = false;
 };

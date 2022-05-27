@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,19 @@
 
 namespace Dali
 {
+namespace
+{
+constexpr std::string_view IBL_INTENSITY_STRING("uIblIntensity");
+constexpr std::string_view IBL_Y_DIRECTION("uYDirection");
+}
+
 namespace SceneLoader
 {
+bool NodeDefinition::Renderable::GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const
+{
+  return false;
+}
+
 void NodeDefinition::Renderable::RegisterResources(IResourceReceiver& receiver) const
 {
   receiver.Register(ResourceType::Shader, mShaderIdx);
@@ -87,6 +98,50 @@ Matrix NodeDefinition::GetLocalSpace() const
   Matrix localSpace{false};
   localSpace.SetTransformComponents(mScale, mOrientation, mPosition);
   return localSpace;
+}
+
+std::string_view NodeDefinition::GetIblScaleFactorUniformName()
+{
+  return IBL_INTENSITY_STRING;
+}
+
+std::string_view NodeDefinition::GetIblYDirectionUniformName()
+{
+  return IBL_Y_DIRECTION;
+}
+
+bool NodeDefinition::GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const
+{
+  if(mRenderable)
+  {
+    if(!mRenderable->GetExtents(resources, min, max))
+    {
+      // If the renderable node don't have mesh accessor, use size to compute extents.
+      min = -mSize / 2.0f;
+      max = mSize / 2.0f;
+    }
+    return true;
+  }
+  return false;
+}
+
+bool ModelNode::GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const
+{
+  auto& mesh = resources.mMeshes[mMeshIdx];
+  uint32_t minSize = mesh.first.mPositions.mBlob.mMin.size();
+  uint32_t maxSize = mesh.first.mPositions.mBlob.mMax.size();
+  if(minSize == maxSize && minSize >= 2u && maxSize >= 2u)
+  {
+    min = Vector3(mesh.first.mPositions.mBlob.mMin[0], mesh.first.mPositions.mBlob.mMin[1], 0.0f);
+    max = Vector3(mesh.first.mPositions.mBlob.mMax[0], mesh.first.mPositions.mBlob.mMax[1], 0.0f);
+    if(minSize == 3u)
+    {
+      min.z = mesh.first.mPositions.mBlob.mMin[2];
+      max.z = mesh.first.mPositions.mBlob.mMax[2];
+    }
+    return true;
+  }
+  return false;
 }
 
 void ModelNode::RegisterResources(IResourceReceiver& receiver) const
@@ -167,10 +222,11 @@ void ModelNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParam
   }
 
   Index envIdx = matDef.mEnvironmentIdx;
-  actor.RegisterProperty("uIblIntensity", resources.mEnvironmentMaps[envIdx].first.mIblIntensity);
+  actor.RegisterProperty(IBL_INTENSITY_STRING.data(), resources.mEnvironmentMaps[envIdx].first.mIblIntensity);
+  actor.RegisterProperty(IBL_Y_DIRECTION.data(), resources.mEnvironmentMaps[envIdx].first.mYDirection);
 
-  float opaque = 0.0f;
-  float mask = 0.0f;
+  float opaque      = 0.0f;
+  float mask        = 0.0f;
   float alphaCutoff = matDef.GetAlphaCutoff();
   if(!MaskMatch(matDef.mFlags, MaterialDefinition::TRANSPARENCY))
   {

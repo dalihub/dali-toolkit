@@ -262,6 +262,13 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
   if(mEnvironmentIdx < environments.size())
   {
     auto& envTextures = environments[mEnvironmentIdx].second;
+    // If pre-computed brdf texture is defined, set the texture.
+    if(envTextures.mBrdf)
+    {
+      textureSet.SetTexture(n, envTextures.mBrdf);
+      ++n;
+    }
+
     if(envTextures.mDiffuse)
     {
       textureSet.SetTexture(n, envTextures.mDiffuse);
@@ -277,12 +284,6 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
       textureSet.SetTexture(n, envTextures.mSpecular);
       textureSet.SetSampler(n, specularSampler);
       ++n;
-    }
-
-    // If pre-computed brdf texture is defined, set the texture.
-    if(envTextures.mBrdf)
-    {
-      textureSet.SetTexture(n, envTextures.mBrdf);
     }
   }
   else

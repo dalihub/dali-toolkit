@@ -16,6 +16,7 @@ SET(TC_SOURCES
   utc-Dali-FacialAnimation.cpp
   utc-Dali-Gltf2Loader.cpp
   utc-Dali-KtxLoader.cpp
+  utc-Dali-ModelView.cpp
   utc-Dali-MatrixStack.cpp
   utc-Dali-MeshDefinition.cpp
   utc-Dali-NodeDefinition.cpp

@@ -15,6 +15,7 @@ set(scene_loader_src_files ${scene_loader_src_files}
 	${scene_loader_public_api_dir}/material-definition.cpp
 	${scene_loader_public_api_dir}/matrix-stack.cpp
 	${scene_loader_public_api_dir}/mesh-definition.cpp
+	${scene_loader_public_api_dir}/controls/model-view/model-view.cpp
 	${scene_loader_public_api_dir}/node-definition.cpp
 	${scene_loader_public_api_dir}/parse-renderer-state.cpp
 	${scene_loader_public_api_dir}/renderer-state.cpp
