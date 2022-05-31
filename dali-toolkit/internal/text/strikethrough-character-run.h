@@ -22,7 +22,7 @@
 #include <dali/public-api/math/vector4.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/character-run.h>
+#include <dali-toolkit/internal/text/abstract-style-character-run.h>
 #include <dali-toolkit/internal/text/strikethrough-style-properties.h>
 
 namespace Dali
@@ -34,24 +34,33 @@ namespace Text
 /**
  * @brief Run of strikethrough characters with same properties.
  */
-struct StrikethroughCharacterRun
+struct StrikethroughCharacterRun : public AbstractStyleCharacterRun
 {
   /**
    * Default constructor to set the default values of bitfields
    */
   StrikethroughCharacterRun()
-  : characterRun{},
+  : AbstractStyleCharacterRun(),
     properties{}
   {
   }
 
-  CharacterRun                 characterRun; ///< The initial character index and the number of characters of the run.
-  StrikethroughStyleProperties properties;   /// The properties of strikethrough style
+  StrikethroughStyleProperties properties; /// The properties of strikethrough style
 };
 
 } // namespace Text
 
 } // namespace Toolkit
+
+// Allow StrikethroughCharacterRun to be treated as a POD type
+template<>
+struct TypeTraits<Dali::Toolkit::Text::StrikethroughCharacterRun> : public Dali::BasicTypes<Dali::Toolkit::Text::StrikethroughCharacterRun>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 } // namespace Dali
 

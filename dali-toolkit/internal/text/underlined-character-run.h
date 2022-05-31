@@ -22,7 +22,7 @@
 #include <dali/public-api/math/vector4.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/character-run.h>
+#include <dali-toolkit/internal/text/abstract-style-character-run.h>
 #include <dali-toolkit/internal/text/underline-style-properties.h>
 
 namespace Dali
@@ -34,24 +34,33 @@ namespace Text
 /**
  * @brief Run of underlined characters with same properties.
  */
-struct UnderlinedCharacterRun
+struct UnderlinedCharacterRun : public AbstractStyleCharacterRun
 {
   /**
    * Default constructor to set the default values of bitfields
    */
   UnderlinedCharacterRun()
-  : characterRun{},
+  : AbstractStyleCharacterRun(),
     properties{}
   {
   }
 
-  CharacterRun             characterRun; ///< The initial character index and the number of characters of the run.
-  UnderlineStyleProperties properties;   /// The properties of underline style
+  UnderlineStyleProperties properties; /// The properties of underline style
 };
 
 } // namespace Text
 
 } // namespace Toolkit
+
+// Allow UnderlinedCharacterRun to be treated as a POD type
+template<>
+struct TypeTraits<Dali::Toolkit::Text::UnderlinedCharacterRun> : public Dali::BasicTypes<Dali::Toolkit::Text::UnderlinedCharacterRun>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 } // namespace Dali
 

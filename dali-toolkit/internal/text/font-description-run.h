@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_FONT_DESCRIPTION_RUN_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/devel-api/text-abstraction/font-list.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/character-run.h>
+#include <dali-toolkit/internal/text/abstract-style-character-run.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
@@ -34,13 +34,13 @@ namespace Text
 /**
  * @brief Run of characters with the same font.
  */
-struct FontDescriptionRun
+struct FontDescriptionRun : public AbstractStyleCharacterRun
 {
   /**
    * Default constructor to set the default values of bitfields
    */
   FontDescriptionRun()
-  : characterRun{},
+  : AbstractStyleCharacterRun(),
     familyName{nullptr},
     familyLength{0u},
     weight{FontWeight::NONE},
@@ -67,7 +67,7 @@ struct FontDescriptionRun
                      bool                widthDefined,
                      bool                slantDefined,
                      bool                sizeDefined)
-  : characterRun{characterRun},
+  : AbstractStyleCharacterRun(characterRun),
     familyName{familyName},
     familyLength{familyLength},
     weight{weight},
@@ -82,7 +82,6 @@ struct FontDescriptionRun
   {
   }
 
-  CharacterRun    characterRun; ///< The initial character index and the number of characters of the run.
   char*           familyName;   ///< The font's family name.
   Length          familyLength; ///< The length of the font's family name.
   FontWeight      weight;       ///< The font's weight.
@@ -100,6 +99,16 @@ struct FontDescriptionRun
 } // namespace Text
 
 } // namespace Toolkit
+
+// Allow FontDescriptionRun to be treated as a POD type
+template<>
+struct TypeTraits<Dali::Toolkit::Text::FontDescriptionRun> : public Dali::BasicTypes<Dali::Toolkit::Text::FontDescriptionRun>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 } // namespace Dali
 
