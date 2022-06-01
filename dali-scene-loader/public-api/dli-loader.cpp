@@ -1263,9 +1263,10 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
       auto& extras = nodeDef.mExtras;
       extras.reserve(eExtras->Size());
 
-      NodeDefinition::Extra e;
       for(auto i0 = eExtras->CBegin(), i1 = eExtras->CEnd(); i0 != i1; ++i0)
       {
+        NodeDefinition::Extra e;
+
         auto eExtra = *i0;
         e.mKey      = eExtra.first;
         if(e.mKey.empty())
