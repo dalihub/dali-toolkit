@@ -569,6 +569,7 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
   const Dali::FittingMode::Type&             fittingMode,
   const Dali::SamplingMode::Type&            samplingMode,
   const TextureCacheManager::UseAtlas&       useAtlas,
+  const StorageType&                         storageType,
   const TextureCacheManager::TextureId&      maskTextureId,
   const bool&                                cropToMask,
   const TextureCacheManager::MultiplyOnLoad& preMultiplyOnLoad,
@@ -593,6 +594,7 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
            (cropToMask == textureInfo.cropToMask) &&
            (size == textureInfo.desiredSize) &&
            (isAnimatedImage == textureInfo.isAnimatedImageFormat) &&
+           (storageType == textureInfo.storageType) &&
            (frameIndex == textureInfo.frameIndex) &&
            ((size.GetWidth() == 0 && size.GetHeight() == 0) ||
             (fittingMode == textureInfo.fittingMode &&

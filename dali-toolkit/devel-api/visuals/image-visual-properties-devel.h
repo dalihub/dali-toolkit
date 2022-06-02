@@ -145,7 +145,14 @@ enum Type
    * @details Name "redrawInScalingDown", type Property::BOOLEAN.
    * @note It is used in the AnimatedVectorImageVisual. The default is true.
    */
-  REDRAW_IN_SCALING_DOWN
+  REDRAW_IN_SCALING_DOWN = ORIENTATION_CORRECTION + 11,
+
+  /**
+   * @brief Whether to apply mask in loading time or rendering time.
+   * @details Name "maskingType", type PlayState::Type (Property::INTEGER).
+   * @note It is used in the ImageVisual and AnimatedImageVisual. The default is MASKING_ON_LOADING.
+   */
+  MASKING_TYPE = ORIENTATION_CORRECTION + 12
 };
 
 } //namespace Property
@@ -190,6 +197,19 @@ enum Type
 };
 
 } // namespace LoopingMode
+
+/**
+ * @brief Enumeration for what masking type is in.
+ */
+namespace MaskingType
+{
+enum Type
+{
+  MASKING_ON_RENDERING, ///< Alpha masking is applied for each rendering time. (On GPU)
+  MASKING_ON_LOADING    ///< Alpha masking is applied when the image is loading. (On CPU)
+};
+
+}
 
 } // namespace DevelImageVisual
 

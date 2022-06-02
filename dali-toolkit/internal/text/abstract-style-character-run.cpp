@@ -1,6 +1,3 @@
-#ifndef DALI_TOOLKIT_TEXT_COLOR_RUN_H
-#define DALI_TOOLKIT_TEXT_COLOR_RUN_H
-
 /*
  * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
@@ -18,7 +15,7 @@
  *
  */
 
-// INTERNAL INCLUDES
+// FILE HEADER
 #include <dali-toolkit/internal/text/abstract-style-character-run.h>
 
 namespace Dali
@@ -27,36 +24,23 @@ namespace Toolkit
 {
 namespace Text
 {
-/**
- * @brief Run of characters with the same color.
- */
-struct ColorRun : public AbstractStyleCharacterRun
+CharacterIndex AbstractStyleCharacterRun::GetStartCharacterIndex() const
 {
-  /**
-   * @brief Constructor.
-   * Default constructor to set the default values
-   */
-  ColorRun()
-  : AbstractStyleCharacterRun()
-  {
-  }
-  Vector4 color; ///< The color of the characters.
-};
+  return characterRun.characterIndex;
+}
+
+Length AbstractStyleCharacterRun::GetNumberOfCharacters() const
+{
+  return characterRun.numberOfCharacters;
+}
+
+CharacterIndex AbstractStyleCharacterRun::GetEndCharacterIndex() const
+{
+  return characterRun.GetEndCharacterIndex();
+}
 
 } // namespace Text
 
 } // namespace Toolkit
 
-// Allow ColorRun to be treated as a POD type
-template<>
-struct TypeTraits<Dali::Toolkit::Text::ColorRun> : public Dali::BasicTypes<Dali::Toolkit::Text::ColorRun>
-{
-  enum
-  {
-    IS_TRIVIAL_TYPE = true
-  };
-};
-
 } // namespace Dali
-
-#endif // DALI_TOOLKIT_TEXT_COLOR_RUN_H

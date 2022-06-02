@@ -441,7 +441,10 @@ int UtcDaliVisualSetOnOffScene2(void)
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Wait for loading & rasterization
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
   Renderer renderer = actor.GetRendererAt(0);
   auto     textures = renderer.GetTextures();
@@ -3764,7 +3767,8 @@ int UtcDaliSvgVisualCustomShader(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Wait for loading & rasterization
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   Renderer        renderer = dummy.GetRendererAt(0);
   Shader          shader2  = renderer.GetShader();
@@ -3783,7 +3787,6 @@ int UtcDaliSvgVisualCustomShader(void)
 
 int UtcDaliVisualRoundedCorner(void)
 {
-  ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualRoundedCorner");
 
   static std::vector<UniformData> customUniforms =
@@ -3792,11 +3795,12 @@ int UtcDaliVisualRoundedCorner(void)
       UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
     };
 
-  TestGraphicsController& graphics = application.GetGraphicsController();
-  graphics.AddCustomUniforms(customUniforms);
-
   // image visual
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     float         cornerRadius = 30.0f;
@@ -3831,6 +3835,10 @@ int UtcDaliVisualRoundedCorner(void)
 
   // color visual 1
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     float         cornerRadius = 30.0f;
@@ -3864,6 +3872,10 @@ int UtcDaliVisualRoundedCorner(void)
 
   // color visual 2
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     Vector4       cornerRadius(0.5f, 0.5f, 0.5f, 0.3f);
@@ -3897,6 +3909,10 @@ int UtcDaliVisualRoundedCorner(void)
 
   // color visual 3 - invalid value
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     Vector4       cornerRadius(30.0f, 30.0f, 30.0f, 20.0f);
@@ -3931,6 +3947,10 @@ int UtcDaliVisualRoundedCorner(void)
 
   // gradient visual
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     float         cornerRadius = 30.0f;
@@ -3978,6 +3998,10 @@ int UtcDaliVisualRoundedCorner(void)
 
   // animated image visual
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     Vector4       cornerRadius(24.0f, 23.0f, 22.0f, 21.0f);
@@ -4013,6 +4037,10 @@ int UtcDaliVisualRoundedCorner(void)
 
   // vector image visual
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     Vector4       cornerRadius(27.0f, 72.0f, 11.0f, 500.5f);
@@ -4035,7 +4063,8 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    // Wait for loading & rasterization
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
@@ -4047,6 +4076,10 @@ int UtcDaliVisualRoundedCorner(void)
 
   // animated vector image visual
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     float         cornerRadius = 1.3f;
@@ -4085,7 +4118,6 @@ int UtcDaliVisualRoundedCorner(void)
 
 int UtcDaliVisualBorderline(void)
 {
-  ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualBorderline");
 
   static std::vector<UniformData> customUniforms =
@@ -4097,11 +4129,12 @@ int UtcDaliVisualBorderline(void)
       UniformData("borderlineOffset", Property::Type::FLOAT),
     };
 
-  TestGraphicsController& graphics = application.GetGraphicsController();
-  graphics.AddCustomUniforms(customUniforms);
-
   // image visual
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     float         cornerRadius    = 5.0f;
@@ -4145,6 +4178,10 @@ int UtcDaliVisualBorderline(void)
 
   // color visual 1
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     Vector4       cornerRadius(23.0f, 2.0f, 3.0f, 2.3f);
@@ -4184,6 +4221,10 @@ int UtcDaliVisualBorderline(void)
 
   // color visual 2, default color, default offset
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     float         borderlineWidth = 30.0f;
@@ -4218,6 +4259,10 @@ int UtcDaliVisualBorderline(void)
 
   // color visual 3, offset not [-1.0 ~ 1.0], but uniform value is same anyway
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     float         borderlineWidth = 30.0f;
@@ -4255,6 +4300,10 @@ int UtcDaliVisualBorderline(void)
 
   // gradient visual
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     float         borderlineWidth = 30.0f;
@@ -4309,6 +4358,10 @@ int UtcDaliVisualBorderline(void)
 
   // animated image visual
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     float         borderlineWidth  = 24.0f;
@@ -4347,6 +4400,10 @@ int UtcDaliVisualBorderline(void)
 
   // vector image visual
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     Vector4       cornerRadius(54.0f, 43.0f, 32.0f, 21.0f);
@@ -4373,7 +4430,8 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    // Wait for loading & rasterization
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
@@ -4389,6 +4447,10 @@ int UtcDaliVisualBorderline(void)
 
   // animated vector image visual
   {
+    ToolkitTestApplication  application;
+    TestGraphicsController& graphics = application.GetGraphicsController();
+    graphics.AddCustomUniforms(customUniforms);
+
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     Vector4       cornerRadius(1.3f, 0.0f, 0.4f, 0.2f);
@@ -5270,8 +5332,8 @@ int UtcDaliVisualGetVisualProperty05(void)
   application.SendNotification();
   application.Render();
 
-  // Wait for image loading
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Wait for loading & rasterization
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();

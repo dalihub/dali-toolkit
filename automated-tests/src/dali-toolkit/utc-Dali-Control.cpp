@@ -1074,8 +1074,8 @@ int UtcDaliControlResourcesReady02(void)
   application.SendNotification();
   application.Render();
 
-  // Wait for rasterization
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Wait for loading & rasterization
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(control.IsResourceReady(), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);

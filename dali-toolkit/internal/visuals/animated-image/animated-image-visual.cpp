@@ -46,7 +46,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(3); // ltr, wrap, pixel area,
+const int CUSTOM_PROPERTY_COUNT(10); // ltr, wrap, pixel area, crop to mask, mask texture ratio + border/corner
 
 // stop behavior
 DALI_ENUM_TO_STRING_TABLE_BEGIN(STOP_BEHAVIOR)
@@ -82,6 +82,8 @@ static constexpr uint16_t MINIMUM_CACHESIZE  = 1;
 static constexpr Vector4  FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 static constexpr auto     LOOP_FOREVER = -1;
 static constexpr auto     FIRST_LOOP   = 0u;
+
+constexpr uint32_t TEXTURE_COUNT_FOR_GPU_ALPHA_MASK = 2u;
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
@@ -317,6 +319,7 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
     map.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mMaskingData->mAlphaMaskUrl.GetUrl());
     map.Insert(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, mMaskingData->mContentScaleFactor);
     map.Insert(Toolkit::ImageVisual::Property::CROP_TO_MASK, mMaskingData->mCropToMask);
+    map.Insert(Toolkit::DevelImageVisual::Property::MASKING_TYPE, mMaskingData->mPreappliedMasking ? DevelImageVisual::MaskingType::MASKING_ON_LOADING : DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
   }
 
   map.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, mLoadPolicy);
@@ -445,6 +448,10 @@ void AnimatedImageVisual::DoSetProperties(const Property::Map& propertyMap)
       else if(keyValue.first == CROP_TO_MASK_NAME)
       {
         DoSetProperty(Toolkit::ImageVisual::Property::CROP_TO_MASK, keyValue.second);
+      }
+      else if(keyValue.first == MASKING_TYPE_NAME)
+      {
+        DoSetProperty(Toolkit::DevelImageVisual::Property::MASKING_TYPE, keyValue.second);
       }
       else if(keyValue.first == LOAD_POLICY_NAME)
       {
@@ -620,6 +627,17 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
       break;
     }
 
+    case Toolkit::DevelImageVisual::Property::MASKING_TYPE:
+    {
+      int maskingType = 0;
+      if(value.Get(maskingType))
+      {
+        AllocateMaskData();
+        mMaskingData->mPreappliedMasking = Toolkit::DevelImageVisual::MaskingType::Type(maskingType) == Toolkit::DevelImageVisual::MaskingType::MASKING_ON_LOADING ? true : false;
+      }
+      break;
+    }
+
     case Toolkit::ImageVisual::Property::RELEASE_POLICY:
     {
       int releasePolicy = 0;
@@ -690,14 +708,16 @@ void AnimatedImageVisual::UpdateShader()
 
 Shader AnimatedImageVisual::GenerateShader() const
 {
-  bool   defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
+  bool   defaultWrapMode                 = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
+  bool   requiredAlphaMaskingOnRendering = (mMaskingData && !mMaskingData->mMaskImageLoadingFailed) ? !mMaskingData->mPreappliedMasking : false;
   Shader shader;
   shader = mImageVisualShaderFactory.GetShader(
     mFactoryCache,
     ImageVisualShaderFeature::FeatureBuilder()
       .ApplyDefaultTextureWrapMode(defaultWrapMode)
       .EnableRoundedCorner(IsRoundedCornerRequired())
-      .EnableBorderline(IsBorderlineRequired()));
+      .EnableBorderline(IsBorderlineRequired())
+      .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering));
   return shader;
 }
 
@@ -728,6 +748,11 @@ void AnimatedImageVisual::OnInitialize()
     mImpl->mRenderer.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, mPixelArea);
   }
 
+  if(mMaskingData)
+  {
+    mImpl->mRenderer.RegisterProperty(CROP_TO_MASK_NAME, static_cast<float>(mMaskingData->mCropToMask));
+  }
+
   // Enable PreMultipliedAlpha if it need premultiplied
   auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader
                              ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
@@ -743,6 +768,7 @@ void AnimatedImageVisual::StartFirstFrame(TextureSet& textureSet, uint32_t first
   if(mImpl->mRenderer)
   {
     mImpl->mRenderer.SetTextures(textureSet);
+    CheckMaskTexture();
 
     Actor actor = mPlacementActor.GetHandle();
     if(actor)
@@ -793,6 +819,22 @@ void AnimatedImageVisual::SetImageSize(TextureSet& textureSet)
       mImageSize.SetWidth(texture.GetWidth());
       mImageSize.SetHeight(texture.GetHeight());
     }
+
+    if(textureSet.GetTextureCount() > 1u && mMaskingData && mMaskingData->mCropToMask)
+    {
+      Texture maskTexture = textureSet.GetTexture(1);
+      if(maskTexture)
+      {
+        mImageSize.SetWidth(std::min(static_cast<uint32_t>(mImageSize.GetWidth() * mMaskingData->mContentScaleFactor), maskTexture.GetWidth()));
+        mImageSize.SetHeight(std::min(static_cast<uint32_t>(mImageSize.GetHeight() * mMaskingData->mContentScaleFactor), maskTexture.GetHeight()));
+
+        float   textureWidth  = std::max(static_cast<float>(texture.GetWidth() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
+        float   textureHeight = std::max(static_cast<float>(texture.GetHeight() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
+        Vector2 textureRatio(std::min(static_cast<float>(maskTexture.GetWidth()), textureWidth) / textureWidth,
+                             std::min(static_cast<float>(maskTexture.GetHeight()), textureHeight) / textureHeight);
+        mImpl->mRenderer.RegisterProperty(MASK_TEXTURE_RATIO_NAME, textureRatio);
+      }
+    }
   }
 }
 
@@ -819,6 +861,7 @@ void AnimatedImageVisual::FrameReady(TextureSet textureSet, uint32_t interval)
         mFrameDelayTimer.SetInterval(interval);
       }
       mImpl->mRenderer.SetTextures(textureSet);
+      CheckMaskTexture();
     }
   }
 }
@@ -887,6 +930,7 @@ bool AnimatedImageVisual::DisplayNextFrame()
       if(mImpl->mRenderer)
       {
         mImpl->mRenderer.SetTextures(textureSet);
+        CheckMaskTexture();
       }
       mFrameDelayTimer.SetInterval(mImageCache->GetFrameInterval(frameIndex));
     }
@@ -928,6 +972,24 @@ void AnimatedImageVisual::AllocateMaskData()
   if(!mMaskingData)
   {
     mMaskingData.reset(new TextureManager::MaskingData());
+  }
+}
+
+void AnimatedImageVisual::CheckMaskTexture()
+{
+  if(mMaskingData && !mMaskingData->mPreappliedMasking)
+  {
+    bool maskLoadFailed = true;
+    TextureSet textures = mImpl->mRenderer.GetTextures();
+    if(textures && textures.GetTextureCount() >= TEXTURE_COUNT_FOR_GPU_ALPHA_MASK)
+    {
+      maskLoadFailed = false;
+    }
+    if(mMaskingData->mMaskImageLoadingFailed != maskLoadFailed)
+    {
+      mMaskingData->mMaskImageLoadingFailed = maskLoadFailed;
+      UpdateShader();
+    }
   }
 }
 

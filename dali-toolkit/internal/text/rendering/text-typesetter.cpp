@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/line-helper-functions.h>
 #include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 #include <dali-toolkit/internal/text/rendering/styles/strikethrough-helper-functions.h>
 #include <dali-toolkit/internal/text/rendering/styles/underline-helper-functions.h>
@@ -486,6 +487,8 @@ Devel::PixelBuffer DrawGlyphsBackground(const ViewModel* model, Devel::PixelBuff
   const Vector4* const    backgroundColorsBuffer       = model->GetBackgroundColors();
   const ColorIndex* const backgroundColorIndicesBuffer = model->GetBackgroundColorIndices();
 
+  const DevelText::VerticalLineAlignment::Type verLineAlign = model->GetVerticalLineAlignment();
+
   // Create and initialize the pixel buffer.
   GlyphData glyphData;
   glyphData.verticalOffset   = verticalOffset;
@@ -507,13 +510,7 @@ Devel::PixelBuffer DrawGlyphsBackground(const ViewModel* model, Devel::PixelBuff
     glyphData.horizontalOffset += horizontalOffset;
 
     // Increases the vertical offset with the line's ascender.
-    glyphData.verticalOffset += static_cast<int32_t>(line.ascender);
-
-    // Include line spacing after first line
-    if(lineIndex > 0u)
-    {
-      glyphData.verticalOffset += static_cast<int32_t>(line.lineSpacing);
-    }
+    glyphData.verticalOffset += static_cast<int32_t>(line.ascender + GetPreOffsetVerticalLineAlignment(line, verLineAlign));
 
     float left     = bufferWidth;
     float right    = 0.0f;
@@ -579,7 +576,7 @@ Devel::PixelBuffer DrawGlyphsBackground(const ViewModel* model, Devel::PixelBuff
     }
 
     // Increases the vertical offset with the line's descender.
-    glyphData.verticalOffset += static_cast<int32_t>(-line.descender);
+    glyphData.verticalOffset += static_cast<int32_t>(-line.descender + GetPostOffsetVerticalLineAlignment(line, verLineAlign));
   }
 
   return glyphData.bitmapBuffer;
@@ -856,29 +853,6 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
     }
   }
 
-  // Calculate vertical line alignment
-  switch(mModel->GetVerticalLineAlignment())
-  {
-    case DevelText::VerticalLineAlignment::TOP:
-    {
-      break;
-    }
-    case DevelText::VerticalLineAlignment::MIDDLE:
-    {
-      const auto& line = *mModel->GetLines();
-      penY -= line.descender;
-      penY += static_cast<int32_t>(line.lineSpacing * 0.5f + line.descender);
-      break;
-    }
-    case DevelText::VerticalLineAlignment::BOTTOM:
-    {
-      const auto& line       = *mModel->GetLines();
-      const auto  lineHeight = line.ascender + (-line.descender) + line.lineSpacing;
-      penY += static_cast<int32_t>(lineHeight - (line.ascender - line.descender));
-      break;
-    }
-  }
-
   // Generate the image buffers of the text for each different style first,
   // then combine all of them together as one final image buffer. We try to
   // do all of these in CPU only, so that once the final texture is generated,
@@ -1046,6 +1020,8 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t& bufferWidth, co
   const Vector<CharacterIndex>& glyphToCharacterMap       = mModel->GetGlyphsToCharacters();
   const CharacterIndex*         glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
 
+  const DevelText::VerticalLineAlignment::Type verLineAlign = mModel->GetVerticalLineAlignment();
+
   // Traverses the lines of the text.
   for(LineIndex lineIndex = 0u; lineIndex < modelNumberOfLines; ++lineIndex)
   {
@@ -1056,7 +1032,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t& bufferWidth, co
     glyphData.horizontalOffset += horizontalOffset;
 
     // Increases the vertical offset with the line's ascender.
-    glyphData.verticalOffset += static_cast<int32_t>(line.ascender);
+    glyphData.verticalOffset += static_cast<int32_t>(line.ascender + GetPreOffsetVerticalLineAlignment(line, verLineAlign));
 
     // Retrieves the glyph's outline width
     float outlineWidth = static_cast<float>(mModel->GetOutlineWidth());
@@ -1357,7 +1333,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t& bufferWidth, co
     }
 
     // Increases the vertical offset with the line's descender & line spacing.
-    glyphData.verticalOffset += static_cast<int32_t>(-line.descender + line.lineSpacing);
+    glyphData.verticalOffset += static_cast<int32_t>(-line.descender + GetPostOffsetVerticalLineAlignment(line, verLineAlign));
   }
 
   return glyphData.bitmapBuffer;

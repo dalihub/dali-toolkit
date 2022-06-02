@@ -299,11 +299,28 @@ private:
   void RemoveTexture();
 
   /**
+   * @brief Compute texture size
+   */
+  void ComputeTextureSize();
+
+  /**
+   * @brief Compute mask texture ratio
+   * @return The Mask Texture Ratio
+   */
+  Vector2 ComputeMaskTextureRatio();
+
+  /**
    * Helper method to set individual values by index key.
    * @param[in] index The index key of the value
    * @param[in] value The value
    */
   void DoSetProperty(Property::Index index, const Property::Value& value);
+
+  /**
+   * @brief Check whether the mask texture is loaded or not.
+   * If MaskingType is MASKING_ON_LOADING and mask texture is failed to load, update shader.
+   */
+  void CheckMaskTexture();
 
 private:
   Vector4                            mPixelArea;
@@ -314,6 +331,7 @@ private:
   Dali::ImageDimensions     mDesiredSize;
   TextureManager::TextureId mTextureId;
   TextureSet                mTextures;
+  Vector2                   mTextureSize;
 
   ImageVisualShaderFactory& mImageVisualShaderFactory;
 

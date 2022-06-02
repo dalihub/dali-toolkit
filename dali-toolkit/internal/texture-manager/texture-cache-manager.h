@@ -230,6 +230,7 @@ public:
    * @param[in] fittingMode       The FittingMode to use
    * @param[in] samplingMode      The SamplingMode to use
    * @param[in] useAtlas          True if atlased
+   * @param[in] storageType       Whether the pixel data is stored in the cache or uploaded to the GPU
    * @param[in] maskTextureId     Optional texture ID to use to mask this image
    * @param[in] cropToMask        True if crop to mask
    * @param[in] preMultiplyOnLoad if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
@@ -244,6 +245,7 @@ public:
     const Dali::FittingMode::Type&             fittingMode,
     const Dali::SamplingMode::Type&            samplingMode,
     const TextureCacheManager::UseAtlas&       useAtlas,
+    const StorageType&                         storageType,
     const TextureCacheManager::TextureId&      maskTextureId,
     const bool&                                cropToMask,
     const TextureCacheManager::MultiplyOnLoad& preMultiplyOnLoad,
