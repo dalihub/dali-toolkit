@@ -87,7 +87,7 @@ bool IsEqualGlyph(const GlyphInfoData& glyphData, const GlyphInfo& glyph)
   {
     return false;
   }
-  if(fabsf(glyphData.advance - floor(glyph.advance)) > Math::MACHINE_EPSILON_1000)
+  if(glyphData.advance >= 0.0f && fabsf(glyphData.advance - floor(glyph.advance)) > Math::MACHINE_EPSILON_1000)
   {
     return false;
   }
@@ -961,9 +961,10 @@ int UtcDaliTextShapeEmojiSequences(void)
   bool sizeDefined   = false;
 
   // variation selector 16 (Emoji)
+  // Note : Non-scalable font's advance value is undefined. See https://github.com/harfbuzz/harfbuzz/discussions/3023. 2022-06-03 updated.
   struct GlyphInfoData glyphsVS16[] =
     {
-      {2u, 74u, 0.f, 0.f, 0.f, 0.f, 39.0f, 0.f, false, false},
+      {2u, 74u, 0.f, 0.f, 0.f, 0.f, -1.0f /* Special value that we don't check it */, 0.f, false, false},
     };
   CharacterIndex characterIndicesVS16[]   = {0u, 1u};
   Length         charactersPerGlyphVS16[] = {2u};
