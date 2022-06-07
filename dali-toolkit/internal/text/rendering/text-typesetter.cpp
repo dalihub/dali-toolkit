@@ -96,8 +96,9 @@ void TypesetGlyph(GlyphData&           data,
   const int32_t xOffset = data.horizontalOffset + position->x;
 
   // Whether the given glyph is a color one.
-  const bool     isColorGlyph   = data.glyphBitmap.isColorEmoji || data.glyphBitmap.isColorBitmap;
-  const uint32_t glyphPixelSize = Pixel::GetBytesPerPixel(data.glyphBitmap.format);
+  const bool     isColorGlyph    = data.glyphBitmap.isColorEmoji || data.glyphBitmap.isColorBitmap;
+  const uint32_t glyphPixelSize  = Pixel::GetBytesPerPixel(data.glyphBitmap.format);
+  const uint32_t glyphAlphaIndex = glyphPixelSize - 1u;
 
   // Determinate iterator range.
   const int32_t lineIndexRangeMin = std::max(0, -yOffset);
@@ -204,7 +205,7 @@ void TypesetGlyph(GlyphData&           data,
         for(int32_t index = indexRangeMin; index < indexRangeMax; ++index)
         {
           // Update the alpha channel.
-          const uint8_t alpha = *(glyphBuffer + index);
+          const uint8_t alpha = *(glyphBuffer + index * glyphPixelSize + glyphAlphaIndex);
 
           // Copy non-transparent pixels only
           if(alpha > 0u)
@@ -259,7 +260,7 @@ void TypesetGlyph(GlyphData&           data,
 
       // Skip basic line.
       bitmapBuffer += (lineIndexRangeMin + yOffset) * static_cast<int32_t>(data.width);
-      glyphBuffer += (lineIndexRangeMin) * static_cast<int32_t>(data.glyphBitmap.width);
+      glyphBuffer += (lineIndexRangeMin) * static_cast<int32_t>(data.glyphBitmap.width) * glyphPixelSize;
 
       // Traverse the pixels of the glyph line per line.
       for(int32_t lineIndex = lineIndexRangeMin; lineIndex < lineIndexRangeMax; ++lineIndex)
@@ -269,7 +270,7 @@ void TypesetGlyph(GlyphData&           data,
           const int32_t xOffsetIndex = xOffset + index;
 
           // Update the alpha channel.
-          const uint8_t alpha = *(glyphBuffer + index);
+          const uint8_t alpha = *(glyphBuffer + index * glyphPixelSize + glyphAlphaIndex);
 
           // Copy non-transparent pixels only
           if(alpha > 0u)
@@ -286,7 +287,7 @@ void TypesetGlyph(GlyphData&           data,
         }
 
         bitmapBuffer += data.width;
-        glyphBuffer += data.glyphBitmap.width;
+        glyphBuffer += data.glyphBitmap.width * glyphPixelSize;
       }
     }
   }
