@@ -346,6 +346,7 @@ struct Controller::Impl
     mMarkupProcessorEnabled(false),
     mClipboardHideEnabled(true),
     mIsAutoScrollEnabled(false),
+    mIsAutoScrollMaxTextureExceeded(false),
     mUpdateTextDirection(true),
     mIsTextDirectionRTL(false),
     mUnderlineSetByString(false),
@@ -1000,12 +1001,13 @@ public:
   std::unique_ptr<InputFilter> mInputFilter;                ///< Avoid allocating this when the user does not specify input filter mode.
   Vector2                      mTextFitContentSize;         ///< Size of Text fit content
 
-  bool               mRecalculateNaturalSize : 1; ///< Whether the natural size needs to be recalculated.
-  bool               mMarkupProcessorEnabled : 1; ///< Whether the mark-up procesor is enabled.
-  bool               mClipboardHideEnabled : 1;   ///< Whether the ClipboardHide function work or not
-  bool               mIsAutoScrollEnabled : 1;    ///< Whether auto text scrolling is enabled.
-  bool               mUpdateTextDirection : 1;    ///< Whether the text direction needs to be updated.
-  CharacterDirection mIsTextDirectionRTL : 1;     ///< Whether the text direction is right to left or not
+  bool               mRecalculateNaturalSize : 1;         ///< Whether the natural size needs to be recalculated.
+  bool               mMarkupProcessorEnabled : 1;         ///< Whether the mark-up procesor is enabled.
+  bool               mClipboardHideEnabled : 1;           ///< Whether the ClipboardHide function work or not
+  bool               mIsAutoScrollEnabled : 1;            ///< Whether auto text scrolling is enabled.
+  bool               mIsAutoScrollMaxTextureExceeded : 1; ///< Whether auto text scrolling is exceed max texture size.
+  bool               mUpdateTextDirection : 1;            ///< Whether the text direction needs to be updated.
+  CharacterDirection mIsTextDirectionRTL : 1;             ///< Whether the text direction is right to left or not
 
   bool                  mUnderlineSetByString : 1;     ///< Set when underline is set by string (legacy) instead of map
   bool                  mShadowSetByString : 1;        ///< Set when shadow is set by string (legacy) instead of map

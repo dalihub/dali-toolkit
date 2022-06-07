@@ -351,11 +351,13 @@ void CreateTextModel(const std::string&                text,
   layoutParameters.startLineIndex         = 0u;
   layoutParameters.estimatedNumberOfLines = logicalModel->mParagraphInfo.Count();
 
-  bool isAutoScroll = false;
+  bool isAutoScroll                   = false;
+  bool isAutoScrollMaxTextureExceeded = false;
   layoutEngine.LayoutText(layoutParameters,
                           layoutSize,
                           false,
                           isAutoScroll,
+                          isAutoScrollMaxTextureExceeded,
                           ellipsisPosition);
 
   if(options.align)
