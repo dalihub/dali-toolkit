@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_STYLE_MANAGER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/builder/builder.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 #include <dali-toolkit/internal/builder/style.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
-#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 
 namespace Dali
 {
@@ -93,7 +93,7 @@ public: // Public API
   /**
    * @copydoc Toolkit::StyleManager::GetConfigurations
    */
-  const Property::Map GetConfigurations();
+  const Property::Map& GetConfigurations();
 
   /**
    * @copydoc Toolkit::DevelStyleManager::SetBrokenImageUrl
@@ -255,7 +255,7 @@ private:
 
   Toolkit::Internal::FeedbackStyle* mFeedbackStyle; ///< Feedback style
 
-  std::vector<std::string> mBrokenImageUrls;    ///< Broken Image Urls received from user
+  std::vector<std::string> mBrokenImageUrls; ///< Broken Image Urls received from user
 
   // Signals
   Toolkit::StyleManager::StyleChangedSignalType            mControlStyleChangeSignal; ///< Emitted when the style( theme/font ) changes for the controls to style themselves

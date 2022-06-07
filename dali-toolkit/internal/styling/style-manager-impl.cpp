@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -285,44 +285,40 @@ void StyleManager::SetTheme(const std::string& themeFile)
   }
 }
 
-const Property::Map StyleManager::GetConfigurations()
+const Property::Map& StyleManager::GetConfigurations()
 {
   DALI_LOG_STREAM(gLogFilter, Debug::Concise, "GetConfigurations()\n On entry, mThemeBuilder: " << (bool(mThemeBuilder) ? "Created" : "Empty") << "  mThemeFile: " << mThemeFile);
 
-  Property::Map result;
-  if(mThemeBuilder)
-  {
-    result = mThemeBuilder.GetConfigurations();
-  }
-  else
+  if(!mThemeBuilder)
   {
     DALI_LOG_STREAM(gLogFilter, Debug::Concise, "GetConfigurations()  Loading default theme");
-
-    bool themeLoaded = false;
 
     mThemeBuilder = CreateBuilder(mThemeBuilderConstants);
 
     // Load default theme because this is first try to load stylesheet.
-    themeLoaded = LoadJSON(mThemeBuilder, mDefaultThemeFilePath);
-    mThemeFile  = mDefaultThemeFilePath;
-
-    if(themeLoaded)
-    {
-      result = mThemeBuilder.GetConfigurations();
-    }
+#if defined(DEBUG_ENABLED)
+    bool themeLoaded = LoadJSON(mThemeBuilder, mDefaultThemeFilePath);
     DALI_LOG_STREAM(gLogFilter, Debug::Concise, "  themeLoaded" << (themeLoaded ? "success" : "failure"));
+#else
+    LoadJSON(mThemeBuilder, mDefaultThemeFilePath);
+#endif
+
+    mThemeFile = mDefaultThemeFilePath;
   }
 
+#if defined(DEBUG_ENABLED)
+  Property::Map result = mThemeBuilder.GetConfigurations();
   DALI_LOG_STREAM(gLogFilter, Debug::Concise, "GetConfigurations()\n On exit, result Count: " << (result.Count() != 0));
   DALI_LOG_STREAM(gLogFilter, Debug::Verbose, "          result: " << result);
+#endif
 
-  return result;
+  return mThemeBuilder.GetConfigurations();
 }
 
 void StyleManager::SetBrokenImageUrl(DevelStyleManager::BrokenImageType brokenImageType, const std::string& brokenImageUrl)
 {
-  int brokenType = static_cast<int>(brokenImageType);
-  mBrokenImageUrls[brokenType] = brokenImageUrl;
+  int brokenType                     = static_cast<int>(brokenImageType);
+  mBrokenImageUrls[brokenType]       = brokenImageUrl;
   Toolkit::StyleManager styleManager = StyleManager::Get();
   mBrokenImageChangedSignal.Emit(styleManager);
 }

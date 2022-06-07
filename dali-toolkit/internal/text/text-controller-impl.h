@@ -37,10 +37,10 @@ namespace Toolkit
 {
 namespace Text
 {
-const float DEFAULT_TEXTFIT_MIN     = 10.f;
-const float DEFAULT_TEXTFIT_MAX     = 100.f;
-const float DEFAULT_TEXTFIT_STEP    = 1.f;
-const float DEFAULT_FONT_SIZE_SCALE = 1.f;
+const float DEFAULT_TEXTFIT_MIN            = 10.f;
+const float DEFAULT_TEXTFIT_MAX            = 100.f;
+const float DEFAULT_TEXTFIT_STEP           = 1.f;
+const float DEFAULT_FONT_SIZE_SCALE        = 1.f;
 const float DEFAULT_DISABLED_COLOR_OPACITY = 0.3f;
 
 //Forward declarations
@@ -385,12 +385,11 @@ struct Controller::Impl
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
     if(styleManager)
     {
-      bool          temp;
-      Property::Map config = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
-      if(config["clearFocusOnEscape"].Get(temp))
-      {
-        mShouldClearFocusOnEscape = temp;
-      }
+      const Property::Map& config                  = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
+      const auto           clearFocusOnEscapeValue = config.Find("clearFocusOnEscape", Property::Type::BOOLEAN);
+
+      // Default is true. If config don't have "clearFocusOnEscape" property, make it true.
+      mShouldClearFocusOnEscape = (!clearFocusOnEscapeValue || clearFocusOnEscapeValue->Get<bool>());
     }
   }
 

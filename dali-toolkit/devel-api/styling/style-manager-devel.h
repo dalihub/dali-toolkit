@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_STYLE_MANAGER_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ using BrokenImageChangedSignalType = Signal<void(StyleManager)>;
  * @param[in] styleManager The instance of StyleManager
  * @return A property map to the currently defined configurations
 **/
-DALI_TOOLKIT_API const Property::Map GetConfigurations(StyleManager styleManager);
+DALI_TOOLKIT_API const Property::Map& GetConfigurations(StyleManager styleManager);
 
 /**
    * @brief Sets an image to be used when a visual has failed to correctly render
