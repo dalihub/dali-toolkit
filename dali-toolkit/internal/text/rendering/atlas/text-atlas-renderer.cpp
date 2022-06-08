@@ -221,7 +221,7 @@ struct AtlasRenderer::Impl
                                 glyphBufferData.width,
                                 glyphBufferData.height,
                                 glyphBufferData.format,
-                                PixelData::DELETE_ARRAY);
+                                PixelData::FREE);
 
         if(bitmap)
         {

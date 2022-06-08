@@ -1307,8 +1307,8 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t& bufferWidth, co
           glyphData.verticalOffset += glyphData.glyphBitmap.outlineOffsetY;
         }
 
-        // delete the glyphBitmap.buffer as it is now copied into glyphData.bitmapBuffer
-        delete[] glyphData.glyphBitmap.buffer;
+        // free the glyphBitmap.buffer as it is now copied into glyphData.bitmapBuffer
+        free(glyphData.glyphBitmap.buffer);
         glyphData.glyphBitmap.buffer = NULL;
       }
 
