@@ -30,8 +30,8 @@ uniform mediump float cornerRadiusPolicy;
 
 vec4 ComputeVertexPosition()
 {
-  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );
-  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);
+  vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw );
+  vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
 
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
   vRectSize = visualSize * 0.5;
@@ -68,7 +68,7 @@ vec4 ComputeVertexPosition()
 
   vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;
 
-  return vec4(vPosition + anchorPoint * visualSize + (visualOffset + origin) * uSize.xy, 0.0, 1.0);
+  return vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
 }
 
 void main()

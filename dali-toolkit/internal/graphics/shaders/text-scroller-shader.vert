@@ -18,13 +18,13 @@ uniform mediump vec2 anchorPoint;
 
 void main()
 {
-  highp vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy );
-  highp vec2 visualSize = mix( uSize.xy * size, size, offsetSizeMode.zw );
+  highp vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw);
+  highp vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
 
   vTexCoord.x = ( uDelta + uHorizontalAlign * ( uTextureSize.x - visualSize.x - uGap ) + aPosition.x * visualSize.x - uGap * 0.5 ) / uTextureSize.x + 0.5;
   vTexCoord.y = ( uVerticalAlign * ( uTextureSize.y - visualSize.y ) + aPosition.y * visualSize.y ) / ( uTextureSize.y ) + 0.5;
 
-  highp vec4 vertexPosition = vec4( ( aPosition + anchorPoint ) * visualSize + ( visualOffset + origin ) * uSize.xy, 0.0, 1.0 );
+  highp vec4 vertexPosition = vec4( ( aPosition + anchorPoint ) * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0 );
 
   gl_Position = uMvpMatrix * vertexPosition;
 }

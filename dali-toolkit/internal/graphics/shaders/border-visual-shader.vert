@@ -14,9 +14,9 @@ uniform mediump vec2 anchorPoint;
 
 vec2 ComputeVertexPosition()
 {
-  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );
-  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);
-  return (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy;
+  vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw );
+  vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
+  return (aPosition + anchorPoint)*visualSize + visualOffset + origin * uSize.xy;
 }
 
 void main()
