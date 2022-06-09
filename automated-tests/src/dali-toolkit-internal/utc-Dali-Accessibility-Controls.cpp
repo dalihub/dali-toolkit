@@ -598,6 +598,16 @@ int UtcDaliAccessibilityTextField(void)
   DALI_TEST_EQUALS( text->SetRangeOfSelection( 1, 0, 1 ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( text->RemoveSelection( 1 ), false, TEST_LOCATION );
 
+  // Insert into empty field
+  DALI_TEST_EQUALS(editabletext->SetTextContents(""), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(editabletext->InsertText(1, "xyz"), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(editabletext->InsertText(0, "abc"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(text->GetText(0, 3), "abc", TEST_LOCATION);
+
+  // Append at end
+  DALI_TEST_EQUALS(editabletext->InsertText(3, "xyz"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(text->GetText(0, 6), "abcxyz", TEST_LOCATION);
+
   DALI_TEST_EQUALS(editabletext->SetTextContents("adef"), true, TEST_LOCATION);
   DALI_TEST_EQUALS(editabletext->InsertText(1, "bc"), true, TEST_LOCATION);
   DALI_TEST_EQUALS(text->GetText(0, 6), "abcdef", TEST_LOCATION);
@@ -698,6 +708,16 @@ int UtcDaliAccessibilityTextEditor(void)
   DALI_TEST_EQUALS( range.content, "", TEST_LOCATION );
   DALI_TEST_EQUALS( text->SetRangeOfSelection( 1, 0, 1 ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( text->RemoveSelection( 1 ), false, TEST_LOCATION );
+
+  // Insert into empty field
+  DALI_TEST_EQUALS(editabletext->SetTextContents(""), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(editabletext->InsertText(1, "xyz"), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(editabletext->InsertText(0, "abc"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(text->GetText(0, 3), "abc", TEST_LOCATION);
+
+  // Append at end
+  DALI_TEST_EQUALS(editabletext->InsertText(3, "xyz"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(text->GetText(0, 6), "abcxyz", TEST_LOCATION);
 
   DALI_TEST_EQUALS(editabletext->SetTextContents("adef"), true, TEST_LOCATION);
   DALI_TEST_EQUALS(editabletext->InsertText(1, "bc"), true, TEST_LOCATION);
