@@ -1030,6 +1030,7 @@ void Visual::Base::AnimateProperty(
   Internal::TransitionData::Animator& animator)
 {
 #if defined(DEBUG_ENABLED)
+  if(gVisualBaseLogFilter->IsEnabledFor(Debug::General))
   {
     std::ostringstream oss;
     oss << "Visual::Base::AnimateProperty(Visual:" << mImpl->mName << " Property:" << animator.propertyKey << " Target: " << animator.targetValue << std::endl;
