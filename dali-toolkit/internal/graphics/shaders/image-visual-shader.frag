@@ -1,39 +1,23 @@
-#ifndef IS_REQUIRED_ROUNDED_CORNER
-#define IS_REQUIRED_ROUNDED_CORNER 0
-#endif
-#ifndef IS_REQUIRED_BORDERLINE
-#define IS_REQUIRED_BORDERLINE 0
-#endif
-#ifndef IS_REQUIRED_ALPHA_MASKING
-#define IS_REQUIRED_ALPHA_MASKING 0
-#endif
-#ifndef ATLAS_DEFAULT_WARP
-#define ATLAS_DEFAULT_WARP 0
-#endif
-#ifndef ATLAS_CUSTOM_WARP
-#define ATLAS_CUSTOM_WARP 0
-#endif
-
 INPUT mediump vec2 vTexCoord;
-#if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 INPUT mediump vec2 vPosition;
 INPUT mediump vec2 vRectSize;
 INPUT mediump vec2 vOptRectSize;
-#if IS_REQUIRED_ROUNDED_CORNER
+#ifdef IS_REQUIRED_ROUNDED_CORNER
 INPUT mediump vec4 vCornerRadius;
 #endif
 #endif
 
 uniform sampler2D sTexture;
 
-#if IS_REQUIRED_ALPHA_MASKING
+#ifdef IS_REQUIRED_ALPHA_MASKING
 uniform sampler2D sMaskTexture;
 INPUT mediump vec2 vMaskTexCoord;
 #endif
 
-#if ATLAS_DEFAULT_WARP
+#ifdef ATLAS_DEFAULT_WARP
 uniform mediump vec4 uAtlasRect;
-#elif ATLAS_CUSTOM_WARP
+#elif defined(ATLAS_CUSTOM_WARP)
 // WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
 uniform lowp vec2 wrapMode;
 #endif
@@ -41,14 +25,14 @@ uniform lowp vec2 wrapMode;
 uniform lowp vec4 uColor;
 uniform lowp vec3 mixColor;
 uniform lowp float preMultipliedAlpha;
-#if IS_REQUIRED_BORDERLINE
+#ifdef IS_REQUIRED_BORDERLINE
 uniform mediump float borderlineWidth;
 uniform mediump float borderlineOffset;
 uniform lowp vec4 borderlineColor;
 uniform lowp vec4 uActorColor;
 #endif
 
-#if ATLAS_CUSTOM_WARP
+#ifdef ATLAS_CUSTOM_WARP
 mediump float wrapCoordinate( mediump vec2 range, mediump float coordinate, lowp float wrap )
 {
   mediump float coord;
@@ -60,7 +44,7 @@ mediump float wrapCoordinate( mediump vec2 range, mediump float coordinate, lowp
 }
 #endif
 
-#if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 // Global values both rounded corner and borderline use
 
 // radius of rounded corner on this quadrant
@@ -84,7 +68,7 @@ mediump float gMinInlinePotential = 0.0;
 
 void calculateCornerRadius()
 {
-#if IS_REQUIRED_ROUNDED_CORNER
+#ifdef IS_REQUIRED_ROUNDED_CORNER
   gRadius =
   mix(
     mix(vCornerRadius.x, vCornerRadius.y, sign(vPosition.x) * 0.5 + 0.5),
@@ -98,7 +82,7 @@ void calculatePosition()
 {
   gFragmentPosition = abs(vPosition) - vRectSize;
   gCenterPosition = -gRadius;
-#if IS_REQUIRED_BORDERLINE
+#ifdef IS_REQUIRED_BORDERLINE
   gCenterPosition += borderlineWidth * (clamp(borderlineOffset, -1.0, 1.0) + 1.0) * 0.5;
 #endif
   gDiff = gFragmentPosition - gCenterPosition;
@@ -116,7 +100,7 @@ void setupMinMaxPotential()
   gMaxOutlinePotential = gRadius + gPotentialRange;
   gMinOutlinePotential = gRadius - gPotentialRange;
 
-#if IS_REQUIRED_BORDERLINE
+#ifdef IS_REQUIRED_BORDERLINE
   gMaxInlinePotential = gMaxOutlinePotential - borderlineWidth;
   gMinInlinePotential = gMinOutlinePotential - borderlineWidth;
 #else
@@ -139,7 +123,7 @@ void PreprocessPotential()
 }
 #endif
 
-#if IS_REQUIRED_BORDERLINE
+#ifdef IS_REQUIRED_BORDERLINE
 lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 {
   mediump float potential = gPotential;
@@ -202,7 +186,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 }
 #endif
 
-#if IS_REQUIRED_ROUNDED_CORNER
+#ifdef IS_REQUIRED_ROUNDED_CORNER
 mediump float calculateCornerOpacity()
 {
   mediump float potential = gPotential;
@@ -226,9 +210,9 @@ mediump float calculateCornerOpacity()
 
 void main()
 {
-#if ATLAS_DEFAULT_WARP
+#ifdef ATLAS_DEFAULT_WARP
   mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );
-#elif ATLAS_CUSTOM_WARP
+#elif defined(ATLAS_CUSTOM_WARP)
   mediump vec2 texCoord = vec2( wrapCoordinate( uAtlasRect.xz, vTexCoord.x, wrapMode.x ),
                                 wrapCoordinate( uAtlasRect.yw, vTexCoord.y, wrapMode.y ) );
 #else
@@ -237,13 +221,13 @@ void main()
 
   lowp vec4 textureColor = TEXTURE( sTexture, texCoord ) * vec4( mixColor, 1.0 ) * uColor;
 
-#if IS_REQUIRED_ALPHA_MASKING
+#ifdef IS_REQUIRED_ALPHA_MASKING
   mediump float maskAlpha = TEXTURE(sMaskTexture, vMaskTexCoord).a;
   textureColor.a *= maskAlpha;
   textureColor.rgb *= mix(1.0, maskAlpha, preMultipliedAlpha);
 #endif
 
-#if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
@@ -254,18 +238,18 @@ void main()
     PreprocessPotential();
 #endif
 
-#if IS_REQUIRED_BORDERLINE
+#ifdef IS_REQUIRED_BORDERLINE
     textureColor = convertBorderlineColor(textureColor);
 #endif
     OUT_COLOR = textureColor;
 
-#if IS_REQUIRED_ROUNDED_CORNER
+#ifdef IS_REQUIRED_ROUNDED_CORNER
     mediump float opacity = calculateCornerOpacity();
     OUT_COLOR.a *= opacity;
     OUT_COLOR.rgb *= mix(1.0, opacity, preMultipliedAlpha);
 #endif
 
-#if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
   }
 #endif
 }

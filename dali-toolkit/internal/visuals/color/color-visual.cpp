@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/rendering/decorated-visual-renderer.h>
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
@@ -41,7 +42,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(6); // Blur Radius + border/corner
+const int CUSTOM_PROPERTY_COUNT(0);
 
 VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[6] =
   {
@@ -73,7 +74,6 @@ ColorVisualPtr ColorVisual::New(VisualFactoryCache& factoryCache, const Property
 ColorVisual::ColorVisual(VisualFactoryCache& factoryCache)
 : Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::COLOR),
   mBlurRadius(0.0f),
-  mBlurRadiusIndex(Property::INVALID_INDEX),
   mAlwaysUsingBlurRadius(false)
 {
 }
@@ -117,25 +117,26 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
       DALI_LOG_ERROR("ColorVisual:DoSetProperties:: BLUR_RADIUS property has incorrect type: %d\n", blurRadiusValue->GetType());
     }
 
-    if(mBlurRadiusIndex != Property::INVALID_INDEX)
-    {
-      mImpl->mRenderer.SetProperty(mBlurRadiusIndex, mBlurRadius);
-    }
-    else if(DALI_UNLIKELY(mImpl->mRenderer && (!EqualsZero(mBlurRadius) || mAlwaysUsingBlurRadius)))
+    if(DALI_UNLIKELY(mImpl->mRenderer))
     {
       // Unusual case. SetProperty called after OnInitialize().
       // Assume that DoAction call UPDATE_PROPERTY.
-      // We must regist properies into renderer, and update shader.
+      DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBlurRadiusUniform();
+      mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BLUR_RADIUS, mBlurRadius);
 
-      // BlurRadius added by this action. Regist property to renderer.
-      mBlurRadiusIndex = mImpl->mRenderer.RegisterUniqueProperty(DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME, mBlurRadius);
-      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+      // Check whether we must update shader.
+      if(!mAlwaysUsingBlurRadius && IsBlurRequired())
+      {
+        // Change the shader must not be occured many times. we always have to use blur feature.
+        mAlwaysUsingBlurRadius = true;
 
-      // Change the shader must not be occured many times. we always have to use blur feature.
-      mAlwaysUsingBlurRadius = true;
-
-      // Change shader
-      UpdateShader();
+        mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+        // Change shader
+        if(!mImpl->mCustomShader)
+        {
+          UpdateShader();
+        }
+      }
     }
   }
 }
@@ -159,10 +160,10 @@ void ColorVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
   map.Insert(Toolkit::ColorVisual::Property::MIX_COLOR, mImpl->mMixColor);
 
-  if(mImpl->mRenderer && mBlurRadiusIndex != Property::INVALID_INDEX)
+  if(mImpl->mRenderer)
   {
     // Update values from Renderer
-    float blurRadius = mImpl->mRenderer.GetProperty<float>(mBlurRadiusIndex);
+    float blurRadius = mImpl->mRenderer.GetProperty<float>(DecoratedVisualRenderer::Property::BLUR_RADIUS);
     map.Insert(Toolkit::DevelColorVisual::Property::BLUR_RADIUS, blurRadius);
   }
   else
@@ -208,14 +209,15 @@ void ColorVisual::OnInitialize()
 
   Shader shader = GenerateShader();
 
-  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
+  mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, Vector3(mImpl->mMixColor));
 
-  if(!EqualsZero(mBlurRadius))
+  if(mAlwaysUsingBlurRadius || !EqualsZero(mBlurRadius))
   {
-    mBlurRadiusIndex = mImpl->mRenderer.RegisterUniqueProperty(DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME, mBlurRadius);
+    DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBlurRadiusUniform();
+    mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BLUR_RADIUS, mBlurRadius);
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
   }
 
@@ -230,7 +232,7 @@ Shader ColorVisual::GenerateShader() const
 
   bool roundedCorner  = IsRoundedCornerRequired();
   bool borderline     = IsBorderlineRequired();
-  bool blur           = !EqualsZero(mBlurRadius) || mAlwaysUsingBlurRadius;
+  bool blur           = IsBlurRequired();
   int  shaderTypeFlag = ColorVisualRequireFlag::DEFAULT;
 
   if(roundedCorner)
@@ -256,18 +258,18 @@ Shader ColorVisual::GenerateShader() const
     std::string fragmentShaderPrefixList;
     if(roundedCorner)
     {
-      vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
     }
     if(blur)
     {
-      vertexShaderPrefixList += "#define IS_REQUIRED_BLUR 1\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_BLUR 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_BLUR\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_BLUR\n";
     }
     if(borderline)
     {
-      vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
     }
     shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_VERT.data(),
                          Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
@@ -287,21 +289,37 @@ Dali::Property ColorVisual::OnGetPropertyObject(Dali::Property::Key key)
 
   if((key.type == Property::Key::INDEX && key.indexKey == DevelColorVisual::Property::BLUR_RADIUS) || (key.type == Property::Key::STRING && key.stringKey == BLUR_RADIUS_NAME))
   {
-    mBlurRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME, mBlurRadius);
+    const bool updateShader = !mImpl->mCustomShader && !IsBlurRequired();
 
     // Blur is animated now. we always have to use blur feature.
     mAlwaysUsingBlurRadius = true;
 
+    if(updateShader)
+    {
+      // Update each values to renderer
+      DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBlurRadiusUniform();
+      mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BLUR_RADIUS, mBlurRadius);
+
+      // Change shader
+      UpdateShader();
+    }
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
-
-    // Change shader
-    UpdateShader();
-
-    return Dali::Property(mImpl->mRenderer, mBlurRadiusIndex);
+    return Dali::Property(mImpl->mRenderer, DecoratedVisualRenderer::Property::BLUR_RADIUS);
   }
 
   Handle handle;
   return Dali::Property(handle, Property::INVALID_INDEX);
+}
+
+bool ColorVisual::IsBlurRequired() const
+{
+  float blurRadius = mBlurRadius;
+  if(mImpl->mRenderer)
+  {
+    // Update values from Renderer
+    blurRadius = mImpl->mRenderer.GetProperty<float>(DecoratedVisualRenderer::Property::BLUR_RADIUS);
+  }
+  return mAlwaysUsingBlurRadius || !EqualsZero(blurRadius);
 }
 
 } // namespace Internal

@@ -24,6 +24,7 @@
 #include <dali-toolkit/public-api/transition/transition-set.h>
 #include <dali-toolkit/public-api/transition/transition.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/public-api/rendering/decorated-visual-renderer.h> // for Renderer Property Index.
 #include <stdlib.h>
 #include <iostream>
 
@@ -287,18 +288,14 @@ int UtcDaliTransitionBetweenControlPair(void)
 
   DALI_TEST_NOT_EQUALS(destinationPosition, control2.GetCurrentProperty<Vector3>(Actor::Property::POSITION), 0.00001f, TEST_LOCATION);
   DALI_TEST_EQUALS(1, control2.GetRendererCount(), TEST_LOCATION);
-  Dali::Renderer  renderer = control2.GetRendererAt(0);
-  Property::Index index    = renderer.GetPropertyIndex(DevelVisual::Property::CORNER_RADIUS);
-  cornerRadius             = renderer.GetCurrentProperty<Vector4>(index);
+  Dali::Renderer renderer = control2.GetRendererAt(0);
+  cornerRadius            = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS);
   DALI_TEST_NOT_EQUALS(destinationRadiusV4, cornerRadius, 0.00001f, TEST_LOCATION);
-  index           = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_WIDTH);
-  borderlineWidth = renderer.GetCurrentProperty<float>(index);
+  borderlineWidth = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH);
   DALI_TEST_NOT_EQUALS(destinationBorderlineWidth, borderlineWidth, 0.00001f, TEST_LOCATION);
-  index           = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_COLOR);
-  borderlineColor = renderer.GetCurrentProperty<Vector4>(index);
+  borderlineColor = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR);
   DALI_TEST_NOT_EQUALS(destinationBorderlineColor, borderlineColor, 0.00001f, TEST_LOCATION);
-  index            = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_OFFSET);
-  borderlineOffset = renderer.GetCurrentProperty<float>(index);
+  borderlineOffset = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET);
   DALI_TEST_NOT_EQUALS(destinationBorderlineOffset, borderlineOffset, 0.00001f, TEST_LOCATION);
 
   application.SendNotification();
@@ -318,17 +315,13 @@ int UtcDaliTransitionBetweenControlPair(void)
   DALI_TEST_EQUALS(destinationOpacity, control2.GetCurrentProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
   DALI_TEST_EQUALS(1, control2.GetRendererCount(), TEST_LOCATION);
   renderer     = control2.GetRendererAt(0);
-  index        = renderer.GetPropertyIndex(DevelVisual::Property::CORNER_RADIUS);
-  cornerRadius = renderer.GetCurrentProperty<Vector4>(index);
+  cornerRadius = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS);
   DALI_TEST_EQUALS(destinationRadiusV4, cornerRadius, TEST_LOCATION);
-  index           = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_WIDTH);
-  borderlineWidth = renderer.GetCurrentProperty<float>(index);
+  borderlineWidth = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH);
   DALI_TEST_EQUALS(destinationBorderlineWidth, borderlineWidth, TEST_LOCATION);
-  index           = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_COLOR);
-  borderlineColor = renderer.GetCurrentProperty<Vector4>(index);
+  borderlineColor = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR);
   DALI_TEST_EQUALS(destinationBorderlineColor, borderlineColor, TEST_LOCATION);
-  index            = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_OFFSET);
-  borderlineOffset = renderer.GetCurrentProperty<float>(index);
+  borderlineOffset = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET);
   DALI_TEST_EQUALS(destinationBorderlineOffset, borderlineOffset, TEST_LOCATION);
 
   END_TEST;
@@ -431,21 +424,17 @@ int UtcDaliTransitionBetweenControlPair2(void)
   DALI_TEST_NOT_EQUALS(destinationPosition, control1.GetCurrentProperty<Vector3>(Actor::Property::POSITION), 0.00001f, TEST_LOCATION);
   DALI_TEST_EQUALS(1, control1.GetRendererCount(), TEST_LOCATION);
 
-  Dali::Renderer  renderer = control1.GetRendererAt(0);
-  Property::Index index    = renderer.GetPropertyIndex(DevelVisual::Property::CORNER_RADIUS);
-  cornerRadius             = renderer.GetCurrentProperty<Vector4>(index);
+  Dali::Renderer renderer = control1.GetRendererAt(0);
+  cornerRadius            = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS);
   DALI_TEST_NOT_EQUALS(destinationRadiusV4, cornerRadius, 0.00001f, TEST_LOCATION);
 
-  index           = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_WIDTH);
-  borderlineWidth = renderer.GetCurrentProperty<float>(index);
+  borderlineWidth = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH);
   DALI_TEST_NOT_EQUALS(destinationBorderlineWidth, borderlineWidth, 0.00001f, TEST_LOCATION);
 
-  index           = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_COLOR);
-  borderlineColor = renderer.GetCurrentProperty<Vector4>(index);
+  borderlineColor = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR);
   DALI_TEST_NOT_EQUALS(destinationBorderlineColor, borderlineColor, 0.00001f, TEST_LOCATION);
 
-  index            = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_OFFSET);
-  borderlineOffset = renderer.GetCurrentProperty<float>(index);
+  borderlineOffset = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET);
   DALI_TEST_NOT_EQUALS(destinationBorderlineOffset, borderlineOffset, 0.00001f, TEST_LOCATION);
 
   application.SendNotification();
@@ -465,20 +454,16 @@ int UtcDaliTransitionBetweenControlPair2(void)
 
   DALI_TEST_EQUALS(1, control1.GetRendererCount(), TEST_LOCATION);
   renderer     = control1.GetRendererAt(0);
-  index        = renderer.GetPropertyIndex(DevelVisual::Property::CORNER_RADIUS);
-  cornerRadius = renderer.GetCurrentProperty<Vector4>(index);
+  cornerRadius = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS);
   DALI_TEST_EQUALS(destinationRadiusV4, cornerRadius, TEST_LOCATION);
 
-  index           = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_WIDTH);
-  borderlineWidth = renderer.GetCurrentProperty<float>(index);
+  borderlineWidth = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH);
   DALI_TEST_EQUALS(destinationBorderlineWidth, borderlineWidth, TEST_LOCATION);
 
-  index           = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_COLOR);
-  borderlineColor = renderer.GetCurrentProperty<Vector4>(index);
+  borderlineColor = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR);
   DALI_TEST_EQUALS(destinationBorderlineColor, borderlineColor, TEST_LOCATION);
 
-  index            = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_OFFSET);
-  borderlineOffset = renderer.GetCurrentProperty<float>(index);
+  borderlineOffset = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET);
   DALI_TEST_EQUALS(destinationBorderlineOffset, borderlineOffset, TEST_LOCATION);
 
   // every actor properties of control1 are returned to the source properties.
@@ -494,20 +479,16 @@ int UtcDaliTransitionBetweenControlPair2(void)
   // after next update, renderer properties are returned to the source properties.
   DALI_TEST_EQUALS(1, control1.GetRendererCount(), TEST_LOCATION);
   renderer     = control1.GetRendererAt(0);
-  index        = renderer.GetPropertyIndex(DevelVisual::Property::CORNER_RADIUS);
-  cornerRadius = renderer.GetCurrentProperty<Vector4>(index);
+  cornerRadius = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS);
   DALI_TEST_EQUALS(sourceRadiusV4, cornerRadius, TEST_LOCATION);
 
-  index           = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_WIDTH);
-  borderlineWidth = renderer.GetCurrentProperty<float>(index);
+  borderlineWidth = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH);
   DALI_TEST_EQUALS(sourceBorderlineWidth, borderlineWidth, TEST_LOCATION);
 
-  index           = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_COLOR);
-  borderlineColor = renderer.GetCurrentProperty<Vector4>(index);
+  borderlineColor = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR);
   DALI_TEST_EQUALS(sourceBorderlineColor, borderlineColor, TEST_LOCATION);
 
-  index            = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_OFFSET);
-  borderlineOffset = renderer.GetCurrentProperty<float>(index);
+  borderlineOffset = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET);
   DALI_TEST_EQUALS(sourceBorderlineOffset, borderlineOffset, TEST_LOCATION);
 
   END_TEST;

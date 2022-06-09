@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -183,8 +183,10 @@ void KeyboardFocusManager::GetConfigurationFromStyleManger()
   Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
   if(styleManager)
   {
-    Property::Map config   = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
-    mAlwaysShowIndicator   = config["alwaysShowFocus"].Get<bool>() ? ALWAYS_SHOW : NONE;
+    const Property::Map& config               = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
+    const auto           alwaysShowFocusValue = config.Find("alwaysShowFocus", Property::Type::BOOLEAN);
+
+    mAlwaysShowIndicator   = (alwaysShowFocusValue && alwaysShowFocusValue->Get<bool>()) ? ALWAYS_SHOW : NONE;
     mIsFocusIndicatorShown = (mAlwaysShowIndicator == ALWAYS_SHOW) ? SHOW : HIDE;
     mClearFocusOnTouch     = (mIsFocusIndicatorShown == SHOW) ? false : true;
   }
@@ -520,16 +522,16 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
         nextFocusableActor                  = mPreFocusChangeSignal.Emit(currentFocusActor, Actor(), direction);
         mIsWaitingKeyboardFocusChangeCommit = false;
       }
-      else if (mEnableDefaultAlgorithm)
+      else if(mEnableDefaultAlgorithm)
       {
         Actor rootActor = mFocusFinderRootActor.GetHandle();
         if(!rootActor)
         {
-          if (currentFocusActor)
+          if(currentFocusActor)
           {
             // Find the window of the focused actor.
             Integration::SceneHolder window = Integration::SceneHolder::Get(currentFocusActor);
-            if (window)
+            if(window)
             {
               rootActor = window.GetRootLayer();
             }
@@ -799,7 +801,7 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
 
 void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 {
-  const std::string& keyName = event.GetKeyName();
+  const std::string& keyName    = event.GetKeyName();
   const std::string& deviceName = event.GetDeviceName();
 
   if(mIsFocusIndicatorShown == UNKNOWN)
@@ -1045,8 +1047,8 @@ void KeyboardFocusManager::OnWheelEvent(const WheelEvent& event)
 
 bool KeyboardFocusManager::OnCustomWheelEvent(const WheelEvent& event)
 {
-  bool consumed = false;
-  Actor actor = GetCurrentFocusActor();
+  bool  consumed = false;
+  Actor actor    = GetCurrentFocusActor();
   if(actor)
   {
     // Notify the actor about the wheel event

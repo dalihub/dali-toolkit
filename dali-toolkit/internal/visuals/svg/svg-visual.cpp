@@ -29,6 +29,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/rendering/decorated-visual-renderer.h>
 
 namespace Dali
 {
@@ -38,7 +39,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(6); // atlas + corner/border
+const int CUSTOM_PROPERTY_COUNT(1); // atlas
 
 // property name
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
@@ -85,7 +86,7 @@ void SvgVisual::OnInitialize()
 {
   Shader   shader   = GenerateShader();
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
-  mImpl->mRenderer  = VisualRenderer::New(geometry, shader);
+  mImpl->mRenderer  = DecoratedVisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   Vector2 dpi     = Stage::GetCurrent().GetDpi();

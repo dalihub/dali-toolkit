@@ -123,6 +123,14 @@ protected:
    */
   Dali::Property OnGetPropertyObject(Dali::Property::Key key) override;
 
+protected:
+  /**
+   * @brief Query whether the visual requires to be blur.
+   *
+   * @return Returns true if the blur is required, false otherwise.
+   */
+  bool IsBlurRequired() const;
+
 private:
   // Undefined
   ColorVisual(const ColorVisual& colorRenderer);
@@ -131,9 +139,8 @@ private:
   ColorVisual& operator=(const ColorVisual& colorRenderer);
 
 private:
-  float           mBlurRadius;                ///< The blur radius
-  Property::Index mBlurRadiusIndex;           ///< The blur radius property index
-  bool            mAlwaysUsingBlurRadius : 1; ///< Whether we need the blur radius in shader always.
+  float mBlurRadius;                ///< The blur radius
+  bool  mAlwaysUsingBlurRadius : 1; ///< Whether we need the blur radius in shader always.
 };
 
 } // namespace Internal

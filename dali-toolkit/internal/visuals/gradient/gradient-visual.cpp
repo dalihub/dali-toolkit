@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/property-array.h>
+#include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <typeinfo>
 
 // INTERNAL INCLUDES
@@ -46,7 +47,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(6); // alignment + corner/border
+const int CUSTOM_PROPERTY_COUNT(1); // alignment
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN(UNITS)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::GradientVisual::Units, OBJECT_BOUNDING_BOX)
@@ -261,7 +262,7 @@ void GradientVisual::OnInitialize()
   sampler.SetWrapMode(wrap, wrap);
   textureSet.SetSampler(0u, sampler);
 
-  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
+  mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
   mImpl->mRenderer.SetTextures(textureSet);
 
@@ -391,21 +392,21 @@ Shader GradientVisual::GenerateShader() const
 
     if(roundedCorner)
     {
-      vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
     }
     if(borderline)
     {
-      vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
     }
     if(radialGradient)
     {
-      fragmentShaderPrefixList += "#define RADIAL 1\n";
+      fragmentShaderPrefixList += "#define RADIAL\n";
     }
     if(userspaceUnit)
     {
-      vertexShaderPrefixList += "#define USER_SPACE 1\n";
+      vertexShaderPrefixList += "#define USER_SPACE\n";
     }
 
     shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_VERT.data(),

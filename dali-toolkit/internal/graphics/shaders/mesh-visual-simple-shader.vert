@@ -23,8 +23,8 @@ vec4 ComputeVertexPosition()
   float scaleFactor = min( visualSize.x, visualSize.y );
   vec3 originFlipY =vec3(origin.x, -origin.y, 0.0);
   vec3 anchorPointFlipY = vec3( anchorPoint.x, -anchorPoint.y, 0.0);
-  vec3 offset = vec3( ( offset / uSize.xy ) * offsetSizeMode.xy + offset * (1.0-offsetSizeMode.xy), 0.0) * vec3(1.0,-1.0,1.0);
-  return vec4( (aPosition + anchorPointFlipY)*scaleFactor + (offset + originFlipY)*uSize, 1.0 );
+  vec3 visualOffset = vec3( offset * offsetSizeMode.xy + offset * uSize.xy * (1.0-offsetSizeMode.xy), 0.0) * vec3(1.0,-1.0,1.0);
+  return vec4( (aPosition + anchorPointFlipY)*scaleFactor + visualOffset + originFlipY * uSize, 1.0 );
 }
 
 void main()

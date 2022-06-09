@@ -141,6 +141,38 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
   return true;
 }
 
+void TestShaderCodeContainSubstrings(Control control, std::vector<std::pair<std::string, bool>> substringCheckList, const char* location)
+{
+  Renderer        renderer = control.GetRendererAt(0);
+  Shader          shader   = renderer.GetShader();
+  Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
+  Property::Map*  map      = value.GetMap();
+  DALI_TEST_CHECK(map);
+
+  Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
+  DALI_TEST_CHECK(fragment);
+  std::string fragmentShader;
+  DALI_TEST_CHECK(fragment->Get(fragmentShader));
+  for(const auto& checkPair : substringCheckList)
+  {
+    const auto& keyword = checkPair.first;
+    const auto& expect  = checkPair.second;
+    tet_printf("check [%s] %s exist in fragment shader\n", keyword.c_str(), expect ? "is" : "is not");
+    DALI_TEST_EQUALS((fragmentShader.find(keyword.c_str()) != std::string::npos), expect, location);
+  }
+
+  Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
+  std::string      vertexShader;
+  DALI_TEST_CHECK(vertex->Get(vertexShader));
+  for(const auto& checkPair : substringCheckList)
+  {
+    const auto& keyword = checkPair.first;
+    const auto& expect  = checkPair.second;
+    tet_printf("check [%s] %s exist in vertex shader\n", keyword.c_str(), expect ? "is" : "is not");
+    DALI_TEST_EQUALS((vertexShader.find(keyword.c_str()) != std::string::npos), expect, location);
+  }
+}
+
 } //namespace
 
 void dali_visual_startup(void)
@@ -906,7 +938,7 @@ int UtcDaliVisualGetPropertyMap6(void)
 
   value = resultMap.Find(ImageVisual::Property::BORDER, Property::RECTANGLE);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<Rect<int> >() == border);
+  DALI_TEST_CHECK(value->Get<Rect<int>>() == border);
 
   value = resultMap.Find(DevelImageVisual::Property::AUXILIARY_IMAGE, Property::STRING);
   DALI_TEST_CHECK(value);
@@ -947,7 +979,7 @@ int UtcDaliVisualGetPropertyMap6(void)
 
   value = resultMap.Find(ImageVisual::Property::BORDER, Property::RECTANGLE);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<Rect<int> >() == border);
+  DALI_TEST_CHECK(value->Get<Rect<int>>() == border);
 
   END_TEST;
 }
@@ -5671,27 +5703,14 @@ int UtcDaliVisualUpdatePropertyChangeShader01(void)
   application.SendNotification();
   application.Render();
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", false},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+    },
+    TEST_LOCATION);
 
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") == std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") == std::string::npos);
-  }
   callStack.Reset();
   callStack.Enable(true);
 
@@ -5716,27 +5735,13 @@ int UtcDaliVisualUpdatePropertyChangeShader01(void)
   DALI_TEST_CHECK(cornerRadiusPolicyValue);
   DALI_TEST_EQUALS(cornerRadiusPolicyValue->Get<int>(), static_cast<int>(Toolkit::Visual::Transform::Policy::RELATIVE), TEST_LOCATION);
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
-
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-  }
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", false},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true},
+    },
+    TEST_LOCATION);
 
   // Send shader compile signal
   application.SendNotification();
@@ -5786,29 +5791,13 @@ int UtcDaliVisualUpdatePropertyChangeShader01(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
-
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") != std::string::npos);
-    // Note : mAlwaysUsingCornerRadius is true.
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") != std::string::npos);
-    // Note : mAlwaysUsingCornerRadius is true.
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-  }
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", true},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
+    },
+    TEST_LOCATION);
 
   // Send shader compile signal
   application.SendNotification();
@@ -5854,29 +5843,13 @@ int UtcDaliVisualUpdatePropertyChangeShader01(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), 0.0f, TEST_LOCATION);
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
-
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    // Note : mAlwaysUsingBorderline and mAlwaysUsingCornerRadius is true.
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") != std::string::npos);
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    // Note : mAlwaysUsingBorderline and mAlwaysUsingCornerRadius is true.
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") != std::string::npos);
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-  }
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", true},     // Note : mAlwaysUsingBorderline is true.
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
+    },
+    TEST_LOCATION);
 
   // Send shader compile signal
   application.SendNotification();
@@ -5919,27 +5892,13 @@ int UtcDaliVisualUpdatePropertyChangeShader02(void)
   application.SendNotification();
   application.Render();
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
-
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") == std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") == std::string::npos);
-  }
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", false},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+    },
+    TEST_LOCATION);
 
   Vector4 targetCornerRadius = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -5960,29 +5919,13 @@ int UtcDaliVisualUpdatePropertyChangeShader02(void)
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
-
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    // Note : corner radius is zero. so we don't change shader!
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") == std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    // Note : corner radius is zero. so we don't change shader!
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") == std::string::npos);
-  }
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", false},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", false}, // Note : corner radius is zero. so we don't change shader!
+    },
+    TEST_LOCATION);
 
   // Send shader compile signal
   application.SendNotification();
@@ -6023,29 +5966,13 @@ int UtcDaliVisualUpdatePropertyChangeShader02(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
-
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    // Note : borderline width is zero. so we don't change shader!
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") == std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    // Note : borderline width is zero. so we don't change shader!
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") == std::string::npos);
-  }
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", false}, // Note : borderline width is zero. so we don't change shader!
+      {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+    },
+    TEST_LOCATION);
 
   // Send shader compile signal
   application.SendNotification();
@@ -6086,29 +6013,14 @@ int UtcDaliVisualUpdatePropertyChangeShader03(void)
   application.SendNotification();
   application.Render();
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
-
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BLUR 1") == std::string::npos);
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") == std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BLUR 1") == std::string::npos);
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") == std::string::npos);
-  }
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BLUR", false},
+      {"#define IS_REQUIRED_BORDERLINE", false},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+    },
+    TEST_LOCATION);
 
   float   targetBlurRadius   = 15.0f;
   Vector4 targetCornerRadius = Vector4(1.0f, 0.1f, 1.1f, 0.0f);
@@ -6136,31 +6048,14 @@ int UtcDaliVisualUpdatePropertyChangeShader03(void)
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
-
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BLUR 1") != std::string::npos);
-    // Note : We ignore borderline when blur radius occured
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BLUR 1") != std::string::npos);
-    // Note : We ignore borderline when blur radius occured
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-  }
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BLUR", true},
+      {"#define IS_REQUIRED_BORDERLINE", false}, // Note : We ignore borderline when blur radius occured
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true},
+    },
+    TEST_LOCATION);
 
   // Send shader compile signal
   application.SendNotification();
@@ -6193,33 +6088,14 @@ int UtcDaliVisualUpdatePropertyChangeShader03(void)
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), Vector4::ZERO, TEST_LOCATION);
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
-
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    // Note : mAlwaysUsingBlurRadius and mAlwaysUsingCornerRadius is true.
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BLUR 1") != std::string::npos);
-    // Note : We ignore borderline when blur radius occured
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    // Note : mAlwaysUsingBlurRadius and mAlwaysUsingCornerRadius is true.
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BLUR 1") != std::string::npos);
-    // Note : We ignore borderline when blur radius occured
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-  }
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BLUR", true},           // Note : mAlwaysUsingBlurRadius is true.
+      {"#define IS_REQUIRED_BORDERLINE", false},    // Note : We ignore borderline when blur radius occured
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
+    },
+    TEST_LOCATION);
 
   // Send shader compile signal
   application.SendNotification();
@@ -6264,27 +6140,14 @@ int UtcDaliVisualUpdatePropertyChangeShader04(void)
   application.SendNotification();
   application.Render();
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", false},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true},
+    },
+    TEST_LOCATION);
 
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-  }
   callStack.Reset();
   callStack.Enable(true);
 
@@ -6298,29 +6161,14 @@ int UtcDaliVisualUpdatePropertyChangeShader04(void)
   application.Render();
   application.Render(1001u); // End of animation
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", false},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
+    },
+    TEST_LOCATION);
 
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    // Note : mAlwaysUsingCornerRadius is true.
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") == std::string::npos);
-    // Note : mAlwaysUsingCornerRadius is true.
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-  }
   callStack.Enable(false);
   // Shader not changed
   DALI_TEST_CHECK(!callStack.FindMethod("CreateShader"));
@@ -6350,29 +6198,13 @@ int UtcDaliVisualUpdatePropertyChangeShader04(void)
   DALI_TEST_CHECK(borderlineWidthValue);
   DALI_TEST_EQUALS(borderlineWidthValue->Get<float>(), targetBorderlineWidth, TEST_LOCATION);
 
-  // Get shader
-  {
-    Renderer        renderer = dummyControl.GetRendererAt(0);
-    Shader          shader   = renderer.GetShader();
-    Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-    Property::Map*  map      = value.GetMap();
-    DALI_TEST_CHECK(map);
-
-    Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_CHECK(fragment);
-    std::string fragmentShader;
-    DALI_TEST_CHECK(fragment->Get(fragmentShader));
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_BORDERLINE 1") != std::string::npos);
-    // Note : mAlwaysUsingCornerRadius is true.
-    DALI_TEST_CHECK(fragmentShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-
-    Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    std::string      vertexShader;
-    DALI_TEST_CHECK(vertex->Get(vertexShader));
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_BORDERLINE 1") != std::string::npos);
-    // Note : mAlwaysUsingCornerRadius is true.
-    DALI_TEST_CHECK(vertexShader.find("#define IS_REQUIRED_ROUNDED_CORNER 1") != std::string::npos);
-  }
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", true},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
+    },
+    TEST_LOCATION);
 
   // Send shader compile signal
   application.SendNotification();

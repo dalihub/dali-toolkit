@@ -422,6 +422,11 @@ private:
   void RegisterMixColor();
 
   /**
+   * Register the uniform on the DecoratedVisualRenderer and store the property index if necessary.
+   */
+  void RegisterDecoration();
+
+  /**
    * Find the matching property on the renderer or shader. If it's a shader
    * property, register it on the renderer in order to animate it for this
    * visual independently.

@@ -27,6 +27,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <cstring> // for strlen()
 
 // INTERNAL HEADERS
@@ -51,7 +52,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(12); // ltr, wrap, pixel area, atlas, pixalign, crop to mask, mask texture ratio + border/corner
+const int CUSTOM_PROPERTY_COUNT(7); // ltr, wrap, pixel area, atlas, pixalign, crop to mask, mask texture ratio
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
@@ -582,7 +583,7 @@ void ImageVisual::OnInitialize()
   Shader shader = GenerateShader();
 
   // Create the renderer
-  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
+  mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   //Register transform properties
@@ -1057,7 +1058,7 @@ Shader ImageVisual::GenerateShader() const
 
   if(useStandardShader)
   {
-    bool   requiredAlphaMaskingOnRendering = (mMaskingData && !mMaskingData->mMaskImageLoadingFailed) ? !mMaskingData->mPreappliedMasking : false;
+    bool requiredAlphaMaskingOnRendering = (mMaskingData && !mMaskingData->mMaskImageLoadingFailed) ? !mMaskingData->mPreappliedMasking : false;
     // Create and cache the standard shader
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
@@ -1133,8 +1134,8 @@ void ImageVisual::CheckMaskTexture()
 {
   if(mMaskingData && !mMaskingData->mPreappliedMasking)
   {
-    bool maskLoadFailed = true;
-    TextureSet textures = mImpl->mRenderer.GetTextures();
+    bool       maskLoadFailed = true;
+    TextureSet textures       = mImpl->mRenderer.GetTextures();
     if(textures && textures.GetTextureCount() >= TEXTURE_COUNT_FOR_GPU_ALPHA_MASK)
     {
       if(mMaskingData->mCropToMask)

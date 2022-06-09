@@ -16,8 +16,8 @@ uniform mediump vec2 extraSize;
 
 void main()
 {
-  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;
-  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);
+  vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw ) + extraSize;
+  vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
 
   mediump vec2 size = visualSize.xy;
 
@@ -31,7 +31,7 @@ void main()
   mediump vec4 gridPosition = vec4( fixedFactor * fixedScaleDownRate + ( size - fixedTotal * fixedScaleDownRate ) * stretch, 0.0, 1.0 );
   mediump vec4 vertexPosition = gridPosition;
   vertexPosition.xy -= size * vec2( 0.5, 0.5 );
-  vertexPosition.xy += anchorPoint*size + (visualOffset + origin)*uSize.xy;
+  vertexPosition.xy += anchorPoint*size + visualOffset + origin * uSize.xy;
 
   vertexPosition = uMvpMatrix * vertexPosition;
 
