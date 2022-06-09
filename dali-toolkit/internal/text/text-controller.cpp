@@ -172,6 +172,11 @@ void Controller::SetAutoScrollEnabled(bool enable)
   mImpl->SetAutoScrollEnabled(enable);
 }
 
+void Controller::SetAutoScrollMaxTextureExceeded(bool exceed)
+{
+  mImpl->mIsAutoScrollMaxTextureExceeded = exceed;
+}
+
 bool Controller::IsAutoScrollEnabled() const
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::IsAutoScrollEnabled[%s]\n", mImpl->mIsAutoScrollEnabled ? "true" : "false");

@@ -1125,6 +1125,7 @@ void TextLabel::SetUpAutoScrolling()
     if(textNaturalSize.width > maxTextureSize)
     {
       mController->SetTextElideEnabled(true);
+      mController->SetAutoScrollMaxTextureExceeded(true);
     }
     GetHeightForWidth(maxTextureSize);
     wrapGap = std::max(maxTextureSize - textNaturalSize.width, 0.0f);
@@ -1152,6 +1153,7 @@ void TextLabel::SetUpAutoScrolling()
   Renderer renderer = static_cast<Internal::Visual::Base&>(GetImplementation(mVisual)).GetRenderer();
   mTextScroller->SetParameters(Self(), renderer, textureSet, controlSize, verifiedSize, wrapGap, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment());
   mController->SetTextElideEnabled(actualellipsis);
+  mController->SetAutoScrollMaxTextureExceeded(false);
 }
 
 void TextLabel::ScrollingFinished()

@@ -180,11 +180,13 @@ bool LayoutTextTest(const LayoutTextData& data)
 
   layoutSize = Vector2::ZERO;
 
-  bool       isAutoScroll = false;
-  const bool updated      = engine.LayoutText(layoutParameters,
+  bool       isAutoScroll                   = false;
+  bool       isAutoScrollMaxTextureExceeded = false;
+  const bool updated                        = engine.LayoutText(layoutParameters,
                                          layoutSize,
                                          data.ellipsis,
                                          isAutoScroll,
+                                         isAutoScrollMaxTextureExceeded,
                                          DevelText::EllipsisPosition::END);
 
   // 4) Compare the results.

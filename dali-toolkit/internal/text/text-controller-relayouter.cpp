@@ -93,6 +93,12 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
   {
     impl.UpdateModel(onlyOnceOperations);
 
+    if(impl.mIsAutoScrollEnabled)
+    {
+      // Layout the text for the new width.
+      operationsPending = static_cast<OperationsMask>(operationsPending | requestedOperationsMask);
+    }
+
     DoRelayout(impl,
                requestedControllerSize,
                static_cast<OperationsMask>(onlyOnceOperations | requestedOperationsMask),
@@ -619,12 +625,15 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
     }
 
     // Update the visual model.
-    bool isAutoScrollEnabled = impl.mIsAutoScrollEnabled;
+    bool isAutoScrollEnabled            = impl.mIsAutoScrollEnabled;
+    bool isAutoScrollMaxTextureExceeded = impl.mIsAutoScrollMaxTextureExceeded;
+
     Size newLayoutSize;
     viewUpdated               = impl.mLayoutEngine.LayoutText(layoutParameters,
                                                 newLayoutSize,
                                                 elideTextEnabled,
                                                 isAutoScrollEnabled,
+                                                isAutoScrollMaxTextureExceeded,
                                                 ellipsisPosition);
     impl.mIsAutoScrollEnabled = isAutoScrollEnabled;
 
