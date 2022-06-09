@@ -1215,16 +1215,22 @@ struct Engine::Impl
                     Length&                           numberOfLines,
                     float                             penY,
                     bool&                             isAutoScrollEnabled,
+                    bool                              isAutoScrollMaxTextureExceeded,
                     DevelText::EllipsisPosition::Type ellipsisPosition,
                     bool                              enforceEllipsisInSingleLine)
   {
-    const bool ellipsis    = enforceEllipsisInSingleLine || (isAutoScrollEnabled ? (penY - layout.descender > layoutParameters.boundingBox.height) : ((penY - layout.descender > layoutParameters.boundingBox.height) || ((mLayout == SINGLE_LINE_BOX) && (layout.length > layoutParameters.boundingBox.width))));
+    const bool ellipsis    = enforceEllipsisInSingleLine || (isAutoScrollEnabled ? isAutoScrollMaxTextureExceeded : ((penY - layout.descender > layoutParameters.boundingBox.height) || ((mLayout == SINGLE_LINE_BOX) && (layout.length > layoutParameters.boundingBox.width))));
     const bool isMultiline = !enforceEllipsisInSingleLine && (mLayout == MULTI_LINE_BOX);
     if(ellipsis && (ellipsisPosition == DevelText::EllipsisPosition::END || !isMultiline))
     {
-      isAutoScrollEnabled = false;
-      // Do not layout more lines if ellipsis is enabled.
+      if(penY - layout.descender > layoutParameters.boundingBox.height)
+      {
+        // Even if auto scroll is enabled and text is bigger than max texture size,
+        // if the the height is small, auto scroll should not work.
+        isAutoScrollEnabled = false;
+      }
 
+      // Do not layout more lines if ellipsis is enabled.
       // The last line needs to be completely filled with characters.
       // Part of a word may be used.
 
@@ -1500,6 +1506,7 @@ struct Engine::Impl
                   Size&                             layoutSize,
                   bool                              elideTextEnabled,
                   bool&                             isAutoScrollEnabled,
+                  bool                              isAutoScrollMaxTextureExceeded,
                   DevelText::EllipsisPosition::Type ellipsisPosition)
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->LayoutText\n");
@@ -1726,6 +1733,7 @@ struct Engine::Impl
                                 numberOfLines,
                                 penY,
                                 isAutoScrollEnabled,
+                                isAutoScrollMaxTextureExceeded,
                                 ellipsisPosition,
                                 false);
       }
@@ -1744,6 +1752,7 @@ struct Engine::Impl
                                   numberOfLines,
                                   penY,
                                   isAutoScrollEnabled,
+                                  isAutoScrollMaxTextureExceeded,
                                   ellipsisPosition,
                                   true);
         }
@@ -2144,12 +2153,14 @@ bool Engine::LayoutText(Parameters&                       layoutParameters,
                         Size&                             layoutSize,
                         bool                              elideTextEnabled,
                         bool&                             isAutoScrollEnabled,
+                        bool                              isAutoScrollMaxTextureExceeded,
                         DevelText::EllipsisPosition::Type ellipsisPosition)
 {
   return mImpl->LayoutText(layoutParameters,
                            layoutSize,
                            elideTextEnabled,
                            isAutoScrollEnabled,
+                           isAutoScrollMaxTextureExceeded,
                            ellipsisPosition);
 }
 

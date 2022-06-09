@@ -1051,10 +1051,12 @@ Size LayoutText(const RendererParameters& textParameters, TextAbstraction::TextR
   // Update the visual model.
   Size newLayoutSize;
   bool isAutoScrollEnabled = false;
+  bool isAutoScrollMaxTextureExceeded = false;
   layoutEngine.LayoutText(layoutParameters,
                           newLayoutSize,
                           textParameters.ellipsisEnabled,
                           isAutoScrollEnabled,
+                          isAutoScrollMaxTextureExceeded,
                           ellipsisPosition);
 
   return newLayoutSize;
