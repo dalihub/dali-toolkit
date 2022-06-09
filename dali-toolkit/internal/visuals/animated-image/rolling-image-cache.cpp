@@ -29,6 +29,7 @@ namespace
 Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
 
 #define LOG_CACHE                                                                                                                                                        \
+  if(gAnimImgLogFilter->IsEnabledFor(Debug::Concise))                                                                                                                    \
   {                                                                                                                                                                      \
     std::ostringstream oss;                                                                                                                                              \
     oss << "Size:" << mQueue.Count() << " [ ";                                                                                                                           \
