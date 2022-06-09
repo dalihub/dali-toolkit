@@ -376,10 +376,73 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
                 glyphInfo = ellipsisGlyph;
 
                 // Change the 'x' and 'y' position of the ellipsis glyph.
-
                 if(position.x > firstPenX)
                 {
-                  position.x = firstPenX + removedGlypsWidth - ellipsisGlyphWidth;
+                  if(isTailMode)
+                  {
+                    // To handle case of the mixed languages (LTR then RTL) with
+                    // EllipsisPosition::END and the LayoutDirection::RIGHT_TO_LEFT
+                    float nextXPositions = ellipsisLine->width;
+                    if(indexOfEllipsis + 1u < numberOfGlyphs)
+                    {
+                      Vector2& positionOfNextGlyph = *(glyphPositions + indexOfEllipsis + 1u);
+                      nextXPositions               = positionOfNextGlyph.x;
+                    }
+
+                    if(position.x > nextXPositions) // RTL language
+                    {
+                      if((indexOfEllipsis > 0u) && ((position.x - nextXPositions) > removedGlypsWidth))
+                      {
+                        // To handle mixed directions
+                        // Re-calculates the first penX which will be used if rtl text is elided.
+                        firstPenX = position.x - glyphToRemove.xBearing;
+                        if(firstPenX < -ellipsisGlyph.xBearing)
+                        {
+                          // Avoids to exceed the bounding box when rtl text is elided.
+                          firstPenX = -ellipsisGlyph.xBearing;
+                        }
+                        //Reset the width of removed glyphs
+                        removedGlypsWidth = std::min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width)) - ellipsisGlyph.xBearing;
+
+                        --indexOfEllipsis;
+                        continue;
+                      }
+                      else
+                      {
+                        // To handle the case of RTL language with EllipsisPosition::END
+                        position.x = firstPenX + removedGlypsWidth - ellipsisGlyphWidth;
+                      }
+                    }
+                  }
+                  else
+                  {
+                    // To handle the case of LTR language with EllipsisPosition::START
+                    position.x = firstPenX + removedGlypsWidth - ellipsisGlyphWidth;
+                  }
+                }
+                else
+                {
+                  if(!isTailMode)
+                  {
+                    // To handle case of the mixed languages (RTL then LTR) with
+                    // EllipsisPosition::START and the LayoutDirection::RIGHT_TO_LEFT
+                    float nextXPositions = ellipsisLine->width;
+                    if(indexOfEllipsis + 1u < numberOfGlyphs)
+                    {
+                      Vector2& positionOfNextGlyph = *(glyphPositions + indexOfEllipsis + 1u);
+                      nextXPositions               = positionOfNextGlyph.x;
+                    }
+
+                    if(position.x < nextXPositions) // LTR language
+                    {
+                      position.x = firstPenX + removedGlypsWidth - ellipsisGlyphWidth;
+
+                      if((position.x + ellipsisGlyphWidth + ellipsisGlyph.xBearing) > nextXPositions)
+                      {
+                        position.x -= (position.x + ellipsisGlyphWidth + ellipsisGlyph.xBearing) - nextXPositions;
+                      }
+                    }
+                  }
                 }
 
                 position.x += ellipsisGlyph.xBearing;
