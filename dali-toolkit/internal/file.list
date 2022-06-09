@@ -44,6 +44,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/primitive/primitive-visual.cpp
    ${toolkit_src_dir}/visuals/svg/svg-rasterize-thread.cpp
    ${toolkit_src_dir}/visuals/svg/svg-visual.cpp
+   ${toolkit_src_dir}/visuals/text-visual-shader-factory.cpp
    ${toolkit_src_dir}/visuals/text/text-visual.cpp
    ${toolkit_src_dir}/visuals/transition-data-impl.cpp
    ${toolkit_src_dir}/visuals/image-visual-shader-factory.cpp

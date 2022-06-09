@@ -802,11 +802,14 @@ struct AtlasRenderer::Impl
     Toolkit::AtlasGlyphManager::Metrics metrics = mGlyphManager.GetMetrics();
     DALI_LOG_INFO(gLogFilter, Debug::General, "TextAtlasRenderer::GlyphManager::GlyphCount: %i, AtlasCount: %i, TextureMemoryUse: %iK\n", metrics.mGlyphCount, metrics.mAtlasMetrics.mAtlasCount, metrics.mAtlasMetrics.mTextureMemoryUsed / 1024);
 
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "%s\n", metrics.mVerboseGlyphCounts.c_str());
-
-    for(uint32_t i = 0; gLogFilter->IsEnabledFor(Debug::Verbose) && i < metrics.mAtlasMetrics.mAtlasCount; ++i)
+    if(gLogFilter->IsEnabledFor(Debug::Verbose))
     {
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "   Atlas [%i] %sPixels: %s Size: %ix%i, BlockSize: %ix%i, BlocksUsed: %i/%i\n", i + 1, i > 8 ? "" : " ", metrics.mAtlasMetrics.mAtlasMetrics[i].mPixelFormat == Pixel::L8 ? "L8  " : "BGRA", metrics.mAtlasMetrics.mAtlasMetrics[i].mSize.mWidth, metrics.mAtlasMetrics.mAtlasMetrics[i].mSize.mHeight, metrics.mAtlasMetrics.mAtlasMetrics[i].mSize.mBlockWidth, metrics.mAtlasMetrics.mAtlasMetrics[i].mSize.mBlockHeight, metrics.mAtlasMetrics.mAtlasMetrics[i].mBlocksUsed, metrics.mAtlasMetrics.mAtlasMetrics[i].mTotalBlocks);
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "%s\n", metrics.mVerboseGlyphCounts.c_str());
+
+      for(uint32_t i = 0; i < metrics.mAtlasMetrics.mAtlasCount; ++i)
+      {
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "   Atlas [%i] %sPixels: %s Size: %ix%i, BlockSize: %ix%i, BlocksUsed: %i/%i\n", i + 1, i > 8 ? "" : " ", metrics.mAtlasMetrics.mAtlasMetrics[i].mPixelFormat == Pixel::L8 ? "L8  " : "BGRA", metrics.mAtlasMetrics.mAtlasMetrics[i].mSize.mWidth, metrics.mAtlasMetrics.mAtlasMetrics[i].mSize.mHeight, metrics.mAtlasMetrics.mAtlasMetrics[i].mSize.mBlockWidth, metrics.mAtlasMetrics.mAtlasMetrics[i].mSize.mBlockHeight, metrics.mAtlasMetrics.mAtlasMetrics[i].mBlocksUsed, metrics.mAtlasMetrics.mAtlasMetrics[i].mTotalBlocks);
+      }
     }
 #endif
   }
