@@ -599,8 +599,6 @@ int UtcTextureManagerUseInvalidMask(void)
     atlasRectSize,
     atlasingStatus,
     loadingStatus,
-    WrapMode::DEFAULT,
-    WrapMode::DEFAULT,
     &observer,
     atlasUploadObserver,
     atlasManager,
@@ -666,8 +664,6 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedFirst(void)
     atlasRectSize,
     atlasingStatus,
     loadingStatus,
-    WrapMode::DEFAULT,
-    WrapMode::DEFAULT,
     &observer,
     atlasUploadObserver,
     atlasManager,
@@ -733,8 +729,6 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedLater(void)
     atlasRectSize,
     atlasingStatus,
     loadingStatus,
-    WrapMode::DEFAULT,
-    WrapMode::DEFAULT,
     &observer,
     atlasUploadObserver,
     atlasManager,
@@ -820,8 +814,6 @@ int UtcTextureManagerSynchronousLoadingFail(void)
     atlasRectSize,
     atlasingStatus,
     loadingStatus,
-    WrapMode::DEFAULT,
-    WrapMode::DEFAULT,
     &observer,
     atlasUploadObserver,
     atlasManager,
@@ -876,8 +868,6 @@ int UtcTextureManagerCachingSynchronousLoading(void)
     atlasRectSize,
     atlasingStatus,
     loadingStatus,
-    WrapMode::DEFAULT,
-    WrapMode::DEFAULT,
     &observer,
     atlasUploadObserver,
     atlasManager,
@@ -908,8 +898,6 @@ int UtcTextureManagerCachingSynchronousLoading(void)
     atlasRectSize,
     atlasingStatus,
     loadingStatus,
-    WrapMode::DEFAULT,
-    WrapMode::DEFAULT,
     &asyncObserver,
     atlasUploadObserver,
     atlasManager,
@@ -968,8 +956,6 @@ int UtcTextureManagerAsyncSyncAsync(void)
     atlasRectSize,
     atlasingStatus,
     asyncLoadingStatus1,
-    WrapMode::DEFAULT,
-    WrapMode::DEFAULT,
     &asyncObserver1,
     atlasUploadObserver,
     atlasManager,
@@ -1000,8 +986,6 @@ int UtcTextureManagerAsyncSyncAsync(void)
     atlasRectSize,
     atlasingStatus,
     syncLoadingStatus,
-    WrapMode::DEFAULT,
-    WrapMode::DEFAULT,
     &syncObserver,
     atlasUploadObserver,
     atlasManager,
@@ -1037,8 +1021,6 @@ int UtcTextureManagerAsyncSyncAsync(void)
     atlasRectSize,
     atlasingStatus,
     asyncLoadingStatus2,
-    WrapMode::DEFAULT,
-    WrapMode::DEFAULT,
     &asyncObserver2,
     atlasUploadObserver,
     atlasManager,
@@ -1048,7 +1030,11 @@ int UtcTextureManagerAsyncSyncAsync(void)
 
   DALI_TEST_EQUALS(asyncLoadingStatus2, false, TEST_LOCATION); // texture is loaded by previous sync request
   DALI_TEST_CHECK(asyncTextureSet2);                           // texture is loaded
-  DALI_TEST_CHECK(asyncTextureSet2 == syncTextureSet);         // check loaded two texture is same.
+  Texture syncTexture   = syncTextureSet.GetTexture(0u);
+  Texture asyncTexture2 = asyncTextureSet2.GetTexture(0u);
+  DALI_TEST_CHECK(syncTexture);
+  DALI_TEST_CHECK(asyncTexture2);
+  DALI_TEST_CHECK(asyncTexture2 == syncTexture);               // check loaded two texture is same.
 
   // observer is called synchronously because the texture is cached.
   DALI_TEST_EQUALS(asyncObserver2.mLoaded, true, TEST_LOCATION);
@@ -1064,7 +1050,10 @@ int UtcTextureManagerAsyncSyncAsync(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
   DALI_TEST_EQUALS(asyncObserver1.mLoaded, true, TEST_LOCATION);
   DALI_TEST_EQUALS(asyncObserver1.mObserverCalled, true, TEST_LOCATION);
-  DALI_TEST_CHECK(asyncObserver1.mTextureSet == asyncTextureSet2); // check loaded two texture is same.
+  DALI_TEST_CHECK(asyncObserver1.mTextureSet);
+
+  Texture observerTexture = asyncObserver1.mTextureSet.GetTexture(0u);
+  DALI_TEST_CHECK(observerTexture == asyncTexture2); // check loaded two texture is same.
 
   // asyncObserver2 was already called so it isn't called here.
   DALI_TEST_EQUALS(asyncObserver2.mLoaded, false, TEST_LOCATION);
@@ -1165,8 +1154,6 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
     atlasRectSize,
     atlasingStatus,
     loadingStatus,
-    WrapMode::DEFAULT,
-    WrapMode::DEFAULT,
     &observer1,
     atlasUploadObserver,
     atlasManager,

@@ -37,6 +37,9 @@ constexpr auto INITIAL_HASH_NUMBER                     = size_t{0u};
 constexpr auto DEFAULT_NUMBER_OF_LOCAL_LOADER_THREADS  = size_t{4u};
 constexpr auto DEFAULT_NUMBER_OF_REMOTE_LOADER_THREADS = size_t{8u};
 
+constexpr auto TEXTURE_INDEX       = 0u; ///< The Index for texture
+constexpr auto MASK_TEXTURE_INDEX  = 1u; ///< The Index for mask texture
+
 constexpr auto NUMBER_OF_LOCAL_LOADER_THREADS_ENV  = "DALI_TEXTURE_LOCAL_THREADS";
 constexpr auto NUMBER_OF_REMOTE_LOADER_THREADS_ENV = "DALI_TEXTURE_REMOTE_THREADS";
 constexpr auto LOAD_IMAGE_YUV_PLANES_ENV           = "DALI_LOAD_IMAGE_YUV_PLANES";
@@ -155,8 +158,6 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
   TextureManager::TextureId&      textureId,
   MaskingDataPointer&             maskInfo,
   const Dali::SamplingMode::Type& samplingMode,
-  const Dali::WrapMode::Type&     wrapModeU,
-  const Dali::WrapMode::Type&     wrapModeV,
   const bool&                     synchronousLoading,
   TextureUploadObserver*          textureObserver,
   TextureManager::MultiplyOnLoad& preMultiplyOnLoad)
@@ -210,10 +211,10 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
         Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
         texture.Upload(pixelData);
         textureSet = TextureSet::New();
-        textureSet.SetTexture(0u, texture);
+        textureSet.SetTexture(TEXTURE_INDEX, texture);
         if(maskTexture)
         {
-          textureSet.SetTexture(1u, maskTexture);
+          textureSet.SetTexture(MASK_TEXTURE_INDEX, maskTexture);
         }
       }
     }
@@ -242,13 +243,6 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
       // LoadComplete has already been called - keep the same texture set
       textureSet = GetTextureSet(textureId);
     }
-  }
-
-  if(textureSet)
-  {
-    Sampler sampler = Sampler::New();
-    sampler.SetWrapMode(wrapModeU, wrapModeV);
-    textureSet.SetSampler(0u, sampler);
   }
 
   return textureSet;
@@ -307,8 +301,6 @@ TextureSet TextureManager::LoadTexture(
   Dali::ImageDimensions&              textureRectSize,
   bool&                               atlasingStatus,
   bool&                               loadingStatus,
-  const Dali::WrapMode::Type&         wrapModeU,
-  const Dali::WrapMode::Type&         wrapModeV,
   TextureUploadObserver*              textureObserver,
   AtlasUploadObserver*                atlasObserver,
   ImageAtlasManagerPtr                imageAtlasManager,
@@ -444,7 +436,7 @@ TextureSet TextureManager::LoadTexture(
         if(loadState == TextureManager::LoadState::UPLOADED)
         {
           // LoadComplete has already been called - keep the same texture set
-          textureSet = mTextureCacheManager.GetTextureSet(textureId);
+          textureSet = GetTextureSet(textureId);
         }
 
         // If we are loading the texture, or waiting for the ready signal handler to complete, inform
@@ -461,13 +453,6 @@ TextureSet TextureManager::LoadTexture(
         textureRectSize = atlasDesiredSize;
       }
     }
-  }
-
-  if(!atlasingStatus && textureSet)
-  {
-    Sampler sampler = Sampler::New();
-    sampler.SetWrapMode(wrapModeU, wrapModeV);
-    textureSet.SetSampler(0u, sampler);
   }
 
   if(synchronousLoading)
@@ -683,10 +668,9 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
           {
             if(mTextureCacheManager[maskCacheIndex].storageType == StorageType::KEEP_TEXTURE)
             {
-              TextureSet maskTextures = mTextureCacheManager[maskCacheIndex].textureSet;
-              if(maskTextures && maskTextures.GetTextureCount())
+              if(!mTextureCacheManager[maskCacheIndex].textures.empty())
               {
-                maskTexture = maskTextures.GetTexture(0u);
+                maskTexture = mTextureCacheManager[maskCacheIndex].textures[0];
               }
             }
             else if(mTextureCacheManager[maskCacheIndex].storageType == StorageType::KEEP_PIXEL_BUFFER)
@@ -711,13 +695,10 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 
         // Upload texture
         UploadTextures(pixelBuffers, textureInfo);
-        if(maskTexture && textureInfo.textureSet)
-        {
-          textureInfo.textureSet.SetTexture(1u, maskTexture);
-        }
       }
     }
   }
+
   return textureId;
 }
 
@@ -1014,11 +995,7 @@ void TextureManager::PostLoad(TextureManager::TextureInfo& textureInfo, std::vec
                   {
                     // Upload image texture. textureInfo.loadState will be UPLOADED.
                     UploadTextures(pixelBuffers, textureInfo);
-                    if(maskTextureInfo.textureSet.GetTextureCount() > 0u)
-                    {
-                      Texture maskTexture = maskTextureInfo.textureSet.GetTexture(0u);
-                      textureInfo.textureSet.SetTexture(1u, maskTexture);
-                    }
+
                     // notify mask texture set.
                     NotifyObservers(textureInfo, true);
                   }
@@ -1123,11 +1100,7 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
           std::vector<Devel::PixelBuffer> pixelBuffers;
           pixelBuffers.push_back(textureInfo.pixelBuffer);
           UploadTextures(pixelBuffers, textureInfo);
-          if(maskTextureInfo.textureSet.GetTextureCount() > 0u)
-          {
-            Texture maskTexture = maskTextureInfo.textureSet.GetTexture(0u);
-            textureInfo.textureSet.SetTexture(1u, maskTexture);
-          }
+
           // notify mask texture set.
           NotifyObservers(textureInfo, true);
         }
@@ -1180,19 +1153,15 @@ void TextureManager::UploadTextures(std::vector<Devel::PixelBuffer>& pixelBuffer
       renderingAddOn.CreateGeometry(textureInfo.textureId, pixelBuffers[0]);
     }
 
-    if(!textureInfo.textureSet)
-    {
-      textureInfo.textureSet = TextureSet::New();
-    }
+    // Remove previous textures and insert new textures
+    textureInfo.textures.clear();
 
-    uint32_t index = 0;
     for(auto&& pixelBuffer : pixelBuffers)
     {
       Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight());
-
       PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
       texture.Upload(pixelData);
-      textureInfo.textureSet.SetTexture(index++, texture);
+      textureInfo.textures.push_back(texture);
     }
   }
 
@@ -1309,14 +1278,75 @@ void TextureManager::EmitLoadComplete(TextureUploadObserver* observer, TextureMa
   {
     observer->LoadComplete(success, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::PIXEL_BUFFER, textureInfo.pixelBuffer, textureInfo.url.GetUrl(), textureInfo.preMultiplied));
   }
-  else if(textureInfo.isAnimatedImageFormat)
+  else
   {
-    observer->LoadComplete(success, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::ANIMATED_IMAGE_TEXTURE, textureInfo.textureId, textureInfo.frameCount, textureInfo.frameInterval));
+    TextureSet textureSet = GetTextureSet(textureInfo);
+    if(textureInfo.isAnimatedImageFormat)
+    {
+      observer->LoadComplete(success, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::ANIMATED_IMAGE_TEXTURE, textureInfo.textureId, textureSet, textureInfo.frameCount, textureInfo.frameInterval));
+    }
+    else
+    {
+      observer->LoadComplete(success, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::TEXTURE, textureInfo.textureId, textureSet, (textureInfo.useAtlas == UseAtlas::USE_ATLAS) ? true : false, textureInfo.atlasRect, textureInfo.preMultiplied));
+    }
+  }
+}
+
+TextureSet TextureManager::GetTextureSet(const TextureManager::TextureId& textureId)
+{
+  TextureSet textureSet;
+  TextureManager::LoadState loadState = mTextureCacheManager.GetTextureStateInternal(textureId);
+  if(loadState == TextureManager::LoadState::UPLOADED)
+  {
+    // LoadComplete has already been called - keep the same texture set
+    TextureCacheIndex textureCacheIndex = mTextureCacheManager.GetCacheIndexFromId(textureId);
+    if(textureCacheIndex != INVALID_CACHE_INDEX)
+    {
+      TextureInfo& textureInfo(mTextureCacheManager[textureCacheIndex]);
+      textureSet = GetTextureSet(textureInfo);
+    }
   }
   else
   {
-    observer->LoadComplete(success, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::TEXTURE, textureInfo.textureId, textureInfo.textureSet, (textureInfo.useAtlas == UseAtlas::USE_ATLAS) ? true : false, textureInfo.atlasRect, textureInfo.preMultiplied));
+    DALI_LOG_ERROR("GetTextureSet is failed. texture is not uploaded \n");
   }
+  return textureSet;
+}
+
+TextureSet TextureManager::GetTextureSet(const TextureManager::TextureInfo& textureInfo)
+{
+  TextureSet textureSet;
+
+  // LoadComplete has already been called - keep the same texture set
+  textureSet = TextureSet::New();
+  if(!textureInfo.textures.empty())
+  {
+    if(textureInfo.textures.size() > 1) // For YUV case
+    {
+      uint32_t index = 0u;
+      for(auto&& texture : textureInfo.textures)
+      {
+        textureSet.SetTexture(index++, texture);
+      }
+    }
+    else
+    {
+      textureSet.SetTexture(TEXTURE_INDEX, textureInfo.textures[0]);
+      TextureCacheIndex maskCacheIndex = mTextureCacheManager.GetCacheIndexFromId(textureInfo.maskTextureId);
+      if(maskCacheIndex != INVALID_CACHE_INDEX)
+      {
+        TextureInfo& maskTextureInfo(mTextureCacheManager[maskCacheIndex]);
+        if(maskTextureInfo.storageType == StorageType::UPLOAD_TO_TEXTURE || maskTextureInfo.storageType == StorageType::KEEP_TEXTURE)
+        {
+          if(!maskTextureInfo.textures.empty())
+          {
+            textureSet.SetTexture(MASK_TEXTURE_INDEX, maskTextureInfo.textures[0]);
+          }
+        }
+      }
+    }
+  }
+  return textureSet;
 }
 
 } // namespace Internal

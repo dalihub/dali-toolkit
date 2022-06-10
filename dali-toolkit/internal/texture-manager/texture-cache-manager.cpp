@@ -167,22 +167,20 @@ TextureCacheManager::LoadState TextureCacheManager::GetTextureStateInternal(cons
   return loadState;
 }
 
-TextureSet TextureCacheManager::GetTextureSet(const TextureCacheManager::TextureId& textureId)
+Texture TextureCacheManager::GetTexture(const TextureCacheManager::TextureId& textureId, uint32_t textureIndex)
 {
-  TextureSet        textureSet; // empty handle
-  TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<std::uint32_t>(textureId)]);
+  Texture        texture; // empty handle
+  TextureCacheIndex cacheIndex = GetCacheIndexFromId(textureId);
 
   switch(static_cast<TextureCacheIndexType>(cacheIndex.detailValue.type))
   {
     case TextureCacheIndexType::TEXTURE_CACHE_INDEX_TYPE_LOCAL:
     {
       TextureInfo& cachedTextureInfo(mTextureInfoContainer[cacheIndex.GetIndex()]);
-      textureSet = cachedTextureInfo.textureSet;
-      break;
-    }
-    case TextureCacheIndexType::TEXTURE_CACHE_INDEX_TYPE_TEXTURE:
-    {
-      textureSet = mExternalTextures[cacheIndex.GetIndex()].textureSet;
+      if(textureIndex < static_cast<uint32_t>(cachedTextureInfo.textures.size()))
+      {
+        texture = cachedTextureInfo.textures[textureIndex];
+      }
       break;
     }
     default:
@@ -191,7 +189,7 @@ TextureSet TextureCacheManager::GetTextureSet(const TextureCacheManager::Texture
     }
   }
 
-  return textureSet;
+  return texture;
 }
 
 TextureSet TextureCacheManager::GetExternalTextureSet(const TextureCacheManager::TextureId& textureId)

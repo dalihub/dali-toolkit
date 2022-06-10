@@ -102,7 +102,7 @@ public:
   /**
    * @brief Get the current state of a texture
    * @note This API doesn't consider encodedimagebuffer.
-   * @param[in] textureId The texture id to query
+   * @param[in] textureId The texture id to query.defaul value is 0.
    * @return The loading state if the texture is valid, or NOT_STARTED if the textureId
    * is not valid.
    */
@@ -120,9 +120,10 @@ public:
   /**
    * @brief Get the associated texture set if the texture id is valid
    * @param[in] textureId The texture Id to look up
-   * @return the associated texture set, or an empty handle if textureId is not valid
+   * @param[in] textureIndex The texture index to query
+   * @return the associated texture, or an empty handle if textureId is not valid
    */
-  TextureSet GetTextureSet(const TextureCacheManager::TextureId& textureId);
+  Texture GetTexture(const TextureCacheManager::TextureId& textureId, uint32_t textureIndex = 0);
 
   /**
    * @brief Get the external texture set if the texture id is valid
