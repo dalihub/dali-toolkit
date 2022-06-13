@@ -488,7 +488,7 @@ bool EditableTextControlAccessible::InsertText(std::size_t startPosition, std::s
 {
   auto text = GetWholeText();
 
-  if(!ValidateRange(text, startPosition, startPosition + 1))
+  if(!ValidateRange(text, startPosition, startPosition + 1) && !(startPosition == text.size()))
   {
     return false;
   }
