@@ -3439,6 +3439,19 @@ void OnResourceReadySignal04(Control control)
   }
 }
 
+void OnResourceReadySignal05(Control control)
+{
+  gResourceReadySignalCounter++;
+
+  // Request load with same image
+  // NOTE : The url must not be same as gImageView1
+  const int viewCount = 4;
+  for(int i = 0; i < viewCount; ++i)
+  {
+    gImageView1.Add(ImageView::New("invalid2.jpg"));
+  }
+}
+
 } // namespace
 
 int UtcDaliImageViewSetImageOnResourceReadySignal01(void)
@@ -3835,6 +3848,36 @@ int UtcDaliImageViewSetImageOnResourceReadySignal04(void)
     DALI_TEST_EQUALS(gImageView3.GetRendererAt(0).GetTextures().GetTextureCount(), 1u, TEST_LOCATION);
     DALI_TEST_EQUALS(gImageView4.GetRendererAt(0).GetTextures().GetTextureCount(), 1u, TEST_LOCATION);
   }
+
+  END_TEST;
+}
+int UtcDaliImageViewSetImageOnResourceReadySignal05(void)
+{
+  tet_infoline("Test multiple views with same image during ResourceReady load the image only 1 times");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  gImageView1 = ImageView::New("invalid.jpg"); // request invalid image, to make loading failed fast.
+  gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal05);
+  application.GetScene().Add(gImageView1);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Try to load 1 invalid.jpg image");
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, TEST_LOCATION);
+
+  tet_infoline("Try to load 1 invalid2.jpg image");
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  tet_infoline("Now we don't have any image to be loaded. Check event thread trigger failed.");
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 1), false, TEST_LOCATION);
+
+  gImageView1.Unparent();
+  gImageView1.Reset();
 
   END_TEST;
 }
