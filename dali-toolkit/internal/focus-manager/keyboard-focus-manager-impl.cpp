@@ -246,14 +246,6 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
       actor.Add(GetFocusIndicatorActor());
     }
 
-    Toolkit::Control currentlyFocusedControl = Toolkit::Control::DownCast(currentFocusedActor);
-    if(currentlyFocusedControl)
-    {
-      // Do we need it to remember if it was previously DISABLED?
-      currentlyFocusedControl.SetProperty(DevelControl::Property::STATE, DevelControl::NORMAL);
-      currentlyFocusedControl.ClearKeyInputFocus();
-    }
-
     // Save the current focused actor
     mCurrentFocusActor = actor;
 
@@ -277,6 +269,14 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
     if(!mFocusChangedSignal.Empty())
     {
       mFocusChangedSignal.Emit(currentFocusedActor, actor);
+    }
+
+    Toolkit::Control currentlyFocusedControl = Toolkit::Control::DownCast(currentFocusedActor);
+    if(currentlyFocusedControl)
+    {
+      // Do we need it to remember if it was previously DISABLED?
+      currentlyFocusedControl.SetProperty(DevelControl::Property::STATE, DevelControl::NORMAL);
+      currentlyFocusedControl.ClearKeyInputFocus();
     }
 
     Toolkit::Control newlyFocusedControl = Toolkit::Control::DownCast(actor);
