@@ -82,6 +82,7 @@ public:
    * @param[in] orientationCorrection Whether to use image metadata to rotate or flip the image,
    *                                  e.g., from portrait to landscape
    * @param[in] preMultiplyOnLoad     if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
+   * @param[in] loadYuvPlanes         True if the image should be loaded as yuv planes
    */
   void Load(const TextureManager::TextureId&                textureId,
             const VisualUrl&                                url,
@@ -89,7 +90,8 @@ public:
             const Dali::FittingMode::Type&                  fittingMode,
             const Dali::SamplingMode::Type&                 samplingMode,
             const bool&                                     orientationCorrection,
-            const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad);
+            const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad,
+            const bool&                                     loadYuvPlanes);
 
   /**
    * @brief Apply mask
@@ -126,11 +128,11 @@ private:
                             AsyncLoadingInfoContainerType&& loadingInfoContainer);
 
   /**
-   * @brief Callback to be called when texture loading is complete, it passes the pixel buffer on to texture manager.
-   * @param[in] id          Loader id
-   * @param[in] pixelBuffer Image data
+   * @brief Callback to be called when texture loading is complete, it passes the pixel buffer list on to texture manager.
+   * @param[in] id           Loader id
+   * @param[in] pixelBuffers Image data
    */
-  void AsyncLoadComplete(std::uint32_t id, Devel::PixelBuffer pixelBuffer);
+  void AsyncLoadComplete(std::uint32_t id, std::vector<Devel::PixelBuffer>& pixelBuffers);
 
 private: // Member Variables:
   Toolkit::AsyncImageLoader     mLoader;
