@@ -56,7 +56,8 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId&           
                                      const Dali::FittingMode::Type&                  fittingMode,
                                      const Dali::SamplingMode::Type&                 samplingMode,
                                      const bool&                                     orientationCorrection,
-                                     const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad)
+                                     const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad,
+                                     const bool&                                     loadYuvPlanes)
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
   if(DALI_UNLIKELY(url.IsBufferResource()))
@@ -66,7 +67,7 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId&           
   }
   else
   {
-    auto id                             = GetImplementation(mLoader).Load(url, desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
+    auto id                             = GetImplementation(mLoader).Load(url, desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes);
     mLoadingInfoContainer.back().loadId = id;
   }
 }
@@ -112,7 +113,7 @@ void TextureAsyncLoadingHelper::AsyncLoadComplete(uint32_t                      
     if(loadingInfo.loadId == id)
     {
       // Call TextureManager::AsyncLoadComplete
-      mTextureManager.AsyncLoadComplete(loadingInfo.textureId, pixelBuffers[0]);
+      mTextureManager.AsyncLoadComplete(loadingInfo.textureId, pixelBuffers);
     }
 
     mLoadingInfoContainer.pop_front();

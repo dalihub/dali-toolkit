@@ -243,7 +243,8 @@ struct TextureInfo
               const bool&                       orientationCorrection,
               const bool&                       preMultiplyOnLoad,
               const Dali::AnimatedImageLoading& animatedImageLoading,
-              const std::uint32_t&              frameIndex)
+              const std::uint32_t&              frameIndex,
+              const bool&                       loadYuvPlanes)
   : url(url),
     desiredSize(desiredSize),
     useSize(desiredSize),
@@ -266,7 +267,8 @@ struct TextureInfo
     cropToMask(cropToMask),
     orientationCorrection(true),
     preMultiplyOnLoad(preMultiplyOnLoad),
-    preMultiplied(false)
+    preMultiplied(false),
+    loadYuvPlanes(loadYuvPlanes)
   {
     isAnimatedImageFormat = (animatedImageLoading) ? true : false;
   }
@@ -305,6 +307,7 @@ struct TextureInfo
   bool preMultiplyOnLoad : 1;     ///< True if the image's color should be multiplied by it's alpha
   bool preMultiplied : 1;         ///< True if the image's color was multiplied by it's alpha
   bool isAnimatedImageFormat : 1; ///< true if the image is requested from animated image visual.
+  bool loadYuvPlanes : 1;         ///< true if the image should be loaded as yuv planes
 };
 
 } // namespace TextureManagerType

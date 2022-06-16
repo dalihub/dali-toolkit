@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,12 +59,12 @@ AsyncImageLoader AsyncImageLoader::New()
 
 uint32_t AsyncImageLoader::Load(const std::string& url)
 {
-  return GetImplementation(*this).Load(Toolkit::Internal::VisualUrl(url), ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
+  return GetImplementation(*this).Load(Toolkit::Internal::VisualUrl(url), ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, false);
 }
 
 uint32_t AsyncImageLoader::Load(const std::string& url, ImageDimensions dimensions)
 {
-  return GetImplementation(*this).Load(Toolkit::Internal::VisualUrl(url), dimensions, FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
+  return GetImplementation(*this).Load(Toolkit::Internal::VisualUrl(url), dimensions, FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, false);
 }
 
 uint32_t AsyncImageLoader::Load(const std::string& url,
@@ -73,7 +73,7 @@ uint32_t AsyncImageLoader::Load(const std::string& url,
                                 SamplingMode::Type samplingMode,
                                 bool               orientationCorrection)
 {
-  return GetImplementation(*this).Load(Toolkit::Internal::VisualUrl(url), dimensions, fittingMode, samplingMode, orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
+  return GetImplementation(*this).Load(Toolkit::Internal::VisualUrl(url), dimensions, fittingMode, samplingMode, orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, false);
 }
 
 bool AsyncImageLoader::Cancel(uint32_t loadingTaskId)
