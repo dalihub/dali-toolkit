@@ -986,7 +986,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
         actor.Add(GetFocusIndicatorActor());
       }
     }
-    else
+    else if(!mEnableDefaultAlgorithm)
     {
       // No actor is focused but keyboard focus is activated by the key press
       // Let's try to move the initial focus
