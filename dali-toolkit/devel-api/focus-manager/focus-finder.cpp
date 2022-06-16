@@ -152,9 +152,9 @@ static int MinorAxisDistance(Dali::Toolkit::Control::KeyboardFocus::Direction di
  * @param minorAxisDistance The minorAxisDistance
  * @return The distance
  */
-static int GetWeightedDistanceFor(int majorAxisDistance, int minorAxisDistance)
+static uint64_t GetWeightedDistanceFor(int majorAxisDistance, int minorAxisDistance)
 {
-  return 13 * majorAxisDistance * majorAxisDistance + minorAxisDistance * minorAxisDistance;
+  return 13 * static_cast<int64_t>(majorAxisDistance) * static_cast<int64_t>(majorAxisDistance) + static_cast<int64_t>(minorAxisDistance) * static_cast<int64_t>(minorAxisDistance);
 }
 
 /**
