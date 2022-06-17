@@ -168,9 +168,10 @@ private:
   void DoSetProperty(Property::Index index, const Property::Value& value);
 
   /**
-   * @brief Called when the texture upload is completed.
+   * @brief Called when the resource is ready.
+   * @param[in] success True if the texture load was successful. If false, then the resource failed to load.
    */
-  void OnUploadCompleted();
+  void OnResourceReady(bool success);
 
   /**
    * @brief Event callback from rasterize thread. This is called after the animation is finished.

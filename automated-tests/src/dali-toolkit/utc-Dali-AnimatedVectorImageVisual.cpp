@@ -86,6 +86,9 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual01(void)
   application.SendNotification();
   application.Render();
 
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
   Renderer renderer = actor.GetRendererAt(0u);
@@ -118,6 +121,9 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual02(void)
 
   application.SendNotification();
   application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -159,6 +165,9 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual03(void)
 
   application.SendNotification();
   application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -210,8 +219,8 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -319,7 +328,8 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   Property::Map resultMap;
   resultMap = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
@@ -558,6 +568,9 @@ int UtcDaliAnimatedVectorImageVisualCustomShader(void)
   application.SendNotification();
   application.Render();
 
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
   Renderer        renderer = dummy.GetRendererAt(0);
   Shader          shader2  = renderer.GetShader();
   Property::Value value    = shader2.GetProperty(Shader::Property::PROGRAM);
@@ -641,8 +654,8 @@ int UtcDaliAnimatedVectorImageVisualLoopCount(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -685,7 +698,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -712,10 +726,13 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   attributes.Add(DevelImageVisual::Property::PLAY_RANGE, array);
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
 
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::PLAY_RANGE);
@@ -734,10 +751,13 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
 
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3);
 
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
+
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -751,10 +771,13 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   attributes.Add(DevelImageVisual::Property::PLAY_RANGE, array);
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
 
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::PLAY_RANGE);
@@ -803,7 +826,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -830,10 +854,13 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
   attributes.Add(DevelImageVisual::Property::PLAY_RANGE, array);
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
 
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::PLAY_RANGE);
@@ -854,10 +881,13 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
   attributes.Add(DevelImageVisual::Property::PLAY_RANGE, array);
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
 
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
+
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::PLAY_RANGE);
@@ -902,8 +932,8 @@ int UtcDaliAnimatedVectorImageVisualAnimationFinishedSignal(void)
   application.SendNotification();
   application.Render();
 
-  // Wait for animation finish
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Wait for animation finish - load, render, finish
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::PLAY_STATE);
@@ -921,7 +951,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
-    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME);
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+    .Add(DevelImageVisual::Property::LOOP_COUNT, 3);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -940,12 +971,18 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   application.SendNotification();
   application.Render();
 
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 2);
+
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
 
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -963,10 +1000,13 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3);
 
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
+
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -990,15 +1030,19 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   application.SendNotification();
   application.Render();
 
-  // Stop and jump to 3
-  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::STOP, attributes);
+  // Wait for animation finish
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
+  // Jump to 3
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3);
+
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
 
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1009,10 +1053,13 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   // Jump to the same position
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3);
 
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
+
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1054,7 +1101,8 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::LOOP_COUNT);
@@ -1079,10 +1127,13 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
 
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
 
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::LOOP_COUNT);
@@ -1105,10 +1156,13 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
 
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
 
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
+
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // wait for next rasterize thread run
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::PLAY_RANGE);
@@ -1169,8 +1223,8 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - animation finished
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load, render, animation finished
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1217,6 +1271,14 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   // Pause
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PAUSE, attributes);
 
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
   map                    = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value                  = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
   int currentFrameNumber = value->Get<int>();
@@ -1224,8 +1286,13 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   // Stop
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::STOP, attributes);
 
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
+
   application.SendNotification();
-  application.Render(16);
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1264,8 +1331,8 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - animation finished
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load, render, animation finished
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1328,33 +1395,39 @@ int UtcDaliAnimatedVectorImageVisualPropertyNotification(void)
   DummyControl      actor     = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
-
-  Vector2 controlSize(20.f, 30.f);
-  Vector3 controlScale(2.0f, 2.0f, 1.0f);
-  actor.SetProperty(Actor::Property::SIZE, controlSize);
-  actor.SetProperty(Actor::Property::SCALE, controlScale);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
 
   application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  application.SendNotification();
-  application.Render();
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
 
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.SendNotification();
+  application.Render();
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
   auto textureSet = renderer.GetTextures();
   auto texture    = textureSet.GetTexture(0);
 
-  DALI_TEST_EQUALS(controlSize.width * controlScale.width, texture.GetWidth(), TEST_LOCATION);
-  DALI_TEST_EQUALS(controlSize.height * controlScale.height, texture.GetHeight(), TEST_LOCATION);
+  DALI_TEST_EQUALS(controlSize.width, texture.GetWidth(), TEST_LOCATION);
+  DALI_TEST_EQUALS(controlSize.height, texture.GetHeight(), TEST_LOCATION);
 
-  // Change scale and size
-  controlSize  = Vector2(50.f, 40.f);
-  controlScale = Vector3(0.5f, 0.5f, 1.0f);
-  actor.SetProperty(Actor::Property::SIZE, controlSize);
+  // Change scale
+  Vector3 controlScale(2.0f, 2.0f, 1.0f);
   actor.SetProperty(Actor::Property::SCALE, controlScale);
 
   application.SendNotification();
@@ -1362,6 +1435,33 @@ int UtcDaliAnimatedVectorImageVisualPropertyNotification(void)
 
   application.SendNotification();
   application.Render();
+
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  renderer = actor.GetRendererAt(0u);
+  DALI_TEST_CHECK(renderer);
+
+  textureSet = renderer.GetTextures();
+  texture    = textureSet.GetTexture(0);
+
+  DALI_TEST_EQUALS(controlSize.width * controlScale.width, texture.GetWidth(), TEST_LOCATION);
+  DALI_TEST_EQUALS(controlSize.height * controlScale.height, texture.GetHeight(), TEST_LOCATION);
+
+  // Size animation
+  controlSize         = Vector2(50.0f, 100.0f);
+  Animation animation = Animation::New(1.0);
+  animation.AnimateTo(Property(actor, Actor::Property::SIZE), Vector3(controlSize.x, controlSize.y, 0.0f));
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(1100); // After the animation
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
@@ -1411,12 +1511,18 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
 
   application.GetScene().Add(actor2);
 
+  // Trigger count is 4 - load & render a frame for each instance
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
+
   DevelControl::DoAction(actor2, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, Property::Map());
+
+  // To make event trigger
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
 
   application.SendNotification();
   application.Render();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   Property::Map attributes;
   attributes.Add(DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::LAST_FRAME);
@@ -1462,6 +1568,9 @@ int UtcDaliAnimatedVectorImageVisualControlVisibilityChanged(void)
 
   application.SendNotification();
   application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   Property::Map attributes;
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
@@ -1510,6 +1619,9 @@ int UtcDaliAnimatedVectorImageVisualWindowVisibilityChanged(void)
   application.SendNotification();
   application.Render();
 
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
   Property::Map attributes;
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
 
@@ -1534,7 +1646,7 @@ int UtcDaliAnimatedVectorImageVisualWindowVisibilityChanged(void)
   END_TEST;
 }
 
-int UtcDaliAnimatedVectorImageVisualInvalidFile(void)
+int UtcDaliAnimatedVectorImageVisualInvalidFile01(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Request loading with invalid file - should draw broken image");
@@ -1557,6 +1669,99 @@ int UtcDaliAnimatedVectorImageVisualInvalidFile(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
 
   application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - load
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check resource status
+  Visual::ResourceStatus status = actor.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL);
+  DALI_TEST_EQUALS(status, Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+  // The broken image should be shown.
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualInvalidFile02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Request loading with invalid file - should draw broken image");
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_INVALID_FILE_NAME);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - load
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Add to the Scene after loading
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check resource status
+  Visual::ResourceStatus status = actor.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL);
+  DALI_TEST_EQUALS(status, Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+  // The broken image should be shown.
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualInvalidFile03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Request loading with invalid file without size set - should draw broken image");
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_INVALID_FILE_NAME);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - load
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -1606,13 +1811,71 @@ int UtcDaliAnimatedVectorImageVisualFrameDrops(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - render the first frame & calculating frame drops
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load, render the first frame & calculating frame drops
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   // Check dropped frame
   uint32_t frames = Test::VectorAnimationRenderer::GetDroppedFrames();
   DALI_TEST_CHECK(frames > 0);
   DALI_TEST_CHECK(frames <= static_cast<uint32_t>(totalFrameNumber));
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualSize");
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base  visual  = factory.CreateVisual(TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions());
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  // Trigger count is 2 - load, resource ready
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  textureTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  {
+    int               width = 100, height = 100; // 100x100 is the content default size.
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
+    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - resource ready
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  textureTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  {
+    int               width = 200, height = 200;
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
+    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
 
   END_TEST;
 }

@@ -3703,7 +3703,7 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
 
     tet_printf("test %s [sync:%d] signal fired\n", url.c_str(), isSynchronous ? 1 : 0);
     DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, location);
-    DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(Toolkit::ImageView::Property::IMAGE), loadSuccess ? Toolkit::Visual::ResourceStatus::READY : Toolkit::Visual::ResourceStatus::FAILED, TEST_LOCATION);
+    DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(Toolkit::ImageView::Property::IMAGE), loadSuccess ? Toolkit::Visual::ResourceStatus::READY : Toolkit::Visual::ResourceStatus::FAILED, location);
 
     imageView.Unparent();
   };
@@ -3750,7 +3750,7 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
   TestResourceReadyUrl(1, 0, 1, TEST_BROKEN_IMAGE_L, "", TEST_LOCATION);
 
   TestResourceReadyUrl(2, 0, 1, TEST_GIF_FILE_NAME, "", TEST_LOCATION);                   // 2 image loading - batch size
-  TestResourceReadyUrl(1, 0, 1, TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, "", TEST_LOCATION); // 1 rasterize
+  TestResourceReadyUrl(2, 0, 1, TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, "", TEST_LOCATION); // load & rasterize
 
   TestResourceReadyUrl(3, 0, 1, gImage_600_RGB, gImage_34_RGBA, TEST_LOCATION); // 2 image loading + 1 applymask
 
@@ -3761,7 +3761,7 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
   TestResourceReadyUrl(1, 0, 0, "invalid.svg", "", TEST_LOCATION);
   TestResourceReadyUrl(1, 0, 0, "invalid.9.png", "", TEST_LOCATION);
   TestResourceReadyUrl(1, 0, 0, "invalid.gif", "", TEST_LOCATION);  // 1 image loading
-  TestResourceReadyUrl(0, 0, 0, "invalid.json", "", TEST_LOCATION); // 0 rasterize
+  TestResourceReadyUrl(1, 0, 0, "invalid.json", "", TEST_LOCATION); // 0 rasterize
 
   TestResourceReadyUrl(2, 0, 0, "invalid.jpg", "invalid.png", TEST_LOCATION);  // 2 image loading
   TestResourceReadyUrl(2, 0, 1, gImage_600_RGB, "invalid.png", TEST_LOCATION); // 2 image loading
@@ -3779,8 +3779,7 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
   TestResourceReadyUrl(0, 1, 1, TEST_SVG_FILE_NAME, "", TEST_LOCATION); // synchronous rasterize
   TestResourceReadyUrl(0, 1, 1, TEST_BROKEN_IMAGE_L, "", TEST_LOCATION);
 
-  TestResourceReadyUrl(1, 1, 1, TEST_GIF_FILE_NAME, "", TEST_LOCATION);                   // first frame image loading sync + second frame image loading async
-  TestResourceReadyUrl(0, 1, 1, TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, "", TEST_LOCATION); // synchronous rasterize
+  TestResourceReadyUrl(1, 1, 1, TEST_GIF_FILE_NAME, "", TEST_LOCATION); // first frame image loading sync + second frame image loading async
 
   TestResourceReadyUrl(0, 1, 1, gImage_600_RGB, gImage_34_RGBA, TEST_LOCATION);
 
@@ -3791,7 +3790,6 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
   TestResourceReadyUrl(0, 1, 0, "invalid.svg", "", TEST_LOCATION);
   TestResourceReadyUrl(0, 1, 0, "invalid.9.png", "", TEST_LOCATION);
   TestResourceReadyUrl(0, 1, 0, "invalid.gif", "", TEST_LOCATION);
-  TestResourceReadyUrl(0, 1, 0, "invalid.json", "", TEST_LOCATION); // 0 rasterize
 
   TestResourceReadyUrl(0, 1, 0, "invalid.jpg", "invalid.png", TEST_LOCATION);
   TestResourceReadyUrl(0, 1, 1, gImage_600_RGB, "invalid.png", TEST_LOCATION);
