@@ -2833,7 +2833,7 @@ int UtcDaliImageViewSVGLoadingSyncSetInvalidValue(void)
   END_TEST;
 }
 
-int UtcDaliImageViewSvgLoadingFailure(void)
+int UtcDaliImageViewSvgLoadingFailureLocalFile(void)
 {
   // Local svg file - invalid file path
   {
@@ -2941,6 +2941,11 @@ int UtcDaliImageViewSvgLoadingFailure(void)
     DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
   }
 
+  END_TEST;
+}
+
+int UtcDaliImageViewSvgLoadingFailureRemoteFile01(void)
+{
   // Remote svg file
   {
     ToolkitTestApplication application;
@@ -2950,7 +2955,6 @@ int UtcDaliImageViewSvgLoadingFailure(void)
     textureTrace.Enable(true);
 
     gResourceReadySignalFired = false;
-    textureTrace.Reset();
 
     ImageView imageView = ImageView::New("https://bar.org/foobar.svg");
     imageView.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
@@ -2977,6 +2981,11 @@ int UtcDaliImageViewSvgLoadingFailure(void)
     DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
   }
 
+  END_TEST;
+}
+
+int UtcDaliImageViewSvgLoadingFailureRemoteFile02(void)
+{
   // Remote svg file without size set
   {
     ToolkitTestApplication application;
@@ -2986,7 +2995,6 @@ int UtcDaliImageViewSvgLoadingFailure(void)
     textureTrace.Enable(true);
 
     gResourceReadySignalFired = false;
-    textureTrace.Reset();
 
     ImageView imageView = ImageView::New("https://bar.org/foobar.svg");
     imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
