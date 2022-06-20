@@ -2087,6 +2087,13 @@ int UtcDaliToolkitTextlabelMaxTextureSet(void)
   // Check if the number of renderers is greater than 1.
   DALI_TEST_CHECK(label.GetRendererCount() > 1u);
 
+  // Coverage test for case of layoutSize is bigger than maxTextureSize
+  float max_value = static_cast<float>(std::numeric_limits<uint16_t>::max());
+  label.SetProperty(Actor::Property::SIZE, Vector2(max_value, 30.0f));
+  application.SendNotification();
+  application.Render();
+
+
   END_TEST;
 }
 
