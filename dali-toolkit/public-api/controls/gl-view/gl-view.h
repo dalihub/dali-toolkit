@@ -54,20 +54,35 @@ public:
      * pipeline. When Renderer is about to be drawn, the callback
      * will be executed and the custom code "injected" into the pipeline.
      * This allows rendering directly to the surface rather than offscreen.
+     *
+     * * @SINCE_2_1.18
      */
     DIRECT_RENDERING = 0,
+
+    /**
+     * DIRECT_RENDERING_THREADED mode executes GL code on separate thread
+     * and then blits the result within DALi graphics commands stream.
+     * The mode is logically compatible with the EGL_IMAGE_OFFSCREEN_RENDERING.
+     *
+     * @SINCE_2_1.30
+     */
+    DIRECT_RENDERING_THREADED,
 
     /**
      * EGL_IMAGE_OFFSCREEN_RENDERING mode executes GL code in own thread
      * and renders to the offscreen NativeImage (EGL) buffer. This backend
      * will render in parallel but has higher memory footprint and may suffer
      * performance issues due to using EGL image.
+     *
+     * @SINCE_2_1.18
      */
     EGL_IMAGE_OFFSCREEN_RENDERING,
 
     /**
      * The default mode is set to EGL_IMAGE_OFFSCREEN_RENDERING for backwards
      * compatibility.
+     *
+     * @SINCE_2_1.18
      */
     DEFAULT = EGL_IMAGE_OFFSCREEN_RENDERING
   };

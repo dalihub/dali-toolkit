@@ -14,6 +14,10 @@ BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(dali2-core)
 BuildRequires:  pkgconfig(dali2-adaptor)
+BuildRequires:  pkgconfig(gles20)
+BuildRequires:  pkgconfig(glesv2)
+BuildRequires:  pkgconfig(egl)
+
 BuildRequires:  gettext
 BuildRequires:  pkgconfig(libtzplatform-config)
 
