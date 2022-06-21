@@ -107,6 +107,7 @@ public:
    * @param[out] layoutSize The size of the text after it has been laid-out.
    * @param[in] elideTextEnabled Whether the text elide is enabled.
    * @param[in,out] isAutoScrollEnabled If the isAutoScrollEnabled is true and the height of the text exceeds the boundaries of the control the text is elided and the isAutoScrollEnabled is set to false to disable the autoscroll
+   * @param[in] isAutoScrollMaxTextureExceeded If isAutoScrollMaxTextureExceeded is true, enable ellipsis during auro scroll.
    * @param[in] ellipsisPosition The location of the text ellipsis
    *
    * @return \e true if the text has been re-laid-out. \e false means the given width is too small to layout even a single character.
@@ -115,6 +116,7 @@ public:
                   Size&                             layoutSize,
                   bool                              elideTextEnabled,
                   bool&                             isAutoScrollEnabled,
+                  bool                              isAutoScrollMaxTextureExceeded,
                   DevelText::EllipsisPosition::Type ellipsisPosition);
 
   /**

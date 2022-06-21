@@ -782,7 +782,7 @@ struct AtlasRenderer::Impl
 
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "%s\n", metrics.mVerboseGlyphCounts.c_str());
 
-    for(uint32_t i = 0; i < metrics.mAtlasMetrics.mAtlasCount; ++i)
+    for(uint32_t i = 0; gLogFilter->IsEnabledFor(Debug::Verbose) && i < metrics.mAtlasMetrics.mAtlasCount; ++i)
     {
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "   Atlas [%i] %sPixels: %s Size: %ix%i, BlockSize: %ix%i, BlocksUsed: %i/%i\n", i + 1, i > 8 ? "" : " ", metrics.mAtlasMetrics.mAtlasMetrics[i].mPixelFormat == Pixel::L8 ? "L8  " : "BGRA", metrics.mAtlasMetrics.mAtlasMetrics[i].mSize.mWidth, metrics.mAtlasMetrics.mAtlasMetrics[i].mSize.mHeight, metrics.mAtlasMetrics.mAtlasMetrics[i].mSize.mBlockWidth, metrics.mAtlasMetrics.mAtlasMetrics[i].mSize.mBlockHeight, metrics.mAtlasMetrics.mAtlasMetrics[i].mBlocksUsed, metrics.mAtlasMetrics.mAtlasMetrics[i].mTotalBlocks);
     }

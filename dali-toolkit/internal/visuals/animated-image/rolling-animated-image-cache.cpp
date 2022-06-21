@@ -28,6 +28,7 @@ namespace
 Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
 
 #define LOG_CACHE                                                                                                       \
+  if(gAnimImgLogFilter->IsEnabledFor(Debug::Concise))                                                                   \
   {                                                                                                                     \
     std::ostringstream oss;                                                                                             \
     oss << "Size:" << mQueue.Count() << " [ ";                                                                          \
@@ -194,7 +195,7 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
   mLoadState = TextureManager::LoadState::LOADING;
 
   auto preMultiplyOnLoading = mPreMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
-                                                  : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+                                                 : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
   TextureSet                textureSet    = mTextureManager.LoadAnimatedImageTexture(mImageUrl,

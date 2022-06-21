@@ -257,6 +257,15 @@ public: // Configure the text controller.
   void SetAutoScrollEnabled(bool enable);
 
   /**
+   * @brief Whether the auto scrolling texture exceed max texture.
+   *
+   * By default is false.
+   *
+   * @param[in] exceed Whether the auto scrolling texture exceed max texture.
+   */
+  void SetAutoScrollMaxTextureExceeded(bool exceed);
+
+  /**
    * @brief Retrieves whether auto text scrolling is enabled.
    *
    * By default is disabled.

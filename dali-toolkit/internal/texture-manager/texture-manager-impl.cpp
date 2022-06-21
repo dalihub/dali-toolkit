@@ -121,10 +121,8 @@ TextureManager::MaskingData::MaskingData()
 
 TextureManager::TextureManager()
 : mTextureCacheManager(),
-  mAsyncLocalLoaders(GetNumberOfLocalLoaderThreads(), [&]()
-                     { return TextureAsyncLoadingHelper(*this); }),
-  mAsyncRemoteLoaders(GetNumberOfRemoteLoaderThreads(), [&]()
-                      { return TextureAsyncLoadingHelper(*this); }),
+  mAsyncLocalLoaders(GetNumberOfLocalLoaderThreads(), [&]() { return TextureAsyncLoadingHelper(*this); }),
+  mAsyncRemoteLoaders(GetNumberOfRemoteLoaderThreads(), [&]() { return TextureAsyncLoadingHelper(*this); }),
   mLifecycleObservers(),
   mLoadQueue(),
   mRemoveQueue(),
@@ -533,7 +531,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 {
   TextureHash       textureHash = INITIAL_HASH_NUMBER;
   TextureCacheIndex cacheIndex  = INVALID_CACHE_INDEX;
-  if(storageType != StorageType::RETURN_PIXEL_BUFFER && frameIndex == 0)
+  if(storageType != StorageType::RETURN_PIXEL_BUFFER)
   {
     textureHash = mTextureCacheManager.GenerateHash(url, desiredSize, fittingMode, samplingMode, useAtlas, maskTextureId, cropToMask, frameIndex);
 
@@ -568,7 +566,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     // Cache new texutre, and get cacheIndex.
     cacheIndex = mTextureCacheManager.AppendCache(TextureInfo(textureId, maskTextureId, url, desiredSize, contentScale, fittingMode, samplingMode, false, cropToMask, useAtlas, textureHash, orientationCorrection, preMultiply, animatedImageLoading, frameIndex));
 
-    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) New texture, cacheIndex:%d, textureId=%d, frameindex=%d\n", url.GetUrl().c_str(), observer, cacheIndex.GetIndex(), textureId, frameIndex);
+    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) New texture, cacheIndex:%d, textureId=%d, frameindex=%d premultiply=%d\n", url.GetUrl().c_str(), observer, cacheIndex.GetIndex(), textureId, frameIndex, preMultiply);
   }
 
   // The below code path is common whether we are using the cache or not.
@@ -877,6 +875,12 @@ void TextureManager::ProcessLoadQueue()
       if((textureInfo.loadState == LoadState::UPLOADED) || (textureInfo.loadState == LoadState::LOAD_FINISHED && textureInfo.storageType == StorageType::RETURN_PIXEL_BUFFER))
       {
         EmitLoadComplete(element.mObserver, textureInfo, true);
+      }
+      else if(textureInfo.loadState == LoadState::LOADING)
+      {
+        // Note : LOADING state texture cannot be queue.
+        // This case be occured when same texture id are queue in mLoadQueue.
+        ObserveTexture(textureInfo, element.mObserver);
       }
       else
       {

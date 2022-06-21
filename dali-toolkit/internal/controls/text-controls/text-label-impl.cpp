@@ -1062,6 +1062,13 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
     alignmentOffset.x = 0.0f;
     alignmentOffset.y = (contentSize.y - layoutSize.y) * VERTICAL_ALIGNMENT_TABLE[mController->GetVerticalAlignment()];
 
+    const int maxTextureSize = Dali::GetMaxTextureSize();
+    if(layoutSize.width > maxTextureSize)
+    {
+      DALI_LOG_WARNING("layoutSize(%f) > maxTextureSize(%d): To guarantee the behavior of Texture::New, layoutSize must not be bigger than maxTextureSize\n", layoutSize.width, maxTextureSize);
+      layoutSize.width = maxTextureSize;
+    }
+
     Property::Map visualTransform;
     visualTransform.Add(Toolkit::Visual::Transform::Property::SIZE, layoutSize)
       .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
@@ -1125,6 +1132,7 @@ void TextLabel::SetUpAutoScrolling()
     if(textNaturalSize.width > maxTextureSize)
     {
       mController->SetTextElideEnabled(true);
+      mController->SetAutoScrollMaxTextureExceeded(true);
     }
     GetHeightForWidth(maxTextureSize);
     wrapGap = std::max(maxTextureSize - textNaturalSize.width, 0.0f);
@@ -1152,6 +1160,7 @@ void TextLabel::SetUpAutoScrolling()
   Renderer renderer = static_cast<Internal::Visual::Base&>(GetImplementation(mVisual)).GetRenderer();
   mTextScroller->SetParameters(Self(), renderer, textureSet, controlSize, verifiedSize, wrapGap, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment());
   mController->SetTextElideEnabled(actualellipsis);
+  mController->SetAutoScrollMaxTextureExceeded(false);
 }
 
 void TextLabel::ScrollingFinished()

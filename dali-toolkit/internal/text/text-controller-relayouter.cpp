@@ -67,7 +67,7 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
                                                                         SHAPE_TEXT |
                                                                         GET_GLYPH_METRICS);
 
-  const OperationsMask sizeOperations     = static_cast<OperationsMask>(LAYOUT | ALIGN | REORDER);
+  const OperationsMask sizeOperations = static_cast<OperationsMask>(LAYOUT | ALIGN | REORDER);
 
   // Set the update info to relayout the whole text.
   TextUpdateInfo& textUpdateInfo = impl.mTextUpdateInfo;
@@ -92,6 +92,9 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
   if(!isEditable)
   {
     impl.UpdateModel(onlyOnceOperations);
+
+    // Layout the text for the new width.
+    operationsPending = static_cast<OperationsMask>(operationsPending | requestedOperationsMask);
 
     DoRelayout(impl,
                requestedControllerSize,
@@ -619,12 +622,15 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
     }
 
     // Update the visual model.
-    bool isAutoScrollEnabled = impl.mIsAutoScrollEnabled;
+    bool isAutoScrollEnabled            = impl.mIsAutoScrollEnabled;
+    bool isAutoScrollMaxTextureExceeded = impl.mIsAutoScrollMaxTextureExceeded;
+
     Size newLayoutSize;
     viewUpdated               = impl.mLayoutEngine.LayoutText(layoutParameters,
                                                 newLayoutSize,
                                                 elideTextEnabled,
                                                 isAutoScrollEnabled,
+                                                isAutoScrollMaxTextureExceeded,
                                                 ellipsisPosition);
     impl.mIsAutoScrollEnabled = isAutoScrollEnabled;
 
@@ -798,13 +804,13 @@ void Controller::Relayouter::DoRelayoutHorizontalAlignment(Controller::Impl&    
 
 void Controller::Relayouter::CalculateVerticalOffset(Controller::Impl& impl, const Size& controlSize)
 {
-  ModelPtr&         model                 = impl.mModel;
-  VisualModelPtr&   visualModel           = model->mVisualModel;
-  Size              layoutSize            = model->mVisualModel->GetLayoutSize();
-  Size              oldLayoutSize         = layoutSize;
-  float             offsetY               = 0.f;
-  bool              needRecalc            = false;
-  float             defaultFontLineHeight = impl.GetDefaultFontLineHeight();
+  ModelPtr&       model                 = impl.mModel;
+  VisualModelPtr& visualModel           = model->mVisualModel;
+  Size            layoutSize            = model->mVisualModel->GetLayoutSize();
+  Size            oldLayoutSize         = layoutSize;
+  float           offsetY               = 0.f;
+  bool            needRecalc            = false;
+  float           defaultFontLineHeight = impl.GetDefaultFontLineHeight();
 
   if(fabsf(layoutSize.height) < Math::MACHINE_EPSILON_1000)
   {
