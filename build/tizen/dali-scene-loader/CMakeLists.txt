@@ -64,7 +64,7 @@ if (ENABLE_PKG_CONFIGURE)
 
 	set(PREFIX ${prefix})
 	set(EXEC_PREFIX ${CMAKE_INSTALL_PREFIX})
-	set(DEV_INCLUDE_PATH ${INCLUDE_DIR})
+	set(DEV_INCLUDE_PATH ${repo_root_dir})
 
 	set(core_pkg_cfg_file dali2-scene-loader.pc)
 	configure_file(${CMAKE_CURRENT_LIST_DIR}/${core_pkg_cfg_file}.in ${core_pkg_cfg_file} @ONLY)
