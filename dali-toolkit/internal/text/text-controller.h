@@ -1922,6 +1922,12 @@ public: // Text-input Event Queuing.
   virtual void ScrollBy(Vector2 scroll);
 
   /**
+   * @brief Whether the text is scrollable.
+   * @return Returns true if the text is scrollable.
+   */
+  bool IsScrollable(const Vector2& displacement);
+
+  /**
    * @copydoc Dali::Toolkit::Internal::TextEditor::GetHorizontalScrollPosition()
    */
   float GetHorizontalScrollPosition();

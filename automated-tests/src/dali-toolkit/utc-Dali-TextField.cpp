@@ -19,10 +19,6 @@
 #include <unistd.h>
 #include <iostream>
 
-#include <dali/integration-api/events/key-event-integ.h>
-#include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/public-api/rendering/renderer.h>
-#include <dali/devel-api/actors/actor-devel.h>
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
@@ -30,8 +26,13 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
+#include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/events/key-event-integ.h>
+#include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/public-api/rendering/renderer.h>
 #include "test-text-geometry-utils.h"
 #include "toolkit-clipboard.h"
 
@@ -404,6 +405,56 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
 
   return true;
 }
+
+
+// Stores data that is populated in the callback and will be read by the test cases
+struct SignalData
+{
+  SignalData()
+  : functorCalled(false),
+    voidFunctorCalled(false),
+    receivedGesture()
+  {
+  }
+
+  void Reset()
+  {
+    functorCalled     = false;
+    voidFunctorCalled = false;
+
+    receivedGesture.Reset();
+
+    pannedActor.Reset();
+  }
+
+  bool       functorCalled;
+  bool       voidFunctorCalled;
+  PanGesture receivedGesture;
+  Actor      pannedActor;
+};
+
+// Functor that sets the data when called
+struct GestureReceivedFunctor
+{
+  GestureReceivedFunctor(SignalData& data)
+  : signalData(data)
+  {
+  }
+
+  void operator()(Actor actor, const PanGesture& pan)
+  {
+    signalData.functorCalled   = true;
+    signalData.receivedGesture = pan;
+    signalData.pannedActor     = actor;
+  }
+
+  void operator()()
+  {
+    signalData.voidFunctorCalled = true;
+  }
+
+  SignalData& signalData;
+};
 
 } // namespace
 
@@ -5564,6 +5615,78 @@ int utcDaliTextFieldClusteredEmojiDeletionDeleteKey(void)
   // Render and notify
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int utcDaliTextFieldPanGesturePropagation(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldPanGesturePropagation");
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  field.SetProperty(TextField::Property::TEXT, "This is a long text for the size of the text-field.");
+  field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
+
+  field.SetProperty(Actor::Property::SIZE, Vector2(50.f, 100.f));
+  field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  actor.Add(field);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Tap first to get the focus.
+  TestGenerateTap(application, 3.0f, 25.0f, 100);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Pan the text field
+  uint32_t time = 100;
+  TestStartPan(application, Vector2(40.0f, 50.0f), Vector2(40.0f, 50.0f), time);
+  TestMovePan(application, Vector2(10.0f, 50.0f), time);
+  TestEndPan(application, Vector2(40.0f, 50.0f), time);
+  application.SendNotification();
+  application.Render();
+
+  // The text scrolls because there is text that is scrolling.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Set the size large enough to prevent scrolling.
+  field.SetProperty(Actor::Property::SIZE, Vector2(700.f, 100.f));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  time = 200;
+  TestStartPan(application, Vector2(40.0f, 50.0f), Vector2(40.0f, 50.0f), time);
+  TestMovePan(application, Vector2(10.0f, 50.0f), time);
+  TestEndPan(application, Vector2(40.0f, 50.0f), time);
+
+  // Because scrolling is not possible, the pan gesture is propagated.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
 
   END_TEST;
 }

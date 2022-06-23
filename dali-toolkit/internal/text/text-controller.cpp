@@ -1607,6 +1607,11 @@ void Controller::ScrollBy(Vector2 scroll)
   mImpl->ScrollBy(scroll);
 }
 
+bool Controller::IsScrollable(const Vector2& displacement)
+{
+  return mImpl->IsScrollable(displacement);
+}
+
 float Controller::GetHorizontalScrollPosition()
 {
   return mImpl->GetHorizontalScrollPosition();
