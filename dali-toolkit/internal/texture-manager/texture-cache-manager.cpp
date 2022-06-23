@@ -645,61 +645,55 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::AppendCache(const Te
   return cacheIndex;
 }
 
-void TextureCacheManager::RemoveCache(const TextureCacheManager::TextureId& textureId)
+void TextureCacheManager::RemoveCache(TextureCacheManager::TextureInfo& textureInfo)
 {
-  TextureCacheIndex textureInfoIndex = GetCacheIndexFromId(textureId);
-
+  TextureCacheIndex textureInfoIndex = GetCacheIndexFromId(textureInfo.textureId);
   bool removeTextureInfo = false;
 
-  if(textureInfoIndex != INVALID_CACHE_INDEX)
+  DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureCacheManager::Remove(textureId:%d) url:%s\n  cacheIdx:%d loadState:%s reference count = %d\n", textureInfo.textureId, textureInfo.url.GetUrl().c_str(), textureInfoIndex.GetIndex(), GET_LOAD_STATE_STRING(textureInfo.loadState), textureInfo.referenceCount);
+
+  // Decrement the reference count and check if this is the last user of this Texture.
+  if(--textureInfo.referenceCount <= 0)
   {
-    TextureInfo& textureInfo(mTextureInfoContainer[textureInfoIndex.GetIndex()]);
+    // This is the last remove for this Texture.
+    textureInfo.referenceCount = 0;
 
-    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureCacheManager::Remove(textureId:%d) url:%s\n  cacheIdx:%d loadState:%s reference count = %d\n", textureId, textureInfo.url.GetUrl().c_str(), textureInfoIndex.GetIndex(), GET_LOAD_STATE_STRING(textureInfo.loadState), textureInfo.referenceCount);
-
-    // Decrement the reference count and check if this is the last user of this Texture.
-    if(--textureInfo.referenceCount <= 0)
+    // If loaded, we can remove the TextureInfo and the Atlas (if atlased).
+    if(textureInfo.loadState == LoadState::UPLOADED)
     {
-      // This is the last remove for this Texture.
-      textureInfo.referenceCount = 0;
-
-      // If loaded, we can remove the TextureInfo and the Atlas (if atlased).
-      if(textureInfo.loadState == LoadState::UPLOADED)
+      if(textureInfo.atlas)
       {
-        if(textureInfo.atlas)
-        {
-          textureInfo.atlas.Remove(textureInfo.atlasRect);
-        }
-        removeTextureInfo = true;
+        textureInfo.atlas.Remove(textureInfo.atlasRect);
       }
-      else if(textureInfo.loadState == LoadState::LOADING || textureInfo.loadState == LoadState::MASK_APPLYING)
+      removeTextureInfo = true;
+    }
+    else if(textureInfo.loadState == LoadState::LOADING || textureInfo.loadState == LoadState::MASK_APPLYING)
+    {
+      // We mark the textureInfo for removal.
+      // Once the load has completed, this method will be called again.
+      textureInfo.loadState = LoadState::CANCELLED;
+    }
+    else
+    {
+      // In other states, we are not waiting for a load so we are safe to remove the TextureInfo data.
+      removeTextureInfo = true;
+    }
+
+    // If the state allows us to remove the TextureInfo data, we do so.
+    if(removeTextureInfo)
+    {
+      // If url location is BUFFER, decrease reference count of EncodedImageBuffer.
+      if(textureInfo.url.IsBufferResource())
       {
-        // We mark the textureInfo for removal.
-        // Once the load has completed, this method will be called again.
-        textureInfo.loadState = LoadState::CANCELLED;
-      }
-      else
-      {
-        // In other states, we are not waiting for a load so we are safe to remove the TextureInfo data.
-        removeTextureInfo = true;
+        RemoveEncodedImageBuffer(textureInfo.url.GetUrl());
       }
 
-      // If the state allows us to remove the TextureInfo data, we do so.
-      if(removeTextureInfo)
-      {
-        // If url location is BUFFER, decrease reference count of EncodedImageBuffer.
-        if(textureInfo.url.IsBufferResource())
-        {
-          RemoveEncodedImageBuffer(textureInfo.url.GetUrl());
-        }
+      // Permanently remove the textureInfo struct.
 
-        // Permanently remove the textureInfo struct.
-
-        // Step 1. remove current textureId information in mTextureHashContainer.
-        RemoveHashId(textureInfo.hash, textureId);
-        // Step 2. make textureId is not using anymore. After this job, we can reuse textureId.
-        mTextureIdConverter.Remove(textureId);
-      }
+      // Step 1. remove current textureId information in mTextureHashContainer.
+      RemoveHashId(textureInfo.hash, textureInfo.textureId);
+      // Step 2. make textureId is not using anymore. After this job, we can reuse textureId.
+      mTextureIdConverter.Remove(textureInfo.textureId);
     }
   }
 

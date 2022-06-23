@@ -1216,22 +1216,6 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
 
   tet_printf("textureId1:%d removed and textureId2:%d requested\n", static_cast<int>(textureId1), static_cast<int>(textureId2));
 
-  // ApplyMask event come back, and do nothing.
-  // CAPTION : HARD-CODING.
-  {
-    std::vector<Devel::PixelBuffer> pixelBuffers;
-    textureManager.AsyncLoadComplete(textureId1, pixelBuffers);
-    textureManager.Remove(maskInfo->mAlphaMaskId, nullptr);
-  }
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(observer1.mLoaded, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(observer1.mObserverCalled, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(observer2.mLoaded, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(observer2.mObserverCalled, false, TEST_LOCATION);
-
   // CAPTION : HARD-CODING.
   {
     std::vector<Devel::PixelBuffer> pixelBuffers;
