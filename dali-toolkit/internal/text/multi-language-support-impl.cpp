@@ -205,9 +205,9 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
   currentScriptRun.isRightToLeft = false;
 
   // Traverse all characters and set the scripts.
-  const Length lastCharacter = startIndex + numberOfCharacters;
+  const Length lastCharacter = startIndex + numberOfCharacters - 1u;
 
-  for(Length index = startIndex; index < lastCharacter; ++index)
+  for(Length index = startIndex; index <= lastCharacter; ++index)
   {
     Character character = *(textBuffer + index);
 
@@ -223,7 +223,7 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
     //   script of the first character of the paragraph with a defined script.
 
     // Skip those characters valid for many scripts like white spaces or '\n'.
-    bool endOfText = index == lastCharacter;
+    bool endOfText = index > lastCharacter;
 
     //Handle all Emoji Sequence cases
     if(IsNewSequence(textBuffer, currentScriptRun.script, index, lastCharacter, script))
@@ -280,7 +280,7 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
 
       // Get the next character.
       ++index;
-      endOfText = index == lastCharacter;
+      endOfText = index > lastCharacter;
       if(!endOfText)
       {
         character = *(textBuffer + index);
@@ -471,8 +471,8 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
   FontId                  previousEmojiFontId = 0u;
   TextAbstraction::Script previousScript      = TextAbstraction::UNKNOWN;
 
-  CharacterIndex lastCharacter = startIndex + numberOfCharacters;
-  for(Length index = startIndex; index < lastCharacter; ++index)
+  CharacterIndex lastCharacter = startIndex + numberOfCharacters - 1u;
+  for(Length index = startIndex; index <= lastCharacter; ++index)
   {
     // Get the current character.
     const Character character        = *(textBuffer + index);
