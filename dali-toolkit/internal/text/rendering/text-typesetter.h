@@ -144,7 +144,7 @@ private:
    *
    * @return An image buffer with the text.
    */
-  Devel::PixelBuffer CreateImageBuffer(const uint32_t& bufferWidth, const uint32_t& bufferHeight, Typesetter::Style style, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const int32_t& horizontalOffset, const int32_t& verticalOffset, TextAbstraction::GlyphIndex fromGlyphIndex, TextAbstraction::GlyphIndex toGlyphIndex);
+  Devel::PixelBuffer CreateImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Typesetter::Style style, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset, const TextAbstraction::GlyphIndex fromGlyphIndex, const TextAbstraction::GlyphIndex toGlyphIndex);
 
   /**
    * @brief Apply behaviour of tags if the markup-processor is enabled.
@@ -159,7 +159,7 @@ private:
    *
    * @return The image buffer with the markup.
    */
-  Devel::PixelBuffer ApplyMarkupProcessorOnPixelBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t& bufferWidth, const uint32_t& bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const int32_t& horizontalOffset, const int32_t& verticalOffset);
+  Devel::PixelBuffer ApplyMarkupProcessorOnPixelBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset);
 
   /**
    * @brief Apply markup underline tags.
@@ -180,7 +180,7 @@ private:
    *
    * @return The image buffer with the markup.
    */
-  Devel::PixelBuffer ApplyUnderlineMarkupImageBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t& bufferWidth, const uint32_t& bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const int32_t& horizontalOffset, const int32_t& verticalOffset);
+  Devel::PixelBuffer ApplyUnderlineMarkupImageBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset);
 
   /**
    * @brief Apply markup strikethrough tags.
@@ -201,7 +201,7 @@ private:
    *
    * @return The image buffer with the markup.
    */
-  Devel::PixelBuffer ApplyStrikethroughMarkupImageBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t& bufferWidth, const uint32_t& bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const int32_t& horizontalOffset, const int32_t& verticalOffset);
+  Devel::PixelBuffer ApplyStrikethroughMarkupImageBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset);
 
 protected:
   /**

@@ -215,13 +215,35 @@ struct AtlasRenderer::Impl
                                  glyphBufferData,
                                  style.outline);
 
+        uint32_t glyphBufferSize = glyphBufferData.width * glyphBufferData.height * Pixel::GetBytesPerPixel(glyphBufferData.format);
+        // If glyph buffer data don't have ownership, Or if we need to decompress, create new memory and replace ownership.
+        if(!glyphBufferData.isBufferOwned || glyphBufferData.compressType != TextAbstraction::FontClient::GlyphBufferData::CompressType::NO_COMPRESS)
+        {
+          uint8_t* newBuffer = (uint8_t*)malloc(glyphBufferSize);
+          if(DALI_LIKELY(newBuffer != nullptr))
+          {
+            TextAbstraction::FontClient::GlyphBufferData::Decompress(glyphBufferData, newBuffer);
+            if(glyphBufferData.isBufferOwned)
+            {
+              // Release previous buffer
+              free(glyphBufferData.buffer);
+            }
+            glyphBufferData.isBufferOwned = true;
+            glyphBufferData.buffer        = newBuffer;
+            glyphBufferData.compressType  = TextAbstraction::FontClient::GlyphBufferData::CompressType::NO_COMPRESS;
+          }
+        }
+
         // Create the pixel data.
         bitmap = PixelData::New(glyphBufferData.buffer,
-                                glyphBufferData.width * glyphBufferData.height * GetBytesPerPixel(glyphBufferData.format),
+                                glyphBufferSize,
                                 glyphBufferData.width,
                                 glyphBufferData.height,
                                 glyphBufferData.format,
                                 PixelData::FREE);
+
+        // Change buffer ownership.
+        glyphBufferData.isBufferOwned = false;
 
         if(bitmap)
         {
