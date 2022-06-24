@@ -194,47 +194,31 @@ protected:
 private:
   struct TilingInfo
   {
-    unsigned char* textBuffer;
-    unsigned char* styleBuffer;
-    unsigned char* overlayStyleBuffer;
-    unsigned char* maskBuffer;
-    int            width;
-    int            height;
-    Pixel::Format  textPixelFormat;
-    int            offsetPosition;
-    Vector2        offSet;
+    PixelData     textPixelData;
+    PixelData     stylePixelData;
+    PixelData     overlayStylePixelData;
+    PixelData     maskPixelData;
+    int32_t       width;
+    int32_t       height;
+    Pixel::Format textPixelFormat;
+    uint32_t      offsetHeight;
+    Vector2       transformOffset;
 
-    TilingInfo(int width, int height, Pixel::Format textPixelFormat)
-    : textBuffer(NULL),
-      styleBuffer(NULL),
-      overlayStyleBuffer(NULL),
-      maskBuffer(NULL),
+    TilingInfo(int32_t width, int32_t height, Pixel::Format textPixelFormat)
+    : textPixelData(),
+      stylePixelData(),
+      overlayStylePixelData(),
+      maskPixelData(),
       width(width),
       height(height),
       textPixelFormat(textPixelFormat),
-      offsetPosition(0),
-      offSet(0.f, 0.f)
+      offsetHeight(0u),
+      transformOffset(0.f, 0.f)
     {
     }
 
     ~TilingInfo()
     {
-      if(textBuffer)
-      {
-        free(textBuffer);
-      }
-      if(styleBuffer)
-      {
-        free(styleBuffer);
-      }
-      if(overlayStyleBuffer)
-      {
-        free(overlayStyleBuffer);
-      }
-      if(maskBuffer)
-      {
-        free(maskBuffer);
-      }
     }
   };
 
@@ -260,21 +244,21 @@ private:
   /**
    * @brief Create a texture in textureSet and add it.
    * @param[in] textureSet The textureSet to which the texture will be added.
-   * @param[in] data The PixelData to be uploaded to texture
+   * @param[in] data The PixelData to be uploaded to texture.
    * @param[in] sampler The sampler.
    * @param[in] textureSetIndex The Index of TextureSet.
    */
   void AddTexture(TextureSet& textureSet, PixelData& data, Sampler& sampler, unsigned int textureSetIndex);
 
   /**
-   * @brief Convert the buffer to pixelData.
-   * @param[in] buffer The Buffer to be converted to pixelData.
-   * @param[in] width The width of pixel data.
-   * @param[in] height The height of pixel data.
-   * @param[in] offsetPosition The The buffer's start position.
-   * @param[in] textPixelFormat The PixelForma of text.
+   * @brief Create a texture in textureSet and add it.
+   * @param[in] textureSet The textureSet to which the texture will be added.
+   * @param[in] tilingInfo The tiling infomation to be uploaded to texture.
+   * @param[in] data The PixelData to be uploaded to texture.
+   * @param[in] sampler The sampler.
+   * @param[in] textureSetIndex The Index of TextureSet.
    */
-  PixelData ConvertToPixelData(unsigned char* buffer, int width, int height, int offsetPosition, const Pixel::Format textPixelFormat);
+  void AddTilingTexture(TextureSet& textureSet, TilingInfo& tilingInfo, PixelData& data, Sampler& sampler, unsigned int textureSetIndex);
 
   /**
    * @brief Create the text's texture. It will use cached shader feature for text visual.
