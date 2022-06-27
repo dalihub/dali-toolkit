@@ -77,7 +77,7 @@ bool IsNewKeycapSequence(const Character* const   textBuffer,
   // Default initialization does not keycap sequence
   bool isNewKeycapSequence = false;
 
-  if(currentCharacterIndex < lastCharacterIndex)
+  if(currentCharacterIndex <= lastCharacterIndex)
   {
     Character currentCharacter = *(textBuffer + currentCharacterIndex);
     if(IsStartForKeycapSequence(currentCharacter))
@@ -112,7 +112,7 @@ bool IsNewVariationSelectorSequence(const Character* const         textBuffer,
   // Default initialization does not VariationSelector sequence
   bool isNewVariationSelectorSequence = false;
 
-  if(currentCharacterIndex < lastCharacterIndex)
+  if(currentCharacterIndex <= lastCharacterIndex)
   {
     Character currentCharacter = *(textBuffer + currentCharacterIndex);
     if(TextAbstraction::IsEmojiVariationSequences(currentCharacter))
