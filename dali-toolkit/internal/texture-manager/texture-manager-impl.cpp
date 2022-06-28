@@ -39,6 +39,7 @@ constexpr auto DEFAULT_NUMBER_OF_REMOTE_LOADER_THREADS = size_t{8u};
 
 constexpr auto NUMBER_OF_LOCAL_LOADER_THREADS_ENV  = "DALI_TEXTURE_LOCAL_THREADS";
 constexpr auto NUMBER_OF_REMOTE_LOADER_THREADS_ENV = "DALI_TEXTURE_REMOTE_THREADS";
+constexpr auto LOAD_IMAGE_YUV_PLANES_ENV           = "DALI_LOAD_IMAGE_YUV_PLANES_ENV";
 
 size_t GetNumberOfThreads(const char* environmentVariable, size_t defaultValue)
 {
@@ -60,6 +61,12 @@ size_t GetNumberOfRemoteLoaderThreads()
   return GetNumberOfThreads(NUMBER_OF_REMOTE_LOADER_THREADS_ENV, DEFAULT_NUMBER_OF_REMOTE_LOADER_THREADS);
 }
 
+bool NeedToLoadYuvPlanes()
+{
+  auto loadYuvPlanesString = Dali::EnvironmentVariable::GetEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV);
+  bool loadYuvPlanes       = loadYuvPlanesString ? std::atoi(loadYuvPlanesString) : false;
+  return loadYuvPlanes;
+}
 } // namespace
 
 namespace Dali
@@ -126,7 +133,8 @@ TextureManager::TextureManager()
   mLifecycleObservers(),
   mLoadQueue(),
   mRemoveQueue(),
-  mQueueLoadFlag(false)
+  mQueueLoadFlag(false),
+  mLoadYuvPlanes(NeedToLoadYuvPlanes())
 {
   // Initialize the AddOn
   RenderingAddOn::Get();
@@ -337,22 +345,24 @@ TextureSet TextureManager::LoadTexture(
                                                                                                          : false;
       if(synchronousAtlasAvaliable)
       {
-        Devel::PixelBuffer pixelBuffer = LoadImageSynchronously(url, desiredSize, fittingMode, samplingMode, orientationCorrection);
+        std::vector<Devel::PixelBuffer> pixelBuffers;
+        LoadImageSynchronously(url, desiredSize, fittingMode, samplingMode, orientationCorrection, false, pixelBuffers);
 
-        if(pixelBuffer && maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
+        if(!pixelBuffers.empty() && maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
         {
-          Devel::PixelBuffer maskPixelBuffer = LoadImageSynchronously(maskInfo->mAlphaMaskUrl, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true);
-          if(maskPixelBuffer)
+          std::vector<Devel::PixelBuffer> maskPixelBuffers;
+          LoadImageSynchronously(maskInfo->mAlphaMaskUrl, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true, false, maskPixelBuffers);
+          if(!maskPixelBuffers.empty())
           {
-            pixelBuffer.ApplyMask(maskPixelBuffer, maskInfo->mContentScaleFactor, maskInfo->mCropToMask);
+            pixelBuffers[0].ApplyMask(maskPixelBuffers[0], maskInfo->mContentScaleFactor, maskInfo->mCropToMask);
           }
         }
 
         PixelData data;
-        if(pixelBuffer)
+        if(!pixelBuffers.empty())
         {
-          PreMultiply(pixelBuffer, preMultiplyOnLoad);
-          data = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
+          PreMultiply(pixelBuffers[0], preMultiplyOnLoad);
+          data = Devel::PixelBuffer::Convert(pixelBuffers[0]); // takes ownership of buffer
 
           if(data)
           {
@@ -529,8 +539,10 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
   const std::uint32_t&                frameIndex,
   const bool&                         synchronousLoading)
 {
-  TextureHash       textureHash = INITIAL_HASH_NUMBER;
-  TextureCacheIndex cacheIndex  = INVALID_CACHE_INDEX;
+  TextureHash       textureHash   = INITIAL_HASH_NUMBER;
+  TextureCacheIndex cacheIndex    = INVALID_CACHE_INDEX;
+  bool              loadYuvPlanes = (mLoadYuvPlanes && maskTextureId == INVALID_TEXTURE_ID && storageType == StorageType::UPLOAD_TO_TEXTURE);
+
   if(storageType != StorageType::RETURN_PIXEL_BUFFER)
   {
     textureHash = mTextureCacheManager.GenerateHash(url, desiredSize, fittingMode, samplingMode, useAtlas, maskTextureId, cropToMask, frameIndex);
@@ -564,7 +576,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     bool preMultiply = (preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
 
     // Cache new texutre, and get cacheIndex.
-    cacheIndex = mTextureCacheManager.AppendCache(TextureInfo(textureId, maskTextureId, url, desiredSize, contentScale, fittingMode, samplingMode, false, cropToMask, useAtlas, textureHash, orientationCorrection, preMultiply, animatedImageLoading, frameIndex));
+    cacheIndex = mTextureCacheManager.AppendCache(TextureInfo(textureId, maskTextureId, url, desiredSize, contentScale, fittingMode, samplingMode, false, cropToMask, useAtlas, textureHash, orientationCorrection, preMultiply, animatedImageLoading, frameIndex, loadYuvPlanes));
 
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) New texture, cacheIndex:%d, textureId=%d, frameindex=%d premultiply=%d\n", url.GetUrl().c_str(), observer, cacheIndex.GetIndex(), textureId, frameIndex, preMultiply);
   }
@@ -646,9 +658,10 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     if(!(textureInfo.loadState == TextureManager::LoadState::UPLOADED ||
          textureInfo.loadState == TextureManager::LoadState::LOAD_FINISHED))
     {
-      Devel::PixelBuffer pixelBuffer = LoadImageSynchronously(url, desiredSize, fittingMode, samplingMode, orientationCorrection);
+      std::vector<Devel::PixelBuffer> pixelBuffers;
+      LoadImageSynchronously(url, desiredSize, fittingMode, samplingMode, orientationCorrection, loadYuvPlanes, pixelBuffers);
 
-      if(!pixelBuffer)
+      if(pixelBuffers.empty())
       {
         // If pixelBuffer loading is failed in synchronously, call Remove() method.
         Remove(textureId, nullptr);
@@ -657,7 +670,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 
       if(storageType == StorageType::KEEP_PIXEL_BUFFER) // For the mask image loading.
       {
-        textureInfo.pixelBuffer = pixelBuffer; // Store the pixel data
+        textureInfo.pixelBuffer = pixelBuffers[0]; // Store the pixel data
         textureInfo.loadState   = LoadState::LOAD_FINISHED;
       }
       else // For the image loading.
@@ -681,7 +694,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
               Devel::PixelBuffer maskPixelBuffer = mTextureCacheManager[maskCacheIndex].pixelBuffer;
               if(maskPixelBuffer)
               {
-                pixelBuffer.ApplyMask(maskPixelBuffer, contentScale, cropToMask);
+                pixelBuffers[0].ApplyMask(maskPixelBuffer, contentScale, cropToMask);
               }
               else
               {
@@ -694,10 +707,10 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
             DALI_LOG_ERROR("Mask image is not stored in cache.\n");
           }
         }
-        PreMultiply(pixelBuffer, preMultiplyOnLoad);
+        PreMultiply(pixelBuffers[0], preMultiplyOnLoad);
 
         // Upload texture
-        UploadTexture(pixelBuffer, textureInfo);
+        UploadTextures(pixelBuffers, textureInfo);
         if(maskTexture && textureInfo.textureSet)
         {
           textureInfo.textureSet.SetTexture(1u, maskTexture);
@@ -739,12 +752,14 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId, TextureU
   }
 }
 
-Devel::PixelBuffer TextureManager::LoadImageSynchronously(
-  const VisualUrl&                url,
-  const Dali::ImageDimensions&    desiredSize,
-  const Dali::FittingMode::Type&  fittingMode,
-  const Dali::SamplingMode::Type& samplingMode,
-  const bool&                     orientationCorrection)
+void TextureManager::LoadImageSynchronously(
+  const VisualUrl&                 url,
+  const Dali::ImageDimensions&     desiredSize,
+  const Dali::FittingMode::Type&   fittingMode,
+  const Dali::SamplingMode::Type&  samplingMode,
+  const bool&                      orientationCorrection,
+  const bool&                      loadYuvPlanes,
+  std::vector<Devel::PixelBuffer>& pixelBuffers)
 {
   Devel::PixelBuffer pixelBuffer;
   if(url.IsBufferResource())
@@ -757,9 +772,20 @@ Devel::PixelBuffer TextureManager::LoadImageSynchronously(
   }
   else
   {
-    pixelBuffer = LoadImageFromFile(url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection);
+    if(loadYuvPlanes)
+    {
+      Dali::LoadImagePlanesFromFile(url.GetUrl(), pixelBuffers, desiredSize, fittingMode, samplingMode, orientationCorrection);
+    }
+    else
+    {
+      pixelBuffer = Dali::LoadImageFromFile(url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection);
+    }
   }
-  return pixelBuffer;
+
+  if(pixelBuffer)
+  {
+    pixelBuffers.push_back(pixelBuffer);
+  }
 }
 
 void TextureManager::AddObserver(TextureManager::LifecycleObserver& observer)
@@ -853,7 +879,7 @@ void TextureManager::LoadTexture(TextureManager::TextureInfo& textureInfo, Textu
     }
     else
     {
-      loadingHelperIt->Load(textureInfo.textureId, textureInfo.url, textureInfo.desiredSize, textureInfo.fittingMode, textureInfo.samplingMode, textureInfo.orientationCorrection, premultiplyOnLoad);
+      loadingHelperIt->Load(textureInfo.textureId, textureInfo.url, textureInfo.desiredSize, textureInfo.fittingMode, textureInfo.samplingMode, textureInfo.orientationCorrection, premultiplyOnLoad, textureInfo.loadYuvPlanes);
     }
   }
   ObserveTexture(textureInfo, observer);
@@ -912,7 +938,7 @@ void TextureManager::ObserveTexture(TextureManager::TextureInfo& textureInfo,
   }
 }
 
-void TextureManager::AsyncLoadComplete(const TextureManager::TextureId& textureId, Devel::PixelBuffer pixelBuffer)
+void TextureManager::AsyncLoadComplete(const TextureManager::TextureId& textureId, std::vector<Devel::PixelBuffer>& pixelBuffers)
 {
   TextureCacheIndex cacheIndex = mTextureCacheManager.GetCacheIndexFromId(textureId);
   DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureManager::AsyncLoadComplete( textureId:%d CacheIndex:%d )\n", textureId, cacheIndex.GetIndex());
@@ -925,7 +951,7 @@ void TextureManager::AsyncLoadComplete(const TextureManager::TextureId& textureI
     if(textureInfo.loadState != LoadState::CANCELLED)
     {
       // textureInfo can be invalidated after this call (as the mTextureInfoContainer may be modified)
-      PostLoad(textureInfo, pixelBuffer);
+      PostLoad(textureInfo, pixelBuffers);
     }
     else
     {
@@ -934,95 +960,112 @@ void TextureManager::AsyncLoadComplete(const TextureManager::TextureId& textureI
   }
 }
 
-void TextureManager::PostLoad(TextureManager::TextureInfo& textureInfo, Devel::PixelBuffer& pixelBuffer)
+void TextureManager::PostLoad(TextureManager::TextureInfo& textureInfo, std::vector<Devel::PixelBuffer>& pixelBuffers)
 {
   // Was the load successful?
-  if(pixelBuffer && (pixelBuffer.GetWidth() != 0) && (pixelBuffer.GetHeight() != 0))
+  if(!pixelBuffers.empty())
   {
-    // No atlas support for now
-    textureInfo.useAtlas      = UseAtlas::NO_ATLAS;
-    textureInfo.preMultiplied = pixelBuffer.IsAlphaPreMultiplied();
-
-    if(textureInfo.storageType == StorageType::UPLOAD_TO_TEXTURE)
+    if(pixelBuffers.size() == 1)
     {
-      // If there is a mask texture ID associated with this texture, then apply the mask
-      // if it's already loaded. If it hasn't, and the mask is still loading,
-      // wait for the mask to finish loading.
-      // note, If the texture is already uploaded synchronously during loading,
-      // we don't need to apply mask.
-      if(textureInfo.loadState != LoadState::UPLOADED &&
-         textureInfo.maskTextureId != INVALID_TEXTURE_ID)
+      Devel::PixelBuffer pixelBuffer = pixelBuffers[0];
+      if(pixelBuffer && (pixelBuffer.GetWidth() != 0) && (pixelBuffer.GetHeight() != 0))
       {
-        if(textureInfo.loadState == LoadState::MASK_APPLYING)
+        // No atlas support for now
+        textureInfo.useAtlas      = UseAtlas::NO_ATLAS;
+        textureInfo.preMultiplied = pixelBuffer.IsAlphaPreMultiplied();
+
+        if(textureInfo.storageType == StorageType::UPLOAD_TO_TEXTURE)
         {
-          textureInfo.loadState = LoadState::MASK_APPLIED;
-          UploadTexture(pixelBuffer, textureInfo);
-          NotifyObservers(textureInfo, true);
-        }
-        else
-        {
-          LoadState maskLoadState = mTextureCacheManager.GetTextureStateInternal(textureInfo.maskTextureId);
-          textureInfo.pixelBuffer = pixelBuffer; // Store the pixel buffer temporarily
-          if(maskLoadState == LoadState::LOADING)
+          // If there is a mask texture ID associated with this texture, then apply the mask
+          // if it's already loaded. If it hasn't, and the mask is still loading,
+          // wait for the mask to finish loading.
+          // note, If the texture is already uploaded synchronously during loading,
+          // we don't need to apply mask.
+          if(textureInfo.loadState != LoadState::UPLOADED &&
+             textureInfo.maskTextureId != INVALID_TEXTURE_ID)
           {
-            textureInfo.loadState = LoadState::WAITING_FOR_MASK;
-          }
-          else if(maskLoadState == LoadState::LOAD_FINISHED || maskLoadState == LoadState::UPLOADED)
-          {
-            // Send New Task to Thread
-            TextureCacheIndex maskCacheIndex = mTextureCacheManager.GetCacheIndexFromId(textureInfo.maskTextureId);
-            if(maskCacheIndex != INVALID_CACHE_INDEX)
+            if(textureInfo.loadState == LoadState::MASK_APPLYING)
             {
-              TextureInfo& maskTextureInfo(mTextureCacheManager[maskCacheIndex]);
-              if(maskTextureInfo.storageType == StorageType::KEEP_PIXEL_BUFFER)
+              textureInfo.loadState = LoadState::MASK_APPLIED;
+              UploadTextures(pixelBuffers, textureInfo);
+              NotifyObservers(textureInfo, true);
+            }
+            else
+            {
+              LoadState maskLoadState = mTextureCacheManager.GetTextureStateInternal(textureInfo.maskTextureId);
+              textureInfo.pixelBuffer = pixelBuffer; // Store the pixel buffer temporarily
+              if(maskLoadState == LoadState::LOADING)
+              {
+                textureInfo.loadState = LoadState::WAITING_FOR_MASK;
+              }
+              else if(maskLoadState == LoadState::LOAD_FINISHED || maskLoadState == LoadState::UPLOADED)
               {
                 // Send New Task to Thread
-                ApplyMask(textureInfo, textureInfo.maskTextureId);
-              }
-              else if(maskTextureInfo.storageType == StorageType::KEEP_TEXTURE)
-              {
-                // Upload image texture. textureInfo.loadState will be UPLOADED.
-                UploadTexture(textureInfo.pixelBuffer, textureInfo);
-                if(maskTextureInfo.textureSet.GetTextureCount() > 0u)
+                TextureCacheIndex maskCacheIndex = mTextureCacheManager.GetCacheIndexFromId(textureInfo.maskTextureId);
+                if(maskCacheIndex != INVALID_CACHE_INDEX)
                 {
-                  Texture maskTexture = maskTextureInfo.textureSet.GetTexture(0u);
-                  textureInfo.textureSet.SetTexture(1u, maskTexture);
+                  TextureInfo& maskTextureInfo(mTextureCacheManager[maskCacheIndex]);
+                  if(maskTextureInfo.storageType == StorageType::KEEP_PIXEL_BUFFER)
+                  {
+                    // Send New Task to Thread
+                    ApplyMask(textureInfo, textureInfo.maskTextureId);
+                  }
+                  else if(maskTextureInfo.storageType == StorageType::KEEP_TEXTURE)
+                  {
+                    // Upload image texture. textureInfo.loadState will be UPLOADED.
+                    UploadTextures(pixelBuffers, textureInfo);
+                    if(maskTextureInfo.textureSet.GetTextureCount() > 0u)
+                    {
+                      Texture maskTexture = maskTextureInfo.textureSet.GetTexture(0u);
+                      textureInfo.textureSet.SetTexture(1u, maskTexture);
+                    }
+                    // notify mask texture set.
+                    NotifyObservers(textureInfo, true);
+                  }
                 }
-                // notify mask texture set.
+              }
+              else // maskLoadState == LoadState::LOAD_FAILED
+              {
+                // Url texture load success, But alpha mask texture load failed. Run as normal image upload.
+                DALI_LOG_ERROR("Alpha mask image loading failed! Image will not be masked\n");
+                UploadTextures(pixelBuffers, textureInfo);
                 NotifyObservers(textureInfo, true);
               }
             }
           }
-          else // maskLoadState == LoadState::LOAD_FAILED
+          else
           {
-            // Url texture load success, But alpha mask texture load failed. Run as normal image upload.
-            DALI_LOG_ERROR("Alpha mask image loading failed! Image will not be masked\n");
-            UploadTexture(pixelBuffer, textureInfo);
+            UploadTextures(pixelBuffers, textureInfo);
             NotifyObservers(textureInfo, true);
           }
         }
-      }
-      else
-      {
-        UploadTexture(pixelBuffer, textureInfo);
-        NotifyObservers(textureInfo, true);
+        else
+        {
+          textureInfo.pixelBuffer = pixelBuffer; // Store the pixel data
+          textureInfo.loadState   = LoadState::LOAD_FINISHED;
+
+          if(textureInfo.storageType == StorageType::RETURN_PIXEL_BUFFER)
+          {
+            NotifyObservers(textureInfo, true);
+          }
+          else // for the StorageType::KEEP_PIXEL_BUFFER and StorageType::KEEP_TEXTURE
+          {
+            // Check if there was another texture waiting for this load to complete
+            // (e.g. if this was an image mask, and its load is on a different thread)
+            CheckForWaitingTexture(textureInfo);
+          }
+        }
       }
     }
     else
     {
-      textureInfo.pixelBuffer = pixelBuffer; // Store the pixel data
-      textureInfo.loadState   = LoadState::LOAD_FINISHED;
+      // YUV case
+      // No atlas support for now
+      textureInfo.useAtlas      = UseAtlas::NO_ATLAS;
+      textureInfo.preMultiplied = false;
 
-      if(textureInfo.storageType == StorageType::RETURN_PIXEL_BUFFER)
-      {
-        NotifyObservers(textureInfo, true);
-      }
-      else // for the StorageType::KEEP_PIXEL_BUFFER and StorageType::KEEP_TEXTURE
-      {
-        // Check if there was another texture waiting for this load to complete
-        // (e.g. if this was an image mask, and its load is on a different thread)
-        CheckForWaitingTexture(textureInfo);
-      }
+      UploadTextures(pixelBuffers, textureInfo);
+      NotifyObservers(textureInfo, true);
     }
   }
   else
@@ -1047,7 +1090,9 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
      maskTextureInfo.storageType == StorageType::KEEP_TEXTURE)
   {
     // Upload mask texture. textureInfo.loadState will be UPLOADED.
-    UploadTexture(maskTextureInfo.pixelBuffer, maskTextureInfo);
+    std::vector<Devel::PixelBuffer> pixelBuffers;
+    pixelBuffers.push_back(maskTextureInfo.pixelBuffer);
+    UploadTextures(pixelBuffers, maskTextureInfo);
   }
 
   // Search the cache, checking if any texture has this texture id as a
@@ -1075,7 +1120,9 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
         if(maskTextureInfo.storageType == StorageType::KEEP_TEXTURE)
         {
           // Upload image texture. textureInfo.loadState will be UPLOADED.
-          UploadTexture(textureInfo.pixelBuffer, textureInfo);
+          std::vector<Devel::PixelBuffer> pixelBuffers;
+          pixelBuffers.push_back(textureInfo.pixelBuffer);
+          UploadTextures(pixelBuffers, textureInfo);
           if(maskTextureInfo.textureSet.GetTextureCount() > 0u)
           {
             Texture maskTexture = maskTextureInfo.textureSet.GetTexture(0u);
@@ -1089,7 +1136,9 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
       {
         // Url texture load success, But alpha mask texture load failed. Run as normal image upload.
         DALI_LOG_ERROR("Alpha mask image loading failed! Image will not be masked\n");
-        UploadTexture(textureInfo.pixelBuffer, textureInfo);
+        std::vector<Devel::PixelBuffer> pixelBuffers;
+        pixelBuffers.push_back(textureInfo.pixelBuffer);
+        UploadTextures(pixelBuffers, textureInfo);
         NotifyObservers(textureInfo, true);
       }
     }
@@ -1116,30 +1165,35 @@ void TextureManager::ApplyMask(TextureManager::TextureInfo& textureInfo, const T
   }
 }
 
-void TextureManager::UploadTexture(Devel::PixelBuffer& pixelBuffer, TextureManager::TextureInfo& textureInfo)
+void TextureManager::UploadTextures(std::vector<Devel::PixelBuffer>& pixelBuffers, TextureManager::TextureInfo& textureInfo)
 {
-  if(textureInfo.loadState != LoadState::UPLOADED && textureInfo.useAtlas != UseAtlas::USE_ATLAS)
+  if(!pixelBuffers.empty() && textureInfo.loadState != LoadState::UPLOADED && textureInfo.useAtlas != UseAtlas::USE_ATLAS)
   {
-    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "  TextureManager::UploadTexture() New Texture for textureId:%d\n", textureInfo.textureId);
+    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "  TextureManager::UploadTextures() New Texture for textureId:%d\n", textureInfo.textureId);
 
     // Check if this pixelBuffer is premultiplied
-    textureInfo.preMultiplied = pixelBuffer.IsAlphaPreMultiplied();
+    textureInfo.preMultiplied = pixelBuffers[0].IsAlphaPreMultiplied();
 
     auto& renderingAddOn = RenderingAddOn::Get();
     if(renderingAddOn.IsValid())
     {
-      renderingAddOn.CreateGeometry(textureInfo.textureId, pixelBuffer);
+      renderingAddOn.CreateGeometry(textureInfo.textureId, pixelBuffers[0]);
     }
 
-    Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight());
-
-    PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
-    texture.Upload(pixelData);
     if(!textureInfo.textureSet)
     {
       textureInfo.textureSet = TextureSet::New();
     }
-    textureInfo.textureSet.SetTexture(0u, texture);
+
+    uint32_t index = 0;
+    for(auto&& pixelBuffer : pixelBuffers)
+    {
+      Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight());
+
+      PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
+      texture.Upload(pixelData);
+      textureInfo.textureSet.SetTexture(index++, texture);
+    }
   }
 
   // Update the load state.

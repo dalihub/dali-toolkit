@@ -26,6 +26,7 @@
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/public-api/rendering/renderer.h>
@@ -389,6 +390,57 @@ public:
   bool& mStartedCalled;
   bool& mFinishedCalled;
 };
+
+
+// Stores data that is populated in the callback and will be read by the test cases
+struct SignalData
+{
+  SignalData()
+  : functorCalled(false),
+    voidFunctorCalled(false),
+    receivedGesture()
+  {
+  }
+
+  void Reset()
+  {
+    functorCalled     = false;
+    voidFunctorCalled = false;
+
+    receivedGesture.Reset();
+
+    pannedActor.Reset();
+  }
+
+  bool       functorCalled;
+  bool       voidFunctorCalled;
+  PanGesture receivedGesture;
+  Actor      pannedActor;
+};
+
+// Functor that sets the data when called
+struct GestureReceivedFunctor
+{
+  GestureReceivedFunctor(SignalData& data)
+  : signalData(data)
+  {
+  }
+
+  void operator()(Actor actor, const PanGesture& pan)
+  {
+    signalData.functorCalled   = true;
+    signalData.receivedGesture = pan;
+    signalData.pannedActor     = actor;
+  }
+
+  void operator()()
+  {
+    signalData.voidFunctorCalled = true;
+  }
+
+  SignalData& signalData;
+};
+
 
 } // namespace
 
@@ -6231,6 +6283,78 @@ int utcDaliTextEditorClusteredEmojiDeletionDeleteKey(void)
   // Render and notify
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int utcDaliTextEditorPanGesturePropagation(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorPanGesturePropagation");
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  editor.SetProperty(TextEditor::Property::TEXT, "This is a long text for the size of the text-editor.");
+  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
+
+  editor.SetProperty(Actor::Property::SIZE, Vector2(30.f, 500.f));
+  editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  actor.Add(editor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Tap first to get the focus.
+  TestGenerateTap(application, 3.0f, 25.0f, 100);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Pan the text editor
+  uint32_t time = 100;
+  TestStartPan(application, Vector2(10.0f, 50.0f), Vector2(10.0f, 50.0f), time);
+  TestMovePan(application, Vector2(10.0f, 30.0f), time);
+  TestEndPan(application, Vector2(10.0f, 50.0f), time);
+  application.SendNotification();
+  application.Render();
+
+  // The text scrolls because there is text that is scrolling.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Set the size large enough to prevent scrolling.
+  editor.SetProperty(Actor::Property::SIZE, Vector2(500.f, 500.f));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  time = 200;
+  TestStartPan(application, Vector2(10.0f, 50.0f), Vector2(10.0f, 50.0f), time);
+  TestMovePan(application, Vector2(10.0f, 30.0f), time);
+  TestEndPan(application, Vector2(10.0f, 50.0f), time);
+
+  // Because scrolling is not possible, the pan gesture is propagated.
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
 
   END_TEST;
 }

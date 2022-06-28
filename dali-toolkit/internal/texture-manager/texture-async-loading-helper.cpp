@@ -56,7 +56,8 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId&           
                                      const Dali::FittingMode::Type&                  fittingMode,
                                      const Dali::SamplingMode::Type&                 samplingMode,
                                      const bool&                                     orientationCorrection,
-                                     const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad)
+                                     const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad,
+                                     const bool&                                     loadYuvPlanes)
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
   if(DALI_UNLIKELY(url.IsBufferResource()))
@@ -66,7 +67,7 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId&           
   }
   else
   {
-    auto id                             = GetImplementation(mLoader).Load(url, desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
+    auto id                             = GetImplementation(mLoader).Load(url, desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes);
     mLoadingInfoContainer.back().loadId = id;
   }
 }
@@ -100,8 +101,8 @@ TextureAsyncLoadingHelper::TextureAsyncLoadingHelper(
     this, &TextureAsyncLoadingHelper::AsyncLoadComplete);
 }
 
-void TextureAsyncLoadingHelper::AsyncLoadComplete(uint32_t           id,
-                                                  Devel::PixelBuffer pixelBuffer)
+void TextureAsyncLoadingHelper::AsyncLoadComplete(uint32_t                         id,
+                                                  std::vector<Devel::PixelBuffer>& pixelBuffers)
 {
   DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureAsyncLoadingHelper::AsyncLoadComplete( loadId :%d )\n", id);
   if(mLoadingInfoContainer.size() >= 1u)
@@ -112,7 +113,7 @@ void TextureAsyncLoadingHelper::AsyncLoadComplete(uint32_t           id,
     if(loadingInfo.loadId == id)
     {
       // Call TextureManager::AsyncLoadComplete
-      mTextureManager.AsyncLoadComplete(loadingInfo.textureId, pixelBuffer);
+      mTextureManager.AsyncLoadComplete(loadingInfo.textureId, pixelBuffers);
     }
 
     mLoadingInfoContainer.pop_front();

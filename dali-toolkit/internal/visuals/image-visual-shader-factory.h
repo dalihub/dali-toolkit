@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_SHADER_FACTORY_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 /**
  * ImageVisualShaderFeature contains feature lists what image visual shader need to know.
  */
@@ -108,6 +107,18 @@ enum Type
 };
 } // namespace AlphaMaskingOnRendering
 
+namespace ColorConversion
+{
+/**
+ * @brief Whether the color format conversion is needed or not
+ */
+enum Type
+{
+  DONT_NEED = 0, ///< Not need to convert
+  YUV_TO_RGB     ///< Need yuv to rgb conversion
+};
+} // namespace ColorConversion
+
 /**
  * @brief Collection of current image visual feature. Only use for ImageVisualShaderFactory::GetShader()
  */
@@ -119,6 +130,7 @@ struct FeatureBuilder
     mRoundedCorner(RoundedCorner::DISABLED),
     mBorderline(Borderline::DISABLED),
     mAlphaMaskingOnRendering(AlphaMaskingOnRendering::DISABLED),
+    mColorConversion(ColorConversion::DONT_NEED),
     mTexture()
   {
   }
@@ -129,12 +141,14 @@ struct FeatureBuilder
   FeatureBuilder& EnableBorderline(bool enableBorderline);
   FeatureBuilder& SetTextureForFragmentShaderCheck(const Dali::Texture& texture);
   FeatureBuilder& EnableAlphaMaskingOnRendering(bool enableAlphaMaskingOnRendering);
+  FeatureBuilder& EnableYuvToRgb(bool enableYuvToRgb);
 
   TextureAtlas::Type            mTextureAtlas : 2;            ///< Whether use texture with atlas, or not. default as TextureAtlas::DISABLED
   DefaultTextureWrapMode::Type  mDefaultTextureWrapMode : 2;  ///< Whether apply to texture wraping in default, or not. default as DefaultTextureWrapMode::APPLY
   RoundedCorner::Type           mRoundedCorner : 2;           ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED
   Borderline::Type              mBorderline : 2;              ///< Whether use borderline, or not. default as Borderline::DISABLED
   AlphaMaskingOnRendering::Type mAlphaMaskingOnRendering : 2; ///< Whether use runtime alpha masking, or not. default as AlphaMaskingOnRendering::DISABLED
+  ColorConversion::Type         mColorConversion : 2;         ///< Whether the color format conversion is needed or not
   Dali::Texture                 mTexture;                     ///< Texture to check whether we need to change fragment shader or not
 };
 
@@ -146,7 +160,6 @@ struct FeatureBuilder
 class ImageVisualShaderFactory
 {
 public:
-
   /**
    * @brief Constructor
    */
@@ -189,7 +202,6 @@ protected:
   ImageVisualShaderFactory& operator=(const ImageVisualShaderFactory& rhs);
 
 private:
-
   /**
    * @brief Cached information whether native image should change fragment shader.
    * Default it is ChangeFragmentShader::UNDECIDED.
