@@ -100,8 +100,8 @@ TextureAsyncLoadingHelper::TextureAsyncLoadingHelper(
     this, &TextureAsyncLoadingHelper::AsyncLoadComplete);
 }
 
-void TextureAsyncLoadingHelper::AsyncLoadComplete(uint32_t                         id,
-                                                  std::vector<Devel::PixelBuffer>& pixelBuffers)
+void TextureAsyncLoadingHelper::AsyncLoadComplete(uint32_t           id,
+                                                  Devel::PixelBuffer pixelBuffer)
 {
   DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureAsyncLoadingHelper::AsyncLoadComplete( loadId :%d )\n", id);
   if(mLoadingInfoContainer.size() >= 1u)
@@ -112,7 +112,7 @@ void TextureAsyncLoadingHelper::AsyncLoadComplete(uint32_t                      
     if(loadingInfo.loadId == id)
     {
       // Call TextureManager::AsyncLoadComplete
-      mTextureManager.AsyncLoadComplete(loadingInfo.textureId, pixelBuffers[0]);
+      mTextureManager.AsyncLoadComplete(loadingInfo.textureId, pixelBuffer);
     }
 
     mLoadingInfoContainer.pop_front();
