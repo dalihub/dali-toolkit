@@ -9,6 +9,10 @@ INPUT mediump vec4 vCornerRadius;
 #endif
 
 uniform sampler2D sTexture;
+#ifdef IS_REQUIRED_YUV_TO_RGB
+uniform sampler2D sTextureU;
+uniform sampler2D sTextureV;
+#endif
 
 #ifdef IS_REQUIRED_ALPHA_MASKING
 uniform sampler2D sMaskTexture;
@@ -208,6 +212,20 @@ mediump float calculateCornerOpacity()
 }
 #endif
 
+#ifdef IS_REQUIRED_YUV_TO_RGB
+lowp vec3 ConvertYuvToRgb(mediump vec2 texCoord)
+{
+  lowp float y = texture(sTexture, texCoord).r;
+  lowp float u = texture(sTextureU, texCoord).r - 0.5;
+  lowp float v = texture(sTextureV, texCoord).r - 0.5;
+  lowp vec3 rgb;
+  rgb.r = y + (1.403 * v);
+  rgb.g = y - (0.344 * u) - (0.714 * v);
+  rgb.b = y + (1.770 * u);
+  return rgb;
+}
+#endif
+
 void main()
 {
 #ifdef ATLAS_DEFAULT_WARP
@@ -219,7 +237,11 @@ void main()
   mediump vec2 texCoord = vTexCoord;
 #endif
 
+#ifdef IS_REQUIRED_YUV_TO_RGB
+  lowp vec4 textureColor = vec4(ConvertYuvToRgb(texCoord), 1.0) * vec4( mixColor, 1.0 ) * uColor;
+#else
   lowp vec4 textureColor = TEXTURE( sTexture, texCoord ) * vec4( mixColor, 1.0 ) * uColor;
+#endif
 
 #ifdef IS_REQUIRED_ALPHA_MASKING
   mediump float maskAlpha = TEXTURE(sMaskTexture, vMaskTexCoord).a;

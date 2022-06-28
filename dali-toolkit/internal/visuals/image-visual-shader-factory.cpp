@@ -46,13 +46,14 @@ const int NATIVE_SHADER_TYPE_OFFSET = VisualFactoryCache::ShaderType::NATIVE_IMA
 // enum of required list when we select shader
 enum class ImageVisualRequireFlag : uint32_t
 {
-  DEFAULT        = 0,
-  ROUNDED_CORNER = 1 << 0,
-  BORDERLINE     = 1 << 1,
-  ALPHA_MASKING  = 1 << 2,
+  DEFAULT          = 0,
+  ROUNDED_CORNER   = 1 << 0,
+  BORDERLINE       = 1 << 1,
+  ALPHA_MASKING    = 1 << 2,
+  COLOR_CONVERSION = 1 << 3,
 };
 
-static constexpr auto          SHADER_TYPE_COUNT = 8u;
+static constexpr auto          SHADER_TYPE_COUNT = 12u;
 VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[SHADER_TYPE_COUNT] =
   {
     VisualFactoryCache::IMAGE_SHADER,
@@ -62,8 +63,11 @@ VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[SHADER_TYPE_COUNT] =
     VisualFactoryCache::IMAGE_SHADER_MASKING,
     VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_MASKING,
     VisualFactoryCache::IMAGE_SHADER_BORDERLINE_MASKING,
-    VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING};
-
+    VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING,
+    VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
+    VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
+    VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUV_TO_RGB,
+    VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_TO_RGB};
 } // unnamed namespace
 
 namespace ImageVisualShaderFeature
@@ -73,29 +77,40 @@ FeatureBuilder& FeatureBuilder::EnableTextureAtlas(bool enableAtlas)
   mTextureAtlas = (enableAtlas ? TextureAtlas::ENABLED : TextureAtlas::DISABLED);
   return *this;
 }
+
 FeatureBuilder& FeatureBuilder::ApplyDefaultTextureWrapMode(bool applyDefaultTextureWrapMode)
 {
   mDefaultTextureWrapMode = (applyDefaultTextureWrapMode ? DefaultTextureWrapMode::APPLY : DefaultTextureWrapMode::DO_NOT_APPLY);
   return *this;
 }
+
 FeatureBuilder& FeatureBuilder::EnableRoundedCorner(bool enableRoundedCorner)
 {
   mRoundedCorner = (enableRoundedCorner ? RoundedCorner::ENABLED : RoundedCorner::DISABLED);
   return *this;
 }
+
 FeatureBuilder& FeatureBuilder::EnableBorderline(bool enableBorderline)
 {
   mBorderline = (enableBorderline ? Borderline::ENABLED : Borderline::DISABLED);
   return *this;
 }
+
 FeatureBuilder& FeatureBuilder::SetTextureForFragmentShaderCheck(const Dali::Texture& texture)
 {
   mTexture = texture;
   return *this;
 }
+
 FeatureBuilder& FeatureBuilder::EnableAlphaMaskingOnRendering(bool enableAlphaMaskingOnRendering)
 {
   mAlphaMaskingOnRendering = (enableAlphaMaskingOnRendering ? AlphaMaskingOnRendering::ENABLED : AlphaMaskingOnRendering::DISABLED);
+  return *this;
+}
+
+FeatureBuilder& FeatureBuilder::EnableYuvToRgb(bool enableYuvToRgb)
+{
+  mColorConversion = (enableYuvToRgb ? ColorConversion::YUV_TO_RGB : ColorConversion::DONT_NEED);
   return *this;
 }
 } // namespace ImageVisualShaderFeature
@@ -119,9 +134,10 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
   const auto& roundedCorner           = featureBuilder.mRoundedCorner;
   const auto& borderline              = featureBuilder.mBorderline;
   const auto& alphaMaskingOnRendering = featureBuilder.mAlphaMaskingOnRendering;
+  const auto& colorConversion         = featureBuilder.mColorConversion;
   const auto& changeFragmentShader    = (featureBuilder.mTexture && DevelTexture::IsNative(featureBuilder.mTexture))
-                                       ? ImageVisualShaderFeature::ChangeFragmentShader::NEED_CHANGE
-                                       : ImageVisualShaderFeature::ChangeFragmentShader::DONT_CHANGE;
+                                          ? ImageVisualShaderFeature::ChangeFragmentShader::NEED_CHANGE
+                                          : ImageVisualShaderFeature::ChangeFragmentShader::DONT_CHANGE;
 
   if(atlasing == ImageVisualShaderFeature::TextureAtlas::ENABLED)
   {
@@ -148,6 +164,10 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     if(alphaMaskingOnRendering == ImageVisualShaderFeature::AlphaMaskingOnRendering::ENABLED)
     {
       shaderTypeFlag |= static_cast<uint32_t>(ImageVisualRequireFlag::ALPHA_MASKING);
+    }
+    else if(colorConversion == ImageVisualShaderFeature::ColorConversion::YUV_TO_RGB) // Not support gpu masking and color conversion at the same time now
+    {
+      shaderTypeFlag |= static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
     }
     shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
   }
@@ -191,6 +211,10 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
       {
         vertexShaderPrefixList += "#define IS_REQUIRED_ALPHA_MASKING\n";
         fragmentShaderPrefixList += "#define IS_REQUIRED_ALPHA_MASKING\n";
+      }
+      else if(colorConversion == ImageVisualShaderFeature::ColorConversion::YUV_TO_RGB)
+      {
+        fragmentShaderPrefixList += "#define IS_REQUIRED_YUV_TO_RGB\n";
       }
     }
 
