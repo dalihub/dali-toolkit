@@ -9,13 +9,14 @@ INPUT mediump vec4 vCornerRadius;
 
 uniform lowp vec4 uColor;
 uniform lowp vec3 mixColor;
-#ifdef IS_REQUIRED_BLUR
-uniform mediump float blurRadius;
-#elif defined(IS_REQUIRED_BORDERLINE)
+#if !defined(IS_REQUIRED_BLUR) && defined(IS_REQUIRED_BORDERLINE)
 uniform mediump float borderlineWidth;
 uniform mediump float borderlineOffset;
 uniform lowp vec4 borderlineColor;
 uniform lowp vec4 uActorColor;
+#endif
+#ifdef IS_REQUIRED_BLUR
+uniform mediump float blurRadius;
 #endif
 
 
@@ -57,8 +58,7 @@ void calculatePosition()
 {
   gFragmentPosition = abs(vPosition) - vRectSize;
   gCenterPosition = -gRadius;
-#ifdef IS_REQUIRED_BLUR
-#elif defined(IS_REQUIRED_BORDERLINE)
+#if !defined(IS_REQUIRED_BLUR) && defined(IS_REQUIRED_BORDERLINE)
   gCenterPosition += borderlineWidth * (clamp(borderlineOffset, -1.0, 1.0) + 1.0) * 0.5;
 #endif
   gDiff = gFragmentPosition - gCenterPosition;
@@ -76,10 +76,7 @@ void setupMinMaxPotential()
   gMaxOutlinePotential = gRadius + gPotentialRange;
   gMinOutlinePotential = gRadius - gPotentialRange;
 
-#ifdef IS_REQUIRED_BLUR
-  gMaxInlinePotential = gMaxOutlinePotential;
-  gMinInlinePotential = gMinOutlinePotential;
-#elif defined(IS_REQUIRED_BORDERLINE)
+#if !defined(IS_REQUIRED_BLUR) && defined(IS_REQUIRED_BORDERLINE)
   gMaxInlinePotential = gMaxOutlinePotential - borderlineWidth;
   gMinInlinePotential = gMinOutlinePotential - borderlineWidth;
 #else
@@ -102,8 +99,7 @@ void PreprocessPotential()
 }
 #endif
 
-#ifdef IS_REQUIRED_BLUR
-#elif defined(IS_REQUIRED_BORDERLINE)
+#if !defined(IS_REQUIRED_BLUR) && defined(IS_REQUIRED_BORDERLINE)
 lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 {
   mediump float potential = gPotential;
@@ -167,8 +163,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 }
 #endif
 
-#ifdef IS_REQUIRED_BLUR
-#elif defined(IS_REQUIRED_ROUNDED_CORNER)
+#if !defined(IS_REQUIRED_BLUR) && defined(IS_REQUIRED_ROUNDED_CORNER)
 mediump float calculateCornerOpacity()
 {
   mediump float potential = gPotential;
@@ -274,8 +269,7 @@ void main()
     PreprocessPotential();
 #endif
 
-#ifdef IS_REQUIRED_BLUR
-#elif defined(IS_REQUIRED_BORDERLINE)
+#if !defined(IS_REQUIRED_BLUR) && defined(IS_REQUIRED_BORDERLINE)
     targetColor = convertBorderlineColor(targetColor);
 #endif
     OUT_COLOR = targetColor;

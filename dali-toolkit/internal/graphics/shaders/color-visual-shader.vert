@@ -17,11 +17,12 @@ uniform highp vec2 size;
 uniform mediump vec4 offsetSizeMode;
 uniform mediump vec2 origin;
 uniform mediump vec2 anchorPoint;
-#ifdef IS_REQUIRED_BLUR
-uniform mediump float blurRadius;
-#elif defined(IS_REQUIRED_BORDERLINE)
+#if !defined(IS_REQUIRED_BLUR) && defined(IS_REQUIRED_BORDERLINE)
 uniform mediump float borderlineWidth;
 uniform mediump float borderlineOffset;
+#endif
+#ifdef IS_REQUIRED_BLUR
+uniform mediump float blurRadius;
 #endif
 #ifdef IS_REQUIRED_ROUNDED_CORNER
 uniform mediump vec4 cornerRadius;
@@ -40,9 +41,7 @@ vec4 ComputeVertexPosition()
 #endif
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-#ifdef IS_REQUIRED_BLUR
-  mediump float minSize = min(visualSize.x, visualSize.y);
-#elif defined(IS_REQUIRED_BORDERLINE)
+#if !defined(IS_REQUIRED_BLUR) && defined(IS_REQUIRED_BORDERLINE)
   mediump float minSize = min(visualSize.x, visualSize.y) + (1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth;
 #else
   mediump float minSize = min(visualSize.x, visualSize.y);
