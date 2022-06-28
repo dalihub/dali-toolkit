@@ -19,31 +19,26 @@
 
 // EXTERNAL INCLUDE
 #include <cstddef>
-#include <string>
 
 namespace Dali
 {
+
 namespace EnvironmentVariable
 {
+
 namespace
 {
-const char* gReturnValue = NULL;
-std::string gEnvironmentVariableName;
-std::string gEnvironmentVariableValue;
-} // namespace
+const char * gReturnValue = NULL;
+}
 
-const char* GetEnvironmentVariable(const char* variable)
+const char * GetEnvironmentVariable( const char * variable )
 {
-  if(gEnvironmentVariableName == variable)
-  {
-    return gEnvironmentVariableValue.c_str();
-  }
   return gReturnValue;
 }
 
-void SetTestingEnvironmentVariable(bool testing)
+void SetTestingEnvironmentVariable( bool testing)
 {
-  if(testing)
+  if( testing )
   {
     gReturnValue = "1";
   }
@@ -51,12 +46,6 @@ void SetTestingEnvironmentVariable(bool testing)
   {
     gReturnValue = NULL;
   }
-}
-
-void SetTestEnvironmentVariable(const char* variable, const char* value)
-{
-  gEnvironmentVariableName  = variable;
-  gEnvironmentVariableValue = value;
 }
 
 } // namespace EnvironmentVariable

@@ -236,15 +236,11 @@ void SvgRasterizeThread::RemoveTask(SvgVisual* visual)
   ConditionalWait::ScopedLock lock(mConditionalWait);
   if(!mRasterizeTasks.empty())
   {
-    for(std::vector<SvgTaskPtr>::iterator it = mRasterizeTasks.begin(), endIt = mRasterizeTasks.end(); it != endIt;)
+    for(std::vector<SvgTaskPtr>::iterator it = mRasterizeTasks.begin(), endIt = mRasterizeTasks.end(); it != endIt; ++it)
     {
       if((*it) && (*it)->GetSvgVisual() == visual)
       {
-        it = mRasterizeTasks.erase(it);
-      }
-      else
-      {
-        it++;
+        mRasterizeTasks.erase(it);
       }
     }
   }

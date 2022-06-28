@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ uint32_t Load(AsyncImageLoader                         asyncImageLoader,
               bool                                     orientationCorrection,
               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
-  return GetImplementation(asyncImageLoader).Load(Toolkit::Internal::VisualUrl(url), dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad, false);
+  return GetImplementation(asyncImageLoader).Load(Toolkit::Internal::VisualUrl(url), dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
 }
 
 uint32_t ApplyMask(AsyncImageLoader                         asyncImageLoader,

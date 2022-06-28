@@ -492,18 +492,14 @@ private:
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] orientationCorrection Whether to use image metadata to rotate or flip the image,
    *                                  e.g., from portrait to landscape
-   * @param[in] loadYuvPlanes         True if the image should be loaded as yuv planes
-   * @param[out] pixelBuffers         The image pixelBuffer
    * @return PixelBuffer of loaded image.
    */
-  void LoadImageSynchronously(
-    const VisualUrl&                 url,
-    const Dali::ImageDimensions&     desiredSize,
-    const Dali::FittingMode::Type&   fittingMode,
-    const Dali::SamplingMode::Type&  samplingMode,
-    const bool&                      orientationCorrection,
-    const bool&                      loadYuvPlanes,
-    std::vector<Devel::PixelBuffer>& pixelBuffers);
+  Devel::PixelBuffer LoadImageSynchronously(
+    const VisualUrl&                url,
+    const Dali::ImageDimensions&    desiredSize,
+    const Dali::FittingMode::Type&  fittingMode,
+    const Dali::SamplingMode::Type& samplingMode,
+    const bool&                     orientationCorrection);
 
 private:
   // Load and queue
@@ -563,11 +559,11 @@ private:
 
   /**
    * @brief Performs Post-Load steps including atlasing.
-   * @param[in] textureInfo  The struct associated with this Texture
-   * @param[in] pixelBuffers The image pixelBuffer
+   * @param[in] textureInfo The struct associated with this Texture
+   * @param[in] pixelBuffer The image pixelBuffer
    * @return    True if successful
    */
-  void PostLoad(TextureManager::TextureInfo& textureInfo, std::vector<Devel::PixelBuffer>& pixelBuffers);
+  void PostLoad(TextureManager::TextureInfo& textureInfo, Devel::PixelBuffer& pixelBuffer);
 
   /**
    * Check if there is a texture waiting to be masked. If there
@@ -592,13 +588,6 @@ private:
   void UploadTexture(Devel::PixelBuffer& pixelBuffer, TextureManager::TextureInfo& textureInfo);
 
   /**
-   * Upload the texture specified in pixelBuffer to the appropriate location
-   * @param[in] pixelBuffers The image data to upload
-   * @param[in] textureInfo  The texture info containing the location to store the data to.
-   */
-  void UploadTextures(std::vector<Devel::PixelBuffer>& pixelBuffers, TextureManager::TextureInfo& textureInfo);
-
-  /**
    * Notify the current observers that the texture upload is complete,
    * then remove the observers from the list.
    * @param[in] textureInfo The struct associated with this Texture
@@ -618,10 +607,10 @@ public:
   /**
    * @brief Common method to handle loading completion.
    * TextureAsyncLoadingHelper will call this API After async loading finished.
-   * @param[in] textureId    The ID of the texture load complete.
-   * @param[in] pixelBuffers The loaded image data
+   * @param[in] textureId   The ID of the texture load complete.
+   * @param[in] pixelBuffer The loaded image data
    */
-  void AsyncLoadComplete(const TextureManager::TextureId& textureId, std::vector<Devel::PixelBuffer>& pixelBuffers);
+  void AsyncLoadComplete(const TextureManager::TextureId& textureId, Devel::PixelBuffer pixelBuffer);
 
 private:
   /**
@@ -651,7 +640,6 @@ private:                                    // Member Variables:
   Dali::Vector<LoadQueueElement>          mLoadQueue;          ///< Queue of textures to load after NotifyObservers
   Dali::Vector<TextureManager::TextureId> mRemoveQueue;        ///< Queue of textures to remove after NotifyObservers
   bool                                    mQueueLoadFlag;      ///< Flag that causes Load Textures to be queued.
-  bool                                    mLoadYuvPlanes;      ///< A global flag to specify if the image should be loaded as yuv planes
 };
 
 } // namespace Internal

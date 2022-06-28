@@ -684,15 +684,7 @@ void ImageVisual::InitializeRenderer()
     mImpl->mRenderer.SetTextures(mTextures);
     ComputeTextureSize();
     CheckMaskTexture();
-
-    bool needToUpdateShader = DevelTexture::IsNative(mTextures.GetTexture(0));
-    if(mTextures.GetTextureCount() == 3)
-    {
-      //TODO: need to check pixel format yuv. Now we can't get the format of the texture.
-      mNeedYuvToRgb      = true;
-      needToUpdateShader = true;
-    }
-    if(needToUpdateShader)
+    if(DevelTexture::IsNative(mTextures.GetTexture(0)))
     {
       UpdateShader();
     }
@@ -914,13 +906,6 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
       mImpl->mRenderer.SetTextures(textureInformation.textureSet);
       ComputeTextureSize();
       CheckMaskTexture();
-
-      if(textureInformation.textureSet.GetTextureCount() == 3)
-      {
-        //TODO: need to check pixel format yuv. Now we can't get the format of the texture.
-        mNeedYuvToRgb = true;
-        UpdateShader();
-      }
     }
 
     if(actor)
@@ -1083,8 +1068,7 @@ Shader ImageVisual::GenerateShader() const
         .EnableRoundedCorner(IsRoundedCornerRequired())
         .EnableBorderline(IsBorderlineRequired())
         .SetTextureForFragmentShaderCheck(useNativeImage ? mTextures.GetTexture(0) : Dali::Texture())
-        .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering)
-        .EnableYuvToRgb(mNeedYuvToRgb));
+        .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering));
   }
   else
   {

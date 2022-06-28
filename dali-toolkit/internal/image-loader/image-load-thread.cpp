@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 #include "image-load-thread.h"
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
 namespace Dali
 {
@@ -32,85 +32,83 @@ namespace Toolkit
 namespace Internal
 {
 LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
-: url(),
+: pixelBuffer(),
+  url(),
   encodedImageBuffer(),
   id(id),
   dimensions(),
   fittingMode(),
   samplingMode(),
+  orientationCorrection(),
   preMultiplyOnLoad(preMultiplyOnLoad),
+  isMaskTask(false),
   maskPixelBuffer(),
   contentScale(1.0f),
-  animatedImageLoading(animatedImageLoading),
-  frameIndex(frameIndex),
-  orientationCorrection(),
-  isMaskTask(false),
   cropToMask(false),
-  loadPlanes(false)
+  animatedImageLoading(animatedImageLoading),
+  frameIndex(frameIndex)
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes)
-: url(url),
+LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
+: pixelBuffer(),
+  url(url),
   encodedImageBuffer(),
   id(id),
   dimensions(dimensions),
   fittingMode(fittingMode),
   samplingMode(samplingMode),
+  orientationCorrection(orientationCorrection),
   preMultiplyOnLoad(preMultiplyOnLoad),
+  isMaskTask(false),
   maskPixelBuffer(),
   contentScale(1.0f),
-  animatedImageLoading(),
-  frameIndex(0u),
-  orientationCorrection(orientationCorrection),
-  isMaskTask(false),
   cropToMask(false),
-  loadPlanes(loadPlanes)
+  animatedImageLoading(),
+  frameIndex(0u)
 {
 }
 
 LoadingTask::LoadingTask(uint32_t id, const EncodedImageBuffer& encodedImageBuffer, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
-: url(),
+: pixelBuffer(),
+  url(),
   encodedImageBuffer(encodedImageBuffer),
   id(id),
   dimensions(dimensions),
   fittingMode(fittingMode),
   samplingMode(samplingMode),
+  orientationCorrection(orientationCorrection),
   preMultiplyOnLoad(preMultiplyOnLoad),
+  isMaskTask(false),
   maskPixelBuffer(),
   contentScale(1.0f),
-  animatedImageLoading(),
-  frameIndex(0u),
-  orientationCorrection(orientationCorrection),
-  isMaskTask(false),
   cropToMask(false),
-  loadPlanes(false)
+  animatedImageLoading(),
+  frameIndex(0u)
 {
 }
 
 LoadingTask::LoadingTask(uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
-: url(""),
+: pixelBuffer(pixelBuffer),
+  url(""),
   encodedImageBuffer(),
   id(id),
   dimensions(),
   fittingMode(),
   samplingMode(),
+  orientationCorrection(),
   preMultiplyOnLoad(preMultiplyOnLoad),
+  isMaskTask(true),
   maskPixelBuffer(maskPixelBuffer),
   contentScale(contentScale),
-  animatedImageLoading(),
-  frameIndex(0u),
-  orientationCorrection(),
-  isMaskTask(true),
   cropToMask(cropToMask),
-  loadPlanes(false)
+  animatedImageLoading(),
+  frameIndex(0u)
 {
-  pixelBuffers.push_back(pixelBuffer);
 }
 
 void LoadingTask::Load()
 {
-  Devel::PixelBuffer pixelBuffer;
   if(animatedImageLoading)
   {
     pixelBuffer = animatedImageLoading.LoadFrame(frameIndex);
@@ -121,26 +119,14 @@ void LoadingTask::Load()
   }
   else if(url.IsValid() && url.IsLocalResource())
   {
-    if(loadPlanes)
-    {
-      Dali::LoadImagePlanesFromFile(url.GetUrl(), pixelBuffers, dimensions, fittingMode, samplingMode, orientationCorrection);
-    }
-    else
-    {
-      pixelBuffer = Dali::LoadImageFromFile(url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection);
-    }
+    pixelBuffer = Dali::LoadImageFromFile(url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection);
   }
   else if(url.IsValid())
   {
     pixelBuffer = Dali::DownloadImageSynchronously(url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection);
   }
 
-  if(pixelBuffer)
-  {
-    pixelBuffers.push_back(pixelBuffer);
-  }
-
-  if(pixelBuffers.empty())
+  if(!pixelBuffer)
   {
     DALI_LOG_ERROR("LoadingTask::Load: Loading is failed: %s\n", url.GetUrl().c_str());
   }
@@ -148,19 +134,16 @@ void LoadingTask::Load()
 
 void LoadingTask::ApplyMask()
 {
-  if(!pixelBuffers.empty())
-  {
-    pixelBuffers[0].ApplyMask(maskPixelBuffer, contentScale, cropToMask);
-  }
+  pixelBuffer.ApplyMask(maskPixelBuffer, contentScale, cropToMask);
 }
 
 void LoadingTask::MultiplyAlpha()
 {
-  if(!pixelBuffers.empty() && Pixel::HasAlpha(pixelBuffers[0].GetPixelFormat()))
+  if(pixelBuffer && Pixel::HasAlpha(pixelBuffer.GetPixelFormat()))
   {
     if(preMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
     {
-      pixelBuffers[0].MultiplyColorByAlpha();
+      pixelBuffer.MultiplyColorByAlpha();
     }
   }
 }

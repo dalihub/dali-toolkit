@@ -346,7 +346,6 @@ private:
   TextureManager::LoadState                       mLoadState;             ///< The texture loading state
   bool                                            mAttemptAtlasing;       ///< If true will attempt atlasing, otherwise create unique texture
   bool                                            mOrientationCorrection; ///< true if the image will have it's orientation corrected.
-  bool                                            mNeedYuvToRgb{false};   ///< true if we need to convert yuv to rgb.
 };
 
 } // namespace Internal

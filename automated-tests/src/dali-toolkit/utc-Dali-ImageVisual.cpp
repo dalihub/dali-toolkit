@@ -20,7 +20,6 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 
-#include <toolkit-environment-variable.h>
 #include <toolkit-event-thread-callback.h>
 #include <toolkit-timer.h>
 
@@ -61,9 +60,6 @@ const char* TEST_INVALID_FILE_NAME        = TEST_RESOURCE_DIR "/invalid.jpg";
 const char* TEST_REMOTE_INVALID_FILE_NAME = "https://www.tizen.org/invalid.png";
 const char* TEST_MASK_IMAGE_FILE_NAME     = TEST_RESOURCE_DIR "/mask.png";
 const char* TEST_ROTATED_IMAGE            = TEST_RESOURCE_DIR "/keyboard-Landscape.jpg";
-const char* TEST_YUV420_IMAGE_FILE_NAME   = TEST_RESOURCE_DIR "/gallery-small-1-yuv420.jpg";
-
-constexpr auto LOAD_IMAGE_YUV_PLANES_ENV = "DALI_LOAD_IMAGE_YUV_PLANES_ENV";
 
 bool             gResourceReadySignalFired = false;
 std::vector<int> gReadyIds                 = {};
@@ -1698,7 +1694,7 @@ int UtcDaliImageVisualAlphaMask02(void)
   application.Render();
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  Renderer   renderer = actor.GetRendererAt(0u);
+  Renderer renderer = actor.GetRendererAt(0u);
   TextureSet textures = renderer.GetTextures();
   DALI_TEST_CHECK(textures);
   DALI_TEST_EQUALS(textures.GetTextureCount(), 2u, TEST_LOCATION);
@@ -1757,7 +1753,7 @@ int UtcDaliImageVisualAlphaMask03(void)
   application.Render();
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  Renderer   renderer = actor.GetRendererAt(0u);
+  Renderer renderer = actor.GetRendererAt(0u);
   TextureSet textures = renderer.GetTextures();
   DALI_TEST_CHECK(textures);
   DALI_TEST_EQUALS(textures.GetTextureCount(), 1u, TEST_LOCATION);
@@ -1869,7 +1865,7 @@ int UtcDaliImageVisualSynchronousLoadAlphaMask02(void)
   application.Render();
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  Renderer   renderer = actor.GetRendererAt(0u);
+  Renderer renderer = actor.GetRendererAt(0u);
   TextureSet textures = renderer.GetTextures();
   DALI_TEST_CHECK(textures);
   DALI_TEST_EQUALS(textures.GetTextureCount(), 2u, TEST_LOCATION);
@@ -2922,131 +2918,6 @@ int UtcDaliImageVisualLoadReady01(void)
   application.SendNotification();
   DALI_TEST_EQUALS(gReadyIds.size(), 2, TEST_LOCATION);
   DALI_TEST_EQUALS(gReadyIds[1], actor2Id, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliImageVisualLoadImagePlanes01(void)
-{
-  EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
-
-  ToolkitTestApplication application;
-
-  VisualFactory factory = VisualFactory::Get();
-  DALI_TEST_CHECK(factory);
-
-  Property::Map propertyMap;
-  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
-  propertyMap.Insert(ImageVisual::Property::URL, TEST_YUV420_IMAGE_FILE_NAME);
-
-  Visual::Base visual = factory.CreateVisual(propertyMap);
-  DALI_TEST_CHECK(visual);
-
-  DummyControl      actor     = DummyControl::New();
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
-  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
-  application.GetScene().Add(actor);
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  TestGlAbstraction& gl           = application.GetGlAbstraction();
-  TraceCallStack&    textureTrace = gl.GetTextureTrace();
-  textureTrace.Enable(true);
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 3, TEST_LOCATION);
-
-  Renderer renderer           = actor.GetRendererAt(0);
-  auto     preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
-  DALI_TEST_EQUALS(preMultipliedAlpha, false, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliImageVisualLoadImagePlanes02(void)
-{
-  EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
-
-  ToolkitTestApplication application;
-
-  VisualFactory factory = VisualFactory::Get();
-  DALI_TEST_CHECK(factory);
-
-  // Alpha masking case - not support yuv planes
-  Property::Map propertyMap;
-  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
-  propertyMap.Insert(ImageVisual::Property::URL, TEST_YUV420_IMAGE_FILE_NAME);
-  propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME);
-
-  Visual::Base visual = factory.CreateVisual(propertyMap);
-  DALI_TEST_CHECK(visual);
-
-  DummyControl      actor     = DummyControl::New();
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
-  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
-  application.GetScene().Add(actor);
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
-
-  TestGlAbstraction& gl           = application.GetGlAbstraction();
-  TraceCallStack&    textureTrace = gl.GetTextureTrace();
-  textureTrace.Enable(true);
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 1, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliImageVisualLoadImagePlanes03(void)
-{
-  EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
-
-  ToolkitTestApplication application;
-
-  VisualFactory factory = VisualFactory::Get();
-  DALI_TEST_CHECK(factory);
-
-  TestGlAbstraction& gl           = application.GetGlAbstraction();
-  TraceCallStack&    textureTrace = gl.GetTextureTrace();
-  textureTrace.Enable(true);
-
-  Property::Map propertyMap;
-  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
-  propertyMap.Insert(ImageVisual::Property::URL, TEST_YUV420_IMAGE_FILE_NAME);
-  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
-
-  Visual::Base visual = factory.CreateVisual(propertyMap);
-  DALI_TEST_CHECK(visual);
-
-  DummyControl      actor     = DummyControl::New();
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
-  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
-  application.GetScene().Add(actor);
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 3, TEST_LOCATION);
 
   END_TEST;
 }

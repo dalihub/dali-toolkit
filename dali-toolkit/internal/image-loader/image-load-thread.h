@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_LOAD_THREAD_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
-#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
 namespace Dali
 {
@@ -63,7 +63,6 @@ struct LoadingTask
    * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * @param [in] preMultiplyOnLoad ON if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
-   * @param [in] loadPlanes true to load image planes or false to load bitmap image.
    */
   LoadingTask(uint32_t                                 id,
               const VisualUrl&                         url,
@@ -71,8 +70,7 @@ struct LoadingTask
               FittingMode::Type                        fittingMode,
               SamplingMode::Type                       samplingMode,
               bool                                     orientationCorrection,
-              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
-              bool                                     loadPlanes);
+              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
   /**
    * Constructor.
@@ -131,25 +129,23 @@ private:
   LoadingTask& operator=(const LoadingTask& queue);
 
 public:
-  std::vector<Devel::PixelBuffer> pixelBuffers{};              ///< pixelBuffer handle after successful load
-                                                               ///< or pixelBuffer to be masked image in the mask task
-  VisualUrl                                url;                ///< url of the image to load
-  EncodedImageBuffer                       encodedImageBuffer; ///< encoded buffer of the image to load
-  uint32_t                                 id;                 ///< The unique id associated with this task.
-  ImageDimensions                          dimensions;         ///< dimensions to load
-  FittingMode::Type                        fittingMode;        ///< fitting options
-  SamplingMode::Type                       samplingMode;       ///< sampling options
-  DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad;  ///< if the image's color should be multiplied by it's alpha
+  Devel::PixelBuffer pixelBuffer;                                     ///< pixelBuffer handle after successful load
+                                                                      ///< or pixelBuffer to be masked image in the mask task
+  VisualUrl                                url;                       ///< url of the image to load
+  EncodedImageBuffer                       encodedImageBuffer;        ///< encoded buffer of the image to load
+  uint32_t                                 id;                        ///< The unique id associated with this task.
+  ImageDimensions                          dimensions;                ///< dimensions to load
+  FittingMode::Type                        fittingMode;               ///< fitting options
+  SamplingMode::Type                       samplingMode;              ///< sampling options
+  bool                                     orientationCorrection : 1; ///< if orientation correction is needed
+  DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad;         //< if the image's color should be multiplied by it's alpha
 
+  bool                       isMaskTask;      ///< whether this task is for mask or not
   Devel::PixelBuffer         maskPixelBuffer; ///< pixelBuffer of mask image
   float                      contentScale;    ///< The factor to scale the content
+  bool                       cropToMask;      ///< Whether to crop the content to the mask size
   Dali::AnimatedImageLoading animatedImageLoading;
   uint32_t                   frameIndex;
-
-  bool orientationCorrection : 1; ///< if orientation correction is needed
-  bool isMaskTask : 1;            ///< whether this task is for mask or not
-  bool cropToMask : 1;            ///< Whether to crop the content to the mask size
-  bool loadPlanes : 1;            ///< Whether to load image planes
 };
 
 /**

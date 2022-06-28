@@ -160,7 +160,7 @@ bool ImageAtlas::Upload(Vector4&             textureRect,
   uint32_t packPositionY = 0;
   if(mPacker.Pack(dimensions.GetWidth(), dimensions.GetHeight(), packPositionX, packPositionY))
   {
-    uint32_t loadId = GetImplementation(mAsyncLoader).Load(url, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, false);
+    uint32_t loadId = GetImplementation(mAsyncLoader).Load(url, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
     mLoadingTaskInfoContainer.PushBack(new LoadingTaskInfo(loadId, packPositionX, packPositionY, dimensions.GetWidth(), dimensions.GetHeight(), atlasUploadObserver));
     // apply the half pixel correction
     textureRect.x = (static_cast<float>(packPositionX) + 0.5f) / mWidth;                      // left

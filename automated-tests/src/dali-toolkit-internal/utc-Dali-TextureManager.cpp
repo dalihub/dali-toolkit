@@ -760,11 +760,8 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedLater(void)
       true, ///< orientationCorrection
       preMultiply);
 
-    std::vector<Devel::PixelBuffer> pixelBuffers;
-    pixelBuffers.push_back(pixelBuffer);
-    textureManager.AsyncLoadComplete(textureId, pixelBuffers);
-    std::vector<Devel::PixelBuffer> maskBuffers;
-    textureManager.AsyncLoadComplete(maskInfo->mAlphaMaskId, maskBuffers);
+    textureManager.AsyncLoadComplete(textureId, pixelBuffer);
+    textureManager.AsyncLoadComplete(maskInfo->mAlphaMaskId, Dali::Devel::PixelBuffer());
     textureManager.Remove(maskInfo->mAlphaMaskId, nullptr);
     textureManager.Remove(textureId, &observer);
   }
@@ -1219,8 +1216,7 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
   // ApplyMask event come back, and do nothing.
   // CAPTION : HARD-CODING.
   {
-    std::vector<Devel::PixelBuffer> pixelBuffers;
-    textureManager.AsyncLoadComplete(textureId1, pixelBuffers);
+    textureManager.AsyncLoadComplete(textureId1, Dali::Devel::PixelBuffer());
     textureManager.Remove(maskInfo->mAlphaMaskId, nullptr);
   }
 
@@ -1234,8 +1230,7 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
 
   // CAPTION : HARD-CODING.
   {
-    std::vector<Devel::PixelBuffer> pixelBuffers;
-    textureManager.AsyncLoadComplete(textureId2, pixelBuffers);
+    textureManager.AsyncLoadComplete(textureId2, Dali::Devel::PixelBuffer());
     textureManager.Remove(textureId2, &observer2);
   }
 

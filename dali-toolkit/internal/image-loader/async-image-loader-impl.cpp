@@ -65,15 +65,14 @@ uint32_t AsyncImageLoader::Load(const VisualUrl&                         url,
                                 FittingMode::Type                        fittingMode,
                                 SamplingMode::Type                       samplingMode,
                                 bool                                     orientationCorrection,
-                                DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
-                                bool                                     loadPlanes)
+                                DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
   if(!mIsLoadThreadStarted)
   {
     mLoadThread.Start();
     mIsLoadThreadStarted = true;
   }
-  mLoadThread.AddTask(new LoadingTask(++mLoadTaskId, url, dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad, loadPlanes));
+  mLoadThread.AddTask(new LoadingTask(++mLoadTaskId, url, dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad));
 
   return mLoadTaskId;
 }
@@ -137,14 +136,15 @@ void AsyncImageLoader::ProcessLoadedImage()
   {
     if(mPixelBufferLoadedSignal.GetConnectionCount() > 0)
     {
-      mPixelBufferLoadedSignal.Emit(next->id, next->pixelBuffers);
+      std::vector<Devel::PixelBuffer> pixelBuffers{next->pixelBuffer};
+      mPixelBufferLoadedSignal.Emit(next->id, pixelBuffers);
     }
     else if(mLoadedSignal.GetConnectionCount() > 0)
     {
       PixelData pixelData;
-      if(!next->pixelBuffers.empty())
+      if(next->pixelBuffer)
       {
-        pixelData = Devel::PixelBuffer::Convert(next->pixelBuffers[0]);
+        pixelData = Devel::PixelBuffer::Convert(next->pixelBuffer);
       }
       mLoadedSignal.Emit(next->id, pixelData);
     }

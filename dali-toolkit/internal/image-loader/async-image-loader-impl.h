@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ASYNC_IMAGE_LOADER_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,23 +53,14 @@ public:
                              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
   /**
-   * @brief Starts an image loading task.
-   * @param[in] url The URL of the image file to load
-   * @param[in] dimensions The width and height to fit the loaded image to
-   * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
-   * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
-   * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
-   * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
-   * @param[in] loadPlanes true to load image planes or false to load bitmap image.
-   * @return The loading task id
+   * @copydoc Toolkit::AsyncImageLoader::Load( const std::string&, ImageDimensions, FittingMode::Type, SamplingMode::Type, bool , DevelAsyncImageLoader::PreMultiplyOnLoad )
    */
   uint32_t Load(const VisualUrl&                         url,
                 ImageDimensions                          dimensions,
                 FittingMode::Type                        fittingMode,
                 SamplingMode::Type                       samplingMode,
                 bool                                     orientationCorrection,
-                DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
-                bool                                     loadPlanes);
+                DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
   /**
    * @brief Starts an image loading task by encoded image buffer.
