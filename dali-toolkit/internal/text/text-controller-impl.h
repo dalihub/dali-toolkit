@@ -832,6 +832,11 @@ struct Controller::Impl
   void ScrollBy(Vector2 scroll);
 
   /**
+   * @copydoc Controller::IsScrollable()
+   */
+  bool IsScrollable(const Vector2& displacement);
+
+  /**
    * @copydoc Controller::GetHorizontalScrollPosition()
    */
   float GetHorizontalScrollPosition();
