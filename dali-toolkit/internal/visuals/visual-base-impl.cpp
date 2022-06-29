@@ -27,6 +27,7 @@
 #include <dali/public-api/rendering/visual-renderer.h>
 
 //INTERNAL HEARDER
+#include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/helpers/property-helper.h>
@@ -295,7 +296,7 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           mImpl->mBorderlineWidth = width;
         }
 
-        if(DALI_UNLIKELY(mImpl->mRenderer))
+        if(DALI_UNLIKELY(mImpl->mRenderer && IsTypeAvailableForBorderline(mImpl->mType)))
         {
           // Unusual case. SetProperty called after OnInitialize().
           // Assume that DoAction call UPDATE_PROPERTY.
@@ -328,7 +329,7 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           mImpl->mBorderlineColor = color;
         }
 
-        if(DALI_UNLIKELY(mImpl->mRenderer))
+        if(DALI_UNLIKELY(mImpl->mRenderer && IsTypeAvailableForBorderline(mImpl->mType)))
         {
           // Unusual case. SetProperty called after OnInitialize().
           // Assume that DoAction call UPDATE_PROPERTY.
@@ -344,7 +345,7 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           mImpl->mBorderlineOffset = offset;
         }
 
-        if(DALI_UNLIKELY(mImpl->mRenderer))
+        if(DALI_UNLIKELY(mImpl->mRenderer && IsTypeAvailableForBorderline(mImpl->mType)))
         {
           // Unusual case. SetProperty called after OnInitialize().
           // Assume that DoAction call UPDATE_PROPERTY.
@@ -376,7 +377,7 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           }
         }
 
-        if(DALI_UNLIKELY(mImpl->mRenderer))
+        if(DALI_UNLIKELY(mImpl->mRenderer && IsTypeAvailableForCornerRadius(mImpl->mType)))
         {
           // Unusual case. SetProperty called after OnInitialize().
           // Assume that DoAction call UPDATE_PROPERTY.
@@ -1233,16 +1234,32 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
       }
       break;
     }
-    // Special case for MIX_COLOR
     default:
     {
+      // Special case for MIX_COLOR
       if(key.type == Property::Key::INDEX &&
          ((mImpl->mType == Toolkit::Visual::COLOR && key.indexKey == ColorVisual::Property::MIX_COLOR) ||
           (mImpl->mType == Toolkit::Visual::PRIMITIVE && key.indexKey == PrimitiveVisual::Property::MIX_COLOR)))
       {
         return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::VISUAL_MIX_COLOR);
       }
+
+      // Special case for BLUR_RADIUS
+      if(mImpl->mType == Toolkit::Visual::COLOR &&
+         ((key.type == Property::Key::INDEX && key.indexKey == DevelColorVisual::Property::BLUR_RADIUS) ||
+          (key.type == Property::Key::STRING && key.stringKey == BLUR_RADIUS_NAME)))
+      {
+        // Request to color-visual class
+        return OnGetPropertyObject(key);
+      }
     }
+  }
+
+  // If it is not VisualRenderer property, check registered Renderer and Shader property.
+  Property::Index index = GetPropertyIndex(key);
+  if(index != Property::INVALID_INDEX)
+  {
+    return Dali::Property(mImpl->mRenderer, index);
   }
 
   // We can't find the property in the base class.
