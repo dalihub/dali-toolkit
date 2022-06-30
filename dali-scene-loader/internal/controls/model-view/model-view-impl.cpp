@@ -19,8 +19,6 @@
 #include "model-view-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
@@ -41,6 +39,8 @@
 #include <dali-scene-loader/public-api/scene-definition.h>
 #include <dali-scene-loader/public-api/shader-definition-factory.h>
 #include <dali-scene-loader/public-api/controls/model-view/model-view.h>
+#include <dali-scene-loader/public-api/cube-map-loader.h>
+#include <dali-scene-loader/public-api/cube-data.h>
 
 using namespace Dali;
 
@@ -115,22 +115,15 @@ struct BoundingVolume
 
 Texture LoadCubeMap(const std::string& cubeMapPath)
 {
-  std::filesystem::path modelPath(cubeMapPath);
-  std::string           extension = modelPath.extension();
-  std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-
-  Texture cubeTexture;
-  if(extension == KTX_EXTENSION)
+  Texture               cubeTexture;
+  SceneLoader::CubeData cubeData;
+  if(SceneLoader::LoadCubeMapData(cubeMapPath, cubeData))
   {
-    SceneLoader::CubeData cubeData;
-    if(SceneLoader::LoadCubeMapData(cubeMapPath, cubeData))
-    {
-      cubeTexture = cubeData.CreateTexture();
-    }
-    else
-    {
-      DALI_LOG_ERROR("Fail to load cube map, %s\n", cubeMapPath.c_str());
-    }
+    cubeTexture = cubeData.CreateTexture();
+  }
+  else
+  {
+    DALI_LOG_ERROR("Fail to load cube map, %s\n", cubeMapPath.c_str());
   }
 
   return cubeTexture;

@@ -22,6 +22,7 @@
 // INTERNAL INCLUDES
 #include "dali-scene-loader/public-api/environment-definition.h"
 #include "dali-scene-loader/public-api/utils.h"
+#include "dali-scene-loader/public-api/cube-map-loader.h"
 
 namespace
 {

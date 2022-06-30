@@ -19,7 +19,7 @@
 
 // INTERNAL INCLUDES
 #include "dali-scene-loader/public-api/api.h"
-#include "dali-scene-loader/public-api/ktx-loader.h"
+#include "dali-scene-loader/public-api/cube-data.h"
 
 // EXTERNAL INCLUDES
 #include "dali/public-api/math/quaternion.h"
