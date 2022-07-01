@@ -217,7 +217,7 @@ struct AtlasRenderer::Impl
 
         uint32_t glyphBufferSize = glyphBufferData.width * glyphBufferData.height * Pixel::GetBytesPerPixel(glyphBufferData.format);
         // If glyph buffer data don't have ownership, Or if we need to decompress, create new memory and replace ownership.
-        if(!glyphBufferData.isBufferOwned || glyphBufferData.compressType != TextAbstraction::FontClient::GlyphBufferData::CompressType::NO_COMPRESS)
+        if(!glyphBufferData.isBufferOwned || glyphBufferData.compressionType != TextAbstraction::FontClient::GlyphBufferData::CompressionType::NO_COMPRESSION)
         {
           uint8_t* newBuffer = (uint8_t*)malloc(glyphBufferSize);
           if(DALI_LIKELY(newBuffer != nullptr))
@@ -228,9 +228,9 @@ struct AtlasRenderer::Impl
               // Release previous buffer
               free(glyphBufferData.buffer);
             }
-            glyphBufferData.isBufferOwned = true;
-            glyphBufferData.buffer        = newBuffer;
-            glyphBufferData.compressType  = TextAbstraction::FontClient::GlyphBufferData::CompressType::NO_COMPRESS;
+            glyphBufferData.isBufferOwned   = true;
+            glyphBufferData.buffer          = newBuffer;
+            glyphBufferData.compressionType = TextAbstraction::FontClient::GlyphBufferData::CompressionType::NO_COMPRESSION;
           }
         }
 

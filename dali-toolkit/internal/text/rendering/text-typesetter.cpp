@@ -137,7 +137,7 @@ void TypesetGlyph(GlyphData& __restrict__ data,
     uint32_t glyphOffet = 0u;
 
     // Allocate scanline memory for glyph bitmap if we need.
-    const bool useLocalScanline         = data.glyphBitmap.compressType != TextAbstraction::FontClient::GlyphBufferData::CompressType::NO_COMPRESS;
+    const bool useLocalScanline         = data.glyphBitmap.compressionType != TextAbstraction::FontClient::GlyphBufferData::CompressionType::NO_COMPRESSION;
     uint8_t* __restrict__ glyphScanline = useLocalScanline ? (uint8_t*)malloc(data.glyphBitmap.width * glyphPixelSize) : data.glyphBitmap.buffer;
 
     // Precalculate input color's packed result.
@@ -298,7 +298,7 @@ void TypesetGlyph(GlyphData& __restrict__ data,
       uint32_t glyphOffet = 0u;
 
       // Allocate scanline memory for glyph bitmap if we need.
-      const bool useLocalScanline         = data.glyphBitmap.compressType != TextAbstraction::FontClient::GlyphBufferData::CompressType::NO_COMPRESS;
+      const bool useLocalScanline         = data.glyphBitmap.compressionType != TextAbstraction::FontClient::GlyphBufferData::CompressionType::NO_COMPRESSION;
       uint8_t* __restrict__ glyphScanline = useLocalScanline ? (uint8_t*)malloc(data.glyphBitmap.width * glyphPixelSize) : data.glyphBitmap.buffer;
 
       // Skip basic line.
