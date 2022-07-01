@@ -52,7 +52,7 @@ void BlendShapes::ConfigureProperties(const std::pair<MeshDefinition, MeshGeomet
     std::string weightName{weightNameBuffer};
     actor.RegisterProperty(weightName, blendShape.weight);
 
-    if(mesh.first.mBlendShapeVersion == Version::VERSION_1_0)
+    if(shader && mesh.first.mBlendShapeVersion == Version::VERSION_1_0)
     {
       snprintf(pFactorName, sizeof(unnormalizeFactorNameBuffer) - (pFactorName - unnormalizeFactorNameBuffer), "[%d]", index);
       std::string factorName{unnormalizeFactorNameBuffer};
@@ -62,22 +62,25 @@ void BlendShapes::ConfigureProperties(const std::pair<MeshDefinition, MeshGeomet
     ++index;
   }
 
-  if(Version::VERSION_2_0 == mesh.first.mBlendShapeVersion)
+  if(shader)
   {
-    shader.RegisterProperty(UNNORMALIZE_FACTOR, mesh.second.blendShapeUnnormalizeFactor[0u]);
-  }
+    if(Version::VERSION_2_0 == mesh.first.mBlendShapeVersion)
+    {
+      shader.RegisterProperty(UNNORMALIZE_FACTOR, mesh.second.blendShapeUnnormalizeFactor[0u]);
+    }
 
-  shader.RegisterProperty(NUMBER_OF_BLEND_SHAPES, Property::Value(static_cast<int>(index)));
-  shader.RegisterProperty(COMPONENT_SIZE, Property::Value(static_cast<int>(mesh.second.blendShapeBufferOffset)));
+    shader.RegisterProperty(NUMBER_OF_BLEND_SHAPES, Property::Value(static_cast<int>(index)));
+    shader.RegisterProperty(COMPONENT_SIZE, Property::Value(static_cast<int>(mesh.second.blendShapeBufferOffset)));
 
-  // Create a read only property to preserve the components of the blend shape.
-  int32_t components = 0x0;
-  for(auto& bs : mesh.first.mBlendShapes)
-  {
-    components |= (bs.deltas.IsDefined() * Component::POSITIONS) |
-                  (bs.normals.IsDefined() * Component::NORMALS) | (bs.tangents.IsDefined() * Component::TANGENTS);
+    // Create a read only property to preserve the components of the blend shape.
+    int32_t components = 0x0;
+    for(auto& bs : mesh.first.mBlendShapes)
+    {
+      components |= (bs.deltas.IsDefined() * Component::POSITIONS) |
+                    (bs.normals.IsDefined() * Component::NORMALS) | (bs.tangents.IsDefined() * Component::TANGENTS);
+    }
+    shader.RegisterProperty(COMPONENTS, components, Property::AccessMode::READ_ONLY);
   }
-  shader.RegisterProperty(COMPONENTS, components, Property::AccessMode::READ_ONLY);
 }
 
 } // namespace SceneLoader
