@@ -239,10 +239,10 @@ public:
   NPatchLoader& GetNPatchLoader();
 
   /**
-   * Get the SVG rasterization thread.
-   * @return A raw pointer pointing to the SVG rasterization thread.
+   * Get the SVG rasterization manager.
+   * @return A raw pointer pointing to the SVG rasterization manager.
    */
-  SvgRasterizeThread* GetSVGRasterizationThread();
+  SvgRasterizeManager* GetSVGRasterizationManager();
 
   /**
    * Get the vector animation manager.
@@ -342,7 +342,7 @@ private:
   TextureManager       mTextureManager;
   NPatchLoader         mNPatchLoader;
 
-  SvgRasterizeThread*                     mSvgRasterizeThread;
+  std::unique_ptr<SvgRasterizeManager>    mSvgRasterizeManager;
   std::unique_ptr<VectorAnimationManager> mVectorAnimationManager;
   bool                                    mPreMultiplyOnLoad;
   std::vector<BrokenImageInfo>            mBrokenImageInfoContainer;

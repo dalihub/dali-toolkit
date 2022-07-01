@@ -100,7 +100,7 @@ void SvgVisual::OnInitialize()
   }
   else
   {
-    mFactoryCache.GetSVGRasterizationThread()->AddTask(newTask);
+    mFactoryCache.GetSVGRasterizationManager()->AddTask(newTask);
   }
 }
 
@@ -191,7 +191,7 @@ void SvgVisual::DoSetOnScene(Actor& actor)
 
 void SvgVisual::DoSetOffScene(Actor& actor)
 {
-  mFactoryCache.GetSVGRasterizationThread()->RemoveTask(this);
+  mFactoryCache.GetSVGRasterizationManager()->RemoveTask(this);
 
   actor.RemoveRenderer(mImpl->mRenderer);
   mPlacementActor.Reset();
@@ -266,7 +266,7 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
     }
     else
     {
-      mFactoryCache.GetSVGRasterizationThread()->AddTask(newTask);
+      mFactoryCache.GetSVGRasterizationManager()->AddTask(newTask);
     }
   }
 }

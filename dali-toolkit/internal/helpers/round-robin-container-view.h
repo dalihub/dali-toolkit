@@ -3,7 +3,7 @@
 #define DALI_TOOLKIT_INTERNAL_ROUND_ROBIN_CONTAINER_VIEW_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,14 @@ public:
   }
 
   /**
+   * @brief Clear all elements.
+   */
+  void Clear()
+  {
+    mElements.clear();
+  }
+
+  /**
    * @brief Reset the position of the iterator returned by GetNext() to the first element.
    */
   void Reset()
@@ -84,6 +92,15 @@ public:
   typename ContainerType::const_iterator End() const
   {
     return mElements.cend();
+  }
+
+  /**
+   * @brief Returns the element count.
+   * @return The element count
+   */
+  size_t GetElementCount() const
+  {
+    return mElements.size();
   }
 
   // default members
