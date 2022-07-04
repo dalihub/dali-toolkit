@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/animated-gradient-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/arc-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties-devel.h>
@@ -1821,6 +1822,66 @@ int UtcDaliVisualGetPropertyMap13(void)
       DALI_TEST_EQUALS(value->Get<float>(), direction ? offset1 : offset2, Math::MACHINE_EPSILON_100, TEST_LOCATION);
     }
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualAnimateArcVisual(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualAnimateArcVisual color");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("startAngle", Property::Type::FLOAT),
+      UniformData("sweepAngle", Property::Type::FLOAT),
+    };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, DevelVisual::ARC);
+  propertyMap.Insert(Visual::Property::MIX_COLOR, Color::BLUE);
+  propertyMap.Insert(DevelArcVisual::Property::START_ANGLE, 0.0f);
+  propertyMap.Insert(DevelArcVisual::Property::SWEEP_ANGLE, 90.0f);
+  propertyMap.Insert(DevelArcVisual::Property::CAP, DevelArcVisual::Cap::ROUND);
+  propertyMap.Insert(DevelArcVisual::Property::THICKNESS, 20.0f);
+  Visual::Base arcVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl        actor     = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, arcVisual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(2000.f, 2000.f));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  application.GetScene().Add(actor);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer        renderer = actor.GetRendererAt(0);
+  Property::Index index    = renderer.GetPropertyIndex(DevelArcVisual::Property::SWEEP_ANGLE);
+
+  Animation animation = Animation::New(4.0f);
+  animation.AnimateTo(Property(renderer, index), 50.0f);
+  animation.AnimateTo(DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, DevelArcVisual::Property::START_ANGLE), 40.0f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render(2000u); // halfway point
+
+  float sweepAngle = renderer.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(sweepAngle, 70.0f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("startAngle", 20.0f), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("sweepAngle", 70.0f), true, TEST_LOCATION);
+
+  application.Render(2000u); // another halfway point
+
+  sweepAngle = renderer.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(sweepAngle, 50.0f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("startAngle", 40.0f), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("sweepAngle", 50.0f), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -5638,6 +5699,10 @@ int UtcDaliVisualUpdateProperty(void)
   Vector3                  targetMixColor           = Vector3(1.0f, 0.4f, 0.2f);
   bool                     targetPreMultipliedAlpha = originalMap[Visual::Property::PREMULTIPLIED_ALPHA].Get<bool>() ^ true;
   DevelVisual::FittingMode targetVisualFittingMode  = DevelVisual::CENTER;
+  Vector4                  targetCornerRadius       = Vector4(10.0f, 0.0f, 1.0f, 2.0f);
+  float                    targetBorderlineWidth    = 20.0f;
+  Vector4                  targetBorderlineColor    = Color::RED;
+  float                    targetBorderlineOffset   = 1.0f;
 
   Property::Map targetPropertyMap;
   targetPropertyMap[Visual::Property::OPACITY]                  = targetOpacity;
@@ -5645,6 +5710,10 @@ int UtcDaliVisualUpdateProperty(void)
   targetPropertyMap[Visual::Property::MIX_COLOR]                = targetMixColor;
   targetPropertyMap[Visual::Property::PREMULTIPLIED_ALPHA]      = targetPreMultipliedAlpha;
   targetPropertyMap[DevelVisual::Property::VISUAL_FITTING_MODE] = targetVisualFittingMode;
+  targetPropertyMap[DevelVisual::Property::CORNER_RADIUS]       = targetCornerRadius;
+  targetPropertyMap[DevelVisual::Property::BORDERLINE_WIDTH]    = targetBorderlineWidth;
+  targetPropertyMap[DevelVisual::Property::BORDERLINE_COLOR]    = targetBorderlineColor;
+  targetPropertyMap[DevelVisual::Property::BORDERLINE_OFFSET]   = targetBorderlineOffset;
 
   // Update Properties
   DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
@@ -5669,6 +5738,104 @@ int UtcDaliVisualUpdateProperty(void)
   Property::Value* visualFittingModeValue = resultMap.Find(DevelVisual::Property::VISUAL_FITTING_MODE, Property::STRING);
   DALI_TEST_CHECK(visualFittingModeValue);
   DALI_TEST_EQUALS(visualFittingModeValue->Get<std::string>(), "CENTER", TEST_LOCATION);
+
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerRadiusValue);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
+
+  Property::Value* borderlineWidthValue = resultMap.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineWidthValue);
+  DALI_TEST_EQUALS(borderlineWidthValue->Get<float>(), targetBorderlineWidth, TEST_LOCATION);
+
+  Property::Value* borderlineColorValue = resultMap.Find(DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(borderlineColorValue);
+  DALI_TEST_EQUALS(borderlineColorValue->Get<Vector4>(), targetBorderlineColor, TEST_LOCATION);
+
+  Property::Value* borderlineOffsetValue = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineOffsetValue);
+  DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVisualUpdatePropertyInvalidType(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualUpdatePropertyInvalidType: Test update property by DoAction. But some value is not invalid to update");
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap[Visual::Property::TYPE]     = Visual::Type::N_PATCH;
+  propertyMap[ImageVisual::Property::URL] = TEST_NPATCH_FILE_NAME;
+
+  Visual::Base imageVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  // Wait for image loading
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Map originalMap;
+  imageVisual.CreatePropertyMap(originalMap);
+
+  float                    targetOpacity            = 0.5f;
+  Vector3                  targetMixColor           = Vector3(1.0f, 0.4f, 0.2f);
+  bool                     targetPreMultipliedAlpha = originalMap[Visual::Property::PREMULTIPLIED_ALPHA].Get<bool>() ^ true;
+  DevelVisual::FittingMode targetVisualFittingMode  = DevelVisual::CENTER;
+  Vector4                  targetCornerRadius       = Vector4(10.0f, 0.0f, 1.0f, 2.0f);
+  float                    targetBorderlineWidth    = 20.0f;
+  Vector4                  targetBorderlineColor    = Color::RED;
+  float                    targetBorderlineOffset   = 1.0f;
+
+  Property::Map targetPropertyMap;
+  targetPropertyMap[Visual::Property::OPACITY]                  = targetOpacity;
+  targetPropertyMap[ImageVisual::Property::URL]                 = "foobar";
+  targetPropertyMap[Visual::Property::MIX_COLOR]                = targetMixColor;
+  targetPropertyMap[Visual::Property::PREMULTIPLIED_ALPHA]      = targetPreMultipliedAlpha;
+  targetPropertyMap[DevelVisual::Property::VISUAL_FITTING_MODE] = targetVisualFittingMode;
+
+  // Properties that N_PATCH visual could not used.
+  targetPropertyMap[DevelVisual::Property::CORNER_RADIUS]     = targetCornerRadius;
+  targetPropertyMap[DevelVisual::Property::BORDERLINE_WIDTH]  = targetBorderlineWidth;
+  targetPropertyMap[DevelVisual::Property::BORDERLINE_COLOR]  = targetBorderlineColor;
+  targetPropertyMap[DevelVisual::Property::BORDERLINE_OFFSET] = targetBorderlineOffset;
+
+  // Update Properties
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
+
+  Property::Map resultMap;
+  imageVisual.CreatePropertyMap(resultMap);
+
+  // Test property values: they should be updated
+  Property::Value* colorValue = resultMap.Find(Visual::Property::MIX_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(colorValue);
+  DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(targetMixColor.r, targetMixColor.g, targetMixColor.b, targetOpacity), TEST_LOCATION);
+
+  Property::Value* urlValue = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
+  DALI_TEST_CHECK(urlValue);
+  // NOTE : NPatchVisual URL must NOT changed.
+  DALI_TEST_EQUALS(urlValue->Get<std::string>(), TEST_NPATCH_FILE_NAME, TEST_LOCATION);
+
+  Property::Value* preMultipliedValue = resultMap.Find(Visual::Property::PREMULTIPLIED_ALPHA, Property::BOOLEAN);
+  DALI_TEST_CHECK(preMultipliedValue);
+  DALI_TEST_EQUALS(preMultipliedValue->Get<bool>(), targetPreMultipliedAlpha, TEST_LOCATION);
+
+  Property::Value* visualFittingModeValue = resultMap.Find(DevelVisual::Property::VISUAL_FITTING_MODE, Property::STRING);
+  DALI_TEST_CHECK(visualFittingModeValue);
+  DALI_TEST_EQUALS(visualFittingModeValue->Get<std::string>(), "CENTER", TEST_LOCATION);
+
+  // We don't check properties value that N_PATCH visual could not used.
+  // It is undefined.
 
   END_TEST;
 }

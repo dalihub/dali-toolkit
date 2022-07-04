@@ -1097,11 +1097,6 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&          
     ++i;
   } while(true);
 
-  requests.erase(std::remove_if(requests.begin(), requests.end(), [](const BlendshapeShaderConfigurationRequest& bscr) {
-                   return !bscr.mShader;
-                 }),
-                 requests.end());
-
   // Configure the rest.
   bool ok = true;
 
