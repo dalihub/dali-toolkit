@@ -62,6 +62,7 @@ const char* TEST_REMOTE_INVALID_FILE_NAME = "https://www.tizen.org/invalid.png";
 const char* TEST_MASK_IMAGE_FILE_NAME     = TEST_RESOURCE_DIR "/mask.png";
 const char* TEST_ROTATED_IMAGE            = TEST_RESOURCE_DIR "/keyboard-Landscape.jpg";
 const char* TEST_YUV420_IMAGE_FILE_NAME   = TEST_RESOURCE_DIR "/gallery-small-1-yuv420.jpg";
+const char* TEST_N_PATCH_IMAGE_FILE_NAME  = TEST_RESOURCE_DIR "/heartsframe.9.png";
 
 constexpr auto LOAD_IMAGE_YUV_PLANES_ENV = "DALI_LOAD_IMAGE_YUV_PLANES_ENV";
 
@@ -2437,6 +2438,65 @@ int UtcDaliImageVisualReleasePolicy08(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(textureTrace.CountMethod("DeleteTextures"), 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualReleasePolicy09(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliImageVisualReleasePolicy09 Destroyed Policy with N-Patch, Texture should be deleted when visual destroyed");
+
+  Property::Map propertyMapNPatchReleasePolicy;
+  propertyMapNPatchReleasePolicy.Insert(Visual::Property::TYPE, Visual::N_PATCH);
+  propertyMapNPatchReleasePolicy.Insert(ImageVisual::Property::URL, TEST_N_PATCH_IMAGE_FILE_NAME);
+  propertyMapNPatchReleasePolicy.Insert(DevelImageVisual::Property::AUXILIARY_IMAGE, TEST_MASK_IMAGE_FILE_NAME);
+  propertyMapNPatchReleasePolicy.Insert(DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA, 0.9f);
+  propertyMapNPatchReleasePolicy.Insert(ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DESTROYED);
+
+  VisualFactory factory     = VisualFactory::Get();
+  Visual::Base  imageVisual = factory.CreateVisual(propertyMapNPatchReleasePolicy);
+  DALI_TEST_CHECK(imageVisual);
+
+  // Setup debug trace
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline("Register visual with control and ensure it has the only handle");
+  DummyControl        actor     = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual);
+  imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  // Wait for image to load
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+  // Test renderer and texture created
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION);
+
+  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  tet_infoline("Destroy visual by UnRegistering visual with control, check renderer is destroyed");
+  dummyImpl.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
+  DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
+  application.SendNotification();
+  application.Render();
+
+  // Test texture removed after visual destroyed.
+  tet_infoline("Ensure texture is deleted after visual destroyed");
+  DALI_TEST_EQUALS(textureTrace.CountMethod("DeleteTextures"), 2, TEST_LOCATION);
 
   END_TEST;
 }

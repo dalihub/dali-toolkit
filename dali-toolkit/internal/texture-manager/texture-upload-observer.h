@@ -52,6 +52,7 @@ public:
   struct TextureInformation
   {
     TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied);
+    TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, const std::string& url, bool preMultiplied);
     TextureInformation(ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, bool preMultiplied);
     TextureInformation(ReturnType returnType, int32_t textureId, uint32_t frameCount, uint32_t interval);
 
