@@ -2956,7 +2956,7 @@ int UtcDaliImageViewSvgLoadingFailureRemoteFile01(void)
 
     gResourceReadySignalFired = false;
 
-    ImageView imageView = ImageView::New("https://bar.org/foobar.svg");
+    ImageView imageView = ImageView::New("https://127.0.0.1/foobar.svg");
     imageView.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
     imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
 
@@ -2996,7 +2996,7 @@ int UtcDaliImageViewSvgLoadingFailureRemoteFile02(void)
 
     gResourceReadySignalFired = false;
 
-    ImageView imageView = ImageView::New("https://bar.org/foobar.svg");
+    ImageView imageView = ImageView::New("https://127.0.0.1/foobar.svg");
     imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
 
     DALI_TEST_EQUALS(imageView.IsResourceReady(), false, TEST_LOCATION);
