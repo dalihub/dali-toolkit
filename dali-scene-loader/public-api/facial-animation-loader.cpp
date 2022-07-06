@@ -18,6 +18,9 @@
 // FILE HEADER
 #include <dali-scene-loader/public-api/facial-animation-loader.h>
 
+// EXTERNAL INCLUDES
+#include <sstream>
+
 // INTERNAL INCLUDES
 #include <dali-scene-loader/internal/json-reader.h>
 #include <dali-scene-loader/public-api/blend-shape-details.h>
@@ -135,9 +138,7 @@ AnimationDefinition LoadFacialAnimation(const std::string& url)
   }
 
   // Set the property names
-  char        weightNameBuffer[32];
-  char* const pWeightName = weightNameBuffer + sprintf(weightNameBuffer, "%s", BlendShapes::WEIGHTS_UNIFORM.c_str());
-  uint32_t    targets     = 0u;
+  uint32_t targets = 0u;
   for(const auto& blendShape : facialAnimation.mBlendShapes)
   {
     for(uint32_t morphTargetIndex = 0u; morphTargetIndex < blendShape.mNumberOfMorphTarget; ++morphTargetIndex)
@@ -147,8 +148,9 @@ AnimationDefinition LoadFacialAnimation(const std::string& url)
 
       animatedProperty.mNodeName = blendShape.mNodeName;
 
-      snprintf(pWeightName, sizeof(weightNameBuffer) - (pWeightName - weightNameBuffer), "[%d]", morphTargetIndex);
-      animatedProperty.mPropertyName = weightNameBuffer;
+      std::stringstream weightPropertyStream;
+      weightPropertyStream << BlendShapes::WEIGHTS_UNIFORM << "[" << morphTargetIndex << "]";
+      animatedProperty.mPropertyName = weightPropertyStream.str();
     }
     targets += blendShape.mNumberOfMorphTarget;
   }
