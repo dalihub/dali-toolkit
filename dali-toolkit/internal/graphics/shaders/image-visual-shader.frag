@@ -154,7 +154,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
   // But if borderlineOpacity > 0.0 and borderlineColor.a == 0.0, we need to apply tCornerRadius.
   if(borderlineOpacity > 0.0 && borderlineColor.a * borderlineOpacity < 1.0)
   {
-    mediump float tCornerRadius = -gCenterPosition;
+    mediump float tCornerRadius = -gCenterPosition + gPotentialRange;
     mediump float MaxTexturelinePotential = tCornerRadius + gPotentialRange;
     mediump float MinTexturelinePotential = tCornerRadius - gPotentialRange;
     if(potential > MaxTexturelinePotential)
