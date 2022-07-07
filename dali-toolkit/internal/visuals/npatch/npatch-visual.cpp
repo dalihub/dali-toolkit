@@ -28,6 +28,7 @@
 #include <dali-toolkit/devel-api/utility/npatch-helper.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
@@ -85,16 +86,28 @@ void NPatchVisual::LoadImages()
     }
   }
 
-  if(!mAuxiliaryPixelBuffer && mAuxiliaryUrl.IsValid() && (mAuxiliaryUrl.IsLocalResource() || mAuxiliaryUrl.IsBufferResource()))
+  if(mAuxiliaryTextureId == TextureManager::INVALID_TEXTURE_ID && mAuxiliaryUrl.IsValid() && (mAuxiliaryUrl.IsLocalResource() || mAuxiliaryUrl.IsBufferResource()))
   {
+    auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader
+                               ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
+                               : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
+    TextureManager::MaskingDataPointer maskingDataPtr       = nullptr;
+    ImageAtlasManagerPtr               imageAtlasManagerPtr = nullptr;
+
+    bool atlasing      = false;
+    auto atlasRect     = Vector4::ZERO;
+    auto atlasRectSize = Dali::ImageDimensions();
+
+    bool loadingStatus = false;
+
     // Load the auxiliary image
-    auto preMultiplyOnLoading = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-    mAuxiliaryPixelBuffer     = textureManager.LoadPixelBuffer(mAuxiliaryUrl, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, synchronousLoading, this, true, preMultiplyOnLoading);
+    mAuxiliaryTextureSet = textureManager.LoadTexture(mAuxiliaryUrl, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, maskingDataPtr, synchronousLoading, mAuxiliaryTextureId, atlasRect, atlasRectSize, atlasing, loadingStatus, WrapMode::DEFAULT, WrapMode::DEFAULT, this, nullptr, imageAtlasManagerPtr, true, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoad);
 
     // If synchronousLoading is true, we can check the auxiliaryResource's status now.
     if(synchronousLoading)
     {
-      mAuxiliaryResourceStatus = mAuxiliaryPixelBuffer ? Toolkit::Visual::ResourceStatus::READY : Toolkit::Visual::ResourceStatus::FAILED;
+      mAuxiliaryResourceStatus = (mAuxiliaryTextureSet && mAuxiliaryTextureSet.GetTextureCount() > 0u) ? Toolkit::Visual::ResourceStatus::READY : Toolkit::Visual::ResourceStatus::FAILED;
     }
   }
 }
@@ -124,10 +137,10 @@ void NPatchVisual::GetNaturalSize(Vector2& naturalSize)
     }
   }
 
-  if(mAuxiliaryPixelBuffer)
+  if(mAuxiliaryTextureSet && mAuxiliaryTextureSet.GetTextureCount() > 0u)
   {
-    naturalSize.x = std::max(naturalSize.x, float(mAuxiliaryPixelBuffer.GetWidth()));
-    naturalSize.y = std::max(naturalSize.y, float(mAuxiliaryPixelBuffer.GetHeight()));
+    naturalSize.x = std::max(naturalSize.x, float(mAuxiliaryTextureSet.GetTexture(0u).GetWidth()));
+    naturalSize.y = std::max(naturalSize.y, float(mAuxiliaryTextureSet.GetTexture(0u).GetHeight()));
   }
 }
 
@@ -215,11 +228,22 @@ void NPatchVisual::DoSetOnScene(Actor& actor)
 
 void NPatchVisual::DoSetOffScene(Actor& actor)
 {
-  if((mId != NPatchData::INVALID_NPATCH_DATA_ID) && mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED)
+  if(mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED)
   {
-    mLoader.Remove(mId, this);
-    mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
-    mId                    = NPatchData::INVALID_NPATCH_DATA_ID;
+    if(mId != NPatchData::INVALID_NPATCH_DATA_ID)
+    {
+      mLoader.Remove(mId, this);
+      mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
+      mId                    = NPatchData::INVALID_NPATCH_DATA_ID;
+    }
+    if(mAuxiliaryTextureId != TextureManager::INVALID_TEXTURE_ID)
+    {
+      TextureManager& textureManager = mFactoryCache.GetTextureManager();
+      textureManager.Remove(mAuxiliaryTextureId, this);
+      mAuxiliaryTextureId      = TextureManager::INVALID_TEXTURE_ID;
+      mAuxiliaryResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
+      mAuxiliaryTextureSet.Reset();
+    }
   }
 
   actor.RemoveRenderer(mImpl->mRenderer);
@@ -269,6 +293,8 @@ NPatchVisual::NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFa
   mImageUrl(),
   mAuxiliaryUrl(),
   mId(NPatchData::INVALID_NPATCH_DATA_ID),
+  mAuxiliaryTextureSet(),
+  mAuxiliaryTextureId(TextureManager::INVALID_TEXTURE_ID),
   mAuxiliaryResourceStatus(Toolkit::Visual::ResourceStatus::PREPARING),
   mBorderOnly(false),
   mBorder(),
@@ -280,10 +306,23 @@ NPatchVisual::NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFa
 
 NPatchVisual::~NPatchVisual()
 {
-  if(Stage::IsInstalled() && (mId != NPatchData::INVALID_NPATCH_DATA_ID) && (mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER))
+  if(Stage::IsInstalled())
   {
-    mLoader.Remove(mId, this);
-    mId = NPatchData::INVALID_NPATCH_DATA_ID;
+    if(mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER)
+    {
+      if(mId != NPatchData::INVALID_NPATCH_DATA_ID)
+      {
+        mLoader.Remove(mId, this);
+        mId = NPatchData::INVALID_NPATCH_DATA_ID;
+      }
+      if(mAuxiliaryTextureId != TextureManager::INVALID_TEXTURE_ID)
+      {
+        TextureManager& textureManager = mFactoryCache.GetTextureManager();
+        textureManager.Remove(mAuxiliaryTextureId, this);
+        mAuxiliaryTextureId = TextureManager::INVALID_TEXTURE_ID;
+        mAuxiliaryTextureSet.Reset();
+      }
+    }
   }
 }
 
@@ -366,10 +405,10 @@ Shader NPatchVisual::CreateShader()
   NPatchUtility::StretchRanges::SizeType xStretchCount = 0;
   NPatchUtility::StretchRanges::SizeType yStretchCount = 0;
 
-  auto fragmentShader = mAuxiliaryPixelBuffer ? SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG
-                                              : SHADER_NPATCH_VISUAL_SHADER_FRAG;
-  auto shaderType = mAuxiliaryPixelBuffer ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
-                                          : VisualFactoryCache::NINE_PATCH_SHADER;
+  auto fragmentShader = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG
+                                                                                           : SHADER_NPATCH_VISUAL_SHADER_FRAG;
+  auto shaderType = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
+                                                                                       : VisualFactoryCache::NINE_PATCH_SHADER;
 
   // ask loader for the regions
   if(mLoader.GetNPatchData(mId, data))
@@ -447,32 +486,17 @@ void NPatchVisual::ApplyTextureAndUniforms()
     textureSet = data->GetTextures();
     NPatchHelper::ApplyTextureAndUniforms(mImpl->mRenderer, data);
 
-    if(mAuxiliaryPixelBuffer)
+    if(mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY)
     {
-      // If the auxiliary image is smaller than the un-stretched NPatch, use CPU resizing to enlarge it to the
-      // same size as the unstretched NPatch. This will give slightly higher quality results than just relying
-      // on GL interpolation alone.
-      if(mAuxiliaryPixelBuffer.GetWidth() < data->GetCroppedWidth() &&
-         mAuxiliaryPixelBuffer.GetHeight() < data->GetCroppedHeight())
-      {
-        mAuxiliaryPixelBuffer.Resize(data->GetCroppedWidth(), data->GetCroppedHeight());
-      }
-
-      // Note, this resets mAuxiliaryPixelBuffer handle
-      auto auxiliaryPixelData = Devel::PixelBuffer::Convert(mAuxiliaryPixelBuffer);
-
-      auto texture = Texture::New(TextureType::TEXTURE_2D,
-                                  auxiliaryPixelData.GetPixelFormat(),
-                                  auxiliaryPixelData.GetWidth(),
-                                  auxiliaryPixelData.GetHeight());
-      texture.Upload(auxiliaryPixelData);
+      DALI_ASSERT_ALWAYS(mAuxiliaryTextureId != TextureManager::INVALID_TEXTURE_ID);
+      DALI_ASSERT_ALWAYS(mAuxiliaryTextureSet && mAuxiliaryTextureSet.GetTextureCount() > 0u);
 
       // TODO : This code exist due to the texture cache manager hold TextureSet, not Texture.
       // If we call textureSet.SetTexture(1, texture) directly, the cached TextureSet also be changed.
       // We should make pass utc-Dali-VisualFactory.cpp UtcDaliNPatchVisualAuxiliaryImage02().
       TextureSet tempTextureSet = TextureSet::New();
       tempTextureSet.SetTexture(0, textureSet.GetTexture(0));
-      tempTextureSet.SetTexture(1, texture);
+      tempTextureSet.SetTexture(1, mAuxiliaryTextureSet.GetTexture(0));
       textureSet = tempTextureSet;
 
       mImpl->mRenderer.RegisterProperty(DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA,
@@ -552,27 +576,30 @@ void NPatchVisual::SetResource()
 
 void NPatchVisual::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
 {
-  if(textureInformation.returnType == TextureUploadObserver::ReturnType::TEXTURE) // For the Url.
+  if(textureInformation.url.length() > 0) // For the Url.
   {
-    if(textureInformation.textureId != TextureManager::INVALID_TEXTURE_ID)
+    if(DALI_UNLIKELY(mId == NPatchData::INVALID_NPATCH_DATA_ID))
     {
-      if(mId == NPatchData::INVALID_NPATCH_DATA_ID)
-      {
-        // Special case when mLoader.Load call LoadComplete function before mId setup.
-        // We can overwrite mId.
-        mId = static_cast<NPatchData::NPatchDataId>(textureInformation.textureId);
-      }
+      // Special case when mLoader.Load call LoadComplete function before mId setup.
+      // We can overwrite mId.
+      mId = static_cast<NPatchData::NPatchDataId>(textureInformation.textureId);
     }
     if(loadSuccess)
     {
       EnablePreMultipliedAlpha(textureInformation.preMultiplied);
     }
   }
-  else // For the AuxiliaryUrl : ReturnType::PIXEL_BUFFER
+  else // For the AuxiliaryUrl
   {
-    if(loadSuccess && textureInformation.url == mAuxiliaryUrl.GetUrl())
+    if(DALI_UNLIKELY(mAuxiliaryTextureId == TextureManager::INVALID_TEXTURE_ID))
     {
-      mAuxiliaryPixelBuffer    = textureInformation.pixelBuffer;
+      // Special case when TextureManager.LoadTexture call LoadComplete function before mAuxiliaryTextureId setup.
+      // We can overwrite mAuxiliaryTextureId.
+      mAuxiliaryTextureId = textureInformation.textureId;
+    }
+    if(loadSuccess)
+    {
+      mAuxiliaryTextureSet     = textureInformation.textureSet;
       mAuxiliaryResourceStatus = Toolkit::Visual::ResourceStatus::READY;
     }
     else
@@ -580,6 +607,7 @@ void NPatchVisual::LoadComplete(bool loadSuccess, TextureInformation textureInfo
       mAuxiliaryResourceStatus = Toolkit::Visual::ResourceStatus::FAILED;
     }
   }
+
   // If auxiliaryUrl didn't required OR auxiliaryUrl load done.
   if(!mAuxiliaryUrl.IsValid() || mAuxiliaryResourceStatus != Toolkit::Visual::ResourceStatus::PREPARING)
   {

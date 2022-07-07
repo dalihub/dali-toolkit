@@ -221,7 +221,8 @@ private:
   VisualUrl                                 mImageUrl;                ///< The url to the N patch to load
   VisualUrl                                 mAuxiliaryUrl;            ///< An auxiliary image that can be displayed on top of the N-Patch
   NPatchData::NPatchDataId                  mId;                      ///< id of the N patch (from loader/cache)
-  Devel::PixelBuffer                        mAuxiliaryPixelBuffer;    ///< pixel buffer of the auxiliary mask image
+  TextureSet                                mAuxiliaryTextureSet;     ///< TextureSet of the auxiliary mask image
+  TextureManager::TextureId                 mAuxiliaryTextureId;      ///< id of the auxiliary mask image (from TextureManager)
   Toolkit::Visual::ResourceStatus           mAuxiliaryResourceStatus; ///< resource status for auxiliary mask image
   bool                                      mBorderOnly;              ///< if only border is desired
   Rect<int>                                 mBorder;                  ///< The size of the border

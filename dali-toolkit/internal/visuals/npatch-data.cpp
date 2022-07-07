@@ -232,8 +232,7 @@ void NPatchData::NotifyObserver(TextureUploadObserver* observer, const bool& loa
       TextureUploadObserver::ReturnType::TEXTURE,
       static_cast<TextureManager::TextureId>(mId), ///< Note : until end of NPatchLoader::Load, npatch-visual don't know the id of data.
       mTextureSet,
-      false,     // UseAtlas
-      Vector4(), // AtlasRect
+      mUrl.GetUrl(),
       mPreMultiplyOnLoad));
 }
 
