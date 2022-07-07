@@ -49,6 +49,7 @@ namespace
 const char* TEST_IMAGE_FILE_NAME      = TEST_RESOURCE_DIR "/application-icon-%02d.png";
 const char* TEST_GIF_FILE_NAME        = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_MASK_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/mask.png";
+const char* TEST_WEBP_FILE_NAME       = TEST_RESOURCE_DIR "/dali-logo.webp";
 } // namespace
 
 void CopyUrlsIntoArray(Property::Array& urls, int startIndex = 0)
@@ -1776,6 +1777,74 @@ int UtcDaliAnimatedImageVisualPlayback(void)
 
     dummyControl.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualWrapMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualWrapMode");
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  // Test wrap mode in animated image visual.
+  const int     width  = 950;
+  const int     height = 1080;
+  const Vector4 pixelArea(0.0f, 0.0f, 950/ 40, 1.0f);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_WEBP_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::PIXEL_AREA, pixelArea);
+  propertyMap.Insert(ImageVisual::Property::WRAP_MODE_U, WrapMode::REPEAT);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+  textureTrace.EnableLogging(true);
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Enable(true);
+  texParameterTrace.EnableLogging(true);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(width, height));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+
+  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+  // WITHOUT atlasing, the wrapping is handled by setting gl texture parameters
+  std::stringstream out;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_REPEAT;
+  DALI_TEST_CHECK(texParameterTrace.FindMethodAndParams("TexParameteri", out.str()));
+
+  // test the uniforms which used to handle the wrap mode
+  Renderer renderer = actor.GetRendererAt(0u);
+  DALI_TEST_CHECK(renderer);
+
+  Property::Value pixelAreaValue = renderer.GetProperty(renderer.GetPropertyIndex("pixelArea"));
+  DALI_TEST_EQUALS(pixelAreaValue.Get<Vector4>(), pixelArea, TEST_LOCATION);
+
+  actor.Unparent();
+  DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
 
   END_TEST;
 }
