@@ -34,7 +34,38 @@ namespace Adaptor
 namespace
 {
 Dali::Internal::Adaptor::VectorImageRenderer* gVectorImageRenderer = nullptr;
+
+/**
+ * @brief Check whether the data contain keyword as substring or not.
+ * It can be used as Naive Check-up to determine vector image loaded successfully or not.
+ *
+ * @param[in] data Raw data
+ * @param[in] keyword Keyword to check data holded or not.
+ * @return True if data contain keyword.
+ */
+bool CheckKeywordExist(const Vector<uint8_t>& data, std::string keyword)
+{
+  std::string trimedString;
+
+  // Remove useless character in data.
+  for(const uint8_t& it : data)
+  {
+    if(keyword.find(it) != std::string::npos)
+    {
+      trimedString.push_back(it);
+    }
+  }
+
+  if(trimedString.length() >= keyword.length())
+  {
+    if(trimedString.find(keyword) != std::string::npos)
+    {
+      return true;
+    }
+  }
+  return false;
 }
+} // namespace
 
 class VectorImageRenderer : public Dali::BaseObject
 {
@@ -57,6 +88,11 @@ public:
     else if(strncmp(reinterpret_cast<char*>(data.Begin()), "Fail to rasterize", strlen("Fail to rasterize")) == 0)
     {
       mRasterizeSuccess = false;
+    }
+    // Naive check-up whether data is valid format or not. Currently we only check svg and tvg file format.
+    else if(!CheckKeywordExist(data, "</svg>") && !CheckKeywordExist(data, "ThorVG"))
+    {
+      return false;
     }
     mLoadSuccess = true;
     return true;
