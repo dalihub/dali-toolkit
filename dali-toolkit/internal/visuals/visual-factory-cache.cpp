@@ -43,8 +43,8 @@ const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 }
 
 VisualFactoryCache::VisualFactoryCache(bool preMultiplyOnLoad)
-: mSvgRasterizeThread(NULL),
-  mVectorAnimationManager(),
+: mSvgRasterizeManager(nullptr),
+  mVectorAnimationManager(nullptr),
   mPreMultiplyOnLoad(preMultiplyOnLoad),
   mBrokenImageInfoContainer(),
   mDefaultBrokenImageUrl(""),
@@ -54,7 +54,6 @@ VisualFactoryCache::VisualFactoryCache(bool preMultiplyOnLoad)
 
 VisualFactoryCache::~VisualFactoryCache()
 {
-  SvgRasterizeThread::TerminateThread(mSvgRasterizeThread);
 }
 
 Geometry VisualFactoryCache::GetGeometry(GeometryType type)
@@ -131,14 +130,13 @@ NPatchLoader& VisualFactoryCache::GetNPatchLoader()
   return mNPatchLoader;
 }
 
-SvgRasterizeThread* VisualFactoryCache::GetSVGRasterizationThread()
+SvgRasterizeManager* VisualFactoryCache::GetSVGRasterizationManager()
 {
-  if(!mSvgRasterizeThread)
+  if(!mSvgRasterizeManager)
   {
-    mSvgRasterizeThread = new SvgRasterizeThread();
-    mSvgRasterizeThread->Start();
+    mSvgRasterizeManager = std::unique_ptr<SvgRasterizeManager>(new SvgRasterizeManager());
   }
-  return mSvgRasterizeThread;
+  return mSvgRasterizeManager.get();
 }
 
 VectorAnimationManager& VisualFactoryCache::GetVectorAnimationManager()
