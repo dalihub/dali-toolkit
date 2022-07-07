@@ -24,34 +24,40 @@
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/signals/render-callback.h>
 
 namespace Dali::Toolkit::Internal
 {
-Dali::Toolkit::GlView DrawableView::New()
+Dali::Toolkit::GlView DrawableView::New(GlView::BackendMode backendMode)
 {
-  auto* impl   = new DrawableView();
+  auto* impl   = new DrawableView(backendMode);
   Dali::Toolkit::GlView handle = Dali::Toolkit::GlView(*impl);
   impl->Initialize();
   return handle;
 }
 
-DrawableView::DrawableView()
-: Dali::Toolkit::Internal::GlViewImpl( GlView::BackendMode::DIRECT_RENDERING ),
+DrawableView::DrawableView(GlView::BackendMode backendMode)
+: Dali::Toolkit::Internal::GlViewImpl( backendMode),
   mRenderingMode(Toolkit::GlView::RenderingMode::CONTINUOUS),
   mDepth(false),
   mStencil(false),
   mMSAA(0)
 {
   mRenderCallback = RenderCallback::New( this, &DrawableView::OnRenderCallback);
+
+  // Create NativeRenderer
+  Dali::Internal::NativeRendererCreateInfo createInfo;
+  createInfo.maxOffscreenBuffers = 2u;
+  createInfo.threadEnabled = (backendMode == GlView::BackendMode::DIRECT_RENDERING_THREADED);
+  createInfo.presentationMode = Dali::Internal::NativeRendererCreateInfo::PresentationMode::FIFO;
+  mNativeRenderer = std::make_unique<Dali::Internal::DrawableViewNativeRenderer>(createInfo);
 }
 
 DrawableView::~DrawableView() = default;
 
 void DrawableView::RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
 {
-  mOnInitCallback.reset( initCallback );
-  mOnRenderCallback.reset(renderFrameCallback );
-  mOnTerminateCallback. reset( terminateCallback );
+  mNativeRenderer->RegisterGlCallbacks( initCallback, renderFrameCallback, terminateCallback );
 }
 
 void DrawableView::SetResizeCallback(CallbackBase* resizeCallback)
@@ -61,8 +67,8 @@ void DrawableView::SetResizeCallback(CallbackBase* resizeCallback)
 
 bool DrawableView::SetGraphicsConfig(bool depth, bool stencil, int msaa, Dali::Toolkit::GlView::GraphicsApiVersion version)
 {
-  DALI_LOG_ERROR( "DrawableView::SetGraphicsConfig() is currently not implemented");
-
+  // Currently, the settings are not relevant for the DirectRendering feature as all the
+  // setup is inherited from DALi graphics backend.
   return true;
 }
 
@@ -110,8 +116,9 @@ void DrawableView::OnSizeSet(const Vector3& targetSize)
   mSurfaceSize = targetSize;
 
   // If the callbacks are set then schedule execution of resize callback
-  if(mRenderCallback && mOnResizeCallback)
+  if(mRenderCallback && mNativeRenderer)
   {
+    mNativeRenderer->Resize( uint32_t(targetSize.width), uint32_t(targetSize.height));
     mSurfaceResized = true;
   }
 }
@@ -144,6 +151,8 @@ void DrawableView::OnSceneConnection(int depth)
 void DrawableView::OnSceneDisconnection()
 {
   Control::OnSceneDisconnection();
+
+  mNativeRenderer->Terminate();
 }
 
 void DrawableView::AddRenderer()
@@ -155,17 +164,24 @@ void DrawableView::AddRenderer()
 
 bool DrawableView::OnRenderCallback( const RenderCallbackInput& renderCallbackInput )
 {
+  if(mNativeRenderer)
+  {
+    mNativeRenderer->PushRenderCallbackInputData( renderCallbackInput );
+  }
+
   // Init state
   if( mCurrentViewState == ViewState::INIT )
   {
-    if(mOnInitCallback)
-    {
-      CallbackBase::Execute(*mOnInitCallback);
-    }
+    mNativeRenderer->InvokeGlInitCallback(renderCallbackInput);
     mCurrentViewState = ViewState::RENDER;
   }
 
-  int renderFrameResult = 0;
+  if(mSurfaceResized)
+  {
+    mNativeRenderer->Resize( uint32_t(mSurfaceSize.width), uint32_t(mSurfaceSize.height) );
+    mSurfaceResized = false;
+  }
+
   if( mCurrentViewState == ViewState::RENDER )
   {
     // The mSurfaceResized is set by another thread so atomic check must be provided
@@ -178,20 +194,13 @@ bool DrawableView::OnRenderCallback( const RenderCallbackInput& renderCallbackIn
       CallbackBase::Execute(*mOnResizeCallback, static_cast<int>(mSurfaceSize.x), static_cast<int>(mSurfaceSize.y));
     }
 
-    if(mOnRenderCallback)
-    {
-      renderFrameResult = CallbackBase::ExecuteReturn<int>(*mOnRenderCallback);
-      if(renderFrameResult)
-      {
-        // TODO: may be utilized for RenderOnce feature
-      }
-    }
+    mNativeRenderer->InvokeGlRenderCallback(renderCallbackInput);
   }
 
   // The terminate callback isn't easy to implement for DR. The NativeImage backend
   // calls it when the GlView is being destroyed. For DrawableView it means that
   // the RenderCallback won't be executed (as it is a part of graphics pipeline).
-  // We don't have currenty no way to know whether the View will be destroyed and
+  // We don't have currently have any way to know whether the View will be destroyed and
   // to execute last native draw command in the pipeline.
   //
   // else if( mCurrentViewState == ViewState::TERMINATE )

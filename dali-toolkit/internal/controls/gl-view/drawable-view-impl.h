@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_DRAWABLE_VIEW_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/gl-view/gl-view-interface-impl.h>
+#include <dali-toolkit/internal/controls/gl-view/drawable-view-native-renderer.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
 
@@ -44,15 +45,23 @@ protected:
   virtual ~DrawableView();
 
 public:
-  /**
-   * @copydoc Dali::Toolkit::GlView::New()
-   */
-  static Dali::Toolkit::GlView New();
 
   /**
-   * Construct a new GlView.
+   * @brief Creates GlView interface object using DrawableView implementation
+   *
+   * @param[in] backendMode Backend mode to be used. Only DIRECT_RENDERING and DIRECT_RENDERING_THREADED
+   *                        are accepted.
+   * @return Valid GlView object or nullptr on error
    */
-  DrawableView();
+  static Dali::Toolkit::GlView New(GlView::BackendMode backendMode);
+
+  /**
+   * @brief Constructor creates GlView interface object using DrawableView implementation
+   *
+   * @param[in] backendMode Backend mode to be used. Only DIRECT_RENDERING and DIRECT_RENDERING_THREADED
+   *                        are accepted.
+   */
+  explicit DrawableView(GlView::BackendMode backendMode);
 
   /**
    * @copydoc Dali::Toolkit::GlView::RegisterGlCallbacks()
@@ -150,15 +159,13 @@ private:
 
   ViewState mCurrentViewState{ViewState::INIT}; ///< state within RenderCallback
 
-  // These callbacks are stored for GLView API compatibility
-  std::unique_ptr<CallbackBase> mOnInitCallback;
-  std::unique_ptr<CallbackBase> mOnRenderCallback;
-  std::unique_ptr<CallbackBase> mOnTerminateCallback;
-  std::unique_ptr<CallbackBase> mOnResizeCallback;
+  std::unique_ptr<CallbackBase> mOnResizeCallback; ///< Resize callback called when surface size changes
 
   std::atomic_bool mSurfaceResized{false}; ///< Flag to invoke surface resize callback
 
   Size mSurfaceSize{}; ///< Surface size
+
+  std::unique_ptr<Dali::Internal::DrawableViewNativeRenderer> mNativeRenderer; ///< Pointer to the native renderer
 };
 
 } // namespace Internal

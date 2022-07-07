@@ -7,6 +7,7 @@ SET(CAPI_LIB "dali-toolkit")
 
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
+  toolkit-direct-rendering-egl.cpp
   utc-Dali-Alignment.cpp
   utc-Dali-AnimatedImageVisual.cpp
   utc-Dali-AnimatedVectorImageVisual.cpp
