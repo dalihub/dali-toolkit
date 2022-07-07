@@ -147,21 +147,6 @@ private:
   Devel::PixelBuffer CreateImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Typesetter::Style style, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset, const TextAbstraction::GlyphIndex fromGlyphIndex, const TextAbstraction::GlyphIndex toGlyphIndex);
 
   /**
-   * @brief Apply behaviour of tags if the markup-processor is enabled.
-   *
-   * @param[in] topPixelBuffer The top layer buffer.
-   * @param[in] bufferWidth The width of the image buffer.
-   * @param[in] bufferHeight The height of the image buffer.
-   * @param[in] ignoreHorizontalAlignment Whether to ignore the horizontal alignment, not ignored by default.
-   * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
-   * @param[in] horizontalOffset The horizontal offset to be added to the glyph's position.
-   * @param[in] verticalOffset The vertical offset to be added to the glyph's position.
-   *
-   * @return The image buffer with the markup.
-   */
-  Devel::PixelBuffer ApplyMarkupProcessorOnPixelBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset);
-
-  /**
    * @brief Apply markup underline tags.
    *
    * The properties on TextLabel override the behavior of Markup.

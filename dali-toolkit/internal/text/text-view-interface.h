@@ -175,6 +175,13 @@ public:
   virtual bool IsUnderlineEnabled() const = 0;
 
   /**
+   * @brief checks if there is underline set using markup.
+   *
+   * @return boolean if there is underline set using markup.
+   */
+  virtual bool const IsMarkupUnderlineSet() const = 0;
+
+  /**
    * @brief Returns the hyphens glyph info.
    *
    * @return hyphens glyph info.
@@ -309,6 +316,13 @@ public:
    * @return The strikethrough state.
    */
   virtual bool IsStrikethroughEnabled() const = 0;
+
+  /**
+   * @brief checks if there is strikethrough set using markup.
+   *
+   * @return boolean if there is strikethrough set using markup.
+   */
+  virtual bool const IsMarkupStrikethroughSet() const = 0;
 
   /**
    * @brief Retrieves the strikethrough height override

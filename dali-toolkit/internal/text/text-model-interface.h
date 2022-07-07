@@ -262,6 +262,13 @@ public:
   virtual bool IsUnderlineEnabled() const = 0;
 
   /**
+   * @brief checks if there is underline set using markup.
+   *
+   * @return boolean if there is underline set using markup.
+   */
+  virtual bool const IsMarkupUnderlineSet() const = 0;
+
+  /**
    * @brief Retrieves the underline height override
    *
    * @return Returns the override height for an underline, 0 indicates that adaptor will determine the height
@@ -374,6 +381,13 @@ public:
    * @return The strikethrough state.
    */
   virtual bool IsStrikethroughEnabled() const = 0;
+
+  /**
+   * @brief checks if there is strikethrough set using markup.
+   *
+   * @return boolean if there is strikethrough set using markup.
+   */
+  virtual bool const IsMarkupStrikethroughSet() const = 0;
 
   /**
    * @brief Retrieves the strikethrough height override

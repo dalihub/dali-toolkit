@@ -983,7 +983,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
       CombineImageBuffer(imageBuffer, outlineImageBuffer, bufferWidth, bufferHeight, true);
     }
 
-    // @todo. Support shadow and underline for partial text later on.
+    // @todo. Support shadow for partial text later on.
 
     // Generate the shadow if enabled
     const Vector2& shadowOffset = mModel->GetShadowOffset();
@@ -1002,17 +1002,6 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
 
       // Combine the two buffers
       CombineImageBuffer(imageBuffer, shadowImageBuffer, bufferWidth, bufferHeight, true);
-    }
-
-    // Generate the underline if enabled
-    const bool underlineEnabled = mModel->IsUnderlineEnabled();
-    if(underlineEnabled && RENDER_OVERLAY_STYLE == behaviour)
-    {
-      // Create the image buffer for underline
-      Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
-
-      // Combine the two buffers
-      CombineImageBuffer(imageBuffer, underlineImageBuffer, bufferWidth, bufferHeight, true);
     }
 
     // Generate the background if enabled
@@ -1040,20 +1029,40 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
       CombineImageBuffer(imageBuffer, backgroundImageBuffer, bufferWidth, bufferHeight, true);
     }
 
-    // Generate the strikethrough if enabled
-    const bool strikethroughEnabled = mModel->IsStrikethroughEnabled();
-    if(strikethroughEnabled && RENDER_OVERLAY_STYLE == behaviour)
+    if(RENDER_OVERLAY_STYLE == behaviour)
     {
-      // Create the image buffer for strikethrough
-      Devel::PixelBuffer strikethroughImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_STRIKETHROUGH, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, endIndexOfGlyphs);
+      if(mModel->IsUnderlineEnabled())
+      {
+        // Create the image buffer for underline
+        Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
 
-      // Combine the two buffers
-      CombineImageBuffer(imageBuffer, strikethroughImageBuffer, bufferWidth, bufferHeight, true);
+        // Combine the two buffers
+        CombineImageBuffer(imageBuffer, underlineImageBuffer, bufferWidth, bufferHeight, true);
+      }
+
+      if(mModel->IsStrikethroughEnabled())
+      {
+        // Create the image buffer for strikethrough
+        Devel::PixelBuffer strikethroughImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_STRIKETHROUGH, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, endIndexOfGlyphs);
+
+        // Combine the two buffers
+        CombineImageBuffer(imageBuffer, strikethroughImageBuffer, bufferWidth, bufferHeight, true);
+      }
+
+      // Markup-Processor for overlay styles
+      if(mModel->IsMarkupProcessorEnabled())
+      {
+        if(mModel->IsMarkupUnderlineSet())
+        {
+          imageBuffer = ApplyUnderlineMarkupImageBuffer(imageBuffer, bufferWidth, bufferHeight, ignoreHorizontalAlignment, pixelFormat, penX, penY);
+        }
+
+        if(mModel->IsMarkupStrikethroughSet())
+        {
+          imageBuffer = ApplyStrikethroughMarkupImageBuffer(imageBuffer, bufferWidth, bufferHeight, ignoreHorizontalAlignment, pixelFormat, penX, penY);
+        }
+      }
     }
-
-    // Markup-Processor
-
-    imageBuffer = ApplyMarkupProcessorOnPixelBuffer(imageBuffer, bufferWidth, bufferHeight, ignoreHorizontalAlignment, pixelFormat, penX, penY);
   }
 
   // Create the final PixelData for the combined image buffer
@@ -1485,20 +1494,6 @@ Devel::PixelBuffer Typesetter::ApplyStrikethroughMarkupImageBuffer(Devel::PixelB
     CombineImageBuffer(strikethroughImageBuffer, topPixelBuffer, bufferWidth, bufferHeight, false);
 
     itGlyphRun++;
-  }
-
-  return topPixelBuffer;
-}
-
-Devel::PixelBuffer Typesetter::ApplyMarkupProcessorOnPixelBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset)
-{
-  // Apply the markup-Processor if enabled
-  const bool markupProcessorEnabled = mModel->IsMarkupProcessorEnabled();
-  if(markupProcessorEnabled)
-  {
-    topPixelBuffer = ApplyUnderlineMarkupImageBuffer(topPixelBuffer, bufferWidth, bufferHeight, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset);
-
-    topPixelBuffer = ApplyStrikethroughMarkupImageBuffer(topPixelBuffer, bufferWidth, bufferHeight, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset);
   }
 
   return topPixelBuffer;

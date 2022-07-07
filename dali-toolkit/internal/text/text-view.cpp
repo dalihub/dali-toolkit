@@ -670,6 +670,11 @@ bool View::IsUnderlineEnabled() const
   return false;
 }
 
+bool const View::IsMarkupUnderlineSet() const
+{
+  return (GetNumberOfUnderlineRuns() > 0u);
+}
+
 const GlyphInfo* View::GetHyphens() const
 {
   if(mImpl->mVisualModel)
@@ -863,6 +868,11 @@ const Vector4& View::GetStrikethroughColor() const
 bool View::IsStrikethroughEnabled() const
 {
   return (mImpl->mVisualModel) ? mImpl->mVisualModel->IsStrikethroughEnabled() : false;
+}
+
+bool const View::IsMarkupStrikethroughSet() const
+{
+  return (GetNumberOfStrikethroughRuns() > 0u);
 }
 
 float View::GetStrikethroughHeight() const

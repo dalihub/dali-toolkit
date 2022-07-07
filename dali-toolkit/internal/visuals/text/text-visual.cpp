@@ -562,13 +562,14 @@ void TextVisual::UpdateRenderer()
         shadowEnabled = true;
       }
 
-      const bool underlineEnabled       = mController->GetTextModel()->IsUnderlineEnabled();
-      const bool outlineEnabled         = (mController->GetTextModel()->GetOutlineWidth() > Math::MACHINE_EPSILON_1);
-      const bool backgroundEnabled      = mController->GetTextModel()->IsBackgroundEnabled();
-      const bool markupProcessorEnabled = mController->IsMarkupProcessorEnabled();
-      const bool strikethroughEnabled   = mController->GetTextModel()->IsStrikethroughEnabled();
-
-      const bool styleEnabled   = (shadowEnabled || underlineEnabled || outlineEnabled || backgroundEnabled || markupProcessorEnabled || strikethroughEnabled);
+      const bool outlineEnabled             = (mController->GetTextModel()->GetOutlineWidth() > Math::MACHINE_EPSILON_1);
+      const bool backgroundEnabled          = mController->GetTextModel()->IsBackgroundEnabled();
+      const bool markupProcessorEnabled     = mController->IsMarkupProcessorEnabled();
+      const bool markupUnderlineEnabled     = markupProcessorEnabled && mController->GetTextModel()->IsMarkupUnderlineSet();
+      const bool markupStrikethroughEnabled = markupProcessorEnabled && mController->GetTextModel()->IsMarkupStrikethroughSet();
+      const bool underlineEnabled           = mController->GetTextModel()->IsUnderlineEnabled() || markupUnderlineEnabled;
+      const bool strikethroughEnabled       = mController->GetTextModel()->IsStrikethroughEnabled() || markupStrikethroughEnabled;
+      const bool styleEnabled   = (shadowEnabled || outlineEnabled || backgroundEnabled || markupProcessorEnabled);
       const bool isOverlayStyle = underlineEnabled || strikethroughEnabled;
 
       AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
