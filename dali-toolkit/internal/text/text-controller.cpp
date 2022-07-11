@@ -2532,6 +2532,7 @@ bool Controller::RemoveText(int                  cursorOffset,
                             UpdateInputStyleType type)
 {
   bool removed = false;
+  bool removeAll = false;
 
   if(NULL == mImpl->mEventData)
   {
@@ -2559,7 +2560,12 @@ bool Controller::RemoveText(int                  cursorOffset,
       numberOfCharacters = currentText.Count() - cursorIndex;
     }
 
-    if(mImpl->mEventData->mPreEditFlag || // If the preedit flag is enabled, it means two (or more) of them came together i.e. when two keys have been pressed at the same time.
+    if((cursorIndex == 0) && (currentText.Count() - numberOfCharacters == 0))
+    {
+      removeAll = true;
+    }
+
+    if(mImpl->mEventData->mPreEditFlag || removeAll || // If the preedit flag is enabled, it means two (or more) of them came together i.e. when two keys have been pressed at the same time.
        ((cursorIndex + numberOfCharacters) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters))
     {
       // Mark the paragraphs to be updated.
@@ -2603,7 +2609,7 @@ bool Controller::RemoveText(int                  cursorOffset,
 
       // If the number of current text and the number of characters to be deleted are same,
       // it means all texts should be removed and all Preedit variables should be initialized.
-      if((currentText.Count() - numberOfCharacters == 0) && (cursorIndex == 0))
+      if(removeAll)
       {
         mImpl->ClearPreEditFlag();
         mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = 0;
@@ -2629,6 +2635,7 @@ bool Controller::RemoveText(int                  cursorOffset,
       }
 
       DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::RemoveText %p removed %d\n", this, numberOfCharacters);
+      removeAll = false;
       removed = true;
     }
   }
