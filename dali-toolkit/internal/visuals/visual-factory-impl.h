@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ namespace Internal
 {
 class VisualFactoryCache;
 class ImageVisualShaderFactory;
+class TextVisualShaderFactory;
 
 /**
  * @copydoc Toolkit::VisualFactory
@@ -112,6 +113,11 @@ private:
    */
   ImageVisualShaderFactory& GetImageVisualShaderFactory();
 
+  /**
+   * Get the text visual shader factory, creating it if necessary.
+   */
+  TextVisualShaderFactory& GetTextVisualShaderFactory();
+
   VisualFactory(const VisualFactory&) = delete;
 
   VisualFactory& operator=(const VisualFactory& rhs) = delete;
@@ -119,6 +125,7 @@ private:
 private:
   std::unique_ptr<VisualFactoryCache>       mFactoryCache;
   std::unique_ptr<ImageVisualShaderFactory> mImageVisualShaderFactory;
+  std::unique_ptr<TextVisualShaderFactory>  mTextVisualShaderFactory;
   SlotDelegate<VisualFactory>               mSlotDelegate;
   bool                                      mDebugEnabled : 1;
   bool                                      mPreMultiplyOnLoad : 1; ///< Local store for this flag

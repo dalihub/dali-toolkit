@@ -135,6 +135,11 @@ public:
   bool IsUnderlineEnabled() const override;
 
   /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::IsMarkupUnderlineSet()
+   */
+  bool const IsMarkupUnderlineSet() const;
+
+  /**
   * @copydoc Dali::Toolkit::Text::ViewInterface::GetHyphens()
   */
   const GlyphInfo* GetHyphens() const override;
@@ -230,6 +235,11 @@ public:
    * @copydoc Dali::Toolkit::Text::ViewInterface::IsStrikethroughEnabled()
    */
   bool IsStrikethroughEnabled() const override;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::IsMarkupStrikethroughSet()
+   */
+  bool const IsMarkupStrikethroughSet() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetStrikethroughHeight()

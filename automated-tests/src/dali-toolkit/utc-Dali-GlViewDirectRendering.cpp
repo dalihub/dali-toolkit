@@ -23,9 +23,12 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/public-api/signals/render-callback.h>
+
 
 using namespace Dali;
 using namespace Dali::Toolkit;
+
 
 // Positive test case for a method
 int UtcDaliGlViewDirectRenderingNew(void)
@@ -199,6 +202,24 @@ int glRenderFrame(void)
 }
 
 void glTerminate(void)
+{
+}
+
+
+// Internal callback function
+void glInitMT(Dali::RenderCallbackInput& input)
+{
+}
+
+int gDRFramesRendered = 0;
+
+int glRenderFrameMT(Dali::RenderCallbackInput& input)
+{
+  gDRFramesRendered++;
+  return 1;
+}
+
+void glTerminateMT(Dali::RenderCallbackInput& input)
 {
 }
 
@@ -383,6 +404,112 @@ int UtcDaliGlViewDirectRenderingTerminateCallback(void)
   application.SendNotification();
   application.Render();
 
+  DALI_TEST_CHECK(true);
+  END_TEST;
+}
+
+// Positive test case for a method
+int UtcDaliGlViewDirectRenderingThreadedNew(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliGlViewDirectRenderingThreadedNew");
+  GlView view = GlView::New(GlView::BackendMode::DIRECT_RENDERING_THREADED, GlView::ColorFormat::RGBA8888);
+  DALI_TEST_CHECK(view);
+
+  auto mode1 = view.GetBackendMode();
+
+  DALI_TEST_EQUALS(mode1, GlView::BackendMode::DIRECT_RENDERING_THREADED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliGlViewDirectRenderingThreadedOnScene(void)
+{
+  ToolkitTestApplication application;
+
+  GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING_THREADED, GlView::ColorFormat::RGB888);
+
+  //Onscene
+  application.GetScene().Add(view);
+  view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
+  view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_3_0);
+  view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInitMT), Dali::MakeCallback(DirectRenderingCode::glRenderFrameMT), Dali::MakeCallback(DirectRenderingCode::glTerminateMT));
+  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+
+  // Set size on the actor (half the window size to show that glClear() and scissor test work together)
+  view.SetProperty(Actor::Property::SIZE, Size(100, 100));
+  view.SetProperty(Actor::Property::POSITION, Vector2(0,0));
+
+  while( DirectRenderingCode::gDRFramesRendered < 1 )
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  DALI_TEST_CHECK(true);
+  END_TEST;
+}
+
+extern "C" bool gDirectRenderingFailCreateShader;
+extern "C" bool gDirectRenderingFailCreateProgram;
+
+
+int UtcDaliGlViewDirectRenderingThreadedOnScene1(void)
+{
+  ToolkitTestApplication application;
+
+  GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING_THREADED, GlView::ColorFormat::RGB888);
+
+  // This test will fail instantiating shaders
+  gDirectRenderingFailCreateShader = true;
+
+  //Onscene
+  application.GetScene().Add(view);
+  view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
+  view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_3_0);
+  view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInitMT), Dali::MakeCallback(DirectRenderingCode::glRenderFrameMT), Dali::MakeCallback(DirectRenderingCode::glTerminateMT));
+  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+
+  // Set size on the actor (half the window size to show that glClear() and scissor test work together)
+  view.SetProperty(Actor::Property::SIZE, Size(100, 100));
+  view.SetProperty(Actor::Property::POSITION, Vector2(0,0));
+
+  while( DirectRenderingCode::gDRFramesRendered < 1 )
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  DALI_TEST_CHECK(true);
+  END_TEST;
+}
+
+int UtcDaliGlViewDirectRenderingThreadedOnScene2(void)
+{
+  ToolkitTestApplication application;
+
+  GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING_THREADED, GlView::ColorFormat::RGB888);
+
+  // This test will fail instantiating shaders
+  gDirectRenderingFailCreateProgram = true;
+
+  //Onscene
+  application.GetScene().Add(view);
+  view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
+  view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_3_0);
+  view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInitMT), Dali::MakeCallback(DirectRenderingCode::glRenderFrameMT), Dali::MakeCallback(DirectRenderingCode::glTerminateMT));
+  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+
+  // Set size on the actor (half the window size to show that glClear() and scissor test work together)
+  view.SetProperty(Actor::Property::SIZE, Size(100, 100));
+  view.SetProperty(Actor::Property::POSITION, Vector2(0,0));
+
+  while( DirectRenderingCode::gDRFramesRendered < 1 )
+  {
+    application.SendNotification();
+    application.Render();
+  }
   DALI_TEST_CHECK(true);
   END_TEST;
 }

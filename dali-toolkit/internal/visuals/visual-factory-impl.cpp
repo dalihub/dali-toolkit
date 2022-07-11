@@ -40,6 +40,7 @@
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
+#include <dali-toolkit/internal/visuals/text-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -77,6 +78,7 @@ const char* const BROKEN_IMAGE_FILE_NAME = "broken.png"; ///< The file name of t
 VisualFactory::VisualFactory(bool debugEnabled)
 : mFactoryCache(),
   mImageVisualShaderFactory(),
+  mTextVisualShaderFactory(),
   mSlotDelegate(this),
   mDebugEnabled(debugEnabled),
   mPreMultiplyOnLoad(true)
@@ -207,7 +209,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
 
     case Toolkit::Visual::TEXT:
     {
-      visualPtr = TextVisual::New(GetFactoryCache(), propertyMap);
+      visualPtr = TextVisual::New(GetFactoryCache(), GetTextVisualShaderFactory(), propertyMap);
       break;
     }
 
@@ -424,6 +426,15 @@ ImageVisualShaderFactory& VisualFactory::GetImageVisualShaderFactory()
     mImageVisualShaderFactory = std::unique_ptr<ImageVisualShaderFactory>(new ImageVisualShaderFactory());
   }
   return *mImageVisualShaderFactory;
+}
+
+TextVisualShaderFactory& VisualFactory::GetTextVisualShaderFactory()
+{
+  if(!mTextVisualShaderFactory)
+  {
+    mTextVisualShaderFactory = std::unique_ptr<TextVisualShaderFactory>(new TextVisualShaderFactory());
+  }
+  return *mTextVisualShaderFactory;
 }
 
 } // namespace Internal

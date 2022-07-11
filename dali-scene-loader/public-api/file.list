@@ -9,6 +9,7 @@ set(scene_loader_src_files ${scene_loader_src_files}
 	${scene_loader_public_api_dir}/customization.cpp
 	${scene_loader_public_api_dir}/dli-loader.cpp
 	${scene_loader_public_api_dir}/environment-definition.cpp
+	${scene_loader_public_api_dir}/facial-animation-loader.cpp
 	${scene_loader_public_api_dir}/gltf2-loader.cpp
 	${scene_loader_public_api_dir}/ktx-loader.cpp
 	${scene_loader_public_api_dir}/material-definition.cpp

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEST_VECTOR_ANIMATION_RENDERER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ namespace Test
 {
 namespace VectorAnimationRenderer
 {
-
 #define VECTOR_ANIMATION_TOTAL_FRAME_NUMBER 5
 #define VECTOR_ANIMATION_MARKER_NAME_1 "marker1"
 #define VECTOR_ANIMATION_MARKER_NAME_2 "marker2"
@@ -31,12 +30,10 @@ namespace VectorAnimationRenderer
 #define VECTOR_ANIMATION_MARKER_START_FRAME_2 2
 #define VECTOR_ANIMATION_MARKER_END_FRAME_2 3
 
-void RequestTrigger();
-void DelayRendering(uint32_t delay);
+void     DelayRendering(uint32_t delay);
 uint32_t GetDroppedFrames();
 
-} // VectorAnimationRenderer
-} // Test
-
+} // namespace VectorAnimationRenderer
+} // namespace Test
 
 #endif // DALI_TOOLKIT_TEST_VECTOR_ANIMATION_RENDERER_H

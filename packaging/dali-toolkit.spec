@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.1.29
+Version:    2.1.30
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -14,6 +14,10 @@ BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(dali2-core)
 BuildRequires:  pkgconfig(dali2-adaptor)
+BuildRequires:  pkgconfig(gles20)
+BuildRequires:  pkgconfig(glesv2)
+BuildRequires:  pkgconfig(egl)
+
 BuildRequires:  gettext
 BuildRequires:  pkgconfig(libtzplatform-config)
 

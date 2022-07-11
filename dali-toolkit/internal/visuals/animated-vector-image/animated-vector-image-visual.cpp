@@ -102,12 +102,9 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Visual::Base::Impl::IS_PREMULTIPLIED_ALPHA;
 
-  if(!mVectorAnimationTask->Load(mUrl.GetUrl()))
-  {
-    mLoadFailed = true;
-  }
+  mVectorAnimationTask->RequestLoad(mUrl.GetUrl());
 
-  mVectorAnimationTask->UploadCompletedSignal().Connect(this, &AnimatedVectorImageVisual::OnUploadCompleted);
+  mVectorAnimationTask->ResourceReadySignal().Connect(this, &AnimatedVectorImageVisual::OnResourceReady);
   mVectorAnimationTask->SetAnimationFinishedCallback(new EventThreadCallback(MakeCallback(this, &AnimatedVectorImageVisual::OnAnimationFinished)));
 
   auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
@@ -127,7 +124,7 @@ AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
     }
 
     // Finalize animation task and disconnect the signal in the main thread
-    mVectorAnimationTask->UploadCompletedSignal().Disconnect(this, &AnimatedVectorImageVisual::OnUploadCompleted);
+    mVectorAnimationTask->ResourceReadySignal().Disconnect(this, &AnimatedVectorImageVisual::OnResourceReady);
     mVectorAnimationTask->Finalize();
   }
 }
@@ -146,10 +143,28 @@ void AnimatedVectorImageVisual::GetNaturalSize(Vector2& naturalSize)
   }
   else
   {
-    uint32_t width, height;
-    mVectorAnimationTask->GetDefaultSize(width, height);
-    naturalSize.x = width;
-    naturalSize.y = height;
+    if(mLoadFailed && mImpl->mRenderer)
+    {
+      // Load failed, use broken image size
+      auto textureSet = mImpl->mRenderer.GetTextures();
+      if(textureSet && textureSet.GetTextureCount())
+      {
+        auto texture = textureSet.GetTexture(0);
+        if(texture)
+        {
+          naturalSize.x = texture.GetWidth();
+          naturalSize.y = texture.GetHeight();
+          return;
+        }
+      }
+    }
+    else
+    {
+      uint32_t width, height;
+      mVectorAnimationTask->GetDefaultSize(width, height);
+      naturalSize.x = width;
+      naturalSize.y = height;
+    }
   }
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::GetNaturalSize: w = %f, h = %f [%p]\n", naturalSize.width, naturalSize.height, this);
@@ -308,6 +323,8 @@ void AnimatedVectorImageVisual::OnInitialize(void)
 
   // Register transform properties
   mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+
+  mVectorAnimationTask->SetRenderer(mImpl->mRenderer);
 }
 
 void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
@@ -319,16 +336,13 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
 
   if(mLoadFailed)
   {
-    Vector2 imageSize = Vector2::ZERO;
-    imageSize         = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+    Vector2 imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
     mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
     actor.AddRenderer(mImpl->mRenderer);
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
   }
   else
   {
-    mVectorAnimationTask->SetRenderer(mImpl->mRenderer);
-
     // Add property notification for scaling & size
     mScaleNotification = actor.AddPropertyNotification(Actor::Property::WORLD_SCALE, StepCondition(0.1f, 1.0f));
     mScaleNotification.NotifySignal().Connect(this, &AnimatedVectorImageVisual::OnScaleNotification);
@@ -343,6 +357,15 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
     {
       DevelWindow::VisibilityChangedSignal(window).Connect(this, &AnimatedVectorImageVisual::OnWindowVisibilityChanged);
     }
+
+    if(mImpl->mEventObserver)
+    {
+      // The visual needs it's size set before it can be rasterized hence request relayout once on stage
+      mImpl->mEventObserver->RelayoutRequest(*this);
+    }
+
+    mAnimationData.resendFlag |= VectorAnimationTask::RESEND_NEED_RESOURCE_READY;
+    TriggerVectorRasterization();
   }
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOnScene [%p]\n", this);
@@ -374,8 +397,10 @@ void AnimatedVectorImageVisual::DoSetOffScene(Actor& actor)
   mPlacementActor.Reset();
 
   // Reset the visual size to zero so that when adding the actor back to stage the rasterization is forced
-  mVisualSize  = Vector2::ZERO;
-  mVisualScale = Vector2::ONE;
+  mVisualSize           = Vector2::ZERO;
+  mVisualScale          = Vector2::ONE;
+  mAnimationData.width  = 0;
+  mAnimationData.height = 0;
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOffScene [%p]\n", this);
 }
@@ -464,18 +489,30 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
   TriggerVectorRasterization();
 }
 
-void AnimatedVectorImageVisual::OnUploadCompleted()
+void AnimatedVectorImageVisual::OnResourceReady(bool success)
 {
+  mLoadFailed = !success;
+
   // If weak handle is holding a placement actor, it is the time to add the renderer to actor.
   Actor actor = mPlacementActor.GetHandle();
   if(actor && !mRendererAdded)
   {
-    actor.AddRenderer(mImpl->mRenderer);
+    if(success)
+    {
+      actor.AddRenderer(mImpl->mRenderer);
+      ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+    }
+    else
+    {
+      Vector2 imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+      mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+      actor.AddRenderer(mImpl->mRenderer);
+      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+    }
+
     mRendererAdded = true;
 
-    ResourceReady(Toolkit::Visual::ResourceStatus::READY);
-
-    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnUploadCompleted: Renderer is added [%p]\n", this);
+    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "Renderer is added (success = %d) [%p]\n", success, this);
   }
 }
 
@@ -528,9 +565,12 @@ void AnimatedVectorImageVisual::SetVectorImageSize()
   uint32_t width  = static_cast<uint32_t>(mVisualSize.width * mVisualScale.width);
   uint32_t height = static_cast<uint32_t>(mVisualSize.height * mVisualScale.height);
 
-  mAnimationData.width  = width;
-  mAnimationData.height = height;
-  mAnimationData.resendFlag |= VectorAnimationTask::RESEND_SIZE;
+  if(mAnimationData.width != width || mAnimationData.height != height)
+  {
+    mAnimationData.width  = width;
+    mAnimationData.height = height;
+    mAnimationData.resendFlag |= VectorAnimationTask::RESEND_SIZE;
+  }
 }
 
 void AnimatedVectorImageVisual::StopAnimation()
@@ -562,7 +602,7 @@ void AnimatedVectorImageVisual::OnScaleNotification(PropertyNotification& source
   {
     Vector3 scale = actor.GetProperty<Vector3>(Actor::Property::WORLD_SCALE);
 
-    if(mRedrawInScalingDown || scale.width >= 1.0f || scale.height >= 1.0f)
+    if((mVisualScale.width != scale.width || mVisualScale.height != scale.height) && (mRedrawInScalingDown || scale.width >= 1.0f || scale.height >= 1.0f))
     {
       mVisualScale.width  = scale.width;
       mVisualScale.height = scale.height;
@@ -582,16 +622,20 @@ void AnimatedVectorImageVisual::OnSizeNotification(PropertyNotification& source)
   Actor actor = mPlacementActor.GetHandle();
   if(actor)
   {
-    Vector3 size       = actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE);
-    mVisualSize.width  = size.width;
-    mVisualSize.height = size.height;
+    Vector3 size = actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE);
 
-    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnSizeNotification: size = %f, %f [%p]\n", mVisualSize.width, mVisualSize.height, this);
+    if(mVisualSize.width != size.width || mVisualSize.height != size.height)
+    {
+      mVisualSize.width  = size.width;
+      mVisualSize.height = size.height;
 
-    SetVectorImageSize();
-    SendAnimationData();
+      DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnSizeNotification: size = %f, %f [%p]\n", mVisualSize.width, mVisualSize.height, this);
 
-    Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
+      SetVectorImageSize();
+      SendAnimationData();
+
+      Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
+    }
   }
 }
 

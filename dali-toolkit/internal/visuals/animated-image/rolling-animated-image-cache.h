@@ -47,7 +47,10 @@ public:
    * @param[in] observer             FrameReady observer
    * @param[in] cacheSize            The size of the cache
    * @param[in] batchSize            The size of a batch to load
+   * @param[in] wrapModeU            Horizontal Wrap mode
+   * @param[in] wrapModeV            Vertical Wrap mode
    * @param[in] isSynchronousLoading The flag to define whether to load first frame synchronously
+   * @param[in] preMultiplyOnLoad    The flag if image's color should be multiplied by it's alpha
    *
    * This will start loading textures immediately, according to the
    * batch and cache sizes.
@@ -58,6 +61,8 @@ public:
                             ImageCache::FrameReadyObserver&     observer,
                             uint16_t                            cacheSize,
                             uint16_t                            batchSize,
+                            const Dali::WrapMode::Type&         wrapModeU,
+                            const Dali::WrapMode::Type&         wrapModeV,
                             bool                                isSynchronousLoading,
                             bool                                preMultiplyOnLoad);
 
@@ -181,6 +186,8 @@ private:
   std::vector<int32_t>       mIntervals;
   std::vector<uint32_t>      mLoadWaitingQueue;
   CircularQueue<ImageFrame>  mQueue;
+  Dali::WrapMode::Type       mWrapModeU : 3;
+  Dali::WrapMode::Type       mWrapModeV : 3;
   bool                       mIsSynchronousLoading;
   bool                       mPreMultiplyOnLoad;
 };

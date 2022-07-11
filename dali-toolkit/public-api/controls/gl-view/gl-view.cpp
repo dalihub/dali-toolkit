@@ -49,8 +49,9 @@ GlView GlView::New(BackendMode backendMode, ColorFormat colorFormat)
   switch(backendMode)
   {
     case BackendMode::DIRECT_RENDERING:
+    case BackendMode::DIRECT_RENDERING_THREADED:
     {
-      return Internal::DrawableView::New();
+      return Internal::DrawableView::New(backendMode);
     }
     case BackendMode::EGL_IMAGE_OFFSCREEN_RENDERING:
     {

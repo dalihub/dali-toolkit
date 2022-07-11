@@ -1,9 +1,9 @@
-attribute mediump vec2 aPosition;
+INPUT mediump vec2 aPosition;
 uniform highp mat4 uMvpMatrix;
 uniform highp vec3 uSize;
 uniform mediump vec4 pixelArea;
 
-varying mediump vec2 vTexCoord;
+OUTPUT mediump vec2 vTexCoord;
 
 //Visual size and offset
 uniform mediump vec2 offset;

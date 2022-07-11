@@ -1,6 +1,6 @@
 
 /*
-* Copyright (c) 2021 Samsung Electronics Co., Ltd.
+* Copyright (c) 2022 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
 */
 
 // FILE HEADER
-#include "dali-scene-loader/public-api/blend-shape-details.h"
+#include <dali-scene-loader/public-api/blend-shape-details.h>
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/animation/constraints.h"
-#include "dali/public-api/object/property.h"
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/object/property.h>
 
 // INTERNAL INCLUDES
-#include "dali-scene-loader/public-api/resource-bundle.h"
+#include <dali-scene-loader/public-api/resource-bundle.h>
 
 namespace Dali
 {
@@ -69,8 +69,8 @@ void BlendShapes::ConfigureProperties(const std::pair<MeshDefinition, MeshGeomet
       shader.RegisterProperty(UNNORMALIZE_FACTOR, mesh.second.blendShapeUnnormalizeFactor[0u]);
     }
 
-    shader.RegisterProperty(NUMBER_OF_BLEND_SHAPES, Property::Value(static_cast<int>(index)));
-    shader.RegisterProperty(COMPONENT_SIZE, Property::Value(static_cast<int>(mesh.second.blendShapeBufferOffset)));
+    shader.RegisterProperty(NUMBER_OF_BLEND_SHAPES, Property::Value(static_cast<float>(index)));
+    shader.RegisterProperty(COMPONENT_SIZE, Property::Value(static_cast<float>(mesh.second.blendShapeBufferOffset)));
 
     // Create a read only property to preserve the components of the blend shape.
     int32_t components = 0x0;

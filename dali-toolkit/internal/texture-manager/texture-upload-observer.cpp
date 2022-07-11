@@ -37,6 +37,18 @@ TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnT
 {
 }
 
+TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, const std::string& url, bool preMultiplied)
+: returnType(returnType),
+  textureId(textureId),
+  textureSet(textureSet),
+  useAtlasing(false),
+  atlasRect(Vector4::ZERO),
+  preMultiplied(preMultiplied),
+  pixelBuffer(),
+  url(url)
+{
+}
+
 TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, bool preMultiplied)
 : returnType(returnType),
   textureId(Internal::TextureManagerType::INVALID_TEXTURE_ID),

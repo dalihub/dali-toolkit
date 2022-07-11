@@ -178,7 +178,7 @@ void AnimatedImageVisual::CreateImageCache()
 
   if(mAnimatedImageLoading)
   {
-    mImageCache = new RollingAnimatedImageCache(textureManager, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, IsSynchronousLoadingRequired(), mFactoryCache.GetPreMultiplyOnLoad());
+    mImageCache = new RollingAnimatedImageCache(textureManager, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize,  mWrapModeU, mWrapModeV, IsSynchronousLoadingRequired(), mFactoryCache.GetPreMultiplyOnLoad());
   }
   else if(mImageUrls)
   {

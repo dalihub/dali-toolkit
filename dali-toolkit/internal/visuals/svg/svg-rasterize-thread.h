@@ -32,6 +32,7 @@
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/helpers/round-robin-container-view.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
@@ -44,6 +45,7 @@ class SvgVisual;
 typedef IntrusivePtr<SvgVisual> SvgVisualPtr;
 class SvgTask;
 typedef IntrusivePtr<SvgTask> SvgTaskPtr;
+class SvgRasterizeManager;
 
 /**
  * The svg rasterizing tasks to be processed in the worker thread.
@@ -73,6 +75,15 @@ public:
    * Process the task
    */
   virtual void Process() = 0;
+
+  /**
+   * Whether the task is ready to process.
+   * @return True if the task is ready to process.
+   */
+  virtual bool IsReady()
+  {
+    return true;
+  }
 
   /**
    * Whether the task has succeeded.
@@ -161,6 +172,12 @@ public:
   void Process() override;
 
   /**
+   * Whether the task is ready to process.
+   * @return True if the task is ready to process.
+   */
+  bool IsReady() override;
+
+  /**
    * Get the rasterization result.
    * @return The pixel data with the rasterized pixels.
    */
@@ -182,7 +199,52 @@ private:
 /**
  * The worker thread for SVG rasterization.
  */
-class SvgRasterizeThread : public Thread, Integration::Processor
+class SvgRasterizeThread : public Thread
+{
+public:
+  /**
+   * Constructor.
+   */
+  SvgRasterizeThread(SvgRasterizeManager& svgRasterizeManager);
+
+  /**
+   * Destructor.
+   */
+  ~SvgRasterizeThread() override;
+
+  /**
+   * @brief Request the thread to rasterizes the task.
+   * @return True if the request succeeds, otherwise false.
+   */
+  bool RequestRasterize();
+
+protected:
+  /**
+   * The entry function of the worker thread.
+   * It rasterizes the image.
+   */
+  void Run() override;
+
+private:
+  // Undefined
+  SvgRasterizeThread(const SvgRasterizeThread& thread) = delete;
+
+  // Undefined
+  SvgRasterizeThread& operator=(const SvgRasterizeThread& thread) = delete;
+
+private:
+  ConditionalWait                  mConditionalWait;
+  const Dali::LogFactoryInterface& mLogFactory;
+  SvgRasterizeManager&             mSvgRasterizeManager;
+  bool                             mDestroyThread;
+  bool                             mIsThreadStarted;
+  bool                             mIsThreadIdle;
+};
+
+/**
+ * The manager for SVG rasterization.
+ */
+class SvgRasterizeManager : Integration::Processor
 {
 public:
   /**
@@ -190,12 +252,12 @@ public:
    *
    * @param[in] trigger The trigger to wake up the main thread.
    */
-  SvgRasterizeThread();
+  SvgRasterizeManager();
 
   /**
-   * Terminate the svg rasterize thread, join and delete.
+   * Destructor.
    */
-  static void TerminateThread(SvgRasterizeThread*& thread);
+  ~SvgRasterizeManager() override;
 
   /**
    * Add a rasterization task into the waiting queue, called by main thread.
@@ -225,7 +287,6 @@ public:
    */
   void Process(bool postProcessor) override;
 
-private:
   /**
    * Pop the next task out from the queue.
    *
@@ -240,6 +301,7 @@ private:
    */
   void AddCompletedTask(SvgTaskPtr task);
 
+private:
   /**
    * Applies the rasterized image to material
    */
@@ -251,34 +313,59 @@ private:
    */
   void UnregisterProcessor();
 
-protected:
+private:
   /**
-   * Destructor.
+   * @brief Helper class to keep the relation between SvgRasterizeThread and corresponding container
    */
-  ~SvgRasterizeThread() override;
+  class RasterizeHelper
+  {
+  public:
+    /**
+     * @brief Create an RasterizeHelper.
+     *
+     * @param[in] svgRasterizeManager Reference to the SvgRasterizeManager
+     */
+    RasterizeHelper(SvgRasterizeManager& svgRasterizeManager);
 
-  /**
-   * The entry function of the worker thread.
-   * It fetches task from the Queue, rasterizes the image and apply to the renderer.
-   */
-  void Run() override;
+    /**
+     * @brief Request the thread to rasterizes the task.
+     * @return True if the request succeeds, otherwise false.
+     */
+    bool RequestRasterize();
+
+  public:
+    RasterizeHelper(const RasterizeHelper&) = delete;
+    RasterizeHelper& operator=(const RasterizeHelper&) = delete;
+
+    RasterizeHelper(RasterizeHelper&& rhs);
+    RasterizeHelper& operator=(RasterizeHelper&& rhs) = delete;
+
+  private:
+    /**
+     * @brief Main constructor that used by all other constructors
+     */
+    RasterizeHelper(std::unique_ptr<SvgRasterizeThread> rasterizer, SvgRasterizeManager& svgRasterizeManager);
+
+  private:
+    std::unique_ptr<SvgRasterizeThread> mRasterizer;
+    SvgRasterizeManager&                mSvgRasterizeManager;
+  };
 
 private:
   // Undefined
-  SvgRasterizeThread(const SvgRasterizeThread& thread);
+  SvgRasterizeManager(const SvgRasterizeManager& thread);
 
   // Undefined
-  SvgRasterizeThread& operator=(const SvgRasterizeThread& thread);
+  SvgRasterizeManager& operator=(const SvgRasterizeManager& thread);
 
 private:
   std::vector<SvgTaskPtr> mRasterizeTasks; //The queue of the tasks waiting to rasterize the SVG image
   std::vector<SvgTaskPtr> mCompletedTasks; //The queue of the tasks with the SVG rasterization completed
 
-  ConditionalWait                      mConditionalWait;
+  RoundRobinContainerView<RasterizeHelper> mRasterizers;
+
   Dali::Mutex                          mMutex;
   std::unique_ptr<EventThreadCallback> mTrigger;
-  const Dali::LogFactoryInterface&     mLogFactory;
-  bool                                 mIsThreadWaiting;
   bool                                 mProcessorRegistered;
 };
 

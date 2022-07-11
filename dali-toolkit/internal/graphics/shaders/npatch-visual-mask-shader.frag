@@ -14,10 +14,24 @@ void main()
   // where mask is translucent, less of background should be shown.
   // auxiliaryImageAlpha controls how much of mask is visible
 
-  mediump vec4 color = texture2D( sTexture, vTexCoord );
-  mediump vec4 mask= texture2D( sMask, vMaskTexCoord );
+  mediump vec4 color = texture2D(sTexture, vTexCoord);
+  mediump vec4 mask = texture2D(sMask, vMaskTexCoord);
 
-  mediump vec3 mixedColor = color.rgb * mix( 1.0-mask.a, 1.0, 1.0-auxiliaryImageAlpha)
-                            + mask.rgb*mask.a * auxiliaryImageAlpha;
-  gl_FragColor = vec4(mixedColor,1.0) * uColor * vec4( mixColor, 1.0 );
+  mediump float maskAlpha = mask.a * auxiliaryImageAlpha;
+
+  lowp vec3 preMultipliedMaskRGB = mask.rgb * mix(mask.a, 1.0, preMultipliedAlpha) * auxiliaryImageAlpha;
+  lowp vec3 preMultipliedTextureRGB = color.rgb * mix(color.a, 1.0, preMultipliedAlpha);
+
+  // Manual blend operation with premultiplied colors.
+  // Final alpha = maskAlpha + (1.0 - maskAlpha) * color.a.
+  // (Final rgb * alpha) =  preMultipliedMaskRGB + (1.0 - maskAlpha) * preMultipliedTextureRGB
+  // If preMultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
+  // Else, return vec4((rgb*alpha) / alpha, alpha)
+
+  lowp float finalAlpha = mix(color.a, 1.0, maskAlpha);
+  lowp vec3  finalMultipliedRGB = preMultipliedMaskRGB + (1.0 - maskAlpha) * preMultipliedTextureRGB;
+
+  // TODO : Need to find some way without division
+  lowp vec4 finalColor = vec4(finalMultipliedRGB * mix(1.0 / finalAlpha, 1.0, preMultipliedAlpha), finalAlpha);
+  gl_FragColor = finalColor * uColor * vec4(mixColor, 1.0);
 }

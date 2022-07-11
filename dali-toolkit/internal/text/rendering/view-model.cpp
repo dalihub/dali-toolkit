@@ -245,6 +245,11 @@ bool ViewModel::IsUnderlineEnabled() const
   return mModel->IsUnderlineEnabled();
 }
 
+bool const ViewModel::IsMarkupUnderlineSet() const
+{
+  return mModel->IsMarkupUnderlineSet();
+}
+
 float ViewModel::GetUnderlineHeight() const
 {
   return mModel->GetUnderlineHeight();
@@ -697,6 +702,11 @@ const Vector4& ViewModel::GetStrikethroughColor() const
 bool ViewModel::IsStrikethroughEnabled() const
 {
   return mModel->IsStrikethroughEnabled();
+}
+
+bool const ViewModel::IsMarkupStrikethroughSet() const
+{
+  return mModel->IsMarkupStrikethroughSet();
 }
 
 Length ViewModel::GetNumberOfStrikethroughRuns() const

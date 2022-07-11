@@ -148,9 +148,9 @@ void OpacityConstraint(float& current, const PropertyInputContainer& inputs)
 
 } // unnamed namespace
 
-TextVisualPtr TextVisual::New(VisualFactoryCache& factoryCache, const Property::Map& properties)
+TextVisualPtr TextVisual::New(VisualFactoryCache& factoryCache, TextVisualShaderFactory& shaderFactory, const Property::Map& properties)
 {
-  TextVisualPtr textVisualPtr(new TextVisual(factoryCache));
+  TextVisualPtr textVisualPtr(new TextVisual(factoryCache, shaderFactory));
   textVisualPtr->SetProperties(properties);
   textVisualPtr->Initialize();
   return textVisualPtr;
@@ -249,10 +249,12 @@ void TextVisual::EnablePreMultipliedAlpha(bool preMultiplied)
   }
 }
 
-TextVisual::TextVisual(VisualFactoryCache& factoryCache)
+TextVisual::TextVisual(VisualFactoryCache& factoryCache, TextVisualShaderFactory& shaderFactory)
 : Visual::Base(factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO, Toolkit::Visual::TEXT),
   mController(Text::Controller::New()),
   mTypesetter(Text::Typesetter::New(mController->GetTextModel())),
+  mTextVisualShaderFactory(shaderFactory),
+  mTextShaderFeatureCache(),
   mAnimatableTextColorPropertyIndex(Property::INVALID_INDEX),
   mTextColorAnimatableIndex(Property::INVALID_INDEX),
   mRendererUpdateNeeded(false)
@@ -268,7 +270,7 @@ TextVisual::~TextVisual()
 void TextVisual::OnInitialize()
 {
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
-  Shader   shader   = GetTextShader(mFactoryCache, TextType::SINGLE_COLOR_TEXT, TextType::NO_EMOJI, TextType::NO_STYLES);
+  Shader   shader   = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder());
 
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
@@ -560,13 +562,14 @@ void TextVisual::UpdateRenderer()
         shadowEnabled = true;
       }
 
-      const bool underlineEnabled       = mController->GetTextModel()->IsUnderlineEnabled();
-      const bool outlineEnabled         = (mController->GetTextModel()->GetOutlineWidth() > Math::MACHINE_EPSILON_1);
-      const bool backgroundEnabled      = mController->GetTextModel()->IsBackgroundEnabled();
-      const bool markupProcessorEnabled = mController->IsMarkupProcessorEnabled();
-      const bool strikethroughEnabled   = mController->GetTextModel()->IsStrikethroughEnabled();
-
-      const bool styleEnabled   = (shadowEnabled || underlineEnabled || outlineEnabled || backgroundEnabled || markupProcessorEnabled || strikethroughEnabled);
+      const bool outlineEnabled             = (mController->GetTextModel()->GetOutlineWidth() > Math::MACHINE_EPSILON_1);
+      const bool backgroundEnabled          = mController->GetTextModel()->IsBackgroundEnabled();
+      const bool markupProcessorEnabled     = mController->IsMarkupProcessorEnabled();
+      const bool markupUnderlineEnabled     = markupProcessorEnabled && mController->GetTextModel()->IsMarkupUnderlineSet();
+      const bool markupStrikethroughEnabled = markupProcessorEnabled && mController->GetTextModel()->IsMarkupStrikethroughSet();
+      const bool underlineEnabled           = mController->GetTextModel()->IsUnderlineEnabled() || markupUnderlineEnabled;
+      const bool strikethroughEnabled       = mController->GetTextModel()->IsStrikethroughEnabled() || markupStrikethroughEnabled;
+      const bool styleEnabled   = (shadowEnabled || outlineEnabled || backgroundEnabled || markupProcessorEnabled);
       const bool isOverlayStyle = underlineEnabled || strikethroughEnabled;
 
       AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
@@ -604,7 +607,7 @@ PixelData TextVisual::ConvertToPixelData(unsigned char* buffer, int width, int h
   return pixelData;
 }
 
-void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sampler& sampler, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle)
+void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sampler& sampler)
 {
   TextureSet   textureSet      = TextureSet::New();
   unsigned int textureSetIndex = 0u;
@@ -618,21 +621,21 @@ void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sa
     ++textureSetIndex;
   }
 
-  if(styleEnabled && info.styleBuffer && info.overlayStyleBuffer)
+  if(mTextShaderFeatureCache.IsEnabledStyle() && info.styleBuffer)
   {
     PixelData styleData = ConvertToPixelData(info.styleBuffer, info.width, info.height, info.offsetPosition, Pixel::RGBA8888);
     AddTexture(textureSet, styleData, sampler, textureSetIndex);
     ++textureSetIndex;
+  }
 
-    // TODO : We need to seperate whether use overlayStyle or not.
-    // Current text visual shader required both of them.
-
+  if(mTextShaderFeatureCache.IsEnabledOverlay() && info.overlayStyleBuffer)
+  {
     PixelData overlayStyleData = ConvertToPixelData(info.overlayStyleBuffer, info.width, info.height, info.offsetPosition, Pixel::RGBA8888);
     AddTexture(textureSet, overlayStyleData, sampler, textureSetIndex);
     ++textureSetIndex;
   }
 
-  if(containsColorGlyph && !hasMultipleTextColors && info.maskBuffer)
+  if(mTextShaderFeatureCache.IsEnabledEmoji() && !mTextShaderFeatureCache.IsEnabledMultiColor() && info.maskBuffer)
   {
     PixelData maskData = ConvertToPixelData(info.maskBuffer, info.width, info.height, info.offsetPosition, Pixel::L8);
     AddTexture(textureSet, maskData, sampler, textureSetIndex);
@@ -651,14 +654,14 @@ void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sa
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, Vector2(info.width, info.height));
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET, Vector2(info.offSet.x, info.offSet.y));
   renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
-  renderer.RegisterProperty("uHasMultipleTextColors", static_cast<float>(hasMultipleTextColors));
+  renderer.RegisterProperty("uHasMultipleTextColors", static_cast<float>(mTextShaderFeatureCache.IsEnabledMultiColor()));
 
   mRendererList.push_back(renderer);
 }
 
 void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle)
 {
-  Shader shader = GetTextShader(mFactoryCache, hasMultipleTextColors, containsColorGlyph, styleEnabled);
+  Shader shader = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder().EnableMultiColor(hasMultipleTextColors).EnableEmoji(containsColorGlyph).EnableStyle(styleEnabled).EnableOverlay(isOverlayStyle));
   mImpl->mRenderer.SetShader(shader);
 
   // Get the maximum size.
@@ -667,7 +670,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
   // No tiling required. Use the default renderer.
   if(size.height < maxTextureSize)
   {
-    TextureSet textureSet = GetTextTexture(size, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
+    TextureSet textureSet = GetTextTexture(size);
 
     mImpl->mRenderer.SetTextures(textureSet);
     //Register transform properties
@@ -703,23 +706,23 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     Dali::DevelPixelData::PixelDataBuffer textPixelData = Dali::DevelPixelData::ReleasePixelDataBuffer(data);
     info.textBuffer                                     = textPixelData.buffer;
 
-    if(styleEnabled)
+    if(mTextShaderFeatureCache.IsEnabledStyle())
     {
       // Create RGBA texture for all the text styles (without the text itself)
       PixelData                             styleData      = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888);
       Dali::DevelPixelData::PixelDataBuffer stylePixelData = Dali::DevelPixelData::ReleasePixelDataBuffer(styleData);
       info.styleBuffer                                     = stylePixelData.buffer;
+    }
 
-      // TODO : We need to seperate whether use overlayStyle or not.
-      // Current text visual shader required both of them.
-
+    if(mTextShaderFeatureCache.IsEnabledOverlay())
+    {
       // Create RGBA texture for all the overlay styles
       PixelData                             overlayStyleData      = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_OVERLAY_STYLE, false, Pixel::RGBA8888);
       Dali::DevelPixelData::PixelDataBuffer overlayStylePixelData = Dali::DevelPixelData::ReleasePixelDataBuffer(overlayStyleData);
       info.overlayStyleBuffer                                     = overlayStylePixelData.buffer;
     }
 
-    if(containsColorGlyph && !hasMultipleTextColors)
+    if(mTextShaderFeatureCache.IsEnabledEmoji() && !mTextShaderFeatureCache.IsEnabledMultiColor())
     {
       // Create a L8 texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
       PixelData                             maskData      = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_MASK, false, Pixel::L8);
@@ -737,7 +740,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     }
 
     // Create a textureset in the default renderer.
-    CreateTextureSet(info, mImpl->mRenderer, sampler, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
+    CreateTextureSet(info, mImpl->mRenderer, sampler);
 
     verifiedHeight -= maxTextureSize;
 
@@ -756,7 +759,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
       // New offset for tiling.
       info.offSet.y += maxTextureSize;
       // Create a textureset int the new tiling renderer.
-      CreateTextureSet(info, tilingRenderer, sampler, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
+      CreateTextureSet(info, tilingRenderer, sampler);
 
       verifiedHeight -= maxTextureSize;
     }
@@ -800,7 +803,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
   }
 }
 
-TextureSet TextVisual::GetTextTexture(const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle)
+TextureSet TextVisual::GetTextTexture(const Vector2& size)
 {
   // Filter mode needs to be set to linear to produce better quality while scaling.
   Sampler sampler = Sampler::New();
@@ -809,7 +812,7 @@ TextureSet TextVisual::GetTextTexture(const Vector2& size, bool hasMultipleTextC
   TextureSet textureSet = TextureSet::New();
 
   // Create RGBA texture if the text contains emojis or multiple text colors, otherwise L8 texture
-  Pixel::Format textPixelFormat = (containsColorGlyph || hasMultipleTextColors) ? Pixel::RGBA8888 : Pixel::L8;
+  Pixel::Format textPixelFormat = (mTextShaderFeatureCache.IsEnabledEmoji() || mTextShaderFeatureCache.IsEnabledMultiColor()) ? Pixel::RGBA8888 : Pixel::L8;
 
   // Check the text direction
   Toolkit::DevelText::TextDirection::Type textDirection = mController->GetTextDirection();
@@ -823,23 +826,23 @@ TextureSet TextVisual::GetTextTexture(const Vector2& size, bool hasMultipleTextC
   AddTexture(textureSet, data, sampler, textureSetIndex);
   ++textureSetIndex;
 
-  if(styleEnabled)
+  if(mTextShaderFeatureCache.IsEnabledStyle())
   {
     // Create RGBA texture for all the text styles that render in the background (without the text itself)
     PixelData styleData = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888);
     AddTexture(textureSet, styleData, sampler, textureSetIndex);
     ++textureSetIndex;
+  }
 
-    // TODO : We need to seperate whether use overlayStyle or not.
-    // Current text visual shader required both of them.
-
+  if(mTextShaderFeatureCache.IsEnabledOverlay())
+  {
     // Create RGBA texture for overlay styles such as underline and strikethrough (without the text itself)
     PixelData overlayStyleData = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_OVERLAY_STYLE, false, Pixel::RGBA8888);
     AddTexture(textureSet, overlayStyleData, sampler, textureSetIndex);
     ++textureSetIndex;
   }
 
-  if(containsColorGlyph && !hasMultipleTextColors)
+  if(mTextShaderFeatureCache.IsEnabledEmoji() && !mTextShaderFeatureCache.IsEnabledMultiColor())
   {
     // Create a L8 texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
     PixelData maskData = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_MASK, false, Pixel::L8);
@@ -850,73 +853,13 @@ TextureSet TextVisual::GetTextTexture(const Vector2& size, bool hasMultipleTextC
   return textureSet;
 }
 
-Shader TextVisual::GetTextShader(VisualFactoryCache& factoryCache, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled)
+Shader TextVisual::GetTextShader(VisualFactoryCache& factoryCache, const TextVisualShaderFeature::FeatureBuilder& featureBuilder)
 {
-  Shader shader;
+  // Cache feature builder informations.
+  mTextShaderFeatureCache = featureBuilder;
 
-  if(hasMultipleTextColors && !styleEnabled)
-  {
-    // We don't animate text color if the text contains multiple colors
-    shader = factoryCache.GetShader(VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT);
-    if(!shader)
-    {
-      shader = Shader::New(SHADER_TEXT_VISUAL_SHADER_VERT, SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_SHADER_FRAG);
-      shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-      factoryCache.SaveShader(VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT, shader);
-    }
-  }
-  else if(hasMultipleTextColors && styleEnabled)
-  {
-    // We don't animate text color if the text contains multiple colors
-    shader = factoryCache.GetShader(VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE);
-    if(!shader)
-    {
-      shader = Shader::New(SHADER_TEXT_VISUAL_SHADER_VERT, SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_WITH_STYLE_SHADER_FRAG);
-      shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-      factoryCache.SaveShader(VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE, shader);
-    }
-  }
-  else if(!hasMultipleTextColors && !containsColorGlyph && !styleEnabled)
-  {
-    shader = factoryCache.GetShader(VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT);
-    if(!shader)
-    {
-      shader = Shader::New(SHADER_TEXT_VISUAL_SHADER_VERT, SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_SHADER_FRAG);
-      shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-      factoryCache.SaveShader(VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT, shader);
-    }
-  }
-  else if(!hasMultipleTextColors && !containsColorGlyph && styleEnabled)
-  {
-    shader = factoryCache.GetShader(VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE);
-    if(!shader)
-    {
-      shader = Shader::New(SHADER_TEXT_VISUAL_SHADER_VERT, SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_SHADER_FRAG);
-      shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-      factoryCache.SaveShader(VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE, shader);
-    }
-  }
-  else if(!hasMultipleTextColors && containsColorGlyph && !styleEnabled)
-  {
-    shader = factoryCache.GetShader(VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI);
-    if(!shader)
-    {
-      shader = Shader::New(SHADER_TEXT_VISUAL_SHADER_VERT, SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_EMOJI_SHADER_FRAG);
-      shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-      factoryCache.SaveShader(VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI, shader);
-    }
-  }
-  else // if( !hasMultipleTextColors && containsColorGlyph && styleEnabled )
-  {
-    shader = factoryCache.GetShader(VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI);
-    if(!shader)
-    {
-      shader = Shader::New(SHADER_TEXT_VISUAL_SHADER_VERT, SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI_SHADER_FRAG);
-      shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-      factoryCache.SaveShader(VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI, shader);
-    }
-  }
-
+  Shader shader = mTextVisualShaderFactory.GetShader(factoryCache, mTextShaderFeatureCache);
+  shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
   return shader;
 }
 

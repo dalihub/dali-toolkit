@@ -104,12 +104,18 @@ public:
     NATIVE_IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING,
     NINE_PATCH_SHADER,
     NINE_PATCH_MASK_SHADER,
-    TEXT_SHADER_MULTI_COLOR_TEXT,
-    TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE,
     TEXT_SHADER_SINGLE_COLOR_TEXT,
     TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE,
+    TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_OVERLAY,
+    TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_OVERLAY,
     TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI,
     TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI,
+    TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_OVERLAY_AND_EMOJI,
+    TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_OVERLAY_AND_EMOJI,
+    TEXT_SHADER_MULTI_COLOR_TEXT,
+    TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE,
+    TEXT_SHADER_MULTI_COLOR_TEXT_WITH_OVERLAY,
+    TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE_AND_OVERLAY,
     ANIMATED_GRADIENT_SHADER_LINEAR_BOUNDING_REFLECT,
     ANIMATED_GRADIENT_SHADER_LINEAR_BOUNDING_REPEAT,
     ANIMATED_GRADIENT_SHADER_LINEAR_BOUNDING_CLAMP,
@@ -239,10 +245,10 @@ public:
   NPatchLoader& GetNPatchLoader();
 
   /**
-   * Get the SVG rasterization thread.
-   * @return A raw pointer pointing to the SVG rasterization thread.
+   * Get the SVG rasterization manager.
+   * @return A raw pointer pointing to the SVG rasterization manager.
    */
-  SvgRasterizeThread* GetSVGRasterizationThread();
+  SvgRasterizeManager* GetSVGRasterizationManager();
 
   /**
    * Get the vector animation manager.
@@ -342,7 +348,7 @@ private:
   TextureManager       mTextureManager;
   NPatchLoader         mNPatchLoader;
 
-  SvgRasterizeThread*                     mSvgRasterizeThread;
+  std::unique_ptr<SvgRasterizeManager>    mSvgRasterizeManager;
   std::unique_ptr<VectorAnimationManager> mVectorAnimationManager;
   bool                                    mPreMultiplyOnLoad;
   std::vector<BrokenImageInfo>            mBrokenImageInfoContainer;

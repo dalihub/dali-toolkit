@@ -205,6 +205,11 @@ public:
   bool IsUnderlineEnabled() const override;
 
   /**
+   * @copydoc ModelInterface::IsMarkupUnderlineSet()
+   */
+  bool const IsMarkupUnderlineSet() const override;
+
+  /**
    * @copydoc ModelInterface::GetUnderlineHeight()
    */
   float GetUnderlineHeight() const override;
@@ -274,11 +279,26 @@ public:
   */
   Length GetHyphensCount() const override;
 
+  /**
+   * @copydoc ModelInterface::GetStrikethroughHeight()
+   */
   float GetStrikethroughHeight() const override;
 
+  /**
+   * @copydoc ModelInterface::GetStrikethroughColor()
+   */
   const Vector4& GetStrikethroughColor() const override;
 
+  /**
+   * @copydoc ModelInterface::IsStrikethroughEnabled()
+   */
   bool IsStrikethroughEnabled() const override;
+
+  /**
+   * @copydoc ModelInterface::IsMarkupStrikethroughSet()
+   */
+  bool const IsMarkupStrikethroughSet() const override;
+
   /**
    * @copydoc ModelInterface::GetCharacterSpacing()
    */

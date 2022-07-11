@@ -941,10 +941,13 @@ void ResizeModelVectors(MarkupProcessData& markupProcessData,
   markupProcessData.characterSpacingCharacterRuns.Resize(characterSpacingCharacterRunIndex);
 
 #ifdef DEBUG_ENABLED
-  for(uint32_t i = 0; gLogFilter->IsEnabledFor(Debug::Verbose) && i < colorRunIndex; ++i)
+  if(gLogFilter->IsEnabledFor(Debug::Verbose))
   {
-    ColorRun& run = markupProcessData.colorRuns[i];
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "run[%d] index: %d, length: %d, color %f,%f,%f,%f\n", i, run.characterRun.characterIndex, run.characterRun.numberOfCharacters, run.color.r, run.color.g, run.color.b, run.color.a);
+    for(uint32_t i = 0; i < colorRunIndex; ++i)
+    {
+      ColorRun& run = markupProcessData.colorRuns[i];
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "run[%d] index: %d, length: %d, color %f,%f,%f,%f\n", i, run.characterRun.characterIndex, run.characterRun.numberOfCharacters, run.color.r, run.color.g, run.color.b, run.color.a);
+    }
   }
 #endif
 }

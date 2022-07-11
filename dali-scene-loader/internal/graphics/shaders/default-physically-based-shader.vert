@@ -23,7 +23,7 @@ in vec3 aTangent;
 in vec4 aVertexColor;
 
 #ifdef MORPH
-  uniform sampler2D sBlendShapeGeometry;
+  uniform highp sampler2D sBlendShapeGeometry;
 #endif
 
 out vec2 vUV;
@@ -46,35 +46,39 @@ uniform lowp float uHasVertexColor;
 
 #ifdef MORPH
 #define MAX_BLEND_SHAPE_NUMBER 128
-uniform int uNumberOfBlendShapes;                                   ///< Total number of blend shapes loaded.
-uniform float uBlendShapeWeight[MAX_BLEND_SHAPE_NUMBER];            ///< The weight of each blend shape.
+uniform float uNumberOfBlendShapes;                                 ///< Total number of blend shapes loaded.
+uniform highp float uBlendShapeWeight[MAX_BLEND_SHAPE_NUMBER];            ///< The weight of each blend shape.
 #ifdef MORPH_VERSION_2_0
 uniform float uBlendShapeUnnormalizeFactor;                         ///< Factor used to unnormalize the geometry of the blend shape.
 #else
 uniform float uBlendShapeUnnormalizeFactor[MAX_BLEND_SHAPE_NUMBER]; ///< Factor used to unnormalize the geometry of the blend shape.
 #endif
-uniform int uBlendShapeComponentSize;                               ///< The size in the texture of either the vertices, normals or tangents. Used to calculate the offset to address them.
+uniform float uBlendShapeComponentSize;                             ///< The size in the texture of either the vertices, normals or tangents. Used to calculate the offset to address them.
 #endif
 
 void main()
 {
   highp vec4 position = vec4(aPosition, 1.0);
-  vec3 normal = aNormal;
-  vec3 tangent = aTangent.xyz;
+  highp vec3 normal = aNormal;
+  highp vec3 tangent = aTangent.xyz;
 
 #ifdef MORPH
   int width = textureSize( sBlendShapeGeometry, 0 ).x;
 
   int blendShapeBufferOffset = 0;
-  for( int index = 0; index < uNumberOfBlendShapes; ++index )
+  int blendShapeComponentSize = int(uBlendShapeComponentSize);
+  int numberOfBlendShapes = int(uNumberOfBlendShapes);
+
+  for( int index = 0; index < numberOfBlendShapes; ++index )
   {
+    highp vec3 diff = vec3(0.0);
+
 #ifdef MORPH_POSITION
     // Calculate the index to retrieve the geometry from the texture.
     int vertexId = gl_VertexID + blendShapeBufferOffset;
     int x = vertexId % width;
     int y = vertexId / width;
 
-    vec3 diff = vec3(0.0);
     // Retrieves the blend shape geometry from the texture, unnormalizes it and multiply by the weight.
     if( 0.0 != uBlendShapeWeight[index] )
     {
@@ -89,12 +93,12 @@ void main()
 
     position.xyz += diff;
 
-    blendShapeBufferOffset += uBlendShapeComponentSize;
+    blendShapeBufferOffset += blendShapeComponentSize;
 #endif
 
 #ifdef MORPH_NORMAL
     // Calculate the index to retrieve the normal from the texture.
-    vertexId = gl_VertexID + blendShapeBufferOffset;
+    vertexId = gl_VertexID + int(blendShapeBufferOffset);
     x = vertexId % width;
     y = vertexId / width;
 
@@ -106,7 +110,7 @@ void main()
 
     normal += diff.xyz;
 
-    blendShapeBufferOffset += uBlendShapeComponentSize;
+    blendShapeBufferOffset += blendShapeComponentSize;
 #endif
 
 #ifdef MORPH_TANGENT
@@ -123,7 +127,7 @@ void main()
 
     tangent += diff.xyz;
 
-    blendShapeBufferOffset += uBlendShapeComponentSize;
+    blendShapeBufferOffset += blendShapeComponentSize;
 #endif
   }
 

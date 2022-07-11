@@ -27,6 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 #include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/visuals/text-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
@@ -72,10 +73,11 @@ public:
    * @brief Create a new text visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory The TextVisualShaderFactory object
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static TextVisualPtr New(VisualFactoryCache& factoryCache, const Property::Map& properties);
+  static TextVisualPtr New(VisualFactoryCache& factoryCache, TextVisualShaderFactory& shaderFactory, const Property::Map& properties);
 
   /**
    * @brief Converts all strings keys in property map to index keys.  Property Map can then be merged correctly.
@@ -153,8 +155,9 @@ protected:
    * @brief Constructor.
    *
    * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] shaderFactory The TextVisualShaderFactory object
    */
-  TextVisual(VisualFactoryCache& factoryCache);
+  TextVisual(VisualFactoryCache& factoryCache, TextVisualShaderFactory& shaderFactory);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -274,16 +277,12 @@ private:
   PixelData ConvertToPixelData(unsigned char* buffer, int width, int height, int offsetPosition, const Pixel::Format textPixelFormat);
 
   /**
-   * @brief Create the text's texture.
+   * @brief Create the text's texture. It will use cached shader feature for text visual.
    * @param[in] info This is the information you need to create a Tiling.
    * @param[in] renderer The renderer to which the TextureSet will be added.
    * @param[in] sampler The sampler.
-   * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
-   * @param[in] containsColorGlyph Whether the text contains color glyph.
-   * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
-   * @param[in] isOverlayStyle Whether the style needs to overlay on the text (e.g. strikethrough, underline, etc.).
    */
-  void CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sampler& sampler, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle);
+  void CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sampler& sampler);
 
   /**
    * Create renderer of the text for rendering.
@@ -297,23 +296,17 @@ private:
   void AddRenderer(Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle);
 
   /**
-   * Get the texture of the text for rendering.
+   * Get the texture of the text for rendering. It will use cached shader feature for text visual.
    * @param[in] size The texture size.
-   * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
-   * @param[in] containsColorGlyph Whether the text contains color glyph.
-   * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
-   * @param[in] isOverlayStyle Whether the style needs to overlay on the text (e.g. strikethrough, underline, etc.).
    */
-  TextureSet GetTextTexture(const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle);
+  TextureSet GetTextTexture(const Vector2& size);
 
   /**
    * Get the text rendering shader.
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
-   * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
-   * @param[in] containsColorGlyph Whether the text contains color glyph.
-   * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
+   * @param[in] featureBuilder Collection of current text shader's features. It will be cached as text visual.
    */
-  Shader GetTextShader(VisualFactoryCache& factoryCache, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled);
+  Shader GetTextShader(VisualFactoryCache& factoryCache, const TextVisualShaderFeature::FeatureBuilder& featureBuilder);
 
   /**
    * @brief Retrieve the TextVisual object.
@@ -328,32 +321,20 @@ private:
 private:
   typedef std::vector<Renderer> RendererContainer;
 
-  /**
-   * Used as an alternative to boolean so that it is obvious whether the text contains single or multiple text colors, and emoji and styles.
-   */
-  struct TextType
-  {
-    enum Type
-    {
-      SINGLE_COLOR_TEXT = 0, ///< The text contains single color only.
-      MULTI_COLOR_TEXT  = 1, ///< The text contains multiple colorｓ.
-      NO_EMOJI          = 0, ///< The text contains no emoji.
-      HAS_EMOJI         = 1, ///< The text contains emoji.
-      NO_STYLES         = 0, ///< The text contains contains no styles.
-      HAS_SYLES         = 1  ///< The text contains contains styles.
-    };
-  };
-
 private:
-  Text::ControllerPtr mController;                       ///< The text's controller.
-  Text::TypesetterPtr mTypesetter;                       ///< The text's typesetter.
-  WeakHandle<Actor>   mControl;                          ///< The control where the renderer is added.
-  Constraint          mColorConstraint{};                ///< Color constraint
-  Constraint          mOpacityConstraint{};              ///< Opacity constraint
-  Property::Index     mAnimatableTextColorPropertyIndex; ///< The index of animatable text color property registered by the control.
-  Property::Index     mTextColorAnimatableIndex;         ///< The index of uTextColorAnimatable property.
-  bool                mRendererUpdateNeeded : 1;         ///< The flag to indicate whether the renderer needs to be updated.
-  RendererContainer   mRendererList;
+  Text::ControllerPtr mController; ///< The text's controller.
+  Text::TypesetterPtr mTypesetter; ///< The text's typesetter.
+
+  TextVisualShaderFactory&                mTextVisualShaderFactory; ///< The shader factory for text visual.
+  TextVisualShaderFeature::FeatureBuilder mTextShaderFeatureCache;  ///< The cached shader feature for text visual.
+
+  WeakHandle<Actor> mControl;                          ///< The control where the renderer is added.
+  Constraint        mColorConstraint{};                ///< Color constraint
+  Constraint        mOpacityConstraint{};              ///< Opacity constraint
+  Property::Index   mAnimatableTextColorPropertyIndex; ///< The index of animatable text color property registered by the control.
+  Property::Index   mTextColorAnimatableIndex;         ///< The index of uTextColorAnimatable property.
+  bool              mRendererUpdateNeeded : 1;         ///< The flag to indicate whether the renderer needs to be updated.
+  RendererContainer mRendererList;
 };
 
 } // namespace Internal

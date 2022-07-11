@@ -1412,7 +1412,7 @@ int UtcDaliNPatchVisualAuxiliaryImage02(void)
   imageView2[ImageView::Property::IMAGE] = NPATCH_TEST;
   application.GetScene().Add(imageView2);
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();

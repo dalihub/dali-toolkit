@@ -19,6 +19,7 @@
 #include "svg-rasterize-thread.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -33,6 +34,26 @@ namespace Toolkit
 {
 namespace Internal
 {
+namespace
+{
+constexpr auto DEFAULT_NUMBER_OF_SVG_RASTERIZE_THREADS = size_t{4u};
+constexpr auto NUMBER_OF_SVG_RASTERIZE_THREADS_ENV     = "DALI_SVG_RASTERIZE_THREADS";
+
+size_t GetNumberOfThreads(const char* environmentVariable, size_t defaultValue)
+{
+  auto           numberString          = EnvironmentVariable::GetEnvironmentVariable(environmentVariable);
+  auto           numberOfThreads       = numberString ? std::strtoul(numberString, nullptr, 10) : 0;
+  constexpr auto MAX_NUMBER_OF_THREADS = 10u;
+  DALI_ASSERT_DEBUG(numberOfThreads < MAX_NUMBER_OF_THREADS);
+  return (numberOfThreads > 0 && numberOfThreads < MAX_NUMBER_OF_THREADS) ? numberOfThreads : defaultValue;
+}
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gVectorImageLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VECTOR_IMAGE");
+#endif
+
+} // unnamed namespace
+
 SvgTask::SvgTask(SvgVisual* svgVisual, VectorImageRenderer vectorRenderer)
 : mSvgVisual(svgVisual),
   mVectorRenderer(vectorRenderer),
@@ -124,6 +145,8 @@ void SvgRasterizingTask::Process()
     return;
   }
 
+  DALI_LOG_INFO(gVectorImageLogFilter, Debug::Verbose, "Rasterize: (%d x %d) [%p]\n", mWidth, mHeight, this);
+
   Devel::PixelBuffer pixelBuffer = mVectorRenderer.Rasterize(mWidth, mHeight);
   if(!pixelBuffer)
   {
@@ -135,50 +158,111 @@ void SvgRasterizingTask::Process()
   mHasSucceeded = true;
 }
 
+bool SvgRasterizingTask::IsReady()
+{
+  return mVectorRenderer.IsLoaded();
+}
+
 PixelData SvgRasterizingTask::GetPixelData() const
 {
   return mPixelData;
 }
 
-SvgRasterizeThread::SvgRasterizeThread()
-: mTrigger(new EventThreadCallback(MakeCallback(this, &SvgRasterizeThread::ApplyRasterizedSVGToSampler))),
+SvgRasterizeThread::SvgRasterizeThread(SvgRasterizeManager& svgRasterizeManager)
+: mConditionalWait(),
   mLogFactory(Dali::Adaptor::Get().GetLogFactory()),
-  mIsThreadWaiting(false),
-  mProcessorRegistered(false)
+  mSvgRasterizeManager(svgRasterizeManager),
+  mDestroyThread(false),
+  mIsThreadStarted(false),
+  mIsThreadIdle(true)
 {
 }
 
 SvgRasterizeThread::~SvgRasterizeThread()
 {
-  if(mProcessorRegistered)
+  // Stop the thread
   {
-    Adaptor::Get().UnregisterProcessor(*this);
+    ConditionalWait::ScopedLock lock(mConditionalWait);
+    mDestroyThread = true;
+    mConditionalWait.Notify(lock);
   }
+
+  Join();
 }
 
-void SvgRasterizeThread::TerminateThread(SvgRasterizeThread*& thread)
+bool SvgRasterizeThread::RequestRasterize()
 {
-  if(thread)
+  if(!mIsThreadStarted)
   {
-    // add an empty task would stop the thread from conditional wait.
-    thread->AddTask(SvgTaskPtr());
-    // stop the thread
-    thread->Join();
-    // delete the thread
-    delete thread;
-    thread = NULL;
+    Start();
+    mIsThreadStarted = true;
   }
-}
-
-void SvgRasterizeThread::AddTask(SvgTaskPtr task)
-{
-  bool wasEmpty = false;
 
   {
     // Lock while adding task to the queue
     ConditionalWait::ScopedLock lock(mConditionalWait);
-    wasEmpty = mRasterizeTasks.empty();
-    if(!wasEmpty && task)
+
+    if(mIsThreadIdle)
+    {
+      mIsThreadIdle = false;
+
+      // wake up the thread
+      mConditionalWait.Notify(lock);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void SvgRasterizeThread::Run()
+{
+  SetThreadName("SvgRasterizeThread");
+  mLogFactory.InstallLogFunction();
+
+  while(!mDestroyThread)
+  {
+    SvgTaskPtr task = mSvgRasterizeManager.NextTaskToProcess();
+    if(!task)
+    {
+      ConditionalWait::ScopedLock lock(mConditionalWait);
+      mIsThreadIdle = true;
+      mConditionalWait.Wait(lock);
+    }
+    else
+    {
+      task->Process();
+
+      mSvgRasterizeManager.AddCompletedTask(task);
+    }
+  }
+}
+
+SvgRasterizeManager::SvgRasterizeManager()
+: mRasterizers(GetNumberOfThreads(NUMBER_OF_SVG_RASTERIZE_THREADS_ENV, DEFAULT_NUMBER_OF_SVG_RASTERIZE_THREADS), [&]() { return RasterizeHelper(*this); }),
+  mTrigger(new EventThreadCallback(MakeCallback(this, &SvgRasterizeManager::ApplyRasterizedSVGToSampler))),
+  mProcessorRegistered(false)
+{
+}
+
+SvgRasterizeManager::~SvgRasterizeManager()
+{
+  if(mProcessorRegistered)
+  {
+    Adaptor::Get().UnregisterProcessor(*this);
+  }
+
+  mRasterizers.Clear();
+}
+
+void SvgRasterizeManager::AddTask(SvgTaskPtr task)
+{
+  {
+    // Lock while adding task to the queue
+    Mutex::ScopedLock lock(mMutex);
+
+    // There are other tasks waiting for the rasterization
+    if(!mRasterizeTasks.empty())
     {
       // Remove the tasks with the same renderer.
       // Older task which waiting to rasterize and apply the svg to the same renderer is expired.
@@ -197,23 +281,34 @@ void SvgRasterizeThread::AddTask(SvgTaskPtr task)
         }
       }
     }
+
     mRasterizeTasks.push_back(task);
-
-    if(!mProcessorRegistered)
-    {
-      Adaptor::Get().RegisterProcessor(*this);
-      mProcessorRegistered = true;
-    }
   }
 
-  if(wasEmpty)
+  size_t count = mRasterizers.GetElementCount();
+  size_t index = 0;
+  while(index++ < count)
   {
-    // wake up the image loading thread
-    mConditionalWait.Notify();
+    auto rasterizerHelperIt = mRasterizers.GetNext();
+    DALI_ASSERT_ALWAYS(rasterizerHelperIt != mRasterizers.End());
+
+    if(rasterizerHelperIt->RequestRasterize())
+    {
+      break;
+    }
+    // If all threads are busy, then it's ok just to push the task because they will try to get the next job.
   }
+
+  if(!mProcessorRegistered)
+  {
+    Adaptor::Get().RegisterProcessor(*this);
+    mProcessorRegistered = true;
+  }
+
+  return;
 }
 
-SvgTaskPtr SvgRasterizeThread::NextCompletedTask()
+SvgTaskPtr SvgRasterizeManager::NextCompletedTask()
 {
   // Lock while popping task out from the queue
   Mutex::ScopedLock lock(mMutex);
@@ -230,21 +325,23 @@ SvgTaskPtr SvgRasterizeThread::NextCompletedTask()
   return nextTask;
 }
 
-void SvgRasterizeThread::RemoveTask(SvgVisual* visual)
+void SvgRasterizeManager::RemoveTask(SvgVisual* visual)
 {
-  // Lock while remove task from the queue
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-  if(!mRasterizeTasks.empty())
   {
-    for(std::vector<SvgTaskPtr>::iterator it = mRasterizeTasks.begin(); it != mRasterizeTasks.end();)
+    // Lock while remove task from the queue
+    Mutex::ScopedLock lock(mMutex);
+    if(!mRasterizeTasks.empty())
     {
-      if((*it) && (*it)->GetSvgVisual() == visual)
+      for(std::vector<SvgTaskPtr>::iterator it = mRasterizeTasks.begin(); it != mRasterizeTasks.end();)
       {
-        it = mRasterizeTasks.erase(it);
-      }
-      else
-      {
-        it++;
+        if((*it) && (*it)->GetSvgVisual() == visual)
+        {
+          it = mRasterizeTasks.erase(it);
+        }
+        else
+        {
+          it++;
+        }
       }
     }
   }
@@ -252,28 +349,28 @@ void SvgRasterizeThread::RemoveTask(SvgVisual* visual)
   UnregisterProcessor();
 }
 
-SvgTaskPtr SvgRasterizeThread::NextTaskToProcess()
+SvgTaskPtr SvgRasterizeManager::NextTaskToProcess()
 {
   // Lock while popping task out from the queue
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-
-  // conditional wait
-  while(mRasterizeTasks.empty())
-  {
-    mIsThreadWaiting = true;
-    mConditionalWait.Wait(lock);
-  }
-  mIsThreadWaiting = false;
+  Mutex::ScopedLock lock(mMutex);
 
   // pop out the next task from the queue
-  std::vector<SvgTaskPtr>::iterator next     = mRasterizeTasks.begin();
-  SvgTaskPtr                        nextTask = *next;
-  mRasterizeTasks.erase(next);
+  SvgTaskPtr nextTask = nullptr;
+
+  for(auto iter = mRasterizeTasks.begin(), endIter = mRasterizeTasks.end(); iter != endIter; ++iter)
+  {
+    if((*iter)->IsReady())
+    {
+      nextTask = *iter;
+      mRasterizeTasks.erase(iter);
+      break;
+    }
+  }
 
   return nextTask;
 }
 
-void SvgRasterizeThread::AddCompletedTask(SvgTaskPtr task)
+void SvgRasterizeManager::AddCompletedTask(SvgTaskPtr task)
 {
   // Lock while adding task to the queue
   Mutex::ScopedLock lock(mMutex);
@@ -283,35 +380,27 @@ void SvgRasterizeThread::AddCompletedTask(SvgTaskPtr task)
   mTrigger->Trigger();
 }
 
-void SvgRasterizeThread::Run()
-{
-  SetThreadName("SVGThread");
-  mLogFactory.InstallLogFunction();
-
-  while(SvgTaskPtr task = NextTaskToProcess())
-  {
-    task->Process();
-    AddCompletedTask(task);
-  }
-}
-
-void SvgRasterizeThread::ApplyRasterizedSVGToSampler()
+void SvgRasterizeManager::ApplyRasterizedSVGToSampler()
 {
   while(SvgTaskPtr task = NextCompletedTask())
   {
+    DALI_LOG_INFO(gVectorImageLogFilter, Debug::Verbose, "task = %p\n", task.Get());
+
     task->GetSvgVisual()->ApplyRasterizedImage(task->GetPixelData(), task->HasSucceeded());
   }
 
   UnregisterProcessor();
 }
 
-void SvgRasterizeThread::Process(bool postProcessor)
+void SvgRasterizeManager::Process(bool postProcessor)
 {
   ApplyRasterizedSVGToSampler();
 }
 
-void SvgRasterizeThread::UnregisterProcessor()
+void SvgRasterizeManager::UnregisterProcessor()
 {
+  Mutex::ScopedLock lock(mMutex);
+
   if(mProcessorRegistered)
   {
     if(mRasterizeTasks.empty() && mCompletedTasks.empty())
@@ -322,6 +411,26 @@ void SvgRasterizeThread::UnregisterProcessor()
   }
 }
 
+SvgRasterizeManager::RasterizeHelper::RasterizeHelper(SvgRasterizeManager& svgRasterizeManager)
+: RasterizeHelper(std::unique_ptr<SvgRasterizeThread>(new SvgRasterizeThread(svgRasterizeManager)), svgRasterizeManager)
+{
+}
+
+SvgRasterizeManager::RasterizeHelper::RasterizeHelper(RasterizeHelper&& rhs)
+: RasterizeHelper(std::move(rhs.mRasterizer), rhs.mSvgRasterizeManager)
+{
+}
+
+SvgRasterizeManager::RasterizeHelper::RasterizeHelper(std::unique_ptr<SvgRasterizeThread> rasterizer, SvgRasterizeManager& svgRasterizeManager)
+: mRasterizer(std::move(rasterizer)),
+  mSvgRasterizeManager(svgRasterizeManager)
+{
+}
+
+bool SvgRasterizeManager::RasterizeHelper::RequestRasterize()
+{
+  return mRasterizer->RequestRasterize();
+}
 } // namespace Internal
 
 } // namespace Toolkit

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VECTOR_ANIMATION_THREAD_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,9 +60,11 @@ public:
 
   /**
    * @brief Called when the rasterization is completed from the rasterize thread.
-   * @param task The completed task
+   * @param[in] task The completed task
+   * @param[in] success true if the task succeeded, false otherwise.
+   * @param[in] keepAnimation true if the animation is running, false otherwise.
    */
-  void OnTaskCompleted(VectorAnimationTaskPtr task, bool stopped);
+  void OnTaskCompleted(VectorAnimationTaskPtr task, bool success, bool keepAnimation);
 
   /**
    * @brief Called when the sleep thread is awaken.
