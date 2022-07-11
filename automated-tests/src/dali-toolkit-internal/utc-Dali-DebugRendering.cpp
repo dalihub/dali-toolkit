@@ -43,6 +43,7 @@ const char* TEST_SVG_FILE_NAME    = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_GIF_FILE_NAME    = TEST_RESOURCE_DIR "/anim.gif";
 
 const std::string DEFAULT_FONT_DIR("/resources/fonts");
+const char* const DALI_DEBUG_RENDERING("DALI_DEBUG_RENDERING");
 
 void TestDebugVisual(Integration::Scene scene, Visual::Base& visual, DevelVisual::Type actualType, Vector2 expectedNaturalSize)
 {
@@ -96,7 +97,7 @@ void dali_debug_rendering_cleanup(void)
 
 int UtcDaliDebugRenderingGetVisual1(void)
 {
-  EnvironmentVariable::SetTestingEnvironmentVariable(true);
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_RENDERING, "1");
   ToolkitTestApplication application;
   tet_infoline("UtcDaliDebugRenderingGetVisual1:  Request visual with a Property::Map");
 
@@ -213,13 +214,13 @@ int UtcDaliDebugRenderingGetVisual1(void)
   DALI_TEST_CHECK(nPatchVisual);
   TestDebugVisual(application.GetScene(), nPatchVisual, Visual::N_PATCH, Vector2::ZERO);
 
-  EnvironmentVariable::SetTestingEnvironmentVariable(false);
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_RENDERING, "0");
   END_TEST;
 }
 
 int UtcDaliDebugRenderingGetVisual2(void)
 {
-  EnvironmentVariable::SetTestingEnvironmentVariable(true);
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_RENDERING, "1");
   ToolkitTestApplication application;
   tet_infoline("UtcDaliDebugRenderingGetVisual2: Request visual with various parameters");
 
@@ -257,13 +258,13 @@ int UtcDaliDebugRenderingGetVisual2(void)
   DALI_TEST_CHECK(nPatchVisual);
   TestDebugVisual(application.GetScene(), nPatchVisual, Visual::N_PATCH, Vector2::ZERO);
 
-  EnvironmentVariable::SetTestingEnvironmentVariable(false);
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_RENDERING, "0");
   END_TEST;
 }
 
 int UtcDaliDebugRenderingGetVisual3(void)
 {
-  EnvironmentVariable::SetTestingEnvironmentVariable(true);
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_RENDERING, "1");
   ToolkitTestApplication application;
   tet_infoline("UtcDaliDebugRenderingGetVisual3: Request visual with various parameters");
 
@@ -322,13 +323,13 @@ int UtcDaliDebugRenderingGetVisual3(void)
   DALI_TEST_EQUALS(imageView2.GetRendererCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(imageView3.GetRendererCount(), 0u, TEST_LOCATION);
 
-  EnvironmentVariable::SetTestingEnvironmentVariable(false);
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_RENDERING, "0");
   END_TEST;
 }
 
 int UtcDaliDebugRenderingGetVisual4(void)
 {
-  EnvironmentVariable::SetTestingEnvironmentVariable(true);
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_RENDERING, "1");
   ToolkitTestApplication application;
   tet_infoline("UtcDaliDebugRenderingGetVisual4: Request visual with empty URL and empty Array");
 
@@ -372,13 +373,13 @@ int UtcDaliDebugRenderingGetVisual4(void)
     DALI_TEST_CHECK(emptyVisual.GetObjectPtr() == &visualImpl);
   }
 
-  EnvironmentVariable::SetTestingEnvironmentVariable(false);
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_RENDERING, "0");
   END_TEST;
 }
 
 int UtcDaliDebugRenderingGetVisualObject01(void)
 {
-  EnvironmentVariable::SetTestingEnvironmentVariable(true);
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_RENDERING, "1");
   ToolkitTestApplication application;
 
   VisualFactory factory = VisualFactory::Get();
@@ -400,7 +401,7 @@ int UtcDaliDebugRenderingGetVisualObject01(void)
   tet_infoline("Compare the returned TextVisual with the visual implementation, should differ");
   DALI_TEST_CHECK(textVisual.GetObjectPtr() != &visualImpl);
 
-  EnvironmentVariable::SetTestingEnvironmentVariable(false);
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_RENDERING, "0");
   END_TEST;
 }
 
@@ -457,7 +458,7 @@ int UtcDaliDebugRenderingGetVisualObject03(void)
 
 int UtcDaliDebugRenderingRenderText(void)
 {
-  EnvironmentVariable::SetTestingEnvironmentVariable(true);
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_RENDERING, "1");
   ToolkitTestApplication application;
   tet_infoline("Ensure we can render text when in debug mode");
 

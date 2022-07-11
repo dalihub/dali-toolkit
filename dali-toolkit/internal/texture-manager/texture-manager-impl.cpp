@@ -39,7 +39,7 @@ constexpr auto DEFAULT_NUMBER_OF_REMOTE_LOADER_THREADS = size_t{8u};
 
 constexpr auto NUMBER_OF_LOCAL_LOADER_THREADS_ENV  = "DALI_TEXTURE_LOCAL_THREADS";
 constexpr auto NUMBER_OF_REMOTE_LOADER_THREADS_ENV = "DALI_TEXTURE_REMOTE_THREADS";
-constexpr auto LOAD_IMAGE_YUV_PLANES_ENV           = "DALI_LOAD_IMAGE_YUV_PLANES_ENV";
+constexpr auto LOAD_IMAGE_YUV_PLANES_ENV           = "DALI_LOAD_IMAGE_YUV_PLANES";
 
 size_t GetNumberOfThreads(const char* environmentVariable, size_t defaultValue)
 {

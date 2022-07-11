@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@
 #include "toolkit-environment-variable.h"
 
 // EXTERNAL INCLUDE
-#include <cstddef>
-#include <string>
+#include <map>
 
 namespace Dali
 {
@@ -27,36 +26,22 @@ namespace EnvironmentVariable
 {
 namespace
 {
-const char* gReturnValue = NULL;
-std::string gEnvironmentVariableName;
-std::string gEnvironmentVariableValue;
+std::map<std::string, std::string> gEnvironmentVariables;
 } // namespace
 
 const char* GetEnvironmentVariable(const char* variable)
 {
-  if(gEnvironmentVariableName == variable)
+  auto value = gEnvironmentVariables.find(variable);
+  if(value != gEnvironmentVariables.end())
   {
-    return gEnvironmentVariableValue.c_str();
+    return value->second.c_str();
   }
-  return gReturnValue;
-}
-
-void SetTestingEnvironmentVariable(bool testing)
-{
-  if(testing)
-  {
-    gReturnValue = "1";
-  }
-  else
-  {
-    gReturnValue = NULL;
-  }
+  return nullptr;
 }
 
 void SetTestEnvironmentVariable(const char* variable, const char* value)
 {
-  gEnvironmentVariableName  = variable;
-  gEnvironmentVariableValue = value;
+  gEnvironmentVariables[variable] = value;
 }
 
 } // namespace EnvironmentVariable

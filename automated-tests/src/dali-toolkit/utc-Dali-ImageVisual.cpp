@@ -64,7 +64,8 @@ const char* TEST_ROTATED_IMAGE            = TEST_RESOURCE_DIR "/keyboard-Landsca
 const char* TEST_YUV420_IMAGE_FILE_NAME   = TEST_RESOURCE_DIR "/gallery-small-1-yuv420.jpg";
 const char* TEST_N_PATCH_IMAGE_FILE_NAME  = TEST_RESOURCE_DIR "/heartsframe.9.png";
 
-constexpr auto LOAD_IMAGE_YUV_PLANES_ENV = "DALI_LOAD_IMAGE_YUV_PLANES_ENV";
+constexpr auto LOAD_IMAGE_YUV_PLANES_ENV         = "DALI_LOAD_IMAGE_YUV_PLANES";
+constexpr auto ENABLE_DECODE_JPEG_TO_YUV_420_ENV = "DALI_ENABLE_DECODE_JPEG_TO_YUV_420";
 
 bool             gResourceReadySignalFired = false;
 std::vector<int> gReadyIds                 = {};
@@ -2989,6 +2990,7 @@ int UtcDaliImageVisualLoadReady01(void)
 int UtcDaliImageVisualLoadImagePlanes01(void)
 {
   EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
 
   ToolkitTestApplication application;
 
@@ -3034,6 +3036,7 @@ int UtcDaliImageVisualLoadImagePlanes01(void)
 int UtcDaliImageVisualLoadImagePlanes02(void)
 {
   EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
 
   ToolkitTestApplication application;
 
@@ -3077,6 +3080,7 @@ int UtcDaliImageVisualLoadImagePlanes02(void)
 int UtcDaliImageVisualLoadImagePlanes03(void)
 {
   EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
 
   ToolkitTestApplication application;
 
