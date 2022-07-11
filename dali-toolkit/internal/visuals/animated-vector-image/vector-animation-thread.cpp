@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ void VectorAnimationThread::AddTask(VectorAnimationTaskPtr task)
   }
 }
 
-void VectorAnimationThread::OnTaskCompleted(VectorAnimationTaskPtr task, bool keepAnimation)
+void VectorAnimationThread::OnTaskCompleted(VectorAnimationTaskPtr task, bool success, bool keepAnimation)
 {
   if(!mDestroyThread)
   {
@@ -131,7 +131,7 @@ void VectorAnimationThread::OnTaskCompleted(VectorAnimationTaskPtr task, bool ke
       needRasterize = true;
     }
 
-    if(keepAnimation)
+    if(keepAnimation && success)
     {
       if(mCompletedTasks.end() == std::find(mCompletedTasks.begin(), mCompletedTasks.end(), task))
       {
@@ -220,9 +220,9 @@ void VectorAnimationThread::Rasterize()
     auto nextFrameTime = nextTask->GetNextFrameTime();
 
 #if defined(DEBUG_ENABLED)
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nextFrameTime - currentTime);
+//    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nextFrameTime - currentTime);
 
-    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::Rasterize: [next time = %lld]\n", duration.count());
+//    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::Rasterize: [next time = %lld]\n", duration.count());
 #endif
 
     if(nextFrameTime <= currentTime)
@@ -330,9 +330,9 @@ void VectorAnimationThread::SleepThread::Run()
     if(needToSleep)
     {
 #if defined(DEBUG_ENABLED)
-      auto sleepDuration = std::chrono::duration_cast<std::chrono::milliseconds>(mSleepTimePoint - std::chrono::steady_clock::now());
+//      auto sleepDuration = std::chrono::duration_cast<std::chrono::milliseconds>(mSleepTimePoint - std::chrono::steady_clock::now());
 
-      DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::SleepThread::Run: [sleep duration = %lld]\n", sleepDuration.count());
+//      DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::SleepThread::Run: [sleep duration = %lld]\n", sleepDuration.count());
 #endif
 
       std::this_thread::sleep_until(sleepTimePoint);

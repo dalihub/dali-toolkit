@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,9 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mAnimationData(),
   mVectorAnimationThread(factoryCache.GetVectorAnimationManager().GetVectorAnimationThread()),
   mConditionalWait(),
+  mResourceReadySignal(),
   mAnimationFinishedTrigger(),
+  mLoadCompletedTrigger(new EventThreadCallback(MakeCallback(this, &VectorAnimationTask::OnLoadCompleted))),
   mPlayState(PlayState::STOPPED),
   mStopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
   mLoopingMode(DevelImageVisual::LoopingMode::RESTART),
@@ -72,8 +74,11 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mUpdateFrameNumber(false),
   mNeedAnimationFinishedTrigger(true),
   mAnimationDataUpdated(false),
-  mDestroyTask(false)
+  mDestroyTask(false),
+  mLoadRequest(false),
+  mLoadFailed(false)
 {
+  mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
 }
 
 VectorAnimationTask::~VectorAnimationTask()
@@ -96,13 +101,14 @@ void VectorAnimationTask::Finalize()
   mDestroyTask = true;
 }
 
-bool VectorAnimationTask::Load(const std::string& url)
+bool VectorAnimationTask::Load()
 {
-  mUrl = url;
-
   if(!mVectorRenderer.Load(mUrl))
   {
     DALI_LOG_ERROR("VectorAnimationTask::Load: Load failed [%s]\n", mUrl.c_str());
+    mLoadRequest = false;
+    mLoadFailed  = true;
+    mLoadCompletedTrigger->Trigger();
     return false;
   }
 
@@ -113,10 +119,8 @@ bool VectorAnimationTask::Load(const std::string& url)
   mFrameRate                 = mVectorRenderer.GetFrameRate();
   mFrameDurationMicroSeconds = MICROSECONDS_PER_SECOND / mFrameRate;
 
-  uint32_t width, height;
-  mVectorRenderer.GetDefaultSize(width, height);
-
-  SetSize(width, height);
+  mLoadRequest = false;
+  mLoadCompletedTrigger->Trigger();
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Load: file = %s [%d frames, %f fps] [%p]\n", mUrl.c_str(), mTotalFrame, mFrameRate, this);
 
@@ -130,6 +134,14 @@ void VectorAnimationTask::SetRenderer(Renderer renderer)
   mVectorRenderer.SetRenderer(renderer);
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetRenderer [%p]\n", this);
+}
+
+void VectorAnimationTask::RequestLoad(const std::string& url)
+{
+  mUrl         = url;
+  mLoadRequest = true;
+
+  mVectorAnimationThread.AddTask(this);
 }
 
 void VectorAnimationTask::SetAnimationData(const AnimationData& data)
@@ -293,12 +305,12 @@ void VectorAnimationTask::SetPlayRange(const Property::Array& playRange)
         mCurrentFrame = mEndFrame;
       }
 
-      DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetPlayRange: [%d, %d] [%p]\n", mStartFrame, mEndFrame, this);
+      DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetPlayRange: [%d, %d] [%s] [%p]\n", mStartFrame, mEndFrame, mUrl.c_str(), this);
     }
   }
   else
   {
-    DALI_LOG_ERROR("VectorAnimationTask::SetPlayRange: Invalid range (%d, %d) [%p]\n", startFrame, endFrame, this);
+    DALI_LOG_ERROR("VectorAnimationTask::SetPlayRange: Invalid range (%d, %d) [%s] [%p]\n", startFrame, endFrame, mUrl.c_str(), this);
     return;
   }
 }
@@ -326,7 +338,7 @@ void VectorAnimationTask::SetCurrentFrameNumber(uint32_t frameNumber)
   }
   else
   {
-    DALI_LOG_ERROR("Invalid frame number [%d (%d, %d)]\n", frameNumber, mStartFrame, mEndFrame);
+    DALI_LOG_ERROR("Invalid frame number [%d (%d, %d)] [%p]\n", frameNumber, mStartFrame, mEndFrame, this);
   }
 }
 
@@ -364,15 +376,16 @@ void VectorAnimationTask::GetLayerInfo(Property::Map& map) const
   mVectorRenderer.GetLayerInfo(map);
 }
 
-VectorAnimationTask::UploadCompletedSignalType& VectorAnimationTask::UploadCompletedSignal()
+VectorAnimationTask::ResourceReadySignalType& VectorAnimationTask::ResourceReadySignal()
 {
-  return mVectorRenderer.UploadCompletedSignal();
+  return mResourceReadySignal;
 }
 
-bool VectorAnimationTask::Rasterize()
+bool VectorAnimationTask::Rasterize(bool& keepAnimation)
 {
   bool     stopped = false;
   uint32_t currentFrame;
+  keepAnimation = false;
 
   {
     ConditionalWait::ScopedLock lock(mConditionalWait);
@@ -381,13 +394,27 @@ bool VectorAnimationTask::Rasterize()
       // The task will be destroyed. We don't need rasterization.
       return false;
     }
+
+    if(mLoadRequest)
+    {
+      bool result = Load();
+      if(!result)
+      {
+        return false;
+      }
+    }
+  }
+
+  if(mLoadFailed)
+  {
+    return false;
   }
 
   ApplyAnimationData();
 
   if(mPlayState == PlayState::PLAYING && mUpdateFrameNumber)
   {
-    mCurrentFrame = mForward ? mCurrentFrame + mDroppedFrames + 1 : mCurrentFrame - mDroppedFrames - 1;
+    mCurrentFrame = mForward ? mCurrentFrame + mDroppedFrames + 1 : (mCurrentFrame > mDroppedFrames ? mCurrentFrame - mDroppedFrames - 1 : 0);
     Dali::ClampInPlace(mCurrentFrame, mStartFrame, mEndFrame);
   }
 
@@ -479,13 +506,12 @@ bool VectorAnimationTask::Rasterize()
     DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Rasterize: Animation is finished [current = %d] [%p]\n", currentFrame, this);
   }
 
-  bool keepAnimation = true;
-  if(mPlayState == PlayState::PAUSED || mPlayState == PlayState::STOPPED)
+  if(mPlayState != PlayState::PAUSED && mPlayState != PlayState::STOPPED)
   {
-    keepAnimation = false;
+    keepAnimation = true;
   }
 
-  return keepAnimation;
+  return true;
 }
 
 uint32_t VectorAnimationTask::GetStoppedFrame(uint32_t startFrame, uint32_t endFrame, uint32_t currentFrame)
@@ -600,6 +626,11 @@ void VectorAnimationTask::ApplyAnimationData()
     SetCurrentFrameNumber(mAnimationData[index].currentFrame);
   }
 
+  if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_NEED_RESOURCE_READY)
+  {
+    mVectorRenderer.InvalidateBuffer();
+  }
+
   if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_PLAY_STATE)
   {
     if(mAnimationData[index].playState == DevelImageVisual::PlayState::PLAYING)
@@ -619,6 +650,31 @@ void VectorAnimationTask::ApplyAnimationData()
   mAnimationData[index].resendFlag = 0;
 }
 
+void VectorAnimationTask::OnUploadCompleted()
+{
+  mResourceReadySignal.Emit(true);
+}
+
+void VectorAnimationTask::OnLoadCompleted()
+{
+  if(!mLoadFailed)
+  {
+    if(mWidth == 0 && mHeight == 0)
+    {
+      uint32_t width, height;
+      mVectorRenderer.GetDefaultSize(width, height);
+
+      SetSize(width, height);
+
+      mVectorAnimationThread.AddTask(this);
+    }
+  }
+  else
+  {
+    // Load failed
+    mResourceReadySignal.Emit(false);
+  }
+}
 } // namespace Internal
 
 } // namespace Toolkit

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VECTOR_ANIMATION_TASK_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,10 +42,10 @@ typedef IntrusivePtr<VectorAnimationTask> VectorAnimationTaskPtr;
 /**
  * The task of the vector animation.
  */
-class VectorAnimationTask : public RefObject
+class VectorAnimationTask : public RefObject, public ConnectionTracker
 {
 public:
-  using UploadCompletedSignalType = Dali::VectorAnimationRenderer::UploadCompletedSignalType;
+  using ResourceReadySignalType = Signal<void(bool)>;
 
   using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
 
@@ -54,13 +54,14 @@ public:
    */
   enum ResendFlags
   {
-    RESEND_PLAY_RANGE    = 1 << 0,
-    RESEND_LOOP_COUNT    = 1 << 1,
-    RESEND_STOP_BEHAVIOR = 1 << 2,
-    RESEND_LOOPING_MODE  = 1 << 3,
-    RESEND_CURRENT_FRAME = 1 << 4,
-    RESEND_SIZE          = 1 << 5,
-    RESEND_PLAY_STATE    = 1 << 6
+    RESEND_PLAY_RANGE          = 1 << 0,
+    RESEND_LOOP_COUNT          = 1 << 1,
+    RESEND_STOP_BEHAVIOR       = 1 << 2,
+    RESEND_LOOPING_MODE        = 1 << 3,
+    RESEND_CURRENT_FRAME       = 1 << 4,
+    RESEND_SIZE                = 1 << 5,
+    RESEND_PLAY_STATE          = 1 << 6,
+    RESEND_NEED_RESOURCE_READY = 1 << 7
   };
 
   /**
@@ -124,19 +125,18 @@ public:
   void Finalize();
 
   /**
-   * @brief Loads the animation file.
-   *
-   * @param[in] url The url of the vector animation file
-   * @return True if loading success, false otherwise.
-   */
-  bool Load(const std::string& url);
-
-  /**
    * @brief Sets the renderer used to display the result image.
    *
    * @param[in] renderer The renderer used to display the result image
    */
   void SetRenderer(Renderer renderer);
+
+  /**
+   * @brief Request to load the animation file.
+   *
+   * @param[in] url The url of the vector animation file
+   */
+  void RequestLoad(const std::string& url);
 
   /**
    * @brief Sets data to specify animation playback.
@@ -182,16 +182,17 @@ public:
   void GetLayerInfo(Property::Map& map) const;
 
   /**
-   * @brief Connect to this signal to be notified when the texture upload is completed.
+   * @brief Connect to this signal to be notified when the resource is ready.
    * @return The signal to connect to.
    */
-  UploadCompletedSignalType& UploadCompletedSignal();
+  ResourceReadySignalType& ResourceReadySignal();
 
   /**
    * @brief Rasterizes the current frame.
-   * @return true if the animation is running, false otherwise.
+   * @param[out] keepAnimation true if the animation is running, false otherwise.
+   * @return true if the rasterization succeeded, false otherwise.
    */
-  bool Rasterize();
+  bool Rasterize(bool& keepAnimation);
 
   /**
    * @brief Calculates the time for the next frame rasterization.
@@ -206,6 +207,13 @@ public:
   TimePoint GetNextFrameTime();
 
 private:
+  /**
+   * @brief Loads the animation file.
+   *
+   * @return True if loading succeeded, false otherwise.
+   */
+  bool Load();
+
   /**
    * @brief Play the vector animation.
    */
@@ -271,6 +279,16 @@ private:
    */
   void ApplyAnimationData();
 
+  /**
+   * @brief Called when the texture upload is completed.
+   */
+  void OnUploadCompleted();
+
+  /**
+   * @brief Event callback from rasterize thread. This is called when the file loading is completed.
+   */
+  void OnLoadCompleted();
+
   // Undefined
   VectorAnimationTask(const VectorAnimationTask& task) = delete;
 
@@ -291,7 +309,9 @@ private:
   AnimationData                        mAnimationData[2];
   VectorAnimationThread&               mVectorAnimationThread;
   ConditionalWait                      mConditionalWait;
+  ResourceReadySignalType              mResourceReadySignal;
   std::unique_ptr<EventThreadCallback> mAnimationFinishedTrigger;
+  std::unique_ptr<EventThreadCallback> mLoadCompletedTrigger;
   PlayState                            mPlayState;
   DevelImageVisual::StopBehavior::Type mStopBehavior;
   DevelImageVisual::LoopingMode::Type  mLoopingMode;
@@ -313,6 +333,8 @@ private:
   bool                                 mNeedAnimationFinishedTrigger;
   bool                                 mAnimationDataUpdated;
   bool                                 mDestroyTask;
+  bool                                 mLoadRequest;
+  bool                                 mLoadFailed;
 };
 
 } // namespace Internal

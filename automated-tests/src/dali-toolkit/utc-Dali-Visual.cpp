@@ -4197,7 +4197,8 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    // Trigger count is 2 - load & render a frame
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
@@ -4573,7 +4574,8 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    // Trigger count is 2 - load & render a frame
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
@@ -5605,8 +5607,8 @@ int UtcDaliVisualGetVisualProperty07(void)
   application.SendNotification();
   application.Render();
 
-  // Wait for image loading
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
