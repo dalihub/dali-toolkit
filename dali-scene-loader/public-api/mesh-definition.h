@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_MESH_DEFINITION_H
 #define DALI_SCENE_LOADER_MESH_DEFINITION_H
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,6 +78,8 @@ struct DALI_SCENE_LOADER_API MeshDefinition
     std::vector<float> mMin;
     std::vector<float> mMax;
 
+    static void ComputeMinMax(std::vector<float>& min, std::vector<float>& max, uint32_t numComponents, uint32_t count, const float* values);
+
     static void ApplyMinMax(const std::vector<float>& min, const std::vector<float>& max, uint32_t count, float* values);
 
     Blob() = default;
@@ -107,7 +109,20 @@ struct DALI_SCENE_LOADER_API MeshDefinition
     }
 
     /**
-     * @brief Applies the min / max values, if they're defined.
+     * @brief Computes the min / max of the input value data.
+     * The min and max are stored in mMin and mMax.
+     *
+     * @param[in] numComponents number of components of data type. e.g., 3 for Vector3.
+     * @param[in] count The number of data.
+     * @param[in] values Data for the mesh.
+     */
+    void ComputeMinMax(uint32_t numComponents, uint32_t count, float* values);
+
+    /**
+     * @brief Applies the min / max values, if they're defined in the model
+     *
+     * @param[in] count The number of data.
+     * @param[in] values Data for the mesh that min / max values will be applied.
      */
     void ApplyMinMax(uint32_t count, float* values) const;
   };
@@ -224,7 +239,7 @@ struct DALI_SCENE_LOADER_API MeshDefinition
    *  attribute buffers, as well as blend shape data. This is then returned.
    * @note This can be done on any thread.
    */
-  RawData LoadRaw(const std::string& modelsPath) const;
+  RawData LoadRaw(const std::string& modelsPath);
 
   /**
    * @brief Creates a MeshGeometry based firstly on the value of the uri member:
