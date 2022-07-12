@@ -23,8 +23,8 @@
 
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
-#include <dali-toolkit/internal/text/text-controller-impl.h>
-#include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
+#include <dali-toolkit/internal/text/controller/text-controller-impl.h>
 
 using namespace Dali;
 using namespace Toolkit;

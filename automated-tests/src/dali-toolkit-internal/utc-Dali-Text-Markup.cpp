@@ -24,8 +24,8 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
-#include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
-#include <dali-toolkit/internal/text/markup-processor.h>
+#include <dali-toolkit/internal/text/markup-processor/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-processor/markup-processor.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 #include <dali-toolkit/internal/text/text-io.h>
 #include <toolkit-text-utils.h>

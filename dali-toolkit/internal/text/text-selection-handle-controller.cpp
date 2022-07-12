@@ -25,7 +25,7 @@
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
-#include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
+#include <dali-toolkit/internal/text/controller/text-controller-impl-event-handler.h>
 
 using namespace Dali;
 

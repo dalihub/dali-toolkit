@@ -22,10 +22,10 @@
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <dali-toolkit/internal/controls/text-controls/text-label-impl.h>
+#include <dali-toolkit/internal/text/controller/text-controller-impl.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 #include <dali-toolkit/internal/text/rendering/view-model.h>
-#include <dali-toolkit/internal/text/text-controller-impl.h>
-#include <dali-toolkit/internal/text/text-controller.h>
 
 using namespace Dali;
 using namespace Toolkit;
