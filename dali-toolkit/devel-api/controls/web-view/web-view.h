@@ -216,6 +216,16 @@ public:
   static WebView New(uint32_t argc, char** argv);
 
   /**
+   * @brief Get context of web engine.
+   */
+  static Dali::WebEngineContext* GetContext();
+
+  /**
+   * @brief Get cookie manager of web engine.
+   */
+  static Dali::WebEngineCookieManager* GetCookieManager();
+
+  /**
    * @brief Create an uninitialized WebView.
    */
   WebView();
@@ -257,16 +267,6 @@ public:
    * @brief Get WebSettings of WebEngine.
    */
   Dali::Toolkit::WebSettings* GetSettings() const;
-
-  /**
-   * @brief Get WebContext of WebEngine.
-   */
-  Dali::Toolkit::WebContext* GetContext() const;
-
-  /**
-   * @brief Get CookieManager of WebEngine.
-   */
-  Dali::Toolkit::WebCookieManager* GetCookieManager() const;
 
   /**
    * @brief Get WebBackForwardList of WebEngine.

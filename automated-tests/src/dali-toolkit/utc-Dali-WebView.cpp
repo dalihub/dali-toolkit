@@ -22,8 +22,6 @@
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
-#include <dali-toolkit/devel-api/controls/web-view/web-context.h>
-#include <dali-toolkit/devel-api/controls/web-view/web-cookie-manager.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-view.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
@@ -31,9 +29,10 @@
 #include <dali.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-certificate.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-console-message.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-context-menu-item.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-context-menu.h>
-#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-form-repost-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-frame.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-hit-test.h>
@@ -890,10 +889,7 @@ int UtcDaliWebViewGetWebContext(void)
 {
   ToolkitTestApplication application;
 
-  WebView view = WebView::New();
-  DALI_TEST_CHECK(view);
-
-  Dali::Toolkit::WebContext* context = view.GetContext();
+  Dali::WebEngineContext* context = WebView::GetContext();
   DALI_TEST_CHECK(context != 0);
 
   END_TEST;
@@ -903,10 +899,7 @@ int UtcDaliWebViewGetWebCookieManager(void)
 {
   ToolkitTestApplication application;
 
-  WebView view = WebView::New();
-  DALI_TEST_CHECK(view);
-
-  Dali::Toolkit::WebCookieManager* cookieManager = view.GetCookieManager();
+  Dali::WebEngineCookieManager* cookieManager = WebView::GetCookieManager();
   DALI_TEST_CHECK(cookieManager != 0);
 
   END_TEST;
@@ -1519,14 +1512,11 @@ int UtcDaliWebBackForwardListCheckItem(void)
 
 // test cases for web context.
 
-int UtcDaliWebContextGetSetCacheModel(void)
+int UtcDaliWebContextGetSetCacheModelEtc(void)
 {
   ToolkitTestApplication application;
 
-  WebView view = WebView::New();
-  DALI_TEST_CHECK(view);
-
-  Dali::Toolkit::WebContext* context = view.GetContext();
+  Dali::WebEngineContext* context = WebView::GetContext();
   DALI_TEST_CHECK(context != 0)
 
   std::string kDefaultValue;
@@ -1595,10 +1585,7 @@ int UtcDaliWebContextGetWebDatabaseStorageOrigins(void)
 {
   ToolkitTestApplication application;
 
-  WebView view = WebView::New();
-  DALI_TEST_CHECK(view);
-
-  Dali::Toolkit::WebContext* context = view.GetContext();
+  Dali::WebEngineContext* context = WebView::GetContext();
   DALI_TEST_CHECK(context != 0)
 
   std::string kDefaultValue;
@@ -1665,10 +1652,7 @@ int UtcDaliWebContextHttpRequestInterceptor(void)
 {
   ToolkitTestApplication application;
 
-  WebView view = WebView::New();
-  DALI_TEST_CHECK(view);
-
-  Dali::Toolkit::WebContext* context = view.GetContext();
+  Dali::WebEngineContext* context = WebView::GetContext();
   DALI_TEST_CHECK(context != 0)
 
   // load url.
@@ -1708,10 +1692,7 @@ int UtcDaliWebCookieManagerGetSetCookieAcceptPolicy(void)
 {
   ToolkitTestApplication application;
 
-  WebView view = WebView::New();
-  DALI_TEST_CHECK(view);
-
-  Dali::Toolkit::WebCookieManager* cookieManager = view.GetCookieManager();
+  Dali::WebEngineCookieManager* cookieManager = WebView::GetCookieManager();
   DALI_TEST_CHECK(cookieManager != 0)
 
   const std::string kDefaultValue;
@@ -1736,10 +1717,7 @@ int UtcDaliWebCookieManagerChangesWatch(void)
 {
   ToolkitTestApplication application;
 
-  WebView view = WebView::New();
-  DALI_TEST_CHECK(view);
-
-  Dali::Toolkit::WebCookieManager* cookieManager = view.GetCookieManager();
+  Dali::WebEngineCookieManager* cookieManager = WebView::GetCookieManager();
   DALI_TEST_CHECK(cookieManager != 0)
 
   cookieManager->ChangesWatch(&OnChangesWatch);

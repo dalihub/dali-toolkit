@@ -64,6 +64,16 @@ WebView WebView::New(uint32_t argc, char** argv)
   return Internal::WebView::New(argc, argv);
 }
 
+Dali::WebEngineContext* WebView::GetContext()
+{
+  return Internal::WebView::GetContext();
+}
+
+Dali::WebEngineCookieManager* WebView::GetCookieManager()
+{
+  return Internal::WebView::GetCookieManager();
+}
+
 WebView WebView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<WebView, Internal::WebView>(handle);
@@ -72,16 +82,6 @@ WebView WebView::DownCast(BaseHandle handle)
 Dali::Toolkit::WebSettings* WebView::GetSettings() const
 {
   return Dali::Toolkit::GetImpl(*this).GetSettings();
-}
-
-Dali::Toolkit::WebContext* WebView::GetContext() const
-{
-  return Dali::Toolkit::GetImpl(*this).GetContext();
-}
-
-Dali::Toolkit::WebCookieManager* WebView::GetCookieManager() const
-{
-  return Dali::Toolkit::GetImpl(*this).GetCookieManager();
 }
 
 Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
