@@ -467,6 +467,7 @@ bool Controller::TextUpdater::RemoveText(
   UpdateInputStyleType type)
 {
   bool removed = false;
+  bool removeAll = false;
 
   Controller::Impl& impl      = *controller.mImpl;
   EventData*&       eventData = impl.mEventData;
@@ -500,9 +501,14 @@ bool Controller::TextUpdater::RemoveText(
       numberOfCharacters = currentText.Count() - cursorIndex;
     }
 
+    if((cursorIndex == 0) && (currentText.Count() - numberOfCharacters == 0))
+    {
+      removeAll = true;
+    }
+
     TextUpdateInfo& textUpdateInfo = impl.mTextUpdateInfo;
 
-    if(eventData->mPreEditFlag || // If the preedit flag is enabled, it means two (or more) of them came together i.e. when two keys have been pressed at the same time.
+    if(eventData->mPreEditFlag || removeAll || // If the preedit flag is enabled, it means two (or more) of them came together i.e. when two keys have been pressed at the same time.
        ((cursorIndex + numberOfCharacters) <= textUpdateInfo.mPreviousNumberOfCharacters))
     {
       // Mark the paragraphs to be updated.
@@ -548,7 +554,7 @@ bool Controller::TextUpdater::RemoveText(
 
       // If the number of current text and the number of characters to be deleted are same,
       // it means all texts should be removed and all Preedit variables should be initialized.
-      if((currentText.Count() - numberOfCharacters == 0) && (cursorIndex == 0))
+      if(removeAll)
       {
         impl.ClearPreEditFlag();
         textUpdateInfo.mNumberOfCharactersToAdd = 0;
@@ -591,6 +597,7 @@ bool Controller::TextUpdater::RemoveText(
       }
 
       DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::RemoveText %p removed %d\n", &controller, numberOfCharacters);
+      removeAll = false;
       removed = true;
     }
   }
