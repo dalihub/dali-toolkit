@@ -45,7 +45,14 @@ typedef IntrusivePtr<VectorAnimationTask> VectorAnimationTaskPtr;
 class VectorAnimationTask : public RefObject, public ConnectionTracker
 {
 public:
-  using ResourceReadySignalType = Signal<void(bool)>;
+  enum class ResourceStatus
+  {
+    LOADED, /// Resource is loaded
+    READY,  /// Resource is ready
+    FAILED  /// Resource is fail to load
+  };
+
+  using ResourceReadySignalType = Signal<void(ResourceStatus)>;
 
   using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
 
