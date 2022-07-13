@@ -17,6 +17,7 @@
 
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/object/base-object.h>
 #include <toolkit-application.h>
 #include <toolkit-event-thread-callback.h>
@@ -70,6 +71,7 @@ public:
 
   bool Load(const std::string& url)
   {
+    Dali::Mutex::ScopedLock lock(mMutex);
     mUrl = url;
     if(mUrl == "invalid.json")
     {
@@ -80,7 +82,6 @@ public:
     {
       // Change total frame number for test
       mTotalFrameNumber = 200;
-      mTestFrameDrop    = true;
     }
 
     mDefaultWidth  = 100;
@@ -96,6 +97,7 @@ public:
 
   void SetSize(uint32_t width, uint32_t height)
   {
+    Dali::Mutex::ScopedLock lock(mMutex);
     mWidth  = width;
     mHeight = height;
 
@@ -108,6 +110,7 @@ public:
 
   bool Render(uint32_t frameNumber)
   {
+    Dali::Mutex::ScopedLock lock(mMutex);
     if(mWidth == 0 || mHeight == 0)
     {
       return false;
@@ -179,8 +182,12 @@ public:
 
   void InvalidateBuffer()
   {
-    mNeedTrigger   = true;
-    mResourceReady = false;
+    Dali::Mutex::ScopedLock lock(mMutex);
+    if(mResourceReady)
+    {
+      mNeedTrigger   = true;
+      mResourceReady = false;
+    }
   }
 
   Dali::VectorAnimationRenderer::UploadCompletedSignalType& UploadCompletedSignal()
@@ -211,6 +218,7 @@ public:
 
   std::string    mUrl;
   Dali::Renderer mRenderer;
+  Dali::Mutex    mMutex;
   uint32_t       mWidth;
   uint32_t       mHeight;
   uint32_t       mDefaultWidth;
@@ -353,7 +361,8 @@ namespace VectorAnimationRenderer
 {
 void DelayRendering(uint32_t delay)
 {
-  Dali::Internal::Adaptor::gVectorAnimationRenderer->mDelayTime = delay;
+  Dali::Internal::Adaptor::gVectorAnimationRenderer->mDelayTime     = delay;
+  Dali::Internal::Adaptor::gVectorAnimationRenderer->mTestFrameDrop = true;
 }
 
 uint32_t GetDroppedFrames()

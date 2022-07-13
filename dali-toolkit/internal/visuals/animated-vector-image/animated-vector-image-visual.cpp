@@ -374,7 +374,7 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
 void AnimatedVectorImageVisual::DoSetOffScene(Actor& actor)
 {
   StopAnimation();
-  SendAnimationData();
+  TriggerVectorRasterization();
 
   if(mImpl->mRenderer)
   {
@@ -423,7 +423,7 @@ void AnimatedVectorImageVisual::OnSetTransform()
       mAnimationData.resendFlag |= VectorAnimationTask::RESEND_PLAY_STATE;
     }
 
-    SendAnimationData();
+    TriggerVectorRasterization();
   }
 }
 
@@ -489,31 +489,41 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
   TriggerVectorRasterization();
 }
 
-void AnimatedVectorImageVisual::OnResourceReady(bool success)
+void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceStatus status)
 {
-  mLoadFailed = !success;
-
-  // If weak handle is holding a placement actor, it is the time to add the renderer to actor.
-  Actor actor = mPlacementActor.GetHandle();
-  if(actor && !mRendererAdded)
+  if(status == VectorAnimationTask::ResourceStatus::LOADED)
   {
-    if(success)
+    if(mImpl->mEventObserver)
     {
-      actor.AddRenderer(mImpl->mRenderer);
-      ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+      mImpl->mEventObserver->RelayoutRequest(*this);
     }
-    else
-    {
-      Vector2 imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-      mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
-      actor.AddRenderer(mImpl->mRenderer);
-      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
-    }
-
-    mRendererAdded = true;
-
-    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "Renderer is added (success = %d) [%p]\n", success, this);
   }
+  else
+  {
+    mLoadFailed = status == VectorAnimationTask::ResourceStatus::FAILED ? true : false;
+
+    // If weak handle is holding a placement actor, it is the time to add the renderer to actor.
+    Actor actor = mPlacementActor.GetHandle();
+    if(actor && !mRendererAdded)
+    {
+      if(!mLoadFailed)
+      {
+        actor.AddRenderer(mImpl->mRenderer);
+        ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+      }
+      else
+      {
+        Vector2 imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+        mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+        actor.AddRenderer(mImpl->mRenderer);
+        ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+      }
+
+      mRendererAdded = true;
+    }
+  }
+
+  DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "Renderer is added (status = %d) [%p]\n", status, this);
 }
 
 void AnimatedVectorImageVisual::OnAnimationFinished()

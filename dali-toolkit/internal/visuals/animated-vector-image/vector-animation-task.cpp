@@ -397,11 +397,7 @@ bool VectorAnimationTask::Rasterize(bool& keepAnimation)
 
     if(mLoadRequest)
     {
-      bool result = Load();
-      if(!result)
-      {
-        return false;
-      }
+      return Load();
     }
   }
 
@@ -652,27 +648,18 @@ void VectorAnimationTask::ApplyAnimationData()
 
 void VectorAnimationTask::OnUploadCompleted()
 {
-  mResourceReadySignal.Emit(true);
+  mResourceReadySignal.Emit(ResourceStatus::READY);
 }
 
 void VectorAnimationTask::OnLoadCompleted()
 {
   if(!mLoadFailed)
   {
-    if(mWidth == 0 && mHeight == 0)
-    {
-      uint32_t width, height;
-      mVectorRenderer.GetDefaultSize(width, height);
-
-      SetSize(width, height);
-
-      mVectorAnimationThread.AddTask(this);
-    }
+    mResourceReadySignal.Emit(ResourceStatus::LOADED);
   }
   else
   {
-    // Load failed
-    mResourceReadySignal.Emit(false);
+    mResourceReadySignal.Emit(ResourceStatus::FAILED);
   }
 }
 } // namespace Internal

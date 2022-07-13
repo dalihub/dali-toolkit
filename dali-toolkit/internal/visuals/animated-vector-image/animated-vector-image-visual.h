@@ -169,9 +169,9 @@ private:
 
   /**
    * @brief Called when the resource is ready.
-   * @param[in] success True if the texture load was successful. If false, then the resource failed to load.
+   * @param[in] status The resource status
    */
-  void OnResourceReady(bool success);
+  void OnResourceReady(VectorAnimationTask::ResourceStatus status);
 
   /**
    * @brief Event callback from rasterize thread. This is called after the animation is finished.
