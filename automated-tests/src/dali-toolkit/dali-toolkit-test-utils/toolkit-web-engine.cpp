@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,24 @@
 
 #include "toolkit-timer.h"
 
-#include <dali/devel-api/adaptor-framework/web-engine.h>
-#include <dali/devel-api/adaptor-framework/web-engine-back-forward-list.h>
-#include <dali/devel-api/adaptor-framework/web-engine-back-forward-list-item.h>
-#include <dali/devel-api/adaptor-framework/web-engine-certificate.h>
-#include <dali/devel-api/adaptor-framework/web-engine-console-message.h>
-#include <dali/devel-api/adaptor-framework/web-engine-context.h>
-#include <dali/devel-api/adaptor-framework/web-engine-context-menu.h>
-#include <dali/devel-api/adaptor-framework/web-engine-context-menu-item.h>
-#include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
-#include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
-#include <dali/devel-api/adaptor-framework/web-engine-frame.h>
-#include <dali/devel-api/adaptor-framework/web-engine-hit-test.h>
-#include <dali/devel-api/adaptor-framework/web-engine-http-auth-handler.h>
-#include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
-#include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
-#include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
-#include <dali/devel-api/adaptor-framework/web-engine-security-origin.h>
-#include <dali/devel-api/adaptor-framework/web-engine-settings.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-back-forward-list.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-back-forward-list-item.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-certificate.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-console-message.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context-menu.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context-menu-item.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-cookie-manager.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-form-repost-decision.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-frame.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-hit-test.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-http-auth-handler.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-load-error.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-policy-decision.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-request-interceptor.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-security-origin.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-settings.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/any.h>
