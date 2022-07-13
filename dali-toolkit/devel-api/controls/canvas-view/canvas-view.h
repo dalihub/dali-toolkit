@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CANVAS_VIEW_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #include <dali-toolkit/public-api/controls/control.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/canvas-renderer-drawable.h>
-#include <dali/devel-api/adaptor-framework/canvas-renderer-shape.h>
+#include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer-drawable.h>
+#include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer-shape.h>
 
 namespace Dali
 {

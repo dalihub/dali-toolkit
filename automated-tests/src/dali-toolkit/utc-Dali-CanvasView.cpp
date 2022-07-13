@@ -28,8 +28,8 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/canvas-view/canvas-view.h>
 #include <dali-toolkit/internal/controls/canvas-view/canvas-view-rasterize-thread.h>
-#include <dali/devel-api/adaptor-framework/canvas-renderer-shape.h>
-#include <dali/devel-api/adaptor-framework/canvas-renderer.h>
+#include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer-shape.h>
+#include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer.h>
 #include <dali/public-api/images/pixel-data.h>
 
 using namespace Dali;

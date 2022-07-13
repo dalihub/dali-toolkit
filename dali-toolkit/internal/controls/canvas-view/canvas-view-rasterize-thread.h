@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CANVAS_VIEW_RASTERIZE_THREAD_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/canvas-renderer.h>
+#include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
