@@ -34,7 +34,7 @@
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
-#include <dali-toolkit/internal/text/markup-processor.h>
+#include <dali-toolkit/internal/text/markup-processor/markup-processor.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 #include <dali-toolkit/internal/text/segmentation.h>

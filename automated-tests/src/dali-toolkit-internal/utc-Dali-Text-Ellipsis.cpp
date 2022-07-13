@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include <dali-toolkit/internal/text/font-description-run.h>
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 #include <dali-toolkit/internal/text/rendering/view-model.h>
-#include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/text-view.h>
 
 

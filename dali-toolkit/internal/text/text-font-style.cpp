@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-processor/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/property-string-parser.h>
 
 namespace Dali

@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali/devel-api/scripting/scripting.h>
 
