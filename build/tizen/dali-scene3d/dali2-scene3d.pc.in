@@ -1,0 +1,12 @@
+prefix=@PREFIX@
+exec_prefix=@EXEC_PREFIX@
+apiversion=@DALI_SCENE3D_VERSION@
+libdir=@LIB_DIR@
+includedir=@DEV_INCLUDE_PATH@
+
+Name: Dali 3D Engine Scene3D
+Description: Dali Scene3D library
+Version: ${apiversion}
+Requires: dali2-toolkit
+Libs: -L${libdir} -ldali2-scene3d
+Cflags: -I${includedir}

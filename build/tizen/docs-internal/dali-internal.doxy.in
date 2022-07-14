@@ -2293,7 +2293,7 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = DALI_CORE_API \
                          DALI_ADAPTOR_API \
                          DALI_TOOLKIT_API \
-                         DALI_SCENE_LOADER_API \
+                         DALI_SCENE3D_API \
                          DALI_INTERNAL \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
