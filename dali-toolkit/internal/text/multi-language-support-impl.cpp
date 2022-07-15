@@ -542,7 +542,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
     }
 
     bool isCommonScript = false;
-    bool isEmojiScript  = TextAbstraction::IsEmojiScript(script) || TextAbstraction::IsEmojiColorScript(script) || TextAbstraction::IsEmojiTextScript(script);
+    bool isEmojiScript  = TextAbstraction::IsOneOfEmojiScripts(script);
 
     if(isEmojiScript && (previousScript == script))
     {
@@ -628,6 +628,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
           {
             // Use the cached default font for the script if there is one.
             fontId = cachedDefaultFontId;
+            isValidFont = true;
           }
           else
           {
@@ -660,6 +661,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
                 }
               }
               defaultFontsPerScript->Cache(currentFontDescription, fontId);
+              isValidFont = true;
             }
           }
         } // !isValidFont (3)
@@ -729,6 +731,15 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
                     description.path.c_str());
     }
 #endif
+    if(!isValidFont && !isCommonScript)
+    {
+      Dali::TextAbstraction::FontDescription descriptionForLog;
+      fontClient.GetDescription(fontId, descriptionForLog);
+      DALI_LOG_RELEASE_INFO("Validated font set fail : Character : %x, Script : %s, Font : %s \n",
+                            character,
+                            Dali::TextAbstraction::ScriptName[script],
+                            descriptionForLog.path.c_str());
+    }
 
     // Whether bols style is required.
     isBoldRequired = (currentFontDescription.weight >= TextAbstraction::FontWeight::BOLD);
