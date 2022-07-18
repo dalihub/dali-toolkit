@@ -1,9 +1,0 @@
-set(scene_loader_internal_dir "${scene_loader_dir}/internal")
-
-set(scene_loader_src_files ${scene_loader_src_files}
-	${scene_loader_internal_dir}/gltf2-asset.cpp
-	${scene_loader_internal_dir}/hash.cpp
-	${scene_loader_internal_dir}/json-reader.cpp
-	${scene_loader_internal_dir}/json-util.cpp
-	${scene_loader_internal_dir}/controls/model-view/model-view-impl.cpp
-)

@@ -2,5 +2,5 @@ build
 dali.info
 *.dylib
 dali2-*-config.cmake
-libdali2-scene-loader.so*
+libdali2-scene3d.so*
 dali-shader-generator

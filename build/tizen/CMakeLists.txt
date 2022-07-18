@@ -34,7 +34,7 @@ OPTION(ENABLE_LINK_TEST          "Enable the link test" ON)
 OPTION(INSTALL_DOXYGEN_DOC       "Install doxygen doc" ON)
 OPTION(CONFIGURE_AUTOMATED_TESTS "Configure automated tests" ON)
 OPTION(USE_DEFAULT_RESOURCE_DIR  "Whether to use the default resource folders. Otherwise set environment variables for DALI_IMAGE_DIR, DALI_SOUND_DIR, DALI_STYLE_DIR, DALI_STYLE_IMAGE_DIR and DALI_DATA_READ_ONLY_DIR" ON)
-OPTION(BUILD_SCENE_LOADER        "Whether to build dali-scene-loader." ON)
+OPTION(BUILD_SCENE3D        "Whether to build dali-scene3d." ON)
 
 IF( ENABLE_PKG_CONFIGURE )
   FIND_PACKAGE( PkgConfig REQUIRED )
@@ -511,7 +511,7 @@ IF( ENABLE_COVERAGE )
     ADD_CUSTOM_TARGET( ${DALI_TOOLKIT_PREFIX}rename_cov_data ./rename-cov-data )
 
     ADD_CUSTOM_TARGET( ${DALI_TOOLKIT_PREFIX}cov_data ${LCOV_BIN} ${LCOV_OPTS} --base-directory . --directory . -c -o dali.info
-      COMMAND ${LCOV_BIN} ${LCOV_OPTS} --remove dali.info \"*/dali-env/*\" \"/usr/include/*\" \"*/dali-env/*\" \"*solid-color-actor*\" \"*/dali-toolkit/third-party/*\" \"*/dali-scene-loader/third-party/*\" -o dali.info )
+      COMMAND ${LCOV_BIN} ${LCOV_OPTS} --remove dali.info \"*/dali-env/*\" \"/usr/include/*\" \"*/dali-env/*\" \"*solid-color-actor*\" \"*/dali-toolkit/third-party/*\" \"*/dali-scene3d/third-party/*\" -o dali.info )
 
     ADD_CUSTOM_TARGET( ${DALI_TOOLKIT_PREFIX}coverage genhtml -p ${ROOT_SRC_DIR} ${LCOV_OPTS} -o ${COVERAGE_OUTPUT_DIR} dali.info
       DEPENDS cov_data )
@@ -554,8 +554,8 @@ IF( ENABLE_COVERAGE )
   ENDIF( LCOV_BIN )
 ENDIF()
 
-IF ( BUILD_SCENE_LOADER )
-  ADD_SUBDIRECTORY( ${CMAKE_CURRENT_SOURCE_DIR}/dali-scene-loader )
+IF ( BUILD_SCENE3D )
+  ADD_SUBDIRECTORY( ${CMAKE_CURRENT_SOURCE_DIR}/dali-scene3d )
 ENDIF()
 
 
@@ -572,9 +572,9 @@ IF( DOXYGEN_FOUND )
   CONFIGURE_FILE( ${DOXYGEN_SRC_DIR}/dali.doxy.in ${DOXYGEN_SRC_DIR}/dali.doxy @ONLY )
   CONFIGURE_FILE( ${DOXYGEN_INTERNAL_SRC_DIR}/dali-internal.doxy.in ${DOXYGEN_INTERNAL_SRC_DIR}/dali-internal.doxy @ONLY )
 
-  IF ( BUILD_SCENE_LOADER )
+  IF ( BUILD_SCENE3D )
     ADD_CUSTOM_TARGET( doc_doxygen ALL
-      DEPENDS ${name} dali2-scene-loader
+      DEPENDS ${name} dali2-scene3d
       COMMAND ${DOXYGEN_EXECUTABLE} -u ${DOXYGEN_SRC_DIR}/dali.doxy
       COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_SRC_DIR}/dali.doxy
       COMMAND ${CMAKE_COMMAND} -P ${DOXYGEN_SRC_DIR}/check_for_errors.cmake
@@ -630,7 +630,7 @@ MESSAGE( STATUS "Use pkg configure:             " ${ENABLE_PKG_CONFIGURE} )
 MESSAGE( STATUS "Vector Based Text Rendering:   " ${ENABLE_VECTOR_BASED_TEXT_RENDERING} )
 MESSAGE( STATUS "Enable link test:              " ${ENABLE_LINK_TEST} )
 MESSAGE( STATUS "Configure automated tests:     " ${CONFIGURE_AUTOMATED_TESTS} )
-MESSAGE( STATUS "Build Dali Scene Loader:       " ${BUILD_SCENE_LOADER} )
+MESSAGE( STATUS "Build Dali Scene3D:       " ${BUILD_SCENE3D} )
 MESSAGE( STATUS "CXXFLAGS:                      " ${CMAKE_CXX_FLAGS} )
 MESSAGE( STATUS "LDFLAGS:                       " ${CMAKE_SHARED_LINKER_FLAGS_INIT}${CMAKE_SHARED_LINKER_FLAGS} )
 
