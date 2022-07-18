@@ -129,6 +129,11 @@ public:
       mNeedDroppedFrames = false;
     }
 
+    if(mDynamicPropertyCallback)
+    {
+      CallbackBase::ExecuteReturn<Property::Value>(*mDynamicPropertyCallback, 0, 0, frameNumber);
+    }
+
     if(mNeedTrigger)
     {
       mEventThreadCallback->Trigger();
@@ -190,6 +195,11 @@ public:
     }
   }
 
+  void AddPropertyValueCallback(const std::string& keyPath, Dali::VectorAnimationRenderer::VectorProperty property, CallbackBase* callback, int32_t id)
+  {
+    mDynamicPropertyCallback = std::unique_ptr<CallbackBase>(callback);
+  }
+
   Dali::VectorAnimationRenderer::UploadCompletedSignalType& UploadCompletedSignal()
   {
     return mUploadCompletedSignal;
@@ -216,23 +226,25 @@ public:
 public:
   static uint32_t mCount;
 
-  std::string    mUrl;
-  Dali::Renderer mRenderer;
-  Dali::Mutex    mMutex;
-  uint32_t       mWidth;
-  uint32_t       mHeight;
-  uint32_t       mDefaultWidth;
-  uint32_t       mDefaultHeight;
-  uint32_t       mTotalFrameNumber;
-  uint32_t       mPreviousFrame;
-  uint32_t       mDelayTime;
-  uint32_t       mDroppedFrames;
-  float          mFrameRate;
-  bool           mTestFrameDrop;
-  bool           mNeedDroppedFrames;
-  bool           mLoadFailed{false};
-  bool           mResourceReady{false};
-  bool           mNeedTrigger{true};
+  std::string                   mUrl;
+  Dali::Renderer                mRenderer;
+  Dali::Mutex                   mMutex;
+  std::unique_ptr<CallbackBase> mDynamicPropertyCallback{nullptr};
+
+  uint32_t mWidth;
+  uint32_t mHeight;
+  uint32_t mDefaultWidth;
+  uint32_t mDefaultHeight;
+  uint32_t mTotalFrameNumber;
+  uint32_t mPreviousFrame;
+  uint32_t mDelayTime;
+  uint32_t mDroppedFrames;
+  float    mFrameRate;
+  bool     mTestFrameDrop;
+  bool     mNeedDroppedFrames;
+  bool     mLoadFailed{false};
+  bool     mResourceReady{false};
+  bool     mNeedTrigger{true};
 
   Dali::VectorAnimationRenderer::UploadCompletedSignalType mUploadCompletedSignal;
   std::unique_ptr<EventThreadCallback>                     mEventThreadCallback;
@@ -346,6 +358,11 @@ bool VectorAnimationRenderer::GetMarkerInfo(const std::string& marker, uint32_t&
 void VectorAnimationRenderer::InvalidateBuffer()
 {
   return Internal::Adaptor::GetImplementation(*this).InvalidateBuffer();
+}
+
+void VectorAnimationRenderer::AddPropertyValueCallback(const std::string& keyPath, VectorProperty property, CallbackBase* callback, int32_t id)
+{
+  Internal::Adaptor::GetImplementation(*this).AddPropertyValueCallback(keyPath, property, callback, id);
 }
 
 VectorAnimationRenderer::UploadCompletedSignalType& VectorAnimationRenderer::UploadCompletedSignal()

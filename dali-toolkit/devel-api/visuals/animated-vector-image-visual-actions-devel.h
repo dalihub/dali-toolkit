@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_ACTIONS_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,11 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/toolkit-action-index-ranges.h>
+#include <dali/public-api/signals/callback.h>
+#include <string>
 
 namespace Dali
 {
@@ -39,9 +43,34 @@ enum Type
   PAUSE,                            ///< Pause the animated vector image.
   STOP,                             ///< Stop the animated vector image. This is also Default playback mode.
   JUMP_TO,                          ///< Jump to the specified frame. Property::INTEGER value should be passed.
+  SET_DYNAMIC_PROPERTY              ///< Set the dynamic property.
 };
 
 } // namespace Action
+
+/**
+ * @brief The dynamic property info
+ *
+ * @note A callback of the following type may be used:
+ * @code
+ *   Property::Value MyFunction(int32_t id, VectorAnimationRenderer::VectorProperty property, uint32_t frameNumber);
+ * @endcode
+ *
+ * id  The id to specify the callback.
+ * property The property that represent what you are trying to change.
+ * frameNumber The current frame number.
+ * It returns a Property::Value to set according to the property type.
+ *
+ * The callback will be called on the worker thread. You MUST not call other DALi methods in the callback.
+ * And the object must still be alive when the callback occurs if you make the callback from a class member function.
+ */
+struct DynamicPropertyInfo
+{
+  int32_t       id;       ///< The Id to specify the callback. It should be unique and will be passed when the callback is called.
+  std::string   keyPath;  ///< The key path used to target a specific content or a set of contents that will be updated.
+  int32_t       property; ///< The property to set.
+  CallbackBase* callback; ///< The callback that gets called every time the animation is rendered. Ownership of the callback is passed onto the visual.
+};
 
 } // namespace DevelAnimatedVectorImageVisual
 

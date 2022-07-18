@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -358,6 +358,18 @@ DALI_TOOLKIT_API Dali::Animation CreateTransition(Internal::Control&            
  * @param[in] attributes Optional attributes for the action.
  */
 DALI_TOOLKIT_API void DoAction(Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes);
+
+/**
+ * @brief Perform an action on a visual registered to this control.
+ *
+ * Visuals will have actions, this API is used to perform one of these actions with the given attributes.
+ *
+ * @param[in] control The control.
+ * @param[in] visualIndex The Property index of the visual.
+ * @param[in] actionId The action to perform.  See Visual to find supported actions.
+ * @param[in] attributes Optional attributes for the action.
+ */
+DALI_TOOLKIT_API void DoActionExtension(Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes);
 
 /**
  * @brief Set input method context.

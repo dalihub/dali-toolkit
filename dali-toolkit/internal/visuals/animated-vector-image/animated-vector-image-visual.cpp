@@ -489,6 +489,22 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
   TriggerVectorRasterization();
 }
 
+void AnimatedVectorImageVisual::OnDoActionExtension(const Property::Index actionId, Dali::Any attributes)
+{
+  switch(actionId)
+  {
+    case DevelAnimatedVectorImageVisual::Action::SET_DYNAMIC_PROPERTY:
+    {
+      DevelAnimatedVectorImageVisual::DynamicPropertyInfo info = AnyCast<DevelAnimatedVectorImageVisual::DynamicPropertyInfo>(attributes);
+      mAnimationData.dynamicProperties.push_back(info);
+      mAnimationData.resendFlag |= VectorAnimationTask::RESEND_DYNAMIC_PROPERTY;
+      break;
+    }
+  }
+
+  TriggerVectorRasterization();
+}
+
 void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceStatus status)
 {
   if(status == VectorAnimationTask::ResourceStatus::LOADED)
