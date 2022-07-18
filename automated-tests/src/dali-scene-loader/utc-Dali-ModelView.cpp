@@ -46,6 +46,7 @@ const char* TEST_GLTF_FILE_NAME                = TEST_RESOURCE_DIR "/AnimatedCub
 const char* TEST_GLTF_TRIANGLE_FILE_NAME       = TEST_RESOURCE_DIR "/AnimatedTriangle.gltf";
 const char* TEST_GLTF_ANIMATION_TEST_FILE_NAME = TEST_RESOURCE_DIR "/animationTest.gltf";
 const char* TEST_DLI_FILE_NAME                 = TEST_RESOURCE_DIR "/arc.dli";
+const char* TEST_DLI_BEER_FILE_NAME            = TEST_RESOURCE_DIR "/beer_modelViewTest.dli";
 /**
  * For the diffuse and specular cube map texture.
  * These textures are based off version of Wave engine sample
@@ -434,6 +435,35 @@ int UtcDaliModelViewFitSize01(void)
 }
 
 int UtcDaliModelViewFitSize02(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::ModelView view = Scene3D::ModelView::New(TEST_DLI_BEER_FILE_NAME);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Actor   rootActor = view.GetModelRoot();
+  Vector3 rootSize  = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+  DALI_TEST_EQUALS(Vector3(5, 5, 5), rootSize, TEST_LOCATION);
+
+  Vector3 rootScale = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SCALE);
+  DALI_TEST_EQUALS(Vector3(1, 1, 1), rootScale, TEST_LOCATION);
+
+  view.FitSize(true);
+  rootSize = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+  DALI_TEST_EQUALS(Vector3(5, 5, 5), rootSize, TEST_LOCATION);
+
+  rootScale = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SCALE);
+  DALI_TEST_EQUALS(Vector3(10, 10, 10), rootScale, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliModelViewFitSize03(void)
 {
   ToolkitTestApplication application;
 

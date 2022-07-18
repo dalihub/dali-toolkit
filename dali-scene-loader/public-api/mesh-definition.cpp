@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -454,6 +454,21 @@ MeshDefinition::Accessor::Accessor(const MeshDefinition::Blob&       blob,
 {
 }
 
+void MeshDefinition::Blob::ComputeMinMax(std::vector<float>& min, std::vector<float>& max, uint32_t numComponents, uint32_t count, const float* values)
+{
+  min.assign(numComponents, MAXFLOAT);
+  max.assign(numComponents, -MAXFLOAT);
+  for(uint32_t i = 0; i < count; ++i)
+  {
+    for(uint32_t j = 0; j < numComponents; ++j)
+    {
+      min[j] = std::min(min[j], *values);
+      max[j] = std::max(max[j], *values);
+      values++;
+    }
+  }
+}
+
 void MeshDefinition::Blob::ApplyMinMax(const std::vector<float>& min, const std::vector<float>& max, uint32_t count, float* values)
 {
   DALI_ASSERT_DEBUG(max.size() == min.size() || max.size() * min.size() == 0);
@@ -504,6 +519,11 @@ uint32_t MeshDefinition::Blob::GetBufferSize() const
   return IsConsecutive() ? mLength : (mLength * mElementSizeHint / mStride);
 }
 
+void MeshDefinition::Blob::ComputeMinMax(uint32_t numComponents, uint32_t count, float* values)
+{
+  ComputeMinMax(mMin, mMax, numComponents, count, values);
+}
+
 void MeshDefinition::Blob::ApplyMinMax(uint32_t count, float* values) const
 {
   ApplyMinMax(mMin, mMax, count, values);
@@ -545,7 +565,7 @@ void MeshDefinition::RequestTangents()
 }
 
 MeshDefinition::RawData
-MeshDefinition::LoadRaw(const std::string& modelsPath) const
+MeshDefinition::LoadRaw(const std::string& modelsPath)
 {
   RawData raw;
   if(IsQuad())
@@ -613,7 +633,14 @@ MeshDefinition::LoadRaw(const std::string& modelsPath) const
     }
 
     uint32_t numVector3 = bufferSize / sizeof(Vector3);
-    mPositions.mBlob.ApplyMinMax(numVector3, reinterpret_cast<float*>(buffer.data()));
+    if(mPositions.mBlob.mMin.size() != 3u || mPositions.mBlob.mMax.size() != 3u)
+    {
+      mPositions.mBlob.ComputeMinMax(3u, numVector3, reinterpret_cast<float*>(buffer.data()));
+    }
+    else
+    {
+      mPositions.mBlob.ApplyMinMax(numVector3, reinterpret_cast<float*>(buffer.data()));
+    }
 
     if(HasBlendShapes())
     {
