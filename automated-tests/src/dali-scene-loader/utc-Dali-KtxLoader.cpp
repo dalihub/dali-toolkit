@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,28 +30,28 @@ using namespace Dali::SceneLoader;
 int UtcDaliKtxLoaderFailNonexistent(void)
 {
   CubeData data;
-  DALI_TEST_CHECK(!LoadCubeMapData("non-existent.ktx", data));
+  DALI_TEST_CHECK(!LoadKtxData("non-existent.ktx", data));
   END_TEST;
 }
 
 int UtcDaliKtxLoaderFailInvalid1(void)
 {
   CubeData data;
-  DALI_TEST_CHECK(!LoadCubeMapData(TEST_RESOURCE_DIR "/invalid.svg", data)); // file smaller than KTX header
+  DALI_TEST_CHECK(!LoadKtxData(TEST_RESOURCE_DIR "/invalid.svg", data)); // file smaller than KTX header
   END_TEST;
 }
 
 int UtcDaliKtxLoaderFailInvalid2(void)
 {
   CubeData data;
-  DALI_TEST_CHECK(!LoadCubeMapData(TEST_RESOURCE_DIR "/anim.gif", data)); // not a KTX
+  DALI_TEST_CHECK(!LoadKtxData(TEST_RESOURCE_DIR "/anim.gif", data)); // not a KTX
   END_TEST;
 }
 
 int UtcDaliKtxLoaderFailTruncated(void)
 {
   CubeData data;
-  DALI_TEST_CHECK(!LoadCubeMapData(TEST_RESOURCE_DIR "/truncated.ktx", data));
+  DALI_TEST_CHECK(!LoadKtxData(TEST_RESOURCE_DIR "/truncated.ktx", data));
   END_TEST;
 }
 
@@ -59,7 +59,7 @@ int UtcDaliKtxLoaderSuccess(void)
 {
   CubeData cubeData;
   auto path = TEST_RESOURCE_DIR "/forest_radiance.ktx";
-  DALI_TEST_CHECK(LoadCubeMapData(path, cubeData));
+  DALI_TEST_CHECK(LoadKtxData(path, cubeData));
 
   DALI_TEST_EQUAL(6u, cubeData.data.size());
   for (auto& face: cubeData.data)
@@ -103,7 +103,7 @@ int UtcDaliKtxLoaderFormats(void)
   for (auto i : pathFormats)
   {
     CubeData cubeData;
-    DALI_TEST_CHECK(LoadCubeMapData(resPath + i.first + ".ktx", cubeData));
+    DALI_TEST_CHECK(LoadKtxData(resPath + i.first + ".ktx", cubeData));
     DALI_TEST_EQUAL(cubeData.data[0][0].GetPixelFormat(), i.second);
   }
 
@@ -135,7 +135,7 @@ int UtcDaliKtxLoaderCubeDataCreateTexture2(void)
 {
   CubeData cubeData;
   auto path = TEST_RESOURCE_DIR "/forest_radiance.ktx";
-  DALI_TEST_CHECK(LoadCubeMapData(path, cubeData));
+  DALI_TEST_CHECK(LoadKtxData(path, cubeData));
 
   TestApplication app;
   auto texture = cubeData.CreateTexture();
@@ -151,7 +151,7 @@ int UtcDaliKtxLoaderCubeDataCreateTexture3(void)
 {
   CubeData cubeData;
   auto path = TEST_RESOURCE_DIR "/papermill_E_diffuse-64.ktx";
-  DALI_TEST_CHECK(LoadCubeMapData(path, cubeData));
+  DALI_TEST_CHECK(LoadKtxData(path, cubeData));
 
   TestApplication app;
   auto texture = cubeData.CreateTexture();

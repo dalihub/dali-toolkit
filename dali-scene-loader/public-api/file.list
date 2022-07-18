@@ -6,6 +6,9 @@ set(scene_loader_src_files ${scene_loader_src_files}
 	${scene_loader_public_api_dir}/animation-definition.cpp
 	${scene_loader_public_api_dir}/blend-shape-details.cpp
 	${scene_loader_public_api_dir}/camera-parameters.cpp
+	${scene_loader_public_api_dir}/cube-data.cpp
+	${scene_loader_public_api_dir}/cube-loader.cpp
+	${scene_loader_public_api_dir}/cube-map-loader.cpp
 	${scene_loader_public_api_dir}/customization.cpp
 	${scene_loader_public_api_dir}/dli-loader.cpp
 	${scene_loader_public_api_dir}/environment-definition.cpp

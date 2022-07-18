@@ -1,5 +1,3 @@
-#ifndef DALI_SCENE_LOADER_KTX_LOADER_H
-#define DALI_SCENE_LOADER_KTX_LOADER_H
 /*
  * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
@@ -17,25 +15,36 @@
  *
  */
 
+// FILE HEADER
+#include <dali-scene-loader/public-api/cube-map-loader.h>
+
 // INTERNAL INCLUDES
-#include <dali-scene-loader/public-api/api.h>
-#include <dali-scene-loader/public-api/cube-data.h>
+#include <dali-scene-loader/public-api/ktx-loader.h>
+#include <dali-scene-loader/public-api/cube-loader.h>
+
+// EXTERNAL INCLUDES
+#include <filesystem>
 
 namespace Dali
 {
+namespace
+{
+
+const std::string_view KTX_EXTENSION = ".ktx";
+
+}
+
 namespace SceneLoader
 {
 
-/**
- * @brief Loads cube map data texture from a ktx file.
- *
- * @param[in] path The file path.
- * @param[out] cubedata The data structure with all pixel data objects.
- * @return bool True if the loading is succeded.
- */
-bool LoadKtxData(const std::string& path, CubeData& cubedata);
+bool LoadCubeMapData(const std::string& path, CubeData& cubedata)
+{
+  std::filesystem::path modelPath(path);
+  std::string           extension = modelPath.extension();
+  std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+
+  return (extension == KTX_EXTENSION) ? SceneLoader::LoadKtxData(path, cubedata) : SceneLoader::LoadCubeData(path, cubedata);
+}
 
 } // namespace SceneLoader
 } // namespace Dali
-
-#endif // DALI_SCENE_LOADER_KTX_LOADER_H

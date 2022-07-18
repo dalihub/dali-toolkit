@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
  */
 
 // FILE HEADER
-#include "dali-scene-loader/public-api/ktx-loader.h"
+#include <dali-scene-loader/public-api/ktx-loader.h>
 
 // EXTERNAL INCLUDES
 #include <fstream>
 #include <memory>
-#include "dali/public-api/rendering/texture.h"
+#include <dali/public-api/rendering/texture.h>
 
 namespace Dali
 {
@@ -183,22 +183,7 @@ bool ConvertPixelFormat(const uint32_t ktxPixelFormat, Pixel::Format& format)
   return true;
 }
 
-Texture CubeData::CreateTexture() const
-{
-  Texture texture = Texture::New(TextureType::TEXTURE_CUBE, data[0][0].GetPixelFormat(), data[0][0].GetWidth(), data[0][0].GetHeight());
-  for(size_t iSide = 0u, iEndSize = data.size(); iSide < iEndSize; ++iSide)
-  {
-    auto& side = data[iSide];
-    for(size_t iMipLevel = 0u, iEndMipLevel = data[0].size(); iMipLevel < iEndMipLevel; ++iMipLevel)
-    {
-      texture.Upload(side[iMipLevel], CubeMapLayer::POSITIVE_X + iSide, iMipLevel, 0u, 0u, side[iMipLevel].GetWidth(), side[iMipLevel].GetHeight());
-    }
-  }
-
-  return texture;
-}
-
-bool LoadCubeMapData(const std::string& path, CubeData& cubedata)
+bool LoadKtxData(const std::string& path, CubeData& cubedata)
 {
   std::fstream fp(path, std::ios::in | std::ios::binary);
   if(fp.is_open() == false)
