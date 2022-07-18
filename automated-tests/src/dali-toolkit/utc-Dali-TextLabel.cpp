@@ -1140,6 +1140,7 @@ int UtcDaliToolkitTextLabelEmojisP(void)
 
   // EMOJI Sequences case for coverage.
   std::string emojiSequences =
+    "Glyphs not included in the font &#xf01a;&#xf01b;&#xf01c;&#xf01d;&#xf01e;&#xf01f;\n"   //case for coverage when glyph is not included in the font
     "Text VS15 &#x262a;&#xfe0e;\n"                                                         //text presentation sequence and selector
     "Color VS16 &#x262a;&#xfe0f;\n"                                                        //emoji presentation sequence and selector
     "Default &#x262a; \n"                                                                  //default presentation
