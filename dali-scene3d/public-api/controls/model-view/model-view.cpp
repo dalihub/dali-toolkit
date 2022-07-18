@@ -82,6 +82,11 @@ void ModelView::SetImageBasedLightSource(const std::string& diffuse, const std::
   GetImpl(*this).SetImageBasedLightSource(diffuse, specular, scaleFactor);
 }
 
+void ModelView::SetImageBasedLightTexture(Texture diffuse, Texture specular, float scaleFactor)
+{
+  GetImpl(*this).SetImageBasedLightTexture(diffuse, specular, scaleFactor);
+}
+
 uint32_t ModelView::GetAnimationCount()
 {
   return GetImpl(*this).GetAnimationCount();

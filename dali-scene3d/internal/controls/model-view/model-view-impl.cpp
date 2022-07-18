@@ -30,9 +30,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/controls/model-view/model-view.h>
+#include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
 #include <dali-scene3d/public-api/loader/animation-definition.h>
 #include <dali-scene3d/public-api/loader/camera-parameters.h>
-#include <dali-scene3d/public-api/loader/cube-data.h>
 #include <dali-scene3d/public-api/loader/cube-map-loader.h>
 #include <dali-scene3d/public-api/loader/dli-loader.h>
 #include <dali-scene3d/public-api/loader/gltf2-loader.h>
@@ -112,22 +112,6 @@ struct BoundingVolume
   Vector3 pointMin;
   Vector3 pointMax;
 };
-
-Texture LoadCubeMap(const std::string& cubeMapPath)
-{
-  Texture                         cubeTexture;
-  Dali::Scene3D::Loader::CubeData cubeData;
-  if(Dali::Scene3D::Loader::LoadCubeMapData(cubeMapPath, cubeData))
-  {
-    cubeTexture = cubeData.CreateTexture();
-  }
-  else
-  {
-    DALI_LOG_ERROR("Fail to load cube map, %s\n", cubeMapPath.c_str());
-  }
-
-  return cubeTexture;
-}
 
 void ConfigureBlendShapeShaders(
   Dali::Scene3D::Loader::ResourceBundle& resources, const Dali::Scene3D::Loader::SceneDefinition& scene, Actor root, std::vector<Dali::Scene3D::Loader::BlendshapeShaderConfigurationRequest>&& requests)
@@ -238,18 +222,20 @@ void ModelView::FitCenter(bool fit)
 
 void ModelView::SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor)
 {
-  Texture diffuseTexture = LoadCubeMap(diffuse);
-  if(diffuseTexture)
-  {
-    Texture specularTexture = LoadCubeMap(specular);
-    if(specularTexture)
-    {
-      mDiffuseTexture  = diffuseTexture;
-      mSpecularTexture = specularTexture;
-      mIblScaleFactor  = scaleFactor;
+  Texture diffuseTexture  = Dali::Scene3D::Loader::LoadCubeMap(diffuse);
+  Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(specular);
+  SetImageBasedLightTexture(diffuseTexture, specularTexture, scaleFactor);
+}
 
-      SetImageBasedLight(mModelRoot);
-    }
+void ModelView::SetImageBasedLightTexture(Dali::Texture diffuse, Dali::Texture specular, float scaleFactor)
+{
+  if(diffuse && specular)
+  {
+    mDiffuseTexture  = diffuse;
+    mSpecularTexture = specular;
+    mIblScaleFactor  = scaleFactor;
+
+    UpdateImageBasedLight();
   }
 }
 
@@ -297,7 +283,31 @@ void ModelView::OnSceneConnection(int depth)
     LoadModel();
   }
 
+  Actor parent = Self().GetParent();
+  while(parent)
+  {
+    Scene3D::SceneView sceneView = Scene3D::SceneView::DownCast(parent);
+    if(sceneView)
+    {
+      GetImpl(sceneView).RegisterModelView(Scene3D::ModelView::DownCast(Self()));
+      mParentSceneView = sceneView;
+      break;
+    }
+    parent = parent.GetParent();
+  }
+
   Control::OnSceneConnection(depth);
+}
+
+void ModelView::OnSceneDisconnection()
+{
+  Scene3D::SceneView sceneView = mParentSceneView.GetHandle();
+  if(sceneView)
+  {
+    GetImpl(sceneView).UnregisterModelView(Scene3D::ModelView::DownCast(Self()));
+    mParentSceneView.Reset();
+  }
+  Control::OnSceneDisconnection();
 }
 
 void ModelView::OnInitialize()
@@ -452,7 +462,9 @@ void ModelView::LoadModel()
     }
   }
 
-  SetImageBasedLight(mModelRoot);
+  mRenderableActors.clear();
+  CollectRenderableActor(mModelRoot);
+  UpdateImageBasedLight();
 
   mNaturalSize = AABB.CalculateSize();
   mModelPivot  = AABB.CalculatePivot();
@@ -508,42 +520,55 @@ void ModelView::FitModelPosition()
   }
 }
 
-void ModelView::SetImageBasedLight(Actor node)
+void ModelView::CollectRenderableActor(Actor actor)
 {
-  if(!mDiffuseTexture || !mSpecularTexture || !node)
+  uint32_t rendererCount = actor.GetRendererCount();
+  if(rendererCount)
+  {
+    mRenderableActors.push_back(actor);
+  }
+
+  uint32_t childrenCount = actor.GetChildCount();
+  for(uint32_t i = 0; i < childrenCount; ++i)
+  {
+    CollectRenderableActor(actor.GetChildAt(i));
+  }
+}
+
+void ModelView::UpdateImageBasedLight()
+{
+  if(!mDiffuseTexture || !mSpecularTexture)
   {
     return;
   }
 
-  uint32_t rendererCount = node.GetRendererCount();
-  if(rendererCount)
+  for(auto&& actor : mRenderableActors)
   {
-    node.RegisterProperty(Dali::Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), mIblScaleFactor);
-  }
-
-  for(uint32_t i = 0; i < rendererCount; ++i)
-  {
-    Dali::Renderer renderer = node.GetRendererAt(i);
-    if(renderer)
+    Actor renderableActor = actor.GetHandle();
+    if(renderableActor)
     {
-      Dali::TextureSet textures = renderer.GetTextures();
-      if(textures)
+      renderableActor.RegisterProperty(Dali::Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), mIblScaleFactor);
+
+      uint32_t rendererCount = renderableActor.GetRendererCount();
+      for(uint32_t i = 0; i < rendererCount; ++i)
       {
-        uint32_t textureCount = textures.GetTextureCount();
-        // EnvMap requires at least 2 texture, diffuse and specular
-        if(textureCount > 2u)
+        Dali::Renderer renderer = renderableActor.GetRendererAt(i);
+        if(renderer)
         {
-          textures.SetTexture(textureCount - OFFSET_FOR_DIFFUSE_CUBE_TEXTURE, mDiffuseTexture);
-          textures.SetTexture(textureCount - OFFSET_FOR_SPECULAR_CUBE_TEXTURE, mSpecularTexture);
+          Dali::TextureSet textures = renderer.GetTextures();
+          if(textures)
+          {
+            uint32_t textureCount = textures.GetTextureCount();
+            // EnvMap requires at least 2 texture, diffuse and specular
+            if(textureCount > 2u)
+            {
+              textures.SetTexture(textureCount - OFFSET_FOR_DIFFUSE_CUBE_TEXTURE, mDiffuseTexture);
+              textures.SetTexture(textureCount - OFFSET_FOR_SPECULAR_CUBE_TEXTURE, mSpecularTexture);
+            }
+          }
         }
       }
     }
-  }
-
-  uint32_t childrenCount = node.GetChildCount();
-  for(uint32_t i = 0; i < childrenCount; ++i)
-  {
-    SetImageBasedLight(node.GetChildAt(i));
   }
 }
 

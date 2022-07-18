@@ -23,6 +23,7 @@
 #include <dali-scene3d/public-api/loader/ktx-loader.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <filesystem>
 
 namespace Dali
@@ -36,13 +37,29 @@ namespace Scene3D
 {
 namespace Loader
 {
-bool LoadCubeMapData(const std::string& path, CubeData& cubedata)
+bool LoadCubeMapData(const std::string& cubeMapUrl, CubeData& cubedata)
 {
-  std::filesystem::path modelPath(path);
+  std::filesystem::path modelPath(cubeMapUrl);
   std::string           extension = modelPath.extension();
   std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
-  return (extension == KTX_EXTENSION) ? Dali::Scene3D::Loader::LoadKtxData(path, cubedata) : Dali::Scene3D::Loader::LoadCubeData(path, cubedata);
+  return (extension == KTX_EXTENSION) ? Dali::Scene3D::Loader::LoadKtxData(cubeMapUrl, cubedata) : Dali::Scene3D::Loader::LoadCubeData(cubeMapUrl, cubedata);
+}
+
+Texture LoadCubeMap(const std::string& cubeMapUrl)
+{
+  Texture                         cubeTexture;
+  Dali::Scene3D::Loader::CubeData cubeData;
+  if(Dali::Scene3D::Loader::LoadCubeMapData(cubeMapUrl, cubeData))
+  {
+    cubeTexture = cubeData.CreateTexture();
+  }
+  else
+  {
+    DALI_LOG_ERROR("Fail to load cube map, %s\n", cubeMapUrl.c_str());
+  }
+
+  return cubeTexture;
 }
 
 } // namespace Loader
