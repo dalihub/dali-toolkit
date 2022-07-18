@@ -64,10 +64,11 @@ uniform vec3 uEmissiveFactor;
 #endif
 
 //// For IBL
+uniform sampler2D sbrdfLUT;
 uniform samplerCube sDiffuseEnvSampler;
 uniform samplerCube sSpecularEnvSampler;
-uniform sampler2D sbrdfLUT;
 uniform float uIblIntensity;
+uniform vec3 uYDirection;
 
 // For Alpha Mode.
 uniform lowp float uOpaque;
@@ -201,8 +202,8 @@ void main()
   mediump vec3 reflection = -normalize(reflect(v, n));
 
   lowp vec3 color = vec3(0.0);
-  lowp vec3 diffuseLight = linear(texture(sDiffuseEnvSampler, n).rgb);
-  lowp vec3 specularLight = linear(texture(sSpecularEnvSampler, reflection).rgb);
+  lowp vec3 diffuseLight = linear(texture(sDiffuseEnvSampler, n * uYDirection).rgb);
+  lowp vec3 specularLight = linear(texture(sSpecularEnvSampler, reflection * uYDirection).rgb);
   // retrieve a scale and bias to F0. See [1], Figure 3
   lowp vec3 brdf = linear(texture(sbrdfLUT, vec2(NdotV, 1.0 - perceptualRoughness)).rgb);
 

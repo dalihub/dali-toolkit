@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_NODE_DEFINITION_H_
 #define DALI_SCENE_LOADER_NODE_DEFINITION_H_
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,6 +162,7 @@ public: // TYPES
   public: // METHODS
     virtual ~Renderable() = default;
 
+    virtual bool GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const;
     virtual void RegisterResources(IResourceReceiver& receiver) const;
     virtual void ReflectResources(IResourceReflector& reflector);
     virtual void OnCreate(const NodeDefinition& node, CreateParams& params, Actor& actor) const;
@@ -217,7 +218,34 @@ public: // METHODS
    */
   Actor CreateActor(CreateParams& params) const;
 
+  /**
+   * @brief Gets local space matrix of this node
+   * @return Matrix of local space.
+   */
   Matrix GetLocalSpace() const;
+
+  /**
+   * @brief Retrieves minimum and maximum position of this node in local space.
+   * @param[in] resources ResourceBundle that contains mesh information of this node.
+   * @param[out] min Minimum position of the mesh of this node.
+   * @param[out] max Maximum position of the mesh of this node.
+   * @return true If the node has mesh.
+   */
+  bool GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const;
+
+  /**
+   * @brief Retrieves Scale Factor uniform name.
+   * This uniform name can be used to change scale factor for ibl.
+   * @return std::string_view of the scale factor uniform name.
+   */
+  static std::string_view GetIblScaleFactorUniformName();
+
+  /**
+   * @brief Retrieves ibl Ydirection uniform name.
+   * This uniform name can be used to flip y direction of ibl in shader.
+   * @return std::string_view of the YDirection uniform name.
+   */
+  static std::string_view GetIblYDirectionUniformName();
 
 public: // DATA
   static const std::string ORIGINAL_MATRIX_PROPERTY_NAME;
@@ -248,6 +276,7 @@ public: // DATA
   Index   mMaterialIdx = INVALID_INDEX;
 
 public: // METHODS
+  bool GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const override;
   void RegisterResources(IResourceReceiver& receiver) const override;
   void ReflectResources(IResourceReflector& reflector) override;
   void OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const override;
