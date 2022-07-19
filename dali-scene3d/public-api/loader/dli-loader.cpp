@@ -1715,95 +1715,101 @@ void DliLoader::Impl::ParseAnimationGroups(const Toolkit::TreeNode* tnAnimationG
 
 void DliLoader::Impl::GetCameraParameters(std::vector<CameraParameters>& cameras) const
 {
-  if(const TreeNode* jsonCameras = mParser.GetRoot()->GetChild("cameras"))
+  if(mParser.GetRoot())
   {
-    cameras.resize(jsonCameras->Size());
-    auto iCamera = cameras.begin();
-    for(auto i0 = jsonCameras->CBegin(), i1 = jsonCameras->CEnd(); i0 != i1; ++i0)
+    if(const TreeNode* jsonCameras = mParser.GetRoot()->GetChild("cameras"))
     {
-      auto& jsonCamera = (*i0).second;
-
-      ReadFloat(jsonCamera.GetChild("fov"), iCamera->yFov);
-      ReadFloat(jsonCamera.GetChild("near"), iCamera->zNear);
-      ReadFloat(jsonCamera.GetChild("far"), iCamera->zFar);
-      if(ReadVector(jsonCamera.GetChild("orthographic"), iCamera->orthographicSize.AsFloat(), 4u))
+      cameras.resize(jsonCameras->Size());
+      auto iCamera = cameras.begin();
+      for(auto i0 = jsonCameras->CBegin(), i1 = jsonCameras->CEnd(); i0 != i1; ++i0)
       {
-        iCamera->isPerspective = false;
-      }
+        auto& jsonCamera = (*i0).second;
 
-      if(auto jsonMatrix = jsonCamera.GetChild("matrix"))
-      {
-        ReadVector(jsonMatrix, iCamera->matrix.AsFloat(), 16u);
-      }
+        ReadFloat(jsonCamera.GetChild("fov"), iCamera->yFov);
+        ReadFloat(jsonCamera.GetChild("near"), iCamera->zNear);
+        ReadFloat(jsonCamera.GetChild("far"), iCamera->zFar);
+        if(ReadVector(jsonCamera.GetChild("orthographic"), iCamera->orthographicSize.AsFloat(), 4u))
+        {
+          iCamera->isPerspective = false;
+        }
 
-      ++iCamera;
+        if(auto jsonMatrix = jsonCamera.GetChild("matrix"))
+        {
+          ReadVector(jsonMatrix, iCamera->matrix.AsFloat(), 16u);
+        }
+
+        ++iCamera;
+      }
     }
   }
 }
 
 void DliLoader::Impl::GetLightParameters(std::vector<LightParameters>& lights) const
 {
-  if(const TreeNode* jsonLights = mParser.GetRoot()->GetChild("lights"))
+  if(mParser.GetRoot())
   {
-    lights.resize(jsonLights->Size());
-    auto iLight = lights.begin();
-    for(auto i0 = jsonLights->CBegin(), i1 = jsonLights->CEnd(); i0 != i1; ++i0)
+    if(const TreeNode* jsonLights = mParser.GetRoot()->GetChild("lights"))
     {
-      auto& jsonLight = (*i0).second;
-      if(!ReadVector(jsonLight.GetChild("matrix"), iLight->transform.AsFloat(), 16))
+      lights.resize(jsonLights->Size());
+      auto iLight = lights.begin();
+      for(auto i0 = jsonLights->CBegin(), i1 = jsonLights->CEnd(); i0 != i1; ++i0)
       {
-        mOnError(
-          FormatString("Failed to parse light %d - \"matrix\" child with 16 floats expected.\n",
-                       std::distance(jsonLights->CBegin(), i0)));
-        continue;
-      }
+        auto& jsonLight = (*i0).second;
+        if(!ReadVector(jsonLight.GetChild("matrix"), iLight->transform.AsFloat(), 16))
+        {
+          mOnError(
+            FormatString("Failed to parse light %d - \"matrix\" child with 16 floats expected.\n",
+                         std::distance(jsonLights->CBegin(), i0)));
+          continue;
+        }
 
-      int shadowMapSize = 0;
-      if(ReadInt(jsonLight.GetChild(SHADOW_MAP_SIZE), shadowMapSize) && shadowMapSize < 0)
-      {
-        mOnError(
-          FormatString("Failed to parse light %d - %s has an invalid value.",
-                       std::distance(jsonLights->CBegin(), i0),
-                       SHADOW_MAP_SIZE));
-        continue;
-      }
-      iLight->shadowMapSize = shadowMapSize;
+        int shadowMapSize = 0;
+        if(ReadInt(jsonLight.GetChild(SHADOW_MAP_SIZE), shadowMapSize) && shadowMapSize < 0)
+        {
+          mOnError(
+            FormatString("Failed to parse light %d - %s has an invalid value.",
+                         std::distance(jsonLights->CBegin(), i0),
+                         SHADOW_MAP_SIZE));
+          continue;
+        }
+        iLight->shadowMapSize = shadowMapSize;
 
-      float orthoSize = 0.f;
-      if(ReadFloat(jsonLight.GetChild(ORTHOGRAPHIC_SIZE), orthoSize) &&
-         (orthoSize < .0f || std::isnan(orthoSize) || std::isinf(orthoSize)))
-      {
-        mOnError(
-          FormatString("Failed to parse light %d - %s has an invalid value.",
-                       std::distance(jsonLights->CBegin(), i0),
-                       ORTHOGRAPHIC_SIZE));
-        continue;
-      }
-      iLight->orthographicSize = orthoSize;
+        float orthoSize = 0.f;
+        if(ReadFloat(jsonLight.GetChild(ORTHOGRAPHIC_SIZE), orthoSize) &&
+           (orthoSize < .0f || std::isnan(orthoSize) || std::isinf(orthoSize)))
+        {
+          mOnError(
+            FormatString("Failed to parse light %d - %s has an invalid value.",
+                         std::distance(jsonLights->CBegin(), i0),
+                         ORTHOGRAPHIC_SIZE));
+          continue;
+        }
+        iLight->orthographicSize = orthoSize;
 
-      if((iLight->shadowMapSize > 0) != (iLight->orthographicSize > .0f))
-      {
-        mOnError(FormatString(
-          "Light %d: Both shadow map size and orthographic size must be set for shadows to work.",
-          std::distance(jsonLights->CBegin(), i0)));
-      }
+        if((iLight->shadowMapSize > 0) != (iLight->orthographicSize > .0f))
+        {
+          mOnError(FormatString(
+            "Light %d: Both shadow map size and orthographic size must be set for shadows to work.",
+            std::distance(jsonLights->CBegin(), i0)));
+        }
 
-      if(!ReadVector(jsonLight.GetChild("color"), iLight->color.AsFloat(), 3)) // color is optional
-      {
-        iLight->color = Vector3::ONE; // default to white
-      }
+        if(!ReadVector(jsonLight.GetChild("color"), iLight->color.AsFloat(), 3)) // color is optional
+        {
+          iLight->color = Vector3::ONE; // default to white
+        }
 
-      if(!ReadFloat(jsonLight.GetChild("intensity"), iLight->intensity)) // intensity is optional
-      {
-        iLight->intensity = 1.0f; // default to 1.0
-      }
+        if(!ReadFloat(jsonLight.GetChild("intensity"), iLight->intensity)) // intensity is optional
+        {
+          iLight->intensity = 1.0f; // default to 1.0
+        }
 
-      if(!ReadFloat(jsonLight.GetChild("shadowIntensity"), iLight->shadowIntensity)) // intensity is optional
-      {
-        iLight->shadowIntensity = 1.0f; // default to 1.0
-      }
+        if(!ReadFloat(jsonLight.GetChild("shadowIntensity"), iLight->shadowIntensity)) // intensity is optional
+        {
+          iLight->shadowIntensity = 1.0f; // default to 1.0
+        }
 
-      ++iLight;
+        ++iLight;
+      }
     }
   }
 }
