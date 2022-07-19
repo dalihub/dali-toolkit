@@ -10,6 +10,7 @@ SET(TC_SOURCES
   utc-Dali-AlphaFunctionHelper.cpp
   utc-Dali-AnimationDefinition.cpp
   utc-Dali-AnimatedProperty.cpp
+  utc-Dali-BvhLoader.cpp
   utc-Dali-CameraParameters.cpp
   utc-Dali-CubeLoader.cpp
   utc-Dali-CubeMapLoader.cpp
