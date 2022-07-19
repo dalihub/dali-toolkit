@@ -42,13 +42,14 @@ bool IsEmojiSequence(const TextAbstraction::Script&    currentRunScript,
                      const TextAbstraction::Character& character,
                      const TextAbstraction::Script&    characterScript)
 {
-  return (IsOneOfEmojiScripts(currentRunScript) &&
-          (IsOneOfEmojiScripts(characterScript) ||
-           TextAbstraction::IsZeroWidthJoiner(character) ||
-           TextAbstraction::IsZeroWidthNonJoiner(character) ||
-           TextAbstraction::IsEmojiItem(character) ||
-           TextAbstraction::IsMiscellaneousSymbolsAndArrowsEmoji(character) ||
-           TextAbstraction::IsDingbatsEmoji(character)));
+  return (!(TextAbstraction::IsNegativeSquaredLatinCapitalLetter(character)) &&
+          (IsOneOfEmojiScripts(currentRunScript) &&
+           (IsOneOfEmojiScripts(characterScript) ||
+            TextAbstraction::IsZeroWidthJoiner(character) ||
+            TextAbstraction::IsZeroWidthNonJoiner(character) ||
+            TextAbstraction::IsEmojiItem(character) ||
+            TextAbstraction::IsMiscellaneousSymbolsAndArrowsEmoji(character) ||
+            TextAbstraction::IsDingbatsEmoji(character))));
 }
 
 bool IsNewSequence(const Character* const         textBuffer,
