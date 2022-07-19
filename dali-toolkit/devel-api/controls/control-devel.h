@@ -215,6 +215,14 @@ enum
    *
    */
   COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID,
+
+  /**
+   * @brief Identifier that allows the automation framework to find and interact with this element.
+   * @details Name "automationId", type Property::STRING.
+   * @note This is a string identifier (compared to @c Actor::Property::ID which is an integer).
+   * It will also appear in the AT-SPI tree under the key "automationId".
+   */
+  AUTOMATION_ID,
 };
 
 } // namespace Property

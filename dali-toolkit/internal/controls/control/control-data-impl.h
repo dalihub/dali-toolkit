@@ -537,6 +537,7 @@ public:
   std::string mAccessibilityName;
   std::string mAccessibilityDescription;
   std::string mAccessibilityTranslationDomain;
+  std::string mAutomationId;
 
   bool mAccessibilityHighlightable = false;
   bool mAccessibilityHidden        = false;
@@ -593,6 +594,7 @@ public:
   static const PropertyRegistration PROPERTY_23;
   static const PropertyRegistration PROPERTY_24;
   static const PropertyRegistration PROPERTY_25;
+  static const PropertyRegistration PROPERTY_26;
 
 private:
   // Accessibility - notification for highlighted object to check if it is showing.

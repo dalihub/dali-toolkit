@@ -265,6 +265,12 @@ Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
     }
   }
 
+  auto automationId = control.GetProperty<std::string>(Dali::Toolkit::DevelControl::Property::AUTOMATION_ID);
+  if(!automationId.empty())
+  {
+    attributeMap.emplace("automationId", std::move(automationId));
+  }
+
   return attributeMap;
 }
 
