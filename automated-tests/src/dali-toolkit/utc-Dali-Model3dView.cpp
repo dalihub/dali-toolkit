@@ -24,12 +24,12 @@
 using namespace Dali;
 using namespace Dali::Toolkit;
 
-void model_view_startup(void)
+void model3d_view_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void model_view_cleanup(void)
+void model3d_view_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
@@ -42,7 +42,7 @@ const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
 } // namespace
 
 // Negative test case for a method
-int UtcDaliModelViewUninitialized(void)
+int UtcDaliModel3dViewUninitialized(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliModel3dViewUninitialized");
@@ -66,7 +66,7 @@ int UtcDaliModelViewUninitialized(void)
 }
 
 // Positive test case for a method
-int UtcDaliModelViewNew(void)
+int UtcDaliModel3dViewNew(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliModel3dViewNew");
@@ -80,7 +80,7 @@ int UtcDaliModelViewNew(void)
 }
 
 // Positive test case for a method
-int UtcDaliModelViewDownCast(void)
+int UtcDaliModel3dViewDownCast(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliModelViewDownCast");
@@ -96,7 +96,7 @@ int UtcDaliModelViewDownCast(void)
 }
 
 // Positive test case for a method
-int UtcDaliModelViewPropertyNames(void)
+int UtcDaliModel3dViewPropertyNames(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliModel3dViewPropertyNames");
@@ -126,7 +126,7 @@ int UtcDaliModelViewPropertyNames(void)
 }
 
 // Positive test case for a method
-int UtcDaliModelViewAddRemove(void)
+int UtcDaliModel3dViewAddRemove(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliModel3dViewAddRemove");
@@ -150,7 +150,7 @@ int UtcDaliModelViewAddRemove(void)
   END_TEST;
 }
 
-int UtcDaliModelCopyAndAssignment(void)
+int UtcDaliModel3dViewCopyAndAssignment(void)
 {
   ToolkitTestApplication application;
 
@@ -169,7 +169,7 @@ int UtcDaliModelCopyAndAssignment(void)
   END_TEST;
 }
 
-int UtcDaliModelMoveConstructor(void)
+int UtcDaliModel3dViewMoveConstructor(void)
 {
   ToolkitTestApplication application;
 
@@ -187,7 +187,7 @@ int UtcDaliModelMoveConstructor(void)
   END_TEST;
 }
 
-int UtcDaliModelMoveAssignment(void)
+int UtcDaliModel3dViewMoveAssignment(void)
 {
   ToolkitTestApplication application;
 
@@ -206,7 +206,7 @@ int UtcDaliModelMoveAssignment(void)
   END_TEST;
 }
 
-int UtcDaliModelTypeRegistry(void)
+int UtcDaliModel3dViewTypeRegistry(void)
 {
   ToolkitTestApplication application;
 
@@ -225,7 +225,7 @@ int UtcDaliModelTypeRegistry(void)
   END_TEST;
 }
 
-int UtcDaliModelOnSizeSet(void)
+int UtcDaliModel3dViewOnSizeSet(void)
 {
   ToolkitTestApplication application;
 

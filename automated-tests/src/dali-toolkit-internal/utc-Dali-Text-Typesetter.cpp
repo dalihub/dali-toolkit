@@ -25,9 +25,9 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/text/bitmap-font.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 #include <dali-toolkit/internal/text/rendering/view-model.h>
-#include <dali-toolkit/internal/text/text-controller.h>
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
 #include <toolkit-environment-variable.h>
 #include <toolkit-text-utils.h>

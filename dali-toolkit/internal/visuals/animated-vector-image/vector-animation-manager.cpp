@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ VectorAnimationManager::~VectorAnimationManager()
 
   if(mProcessorRegistered)
   {
-    Adaptor::Get().UnregisterProcessor(*this);
+    Adaptor::Get().UnregisterProcessor(*this, true);
   }
 
   for(auto observer : mLifecycleObservers)
@@ -97,7 +97,7 @@ void VectorAnimationManager::RegisterEventCallback(CallbackBase* callback)
 
   if(!mProcessorRegistered)
   {
-    Adaptor::Get().RegisterProcessor(*this);
+    Adaptor::Get().RegisterProcessor(*this, true); // Use post processor to trigger after layoutting
     mProcessorRegistered = true;
   }
 }
@@ -113,7 +113,7 @@ void VectorAnimationManager::UnregisterEventCallback(CallbackBase* callback)
     {
       if(Adaptor::IsAvailable())
       {
-        Adaptor::Get().UnregisterProcessor(*this);
+        Adaptor::Get().UnregisterProcessor(*this, true);
         mProcessorRegistered = false;
       }
     }
@@ -129,7 +129,7 @@ void VectorAnimationManager::Process(bool postProcessor)
   }
   mEventCallbacks.clear();
 
-  Adaptor::Get().UnregisterProcessor(*this);
+  Adaptor::Get().UnregisterProcessor(*this, true);
   mProcessorRegistered = false;
 }
 

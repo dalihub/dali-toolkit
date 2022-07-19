@@ -28,11 +28,11 @@
 #include <dali-toolkit/internal/text/hyphenator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
-#include <dali-toolkit/internal/text/markup-processor.h>
+#include <dali-toolkit/internal/text/markup-processor/markup-processor.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
-#include <dali-toolkit/internal/text/text-controller-impl.h>
+#include <dali-toolkit/internal/text/controller/text-controller-impl.h>
 
 namespace Dali
 {

@@ -1,0 +1,34 @@
+set(scene3d_public_api_dir "${scene3d_dir}/public-api")
+
+set(scene3d_src_files ${scene3d_src_files}
+	${scene3d_public_api_dir}/controls/model-view/model-view.cpp
+	${scene3d_public_api_dir}/loader/alpha-function-helper.cpp
+	${scene3d_public_api_dir}/loader/animated-property.cpp
+	${scene3d_public_api_dir}/loader/animation-definition.cpp
+	${scene3d_public_api_dir}/loader/blend-shape-details.cpp
+	${scene3d_public_api_dir}/loader/bvh-loader.cpp
+	${scene3d_public_api_dir}/loader/camera-parameters.cpp
+	${scene3d_public_api_dir}/loader/cube-data.cpp
+	${scene3d_public_api_dir}/loader/cube-loader.cpp
+	${scene3d_public_api_dir}/loader/cube-map-loader.cpp
+	${scene3d_public_api_dir}/loader/customization.cpp
+	${scene3d_public_api_dir}/loader/dli-loader.cpp
+	${scene3d_public_api_dir}/loader/environment-definition.cpp
+	${scene3d_public_api_dir}/loader/facial-animation-loader.cpp
+	${scene3d_public_api_dir}/loader/gltf2-loader.cpp
+	${scene3d_public_api_dir}/loader/ktx-loader.cpp
+	${scene3d_public_api_dir}/loader/material-definition.cpp
+	${scene3d_public_api_dir}/loader/matrix-stack.cpp
+	${scene3d_public_api_dir}/loader/mesh-definition.cpp
+	${scene3d_public_api_dir}/loader/node-definition.cpp
+	${scene3d_public_api_dir}/loader/parse-renderer-state.cpp
+	${scene3d_public_api_dir}/loader/renderer-state.cpp
+	${scene3d_public_api_dir}/loader/resource-bundle.cpp
+	${scene3d_public_api_dir}/loader/scene-definition.cpp
+	${scene3d_public_api_dir}/loader/shader-definition.cpp
+	${scene3d_public_api_dir}/loader/shader-definition-factory.cpp
+	${scene3d_public_api_dir}/loader/skinning-details.cpp
+	${scene3d_public_api_dir}/loader/string-callback.cpp
+	${scene3d_public_api_dir}/loader/utils.cpp
+	${scene3d_public_api_dir}/loader/view-projection.cpp
+)

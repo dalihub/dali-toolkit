@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-style-properties-devel.h>
-#include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-processor/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/property-string-parser.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 

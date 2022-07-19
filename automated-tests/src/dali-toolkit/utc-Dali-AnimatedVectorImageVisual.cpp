@@ -610,6 +610,9 @@ int UtcDaliAnimatedVectorImageVisualNaturalSize(void)
   application.SendNotification();
   application.Render();
 
+  // Trigger count is 1 - load
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
   visual.GetNaturalSize(naturalSize);
 
   DALI_TEST_EQUALS(naturalSize, Vector2(100.0f, 100.0f), TEST_LOCATION); // 100x100 is the content default size.
@@ -1511,6 +1514,9 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
 
   application.GetScene().Add(actor2);
 
+  application.SendNotification();
+  application.Render();
+
   // Trigger count is 4 - load & render a frame for each instance
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
 
@@ -1798,6 +1804,12 @@ int UtcDaliAnimatedVectorImageVisualFrameDrops(void)
 
   application.GetScene().Add(actor);
 
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - load, render the first frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
   Property::Map    map              = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value            = map.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER);
   int              totalFrameNumber = value->Get<int>();
@@ -1811,8 +1823,8 @@ int UtcDaliAnimatedVectorImageVisualFrameDrops(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 3 - load, render the first frame & calculating frame drops
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+  // Trigger count is 1 - calculating frame drops
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   // Check dropped frame
   uint32_t frames = Test::VectorAnimationRenderer::GetDroppedFrames();

@@ -21,7 +21,7 @@
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
-#include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-font-style.h>

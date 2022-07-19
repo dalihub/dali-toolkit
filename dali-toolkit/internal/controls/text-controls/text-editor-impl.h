@@ -37,7 +37,7 @@
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-anchor-control-interface.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
-#include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-selectable-control-interface.h>
 #include <dali-toolkit/internal/text/text-vertical-scroller.h>

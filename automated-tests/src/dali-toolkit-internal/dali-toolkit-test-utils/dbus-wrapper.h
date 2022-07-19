@@ -125,6 +125,8 @@ struct DBusWrapper
   virtual ObjectPtr eldbus_object_get_impl( const ConnectionPtr &conn, const std::string &bus, const std::string &path ) = 0;
   virtual ProxyPtr eldbus_proxy_get_impl( const ObjectPtr &obj, const std::string &interface ) = 0;
   virtual ProxyPtr eldbus_proxy_copy_impl( const ProxyPtr &ptr) = 0;
+  virtual void eldbus_name_request_impl(const ConnectionPtr&, const std::string&) {} // no-op
+  virtual void eldbus_name_release_impl(const ConnectionPtr&, const std::string&) {} // no-op
 
   class StringStorage
   {

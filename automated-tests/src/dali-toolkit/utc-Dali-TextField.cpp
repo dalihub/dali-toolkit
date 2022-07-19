@@ -2701,14 +2701,14 @@ int utcDaliTextFieldEvent03(void)
   application.Render();
 
   // Tap first to get the focus.
-  TestGenerateTap(application, 3.0f, 25.0f);
+  TestGenerateTap(application, 3.0f, 25.0f, 100);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Double tap to select a word.
-  TestGenerateTap(application, 3.0f, 25.0f);
+  TestGenerateTap(application, 3.0f, 25.0f, 200);
 
   // Render and notify
   application.SendNotification();

@@ -973,7 +973,7 @@ int UtcDaliTextShapeEmojiSequences(void)
   struct GlyphInfoData glyphsVS15[] =
     {
       {1u, 3842u, 0.f, 0.f, 0.f, 0.f, 14.0f, 0.f, false, false},
-      {1u, 8203u, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, false, false},
+      {1u, 3u, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, false, false},
     };
   CharacterIndex characterIndicesVS15[]   = {0u, 0u};
   Length         charactersPerGlyphVS15[] = {0u, 2u};

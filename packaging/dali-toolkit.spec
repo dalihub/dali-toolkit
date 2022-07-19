@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.1.30
+Version:    2.1.31
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -100,25 +100,25 @@ Requires:   %{name} = %{version}-%{release}
 Application development package for Dali 3D engine toolkit - headers and package config
 
 ##############################
-# dali-scene-loader
+# dali-scene3d
 ##############################
-%define dali2_scene_loader dali2-scene-loader
-%package -n %{dali2_scene_loader}
+%define dali2_scene3d dali2-scene3d
+%package -n %{dali2_scene3d}
 Summary:    DLI scene loading library
 Group:      System/Libraries
 License:    Apache-2.0
 Requires:   dali2-toolkit
 
-%description -n %{dali2_scene_loader}
+%description -n %{dali2_scene3d}
 Provides functionality for loading and displaying DLI format scenes. See README.md for more details.
 
-%package -n %{dali2_scene_loader}-devel
-Summary:    Development components for dali-scene-loader
+%package -n %{dali2_scene3d}-devel
+Summary:    Development components for dali-scene3d
 Group:      Development/Building
-Requires:   %{dali2_scene_loader} = %{version}-%{release}
+Requires:   %{dali2_scene3d} = %{version}-%{release}
 
-%description -n %{dali2_scene_loader}-devel
-Development components for dali-scene-loader.
+%description -n %{dali2_scene3d}-devel
+Development components for dali-scene3d.
 
 %define dali_data_rw_dir            %TZ_SYS_SHARE/dali/
 %define dali_data_ro_dir            %TZ_SYS_RO_SHARE/dali/
@@ -480,17 +480,17 @@ esac
 %{dali_toolkit_style_files}/default-feedback-theme.json
 %{_datadir}/locale/*/LC_MESSAGES/*
 
-%files -n %{dali2_scene_loader}
+%files -n %{dali2_scene3d}
 %if 0%{?enable_dali_smack_rules}
-%manifest dali-scene-loader.manifest-smack
+%manifest dali-scene3d.manifest-smack
 %else
-%manifest dali-scene-loader.manifest
+%manifest dali-scene3d.manifest
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/lib%{dali2_scene_loader}.so
+%{_libdir}/lib%{dali2_scene3d}.so
 %license LICENSE
 
-%files -n %{dali2_scene_loader}-devel
+%files -n %{dali2_scene3d}-devel
 %defattr(-,root,root,-)
-%{_includedir}/dali-scene-loader/public-api/*
-%{_libdir}/pkgconfig/dali2-scene-loader.pc
+%{_includedir}/dali-scene3d/public-api/*
+%{_libdir}/pkgconfig/dali2-scene3d.pc

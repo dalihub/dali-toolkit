@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_CONTROLS_COMMON_TEXT_UTILS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-anchor-devel.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
-#include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
 

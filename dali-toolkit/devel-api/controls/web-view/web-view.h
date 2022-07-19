@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_WEB_VIEW_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
-#include <dali/devel-api/adaptor-framework/web-engine-plugin.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-plugin.h>
 
 namespace Dali
 {

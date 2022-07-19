@@ -27,8 +27,6 @@ namespace EnvironmentVariable
 {
 const char* GetEnvironmentVariable(const char* variable);
 
-void SetTestingEnvironmentVariable(bool);
-
 void SetTestEnvironmentVariable(const char* variable, const char* value);
 
 } // namespace EnvironmentVariable

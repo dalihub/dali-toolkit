@@ -15,7 +15,7 @@
          * Build with the Visual Studio project.
          * Build with CMake.
       * [4. Building for MacOS](#4-building-for-macos)
-   * [DALi Scene Loader](#dali-scene-loader)
+   * [DALi Scene3D](#dali-scene3d)
 
 # Build Instructions
 
@@ -131,6 +131,6 @@ To build, run:
 % make install -j8
 ```
 
-# DALi Scene Loader
+# DALi Scene3D
 
-For information about the DALi Scene Loader library, refer to dali-scene-loader/README.md.
+For information about the DALi Scene3D library, refer to dali-scene3d/README.md.
