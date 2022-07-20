@@ -709,8 +709,9 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   Renderer renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
 
-  Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
-  Property::Value* value = map.Find(DevelImageVisual::Property::PLAY_RANGE);
+  Property::Map    map              = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  Property::Value* value            = map.Find(DevelImageVisual::Property::PLAY_RANGE);
+  int              totalFrameNumber = map.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER)->Get<int>();
 
   int              resultStartFrame, resultEndFrame;
   Property::Array* result = value->GetArray();
@@ -744,8 +745,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   result->GetElementAt(0).Get(resultStartFrame);
   result->GetElementAt(1).Get(resultEndFrame);
 
-  DALI_TEST_EQUALS(startFrame, resultStartFrame, TEST_LOCATION); // Should not be changed
-  DALI_TEST_EQUALS(endFrame, resultEndFrame, TEST_LOCATION);
+  DALI_TEST_EQUALS(resultStartFrame, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(resultEndFrame, totalFrameNumber - 1, TEST_LOCATION); // Should be clamped
 
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PAUSE, Property::Map());
 
@@ -1854,8 +1855,14 @@ int UtcDaliAnimatedVectorImageVisualSize(void)
 
   application.SendNotification();
 
-  // Trigger count is 2 - load, resource ready
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 1 - load
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - resource ready
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   textureTrace.Enable(true);
 
