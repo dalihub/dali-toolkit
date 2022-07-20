@@ -2260,55 +2260,6 @@ int UtcDaliKeyboardFocusManagerWithUserInteractionEnabled(void)
   END_TEST;
 }
 
-
-int UtcDaliKeyboardFocusManagerWithHide(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline(" UtcDaliKeyboardFocusManagerWithHide");
-
-  KeyboardFocusManager manager = KeyboardFocusManager::Get();
-  DALI_TEST_CHECK(manager);
-
-  // Create the first control and add it to the stage
-  Control first = Control::New();
-  first.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
-  application.GetScene().Add(first);
-
-  // Create the second control and add it to the first control.
-  Control second = Control::New();
-  second.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
-  first.Add(second);
-
-
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  // Check that no actor is being focused yet.
-  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
-
-  // Check that the focus is set on the actor
-  DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
-  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
-
-  // If the currently focused actor becomes VISIBLE false, it loses focus.
-  first.SetProperty(Actor::Property::VISIBLE, false);
-  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
-
-  first.SetProperty(Actor::Property::VISIBLE, true);
-  // Check that the focus is set on the actor
-  DALI_TEST_CHECK(manager.SetCurrentFocusActor(second) == true);
-  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
-
-  // If the currently focused actor becomes VISIBLE false, When the parent is hidden, the child also loses focus.
-  first.SetProperty(Actor::Property::VISIBLE, false);
-  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
-
-
-  END_TEST;
-}
-
 int UtcDaliKeyboardFocusManagerFocusFinderRootActor(void)
 {
   ToolkitTestApplication application;
