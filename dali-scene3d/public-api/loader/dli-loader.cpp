@@ -407,83 +407,86 @@ void DliLoader::Impl::ParseScene(LoadParams& params)
 
   // get index of root node.
   auto docRoot = mParser.GetRoot();
-
-  // Process resources first - these are shared
-  if(auto environments = docRoot->GetChild("environment"))
+  if(docRoot)
   {
-    ParseEnvironments(environments, output.mResources); // NOTE: must precede parsing of materials
-  }
-
-  if(auto meshes = docRoot->GetChild("meshes"))
-  {
-    ParseMeshes(meshes, output.mResources);
-  }
-
-  if(auto shaders = docRoot->GetChild("shaders"))
-  {
-    ParseShaders(shaders, output.mResources);
-  }
-
-  if(auto materials = docRoot->GetChild("materials"))
-  {
-    ParseMaterials(materials, input.mConvertColorCode, output.mResources);
-  }
-
-  for(auto& c : input.mPreNodeCategoryProcessors)
-  {
-    if(auto node = docRoot->GetChild(c.first))
+    // Process resources first - these are shared
+    if(auto environments = docRoot->GetChild("environment"))
     {
-      Property::Array array;
-      ParseProperties(*node, array);
-      c.second(std::move(array), mOnError);
+      ParseEnvironments(environments, output.mResources); // NOTE: must precede parsing of materials
     }
-  }
 
-  // Process scenes
-  Index iScene = 0; // default scene
-  ReadIndex(docRoot->GetChild("scene"), iScene);
-
-  auto tnScenes = RequireChild(docRoot, "scenes");
-  auto tnNodes  = RequireChild(docRoot, "nodes");
-  ParseSceneInternal(iScene, tnScenes, tnNodes, params);
-
-  ParseSkeletons(docRoot->GetChild("skeletons"), output.mScene, output.mResources);
-
-  output.mScene.EnsureUniqueSkinningShaderInstances(output.mResources);
-  output.mScene.EnsureUniqueBlendShapeShaderInstances(output.mResources);
-
-  // Ger cameras and lights
-  GetCameraParameters(output.mCameraParameters);
-  GetLightParameters(output.mLightParameters);
-
-  // Post-node processors and animations last
-  for(auto& c : input.mPostNodeCategoryProcessors)
-  {
-    if(auto node = docRoot->GetChild(c.first))
+    if(auto meshes = docRoot->GetChild("meshes"))
     {
-      Property::Array array;
-      ParseProperties(*node, array);
-      c.second(std::move(array), mOnError);
+      ParseMeshes(meshes, output.mResources);
     }
-  }
 
-  if(auto animations = docRoot->GetChild("animations"))
-  {
-    ParseAnimations(animations, params);
-  }
-
-  if(!output.mAnimationDefinitions.empty())
-  {
-    if(auto animationGroups = docRoot->GetChild("animationGroups"))
+    if(auto shaders = docRoot->GetChild("shaders"))
     {
-      ParseAnimationGroups(animationGroups, params);
+      ParseShaders(shaders, output.mResources);
+    }
+
+    if(auto materials = docRoot->GetChild("materials"))
+    {
+      ParseMaterials(materials, input.mConvertColorCode, output.mResources);
+    }
+
+    for(auto& c : input.mPreNodeCategoryProcessors)
+    {
+      if(auto node = docRoot->GetChild(c.first))
+      {
+        Property::Array array;
+        ParseProperties(*node, array);
+        c.second(std::move(array), mOnError);
+      }
+    }
+
+    // Process scenes
+    Index iScene = 0; // default scene
+    ReadIndex(docRoot->GetChild("scene"), iScene);
+
+    auto tnScenes = RequireChild(docRoot, "scenes");
+    auto tnNodes  = RequireChild(docRoot, "nodes");
+    ParseSceneInternal(iScene, tnScenes, tnNodes, params);
+
+    ParseSkeletons(docRoot->GetChild("skeletons"), output.mScene, output.mResources);
+
+    output.mScene.EnsureUniqueSkinningShaderInstances(output.mResources);
+    output.mScene.EnsureUniqueBlendShapeShaderInstances(output.mResources);
+
+    // Ger cameras and lights
+    GetCameraParameters(output.mCameraParameters);
+    GetLightParameters(output.mLightParameters);
+
+    // Post-node processors and animations last
+    for(auto& c : input.mPostNodeCategoryProcessors)
+    {
+      if(auto node = docRoot->GetChild(c.first))
+      {
+        Property::Array array;
+        ParseProperties(*node, array);
+        c.second(std::move(array), mOnError);
+      }
+    }
+
+    if(auto animations = docRoot->GetChild("animations"))
+    {
+      ParseAnimations(animations, params);
+    }
+
+    if(!output.mAnimationDefinitions.empty())
+    {
+      if(auto animationGroups = docRoot->GetChild("animationGroups"))
+      {
+        ParseAnimationGroups(animationGroups, params);
+      }
     }
   }
 }
 
 void DliLoader::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* tnScenes, const Toolkit::TreeNode* tnNodes, LoadParams& params)
 {
-  auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene) {
+  auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene)
+  {
     auto tn = GetNthChild(tnScenes, iScene); // now a "scene" object
     if(!tn)
     {
