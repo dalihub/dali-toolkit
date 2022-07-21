@@ -212,8 +212,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
   if(actor &&
      actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) &&
      actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED) &&
-     actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE) &&
-     actor.GetProperty<bool>(Actor::Property::VISIBLE))
+     actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
     // If the parent's KEYBOARD_FOCUSABLE_CHILDREN is false, it cannot have focus.
     Actor parent = actor.GetParent();
