@@ -1096,6 +1096,15 @@ void Control::Impl::DoAction(Dali::Property::Index visualIndex, Dali::Property::
   }
 }
 
+void Control::Impl::DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes)
+{
+  RegisteredVisualContainer::Iterator iter;
+  if(FindVisual(visualIndex, mVisuals, iter))
+  {
+    Toolkit::GetImplementation((*iter)->visual).DoActionExtension(actionId, attributes);
+  }
+}
+
 void Control::Impl::AppendAccessibilityAttribute(const std::string& key, const std::string value)
 {
   Property::Value* checkedValue = mAccessibilityAttributes.Find(key);

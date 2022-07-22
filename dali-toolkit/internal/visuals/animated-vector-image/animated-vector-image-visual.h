@@ -159,6 +159,11 @@ protected:
    */
   void OnDoAction(const Property::Index actionId, const Property::Value& attributes) override;
 
+  /**
+   * @copydoc Visual::Base::OnDoActionExtension
+   */
+  void OnDoActionExtension(const Property::Index actionId, Dali::Any attributes) override;
+
 private:
   /**
    * Helper method to set individual values by index key.

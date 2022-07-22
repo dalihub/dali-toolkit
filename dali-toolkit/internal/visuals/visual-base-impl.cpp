@@ -517,6 +517,11 @@ void Visual::Base::DoAction(const Property::Index actionId, const Property::Valu
   }
 }
 
+void Visual::Base::DoActionExtension(const Dali::Property::Index actionId, const Dali::Any attributes)
+{
+  OnDoActionExtension(actionId, attributes);
+}
+
 void Visual::Base::SetDepthIndex(int index)
 {
   mImpl->mDepthIndex = index;
@@ -694,6 +699,11 @@ bool Visual::Base::IsBorderlineRequired() const
 }
 
 void Visual::Base::OnDoAction(const Property::Index actionId, const Property::Value& attributes)
+{
+  // May be overriden by derived class
+}
+
+void Visual::Base::OnDoActionExtension(const Property::Index actionId, const Dali::Any attributes)
 {
   // May be overriden by derived class
 }

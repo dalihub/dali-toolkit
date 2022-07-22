@@ -631,6 +631,14 @@ void VectorAnimationTask::ApplyAnimationData()
     mVectorRenderer.InvalidateBuffer();
   }
 
+  if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_DYNAMIC_PROPERTY)
+  {
+    for(auto&& iter : mAnimationData[index].dynamicProperties)
+    {
+      mVectorRenderer.AddPropertyValueCallback(iter.keyPath, static_cast<VectorAnimationRenderer::VectorProperty>(iter.property), iter.callback, iter.id);
+    }
+  }
+
   if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_PLAY_STATE)
   {
     if(mAnimationData[index].playState == DevelImageVisual::PlayState::PLAYING)
@@ -647,6 +655,8 @@ void VectorAnimationTask::ApplyAnimationData()
     }
   }
 
+  // reset data
+  mAnimationData[index].dynamicProperties.clear();
   mAnimationData[index].resendFlag = 0;
 }
 

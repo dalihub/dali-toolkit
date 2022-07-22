@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,13 @@ void DoAction(Control& control, Dali::Property::Index visualIndex, Dali::Propert
   Internal::Control&       controlInternal = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(controlInternal);
   controlDataImpl.DoAction(visualIndex, actionId, attributes);
+}
+
+void DoActionExtension(Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes)
+{
+  Internal::Control&       controlInternal = Toolkit::Internal::GetImplementation(control);
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(controlInternal);
+  controlDataImpl.DoActionExtension(visualIndex, actionId, attributes);
 }
 
 void SetInputMethodContext(Internal::Control& control, InputMethodContext& inputMethodContext)
