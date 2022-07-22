@@ -95,6 +95,10 @@ void VectorAnimationTask::Finalize()
   {
     mAnimationFinishedTrigger.reset();
   }
+  if(mLoadCompletedTrigger)
+  {
+    mLoadCompletedTrigger.reset();
+  }
 
   mVectorRenderer.Finalize();
 
@@ -142,6 +146,11 @@ void VectorAnimationTask::RequestLoad(const std::string& url)
   mLoadRequest = true;
 
   mVectorAnimationThread.AddTask(this);
+}
+
+bool VectorAnimationTask::IsLoadRequested() const
+{
+  return mLoadRequest;
 }
 
 void VectorAnimationTask::SetAnimationData(const AnimationData& data)
@@ -280,38 +289,33 @@ void VectorAnimationTask::SetPlayRange(const Property::Array& playRange)
   }
 
   // Make sure the range specified is between 0 and the total frame number
-  if(startFrame < mTotalFrame && endFrame < mTotalFrame)
+  startFrame = std::min(startFrame, mTotalFrame - 1);
+  endFrame   = std::min(endFrame, mTotalFrame - 1);
+
+  // If the range is not in order swap values
+  if(startFrame > endFrame)
   {
-    // If the range is not in order swap values
-    if(startFrame > endFrame)
-    {
-      uint32_t temp = startFrame;
-      startFrame    = endFrame;
-      endFrame      = temp;
-    }
-
-    if(startFrame != mStartFrame || endFrame != mEndFrame)
-    {
-      mStartFrame = startFrame;
-      mEndFrame   = endFrame;
-
-      // If the current frame is out of the range, change the current frame also.
-      if(mStartFrame > mCurrentFrame)
-      {
-        mCurrentFrame = mStartFrame;
-      }
-      else if(mEndFrame < mCurrentFrame)
-      {
-        mCurrentFrame = mEndFrame;
-      }
-
-      DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetPlayRange: [%d, %d] [%s] [%p]\n", mStartFrame, mEndFrame, mUrl.c_str(), this);
-    }
+    uint32_t temp = startFrame;
+    startFrame    = endFrame;
+    endFrame      = temp;
   }
-  else
+
+  if(startFrame != mStartFrame || endFrame != mEndFrame)
   {
-    DALI_LOG_ERROR("VectorAnimationTask::SetPlayRange: Invalid range (%d, %d) [%s] [%p]\n", startFrame, endFrame, mUrl.c_str(), this);
-    return;
+    mStartFrame = startFrame;
+    mEndFrame   = endFrame;
+
+    // If the current frame is out of the range, change the current frame also.
+    if(mStartFrame > mCurrentFrame)
+    {
+      mCurrentFrame = mStartFrame;
+    }
+    else if(mEndFrame < mCurrentFrame)
+    {
+      mCurrentFrame = mEndFrame;
+    }
+
+    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetPlayRange: [%d, %d] [%s] [%p]\n", mStartFrame, mEndFrame, mUrl.c_str(), this);
   }
 }
 

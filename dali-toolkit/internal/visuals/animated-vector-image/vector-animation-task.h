@@ -139,11 +139,17 @@ public:
   void SetRenderer(Renderer renderer);
 
   /**
-   * @brief Request to load the animation file.
+   * @brief Requests to load the animation file.
    *
    * @param[in] url The url of the vector animation file
    */
   void RequestLoad(const std::string& url);
+
+  /**
+   * @brief Queries whether loading is requested.
+   * @return True if loading is requested.
+   */
+  bool IsLoadRequested() const;
 
   /**
    * @brief Sets data to specify animation playback.
