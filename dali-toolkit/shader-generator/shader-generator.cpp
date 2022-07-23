@@ -144,11 +144,13 @@ void GenerateHeaderFile(
             << endl;
     outFile << "const std::string_view " << shaderVariableName << endl;
     outFile << "{" << endl;
+    outFile << "R\"(" << endl;
     string line;
     while(getline(shaderFile, line))
     {
-      outFile << "\"" << line << "\\n\"" << endl;
+      outFile << line << endl;
     }
+    outFile << ")\"" << endl;
     outFile << "};" << endl;
     cout << " [OK]" << endl;
   }
