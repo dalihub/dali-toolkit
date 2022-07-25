@@ -581,22 +581,7 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
     }
     case Actor::Property::VISIBLE:
     {
-      const bool visible = propertyValue.Get<bool>();
-      GetAccessibleObject()->EmitVisible(visible);
-      if(!visible)
-      {
-        Dali::Actor self = Self();
-        Dali::Actor actor = Dali::Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor();
-        while(actor)
-        {
-          if(self == actor)
-          {
-            Dali::Toolkit::KeyboardFocusManager::Get().ClearFocus();
-            break;
-          }
-          actor = actor.GetParent();
-        }
-      }
+      GetAccessibleObject()->EmitVisible(Self().GetProperty<bool>(Actor::Property::VISIBLE));
       break;
     }
     case DevelActor::Property::USER_INTERACTION_ENABLED:

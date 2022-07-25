@@ -21,11 +21,13 @@
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/threading/conditional-wait.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-array.h>
 #include <chrono>
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 
 namespace Dali
@@ -54,7 +56,8 @@ public:
 
   using ResourceReadySignalType = Signal<void(ResourceStatus)>;
 
-  using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
+  using TimePoint           = std::chrono::time_point<std::chrono::steady_clock>;
+  using DynamicPropertyType = std::vector<DevelAnimatedVectorImageVisual::DynamicPropertyInfo>;
 
   /**
    * Flags for re-sending data to the vector animation thread
@@ -68,7 +71,8 @@ public:
     RESEND_CURRENT_FRAME       = 1 << 4,
     RESEND_SIZE                = 1 << 5,
     RESEND_PLAY_STATE          = 1 << 6,
-    RESEND_NEED_RESOURCE_READY = 1 << 7
+    RESEND_NEED_RESOURCE_READY = 1 << 7,
+    RESEND_DYNAMIC_PROPERTY    = 1 << 8
   };
 
   /**
@@ -79,6 +83,7 @@ public:
     AnimationData()
     : resendFlag(0),
       playRange(),
+      dynamicProperties(),
       playState(),
       stopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
       loopingMode(DevelImageVisual::LoopingMode::RESTART),
@@ -100,11 +105,13 @@ public:
       width        = rhs.width;
       height       = rhs.height;
       loopCount    = rhs.loopCount;
+      dynamicProperties.insert(dynamicProperties.end(), rhs.dynamicProperties.begin(), rhs.dynamicProperties.end());
       return *this;
     }
 
     uint32_t                             resendFlag;
     Property::Array                      playRange;
+    DynamicPropertyType                  dynamicProperties;
     DevelImageVisual::PlayState::Type    playState;
     DevelImageVisual::StopBehavior::Type stopBehavior;
     DevelImageVisual::LoopingMode::Type  loopingMode;
@@ -139,11 +146,17 @@ public:
   void SetRenderer(Renderer renderer);
 
   /**
-   * @brief Request to load the animation file.
+   * @brief Requests to load the animation file.
    *
    * @param[in] url The url of the vector animation file
    */
   void RequestLoad(const std::string& url);
+
+  /**
+   * @brief Queries whether loading is requested.
+   * @return True if loading is requested.
+   */
+  bool IsLoadRequested() const;
 
   /**
    * @brief Sets data to specify animation playback.

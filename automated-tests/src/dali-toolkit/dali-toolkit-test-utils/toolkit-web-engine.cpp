@@ -55,15 +55,16 @@ namespace Adaptor
 
 class WebEngine;
 class MockWebEngineContext;
+class MockWebEngineCookieManager;
 
 namespace
 {
-
 // Generally only one WebEngine instance exists.
 // If > 1, a new web engine has been created by CreateWindowSignal.
-static WebEngine* gInstance = nullptr;
-static int gInstanceCount = 0;
-static MockWebEngineContext* gWebEngineContextInstance = nullptr;
+WebEngine* gInstance = nullptr;
+int gInstanceCount = 0;
+MockWebEngineContext* gWebEngineContextInstance = nullptr;
+MockWebEngineCookieManager* gMockWebEngineCookieManager = nullptr;
 
 bool OnGoBack();
 bool OnGoForward();
@@ -342,6 +343,15 @@ private:
   float                              mockZoomFactor;
 };
 
+Dali::WebEngineContext* GetContext()
+{
+  if (!gWebEngineContextInstance)
+  {
+    gWebEngineContextInstance = new MockWebEngineContext();
+  }
+  return gWebEngineContextInstance;
+}
+
 class MockWebEngineCookieManager : public Dali::WebEngineCookieManager
 {
 public:
@@ -383,6 +393,15 @@ public:
 private:
   Dali::WebEngineCookieManager::CookieAcceptPolicy mockCookieAcceptPolicy;
 };
+
+Dali::WebEngineCookieManager* GetCookieManager()
+{
+  if (!gMockWebEngineCookieManager)
+  {
+    gMockWebEngineCookieManager = new MockWebEngineCookieManager();
+  }
+  return gMockWebEngineCookieManager;
+}
 
 class MockWebEngineBackForwardListItem : public Dali::WebEngineBackForwardListItem
 {
@@ -1211,13 +1230,6 @@ public:
     }
 
     mockWebEngineSettings = new MockWebEngineSettings();
-    MockWebEngineContext* engineContext = new MockWebEngineContext();
-    mockWebEngineContext = engineContext;
-    if ( gInstanceCount == 1 )
-    {
-      gWebEngineContextInstance = engineContext;
-    }
-    mockWebEngineCookieManager = new MockWebEngineCookieManager();
     mockWebEngineBackForwardList = new MockWebEngineBackForwardList();
   }
 
@@ -1226,29 +1238,16 @@ public:
     gInstanceCount--;
     if( !gInstanceCount )
     {
-      gInstance = 0;
-      gWebEngineContextInstance = 0;
+      gInstance = nullptr;
     }
 
     delete mockWebEngineSettings;
-    delete mockWebEngineContext;
-    delete mockWebEngineCookieManager;
     delete mockWebEngineBackForwardList;
   }
 
   Dali::WebEngineSettings& GetSettings() const
   {
     return *mockWebEngineSettings;
-  }
-
-  Dali::WebEngineContext& GetContext() const
-  {
-    return *mockWebEngineContext;
-  }
-
-  Dali::WebEngineCookieManager& GetCookieManager() const
-  {
-    return *mockWebEngineCookieManager;
   }
 
   Dali::WebEngineBackForwardList& GetBackForwardList() const
@@ -1604,8 +1603,6 @@ public:
   Dali::Vector2             mScrollSize;
   Dali::Vector2             mContentSize;
   WebEngineBackForwardList* mockWebEngineBackForwardList;
-  WebEngineContext*         mockWebEngineContext;
-  WebEngineCookieManager*   mockWebEngineCookieManager;
   WebEngineSettings*        mockWebEngineSettings;
 
   std::vector<Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback> mResultCallbacks;
@@ -1938,17 +1935,11 @@ bool OnRequestIntercepted()
 
 bool OnChangesWatch()
 {
-  DisconnectFromGlobalSignal( &OnChangesWatch );
-
-  if ( gInstance )
+  DisconnectFromGlobalSignal(&OnChangesWatch);
+  if (gMockWebEngineCookieManager)
   {
-    MockWebEngineCookieManager* temp = (MockWebEngineCookieManager *)(&(gInstance->GetCookieManager()));
-    if ( temp )
-    {
-      temp->mChangesWatchCallback();
-    }
+    gMockWebEngineCookieManager->mChangesWatchCallback();
   }
-
   return false;
 }
 
@@ -2004,6 +1995,16 @@ WebEngine WebEngine::New()
   return WebEngine( baseObject );
 }
 
+Dali::WebEngineContext* WebEngine::GetContext()
+{
+  return Internal::Adaptor::GetContext();
+}
+
+Dali::WebEngineCookieManager* WebEngine::GetCookieManager()
+{
+  return Internal::Adaptor::GetCookieManager();
+}
+
 WebEngine::WebEngine( const WebEngine& WebEngine )
 : BaseHandle( WebEngine )
 {
@@ -2035,16 +2036,6 @@ void WebEngine::Destroy()
 WebEngineSettings& WebEngine::GetSettings() const
 {
   return Internal::Adaptor::GetImplementation( *this ).GetSettings();
-}
-
-WebEngineContext& WebEngine::GetContext() const
-{
-  return Internal::Adaptor::GetImplementation( *this ).GetContext();
-}
-
-WebEngineCookieManager& WebEngine::GetCookieManager() const
-{
-  return Internal::Adaptor::GetImplementation( *this ).GetCookieManager();
 }
 
 WebEngineBackForwardList& WebEngine::GetBackForwardList() const

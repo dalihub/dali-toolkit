@@ -40,8 +40,6 @@ namespace Toolkit
 class KeyEvent;
 class TouchEvent;
 class WebBackForwardList;
-class WebContext;
-class WebCookieManager;
 class WebSettings;
 class WebView;
 
@@ -75,19 +73,19 @@ public:
   static Toolkit::WebView New(uint32_t argc, char** argv);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::GetSettings()
-   */
-  Dali::Toolkit::WebSettings* GetSettings() const;
-
-  /**
    * @copydoc Dali::Toolkit::WebView::GetContext()
    */
-  Dali::Toolkit::WebContext* GetContext() const;
+  static Dali::WebEngineContext* GetContext();
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetCookieManager()
    */
-  Dali::Toolkit::WebCookieManager* GetCookieManager() const;
+  static Dali::WebEngineCookieManager* GetCookieManager();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::GetSettings()
+   */
+  Dali::Toolkit::WebSettings* GetSettings() const;
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetBackForwardList()
@@ -698,8 +696,6 @@ private:
   Dali::Size                  mWebViewSize;
   Dali::WebEngine             mWebEngine;
 
-  std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
-  std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
   std::unique_ptr<Dali::Toolkit::WebSettings>        mWebSettings;
   std::unique_ptr<Dali::Toolkit::WebBackForwardList> mWebBackForwardList;
 

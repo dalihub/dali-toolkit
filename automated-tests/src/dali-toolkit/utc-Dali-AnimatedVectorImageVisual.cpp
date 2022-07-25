@@ -34,6 +34,8 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+
+#include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 
@@ -709,8 +711,9 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   Renderer renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
 
-  Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
-  Property::Value* value = map.Find(DevelImageVisual::Property::PLAY_RANGE);
+  Property::Map    map              = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  Property::Value* value            = map.Find(DevelImageVisual::Property::PLAY_RANGE);
+  int              totalFrameNumber = map.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER)->Get<int>();
 
   int              resultStartFrame, resultEndFrame;
   Property::Array* result = value->GetArray();
@@ -744,8 +747,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   result->GetElementAt(0).Get(resultStartFrame);
   result->GetElementAt(1).Get(resultEndFrame);
 
-  DALI_TEST_EQUALS(startFrame, resultStartFrame, TEST_LOCATION); // Should not be changed
-  DALI_TEST_EQUALS(endFrame, resultEndFrame, TEST_LOCATION);
+  DALI_TEST_EQUALS(resultStartFrame, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(resultEndFrame, totalFrameNumber - 1, TEST_LOCATION); // Should be clamped
 
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PAUSE, Property::Map());
 
@@ -1854,8 +1857,14 @@ int UtcDaliAnimatedVectorImageVisualSize(void)
 
   application.SendNotification();
 
-  // Trigger count is 2 - load, resource ready
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 1 - load
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - resource ready
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   textureTrace.Enable(true);
 
@@ -1888,6 +1897,66 @@ int UtcDaliAnimatedVectorImageVisualSize(void)
     out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
     DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
   }
+
+  END_TEST;
+}
+
+namespace
+{
+bool gDynamicPropertyCallbackFired = false;
+
+Property::Value FillColorCallback(int32_t id, VectorAnimationRenderer::VectorProperty property, uint32_t frameNumber)
+{
+  gDynamicPropertyCallbackFired = true;
+
+  if(frameNumber < 3)
+  {
+    return Vector3(0, 0, 1);
+  }
+  else
+  {
+    return Vector3(1, 0, 0);
+  }
+}
+} // namespace
+
+int UtcDaliAnimatedVectorImageVisualDynamicProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualDynamicProperty");
+
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base  visual  = factory.CreateVisual(TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions());
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  application.GetScene().Add(actor);
+
+  gDynamicPropertyCallbackFired = false;
+
+  // Set dynamic property
+  DevelAnimatedVectorImageVisual::DynamicPropertyInfo info;
+  info.id       = 1;
+  info.keyPath  = "Test.Path";
+  info.property = static_cast<int>(VectorAnimationRenderer::VectorProperty::FILL_COLOR);
+  info.callback = MakeCallback(FillColorCallback);
+
+  DevelControl::DoActionExtension(actor, DummyControl::Property::TEST_VISUAL, DevelAnimatedVectorImageVisual::Action::SET_DYNAMIC_PROPERTY, Any(info));
+
+  Property::Map attributes;
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  // Test whether the property callback is called
+  DALI_TEST_EQUALS(gDynamicPropertyCallbackFired, true, TEST_LOCATION);
 
   END_TEST;
 }

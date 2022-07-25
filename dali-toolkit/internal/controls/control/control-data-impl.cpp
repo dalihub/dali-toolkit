@@ -485,6 +485,7 @@ const PropertyRegistration Control::Impl::PROPERTY_22(typeRegistration, "dispatc
 const PropertyRegistration Control::Impl::PROPERTY_23(typeRegistration, "accessibilityHidden",            Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN,             Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_24(typeRegistration, "clockwiseFocusableActorId",      Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID,     Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_25(typeRegistration, "counterClockwiseFocusableActorId", Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_26(typeRegistration, "automationId",                   Toolkit::DevelControl::Property::AUTOMATION_ID,                    Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 // clang-format on
 
@@ -1095,6 +1096,15 @@ void Control::Impl::DoAction(Dali::Property::Index visualIndex, Dali::Property::
   }
 }
 
+void Control::Impl::DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes)
+{
+  RegisteredVisualContainer::Iterator iter;
+  if(FindVisual(visualIndex, mVisuals, iter))
+  {
+    Toolkit::GetImplementation((*iter)->visual).DoActionExtension(actionId, attributes);
+  }
+}
+
 void Control::Impl::AppendAccessibilityAttribute(const std::string& key, const std::string value)
 {
   Property::Value* checkedValue = mAccessibilityAttributes.Find(key);
@@ -1394,6 +1404,16 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         }
         break;
       }
+
+      case Toolkit::DevelControl::Property::AUTOMATION_ID:
+      {
+        std::string automationId;
+        if(value.Get(automationId))
+        {
+          controlImpl.mImpl->mAutomationId = automationId;
+        }
+        break;
+      }
     }
   }
 }
@@ -1564,6 +1584,12 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID:
       {
         value = controlImpl.mImpl->mCounterClockwiseFocusableActorId;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::AUTOMATION_ID:
+      {
+        value = controlImpl.mImpl->mAutomationId;
         break;
       }
     }

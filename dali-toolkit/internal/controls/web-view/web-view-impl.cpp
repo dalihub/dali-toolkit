@@ -44,8 +44,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
-#include <dali-toolkit/devel-api/controls/web-view/web-context.h>
-#include <dali-toolkit/devel-api/controls/web-view/web-cookie-manager.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
@@ -178,6 +176,16 @@ Toolkit::WebView WebView::New(uint32_t argc, char** argv)
   return handle;
 }
 
+Dali::WebEngineContext* WebView::GetContext()
+{
+  return Dali::WebEngine::GetContext();
+}
+
+Dali::WebEngineCookieManager* WebView::GetCookieManager()
+{
+  return Dali::WebEngine::GetCookieManager();
+}
+
 void WebView::OnInitialize()
 {
   Actor self = Self();
@@ -199,8 +207,6 @@ void WebView::OnInitialize()
   if(mWebEngine)
   {
     mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnFrameRendered);
-    mWebContext         = std::unique_ptr<Dali::Toolkit::WebContext>(new WebContext(mWebEngine.GetContext()));
-    mWebCookieManager   = std::unique_ptr<Dali::Toolkit::WebCookieManager>(new WebCookieManager(mWebEngine.GetCookieManager()));
     mWebSettings        = std::unique_ptr<Dali::Toolkit::WebSettings>(new WebSettings(mWebEngine.GetSettings()));
     mWebBackForwardList = std::unique_ptr<Dali::Toolkit::WebBackForwardList>(new WebBackForwardList(mWebEngine.GetBackForwardList()));
   }
@@ -216,16 +222,6 @@ DevelControl::ControlAccessible* WebView::CreateAccessibleObject()
 Dali::Toolkit::WebSettings* WebView::GetSettings() const
 {
   return mWebSettings.get();
-}
-
-Dali::Toolkit::WebContext* WebView::GetContext() const
-{
-  return mWebContext.get();
-}
-
-Dali::Toolkit::WebCookieManager* WebView::GetCookieManager() const
-{
-  return mWebCookieManager.get();
 }
 
 Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const

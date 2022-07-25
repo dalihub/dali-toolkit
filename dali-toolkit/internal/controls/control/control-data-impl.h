@@ -224,6 +224,11 @@ public:
   void DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes);
 
   /**
+   * @copydoc Dali::Toolkit::DevelControl::DoActionExtension()
+   */
+  void DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes);
+
+  /**
    * @brief Function used to set control properties.
    * @param[in] object The object whose property to set
    * @param[in] index The index of the property to set
@@ -537,6 +542,7 @@ public:
   std::string mAccessibilityName;
   std::string mAccessibilityDescription;
   std::string mAccessibilityTranslationDomain;
+  std::string mAutomationId;
 
   bool mAccessibilityHighlightable = false;
   bool mAccessibilityHidden        = false;
@@ -593,6 +599,7 @@ public:
   static const PropertyRegistration PROPERTY_23;
   static const PropertyRegistration PROPERTY_24;
   static const PropertyRegistration PROPERTY_25;
+  static const PropertyRegistration PROPERTY_26;
 
 private:
   // Accessibility - notification for highlighted object to check if it is showing.

@@ -171,3 +171,38 @@ int utcDaliAccessibilityHidden(void)
 
   END_TEST;
 }
+
+int utcDaliAutomationId(void)
+{
+  ToolkitTestApplication application;
+  Dali::Property::Index  automationIdIndex = Toolkit::DevelControl::Property::AUTOMATION_ID;
+  std::string            automationIdKey   = "automationId";
+  std::string            automationIdValue = "test123";
+
+  auto  control           = Toolkit::Control::New();
+  auto* controlAccessible = Accessibility::Accessible::Get(control);
+
+  // Check that there is no automationId initially
+  DALI_TEST_CHECK(control.GetProperty<std::string>(automationIdIndex).empty());
+  auto attributes = controlAccessible->GetAttributes();
+  DALI_TEST_CHECK(attributes.find(automationIdKey) == attributes.end());
+
+  // Set automationId
+  control.SetProperty(automationIdIndex, automationIdValue);
+
+  // Check that automationId is set
+  DALI_TEST_EQUALS(control.GetProperty<std::string>(automationIdIndex), automationIdValue, TEST_LOCATION);
+  attributes = controlAccessible->GetAttributes();
+  DALI_TEST_CHECK(attributes.find(automationIdKey) != attributes.end());
+  DALI_TEST_EQUALS(attributes[automationIdKey], automationIdValue, TEST_LOCATION);
+
+  // Unset automationId
+  control.SetProperty(automationIdIndex, "");
+
+  // Check that there is no automationId
+  DALI_TEST_CHECK(control.GetProperty<std::string>(automationIdIndex).empty());
+  attributes = controlAccessible->GetAttributes();
+  DALI_TEST_CHECK(attributes.find(automationIdKey) == attributes.end());
+
+  END_TEST;
+}

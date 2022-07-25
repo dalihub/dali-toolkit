@@ -85,7 +85,9 @@ void VectorAnimationThread::AddTask(VectorAnimationTaskPtr task)
 {
   ConditionalWait::ScopedLock lock(mConditionalWait);
 
-  if(mAnimationTasks.end() == std::find(mAnimationTasks.begin(), mAnimationTasks.end(), task))
+  // Find if the task is already in the list except loading task
+  auto iter = std::find_if(mAnimationTasks.begin(), mAnimationTasks.end(), [task](VectorAnimationTaskPtr& element) { return (element == task && !element->IsLoadRequested()); });
+  if(iter == mAnimationTasks.end())
   {
     auto currentTime = task->CalculateNextFrameTime(true); // Rasterize as soon as possible
 

@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/images/pixel-data-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 #include <dali/integration-api/debug.h>
 #include <string.h>
@@ -569,8 +570,8 @@ void TextVisual::UpdateRenderer()
       const bool markupStrikethroughEnabled = markupProcessorEnabled && mController->GetTextModel()->IsMarkupStrikethroughSet();
       const bool underlineEnabled           = mController->GetTextModel()->IsUnderlineEnabled() || markupUnderlineEnabled;
       const bool strikethroughEnabled       = mController->GetTextModel()->IsStrikethroughEnabled() || markupStrikethroughEnabled;
-      const bool styleEnabled   = (shadowEnabled || outlineEnabled || backgroundEnabled || markupProcessorEnabled);
-      const bool isOverlayStyle = underlineEnabled || strikethroughEnabled;
+      const bool styleEnabled               = (shadowEnabled || outlineEnabled || backgroundEnabled || markupProcessorEnabled);
+      const bool isOverlayStyle             = underlineEnabled || strikethroughEnabled;
 
       AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
 
@@ -592,53 +593,47 @@ void TextVisual::AddTexture(TextureSet& textureSet, PixelData& data, Sampler& sa
   textureSet.SetSampler(textureSetIndex, sampler);
 }
 
-PixelData TextVisual::ConvertToPixelData(unsigned char* buffer, int width, int height, int offsetPosition, const Pixel::Format textPixelFormat)
+void TextVisual::AddTilingTexture(TextureSet& textureSet, TilingInfo& tilingInfo, PixelData& data, Sampler& sampler, unsigned int textureSetIndex)
 {
-  int            bpp        = Pixel::GetBytesPerPixel(textPixelFormat);
-  unsigned int   bufferSize = width * height * bpp;
-  unsigned char* dstBuffer  = static_cast<unsigned char*>(malloc(bufferSize));
-  memcpy(dstBuffer, buffer + offsetPosition * bpp, bufferSize);
-  PixelData pixelData = Dali::PixelData::New(dstBuffer,
-                                             bufferSize,
-                                             width,
-                                             height,
-                                             textPixelFormat,
-                                             Dali::PixelData::FREE);
-  return pixelData;
+  Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D,
+                                 tilingInfo.textPixelFormat,
+                                 tilingInfo.width,
+                                 tilingInfo.height);
+  DevelTexture::UploadSubPixelData(texture, data, 0u, tilingInfo.offsetHeight, tilingInfo.width, tilingInfo.height);
+
+  textureSet.SetTexture(textureSetIndex, texture);
+  textureSet.SetSampler(textureSetIndex, sampler);
 }
 
 void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sampler& sampler)
 {
-  TextureSet   textureSet      = TextureSet::New();
-  unsigned int textureSetIndex = 0u;
+  TextureSet textureSet      = TextureSet::New();
+  uint32_t   textureSetIndex = 0u;
 
   // Convert the buffer to pixel data to make it a texture.
 
-  if(info.textBuffer)
+  if(info.textPixelData)
   {
-    PixelData data = ConvertToPixelData(info.textBuffer, info.width, info.height, info.offsetPosition, info.textPixelFormat);
-    AddTexture(textureSet, data, sampler, textureSetIndex);
+    AddTilingTexture(textureSet, info, info.textPixelData, sampler, textureSetIndex);
     ++textureSetIndex;
   }
 
-  if(mTextShaderFeatureCache.IsEnabledStyle() && info.styleBuffer)
+  if(mTextShaderFeatureCache.IsEnabledStyle() && info.stylePixelData)
   {
-    PixelData styleData = ConvertToPixelData(info.styleBuffer, info.width, info.height, info.offsetPosition, Pixel::RGBA8888);
-    AddTexture(textureSet, styleData, sampler, textureSetIndex);
+    AddTilingTexture(textureSet, info, info.stylePixelData, sampler, textureSetIndex);
     ++textureSetIndex;
   }
 
-  if(mTextShaderFeatureCache.IsEnabledOverlay() && info.overlayStyleBuffer)
+  if(mTextShaderFeatureCache.IsEnabledOverlay() && info.overlayStylePixelData)
   {
-    PixelData overlayStyleData = ConvertToPixelData(info.overlayStyleBuffer, info.width, info.height, info.offsetPosition, Pixel::RGBA8888);
-    AddTexture(textureSet, overlayStyleData, sampler, textureSetIndex);
+    AddTilingTexture(textureSet, info, info.overlayStylePixelData, sampler, textureSetIndex);
     ++textureSetIndex;
   }
 
-  if(mTextShaderFeatureCache.IsEnabledEmoji() && !mTextShaderFeatureCache.IsEnabledMultiColor() && info.maskBuffer)
+  if(mTextShaderFeatureCache.IsEnabledEmoji() && !mTextShaderFeatureCache.IsEnabledMultiColor() && info.maskPixelData)
   {
-    PixelData maskData = ConvertToPixelData(info.maskBuffer, info.width, info.height, info.offsetPosition, Pixel::L8);
-    AddTexture(textureSet, maskData, sampler, textureSetIndex);
+    AddTilingTexture(textureSet, info, info.maskPixelData, sampler, textureSetIndex);
+    ++textureSetIndex;
   }
 
   renderer.SetTextures(textureSet);
@@ -652,7 +647,7 @@ void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sa
 
   // Set size and offset for the tiling.
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, Vector2(info.width, info.height));
-  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET, Vector2(info.offSet.x, info.offSet.y));
+  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET, info.transformOffset);
   renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
   renderer.RegisterProperty("uHasMultipleTextColors", static_cast<float>(mTextShaderFeatureCache.IsEnabledMultiColor()));
 
@@ -702,32 +697,25 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     // Set information for creating textures.
     TilingInfo info(verifiedWidth, maxTextureSize, textPixelFormat);
 
-    // Get the buffer of text.
-    Dali::DevelPixelData::PixelDataBuffer textPixelData = Dali::DevelPixelData::ReleasePixelDataBuffer(data);
-    info.textBuffer                                     = textPixelData.buffer;
+    // Get the pixel data of text.
+    info.textPixelData = data;
 
     if(mTextShaderFeatureCache.IsEnabledStyle())
     {
       // Create RGBA texture for all the text styles (without the text itself)
-      PixelData                             styleData      = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888);
-      Dali::DevelPixelData::PixelDataBuffer stylePixelData = Dali::DevelPixelData::ReleasePixelDataBuffer(styleData);
-      info.styleBuffer                                     = stylePixelData.buffer;
+      info.stylePixelData = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888);
     }
 
     if(mTextShaderFeatureCache.IsEnabledOverlay())
     {
       // Create RGBA texture for all the overlay styles
-      PixelData                             overlayStyleData      = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_OVERLAY_STYLE, false, Pixel::RGBA8888);
-      Dali::DevelPixelData::PixelDataBuffer overlayStylePixelData = Dali::DevelPixelData::ReleasePixelDataBuffer(overlayStyleData);
-      info.overlayStyleBuffer                                     = overlayStylePixelData.buffer;
+      info.overlayStylePixelData = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_OVERLAY_STYLE, false, Pixel::RGBA8888);
     }
 
     if(mTextShaderFeatureCache.IsEnabledEmoji() && !mTextShaderFeatureCache.IsEnabledMultiColor())
     {
       // Create a L8 texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
-      PixelData                             maskData      = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_MASK, false, Pixel::L8);
-      Dali::DevelPixelData::PixelDataBuffer maskPixelData = Dali::DevelPixelData::ReleasePixelDataBuffer(maskData);
-      info.maskBuffer                                     = maskPixelData.buffer;
+      info.maskPixelData = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_MASK, false, Pixel::L8);
     }
 
     // Get the current offset for recalculate the offset when tiling.
@@ -736,7 +724,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     Property::Value* offsetValue = retMap.Find(Dali::Toolkit::Visual::Transform::Property::OFFSET);
     if(offsetValue)
     {
-      offsetValue->Get(info.offSet);
+      offsetValue->Get(info.transformOffset);
     }
 
     // Create a textureset in the default renderer.
@@ -746,18 +734,17 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
 
     Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 
-    int offsetPosition = verifiedWidth * maxTextureSize;
     // Create a renderer by cutting maxTextureSize.
     while(verifiedHeight > 0)
     {
       VisualRenderer tilingRenderer = VisualRenderer::New(geometry, shader);
       tilingRenderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT);
       // New offset position of buffer for tiling.
-      info.offsetPosition += offsetPosition;
+      info.offsetHeight += maxTextureSize;
       // New height for tiling.
       info.height = (verifiedHeight - maxTextureSize) > 0 ? maxTextureSize : verifiedHeight;
       // New offset for tiling.
-      info.offSet.y += maxTextureSize;
+      info.transformOffset.y += maxTextureSize;
       // Create a textureset int the new tiling renderer.
       CreateTextureSet(info, tilingRenderer, sampler);
 
@@ -820,9 +807,7 @@ TextureSet TextVisual::GetTextTexture(const Vector2& size)
   // Create a texture for the text without any styles
   PixelData data = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_NO_STYLES, false, textPixelFormat);
 
-  // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
-  // In that case, create a texture. TODO: should tile the text.
-  unsigned int textureSetIndex = 0u;
+  uint32_t textureSetIndex = 0u;
   AddTexture(textureSet, data, sampler, textureSetIndex);
   ++textureSetIndex;
 
