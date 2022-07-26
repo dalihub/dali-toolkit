@@ -25,6 +25,7 @@
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/property-notification.h>
 #include <memory>
+#include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-accessible.h>
@@ -71,6 +72,11 @@ public:
    * @copydoc Dali::Toolkit::WebView::New( uint32_t, char** )
    */
   static Toolkit::WebView New(uint32_t argc, char** argv);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::FindWebView()
+   */
+  static Toolkit::WebView FindWebView(Dali::WebEnginePlugin* plugin);
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetContext()
@@ -459,6 +465,11 @@ private:
   WebView& operator=(const WebView& webView);
 
   /**
+   * @brief Gets web engine plugin.
+   */
+  Dali::WebEnginePlugin* GetPlugin() const;
+
+  /**
    * @brief Set an absolute scroll of the given view.
    * @param[in] x The coordinate x of scroll
    * @param[in] y The coordinate y of scroll
@@ -709,6 +720,8 @@ private:
 
   Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback mScreenshotCapturedCallback;
   Dali::WebEnginePlugin::WebEngineFrameRenderedCallback     mFrameRenderedCallback;
+
+  static std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>> mPluginWebViewMap;
 };
 
 } // namespace Internal

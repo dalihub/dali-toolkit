@@ -95,6 +95,8 @@ DALI_TYPE_REGISTRATION_END()
 #define GET_ENUM_VALUE(structName, inputExp, outputExp) \
   Scripting::GetEnumerationProperty<Toolkit::WebView::structName::Type>(inputExp, structName##_TABLE, structName##_TABLE_COUNT, outputExp)
 
+std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>> WebView::mPluginWebViewMap;
+
 WebView::WebView(const std::string& locale, const std::string& timezoneId)
 : Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
@@ -145,6 +147,11 @@ WebView::~WebView()
   if(mWebEngine)
   {
     mWebEngine.FrameRenderedSignal().Disconnect(this, &WebView::OnFrameRendered);
+    auto iter = mPluginWebViewMap.find(mWebEngine.GetPlugin());
+    if (iter != mPluginWebViewMap.end())
+    {
+      mPluginWebViewMap.erase(iter);
+    }
     mWebEngine.Destroy();
   }
 }
@@ -153,7 +160,10 @@ Toolkit::WebView WebView::New()
 {
   WebView*         impl   = new WebView();
   Toolkit::WebView handle = Toolkit::WebView(*impl);
-
+  if (impl->GetPlugin())
+  {
+    mPluginWebViewMap[impl->GetPlugin()] = handle;
+  }
   impl->Initialize();
   return handle;
 }
@@ -162,7 +172,10 @@ Toolkit::WebView WebView::New(const std::string& locale, const std::string& time
 {
   WebView*         impl   = new WebView(locale, timezoneId);
   Toolkit::WebView handle = Toolkit::WebView(*impl);
-
+  if (impl->GetPlugin())
+  {
+    mPluginWebViewMap[impl->GetPlugin()] = handle;
+  }
   impl->Initialize();
   return handle;
 }
@@ -171,9 +184,22 @@ Toolkit::WebView WebView::New(uint32_t argc, char** argv)
 {
   WebView*         impl   = new WebView(argc, argv);
   Toolkit::WebView handle = Toolkit::WebView(*impl);
-
+  if (impl->GetPlugin())
+  {
+    mPluginWebViewMap[impl->GetPlugin()] = handle;
+  }
   impl->Initialize();
   return handle;
+}
+
+Toolkit::WebView WebView::FindWebView(Dali::WebEnginePlugin* plugin)
+{
+  auto iter = mPluginWebViewMap.find(plugin);
+  if (iter != mPluginWebViewMap.end())
+  {
+    return iter->second.GetHandle();
+  }
+  return Toolkit::WebView();
 }
 
 Dali::WebEngineContext* WebView::GetContext()
@@ -212,6 +238,11 @@ void WebView::OnInitialize()
   }
 
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
+}
+
+Dali::WebEnginePlugin* WebView::GetPlugin() const
+{
+  return mWebEngine ? mWebEngine.GetPlugin() : nullptr;
 }
 
 DevelControl::ControlAccessible* WebView::CreateAccessibleObject()
