@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
 
