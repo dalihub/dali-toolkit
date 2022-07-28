@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_GL_VIEW_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,10 @@
 #include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/gl-view/gl-view-render-thread.h>
 #include <dali-toolkit/internal/controls/gl-view/gl-view-interface-impl.h>
+#include <dali-toolkit/internal/controls/gl-view/gl-view-render-thread.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
-
 
 namespace Dali::Toolkit
 {
@@ -83,6 +82,11 @@ public:
    * @copydoc Dali::Toolkit::GlView::RenderOnce()
    */
   void RenderOnce() override;
+
+  /**
+   * @copydoc Dali::Toolkit::GlView::BindTextureResources()
+   */
+  void BindTextureResources(std::vector<Dali::Texture> textures) override;
 
 private: // From Control
   /**
@@ -155,6 +159,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} // namespace Dali::Toolkit
 
 #endif // DALI_TOOLKIT_INTERNAL_GL_VIEW_H
