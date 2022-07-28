@@ -630,7 +630,7 @@ MESSAGE( STATUS "Use pkg configure:             " ${ENABLE_PKG_CONFIGURE} )
 MESSAGE( STATUS "Vector Based Text Rendering:   " ${ENABLE_VECTOR_BASED_TEXT_RENDERING} )
 MESSAGE( STATUS "Enable link test:              " ${ENABLE_LINK_TEST} )
 MESSAGE( STATUS "Configure automated tests:     " ${CONFIGURE_AUTOMATED_TESTS} )
-MESSAGE( STATUS "Build Dali Scene3D:       " ${BUILD_SCENE3D} )
+MESSAGE( STATUS "Build Dali Scene3D:            " ${BUILD_SCENE3D} )
 MESSAGE( STATUS "CXXFLAGS:                      " ${CMAKE_CXX_FLAGS} )
 MESSAGE( STATUS "LDFLAGS:                       " ${CMAKE_SHARED_LINKER_FLAGS_INIT}${CMAKE_SHARED_LINKER_FLAGS} )
 
