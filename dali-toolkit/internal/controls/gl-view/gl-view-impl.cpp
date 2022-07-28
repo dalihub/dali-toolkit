@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,14 +40,14 @@ namespace Internal
 {
 Dali::Toolkit::GlView GlView::New(Dali::Toolkit::GlView::ColorFormat colorFormat)
 {
-  auto* impl   = new Dali::Toolkit::Internal::GlView(colorFormat);
+  auto*                 impl   = new Dali::Toolkit::Internal::GlView(colorFormat);
   Dali::Toolkit::GlView handle = Dali::Toolkit::GlView(*impl);
   impl->Initialize();
   return handle;
 }
 
 GlView::GlView(Dali::Toolkit::GlView::ColorFormat colorFormat)
-: Dali::Toolkit::Internal::GlViewImpl( Toolkit::GlView::BackendMode::EGL_IMAGE_OFFSCREEN_RENDERING ),
+: Dali::Toolkit::Internal::GlViewImpl(Toolkit::GlView::BackendMode::EGL_IMAGE_OFFSCREEN_RENDERING),
   mRenderThread(nullptr),
   mNativeImageQueue(nullptr),
   mRenderingMode(Toolkit::GlView::RenderingMode::CONTINUOUS),
@@ -145,6 +145,11 @@ void GlView::RenderOnce()
   {
     mRenderThread->RenderOnce();
   }
+}
+
+void GlView::BindTextureResources(std::vector<Dali::Texture> textures)
+{
+  // Not supported in the indirect mode
 }
 
 void GlView::OnInitialize()

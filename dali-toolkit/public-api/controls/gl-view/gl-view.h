@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_GL_VIEW_H
 #define DALI_TOOLKIT_GL_VIEW_H
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -41,7 +44,6 @@ class GlViewImpl;
 class DALI_TOOLKIT_API GlView : public Dali::Toolkit::Control
 {
 public:
-
   /**
    * @brief Implementation backend mode
    *
@@ -321,6 +323,22 @@ public:
    * @SINCE_2_0.45
    */
   void RenderOnce();
+
+  /**
+   * @brief Binds DALi textures to the callback
+   *
+   * The textures that are bound to the callback will be passed upon
+   * callback execution providing native handles (like GL name) so they
+   * can be used alongside with custom GL code.
+   *
+   * Binding texture does not affect lifecycle and it's up to the client-side
+   * to make sure the resource is alive when used inside the callback.
+   *
+   * @param[in] textures List of DALi textures to be bound to the callback
+   *
+   * @note It only supported only in the GlView::BackendMode::DIRECT_RENDERING.
+   */
+  void BindTextureResources(std::vector<Dali::Texture> textures);
 
 public: // Not intended for application developers
   /// @cond internal

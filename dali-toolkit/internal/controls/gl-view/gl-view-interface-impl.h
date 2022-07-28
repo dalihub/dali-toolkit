@@ -39,16 +39,14 @@ namespace Internal
 class GlViewImpl : public Dali::Toolkit::Internal::Control
 {
 protected:
-
   virtual ~GlViewImpl() = default;
 
 public:
-
   /**
    * Construct a new GlView.
    */
-  explicit GlViewImpl( GlView::BackendMode backendMode ) :
-    Control(ControlBehaviour(0u | ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+  explicit GlViewImpl(GlView::BackendMode backendMode)
+  : Control(ControlBehaviour(0u | ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
     mBackendMode(backendMode)
   {
   }
@@ -91,6 +89,11 @@ public:
    */
   virtual void RenderOnce() = 0;
 
+  /**
+   * @copydoc Dali::Toolkit::GlView::BindTextureResources()
+   */
+  virtual void BindTextureResources(std::vector<Dali::Texture> textures) = 0;
+
 private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -108,8 +111,7 @@ private: // From Control
   virtual void OnSceneDisconnection() override = 0;
 
 protected:
-
-  GlView::BackendMode mBackendMode { GlView::BackendMode::DEFAULT }; ///< Implementation backend mode (DirectRendering, EGL image)
+  GlView::BackendMode mBackendMode{GlView::BackendMode::DEFAULT}; ///< Implementation backend mode (DirectRendering, EGL image)
 };
 
 } // namespace Internal
@@ -128,6 +130,6 @@ inline const Dali::Toolkit::Internal::GlViewImpl& GetImpl(const Dali::Toolkit::G
   return static_cast<const Dali::Toolkit::Internal::GlViewImpl&>(impl);
 }
 
-} // namespace Dali
+} // namespace Dali::Toolkit
 
 #endif // DALI_TOOLKIT_INTERNAL_GL_VIEW_IMPL_H

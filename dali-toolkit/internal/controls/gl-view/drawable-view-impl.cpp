@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,39 +30,39 @@ namespace Dali::Toolkit::Internal
 {
 Dali::Toolkit::GlView DrawableView::New(GlView::BackendMode backendMode)
 {
-  auto* impl   = new DrawableView(backendMode);
+  auto*                 impl   = new DrawableView(backendMode);
   Dali::Toolkit::GlView handle = Dali::Toolkit::GlView(*impl);
   impl->Initialize();
   return handle;
 }
 
 DrawableView::DrawableView(GlView::BackendMode backendMode)
-: Dali::Toolkit::Internal::GlViewImpl( backendMode),
+: Dali::Toolkit::Internal::GlViewImpl(backendMode),
   mRenderingMode(Toolkit::GlView::RenderingMode::CONTINUOUS),
   mDepth(false),
   mStencil(false),
   mMSAA(0)
 {
-  mRenderCallback = RenderCallback::New( this, &DrawableView::OnRenderCallback);
+  mRenderCallback = RenderCallback::New(this, &DrawableView::OnRenderCallback);
 
   // Create NativeRenderer
   Dali::Internal::NativeRendererCreateInfo createInfo;
   createInfo.maxOffscreenBuffers = 2u;
-  createInfo.threadEnabled = (backendMode == GlView::BackendMode::DIRECT_RENDERING_THREADED);
-  createInfo.presentationMode = Dali::Internal::NativeRendererCreateInfo::PresentationMode::FIFO;
-  mNativeRenderer = std::make_unique<Dali::Internal::DrawableViewNativeRenderer>(createInfo);
+  createInfo.threadEnabled       = (backendMode == GlView::BackendMode::DIRECT_RENDERING_THREADED);
+  createInfo.presentationMode    = Dali::Internal::NativeRendererCreateInfo::PresentationMode::FIFO;
+  mNativeRenderer                = std::make_unique<Dali::Internal::DrawableViewNativeRenderer>(createInfo);
 }
 
 DrawableView::~DrawableView() = default;
 
 void DrawableView::RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
 {
-  mNativeRenderer->RegisterGlCallbacks( initCallback, renderFrameCallback, terminateCallback );
+  mNativeRenderer->RegisterGlCallbacks(initCallback, renderFrameCallback, terminateCallback);
 }
 
 void DrawableView::SetResizeCallback(CallbackBase* resizeCallback)
 {
-  mOnResizeCallback.reset( resizeCallback );
+  mOnResizeCallback.reset(resizeCallback);
 }
 
 bool DrawableView::SetGraphicsConfig(bool depth, bool stencil, int msaa, Dali::Toolkit::GlView::GraphicsApiVersion version)
@@ -100,6 +100,11 @@ void DrawableView::RenderOnce()
   // feature.
 }
 
+void DrawableView::BindTextureResources(std::vector<Dali::Texture> textures)
+{
+  mRenderCallback->BindTextureResources(std::move(textures));
+}
+
 void DrawableView::OnInitialize()
 {
   AddRenderer();
@@ -118,7 +123,7 @@ void DrawableView::OnSizeSet(const Vector3& targetSize)
   // If the callbacks are set then schedule execution of resize callback
   if(mRenderCallback && mNativeRenderer)
   {
-    mNativeRenderer->Resize( uint32_t(targetSize.width), uint32_t(targetSize.height));
+    mNativeRenderer->Resize(uint32_t(targetSize.width), uint32_t(targetSize.height));
     mSurfaceResized = true;
   }
 }
@@ -158,19 +163,19 @@ void DrawableView::OnSceneDisconnection()
 void DrawableView::AddRenderer()
 {
   Actor    self     = Self();
-  Renderer renderer = Renderer::New( *mRenderCallback );
+  Renderer renderer = Renderer::New(*mRenderCallback);
   self.AddRenderer(renderer);
 }
 
-bool DrawableView::OnRenderCallback( const RenderCallbackInput& renderCallbackInput )
+bool DrawableView::OnRenderCallback(const RenderCallbackInput& renderCallbackInput)
 {
   if(mNativeRenderer)
   {
-    mNativeRenderer->PushRenderCallbackInputData( renderCallbackInput );
+    mNativeRenderer->PushRenderCallbackInputData(renderCallbackInput);
   }
 
   // Init state
-  if( mCurrentViewState == ViewState::INIT )
+  if(mCurrentViewState == ViewState::INIT)
   {
     mNativeRenderer->InvokeGlInitCallback(renderCallbackInput);
     mCurrentViewState = ViewState::RENDER;
@@ -178,18 +183,15 @@ bool DrawableView::OnRenderCallback( const RenderCallbackInput& renderCallbackIn
 
   if(mSurfaceResized)
   {
-    mNativeRenderer->Resize( uint32_t(mSurfaceSize.width), uint32_t(mSurfaceSize.height) );
+    mNativeRenderer->Resize(uint32_t(mSurfaceSize.width), uint32_t(mSurfaceSize.height));
     mSurfaceResized = false;
   }
 
-  if( mCurrentViewState == ViewState::RENDER )
+  if(mCurrentViewState == ViewState::RENDER)
   {
     // The mSurfaceResized is set by another thread so atomic check must be provided
-    bool expected{ true };
-    if(mSurfaceResized.compare_exchange_weak( expected, false,
-                                             std::memory_order_release,
-                                             std::memory_order_relaxed
-                                             ) && mOnResizeCallback)
+    bool expected{true};
+    if(mSurfaceResized.compare_exchange_weak(expected, false, std::memory_order_release, std::memory_order_relaxed) && mOnResizeCallback)
     {
       CallbackBase::Execute(*mOnResizeCallback, static_cast<int>(mSurfaceSize.x), static_cast<int>(mSurfaceSize.y));
     }
@@ -211,4 +213,4 @@ bool DrawableView::OnRenderCallback( const RenderCallbackInput& renderCallbackIn
   return true;
 }
 
-} // namespace Dali
+} // namespace Dali::Toolkit::Internal

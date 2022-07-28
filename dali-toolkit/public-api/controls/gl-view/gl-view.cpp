@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 
 namespace Dali::Toolkit
 {
-
 GlView::GlView() = default;
 
 GlView::GlView(const GlView& GlView) = default;
@@ -41,7 +40,7 @@ GlView GlView::New(ColorFormat colorFormat)
 {
   // This function is backward compatible and always returns
   // backend based on NativeImage.
-  return Internal::GlView::New( colorFormat );
+  return Internal::GlView::New(colorFormat);
 }
 
 GlView GlView::New(BackendMode backendMode, ColorFormat colorFormat)
@@ -105,6 +104,11 @@ void GlView::RenderOnce()
   Dali::Toolkit::GetImpl(*this).RenderOnce();
 }
 
+void GlView::BindTextureResources(std::vector<Dali::Texture> textures)
+{
+  Dali::Toolkit::GetImpl(*this).BindTextureResources(std::move(textures));
+}
+
 GlView::GlView(Internal::GlViewImpl& implementation)
 : Control(implementation)
 {
@@ -116,4 +120,4 @@ GlView::GlView(Dali::Internal::CustomActor* internal)
   VerifyCustomActorPointer<Internal::GlViewImpl>(internal);
 }
 
-} // namespace Dali
+} // namespace Dali::Toolkit
