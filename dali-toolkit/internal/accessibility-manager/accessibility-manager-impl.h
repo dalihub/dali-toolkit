@@ -445,6 +445,14 @@ public:  // Signals
     return mActionScrollSignal;
   }
 
+  /**
+   * @copydoc Dali::Toolkit::AccessibilityManager::ActionForwardSignal
+   */
+  AccessibilityActionSignalType& ActionForwardSignal()
+  {
+    return mActionForwardSignal;
+  }
+
 protected:
 
   /**
@@ -673,6 +681,12 @@ private:
   bool AccessibilityActionStartStop() override;
 
   /**
+   * Perform the accessibility action to forward the event to the application (by one finger double tap and hold).
+   * @return whether the accessibility action is performed or not.
+   */
+  bool AccessibilityActionForwardToApp() override;
+
+  /**
    * This function is connected to the TtsPlayer StateChangeSignal.
    * It is called when the TTS players state changes.
    * @param previousState The previous state of the TTS player (for comparison)
@@ -719,6 +733,7 @@ private:
   AccessibilityActionSignalType       mActionZoomSignal;
   AccessibilityActionSignalType       mActionReadPauseResumeSignal;
   AccessibilityActionSignalType       mActionStartStopSignal;
+  AccessibilityActionSignalType       mActionForwardSignal;
   AccessibilityActionScrollSignalType mActionScrollSignal;
 
   FocusIDContainer mFocusIDContainer;       ///< The container to look up actor ID by focus order

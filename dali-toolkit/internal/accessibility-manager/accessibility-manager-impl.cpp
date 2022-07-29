@@ -1333,6 +1333,17 @@ bool AccessibilityManager::AccessibilityActionStartStop()
   return mIsAccessibilityTtsEnabled;
 }
 
+bool AccessibilityManager::AccessibilityActionForwardToApp()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionForwardSignal.Empty() )
+  {
+    mActionForwardSignal.Emit( handle );
+  }
+
+  return mIsAccessibilityTtsEnabled;
+}
+
 bool AccessibilityManager::HandlePanGesture(const AccessibilityGestureEvent& panEvent)
 {
   bool handled = false;

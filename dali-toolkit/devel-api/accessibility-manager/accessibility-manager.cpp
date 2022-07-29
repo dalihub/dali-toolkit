@@ -350,6 +350,11 @@ AccessibilityManager::AccessibilityActionScrollSignalType& AccessibilityManager:
   return GetImpl(*this).ActionScrollSignal();
 }
 
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionForwardSignal()
+{
+  return GetImpl(*this).ActionForwardSignal();
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

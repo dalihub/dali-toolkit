@@ -817,6 +817,18 @@ public: // Accessibility action signals
    */
   AccessibilityActionScrollSignalType& ActionScrollSignal();
 
+  /**
+   * @brief This is emitted when accessibility action is received to forward the event
+   * to the application (by one finger double tap and hold).
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool YourCallback( AccessibilityManager& manager );
+   * @endcode
+   * @return The signal to connect to
+   */
+  AccessibilityActionSignalType& ActionForwardSignal();
+
 public:
   explicit DALI_INTERNAL AccessibilityManager(Internal::AccessibilityManager* impl);
 
