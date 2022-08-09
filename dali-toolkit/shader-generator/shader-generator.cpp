@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,10 +144,21 @@ void GenerateHeaderFile(
             << endl;
     outFile << "const std::string_view " << shaderVariableName << endl;
     outFile << "{" << endl;
-    outFile << "R\"(" << endl;
+
+    // Using Raw String Literal to generate shader files as this will simplify the file layout.
+    // And it will fix some compilation warnings about missing terminating strings.
+    // Note : we should skip empty headline to guarantee that "#version ~~~" as top of shader code.
+    outFile << "R\"(";
     string line;
+    bool   firstLinePrinted = false;
     while(getline(shaderFile, line))
     {
+      if(!firstLinePrinted && line.find_first_not_of(" \t\r\n") == std::string::npos)
+      {
+        // Empty string occured!
+        continue;
+      }
+      firstLinePrinted = true;
       outFile << line << endl;
     }
     outFile << ")\"" << endl;
