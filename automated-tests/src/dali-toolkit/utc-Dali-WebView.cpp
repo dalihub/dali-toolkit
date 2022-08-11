@@ -890,7 +890,7 @@ int UtcDaliWebViewGetWebContext(void)
   ToolkitTestApplication application;
 
   Dali::WebEngineContext* context = WebView::GetContext();
-  DALI_TEST_CHECK(context != 0);
+  DALI_TEST_CHECK(context != nullptr);
 
   END_TEST;
 }
@@ -1655,6 +1655,12 @@ int UtcDaliWebContextHttpRequestInterceptor(void)
   Dali::WebEngineContext* context = WebView::GetContext();
   DALI_TEST_CHECK(context != 0)
 
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  // Check if web view is found or not when plugin is null.
+  DALI_TEST_CHECK(!WebView::FindWebView(nullptr));
+
   // load url.
   context->RegisterRequestInterceptedCallback(&OnRequestIntercepted);
   DALI_TEST_EQUALS(gRequestInterceptedCallbackCalled, 0, TEST_LOCATION);
@@ -1674,6 +1680,11 @@ int UtcDaliWebContextHttpRequestInterceptor(void)
   DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponseBody((const int8_t*)"test", 4));
   DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponse("key:value", (const int8_t*)"test", 4));
   DALI_TEST_CHECK(gRequestInterceptorInstance->WriteResponseChunk((const int8_t*)"test", 4));
+
+  DALI_TEST_CHECK(gRequestInterceptorInstance->GetWebEngine());
+  // Check if web view is found or not when plugin is not null.
+  DALI_TEST_CHECK(WebView::FindWebView(gRequestInterceptorInstance->GetWebEngine()));
+
   std::string testUrl("http://test.html");
   DALI_TEST_EQUALS(gRequestInterceptorInstance->GetUrl(), testUrl, TEST_LOCATION);
   std::string testMethod("GET");
@@ -1681,6 +1692,8 @@ int UtcDaliWebContextHttpRequestInterceptor(void)
   Dali::Property::Map resultHeaders = gRequestInterceptorInstance->GetHeaders();
   DALI_TEST_EQUALS(resultHeaders.Count(), 2, TEST_LOCATION);
 
+  // Destroy web view.
+  view.Reset();
   gRequestInterceptorInstance = nullptr;
 
   END_TEST;
