@@ -5665,10 +5665,10 @@ int UtcDaliVisualGetVisualProperty07(void)
   END_TEST;
 }
 
-int UtcDaliVisualUpdateProperty(void)
+int UtcDaliVisualUpdateProperty01(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliVisualUpdateProperty: Test update property by DoAction. Standard case");
+  tet_infoline("UtcDaliVisualUpdateProperty01: Test update property by DoAction. Standard case");
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
@@ -5756,6 +5756,82 @@ int UtcDaliVisualUpdateProperty(void)
   Property::Value* borderlineOffsetValue = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVisualUpdateProperty02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualUpdateProperty02: Test update property by DoAction. Initialize as zero, and update non-zero case");
+
+  Vector4 borderlineColor  = Color::BLUE;
+  float   borderlineOffset = 1.0f;
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap[Visual::Property::TYPE]                      = Visual::Type::IMAGE;
+  propertyMap[ImageVisual::Property::URL]                  = TEST_IMAGE_FILE_NAME;
+  propertyMap[Visual::Property::MIX_COLOR]                 = Color::BLUE;
+  propertyMap[DevelVisual::Property::VISUAL_FITTING_MODE]  = DevelVisual::FIT_WIDTH;
+  propertyMap[DevelVisual::Property::CORNER_RADIUS]        = 0.0f;
+  propertyMap[DevelVisual::Property::CORNER_RADIUS_POLICY] = Toolkit::Visual::Transform::Policy::RELATIVE;
+  propertyMap[DevelVisual::Property::BORDERLINE_WIDTH]     = 0.0f;
+  propertyMap[DevelVisual::Property::BORDERLINE_COLOR]     = borderlineColor;
+  propertyMap[DevelVisual::Property::BORDERLINE_OFFSET]    = borderlineOffset;
+
+  Visual::Base imageVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  // Wait for image loading
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Map originalMap;
+  imageVisual.CreatePropertyMap(originalMap);
+
+  Vector4 targetCornerRadius    = Vector4(10.0f, 0.0f, 1.0f, 2.0f);
+  float   targetBorderlineWidth = 20.0f;
+
+  Property::Map targetPropertyMap;
+  targetPropertyMap[DevelVisual::Property::CORNER_RADIUS]    = targetCornerRadius;
+  targetPropertyMap[DevelVisual::Property::BORDERLINE_WIDTH] = targetBorderlineWidth;
+
+  // Update Properties
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
+
+  Property::Map resultMap;
+  imageVisual.CreatePropertyMap(resultMap);
+
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerRadiusValue);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
+
+  Property::Value* cornerRadiusPolicyValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS_POLICY, Property::INTEGER);
+  DALI_TEST_CHECK(cornerRadiusPolicyValue);
+  DALI_TEST_EQUALS(cornerRadiusPolicyValue->Get<int>(), static_cast<int>(Toolkit::Visual::Transform::Policy::RELATIVE), TEST_LOCATION);
+
+  Property::Value* borderlineWidthValue = resultMap.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineWidthValue);
+  DALI_TEST_EQUALS(borderlineWidthValue->Get<float>(), targetBorderlineWidth, TEST_LOCATION);
+
+  Property::Value* borderlineColorValue = resultMap.Find(DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(borderlineColorValue);
+  DALI_TEST_EQUALS(borderlineColorValue->Get<Vector4>(), borderlineColor, TEST_LOCATION);
+
+  Property::Value* borderlineOffsetValue = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineOffsetValue);
+  DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), borderlineOffset, TEST_LOCATION);
 
   END_TEST;
 }
