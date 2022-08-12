@@ -102,13 +102,8 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Visual::Base::Impl::IS_PREMULTIPLIED_ALPHA;
 
-  mVectorAnimationTask->RequestLoad(mUrl.GetUrl());
-
-  mVectorAnimationTask->ResourceReadySignal().Connect(this, &AnimatedVectorImageVisual::OnResourceReady);
-  mVectorAnimationTask->SetAnimationFinishedCallback(new EventThreadCallback(MakeCallback(this, &AnimatedVectorImageVisual::OnAnimationFinished)));
-
-  auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
-  vectorAnimationManager.AddObserver(*this);
+  // By default, load a file synchronously
+  mImpl->mFlags |= Visual::Base::Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
 }
 
 AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
@@ -247,6 +242,10 @@ void AnimatedVectorImageVisual::DoSetProperties(const Property::Map& propertyMap
       {
         DoSetProperty(Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, keyValue.second);
       }
+      else if(keyValue.first == SYNCHRONOUS_LOADING)
+      {
+        DoSetProperty(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second);
+      }
     }
   }
 
@@ -306,11 +305,35 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
       }
       break;
     }
+    case Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING:
+    {
+      bool sync = false;
+      if(value.Get(sync))
+      {
+        if(sync)
+        {
+          mImpl->mFlags |= Visual::Base::Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+        }
+        else
+        {
+          mImpl->mFlags &= ~Visual::Base::Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+        }
+      }
+      break;
+    }
   }
 }
 
 void AnimatedVectorImageVisual::OnInitialize(void)
 {
+  mVectorAnimationTask->ResourceReadySignal().Connect(this, &AnimatedVectorImageVisual::OnResourceReady);
+  mVectorAnimationTask->SetAnimationFinishedCallback(new EventThreadCallback(MakeCallback(this, &AnimatedVectorImageVisual::OnAnimationFinished)));
+
+  mVectorAnimationTask->RequestLoad(mUrl.GetUrl(), IsSynchronousLoadingRequired());
+
+  auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
+  vectorAnimationManager.AddObserver(*this);
+
   Shader shader = GenerateShader();
 
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
@@ -337,7 +360,7 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
   if(mLoadFailed)
   {
     Vector2 imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize, false);
     actor.AddRenderer(mImpl->mRenderer);
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
   }
@@ -530,7 +553,7 @@ void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceSta
       else
       {
         Vector2 imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-        mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+        mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize, false);
         actor.AddRenderer(mImpl->mRenderer);
         ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
       }
@@ -539,7 +562,7 @@ void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceSta
     }
   }
 
-  DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "Renderer is added (status = %d) [%p]\n", status, this);
+  DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "status = %d [%p]\n", status, this);
 }
 
 void AnimatedVectorImageVisual::OnAnimationFinished()
