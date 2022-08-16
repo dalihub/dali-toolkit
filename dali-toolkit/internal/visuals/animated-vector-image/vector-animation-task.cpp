@@ -105,14 +105,17 @@ void VectorAnimationTask::Finalize()
   mDestroyTask = true;
 }
 
-bool VectorAnimationTask::Load()
+bool VectorAnimationTask::Load(bool synchronousLoading)
 {
   if(!mVectorRenderer.Load(mUrl))
   {
     DALI_LOG_ERROR("VectorAnimationTask::Load: Load failed [%s]\n", mUrl.c_str());
     mLoadRequest = false;
     mLoadFailed  = true;
-    mLoadCompletedTrigger->Trigger();
+    if(!synchronousLoading)
+    {
+      mLoadCompletedTrigger->Trigger();
+    }
     return false;
   }
 
@@ -124,7 +127,10 @@ bool VectorAnimationTask::Load()
   mFrameDurationMicroSeconds = MICROSECONDS_PER_SECOND / mFrameRate;
 
   mLoadRequest = false;
-  mLoadCompletedTrigger->Trigger();
+  if(!synchronousLoading)
+  {
+    mLoadCompletedTrigger->Trigger();
+  }
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Load: file = %s [%d frames, %f fps] [%p]\n", mUrl.c_str(), mTotalFrame, mFrameRate, this);
 
@@ -140,12 +146,22 @@ void VectorAnimationTask::SetRenderer(Renderer renderer)
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetRenderer [%p]\n", this);
 }
 
-void VectorAnimationTask::RequestLoad(const std::string& url)
+void VectorAnimationTask::RequestLoad(const std::string& url, bool synchronousLoading)
 {
-  mUrl         = url;
-  mLoadRequest = true;
+  mUrl = url;
 
-  mVectorAnimationThread.AddTask(this);
+  if(!synchronousLoading)
+  {
+    mLoadRequest = true;
+
+    mVectorAnimationThread.AddTask(this);
+  }
+  else
+  {
+    Load(true);
+
+    OnLoadCompleted();
+  }
 }
 
 bool VectorAnimationTask::IsLoadRequested() const
@@ -398,11 +414,11 @@ bool VectorAnimationTask::Rasterize(bool& keepAnimation)
       // The task will be destroyed. We don't need rasterization.
       return false;
     }
+  }
 
-    if(mLoadRequest)
-    {
-      return Load();
-    }
+  if(mLoadRequest)
+  {
+    return Load(false);
   }
 
   if(mLoadFailed)

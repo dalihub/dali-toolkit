@@ -64,6 +64,11 @@ WebView WebView::New(uint32_t argc, char** argv)
   return Internal::WebView::New(argc, argv);
 }
 
+Toolkit::WebView WebView::FindWebView(Dali::WebEnginePlugin* plugin)
+{
+  return Internal::WebView::FindWebView(plugin);
+}
+
 Dali::WebEngineContext* WebView::GetContext()
 {
   return Internal::WebView::GetContext();

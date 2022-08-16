@@ -88,8 +88,8 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual01(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -110,7 +110,8 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual02(void)
 
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
-    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME);
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -154,7 +155,8 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual03(void)
     .Add(DevelImageVisual::Property::LOOP_COUNT, 3)
     .Add(DevelImageVisual::Property::PLAY_RANGE, playRange)
     .Add(DevelVisual::Property::CORNER_RADIUS, 50.0f)
-    .Add(DevelVisual::Property::BORDERLINE_WIDTH, 20.0f);
+    .Add(DevelVisual::Property::BORDERLINE_WIDTH, 20.0f)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -207,7 +209,8 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
     .Add("cornerRadius", cornerRadius)
     .Add("borderlineWidth", borderlineWidth)
     .Add("borderlineColor", borderlineColor)
-    .Add("borderlineOffset", borderlineOffset);
+    .Add("borderlineOffset", borderlineOffset)
+    .Add("synchronousLoading", true);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -221,8 +224,8 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -312,7 +315,8 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
     .Add(DevelVisual::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::RELATIVE)
     .Add(DevelVisual::Property::BORDERLINE_WIDTH, borderlineWidth)
     .Add(DevelVisual::Property::BORDERLINE_COLOR, borderlineColor)
-    .Add(DevelVisual::Property::BORDERLINE_OFFSET, borderlineOffset);
+    .Add(DevelVisual::Property::BORDERLINE_OFFSET, borderlineOffset)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   // request AnimatedVectorImageVisual with a property map
   VisualFactory factory = VisualFactory::Get();
@@ -423,7 +427,8 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
     Visual::Base  visual  = factory.CreateVisual(
       Property::Map()
         .Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
-        .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME));
+        .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+        .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false));
 
     DummyControl        dummyControl = DummyControl::New(true);
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
@@ -570,8 +575,8 @@ int UtcDaliAnimatedVectorImageVisualCustomShader(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   Renderer        renderer = dummy.GetRendererAt(0);
   Shader          shader2  = renderer.GetShader();
@@ -597,7 +602,11 @@ int UtcDaliAnimatedVectorImageVisualNaturalSize(void)
   tet_infoline("UtcDaliAnimatedVectorImageVisualNaturalSize");
 
   VisualFactory factory = VisualFactory::Get();
-  Visual::Base  visual  = factory.CreateVisual(TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions());
+  Visual::Base  visual  = factory.CreateVisual(
+    Property::Map()
+      .Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+      .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+      .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false));
   DALI_TEST_CHECK(visual);
 
   DummyControl      actor     = DummyControl::New(true);
@@ -639,7 +648,8 @@ int UtcDaliAnimatedVectorImageVisualLoopCount(void)
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
-    .Add(DevelImageVisual::Property::LOOP_COUNT, 3);
+    .Add(DevelImageVisual::Property::LOOP_COUNT, 3)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -683,7 +693,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
-    .Add(DevelImageVisual::Property::PLAY_RANGE, array);
+    .Add(DevelImageVisual::Property::PLAY_RANGE, array)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -812,7 +823,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
-    .Add(DevelImageVisual::Property::PLAY_RANGE, array);
+    .Add(DevelImageVisual::Property::PLAY_RANGE, array)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -938,8 +950,8 @@ int UtcDaliAnimatedVectorImageVisualAnimationFinishedSignal(void)
   application.SendNotification();
   application.Render();
 
-  // Wait for animation finish - load, render, finish
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+  // Wait for animation finish - render, finish
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::PLAY_STATE);
@@ -958,7 +970,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
-    .Add(DevelImageVisual::Property::LOOP_COUNT, 3);
+    .Add(DevelImageVisual::Property::LOOP_COUNT, 3)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -1090,7 +1103,8 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
     .Add(DevelImageVisual::Property::LOOP_COUNT, 3)
-    .Add(DevelImageVisual::Property::PLAY_RANGE, playRange);
+    .Add(DevelImageVisual::Property::PLAY_RANGE, playRange)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -1209,7 +1223,8 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
     .Add(DevelImageVisual::Property::LOOP_COUNT, 3)
-    .Add(DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::FIRST_FRAME);
+    .Add(DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::FIRST_FRAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -1317,7 +1332,8 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
     .Add(DevelImageVisual::Property::LOOP_COUNT, 3)
     .Add(DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::LAST_FRAME)
-    .Add(DevelImageVisual::Property::LOOPING_MODE, DevelImageVisual::LoopingMode::AUTO_REVERSE);
+    .Add(DevelImageVisual::Property::LOOPING_MODE, DevelImageVisual::LoopingMode::AUTO_REVERSE)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -1408,8 +1424,8 @@ int UtcDaliAnimatedVectorImageVisualPropertyNotification(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
@@ -1488,7 +1504,8 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
 
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
-    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME);
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual1 = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual1);
@@ -1504,7 +1521,8 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
 
   propertyMap.Clear();
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
-    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME);
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual2 = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual2);
@@ -1561,7 +1579,8 @@ int UtcDaliAnimatedVectorImageVisualControlVisibilityChanged(void)
 
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
-    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME);
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -1628,8 +1647,8 @@ int UtcDaliAnimatedVectorImageVisualWindowVisibilityChanged(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   Property::Map attributes;
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
@@ -1666,7 +1685,8 @@ int UtcDaliAnimatedVectorImageVisualInvalidFile01(void)
 
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
-    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_INVALID_FILE_NAME);
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_INVALID_FILE_NAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -1724,9 +1744,6 @@ int UtcDaliAnimatedVectorImageVisualInvalidFile02(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - load
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
   // Add to the Scene after loading
   application.GetScene().Add(actor);
 
@@ -1755,7 +1772,8 @@ int UtcDaliAnimatedVectorImageVisualInvalidFile03(void)
 
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
-    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_INVALID_FILE_NAME);
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_INVALID_FILE_NAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -1793,7 +1811,8 @@ int UtcDaliAnimatedVectorImageVisualFrameDrops(void)
 
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
-    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME_FRAME_DROP);
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME_FRAME_DROP)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -1854,11 +1873,6 @@ int UtcDaliAnimatedVectorImageVisualSize(void)
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
   application.GetScene().Add(actor);
-
-  application.SendNotification();
-
-  // Trigger count is 1 - load
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -1926,7 +1940,11 @@ int UtcDaliAnimatedVectorImageVisualDynamicProperty(void)
   tet_infoline("UtcDaliAnimatedVectorImageVisualDynamicProperty");
 
   VisualFactory factory = VisualFactory::Get();
-  Visual::Base  visual  = factory.CreateVisual(TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions());
+  Visual::Base  visual  = factory.CreateVisual(
+    Property::Map()
+      .Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+      .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+      .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false));
   DALI_TEST_CHECK(visual);
 
   DummyControl      actor     = DummyControl::New(true);

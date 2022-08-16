@@ -216,6 +216,11 @@ public:
   static WebView New(uint32_t argc, char** argv);
 
   /**
+   * @brief Find web view by web engine plugin.
+   */
+  static Toolkit::WebView FindWebView(Dali::WebEnginePlugin* plugin);
+
+  /**
    * @brief Get context of web engine.
    */
   static Dali::WebEngineContext* GetContext();

@@ -149,8 +149,9 @@ public:
    * @brief Requests to load the animation file.
    *
    * @param[in] url The url of the vector animation file
+   * @param[in] synchronousLoading True if the url should be loaded synchronously
    */
-  void RequestLoad(const std::string& url);
+  void RequestLoad(const std::string& url, bool synchronousLoading);
 
   /**
    * @brief Queries whether loading is requested.
@@ -230,9 +231,10 @@ private:
   /**
    * @brief Loads the animation file.
    *
+   * @param[in] synchronousLoading True if loading is requested synchronously
    * @return True if loading succeeded, false otherwise.
    */
-  bool Load();
+  bool Load(bool synchronousLoading);
 
   /**
    * @brief Play the vector animation.

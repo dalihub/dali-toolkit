@@ -306,6 +306,10 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           // Check whether we must update shader.
           if(!mImpl->mAlwaysUsingBorderline && IsBorderlineRequired())
           {
+            // Required to change shader mean, we didn't setup BORDERLINE_COLOR and BORDERLINE_OFFSET into mRenderer before. Set property now.
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_COLOR, mImpl->mBorderlineColor);
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
+
             // Make Blend mode ON_WITHOUT_CULL for transparent mix color.
             mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON_WITHOUT_CULL);
 
@@ -387,6 +391,9 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           // Check whether we must update shader.
           if(!mImpl->mAlwaysUsingCornerRadius && IsRoundedCornerRequired())
           {
+            // Required to change shader mean, we didn't setup CORNER_RADIUS_POLICY into mRenderer before. Set property now.
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
+
             // Change the shader must not be occured many times. we always have to use corner radius feature.
             mImpl->mAlwaysUsingCornerRadius = true;
 
@@ -574,11 +581,11 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
     mImpl->mTransform.mOffset = mImpl->mRenderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET);
     mImpl->mTransform.mSize   = mImpl->mRenderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE);
 
-    if(IsTypeAvailableForCornerRadius(mImpl->mType))
+    if(IsRoundedCornerRequired())
     {
       mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS);
     }
-    if(IsTypeAvailableForBorderline(mImpl->mType))
+    if(IsBorderlineRequired())
     {
       mImpl->mBorderlineWidth  = mImpl->mRenderer.GetProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH);
       mImpl->mBorderlineColor  = mImpl->mRenderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR);
