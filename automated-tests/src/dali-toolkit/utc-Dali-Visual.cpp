@@ -4182,6 +4182,7 @@ int UtcDaliVisualRoundedCorner(void)
     properties["cornerRadius"]                              = Vector4(1.0f, 100.0f, 10.0f, 0.1f); // Dummy Input
     properties["cornerRadius"]                              = cornerRadius;
     properties[DevelVisual::Property::CORNER_RADIUS_POLICY] = Toolkit::Visual::Transform::Policy::RELATIVE;
+    properties["synchronousLoading"]                        = false;
 
     Visual::Base visual = factory.CreateVisual(properties);
 
@@ -4559,6 +4560,7 @@ int UtcDaliVisualBorderline(void)
     properties[DevelVisual::Property::BORDERLINE_WIDTH]     = borderlineWidth;
     properties["borderlineColor"]                           = borderlineColor;
     properties[DevelVisual::Property::BORDERLINE_OFFSET]    = borderlineOffset;
+    properties[ImageVisual::Property::SYNCHRONOUS_LOADING]  = false;
 
     Visual::Base visual = factory.CreateVisual(properties);
 
@@ -5595,6 +5597,7 @@ int UtcDaliVisualGetVisualProperty07(void)
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE, DevelVisual::Type::ANIMATED_VECTOR_IMAGE);
   propertyMap.Insert(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base animatedVectorVisual = factory.CreateVisual(propertyMap);
 

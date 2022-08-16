@@ -194,7 +194,8 @@ int UtcDaliAnimatedVectorImageVisualSetProperties(void)
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
     .Add(DevelImageVisual::Property::LOOP_COUNT, 3)
-    .Add(DevelImageVisual::Property::PLAY_RANGE, Vector2(0.2f, 0.8f));
+    .Add(DevelImageVisual::Property::PLAY_RANGE, Vector2(0.2f, 0.8f))
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base                     visual     = VisualFactory::Get().CreateVisual(propertyMap);
   Toolkit::Internal::Visual::Base& visualImpl = GetImplementation(visual);
