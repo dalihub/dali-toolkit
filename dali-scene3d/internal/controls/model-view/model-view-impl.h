@@ -115,11 +115,6 @@ private:
   void OnSceneDisconnection() override;
 
   /**
-   * @copydoc Toolkit::Control::OnInitialize()
-   */
-  void OnInitialize() override;
-
-  /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
   Vector3 GetNaturalSize() override;
@@ -167,7 +162,6 @@ private:
 private:
   std::string                    mModelPath;
   std::string                    mResourcePath;
-  Dali::Layer                    mModelLayer;
   Dali::Actor                    mModelRoot;
   std::vector<AnimationData>     mAnimations;
   std::vector<WeakHandle<Actor>> mRenderableActors;

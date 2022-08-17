@@ -176,13 +176,12 @@ ModelView::ModelView(const std::string& modelPath, const std::string& resourcePa
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mModelPath(modelPath),
   mResourcePath(resourcePath),
-  mModelLayer(),
   mModelRoot(),
   mNaturalSize(Vector3::ZERO),
   mModelPivot(AnchorPoint::CENTER),
   mIblScaleFactor(1.0f),
-  mFitSize(false),
-  mFitCenter(false)
+  mFitSize(true),
+  mFitCenter(true)
 {
 }
 
@@ -308,23 +307,6 @@ void ModelView::OnSceneDisconnection()
     mParentSceneView.Reset();
   }
   Control::OnSceneDisconnection();
-}
-
-void ModelView::OnInitialize()
-{
-  Actor self  = Self();
-  mModelLayer = Layer::New();
-  mModelLayer.SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_3D);
-  mModelLayer.SetProperty(Layer::Property::DEPTH_TEST, true);
-  mModelLayer.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mModelLayer.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  mModelLayer.SetResizePolicy(ResizePolicy::FILL_TO_PARENT,
-                              Dimension::ALL_DIMENSIONS);
-
-  // Models in glTF and dli are defined as right hand coordinate system.
-  // DALi uses left hand coordinate system. Scaling negative is for change winding order.
-  mModelLayer.SetProperty(Dali::Actor::Property::SCALE_Y, -1.0f);
-  self.Add(mModelLayer);
 }
 
 Vector3 ModelView::GetNaturalSize()
@@ -469,35 +451,40 @@ void ModelView::LoadModel()
   mNaturalSize = AABB.CalculateSize();
   mModelPivot  = AABB.CalculatePivot();
   mModelRoot.SetProperty(Dali::Actor::Property::SIZE, mNaturalSize);
+  Vector3 controlSize = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+  if(controlSize.x == 0.0f || controlSize.y == 0.0f)
+  {
+    Self().SetProperty(Dali::Actor::Property::SIZE, mNaturalSize);
+  }
 
   FitModelPosition();
   ScaleModel();
 
-  mModelLayer.Add(mModelRoot);
+  Self().Add(mModelRoot);
+
+  Self().SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  Self().SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3(mModelPivot.x, 1.0f - mModelPivot.y, mModelPivot.z));
 }
 
 void ModelView::ScaleModel()
 {
   if(mModelRoot)
   {
-    if(mFitSize)
+    Vector3 size = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+    if(mFitSize && size.x > 0.0f && size.y > 0.0f)
     {
-      Vector3 size = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-      if(size.x > 0.0f && size.y > 0.0f)
-      {
-        float scaleFactor = MAXFLOAT;
-        scaleFactor       = std::min(size.x / mNaturalSize.x, scaleFactor);
-        scaleFactor       = std::min(size.y / mNaturalSize.y, scaleFactor);
-        mModelRoot.SetProperty(Dali::Actor::Property::SCALE, scaleFactor);
-      }
-      else
-      {
-        DALI_LOG_ERROR("ModelView size is wrong.");
-      }
+      float scaleFactor = MAXFLOAT;
+      scaleFactor       = std::min(size.x / mNaturalSize.x, scaleFactor);
+      scaleFactor       = std::min(size.y / mNaturalSize.y, scaleFactor);
+      // Models in glTF and dli are defined as right hand coordinate system.
+      // DALi uses left hand coordinate system. Scaling negative is for change winding order.
+      mModelRoot.SetProperty(Dali::Actor::Property::SCALE, Y_DIRECTION * scaleFactor);
     }
     else
     {
-      mModelRoot.SetProperty(Dali::Actor::Property::SCALE, 1.0f);
+      // Models in glTF and dli are defined as right hand coordinate system.
+      // DALi uses left hand coordinate system. Scaling negative is for change winding order.
+      mModelRoot.SetProperty(Dali::Actor::Property::SCALE, Y_DIRECTION);
     }
   }
 }
