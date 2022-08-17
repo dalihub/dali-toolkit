@@ -513,7 +513,7 @@ int UtcDaliToolkitTextFieldCopyConstructorP(void)
 
   TextField copy(textField);
   DALI_TEST_CHECK(copy);
-  DALI_TEST_CHECK(copy.GetProperty<std::string>(TextLabel::Property::TEXT) == textField.GetProperty<std::string>(TextLabel::Property::TEXT));
+  DALI_TEST_CHECK(copy.GetProperty<std::string>(TextField::Property::TEXT) == textField.GetProperty<std::string>(TextField::Property::TEXT));
   END_TEST;
 }
 
@@ -4871,6 +4871,44 @@ int utcDaliTextFieldGeometryGlyphMiddle(void)
   expectedSizes.PushBack(Vector2(124, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
+
+  END_TEST;
+}
+
+
+int utcDaliTextFieldGeometryNullPtr(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("utcDaliTextFieldGeometryNullPtr");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+
+  field.SetProperty(TextField::Property::POINT_SIZE, 7.f);
+  field.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
+  field.SetProperty(TextField::Property::TEXT, "");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  unsigned int expectedCount = 0;
+  unsigned int startIndex    = 0;
+  unsigned int endIndex      = 0;
+
+  Vector<Vector2> positionsList = DevelTextField::GetTextPosition(field, startIndex, endIndex);
+  Vector<Vector2> sizeList      = DevelTextField::GetTextSize(field, startIndex, endIndex);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
 
   END_TEST;
 }
