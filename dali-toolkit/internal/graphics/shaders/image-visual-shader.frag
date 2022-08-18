@@ -99,7 +99,8 @@ void calculatePotential()
 
 void setupMinMaxPotential()
 {
-  gPotentialRange = 1.0;
+  // Set soft anti-alias range at most 2% of visual size
+  gPotentialRange = min(1.0, max(vRectSize.x, vRectSize.y) * 0.02);
 
   gMaxOutlinePotential = gRadius + gPotentialRange;
   gMinOutlinePotential = gRadius - gPotentialRange;
@@ -142,7 +143,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     borderlineOpacity = smoothstep(gMinInlinePotential, gMaxInlinePotential, potential);
 
     // Muliply borderlineWidth to resolve very thin borderline
-    borderlineOpacity *= min(1.0, borderlineWidth);
+    borderlineOpacity *= min(1.0, borderlineWidth / gPotentialRange);
   }
 
   lowp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
