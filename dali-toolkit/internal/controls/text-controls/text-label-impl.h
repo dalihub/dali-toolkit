@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
@@ -134,6 +135,16 @@ private: // From Control
    */
   void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override;
 
+  /**
+   * @copydoc Control::OnSceneConnection()
+   */
+  void OnSceneConnection(int depth) override;
+
+  /**
+   * @copydoc Control::OnSceneDisconnection()
+   */
+  void OnSceneDisconnection() override;
+
   // From ControlInterface
 
   /**
@@ -211,6 +222,7 @@ private: // Data
 
   int  mRenderingBackend;
   bool mTextUpdateNeeded : 1;
+  bool mLastAutoScrollEnabled : 1;
 
 protected:
   /**
