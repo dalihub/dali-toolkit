@@ -317,7 +317,7 @@ AnimationDefinition GenerateAnimation(const std::string& animationName, std::sha
       rotationProperty.mKeyFrames    = Dali::KeyFrames::New();
       for(uint32_t j = 0; j < frameCount; ++j)
       {
-        translationProperty.mKeyFrames.Add(static_cast<float>(j) * keyFrameInterval, (jointList[i]->translations[j] / scale));
+        translationProperty.mKeyFrames.Add(static_cast<float>(j) * keyFrameInterval, (jointList[i]->translations[j] * scale));
         rotationProperty.mKeyFrames.Add(static_cast<float>(j) * keyFrameInterval, jointList[i]->rotations[j]);
       }
     }
