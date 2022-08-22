@@ -2637,6 +2637,44 @@ int utcDaliTextLabelGeometryOneGlyph(void)
   END_TEST;
 }
 
+
+int utcDaliTextLabelGeometryNullPtr(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("utcDaliTextLabelGeometryNullPtr");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 7.f);
+  label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+  label.SetProperty(TextLabel::Property::TEXT, "");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  unsigned int expectedCount = 0;
+  unsigned int startIndex    = 0;
+  unsigned int endIndex      = 0;
+
+  Vector<Vector2> positionsList = DevelTextLabel::GetTextPosition(label, startIndex, endIndex);
+  Vector<Vector2> sizeList      = DevelTextLabel::GetTextSize(label, startIndex, endIndex);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextlabelEllipsisPositionProperty(void)
 {
   ToolkitTestApplication application;
