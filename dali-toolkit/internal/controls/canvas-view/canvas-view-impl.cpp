@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 #include "canvas-view-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/rendering/texture-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -73,7 +73,7 @@ CanvasView::~CanvasView()
 
   if(Adaptor::IsAvailable())
   {
-    Adaptor::Get().UnregisterProcessor(*this);
+    Adaptor::Get().UnregisterProcessor(*this, true);
   }
 }
 
@@ -196,7 +196,7 @@ void CanvasView::AddRasterizationTask()
 
 void CanvasView::ApplyRasterizedImage(Texture rasterizedTexture)
 {
-  if (rasterizedTexture && rasterizedTexture.GetWidth() != 0 && rasterizedTexture.GetHeight() != 0)
+  if(rasterizedTexture && rasterizedTexture.GetWidth() != 0 && rasterizedTexture.GetHeight() != 0)
   {
     if(!mTextureSet)
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/text-abstraction/segmentation.h>
 #include <dali/public-api/actors/layer.h>
 
 // INTERNAL INCLUDES
@@ -267,11 +268,11 @@ Accessibility::Range TextControlAccessible::GetTextAtOffset(std::size_t offset, 
 
       if(boundary == Dali::Accessibility::TextBoundary::WORD)
       {
-        Accessibility::Accessible::FindWordSeparationsUtf8(reinterpret_cast<const utf8_t*>(text.c_str()), textSize, "", breaks.data());
+        TextAbstraction::Segmentation::Get().GetWordBreakPositionsUtf8(reinterpret_cast<const uint8_t*>(text.c_str()), textSize, breaks.data());
       }
       else
       {
-        Accessibility::Accessible::FindLineSeparationsUtf8(reinterpret_cast<const utf8_t*>(text.c_str()), textSize, "", breaks.data());
+        TextAbstraction::Segmentation::Get().GetLineBreakPositionsUtf8(reinterpret_cast<const uint8_t*>(text.c_str()), textSize, breaks.data());
       }
 
       std::size_t index   = 0u;
