@@ -142,22 +142,27 @@ void TextScroller::SetStopMode(TextLabel::AutoScrollStopMode::Type stopMode)
   mStopMode = stopMode;
 }
 
-void TextScroller::StopScrolling(bool immediate)
+void TextScroller::StopScrolling()
 {
   if(mScrollAnimation && mScrollAnimation.GetState() == Animation::PLAYING)
   {
-    if(mStopMode == TextLabel::AutoScrollStopMode::IMMEDIATE || immediate)
+    switch(mStopMode)
     {
-      mScrollAnimation.Stop();
-      mScrollerInterface.ScrollingFinished();
-    }
-    else if(mStopMode == TextLabel::AutoScrollStopMode::FINISH_LOOP)
-    {
-      mScrollAnimation.SetLoopCount(1); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
-    }
-    else
-    {
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Undifined AutoScrollStopMode\n");
+      case TextLabel::AutoScrollStopMode::IMMEDIATE:
+      {
+        mScrollAnimation.Stop();
+        mScrollerInterface.ScrollingFinished();
+        break;
+      }
+      case TextLabel::AutoScrollStopMode::FINISH_LOOP:
+      {
+        mScrollAnimation.SetLoopCount(1); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
+        break;
+      }
+      default:
+      {
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Undifined AutoScrollStopMode\n");
+      }
     }
   }
   else

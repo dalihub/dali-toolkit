@@ -351,6 +351,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       case Toolkit::TextLabel::Property::ENABLE_AUTO_SCROLL:
       {
         const bool enableAutoScroll = value.Get<bool>();
+        impl.mLastAutoScrollEnabled = enableAutoScroll;
         // If request to auto scroll is the same as current state then do nothing.
         if(enableAutoScroll != impl.mController->IsAutoScrollEnabled())
         {
@@ -359,7 +360,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
           {
             if(impl.mTextScroller)
             {
-              impl.mTextScroller->StopScrolling(false);
+              impl.mTextScroller->StopScrolling();
             }
           }
           // If request is enable (true) then start autoscroll as not already running
@@ -1021,8 +1022,15 @@ void TextLabel::OnSceneDisconnection()
 {
   if(mTextScroller)
   {
-    mLastAutoScrollEnabled = mController->IsAutoScrollEnabled();
-    mTextScroller->StopScrolling(true);
+    if(mLastAutoScrollEnabled && !mController->IsAutoScrollEnabled())
+    {
+      mLastAutoScrollEnabled = false;
+    }
+
+    const Toolkit::TextLabel::AutoScrollStopMode::Type stopMode = mTextScroller->GetStopMode();
+    mTextScroller->SetStopMode(Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE);
+    mTextScroller->StopScrolling();
+    mTextScroller->SetStopMode(stopMode);
   }
   Control::OnSceneDisconnection();
 }
