@@ -359,7 +359,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
           {
             if(impl.mTextScroller)
             {
-              impl.mTextScroller->StopScrolling();
+              impl.mTextScroller->StopScrolling(false);
             }
           }
           // If request is enable (true) then start autoscroll as not already running
@@ -1008,6 +1008,25 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
   }
 }
 
+void TextLabel::OnSceneConnection(int depth)
+{
+  if(mController->IsAutoScrollEnabled() || mLastAutoScrollEnabled)
+  {
+    mController->SetAutoScrollEnabled(true);
+  }
+  Control::OnSceneConnection(depth);
+}
+
+void TextLabel::OnSceneDisconnection()
+{
+  if(mTextScroller)
+  {
+    mLastAutoScrollEnabled = mController->IsAutoScrollEnabled();
+    mTextScroller->StopScrolling(true);
+  }
+  Control::OnSceneDisconnection();
+}
+
 void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::OnRelayout\n");
@@ -1190,7 +1209,8 @@ void TextLabel::OnAccessibilityStatusChanged()
 TextLabel::TextLabel(ControlBehaviour additionalBehavior)
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehavior)),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
-  mTextUpdateNeeded(false)
+  mTextUpdateNeeded(false),
+  mLastAutoScrollEnabled(false)
 {
 }
 

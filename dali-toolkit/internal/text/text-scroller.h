@@ -125,8 +125,9 @@ public:
 
   /**
    * @brief Stop the auto scrolling.
+   * @param[in] immediate Stop scrolling immediately.
    */
-  void StopScrolling();
+  void StopScrolling(bool immediate);
 
   /**
    * @brief Get the mode of scrolling stop
