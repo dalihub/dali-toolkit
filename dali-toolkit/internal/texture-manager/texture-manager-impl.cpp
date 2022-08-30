@@ -732,6 +732,26 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId, TextureU
     }
     else
     {
+      // Erase observer
+      if(observer)
+      {
+        TextureCacheIndex textureInfoIndex = mTextureCacheManager.GetCacheIndexFromId(textureId);
+        if(textureInfoIndex != INVALID_CACHE_INDEX)
+        {
+          TextureInfo& textureInfo(mTextureCacheManager[textureInfoIndex]);
+          for(auto it = textureInfo.observerList.Begin(), endIt = textureInfo.observerList.End(); it != endIt; it++)
+          {
+            if((*it) == observer)
+            {
+              // Disconnect and remove the observer.
+              observer->DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);
+              textureInfo.observerList.Erase(it);
+              break;
+            }
+          }
+        }
+      }
+
       // Remove textureId in CacheManager.
       mTextureCacheManager.RemoveCache(textureId);
     }
