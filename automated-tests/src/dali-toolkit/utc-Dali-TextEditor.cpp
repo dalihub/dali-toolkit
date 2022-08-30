@@ -5124,6 +5124,44 @@ int utcDaliTextEditorGeometryOneGlyph(void)
   END_TEST;
 }
 
+int utcDaliTextEditorGeometryNullPtr(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("utcDaliTextEditorGeometryNullPtr");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  application.GetScene().Add(editor);
+
+  editor.SetProperty(TextEditor::Property::POINT_SIZE, 7.f);
+  editor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+  editor.SetProperty(TextEditor::Property::TEXT, "");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  unsigned int expectedCount = 0;
+  unsigned int startIndex    = 0;
+  unsigned int endIndex      = 0;
+
+  Vector<Vector2> positionsList = DevelTextEditor::GetTextPosition(editor, startIndex, endIndex);
+  Vector<Vector2> sizeList      = DevelTextEditor::GetTextSize(editor, startIndex, endIndex);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
+
+  END_TEST;
+}
+
+
 int utcDaliTextEditorSelectionClearedSignal(void)
 {
   ToolkitTestApplication application;

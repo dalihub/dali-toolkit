@@ -351,6 +351,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       case Toolkit::TextLabel::Property::ENABLE_AUTO_SCROLL:
       {
         const bool enableAutoScroll = value.Get<bool>();
+        impl.mLastAutoScrollEnabled = enableAutoScroll;
         // If request to auto scroll is the same as current state then do nothing.
         if(enableAutoScroll != impl.mController->IsAutoScrollEnabled())
         {
@@ -1008,6 +1009,32 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
   }
 }
 
+void TextLabel::OnSceneConnection(int depth)
+{
+  if(mController->IsAutoScrollEnabled() || mLastAutoScrollEnabled)
+  {
+    mController->SetAutoScrollEnabled(true);
+  }
+  Control::OnSceneConnection(depth);
+}
+
+void TextLabel::OnSceneDisconnection()
+{
+  if(mTextScroller)
+  {
+    if(mLastAutoScrollEnabled && !mController->IsAutoScrollEnabled())
+    {
+      mLastAutoScrollEnabled = false;
+    }
+
+    const Toolkit::TextLabel::AutoScrollStopMode::Type stopMode = mTextScroller->GetStopMode();
+    mTextScroller->SetStopMode(Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE);
+    mTextScroller->StopScrolling();
+    mTextScroller->SetStopMode(stopMode);
+  }
+  Control::OnSceneDisconnection();
+}
+
 void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::OnRelayout\n");
@@ -1190,7 +1217,8 @@ void TextLabel::OnAccessibilityStatusChanged()
 TextLabel::TextLabel(ControlBehaviour additionalBehavior)
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehavior)),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
-  mTextUpdateNeeded(false)
+  mTextUpdateNeeded(false),
+  mLastAutoScrollEnabled(false)
 {
 }
 

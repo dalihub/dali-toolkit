@@ -44,9 +44,14 @@ vec4 ComputeVertexPosition()
   vOptRectSize = vRectSize;
 #endif
 
+#ifdef IS_REQUIRED_BORDERLINE
+  // Extend size of visual by borderline.
+  mediump float outerBorderlineSize = (1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth;
+#endif
+
 #ifdef IS_REQUIRED_ROUNDED_CORNER
 #ifdef IS_REQUIRED_BORDERLINE
-  mediump float minSize = min(visualSize.x, visualSize.y) + (1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth;
+  mediump float minSize = min(visualSize.x, visualSize.y) + outerBorderlineSize;
 #else
   mediump float minSize = min(visualSize.x, visualSize.y);
 #endif
@@ -58,8 +63,8 @@ vec4 ComputeVertexPosition()
 #endif
 
 #ifdef IS_REQUIRED_BORDERLINE
-  vPosition = aPosition * (visualSize + (1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth);
-  vOptRectSize -= (1.0 - clamp(borderlineOffset, -1.0, 1.0)) * 0.5 * borderlineWidth + 1.0;
+  vPosition = aPosition * (visualSize + outerBorderlineSize);
+  vOptRectSize -= (borderlineWidth - outerBorderlineSize * 0.5) + 1.0;
 #elif defined(IS_REQUIRED_ROUNDED_CORNER)
   vPosition = aPosition * visualSize;
 #else
@@ -74,9 +79,17 @@ vec4 ComputeVertexPosition()
                             pixelArea.zw * maskTextureRatio
                        ),
                        cropToMask);
-  vMaskTexCoord = pixelArea.xy + pixelArea.zw * (vPosition.xy / max(vec2(1.0), visualSize) + vec2(0.5));
+  vMaskTexCoord = pixelArea.xy + pixelArea.zw * (vec2(0.5) + aPosition.xy
+#ifdef IS_REQUIRED_BORDERLINE
+                                                  * (1.0 +  outerBorderlineSize / visualSize)
 #endif
-  vTexCoord = finalPixelArea.xy + finalPixelArea.zw * (vPosition.xy / max(vec2(1.0), visualSize) + vec2(0.5));
+                                                );
+#endif
+  vTexCoord = finalPixelArea.xy + finalPixelArea.zw * (vec2(0.5) + aPosition.xy
+#ifdef IS_REQUIRED_BORDERLINE
+                                                        * (1.0 + outerBorderlineSize / visualSize)
+#endif
+                                                      );
 
   return vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
 }
