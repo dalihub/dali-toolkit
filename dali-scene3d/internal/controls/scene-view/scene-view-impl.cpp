@@ -360,7 +360,7 @@ void SceneView::UpdateRenderTask()
 
         // create offscreen buffer of new size to render our child actors to
         mTexture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(size.width), unsigned(size.height));
-        mRenderTarget = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH);
+        mRenderTarget = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
         mRenderTarget.AttachColorTexture(mTexture);
         Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(mRenderTarget, 0u);
 
