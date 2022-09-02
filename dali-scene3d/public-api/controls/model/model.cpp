@@ -67,6 +67,16 @@ const Actor Model::GetModelRoot() const
   return GetImpl(*this).GetModelRoot();
 }
 
+void Model::SetChildrenSensitive(bool enable)
+{
+  GetImpl(*this).SetChildrenSensitive(enable);
+}
+
+bool Model::GetChildrenSensitive() const
+{
+  return GetImpl(*this).GetChildrenSensitive();
+}
+
 void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
   GetImpl(*this).SetImageBasedLightSource(diffuseUrl, specularUrl, scaleFactor);

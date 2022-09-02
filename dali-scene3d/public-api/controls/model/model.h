@@ -23,8 +23,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
-#include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/rendering/texture.h>
 
 namespace Dali
 {
@@ -50,6 +50,7 @@ class Model;
  *
  * By default, The loaded model has its own position and size which are defined in vertex buffer regardless of the Control size.
  *
+ * @SINCE_2_1.41
  * @code
  *
  * Model model = Model::New(modelUrl);
@@ -69,6 +70,8 @@ class DALI_SCENE3D_API Model : public Dali::Toolkit::Control
 public:
   /**
    * @brief Create an initialized Model.
+   *
+   * @SINCE_2_1.41
    * @param[in] modelUrl model file path.(e.g., glTF, and DLI).
    * @param[in] resourceDirectoryUrl resource file path that includes binary, image etc.
    * @note If resourceDirectoryUrl is empty, the parent directory path of modelUrl is used for resource path.
@@ -81,6 +84,8 @@ public:
    *
    * Only derived versions can be instantiated. Calling member
    * functions with an uninitialized Dali::Object is not allowed.
+   *
+   * @SINCE_2_1.41
    */
   Model();
 
@@ -88,11 +93,15 @@ public:
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   *
+   * @SINCE_2_1.41
    */
   ~Model();
 
   /**
    * @brief Copy constructor.
+   *
+   * @SINCE_2_1.41
    * @param[in] model Handle to an object
    */
   Model(const Model& model);
@@ -100,12 +109,15 @@ public:
   /**
    * @brief Move constructor
    *
+   * @SINCE_2_1.41
    * @param[in] rhs A reference to the moved handle
    */
   Model(Model&& rhs);
 
   /**
    * @brief Assignment operator.
+   *
+   * @SINCE_2_1.41
    * @param[in] model Handle to an object
    * @return reference to this
    */
@@ -114,6 +126,7 @@ public:
   /**
    * @brief Move assignment
    *
+   * @SINCE_2_1.41
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
@@ -125,6 +138,7 @@ public:
    * If handle points to a Model, the downcast produces valid handle.
    * If not, the returned handle is left uninitialized.
    *
+   * @SINCE_2_1.41
    * @param[in] handle Handle to an object
    * @return Handle to a Model or an uninitialized handle
    */
@@ -132,12 +146,40 @@ public:
 
   /**
    * @brief Retrieves model root Actor.
+   *
+   * @SINCE_2_1.41
    * @return Root Actor of the model.
    */
   const Actor GetModelRoot() const;
 
   /**
+   * @brief Whether allow this model's children actor to use events.
+   *
+   * Usually, 3D Model might have a lot of actors. And most of them don't need to check events.
+   * To optimize traversal, we need to setup some flag that this model don't allow (or allow) to traversal
+   * children so that child can use events.
+   *
+   * @SINCE_2_1.43
+   * @note Even if we set children sensitive as false, model itself's sensitive
+   * is depend on it's property.
+   * @note If we don't call this API, default is false. (Allow to traversal model's children during hit-test)
+   *
+   * @param[in] enable True to enable model's children can use events.
+   */
+  void SetChildrenSensitive(bool enable);
+
+  /**
+   * @brief Gets whether this Model allow model's children actor to use events or not.
+   *
+   * @SINCE_2_1.43
+   * @return bool True if this Model allow model children sensitive.
+   */
+  bool GetChildrenSensitive() const;
+
+  /**
    * @brief Changes Image Based Light as the input textures.
+   *
+   * @SINCE_2_1.41
    * @param[in] diffuseUrl cube map that can be used as a diffuse IBL source.
    * @param[in] specularUrl cube map that can be used as a specular IBL source.
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f]. Default value is 1.0f.
@@ -147,6 +189,7 @@ public:
   /**
    * @brief Sets Image Based Light Texture.
    *
+   * @SINCE_2_1.41
    * @param[in] diffuseTexture cube map texture that can be used as a diffuse IBL source.
    * @param[in] specularTexture cube map texture that can be used as a specular IBL source.
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f]. Default value is 1.0f.
@@ -158,6 +201,7 @@ public:
   /**
    * @brief Sets Scale Factor of Image Based Light Source.
    *
+   * @SINCE_2_1.41
    * @note If SetImageBasedLightSource() or SetImageBasedLightTexture() method is called after this method, scaleFactor is overrided.
    *
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f].
@@ -168,12 +212,15 @@ public:
    * @brief Gets Scale Factor of Image Based Light Source.
    * Default value is 1.0f.
    *
+   * @SINCE_2_1.41
    * @return scale factor that controls light source intensity.
    */
   float GetImageBasedLightScaleFactor() const;
 
   /**
    * @brief Gets number of animations those loaded from model file.
+   *
+   * @SINCE_2_1.41
    * @return The number of loaded animations.
    * @note This method should be called after Model load finished.
    */
@@ -181,6 +228,8 @@ public:
 
   /**
    * @brief Gets animation at the index.
+   *
+   * @SINCE_2_1.41
    * @param[in] index Index of animation to be retrieved.
    * @return Animation at the index.
    * @note This method should be called after Model load finished.
@@ -189,6 +238,8 @@ public:
 
   /**
    * @brief Retrieves animation with the given name.
+   *
+   * @SINCE_2_1.41
    * @param[in] name string name of animation to be retrieved.
    * @return Animation that has the given name.
    * @note This method should be called after Model load finished.
