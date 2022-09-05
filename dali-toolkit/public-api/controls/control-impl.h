@@ -115,6 +115,12 @@ public:
    */
   void ClearBackground();
 
+  /**
+   * @brief Called when resources of control are ready.
+   * @param[in] relayoutRequest True to request relayout
+   */
+  void SetResourceReady(bool relayoutRequest);
+
   // Accessibility
 
   /**
@@ -455,6 +461,11 @@ public: // API for derived classes to override
    * @SINCE_1_0.0
    */
   virtual void OnInitialize();
+
+  /**
+   * @copydoc Dali::Toolkit::Control::IsResourceReady
+   */
+  virtual bool IsResourceReady() const;
 
   // Styling
 

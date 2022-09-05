@@ -135,6 +135,11 @@ private:
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
+   * @copydoc Toolkit::Control::IsResourceReady()
+   */
+  bool IsResourceReady() const override;
+
+  /**
    * @brief Loads a model from file
    */
   void LoadModel();
@@ -174,6 +179,8 @@ private:
   float         mIblScaleFactor;
   bool          mFitSize;
   bool          mFitCenter;
+  bool          mModelResourceReady;
+  bool          mIBLResourceReady;
 };
 
 } // namespace Internal
