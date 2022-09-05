@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali/integration-api/debug.h>
@@ -29,8 +28,8 @@
 #include <filesystem>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/controls/model-view/model-view.h>
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
+#include <dali-scene3d/public-api/controls/model-view/model-view.h>
 #include <dali-scene3d/public-api/loader/animation-definition.h>
 #include <dali-scene3d/public-api/loader/camera-parameters.h>
 #include <dali-scene3d/public-api/loader/cube-map-loader.h>
@@ -181,7 +180,9 @@ ModelView::ModelView(const std::string& modelPath, const std::string& resourcePa
   mModelPivot(AnchorPoint::CENTER),
   mIblScaleFactor(1.0f),
   mFitSize(true),
-  mFitCenter(true)
+  mFitCenter(true),
+  mModelResourceReady(false),
+  mIBLResourceReady(false)
 {
 }
 
@@ -221,9 +222,18 @@ void ModelView::FitCenter(bool fit)
 
 void ModelView::SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor)
 {
+  mIBLResourceReady = false;
   Texture diffuseTexture  = Dali::Scene3D::Loader::LoadCubeMap(diffuse);
   Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(specular);
   SetImageBasedLightTexture(diffuseTexture, specularTexture, scaleFactor);
+  mIBLResourceReady = true;
+
+  // If Model resource is already ready, then set resource ready.
+  // If Model resource is still not ready, wait for model resource ready.
+  if(IsResourceReady())
+  {
+    SetResourceReady();
+  }
 }
 
 void ModelView::SetImageBasedLightTexture(Dali::Texture diffuse, Dali::Texture specular, float scaleFactor)
@@ -337,6 +347,11 @@ void ModelView::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   Control::OnRelayout(size, container);
   ScaleModel();
+}
+
+bool ModelView::IsResourceReady() const
+{
+  return mModelResourceReady && mIBLResourceReady;
 }
 
 void ModelView::LoadModel()
@@ -464,6 +479,11 @@ void ModelView::LoadModel()
 
   Self().SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   Self().SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3(mModelPivot.x, 1.0f - mModelPivot.y, mModelPivot.z));
+
+  mModelResourceReady = true;
+  mIBLResourceReady   = true;
+
+  Control::SetResourceReady();
 }
 
 void ModelView::ScaleModel()
