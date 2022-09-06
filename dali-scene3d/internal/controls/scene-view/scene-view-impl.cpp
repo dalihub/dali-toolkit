@@ -401,6 +401,12 @@ void SceneView::UpdateRenderTask()
         FrameBuffer framebuffer;
         mRenderTask.SetFrameBuffer(framebuffer);
         mRenderTask.SetClearEnabled(false);
+
+        Toolkit::DevelControl::UnregisterVisual(*this, RENDERING_BUFFER);
+
+        mVisual.Reset();
+        mRenderTarget.Reset();
+        mTexture.Reset();
       }
     }
   }
