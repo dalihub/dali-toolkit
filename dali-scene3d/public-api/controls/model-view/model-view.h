@@ -23,6 +23,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/common/dali-common.h>
 
 namespace Dali
@@ -162,6 +163,17 @@ public:
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f]. Default value is 1.0f.
    */
   void SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor = 1.0f);
+
+  /**
+   * @brief Set Image Based Light Texture.
+   *
+   * @param[in] diffuse cube map texture that can be used as a diffuse IBL source.
+   * @param[in] specular cube map texture that can be used as a specular IBL source.
+   * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f]. Default value is 1.0f.
+   *
+   * @note Both of diffuse and specular should be available. If not, nothing applied.
+   */
+  void SetImageBasedLightTexture(Texture diffuse, Texture specular, float scaleFactor = 1.0f);
 
   /**
    * @brief Gets number of animations those loaded from model file.

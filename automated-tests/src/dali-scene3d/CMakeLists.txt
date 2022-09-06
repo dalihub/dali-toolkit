@@ -20,6 +20,7 @@ SET(TC_SOURCES
   utc-Dali-Gltf2Loader.cpp
   utc-Dali-KtxLoader.cpp
   utc-Dali-ModelView.cpp
+  utc-Dali-SceneView.cpp
   utc-Dali-MatrixStack.cpp
   utc-Dali-MeshDefinition.cpp
   utc-Dali-NodeDefinition.cpp

@@ -422,14 +422,14 @@ int UtcDaliModelViewFitSize01(void)
   DALI_TEST_EQUALS(Vector3(2, 2, 2), rootSize, TEST_LOCATION);
 
   Vector3 rootScale = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SCALE);
-  DALI_TEST_EQUALS(Vector3(1, 1, 1), rootScale, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(25, -25, 25), rootScale, TEST_LOCATION);
 
-  view.FitSize(true);
+  view.FitSize(false);
   rootSize = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SIZE);
   DALI_TEST_EQUALS(Vector3(2, 2, 2), rootSize, TEST_LOCATION);
 
   rootScale = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SCALE);
-  DALI_TEST_EQUALS(Vector3(25, 25, 25), rootScale, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(1, -1, 1), rootScale, TEST_LOCATION);
 
   END_TEST;
 }
@@ -451,14 +451,14 @@ int UtcDaliModelViewFitSize02(void)
   DALI_TEST_EQUALS(Vector3(5, 5, 5), rootSize, TEST_LOCATION);
 
   Vector3 rootScale = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SCALE);
-  DALI_TEST_EQUALS(Vector3(1, 1, 1), rootScale, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(10, -10, 10), rootScale, TEST_LOCATION);
 
-  view.FitSize(true);
+  view.FitSize(false);
   rootSize = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SIZE);
   DALI_TEST_EQUALS(Vector3(5, 5, 5), rootSize, TEST_LOCATION);
 
   rootScale = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SCALE);
-  DALI_TEST_EQUALS(Vector3(10, 10, 10), rootScale, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(1, -1, 1), rootScale, TEST_LOCATION);
 
   END_TEST;
 }
@@ -480,14 +480,14 @@ int UtcDaliModelViewFitSize03(void)
   DALI_TEST_EQUALS(Vector3(2, 2, 2), rootSize, TEST_LOCATION);
 
   Vector3 rootScale = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SCALE);
-  DALI_TEST_EQUALS(Vector3(1, 1, 1), rootScale, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(1, -1, 1), rootScale, TEST_LOCATION);
 
   view.FitSize(true);
   rootSize = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SIZE);
   DALI_TEST_EQUALS(Vector3(2, 2, 2), rootSize, TEST_LOCATION);
 
   rootScale = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SCALE);
-  DALI_TEST_EQUALS(Vector3(1, 1, 1), rootScale, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(1, -1, 1), rootScale, TEST_LOCATION);
 
   END_TEST;
 }
@@ -509,11 +509,11 @@ int UtcDaliModelViewFitCenter(void)
 
   Actor   rootActor   = view.GetModelRoot();
   Vector3 anchorPoint = rootActor.GetProperty<Vector3>(Dali::Actor::Property::ANCHOR_POINT);
-  DALI_TEST_EQUALS(Vector3(0.5, 0.5, 0.5), anchorPoint, TEST_LOCATION);
-
-  view.FitCenter(true);
-  anchorPoint = rootActor.GetProperty<Vector3>(Dali::Actor::Property::ANCHOR_POINT);
   DALI_TEST_EQUALS(Vector3(1.0, 1.0, 0.5), anchorPoint, TEST_LOCATION);
+
+  view.FitCenter(false);
+  anchorPoint = rootActor.GetProperty<Vector3>(Dali::Actor::Property::ANCHOR_POINT);
+  DALI_TEST_EQUALS(Vector3(0.5, 0.5, 0.5), anchorPoint, TEST_LOCATION);
 
   END_TEST;
 }

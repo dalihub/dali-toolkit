@@ -23,9 +23,11 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/rendering/texture.h>
+#include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/controls/model-view/model-view.h>
+#include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
 namespace Dali
 {
@@ -71,6 +73,11 @@ public:
   void SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor);
 
   /**
+   * @copydoc ModelView::SetImageBasedLightTexture()
+   */
+  void SetImageBasedLightTexture(Dali::Texture diffuse, Dali::Texture specular, float scaleFactor);
+
+  /**
    * @copydoc ModelView::GetAnimationCount()
    */
   uint32_t GetAnimationCount();
@@ -103,9 +110,9 @@ private:
   void OnSceneConnection(int depth) override;
 
   /**
-   * @copydoc Toolkit::Control::OnInitialize()
+   * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
-  void OnInitialize() override;
+  void OnSceneDisconnection() override;
 
   /**
    * @copydoc Toolkit::Control::GetNaturalSize
@@ -145,14 +152,20 @@ private:
   /**
    * @brief Changes IBL information of the input node.
    */
-  void SetImageBasedLight(Actor node);
+  void CollectRenderableActor(Actor actor);
+
+  /**
+   * @brief Changes IBL information of the input node.
+   */
+  void UpdateImageBasedLight();
 
 private:
-  std::string                mModelPath;
-  std::string                mResourcePath;
-  Dali::Layer                mModelLayer;
-  Dali::Actor                mModelRoot;
-  std::vector<AnimationData> mAnimations;
+  std::string                    mModelPath;
+  std::string                    mResourcePath;
+  Dali::Actor                    mModelRoot;
+  std::vector<AnimationData>     mAnimations;
+  std::vector<WeakHandle<Actor>> mRenderableActors;
+  WeakHandle<Scene3D::SceneView> mParentSceneView;
 
   Dali::Texture mSpecularTexture;
   Dali::Texture mDiffuseTexture;

@@ -28,13 +28,21 @@ namespace Scene3D
 namespace Loader
 {
 /**
- * @brief Loads cube map data texture from a cube map file.
+ * @brief Loads cube map data from a cube map file.
  *
- * @param[in] path The file path.
+ * @param[in] cubeMapUrl The cube map file url.
  * @param[out] cubedata The data structure with all pixel data objects.
  * @return bool True if the loading is succeded.
  */
-bool LoadCubeMapData(const std::string& path, CubeData& cubedata);
+bool LoadCubeMapData(const std::string& cubeMapUrl, CubeData& cubedata);
+
+/**
+ * @brief Loads cube map data from a cube map file and return texture.
+ *
+ * @param[in] cubeMapUrl The cube map file path.
+ * @return Texture the loaded cube map texture.
+ */
+Texture LoadCubeMap(const std::string& cubeMapUrl);
 
 } // namespace Loader
 } // namespace Scene3D
