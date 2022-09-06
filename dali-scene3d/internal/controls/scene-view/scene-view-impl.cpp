@@ -258,6 +258,7 @@ void SceneView::OnInitialize()
   mRenderTask.SetSourceActor(mRootLayer);
   mRenderTask.SetExclusive(true);
   mRenderTask.SetInputEnabled(true);
+  mRenderTask.SetCullMode(false);
   mRenderTask.SetScreenToFrameBufferMappingActor(Self());
 
   mDefaultCamera = Dali::CameraActor::New();
@@ -329,25 +330,14 @@ void SceneView::UpdateRenderTask()
     }
 
     Vector3 size = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-    float   fov  = 0.0f;
-    Vector3 cameraPosition(Vector3::ZERO);
-    float   nearPlain = 1.0f;
-    float   farPlain  = 1.0f;
-
-    // Several properties such as fov, nearPlane, farPlane, and position should not be changed after SetPerspectiveProjection is called.
-    // In the 3D scene, the properties are not changed by the changes of canvas size.
-    fov            = mSelectedCamera[Dali::CameraActor::Property::FIELD_OF_VIEW];
-    nearPlain      = mSelectedCamera[Dali::CameraActor::Property::NEAR_PLANE_DISTANCE];
-    farPlain       = mSelectedCamera[Dali::CameraActor::Property::FAR_PLANE_DISTANCE];
-    cameraPosition = Vector3(mSelectedCamera[Dali::Actor::Property::POSITION]);
-
-    mSelectedCamera.SetPerspectiveProjection(Dali::Size(size));
-
-    mSelectedCamera[Dali::CameraActor::Property::FIELD_OF_VIEW]       = fov;
-    mSelectedCamera[Dali::CameraActor::Property::NEAR_PLANE_DISTANCE] = nearPlain;
-    mSelectedCamera[Dali::CameraActor::Property::FAR_PLANE_DISTANCE]  = farPlain;
-    mSelectedCamera[Dali::Actor::Property::POSITION]                  = cameraPosition;
-
+    const float aspectRatio = size.width / size.height;
+    mSelectedCamera.SetAspectRatio(aspectRatio);
+    const float halfHeight = mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE];
+    const float halfWidth = aspectRatio * halfHeight;
+    mSelectedCamera[Dali::CameraActor::Property::LEFT_PLANE_DISTANCE]   = -halfWidth;
+    mSelectedCamera[Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE]  = halfWidth;
+    mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE]    = halfHeight; // Top is +ve to keep consistency with orthographic values
+    mSelectedCamera[Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE] = -halfHeight; // Bottom is -ve to keep consistency with orthographic values
     if(mUseFrameBuffer)
     {
       Dali::FrameBuffer currentFrameBuffer = mRenderTask.GetFrameBuffer();

@@ -60,7 +60,7 @@ class SceneView;
  * Users can place multiple cameras in a scene, either to show the entire scene or to show individual objects.
  * And the user can select the currently needed camera by using the SelectCamera() method.
  *
- * SceneView has one CameraActor built-in by default at the (0, 0, -z).
+ * SceneView makes one built-in CameraActor by default.
  * The default CameraActor has index 0 and is not removed by using RemoveCamera() method.
  * Therefore, the minimum value returned by GetCameraCount() method is 1.
  *
@@ -95,7 +95,6 @@ class SceneView;
  * sceneView.Add(model);
  *
  * CameraActor cameraActor = CameraActor::New();
- * // Setting CameraActor.
  * sceneView.AddCamera(cameraActor);
  *
  * @endcode
@@ -167,13 +166,16 @@ public:
    * @brief Adds a CameraActor to the SceneView
    * The CameraActor can be used as a selected camera to render the scene by using SelectCamera(uint32_t) or SelectCamera(std::string)
    *
-   * @note Some properties of the CameraActor will be change depending on the Size of this SceneView.
-   * Those properties are as follows:
-   * projectionMode, aspectRatio, nearPlaneDistance, farPlaneDistance, leftPlaneDistance, rightPlaneDistance, topPlaneDistance, and bottomPlaneDistance.
+   * @note
+   * AspectRatio property of CameraActor will be changed depending on the Size of this SceneView.
    *
+   * For Perspective camera
    * The FieldOfView of Dali::CameraActor is for vertical fov.
    * When the size of the SceneView is changed, the vertical fov is maintained
    * and the horizontal fov is automatically calculated according to the SceneView's aspect ratio.
+   *
+   * For Orthographic camera
+   * leftPlaneDistance, rightPlaneDistance, and bottomPlaneDistance properties are defined according to the topPlaneDistance and aspectRatio.
    *
    * @param[in] camera CameraActor added on this scene view.
    */
