@@ -132,16 +132,21 @@ void FixedImageCache::LoadBatch()
     Dali::ImageDimensions textureRectSize;
     auto                  preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-    mTextureManager.LoadTexture(
-      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, mMaskingData, synchronousLoading, mImageUrls[frameIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
-
+    mTextureManager.LoadTexture(url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, mMaskingData, synchronousLoading, mImageUrls[frameIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
     mRequestingLoad = false;
   }
 }
 
 TextureSet FixedImageCache::GetFrontTextureSet() const
 {
-  return mTextureManager.GetTextureSet(mImageUrls[mFront].mTextureId);
+  TextureSet textureSet = mTextureManager.GetTextureSet(mImageUrls[mFront].mTextureId);
+  if(textureSet)
+  {
+    Sampler sampler = Sampler::New();
+    sampler.SetWrapMode(Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT);
+    textureSet.SetSampler(0u, sampler);
+  }
+  return textureSet;
 }
 
 void FixedImageCache::CheckFrontFrame(bool wasReady)

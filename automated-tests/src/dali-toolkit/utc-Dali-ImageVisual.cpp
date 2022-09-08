@@ -2402,9 +2402,9 @@ int UtcDaliImageVisualReleasePolicy08(void)
   DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION);
   textureTrace.Reset();
 
-  // Ensure TextureSet is same after detach/attach on stage when texture used the DESTROYED release policy
-  // 1. Get TextureSet
-  TextureSet textureSetBefore = actor.GetRendererAt(0u).GetTextures();
+  // Ensure Texture is same after detach/attach on stage when texture used the DESTROYED release policy
+  // 1. Get Texture
+  Texture textureBefore = actor.GetRendererAt(0u).GetTextures().GetTexture(0u);
 
   // 2.Remove actor from stage. In this case, renderer also is deleted.
   tet_infoline("Remove actor from stage");
@@ -2427,12 +2427,12 @@ int UtcDaliImageVisualReleasePolicy08(void)
   DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 0, TEST_LOCATION);
   textureTrace.Reset();
 
-  // 4.Compare Texture with before and after. textureSet need to be same because release policy is the DESTROYED.
-  tet_infoline("Ensure a textureSet is not deleted because it is used the DESTROYED release policy");
-  TextureSet textureSetAfter = actor.GetRendererAt(0u).GetTextures();
-  DALI_TEST_CHECK(textureSetBefore == textureSetAfter);
-  textureSetBefore.Reset();
-  textureSetAfter.Reset();
+  // 4.Compare Texture with before and after. texture need to be same because release policy is the DESTROYED.
+  tet_infoline("Ensure a texture is not deleted because it is used the DESTROYED release policy");
+  Texture textureAfter = actor.GetRendererAt(0u).GetTextures().GetTexture(0u);
+  DALI_TEST_CHECK(textureBefore == textureAfter);
+  textureBefore.Reset();
+  textureAfter.Reset();
 
   dummyImpl.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
   DALI_TEST_CHECK(actor.GetRendererCount() == 0u);

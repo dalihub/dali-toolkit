@@ -61,10 +61,10 @@ TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnT
 {
 }
 
-TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnType, int32_t textureId, uint32_t frameCount, uint32_t interval)
+TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, uint32_t frameCount, uint32_t interval)
 : returnType(returnType),
   textureId(textureId),
-  textureSet(),
+  textureSet(textureSet),
   useAtlasing(false),
   atlasRect(Vector4::ZERO),
   preMultiplied(false),

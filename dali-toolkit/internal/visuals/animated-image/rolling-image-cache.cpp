@@ -168,7 +168,7 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
 
     TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
     TextureSet                textureSet    = mTextureManager.LoadTexture(
-      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, mMaskingData, synchronousLoading, loadTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
+      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, mMaskingData, synchronousLoading, loadTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
     mImageUrls[imageFrame.mUrlIndex].mTextureId = loadTextureId;
 
     mRequestingLoad = false;
@@ -181,7 +181,14 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
 TextureSet RollingImageCache::GetFrontTextureSet() const
 {
   TextureManager::TextureId textureId = GetCachedTextureId(0);
-  return mTextureManager.GetTextureSet(textureId);
+  TextureSet textureSet = mTextureManager.GetTextureSet(textureId);
+  if(textureSet)
+  {
+    Sampler sampler = Sampler::New();
+    sampler.SetWrapMode(Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT);
+    textureSet.SetSampler(0u, sampler);
+  }
+  return textureSet;
 }
 
 TextureManager::TextureId RollingImageCache::GetCachedTextureId(int index) const
@@ -244,7 +251,13 @@ void RollingImageCache::LoadComplete(bool loadSuccess, TextureInformation textur
 
     if(!frontFrameReady && IsFrontReady())
     {
-      mObserver.FrameReady(mTextureManager.GetTextureSet(textureInformation.textureId), mInterval);
+      if(textureInformation.textureSet)
+      {
+        Sampler sampler = Sampler::New();
+        sampler.SetWrapMode(Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT);
+        textureInformation.textureSet.SetSampler(0u, sampler);
+      }
+      mObserver.FrameReady(textureInformation.textureSet, mInterval);
     }
   }
   else

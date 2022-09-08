@@ -281,7 +281,7 @@ struct TextureInfo
   ObserverListType           observerList;         ///< Container used to store all observer clients of this Texture
   Dali::Toolkit::ImageAtlas  atlas;                ///< The atlas this Texture lays within (if any)
   Dali::Devel::PixelBuffer   pixelBuffer;          ///< The PixelBuffer holding the image data (May be empty after upload)
-  Dali::TextureSet           textureSet;           ///< The TextureSet holding the Texture
+  std::vector<Dali::Texture> textures;             ///< The Textures
   VisualUrl                  url;                  ///< The URL of the image
   Dali::ImageDimensions      desiredSize;          ///< The size requested
   Dali::ImageDimensions      useSize;              ///< The size used
