@@ -149,7 +149,7 @@ void WebView::GoBack()
   Dali::Toolkit::GetImpl(*this).GoBack();
 }
 
-void WebView::EvaluateJavaScript(const std::string& script, std::function<void(const std::string&)> resultHandler)
+void WebView::EvaluateJavaScript(const std::string& script, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback resultHandler)
 {
   Dali::Toolkit::GetImpl(*this).EvaluateJavaScript(script, resultHandler);
 }
@@ -159,7 +159,7 @@ void WebView::EvaluateJavaScript(const std::string& script)
   Dali::Toolkit::GetImpl(*this).EvaluateJavaScript(script, nullptr);
 }
 
-void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler)
+void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler)
 {
   Dali::Toolkit::GetImpl(*this).AddJavaScriptMessageHandler(exposedObjectName, handler);
 }
@@ -179,24 +179,29 @@ void WebView::SetTtsFocus(bool focused)
   Dali::Toolkit::GetImpl(*this).SetTtsFocus(focused);
 }
 
-WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
+void WebView::RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).PageLoadStartedSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterPageLoadStartedCallback(callback);
 }
 
-WebView::WebViewPageLoadSignalType& WebView::PageLoadFinishedSignal()
+void WebView::RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).PageLoadFinishedSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterPageLoadFinishedCallback(callback);
 }
 
-WebView::WebViewPageLoadErrorSignalType& WebView::PageLoadErrorSignal()
+void WebView::RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).PageLoadErrorSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterPageLoadErrorCallback(callback);
 }
 
-WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeReachedSignal()
+void WebView::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback)
 {
-  return Dali::Toolkit::GetImpl( *this ).ScrollEdgeReachedSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterScrollEdgeReachedCallback(callback);
+}
+
+void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterNavigationPolicyDecidedCallback(callback);
 }
 
 void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)

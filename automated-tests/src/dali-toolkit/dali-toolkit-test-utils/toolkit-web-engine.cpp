@@ -22,6 +22,8 @@
 #include <dali/devel-api/adaptor-framework/web-engine-back-forward-list-item.h>
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
+#include <dali/devel-api/adaptor-framework/web-engine-frame.h>
+#include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/images/pixel-data.h>
@@ -207,6 +209,85 @@ public:
 private:
   MockWebEngineBackForwardListItem mockItem;
   WebEngineBackForwardListItem* pMockItem;
+};
+
+class MockWebEngineFrame : public Dali::WebEngineFrame
+{
+public:
+  MockWebEngineFrame()
+  {
+  }
+
+  bool IsMainFrame() const override
+  {
+    return true;
+  }
+};
+
+class MockWebEnginePolicyDecision : public Dali::WebEnginePolicyDecision
+{
+public:
+  MockWebEnginePolicyDecision()
+  {
+  }
+
+  std::string GetUrl() const override
+  {
+    return "http://test.html";
+  }
+
+  std::string GetCookie() const override
+  {
+    return "test:abc";
+  }
+
+  Dali::WebEnginePolicyDecision::DecisionType GetDecisionType() const
+  {
+    return Dali::WebEnginePolicyDecision::DecisionType::USE;
+  }
+
+  std::string GetResponseMime() const
+  {
+    return "txt/xml";
+  }
+
+  int32_t GetResponseStatusCode() const
+  {
+    return 500;
+  }
+
+  Dali::WebEnginePolicyDecision::NavigationType GetNavigationType() const
+  {
+    return Dali::WebEnginePolicyDecision::NavigationType::LINK_CLICKED;
+  }
+
+  Dali::WebEngineFrame& GetFrame() const
+  {
+    return *(Dali::WebEngineFrame*)(&mockWebFrame);
+  }
+
+  std::string GetScheme() const
+  {
+    return "test";
+  }
+
+  bool Use()
+  {
+    return true;
+  }
+
+  bool Ignore()
+  {
+    return true;
+  }
+
+  bool Suspend()
+  {
+    return true;
+  }
+
+private:
+  MockWebEngineFrame mockWebFrame;
 };
 
 class MockWebEngineSettings : public WebEngineSettings
@@ -405,7 +486,7 @@ public:
     ConnectToGlobalSignal( &OnGoBack );
   }
 
-  void EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler )
+  void EvaluateJavaScript( const std::string& script, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback resultHandler )
   {
     if( resultHandler )
     {
@@ -437,7 +518,7 @@ public:
     mScrollPosition += Dali::Vector2( dx, dy );
     if ( mScrollPosition.y + mScrollSize.height > mContentSize.height )
     {
-      gInstance->mScrollEdgeReachedSignal.Emit( Dali::WebEnginePlugin::ScrollEdge::BOTTOM );
+      gInstance->mScrollEdgeReachedCallback( Dali::WebEnginePlugin::ScrollEdge::BOTTOM );
     }
   }
 
@@ -465,24 +546,29 @@ public:
     h = mContentSize.height;
   }
 
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadStartedSignal()
+  void RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
   {
-    return mPageLoadStartedSignal;
+    mPageLoadStartedCallback = callback;
   }
 
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadFinishedSignal()
+  void RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
   {
-    return mPageLoadFinishedSignal;
+    mPageLoadFinishedCallback = callback;
   }
 
-  Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType& PageLoadErrorSignal()
+  void RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback)
   {
-    return mPageLoadErrorSignal;
+    mPageLoadErrorCallback = callback;
   }
 
-  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType& ScrollEdgeReachedSignal()
+  void RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback)
   {
-    return mScrollEdgeReachedSignal;
+    mScrollEdgeReachedCallback = callback;
+  }
+
+  void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
+  {
+    mNavigationPolicyDecisionCallback = callback;
   }
 
   void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
@@ -498,13 +584,16 @@ public:
   std::vector< std::string >                                 mHistory;
   size_t                                                     mCurrentPlusOnePos;
   std::string                                                mUserAgent;
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType         mPageLoadStartedSignal;
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType         mPageLoadFinishedSignal;
-  Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType    mPageLoadErrorSignal;
-  std::vector< std::function< void( const std::string& ) > > mResultCallbacks;
-  bool                                                       mEvaluating;
 
-  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType mScrollEdgeReachedSignal;
+  Dali::WebEnginePlugin::WebEnginePageLoadCallback                mPageLoadStartedCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadCallback                mPageLoadFinishedCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback           mPageLoadErrorCallback;
+  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback       mScrollEdgeReachedCallback;
+  Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback mNavigationPolicyDecisionCallback;
+
+  std::vector<Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback> mResultCallbacks;
+  bool                                                                 mEvaluating;
+
   Dali::Vector2                                               mScrollPosition;
   Dali::Vector2                                               mScrollSize;
   Dali::Vector2                                               mContentSize;
@@ -566,8 +655,23 @@ bool OnLoadUrl()
     }
     gInstance->mHistory.push_back( gInstance->mUrl );
     gInstance->mCurrentPlusOnePos++;
-    gInstance->mPageLoadStartedSignal.Emit( gInstance->mUrl );
-    gInstance->mPageLoadFinishedSignal.Emit( gInstance->mUrl );
+    if (gInstance->mPageLoadStartedCallback)
+    {
+      gInstance->mPageLoadStartedCallback( gInstance->mUrl );
+    }
+    if (gInstance->mPageLoadFinishedCallback)
+    {
+      gInstance->mPageLoadFinishedCallback( gInstance->mUrl );
+    }
+    if (gInstance->mPageLoadErrorCallback)
+    {
+      gInstance->mPageLoadErrorCallback(gInstance->mUrl, WebView::LoadErrorCode::UNKNOWN);
+    }
+    if (gInstance->mNavigationPolicyDecisionCallback)
+    {
+      std::unique_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
+      gInstance->mNavigationPolicyDecisionCallback(std::move(policyDecision));
+    }
   }
   return false;
 }
@@ -754,12 +858,12 @@ void WebEngine::GoBack()
   Internal::Adaptor::GetImplementation( *this ).GoBack();
 }
 
-void WebEngine::EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler )
+void WebEngine::EvaluateJavaScript( const std::string& script, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback resultHandler )
 {
   Internal::Adaptor::GetImplementation( *this ).EvaluateJavaScript( script, resultHandler );
 }
 
-void WebEngine::AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void(const std::string&) > handler )
+void WebEngine::AddJavaScriptMessageHandler( const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler )
 {
 }
 
@@ -833,24 +937,29 @@ void WebEngine::EnableVideoHole( bool enabled )
 {
 }
 
-Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadStartedSignal()
+void WebEngine::RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  return Internal::Adaptor::GetImplementation( *this ).PageLoadStartedSignal();
+  Internal::Adaptor::GetImplementation( *this ).RegisterPageLoadStartedCallback(callback);
 }
 
-Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadFinishedSignal()
+void WebEngine::RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  return Internal::Adaptor::GetImplementation( *this ).PageLoadFinishedSignal();
+  Internal::Adaptor::GetImplementation( *this ).RegisterPageLoadFinishedCallback(callback);
 }
 
-Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType& WebEngine::PageLoadErrorSignal()
+void WebEngine::RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback)
 {
-  return Internal::Adaptor::GetImplementation( *this ).PageLoadErrorSignal();
+  Internal::Adaptor::GetImplementation( *this ).RegisterPageLoadErrorCallback(callback);
 }
 
-Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType& WebEngine::ScrollEdgeReachedSignal()
+void WebEngine::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback)
 {
-  return Internal::Adaptor::GetImplementation( *this ).ScrollEdgeReachedSignal();
+  Internal::Adaptor::GetImplementation( *this ).RegisterScrollEdgeReachedCallback(callback);
+}
+
+void WebEngine::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterNavigationPolicyDecidedCallback(callback);
 }
 
 void WebEngine::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)

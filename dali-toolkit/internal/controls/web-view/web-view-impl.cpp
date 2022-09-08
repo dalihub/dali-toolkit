@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine-back-forward-list.h>
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
+#include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -68,11 +69,6 @@ DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollSize",              VECTOR2
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "contentSize",             VECTOR2, CONTENT_SIZE               )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "title",                   STRING,  TITLE                      )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "videoHoleEnabled",        BOOLEAN, VIDEO_HOLE_ENABLED         )
-
-DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadStarted",         PAGE_LOAD_STARTED_SIGNAL            )
-DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadFinished",        PAGE_LOAD_FINISHED_SIGNAL           )
-DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadError",           PAGE_LOAD_ERROR_SIGNAL              )
-DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "scrollEdgeReached",       SCROLL_EDGE_REACHED_SIGNAL          )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -137,9 +133,6 @@ WebView::WebView( const std::string& locale, const std::string& timezoneId )
   mVisual(),
   mWebViewSize( Stage::GetCurrent().GetSize() ),
   mWebEngine(),
-  mPageLoadStartedSignal(),
-  mPageLoadFinishedSignal(),
-  mPageLoadErrorSignal(),
   mVideoHoleEnabled( true ),
   mWebViewArea ( 0, 0, mWebViewSize.width, mWebViewSize.height )
 {
@@ -158,9 +151,6 @@ WebView::WebView( int argc, char** argv )
   mVisual(),
   mWebViewSize( Stage::GetCurrent().GetSize() ),
   mWebEngine(),
-  mPageLoadStartedSignal(),
-  mPageLoadFinishedSignal(),
-  mPageLoadErrorSignal(),
   mVideoHoleEnabled( true ),
   mWebViewArea ( 0, 0, mWebViewSize.width, mWebViewSize.height )
 {
@@ -229,11 +219,6 @@ void WebView::OnInitialize()
 
   if( mWebEngine )
   {
-    mWebEngine.PageLoadStartedSignal().Connect( this, &WebView::OnPageLoadStarted );
-    mWebEngine.PageLoadFinishedSignal().Connect( this, &WebView::OnPageLoadFinished );
-    mWebEngine.PageLoadErrorSignal().Connect( this, &WebView::OnPageLoadError );
-    mWebEngine.ScrollEdgeReachedSignal().Connect( this, &WebView::OnScrollEdgeReached );
-
     mWebContext = std::unique_ptr<Dali::Toolkit::WebContext>( new WebContext( mWebEngine.GetContext() ) );
     mWebCookieManager = std::unique_ptr<Dali::Toolkit::WebCookieManager>( new WebCookieManager( mWebEngine.GetCookieManager() ) );
     mWebSettings = std::unique_ptr<Dali::Toolkit::WebSettings>( new WebSettings( mWebEngine.GetSettings() ) );
@@ -383,7 +368,7 @@ void WebView::GoBack()
   }
 }
 
-void WebView::EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler )
+void WebView::EvaluateJavaScript( const std::string& script, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback resultHandler )
 {
   if( mWebEngine )
   {
@@ -391,7 +376,7 @@ void WebView::EvaluateJavaScript( const std::string& script, std::function< void
   }
 }
 
-void WebView::AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void( const std::string& ) > handler )
+void WebView::AddJavaScriptMessageHandler( const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler )
 {
   if( mWebEngine )
   {
@@ -476,59 +461,43 @@ void WebView::EnableBlendMode( bool blendEnabled )
   }
 }
 
-Dali::Toolkit::WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
+void WebView::RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  return mPageLoadStartedSignal;
-}
-
-Dali::Toolkit::WebView::WebViewPageLoadSignalType& WebView::PageLoadFinishedSignal()
-{
-  return mPageLoadFinishedSignal;
-}
-
-Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType& WebView::PageLoadErrorSignal()
-{
-  return mPageLoadErrorSignal;
-}
-
-Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeReachedSignal()
-{
-  return mScrollEdgeReachedSignal;
-}
-
-void WebView::OnPageLoadStarted( const std::string& url )
-{
-  if( !mPageLoadStartedSignal.Empty() )
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle( GetOwner() );
-    mPageLoadStartedSignal.Emit( handle, url );
+    mWebEngine.RegisterPageLoadStartedCallback(callback);
   }
 }
 
-void WebView::OnPageLoadFinished( const std::string& url )
+void WebView::RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  if( !mPageLoadFinishedSignal.Empty() )
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle( GetOwner() );
-    mPageLoadFinishedSignal.Emit( handle, url );
+    mWebEngine.RegisterPageLoadFinishedCallback(callback);
   }
 }
 
-void WebView::OnPageLoadError( const std::string& url, int errorCode )
+void WebView::RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback)
 {
-  if( !mPageLoadErrorSignal.Empty() )
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle( GetOwner() );
-    mPageLoadErrorSignal.Emit( handle, url, static_cast< Toolkit::WebView::LoadErrorCode >( errorCode ) );
+    mWebEngine.RegisterPageLoadErrorCallback(callback);
   }
 }
 
-void WebView::OnScrollEdgeReached( Dali::WebEnginePlugin::ScrollEdge edge )
+void WebView::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback)
 {
-  if( !mScrollEdgeReachedSignal.Empty() )
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle( GetOwner() );
-    mScrollEdgeReachedSignal.Emit( handle, edge );
+    mWebEngine.RegisterScrollEdgeReachedCallback(callback);
+  }
+}
+
+void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterNavigationPolicyDecidedCallback(callback);
   }
 }
 
@@ -538,37 +507,6 @@ void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceive
   {
     mWebEngine.GetPlainTextAsynchronously(callback);
   }
-}
-
-bool WebView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
-{
-  Dali::BaseHandle handle( object );
-
-  bool connected = false;
-  Toolkit::WebView webView = Toolkit::WebView::DownCast( handle );
-
-  if( 0 == strcmp( signalName.c_str(), PAGE_LOAD_STARTED_SIGNAL ) )
-  {
-    webView.PageLoadStartedSignal().Connect( tracker, functor );
-    connected = true;
-  }
-  else if( 0 == strcmp( signalName.c_str(), PAGE_LOAD_FINISHED_SIGNAL ) )
-  {
-    webView.PageLoadFinishedSignal().Connect( tracker, functor );
-    connected = true;
-  }
-  else if( 0 == strcmp( signalName.c_str(), PAGE_LOAD_ERROR_SIGNAL ) )
-  {
-    webView.PageLoadErrorSignal().Connect( tracker, functor );
-    connected = true;
-  }
-  else if( 0 == strcmp( signalName.c_str(), SCROLL_EDGE_REACHED_SIGNAL ) )
-  {
-    webView.ScrollEdgeReachedSignal().Connect( tracker, functor );
-    connected = true;
-  }
-
-  return connected;
 }
 
 Vector3 WebView::GetNaturalSize()

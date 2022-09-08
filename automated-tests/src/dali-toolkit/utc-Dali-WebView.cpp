@@ -22,6 +22,8 @@
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
 #include <dali.h>
+#include <dali/devel-api/adaptor-framework/web-engine-frame.h>
+#include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/public-api/images/pixel-data.h>
@@ -46,6 +48,7 @@ const char* const TEST_URL2( "http://www.somewhere.valid2.com" );
 static int gPageLoadStartedCallbackCalled = 0;
 static int gPageLoadFinishedCallbackCalled = 0;
 static int gScrollEdgeReachedCallbackCalled = 0;
+static int gNavigationPolicyDecidedCallbackCalled = 0;
 static int gEvaluateJavaScriptCallbackCalled = 0;
 static bool gTouched = false;
 static int gPlainTextReceivedCallbackCalled = 0;
@@ -64,19 +67,24 @@ struct CallbackFunctor
   bool* mCallbackFlag;
 };
 
-static void OnPageLoadStarted( WebView view, const std::string& url )
+static void OnPageLoadStarted( const std::string& url )
 {
   gPageLoadStartedCallbackCalled++;
 }
 
-static void OnPageLoadFinished( WebView view, const std::string& url )
+static void OnPageLoadFinished( const std::string& url )
 {
   gPageLoadFinishedCallbackCalled++;
 }
 
-static void OnScrollEdgeReached( WebView view, Dali::WebEnginePlugin::ScrollEdge edge )
+static void OnScrollEdgeReached( Dali::WebEnginePlugin::ScrollEdge edge )
 {
   gScrollEdgeReachedCallbackCalled++;
+}
+
+static void OnNavigationPolicyDecided(std::unique_ptr<Dali::WebEnginePolicyDecision> decision)
+{
+  gNavigationPolicyDecidedCallbackCalled++;
 }
 
 static bool OnPlainTextReceived(const std::string& plainText)
@@ -85,7 +93,7 @@ static bool OnPlainTextReceived(const std::string& plainText)
   return true;
 }
 
-static void OnPageLoadError( WebView view, const std::string& url, WebView::LoadErrorCode errorCode )
+static void OnPageLoadError( const std::string& url, WebView::LoadErrorCode errorCode )
 {
 }
 
@@ -172,19 +180,13 @@ int UtcDaliWebViewPageNavigation(void)
   application.Render();
   DALI_TEST_CHECK( view );
 
-  ConnectionTracker* testTracker = new ConnectionTracker();
-  view.PageLoadStartedSignal().Connect( &OnPageLoadStarted );
-  view.PageLoadFinishedSignal().Connect( &OnPageLoadFinished );
-  view.PageLoadErrorSignal().Connect( &OnPageLoadError );
-  bool signal1 = false;
-  bool signal2 = false;
-  bool signal3 = false;
-  view.ConnectSignal( testTracker, "pageLoadStarted", CallbackFunctor(&signal1) );
-  view.ConnectSignal( testTracker, "pageLoadFinished", CallbackFunctor(&signal2) );
-  view.ConnectSignal( testTracker, "invalidname", CallbackFunctor(&signal3) );
+  view.RegisterPageLoadStartedCallback( &OnPageLoadStarted );
+  view.RegisterPageLoadFinishedCallback( &OnPageLoadFinished );
+  view.RegisterPageLoadErrorCallback( &OnPageLoadError );
+
   DALI_TEST_EQUALS( gPageLoadStartedCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadFinishedCallbackCalled, 0, TEST_LOCATION );
-
+  DALI_TEST_EQUALS( gPageLoadErrorCallbackCalled, 0, TEST_LOCATION );
 
   view.LoadUrl( TEST_URL1 );
   view.GetNaturalSize();
@@ -192,8 +194,7 @@ int UtcDaliWebViewPageNavigation(void)
   DALI_TEST_EQUALS( view.CanGoBack(), false, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadStartedCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadFinishedCallbackCalled, 1, TEST_LOCATION );
-  DALI_TEST_CHECK( signal1 & signal2 );
-  DALI_TEST_CHECK( !signal3 );
+  DALI_TEST_EQUALS( gPageLoadErrorCallbackCalled, 1, TEST_LOCATION );
 
   view.LoadUrl( TEST_URL2 );
   view.Suspend();
@@ -519,10 +520,7 @@ int UtcDaliWebViewScrollBy(void)
   DALI_TEST_CHECK( view );
 
   // load url.
-  ConnectionTracker* testTracker = new ConnectionTracker();
-  view.ScrollEdgeReachedSignal().Connect( &OnScrollEdgeReached );
-  bool signal1 = false;
-  view.ConnectSignal( testTracker, "scrollEdgeReached", CallbackFunctor(&signal1) );
+  view.RegisterScrollEdgeReachedCallback( &OnScrollEdgeReached );
   DALI_TEST_EQUALS( gScrollEdgeReachedCallbackCalled, 0, TEST_LOCATION );
 
   view.LoadUrl( TEST_URL1 );
@@ -540,7 +538,6 @@ int UtcDaliWebViewScrollBy(void)
   view.GetProperty( WebView::Property::SCROLL_POSITION ).Get( output );
   DALI_TEST_CHECK( output.x == 150 && output.y == 150 );
   DALI_TEST_EQUALS( gScrollEdgeReachedCallbackCalled, 1, TEST_LOCATION );
-  DALI_TEST_CHECK( signal1 );
 
   END_TEST;
 }
@@ -797,6 +794,24 @@ int UtcDaliWebSettingsGetSetDefaultTextEncodingName(void)
   settings->SetDefaultTextEncodingName( kTestValue );
   value = settings->GetDefaultTextEncodingName();
   DALI_TEST_EQUALS( value, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewNavigationPolicyDecisionRequest(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  // load url.
+  view.RegisterNavigationPolicyDecidedCallback(&OnNavigationPolicyDecided);
+  DALI_TEST_EQUALS(gNavigationPolicyDecidedCallbackCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gNavigationPolicyDecidedCallbackCalled, 1, TEST_LOCATION);
 
   END_TEST;
 }

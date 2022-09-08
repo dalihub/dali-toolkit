@@ -161,12 +161,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::EvaluateJavaScript()
    */
-  void EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler );
+  void EvaluateJavaScript( const std::string& script, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback resultHandler );
 
   /**
    * @copydoc Dali::Toolkit::WebView::AddJavaScriptMessageHandler()
    */
-  void AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void( const std::string& ) > handler );
+  void AddJavaScriptMessageHandler( const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler );
 
   /**
    * @brief Clears all tiles resources of Web.
@@ -184,24 +184,29 @@ public:
   void SetTtsFocus(bool focused);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::PageLoadStartedSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterPageLoadStartedCallback()
    */
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType& PageLoadStartedSignal();
+  void RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::PageLoadFinishedSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterPageLoadFinishedCallback()
    */
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType& PageLoadFinishedSignal();
+  void RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::PageLoadErrorSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterPageLoadErrorCallback()
    */
-  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType& PageLoadErrorSignal();
+  void RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::ScrollEdgeReachedSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterScrollEdgeReachedCallback()
    */
-  Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType& ScrollEdgeReachedSignal();
+  void RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterNavigationPolicyDecidedCallback()
+   */
+  void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetPlainTextAsynchronously()
@@ -227,17 +232,6 @@ public: // Properties
    * @return The current value of the property.
    */
   static Dali::Property::Value GetProperty( Dali::BaseObject* object, Dali::Property::Index propertyIndex );
-
-  /**
-   * Connects a callback function with the object's signals.
-   * @param[in] object The object providing the signal.
-   * @param[in] tracker Used to disconnect the signal.
-   * @param[in] signalName The signal to connect to.
-   * @param[in] functor A newly allocated FunctorDelegate.
-   * @return True if the signal was connected.
-   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the c
-   */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
 private: // From Control
 
@@ -351,53 +345,23 @@ private:
    */
   void EnableBlendMode( bool blendEnabled );
 
-  /**
-   * @brief Callback function to be called when page load started.
-   * @param[in] url The url currently being loaded
-   */
-  void OnPageLoadStarted( const std::string& url );
-
-  /**
-   * @brief Callback function to be called when page load finished.
-   * @param[in] url The url currently being loaded
-   */
-  void OnPageLoadFinished( const std::string& url );
-
-  /**
-   * @brief Callback function to be called when there is an error in page loading.
-   * @param[in] url The url currently being loaded
-   * @param[in] errorCode The error code
-   */
-  void OnPageLoadError( const std::string& url, int errorCode );
-
-  /**
-   * @brief Callback function to be called when scroll edge is reached.
-   * @param[in] e The scroll edge reached.
-   */
-  void OnScrollEdgeReached( Dali::WebEnginePlugin::ScrollEdge edge );
-
 private:
 
-  std::string                                            mUrl;
-  Dali::Toolkit::Visual::Base                            mVisual;
-  Dali::Size                                             mWebViewSize;
-  Dali::WebEngine                                        mWebEngine;
+  std::string                                        mUrl;
+  Dali::Toolkit::Visual::Base                        mVisual;
+  Dali::Size                                         mWebViewSize;
+  Dali::WebEngine                                    mWebEngine;
 
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadStartedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadFinishedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType mPageLoadErrorSignal;
-  Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType mScrollEdgeReachedSignal;
+  std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
+  std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
+  std::unique_ptr<Dali::Toolkit::WebSettings>        mWebSettings;
+  std::unique_ptr<Dali::Toolkit::WebBackForwardList> mWebBackForwardList;
 
-  std::unique_ptr<Dali::Toolkit::WebContext>             mWebContext;
-  std::unique_ptr<Dali::Toolkit::WebCookieManager>       mWebCookieManager;
-  std::unique_ptr<Dali::Toolkit::WebSettings>            mWebSettings;
-  std::unique_ptr<Dali::Toolkit::WebBackForwardList>     mWebBackForwardList;
-
-  Dali::PropertyNotification                             mPositionUpdateNotification;
-  Dali::PropertyNotification                             mSizeUpdateNotification;
-  Dali::PropertyNotification                             mScaleUpdateNotification;
-  bool                                                   mVideoHoleEnabled;
-  Dali::Rect< int >                                      mWebViewArea;
+  Dali::PropertyNotification                         mPositionUpdateNotification;
+  Dali::PropertyNotification                         mSizeUpdateNotification;
+  Dali::PropertyNotification                         mScaleUpdateNotification;
+  bool                                               mVideoHoleEnabled;
+  Dali::Rect< int >                                  mWebViewArea;
 };
 
 } // namespace Internal

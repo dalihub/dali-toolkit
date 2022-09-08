@@ -143,21 +143,6 @@ public:
     INTERNAL_SERVER         ///< Web server has an internal server error.
   };
 
-  /**
-   * @brief WebView signal type related with page loading.
-   */
-  typedef Signal<void(WebView, const std::string&)> WebViewPageLoadSignalType;
-
-  /**
-   * @brief WebView signal type related with page loading error.
-   */
-  typedef Signal<void(WebView, const std::string&, LoadErrorCode)> WebViewPageLoadErrorSignalType;
-
-  /**
-   * @brief WebView signal type related with scroll edge reached.
-   */
-  typedef Signal<void(WebView, Dali::WebEnginePlugin::ScrollEdge)> WebViewScrollEdgeReachedSignalType;
-
 public:
   /**
    * @brief Creates an initialized WebView.
@@ -319,7 +304,7 @@ public:
    * @param[in] script The JavaScript code
    * @param[in] resultHandler The callback function to be called by the JavaScript runtime. This carries evaluation result.
    */
-  void EvaluateJavaScript(const std::string& script, std::function<void(const std::string&)> resultHandler);
+  void EvaluateJavaScript(const std::string& script, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback resultHandler);
 
   /**
    * @brief Evaluates JavaScript code represented as a string.
@@ -352,7 +337,7 @@ public:
    * @param[in] exposedObjectName The name of exposed object
    * @param[in] handler The callback function
    */
-  void AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler);
+  void AddJavaScriptMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler);
 
   /**
    * @brief Clears all tiles resources of Web.
@@ -372,32 +357,39 @@ public:
   void SetTtsFocus(bool focused);
 
   /**
-   * @brief Connects to this signal to be notified when page loading is started.
+   * @brief Callback to be called when page loading is started.
    *
-   * @return A signal object to connect with
+   * @param[in] callback
    */
-  WebViewPageLoadSignalType& PageLoadStartedSignal();
+  void RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback);
 
   /**
-   * @brief Connects to this signal to be notified when page loading is finished.
+   * @brief Callback to be called when page loading is finished.
    *
-   * @return A signal object to connect with
+   * @param[in] callback
    */
-  WebViewPageLoadSignalType& PageLoadFinishedSignal();
+  void RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback);
 
   /**
-   * @brief Connects to this signal to be notified when an error occurs in page loading.
+   * @brief Callback to be called when an error occurs in page loading.
    *
-   * @return A signal object to connect with.
+   * @param[in] callback
    */
-  WebViewPageLoadErrorSignalType& PageLoadErrorSignal();
+  void RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback);
 
   /**
-   * @brief Connects to this signal to be notified when scroll edge is reached.
+   * @brief Callback to be called when scroll edge is reached.
    *
-   * @return A signal object to connect with.
+   * @param[in] callback
    */
-  WebViewScrollEdgeReachedSignalType& ScrollEdgeReachedSignal();
+  void RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback);
+
+  /**
+   * @brief Callback to be called when navigation policy would be decided.
+   *
+   * @param[in] callback
+   */
+  void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
 
   /**
    * @brief Get a plain text of current web page asynchronously.
