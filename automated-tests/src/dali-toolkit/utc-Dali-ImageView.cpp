@@ -81,6 +81,7 @@ const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 
 const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
+const char* TEST_WEBP_FILE_NAME                  = TEST_RESOURCE_DIR "/dali-logo.webp";
 
 void TestUrl(ImageView imageView, const std::string url)
 {
@@ -3460,6 +3461,74 @@ void OnResourceReadySignal05(Control control)
   }
 }
 
+int gResourceReadySignal06ComesOrder = 0;
+
+void OnResourceReadySignal06(Control control)
+{
+  gResourceReadySignalCounter++;
+  if(gResourceReadySignalCounter == 1)
+  {
+    auto scene = gImageView1.GetParent();
+
+    // Request load something
+    // We hope this request result is return later than gImageView2.
+
+    Property::Map map1;
+    map1[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_1;
+    map1[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = TEST_BROKEN_IMAGE_DEFAULT;
+
+    gImageView3 = ImageView::New();
+    gImageView3.SetProperty(Toolkit::ImageView::Property::IMAGE, map1);
+    gImageView3.ResourceReadySignal().Connect(&OnResourceReadySignal06);
+
+    Property::Map map2;
+    map2[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_2;
+    map2[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = TEST_BROKEN_IMAGE_S;
+    gImageView4 = ImageView::New();
+    gImageView4.SetProperty(Toolkit::ImageView::Property::IMAGE, map2);
+    gImageView4.ResourceReadySignal().Connect(&OnResourceReadySignal06);
+
+    if(control == gImageView1)
+    {
+      gResourceReadySignal06ComesOrder = 1;
+    }
+    else
+    {
+      gResourceReadySignal06ComesOrder = 2;
+    }
+  }
+  if(gResourceReadySignalCounter == 2)
+  {
+    if(gResourceReadySignal06ComesOrder == 1 && control == gImageView2)
+    {
+      // Scene off first one.
+      gImageView1.Unparent();
+
+      // Scene off second one.
+      gImageView2.Unparent();
+    }
+    else if(gResourceReadySignal06ComesOrder == 2 && control == gImageView1)
+    {
+      // Scene off first one.
+      gImageView2.Unparent();
+
+      // Scene off second one.
+      gImageView1.Unparent();
+    }
+    else
+    {
+      // We can't check that this utc fail case. just pass always when we come here.
+      gResourceReadySignal06ComesOrder = -1;
+    }
+
+    // If we don't seperate index of FreeList area
+    // and if we don't queue remove during obversing,
+    // cache index become something invalid data.
+    // In this case, some strange observer can be called.
+    // For example, gImageView4.LoadComplete will be called.
+  }
+}
+
 } // namespace
 
 int UtcDaliImageViewSetImageOnResourceReadySignal01(void)
@@ -3885,5 +3954,84 @@ int UtcDaliImageViewSetImageOnResourceReadySignal05(void)
   gImageView1.Unparent();
   gImageView1.Reset();
 
+  END_TEST;
+}
+int UtcDaliImageViewSetImageOnResourceReadySignal06(void)
+{
+  tet_infoline("Test texturemanager's remove image & mask queue works well within signal handler.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter      = 0;
+  gResourceReadySignal06ComesOrder = 0;
+
+  Property::Map map;
+  map[Toolkit::ImageVisual::Property::URL] = "invalid.jpg";
+  map[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = "invalid.png";
+
+  gImageView1 = ImageView::New(); // request invalid image, to make loading failed fast.
+  gImageView1.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal06);
+  application.GetScene().Add(gImageView1);
+
+  gImageView2 = ImageView::New(); // request invalid image, to make loading failed fast.
+  gImageView2.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  gImageView2.ResourceReadySignal().Connect(&OnResourceReadySignal06);
+  application.GetScene().Add(gImageView2);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Try to load 2 invalid image");
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalCounter, 2, TEST_LOCATION);
+
+  tet_infoline("load done");
+
+  // We can test this UTC only if gImageView1 and gImageView2 loaded done.
+  if(gResourceReadySignal06ComesOrder == -1)
+  {
+    tet_infoline("Bad news.. gImageView3 or gImageView4 loaded faster than others. just skip this UTC");
+  }
+  else
+  {
+    // gImageView3 and gImageView4 load must not be successed yet.
+    DALI_TEST_EQUALS(gImageView3.GetRendererCount(), 0u, TEST_LOCATION);
+    DALI_TEST_EQUALS(gImageView4.GetRendererCount(), 0u, TEST_LOCATION);
+
+    application.GetScene().Add(gImageView3);
+    application.GetScene().Add(gImageView4);
+    application.SendNotification();
+    application.Render();
+
+    tet_infoline("Try to load 2 valid image");
+
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 2, TEST_LOCATION);
+
+    tet_infoline("load done");
+  }
+  END_TEST;
+}
+
+int UtcDaliImageViewUseSameUrlWithAnimatedImageVisual(void)
+{
+  tet_infoline("Test multiple views with same image in animated image visual");
+  ToolkitTestApplication application;
+
+  gImageView1 = ImageView::New(TEST_WEBP_FILE_NAME);
+  application.GetScene().Add(gImageView1);
+
+  tet_infoline("Remove imageView and Create new imageView with same url");
+  application.GetScene().Remove(gImageView1);
+  gImageView2 = ImageView::New(TEST_WEBP_FILE_NAME);
+  application.GetScene().Add(gImageView2);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Check the ImageView load image successfully");
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
   END_TEST;
 }

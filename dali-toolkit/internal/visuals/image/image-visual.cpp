@@ -180,18 +180,6 @@ ImageVisual::~ImageVisual()
 {
   if(Stage::IsInstalled())
   {
-    if(mMaskingData)
-    {
-      // TextureManager could have been deleted before the actor that contains this
-      // ImageVisual is destroyed (e.g. due to stage shutdown). Ensure the stage
-      // is still valid before accessing texture manager.
-      if(mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
-      {
-        TextureManager& textureManager = mFactoryCache.GetTextureManager();
-        textureManager.Remove(mMaskingData->mAlphaMaskId, this);
-      }
-    }
-
     if(mImageUrl.IsValid())
     {
       // Decrease reference count of External Resources :

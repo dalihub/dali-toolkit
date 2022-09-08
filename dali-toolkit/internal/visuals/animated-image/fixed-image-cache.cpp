@@ -165,13 +165,6 @@ void FixedImageCache::ClearCache()
     {
       mTextureManager.Remove(mImageUrls[i].mTextureId, this);
       mImageUrls[i].mTextureId = TextureManager::INVALID_TEXTURE_ID;
-
-      if(mMaskingData && mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
-      {
-        // In the CPU alpha masking, each frame increases reference count of masking texture.
-        // We should call TextureManager::Remove to decrease reference count when each frame is removed.
-        mTextureManager.Remove(mMaskingData->mAlphaMaskId, this);
-      }
     }
   }
   mReadyFlags.clear();

@@ -517,9 +517,9 @@ private:
   /**
    * Structure to hold info about a texture load queued during NotifyObservers
    */
-  struct LoadQueueElement
+  struct QueueElement
   {
-    LoadQueueElement(TextureManager::TextureId textureId, TextureUploadObserver* observer)
+    QueueElement(TextureManager::TextureId textureId, TextureUploadObserver* observer)
     : mTextureId(textureId),
       mObserver(observer)
     {
@@ -612,6 +612,15 @@ private:
    */
   void EmitLoadComplete(TextureUploadObserver* observer, TextureManager::TextureInfo& textureInfo, const bool& success);
 
+
+  /**
+   * @brief Remove observer in textureInfo
+   *
+   * @param textureInfo The struct associated with this Texture.
+   * @param observer The observer wishing to remove.
+   */
+  void RemoveTextureObserver(TextureManager::TextureInfo& textureInfo, TextureUploadObserver* observer);
+
 public:
   /**
    * @brief Common method to handle loading completion.
@@ -645,11 +654,11 @@ private:                                    // Member Variables:
   RoundRobinContainerView<TextureAsyncLoadingHelper> mAsyncLocalLoaders;  ///< The Asynchronous image loaders used to provide all local async loads
   RoundRobinContainerView<TextureAsyncLoadingHelper> mAsyncRemoteLoaders; ///< The Asynchronous image loaders used to provide all remote async loads
 
-  Dali::Vector<LifecycleObserver*>        mLifecycleObservers; ///< Lifecycle observers of texture manager
-  Dali::Vector<LoadQueueElement>          mLoadQueue;          ///< Queue of textures to load after NotifyObservers
-  Dali::Vector<TextureManager::TextureId> mRemoveQueue;        ///< Queue of textures to remove after NotifyObservers
-  bool                                    mQueueLoadFlag;      ///< Flag that causes Load Textures to be queued.
-  bool                                    mLoadYuvPlanes;      ///< A global flag to specify if the image should be loaded as yuv planes
+  Dali::Vector<LifecycleObserver*>        mLifecycleObservers;      ///< Lifecycle observers of texture manager
+  Dali::Vector<QueueElement>              mLoadQueue;               ///< Queue of textures to load after NotifyObservers
+  Dali::Vector<QueueElement>              mRemoveQueue;             ///< Queue of textures to remove after NotifyObservers
+  TextureManager::TextureId               mLoadingQueueTextureId;   ///< TextureId when it is loading. it causes Load Textures to be queued.
+  bool                                    mLoadYuvPlanes;           ///< A global flag to specify if the image should be loaded as yuv planes
 };
 
 } // namespace Internal

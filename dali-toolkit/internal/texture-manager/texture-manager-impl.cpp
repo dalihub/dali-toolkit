@@ -136,7 +136,7 @@ TextureManager::TextureManager()
   mLifecycleObservers(),
   mLoadQueue(),
   mRemoveQueue(),
-  mQueueLoadFlag(false),
+  mLoadingQueueTextureId(INVALID_TEXTURE_ID),
   mLoadYuvPlanes(NeedToLoadYuvPlanes())
 {
   // Initialize the AddOn
@@ -446,7 +446,7 @@ TextureSet TextureManager::LoadTexture(
                          loadState == TextureManager::LoadState::MASK_APPLYING ||
                          loadState == TextureManager::LoadState::MASK_APPLIED ||
                          loadState == TextureManager::LoadState::NOT_STARTED ||
-                         mQueueLoadFlag);
+                         mLoadingQueueTextureId != INVALID_TEXTURE_ID);
       }
       else
       {
@@ -706,15 +706,60 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId, TextureU
 {
   if(textureId != INVALID_TEXTURE_ID)
   {
-    if(mQueueLoadFlag)
+    TextureCacheIndex textureCacheIndex = mTextureCacheManager.GetCacheIndexFromId(textureId);
+    if(textureCacheIndex != INVALID_CACHE_INDEX)
     {
-      // Remove textureId after NotifyObserver finished
-      mRemoveQueue.PushBack(textureId);
-    }
-    else
-    {
-      // Remove textureId in CacheManager.
-      mTextureCacheManager.RemoveCache(textureId);
+      TextureManager::TextureId maskTextureId = INVALID_TEXTURE_ID;
+      TextureInfo& textureInfo(mTextureCacheManager[textureCacheIndex]);
+      if(textureInfo.maskTextureId != INVALID_TEXTURE_ID)
+      {
+        maskTextureId = textureInfo.maskTextureId;
+      }
+
+      // the case that LoadingQueue is working.
+      if(mLoadingQueueTextureId != INVALID_TEXTURE_ID)
+      {
+        // If textureId is not same, this observer need to delete when ProcessRemoveQueue() is called.
+        TextureUploadObserver* queueObserver = nullptr;
+        if(mLoadingQueueTextureId != textureId)
+        {
+          queueObserver = observer;
+        }
+
+        // Remove textureId after NotifyObserver finished
+        if(maskTextureId != INVALID_TEXTURE_ID)
+        {
+          if(textureInfo.loadState != LoadState::CANCELLED)
+          {
+            mRemoveQueue.PushBack(QueueElement(maskTextureId, nullptr));
+          }
+        }
+        mRemoveQueue.PushBack(QueueElement(textureId, queueObserver));
+      }
+      else
+      {
+        // Remove its observer
+        RemoveTextureObserver(textureInfo, observer);
+
+        // Remove maskTextureId in CacheManager
+        if(maskTextureId != INVALID_TEXTURE_ID)
+        {
+          TextureCacheIndex maskCacheIndex = mTextureCacheManager.GetCacheIndexFromId(maskTextureId);
+          if(maskCacheIndex != INVALID_CACHE_INDEX)
+          {
+            TextureInfo& maskTextureInfo(mTextureCacheManager[maskCacheIndex]);
+
+            // Only Remove maskTexture when texture's loadState is not CANCELLED. because it is already deleted.
+            if(textureInfo.loadState != LoadState::CANCELLED)
+            {
+              mTextureCacheManager.RemoveCache(maskTextureInfo);
+            }
+          }
+        }
+
+        // Remove textureId in CacheManager
+        mTextureCacheManager.RemoveCache(textureInfo);
+      }
     }
 
     if(observer)
@@ -799,7 +844,7 @@ void TextureManager::LoadOrQueueTexture(TextureManager::TextureInfo& textureInfo
     case LoadState::NOT_STARTED:
     case LoadState::LOAD_FAILED:
     {
-      if(mQueueLoadFlag)
+      if(mLoadingQueueTextureId != INVALID_TEXTURE_ID)
       {
         QueueLoadTexture(textureInfo, observer);
       }
@@ -811,7 +856,7 @@ void TextureManager::LoadOrQueueTexture(TextureManager::TextureInfo& textureInfo
     }
     case LoadState::UPLOADED:
     {
-      if(mQueueLoadFlag)
+      if(mLoadingQueueTextureId != INVALID_TEXTURE_ID)
       {
         QueueLoadTexture(textureInfo, observer);
       }
@@ -838,7 +883,7 @@ void TextureManager::LoadOrQueueTexture(TextureManager::TextureInfo& textureInfo
 void TextureManager::QueueLoadTexture(const TextureManager::TextureInfo& textureInfo, TextureUploadObserver* observer)
 {
   const auto& textureId = textureInfo.textureId;
-  mLoadQueue.PushBack(LoadQueueElement(textureId, observer));
+  mLoadQueue.PushBack(QueueElement(textureId, observer));
 
   observer->DestructionSignal().Connect(this, &TextureManager::ObserverDestroyed);
 }
@@ -900,9 +945,16 @@ void TextureManager::ProcessLoadQueue()
 
 void TextureManager::ProcessRemoveQueue()
 {
-  for(const auto& textureId : mRemoveQueue)
+  TextureCacheIndex textureCacheIndex = INVALID_CACHE_INDEX;
+  for(auto&& element : mRemoveQueue)
   {
-    mTextureCacheManager.RemoveCache(textureId);
+    textureCacheIndex = mTextureCacheManager.GetCacheIndexFromId(element.mTextureId);
+    if(textureCacheIndex != INVALID_CACHE_INDEX)
+    {
+      TextureInfo& textureInfo(mTextureCacheManager[textureCacheIndex]);
+      RemoveTextureObserver(textureInfo, element.mObserver);
+      mTextureCacheManager.RemoveCache(textureInfo);
+    }
   }
   mRemoveQueue.Clear();
 }
@@ -1191,7 +1243,7 @@ void TextureManager::NotifyObservers(TextureManager::TextureInfo& textureInfo, c
     info->animatedImageLoading.Reset();
   }
 
-  mQueueLoadFlag = true;
+  mLoadingQueueTextureId = textureId;
 
   // Reverse observer list that we can pop_back the observer.
   std::reverse(info->observerList.Begin(), info->observerList.End());
@@ -1227,7 +1279,7 @@ void TextureManager::NotifyObservers(TextureManager::TextureInfo& textureInfo, c
     info = &mTextureCacheManager[textureInfoIndex];
   }
 
-  mQueueLoadFlag = false;
+  mLoadingQueueTextureId = INVALID_TEXTURE_ID;
   ProcessLoadQueue();
   ProcessRemoveQueue();
 
@@ -1347,6 +1399,22 @@ TextureSet TextureManager::GetTextureSet(const TextureManager::TextureInfo& text
     }
   }
   return textureSet;
+}
+
+void TextureManager::RemoveTextureObserver(TextureManager::TextureInfo& textureInfo, TextureUploadObserver* observer)
+{
+  // Remove its observer
+  if(observer)
+  {
+    const auto   iterEnd = textureInfo.observerList.End();
+    const auto   iter    = std::find(textureInfo.observerList.Begin(), iterEnd, observer);
+    if(iter != iterEnd)
+    {
+      // Disconnect and remove the observer.
+      observer->DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);
+      textureInfo.observerList.Erase(iter);
+    }
+  }
 }
 
 } // namespace Internal

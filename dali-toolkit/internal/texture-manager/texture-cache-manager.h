@@ -270,9 +270,9 @@ public:
    * Textures are cached and therefore only the removal of the last
    * occurrence of a Texture will cause its removal internally.
    *
-   * @param[in] textureId The Id of the Texture to remove at Cache.
+   * @param[in] textureInfo TextureInfo that want to cache in container.
    */
-  void RemoveCache(const TextureCacheManager::TextureId& textureId);
+  void RemoveCache(TextureCacheManager::TextureInfo& textureInfo);
 
 public:
   /**

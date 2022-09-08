@@ -287,7 +287,6 @@ void RollingAnimatedImageCache::PopFrontCache()
 
   if(mMaskingData && mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
   {
-    mTextureManager.Remove(mMaskingData->mAlphaMaskId, this);
     if(mQueue.IsEmpty())
     {
       mMaskingData->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
