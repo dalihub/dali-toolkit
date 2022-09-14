@@ -102,9 +102,9 @@ void SceneView::SelectCamera(const std::string& name)
   GetImpl(*this).SelectCamera(name);
 }
 
-void SceneView::SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor)
+void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
-  GetImpl(*this).SetImageBasedLightSource(diffuse, specular, scaleFactor);
+  GetImpl(*this).SetImageBasedLightSource(diffuseUrl, specularUrl, scaleFactor);
 }
 
 void SceneView::SetImageBasedLightScaleFactor(float scaleFactor)

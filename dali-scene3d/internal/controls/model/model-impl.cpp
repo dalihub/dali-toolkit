@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "model-view-impl.h"
+#include <dali-scene3d/internal/controls/model/model-impl.h>
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/dali-toolkit.h>
@@ -28,8 +28,8 @@
 #include <filesystem>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
-#include <dali-scene3d/public-api/controls/model-view/model-view.h>
 #include <dali-scene3d/public-api/loader/animation-definition.h>
 #include <dali-scene3d/public-api/loader/camera-parameters.h>
 #include <dali-scene3d/public-api/loader/cube-map-loader.h>
@@ -53,11 +53,11 @@ namespace
 {
 BaseHandle Create()
 {
-  return Scene3D::ModelView::New(std::string());
+  return Scene3D::Model::New(std::string());
 }
 
 // Setup properties, signals and actions using the type-registry.
-DALI_TYPE_REGISTRATION_BEGIN(Scene3D::ModelView, Toolkit::Control, Create);
+DALI_TYPE_REGISTRATION_BEGIN(Scene3D::Model, Toolkit::Control, Create);
 DALI_TYPE_REGISTRATION_END()
 
 static constexpr uint32_t OFFSET_FOR_DIFFUSE_CUBE_TEXTURE  = 2u;
@@ -171,30 +171,28 @@ void AddModelTreeToAABB(BoundingVolume& AABB, const Dali::Scene3D::Loader::Scene
 
 } // anonymous namespace
 
-ModelView::ModelView(const std::string& modelPath, const std::string& resourcePath)
+Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUrl)
 : Control(ControlBehaviour(DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
-  mModelPath(modelPath),
-  mResourcePath(resourcePath),
+  mModelUrl(modelUrl),
+  mResourceDirectoryUrl(resourceDirectoryUrl),
   mModelRoot(),
   mNaturalSize(Vector3::ZERO),
   mModelPivot(AnchorPoint::CENTER),
   mIblScaleFactor(1.0f),
-  mFitSize(true),
-  mFitCenter(true),
   mModelResourceReady(false),
   mIBLResourceReady(true)
 {
 }
 
-ModelView::~ModelView()
+Model::~Model()
 {
 }
 
-Dali::Scene3D::ModelView ModelView::New(const std::string& modelPath, const std::string& resourcePath)
+Dali::Scene3D::Model Model::New(const std::string& modelUrl, const std::string& resourceDirectoryUrl)
 {
-  ModelView* impl = new ModelView(modelPath, resourcePath);
+  Model* impl = new Model(modelUrl, resourceDirectoryUrl);
 
-  Dali::Scene3D::ModelView handle = Dali::Scene3D::ModelView(*impl);
+  Dali::Scene3D::Model handle = Dali::Scene3D::Model(*impl);
 
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
@@ -203,28 +201,16 @@ Dali::Scene3D::ModelView ModelView::New(const std::string& modelPath, const std:
   return handle;
 }
 
-const Actor ModelView::GetModelRoot() const
+const Actor Model::GetModelRoot() const
 {
   return mModelRoot;
 }
 
-void ModelView::FitSize(bool fit)
-{
-  mFitSize = fit;
-  ScaleModel();
-}
-
-void ModelView::FitCenter(bool fit)
-{
-  mFitCenter = fit;
-  FitModelPosition();
-}
-
-void ModelView::SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor)
+void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
   mIBLResourceReady = false;
-  Texture diffuseTexture  = Dali::Scene3D::Loader::LoadCubeMap(diffuse);
-  Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(specular);
+  Texture diffuseTexture  = Dali::Scene3D::Loader::LoadCubeMap(diffuseUrl);
+  Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(specularUrl);
   SetImageBasedLightTexture(diffuseTexture, specularTexture, scaleFactor);
   mIBLResourceReady = true;
 
@@ -236,14 +222,14 @@ void ModelView::SetImageBasedLightSource(const std::string& diffuse, const std::
   }
 }
 
-void ModelView::SetImageBasedLightTexture(Dali::Texture diffuse, Dali::Texture specular, float scaleFactor)
+void Model::SetImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor)
 {
-  if(diffuse && specular)
+  if(diffuseTexture && specularTexture)
   {
-    if(mDiffuseTexture != diffuse || mSpecularTexture != specular)
+    if(mDiffuseTexture != diffuseTexture || mSpecularTexture != specularTexture)
     {
-      mDiffuseTexture  = diffuse;
-      mSpecularTexture = specular;
+      mDiffuseTexture  = diffuseTexture;
+      mSpecularTexture = specularTexture;
       UpdateImageBasedLightTexture();
     }
     if(mIblScaleFactor != scaleFactor)
@@ -255,7 +241,7 @@ void ModelView::SetImageBasedLightTexture(Dali::Texture diffuse, Dali::Texture s
   }
 }
 
-void ModelView::SetImageBasedLightScaleFactor(float scaleFactor)
+void Model::SetImageBasedLightScaleFactor(float scaleFactor)
 {
   mIblScaleFactor = scaleFactor;
   if(mDiffuseTexture && mSpecularTexture)
@@ -264,17 +250,17 @@ void ModelView::SetImageBasedLightScaleFactor(float scaleFactor)
   }
 }
 
-float ModelView::GetImageBasedLightScaleFactor() const
+float Model::GetImageBasedLightScaleFactor() const
 {
   return mIblScaleFactor;
 }
 
-uint32_t ModelView::GetAnimationCount() const
+uint32_t Model::GetAnimationCount() const
 {
   return mAnimations.size();
 }
 
-Dali::Animation ModelView::GetAnimation(uint32_t index) const
+Dali::Animation Model::GetAnimation(uint32_t index) const
 {
   Dali::Animation animation;
   if(mAnimations.size() > index)
@@ -284,7 +270,7 @@ Dali::Animation ModelView::GetAnimation(uint32_t index) const
   return animation;
 }
 
-Dali::Animation ModelView::GetAnimation(const std::string& name) const
+Dali::Animation Model::GetAnimation(const std::string& name) const
 {
   Dali::Animation animation;
   if(!name.empty())
@@ -306,7 +292,7 @@ Dali::Animation ModelView::GetAnimation(const std::string& name) const
 // Private methods
 //
 
-void ModelView::OnSceneConnection(int depth)
+void Model::OnSceneConnection(int depth)
 {
   if(!mModelRoot)
   {
@@ -319,7 +305,7 @@ void ModelView::OnSceneConnection(int depth)
     Scene3D::SceneView sceneView = Scene3D::SceneView::DownCast(parent);
     if(sceneView)
     {
-      GetImpl(sceneView).RegisterModelView(Scene3D::ModelView::DownCast(Self()));
+      GetImpl(sceneView).RegisterModel(Scene3D::Model::DownCast(Self()));
       mParentSceneView = sceneView;
       break;
     }
@@ -329,18 +315,18 @@ void ModelView::OnSceneConnection(int depth)
   Control::OnSceneConnection(depth);
 }
 
-void ModelView::OnSceneDisconnection()
+void Model::OnSceneDisconnection()
 {
   Scene3D::SceneView sceneView = mParentSceneView.GetHandle();
   if(sceneView)
   {
-    GetImpl(sceneView).UnregisterModelView(Scene3D::ModelView::DownCast(Self()));
+    GetImpl(sceneView).UnregisterModel(Scene3D::Model::DownCast(Self()));
     mParentSceneView.Reset();
   }
   Control::OnSceneDisconnection();
 }
 
-Vector3 ModelView::GetNaturalSize()
+Vector3 Model::GetNaturalSize()
 {
   if(!mModelRoot)
   {
@@ -350,43 +336,43 @@ Vector3 ModelView::GetNaturalSize()
   return mNaturalSize;
 }
 
-float ModelView::GetHeightForWidth(float width)
+float Model::GetHeightForWidth(float width)
 {
   Extents padding;
   padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
   return Control::GetHeightForWidth(width) + padding.top + padding.bottom;
 }
 
-float ModelView::GetWidthForHeight(float height)
+float Model::GetWidthForHeight(float height)
 {
   Extents padding;
   padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
   return Control::GetWidthForHeight(height) + padding.start + padding.end;
 }
 
-void ModelView::OnRelayout(const Vector2& size, RelayoutContainer& container)
+void Model::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   Control::OnRelayout(size, container);
   ScaleModel();
 }
 
-bool ModelView::IsResourceReady() const
+bool Model::IsResourceReady() const
 {
   return mModelResourceReady && mIBLResourceReady;
 }
 
-void ModelView::LoadModel()
+void Model::LoadModel()
 {
-  std::filesystem::path modelPath(mModelPath);
-  if(mResourcePath.empty())
+  std::filesystem::path modelUrl(mModelUrl);
+  if(mResourceDirectoryUrl.empty())
   {
-    mResourcePath = std::string(modelPath.parent_path()) + "/";
+    mResourceDirectoryUrl = std::string(modelUrl.parent_path()) + "/";
   }
-  std::string extension = modelPath.extension();
+  std::string extension = modelUrl.extension();
   std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
   Dali::Scene3D::Loader::ResourceBundle::PathProvider pathProvider = [&](Dali::Scene3D::Loader::ResourceType::Value type) {
-    return mResourcePath;
+    return mResourceDirectoryUrl;
   };
 
   Dali::Scene3D::Loader::ResourceBundle                        resources;
@@ -411,16 +397,16 @@ void ModelView::LoadModel()
       nullptr,
       {}};
     Dali::Scene3D::Loader::DliLoader::LoadParams loadParams{input, output};
-    if(!loader.LoadScene(mModelPath, loadParams))
+    if(!loader.LoadScene(mModelUrl, loadParams))
     {
-      Dali::Scene3D::Loader::ExceptionFlinger(ASSERT_LOCATION) << "Failed to load scene from '" << mModelPath << "': " << loader.GetParseError();
+      Dali::Scene3D::Loader::ExceptionFlinger(ASSERT_LOCATION) << "Failed to load scene from '" << mModelUrl << "': " << loader.GetParseError();
     }
   }
   else if(extension == GLTF_EXTENSION)
   {
     Dali::Scene3D::Loader::ShaderDefinitionFactory sdf;
     sdf.SetResources(resources);
-    Dali::Scene3D::Loader::LoadGltfScene(mModelPath, sdf, output);
+    Dali::Scene3D::Loader::LoadGltfScene(mModelUrl, sdf, output);
 
     resources.mEnvironmentMaps.push_back({});
   }
@@ -507,48 +493,35 @@ void ModelView::LoadModel()
   Control::SetResourceReady(false);
 }
 
-void ModelView::ScaleModel()
+void Model::ScaleModel()
 {
   if(mModelRoot)
   {
-    Vector3 size = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-    if(mFitSize && size.x > 0.0f && size.y > 0.0f)
+    float   scale = 1.0f;
+    Vector3 size  = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+    if(size.x > 0.0f && size.y > 0.0f)
     {
-      float scaleFactor = MAXFLOAT;
-      scaleFactor       = std::min(size.x / mNaturalSize.x, scaleFactor);
-      scaleFactor       = std::min(size.y / mNaturalSize.y, scaleFactor);
-      // Models in glTF and dli are defined as right hand coordinate system.
-      // DALi uses left hand coordinate system. Scaling negative is for change winding order.
-      mModelRoot.SetProperty(Dali::Actor::Property::SCALE, Y_DIRECTION * scaleFactor);
+      scale = MAXFLOAT;
+      scale = std::min(size.x / mNaturalSize.x, scale);
+      scale = std::min(size.y / mNaturalSize.y, scale);
     }
-    else
-    {
-      // Models in glTF and dli are defined as right hand coordinate system.
-      // DALi uses left hand coordinate system. Scaling negative is for change winding order.
-      mModelRoot.SetProperty(Dali::Actor::Property::SCALE, Y_DIRECTION);
-    }
+    // Models in glTF and dli are defined as right hand coordinate system.
+    // DALi uses left hand coordinate system. Scaling negative is for change winding order.
+    mModelRoot.SetProperty(Dali::Actor::Property::SCALE, Y_DIRECTION * scale);
   }
 }
 
-void ModelView::FitModelPosition()
+void Model::FitModelPosition()
 {
   if(mModelRoot)
   {
-    if(mFitCenter)
-    {
-      // Loaded model pivot is not the model center.
-      mModelRoot.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-      mModelRoot.SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3::ONE - mModelPivot);
-    }
-    else
-    {
-      mModelRoot.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-      mModelRoot.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-    }
+    // Loaded model pivot is not the model center.
+    mModelRoot.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    mModelRoot.SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3::ONE - mModelPivot);
   }
 }
 
-void ModelView::CollectRenderableActor(Actor actor)
+void Model::CollectRenderableActor(Actor actor)
 {
   uint32_t rendererCount = actor.GetRendererCount();
   if(rendererCount)
@@ -563,7 +536,7 @@ void ModelView::CollectRenderableActor(Actor actor)
   }
 }
 
-void ModelView::UpdateImageBasedLightTexture()
+void Model::UpdateImageBasedLightTexture()
 {
   if(!mDiffuseTexture || !mSpecularTexture)
   {
@@ -598,7 +571,7 @@ void ModelView::UpdateImageBasedLightTexture()
   }
 }
 
-void ModelView::UpdateImageBasedLightScaleFactor()
+void Model::UpdateImageBasedLightScaleFactor()
 {
   if(!mDiffuseTexture || !mSpecularTexture)
   {

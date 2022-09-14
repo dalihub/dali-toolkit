@@ -1,5 +1,5 @@
-#ifndef DALI_SCENE3D_INTERNAL_MODEL_VIEW_H
-#define DALI_SCENE3D_INTERNAL_MODEL_VIEW_H
+#ifndef DALI_SCENE3D_INTERNAL_MODEL_H
+#define DALI_SCENE3D_INTERNAL_MODEL_H
 
 /*
  * Copyright (c) 2022 Samsung Electronics Co., Ltd.
@@ -26,92 +26,82 @@
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/controls/model-view/model-view.h>
+#include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
 namespace Dali
 {
 namespace Scene3D
 {
-class ModelView;
+class Model;
 
 namespace Internal
 {
 /**
- * @brief Impl class for ModelView.
+ * @brief Impl class for Model.
  */
-class ModelView : public Dali::Toolkit::Internal::Control
+class Model : public Dali::Toolkit::Internal::Control
 {
 public:
   using AnimationData = std::pair<std::string, Dali::Animation>;
 
   /**
-   * @brief Creates a new ModelView.
+   * @brief Creates a new Model.
    *
-   * @return A public handle to the newly allocated ModelView.
+   * @return A public handle to the newly allocated Model.
    */
-  static Dali::Scene3D::ModelView New(const std::string& modelPath, const std::string& resourcePath);
+  static Dali::Scene3D::Model New(const std::string& modelUrl, const std::string& resourceDirectoryUrl);
 
   /**
-   * @copydoc ModelView::GetModelRoot()
+   * @copydoc Model::GetModelRoot()
    */
   const Actor GetModelRoot() const;
 
   /**
-   * @copydoc ModelView::FitModel()
+   * @copydoc Model::SetImageBasedLightSource()
    */
-  void FitSize(bool fit);
+  void SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor);
 
   /**
-   * @copydoc ModelView::FitCenter()
+   * @copydoc Model::SetImageBasedLightTexture()
    */
-  void FitCenter(bool fit);
+  void SetImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor);
 
   /**
-   * @copydoc ModelView::SetImageBasedLightSource()
-   */
-  void SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor);
-
-  /**
-   * @copydoc ModelView::SetImageBasedLightTexture()
-   */
-  void SetImageBasedLightTexture(Dali::Texture diffuse, Dali::Texture specular, float scaleFactor);
-
-  /**
-   * @copydoc ModelView::SetImageBasedLightScaleFactor()
+   * @copydoc Model::SetImageBasedLightScaleFactor()
    */
   void SetImageBasedLightScaleFactor(float scaleFactor);
 
   /**
-   * @copydoc ModelView::GetImageBasedLightScaleFactor()
+   * @copydoc Model::GetImageBasedLightScaleFactor()
    */
   float GetImageBasedLightScaleFactor() const;
 
   /**
-   * @copydoc ModelView::GetAnimationCount()
+   * @copydoc Model::GetAnimationCount()
    */
   uint32_t GetAnimationCount() const;
 
   /**
-   * @copydoc ModelView::GetAnimation()
+   * @copydoc Model::GetAnimation()
    */
   Dali::Animation GetAnimation(uint32_t index) const;
 
   /**
-   * @copydoc ModelView::GetAnimation()
+   * @copydoc Model::GetAnimation()
    */
   Dali::Animation GetAnimation(const std::string& name) const;
 
 protected:
   /**
-   * @brief Constructs a new ModelView.
+   * @brief Constructs a new Model.
    */
-  ModelView(const std::string& modelPath, const std::string& resourcePath);
+  Model(const std::string& modelUrl, const std::string& resourceDirectoryUrl);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~ModelView();
+  virtual ~Model();
 
 private:
   /**
@@ -180,8 +170,8 @@ private:
   void UpdateImageBasedLightScaleFactor();
 
 private:
-  std::string                    mModelPath;
-  std::string                    mResourcePath;
+  std::string                    mModelUrl;
+  std::string                    mResourceDirectoryUrl;
   Dali::Actor                    mModelRoot;
   std::vector<AnimationData>     mAnimations;
   std::vector<WeakHandle<Actor>> mRenderableActors;
@@ -192,8 +182,6 @@ private:
   Vector3       mNaturalSize;
   Vector3       mModelPivot;
   float         mIblScaleFactor;
-  bool          mFitSize;
-  bool          mFitCenter;
   bool          mModelResourceReady;
   bool          mIBLResourceReady;
 };
@@ -201,22 +189,22 @@ private:
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Dali::Scene3D::Internal::ModelView& GetImpl(Dali::Scene3D::ModelView& obj)
+inline Dali::Scene3D::Internal::Model& GetImpl(Dali::Scene3D::Model& obj)
 {
   DALI_ASSERT_ALWAYS(obj);
   Dali::RefObject& handle = obj.GetImplementation();
-  return static_cast<Dali::Scene3D::Internal::ModelView&>(handle);
+  return static_cast<Dali::Scene3D::Internal::Model&>(handle);
 }
 
-inline const Dali::Scene3D::Internal::ModelView& GetImpl(const Dali::Scene3D::ModelView& obj)
+inline const Dali::Scene3D::Internal::Model& GetImpl(const Dali::Scene3D::Model& obj)
 {
   DALI_ASSERT_ALWAYS(obj);
   const Dali::RefObject& handle = obj.GetImplementation();
-  return static_cast<const Dali::Scene3D::Internal::ModelView&>(handle);
+  return static_cast<const Dali::Scene3D::Internal::Model&>(handle);
 }
 
 } // namespace Scene3D
 
 } // namespace Dali
 
-#endif // DALI_SCENE3D_INTERNAL_MODEL_VIEW_H
+#endif // DALI_SCENE3D_INTERNAL_MODEL_H

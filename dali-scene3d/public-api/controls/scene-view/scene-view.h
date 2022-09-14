@@ -91,7 +91,7 @@ class SceneView;
  * sceneView.SetProperty(Dali::Actor::Property::SIZE, Vector2(400, 400));
  * mWindow.Add(sceneView);
  *
- * Dali::Scene3D::ModelView model = Dali::Scene3D::ModelView::New(...);
+ * Dali::Scene3D::Model model = Dali::Scene3D::Model::New(...);
  * sceneView.Add(model);
  *
  * CameraActor cameraActor = CameraActor::New();
@@ -243,11 +243,11 @@ public:
    * If SceneView has IBL, IBL of newly added Model is also overridden.
    * To set indivisual IBL for each Model, the Model's IBL should be set after the SceneView's IBL.
    *
-   * @param[in] diffuse cube map that can be used as a diffuse IBL source.
-   * @param[in] specular cube map that can be used as a specular IBL source.
+   * @param[in] diffuseUrl cube map that can be used as a diffuse IBL source.
+   * @param[in] specularUrl cube map that can be used as a specular IBL source.
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f]. Default value is 1.0f.
    */
-  void SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor = 1.0f);
+  void SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor = 1.0f);
 
   /**
    * @brief Sets Scale Factor of Image Based Light Source.

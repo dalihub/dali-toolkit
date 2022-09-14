@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include <dali-scene3d/public-api/controls/model-view/model-view.h>
+#include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
 using namespace Dali;
@@ -73,11 +73,11 @@ const char* TEST_GLTF_FILE_NAME = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
 const char* TEST_DIFFUSE_TEXTURE  = TEST_RESOURCE_DIR "/forest_irradiance.ktx";
 const char* TEST_SPECULAR_TEXTURE = TEST_RESOURCE_DIR "/forest_radiance.ktx";
 
-Dali::Texture GetDiffuseTexture(Dali::Scene3D::ModelView modelView)
+Dali::Texture GetDiffuseTexture(Dali::Scene3D::Model model)
 {
   Dali::Texture texture;
 
-  Actor meshActor = modelView.FindChildByName("AnimatedCube");
+  Actor meshActor = model.FindChildByName("AnimatedCube");
   if(meshActor)
   {
     Renderer renderer = meshActor.GetRendererAt(0u);
@@ -94,11 +94,11 @@ Dali::Texture GetDiffuseTexture(Dali::Scene3D::ModelView modelView)
   return texture;
 }
 
-Dali::Texture GetSpecularTexture(Dali::Scene3D::ModelView modelView)
+Dali::Texture GetSpecularTexture(Dali::Scene3D::Model model)
 {
   Dali::Texture texture;
 
-  Actor meshActor = modelView.FindChildByName("AnimatedCube");
+  Actor meshActor = model.FindChildByName("AnimatedCube");
   if(meshActor)
   {
     Renderer renderer = meshActor.GetRendererAt(0u);
@@ -126,7 +126,7 @@ int UtcDaliSceneViewUninitialized(void)
 
   try
   {
-    // New() must be called to create a ModelView or it wont be valid.
+    // New() must be called to create a Model or it wont be valid.
     Actor a = Actor::New();
     view.Add(a);
     DALI_TEST_CHECK(false);
@@ -181,8 +181,8 @@ int UtcDaliSceneViewTypeRegistry(void)
   BaseHandle handle = typeInfo.CreateInstance();
   DALI_TEST_CHECK(handle);
 
-  Scene3D::SceneView modelView = Scene3D::SceneView::DownCast(handle);
-  DALI_TEST_CHECK(modelView);
+  Scene3D::SceneView model = Scene3D::SceneView::DownCast(handle);
+  DALI_TEST_CHECK(model);
 
   END_TEST;
 }
@@ -425,9 +425,9 @@ int UtcDaliSceneViewImageBasedLight(void)
   application.SendNotification();
   application.Render();
 
-  Scene3D::ModelView modelView1 = Scene3D::ModelView::New(TEST_GLTF_FILE_NAME);
-  Scene3D::ModelView modelView2 = Scene3D::ModelView::New(TEST_GLTF_FILE_NAME);
-  Scene3D::ModelView modelView3 = Scene3D::ModelView::New(TEST_GLTF_FILE_NAME);
+  Scene3D::Model modelView1 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  Scene3D::Model modelView2 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  Scene3D::Model modelView3 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
   view.Add(modelView1);
   view.Add(modelView2);
 
@@ -473,7 +473,7 @@ int UtcDaliSceneViewImageBasedFactor(void)
   application.SendNotification();
   application.Render();
 
-  Scene3D::ModelView modelView1 = Scene3D::ModelView::New(TEST_GLTF_FILE_NAME);
+  Scene3D::Model modelView1 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
   view.Add(modelView1);
 
   DALI_TEST_EQUALS(view.GetImageBasedLightScaleFactor(), 1.0f, TEST_LOCATION);

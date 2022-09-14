@@ -31,7 +31,7 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/controls/model-view/model-view-impl.h>
+#include <dali-scene3d/internal/controls/model/model-impl.h>
 #include <dali-scene3d/public-api/loader/cube-map-loader.h>
 
 #include <dali/integration-api/debug.h>
@@ -162,22 +162,22 @@ void SceneView::SelectCamera(const std::string& name)
   UpdateCamera(GetCamera(name));
 }
 
-void SceneView::RegisterModelView(Scene3D::ModelView modelView)
+void SceneView::RegisterModel(Scene3D::Model model)
 {
-  if(modelView)
+  if(model)
   {
-    modelView.SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
-    mModels.push_back(modelView);
+    model.SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
+    mModels.push_back(model);
   }
 }
 
-void SceneView::UnregisterModelView(Scene3D::ModelView modelView)
+void SceneView::UnregisterModel(Scene3D::Model model)
 {
-  if(modelView)
+  if(model)
   {
     for(uint32_t i = 0; i < mModels.size(); ++i)
     {
-      if(mModels[i] == modelView)
+      if(mModels[i] == model)
       {
         mModels.erase(mModels.begin() + i);
         break;
@@ -186,13 +186,13 @@ void SceneView::UnregisterModelView(Scene3D::ModelView modelView)
   }
 }
 
-void SceneView::SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor)
+void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
   mIBLResourceReady = false;
-  Texture diffuseTexture = Dali::Scene3D::Loader::LoadCubeMap(diffuse);
+  Texture diffuseTexture = Dali::Scene3D::Loader::LoadCubeMap(diffuseUrl);
   if(diffuseTexture)
   {
-    Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(specular);
+    Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(specularUrl);
     if(specularTexture)
     {
       mDiffuseTexture  = diffuseTexture;
