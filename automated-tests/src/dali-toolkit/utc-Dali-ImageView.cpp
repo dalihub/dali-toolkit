@@ -82,8 +82,6 @@ const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
 
-const char* TEST_WEBP_FILE_NAME                  = TEST_RESOURCE_DIR "/dali-logo.webp";
-
 void TestUrl(ImageView imageView, const std::string url)
 {
   Property::Value value = imageView.GetProperty(imageView.GetPropertyIndex("image"));
@@ -3887,26 +3885,5 @@ int UtcDaliImageViewSetImageOnResourceReadySignal05(void)
   gImageView1.Unparent();
   gImageView1.Reset();
 
-  END_TEST;
-}
-
-int UtcDaliImageViewUseSameUrlWithAnimatedImageVisual(void)
-{
-  tet_infoline("Test multiple views with same image in animated image visual");
-  ToolkitTestApplication application;
-
-  gImageView1 = ImageView::New(TEST_WEBP_FILE_NAME);
-  application.GetScene().Add(gImageView1);
-
-  tet_infoline("Remove imageView and Create new imageView with same url");
-  application.GetScene().Remove(gImageView1);
-  gImageView2 = ImageView::New(TEST_WEBP_FILE_NAME);
-  application.GetScene().Add(gImageView2);
-
-  application.SendNotification();
-  application.Render();
-
-  tet_infoline("Check the ImageView load image successfully");
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
   END_TEST;
 }
