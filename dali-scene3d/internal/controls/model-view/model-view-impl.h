@@ -55,7 +55,7 @@ public:
   /**
    * @copydoc ModelView::GetModelRoot()
    */
-  const Actor GetModelRoot();
+  const Actor GetModelRoot() const;
 
   /**
    * @copydoc ModelView::FitModel()
@@ -78,19 +78,29 @@ public:
   void SetImageBasedLightTexture(Dali::Texture diffuse, Dali::Texture specular, float scaleFactor);
 
   /**
+   * @copydoc ModelView::SetImageBasedLightScaleFactor()
+   */
+  void SetImageBasedLightScaleFactor(float scaleFactor);
+
+  /**
+   * @copydoc ModelView::GetImageBasedLightScaleFactor()
+   */
+  float GetImageBasedLightScaleFactor() const;
+
+  /**
    * @copydoc ModelView::GetAnimationCount()
    */
-  uint32_t GetAnimationCount();
+  uint32_t GetAnimationCount() const;
 
   /**
    * @copydoc ModelView::GetAnimation()
    */
-  Dali::Animation GetAnimation(uint32_t index);
+  Dali::Animation GetAnimation(uint32_t index) const;
 
   /**
    * @copydoc ModelView::GetAnimation()
    */
-  Dali::Animation GetAnimation(const std::string& name);
+  Dali::Animation GetAnimation(const std::string& name) const;
 
 protected:
   /**
@@ -160,9 +170,14 @@ private:
   void CollectRenderableActor(Actor actor);
 
   /**
-   * @brief Changes IBL information of the input node.
+   * @brief Changes IBL textures of the input node.
    */
-  void UpdateImageBasedLight();
+  void UpdateImageBasedLightTexture();
+
+  /**
+   * @brief Changes IBL scale factor of the input node.
+   */
+  void UpdateImageBasedLightScaleFactor();
 
 private:
   std::string                    mModelPath;

@@ -72,22 +72,22 @@ void SceneView::RemoveCamera(CameraActor camera)
   GetImpl(*this).RemoveCamera(camera);
 }
 
-uint32_t SceneView::GetCameraCount()
+uint32_t SceneView::GetCameraCount() const
 {
   return GetImpl(*this).GetCameraCount();
 }
 
-CameraActor SceneView::GetSelectedCamera()
+CameraActor SceneView::GetSelectedCamera() const
 {
   return GetImpl(*this).GetSelectedCamera();
 }
 
-CameraActor SceneView::GetCamera(uint32_t index)
+CameraActor SceneView::GetCamera(uint32_t index) const
 {
   return GetImpl(*this).GetCamera(index);
 }
 
-CameraActor SceneView::GetCamera(const std::string& name)
+CameraActor SceneView::GetCamera(const std::string& name) const
 {
   return GetImpl(*this).GetCamera(name);
 }
@@ -107,12 +107,22 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuse, const std::
   GetImpl(*this).SetImageBasedLightSource(diffuse, specular, scaleFactor);
 }
 
+void SceneView::SetImageBasedLightScaleFactor(float scaleFactor)
+{
+  GetImpl(*this).SetImageBasedLightScaleFactor(scaleFactor);
+}
+
+float SceneView::GetImageBasedLightScaleFactor() const
+{
+  return GetImpl(*this).GetImageBasedLightScaleFactor();
+}
+
 void SceneView::UseFramebuffer(bool useFramebuffer)
 {
   GetImpl(*this).UseFramebuffer(useFramebuffer);
 }
 
-bool SceneView::IsUsingFramebuffer()
+bool SceneView::IsUsingFramebuffer() const
 {
   return GetImpl(*this).IsUsingFramebuffer();
 }

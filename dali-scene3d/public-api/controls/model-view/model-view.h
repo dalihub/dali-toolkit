@@ -137,7 +137,7 @@ public:
    * @brief Retrieves model root Actor.
    * @return Root Actor of the model.
    */
-  const Actor GetModelRoot();
+  const Actor GetModelRoot() const;
 
   /**
    * @brief Fits the model to the Control size.
@@ -165,7 +165,7 @@ public:
   void SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor = 1.0f);
 
   /**
-   * @brief Set Image Based Light Texture.
+   * @brief Sets Image Based Light Texture.
    *
    * @param[in] diffuse cube map texture that can be used as a diffuse IBL source.
    * @param[in] specular cube map texture that can be used as a specular IBL source.
@@ -176,11 +176,28 @@ public:
   void SetImageBasedLightTexture(Texture diffuse, Texture specular, float scaleFactor = 1.0f);
 
   /**
+   * @brief Sets Scale Factor of Image Based Light Source.
+   *
+   * @note If SetImageBasedLightSource() or SetImageBasedLightTexture() method is called after this method, scaleFactor is overrided.
+   *
+   * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f].
+   */
+  void SetImageBasedLightScaleFactor(float scaleFactor);
+
+  /**
+   * @brief Gets Scale Factor of Image Based Light Source.
+   * Default value is 1.0f.
+   *
+   * @return scale factor that controls light source intensity.
+   */
+  float GetImageBasedLightScaleFactor() const;
+
+  /**
    * @brief Gets number of animations those loaded from model file.
    * @return The number of loaded animations.
    * @note This method should be called after Model load finished.
    */
-  uint32_t GetAnimationCount();
+  uint32_t GetAnimationCount() const;
 
   /**
    * @brief Gets animation at the index.
@@ -188,7 +205,7 @@ public:
    * @return Animation at the index.
    * @note This method should be called after Model load finished.
    */
-  Dali::Animation GetAnimation(uint32_t index);
+  Dali::Animation GetAnimation(uint32_t index) const;
 
   /**
    * @brief Retrieves animation with the given name.
@@ -196,7 +213,7 @@ public:
    * @return Animation that has the given name.
    * @note This method should be called after Model load finished.
    */
-  Dali::Animation GetAnimation(const std::string& name);
+  Dali::Animation GetAnimation(const std::string& name) const;
 
 public: // Not intended for application developers
   /// @cond internal

@@ -118,17 +118,17 @@ void SceneView::RemoveCamera(CameraActor camera)
   }
 }
 
-uint32_t SceneView::GetCameraCount()
+uint32_t SceneView::GetCameraCount() const
 {
   return mCameras.size();
 }
 
-CameraActor SceneView::GetSelectedCamera()
+CameraActor SceneView::GetSelectedCamera() const
 {
   return mSelectedCamera;
 }
 
-CameraActor SceneView::GetCamera(uint32_t index)
+CameraActor SceneView::GetCamera(uint32_t index) const
 {
   if(index < mCameras.size())
   {
@@ -138,7 +138,7 @@ CameraActor SceneView::GetCamera(uint32_t index)
   return CameraActor();
 }
 
-CameraActor SceneView::GetCamera(const std::string& name)
+CameraActor SceneView::GetCamera(const std::string& name) const
 {
   CameraActor returnCamera;
   for(auto&& camera : mCameras)
@@ -212,6 +212,23 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuse, const std::
   Control::SetResourceReady(false);
 }
 
+void SceneView::SetImageBasedLightScaleFactor(float scaleFactor)
+{
+  mIblScaleFactor = scaleFactor;
+  for(auto&& model : mModels)
+  {
+    if(model)
+    {
+      model.SetImageBasedLightScaleFactor(scaleFactor);
+    }
+  }
+}
+
+float SceneView::GetImageBasedLightScaleFactor() const
+{
+  return mIblScaleFactor;
+}
+
 void SceneView::UseFramebuffer(bool useFramebuffer)
 {
   if(mUseFrameBuffer != useFramebuffer)
@@ -221,7 +238,7 @@ void SceneView::UseFramebuffer(bool useFramebuffer)
   }
 }
 
-bool SceneView::IsUsingFramebuffer()
+bool SceneView::IsUsingFramebuffer() const
 {
   return mUseFrameBuffer;
 }

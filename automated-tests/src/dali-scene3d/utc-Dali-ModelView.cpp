@@ -405,6 +405,19 @@ int UtcDaliModelViewSetImageBasedLightSource03(void)
   END_TEST;
 }
 
+int UtcDaliModelViewImageBasedFactor(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::ModelView modelView = Scene3D::ModelView::New(TEST_GLTF_FILE_NAME);
+
+  DALI_TEST_EQUALS(modelView.GetImageBasedLightScaleFactor(), 1.0f, TEST_LOCATION);
+
+  modelView.SetImageBasedLightScaleFactor(0.5f);
+  DALI_TEST_EQUALS(modelView.GetImageBasedLightScaleFactor(), 0.5f, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliModelViewFitSize01(void)
 {
   ToolkitTestApplication application;

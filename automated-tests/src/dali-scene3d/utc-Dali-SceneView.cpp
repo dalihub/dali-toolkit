@@ -461,6 +461,30 @@ int UtcDaliSceneViewImageBasedLight(void)
   END_TEST;
 }
 
+int UtcDaliSceneViewImageBasedFactor(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Scene3D::ModelView modelView1 = Scene3D::ModelView::New(TEST_GLTF_FILE_NAME);
+  view.Add(modelView1);
+
+  DALI_TEST_EQUALS(view.GetImageBasedLightScaleFactor(), 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(modelView1.GetImageBasedLightScaleFactor(), 1.0f, TEST_LOCATION);
+
+  view.SetImageBasedLightScaleFactor(0.5f);
+  DALI_TEST_EQUALS(view.GetImageBasedLightScaleFactor(), 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(modelView1.GetImageBasedLightScaleFactor(), 0.5f, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliSceneViewUseFramebuffer01(void)
 {
   ToolkitTestApplication application;

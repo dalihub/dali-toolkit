@@ -67,22 +67,22 @@ public:
   /**
    * @copydoc SceneView::GetCameraCount()
    */
-  uint32_t GetCameraCount();
+  uint32_t GetCameraCount() const;
 
   /**
    * @copydoc SceneView::GetSelectedCamera()
    */
-  CameraActor GetSelectedCamera();
+  CameraActor GetSelectedCamera() const;
 
   /**
    * @copydoc SceneView::GetCamera()
    */
-  CameraActor GetCamera(uint32_t index);
+  CameraActor GetCamera(uint32_t index) const;
 
   /**
    * @copydoc SceneView::GetCamera()
    */
-  CameraActor GetCamera(const std::string& name);
+  CameraActor GetCamera(const std::string& name) const;
 
   /**
    * @copydoc SceneView::SelectCamera()
@@ -116,6 +116,16 @@ public:
   void SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor);
 
   /**
+   * @copydoc SceneView::SetImageBasedLightScaleFactor()
+   */
+  void SetImageBasedLightScaleFactor(float scaleFactor);
+
+  /**
+   * @copydoc SceneView::GetImageBasedLightScaleFactor()
+   */
+  float GetImageBasedLightScaleFactor() const;
+
+  /**
    * @copydoc SceneView::UseFramebuffer()
    */
   void UseFramebuffer(bool useFramebuffer);
@@ -123,7 +133,7 @@ public:
   /**
    * @copydoc SceneView::IsUsingFramebuffer()
    */
-  bool IsUsingFramebuffer();
+  bool IsUsingFramebuffer() const;
 
 protected:
   /**

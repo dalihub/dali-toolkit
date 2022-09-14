@@ -203,7 +203,7 @@ Dali::Scene3D::ModelView ModelView::New(const std::string& modelPath, const std:
   return handle;
 }
 
-const Actor ModelView::GetModelRoot()
+const Actor ModelView::GetModelRoot() const
 {
   return mModelRoot;
 }
@@ -240,20 +240,41 @@ void ModelView::SetImageBasedLightTexture(Dali::Texture diffuse, Dali::Texture s
 {
   if(diffuse && specular)
   {
-    mDiffuseTexture  = diffuse;
-    mSpecularTexture = specular;
-    mIblScaleFactor  = scaleFactor;
+    if(mDiffuseTexture != diffuse || mSpecularTexture != specular)
+    {
+      mDiffuseTexture  = diffuse;
+      mSpecularTexture = specular;
+      UpdateImageBasedLightTexture();
+    }
+    if(mIblScaleFactor != scaleFactor)
+    {
+      mIblScaleFactor = scaleFactor;
+      UpdateImageBasedLightScaleFactor();
+    }
 
-    UpdateImageBasedLight();
   }
 }
 
-uint32_t ModelView::GetAnimationCount()
+void ModelView::SetImageBasedLightScaleFactor(float scaleFactor)
+{
+  mIblScaleFactor = scaleFactor;
+  if(mDiffuseTexture && mSpecularTexture)
+  {
+    UpdateImageBasedLightScaleFactor();
+  }
+}
+
+float ModelView::GetImageBasedLightScaleFactor() const
+{
+  return mIblScaleFactor;
+}
+
+uint32_t ModelView::GetAnimationCount() const
 {
   return mAnimations.size();
 }
 
-Dali::Animation ModelView::GetAnimation(uint32_t index)
+Dali::Animation ModelView::GetAnimation(uint32_t index) const
 {
   Dali::Animation animation;
   if(mAnimations.size() > index)
@@ -263,7 +284,7 @@ Dali::Animation ModelView::GetAnimation(uint32_t index)
   return animation;
 }
 
-Dali::Animation ModelView::GetAnimation(const std::string& name)
+Dali::Animation ModelView::GetAnimation(const std::string& name) const
 {
   Dali::Animation animation;
   if(!name.empty())
@@ -461,7 +482,8 @@ void ModelView::LoadModel()
 
   mRenderableActors.clear();
   CollectRenderableActor(mModelRoot);
-  UpdateImageBasedLight();
+  UpdateImageBasedLightTexture();
+  UpdateImageBasedLightScaleFactor();
 
   mNaturalSize = AABB.CalculateSize();
   mModelPivot  = AABB.CalculatePivot();
@@ -541,7 +563,7 @@ void ModelView::CollectRenderableActor(Actor actor)
   }
 }
 
-void ModelView::UpdateImageBasedLight()
+void ModelView::UpdateImageBasedLightTexture()
 {
   if(!mDiffuseTexture || !mSpecularTexture)
   {
@@ -553,8 +575,6 @@ void ModelView::UpdateImageBasedLight()
     Actor renderableActor = actor.GetHandle();
     if(renderableActor)
     {
-      renderableActor.RegisterProperty(Dali::Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), mIblScaleFactor);
-
       uint32_t rendererCount = renderableActor.GetRendererCount();
       for(uint32_t i = 0; i < rendererCount; ++i)
       {
@@ -574,6 +594,22 @@ void ModelView::UpdateImageBasedLight()
           }
         }
       }
+    }
+  }
+}
+
+void ModelView::UpdateImageBasedLightScaleFactor()
+{
+  if(!mDiffuseTexture || !mSpecularTexture)
+  {
+    return;
+  }
+  for(auto&& actor : mRenderableActors)
+  {
+    Actor renderableActor = actor.GetHandle();
+    if(renderableActor)
+    {
+      renderableActor.RegisterProperty(Dali::Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), mIblScaleFactor);
     }
   }
 }

@@ -62,7 +62,7 @@ ModelView::ModelView(Dali::Internal::CustomActor* internal)
   VerifyCustomActorPointer<Internal::ModelView>(internal);
 }
 
-const Actor ModelView::GetModelRoot()
+const Actor ModelView::GetModelRoot() const
 {
   return GetImpl(*this).GetModelRoot();
 }
@@ -87,17 +87,27 @@ void ModelView::SetImageBasedLightTexture(Texture diffuse, Texture specular, flo
   GetImpl(*this).SetImageBasedLightTexture(diffuse, specular, scaleFactor);
 }
 
-uint32_t ModelView::GetAnimationCount()
+void ModelView::SetImageBasedLightScaleFactor(float scaleFactor)
+{
+  GetImpl(*this).SetImageBasedLightScaleFactor(scaleFactor);
+}
+
+float ModelView::GetImageBasedLightScaleFactor() const
+{
+  return GetImpl(*this).GetImageBasedLightScaleFactor();
+}
+
+uint32_t ModelView::GetAnimationCount() const
 {
   return GetImpl(*this).GetAnimationCount();
 }
 
-Dali::Animation ModelView::GetAnimation(uint32_t index)
+Dali::Animation ModelView::GetAnimation(uint32_t index) const
 {
   return GetImpl(*this).GetAnimation(index);
 }
 
-Dali::Animation ModelView::GetAnimation(const std::string& name)
+Dali::Animation ModelView::GetAnimation(const std::string& name) const
 {
   return GetImpl(*this).GetAnimation(name);
 }

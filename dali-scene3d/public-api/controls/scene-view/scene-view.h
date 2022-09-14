@@ -195,14 +195,14 @@ public:
    *
    * @return Number of cameras those currently the SceneView contains.
    */
-  uint32_t GetCameraCount();
+  uint32_t GetCameraCount() const;
 
   /**
    * @brief Retrieves selected CameraActor.
    *
    * @return CameraActor currently used in SceneView as a selected CameraActor
    */
-  CameraActor GetSelectedCamera();
+  CameraActor GetSelectedCamera() const;
 
   /**
    * @brief Retrieves a CameraActor of the index.
@@ -211,7 +211,7 @@ public:
    *
    * @return CameraActor of the index
    */
-  CameraActor GetCamera(uint32_t index);
+  CameraActor GetCamera(uint32_t index) const;
 
   /**
    * @brief Retrieves a CameraActor of the name.
@@ -220,7 +220,7 @@ public:
    *
    * @return CameraActor that has the name as a Dali::Actor::Property::NAME
    */
-  CameraActor GetCamera(const std::string& name);
+  CameraActor GetCamera(const std::string& name) const;
 
   /**
    * @brief Makes SceneView use a CameraActor of index as a selected camera.
@@ -250,6 +250,24 @@ public:
   void SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor = 1.0f);
 
   /**
+   * @brief Sets Scale Factor of Image Based Light Source.
+   *
+   * @note If SetImageBasedLightSource() or SetImageBasedLightTexture() method is called after this method, scaleFactor is overriden.
+   * @note Default value is 1.0f.
+   *
+   * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f].
+   */
+  void SetImageBasedLightScaleFactor(float scaleFactor);
+
+  /**
+   * @brief Gets Scale Factor of Image Based Light Source.
+   * Default value is 1.0f.
+   *
+   * @return scale factor that controls light source intensity.
+   */
+  float GetImageBasedLightScaleFactor() const;
+
+  /**
    * @brief Sets whether to use FBO or not for the SceneView.
    * If useFramebuffer is true, rendering result of SceneView is drawn on FBO and it is mapping on this SceneView plane.
    * If useFramebuffer is false, each item in SceneView is rendered on window directly.
@@ -267,7 +285,7 @@ public:
    *
    * @return bool True if this SceneView uses Framebuffer.
    */
-  bool IsUsingFramebuffer();
+  bool IsUsingFramebuffer() const;
 
 public: // Not intended for application developers
   /// @cond internal
