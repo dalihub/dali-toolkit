@@ -120,8 +120,6 @@ public:
    * @param[out] textureId             The textureId of the frame
    * @param[in, out] maskInfo          Mask info structure
    * @param[in]  samplingMode          The SamplingMode to use
-   * @param[in]  wrapModeU             Horizontal Wrap mode
-   * @param[in]  wrapModeV             Vertical Wrap mode
    * @param[in]  synchronousLoading    true if the frame should be loaded synchronously
    * @param[in]  textureObserver       The client object should inherit from this and provide the "LoadCompleted" virtual.
    *                                   This is called when an image load completes (or fails).
@@ -136,8 +134,6 @@ public:
                                       TextureManager::TextureId&      textureId,
                                       MaskingDataPointer&             maskInfo,
                                       const Dali::SamplingMode::Type& samplingMode,
-                                      const Dali::WrapMode::Type&     wrapModeU,
-                                      const Dali::WrapMode::Type&     wrapModeV,
                                       const bool&                     synchronousLoading,
                                       TextureUploadObserver*          textureObserver,
                                       TextureManager::MultiplyOnLoad& preMultiplyOnLoad);
@@ -194,8 +190,6 @@ public:
    *                                  be loaded, and marked successful, but this will be set to false.
    *                                  If atlasing succeeds, this will be set to true.
    * @param[out] loadingStatus        The loading status of the texture
-   * @param[in] wrapModeU             Horizontal Wrap mode
-   * @param[in] wrapModeV             Vertical Wrap mode
    * @param[in] textureObserver       The client object should inherit from this and provide the "LoadCompleted" virtual.
    *                                  This is called when an image load completes (or fails).
    * @param[in] atlasObserver         This is used if the texture is atlased, and will be called instead of
@@ -220,8 +214,6 @@ public:
     Dali::ImageDimensions&              textureRectSize,
     bool&                               atlasingStatus,
     bool&                               loadingStatus,
-    const Dali::WrapMode::Type&         wrapModeU,
-    const Dali::WrapMode::Type&         wrapModeV,
     TextureUploadObserver*              textureObserver,
     AtlasUploadObserver*                atlasObserver,
     ImageAtlasManagerPtr                imageAtlasManager,
@@ -262,6 +254,20 @@ public:
    */
   Geometry GetRenderGeometry(const TextureManager::TextureId& textureId, std::uint32_t& frontElements, std::uint32_t& backElements);
 
+  /**
+   * @brief Returns the textureSet in texture manager.
+   * @param[in] textureId Id of the texture
+   * @return The textureSet in texture manager. These textures include YUV textures or images and masks.
+   */
+  TextureSet GetTextureSet(const TextureManager::TextureId& textureId);
+
+  /**
+   * @brief Returns the textureSet in texture manager.
+   * @param[in] textureInfo the information of the texture
+   * @return The textureSet in texture manager. These textures include YUV textures or images and masks.
+   */
+  TextureSet GetTextureSet(const TextureManager::TextureInfo& textureInfo);
+
 public:
   // API list that need to access TextureCacheManager.
 
@@ -274,11 +280,11 @@ public:
   }
 
   /**
-   * @copydoc TextureCacheManager::GetTextureSet
+   * @copydoc TextureCacheManager::GetTexture
    */
-  inline TextureSet GetTextureSet(const TextureManager::TextureId& textureId)
+  inline Texture GetTexture(const TextureManager::TextureId& textureId)
   {
-    return mTextureCacheManager.GetTextureSet(textureId);
+    return mTextureCacheManager.GetTexture(textureId);
   }
 
   /**
@@ -511,9 +517,9 @@ private:
   /**
    * Structure to hold info about a texture load queued during NotifyObservers
    */
-  struct LoadQueueElement
+  struct QueueElement
   {
-    LoadQueueElement(TextureManager::TextureId textureId, TextureUploadObserver* observer)
+    QueueElement(TextureManager::TextureId textureId, TextureUploadObserver* observer)
     : mTextureId(textureId),
       mObserver(observer)
     {
@@ -606,6 +612,15 @@ private:
    */
   void EmitLoadComplete(TextureUploadObserver* observer, TextureManager::TextureInfo& textureInfo, const bool& success);
 
+
+  /**
+   * @brief Remove observer in textureInfo
+   *
+   * @param textureInfo The struct associated with this Texture.
+   * @param observer The observer wishing to remove.
+   */
+  void RemoveTextureObserver(TextureManager::TextureInfo& textureInfo, TextureUploadObserver* observer);
+
 public:
   /**
    * @brief Common method to handle loading completion.
@@ -639,11 +654,11 @@ private:                                    // Member Variables:
   RoundRobinContainerView<TextureAsyncLoadingHelper> mAsyncLocalLoaders;  ///< The Asynchronous image loaders used to provide all local async loads
   RoundRobinContainerView<TextureAsyncLoadingHelper> mAsyncRemoteLoaders; ///< The Asynchronous image loaders used to provide all remote async loads
 
-  Dali::Vector<LifecycleObserver*>        mLifecycleObservers; ///< Lifecycle observers of texture manager
-  Dali::Vector<LoadQueueElement>          mLoadQueue;          ///< Queue of textures to load after NotifyObservers
-  Dali::Vector<TextureManager::TextureId> mRemoveQueue;        ///< Queue of textures to remove after NotifyObservers
-  bool                                    mQueueLoadFlag;      ///< Flag that causes Load Textures to be queued.
-  bool                                    mLoadYuvPlanes;      ///< A global flag to specify if the image should be loaded as yuv planes
+  Dali::Vector<LifecycleObserver*>        mLifecycleObservers;      ///< Lifecycle observers of texture manager
+  Dali::Vector<QueueElement>              mLoadQueue;               ///< Queue of textures to load after NotifyObservers
+  Dali::Vector<QueueElement>              mRemoveQueue;             ///< Queue of textures to remove after NotifyObservers
+  TextureManager::TextureId               mLoadingQueueTextureId;   ///< TextureId when it is loading. it causes Load Textures to be queued.
+  bool                                    mLoadYuvPlanes;           ///< A global flag to specify if the image should be loaded as yuv planes
 };
 
 } // namespace Internal

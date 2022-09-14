@@ -208,11 +208,15 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                    loadTextureId,
                                                                    mMaskingData,
                                                                    SamplingMode::BOX_THEN_LINEAR,
-                                                                   mWrapModeU,
-                                                                   mWrapModeV,
                                                                    synchronousLoading,
                                                                    this,
                                                                    preMultiplyOnLoading);
+  if(textureSet)
+  {
+    Sampler sampler = Sampler::New();
+    sampler.SetWrapMode(mWrapModeU, mWrapModeV);
+    textureSet.SetSampler(0u, sampler);
+  }
 
   mTextureIds[frameIndex] = loadTextureId;
 
@@ -260,7 +264,14 @@ TextureSet RollingAnimatedImageCache::GetFrontTextureSet() const
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "RollingAnimatedImageCache::GetFrontTextureSet() FrameNumber:%d\n", mQueue[0].mFrameNumber);
 
   TextureManager::TextureId textureId = GetCachedTextureId(0);
-  return mTextureManager.GetTextureSet(textureId);
+  TextureSet textureSet = mTextureManager.GetTextureSet(textureId);
+  if(textureSet)
+  {
+    Sampler sampler = Sampler::New();
+    sampler.SetWrapMode(mWrapModeU, mWrapModeV);
+    textureSet.SetSampler(0u, sampler);
+  }
+  return textureSet;
 }
 
 TextureManager::TextureId RollingAnimatedImageCache::GetCachedTextureId(int index) const
@@ -276,7 +287,6 @@ void RollingAnimatedImageCache::PopFrontCache()
 
   if(mMaskingData && mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
   {
-    mTextureManager.Remove(mMaskingData->mAlphaMaskId, this);
     if(mQueue.IsEmpty())
     {
       mMaskingData->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
@@ -332,15 +342,14 @@ void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformatio
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::LoadComplete(textureId:%d) start\n", textureInformation.textureId);
   LOG_CACHE;
 
-  TextureSet textureSet = mTextureManager.GetTextureSet(textureInformation.textureId);
-  if(textureSet)
+  if(textureInformation.textureSet)
   {
     Sampler sampler = Sampler::New();
     sampler.SetWrapMode(mWrapModeU, mWrapModeV);
-    textureSet.SetSampler(0u, sampler);
+    textureInformation.textureSet.SetSampler(0u, sampler);
   }
 
-  MakeFrameReady(loadSuccess, textureSet, textureInformation.interval);
+  MakeFrameReady(loadSuccess, textureInformation.textureSet, textureInformation.interval);
 
   if(loadSuccess)
   {

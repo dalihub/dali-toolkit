@@ -180,18 +180,6 @@ ImageVisual::~ImageVisual()
 {
   if(Stage::IsInstalled())
   {
-    if(mMaskingData)
-    {
-      // TextureManager could have been deleted before the actor that contains this
-      // ImageVisual is destroyed (e.g. due to stage shutdown). Ensure the stage
-      // is still valid before accessing texture manager.
-      if(mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
-      {
-        TextureManager& textureManager = mFactoryCache.GetTextureManager();
-        textureManager.Remove(mMaskingData->mAlphaMaskId, this);
-      }
-    }
-
     if(mImageUrl.IsValid())
     {
       // Decrease reference count of External Resources :
@@ -618,7 +606,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
   bool synchronousLoading = IsSynchronousLoadingRequired();
   bool loadingStatus;
 
-  textures = textureManager.LoadTexture(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mTextureId, atlasRect, mAtlasRectSize, atlasing, loadingStatus, mWrapModeU, mWrapModeV, textureObserver, atlasUploadObserver, atlasManager, mOrientationCorrection, forceReload, preMultiplyOnLoad);
+  textures = textureManager.LoadTexture(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mTextureId, atlasRect, mAtlasRectSize, atlasing, loadingStatus, textureObserver, atlasUploadObserver, atlasManager, mOrientationCorrection, forceReload, preMultiplyOnLoad);
 
   if(textures)
   {
@@ -632,6 +620,12 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
     }
 
     EnablePreMultipliedAlpha(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
+    if(!atlasing)
+    {
+      Sampler sampler = Sampler::New();
+      sampler.SetWrapMode(mWrapModeU, mWrapModeV);
+      textures.SetSampler(0u, sampler);
+    }
   }
   else if(synchronousLoading)
   {
@@ -676,6 +670,12 @@ void ImageVisual::InitializeRenderer()
     else
     {
       mTextures = mFactoryCache.GetTextureManager().GetTextureSet(mTextureId);
+      if(!(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED) && mTextures)
+      {
+        Sampler sampler = Sampler::New();
+        sampler.SetWrapMode(mWrapModeU, mWrapModeV);
+        mTextures.SetSampler(0u, sampler);
+      }
     }
   }
 
@@ -912,9 +912,13 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
     }
     else
     {
-      Sampler sampler = Sampler::New();
-      sampler.SetWrapMode(mWrapModeU, mWrapModeV);
-      textureInformation.textureSet.SetSampler(0u, sampler);
+      if(!textureInformation.useAtlasing)
+      {
+        Sampler sampler = Sampler::New();
+        sampler.SetWrapMode(mWrapModeU, mWrapModeV);
+        textureInformation.textureSet.SetSampler(0u, sampler);
+      }
+
       mImpl->mRenderer.SetTextures(textureInformation.textureSet);
       ComputeTextureSize();
       CheckMaskTexture();
