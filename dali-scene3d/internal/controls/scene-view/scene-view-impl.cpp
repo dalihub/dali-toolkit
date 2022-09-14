@@ -83,6 +83,13 @@ void SceneView::AddCamera(CameraActor camera)
 {
   if(camera)
   {
+    {
+      // To do not change camera properties during OnScene in CameraActor
+      // TODO: this will be removed after CameraActor is fixed.
+      Vector3     size        = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+      const float aspectRatio = (size.height > 0.1f) ? size.width / size.height : 1.0f;
+      camera.SetAspectRatio(aspectRatio);
+    }
     if(mCameras.empty())
     {
       UpdateCamera(camera);
@@ -188,6 +195,7 @@ void SceneView::UnregisterModelView(Scene3D::ModelView modelView)
 
 void SceneView::SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor)
 {
+  mIBLResourceReady = false;
   Texture diffuseTexture = Dali::Scene3D::Loader::LoadCubeMap(diffuse);
   if(diffuseTexture)
   {
@@ -207,6 +215,8 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuse, const std::
       }
     }
   }
+  mIBLResourceReady = true;
+  Control::SetResourceReady();
 }
 
 void SceneView::UseFramebuffer(bool useFramebuffer)
@@ -264,6 +274,11 @@ void SceneView::OnInitialize()
   mDefaultCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mDefaultCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
   mDefaultCamera.SetNearClippingPlane(1.0f);
+  {
+    // To do not change camera properties during OnScene in CameraActor
+    // TODO: this will be removed after CameraActor is fixed.
+    mDefaultCamera.SetAspectRatio(1.0f);
+  }
   AddCamera(mDefaultCamera);
   UpdateCamera(mDefaultCamera);
 }
@@ -304,6 +319,11 @@ void SceneView::OnRelayout(const Vector2& size, RelayoutContainer& container)
   UpdateRenderTask();
 }
 
+bool SceneView::IsResourceReady() const
+{
+  return mIBLResourceReady;
+}
+
 void SceneView::UpdateCamera(CameraActor camera)
 {
   if(camera)
@@ -329,25 +349,16 @@ void SceneView::UpdateRenderTask()
     }
 
     Vector3 size = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-    float   fov  = 0.0f;
-    Vector3 cameraPosition(Vector3::ZERO);
-    float   nearPlain = 1.0f;
-    float   farPlain  = 1.0f;
-
-    // Several properties such as fov, nearPlane, farPlane, and position should not be changed after SetPerspectiveProjection is called.
-    // In the 3D scene, the properties are not changed by the changes of canvas size.
-    fov            = mSelectedCamera[Dali::CameraActor::Property::FIELD_OF_VIEW];
-    nearPlain      = mSelectedCamera[Dali::CameraActor::Property::NEAR_PLANE_DISTANCE];
-    farPlain       = mSelectedCamera[Dali::CameraActor::Property::FAR_PLANE_DISTANCE];
-    cameraPosition = Vector3(mSelectedCamera[Dali::Actor::Property::POSITION]);
-
-    mSelectedCamera.SetPerspectiveProjection(Dali::Size(size));
-
-    mSelectedCamera[Dali::CameraActor::Property::FIELD_OF_VIEW]       = fov;
-    mSelectedCamera[Dali::CameraActor::Property::NEAR_PLANE_DISTANCE] = nearPlain;
-    mSelectedCamera[Dali::CameraActor::Property::FAR_PLANE_DISTANCE]  = farPlain;
-    mSelectedCamera[Dali::Actor::Property::POSITION]                  = cameraPosition;
-
+    const float aspectRatio = size.width / size.height;
+    mSelectedCamera.SetAspectRatio(aspectRatio);
+    const float fov = mSelectedCamera[Dali::CameraActor::Property::FIELD_OF_VIEW];
+    const float near = mSelectedCamera[Dali::CameraActor::Property::NEAR_PLANE_DISTANCE];
+    const float halfHeight = tanf(fov/2) * near;
+    const float halfWidth = aspectRatio * halfHeight;
+    mSelectedCamera[Dali::CameraActor::Property::LEFT_PLANE_DISTANCE]   = -halfWidth;
+    mSelectedCamera[Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE]  = halfWidth;
+    mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE]    = halfHeight; // Top is +ve to keep consistency with orthographic values
+    mSelectedCamera[Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE] = -halfHeight; // Bottom is -ve to keep consistency with orthographic values
     if(mUseFrameBuffer)
     {
       Dali::FrameBuffer currentFrameBuffer = mRenderTask.GetFrameBuffer();
