@@ -117,7 +117,10 @@ void Control::ClearBackground()
 
 bool Control::IsResourceReady() const
 {
-  return Internal::GetImplementation(*this).IsResourceReady();
+  const Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(*this);
+  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(internalControl);
+
+  return controlDataImpl.IsResourceReady();
 }
 
 Toolkit::Visual::ResourceStatus Control::GetVisualResourceStatus(Dali::Property::Index index)

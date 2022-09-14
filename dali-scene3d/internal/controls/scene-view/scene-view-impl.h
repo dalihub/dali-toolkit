@@ -178,11 +178,6 @@ private:
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
-   * @copydoc Toolkit::Control::IsResourceReady()
-   */
-  bool IsResourceReady() const override;
-
-  /**
    * @brief Changes main camera as a input camera
    *
    * @param camera CameraActor that will be a main camera of the SceneView
@@ -213,7 +208,6 @@ private:
   Dali::Texture mDiffuseTexture;
   float         mIblScaleFactor{1.0f};
   bool          mUseFrameBuffer{false};
-  bool          mIBLResourceReady{true};
 
   // TODO : Light Source
 };
