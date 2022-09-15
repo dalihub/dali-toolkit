@@ -191,6 +191,12 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
         return false;
       }
 
+      if(controller.mImpl->mEventData->mState == EventData::INACTIVE)
+      {
+        // Cursor position will be updated
+        controller.mImpl->ChangeState(EventData::EDITING);
+      }
+
       controller.mImpl->mEventData->mCheckScrollAmount = true;
       Event event(Event::CURSOR_KEY_EVENT);
       event.p1.mInt  = keyCode;
