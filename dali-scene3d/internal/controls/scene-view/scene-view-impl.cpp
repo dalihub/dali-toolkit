@@ -188,6 +188,7 @@ void SceneView::UnregisterModelView(Scene3D::ModelView modelView)
 
 void SceneView::SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor)
 {
+  mIBLResourceReady = false;
   Texture diffuseTexture = Dali::Scene3D::Loader::LoadCubeMap(diffuse);
   if(diffuseTexture)
   {
@@ -207,6 +208,8 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuse, const std::
       }
     }
   }
+  mIBLResourceReady = true;
+  Control::SetResourceReady(false);
 }
 
 void SceneView::UseFramebuffer(bool useFramebuffer)
@@ -303,6 +306,11 @@ void SceneView::OnRelayout(const Vector2& size, RelayoutContainer& container)
   Control::OnRelayout(size, container);
   // Change canvas size of camera actor.
   UpdateRenderTask();
+}
+
+bool SceneView::IsResourceReady() const
+{
+  return mIBLResourceReady;
 }
 
 void SceneView::UpdateCamera(CameraActor camera)

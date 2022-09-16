@@ -570,3 +570,47 @@ int UtcDaliModelViewAnimation02(void)
 
   END_TEST;
 }
+
+// For ResourceReady
+namespace
+{
+static bool gOnRelayoutCallBackCalled = false;
+void OnRelayoutCallback(Actor actor)
+{
+  gOnRelayoutCallBackCalled = true;
+}
+
+static bool gResourceReadyCalled = false;
+void OnResourceReady(Control control)
+{
+  gResourceReadyCalled = true;
+}
+}
+
+int UtcDaliModelViewResourceReady(void)
+{
+  ToolkitTestApplication application;
+
+  gOnRelayoutCallBackCalled = false;
+  gResourceReadyCalled = false;
+  Scene3D::ModelView model = Scene3D::ModelView::New(TEST_GLTF_ANIMATION_TEST_FILE_NAME);
+  model.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  model.OnRelayoutSignal().Connect(OnRelayoutCallback);
+  model.ResourceReadySignal().Connect(OnResourceReady);
+  DALI_TEST_EQUALS(model.IsResourceReady(), false, TEST_LOCATION);
+
+  // Sanity check
+  DALI_TEST_CHECK(!gOnRelayoutCallBackCalled);
+  DALI_TEST_CHECK(!gResourceReadyCalled);
+
+  application.GetScene().Add(model);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(model.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  END_TEST;
+}
