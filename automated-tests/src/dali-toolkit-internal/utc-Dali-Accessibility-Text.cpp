@@ -234,19 +234,10 @@ int utcDaliAccessibilityTextEditorGetRangeExtents(void)
     auto characterCount = x->GetCharacterCount();
     rangeExtents        = x->GetRangeExtents( 0, characterCount, Dali::Accessibility::CoordinateType::WINDOW );
 
-    Vector<Vector2> positionList = Toolkit::DevelTextEditor::GetTextPosition(editor, 0, characterCount);
-    Vector<Vector2> sizeList     = Toolkit::DevelTextEditor::GetTextSize(editor, 0, characterCount);
-
-    DALI_TEST_EQUALS(positionList.Size() == sizeList.Size(), true, TEST_LOCATION);
-
-    unsigned int sizeListSize = sizeList.Size();
-    for(unsigned int i = 0; i < sizeListSize; i++)
-    {
-      DALI_TEST_EQUALS((int)positionList[i].x >= rangeExtents.x, true, TEST_LOCATION);
-      DALI_TEST_EQUALS((int)positionList[i].y >= rangeExtents.y, true, TEST_LOCATION);
-      DALI_TEST_EQUALS((int)sizeList[i].x <= rangeExtents.width, true, TEST_LOCATION);
-      DALI_TEST_EQUALS((int)sizeList[i].y <= rangeExtents.height, true, TEST_LOCATION);
-    }
+    DALI_TEST_EQUALS((int)rangeExtents.x >= 0, true, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)rangeExtents.y >= 0, true, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)rangeExtents.width <= 200, true, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)rangeExtents.height <= 200, true, TEST_LOCATION);
   }
 
   END_TEST;
@@ -478,19 +469,10 @@ int utcDaliAccessibilityTextFieldGetRangeExtents(void)
     auto characterCount = x->GetCharacterCount();
     rangeExtents        = x->GetRangeExtents( 0, characterCount, Dali::Accessibility::CoordinateType::WINDOW );
 
-    Vector<Vector2> positionList = Toolkit::DevelTextField::GetTextPosition(field, 0, characterCount);
-    Vector<Vector2> sizeList     = Toolkit::DevelTextField::GetTextSize(field, 0, characterCount);
-
-    DALI_TEST_EQUALS(positionList.Size() == sizeList.Size(), true, TEST_LOCATION);
-
-    unsigned int sizeListSize = sizeList.Size();
-    for(unsigned int i = 0; i < sizeListSize; i++)
-    {
-      DALI_TEST_EQUALS((int)positionList[i].x >= rangeExtents.x, true, TEST_LOCATION);
-      DALI_TEST_EQUALS((int)positionList[i].y >= rangeExtents.y, true, TEST_LOCATION);
-      DALI_TEST_EQUALS((int)sizeList[i].x <= rangeExtents.width, true, TEST_LOCATION);
-      DALI_TEST_EQUALS((int)sizeList[i].y <= rangeExtents.height, true, TEST_LOCATION);
-    }
+    DALI_TEST_EQUALS((int)rangeExtents.x >= 0, true, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)rangeExtents.y >= 0, true, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)rangeExtents.width <= 200, true, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)rangeExtents.height <= 200, true, TEST_LOCATION);
   }
 
   END_TEST;
@@ -663,19 +645,10 @@ int utcDaliAccessibilityTextLabelGetRangeExtents(void)
     auto characterCount = x->GetCharacterCount();
     rangeExtents        = x->GetRangeExtents( 0, characterCount, Dali::Accessibility::CoordinateType::WINDOW );
 
-    Vector<Vector2> positionList = Toolkit::DevelTextLabel::GetTextPosition(label, 0, characterCount);
-    Vector<Vector2> sizeList     = Toolkit::DevelTextLabel::GetTextSize(label, 0, characterCount);
-
-    DALI_TEST_EQUALS(positionList.Size() == sizeList.Size(), true, TEST_LOCATION);
-
-    unsigned int sizeListSize = sizeList.Size();
-    for(unsigned int i = 0; i < sizeListSize; i++)
-    {
-      DALI_TEST_EQUALS((int)positionList[i].x >= rangeExtents.x, true, TEST_LOCATION);
-      DALI_TEST_EQUALS((int)positionList[i].y >= rangeExtents.y, true, TEST_LOCATION);
-      DALI_TEST_EQUALS((int)sizeList[i].x <= rangeExtents.width, true, TEST_LOCATION);
-      DALI_TEST_EQUALS((int)sizeList[i].y <= rangeExtents.height, true, TEST_LOCATION);
-    }
+    DALI_TEST_EQUALS((int)rangeExtents.x >= 0, true, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)rangeExtents.y >= 0, true, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)rangeExtents.width <= 200, true, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)rangeExtents.height <= 200, true, TEST_LOCATION);
   }
 
   END_TEST;

@@ -1428,10 +1428,11 @@ Rect<> Controller::GetTextBoundingRectangle(CharacterIndex startIndex, Character
     return {0, 0, 0, 0};
   }
 
-  auto minX      = positionList[0].x;
-  auto minY      = positionList[0].y;
-  auto maxRight  = positionList[0].x + sizeList[0].x;
-  auto maxBottom = positionList[0].y + sizeList[0].y;
+  auto controlWidth = mImpl->mModel->mVisualModel->mControlSize.width;
+  auto minX         = positionList[0].x;
+  auto minY         = positionList[0].y;
+  auto maxRight     = positionList[0].x + sizeList[0].x;
+  auto maxBottom    = positionList[0].y + sizeList[0].y;
 
   for(unsigned int i = 1; i < sizeList.Size(); i++)
   {
@@ -1439,6 +1440,16 @@ Rect<> Controller::GetTextBoundingRectangle(CharacterIndex startIndex, Character
     minY      = std::min(minY, positionList[i].y);
     maxRight  = std::max(maxRight, positionList[i].x + sizeList[i].x);
     maxBottom = std::max(maxBottom, positionList[i].y + sizeList[i].y);
+  }
+
+  if(minX < 0.0f)
+  {
+    minX = 0.0f;
+  }
+
+  if(maxRight > controlWidth)
+  {
+    maxRight = controlWidth;
   }
 
   return {minX, minY, maxRight - minX, maxBottom - minY};
