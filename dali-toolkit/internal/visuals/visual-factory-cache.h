@@ -27,7 +27,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
-#include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 
 namespace Dali
@@ -245,12 +244,6 @@ public:
   NPatchLoader& GetNPatchLoader();
 
   /**
-   * Get the SVG rasterization manager.
-   * @return A raw pointer pointing to the SVG rasterization manager.
-   */
-  SvgRasterizeManager* GetSVGRasterizationManager();
-
-  /**
    * Get the vector animation manager.
    * @return A reference to the vector animation manager.
    */
@@ -348,7 +341,6 @@ private:
   TextureManager       mTextureManager;
   NPatchLoader         mNPatchLoader;
 
-  std::unique_ptr<SvgRasterizeManager>    mSvgRasterizeManager;
   std::unique_ptr<VectorAnimationManager> mVectorAnimationManager;
   bool                                    mPreMultiplyOnLoad;
   std::vector<BrokenImageInfo>            mBrokenImageInfoContainer;

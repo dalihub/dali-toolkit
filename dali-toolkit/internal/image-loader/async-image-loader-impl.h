@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
-#include <dali-toolkit/internal/image-loader/image-load-thread.h>
+#include <dali-toolkit/internal/image-loader/loading-task.h>
 #include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 
 namespace Dali
@@ -32,7 +32,21 @@ namespace Toolkit
 {
 namespace Internal
 {
-class AsyncImageLoader : public BaseObject
+using LoadingTaskPtr = IntrusivePtr<LoadingTask>;
+
+struct AsyncImageLoadingInfo
+{
+  AsyncImageLoadingInfo(LoadingTaskPtr loadingTask,std::uint32_t loadId)
+  : loadingTask(loadingTask),
+    loadId(loadId)
+  {
+  }
+
+  LoadingTaskPtr loadingTask;
+  std::uint32_t  loadId;
+};
+
+class AsyncImageLoader : public BaseObject, public ConnectionTracker
 {
 public:
   /**
@@ -126,7 +140,7 @@ public:
   /**
    * Process the completed loading task from the worker thread.
    */
-  void ProcessLoadedImage();
+  void ProcessLoadedImage(LoadingTaskPtr task);
 
 protected:
   /**
@@ -135,12 +149,17 @@ protected:
   ~AsyncImageLoader() override;
 
 private:
+  /**
+   * Remove already completed tasks
+   */
+  void RemoveCompletedTask();
+
+private:
   Toolkit::AsyncImageLoader::ImageLoadedSignalType            mLoadedSignal;
   Toolkit::DevelAsyncImageLoader::PixelBufferLoadedSignalType mPixelBufferLoadedSignal;
-
-  ImageLoadThread mLoadThread;
-  uint32_t        mLoadTaskId;
-  bool            mIsLoadThreadStarted;
+  std::vector<AsyncImageLoadingInfo>                          mLoadingTasks;
+  std::vector<uint32_t>                                       mCompletedTaskIds;
+  uint32_t                                                    mLoadTaskId;
 };
 
 } // namespace Internal

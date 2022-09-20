@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
+#include <dali-toolkit/internal/visuals/svg/svg-task.h>
 
 namespace Dali
 {
@@ -153,10 +154,9 @@ public:
   /**
    * @bried Apply the rasterized image to the visual.
    *
-   * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
-   * @param[in] success Whether the task succeeds.
+   * @param[in] task SvgTaskPtr
    */
-  void ApplyRasterizedImage(PixelData rasterizedPixelData, bool success);
+  void ApplyRasterizedImage(SvgTaskPtr task);
 
 private:
   /**
@@ -189,6 +189,8 @@ private:
   WeakHandle<Actor>         mPlacementActor;
   Vector2                   mRasterizedSize;
   Dali::ImageDimensions     mDesiredSize{};
+  SvgTaskPtr                mLoadingTask;
+  SvgTaskPtr                mRasterizingTask;
   bool                      mLoadFailed;
   bool                      mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
 };

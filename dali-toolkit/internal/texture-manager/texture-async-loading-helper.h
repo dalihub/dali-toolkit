@@ -22,7 +22,7 @@
 #include <deque>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/image-loader/async-image-loader-impl.h>
+#include <dali-toolkit/internal/image-loader/loading-task.h>
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 
 namespace Dali
@@ -31,27 +31,12 @@ namespace Toolkit
 {
 namespace Internal
 {
+
 /**
  * @brief Helper class to keep the relation between AsyncImageLoader and corresponding LoadingInfo container
  */
 class TextureAsyncLoadingHelper : public ConnectionTracker
 {
-  /**
-   * Struct to hold information about a requested Async load.
-   * This is used to look up a TextureManager::TextureId from the returned AsyncLoad Id.
-   */
-  struct AsyncLoadingInfo
-  {
-    AsyncLoadingInfo(TextureManager::TextureId textureId)
-    : textureId(textureId),
-      loadId(0)
-    {
-    }
-
-    TextureManager::TextureId textureId; ///< The external Texture Id assigned to this load
-    std::uint32_t             loadId;    ///< The load Id used by the async loader to reference this load
-  };
-
 public:
   /**
    * @brief Create an TextureAsyncLoadingHelper.
@@ -113,31 +98,16 @@ public:
   TextureAsyncLoadingHelper(const TextureAsyncLoadingHelper&) = delete;
   TextureAsyncLoadingHelper& operator=(const TextureAsyncLoadingHelper&) = delete;
 
-  TextureAsyncLoadingHelper(TextureAsyncLoadingHelper&& rhs);
-  TextureAsyncLoadingHelper& operator=(TextureAsyncLoadingHelper&& rhs) = delete;
-
-private:                                                              // Private typedefs:
-  typedef std::deque<AsyncLoadingInfo> AsyncLoadingInfoContainerType; ///< The container type used to manage Asynchronous loads in progress
-
 private:
   /**
-   * @brief Main constructor that used by all other constructors
-   */
-  TextureAsyncLoadingHelper(Toolkit::AsyncImageLoader       loader,
-                            TextureManager&                 textureManager,
-                            AsyncLoadingInfoContainerType&& loadingInfoContainer);
-
-  /**
    * @brief Callback to be called when texture loading is complete, it passes the pixel buffer list on to texture manager.
-   * @param[in] id           Loader id
-   * @param[in] pixelBuffers Image data
+   * @param[in] task LoadingTaskPtr
    */
-  void AsyncLoadComplete(std::uint32_t id, std::vector<Devel::PixelBuffer>& pixelBuffers);
+  void AsyncLoadComplete(LoadingTaskPtr task);
 
 private: // Member Variables:
-  Toolkit::AsyncImageLoader     mLoader;
-  TextureManager&               mTextureManager;
-  AsyncLoadingInfoContainerType mLoadingInfoContainer;
+  TextureManager& mTextureManager;
+  uint32_t        mLoadTaskId;
 };
 
 } // namespace Internal

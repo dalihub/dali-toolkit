@@ -36,7 +36,8 @@ extern Debug::Filter* gTextureManagerLogFilter; ///< Define at texture-manager-i
 #endif
 
 TextureAsyncLoadingHelper::TextureAsyncLoadingHelper(TextureManager& textureManager)
-: TextureAsyncLoadingHelper(Toolkit::AsyncImageLoader::New(), textureManager, AsyncLoadingInfoContainerType())
+: mTextureManager(textureManager),
+  mLoadTaskId(0u)
 {
 }
 
@@ -45,9 +46,9 @@ void TextureAsyncLoadingHelper::LoadAnimatedImage(const TextureManager::TextureI
                                                   const std::uint32_t&                            frameIndex,
                                                   const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad)
 {
-  mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id                             = GetImplementation(mLoader).LoadAnimatedImage(animatedImageLoading, frameIndex, preMultiplyOnLoad);
-  mLoadingInfoContainer.back().loadId = id;
+  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
+  loadingTask->SetTextureId(textureId);
+  Dali::AsyncTaskManager::Get().AddTask(loadingTask);
 }
 
 void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId&                textureId,
@@ -59,17 +60,18 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId&           
                                      const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad,
                                      const bool&                                     loadYuvPlanes)
 {
-  mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
+  LoadingTaskPtr loadingTask;
   if(DALI_UNLIKELY(url.IsBufferResource()))
   {
-    auto id                             = GetImplementation(mLoader).LoadEncodedImageBuffer(mTextureManager.GetEncodedImageBuffer(url.GetUrl()), desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
-    mLoadingInfoContainer.back().loadId = id;
+    loadingTask = new LoadingTask(++mLoadTaskId, mTextureManager.GetEncodedImageBuffer(url.GetUrl()), desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   }
   else
   {
-    auto id                             = GetImplementation(mLoader).Load(url, desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes);
-    mLoadingInfoContainer.back().loadId = id;
+    loadingTask = new LoadingTask(++mLoadTaskId, url, desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   }
+
+  loadingTask->SetTextureId(textureId);
+  Dali::AsyncTaskManager::Get().AddTask(loadingTask);
 }
 
 void TextureAsyncLoadingHelper::ApplyMask(const TextureManager::TextureId&                textureId,
@@ -79,44 +81,18 @@ void TextureAsyncLoadingHelper::ApplyMask(const TextureManager::TextureId&      
                                           const bool&                                     cropToMask,
                                           const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad)
 {
-  mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id                             = GetImplementation(mLoader).ApplyMask(pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad);
-  mLoadingInfoContainer.back().loadId = id;
+
+  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
+  loadingTask->SetTextureId(textureId);
+  Dali::AsyncTaskManager::Get().AddTask(loadingTask);
 }
 
-TextureAsyncLoadingHelper::TextureAsyncLoadingHelper(TextureAsyncLoadingHelper&& rhs)
-: TextureAsyncLoadingHelper(rhs.mLoader, rhs.mTextureManager, std::move(rhs.mLoadingInfoContainer))
+void TextureAsyncLoadingHelper::AsyncLoadComplete(LoadingTaskPtr task)
 {
-}
-
-TextureAsyncLoadingHelper::TextureAsyncLoadingHelper(
-  Toolkit::AsyncImageLoader       loader,
-  TextureManager&                 textureManager,
-  AsyncLoadingInfoContainerType&& loadingInfoContainer)
-: mLoader(loader),
-  mTextureManager(textureManager),
-  mLoadingInfoContainer(std::move(loadingInfoContainer))
-{
-  DevelAsyncImageLoader::PixelBufferLoadedSignal(mLoader).Connect(
-    this, &TextureAsyncLoadingHelper::AsyncLoadComplete);
-}
-
-void TextureAsyncLoadingHelper::AsyncLoadComplete(uint32_t                         id,
-                                                  std::vector<Devel::PixelBuffer>& pixelBuffers)
-{
-  DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureAsyncLoadingHelper::AsyncLoadComplete( loadId :%d )\n", id);
-  if(mLoadingInfoContainer.size() >= 1u)
+  // Call TextureManager::AsyncLoadComplete
+  if(task->textureId != TextureManager::INVALID_TEXTURE_ID)
   {
-    AsyncLoadingInfo loadingInfo = mLoadingInfoContainer.front();
-
-    // We can assume that First Loading task comes First.
-    if(loadingInfo.loadId == id)
-    {
-      // Call TextureManager::AsyncLoadComplete
-      mTextureManager.AsyncLoadComplete(loadingInfo.textureId, pixelBuffers);
-    }
-
-    mLoadingInfoContainer.pop_front();
+    mTextureManager.AsyncLoadComplete(task->textureId, task->pixelBuffers);
   }
 }
 

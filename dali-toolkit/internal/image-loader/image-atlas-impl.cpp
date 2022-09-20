@@ -89,6 +89,12 @@ ImageAtlas::ImageAtlas(SizeType width, SizeType height, Pixel::Format pixelForma
 
 ImageAtlas::~ImageAtlas()
 {
+  if(mAsyncLoader)
+  {
+    mAsyncLoader.CancelAll();
+    mAsyncLoader.ImageLoadedSignal().Disconnect(this, &ImageAtlas::UploadToAtlas);
+  }
+
   const std::size_t count = mLoadingTaskInfoContainer.Count();
   for(std::size_t i = 0; i < count; ++i)
   {
@@ -211,6 +217,7 @@ bool ImageAtlas::Upload(Vector4&                  textureRect,
   {
     uint32_t loadId = GetImplementation(mAsyncLoader).LoadEncodedImageBuffer(encodedImageBuffer, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
     mLoadingTaskInfoContainer.PushBack(new LoadingTaskInfo(loadId, packPositionX, packPositionY, size.GetWidth(), size.GetHeight(), atlasUploadObserver));
+
     // apply the half pixel correction
     textureRect.x = (static_cast<float>(packPositionX) + 0.5f) / mWidth;                // left
     textureRect.y = (static_cast<float>(packPositionY) + 0.5f) / mHeight;               // top
@@ -273,37 +280,42 @@ void ImageAtlas::ObserverDestroyed(AtlasUploadObserver* observer)
 
 void ImageAtlas::UploadToAtlas(uint32_t id, PixelData pixelData)
 {
-  if(mLoadingTaskInfoContainer[0]->loadTaskId == id)
+  auto end = mLoadingTaskInfoContainer.End();
+  for(auto loadingTaskIterator = mLoadingTaskInfoContainer.Begin(); loadingTaskIterator != end; ++loadingTaskIterator)
   {
-    Rect<uint32_t> packRect(mLoadingTaskInfoContainer[0]->packRect);
-    if(!pixelData || (pixelData.GetWidth() == 0 && pixelData.GetHeight() == 0))
+    if((*loadingTaskIterator) && (*loadingTaskIterator)->loadTaskId == id)
     {
-      if(!mBrokenImageUrl.empty()) // replace with the broken image
+      Rect<uint32_t> packRect((*loadingTaskIterator)->packRect);
+      if(!pixelData || (pixelData.GetWidth() == 0 && pixelData.GetHeight() == 0))
       {
-        UploadBrokenImage(packRect);
+        if(!mBrokenImageUrl.empty()) // replace with the broken image
+        {
+          UploadBrokenImage(packRect);
+        }
       }
-    }
-    else
-    {
-      if(pixelData.GetWidth() < packRect.width || pixelData.GetHeight() < packRect.height)
+      else
       {
-        DALI_LOG_ERROR("Can not upscale the image from actual loaded size [ %d, %d ] to specified size [ %d, %d ]\n",
-                       pixelData.GetWidth(),
-                       pixelData.GetHeight(),
-                       packRect.width,
-                       packRect.height);
+        if(pixelData.GetWidth() < packRect.width || pixelData.GetHeight() < packRect.height)
+        {
+          DALI_LOG_ERROR("Can not upscale the image from actual loaded size [ %d, %d ] to specified size [ %d, %d ]\n",
+                        pixelData.GetWidth(),
+                        pixelData.GetHeight(),
+                        packRect.width,
+                        packRect.height);
+        }
+
+        mAtlas.Upload(pixelData, 0u, 0u, packRect.x, packRect.y, packRect.width, packRect.height);
       }
 
-      mAtlas.Upload(pixelData, 0u, 0u, packRect.x, packRect.y, packRect.width, packRect.height);
-    }
+      if((*loadingTaskIterator)->observer)
+      {
+        (*loadingTaskIterator)->observer->UploadCompleted();
+        (*loadingTaskIterator)->observer->Unregister(*this);
+      }
 
-    if(mLoadingTaskInfoContainer[0]->observer)
-    {
-      mLoadingTaskInfoContainer[0]->observer->UploadCompleted();
-      mLoadingTaskInfoContainer[0]->observer->Unregister(*this);
+      mLoadingTaskInfoContainer.Erase(loadingTaskIterator);
+      break;
     }
-
-    mLoadingTaskInfoContainer.Erase(mLoadingTaskInfoContainer.Begin());
   }
 }
 

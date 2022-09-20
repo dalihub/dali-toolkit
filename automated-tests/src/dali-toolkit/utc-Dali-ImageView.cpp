@@ -2694,10 +2694,6 @@ void ReloadImage(ImageView imageView)
 void ResourceFailedReload(Control control)
 {
   gFailCounter++;
-  if(gFailCounter < MAX_RETRIES)
-  {
-    ReloadImage(ImageView::DownCast(control));
-  }
 }
 } // namespace
 
@@ -2716,17 +2712,14 @@ int UtcDaliImageViewReloadFailedOnResourceReadySignal(void)
 
   // loading started, this waits for the loader thread to complete
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-  application.SendNotification();
-
   DALI_TEST_EQUALS(gFailCounter, 1, TEST_LOCATION);
 
+  ReloadImage(imageView);
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-  application.SendNotification();
-
   DALI_TEST_EQUALS(gFailCounter, 2, TEST_LOCATION);
 
+  ReloadImage(imageView);
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-  application.SendNotification();
   DALI_TEST_EQUALS(gFailCounter, 3, TEST_LOCATION);
 
   END_TEST;
@@ -3866,8 +3859,6 @@ int UtcDaliImageViewOnResourceReadySignalWithBrokenAlphaMask02(void)
     imageView.ResourceReadySignal().Connect(&OnSimpleResourceReadySignal);
 
     application.GetScene().Add(imageView);
-    application.SendNotification();
-    application.Render();
 
     // Don't unparent imageView, for keep the cache.
   };
@@ -3885,7 +3876,8 @@ int UtcDaliImageViewOnResourceReadySignalWithBrokenAlphaMask02(void)
 
   // Remain 1 signal due to we use #URL + 1 mask image.
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(expectResourceReadySignalCounter + 1), true, TEST_LOCATION);
-
+  application.SendNotification();
+  application.Render();
   DALI_TEST_EQUALS(gResourceReadySignalCounter, expectResourceReadySignalCounter, TEST_LOCATION);
 
   END_TEST;
@@ -4339,10 +4331,6 @@ int UtcDaliImageViewNpatchImageCacheTest02(void)
   textureCallStack.EnableLogging(true);
 
   auto TestBorderImage = [&](int index, const std::string& normalImageUrl, const Rect<int> border, const char* location) {
-    if(imageView[index])
-    {
-      imageView[index].Unparent();
-    }
     Property::Map map;
     map[Toolkit::Visual::Property::TYPE]        = Toolkit::Visual::N_PATCH;
     map[Toolkit::ImageVisual::Property::URL]    = normalImageUrl;
@@ -4375,6 +4363,7 @@ int UtcDaliImageViewNpatchImageCacheTest02(void)
 
   application.SendNotification();
   application.Render();
+
   // Check we use cached npatch data so we don't generate new texture textures
   DALI_TEST_EQUALS(textureCallStack.CountMethod("GenTextures"), 0, TEST_LOCATION);
 

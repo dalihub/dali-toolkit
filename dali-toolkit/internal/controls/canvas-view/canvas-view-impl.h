@@ -28,6 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/canvas-view/canvas-view.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/internal/controls/canvas-view/canvas-view-rasterize-task.h>
 
 namespace Dali
 {
@@ -135,20 +136,20 @@ public:
   /**
    * @bried Apply the rasterized image to the canvas view
    *
-   * @param[in] rasterizedTexture The texture with the rasterized pixels
+   * @param[in] task CanvasRendererRasterizingTaskPtr
    */
-  void ApplyRasterizedImage(Texture rasterizedTexture);
+  void ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task);
 
 private:
   CanvasView(const CanvasView&) = delete;
   CanvasView& operator=(const CanvasView&) = delete;
 
 private:
-  CanvasRenderer             mCanvasRenderer;
-  Dali::Texture              mTexture;
-  TextureSet                 mTextureSet;
-  Vector2                    mSize;
-  CanvasViewRasterizeThread* mCanvasViewRasterizeThread;
+  CanvasRenderer                   mCanvasRenderer;
+  Dali::Texture                    mTexture;
+  TextureSet                       mTextureSet;
+  Vector2                          mSize;
+  CanvasRendererRasterizingTaskPtr mRasterizingTask;
 };
 
 } // namespace Internal

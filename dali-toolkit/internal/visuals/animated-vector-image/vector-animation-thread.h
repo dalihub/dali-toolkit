@@ -22,10 +22,10 @@
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 #include <dali/public-api/signals/connection-tracker.h>
+#include <dali/public-api/adaptor-framework/round-robin-container-view.h>
 #include <memory>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/helpers/round-robin-container-view.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-task.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-rasterize-thread.h>
 

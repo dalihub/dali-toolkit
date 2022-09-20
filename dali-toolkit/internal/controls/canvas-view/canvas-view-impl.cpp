@@ -27,7 +27,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/internal/controls/canvas-view/canvas-view-rasterize-thread.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -57,22 +56,16 @@ CanvasView::CanvasView(const Vector2& viewBox)
   mCanvasRenderer(CanvasRenderer::New(viewBox)),
   mTexture(),
   mTextureSet(),
-  mSize(viewBox),
-  mCanvasViewRasterizeThread(nullptr)
+  mSize(viewBox)
 {
 }
 
 CanvasView::~CanvasView()
 {
-  if(mCanvasViewRasterizeThread)
-  {
-    mCanvasViewRasterizeThread->RemoveTask(this);
-
-    CanvasViewRasterizeThread::TerminateThread(mCanvasViewRasterizeThread);
-  }
-
   if(Adaptor::IsAvailable())
   {
+    Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
+    mRasterizingTask.Reset();
     Adaptor::Get().UnregisterProcessor(*this, true);
   }
 }
@@ -179,40 +172,37 @@ void CanvasView::Process(bool postProcessor)
 
 void CanvasView::AddRasterizationTask()
 {
-  CanvasRendererRasterizingTaskPtr newTask = new CanvasRendererRasterizingTask(this, mCanvasRenderer);
-
-  if(!mCanvasViewRasterizeThread)
-  {
-    mCanvasViewRasterizeThread = new CanvasViewRasterizeThread();
-    mCanvasViewRasterizeThread->RasterizationCompletedSignal().Connect(this, &CanvasView::ApplyRasterizedImage);
-    mCanvasViewRasterizeThread->Start();
-  }
+  mRasterizingTask = new CanvasRendererRasterizingTask(mCanvasRenderer, MakeCallback(this, &CanvasView::ApplyRasterizedImage));
 
   if(mCanvasRenderer.Commit())
   {
-    mCanvasViewRasterizeThread->AddTask(newTask);
+    AsyncTaskManager::Get().AddTask(mRasterizingTask);
   }
 }
 
-void CanvasView::ApplyRasterizedImage(Texture rasterizedTexture)
+void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
 {
-  if(rasterizedTexture && rasterizedTexture.GetWidth() != 0 && rasterizedTexture.GetHeight() != 0)
+  if(task->IsRasterized())
   {
-    if(!mTextureSet)
+    Texture rasterizedTexture = task->GetRasterizedTexture();
+    if(rasterizedTexture && rasterizedTexture.GetWidth() != 0 && rasterizedTexture.GetHeight() != 0)
     {
-      std::string fragmentShader = SHADER_CANVAS_VIEW_FRAG.data();
-      DevelTexture::ApplyNativeFragmentShader(rasterizedTexture, fragmentShader);
+      if(!mTextureSet)
+      {
+        std::string fragmentShader = SHADER_CANVAS_VIEW_FRAG.data();
+        DevelTexture::ApplyNativeFragmentShader(rasterizedTexture, fragmentShader);
 
-      mTextureSet       = TextureSet::New();
-      Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-      Shader   shader   = Shader::New(SHADER_CANVAS_VIEW_VERT, fragmentShader);
-      Renderer renderer = Renderer::New(geometry, shader);
+        mTextureSet       = TextureSet::New();
+        Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
+        Shader   shader   = Shader::New(SHADER_CANVAS_VIEW_VERT, fragmentShader);
+        Renderer renderer = Renderer::New(geometry, shader);
 
-      renderer.SetTextures(mTextureSet);
-      renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
-      Self().AddRenderer(renderer);
+        renderer.SetTextures(mTextureSet);
+        renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
+        Self().AddRenderer(renderer);
+      }
+      mTextureSet.SetTexture(0, rasterizedTexture);
     }
-    mTextureSet.SetTexture(0, rasterizedTexture);
   }
 
   //If there are accumulated changes to CanvasRenderer during Rasterize, Rasterize once again.
