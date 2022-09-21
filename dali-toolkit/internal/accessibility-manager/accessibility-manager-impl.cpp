@@ -1378,7 +1378,11 @@ bool AccessibilityManager::HandlePanGesture(const AccessibilityGestureEvent& pan
   DevelPanGesture::SetNumberOfTouches( pan, panEvent.numberOfTouches  );
   DevelPanGesture::SetScreenPosition( pan, panEvent.currentPosition );
   DevelPanGesture::SetScreenDisplacement( pan, mPreviousPosition - panEvent.currentPosition );
-  DevelPanGesture::SetScreenVelocity( pan, Vector2( pan.GetScreenDisplacement().x / panEvent.timeDelta, pan.GetScreenDisplacement().y / panEvent.timeDelta ) );
+  // Avoid dividing by 0
+  if(panEvent.timeDelta > 0)
+  {
+    DevelPanGesture::SetScreenVelocity( pan, Vector2( pan.GetScreenDisplacement().x / panEvent.timeDelta, pan.GetScreenDisplacement().y / panEvent.timeDelta ) );
+  }
 
   // Only handle the pan gesture when the current focused actor is scrollable or within a scrollable actor
   while(mCurrentGesturedActor && mCurrentGesturedActor != rootActor && !handled)
@@ -1394,7 +1398,11 @@ bool AccessibilityManager::HandlePanGesture(const AccessibilityGestureEvent& pan
       control.ScreenToLocal( localPrevious.x, localPrevious.y, mPreviousPosition.x, mPreviousPosition.y );
 
       DevelPanGesture::SetDisplacement( pan, localCurrent - localPrevious );
-      DevelPanGesture::SetVelocity( pan, Vector2( pan.GetDisplacement().x / panEvent.timeDelta, pan.GetDisplacement().y / panEvent.timeDelta ));
+      // Avoid dividing by 0
+      if(panEvent.timeDelta > 0)
+      {
+        DevelPanGesture::SetVelocity( pan, Vector2( pan.GetDisplacement().x / panEvent.timeDelta, pan.GetDisplacement().y / panEvent.timeDelta ));
+      }
 
       handled = GetImplementation( control ).OnAccessibilityPan(pan);
     }
