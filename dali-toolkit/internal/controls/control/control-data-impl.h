@@ -126,11 +126,6 @@ public:
   void LongPressDetected(Actor actor, const LongPressGesture& longPress);
 
   /**
-   * @brief Called when resources of control are ready.
-   */
-  void ResourceReady();
-
-  /**
    * @brief Called when a resource is ready.
    * @param[in] object The visual whose resources are ready
    * @note Overriding method in Visual::EventObserver.
