@@ -1167,3 +1167,70 @@ int UtcDaliControlImplOnPinch(void)
 
   END_TEST;
 }
+
+// For ResourceReady
+namespace
+{
+static bool gOnRelayoutCallBackCalled = false;
+void OnRelayoutCallback(Actor actor)
+{
+  gOnRelayoutCallBackCalled = true;
+}
+
+static bool gResourceReadyCalled = false;
+void OnResourceReady(Control control)
+{
+  gResourceReadyCalled = true;
+}
+}
+
+int UtcDaliControlImplResourceReady(void)
+{
+  ToolkitTestApplication application;
+
+  gOnRelayoutCallBackCalled = false;
+  gResourceReadyCalled = false;
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.OnRelayoutSignal().Connect(OnRelayoutCallback);
+  control.ResourceReadySignal().Connect(OnResourceReady);
+  application.GetScene().Add(control);
+
+  // Sanity check
+  DALI_TEST_CHECK(!gOnRelayoutCallBackCalled);
+  DALI_TEST_CHECK(!gResourceReadyCalled);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, true, TEST_LOCATION);
+  gOnRelayoutCallBackCalled = false;
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
+  Toolkit::Internal::Control& impl = Toolkit::Internal::GetImplementation(control);
+  // ResourceReady is true when there is no visual in the default Toolkit::Internal::Control.
+  DALI_TEST_EQUALS(impl.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+  impl.SetResourceReady(false);
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
+  gResourceReadyCalled = false;
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+  impl.SetResourceReady(true);
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, true, TEST_LOCATION);
+
+  END_TEST;
+}

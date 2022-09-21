@@ -60,7 +60,7 @@ class SceneView;
  * Users can place multiple cameras in a scene, either to show the entire scene or to show individual objects.
  * And the user can select the currently needed camera by using the SelectCamera() method.
  *
- * SceneView has one CameraActor built-in by default at the (0, 0, -z).
+ * SceneView makes one built-in CameraActor by default.
  * The default CameraActor has index 0 and is not removed by using RemoveCamera() method.
  * Therefore, the minimum value returned by GetCameraCount() method is 1.
  *
@@ -91,11 +91,10 @@ class SceneView;
  * sceneView.SetProperty(Dali::Actor::Property::SIZE, Vector2(400, 400));
  * mWindow.Add(sceneView);
  *
- * Dali::Scene3D::ModelView model = Dali::Scene3D::ModelView::New(...);
+ * Dali::Scene3D::Model model = Dali::Scene3D::Model::New(...);
  * sceneView.Add(model);
  *
  * CameraActor cameraActor = CameraActor::New();
- * // Setting CameraActor.
  * sceneView.AddCamera(cameraActor);
  *
  * @endcode
@@ -167,13 +166,16 @@ public:
    * @brief Adds a CameraActor to the SceneView
    * The CameraActor can be used as a selected camera to render the scene by using SelectCamera(uint32_t) or SelectCamera(std::string)
    *
-   * @note Some properties of the CameraActor will be change depending on the Size of this SceneView.
-   * Those properties are as follows:
-   * projectionMode, aspectRatio, nearPlaneDistance, farPlaneDistance, leftPlaneDistance, rightPlaneDistance, topPlaneDistance, and bottomPlaneDistance.
+   * @note
+   * AspectRatio property of CameraActor will be changed depending on the Size of this SceneView.
    *
+   * For Perspective camera
    * The FieldOfView of Dali::CameraActor is for vertical fov.
    * When the size of the SceneView is changed, the vertical fov is maintained
    * and the horizontal fov is automatically calculated according to the SceneView's aspect ratio.
+   *
+   * For Orthographic camera
+   * leftPlaneDistance, rightPlaneDistance, and bottomPlaneDistance properties are defined according to the topPlaneDistance and aspectRatio.
    *
    * @param[in] camera CameraActor added on this scene view.
    */
@@ -193,14 +195,14 @@ public:
    *
    * @return Number of cameras those currently the SceneView contains.
    */
-  uint32_t GetCameraCount();
+  uint32_t GetCameraCount() const;
 
   /**
    * @brief Retrieves selected CameraActor.
    *
    * @return CameraActor currently used in SceneView as a selected CameraActor
    */
-  CameraActor GetSelectedCamera();
+  CameraActor GetSelectedCamera() const;
 
   /**
    * @brief Retrieves a CameraActor of the index.
@@ -209,7 +211,7 @@ public:
    *
    * @return CameraActor of the index
    */
-  CameraActor GetCamera(uint32_t index);
+  CameraActor GetCamera(uint32_t index) const;
 
   /**
    * @brief Retrieves a CameraActor of the name.
@@ -218,7 +220,7 @@ public:
    *
    * @return CameraActor that has the name as a Dali::Actor::Property::NAME
    */
-  CameraActor GetCamera(const std::string& name);
+  CameraActor GetCamera(const std::string& name) const;
 
   /**
    * @brief Makes SceneView use a CameraActor of index as a selected camera.
@@ -241,11 +243,29 @@ public:
    * If SceneView has IBL, IBL of newly added Model is also overridden.
    * To set indivisual IBL for each Model, the Model's IBL should be set after the SceneView's IBL.
    *
-   * @param[in] diffuse cube map that can be used as a diffuse IBL source.
-   * @param[in] specular cube map that can be used as a specular IBL source.
+   * @param[in] diffuseUrl cube map that can be used as a diffuse IBL source.
+   * @param[in] specularUrl cube map that can be used as a specular IBL source.
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f]. Default value is 1.0f.
    */
-  void SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor = 1.0f);
+  void SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor = 1.0f);
+
+  /**
+   * @brief Sets Scale Factor of Image Based Light Source.
+   *
+   * @note If SetImageBasedLightSource() or SetImageBasedLightTexture() method is called after this method, scaleFactor is overriden.
+   * @note Default value is 1.0f.
+   *
+   * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f].
+   */
+  void SetImageBasedLightScaleFactor(float scaleFactor);
+
+  /**
+   * @brief Gets Scale Factor of Image Based Light Source.
+   * Default value is 1.0f.
+   *
+   * @return scale factor that controls light source intensity.
+   */
+  float GetImageBasedLightScaleFactor() const;
 
   /**
    * @brief Sets whether to use FBO or not for the SceneView.
@@ -265,7 +285,7 @@ public:
    *
    * @return bool True if this SceneView uses Framebuffer.
    */
-  bool IsUsingFramebuffer();
+  bool IsUsingFramebuffer() const;
 
 public: // Not intended for application developers
   /// @cond internal

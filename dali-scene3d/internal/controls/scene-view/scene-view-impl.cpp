@@ -31,7 +31,7 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/controls/model-view/model-view-impl.h>
+#include <dali-scene3d/internal/controls/model/model-impl.h>
 #include <dali-scene3d/public-api/loader/cube-map-loader.h>
 
 #include <dali/integration-api/debug.h>
@@ -118,17 +118,17 @@ void SceneView::RemoveCamera(CameraActor camera)
   }
 }
 
-uint32_t SceneView::GetCameraCount()
+uint32_t SceneView::GetCameraCount() const
 {
   return mCameras.size();
 }
 
-CameraActor SceneView::GetSelectedCamera()
+CameraActor SceneView::GetSelectedCamera() const
 {
   return mSelectedCamera;
 }
 
-CameraActor SceneView::GetCamera(uint32_t index)
+CameraActor SceneView::GetCamera(uint32_t index) const
 {
   if(index < mCameras.size())
   {
@@ -138,7 +138,7 @@ CameraActor SceneView::GetCamera(uint32_t index)
   return CameraActor();
 }
 
-CameraActor SceneView::GetCamera(const std::string& name)
+CameraActor SceneView::GetCamera(const std::string& name) const
 {
   CameraActor returnCamera;
   for(auto&& camera : mCameras)
@@ -162,22 +162,22 @@ void SceneView::SelectCamera(const std::string& name)
   UpdateCamera(GetCamera(name));
 }
 
-void SceneView::RegisterModelView(Scene3D::ModelView modelView)
+void SceneView::RegisterModel(Scene3D::Model model)
 {
-  if(modelView)
+  if(model)
   {
-    modelView.SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
-    mModels.push_back(modelView);
+    model.SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
+    mModels.push_back(model);
   }
 }
 
-void SceneView::UnregisterModelView(Scene3D::ModelView modelView)
+void SceneView::UnregisterModel(Scene3D::Model model)
 {
-  if(modelView)
+  if(model)
   {
     for(uint32_t i = 0; i < mModels.size(); ++i)
     {
-      if(mModels[i] == modelView)
+      if(mModels[i] == model)
       {
         mModels.erase(mModels.begin() + i);
         break;
@@ -186,12 +186,13 @@ void SceneView::UnregisterModelView(Scene3D::ModelView modelView)
   }
 }
 
-void SceneView::SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor)
+void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
-  Texture diffuseTexture = Dali::Scene3D::Loader::LoadCubeMap(diffuse);
+  mIBLResourceReady = false;
+  Texture diffuseTexture = Dali::Scene3D::Loader::LoadCubeMap(diffuseUrl);
   if(diffuseTexture)
   {
-    Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(specular);
+    Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(specularUrl);
     if(specularTexture)
     {
       mDiffuseTexture  = diffuseTexture;
@@ -207,6 +208,25 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuse, const std::
       }
     }
   }
+  mIBLResourceReady = true;
+  Control::SetResourceReady(false);
+}
+
+void SceneView::SetImageBasedLightScaleFactor(float scaleFactor)
+{
+  mIblScaleFactor = scaleFactor;
+  for(auto&& model : mModels)
+  {
+    if(model)
+    {
+      model.SetImageBasedLightScaleFactor(scaleFactor);
+    }
+  }
+}
+
+float SceneView::GetImageBasedLightScaleFactor() const
+{
+  return mIblScaleFactor;
 }
 
 void SceneView::UseFramebuffer(bool useFramebuffer)
@@ -218,7 +238,7 @@ void SceneView::UseFramebuffer(bool useFramebuffer)
   }
 }
 
-bool SceneView::IsUsingFramebuffer()
+bool SceneView::IsUsingFramebuffer() const
 {
   return mUseFrameBuffer;
 }
@@ -258,6 +278,7 @@ void SceneView::OnInitialize()
   mRenderTask.SetSourceActor(mRootLayer);
   mRenderTask.SetExclusive(true);
   mRenderTask.SetInputEnabled(true);
+  mRenderTask.SetCullMode(false);
   mRenderTask.SetScreenToFrameBufferMappingActor(Self());
 
   mDefaultCamera = Dali::CameraActor::New();
@@ -304,6 +325,11 @@ void SceneView::OnRelayout(const Vector2& size, RelayoutContainer& container)
   UpdateRenderTask();
 }
 
+bool SceneView::IsResourceReady() const
+{
+  return mIBLResourceReady;
+}
+
 void SceneView::UpdateCamera(CameraActor camera)
 {
   if(camera)
@@ -329,25 +355,14 @@ void SceneView::UpdateRenderTask()
     }
 
     Vector3 size = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-    float   fov  = 0.0f;
-    Vector3 cameraPosition(Vector3::ZERO);
-    float   nearPlain = 1.0f;
-    float   farPlain  = 1.0f;
-
-    // Several properties such as fov, nearPlane, farPlane, and position should not be changed after SetPerspectiveProjection is called.
-    // In the 3D scene, the properties are not changed by the changes of canvas size.
-    fov            = mSelectedCamera[Dali::CameraActor::Property::FIELD_OF_VIEW];
-    nearPlain      = mSelectedCamera[Dali::CameraActor::Property::NEAR_PLANE_DISTANCE];
-    farPlain       = mSelectedCamera[Dali::CameraActor::Property::FAR_PLANE_DISTANCE];
-    cameraPosition = Vector3(mSelectedCamera[Dali::Actor::Property::POSITION]);
-
-    mSelectedCamera.SetPerspectiveProjection(Dali::Size(size));
-
-    mSelectedCamera[Dali::CameraActor::Property::FIELD_OF_VIEW]       = fov;
-    mSelectedCamera[Dali::CameraActor::Property::NEAR_PLANE_DISTANCE] = nearPlain;
-    mSelectedCamera[Dali::CameraActor::Property::FAR_PLANE_DISTANCE]  = farPlain;
-    mSelectedCamera[Dali::Actor::Property::POSITION]                  = cameraPosition;
-
+    const float aspectRatio = size.width / size.height;
+    mSelectedCamera.SetAspectRatio(aspectRatio);
+    const float halfHeight = mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE];
+    const float halfWidth = aspectRatio * halfHeight;
+    mSelectedCamera[Dali::CameraActor::Property::LEFT_PLANE_DISTANCE]   = -halfWidth;
+    mSelectedCamera[Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE]  = halfWidth;
+    mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE]    = halfHeight; // Top is +ve to keep consistency with orthographic values
+    mSelectedCamera[Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE] = -halfHeight; // Bottom is -ve to keep consistency with orthographic values
     if(mUseFrameBuffer)
     {
       Dali::FrameBuffer currentFrameBuffer = mRenderTask.GetFrameBuffer();

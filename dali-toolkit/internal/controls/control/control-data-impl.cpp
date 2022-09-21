@@ -909,6 +909,24 @@ void Control::Impl::StartObservingVisual(Toolkit::Visual::Base& visual)
   visualImpl.AddEventObserver(*this);
 }
 
+void Control::Impl::ResourceReady(bool relayoutRequest)
+{
+  Actor self = mControlImpl.Self();
+  // A visual is ready so control may need relayouting if staged
+  if(relayoutRequest && self.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  {
+    mControlImpl.RelayoutRequest();
+  }
+
+  // Emit signal if all enabled visuals registered by the control are ready or there are no visuals.
+  if(IsResourceReady())
+  {
+    // Reset the flag
+    mNeedToEmitResourceReady = false;
+    EmitResourceReadySignal();
+  }
+}
+
 // Called by a Visual when it's resource is ready
 void Control::Impl::ResourceReady(Visual::Base& object)
 {
@@ -938,20 +956,8 @@ void Control::Impl::ResourceReady(Visual::Base& object)
     }
   }
 
-  // A visual is ready so control may need relayouting if staged
-  if(self.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
-  {
-    mControlImpl.RelayoutRequest();
-  }
-
-  // Emit signal if all enabled visuals registered by the control are ready.
-  if(IsResourceReady())
-  {
-    // Reset the flag
-    mNeedToEmitResourceReady = false;
-
-    EmitResourceReadySignal();
-  }
+  // Called by a Visual when it's resource is ready
+  ResourceReady(true);
 }
 
 void Control::Impl::NotifyVisualEvent(Visual::Base& object, Property::Index signalId)

@@ -30,8 +30,8 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/controls/model-view/model-view.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
+#include <dali-scene3d/public-api/controls/model/model.h>
 
 namespace Dali
 {
@@ -67,22 +67,22 @@ public:
   /**
    * @copydoc SceneView::GetCameraCount()
    */
-  uint32_t GetCameraCount();
+  uint32_t GetCameraCount() const;
 
   /**
    * @copydoc SceneView::GetSelectedCamera()
    */
-  CameraActor GetSelectedCamera();
+  CameraActor GetSelectedCamera() const;
 
   /**
    * @copydoc SceneView::GetCamera()
    */
-  CameraActor GetCamera(uint32_t index);
+  CameraActor GetCamera(uint32_t index) const;
 
   /**
    * @copydoc SceneView::GetCamera()
    */
-  CameraActor GetCamera(const std::string& name);
+  CameraActor GetCamera(const std::string& name) const;
 
   /**
    * @copydoc SceneView::SelectCamera()
@@ -95,25 +95,35 @@ public:
   void SelectCamera(const std::string& name);
 
   /**
-   * @brief Register a ModelView.
-   * Some works like ibl setting should be applied on the only ModelView not the all child actors.
-   * SceneView contains child ModelView list to apply the works effectively.
+   * @brief Register a Model.
+   * Some works like ibl setting should be applied on the only Model not the all child actors.
+   * SceneView contains child Model list to apply the works effectively.
    *
-   * @param[in] modelView ModelView to be registered.
+   * @param[in] model Model to be registered.
    */
-  void RegisterModelView(Scene3D::ModelView modelView);
+  void RegisterModel(Scene3D::Model model);
 
   /**
-   * @brief Unregister a ModelView
+   * @brief Unregister a Model
    *
-   * @param[in] modelView ModelView to be unregistered.
+   * @param[in] model Model to be unregistered.
    */
-  void UnregisterModelView(Scene3D::ModelView modelView);
+  void UnregisterModel(Scene3D::Model model);
 
   /**
    * @copydoc SceneView::SetImageBasedLightSource()
    */
-  void SetImageBasedLightSource(const std::string& diffuse, const std::string& specular, float scaleFactor);
+  void SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor);
+
+  /**
+   * @copydoc SceneView::SetImageBasedLightScaleFactor()
+   */
+  void SetImageBasedLightScaleFactor(float scaleFactor);
+
+  /**
+   * @copydoc SceneView::GetImageBasedLightScaleFactor()
+   */
+  float GetImageBasedLightScaleFactor() const;
 
   /**
    * @copydoc SceneView::UseFramebuffer()
@@ -123,7 +133,7 @@ public:
   /**
    * @copydoc SceneView::IsUsingFramebuffer()
    */
-  bool IsUsingFramebuffer();
+  bool IsUsingFramebuffer() const;
 
 protected:
   /**
@@ -178,6 +188,11 @@ private:
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
+   * @copydoc Toolkit::Control::IsResourceReady()
+   */
+  bool IsResourceReady() const override;
+
+  /**
    * @brief Changes main camera as a input camera
    *
    * @param camera CameraActor that will be a main camera of the SceneView
@@ -194,13 +209,13 @@ private:
 
   /////////////////////////////////////////////////////////////
   // FrameBuffer and Rendertask to render child objects as a 3D Scene
-  CameraActor                     mDefaultCamera;
-  CameraActor                     mSelectedCamera;
-  std::vector<CameraActor>        mCameras;
-  std::vector<Scene3D::ModelView> mModels;
-  Dali::FrameBuffer               mRenderTarget;
-  Dali::Texture                   mTexture;
-  Dali::RenderTask                mRenderTask;
+  CameraActor                 mDefaultCamera;
+  CameraActor                 mSelectedCamera;
+  std::vector<CameraActor>    mCameras;
+  std::vector<Scene3D::Model> mModels;
+  Dali::FrameBuffer           mRenderTarget;
+  Dali::Texture               mTexture;
+  Dali::RenderTask            mRenderTask;
 
   Layer mRootLayer;
 
@@ -208,6 +223,7 @@ private:
   Dali::Texture mDiffuseTexture;
   float         mIblScaleFactor{1.0f};
   bool          mUseFrameBuffer{false};
+  bool          mIBLResourceReady{true};
 
   // TODO : Light Source
 };

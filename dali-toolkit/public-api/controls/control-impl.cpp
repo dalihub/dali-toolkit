@@ -167,6 +167,12 @@ void Control::ClearBackground()
   RelayoutRequest();
 }
 
+void Control::SetResourceReady(bool relayoutRequest)
+{
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+  controlDataImpl.ResourceReady(relayoutRequest);
+}
+
 Toolkit::DevelControl::ControlAccessible* Control::GetAccessibleObject()
 {
   return mImpl->GetAccessibleObject();
@@ -448,6 +454,12 @@ void Control::Initialize()
 
 void Control::OnInitialize()
 {
+}
+
+bool Control::IsResourceReady() const
+{
+  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+  return controlDataImpl.IsResourceReady();
 }
 
 void Control::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)

@@ -1,7 +1,7 @@
 set(scene3d_public_api_dir "${scene3d_dir}/public-api")
 
 set(scene3d_src_files ${scene3d_src_files}
-	${scene3d_public_api_dir}/controls/model-view/model-view.cpp
+	${scene3d_public_api_dir}/controls/model/model.cpp
 	${scene3d_public_api_dir}/controls/scene-view/scene-view.cpp
 	${scene3d_public_api_dir}/loader/alpha-function-helper.cpp
 	${scene3d_public_api_dir}/loader/animated-property.cpp

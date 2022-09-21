@@ -1146,6 +1146,9 @@ int UtcDaliTextControllerCheckInputFontPointSizeChanged(void)
   const Size size( application.GetScene().GetSize() );
   controller->Relayout(size);
 
+  // For coverage
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::DOWN ) );
+
   tet_result(TET_PASS);
 
   END_TEST;
