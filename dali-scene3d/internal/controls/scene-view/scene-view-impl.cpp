@@ -268,7 +268,6 @@ void SceneView::OnInitialize()
   mRenderTask.SetSourceActor(mRootLayer);
   mRenderTask.SetExclusive(true);
   mRenderTask.SetInputEnabled(true);
-  mRenderTask.SetCullMode(false);
   mRenderTask.SetScreenToFrameBufferMappingActor(Self());
 
   mDefaultCamera = Dali::CameraActor::New();
@@ -352,7 +351,9 @@ void SceneView::UpdateRenderTask()
     Vector3 size = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
     const float aspectRatio = size.width / size.height;
     mSelectedCamera.SetAspectRatio(aspectRatio);
-    const float halfHeight = mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE];
+    const float fov = mSelectedCamera[Dali::CameraActor::Property::FIELD_OF_VIEW];
+    const float near = mSelectedCamera[Dali::CameraActor::Property::NEAR_PLANE_DISTANCE];
+    const float halfHeight = tanf(fov/2) * near;
     const float halfWidth = aspectRatio * halfHeight;
     mSelectedCamera[Dali::CameraActor::Property::LEFT_PLANE_DISTANCE]   = -halfWidth;
     mSelectedCamera[Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE]  = halfWidth;
