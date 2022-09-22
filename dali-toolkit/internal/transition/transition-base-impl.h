@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TRANSITION_BASE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,7 +126,6 @@ public:
   }
 
 protected:
-
   /**
    * @brief Set property map which will be used as a animation start properties.
    * @param[in] propertyMap propertyMap that will be used as a start value of transition.
@@ -161,18 +160,6 @@ protected:
   {
     mTarget = target;
   }
-
-  /**
-   * @brief Gets world transform of input Actor.
-   * @param[in] actor actor for get world transform.
-   */
-  Matrix GetWorldTransform(Dali::Actor actor);
-
-  /**
-   * @brief Gets world color of input Actor.
-   * @param[in] actor actor for get world color.
-   */
-  Vector4 GetWorldColor(Dali::Actor actor);
 
   /**
    * @brief Returns whether this transition will be applied to children of target or not.
@@ -256,19 +243,19 @@ private:
   }
 
 private:
-  Dali::Toolkit::Control       mTarget;              ///< Target that will be animated.
-  Dali::Actor                  mCopiedActor;         ///< Copied View that will replace mTarget during transition
-  Dali::Animation              mAnimation;           ///< Property animations for the transition of mTarget
-  AlphaFunction                mAlphaFunction;       ///< Alpha function that will applied for the property animation
-  Property::Map                mStartPropertyMap;    ///< Start properties to be animated. (world transform)
-  Property::Map                mFinishPropertyMap;   ///< Finish properties to be animated. (world transform)
-  Property::Map                mOriginalPropertyMap; ///< Original properties of mTarget to be used to restore after the transition is finished.
-  Dali::TimePeriod             mTimePeriod;          ///< TimePeriod of transition
-  bool                         mTransitionWithChild; ///< True, if mTarget transition is inherit to its child Actors.
-                                                     ///< If this is false, the child Actors are moved to the child of mCopiedActor that will have original properties of target Actor during Transition.
-  bool mMoveTargetChildren;                          ///< Flag, if mTransitionWithChild is false and mTarget has children than True.
-  bool mIsAppearingTransition;                       ///< True, if this transition is appearing transition.
-  bool mIsPairTransition;                            ///< True, if this transition is started from a Control to another Control.
+  Dali::Toolkit::Control mTarget;              ///< Target that will be animated.
+  Dali::Actor            mCopiedActor;         ///< Copied View that will replace mTarget during transition
+  Dali::Animation        mAnimation;           ///< Property animations for the transition of mTarget
+  AlphaFunction          mAlphaFunction;       ///< Alpha function that will applied for the property animation
+  Property::Map          mStartPropertyMap;    ///< Start properties to be animated. (world transform)
+  Property::Map          mFinishPropertyMap;   ///< Finish properties to be animated. (world transform)
+  Property::Map          mOriginalPropertyMap; ///< Original properties of mTarget to be used to restore after the transition is finished.
+  Dali::TimePeriod       mTimePeriod;          ///< TimePeriod of transition
+  bool                   mTransitionWithChild; ///< True, if mTarget transition is inherit to its child Actors.
+                                               ///< If this is false, the child Actors are moved to the child of mCopiedActor that will have original properties of target Actor during Transition.
+  bool mMoveTargetChildren;                    ///< Flag, if mTransitionWithChild is false and mTarget has children than True.
+  bool mIsAppearingTransition;                 ///< True, if this transition is appearing transition.
+  bool mIsPairTransition;                      ///< True, if this transition is started from a Control to another Control.
 };
 
 } // namespace Internal

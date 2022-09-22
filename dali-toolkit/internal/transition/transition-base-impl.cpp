@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,36 +70,6 @@ Property::Map GetOriginalProperties(Dali::Toolkit::Control control)
   return propertyMap;
 }
 
-/**
- * @brief Computes and center position by using transform properties.
- * @param[in] anchorPoint anchorPoint of an actor.
- * @param[in] positionUsesAnchorPoint positionUsesAnchorPoint of an actor.
- * @param[in] size size of an actor.
- * @param[in] scale scale of an actor.
- * @param[in] orientation orientation of an actor.
- */
-Vector3 CalculateCenterPosition(
-  const Vector3&    anchorPoint,
-  const bool        positionUsesAnchorPoint,
-  const Vector3&    size,
-  const Vector3&    scale,
-  const Quaternion& orientation)
-{
-  Vector3       centerPosition;
-  const Vector3 half(0.5f, 0.5f, 0.5f);
-  const Vector3 topLeft(0.0f, 0.0f, 0.5f);
-  // Calculate the center-point by applying the scale and rotation on the anchor point.
-  centerPosition = (half - anchorPoint) * size * scale;
-  centerPosition *= orientation;
-
-  // If the position is ignoring the anchor-point, then remove the anchor-point shift from the position.
-  if(!positionUsesAnchorPoint)
-  {
-    centerPosition -= (topLeft - anchorPoint) * size;
-  }
-  return centerPosition;
-}
-
 } // anonymous namespace
 
 TransitionBasePtr TransitionBase::New()
@@ -161,7 +131,7 @@ void TransitionBase::TransitionWithChild(bool transitionWithChild)
 
 void TransitionBase::PreProcess(Dali::Animation animation)
 {
-  mAnimation           = animation;
+  mAnimation = animation;
   // Retrieve original property map of mTarget to backup and to reset after transition is finished.
   mOriginalPropertyMap = GetOriginalProperties(mTarget);
   mMoveTargetChildren  = false;
@@ -183,11 +153,11 @@ void TransitionBase::Play()
 
   // Set world transform and color to the target control to make it independent of the parent control and its transition.
   // The properties will be returned at the TransitionFinished() method.
-  Matrix     targetWorldTransform = GetWorldTransform(mTarget);
+  Matrix     targetWorldTransform = DevelActor::GetWorldTransform(mTarget);
   Vector3    targetPosition, targetScale;
   Quaternion targetOrientation;
   targetWorldTransform.GetTransformComponents(targetPosition, targetOrientation, targetScale);
-  Vector4 targetColor = GetWorldColor(mTarget);
+  Vector4 targetColor = DevelActor::GetWorldColor(mTarget);
 
   mTarget.SetProperties(PROPERTY_MAP_INDEPENDENT_CONTROL);
   mTarget[Dali::Actor::Property::POSITION]    = targetPosition;
@@ -280,141 +250,6 @@ void TransitionBase::TransitionFinished()
     mCopiedActor.Reset();
   }
   mAnimation.Reset();
-}
-
-Matrix TransitionBase::GetWorldTransform(Dali::Actor actor)
-{
-  enum InheritanceMode
-  {
-    DONT_INHERIT_TRANSFORM = 0,
-    INHERIT_POSITION       = 1,
-    INHERIT_SCALE          = 2,
-    INHERIT_ORIENTATION    = 4,
-    INHERIT_ALL            = INHERIT_POSITION | INHERIT_SCALE | INHERIT_ORIENTATION,
-  };
-
-  std::vector<Dali::Actor>     descentList;
-  std::vector<InheritanceMode> inheritanceModeList;
-  Dali::Actor                  currentActor = actor;
-  int                          inheritance  = 0;
-  do
-  {
-    inheritance = (static_cast<int>(currentActor.GetProperty<bool>(Dali::Actor::Property::INHERIT_ORIENTATION)) << 2) +
-                  (static_cast<int>(currentActor.GetProperty<bool>(Dali::Actor::Property::INHERIT_SCALE)) << 1) +
-                  static_cast<int>(currentActor.GetProperty<bool>(Dali::Actor::Property::INHERIT_POSITION));
-    inheritanceModeList.push_back(static_cast<InheritanceMode>(inheritance));
-    descentList.push_back(currentActor);
-    currentActor = currentActor.GetParent();
-  } while(inheritance != DONT_INHERIT_TRANSFORM && currentActor);
-
-  Matrix  worldMatrix;
-  Vector3 localPosition;
-  for(unsigned int i(descentList.size() - 1); i < descentList.size(); --i)
-  {
-    Vector3    anchorPoint             = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::ANCHOR_POINT);
-    Vector3    parentOrigin            = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::PARENT_ORIGIN);
-    bool       positionUsesAnchorPoint = descentList[i].GetProperty<bool>(Dali::Actor::Property::POSITION_USES_ANCHOR_POINT);
-    Vector3    size                    = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-    Vector3    actorPosition           = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::POSITION);
-    Quaternion localOrientation        = descentList[i].GetProperty<Quaternion>(Dali::Actor::Property::ORIENTATION);
-    Vector3    localScale              = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::SCALE);
-
-    Vector3 centerPosition = CalculateCenterPosition(anchorPoint, positionUsesAnchorPoint, size, localScale, localOrientation);
-    if(inheritanceModeList[i] != DONT_INHERIT_TRANSFORM && descentList[i].GetParent())
-    {
-      Matrix  localMatrix;
-      Vector3 parentSize = descentList[i + 1].GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-      if(inheritanceModeList[i] == INHERIT_ALL)
-      {
-        localPosition = actorPosition + centerPosition + (parentOrigin - Vector3(0.5f, 0.5f, 0.5f)) * parentSize;
-        localMatrix.SetTransformComponents(localScale, localOrientation, localPosition);
-
-        //Update the world matrix
-        Matrix tempMatrix;
-        Matrix::Multiply(tempMatrix, localMatrix, worldMatrix);
-        worldMatrix = tempMatrix;
-      }
-      else
-      {
-        Vector3    parentPosition, parentScale;
-        Quaternion parentOrientation;
-        worldMatrix.GetTransformComponents(parentPosition, parentOrientation, parentScale);
-
-        if((inheritanceModeList[i] & INHERIT_SCALE) == 0)
-        {
-          //Don't inherit scale
-          localScale /= parentScale;
-        }
-
-        if((inheritanceModeList[i] & INHERIT_ORIENTATION) == 0)
-        {
-          //Don't inherit orientation
-          parentOrientation.Invert();
-          localOrientation = parentOrientation * localOrientation;
-        }
-
-        if((inheritanceModeList[i] & INHERIT_POSITION) == 0)
-        {
-          localMatrix.SetTransformComponents(localScale, localOrientation, Vector3::ZERO);
-          Matrix tempMatrix;
-          Matrix::Multiply(tempMatrix, localMatrix, worldMatrix);
-          worldMatrix = tempMatrix;
-          worldMatrix.SetTranslation(actorPosition + centerPosition);
-        }
-        else
-        {
-          localPosition = actorPosition + centerPosition + (parentOrigin - Vector3(0.5f, 0.5f, 0.5f)) * parentSize;
-          localMatrix.SetTransformComponents(localScale, localOrientation, localPosition);
-          Matrix tempMatrix;
-          Matrix::Multiply(tempMatrix, localMatrix, worldMatrix);
-          worldMatrix = tempMatrix;
-        }
-      }
-    }
-    else
-    {
-      localPosition = actorPosition + centerPosition;
-      worldMatrix.SetTransformComponents(localScale, localOrientation, localPosition);
-    }
-  }
-
-  return worldMatrix;
-}
-
-Vector4 TransitionBase::GetWorldColor(Dali::Actor actor)
-{
-  std::vector<Dali::Actor>     descentList;
-  std::vector<Dali::ColorMode> inheritanceModeList;
-  Dali::Actor                  currentActor = actor;
-  Dali::ColorMode              inheritance  = Dali::ColorMode::USE_OWN_MULTIPLY_PARENT_ALPHA;
-  do
-  {
-    inheritance = currentActor.GetProperty<Dali::ColorMode>(Dali::Actor::Property::COLOR_MODE);
-    inheritanceModeList.push_back(inheritance);
-    descentList.push_back(currentActor);
-    currentActor = currentActor.GetParent();
-  } while(inheritance != Dali::ColorMode::USE_OWN_COLOR && currentActor);
-
-  Vector4 worldColor;
-  for(unsigned int i(descentList.size() - 1); i < descentList.size(); --i)
-  {
-    if(inheritanceModeList[i] == USE_OWN_COLOR || i == descentList.size() - 1)
-    {
-      worldColor = descentList[i].GetProperty<Vector4>(Dali::Actor::Property::COLOR);
-    }
-    else if(inheritanceModeList[i] == USE_OWN_MULTIPLY_PARENT_ALPHA)
-    {
-      Vector4 ownColor = descentList[i].GetProperty<Vector4>(Dali::Actor::Property::COLOR);
-      worldColor       = Vector4(ownColor.r, ownColor.g, ownColor.b, ownColor.a * worldColor.a);
-    }
-    else if(inheritanceModeList[i] == USE_OWN_MULTIPLY_PARENT_COLOR)
-    {
-      Vector4 ownColor = descentList[i].GetProperty<Vector4>(Dali::Actor::Property::COLOR);
-      worldColor *= ownColor;
-    }
-  }
-
-  return worldColor;
 }
 
 } // namespace Internal
