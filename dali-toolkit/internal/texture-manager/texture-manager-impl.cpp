@@ -711,29 +711,39 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId, TextureU
     {
       TextureManager::TextureId maskTextureId = INVALID_TEXTURE_ID;
       TextureInfo&              textureInfo(mTextureCacheManager[textureCacheIndex]);
-      if(textureInfo.maskTextureId != INVALID_TEXTURE_ID)
+      // We only need to consider maskTextureId when texture's loadState is not CANCELLED. Because it is already deleted.
+      if(textureInfo.loadState != LoadState::CANCELLED)
       {
-        maskTextureId = textureInfo.maskTextureId;
+        if(textureInfo.maskTextureId != INVALID_TEXTURE_ID)
+        {
+          maskTextureId = textureInfo.maskTextureId;
+        }
       }
 
       // the case that LoadingQueue is working.
       if(mLoadingQueueTextureId != INVALID_TEXTURE_ID)
       {
         // If textureId is not same, this observer need to delete when ProcessRemoveQueue() is called.
-        TextureUploadObserver* queueObserver = nullptr;
-        if(mLoadingQueueTextureId != textureId)
+        // If textureId is same, we should not call RemoveTextureObserver.
+        // Because ObserverDestroyed signal already disconnected in NotifyObservers
+        TextureUploadObserver* queueObserver = observer;
+        if(mLoadingQueueTextureId == textureId)
         {
-          queueObserver = observer;
+          queueObserver = nullptr;
         }
 
-        // Remove textureId after NotifyObserver finished
-        if(maskTextureId != INVALID_TEXTURE_ID)
+        // Remove element from the mLoadQueue
+        for(auto&& element : mLoadQueue)
         {
-          if(textureInfo.loadState != LoadState::CANCELLED)
+          if(element.mTextureId == textureId && element.mObserver == observer)
           {
-            mRemoveQueue.PushBack(QueueElement(maskTextureId, nullptr));
+            // Do not erase the item. We will clear it later in ProcessLoadQueue().
+            element.mTextureId = INVALID_TEXTURE_ID;
+            element.mObserver  = nullptr;
+            break;
           }
         }
+
         mRemoveQueue.PushBack(QueueElement(textureId, queueObserver));
       }
       else
@@ -741,10 +751,7 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId, TextureU
         // Remove its observer
         RemoveTextureObserver(textureInfo, observer);
 
-        // Keep loadState due to the textureInfo validate problem.
-        auto textureLoadState = textureInfo.loadState;
-
-        // Remove textureId in CacheManager
+        // Remove textureId in CacheManager. Now, textureInfo is invalidate.
         mTextureCacheManager.RemoveCache(textureInfo);
 
         // Remove maskTextureId in CacheManager
@@ -754,27 +761,8 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId, TextureU
           if(maskCacheIndex != INVALID_CACHE_INDEX)
           {
             TextureInfo& maskTextureInfo(mTextureCacheManager[maskCacheIndex]);
-
-            // Only Remove maskTexture when texture's loadState is not CANCELLED. because it is already deleted.
-            if(textureLoadState != LoadState::CANCELLED)
-            {
-              mTextureCacheManager.RemoveCache(maskTextureInfo);
-            }
+            mTextureCacheManager.RemoveCache(maskTextureInfo);
           }
-        }
-      }
-    }
-
-    if(observer)
-    {
-      // Remove element from the LoadQueue
-      for(auto&& element : mLoadQueue)
-      {
-        if(element.mObserver == observer)
-        {
-          // Do not erase the item. We will clear it later in ProcessLoadQueue().
-          element.mObserver = nullptr;
-          break;
         }
       }
     }
@@ -888,7 +876,10 @@ void TextureManager::QueueLoadTexture(const TextureManager::TextureInfo& texture
   const auto& textureId = textureInfo.textureId;
   mLoadQueue.PushBack(QueueElement(textureId, observer));
 
-  observer->DestructionSignal().Connect(this, &TextureManager::ObserverDestroyed);
+  if(observer)
+  {
+    observer->DestructionSignal().Connect(this, &TextureManager::ObserverDestroyed);
+  }
 }
 
 void TextureManager::LoadTexture(TextureManager::TextureInfo& textureInfo, TextureUploadObserver* observer)
@@ -918,7 +909,7 @@ void TextureManager::ProcessLoadQueue()
 {
   for(auto&& element : mLoadQueue)
   {
-    if(!element.mObserver)
+    if(element.mTextureId == INVALID_TEXTURE_ID)
     {
       continue;
     }
@@ -929,7 +920,10 @@ void TextureManager::ProcessLoadQueue()
       TextureInfo& textureInfo(mTextureCacheManager[cacheIndex]);
       if((textureInfo.loadState == LoadState::UPLOADED) || (textureInfo.loadState == LoadState::LOAD_FINISHED && textureInfo.storageType == StorageType::RETURN_PIXEL_BUFFER))
       {
-        EmitLoadComplete(element.mObserver, textureInfo, true);
+        if(element.mObserver)
+        {
+          EmitLoadComplete(element.mObserver, textureInfo, true);
+        }
       }
       else if(textureInfo.loadState == LoadState::LOADING)
       {
@@ -948,15 +942,11 @@ void TextureManager::ProcessLoadQueue()
 
 void TextureManager::ProcessRemoveQueue()
 {
-  TextureCacheIndex textureCacheIndex = INVALID_CACHE_INDEX;
   for(auto&& element : mRemoveQueue)
   {
-    textureCacheIndex = mTextureCacheManager.GetCacheIndexFromId(element.mTextureId);
-    if(textureCacheIndex != INVALID_CACHE_INDEX)
+    if(element.mTextureId != INVALID_TEXTURE_ID)
     {
-      TextureInfo& textureInfo(mTextureCacheManager[textureCacheIndex]);
-      RemoveTextureObserver(textureInfo, element.mObserver);
-      mTextureCacheManager.RemoveCache(textureInfo);
+      Remove(element.mTextureId, element.mObserver);
     }
   }
   mRemoveQueue.Clear();
@@ -1127,9 +1117,12 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
     UploadTextures(pixelBuffers, maskTextureInfo);
   }
 
-  // Search the cache, checking if any texture has this texture id as a
-  // maskTextureId:
+  // Search the cache, checking if any texture has this texture id as a maskTextureId
   const std::size_t size = mTextureCacheManager.size();
+
+  // Keep notify observer required textureIds.
+  // Note : NotifyObservers can change mTextureCacheManager cache struct. We should check id's validation before notify.
+  std::vector<TextureId> notifyRequiredTextureIds;
 
   // TODO : Refactorize here to not iterate whole cached image.
   for(TextureCacheIndex cacheIndex = TextureCacheIndex(TextureManagerType::TEXTURE_CACHE_INDEX_TYPE_LOCAL, 0u); cacheIndex.GetIndex() < size; ++cacheIndex.detailValue.index)
@@ -1156,8 +1149,7 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
           pixelBuffers.push_back(textureInfo.pixelBuffer);
           UploadTextures(pixelBuffers, textureInfo);
 
-          // notify mask texture set.
-          NotifyObservers(textureInfo, true);
+          notifyRequiredTextureIds.push_back(textureInfo.textureId);
         }
       }
       else
@@ -1167,8 +1159,20 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
         std::vector<Devel::PixelBuffer> pixelBuffers;
         pixelBuffers.push_back(textureInfo.pixelBuffer);
         UploadTextures(pixelBuffers, textureInfo);
-        NotifyObservers(textureInfo, true);
+
+        notifyRequiredTextureIds.push_back(textureInfo.textureId);
       }
+    }
+  }
+
+  // Notify textures are masked
+  for(const auto textureId : notifyRequiredTextureIds)
+  {
+    TextureCacheIndex textureCacheIndex = mTextureCacheManager.GetCacheIndexFromId(textureId);
+    if(textureCacheIndex != INVALID_CACHE_INDEX)
+    {
+      TextureInfo& textureInfo(mTextureCacheManager[textureCacheIndex]);
+      NotifyObservers(textureInfo, true);
     }
   }
 }
@@ -1317,7 +1321,8 @@ void TextureManager::ObserverDestroyed(TextureUploadObserver* observer)
   {
     if(element.mObserver == observer)
     {
-      element.mObserver = nullptr;
+      element.mTextureId = INVALID_TEXTURE_ID;
+      element.mObserver  = nullptr;
     }
   }
 }
