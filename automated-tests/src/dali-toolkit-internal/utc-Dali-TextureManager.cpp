@@ -54,8 +54,9 @@ void utc_dali_toolkit_texture_manager_cleanup(void)
 
 namespace
 {
-const char* TEST_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
-const char* TEST_MASK_FILE_NAME  = TEST_RESOURCE_DIR "/mask.png";
+const char* TEST_IMAGE_FILE_NAME   = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
+const char* TEST_IMAGE_2_FILE_NAME = TEST_RESOURCE_DIR "/icon-delete.png";
+const char* TEST_MASK_FILE_NAME    = TEST_RESOURCE_DIR "/mask.png";
 
 class TestObserver : public Dali::Toolkit::TextureUploadObserver
 {
@@ -1034,7 +1035,7 @@ int UtcTextureManagerAsyncSyncAsync(void)
   Texture asyncTexture2 = asyncTextureSet2.GetTexture(0u);
   DALI_TEST_CHECK(syncTexture);
   DALI_TEST_CHECK(asyncTexture2);
-  DALI_TEST_CHECK(asyncTexture2 == syncTexture);               // check loaded two texture is same.
+  DALI_TEST_CHECK(asyncTexture2 == syncTexture); // check loaded two texture is same.
 
   // observer is called synchronously because the texture is cached.
   DALI_TEST_EQUALS(asyncObserver2.mLoaded, true, TEST_LOCATION);
@@ -1213,6 +1214,165 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
   DALI_TEST_EQUALS(observer2.mLoaded, false, TEST_LOCATION); ///< Note that we call AsyncLoadComplete hardly with empty pixelbuffer.
   DALI_TEST_EQUALS(observer2.mObserverCalled, true, TEST_LOCATION);
   DALI_TEST_EQUALS(observer2.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcTextureManagerMaskCacheTest(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcTextureManagerMaskCacheTest");
+
+  TextureManager textureManager; // Create new texture manager
+
+  TestObserver observer1;
+  TestObserver observer2;
+
+  std::string                        filename(TEST_IMAGE_FILE_NAME);
+  std::string                        filename2(TEST_IMAGE_2_FILE_NAME);
+  std::string                        maskname(TEST_MASK_FILE_NAME);
+  TextureManager::MaskingDataPointer maskInfo = nullptr;
+  maskInfo.reset(new TextureManager::MaskingData());
+  maskInfo->mAlphaMaskUrl       = maskname;
+  maskInfo->mAlphaMaskId        = TextureManager::INVALID_TEXTURE_ID;
+  maskInfo->mCropToMask         = true;
+  maskInfo->mContentScaleFactor = 1.0f;
+
+  TextureManager::MaskingDataPointer maskInfo2 = nullptr;
+  maskInfo2.reset(new TextureManager::MaskingData());
+  maskInfo2->mAlphaMaskUrl       = maskname;
+  maskInfo2->mAlphaMaskId        = TextureManager::INVALID_TEXTURE_ID;
+  maskInfo2->mCropToMask         = true;
+  maskInfo2->mContentScaleFactor = 1.0f;
+
+  auto                          textureId1(TextureManager::INVALID_TEXTURE_ID);
+  auto                          textureId2(TextureManager::INVALID_TEXTURE_ID);
+  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
+  Dali::ImageDimensions         atlasRectSize(0, 0);
+  bool                          synchronousLoading(false);
+  bool                          atlasingStatus(false);
+  bool                          loadingStatus(false);
+  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  ImageAtlasManagerPtr          atlasManager        = nullptr;
+  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+
+  textureManager.LoadTexture(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    synchronousLoading,
+    textureId1,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    &observer1,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  DALI_TEST_EQUALS(observer1.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mObserverCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Load image and mask image.
+  // Now, LoadState become MASK_APPLYING
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  tet_printf("Current textureId1:%d's state become MASK_APPLYING\n", static_cast<int>(textureId1));
+
+  textureManager.LoadTexture(
+    filename2,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo2,
+    synchronousLoading,
+    textureId2,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    &observer2,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  application.SendNotification();
+  application.Render();
+
+  // Load image2 + image1 apply mask + image2 apply mask = total 3 event trigger required.
+  // Note that we use cached mask image.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mObserverCalled, true, TEST_LOCATION);
+
+  try
+  {
+    // Remove textureId1 first, and then remove textureId2. Check whether segfault occured.
+    textureManager.Remove(textureId1, &observer1);
+    textureManager.Remove(textureId2, &observer2);
+
+    TestObserver observer3;
+    maskInfo.reset(new TextureManager::MaskingData());
+    maskInfo->mAlphaMaskUrl       = maskname;
+    maskInfo->mAlphaMaskId        = TextureManager::INVALID_TEXTURE_ID;
+    maskInfo->mCropToMask         = true;
+    maskInfo->mContentScaleFactor = 1.0f;
+
+    textureManager.LoadTexture(
+      filename,
+      ImageDimensions(),
+      FittingMode::SCALE_TO_FILL,
+      SamplingMode::BOX_THEN_LINEAR,
+      maskInfo,
+      synchronousLoading,
+      textureId1,
+      atlasRect,
+      atlasRectSize,
+      atlasingStatus,
+      loadingStatus,
+      &observer3,
+      atlasUploadObserver,
+      atlasManager,
+      true,
+      TextureManager::ReloadPolicy::CACHED,
+      preMultiply);
+
+    DALI_TEST_EQUALS(observer3.mLoaded, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3.mObserverCalled, false, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    // Load image and mask image.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(observer3.mLoaded, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3.mObserverCalled, false, TEST_LOCATION);
+
+    // Apply mask.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(observer3.mLoaded, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3.mObserverCalled, true, TEST_LOCATION);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
+  }
 
   END_TEST;
 }

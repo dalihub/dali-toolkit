@@ -37,8 +37,8 @@ constexpr auto INITIAL_HASH_NUMBER                     = size_t{0u};
 constexpr auto DEFAULT_NUMBER_OF_LOCAL_LOADER_THREADS  = size_t{4u};
 constexpr auto DEFAULT_NUMBER_OF_REMOTE_LOADER_THREADS = size_t{8u};
 
-constexpr auto TEXTURE_INDEX       = 0u; ///< The Index for texture
-constexpr auto MASK_TEXTURE_INDEX  = 1u; ///< The Index for mask texture
+constexpr auto TEXTURE_INDEX      = 0u; ///< The Index for texture
+constexpr auto MASK_TEXTURE_INDEX = 1u; ///< The Index for mask texture
 
 constexpr auto NUMBER_OF_LOCAL_LOADER_THREADS_ENV  = "DALI_TEXTURE_LOCAL_THREADS";
 constexpr auto NUMBER_OF_REMOTE_LOADER_THREADS_ENV = "DALI_TEXTURE_REMOTE_THREADS";
@@ -710,7 +710,7 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId, TextureU
     if(textureCacheIndex != INVALID_CACHE_INDEX)
     {
       TextureManager::TextureId maskTextureId = INVALID_TEXTURE_ID;
-      TextureInfo& textureInfo(mTextureCacheManager[textureCacheIndex]);
+      TextureInfo&              textureInfo(mTextureCacheManager[textureCacheIndex]);
       if(textureInfo.maskTextureId != INVALID_TEXTURE_ID)
       {
         maskTextureId = textureInfo.maskTextureId;
@@ -741,6 +741,12 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId, TextureU
         // Remove its observer
         RemoveTextureObserver(textureInfo, observer);
 
+        // Keep loadState due to the textureInfo validate problem.
+        auto textureLoadState = textureInfo.loadState;
+
+        // Remove textureId in CacheManager
+        mTextureCacheManager.RemoveCache(textureInfo);
+
         // Remove maskTextureId in CacheManager
         if(maskTextureId != INVALID_TEXTURE_ID)
         {
@@ -750,15 +756,12 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId, TextureU
             TextureInfo& maskTextureInfo(mTextureCacheManager[maskCacheIndex]);
 
             // Only Remove maskTexture when texture's loadState is not CANCELLED. because it is already deleted.
-            if(textureInfo.loadState != LoadState::CANCELLED)
+            if(textureLoadState != LoadState::CANCELLED)
             {
               mTextureCacheManager.RemoveCache(maskTextureInfo);
             }
           }
         }
-
-        // Remove textureId in CacheManager
-        mTextureCacheManager.RemoveCache(textureInfo);
       }
     }
 
@@ -1210,7 +1213,7 @@ void TextureManager::UploadTextures(std::vector<Devel::PixelBuffer>& pixelBuffer
 
     for(auto&& pixelBuffer : pixelBuffers)
     {
-      Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight());
+      Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight());
       PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
       texture.Upload(pixelData);
       textureInfo.textures.push_back(texture);
@@ -1346,7 +1349,7 @@ void TextureManager::EmitLoadComplete(TextureUploadObserver* observer, TextureMa
 
 TextureSet TextureManager::GetTextureSet(const TextureManager::TextureId& textureId)
 {
-  TextureSet textureSet;
+  TextureSet                textureSet;
   TextureManager::LoadState loadState = mTextureCacheManager.GetTextureStateInternal(textureId);
   if(loadState == TextureManager::LoadState::UPLOADED)
   {
@@ -1406,8 +1409,8 @@ void TextureManager::RemoveTextureObserver(TextureManager::TextureInfo& textureI
   // Remove its observer
   if(observer)
   {
-    const auto   iterEnd = textureInfo.observerList.End();
-    const auto   iter    = std::find(textureInfo.observerList.Begin(), iterEnd, observer);
+    const auto iterEnd = textureInfo.observerList.End();
+    const auto iter    = std::find(textureInfo.observerList.Begin(), iterEnd, observer);
     if(iter != iterEnd)
     {
       // Disconnect and remove the observer.
