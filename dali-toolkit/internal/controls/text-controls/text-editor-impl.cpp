@@ -364,6 +364,11 @@ Vector<Vector2> TextEditor::GetTextPosition(const uint32_t startIndex, const uin
   return mController->GetTextPosition(startIndex, endIndex);
 }
 
+Rect<float> TextEditor::GetLineBoundingRectangle(const uint32_t lineIndex) const
+{
+  return mController->GetLineBoundingRectangle(lineIndex);
+}
+
 string TextEditor::GetSelectedText() const
 {
   string selectedText = "";

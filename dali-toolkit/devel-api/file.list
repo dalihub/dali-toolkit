@@ -71,6 +71,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/visual-factory/visual-base.cpp
   ${devel_api_src_dir}/controls/gaussian-blur-view/gaussian-blur-view.cpp
   ${devel_api_src_dir}/drag-drop-detector/drag-and-drop-detector.cpp
+  ${devel_api_src_dir}/text/text-geometry-devel.cpp
 )
 
 # Add devel header files here
@@ -231,6 +232,7 @@ SET( devel_api_text_header_files
   ${devel_api_src_dir}/text/bitmap-font.h
   ${devel_api_src_dir}/text/text-utils-devel.h
   ${devel_api_src_dir}/text/rendering-backend.h
+  ${devel_api_src_dir}/text/text-geometry-devel.h
 )
 
 SET( devel_api_tool_bar_header_files

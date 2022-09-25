@@ -56,6 +56,14 @@ struct LineRun
  */
 float GetLineHeight(const LineRun lineRun, bool isLastLine);
 
+/**
+ * @brief Get the line width for the specified line run.
+ *
+ * @param[in] lineRun The line runs to get the width for.
+ * @return the width of the line.
+ */
+float GetLineWidth(const LineRun& lineRun);
+
 } // namespace Text
 
 } // namespace Toolkit

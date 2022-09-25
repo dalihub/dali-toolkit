@@ -42,6 +42,7 @@ SET(TC_SOURCES
   utc-Dali-TableView.cpp
   utc-Dali-TextEditor.cpp
   utc-Dali-TextField.cpp
+  utc-Dali-TextGeometry.cpp
   utc-Dali-TextLabel.cpp
   utc-Dali-TextSelectionPopup.cpp
   utc-Dali-TextSelectionPopupMirroringLTR.cpp

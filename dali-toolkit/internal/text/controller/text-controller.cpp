@@ -38,7 +38,6 @@
 #include <dali-toolkit/internal/text/controller/text-controller-text-updater.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-geometry.h>
-
 namespace
 {
 #if defined(DEBUG_ENABLED)
@@ -1414,6 +1413,11 @@ Vector<Vector2> Controller::GetTextPosition(CharacterIndex startIndex, Character
 
   GetTextGeometry(mImpl->mModel, startIndex, endIndex, sizesList, positionsList);
   return positionsList;
+}
+
+Rect<float> Controller::GetLineBoundingRectangle(const uint32_t lineIndex)
+{
+  return GetLineBoundingRect(mImpl->mModel, lineIndex);
 }
 
 Rect<> Controller::GetTextBoundingRectangle(CharacterIndex startIndex, CharacterIndex endIndex)
