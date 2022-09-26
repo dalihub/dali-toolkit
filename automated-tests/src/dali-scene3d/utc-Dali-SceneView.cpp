@@ -525,6 +525,9 @@ int UtcDaliSceneViewUseFramebuffer02(void)
   view.UseFramebuffer(false);
   DALI_TEST_CHECK(!renderTask.GetFrameBuffer());
 
+  view.UseFramebuffer(true);
+  DALI_TEST_CHECK(renderTask.GetFrameBuffer());
+
   END_TEST;
 }
 
