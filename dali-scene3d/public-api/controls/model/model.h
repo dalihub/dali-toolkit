@@ -146,7 +146,6 @@ public:
 
   /**
    * @brief Sets Image Based Light Texture.
-   * @note This method doesn't load texture from file, so this work is performed synchronously.
    *
    * @param[in] diffuseTexture cube map texture that can be used as a diffuse IBL source.
    * @param[in] specularTexture cube map texture that can be used as a specular IBL source.
