@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ Transition::~Transition()
 
 void Transition::OnPlay()
 {
-  Dali::Toolkit::Control sourceControl = mSourceControl.GetHandle();
+  Dali::Toolkit::Control sourceControl      = mSourceControl.GetHandle();
   Dali::Toolkit::Control destinationControl = mDestinationControl.GetHandle();
   if(!sourceControl || !sourceControl[Dali::Actor::Property::CONNECTED_TO_SCENE] ||
      !destinationControl || !destinationControl[Dali::Actor::Property::CONNECTED_TO_SCENE])
@@ -92,12 +92,12 @@ void Transition::OnPlay()
   }
 
   //Make startPropertyMap and finishPropertyMap to use for property animation.
-  Matrix     sourceWorldTransform = GetWorldTransform(sourceControl);
+  Matrix     sourceWorldTransform = DevelActor::GetWorldTransform(sourceControl);
   Vector3    sourcePosition, sourceScale;
   Quaternion sourceOrientation;
   sourceWorldTransform.GetTransformComponents(sourcePosition, sourceOrientation, sourceScale);
 
-  Matrix     destinationWorldTransform = GetWorldTransform(destinationControl);
+  Matrix     destinationWorldTransform = DevelActor::GetWorldTransform(destinationControl);
   Vector3    destinationPosition, destinationScale;
   Quaternion destinationOrientation;
   destinationWorldTransform.GetTransformComponents(destinationPosition, destinationOrientation, destinationScale);
@@ -115,8 +115,8 @@ void Transition::OnPlay()
   startPropertyMap.Insert(Dali::Actor::Property::SCALE, sourceScale);
   finishPropertyMap.Insert(Dali::Actor::Property::SCALE, destinationScale);
 
-  Vector4 sourceColor      = GetWorldColor(sourceControl);
-  Vector4 destinationColor = GetWorldColor(destinationControl);
+  Vector4 sourceColor      = DevelActor::GetWorldColor(sourceControl);
+  Vector4 destinationColor = DevelActor::GetWorldColor(destinationControl);
   startPropertyMap.Insert(Dali::Actor::Property::COLOR, sourceColor);
   finishPropertyMap.Insert(Dali::Actor::Property::COLOR, destinationColor);
 
