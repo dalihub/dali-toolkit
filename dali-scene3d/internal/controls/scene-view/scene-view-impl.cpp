@@ -29,6 +29,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/controls/model/model-impl.h>
@@ -60,11 +61,19 @@ Property::Index RENDERING_BUFFER = Dali::Toolkit::Control::CONTROL_PROPERTY_END_
 } // anonymous namespace
 
 SceneView::SceneView()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT))
+: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+  mIblLoadedCallback(nullptr)
 {
 }
 
-SceneView::~SceneView() = default;
+SceneView::~SceneView()
+{
+  if(mIblLoadedCallback && Adaptor::IsAvailable())
+  {
+    // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
+    Adaptor::Get().RemoveIdle(mIblLoadedCallback);
+  }
+}
 
 Dali::Scene3D::SceneView SceneView::New()
 {
@@ -188,28 +197,17 @@ void SceneView::UnregisterModel(Scene3D::Model model)
 
 void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
-  mIBLResourceReady = false;
-  Texture diffuseTexture = Dali::Scene3D::Loader::LoadCubeMap(diffuseUrl);
-  if(diffuseTexture)
+  // Request asynchronous model loading
+  if(!mIblLoadedCallback)
   {
-    Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(specularUrl);
-    if(specularTexture)
-    {
-      mDiffuseTexture  = diffuseTexture;
-      mSpecularTexture = specularTexture;
-      mIblScaleFactor  = scaleFactor;
-
-      for(auto&& model : mModels)
-      {
-        if(model)
-        {
-          model.SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
-        }
-      }
-    }
+    mIBLResourceReady = false;
+    mDiffuseIblUrl = diffuseUrl;
+    mSpecularIblUrl = specularUrl;
+    mIblScaleFactor = scaleFactor;
+    // The callback manager takes the ownership of the callback object.
+    mIblLoadedCallback = MakeCallback(this, &SceneView::OnLoadComplete);
+    Adaptor::Get().AddIdle(mIblLoadedCallback, false);
   }
-  mIBLResourceReady = true;
-  Control::SetResourceReady(false);
 }
 
 void SceneView::SetImageBasedLightScaleFactor(float scaleFactor)
@@ -409,6 +407,53 @@ void SceneView::UpdateRenderTask()
         mTexture.Reset();
       }
     }
+  }
+}
+
+void SceneView::LoadImageBasedLight()
+{
+  Texture diffuseTexture  = Dali::Scene3D::Loader::LoadCubeMap(mDiffuseIblUrl);
+  Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(mSpecularIblUrl);
+
+  if(diffuseTexture)
+  {
+    if(specularTexture)
+    {
+      mDiffuseTexture  = diffuseTexture;
+      mSpecularTexture = specularTexture;
+
+      for(auto&& model : mModels)
+      {
+        if(model)
+        {
+          model.SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
+        }
+      }
+    }
+  }
+}
+
+void SceneView::OnLoadComplete()
+{
+  // TODO: In this implementation, we cannot know which request occurs this OnLoadComplete Callback.
+  // Currently it is no problem because the all loading is processed in this method.
+
+  // Prevent to emit unnecessary resource ready signal.
+  if(IsResourceReady())
+  {
+    return;
+  }
+
+  if(!mIBLResourceReady)
+  {
+    LoadImageBasedLight();
+    mIBLResourceReady = true;
+    mIblLoadedCallback = nullptr;
+  }
+
+  if(IsResourceReady())
+  {
+    Control::SetResourceReady(false);
   }
 }
 

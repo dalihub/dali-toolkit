@@ -145,6 +145,11 @@ private:
   void LoadModel();
 
   /**
+   * @brief Loads image based light from file.
+   */
+  void LoadImageBasedLight();
+
+  /**
    * @brief Scales the model to fit the control or to return to original size.
    */
   void ScaleModel();
@@ -169,6 +174,11 @@ private:
    */
   void UpdateImageBasedLightScaleFactor();
 
+  /**
+   * @brief Asynchronously loading finished.
+   */
+  void OnLoadComplete();
+
 private:
   std::string                    mModelUrl;
   std::string                    mResourceDirectoryUrl;
@@ -176,6 +186,11 @@ private:
   std::vector<AnimationData>     mAnimations;
   std::vector<WeakHandle<Actor>> mRenderableActors;
   WeakHandle<Scene3D::SceneView> mParentSceneView;
+
+  CallbackBase* mModelLoadedCallback;
+  CallbackBase* mIblLoadedCallback;
+  std::string   mDiffuseIblUrl;
+  std::string   mSpecularIblUrl;
 
   Dali::Texture mSpecularTexture;
   Dali::Texture mDiffuseTexture;
