@@ -1149,6 +1149,12 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
           pixelBuffers.push_back(textureInfo.pixelBuffer);
           UploadTextures(pixelBuffers, textureInfo);
 
+          // Increase reference counts for notify required textureId.
+          // Now we can assume that we don't remove & re-assign this textureId
+          // during NotifyObserver signal emit.
+          maskTextureInfo.referenceCount++;
+          textureInfo.referenceCount++;
+
           notifyRequiredTextureIds.push_back(textureInfo.textureId);
         }
       }
@@ -1159,6 +1165,12 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
         std::vector<Devel::PixelBuffer> pixelBuffers;
         pixelBuffers.push_back(textureInfo.pixelBuffer);
         UploadTextures(pixelBuffers, textureInfo);
+
+        // Increase reference counts for notify required textureId.
+        // Now we can assume that we don't remove & re-assign this textureId
+        // during NotifyObserver signal emit.
+        maskTextureInfo.referenceCount++;
+        textureInfo.referenceCount++;
 
         notifyRequiredTextureIds.push_back(textureInfo.textureId);
       }
@@ -1174,6 +1186,12 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
       TextureInfo& textureInfo(mTextureCacheManager[textureCacheIndex]);
       NotifyObservers(textureInfo, true);
     }
+  }
+
+  // Decrease reference count
+  for(const auto textureId : notifyRequiredTextureIds)
+  {
+    Remove(textureId, nullptr);
   }
 }
 
