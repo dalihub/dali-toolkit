@@ -43,6 +43,7 @@ extern Debug::Filter* gTextureManagerLogFilter; ///< Define at texture-manager-i
   loadState == TextureManagerType::LoadState::MASK_APPLIED     ? "MASK_APPLIED"     : \
   loadState == TextureManagerType::LoadState::UPLOADED         ? "UPLOADED"         : \
   loadState == TextureManagerType::LoadState::CANCELLED        ? "CANCELLED"        : \
+  loadState == TextureManagerType::LoadState::MASK_CANCELLED   ? "MASK_CANCELLED"   : \
   loadState == TextureManagerType::LoadState::LOAD_FAILED      ? "LOAD_FAILED"      : \
                                                                  "Unknown"
 // clang-format on
@@ -169,7 +170,7 @@ TextureCacheManager::LoadState TextureCacheManager::GetTextureStateInternal(cons
 
 Texture TextureCacheManager::GetTexture(const TextureCacheManager::TextureId& textureId, uint32_t textureIndex)
 {
-  Texture        texture; // empty handle
+  Texture           texture; // empty handle
   TextureCacheIndex cacheIndex = GetCacheIndexFromId(textureId);
 
   switch(static_cast<TextureCacheIndexType>(cacheIndex.detailValue.type))
@@ -645,8 +646,8 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::AppendCache(const Te
 
 void TextureCacheManager::RemoveCache(TextureCacheManager::TextureInfo& textureInfo)
 {
-  TextureCacheIndex textureInfoIndex = GetCacheIndexFromId(textureInfo.textureId);
-  bool removeTextureInfo = false;
+  TextureCacheIndex textureInfoIndex  = GetCacheIndexFromId(textureInfo.textureId);
+  bool              removeTextureInfo = false;
 
   DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureCacheManager::Remove(textureId:%d) url:%s\n  cacheIdx:%d loadState:%s reference count = %d\n", textureInfo.textureId, textureInfo.url.GetUrl().c_str(), textureInfoIndex.GetIndex(), GET_LOAD_STATE_STRING(textureInfo.loadState), textureInfo.referenceCount);
 
@@ -665,11 +666,17 @@ void TextureCacheManager::RemoveCache(TextureCacheManager::TextureInfo& textureI
       }
       removeTextureInfo = true;
     }
-    else if(textureInfo.loadState == LoadState::LOADING || textureInfo.loadState == LoadState::MASK_APPLYING)
+    else if(textureInfo.loadState == LoadState::LOADING)
     {
       // We mark the textureInfo for removal.
       // Once the load has completed, this method will be called again.
       textureInfo.loadState = LoadState::CANCELLED;
+    }
+    else if(textureInfo.loadState == LoadState::MASK_APPLYING)
+    {
+      // We mark the textureInfo for removal.
+      // Once the load has completed, this method will be called again.
+      textureInfo.loadState = LoadState::MASK_CANCELLED;
     }
     else
     {

@@ -1274,6 +1274,74 @@ int UtcDaliImageViewReplaceImage(void)
   END_TEST;
 }
 
+int UtcDaliImageViewReloadAlphaMaskImage(void)
+{
+  ToolkitTestApplication application;
+
+  gResourceReadySignalFired = false;
+
+  ImageView     dummy     = ImageView::New();
+  ImageView     imageView = ImageView::New();
+  Property::Map propertyMap;
+
+  // To keep alpha mask cached, scene on some dummy image.
+  // Note : If we don't cache alpha mask image, the reference count of mask image become zero.
+  // In this case, we might need to wait mask image loading, which is not neccesary & can be changed behavior.
+  propertyMap[ImageVisual::Property::URL]            = gImage_600_RGB;
+  propertyMap[ImageVisual::Property::ALPHA_MASK_URL] = TEST_BROKEN_IMAGE_DEFAULT;
+  dummy.SetProperty(ImageView::Property::IMAGE, propertyMap);
+
+  application.GetScene().Add(dummy);
+
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  propertyMap.Clear();
+  propertyMap[ImageVisual::Property::URL]            = gImage_34_RGBA;
+  propertyMap[ImageVisual::Property::ALPHA_MASK_URL] = TEST_BROKEN_IMAGE_DEFAULT;
+  imageView.SetProperty(ImageView::Property::IMAGE, propertyMap);
+
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), false, TEST_LOCATION);
+
+  imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
+
+  application.GetScene().Add(imageView);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Load image and use cached mask. Now we try to apply masking.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+
+  // Cancel apply masking.
+  imageView.Unparent();
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Reload same image again.
+  application.GetScene().Add(imageView);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Finish apply masking.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(imageView.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
 void OnRelayoutOverride(Size size)
 {
   gNaturalSize = size; // Size Relayout is using

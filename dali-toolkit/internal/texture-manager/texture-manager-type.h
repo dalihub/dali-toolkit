@@ -201,6 +201,7 @@ enum class LoadState
   MASK_APPLIED,     ///< Loading has finished, Mask is applyied by GPU
   UPLOADED,         ///< Uploaded and ready. (For GPU upload only)
   CANCELLED,        ///< Removed before loading completed
+  MASK_CANCELLED,   ///< Removed before mask applying completed
   LOAD_FAILED       ///< Async loading failed, e.g. connection problem
 };
 

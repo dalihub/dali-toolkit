@@ -92,6 +92,7 @@ Debug::Filter* gTextureManagerLogFilter = Debug::Filter::New(Debug::NoLogging, f
   loadState == TextureManagerType::LoadState::MASK_APPLIED     ? "MASK_APPLIED"     : \
   loadState == TextureManagerType::LoadState::UPLOADED         ? "UPLOADED"         : \
   loadState == TextureManagerType::LoadState::CANCELLED        ? "CANCELLED"        : \
+  loadState == TextureManagerType::LoadState::MASK_CANCELLED   ? "MASK_CANCELLED"   : \
   loadState == TextureManagerType::LoadState::LOAD_FAILED      ? "LOAD_FAILED"      : \
                                                                  "Unknown"
 // clang-format on
@@ -551,7 +552,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     // Update preMultiplyOnLoad value. It should be changed according to preMultiplied value of the cached info.
     preMultiplyOnLoad = mTextureCacheManager[cacheIndex].preMultiplied ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) Using cached texture id@%d, textureId=%d, frameindex=%d, premultiplied=%d\n", url.GetUrl().c_str(), observer, cacheIndex.GetIndex(), textureId, frameIndex, mTextureCacheManager[cacheIndex].preMultiplied ? 1 : 0);
+    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) Using cached texture id@%d, textureId=%d, maskTextureId=%d, frameindex=%d, premultiplied=%d\n", url.GetUrl().c_str(), observer, cacheIndex.GetIndex(), textureId, maskTextureId, frameIndex, mTextureCacheManager[cacheIndex].preMultiplied ? 1 : 0);
   }
 
   if(textureId == INVALID_TEXTURE_ID) // There was no caching, or caching not required
@@ -563,7 +564,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     // Cache new texutre, and get cacheIndex.
     cacheIndex = mTextureCacheManager.AppendCache(TextureInfo(textureId, maskTextureId, url, desiredSize, contentScale, fittingMode, samplingMode, false, cropToMask, useAtlas, textureHash, orientationCorrection, preMultiply, animatedImageLoading, frameIndex, loadYuvPlanes));
 
-    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) New texture, cacheIndex:%d, textureId=%d, frameindex=%d premultiply=%d\n", url.GetUrl().c_str(), observer, cacheIndex.GetIndex(), textureId, frameIndex, preMultiply);
+    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) New texture, cacheIndex:%d, textureId=%d, maskTextureId=%d, frameindex=%d premultiply=%d\n", url.GetUrl().c_str(), observer, cacheIndex.GetIndex(), textureId, maskTextureId, frameIndex, preMultiply);
   }
 
   // The below code path is common whether we are using the cache or not.
@@ -582,9 +583,10 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
      TextureManager::LoadState::WAITING_FOR_MASK != textureInfo.loadState &&
      TextureManager::LoadState::MASK_APPLYING != textureInfo.loadState &&
      TextureManager::LoadState::MASK_APPLIED != textureInfo.loadState &&
-     TextureManager::LoadState::CANCELLED != textureInfo.loadState)
+     TextureManager::LoadState::CANCELLED != textureInfo.loadState &&
+     TextureManager::LoadState::MASK_CANCELLED != textureInfo.loadState)
   {
-    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "TextureManager::RequestLoad( url=%s observer=%p ) ForcedReload cacheIndex:%d, textureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex.GetIndex(), textureId);
+    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "TextureManager::RequestLoad( url=%s observer=%p ) ForcedReload cacheIndex:%d, textureId=%d, maskTextureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex.GetIndex(), textureId, maskTextureId);
 
     textureInfo.loadState = TextureManager::LoadState::NOT_STARTED;
   }
@@ -622,6 +624,14 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
         // A cancelled texture hasn't finished loading yet. Treat as a loading texture
         // (it's ref count has already been incremented, above)
         textureInfo.loadState = TextureManager::LoadState::LOADING;
+        ObserveTexture(textureInfo, observer);
+        break;
+      }
+      case TextureManager::LoadState::MASK_CANCELLED:
+      {
+        // A cancelled texture hasn't finished mask applying yet. Treat as a mask applying texture
+        // (it's ref count has already been incremented, above)
+        textureInfo.loadState = TextureManager::LoadState::MASK_APPLYING;
         ObserveTexture(textureInfo, observer);
         break;
       }
@@ -711,14 +721,16 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId, TextureU
     {
       TextureManager::TextureId maskTextureId = INVALID_TEXTURE_ID;
       TextureInfo&              textureInfo(mTextureCacheManager[textureCacheIndex]);
-      // We only need to consider maskTextureId when texture's loadState is not CANCELLED. Because it is already deleted.
-      if(textureInfo.loadState != LoadState::CANCELLED)
+      // We only need to consider maskTextureId when texture's loadState is not cancelled. Because it is already deleted.
+      if(textureInfo.loadState != LoadState::CANCELLED && textureInfo.loadState != LoadState::MASK_CANCELLED)
       {
         if(textureInfo.maskTextureId != INVALID_TEXTURE_ID)
         {
           maskTextureId = textureInfo.maskTextureId;
         }
       }
+
+      DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::Remove( textureId=%d observer=%p ) cacheIndex:%d removal maskTextureId=%d, loadingQueueTextureId=%d, loadState=%s\n", textureId, observer, textureCacheIndex.GetIndex(), maskTextureId, mLoadingQueueTextureId, GET_LOAD_STATE_STRING(textureInfo.loadState));
 
       // the case that LoadingQueue is working.
       if(mLoadingQueueTextureId != INVALID_TEXTURE_ID)
@@ -861,6 +873,7 @@ void TextureManager::LoadOrQueueTexture(TextureManager::TextureInfo& textureInfo
     }
     case LoadState::LOADING:
     case LoadState::CANCELLED:
+    case LoadState::MASK_CANCELLED:
     case LoadState::LOAD_FINISHED:
     case LoadState::WAITING_FOR_MASK:
     case LoadState::MASK_APPLYING:
@@ -974,7 +987,7 @@ void TextureManager::AsyncLoadComplete(const TextureManager::TextureId& textureI
 
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "  textureId:%d Url:%s CacheIndex:%d LoadState: %s\n", textureInfo.textureId, textureInfo.url.GetUrl().c_str(), cacheIndex.GetIndex(), GET_LOAD_STATE_STRING(textureInfo.loadState));
 
-    if(textureInfo.loadState != LoadState::CANCELLED)
+    if(textureInfo.loadState != LoadState::CANCELLED && textureInfo.loadState != LoadState::MASK_CANCELLED)
     {
       // textureInfo can be invalidated after this call (as the mTextureInfoContainer may be modified)
       PostLoad(textureInfo, pixelBuffers);
@@ -1117,6 +1130,8 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
     UploadTextures(pixelBuffers, maskTextureInfo);
   }
 
+  DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureManager::CheckForWaitingTexture(): maskTextureId=%d, maskTextureUrl=%s\n", maskTextureInfo.textureId, maskTextureInfo.url.GetUrl().c_str());
+
   // Search the cache, checking if any texture has this texture id as a maskTextureId
   const std::size_t size = mTextureCacheManager.size();
 
@@ -1155,10 +1170,12 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
           maskTextureInfo.referenceCount++;
           textureInfo.referenceCount++;
 
+          DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureManager::CheckForWaitingTexture(): Ready to notify textureId=%d\n", textureInfo.textureId);
+
           notifyRequiredTextureIds.push_back(textureInfo.textureId);
         }
       }
-      else
+      else // maskTextureInfo.loadState == LoadState::LOAD_FAILED
       {
         // Url texture load success, But alpha mask texture load failed. Run as normal image upload.
         DALI_LOG_ERROR("Alpha mask image loading failed! Image will not be masked\n");
@@ -1171,6 +1188,8 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
         // during NotifyObserver signal emit.
         maskTextureInfo.referenceCount++;
         textureInfo.referenceCount++;
+
+        DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureManager::CheckForWaitingTexture(): Ready to notify textureId=%d\n", textureInfo.textureId);
 
         notifyRequiredTextureIds.push_back(textureInfo.textureId);
       }
