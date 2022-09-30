@@ -23,6 +23,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/render-tasks/render-task.h>
@@ -30,8 +31,8 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
+#include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
 namespace Dali
 {
@@ -214,6 +215,16 @@ private:
    */
   void OnLoadComplete();
 
+  /*
+   * @brief Callback that will be called when window is resized.
+   */
+  void OnWindowResized(Window window, Window::WindowSize size);
+
+  /**
+   * @brief Update camera's projection orientation according to the screen orientation.
+   */
+  void RotateCamera();
+
 private:
   Toolkit::Visual::Base mVisual;
 
@@ -230,6 +241,7 @@ private:
   CallbackBase* mIblLoadedCallback;
   std::string   mDiffuseIblUrl;
   std::string   mSpecularIblUrl;
+  int32_t       mScreenOrientation;
 
   Layer         mRootLayer;
   Dali::Texture mSpecularTexture;
