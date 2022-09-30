@@ -343,7 +343,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageD
       }
       case VisualUrl::JSON:
       {
-        visualPtr = AnimatedVectorImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl);
+        visualPtr = AnimatedVectorImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, size);
         break;
       }
       case VisualUrl::REGULAR_IMAGE:
