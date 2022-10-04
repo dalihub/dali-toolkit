@@ -58,11 +58,11 @@ Window* Window::New(const PositionSize& positionSize, const std::string& name, c
   return new Window( positionSize );
 }
 
-WindowPosition Window::GetPosition() const
+Dali::Window::WindowPosition  Window::GetPosition() const
 {
   PositionSize positionSize = mRenderSurface.GetPositionSize();
 
-  return WindowPosition(positionSize.x, positionSize.y);
+  return Dali::Window::WindowPosition(positionSize.x, positionSize.y);
 }
 
 PositionSize Window::GetPositionSize() const
