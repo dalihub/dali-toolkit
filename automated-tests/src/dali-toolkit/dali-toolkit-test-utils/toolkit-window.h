@@ -52,37 +52,7 @@ typedef Signal< void (Window,Uint16Pair) > ResizeSignalType;
 class Window : public BaseHandle
 {
 public:
-    class IntPair
-    {
-    public:
-      IntPair()
-      : mX(0),
-        mY(0)
-      {
-      };
-
-      IntPair(int x, int y)
-      {
-        mX = x;
-        mY = y;
-      }
-
-      // Default operation
-    public:
-      IntPair(const IntPair&) = default;            ///< Default copy constructor
-      IntPair(IntPair&&)      = default;            ///< Default move constructor
-      IntPair& operator=(const IntPair&) = default; ///< Default copy assignment operator
-      IntPair& operator=(IntPair&&) = default;      ///< Default move assignment operator
-
-      // member data
-    private:
-      int mX;
-      int mY;
-    };
-
-public:
   using WindowSize     = Uint16Pair;
-  using WindowPosition = Dali::Window::IntPair;
 
   using KeyEventSignalType = Signal< void (const KeyEvent&) >;
   using TouchEventSignalType = Signal< void (const TouchEvent&) >;
