@@ -25,13 +25,11 @@
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
-#include <dali/devel-api/actors/camera-actor-devel.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
-#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/controls/model/model-impl.h>
@@ -58,15 +56,13 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::SceneView, Toolkit::Control, Create);
 DALI_TYPE_REGISTRATION_END()
 
-Property::Index   RENDERING_BUFFER    = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
-constexpr int32_t DEFAULT_ORIENTATION = 0;
+Property::Index RENDERING_BUFFER = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
 
 } // anonymous namespace
 
 SceneView::SceneView()
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
-  mIblLoadedCallback(nullptr),
-  mScreenOrientation(DEFAULT_ORIENTATION)
+  mIblLoadedCallback(nullptr)
 {
 }
 
@@ -205,9 +201,9 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
   if(!mIblLoadedCallback)
   {
     mIBLResourceReady = false;
-    mDiffuseIblUrl    = diffuseUrl;
-    mSpecularIblUrl   = specularUrl;
-    mIblScaleFactor   = scaleFactor;
+    mDiffuseIblUrl = diffuseUrl;
+    mSpecularIblUrl = specularUrl;
+    mIblScaleFactor = scaleFactor;
     // The callback manager takes the ownership of the callback object.
     mIblLoadedCallback = MakeCallback(this, &SceneView::OnLoadComplete);
     Adaptor::Get().AddIdle(mIblLoadedCallback, false);
@@ -254,25 +250,12 @@ void SceneView::OnSceneConnection(int depth)
 {
   UpdateRenderTask();
 
-  Window window = DevelWindow::Get(Self());
-  if(window)
-  {
-    window.ResizeSignal().Connect(this, &SceneView::OnWindowResized);
-  }
-
   Control::OnSceneConnection(depth);
 }
 
 void SceneView::OnSceneDisconnection()
 {
   mModels.clear();
-
-  Window window = DevelWindow::Get(Self());
-  if(window)
-  {
-    window.ResizeSignal().Disconnect(this, &SceneView::OnWindowResized);
-  }
-
   Control::OnSceneDisconnection();
 }
 
@@ -369,14 +352,14 @@ void SceneView::UpdateRenderTask()
       mRenderTask.SetCameraActor(mSelectedCamera);
     }
 
-    Vector3     size        = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+    Vector3 size = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
     const float aspectRatio = size.width / size.height;
     mSelectedCamera.SetAspectRatio(aspectRatio);
-    const float halfHeight                                              = mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE];
-    const float halfWidth                                               = aspectRatio * halfHeight;
+    const float halfHeight = mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE];
+    const float halfWidth = aspectRatio * halfHeight;
     mSelectedCamera[Dali::CameraActor::Property::LEFT_PLANE_DISTANCE]   = -halfWidth;
     mSelectedCamera[Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE]  = halfWidth;
-    mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE]    = halfHeight;  // Top is +ve to keep consistency with orthographic values
+    mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE]    = halfHeight; // Top is +ve to keep consistency with orthographic values
     mSelectedCamera[Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE] = -halfHeight; // Bottom is -ve to keep consistency with orthographic values
     if(mUseFrameBuffer)
     {
@@ -424,26 +407,6 @@ void SceneView::UpdateRenderTask()
         mTexture.Reset();
       }
     }
-
-    RotateCamera();
-  }
-}
-
-void SceneView::OnWindowResized(Window window, Window::WindowSize size)
-{
-  mScreenOrientation = DevelWindow::GetPhysicalOrientation(window);
-  RotateCamera();
-}
-
-void SceneView::RotateCamera()
-{
-  if(mUseFrameBuffer)
-  {
-    DevelCameraActor::RotateProjection(mSelectedCamera, DEFAULT_ORIENTATION);
-  }
-  else
-  {
-    DevelCameraActor::RotateProjection(mSelectedCamera, mScreenOrientation);
   }
 }
 
@@ -484,7 +447,7 @@ void SceneView::OnLoadComplete()
   if(!mIBLResourceReady)
   {
     LoadImageBasedLight();
-    mIBLResourceReady  = true;
+    mIBLResourceReady = true;
     mIblLoadedCallback = nullptr;
   }
 
