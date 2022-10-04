@@ -204,16 +204,6 @@ private:
    */
   void UpdateRenderTask();
 
-  /**
-   * @brief Loads image based light from file.
-   */
-  void LoadImageBasedLight();
-
-  /**
-   * @brief Asynchronously loading finished.
-   */
-  void OnLoadComplete();
-
 private:
   Toolkit::Visual::Base mVisual;
 
@@ -227,11 +217,8 @@ private:
   Dali::Texture               mTexture;
   Dali::RenderTask            mRenderTask;
 
-  CallbackBase* mIblLoadedCallback;
-  std::string   mDiffuseIblUrl;
-  std::string   mSpecularIblUrl;
+  Layer mRootLayer;
 
-  Layer         mRootLayer;
   Dali::Texture mSpecularTexture;
   Dali::Texture mDiffuseTexture;
   float         mIblScaleFactor{1.0f};

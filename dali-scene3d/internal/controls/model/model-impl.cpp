@@ -25,7 +25,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <filesystem>
 
 // INTERNAL INCLUDES
@@ -177,8 +176,6 @@ Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUr
   mModelUrl(modelUrl),
   mResourceDirectoryUrl(resourceDirectoryUrl),
   mModelRoot(),
-  mModelLoadedCallback(nullptr),
-  mIblLoadedCallback(nullptr),
   mNaturalSize(Vector3::ZERO),
   mModelPivot(AnchorPoint::CENTER),
   mIblScaleFactor(1.0f),
@@ -189,17 +186,6 @@ Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUr
 
 Model::~Model()
 {
-  if(mModelLoadedCallback && Adaptor::IsAvailable())
-  {
-    // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
-    Adaptor::Get().RemoveIdle(mModelLoadedCallback);
-  }
-
-  if(mIblLoadedCallback && Adaptor::IsAvailable())
-  {
-    // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
-    Adaptor::Get().RemoveIdle(mIblLoadedCallback);
-  }
 }
 
 Dali::Scene3D::Model Model::New(const std::string& modelUrl, const std::string& resourceDirectoryUrl)
@@ -222,16 +208,17 @@ const Actor Model::GetModelRoot() const
 
 void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
-  // Request asynchronous model loading
-  if(!mIblLoadedCallback)
+  mIBLResourceReady = false;
+  Texture diffuseTexture  = Dali::Scene3D::Loader::LoadCubeMap(diffuseUrl);
+  Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(specularUrl);
+  SetImageBasedLightTexture(diffuseTexture, specularTexture, scaleFactor);
+  mIBLResourceReady = true;
+
+  // If Model resource is already ready, then set resource ready.
+  // If Model resource is still not ready, wait for model resource ready.
+  if(IsResourceReady())
   {
-    mIBLResourceReady = false;
-    mDiffuseIblUrl = diffuseUrl;
-    mSpecularIblUrl = specularUrl;
-    mIblScaleFactor = scaleFactor;
-    // The callback manager takes the ownership of the callback object.
-    mIblLoadedCallback = MakeCallback(this, &Model::OnLoadComplete);
-    Adaptor::Get().AddIdle(mIblLoadedCallback, false);
+    SetResourceReady(false);
   }
 }
 
@@ -250,6 +237,7 @@ void Model::SetImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Textur
       mIblScaleFactor = scaleFactor;
       UpdateImageBasedLightScaleFactor();
     }
+
   }
 }
 
@@ -308,14 +296,7 @@ void Model::OnSceneConnection(int depth)
 {
   if(!mModelRoot)
   {
-    // Request asynchronous model loading
-    if(!mModelLoadedCallback)
-    {
-      mModelResourceReady = false;
-      // The callback manager takes the ownership of the callback object.
-      mModelLoadedCallback = MakeCallback(this, &Model::OnLoadComplete);
-      Adaptor::Get().AddIdle(mModelLoadedCallback, false);
-    }
+    LoadModel();
   }
 
   Actor parent = Self().GetParent();
@@ -349,8 +330,7 @@ Vector3 Model::GetNaturalSize()
 {
   if(!mModelRoot)
   {
-    DALI_LOG_ERROR("Model is still not loaded.\n");
-    return Vector3::ZERO;
+    LoadModel();
   }
 
   return mNaturalSize;
@@ -507,13 +487,10 @@ void Model::LoadModel()
 
   Self().SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   Self().SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3(mModelPivot.x, 1.0f - mModelPivot.y, mModelPivot.z));
-}
 
-void Model::LoadImageBasedLight()
-{
-  Texture diffuseTexture  = Dali::Scene3D::Loader::LoadCubeMap(mDiffuseIblUrl);
-  Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(mSpecularIblUrl);
-  SetImageBasedLightTexture(diffuseTexture, specularTexture, mIblScaleFactor);
+  mModelResourceReady = true;
+
+  Control::SetResourceReady(false);
 }
 
 void Model::ScaleModel()
@@ -607,37 +584,6 @@ void Model::UpdateImageBasedLightScaleFactor()
     {
       renderableActor.RegisterProperty(Dali::Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), mIblScaleFactor);
     }
-  }
-}
-
-void Model::OnLoadComplete()
-{
-  // TODO: In this implementation, we cannot know which request occurs this OnLoadComplete Callback.
-  // Currently it is no problem because the all loading is processed in this method.
-
-  // Prevent to emit unnecessary resource ready signal.
-  if(IsResourceReady())
-  {
-    return;
-  }
-
-  if(!mIBLResourceReady)
-  {
-    LoadImageBasedLight();
-    mIBLResourceReady = true;
-    mIblLoadedCallback = nullptr;
-  }
-
-  if(!mModelResourceReady)
-  {
-    LoadModel();
-    mModelResourceReady = true;
-    mModelLoadedCallback = nullptr;
-  }
-
-  if(IsResourceReady())
-  {
-    Control::SetResourceReady(false);
   }
 }
 
