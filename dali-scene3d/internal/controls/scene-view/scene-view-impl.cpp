@@ -25,6 +25,8 @@
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
+#include <dali/devel-api/actors/camera-actor-devel.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -56,13 +58,15 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::SceneView, Toolkit::Control, Create);
 DALI_TYPE_REGISTRATION_END()
 
-Property::Index RENDERING_BUFFER = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
+Property::Index   RENDERING_BUFFER    = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
+constexpr int32_t DEFAULT_ORIENTATION = 0;
 
 } // anonymous namespace
 
 SceneView::SceneView()
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
-  mIblLoadedCallback(nullptr)
+  mIblLoadedCallback(nullptr),
+  mScreenOrientation(DEFAULT_ORIENTATION)
 {
 }
 
@@ -250,12 +254,25 @@ void SceneView::OnSceneConnection(int depth)
 {
   UpdateRenderTask();
 
+  Window window = DevelWindow::Get(Self());
+  if(window)
+  {
+    window.ResizeSignal().Connect(this, &SceneView::OnWindowResized);
+  }
+
   Control::OnSceneConnection(depth);
 }
 
 void SceneView::OnSceneDisconnection()
 {
   mModels.clear();
+
+  Window window = DevelWindow::Get(Self());
+  if(window)
+  {
+    window.ResizeSignal().Disconnect(this, &SceneView::OnWindowResized);
+  }
+
   Control::OnSceneDisconnection();
 }
 
@@ -407,6 +424,26 @@ void SceneView::UpdateRenderTask()
         mTexture.Reset();
       }
     }
+
+    RotateCamera();
+  }
+}
+
+void SceneView::OnWindowResized(Window window, Window::WindowSize size)
+{
+  mScreenOrientation = DevelWindow::GetPhysicalOrientation(window);
+  RotateCamera();
+}
+
+void SceneView::RotateCamera()
+{
+  if(mUseFrameBuffer)
+  {
+    DevelCameraActor::RotateProjection(mSelectedCamera, DEFAULT_ORIENTATION);
+  }
+  else
+  {
+    DevelCameraActor::RotateProjection(mSelectedCamera, mScreenOrientation);
   }
 }
 
