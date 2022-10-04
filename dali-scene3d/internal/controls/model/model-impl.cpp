@@ -22,14 +22,15 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <filesystem>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
+#include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/loader/animation-definition.h>
 #include <dali-scene3d/public-api/loader/camera-parameters.h>
 #include <dali-scene3d/public-api/loader/cube-map-loader.h>
@@ -64,6 +65,8 @@ static constexpr uint32_t OFFSET_FOR_DIFFUSE_CUBE_TEXTURE  = 2u;
 static constexpr uint32_t OFFSET_FOR_SPECULAR_CUBE_TEXTURE = 1u;
 
 static constexpr Vector3 Y_DIRECTION(1.0f, -1.0f, 1.0f);
+
+static constexpr bool DEFAULT_MODEL_CHILDREN_SENSITIVE = false;
 
 static constexpr std::string_view KTX_EXTENSION  = ".ktx";
 static constexpr std::string_view OBJ_EXTENSION  = ".obj";
@@ -179,6 +182,7 @@ Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUr
   mNaturalSize(Vector3::ZERO),
   mModelPivot(AnchorPoint::CENTER),
   mIblScaleFactor(1.0f),
+  mModelChildrenSensitive(DEFAULT_MODEL_CHILDREN_SENSITIVE),
   mModelResourceReady(false),
   mIBLResourceReady(true)
 {
@@ -206,9 +210,26 @@ const Actor Model::GetModelRoot() const
   return mModelRoot;
 }
 
+void Model::SetChildrenSensitive(bool enable)
+{
+  if(mModelChildrenSensitive != enable)
+  {
+    mModelChildrenSensitive = enable;
+    if(mModelRoot)
+    {
+      mModelRoot.SetProperty(Dali::Actor::Property::SENSITIVE, mModelChildrenSensitive);
+    }
+  }
+}
+
+bool Model::GetChildrenSensitive() const
+{
+  return mModelChildrenSensitive;
+}
+
 void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
-  mIBLResourceReady = false;
+  mIBLResourceReady       = false;
   Texture diffuseTexture  = Dali::Scene3D::Loader::LoadCubeMap(diffuseUrl);
   Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(specularUrl);
   SetImageBasedLightTexture(diffuseTexture, specularTexture, scaleFactor);
@@ -237,7 +258,6 @@ void Model::SetImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Textur
       mIblScaleFactor = scaleFactor;
       UpdateImageBasedLightScaleFactor();
     }
-
   }
 }
 
@@ -482,6 +502,8 @@ void Model::LoadModel()
 
   FitModelPosition();
   ScaleModel();
+
+  mModelRoot.SetProperty(Dali::Actor::Property::SENSITIVE, mModelChildrenSensitive);
 
   Self().Add(mModelRoot);
 

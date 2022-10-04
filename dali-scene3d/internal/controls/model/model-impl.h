@@ -22,8 +22,8 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/object/weak-handle.h>
+#include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/controls/model/model.h>
@@ -56,6 +56,16 @@ public:
    * @copydoc Model::GetModelRoot()
    */
   const Actor GetModelRoot() const;
+
+  /**
+   * @copydoc Model::SetChildrenSensitive()
+   */
+  void SetChildrenSensitive(bool enable);
+
+  /**
+   * @copydoc Model::GetChildrenSensitive()
+   */
+  bool GetChildrenSensitive() const;
 
   /**
    * @copydoc Model::SetImageBasedLightSource()
@@ -182,6 +192,7 @@ private:
   Vector3       mNaturalSize;
   Vector3       mModelPivot;
   float         mIblScaleFactor;
+  bool          mModelChildrenSensitive;
   bool          mModelResourceReady;
   bool          mIBLResourceReady;
 };

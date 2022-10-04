@@ -20,6 +20,9 @@
 #include <stdlib.h>
 #include <iostream>
 
+#include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
+#include <dali/integration-api/events/touch-event-integ.h>
+
 #include <dali-scene3d/public-api/controls/model/model.h>
 
 using namespace Dali;
@@ -37,6 +40,7 @@ void model_cleanup(void)
 
 namespace
 {
+const bool DEFAULT_MODEL_CHILDREN_SENSITIVE = false;
 /**
  * For the AnimatedCube.gltf and its Assets
  * Donated by Norbert Nopper for glTF testing.
@@ -72,6 +76,14 @@ const char* TEST_DLI_FILE_NAME                 = TEST_RESOURCE_DIR "/arc.dli";
  */
 const char* TEST_DIFFUSE_TEXTURE  = TEST_RESOURCE_DIR "/forest_irradiance.ktx";
 const char* TEST_SPECULAR_TEXTURE = TEST_RESOURCE_DIR "/forest_radiance.ktx";
+
+bool gTouchCallBackCalled = false;
+bool TestTouchCallback(Actor, const TouchEvent&)
+{
+  gTouchCallBackCalled = true;
+  return true;
+}
+
 } // namespace
 
 // Negative test case for a method
@@ -116,7 +128,7 @@ int UtcDaliModelDownCast(void)
   tet_infoline(" UtcDaliModelDownCast");
 
   Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
-  BaseHandle         handle(model);
+  BaseHandle     handle(model);
 
   Scene3D::Model model2 = Scene3D::Model::DownCast(handle);
   DALI_TEST_CHECK(model);
@@ -416,6 +428,165 @@ int UtcDaliModelImageBasedFactor(void)
   END_TEST;
 }
 
+int UtcDaliModelChildrenSensitive01(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model view = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector3(100, 100, 100));
+  view.SetProperty(Dali::Actor::Property::POSITION, Vector3(0, 0, 0));
+  view.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  view.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  // Get default vaule.
+  DALI_TEST_EQUALS(view.GetChildrenSensitive(), DEFAULT_MODEL_CHILDREN_SENSITIVE, TEST_LOCATION);
+
+  // Allow children actor's event before on scene.
+  view.SetChildrenSensitive(true);
+  DALI_TEST_EQUALS(view.GetChildrenSensitive(), true, TEST_LOCATION);
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Actor meshActor = view.FindChildByName("AnimatedCube");
+  DALI_TEST_CHECK(meshActor);
+
+  // connect hit-test signal
+  gTouchCallBackCalled = false;
+  meshActor.TouchedSignal().Connect(TestTouchCallback);
+
+  Vector2 sceneSize = application.GetScene().GetSize();
+
+  // Try to touch center of scene.
+  Dali::Integration::Point point;
+  point.SetState(PointState::DOWN);
+  point.SetScreenPosition(sceneSize * 0.5f);
+  Dali::Integration::TouchEvent event;
+  event.AddPoint(point);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Not touched yet.
+  DALI_TEST_CHECK(!gTouchCallBackCalled);
+  application.ProcessEvent(event);
+  // Touched.
+  DALI_TEST_CHECK(gTouchCallBackCalled);
+
+  // Clear
+  gTouchCallBackCalled = false;
+
+  // Block children actor's event
+  view.SetChildrenSensitive(false);
+  DALI_TEST_EQUALS(view.GetChildrenSensitive(), false, TEST_LOCATION);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Not touched yet.
+  DALI_TEST_CHECK(!gTouchCallBackCalled);
+  application.ProcessEvent(event);
+  // Also not touched.
+  DALI_TEST_CHECK(!gTouchCallBackCalled);
+
+  // Clear
+  gTouchCallBackCalled = false;
+
+  // Allow again
+  view.SetChildrenSensitive(true);
+  DALI_TEST_EQUALS(view.GetChildrenSensitive(), true, TEST_LOCATION);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Not touched yet.
+  DALI_TEST_CHECK(!gTouchCallBackCalled);
+  application.ProcessEvent(event);
+  // Touched.
+  DALI_TEST_CHECK(gTouchCallBackCalled);
+
+  // Clear
+  gTouchCallBackCalled = false;
+
+  END_TEST;
+}
+
+int UtcDaliModelChildrenSensitive02(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model view = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector3(100, 100, 100));
+  view.SetProperty(Dali::Actor::Property::POSITION, Vector3(0, 0, 0));
+  view.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  view.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  // Get vaule.
+  DALI_TEST_EQUALS(view.GetChildrenSensitive(), DEFAULT_MODEL_CHILDREN_SENSITIVE, TEST_LOCATION);
+
+  // Block children actor's event before on scene.
+  view.SetChildrenSensitive(false);
+  DALI_TEST_EQUALS(view.GetChildrenSensitive(), false, TEST_LOCATION);
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Actor meshActor = view.FindChildByName("AnimatedCube");
+  DALI_TEST_CHECK(meshActor);
+
+  // connect hit-test signal
+  gTouchCallBackCalled = false;
+  meshActor.TouchedSignal().Connect(TestTouchCallback);
+
+  Vector2 sceneSize = application.GetScene().GetSize();
+
+  // Try to touch center of scene.
+  Dali::Integration::Point point;
+  point.SetState(PointState::DOWN);
+  point.SetScreenPosition(sceneSize * 0.5f);
+  Dali::Integration::TouchEvent event;
+  event.AddPoint(point);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Not touched yet.
+  DALI_TEST_CHECK(!gTouchCallBackCalled);
+  application.ProcessEvent(event);
+  // Also not touched.
+  DALI_TEST_CHECK(!gTouchCallBackCalled);
+
+  // Clear
+  gTouchCallBackCalled = false;
+
+  // Allow again
+  view.SetChildrenSensitive(true);
+  DALI_TEST_EQUALS(view.GetChildrenSensitive(), true, TEST_LOCATION);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Not touched yet.
+  DALI_TEST_CHECK(!gTouchCallBackCalled);
+  application.ProcessEvent(event);
+  // Touched.
+  DALI_TEST_CHECK(gTouchCallBackCalled);
+
+  // Clear
+  gTouchCallBackCalled = false;
+
+  END_TEST;
+}
+
 int UtcDaliModelAnimation01(void)
 {
   ToolkitTestApplication application;
@@ -473,25 +644,25 @@ int UtcDaliModelAnimation02(void)
 namespace
 {
 static bool gOnRelayoutCallBackCalled = false;
-void OnRelayoutCallback(Actor actor)
+void        OnRelayoutCallback(Actor actor)
 {
   gOnRelayoutCallBackCalled = true;
 }
 
 static bool gResourceReadyCalled = false;
-void OnResourceReady(Control control)
+void        OnResourceReady(Control control)
 {
   gResourceReadyCalled = true;
 }
-}
+} // namespace
 
 int UtcDaliModelResourceReady(void)
 {
   ToolkitTestApplication application;
 
   gOnRelayoutCallBackCalled = false;
-  gResourceReadyCalled = false;
-  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_ANIMATION_TEST_FILE_NAME);
+  gResourceReadyCalled      = false;
+  Scene3D::Model model      = Scene3D::Model::New(TEST_GLTF_ANIMATION_TEST_FILE_NAME);
   model.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   model.OnRelayoutSignal().Connect(OnRelayoutCallback);
   model.ResourceReadySignal().Connect(OnResourceReady);
