@@ -70,20 +70,20 @@ Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, 
 
 AnimatedVectorImageVisualPtr AnimatedVectorImageVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties)
 {
-  AnimatedVectorImageVisualPtr visual(new AnimatedVectorImageVisual(factoryCache, shaderFactory, imageUrl, ImageDimensions{}));
+  AnimatedVectorImageVisualPtr visual(new AnimatedVectorImageVisual(factoryCache, shaderFactory, imageUrl));
   visual->SetProperties(properties);
   visual->Initialize();
   return visual;
 }
 
-AnimatedVectorImageVisualPtr AnimatedVectorImageVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, ImageDimensions size)
+AnimatedVectorImageVisualPtr AnimatedVectorImageVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl)
 {
-  AnimatedVectorImageVisualPtr visual(new AnimatedVectorImageVisual(factoryCache, shaderFactory, imageUrl, size));
+  AnimatedVectorImageVisualPtr visual(new AnimatedVectorImageVisual(factoryCache, shaderFactory, imageUrl));
   visual->Initialize();
   return visual;
 }
 
-AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, ImageDimensions size)
+AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl)
 : Visual::Base(factoryCache, Visual::FittingMode::FILL, static_cast<Toolkit::Visual::Type>(Toolkit::DevelVisual::ANIMATED_VECTOR_IMAGE)),
   mUrl(imageUrl),
   mAnimationData(),
@@ -91,7 +91,6 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   mImageVisualShaderFactory(shaderFactory),
   mVisualSize(),
   mVisualScale(Vector2::ONE),
-  mDesiredSize(size),
   mPlacementActor(),
   mPlayState(DevelImageVisual::PlayState::STOPPED),
   mEventCallback(nullptr),
@@ -133,12 +132,7 @@ void AnimatedVectorImageVisual::VectorAnimationManagerDestroyed()
 
 void AnimatedVectorImageVisual::GetNaturalSize(Vector2& naturalSize)
 {
-  if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
-  {
-    naturalSize.x = mDesiredSize.GetWidth();
-    naturalSize.y = mDesiredSize.GetHeight();
-  }
-  else if(mVisualSize != Vector2::ZERO)
+  if(mVisualSize != Vector2::ZERO)
   {
     naturalSize = mVisualSize;
   }
@@ -200,10 +194,6 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap(Property::Map& map) const
   Property::Map layerInfo;
   mVectorAnimationTask->GetLayerInfo(layerInfo);
   map.Insert(Toolkit::DevelImageVisual::Property::CONTENT_INFO, layerInfo);
-
-  map.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, IsSynchronousLoadingRequired());
-  map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
-  map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -255,14 +245,6 @@ void AnimatedVectorImageVisual::DoSetProperties(const Property::Map& propertyMap
       else if(keyValue.first == SYNCHRONOUS_LOADING)
       {
         DoSetProperty(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_DESIRED_WIDTH)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_WIDTH, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_DESIRED_HEIGHT)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second);
       }
     }
   }
@@ -336,25 +318,6 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
         {
           mImpl->mFlags &= ~Visual::Base::Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
         }
-      }
-      break;
-    }
-    case Toolkit::ImageVisual::Property::DESIRED_WIDTH:
-    {
-      int32_t desiredWidth = 0;
-      if(value.Get(desiredWidth))
-      {
-        mDesiredSize.SetWidth(desiredWidth);
-      }
-      break;
-    }
-
-    case Toolkit::ImageVisual::Property::DESIRED_HEIGHT:
-    {
-      int32_t desiredHeight = 0;
-      if(value.Get(desiredHeight))
-      {
-        mDesiredSize.SetHeight(desiredHeight);
       }
       break;
     }
@@ -648,17 +611,8 @@ void AnimatedVectorImageVisual::SendAnimationData()
 
 void AnimatedVectorImageVisual::SetVectorImageSize()
 {
-  uint32_t width, height;
-  if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
-  {
-    width  = mDesiredSize.GetWidth();
-    height = mDesiredSize.GetHeight();
-  }
-  else
-  {
-    width  = static_cast<uint32_t>(mVisualSize.width * mVisualScale.width);
-    height = static_cast<uint32_t>(mVisualSize.height * mVisualScale.height);
-  }
+  uint32_t width  = static_cast<uint32_t>(mVisualSize.width * mVisualScale.width);
+  uint32_t height = static_cast<uint32_t>(mVisualSize.height * mVisualScale.height);
 
   if(mAnimationData.width != width || mAnimationData.height != height)
   {
