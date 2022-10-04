@@ -25,9 +25,7 @@ namespace Dali
 {
 namespace Scene3D
 {
-Model::Model()
-{
-}
+Model::Model() = default;
 
 Model::Model(const Model& model) = default;
 
@@ -37,9 +35,7 @@ Model& Model::operator=(const Model& model) = default;
 
 Model& Model::operator=(Model&& rhs) = default;
 
-Model::~Model()
-{
-}
+Model::~Model() = default;
 
 Model Model::New(const std::string& modelUrl, const std::string& resourceDirectoryUrl)
 {

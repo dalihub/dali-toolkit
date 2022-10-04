@@ -30,8 +30,8 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
+#include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
 namespace Dali
 {
@@ -204,6 +204,16 @@ private:
    */
   void UpdateRenderTask();
 
+  /**
+   * @brief Loads image based light from file.
+   */
+  void LoadImageBasedLight();
+
+  /**
+   * @brief Asynchronously loading finished.
+   */
+  void OnLoadComplete();
+
 private:
   Toolkit::Visual::Base mVisual;
 
@@ -217,8 +227,11 @@ private:
   Dali::Texture               mTexture;
   Dali::RenderTask            mRenderTask;
 
-  Layer mRootLayer;
+  CallbackBase* mIblLoadedCallback;
+  std::string   mDiffuseIblUrl;
+  std::string   mSpecularIblUrl;
 
+  Layer         mRootLayer;
   Dali::Texture mSpecularTexture;
   Dali::Texture mDiffuseTexture;
   float         mIblScaleFactor{1.0f};
