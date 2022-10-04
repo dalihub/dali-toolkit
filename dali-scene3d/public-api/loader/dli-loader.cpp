@@ -1195,7 +1195,7 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
         ReadArcField(eRenderable, *arcNode);
       }
 
-      if(renderable) // process common properties of all renderables + register payload
+      if(renderable && eRenderable != nullptr) // process common properties of all renderables + register payload
       {
         // shader
         renderable->mShaderIdx = 0;

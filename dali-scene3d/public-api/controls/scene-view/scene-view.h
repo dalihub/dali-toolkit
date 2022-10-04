@@ -85,6 +85,7 @@ class SceneView;
  *
  * And since SceneView is a Control, it can be placed together with other 2D UI components in the DALi window.
  *
+ * @SINCE_2_1.38
  * @code
  *
  * Dali::Scene3D::SceneView sceneView = Dali::Scene3D::SceneView::New();
@@ -104,6 +105,8 @@ class DALI_SCENE3D_API SceneView : public Dali::Toolkit::Control
 public:
   /**
    * @brief Create an initialized SceneView.
+   *
+   * @SINCE_2_1.38
    * @return A handle to a newly allocated Dali resource
    */
   static SceneView New();
@@ -113,6 +116,8 @@ public:
    *
    * Only derived versions can be instantiated. Calling member
    * functions with an uninitialized Dali::Object is not allowed.
+   *
+   * @SINCE_2_1.38
    */
   SceneView();
 
@@ -120,11 +125,15 @@ public:
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   *
+   * @SINCE_2_1.38
    */
   ~SceneView();
 
   /**
    * @brief Copy constructor.
+   *
+   * @SINCE_2_1.38
    * @param[in] sceneView Handle to an object
    */
   SceneView(const SceneView& sceneView);
@@ -132,12 +141,15 @@ public:
   /**
    * @brief Move constructor
    *
+   * @SINCE_2_1.38
    * @param[in] rhs A reference to the moved handle
    */
   SceneView(SceneView&& rhs);
 
   /**
    * @brief Assignment operator.
+   *
+   * @SINCE_2_1.38
    * @param[in] sceneView Handle to an object
    * @return reference to this
    */
@@ -146,6 +158,7 @@ public:
   /**
    * @brief Move assignment
    *
+   * @SINCE_2_1.38
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
@@ -157,6 +170,7 @@ public:
    * If handle points to a SceneView, the downcast produces valid handle.
    * If not, the returned handle is left uninitialized.
    *
+   * @SINCE_2_1.38
    * @param[in] handle Handle to an object
    * @return Handle to a SceneView or an uninitialized handle
    */
@@ -166,6 +180,7 @@ public:
    * @brief Adds a CameraActor to the SceneView
    * The CameraActor can be used as a selected camera to render the scene by using SelectCamera(uint32_t) or SelectCamera(std::string)
    *
+   * @SINCE_2_1.38
    * @note
    * AspectRatio property of CameraActor will be changed depending on the Size of this SceneView.
    *
@@ -183,6 +198,8 @@ public:
 
   /**
    * @brief Removes a CameraActor from this SceneView.
+   *
+   * @SINCE_2_1.38
    * @note If removed CameraActor is selected CameraActor,
    * first camera in the list is set to selected CameraActor.
    *
@@ -193,6 +210,7 @@ public:
   /**
    * @brief Retrieves the number of cameras.
    *
+   * @SINCE_2_1.38
    * @return Number of cameras those currently the SceneView contains.
    */
   uint32_t GetCameraCount() const;
@@ -200,6 +218,7 @@ public:
   /**
    * @brief Retrieves selected CameraActor.
    *
+   * @SINCE_2_1.38
    * @return CameraActor currently used in SceneView as a selected CameraActor
    */
   CameraActor GetSelectedCamera() const;
@@ -207,6 +226,7 @@ public:
   /**
    * @brief Retrieves a CameraActor of the index.
    *
+   * @SINCE_2_1.38
    * @param[in] index Index of CameraActor to be retrieved.
    *
    * @return CameraActor of the index
@@ -216,6 +236,7 @@ public:
   /**
    * @brief Retrieves a CameraActor of the name.
    *
+   * @SINCE_2_1.38
    * @param[in] name string keyword of CameraActor to be retrieved.
    *
    * @return CameraActor that has the name as a Dali::Actor::Property::NAME
@@ -225,6 +246,7 @@ public:
   /**
    * @brief Makes SceneView use a CameraActor of index as a selected camera.
    *
+   * @SINCE_2_1.38
    * @param[in] index Index of CameraActor to be used as a selected camera.
    */
   void SelectCamera(uint32_t index);
@@ -232,6 +254,7 @@ public:
   /**
    * @brief Makes SceneView use a CameraActor of a name as a selected camera.
    *
+   * @SINCE_2_1.38
    * @param[in] name string keyword of CameraActor to be used as a selected camera.
    */
   void SelectCamera(const std::string& name);
@@ -239,6 +262,7 @@ public:
   /**
    * @brief Sets Image Based Light Source to apply it on the all Models those added on this SceneView.
    *
+   * @SINCE_2_1.38
    * @note If any Models already have IBL, they are batch-overridden with the SceneView's IBL.
    * If SceneView has IBL, IBL of newly added Model is also overridden.
    * To set indivisual IBL for each Model, the Model's IBL should be set after the SceneView's IBL.
@@ -252,6 +276,7 @@ public:
   /**
    * @brief Sets Scale Factor of Image Based Light Source.
    *
+   * @SINCE_2_1.41
    * @note If SetImageBasedLightSource() or SetImageBasedLightTexture() method is called after this method, scaleFactor is overriden.
    * @note Default value is 1.0f.
    *
@@ -263,6 +288,7 @@ public:
    * @brief Gets Scale Factor of Image Based Light Source.
    * Default value is 1.0f.
    *
+   * @SINCE_2_1.41
    * @return scale factor that controls light source intensity.
    */
   float GetImageBasedLightScaleFactor() const;
@@ -273,6 +299,7 @@ public:
    * If useFramebuffer is false, each item in SceneView is rendered on window directly.
    * Default is false.
    *
+   * @SINCE_2_1.38
    * @note If useFramebuffer is true, it could decrease performance but entire rendering order is satisfied.
    * If useFramebuffer is false, performance is become better but SceneView is rendered on top of the other 2D Actors regardless tree order.
    *
@@ -283,6 +310,7 @@ public:
   /**
    * @brief Gets whether this SceneView uses Framebuffer or not.
    *
+   * @SINCE_2_1.38
    * @return bool True if this SceneView uses Framebuffer.
    */
   bool IsUsingFramebuffer() const;

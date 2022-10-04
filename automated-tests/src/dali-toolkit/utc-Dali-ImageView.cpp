@@ -1274,6 +1274,74 @@ int UtcDaliImageViewReplaceImage(void)
   END_TEST;
 }
 
+int UtcDaliImageViewReloadAlphaMaskImage(void)
+{
+  ToolkitTestApplication application;
+
+  gResourceReadySignalFired = false;
+
+  ImageView     dummy     = ImageView::New();
+  ImageView     imageView = ImageView::New();
+  Property::Map propertyMap;
+
+  // To keep alpha mask cached, scene on some dummy image.
+  // Note : If we don't cache alpha mask image, the reference count of mask image become zero.
+  // In this case, we might need to wait mask image loading, which is not neccesary & can be changed behavior.
+  propertyMap[ImageVisual::Property::URL]            = gImage_600_RGB;
+  propertyMap[ImageVisual::Property::ALPHA_MASK_URL] = TEST_BROKEN_IMAGE_DEFAULT;
+  dummy.SetProperty(ImageView::Property::IMAGE, propertyMap);
+
+  application.GetScene().Add(dummy);
+
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  propertyMap.Clear();
+  propertyMap[ImageVisual::Property::URL]            = gImage_34_RGBA;
+  propertyMap[ImageVisual::Property::ALPHA_MASK_URL] = TEST_BROKEN_IMAGE_DEFAULT;
+  imageView.SetProperty(ImageView::Property::IMAGE, propertyMap);
+
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), false, TEST_LOCATION);
+
+  imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
+
+  application.GetScene().Add(imageView);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Load image and use cached mask. Now we try to apply masking.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+
+  // Cancel apply masking.
+  imageView.Unparent();
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Reload same image again.
+  application.GetScene().Add(imageView);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Finish apply masking.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(imageView.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
 void OnRelayoutOverride(Size size)
 {
   gNaturalSize = size; // Size Relayout is using
@@ -3474,7 +3542,7 @@ void OnResourceReadySignal06(Control control)
     // We hope this request result is return later than gImageView2.
 
     Property::Map map1;
-    map1[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_1;
+    map1[Toolkit::ImageVisual::Property::URL]            = TEST_IMAGE_1;
     map1[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = TEST_BROKEN_IMAGE_DEFAULT;
 
     gImageView3 = ImageView::New();
@@ -3482,9 +3550,9 @@ void OnResourceReadySignal06(Control control)
     gImageView3.ResourceReadySignal().Connect(&OnResourceReadySignal06);
 
     Property::Map map2;
-    map2[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_2;
+    map2[Toolkit::ImageVisual::Property::URL]            = TEST_IMAGE_2;
     map2[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = TEST_BROKEN_IMAGE_S;
-    gImageView4 = ImageView::New();
+    gImageView4                                          = ImageView::New();
     gImageView4.SetProperty(Toolkit::ImageView::Property::IMAGE, map2);
     gImageView4.ResourceReadySignal().Connect(&OnResourceReadySignal06);
 
@@ -3526,6 +3594,28 @@ void OnResourceReadySignal06(Control control)
     // cache index become something invalid data.
     // In this case, some strange observer can be called.
     // For example, gImageView4.LoadComplete will be called.
+  }
+}
+
+void OnResourceReadySignal07(Control control)
+{
+  gResourceReadySignalCounter++;
+  // Load masked image
+  tet_printf("rc %d %d\n", gResourceReadySignalCounter, static_cast<bool>(gImageView2));
+
+  if(!gImageView2)
+  {
+    auto scene = gImageView1.GetParent();
+
+    Property::Map map1;
+    map1[Toolkit::ImageVisual::Property::URL]            = TEST_IMAGE_1;
+    map1[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = TEST_BROKEN_IMAGE_DEFAULT;
+
+    gImageView2 = ImageView::New();
+    gImageView2.SetProperty(Toolkit::ImageView::Property::IMAGE, map1);
+    gImageView2.ResourceReadySignal().Connect(&OnResourceReadySignal07);
+
+    scene.Add(gImageView2);
   }
 }
 
@@ -3966,7 +4056,7 @@ int UtcDaliImageViewSetImageOnResourceReadySignal06(void)
   gResourceReadySignal06ComesOrder = 0;
 
   Property::Map map;
-  map[Toolkit::ImageVisual::Property::URL] = "invalid.jpg";
+  map[Toolkit::ImageVisual::Property::URL]            = "invalid.jpg";
   map[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = "invalid.png";
 
   gImageView1 = ImageView::New(); // request invalid image, to make loading failed fast.
@@ -4012,6 +4102,57 @@ int UtcDaliImageViewSetImageOnResourceReadySignal06(void)
 
     tet_infoline("load done");
   }
+  END_TEST;
+}
+
+int UtcDaliImageViewSetImageOnResourceReadySignal07(void)
+{
+  tet_infoline("Test texturemanager's remove image & mask queue works well within signal handler 02.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  Property::Map map;
+  map[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_1;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+  if(gImageView2)
+  {
+    gImageView2.Reset();
+  }
+
+  gImageView1 = ImageView::New();
+  gImageView1.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal07);
+  application.GetScene().Add(gImageView1);
+
+  application.SendNotification();
+  application.Render();
+
+  // Load gImageView1
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, TEST_LOCATION);
+
+  tet_infoline("load image1 done");
+
+  // Load gImageView2 and mask
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, TEST_LOCATION);
+
+  // gImageView2 mask apply done
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalCounter, 2, TEST_LOCATION);
+
+  tet_infoline("load image2 done");
   END_TEST;
 }
 

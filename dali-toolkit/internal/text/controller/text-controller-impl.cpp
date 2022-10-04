@@ -1917,7 +1917,6 @@ void Controller::Impl::SetDefaultColor(const Vector4& color)
   if(!IsShowingPlaceholderText())
   {
     mModel->mVisualModel->SetTextColor(color);
-    mModel->mLogicalModel->mColorRuns.Clear();
     mOperationsPending = static_cast<OperationsMask>(mOperationsPending | COLOR);
     RequestRelayout();
   }

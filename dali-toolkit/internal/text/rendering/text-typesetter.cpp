@@ -974,7 +974,8 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
   {
     // Generate the outline if enabled
     const uint16_t outlineWidth = mModel->GetOutlineWidth();
-    if(outlineWidth != 0u && RENDER_OVERLAY_STYLE != behaviour)
+    const float    outlineAlpha = mModel->GetOutlineColor().a;
+    if(outlineWidth != 0u && fabsf(outlineAlpha) > Math::MACHINE_EPSILON_1 && RENDER_OVERLAY_STYLE != behaviour)
     {
       // Create the image buffer for outline
       Devel::PixelBuffer outlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_OUTLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
@@ -987,7 +988,8 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
 
     // Generate the shadow if enabled
     const Vector2& shadowOffset = mModel->GetShadowOffset();
-    if(RENDER_OVERLAY_STYLE != behaviour && (fabsf(shadowOffset.x) > Math::MACHINE_EPSILON_1 || fabsf(shadowOffset.y) > Math::MACHINE_EPSILON_1))
+    const float    shadowAlpha  = mModel->GetShadowColor().a;
+    if(RENDER_OVERLAY_STYLE != behaviour && fabsf(shadowAlpha) > Math::MACHINE_EPSILON_1 && (fabsf(shadowOffset.x) > Math::MACHINE_EPSILON_1 || fabsf(shadowOffset.y) > Math::MACHINE_EPSILON_1))
     {
       // Create the image buffer for shadow
       Devel::PixelBuffer shadowImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_SHADOW, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
