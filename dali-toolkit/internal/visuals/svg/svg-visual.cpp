@@ -48,20 +48,20 @@ const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 SvgVisualPtr SvgVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties)
 {
-  SvgVisualPtr svgVisual(new SvgVisual(factoryCache, shaderFactory, imageUrl, ImageDimensions{}));
+  SvgVisualPtr svgVisual(new SvgVisual(factoryCache, shaderFactory, imageUrl));
   svgVisual->SetProperties(properties);
   svgVisual->Initialize();
   return svgVisual;
 }
 
-SvgVisualPtr SvgVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, ImageDimensions size)
+SvgVisualPtr SvgVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl)
 {
-  SvgVisualPtr svgVisual(new SvgVisual(factoryCache, shaderFactory, imageUrl, size));
+  SvgVisualPtr svgVisual(new SvgVisual(factoryCache, shaderFactory, imageUrl));
   svgVisual->Initialize();
   return svgVisual;
 }
 
-SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, ImageDimensions size)
+SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl)
 : Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::SVG),
   mImageVisualShaderFactory(shaderFactory),
   mAtlasRect(FULL_TEXTURE_RECT),
@@ -71,7 +71,6 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
   mDefaultHeight(0),
   mPlacementActor(),
   mRasterizedSize(Vector2::ZERO),
-  mDesiredSize(size),
   mLoadFailed(false),
   mAttemptAtlasing(false)
 {
@@ -123,14 +122,6 @@ void SvgVisual::DoSetProperties(const Property::Map& propertyMap)
     {
       DoSetProperty(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second);
     }
-    else if(keyValue.first == IMAGE_DESIRED_WIDTH)
-    {
-      DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_WIDTH, keyValue.second);
-    }
-    else if(keyValue.first == IMAGE_DESIRED_HEIGHT)
-    {
-      DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second);
-    }
   }
 }
 
@@ -160,24 +151,6 @@ void SvgVisual::DoSetProperty(Property::Index index, const Property::Value& valu
       else
       {
         DALI_LOG_ERROR("ImageVisual: synchronousLoading property has incorrect type\n");
-      }
-      break;
-    }
-    case Toolkit::ImageVisual::Property::DESIRED_WIDTH:
-    {
-      int32_t desiredWidth = 0;
-      if(value.Get(desiredWidth))
-      {
-        mDesiredSize.SetWidth(desiredWidth);
-      }
-      break;
-    }
-    case Toolkit::ImageVisual::Property::DESIRED_HEIGHT:
-    {
-      int32_t desiredHeight = 0;
-      if(value.Get(desiredHeight))
-      {
-        mDesiredSize.SetHeight(desiredHeight);
       }
       break;
     }
@@ -229,12 +202,7 @@ void SvgVisual::DoSetOffScene(Actor& actor)
 
 void SvgVisual::GetNaturalSize(Vector2& naturalSize)
 {
-  if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
-  {
-    naturalSize.x = mDesiredSize.GetWidth();
-    naturalSize.y = mDesiredSize.GetHeight();
-  }
-  else if(mLoadFailed && mImpl->mRenderer)
+  if(mLoadFailed && mImpl->mRenderer)
   {
     // Load failed, use broken image size
     auto textureSet = mImpl->mRenderer.GetTextures();
@@ -266,8 +234,6 @@ void SvgVisual::DoCreatePropertyMap(Property::Map& map) const
     map.Insert(Toolkit::ImageVisual::Property::ATLASING, mAttemptAtlasing);
   }
   map.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, IsSynchronousLoadingRequired());
-  map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
-  map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
 }
 
 void SvgVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -401,24 +367,14 @@ void SvgVisual::ApplyRasterizedImage(PixelData rasterizedPixelData, bool success
 
 void SvgVisual::OnSetTransform()
 {
+  Vector2 visualSize = mImpl->mTransform.GetVisualSize(mImpl->mControlSize);
+
   if(IsOnScene() && !mLoadFailed)
   {
-    Vector2 size;
-    if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
+    if(visualSize != mRasterizedSize || mDefaultWidth == 0 || mDefaultHeight == 0)
     {
-      // Use desired size
-      size = Vector2(mDesiredSize.GetWidth(), mDesiredSize.GetHeight());
-    }
-    else
-    {
-      // Use visual size
-      size = mImpl->mTransform.GetVisualSize(mImpl->mControlSize);
-    }
-
-    if(size != mRasterizedSize || mDefaultWidth == 0 || mDefaultHeight == 0)
-    {
-      mRasterizedSize = size;
-      AddRasterizationTask(size);
+      mRasterizedSize = visualSize;
+      AddRasterizationTask(visualSize);
     }
   }
 

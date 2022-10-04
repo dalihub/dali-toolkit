@@ -3177,66 +3177,6 @@ int UtcDaliImageViewTVGLoading(void)
   END_TEST;
 }
 
-int UtcDaliImageViewSvgDesiredSize01(void)
-{
-  ToolkitTestApplication application;
-
-  TestGlAbstraction& gl           = application.GetGlAbstraction();
-  TraceCallStack&    textureTrace = gl.GetTextureTrace();
-  textureTrace.Enable(true);
-
-  int       desiredWidth = 100, desiredHeight = 150;
-  ImageView imageView = ImageView::New(TEST_SVG_FILE_NAME, ImageDimensions(desiredWidth, desiredHeight));
-
-  application.GetScene().Add(imageView);
-
-  application.SendNotification();
-
-  // Wait for loading & rasterization
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render(16);
-
-  {
-    std::stringstream out;
-    out << GL_TEXTURE_2D << ", " << 0u << ", " << desiredWidth << ", " << desiredHeight;
-    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
-  }
-
-  END_TEST;
-}
-
-int UtcDaliImageViewSvgDesiredSize02(void)
-{
-  ToolkitTestApplication application;
-
-  TestGlAbstraction& gl           = application.GetGlAbstraction();
-  TraceCallStack&    textureTrace = gl.GetTextureTrace();
-  textureTrace.Enable(true);
-
-  int       desiredWidth = 150, desiredHeight = 100;
-  ImageView imageView                   = ImageView::New();
-  imageView[ImageView::Property::IMAGE] = Property::Map().Add("url", TEST_SVG_FILE_NAME).Add("desiredWidth", desiredWidth).Add("desiredHeight", desiredHeight);
-  application.GetScene().Add(imageView);
-
-  application.SendNotification();
-
-  // Wait for loading & rasterization
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render(16);
-
-  {
-    std::stringstream out;
-    out << GL_TEXTURE_2D << ", " << 0u << ", " << desiredWidth << ", " << desiredHeight;
-    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
-  }
-
-  END_TEST;
-}
-
 int UtcDaliImageViewImageLoadFailure01(void)
 {
   ToolkitTestApplication application;
