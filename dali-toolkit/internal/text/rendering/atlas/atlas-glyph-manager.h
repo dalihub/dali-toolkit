@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,6 +180,13 @@ public:
    * @param[in] delta The adjustment to make to the reference count
    */
   void AdjustReferenceCount(Text::FontId fontId, Text::GlyphIndex index, const GlyphStyle& style, int32_t delta);
+
+public:
+  // Default copy and move operator
+  AtlasGlyphManager(const AtlasGlyphManager& rhs) = default;
+  AtlasGlyphManager(AtlasGlyphManager&& rhs)      = default;
+  AtlasGlyphManager& operator=(const AtlasGlyphManager& rhs) = default;
+  AtlasGlyphManager& operator=(AtlasGlyphManager&& rhs) = default;
 
 private:
   explicit DALI_INTERNAL AtlasGlyphManager(Internal::AtlasGlyphManager* impl);

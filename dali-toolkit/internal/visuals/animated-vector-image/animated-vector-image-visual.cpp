@@ -23,6 +23,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 
 // INTERNAL INCLUDES
@@ -697,7 +698,7 @@ void AnimatedVectorImageVisual::OnScaleNotification(PropertyNotification& source
   {
     Vector3 scale = actor.GetProperty<Vector3>(Actor::Property::WORLD_SCALE);
 
-    if((mVisualScale.width != scale.width || mVisualScale.height != scale.height) && (mRedrawInScalingDown || scale.width >= 1.0f || scale.height >= 1.0f))
+    if((!Dali::Equals(mVisualScale.width, scale.width) || !Dali::Equals(mVisualScale.height, scale.height)) && (mRedrawInScalingDown || scale.width >= 1.0f || scale.height >= 1.0f))
     {
       mVisualScale.width  = scale.width;
       mVisualScale.height = scale.height;
@@ -719,7 +720,7 @@ void AnimatedVectorImageVisual::OnSizeNotification(PropertyNotification& source)
   {
     Vector3 size = actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE);
 
-    if(mVisualSize.width != size.width || mVisualSize.height != size.height)
+    if(!Dali::Equals(mVisualSize.width, size.width) || !Dali::Equals(mVisualSize.height, size.height))
     {
       mVisualSize.width  = size.width;
       mVisualSize.height = size.height;

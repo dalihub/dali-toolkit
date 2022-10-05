@@ -109,35 +109,35 @@ public:
    *
    * @return Pointer to the vector of colors.
    */
-  virtual const Vector4* const GetColors() const = 0;
+  virtual const Vector4* GetColors() const = 0;
 
   /**
    * @brief Retrieves the vector of indices to the vector of colors.
    *
    * @return Pointer to a vector which stores for each glyph the index to the vector of colors.
    */
-  virtual const ColorIndex* const GetColorIndices() const = 0;
+  virtual const ColorIndex* GetColorIndices() const = 0;
 
   /**
    * @brief Retrieves the vector of background colors.
    *
    * @return Pointer to the vector of background colors.
    */
-  virtual const Vector4* const GetBackgroundColors() const = 0;
+  virtual const Vector4* GetBackgroundColors() const = 0;
 
   /**
    * @brief Retrieves the vector of indices to the vector of background colors.
    *
    * @return Pointer to a vector which stores for each glyph the index to the vector of background colors.
    */
-  virtual const ColorIndex* const GetBackgroundColorIndices() const = 0;
+  virtual const ColorIndex* GetBackgroundColorIndices() const = 0;
 
   /**
    * @brief checks if there is background colors set using markup.
    *
    * @return boolean if there is background colors set using markup .
    */
-  virtual bool const IsMarkupBackgroundColorSet() const = 0;
+  virtual bool IsMarkupBackgroundColorSet() const = 0;
 
   /**
    * @brief Retrieves the text color
@@ -179,7 +179,7 @@ public:
    *
    * @return boolean if there is underline set using markup.
    */
-  virtual bool const IsMarkupUnderlineSet() const = 0;
+  virtual bool IsMarkupUnderlineSet() const = 0;
 
   /**
    * @brief Returns the hyphens glyph info.
@@ -322,7 +322,7 @@ public:
    *
    * @return boolean if there is strikethrough set using markup.
    */
-  virtual bool const IsMarkupStrikethroughSet() const = 0;
+  virtual bool IsMarkupStrikethroughSet() const = 0;
 
   /**
    * @brief Retrieves the strikethrough height override
@@ -384,7 +384,7 @@ public:
    *
    * @return characterSpacing.
    */
-  virtual const float GetCharacterSpacing() const = 0;
+  virtual float GetCharacterSpacing() const = 0;
 
   /**
    * @brief The text buffer.

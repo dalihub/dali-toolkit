@@ -1598,7 +1598,7 @@ public: // Queries & retrieves.
    *
    * @return A pointer to the text's model.
    */
-  const ModelInterface* const GetTextModel() const;
+  const ModelInterface* GetTextModel() const;
 
   /**
    * @brief Used to get scrolled distance by user input

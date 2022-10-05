@@ -108,6 +108,14 @@ TextureDefinition::TextureDefinition(const std::string& imageUri, SamplerFlags::
 {
 }
 
+TextureDefinition::TextureDefinition(std::string&& imageUri, SamplerFlags::Type samplerFlags, ImageDimensions minImageDimensions, SamplingMode::Type samplingMode)
+: mImageUri(std::move(imageUri)),
+  mSamplerFlags(samplerFlags),
+  mMinImageDimensions(minImageDimensions),
+  mSamplingMode(samplingMode)
+{
+}
+
 MaterialDefinition::RawData
 MaterialDefinition::LoadRaw(const std::string& imagesPath) const
 {

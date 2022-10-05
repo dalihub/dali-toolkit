@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_POPUP_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,6 +166,23 @@ public:
    * @return A reference to this
    */
   Popup& operator=(const Popup& handle);
+
+  /**
+   * @brief Move constructor.
+   *
+   * Creates another handle that points to the same real object
+   * @param[in] handle Handle to the moved object
+   */
+  Popup(Popup&& handle);
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * Changes this handle to point to another real object
+   * @param[in] handle Handle to the object
+   * @return A reference to this
+   */
+  Popup& operator=(Popup&& handle);
 
   /**
    * @brief Downcast an Object handle to Popup.

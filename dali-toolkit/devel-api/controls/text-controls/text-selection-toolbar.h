@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SELECTION_TOOLBAR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,21 @@ public:
    * @return A reference to this.
    */
   TextSelectionToolbar& operator=(const TextSelectionToolbar& handle);
+
+  /**
+   * @brief Move constructor.
+   *
+   * @param[in] handle The handle to move from.
+   */
+  TextSelectionToolbar(TextSelectionToolbar&& handle);
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @param[in] handle The handle to move from.
+   * @return A reference to this.
+   */
+  TextSelectionToolbar& operator=(TextSelectionToolbar&& handle);
 
   /**
    * @brief Destructor

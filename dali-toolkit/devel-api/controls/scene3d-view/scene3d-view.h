@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SCENE3D_VIEW_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,13 +93,29 @@ public:
 
   /**
    * @brief Copy constructor. Creates another handle that points to the same real object
+   * @param[in] handle to copy from
    */
   Scene3dView(const Scene3dView& handle);
 
   /**
    * @brief Assignment operator. Changes this handle to point to another real object
+   * @param[in] handle to copy from
+   * @return reference to this
    */
   Scene3dView& operator=(const Scene3dView& handle);
+
+  /**
+   * @brief Move constructor. Creates another handle that points to the same real object
+   * @param[in] rhs to move from
+   */
+  Scene3dView(Scene3dView&& rhs);
+
+  /**
+   * @brief Move assignment operator. Changes this handle to point to another real object
+   * @param[in] rhs to move from
+   * @return reference to this
+   */
+  Scene3dView& operator=(Scene3dView&& rhs);
 
   /**
    * @brief Destructor

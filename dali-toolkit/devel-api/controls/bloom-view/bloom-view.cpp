@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,19 +33,13 @@ BloomView::~BloomView()
 {
 }
 
-BloomView::BloomView(const BloomView& handle)
-: Control(handle)
-{
-}
+BloomView::BloomView(const BloomView& handle) = default;
 
-BloomView& BloomView::operator=(const BloomView& rhs)
-{
-  if(&rhs != this)
-  {
-    Control::operator=(rhs);
-  }
-  return *this;
-}
+BloomView& BloomView::operator=(const BloomView& rhs) = default;
+
+BloomView::BloomView(BloomView&& handle) = default;
+
+BloomView& BloomView::operator=(BloomView&& rhs) = default;
 
 BloomView BloomView::New()
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,19 +36,13 @@ ToolBar::ToolBar()
 {
 }
 
-ToolBar::ToolBar(const ToolBar& handle)
-: Control(handle)
-{
-}
+ToolBar::ToolBar(const ToolBar& handle) = default;
 
-ToolBar& ToolBar::operator=(const ToolBar& handle)
-{
-  if(&handle != this)
-  {
-    Control::operator=(handle);
-  }
-  return *this;
-}
+ToolBar& ToolBar::operator=(const ToolBar& handle) = default;
+
+ToolBar::ToolBar(ToolBar&& handle) = default;
+
+ToolBar& ToolBar::operator=(ToolBar&& handle) = default;
 
 ToolBar::~ToolBar()
 {

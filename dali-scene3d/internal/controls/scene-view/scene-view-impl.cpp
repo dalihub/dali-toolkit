@@ -31,6 +31,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <string_view>
@@ -552,8 +553,8 @@ void SceneView::UpdateRenderTask()
     {
       Dali::FrameBuffer currentFrameBuffer = mRenderTask.GetFrameBuffer();
       if(!currentFrameBuffer ||
-         currentFrameBuffer.GetColorTexture().GetWidth() != size.width ||
-         currentFrameBuffer.GetColorTexture().GetHeight() != size.height)
+         !Dali::Equals(currentFrameBuffer.GetColorTexture().GetWidth(), size.width) ||
+         !Dali::Equals(currentFrameBuffer.GetColorTexture().GetHeight(), size.height))
       {
         mRenderTask.ResetViewportGuideActor();
         mRenderTask.SetViewport(Dali::Viewport(Vector4::ZERO));

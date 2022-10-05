@@ -121,7 +121,7 @@ public:
    *
    * @return A pointer to the vector with the laid-out lines.
    */
-  virtual const LineRun* const GetLines() const = 0;
+  virtual const LineRun* GetLines() const = 0;
 
   /**
    * @brief Retrieves the number of script runs.
@@ -135,7 +135,7 @@ public:
    *
    * @return A pointer to the vector with the runs of characters with the same script..
    */
-  virtual const ScriptRun* const GetScriptRuns() const = 0;
+  virtual const ScriptRun* GetScriptRuns() const = 0;
 
   /**
    * @brief Retrieves the number of laid-out glyphs.
@@ -177,49 +177,49 @@ public:
    *
    * @return A pointer to the vector with the laid-out glyphs.
    */
-  virtual const GlyphInfo* const GetGlyphs() const = 0;
+  virtual const GlyphInfo* GetGlyphs() const = 0;
 
   /**
    * @brief Retrieves the text layout.
    *
    * @return A pointer to the vector with the positions for each glyph.
    */
-  virtual const Vector2* const GetLayout() const = 0;
+  virtual const Vector2* GetLayout() const = 0;
 
   /**
    * @brief Retrieves the vector of colors.
    *
    * @return Pointer to the vector of colors.
    */
-  virtual const Vector4* const GetColors() const = 0;
+  virtual const Vector4* GetColors() const = 0;
 
   /**
    * @brief Retrieves the vector of indices to the vector of colors.
    *
    * @return Pointer to a vector which stores for each glyph the index to the vector of colors.
    */
-  virtual const ColorIndex* const GetColorIndices() const = 0;
+  virtual const ColorIndex* GetColorIndices() const = 0;
 
   /**
    * @brief Retrieves the vector of background colors.
    *
    * @return Pointer to the vector of background colors.
    */
-  virtual const Vector4* const GetBackgroundColors() const = 0;
+  virtual const Vector4* GetBackgroundColors() const = 0;
 
   /**
    * @brief Retrieves the vector of indices to the vector of background colors.
    *
    * @return Pointer to a vector which stores for each glyph the index to the vector of background colors.
    */
-  virtual const ColorIndex* const GetBackgroundColorIndices() const = 0;
+  virtual const ColorIndex* GetBackgroundColorIndices() const = 0;
 
   /**
    * @brief checks if there is background colors set using markup.
    *
    * @return boolean if there is background colors set using markup .
    */
-  virtual bool const IsMarkupBackgroundColorSet() const = 0;
+  virtual bool IsMarkupBackgroundColorSet() const = 0;
 
   /**
    * @brief Retrieves the text's default color.
@@ -268,7 +268,7 @@ public:
    *
    * @return boolean if there is underline set using markup.
    */
-  virtual bool const IsMarkupUnderlineSet() const = 0;
+  virtual bool IsMarkupUnderlineSet() const = 0;
 
   /**
    * @brief Retrieves the underline height override
@@ -398,7 +398,7 @@ public:
    *
    * @return boolean if there is strikethrough set using markup.
    */
-  virtual bool const IsMarkupStrikethroughSet() const = 0;
+  virtual bool IsMarkupStrikethroughSet() const = 0;
 
   /**
    * @brief Retrieves the strikethrough height override
@@ -458,7 +458,7 @@ public:
    *
    * @return The character spacing.
    */
-  virtual const float GetCharacterSpacing() const = 0;
+  virtual float GetCharacterSpacing() const = 0;
 
   /**
    * @brief Retrieves the text buffer.

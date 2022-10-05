@@ -52,7 +52,7 @@ int UtcDaliVisualUrlConstructor(void)
   DALI_TEST_EQUALS(visualUrl4.GetProtocolType(), VisualUrl::LOCAL, TEST_LOCATION);
 
   VisualUrl visualUrl5("dali://1");
-  visualUrl4 = visualUrl5;
+  visualUrl4 = std::move(visualUrl5);
   DALI_TEST_EQUALS(true, visualUrl4.IsValid(), TEST_LOCATION);
   DALI_TEST_EQUALS(visualUrl4.GetType(), VisualUrl::REGULAR_IMAGE, TEST_LOCATION);
   DALI_TEST_EQUALS(visualUrl4.GetProtocolType(), VisualUrl::TEXTURE, TEST_LOCATION);
@@ -68,6 +68,18 @@ int UtcDaliVisualUrlConstructor(void)
   DALI_TEST_EQUALS(true, visualUrl6.IsValid(), TEST_LOCATION);
   DALI_TEST_EQUALS(visualUrl6.GetType(), VisualUrl::REGULAR_IMAGE, TEST_LOCATION);
   DALI_TEST_EQUALS(visualUrl6.GetProtocolType(), VisualUrl::BUFFER, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(true, visualUrl7.IsValid(), TEST_LOCATION);
+  std::size_t hashResult = visualUrl7.GetUrlHash();
+
+  VisualUrl visualUrl8(std::move(visualUrl7));
+  DALI_TEST_EQUALS(true, visualUrl8.IsValid(), TEST_LOCATION);
+  DALI_TEST_EQUALS(visualUrl8.GetType(), VisualUrl::REGULAR_IMAGE, TEST_LOCATION);
+  DALI_TEST_EQUALS(visualUrl8.GetProtocolType(), VisualUrl::BUFFER, TEST_LOCATION);
+  DALI_TEST_EQUALS(visualUrl8.GetUrlHash(), hashResult, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(false, visualUrl7.IsValid(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::CalculateHash(std::string("")), visualUrl7.GetUrlHash(), TEST_LOCATION);
   END_TEST;
 }
 

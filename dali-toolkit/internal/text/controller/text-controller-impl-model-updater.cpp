@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/math/math-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
@@ -404,13 +405,13 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           impl.mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
 
           Vector4 backgroundColor = impl.mModel->mVisualModel->GetBackgroundColor();
-          if(backgroundColor.a == 0) // There is no text background color.
+          if(Dali::EqualsZero(backgroundColor.a)) // There is no text background color.
           {
             // Try use the control's background color.
             if(nullptr != impl.mEditableControlInterface)
             {
               impl.mEditableControlInterface->GetControlBackgroundColor(backgroundColor);
-              if(backgroundColor.a == 0) // There is no control background color.
+              if(Dali::EqualsZero(backgroundColor.a)) // There is no control background color.
               {
                 // Determines black or white color according to text color.
                 // Based on W3C Recommendations (https://www.w3.org/TR/WCAG20/)

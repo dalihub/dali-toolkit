@@ -82,7 +82,7 @@ Length Model::GetNumberOfLines() const
   return mVisualModel->mLines.Count();
 }
 
-const LineRun* const Model::GetLines() const
+const LineRun* Model::GetLines() const
 {
   return mVisualModel->mLines.Begin();
 }
@@ -92,7 +92,7 @@ Length Model::GetNumberOfScripts() const
   return mLogicalModel->mScriptRuns.Count();
 }
 
-const ScriptRun* const Model::GetScriptRuns() const
+const ScriptRun* Model::GetScriptRuns() const
 {
   return mLogicalModel->mScriptRuns.Begin();
 }
@@ -122,37 +122,37 @@ GlyphIndex Model::GetSecondMiddleIndexOfElidedGlyphs() const
   return mVisualModel->GetSecondMiddleIndexOfElidedGlyphs();
 }
 
-const GlyphInfo* const Model::GetGlyphs() const
+const GlyphInfo* Model::GetGlyphs() const
 {
   return mVisualModel->mGlyphs.Begin();
 }
 
-const Vector2* const Model::GetLayout() const
+const Vector2* Model::GetLayout() const
 {
   return mVisualModel->mGlyphPositions.Begin();
 }
 
-const Vector4* const Model::GetColors() const
+const Vector4* Model::GetColors() const
 {
   return mVisualModel->mColors.Begin();
 }
 
-const ColorIndex* const Model::GetColorIndices() const
+const ColorIndex* Model::GetColorIndices() const
 {
   return mVisualModel->mColorIndices.Begin();
 }
 
-const Vector4* const Model::GetBackgroundColors() const
+const Vector4* Model::GetBackgroundColors() const
 {
   return mVisualModel->mBackgroundColors.Begin();
 }
 
-const ColorIndex* const Model::GetBackgroundColorIndices() const
+const ColorIndex* Model::GetBackgroundColorIndices() const
 {
   return mVisualModel->mBackgroundColorIndices.Begin();
 }
 
-bool const Model::IsMarkupBackgroundColorSet() const
+bool Model::IsMarkupBackgroundColorSet() const
 {
   return (mVisualModel->mBackgroundColors.Count() > 0);
 }
@@ -187,7 +187,7 @@ bool Model::IsUnderlineEnabled() const
   return mVisualModel->IsUnderlineEnabled();
 }
 
-bool const Model::IsMarkupUnderlineSet() const
+bool Model::IsMarkupUnderlineSet() const
 {
   return (mVisualModel->mUnderlineRuns.Count() > 0u);
 }
@@ -276,7 +276,7 @@ bool Model::IsStrikethroughEnabled() const
   return mVisualModel->IsStrikethroughEnabled();
 }
 
-bool const Model::IsMarkupStrikethroughSet() const
+bool Model::IsMarkupStrikethroughSet() const
 {
   return (mVisualModel->mStrikethroughRuns.Count() > 0u);
 }
@@ -316,7 +316,7 @@ const Vector<CharacterSpacingGlyphRun>& Model::GetCharacterSpacingGlyphRuns() co
   return mVisualModel->GetCharacterSpacingGlyphRuns();
 }
 
-const float Model::GetCharacterSpacing() const
+float Model::GetCharacterSpacing() const
 {
   return mVisualModel->GetCharacterSpacing();
 }

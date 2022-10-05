@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry.h>
 #include <limits>
 
@@ -105,10 +106,10 @@ void SlideTransition::OnPlay()
                           Vector2(currentPosition.x + ((mDirection.x < 0.0f) ? size.x / 2.0f : -size.x / 2.0f),
                                   currentPosition.y + ((mDirection.y < 0.0f) ? size.y / 2.0f : -size.y / 2.0f));
 
-  float xScale = (mDirection.x == 0.0f) ? std::numeric_limits<float>::max()
-                                        : ((mDirection.x < 0.0f) ? checkPosition.x : windowSize.x - checkPosition.x) / std::abs(mDirection.x);
-  float yScale = (mDirection.y == 0.0f) ? std::numeric_limits<float>::max()
-                                        : ((mDirection.y < 0.0f) ? checkPosition.y : windowSize.y - checkPosition.y) / std::abs(mDirection.y);
+  float xScale = (Dali::EqualsZero(mDirection.x)) ? std::numeric_limits<float>::max()
+                                                  : ((mDirection.x < 0.0f) ? checkPosition.x : windowSize.x - checkPosition.x) / std::abs(mDirection.x);
+  float yScale = (Dali::EqualsZero(mDirection.y)) ? std::numeric_limits<float>::max()
+                                                  : ((mDirection.y < 0.0f) ? checkPosition.y : windowSize.y - checkPosition.y) / std::abs(mDirection.y);
 
   Vector2 displacement = mDirection * std::min(xScale, yScale);
 

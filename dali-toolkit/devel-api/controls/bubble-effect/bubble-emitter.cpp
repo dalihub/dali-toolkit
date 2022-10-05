@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,19 +52,13 @@ BubbleEmitter BubbleEmitter::New(const Vector2& winSize,
   return Internal::BubbleEmitter::New(winSize, shapeTexture, maximumNumberOfBubble, bubbleSizeRange);
 }
 
-BubbleEmitter::BubbleEmitter(const BubbleEmitter& handle)
-: Control(handle)
-{
-}
+BubbleEmitter::BubbleEmitter(const BubbleEmitter& handle) = default;
 
-BubbleEmitter& BubbleEmitter::operator=(const BubbleEmitter& rhs)
-{
-  if(&rhs != this)
-  {
-    Control::operator=(rhs);
-  }
-  return *this;
-}
+BubbleEmitter& BubbleEmitter::operator=(const BubbleEmitter& rhs) = default;
+
+BubbleEmitter::BubbleEmitter(BubbleEmitter&& handle) = default;
+
+BubbleEmitter& BubbleEmitter::operator=(BubbleEmitter&& rhs) = default;
 
 BubbleEmitter BubbleEmitter::DownCast(BaseHandle handle)
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,19 +34,13 @@ SuperBlurView SuperBlurView::New(unsigned int blurLevels)
   return Internal::SuperBlurView::New(blurLevels);
 }
 
-SuperBlurView::SuperBlurView(const SuperBlurView& handle)
-: Control(handle)
-{
-}
+SuperBlurView::SuperBlurView(const SuperBlurView& handle) = default;
 
-SuperBlurView& SuperBlurView::operator=(const SuperBlurView& rhs)
-{
-  if(&rhs != this)
-  {
-    Control::operator=(rhs);
-  }
-  return *this;
-}
+SuperBlurView& SuperBlurView::operator=(const SuperBlurView& rhs) = default;
+
+SuperBlurView::SuperBlurView(SuperBlurView&& handle) = default;
+
+SuperBlurView& SuperBlurView::operator=(SuperBlurView&& rhs) = default;
 
 SuperBlurView::~SuperBlurView()
 {

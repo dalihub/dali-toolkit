@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_NAVIGATION_VIEW_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,11 +57,24 @@ public:
   NavigationView(const NavigationView& handle);
 
   /**
-  * @brief Assignment operator.
-  * @param handle The handle to copy from.
-  * @return reference to this
-  */
+   * @brief Assignment operator.
+   * @param[in] handle The handle to copy from.
+   * @return reference to this
+   */
   NavigationView& operator=(const NavigationView& handle);
+
+  /**
+   * @brief Move Constructor.
+   * @param[in] handle Handle to move.
+   */
+  NavigationView(NavigationView&& handle);
+
+  /**
+   * @brief Move assignment operator.
+   * @param[in] handle The handle to move from.
+   * @return reference to this
+   */
+  NavigationView& operator=(NavigationView&& handle);
 
   /**
    * @brief Destructor

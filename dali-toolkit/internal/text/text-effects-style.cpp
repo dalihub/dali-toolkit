@@ -18,6 +18,9 @@
 // FILE HEADER
 #include <dali-toolkit/internal/text/text-effects-style.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/math/math-utils.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-style-properties-devel.h>
 #include <dali-toolkit/internal/text/markup-processor/markup-processor-helper-functions.h>
@@ -610,7 +613,7 @@ bool SetShadowProperties(ControllerPtr controller, const Property::Value& value,
             update = true;
           }
 
-          if(blurRadiusDefined && (controller->GetShadowBlurRadius() != blurRadius))
+          if(blurRadiusDefined && (!Dali::Equals(controller->GetShadowBlurRadius(), blurRadius)))
           {
             controller->SetShadowBlurRadius(blurRadius);
             update = true;

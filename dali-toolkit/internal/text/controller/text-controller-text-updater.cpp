@@ -20,15 +20,16 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/math/math-utils.h>
 #include <memory.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/characters-helper-functions.h>
-#include <dali-toolkit/internal/text/emoji-helper.h>
-#include <dali-toolkit/internal/text/markup-processor/markup-processor.h>
 #include <dali-toolkit/internal/text/controller/text-controller-impl.h>
 #include <dali-toolkit/internal/text/controller/text-controller-placeholder-handler.h>
+#include <dali-toolkit/internal/text/emoji-helper.h>
+#include <dali-toolkit/internal/text/markup-processor/markup-processor.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 
 namespace
@@ -323,7 +324,7 @@ void Controller::TextUpdater::InsertText(Controller& controller, const std::stri
     const bool addFontWeightRun = (style.weight != inputStyle.weight) && inputStyle.isWeightDefined;
     const bool addFontWidthRun  = (style.width != inputStyle.width) && inputStyle.isWidthDefined;
     const bool addFontSlantRun  = (style.slant != inputStyle.slant) && inputStyle.isSlantDefined;
-    const bool addFontSizeRun   = (style.size != inputStyle.size) && inputStyle.isSizeDefined;
+    const bool addFontSizeRun   = (!Dali::Equals(style.size, inputStyle.size)) && inputStyle.isSizeDefined;
 
     // Add style runs.
     if(addColorRun)
@@ -494,7 +495,7 @@ bool Controller::TextUpdater::RemoveText(
   int                  numberOfCharacters,
   UpdateInputStyleType type)
 {
-  bool removed = false;
+  bool removed   = false;
   bool removeAll = false;
 
   Controller::Impl& impl      = *controller.mImpl;
@@ -646,7 +647,7 @@ bool Controller::TextUpdater::RemoveText(
 
       DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::RemoveText %p removed %d\n", &controller, numberOfCharacters);
       removeAll = false;
-      removed = true;
+      removed   = true;
     }
   }
 

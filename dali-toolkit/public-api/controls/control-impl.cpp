@@ -24,6 +24,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-info.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
@@ -37,8 +38,8 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
-#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
@@ -599,7 +600,7 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
     case DevelActor::Property::USER_INTERACTION_ENABLED:
     {
       const bool enabled = propertyValue.Get<bool>();
-      if (!enabled && Self() == Dali::Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor())
+      if(!enabled && Self() == Dali::Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor())
       {
         Dali::Toolkit::KeyboardFocusManager::Get().ClearFocus();
       }
@@ -727,8 +728,7 @@ void Control::SignalDisconnected(SlotObserver* slotObserver, CallbackBase* callb
   mImpl->SignalDisconnected(slotObserver, callback);
 }
 
-void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali::Property::Map& destinationPropertyMap,
-                                   Dali::Toolkit::Control source, Dali::Toolkit::Control destination, Dali::Property::Index visualIndex)
+void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali::Property::Map& destinationPropertyMap, Dali::Toolkit::Control source, Dali::Toolkit::Control destination, Dali::Property::Index visualIndex)
 {
   sourcePropertyMap.Clear();
   destinationPropertyMap.Clear();
@@ -747,8 +747,7 @@ void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali:
   sourceVisual.CreatePropertyMap(sourceMap);
   destinationVisual.CreatePropertyMap(destinationMap);
 
-  static auto findValueVector4 = [](const Property::Map& map, Property::Index index, const Vector4& defaultValue = Vector4()) -> Vector4
-  {
+  static auto findValueVector4 = [](const Property::Map& map, Property::Index index, const Vector4& defaultValue = Vector4()) -> Vector4 {
     Property::Value* propertyValue = map.Find(index);
     if(propertyValue)
     {
@@ -757,8 +756,7 @@ void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali:
     return defaultValue;
   };
 
-  static auto findValueFloat = [](const Property::Map& map, Property::Index index, const float& defaultValue = 0.0f) -> float
-  {
+  static auto findValueFloat = [](const Property::Map& map, Property::Index index, const float& defaultValue = 0.0f) -> float {
     Property::Value* propertyValue = map.Find(index);
     if(propertyValue)
     {
@@ -804,7 +802,7 @@ void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali:
     destinationPropertyMap.Add(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS, destinationCornerRadius);
   }
 
-  if(sourceBorderlineWidth != destinationBorderlineWidth)
+  if(!Dali::Equals(sourceBorderlineWidth, destinationBorderlineWidth))
   {
     sourcePropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, sourceBorderlineWidth);
     destinationPropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, destinationBorderlineWidth);
@@ -816,7 +814,7 @@ void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali:
     destinationPropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_COLOR, destinationBorderlineColor);
   }
 
-  if(sourceBorderlineOffset != destinationBorderlineOffset)
+  if(!Dali::Equals(sourceBorderlineOffset, destinationBorderlineOffset))
   {
     sourcePropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, sourceBorderlineOffset);
     destinationPropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, destinationBorderlineOffset);

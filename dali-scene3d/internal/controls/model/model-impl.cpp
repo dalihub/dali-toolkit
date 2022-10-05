@@ -24,6 +24,7 @@
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <filesystem>
@@ -104,7 +105,7 @@ struct BoundingVolume
     for(uint32_t i = 0; i < 3; ++i)
     {
       // To avoid divid by zero
-      if(pointMin[i] == pointMax[i])
+      if(Dali::Equals(pointMin[i], pointMax[i]))
       {
         pivot[i] = 0.5f;
       }
@@ -529,7 +530,7 @@ void Model::LoadModel()
   mModelPivot  = AABB.CalculatePivot();
   mModelRoot.SetProperty(Dali::Actor::Property::SIZE, mNaturalSize);
   Vector3 controlSize = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-  if(controlSize.x == 0.0f || controlSize.y == 0.0f)
+  if(Dali::EqualsZero(controlSize.x) || Dali::EqualsZero(controlSize.y))
   {
     Self().SetProperty(Dali::Actor::Property::SIZE, mNaturalSize);
   }

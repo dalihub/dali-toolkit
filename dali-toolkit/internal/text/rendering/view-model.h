@@ -104,7 +104,7 @@ public:
   /**
    * @copydoc ModelInterface::GetLines()
    */
-  const LineRun* const GetLines() const override;
+  const LineRun* GetLines() const override;
 
   /**
    * @copydoc ModelInterface::GetNumberOfScripts()
@@ -114,7 +114,7 @@ public:
   /**
    * @copydoc ModelInterface::GetScriptRuns()
    */
-  const ScriptRun* const GetScriptRuns() const override;
+  const ScriptRun* GetScriptRuns() const override;
 
   /**
    * @copydoc ModelInterface::GetNumberOfGlyphs()
@@ -144,37 +144,37 @@ public:
   /**
    * @copydoc ModelInterface::GetGlyphs()
    */
-  const GlyphInfo* const GetGlyphs() const override;
+  const GlyphInfo* GetGlyphs() const override;
 
   /**
    * @copydoc ModelInterface::GetLayout()
    */
-  const Vector2* const GetLayout() const override;
+  const Vector2* GetLayout() const override;
 
   /**
    * @copydoc ModelInterface::GetColors()
    */
-  const Vector4* const GetColors() const override;
+  const Vector4* GetColors() const override;
 
   /**
    * @copydoc ModelInterface::GetColorIndices()
    */
-  const ColorIndex* const GetColorIndices() const override;
+  const ColorIndex* GetColorIndices() const override;
 
   /**
    * @copydoc ModelInterface::GetBackgroundColors()
    */
-  const Vector4* const GetBackgroundColors() const override;
+  const Vector4* GetBackgroundColors() const override;
 
   /**
    * @copydoc ModelInterface::GetBackgroundColorIndices()
    */
-  const ColorIndex* const GetBackgroundColorIndices() const override;
+  const ColorIndex* GetBackgroundColorIndices() const override;
 
   /**
    * @copydoc ModelInterface::IsMarkupBackgroundColorSet()
    */
-  bool const IsMarkupBackgroundColorSet() const override;
+  bool IsMarkupBackgroundColorSet() const override;
 
   /**
    * @copydoc ModelInterface::GetDefaultColor()
@@ -209,7 +209,7 @@ public:
   /**
    * @copydoc ModelInterface::IsMarkupUnderlineSet()
    */
-  bool const IsMarkupUnderlineSet() const override;
+  bool IsMarkupUnderlineSet() const override;
 
   /**
    * @copydoc ModelInterface::GetUnderlineHeight()
@@ -289,7 +289,7 @@ public:
   /**
   * @copydoc ModelInterface::GetCharacterSpacing()
   */
-  const float GetCharacterSpacing() const override;
+  float GetCharacterSpacing() const override;
 
   /**
   * @copydoc ModelInterface::GetTextBuffer()
@@ -331,7 +331,7 @@ public:
   /**
    * @copydoc ModelInterface::IsMarkupStrikethroughSet()
    */
-  bool const IsMarkupStrikethroughSet() const override;
+  bool IsMarkupStrikethroughSet() const override;
 
   /**
    * @copydoc ModelInterface::GetNumberOfStrikethroughRuns()

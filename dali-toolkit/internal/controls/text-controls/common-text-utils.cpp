@@ -316,7 +316,7 @@ Accessibility::Range TextControlAccessible::GetTextAtOffset(std::size_t offset, 
       break;
     }
 
-    case Dali::Accessibility::TextBoundary::SENTENCE: // Not supported by default
+    case Dali::Accessibility::TextBoundary::SENTENCE:  // Not supported by default
     case Dali::Accessibility::TextBoundary::PARAGRAPH: // Not supported by libunibreak library
     default:
     {
@@ -482,7 +482,7 @@ bool EditableTextControlAccessible::DeleteText(std::size_t startPosition, std::s
     return false;
   }
 
-  return SetTextContents(text.erase(startPosition, endPosition - startPosition));
+  return SetTextContents(std::move(text.erase(startPosition, endPosition - startPosition)));
 }
 
 bool EditableTextControlAccessible::InsertText(std::size_t startPosition, std::string newText)
@@ -494,7 +494,7 @@ bool EditableTextControlAccessible::InsertText(std::size_t startPosition, std::s
     return false;
   }
 
-  return SetTextContents(text.insert(startPosition, std::move(newText)));
+  return SetTextContents(std::move(text.insert(startPosition, newText)));
 }
 
 bool EditableTextControlAccessible::SetTextContents(std::string newContents)

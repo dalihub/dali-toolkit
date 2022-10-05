@@ -20,13 +20,14 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -344,8 +345,8 @@ void ImageView::SetTransformMapForFittingMode(Vector2 finalSize, Vector2 natural
       auto availableVisualSize = finalSize;
 
       // scale to fit the padded area
-      finalSize = naturalSize * std::min((naturalSize.width ? (availableVisualSize.width / naturalSize.width) : 0),
-                                         (naturalSize.height ? (availableVisualSize.height / naturalSize.height) : 0));
+      finalSize = naturalSize * std::min((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0),
+                                         (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0));
 
       // calculate final offset within the padded area
       finalOffset += (availableVisualSize - finalSize) * .5f;
@@ -359,8 +360,8 @@ void ImageView::SetTransformMapForFittingMode(Vector2 finalSize, Vector2 natural
     {
       mImageViewPixelAreaSetByFittingMode = true;
       auto availableVisualSize            = finalSize;
-      finalSize                           = naturalSize * std::max((naturalSize.width ? (availableVisualSize.width / naturalSize.width) : 0),
-                                         (naturalSize.height ? (availableVisualSize.height / naturalSize.height) : 0));
+      finalSize                           = naturalSize * std::max((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
+                                         (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
 
       auto originalOffset = finalOffset;
       finalOffset += (availableVisualSize - finalSize) * .5f;
@@ -386,8 +387,8 @@ void ImageView::SetTransformMapForFittingMode(Vector2 finalSize, Vector2 natural
       }
       else
       {
-        finalSize = naturalSize * std::min((naturalSize.width ? (availableVisualSize.width / naturalSize.width) : 0),
-                                           (naturalSize.height ? (availableVisualSize.height / naturalSize.height) : 0));
+        finalSize = naturalSize * std::min((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
+                                           (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
       }
 
       finalOffset += (availableVisualSize - finalSize) * .5f;

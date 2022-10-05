@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/math/math-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
@@ -74,7 +75,7 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
   sizesList.Clear();
   positionsList.Clear();
 
-  if(charactersToGlyphBuffer == nullptr || glyphsPerCharacterBuffer  == nullptr || charactersPerGlyphBuffer  == nullptr || glyphToCharacterBuffer == nullptr )
+  if(charactersToGlyphBuffer == nullptr || glyphsPerCharacterBuffer == nullptr || charactersPerGlyphBuffer == nullptr || glyphToCharacterBuffer == nullptr)
   {
     return;
   }
@@ -244,7 +245,7 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
       blockPos  = currentPosition;
       blockSize = currentSize;
     }
-    else if((isPrevoiusRightToLeft != isCurrentRightToLeft) || (blockPos.y != currentPosition.y)) //new direction or new line
+    else if((isPrevoiusRightToLeft != isCurrentRightToLeft) || (!Dali::Equals(blockPos.y, currentPosition.y))) //new direction or new line
     {
       sizesList.PushBack(blockSize);
       positionsList.PushBack(blockPos);
@@ -277,19 +278,19 @@ float GetLineLeft(const LineRun& lineRun)
 
 float GetLineTop(const Vector<LineRun>& lines, const LineRun& lineRun)
 {
-  float lineTop = 0;
+  float     lineTop       = 0;
   const int numberOfLines = (int)lines.Count();
 
-  int currentLineIndex = 0;
-  Vector<LineRun>::ConstIterator endIt = (&lineRun);
+  int                            currentLineIndex = 0;
+  Vector<LineRun>::ConstIterator endIt            = (&lineRun);
   for(Vector<LineRun>::Iterator it = lines.Begin();
       it != endIt;
       ++it, ++currentLineIndex)
-    {
-      LineRun& line = *it;
-      bool isLastLine  = (currentLineIndex + 1) == numberOfLines;
-      lineTop         += GetLineHeight(line, isLastLine);
-    }
+  {
+    LineRun& line       = *it;
+    bool     isLastLine = (currentLineIndex + 1) == numberOfLines;
+    lineTop += GetLineHeight(line, isLastLine);
+  }
 
   return lineTop;
 }
@@ -301,7 +302,6 @@ float GetLineWidth(const LineRun& lineRun)
 
 Rect<float> GetLineBoundingRect(ModelPtr textModel, const uint32_t lineIndex)
 {
-
   if(textModel->mVisualModel == nullptr)
   {
     return {0, 0, 0, 0};
@@ -314,10 +314,10 @@ Rect<float> GetLineBoundingRect(ModelPtr textModel, const uint32_t lineIndex)
     return {0, 0, 0, 0};
   }
 
-  const Vector<LineRun>& lines   = textModel->mVisualModel->mLines;
-  const LineRun&         lineRun = lines[lineIndex];
-  bool  isFirstLine = lineIndex == 0;
-  bool  isLastLine  = (lineIndex + 1) == numberOfLines;
+  const Vector<LineRun>& lines       = textModel->mVisualModel->mLines;
+  const LineRun&         lineRun     = lines[lineIndex];
+  bool                   isFirstLine = lineIndex == 0;
+  bool                   isLastLine  = (lineIndex + 1) == numberOfLines;
 
   // Calculate the Left(lineX) = X position.
   float lineX = GetLineLeft(lineRun) + textModel->mScrollPosition.x;
@@ -376,7 +376,7 @@ Rect<> GetCharacterBoundingRect(ModelPtr textModel, const uint32_t charIndex)
   const GlyphIndex glyphIndex = visualModel->mCharactersToGlyph[charIndex]; //took its glyphs
 
   const Vector2&   characterPosition = glyphPositions[glyphIndex];
-  const GlyphInfo& glyphInfo    = glyphs[glyphIndex];
+  const GlyphInfo& glyphInfo         = glyphs[glyphIndex];
 
   // GetLineOfCharacter function returns 0 if the lines are empty
   const int      lineIndex = visualModel->GetLineOfCharacter(charIndex);

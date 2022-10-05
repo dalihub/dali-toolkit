@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,19 +36,13 @@ TextAnchor::TextAnchor()
 {
 }
 
-TextAnchor::TextAnchor(const TextAnchor& handle)
-: Control(handle)
-{
-}
+TextAnchor::TextAnchor(const TextAnchor& handle) = default;
 
-TextAnchor& TextAnchor::operator=(const TextAnchor& handle)
-{
-  if(&handle != this)
-  {
-    Control::operator=(handle);
-  }
-  return *this;
-}
+TextAnchor& TextAnchor::operator=(const TextAnchor& handle) = default;
+
+TextAnchor::TextAnchor(TextAnchor&& handle) = default;
+
+TextAnchor& TextAnchor::operator=(TextAnchor&& handle) = default;
 
 TextAnchor::~TextAnchor()
 {

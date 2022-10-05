@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_MAGNIFIER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,14 +78,29 @@ public:
 
   /**
    * Copy constructor. Creates another handle that points to the same real object
-   * @param handle to copy from
+   * @param[in] handle to copy from
    */
   Magnifier(const Magnifier& handle);
 
   /**
    * Assignment operator. Changes this handle to point to another real object
+   * @param[in] handle to copy from
+   * @return reference to this
    */
   Magnifier& operator=(const Magnifier& handle);
+
+  /**
+   * Move constructor. Creates another handle that points to the same real object
+   * @param[in] rhs to move from
+   */
+  Magnifier(Magnifier&& rhs);
+
+  /**
+   * Move assignment operator. Changes this handle to point to another real object
+   * @param[in] rhs to move from
+   * @return reference to this
+   */
+  Magnifier& operator=(Magnifier&& rhs);
 
   /**
    * @brief Destructor

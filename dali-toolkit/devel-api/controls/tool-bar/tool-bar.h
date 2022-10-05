@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TOOL_BAR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,14 +55,29 @@ public:
 
   /**
    * Copy constructor. Creates another handle that points to the same real object
-   * @param handle to copy from
+   * @param[in] handle Handle to copy.
    */
   ToolBar(const ToolBar& handle);
 
   /**
    * Assignment operator. Changes this handle to point to another real object
+   * @param[in] handle The handle to copy from.
+   * @return reference to this
    */
   ToolBar& operator=(const ToolBar& handle);
+
+  /**
+   * Move constructor. Creates another handle that points to the same real object
+   * @param[in] handle Handle to move.
+   */
+  ToolBar(ToolBar&& handle);
+
+  /**
+   * Move assignment operator. Changes this handle to point to another real object
+   * @param[in] handle The handle to move from.
+   * @return reference to this
+   */
+  ToolBar& operator=(ToolBar&& handle);
 
   /**
    * @brief Destructor

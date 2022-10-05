@@ -1284,7 +1284,7 @@ int Controller::GetLineCount(float width)
   return mImpl->mModel->GetNumberOfLines();
 }
 
-const ModelInterface* const Controller::GetTextModel() const
+const ModelInterface* Controller::GetTextModel() const
 {
   return mImpl->mModel.Get();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,19 +36,13 @@ EffectsView::EffectsView()
 {
 }
 
-EffectsView::EffectsView(const EffectsView& handle)
-: Control(handle)
-{
-}
+EffectsView::EffectsView(const EffectsView& handle) = default;
 
-EffectsView& EffectsView::operator=(const EffectsView& rhs)
-{
-  if(&rhs != this)
-  {
-    Control::operator=(rhs);
-  }
-  return *this;
-}
+EffectsView& EffectsView::operator=(const EffectsView& handle) = default;
+
+EffectsView::EffectsView(EffectsView&& handle) = default;
+
+EffectsView& EffectsView::operator=(EffectsView&& handle) = default;
 
 EffectsView EffectsView::DownCast(BaseHandle handle)
 {

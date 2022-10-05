@@ -957,7 +957,7 @@ void SceneDefinition::ConfigureSkeletonJoints(uint32_t iRoot, const SkeletonDefi
   }
 
   // 3, For each root, register joint matrices and constraints
-  for(auto r : rootsJoints)
+  for(const auto& r : rootsJoints)
   {
     auto node      = GetNode(r.first);
     auto rootJoint = root.FindChildByName(node->mName);
@@ -972,7 +972,7 @@ void SceneDefinition::ConfigureSkeletonJoints(uint32_t iRoot, const SkeletonDefi
     constraint.AddSource(Source(rootJoint, Actor::Property::POSITION));
     constraint.Apply();
 
-    for(auto j : r.second)
+    for(const auto j : r.second)
     {
       node       = GetNode(j);
       auto joint = rootJoint.FindChildByName(node->mName);

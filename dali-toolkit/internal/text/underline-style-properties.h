@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector4.h>
 
 // INTERNAL INCLUDES
@@ -85,9 +86,9 @@ struct UnderlineStyleProperties
     //The property is similar when both are not defined or when both are defined and have the same value.
     return ((!typeDefined && !other.typeDefined) || ((typeDefined && other.typeDefined) && (type == other.type))) &&
            ((!colorDefined && !other.colorDefined) || ((colorDefined && other.colorDefined) && (color == other.color))) &&
-           ((!heightDefined && !other.heightDefined) || ((heightDefined && other.heightDefined) && (height == other.height))) &&
-           ((!dashGapDefined && !other.dashGapDefined) || ((dashGapDefined && other.dashGapDefined) && (dashGap == other.dashGap))) &&
-           ((!dashWidthDefined && !other.dashWidthDefined) || ((dashWidthDefined && other.dashWidthDefined) && (dashWidth == other.dashWidth)));
+           ((!heightDefined && !other.heightDefined) || ((heightDefined && other.heightDefined) && (Dali::Equals(height, other.height)))) &&
+           ((!dashGapDefined && !other.dashGapDefined) || ((dashGapDefined && other.dashGapDefined) && (Dali::Equals(dashGap, other.dashGap)))) &&
+           ((!dashWidthDefined && !other.dashWidthDefined) || ((dashWidthDefined && other.dashWidthDefined) && (Dali::Equals(dashWidth, other.dashWidth))));
   }
 
   bool operator!=(const UnderlineStyleProperties& other) const
@@ -97,7 +98,7 @@ struct UnderlineStyleProperties
 
   bool IsHeightEqualTo(const UnderlineStyleProperties& other) const
   {
-    return ((!heightDefined && !other.heightDefined) || ((heightDefined && other.heightDefined) && (height == other.height)));
+    return ((!heightDefined && !other.heightDefined) || ((heightDefined && other.heightDefined) && (Dali::Equals(height, other.height))));
   }
 
   UnderlineStyleProperties& CopyIfNotDefined(const UnderlineStyleProperties& other)

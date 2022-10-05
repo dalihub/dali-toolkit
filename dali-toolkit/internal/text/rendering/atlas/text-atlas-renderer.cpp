@@ -22,6 +22,7 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <map>
@@ -581,7 +582,7 @@ struct AtlasRenderer::Impl
       thereAreStrikethroughGlyphs                                                 = thereAreStrikethroughGlyphs || isGlyphStrikethrough;
 
       // No operation for white space
-      if(glyph.width && glyph.height)
+      if(!Dali::EqualsZero(glyph.width) && !Dali::EqualsZero(glyph.height))
       {
         // Check and update decorative-lines informations
         if(isGlyphUnderlined || isGlyphStrikethrough)

@@ -45,16 +45,13 @@ Backend::~Backend()
 {
 }
 
-Backend::Backend(const Backend& handle)
-: BaseHandle(handle)
-{
-}
+Backend::Backend(const Backend& handle) = default;
 
-Backend& Backend::operator=(const Backend& handle)
-{
-  BaseHandle::operator=(handle);
-  return *this;
-}
+Backend& Backend::operator=(const Backend& handle) = default;
+
+Backend::Backend(Backend&& handle) = default;
+
+Backend& Backend::operator=(Backend&& handle) = default;
 
 Backend::Backend(Internal::Backend* internal)
 : BaseHandle(internal)

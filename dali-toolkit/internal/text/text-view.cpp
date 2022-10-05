@@ -575,7 +575,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
   return numberOfLaidOutGlyphs;
 }
 
-const Vector4* const View::GetColors() const
+const Vector4* View::GetColors() const
 {
   if(mImpl->mVisualModel)
   {
@@ -585,7 +585,7 @@ const Vector4* const View::GetColors() const
   return NULL;
 }
 
-const ColorIndex* const View::GetColorIndices() const
+const ColorIndex* View::GetColorIndices() const
 {
   if(mImpl->mVisualModel)
   {
@@ -595,7 +595,7 @@ const ColorIndex* const View::GetColorIndices() const
   return NULL;
 }
 
-const Vector4* const View::GetBackgroundColors() const
+const Vector4* View::GetBackgroundColors() const
 {
   if(mImpl->mVisualModel)
   {
@@ -605,7 +605,7 @@ const Vector4* const View::GetBackgroundColors() const
   return nullptr;
 }
 
-const ColorIndex* const View::GetBackgroundColorIndices() const
+const ColorIndex* View::GetBackgroundColorIndices() const
 {
   if(mImpl->mVisualModel)
   {
@@ -615,7 +615,7 @@ const ColorIndex* const View::GetBackgroundColorIndices() const
   return nullptr;
 }
 
-bool const View::IsMarkupBackgroundColorSet() const
+bool View::IsMarkupBackgroundColorSet() const
 {
   if(mImpl->mVisualModel)
   {
@@ -670,7 +670,7 @@ bool View::IsUnderlineEnabled() const
   return false;
 }
 
-bool const View::IsMarkupUnderlineSet() const
+bool View::IsMarkupUnderlineSet() const
 {
   return (GetNumberOfUnderlineRuns() > 0u);
 }
@@ -870,7 +870,7 @@ bool View::IsStrikethroughEnabled() const
   return (mImpl->mVisualModel) ? mImpl->mVisualModel->IsStrikethroughEnabled() : false;
 }
 
-bool const View::IsMarkupStrikethroughSet() const
+bool View::IsMarkupStrikethroughSet() const
 {
   return (GetNumberOfStrikethroughRuns() > 0u);
 }
@@ -927,7 +927,7 @@ const Vector<CharacterSpacingGlyphRun>& View::GetCharacterSpacingGlyphRuns() con
   return (mImpl->mVisualModel) ? mImpl->mVisualModel->GetCharacterSpacingGlyphRuns() : GetEmptyCharacterSpacingGlyphRuns();
 }
 
-const float View::GetCharacterSpacing() const
+float View::GetCharacterSpacing() const
 {
   return (mImpl->mVisualModel) ? mImpl->mVisualModel->GetCharacterSpacing() : 0.f;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
+#include <dali-toolkit/internal/controls/scene3d-view/gltf-loader.h>
 
 namespace Dali
 {
@@ -131,14 +132,14 @@ bool Scene3dView::PlayAnimations()
 
 bool Scene3dView::SetLight(Toolkit::Scene3dView::LightType type, Vector3 lightVector, Vector3 lightColor)
 {
-  mLightType = type;
+  mLightType   = type;
   mLightVector = lightVector;
   mLightColor  = lightColor;
 
   for(auto&& shader : mShaderArray)
   {
     float hasLightSource = static_cast<float>(!!(GetLightType() & (Toolkit::Scene3dView::LightType::POINT_LIGHT | Toolkit::Scene3dView::LightType::DIRECTIONAL_LIGHT)));
-    float isPointLight = static_cast<float>(!!(GetLightType() & Toolkit::Scene3dView::LightType::POINT_LIGHT));
+    float isPointLight   = static_cast<float>(!!(GetLightType() & Toolkit::Scene3dView::LightType::POINT_LIGHT));
     shader.RegisterProperty("uHasLightSource", hasLightSource);
     shader.RegisterProperty("uIsPointLight", isPointLight);
     shader.RegisterProperty("uLightVector", lightVector);
@@ -230,7 +231,7 @@ void Scene3dView::SetCubeMap(const std::string& diffuseTexturePath, const std::s
   mSpecularTexture.GenerateMipmaps();
 
   mIBLScaleFactor = scaleFactor;
-  mUseIBL = true;
+  mUseIBL         = true;
 }
 
 bool Scene3dView::SetDefaultCamera(const Dali::Camera::Type type, const float nearPlane, const Vector3 cameraPosition)

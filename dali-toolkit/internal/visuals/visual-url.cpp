@@ -249,6 +249,15 @@ VisualUrl::VisualUrl(const VisualUrl& url)
 {
 }
 
+VisualUrl::VisualUrl(VisualUrl&& url) noexcept
+: mUrl(std::move(url.mUrl)),
+  mType(std::move(url.mType)),
+  mLocation(std::move(url.mLocation)),
+  mUrlHash(std::move(url.mUrlHash))
+{
+  url.mUrlHash = 0ull;
+}
+
 VisualUrl::~VisualUrl()
 {
 }
@@ -265,12 +274,26 @@ VisualUrl& VisualUrl::operator=(const VisualUrl& url)
   return *this;
 }
 
+VisualUrl& VisualUrl::operator=(VisualUrl&& url) noexcept
+{
+  if(&url != this)
+  {
+    mUrl      = std::move(url.mUrl);
+    mType     = std::move(url.mType);
+    mLocation = std::move(url.mLocation);
+    mUrlHash  = std::move(url.mUrlHash);
+
+    url.mUrlHash = 0ull;
+  }
+  return *this;
+}
+
 const std::string& VisualUrl::GetUrl() const
 {
   return mUrl;
 }
 
-const std::uint64_t& VisualUrl::GetUrlHash() const
+std::uint64_t VisualUrl::GetUrlHash() const
 {
   return DALI_UNLIKELY(mUrlHash == 0) ? (mUrlHash = Dali::CalculateHash(mUrl)) : mUrlHash;
 }

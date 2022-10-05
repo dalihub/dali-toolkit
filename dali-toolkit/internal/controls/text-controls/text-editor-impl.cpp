@@ -27,6 +27,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <cstring>
 #include <limits>
@@ -1237,7 +1238,7 @@ void TextEditor::UpdateScrollBar()
 void TextEditor::OnScrollIndicatorAnimationFinished(Animation& animation)
 {
   // If animation is successfully ended, then emit ScrollStateChangedSignal
-  if(animation.GetCurrentProgress() == 0.0f)
+  if(Dali::EqualsZero(animation.GetCurrentProgress()))
   {
     mScrollStarted = false;
     Dali::Toolkit::TextEditor handle(GetOwner());
