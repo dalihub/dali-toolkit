@@ -1200,14 +1200,20 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
         // shader
         renderable->mShaderIdx = 0;
         auto eShader           = eRenderable->GetChild("shader");
-        resourceIds.push_back({ResourceType::Shader, eShader, renderable->mShaderIdx});
+        if(eShader)
+        {
+          resourceIds.push_back({ResourceType::Shader, eShader, renderable->mShaderIdx});
+        }
 
         // color
         if(modelNode)
         {
           modelNode->mMaterialIdx = 0; // must offer default of 0
           auto eMaterial          = eRenderable->GetChild("material");
-          resourceIds.push_back({ResourceType::Material, eMaterial, modelNode->mMaterialIdx});
+          if(eMaterial)
+          {
+            resourceIds.push_back({ResourceType::Material, eMaterial, modelNode->mMaterialIdx});
+          }
 
           if(!ReadColorCodeOrColor(eRenderable, modelNode->mColor, params.input.mConvertColorCode))
           {
