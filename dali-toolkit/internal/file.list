@@ -190,6 +190,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/controller/text-controller-placeholder-handler.cpp
    ${toolkit_src_dir}/text/controller/text-controller-relayouter.cpp
    ${toolkit_src_dir}/text/controller/text-controller-text-updater.cpp
+   ${toolkit_src_dir}/text/controller/text-controller-spannable-handler.cpp
    ${toolkit_src_dir}/text/layouts/layout-engine-helper-functions.cpp
    ${toolkit_src_dir}/text/layouts/layout-engine.cpp
    ${toolkit_src_dir}/text/markup-processor/markup-processor.cpp

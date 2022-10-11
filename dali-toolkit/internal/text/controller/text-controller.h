@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/devel-api/text/spanned.h>
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/events/gesture.h>
 
@@ -751,6 +752,15 @@ public: // Update.
    * @param[out] text A string of UTF-8 characters.
    */
   void GetText(std::string& text) const;
+
+  /**
+ * @brief Set the @p spannedText
+ * the spanned text contains content (text) and  format (spans with ranges)
+ * the text is copied into text-controller and the spans are applied on ranges
+ *
+ * @param[in] spannedText the text with spans.
+ */
+  void SetSpannedText(const Text::Spanned& spannedText);
 
   /**
    * @brief Replaces any placeholder text previously set.
@@ -2084,6 +2094,7 @@ private:
   struct PlaceholderHandler;
   struct Relayouter;
   struct TextUpdater;
+  struct SpannableHandler;
 
   Impl* mImpl;
 };

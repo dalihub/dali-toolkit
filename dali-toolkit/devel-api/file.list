@@ -36,6 +36,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/text-controls/text-editor-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-field-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-label-devel.cpp
+  ${devel_api_src_dir}/controls/text-controls/text-spannable.cpp
   ${devel_api_src_dir}/controls/text-controls/text-selection-popup.cpp
   ${devel_api_src_dir}/controls/text-controls/text-selection-toolbar.cpp
   ${devel_api_src_dir}/controls/tool-bar/tool-bar.cpp
@@ -229,6 +230,7 @@ SET( devel_api_text_controls_header_files
   ${devel_api_src_dir}/controls/text-controls/text-editor-devel.h
   ${devel_api_src_dir}/controls/text-controls/text-field-devel.h
   ${devel_api_src_dir}/controls/text-controls/text-label-devel.h
+  ${devel_api_src_dir}/controls/text-controls/text-spannable.h
   ${devel_api_src_dir}/controls/text-controls/text-selection-popup.h
   ${devel_api_src_dir}/controls/text-controls/text-selection-toolbar.h
   ${devel_api_src_dir}/controls/text-controls/text-style-properties-devel.h

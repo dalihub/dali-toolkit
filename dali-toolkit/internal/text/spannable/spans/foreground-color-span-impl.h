@@ -23,6 +23,7 @@
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/spannable/spans/base-span-impl.h>
 #include <dali/public-api/math/vector4.h>
 
@@ -83,6 +84,12 @@ public: //Methods. Not intended for application developers
    * @param[in] color The foreground-color.
    */
   void SetForegroundColor(Vector4 color);
+
+public: //Methods for internal only
+        /**
+   * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
+   */
+  void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
 
 private:
   struct Impl;

@@ -30,11 +30,11 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-anchor-control-interface.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
-#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-selectable-control-interface.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -282,7 +282,6 @@ private: // From Control
 
   // From SelectableControlInterface
 public:
-
   /**
    * @copydoc Text::SelectableControlInterface::SetTextSelectionRange()
    */
@@ -384,6 +383,15 @@ public:
    * @return bounding rectangle.
    */
   Rect<float> GetCharacterBoundingRectangle(const uint32_t charIndex) const;
+
+  /**
+   * @brief Set the @p spannedText into current textField
+   * the spanned text contains content (text) and  format (spans with ranges)
+   * the text is copied into text-controller and the spans are applied on ranges
+   *
+   * @param[in] spannedText the text with spans.
+   */
+  void SetSpannedText(const Text::Spanned& spannedText);
 
 private: // Implementation
   /**

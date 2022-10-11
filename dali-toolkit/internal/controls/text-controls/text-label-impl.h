@@ -25,18 +25,18 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/text/spanned.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-anchor-control-interface.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
-#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/text-scroller-interface.h>
 #include <dali-toolkit/internal/text/text-scroller.h>
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-
 namespace Dali
 {
 namespace Toolkit
@@ -142,6 +142,15 @@ public:
    * @return bounding rectangle.
    */
   Rect<float> GetCharacterBoundingRectangle(const uint32_t charIndex) const;
+
+  /**
+   * @brief Set the @p spannedText into current textLabel
+   * the spanned text contains content (text) and  format (spans with ranges)
+   * the text is copied into text-controller and the spans are applied on ranges
+   *
+   * @param[in] spannedText the text with spans.
+   */
+  void SetSpannedText(const Text::Spanned& spannedText);
 
 private: // From Control
   /**

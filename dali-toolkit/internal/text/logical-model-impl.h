@@ -262,6 +262,7 @@ public:
   Vector<CharacterSpacingCharacterRun>  mCharacterSpacingCharacterRuns; ///< The character-spacing character run from markup-processor.
 
   BidirectionalLineRunIndex mBidirectionalLineIndex; ///< The last fetched bidirectional line info.
+  bool                      mSpannedTextPlaced : 1;  ///< Whether the spanned-text is placed.
 };
 
 } // namespace Text

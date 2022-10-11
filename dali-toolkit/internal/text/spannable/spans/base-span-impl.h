@@ -22,6 +22,7 @@
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/text/range.h>
 #include <dali-toolkit/devel-api/text/spans/base-span.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 #include <dali/public-api/object/base-object.h>
@@ -65,6 +66,15 @@ protected:
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~BaseSpan();
+
+public: //Methods for internal only
+  /**
+   * @brief Create an instance for specific style character run and add it to its logicalModel run.
+   *
+   * @param[in] logicalModel The logical model.
+   * @param[in] range The range.
+   */
+  virtual void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const = 0;
 
 }; // class BaseSpan
 

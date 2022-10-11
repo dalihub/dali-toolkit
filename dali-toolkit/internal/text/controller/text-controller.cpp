@@ -35,6 +35,7 @@
 #include <dali-toolkit/internal/text/controller/text-controller-input-properties.h>
 #include <dali-toolkit/internal/text/controller/text-controller-placeholder-handler.h>
 #include <dali-toolkit/internal/text/controller/text-controller-relayouter.h>
+#include <dali-toolkit/internal/text/controller/text-controller-spannable-handler.h>
 #include <dali-toolkit/internal/text/controller/text-controller-text-updater.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-geometry.h>
@@ -470,6 +471,11 @@ void Controller::SetText(const std::string& text)
 void Controller::GetText(std::string& text) const
 {
   mImpl->GetText(text);
+}
+
+void Controller::SetSpannedText(const Text::Spanned& spannedText)
+{
+  SpannableHandler::SetSpannedText(*this, spannedText);
 }
 
 void Controller::SetPlaceholderText(PlaceholderType type, const std::string& text)

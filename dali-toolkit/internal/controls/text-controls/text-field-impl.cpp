@@ -827,7 +827,7 @@ void TextField::OnTap(const TapGesture& gesture)
   mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
 
   Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
-  if (keyboardFocusManager)
+  if(keyboardFocusManager)
   {
     keyboardFocusManager.SetCurrentFocusActor(Self());
   }
@@ -867,7 +867,7 @@ bool TextField::OnKeyEvent(const KeyEvent& event)
     if(event.GetState() == KeyEvent::UP)
     {
       Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
-      if (keyboardFocusManager)
+      if(keyboardFocusManager)
       {
         keyboardFocusManager.ClearFocus();
       }
@@ -1213,6 +1213,11 @@ Rect<float> TextField::GetLineBoundingRectangle(const uint32_t lineIndex) const
 Rect<float> TextField::GetCharacterBoundingRectangle(const uint32_t charIndex) const
 {
   return mController->GetCharacterBoundingRectangle(charIndex);
+}
+
+void TextField::SetSpannedText(const Text::Spanned& spannedText)
+{
+  mController->SetSpannedText(spannedText);
 }
 
 std::string TextField::TextFieldAccessible::GetName() const

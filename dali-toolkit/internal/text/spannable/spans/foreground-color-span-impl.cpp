@@ -73,6 +73,16 @@ void ForegroundColorSpan::SetForegroundColor(Vector4 color)
   mImpl->mForegroundColorDefined = true;
 }
 
+void ForegroundColorSpan::CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const
+{
+  ColorRun colorRun;
+  colorRun.characterRun.characterIndex     = range.GetStartIndex();
+  colorRun.characterRun.numberOfCharacters = range.GetNumberOfIndices();
+
+  colorRun.color = mImpl->mForegroundColor;
+  logicalModel->mColorRuns.PushBack(colorRun);
+}
+
 } // namespace Internal
 
 } // namespace Text
