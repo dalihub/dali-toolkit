@@ -333,6 +333,73 @@ Rect<float> GetLineBoundingRect(ModelPtr textModel, const uint32_t lineIndex)
   return {lineX, lineY, lineWidth, lineHeight};
 }
 
+float GetCharacterLeft(const GlyphInfo& glyph, const Vector2& characterPosition)
+{
+  return characterPosition.x - glyph.xBearing;
+}
+
+float GetCharacterTop(const float& yPosition)
+{
+  return (-1 * yPosition);
+}
+
+float GetCharacterHeight(const GlyphInfo& glyph)
+{
+  return glyph.height;
+}
+
+float GetCharacterWidth(const GlyphInfo& glyph)
+{
+  return glyph.advance;
+}
+
+Rect<> GetCharacterBoundingRect(ModelPtr textModel, const uint32_t charIndex)
+{
+  if(textModel->mVisualModel == nullptr)
+  {
+    return {0, 0, 0, 0};
+  }
+
+  VisualModelPtr&  visualModel  = textModel->mVisualModel;
+  LogicalModelPtr& logicalModel = textModel->mLogicalModel;
+
+  if(charIndex >= logicalModel->mText.Count() || visualModel->mLines.Empty())
+  {
+    return {0, 0, 0, 0};
+  }
+
+  const Vector<Vector2>&   glyphPositions = visualModel->mGlyphPositions;
+  const Vector<GlyphInfo>& glyphs         = visualModel->mGlyphs;
+  const Vector<LineRun>&   lines          = visualModel->mLines;
+
+  //For each character, the index of the first glyph.
+  const GlyphIndex glyphIndex = visualModel->mCharactersToGlyph[charIndex]; //took its glyphs
+
+  const Vector2&   characterPosition = glyphPositions[glyphIndex];
+  const GlyphInfo& glyphInfo    = glyphs[glyphIndex];
+
+  // GetLineOfCharacter function returns 0 if the lines are empty
+  const int      lineIndex = visualModel->GetLineOfCharacter(charIndex);
+  const LineRun& lineRun   = lines[lineIndex];
+
+  //Calculate the left: x position of the glyph + alignmentOffset of the line +  mScrollPosition.x.
+  float characterX = lineRun.alignmentOffset + GetCharacterLeft(glyphInfo, characterPosition) + textModel->mScrollPosition.x;
+
+  //Calculate the Top(characterY): position.Y + previouse lines height + mScrollPosition.y.
+  bool isFirstLine = lineIndex == 0;
+
+  //If the line is the first line of the text; its top = 0.
+  float lineY = (isFirstLine ? 0 : GetLineTop(lines, lineRun));
+
+  float characterY = lineY + GetCharacterTop(characterPosition.y) + textModel->mScrollPosition.y;
+
+  //The rectangle contains the width and height:
+  float characterWidth  = GetCharacterWidth(glyphInfo);
+  float characterHeight = GetCharacterHeight(glyphInfo);
+
+  return {characterX, characterY, characterWidth, characterHeight};
+}
+
 } // namespace Text
 
 } // namespace Toolkit

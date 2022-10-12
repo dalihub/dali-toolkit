@@ -47,6 +47,21 @@ Rect<float> GetLineBoundingRectangle(TextField field, const uint32_t lineIndex)
   return GetImpl(field).GetLineBoundingRectangle(lineIndex);
 }
 
+Rect<float> GetCharacterBoundingRectangle(TextLabel label, const uint32_t charIndex)
+{
+  return GetImpl(label).GetCharacterBoundingRectangle(charIndex);
+}
+
+Rect<float> GetCharacterBoundingRectangle(TextEditor editor, const uint32_t charIndex)
+{
+  return GetImpl(editor).GetCharacterBoundingRectangle(charIndex);
+}
+
+Rect<float> GetCharacterBoundingRectangle(TextField field, const uint32_t charIndex)
+{
+  return GetImpl(field).GetCharacterBoundingRectangle(charIndex);
+}
+
 } //namespace TextGeometry
 
 } // namespace Text

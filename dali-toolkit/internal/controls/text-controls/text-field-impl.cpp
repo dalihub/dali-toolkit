@@ -1210,6 +1210,11 @@ Rect<float> TextField::GetLineBoundingRectangle(const uint32_t lineIndex) const
   return mController->GetLineBoundingRectangle(lineIndex);
 }
 
+Rect<float> TextField::GetCharacterBoundingRectangle(const uint32_t charIndex) const
+{
+  return mController->GetCharacterBoundingRectangle(charIndex);
+}
+
 std::string TextField::TextFieldAccessible::GetName() const
 {
   if(IsHiddenInput())

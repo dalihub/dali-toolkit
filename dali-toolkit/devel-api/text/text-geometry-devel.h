@@ -62,6 +62,37 @@ namespace TextGeometry
    */
    DALI_TOOLKIT_API Rect<float> GetLineBoundingRectangle(TextField field, const uint32_t lineIndex);
 
+  /**
+   * @brief Get the character bounding rectangle.
+   * If the text is not yet rendered or the index > text.Count(); a rect of {0, 0, 0, 0} is returned.
+   *
+   * @param[in] label text model containing text info.
+   * @param[in] charIndex character index to which we want to calculate the geometry for.
+   * @return bounding rectangle.
+   */
+   DALI_TOOLKIT_API Rect<float> GetCharacterBoundingRectangle(TextLabel label, const uint32_t charIndex);
+
+  /**
+   * @brief Get the character bounding rectangle.
+   * If the text is not yet rendered or the index > text.Count(); a rect of {0, 0, 0, 0} is returned.
+   *
+   * @param[in] field text model containing text info.
+   * @param[in] charIndex character index to which we want to calculate the geometry for.
+   * @return bounding rectangle.
+   */
+   DALI_TOOLKIT_API Rect<float> GetCharacterBoundingRectangle(TextField field, const uint32_t charIndex);
+
+  /**
+   * @brief Get the character bounding rectangle.
+   * If the text is not yet rendered or the index > text.Count(); a rect of {0, 0, 0, 0} is returned.
+   *
+   * @param[in] editor text model containing text info.
+   * @param[in] charIndex character index to which we want to calculate the geometry for.
+   * @return bounding rectangle.
+   */
+   DALI_TOOLKIT_API Rect<float> GetCharacterBoundingRectangle(TextEditor editor, const uint32_t charIndex);
+
+
 } // namespace TextGeometry
 
 } // namespace Text

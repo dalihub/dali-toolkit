@@ -369,6 +369,11 @@ Rect<float> TextEditor::GetLineBoundingRectangle(const uint32_t lineIndex) const
   return mController->GetLineBoundingRectangle(lineIndex);
 }
 
+Rect<float> TextEditor::GetCharacterBoundingRectangle(const uint32_t charIndex) const
+{
+  return mController->GetCharacterBoundingRectangle(charIndex);
+}
+
 string TextEditor::GetSelectedText() const
 {
   string selectedText = "";

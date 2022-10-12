@@ -367,6 +367,15 @@ public:
   Rect<float> GetLineBoundingRectangle(const uint32_t lineIndex) const;
 
   /**
+   * @brief Get the character bounding rectangle.
+   * If the text is not yet rendered or the index > text.Count(); a rect of {0, 0, 0, 0} is returned.
+   *
+   * @param[in] charIndex character index to which we want to calculate the geometry for.
+   * @return bounding rectangle.
+   */
+  Rect<float> GetCharacterBoundingRectangle(const uint32_t charIndex) const;
+
+  /**
    * @copydoc Text::SelectableControlInterface::GetSelectedText()
    */
   string GetSelectedText() const override;

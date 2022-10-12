@@ -1742,6 +1742,15 @@ public: // Queries & retrieves.
   Rect<float> GetLineBoundingRectangle(const uint32_t lineIndex);
 
   /**
+   * @brief Get the char bounding rectangle.
+   * If the text is not yet rendered or the index > text.Count(); a rect of {0, 0, 0, 0} is returned.
+   *
+   * @param[in] charIndex character index to which we want to calculate the geometry for.
+   * @return bounding rectangle.
+   */
+  Rect<float> GetCharacterBoundingRectangle(const uint32_t charIndex);
+
+  /**
    * @brief Gets the bounding box of a specific text range.
    *
    * @param[in] startIndex start index of the text requested to get bounding box to.
