@@ -86,6 +86,10 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
   // Store the actual control's size to restore later.
   const Size actualControlSize = visualModel->mControlSize;
 
+  // This is to keep Index to the first character to be updated.
+  // Then restore it after calling Clear method.
+  auto updateInfoCharIndexBackup = textUpdateInfo.mCharacterIndex;
+
   // Whether the text control is editable
   const bool isEditable = NULL != impl.mEventData;
 
@@ -109,10 +113,6 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
   }
   else
   {
-    // This is to keep Index to the first character to be updated.
-    // Then restore it after calling Clear method.
-    auto updateInfoCharIndexBackup = textUpdateInfo.mCharacterIndex;
-
     // Layout the text for the new width.
     // Apply the pending operations, requested operations and the only once operations.
     // Then remove onlyOnceOperations
@@ -133,16 +133,16 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
     //TODO: then calculate GlyphPositions. Lines, Size, Layout for Natural-Size
     //TODO: and utilize the values in OperationsPending and TextUpdateInfo without changing the original one.
     //TODO: Also it will improve performance because there is no need todo FullRelyout on the next need for layouting.
-
-    // FullRelayoutNeeded should be true because DoRelayout is MAX_FLOAT, MAX_FLOAT.
-    // By this no need to take backup and restore it.
-    textUpdateInfo.mFullRelayoutNeeded = true;
-
-    // Restore mCharacterIndex. Because "Clear" set it to the maximum integer.
-    // The "CalculateTextUpdateIndices" does not work proprely because the mCharacterIndex will be greater than mPreviousNumberOfCharacters.
-    // Which apply an assumption to update only the last  paragraph. That could cause many of out of index crashes.
-    textUpdateInfo.mCharacterIndex = updateInfoCharIndexBackup;
   }
+
+  // FullRelayoutNeeded should be true because DoRelayout is MAX_FLOAT, MAX_FLOAT.
+  // By this no need to take backup and restore it.
+  textUpdateInfo.mFullRelayoutNeeded = true;
+
+  // Restore mCharacterIndex. Because "Clear" set it to the maximum integer.
+  // The "CalculateTextUpdateIndices" does not work proprely because the mCharacterIndex will be greater than mPreviousNumberOfCharacters.
+  // Which apply an assumption to update only the last  paragraph. That could cause many of out of index crashes.
+  textUpdateInfo.mCharacterIndex = updateInfoCharIndexBackup;
 
   // Do the size related operations again.
   operationsPending = static_cast<OperationsMask>(operationsPending | sizeOperations);
