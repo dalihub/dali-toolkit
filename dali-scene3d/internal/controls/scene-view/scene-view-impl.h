@@ -136,6 +136,31 @@ public:
    */
   bool IsUsingFramebuffer() const;
 
+  /**
+   * @copydoc SceneView::SetSkybox()
+   */
+  void SetSkybox(const std::string& skyboxUrl);
+
+  /**
+   * @copydoc SceneView::SetSkyboxIntensity()
+   */
+  void SetSkyboxIntensity(float intensity);
+
+  /**
+   * @copydoc SceneView::GetSkyboxIntensity()
+   */
+  float GetSkyboxIntensity() const;
+
+  /**
+   * @copydoc SceneView::SetSkyboxOrientation()
+   */
+  void SetSkyboxOrientation(const Quaternion& orientation);
+
+  /**
+   * @copydoc SceneView::GetSkyboxOrientation()
+   */
+  Quaternion GetSkyboxOrientation() const;
+
 protected:
   /**
    * @brief Constructs a new SceneView.
@@ -229,12 +254,16 @@ private:
   Dali::RenderTask            mRenderTask;
   Layer                       mRootLayer;
   int32_t                     mWindowOrientation;
+  Dali::Actor                 mSkybox;
+  Quaternion                  mSkyboxOrientation;
+  float                       mSkyboxIntensity{1.0f};
 
   Dali::Texture mSpecularTexture;
   Dali::Texture mDiffuseTexture;
   float         mIblScaleFactor{1.0f};
   bool          mUseFrameBuffer{false};
   bool          mIBLResourceReady{true};
+  bool          mSkyboxResourceReady{true};
 
   // TODO : Light Source
 };

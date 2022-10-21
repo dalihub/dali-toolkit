@@ -586,3 +586,67 @@ int UtcDaliSceneViewResourceReady(void)
 
   END_TEST;
 }
+
+int UtcDaliSceneViewSetSkybox(void)
+{
+  ToolkitTestApplication application;
+
+  gResourceReadyCalled = false;
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  view.ResourceReadySignal().Connect(OnResourceReady);
+  // SceneView::IsResourceReady() returns true by default.
+  DALI_TEST_EQUALS(view.IsResourceReady(), true, TEST_LOCATION);
+
+  // Sanity check
+  DALI_TEST_CHECK(!gResourceReadyCalled);
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(view.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  gResourceReadyCalled = false;
+
+  view.SetSkybox(TEST_SPECULAR_TEXTURE);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewSetSkyboxIntensity(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+
+  float intensity = 0.5f;
+  DALI_TEST_EQUALS(view.GetSkyboxIntensity(), 1.0f, TEST_LOCATION);
+
+  view.SetSkyboxIntensity(intensity);
+  DALI_TEST_EQUALS(view.GetSkyboxIntensity(), intensity, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewSetSkyboxOrientation(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+
+  Dali::Quaternion orientation = Dali::Quaternion(Radian(0.5f), Vector3::YAXIS);
+  view.SetSkyboxOrientation(orientation);
+  DALI_TEST_EQUALS(view.GetSkyboxOrientation(), orientation, TEST_LOCATION);
+
+  END_TEST;
+}

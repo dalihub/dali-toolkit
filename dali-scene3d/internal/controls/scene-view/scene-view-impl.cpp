@@ -31,9 +31,11 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
+#include <string_view>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/controls/model/model-impl.h>
+#include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/public-api/loader/cube-map-loader.h>
 
 #include <dali/integration-api/debug.h>
@@ -60,11 +62,100 @@ DALI_TYPE_REGISTRATION_END()
 Property::Index   RENDERING_BUFFER    = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
 constexpr int32_t DEFAULT_ORIENTATION = 0;
 
+static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
+
+Dali::Actor CreateSkybox(const std::string& skyboxUrl)
+{
+  struct Vertex
+  {
+    Vector3 aPosition;
+  };
+
+  Vertex skyboxVertices[] = {
+    // back
+    {Vector3(-1.0f, 1.0f, -1.0f)},
+    {Vector3(-1.0f, -1.0f, -1.0f)},
+    {Vector3(1.0f, -1.0f, -1.0f)},
+    {Vector3(1.0f, -1.0f, -1.0f)},
+    {Vector3(1.0f, 1.0f, -1.0f)},
+    {Vector3(-1.0f, 1.0f, -1.0f)},
+
+    // left
+    {Vector3(-1.0f, -1.0f, 1.0f)},
+    {Vector3(-1.0f, -1.0f, -1.0f)},
+    {Vector3(-1.0f, 1.0f, -1.0f)},
+    {Vector3(-1.0f, 1.0f, -1.0f)},
+    {Vector3(-1.0f, 1.0f, 1.0f)},
+    {Vector3(-1.0f, -1.0f, 1.0f)},
+
+    // right
+    {Vector3(1.0f, -1.0f, -1.0f)},
+    {Vector3(1.0f, -1.0f, 1.0f)},
+    {Vector3(1.0f, 1.0f, 1.0f)},
+    {Vector3(1.0f, 1.0f, 1.0f)},
+    {Vector3(1.0f, 1.0f, -1.0f)},
+    {Vector3(1.0f, -1.0f, -1.0f)},
+
+    // front
+    {Vector3(-1.0f, -1.0f, 1.0f)},
+    {Vector3(-1.0f, 1.0f, 1.0f)},
+    {Vector3(1.0f, 1.0f, 1.0f)},
+    {Vector3(1.0f, 1.0f, 1.0f)},
+    {Vector3(1.0f, -1.0f, 1.0f)},
+    {Vector3(-1.0f, -1.0f, 1.0f)},
+
+    // botton
+    {Vector3(-1.0f, 1.0f, -1.0f)},
+    {Vector3(1.0f, 1.0f, -1.0f)},
+    {Vector3(1.0f, 1.0f, 1.0f)},
+    {Vector3(1.0f, 1.0f, 1.0f)},
+    {Vector3(-1.0f, 1.0f, 1.0f)},
+    {Vector3(-1.0f, 1.0f, -1.0f)},
+
+    // top
+    {Vector3(-1.0f, -1.0f, -1.0f)},
+    {Vector3(-1.0f, -1.0f, 1.0f)},
+    {Vector3(1.0f, -1.0f, -1.0f)},
+    {Vector3(1.0f, -1.0f, -1.0f)},
+    {Vector3(-1.0f, -1.0f, 1.0f)},
+    {Vector3(1.0f, -1.0f, 1.0f)}};
+
+  Dali::Shader       shaderSkybox  = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
+  Dali::VertexBuffer vertexBuffer  = Dali::VertexBuffer::New(Property::Map().Add("aPosition", Property::VECTOR3));
+  vertexBuffer.SetData(skyboxVertices, sizeof(skyboxVertices) / sizeof(Vertex));
+
+  Dali::Geometry skyboxGeometry = Geometry::New();
+  skyboxGeometry.AddVertexBuffer(vertexBuffer);
+  skyboxGeometry.SetType(Geometry::TRIANGLES);
+
+  Dali::Texture    skyboxTexture   = Dali::Scene3D::Loader::LoadCubeMap(skyboxUrl);
+  Dali::TextureSet skyboxTextures = TextureSet::New();
+  skyboxTextures.SetTexture(0, skyboxTexture);
+
+  Dali::Renderer skyboxRenderer = Renderer::New(skyboxGeometry, shaderSkybox);
+  skyboxRenderer.SetTextures(skyboxTextures);
+  skyboxRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, 2.0f);
+  // Enables the depth test.
+  skyboxRenderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON);
+  // The fragment shader will run only is those pixels that have the max depth value.
+  skyboxRenderer.SetProperty(Renderer::Property::DEPTH_FUNCTION, DepthFunction::LESS_EQUAL);
+
+  Dali::Actor skyboxActor = Actor::New();
+  skyboxActor.SetProperty(Dali::Actor::Property::NAME, "SkyBox");
+  skyboxActor.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  skyboxActor.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  skyboxActor.AddRenderer(skyboxRenderer);
+  return skyboxActor;
+}
+
 } // anonymous namespace
 
 SceneView::SceneView()
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
-  mWindowOrientation(DEFAULT_ORIENTATION)
+  mWindowOrientation(DEFAULT_ORIENTATION),
+  mSkybox(),
+  mSkyboxOrientation(Quaternion()),
+  mSkyboxIntensity(1.0f)
 {
 }
 
@@ -213,7 +304,10 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
     }
   }
   mIBLResourceReady = true;
-  Control::SetResourceReady(false);
+  if(IsResourceReady())
+  {
+    Control::SetResourceReady(false);
+  }
 }
 
 void SceneView::SetImageBasedLightScaleFactor(float scaleFactor)
@@ -245,6 +339,63 @@ void SceneView::UseFramebuffer(bool useFramebuffer)
 bool SceneView::IsUsingFramebuffer() const
 {
   return mUseFrameBuffer;
+}
+
+void SceneView::SetSkybox(const std::string& skyboxUrl)
+{
+  mSkyboxResourceReady = false;
+  if(mSkybox)
+  {
+    mSkybox.Unparent();
+    mSkybox.Reset();
+  }
+  mSkybox = CreateSkybox(skyboxUrl);
+  SetSkyboxIntensity(mSkyboxIntensity);
+  SetSkyboxOrientation(mSkyboxOrientation);
+  if(mRootLayer)
+  {
+    mRootLayer.Add(mSkybox);
+  }
+
+  mSkyboxResourceReady = true;
+  if(IsResourceReady())
+  {
+    Control::SetResourceReady(false);
+  }
+}
+
+void SceneView::SetSkyboxIntensity(float intensity)
+{
+  mSkyboxIntensity = intensity;
+  if(intensity < 0)
+  {
+    DALI_LOG_ERROR("Intensity should be greater than or equal to 0.\n");
+    mSkyboxIntensity = 0.0f;
+  }
+
+  if(mSkybox)
+  {
+    mSkybox.RegisterProperty(SKYBOX_INTENSITY_STRING.data(), mSkyboxIntensity);
+  }
+}
+
+float SceneView::GetSkyboxIntensity() const
+{
+  return mSkyboxIntensity;
+}
+
+void SceneView::SetSkyboxOrientation(const Quaternion& orientation)
+{
+  mSkyboxOrientation = orientation;
+  if(mSkybox)
+  {
+    mSkybox.SetProperty(Dali::Actor::Property::ORIENTATION, orientation);
+  }
+}
+
+Quaternion SceneView::GetSkyboxOrientation() const
+{
+  return mSkyboxOrientation;
 }
 
 ///////////////////////////////////////////////////////////
@@ -344,7 +495,7 @@ void SceneView::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
 bool SceneView::IsResourceReady() const
 {
-  return mIBLResourceReady;
+  return mIBLResourceReady & mSkyboxResourceReady;
 }
 
 void SceneView::UpdateCamera(CameraActor camera)

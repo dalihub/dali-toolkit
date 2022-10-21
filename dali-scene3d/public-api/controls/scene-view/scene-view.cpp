@@ -127,6 +127,31 @@ bool SceneView::IsUsingFramebuffer() const
   return GetImpl(*this).IsUsingFramebuffer();
 }
 
+void SceneView::SetSkybox(const std::string& skyboxUrl)
+{
+  GetImpl(*this).SetSkybox(skyboxUrl);
+}
+
+void SceneView::SetSkyboxIntensity(float intensity)
+{
+  GetImpl(*this).SetSkyboxIntensity(intensity);
+}
+
+float SceneView::GetSkyboxIntensity() const
+{
+  return GetImpl(*this).GetSkyboxIntensity();
+}
+
+void SceneView::SetSkyboxOrientation(const Quaternion& orientation)
+{
+  GetImpl(*this).SetSkyboxOrientation(orientation);
+}
+
+Quaternion SceneView::GetSkyboxOrientation() const
+{
+  return GetImpl(*this).GetSkyboxOrientation();
+}
+
 } // namespace Scene3D
 
 } // namespace Dali
