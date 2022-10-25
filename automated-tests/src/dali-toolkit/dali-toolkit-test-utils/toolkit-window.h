@@ -68,7 +68,8 @@ public:
   Window(const Window& handle);
   Window& operator=(const Window& rhs);
   Window(Window&& rhs);
-  Window& operator=(Window&& rhs);
+  Window&       operator=(Window&& rhs);
+  static Window DownCast(BaseHandle handle);
 
   Integration::Scene            GetScene();
   Dali::RenderSurfaceInterface& GetRenderSurface();
@@ -101,7 +102,6 @@ typedef Signal<bool(const WheelEvent&)> WheelEventGeneratedSignalType;
 typedef Signal<void(Window, bool)>      VisibilityChangedSignalType;
 
 Dali::Window Get(Actor actor);
-Dali::Window DownCast(BaseHandle handle);
 void         SetPositionSize(Window window, PositionSize positionSize);
 int          GetPhysicalOrientation(Window window);
 void         AddFrameRenderedCallback(Window window, std::unique_ptr<CallbackBase> callback, int32_t frameId);

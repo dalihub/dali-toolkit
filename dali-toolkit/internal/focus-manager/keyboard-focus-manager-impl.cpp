@@ -149,7 +149,7 @@ void KeyboardFocusManager::OnAdaptorInit()
       (*iter).TouchedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
       (*iter).WheelEventGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnCustomWheelEvent);
       (*iter).WheelEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWheelEvent);
-      Dali::Window window = DevelWindow::DownCast(*iter);
+      Window window = Window::DownCast(*iter);
       if(window)
       {
         window.FocusChangeSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWindowFocusChanged);
@@ -167,7 +167,7 @@ void KeyboardFocusManager::OnSceneHolderCreated(Dali::Integration::SceneHolder& 
   sceneHolder.TouchedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
   sceneHolder.WheelEventGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnCustomWheelEvent);
   sceneHolder.WheelEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWheelEvent);
-  Dali::Window window = DevelWindow::DownCast(sceneHolder);
+  Window window = Window::DownCast(sceneHolder);
   if(window)
   {
     window.FocusChangeSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWindowFocusChanged);
