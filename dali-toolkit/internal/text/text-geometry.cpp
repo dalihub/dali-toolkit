@@ -84,12 +84,12 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
 
   if(startIndex >= logicalModel->mText.Count())
   {
-    startIndex = logicalModel->mText.Count() - 1;
+    startIndex = static_cast<CharacterIndex>(logicalModel->mText.Count() - 1u);
   }
 
   if(endIndex >= logicalModel->mText.Count())
   {
-    endIndex = logicalModel->mText.Count() - 1;
+    endIndex = static_cast<CharacterIndex>(logicalModel->mText.Count() - 1u);
   }
 
   if(startIndex > endIndex)

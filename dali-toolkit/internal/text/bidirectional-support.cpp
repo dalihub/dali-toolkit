@@ -313,12 +313,12 @@ void GetCharactersDirection(const Vector<BidirectionalParagraphInfoRun>& bidirec
     const Length numberOfLeftToRightCharacters = paragraph.characterRun.characterIndex - index;
     if(numberOfLeftToRightCharacters > 0u)
     {
-      memset(directionsBuffer + index - startIndex, false, numberOfLeftToRightCharacters * sizeof(bool));
+      memset(directionsBuffer + static_cast<std::size_t>(index - startIndex), false, static_cast<std::size_t>(numberOfLeftToRightCharacters) * sizeof(bool));
     }
 
     // Set the directions of the bidirectional text.
     bidirectionalSupport.GetCharactersDirection(paragraph.bidirectionalInfoIndex,
-                                                directionsBuffer + paragraph.characterRun.characterIndex - startIndex,
+                                                directionsBuffer + static_cast<std::size_t>(paragraph.characterRun.characterIndex - startIndex),
                                                 paragraph.characterRun.numberOfCharacters);
 
     // Update the index.
@@ -326,7 +326,7 @@ void GetCharactersDirection(const Vector<BidirectionalParagraphInfoRun>& bidirec
   }
 
   // Fills with left to right those paragraphs without right to left characters.
-  memset(directionsBuffer + index - startIndex, false, (lastCharacter - index) * sizeof(bool));
+  memset(directionsBuffer + static_cast<std::size_t>(index - startIndex), false, static_cast<std::size_t>(lastCharacter - index) * sizeof(bool));
 
   // If the direction info is updated, it needs to be inserted in the model.
   if(updateCurrentBuffer)
