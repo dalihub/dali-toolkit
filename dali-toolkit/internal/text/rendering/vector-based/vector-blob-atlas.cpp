@@ -188,7 +188,7 @@ void VectorBlobAtlas::TexSubImage(unsigned int offsetX,
                                   unsigned int height,
                                   VectorBlob*  blob)
 {
-  const size_t size   = width * height * 4;
+  const size_t size   = static_cast<size_t>(width) * static_cast<size_t>(height) * 4;
   uint8_t*     pixbuf = new uint8_t[size];
 
   size_t pos;

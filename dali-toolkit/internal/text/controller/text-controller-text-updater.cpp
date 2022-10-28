@@ -372,7 +372,7 @@ void Controller::TextUpdater::InsertText(Controller& controller, const std::stri
     {
       pos = modifyText.Begin() + cursorIndex;
     }
-    unsigned int realPos = pos - modifyText.Begin();
+    unsigned int realPos = static_cast<unsigned int>(pos - modifyText.Begin());
     modifyText.Insert(pos, utf32Characters.Begin(), utf32Characters.Begin() + maxSizeOfNewText);
 
     if(NULL != impl.mEditableControlInterface)

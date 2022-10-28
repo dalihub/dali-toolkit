@@ -2673,6 +2673,17 @@ int utcDaliTextLabelGeometryOneGlyph(void)
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 
+  positionsList.Clear();
+  sizeList.Clear();
+
+  startIndex = 2;
+  endIndex   = 0;
+
+  positionsList = DevelTextLabel::GetTextPosition(label, startIndex, endIndex);
+  sizeList      = DevelTextLabel::GetTextSize(label, startIndex, endIndex);
+
+  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
+
   END_TEST;
 }
 

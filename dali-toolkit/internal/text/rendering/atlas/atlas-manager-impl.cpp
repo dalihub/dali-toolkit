@@ -240,7 +240,7 @@ AtlasManager::SizeType AtlasManager::CheckAtlas(SizeType      atlas,
   {
     // Check to see if the image will fit in these blocks
 
-    const SizeType availableBlocks = mAtlasList[atlas].mAvailableBlocks + mAtlasList[atlas].mFreeBlocksList.Size();
+    const SizeType availableBlocks = mAtlasList[atlas].mAvailableBlocks + static_cast<SizeType>(mAtlasList[atlas].mFreeBlocksList.Size());
 
     if(availableBlocks && IsBlockSizeSufficient(width, height, mAtlasList[atlas].mSize.mBlockWidth, mAtlasList[atlas].mSize.mBlockHeight))
     {
@@ -454,7 +454,7 @@ void AtlasManager::GetMetrics(Toolkit::AtlasManager::Metrics& metrics)
   {
     entry.mSize        = mAtlasList[i].mSize;
     entry.mTotalBlocks = mAtlasList[i].mTotalBlocks;
-    entry.mBlocksUsed  = entry.mTotalBlocks - mAtlasList[i].mAvailableBlocks + mAtlasList[i].mFreeBlocksList.Size();
+    entry.mBlocksUsed  = entry.mTotalBlocks - mAtlasList[i].mAvailableBlocks + static_cast<SizeType>(mAtlasList[i].mFreeBlocksList.Size());
     entry.mPixelFormat = GetPixelFormat(i + 1);
 
     metrics.mAtlasMetrics.PushBack(entry);
