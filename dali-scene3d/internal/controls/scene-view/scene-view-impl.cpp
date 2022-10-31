@@ -37,8 +37,6 @@
 #include <dali-scene3d/internal/controls/model/model-impl.h>
 #include <dali-scene3d/public-api/loader/cube-map-loader.h>
 
-#include <dali/integration-api/debug.h>
-
 using namespace Dali;
 
 namespace Dali
@@ -175,24 +173,24 @@ void SceneView::SelectCamera(const std::string& name)
   UpdateCamera(GetCamera(name));
 }
 
-void SceneView::RegisterModel(Scene3D::Model model)
+void SceneView::RegisterSceneItem(Scene3D::Internal::ImageBasedLightObserver *item)
 {
-  if(model)
+  if(item)
   {
-    model.SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
-    mModels.push_back(model);
+    item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
+    mItems.push_back(item);
   }
 }
 
-void SceneView::UnregisterModel(Scene3D::Model model)
+void SceneView::UnregisterSceneItem(Scene3D::Internal::ImageBasedLightObserver *item)
 {
-  if(model)
+  if(item)
   {
-    for(uint32_t i = 0; i < mModels.size(); ++i)
+    for(uint32_t i = 0; i < mItems.size(); ++i)
     {
-      if(mModels[i] == model)
+      if(mItems[i] == item)
       {
-        mModels.erase(mModels.begin() + i);
+        mItems.erase(mItems.begin() + i);
         break;
       }
     }
@@ -217,11 +215,11 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
 void SceneView::SetImageBasedLightScaleFactor(float scaleFactor)
 {
   mIblScaleFactor = scaleFactor;
-  for(auto&& model : mModels)
+  for(auto&& item : mItems)
   {
-    if(model)
+    if(item)
     {
-      model.SetImageBasedLightScaleFactor(scaleFactor);
+      item->NotifyImageBasedLightScaleFactor(scaleFactor);
     }
   }
 }
@@ -265,7 +263,7 @@ void SceneView::OnSceneConnection(int depth)
 
 void SceneView::OnSceneDisconnection()
 {
-  mModels.clear();
+  mItems.clear();
 
   Window window = DevelWindow::Get(Self());
   if(window)
@@ -459,19 +457,15 @@ void SceneView::LoadImageBasedLight()
   Texture diffuseTexture  = Dali::Scene3D::Loader::LoadCubeMap(mDiffuseIblUrl);
   Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(mSpecularIblUrl);
 
-  if(diffuseTexture)
+  if(diffuseTexture && specularTexture)
   {
-    if(specularTexture)
+    mDiffuseTexture  = diffuseTexture;
+    mSpecularTexture = specularTexture;
+    for(auto&& item : mItems)
     {
-      mDiffuseTexture  = diffuseTexture;
-      mSpecularTexture = specularTexture;
-
-      for(auto&& model : mModels)
+      if(item)
       {
-        if(model)
-        {
-          model.SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
-        }
+        item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
       }
     }
   }

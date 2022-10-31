@@ -48,8 +48,6 @@ const std::string MRENDERER_MODEL_IDENTIFICATION("M-Renderer");
 const std::string ROOT_NODE_NAME("RootNode");
 const Vector3     SCALE_TO_ADJUST(100.0f, 100.0f, 100.0f);
 
-constexpr float DEFAULT_INTENSITY = 0.5f;
-
 const Geometry::Type GLTF2_TO_DALI_PRIMITIVES[]{
   Geometry::POINTS,
   Geometry::LINES,
@@ -1171,7 +1169,7 @@ void SetDefaultEnvironmentMap(const gt::Document& doc, ConversionContext& cctx)
 {
   EnvironmentDefinition envDef;
   envDef.mUseBrdfTexture = true;
-  envDef.mIblIntensity   = DEFAULT_INTENSITY;
+  envDef.mIblIntensity   = Scene3D::Loader::EnvironmentDefinition::GetDefaultIntensity();
   cctx.mOutput.mResources.mEnvironmentMaps.push_back({std::move(envDef), EnvironmentDefinition::Textures()});
 }
 

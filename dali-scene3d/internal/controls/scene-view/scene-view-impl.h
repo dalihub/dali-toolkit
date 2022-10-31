@@ -31,7 +31,7 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/controls/model/model.h>
+#include <dali-scene3d/internal/common/image-based-light-observer.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
 namespace Dali
@@ -96,20 +96,21 @@ public:
   void SelectCamera(const std::string& name);
 
   /**
-   * @brief Register a Model.
-   * Some works like ibl setting should be applied on the only Model not the all child actors.
-   * SceneView contains child Model list to apply the works effectively.
+   * @brief Register an item.
    *
-   * @param[in] model Model to be registered.
+   * Some works(e.g, lighting) of SceneView should be propagated to the child 3D items.
+   * SceneView can avoid unnecessary tree traversal to find 3D items by storing only 3D items as a list.
+   *
+   * @param[in] item scene observer to be registered.
    */
-  void RegisterModel(Scene3D::Model model);
+  void RegisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* item);
 
   /**
-   * @brief Unregister a Model
+   * @brief Unregister an item
    *
-   * @param[in] model Model to be unregistered.
+   * @param[in] item scene observer to be unregistered.
    */
-  void UnregisterModel(Scene3D::Model model);
+  void UnregisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* item);
 
   /**
    * @copydoc SceneView::SetImageBasedLightSource()
@@ -230,15 +231,15 @@ private:
 
   /////////////////////////////////////////////////////////////
   // FrameBuffer and Rendertask to render child objects as a 3D Scene
-  CameraActor                 mDefaultCamera;
-  CameraActor                 mSelectedCamera;
-  std::vector<CameraActor>    mCameras;
-  std::vector<Scene3D::Model> mModels;
-  Dali::FrameBuffer           mRenderTarget;
-  Dali::Texture               mTexture;
-  Dali::RenderTask            mRenderTask;
-  Layer                       mRootLayer;
-  int32_t                     mWindowOrientation;
+  CameraActor                                              mDefaultCamera;
+  CameraActor                                              mSelectedCamera;
+  std::vector<CameraActor>                                 mCameras;
+  std::vector<Scene3D::Internal::ImageBasedLightObserver*> mItems;
+  Dali::FrameBuffer                                        mRenderTarget;
+  Dali::Texture                                            mTexture;
+  Dali::RenderTask                                         mRenderTask;
+  Layer                                                    mRootLayer;
+  int32_t                                                  mWindowOrientation;
 
   CallbackBase* mIblLoadedCallback;
   std::string   mDiffuseIblUrl;
