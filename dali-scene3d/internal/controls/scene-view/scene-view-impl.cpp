@@ -38,8 +38,6 @@
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/public-api/loader/cube-map-loader.h>
 
-#include <dali/integration-api/debug.h>
-
 using namespace Dali;
 
 namespace Dali
@@ -257,24 +255,24 @@ void SceneView::SelectCamera(const std::string& name)
   UpdateCamera(GetCamera(name));
 }
 
-void SceneView::RegisterModel(Scene3D::Model model)
+void SceneView::RegisterSceneItem(Scene3D::Internal::ImageBasedLightObserver *item)
 {
-  if(model)
+  if(item)
   {
-    model.SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
-    mModels.push_back(model);
+    item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
+    mItems.push_back(item);
   }
 }
 
-void SceneView::UnregisterModel(Scene3D::Model model)
+void SceneView::UnregisterSceneItem(Scene3D::Internal::ImageBasedLightObserver *item)
 {
-  if(model)
+  if(item)
   {
-    for(uint32_t i = 0; i < mModels.size(); ++i)
+    for(uint32_t i = 0; i < mItems.size(); ++i)
     {
-      if(mModels[i] == model)
+      if(mItems[i] == item)
       {
-        mModels.erase(mModels.begin() + i);
+        mItems.erase(mItems.begin() + i);
         break;
       }
     }
@@ -283,26 +281,22 @@ void SceneView::UnregisterModel(Scene3D::Model model)
 
 void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
-  mIBLResourceReady      = false;
-  Texture diffuseTexture = Dali::Scene3D::Loader::LoadCubeMap(diffuseUrl);
-  if(diffuseTexture)
-  {
-    Texture specularTexture = Dali::Scene3D::Loader::LoadCubeMap(specularUrl);
-    if(specularTexture)
-    {
-      mDiffuseTexture  = diffuseTexture;
-      mSpecularTexture = specularTexture;
-      mIblScaleFactor  = scaleFactor;
+  mIBLResourceReady = false;
 
-      for(auto&& model : mModels)
-      {
-        if(model)
-        {
-          model.SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
-        }
-      }
+  // If url is empty or invalid, reset IBL.
+  mDiffuseTexture  = (!diffuseUrl.empty()) ? Dali::Scene3D::Loader::LoadCubeMap(diffuseUrl) : Texture();
+  mSpecularTexture = (!specularUrl.empty()) ? Dali::Scene3D::Loader::LoadCubeMap(specularUrl) : Texture();
+
+  mIblScaleFactor = scaleFactor;
+
+  for(auto&& item : mItems)
+  {
+    if(item)
+    {
+      item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
     }
   }
+
   mIBLResourceReady = true;
   if(IsResourceReady())
   {
@@ -313,11 +307,11 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
 void SceneView::SetImageBasedLightScaleFactor(float scaleFactor)
 {
   mIblScaleFactor = scaleFactor;
-  for(auto&& model : mModels)
+  for(auto&& item : mItems)
   {
-    if(model)
+    if(item)
     {
-      model.SetImageBasedLightScaleFactor(scaleFactor);
+      item->NotifyImageBasedLightScaleFactor(scaleFactor);
     }
   }
 }
@@ -418,7 +412,7 @@ void SceneView::OnSceneConnection(int depth)
 
 void SceneView::OnSceneDisconnection()
 {
-  mModels.clear();
+  mItems.clear();
 
   Window window = DevelWindow::Get(Self());
   if(window)
