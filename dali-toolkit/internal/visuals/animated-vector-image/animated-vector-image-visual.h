@@ -73,10 +73,9 @@ public:
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to an animated vector image to use
-   * @param[in] size The width and height of the rasterized buffer. The visual size will be used if these are 0.
    * @return A smart-pointer to the newly allocated visual.
    */
-  static AnimatedVectorImageVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, ImageDimensions size = ImageDimensions());
+  static AnimatedVectorImageVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl);
 
 public: // from Visual
   /**
@@ -112,9 +111,8 @@ protected:
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to an animated vector image to use
-   * @param[in] size The width and height of the rasterized buffer. The visual size will be used if these are 0.
    */
-  AnimatedVectorImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, ImageDimensions size);
+  AnimatedVectorImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -245,7 +243,6 @@ private:
   PropertyNotification               mSizeNotification;
   Vector2                            mVisualSize;
   Vector2                            mVisualScale;
-  Dali::ImageDimensions              mDesiredSize{};
   WeakHandle<Actor>                  mPlacementActor;
   DevelImageVisual::PlayState::Type  mPlayState;
   CallbackBase*                      mEventCallback; // Not owned

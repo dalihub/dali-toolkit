@@ -318,7 +318,7 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
 
     case Toolkit::ImageVisual::Property::DESIRED_WIDTH:
     {
-      int32_t desiredWidth = 0;
+      float desiredWidth = 0.0f;
       if(value.Get(desiredWidth))
       {
         mDesiredSize.SetWidth(desiredWidth);
@@ -332,7 +332,7 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
 
     case Toolkit::ImageVisual::Property::DESIRED_HEIGHT:
     {
-      int32_t desiredHeight = 0;
+      float desiredHeight = 0.0f;
       if(value.Get(desiredHeight))
       {
         mDesiredSize.SetHeight(desiredHeight);

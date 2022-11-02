@@ -190,7 +190,6 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   tet_infoline("UtcDaliVisualFactoryGetAnimatedVectorImageVisual04: Request animated vector image visual with a Property::Map");
 
   int             startFrame = 1, endFrame = 3;
-  int             desiredWidth = 100, desiredHeight = 150;
   float           cornerRadius     = 22.0f;
   float           borderlineWidth  = 2.0f;
   Vector4         borderlineColor  = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -211,8 +210,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
     .Add("borderlineWidth", borderlineWidth)
     .Add("borderlineColor", borderlineColor)
     .Add("borderlineOffset", borderlineOffset)
-    .Add("desiredWidth", desiredWidth)
-    .Add("desiredHeight", desiredHeight);
+    .Add("synchronousLoading", true);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -288,14 +286,6 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), borderlineOffset, TEST_LOCATION);
 
-  value = resultMap.Find(ImageVisual::Property::DESIRED_WIDTH, Property::INTEGER);
-  DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<int>(), desiredWidth, TEST_LOCATION);
-
-  value = resultMap.Find(ImageVisual::Property::DESIRED_HEIGHT, Property::INTEGER);
-  DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<int>(), desiredHeight, TEST_LOCATION);
-
   actor.Unparent();
   DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
 
@@ -308,7 +298,6 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   tet_infoline("UtcDaliAnimatedVectorImageVisualGetPropertyMap01");
 
   int             startFrame = 1, endFrame = 3;
-  int             desiredWidth = 100, desiredHeight = 150;
   Vector4         cornerRadius(50.0f, 22.0f, 0.0f, 3.0f);
   float           borderlineWidth  = 2.3f;
   Vector4         borderlineColor  = Vector4(0.3f, 0.3f, 1.0f, 1.0f);
@@ -327,9 +316,7 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
     .Add(DevelVisual::Property::BORDERLINE_WIDTH, borderlineWidth)
     .Add(DevelVisual::Property::BORDERLINE_COLOR, borderlineColor)
     .Add(DevelVisual::Property::BORDERLINE_OFFSET, borderlineOffset)
-    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false)
-    .Add(ImageVisual::Property::DESIRED_WIDTH, desiredWidth)
-    .Add(ImageVisual::Property::DESIRED_HEIGHT, desiredHeight);
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   // request AnimatedVectorImageVisual with a property map
   VisualFactory factory = VisualFactory::Get();
@@ -409,14 +396,6 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   value = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), borderlineOffset, TEST_LOCATION);
-
-  value = resultMap.Find(ImageVisual::Property::DESIRED_WIDTH, Property::INTEGER);
-  DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<int>(), desiredWidth, TEST_LOCATION);
-
-  value = resultMap.Find(ImageVisual::Property::DESIRED_HEIGHT, Property::INTEGER);
-  DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<int>(), desiredHeight, TEST_LOCATION);
 
   // request AnimatedVectorImageVisual with an URL
   Visual::Base visual2 = factory.CreateVisual(TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions());
@@ -1996,71 +1975,6 @@ int UtcDaliAnimatedVectorImageVisualDynamicProperty(void)
 
   // Test whether the property callback is called
   DALI_TEST_EQUALS(gDynamicPropertyCallbackFired, true, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliAnimatedVectorImageVisualDesiredSize(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliAnimatedVectorImageVisualDesiredSize");
-
-  TestGlAbstraction& gl           = application.GetGlAbstraction();
-  TraceCallStack&    textureTrace = gl.GetTextureTrace();
-  int                desiredWidth = 150, desiredHeight = 200;
-
-  Visual::Base visual = VisualFactory::Get().CreateVisual(TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions(desiredWidth, desiredHeight));
-  DALI_TEST_CHECK(visual);
-
-  DummyControl      actor     = DummyControl::New(true);
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
-
-  application.GetScene().Add(actor);
-
-  application.SendNotification();
-  application.Render();
-
-  // Trigger count is 1 - resource ready
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  textureTrace.Enable(true);
-
-  application.SendNotification();
-  application.Render();
-
-  {
-    std::stringstream out;
-    out << GL_TEXTURE_2D << ", " << 0u << ", " << desiredWidth << ", " << desiredHeight;
-    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
-  }
-
-  // Unparent to make next trigger
-  actor.Unparent();
-
-  application.SendNotification();
-  application.Render();
-
-  // Set visual size
-  actor.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
-  application.GetScene().Add(actor);
-
-  application.SendNotification();
-  application.Render();
-
-  // Trigger count is 1 - resource ready
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  textureTrace.Reset();
-
-  application.SendNotification();
-  application.Render();
-
-  {
-    std::stringstream out;
-    out << GL_TEXTURE_2D << ", " << 0u << ", " << desiredWidth << ", " << desiredHeight;
-    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str())); // The size should not be changed
-  }
 
   END_TEST;
 }
