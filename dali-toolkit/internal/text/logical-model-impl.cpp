@@ -146,8 +146,8 @@ CharacterIndex LogicalModel::GetLogicalCursorIndex(CharacterIndex visualCursorIn
     // both characters and the direction of the paragraph.
 
     const CharacterIndex previousVisualCursorIndex  = visualCursorIndex - 1u;
-    const CharacterIndex previousLogicalCursorIndex = *(bidirectionalLineInfo->visualToLogicalMap + previousVisualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex) + bidirectionalLineInfo->characterRun.characterIndex;
-    const CharacterIndex currentLogicalCursorIndex  = *(bidirectionalLineInfo->visualToLogicalMap + visualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex) + bidirectionalLineInfo->characterRun.characterIndex;
+    const CharacterIndex previousLogicalCursorIndex = *(bidirectionalLineInfo->visualToLogicalMap + static_cast<std::size_t>(previousVisualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex)) + bidirectionalLineInfo->characterRun.characterIndex;
+    const CharacterIndex currentLogicalCursorIndex  = *(bidirectionalLineInfo->visualToLogicalMap + static_cast<std::size_t>(visualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex)) + bidirectionalLineInfo->characterRun.characterIndex;
 
     const CharacterDirection previousCharacterDirection = *(modelCharacterDirections + previousLogicalCursorIndex);
     const CharacterDirection currentCharacterDirection  = *(modelCharacterDirections + currentLogicalCursorIndex);
@@ -199,7 +199,7 @@ CharacterIndex LogicalModel::GetLogicalCharacterIndex(CharacterIndex visualChara
   // The bidirectional line info.
   const BidirectionalLineInfoRun* const bidirectionalLineInfo = mBidirectionalLineInfo.Begin() + mBidirectionalLineIndex;
 
-  return *(bidirectionalLineInfo->visualToLogicalMap + visualCharacterIndex - bidirectionalLineInfo->characterRun.characterIndex) + bidirectionalLineInfo->characterRun.characterIndex;
+  return *(bidirectionalLineInfo->visualToLogicalMap + static_cast<std::size_t>(visualCharacterIndex - bidirectionalLineInfo->characterRun.characterIndex)) + bidirectionalLineInfo->characterRun.characterIndex;
 }
 
 bool LogicalModel::FetchBidirectionalLineInfo(CharacterIndex characterIndex)
@@ -543,7 +543,7 @@ void LogicalModel::CreateParagraphInfo(CharacterIndex startIndex,
   if(updateCurrentParagraphs)
   {
     for(Vector<ParagraphRun>::ConstIterator it    = mParagraphInfo.Begin(),
-                                            endIt = mParagraphInfo.Begin() + totalNumberOfParagraphs - numberOfNewParagraphs;
+                                            endIt = mParagraphInfo.Begin() + static_cast<std::size_t>(totalNumberOfParagraphs - numberOfNewParagraphs);
         it != endIt;
         ++it)
     {

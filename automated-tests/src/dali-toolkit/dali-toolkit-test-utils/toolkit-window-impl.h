@@ -30,7 +30,6 @@ namespace Dali
 {
 
 using PositionSize   = Dali::Rect<int>;
-using WindowPosition = Uint16Pair;
 
 namespace Internal
 {
@@ -45,9 +44,9 @@ public:
   virtual ~Window() = default;
   static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent);
 
-  WindowPosition           GetPosition() const;
-  PositionSize             GetPositionSize() const;
-  Dali::Window::WindowSize GetSize() const;
+  Dali::Window::WindowPosition           GetPosition() const;
+  PositionSize                           GetPositionSize() const;
+  Dali::Window::WindowSize               GetSize() const;
 
   void SetPositionSize(PositionSize positionSize);
 

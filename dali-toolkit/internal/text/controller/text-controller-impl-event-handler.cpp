@@ -334,7 +334,7 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
 
     const LineIndex lineIndex         = visualModel->GetLineOfCharacter(characterIndex);
     const LineIndex previousLineIndex = (lineIndex > 0 ? lineIndex - 1u : lineIndex);
-    const LineIndex lastLineIndex     = (visualModel->mLines.Size() > 0 ? visualModel->mLines.Size() - 1u : 0);
+    const size_t    lastLineIndex     = (visualModel->mLines.Size() > 0 ? visualModel->mLines.Size() - 1u : 0);
     const bool      isLastLine        = (previousLineIndex == lastLineIndex);
 
     // Retrieve the cursor position info.
@@ -383,7 +383,7 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
       const LineRun& currline = *(visualModel->mLines.Begin() + lineIndex);
 
       // Get last line index
-      const LineIndex lastLineIndex = (visualModel->mLines.Size() > 0 ? visualModel->mLines.Size() - 1u : 0);
+      const size_t    lastLineIndex = (visualModel->mLines.Size() > 0 ? visualModel->mLines.Size() - 1u : 0);
       const bool      isLastLine    = (lineIndex + 1u == lastLineIndex);
 
       // Get the next hit 'y' point.

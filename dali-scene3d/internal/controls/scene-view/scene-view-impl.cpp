@@ -25,6 +25,8 @@
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
+#include <dali/devel-api/actors/camera-actor-devel.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -55,12 +57,14 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::SceneView, Toolkit::Control, Create);
 DALI_TYPE_REGISTRATION_END()
 
-Property::Index RENDERING_BUFFER = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
+Property::Index   RENDERING_BUFFER    = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
+constexpr int32_t DEFAULT_ORIENTATION = 0;
 
 } // anonymous namespace
 
 SceneView::SceneView()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT))
+: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+  mWindowOrientation(DEFAULT_ORIENTATION)
 {
 }
 
@@ -188,7 +192,7 @@ void SceneView::UnregisterModel(Scene3D::Model model)
 
 void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
-  mIBLResourceReady = false;
+  mIBLResourceReady      = false;
   Texture diffuseTexture = Dali::Scene3D::Loader::LoadCubeMap(diffuseUrl);
   if(diffuseTexture)
   {
@@ -252,12 +256,25 @@ void SceneView::OnSceneConnection(int depth)
 {
   UpdateRenderTask();
 
+  Window window = DevelWindow::Get(Self());
+  if(window)
+  {
+    window.ResizeSignal().Connect(this, &SceneView::OnWindowResized);
+  }
+
   Control::OnSceneConnection(depth);
 }
 
 void SceneView::OnSceneDisconnection()
 {
   mModels.clear();
+
+  Window window = DevelWindow::Get(Self());
+  if(window)
+  {
+    window.ResizeSignal().Disconnect(this, &SceneView::OnWindowResized);
+  }
+
   Control::OnSceneDisconnection();
 }
 
@@ -354,15 +371,22 @@ void SceneView::UpdateRenderTask()
       mRenderTask.SetCameraActor(mSelectedCamera);
     }
 
-    Vector3 size = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+    Vector3     size        = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
     const float aspectRatio = size.width / size.height;
     mSelectedCamera.SetAspectRatio(aspectRatio);
-    const float halfHeight = mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE];
-    const float halfWidth = aspectRatio * halfHeight;
+    const bool projectionVertical = mSelectedCamera.GetProperty<int>(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION) == Dali::DevelCameraActor::VERTICAL;
+
+    // if projectionVertical, Top / Bottom is +-ve to keep consistency with orthographic values
+    // else, Left / Right is +-ve to keep consistency with orthographic values
+    const float orthographicSize = DALI_LIKELY(projectionVertical) ? mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE] : mSelectedCamera[Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE];
+    const float halfHeight       = DALI_LIKELY(projectionVertical) ? orthographicSize : orthographicSize / aspectRatio;
+    const float halfWidth        = DALI_LIKELY(projectionVertical) ? orthographicSize * aspectRatio : orthographicSize;
+
     mSelectedCamera[Dali::CameraActor::Property::LEFT_PLANE_DISTANCE]   = -halfWidth;
     mSelectedCamera[Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE]  = halfWidth;
-    mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE]    = halfHeight; // Top is +ve to keep consistency with orthographic values
-    mSelectedCamera[Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE] = -halfHeight; // Bottom is -ve to keep consistency with orthographic values
+    mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE]    = halfHeight;
+    mSelectedCamera[Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE] = -halfHeight;
+
     if(mUseFrameBuffer)
     {
       Dali::FrameBuffer currentFrameBuffer = mRenderTask.GetFrameBuffer();
@@ -409,6 +433,26 @@ void SceneView::UpdateRenderTask()
         mTexture.Reset();
       }
     }
+
+    RotateCamera();
+  }
+}
+
+void SceneView::OnWindowResized(Window window, Window::WindowSize size)
+{
+  mWindowOrientation = DevelWindow::GetPhysicalOrientation(window);
+  RotateCamera();
+}
+
+void SceneView::RotateCamera()
+{
+  if(mUseFrameBuffer)
+  {
+    DevelCameraActor::RotateProjection(mSelectedCamera, DEFAULT_ORIENTATION);
+  }
+  else
+  {
+    DevelCameraActor::RotateProjection(mSelectedCamera, mWindowOrientation);
   }
 }
 

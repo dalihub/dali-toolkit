@@ -90,7 +90,7 @@ void CalculateGlyphPositionsRTL(const VisualModelPtr&            visualModel,
     const GlyphIndex glyphIndex = *(charactersToGlyphsBuffer + characterVisualIndex);
     const GlyphInfo& glyph      = *(glyphsBuffer + glyphIndex);
 
-    Vector2& position = *(glyphPositionsBuffer + glyphIndex - startGlyphIndex);
+    Vector2& position = *(glyphPositionsBuffer + static_cast<std::size_t>(glyphIndex - startGlyphIndex));
     position.x        = penX;
     position.y        = -glyph.yBearing;
 
@@ -140,7 +140,7 @@ void TraversesCharactersForGlyphPositionsRTL(const VisualModelPtr&  visualModel,
       DALI_ASSERT_DEBUG(glyphIndex < visualModel->mGlyphs.Count());
 
       const GlyphInfo& glyph    = *(glyphsBuffer + glyphIndex);
-      Vector2&         position = *(glyphPositionsBuffer + glyphIndex - startGlyphIndex);
+      Vector2&         position = *(glyphPositionsBuffer + static_cast<std::size_t>(glyphIndex - startGlyphIndex));
 
       position.x = penX + glyph.xBearing;
       position.y = -glyph.yBearing;

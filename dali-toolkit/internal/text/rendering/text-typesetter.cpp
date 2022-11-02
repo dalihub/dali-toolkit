@@ -749,12 +749,12 @@ inline Devel::PixelBuffer CreateTransparentImageBuffer(const uint32_t bufferWidt
   if(Pixel::RGBA8888 == pixelFormat)
   {
     const uint32_t bufferSizeInt  = bufferWidth * bufferHeight;
-    const uint32_t bufferSizeChar = sizeof(uint32_t) * bufferSizeInt;
+    const size_t bufferSizeChar = sizeof(uint32_t) * static_cast<std::size_t>(bufferSizeInt);
     memset(imageBuffer.GetBuffer(), 0, bufferSizeChar);
   }
   else
   {
-    memset(imageBuffer.GetBuffer(), 0, bufferWidth * bufferHeight);
+    memset(imageBuffer.GetBuffer(), 0, static_cast<std::size_t>(bufferWidth * bufferHeight));
   }
 
   return imageBuffer;
@@ -945,7 +945,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
   const uint32_t bufferHeight = static_cast<uint32_t>(size.height);
 
   const uint32_t bufferSizeInt  = bufferWidth * bufferHeight;
-  const uint32_t bufferSizeChar = sizeof(uint32_t) * bufferSizeInt;
+  const size_t bufferSizeChar = sizeof(uint32_t) * static_cast<std::size_t>(bufferSizeInt);
 
   //Elided text in ellipsis at START could start on index greater than 0
   auto startIndexOfGlyphs = mModel->GetStartIndexOfElidedGlyphs();

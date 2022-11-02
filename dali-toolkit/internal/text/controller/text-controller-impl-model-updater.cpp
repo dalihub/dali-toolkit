@@ -330,7 +330,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
     updated = true;
   }
 
-  const Length numberOfGlyphs = glyphs.Count() - currentNumberOfGlyphs;
+  const Length numberOfGlyphs = static_cast<Length>(glyphs.Count()) - currentNumberOfGlyphs;
 
   if(Controller::NO_OPERATION != (Controller::GET_GLYPH_METRICS & operations))
   {
