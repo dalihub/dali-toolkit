@@ -332,7 +332,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageD
       case VisualUrl::TVG:
       case VisualUrl::SVG:
       {
-        visualPtr = SvgVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, size);
+        visualPtr = SvgVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl);
         break;
       }
       case VisualUrl::GIF:

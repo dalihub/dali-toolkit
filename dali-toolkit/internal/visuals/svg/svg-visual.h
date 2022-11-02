@@ -72,10 +72,9 @@ public:
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to svg resource to use
-   * @param[in] size The width and height of the rasterized buffer. The visual size will be used if these are 0.
    * @return A smart-pointer to the newly allocated visual.
    */
-  static SvgVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, ImageDimensions size = ImageDimensions());
+  static SvgVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl);
 
 public: // from Visual
   /**
@@ -105,9 +104,8 @@ protected:
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to svg resource to use
-   * @param[in] size The width and height of the rasterized buffer. The visual size will be used if these are 0.
    */
-  SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, ImageDimensions size);
+  SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -188,7 +186,6 @@ private:
   uint32_t                  mDefaultHeight;
   WeakHandle<Actor>         mPlacementActor;
   Vector2                   mRasterizedSize;
-  Dali::ImageDimensions     mDesiredSize{};
   bool                      mLoadFailed;
   bool                      mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
 };
