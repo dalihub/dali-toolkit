@@ -94,7 +94,7 @@ DALI_SCENE3D_API std::string FormatString(const char* format, ...);
  */
 DALI_SCENE3D_API constexpr size_t NthBit(size_t n)
 {
-  return 1 << n;
+  return 1u << n;
 }
 
 /*
