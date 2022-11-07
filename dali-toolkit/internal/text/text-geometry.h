@@ -18,9 +18,11 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/math/rect.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-model.h>
-
 namespace Dali
 {
 namespace Toolkit
@@ -39,6 +41,34 @@ namespace Text
    * @param[in] positionsList list of positions for the requested text
    */
 void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterIndex endIndex, Vector<Vector2>& sizesList, Vector<Vector2>& positionsList);
+
+/**
+  * @brief Get the line bounding rectangle.
+  * if the requested index is out of range or the line is not yet rendered, a rect of {0, 0, 0, 0} is returned.
+  *
+  * @param[in] textModel text model containing line info.
+  * @param[in] lineIndex line index to which we want to calculate the geometry for.
+  * @return bounding rectangle.
+  */
+Rect<float> GetLineBoundingRect(ModelPtr textModel, const uint32_t lineIndex);
+
+/**
+  * @brief Get the left point of the line (x).
+  *
+  * @param[in] lineRun the requested line.
+  * @return x point of the line.
+  */
+float GetLineLeft(const LineRun& lineRun);
+
+/**
+  * @brief Get the top point of the line (y).
+  * if the requested line id the first; the top = 0, else the top = the heights of the previouse lines.
+  *
+  * @param[in] lines   the lines in the text controller.
+  * @param[in] lineRun the requested line.
+  * @return y point of the line.
+  */
+float GetLineTop(const Vector<LineRun>& lines, const LineRun& lineRun);
 
 } // namespace Text
 

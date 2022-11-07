@@ -1205,6 +1205,11 @@ Vector<Vector2> TextField::GetTextPosition(const uint32_t startIndex, const uint
   return mController->GetTextPosition(startIndex, endIndex);
 }
 
+Rect<float> TextField::GetLineBoundingRectangle(const uint32_t lineIndex) const
+{
+  return mController->GetLineBoundingRectangle(lineIndex);
+}
+
 std::string TextField::TextFieldAccessible::GetName() const
 {
   if(IsHiddenInput())

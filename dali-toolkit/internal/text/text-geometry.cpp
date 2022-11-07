@@ -23,6 +23,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
+#include <dali-toolkit/internal/text/line-run.h>
+#include <dali-toolkit/internal/text/visual-model-impl.h>
 
 using namespace Dali;
 
@@ -266,6 +268,69 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
   //add last block
   sizesList.PushBack(blockSize);
   positionsList.PushBack(blockPos);
+}
+
+float GetLineLeft(const LineRun& lineRun)
+{
+  return lineRun.alignmentOffset;
+}
+
+float GetLineTop(const Vector<LineRun>& lines, const LineRun& lineRun)
+{
+  float lineTop = 0;
+  const int numberOfLines = (int)lines.Count();
+
+  int currentLineIndex = 0;
+  Vector<LineRun>::ConstIterator endIt = (&lineRun);
+  for(Vector<LineRun>::Iterator it = lines.Begin();
+      it != endIt;
+      ++it, ++currentLineIndex)
+    {
+      LineRun& line = *it;
+      bool isLastLine  = (currentLineIndex + 1) == numberOfLines;
+      lineTop         += GetLineHeight(line, isLastLine);
+    }
+
+  return lineTop;
+}
+
+float GetLineWidth(const LineRun& lineRun)
+{
+  return lineRun.width;
+}
+
+Rect<float> GetLineBoundingRect(ModelPtr textModel, const uint32_t lineIndex)
+{
+
+  if(textModel->mVisualModel == nullptr)
+  {
+    return {0, 0, 0, 0};
+  }
+
+  Length numberOfLines = textModel->mVisualModel->GetTotalNumberOfLines();
+
+  if(lineIndex >= numberOfLines)
+  {
+    return {0, 0, 0, 0};
+  }
+
+  const Vector<LineRun>& lines   = textModel->mVisualModel->mLines;
+  const LineRun&         lineRun = lines[lineIndex];
+  bool  isFirstLine = lineIndex == 0;
+  bool  isLastLine  = (lineIndex + 1) == numberOfLines;
+
+  // Calculate the Left(lineX) = X position.
+  float lineX = GetLineLeft(lineRun) + textModel->mScrollPosition.x;
+
+  // Calculate the Top(lineY) = PreviousHeights.
+  // If the line is the first line of the text; its top = 0.
+  float lineY = (isFirstLine ? 0 : GetLineTop(lines, lineRun)) + textModel->mScrollPosition.y;
+
+  // The rectangle contains the width and height:
+  float lineWidth  = GetLineWidth(lineRun);
+  float lineHeight = GetLineHeight(lineRun, isLastLine);
+
+  return {lineX, lineY, lineWidth, lineHeight};
 }
 
 } // namespace Text

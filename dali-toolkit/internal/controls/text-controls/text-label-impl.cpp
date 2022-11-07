@@ -1236,6 +1236,11 @@ Vector<Vector2> TextLabel::GetTextPosition(const uint32_t startIndex, const uint
   return mController->GetTextPosition(startIndex, endIndex);
 }
 
+Rect<float> TextLabel::GetLineBoundingRectangle(const uint32_t lineIndex) const
+{
+  return mController->GetLineBoundingRectangle(lineIndex);
+}
+
 std::string TextLabel::TextLabelAccessible::GetNameRaw() const
 {
   return GetWholeText();

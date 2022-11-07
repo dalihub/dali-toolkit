@@ -34,4 +34,12 @@ void CheckGeometryResult(Vector<Vector2> positionsList, Vector<Vector2> sizeList
   }
 }
 
+void CheckRectGeometryResult(Rect<> rectGeometry, Rect<> expectedRectGeometry)
+{
+  DALI_TEST_EQUALS((float)rectGeometry.x, (float)expectedRectGeometry.x, TEST_LOCATION);
+  DALI_TEST_EQUALS((float)rectGeometry.y, (float)expectedRectGeometry.y, TEST_LOCATION);
+  DALI_TEST_EQUALS((float)rectGeometry.width, (float)expectedRectGeometry.width, TEST_LOCATION);
+  DALI_TEST_EQUALS((float)rectGeometry.height, (float)expectedRectGeometry.height, TEST_LOCATION);
+}
+
 }

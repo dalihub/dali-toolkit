@@ -125,6 +125,15 @@ public:
    */
   Vector<Vector2> GetTextPosition(const uint32_t startIndex, const uint32_t endIndex) const;
 
+  /**
+   * @brief Get the line bounding rectangle.
+   * if the requested index is out of range or the line is not yet rendered, a rect of {0, 0, 0, 0} is returned.
+   *
+   * @param[in] lineIndex line index to which we want to calculate the geometry for.
+   * @return bounding rectangle.
+   */
+  Rect<float> GetLineBoundingRectangle(const uint32_t lineIndex) const;
+
 private: // From Control
   /**
    * @copydoc Control::OnInitialize()
