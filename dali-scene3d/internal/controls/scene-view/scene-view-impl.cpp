@@ -118,15 +118,15 @@ Dali::Actor CreateSkybox(const std::string& skyboxUrl)
     {Vector3(-1.0f, -1.0f, 1.0f)},
     {Vector3(1.0f, -1.0f, 1.0f)}};
 
-  Dali::Shader       shaderSkybox  = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
-  Dali::VertexBuffer vertexBuffer  = Dali::VertexBuffer::New(Property::Map().Add("aPosition", Property::VECTOR3));
+  Dali::Shader       shaderSkybox = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
+  Dali::VertexBuffer vertexBuffer = Dali::VertexBuffer::New(Property::Map().Add("aPosition", Property::VECTOR3));
   vertexBuffer.SetData(skyboxVertices, sizeof(skyboxVertices) / sizeof(Vertex));
 
   Dali::Geometry skyboxGeometry = Geometry::New();
   skyboxGeometry.AddVertexBuffer(vertexBuffer);
   skyboxGeometry.SetType(Geometry::TRIANGLES);
 
-  Dali::Texture    skyboxTexture   = Dali::Scene3D::Loader::LoadCubeMap(skyboxUrl);
+  Dali::Texture    skyboxTexture  = Dali::Scene3D::Loader::LoadCubeMap(skyboxUrl);
   Dali::TextureSet skyboxTextures = TextureSet::New();
   skyboxTextures.SetTexture(0, skyboxTexture);
 
@@ -519,18 +519,6 @@ void SceneView::UpdateRenderTask()
     Vector3     size        = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
     const float aspectRatio = size.width / size.height;
     mSelectedCamera.SetAspectRatio(aspectRatio);
-    const bool projectionVertical = mSelectedCamera.GetProperty<int>(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION) == Dali::DevelCameraActor::VERTICAL;
-
-    // if projectionVertical, Top / Bottom is +-ve to keep consistency with orthographic values
-    // else, Left / Right is +-ve to keep consistency with orthographic values
-    const float orthographicSize = DALI_LIKELY(projectionVertical) ? mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE] : mSelectedCamera[Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE];
-    const float halfHeight       = DALI_LIKELY(projectionVertical) ? orthographicSize : orthographicSize / aspectRatio;
-    const float halfWidth        = DALI_LIKELY(projectionVertical) ? orthographicSize * aspectRatio : orthographicSize;
-
-    mSelectedCamera[Dali::CameraActor::Property::LEFT_PLANE_DISTANCE]   = -halfWidth;
-    mSelectedCamera[Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE]  = halfWidth;
-    mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE]    = halfHeight;
-    mSelectedCamera[Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE] = -halfHeight;
 
     if(mUseFrameBuffer)
     {

@@ -485,8 +485,7 @@ void DliLoader::Impl::ParseScene(LoadParams& params)
 
 void DliLoader::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* tnScenes, const Toolkit::TreeNode* tnNodes, LoadParams& params)
 {
-  auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene)
-  {
+  auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene) {
     auto tn = GetNthChild(tnScenes, iScene); // now a "scene" object
     if(!tn)
     {
@@ -1728,6 +1727,8 @@ void DliLoader::Impl::GetCameraParameters(std::vector<CameraParameters>& cameras
   {
     if(const TreeNode* jsonCameras = mParser.GetRoot()->GetChild("cameras"))
     {
+      float dummyFloatArray[4];
+
       cameras.resize(jsonCameras->Size());
       auto iCamera = cameras.begin();
       for(auto i0 = jsonCameras->CBegin(), i1 = jsonCameras->CEnd(); i0 != i1; ++i0)
@@ -1737,9 +1738,12 @@ void DliLoader::Impl::GetCameraParameters(std::vector<CameraParameters>& cameras
         ReadFloat(jsonCamera.GetChild("fov"), iCamera->yFov);
         ReadFloat(jsonCamera.GetChild("near"), iCamera->zNear);
         ReadFloat(jsonCamera.GetChild("far"), iCamera->zFar);
-        if(ReadVector(jsonCamera.GetChild("orthographic"), iCamera->orthographicSize.AsFloat(), 4u))
+        if(ReadVector(jsonCamera.GetChild("orthographic"), dummyFloatArray, 4u))
         {
           iCamera->isPerspective = false;
+
+          iCamera->orthographicSize = dummyFloatArray[2] * 0.5f;
+          iCamera->aspectRatio      = dummyFloatArray[1] / dummyFloatArray[2];
         }
 
         if(auto jsonMatrix = jsonCamera.GetChild("matrix"))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
@@ -231,7 +232,7 @@ void FitBuffer(Dali::Vector<Vector4>& bufferDestination, Dali::Vector<T>& buffer
 template<typename T>
 bool ReadBinFile(Vector<T>& dataBuffer, std::string url, int32_t offset, int32_t count)
 {
-  size_t readCount = 0;
+  size_t           readCount = 0;
   Dali::FileStream fileStream(url, FileStream::READ | FileStream::BINARY);
   FILE*            fp = fileStream.GetFile();
   if(fp)
@@ -1300,9 +1301,22 @@ void Loader::LoadCamera(Scene3dView& scene3dView)
     if(cameraInfo.type == "orthographic")
     {
       LoadOrthoGraphic((*cameraIter).second, cameraInfo);
-      float xMag_2 = cameraInfo.orthographic.xmag / 2.0;
-      float yMag_2 = cameraInfo.orthographic.ymag / 2.0;
-      cameraActor.SetOrthographicProjection(-xMag_2, xMag_2, yMag_2, -yMag_2, cameraInfo.orthographic.znear, cameraInfo.orthographic.zfar);
+      float       xMag_2 = cameraInfo.orthographic.xmag / 2.0;
+      float       yMag_2 = cameraInfo.orthographic.ymag / 2.0;
+      const float aspect = xMag_2 / yMag_2;
+
+      cameraActor.SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
+      cameraActor.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, yMag_2);
+
+      cameraActor.SetNearClippingPlane(cameraInfo.orthographic.znear);
+      if(cameraInfo.orthographic.zfar > 0.0)
+      {
+        cameraActor.SetFarClippingPlane(cameraInfo.orthographic.zfar);
+      }
+      if(aspect > 0.0f) // Avoid divide-by-zero logic
+      {
+        cameraActor.SetAspectRatio(aspect);
+      }
     }
     else if(cameraInfo.type == "perspective")
     {
@@ -1593,7 +1607,7 @@ Actor Loader::AddNode(Scene3dView& scene3dView, uint32_t index)
     actor.SetProperty(Actor::Property::POSITION, translation);
 
     float hasLightSource = static_cast<float>(!!(scene3dView.GetLightType() & (Toolkit::Scene3dView::LightType::POINT_LIGHT | Toolkit::Scene3dView::LightType::DIRECTIONAL_LIGHT)));
-    float isPointLight = static_cast<float>(!!(scene3dView.GetLightType() & Toolkit::Scene3dView::LightType::POINT_LIGHT));
+    float isPointLight   = static_cast<float>(!!(scene3dView.GetLightType() & Toolkit::Scene3dView::LightType::POINT_LIGHT));
     shader.RegisterProperty("uHasLightSource", hasLightSource);
     shader.RegisterProperty("uIsPointLight", isPointLight);
     shader.RegisterProperty("uLightVector", scene3dView.GetLightVector());
