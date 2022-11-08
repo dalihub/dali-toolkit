@@ -4236,3 +4236,147 @@ int UtcDaliImageViewUseSameUrlWithAnimatedImageVisual(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliImageViewNpatchImageCacheTest01(void)
+{
+  tet_infoline("Test npatch image cached");
+
+  ToolkitTestApplication application;
+  ImageView              imageView[2];
+
+  auto& gl = application.GetGlAbstraction();
+  gl.EnableTextureCallTrace(true);
+  auto& textureCallStack = gl.GetTextureTrace();
+  textureCallStack.Enable(true);
+  textureCallStack.EnableLogging(true);
+
+  auto TestNPatch = [&](int index, const std::string& nPatchImageUrl, const char* location) {
+    if(imageView[index])
+    {
+      imageView[index].Unparent();
+    }
+    imageView[index] = ImageView::New(nPatchImageUrl);
+    imageView[index].SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+    application.GetScene().Add(imageView[index]);
+  };
+
+  TestNPatch(0, TEST_BROKEN_IMAGE_M, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("trace : \n%s\n", textureCallStack.GetTraceString().c_str());
+
+  // Check we gen only 1 textures
+  DALI_TEST_EQUALS(textureCallStack.CountMethod("GenTextures"), 1, TEST_LOCATION);
+  textureCallStack.Reset();
+
+  // Let we use cached textures
+  for(int i = 0; i < 10; i++)
+  {
+    TestNPatch(1, TEST_BROKEN_IMAGE_M, TEST_LOCATION);
+    TestNPatch(0, TEST_BROKEN_IMAGE_M, TEST_LOCATION);
+  }
+
+  application.SendNotification();
+  application.Render();
+  // Check we use cached npatch data so we don't generate new texture textures
+  DALI_TEST_EQUALS(textureCallStack.CountMethod("GenTextures"), 0, TEST_LOCATION);
+
+  // Clear all cached
+  imageView[0].Unparent();
+  imageView[0].Reset();
+  imageView[1].Unparent();
+  imageView[1].Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  textureCallStack.Reset();
+  // Let we use deference textures
+  TestNPatch(1, TEST_BROKEN_IMAGE_S, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+  // Try to load multiple times.
+  for(int i = 0; i < 3; i++)
+  {
+    TestNPatch(0, TEST_BROKEN_IMAGE_M, TEST_LOCATION);
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    TestNPatch(1, TEST_BROKEN_IMAGE_S, TEST_LOCATION);
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  }
+  application.SendNotification();
+  application.Render();
+
+  imageView[0].Unparent();
+  imageView[0].Reset();
+  imageView[1].Unparent();
+  imageView[1].Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  // Check memory leak
+  DALI_TEST_EQUALS(textureCallStack.CountMethod("GenTextures"), textureCallStack.CountMethod("DeleteTextures"), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageViewNpatchImageCacheTest02(void)
+{
+  tet_infoline("Test npatch image cached with border");
+
+  ToolkitTestApplication application;
+  ImageView              imageView[2];
+
+  auto& gl = application.GetGlAbstraction();
+  gl.EnableTextureCallTrace(true);
+  auto& textureCallStack = gl.GetTextureTrace();
+  textureCallStack.Enable(true);
+  textureCallStack.EnableLogging(true);
+
+  auto TestBorderImage = [&](int index, const std::string& normalImageUrl, const Rect<int> border, const char* location) {
+    if(imageView[index])
+    {
+      imageView[index].Unparent();
+    }
+    Property::Map map;
+    map[Toolkit::Visual::Property::TYPE]        = Toolkit::Visual::N_PATCH;
+    map[Toolkit::ImageVisual::Property::URL]    = normalImageUrl;
+    map[Toolkit::ImageVisual::Property::BORDER] = border;
+
+    imageView[index] = ImageView::New();
+    imageView[index].SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+    imageView[index].SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+    application.GetScene().Add(imageView[index]);
+  };
+
+  TestBorderImage(0, gImage_34_RGBA, Rect<int>(0, 0, 0, 0), TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("trace : \n%s\n", textureCallStack.GetTraceString().c_str());
+
+  // Check we gen only 1 textures
+  DALI_TEST_EQUALS(textureCallStack.CountMethod("GenTextures"), 1, TEST_LOCATION);
+  textureCallStack.Reset();
+
+  // Let we use cached textures
+  for(int i = 0; i < 10; i++)
+  {
+    TestBorderImage(0, gImage_34_RGBA, Rect<int>(i, i + 1, i + 2, i + 3), TEST_LOCATION);
+    TestBorderImage(1, gImage_34_RGBA, Rect<int>(i + 1, i, i + 3, i + 2), TEST_LOCATION);
+  }
+
+  application.SendNotification();
+  application.Render();
+  // Check we use cached npatch data so we don't generate new texture textures
+  DALI_TEST_EQUALS(textureCallStack.CountMethod("GenTextures"), 0, TEST_LOCATION);
+
+  END_TEST;
+}
