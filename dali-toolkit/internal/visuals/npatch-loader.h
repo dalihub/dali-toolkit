@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/rendering/texture-set.h>
+#include <memory> // for std::unique_ptr
 #include <string>
 
 // INTERNAL INCLUDES
@@ -117,36 +118,27 @@ private:
     }
     ~NPatchInfo()
     {
-      if(mData)
-      {
-        delete mData;
-      }
     }
-    NPatchInfo(NPatchInfo&& info) // move constructor
+    NPatchInfo(NPatchInfo&& info) noexcept // move constructor
     {
       mData                = std::move(info.mData);
       mReferenceCount      = info.mReferenceCount;
-      info.mData           = nullptr;
       info.mReferenceCount = 0u;
     }
-    NPatchInfo& operator=(NPatchInfo&& info) // move operator
+    NPatchInfo& operator=(NPatchInfo&& info) noexcept // move operator
     {
-      if(mData)
-      {
-        delete mData;
-      }
       mData                = std::move(info.mData);
       mReferenceCount      = info.mReferenceCount;
-      info.mData           = nullptr;
       info.mReferenceCount = 0u;
       return *this;
     }
 
-    NPatchInfo()                       = delete; // Do not use default constructor
-    NPatchInfo(const NPatchInfo& info) = delete; // Do not use copy constructor
+    NPatchInfo()                       = delete;            // Do not use default constructor
+    NPatchInfo(const NPatchInfo& info) = delete;            // Do not use copy constructor
+    NPatchInfo& operator=(const NPatchInfo& info) = delete; // Do not use copy assign
 
-    NPatchData*  mData;
-    std::int16_t mReferenceCount; ///< The number of N-patch visuals that use this data.
+    std::unique_ptr<NPatchData> mData;
+    std::int16_t                mReferenceCount; ///< The number of N-patch visuals that use this data.
   };
 
   /**

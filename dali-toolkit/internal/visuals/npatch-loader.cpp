@@ -120,7 +120,7 @@ bool NPatchLoader::GetNPatchData(const NPatchData::NPatchDataId id, const NPatch
   int32_t cacheIndex = GetCacheIndexFromId(id);
   if(cacheIndex != INVALID_CACHE_INDEX)
   {
-    data = mCache[cacheIndex].mData;
+    data = mCache[cacheIndex].mData.get();
     return true;
   }
   data = nullptr;
@@ -164,7 +164,7 @@ NPatchData* NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>& b
         if(mCache[index].mData->GetBorder() == border)
         {
           mCache[index].mReferenceCount++;
-          return mCache[index].mData;
+          return mCache[index].mData.get();
         }
         else
         {
@@ -245,7 +245,7 @@ NPatchData* NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>& b
 
   DALI_ASSERT_ALWAYS(infoPtr && "NPatchInfo creation failed!");
 
-  return infoPtr->mData;
+  return infoPtr->mData.get();
 }
 
 } // namespace Internal
