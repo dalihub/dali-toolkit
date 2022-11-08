@@ -40,6 +40,10 @@ SET(TC_SOURCES
   utc-Dali-SlideTransition.cpp
   utc-Dali-Slider.cpp
   utc-Dali-TableView.cpp
+  utc-Dali-Text-BaseSpan.cpp
+  utc-Dali-Text-ForegroundColorSpan.cpp
+  utc-Dali-Text-Range.cpp
+  utc-Dali-Text-SpannableString.cpp
   utc-Dali-TextEditor.cpp
   utc-Dali-TextField.cpp
   utc-Dali-TextGeometry.cpp

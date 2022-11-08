@@ -60,6 +60,13 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/styling/style-manager-devel.cpp
   ${devel_api_src_dir}/text/bitmap-font.cpp
   ${devel_api_src_dir}/text/text-utils-devel.cpp
+  ${devel_api_src_dir}/text/character-sequence.cpp
+  ${devel_api_src_dir}/text/range.cpp
+  ${devel_api_src_dir}/text/spanned.cpp
+  ${devel_api_src_dir}/text/spannable.cpp
+  ${devel_api_src_dir}/text/spannable-string.cpp
+  ${devel_api_src_dir}/text/spans/base-span.cpp
+  ${devel_api_src_dir}/text/spans/foreground-color-span.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-cross-effect.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-effect.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-fold-effect.cpp
@@ -233,6 +240,13 @@ SET( devel_api_text_header_files
   ${devel_api_src_dir}/text/text-utils-devel.h
   ${devel_api_src_dir}/text/rendering-backend.h
   ${devel_api_src_dir}/text/text-geometry-devel.h
+  ${devel_api_src_dir}/text/character-sequence.h
+  ${devel_api_src_dir}/text/range.h
+  ${devel_api_src_dir}/text/spanned.h
+  ${devel_api_src_dir}/text/spannable.h
+  ${devel_api_src_dir}/text/spannable-string.h
+  ${devel_api_src_dir}/text/spans/base-span.h
+  ${devel_api_src_dir}/text/spans/foreground-color-span.h
 )
 
 SET( devel_api_tool_bar_header_files

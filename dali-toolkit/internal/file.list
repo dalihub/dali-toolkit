@@ -157,6 +157,14 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/property-string-parser.cpp
    ${toolkit_src_dir}/text/segmentation.cpp
    ${toolkit_src_dir}/text/shaper.cpp
+   ${toolkit_src_dir}/text/string-text/character-sequence-impl.cpp
+   ${toolkit_src_dir}/text/string-text/range-impl.cpp
+   ${toolkit_src_dir}/text/spannable/spanned-impl.cpp
+   ${toolkit_src_dir}/text/spannable/spannable-impl.cpp
+   ${toolkit_src_dir}/text/spannable/spannable-string-impl.cpp
+   ${toolkit_src_dir}/text/spannable/spans/base-span-impl.cpp
+   ${toolkit_src_dir}/text/spannable/spans/foreground-color-span-impl.cpp
+   ${toolkit_src_dir}/text/spannable/span-ranges-container-impl.cpp
    ${toolkit_src_dir}/text/hyphenator.cpp
    ${toolkit_src_dir}/text/text-enumerations-impl.cpp
    ${toolkit_src_dir}/text/text-effects-style.cpp
