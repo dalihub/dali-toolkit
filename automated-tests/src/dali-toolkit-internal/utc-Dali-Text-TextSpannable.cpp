@@ -41,11 +41,6 @@ Text::SpannableString CreateSpannableStringForForegroundColorSpan()
     Text::Range::New(5u, 7u));
   DALI_TEST_CHECK(isAddedGreen);
 
-  auto isAddedBlue = spannableString.AttachSpan(
-    Text::ForegroundColorSpan::New(Color::BLUE),
-    Text::Range::New(1u, 2u));
-  DALI_TEST_CHECK(isAddedBlue);
-
   return spannableString;
 }
 
@@ -81,7 +76,7 @@ int UtcDaliToolkitTextLabelSetSpannedText(void)
   Toolkit::Internal::TextLabel& labelImpl           = GetImpl(textLabel);
   const Text::ColorIndex* const colorIndicesBuffer  = labelImpl.GetTextController()->GetTextModel()->GetColorIndices();
 
-  CheckColorIndices(colorIndicesBuffer, 6u, {0u, 1u, 2u, 5u, 7u, 10u}, {0u, 2u, 2u, 1u, 1u, 0u});
+  CheckColorIndices(colorIndicesBuffer, 4u, {0u, 5u, 7u, 10u}, {0u, 1u, 1u, 0u});
 
   END_TEST;
 }
@@ -105,7 +100,7 @@ int UtcDaliToolkitTextEditorSetSpannedText(void)
   Toolkit::Internal::TextEditor& labelImpl          = GetImpl(textEditor);
   const Text::ColorIndex* const  colorIndicesBuffer = labelImpl.GetTextController()->GetTextModel()->GetColorIndices();
 
-  CheckColorIndices(colorIndicesBuffer, 6u, {0u, 1u, 2u, 5u, 7u, 10u}, {0u, 2u, 2u, 1u, 1u, 0u});
+  CheckColorIndices(colorIndicesBuffer, 4u, {0u, 5u, 7u, 10u}, {0u, 1u, 1u, 0u});
 
   END_TEST;
 }
@@ -129,7 +124,7 @@ int UtcDaliToolkitTextFieldSetSpannedText(void)
   Toolkit::Internal::TextField& labelImpl          = GetImpl(textField);
   const Text::ColorIndex* const colorIndicesBuffer = labelImpl.GetTextController()->GetTextModel()->GetColorIndices();
 
-  CheckColorIndices(colorIndicesBuffer, 6u, {0u, 1u, 2u, 5u, 7u, 10u}, {0u, 2u, 2u, 1u, 1u, 0u});
+  CheckColorIndices(colorIndicesBuffer, 4u, {0u, 5u, 7u, 10u}, {0u, 1u, 1u, 0u});
 
   END_TEST;
 }
