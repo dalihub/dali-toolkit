@@ -382,7 +382,7 @@ public:
   static TextLabel New(const std::string& text);
 
   /**
-   * @brief Creates the TextLabel control with additional behavior.
+   * @brief Creates the TextLabel control with additional behaviour.
    *
    * @SINCE_2_1.8
    * @param[in] additionalBehaviour Additional control behaviour
@@ -391,7 +391,7 @@ public:
   static TextLabel New(ControlBehaviour additionalBehaviour);
 
   /**
-   * @brief Creates the TextLabel control with additional behavior.
+   * @brief Creates the TextLabel control with additional behaviour.
    *
    * @SINCE_2_1.8
    * @param[in] additionalBehaviour Additional control behaviour
