@@ -512,6 +512,15 @@ public:
   New();
 
   /**
+   * @brief Creates the TextEditor control with additional behaviour.
+   *
+   * @SINCE_2_2.3
+   * @param[in] additionalBehaviour Additional control behaviour
+   * @return A handle to the TextEditor control
+   */
+  static TextEditor New(ControlBehaviour additionalBehaviour);
+
+  /**
    * @brief Creates an empty handle.
    *
    * @SINCE_1_1.37

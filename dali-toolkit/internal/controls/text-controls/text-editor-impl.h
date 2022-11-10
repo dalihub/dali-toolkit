@@ -58,8 +58,9 @@ class TextEditor : public Control, public Text::ControlInterface, public Text::E
 public:
   /**
    * @copydoc Dali::Toollkit::TextEditor::New()
+   * @param[in] additionalBehaviour custom behavior flags for this TextEditor. Default is CONTROL_BEHAVIOUR_DEFAULT
    */
-  static Toolkit::TextEditor New();
+  static Toolkit::TextEditor New(ControlBehaviour additionalBehaviour = ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT);
 
   // Properties
 
@@ -498,8 +499,10 @@ private: // Implementation
 
   /**
    * Construct a new TextEditor.
+   *
+   * @param[in] additionalBehaviour additional behaviour flags for this TextEditor
    */
-  TextEditor();
+  TextEditor(ControlBehaviour additionalBehaviour);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()

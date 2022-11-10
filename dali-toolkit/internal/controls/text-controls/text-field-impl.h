@@ -54,8 +54,9 @@ class TextField : public Control, public Text::ControlInterface, public Text::Ed
 public:
   /**
    * @copydoc Dali::Toollkit::TextField::New()
+   * @param[in] additionalBehaviour custom behavior flags for this TextField. Default is CONTROL_BEHAVIOUR_DEFAULT
    */
-  static Toolkit::TextField New();
+  static Toolkit::TextField New(ControlBehaviour additionalBehaviour = ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT);
 
   // Properties
 
@@ -455,8 +456,10 @@ private: // Implementation
 
   /**
    * Construct a new TextField.
+   *
+   * @param[in] additionalBehaviour additional behaviour flags for this TextField
    */
-  TextField();
+  TextField(ControlBehaviour additionalBehaviour);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
