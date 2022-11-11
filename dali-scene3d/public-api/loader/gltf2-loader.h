@@ -34,9 +34,16 @@ struct LoadResult;
 class ShaderDefinitionFactory;
 
 /**
+ * @brief Initialize glTF Loader.
+ * @note This method should be called once before LoadGltfScene() is called.
+ */
+DALI_SCENE3D_API void InitializeGltfLoader();
+
+/**
  * @brief Loads the scene from the glTF file located at @a url, storing the results in @a params.
  * @note Will throw std::runtime_error for JSON entities with types mismatching expectations, carrying
  *  invalid values, or I/O errors.
+ * @note InitializeGltfLoader() should be called once before this function is called.
  */
 DALI_SCENE3D_API void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactory, LoadResult& params);
 

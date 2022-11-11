@@ -225,7 +225,8 @@ struct DALI_SCENE3D_API MaterialDefinition
   }
 
 public: // DATA
-  uint32_t mFlags = 0x0;
+  std::shared_ptr<RawData> mRawData;
+  uint32_t                 mFlags = 0x0;
 
   Index   mEnvironmentIdx      = 0;
   Vector4 mColor               = Color::WHITE;

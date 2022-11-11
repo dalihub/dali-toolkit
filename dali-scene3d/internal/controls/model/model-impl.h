@@ -26,7 +26,9 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/environment-map-load-task.h>
 #include <dali-scene3d/internal/common/image-based-light-observer.h>
+#include <dali-scene3d/internal/common/model-load-task.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
@@ -166,11 +168,6 @@ private:
   bool IsResourceReady() const override;
 
   /**
-   * @brief Loads a model from file
-   */
-  void LoadModel();
-
-  /**
    * @brief Scales the model to fit the control or to return to original size.
    */
   void ScaleModel();
@@ -207,12 +204,46 @@ public: // Overrides ImageBasedLightObserver Methods.
   void NotifyImageBasedLightScaleFactor(float scaleFactor) override;
 
 private:
+  /**
+   * @brief Asynchronously model loading finished.
+   */
+  void OnModelLoadComplete();
+
+  /**
+   * @brief Asynchronously ibl diffusel image loading finished.
+   */
+  void OnIblDiffuseLoadComplete();
+
+  /**
+   * @brief Asynchronously ibl specular image loading finished.
+   */
+  void OnIblSpecularLoadComplete();
+
+  /**
+   * @brief Asynchronously ibl loading finished.
+   */
+  void OnIblLoadComplete();
+
+  /**
+   * @brief Reset Resource loading tasks.
+   */
+  void ResetResourceTasks();
+
+private:
   std::string                    mModelUrl;
   std::string                    mResourceDirectoryUrl;
   Dali::Actor                    mModelRoot;
   std::vector<AnimationData>     mAnimations;
   std::vector<WeakHandle<Actor>> mRenderableActors;
   WeakHandle<Scene3D::SceneView> mParentSceneView;
+
+  // Asynchronous loading variable
+  ModelLoadTaskPtr          mModelLoadTask;
+  EnvironmentMapLoadTaskPtr mIblDiffuseLoadTask;
+  EnvironmentMapLoadTaskPtr mIblSpecularLoadTask;
+
+  std::string mDiffuseIblUrl;
+  std::string mSpecularIblUrl;
 
   // TODO: This default texture can be removed after 3D Resource Cache is added.
   Dali::Texture mDefaultSpecularTexture;
@@ -228,7 +259,10 @@ private:
   bool          mModelChildrenSensitive;
   bool          mModelChildrenFocusable;
   bool          mModelResourceReady;
-  bool          mIBLResourceReady;
+  bool          mIblDiffuseResourceReady;
+  bool          mIblSpecularResourceReady;
+  bool          mIblDiffuseDirty;
+  bool          mIblSpecularDirty;
 };
 
 } // namespace Internal

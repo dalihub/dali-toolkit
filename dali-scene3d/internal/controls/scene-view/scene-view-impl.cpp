@@ -25,7 +25,6 @@
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
-#include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
@@ -34,6 +33,7 @@
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <string_view>
 
 // INTERNAL INCLUDES
@@ -67,7 +67,7 @@ constexpr uint8_t DEFAULT_FRAME_BUFFER_MULTI_SAMPLING_LEVEL = 4u;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
 
-Dali::Actor CreateSkybox(const std::string& skyboxUrl, Scene3D::SceneView::SkyboxType skyboxType)
+Dali::Actor CreateSkybox()
 {
   struct Vertex
   {
@@ -130,30 +130,9 @@ Dali::Actor CreateSkybox(const std::string& skyboxUrl, Scene3D::SceneView::Skybo
   skyboxGeometry.AddVertexBuffer(vertexBuffer);
   skyboxGeometry.SetType(Geometry::TRIANGLES);
 
-  Dali::Texture  skyboxTexture;
-  Dali::Shader   shaderSkybox;
+  Dali::Shader   shaderSkybox = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
   Dali::Renderer skyboxRenderer;
-
-  if(skyboxType == Scene3D::SceneView::SkyboxType::CUBEMAP)
-  {
-    skyboxTexture = Dali::Scene3D::Loader::LoadCubeMap(skyboxUrl);
-    shaderSkybox  = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
-  }
-  else // Scene3D::SceneView::SkyboxType::EQUIRECTANGULAR
-  {
-    // Load image from file
-    PixelData pixels = Dali::Toolkit::SyncImageLoader::Load(skyboxUrl);
-
-    skyboxTexture = Texture::New(TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight());
-    skyboxTexture.Upload(pixels, 0, 0, 0, 0, pixels.GetWidth(), pixels.GetHeight());
-    shaderSkybox = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_EQUIRECTANGULAR_SHADER_FRAG.data());
-  }
-
-  Dali::TextureSet skyboxTextures = TextureSet::New();
-  skyboxTextures.SetTexture(0, skyboxTexture);
-
   skyboxRenderer = Renderer::New(skyboxGeometry, shaderSkybox);
-  skyboxRenderer.SetTextures(skyboxTextures);
   skyboxRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, 2.0f);
   // Enables the depth test.
   skyboxRenderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON);
@@ -179,7 +158,27 @@ SceneView::SceneView()
 {
 }
 
-SceneView::~SceneView() = default;
+SceneView::~SceneView()
+{
+  if(Dali::Adaptor::IsAvailable())
+  {
+    if(mIblDiffuseLoadTask)
+    {
+      Dali::AsyncTaskManager::Get().RemoveTask(mIblDiffuseLoadTask);
+      mIblDiffuseLoadTask.Reset();
+    }
+    if(mIblSpecularLoadTask)
+    {
+      Dali::AsyncTaskManager::Get().RemoveTask(mIblSpecularLoadTask);
+      mIblSpecularLoadTask.Reset();
+    }
+    if(mSkyboxLoadTask)
+    {
+      Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
+      mSkyboxLoadTask.Reset();
+    }
+  }
+}
 
 Dali::Scene3D::SceneView SceneView::New()
 {
@@ -303,23 +302,95 @@ void SceneView::UnregisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* 
 
 void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
-  mIBLResourceReady = false;
-
-  // If url is empty or invalid, reset IBL.
-  mDiffuseTexture  = (!diffuseUrl.empty()) ? Dali::Scene3D::Loader::LoadCubeMap(diffuseUrl) : Texture();
-  mSpecularTexture = (!specularUrl.empty()) ? Dali::Scene3D::Loader::LoadCubeMap(specularUrl) : Texture();
-
-  mIblScaleFactor = scaleFactor;
-
-  for(auto&& item : mItems)
+  bool needIblReset = false;
+  bool isOnScene = Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE);
+  if(mDiffuseIblUrl != diffuseUrl)
   {
-    if(item)
+    mDiffuseIblUrl = diffuseUrl;
+    if(mDiffuseIblUrl.empty())
     {
-      item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
+      needIblReset             = true;
+    }
+    else
+    {
+      mIblDiffuseDirty         = true;
+      mIblDiffuseResourceReady = false;
     }
   }
 
-  mIBLResourceReady = true;
+  if(mSpecularIblUrl != specularUrl)
+  {
+    mSpecularIblUrl = specularUrl;
+    if(mSpecularIblUrl.empty())
+    {
+      needIblReset              = true;
+    }
+    else
+    {
+      mIblSpecularDirty         = true;
+      mIblSpecularResourceReady = false;
+    }
+  }
+
+  // If one or both of diffuse url and specular url are empty,
+  // we don't need to request to load texture.
+  if(needIblReset)
+  {
+    if(mIblDiffuseLoadTask)
+    {
+      Dali::AsyncTaskManager::Get().RemoveTask(mIblDiffuseLoadTask);
+      mIblDiffuseLoadTask.Reset();
+    }
+
+    if(mIblSpecularLoadTask)
+    {
+      Dali::AsyncTaskManager::Get().RemoveTask(mIblSpecularLoadTask);
+      mIblSpecularLoadTask.Reset();
+    }
+
+    mIblDiffuseDirty          = false;
+    mIblSpecularDirty         = false;
+    mIblDiffuseResourceReady  = true;
+    mIblSpecularResourceReady = true;
+
+    mDiffuseTexture.Reset();
+    mSpecularTexture.Reset();
+
+    NotifyImageBasedLightTextureChange();
+  }
+  else
+  {
+    if(isOnScene && mIblDiffuseDirty)
+    {
+      if(mIblDiffuseLoadTask)
+      {
+        Dali::AsyncTaskManager::Get().RemoveTask(mIblDiffuseLoadTask);
+        mIblDiffuseLoadTask.Reset();
+      }
+      mIblDiffuseLoadTask = new EnvironmentMapLoadTask(mDiffuseIblUrl, MakeCallback(this, &SceneView::OnIblDiffuseLoadComplete));
+      Dali::AsyncTaskManager::Get().AddTask(mIblDiffuseLoadTask);
+      mIblDiffuseDirty = false;
+    }
+
+    if(isOnScene && mIblSpecularDirty)
+    {
+      if(mIblSpecularLoadTask)
+      {
+        Dali::AsyncTaskManager::Get().RemoveTask(mIblSpecularLoadTask);
+        mIblSpecularLoadTask.Reset();
+      }
+      mIblSpecularLoadTask = new EnvironmentMapLoadTask(mSpecularIblUrl, MakeCallback(this, &SceneView::OnIblSpecularLoadComplete));
+      Dali::AsyncTaskManager::Get().AddTask(mIblSpecularLoadTask);
+      mIblSpecularDirty = false;
+    }
+  }
+
+  if(!Dali::Equals(mIblScaleFactor, scaleFactor))
+  {
+    SetImageBasedLightScaleFactor(scaleFactor);
+  }
+
+  // If diffuse and specular textures are already loaded, emits resource ready signal here.
   if(IsResourceReady())
   {
     Control::SetResourceReady(false);
@@ -359,21 +430,57 @@ bool SceneView::IsUsingFramebuffer() const
 
 void SceneView::SetSkybox(const std::string& skyboxUrl, Scene3D::SceneView::SkyboxType skyboxType)
 {
-  mSkyboxResourceReady = false;
-  if(mSkybox)
+  mSkyboxEnvironmentMapType = skyboxType;
+  bool isOnScene = Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE);
+  if(mSkyboxUrl != skyboxUrl)
   {
-    mSkybox.Unparent();
-    mSkybox.Reset();
-  }
-  mSkybox = CreateSkybox(skyboxUrl, skyboxType);
-  SetSkyboxIntensity(mSkyboxIntensity);
-  SetSkyboxOrientation(mSkyboxOrientation);
-  if(mRootLayer)
-  {
-    mRootLayer.Add(mSkybox);
+    mSkyboxDirty         = true;
+    mSkyboxResourceReady = false;
+    mSkyboxUrl           = skyboxUrl;
   }
 
-  mSkyboxResourceReady = true;
+  if(mSkyboxUrl.empty())
+  {
+    if(mSkyboxLoadTask)
+    {
+      Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
+      mSkyboxLoadTask.Reset();
+    }
+    if(mSkyboxImageLoader)
+    {
+      mSkyboxImageLoader.Cancel(mSkyboxImageId);
+    }
+    mSkyboxDirty         = false;
+    mSkyboxResourceReady = true;
+  }
+  else
+  {
+    if(isOnScene && mSkyboxDirty)
+    {
+      if(mSkyboxLoadTask)
+      {
+        Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
+        mSkyboxLoadTask.Reset();
+      }
+      if(mSkyboxImageLoader)
+      {
+        mSkyboxImageLoader.Cancel(mSkyboxImageId);
+      }
+      if(mSkyboxEnvironmentMapType == Scene3D::SceneView::SkyboxType::CUBEMAP)
+      {
+        mSkyboxLoadTask = new EnvironmentMapLoadTask(mSkyboxUrl, MakeCallback(this, &SceneView::OnSkyboxLoadComplete));
+        Dali::AsyncTaskManager::Get().AddTask(mSkyboxLoadTask);
+      }
+      else
+      {
+        mSkyboxImageLoader = Dali::Toolkit::AsyncImageLoader::New();
+        mSkyboxImageLoader.ImageLoadedSignal().Connect(this, &SceneView::OnSkyboxEquirectangularLoadComplete);
+        mSkyboxImageId = mSkyboxImageLoader.Load(mSkyboxUrl);
+      }
+      mSkyboxDirty = false;
+    }
+  }
+
   if(IsResourceReady())
   {
     Control::SetResourceReady(false);
@@ -421,6 +528,17 @@ Quaternion SceneView::GetSkyboxOrientation() const
 
 void SceneView::OnSceneConnection(int depth)
 {
+  // If diffuse and specular url is not valid, IBL does not need to be loaded.
+  if(!mDiffuseIblUrl.empty() && !mSpecularIblUrl.empty())
+  {
+    SetImageBasedLightSource(mDiffuseIblUrl, mSpecularIblUrl, mIblScaleFactor);
+  }
+
+  if(!mSkyboxUrl.empty())
+  {
+    SetSkybox(mSkyboxUrl, mSkyboxEnvironmentMapType);
+  }
+
   Window window = DevelWindow::Get(Self());
   if(window)
   {
@@ -518,7 +636,7 @@ void SceneView::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
 bool SceneView::IsResourceReady() const
 {
-  return mIBLResourceReady & mSkyboxResourceReady;
+  return mIblDiffuseResourceReady && mIblSpecularResourceReady && mSkyboxResourceReady;
 }
 
 void SceneView::UpdateCamera(CameraActor camera)
@@ -627,6 +745,97 @@ void SceneView::RotateCamera()
   else
   {
     DevelCameraActor::RotateProjection(mSelectedCamera, mWindowOrientation);
+  }
+}
+
+void SceneView::OnSkyboxEquirectangularLoadComplete(uint32_t loadedTaskId, PixelData pixelData)
+{
+  mSkyboxTexture = Texture::New(TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
+  mSkyboxTexture.Upload(pixelData, 0, 0, 0, 0, pixelData.GetWidth(), pixelData.GetHeight());
+  OnSkyboxLoadComplete();
+}
+
+void SceneView::OnSkyboxLoadComplete()
+{
+  if(!mSkybox)
+  {
+    mSkybox = CreateSkybox();
+    SetSkyboxIntensity(mSkyboxIntensity);
+    SetSkyboxOrientation(mSkyboxOrientation);
+    if(mRootLayer)
+    {
+      mRootLayer.Add(mSkybox);
+    }
+  }
+
+  mSkyboxResourceReady = true;
+  if(IsResourceReady())
+  {
+    Control::SetResourceReady(false);
+  }
+
+  Shader skyboxShader;
+  if(mSkyboxEnvironmentMapType == Scene3D::SceneView::SkyboxType::CUBEMAP)
+  {
+    mSkyboxTexture = (mSkyboxLoadTask->HasSucceeded()) ? mSkyboxLoadTask->GetEnvironmentMap().CreateTexture() : Texture();
+    skyboxShader   = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
+    Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
+    mSkyboxLoadTask.Reset();
+  }
+  else
+  {
+    skyboxShader = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_EQUIRECTANGULAR_SHADER_FRAG.data());
+  }
+
+  Renderer skyboxRenderer = (mSkybox.GetRendererCount() > 0u) ? mSkybox.GetRendererAt(0u) : Renderer();
+  if(skyboxRenderer)
+  {
+    Dali::TextureSet skyboxTextures = TextureSet::New();
+    skyboxTextures.SetTexture(0, mSkyboxTexture);
+    skyboxRenderer.SetTextures(skyboxTextures);
+    skyboxRenderer.SetShader(skyboxShader);
+  }
+}
+
+void SceneView::OnIblDiffuseLoadComplete()
+{
+  mDiffuseTexture          = (mIblDiffuseLoadTask->HasSucceeded()) ? mIblDiffuseLoadTask->GetEnvironmentMap().CreateTexture() : Texture();
+  mIblDiffuseResourceReady = true;
+  if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
+  {
+    OnIblLoadComplete();
+  }
+  mIblDiffuseLoadTask.Reset();
+}
+
+void SceneView::OnIblSpecularLoadComplete()
+{
+  mSpecularTexture          = (mIblSpecularLoadTask->HasSucceeded()) ? mIblSpecularLoadTask->GetEnvironmentMap().CreateTexture() : Texture();
+  mIblSpecularResourceReady = true;
+  if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
+  {
+    OnIblLoadComplete();
+  }
+  mIblSpecularLoadTask.Reset();
+}
+
+void SceneView::OnIblLoadComplete()
+{
+  NotifyImageBasedLightTextureChange();
+  if(IsResourceReady())
+  {
+    Control::SetResourceReady(false);
+  }
+}
+
+void SceneView::NotifyImageBasedLightTextureChange()
+{
+  for(auto&& item : mItems)
+  {
+    if(item)
+    {
+      item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
+    }
   }
 }
 

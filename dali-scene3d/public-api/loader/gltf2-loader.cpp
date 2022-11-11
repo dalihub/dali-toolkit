@@ -22,6 +22,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/math/quaternion.h>
+#include <dali/devel-api/threading/mutex.h>
 #include <fstream>
 
 // INTERNAL INCLUDES
@@ -43,6 +44,9 @@ namespace Loader
 {
 namespace
 {
+Dali::Mutex gInitializeMutex;
+Dali::Mutex gReadMutex;
+
 const std::string POSITION_PROPERTY("position");
 const std::string ORIENTATION_PROPERTY("orientation");
 const std::string SCALE_PROPERTY("scale");
@@ -76,9 +80,6 @@ struct AttributeMapping
 
 std::vector<gt::Animation> ReadAnimationArray(const json_value_s& j)
 {
-  gt::Animation proxy;
-  SetRefReaderObject(proxy);
-
   auto results = js::Read::Array<gt::Animation, js::ObjectReader<gt::Animation>::Read>(j);
 
   for(auto& animation : results)
@@ -1230,6 +1231,21 @@ void SetDefaultEnvironmentMap(const gt::Document& doc, ConversionContext& contex
 
 } // namespace
 
+void InitializeGltfLoader()
+{
+  // Set ObjectReader only once (for all gltf loading).
+  static bool setObjectReadersRequired = true;
+  {
+    Mutex::ScopedLock lock(gInitializeMutex);
+    if(setObjectReadersRequired)
+    {
+      // NOTE: only referencing own, anonymous namespace, const objects; the pointers will never need to change.
+      SetObjectReaders();
+      setObjectReadersRequired = false;
+    }
+  }
+}
+
 void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactory, LoadResult& params)
 {
   bool failed = false;
@@ -1243,14 +1259,6 @@ void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactor
   if(!root)
   {
     throw std::runtime_error("Failed to parse " + url);
-  }
-
-  static bool setObjectReaders = true;
-  if(setObjectReaders)
-  {
-    // NOTE: only referencing own, anonymous namespace, const objects; the pointers will never need to change.
-    SetObjectReaders();
-    setObjectReaders = false;
   }
 
   gt::Document doc;
@@ -1272,8 +1280,11 @@ void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactor
     isMRendererModel      = (doc.mAsset.mGenerator.find(MRENDERER_MODEL_IDENTIFICATION) != std::string_view::npos);
   }
 
-  gt::SetRefReaderObject(doc);
-  DOCUMENT_READER.Read(rootObj, doc);
+  {
+    Mutex::ScopedLock lock(gReadMutex);
+    gt::SetRefReaderObject(doc);
+    DOCUMENT_READER.Read(rootObj, doc);
+  }
 
   auto              path = url.substr(0, url.rfind('/') + 1);
   ConversionContext context{params, path, INVALID_INDEX};
