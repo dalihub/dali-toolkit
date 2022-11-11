@@ -68,6 +68,7 @@ static constexpr uint32_t OFFSET_FOR_SPECULAR_CUBE_TEXTURE = 1u;
 static constexpr Vector3 Y_DIRECTION(1.0f, -1.0f, 1.0f);
 
 static constexpr bool DEFAULT_MODEL_CHILDREN_SENSITIVE = false;
+static constexpr bool DEFAULT_MODEL_CHILDREN_FOCUSABLE = false;
 
 static constexpr std::string_view KTX_EXTENSION  = ".ktx";
 static constexpr std::string_view OBJ_EXTENSION  = ".obj";
@@ -187,6 +188,7 @@ Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUr
   mSceneIblScaleFactor(1.0f),
   mIblScaleFactor(1.0f),
   mModelChildrenSensitive(DEFAULT_MODEL_CHILDREN_SENSITIVE),
+  mModelChildrenFocusable(DEFAULT_MODEL_CHILDREN_FOCUSABLE),
   mModelResourceReady(false),
   mIBLResourceReady(true)
 {
@@ -240,6 +242,24 @@ void Model::SetChildrenSensitive(bool enable)
 bool Model::GetChildrenSensitive() const
 {
   return mModelChildrenSensitive;
+}
+
+void Model::SetChildrenFocusable(bool enable)
+{
+  if(mModelChildrenFocusable != enable)
+  {
+    mModelChildrenFocusable = enable;
+    if(mModelRoot)
+    {
+      mModelRoot.SetProperty(Dali::Actor::Property::KEYBOARD_FOCUSABLE, mModelChildrenFocusable);
+      mModelRoot.SetProperty(Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, mModelChildrenFocusable);
+    }
+  }
+}
+
+bool Model::GetChildrenFocusable() const
+{
+  return mModelChildrenFocusable;
 }
 
 void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
@@ -319,6 +339,12 @@ Dali::Animation Model::GetAnimation(const std::string& name) const
 //
 // Private methods
 //
+
+void Model::OnInitialize()
+{
+  // Make ParentOrigin as Center.
+  Self().SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+}
 
 void Model::OnSceneConnection(int depth)
 {
@@ -526,10 +552,11 @@ void Model::LoadModel()
   ScaleModel();
 
   mModelRoot.SetProperty(Dali::Actor::Property::SENSITIVE, mModelChildrenSensitive);
+  mModelRoot.SetProperty(Dali::Actor::Property::KEYBOARD_FOCUSABLE, mModelChildrenFocusable);
+  mModelRoot.SetProperty(Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, mModelChildrenFocusable);
 
   Self().Add(mModelRoot);
 
-  Self().SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   Self().SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3(mModelPivot.x, 1.0f - mModelPivot.y, mModelPivot.z));
 }
 

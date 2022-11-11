@@ -162,7 +162,7 @@ public:
    * @SINCE_2_1.43
    * @note Even if we set children sensitive as false, model itself's sensitive
    * is depend on it's property.
-   * @note If we don't call this API, default is false. (Allow to traversal model's children during hit-test)
+   * @note If we don't call this API, default is false. (Don't allow to traversal model's children during hit-test)
    *
    * @param[in] enable True to enable model's children can use events.
    */
@@ -175,6 +175,28 @@ public:
    * @return bool True if this Model allow model children sensitive.
    */
   bool GetChildrenSensitive() const;
+
+  /**
+   * @brief Whether allow this model's children actor to use keyboard focusable.
+   *
+   * Usually, 3D Model might have a lot of actors. And most of them don't need to check focusable.
+   * To optimize traversal, we need to setup some flag that this model don't allow (or allow) to traversal
+   * children so that child can use keyboard focusable.
+   *
+   * @note Even if we set children focusable as false, model itself's focusable
+   * is depend on it's property.
+   * @note If we don't call this API, default is false. (Don't allow to traversal model's children during focusable test)
+   *
+   * @param[in] enable True to enable model's children can focusable.
+   */
+  void SetChildrenFocusable(bool enable);
+
+  /**
+   * @brief Gets whether this Model allow model's children actor to use focusable or not.
+   *
+   * @return bool True if this Model allow model children focusable.
+   */
+  bool GetChildrenFocusable() const;
 
   /**
    * @brief Changes Image Based Light as the input textures.

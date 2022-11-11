@@ -26,9 +26,9 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/image-based-light-observer.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
-#include <dali-scene3d/internal/common/image-based-light-observer.h>
 
 namespace Dali
 {
@@ -67,6 +67,16 @@ public:
    * @copydoc Model::GetChildrenSensitive()
    */
   bool GetChildrenSensitive() const;
+
+  /**
+   * @copydoc Model::SetChildrenFocusable()
+   */
+  void SetChildrenFocusable(bool enable);
+
+  /**
+   * @copydoc Model::GetChildrenFocusable()
+   */
+  bool GetChildrenFocusable() const;
 
   /**
    * @copydoc Model::SetImageBasedLightSource()
@@ -115,6 +125,11 @@ protected:
   virtual ~Model();
 
 private:
+  /**
+   * @copydoc Toolkit::Control::OnInitialize
+   */
+  void OnInitialize();
+
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
@@ -226,6 +241,7 @@ private:
   float         mSceneIblScaleFactor;
   float         mIblScaleFactor;
   bool          mModelChildrenSensitive;
+  bool          mModelChildrenFocusable;
   bool          mModelResourceReady;
   bool          mIBLResourceReady;
 };

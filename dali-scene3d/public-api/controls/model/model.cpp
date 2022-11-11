@@ -73,6 +73,16 @@ bool Model::GetChildrenSensitive() const
   return GetImpl(*this).GetChildrenSensitive();
 }
 
+void Model::SetChildrenFocusable(bool enable)
+{
+  GetImpl(*this).SetChildrenFocusable(enable);
+}
+
+bool Model::GetChildrenFocusable() const
+{
+  return GetImpl(*this).GetChildrenFocusable();
+}
+
 void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
   GetImpl(*this).SetImageBasedLightSource(diffuseUrl, specularUrl, scaleFactor);

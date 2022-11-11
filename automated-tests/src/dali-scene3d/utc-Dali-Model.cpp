@@ -41,6 +41,7 @@ void model_cleanup(void)
 namespace
 {
 const bool DEFAULT_MODEL_CHILDREN_SENSITIVE = false;
+const bool DEFAULT_MODEL_CHILDREN_FOCUSABLE = false;
 /**
  * For the AnimatedCube.gltf and its Assets
  * Donated by Norbert Nopper for glTF testing.
@@ -82,6 +83,12 @@ bool TestTouchCallback(Actor, const TouchEvent&)
 {
   gTouchCallBackCalled = true;
   return true;
+}
+
+bool gFocusChangedCallBackCalled = false;
+void TestFocusChangedCallback(Actor, Actor)
+{
+  gFocusChangedCallBackCalled = true;
 }
 
 } // namespace
@@ -583,6 +590,187 @@ int UtcDaliModelChildrenSensitive02(void)
 
   // Clear
   gTouchCallBackCalled = false;
+
+  END_TEST;
+}
+
+int UtcDaliModelChildrenFocusable01(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model view = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector3(100, 100, 100));
+  view.SetProperty(Dali::Actor::Property::POSITION, Vector3(0, 0, 0));
+  view.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  view.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  // Get vaule. Default is false.
+  DALI_TEST_EQUALS(view.GetChildrenFocusable(), DEFAULT_MODEL_CHILDREN_FOCUSABLE, TEST_LOCATION);
+
+  // Allow children actor's focus before on scene.
+  view.SetChildrenFocusable(true);
+  DALI_TEST_EQUALS(view.GetChildrenFocusable(), true, TEST_LOCATION);
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Actor meshActor = view.FindChildByName("AnimatedCube");
+  DALI_TEST_CHECK(meshActor);
+
+  // Enable the default algorithm
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+  Dali::Toolkit::DevelKeyboardFocusManager::EnableDefaultAlgorithm(manager, true);
+
+  // connect focusable signal
+  gFocusChangedCallBackCalled = false;
+  meshActor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  manager.FocusChangedSignal().Connect(TestFocusChangedCallback);
+
+  // Initialize with some left-positioned actor
+  Control focusStartActor = Control::New();
+  focusStartActor.SetProperty(Dali::Actor::Property::SIZE, Vector3(100, 100, 100));
+  focusStartActor.SetProperty(Dali::Actor::Property::POSITION, Vector3(-200, 0, 0));
+  focusStartActor.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  focusStartActor.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  focusStartActor.SetProperty(Dali::Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(focusStartActor);
+
+  // Clear
+  manager.ClearFocus();
+  manager.SetCurrentFocusActor(focusStartActor);
+  gFocusChangedCallBackCalled = false;
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Focusable view find success
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == true);
+  DALI_TEST_CHECK(gFocusChangedCallBackCalled);
+
+  // Clear
+  manager.ClearFocus();
+  manager.SetCurrentFocusActor(focusStartActor);
+  gFocusChangedCallBackCalled = false;
+
+  // Block children actor's focus
+  view.SetChildrenFocusable(false);
+  DALI_TEST_EQUALS(view.GetChildrenFocusable(), false, TEST_LOCATION);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Focusable view find failed
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == false);
+  DALI_TEST_CHECK(!gFocusChangedCallBackCalled);
+
+  // Clear
+  manager.ClearFocus();
+  manager.SetCurrentFocusActor(focusStartActor);
+  gFocusChangedCallBackCalled = false;
+
+  // Allow again
+  view.SetChildrenFocusable(true);
+  DALI_TEST_EQUALS(view.GetChildrenFocusable(), true, TEST_LOCATION);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Focusable view find success
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == true);
+  DALI_TEST_CHECK(gFocusChangedCallBackCalled);
+
+  // Clear
+  manager.ClearFocus();
+  manager.SetCurrentFocusActor(focusStartActor);
+  gFocusChangedCallBackCalled = false;
+
+  END_TEST;
+}
+
+int UtcDaliModelModelChildrenFocusable02(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model view = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector3(100, 100, 100));
+  view.SetProperty(Dali::Actor::Property::POSITION, Vector3(0, 0, 0));
+  view.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  view.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  // Get vaule. Default is true.
+  DALI_TEST_EQUALS(view.GetChildrenFocusable(), DEFAULT_MODEL_CHILDREN_FOCUSABLE, TEST_LOCATION);
+
+  // Block children actor's focus before on scene.
+  view.SetChildrenFocusable(false);
+  DALI_TEST_EQUALS(view.GetChildrenFocusable(), false, TEST_LOCATION);
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Actor meshActor = view.FindChildByName("AnimatedCube");
+  DALI_TEST_CHECK(meshActor);
+
+  // Enable the default algorithm
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+  Dali::Toolkit::DevelKeyboardFocusManager::EnableDefaultAlgorithm(manager, true);
+
+  // connect focusable signal
+  gFocusChangedCallBackCalled = false;
+  meshActor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  manager.FocusChangedSignal().Connect(TestFocusChangedCallback);
+
+  // Initialize with some left-positioned actor
+  Control focusStartActor = Control::New();
+  focusStartActor.SetProperty(Dali::Actor::Property::SIZE, Vector3(100, 100, 100));
+  focusStartActor.SetProperty(Dali::Actor::Property::POSITION, Vector3(-200, 0, 0));
+  focusStartActor.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  focusStartActor.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  focusStartActor.SetProperty(Dali::Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(focusStartActor);
+
+  // Clear
+  manager.ClearFocus();
+  manager.SetCurrentFocusActor(focusStartActor);
+  gFocusChangedCallBackCalled = false;
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Focusable view find failed
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == false);
+  DALI_TEST_CHECK(!gFocusChangedCallBackCalled);
+
+  // Clear
+  manager.ClearFocus();
+  manager.SetCurrentFocusActor(focusStartActor);
+  gFocusChangedCallBackCalled = false;
+
+  // Allow again
+  view.SetChildrenFocusable(true);
+  DALI_TEST_EQUALS(view.GetChildrenFocusable(), true, TEST_LOCATION);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Focusable view find success
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == true);
+  DALI_TEST_CHECK(gFocusChangedCallBackCalled);
+
+  // Clear
+  manager.ClearFocus();
+  manager.SetCurrentFocusActor(focusStartActor);
+  gFocusChangedCallBackCalled = false;
 
   END_TEST;
 }
