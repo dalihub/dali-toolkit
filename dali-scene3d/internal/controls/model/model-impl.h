@@ -26,9 +26,9 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/image-based-light-observer.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
-#include <dali-scene3d/internal/common/image-based-light-observer.h>
 
 namespace Dali
 {
@@ -67,6 +67,16 @@ public:
    * @copydoc Model::GetChildrenSensitive()
    */
   bool GetChildrenSensitive() const;
+
+  /**
+   * @copydoc Model::SetChildrenFocusable()
+   */
+  void SetChildrenFocusable(bool enable);
+
+  /**
+   * @copydoc Model::GetChildrenFocusable()
+   */
+  bool GetChildrenFocusable() const;
 
   /**
    * @copydoc Model::SetImageBasedLightSource()
@@ -115,6 +125,11 @@ protected:
   virtual ~Model();
 
 private:
+  /**
+   * @copydoc Toolkit::Control::OnInitialize
+   */
+  void OnInitialize();
+
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
@@ -181,7 +196,6 @@ private:
   void UpdateImageBasedLightScaleFactor();
 
 public: // Overrides ImageBasedLightObserver Methods.
-
   /**
    * @copydoc Dali::Scene3D::Internal::ImageBasedLightObserver::NotifyImageBasedLightTexture()
    */
@@ -190,7 +204,7 @@ public: // Overrides ImageBasedLightObserver Methods.
   /**
    * @copydoc Dali::Scene3D::Internal::ImageBasedLightObserver::NotifyImageBasedLightScaleFactor()
    */
-  void NotifyImageBasedLightScaleFactor(float scaleFactor)  override;
+  void NotifyImageBasedLightScaleFactor(float scaleFactor) override;
 
 private:
   std::string                    mModelUrl;
@@ -212,6 +226,7 @@ private:
   float         mSceneIblScaleFactor;
   float         mIblScaleFactor;
   bool          mModelChildrenSensitive;
+  bool          mModelChildrenFocusable;
   bool          mModelResourceReady;
   bool          mIBLResourceReady;
 };
