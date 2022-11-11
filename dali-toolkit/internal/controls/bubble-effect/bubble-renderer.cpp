@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ void BubbleRenderer::Initialize(unsigned int numberOfBubble, const Vector2& move
   mIndicesOffset.resize(9);
   int offset = movementArea.Length() / 10.f;
 
-  unsigned int seed = time(NULL);
+  uint32_t seed = static_cast<uint32_t>(time(NULL));
 
   mIndicesOffset[0] = mRenderer.RegisterUniqueProperty("uOffset[0]", Vector2(0.f, 0.f));
   mIndicesOffset[1] = mRenderer.RegisterUniqueProperty("uOffset[1]", Vector2(rand_r(&seed) % offset, rand_r(&seed) % offset));
