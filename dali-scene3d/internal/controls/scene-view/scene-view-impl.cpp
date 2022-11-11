@@ -28,6 +28,7 @@
 #include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -59,6 +60,8 @@ DALI_TYPE_REGISTRATION_END()
 
 Property::Index   RENDERING_BUFFER    = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
 constexpr int32_t DEFAULT_ORIENTATION = 0;
+
+constexpr uint8_t DEFAULT_FRAME_BUFFER_MULTI_SAMPLING_LEVEL = 4u;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
 
@@ -255,7 +258,7 @@ void SceneView::SelectCamera(const std::string& name)
   UpdateCamera(GetCamera(name));
 }
 
-void SceneView::RegisterSceneItem(Scene3D::Internal::ImageBasedLightObserver *item)
+void SceneView::RegisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* item)
 {
   if(item)
   {
@@ -264,7 +267,7 @@ void SceneView::RegisterSceneItem(Scene3D::Internal::ImageBasedLightObserver *it
   }
 }
 
-void SceneView::UnregisterSceneItem(Scene3D::Internal::ImageBasedLightObserver *item)
+void SceneView::UnregisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* item)
 {
   if(item)
   {
@@ -430,7 +433,7 @@ void SceneView::OnSceneDisconnection()
     if(mRenderTask)
     {
       taskList.RemoveTask(mRenderTask);
-      mRenderTarget.Reset();
+      mFrameBuffer.Reset();
     }
   }
   mWindow.Reset();
@@ -538,10 +541,11 @@ void SceneView::UpdateRenderTask()
         mRenderTask.SetViewport(Dali::Viewport(Vector4::ZERO));
 
         // create offscreen buffer of new size to render our child actors to
-        mTexture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(size.width), unsigned(size.height));
-        mRenderTarget = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
-        mRenderTarget.AttachColorTexture(mTexture);
-        Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(mRenderTarget, 0u);
+        mTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(size.width), unsigned(size.height));
+        mFrameBuffer = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
+        mFrameBuffer.AttachColorTexture(mTexture);
+        DevelFrameBuffer::SetMultiSamplingLevel(mFrameBuffer, DEFAULT_FRAME_BUFFER_MULTI_SAMPLING_LEVEL);
+        Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(mFrameBuffer, 0u);
 
         Property::Map imagePropertyMap;
         imagePropertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
@@ -552,7 +556,7 @@ void SceneView::UpdateRenderTask()
 
         Toolkit::DevelControl::RegisterVisual(*this, RENDERING_BUFFER, mVisual);
 
-        mRenderTask.SetFrameBuffer(mRenderTarget);
+        mRenderTask.SetFrameBuffer(mFrameBuffer);
         mRenderTask.SetClearEnabled(true);
         mRenderTask.SetClearColor(Color::TRANSPARENT);
       }
@@ -569,7 +573,7 @@ void SceneView::UpdateRenderTask()
         Toolkit::DevelControl::UnregisterVisual(*this, RENDERING_BUFFER);
 
         mVisual.Reset();
-        mRenderTarget.Reset();
+        mFrameBuffer.Reset();
         mTexture.Reset();
       }
     }
