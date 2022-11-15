@@ -131,10 +131,6 @@ private:
     }
     NPatchInfo& operator=(NPatchInfo&& info) // move operator
     {
-      if(mData)
-      {
-        delete mData;
-      }
       mData                = std::move(info.mData);
       mReferenceCount      = info.mReferenceCount;
       info.mData           = nullptr;
