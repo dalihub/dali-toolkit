@@ -71,19 +71,14 @@ std::string FormatString(const char* format, ...)
   va_list vl2;
   va_copy(vl2, vl);
 
-  std::string result;
-  int32_t     length = vsnprintf(nullptr, 0, format, vl);
+  size_t sizeRequired = vsnprintf(nullptr, 0, format, vl);
   va_end(vl);
 
-  if(length >= 0)
-  {
-    size_t sizeRequired = static_cast<size_t>(length);
-    ++sizeRequired;
-    std::string formatString(sizeRequired, '\0');
-    vsnprintf(&formatString[0], sizeRequired, format, vl2);
-    result = formatString;
-  }
+  ++sizeRequired;
+  std::string result(sizeRequired, '\0');
+  vsnprintf(&result[0], sizeRequired, format, vl2);
   va_end(vl2);
+
   return result;
 }
 

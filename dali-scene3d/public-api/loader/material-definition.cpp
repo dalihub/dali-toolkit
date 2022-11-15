@@ -113,8 +113,8 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
 
   const bool hasTransparency = MaskMatch(mFlags, TRANSPARENCY);
   // Why we add additional count here?
-  uint32_t numBuffers = static_cast<uint32_t>(mTextureStages.size()) + (hasTransparency ? !CheckTextures(ALBEDO) + !CheckTextures(METALLIC | ROUGHNESS) + !CheckTextures(NORMAL)
-                                                                                        : !CheckTextures(ALBEDO | METALLIC) + !CheckTextures(NORMAL | ROUGHNESS));
+  uint32_t numBuffers = mTextureStages.size() + (hasTransparency ? !CheckTextures(ALBEDO) + !CheckTextures(METALLIC | ROUGHNESS) + !CheckTextures(NORMAL)
+                                                                 : !CheckTextures(ALBEDO | METALLIC) + !CheckTextures(NORMAL | ROUGHNESS));
   if(numBuffers == 0)
   {
     return raw;
@@ -261,7 +261,7 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
   }
 
   // Assign textures to slots -- starting with 2D ones, then cubemaps, if any.
-  if(mEnvironmentIdx < static_cast<Index>(environments.size()))
+  if(mEnvironmentIdx < environments.size())
   {
     auto& envTextures = environments[mEnvironmentIdx].second;
     // If pre-computed brdf texture is defined, set the texture.

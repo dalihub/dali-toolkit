@@ -177,7 +177,7 @@ void GenerateNormals(MeshDefinition::RawData& raw)
   DALI_ASSERT_DEBUG(attribs.size() > 0); // positions
   IndexProvider getIndex(raw.mIndices.data());
 
-  const uint32_t numIndices = raw.mIndices.empty() ? attribs[0].mNumElements : static_cast<uint32_t>(raw.mIndices.size());
+  const uint32_t numIndices = raw.mIndices.empty() ? attribs[0].mNumElements : raw.mIndices.size();
 
   auto* positions = reinterpret_cast<const Vector3*>(attribs[0].mData.data());
 
@@ -214,7 +214,7 @@ void GenerateTangentsWithUvs(MeshDefinition::RawData& raw)
   DALI_ASSERT_DEBUG(attribs.size() > 2); // positions, normals, uvs
   IndexProvider getIndex(raw.mIndices.data());
 
-  const uint32_t numIndices = raw.mIndices.empty() ? attribs[0].mNumElements : static_cast<uint32_t>(raw.mIndices.size());
+  const uint32_t numIndices = raw.mIndices.empty() ? attribs[0].mNumElements : raw.mIndices.size();
 
   auto* positions = reinterpret_cast<const Vector3*>(attribs[0].mData.data());
   auto* uvs       = reinterpret_cast<const Vector2*>(attribs[2].mData.data());
@@ -328,7 +328,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::ifstream& binFile, 
       std::vector<uint8_t> buffer(bufferSize);
       if(ReadAccessor(blendShape.deltas, binFile, buffer.data()))
       {
-        blendShape.deltas.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()));
+        blendShape.deltas.mBlob.ApplyMinMax(bufferSize / sizeof(Vector3), reinterpret_cast<float*>(buffer.data()));
         // Calculate the difference with the original mesh.
         // Find the max distance to normalize the deltas.
         const Vector3* const deltasBuffer = reinterpret_cast<const Vector3* const>(buffer.data());
@@ -353,7 +353,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::ifstream& binFile, 
       std::vector<uint8_t> buffer(bufferSize);
       if(ReadAccessor(blendShape.normals, binFile, buffer.data()))
       {
-        blendShape.normals.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()));
+        blendShape.normals.mBlob.ApplyMinMax(bufferSize / sizeof(Vector3), reinterpret_cast<float*>(buffer.data()));
 
         // Calculate the difference with the original mesh, and translate to make all values positive.
         const Vector3* const deltasBuffer = reinterpret_cast<const Vector3* const>(buffer.data());
@@ -384,7 +384,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::ifstream& binFile, 
       std::vector<uint8_t> buffer(bufferSize);
       if(ReadAccessor(blendShape.tangents, binFile, buffer.data()))
       {
-        blendShape.tangents.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()));
+        blendShape.tangents.mBlob.ApplyMinMax(bufferSize / sizeof(Vector3), reinterpret_cast<float*>(buffer.data()));
 
         // Calculate the difference with the original mesh, and translate to make all values positive.
         const Vector3* const deltasBuffer = reinterpret_cast<const Vector3* const>(buffer.data());
@@ -634,7 +634,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
       ExceptionFlinger(ASSERT_LOCATION) << "Failed to read positions from '" << meshPath << "'.";
     }
 
-    uint32_t numVector3 = static_cast<uint32_t>(bufferSize / sizeof(Vector3));
+    uint32_t numVector3 = bufferSize / sizeof(Vector3);
     if(mPositions.mBlob.mMin.size() != 3u || mPositions.mBlob.mMax.size() != 3u)
     {
       mPositions.mBlob.ComputeMinMax(3u, numVector3, reinterpret_cast<float*>(buffer.data()));
@@ -667,7 +667,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
       ExceptionFlinger(ASSERT_LOCATION) << "Failed to read normals from '" << meshPath << "'.";
     }
 
-    mNormals.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()));
+    mNormals.mBlob.ApplyMinMax(bufferSize / sizeof(Vector3), reinterpret_cast<float*>(buffer.data()));
 
     raw.mAttribs.push_back({"aNormal", Property::VECTOR3, static_cast<uint32_t>(bufferSize / sizeof(Vector3)), std::move(buffer)});
   }
@@ -703,14 +703,14 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
       }
     }
 
-    mTexCoords.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector2)), reinterpret_cast<float*>(buffer.data()));
+    mTexCoords.mBlob.ApplyMinMax(bufferSize / sizeof(Vector2), reinterpret_cast<float*>(buffer.data()));
 
     raw.mAttribs.push_back({"aTexCoord", Property::VECTOR2, static_cast<uint32_t>(uvCount), std::move(buffer)});
   }
 
   if(mTangents.IsDefined())
   {
-    uint32_t propertySize = static_cast<uint32_t>((mTangentType == Property::VECTOR4) ? sizeof(Vector4) : sizeof(Vector3));
+    uint32_t propertySize = (mTangentType == Property::VECTOR4) ? sizeof(Vector4) : sizeof(Vector3);
     DALI_ASSERT_ALWAYS(((mTangents.mBlob.mLength % propertySize == 0) ||
                         mTangents.mBlob.mStride >= propertySize) &&
                        "Tangents buffer length not a multiple of element size");
@@ -825,7 +825,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
 
   if(HasBlendShapes())
   {
-    const uint32_t numberOfVertices = static_cast<uint32_t>(mPositions.mBlob.mLength / sizeof(Vector3));
+    const uint32_t numberOfVertices = mPositions.mBlob.mLength / sizeof(Vector3);
 
     // Calculate the size of one buffer inside the texture.
     raw.mBlendShapeBufferOffset = numberOfVertices;
@@ -836,7 +836,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
 
     if(!mBlendShapeHeader.IsDefined())
     {
-      CalculateTextureSize(static_cast<uint32_t>(blendShapesBlob.mLength / sizeof(Vector3)), textureWidth, textureHeight);
+      CalculateTextureSize(blendShapesBlob.mLength / sizeof(Vector3), textureWidth, textureHeight);
       calculateGltf2BlendShapes = true;
     }
     else
@@ -860,7 +860,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
     else
     {
       Blob unnormalizeFactorBlob;
-      unnormalizeFactorBlob.mLength = static_cast<uint32_t>(sizeof(float) * ((BlendShapes::Version::VERSION_2_0 == mBlendShapeVersion) ? 1u : numberOfBlendShapes));
+      unnormalizeFactorBlob.mLength = sizeof(float) * ((BlendShapes::Version::VERSION_2_0 == mBlendShapeVersion) ? 1u : numberOfBlendShapes);
 
       if(blendShapesBlob.IsDefined())
       {
