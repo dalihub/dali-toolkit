@@ -244,6 +244,7 @@ private:
   std::string   mDiffuseIblUrl;
   std::string   mSpecularIblUrl;
 
+  Layer         mRootLayer;
   Dali::Texture mSpecularTexture;
   Dali::Texture mDiffuseTexture;
   float         mIblScaleFactor{1.0f};
