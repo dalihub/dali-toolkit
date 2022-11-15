@@ -31,6 +31,8 @@ std::string GetDaliImagePath()
 {
   return (nullptr == DALI_IMAGE_DIR) ? Dali::EnvironmentVariable::GetEnvironmentVariable(TOKEN_STRING(DALI_IMAGE_DIR)) : DALI_IMAGE_DIR;
 }
+
+static constexpr float DEFAULT_INTENSITY = 1.0f;
 } // unnamed namespace
 
 namespace Dali
@@ -99,6 +101,11 @@ EnvironmentDefinition::Textures EnvironmentDefinition::Load(RawData&& raw) const
     textures.mBrdf.Upload(raw.mBrdf);
   }
   return textures;
+}
+
+float EnvironmentDefinition::GetDefaultIntensity()
+{
+  return DEFAULT_INTENSITY;
 }
 
 } // namespace Loader

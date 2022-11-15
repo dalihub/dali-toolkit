@@ -35,10 +35,10 @@
 #include <dali-toolkit/internal/text/controller/text-controller-input-properties.h>
 #include <dali-toolkit/internal/text/controller/text-controller-placeholder-handler.h>
 #include <dali-toolkit/internal/text/controller/text-controller-relayouter.h>
+#include <dali-toolkit/internal/text/controller/text-controller-spannable-handler.h>
 #include <dali-toolkit/internal/text/controller/text-controller-text-updater.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-geometry.h>
-
 namespace
 {
 #if defined(DEBUG_ENABLED)
@@ -471,6 +471,11 @@ void Controller::SetText(const std::string& text)
 void Controller::GetText(std::string& text) const
 {
   mImpl->GetText(text);
+}
+
+void Controller::SetSpannedText(const Text::Spanned& spannedText)
+{
+  SpannableHandler::SetSpannedText(*this, spannedText);
 }
 
 void Controller::SetPlaceholderText(PlaceholderType type, const std::string& text)
@@ -1414,6 +1419,16 @@ Vector<Vector2> Controller::GetTextPosition(CharacterIndex startIndex, Character
 
   GetTextGeometry(mImpl->mModel, startIndex, endIndex, sizesList, positionsList);
   return positionsList;
+}
+
+Rect<float> Controller::GetLineBoundingRectangle(const uint32_t lineIndex)
+{
+  return GetLineBoundingRect(mImpl->mModel, lineIndex);
+}
+
+Rect<float> Controller::GetCharacterBoundingRectangle(const uint32_t charIndex)
+{
+  return GetCharacterBoundingRect(mImpl->mModel, charIndex);
 }
 
 Rect<> Controller::GetTextBoundingRectangle(CharacterIndex startIndex, CharacterIndex endIndex)

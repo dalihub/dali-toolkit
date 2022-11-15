@@ -658,7 +658,8 @@ LogicalModel::~LogicalModel()
 }
 
 LogicalModel::LogicalModel()
-: mBidirectionalLineIndex(0u)
+: mBidirectionalLineIndex(0u),
+  mSpannedTextPlaced(false)
 {
 }
 

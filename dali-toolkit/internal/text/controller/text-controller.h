@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/devel-api/text/spanned.h>
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/events/gesture.h>
 
@@ -751,6 +752,15 @@ public: // Update.
    * @param[out] text A string of UTF-8 characters.
    */
   void GetText(std::string& text) const;
+
+  /**
+ * @brief Set the @p spannedText
+ * the spanned text contains content (text) and  format (spans with ranges)
+ * the text is copied into text-controller and the spans are applied on ranges
+ *
+ * @param[in] spannedText the text with spans.
+ */
+  void SetSpannedText(const Text::Spanned& spannedText);
 
   /**
    * @brief Replaces any placeholder text previously set.
@@ -1733,6 +1743,24 @@ public: // Queries & retrieves.
   Vector<Vector2> GetTextPosition(CharacterIndex startIndex, CharacterIndex endIndex);
 
   /**
+   * @brief Get the line bounding rectangle.
+   * if the requested index is out of range or the line is not yet rendered, a rect of {0, 0, 0, 0} is returned.
+   *
+   * @param[in] lineIndex line index to which we want to calculate the geometry for.
+   * @return bounding rectangle.
+   */
+  Rect<float> GetLineBoundingRectangle(const uint32_t lineIndex);
+
+  /**
+   * @brief Get the char bounding rectangle.
+   * If the text is not yet rendered or the index > text.Count(); a rect of {0, 0, 0, 0} is returned.
+   *
+   * @param[in] charIndex character index to which we want to calculate the geometry for.
+   * @return bounding rectangle.
+   */
+  Rect<float> GetCharacterBoundingRectangle(const uint32_t charIndex);
+
+  /**
    * @brief Gets the bounding box of a specific text range.
    *
    * @param[in] startIndex start index of the text requested to get bounding box to.
@@ -2066,6 +2094,7 @@ private:
   struct PlaceholderHandler;
   struct Relayouter;
   struct TextUpdater;
+  struct SpannableHandler;
 
   Impl* mImpl;
 };

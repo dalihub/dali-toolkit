@@ -30,11 +30,11 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-anchor-control-interface.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
-#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-selectable-control-interface.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -282,7 +282,6 @@ private: // From Control
 
   // From SelectableControlInterface
 public:
-
   /**
    * @copydoc Text::SelectableControlInterface::SetTextSelectionRange()
    */
@@ -366,6 +365,33 @@ public:
    * @return list of positions of the requested text.
    */
   Vector<Vector2> GetTextPosition(const uint32_t startIndex, const uint32_t endIndex) const;
+
+  /**
+   * @brief Get the line bounding rectangle.
+   * if the requested index is out of range or the line is not yet rendered, a rect of {0, 0, 0, 0} is returned.
+   *
+   * @param[in] lineIndex line index to which we want to calculate the geometry for.
+   * @return bounding rectangle.
+   */
+  Rect<float> GetLineBoundingRectangle(const uint32_t lineIndex) const;
+
+  /**
+   * @brief Get the character bounding rectangle.
+   * If the text is not yet rendered or the index > text.Count(); a rect of {0, 0, 0, 0} is returned.
+   *
+   * @param[in] charIndex character index to which we want to calculate the geometry for.
+   * @return bounding rectangle.
+   */
+  Rect<float> GetCharacterBoundingRectangle(const uint32_t charIndex) const;
+
+  /**
+   * @brief Set the @p spannedText into current textField
+   * the spanned text contains content (text) and  format (spans with ranges)
+   * the text is copied into text-controller and the spans are applied on ranges
+   *
+   * @param[in] spannedText the text with spans.
+   */
+  void SetSpannedText(const Text::Spanned& spannedText);
 
 private: // Implementation
   /**

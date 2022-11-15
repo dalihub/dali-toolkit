@@ -27,6 +27,7 @@
 namespace TestTextGeometryUtils
 {
 void CheckGeometryResult(Vector<Vector2> positionsList, Vector<Vector2> sizeList, Vector<Vector2> expectedPositions, Vector<Vector2> expectedSizes);
+void CheckRectGeometryResult(Rect<> rectGeometry, Rect<> expectedRectGeometry);
 }
 
 #endif // TOOLKIT_TEXT_GEOMETRY_UTILS_H

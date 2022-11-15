@@ -315,6 +315,51 @@ public:
    */
   bool IsUsingFramebuffer() const;
 
+  /**
+   * @brief Sets Skybox for this scene.
+   * Skybox texture is asynchronously loaded. When loading is finished, ResourceReady is emitted.
+   *
+   * @SINCE_2_2.0
+   * @param[in] skyboxUrl Cube map image url for skybox.
+   */
+  void SetSkybox(const std::string& skyboxUrl);
+
+  /**
+   * @brief Sets Skybox intensity.
+   * The skybox intensity is multiplied to the color of skybox texture.
+   * Default value is 1.0f.
+   *
+   * @SINCE_2_2.0
+   * @note Intensity should be positive value.
+   * @param[in] intensity Intensity value to be multiplied to the cube map color
+   */
+  void SetSkyboxIntensity(float intensity);
+
+  /**
+   * @brief Gets Skybox intensity.
+   * Default value is 1.0f.
+   *
+   * @SINCE_2_2.0
+   * @return skybox intensity
+   */
+  float GetSkyboxIntensity() const;
+
+  /**
+   * @brief Sets Orientation of Skybox.
+   *
+   * @SINCE_2_2.0
+   * @param[in] orientation Quaternion for orientation of Skybox.
+   */
+  void SetSkyboxOrientation(const Quaternion& orientation);
+
+  /**
+   * @brief Gets Skybox orientation.
+   *
+   * @SINCE_2_2.0
+   * @return skybox orientation
+   */
+  Quaternion GetSkyboxOrientation() const;
+
 public: // Not intended for application developers
   /// @cond internal
   /**

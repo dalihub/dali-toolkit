@@ -36,6 +36,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/text-controls/text-editor-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-field-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-label-devel.cpp
+  ${devel_api_src_dir}/controls/text-controls/text-spannable.cpp
   ${devel_api_src_dir}/controls/text-controls/text-selection-popup.cpp
   ${devel_api_src_dir}/controls/text-controls/text-selection-toolbar.cpp
   ${devel_api_src_dir}/controls/tool-bar/tool-bar.cpp
@@ -60,6 +61,13 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/styling/style-manager-devel.cpp
   ${devel_api_src_dir}/text/bitmap-font.cpp
   ${devel_api_src_dir}/text/text-utils-devel.cpp
+  ${devel_api_src_dir}/text/character-sequence.cpp
+  ${devel_api_src_dir}/text/range.cpp
+  ${devel_api_src_dir}/text/spanned.cpp
+  ${devel_api_src_dir}/text/spannable.cpp
+  ${devel_api_src_dir}/text/spannable-string.cpp
+  ${devel_api_src_dir}/text/spans/base-span.cpp
+  ${devel_api_src_dir}/text/spans/foreground-color-span.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-cross-effect.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-effect.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-fold-effect.cpp
@@ -71,6 +79,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/visual-factory/visual-base.cpp
   ${devel_api_src_dir}/controls/gaussian-blur-view/gaussian-blur-view.cpp
   ${devel_api_src_dir}/drag-drop-detector/drag-and-drop-detector.cpp
+  ${devel_api_src_dir}/text/text-geometry-devel.cpp
 )
 
 # Add devel header files here
@@ -221,6 +230,7 @@ SET( devel_api_text_controls_header_files
   ${devel_api_src_dir}/controls/text-controls/text-editor-devel.h
   ${devel_api_src_dir}/controls/text-controls/text-field-devel.h
   ${devel_api_src_dir}/controls/text-controls/text-label-devel.h
+  ${devel_api_src_dir}/controls/text-controls/text-spannable.h
   ${devel_api_src_dir}/controls/text-controls/text-selection-popup.h
   ${devel_api_src_dir}/controls/text-controls/text-selection-toolbar.h
   ${devel_api_src_dir}/controls/text-controls/text-style-properties-devel.h
@@ -231,6 +241,14 @@ SET( devel_api_text_header_files
   ${devel_api_src_dir}/text/bitmap-font.h
   ${devel_api_src_dir}/text/text-utils-devel.h
   ${devel_api_src_dir}/text/rendering-backend.h
+  ${devel_api_src_dir}/text/text-geometry-devel.h
+  ${devel_api_src_dir}/text/character-sequence.h
+  ${devel_api_src_dir}/text/range.h
+  ${devel_api_src_dir}/text/spanned.h
+  ${devel_api_src_dir}/text/spannable.h
+  ${devel_api_src_dir}/text/spannable-string.h
+  ${devel_api_src_dir}/text/spans/base-span.h
+  ${devel_api_src_dir}/text/spans/foreground-color-span.h
 )
 
 SET( devel_api_tool_bar_header_files

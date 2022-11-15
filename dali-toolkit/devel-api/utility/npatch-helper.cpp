@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2021 Samsung Electronics Co., Ltd.
+* Copyright (c) 2022 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace
  * @param[in]  indices              The indices to generate the geometry from
  * @return The geometry formed from the vertices and indices
  */
-Geometry GenerateGeometry(const Vector<Vector2>& vertices, const Vector<unsigned short>& indices)
+Geometry GenerateGeometry(const Vector<Vector2>& vertices, const Vector<uint16_t>& indices)
 {
   Property::Map vertexFormat;
   vertexFormat["aPosition"] = Property::VECTOR2;
@@ -64,7 +64,7 @@ Geometry GenerateGeometry(const Vector<Vector2>& vertices, const Vector<unsigned
  * @param[in]  rowIdx      The row index to start the quad
  * @param[in]  nextRowIdx  The index to the next row
  */
-void AddQuadIndices(Vector<unsigned short>& indices, unsigned int rowIdx, unsigned int nextRowIdx)
+void AddQuadIndices(Vector<uint16_t>& indices, uint32_t rowIdx, uint32_t nextRowIdx)
 {
   indices.PushBack(rowIdx);
   indices.PushBack(nextRowIdx + 1);
@@ -81,7 +81,7 @@ void AddQuadIndices(Vector<unsigned short>& indices, unsigned int rowIdx, unsign
  * @param[in]  x        The x value of vector
  * @param[in]  y        The y value of vector
  */
-void AddVertex(Vector<Vector2>& vertices, unsigned int x, unsigned int y)
+void AddVertex(Vector<Vector2>& vertices, uint32_t x, uint32_t y)
 {
   vertices.PushBack(Vector2(x, y));
 }
@@ -95,25 +95,25 @@ Geometry CreateGridGeometry(Uint16Pair gridSize)
 
   // Create vertices
   Vector<Vector2> vertices;
-  vertices.Reserve((gridWidth + 1) * (gridHeight + 1));
+  vertices.Reserve((gridWidth + 1u) * (gridHeight + 1u));
 
-  for(int y = 0; y < gridHeight + 1; ++y)
+  for(uint32_t y = 0u; y < gridHeight + 1u; ++y)
   {
-    for(int x = 0; x < gridWidth + 1; ++x)
+    for(uint32_t x = 0u; x < gridWidth + 1u; ++x)
     {
       AddVertex(vertices, x, y);
     }
   }
 
   // Create indices
-  Vector<unsigned short> indices;
-  indices.Reserve(gridWidth * gridHeight * 6);
+  Vector<uint16_t> indices;
+  indices.Reserve(gridWidth * gridHeight * 6u);
 
-  unsigned int rowIdx     = 0;
-  unsigned int nextRowIdx = gridWidth + 1;
-  for(int y = 0; y < gridHeight; ++y, ++nextRowIdx, ++rowIdx)
+  uint32_t rowIdx     = 0u;
+  uint32_t nextRowIdx = gridWidth + 1u;
+  for(uint32_t y = 0u; y < gridHeight; ++y, ++nextRowIdx, ++rowIdx)
   {
-    for(int x = 0; x < gridWidth; ++x, ++nextRowIdx, ++rowIdx)
+    for(uint32_t x = 0u; x < gridWidth; ++x, ++nextRowIdx, ++rowIdx)
     {
       AddQuadIndices(indices, rowIdx, nextRowIdx);
     }
@@ -129,71 +129,71 @@ Geometry CreateBorderGeometry(Uint16Pair gridSize)
 
   // Create vertices
   Vector<Vector2> vertices;
-  vertices.Reserve((gridWidth + 1) * (gridHeight + 1));
+  vertices.Reserve((gridWidth + 1u) * (gridHeight + 1u));
 
   //top
-  int y = 0;
-  for(; y < 2; ++y)
+  uint16_t y = 0u;
+  for(; y < 2u; ++y)
   {
-    for(int x = 0; x < gridWidth + 1; ++x)
+    for(uint16_t x = 0; x < gridWidth + 1u; ++x)
     {
       AddVertex(vertices, x, y);
     }
   }
 
-  for(; y < gridHeight - 1; ++y)
+  for(; y < gridHeight - 1u; ++y)
   {
     //left
-    AddVertex(vertices, 0, y);
-    AddVertex(vertices, 1, y);
+    AddVertex(vertices, 0u, y);
+    AddVertex(vertices, 1u, y);
 
     //right
-    AddVertex(vertices, gridWidth - 1, y);
+    AddVertex(vertices, gridWidth - 1u, y);
     AddVertex(vertices, gridWidth, y);
   }
 
   //bottom
-  for(; y < gridHeight + 1; ++y)
+  for(; y < gridHeight + 1u; ++y)
   {
-    for(int x = 0; x < gridWidth + 1; ++x)
+    for(uint16_t x = 0; x < gridWidth + 1u; ++x)
     {
       AddVertex(vertices, x, y);
     }
   }
 
   // Create indices
-  Vector<unsigned short> indices;
-  indices.Reserve(gridWidth * gridHeight * 6);
+  Vector<uint16_t> indices;
+  indices.Reserve(gridWidth * gridHeight * 6u);
 
   //top
-  unsigned int rowIdx     = 0;
-  unsigned int nextRowIdx = gridWidth + 1;
-  for(int x = 0; x < gridWidth; ++x, ++nextRowIdx, ++rowIdx)
+  uint32_t rowIdx     = 0u;
+  uint32_t nextRowIdx = gridWidth + 1u;
+  for(uint16_t x = 0; x < gridWidth; ++x, ++nextRowIdx, ++rowIdx)
   {
     AddQuadIndices(indices, rowIdx, nextRowIdx);
   }
 
-  if(gridHeight > 2)
+  if(gridHeight > 2u)
   {
-    rowIdx     = gridWidth + 1;
-    nextRowIdx = (gridWidth + 1) * 2;
+    rowIdx     = gridWidth + 1u;
+    nextRowIdx = (gridWidth + 1u) * 2u;
 
-    unsigned increment = gridWidth - 1;
-    if(gridHeight > 3)
+    uint16_t increment = gridWidth - 1u;
+    if(gridHeight > 3u)
     {
-      increment = 2;
+      increment = 2u;
       //second row left
       AddQuadIndices(indices, rowIdx, nextRowIdx);
 
-      rowIdx     = gridWidth * 2;
-      nextRowIdx = (gridWidth + 1) * 2 + 2;
+      rowIdx     = gridWidth * 2u;
+      nextRowIdx = (gridWidth + 1u) * 2u + 2u;
       //second row right
       AddQuadIndices(indices, rowIdx, nextRowIdx);
 
       //left and right
-      rowIdx     = nextRowIdx - 2;
-      nextRowIdx = rowIdx + 4;
-      for(int y = 2; y < 2 * (gridHeight - 3); ++y, rowIdx += 2, nextRowIdx += 2)
+      rowIdx     = nextRowIdx - 2u;
+      nextRowIdx = rowIdx + 4u;
+      for(uint16_t y = 2u; y < 2u * (gridHeight - 3u); ++y, rowIdx += 2u, nextRowIdx += 2u)
       {
         AddQuadIndices(indices, rowIdx, nextRowIdx);
       }
@@ -203,15 +203,15 @@ Geometry CreateBorderGeometry(Uint16Pair gridSize)
     AddQuadIndices(indices, rowIdx, nextRowIdx);
 
     rowIdx += increment;
-    nextRowIdx += gridWidth - 1;
+    nextRowIdx += gridWidth - 1u;
     //second row right
     AddQuadIndices(indices, rowIdx, nextRowIdx);
   }
 
   //bottom
-  rowIdx     = nextRowIdx - gridWidth + 1;
-  nextRowIdx = rowIdx + gridWidth + 1;
-  for(int x = 0; x < gridWidth; ++x, ++nextRowIdx, ++rowIdx)
+  rowIdx     = nextRowIdx - gridWidth + 1u;
+  nextRowIdx = rowIdx + gridWidth + 1u;
+  for(uint16_t x = 0u; x < gridWidth; ++x, ++nextRowIdx, ++rowIdx)
   {
     AddQuadIndices(indices, rowIdx, nextRowIdx);
   }
@@ -221,10 +221,10 @@ Geometry CreateBorderGeometry(Uint16Pair gridSize)
 
 void RegisterStretchProperties(Renderer& renderer, const char* uniformName, const NPatchUtility::StretchRanges& stretchPixels, uint16_t imageExtent)
 {
-  uint16_t     prevEnd     = 0;
-  uint16_t     prevFix     = 0;
-  uint16_t     prevStretch = 0;
-  unsigned int i           = 1;
+  uint16_t prevEnd     = 0;
+  uint16_t prevFix     = 0;
+  uint16_t prevStretch = 0;
+  uint32_t i           = 1;
   for(NPatchUtility::StretchRanges::ConstIterator it = stretchPixels.Begin(); it != stretchPixels.End(); ++it, ++i)
   {
     uint16_t start = it->GetX();
@@ -252,17 +252,17 @@ void RegisterStretchProperties(Renderer& renderer, const char* uniformName, cons
 
 void ApplyTextureAndUniforms(Renderer& renderer, const Internal::NPatchData* data)
 {
-  TextureSet        textureSet;
+  TextureSet textureSet;
   textureSet = data->GetTextures();
 
-  if(data->GetStretchPixelsX().Size() == 1 && data->GetStretchPixelsY().Size() == 1)
+  if(data->GetStretchPixelsX().Size() == 1u && data->GetStretchPixelsY().Size() == 1u)
   {
     //special case for 9 patch
     Uint16Pair stretchX = data->GetStretchPixelsX()[0];
     Uint16Pair stretchY = data->GetStretchPixelsY()[0];
 
-    uint16_t stretchWidth  = (stretchX.GetY() >= stretchX.GetX()) ? stretchX.GetY() - stretchX.GetX() : 0;
-    uint16_t stretchHeight = (stretchY.GetY() >= stretchY.GetX()) ? stretchY.GetY() - stretchY.GetX() : 0;
+    uint16_t stretchWidth  = (stretchX.GetY() >= stretchX.GetX()) ? stretchX.GetY() - stretchX.GetX() : 0u;
+    uint16_t stretchHeight = (stretchY.GetY() >= stretchY.GetX()) ? stretchY.GetY() - stretchY.GetX() : 0u;
 
     renderer.RegisterProperty("uFixed[0]", Vector2::ZERO);
     renderer.RegisterProperty("uFixed[1]", Vector2(stretchX.GetX(), stretchY.GetX()));

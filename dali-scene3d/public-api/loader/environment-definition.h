@@ -80,6 +80,12 @@ struct DALI_SCENE3D_API EnvironmentDefinition
    */
   Textures Load(RawData&& raw) const;
 
+  /**
+   * @brief Get default intensity value.
+   * @return Default intensity. (1.0f)
+   */
+  static float GetDefaultIntensity();
+
 public: // DATA
   std::string mDiffuseMapPath;
   std::string mSpecularMapPath;

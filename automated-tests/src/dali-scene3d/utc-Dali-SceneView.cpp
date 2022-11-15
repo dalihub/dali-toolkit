@@ -413,7 +413,7 @@ int UtcDaliSceneViewAddRemoveCamera(void)
   END_TEST;
 }
 
-int UtcDaliSceneViewImageBasedLight(void)
+int UtcDaliSceneViewImageBasedLight01(void)
 {
   ToolkitTestApplication application;
 
@@ -461,6 +461,80 @@ int UtcDaliSceneViewImageBasedLight(void)
   END_TEST;
 }
 
+int UtcDaliSceneViewImageBasedLight02(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Scene3D::Model modelView1 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  view.Add(modelView1);
+
+  view.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE);
+  Dali::Texture diffuseTexture = GetDiffuseTexture(modelView1);
+  Dali::Texture specularTexture = GetSpecularTexture(modelView1);
+
+  modelView1.SetImageBasedLightSource(TEST_SPECULAR_TEXTURE, TEST_DIFFUSE_TEXTURE);
+  DALI_TEST_NOT_EQUALS(GetDiffuseTexture(modelView1), diffuseTexture, 0.0f, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), specularTexture, 0.0f, TEST_LOCATION);
+  diffuseTexture = GetDiffuseTexture(modelView1);
+  specularTexture = GetSpecularTexture(modelView1);
+
+  // reset SceneView IBL
+  view.SetImageBasedLightSource("", "");
+  DALI_TEST_EQUALS(GetDiffuseTexture(modelView1), diffuseTexture, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetSpecularTexture(modelView1), specularTexture, TEST_LOCATION);
+
+  modelView1.SetImageBasedLightSource("", "");
+  DALI_TEST_NOT_EQUALS(GetDiffuseTexture(modelView1), diffuseTexture, 0.0f, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), specularTexture, 0.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewImageBasedLight03(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Scene3D::Model modelView1 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  view.Add(modelView1);
+
+  modelView1.SetImageBasedLightSource(TEST_SPECULAR_TEXTURE, TEST_DIFFUSE_TEXTURE);
+  Dali::Texture diffuseTexture = GetDiffuseTexture(modelView1);
+  Dali::Texture specularTexture = GetSpecularTexture(modelView1);
+
+  view.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE);
+  DALI_TEST_EQUALS(GetDiffuseTexture(modelView1), diffuseTexture, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetSpecularTexture(modelView1), specularTexture, TEST_LOCATION);
+
+  modelView1.SetImageBasedLightSource("", "");
+  DALI_TEST_NOT_EQUALS(GetDiffuseTexture(modelView1), diffuseTexture, 0.0f, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), specularTexture, 0.0f, TEST_LOCATION);
+  diffuseTexture = GetDiffuseTexture(modelView1);
+  specularTexture = GetSpecularTexture(modelView1);
+
+  // reset SceneView IBL
+  view.SetImageBasedLightSource("", "");
+  DALI_TEST_NOT_EQUALS(GetDiffuseTexture(modelView1), diffuseTexture, 0.0f, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), specularTexture, 0.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliSceneViewImageBasedFactor(void)
 {
   ToolkitTestApplication application;
@@ -481,7 +555,7 @@ int UtcDaliSceneViewImageBasedFactor(void)
 
   view.SetImageBasedLightScaleFactor(0.5f);
   DALI_TEST_EQUALS(view.GetImageBasedLightScaleFactor(), 0.5f, TEST_LOCATION);
-  DALI_TEST_EQUALS(modelView1.GetImageBasedLightScaleFactor(), 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(modelView1.GetImageBasedLightScaleFactor(), 1.0f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -583,6 +657,70 @@ int UtcDaliSceneViewResourceReady(void)
 
   DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewSetSkybox(void)
+{
+  ToolkitTestApplication application;
+
+  gResourceReadyCalled = false;
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  view.ResourceReadySignal().Connect(OnResourceReady);
+  // SceneView::IsResourceReady() returns true by default.
+  DALI_TEST_EQUALS(view.IsResourceReady(), true, TEST_LOCATION);
+
+  // Sanity check
+  DALI_TEST_CHECK(!gResourceReadyCalled);
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(view.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  gResourceReadyCalled = false;
+
+  view.SetSkybox(TEST_SPECULAR_TEXTURE);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewSetSkyboxIntensity(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+
+  float intensity = 0.5f;
+  DALI_TEST_EQUALS(view.GetSkyboxIntensity(), 1.0f, TEST_LOCATION);
+
+  view.SetSkyboxIntensity(intensity);
+  DALI_TEST_EQUALS(view.GetSkyboxIntensity(), intensity, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewSetSkyboxOrientation(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+
+  Dali::Quaternion orientation = Dali::Quaternion(Radian(0.5f), Vector3::YAXIS);
+  view.SetSkyboxOrientation(orientation);
+  DALI_TEST_EQUALS(view.GetSkyboxOrientation(), orientation, TEST_LOCATION);
 
   END_TEST;
 }

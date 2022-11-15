@@ -364,6 +364,21 @@ Vector<Vector2> TextEditor::GetTextPosition(const uint32_t startIndex, const uin
   return mController->GetTextPosition(startIndex, endIndex);
 }
 
+Rect<float> TextEditor::GetLineBoundingRectangle(const uint32_t lineIndex) const
+{
+  return mController->GetLineBoundingRectangle(lineIndex);
+}
+
+Rect<float> TextEditor::GetCharacterBoundingRectangle(const uint32_t charIndex) const
+{
+  return mController->GetCharacterBoundingRectangle(charIndex);
+}
+
+void TextEditor::SetSpannedText(const Text::Spanned& spannedText)
+{
+  mController->SetSpannedText(spannedText);
+}
+
 string TextEditor::GetSelectedText() const
 {
   string selectedText = "";
@@ -894,7 +909,7 @@ void TextEditor::OnTap(const TapGesture& gesture)
   mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
 
   Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
-  if (keyboardFocusManager)
+  if(keyboardFocusManager)
   {
     keyboardFocusManager.SetCurrentFocusActor(Self());
   }
@@ -934,7 +949,7 @@ bool TextEditor::OnKeyEvent(const KeyEvent& event)
     if(event.GetState() == KeyEvent::UP)
     {
       Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
-      if (keyboardFocusManager)
+      if(keyboardFocusManager)
       {
         keyboardFocusManager.ClearFocus();
       }

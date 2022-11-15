@@ -26,6 +26,7 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/image-based-light-observer.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
@@ -40,7 +41,7 @@ namespace Internal
 /**
  * @brief Impl class for Model.
  */
-class Model : public Dali::Toolkit::Internal::Control
+class Model : public Dali::Toolkit::Internal::Control, public ImageBasedLightObserver
 {
 public:
   using AnimationData = std::pair<std::string, Dali::Animation>;
@@ -66,6 +67,16 @@ public:
    * @copydoc Model::GetChildrenSensitive()
    */
   bool GetChildrenSensitive() const;
+
+  /**
+   * @copydoc Model::SetChildrenFocusable()
+   */
+  void SetChildrenFocusable(bool enable);
+
+  /**
+   * @copydoc Model::GetChildrenFocusable()
+   */
+  bool GetChildrenFocusable() const;
 
   /**
    * @copydoc Model::SetImageBasedLightSource()
@@ -114,6 +125,11 @@ protected:
   virtual ~Model();
 
 private:
+  /**
+   * @copydoc Toolkit::Control::OnInitialize
+   */
+  void OnInitialize();
+
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
@@ -179,6 +195,17 @@ private:
    */
   void UpdateImageBasedLightScaleFactor();
 
+public: // Overrides ImageBasedLightObserver Methods.
+  /**
+   * @copydoc Dali::Scene3D::Internal::ImageBasedLightObserver::NotifyImageBasedLightTexture()
+   */
+  void NotifyImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor) override;
+
+  /**
+   * @copydoc Dali::Scene3D::Internal::ImageBasedLightObserver::NotifyImageBasedLightScaleFactor()
+   */
+  void NotifyImageBasedLightScaleFactor(float scaleFactor) override;
+
 private:
   std::string                    mModelUrl;
   std::string                    mResourceDirectoryUrl;
@@ -187,12 +214,19 @@ private:
   std::vector<WeakHandle<Actor>> mRenderableActors;
   WeakHandle<Scene3D::SceneView> mParentSceneView;
 
+  // TODO: This default texture can be removed after 3D Resource Cache is added.
+  Dali::Texture mDefaultSpecularTexture;
+  Dali::Texture mDefaultDiffuseTexture;
+  Dali::Texture mSceneSpecularTexture;
+  Dali::Texture mSceneDiffuseTexture;
   Dali::Texture mSpecularTexture;
   Dali::Texture mDiffuseTexture;
   Vector3       mNaturalSize;
   Vector3       mModelPivot;
+  float         mSceneIblScaleFactor;
   float         mIblScaleFactor;
   bool          mModelChildrenSensitive;
+  bool          mModelChildrenFocusable;
   bool          mModelResourceReady;
   bool          mIBLResourceReady;
 };

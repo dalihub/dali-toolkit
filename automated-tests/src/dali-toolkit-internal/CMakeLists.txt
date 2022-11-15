@@ -30,6 +30,7 @@ SET(TC_SOURCES
  utc-Dali-Text-MultiLanguage.cpp
  utc-Dali-Text-Segmentation.cpp
  utc-Dali-Text-Shaping.cpp
+ utc-Dali-Text-TextSpannable.cpp
  utc-Dali-Text-Typesetter.cpp
  utc-Dali-Text-ViewModel.cpp
  utc-Dali-TextField-internal.cpp

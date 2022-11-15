@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -357,7 +357,7 @@ void ToggleButton::OnPressed()
 {
   DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::OnPressed\n");
   // State index will add 1 only when button is pressed.
-  mCurrentToggleIndex = (mCurrentToggleIndex + 1) % mToggleVisuals.size();
+  mCurrentToggleIndex = (mCurrentToggleIndex + 1) % static_cast<uint32_t>(mToggleVisuals.size());
 
   // Both create SelectedVisual and UnselectedVisual
   PrepareVisual(Toolkit::Button::Property::UNSELECTED_VISUAL, mToggleVisuals[mCurrentToggleIndex]);

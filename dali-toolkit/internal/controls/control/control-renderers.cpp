@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,11 @@ Geometry CreateGridGeometry(Uint16Pair gridSize)
 
   // Create vertices
   Vector<Vector2> vertices;
-  vertices.Reserve((gridWidth + 1) * (gridHeight + 1));
+  vertices.Reserve((gridWidth + 1u) * (gridHeight + 1u));
 
-  for(int y = 0; y < gridHeight + 1; ++y)
+  for(uint16_t y = 0u; y < gridHeight + 1u; ++y)
   {
-    for(int x = 0; x < gridWidth + 1; ++x)
+    for(uint16_t x = 0u; x < gridWidth + 1u; ++x)
     {
       vertices.PushBack(Vector2((float)x / gridWidth - 0.5f, (float)y / gridHeight - 0.5f));
     }
@@ -42,12 +42,12 @@ Geometry CreateGridGeometry(Uint16Pair gridSize)
 
   // Create indices
   Vector<unsigned short> indices;
-  indices.Reserve((gridWidth + 2) * gridHeight * 2 - 2);
+  indices.Reserve((gridWidth + 2u) * gridHeight * 2u - 2u);
 
-  for(unsigned int row = 0u; row < gridHeight; ++row)
+  for(uint16_t row = 0u; row < gridHeight; ++row)
   {
-    unsigned int rowStartIndex     = row * (gridWidth + 1u);
-    unsigned int nextRowStartIndex = rowStartIndex + gridWidth + 1u;
+    uint32_t rowStartIndex     = row * (gridWidth + 1u);
+    uint32_t nextRowStartIndex = rowStartIndex + gridWidth + 1u;
 
     if(row != 0u) // degenerate index on non-first row
     {
