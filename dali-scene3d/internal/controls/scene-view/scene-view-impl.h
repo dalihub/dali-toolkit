@@ -215,16 +215,6 @@ private:
    */
   void RotateCamera();
 
-  /**
-   * @brief Loads image based light from file.
-   */
-  void LoadImageBasedLight();
-
-  /**
-   * @brief Asynchronously loading finished.
-   */
-  void OnLoadComplete();
-
 private:
   Toolkit::Visual::Base mVisual;
 
@@ -240,11 +230,6 @@ private:
   Layer                       mRootLayer;
   int32_t                     mWindowOrientation;
 
-  CallbackBase* mIblLoadedCallback;
-  std::string   mDiffuseIblUrl;
-  std::string   mSpecularIblUrl;
-
-  Layer         mRootLayer;
   Dali::Texture mSpecularTexture;
   Dali::Texture mDiffuseTexture;
   float         mIblScaleFactor{1.0f};
