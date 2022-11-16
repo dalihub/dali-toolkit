@@ -100,9 +100,11 @@ Sampler SamplerFlags::MakeSampler(Type flags)
   return sampler;
 }
 
-TextureDefinition::TextureDefinition(const std::string& imageUri, SamplerFlags::Type samplerFlags)
+TextureDefinition::TextureDefinition(const std::string& imageUri, SamplerFlags::Type samplerFlags, ImageDimensions minImageDimensions, SamplingMode::Type samplingMode)
 : mImageUri(imageUri),
-  mSamplerFlags(samplerFlags)
+  mSamplerFlags(samplerFlags),
+  mMinImageDimensions(minImageDimensions),
+  mSamplingMode(samplingMode)
 {
 }
 
@@ -130,12 +132,12 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
   // Check for compulsory textures: Albedo, Metallic, Roughness, Normal
   if(checkStage(ALBEDO | METALLIC))
   {
-    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri, iTexture->mTexture.mMinImageDimensions, FittingMode::DEFAULT, iTexture->mTexture.mSamplingMode, true), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
 
     if(checkStage(NORMAL | ROUGHNESS))
     {
-      raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+      raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri, iTexture->mTexture.mMinImageDimensions, FittingMode::DEFAULT, iTexture->mTexture.mSamplingMode, true), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
     else // single value normal-roughness
@@ -149,7 +151,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
   {
     if(checkStage(ALBEDO))
     {
-      raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+      raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri, iTexture->mTexture.mMinImageDimensions, FittingMode::DEFAULT, iTexture->mTexture.mSamplingMode, true), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
     else if(mNeedAlbedoTexture) // single value albedo, albedo-alpha or albedo-metallic
@@ -183,7 +185,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
     const bool createMetallicRoughnessAndNormal = hasTransparency || std::distance(mTextureStages.begin(), iTexture) > 0;
     if(checkStage(METALLIC | ROUGHNESS))
     {
-      raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+      raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri, iTexture->mTexture.mMinImageDimensions, FittingMode::DEFAULT, iTexture->mTexture.mSamplingMode, true), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
     else if(createMetallicRoughnessAndNormal && mNeedMetallicRoughnessTexture)
@@ -197,7 +199,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
 
     if(checkStage(NORMAL))
     {
-      raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+      raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri, iTexture->mTexture.mMinImageDimensions, FittingMode::DEFAULT, iTexture->mTexture.mSamplingMode, true), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
     else if(mNeedNormalTexture)
@@ -220,31 +222,31 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
   // Extra textures.
   if(checkStage(SUBSURFACE))
   {
-    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri, iTexture->mTexture.mMinImageDimensions, FittingMode::DEFAULT, iTexture->mTexture.mSamplingMode, true), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
   if(checkStage(SPECULAR))
   {
-    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri, iTexture->mTexture.mMinImageDimensions, FittingMode::DEFAULT, iTexture->mTexture.mSamplingMode, true), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
   if(checkStage(SPECULAR_COLOR))
   {
-    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri, iTexture->mTexture.mMinImageDimensions, FittingMode::DEFAULT, iTexture->mTexture.mSamplingMode, true), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
   if(checkStage(OCCLUSION))
   {
-    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri, iTexture->mTexture.mMinImageDimensions, FittingMode::DEFAULT, iTexture->mTexture.mSamplingMode, true), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
   if(checkStage(EMISSIVE))
   {
-    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri, iTexture->mTexture.mMinImageDimensions, FittingMode::DEFAULT, iTexture->mTexture.mSamplingMode, true), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 

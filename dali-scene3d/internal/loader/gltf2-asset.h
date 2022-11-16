@@ -29,6 +29,25 @@
 #include "dali/public-api/math/quaternion.h"
 #include "dali/public-api/math/vector4.h"
 
+#define ENUM_STRING_MAPPING(t, x) \
+  {                               \
+#x, t::x                      \
+  }
+
+#define ENUM_TYPE_FROM_STRING(structName, table)                             \
+  structName::Type structName::FromString(const char* s, size_t len)         \
+  {                                                                          \
+    std::string target(s, len);                                              \
+    std::transform(target.begin(), target.end(), target.begin(), ::toupper); \
+                                                                             \
+    auto iFind = table.find(std::string_view(target.c_str(), len));          \
+    if(iFind != table.end())                                                 \
+    {                                                                        \
+      return iFind->second;                                                  \
+    }                                                                        \
+    return structName::INVALID;                                              \
+  }
+
 namespace gltf2
 {
 using Index = Dali::Scene3D::Loader::Index;
@@ -357,14 +376,14 @@ struct Material : Named
     //TODO: extras
   };
 
-  Pbr               mPbrMetallicRoughness;
-  TextureInfo       mNormalTexture;
-  TextureInfo       mOcclusionTexture;
-  TextureInfo       mEmissiveTexture;
-  Dali::Vector3     mEmissiveFactor;
-  AlphaMode::Type   mAlphaMode   = AlphaMode::OPAQUE;
-  float             mAlphaCutoff = .5f;
-  bool              mDoubleSided = false;
+  Pbr             mPbrMetallicRoughness;
+  TextureInfo     mNormalTexture;
+  TextureInfo     mOcclusionTexture;
+  TextureInfo     mEmissiveTexture;
+  Dali::Vector3   mEmissiveFactor;
+  AlphaMode::Type mAlphaMode   = AlphaMode::OPAQUE;
+  float           mAlphaCutoff = .5f;
+  bool            mDoubleSided = false;
 
   //extensions
   MaterialExtensions mMaterialExtensions;

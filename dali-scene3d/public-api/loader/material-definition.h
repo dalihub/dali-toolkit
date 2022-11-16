@@ -24,6 +24,7 @@
 #include "dali-scene3d/public-api/loader/utils.h"
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/images/image-operations.h>
 #include <cmath>
 #include "dali/public-api/common/vector-wrapper.h"
 #include "dali/public-api/math/vector4.h"
@@ -115,8 +116,10 @@ struct DALI_SCENE3D_API TextureDefinition
 {
   std::string        mImageUri;
   SamplerFlags::Type mSamplerFlags;
+  ImageDimensions    mMinImageDimensions;
+  SamplingMode::Type mSamplingMode;
 
-  TextureDefinition(const std::string& imageUri = "", SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT);
+  TextureDefinition(const std::string& imageUri = "", SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR);
 };
 
 /**

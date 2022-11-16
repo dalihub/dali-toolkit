@@ -14,20 +14,23 @@
  * limitations under the License.
  *
  */
-#include "dali-scene3d/public-api/loader/gltf2-loader.h"
-#include <fstream>
-#include "dali-scene3d/internal/loader/gltf2-asset.h"
-#include "dali-scene3d/public-api/loader/load-result.h"
-#include "dali-scene3d/public-api/loader/resource-bundle.h"
-#include "dali-scene3d/public-api/loader/scene-definition.h"
-#include "dali-scene3d/public-api/loader/shader-definition-factory.h"
-#include "dali-scene3d/public-api/loader/utils.h"
-#include "dali/public-api/math/quaternion.h"
 
-#define ENUM_STRING_MAPPING(t, x) \
-  {                               \
-#x, t::x                      \
-  }
+// FILE HEADER
+#include <dali-scene3d/public-api/loader/gltf2-loader.h>
+
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+#include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/math/quaternion.h>
+#include <fstream>
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/internal/loader/gltf2-asset.h>
+#include <dali-scene3d/public-api/loader/load-result.h>
+#include <dali-scene3d/public-api/loader/resource-bundle.h>
+#include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali-scene3d/public-api/loader/shader-definition-factory.h>
+#include <dali-scene3d/public-api/loader/utils.h>
 
 namespace gt = gltf2;
 namespace js = json;
@@ -176,7 +179,6 @@ const auto MATERIAL_SPECULAR_READER = std::move(js::Reader<gt::MaterialSpecular>
 
 const auto MATERIAL_IOR_READER = std::move(js::Reader<gt::MaterialIor>()
                                              .Register(*js::MakeProperty("ior", js::Read::Number<float>, &gt::MaterialIor::mIor)));
-
 
 const auto MATERIAL_EXTENSION_READER = std::move(js::Reader<gt::MaterialExtensions>()
                                                    .Register(*js::MakeProperty("KHR_materials_ior", js::ObjectReader<gt::MaterialIor>::Read, &gt::MaterialExtensions::mMaterialIor))
@@ -436,13 +438,24 @@ SamplerFlags::Type ConvertSampler(const gt::Ref<gt::Sampler>& s)
   }
 }
 
-TextureDefinition ConvertTextureInfo(const gt::TextureInfo& mm)
+TextureDefinition ConvertTextureInfo(const gt::TextureInfo& mm, const ImageMetadata& metaData = ImageMetadata())
 {
-  return TextureDefinition{std::string(mm.mTexture->mSource->mUri), ConvertSampler(mm.mTexture->mSampler)};
+  return TextureDefinition{std::string(mm.mTexture->mSource->mUri), ConvertSampler(mm.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode};
 }
 
-void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)& outMaterials)
+void ConvertMaterial(const gt::Material& m, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials)
 {
+  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gt::TextureInfo& info) {
+    if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
+    {
+      return search->second;
+    }
+    else
+    {
+      return ImageMetadata();
+    }
+  };
+
   MaterialDefinition matDef;
 
   auto& pbr = m.mPbrMetallicRoughness;
@@ -464,7 +477,7 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
   if(pbr.mBaseColorTexture)
   {
     const auto semantic = MaterialDefinition::ALBEDO;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mBaseColorTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mBaseColorTexture, getTextureMetaData(imageMetaData, pbr.mBaseColorTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
@@ -480,7 +493,7 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
   {
     const auto semantic = MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
                           MaterialDefinition::GLTF_CHANNELS;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mMetallicRoughnessTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mMetallicRoughnessTexture, getTextureMetaData(imageMetaData, pbr.mMetallicRoughnessTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
@@ -493,7 +506,7 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
   if(m.mNormalTexture)
   {
     const auto semantic = MaterialDefinition::NORMAL;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mNormalTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mNormalTexture, getTextureMetaData(imageMetaData, m.mNormalTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
@@ -505,7 +518,7 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
   if(m.mOcclusionTexture)
   {
     const auto semantic = MaterialDefinition::OCCLUSION;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mOcclusionTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mOcclusionTexture, getTextureMetaData(imageMetaData, m.mOcclusionTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
     matDef.mOcclusionStrength = m.mOcclusionTexture.mStrength;
@@ -514,7 +527,7 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
   if(m.mEmissiveTexture)
   {
     const auto semantic = MaterialDefinition::EMISSIVE;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mEmissiveTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mEmissiveTexture, getTextureMetaData(imageMetaData, m.mEmissiveTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
     matDef.mEmissiveFactor = m.mEmissiveFactor;
@@ -522,8 +535,8 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
 
   if(m.mMaterialExtensions.mMaterialIor.mIor < MAXFLOAT)
   {
-    float ior = m.mMaterialExtensions.mMaterialIor.mIor;
-    matDef.mDielectricSpecular = powf((ior-1.0f)/(ior+1.0f), 2.0f);
+    float ior                  = m.mMaterialExtensions.mMaterialIor.mIor;
+    matDef.mDielectricSpecular = powf((ior - 1.0f) / (ior + 1.0f), 2.0f);
   }
   matDef.mSpecularFactor      = m.mMaterialExtensions.mMaterialSpecular.mSpecularFactor;
   matDef.mSpecularColorFactor = m.mMaterialExtensions.mMaterialSpecular.mSpecularColorFactor;
@@ -531,14 +544,14 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
   if(m.mMaterialExtensions.mMaterialSpecular.mSpecularTexture)
   {
     const auto semantic = MaterialDefinition::SPECULAR;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mMaterialExtensions.mMaterialSpecular.mSpecularTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mMaterialExtensions.mMaterialSpecular.mSpecularTexture, getTextureMetaData(imageMetaData, m.mMaterialExtensions.mMaterialSpecular.mSpecularTexture))});
     matDef.mFlags |= semantic;
   }
 
   if(m.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture)
   {
     const auto semantic = MaterialDefinition::SPECULAR_COLOR;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture, getTextureMetaData(imageMetaData, m.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture))});
     matDef.mFlags |= semantic;
   }
 
@@ -549,12 +562,14 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
 
 void ConvertMaterials(const gt::Document& doc, ConversionContext& cctx)
 {
+  auto& imageMetaData = cctx.mOutput.mSceneMetadata.mImageMetadata;
+
   auto& outMaterials = cctx.mOutput.mResources.mMaterials;
   outMaterials.reserve(doc.mMaterials.size());
 
   for(auto& m : doc.mMaterials)
   {
-    ConvertMaterial(m, outMaterials);
+    ConvertMaterial(m, imageMetaData, outMaterials);
   }
 }
 
@@ -735,7 +750,7 @@ ModelNode* MakeModelNode(const gt::Mesh::Primitive& prim, ConversionContext& cct
       auto& outMaterials    = cctx.mOutput.mResources.mMaterials;
       cctx.mDefaultMaterial = outMaterials.size();
 
-      ConvertMaterial(gt::Material{}, outMaterials);
+      ConvertMaterial(gt::Material{}, cctx.mOutput.mSceneMetadata.mImageMetadata, outMaterials);
     }
 
     materialIdx = cctx.mDefaultMaterial;
