@@ -14,21 +14,23 @@
  * limitations under the License.
  *
  */
-#include <fstream>
+
+// FILE HEADER
 #include <dali-scene3d/public-api/loader/gltf2-loader.h>
+
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+#include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/math/quaternion.h>
+#include <fstream>
+
+// INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/gltf2-asset.h>
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-scene3d/public-api/loader/shader-definition-factory.h>
 #include <dali-scene3d/public-api/loader/utils.h>
-#include <dali/public-api/math/quaternion.h>
-#include <dali/integration-api/debug.h>
-
-#define ENUM_STRING_MAPPING(t, x) \
-  {                               \
-#x, t::x                      \
-  }
 
 namespace gt = gltf2;
 namespace js = json;
@@ -177,7 +179,6 @@ const auto MATERIAL_SPECULAR_READER = std::move(js::Reader<gt::MaterialSpecular>
 
 const auto MATERIAL_IOR_READER = std::move(js::Reader<gt::MaterialIor>()
                                              .Register(*js::MakeProperty("ior", js::Read::Number<float>, &gt::MaterialIor::mIor)));
-
 
 const auto MATERIAL_EXTENSION_READER = std::move(js::Reader<gt::MaterialExtensions>()
                                                    .Register(*js::MakeProperty("KHR_materials_ior", js::ObjectReader<gt::MaterialIor>::Read, &gt::MaterialExtensions::mMaterialIor))
@@ -437,13 +438,24 @@ SamplerFlags::Type ConvertSampler(const gt::Ref<gt::Sampler>& s)
   }
 }
 
-TextureDefinition ConvertTextureInfo(const gt::TextureInfo& mm)
+TextureDefinition ConvertTextureInfo(const gt::TextureInfo& mm, const ImageMetadata& metaData = ImageMetadata())
 {
-  return TextureDefinition{std::string(mm.mTexture->mSource->mUri), ConvertSampler(mm.mTexture->mSampler)};
+  return TextureDefinition{std::string(mm.mTexture->mSource->mUri), ConvertSampler(mm.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode};
 }
 
-void ConvertMaterial(const gt::Material& material, decltype(ResourceBundle::mMaterials)& outMaterials)
+void ConvertMaterial(const gt::Material& material, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials)
 {
+  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gt::TextureInfo& info) {
+    if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
+    {
+      return search->second;
+    }
+    else
+    {
+      return ImageMetadata();
+    }
+  };
+
   MaterialDefinition matDef;
 
   auto& pbr = material.mPbrMetallicRoughness;
@@ -463,7 +475,7 @@ void ConvertMaterial(const gt::Material& material, decltype(ResourceBundle::mMat
   if(pbr.mBaseColorTexture)
   {
     const auto semantic = MaterialDefinition::ALBEDO;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mBaseColorTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mBaseColorTexture, getTextureMetaData(imageMetaData, pbr.mBaseColorTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
@@ -479,7 +491,7 @@ void ConvertMaterial(const gt::Material& material, decltype(ResourceBundle::mMat
   {
     const auto semantic = MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
                           MaterialDefinition::GLTF_CHANNELS;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mMetallicRoughnessTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mMetallicRoughnessTexture, getTextureMetaData(imageMetaData, pbr.mMetallicRoughnessTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
@@ -492,7 +504,7 @@ void ConvertMaterial(const gt::Material& material, decltype(ResourceBundle::mMat
   if(material.mNormalTexture)
   {
     const auto semantic = MaterialDefinition::NORMAL;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mNormalTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mNormalTexture, getTextureMetaData(imageMetaData, material.mNormalTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
@@ -504,7 +516,7 @@ void ConvertMaterial(const gt::Material& material, decltype(ResourceBundle::mMat
   if(material.mOcclusionTexture)
   {
     const auto semantic = MaterialDefinition::OCCLUSION;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mOcclusionTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mOcclusionTexture, getTextureMetaData(imageMetaData, material.mOcclusionTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
     matDef.mOcclusionStrength = material.mOcclusionTexture.mStrength;
@@ -513,7 +525,7 @@ void ConvertMaterial(const gt::Material& material, decltype(ResourceBundle::mMat
   if(material.mEmissiveTexture)
   {
     const auto semantic = MaterialDefinition::EMISSIVE;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mEmissiveTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mEmissiveTexture, getTextureMetaData(imageMetaData, material.mEmissiveTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
     matDef.mEmissiveFactor = material.mEmissiveFactor;
@@ -521,8 +533,8 @@ void ConvertMaterial(const gt::Material& material, decltype(ResourceBundle::mMat
 
   if(material.mMaterialExtensions.mMaterialIor.mIor < MAXFLOAT)
   {
-    float ior = material.mMaterialExtensions.mMaterialIor.mIor;
-    matDef.mDielectricSpecular = powf((ior-1.0f)/(ior+1.0f), 2.0f);
+    float ior                  = material.mMaterialExtensions.mMaterialIor.mIor;
+    matDef.mDielectricSpecular = powf((ior - 1.0f) / (ior + 1.0f), 2.0f);
   }
   matDef.mSpecularFactor      = material.mMaterialExtensions.mMaterialSpecular.mSpecularFactor;
   matDef.mSpecularColorFactor = material.mMaterialExtensions.mMaterialSpecular.mSpecularColorFactor;
@@ -530,14 +542,14 @@ void ConvertMaterial(const gt::Material& material, decltype(ResourceBundle::mMat
   if(material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture)
   {
     const auto semantic = MaterialDefinition::SPECULAR;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture, getTextureMetaData(imageMetaData, material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture))});
     matDef.mFlags |= semantic;
   }
 
   if(material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture)
   {
     const auto semantic = MaterialDefinition::SPECULAR_COLOR;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture)});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture, getTextureMetaData(imageMetaData, material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture))});
     matDef.mFlags |= semantic;
   }
 
@@ -548,12 +560,14 @@ void ConvertMaterial(const gt::Material& material, decltype(ResourceBundle::mMat
 
 void ConvertMaterials(const gt::Document& doc, ConversionContext& context)
 {
+  auto& imageMetaData = context.mOutput.mSceneMetadata.mImageMetadata;
+
   auto& outMaterials = context.mOutput.mResources.mMaterials;
   outMaterials.reserve(doc.mMaterials.size());
 
   for(auto& m : doc.mMaterials)
   {
-    ConvertMaterial(m, outMaterials);
+    ConvertMaterial(m, imageMetaData, outMaterials);
   }
 }
 
@@ -628,11 +642,11 @@ void ConvertMeshes(const gt::Document& doc, ConversionContext& context)
     {
       MeshDefinition meshDefinition;
 
-      auto& attribs          = primitive.mAttributes;
+      auto& attribs                 = primitive.mAttributes;
       meshDefinition.mUri           = attribs.begin()->second->mBufferView->mBuffer->mUri;
       meshDefinition.mPrimitiveType = GLTF2_TO_DALI_PRIMITIVES[primitive.mMode];
 
-      auto& accPositions = *attribs.find(gt::Attribute::POSITION)->second;
+      auto& accPositions        = *attribs.find(gt::Attribute::POSITION)->second;
       meshDefinition.mPositions = ConvertMeshPrimitiveAccessor(accPositions);
       // glTF2 support vector4 tangent for mesh.
       // https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#meshes-overview
@@ -730,10 +744,10 @@ ModelRenderable* MakeModelRenderable(const gt::Mesh::Primitive& prim, Conversion
     // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#default-material
     if(INVALID_INDEX == context.mDefaultMaterial)
     {
-      auto& outMaterials    = context.mOutput.mResources.mMaterials;
+      auto& outMaterials       = context.mOutput.mResources.mMaterials;
       context.mDefaultMaterial = outMaterials.size();
 
-      ConvertMaterial(gt::Material{}, outMaterials);
+      ConvertMaterial(gt::Material{}, context.mOutput.mSceneMetadata.mImageMetadata, outMaterials);
     }
 
     materialIdx = context.mDefaultMaterial;
@@ -814,8 +828,8 @@ void ConvertNode(gt::Node const& node, const Index gltfIdx, Index parentIdx, Con
     for(uint32_t i = 0; i < primitiveCount; ++i)
     {
       std::unique_ptr<NodeDefinition::Renderable> renderable;
-      auto modelRenderable      = MakeModelRenderable(mesh.mPrimitives[i], context);
-      modelRenderable->mMeshIdx = meshIdx + i;
+      auto                                        modelRenderable = MakeModelRenderable(mesh.mPrimitives[i], context);
+      modelRenderable->mMeshIdx                                   = meshIdx + i;
 
       DALI_ASSERT_DEBUG(resources.mMeshes[modelRenderable->mMeshIdx].first.mSkeletonIdx == INVALID_INDEX ||
                         resources.mMeshes[modelRenderable->mMeshIdx].first.mSkeletonIdx == skeletonIdx);

@@ -425,7 +425,14 @@ void Model::LoadModel()
   std::vector<Dali::Scene3D::Loader::AnimationDefinition> animations;
   animations.clear();
 
-  Dali::Scene3D::Loader::LoadResult output{resources, scene, animations, animGroups, cameraParameters, lights};
+  Dali::Scene3D::Loader::SceneMetadata metaData;
+
+  std::filesystem::path metaDataUrl = modelUrl;
+  metaDataUrl.replace_extension("metadata");
+
+  Dali::Scene3D::Loader::LoadSceneMetadata(metaDataUrl.c_str(), metaData);
+
+  Dali::Scene3D::Loader::LoadResult output{resources, scene, metaData, animations, animGroups, cameraParameters, lights};
 
   if(extension == DLI_EXTENSION)
   {

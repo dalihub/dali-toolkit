@@ -18,13 +18,13 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
+#include <dali-scene3d/internal/loader/json-util.h>
+#include <dali-scene3d/public-api/loader/dli-loader.h>
+#include <dali-scene3d/public-api/loader/load-result.h>
+#include <dali-scene3d/public-api/loader/resource-bundle.h>
+#include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-test-suite-utils.h>
 #include <string_view>
-#include "dali-scene3d/internal/loader/json-util.h"
-#include "dali-scene3d/public-api/loader/dli-loader.h"
-#include "dali-scene3d/public-api/loader/load-result.h"
-#include "dali-scene3d/public-api/loader/resource-bundle.h"
-#include "dali-scene3d/public-api/loader/scene-definition.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
@@ -61,9 +61,12 @@ struct Context
   std::vector<AnimationDefinition>      animations;
   std::vector<AnimationGroupDefinition> animGroups;
 
+  SceneMetadata metaData;
+
   LoadResult output{
     resources,
     scene,
+    metaData,
     animations,
     animGroups,
     cameraParameters,

@@ -18,6 +18,7 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_public_api_dir}/loader/facial-animation-loader.cpp
 	${scene3d_public_api_dir}/loader/gltf2-loader.cpp
 	${scene3d_public_api_dir}/loader/ktx-loader.cpp
+	${scene3d_public_api_dir}/loader/load-scene-metadata.cpp
 	${scene3d_public_api_dir}/loader/material-definition.cpp
 	${scene3d_public_api_dir}/loader/matrix-stack.cpp
 	${scene3d_public_api_dir}/loader/mesh-definition.cpp

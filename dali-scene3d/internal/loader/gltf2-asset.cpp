@@ -14,15 +14,14 @@
 * limitations under the License.
 *
 */
-#include "dali-scene3d/internal/loader/gltf2-asset.h"
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/math/matrix.h>
 #include <algorithm>
 #include <map>
-#include "dali/public-api/math/matrix.h"
 
-#define ENUM_STRING_MAPPING(t, x) \
-  {                               \
-#x, t::x                      \
-  }
+// INTERNAL INCLUDES
+#include <dali-scene3d/internal/loader/gltf2-asset.h>
 
 using namespace Dali;
 
@@ -82,6 +81,12 @@ const std::map<std::string_view, Animation::Channel::Target::Type> ANIMATION_CHA
 
 } // namespace
 
+ENUM_TYPE_FROM_STRING(AccessorType, ACCESSOR_TYPES)
+ENUM_TYPE_FROM_STRING(AlphaMode, ALPHA_MODE_TYPES)
+ENUM_TYPE_FROM_STRING(Attribute, ATTRIBUTE_TYPES)
+ENUM_TYPE_FROM_STRING(Animation::Sampler::Interpolation, ANIMATION_SAMPLER_INTERPOLATION)
+ENUM_TYPE_FROM_STRING(Animation::Channel::Target, ANIMATION_CHANNEL_TARGET_PATH_TYPES)
+
 bool Component::IsUnsigned(Type t)
 {
   return t == UNSIGNED_BYTE || t == UNSIGNED_SHORT || t == UNSIGNED_INT;
@@ -110,63 +115,10 @@ uint32_t AccessorType::ElementCount(Type t)
   return ACCESSOR_TYPE_ELEMENT_COUNT[t];
 }
 
-AccessorType::Type AccessorType::FromString(const char* s, size_t len)
-{
-  auto iFind = ACCESSOR_TYPES.find(std::string_view(s, len));
-  if(iFind != ACCESSOR_TYPES.end())
-  {
-    return iFind->second;
-  }
-  return AccessorType::INVALID;
-}
-
-AlphaMode::Type AlphaMode::FromString(const char* s, size_t len)
-{
-  auto iFind = ALPHA_MODE_TYPES.find(std::string_view(s, len));
-  if(iFind != ALPHA_MODE_TYPES.end())
-  {
-    return iFind->second;
-  }
-  return AlphaMode::INVALID;
-}
-
-Attribute::Type Attribute::FromString(const char* s, size_t len)
-{
-  auto iFind = ATTRIBUTE_TYPES.find(std::string_view(s, len));
-  if(iFind != ATTRIBUTE_TYPES.end())
-  {
-    return iFind->second;
-  }
-  return Attribute::INVALID;
-}
-
-Animation::Sampler::Interpolation::Type Animation::Sampler::Interpolation::FromString(const char* s, size_t len)
-{
-  auto iFind = ANIMATION_SAMPLER_INTERPOLATION.find(std::string_view(s, len));
-  if(iFind != ANIMATION_SAMPLER_INTERPOLATION.end())
-  {
-    return iFind->second;
-  }
-  return Animation::Sampler::Interpolation::Type::INVALID;
-}
-
 uint32_t ComponentTypedBufferViewClient::GetBytesPerComponent() const
 {
   return Component::Size(mComponentType);
 }
-
-Animation::Channel::Target::Type Animation::Channel::Target::FromString(const char* s, size_t len)
-{
-  std::string target(s, len);
-  std::transform(target.begin(), target.end(), target.begin(), ::toupper);
-
-  auto iFind = ANIMATION_CHANNEL_TARGET_PATH_TYPES.find(std::string_view(target.c_str(), len));
-  if(iFind != ANIMATION_CHANNEL_TARGET_PATH_TYPES.end())
-  {
-    return iFind->second;
-  }
-  return Animation::Channel::Target::INVALID;
-};
 
 void Node::SetMatrix(const Matrix& m)
 {

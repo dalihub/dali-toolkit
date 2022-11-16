@@ -18,13 +18,13 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
+#include <dali-scene3d/public-api/loader/gltf2-loader.h>
+#include <dali-scene3d/public-api/loader/load-result.h>
+#include <dali-scene3d/public-api/loader/resource-bundle.h>
+#include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali-scene3d/public-api/loader/shader-definition-factory.h>
 #include <dali-test-suite-utils.h>
 #include <string_view>
-#include "dali-scene3d/public-api/loader/gltf2-loader.h"
-#include "dali-scene3d/public-api/loader/load-result.h"
-#include "dali-scene3d/public-api/loader/resource-bundle.h"
-#include "dali-scene3d/public-api/loader/scene-definition.h"
-#include "dali-scene3d/public-api/loader/shader-definition-factory.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
@@ -61,6 +61,7 @@ struct Context
 
   ResourceBundle  resources;
   SceneDefinition scene;
+  SceneMetadata   metaData;
 
   std::vector<AnimationDefinition>      animations;
   std::vector<AnimationGroupDefinition> animationGroups;
@@ -70,6 +71,7 @@ struct Context
   LoadResult loadResult{
     resources,
     scene,
+    metaData,
     animations,
     animationGroups,
     cameras,
@@ -153,6 +155,21 @@ int UtcDaliGltfLoaderSuccess1(void)
 {
   Context ctx;
 
+  LoadSceneMetadata(TEST_RESOURCE_DIR "/AnimatedCube.metadata", ctx.metaData);
+
+  std::unordered_map<std::string, ImageMetadata> imageMetadataGroundTruth;
+  imageMetadataGroundTruth["AnimatedCube_BaseColor.png"]         = ImageMetadata{ImageDimensions(256, 256), Dali::SamplingMode::BOX_THEN_NEAREST};
+  imageMetadataGroundTruth["AnimatedCube_MetallicRoughness.png"] = ImageMetadata{ImageDimensions(256, 256), Dali::SamplingMode::NEAREST};
+
+  auto metaData = ctx.metaData.mImageMetadata.begin();
+  for(auto& groundTruth : imageMetadataGroundTruth)
+  {
+    DALI_TEST_EQUAL(groundTruth.first, metaData->first);
+    DALI_TEST_EQUAL(groundTruth.second.mMinSize, metaData->second.mMinSize);
+    DALI_TEST_EQUAL(groundTruth.second.mSamplingMode, metaData->second.mSamplingMode);
+    ++metaData;
+  }
+
   ShaderDefinitionFactory sdf;
   sdf.SetResources(ctx.resources);
 
@@ -163,6 +180,17 @@ int UtcDaliGltfLoaderSuccess1(void)
 
   // Default envmap is used
   DALI_TEST_EQUAL(1u, ctx.resources.mEnvironmentMaps.size());
+
+  TestApplication app;
+
+  Customization::Choices choices;
+  for(auto iRoot : ctx.scene.GetRoots())
+  {
+    auto resourceRefs = ctx.resources.CreateRefCounter();
+    ctx.scene.CountResourceRefs(iRoot, choices, resourceRefs);
+    ctx.resources.CountEnvironmentReferences(resourceRefs);
+    ctx.resources.LoadResources(resourceRefs, ctx.pathProvider);
+  }
 
   auto& materials = ctx.resources.mMaterials;
   DALI_TEST_EQUAL(2u, materials.size());
@@ -188,22 +216,34 @@ int UtcDaliGltfLoaderSuccess1(void)
      {
        {MaterialDefinition::ALBEDO,
         {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+         ImageDimensions(256, 256),
+         SamplingMode::BOX_THEN_NEAREST}},
        {MaterialDefinition::NORMAL,
         {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+         ImageDimensions(256, 256),
+         SamplingMode::BOX_THEN_NEAREST}},
        {MaterialDefinition::OCCLUSION,
         {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+         ImageDimensions(256, 256),
+         SamplingMode::BOX_THEN_NEAREST}},
        {MaterialDefinition::EMISSIVE,
         {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+         ImageDimensions(256, 256),
+         SamplingMode::BOX_THEN_NEAREST}},
        {MaterialDefinition::SPECULAR,
         {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+         ImageDimensions(256, 256),
+         SamplingMode::BOX_THEN_NEAREST}},
        {MaterialDefinition::SPECULAR_COLOR,
         {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+         ImageDimensions(256, 256),
+         SamplingMode::BOX_THEN_NEAREST}},
      }},
     {MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
        MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
@@ -226,23 +266,34 @@ int UtcDaliGltfLoaderSuccess1(void)
      {
        {MaterialDefinition::ALBEDO,
         {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+         ImageDimensions(256, 256),
+         SamplingMode::BOX_THEN_NEAREST}},
        {MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS | MaterialDefinition::GLTF_CHANNELS,
         {"AnimatedCube_MetallicRoughness.png",
-         SamplerFlags::Encode(FilterMode::NEAREST_MIPMAP_LINEAR, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::MIRRORED_REPEAT)}},
+         SamplerFlags::Encode(FilterMode::NEAREST_MIPMAP_LINEAR, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::MIRRORED_REPEAT),
+         ImageDimensions(256, 256),
+         SamplingMode::NEAREST}},
        {MaterialDefinition::NORMAL,
         {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+         ImageDimensions(256, 256),
+         SamplingMode::BOX_THEN_NEAREST}},
        {MaterialDefinition::OCCLUSION,
         {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+         ImageDimensions(256, 256),
+         SamplingMode::BOX_THEN_NEAREST}},
        {MaterialDefinition::EMISSIVE,
         {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+         ImageDimensions(256, 256),
+         SamplingMode::BOX_THEN_NEAREST}},
      }},
   };
 
   auto iMaterial = materials.begin();
+  auto iMetadata = ctx.metaData.mImageMetadata.begin();
   for(auto& m : materialGroundTruth)
   {
     printf("material %ld\n", iMaterial - materials.begin());
@@ -271,9 +322,13 @@ int UtcDaliGltfLoaderSuccess1(void)
       DALI_TEST_EQUAL(iTexture->mSemantic, ts.mSemantic);
       DALI_TEST_EQUAL(iTexture->mTexture.mImageUri, ts.mTexture.mImageUri);
       DALI_TEST_EQUAL(uint32_t(iTexture->mTexture.mSamplerFlags), uint32_t(ts.mTexture.mSamplerFlags)); // don't interpret it as a character
+      DALI_TEST_EQUAL(iTexture->mTexture.mMinImageDimensions, ts.mTexture.mMinImageDimensions);
+      DALI_TEST_EQUAL(iTexture->mTexture.mSamplingMode, ts.mTexture.mSamplingMode);
+
       ++iTexture;
     }
     ++iMaterial;
+    ++iMetadata;
   }
 
   auto& meshes = ctx.resources.mMeshes;
