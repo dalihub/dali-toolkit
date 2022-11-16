@@ -718,7 +718,8 @@ void ConvertCamera(const gt::Camera& camera, CameraParameters& camParams)
   else
   {
     auto& ortho                = camera.mOrthographic;
-    camParams.orthographicSize = Vector4(-ortho.mXMag, ortho.mXMag, ortho.mYMag, -ortho.mYMag) * .5f;
+    camParams.orthographicSize = ortho.mYMag * .5f;
+    camParams.aspectRatio      = ortho.mXMag / ortho.mYMag;
     camParams.zNear            = ortho.mZNear;
     camParams.zFar             = ortho.mZFar;
   }

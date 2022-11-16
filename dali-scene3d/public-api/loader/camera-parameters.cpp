@@ -16,6 +16,7 @@
  */
 #include "dali-scene3d/public-api/loader/camera-parameters.h"
 #include "dali-scene3d/public-api/loader/utils.h"
+#include "dali/devel-api/actors/camera-actor-devel.h"
 #include "dali/integration-api/debug.h"
 #include "dali/public-api/actors/camera-actor.h"
 #include "dali/public-api/math/quaternion.h"
@@ -155,10 +156,10 @@ ViewProjection CameraParameters::GetViewProjection() const
   else
   {
     Orthographic(viewProjection.GetProjection(),
-                 orthographicSize.x,
-                 orthographicSize.y,
-                 orthographicSize.z,
-                 orthographicSize.w,
+                 -orthographicSize * aspectRatio,
+                 orthographicSize * aspectRatio,
+                 orthographicSize,
+                 -orthographicSize,
                  zNear,
                  zFar,
                  true);
@@ -204,12 +205,10 @@ void CameraParameters::ConfigureCamera(CameraActor& camera) const
   else
   {
     camera.SetProjectionMode(Camera::ORTHOGRAPHIC_PROJECTION);
-    camera.SetOrthographicProjection(orthographicSize.x,
-                                     orthographicSize.y,
-                                     orthographicSize.z,
-                                     orthographicSize.w,
-                                     zNear,
-                                     zFar);
+    camera.SetNearClippingPlane(zNear);
+    camera.SetFarClippingPlane(zFar);
+    camera.SetAspectRatio(aspectRatio);
+    camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, orthographicSize);
   }
 
   // model
