@@ -168,7 +168,7 @@ int UtcDaliGltfLoaderSuccess1(void)
   DALI_TEST_EQUAL(2u, materials.size());
   const MaterialDefinition materialGroundTruth[]{
     {MaterialDefinition::ALBEDO | MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
-       MaterialDefinition::NORMAL | MaterialDefinition::TRANSPARENCY |
+       MaterialDefinition::NORMAL |
        (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
      0,
      Color::WHITE,
@@ -181,6 +181,7 @@ int UtcDaliGltfLoaderSuccess1(void)
      true,
      false,
      true,
+     false,
      {
        {MaterialDefinition::ALBEDO,
         {"AnimatedCube_BaseColor.png",
@@ -209,6 +210,7 @@ int UtcDaliGltfLoaderSuccess1(void)
      true,
      true,
      true,
+     false,
      {
        {MaterialDefinition::ALBEDO,
         {"AnimatedCube_BaseColor.png",
@@ -386,9 +388,9 @@ int UtcDaliGltfLoaderSuccessShort(void)
 
         void Start(NodeDefinition& n) override
         {
-          if(n.mRenderable)
+          for(auto& renderable : n.mRenderables)
           {
-            n.mRenderable->RegisterResources(receiver);
+            renderable->RegisterResources(receiver);
           }
         }
 

@@ -47,9 +47,10 @@ const bool DEFAULT_MODEL_CHILDREN_FOCUSABLE = false;
  * Donated by Norbert Nopper for glTF testing.
  * Take from https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/AnimatedCube
  */
-const char* TEST_GLTF_FILE_NAME                = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
-const char* TEST_GLTF_ANIMATION_TEST_FILE_NAME = TEST_RESOURCE_DIR "/animationTest.gltf";
-const char* TEST_DLI_FILE_NAME                 = TEST_RESOURCE_DIR "/arc.dli";
+const char* TEST_GLTF_FILE_NAME                    = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
+const char* TEST_GLTF_ANIMATION_TEST_FILE_NAME     = TEST_RESOURCE_DIR "/animationTest.gltf";
+const char* TEST_GLTF_MULTIPLE_PRIMITIVE_FILE_NAME = TEST_RESOURCE_DIR "/simpleMultiplePrimitiveTest.gltf";
+const char* TEST_DLI_FILE_NAME                     = TEST_RESOURCE_DIR "/arc.dli";
 /**
  * For the diffuse and specular cube map texture.
  * These textures are based off version of Wave engine sample
@@ -824,6 +825,26 @@ int UtcDaliModelAnimation02(void)
   DALI_TEST_EQUALS(1.66667f, animation2.GetDuration(), 0.001f, TEST_LOCATION);
 
   DALI_TEST_NOT_EQUALS(animation1, animation2, 0.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliModelMultiplePrimitives(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_MULTIPLE_PRIMITIVE_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+
+  application.GetScene().Add(model);
+
+  application.SendNotification();
+  application.Render();
+
+  Actor actor = model.FindChildByName("rootNode");
+
+  DALI_TEST_EQUALS(0, actor.GetChildCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(2, actor.GetRendererCount(), TEST_LOCATION);
 
   END_TEST;
 }

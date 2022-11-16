@@ -20,6 +20,7 @@
 // INTERNAL INCLUDES
 #include "dali-scene3d/public-api/api.h"
 #include "dali-scene3d/public-api/loader/index.h"
+#include <dali-scene3d/public-api/loader/node-definition.h>
 
 // EXTERNAL INCLUDER
 #include <memory>
@@ -51,7 +52,7 @@ public:
    *  already existing in the ResourceBundle are ignored), otherwise the index of the previously
    *  created shader will be returned.
    */
-  Index ProduceShader(const NodeDefinition& nodeDef);
+  Index ProduceShader(NodeDefinition::Renderable& renderable);
 
 private:
   struct Impl;
