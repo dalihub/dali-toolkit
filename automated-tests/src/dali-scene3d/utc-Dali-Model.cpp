@@ -339,15 +339,15 @@ int UtcDaliModelSetImageBasedLightSource01(void)
   DALI_TEST_CHECK(renderer);
 
   TextureSet textureSet = renderer.GetTextures();
-  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 7u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 9u, TEST_LOCATION);
 
-  Texture diffuseTexture  = textureSet.GetTexture(5u);
-  Texture specularTexture = textureSet.GetTexture(6u);
+  Texture diffuseTexture  = textureSet.GetTexture(7u);
+  Texture specularTexture = textureSet.GetTexture(8u);
 
   model.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE);
 
-  Texture newDiffuseTexture  = textureSet.GetTexture(5u);
-  Texture newSpecularTexture = textureSet.GetTexture(6u);
+  Texture newDiffuseTexture  = textureSet.GetTexture(7u);
+  Texture newSpecularTexture = textureSet.GetTexture(8u);
 
   DALI_TEST_NOT_EQUALS(diffuseTexture, newDiffuseTexture, 0.0f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(specularTexture, newSpecularTexture, 0.0f, TEST_LOCATION);
@@ -373,15 +373,15 @@ int UtcDaliModelSetImageBasedLightSource02(void)
   DALI_TEST_CHECK(renderer);
 
   TextureSet textureSet = renderer.GetTextures();
-  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 7u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 9u, TEST_LOCATION);
 
-  Texture diffuseTexture  = textureSet.GetTexture(5u);
-  Texture specularTexture = textureSet.GetTexture(6u);
+  Texture diffuseTexture  = textureSet.GetTexture(7u);
+  Texture specularTexture = textureSet.GetTexture(8u);
 
   model.SetImageBasedLightSource("", "");
 
-  Texture newDiffuseTexture  = textureSet.GetTexture(5u);
-  Texture newSpecularTexture = textureSet.GetTexture(6u);
+  Texture newDiffuseTexture  = textureSet.GetTexture(7u);
+  Texture newSpecularTexture = textureSet.GetTexture(8u);
 
   DALI_TEST_EQUALS(diffuseTexture, newDiffuseTexture, TEST_LOCATION);
   DALI_TEST_EQUALS(specularTexture, newSpecularTexture, TEST_LOCATION);
@@ -407,15 +407,15 @@ int UtcDaliModelSetImageBasedLightSource03(void)
   DALI_TEST_CHECK(renderer);
 
   TextureSet textureSet = renderer.GetTextures();
-  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 7u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 9u, TEST_LOCATION);
 
-  Texture diffuseTexture  = textureSet.GetTexture(5u);
-  Texture specularTexture = textureSet.GetTexture(6u);
+  Texture diffuseTexture  = textureSet.GetTexture(7u);
+  Texture specularTexture = textureSet.GetTexture(8u);
 
   model.SetImageBasedLightSource("dummy.ktx", "dummy.ktx");
 
-  Texture newDiffuseTexture  = textureSet.GetTexture(5u);
-  Texture newSpecularTexture = textureSet.GetTexture(6u);
+  Texture newDiffuseTexture  = textureSet.GetTexture(7u);
+  Texture newSpecularTexture = textureSet.GetTexture(8u);
 
   DALI_TEST_EQUALS(diffuseTexture, newDiffuseTexture, TEST_LOCATION);
   DALI_TEST_EQUALS(specularTexture, newSpecularTexture, TEST_LOCATION);
