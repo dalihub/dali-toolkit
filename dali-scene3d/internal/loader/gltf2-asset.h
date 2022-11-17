@@ -325,9 +325,28 @@ struct TextureInfo
   }
 };
 
+struct MaterialIor
+{
+  float mIor = MAXFLOAT;
+};
+
+struct MaterialSpecular
+{
+  float         mSpecularFactor = 1.0f;
+  TextureInfo   mSpecularTexture;
+  Dali::Vector3 mSpecularColorFactor = Dali::Vector3::ONE;
+  TextureInfo   mSpecularColorTexture;
+};
+
+struct MaterialExtensions
+{
+  MaterialSpecular mMaterialSpecular;
+  MaterialIor      mMaterialIor;
+};
+
 struct Material : Named
 {
-  struct Pbr //MetallicRoughness
+  struct Pbr // MetallicRoughness
   {
     Dali::Vector4 mBaseColorFactor = Dali::Vector4::ONE;
     TextureInfo   mBaseColorTexture;
@@ -338,15 +357,17 @@ struct Material : Named
     //TODO: extras
   };
 
-  Pbr             mPbrMetallicRoughness;
-  TextureInfo     mNormalTexture;
-  TextureInfo     mOcclusionTexture;
-  TextureInfo     mEmissiveTexture;
-  Dali::Vector3   mEmissiveFactor;
-  AlphaMode::Type mAlphaMode   = AlphaMode::OPAQUE;
-  float           mAlphaCutoff = .5f;
-  bool            mDoubleSided = false;
-  //TODO: extensions
+  Pbr               mPbrMetallicRoughness;
+  TextureInfo       mNormalTexture;
+  TextureInfo       mOcclusionTexture;
+  TextureInfo       mEmissiveTexture;
+  Dali::Vector3     mEmissiveFactor;
+  AlphaMode::Type   mAlphaMode   = AlphaMode::OPAQUE;
+  float             mAlphaCutoff = .5f;
+  bool              mDoubleSided = false;
+
+  //extensions
+  MaterialExtensions mMaterialExtensions;
   //TODO: extras
 };
 

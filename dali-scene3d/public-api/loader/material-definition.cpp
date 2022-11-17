@@ -224,6 +224,18 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath) const
     ++iTexture;
   }
 
+  if(checkStage(SPECULAR))
+  {
+    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+    ++iTexture;
+  }
+
+  if(checkStage(SPECULAR_COLOR))
+  {
+    raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});
+    ++iTexture;
+  }
+
   if(checkStage(OCCLUSION))
   {
     raw.mTextures.push_back({SyncImageLoader::Load(imagesPath + iTexture->mTexture.mImageUri), iTexture->mTexture.mSamplerFlags});

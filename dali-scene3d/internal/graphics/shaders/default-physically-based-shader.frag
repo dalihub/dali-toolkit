@@ -36,6 +36,7 @@ precision mediump float;
 uniform lowp vec4 uColorFactor;
 uniform lowp float uMetallicFactor;
 uniform lowp float uRoughnessFactor;
+uniform lowp float uDielectricSpecular;
 
 #ifdef THREE_TEX
 #ifdef BASECOLOR_TEX
@@ -51,6 +52,15 @@ uniform float uNormalScale;
 #else // THREE_TEX
 uniform sampler2D sAlbedoMetal;
 uniform sampler2D sNormalRoughness;
+#endif
+
+uniform float uSpecularFactor;
+uniform vec3  uSpecularColorFactor;
+#ifdef MATERIAL_SPECULAR_TEXTURE
+uniform sampler2D sSpecular;
+#endif
+#ifdef MATERIAL_SPECULAR_COLOR_TEXTURE
+uniform sampler2D sSpecularColor;
 #endif
 
 #ifdef OCCLUSION
@@ -83,42 +93,7 @@ in highp vec3 vPositionToCamera;
 
 out vec4 FragColor;
 
-struct PBRInfo
-{
-  mediump float NdotL;        // cos angle between normal and light direction
-  mediump float NdotV;        // cos angle between normal and view direction
-  mediump float NdotH;        // cos angle between normal and half vector
-  mediump float VdotH;        // cos angle between view direction and half vector
-  mediump vec3 reflectance0;  // full reflectance color (normal incidence angle)
-  mediump vec3 reflectance90; // reflectance color at grazing angle
-  lowp float alphaRoughness;  // roughness mapped to a more linear change in the roughness (proposed by [2])
-};
-
-const float M_PI = 3.141592653589793;
 const float c_MinRoughness = 0.04;
-
-vec3 specularReflection(PBRInfo pbrInputs)
-{
-  return pbrInputs.reflectance0 + (pbrInputs.reflectance90 - pbrInputs.reflectance0) * pow(clamp(1.0 - pbrInputs.VdotH, 0.0, 1.0), 5.0);
-}
-
-float geometricOcclusion(PBRInfo pbrInputs)
-{
-  mediump float NdotL = pbrInputs.NdotL;
-  mediump float NdotV = pbrInputs.NdotV;
-  lowp float r = pbrInputs.alphaRoughness;
-
-  lowp float attenuationL = 2.0 * NdotL / (NdotL + sqrt(r * r + (1.0 - r * r) * (NdotL * NdotL)));
-  lowp float attenuationV = 2.0 * NdotV / (NdotV + sqrt(r * r + (1.0 - r * r) * (NdotV * NdotV)));
-  return attenuationL * attenuationV;
-}
-
-float microfacetDistribution(PBRInfo pbrInputs)
-{
-  mediump float roughnessSq = pbrInputs.alphaRoughness * pbrInputs.alphaRoughness;
-  lowp float f = (pbrInputs.NdotH * roughnessSq - pbrInputs.NdotH) * pbrInputs.NdotH + 1.0;
-  return roughnessSq / (M_PI * f * f);
-}
 
 vec3 linear(vec3 color)
 {
@@ -181,35 +156,45 @@ void main()
   // Roughness is authored as perceptual roughness; as is convention,
   // convert to material roughness by squaring the perceptual roughness [2].
   perceptualRoughness = clamp(perceptualRoughness, c_MinRoughness, 1.0);
-  lowp float alphaRoughness = perceptualRoughness * perceptualRoughness;
 
-  lowp vec3 f0 = vec3(0.04);
-  lowp vec3 diffuseColor = baseColor.rgb * (vec3(1.0) - f0);
-  diffuseColor *= (1.0 - metallic);
-  lowp vec3 specularColor = mix(f0, baseColor.rgb, metallic);
+  // Material ior
+  lowp vec3 f0 = vec3(uDielectricSpecular);
 
-  // Compute reflectance.
-  lowp float reflectance = max(max(specularColor.r, specularColor.g), specularColor.b);
-
-  // For typical incident reflectance range (between 4% to 100%) set the grazing reflectance to 100% for typical fresnel effect.
-  // For very low reflectance range on highly diffuse objects (below 4%), incrementally reduce grazing reflecance to 0%.
-  lowp float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);
-  lowp vec3 specularEnvironmentR0 = specularColor.rgb;
-  lowp vec3 specularEnvironmentR90 = vec3(1.0, 1.0, 1.0) * reflectance90;
+  // Material Specular
+  float specularWeight = 1.0;
+  vec4 materialSpecularTexture = vec4(1.0);
+#ifdef MATERIAL_SPECULAR_TEXTURE
+  materialSpecularTexture.a = texture(sSpecular, vUV).a;
+#endif
+#ifdef MATERIAL_SPECULAR_COLOR_TEXTURE
+  materialSpecularTexture.rgb = texture(sSpecularColor, vUV).rgb;
+#endif
+  specularWeight = uSpecularFactor * materialSpecularTexture.a;
+  f0 = min(f0 * uSpecularColorFactor * materialSpecularTexture.rgb, vec3(1.0));
+  f0 = mix(f0, baseColor.rgb, metallic);
 
   mediump vec3 v = normalize(vPositionToCamera); // Vector from surface point to camera
   mediump float NdotV = clamp(abs(dot(n, v)), 0.001, 1.0);
   mediump vec3 reflection = -normalize(reflect(v, n));
-
-  lowp vec3 color = vec3(0.0);
-  lowp vec3 diffuseLight = linear(texture(sDiffuseEnvSampler, n * uYDirection).rgb);
-  lowp vec3 specularLight = linear(texture(sSpecularEnvSampler, reflection * uYDirection).rgb);
-  // retrieve a scale and bias to F0. See [1], Figure 3
   lowp vec3 brdf = linear(texture(sbrdfLUT, vec2(NdotV, 1.0 - perceptualRoughness)).rgb);
+  vec3 Fr = max(vec3(1.0 - perceptualRoughness), f0) - f0;
+  vec3 k_S = f0 + Fr * pow(1.0 - NdotV, 5.0);
+  vec3 FssEss = specularWeight * (k_S * brdf.x + brdf.y);
 
-  lowp vec3 diffuse = diffuseLight * diffuseColor;
-  lowp vec3 specular = specularLight * (specularColor * brdf.x + brdf.y);
-  color += (diffuse + specular) * uIblIntensity;
+  // Specular Light
+  lowp vec3 specularLight = linear(texture(sSpecularEnvSampler, reflection * uYDirection).rgb);
+  lowp vec3 specular = specularLight * FssEss;
+
+  // Diffuse Light
+  lowp vec3 diffuseColor = mix(baseColor.rgb, vec3(0), metallic);
+  lowp vec3 irradiance = linear(texture(sDiffuseEnvSampler, n * uYDirection).rgb);
+  float Ems = (1.0 - (brdf.x + brdf.y));
+  vec3 F_avg = specularWeight * (f0 + (1.0 - f0) / 21.0);
+  vec3 FmsEms = Ems * FssEss * F_avg / (1.0 - F_avg * Ems);
+  vec3 k_D = diffuseColor * (1.0 - FssEss + FmsEms);
+  lowp vec3 diffuse = (FmsEms + k_D) * irradiance;
+
+  lowp vec3 color = (diffuse + specular) * uIblIntensity;
 
 #ifdef OCCLUSION
   lowp float ao = texture(sOcclusion, vUV).r;

@@ -218,6 +218,9 @@ void ModelNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParam
   actor.RegisterProperty("uColorFactor", matDef.mBaseColorFactor);
   actor.RegisterProperty("uMetallicFactor", matDef.mMetallic);
   actor.RegisterProperty("uRoughnessFactor", matDef.mRoughness);
+  actor.RegisterProperty("uDielectricSpecular", matDef.mDielectricSpecular);
+  actor.RegisterProperty("uSpecularFactor", matDef.mSpecularFactor);
+  actor.RegisterProperty("uSpecularColorFactor", matDef.mSpecularColorFactor);
   actor.RegisterProperty("uNormalScale", matDef.mNormalScale);
   if(matDef.mFlags & MaterialDefinition::OCCLUSION)
   {

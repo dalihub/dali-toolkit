@@ -168,6 +168,20 @@ const auto MATERIAL_PBR_READER = std::move(js::Reader<gt::Material::Pbr>()
                                              .Register(*js::MakeProperty("roughnessFactor", js::Read::Number<float>, &gt::Material::Pbr::mRoughnessFactor))
                                              .Register(*js::MakeProperty("metallicRoughnessTexture", js::ObjectReader<gt::TextureInfo>::Read, &gt::Material::Pbr::mMetallicRoughnessTexture)));
 
+const auto MATERIAL_SPECULAR_READER = std::move(js::Reader<gt::MaterialSpecular>()
+                                                  .Register(*js::MakeProperty("specularFactor", js::Read::Number<float>, &gt::MaterialSpecular::mSpecularFactor))
+                                                  .Register(*js::MakeProperty("specularTexture", js::ObjectReader<gt::TextureInfo>::Read, &gt::MaterialSpecular::mSpecularTexture))
+                                                  .Register(*js::MakeProperty("specularColorFactor", gt::ReadDaliVector<Vector3>, &gt::MaterialSpecular::mSpecularColorFactor))
+                                                  .Register(*js::MakeProperty("specularColorTexture", js::ObjectReader<gt::TextureInfo>::Read, &gt::MaterialSpecular::mSpecularColorTexture)));
+
+const auto MATERIAL_IOR_READER = std::move(js::Reader<gt::MaterialIor>()
+                                             .Register(*js::MakeProperty("ior", js::Read::Number<float>, &gt::MaterialIor::mIor)));
+
+
+const auto MATERIAL_EXTENSION_READER = std::move(js::Reader<gt::MaterialExtensions>()
+                                                   .Register(*js::MakeProperty("KHR_materials_ior", js::ObjectReader<gt::MaterialIor>::Read, &gt::MaterialExtensions::mMaterialIor))
+                                                   .Register(*js::MakeProperty("KHR_materials_specular", js::ObjectReader<gt::MaterialSpecular>::Read, &gt::MaterialExtensions::mMaterialSpecular)));
+
 const auto MATERIAL_READER = std::move(js::Reader<gt::Material>()
                                          .Register(*new js::Property<gt::Material, std::string_view>("name", js::Read::StringView, &gt::Material::mName))
                                          .Register(*js::MakeProperty("pbrMetallicRoughness", js::ObjectReader<gt::Material::Pbr>::Read, &gt::Material::mPbrMetallicRoughness))
@@ -177,7 +191,8 @@ const auto MATERIAL_READER = std::move(js::Reader<gt::Material>()
                                          .Register(*js::MakeProperty("emissiveFactor", gt::ReadDaliVector<Vector3>, &gt::Material::mEmissiveFactor))
                                          .Register(*js::MakeProperty("alphaMode", gt::ReadStringEnum<gt::AlphaMode>, &gt::Material::mAlphaMode))
                                          .Register(*js::MakeProperty("alphaCutoff", js::Read::Number<float>, &gt::Material::mAlphaCutoff))
-                                         .Register(*js::MakeProperty("doubleSided", js::Read::Boolean, &gt::Material::mDoubleSided)));
+                                         .Register(*js::MakeProperty("doubleSided", js::Read::Boolean, &gt::Material::mDoubleSided))
+                                         .Register(*js::MakeProperty("extensions", js::ObjectReader<gt::MaterialExtensions>::Read, &gt::Material::mMaterialExtensions)));
 
 std::map<gt::Attribute::Type, gt::Ref<gt::Accessor>> ReadMeshPrimitiveAttributes(const json_value_s& j)
 {
@@ -501,6 +516,28 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
     matDef.mEmissiveFactor = m.mEmissiveFactor;
+  }
+
+  if(m.mMaterialExtensions.mMaterialIor.mIor < MAXFLOAT)
+  {
+    float ior = m.mMaterialExtensions.mMaterialIor.mIor;
+    matDef.mDielectricSpecular = powf((ior-1.0f)/(ior+1.0f), 2.0f);
+  }
+  matDef.mSpecularFactor      = m.mMaterialExtensions.mMaterialSpecular.mSpecularFactor;
+  matDef.mSpecularColorFactor = m.mMaterialExtensions.mMaterialSpecular.mSpecularColorFactor;
+
+  if(m.mMaterialExtensions.mMaterialSpecular.mSpecularTexture)
+  {
+    const auto semantic = MaterialDefinition::SPECULAR;
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mMaterialExtensions.mMaterialSpecular.mSpecularTexture)});
+    matDef.mFlags |= semantic;
+  }
+
+  if(m.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture)
+  {
+    const auto semantic = MaterialDefinition::SPECULAR_COLOR;
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture)});
+    matDef.mFlags |= semantic;
   }
 
   matDef.mDoubleSided = m.mDoubleSided;
@@ -1153,6 +1190,9 @@ void SetObjectReaders()
   js::SetObjectReader(TEXURE_READER);
   js::SetObjectReader(TEXURE_INFO_READER);
   js::SetObjectReader(MATERIAL_PBR_READER);
+  js::SetObjectReader(MATERIAL_SPECULAR_READER);
+  js::SetObjectReader(MATERIAL_IOR_READER);
+  js::SetObjectReader(MATERIAL_EXTENSION_READER);
   js::SetObjectReader(MATERIAL_READER);
   js::SetObjectReader(MESH_PRIMITIVE_READER);
   js::SetObjectReader(MESH_READER);

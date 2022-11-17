@@ -244,6 +244,16 @@ Index ShaderDefinitionFactory::ProduceShader(const NodeDefinition& nodeDef)
     shaderDef.mDefines.push_back("SSS");
   }
 
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
+  {
+    shaderDef.mDefines.push_back("MATERIAL_SPECULAR_TEXTURE");
+  }
+
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
+  {
+    shaderDef.mDefines.push_back("MATERIAL_SPECULAR_COLOR_TEXTURE");
+  }
+
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
   {
     shaderDef.mDefines.push_back("OCCLUSION");
