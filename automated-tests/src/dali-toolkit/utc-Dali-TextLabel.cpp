@@ -1508,7 +1508,6 @@ int UtcDaliToolkitTextlabelScrollingN(void)
   const bool enabled = label.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>();
   DALI_TEST_CHECK(!enabled);
 
-
   label.SetProperty(TextLabel::Property::MULTI_LINE, false);
   label.SetProperty(TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 1);
   label.SetProperty(TextLabel::Property::AUTO_SCROLL_SPEED, 9999.0f);
@@ -2038,6 +2037,47 @@ int UtcDaliToolkitTextlabelTextFit(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextlabelTextFitStressTest(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelTextFitStressTest");
+  TextLabel label = TextLabel::New();
+  Vector2   size(460.0f, 100.0f);
+  label.SetProperty(Actor::Property::SIZE, size);
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world");
+
+  // connect to the text git changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChangedCallback);
+  bool textFitChangedSignal = false;
+  label.ConnectSignal(testTracker, "textFitChanged", CallbackFunctor(&textFitChangedSignal));
+  gTextFitChangedCallBackCalled = false;
+
+  // check point size with veryvery big range
+  Property::Map textFitMapSet;
+  textFitMapSet["enable"]       = true;
+  textFitMapSet["minSize"]      = 10.f;
+  textFitMapSet["maxSize"]      = 10000.f;
+  textFitMapSet["stepSize"]     = -1.0f;
+  textFitMapSet["fontSizeType"] = "pointSize";
+
+  label.SetProperty(Toolkit::DevelTextLabel::Property::TEXT_FIT, textFitMapSet);
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 120.f);
+
+  application.GetScene().Add(label);
+
+  application.SendNotification();
+  application.Render();
+
+  const Vector3 EXPECTED_NATURAL_SIZE(450.0f, 96.0f, 0.0f);
+  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION);
+
+  DALI_TEST_CHECK(gTextFitChangedCallBackCalled);
+  DALI_TEST_CHECK(textFitChangedSignal);
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextlabelMaxTextureSet(void)
 {
   ToolkitTestApplication application;
@@ -2137,7 +2177,6 @@ int UtcDaliToolkitTextlabelMaxTextureSet(void)
   label.SetProperty(Actor::Property::SIZE, Vector2(max_value, 30.0f));
   application.SendNotification();
   application.Render();
-
 
   END_TEST;
 }
@@ -2686,7 +2725,6 @@ int utcDaliTextLabelGeometryOneGlyph(void)
 
   END_TEST;
 }
-
 
 int utcDaliTextLabelGeometryNullPtr(void)
 {
