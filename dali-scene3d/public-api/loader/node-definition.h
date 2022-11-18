@@ -259,7 +259,8 @@ public: // DATA
   Vector3    mScale       = Vector3::ONE;
   Vector3    mSize        = Vector3::ONE;
 
-  bool mIsVisible = true;
+  bool mIsVisible    = true;
+  bool mInheritColor = false;
 
   std::unique_ptr<Renderable>              mRenderable;
   std::unique_ptr<CustomizationDefinition> mCustomization;

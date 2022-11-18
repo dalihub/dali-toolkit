@@ -176,7 +176,8 @@ const auto MATERIAL_READER = std::move(js::Reader<gt::Material>()
                                          .Register(*js::MakeProperty("emissiveTexture", js::ObjectReader<gt::TextureInfo>::Read, &gt::Material::mEmissiveTexture))
                                          .Register(*js::MakeProperty("emissiveFactor", gt::ReadDaliVector<Vector3>, &gt::Material::mEmissiveFactor))
                                          .Register(*js::MakeProperty("alphaMode", gt::ReadStringEnum<gt::AlphaMode>, &gt::Material::mAlphaMode))
-                                         .Register(*js::MakeProperty("alphaCutoff", js::Read::Number<float>, &gt::Material::mAlphaCutoff)));
+                                         .Register(*js::MakeProperty("alphaCutoff", js::Read::Number<float>, &gt::Material::mAlphaCutoff))
+                                         .Register(*js::MakeProperty("doubleSided", js::Read::Boolean, &gt::Material::mDoubleSided)));
 
 std::map<gt::Attribute::Type, gt::Ref<gt::Accessor>> ReadMeshPrimitiveAttributes(const json_value_s& j)
 {
@@ -430,7 +431,7 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
   MaterialDefinition matDef;
 
   auto& pbr = m.mPbrMetallicRoughness;
-  if(m.mAlphaMode != gt::AlphaMode::OPAQUE || pbr.mBaseColorFactor.a < 1.f)
+  if(pbr.mBaseColorFactor.a < 1.f)
   {
     matDef.mFlags |= MaterialDefinition::TRANSPARENCY;
   }
@@ -484,7 +485,6 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
     matDef.mNeedNormalTexture = false;
   }
 
-  // TODO: handle doubleSided
   if(m.mOcclusionTexture)
   {
     const auto semantic = MaterialDefinition::OCCLUSION;
@@ -502,6 +502,8 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
     matDef.mFlags |= semantic;
     matDef.mEmissiveFactor = m.mEmissiveFactor;
   }
+
+  matDef.mDoubleSided = m.mDoubleSided;
 
   outMaterials.emplace_back(std::move(matDef), TextureSet());
 }
@@ -791,6 +793,7 @@ void ConvertNode(gt::Node const& node, const Index gltfIdx, Index parentIdx, Con
       childModel->mMeshIdx = meshIdx;
 
       child->mRenderable.reset(childModel);
+      child->mInheritColor = true;
 
       scene.AddNode(std::move(child));
 

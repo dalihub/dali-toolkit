@@ -195,9 +195,14 @@ Index ShaderDefinitionFactory::ProduceShader(const NodeDefinition& nodeDef)
 
   ShaderDefinition shaderDef;
   shaderDef.mUseBuiltInShader = true;
-  shaderDef.mRendererState    = RendererState::DEPTH_TEST | RendererState::DEPTH_WRITE | RendererState::CULL_BACK;
+  shaderDef.mRendererState    = RendererState::DEPTH_TEST | RendererState::DEPTH_WRITE;
 
-  auto&      materialDef     = *receiver.mMaterialDef;
+  auto& materialDef = *receiver.mMaterialDef;
+  if(!materialDef.mDoubleSided)
+  {
+    shaderDef.mRendererState |= RendererState::CULL_BACK;
+  }
+
   const bool hasTransparency = MaskMatch(materialDef.mFlags, MaterialDefinition::TRANSPARENCY);
   if(hasTransparency)
   {

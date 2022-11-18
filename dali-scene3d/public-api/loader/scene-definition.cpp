@@ -526,7 +526,7 @@ void SceneDefinition::GetCustomizationOptions(const Customization::Choices& choi
 
 NodeDefinition* SceneDefinition::AddNode(std::unique_ptr<NodeDefinition>&& nodeDef)
 {
-  if(FindNode(nodeDef->mName))
+  if(!nodeDef->mName.empty() && FindNode(nodeDef->mName))
   {
     return nullptr;
   }
