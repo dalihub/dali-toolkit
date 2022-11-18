@@ -33,7 +33,8 @@ precision mediump float;
 #endif //GLTF_CHANNELS
 #endif //THREE_TEX
 
-uniform lowp vec4 uColorFactor;
+uniform lowp vec4 uColor; // Color from SceneGraph
+uniform lowp vec4 uColorFactor; // Color from material
 uniform lowp float uMetallicFactor;
 uniform lowp float uRoughnessFactor;
 
@@ -221,5 +222,5 @@ void main()
   color += emissive;
 #endif // EMISSIVE
 
-  FragColor = vec4(pow(color, vec3(1.0 / 2.2)), baseColor.a);
+  FragColor = vec4(pow(color, vec3(1.0 / 2.2)), baseColor.a) * uColor;
 }
