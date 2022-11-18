@@ -75,6 +75,16 @@ SceneView::~SceneView()
     // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
     Adaptor::Get().RemoveIdle(mIblLoadedCallback);
   }
+
+  if(Stage::IsInstalled())
+  {
+    if(mRenderTask)
+    {
+      RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+      taskList.RemoveTask(mRenderTask);
+      mRenderTask.Reset();
+    }
+  }
 }
 
 Dali::Scene3D::SceneView SceneView::New()
@@ -173,7 +183,7 @@ void SceneView::SelectCamera(const std::string& name)
   UpdateCamera(GetCamera(name));
 }
 
-void SceneView::RegisterSceneItem(Scene3D::Internal::ImageBasedLightObserver *item)
+void SceneView::RegisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* item)
 {
   if(item)
   {
@@ -182,7 +192,7 @@ void SceneView::RegisterSceneItem(Scene3D::Internal::ImageBasedLightObserver *it
   }
 }
 
-void SceneView::UnregisterSceneItem(Scene3D::Internal::ImageBasedLightObserver *item)
+void SceneView::UnregisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* item)
 {
   if(item)
   {
