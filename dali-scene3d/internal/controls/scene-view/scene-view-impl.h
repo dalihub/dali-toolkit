@@ -237,7 +237,7 @@ private:
   void OnWindowResized(Window window, Window::WindowSize size);
 
   /**
-   * @brief Update camera's projection orientation according to the screen orientation.
+   * @brief Updates camera's projection orientation according to the screen orientation.
    */
   void RotateCamera();
 
@@ -246,6 +246,7 @@ private:
 
   /////////////////////////////////////////////////////////////
   // FrameBuffer and Rendertask to render child objects as a 3D Scene
+  Dali::WeakHandle<Dali::Window>                           mWindow;
   CameraActor                                              mDefaultCamera;
   CameraActor                                              mSelectedCamera;
   std::vector<CameraActor>                                 mCameras;

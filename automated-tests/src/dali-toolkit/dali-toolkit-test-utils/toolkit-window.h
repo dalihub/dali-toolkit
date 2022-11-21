@@ -85,6 +85,7 @@ public:
   KeyEventSignalType&           KeyEventSignal();
   TouchEventSignalType&         TouchedSignal();
   ResizeSignalType&             ResizeSignal();
+  Dali::RenderTaskList          GetRenderTaskList();
 
 public:
   explicit Window(Internal::Adaptor::Window* window);
