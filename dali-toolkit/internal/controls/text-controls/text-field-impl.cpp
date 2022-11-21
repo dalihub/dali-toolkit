@@ -1215,6 +1215,11 @@ Rect<float> TextField::GetCharacterBoundingRectangle(const uint32_t charIndex) c
   return mController->GetCharacterBoundingRectangle(charIndex);
 }
 
+int TextField::GetCharacterIndexAtPosition(float visualX, float visualY) const
+{
+  return mController->GetCharacterIndexAtPosition(visualX, visualY);
+}
+
 void TextField::SetSpannedText(const Text::Spanned& spannedText)
 {
   mController->SetSpannedText(spannedText);

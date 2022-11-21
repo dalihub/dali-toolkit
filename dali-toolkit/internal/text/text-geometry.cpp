@@ -25,6 +25,7 @@
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
+#include <algorithm>
 
 using namespace Dali;
 
@@ -400,6 +401,126 @@ Rect<> GetCharacterBoundingRect(ModelPtr textModel, const uint32_t charIndex)
   return {characterX, characterY, characterWidth, characterHeight};
 }
 
+int GetCharIndexAtPosition(ModelPtr textModel, float visualX, float visualY)
+{
+  if(textModel == nullptr)
+  {
+    return -1;
+  }
+
+  VisualModelPtr& visualModel = textModel->mVisualModel;
+
+  const int totalNumberOfGlyphs = visualModel->mGlyphs.Count();
+  const int totalNumberOfLines  = visualModel->mLines.Count();
+
+  if((0 == totalNumberOfGlyphs) ||
+     (0 == totalNumberOfLines))
+  {
+    return -1;
+  }
+
+  //The top point of the view = 0.
+  if(visualY < 0)
+  {
+    return -1;
+  }
+
+  const Vector<LineRun>& lines = visualModel->mLines;
+
+  float lineTop   = 0.f;
+  int   lineIndex = -1;
+  int   high      = totalNumberOfLines;
+  int   low       = -1;
+  int   guess;
+
+  // Searching for the correct line.
+  while(high - low > 1)
+  {
+    guess = (high + low) / 2;
+    Vector<LineRun>::ConstIterator it = lines.Begin() + guess;
+
+    lineTop = GetLineTop(lines, *it);
+
+    if(lineTop > visualY)
+    {
+      high = guess;
+    }
+    else
+    {
+      low = guess;
+    }
+  }
+
+  if(low < 0)
+  {
+    lineIndex = 0;
+  }
+  else
+  {
+    lineIndex = low;
+  }
+
+  bool isLastLine = lineIndex + 1 == totalNumberOfLines;
+
+  if(isLastLine)
+  {
+    const LineRun& line = *(visualModel->mLines.Begin() + lineIndex);
+    float lineHeight = GetLineHeight(line, isLastLine);
+
+    // If the visualY is placed after the last line.
+    if(visualY > lineTop + lineHeight)
+    {
+      return -1;
+    }
+  }
+
+  // Check if a line is not found; return -1.
+  if(lineIndex == -1)
+  {
+    return -1;
+  }
+
+ // Start searching for the visualX
+  const LineRun& line = *(visualModel->mLines.Begin() + lineIndex);
+
+  visualX -= line.alignmentOffset;
+
+  // Positions of the glyphs
+  const Vector2* const positionsBuffer = visualModel->mGlyphPositions.Begin();
+
+  const CharacterIndex startCharacter = line.characterRun.characterIndex;
+  const CharacterIndex endCharacter   = line.characterRun.characterIndex + line.characterRun.numberOfCharacters - 1;
+
+  CharacterIndex characterIndexAtPosition = -1;
+  CharacterIndex characterIndex           = startCharacter;
+  float characterPosition;
+  float rightMostCharacterPosition;
+
+  for(; characterIndex != endCharacter; characterIndex++)
+  {
+    characterPosition = positionsBuffer[characterIndex].x;
+    rightMostCharacterPosition = positionsBuffer[characterIndex+1].x;
+
+    if(visualX < rightMostCharacterPosition && visualX >= characterPosition)
+    {
+      characterIndexAtPosition = characterIndex;
+      break;
+    }
+  }
+
+  if(characterIndex == endCharacter)
+  {
+    // If the visualX is within the last character position or it comes after the last character; we return the last character.
+    rightMostCharacterPosition = positionsBuffer[endCharacter].x + GetCharacterWidth(visualModel->mGlyphs[endCharacter]);
+
+    if(visualX >= positionsBuffer[endCharacter].x && visualX < rightMostCharacterPosition)
+    {
+      characterIndexAtPosition = endCharacter;
+    }
+  }
+
+  return characterIndexAtPosition;
+}
 } // namespace Text
 
 } // namespace Toolkit

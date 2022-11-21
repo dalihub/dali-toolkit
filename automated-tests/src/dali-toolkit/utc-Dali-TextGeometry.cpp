@@ -527,3 +527,160 @@ int UtcDaliTextGeometryWithVerticalLineAlignmentBottomGetCharacterBoundingRectan
 
   END_TEST;
 }
+
+int UtcDaliTextGeometryGetCharacterIndexAtPositionTextLabel(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextGeometryGetCharacterIndexAtPositionTextLabel");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+
+  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
+  label.SetProperty(TextLabel::Property::TEXT, "sara سارة");
+
+  application.SendNotification();
+  application.Render();
+
+  int characterIndex = TextGeometry::GetCharacterIndexAtPosition(label, 1, 1);
+
+  int expectedCharacterIndex = 0;
+
+  DALI_TEST_EQUALS(characterIndex, expectedCharacterIndex, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextGeometryGetCharacterIndexAtPositionTextEditor(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextGeometryGetCharacterIndexAtPositionTextEditor");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  application.GetScene().Add(editor);
+
+  editor.SetProperty(Actor::Property::SIZE, Vector2(160.0f, 250.f));
+  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
+  editor.SetProperty(TextEditor::Property::TEXT, "Hello everyone.");
+
+  application.SendNotification();
+  application.Render();
+
+  int characterIndex = TextGeometry::GetCharacterIndexAtPosition(editor, 2, 2);
+
+  int expectedCharacterIndex = 0;
+
+  DALI_TEST_EQUALS(characterIndex, expectedCharacterIndex, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextGeometryGetCharacterIndexAtPositionTextField(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextGeometryGetCharacterIndexAtPositionTextField");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+
+  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  field.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 350.f));
+  field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
+  field.SetProperty(TextField::Property::TEXT, "مرحبا بالعالم");
+
+  application.SendNotification();
+  application.Render();
+
+  int characterIndex = TextGeometry::GetCharacterIndexAtPosition(field, 18.6, 6);
+
+  int expectedCharacterIndex = 12;
+
+  DALI_TEST_EQUALS(characterIndex, expectedCharacterIndex, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextGeometryGetCharacterIndexAtPositionTextLabelEmptyText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextGeometryGetCharacterIndexAtPositionTextLabelEmptyText");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+
+  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
+  label.SetProperty(TextLabel::Property::TEXT, "");
+
+  application.SendNotification();
+  application.Render();
+
+  int characterIndex = TextGeometry::GetCharacterIndexAtPosition(label, 1, 0);
+
+  int expectedCharacterIndex = -1;
+
+  DALI_TEST_EQUALS(characterIndex, expectedCharacterIndex, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextGeometryGetCharacterIndexAtPositionLastCharacter(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextGeometryGetCharacterIndexAtPositionLastCharacter");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+
+  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
+  label.SetProperty(TextLabel::Property::TEXT, "Hello");
+
+  application.SendNotification();
+  application.Render();
+
+  int characterIndex = TextGeometry::GetCharacterIndexAtPosition(label, 57, 2);
+
+  int expectedCharacterIndex = 4;
+
+  DALI_TEST_EQUALS(characterIndex, expectedCharacterIndex, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextGeometryGetCharacterIndexAtPositionXExceedsTextWidth(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextGeometryGetCharacterIndexAtPositionXExceedsTextWidth");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+
+  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
+  label.SetProperty(TextLabel::Property::TEXT, "Hello");
+
+  application.SendNotification();
+  application.Render();
+
+  int characterIndex = TextGeometry::GetCharacterIndexAtPosition(label, 150, 1);
+
+  int expectedCharacterIndex = -1;
+
+  DALI_TEST_EQUALS(characterIndex, expectedCharacterIndex, TEST_LOCATION);
+
+  END_TEST;
+}

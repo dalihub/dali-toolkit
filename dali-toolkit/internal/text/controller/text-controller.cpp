@@ -1431,6 +1431,11 @@ Rect<float> Controller::GetCharacterBoundingRectangle(const uint32_t charIndex)
   return GetCharacterBoundingRect(mImpl->mModel, charIndex);
 }
 
+int Controller::GetCharacterIndexAtPosition(float visualX, float visualY)
+{
+  return GetCharIndexAtPosition(mImpl->mModel, visualX, visualY);
+}
+
 Rect<> Controller::GetTextBoundingRectangle(CharacterIndex startIndex, CharacterIndex endIndex)
 {
   Vector<Vector2> sizeList;

@@ -377,6 +377,16 @@ public:
   Rect<float> GetCharacterBoundingRectangle(const uint32_t charIndex) const;
 
   /**
+   * @brief Get the character index.
+   * If the text is not yet rendered or the text is empty, -1 is returned.
+   *
+   * @param[in] visualX visual x position.
+   * @param[in] visualY visual y position.
+   * @return character index.
+   */
+  int GetCharacterIndexAtPosition(float visualX, float visualY) const;
+
+  /**
    * @brief Set the @p spannedText into current textEditor
    * the spanned text contains content (text) and  format (spans with ranges)
    * the text is copied into text-controller and the spans are applied on ranges

@@ -374,6 +374,11 @@ Rect<float> TextEditor::GetCharacterBoundingRectangle(const uint32_t charIndex) 
   return mController->GetCharacterBoundingRectangle(charIndex);
 }
 
+int TextEditor::GetCharacterIndexAtPosition(float visualX, float visualY) const
+{
+  return mController->GetCharacterIndexAtPosition(visualX, visualY);
+}
+
 void TextEditor::SetSpannedText(const Text::Spanned& spannedText)
 {
   mController->SetSpannedText(spannedText);
