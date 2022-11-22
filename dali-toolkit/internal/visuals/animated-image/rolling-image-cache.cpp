@@ -92,7 +92,7 @@ TextureSet RollingImageCache::Frame(uint32_t frameIndex)
     // If the frame of frameIndex was already loaded, load batch from the last frame of queue
     if(!mQueue.IsEmpty())
     {
-      batchFrameIndex = (mQueue.Back().mUrlIndex + 1) % mImageUrls.size();
+      batchFrameIndex = (mQueue.Back().mUrlIndex + 1) % static_cast<uint32_t>(mImageUrls.size());
     }
     LoadBatch(batchFrameIndex);
   }
