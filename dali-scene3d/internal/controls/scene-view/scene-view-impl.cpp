@@ -399,12 +399,20 @@ Quaternion SceneView::GetSkyboxOrientation() const
 
 void SceneView::OnSceneConnection(int depth)
 {
-  UpdateRenderTask();
-
   Window window = DevelWindow::Get(Self());
   if(window)
   {
     window.ResizeSignal().Connect(this, &SceneView::OnWindowResized);
+    RenderTaskList taskList = window.GetRenderTaskList();
+    mRenderTask             = taskList.CreateTask();
+    mRenderTask.SetSourceActor(mRootLayer);
+    mRenderTask.SetExclusive(true);
+    mRenderTask.SetInputEnabled(true);
+    mRenderTask.SetCullMode(false);
+    mRenderTask.SetScreenToFrameBufferMappingActor(Self());
+
+    UpdateRenderTask();
+    mWindow = window;
   }
 
   Control::OnSceneConnection(depth);
@@ -414,11 +422,18 @@ void SceneView::OnSceneDisconnection()
 {
   mItems.clear();
 
-  Window window = DevelWindow::Get(Self());
+  Window window = mWindow.GetHandle();
   if(window)
   {
     window.ResizeSignal().Disconnect(this, &SceneView::OnWindowResized);
+    RenderTaskList taskList = window.GetRenderTaskList();
+    if(mRenderTask)
+    {
+      taskList.RemoveTask(mRenderTask);
+      mRenderTarget.Reset();
+    }
   }
+  mWindow.Reset();
 
   Control::OnSceneDisconnection();
 }
@@ -434,14 +449,6 @@ void SceneView::OnInitialize()
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_ORIENTATION, false);
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_SCALE, false);
   self.Add(mRootLayer);
-
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
-  mRenderTask             = taskList.CreateTask();
-  mRenderTask.SetSourceActor(mRootLayer);
-  mRenderTask.SetExclusive(true);
-  mRenderTask.SetInputEnabled(true);
-  mRenderTask.SetCullMode(false);
-  mRenderTask.SetScreenToFrameBufferMappingActor(Self());
 
   mDefaultCamera = Dali::CameraActor::New();
   mDefaultCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);

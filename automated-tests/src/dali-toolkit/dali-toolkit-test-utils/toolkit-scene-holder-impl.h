@@ -127,6 +127,8 @@ public:
 
   Dali::RenderSurfaceInterface& GetRenderSurface();
 
+  Dali::RenderTaskList GetRenderTaskList();
+
 protected:
 
   TestRenderSurface mRenderSurface;

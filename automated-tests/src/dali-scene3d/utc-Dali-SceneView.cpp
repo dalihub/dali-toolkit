@@ -302,15 +302,19 @@ int UtcDaliSceneViewOnScene02(void)
   Scene3D::SceneView view = Scene3D::SceneView::New();
 
   renderTaskCount = application.GetScene().GetRenderTaskList().GetTaskCount();
-  DALI_TEST_EQUALS(2u, renderTaskCount, TEST_LOCATION);
-
-  RenderTask  renderTask = application.GetScene().GetRenderTaskList().GetTask(1u);
-  CameraActor camera     = renderTask.GetCameraActor();
+  DALI_TEST_EQUALS(1u, renderTaskCount, TEST_LOCATION);
 
   application.GetScene().Add(view);
 
   application.SendNotification();
   application.Render();
+
+
+  renderTaskCount = application.GetScene().GetRenderTaskList().GetTaskCount();
+  DALI_TEST_EQUALS(2u, renderTaskCount, TEST_LOCATION);
+
+  RenderTask  renderTask = application.GetScene().GetRenderTaskList().GetTask(1u);
+  CameraActor camera     = renderTask.GetCameraActor();
 
   CameraActor defaultCamera = renderTask.GetCameraActor();
   DALI_TEST_CHECK(defaultCamera);
@@ -721,6 +725,29 @@ int UtcDaliSceneViewSetSkyboxOrientation(void)
   Dali::Quaternion orientation = Dali::Quaternion(Radian(0.5f), Vector3::YAXIS);
   view.SetSkyboxOrientation(orientation);
   DALI_TEST_EQUALS(view.GetSkyboxOrientation(), orientation, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewCreateAndRemoveRenderTask(void)
+{
+  ToolkitTestApplication application;
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+
+  uint32_t renderTaskCount = taskList.GetTaskCount();
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+
+  DALI_TEST_EQUALS(renderTaskCount, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+
+  application.GetScene().Add(view);
+
+  DALI_TEST_EQUALS(renderTaskCount + 1, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+
+  view.Unparent();
+
+  DALI_TEST_EQUALS(renderTaskCount, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
 
   END_TEST;
 }
