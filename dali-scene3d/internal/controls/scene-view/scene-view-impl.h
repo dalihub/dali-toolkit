@@ -235,7 +235,7 @@ private:
   CameraActor                                              mSelectedCamera;
   std::vector<CameraActor>                                 mCameras;
   std::vector<Scene3D::Internal::ImageBasedLightObserver*> mItems;
-  Dali::FrameBuffer                                        mRenderTarget;
+  Dali::FrameBuffer                                        mFrameBuffer;
   Dali::Texture                                            mTexture;
   Dali::RenderTask                                         mRenderTask;
   Layer                                                    mRootLayer;
