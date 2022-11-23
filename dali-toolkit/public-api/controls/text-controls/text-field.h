@@ -523,6 +523,15 @@ public:
   static TextField New();
 
   /**
+   * @brief Creates the TextField control with additional behaviour.
+   *
+   * @SINCE_2_2.3
+   * @param[in] additionalBehaviour Additional control behaviour
+   * @return A handle to the TextField control
+   */
+  static TextField New(ControlBehaviour additionalBehaviour);
+
+  /**
    * @brief Creates an empty handle.
    * @SINCE_1_0.0
    */

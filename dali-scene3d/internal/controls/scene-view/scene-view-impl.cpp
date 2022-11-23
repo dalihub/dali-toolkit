@@ -118,15 +118,15 @@ Dali::Actor CreateSkybox(const std::string& skyboxUrl)
     {Vector3(-1.0f, -1.0f, 1.0f)},
     {Vector3(1.0f, -1.0f, 1.0f)}};
 
-  Dali::Shader       shaderSkybox  = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
-  Dali::VertexBuffer vertexBuffer  = Dali::VertexBuffer::New(Property::Map().Add("aPosition", Property::VECTOR3));
+  Dali::Shader       shaderSkybox = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
+  Dali::VertexBuffer vertexBuffer = Dali::VertexBuffer::New(Property::Map().Add("aPosition", Property::VECTOR3));
   vertexBuffer.SetData(skyboxVertices, sizeof(skyboxVertices) / sizeof(Vertex));
 
   Dali::Geometry skyboxGeometry = Geometry::New();
   skyboxGeometry.AddVertexBuffer(vertexBuffer);
   skyboxGeometry.SetType(Geometry::TRIANGLES);
 
-  Dali::Texture    skyboxTexture   = Dali::Scene3D::Loader::LoadCubeMap(skyboxUrl);
+  Dali::Texture    skyboxTexture  = Dali::Scene3D::Loader::LoadCubeMap(skyboxUrl);
   Dali::TextureSet skyboxTextures = TextureSet::New();
   skyboxTextures.SetTexture(0, skyboxTexture);
 
@@ -399,12 +399,20 @@ Quaternion SceneView::GetSkyboxOrientation() const
 
 void SceneView::OnSceneConnection(int depth)
 {
-  UpdateRenderTask();
-
   Window window = DevelWindow::Get(Self());
   if(window)
   {
     window.ResizeSignal().Connect(this, &SceneView::OnWindowResized);
+    RenderTaskList taskList = window.GetRenderTaskList();
+    mRenderTask             = taskList.CreateTask();
+    mRenderTask.SetSourceActor(mRootLayer);
+    mRenderTask.SetExclusive(true);
+    mRenderTask.SetInputEnabled(true);
+    mRenderTask.SetCullMode(false);
+    mRenderTask.SetScreenToFrameBufferMappingActor(Self());
+
+    UpdateRenderTask();
+    mWindow = window;
   }
 
   Control::OnSceneConnection(depth);
@@ -414,11 +422,18 @@ void SceneView::OnSceneDisconnection()
 {
   mItems.clear();
 
-  Window window = DevelWindow::Get(Self());
+  Window window = mWindow.GetHandle();
   if(window)
   {
     window.ResizeSignal().Disconnect(this, &SceneView::OnWindowResized);
+    RenderTaskList taskList = window.GetRenderTaskList();
+    if(mRenderTask)
+    {
+      taskList.RemoveTask(mRenderTask);
+      mRenderTarget.Reset();
+    }
   }
+  mWindow.Reset();
 
   Control::OnSceneDisconnection();
 }
@@ -434,14 +449,6 @@ void SceneView::OnInitialize()
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_ORIENTATION, false);
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_SCALE, false);
   self.Add(mRootLayer);
-
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
-  mRenderTask             = taskList.CreateTask();
-  mRenderTask.SetSourceActor(mRootLayer);
-  mRenderTask.SetExclusive(true);
-  mRenderTask.SetInputEnabled(true);
-  mRenderTask.SetCullMode(false);
-  mRenderTask.SetScreenToFrameBufferMappingActor(Self());
 
   mDefaultCamera = Dali::CameraActor::New();
   mDefaultCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -519,18 +526,6 @@ void SceneView::UpdateRenderTask()
     Vector3     size        = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
     const float aspectRatio = size.width / size.height;
     mSelectedCamera.SetAspectRatio(aspectRatio);
-    const bool projectionVertical = mSelectedCamera.GetProperty<int>(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION) == Dali::DevelCameraActor::VERTICAL;
-
-    // if projectionVertical, Top / Bottom is +-ve to keep consistency with orthographic values
-    // else, Left / Right is +-ve to keep consistency with orthographic values
-    const float orthographicSize = DALI_LIKELY(projectionVertical) ? mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE] : mSelectedCamera[Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE];
-    const float halfHeight       = DALI_LIKELY(projectionVertical) ? orthographicSize : orthographicSize / aspectRatio;
-    const float halfWidth        = DALI_LIKELY(projectionVertical) ? orthographicSize * aspectRatio : orthographicSize;
-
-    mSelectedCamera[Dali::CameraActor::Property::LEFT_PLANE_DISTANCE]   = -halfWidth;
-    mSelectedCamera[Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE]  = halfWidth;
-    mSelectedCamera[Dali::CameraActor::Property::TOP_PLANE_DISTANCE]    = halfHeight;
-    mSelectedCamera[Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE] = -halfHeight;
 
     if(mUseFrameBuffer)
     {

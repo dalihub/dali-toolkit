@@ -209,10 +209,10 @@ Toolkit::TextField::InputStyle::Mask ConvertInputStyle(Text::InputStyle::Mask in
 
 } // namespace
 
-Toolkit::TextField TextField::New()
+Toolkit::TextField TextField::New(ControlBehaviour additionalBehaviour)
 {
   // Create the implementation, temporarily owned by this handle on stack
-  IntrusivePtr<TextField> impl = new TextField();
+  IntrusivePtr<TextField> impl = new TextField(additionalBehaviour);
 
   // Pass ownership to CustomActor handle
   Toolkit::TextField handle(*impl);
@@ -1167,8 +1167,8 @@ void TextField::OnIdleSignal()
   mIdleCallback = NULL;
 }
 
-TextField::TextField()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+TextField::TextField(ControlBehaviour additionalBehaviour)
+: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mIdleCallback(NULL),
   mAlignmentOffset(0.f),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),

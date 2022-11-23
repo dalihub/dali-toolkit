@@ -233,10 +233,10 @@ Toolkit::TextEditor::InputStyle::Mask ConvertInputStyle(Text::InputStyle::Mask i
 
 } // namespace
 
-Toolkit::TextEditor TextEditor::New()
+Toolkit::TextEditor TextEditor::New(ControlBehaviour additionalBehaviour)
 {
   // Create the implementation, temporarily owned by this handle on stack
-  IntrusivePtr<TextEditor> impl = new TextEditor();
+  IntrusivePtr<TextEditor> impl = new TextEditor(additionalBehaviour);
 
   // Pass ownership to CustomActor handle
   Toolkit::TextEditor handle(*impl);
@@ -1366,8 +1366,8 @@ void TextEditor::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type typ
   mController->ChangedLayoutDirection();
 }
 
-TextEditor::TextEditor()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+TextEditor::TextEditor(ControlBehaviour additionalBehaviour)
+: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mAnimationPeriod(0.0f, 0.0f),
   mIdleCallback(NULL),
   mAlignmentOffset(0.f),

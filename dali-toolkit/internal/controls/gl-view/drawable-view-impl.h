@@ -28,8 +28,8 @@
 #include "gl-view-interface-impl.h"
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/gl-view/gl-view-interface-impl.h>
 #include <dali-toolkit/internal/controls/gl-view/drawable-view-native-renderer.h>
+#include <dali-toolkit/internal/controls/gl-view/gl-view-interface-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
 
@@ -45,7 +45,6 @@ protected:
   virtual ~DrawableView();
 
 public:
-
   /**
    * @brief Creates GlView interface object using DrawableView implementation
    *
@@ -91,7 +90,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::GlView::RenderOnce()
    */
-  void RenderOnce();
+  void RenderOnce() override;
+
+  /**
+   * @copydoc Dali::Toolkit::GlView::BindTextureResources()
+   */
+  void BindTextureResources(std::vector<Dali::Texture> textures) override;
 
 private: // From Control
   /**
@@ -135,8 +139,7 @@ private:
   void AddRenderer();
 
 private:
-
-  bool OnRenderCallback( const RenderCallbackInput& renderCallbackInput );
+  bool OnRenderCallback(const RenderCallbackInput& renderCallbackInput);
 
 private:
   Dali::Toolkit::GlView::RenderingMode mRenderingMode;
@@ -170,6 +173,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali
+} // namespace Dali::Toolkit
 
 #endif // DALI_TOOLKIT_INTERNAL_DRAWABLE_VIEW_H

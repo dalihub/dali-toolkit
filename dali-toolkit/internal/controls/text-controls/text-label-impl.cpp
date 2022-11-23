@@ -1214,8 +1214,8 @@ void TextLabel::OnAccessibilityStatusChanged()
   CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
 }
 
-TextLabel::TextLabel(ControlBehaviour additionalBehavior)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehavior)),
+TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
+: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mTextUpdateNeeded(false),
   mLastAutoScrollEnabled(false)

@@ -25,10 +25,8 @@
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/public-api/signals/render-callback.h>
 
-
 using namespace Dali;
 using namespace Dali::Toolkit;
-
 
 // Positive test case for a method
 int UtcDaliGlViewDirectRenderingNew(void)
@@ -189,22 +187,28 @@ int UtcDaliGlViewDirectRenderingOnSizeSet(void)
 
 namespace DirectRenderingCode
 {
-
 // Internal callback function
-void glInit(void)
+void glInit(Dali::RenderCallbackInput& input)
 {
 }
 
-int glRenderFrame(void)
+int glRenderFrame(Dali::RenderCallbackInput& input)
 {
   static unsigned int retFlag = 0;
   return retFlag++;
 }
 
-void glTerminate(void)
+int gBoundTextureCount = 0;
+
+int glRenderFrameWithTextures(Dali::RenderCallbackInput& input)
 {
+  gBoundTextureCount = input.textureBindings.size();
+  return 1;
 }
 
+void glTerminate(Dali::RenderCallbackInput& input)
+{
+}
 
 // Internal callback function
 void glInitMT(Dali::RenderCallbackInput& input)
@@ -227,7 +231,7 @@ void resizeCB(Vector2 size)
 {
 }
 
-}
+} // namespace DirectRenderingCode
 
 int UtcDaliGlViewDirectRenderingRegisterGlCallbacksN(void)
 {
@@ -396,8 +400,6 @@ int UtcDaliGlViewDirectRenderingTerminateCallback(void)
   application.SendNotification();
   application.Render();
 
-
-
   //To GlViewRenderThread can recognize Resize signal the main thread have to sleep.
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
@@ -405,6 +407,52 @@ int UtcDaliGlViewDirectRenderingTerminateCallback(void)
   application.Render();
 
   DALI_TEST_CHECK(true);
+  END_TEST;
+}
+
+int UtcDaliGlViewDirectRenderingTextureBinding(void)
+{
+  ToolkitTestApplication application;
+
+  GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
+
+  view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
+  view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
+  view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInit), Dali::MakeCallback(DirectRenderingCode::glRenderFrameWithTextures), Dali::MakeCallback(DirectRenderingCode::glTerminate));
+  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::SIZE, Vector2(360.0f, 360.0f));
+
+  // Set size on the actor (half the window size to show that glClear() and scissor test work together)
+  view.SetProperty(Actor::Property::SIZE, Size(100, 100));
+  view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
+
+  application.GetScene().Add(view);
+
+  // Prepare texture 1
+  Texture   texture1   = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 512, 512);
+  auto*     data1      = reinterpret_cast<uint8_t*>(malloc(512 * 512 * 4));
+  PixelData pixelData1 = PixelData::New(data1, 512 * 512 * 4, 512, 512, Pixel::Format::RGBA8888, PixelData::ReleaseFunction::FREE);
+  texture1.Upload(pixelData1);
+
+  // Prepare texture 2
+  Texture   texture2   = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 512, 512);
+  auto*     data2      = reinterpret_cast<uint8_t*>(malloc(512 * 512 * 4));
+  PixelData pixelData2 = PixelData::New(data2, 512 * 512 * 4, 512, 512, Pixel::Format::RGBA8888, PixelData::ReleaseFunction::FREE);
+  texture2.Upload(pixelData2);
+
+  std::vector<Texture> texturesToBind;
+  texturesToBind.push_back(texture1);
+  texturesToBind.push_back(texture2);
+
+  view.BindTextureResources(texturesToBind);
+
+  DirectRenderingCode::gBoundTextureCount = 0;
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(DirectRenderingCode::gBoundTextureCount, texturesToBind.size(), TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -439,9 +487,9 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene(void)
 
   // Set size on the actor (half the window size to show that glClear() and scissor test work together)
   view.SetProperty(Actor::Property::SIZE, Size(100, 100));
-  view.SetProperty(Actor::Property::POSITION, Vector2(0,0));
+  view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
 
-  while( DirectRenderingCode::gDRFramesRendered < 1 )
+  while(DirectRenderingCode::gDRFramesRendered < 1)
   {
     application.SendNotification();
     application.Render();
@@ -452,7 +500,6 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene(void)
 
 extern "C" bool gDirectRenderingFailCreateShader;
 extern "C" bool gDirectRenderingFailCreateProgram;
-
 
 int UtcDaliGlViewDirectRenderingThreadedOnScene1(void)
 {
@@ -473,9 +520,9 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene1(void)
 
   // Set size on the actor (half the window size to show that glClear() and scissor test work together)
   view.SetProperty(Actor::Property::SIZE, Size(100, 100));
-  view.SetProperty(Actor::Property::POSITION, Vector2(0,0));
+  view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
 
-  while( DirectRenderingCode::gDRFramesRendered < 1 )
+  while(DirectRenderingCode::gDRFramesRendered < 1)
   {
     application.SendNotification();
     application.Render();
@@ -503,9 +550,9 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene2(void)
 
   // Set size on the actor (half the window size to show that glClear() and scissor test work together)
   view.SetProperty(Actor::Property::SIZE, Size(100, 100));
-  view.SetProperty(Actor::Property::POSITION, Vector2(0,0));
+  view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
 
-  while( DirectRenderingCode::gDRFramesRendered < 1 )
+  while(DirectRenderingCode::gDRFramesRendered < 1)
   {
     application.SendNotification();
     application.Render();
