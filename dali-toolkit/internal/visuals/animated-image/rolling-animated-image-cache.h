@@ -116,14 +116,25 @@ private:
   bool IsFrontReady() const;
 
   /**
-   * @brief Request to Load a frame
+   * @brief Request to Load a frame asynchronously
    *
-   * @param[in] frameIndex          index of frame to be loaded.
-   * @param[in] synchronousLoading  true if the frame should be loaded synchronously
+   * @param[in] frameIndex index of frame to be loaded.
    *
    * @return the texture set currently loaded.
    */
-  TextureSet RequestFrameLoading(uint32_t frameIndex, bool synchronousLoading);
+  TextureSet RequestFrameLoading(uint32_t frameIndex);
+
+  /**
+   * @brief Request to Load a frame
+   *
+   * @param[in] frameIndex             Index of frame to be loaded.
+   * @param[in] synchronousLoading     True if the frame should be loaded synchronously
+   * @param[in,out] preMultiplyOnLoad  True if the image color should be multiplied by it's alpha. Set to false if the
+   *                                   image has no alpha channel
+   *
+   * @return the texture set currently loaded.
+   */
+  TextureSet RequestFrameLoading(uint32_t frameIndex, bool synchronousLoading, TextureManager::MultiplyOnLoad& preMultiplyOnLoading);
 
   /**
    * @brief Load the next batch of images
@@ -159,8 +170,9 @@ private:
    * @param[in] loadSuccess whether the loading is succeded or not.
    * @param[in] textureSet textureSet for this frame.
    * @param[in] interval interval between this frame and next frame.
+   * @param[in] preMultiplied whether the texture is premultied alpha or not.
    */
-  void MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t interval);
+  void MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t interval, bool preMultiplied);
 
   /**
    * @brief Pop front entity of Cache.
@@ -195,7 +207,6 @@ private:
   Dali::WrapMode::Type       mWrapModeU : 3;
   Dali::WrapMode::Type       mWrapModeV : 3;
   bool                       mIsSynchronousLoading;
-  bool                       mPreMultiplyOnLoad;
 };
 
 } // namespace Internal

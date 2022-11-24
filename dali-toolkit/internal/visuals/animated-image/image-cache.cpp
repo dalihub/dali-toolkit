@@ -29,7 +29,8 @@ ImageCache::ImageCache(TextureManager&                     textureManager,
                        TextureManager::MaskingDataPointer& maskingData,
                        ImageCache::FrameReadyObserver&     observer,
                        uint32_t                            batchSize,
-                       uint32_t                            interval)
+                       uint32_t                            interval,
+                       bool                                preMultiplyOnLoad)
 : mTextureManager(textureManager),
   mObserver(observer),
   mMaskingData(maskingData),
@@ -40,6 +41,7 @@ ImageCache::ImageCache(TextureManager&                     textureManager,
   mInterval(interval),
   mLoadState(TextureManager::LoadState::NOT_STARTED),
   mRequestingLoad(false),
+  mPreMultiplyOnLoad(preMultiplyOnLoad),
   mTextureManagerAlive(true)
 {
   mTextureManager.AddObserver(*this);
