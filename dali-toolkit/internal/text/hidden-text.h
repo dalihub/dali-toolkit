@@ -74,7 +74,12 @@ public: // Intended for internal use
    * @param[in] source The original text
    * @param[out] destination The applied text
    */
-  void Substitute(const Vector<Character>& source, Vector<Character>& destination);
+  void Substitute(const Vector<Character>& source, Vector<Character>& destination, Length currentCursorIndex);
+
+  /**
+   * @brief Initialize the value of PreviousTextCount
+   */
+  void InitPreviousTextCount();
 
   /**
    * @brief Invoked when the timer is expired
@@ -89,6 +94,7 @@ private:
   int       mDisplayDuration;
   int       mSubstituteCount;
   Length    mPreviousTextCount;
+  bool      mIsLastCharacterShow;
 };
 
 } // namespace Text
