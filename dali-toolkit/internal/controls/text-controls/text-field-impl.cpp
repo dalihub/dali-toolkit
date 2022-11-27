@@ -1220,6 +1220,11 @@ int TextField::GetCharacterIndexAtPosition(float visualX, float visualY) const
   return mController->GetCharacterIndexAtPosition(visualX, visualY);
 }
 
+Rect<> TextField::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const
+{
+  return mController->GetTextBoundingRectangle(startIndex, endIndex);
+}
+
 void TextField::SetSpannedText(const Text::Spanned& spannedText)
 {
   mController->SetSpannedText(spannedText);

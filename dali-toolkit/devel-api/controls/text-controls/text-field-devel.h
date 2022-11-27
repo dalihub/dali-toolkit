@@ -413,6 +413,16 @@ DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextField textField, const uint32_t
 DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextField textField, const uint32_t startIndex, const uint32_t endIndex);
 
 /**
+ * @brief Gets the bounding box of a specific text range.
+ *
+ * @param[in] textField The instance of textField.
+ * @param[in] startIndex start index of the text requested to get bounding box to.
+ * @param[in] endIndex end index(included) of the text requested to get bounding box to.
+ * @return bounding box of the requested text.
+ */
+DALI_TOOLKIT_API Rect<> GetTextBoundingRectangle(TextField textField, uint32_t startIndex, uint32_t endIndex);
+
+/**
  * @brief Select the whole text of TextField.
  *
  * @param[in] textField The instance of TextField.

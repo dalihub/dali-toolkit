@@ -3080,3 +3080,37 @@ int UtcDaliToolkitTextlabelParagraphTag(void)
 
   END_TEST;
 }
+
+int utcDaliTextLabelGetTextBoundingRectangle(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextLabelGeometryEllipsisMiddle");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 7.f);
+  label.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(TextLabel::Property::TEXT, "Hello this is the Text Bounding Rectangle TC");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  unsigned int startIndex    = 0;
+  unsigned int endIndex      = 15;
+
+  Rect<> textBoundingRectangle = DevelTextLabel::GetTextBoundingRectangle(label, startIndex, endIndex);
+  Rect<> expectedTextBoundingRectangle = {0, 0, 100, 25};
+
+  TestTextGeometryUtils::CheckRectGeometryResult(textBoundingRectangle, expectedTextBoundingRectangle);
+
+  END_TEST;
+}
