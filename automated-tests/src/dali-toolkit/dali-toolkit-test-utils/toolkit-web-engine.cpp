@@ -44,7 +44,7 @@ class WebEngine;
 
 namespace
 {
-static WebEngine* gInstance = NULL;
+static WebEngine* gInstance = nullptr;
 static int gInstanceCount = 0;
 
 bool OnGoBack();
@@ -566,6 +566,11 @@ public:
     mScrollEdgeReachedCallback = callback;
   }
 
+  void RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
+  {
+    mUrlChangedCallback = callback;
+  }
+
   void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
   {
     mNavigationPolicyDecisionCallback = callback;
@@ -589,6 +594,7 @@ public:
   Dali::WebEnginePlugin::WebEnginePageLoadCallback                mPageLoadFinishedCallback;
   Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback           mPageLoadErrorCallback;
   Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback       mScrollEdgeReachedCallback;
+  Dali::WebEnginePlugin::WebEngineUrlChangedCallback              mUrlChangedCallback;
   Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback mNavigationPolicyDecisionCallback;
 
   std::vector<Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback> mResultCallbacks;
@@ -666,6 +672,10 @@ bool OnLoadUrl()
     if (gInstance->mPageLoadErrorCallback)
     {
       gInstance->mPageLoadErrorCallback(gInstance->mUrl, WebView::LoadErrorCode::UNKNOWN);
+    }
+    if (gInstance->mUrlChangedCallback)
+    {
+      gInstance->mUrlChangedCallback("http://new-test");
     }
     if (gInstance->mNavigationPolicyDecisionCallback)
     {
@@ -954,7 +964,12 @@ void WebEngine::RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePa
 
 void WebEngine::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterScrollEdgeReachedCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterScrollEdgeReachedCallback(callback);
+}
+
+void WebEngine::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterUrlChangedCallback(callback);
 }
 
 void WebEngine::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)

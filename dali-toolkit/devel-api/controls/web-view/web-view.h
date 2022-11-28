@@ -385,6 +385,13 @@ public:
   void RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback);
 
   /**
+   * @brief Callback to be called when url is changed.
+   *
+   * @param[in] callback
+   */
+  void RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback);
+
+  /**
    * @brief Callback to be called when navigation policy would be decided.
    *
    * @param[in] callback

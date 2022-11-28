@@ -493,6 +493,14 @@ void WebView::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngine
   }
 }
 
+void WebView::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterUrlChangedCallback(callback);
+  }
+}
+
 void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
 {
   if(mWebEngine)

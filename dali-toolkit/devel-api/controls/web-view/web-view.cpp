@@ -199,6 +199,11 @@ void WebView::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngine
   Dali::Toolkit::GetImpl(*this).RegisterScrollEdgeReachedCallback(callback);
 }
 
+void WebView::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterUrlChangedCallback(callback);
+}
+
 void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
 {
   Dali::Toolkit::GetImpl(*this).RegisterNavigationPolicyDecidedCallback(callback);

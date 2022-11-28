@@ -48,6 +48,7 @@ const char* const TEST_URL2( "http://www.somewhere.valid2.com" );
 static int gPageLoadStartedCallbackCalled = 0;
 static int gPageLoadFinishedCallbackCalled = 0;
 static int gScrollEdgeReachedCallbackCalled = 0;
+static int gUrlChangedCallbackCalled = 0;
 static int gNavigationPolicyDecidedCallbackCalled = 0;
 static int gEvaluateJavaScriptCallbackCalled = 0;
 static bool gTouched = false;
@@ -80,6 +81,11 @@ static void OnPageLoadFinished( const std::string& url )
 static void OnScrollEdgeReached( Dali::WebEnginePlugin::ScrollEdge edge )
 {
   gScrollEdgeReachedCallbackCalled++;
+}
+
+static void OnUrlChanged( WebView view, const std::string& url )
+{
+  gUrlChangedCallbackCalled++;
 }
 
 static void OnNavigationPolicyDecided(std::unique_ptr<Dali::WebEnginePolicyDecision> decision)
@@ -183,10 +189,12 @@ int UtcDaliWebViewPageNavigation(void)
   view.RegisterPageLoadStartedCallback( &OnPageLoadStarted );
   view.RegisterPageLoadFinishedCallback( &OnPageLoadFinished );
   view.RegisterPageLoadErrorCallback( &OnPageLoadError );
+  view.RegisterUrlChangedCallback( &OnUrlChanged );
 
   DALI_TEST_EQUALS( gPageLoadStartedCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadFinishedCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadErrorCallbackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( gUrlChangedCallbackCalled, 0, TEST_LOCATION );
 
   view.LoadUrl( TEST_URL1 );
   view.GetNaturalSize();
@@ -195,6 +203,7 @@ int UtcDaliWebViewPageNavigation(void)
   DALI_TEST_EQUALS( gPageLoadStartedCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadFinishedCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadErrorCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gUrlChangedCallbackCalled, 1, TEST_LOCATION );
 
   view.LoadUrl( TEST_URL2 );
   view.Suspend();
@@ -207,6 +216,7 @@ int UtcDaliWebViewPageNavigation(void)
   DALI_TEST_EQUALS( view.CanGoForward(), false, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadStartedCallbackCalled, 2, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadFinishedCallbackCalled, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( gUrlChangedCallbackCalled, 2, TEST_LOCATION );
 
   view.GoBack();
   Test::EmitGlobalTimerSignal();
