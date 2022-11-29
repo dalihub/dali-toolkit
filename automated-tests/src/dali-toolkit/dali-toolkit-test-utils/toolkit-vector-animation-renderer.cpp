@@ -331,6 +331,10 @@ bool VectorAnimationRenderer::Render(uint32_t frameNumber)
   return Internal::Adaptor::GetImplementation(*this).Render(frameNumber);
 }
 
+void VectorAnimationRenderer::RenderStopped()
+{
+}
+
 uint32_t VectorAnimationRenderer::GetTotalFrameNumber() const
 {
   return Internal::Adaptor::GetImplementation(*this).GetTotalFrameNumber();
