@@ -620,12 +620,19 @@ bool Controller::Relayouter::DoRelayout(Controller& controller, const Size& size
     // Update the visual model.
     bool isAutoScrollEnabled = impl.mIsAutoScrollEnabled;
     bool isAutoScrollMaxTextureExceeded = impl.mIsAutoScrollMaxTextureExceeded;
+    bool isHiddenInputEnabled           = false;
+    if(impl.mHiddenInput && impl.mEventData != nullptr && impl.mHiddenInput->GetHideMode() != Toolkit::HiddenInput::Mode::HIDE_NONE)
+    {
+      isHiddenInputEnabled = true;
+    }
+
     Size newLayoutSize;
     viewUpdated = impl.mLayoutEngine.LayoutText(layoutParameters,
                                                 newLayoutSize,
                                                 elideTextEnabled,
                                                 isAutoScrollEnabled,
                                                 isAutoScrollMaxTextureExceeded,
+                                                isHiddenInputEnabled,
                                                 ellipsisPosition);
     impl.mIsAutoScrollEnabled = isAutoScrollEnabled;
 

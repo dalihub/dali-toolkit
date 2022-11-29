@@ -593,6 +593,7 @@ struct Engine::Impl
    * @param[out] lineLayout The line layout.
    * @param[in] completelyFill Whether to completely fill the line ( even if the last word exceeds the boundaries ).
    * @param[in] ellipsisPosition Where is the location the text elide
+   * @param[in] hiddenInputEnabled Whether the hidden input is enabled.
    */
   void GetLineLayoutForBox(const Parameters&                 parameters,
                            LayoutBidiParameters&             bidiParameters,
@@ -600,7 +601,8 @@ struct Engine::Impl
                            bool                              completelyFill,
                            DevelText::EllipsisPosition::Type ellipsisPosition,
                            bool                              enforceEllipsisInSingleLine,
-                           bool                              elideTextEnabled)
+                           bool                              elideTextEnabled,
+                           bool                              hiddenInputEnabled)
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->GetLineLayoutForBox\n");
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "  initial glyph index : %d\n", lineLayout.glyphIndex);
@@ -736,7 +738,10 @@ struct Engine::Impl
       const float previousTmpLength                    = tmpLineLayout.length;
       const float previousTmpWhiteSpaceLengthEndOfLine = tmpLineLayout.whiteSpaceLengthEndOfLine;
 
-      if(isWhiteSpace)
+      // The calculated text size is used in atlas renderer.
+      // When the text is all white space, partial render issue occurs because the width is 0.
+      // To avoid issue, do not remove the white space size in hidden input mode.
+      if(isWhiteSpace && !hiddenInputEnabled)
       {
         // Add the length to the length of white spaces at the end of the line.
         tmpLineLayout.whiteSpaceLengthEndOfLine += glyphMetrics.advance; // The advance is used as the width is always zero for the white spaces.
@@ -813,7 +818,7 @@ struct Engine::Impl
             tmpLineLayout.numberOfGlyphs -= numberOfGLyphsInGroup;
           }
 
-          if(isRemovedGlyphWhiteSpace)
+          if(isRemovedGlyphWhiteSpace && !hiddenInputEnabled)
           {
             tmpLineLayout.penX -= glyphMetrics.advance;
             tmpLineLayout.length -= glyphMetrics.advance;
@@ -1202,6 +1207,7 @@ struct Engine::Impl
    * @param[in] penY The vertical layout position.
    * @param[in] currentParagraphDirection The current paragraph's direction.
    * @param[in,out] isAutoScrollEnabled If the isAutoScrollEnabled is true and the height of the text exceeds the boundaries of the control the text is elided and the isAutoScrollEnabled is set to false to disable the autoscroll
+   * @param[in] isHiddenInputEnabled Whether the hidden input is enabled.
    * @param[in] ellipsisPosition Where is the location the text elide
    *
    * return Whether the line is ellipsized.
@@ -1216,6 +1222,7 @@ struct Engine::Impl
                     float                             penY,
                     bool&                             isAutoScrollEnabled,
                     bool                              isAutoScrollMaxTextureExceeded,
+                    bool                              isHiddenInputEnabled,
                     DevelText::EllipsisPosition::Type ellipsisPosition,
                     bool                              enforceEllipsisInSingleLine)
   {
@@ -1262,7 +1269,8 @@ struct Engine::Impl
                           true,
                           ellipsisPosition,
                           enforceEllipsisInSingleLine,
-                          true);
+                          true,
+                          isHiddenInputEnabled);
 
       if(ellipsisPosition == DevelText::EllipsisPosition::START && !isMultiline)
       {
@@ -1507,6 +1515,7 @@ struct Engine::Impl
                   bool                              elideTextEnabled,
                   bool&                             isAutoScrollEnabled,
                   bool                              isAutoScrollMaxTextureExceeded,
+                  bool                              isHiddenInputEnabled,
                   DevelText::EllipsisPosition::Type ellipsisPosition)
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->LayoutText\n");
@@ -1691,7 +1700,8 @@ struct Engine::Impl
                           false,
                           ellipsisPosition,
                           false,
-                          elideTextEnabled);
+                          elideTextEnabled,
+                          isHiddenInputEnabled);
 
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "           glyph index %d\n", layout.glyphIndex);
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "       character index %d\n", layout.characterIndex);
@@ -1734,6 +1744,7 @@ struct Engine::Impl
                                 penY,
                                 isAutoScrollEnabled,
                                 isAutoScrollMaxTextureExceeded,
+                                isHiddenInputEnabled,
                                 ellipsisPosition,
                                 false);
       }
@@ -1753,6 +1764,7 @@ struct Engine::Impl
                                   penY,
                                   isAutoScrollEnabled,
                                   isAutoScrollMaxTextureExceeded,
+                                  isHiddenInputEnabled,
                                   ellipsisPosition,
                                   true);
         }
@@ -2154,6 +2166,7 @@ bool Engine::LayoutText(Parameters&                       layoutParameters,
                         bool                              elideTextEnabled,
                         bool&                             isAutoScrollEnabled,
                         bool                              isAutoScrollMaxTextureExceeded,
+                        bool                              isHiddenInputEnabled,
                         DevelText::EllipsisPosition::Type ellipsisPosition)
 {
   return mImpl->LayoutText(layoutParameters,
@@ -2161,6 +2174,7 @@ bool Engine::LayoutText(Parameters&                       layoutParameters,
                            elideTextEnabled,
                            isAutoScrollEnabled,
                            isAutoScrollMaxTextureExceeded,
+                           isHiddenInputEnabled,
                            ellipsisPosition);
 }
 
