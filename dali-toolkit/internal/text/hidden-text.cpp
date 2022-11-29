@@ -190,6 +190,11 @@ void HiddenText::InitPreviousTextCount()
   mPreviousTextCount = 0u;
 }
 
+int HiddenText::GetHideMode()
+{
+  return mHideMode;
+}
+
 bool HiddenText::OnTick()
 {
   if(mObserver != NULL)

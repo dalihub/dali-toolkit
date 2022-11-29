@@ -182,11 +182,13 @@ bool LayoutTextTest(const LayoutTextData& data)
 
   bool       isAutoScroll                   = false;
   bool       isAutoScrollMaxTextureExceeded = false;
+  bool       isHiddenInputEnabled           = false;
   const bool updated                        = engine.LayoutText(layoutParameters,
                                          layoutSize,
                                          data.ellipsis,
                                          isAutoScroll,
                                          isAutoScrollMaxTextureExceeded,
+                                         isHiddenInputEnabled,
                                          data.ellipsisPosition);
 
   // 4) Compare the results.
