@@ -1067,12 +1067,14 @@ Size LayoutText(const RendererParameters& textParameters, TextAbstraction::TextR
   Size newLayoutSize;
   bool isAutoScrollEnabled            = false;
   bool isAutoScrollMaxTextureExceeded = false;
+  bool isHiddenInputEnabled           = false;
 
   layoutEngine.LayoutText(layoutParameters,
                           newLayoutSize,
                           textParameters.ellipsisEnabled,
                           isAutoScrollEnabled,
                           isAutoScrollMaxTextureExceeded,
+                          isHiddenInputEnabled,
                           ellipsisPosition);
 
   return newLayoutSize;

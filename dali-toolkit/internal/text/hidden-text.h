@@ -82,6 +82,12 @@ public: // Intended for internal use
   void InitPreviousTextCount();
 
   /**
+   * @brief Returns the hide mode of hidden text.
+   * @return The hide mode of hidden text.
+   */
+  int GetHideMode();
+
+  /**
    * @brief Invoked when the timer is expired
    */
   bool OnTick();

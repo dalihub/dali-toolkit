@@ -353,11 +353,13 @@ void CreateTextModel(const std::string&                text,
 
   bool isAutoScroll                   = false;
   bool isAutoScrollMaxTextureExceeded = false;
+  bool isHiddenInputEnabled           = false;
   layoutEngine.LayoutText(layoutParameters,
                           layoutSize,
                           false,
                           isAutoScroll,
                           isAutoScrollMaxTextureExceeded,
+                          isHiddenInputEnabled,
                           ellipsisPosition);
 
   if(options.align)
