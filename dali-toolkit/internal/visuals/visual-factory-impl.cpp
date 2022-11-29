@@ -338,7 +338,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageD
       case VisualUrl::GIF:
       case VisualUrl::WEBP:
       {
-        visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl);
+        visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, size);
         break;
       }
       case VisualUrl::JSON:

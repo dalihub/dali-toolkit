@@ -38,8 +38,30 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
   id(id),
   textureId(TextureManagerType::INVALID_TEXTURE_ID),
   dimensions(),
-  fittingMode(),
-  samplingMode(),
+  fittingMode(FittingMode::SCALE_TO_FILL),
+  samplingMode(SamplingMode::BOX_THEN_LINEAR),
+  preMultiplyOnLoad(preMultiplyOnLoad),
+  maskPixelBuffer(),
+  contentScale(1.0f),
+  animatedImageLoading(animatedImageLoading),
+  frameIndex(frameIndex),
+  orientationCorrection(),
+  isMaskTask(false),
+  cropToMask(false),
+  loadPlanes(false),
+  isReady(true)
+{
+}
+
+LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+: AsyncTask(callback),
+  url(),
+  encodedImageBuffer(),
+  id(id),
+  textureId(TextureManagerType::INVALID_TEXTURE_ID),
+  dimensions(dimensions),
+  fittingMode(fittingMode),
+  samplingMode(samplingMode),
   preMultiplyOnLoad(preMultiplyOnLoad),
   maskPixelBuffer(),
   contentScale(1.0f),
@@ -149,7 +171,7 @@ void LoadingTask::Load()
   Devel::PixelBuffer pixelBuffer;
   if(animatedImageLoading)
   {
-    pixelBuffer = animatedImageLoading.LoadFrame(frameIndex);
+    pixelBuffer = animatedImageLoading.LoadFrame(frameIndex, dimensions, fittingMode, samplingMode);
   }
   else if(encodedImageBuffer)
   {

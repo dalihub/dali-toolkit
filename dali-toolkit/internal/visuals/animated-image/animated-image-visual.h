@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,8 +111,9 @@ public:
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to animated image resource to use
+   * @param[in] size The width and height of the image. The visual size will be used if these are 0.
    */
-  static AnimatedImageVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl);
+  static AnimatedImageVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, ImageDimensions size = ImageDimensions());
 
 public: // from Visual
   /**
@@ -141,8 +142,9 @@ protected:
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] shaderFactory The ImageVisualShaderFactory object
+   * @param[in] desiredSize The width and height of the image. The visual size will be used if these are 0.
    */
-  AnimatedImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory);
+  AnimatedImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, ImageDimensions desiredSize);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -284,6 +286,7 @@ private:
   Dali::Toolkit::ImageVisual::LoadPolicy::Type    mLoadPolicy;
   Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
   TextureManager::MaskingDataPointer              mMaskingData;
+  Dali::ImageDimensions                           mDesiredSize;
 
   // Shared variables
   uint32_t        mFrameCount; // Number of frames
@@ -291,11 +294,13 @@ private:
 
   DevelAnimatedImageVisual::Action::Type mActionStatus;
 
-  Dali::WrapMode::Type                   mWrapModeU : 3;
-  Dali::WrapMode::Type                   mWrapModeV : 3;
-  DevelImageVisual::StopBehavior::Type   mStopBehavior : 2;
-  bool                                   mStartFirstFrame : 1;
-  bool                                   mIsJumpTo : 1;
+  Dali::WrapMode::Type                 mWrapModeU : 3;
+  Dali::WrapMode::Type                 mWrapModeV : 3;
+  Dali::FittingMode::Type              mFittingMode : 3;
+  Dali::SamplingMode::Type             mSamplingMode : 4;
+  DevelImageVisual::StopBehavior::Type mStopBehavior : 2;
+  bool                                 mStartFirstFrame : 1;
+  bool                                 mIsJumpTo : 1;
 };
 
 } // namespace Internal

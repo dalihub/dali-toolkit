@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,9 @@ namespace Toolkit
 namespace Internal
 {
 ImageCache::ImageCache(TextureManager&                     textureManager,
+                       ImageDimensions                     size,
+                       Dali::FittingMode::Type             fittingMode,
+                       Dali::SamplingMode::Type            samplingMode,
                        TextureManager::MaskingDataPointer& maskingData,
                        ImageCache::FrameReadyObserver&     observer,
                        uint32_t                            batchSize,
@@ -30,6 +33,9 @@ ImageCache::ImageCache(TextureManager&                     textureManager,
 : mTextureManager(textureManager),
   mObserver(observer),
   mMaskingData(maskingData),
+  mDesiredSize(size),
+  mFittingMode(fittingMode),
+  mSamplingMode(samplingMode),
   mBatchSize(batchSize),
   mInterval(interval),
   mLoadState(TextureManager::LoadState::NOT_STARTED),
