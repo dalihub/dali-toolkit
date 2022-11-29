@@ -70,10 +70,17 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
   Vector<Character>& srcCharacters = impl.mModel->mLogicalModel->mText;
   Vector<Character>  displayCharacters;
   bool               useHiddenText = false;
-  if(impl.mHiddenInput && impl.mEventData != nullptr && !impl.mEventData->mIsShowingPlaceholderText)
+  if(impl.mHiddenInput && impl.mEventData != nullptr)
   {
-    impl.mHiddenInput->Substitute(srcCharacters, displayCharacters);
-    useHiddenText = true;
+    if(impl.mEventData->mIsShowingPlaceholderText)
+    {
+      impl.mHiddenInput->InitPreviousTextCount();
+    }
+    else
+    {
+      impl.mHiddenInput->Substitute(srcCharacters, displayCharacters, impl.mEventData->mPrimaryCursorPosition);
+      useHiddenText = true;
+    }
   }
 
   Vector<Character>& utf32Characters    = useHiddenText ? displayCharacters : srcCharacters;

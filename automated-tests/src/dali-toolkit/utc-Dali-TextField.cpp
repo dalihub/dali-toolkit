@@ -3012,6 +3012,7 @@ int utcDaliTextFieldEvent09(void)
   application.Render();
 
   field.SetProperty(TextField::Property::TEXT, "Hello");
+  field.SetProperty(TextField::Property::PLACEHOLDER_TEXT, "Placeholder text");
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
@@ -3031,6 +3032,12 @@ int utcDaliTextFieldEvent09(void)
   application.ProcessEvent(GenerateKey("d", "", "d", 0, 0, 0, Integration::KeyEvent::DOWN, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
+  for(unsigned int index = 0u; index < 6u; ++index)
+  {
+    application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+    application.SendNotification();
+    application.Render();
+  }
 
   map[HiddenInput::Property::MODE]                 = HiddenInput::Mode::HIDE_ALL;
   map[HiddenInput::Property::SUBSTITUTE_CHARACTER] = 0x23;
