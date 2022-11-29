@@ -91,9 +91,9 @@ int UtcDaliShaderDefinitionFactoryProduceShaderInvalid(void)
   Context ctx;
 
   NodeDefinition nodeDef;
-  nodeDef.mRenderable.reset(new NodeDefinition::Renderable());
+  std::unique_ptr<NodeDefinition::Renderable> renderable = std::unique_ptr<NodeDefinition::Renderable>(new NodeDefinition::Renderable());
+  nodeDef.mRenderables.push_back(std::move(renderable));
 
-  DALI_TEST_EQUAL(INVALID_INDEX, ctx.factory.ProduceShader(nodeDef));
   DALI_TEST_CHECK(ctx.resources.mShaders.empty());
 
   END_TEST;
@@ -250,12 +250,14 @@ int UtcDaliShaderDefinitionFactoryProduceShader(void)
 
   for(auto& ps : permSets)
   {
-    auto modelNode          = new ModelNode();
-    modelNode->mMeshIdx     = 0;
-    modelNode->mMaterialIdx = 0;
+    auto modelRenderable          = new ModelRenderable();
+    modelRenderable->mMeshIdx     = 0;
+    modelRenderable->mMaterialIdx = 0;
 
     NodeDefinition nodeDef;
-    nodeDef.mRenderable.reset(modelNode);
+    std::unique_ptr<NodeDefinition::Renderable> renderable;
+    renderable.reset(modelRenderable);
+    nodeDef.mRenderables.push_back(std::move(renderable));
 
     auto&            meshDef     = NewMeshDefinition(ctx.resources);
     auto&            materialDef = NewMaterialDefinition(ctx.resources);
@@ -270,35 +272,38 @@ int UtcDaliShaderDefinitionFactoryProduceShader(void)
       rendererState = (rendererState | p->rendererStateSet) & ~p->rendererStateClear;
     }
 
-    auto shaderIdx = ctx.factory.ProduceShader(nodeDef);
-    DALI_TEST_EQUAL(ps.shaderIdx, shaderIdx);
-
-    auto& shaderDef = ctx.resources.mShaders[shaderIdx].first;
-    DALI_TEST_EQUAL(shaderDef.mRendererState, rendererState);
-
-    uint32_t definesUnmatched = shaderDef.mDefines.size();
-    for(auto& define : shaderDef.mDefines)
+    for(auto& renderable : nodeDef.mRenderables)
     {
-      auto iFind = defines.find(define);
-      if(iFind != defines.end())
+      auto shaderIdx = ctx.factory.ProduceShader(*renderable);
+      DALI_TEST_EQUAL(ps.shaderIdx, shaderIdx);
+
+      auto& shaderDef = ctx.resources.mShaders[shaderIdx].first;
+      DALI_TEST_EQUAL(shaderDef.mRendererState, rendererState);
+
+      uint32_t definesUnmatched = shaderDef.mDefines.size();
+      for(auto& define : shaderDef.mDefines)
       {
-        defines.erase(iFind);
-        --definesUnmatched;
+        auto iFind = defines.find(define);
+        if(iFind != defines.end())
+        {
+          defines.erase(iFind);
+          --definesUnmatched;
+        }
+        else
+        {
+          break;
+        }
       }
-      else
-      {
-        break;
-      }
+
+      DALI_TEST_CHECK(defines.empty());
+      DALI_TEST_EQUAL(0, definesUnmatched);
+
+      auto uMaxLOD = shaderDef.mUniforms["uMaxLOD"];
+      DALI_TEST_EQUAL(uMaxLOD.GetType(), Property::FLOAT);
+
+      auto uCubeMatrix = shaderDef.mUniforms["uCubeMatrix"];
+      DALI_TEST_EQUAL(uCubeMatrix.GetType(), Property::MATRIX);
     }
-
-    DALI_TEST_CHECK(defines.empty());
-    DALI_TEST_EQUAL(0, definesUnmatched);
-
-    auto uMaxLOD = shaderDef.mUniforms["uMaxLOD"];
-    DALI_TEST_EQUAL(uMaxLOD.GetType(), Property::FLOAT);
-
-    auto uCubeMatrix = shaderDef.mUniforms["uCubeMatrix"];
-    DALI_TEST_EQUAL(uCubeMatrix.GetType(), Property::MATRIX);
 
     ClearMeshesAndMaterials(ctx.resources);
   }

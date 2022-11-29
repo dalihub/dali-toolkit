@@ -234,6 +234,7 @@ public: // DATA
   bool mNeedAlbedoTexture            = true;
   bool mNeedMetallicRoughnessTexture = true;
   bool mNeedNormalTexture            = true;
+  bool mDoubleSided                  = false;
 
   std::vector<TextureStage> mTextureStages;
 };

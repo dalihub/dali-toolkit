@@ -68,7 +68,7 @@ void RetrieveBlendShapeComponents(const std::vector<MeshDefinition::BlendShape>&
   }
 }
 
-uint64_t HashNode(const NodeDefinition& nodeDef, const MaterialDefinition& materialDef, const MeshDefinition& meshDef)
+uint64_t HashNode(const MaterialDefinition& materialDef, const MeshDefinition& meshDef)
 {
   Hash hash;
 
@@ -173,145 +173,155 @@ void ShaderDefinitionFactory::SetResources(ResourceBundle& resources)
   mImpl->mShaderMap.clear();
 }
 
-Index ShaderDefinitionFactory::ProduceShader(const NodeDefinition& nodeDef)
+Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& renderable)
 {
-  DALI_ASSERT_DEBUG(nodeDef.mRenderable);
+  auto& resources = *mImpl->mResources;
 
-  auto&            resources = *mImpl->mResources;
   ResourceReceiver receiver{resources};
-  nodeDef.mRenderable->RegisterResources(receiver);
+  renderable.RegisterResources(receiver);
+
   if(!(receiver.mMeshDef && receiver.mMaterialDef))
   {
+    renderable.mShaderIdx = INVALID_INDEX;
     return INVALID_INDEX;
   }
 
   auto&    shaderMap = mImpl->mShaderMap;
-  uint64_t hash      = HashNode(nodeDef, *receiver.mMaterialDef, *receiver.mMeshDef);
+  uint64_t hash      = HashNode(*receiver.mMaterialDef, *receiver.mMeshDef);
   auto     iFind     = shaderMap.find(hash);
   if(iFind != shaderMap.end())
   {
-    return iFind->second;
+    renderable.mShaderIdx = iFind->second;
   }
-
-  ShaderDefinition shaderDef;
-  shaderDef.mUseBuiltInShader = true;
-  shaderDef.mRendererState    = RendererState::DEPTH_TEST | RendererState::DEPTH_WRITE | RendererState::CULL_BACK;
-
-  auto&      materialDef     = *receiver.mMaterialDef;
-  const bool hasTransparency = MaskMatch(materialDef.mFlags, MaterialDefinition::TRANSPARENCY);
-  if(hasTransparency)
+  else
   {
-    // TODO: this requires more granularity
-    shaderDef.mRendererState = (shaderDef.mRendererState | RendererState::ALPHA_BLEND) & ~RendererState::DEPTH_WRITE;
-  }
+    ShaderDefinition shaderDef;
+    shaderDef.mUseBuiltInShader = true;
+    shaderDef.mRendererState    = RendererState::DEPTH_TEST | RendererState::DEPTH_WRITE;
 
-  if(hasTransparency ||
-     !materialDef.CheckTextures(MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC) ||
-     !materialDef.CheckTextures(MaterialDefinition::NORMAL | MaterialDefinition::ROUGHNESS))
-
-  {
-    shaderDef.mDefines.push_back("THREE_TEX");
-
-    // For the glTF, each of basecolor, metallic_roughness, normal texture is not essential.
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO))
+    auto& materialDef = *receiver.mMaterialDef;
+    if(!materialDef.mDoubleSided)
     {
-      shaderDef.mDefines.push_back("BASECOLOR_TEX");
+      shaderDef.mRendererState |= RendererState::CULL_BACK;
     }
 
-    if(materialDef.CheckTextures(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS))
+    const bool hasTransparency = MaskMatch(materialDef.mFlags, MaterialDefinition::TRANSPARENCY);
+    if(hasTransparency)
     {
-      shaderDef.mDefines.push_back("METALLIC_ROUGHNESS_TEX");
+      // TODO: this requires more granularity
+      shaderDef.mRendererState = (shaderDef.mRendererState | RendererState::ALPHA_BLEND) & ~RendererState::DEPTH_WRITE;
     }
 
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::NORMAL))
+    if(hasTransparency ||
+       !materialDef.CheckTextures(MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC) ||
+       !materialDef.CheckTextures(MaterialDefinition::NORMAL | MaterialDefinition::ROUGHNESS))
+
     {
-      shaderDef.mDefines.push_back("NORMAL_TEX");
-    }
-  }
+      shaderDef.mDefines.push_back("THREE_TEX");
 
-  if(materialDef.GetAlphaCutoff() > 0.f)
-  {
-    shaderDef.mDefines.push_back("ALPHA_TEST");
-  }
-
-  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SUBSURFACE))
-  {
-    shaderDef.mDefines.push_back("SSS");
-  }
-
-  if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
-  {
-    shaderDef.mDefines.push_back("OCCLUSION");
-  }
-
-  if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
-  {
-    shaderDef.mDefines.push_back("EMISSIVE");
-  }
-
-  if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))
-  {
-    shaderDef.mDefines.push_back("GLTF_CHANNELS");
-  }
-
-  const auto& meshDef = *receiver.mMeshDef;
-  if(meshDef.IsSkinned())
-  {
-    shaderDef.mDefines.push_back("SKINNING");
-  }
-
-  if(MaskMatch(meshDef.mFlags, MeshDefinition::FLIP_UVS_VERTICAL))
-  {
-    shaderDef.mDefines.push_back("FLIP_V");
-  }
-
-  if(meshDef.HasBlendShapes())
-  {
-    bool hasPositions = false;
-    bool hasNormals   = false;
-    bool hasTangents  = false;
-    RetrieveBlendShapeComponents(meshDef.mBlendShapes, hasPositions, hasNormals, hasTangents);
-
-    if(hasPositions)
-    {
-      shaderDef.mDefines.push_back("MORPH_POSITION");
-    }
-
-    if(hasNormals)
-    {
-      shaderDef.mDefines.push_back("MORPH_NORMAL");
-    }
-
-    if(hasTangents)
-    {
-      shaderDef.mDefines.push_back("MORPH_TANGENT");
-    }
-
-    if(hasPositions || hasNormals || hasTangents)
-    {
-      shaderDef.mDefines.push_back("MORPH");
-
-      if(BlendShapes::Version::VERSION_2_0 == meshDef.mBlendShapeVersion)
+      // For the glTF, each of basecolor, metallic_roughness, normal texture is not essential.
+      if(MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO))
       {
-        shaderDef.mDefines.push_back("MORPH_VERSION_2_0");
+        shaderDef.mDefines.push_back("BASECOLOR_TEX");
+      }
+
+      if(materialDef.CheckTextures(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS))
+      {
+        shaderDef.mDefines.push_back("METALLIC_ROUGHNESS_TEX");
+      }
+
+      if(MaskMatch(materialDef.mFlags, MaterialDefinition::NORMAL))
+      {
+        shaderDef.mDefines.push_back("NORMAL_TEX");
       }
     }
+
+    if(materialDef.GetAlphaCutoff() > 0.f)
+    {
+      shaderDef.mDefines.push_back("ALPHA_TEST");
+    }
+
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SUBSURFACE))
+    {
+      shaderDef.mDefines.push_back("SSS");
+    }
+
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
+    {
+      shaderDef.mDefines.push_back("OCCLUSION");
+    }
+
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
+    {
+      shaderDef.mDefines.push_back("EMISSIVE");
+    }
+
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))
+    {
+      shaderDef.mDefines.push_back("GLTF_CHANNELS");
+    }
+
+    const auto& meshDef = *receiver.mMeshDef;
+    if(meshDef.IsSkinned())
+    {
+      shaderDef.mDefines.push_back("SKINNING");
+    }
+
+    if(MaskMatch(meshDef.mFlags, MeshDefinition::FLIP_UVS_VERTICAL))
+    {
+      shaderDef.mDefines.push_back("FLIP_V");
+    }
+
+    if(meshDef.HasBlendShapes())
+    {
+      bool hasPositions = false;
+      bool hasNormals   = false;
+      bool hasTangents  = false;
+      RetrieveBlendShapeComponents(meshDef.mBlendShapes, hasPositions, hasNormals, hasTangents);
+
+      if(hasPositions)
+      {
+        shaderDef.mDefines.push_back("MORPH_POSITION");
+      }
+
+      if(hasNormals)
+      {
+        shaderDef.mDefines.push_back("MORPH_NORMAL");
+      }
+
+      if(hasTangents)
+      {
+        shaderDef.mDefines.push_back("MORPH_TANGENT");
+      }
+
+      if(hasPositions || hasNormals || hasTangents)
+      {
+        shaderDef.mDefines.push_back("MORPH");
+
+        if(BlendShapes::Version::VERSION_2_0 == meshDef.mBlendShapeVersion)
+        {
+          shaderDef.mDefines.push_back("MORPH_VERSION_2_0");
+        }
+      }
+    }
+
+    if(meshDef.mTangentType == Property::VECTOR4)
+    {
+      shaderDef.mDefines.push_back("VEC4_TANGENT");
+    }
+
+    shaderDef.mUniforms["uMaxLOD"]     = 6.f;
+    shaderDef.mUniforms["uCubeMatrix"] = Matrix::IDENTITY;
+
+    Index result    = resources.mShaders.size();
+    shaderMap[hash] = result;
+
+    resources.mShaders.emplace_back(std::move(shaderDef), Shader());
+
+    renderable.mShaderIdx = result;
   }
 
-  if(meshDef.mTangentType == Property::VECTOR4)
-  {
-    shaderDef.mDefines.push_back("VEC4_TANGENT");
-  }
-
-  shaderDef.mUniforms["uMaxLOD"]     = 6.f;
-  shaderDef.mUniforms["uCubeMatrix"] = Matrix::IDENTITY;
-
-  Index result    = resources.mShaders.size();
-  shaderMap[hash] = result;
-
-  resources.mShaders.emplace_back(std::move(shaderDef), Shader());
-
-  return result;
+  return renderable.mShaderIdx;
 }
 
 } // namespace Loader
