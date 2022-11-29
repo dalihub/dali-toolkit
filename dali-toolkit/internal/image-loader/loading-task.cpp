@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "image-load-thread.h"
+#include "loading-task.h"
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
@@ -31,10 +31,12 @@ namespace Toolkit
 {
 namespace Internal
 {
-LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
-: url(),
+LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+: AsyncTask(callback),
+  url(),
   encodedImageBuffer(),
   id(id),
+  textureId(TextureManagerType::INVALID_TEXTURE_ID),
   dimensions(),
   fittingMode(),
   samplingMode(),
@@ -46,14 +48,17 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
   orientationCorrection(),
   isMaskTask(false),
   cropToMask(false),
-  loadPlanes(false)
+  loadPlanes(false),
+  isReady(true)
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes)
-: url(url),
+LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
+: AsyncTask(callback),
+  url(url),
   encodedImageBuffer(),
   id(id),
+  textureId(TextureManagerType::INVALID_TEXTURE_ID),
   dimensions(dimensions),
   fittingMode(fittingMode),
   samplingMode(samplingMode),
@@ -65,14 +70,17 @@ LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dime
   orientationCorrection(orientationCorrection),
   isMaskTask(false),
   cropToMask(false),
-  loadPlanes(loadPlanes)
+  loadPlanes(loadPlanes),
+  isReady(true)
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, const EncodedImageBuffer& encodedImageBuffer, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
-: url(),
+LoadingTask::LoadingTask(uint32_t id, const EncodedImageBuffer& encodedImageBuffer, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+: AsyncTask(callback),
+  url(),
   encodedImageBuffer(encodedImageBuffer),
   id(id),
+  textureId(TextureManagerType::INVALID_TEXTURE_ID),
   dimensions(dimensions),
   fittingMode(fittingMode),
   samplingMode(samplingMode),
@@ -84,14 +92,17 @@ LoadingTask::LoadingTask(uint32_t id, const EncodedImageBuffer& encodedImageBuff
   orientationCorrection(orientationCorrection),
   isMaskTask(false),
   cropToMask(false),
-  loadPlanes(false)
+  loadPlanes(false),
+  isReady(true)
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
-: url(""),
+LoadingTask::LoadingTask(uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+: AsyncTask(callback),
+  url(""),
   encodedImageBuffer(),
   id(id),
+  textureId(TextureManagerType::INVALID_TEXTURE_ID),
   dimensions(),
   fittingMode(),
   samplingMode(),
@@ -103,9 +114,34 @@ LoadingTask::LoadingTask(uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::Pix
   orientationCorrection(),
   isMaskTask(true),
   cropToMask(cropToMask),
-  loadPlanes(false)
+  loadPlanes(false),
+  isReady(true)
 {
   pixelBuffers.push_back(pixelBuffer);
+}
+
+LoadingTask::~LoadingTask()
+{
+}
+
+void LoadingTask::Process()
+{
+  isReady = false;
+  if(!isMaskTask)
+  {
+    Load();
+  }
+  else
+  {
+    ApplyMask();
+  }
+  MultiplyAlpha();
+  isReady = true;
+}
+
+bool LoadingTask::IsReady()
+{
+  return isReady;
 }
 
 void LoadingTask::Load()
@@ -165,144 +201,9 @@ void LoadingTask::MultiplyAlpha()
   }
 }
 
-ImageLoadThread::ImageLoadThread(EventThreadCallback* trigger)
-: mTrigger(trigger),
-  mLogFactory(Dali::Adaptor::Get().GetLogFactory())
+void LoadingTask::SetTextureId(TextureManagerType::TextureId id)
 {
-}
-
-ImageLoadThread::~ImageLoadThread()
-{
-  // add an empty task would stop the thread from conditional wait.
-  AddTask(NULL);
-  // stop the thread
-  Join();
-
-  delete mTrigger;
-
-  for(auto&& iter : mLoadQueue)
-  {
-    delete iter;
-  }
-  mLoadQueue.Clear();
-
-  for(auto&& iter : mCompleteQueue)
-  {
-    delete iter;
-  }
-  mCompleteQueue.Clear();
-}
-
-void ImageLoadThread::Run()
-{
-  SetThreadName("ImageLoadThread");
-  mLogFactory.InstallLogFunction();
-
-  while(LoadingTask* task = NextTaskToProcess())
-  {
-    if(!task->isMaskTask)
-    {
-      task->Load();
-    }
-    else
-    {
-      task->ApplyMask();
-    }
-    task->MultiplyAlpha();
-
-    AddCompletedTask(task);
-  }
-}
-
-void ImageLoadThread::AddTask(LoadingTask* task)
-{
-  bool wasEmpty = false;
-  {
-    // Lock while adding task to the queue
-    ConditionalWait::ScopedLock lock(mConditionalWait);
-    wasEmpty = mLoadQueue.Empty();
-    mLoadQueue.PushBack(task);
-  }
-
-  if(wasEmpty)
-  {
-    // wake up the image loading thread
-    mConditionalWait.Notify();
-  }
-}
-
-LoadingTask* ImageLoadThread::NextCompletedTask()
-{
-  // Lock while popping task out from the queue
-  Mutex::ScopedLock lock(mMutex);
-
-  if(mCompleteQueue.Empty())
-  {
-    return NULL;
-  }
-
-  Vector<LoadingTask*>::Iterator next     = mCompleteQueue.Begin();
-  LoadingTask*                   nextTask = *next;
-  mCompleteQueue.Erase(next);
-
-  return nextTask;
-}
-
-bool ImageLoadThread::CancelTask(uint32_t loadingTaskId)
-{
-  // Lock while remove task from the queue
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-
-  for(Vector<LoadingTask*>::Iterator iter = mLoadQueue.Begin(); iter != mLoadQueue.End(); ++iter)
-  {
-    if((*iter)->id == loadingTaskId)
-    {
-      delete(*iter);
-      mLoadQueue.Erase(iter);
-      return true;
-    }
-  }
-
-  return false;
-}
-
-void ImageLoadThread::CancelAll()
-{
-  // Lock while remove task from the queue
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-
-  for(Vector<LoadingTask*>::Iterator iter = mLoadQueue.Begin(); iter != mLoadQueue.End(); ++iter)
-  {
-    delete(*iter);
-  }
-  mLoadQueue.Clear();
-}
-
-LoadingTask* ImageLoadThread::NextTaskToProcess()
-{
-  // Lock while popping task out from the queue
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-
-  while(mLoadQueue.Empty())
-  {
-    mConditionalWait.Wait(lock);
-  }
-
-  Vector<LoadingTask*>::Iterator next     = mLoadQueue.Begin();
-  LoadingTask*                   nextTask = *next;
-  mLoadQueue.Erase(next);
-
-  return nextTask;
-}
-
-void ImageLoadThread::AddCompletedTask(LoadingTask* task)
-{
-  // Lock while adding task to the queue
-  Mutex::ScopedLock lock(mMutex);
-  mCompleteQueue.PushBack(task);
-
-  // wake up the main thread
-  mTrigger->Trigger();
+  textureId = id;
 }
 
 } // namespace Internal

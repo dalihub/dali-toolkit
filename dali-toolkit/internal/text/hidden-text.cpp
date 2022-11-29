@@ -42,7 +42,8 @@ HiddenText::HiddenText(Observer* observer)
   mSubstituteText(STAR),
   mDisplayDuration(DEFAULT_SHOW_DURATION),
   mSubstituteCount(0),
-  mPreviousTextCount(0)
+  mPreviousTextCount(0u),
+  mIsLastCharacterShow(false)
 {
   mTimer = Timer::New(mDisplayDuration);
   mTimer.TickSignal().Connect(this, &HiddenText::OnTick);
@@ -85,7 +86,7 @@ void HiddenText::GetProperties(Property::Map& map)
   map[Toolkit::HiddenInput::Property::SHOW_LAST_CHARACTER_DURATION] = mDisplayDuration;
 }
 
-void HiddenText::Substitute(const Vector<Character>& source, Vector<Character>& destination)
+void HiddenText::Substitute(const Vector<Character>& source, Vector<Character>& destination, Length cursorPos)
 {
   const Length characterCount = source.Count();
 
@@ -125,14 +126,15 @@ void HiddenText::Substitute(const Vector<Character>& source, Vector<Character>& 
     }
     case Toolkit::HiddenInput::Mode::SHOW_LAST_CHARACTER:
     {
+      hideStart = begin;
+      hideEnd   = end;
       if(mPreviousTextCount < characterCount)
       {
-        hideStart = begin;
-        hideEnd   = end - 1;
         if(mDisplayDuration > 0)
         {
           mTimer.SetInterval(mDisplayDuration);
           mTimer.Start();
+          mIsLastCharacterShow = true;
         }
         else
         {
@@ -141,25 +143,51 @@ void HiddenText::Substitute(const Vector<Character>& source, Vector<Character>& 
       }
       else
       {
-        hideStart = begin;
-        hideEnd   = end;
+        mIsLastCharacterShow = false;
       }
       break;
     }
   }
-  for(; begin < end; ++begin)
+
+
+  if(mHideMode == Toolkit::HiddenInput::Mode::SHOW_LAST_CHARACTER)
   {
-    if(begin >= hideStart && begin < hideEnd)
+    Length currentPos = 0u;
+    for(; begin < end; ++begin)
     {
-      *begin = static_cast<uint32_t>(mSubstituteText);
+      if(begin >= hideStart && begin < hideEnd && cursorPos > 0u && currentPos != cursorPos - 1u)
+      {
+        *begin = static_cast<uint32_t>(mSubstituteText);
+      }
+      else
+      {
+        *begin = mIsLastCharacterShow ? *sourcePos : static_cast<uint32_t>(mSubstituteText);
+      }
       sourcePos++;
+      currentPos++;
     }
-    else
+  }
+  else
+  {
+    for(; begin < end; ++begin)
     {
-      *begin = *sourcePos++;
+      if(begin >= hideStart && begin < hideEnd)
+      {
+        *begin = static_cast<uint32_t>(mSubstituteText);
+        sourcePos++;
+      }
+      else
+      {
+        *begin = *sourcePos++;
+      }
     }
   }
   mPreviousTextCount = characterCount;
+}
+
+void HiddenText::InitPreviousTextCount()
+{
+  mPreviousTextCount = 0u;
 }
 
 bool HiddenText::OnTick()
@@ -168,7 +196,7 @@ bool HiddenText::OnTick()
   {
     mObserver->DisplayTimeExpired();
   }
-
+  mIsLastCharacterShow = false;
   return false;
 }
 

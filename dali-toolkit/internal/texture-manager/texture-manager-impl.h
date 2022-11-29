@@ -23,10 +23,10 @@
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/adaptor-framework/round-robin-container-view.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
-#include <dali-toolkit/internal/helpers/round-robin-container-view.h>
 #include <dali-toolkit/internal/texture-manager/texture-cache-manager.h>
 #include <dali-toolkit/internal/texture-manager/texture-manager-type.h>
 #include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
@@ -650,10 +650,7 @@ private:
 
 private:                                    // Member Variables:
   TextureCacheManager mTextureCacheManager; ///< Manager the life-cycle and caching of Textures
-
-  RoundRobinContainerView<TextureAsyncLoadingHelper> mAsyncLocalLoaders;  ///< The Asynchronous image loaders used to provide all local async loads
-  RoundRobinContainerView<TextureAsyncLoadingHelper> mAsyncRemoteLoaders; ///< The Asynchronous image loaders used to provide all remote async loads
-
+  std::unique_ptr<TextureAsyncLoadingHelper> mAsyncLoader;  ///< The Asynchronous image loader used to provide all local async loads
   Dali::Vector<LifecycleObserver*>        mLifecycleObservers;      ///< Lifecycle observers of texture manager
   Dali::Vector<QueueElement>              mLoadQueue;               ///< Queue of textures to load after NotifyObservers
   Dali::Vector<QueueElement>              mRemoveQueue;             ///< Queue of textures to remove after NotifyObservers

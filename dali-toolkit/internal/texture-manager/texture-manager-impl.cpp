@@ -34,8 +34,6 @@
 namespace
 {
 constexpr auto INITIAL_HASH_NUMBER                     = size_t{0u};
-constexpr auto DEFAULT_NUMBER_OF_LOCAL_LOADER_THREADS  = size_t{4u};
-constexpr auto DEFAULT_NUMBER_OF_REMOTE_LOADER_THREADS = size_t{8u};
 
 constexpr auto TEXTURE_INDEX      = 0u; ///< The Index for texture
 constexpr auto MASK_TEXTURE_INDEX = 1u; ///< The Index for mask texture
@@ -43,26 +41,6 @@ constexpr auto MASK_TEXTURE_INDEX = 1u; ///< The Index for mask texture
 constexpr auto NUMBER_OF_LOCAL_LOADER_THREADS_ENV  = "DALI_TEXTURE_LOCAL_THREADS";
 constexpr auto NUMBER_OF_REMOTE_LOADER_THREADS_ENV = "DALI_TEXTURE_REMOTE_THREADS";
 constexpr auto LOAD_IMAGE_YUV_PLANES_ENV           = "DALI_LOAD_IMAGE_YUV_PLANES";
-
-size_t GetNumberOfThreads(const char* environmentVariable, size_t defaultValue)
-{
-  using Dali::EnvironmentVariable::GetEnvironmentVariable;
-  auto           numberString          = GetEnvironmentVariable(environmentVariable);
-  auto           numberOfThreads       = numberString ? std::strtoul(numberString, nullptr, 10) : 0;
-  constexpr auto MAX_NUMBER_OF_THREADS = 100u;
-  DALI_ASSERT_DEBUG(numberOfThreads < MAX_NUMBER_OF_THREADS);
-  return (numberOfThreads > 0 && numberOfThreads < MAX_NUMBER_OF_THREADS) ? numberOfThreads : defaultValue;
-}
-
-size_t GetNumberOfLocalLoaderThreads()
-{
-  return GetNumberOfThreads(NUMBER_OF_LOCAL_LOADER_THREADS_ENV, DEFAULT_NUMBER_OF_LOCAL_LOADER_THREADS);
-}
-
-size_t GetNumberOfRemoteLoaderThreads()
-{
-  return GetNumberOfThreads(NUMBER_OF_REMOTE_LOADER_THREADS_ENV, DEFAULT_NUMBER_OF_REMOTE_LOADER_THREADS);
-}
 
 bool NeedToLoadYuvPlanes()
 {
@@ -132,8 +110,7 @@ TextureManager::MaskingData::MaskingData()
 
 TextureManager::TextureManager()
 : mTextureCacheManager(),
-  mAsyncLocalLoaders(GetNumberOfLocalLoaderThreads(), [&]() { return TextureAsyncLoadingHelper(*this); }),
-  mAsyncRemoteLoaders(GetNumberOfRemoteLoaderThreads(), [&]() { return TextureAsyncLoadingHelper(*this); }),
+  mAsyncLoader(std::unique_ptr<TextureAsyncLoadingHelper>(new TextureAsyncLoadingHelper(*this))),
   mLifecycleObservers(),
   mLoadQueue(),
   mRemoveQueue(),
@@ -551,7 +528,6 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 
     // Update preMultiplyOnLoad value. It should be changed according to preMultiplied value of the cached info.
     preMultiplyOnLoad = mTextureCacheManager[cacheIndex].preMultiplied ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) Using cached texture id@%d, textureId=%d, maskTextureId=%d, frameindex=%d, premultiplied=%d\n", url.GetUrl().c_str(), observer, cacheIndex.GetIndex(), textureId, maskTextureId, frameIndex, mTextureCacheManager[cacheIndex].preMultiplied ? 1 : 0);
   }
 
@@ -563,7 +539,6 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 
     // Cache new texutre, and get cacheIndex.
     cacheIndex = mTextureCacheManager.AppendCache(TextureInfo(textureId, maskTextureId, url, desiredSize, contentScale, fittingMode, samplingMode, false, cropToMask, useAtlas, textureHash, orientationCorrection, preMultiply, animatedImageLoading, frameIndex, loadYuvPlanes));
-
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) New texture, cacheIndex:%d, textureId=%d, maskTextureId=%d, frameindex=%d premultiply=%d\n", url.GetUrl().c_str(), observer, cacheIndex.GetIndex(), textureId, maskTextureId, frameIndex, preMultiply);
   }
 
@@ -587,7 +562,6 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
      TextureManager::LoadState::MASK_CANCELLED != textureInfo.loadState)
   {
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "TextureManager::RequestLoad( url=%s observer=%p ) ForcedReload cacheIndex:%d, textureId=%d, maskTextureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex.GetIndex(), textureId, maskTextureId);
-
     textureInfo.loadState = TextureManager::LoadState::NOT_STARTED;
   }
 
@@ -898,21 +872,17 @@ void TextureManager::QueueLoadTexture(const TextureManager::TextureInfo& texture
 void TextureManager::LoadTexture(TextureManager::TextureInfo& textureInfo, TextureUploadObserver* observer)
 {
   DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureManager::LoadTexture(): url:%s sync:%s\n", textureInfo.url.GetUrl().c_str(), textureInfo.loadSynchronously ? "T" : "F");
-
   textureInfo.loadState = LoadState::LOADING;
   if(!textureInfo.loadSynchronously)
   {
-    auto& loadersContainer  = (textureInfo.url.IsLocalResource() || textureInfo.url.IsBufferResource()) ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
-    auto  loadingHelperIt   = loadersContainer.GetNext();
     auto  premultiplyOnLoad = (textureInfo.preMultiplyOnLoad && textureInfo.maskTextureId == INVALID_TEXTURE_ID) ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
-    DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
     if(textureInfo.animatedImageLoading)
     {
-      loadingHelperIt->LoadAnimatedImage(textureInfo.textureId, textureInfo.animatedImageLoading, textureInfo.frameIndex, premultiplyOnLoad);
+      mAsyncLoader->LoadAnimatedImage(textureInfo.textureId, textureInfo.animatedImageLoading, textureInfo.frameIndex, premultiplyOnLoad);
     }
     else
     {
-      loadingHelperIt->Load(textureInfo.textureId, textureInfo.url, textureInfo.desiredSize, textureInfo.fittingMode, textureInfo.samplingMode, textureInfo.orientationCorrection, premultiplyOnLoad, textureInfo.loadYuvPlanes);
+      mAsyncLoader->Load(textureInfo.textureId, textureInfo.url, textureInfo.desiredSize, textureInfo.fittingMode, textureInfo.samplingMode, textureInfo.orientationCorrection, premultiplyOnLoad, textureInfo.loadYuvPlanes);
     }
   }
   ObserveTexture(textureInfo, observer);
@@ -986,7 +956,6 @@ void TextureManager::AsyncLoadComplete(const TextureManager::TextureId& textureI
     TextureInfo& textureInfo(mTextureCacheManager[cacheIndex]);
 
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "  textureId:%d Url:%s CacheIndex:%d LoadState: %s\n", textureInfo.textureId, textureInfo.url.GetUrl().c_str(), cacheIndex.GetIndex(), GET_LOAD_STATE_STRING(textureInfo.loadState));
-
     if(textureInfo.loadState != LoadState::CANCELLED && textureInfo.loadState != LoadState::MASK_CANCELLED)
     {
       // textureInfo can be invalidated after this call (as the mTextureInfoContainer may be modified)
@@ -1226,11 +1195,8 @@ void TextureManager::ApplyMask(TextureManager::TextureInfo& textureInfo, const T
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureManager::ApplyMask(): url:%s sync:%s\n", textureInfo.url.GetUrl().c_str(), textureInfo.loadSynchronously ? "T" : "F");
 
     textureInfo.loadState   = LoadState::MASK_APPLYING;
-    auto& loadersContainer  = (textureInfo.url.IsLocalResource() || textureInfo.url.IsBufferResource()) ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
-    auto  loadingHelperIt   = loadersContainer.GetNext();
-    auto  premultiplyOnLoad = textureInfo.preMultiplyOnLoad ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
-    DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
-    loadingHelperIt->ApplyMask(textureInfo.textureId, pixelBuffer, maskPixelBuffer, textureInfo.scaleFactor, textureInfo.cropToMask, premultiplyOnLoad);
+    auto premultiplyOnLoad = textureInfo.preMultiplyOnLoad ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
+    mAsyncLoader->ApplyMask(textureInfo.textureId, pixelBuffer, maskPixelBuffer, textureInfo.scaleFactor, textureInfo.cropToMask, premultiplyOnLoad);
   }
 }
 
@@ -1305,7 +1271,6 @@ void TextureManager::NotifyObservers(TextureManager::TextureInfo& textureInfo, c
     // Texture load requests for the same URL are deferred until the end of this
     // method.
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureManager::NotifyObservers() textureId:%d url:%s loadState:%s\n", textureId, info->url.GetUrl().c_str(), GET_LOAD_STATE_STRING(info->loadState));
-
     // It is possible for the observer to be deleted.
     // Disconnect and remove the observer first.
     observer->DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);

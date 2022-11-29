@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
-#include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
+#include <dali-toolkit/internal/visuals/svg/svg-task.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
@@ -93,15 +93,15 @@ void SvgVisual::OnInitialize()
   Vector2 dpi     = Stage::GetCurrent().GetDpi();
   float   meanDpi = (dpi.height + dpi.width) * 0.5f;
 
-  SvgTaskPtr newTask = new SvgLoadingTask(this, mVectorRenderer, mImageUrl, meanDpi);
+  mLoadingTask = new SvgLoadingTask(mVectorRenderer, mImageUrl, meanDpi, MakeCallback(this, &SvgVisual::ApplyRasterizedImage));
 
   if(IsSynchronousLoadingRequired() && mImageUrl.IsLocalResource())
   {
-    newTask->Process();
+    mLoadingTask->Process();
   }
   else
   {
-    mFactoryCache.GetSVGRasterizationManager()->AddTask(newTask);
+    Dali::AsyncTaskManager::Get().AddTask(mLoadingTask);
   }
 }
 
@@ -218,7 +218,11 @@ void SvgVisual::DoSetOnScene(Actor& actor)
 
 void SvgVisual::DoSetOffScene(Actor& actor)
 {
-  mFactoryCache.GetSVGRasterizationManager()->RemoveTask(this);
+  // Remove loading & rasterizing task
+  Dali::AsyncTaskManager::Get().RemoveTask(mLoadingTask);
+  Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
+  mLoadingTask.Reset();
+  mRasterizingTask.Reset();
 
   actor.RemoveRenderer(mImpl->mRenderer);
   mPlacementActor.Reset();
@@ -291,27 +295,28 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
     unsigned int width  = static_cast<unsigned int>(size.width);
     unsigned int height = static_cast<unsigned int>(size.height);
 
-    SvgTaskPtr newTask = new SvgRasterizingTask(this, mVectorRenderer, width, height);
+    mRasterizingTask = new SvgRasterizingTask(mVectorRenderer, width, height, MakeCallback(this, &SvgVisual::ApplyRasterizedImage));
 
     if(IsSynchronousLoadingRequired() && mImageUrl.IsLocalResource())
     {
-      newTask->Process();
-      ApplyRasterizedImage(newTask->GetPixelData(), newTask->HasSucceeded());
+      mRasterizingTask->Process();
+      ApplyRasterizedImage(mRasterizingTask);
     }
     else
     {
-      mFactoryCache.GetSVGRasterizationManager()->AddTask(newTask);
+      Dali::AsyncTaskManager::Get().AddTask(mRasterizingTask);
     }
   }
 }
 
-void SvgVisual::ApplyRasterizedImage(PixelData rasterizedPixelData, bool success)
+void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
 {
-  if(success)
+  if(task->HasSucceeded())
   {
+    PixelData rasterizedPixelData = task->GetPixelData();
     if(mDefaultWidth == 0 || mDefaultHeight == 0)
     {
-      mVectorRenderer.GetDefaultSize(mDefaultWidth, mDefaultHeight);
+      task->GetRenderer().GetDefaultSize(mDefaultWidth, mDefaultHeight);
     }
 
     // Rasterization success
@@ -382,7 +387,7 @@ void SvgVisual::ApplyRasterizedImage(PixelData rasterizedPixelData, bool success
       ResourceReady(Toolkit::Visual::ResourceStatus::READY);
     }
   }
-  else if(!success && !mLoadFailed)
+  else if(!mLoadFailed)
   {
     mLoadFailed = true;
 

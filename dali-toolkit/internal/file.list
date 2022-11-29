@@ -42,7 +42,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/npatch-loader.cpp
    ${toolkit_src_dir}/visuals/npatch/npatch-visual.cpp
    ${toolkit_src_dir}/visuals/primitive/primitive-visual.cpp
-   ${toolkit_src_dir}/visuals/svg/svg-rasterize-thread.cpp
+   ${toolkit_src_dir}/visuals/svg/svg-task.cpp
    ${toolkit_src_dir}/visuals/svg/svg-visual.cpp
    ${toolkit_src_dir}/visuals/text-visual-shader-factory.cpp
    ${toolkit_src_dir}/visuals/text/text-visual.cpp
@@ -65,7 +65,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/buttons/radio-button-impl.cpp
    ${toolkit_src_dir}/controls/buttons/toggle-button-impl.cpp
    ${toolkit_src_dir}/controls/canvas-view/canvas-view-impl.cpp
-   ${toolkit_src_dir}/controls/canvas-view/canvas-view-rasterize-thread.cpp
+   ${toolkit_src_dir}/controls/canvas-view/canvas-view-rasterize-task.cpp
    ${toolkit_src_dir}/controls/control/control-data-impl.cpp
    ${toolkit_src_dir}/controls/control/control-debug.cpp
    ${toolkit_src_dir}/controls/control/control-renderers.cpp
@@ -124,9 +124,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/gl-view/gl-view-impl.cpp
    ${toolkit_src_dir}/controls/gl-view/gl-view-render-thread.cpp
    ${toolkit_src_dir}/accessibility-manager/accessibility-manager-impl.cpp
-
    ${toolkit_src_dir}/feedback/feedback-style.cpp
-
    ${toolkit_src_dir}/focus-manager/keyboard-focus-manager-impl.cpp
    ${toolkit_src_dir}/focus-manager/keyinput-focus-manager-impl.cpp
    ${toolkit_src_dir}/helpers/color-conversion.cpp
@@ -138,7 +136,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/image-loader/async-image-loader-impl.cpp
    ${toolkit_src_dir}/image-loader/atlas-packer.cpp
    ${toolkit_src_dir}/image-loader/image-atlas-impl.cpp
-   ${toolkit_src_dir}/image-loader/image-load-thread.cpp
+   ${toolkit_src_dir}/image-loader/loading-task.cpp
    ${toolkit_src_dir}/image-loader/image-url-impl.cpp
    ${toolkit_src_dir}/styling/style-manager-impl.cpp
    ${toolkit_src_dir}/text/abstract-style-character-run.cpp

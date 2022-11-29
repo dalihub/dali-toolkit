@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <toolkit-event-thread-callback.h>
 #include <unistd.h>
+#include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -33,6 +34,8 @@ static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
 static const char* gImage_50_RGBA = TEST_RESOURCE_DIR "/icon-delete.png";
 // resolution: 128*128, pixel format: RGB888
 static const char* gImage_128_RGB = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
+// animated image
+static const char* gImage_gif = TEST_RESOURCE_DIR "/canvas-none.gif";
 
 // for testing the ImageLoadedSignal
 class ImageLoadedSignalVerifier : public ConnectionTracker
@@ -49,8 +52,11 @@ public:
 
   void ImageLoaded(uint32_t id, PixelData pixelData)
   {
-    mIDs.push_back(id);
-    mPixelDataList.push_back(pixelData);
+    if(pixelData)
+    {
+      mIDs.push_back(id);
+      mPixelDataList.push_back(pixelData);
+    }
     mCount++;
   }
 
@@ -210,12 +216,21 @@ int UtcDaliAsyncImageLoaderLoadAndLoadedSignal(void)
   uint32_t id02 = loader.Load(gImage_50_RGBA, ImageDimensions(25, 25));
   uint32_t id03 = loader.Load(gImage_128_RGB, ImageDimensions(100, 100), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true);
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+  // Try load animted image
+  Dali::AnimatedImageLoading animatedImageLoading = Dali::AnimatedImageLoading::New(gImage_gif, true);
+  DevelAsyncImageLoader::LoadAnimatedImage(loader, animatedImageLoading, 0, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
+
+  // Try apply mask image
+  Devel::PixelBuffer imageData = Devel::PixelBuffer::New(50, 50, Dali::Pixel::RGBA8888);
+  Devel::PixelBuffer maskData = Devel::PixelBuffer::New(50, 50, Dali::Pixel::RGBA8888);
+  DevelAsyncImageLoader::ApplyMask(loader, imageData, maskData, 0.0f, false, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(loadedSignalVerifier.LoadedImageCount() == 3);
+  DALI_TEST_CHECK(loadedSignalVerifier.LoadedImageCount() == 4);
   DALI_TEST_CHECK(loadedSignalVerifier.Verify(id02, 25, 25));
   DALI_TEST_CHECK(loadedSignalVerifier.Verify(id03, 100, 100));
 
@@ -223,7 +238,7 @@ int UtcDaliAsyncImageLoaderLoadAndLoadedSignal(void)
 }
 
 // Note: This is not an ideal test, but we cannot guarantee we can call Cancel() before the image has finished loading.
-int UtcDaliAsyncImageLoaderCancel(void)
+int UtcDaliAsyncImageLoaderCancel01(void)
 {
   ToolkitTestApplication application;
 
@@ -252,6 +267,19 @@ int UtcDaliAsyncImageLoaderCancel(void)
   END_TEST;
 }
 
+int UtcDaliAsyncImageLoaderCancel02(void)
+{
+  ToolkitTestApplication application;
+
+  AsyncImageLoader loader = AsyncImageLoader::New();
+  uint32_t id01 = loader.Load(gImage_34_RGBA, ImageDimensions(34, 34));
+  DALI_TEST_CHECK(loader.Cancel(id01)); // Cancle a task
+
+  application.SendNotification();
+  application.Render();
+  END_TEST;
+}
+
 int UtcDaliAsyncImageLoaderCancelAll(void)
 {
   ToolkitTestApplication application;
@@ -271,6 +299,19 @@ int UtcDaliAsyncImageLoaderCancelAll(void)
   // Test that cancelling a non-existing loading task will return false
   uint32_t id = 1;
   DALI_TEST_CHECK(!(loader.Cancel(id)));
+
+  uint32_t id01 = loader.Load(gImage_34_RGBA, ImageDimensions(34, 34));
+  uint32_t id02 = loader.Load(gImage_50_RGBA, ImageDimensions(25, 25));
+  uint32_t id03 = loader.Load(gImage_128_RGB, ImageDimensions(100, 100), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true);
+  loader.CancelAll();
+
+  // Test that cancelling a non-existing loading task will return false
+  DALI_TEST_CHECK(!(loader.Cancel(id01)));
+  DALI_TEST_CHECK(!(loader.Cancel(id02)));
+  DALI_TEST_CHECK(!(loader.Cancel(id03)));
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

@@ -1226,11 +1226,6 @@ int UtcDaliVisualFactoryGetNPatchVisual9(void)
   DALI_TEST_EQUALS(actor2.GetRendererCount(), 0u, TEST_LOCATION);
 
   application.GetScene().Add(actor2);
-
-  application.SendNotification();
-  application.Render();
-
-  application.SendNotification();
   application.Render();
 
   // Async loading is not finished yet.
