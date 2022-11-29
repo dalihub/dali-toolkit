@@ -168,7 +168,7 @@ int UtcDaliGltfLoaderSuccess1(void)
   DALI_TEST_EQUAL(2u, materials.size());
   const MaterialDefinition materialGroundTruth[]{
     {MaterialDefinition::ALBEDO | MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
-       MaterialDefinition::NORMAL |
+       MaterialDefinition::NORMAL | MaterialDefinition::SPECULAR | MaterialDefinition::SPECULAR_COLOR |
        (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
      0,
      Color::WHITE,
@@ -178,6 +178,9 @@ int UtcDaliGltfLoaderSuccess1(void)
      1.f,
      1.f,
      Vector3(0.2, 0.1, 0.0),
+     0.0f,
+     0.5f,
+     Vector3(0, 0, 1),
      true,
      false,
      true,
@@ -195,6 +198,12 @@ int UtcDaliGltfLoaderSuccess1(void)
        {MaterialDefinition::EMISSIVE,
         {"AnimatedCube_BaseColor.png",
          SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+       {MaterialDefinition::SPECULAR,
+        {"AnimatedCube_BaseColor.png",
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
+       {MaterialDefinition::SPECULAR_COLOR,
+        {"AnimatedCube_BaseColor.png",
+         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT)}},
      }},
     {MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
        MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
@@ -207,6 +216,9 @@ int UtcDaliGltfLoaderSuccess1(void)
      1.f,
      1.f,
      Vector3(0.2, 0.1, 0.0),
+     0.04f,
+     1.0f,
+     Vector3::ONE,
      true,
      true,
      true,
@@ -244,6 +256,9 @@ int UtcDaliGltfLoaderSuccess1(void)
     DALI_TEST_EQUAL(md.mNormalScale, m.mNormalScale);
     DALI_TEST_EQUAL(md.mOcclusionStrength, m.mOcclusionStrength);
     DALI_TEST_EQUAL(md.mEmissiveFactor, m.mEmissiveFactor);
+    DALI_TEST_EQUAL(md.mDielectricSpecular, m.mDielectricSpecular);
+    DALI_TEST_EQUAL(md.mSpecularFactor, m.mSpecularFactor);
+    DALI_TEST_EQUAL(md.mSpecularColorFactor, m.mSpecularColorFactor);
     DALI_TEST_EQUAL(md.mNeedAlbedoTexture, m.mNeedAlbedoTexture);
     DALI_TEST_EQUAL(md.mNeedMetallicRoughnessTexture, m.mNeedMetallicRoughnessTexture);
     DALI_TEST_EQUAL(md.mNeedNormalTexture, m.mNeedNormalTexture);

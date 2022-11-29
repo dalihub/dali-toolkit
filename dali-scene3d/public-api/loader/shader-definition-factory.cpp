@@ -93,6 +93,16 @@ uint64_t HashNode(const MaterialDefinition& materialDef, const MeshDefinition& m
     hash.Add("SSS");
   }
 
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
+  {
+    hash.Add("SPECTEX");
+  }
+
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
+  {
+    hash.Add("SPECCOLTEX");
+  }
+
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
   {
     hash.Add("OCCL" /*USION*/);
@@ -244,6 +254,16 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
     if(MaskMatch(materialDef.mFlags, MaterialDefinition::SUBSURFACE))
     {
       shaderDef.mDefines.push_back("SSS");
+    }
+
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
+    {
+      shaderDef.mDefines.push_back("MATERIAL_SPECULAR_TEXTURE");
+    }
+
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
+    {
+      shaderDef.mDefines.push_back("MATERIAL_SPECULAR_COLOR_TEXTURE");
     }
 
     if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
