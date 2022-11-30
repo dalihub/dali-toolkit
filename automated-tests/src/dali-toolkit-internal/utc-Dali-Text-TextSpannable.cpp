@@ -39,6 +39,7 @@
 #include <toolkit-text-utils.h>
 #include <dali-toolkit/devel-api/text/spans/character-spacing-span.h>
 #include <dali-toolkit/devel-api/text/spans/bold-span.h>
+#include <dali-toolkit/devel-api/text/spans/italic-span.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -116,6 +117,19 @@ Text::SpannableString CreateSpannableStringForBoldSpan()
 
   return spannableString;
 
+}
+
+Text::SpannableString CreateSpannableStringForItalicSpan()
+{
+  Text::SpannableString spannableString = Text::SpannableString::New("Hello");
+  DALI_TEST_CHECK(spannableString);
+
+  auto isAddedItalic = spannableString.AttachSpan(
+  Text::ItalicSpan::New(),
+  Text::Range::New(0u, 3u));
+  DALI_TEST_CHECK(isAddedItalic);
+
+  return spannableString;
 }
 
 void CheckColorIndices(const Text::ColorIndex* const colorIndicesBuffer,
@@ -440,5 +454,31 @@ int UtcDaliToolkitTextLabelSetSpannedText_BoldSpan(void)
   DALI_TEST_EQUALS(validFonts[0].characterRun.GetEndCharacterIndex(),3, TEST_LOCATION);
   DALI_TEST_EQUALS(validFonts[0].isBoldRequired, true, TEST_LOCATION);
 
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelSetSpannedText_ItalicSpan(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliToolkitTextLabelSetSpannedText_ItalicSpan");
+
+  TextLabel textLabel = TextLabel::New();
+  DALI_TEST_CHECK(textLabel);
+
+  application.GetScene().Add(textLabel);
+
+  Text::SpannableString spannableString = CreateSpannableStringForItalicSpan();
+
+  Text::SetSpannedText(textLabel, spannableString);
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextLabel& labelImpl       = GetImpl(textLabel);
+  const Vector<Text::FontRun>& validFontsItalic = labelImpl.GetTextController()->GetTextModel()->GetFontRuns();
+
+  DALI_TEST_EQUALS(validFontsItalic.Count(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFontsItalic[0].characterRun.characterIndex, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFontsItalic[0].characterRun.GetEndCharacterIndex(), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFontsItalic[0].isItalicRequired, true, TEST_LOCATION);
   END_TEST;
 }
