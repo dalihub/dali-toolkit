@@ -423,7 +423,7 @@ SamplerFlags::Type ConvertSampler(const gt::Ref<gt::Sampler>& s)
 {
   if(s)
   {
-    return (s->mMinFilter < gt::Filter::NEAREST_MIPMAP_NEAREST) ? (s->mMinFilter - gt::Filter::NEAREST) : ((s->mMinFilter - gt::Filter::NEAREST_MIPMAP_NEAREST) + 2) | ((s->mMagFilter - gt::Filter::NEAREST) << SamplerFlags::FILTER_MAG_SHIFT) | (ConvertWrapMode(s->mWrapS) << SamplerFlags::WRAP_S_SHIFT) | (ConvertWrapMode(s->mWrapT) << SamplerFlags::WRAP_T_SHIFT);
+    return ((s->mMinFilter < gt::Filter::NEAREST_MIPMAP_NEAREST) ? (s->mMinFilter - gt::Filter::NEAREST) : ((s->mMinFilter - gt::Filter::NEAREST_MIPMAP_NEAREST) + 2)) | ((s->mMagFilter - gt::Filter::NEAREST) << SamplerFlags::FILTER_MAG_SHIFT) | (ConvertWrapMode(s->mWrapS) << SamplerFlags::WRAP_S_SHIFT) | (ConvertWrapMode(s->mWrapT) << SamplerFlags::WRAP_T_SHIFT);
   }
   else
   {
@@ -446,13 +446,15 @@ void ConvertMaterial(const gt::Material& m, decltype(ResourceBundle::mMaterials)
   MaterialDefinition matDef;
 
   auto& pbr = m.mPbrMetallicRoughness;
-  if(pbr.mBaseColorFactor.a < 1.f)
+  if(m.mAlphaMode == gt::AlphaMode::BLEND)
   {
+    matDef.mIsOpaque = false;
     matDef.mFlags |= MaterialDefinition::TRANSPARENCY;
   }
 
   if(m.mAlphaMode == gt::AlphaMode::MASK)
   {
+    matDef.mIsMask = true;
     matDef.SetAlphaCutoff(std::min(1.f, std::max(0.f, m.mAlphaCutoff)));
   }
 
@@ -888,14 +890,19 @@ void ConvertSceneNodes(const gt::Scene& scene, ConversionContext& cctx, bool isM
 
 void ConvertNodes(const gt::Document& doc, ConversionContext& cctx, bool isMRendererModel)
 {
-  ConvertSceneNodes(*doc.mScene, cctx, isMRendererModel);
+  uint32_t rootSceneIndex = 0u;
+  if(doc.mScene)
+  {
+    rootSceneIndex = doc.mScene.GetIndex();
+  }
+  ConvertSceneNodes(doc.mScenes[rootSceneIndex], cctx, isMRendererModel);
 
-  for(uint32_t i = 0, i1 = doc.mScene.GetIndex(); i < i1; ++i)
+  for(uint32_t i = 0, i1 = rootSceneIndex; i < i1; ++i)
   {
     ConvertSceneNodes(doc.mScenes[i], cctx, isMRendererModel);
   }
 
-  for(uint32_t i = doc.mScene.GetIndex() + 1; i < doc.mScenes.size(); ++i)
+  for(uint32_t i = rootSceneIndex + 1; i < doc.mScenes.size(); ++i)
   {
     ConvertSceneNodes(doc.mScenes[i], cctx, isMRendererModel);
   }

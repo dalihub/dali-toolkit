@@ -103,6 +103,16 @@ uint64_t HashNode(const NodeDefinition& nodeDef, const MaterialDefinition& mater
     hash.Add("EMIS" /*SIVE*/);
   }
 
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
+  {
+    hash.Add("SPECTEX");
+  }
+
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
+  {
+    hash.Add("SPECCOLTEX");
+  }
+
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))
   {
     hash.Add("GLTF" /*_CHANNELS*/);
@@ -244,16 +254,6 @@ Index ShaderDefinitionFactory::ProduceShader(const NodeDefinition& nodeDef)
     shaderDef.mDefines.push_back("SSS");
   }
 
-  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
-  {
-    shaderDef.mDefines.push_back("MATERIAL_SPECULAR_TEXTURE");
-  }
-
-  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
-  {
-    shaderDef.mDefines.push_back("MATERIAL_SPECULAR_COLOR_TEXTURE");
-  }
-
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
   {
     shaderDef.mDefines.push_back("OCCLUSION");
@@ -262,6 +262,16 @@ Index ShaderDefinitionFactory::ProduceShader(const NodeDefinition& nodeDef)
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
   {
     shaderDef.mDefines.push_back("EMISSIVE");
+  }
+
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
+  {
+    shaderDef.mDefines.push_back("MATERIAL_SPECULAR_TEXTURE");
+  }
+
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
+  {
+    shaderDef.mDefines.push_back("MATERIAL_SPECULAR_COLOR_TEXTURE");
   }
 
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))

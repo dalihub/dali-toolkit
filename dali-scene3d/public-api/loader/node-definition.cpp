@@ -235,20 +235,10 @@ void ModelNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParam
   actor.RegisterProperty(IBL_INTENSITY_STRING.data(), resources.mEnvironmentMaps[envIdx].first.mIblIntensity);
   actor.RegisterProperty(IBL_Y_DIRECTION.data(), resources.mEnvironmentMaps[envIdx].first.mYDirection);
 
-  float opaque      = 0.0f;
-  float mask        = 0.0f;
+  float opaque      = matDef.mIsOpaque ? 1.0f : 0.0f;
+  float mask        = matDef.mIsMask ? 1.0f : 0.0f;
   float alphaCutoff = matDef.GetAlphaCutoff();
-  if(!MaskMatch(matDef.mFlags, MaterialDefinition::TRANSPARENCY))
-  {
-    opaque = 1.0f;
-  }
-  else
-  {
-    if(alphaCutoff > 0.f)
-    {
-      mask = 1.0f;
-    }
-  }
+
   actor.RegisterProperty("uOpaque", opaque);
   actor.RegisterProperty("uMask", mask);
   actor.RegisterProperty("uAlphaThreshold", alphaCutoff);

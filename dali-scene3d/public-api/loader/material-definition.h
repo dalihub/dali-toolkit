@@ -174,10 +174,10 @@ struct DALI_SCENE3D_API MaterialDefinition
 
   MaterialDefinition() = default;
 
-  MaterialDefinition(const MaterialDefinition&) = delete;
+  MaterialDefinition(const MaterialDefinition&)            = delete;
   MaterialDefinition& operator=(const MaterialDefinition&) = delete;
 
-  MaterialDefinition(MaterialDefinition&&) = default;
+  MaterialDefinition(MaterialDefinition&&)            = default;
   MaterialDefinition& operator=(MaterialDefinition&&) = default;
 
   /**
@@ -241,6 +241,9 @@ public: // DATA
   bool mNeedNormalTexture            = true;
   bool mDoubleSided                  = false;
 
+  bool mIsOpaque = true;
+  bool mIsMask   = false;
+
   std::vector<TextureStage> mTextureStages;
 };
 
@@ -248,4 +251,4 @@ public: // DATA
 } // namespace Scene3D
 } // namespace Dali
 
-#endif //DALI_SCENE3D_LOADER_MATERIAL_DEFINITION_H
+#endif // DALI_SCENE3D_LOADER_MATERIAL_DEFINITION_H

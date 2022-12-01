@@ -55,15 +55,6 @@ uniform sampler2D sAlbedoMetal;
 uniform sampler2D sNormalRoughness;
 #endif
 
-uniform float uSpecularFactor;
-uniform vec3  uSpecularColorFactor;
-#ifdef MATERIAL_SPECULAR_TEXTURE
-uniform sampler2D sSpecular;
-#endif
-#ifdef MATERIAL_SPECULAR_COLOR_TEXTURE
-uniform sampler2D sSpecularColor;
-#endif
-
 #ifdef OCCLUSION
 uniform sampler2D sOcclusion;
 uniform float uOcclusionStrength;
@@ -72,6 +63,15 @@ uniform float uOcclusionStrength;
 #ifdef EMISSIVE
 uniform sampler2D sEmissive;
 uniform vec3 uEmissiveFactor;
+#endif
+
+uniform float uSpecularFactor;
+uniform vec3  uSpecularColorFactor;
+#ifdef MATERIAL_SPECULAR_TEXTURE
+uniform sampler2D sSpecular;
+#endif
+#ifdef MATERIAL_SPECULAR_COLOR_TEXTURE
+uniform sampler2D sSpecularColor;
 #endif
 
 //// For IBL
@@ -146,12 +146,15 @@ void main()
 #endif // THREE_TEX
 
   // The value of uOpaque and uMask can be 0.0 or 1.0.
+  // If uMask is 0.0, a Pixel that has bigger alpha than uAlphaThreashold becomes fully opaque,
+  // in other hand, a pixel that has smaller alpha than uAlphaThreashold becomes fully transparent.
   // If uOpaque is 1.0, alpha value of final color is 1.0;
-  // If uOpaque is 0.0 and uMask is 1.0, alpha value of final color is 0.0 when input alpha is lower than uAlphaThreshold or
-  // 1.0 when input alpha is larger than uAlphaThreshold.
   // https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#_material_alphamode
+  if(uMask > 0.5 && baseColor.a < uAlphaThreshold)
+  {
+    discard;
+  }
   baseColor.a = mix(baseColor.a, 1.0, uOpaque);
-  baseColor.a = min(mix(baseColor.a, floor(baseColor.a - uAlphaThreshold + 1.0), uMask), 1.0);
 
   metallic = clamp(metallic, 0.0, 1.0);
   // Roughness is authored as perceptual roughness; as is convention,
