@@ -244,6 +244,9 @@ public: // DATA
   bool mNeedNormalTexture            = true;
   bool mDoubleSided                  = false;
 
+  bool mIsOpaque = true;
+  bool mIsMask   = false;
+
   std::vector<TextureStage> mTextureStages;
 };
 

@@ -213,6 +213,8 @@ int UtcDaliGltfLoaderSuccess1(void)
      false,
      true,
      false,
+     true,
+     true,
      {
        {MaterialDefinition::ALBEDO,
         {"AnimatedCube_BaseColor.png",
@@ -261,6 +263,8 @@ int UtcDaliGltfLoaderSuccess1(void)
      Vector3::ONE,
      true,
      true,
+     true,
+     false,
      true,
      false,
      {
@@ -313,6 +317,8 @@ int UtcDaliGltfLoaderSuccess1(void)
     DALI_TEST_EQUAL(md.mNeedAlbedoTexture, m.mNeedAlbedoTexture);
     DALI_TEST_EQUAL(md.mNeedMetallicRoughnessTexture, m.mNeedMetallicRoughnessTexture);
     DALI_TEST_EQUAL(md.mNeedNormalTexture, m.mNeedNormalTexture);
+    DALI_TEST_EQUAL(md.mIsOpaque, m.mIsOpaque);
+    DALI_TEST_EQUAL(md.mIsMask, m.mIsMask);
 
     DALI_TEST_EQUAL(md.mTextureStages.size(), m.mTextureStages.size());
     auto iTexture = md.mTextureStages.begin();
@@ -395,6 +401,33 @@ int UtcDaliGltfLoaderSuccess1(void)
   DALI_TEST_EQUAL(0u, ctx.lights.size());
   DALI_TEST_EQUAL(1u, ctx.animations.size());
   DALI_TEST_EQUAL(0u, ctx.animationGroups.size());
+
+  END_TEST;
+}
+
+int UtcDaliGltfLoaderSuccess2(void)
+{
+  Context ctx;
+  ShaderDefinitionFactory sdf;
+  sdf.SetResources(ctx.resources);
+
+  LoadGltfScene(TEST_RESOURCE_DIR "/AnimatedCubeStride.gltf", sdf, ctx.loadResult);
+
+  DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(1u, ctx.scene.GetNodeCount());
+
+  TestApplication app;
+
+  Customization::Choices choices;
+  for(auto iRoot : ctx.scene.GetRoots())
+  {
+    auto resourceRefs = ctx.resources.CreateRefCounter();
+    ctx.scene.CountResourceRefs(iRoot, choices, resourceRefs);
+    ctx.resources.LoadResources(resourceRefs, ctx.pathProvider);
+  }
+
+  DALI_TEST_EQUAL(true, ctx.resources.mMeshes[0u].first.mPositions.IsDefined());
+  DALI_TEST_EQUAL(432, ctx.resources.mMeshes[0u].first.mPositions.mBlob.mLength);
 
   END_TEST;
 }

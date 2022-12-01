@@ -93,16 +93,6 @@ uint64_t HashNode(const MaterialDefinition& materialDef, const MeshDefinition& m
     hash.Add("SSS");
   }
 
-  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
-  {
-    hash.Add("SPECTEX");
-  }
-
-  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
-  {
-    hash.Add("SPECCOLTEX");
-  }
-
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
   {
     hash.Add("OCCL" /*USION*/);
@@ -111,6 +101,16 @@ uint64_t HashNode(const MaterialDefinition& materialDef, const MeshDefinition& m
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
   {
     hash.Add("EMIS" /*SIVE*/);
+  }
+
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
+  {
+    hash.Add("SPECTEX");
+  }
+
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
+  {
+    hash.Add("SPECCOLTEX");
   }
 
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))
@@ -256,16 +256,6 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
       shaderDef.mDefines.push_back("SSS");
     }
 
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
-    {
-      shaderDef.mDefines.push_back("MATERIAL_SPECULAR_TEXTURE");
-    }
-
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
-    {
-      shaderDef.mDefines.push_back("MATERIAL_SPECULAR_COLOR_TEXTURE");
-    }
-
     if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
     {
       shaderDef.mDefines.push_back("OCCLUSION");
@@ -274,6 +264,16 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
     if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
     {
       shaderDef.mDefines.push_back("EMISSIVE");
+    }
+
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
+    {
+      shaderDef.mDefines.push_back("MATERIAL_SPECULAR_TEXTURE");
+    }
+
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
+    {
+      shaderDef.mDefines.push_back("MATERIAL_SPECULAR_COLOR_TEXTURE");
     }
 
     if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))
