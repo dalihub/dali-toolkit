@@ -46,6 +46,7 @@ SET(TC_SOURCES
   utc-Dali-Text-FontSpan.cpp
   utc-Dali-Text-BoldSpan.cpp
   utc-Dali-Text-ItalicSpan.cpp
+  utc-Dali-Text-BackgroundColorSpan.cpp
   utc-Dali-Text-Range.cpp
   utc-Dali-Text-SpannableString.cpp
   utc-Dali-Text-UnderlineSpan.cpp

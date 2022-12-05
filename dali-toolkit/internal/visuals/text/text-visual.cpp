@@ -570,7 +570,8 @@ void TextVisual::UpdateRenderer()
       const bool markupStrikethroughEnabled = markupOrSpannedText && mController->GetTextModel()->IsMarkupStrikethroughSet();
       const bool underlineEnabled           = mController->GetTextModel()->IsUnderlineEnabled() || markupUnderlineEnabled;
       const bool strikethroughEnabled       = mController->GetTextModel()->IsStrikethroughEnabled() || markupStrikethroughEnabled;
-      const bool styleEnabled               = (shadowEnabled || outlineEnabled || backgroundEnabled || markupOrSpannedText);
+      const bool backgroundMarkupSet        = mController->GetTextModel()->IsMarkupBackgroundColorSet();
+      const bool styleEnabled               = (shadowEnabled || outlineEnabled || backgroundEnabled || markupOrSpannedText || backgroundMarkupSet);
       const bool isOverlayStyle             = underlineEnabled || strikethroughEnabled;
 
       AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);

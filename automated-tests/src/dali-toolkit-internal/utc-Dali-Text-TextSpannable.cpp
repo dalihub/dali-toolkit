@@ -40,6 +40,7 @@
 #include <dali-toolkit/devel-api/text/spans/character-spacing-span.h>
 #include <dali-toolkit/devel-api/text/spans/bold-span.h>
 #include <dali-toolkit/devel-api/text/spans/italic-span.h>
+#include <dali-toolkit/devel-api/text/spans/background-color-span.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -128,6 +129,21 @@ Text::SpannableString CreateSpannableStringForItalicSpan()
   Text::ItalicSpan::New(),
   Text::Range::New(0u, 3u));
   DALI_TEST_CHECK(isAddedItalic);
+
+  return spannableString;
+}
+
+Text::SpannableString CreateSpannableStringForBackgroundColorSpan()
+{
+
+  Text::SpannableString spannableString = Text::SpannableString::New("Hello مرحبا");
+
+  DALI_TEST_CHECK(spannableString);
+
+  auto isAddedGreen = spannableString.AttachSpan(
+  Text::BackgroundColorSpan::New(Color::GREEN),
+  Text::Range::New(5u, 7u));
+  DALI_TEST_CHECK(isAddedGreen);
 
   return spannableString;
 }
@@ -453,7 +469,6 @@ int UtcDaliToolkitTextLabelSetSpannedText_BoldSpan(void)
   DALI_TEST_EQUALS(validFonts[0].characterRun.characterIndex,0, TEST_LOCATION);
   DALI_TEST_EQUALS(validFonts[0].characterRun.GetEndCharacterIndex(),3, TEST_LOCATION);
   DALI_TEST_EQUALS(validFonts[0].isBoldRequired, true, TEST_LOCATION);
-
   END_TEST;
 }
 
@@ -482,3 +497,29 @@ int UtcDaliToolkitTextLabelSetSpannedText_ItalicSpan(void)
   DALI_TEST_EQUALS(validFontsItalic[0].isItalicRequired, true, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliToolkitTextLabelSetSpannedText_BackgroundColorSpan(void)
+{
+
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliToolkitTextLabelSetSpannedText_BackgroundColorSpan");
+
+  TextLabel textLabel = TextLabel::New();
+  DALI_TEST_CHECK(textLabel);
+
+  application.GetScene().Add(textLabel);
+
+  Text::SpannableString spannableString = CreateSpannableStringForBackgroundColorSpan();
+  Text::SetSpannedText(textLabel, spannableString);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextLabel& labelImpl          = GetImpl(textLabel);
+  const Text::ColorIndex* const backgroundColorIndicesBuffer  = labelImpl.GetTextController()->GetTextModel()->GetBackgroundColorIndices();
+
+  CheckColorIndices(backgroundColorIndicesBuffer, 4u, {0u, 5u, 7u, 10u}, {0u, 1u, 1u, 0u});
+
+  END_TEST;
+}
+

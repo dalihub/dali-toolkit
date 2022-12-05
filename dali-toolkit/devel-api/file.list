@@ -73,6 +73,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/text/spans/underline-span.cpp
   ${devel_api_src_dir}/text/spans/bold-span.cpp
   ${devel_api_src_dir}/text/spans/italic-span.cpp
+  ${devel_api_src_dir}/text/spans/background-color-span.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-cross-effect.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-effect.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-fold-effect.cpp
@@ -259,6 +260,7 @@ SET( devel_api_text_header_files
   ${devel_api_src_dir}/text/spans/underline-span.h
   ${devel_api_src_dir}/text/spans/bold-span.h
   ${devel_api_src_dir}/text/spans/italic-span.h
+  ${devel_api_src_dir}/text/spans/background-color-span.h
 )
 
 SET( devel_api_tool_bar_header_files
