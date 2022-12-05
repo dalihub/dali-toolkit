@@ -739,6 +739,16 @@ const Vector<CharacterSpacingGlyphRun>& ViewModel::GetCharacterSpacingGlyphRuns(
   return mModel->GetCharacterSpacingGlyphRuns();
 }
 
+const Vector<FontRun>& ViewModel::GetFontRuns() const
+{
+  return mModel->GetFontRuns();
+}
+
+const Vector<FontDescriptionRun>& ViewModel::GetFontDescriptionRuns() const
+{
+  return mModel->GetFontDescriptionRuns();
+}
+
 } // namespace Text
 
 } // namespace Toolkit

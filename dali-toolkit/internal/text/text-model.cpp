@@ -326,6 +326,16 @@ const Vector<CharacterIndex>& Model::GetGlyphsToCharacters() const
   return mVisualModel->mGlyphsToCharacters;
 }
 
+const Vector<FontRun>& Model::GetFontRuns() const
+{
+  return mLogicalModel->mFontRuns;
+}
+
+const Vector<FontDescriptionRun>& Model::GetFontDescriptionRuns() const
+{
+  return mLogicalModel->mFontDescriptionRuns;
+}
+
 Model::Model()
 : mLogicalModel(),
   mVisualModel(),

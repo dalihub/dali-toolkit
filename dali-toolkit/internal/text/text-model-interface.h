@@ -25,6 +25,8 @@
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/bounded-paragraph-run.h>
 #include <dali-toolkit/internal/text/character-spacing-glyph-run.h>
+#include <dali-toolkit/internal/text/font-description-run.h>
+#include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/strikethrough-glyph-run.h>
@@ -462,6 +464,20 @@ public:
    * @return The GlyphsToCharacters.
    */
   virtual const Vector<CharacterIndex>& GetGlyphsToCharacters() const = 0;
+
+  /**
+   * @brief Retrieves the reference for font runs.
+   *
+   * @return The reference for font runs.
+   */
+  virtual const Vector<FontRun>& GetFontRuns() const = 0;
+
+  /**
+   * @brief Retrieves the reference for font description runs.
+   *
+   * @return The reference for font description runs.
+   */
+  virtual const Vector<FontDescriptionRun>& GetFontDescriptionRuns() const = 0;
 };
 
 } // namespace Text

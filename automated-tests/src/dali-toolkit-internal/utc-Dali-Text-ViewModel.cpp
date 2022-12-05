@@ -669,3 +669,89 @@ int UtcDaliTextViewModelElideText02(void)
   tet_result(TET_PASS);
   END_TEST;
 }
+
+int UtcDaliTextViewModelGetFontRuns(void)
+{
+  tet_infoline(" UtcDaliTextViewModelGetFontRuns");
+  ToolkitTestApplication application;
+
+  // Load some fonts.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi(93u, 93u);
+
+  char*             pathNamePtr = get_current_dir_name();
+  const std::string pathName(pathNamePtr);
+  free(pathNamePtr);
+
+  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf");
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  // Tests the rendering controller has been created.
+  TypesetterPtr typesetter = Typesetter::New(controller->GetTextModel());
+  DALI_TEST_CHECK(typesetter);
+
+  // Tests the view model has been created.
+  ViewModel* model = typesetter->GetViewModel();
+  DALI_TEST_CHECK(NULL != model);
+
+  // Configures the text controller similarly to the text-editor.
+  ConfigureTextEditor(controller);
+
+  // Sets a text and relais-out.
+  controller->SetMarkupProcessorEnabled(true);
+  controller->SetText("<font family='TizenSansRegular' size='10'>Hello </font>Hello<font family='TizenSansRegular' size='15'>Hello</font>");
+  controller->Relayout(CONTROL_SIZE);
+
+  const Vector<FontRun>& validFonts = model->GetFontRuns();
+
+  // The font-runs should be equal to number of segments have different fonts.
+  DALI_TEST_EQUALS(validFonts.Count(), 3u, TEST_LOCATION);
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextViewModelGetFontDescriptionRuns(void)
+{
+  tet_infoline(" UtcDaliTextViewModelGetFontDescriptionRuns");
+  ToolkitTestApplication application;
+
+  // Load some fonts.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi(93u, 93u);
+
+  char*             pathNamePtr = get_current_dir_name();
+  const std::string pathName(pathNamePtr);
+  free(pathNamePtr);
+
+  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf");
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  // Tests the rendering controller has been created.
+  TypesetterPtr typesetter = Typesetter::New(controller->GetTextModel());
+  DALI_TEST_CHECK(typesetter);
+
+  // Tests the view model has been created.
+  ViewModel* model = typesetter->GetViewModel();
+  DALI_TEST_CHECK(NULL != model);
+
+  // Configures the text controller similarly to the text-editor.
+  ConfigureTextEditor(controller);
+
+  // Sets a text and relais-out.
+  controller->SetMarkupProcessorEnabled(true);
+  controller->SetText("<font family='TizenSansRegular' size='10'>Hello </font>Hello<font family='TizenSansRegular' size='15'>Hello</font>");
+  controller->Relayout(CONTROL_SIZE);
+
+  const Vector<FontDescriptionRun>& validFonts = model->GetFontDescriptionRuns();
+
+  // The font-description-runs should be equal number of the used fonts.
+  DALI_TEST_EQUALS(validFonts.Count(), 2u, TEST_LOCATION);
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
