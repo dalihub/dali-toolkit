@@ -21,9 +21,9 @@
 #include <dali/devel-api/adaptor-framework/animated-image-loading.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
+#include <dali/public-api/adaptor-framework/round-robin-container-view.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/rendering/geometry.h>
-#include <dali/public-api/adaptor-framework/round-robin-container-view.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
@@ -119,6 +119,8 @@ public:
    * @param[in]  frameIndex            The frame index to load.
    * @param[out] textureId             The textureId of the frame
    * @param[in, out] maskInfo          Mask info structure
+   * @param[in]  desiredSize           The size the image is likely to appear at. This can be set to 0, 0 for automatic
+   * @param[in]  fittingMode           The FittingMode to use
    * @param[in]  samplingMode          The SamplingMode to use
    * @param[in]  synchronousLoading    true if the frame should be loaded synchronously
    * @param[in]  textureObserver       The client object should inherit from this and provide the "LoadCompleted" virtual.
@@ -133,6 +135,8 @@ public:
                                       const uint32_t&                 frameIndex,
                                       TextureManager::TextureId&      textureId,
                                       MaskingDataPointer&             maskInfo,
+                                      const Dali::ImageDimensions&    desiredSize,
+                                      const Dali::FittingMode::Type&  fittingMode,
                                       const Dali::SamplingMode::Type& samplingMode,
                                       const bool&                     synchronousLoading,
                                       TextureUploadObserver*          textureObserver,
@@ -612,7 +616,6 @@ private:
    */
   void EmitLoadComplete(TextureUploadObserver* observer, TextureManager::TextureInfo& textureInfo, const bool& success);
 
-
   /**
    * @brief Remove observer in textureInfo
    *
@@ -648,14 +651,14 @@ private:
    */
   void ObserverDestroyed(TextureUploadObserver* observer);
 
-private:                                    // Member Variables:
-  TextureCacheManager mTextureCacheManager; ///< Manager the life-cycle and caching of Textures
-  std::unique_ptr<TextureAsyncLoadingHelper> mAsyncLoader;  ///< The Asynchronous image loader used to provide all local async loads
-  Dali::Vector<LifecycleObserver*>        mLifecycleObservers;      ///< Lifecycle observers of texture manager
-  Dali::Vector<QueueElement>              mLoadQueue;               ///< Queue of textures to load after NotifyObservers
-  Dali::Vector<QueueElement>              mRemoveQueue;             ///< Queue of textures to remove after NotifyObservers
-  TextureManager::TextureId               mLoadingQueueTextureId;   ///< TextureId when it is loading. it causes Load Textures to be queued.
-  bool                                    mLoadYuvPlanes;           ///< A global flag to specify if the image should be loaded as yuv planes
+private:                                                             // Member Variables:
+  TextureCacheManager                        mTextureCacheManager;   ///< Manager the life-cycle and caching of Textures
+  std::unique_ptr<TextureAsyncLoadingHelper> mAsyncLoader;           ///< The Asynchronous image loader used to provide all local async loads
+  Dali::Vector<LifecycleObserver*>           mLifecycleObservers;    ///< Lifecycle observers of texture manager
+  Dali::Vector<QueueElement>                 mLoadQueue;             ///< Queue of textures to load after NotifyObservers
+  Dali::Vector<QueueElement>                 mRemoveQueue;           ///< Queue of textures to remove after NotifyObservers
+  TextureManager::TextureId                  mLoadingQueueTextureId; ///< TextureId when it is loading. it causes Load Textures to be queued.
+  bool                                       mLoadYuvPlanes;         ///< A global flag to specify if the image should be loaded as yuv planes
 };
 
 } // namespace Internal

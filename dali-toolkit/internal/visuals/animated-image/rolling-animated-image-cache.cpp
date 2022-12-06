@@ -61,6 +61,9 @@ static constexpr uint32_t FIRST_FRAME_INDEX  = 0u;
 } // namespace
 
 RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&                     textureManager,
+                                                     ImageDimensions                     size,
+                                                     Dali::FittingMode::Type             fittingMode,
+                                                     Dali::SamplingMode::Type            samplingMode,
                                                      AnimatedImageLoading&               animatedImageLoading,
                                                      TextureManager::MaskingDataPointer& maskingData,
                                                      ImageCache::FrameReadyObserver&     observer,
@@ -70,7 +73,7 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&            
                                                      const Dali::WrapMode::Type&         wrapModeV,
                                                      bool                                isSynchronousLoading,
                                                      bool                                preMultiplyOnLoad)
-: ImageCache(textureManager, maskingData, observer, batchSize, 0u),
+: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, 0u),
   mImageUrl(animatedImageLoading.GetUrl()),
   mAnimatedImageLoading(animatedImageLoading),
   mFrameCount(SINGLE_IMAGE_COUNT),
@@ -207,7 +210,9 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                    frameIndex,
                                                                    loadTextureId,
                                                                    mMaskingData,
-                                                                   SamplingMode::BOX_THEN_LINEAR,
+                                                                   mDesiredSize,
+                                                                   mFittingMode,
+                                                                   mSamplingMode,
                                                                    synchronousLoading,
                                                                    this,
                                                                    preMultiplyOnLoading);
@@ -263,8 +268,8 @@ TextureSet RollingAnimatedImageCache::GetFrontTextureSet() const
 {
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "RollingAnimatedImageCache::GetFrontTextureSet() FrameNumber:%d\n", mQueue[0].mFrameNumber);
 
-  TextureManager::TextureId textureId = GetCachedTextureId(0);
-  TextureSet textureSet = mTextureManager.GetTextureSet(textureId);
+  TextureManager::TextureId textureId  = GetCachedTextureId(0);
+  TextureSet                textureSet = mTextureManager.GetTextureSet(textureId);
   if(textureSet)
   {
     Sampler sampler = Sampler::New();

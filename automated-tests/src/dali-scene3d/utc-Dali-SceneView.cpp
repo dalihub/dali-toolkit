@@ -84,9 +84,9 @@ Dali::Texture GetDiffuseTexture(Dali::Scene3D::Model model)
     if(renderer)
     {
       TextureSet textureSet = renderer.GetTextures();
-      if(textureSet.GetTextureCount() == 7u)
+      if(textureSet.GetTextureCount() == 9u)
       {
-        texture = textureSet.GetTexture(5u);
+        texture = textureSet.GetTexture(7u);
       }
     }
   }
@@ -105,9 +105,9 @@ Dali::Texture GetSpecularTexture(Dali::Scene3D::Model model)
     if(renderer)
     {
       TextureSet textureSet = renderer.GetTextures();
-      if(textureSet.GetTextureCount() == 7u)
+      if(textureSet.GetTextureCount() == 9u)
       {
-        texture = textureSet.GetTexture(6u);
+        texture = textureSet.GetTexture(8u);
       }
     }
   }

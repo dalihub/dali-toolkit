@@ -77,9 +77,9 @@ Actor NodeDefinition::CreateActor(CreateParams& params) const
 
   actor.RegisterProperty(ORIGINAL_MATRIX_PROPERTY_NAME, GetLocalSpace(), Property::AccessMode::READ_ONLY);
 
-  if(mRenderable)
+  for(auto& renderable : mRenderables)
   {
-    mRenderable->OnCreate(*this, params, actor);
+    renderable->OnCreate(*this, params, actor);
   }
 
   for(auto& e : mExtras)
@@ -114,20 +114,38 @@ std::string_view NodeDefinition::GetIblYDirectionUniformName()
 
 bool NodeDefinition::GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const
 {
-  if(mRenderable)
+  if(mRenderables.empty())
   {
-    if(!mRenderable->GetExtents(resources, min, max))
-    {
-      // If the renderable node don't have mesh accessor, use size to compute extents.
-      min = -mSize / 2.0f;
-      max = mSize / 2.0f;
-    }
-    return true;
+    return false;
   }
-  return false;
+
+  bool useModelExtents = false;
+  for(auto& renderable : mRenderables)
+  {
+    Vector3 renderableMin(Vector3::ONE * MAXFLOAT), renderableMax(-Vector3::ONE * MAXFLOAT);
+    if(!renderable->GetExtents(resources, renderableMin, renderableMax))
+    {
+      useModelExtents = false;
+      break;
+    }
+    useModelExtents = true;
+    min.x           = std::min(min.x, renderableMin.x);
+    min.y           = std::min(min.y, renderableMin.y);
+    min.z           = std::min(min.z, renderableMin.z);
+    max.x           = std::max(max.x, renderableMax.x);
+    max.y           = std::max(max.y, renderableMax.y);
+    max.z           = std::max(max.z, renderableMax.z);
+  }
+  if(!useModelExtents)
+  {
+    // If the renderable node don't have mesh accessor, use size to compute extents.
+    min = -mSize / 2.0f;
+    max = mSize / 2.0f;
+  }
+  return true;
 }
 
-bool ModelNode::GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const
+bool ModelRenderable::GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const
 {
   auto&    mesh    = resources.mMeshes[mMeshIdx];
   uint32_t minSize = mesh.first.mPositions.mBlob.mMin.size();
@@ -146,21 +164,21 @@ bool ModelNode::GetExtents(const ResourceBundle& resources, Vector3& min, Vector
   return false;
 }
 
-void ModelNode::RegisterResources(IResourceReceiver& receiver) const
+void ModelRenderable::RegisterResources(IResourceReceiver& receiver) const
 {
   Renderable::RegisterResources(receiver);
   receiver.Register(ResourceType::Mesh, mMeshIdx);
   receiver.Register(ResourceType::Material, mMaterialIdx);
 }
 
-void ModelNode::ReflectResources(IResourceReflector& reflector)
+void ModelRenderable::ReflectResources(IResourceReflector& reflector)
 {
   Renderable::ReflectResources(reflector);
   reflector.Reflect(ResourceType::Mesh, mMeshIdx);
   reflector.Reflect(ResourceType::Material, mMaterialIdx);
 }
 
-void ModelNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const
+void ModelRenderable::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const
 {
   DALI_ASSERT_DEBUG(mMeshIdx != INVALID_INDEX);
   Renderable::OnCreate(node, params, actor);
@@ -168,7 +186,7 @@ void ModelNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParam
   auto& resources = params.mResources;
   auto& mesh      = resources.mMeshes[mMeshIdx];
 
-  auto     renderer = actor.GetRendererAt(0);
+  auto     renderer = actor.GetRendererAt(actor.GetRendererCount() - 1u);
   Geometry geometry = mesh.second.geometry;
   renderer.SetGeometry(geometry);
 
@@ -203,29 +221,28 @@ void ModelNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParam
     textures = newTextureSet;
   }
 
-  renderer.SetTextures(textures);
-
-  actor.SetProperty(Actor::Property::COLOR, mColor);
-
-  actor.RegisterProperty("uHasVertexColor", static_cast<float>(mesh.first.mColors.IsDefined()));
+  renderer.RegisterProperty("uHasVertexColor", static_cast<float>(mesh.first.mColors.IsDefined()));
 
   auto& matDef = resources.mMaterials[mMaterialIdx].first;
   actor.RegisterProperty("uColorFactor", matDef.mBaseColorFactor);
   actor.RegisterProperty("uMetallicFactor", matDef.mMetallic);
   actor.RegisterProperty("uRoughnessFactor", matDef.mRoughness);
+  actor.RegisterProperty("uDielectricSpecular", matDef.mDielectricSpecular);
+  actor.RegisterProperty("uSpecularFactor", matDef.mSpecularFactor);
+  actor.RegisterProperty("uSpecularColorFactor", matDef.mSpecularColorFactor);
   actor.RegisterProperty("uNormalScale", matDef.mNormalScale);
   if(matDef.mFlags & MaterialDefinition::OCCLUSION)
   {
-    actor.RegisterProperty("uOcclusionStrength", matDef.mOcclusionStrength);
+    renderer.RegisterProperty("uOcclusionStrength", matDef.mOcclusionStrength);
   }
   if(matDef.mFlags & MaterialDefinition::EMISSIVE)
   {
-    actor.RegisterProperty("uEmissiveFactor", matDef.mEmissiveFactor);
+    renderer.RegisterProperty("uEmissiveFactor", matDef.mEmissiveFactor);
   }
 
   Index envIdx = matDef.mEnvironmentIdx;
-  actor.RegisterProperty(IBL_INTENSITY_STRING.data(), resources.mEnvironmentMaps[envIdx].first.mIblIntensity);
-  actor.RegisterProperty(IBL_Y_DIRECTION.data(), resources.mEnvironmentMaps[envIdx].first.mYDirection);
+  renderer.RegisterProperty(IBL_INTENSITY_STRING.data(), resources.mEnvironmentMaps[envIdx].first.mIblIntensity);
+  renderer.RegisterProperty(IBL_Y_DIRECTION.data(), resources.mEnvironmentMaps[envIdx].first.mYDirection);
 
   float opaque      = 0.0f;
   float mask        = 0.0f;
@@ -241,14 +258,18 @@ void ModelNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParam
       mask = 1.0f;
     }
   }
-  actor.RegisterProperty("uOpaque", opaque);
-  actor.RegisterProperty("uMask", mask);
-  actor.RegisterProperty("uAlphaThreshold", alphaCutoff);
+  renderer.RegisterProperty("uOpaque", opaque);
+  renderer.RegisterProperty("uMask", mask);
+  renderer.RegisterProperty("uAlphaThreshold", alphaCutoff);
+
+  renderer.SetTextures(textures);
+
+  actor.SetProperty(Actor::Property::COLOR, mColor);
 }
 
-void ArcNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const
+void ArcRenderable::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const
 {
-  ModelNode::OnCreate(node, params, actor);
+  ModelRenderable::OnCreate(node, params, actor);
 
   actor.RegisterProperty("antiAliasing", mAntiAliasing ? 1 : 0);
   actor.RegisterProperty("arcCaps", mArcCaps);
@@ -263,13 +284,13 @@ void ArcNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams&
   actor.RegisterProperty("endAngle", endPolar);
 }
 
-void ArcNode::GetEndVectorWithDiffAngle(float startAngle, float diffAngle, Vector2& endVector)
+void ArcRenderable::GetEndVectorWithDiffAngle(float startAngle, float diffAngle, Vector2& endVector)
 {
   float endAngle = 0.f;
 
   if(diffAngle <= 0.001f)
   {
-    //0.001 is used to ensure is empty arc when startAngle = endAngle + 360 * N
+    // 0.001 is used to ensure is empty arc when startAngle = endAngle + 360 * N
     endAngle = startAngle + 0.001f;
   }
   else if(diffAngle >= 360.f)

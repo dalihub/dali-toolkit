@@ -29,6 +29,25 @@
 #include "dali/public-api/math/quaternion.h"
 #include "dali/public-api/math/vector4.h"
 
+#define ENUM_STRING_MAPPING(t, x) \
+  {                               \
+#x, t::x                      \
+  }
+
+#define ENUM_TYPE_FROM_STRING(structName, table)                             \
+  structName::Type structName::FromString(const char* s, size_t len)         \
+  {                                                                          \
+    std::string target(s, len);                                              \
+    std::transform(target.begin(), target.end(), target.begin(), ::toupper); \
+                                                                             \
+    auto iFind = table.find(std::string_view(target.c_str(), len));          \
+    if(iFind != table.end())                                                 \
+    {                                                                        \
+      return iFind->second;                                                  \
+    }                                                                        \
+    return structName::INVALID;                                              \
+  }
+
 namespace gltf2
 {
 using Index = Dali::Scene3D::Loader::Index;
@@ -325,9 +344,36 @@ struct TextureInfo
   }
 };
 
+/**
+ * Material Ior is supported with KHR_materials_ior extension.
+ * https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_ior
+ */
+struct MaterialIor
+{
+  float mIor = MAXFLOAT;
+};
+
+/**
+ * Material Specular is supported with KHR_materials_ior extension.
+ * https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_specular
+ */
+struct MaterialSpecular
+{
+  float         mSpecularFactor = 1.0f;
+  TextureInfo   mSpecularTexture;
+  Dali::Vector3 mSpecularColorFactor = Dali::Vector3::ONE;
+  TextureInfo   mSpecularColorTexture;
+};
+
+struct MaterialExtensions
+{
+  MaterialSpecular mMaterialSpecular;
+  MaterialIor      mMaterialIor;
+};
+
 struct Material : Named
 {
-  struct Pbr //MetallicRoughness
+  struct Pbr // MetallicRoughness
   {
     Dali::Vector4 mBaseColorFactor = Dali::Vector4::ONE;
     TextureInfo   mBaseColorTexture;
@@ -346,7 +392,9 @@ struct Material : Named
   AlphaMode::Type mAlphaMode   = AlphaMode::OPAQUE;
   float           mAlphaCutoff = .5f;
   bool            mDoubleSided = false;
-  //TODO: extensions
+
+  //extensions
+  MaterialExtensions mMaterialExtensions;
   //TODO: extras
 };
 

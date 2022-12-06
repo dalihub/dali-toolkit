@@ -36,7 +36,7 @@ using LoadingTaskPtr = IntrusivePtr<LoadingTask>;
 
 struct AsyncImageLoadingInfo
 {
-  AsyncImageLoadingInfo(LoadingTaskPtr loadingTask,std::uint32_t loadId)
+  AsyncImageLoadingInfo(LoadingTaskPtr loadingTask, std::uint32_t loadId)
   : loadingTask(loadingTask),
     loadId(loadId)
   {
@@ -64,6 +64,24 @@ public:
    */
   uint32_t LoadAnimatedImage(Dali::AnimatedImageLoading               animatedImageLoading,
                              uint32_t                                 frameIndex,
+                             DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
+
+  /**
+   * @brief Starts an animated image loading task.
+   * @param[in] asyncImageLoader The ayncImageLoader
+   * @param[in] animatedImageLoading The AnimatedImageLoading to load animated image
+   * @param[in] frameIndex The frame index of a frame to be loaded frame
+   * @param[in] dimensions The width and height to fit the loaded image to
+   * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
+   * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
+   * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
+   * @return The loading task id
+   */
+  uint32_t LoadAnimatedImage(Dali::AnimatedImageLoading               animatedImageLoading,
+                             uint32_t                                 frameIndex,
+                             Dali::ImageDimensions                    desiredSize,
+                             Dali::FittingMode::Type                  fittingMode,
+                             Dali::SamplingMode::Type                 samplingMode,
                              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
   /**

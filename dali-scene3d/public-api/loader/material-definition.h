@@ -24,6 +24,7 @@
 #include "dali-scene3d/public-api/loader/utils.h"
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/images/image-operations.h>
 #include <cmath>
 #include "dali/public-api/common/vector-wrapper.h"
 #include "dali/public-api/math/vector4.h"
@@ -115,8 +116,10 @@ struct DALI_SCENE3D_API TextureDefinition
 {
   std::string        mImageUri;
   SamplerFlags::Type mSamplerFlags;
+  ImageDimensions    mMinImageDimensions;
+  SamplingMode::Type mSamplingMode;
 
-  TextureDefinition(const std::string& imageUri = "", SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT);
+  TextureDefinition(const std::string& imageUri = "", SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR);
 };
 
 /**
@@ -130,13 +133,15 @@ struct DALI_SCENE3D_API MaterialDefinition
   enum Flags : uint32_t
   {
     // Texture semantics
-    ALBEDO     = NthBit(0),
-    METALLIC   = NthBit(1),
-    ROUGHNESS  = NthBit(2),
-    NORMAL     = NthBit(3),
-    EMISSIVE   = NthBit(4), // TODO: support
-    OCCLUSION  = NthBit(5), // TODO: support
-    SUBSURFACE = NthBit(6), // Note: dli-only
+    ALBEDO         = NthBit(0),
+    METALLIC       = NthBit(1),
+    ROUGHNESS      = NthBit(2),
+    NORMAL         = NthBit(3),
+    EMISSIVE       = NthBit(4),
+    OCCLUSION      = NthBit(5),
+    SPECULAR       = NthBit(6),
+    SPECULAR_COLOR = NthBit(7),
+    SUBSURFACE     = NthBit(8), // Note: dli-only
 
     // Other binary options
     TRANSPARENCY  = NthBit(20),
@@ -221,19 +226,23 @@ struct DALI_SCENE3D_API MaterialDefinition
 public: // DATA
   uint32_t mFlags = 0x0;
 
-  Index   mEnvironmentIdx    = 0;
-  Vector4 mColor             = Color::WHITE;
-  float   mMetallic          = 1.f;
-  float   mRoughness         = 1.f;
-  Vector4 mBaseColorFactor   = Vector4::ONE;
-  float   mNormalScale       = 1.f;
-  float   mOcclusionStrength = 1.f;
-  Vector3 mEmissiveFactor    = Vector3::ZERO;
+  Index   mEnvironmentIdx      = 0;
+  Vector4 mColor               = Color::WHITE;
+  float   mMetallic            = 1.f;
+  float   mRoughness           = 1.f;
+  Vector4 mBaseColorFactor     = Vector4::ONE;
+  float   mNormalScale         = 1.f;
+  float   mOcclusionStrength   = 1.f;
+  Vector3 mEmissiveFactor      = Vector3::ZERO;
+  float   mDielectricSpecular  = 0.04f;
+  float   mSpecularFactor      = 1.0f;
+  Vector3 mSpecularColorFactor = Vector3::ONE;
 
   // For the glTF, each of albedo, metallicRoughness, normal textures are not essential.
   bool mNeedAlbedoTexture            = true;
   bool mNeedMetallicRoughnessTexture = true;
   bool mNeedNormalTexture            = true;
+  bool mDoubleSided                  = false;
 
   std::vector<TextureStage> mTextureStages;
 };

@@ -36,12 +36,15 @@ constexpr uint32_t FIRST_FRAME_INDEX = 0u;
 } // namespace
 
 FixedImageCache::FixedImageCache(TextureManager&                     textureManager,
+                                 ImageDimensions                     size,
+                                 Dali::FittingMode::Type             fittingMode,
+                                 Dali::SamplingMode::Type            samplingMode,
                                  UrlList&                            urlList,
                                  TextureManager::MaskingDataPointer& maskingData,
                                  ImageCache::FrameReadyObserver&     observer,
                                  uint32_t                            batchSize,
                                  uint32_t                            interval)
-: ImageCache(textureManager, maskingData, observer, batchSize, interval),
+: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, interval),
   mImageUrls(urlList),
   mFront(FIRST_FRAME_INDEX)
 {
@@ -132,7 +135,7 @@ void FixedImageCache::LoadBatch()
     Dali::ImageDimensions textureRectSize;
     auto                  preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-    mTextureManager.LoadTexture(url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, mMaskingData, synchronousLoading, mImageUrls[frameIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
+    mTextureManager.LoadTexture(url, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mImageUrls[frameIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
     mRequestingLoad = false;
   }
 }

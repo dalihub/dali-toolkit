@@ -19,8 +19,8 @@
 #include "async-image-loader-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/public-api/adaptor-framework/async-task-manager.h>
 
 namespace Dali
 {
@@ -49,7 +49,19 @@ uint32_t AsyncImageLoader::LoadAnimatedImage(Dali::AnimatedImageLoading         
                                              uint32_t                                 frameIndex,
                                              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, preMultiplyOnLoad,MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
+  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, preMultiplyOnLoad, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
+  Dali::AsyncTaskManager::Get().AddTask(loadingTask);
+  return mLoadTaskId;
+}
+
+uint32_t AsyncImageLoader::LoadAnimatedImage(Dali::AnimatedImageLoading               animatedImageLoading,
+                                             uint32_t                                 frameIndex,
+                                             Dali::ImageDimensions                    desiredSize,
+                                             Dali::FittingMode::Type                  fittingMode,
+                                             Dali::SamplingMode::Type                 samplingMode,
+                                             DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
+{
+  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, fittingMode, samplingMode, preMultiplyOnLoad, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
   return mLoadTaskId;
 }
@@ -64,7 +76,7 @@ uint32_t AsyncImageLoader::Load(const VisualUrl&                         url,
 {
   LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, url, dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad, loadPlanes, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
   AsyncTaskManager::Get().AddTask(loadingTask);
-  mLoadingTasks.push_back(AsyncImageLoadingInfo(loadingTask,mLoadTaskId));
+  mLoadingTasks.push_back(AsyncImageLoadingInfo(loadingTask, mLoadTaskId));
   return mLoadTaskId;
 }
 
@@ -77,7 +89,7 @@ uint32_t AsyncImageLoader::LoadEncodedImageBuffer(const EncodedImageBuffer&     
 {
   LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, encodedImageBuffer, dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
-  mLoadingTasks.push_back(AsyncImageLoadingInfo(loadingTask,mLoadTaskId));
+  mLoadingTasks.push_back(AsyncImageLoadingInfo(loadingTask, mLoadTaskId));
   return mLoadTaskId;
 }
 
@@ -89,7 +101,7 @@ uint32_t AsyncImageLoader::ApplyMask(Devel::PixelBuffer                       pi
 {
   LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
-  mLoadingTasks.push_back(AsyncImageLoadingInfo(loadingTask,mLoadTaskId));
+  mLoadingTasks.push_back(AsyncImageLoadingInfo(loadingTask, mLoadTaskId));
   return mLoadTaskId;
 }
 
@@ -160,8 +172,8 @@ void AsyncImageLoader::ProcessLoadedImage(LoadingTaskPtr task)
 void AsyncImageLoader::RemoveCompletedTask()
 {
   std::uint32_t loadingTaskId;
-  auto end = mLoadingTasks.end();
-  auto endCompletedIter = mCompletedTaskIds.end();
+  auto          end              = mLoadingTasks.end();
+  auto          endCompletedIter = mCompletedTaskIds.end();
   for(std::vector<AsyncImageLoadingInfo>::iterator iter = mLoadingTasks.begin(); iter != end; ++iter)
   {
     loadingTaskId = (*iter).loadId;

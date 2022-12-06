@@ -18,10 +18,11 @@
  */
 
 // INTERNAL INCLUDES
-#include "dali-scene3d/public-api/api.h"
-#include "dali-scene3d/public-api/loader/animation-definition.h"
-#include "dali-scene3d/public-api/loader/camera-parameters.h"
-#include "dali-scene3d/public-api/loader/light-parameters.h"
+#include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/loader/animation-definition.h>
+#include <dali-scene3d/public-api/loader/camera-parameters.h>
+#include <dali-scene3d/public-api/loader/light-parameters.h>
+#include <dali-scene3d/public-api/loader/load-scene-metadata.h>
 
 namespace Dali
 {
@@ -46,6 +47,11 @@ struct DALI_SCENE3D_API LoadResult
    * @brief The scene definition to populate.
    */
   SceneDefinition& mScene;
+
+  /**
+   * @brief The metadata of the scene.
+   */
+  SceneMetadata& mSceneMetadata;
 
   /**
    * @brief The list of animation definitions, in lexicographical order of their names.
