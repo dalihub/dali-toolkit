@@ -25,6 +25,7 @@
 #include <dali-toolkit/devel-api/text/spannable-string.h>
 #include <dali-toolkit/devel-api/text/spans/font-span.h>
 #include <dali-toolkit/devel-api/text/spans/foreground-color-span.h>
+#include <dali-toolkit/devel-api/text/spans/underline-span.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
@@ -72,6 +73,19 @@ Text::SpannableString CreateSpannableStringForFontSpan()
                         Dali::TextAbstraction::FontSlant::OBLIQUE),
     Text::Range::New(5u, 7u));
   DALI_TEST_CHECK(isAddedFontSpan);
+
+  return spannableString;
+}
+
+Text::SpannableString CreateSpannableStringForUnderlineSpan()
+{
+  Text::SpannableString spannableString = Text::SpannableString::New("Hello World");
+  DALI_TEST_CHECK(spannableString);
+
+  auto isAddedUnderlineSpan = spannableString.AttachSpan(
+    Text::UnderlineSpan::NewDashed(Color::GREEN, 5.0f, 2.0f, 3.0f),
+    Text::Range::New(5u, 7u));
+  DALI_TEST_CHECK(isAddedUnderlineSpan);
 
   return spannableString;
 }
@@ -300,6 +314,52 @@ int UtcDaliTextModelIsSpannedTextPlaced(void)
   DALI_TEST_EQUALS(true, viewModelField->IsSpannedTextPlaced(), TEST_LOCATION);
 
   tet_result(TET_PASS);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelSetSpannedText_UnderlineSpan(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelSetSpannedText_UnderlineSpan ");
+
+  Dali::Toolkit::Text::UnderlineStyleProperties expectedProperties = {
+    Text::Underline::DASHED,
+    Color::GREEN,
+    5u,
+    2u,
+    3u,
+    true,
+    true,
+    true,
+    true,
+    true};
+
+  TextLabel textLabel = TextLabel::New();
+  DALI_TEST_CHECK(textLabel);
+  application.GetScene().Add(textLabel);
+
+  Text::SpannableString spannableString = CreateSpannableStringForUnderlineSpan();
+
+  Text::SetSpannedText(textLabel, spannableString);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextLabel& labelImpl             = GetImpl(textLabel);
+  const Text::Length            numberOfUnderlineRuns = labelImpl.GetTextController()->GetTextModel()->GetNumberOfUnderlineRuns();
+
+  DALI_TEST_EQUALS(numberOfUnderlineRuns, 1u, TEST_LOCATION);
+
+  Vector<Dali::Toolkit::Text::UnderlinedGlyphRun> underlineRuns;
+
+  underlineRuns.Resize(numberOfUnderlineRuns);
+
+  labelImpl.GetTextController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+
+  DALI_TEST_EQUALS(underlineRuns[0].glyphRun.glyphIndex, 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(underlineRuns[0].glyphRun.numberOfGlyphs, 3u, TEST_LOCATION);
+  DALI_TEST_CHECK(underlineRuns[0].properties == expectedProperties);
 
   END_TEST;
 }
