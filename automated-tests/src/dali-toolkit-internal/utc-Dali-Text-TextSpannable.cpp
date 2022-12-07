@@ -29,8 +29,13 @@
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/text-label-impl.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
+#include <dali-toolkit/internal/text/rendering/text-typesetter.h>
+#include <dali-toolkit/internal/text/rendering/view-model.h>
+#include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
+#include <toolkit-text-utils.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -38,7 +43,7 @@ using namespace Toolkit;
 namespace
 {
 const std::string DEFAULT_FONT_DIR("/resources/fonts");
-const float PIXEL_FORMAT_64_FACTOR = 64.f; ///< 64.f is used to convert from point size to 26.6 pixel format.
+const float       PIXEL_FORMAT_64_FACTOR = 64.f; ///< 64.f is used to convert from point size to 26.6 pixel format.
 } // namespace
 
 Text::SpannableString CreateSpannableStringForForegroundColorSpan()
@@ -100,8 +105,8 @@ int UtcDaliToolkitTextLabelSetSpannedText(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Internal::TextLabel& labelImpl           = GetImpl(textLabel);
-  const Text::ColorIndex* const colorIndicesBuffer  = labelImpl.GetTextController()->GetTextModel()->GetColorIndices();
+  Toolkit::Internal::TextLabel& labelImpl          = GetImpl(textLabel);
+  const Text::ColorIndex* const colorIndicesBuffer = labelImpl.GetTextController()->GetTextModel()->GetColorIndices();
 
   CheckColorIndices(colorIndicesBuffer, 4u, {0u, 5u, 7u, 10u}, {0u, 1u, 1u, 0u});
 
@@ -182,7 +187,7 @@ int UtcDaliToolkitTextLabelSetSpannedText_FontSpan(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Internal::TextLabel&               labelImpl  = GetImpl(textLabel);
+  Toolkit::Internal::TextLabel&               labelImpl     = GetImpl(textLabel);
   const Vector<Dali::Toolkit::Text::FontRun>& validFontRuns = labelImpl.GetTextController()->GetTextModel()->GetFontRuns();
 
   DALI_TEST_EQUALS(validFontRuns.Count(), 3u, TEST_LOCATION);
@@ -210,6 +215,91 @@ int UtcDaliToolkitTextLabelSetSpannedText_FontSpan(void)
   DALI_TEST_EQUALS(validFontDescriptionRuns[0].weight, Dali::TextAbstraction::FontWeight::BOLD, TEST_LOCATION);
   DALI_TEST_EQUALS(validFontDescriptionRuns[0].width, Dali::TextAbstraction::FontWidth::SEMI_CONDENSED, TEST_LOCATION);
   DALI_TEST_EQUALS(validFontDescriptionRuns[0].slant, Dali::TextAbstraction::FontSlant::OBLIQUE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextModelIsSpannedTextPlaced(void)
+
+{
+  tet_infoline(" UtcDaliTextModelIsSpannedTextPlaced");
+
+  ToolkitTestApplication application;
+
+  // Create spanned-text and set it
+  Text::SpannableString spannedText = Text::SpannableString::New("Hello مرحبا");
+  DALI_TEST_CHECK(spannedText);
+
+  // Creates a text controller.
+  Dali::Toolkit::Text::ControllerPtr         controllerTextEditor = Dali::Toolkit::Text::Controller::New();
+  const Dali::Toolkit::Text::ModelInterface* modelEditor          = controllerTextEditor->GetTextModel();
+
+  // Tests the rendering controller has been created.
+  Dali::Toolkit::Text::TypesetterPtr typesetterEditor = Dali::Toolkit::Text::Typesetter::New(controllerTextEditor->GetTextModel());
+  DALI_TEST_CHECK(typesetterEditor);
+
+  // Tests the view model has been created.
+  Dali::Toolkit::Text::ViewModel* viewModelEditor = typesetterEditor->GetViewModel();
+  DALI_TEST_CHECK(viewModelEditor);
+
+  // Configures the text controller similarly to the text-editor.
+  Dali::Toolkit::Text::ConfigureTextEditor(controllerTextEditor);
+
+  DALI_TEST_EQUALS(false, modelEditor->IsSpannedTextPlaced(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, viewModelEditor->IsSpannedTextPlaced(), TEST_LOCATION);
+
+  controllerTextEditor->SetSpannedText(spannedText);
+
+  DALI_TEST_EQUALS(true, modelEditor->IsSpannedTextPlaced(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, viewModelEditor->IsSpannedTextPlaced(), TEST_LOCATION);
+
+  // Creates a text controller.
+  Dali::Toolkit::Text::ControllerPtr         controllerTextLabel = Dali::Toolkit::Text::Controller::New();
+  const Dali::Toolkit::Text::ModelInterface* modelLabel          = controllerTextLabel->GetTextModel();
+
+  // Tests the rendering controller has been created.
+  Dali::Toolkit::Text::TypesetterPtr typesetterLabel = Dali::Toolkit::Text::Typesetter::New(controllerTextLabel->GetTextModel());
+  DALI_TEST_CHECK(typesetterLabel);
+
+  // Tests the view model has been created.
+  Dali::Toolkit::Text::ViewModel* viewModelLabel = typesetterLabel->GetViewModel();
+  DALI_TEST_CHECK(viewModelLabel);
+
+  // Configures the text controller similarly to the text-label.
+  Dali::Toolkit::Text::ConfigureTextLabel(controllerTextLabel);
+
+  DALI_TEST_EQUALS(false, modelLabel->IsSpannedTextPlaced(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, viewModelLabel->IsSpannedTextPlaced(), TEST_LOCATION);
+
+  controllerTextLabel->SetSpannedText(spannedText);
+
+  DALI_TEST_EQUALS(true, modelLabel->IsSpannedTextPlaced(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, viewModelLabel->IsSpannedTextPlaced(), TEST_LOCATION);
+
+  // Creates a text controller.
+  Dali::Toolkit::Text::ControllerPtr         controllerTextField = Dali::Toolkit::Text::Controller::New();
+  const Dali::Toolkit::Text::ModelInterface* modelField          = controllerTextField->GetTextModel();
+
+  // Tests the rendering controller has been created.
+  Dali::Toolkit::Text::TypesetterPtr typesetterField = Dali::Toolkit::Text::Typesetter::New(controllerTextField->GetTextModel());
+  DALI_TEST_CHECK(typesetterField);
+
+  // Tests the view model has been created.
+  Dali::Toolkit::Text::ViewModel* viewModelField = typesetterField->GetViewModel();
+  DALI_TEST_CHECK(viewModelField);
+
+  // Configures the text controller similarly to the text-field.
+  Dali::Toolkit::Text::ConfigureTextField(controllerTextField);
+
+  DALI_TEST_EQUALS(false, modelField->IsSpannedTextPlaced(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, viewModelField->IsSpannedTextPlaced(), TEST_LOCATION);
+
+  controllerTextField->SetSpannedText(spannedText);
+
+  DALI_TEST_EQUALS(true, modelField->IsSpannedTextPlaced(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, viewModelField->IsSpannedTextPlaced(), TEST_LOCATION);
+
+  tet_result(TET_PASS);
 
   END_TEST;
 }
