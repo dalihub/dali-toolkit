@@ -97,6 +97,11 @@ public:
   static Toolkit::WebView New( int argc, char** argv );
 
   /**
+   * @copydoc Dali::Toolkit::WebView::GetPlugin()
+   */
+  Dali::WebEnginePlugin* GetPlugin() const;
+
+  /**
    * @brief Get favicon of web page.
    *
    * @return Handle to a favicon
@@ -214,6 +219,11 @@ public:
   void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::RegisterNewWindowCreatedCallback()
+   */
+  void RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::GetPlainTextAsynchronously()
    */
   void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback);
@@ -314,6 +324,12 @@ private:
   void GetContentSize( int& width, int& height ) const;
 
   /**
+   * @brief Get current url.
+   * @return The string value of current url
+   */
+  std::string GetUrl() const;
+
+  /**
    * @brief Returns the title of the Web.
    *
    * @return The title of web page
@@ -324,7 +340,7 @@ private:
    * @brief Get user agent string.
    * @return The string value of user agent
    */
-  const std::string& GetUserAgent() const;
+  std::string GetUserAgent() const;
 
   /**
    * @brief Set user agent string.
@@ -352,7 +368,6 @@ private:
 
 private:
 
-  std::string                                        mUrl;
   Dali::Toolkit::Visual::Base                        mVisual;
   Dali::Size                                         mWebViewSize;
   Dali::WebEngine                                    mWebEngine;

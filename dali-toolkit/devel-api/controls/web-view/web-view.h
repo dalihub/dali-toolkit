@@ -227,6 +227,11 @@ public:
   Dali::Toolkit::WebBackForwardList* GetBackForwardList() const;
 
   /**
+   * @brief Gets web engine plugin.
+   */
+  Dali::WebEnginePlugin* GetPlugin() const;
+
+  /**
    * @brief Get favicon of web page.
    *
    * @return Handle to a favicon
@@ -397,6 +402,13 @@ public:
    * @param[in] callback
    */
   void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
+
+  /**
+   * @brief Callback to be called when a new window would be created.
+   *
+   * @param[in] callback
+   */
+  void RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback);
 
   /**
    * @brief Get a plain text of current web page asynchronously.

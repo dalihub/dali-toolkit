@@ -44,6 +44,9 @@ class WebEngine;
 
 namespace
 {
+
+// Generally only one WebEngine instance exists.
+// If > 1, a new web engine has been created by NewWindowCreated callback.
 static WebEngine* gInstance = nullptr;
 static int gInstanceCount = 0;
 
@@ -382,7 +385,10 @@ public:
     , mContentSize( 500, 500 )
   {
     gInstanceCount++;
-    gInstance = this;
+    if (gInstanceCount == 1) // only first web engine need be saved.
+    {
+      gInstance = this;
+    }
 
     mockWebEngineSettings = new MockWebEngineSettings();
     mockWebEngineContext = new MockWebEngineContext();
@@ -393,9 +399,9 @@ public:
   virtual ~WebEngine()
   {
     gInstanceCount--;
-    if( !gInstanceCount )
+    if(!gInstanceCount)
     {
-      gInstance = NULL;
+      gInstance = nullptr;
     }
 
     delete mockWebEngineSettings;
@@ -422,6 +428,11 @@ public:
   Dali::WebEngineBackForwardList& GetBackForwardList() const
   {
     return *mockWebEngineBackForwardList;
+  }
+
+  Dali::WebEnginePlugin* GetPlugin() const
+  {
+    return nullptr;
   }
 
   void LoadUrl( const std::string& url )
@@ -576,6 +587,11 @@ public:
     mNavigationPolicyDecisionCallback = callback;
   }
 
+  void RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback)
+  {
+    mNewWindowCreatedCallback = callback;
+  }
+
   void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
   {
     if (callback)
@@ -596,6 +612,7 @@ public:
   Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback       mScrollEdgeReachedCallback;
   Dali::WebEnginePlugin::WebEngineUrlChangedCallback              mUrlChangedCallback;
   Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback mNavigationPolicyDecisionCallback;
+  Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback        mNewWindowCreatedCallback;
 
   std::vector<Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback> mResultCallbacks;
   bool                                                                 mEvaluating;
@@ -681,6 +698,11 @@ bool OnLoadUrl()
     {
       std::unique_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
       gInstance->mNavigationPolicyDecisionCallback(std::move(policyDecision));
+    }
+    if (gInstance->mNewWindowCreatedCallback)
+    {
+      Dali::WebEnginePlugin* plugin = 0;
+      gInstance->mNewWindowCreatedCallback(plugin);
     }
   }
   return false;
@@ -975,6 +997,11 @@ void WebEngine::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlCh
 void WebEngine::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
 {
   Internal::Adaptor::GetImplementation(*this).RegisterNavigationPolicyDecidedCallback(callback);
+}
+
+void WebEngine::RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterNewWindowCreatedCallback(callback);
 }
 
 void WebEngine::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)

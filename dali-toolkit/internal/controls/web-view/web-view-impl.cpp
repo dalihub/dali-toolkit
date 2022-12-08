@@ -129,7 +129,6 @@ Dali::Toolkit::Visual::Base CreateNativeImageVisual( NativeImageInterfacePtr nat
 
 WebView::WebView( const std::string& locale, const std::string& timezoneId )
 : Control( ControlBehaviour( ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS ) ),
-  mUrl(),
   mVisual(),
   mWebViewSize( Stage::GetCurrent().GetSize() ),
   mWebEngine(),
@@ -147,7 +146,6 @@ WebView::WebView( const std::string& locale, const std::string& timezoneId )
 
 WebView::WebView( int argc, char** argv )
 : Control( ControlBehaviour( ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS ) ),
-  mUrl(),
   mVisual(),
   mWebViewSize( Stage::GetCurrent().GetSize() ),
   mWebEngine(),
@@ -246,6 +244,11 @@ Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
   return mWebBackForwardList.get();
 }
 
+Dali::WebEnginePlugin* WebView::GetPlugin() const
+{
+  return mWebEngine ? mWebEngine.GetPlugin() : nullptr;
+}
+
 Dali::Toolkit::ImageView WebView::GetFavicon() const
 {
   Dali::Toolkit::ImageView faviconView;
@@ -264,7 +267,6 @@ Dali::Toolkit::ImageView WebView::GetFavicon() const
 
 void WebView::LoadUrl( const std::string& url )
 {
-  mUrl = url;
   if( mWebEngine )
   {
     mVisual = CreateNativeImageVisual( mWebEngine.GetNativeImageSource() );
@@ -509,6 +511,14 @@ void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::Web
   }
 }
 
+void WebView::RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterNewWindowCreatedCallback(callback);
+  }
+}
+
 void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
 {
   if(mWebEngine)
@@ -598,7 +608,7 @@ Property::Value WebView::GetProperty( BaseObject* object, Property::Index proper
     {
       case Toolkit::WebView::Property::URL:
       {
-        value = impl.mUrl;
+        value = impl.GetUrl();
         break;
       }
       case Toolkit::WebView::Property::USER_AGENT:
@@ -719,12 +729,17 @@ void WebView::GetContentSize( int& width, int& height ) const
   }
 }
 
+std::string WebView::GetUrl() const
+{
+  return mWebEngine ? mWebEngine.GetUrl() : kEmptyString;
+}
+
 std::string WebView::GetTitle() const
 {
   return mWebEngine ?  mWebEngine.GetTitle() : kEmptyString;
 }
 
-const std::string& WebView::GetUserAgent() const
+std::string WebView::GetUserAgent() const
 {
   return mWebEngine ? mWebEngine.GetUserAgent() : kEmptyString;
 }

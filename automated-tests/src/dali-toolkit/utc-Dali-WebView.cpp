@@ -50,6 +50,7 @@ static int gPageLoadFinishedCallbackCalled = 0;
 static int gScrollEdgeReachedCallbackCalled = 0;
 static int gUrlChangedCallbackCalled = 0;
 static int gNavigationPolicyDecidedCallbackCalled = 0;
+static int gNewWindowCreatedCallbackCalled = 0;
 static int gEvaluateJavaScriptCallbackCalled = 0;
 static bool gTouched = false;
 static int gPlainTextReceivedCallbackCalled = 0;
@@ -83,7 +84,7 @@ static void OnScrollEdgeReached( Dali::WebEnginePlugin::ScrollEdge edge )
   gScrollEdgeReachedCallbackCalled++;
 }
 
-static void OnUrlChanged( WebView view, const std::string& url )
+static void OnUrlChanged(const std::string& url)
 {
   gUrlChangedCallbackCalled++;
 }
@@ -91,6 +92,13 @@ static void OnUrlChanged( WebView view, const std::string& url )
 static void OnNavigationPolicyDecided(std::unique_ptr<Dali::WebEnginePolicyDecision> decision)
 {
   gNavigationPolicyDecidedCallbackCalled++;
+}
+
+static void OnNewWindowCreated(Dali::WebEnginePlugin*& outPlugin)
+{
+  gNewWindowCreatedCallbackCalled++;
+  WebView newView = WebView::New();
+  outPlugin = newView.GetPlugin();
 }
 
 static bool OnPlainTextReceived(const std::string& plainText)
@@ -822,6 +830,24 @@ int UtcDaliWebViewNavigationPolicyDecisionRequest(void)
   view.LoadUrl(TEST_URL1);
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS(gNavigationPolicyDecidedCallbackCalled, 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliWebViewNewWindowCreated(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  // load url.
+  view.RegisterNewWindowCreatedCallback(&OnNewWindowCreated);
+  DALI_TEST_EQUALS(gNewWindowCreatedCallbackCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gNewWindowCreatedCallbackCalled, 1, TEST_LOCATION);
 
   END_TEST;
 }
