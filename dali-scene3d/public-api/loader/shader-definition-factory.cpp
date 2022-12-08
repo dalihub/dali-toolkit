@@ -81,6 +81,22 @@ uint64_t HashNode(const NodeDefinition& nodeDef, const MaterialDefinition& mater
      materialDef.CheckTextures(MaterialDefinition::NORMAL))
   {
     hash.Add("3TEX");
+
+    // For the glTF, each of basecolor, metallic_roughness, normal texture is not essential.
+    if(materialDef.CheckTextures(MaterialDefinition::ALBEDO))
+    {
+      hash.Add("BCTEX");
+    }
+
+    if(materialDef.CheckTextures(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS))
+    {
+      hash.Add("MRTEX");
+    }
+
+    if(materialDef.CheckTextures(MaterialDefinition::NORMAL))
+    {
+      hash.Add("NTEX");
+    }
   }
 
   if(materialDef.GetAlphaCutoff() > 0.f)
@@ -158,6 +174,16 @@ uint64_t HashNode(const NodeDefinition& nodeDef, const MaterialDefinition& mater
         hash.Add("MORPHV2");
       }
     }
+  }
+
+  if(meshDef.mColors.IsDefined())
+  {
+    hash.Add("COLATT");
+  }
+
+  if(meshDef.mTangentType == Property::VECTOR4)
+  {
+    hash.Add("V4TAN");
   }
 
   return hash;
@@ -321,6 +347,11 @@ Index ShaderDefinitionFactory::ProduceShader(const NodeDefinition& nodeDef)
         shaderDef.mDefines.push_back("MORPH_VERSION_2_0");
       }
     }
+  }
+
+  if(meshDef.mColors.IsDefined())
+  {
+    shaderDef.mDefines.push_back("COLOR_ATTRIBUTE");
   }
 
   if(meshDef.mTangentType == Property::VECTOR4)

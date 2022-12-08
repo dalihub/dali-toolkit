@@ -89,7 +89,9 @@ uniform lowp float uAlphaThreshold;
 // TODO: Multiple texture coordinate will be supported.
 in lowp vec2 vUV;
 in lowp mat3 vTBN;
+#ifdef COLOR_ATTRIBUTE
 in lowp vec4 vColor;
+#endif
 in highp vec3 vPositionToCamera;
 
 out vec4 FragColor;
@@ -119,7 +121,11 @@ void main()
   lowp vec4 baseColor = texture(sAlbedoAlpha, vUV);
   baseColor = vec4(linear(baseColor.rgb), baseColor.w) * uColorFactor;
 #else // BASECOLOR_TEX
+#ifdef COLOR_ATTRIBUTE
   lowp vec4 baseColor = vColor * uColorFactor;
+#else // COLOR_ATTRIBUTE
+  lowp vec4 baseColor = uColorFactor;
+#endif // COLOR_ATTRIBUTE
 #endif // BASECOLOR_TEX
 
 #ifdef METALLIC_ROUGHNESS_TEX
@@ -134,7 +140,11 @@ void main()
 #endif // NORMAL_TEX
 #else // THREE_TEX
   vec4 albedoMetal = texture(sAlbedoMetal, vUV);
+#ifdef COLOR_ATTRIBUTE
   lowp vec4 baseColor = vec4(linear(albedoMetal.rgb), 1.0) * vColor * uColorFactor;
+#else // COLOR_ATTRIBUTE
+  lowp vec4 baseColor = vec4(linear(albedoMetal.rgb), 1.0) * uColorFactor;
+#endif // COLOR_ATTRIBUTE
 
   metallic = albedoMetal.METALLIC * metallic;
 
