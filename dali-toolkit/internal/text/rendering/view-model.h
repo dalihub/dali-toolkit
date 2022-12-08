@@ -358,6 +358,16 @@ public:
    */
   const Vector<CharacterSpacingGlyphRun>& GetCharacterSpacingGlyphRuns() const override;
 
+  /**
+   * @copydoc ModelInterface::GetFontRuns()
+   */
+  const Vector<FontRun>& GetFontRuns() const override;
+
+  /**
+   * @copydoc ModelInterface::GetFontDescriptionRuns()
+   */
+  const Vector<FontDescriptionRun>& GetFontDescriptionRuns() const override;
+
 private:
   const ModelInterface* const mModel;                           ///< Pointer to the text's model.
   Vector<GlyphInfo>           mElidedGlyphs;                    ///< Stores the glyphs of the elided text.
