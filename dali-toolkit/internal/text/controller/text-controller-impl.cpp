@@ -1757,6 +1757,9 @@ void Controller::Impl::CopyStrikethroughFromLogicalToVisualModels()
 
     mModel->mVisualModel->mStrikethroughRuns.PushBack(strikethroughGlyphRun);
   }
+
+  // Reset flag. The updates have been applied from logical to visual.
+  mModel->mLogicalModel->mStrikethroughRunsUpdated = false;
 }
 
 void Controller::Impl::CopyCharacterSpacingFromLogicalToVisualModels()

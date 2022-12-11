@@ -50,6 +50,7 @@ SET(TC_SOURCES
   utc-Dali-Text-Range.cpp
   utc-Dali-Text-SpannableString.cpp
   utc-Dali-Text-UnderlineSpan.cpp
+  utc-Dali-Text-StrikethroughSpan.cpp
   utc-Dali-TextEditor.cpp
   utc-Dali-TextField.cpp
   utc-Dali-TextGeometry.cpp
