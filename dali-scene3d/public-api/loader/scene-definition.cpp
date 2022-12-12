@@ -526,11 +526,6 @@ void SceneDefinition::GetCustomizationOptions(const Customization::Choices& choi
 
 NodeDefinition* SceneDefinition::AddNode(std::unique_ptr<NodeDefinition>&& nodeDef)
 {
-  if(!nodeDef->mName.empty() && FindNode(nodeDef->mName))
-  {
-    return nullptr;
-  }
-
   // add next index (to which we're about to push) as a child to the designated parent, if any.
   if(nodeDef->mParentIdx != INVALID_INDEX)
   {
