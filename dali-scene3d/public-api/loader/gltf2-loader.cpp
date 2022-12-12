@@ -951,7 +951,7 @@ float LoadKeyFrames(const std::string& path, const gt::Animation::Channel& chann
   return duration;
 }
 
-float LoadBlendShapeKeyFrames(const std::string& path, const gt::Animation::Channel& channel, const std::string& nodeName, uint32_t& propertyIndex, std::vector<Dali::Scene3D::Loader::AnimatedProperty>& properties)
+float LoadBlendShapeKeyFrames(const std::string& path, const gt::Animation::Channel& channel, Index nodeIndex, uint32_t& propertyIndex, std::vector<Dali::Scene3D::Loader::AnimatedProperty>& properties)
 {
   const gltf2::Accessor& input  = *channel.mSampler->mInput;
   const gltf2::Accessor& output = *channel.mSampler->mOutput;
@@ -969,7 +969,7 @@ float LoadBlendShapeKeyFrames(const std::string& path, const gt::Animation::Chan
   {
     AnimatedProperty& animatedProperty = properties[propertyIndex++];
 
-    animatedProperty.mNodeName = nodeName;
+    animatedProperty.mNodeIndex = nodeIndex;
     snprintf(pWeightName, remainingSize, "%d]", weightIndex);
     animatedProperty.mPropertyName = std::string(weightNameBuffer);
 
@@ -1001,27 +1001,23 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& context)
     }
 
     uint32_t numberOfProperties = 0u;
-
     for(const auto& channel : animation.mChannels)
     {
-      numberOfProperties += channel.mSampler->mOutput->mCount;
+      if(channel.mTarget.mPath == gt::Animation::Channel::Target::WEIGHTS)
+      {
+        numberOfProperties += channel.mSampler->mOutput->mCount / channel.mSampler->mInput->mCount;
+      }
+      else
+      {
+        numberOfProperties++;
+      }
     }
     animationDef.mProperties.resize(numberOfProperties);
 
     Index propertyIndex = 0u;
     for(const auto& channel : animation.mChannels)
     {
-      std::string nodeName;
-      if(!channel.mTarget.mNode->mName.empty())
-      {
-        nodeName = channel.mTarget.mNode->mName;
-      }
-      else
-      {
-        Index index = context.mNodeIndices.GetRuntimeId(channel.mTarget.mNode.GetIndex());
-        nodeName    = context.mOutput.mScene.GetNode(index)->mName;
-      }
-
+      Index nodeIndex    = context.mNodeIndices.GetRuntimeId(channel.mTarget.mNode.GetIndex());
       float duration = 0.f;
 
       switch(channel.mTarget.mPath)
@@ -1030,7 +1026,7 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& context)
         {
           AnimatedProperty& animatedProperty = animationDef.mProperties[propertyIndex];
 
-          animatedProperty.mNodeName     = nodeName;
+          animatedProperty.mNodeIndex    = nodeIndex;
           animatedProperty.mPropertyName = POSITION_PROPERTY;
 
           animatedProperty.mKeyFrames = KeyFrames::New();
@@ -1043,7 +1039,7 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& context)
         {
           AnimatedProperty& animatedProperty = animationDef.mProperties[propertyIndex];
 
-          animatedProperty.mNodeName     = nodeName;
+          animatedProperty.mNodeIndex    = nodeIndex;
           animatedProperty.mPropertyName = ORIENTATION_PROPERTY;
 
           animatedProperty.mKeyFrames = KeyFrames::New();
@@ -1056,7 +1052,7 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& context)
         {
           AnimatedProperty& animatedProperty = animationDef.mProperties[propertyIndex];
 
-          animatedProperty.mNodeName     = nodeName;
+          animatedProperty.mNodeIndex    = nodeIndex;
           animatedProperty.mPropertyName = SCALE_PROPERTY;
 
           animatedProperty.mKeyFrames = KeyFrames::New();
@@ -1067,7 +1063,7 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& context)
         }
         case gt::Animation::Channel::Target::WEIGHTS:
         {
-          duration = LoadBlendShapeKeyFrames(context.mPath, channel, nodeName, propertyIndex, animationDef.mProperties);
+          duration = LoadBlendShapeKeyFrames(context.mPath, channel, nodeIndex, propertyIndex, animationDef.mProperties);
 
           break;
         }

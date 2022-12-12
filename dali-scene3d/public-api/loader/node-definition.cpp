@@ -63,9 +63,11 @@ void NodeDefinition::Renderable::OnCreate(const NodeDefinition& node, CreatePara
 
 const std::string NodeDefinition::ORIGINAL_MATRIX_PROPERTY_NAME = "originalMatrix";
 
-Actor NodeDefinition::CreateActor(CreateParams& params) const
+Actor NodeDefinition::CreateActor(CreateParams& params)
 {
   Actor actor = Actor::New();
+  mNodeId     = actor.GetProperty<int32_t>(Dali::Actor::Property::ID);
+
   SetActorCentered(actor);
 
   actor.SetProperty(Actor::Property::NAME, mName);

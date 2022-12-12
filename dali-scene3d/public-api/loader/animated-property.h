@@ -19,6 +19,8 @@
 
 // INTERNAL INCLUDES
 #include "dali-scene3d/public-api/api.h"
+#include "dali-scene3d/public-api/loader/index.h"
+
 
 // EXTERNAL INCLUDES
 #include <functional>
@@ -44,10 +46,10 @@ struct DALI_SCENE3D_API AnimatedProperty
 {
 public: // METHODS
   /**
-   * @brief Function to obtain an Actor based on its name. Its processing will
+   * @brief Function to obtain an Actor based on its property. Its processing will
    *  ignore empty handles returned by it.
    */
-  using GetActor = std::function<Actor(const std::string&)>;
+  using GetActor = std::function<Actor(const AnimatedProperty&)>;
 
   /**
    * @return The Property object (of the given @a actor) whose value is being animated.
@@ -82,6 +84,7 @@ public: // DATA
     bool            mIsRelative;
   };
 
+  Index       mNodeIndex = INVALID_INDEX;
   std::string mNodeName;
   std::string mPropertyName;
 

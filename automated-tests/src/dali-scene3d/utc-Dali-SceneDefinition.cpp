@@ -42,10 +42,9 @@ int UtcDaliSceneDefinitionAddNode(void)
   auto node2 = new NodeDefinition();
   node2->mName = node->mName;
   result = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{ node2 });
-  DALI_TEST_EQUAL(result, static_cast<NodeDefinition*>(nullptr)); // failed
-  DALI_TEST_EQUAL(sceneDef.GetNodeCount(), 1u); // still
-  DALI_TEST_EQUAL(sceneDef.GetNode(0), node); // still
-  DALI_TEST_EQUAL(sceneDef.FindNode(node->mName), node); // still
+  DALI_TEST_EQUAL(result, node2);
+  DALI_TEST_EQUAL(sceneDef.GetNodeCount(), 2u);
+  DALI_TEST_EQUAL(sceneDef.GetNode(1), node2);
 
   auto child = new NodeDefinition();
   child->mName = "Second";
@@ -55,11 +54,11 @@ int UtcDaliSceneDefinitionAddNode(void)
 
   result = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{ child });
   DALI_TEST_EQUAL(result, child);
-  DALI_TEST_EQUAL(sceneDef.GetNodeCount(), 2u);
-  DALI_TEST_EQUAL(sceneDef.GetNode(1), child);
+  DALI_TEST_EQUAL(sceneDef.GetNodeCount(), 3u);
+  DALI_TEST_EQUAL(sceneDef.GetNode(2), child);
   DALI_TEST_EQUAL(sceneDef.FindNode(child->mName), child);
 
-  DALI_TEST_EQUAL(node->mChildren[0], 1u); // these are hooked up by AddNode, base on parent idx.
+  DALI_TEST_EQUAL(node->mChildren[0], 2u); // these are hooked up by AddNode, base on parent idx.
 
   END_TEST;
 }

@@ -113,7 +113,7 @@ public: // METHODS
    *  from node definitions.
    * @return Handle to the root actor.
    */
-  Actor CreateNodes(Index iNode, const Customization::Choices& choices, NodeDefinition::CreateParams& params) const;
+  Actor CreateNodes(Index iNode, const Customization::Choices& choices, NodeDefinition::CreateParams& params);
 
   /*
    * @brief Creates / update a registry of mappings from customization tags to

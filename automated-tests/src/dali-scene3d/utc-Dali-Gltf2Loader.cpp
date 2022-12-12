@@ -546,3 +546,59 @@ int UtcDaliGltfLoaderMRendererTest(void)
 
   END_TEST;
 }
+
+
+int UtcDaliGltfLoaderAnimationLoadingTest(void)
+{
+  Context ctx;
+
+  ShaderDefinitionFactory sdf;
+  sdf.SetResources(ctx.resources);
+  auto& resources = ctx.resources;
+
+  LoadGltfScene(TEST_RESOURCE_DIR "/BoxAnimated.gltf", sdf, ctx.loadResult);
+
+  auto& scene = ctx.scene;
+  auto& roots = scene.GetRoots();
+  DALI_TEST_EQUAL(roots.size(), 1u);
+
+  ViewProjection viewProjection;
+  Transforms     xforms{
+    MatrixStack{},
+    viewProjection};
+  NodeDefinition::CreateParams nodeParams{
+    resources,
+    xforms,
+  };
+
+  Customization::Choices choices;
+
+  TestApplication app;
+
+  Actor root = Actor::New();
+  SetActorCentered(root);
+  for(auto iRoot : roots)
+  {
+    auto resourceRefs = resources.CreateRefCounter();
+    scene.CountResourceRefs(iRoot, choices, resourceRefs);
+    resources.CountEnvironmentReferences(resourceRefs);
+    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
+    {
+      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
+      scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
+      scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
+      root.Add(actor);
+    }
+  }
+
+  DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions.size(), 1u);
+  DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions[0].mProperties.size(), 2u);
+
+  uint32_t id = ctx.loadResult.mScene.GetNode(ctx.loadResult.mAnimationDefinitions[0].mProperties[0].mNodeIndex)->mNodeId;
+  DALI_TEST_EQUAL(id, root.FindChildByName("node2").GetProperty<int32_t>(Dali::Actor::Property::ID));
+  uint32_t id2 = ctx.loadResult.mScene.GetNode(ctx.loadResult.mAnimationDefinitions[0].mProperties[1].mNodeIndex)->mNodeId;
+  DALI_TEST_EQUAL(id2, root.FindChildByName("node0").GetProperty<int32_t>(Dali::Actor::Property::ID));
+
+  END_TEST;
+}

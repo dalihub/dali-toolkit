@@ -169,7 +169,6 @@ int UtcDaliDliLoaderLoadSceneAssertions(void)
     {"node-renderable-mesh-invalid-type", "Invalid Mesh index type"},
     {"node-renderable-mesh-out-of-bounds", "out of bounds"},
     {"node-child-invalid-type", "invalid index type"},
-    {"node-name-already-used", "name already used"},
     // from ParseAnimations()
     {"animation-failed-to-open", "Failed to open animation data"}};
   for(auto& i : pathExceptionPairs)

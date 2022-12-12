@@ -57,8 +57,8 @@ int UtcDaliLoadBvh(void)
   first.SetProperty(Actor::Property::NAME, "first");
   root.Add(first);
 
-  auto getActor = [&root](const std::string& name) {
-    return root.FindChildByName(name);
+  auto getActor = [&root](const Dali::Scene3D::Loader::AnimatedProperty& property) {
+    return root.FindChildByName(property.mNodeName);
   };
 
   Animation animation = animDef.ReAnimate(getActor);
