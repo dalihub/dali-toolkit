@@ -233,7 +233,7 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
   {
     ShaderDefinition shaderDef;
     shaderDef.mUseBuiltInShader = true;
-    shaderDef.mRendererState    = RendererState::DEPTH_TEST | RendererState::DEPTH_WRITE;
+    shaderDef.mRendererState    = RendererState::DEPTH_TEST;
 
     auto& materialDef = *receiver.mMaterialDef;
     if(!materialDef.mDoubleSided)
@@ -245,7 +245,7 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
     if(hasTransparency)
     {
       // TODO: this requires more granularity
-      shaderDef.mRendererState = (shaderDef.mRendererState | RendererState::ALPHA_BLEND) & ~RendererState::DEPTH_WRITE;
+      shaderDef.mRendererState = (shaderDef.mRendererState | RendererState::ALPHA_BLEND);
     }
 
     if(hasTransparency ||

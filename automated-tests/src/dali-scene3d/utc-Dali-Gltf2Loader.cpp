@@ -577,6 +577,9 @@ int UtcDaliGltfLoaderMRendererTest(void)
   DALI_TEST_EQUAL(child.GetRendererCount(), 1u);
   DALI_TEST_EQUAL(child.GetRendererAt(0).GetTextures().GetTextureCount(), 4u);
 
+  DALI_TEST_EQUAL(child.GetRendererCount(), 1u);
+  DALI_TEST_EQUAL(child.GetRendererAt(0u).GetProperty<decltype(BlendMode::ON)>(Renderer::Property::BLEND_MODE), BlendMode::ON);
+
   END_TEST;
 }
 
