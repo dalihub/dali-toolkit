@@ -550,9 +550,18 @@ void SceneView::UpdateRenderTask()
         Property::Map imagePropertyMap;
         imagePropertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
         imagePropertyMap.Insert(Toolkit::ImageVisual::Property::URL, imageUrl.GetUrl());
+        // To make sure this visual call LoadTexture API immediate.
+        imagePropertyMap.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, Toolkit::ImageVisual::LoadPolicy::IMMEDIATE);
+        imagePropertyMap.Insert(Toolkit::ImageVisual::Property::RELEASE_POLICY, Toolkit::ImageVisual::ReleasePolicy::DESTROYED);
         // To flip rendered scene without CameraActor::SetInvertYAxis() to avoid backface culling.
         imagePropertyMap.Insert(Toolkit::ImageVisual::Property::PIXEL_AREA, Vector4(0.0f, 1.0f, 1.0f, -1.0f));
         mVisual = Toolkit::VisualFactory::Get().CreateVisual(imagePropertyMap);
+
+        // Use premultiplied alpha when we use FBO
+        if(mVisual)
+        {
+          Toolkit::GetImplementation(mVisual).EnablePreMultipliedAlpha(true);
+        }
 
         Toolkit::DevelControl::RegisterVisual(*this, RENDERING_BUFFER, mVisual);
 
