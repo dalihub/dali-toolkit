@@ -43,6 +43,8 @@
 #include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
+#include <functional>
+
 namespace Dali
 {
 
@@ -62,13 +64,13 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::WebView, Toolkit::Control, Create )
 
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "url",                     STRING,  URL                        )
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "userAgent",               STRING,  USER_AGENT                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollPosition",          VECTOR2, SCROLL_POSITION            )
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollSize",              VECTOR2, SCROLL_SIZE                )
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "contentSize",             VECTOR2, CONTENT_SIZE               )
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "title",                   STRING,  TITLE                      )
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "videoHoleEnabled",        BOOLEAN, VIDEO_HOLE_ENABLED         )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "url",              STRING,  URL                )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "userAgent",        STRING,  USER_AGENT         )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollPosition",   VECTOR2, SCROLL_POSITION    )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollSize",       VECTOR2, SCROLL_SIZE        )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "contentSize",      VECTOR2, CONTENT_SIZE       )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "title",            STRING,  TITLE              )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "videoHoleEnabled", BOOLEAN, VIDEO_HOLE_ENABLED )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -85,16 +87,15 @@ const char* FRAGMENT_SHADER_TEXTURE = DALI_COMPOSE_SHADER(
   \n
   void main()\n
   {\n
-      gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * vec4( mixColor, 1.0 );\n
+      gl_FragColor = texture2D(sTexture, vTexCoord) * uColor * vec4(mixColor, 1.0);\n
   }\n
 );
 
-Dali::Toolkit::Visual::Base CreateNativeImageVisual( NativeImageInterfacePtr nativeImageInterface )
+Dali::Toolkit::Visual::Base CreateNativeImageVisual(NativeImageInterfacePtr nativeImageInterface)
 {
   std::string fragmentShader;
-
   const char* fragmentPrefix = nativeImageInterface->GetCustomFragmentPrefix();
-  if( fragmentPrefix )
+  if(fragmentPrefix)
   {
     fragmentShader = fragmentPrefix;
     fragmentShader += FRAGMENT_SHADER_TEXTURE;
@@ -105,13 +106,13 @@ Dali::Toolkit::Visual::Base CreateNativeImageVisual( NativeImageInterfacePtr nat
   }
 
   const char* customSamplerTypename = nativeImageInterface->GetCustomSamplerTypename();
-  if( customSamplerTypename )
+  if(customSamplerTypename)
   {
-    fragmentShader.replace( fragmentShader.find( DEFAULT_SAMPLER_TYPENAME ), strlen( DEFAULT_SAMPLER_TYPENAME ), customSamplerTypename );
+    fragmentShader.replace(fragmentShader.find(DEFAULT_SAMPLER_TYPENAME), strlen(DEFAULT_SAMPLER_TYPENAME), customSamplerTypename);
   }
 
-  Texture texture = Dali::Texture::New( *nativeImageInterface );
-  const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture( texture );
+  Texture texture = Dali::Texture::New(*nativeImageInterface);
+  const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
 
   return Toolkit::VisualFactory::Get().CreateVisual(
     { { Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE } ,
@@ -120,12 +121,6 @@ Dali::Toolkit::Visual::Base CreateNativeImageVisual( NativeImageInterfacePtr nat
 }
 
 } // anonymous namepsace
-
-#define GET_ENUM_STRING( structName, inputExp ) \
-  Scripting::GetLinearEnumerationName< Toolkit::WebView::structName::Type >( static_cast< Toolkit::WebView::structName::Type >( inputExp ), structName##_TABLE, structName##_TABLE_COUNT )
-
-#define GET_ENUM_VALUE( structName, inputExp, outputExp ) \
-  Scripting::GetEnumerationProperty< Toolkit::WebView::structName::Type >( inputExp, structName##_TABLE, structName##_TABLE_COUNT, outputExp )
 
 WebView::WebView( const std::string& locale, const std::string& timezoneId )
 : Control( ControlBehaviour( ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS ) ),
@@ -205,22 +200,23 @@ void WebView::OnInitialize()
 {
   Actor self = Self();
 
-  self.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
-  self.TouchedSignal().Connect( this, &WebView::OnTouchEvent );
+  self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  self.TouchedSignal().Connect(this, &WebView::OnTouchEvent);
 
   mPositionUpdateNotification = self.AddPropertyNotification( Actor::Property::WORLD_POSITION, StepCondition( 1.0f, 1.0f ) );
   mSizeUpdateNotification = self.AddPropertyNotification( Actor::Property::SIZE, StepCondition( 1.0f, 1.0f ) );
   mScaleUpdateNotification = self.AddPropertyNotification( Actor::Property::WORLD_SCALE, StepCondition( 0.1f, 1.0f ) );
-  mPositionUpdateNotification.NotifySignal().Connect( this, &WebView::UpdateDisplayArea );
-  mSizeUpdateNotification.NotifySignal().Connect( this, &WebView::UpdateDisplayArea );
-  mScaleUpdateNotification.NotifySignal().Connect( this, &WebView::UpdateDisplayArea );
+  mPositionUpdateNotification.NotifySignal().Connect( this, &WebView::OnDisplayAreaUpdated );
+  mSizeUpdateNotification.NotifySignal().Connect( this, &WebView::OnDisplayAreaUpdated );
+  mScaleUpdateNotification.NotifySignal().Connect( this, &WebView::OnDisplayAreaUpdated );
 
-  if( mWebEngine )
+  if(mWebEngine)
   {
-    mWebContext = std::unique_ptr<Dali::Toolkit::WebContext>( new WebContext( mWebEngine.GetContext() ) );
-    mWebCookieManager = std::unique_ptr<Dali::Toolkit::WebCookieManager>( new WebCookieManager( mWebEngine.GetCookieManager() ) );
-    mWebSettings = std::unique_ptr<Dali::Toolkit::WebSettings>( new WebSettings( mWebEngine.GetSettings() ) );
-    mWebBackForwardList = std::unique_ptr<Dali::Toolkit::WebBackForwardList>( new WebBackForwardList( mWebEngine.GetBackForwardList() ) );
+    mWebEngine.RegisterFrameRenderedCallback(std::bind(&WebView::OnFrameRendered, this));
+    mWebContext = std::unique_ptr<Dali::Toolkit::WebContext>(new WebContext(mWebEngine.GetContext()));
+    mWebCookieManager = std::unique_ptr<Dali::Toolkit::WebCookieManager>(new WebCookieManager(mWebEngine.GetCookieManager()));
+    mWebSettings = std::unique_ptr<Dali::Toolkit::WebSettings>(new WebSettings(mWebEngine.GetSettings()));
+    mWebBackForwardList = std::unique_ptr<Dali::Toolkit::WebBackForwardList>(new WebBackForwardList(mWebEngine.GetBackForwardList()));
   }
 }
 
@@ -265,42 +261,19 @@ Dali::Toolkit::ImageView WebView::GetFavicon() const
   return faviconView;
 }
 
-void WebView::LoadUrl( const std::string& url )
+void WebView::LoadUrl(const std::string& url)
 {
-  if( mWebEngine )
+  if(mWebEngine)
   {
-    mVisual = CreateNativeImageVisual( mWebEngine.GetNativeImageSource() );
-
-    if( mVisual )
-    {
-      // Clean up previously registered visual and add new one.
-      DevelControl::RegisterVisual( *this, Toolkit::WebView::Property::URL, mVisual );
-      mWebEngine.LoadUrl( url );
-    }
-
-    if ( mVideoHoleEnabled )
-    {
-      EnableBlendMode( false );
-    }
+    mWebEngine.LoadUrl(url);
   }
 }
 
-void WebView::LoadHtmlString( const std::string& htmlString )
+void WebView::LoadHtmlString(const std::string& htmlString)
 {
-  if( mWebEngine )
+  if(mWebEngine)
   {
-    mVisual = CreateNativeImageVisual( mWebEngine.GetNativeImageSource() );
-
-    if( mVisual )
-    {
-      DevelControl::RegisterVisual( *this, Toolkit::WebView::Property::URL, mVisual );
-      mWebEngine.LoadHtmlString( htmlString );
-    }
-
-    if ( mVideoHoleEnabled )
-    {
-      EnableBlendMode( false );
-    }
+    mWebEngine.LoadHtmlString(htmlString);
   }
 }
 
@@ -410,56 +383,23 @@ void WebView::SetTtsFocus(bool focused)
   }
 }
 
-void WebView::UpdateDisplayArea( Dali::PropertyNotification& /*source*/ )
-{
-  if( !mWebEngine )
-    return;
-
-  Actor self( Self() );
-
-  bool positionUsesAnchorPoint = self.GetProperty< bool >( Actor::Property::POSITION_USES_ANCHOR_POINT );
-  Vector3 actorSize = self.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) * self.GetCurrentProperty< Vector3 >( Actor::Property::SCALE );
-  Vector3 anchorPointOffSet = actorSize * ( positionUsesAnchorPoint ? self.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ) : AnchorPoint::TOP_LEFT );
-  Vector2 screenPosition = self.GetProperty< Vector2 >( Actor::Property::SCREEN_POSITION );
-
-  Dali::Rect< int > displayArea;
-  displayArea.x = screenPosition.x - anchorPointOffSet.x;
-  displayArea.y = screenPosition.y - anchorPointOffSet.y;
-  displayArea.width = actorSize.x;
-  displayArea.height = actorSize.y;
-
-  Size displaySize = Size( displayArea.width, displayArea.height );
-  if ( mWebViewSize != displaySize )
-  {
-    mWebViewSize = displaySize;
-  }
-
-  if (mWebViewArea != displayArea )
-  {
-    mWebViewArea = displayArea;
-    mWebEngine.UpdateDisplayArea( mWebViewArea );
-  }
-}
-
 void WebView::EnableVideoHole( bool enabled )
 {
   mVideoHoleEnabled = enabled;
-
-  EnableBlendMode( !mVideoHoleEnabled );
-
-  if( mWebEngine )
+  EnableBlendMode(!mVideoHoleEnabled);
+  if(mWebEngine)
   {
-    mWebEngine.EnableVideoHole( mVideoHoleEnabled );
+    mWebEngine.EnableVideoHole(mVideoHoleEnabled);
   }
 }
 
-void WebView::EnableBlendMode( bool blendEnabled )
+void WebView::EnableBlendMode(bool blendEnabled)
 {
   Actor self = Self();
   for (uint32_t i = 0; i < self.GetRendererCount(); i++)
   {
-    Dali::Renderer render = self.GetRendererAt( i );
-    render.SetProperty( Renderer::Property::BLEND_MODE, blendEnabled ? BlendMode::ON : BlendMode::OFF );
+    Dali::Renderer render = self.GetRendererAt(i);
+    render.SetProperty(Renderer::Property::BLEND_MODE, blendEnabled ? BlendMode::ON : BlendMode::OFF);
   }
 }
 
@@ -535,21 +475,18 @@ Vector3 WebView::GetNaturalSize()
     mVisual.GetNaturalSize( rendererNaturalSize );
     return Vector3( rendererNaturalSize );
   }
-
   return Vector3( mWebViewSize );
 }
 
 void WebView::OnSceneConnection( int depth )
 {
   Control::OnSceneConnection( depth );
-
   EnableBlendMode( !mVideoHoleEnabled );
 }
 
 void WebView::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
   Toolkit::WebView webView = Toolkit::WebView::DownCast( Dali::BaseHandle( object ) );
-
   if( webView )
   {
     WebView& impl = GetImpl( webView );
@@ -598,9 +535,7 @@ void WebView::SetProperty( BaseObject* object, Property::Index index, const Prop
 Property::Value WebView::GetProperty( BaseObject* object, Property::Index propertyIndex )
 {
   Property::Value value;
-
   Toolkit::WebView webView = Toolkit::WebView::DownCast( Dali::BaseHandle( object ) );
-
   if( webView )
   {
     WebView& impl = GetImpl( webView );
@@ -658,7 +593,6 @@ Property::Value WebView::GetProperty( BaseObject* object, Property::Index proper
 bool WebView::OnTouchEvent( Actor actor, const Dali::TouchEvent& touch )
 {
   bool result = false;
-
   if( mWebEngine )
   {
     result = mWebEngine.SendTouchEvent( touch );
@@ -669,7 +603,6 @@ bool WebView::OnTouchEvent( Actor actor, const Dali::TouchEvent& touch )
 bool WebView::OnKeyEvent( const Dali::KeyEvent& event )
 {
   bool result = false;
-
   if( mWebEngine )
   {
     result = mWebEngine.SendKeyEvent( event );
@@ -683,7 +616,6 @@ void WebView::OnKeyInputFocusGained()
   {
     mWebEngine.SetFocus( true );
   }
-
   EmitKeyInputFocusSignal( true ); // Calls back into the Control hence done last.
 }
 
@@ -693,8 +625,52 @@ void WebView::OnKeyInputFocusLost()
   {
     mWebEngine.SetFocus( false );
   }
-
   EmitKeyInputFocusSignal( false ); // Calls back into the Control hence done last.
+}
+
+void WebView::OnFrameRendered()
+{
+  // Make sure that mVisual is created only once.
+  if (mVisual)
+    return;
+
+  mVisual = CreateNativeImageVisual(mWebEngine.GetNativeImageSource());
+  if (mVisual)
+  {
+    DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
+    EnableBlendMode(!mVideoHoleEnabled);
+  }
+}
+
+void WebView::OnDisplayAreaUpdated(Dali::PropertyNotification& /*source*/)
+{
+  if( !mWebEngine )
+    return;
+
+  Actor self( Self() );
+
+  bool positionUsesAnchorPoint = self.GetProperty< bool >( Actor::Property::POSITION_USES_ANCHOR_POINT );
+  Vector3 actorSize = self.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) * self.GetCurrentProperty< Vector3 >( Actor::Property::SCALE );
+  Vector3 anchorPointOffSet = actorSize * ( positionUsesAnchorPoint ? self.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ) : AnchorPoint::TOP_LEFT );
+  Vector2 screenPosition = self.GetProperty< Vector2 >( Actor::Property::SCREEN_POSITION );
+
+  Dali::Rect< int > displayArea;
+  displayArea.x = screenPosition.x - anchorPointOffSet.x;
+  displayArea.y = screenPosition.y - anchorPointOffSet.y;
+  displayArea.width = actorSize.x;
+  displayArea.height = actorSize.y;
+
+  Size displaySize = Size( displayArea.width, displayArea.height );
+  if ( mWebViewSize != displaySize )
+  {
+    mWebViewSize = displaySize;
+  }
+
+  if (mWebViewArea != displayArea )
+  {
+    mWebViewArea = displayArea;
+    mWebEngine.UpdateDisplayArea( mWebViewArea );
+  }
 }
 
 void WebView::SetScrollPosition( int x, int y )
@@ -751,9 +727,6 @@ void WebView::SetUserAgent( const std::string& userAgent )
     mWebEngine.SetUserAgent( userAgent );
   }
 }
-
-#undef GET_ENUM_STRING
-#undef GET_ENUM_VALUE
 
 } // namespace Internal
 

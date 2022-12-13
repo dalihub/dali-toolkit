@@ -284,6 +284,17 @@ private: // From Control
   void OnKeyInputFocusLost() override;
 
   /**
+   * @brief Callback for notifying frame rendered.
+   */
+  void OnFrameRendered();
+
+  /**
+   * @brief Callback for updating display area of web view.
+   * @param[in] source The soource triggers Notification.
+   */
+  void OnDisplayAreaUpdated(Dali::PropertyNotification& source);
+
+  /**
    * @copydoc Toolkit::Control::OnSceneConnection()
    */
   void OnSceneConnection( int depth ) override;
@@ -347,12 +358,6 @@ private:
    * @param[in] userAgent The string value of user agent
    */
   void SetUserAgent( const std::string& userAgent );
-
-  /**
-   * @brief Updates display area of web view.
-   * @param[in] source The soource triggers Notification.
-   */
-  void UpdateDisplayArea( Dali::PropertyNotification& source );
 
   /**
    * @brief Enable/Disable video hole for video playing.
