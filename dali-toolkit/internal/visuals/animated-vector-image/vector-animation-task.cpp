@@ -510,6 +510,12 @@ bool VectorAnimationTask::Rasterize(bool& keepAnimation)
     mForward     = true;
     mCurrentLoop = 0;
 
+    if(mVectorRenderer)
+    {
+      // Notify the Renderer that rendering is stopped.
+      mVectorRenderer.RenderStopped();
+    }
+
     // Animation is finished
     {
       ConditionalWait::ScopedLock lock(mConditionalWait);

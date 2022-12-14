@@ -344,6 +344,16 @@ public:
    */
   const Vector<CharacterSpacingGlyphRun>& GetCharacterSpacingGlyphRuns() const override;
 
+  /**
+   * @copydoc ModelInterface::GetFontRuns()
+   */
+  const Vector<FontRun>& GetFontRuns() const override;
+
+  /**
+   * @copydoc ModelInterface::GetFontDescriptionRuns()
+   */
+  const Vector<FontDescriptionRun>& GetFontDescriptionRuns() const override;
+
 private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.
