@@ -218,7 +218,7 @@ public: // METHODS
    * @brief Creates a DALi Actor from this definition only.
    * @note Not recursive.
    */
-  Actor CreateActor(CreateParams& params) const;
+  Actor CreateActor(CreateParams& params);
 
   /**
    * @brief Gets local space matrix of this node
@@ -253,6 +253,7 @@ public: // DATA
   static const std::string ORIGINAL_MATRIX_PROPERTY_NAME;
 
   std::string mName;
+  uint32_t    mNodeId = INVALID_INDEX;
 
   Vector3    mPosition    = Vector3::ZERO;
   Quaternion mOrientation = Quaternion::IDENTITY;

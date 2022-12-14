@@ -164,7 +164,7 @@ void AddJointDebugVisual(Actor aJoint)
 }
 #endif //DEBUG_JOINTS
 
-class ActorCreatorVisitor : public NodeDefinition::IConstVisitor
+class ActorCreatorVisitor : public NodeDefinition::IVisitor
 {
 public:
   ActorCreatorVisitor(NodeDefinition::CreateParams& params)
@@ -172,7 +172,7 @@ public:
   {
   }
 
-  void Start(const NodeDefinition& n)
+  void Start(NodeDefinition& n)
   {
     mCreationContext.mXforms.modelStack.Push(n.GetLocalSpace());
 
@@ -188,7 +188,7 @@ public:
     mActorStack.push_back(a);
   }
 
-  void Finish(const NodeDefinition& n)
+  void Finish(NodeDefinition& n)
   {
     mActorStack.pop_back();
     mCreationContext.mXforms.modelStack.Pop();
@@ -469,7 +469,7 @@ void SceneDefinition::CountResourceRefs(Index iNode, const Customization::Choice
   Visit(iNode, choices, refCounterVisitor);
 }
 
-Actor SceneDefinition::CreateNodes(Index iNode, const Customization::Choices& choices, NodeDefinition::CreateParams& params) const
+Actor SceneDefinition::CreateNodes(Index iNode, const Customization::Choices& choices, NodeDefinition::CreateParams& params)
 {
   ActorCreatorVisitor actorCreatorVisitor(params);
 
