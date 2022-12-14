@@ -1790,6 +1790,7 @@ void Controller::Impl::CopyCharacterSpacingFromLogicalToVisualModels()
 
     mModel->mVisualModel->mCharacterSpacingRuns.PushBack(characterSpacingGlyphRun);
   }
+  mModel->mLogicalModel->mCharacterSpacingRunsUpdated = false;
 }
 
 void Controller::Impl::SetAutoScrollEnabled(bool enable)

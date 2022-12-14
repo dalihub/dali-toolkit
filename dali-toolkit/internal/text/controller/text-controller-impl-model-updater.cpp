@@ -583,7 +583,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
   {
     //Mark-up processor case
     if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled() ||
-       impl.mModel->mLogicalModel->mUnderlineRunsUpdated)
+       impl.mModel->mLogicalModel->mUnderlineRunsUpdated ||
+       impl.mModel->mLogicalModel->mCharacterSpacingRunsUpdated)
     {
       impl.CopyUnderlinedFromLogicalToVisualModels(true);
       impl.CopyStrikethroughFromLogicalToVisualModels();
