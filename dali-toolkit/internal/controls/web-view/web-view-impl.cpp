@@ -1304,6 +1304,9 @@ void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::
 {
   if(mRemoteChild.GetAddress())
   {
+    // DoGetChildren is called at most once per every OnChildrenChanged.
+    // We have only one OnChildrenChanged in this case, so EmbedAtkSocket will be called only once.
+    Accessibility::Bridge::GetCurrentBridge()->EmbedAtkSocket(GetAddress(), mRemoteChild.GetAddress());
     children.push_back(&mRemoteChild);
   }
 }
@@ -1334,11 +1337,6 @@ void WebView::WebViewAccessible::SetRemoteChildAddress(Dali::Accessibility::Addr
 {
   mRemoteChild.SetAddress(address);
   OnChildrenChanged();
-
-  if(address)
-  {
-    Accessibility::Bridge::GetCurrentBridge()->EmbedAtkSocket(GetAddress(), address);
-  }
 }
 
 #undef GET_ENUM_STRING
