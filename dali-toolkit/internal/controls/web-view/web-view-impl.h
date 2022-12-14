@@ -99,6 +99,11 @@ public:
   Dali::Toolkit::WebBackForwardList* GetBackForwardList() const;
 
   /**
+   * @copydoc Dali::Toolkit::WebView::GetPlugin()
+   */
+  Dali::WebEnginePlugin* GetPlugin() const;
+
+  /**
    * @copydoc Dali::Toolkit::WebView::GetFavicon()
    */
   Dali::Toolkit::ImageView GetFavicon() const;
@@ -374,6 +379,11 @@ public:
   void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::RegisterNewWindowCreatedCallback()
+   */
+  void RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::RegisterCertificateConfirmedCallback()
    */
   void RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback);
@@ -463,11 +473,6 @@ private:
   WebView(const WebView& webView);
 
   WebView& operator=(const WebView& webView);
-
-  /**
-   * @brief Gets web engine plugin.
-   */
-  Dali::WebEnginePlugin* GetPlugin() const;
 
   /**
    * @brief Set an absolute scroll of the given view.
@@ -593,12 +598,6 @@ private:
   bool SetVisibility(bool visible);
 
   /**
-   * @brief Update display area of web view.
-   * @param[in] source The soource triggers Notification.
-   */
-  void UpdateDisplayArea(Dali::PropertyNotification& source);
-
-  /**
    * @brief Enable/Disable video hole for video playing.
    * @param[in] enabled True if video hole is enabled, false otherwise.
    */
@@ -661,9 +660,10 @@ private:
   void OnFrameRendered();
 
   /**
-   * @brief Callback function to be called when frame is rendered. This is to check initial buffer is ready.
+   * @brief Callback for updating display area of web view.
+   * @param[in] source The soource triggers Notification.
    */
-  void OnInitialFrameRendered();
+  void OnDisplayAreaUpdated(Dali::PropertyNotification& source);
 
   /**
    * @brief Callback function to be called when visibility is changed.

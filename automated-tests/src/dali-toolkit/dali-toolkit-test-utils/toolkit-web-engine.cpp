@@ -1229,7 +1229,7 @@ public:
   void EnableVideoHole(bool enabled) override {}
   bool SendHoverEvent(const HoverEvent& event) override { return false; }
   bool SendWheelEvent(const WheelEvent& event) override { return false; }
-  WebEngineFrameRenderedSignalType& FrameRenderedSignal() override { return frameRenderedSignal; }
+  void RegisterFrameRenderedCallback(WebEngineFrameRenderedCallback callback) override {}
   void RegisterPageLoadStartedCallback(WebEnginePageLoadCallback callback) override {}
   void RegisterPageLoadInProgressCallback(WebEnginePageLoadCallback callback) override {}
   void RegisterPageLoadFinishedCallback(WebEnginePageLoadCallback callback) override {}
@@ -1240,6 +1240,7 @@ public:
   void RegisterConsoleMessageReceivedCallback(WebEngineConsoleMessageReceivedCallback callback) override {}
   void RegisterResponsePolicyDecidedCallback(WebEngineResponsePolicyDecidedCallback callback) override {}
   void RegisterNavigationPolicyDecidedCallback(WebEngineNavigationPolicyDecidedCallback callback) override {}
+  void RegisterNewWindowCreatedCallback(WebEngineNewWindowCreatedCallback callback) override {}
   void RegisterCertificateConfirmedCallback(WebEngineCertificateCallback callback) override {}
   void RegisterSslCertificateChangedCallback(WebEngineCertificateCallback callback) override {}
   void RegisterHttpAuthHandlerCallback(WebEngineHttpAuthHandlerCallback callback) override {}
@@ -1249,7 +1250,6 @@ public:
 private:
   MockWebEngineSettings settings;
   MockWebEngineBackForwardList backForwardList;
-  WebEngineFrameRenderedSignalType frameRenderedSignal;
 };
 
 Dali::WebEnginePlugin* GetWebEnginePlugin()
@@ -1614,9 +1614,9 @@ public:
     }
   }
 
-  Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType& FrameRenderedSignal()
+  void RegisterFrameRenderedCallback(Dali::WebEnginePlugin::WebEngineFrameRenderedCallback callback)
   {
-    return mFrameRenderedSignal;
+    mFrameRenderedCallback = callback;
   }
 
   void RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
@@ -1669,6 +1669,11 @@ public:
     mNavigationPolicyDecisionCallback = callback;
   }
 
+  void RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback)
+  {
+    mNewWindowCreatedCallback = callback;
+  }
+
   void RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
   {
     mCertificateConfirmCallback = callback;
@@ -1708,8 +1713,6 @@ public:
   size_t                   mCurrentPlusOnePos;
   std::string              mUserAgent;
 
-  Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType mFrameRenderedSignal;
-
   bool  mEvaluating;
   float mPageZoomFactor;
   float mTextZoomFactor;
@@ -1734,6 +1737,7 @@ public:
   Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback  mConsoleMessageCallback;
   Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback   mResponsePolicyDecisionCallback;
   Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback mNavigationPolicyDecisionCallback;
+  Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback        mNewWindowCreatedCallback;
   Dali::WebEnginePlugin::WebEngineCertificateCallback             mCertificateConfirmCallback;
   Dali::WebEnginePlugin::WebEngineCertificateCallback             mSslCertificateChangedCallback;
   Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback         mHttpAuthHandlerCallback;
@@ -1813,7 +1817,6 @@ bool OnLoadUrl()
       std::unique_ptr<Dali::WebEngineFormRepostDecision> repostDecision(new MockWebEngineFormRepostDecision());
       gInstance->mFormRepostDecidedCallback(std::move(repostDecision));
     }
-    gInstance->mFrameRenderedSignal.Emit();
     if (gInstance->mFrameRenderedCallback)
     {
       gInstance->mFrameRenderedCallback();
@@ -1832,6 +1835,11 @@ bool OnLoadUrl()
     {
       std::unique_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
       gInstance->mNavigationPolicyDecisionCallback(std::move(policyDecision));
+    }
+    if (gInstance->mNewWindowCreatedCallback)
+    {
+      Dali::WebEnginePlugin* plugin = 0;
+      gInstance->mNewWindowCreatedCallback(plugin);
     }
     if (gInstance->mCertificateConfirmCallback)
     {
@@ -2507,9 +2515,9 @@ void WebEngine::EnableKeyEvents( bool enabled )
 {
 }
 
-Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType& WebEngine::FrameRenderedSignal()
+void WebEngine::RegisterFrameRenderedCallback(Dali::WebEnginePlugin::WebEngineFrameRenderedCallback callback)
 {
-  return Internal::Adaptor::GetImplementation(*this).FrameRenderedSignal();
+  Internal::Adaptor::GetImplementation(*this).RegisterFrameRenderedCallback(callback);
 }
 
 void WebEngine::RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
@@ -2560,6 +2568,11 @@ void WebEngine::RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::Web
 void WebEngine::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
 {
   Internal::Adaptor::GetImplementation(*this).RegisterNavigationPolicyDecidedCallback(callback);
+}
+
+void WebEngine::RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterNewWindowCreatedCallback(callback);
 }
 
 void WebEngine::RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
