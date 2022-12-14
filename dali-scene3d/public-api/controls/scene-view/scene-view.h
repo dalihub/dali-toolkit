@@ -104,6 +104,16 @@ class DALI_SCENE3D_API SceneView : public Dali::Toolkit::Control
 {
 public:
   /**
+   * @brief The skybox types
+   * @SINCE_2_2.6
+   */
+  enum class SkyboxType
+  {
+    CUBEMAP,        ///< Skybox in cubemap
+    EQUIRECTANGULAR ///< Skybox in equirectangular projection
+  };
+
+  /**
    * @brief Create an initialized SceneView.
    *
    * @SINCE_2_1.38
@@ -320,9 +330,10 @@ public:
    * Skybox texture is asynchronously loaded. When loading is finished, ResourceReady is emitted.
    *
    * @SINCE_2_2.0
-   * @param[in] skyboxUrl Cube map image url for skybox.
+   * @param[in] skyboxUrl image url for skybox.
+   * @param[in] skyboxType The skybox type (by default it is cubemap).
    */
-  void SetSkybox(const std::string& skyboxUrl);
+  void SetSkybox(const std::string& skyboxUrl, SkyboxType skyboxType = SkyboxType::CUBEMAP);
 
   /**
    * @brief Sets Skybox intensity.
