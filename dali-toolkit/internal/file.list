@@ -163,6 +163,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/spannable/spans/base-span-impl.cpp
    ${toolkit_src_dir}/text/spannable/spans/foreground-color-span-impl.cpp
    ${toolkit_src_dir}/text/spannable/spans/font-span-impl.cpp
+   ${toolkit_src_dir}/text/spannable/spans/underline-span-impl.cpp
    ${toolkit_src_dir}/text/spannable/span-ranges-container-impl.cpp
    ${toolkit_src_dir}/text/hyphenator.cpp
    ${toolkit_src_dir}/text/text-enumerations-impl.cpp

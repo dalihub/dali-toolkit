@@ -1721,6 +1721,9 @@ void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearP
 
     mModel->mVisualModel->mUnderlineRuns.PushBack(underlineGlyphRun);
   }
+
+  // Reset flag. The updates have been applied from logical to visual.
+  mModel->mLogicalModel->mUnderlineRunsUpdated = false;
 }
 
 void Controller::Impl::CopyStrikethroughFromLogicalToVisualModels()

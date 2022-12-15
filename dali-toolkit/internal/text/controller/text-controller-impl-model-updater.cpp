@@ -387,7 +387,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           impl.mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
 
           //Mark-up processor case
-          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled())
+          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled() ||
+             impl.mModel->mLogicalModel->mUnderlineRunsUpdated)
           {
             impl.CopyUnderlinedFromLogicalToVisualModels(false);
           }
@@ -428,7 +429,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           impl.mModel->mLogicalModel->mColorRuns.PushBack(colorRun);
 
           //Mark-up processor case
-          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled())
+          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled() ||
+             impl.mModel->mLogicalModel->mUnderlineRunsUpdated)
           {
             impl.CopyUnderlinedFromLogicalToVisualModels(false);
           }
@@ -443,7 +445,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           impl.mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
 
           //Mark-up processor case
-          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled())
+          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled() ||
+             impl.mModel->mLogicalModel->mUnderlineRunsUpdated)
           {
             impl.CopyUnderlinedFromLogicalToVisualModels(false);
           }
@@ -464,7 +467,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           impl.mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
 
           //Mark-up processor case
-          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled())
+          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled() ||
+             impl.mModel->mLogicalModel->mUnderlineRunsUpdated)
           {
             impl.CopyUnderlinedFromLogicalToVisualModels(false);
           }
@@ -485,7 +489,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           impl.mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
 
           //Mark-up processor case
-          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled())
+          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled() ||
+             impl.mModel->mLogicalModel->mUnderlineRunsUpdated)
           {
             impl.CopyUnderlinedFromLogicalToVisualModels(false);
           }
@@ -506,7 +511,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           impl.mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
 
           //Mark-up processor case
-          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled())
+          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled() ||
+             impl.mModel->mLogicalModel->mUnderlineRunsUpdated)
           {
             impl.CopyUnderlinedFromLogicalToVisualModels(false);
           }
@@ -527,7 +533,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           impl.mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
 
           //Mark-up processor case
-          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled())
+          if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled() ||
+             impl.mModel->mLogicalModel->mUnderlineRunsUpdated)
           {
             impl.CopyUnderlinedFromLogicalToVisualModels(false);
           }
@@ -575,7 +582,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
        (0u != impl.mModel->mVisualModel->mCharactersToGlyph.Count())))
   {
     //Mark-up processor case
-    if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled())
+    if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled() ||
+       impl.mModel->mLogicalModel->mUnderlineRunsUpdated)
     {
       impl.CopyUnderlinedFromLogicalToVisualModels(true);
       impl.CopyStrikethroughFromLogicalToVisualModels();
