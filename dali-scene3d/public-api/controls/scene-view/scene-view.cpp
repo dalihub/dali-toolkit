@@ -127,9 +127,9 @@ bool SceneView::IsUsingFramebuffer() const
   return GetImpl(*this).IsUsingFramebuffer();
 }
 
-void SceneView::SetSkybox(const std::string& skyboxUrl)
+void SceneView::SetSkybox(const std::string& skyboxUrl, SkyboxType skyboxType)
 {
-  GetImpl(*this).SetSkybox(skyboxUrl);
+  GetImpl(*this).SetSkybox(skyboxUrl, skyboxType);
 }
 
 void SceneView::SetSkyboxIntensity(float intensity)

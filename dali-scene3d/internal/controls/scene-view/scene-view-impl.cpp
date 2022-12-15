@@ -25,6 +25,7 @@
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
+#include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
@@ -65,7 +66,7 @@ constexpr uint8_t DEFAULT_FRAME_BUFFER_MULTI_SAMPLING_LEVEL = 4u;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
 
-Dali::Actor CreateSkybox(const std::string& skyboxUrl)
+Dali::Actor CreateSkybox(const std::string& skyboxUrl, Scene3D::SceneView::SkyboxType skyboxType)
 {
   struct Vertex
   {
@@ -121,7 +122,6 @@ Dali::Actor CreateSkybox(const std::string& skyboxUrl)
     {Vector3(-1.0f, -1.0f, 1.0f)},
     {Vector3(1.0f, -1.0f, 1.0f)}};
 
-  Dali::Shader       shaderSkybox = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
   Dali::VertexBuffer vertexBuffer = Dali::VertexBuffer::New(Property::Map().Add("aPosition", Property::VECTOR3));
   vertexBuffer.SetData(skyboxVertices, sizeof(skyboxVertices) / sizeof(Vertex));
 
@@ -129,11 +129,29 @@ Dali::Actor CreateSkybox(const std::string& skyboxUrl)
   skyboxGeometry.AddVertexBuffer(vertexBuffer);
   skyboxGeometry.SetType(Geometry::TRIANGLES);
 
-  Dali::Texture    skyboxTexture  = Dali::Scene3D::Loader::LoadCubeMap(skyboxUrl);
+  Dali::Texture  skyboxTexture;
+  Dali::Shader   shaderSkybox;
+  Dali::Renderer skyboxRenderer;
+
+  if(skyboxType == Scene3D::SceneView::SkyboxType::CUBEMAP)
+  {
+    skyboxTexture = Dali::Scene3D::Loader::LoadCubeMap(skyboxUrl);
+    shaderSkybox  = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
+  }
+  else // Scene3D::SceneView::SkyboxType::EQUIRECTANGULAR
+  {
+    // Load image from file
+    PixelData pixels = Dali::Toolkit::SyncImageLoader::Load(skyboxUrl);
+
+    skyboxTexture = Texture::New(TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight());
+    skyboxTexture.Upload(pixels, 0, 0, 0, 0, pixels.GetWidth(), pixels.GetHeight());
+    shaderSkybox = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_EQUIRECTANGULAR_SHADER_FRAG.data());
+  }
+
   Dali::TextureSet skyboxTextures = TextureSet::New();
   skyboxTextures.SetTexture(0, skyboxTexture);
 
-  Dali::Renderer skyboxRenderer = Renderer::New(skyboxGeometry, shaderSkybox);
+  skyboxRenderer = Renderer::New(skyboxGeometry, shaderSkybox);
   skyboxRenderer.SetTextures(skyboxTextures);
   skyboxRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, 2.0f);
   // Enables the depth test.
@@ -338,7 +356,7 @@ bool SceneView::IsUsingFramebuffer() const
   return mUseFrameBuffer;
 }
 
-void SceneView::SetSkybox(const std::string& skyboxUrl)
+void SceneView::SetSkybox(const std::string& skyboxUrl, Scene3D::SceneView::SkyboxType skyboxType)
 {
   mSkyboxResourceReady = false;
   if(mSkybox)
@@ -346,7 +364,7 @@ void SceneView::SetSkybox(const std::string& skyboxUrl)
     mSkybox.Unparent();
     mSkybox.Reset();
   }
-  mSkybox = CreateSkybox(skyboxUrl);
+  mSkybox = CreateSkybox(skyboxUrl, skyboxType);
   SetSkyboxIntensity(mSkyboxIntensity);
   SetSkyboxOrientation(mSkyboxOrientation);
   if(mRootLayer)

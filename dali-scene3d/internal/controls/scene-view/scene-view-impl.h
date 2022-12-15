@@ -140,7 +140,7 @@ public:
   /**
    * @copydoc SceneView::SetSkybox()
    */
-  void SetSkybox(const std::string& skyboxUrl);
+  void SetSkybox(const std::string& skyboxUrl, Scene3D::SceneView::SkyboxType skyboxType);
 
   /**
    * @copydoc SceneView::SetSkyboxIntensity()
