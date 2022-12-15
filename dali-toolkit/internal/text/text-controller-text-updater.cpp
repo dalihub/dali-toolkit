@@ -215,19 +215,41 @@ void Controller::TextUpdater::InsertText(Controller& controller, const std::stri
 
   if(!text.empty())
   {
+    std::string redefinedText = text;
+
+    if(controller.mImpl->mInputFilter != NULL)
+    {
+      bool accepted = false;
+      bool rejected = false;
+
+      accepted = impl.mInputFilter->Filter(Toolkit::InputFilter::Property::ACCEPTED, redefinedText);
+      rejected = impl.mInputFilter->Filter(Toolkit::InputFilter::Property::REJECTED, redefinedText);
+
+      if(accepted)
+      {
+        // Signal emits when the string to be inserted is filtered by the accepted filter.
+        controller.mImpl->mEditableControlInterface->InputFiltered(Toolkit::InputFilter::Property::ACCEPTED);
+      }
+      if(rejected)
+      {
+        // Signal emits when the string to be inserted is filtered by the rejected filter.
+        controller.mImpl->mEditableControlInterface->InputFiltered(Toolkit::InputFilter::Property::REJECTED);
+      }
+    }
+
     //  Convert text into UTF-32
-    utf32Characters.Resize(text.size());
+    utf32Characters.Resize(redefinedText.size());
 
     // This is a bit horrible but std::string returns a (signed) char*
-    const uint8_t* utf8 = reinterpret_cast<const uint8_t*>(text.c_str());
+    const uint8_t* utf8 = reinterpret_cast<const uint8_t*>(redefinedText.c_str());
 
     // Transform a text array encoded in utf8 into an array encoded in utf32.
     // It returns the actual number of characters.
-    characterCount = Utf8ToUtf32(utf8, text.size(), utf32Characters.Begin());
+    characterCount = Utf8ToUtf32(utf8, redefinedText.size(), utf32Characters.Begin());
     utf32Characters.Resize(characterCount);
 
-    DALI_ASSERT_DEBUG(text.size() >= utf32Characters.Count() && "Invalid UTF32 conversion length");
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "UTF8 size %d, UTF32 size %d\n", text.size(), utf32Characters.Count());
+    DALI_ASSERT_DEBUG(redefinedText.size() >= utf32Characters.Count() && "Invalid UTF32 conversion length");
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "UTF8 size %d, UTF32 size %d\n", redefinedText.size(), utf32Characters.Count());
   }
 
   if(0u != utf32Characters.Count()) // Check if Utf8ToUtf32 conversion succeeded
