@@ -332,6 +332,7 @@ private:
   TextureManager::TextureId mTextureId;
   TextureSet                mTextures;
   Vector2                   mTextureSize;
+  Vector2                   mPlacementActorSize;
 
   ImageVisualShaderFactory& mImageVisualShaderFactory;
 
