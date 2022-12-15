@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace
 // currently not called from code so compiler will optimize these away, kept here for future debugging
 
 #define FLEX_CONTAINER_TAG "DALI Toolkit::FlexContainer "
-#define FC_LOG(fmt, args, ...) Debug::LogMessageWithFunctionLine(Debug::DebugInfo, FLEX_CONTAINER_TAG fmt, ##args)
+#define FC_LOG(fmt, args, ...) Debug::LogMessageWithFunctionLine(Debug::INFO, FLEX_CONTAINER_TAG fmt, ##args)
 // #define FLEX_CONTAINER_DEBUG 1
 
 #if defined(FLEX_CONTAINER_DEBUG)
