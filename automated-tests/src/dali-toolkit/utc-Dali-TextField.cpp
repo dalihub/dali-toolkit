@@ -1788,6 +1788,57 @@ int utcDaliTextFieldPositionWithInputMethodContext(void)
   END_TEST;
 }
 
+int utcDaliTextFieldInputFilterWithInputMethodContext(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldInputFilterWithInputMethodContext");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  Property::Map inputFilter;
+  inputFilter[InputFilter::Property::ACCEPTED] = "[\\d]";
+  inputFilter[InputFilter::Property::REJECTED] = "[5-7]";
+
+  // Set input filter to TextField.
+  field.SetProperty(DevelTextField::Property::INPUT_FILTER, inputFilter);
+
+  application.GetScene().Add(field);
+
+  // connect to the input filtered signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextField::InputFilteredSignal(field).Connect(&TestInputFilteredCallback);
+  bool inputFilteredSignal = false;
+  field.ConnectSignal(testTracker, "inputFiltered", CallbackFunctor(&inputFilteredSignal));
+
+  // get InputMethodContext
+  std::string                   text;
+  InputMethodContext::EventData imfEvent;
+  InputMethodContext            inputMethodContext = DevelTextField::GetInputMethodContext(field);
+
+  field.SetKeyInputFocus();
+  field.SetProperty(DevelTextField::Property::ENABLE_EDITING, true);
+
+  // input text
+  gInputFilteredAcceptedCallbackCalled = false;
+  imfEvent = InputMethodContext::EventData(InputMethodContext::COMMIT, "Hello1234", 0, 9);
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(gInputFilteredAcceptedCallbackCalled);
+  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("1234"), TEST_LOCATION);
+
+  inputFilteredSignal = false;
+  gInputFilteredRejectedCallbackCalled = false;
+  imfEvent = InputMethodContext::EventData(InputMethodContext::COMMIT, "1234567", 0, 7);
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(gInputFilteredRejectedCallbackCalled);
+  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("12341234"), TEST_LOCATION);
+
+  END_TEST;
+}
+
 // Negative test for the textChanged signal.
 int utcDaliTextFieldTextChangedN(void)
 {

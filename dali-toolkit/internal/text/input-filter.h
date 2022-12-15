@@ -63,6 +63,14 @@ public: // Intended for internal use
    */
   bool Contains(Toolkit::InputFilter::Property::Type type, std::string source);
 
+  /**
+   * @brief Filtering the text using regex.
+   * @param[in] type ACCEPTED or REJECTED
+   * @param[in,out] text The string value to filter and write back.
+   * @return @e true if the text is filtered by the regex, otherwise returns @e false.
+   */
+  bool Filter(Toolkit::InputFilter::Property::Type type, std::string& text);
+
 private:
   std::string mAccepted;
   std::string mRejected;
