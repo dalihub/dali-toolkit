@@ -73,7 +73,7 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&            
                                                      const Dali::WrapMode::Type&         wrapModeV,
                                                      bool                                isSynchronousLoading,
                                                      bool                                preMultiplyOnLoad)
-: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, 0u),
+: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, 0u, preMultiplyOnLoad),
   mImageUrl(animatedImageLoading.GetUrl()),
   mAnimatedImageLoading(animatedImageLoading),
   mFrameCount(SINGLE_IMAGE_COUNT),
@@ -82,8 +82,7 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&            
   mQueue(cacheSize),
   mWrapModeU(wrapModeU),
   mWrapModeV(wrapModeV),
-  mIsSynchronousLoading(isSynchronousLoading),
-  mPreMultiplyOnLoad(preMultiplyOnLoad)
+  mIsSynchronousLoading(isSynchronousLoading)
 {
   mTextureIds.resize(mFrameCount);
   mIntervals.assign(mFrameCount, 0);
@@ -111,7 +110,10 @@ TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
   bool synchronouslyLoaded = false;
   if(mIsSynchronousLoading && mQueue.IsEmpty())
   {
-    textureSet        = RequestFrameLoading(frameIndex, true);
+    auto preMultiplyOnLoading = mPreMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
+                                                   : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
+    textureSet        = RequestFrameLoading(frameIndex, true, preMultiplyOnLoading);
     batchFrameIndex   = (frameIndex + 1) % mFrameCount;
     uint32_t interval = 0u;
     if(textureSet)
@@ -119,7 +121,7 @@ TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
       synchronouslyLoaded = true;
       interval            = mAnimatedImageLoading.GetFrameInterval(mQueue.Back().mFrameNumber);
     }
-    MakeFrameReady(synchronouslyLoaded, textureSet, interval);
+    MakeFrameReady(synchronouslyLoaded, textureSet, interval, preMultiplyOnLoading == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
   }
 
   if(popExist || mQueue.IsEmpty() || synchronouslyLoaded)
@@ -191,7 +193,15 @@ bool RollingAnimatedImageCache::IsFrontReady() const
   return (!mQueue.IsEmpty() && mQueue.Front().mReady);
 }
 
-TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, bool synchronousLoading)
+TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex)
+{
+  auto preMultiplyOnLoading = mPreMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
+                                                 : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
+  return RequestFrameLoading(frameIndex, false, preMultiplyOnLoading);
+}
+
+TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, bool synchronousLoading, TextureManager::MultiplyOnLoad& preMultiplyOnLoading)
 {
   ImageFrame imageFrame;
   imageFrame.mFrameNumber = frameIndex;
@@ -200,9 +210,6 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
   mQueue.PushBack(imageFrame);
 
   mLoadState = TextureManager::LoadState::LOADING;
-
-  auto preMultiplyOnLoading = mPreMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
-                                                 : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
   TextureSet                textureSet    = mTextureManager.LoadAnimatedImageTexture(mImageUrl,
@@ -238,7 +245,7 @@ void RollingAnimatedImageCache::LoadBatch(uint32_t frameIndex)
   {
     if(mLoadState != TextureManager::LoadState::LOADING)
     {
-      RequestFrameLoading(frameIndex, false);
+      RequestFrameLoading(frameIndex);
     }
     else
     {
@@ -309,12 +316,13 @@ void RollingAnimatedImageCache::ClearCache()
   mLoadState = TextureManager::LoadState::NOT_STARTED;
 }
 
-void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t interval)
+void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t interval, bool preMultiplied)
 {
   if(!loadSuccess)
   {
     mLoadState = TextureManager::LoadState::LOAD_FAILED;
-    mObserver.FrameReady(TextureSet(), 0);
+    // preMultiplied should be false because broken image don't premultiply alpha on load
+    mObserver.FrameReady(TextureSet(), 0, false);
   }
   else
   {
@@ -337,7 +345,7 @@ void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet text
     // If it is, notify frame ready to observer.
     if(frontFrameReady == false && IsFrontReady())
     {
-      mObserver.FrameReady(textureSet, interval);
+      mObserver.FrameReady(textureSet, interval, preMultiplied);
     }
   }
 }
@@ -354,7 +362,7 @@ void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformatio
     textureInformation.textureSet.SetSampler(0u, sampler);
   }
 
-  MakeFrameReady(loadSuccess, textureInformation.textureSet, textureInformation.interval);
+  MakeFrameReady(loadSuccess, textureInformation.textureSet, textureInformation.interval, textureInformation.preMultiplied);
 
   if(loadSuccess)
   {
@@ -365,7 +373,7 @@ void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformatio
     {
       uint32_t loadingIndex = mLoadWaitingQueue.front();
       mLoadWaitingQueue.erase(mLoadWaitingQueue.begin());
-      RequestFrameLoading(loadingIndex, false);
+      RequestFrameLoading(loadingIndex);
     }
     else if(mQueue.Count() == 1u && textureInformation.frameCount > SINGLE_IMAGE_COUNT)
     {

@@ -37,16 +37,17 @@ class RollingImageCache : public ImageCache, public TextureUploadObserver
 public:
   /**
    * Constructor.
-   * @param[in] textureManager The texture manager
-   * @param[in] size           The width and height to fit the loaded image to.
-   * @param[in] fittingMode    The FittingMode of the resource to load
-   * @param[in] samplingMode   The SamplingMode of the resource to load
-   * @param[in] urlList        List of urls to cache
-   * @param[in] maskingData    Masking data to be applied.
-   * @param[in] observer       FrameReady observer
-   * @param[in] cacheSize      The size of the cache
-   * @param[in] batchSize      The size of a batch to load
-   * @param[in] interval       Time interval between each frame
+   * @param[in] textureManager    The texture manager
+   * @param[in] size              The width and height to fit the loaded image to.
+   * @param[in] fittingMode       The FittingMode of the resource to load
+   * @param[in] samplingMode      The SamplingMode of the resource to load
+   * @param[in] urlList           List of urls to cache
+   * @param[in] maskingData       Masking data to be applied.
+   * @param[in] observer          FrameReady observer
+   * @param[in] cacheSize         The size of the cache
+   * @param[in] batchSize         The size of a batch to load
+   * @param[in] interval          Time interval between each frame
+   * @param[in] preMultiplyOnLoad The flag if image's color should be multiplied by it's alpha
    *
    * This will start loading textures immediately, according to the
    * batch and cache sizes.
@@ -60,7 +61,8 @@ public:
                     ImageCache::FrameReadyObserver&     observer,
                     uint16_t                            cacheSize,
                     uint16_t                            batchSize,
-                    uint32_t                            interval);
+                    uint32_t                            interval,
+                    bool                                preMultiplyOnLoad);
 
   /**
    * Destructor

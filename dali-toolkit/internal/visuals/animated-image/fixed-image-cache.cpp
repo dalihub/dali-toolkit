@@ -43,8 +43,9 @@ FixedImageCache::FixedImageCache(TextureManager&                     textureMana
                                  TextureManager::MaskingDataPointer& maskingData,
                                  ImageCache::FrameReadyObserver&     observer,
                                  uint32_t                            batchSize,
-                                 uint32_t                            interval)
-: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, interval),
+                                 uint32_t                            interval,
+                                 bool                                preMultiplyOnLoad)
+: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, interval, preMultiplyOnLoad),
   mImageUrls(urlList),
   mFront(FIRST_FRAME_INDEX)
 {
@@ -133,9 +134,11 @@ void FixedImageCache::LoadBatch()
     ImageAtlasManagerPtr  imageAtlasManager  = nullptr;
     Vector4               textureRect;
     Dali::ImageDimensions textureRectSize;
-    auto                  preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-    mTextureManager.LoadTexture(url, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mImageUrls[frameIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
+    auto preMultiplyOnLoading = mPreMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
+                                                   : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
+    mTextureManager.LoadTexture(url, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mImageUrls[frameIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
     mRequestingLoad = false;
   }
 }
@@ -152,11 +155,11 @@ TextureSet FixedImageCache::GetFrontTextureSet() const
   return textureSet;
 }
 
-void FixedImageCache::CheckFrontFrame(bool wasReady)
+void FixedImageCache::CheckFrontFrame(bool wasReady, bool preMultiplied)
 {
   if(wasReady == false && IsFrontReady())
   {
-    mObserver.FrameReady(GetFrontTextureSet(), mInterval);
+    mObserver.FrameReady(GetFrontTextureSet(), mInterval, preMultiplied);
   }
 }
 
@@ -199,12 +202,13 @@ void FixedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureI
     {
       mReadyFlags.back() = true;
     }
-    CheckFrontFrame(frontFrameReady);
+    CheckFrontFrame(frontFrameReady, textureInformation.preMultiplied);
   }
   else
   {
     mLoadState = TextureManager::LoadState::LOAD_FAILED;
-    mObserver.FrameReady(TextureSet(), 0);
+    // preMultiplied should be false because broken image don't premultiply alpha on load
+    mObserver.FrameReady(TextureSet(), 0, false);
   }
 }
 
