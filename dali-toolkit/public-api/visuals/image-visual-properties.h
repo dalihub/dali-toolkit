@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -245,7 +245,7 @@ enum
    * @brief The policy to determine when an image should no longer be cached.
    * @details Name "releasePolicy", Type ReleasePolicy::Type (Property::INTEGER) or Property::STRING
    * @SINCE_1_3_5
-   * @note Default ReleasePolicy::DESTROYED
+   * @note Default ReleasePolicy::DETACHED
    * @see ReleasePolicy::Type
    */
   RELEASE_POLICY,
