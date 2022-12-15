@@ -21,11 +21,12 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <toolkit-text-utils.h>
-#include <dali-toolkit/internal/text/font-description-run.h>
+#include <dali-toolkit/devel-api/text/spannable-string.h>
 #include <dali-toolkit/internal/text/controller/text-controller.h>
+#include <dali-toolkit/internal/text/font-description-run.h>
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 #include <dali-toolkit/internal/text/rendering/view-model.h>
+#include <toolkit-text-utils.h>
 
 using namespace Dali;
 using namespace Toolkit;

@@ -350,6 +350,15 @@ public:
   virtual bool IsMarkupProcessorEnabled() const = 0;
 
   /**
+   * @brief Retrieves whether the spanned-text is placed.
+   *
+   * By default is disabled.
+   *
+   * @return @e true if the spanned-text is placed, otherwise returns @e false.
+   */
+  virtual bool IsSpannedTextPlaced() const = 0;
+
+  /**
    * @brief Returns the hyphens glyph info.
    *
    * @return hyphens glyph info.
