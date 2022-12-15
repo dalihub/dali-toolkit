@@ -28,12 +28,13 @@
 
 namespace Dali
 {
+class WebEngineContext;
+class WebEngineCookieManager;
+
 namespace Toolkit
 {
 class ImageView;
 class WebBackForwardList;
-class WebContext;
-class WebCookieManager;
 class WebSettings;
 
 namespace Internal DALI_INTERNAL
@@ -277,6 +278,11 @@ public:
    * @brief Get WebBackForwardList of WebEngine.
    */
   Dali::Toolkit::WebBackForwardList* GetBackForwardList() const;
+
+  /**
+   * @brief Gets web engine plugin.
+   */
+  Dali::WebEnginePlugin* GetPlugin() const;
 
   /**
    * @brief Get favicon of web page.
@@ -702,6 +708,13 @@ public:
    * @param[in] callback
    */
   void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
+
+  /**
+   * @brief Callback to be called when a new window would be created.
+   *
+   * @param[in] callback
+   */
+  void RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback);
 
   /**
    * @brief Callback to be called when certificate need be confirmed.

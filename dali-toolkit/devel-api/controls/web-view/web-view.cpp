@@ -94,6 +94,11 @@ Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
   return Dali::Toolkit::GetImpl(*this).GetBackForwardList();
 }
 
+Dali::WebEnginePlugin* WebView::GetPlugin() const
+{
+  return Dali::Toolkit::GetImpl(*this).GetPlugin();
+}
+
 Dali::Toolkit::ImageView WebView::GetFavicon() const
 {
   return Dali::Toolkit::GetImpl(*this).GetFavicon();
@@ -372,6 +377,11 @@ void WebView::RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEn
 void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
 {
   Dali::Toolkit::GetImpl(*this).RegisterNavigationPolicyDecidedCallback(callback);
+}
+
+void WebView::RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterNewWindowCreatedCallback(callback);
 }
 
 void WebView::RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)

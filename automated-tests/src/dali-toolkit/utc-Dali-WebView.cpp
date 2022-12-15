@@ -79,6 +79,7 @@ static int                                                                gConso
 static std::unique_ptr<Dali::WebEngineConsoleMessage>                     gConsoleMessageInstance                = nullptr;
 static int                                                                gResponsePolicyDecidedCallbackCalled   = 0;
 static int                                                                gNavigationPolicyDecidedCallbackCalled = 0;
+static int                                                                gNewWindowCreatedCallbackCalled        = 0;
 static std::unique_ptr<Dali::WebEnginePolicyDecision>                     gResponsePolicyDecisionInstance        = nullptr;
 static int                                                                gCertificateConfirmCallbackCalled      = 0;
 static std::unique_ptr<Dali::WebEngineCertificate>                        gCertificateConfirmInstance            = nullptr;
@@ -146,6 +147,13 @@ static void OnResponsePolicyDecided(std::unique_ptr<Dali::WebEnginePolicyDecisio
 static void OnNavigationPolicyDecided(std::unique_ptr<Dali::WebEnginePolicyDecision> decision)
 {
   gNavigationPolicyDecidedCallbackCalled++;
+}
+
+static void OnNewWindowCreated(Dali::WebEnginePlugin*& outPlugin)
+{
+  gNewWindowCreatedCallbackCalled++;
+  WebView newView = WebView::New();
+  outPlugin = newView.GetPlugin();
 }
 
 static void OnUrlChanged(const std::string& url)
@@ -1289,6 +1297,24 @@ int UtcDaliWebViewNavigationPolicyDecisionRequest(void)
   view.LoadUrl(TEST_URL1);
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS(gNavigationPolicyDecidedCallbackCalled, 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliWebViewNewWindowCreated(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  // load url.
+  view.RegisterNewWindowCreatedCallback(&OnNewWindowCreated);
+  DALI_TEST_EQUALS(gNewWindowCreatedCallbackCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gNewWindowCreatedCallbackCalled, 1, TEST_LOCATION);
 
   END_TEST;
 }
