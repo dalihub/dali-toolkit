@@ -24,7 +24,7 @@ namespace Loader
 {
 void AnimatedProperty::Animate(Animation& anim, GetActor getActor)
 {
-  if(Actor actor = getActor(mNodeName))
+  if(Actor actor = getActor(*this))
   {
     Property prop = GetProperty(actor);
     if(mKeyFrames)

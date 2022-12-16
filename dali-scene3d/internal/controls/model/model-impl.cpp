@@ -507,8 +507,8 @@ void Model::LoadModel()
 
   if(!animations.empty())
   {
-    auto getActor = [&](const std::string& name) {
-      return mModelRoot.FindChildByName(name);
+    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property) {
+      return mModelRoot.FindChildById(scene.GetNode(property.mNodeIndex)->mNodeId);
     };
 
     mAnimations.clear();

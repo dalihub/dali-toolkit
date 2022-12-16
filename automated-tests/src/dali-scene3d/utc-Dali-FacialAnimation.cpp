@@ -77,8 +77,8 @@ int UtcDaliLoadFacialAnimation(void)
     actor.RegisterProperty(weightName, 0.0f);
   }
 
-  auto getActor = [&actor](const std::string& name) {
-    return actor.FindChildByName(name);
+  auto getActor = [&actor](const Dali::Scene3D::Loader::AnimatedProperty& property) {
+    return actor.FindChildByName(property.mNodeName);
   };
 
   auto anim = animDef.ReAnimate(getActor);

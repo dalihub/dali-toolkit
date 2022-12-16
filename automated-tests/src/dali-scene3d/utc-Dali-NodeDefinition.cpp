@@ -101,6 +101,7 @@ int UtcDaliNodeDefinitionProperties(void)
   TestApplication testApp;
   NodeDefinition  nodeDef{
     "testRootNode",
+    INVALID_INDEX,
     Vector3{-100.f, 100.f, -500.f},
     Quaternion{Radian(Degree(45.f)), Vector3::ZAXIS},
     Vector3{2.f, 4.f, 8.f},
