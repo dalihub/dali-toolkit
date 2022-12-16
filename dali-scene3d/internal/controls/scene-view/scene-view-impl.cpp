@@ -402,6 +402,7 @@ void SceneView::UpdateRenderTask()
          currentFrameBuffer.GetColorTexture().GetWidth() != size.width ||
          currentFrameBuffer.GetColorTexture().GetHeight() != size.height)
       {
+        mRootLayer.SetProperty(Dali::Actor::Property::COLOR_MODE, ColorMode::USE_OWN_COLOR);
         mRenderTask.ResetViewportGuideActor();
         mRenderTask.SetViewport(Dali::Viewport(Vector4::ZERO));
 
@@ -440,6 +441,7 @@ void SceneView::UpdateRenderTask()
       mRenderTask.SetViewportGuideActor(Self());
       if(mRenderTask.GetFrameBuffer())
       {
+        mRootLayer.SetProperty(Dali::Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_ALPHA);
         FrameBuffer framebuffer;
         mRenderTask.SetFrameBuffer(framebuffer);
         mRenderTask.SetClearEnabled(false);
