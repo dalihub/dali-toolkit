@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDE
 #include <map>
+#include <string>
 
 namespace Dali
 {
