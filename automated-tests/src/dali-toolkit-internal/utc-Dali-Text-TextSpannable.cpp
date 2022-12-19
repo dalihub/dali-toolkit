@@ -37,6 +37,8 @@
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <toolkit-text-utils.h>
+#include <dali-toolkit/devel-api/text/spans/character-spacing-span.h>
+
 
 using namespace Dali;
 using namespace Toolkit;
@@ -86,6 +88,19 @@ Text::SpannableString CreateSpannableStringForUnderlineSpan()
     Text::UnderlineSpan::NewDashed(Color::GREEN, 5.0f, 2.0f, 3.0f),
     Text::Range::New(5u, 7u));
   DALI_TEST_CHECK(isAddedUnderlineSpan);
+
+  return spannableString;
+}
+
+Text::SpannableString CreateSpannableStringForCharacterSpacing()
+{
+  Text::SpannableString spannableString = Text::SpannableString::New("Hello World");
+  DALI_TEST_CHECK(spannableString);
+
+  auto isCharacterSpacingSpan = spannableString.AttachSpan(
+  Text::CharacterSpacingSpan::New(5.2f),
+  Text::Range::New(5u, 7u));
+  DALI_TEST_CHECK(isCharacterSpacingSpan);
 
   return spannableString;
 }
@@ -361,5 +376,26 @@ int UtcDaliToolkitTextLabelSetSpannedText_UnderlineSpan(void)
   DALI_TEST_EQUALS(underlineRuns[0].glyphRun.numberOfGlyphs, 3u, TEST_LOCATION);
   DALI_TEST_CHECK(underlineRuns[0].properties == expectedProperties);
 
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelSetSpannedText_CharacterSpacingSpan(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliToolkitTextLabelSetSpannedText_CharacterSpacingSpan");
+
+  TextLabel textLabel = TextLabel::New();
+  DALI_TEST_CHECK(textLabel);
+  application.GetScene().Add(textLabel);
+
+  Text::SpannableString spannableString = CreateSpannableStringForCharacterSpacing();
+  Text::SetSpannedText(textLabel, spannableString);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextLabel& labelImpl   = GetImpl(textLabel);
+  const Vector<Dali::Toolkit::Text::CharacterSpacingGlyphRun> characterSpacing = labelImpl.GetTextController()->GetTextModel()->GetCharacterSpacingGlyphRuns();
+  DALI_TEST_EQUALS(1, characterSpacing.Count(), TEST_LOCATION);
   END_TEST;
 }
