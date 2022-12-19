@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ bool FitToChild(Actor actor, Dimension::Type dimension)
 // currently not called from code so compiler will optimize these away, kept here for future debugging
 
 #define TABLEVIEW_TAG "DALI Toolkit::TableView "
-#define TV_LOG(fmt, args, ...) Debug::LogMessageWithFunctionLine(Debug::DebugInfo, TABLEVIEW_TAG fmt, ##args)
+#define TV_LOG(fmt, args, ...) Debug::LogMessageWithFunctionLine(Debug::INFO, TABLEVIEW_TAG fmt, ##args)
 //#define TABLEVIEW_DEBUG 1
 
 #if defined(TABLEVIEW_DEBUG)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,15 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include "dali-scene3d/public-api/loader/string-callback.h"
 #include <dali-test-suite-utils.h>
 #include <string_view>
+#include "dali-scene3d/public-api/loader/string-callback.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
 
 namespace
 {
-
 char sBuffer[64];
 
 void TestLogFunction(Integration::Log::DebugPriority level, std::string& str)
@@ -35,12 +34,12 @@ void TestLogFunction(Integration::Log::DebugPriority level, std::string& str)
   snprintf(sBuffer, sizeof(sBuffer), "%d: %s", level, str.c_str());
 }
 
-}
+} // namespace
 
 int UtcDaliUtilsDefaultStringCallback(void)
 {
   InstallLogFunction(TestLogFunction);
   DefaultErrorCallback("Hello world!");
-  DALI_TEST_EQUAL(std::string(sBuffer), "2: string-callback.cpp: DefaultErrorCallback(28) > Hello world!");
+  DALI_TEST_EQUAL(std::string(sBuffer), "3: string-callback.cpp: DefaultErrorCallback(28) > Hello world!");
   END_TEST;
 }
