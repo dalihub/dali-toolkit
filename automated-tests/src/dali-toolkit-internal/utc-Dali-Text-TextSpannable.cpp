@@ -38,7 +38,7 @@
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <toolkit-text-utils.h>
 #include <dali-toolkit/devel-api/text/spans/character-spacing-span.h>
-
+#include <dali-toolkit/devel-api/text/spans/bold-span.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -103,6 +103,19 @@ Text::SpannableString CreateSpannableStringForCharacterSpacing()
   DALI_TEST_CHECK(isCharacterSpacingSpan);
 
   return spannableString;
+}
+
+Text::SpannableString CreateSpannableStringForBoldSpan()
+{
+  Text::SpannableString spannableString = Text::SpannableString::New("Hello");
+  DALI_TEST_CHECK(spannableString);
+
+  auto boldspan = Dali::Toolkit::Text::BoldSpan::New();
+  auto isBoldSpan = spannableString.AttachSpan(boldspan,Dali::Toolkit::Text::Range::New(0u, 3u));
+  DALI_TEST_CHECK(isBoldSpan);
+
+  return spannableString;
+
 }
 
 void CheckColorIndices(const Text::ColorIndex* const colorIndicesBuffer,
@@ -397,5 +410,35 @@ int UtcDaliToolkitTextLabelSetSpannedText_CharacterSpacingSpan(void)
   Toolkit::Internal::TextLabel& labelImpl   = GetImpl(textLabel);
   const Vector<Dali::Toolkit::Text::CharacterSpacingGlyphRun> characterSpacing = labelImpl.GetTextController()->GetTextModel()->GetCharacterSpacingGlyphRuns();
   DALI_TEST_EQUALS(1, characterSpacing.Count(), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelSetSpannedText_BoldSpan(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("UtcDaliToolkitTextLabelSetSpannedText_BoldSpan");
+
+  TextLabel textLabel = TextLabel::New();
+
+  DALI_TEST_CHECK(textLabel);
+
+  application.GetScene().Add(textLabel);
+
+  Text::SpannableString spannableString = CreateSpannableStringForBoldSpan();
+  Text::SetSpannedText(textLabel, spannableString);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextLabel&               labelImpl  = GetImpl(textLabel);
+
+  const Vector<Text::FontRun>& validFonts = labelImpl.GetTextController()->GetTextModel()->GetFontRuns();
+
+  DALI_TEST_EQUALS(validFonts.Count(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFonts[0].characterRun.characterIndex,0, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFonts[0].characterRun.GetEndCharacterIndex(),3, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFonts[0].isBoldRequired, true, TEST_LOCATION);
+
   END_TEST;
 }
