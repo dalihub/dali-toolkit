@@ -482,6 +482,7 @@ void Model::LoadModel()
   Dali::Scene3D::Loader::Customization::Choices       choices;
 
   mModelRoot = Actor::New();
+  mModelRoot.SetProperty(Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR);
 
   BoundingVolume AABB;
   for(auto iRoot : scene.GetRoots())

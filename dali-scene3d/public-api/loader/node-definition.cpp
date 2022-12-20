@@ -83,6 +83,10 @@ Actor NodeDefinition::CreateActor(CreateParams& params)
   {
     actor.SetProperty(Actor::Property::COLOR_MODE, ColorMode::USE_PARENT_COLOR);
   }
+  else
+  {
+    actor.SetProperty(Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR);
+  }
 
   if(mRenderable)
   {
