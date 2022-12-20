@@ -213,6 +213,8 @@ int UtcDaliGltfLoaderSuccess1(void)
      false,
      true,
      false,
+     true,
+     true,
      {
        {MaterialDefinition::ALBEDO,
         {"AnimatedCube_BaseColor.png",
@@ -261,6 +263,8 @@ int UtcDaliGltfLoaderSuccess1(void)
      Vector3::ONE,
      true,
      true,
+     true,
+     false,
      true,
      false,
      {
@@ -313,6 +317,8 @@ int UtcDaliGltfLoaderSuccess1(void)
     DALI_TEST_EQUAL(md.mNeedAlbedoTexture, m.mNeedAlbedoTexture);
     DALI_TEST_EQUAL(md.mNeedMetallicRoughnessTexture, m.mNeedMetallicRoughnessTexture);
     DALI_TEST_EQUAL(md.mNeedNormalTexture, m.mNeedNormalTexture);
+    DALI_TEST_EQUAL(md.mIsOpaque, m.mIsOpaque);
+    DALI_TEST_EQUAL(md.mIsMask, m.mIsMask);
 
     DALI_TEST_EQUAL(md.mTextureStages.size(), m.mTextureStages.size());
     auto iTexture = md.mTextureStages.begin();
@@ -395,6 +401,33 @@ int UtcDaliGltfLoaderSuccess1(void)
   DALI_TEST_EQUAL(0u, ctx.lights.size());
   DALI_TEST_EQUAL(1u, ctx.animations.size());
   DALI_TEST_EQUAL(0u, ctx.animationGroups.size());
+
+  END_TEST;
+}
+
+int UtcDaliGltfLoaderSuccess2(void)
+{
+  Context ctx;
+  ShaderDefinitionFactory sdf;
+  sdf.SetResources(ctx.resources);
+
+  LoadGltfScene(TEST_RESOURCE_DIR "/AnimatedCubeStride.gltf", sdf, ctx.loadResult);
+
+  DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(1u, ctx.scene.GetNodeCount());
+
+  TestApplication app;
+
+  Customization::Choices choices;
+  for(auto iRoot : ctx.scene.GetRoots())
+  {
+    auto resourceRefs = ctx.resources.CreateRefCounter();
+    ctx.scene.CountResourceRefs(iRoot, choices, resourceRefs);
+    ctx.resources.LoadResources(resourceRefs, ctx.pathProvider);
+  }
+
+  DALI_TEST_EQUAL(true, ctx.resources.mMeshes[0u].first.mPositions.IsDefined());
+  DALI_TEST_EQUAL(432, ctx.resources.mMeshes[0u].first.mPositions.mBlob.mLength);
 
   END_TEST;
 }
@@ -543,6 +576,62 @@ int UtcDaliGltfLoaderMRendererTest(void)
   DALI_TEST_EQUAL(child.GetProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3(1.0f, 1.0f, 1.0f));
   DALI_TEST_EQUAL(child.GetRendererCount(), 1u);
   DALI_TEST_EQUAL(child.GetRendererAt(0).GetTextures().GetTextureCount(), 4u);
+
+  END_TEST;
+}
+
+
+int UtcDaliGltfLoaderAnimationLoadingTest(void)
+{
+  Context ctx;
+
+  ShaderDefinitionFactory sdf;
+  sdf.SetResources(ctx.resources);
+  auto& resources = ctx.resources;
+
+  LoadGltfScene(TEST_RESOURCE_DIR "/BoxAnimated.gltf", sdf, ctx.loadResult);
+
+  auto& scene = ctx.scene;
+  auto& roots = scene.GetRoots();
+  DALI_TEST_EQUAL(roots.size(), 1u);
+
+  ViewProjection viewProjection;
+  Transforms     xforms{
+    MatrixStack{},
+    viewProjection};
+  NodeDefinition::CreateParams nodeParams{
+    resources,
+    xforms,
+  };
+
+  Customization::Choices choices;
+
+  TestApplication app;
+
+  Actor root = Actor::New();
+  SetActorCentered(root);
+  for(auto iRoot : roots)
+  {
+    auto resourceRefs = resources.CreateRefCounter();
+    scene.CountResourceRefs(iRoot, choices, resourceRefs);
+    resources.CountEnvironmentReferences(resourceRefs);
+    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
+    {
+      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
+      scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
+      scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
+      root.Add(actor);
+    }
+  }
+
+  DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions.size(), 1u);
+  DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions[0].mProperties.size(), 2u);
+
+  uint32_t id = ctx.loadResult.mScene.GetNode(ctx.loadResult.mAnimationDefinitions[0].mProperties[0].mNodeIndex)->mNodeId;
+  DALI_TEST_EQUAL(id, root.FindChildByName("node2").GetProperty<int32_t>(Dali::Actor::Property::ID));
+  uint32_t id2 = ctx.loadResult.mScene.GetNode(ctx.loadResult.mAnimationDefinitions[0].mProperties[1].mNodeIndex)->mNodeId;
+  DALI_TEST_EQUAL(id2, root.FindChildByName("node0").GetProperty<int32_t>(Dali::Actor::Property::ID));
 
   END_TEST;
 }

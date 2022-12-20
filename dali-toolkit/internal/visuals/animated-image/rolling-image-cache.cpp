@@ -66,8 +66,9 @@ RollingImageCache::RollingImageCache(TextureManager&                     texture
                                      ImageCache::FrameReadyObserver&     observer,
                                      uint16_t                            cacheSize,
                                      uint16_t                            batchSize,
-                                     uint32_t                            interval)
-: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, interval),
+                                     uint32_t                            interval,
+                                     bool                                preMultiplyOnLoad)
+: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, interval, preMultiplyOnLoad),
   mImageUrls(urlList),
   mQueue(cacheSize)
 {
@@ -167,11 +168,13 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
     ImageAtlasManagerPtr  imageAtlasManager  = nullptr;
     Vector4               textureRect;
     Dali::ImageDimensions textureRectSize;
-    auto                  preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
+    auto preMultiplyOnLoading = mPreMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
+                                                   : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
     TextureSet                textureSet    = mTextureManager.LoadTexture(
-      url, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
+      url, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
     mImageUrls[imageFrame.mUrlIndex].mTextureId = loadTextureId;
 
     mRequestingLoad = false;
@@ -259,13 +262,14 @@ void RollingImageCache::LoadComplete(bool loadSuccess, TextureInformation textur
         sampler.SetWrapMode(Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT);
         textureInformation.textureSet.SetSampler(0u, sampler);
       }
-      mObserver.FrameReady(textureInformation.textureSet, mInterval);
+      mObserver.FrameReady(textureInformation.textureSet, mInterval, textureInformation.preMultiplied);
     }
   }
   else
   {
     mLoadState = TextureManager::LoadState::LOAD_FAILED;
-    mObserver.FrameReady(TextureSet(), 0);
+    // preMultiplied should be false because broken image don't premultiply alpha on load
+    mObserver.FrameReady(TextureSet(), 0, false);
   }
 
   LOG_CACHE;

@@ -92,6 +92,47 @@ bool InputFilter::Contains(Toolkit::InputFilter::Property::Type type, std::strin
   return match;
 }
 
+bool InputFilter::Filter(Toolkit::InputFilter::Property::Type type, std::string& text)
+{
+  std::regex pattern;
+  std::string result;
+
+  if(type == Toolkit::InputFilter::Property::ACCEPTED)
+  {
+    if(mAccepted.empty())
+    {
+      return false;
+    }
+    pattern = mAccepted;
+
+    auto start = std::sregex_iterator(text.begin(), text.end(), pattern);
+    auto end   = std::sregex_iterator();
+
+    while (start != end) {
+      result += start->str();
+      ++start;
+    }
+  }
+  else if(type == Toolkit::InputFilter::Property::REJECTED)
+  {
+    if(mRejected.empty())
+    {
+      return false;
+    }
+    pattern = mRejected;
+
+    result = std::regex_replace(text, pattern, "");
+  }
+
+  if(result.compare(text) == 0)
+  {
+    return false;
+  }
+
+  text = result;
+  return true;
+}
+
 } // namespace Text
 
 } // namespace Toolkit

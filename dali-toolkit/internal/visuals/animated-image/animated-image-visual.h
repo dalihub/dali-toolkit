@@ -228,8 +228,9 @@ private:
    * @brief Called when the next frame is ready.
    * @param[in] textureSet the texture set to apply
    * @param[in] interval interval(ms) for the frame
+   * @param[in] preMultiplied whether the texture is premultied alpha or not.
    */
-  void FrameReady(TextureSet textureSet, uint32_t interval) override;
+  void FrameReady(TextureSet textureSet, uint32_t interval, bool preMultiplied) override;
 
   /**
    * @brief Display the next frame. It is called when the mFrameDelayTimer ticks.

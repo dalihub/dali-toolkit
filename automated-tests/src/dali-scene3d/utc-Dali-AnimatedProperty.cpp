@@ -31,6 +31,7 @@ int UtcDaliAnimatedPropertyGetPropertyType(void)
   actor.SetProperty(Actor::Property::NAME, "ChristopherPlummer");
 
   AnimatedProperty animProp {
+    INVALID_INDEX,
    "ChristopherPlummer",
    "position",
    KeyFrames(),

@@ -23,7 +23,6 @@ precision highp float;
 precision mediump float;
 #endif
 
-#ifdef THREE_TEX
 #ifdef GLTF_CHANNELS
 #define METALLIC b
 #define ROUGHNESS g
@@ -31,7 +30,6 @@ precision mediump float;
 #define METALLIC r
 #define ROUGHNESS a
 #endif //GLTF_CHANNELS
-#endif //THREE_TEX
 
 uniform lowp vec4 uColor; // Color from SceneGraph
 uniform lowp vec4 uColorFactor; // Color from material
@@ -55,15 +53,6 @@ uniform sampler2D sAlbedoMetal;
 uniform sampler2D sNormalRoughness;
 #endif
 
-uniform float uSpecularFactor;
-uniform vec3  uSpecularColorFactor;
-#ifdef MATERIAL_SPECULAR_TEXTURE
-uniform sampler2D sSpecular;
-#endif
-#ifdef MATERIAL_SPECULAR_COLOR_TEXTURE
-uniform sampler2D sSpecularColor;
-#endif
-
 #ifdef OCCLUSION
 uniform sampler2D sOcclusion;
 uniform float uOcclusionStrength;
@@ -72,6 +61,15 @@ uniform float uOcclusionStrength;
 #ifdef EMISSIVE
 uniform sampler2D sEmissive;
 uniform vec3 uEmissiveFactor;
+#endif
+
+uniform float uSpecularFactor;
+uniform vec3  uSpecularColorFactor;
+#ifdef MATERIAL_SPECULAR_TEXTURE
+uniform sampler2D sSpecular;
+#endif
+#ifdef MATERIAL_SPECULAR_COLOR_TEXTURE
+uniform sampler2D sSpecularColor;
 #endif
 
 //// For IBL
@@ -87,9 +85,11 @@ uniform lowp float uMask;
 uniform lowp float uAlphaThreshold;
 
 // TODO: Multiple texture coordinate will be supported.
-in lowp vec2 vUV;
+in mediump vec2 vUV;
 in lowp mat3 vTBN;
+#ifdef COLOR_ATTRIBUTE
 in lowp vec4 vColor;
+#endif
 in highp vec3 vPositionToCamera;
 
 out vec4 FragColor;
@@ -119,7 +119,11 @@ void main()
   lowp vec4 baseColor = texture(sAlbedoAlpha, vUV);
   baseColor = vec4(linear(baseColor.rgb), baseColor.w) * uColorFactor;
 #else // BASECOLOR_TEX
+#ifdef COLOR_ATTRIBUTE
   lowp vec4 baseColor = vColor * uColorFactor;
+#else // COLOR_ATTRIBUTE
+  lowp vec4 baseColor = uColorFactor;
+#endif // COLOR_ATTRIBUTE
 #endif // BASECOLOR_TEX
 
 #ifdef METALLIC_ROUGHNESS_TEX
@@ -134,7 +138,11 @@ void main()
 #endif // NORMAL_TEX
 #else // THREE_TEX
   vec4 albedoMetal = texture(sAlbedoMetal, vUV);
+#ifdef COLOR_ATTRIBUTE
   lowp vec4 baseColor = vec4(linear(albedoMetal.rgb), 1.0) * vColor * uColorFactor;
+#else // COLOR_ATTRIBUTE
+  lowp vec4 baseColor = vec4(linear(albedoMetal.rgb), 1.0) * uColorFactor;
+#endif // COLOR_ATTRIBUTE
 
   metallic = albedoMetal.METALLIC * metallic;
 
@@ -146,12 +154,15 @@ void main()
 #endif // THREE_TEX
 
   // The value of uOpaque and uMask can be 0.0 or 1.0.
+  // If uMask is 1.0, a Pixel that has bigger alpha than uAlphaThreashold becomes fully opaque,
+  // and, a pixel that has smaller alpha than uAlphaThreashold becomes fully transparent.
   // If uOpaque is 1.0, alpha value of final color is 1.0;
-  // If uOpaque is 0.0 and uMask is 1.0, alpha value of final color is 0.0 when input alpha is lower than uAlphaThreshold or
-  // 1.0 when input alpha is larger than uAlphaThreshold.
   // https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#_material_alphamode
+  if(uMask > 0.5 && baseColor.a < uAlphaThreshold)
+  {
+    discard;
+  }
   baseColor.a = mix(baseColor.a, 1.0, uOpaque);
-  baseColor.a = min(mix(baseColor.a, floor(baseColor.a - uAlphaThreshold + 1.0), uMask), 1.0);
 
   metallic = clamp(metallic, 0.0, 1.0);
   // Roughness is authored as perceptual roughness; as is convention,

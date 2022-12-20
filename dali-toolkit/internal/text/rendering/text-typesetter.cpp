@@ -1052,7 +1052,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
       }
 
       // Markup-Processor for overlay styles
-      if(mModel->IsMarkupProcessorEnabled())
+      if(mModel->IsMarkupProcessorEnabled() || mModel->IsSpannedTextPlaced())
       {
         if(mModel->IsMarkupUnderlineSet())
         {

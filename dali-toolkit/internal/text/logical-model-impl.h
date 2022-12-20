@@ -263,6 +263,9 @@ public:
 
   BidirectionalLineRunIndex mBidirectionalLineIndex; ///< The last fetched bidirectional line info.
   bool                      mSpannedTextPlaced : 1;  ///< Whether the spanned-text is placed.
+
+  bool mUnderlineRunsUpdated : 1; /// Whether the UnderlinedCharacterRuns is updated. (Added for SpannedText)
+  bool mCharacterSpacingRunsUpdated : 1; // Flag for updating character-spacing.
 };
 
 } // namespace Text

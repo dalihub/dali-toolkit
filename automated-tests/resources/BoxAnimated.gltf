@@ -14,6 +14,7 @@
     ],
     "nodes": [
         {
+            "name" : "node0",
             "children": [
                 1
             ],
@@ -25,11 +26,13 @@
             ]
         },
         {
+            "name" : "node1",
             "children": [
                 2
             ]
         },
         {
+            "name" : "node2",
             "mesh": 0,
             "rotation": [
                 -0.0,
@@ -39,6 +42,7 @@
             ]
         },
         {
+            "name" : "node3",
             "mesh": 1
         }
     ],

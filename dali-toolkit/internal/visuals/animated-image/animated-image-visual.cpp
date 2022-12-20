@@ -198,7 +198,7 @@ void AnimatedImageVisual::CreateImageCache()
 
   if(mAnimatedImageLoading)
   {
-    mImageCache = new RollingAnimatedImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, mWrapModeU, mWrapModeV, IsSynchronousLoadingRequired(), mFactoryCache.GetPreMultiplyOnLoad());
+    mImageCache = new RollingAnimatedImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, mWrapModeU, mWrapModeV, IsSynchronousLoadingRequired(), IsPreMultipliedAlphaEnabled());
   }
   else if(mImageUrls)
   {
@@ -209,11 +209,11 @@ void AnimatedImageVisual::CreateImageCache()
     uint16_t cacheSize = std::max(std::min(std::max(batchSize, mCacheSize), numUrls), MINIMUM_CACHESIZE);
     if(cacheSize < numUrls)
     {
-      mImageCache = new RollingImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, *mImageUrls, mMaskingData, *this, cacheSize, batchSize, mFrameDelay);
+      mImageCache = new RollingImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, *mImageUrls, mMaskingData, *this, cacheSize, batchSize, mFrameDelay, IsPreMultipliedAlphaEnabled());
     }
     else
     {
-      mImageCache = new FixedImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, *mImageUrls, mMaskingData, *this, batchSize, mFrameDelay);
+      mImageCache = new FixedImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, *mImageUrls, mMaskingData, *this, batchSize, mFrameDelay, IsPreMultipliedAlphaEnabled());
     }
   }
 
@@ -940,8 +940,10 @@ void AnimatedImageVisual::SetImageSize(TextureSet& textureSet)
   }
 }
 
-void AnimatedImageVisual::FrameReady(TextureSet textureSet, uint32_t interval)
+void AnimatedImageVisual::FrameReady(TextureSet textureSet, uint32_t interval, bool preMultiplied)
 {
+  EnablePreMultipliedAlpha(preMultiplied);
+
   // When image visual requested to load new frame to mImageCache and it is failed.
   if(!mImageCache || !textureSet)
   {

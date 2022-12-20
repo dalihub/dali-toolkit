@@ -114,6 +114,133 @@ struct Base::Impl
     Toolkit::Align::Type mAnchorPoint;
   };
 
+  struct DecorationData
+  {
+    // Default constructor
+    DecorationData()
+    : mBorderlineColor(Color::BLACK),
+      mCornerRadius(Vector4::ZERO),
+      mBorderlineWidth(0.0f),
+      mBorderlineOffset(0.0f),
+      mCornerRadiusPolicy(static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE))
+    {
+    }
+    Vector4 mBorderlineColor;
+    Vector4 mCornerRadius;
+    float   mBorderlineWidth;
+    float   mBorderlineOffset;
+    int     mCornerRadiusPolicy;
+  };
+
+  DecorationData* EnsureDecorationData()
+  {
+    if(mDecorationData == nullptr)
+    {
+      mDecorationData = new DecorationData();
+    }
+    return mDecorationData;
+  }
+
+  /**
+   * @brief Get decoration data value : borderline width
+   *
+   * Keep these API as inline function due to the performance.
+   */
+  float GetBorderlineWidth()
+  {
+    return mDecorationData ? mDecorationData->mBorderlineWidth : 0.0f;
+  }
+
+  /**
+   * @brief Set decoration data value : borderline width
+   *
+   * Keep these API as inline function due to the performance.
+   */
+  void SetBorderlineWidth(float value)
+  {
+    EnsureDecorationData()->mBorderlineWidth = value;
+  }
+
+  /**
+   * @brief Get decoration data value : borderline color
+   *
+   * Keep these API as inline function due to the performance.
+   */
+  Vector4 GetBorderlineColor()
+  {
+    return mDecorationData ? mDecorationData->mBorderlineColor : Color::BLACK;
+  }
+
+  /**
+   * @brief Set decoration data value : borderline color
+   *
+   * Keep these API as inline function due to the performance.
+   */
+  void SetBorderlineColor(Vector4 value)
+  {
+    EnsureDecorationData()->mBorderlineColor = value;
+  }
+
+  /**
+   * @brief Get decoration data value : borderline offset
+   *
+   * Keep these API as inline function due to the performance.
+   */
+  float GetBorderlineOffset()
+  {
+    return mDecorationData ? mDecorationData->mBorderlineOffset : 0.0f;
+  }
+
+  /**
+   * @brief Set decoration data value : borderline offset
+   *
+   * Keep these API as inline function due to the performance.
+   */
+  void SetBorderlineOffset(float value)
+  {
+    EnsureDecorationData()->mBorderlineOffset = value;
+  }
+
+  /**
+   * @brief Get decoration data value : corner radius
+   *
+   * Keep these API as inline function due to the performance.
+   */
+  Vector4 GetCornerRadius()
+  {
+    return mDecorationData ? mDecorationData->mCornerRadius : Vector4::ZERO;
+  }
+
+  /**
+   * @brief Set decoration data value : corner radius
+   *
+   * Keep these API as inline function due to the performance.
+   */
+  void SetCornerRadius(Vector4 value)
+  {
+    EnsureDecorationData()->mCornerRadius = value;
+  }
+
+  /**
+   * @brief Get decoration data value : corner radius policy
+   *
+   * Keep these API as inline function due to the performance.
+   */
+  int GetCornerRadiusPolicy()
+  {
+    return mDecorationData ? mDecorationData->mCornerRadiusPolicy : static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE);
+  }
+
+  /**
+   * @brief Set decoration data value : corner radius policy
+   *
+   * Keep these API as inline function due to the performance.
+   */
+  void SetCornerRadiusPolicy(int value)
+  {
+    EnsureDecorationData()->mCornerRadiusPolicy = value;
+  }
+
   VisualRenderer                  mRenderer;
   CustomShader*                   mCustomShader;
   EventObserver*                  mEventObserver; ///< Allows controls to observe when the visual has events to notify
@@ -121,11 +248,7 @@ struct Base::Impl
   Transform                       mTransform;
   Vector4                         mMixColor;
   Size                            mControlSize;
-  float                           mBorderlineWidth;
-  Vector4                         mBorderlineColor;
-  float                           mBorderlineOffset;
-  Vector4                         mCornerRadius;
-  float                           mCornerRadiusPolicy;
+  DecorationData*                 mDecorationData;
   int                             mDepthIndex;
   FittingMode                     mFittingMode; ///< How the contents should fit the view
   int                             mFlags;

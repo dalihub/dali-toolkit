@@ -82,18 +82,22 @@ bool ReadBlob(const MeshDefinition::Blob& descriptor, std::istream& source, uint
   }
   else
   {
-    DALI_ASSERT_DEBUG(descriptor.mStride > descriptor.mElementSizeHint);
-    const uint32_t diff     = descriptor.mStride - descriptor.mElementSizeHint;
-    uint32_t       readSize = 0;
-    while(readSize < descriptor.mLength &&
-          source.read(reinterpret_cast<char*>(target), descriptor.mElementSizeHint) &&
-          source.seekg(diff, std::istream::cur))
+    if(descriptor.mStride > descriptor.mElementSizeHint)
     {
-      readSize += descriptor.mStride;
-      target += descriptor.mElementSizeHint;
+      const uint32_t diff      = descriptor.mStride - descriptor.mElementSizeHint;
+      uint32_t       readSize  = 0;
+      uint32_t       totalSize = (descriptor.mLength / descriptor.mElementSizeHint) * descriptor.mStride;
+      while(readSize < totalSize &&
+            source.read(reinterpret_cast<char*>(target), descriptor.mElementSizeHint) &&
+            source.seekg(diff, std::istream::cur))
+      {
+        readSize += descriptor.mStride;
+        target += descriptor.mElementSizeHint;
+      }
+      return readSize == totalSize;
     }
-    return readSize == descriptor.mLength;
   }
+  return false;
 }
 
 template<typename T>
@@ -518,7 +522,7 @@ MeshDefinition::Blob::Blob(uint32_t offset, uint32_t length, uint16_t stride, ui
 
 uint32_t MeshDefinition::Blob::GetBufferSize() const
 {
-  return IsConsecutive() ? mLength : (mLength * mElementSizeHint / mStride);
+  return mLength;
 }
 
 void MeshDefinition::Blob::ComputeMinMax(uint32_t numComponents, uint32_t count, float* values)

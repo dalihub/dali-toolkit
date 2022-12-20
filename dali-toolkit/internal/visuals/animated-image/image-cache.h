@@ -40,8 +40,9 @@ public:
      * @brief Informs observer when the next texture set is ready to display
      * @param[in] textureSet The ready texture set
      * @param[in] interval interval(ms) for the frame
+     * @param[in] preMultiplied whether the texture is premultied alpha or not.
      */
-    virtual void FrameReady(TextureSet textureSet, uint32_t interval) = 0;
+    virtual void FrameReady(TextureSet textureSet, uint32_t interval, bool preMultiplied) = 0;
   };
 
   struct UrlStore
@@ -58,14 +59,15 @@ public:
 public:
   /**
    * @brief Constructor.
-   * @param[in] textureManager The texture manager
-   * @param[in] size           The width and height to fit the loaded image to.
-   * @param[in] fittingMode    The FittingMode of the resource to load
-   * @param[in] samplingMode   The SamplingMode of the resource to load
-   * @param[in] observer       FrameReady observer
-   * @param[in] maskingData    Masking data to be applied.
-   * @param[in] batchSize The size of a batch to load
-   * @param[in] interval Time interval(ms) between each frame
+   * @param[in] textureManager    The texture manager
+   * @param[in] size              The width and height to fit the loaded image to.
+   * @param[in] fittingMode       The FittingMode of the resource to load
+   * @param[in] samplingMode      The SamplingMode of the resource to load
+   * @param[in] observer          FrameReady observer
+   * @param[in] maskingData       Masking data to be applied.
+   * @param[in] batchSize         The size of a batch to load
+   * @param[in] interval          Time interval(ms) between each frame
+   * @param[in] preMultiplyOnLoad The flag if image's color should be multiplied by it's alpha
    *
    * This will start loading textures immediately, according to the
    * batch and cache sizes. The cache is as large as the number of urls.
@@ -77,7 +79,8 @@ public:
              TextureManager::MaskingDataPointer& maskingData,
              ImageCache::FrameReadyObserver&     observer,
              uint32_t                            batchSize,
-             uint32_t                            interval);
+             uint32_t                            interval,
+             bool                                preMultiplyOnLoad);
 
   virtual ~ImageCache();
 
@@ -152,6 +155,7 @@ protected:
   uint32_t                            mInterval;
   TextureManager::LoadState           mLoadState;
   bool                                mRequestingLoad : 1;
+  bool                                mPreMultiplyOnLoad : 1;
   bool                                mTextureManagerAlive : 1;
 };
 

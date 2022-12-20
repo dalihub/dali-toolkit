@@ -42,9 +42,11 @@ SET(TC_SOURCES
   utc-Dali-TableView.cpp
   utc-Dali-Text-BaseSpan.cpp
   utc-Dali-Text-ForegroundColorSpan.cpp
+  utc-Dali-Text-CharacterSpacingSpan.cpp
   utc-Dali-Text-FontSpan.cpp
   utc-Dali-Text-Range.cpp
   utc-Dali-Text-SpannableString.cpp
+  utc-Dali-Text-UnderlineSpan.cpp
   utc-Dali-TextEditor.cpp
   utc-Dali-TextField.cpp
   utc-Dali-TextGeometry.cpp

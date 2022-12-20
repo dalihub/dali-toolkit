@@ -689,6 +689,11 @@ protected:
 
   protected:
     /**
+     * @copydoc Dali::Accessibility::Accessible::GetAttributes()
+     */
+    Dali::Accessibility::Attributes GetAttributes() const override;
+
+    /**
      * @copydoc Dali::Accessibility::ActorAccessible::DoGetChildren()
      */
     void DoGetChildren(std::vector<Dali::Accessibility::Accessible*>& children) override;

@@ -525,6 +525,11 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
         {
           imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
         }
+        else
+        {
+          imageSize = mPlacementActorSize;
+        }
+
         mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
         Texture brokenImage = mImpl->mRenderer.GetTextures().GetTexture(0);
         naturalSize.x       = brokenImage.GetWidth();
@@ -757,8 +762,10 @@ void ImageVisual::DoSetOnScene(Actor& actor)
     Vector2 imageSize = Vector2::ZERO;
     if(actor)
     {
-      imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+      imageSize  = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+      mPlacementActorSize = imageSize;
     }
+
     mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
     actor.AddRenderer(mImpl->mRenderer);
     mPlacementActor.Reset();
@@ -905,8 +912,14 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
       Vector2 imageSize = Vector2::ZERO;
       if(actor)
       {
-        imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+        imageSize  = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+        mPlacementActorSize = imageSize;
       }
+      else
+      {
+        imageSize = mPlacementActorSize;
+      }
+
       mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
       textureInformation.textureSet = mImpl->mRenderer.GetTextures();
     }

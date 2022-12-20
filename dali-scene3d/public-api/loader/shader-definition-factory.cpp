@@ -81,6 +81,22 @@ uint64_t HashNode(const MaterialDefinition& materialDef, const MeshDefinition& m
      materialDef.CheckTextures(MaterialDefinition::NORMAL))
   {
     hash.Add("3TEX");
+
+    // For the glTF, each of basecolor, metallic_roughness, normal texture is not essential.
+    if(materialDef.CheckTextures(MaterialDefinition::ALBEDO))
+    {
+      hash.Add("BCTEX");
+    }
+
+    if(materialDef.CheckTextures(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS))
+    {
+      hash.Add("MRTEX");
+    }
+
+    if(materialDef.CheckTextures(MaterialDefinition::NORMAL))
+    {
+      hash.Add("NTEX");
+    }
   }
 
   if(materialDef.GetAlphaCutoff() > 0.f)
@@ -93,16 +109,6 @@ uint64_t HashNode(const MaterialDefinition& materialDef, const MeshDefinition& m
     hash.Add("SSS");
   }
 
-  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
-  {
-    hash.Add("SPECTEX");
-  }
-
-  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
-  {
-    hash.Add("SPECCOLTEX");
-  }
-
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
   {
     hash.Add("OCCL" /*USION*/);
@@ -111,6 +117,16 @@ uint64_t HashNode(const MaterialDefinition& materialDef, const MeshDefinition& m
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
   {
     hash.Add("EMIS" /*SIVE*/);
+  }
+
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
+  {
+    hash.Add("SPECTEX");
+  }
+
+  if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
+  {
+    hash.Add("SPECCOLTEX");
   }
 
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))
@@ -126,6 +142,16 @@ uint64_t HashNode(const MaterialDefinition& materialDef, const MeshDefinition& m
   if(MaskMatch(meshDef.mFlags, MeshDefinition::FLIP_UVS_VERTICAL))
   {
     hash.Add("FLIP" /*_V*/);
+  }
+
+  if(meshDef.mColors.IsDefined())
+  {
+    hash.Add("COLATT");
+  }
+
+  if(meshDef.mTangentType == Property::VECTOR4)
+  {
+    hash.Add("V4TAN");
   }
 
   if(meshDef.HasBlendShapes())
@@ -256,16 +282,6 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
       shaderDef.mDefines.push_back("SSS");
     }
 
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
-    {
-      shaderDef.mDefines.push_back("MATERIAL_SPECULAR_TEXTURE");
-    }
-
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
-    {
-      shaderDef.mDefines.push_back("MATERIAL_SPECULAR_COLOR_TEXTURE");
-    }
-
     if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
     {
       shaderDef.mDefines.push_back("OCCLUSION");
@@ -274,6 +290,16 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
     if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
     {
       shaderDef.mDefines.push_back("EMISSIVE");
+    }
+
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
+    {
+      shaderDef.mDefines.push_back("MATERIAL_SPECULAR_TEXTURE");
+    }
+
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
+    {
+      shaderDef.mDefines.push_back("MATERIAL_SPECULAR_COLOR_TEXTURE");
     }
 
     if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))
@@ -290,6 +316,16 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
     if(MaskMatch(meshDef.mFlags, MeshDefinition::FLIP_UVS_VERTICAL))
     {
       shaderDef.mDefines.push_back("FLIP_V");
+    }
+
+    if(meshDef.mColors.IsDefined())
+    {
+      shaderDef.mDefines.push_back("COLOR_ATTRIBUTE");
+    }
+
+    if(meshDef.mTangentType == Property::VECTOR4)
+    {
+      shaderDef.mDefines.push_back("VEC4_TANGENT");
     }
 
     if(meshDef.HasBlendShapes())
@@ -323,11 +359,6 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
           shaderDef.mDefines.push_back("MORPH_VERSION_2_0");
         }
       }
-    }
-
-    if(meshDef.mTangentType == Property::VECTOR4)
-    {
-      shaderDef.mDefines.push_back("VEC4_TANGENT");
     }
 
     shaderDef.mUniforms["uMaxLOD"]     = 6.f;

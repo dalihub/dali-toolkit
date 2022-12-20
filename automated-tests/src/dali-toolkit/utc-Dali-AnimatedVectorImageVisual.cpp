@@ -1972,6 +1972,9 @@ int UtcDaliAnimatedVectorImageVisualDynamicProperty(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
   application.GetScene().Add(actor);
 
   gDynamicPropertyCallbackFired = false;

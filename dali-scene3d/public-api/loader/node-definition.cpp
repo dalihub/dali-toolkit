@@ -63,9 +63,11 @@ void NodeDefinition::Renderable::OnCreate(const NodeDefinition& node, CreatePara
 
 const std::string NodeDefinition::ORIGINAL_MATRIX_PROPERTY_NAME = "originalMatrix";
 
-Actor NodeDefinition::CreateActor(CreateParams& params) const
+Actor NodeDefinition::CreateActor(CreateParams& params)
 {
   Actor actor = Actor::New();
+  mNodeId     = actor.GetProperty<int32_t>(Dali::Actor::Property::ID);
+
   SetActorCentered(actor);
 
   actor.SetProperty(Actor::Property::NAME, mName);
@@ -244,20 +246,10 @@ void ModelRenderable::OnCreate(const NodeDefinition& node, NodeDefinition::Creat
   renderer.RegisterProperty(IBL_INTENSITY_STRING.data(), resources.mEnvironmentMaps[envIdx].first.mIblIntensity);
   renderer.RegisterProperty(IBL_Y_DIRECTION.data(), resources.mEnvironmentMaps[envIdx].first.mYDirection);
 
-  float opaque      = 0.0f;
-  float mask        = 0.0f;
+  float opaque      = matDef.mIsOpaque ? 1.0f : 0.0f;
+  float mask        = matDef.mIsMask ? 1.0f : 0.0f;
   float alphaCutoff = matDef.GetAlphaCutoff();
-  if(!MaskMatch(matDef.mFlags, MaterialDefinition::TRANSPARENCY))
-  {
-    opaque = 1.0f;
-  }
-  else
-  {
-    if(alphaCutoff > 0.f)
-    {
-      mask = 1.0f;
-    }
-  }
+
   renderer.RegisterProperty("uOpaque", opaque);
   renderer.RegisterProperty("uMask", mask);
   renderer.RegisterProperty("uAlphaThreshold", alphaCutoff);
