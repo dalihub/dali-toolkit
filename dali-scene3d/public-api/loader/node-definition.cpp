@@ -79,6 +79,8 @@ Actor NodeDefinition::CreateActor(CreateParams& params)
 
   actor.RegisterProperty(ORIGINAL_MATRIX_PROPERTY_NAME, GetLocalSpace(), Property::AccessMode::READ_ONLY);
 
+  actor.SetProperty(Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR);
+
   for(auto& renderable : mRenderables)
   {
     renderable->OnCreate(*this, params, actor);

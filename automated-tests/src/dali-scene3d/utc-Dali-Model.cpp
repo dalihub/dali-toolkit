@@ -849,6 +849,29 @@ int UtcDaliModelMultiplePrimitives(void)
   END_TEST;
 }
 
+int UtcDaliModelColorMode(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+  model.SetProperty(Dali::Actor::Property::COLOR, Color::RED);
+
+  application.GetScene().Add(model);
+
+  application.SendNotification();
+  application.Render();
+
+  Actor actor = model.FindChildByName("AnimatedCube");
+  Vector4 childColor = actor[Dali::Actor::Property::COLOR];
+  Vector4 childWorldColor = actor[Dali::Actor::Property::WORLD_COLOR];
+
+  DALI_TEST_EQUALS(childColor, Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(childWorldColor, Color::RED, TEST_LOCATION);
+
+  END_TEST;
+}
+
 // For ResourceReady
 namespace
 {
