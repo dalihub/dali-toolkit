@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUILDER_GET_IS_INL
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,6 +159,30 @@ inline bool CopyNumbers(TreeNode::ConstIterator iter, int N, T& vector)
   return true;
 }
 
+// copy N Numbers
+template<typename T, int N>
+inline bool CopyNumbers(TreeNode::ConstIterator iter, T (&vector)[N])
+{
+  for(int i = 0; i < N; ++i)
+  {
+    if((*iter).second.GetType() == TreeNode::FLOAT)
+    {
+      vector[i] = (*iter).second.GetFloat();
+    }
+    else if((*iter).second.GetType() == TreeNode::INTEGER)
+    {
+      vector[i] = static_cast<float>((*iter).second.GetInteger());
+    }
+    else
+    {
+      return false;
+    }
+    iter++;
+  }
+
+  return true;
+}
+
 inline OptionalVector4 IsVector4(const OptionalChild& node)
 {
   OptionalVector4 ret;
@@ -214,7 +238,7 @@ inline OptionalMatrix IsMatrix(const OptionalChild& node)
   if(node && (TreeNode::ARRAY == (*node).GetType()) && (*node).Size() >= 16)
   {
     float v[16];
-    if(CopyNumbers((*node).CBegin(), 16, v))
+    if(CopyNumbers((*node).CBegin(), v))
     {
       ret = OptionalMatrix(Dali::Matrix(v));
     }
@@ -230,7 +254,7 @@ inline OptionalMatrix3 IsMatrix3(const OptionalChild& node)
   if(node && (TreeNode::ARRAY == (*node).GetType()) && (*node).Size() >= 9)
   {
     float v[9];
-    if(CopyNumbers((*node).CBegin(), 9, v))
+    if(CopyNumbers((*node).CBegin(), v))
     {
       ret = OptionalMatrix3(Dali::Matrix3(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8]));
     }
@@ -247,10 +271,10 @@ inline OptionalRect IsRect(const OptionalChild& node)
     if((*node).Size() >= 4)
     {
       TreeNode::ConstIterator iter((*node).CBegin());
-      int                     v[4];
-      if(CopyNumbers((*node).CBegin(), 4, v))
+      float                   v[4];
+      if(CopyNumbers((*node).CBegin(), v))
       {
-        ret = OptionalRect(Dali::Rect<int>(v[0], v[1], v[2], v[3]));
+        ret = OptionalRect(Dali::Rect<int>(static_cast<int>(v[0]), static_cast<int>(v[1]), static_cast<int>(v[2]), static_cast<int>(v[3])));
       }
     }
   }
@@ -265,10 +289,10 @@ inline OptionalExtents IsExtents(const OptionalChild& node)
     if((*node).Size() >= 4)
     {
       TreeNode::ConstIterator iter((*node).CBegin());
-      int                     v[4];
-      if(CopyNumbers((*node).CBegin(), 4, v))
+      float                   v[4];
+      if(CopyNumbers((*node).CBegin(), v))
       {
-        extents = OptionalExtents(Dali::Extents(v[0], v[1], v[2], v[3]));
+        extents = OptionalExtents(Dali::Extents(static_cast<uint16_t>(v[0]), static_cast<uint16_t>(v[1]), static_cast<uint16_t>(v[2]), static_cast<uint16_t>(v[3])));
       }
     }
   }
