@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,19 +39,13 @@ ConfirmationPopup::ConfirmationPopup(Internal::ConfirmationPopup& implementation
 {
 }
 
-ConfirmationPopup::ConfirmationPopup(const ConfirmationPopup& confirmationPopup)
-: Popup(confirmationPopup)
-{
-}
+ConfirmationPopup::ConfirmationPopup(const ConfirmationPopup& confirmationPopup) = default;
 
-ConfirmationPopup& ConfirmationPopup::operator=(const ConfirmationPopup& confirmationPopup)
-{
-  if(&confirmationPopup != this)
-  {
-    Popup::operator=(confirmationPopup);
-  }
-  return *this;
-}
+ConfirmationPopup& ConfirmationPopup::operator=(const ConfirmationPopup& confirmationPopup) = default;
+
+ConfirmationPopup::ConfirmationPopup(ConfirmationPopup&& confirmationPopup) = default;
+
+ConfirmationPopup& ConfirmationPopup::operator=(ConfirmationPopup&& confirmationPopup) = default;
 
 ConfirmationPopup::ConfirmationPopup(Dali::Internal::CustomActor* internal)
 : Popup(internal)

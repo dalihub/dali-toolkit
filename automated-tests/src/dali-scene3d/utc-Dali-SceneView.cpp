@@ -751,3 +751,23 @@ int UtcDaliSceneViewCreateAndRemoveRenderTask(void)
 
   END_TEST;
 }
+
+int UtcDaliSceneViewColorMode(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  application.GetScene().Add(view);
+
+  DALI_TEST_EQUALS(view.GetChildAt(0u).GetProperty<int>(Dali::Actor::Property::COLOR_MODE), static_cast<int>(ColorMode::USE_OWN_MULTIPLY_PARENT_ALPHA), TEST_LOCATION);
+
+  view.UseFramebuffer(true);
+
+  DALI_TEST_EQUALS(view.GetChildAt(0u).GetProperty<int>(Dali::Actor::Property::COLOR_MODE), static_cast<int>(ColorMode::USE_OWN_COLOR), TEST_LOCATION);
+
+  view.UseFramebuffer(false);
+
+  DALI_TEST_EQUALS(view.GetChildAt(0u).GetProperty<int>(Dali::Actor::Property::COLOR_MODE), static_cast<int>(ColorMode::USE_OWN_MULTIPLY_PARENT_ALPHA), TEST_LOCATION);
+
+  END_TEST;
+}

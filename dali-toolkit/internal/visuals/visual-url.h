@@ -84,6 +84,18 @@ public:
   VisualUrl& operator=(const VisualUrl& url);
 
   /**
+   * Move constructor
+   * @param[in] url The VisualUrl to move
+   */
+  VisualUrl(VisualUrl&& url) noexcept;
+
+  /**
+   * Move assignment operator
+   * @param[in] url The VisualUrl to move
+   */
+  VisualUrl& operator=(VisualUrl&& url) noexcept;
+
+  /**
    * Get the full URL
    * @return The url
    */
@@ -93,7 +105,7 @@ public:
    * Get the hash value of full URL
    * @return The hash value of url
    */
-  const std::uint64_t& GetUrlHash() const;
+  std::uint64_t GetUrlHash() const;
 
   /**
    * Get the visual type of the URL

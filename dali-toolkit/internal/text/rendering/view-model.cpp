@@ -93,7 +93,7 @@ Length ViewModel::GetNumberOfLines() const
   return mModel->GetNumberOfLines();
 }
 
-const LineRun* const ViewModel::GetLines() const
+const LineRun* ViewModel::GetLines() const
 {
   return mModel->GetLines();
 }
@@ -103,7 +103,7 @@ Length ViewModel::GetNumberOfScripts() const
   return mModel->GetNumberOfScripts();
 }
 
-const ScriptRun* const ViewModel::GetScriptRuns() const
+const ScriptRun* ViewModel::GetScriptRuns() const
 {
   return mModel->GetScriptRuns();
 }
@@ -162,7 +162,7 @@ GlyphIndex ViewModel::GetSecondMiddleIndexOfElidedGlyphs() const
   return mModel->GetSecondMiddleIndexOfElidedGlyphs();
 }
 
-const GlyphInfo* const ViewModel::GetGlyphs() const
+const GlyphInfo* ViewModel::GetGlyphs() const
 {
   if(mIsTextElided && mModel->IsTextElideEnabled())
   {
@@ -176,7 +176,7 @@ const GlyphInfo* const ViewModel::GetGlyphs() const
   return NULL;
 }
 
-const Vector2* const ViewModel::GetLayout() const
+const Vector2* ViewModel::GetLayout() const
 {
   if(mIsTextElided && mModel->IsTextElideEnabled())
   {
@@ -190,27 +190,27 @@ const Vector2* const ViewModel::GetLayout() const
   return NULL;
 }
 
-const Vector4* const ViewModel::GetColors() const
+const Vector4* ViewModel::GetColors() const
 {
   return mModel->GetColors();
 }
 
-const ColorIndex* const ViewModel::GetColorIndices() const
+const ColorIndex* ViewModel::GetColorIndices() const
 {
   return mModel->GetColorIndices();
 }
 
-const Vector4* const ViewModel::GetBackgroundColors() const
+const Vector4* ViewModel::GetBackgroundColors() const
 {
   return mModel->GetBackgroundColors();
 }
 
-const ColorIndex* const ViewModel::GetBackgroundColorIndices() const
+const ColorIndex* ViewModel::GetBackgroundColorIndices() const
 {
   return mModel->GetBackgroundColorIndices();
 }
 
-bool const ViewModel::IsMarkupBackgroundColorSet() const
+bool ViewModel::IsMarkupBackgroundColorSet() const
 {
   return mModel->IsMarkupBackgroundColorSet();
 }
@@ -245,7 +245,7 @@ bool ViewModel::IsUnderlineEnabled() const
   return mModel->IsUnderlineEnabled();
 }
 
-bool const ViewModel::IsMarkupUnderlineSet() const
+bool ViewModel::IsMarkupUnderlineSet() const
 {
   return mModel->IsMarkupUnderlineSet();
 }
@@ -325,7 +325,7 @@ Length ViewModel::GetHyphensCount() const
   return mModel->GetHyphensCount();
 }
 
-const float ViewModel::GetCharacterSpacing() const
+float ViewModel::GetCharacterSpacing() const
 {
   return mModel->GetCharacterSpacing();
 }
@@ -709,7 +709,7 @@ bool ViewModel::IsStrikethroughEnabled() const
   return mModel->IsStrikethroughEnabled();
 }
 
-bool const ViewModel::IsMarkupStrikethroughSet() const
+bool ViewModel::IsMarkupStrikethroughSet() const
 {
   return mModel->IsMarkupStrikethroughSet();
 }

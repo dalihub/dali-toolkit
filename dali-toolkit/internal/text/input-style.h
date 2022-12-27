@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_INPUT_STYLE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/math/math-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-definitions.h>
@@ -149,8 +150,8 @@ struct InputStyle
        (weight != inputStyle.weight) ||
        (width != inputStyle.width) ||
        (slant != inputStyle.slant) ||
-       (size != inputStyle.size) ||
-       (lineSpacing != inputStyle.lineSpacing) ||
+       (!Dali::Equals(size, inputStyle.size)) ||
+       (!Dali::Equals(lineSpacing, inputStyle.lineSpacing)) ||
        (underlineProperties != inputStyle.underlineProperties) ||
        (shadowProperties != inputStyle.shadowProperties) ||
        (embossProperties != inputStyle.embossProperties) ||
@@ -187,11 +188,11 @@ struct InputStyle
     {
       mask = static_cast<Mask>(mask | INPUT_FONT_SLANT);
     }
-    if(size != inputStyle.size)
+    if(!Dali::Equals(size, inputStyle.size))
     {
       mask = static_cast<Mask>(mask | INPUT_POINT_SIZE);
     }
-    if(lineSpacing != inputStyle.lineSpacing)
+    if(!Dali::Equals(lineSpacing, inputStyle.lineSpacing))
     {
       mask = static_cast<Mask>(mask | INPUT_LINE_SPACING);
     }

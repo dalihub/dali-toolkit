@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_POPUP_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ public:
   /**
    * @copydoc Toolkit::Popup::IsTailVisible
    */
-  const bool IsTailVisible() const;
+  bool IsTailVisible() const;
 
   /**
    * @copydoc Toolkit::Popup::SetTailPosition
@@ -172,7 +172,7 @@ public:
   /**
    * @copydoc Toolkit::Popup::IsBackingEnabled
    */
-  const bool IsBackingEnabled() const;
+  bool IsBackingEnabled() const;
 
   /**
    * @copydoc Toolkit::Popup::SetBackingColor
@@ -340,7 +340,7 @@ private:
    *
    * @return True if the popup is touch-transparent.
    */
-  const bool IsTouchTransparent() const;
+  bool IsTouchTransparent() const;
 
   /**
    * @brief Allows the popup entry animation to be setup from a Property::Map that could

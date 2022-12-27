@@ -290,9 +290,9 @@ void TreeNodeManipulator::SetType(TreeNode::NodeType type)
   {
     if(mNode->mFirstChild != NULL)
     {
-      TreeNode::NodeType type = mNode->mFirstChild->GetType();
+      TreeNode::NodeType firstChildType = mNode->mFirstChild->GetType();
 
-      if(TreeNode::FLOAT == type || TreeNode::INTEGER == type)
+      if(TreeNode::FLOAT == firstChildType || TreeNode::INTEGER == firstChildType)
       {
         // Arrays of numbers should be replaced, not appended to.
         RemoveChildren();

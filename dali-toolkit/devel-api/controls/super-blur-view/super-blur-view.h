@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SUPER_BLUR_VIEW_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,6 +107,23 @@ public:
    * @return a reference to this
    */
   SuperBlurView& operator=(const SuperBlurView& rhs);
+
+  /**
+   * @brief Move constructor.
+   *
+   * Creates another handle that points to the same real object.
+   * @param[in] handle the handle to move from
+   */
+  SuperBlurView(SuperBlurView&& handle);
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * Changes this handle to point to another real object.
+   * @param[in] rhs the handle to move from
+   * @return a reference to this
+   */
+  SuperBlurView& operator=(SuperBlurView&& rhs);
 
   /**
    * @brief Destructor

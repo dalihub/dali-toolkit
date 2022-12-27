@@ -453,10 +453,24 @@ MeshDefinition::SparseBlob::SparseBlob(const Blob& indices, const Blob& values, 
 {
 }
 
+MeshDefinition::SparseBlob::SparseBlob(Blob&& indices, Blob&& values, uint32_t count)
+: mIndices(std::move(indices)),
+  mValues(std::move(values)),
+  mCount{count}
+{
+}
+
 MeshDefinition::Accessor::Accessor(const MeshDefinition::Blob&       blob,
                                    const MeshDefinition::SparseBlob& sparse)
 : mBlob{blob},
   mSparse{(sparse.mIndices.IsDefined() && sparse.mValues.IsDefined()) ? new SparseBlob{sparse} : nullptr}
+{
+}
+
+MeshDefinition::Accessor::Accessor(MeshDefinition::Blob&&       blob,
+                                   MeshDefinition::SparseBlob&& sparse)
+: mBlob{std::move(blob)},
+  mSparse{(sparse.mIndices.IsDefined() && sparse.mValues.IsDefined()) ? new SparseBlob{std::move(sparse)} : nullptr}
 {
 }
 

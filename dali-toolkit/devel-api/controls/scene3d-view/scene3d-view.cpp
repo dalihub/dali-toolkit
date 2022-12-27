@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,16 +33,13 @@ Scene3dView::~Scene3dView()
 {
 }
 
-Scene3dView::Scene3dView(const Scene3dView& handle)
-: Control(handle)
-{
-}
+Scene3dView::Scene3dView(const Scene3dView& handle) = default;
 
-Scene3dView& Scene3dView::operator=(const Scene3dView& handle)
-{
-  BaseHandle::operator=(handle);
-  return *this;
-}
+Scene3dView& Scene3dView::operator=(const Scene3dView& handle) = default;
+
+Scene3dView::Scene3dView(Scene3dView&& rhs) = default;
+
+Scene3dView& Scene3dView::operator=(Scene3dView&& rhs) = default;
 
 Scene3dView Scene3dView::New(const std::string& filePath)
 {

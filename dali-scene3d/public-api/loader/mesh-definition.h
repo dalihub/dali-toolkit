@@ -86,6 +86,12 @@ struct DALI_SCENE3D_API MeshDefinition
 
     Blob() = default;
 
+    Blob(const Blob&) = default;
+    Blob& operator=(const Blob&) = default;
+
+    Blob(Blob&&)  = default;
+    Blob& operator=(Blob&&) = default;
+
     Blob(uint32_t offset, uint32_t length, uint16_t stride = 0, uint16_t elementSizeHint = 0, const std::vector<float>& min = {}, const std::vector<float>& max = {});
 
     /**
@@ -138,7 +144,14 @@ struct DALI_SCENE3D_API MeshDefinition
   {
     SparseBlob() = default;
 
+    SparseBlob(const SparseBlob&) = default;
+    SparseBlob& operator=(const SparseBlob&) = default;
+
+    SparseBlob(SparseBlob&&) = default;
+    SparseBlob& operator=(SparseBlob&&) = default;
+
     SparseBlob(const Blob& indices, const Blob& values, uint32_t count);
+    SparseBlob(Blob&& indices, Blob&& values, uint32_t count);
 
     Blob     mIndices;
     Blob     mValues;
@@ -160,6 +173,8 @@ struct DALI_SCENE3D_API MeshDefinition
 
     Accessor(const MeshDefinition::Blob&       blob,
              const MeshDefinition::SparseBlob& sparse);
+    Accessor(MeshDefinition::Blob&&       blob,
+             MeshDefinition::SparseBlob&& sparse);
 
     bool IsDefined() const
     {

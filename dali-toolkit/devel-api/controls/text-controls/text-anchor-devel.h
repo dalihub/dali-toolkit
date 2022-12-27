@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ANCHOR_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,6 +97,21 @@ public:
    * @return A reference to this.
    */
   TextAnchor& operator=(const TextAnchor& handle);
+
+  /**
+   * @brief Move constructor.
+   *
+   * @param[in] handle The handle to move from.
+   */
+  TextAnchor(TextAnchor&& handle);
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @param[in] handle The handle to move from.
+   * @return A reference to this.
+   */
+  TextAnchor& operator=(TextAnchor&& handle);
 
   /**
    * @brief Destructor

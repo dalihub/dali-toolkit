@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,19 +40,13 @@ ShadowView::~ShadowView()
 {
 }
 
-ShadowView::ShadowView(const ShadowView& handle)
-: Control(handle)
-{
-}
+ShadowView::ShadowView(const ShadowView& handle) = default;
 
-ShadowView& ShadowView::operator=(const ShadowView& rhs)
-{
-  if(&rhs != this)
-  {
-    Control::operator=(rhs);
-  }
-  return *this;
-}
+ShadowView& ShadowView::operator=(const ShadowView& handle) = default;
+
+ShadowView::ShadowView(ShadowView&& rhs) = default;
+
+ShadowView& ShadowView::operator=(ShadowView&& rhs) = default;
 
 ShadowView ShadowView::New()
 {

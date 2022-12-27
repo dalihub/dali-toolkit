@@ -109,7 +109,7 @@ ShaderDefinition::LoadRaw(const std::string& shadersPath) const
 
   if(!fail)
   {
-    for(auto definevar : mDefines)
+    for(const auto& definevar : mDefines)
     {
       ApplyDefine(raw.mVertexShaderSource, definevar);
       ApplyDefine(raw.mFragmentShaderSource, definevar);

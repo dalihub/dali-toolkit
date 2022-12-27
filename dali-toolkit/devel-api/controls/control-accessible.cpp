@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,14 @@ namespace Dali::Toolkit::DevelControl
 {
 namespace
 {
-static std::string GetLocaleText(std::string string, const char *domain = "dali-toolkit")
+static std::string GetLocaleText(std::string string, const char* domain = "dali-toolkit")
 {
 #ifdef DGETTEXT_ENABLED
-    /*TODO: currently non-localized string is used as a key for translation lookup. In case the lookup key formatting is forced
+  /*TODO: currently non-localized string is used as a key for translation lookup. In case the lookup key formatting is forced
           consider calling utility function for converting non-localized string into well-formatted key before lookup. */
-    return dgettext(domain, string.c_str());
+  return dgettext(domain, string.c_str());
 #else
-    return string;
+  return string;
 #endif
 }
 
@@ -104,7 +104,7 @@ std::string ControlAccessible::GetName() const
 
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
-  std::string name;
+  std::string              name;
 
   if(!controlImpl.mAccessibilityGetNameSignal.Empty())
   {
@@ -142,7 +142,7 @@ std::string ControlAccessible::GetDescription() const
 
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
-  std::string description;
+  std::string              description;
 
   if(!controlImpl.mAccessibilityGetDescriptionSignal.Empty())
   {
@@ -183,7 +183,7 @@ std::string ControlAccessible::GetLocalizedRoleName() const
 bool ControlAccessible::IsShowing()
 {
   Dali::Actor self = Self();
-  if(!self.GetProperty<bool>(Actor::Property::VISIBLE) || self.GetProperty<Vector4>(Actor::Property::WORLD_COLOR).a == 0 || self.GetProperty<bool>(Dali::DevelActor::Property::CULLED))
+  if(!self.GetProperty<bool>(Actor::Property::VISIBLE) || Dali::EqualsZero(self.GetProperty<Vector4>(Actor::Property::WORLD_COLOR).a) || self.GetProperty<bool>(Dali::DevelActor::Property::CULLED))
   {
     return false;
   }
@@ -198,14 +198,14 @@ bool ControlAccessible::IsShowing()
   auto childExtent = child->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
   while(parent)
   {
-    auto control      = Dali::Toolkit::Control::DownCast(parent->Self());
+    auto control = Dali::Toolkit::Control::DownCast(parent->Self());
     if(!control.GetProperty<bool>(Actor::Property::VISIBLE))
     {
       return false;
     }
     auto clipMode     = control.GetProperty(Actor::Property::CLIPPING_MODE).Get<bool>();
     auto parentExtent = parent->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
-    if ((clipMode != ClippingMode::DISABLED) && !parentExtent.Intersects(childExtent))
+    if((clipMode != ClippingMode::DISABLED) && !parentExtent.Intersects(childExtent))
     {
       return false;
     }
@@ -219,7 +219,7 @@ Dali::Accessibility::States ControlAccessible::CalculateStates()
 {
   using Dali::Accessibility::State;
 
-  Dali::Actor self = Self();
+  Dali::Actor                 self = Self();
   Dali::Accessibility::States states;
 
   states[State::FOCUSABLE]     = self.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE);
@@ -243,9 +243,9 @@ Dali::Accessibility::States ControlAccessible::GetStates()
 Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
 {
   std::unordered_map<std::string, std::string> attributeMap;
-  auto control = Dali::Toolkit::Control::DownCast(Self());
-  auto attribute = control.GetProperty(Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
-  auto map = attribute.GetMap();
+  auto                                         control   = Dali::Toolkit::Control::DownCast(Self());
+  auto                                         attribute = control.GetProperty(Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
+  auto                                         map       = attribute.GetMap();
 
   if(map)
   {
@@ -291,12 +291,12 @@ bool ControlAccessible::GrabFocus()
 
 void ControlAccessible::ScrollToSelf()
 {
-  auto* child = this;
+  auto* child  = this;
   auto* parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(child->GetParent());
 
-  while (parent)
+  while(parent)
   {
-    if (parent->IsScrollable())
+    if(parent->IsScrollable())
     {
       parent->ScrollToChild(child->Self());
     }
@@ -323,8 +323,8 @@ void ControlAccessible::UnregisterPositionPropertyNotification()
 
 bool ControlAccessible::GrabHighlight()
 {
-  Dali::Actor self = Self();
-  auto oldHighlightedActor = GetCurrentlyHighlightedActor();
+  Dali::Actor self                = Self();
+  auto        oldHighlightedActor = GetCurrentlyHighlightedActor();
 
   if(!Dali::Accessibility::IsUp())
   {

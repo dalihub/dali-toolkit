@@ -120,6 +120,7 @@ struct DALI_SCENE3D_API TextureDefinition
   SamplingMode::Type mSamplingMode;
 
   TextureDefinition(const std::string& imageUri = "", SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR);
+  TextureDefinition(std::string&& imageUri, SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR);
 };
 
 /**

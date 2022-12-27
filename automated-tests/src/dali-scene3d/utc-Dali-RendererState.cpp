@@ -60,10 +60,10 @@ int UtcDaliRendererStateApply(void)
   Shader shader = Shader::New(vsh, fsh);
   Renderer renderer = Renderer::New(geom, shader);
 
-  HELP_TEST_RENDERER_STATE(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF, rs::DEPTH_WRITE, DepthWriteMode::ON, renderer);
   HELP_TEST_RENDERER_STATE(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::OFF, rs::DEPTH_TEST, DepthTestMode::ON, renderer);
 
   HELP_TEST_RENDERER_STATE(Renderer::Property::BLEND_MODE, BlendMode::OFF, rs::ALPHA_BLEND, BlendMode::ON, renderer);
+  HELP_TEST_RENDERER_STATE(Renderer::Property::BLEND_MODE, BlendMode::OFF, ~(rs::ALPHA_BLEND), BlendMode::USE_ACTOR_OPACITY, renderer);
 
   HELP_TEST_RENDERER_STATE(Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::NONE, rs::CULL_FRONT, FaceCullingMode::FRONT, renderer);
   HELP_TEST_RENDERER_STATE(Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::NONE, rs::CULL_BACK, FaceCullingMode::BACK, renderer);

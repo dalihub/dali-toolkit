@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCENE3D_VIEW_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/rendering/texture.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/scene3d-view/scene3d-view.h>
-#include <dali-toolkit/internal/controls/scene3d-view/gltf-loader.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali

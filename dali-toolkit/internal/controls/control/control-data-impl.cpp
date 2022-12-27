@@ -30,6 +30,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <cstring>
@@ -580,11 +581,11 @@ void Control::Impl::CheckHighlightedObjectGeometry()
     }
     case Dali::Accessibility::ScreenRelativeMoveType::INSIDE:
     {
-      if(rect.width < 0 && accessibleRect.x != lastPosition.x)
+      if(rect.width < 0 && !Dali::Equals(accessibleRect.x, lastPosition.x))
       {
         mAccessibilityLastScreenRelativeMoveType = (accessibleRect.x < lastPosition.x) ? Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT : Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT;
       }
-      if(rect.height < 0 && accessibleRect.y != lastPosition.y)
+      if(rect.height < 0 && !Dali::Equals(accessibleRect.y, lastPosition.y))
       {
         mAccessibilityLastScreenRelativeMoveType = (accessibleRect.y < lastPosition.y) ? Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT : Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT;
       }

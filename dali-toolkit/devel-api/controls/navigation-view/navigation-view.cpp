@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,19 +31,13 @@ NavigationView::NavigationView()
 {
 }
 
-NavigationView::NavigationView(const NavigationView& handle)
-: Control(handle)
-{
-}
+NavigationView::NavigationView(const NavigationView& handle) = default;
 
-NavigationView& NavigationView::operator=(const NavigationView& handle)
-{
-  if(&handle != this)
-  {
-    Control::operator=(handle);
-  }
-  return *this;
-}
+NavigationView& NavigationView::operator=(const NavigationView& handle) = default;
+
+NavigationView::NavigationView(NavigationView&& handle) = default;
+
+NavigationView& NavigationView::operator=(NavigationView&& handle) = default;
 
 NavigationView::~NavigationView()
 {

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_BUBBLE_EMMITER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,23 @@ public:
    * @return A reference to this
    */
   BubbleEmitter& operator=(const BubbleEmitter& rhs);
+
+  /**
+   * @brief Move constructor.
+   *
+   * Creates another handle that points to the same real object
+   * @param[in] handle The handle to move
+   */
+  BubbleEmitter(BubbleEmitter&& handle);
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * Changes this handle to point to another real object
+   * @param[in] rhs The object to point at
+   * @return A reference to this
+   */
+  BubbleEmitter& operator=(BubbleEmitter&& rhs);
 
   /**
    * @brief Downcast an Object handle to SuperBlurView.

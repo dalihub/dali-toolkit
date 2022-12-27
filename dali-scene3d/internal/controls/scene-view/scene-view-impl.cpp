@@ -31,6 +31,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <string_view>
@@ -552,9 +553,10 @@ void SceneView::UpdateRenderTask()
     {
       Dali::FrameBuffer currentFrameBuffer = mRenderTask.GetFrameBuffer();
       if(!currentFrameBuffer ||
-         currentFrameBuffer.GetColorTexture().GetWidth() != size.width ||
-         currentFrameBuffer.GetColorTexture().GetHeight() != size.height)
+         !Dali::Equals(currentFrameBuffer.GetColorTexture().GetWidth(), size.width) ||
+         !Dali::Equals(currentFrameBuffer.GetColorTexture().GetHeight(), size.height))
       {
+        mRootLayer.SetProperty(Dali::Actor::Property::COLOR_MODE, ColorMode::USE_OWN_COLOR);
         mRenderTask.ResetViewportGuideActor();
         mRenderTask.SetViewport(Dali::Viewport(Vector4::ZERO));
 
@@ -593,6 +595,7 @@ void SceneView::UpdateRenderTask()
       mRenderTask.SetViewportGuideActor(Self());
       if(mRenderTask.GetFrameBuffer())
       {
+        mRootLayer.SetProperty(Dali::Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_ALPHA);
         FrameBuffer framebuffer;
         mRenderTask.SetFrameBuffer(framebuffer);
         mRenderTask.SetClearEnabled(false);

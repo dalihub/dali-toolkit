@@ -25,6 +25,9 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/scene3d-view/scene3d-view-impl.h>
+
 namespace Dali
 {
 namespace Toolkit

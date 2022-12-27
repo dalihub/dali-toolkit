@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1210,8 +1210,8 @@ void Builder::RecordStyle(StylePtr           style,
         StylePtr* stylePtr = style->subStates.Find(stateName);
         if(stylePtr)
         {
-          StylePtr style(*stylePtr);
-          RecordStyle(style, stateNode, handle, replacements);
+          StylePtr subState(*stylePtr);
+          RecordStyle(subState, stateNode, handle, replacements);
         }
         else
         {
@@ -1577,8 +1577,8 @@ bool Builder::ConvertChildValue(const TreeNode& mappingRoot, KeyStack& keyStack,
       {
         for(Property::Map::SizeType i = 0; i < map->Count(); ++i)
         {
-          Property::Value& child = map->GetValue(i);
-          ConvertChildValue(mappingRoot, keyStack, child);
+          Property::Value& currentChild = map->GetValue(i);
+          ConvertChildValue(mappingRoot, keyStack, currentChild);
         }
       }
       break;
@@ -1591,8 +1591,8 @@ bool Builder::ConvertChildValue(const TreeNode& mappingRoot, KeyStack& keyStack,
       {
         for(Property::Array::SizeType i = 0; i < array->Count(); ++i)
         {
-          Property::Value& child = array->GetElementAt(i);
-          ConvertChildValue(mappingRoot, keyStack, child);
+          Property::Value& currentChild = array->GetElementAt(i);
+          ConvertChildValue(mappingRoot, keyStack, currentChild);
         }
       }
       break;

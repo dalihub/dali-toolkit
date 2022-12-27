@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,19 +37,13 @@ Magnifier::Magnifier()
 {
 }
 
-Magnifier::Magnifier(const Magnifier& handle)
-: Control(handle)
-{
-}
+Magnifier::Magnifier(const Magnifier& handle) = default;
 
-Magnifier& Magnifier::operator=(const Magnifier& handle)
-{
-  if(&handle != this)
-  {
-    Control::operator=(handle);
-  }
-  return *this;
-}
+Magnifier& Magnifier::operator=(const Magnifier& handle) = default;
+
+Magnifier::Magnifier(Magnifier&& rhs) = default;
+
+Magnifier& Magnifier::operator=(Magnifier&& rhs) = default;
 
 Magnifier::Magnifier(Internal::Magnifier& implementation)
 : Control(implementation)

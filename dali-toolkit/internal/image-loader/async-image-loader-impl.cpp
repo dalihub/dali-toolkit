@@ -174,17 +174,22 @@ void AsyncImageLoader::RemoveCompletedTask()
   std::uint32_t loadingTaskId;
   auto          end              = mLoadingTasks.end();
   auto          endCompletedIter = mCompletedTaskIds.end();
-  for(std::vector<AsyncImageLoadingInfo>::iterator iter = mLoadingTasks.begin(); iter != end; ++iter)
+  for(auto iterCompleted = mCompletedTaskIds.begin(); iterCompleted != endCompletedIter; ++iterCompleted)
   {
-    loadingTaskId = (*iter).loadId;
-    for(auto iterCompleted = mCompletedTaskIds.begin(); iterCompleted != endCompletedIter; ++iterCompleted)
+    loadingTaskId = (*iterCompleted);
+    for(std::vector<AsyncImageLoadingInfo>::iterator iter = mLoadingTasks.begin(); iter != end; ++iter)
     {
-      if((*iterCompleted) == loadingTaskId)
+      if((*iter).loadId == loadingTaskId)
       {
         mLoadingTasks.erase(iter);
+        end = mLoadingTasks.end();
+        break;
       }
     }
   }
+
+  // Remove cached completed tasks
+  mCompletedTaskIds.clear();
 }
 
 } // namespace Internal

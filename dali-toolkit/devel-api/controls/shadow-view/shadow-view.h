@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SHADOW_VIEW_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,13 +107,29 @@ public:
 
   /**
    * Copy constructor. Creates another handle that points to the same real object
+   * @param[in] handle to copy from
    */
   ShadowView(const ShadowView& handle);
 
   /**
    * Assignment operator. Changes this handle to point to another real object
+   * @param[in] handle to copy from
+   * @return reference to this
    */
-  ShadowView& operator=(const ShadowView& view);
+  ShadowView& operator=(const ShadowView& handle);
+
+  /**
+   * Move constructor. Creates another handle that points to the same real object
+   * @param[in] rhs to move from
+   */
+  ShadowView(ShadowView&& rhs);
+
+  /**
+   * Move assignment operator. Changes this handle to point to another real object
+   * @param[in] rhs to move from
+   * @return reference to this
+   */
+  ShadowView& operator=(ShadowView&& rhs);
 
   /**
    * @brief Destructor

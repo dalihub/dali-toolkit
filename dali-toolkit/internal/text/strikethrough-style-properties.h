@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector4.h>
 
 namespace Dali
@@ -63,7 +64,7 @@ struct StrikethroughStyleProperties
   {
     //The property is similar when both are not defined or when both are defined and have the same value.
     return ((!colorDefined && !other.colorDefined) || ((colorDefined && other.colorDefined) && (color == other.color))) &&
-           ((!heightDefined && !other.heightDefined) || ((heightDefined && other.heightDefined) && (height == other.height)));
+           ((!heightDefined && !other.heightDefined) || ((heightDefined && other.heightDefined) && (Dali::Equals(height, other.height))));
   }
 
   bool operator!=(const StrikethroughStyleProperties& other) const
@@ -73,7 +74,7 @@ struct StrikethroughStyleProperties
 
   bool IsHeightEqualTo(const StrikethroughStyleProperties& other) const
   {
-    return ((!heightDefined && !other.heightDefined) || ((heightDefined && other.heightDefined) && (height == other.height)));
+    return ((!heightDefined && !other.heightDefined) || ((heightDefined && other.heightDefined) && (Dali::Equals(height, other.height))));
   }
 
   StrikethroughStyleProperties& CopyIfNotDefined(const StrikethroughStyleProperties& other)

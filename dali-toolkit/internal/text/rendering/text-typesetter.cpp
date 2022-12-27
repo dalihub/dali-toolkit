@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/math/math-utils.h>
 #include <memory.h>
 
 // INTERNAL INCLUDES
@@ -447,7 +448,7 @@ void DrawUnderline(
 
         for(uint32_t x = xRangeMin; x < xRangeMax; x++)
         {
-          if(dashGap == 0 && dashWidth > 0)
+          if(Dali::EqualsZero(dashGap) && dashWidth > 0)
           {
             // Note : this is same logic as bitmap[y][x] = underlineColor;
             *(bitmapBuffer + x) = packedUnderlineColor;
@@ -749,7 +750,7 @@ inline Devel::PixelBuffer CreateTransparentImageBuffer(const uint32_t bufferWidt
   if(Pixel::RGBA8888 == pixelFormat)
   {
     const uint32_t bufferSizeInt  = bufferWidth * bufferHeight;
-    const size_t bufferSizeChar = sizeof(uint32_t) * static_cast<std::size_t>(bufferSizeInt);
+    const size_t   bufferSizeChar = sizeof(uint32_t) * static_cast<std::size_t>(bufferSizeInt);
     memset(imageBuffer.GetBuffer(), 0, bufferSizeChar);
   }
   else
@@ -945,7 +946,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
   const uint32_t bufferHeight = static_cast<uint32_t>(size.height);
 
   const uint32_t bufferSizeInt  = bufferWidth * bufferHeight;
-  const size_t bufferSizeChar = sizeof(uint32_t) * static_cast<std::size_t>(bufferSizeInt);
+  const size_t   bufferSizeChar = sizeof(uint32_t) * static_cast<std::size_t>(bufferSizeInt);
 
   //Elided text in ellipsis at START could start on index greater than 0
   auto startIndexOfGlyphs = mModel->GetStartIndexOfElidedGlyphs();

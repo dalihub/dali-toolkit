@@ -496,7 +496,7 @@ float Visual::Base::GetHeightForWidth(float width)
   float   aspectCorrectedHeight = 0.f;
   Vector2 naturalSize;
   GetNaturalSize(naturalSize);
-  if(naturalSize.width)
+  if(naturalSize.width > 0.0f)
   {
     aspectCorrectedHeight = naturalSize.height * width / naturalSize.width;
   }

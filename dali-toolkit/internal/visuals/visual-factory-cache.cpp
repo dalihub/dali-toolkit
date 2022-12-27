@@ -20,6 +20,8 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/common/hash.h>
+#include <dali/integration-api/debug.h>
+#include <dali/public-api/math/math-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/utility/npatch-helper.h>
@@ -29,7 +31,6 @@
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -436,7 +437,7 @@ int32_t VisualFactoryCache::GetProperBrokenImageIndex(const Vector2& size)
 {
   // Sets the default broken type
   int32_t returnIndex = 0;
-  if((size.width == 0 || size.height == 0) || mUseDefaultBrokenImageOnly)
+  if(Dali::EqualsZero(size.width) || Dali::EqualsZero(size.height) || mUseDefaultBrokenImageOnly)
   {
     // To do : Need to add observer about size
     return returnIndex;

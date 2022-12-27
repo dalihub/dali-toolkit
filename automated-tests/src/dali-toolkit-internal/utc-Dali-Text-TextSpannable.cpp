@@ -23,8 +23,13 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-spannable.h>
 #include <dali-toolkit/devel-api/text/spannable-string.h>
+#include <dali-toolkit/devel-api/text/spans/background-color-span.h>
+#include <dali-toolkit/devel-api/text/spans/bold-span.h>
+#include <dali-toolkit/devel-api/text/spans/character-spacing-span.h>
 #include <dali-toolkit/devel-api/text/spans/font-span.h>
 #include <dali-toolkit/devel-api/text/spans/foreground-color-span.h>
+#include <dali-toolkit/devel-api/text/spans/italic-span.h>
+#include <dali-toolkit/devel-api/text/spans/strikethrough-span.h>
 #include <dali-toolkit/devel-api/text/spans/underline-span.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
@@ -37,8 +42,6 @@
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <toolkit-text-utils.h>
-#include <dali-toolkit/devel-api/text/spans/character-spacing-span.h>
-
 
 using namespace Dali;
 using namespace Toolkit;
@@ -48,6 +51,19 @@ namespace
 const std::string DEFAULT_FONT_DIR("/resources/fonts");
 const float       PIXEL_FORMAT_64_FACTOR = 64.f; ///< 64.f is used to convert from point size to 26.6 pixel format.
 } // namespace
+
+Text::SpannableString CreateSpannableStringForStrikethroughSpan()
+{
+  Text::SpannableString spannableString = Text::SpannableString::New("Hello World");
+  DALI_TEST_CHECK(spannableString);
+
+  auto isAddedStrikethroughSpan = spannableString.AttachSpan(
+    Text::StrikethroughSpan::New(Color::GREEN, 5.0f),
+    Text::Range::New(5u, 7u));
+  DALI_TEST_CHECK(isAddedStrikethroughSpan);
+
+  return spannableString;
+}
 
 Text::SpannableString CreateSpannableStringForForegroundColorSpan()
 {
@@ -98,9 +114,48 @@ Text::SpannableString CreateSpannableStringForCharacterSpacing()
   DALI_TEST_CHECK(spannableString);
 
   auto isCharacterSpacingSpan = spannableString.AttachSpan(
-  Text::CharacterSpacingSpan::New(5.2f),
-  Text::Range::New(5u, 7u));
+    Text::CharacterSpacingSpan::New(5.2f),
+    Text::Range::New(5u, 7u));
   DALI_TEST_CHECK(isCharacterSpacingSpan);
+
+  return spannableString;
+}
+
+Text::SpannableString CreateSpannableStringForBoldSpan()
+{
+  Text::SpannableString spannableString = Text::SpannableString::New("Hello");
+  DALI_TEST_CHECK(spannableString);
+
+  auto boldspan   = Dali::Toolkit::Text::BoldSpan::New();
+  auto isBoldSpan = spannableString.AttachSpan(boldspan, Dali::Toolkit::Text::Range::New(0u, 3u));
+  DALI_TEST_CHECK(isBoldSpan);
+
+  return spannableString;
+}
+
+Text::SpannableString CreateSpannableStringForItalicSpan()
+{
+  Text::SpannableString spannableString = Text::SpannableString::New("Hello");
+  DALI_TEST_CHECK(spannableString);
+
+  auto isAddedItalic = spannableString.AttachSpan(
+    Text::ItalicSpan::New(),
+    Text::Range::New(0u, 3u));
+  DALI_TEST_CHECK(isAddedItalic);
+
+  return spannableString;
+}
+
+Text::SpannableString CreateSpannableStringForBackgroundColorSpan()
+{
+  Text::SpannableString spannableString = Text::SpannableString::New("Hello مرحبا");
+
+  DALI_TEST_CHECK(spannableString);
+
+  auto isAddedGreen = spannableString.AttachSpan(
+    Text::BackgroundColorSpan::New(Color::GREEN),
+    Text::Range::New(5u, 7u));
+  DALI_TEST_CHECK(isAddedGreen);
 
   return spannableString;
 }
@@ -394,8 +449,129 @@ int UtcDaliToolkitTextLabelSetSpannedText_CharacterSpacingSpan(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Internal::TextLabel& labelImpl   = GetImpl(textLabel);
+  Toolkit::Internal::TextLabel&                               labelImpl        = GetImpl(textLabel);
   const Vector<Dali::Toolkit::Text::CharacterSpacingGlyphRun> characterSpacing = labelImpl.GetTextController()->GetTextModel()->GetCharacterSpacingGlyphRuns();
   DALI_TEST_EQUALS(1, characterSpacing.Count(), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelSetSpannedText_BoldSpan(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("UtcDaliToolkitTextLabelSetSpannedText_BoldSpan");
+
+  TextLabel textLabel = TextLabel::New();
+
+  DALI_TEST_CHECK(textLabel);
+
+  application.GetScene().Add(textLabel);
+
+  Text::SpannableString spannableString = CreateSpannableStringForBoldSpan();
+  Text::SetSpannedText(textLabel, spannableString);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextLabel& labelImpl = GetImpl(textLabel);
+
+  const Vector<Text::FontRun>& validFonts = labelImpl.GetTextController()->GetTextModel()->GetFontRuns();
+
+  DALI_TEST_EQUALS(validFonts.Count(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFonts[0].characterRun.characterIndex, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFonts[0].characterRun.GetEndCharacterIndex(), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFonts[0].isBoldRequired, true, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelSetSpannedText_ItalicSpan(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliToolkitTextLabelSetSpannedText_ItalicSpan");
+
+  TextLabel textLabel = TextLabel::New();
+  DALI_TEST_CHECK(textLabel);
+
+  application.GetScene().Add(textLabel);
+
+  Text::SpannableString spannableString = CreateSpannableStringForItalicSpan();
+
+  Text::SetSpannedText(textLabel, spannableString);
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextLabel& labelImpl        = GetImpl(textLabel);
+  const Vector<Text::FontRun>&  validFontsItalic = labelImpl.GetTextController()->GetTextModel()->GetFontRuns();
+
+  DALI_TEST_EQUALS(validFontsItalic.Count(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFontsItalic[0].characterRun.characterIndex, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFontsItalic[0].characterRun.GetEndCharacterIndex(), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFontsItalic[0].isItalicRequired, true, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelSetSpannedText_BackgroundColorSpan(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliToolkitTextLabelSetSpannedText_BackgroundColorSpan");
+
+  TextLabel textLabel = TextLabel::New();
+  DALI_TEST_CHECK(textLabel);
+
+  application.GetScene().Add(textLabel);
+
+  Text::SpannableString spannableString = CreateSpannableStringForBackgroundColorSpan();
+  Text::SetSpannedText(textLabel, spannableString);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextLabel& labelImpl                    = GetImpl(textLabel);
+  const Text::ColorIndex* const backgroundColorIndicesBuffer = labelImpl.GetTextController()->GetTextModel()->GetBackgroundColorIndices();
+
+  CheckColorIndices(backgroundColorIndicesBuffer, 4u, {0u, 5u, 7u, 10u}, {0u, 1u, 1u, 0u});
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelSetSpannedText_StrikethroughSpan(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliToolkitTextLabelSetSpannedText_StrikethroughSpan ");
+
+  Dali::Toolkit::Text::StrikethroughStyleProperties expectedProperties = {
+    Color::GREEN,
+    5u,
+    true,
+    true};
+
+  TextLabel textLabel = TextLabel::New();
+
+  DALI_TEST_CHECK(textLabel);
+
+  application.GetScene().Add(textLabel);
+
+  Text::SpannableString spannableString = CreateSpannableStringForStrikethroughSpan();
+  Text::SetSpannedText(textLabel, spannableString);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextLabel& labelImpl = GetImpl(textLabel);
+
+  const Text::Length numberOfStrikethroughRuns = labelImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
+
+  DALI_TEST_EQUALS(numberOfStrikethroughRuns, 1u, TEST_LOCATION);
+
+  Vector<Dali::Toolkit::Text::StrikethroughGlyphRun> strikethroughRuns;
+  strikethroughRuns.Resize(numberOfStrikethroughRuns);
+
+  labelImpl.GetTextController()->GetTextModel()->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
+
+  DALI_TEST_EQUALS(strikethroughRuns[0].glyphRun.glyphIndex, 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(strikethroughRuns[0].glyphRun.numberOfGlyphs, 3u, TEST_LOCATION);
+  DALI_TEST_CHECK(strikethroughRuns[0].properties == expectedProperties);
+
   END_TEST;
 }

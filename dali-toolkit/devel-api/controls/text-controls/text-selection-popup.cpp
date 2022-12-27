@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,19 +36,13 @@ TextSelectionPopup::TextSelectionPopup()
 {
 }
 
-TextSelectionPopup::TextSelectionPopup(const TextSelectionPopup& handle)
-: Control(handle)
-{
-}
+TextSelectionPopup::TextSelectionPopup(const TextSelectionPopup& handle) = default;
 
-TextSelectionPopup& TextSelectionPopup::operator=(const TextSelectionPopup& handle)
-{
-  if(&handle != this)
-  {
-    Control::operator=(handle);
-  }
-  return *this;
-}
+TextSelectionPopup& TextSelectionPopup::operator=(const TextSelectionPopup& handle) = default;
+
+TextSelectionPopup::TextSelectionPopup(TextSelectionPopup&& handle) = default;
+
+TextSelectionPopup& TextSelectionPopup::operator=(TextSelectionPopup&& handle) = default;
 
 TextSelectionPopup::~TextSelectionPopup()
 {

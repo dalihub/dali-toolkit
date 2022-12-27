@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -867,21 +868,21 @@ Toolkit::ScrollBar ScrollBar::New(Toolkit::ScrollBar::Direction direction)
 
 double ScrollBar::ScrollBarAccessible::GetMinimum() const
 {
-  auto self = Toolkit::ScrollBar::DownCast(Self());
+  auto   self             = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(self).mScrollableObject.GetHandle();
   return scrollableHandle ? scrollableHandle.GetCurrentProperty<float>(GetImpl(self).mPropertyMinScrollPosition) : 0.0f;
 }
 
 double ScrollBar::ScrollBarAccessible::GetCurrent() const
 {
-  auto self = Toolkit::ScrollBar::DownCast(Self());
+  auto   self             = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(self).mScrollableObject.GetHandle();
   return scrollableHandle ? scrollableHandle.GetCurrentProperty<float>(GetImpl(self).mPropertyScrollPosition) : 0.0f;
 }
 
 double ScrollBar::ScrollBarAccessible::GetMaximum() const
 {
-  auto self = Toolkit::ScrollBar::DownCast(Self());
+  auto   self             = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(self).mScrollableObject.GetHandle();
   return scrollableHandle ? scrollableHandle.GetCurrentProperty<float>(GetImpl(self).mPropertyMaxScrollPosition) : 1.0f;
 }
@@ -895,7 +896,7 @@ bool ScrollBar::ScrollBarAccessible::SetCurrent(double current)
 
   auto valueBefore = GetCurrent();
 
-  auto self = Toolkit::ScrollBar::DownCast(Self());
+  auto   self             = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(self).mScrollableObject.GetHandle();
   if(!scrollableHandle)
   {
@@ -906,7 +907,7 @@ bool ScrollBar::ScrollBarAccessible::SetCurrent(double current)
 
   auto valueAfter = GetCurrent();
 
-  if((current != valueBefore) && (valueBefore == valueAfter))
+  if(!Dali::Equals(current, valueBefore) && Dali::Equals(valueBefore, valueAfter))
   {
     return false;
   }

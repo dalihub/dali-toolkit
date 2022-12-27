@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,19 +35,13 @@ Popup::Popup()
 {
 }
 
-Popup::Popup(const Popup& handle)
-: Control(handle)
-{
-}
+Popup::Popup(const Popup& handle) = default;
 
-Popup& Popup::operator=(const Popup& handle)
-{
-  if(&handle != this)
-  {
-    Control::operator=(handle);
-  }
-  return *this;
-}
+Popup& Popup::operator=(const Popup& handle) = default;
+
+Popup::Popup(Popup&& handle) = default;
+
+Popup& Popup::operator=(Popup&& handle) = default;
 
 Popup::Popup(Internal::Popup& implementation)
 : Control(implementation)

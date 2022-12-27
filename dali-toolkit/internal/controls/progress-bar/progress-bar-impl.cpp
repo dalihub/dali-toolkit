@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -261,7 +261,7 @@ void ProgressBar::SetProgressValue(float value)
 {
   // update the progress bar value (taking float precision errors into account)
   // TODO : it seems 0.0f cannot into this statement.
-  if((mProgressValue != value) &&
+  if((!Equals(mProgressValue, value)) &&
      ((value >= DEFAULT_LOWER_BOUND) || (Equals(value, DEFAULT_LOWER_BOUND))) &&
      ((value <= DEFAULT_UPPER_BOUND) || (Equals(value, DEFAULT_UPPER_BOUND))))
   {
@@ -288,7 +288,7 @@ void ProgressBar::SetSecondaryProgressValue(float value)
 {
   // update the progress bar value (taking float precision errors into account)
   // TODO : it seems 0.0f cannot into this statement.
-  if((mSecondaryProgressValue != value) &&
+  if((!Equals(mSecondaryProgressValue, value)) &&
      ((value >= DEFAULT_LOWER_BOUND) || (Equals(value, DEFAULT_LOWER_BOUND))) &&
      ((value <= DEFAULT_UPPER_BOUND) || (Equals(value, DEFAULT_UPPER_BOUND))))
   {

@@ -87,27 +87,27 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetColors()
    */
-  const Vector4* const GetColors() const override;
+  const Vector4* GetColors() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetColorIndices()
    */
-  const ColorIndex* const GetColorIndices() const override;
+  const ColorIndex* GetColorIndices() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetBackgroundColors()
    */
-  const Vector4* const GetBackgroundColors() const override;
+  const Vector4* GetBackgroundColors() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetBackgroundColorIndices()
    */
-  const ColorIndex* const GetBackgroundColorIndices() const override;
+  const ColorIndex* GetBackgroundColorIndices() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::IsMarkupBackgroundColorSet()
    */
-  bool const IsMarkupBackgroundColorSet() const;
+  bool IsMarkupBackgroundColorSet() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetTextColor()
@@ -137,7 +137,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::IsMarkupUnderlineSet()
    */
-  bool const IsMarkupUnderlineSet() const;
+  bool IsMarkupUnderlineSet() const;
 
   /**
   * @copydoc Dali::Toolkit::Text::ViewInterface::GetHyphens()
@@ -239,7 +239,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::IsMarkupStrikethroughSet()
    */
-  bool const IsMarkupStrikethroughSet() const;
+  bool IsMarkupStrikethroughSet() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetStrikethroughHeight()
@@ -281,7 +281,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetCharacterSpacing()
    */
-  const float GetCharacterSpacing() const override;
+  float GetCharacterSpacing() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetTextBuffer()

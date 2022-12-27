@@ -485,8 +485,7 @@ void DliLoader::Impl::ParseScene(LoadParams& params)
 
 void DliLoader::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* tnScenes, const Toolkit::TreeNode* tnNodes, LoadParams& params)
 {
-  auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene)
-  {
+  auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene) {
     auto tn = GetNthChild(tnScenes, iScene); // now a "scene" object
     if(!tn)
     {
@@ -569,8 +568,7 @@ void DliLoader::Impl::ParseSkeletons(const TreeNode* skeletons, SceneDefinition&
         uint32_t                   jointCount = 0;
         std::function<void(Index)> visitFn;
         auto&                      ibms = mInverseBindMatrices;
-        visitFn                         = [&](Index id)
-        {
+        visitFn                         = [&](Index id) {
           auto node = scene.GetNode(id);
           jointCount += ibms.find(id) != ibms.end();
 
@@ -589,8 +587,7 @@ void DliLoader::Impl::ParseSkeletons(const TreeNode* skeletons, SceneDefinition&
 
         skeleton.mJoints.reserve(jointCount);
 
-        visitFn = [&](Index id)
-        {
+        visitFn = [&](Index id) {
           auto iFind = ibms.find(id);
           if(iFind != ibms.end() && skeleton.mJoints.size() < Skinning::MAX_JOINTS)
           {
@@ -742,9 +739,10 @@ void DliLoader::Impl::ParseShaders(const TreeNode* shaders, ResourceBundle& reso
 
             default:
               mOnError(FormatString(
-                "shader %d: Ignoring uniform '%s': failed to infer type from %d elements.",
+                "shader %u: Ignoring uniform '%s': failed to infer type from %zu elements.",
                 iShader,
-                key.c_str()));
+                key.c_str(),
+                size));
               break;
           }
 
@@ -1080,8 +1078,7 @@ void DliLoader::Impl::ParseNodes(const TreeNode* const nodes, Index index, LoadP
 
     virtual unsigned int Resolve(Index iDli) override
     {
-      auto iFind = std::lower_bound(mIndices.begin(), mIndices.end(), iDli, [](const Entry& idx, Index iDli)
-                                    { return idx.iDli < iDli; });
+      auto iFind = std::lower_bound(mIndices.begin(), mIndices.end(), iDli, [](const Entry& idx, Index iDli) { return idx.iDli < iDli; });
       DALI_ASSERT_ALWAYS(iFind != mIndices.end());
       return iFind->iScene;
     }
@@ -1357,7 +1354,7 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
     const unsigned int myIndex = output.mScene.GetNodeCount();
     if(!mapper.Map(index, myIndex))
     {
-      mOnError(FormatString("node %d: error mapping dli index %d: node has multiple parents. Ignoring subtree."));
+      mOnError(FormatString("node %d: error mapping dli index %d: node has multiple parents. Ignoring subtree.", index, myIndex));
       return;
     }
 
@@ -1428,8 +1425,7 @@ void DliLoader::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadParams& 
     AnimationDefinition animDef;
     ReadString(tnAnim.GetChild(NAME), animDef.mName);
 
-    auto       iFind     = std::lower_bound(definitions.begin(), definitions.end(), animDef, [](const AnimationDefinition& ad0, const AnimationDefinition& ad1)
-                                  { return ad0.mName < ad1.mName; });
+    auto       iFind     = std::lower_bound(definitions.begin(), definitions.end(), animDef, [](const AnimationDefinition& ad0, const AnimationDefinition& ad1) { return ad0.mName < ad1.mName; });
     const bool overwrite = iFind != definitions.end() && iFind->mName == animDef.mName;
     if(overwrite)
     {
@@ -1695,8 +1691,7 @@ void DliLoader::Impl::ParseAnimationGroups(const Toolkit::TreeNode* tnAnimationG
       continue;
     }
 
-    auto iFind = std::lower_bound(animGroups.begin(), animGroups.end(), groupName, [](const AnimationGroupDefinition& group, const std::string& name)
-                                  { return group.mName < name; });
+    auto iFind = std::lower_bound(animGroups.begin(), animGroups.end(), groupName, [](const AnimationGroupDefinition& group, const std::string& name) { return group.mName < name; });
     if(iFind != animGroups.end() && iFind->mName == groupName)
     {
       mOnError(FormatString("Animation group with name '%s' already exists; new entries will be merged.", groupName.c_str()));

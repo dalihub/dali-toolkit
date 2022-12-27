@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/math/math-utils.h>
 #include <limits>
 
 // INTERNAL INCLUDES
@@ -307,7 +308,7 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
     }
 
     model->mElideEnabled = actualellipsis;
-    if(currentFitPointSize != bestPointSize)
+    if(!Dali::Equals(currentFitPointSize, bestPointSize))
     {
       impl.mTextFitChanged = true;
     }
@@ -843,7 +844,7 @@ void Controller::Relayouter::CalculateVerticalOffset(Controller::Impl& impl, con
 
   // Whether the text control is editable
   const bool isEditable = NULL != impl.mEventData;
-  if(isEditable && layoutSize.height != defaultFontLineHeight && impl.IsShowingPlaceholderText())
+  if(isEditable && !Dali::Equals(layoutSize.height, defaultFontLineHeight) && impl.IsShowingPlaceholderText())
   {
     // This code prevents the wrong positioning of cursor when the layout size is bigger/smaller than defaultFontLineHeight.
     // This situation occurs when the size of placeholder text is different from the default text.
