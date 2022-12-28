@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/devel-api/text/spans/span-enumerations.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/object/base-handle.h>
 
@@ -89,6 +90,13 @@ public:
    * @brief Non virtual destructor.
    */
   ~BaseSpan();
+
+  /**
+   * @brief Retrive the span type.
+   *
+   * @return A span type value.
+   */
+  const Dali::Toolkit::Text::SpanType::Value GetSpanType() const;
 
   /**
    * @brief Downcasts to a BaseSpan handle.

@@ -58,7 +58,7 @@ protected:
   /**
    * @brief Default Constructor
    */
-  BaseSpan();
+  BaseSpan(Dali::Toolkit::Text::SpanType::Value spanType);
 
   /**
    * @brief Virtual destructor.
@@ -66,6 +66,13 @@ protected:
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~BaseSpan();
+
+public:
+  /**
+   * @copydoc Dali::Toolkit::Text::SpanType::Value GetSpanType
+   */
+
+  const Dali::Toolkit::Text::SpanType::Value GetSpanType() const;
 
 public: //Methods for internal only
   /**
@@ -75,6 +82,10 @@ public: //Methods for internal only
    * @param[in] range The range.
    */
   virtual void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const = 0;
+
+private:
+  struct Impl;
+  std::unique_ptr<Impl> mImpl{nullptr};
 
 }; // class BaseSpan
 

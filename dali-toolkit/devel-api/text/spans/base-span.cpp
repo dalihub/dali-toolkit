@@ -49,6 +49,11 @@ BaseSpan BaseSpan::DownCast(BaseHandle handle)
   return BaseSpan(dynamic_cast<Dali::Toolkit::Text::Internal::BaseSpan*>(handle.GetObjectPtr()));
 }
 
+const Dali::Toolkit::Text::SpanType::Value BaseSpan::GetSpanType() const
+{
+  return GetImplementation(*this).GetSpanType();
+}
+
 } // namespace Text
 
 } // namespace Toolkit
