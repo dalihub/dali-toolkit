@@ -22,12 +22,13 @@
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/controller/text-controller-impl.h>
 #include <dali-toolkit/internal/text/controller/text-controller-placeholder-handler.h>
 #include <dali-toolkit/internal/text/controller/text-controller-text-updater.h>
+#include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 
 namespace
@@ -35,6 +36,8 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
+
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 
 const std::string KEY_C_NAME      = "c";
 const std::string KEY_V_NAME      = "v";
@@ -604,6 +607,8 @@ void Controller::EventHandler::ProcessModifyEvents(Controller& controller)
     return;
   }
 
+  DALI_TRACE_BEGIN(gTraceFilter, "DALI_TEXT_MODIFY_EVENTS");
+
   for(Vector<ModifyEvent>::ConstIterator it    = events.Begin(),
                                          endIt = events.End();
       it != endIt;
@@ -653,6 +658,7 @@ void Controller::EventHandler::ProcessModifyEvents(Controller& controller)
 
   // DISCARD temporary text
   events.Clear();
+  DALI_TRACE_END(gTraceFilter, "DALI_TEXT_MODIFY_EVENTS");
 }
 
 void Controller::EventHandler::TextReplacedEvent(Controller& controller)
@@ -827,7 +833,7 @@ InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextE
     case InputMethodContext::SELECTION_SET:
     {
       uint32_t start = static_cast<uint32_t>(inputMethodContextEvent.startIndex);
-      uint32_t end = static_cast<uint32_t>(inputMethodContextEvent.endIndex);
+      uint32_t end   = static_cast<uint32_t>(inputMethodContextEvent.endIndex);
       if(start == end)
       {
         controller.SetPrimaryCursorPosition(start, true);

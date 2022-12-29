@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/trace.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/math/math-utils.h>
 #include <memory.h>
@@ -41,6 +42,8 @@ namespace Text
 {
 namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+
 const float HALF(0.5f);
 const float ONE_AND_A_HALF(1.5f);
 
@@ -882,6 +885,7 @@ ViewModel* Typesetter::GetViewModel()
 
 PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat)
 {
+  DALI_TRACE_BEGIN(gTraceFilter, "DALI_TEXT_RENDERING_TYPESETTER");
   // @todo. This initial implementation for a TextLabel has only one visible page.
 
   // Elides the text if needed.
@@ -1070,6 +1074,8 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
 
   // Create the final PixelData for the combined image buffer
   PixelData pixelData = Devel::PixelBuffer::Convert(imageBuffer);
+
+  DALI_TRACE_END(gTraceFilter, "DALI_TEXT_RENDERING_TYPESETTER");
 
   return pixelData;
 }
