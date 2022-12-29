@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_ENVIRONMENT_MAP_LOAD_TASK_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali-scene3d/public-api/common/environment-map.h>
+#include <dali-scene3d/public-api/loader/environment-map-data.h>
 
 namespace Dali
 {
@@ -44,7 +46,7 @@ public:
    * @param[in] environmentMapUrl The url of the environment map image file.
    * @param[in] callback The callback that is called when the operation is completed.
    */
-  EnvironmentMapLoadTask(const std::string& environmentMapUrl, CallbackBase* callback);
+  EnvironmentMapLoadTask(const std::string& environmentMapUrl, Dali::Scene3D::EnvironmentMapType environmentMapType, CallbackBase* callback);
 
   /**
    * Destructor.
@@ -70,11 +72,9 @@ public:
 
   /**
    * Retrieves loaded Environment Map
-   * @return CubeData loaded from url.
-   *
-   * TODO: Supports Equirectangular environment map
+   * @return EnvironmentMapData that is loaded from url.
    */
-  Dali::Scene3D::Loader::CubeData GetEnvironmentMap() const;
+  Dali::Scene3D::Loader::EnvironmentMapData& GetEnvironmentMap();
 
 private:
   // Undefined
@@ -84,8 +84,9 @@ private:
   EnvironmentMapLoadTask& operator=(const EnvironmentMapLoadTask& task) = delete;
 
 private:
-  std::string                     mEnvironmentMapUrl;
-  Dali::Scene3D::Loader::CubeData mEnvironmentMapPixelData;
+  std::string                               mEnvironmentMapUrl;
+  Dali::Scene3D::Loader::EnvironmentMapData mEnvironmentMapData;
+  Dali::Scene3D::EnvironmentMapType         mEnvironmentMapType{Dali::Scene3D::EnvironmentMapType::AUTO};
 
   bool mIsReady;
   bool mHasSucceeded;

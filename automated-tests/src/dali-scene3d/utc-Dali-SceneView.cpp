@@ -802,7 +802,8 @@ int UtcDaliSceneViewSetSkyboxEquirectangular(void)
   application.Render();
 
   uint32_t childCount = view.GetChildAt(0u).GetChildCount();
-  view.SetSkybox(TEST_EQUIRECTANGULAR_TEXTURE, Scene3D::SceneView::SkyboxType::EQUIRECTANGULAR);
+  view.SetSkyboxEnvironmentMapType(Scene3D::EnvironmentMapType::EQUIRECTANGULAR);
+  view.SetSkybox(TEST_EQUIRECTANGULAR_TEXTURE);
 
   gResourceReadyCalled = false;
   DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
@@ -860,7 +861,7 @@ int UtcDaliSceneViewSetSkyboxEquirectangularEmpty(void)
   application.Render();
 
   uint32_t childCount = view.GetChildAt(0u).GetChildCount();
-  view.SetSkybox("", Scene3D::SceneView::SkyboxType::EQUIRECTANGULAR);
+  view.SetSkybox("");
   DALI_TEST_EQUALS(view.GetChildAt(0u).GetChildCount(), childCount, TEST_LOCATION);
 
   view.Unparent();

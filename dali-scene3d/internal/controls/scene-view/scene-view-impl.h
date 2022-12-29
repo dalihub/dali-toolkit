@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/window.h>
@@ -142,7 +141,12 @@ public:
   /**
    * @copydoc SceneView::SetSkybox()
    */
-  void SetSkybox(const std::string& skyboxUrl, Scene3D::SceneView::SkyboxType skyboxType);
+  void SetSkybox(const std::string& skyboxUrl);
+
+  /**
+   * @copydoc SceneView::SetSkyboxEnvironmentMapType()
+   */
+  void SetSkyboxEnvironmentMapType(Scene3D::EnvironmentMapType skyboxEnvironmentMapType);
 
   /**
    * @copydoc SceneView::SetSkyboxIntensity()
@@ -244,9 +248,12 @@ private:
   void RotateCamera();
 
   /**
-   * @brief Asynchronously skybox (Equirectangular) loading finished.
+   * @brief UpdateSkybox with skybox url and skybox environment map type.
+   *
+   * @param[in] skyboxUrl image url for skybox.
+   * @param[in] skyboxEnvironmentMapType The environment type of skybox.
    */
-  void OnSkyboxEquirectangularLoadComplete(uint32_t loadedTaskId, PixelData pixelData);
+  void UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentMapType skyboxEnvironmentMapType);
 
   /**
    * @brief Asynchronously skybox loading finished.
@@ -299,21 +306,19 @@ private:
   std::string                     mSkyboxUrl;
   std::string                     mDiffuseIblUrl;
   std::string                     mSpecularIblUrl;
-  Dali::Toolkit::AsyncImageLoader mSkyboxImageLoader;
-  uint32_t                        mSkyboxImageId{0u};
 
-  Scene3D::SceneView::SkyboxType mSkyboxEnvironmentMapType{Scene3D::SceneView::SkyboxType::CUBEMAP};
-  Dali::Texture                  mSkyboxTexture;
-  Dali::Texture                  mDiffuseTexture;
-  Dali::Texture                  mSpecularTexture;
-  float                          mIblScaleFactor{1.0f};
-  bool                           mUseFrameBuffer{false};
-  bool                           mSkyboxResourceReady{true};
-  bool                           mIblDiffuseResourceReady{true};
-  bool                           mIblSpecularResourceReady{true};
-  bool                           mSkyboxDirty{false};
-  bool                           mIblDiffuseDirty{false};
-  bool                           mIblSpecularDirty{false};
+  Scene3D::EnvironmentMapType mSkyboxEnvironmentMapType{Scene3D::EnvironmentMapType::AUTO};
+  Dali::Texture               mSkyboxTexture;
+  Dali::Texture               mDiffuseTexture;
+  Dali::Texture               mSpecularTexture;
+  float                       mIblScaleFactor{1.0f};
+  bool                        mUseFrameBuffer{false};
+  bool                        mSkyboxResourceReady{true};
+  bool                        mIblDiffuseResourceReady{true};
+  bool                        mIblSpecularResourceReady{true};
+  bool                        mSkyboxDirty{false};
+  bool                        mIblDiffuseDirty{false};
+  bool                        mIblSpecularDirty{false};
 
   // TODO : Light Source
 };

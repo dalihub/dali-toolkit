@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/controls/model/model-impl.h>
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
-#include <dali-scene3d/public-api/loader/cube-map-loader.h>
 
 using namespace Dali;
 
@@ -367,7 +366,7 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
         Dali::AsyncTaskManager::Get().RemoveTask(mIblDiffuseLoadTask);
         mIblDiffuseLoadTask.Reset();
       }
-      mIblDiffuseLoadTask = new EnvironmentMapLoadTask(mDiffuseIblUrl, MakeCallback(this, &SceneView::OnIblDiffuseLoadComplete));
+      mIblDiffuseLoadTask = new EnvironmentMapLoadTask(mDiffuseIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &SceneView::OnIblDiffuseLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblDiffuseLoadTask);
       mIblDiffuseDirty = false;
     }
@@ -379,7 +378,7 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
         Dali::AsyncTaskManager::Get().RemoveTask(mIblSpecularLoadTask);
         mIblSpecularLoadTask.Reset();
       }
-      mIblSpecularLoadTask = new EnvironmentMapLoadTask(mSpecularIblUrl, MakeCallback(this, &SceneView::OnIblSpecularLoadComplete));
+      mIblSpecularLoadTask = new EnvironmentMapLoadTask(mSpecularIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &SceneView::OnIblSpecularLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblSpecularLoadTask);
       mIblSpecularDirty = false;
     }
@@ -428,62 +427,19 @@ bool SceneView::IsUsingFramebuffer() const
   return mUseFrameBuffer;
 }
 
-void SceneView::SetSkybox(const std::string& skyboxUrl, Scene3D::SceneView::SkyboxType skyboxType)
+void SceneView::SetSkybox(const std::string& skyboxUrl)
 {
-  mSkyboxEnvironmentMapType = skyboxType;
-  bool isOnScene = Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE);
   if(mSkyboxUrl != skyboxUrl)
   {
-    mSkyboxDirty         = true;
-    mSkyboxResourceReady = false;
-    mSkyboxUrl           = skyboxUrl;
+    UpdateSkybox(skyboxUrl, mSkyboxEnvironmentMapType);
   }
+}
 
-  if(mSkyboxUrl.empty())
+void SceneView::SetSkyboxEnvironmentMapType(Scene3D::EnvironmentMapType skyboxEnvironmentMapType)
+{
+  if(mSkyboxEnvironmentMapType != skyboxEnvironmentMapType)
   {
-    if(mSkyboxLoadTask)
-    {
-      Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
-      mSkyboxLoadTask.Reset();
-    }
-    if(mSkyboxImageLoader)
-    {
-      mSkyboxImageLoader.Cancel(mSkyboxImageId);
-    }
-    mSkyboxDirty         = false;
-    mSkyboxResourceReady = true;
-  }
-  else
-  {
-    if(isOnScene && mSkyboxDirty)
-    {
-      if(mSkyboxLoadTask)
-      {
-        Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
-        mSkyboxLoadTask.Reset();
-      }
-      if(mSkyboxImageLoader)
-      {
-        mSkyboxImageLoader.Cancel(mSkyboxImageId);
-      }
-      if(mSkyboxEnvironmentMapType == Scene3D::SceneView::SkyboxType::CUBEMAP)
-      {
-        mSkyboxLoadTask = new EnvironmentMapLoadTask(mSkyboxUrl, MakeCallback(this, &SceneView::OnSkyboxLoadComplete));
-        Dali::AsyncTaskManager::Get().AddTask(mSkyboxLoadTask);
-      }
-      else
-      {
-        mSkyboxImageLoader = Dali::Toolkit::AsyncImageLoader::New();
-        mSkyboxImageLoader.ImageLoadedSignal().Connect(this, &SceneView::OnSkyboxEquirectangularLoadComplete);
-        mSkyboxImageId = mSkyboxImageLoader.Load(mSkyboxUrl);
-      }
-      mSkyboxDirty = false;
-    }
-  }
-
-  if(IsResourceReady())
-  {
-    Control::SetResourceReady(false);
+    UpdateSkybox(mSkyboxUrl, skyboxEnvironmentMapType);
   }
 }
 
@@ -536,7 +492,7 @@ void SceneView::OnSceneConnection(int depth)
 
   if(!mSkyboxUrl.empty())
   {
-    SetSkybox(mSkyboxUrl, mSkyboxEnvironmentMapType);
+    UpdateSkybox(mSkyboxUrl, mSkyboxEnvironmentMapType);
   }
 
   Window window = DevelWindow::Get(Self());
@@ -748,11 +704,47 @@ void SceneView::RotateCamera()
   }
 }
 
-void SceneView::OnSkyboxEquirectangularLoadComplete(uint32_t loadedTaskId, PixelData pixelData)
+void SceneView::UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentMapType skyboxEnvironmentMapType)
 {
-  mSkyboxTexture = Texture::New(TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
-  mSkyboxTexture.Upload(pixelData, 0, 0, 0, 0, pixelData.GetWidth(), pixelData.GetHeight());
-  OnSkyboxLoadComplete();
+  bool isOnScene = Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE);
+  if(mSkyboxUrl != skyboxUrl || mSkyboxEnvironmentMapType != skyboxEnvironmentMapType)
+  {
+    mSkyboxDirty         = true;
+    mSkyboxResourceReady = false;
+    mSkyboxUrl           = skyboxUrl;
+    mSkyboxEnvironmentMapType = skyboxEnvironmentMapType;
+  }
+
+  if(mSkyboxUrl.empty())
+  {
+    if(mSkyboxLoadTask)
+    {
+      Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
+      mSkyboxLoadTask.Reset();
+    }
+    mSkyboxDirty         = false;
+    mSkyboxResourceReady = true;
+  }
+  else
+  {
+    if(isOnScene && mSkyboxDirty)
+    {
+      if(mSkyboxLoadTask)
+      {
+        Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
+        mSkyboxLoadTask.Reset();
+      }
+
+      mSkyboxLoadTask = new EnvironmentMapLoadTask(mSkyboxUrl, mSkyboxEnvironmentMapType, MakeCallback(this, &SceneView::OnSkyboxLoadComplete));
+      Dali::AsyncTaskManager::Get().AddTask(mSkyboxLoadTask);
+      mSkyboxDirty = false;
+    }
+  }
+
+  if(IsResourceReady())
+  {
+    Control::SetResourceReady(false);
+  }
 }
 
 void SceneView::OnSkyboxLoadComplete()
@@ -774,13 +766,11 @@ void SceneView::OnSkyboxLoadComplete()
     Control::SetResourceReady(false);
   }
 
+  mSkyboxTexture = (mSkyboxLoadTask->HasSucceeded()) ? mSkyboxLoadTask->GetEnvironmentMap().GetTexture() : Texture();
   Shader skyboxShader;
-  if(mSkyboxEnvironmentMapType == Scene3D::SceneView::SkyboxType::CUBEMAP)
+  if(mSkyboxEnvironmentMapType == Scene3D::EnvironmentMapType::CUBEMAP)
   {
-    mSkyboxTexture = (mSkyboxLoadTask->HasSucceeded()) ? mSkyboxLoadTask->GetEnvironmentMap().CreateTexture() : Texture();
     skyboxShader   = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
-    Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
-    mSkyboxLoadTask.Reset();
   }
   else
   {
@@ -795,11 +785,13 @@ void SceneView::OnSkyboxLoadComplete()
     skyboxRenderer.SetTextures(skyboxTextures);
     skyboxRenderer.SetShader(skyboxShader);
   }
+
+  mSkyboxLoadTask.Reset();
 }
 
 void SceneView::OnIblDiffuseLoadComplete()
 {
-  mDiffuseTexture          = (mIblDiffuseLoadTask->HasSucceeded()) ? mIblDiffuseLoadTask->GetEnvironmentMap().CreateTexture() : Texture();
+  mDiffuseTexture          = (mIblDiffuseLoadTask->HasSucceeded()) ? mIblDiffuseLoadTask->GetEnvironmentMap().GetTexture() : Texture();
   mIblDiffuseResourceReady = true;
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
   {
@@ -810,7 +802,7 @@ void SceneView::OnIblDiffuseLoadComplete()
 
 void SceneView::OnIblSpecularLoadComplete()
 {
-  mSpecularTexture          = (mIblSpecularLoadTask->HasSucceeded()) ? mIblSpecularLoadTask->GetEnvironmentMap().CreateTexture() : Texture();
+  mSpecularTexture          = (mIblSpecularLoadTask->HasSucceeded()) ? mIblSpecularLoadTask->GetEnvironmentMap().GetTexture() : Texture();
   mIblSpecularResourceReady = true;
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
   {
