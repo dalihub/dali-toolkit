@@ -70,7 +70,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
     // Nothing to do if no operations are pending and required.
     return false;
   }
-  DALI_TRACE_BEGIN(gTraceFilter, "DALI_TEXT_MODEL_UPDATE");
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_MODEL_UPDATE");
 
   Vector<Character>& srcCharacters = impl.mModel->mLogicalModel->mText;
   Vector<Character>  displayCharacters;
@@ -605,8 +605,6 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
 
   // Set the previous number of characters for the next time the text is updated.
   impl.mTextUpdateInfo.mPreviousNumberOfCharacters = numberOfCharacters;
-
-  DALI_TRACE_END(gTraceFilter, "DALI_TEXT_MODEL_UPDATE");
 
   return updated;
 }

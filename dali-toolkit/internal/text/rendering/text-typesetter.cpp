@@ -885,7 +885,7 @@ ViewModel* Typesetter::GetViewModel()
 
 PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat)
 {
-  DALI_TRACE_BEGIN(gTraceFilter, "DALI_TEXT_RENDERING_TYPESETTER");
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_RENDERING_TYPESETTER");
   // @todo. This initial implementation for a TextLabel has only one visible page.
 
   // Elides the text if needed.
@@ -1074,8 +1074,6 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
 
   // Create the final PixelData for the combined image buffer
   PixelData pixelData = Devel::PixelBuffer::Convert(imageBuffer);
-
-  DALI_TRACE_END(gTraceFilter, "DALI_TEXT_RENDERING_TYPESETTER");
 
   return pixelData;
 }

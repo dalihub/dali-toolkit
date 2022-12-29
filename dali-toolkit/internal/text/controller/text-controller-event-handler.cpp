@@ -607,7 +607,7 @@ void Controller::EventHandler::ProcessModifyEvents(Controller& controller)
     return;
   }
 
-  DALI_TRACE_BEGIN(gTraceFilter, "DALI_TEXT_MODIFY_EVENTS");
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_MODIFY_EVENTS");
 
   for(Vector<ModifyEvent>::ConstIterator it    = events.Begin(),
                                          endIt = events.End();
@@ -658,7 +658,6 @@ void Controller::EventHandler::ProcessModifyEvents(Controller& controller)
 
   // DISCARD temporary text
   events.Clear();
-  DALI_TRACE_END(gTraceFilter, "DALI_TEXT_MODIFY_EVENTS");
 }
 
 void Controller::EventHandler::TextReplacedEvent(Controller& controller)

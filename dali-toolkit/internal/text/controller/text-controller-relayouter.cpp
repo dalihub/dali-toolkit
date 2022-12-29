@@ -160,7 +160,7 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
 Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::GetNaturalSize\n");
-  DALI_TRACE_BEGIN(gTraceFilter, "DALI_TEXT_GET_NATURAL_SIZE");
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_GET_NATURAL_SIZE");
   Vector3 naturalSizeVec3;
 
   // Make sure the model is up-to-date before layouting
@@ -198,8 +198,6 @@ Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
 
   naturalSizeVec3.x = ConvertToEven(naturalSizeVec3.x);
   naturalSizeVec3.y = ConvertToEven(naturalSizeVec3.y);
-
-  DALI_TRACE_END(gTraceFilter, "DALI_TEXT_GET_NATURAL_SIZE");
 
   return naturalSizeVec3;
 }
@@ -251,7 +249,7 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
   const OperationsMask operations = impl.mOperationsPending;
   if(NO_OPERATION != (UPDATE_LAYOUT_SIZE & operations) || impl.mTextFitContentSize != layoutSize)
   {
-    DALI_TRACE_BEGIN(gTraceFilter, "DALI_TEXT_FIT_LAYOUT");
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_FIT_LAYOUT");
     ModelPtr& model = impl.mModel;
 
     bool  actualellipsis      = model->mElideEnabled;
@@ -322,15 +320,13 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
     impl.mFontDefaults->mFitPointSize = bestPointSize;
     impl.mFontDefaults->sizeDefined   = true;
     impl.ClearFontData();
-
-    DALI_TRACE_END(gTraceFilter, "DALI_TEXT_FIT_LAYOUT");
   }
 }
 
 float Controller::Relayouter::GetHeightForWidth(Controller& controller, float width)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::GetHeightForWidth %p width %f\n", &controller, width);
-  DALI_TRACE_BEGIN(gTraceFilter, "DALI_TEXT_GET_HEIGHT_FOR_WIDTH");
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_GET_HEIGHT_FOR_WIDTH");
 
   // Make sure the model is up-to-date before layouting
   EventHandler::ProcessModifyEvents(controller);
@@ -360,8 +356,6 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth cached %f\n", layoutSize.height);
   }
 
-  DALI_TRACE_END(gTraceFilter, "DALI_TEXT_GET_HEIGHT_FOR_WIDTH");
-
   return layoutSize.height;
 }
 
@@ -373,7 +367,7 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
   TextUpdateInfo&   textUpdateInfo = impl.mTextUpdateInfo;
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", &controller, size.width, size.height, impl.mIsAutoScrollEnabled ? "true" : "false");
-  DALI_TRACE_BEGIN(gTraceFilter, "DALI_TEXT_RELAYOUT");
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_RELAYOUT");
 
   UpdateTextType updateTextType = NONE_UPDATED;
 
@@ -390,7 +384,6 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
 
     // Not worth to relayout if width or height is equal to zero.
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::Relayout (skipped)\n");
-    DALI_TRACE_END(gTraceFilter, "DALI_TEXT_RELAYOUT");
 
     return updateTextType;
   }
@@ -545,7 +538,6 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
   // Clear the update info. This info will be set the next time the text is updated.
   textUpdateInfo.Clear();
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::Relayout\n");
-  DALI_TRACE_END(gTraceFilter, "DALI_TEXT_RELAYOUT");
 
   return updateTextType;
 }
@@ -553,7 +545,7 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
 bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size, OperationsMask operationsRequired, Size& layoutSize)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::Relayouter::DoRelayout %p size %f,%f\n", &impl, size.width, size.height);
-  DALI_TRACE_BEGIN(gTraceFilter, "DALI_TEXT_DORELAYOUT");
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_DORELAYOUT");
   bool viewUpdated(false);
 
   // Calculate the operations to be done.
@@ -596,8 +588,6 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
       DALI_LOG_ERROR("Current text is: %s\n", currentText.c_str());
       DALI_LOG_ERROR("startIndex: %u, lastIndex: %u, requestedNumberOfCharacters: %u, charactersToGlyph.Count = %lu, glyphsPerCharacter.Count = %lu\n", startIndex, lastIndex, requestedNumberOfCharacters, charactersToGlyph.Count(), glyphsPerCharacter.Count());
 
-      DALI_TRACE_END(gTraceFilter, "DALI_TEXT_DORELAYOUT");
-
       return false;
     }
 
@@ -613,7 +603,6 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
 
       // Nothing else to do if there is no glyphs.
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::DoRelayout no glyphs, view updated true\n");
-      DALI_TRACE_END(gTraceFilter, "DALI_TEXT_DORELAYOUT");
       return true;
     }
 
@@ -712,7 +701,6 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
   DALI_LOG_INFO(gLogFilter, Debug::Concise, "Controller::Relayouter::DoRelayout [%p] mImpl->mIsTextDirectionRTL[%s] [%s]\n", &impl, (impl.mIsTextDirectionRTL) ? "true" : "false", currentText.c_str());
 #endif
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::Relayouter::DoRelayout, view updated %s\n", (viewUpdated ? "true" : "false"));
-  DALI_TRACE_END(gTraceFilter, "DALI_TEXT_DORELAYOUT");
   return viewUpdated;
 }
 

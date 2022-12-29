@@ -663,7 +663,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
   Shader shader = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder().EnableMultiColor(hasMultipleTextColors).EnableEmoji(containsColorGlyph).EnableStyle(styleEnabled).EnableOverlay(isOverlayStyle));
   mImpl->mRenderer.SetShader(shader);
 
-  DALI_TRACE_BEGIN(gTraceFilter, "DALI_TEXT_VISUAL_UPDATE_RENDERER");
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_VISUAL_UPDATE_RENDERER");
 
   // Get the maximum size.
   const int maxTextureSize = Dali::GetMaxTextureSize();
@@ -794,8 +794,6 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
       }
     }
   }
-
-  DALI_TRACE_END(gTraceFilter, "DALI_TEXT_VISUAL_UPDATE_RENDERER");
 }
 
 TextureSet TextVisual::GetTextTexture(const Vector2& size)
