@@ -517,17 +517,20 @@ void Controller::SetDefaultFontFamily(const std::string& defaultFontFamily)
 {
   EnsureCreated(mImpl->mFontDefaults);
 
-  mImpl->mFontDefaults->mFontDescription.family = defaultFontFamily;
-  DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetDefaultFontFamily %s\n", defaultFontFamily.c_str());
-  mImpl->mFontDefaults->familyDefined = !defaultFontFamily.empty();
+  if(mImpl->mFontDefaults->mFontDescription.family != defaultFontFamily)
+  {
+    mImpl->mFontDefaults->mFontDescription.family = defaultFontFamily;
+    DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetDefaultFontFamily %s\n", defaultFontFamily.c_str());
+    mImpl->mFontDefaults->familyDefined = !defaultFontFamily.empty();
 
-  // Update the cursor position if it's in editing mode
-  UpdateCursorPosition(mImpl->mEventData);
+    // Update the cursor position if it's in editing mode
+    UpdateCursorPosition(mImpl->mEventData);
 
-  // Clear the font-specific data
-  mImpl->ClearFontData();
+    // Clear the font-specific data
+    mImpl->ClearFontData();
 
-  mImpl->RequestRelayout();
+    mImpl->RequestRelayout();
+  }
 }
 
 const std::string& Controller::GetDefaultFontFamily() const
