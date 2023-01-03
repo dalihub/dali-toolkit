@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/public-api/math/math-utils.h>
 #include <limits>
 
@@ -33,6 +34,8 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
+
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 
 constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
@@ -157,6 +160,7 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
 Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::GetNaturalSize\n");
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_GET_NATURAL_SIZE");
   Vector3 naturalSizeVec3;
 
   // Make sure the model is up-to-date before layouting
@@ -245,6 +249,7 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
   const OperationsMask operations = impl.mOperationsPending;
   if(NO_OPERATION != (UPDATE_LAYOUT_SIZE & operations) || impl.mTextFitContentSize != layoutSize)
   {
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_FIT_LAYOUT");
     ModelPtr& model = impl.mModel;
 
     bool  actualellipsis      = model->mElideEnabled;
@@ -321,6 +326,7 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
 float Controller::Relayouter::GetHeightForWidth(Controller& controller, float width)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::GetHeightForWidth %p width %f\n", &controller, width);
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_GET_HEIGHT_FOR_WIDTH");
 
   // Make sure the model is up-to-date before layouting
   EventHandler::ProcessModifyEvents(controller);
@@ -361,6 +367,7 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
   TextUpdateInfo&   textUpdateInfo = impl.mTextUpdateInfo;
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", &controller, size.width, size.height, impl.mIsAutoScrollEnabled ? "true" : "false");
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_RELAYOUT");
 
   UpdateTextType updateTextType = NONE_UPDATED;
 
@@ -538,6 +545,7 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
 bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size, OperationsMask operationsRequired, Size& layoutSize)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::Relayouter::DoRelayout %p size %f,%f\n", &impl, size.width, size.height);
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_DORELAYOUT");
   bool viewUpdated(false);
 
   // Calculate the operations to be done.

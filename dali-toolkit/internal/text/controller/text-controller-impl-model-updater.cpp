@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/public-api/math/math-utils.h>
 
 // INTERNAL INCLUDES
@@ -39,6 +40,8 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
+
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 
 // The relative luminance of a color is defined as (L = 0.2126 * R + 0.7152 * G + 0.0722 * B)
 // based on W3C Recommendations (https://www.w3.org/TR/WCAG20/)
@@ -67,6 +70,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
     // Nothing to do if no operations are pending and required.
     return false;
   }
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_MODEL_UPDATE");
 
   Vector<Character>& srcCharacters = impl.mModel->mLogicalModel->mText;
   Vector<Character>  displayCharacters;

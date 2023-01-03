@@ -25,6 +25,7 @@
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <string.h>
 
 // INTERNAL HEADER
@@ -51,6 +52,8 @@ namespace Internal
 {
 namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+
 const int CUSTOM_PROPERTY_COUNT(5); // anim,premul,size,offset,multicol
 
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
@@ -659,6 +662,8 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
 {
   Shader shader = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder().EnableMultiColor(hasMultipleTextColors).EnableEmoji(containsColorGlyph).EnableStyle(styleEnabled).EnableOverlay(isOverlayStyle));
   mImpl->mRenderer.SetShader(shader);
+
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_VISUAL_UPDATE_RENDERER");
 
   // Get the maximum size.
   const int maxTextureSize = Dali::GetMaxTextureSize();

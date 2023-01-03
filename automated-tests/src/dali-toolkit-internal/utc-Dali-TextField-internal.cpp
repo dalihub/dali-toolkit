@@ -22,8 +22,8 @@
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
-#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/controller/text-controller-impl.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 
 using namespace Dali;
@@ -114,10 +114,10 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
   END_TEST;
 }
 
-int UtcDaliTextFieldSelectText(void)
+int UtcDaliInternalTextFieldSelectText(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextFieldSelectText");
+  tet_infoline("UtcDaliInternalTextFieldSelectText");
 
   // Create a text field
   TextField textField = TextField::New();
