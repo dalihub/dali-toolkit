@@ -422,7 +422,11 @@ const NodeDefinition* SceneDefinition::GetNode(Index iNode) const
 
 NodeDefinition* SceneDefinition::GetNode(Index iNode)
 {
-  return mNodes[iNode].get();
+  if(iNode != Scene3D::Loader::INVALID_INDEX && iNode < mNodes.size())
+  {
+    return mNodes[iNode].get();
+  }
+  return nullptr;
 }
 
 void SceneDefinition::Visit(Index iNode, const Customization::Choices& choices, NodeDefinition::IVisitor& v)
