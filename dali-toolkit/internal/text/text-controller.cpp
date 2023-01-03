@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/adaptor-framework/tts-player.h>
 #include <memory.h>
 #include <cmath>
 #include <limits>
@@ -2277,6 +2278,13 @@ void Controller::InsertText(const std::string& text, Controller::InsertType type
   }
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::InsertText %p %s (%s) mPrimaryCursorPosition %d mPreEditFlag %d mPreEditStartPosition %d mPreEditLength %d\n", this, text.c_str(), (COMMIT == type ? "COMMIT" : "PRE_EDIT"), mImpl->mEventData->mPrimaryCursorPosition, mImpl->mEventData->mPreEditFlag, mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength);
+
+  // Play the input text with the TTS player.
+  Dali::TtsPlayer player = Dali::TtsPlayer::Get(Dali::TtsPlayer::SCREEN_READER);
+  if (player)
+  {
+    player.Play(text);
+  }
 
   // TODO: At the moment the underline runs are only for pre-edit.
   mImpl->mModel->mVisualModel->mUnderlineRuns.Clear();
