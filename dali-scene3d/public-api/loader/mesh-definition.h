@@ -53,6 +53,7 @@ struct DALI_SCENE3D_API MeshDefinition
     FLIP_UVS_VERTICAL = NthBit(0),
     U32_INDICES       = NthBit(1), // default is unsigned short
     U16_JOINT_IDS     = NthBit(2), // default is floats
+    U8_JOINT_IDS      = NthBit(3),
   };
 
   enum Attributes

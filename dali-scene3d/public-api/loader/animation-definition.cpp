@@ -60,6 +60,7 @@ Animation AnimationDefinition::ReAnimate(AnimatedProperty::GetActor getActor)
 {
   // Create and configure new animation.
   Animation a = Animation::New(mDuration);
+
   a.SetLoopCount(mLoopCount);
   a.SetDisconnectAction(mDisconnectAction);
   a.SetEndAction(mEndAction);

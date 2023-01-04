@@ -652,7 +652,8 @@ void ConvertMeshes(const gt::Document& doc, ConversionContext& cctx)
           if(iFind->first == gt::Attribute::JOINTS_0)
           {
             meshDef.mFlags |= (iFind->second->mComponentType == gt::Component::UNSIGNED_SHORT) * MeshDefinition::U16_JOINT_IDS;
-            DALI_ASSERT_DEBUG(MaskMatch(meshDef.mFlags, MeshDefinition::U16_JOINT_IDS) || iFind->second->mComponentType == gt::Component::FLOAT);
+            meshDef.mFlags |= (iFind->second->mComponentType == gt::Component::UNSIGNED_BYTE) * MeshDefinition::U8_JOINT_IDS;
+            DALI_ASSERT_DEBUG(MaskMatch(meshDef.mFlags, MeshDefinition::U16_JOINT_IDS) || MaskMatch(meshDef.mFlags, MeshDefinition::U8_JOINT_IDS) || iFind->second->mComponentType == gt::Component::FLOAT);
           }
         }
         else if(needNormalsTangents)
@@ -948,7 +949,7 @@ float LoadKeyFrames(const std::string& path, const gt::Animation::Channel& chann
   Vector<float> inputDataBuffer;
   Vector<T>     outputDataBuffer;
 
-  const float duration = LoadDataFromAccessors<T>(path, input, output, inputDataBuffer, outputDataBuffer);
+  const float duration = std::max(LoadDataFromAccessors<T>(path, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
 
   for(uint32_t i = 0; i < input.mCount; ++i)
   {
