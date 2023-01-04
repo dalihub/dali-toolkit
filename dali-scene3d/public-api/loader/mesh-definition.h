@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_MESH_DEFINITION_H
 #define DALI_SCENE3D_LOADER_MESH_DEFINITION_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ struct DALI_SCENE3D_API MeshDefinition
     FLIP_UVS_VERTICAL = NthBit(0),
     U32_INDICES       = NthBit(1), // default is unsigned short
     U16_JOINT_IDS     = NthBit(2), // default is floats
+    U8_JOINT_IDS      = NthBit(3),
   };
 
   enum Attributes

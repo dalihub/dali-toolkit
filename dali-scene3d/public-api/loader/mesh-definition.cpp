@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,6 @@ namespace Loader
 {
 namespace
 {
-using Uint16Vector4 = uint16_t[4];
-
 class IndexProvider
 {
 public:
@@ -173,6 +171,40 @@ bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source
   }
 
   return success;
+}
+
+template<typename T>
+void ReadJointAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Accessor& accessor, std::ifstream& binFile, const std::string& meshPath)
+{
+  constexpr auto sizeofBlobUnit = sizeof(T) * 4;
+
+  DALI_ASSERT_ALWAYS(((accessor.mBlob.mLength % sizeofBlobUnit == 0) ||
+                      accessor.mBlob.mStride >= sizeofBlobUnit) &&
+                     "Joints buffer length not a multiple of element size");
+  const auto inBufferSize  = accessor.mBlob.GetBufferSize();
+  const auto outBufferSize = (sizeof(Vector4) / sizeofBlobUnit) * inBufferSize;
+
+  std::vector<uint8_t> buffer(outBufferSize);
+  auto                 inBuffer = buffer.data() + outBufferSize - inBufferSize;
+  if(!ReadAccessor(accessor, binFile, inBuffer))
+  {
+    ExceptionFlinger(ASSERT_LOCATION) << "Failed to read joints from '" << meshPath << "'.";
+  }
+
+  if constexpr(sizeofBlobUnit != sizeof(Vector4))
+  {
+    auto       floats = reinterpret_cast<float*>(buffer.data());
+    const auto end    = inBuffer + inBufferSize;
+    while(inBuffer != end)
+    {
+      const auto value = *reinterpret_cast<T*>(inBuffer);
+      *floats          = static_cast<float>(value);
+
+      inBuffer += sizeof(T);
+      ++floats;
+    }
+  }
+  raw.mAttribs.push_back({"aJoints", Property::VECTOR4, static_cast<uint32_t>(outBufferSize / sizeof(Vector4)), std::move(buffer)});
 }
 
 void GenerateNormals(MeshDefinition::RawData& raw)
@@ -773,42 +805,15 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
   {
     if(MaskMatch(mFlags, U16_JOINT_IDS))
     {
-      DALI_ASSERT_ALWAYS(((mJoints0.mBlob.mLength % sizeof(Uint16Vector4) == 0) ||
-                          mJoints0.mBlob.mStride >= sizeof(Uint16Vector4)) &&
-                         "Joints buffer length not a multiple of element size");
-      const auto           inBufferSize = mJoints0.mBlob.GetBufferSize();
-      std::vector<uint8_t> buffer(inBufferSize * 2);
-      auto                 u16s = buffer.data() + inBufferSize;
-      if(!ReadAccessor(mJoints0, binFile, u16s))
-      {
-        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read joints from '" << meshPath << "'.";
-      }
-
-      auto floats = reinterpret_cast<float*>(buffer.data());
-      auto end    = u16s + inBufferSize;
-      while(u16s != end)
-      {
-        auto value = *reinterpret_cast<uint16_t*>(u16s);
-        *floats    = static_cast<float>(value);
-
-        u16s += sizeof(uint16_t);
-        ++floats;
-      }
-      raw.mAttribs.push_back({"aJoints", Property::VECTOR4, static_cast<uint32_t>(buffer.size() / sizeof(Vector4)), std::move(buffer)});
+      ReadJointAccessor<uint16_t>(raw, mJoints0, binFile, meshPath);
+    }
+    else if(MaskMatch(mFlags, U8_JOINT_IDS))
+    {
+      ReadJointAccessor<uint8_t>(raw, mJoints0, binFile, meshPath);
     }
     else
     {
-      DALI_ASSERT_ALWAYS(((mJoints0.mBlob.mLength % sizeof(Vector4) == 0) ||
-                          mJoints0.mBlob.mStride >= sizeof(Vector4)) &&
-                         "Joints buffer length not a multiple of element size");
-      const auto           bufferSize = mJoints0.mBlob.GetBufferSize();
-      std::vector<uint8_t> buffer(bufferSize);
-      if(!ReadAccessor(mJoints0, binFile, buffer.data()))
-      {
-        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read joints from '" << meshPath << "'.";
-      }
-
-      raw.mAttribs.push_back({"aJoints", Property::VECTOR4, static_cast<uint32_t>(bufferSize / sizeof(Vector4)), std::move(buffer)});
+      ReadJointAccessor<float>(raw, mJoints0, binFile, meshPath);
     }
 
     DALI_ASSERT_ALWAYS(((mWeights0.mBlob.mLength % sizeof(Vector4) == 0) ||
