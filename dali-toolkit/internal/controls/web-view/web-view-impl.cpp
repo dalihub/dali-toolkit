@@ -39,7 +39,6 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <cstring>
-#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -49,6 +48,9 @@
 #include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+
+#include <functional>
+#include <memory>
 
 namespace Dali
 {
@@ -89,12 +91,6 @@ DALI_TYPE_REGISTRATION_END()
 
 } // namespace
 
-#define GET_ENUM_STRING(structName, inputExp) \
-  Scripting::GetLinearEnumerationName<Toolkit::WebView::structName::Type>(static_cast<Toolkit::WebView::structName::Type>(inputExp), structName##_TABLE, structName##_TABLE_COUNT)
-
-#define GET_ENUM_VALUE(structName, inputExp, outputExp) \
-  Scripting::GetEnumerationProperty<Toolkit::WebView::structName::Type>(inputExp, structName##_TABLE, structName##_TABLE_COUNT, outputExp)
-
 std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>> WebView::mPluginWebViewMap;
 
 WebView::WebView(const std::string& locale, const std::string& timezoneId)
@@ -106,7 +102,8 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mVideoHoleEnabled(false),
   mMouseEventsEnabled(true),
   mKeyEventsEnabled(true),
-  mScreenshotCapturedCallback(nullptr)
+  mScreenshotCapturedCallback{nullptr},
+  mFrameRenderedCallback{nullptr}
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -126,7 +123,8 @@ WebView::WebView(uint32_t argc, char** argv)
   mVideoHoleEnabled(false),
   mMouseEventsEnabled(true),
   mKeyEventsEnabled(true),
-  mScreenshotCapturedCallback(nullptr)
+  mScreenshotCapturedCallback{nullptr},
+  mFrameRenderedCallback{nullptr}
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -146,7 +144,6 @@ WebView::~WebView()
 {
   if(mWebEngine)
   {
-    mWebEngine.FrameRenderedSignal().Disconnect(this, &WebView::OnFrameRendered);
     auto iter = mPluginWebViewMap.find(mWebEngine.GetPlugin());
     if (iter != mPluginWebViewMap.end())
     {
@@ -226,23 +223,18 @@ void WebView::OnInitialize()
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
   mSizeUpdateNotification     = self.AddPropertyNotification(Actor::Property::SIZE, StepCondition(1.0f, 1.0f));
   mScaleUpdateNotification    = self.AddPropertyNotification(Actor::Property::WORLD_SCALE, StepCondition(0.1f, 1.0f));
-  mPositionUpdateNotification.NotifySignal().Connect(this, &WebView::UpdateDisplayArea);
-  mSizeUpdateNotification.NotifySignal().Connect(this, &WebView::UpdateDisplayArea);
-  mScaleUpdateNotification.NotifySignal().Connect(this, &WebView::UpdateDisplayArea);
+  mPositionUpdateNotification.NotifySignal().Connect(this, &WebView::OnDisplayAreaUpdated);
+  mSizeUpdateNotification.NotifySignal().Connect(this, &WebView::OnDisplayAreaUpdated);
+  mScaleUpdateNotification.NotifySignal().Connect(this, &WebView::OnDisplayAreaUpdated);
 
   if(mWebEngine)
   {
-    mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnFrameRendered);
+    mWebEngine.RegisterFrameRenderedCallback(std::bind(&WebView::OnFrameRendered, this));
     mWebSettings        = std::unique_ptr<Dali::Toolkit::WebSettings>(new WebSettings(mWebEngine.GetSettings()));
     mWebBackForwardList = std::unique_ptr<Dali::Toolkit::WebBackForwardList>(new WebBackForwardList(mWebEngine.GetBackForwardList()));
   }
 
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
-}
-
-Dali::WebEnginePlugin* WebView::GetPlugin() const
-{
-  return mWebEngine ? mWebEngine.GetPlugin() : nullptr;
 }
 
 DevelControl::ControlAccessible* WebView::CreateAccessibleObject()
@@ -260,6 +252,11 @@ Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
   return mWebBackForwardList.get();
 }
 
+Dali::WebEnginePlugin* WebView::GetPlugin() const
+{
+  return mWebEngine ? mWebEngine.GetPlugin() : nullptr;
+}
+
 Dali::Toolkit::ImageView WebView::GetFavicon() const
 {
   Dali::Toolkit::ImageView faviconView;
@@ -275,11 +272,6 @@ void WebView::LoadUrl(const std::string& url)
 {
   if(mWebEngine)
   {
-    if(!mVisual)
-    {
-      mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnInitialFrameRendered);
-    }
-
     mWebEngine.LoadUrl(url);
   }
 }
@@ -288,11 +280,6 @@ void WebView::LoadHtmlString(const std::string& htmlString)
 {
   if(mWebEngine)
   {
-    if(!mVisual)
-    {
-      mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnInitialFrameRendered);
-    }
-
     mWebEngine.LoadHtmlString(htmlString);
   }
 }
@@ -302,11 +289,6 @@ bool WebView::LoadHtmlStringOverrideCurrentEntry(const std::string& html, const 
   if(!mWebEngine)
     return false;
 
-  if(!mVisual)
-  {
-    mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnInitialFrameRendered);
-  }
-
   return mWebEngine.LoadHtmlStringOverrideCurrentEntry(html, basicUri, unreachableUrl);
 }
 
@@ -314,11 +296,6 @@ bool WebView::LoadContents(const std::string& contents, uint32_t contentSize, co
 {
   if(!mWebEngine)
     return false;
-
-  if(!mVisual)
-  {
-    mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnInitialFrameRendered);
-  }
 
   return mWebEngine.LoadContents(contents, contentSize, mimeType, encoding, baseUri);
 }
@@ -608,37 +585,6 @@ void WebView::SetTtsFocus(bool focused)
   }
 }
 
-void WebView::UpdateDisplayArea(Dali::PropertyNotification& /*source*/)
-{
-  if(!mWebEngine)
-    return;
-
-  Actor self(Self());
-
-  bool    positionUsesAnchorPoint = self.GetProperty<bool>(Actor::Property::POSITION_USES_ANCHOR_POINT);
-  Vector3 actorSize               = self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::SCALE);
-  Vector3 anchorPointOffSet       = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
-  Vector2 screenPosition          = self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION);
-
-  Dali::Rect<int32_t> displayArea;
-  displayArea.x      = screenPosition.x - anchorPointOffSet.x;
-  displayArea.y      = screenPosition.y - anchorPointOffSet.y;
-  displayArea.width  = actorSize.x;
-  displayArea.height = actorSize.y;
-
-  Size displaySize = Size(displayArea.width, displayArea.height);
-  if(mWebViewSize != displaySize)
-  {
-    mWebViewSize = displaySize;
-  }
-
-  if(mWebViewArea != displayArea)
-  {
-    mWebViewArea = displayArea;
-    mWebEngine.UpdateDisplayArea(mWebViewArea);
-  }
-}
-
 void WebView::EnableVideoHole(bool enabled)
 {
   mVideoHoleEnabled = enabled;
@@ -759,6 +705,14 @@ void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::Web
   }
 }
 
+void WebView::RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterNewWindowCreatedCallback(callback);
+  }
+}
+
 void WebView::RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
 {
   if(mWebEngine)
@@ -813,19 +767,48 @@ void WebView::OnFrameRendered()
   {
     mFrameRenderedCallback();
   }
-}
 
-void WebView::OnInitialFrameRendered()
-{
-  mWebEngine.FrameRenderedSignal().Disconnect(this, &WebView::OnInitialFrameRendered);
+  // Make sure that mVisual is created only once.
+  if (mVisual)
+    return;
 
   Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(mWebEngine.GetNativeImageSource());
   mVisual                                = Toolkit::VisualFactory::Get().CreateVisual({{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE}, {Toolkit::ImageVisual::Property::URL, nativeImageUrl.GetUrl()}});
-
   if(mVisual)
   {
     DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
     EnableBlendMode(!mVideoHoleEnabled);
+  }
+}
+
+void WebView::OnDisplayAreaUpdated(Dali::PropertyNotification& /*source*/)
+{
+  if(!mWebEngine)
+    return;
+
+  Actor self(Self());
+
+  bool    positionUsesAnchorPoint = self.GetProperty<bool>(Actor::Property::POSITION_USES_ANCHOR_POINT);
+  Vector3 actorSize               = self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::SCALE);
+  Vector3 anchorPointOffSet       = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
+  Vector2 screenPosition          = self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION);
+
+  Dali::Rect<int32_t> displayArea;
+  displayArea.x      = screenPosition.x - anchorPointOffSet.x;
+  displayArea.y      = screenPosition.y - anchorPointOffSet.y;
+  displayArea.width  = actorSize.x;
+  displayArea.height = actorSize.y;
+
+  Size displaySize = Size(displayArea.width, displayArea.height);
+  if(mWebViewSize != displaySize)
+  {
+    mWebViewSize = displaySize;
+  }
+
+  if(mWebViewArea != displayArea)
+  {
+    mWebViewArea = displayArea;
+    mWebEngine.UpdateDisplayArea(mWebViewArea);
   }
 }
 
@@ -1338,9 +1321,6 @@ void WebView::WebViewAccessible::SetRemoteChildAddress(Dali::Accessibility::Addr
   mRemoteChild.SetAddress(address);
   OnChildrenChanged();
 }
-
-#undef GET_ENUM_STRING
-#undef GET_ENUM_VALUE
 
 } // namespace Internal
 
