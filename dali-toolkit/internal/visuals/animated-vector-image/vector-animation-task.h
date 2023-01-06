@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VECTOR_ANIMATION_TASK_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/threading/conditional-wait.h>
+#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-array.h>
 #include <chrono>
@@ -44,7 +45,7 @@ typedef IntrusivePtr<VectorAnimationTask> VectorAnimationTaskPtr;
 /**
  * The task of the vector animation.
  */
-class VectorAnimationTask : public RefObject, public ConnectionTracker
+class VectorAnimationTask : public AsyncTask, public ConnectionTracker
 {
 public:
   enum class ResourceStatus
@@ -134,6 +135,17 @@ public:
   ~VectorAnimationTask() override;
 
   /**
+   * Process the task accodring to the type
+   */
+  void Process() override;
+
+  /**
+   * Whether the task is ready to process.
+   * @return True if the task is ready to process.
+   */
+  bool IsReady() override;
+
+  /**
    * @brief Finalizes the task.
    */
   void Finalize();
@@ -210,10 +222,9 @@ public:
 
   /**
    * @brief Rasterizes the current frame.
-   * @param[out] keepAnimation true if the animation is running, false otherwise.
    * @return true if the rasterization succeeded, false otherwise.
    */
-  bool Rasterize(bool& keepAnimation);
+  bool Rasterize();
 
   /**
    * @brief Calculates the time for the next frame rasterization.
@@ -226,6 +237,24 @@ public:
    * @return The time for the next frame rasterization.
    */
   TimePoint GetNextFrameTime();
+
+  /**
+   * @brief Called when the rasterization is completed from the asyncTaskManager
+   * @param[in] task The completed task
+   */
+  void TaskCompleted(VectorAnimationTaskPtr task);
+
+  /**
+   * @brief Check the rasterization succeeded
+   * @return true if the rasterization succeeded, false otherwise.
+   */
+  bool IsRasterized();
+
+  /**
+   * @brief Check the animation is running
+   * @return true if the animation is running, false otherwise.
+   */
+  bool IsAnimating();
 
 private:
   /**
@@ -357,6 +386,8 @@ private:
   bool                                 mDestroyTask;
   bool                                 mLoadRequest;
   bool                                 mLoadFailed;
+  bool                                 mRasterized;
+  bool                                 mKeepAnimation;
 };
 
 } // namespace Internal

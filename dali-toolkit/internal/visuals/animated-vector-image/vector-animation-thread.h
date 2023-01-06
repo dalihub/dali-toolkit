@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VECTOR_ANIMATION_THREAD_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,12 @@
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
-#include <dali/public-api/signals/connection-tracker.h>
 #include <dali/public-api/adaptor-framework/round-robin-container-view.h>
+#include <dali/public-api/signals/connection-tracker.h>
 #include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-task.h>
-#include <dali-toolkit/internal/visuals/animated-vector-image/vector-rasterize-thread.h>
 
 namespace Dali
 {
@@ -83,45 +82,6 @@ private:
    */
   void Rasterize();
 
-private:
-  /**
-   * @brief Helper class to keep the relation between VectorRasterizeThread and corresponding container
-   */
-  class RasterizeHelper : public ConnectionTracker
-  {
-  public:
-    /**
-     * @brief Create an RasterizeHelper.
-     *
-     * @param[in] animationThread Reference to the VectorAnimationThread
-     */
-    RasterizeHelper(VectorAnimationThread& animationThread);
-
-    /**
-     * @brief Rasterizes the task.
-     *
-     * @param[in] task The task to rasterize.
-     */
-    void Rasterize(VectorAnimationTaskPtr task);
-
-  public:
-    RasterizeHelper(const RasterizeHelper&) = delete;
-    RasterizeHelper& operator=(const RasterizeHelper&) = delete;
-
-    RasterizeHelper(RasterizeHelper&& rhs);
-    RasterizeHelper& operator=(RasterizeHelper&& rhs) = delete;
-
-  private:
-    /**
-     * @brief Main constructor that used by all other constructors
-     */
-    RasterizeHelper(std::unique_ptr<VectorRasterizeThread> rasterizer, VectorAnimationThread& animationThread);
-
-  private:
-    std::unique_ptr<VectorRasterizeThread> mRasterizer;
-    VectorAnimationThread&                 mAnimationThread;
-  };
-
   /**
    * @brief The thread to sleep until the next frame time.
    */
@@ -170,15 +130,15 @@ private:
   VectorAnimationThread& operator=(const VectorAnimationThread& thread) = delete;
 
 private:
-  std::vector<VectorAnimationTaskPtr>      mAnimationTasks;
-  std::vector<VectorAnimationTaskPtr>      mCompletedTasks;
-  std::vector<VectorAnimationTaskPtr>      mWorkingTasks;
-  RoundRobinContainerView<RasterizeHelper> mRasterizers;
-  SleepThread                              mSleepThread;
-  ConditionalWait                          mConditionalWait;
-  bool                                     mNeedToSleep;
-  bool                                     mDestroyThread;
-  const Dali::LogFactoryInterface&         mLogFactory;
+  std::vector<VectorAnimationTaskPtr> mAnimationTasks;
+  std::vector<VectorAnimationTaskPtr> mCompletedTasks;
+  std::vector<VectorAnimationTaskPtr> mWorkingTasks;
+  SleepThread                         mSleepThread;
+  ConditionalWait                     mConditionalWait;
+  bool                                mNeedToSleep;
+  bool                                mDestroyThread;
+  const Dali::LogFactoryInterface&    mLogFactory;
+  Dali::AsyncTaskManager              mAsyncTaskManager;
 };
 
 } // namespace Internal
