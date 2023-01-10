@@ -509,8 +509,22 @@ void Model::LoadModel()
 
   if(!animations.empty())
   {
-    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property) {
-      return mModelRoot.FindChildById(scene.GetNode(property.mNodeIndex)->mNodeId);
+    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property)
+    {
+      Dali::Actor actor;
+      if(property.mNodeIndex != Scene3D::Loader::INVALID_INDEX)
+      {
+        auto* node = scene.GetNode(property.mNodeIndex);
+        if(node != nullptr)
+        {
+          actor = mModelRoot.FindChildById(node->mNodeId);
+        }
+      }
+      else
+      {
+        actor = mModelRoot.FindChildByName(property.mNodeName);
+      }
+      return actor;
     };
 
     mAnimations.clear();

@@ -51,6 +51,7 @@ const char* TEST_GLTF_FILE_NAME                    = TEST_RESOURCE_DIR "/Animate
 const char* TEST_GLTF_ANIMATION_TEST_FILE_NAME     = TEST_RESOURCE_DIR "/animationTest.gltf";
 const char* TEST_GLTF_MULTIPLE_PRIMITIVE_FILE_NAME = TEST_RESOURCE_DIR "/simpleMultiplePrimitiveTest.gltf";
 const char* TEST_DLI_FILE_NAME                     = TEST_RESOURCE_DIR "/arc.dli";
+const char* TEST_DLI_EXERCISE_FILE_NAME            = TEST_RESOURCE_DIR "/exercise.dli";
 /**
  * For the diffuse and specular cube map texture.
  * These textures are based off version of Wave engine sample
@@ -825,6 +826,31 @@ int UtcDaliModelAnimation02(void)
   DALI_TEST_EQUALS(1.66667f, animation2.GetDuration(), 0.001f, TEST_LOCATION);
 
   DALI_TEST_NOT_EQUALS(animation1, animation2, 0.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliModelAnimation03(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_DLI_EXERCISE_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+
+  application.GetScene().Add(model);
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t animationCount = model.GetAnimationCount();
+  DALI_TEST_EQUALS(18, animationCount, TEST_LOCATION);
+
+  Animation animationByIndex = model.GetAnimation(0u);
+  DALI_TEST_CHECK(animationByIndex);
+
+  Animation animationByName = model.GetAnimation("idleClip");
+  DALI_TEST_CHECK(animationByName);
+  DALI_TEST_EQUALS(animationByIndex, animationByName, TEST_LOCATION);
 
   END_TEST;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,19 +33,6 @@ namespace Internal
 {
 namespace
 {
-constexpr auto DEFAULT_NUMBER_OF_RASTERIZE_THREADS = size_t{4u};
-constexpr auto NUMBER_OF_RASTERIZE_THREADS_ENV     = "DALI_VECTOR_RASTERIZE_THREADS";
-
-size_t GetNumberOfThreads(const char* environmentVariable, size_t defaultValue)
-{
-  using Dali::EnvironmentVariable::GetEnvironmentVariable;
-  auto           numberString          = GetEnvironmentVariable(environmentVariable);
-  auto           numberOfThreads       = numberString ? std::strtoul(numberString, nullptr, 10) : 0;
-  constexpr auto MAX_NUMBER_OF_THREADS = 100u;
-  DALI_ASSERT_DEBUG(numberOfThreads < MAX_NUMBER_OF_THREADS);
-  return (numberOfThreads > 0 && numberOfThreads < MAX_NUMBER_OF_THREADS) ? numberOfThreads : defaultValue;
-}
-
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VECTOR_ANIMATION");
 #endif
@@ -56,13 +43,13 @@ VectorAnimationThread::VectorAnimationThread()
 : mAnimationTasks(),
   mCompletedTasks(),
   mWorkingTasks(),
-  mRasterizers(GetNumberOfThreads(NUMBER_OF_RASTERIZE_THREADS_ENV, DEFAULT_NUMBER_OF_RASTERIZE_THREADS), [&]() { return RasterizeHelper(*this); }),
   mSleepThread(MakeCallback(this, &VectorAnimationThread::OnAwakeFromSleep)),
   mConditionalWait(),
   mNeedToSleep(false),
   mDestroyThread(false),
   mLogFactory(Dali::Adaptor::Get().GetLogFactory())
 {
+  mAsyncTaskManager = Dali::AsyncTaskManager::Get();
   mSleepThread.Start();
 }
 
@@ -226,7 +213,6 @@ void VectorAnimationThread::Rasterize()
 
 //    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::Rasterize: [next time = %lld]\n", duration.count());
 #endif
-
     if(nextFrameTime <= currentTime)
     {
       // If the task is not in the working list
@@ -236,11 +222,7 @@ void VectorAnimationThread::Rasterize()
 
         // Add it to the working list
         mWorkingTasks.push_back(nextTask);
-
-        auto rasterizerHelperIt = mRasterizers.GetNext();
-        DALI_ASSERT_ALWAYS(rasterizerHelperIt != mRasterizers.End());
-
-        rasterizerHelperIt->Rasterize(nextTask);
+        mAsyncTaskManager.AddTask(nextTask);
       }
       else
       {
@@ -252,31 +234,6 @@ void VectorAnimationThread::Rasterize()
       mSleepThread.SleepUntil(nextFrameTime);
       break;
     }
-  }
-}
-
-VectorAnimationThread::RasterizeHelper::RasterizeHelper(VectorAnimationThread& animationThread)
-: RasterizeHelper(std::unique_ptr<VectorRasterizeThread>(new VectorRasterizeThread()), animationThread)
-{
-}
-
-VectorAnimationThread::RasterizeHelper::RasterizeHelper(RasterizeHelper&& rhs)
-: RasterizeHelper(std::move(rhs.mRasterizer), rhs.mAnimationThread)
-{
-}
-
-VectorAnimationThread::RasterizeHelper::RasterizeHelper(std::unique_ptr<VectorRasterizeThread> rasterizer, VectorAnimationThread& animationThread)
-: mRasterizer(std::move(rasterizer)),
-  mAnimationThread(animationThread)
-{
-  mRasterizer->SetCompletedCallback(MakeCallback(&mAnimationThread, &VectorAnimationThread::OnTaskCompleted));
-}
-
-void VectorAnimationThread::RasterizeHelper::Rasterize(VectorAnimationTaskPtr task)
-{
-  if(task)
-  {
-    mRasterizer->AddTask(task);
   }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,8 @@ Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, 
 } // unnamed namespace
 
 VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
-: mUrl(),
+: AsyncTask(MakeCallback(this, &VectorAnimationTask::TaskCompleted), AsyncTask::ThreadType::WORKER_THREAD),
+  mUrl(),
   mVectorRenderer(VectorAnimationRenderer::New()),
   mAnimationData(),
   mVectorAnimationThread(factoryCache.GetVectorAnimationManager().GetVectorAnimationThread()),
@@ -76,7 +77,9 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mAnimationDataUpdated(false),
   mDestroyTask(false),
   mLoadRequest(false),
-  mLoadFailed(false)
+  mLoadFailed(false),
+  mRasterized(false),
+  mKeepAnimation(false)
 {
   mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
 }
@@ -84,6 +87,16 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
 VectorAnimationTask::~VectorAnimationTask()
 {
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::~VectorAnimationTask: destructor [%p]\n", this);
+}
+
+void VectorAnimationTask::Process()
+{
+  mRasterized = Rasterize();
+}
+
+bool VectorAnimationTask::IsReady()
+{
+  return true;
 }
 
 void VectorAnimationTask::Finalize()
@@ -103,6 +116,21 @@ void VectorAnimationTask::Finalize()
   mVectorRenderer.Finalize();
 
   mDestroyTask = true;
+}
+
+void VectorAnimationTask::TaskCompleted(VectorAnimationTaskPtr task)
+{
+  mVectorAnimationThread.OnTaskCompleted(task, task->IsRasterized(), task->IsAnimating());
+}
+
+bool VectorAnimationTask::IsRasterized()
+{
+  return mRasterized;
+}
+
+bool VectorAnimationTask::IsAnimating()
+{
+  return mKeepAnimation;
 }
 
 bool VectorAnimationTask::Load(bool synchronousLoading)
@@ -401,11 +429,11 @@ VectorAnimationTask::ResourceReadySignalType& VectorAnimationTask::ResourceReady
   return mResourceReadySignal;
 }
 
-bool VectorAnimationTask::Rasterize(bool& keepAnimation)
+bool VectorAnimationTask::Rasterize()
 {
   bool     stopped = false;
   uint32_t currentFrame;
-  keepAnimation = false;
+  mKeepAnimation = false;
 
   {
     ConditionalWait::ScopedLock lock(mConditionalWait);
@@ -530,7 +558,7 @@ bool VectorAnimationTask::Rasterize(bool& keepAnimation)
 
   if(mPlayState != PlayState::PAUSED && mPlayState != PlayState::STOPPED)
   {
-    keepAnimation = true;
+    mKeepAnimation = true;
   }
 
   return true;
