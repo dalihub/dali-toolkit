@@ -1761,6 +1761,16 @@ public: // Queries & retrieves.
   Rect<float> GetCharacterBoundingRectangle(const uint32_t charIndex);
 
   /**
+   * @brief Get the character index.
+   * If the text is not yet rendered or the text is empty, -1 is returned.
+   *
+   * @param[in] visualX visual x position.
+   * @param[in] visualY visual y position.
+   * @return character index.
+   */
+  int GetCharacterIndexAtPosition(float visualX, float visualY);
+
+  /**
    * @brief Gets the bounding box of a specific text range.
    *
    * @param[in] startIndex start index of the text requested to get bounding box to.

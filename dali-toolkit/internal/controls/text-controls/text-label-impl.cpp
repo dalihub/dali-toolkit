@@ -1246,6 +1246,11 @@ Rect<float> TextLabel::GetCharacterBoundingRectangle(const uint32_t charIndex) c
   return mController->GetCharacterBoundingRectangle(charIndex);
 }
 
+int TextLabel::GetCharacterIndexAtPosition(float visualX, float visualY) const
+{
+  return mController->GetCharacterIndexAtPosition(visualX, visualY);
+}
+
 void TextLabel::SetSpannedText(const Text::Spanned& spannedText)
 {
   mController->SetSpannedText(spannedText);
