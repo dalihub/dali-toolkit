@@ -387,6 +387,15 @@ public:
   int GetCharacterIndexAtPosition(float visualX, float visualY) const;
 
   /**
+   * @brief Gets the bounding box of a specific text range.
+   *
+   * @param[in] startIndex start index of the text requested to get bounding box to.
+   * @param[in] endIndex end index(included) of the text requested to get bounding box to.
+   * @return bounding box of the requested text.
+   */
+  Rect<> GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const;
+
+  /**
    * @brief Set the @p spannedText into current textEditor
    * the spanned text contains content (text) and  format (spans with ranges)
    * the text is copied into text-controller and the spans are applied on ranges
