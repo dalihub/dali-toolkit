@@ -784,6 +784,7 @@ struct Decorator::Impl : public ConnectionTracker
         grabHandle.actor = ImageView::New(mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED]);
         GetImpl(grabHandle.actor).SetDepthIndex(DepthIndex::DECORATION);
         grabHandle.actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER);
+        grabHandle.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
 
         // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
@@ -867,6 +868,7 @@ struct Decorator::Impl : public ConnectionTracker
         primary.actor.SetProperty(Dali::Actor::Property::NAME, "SelectionHandleOne");
 #endif
         primary.actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
+        primary.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
         GetImpl(primary.actor).SetDepthIndex(DepthIndex::DECORATION);
         primary.actor.SetProperty(Actor::Property::COLOR, mHandleColor);
 
@@ -911,6 +913,7 @@ struct Decorator::Impl : public ConnectionTracker
         secondary.actor.SetProperty(Dali::Actor::Property::NAME, "SelectionHandleTwo");
 #endif
         secondary.actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
+        secondary.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
         GetImpl(secondary.actor).SetDepthIndex(DepthIndex::DECORATION);
         secondary.actor.SetProperty(Actor::Property::COLOR, mHandleColor);
 
@@ -955,6 +958,7 @@ struct Decorator::Impl : public ConnectionTracker
       mCopyPastePopup.actor.SetProperty(Dali::Actor::Property::NAME, "mCopyPastePopup");
   #endif
       mCopyPastePopup.actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+      mCopyPastePopup.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
       mCopyPastePopup.actor.OnRelayoutSignal().Connect(this, &Decorator::Impl::SetPopupPosition); // Position popup after size negotiation
     }
   }
