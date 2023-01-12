@@ -41,7 +41,7 @@ namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
 
 // The relative luminance of a color is defined as (L = 0.2126 * R + 0.7152 * G + 0.0722 * B)
 // based on W3C Recommendations (https://www.w3.org/TR/WCAG20/)
