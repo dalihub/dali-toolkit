@@ -41,7 +41,7 @@ namespace Text
 {
 namespace
 {
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
 
 const float HALF(0.5f);
 const float ONE_AND_A_HALF(1.5f);

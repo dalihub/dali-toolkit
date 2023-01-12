@@ -52,7 +52,7 @@ namespace Internal
 {
 namespace
 {
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
 
 const int CUSTOM_PROPERTY_COUNT(5); // anim,premul,size,offset,multicol
 
