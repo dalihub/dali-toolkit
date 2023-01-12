@@ -51,6 +51,11 @@ public:
   virtual ~Clipboard();
 
   /**
+   * @copydoc Dali::Clipboard::IsAvailable()
+   */
+  static bool IsAvailable();
+
+  /**
    * @copydoc Dali::Clipboard::SetItem()
    */
   bool SetItem(const std::string &itemData);
@@ -111,6 +116,15 @@ Dali::Clipboard Clipboard::Get()
     mToolkitClipboard = Dali::Clipboard( new Dali::Internal::Adaptor::Clipboard() );
   }
   return mToolkitClipboard;
+}
+
+bool Clipboard::IsAvailable()
+{
+  if(mToolkitClipboard)
+  {
+    return true;
+  }
+  return false;
 }
 
 bool Clipboard::SetItem(const std::string &itemData )
