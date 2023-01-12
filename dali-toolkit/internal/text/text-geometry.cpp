@@ -428,7 +428,7 @@ int GetCharIndexAtPosition(ModelPtr textModel, float visualX, float visualY)
   const Vector<LineRun>& lines = visualModel->mLines;
 
   float lineTop   = 0.f;
-  int   lineIndex = -1;
+  int   lineIndex = 0;
   int   high      = totalNumberOfLines;
   int   low       = -1;
   int   guess;
@@ -472,12 +472,6 @@ int GetCharIndexAtPosition(ModelPtr textModel, float visualX, float visualY)
     {
       return -1;
     }
-  }
-
-  // Check if a line is not found; return -1.
-  if(lineIndex == -1)
-  {
-    return -1;
   }
 
  // Start searching for the visualX
