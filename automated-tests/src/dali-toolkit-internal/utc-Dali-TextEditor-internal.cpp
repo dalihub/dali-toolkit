@@ -30,10 +30,10 @@ using namespace Dali;
 using namespace Toolkit;
 using namespace Text;
 
-int UtcDaliTextEditorSelectText(void)
+int UtcDaliInternalTextEditorSelectText(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextEditorSelectText");
+  tet_infoline("UtcDaliInternalTextEditorSelectText");
 
   // Create a text editor
   TextEditor textEditor = TextEditor::New();
