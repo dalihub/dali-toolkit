@@ -59,7 +59,7 @@ EnvironmentDefinition::LoadRaw(const std::string& environmentsPath) const
         face.push_back(PixelData::New(new uint8_t[3]{0xff, 0xff, 0xff}, 3, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY));
       }
     }
-    else if(!LoadCubeMapData(environmentsPath + path, cd))
+    else if(!LoadCubeMapData(environmentsPath + path, cd)) // TODO: supporting EQUIRECTANGULAR
     {
       ExceptionFlinger(ASSERT_LOCATION) << "Failed to load cubemap texture from '" << path << "'.";
     }

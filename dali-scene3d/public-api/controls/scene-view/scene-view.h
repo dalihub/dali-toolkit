@@ -331,7 +331,7 @@ public:
    *
    * @SINCE_2_2.0
    * @param[in] skyboxUrl image url for skybox.
-   * @param[in] skyboxType The skybox type (by default it is cubemap).
+   * @param[in] skyboxType The environment type of skymap (by default it is cubemap).
    */
   void SetSkybox(const std::string& skyboxUrl, SkyboxType skyboxType = SkyboxType::CUBEMAP);
 
