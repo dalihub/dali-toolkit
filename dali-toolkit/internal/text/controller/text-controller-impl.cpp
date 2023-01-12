@@ -1051,7 +1051,7 @@ std::pair<int, int> Controller::Impl::GetSelectionIndexes() const
 
 void Controller::Impl::ShowClipboard()
 {
-  if(mClipboard)
+  if(EnsureClipboardCreated())
   {
     mClipboard.ShowClipboard();
   }
@@ -1059,7 +1059,7 @@ void Controller::Impl::ShowClipboard()
 
 void Controller::Impl::HideClipboard()
 {
-  if(mClipboard && mClipboardHideEnabled)
+  if(EnsureClipboardCreated() && mClipboardHideEnabled)
   {
     mClipboard.HideClipboard();
   }
@@ -1073,7 +1073,7 @@ void Controller::Impl::SetClipboardHideEnable(bool enable)
 bool Controller::Impl::CopyStringToClipboard(const std::string& source)
 {
   //Send string to clipboard
-  return (mClipboard && mClipboard.SetItem(source));
+  return (EnsureClipboardCreated() && mClipboard.SetItem(source));
 }
 
 void Controller::Impl::SendSelectionToClipboard(bool deleteAfterSending)
@@ -1086,7 +1086,7 @@ void Controller::Impl::SendSelectionToClipboard(bool deleteAfterSending)
 
 void Controller::Impl::RequestGetTextFromClipboard()
 {
-  if(mClipboard)
+  if(EnsureClipboardCreated())
   {
     mClipboard.RequestItem();
   }

@@ -67,6 +67,13 @@ public:
   static Clipboard Get();
 
   /**
+   * @brief Checks whether the clipboard is available.
+   *
+   * @return true, if it is available, false otherwise.
+   */
+  static bool IsAvailable();
+
+  /**
    * Send the given string to the clipboard
    * @param[in] itemData string to send to clip board
    * @return bool true if the internal clip board sending was successful.
