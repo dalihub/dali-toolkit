@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_INTERNAL_SCENE_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -302,7 +302,7 @@ private:
   Dali::Toolkit::AsyncImageLoader mSkyboxImageLoader;
   uint32_t                        mSkyboxImageId{0u};
 
-  Scene3D::SceneView::SkyboxType mSkyboxEnvironmentMapType;
+  Scene3D::SceneView::SkyboxType mSkyboxEnvironmentMapType{Scene3D::SceneView::SkyboxType::CUBEMAP};
   Dali::Texture                  mSkyboxTexture;
   Dali::Texture                  mDiffuseTexture;
   Dali::Texture                  mSpecularTexture;
