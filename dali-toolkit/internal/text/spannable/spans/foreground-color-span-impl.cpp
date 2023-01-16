@@ -37,7 +37,7 @@ struct ForegroundColorSpan::Impl
 };
 
 ForegroundColorSpan::ForegroundColorSpan()
-: BaseSpan()
+: BaseSpan(Dali::Toolkit::Text::SpanType::Value::FOREGROUND_COLOR)
 {
   mImpl = std::make_unique<Impl>();
 }

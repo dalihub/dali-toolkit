@@ -29,7 +29,8 @@ namespace Text
 {
 namespace Internal
 {
-ItalicSpan::ItalicSpan():BaseSpan()
+ItalicSpan::ItalicSpan()
+: BaseSpan(Dali::Toolkit::Text::SpanType::Value::ITALIC)
 {
 }
 

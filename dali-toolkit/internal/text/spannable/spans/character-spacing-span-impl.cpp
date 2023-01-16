@@ -37,7 +37,7 @@ struct CharacterSpacingSpan::Impl
 };
 
 CharacterSpacingSpan::CharacterSpacingSpan()
-: BaseSpan()
+: BaseSpan(Dali::Toolkit::Text::SpanType::Value::CHARACTER_SPACING)
 {
   mImpl = std::make_unique<Impl>();
 }

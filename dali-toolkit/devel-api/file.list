@@ -263,6 +263,7 @@ SET( devel_api_text_header_files
   ${devel_api_src_dir}/text/spans/bold-span.h
   ${devel_api_src_dir}/text/spans/italic-span.h
   ${devel_api_src_dir}/text/spans/background-color-span.h
+  ${devel_api_src_dir}/text/spans/span-enumerations.h
 )
 
 SET( devel_api_tool_bar_header_files

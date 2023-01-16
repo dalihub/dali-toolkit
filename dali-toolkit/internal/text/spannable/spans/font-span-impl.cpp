@@ -56,7 +56,7 @@ struct FontSpan::Impl
 };
 
 FontSpan::FontSpan()
-: BaseSpan()
+: BaseSpan(Dali::Toolkit::Text::SpanType::Value::FONT)
 {
   mImpl = std::make_unique<Impl>();
 }
