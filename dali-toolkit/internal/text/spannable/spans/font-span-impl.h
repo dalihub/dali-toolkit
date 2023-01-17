@@ -85,7 +85,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::FontSpan::GetWeight()
    */
-  const Dali::TextAbstraction::FontWeight::Type GetWeight() const;
+  Dali::TextAbstraction::FontWeight::Type GetWeight() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::FontSpan::IsWeightDefined()
@@ -95,7 +95,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::FontSpan::GetWidth()
    */
-  const Dali::TextAbstraction::FontWidth::Type GetWidth() const;
+  Dali::TextAbstraction::FontWidth::Type GetWidth() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::FontSpan::IsWidthDefined()
@@ -105,7 +105,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::FontSpan::GetSlant()
    */
-  const Dali::TextAbstraction::FontSlant::Type GetSlant() const;
+  Dali::TextAbstraction::FontSlant::Type GetSlant() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::FontSpan::IsSlantDefined()
@@ -115,7 +115,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::FontSpan::GetSize()
    */
-  const float GetSize() const;
+  float GetSize() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::FontSpan::IsSizeDefined()

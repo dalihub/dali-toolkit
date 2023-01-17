@@ -100,7 +100,7 @@ void FontSpan::SetFamilyName(const std::string& familyName)
   mImpl->mFamilyNameDefined = true;
 }
 
-const Dali::TextAbstraction::FontWeight::Type FontSpan::GetWeight() const
+Dali::TextAbstraction::FontWeight::Type FontSpan::GetWeight() const
 {
   return mImpl->mWeight;
 }
@@ -116,7 +116,7 @@ void FontSpan::SetWeight(const Dali::TextAbstraction::FontWeight::Type& weight)
   mImpl->mWeightDefined = true;
 }
 
-const Dali::TextAbstraction::FontWidth::Type FontSpan::GetWidth() const
+Dali::TextAbstraction::FontWidth::Type FontSpan::GetWidth() const
 {
   return mImpl->mWidth;
 }
@@ -132,7 +132,7 @@ void FontSpan::SetWidth(const Dali::TextAbstraction::FontWidth::Type& width)
   mImpl->mWidthDefined = true;
 }
 
-const Dali::TextAbstraction::FontSlant::Type FontSpan::GetSlant() const
+Dali::TextAbstraction::FontSlant::Type FontSpan::GetSlant() const
 {
   return mImpl->mSlant;
 }
@@ -148,7 +148,7 @@ void FontSpan::SetSlant(const Dali::TextAbstraction::FontSlant::Type& slant)
   mImpl->mSlantDefined = true;
 }
 
-const float FontSpan::GetSize() const
+float FontSpan::GetSize() const
 {
   return mImpl->mSize;
 }

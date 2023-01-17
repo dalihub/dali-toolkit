@@ -56,7 +56,7 @@ Dali::Toolkit::Text::BackgroundColorSpan BackgroundColorSpan::New(const Vector4 
 }
 
 //Methods
-const Vector4 BackgroundColorSpan::GetBackgroundColor() const
+Vector4 BackgroundColorSpan::GetBackgroundColor() const
 {
   return mImpl->mBackgroundColor;
 }

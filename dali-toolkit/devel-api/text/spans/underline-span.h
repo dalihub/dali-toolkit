@@ -133,7 +133,7 @@ public: //Methods
    *
    * @return A type value.
    */
-  const Text::Underline::Type GetType() const;
+  Text::Underline::Type GetType() const;
 
   /**
    * @brief Retrieve whether the type is defined.
@@ -147,7 +147,7 @@ public: //Methods
    *
    * @return A color value.
    */
-  const Vector4 GetColor() const;
+  Vector4 GetColor() const;
 
   /**
    * @brief Retrieve whether the color is defined.
@@ -161,7 +161,7 @@ public: //Methods
    *
    * @return A height value.
    */
-  const float GetHeight() const;
+  float GetHeight() const;
 
   /**
    * @brief Retrieve whether the height is defined.
@@ -175,7 +175,7 @@ public: //Methods
    *
    * @return A dash-gap value.
    */
-  const float GetDashGap() const;
+  float GetDashGap() const;
 
   /**
    * @brief Retrieve whether the dash-gap is defined.
@@ -189,7 +189,7 @@ public: //Methods
    *
    * @return A dash-width value.
    */
-  const float GetDashWidth() const;
+  float GetDashWidth() const;
 
   /**
    * @brief Retrieve whether the dash-width is defined.

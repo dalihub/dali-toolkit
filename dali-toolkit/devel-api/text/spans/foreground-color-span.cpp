@@ -50,7 +50,7 @@ ForegroundColorSpan& ForegroundColorSpan::operator=(ForegroundColorSpan&& rhs) =
 ForegroundColorSpan::~ForegroundColorSpan() = default;
 
 //Methods
-const Vector4 ForegroundColorSpan::GetForegroundColor() const
+Vector4 ForegroundColorSpan::GetForegroundColor() const
 {
   return GetImplementation(*this).GetForegroundColor();
 }

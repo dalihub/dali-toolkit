@@ -96,7 +96,7 @@ public:
    *
    * @return A span type value.
    */
-  const Dali::Toolkit::Text::SpanType::Value GetSpanType() const;
+  Dali::Toolkit::Text::SpanType::Value GetSpanType() const;
 
   /**
    * @brief Downcasts to a BaseSpan handle.

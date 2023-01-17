@@ -2106,7 +2106,7 @@ private:
   struct TextUpdater;
   struct SpannableHandler;
 
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr<Impl> mImpl{nullptr};
 };
 
 } // namespace Dali::Toolkit::Text

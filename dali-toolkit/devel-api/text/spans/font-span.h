@@ -118,28 +118,28 @@ public: //Methods
    *
    * @return A font weight value.
    */
-  const Dali::TextAbstraction::FontWeight::Type GetWeight() const;
+  Dali::TextAbstraction::FontWeight::Type GetWeight() const;
 
   /**
    * @brief Retrive the font width.
    *
    * @return A font width value.
    */
-  const Dali::TextAbstraction::FontWidth::Type GetWidth() const;
+  Dali::TextAbstraction::FontWidth::Type GetWidth() const;
 
   /**
    * @brief Retrive the font slant.
    *
    * @return A font slant value.
    */
-  const Dali::TextAbstraction::FontSlant::Type GetSlant() const;
+  Dali::TextAbstraction::FontSlant::Type GetSlant() const;
 
   /**
    * @brief Retrive the font size.
    *
    * @return A font size value.
    */
-  const float GetSize() const;
+  float GetSize() const;
 
   /**
    * @brief Retrieve whether the font family name is defined.

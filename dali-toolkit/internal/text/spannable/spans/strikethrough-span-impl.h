@@ -83,7 +83,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::StrikethroughSpan::GetColor()
    */
-  const Vector4 GetColor() const;
+  Vector4 GetColor() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::StrikethroughSpan::IsColorDefined()
@@ -93,7 +93,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::StrikethroughSpan::GetHeight()
    */
-  const float GetHeight() const;
+  float GetHeight() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::StrikethroughSpan::IsHeightDefined()

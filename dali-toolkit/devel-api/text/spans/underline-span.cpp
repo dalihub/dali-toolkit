@@ -66,7 +66,7 @@ UnderlineSpan::~UnderlineSpan() = default;
 
 //Methods
 
-const Text::Underline::Type UnderlineSpan::GetType() const
+Text::Underline::Type UnderlineSpan::GetType() const
 {
   return GetImplementation(*this).GetType();
 }
@@ -76,7 +76,7 @@ bool UnderlineSpan::IsTypeDefined() const
   return GetImplementation(*this).IsTypeDefined();
 }
 
-const Vector4 UnderlineSpan::GetColor() const
+Vector4 UnderlineSpan::GetColor() const
 {
   return GetImplementation(*this).GetColor();
 }
@@ -86,7 +86,7 @@ bool UnderlineSpan::IsColorDefined() const
   return GetImplementation(*this).IsColorDefined();
 }
 
-const float UnderlineSpan::GetHeight() const
+float UnderlineSpan::GetHeight() const
 {
   return GetImplementation(*this).GetHeight();
 }
@@ -96,7 +96,7 @@ bool UnderlineSpan::IsHeightDefined() const
   return GetImplementation(*this).IsHeightDefined();
 }
 
-const float UnderlineSpan::GetDashGap() const
+float UnderlineSpan::GetDashGap() const
 {
   return GetImplementation(*this).GetDashGap();
 }
@@ -106,7 +106,7 @@ bool UnderlineSpan::IsDashGapDefined() const
   return GetImplementation(*this).IsDashGapDefined();
 }
 
-const float UnderlineSpan::GetDashWidth() const
+float UnderlineSpan::GetDashWidth() const
 {
   return GetImplementation(*this).GetDashWidth();
 }

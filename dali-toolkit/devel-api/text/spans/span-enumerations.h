@@ -32,7 +32,7 @@ namespace SpanType
 /**
  * @brief Enumeration for type of the span.
  */
-enum class Value : uint8_t
+enum Value : uint8_t
 {
   BASE = 0,
   FOREGROUND_COLOR,
@@ -43,7 +43,6 @@ enum class Value : uint8_t
   UNDERLINE,
   STRIKETHROUGH,
   CHARACTER_SPACING
-
 };
 } // namespace SpanType
 

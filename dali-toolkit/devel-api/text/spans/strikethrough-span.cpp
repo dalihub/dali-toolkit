@@ -50,7 +50,7 @@ StrikethroughSpan& StrikethroughSpan::operator=(StrikethroughSpan&& rhs) = defau
 StrikethroughSpan::~StrikethroughSpan()                                  = default;
 
 //Methods
-const Vector4 StrikethroughSpan::GetColor() const
+Vector4 StrikethroughSpan::GetColor() const
 {
   return GetImplementation(*this).GetColor();
 }
@@ -60,7 +60,7 @@ bool StrikethroughSpan::IsColorDefined() const
   return GetImplementation(*this).IsColorDefined();
 }
 
-const float StrikethroughSpan::GetHeight() const
+float StrikethroughSpan::GetHeight() const
 {
   return GetImplementation(*this).GetHeight();
 }
