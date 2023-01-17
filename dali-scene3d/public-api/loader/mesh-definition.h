@@ -23,6 +23,7 @@
 #include "dali-scene3d/public-api/loader/index.h"
 #include "dali-scene3d/public-api/loader/mesh-geometry.h"
 #include "dali-scene3d/public-api/loader/utils.h"
+#include <dali-scene3d/public-api/loader/buffer-definition.h>
 
 // EXTERNAL INCLUDES
 #include <memory>
@@ -52,8 +53,9 @@ struct DALI_SCENE3D_API MeshDefinition
   {
     FLIP_UVS_VERTICAL = NthBit(0),
     U32_INDICES       = NthBit(1), // default is unsigned short
-    U16_JOINT_IDS     = NthBit(2), // default is floats
-    U8_JOINT_IDS      = NthBit(3),
+    U8_INDICES        = NthBit(2), // default is unsigned short
+    U16_JOINT_IDS     = NthBit(3), // default is floats
+    U8_JOINT_IDS      = NthBit(4),
   };
 
   enum Attributes
@@ -163,6 +165,7 @@ struct DALI_SCENE3D_API MeshDefinition
   {
     Blob                        mBlob;
     std::unique_ptr<SparseBlob> mSparse;
+    Index                       mBufferIdx = INVALID_INDEX;
 
     Accessor() = default;
 
@@ -173,9 +176,11 @@ struct DALI_SCENE3D_API MeshDefinition
     Accessor& operator=(Accessor&&) = default;
 
     Accessor(const MeshDefinition::Blob&       blob,
-             const MeshDefinition::SparseBlob& sparse);
+             const MeshDefinition::SparseBlob& sparse,
+             Index bufferIndex = INVALID_INDEX);
     Accessor(MeshDefinition::Blob&&       blob,
-             MeshDefinition::SparseBlob&& sparse);
+             MeshDefinition::SparseBlob&& sparse,
+             Index bufferIndex = INVALID_INDEX);
 
     bool IsDefined() const
     {
@@ -257,7 +262,7 @@ struct DALI_SCENE3D_API MeshDefinition
    *  attribute buffers, as well as blend shape data. This is then returned.
    * @note This can be done on any thread.
    */
-  RawData LoadRaw(const std::string& modelsPath);
+  RawData LoadRaw(const std::string& modelsPath, BufferDefinition::Vector& buffers);
 
   /**
    * @brief Creates a MeshGeometry based firstly on the value of the uri member:
@@ -272,7 +277,7 @@ public: // DATA
   std::shared_ptr<RawData> mRawData;
   uint32_t                 mFlags         = 0x0;
   Geometry::Type           mPrimitiveType = Geometry::TRIANGLES;
-  std::string              mUri;
+  std::string              mUri; // When the mesh data is loaded from embedded resources, this URI is used as a data stream.
   Accessor                 mIndices;
   Accessor                 mPositions;
   Accessor                 mNormals; // data can be generated based on positions
