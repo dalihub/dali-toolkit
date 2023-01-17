@@ -24,6 +24,7 @@
 // EXTERNAL INCLUDES
 #include "dali/public-api/math/quaternion.h"
 #include "dali/public-api/rendering/texture.h"
+#include <memory>
 
 namespace Dali
 {
@@ -87,12 +88,13 @@ struct DALI_SCENE3D_API EnvironmentDefinition
   static float GetDefaultIntensity();
 
 public: // DATA
-  std::string mDiffuseMapPath;
-  std::string mSpecularMapPath;
-  Quaternion  mCubeOrientation = Quaternion::IDENTITY;
-  Vector3     mYDirection      = Vector3::ONE;
-  float       mIblIntensity    = 1.0f;
-  bool        mUseBrdfTexture  = false;
+  std::string              mDiffuseMapPath;
+  std::string              mSpecularMapPath;
+  std::shared_ptr<RawData> mRawData;
+  Quaternion               mCubeOrientation = Quaternion::IDENTITY;
+  Vector3                  mYDirection      = Vector3::ONE;
+  float                    mIblIntensity    = 1.0f;
+  bool                     mUseBrdfTexture  = false;
 };
 
 } // namespace Loader

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1761,6 +1761,16 @@ public: // Queries & retrieves.
   Rect<float> GetCharacterBoundingRectangle(const uint32_t charIndex);
 
   /**
+   * @brief Get the character index.
+   * If the text is not yet rendered or the text is empty, -1 is returned.
+   *
+   * @param[in] visualX visual x position.
+   * @param[in] visualY visual y position.
+   * @return character index.
+   */
+  int GetCharacterIndexAtPosition(float visualX, float visualY);
+
+  /**
    * @brief Gets the bounding box of a specific text range.
    *
    * @param[in] startIndex start index of the text requested to get bounding box to.
@@ -2096,7 +2106,7 @@ private:
   struct TextUpdater;
   struct SpannableHandler;
 
-  Impl* mImpl;
+  std::unique_ptr<Impl> mImpl;
 };
 
 } // namespace Dali::Toolkit::Text

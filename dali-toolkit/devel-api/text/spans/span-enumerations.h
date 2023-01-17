@@ -1,3 +1,6 @@
+#ifndef DALI_SPAN_ENUMERATIONS_H
+#define DALI_SPAN_ENUMERATIONS_H
+
 /*
  * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
@@ -15,8 +18,8 @@
  *
  */
 
-// CLASS HEADER
-#include <dali-toolkit/internal/text/spannable/spans/base-span-impl.h>
+// EXTERNAL INCLUDES
+#include <cstdint>
 
 namespace Dali
 {
@@ -24,32 +27,30 @@ namespace Toolkit
 {
 namespace Text
 {
-namespace Internal
+namespace SpanType
 {
-struct BaseSpan::Impl
+/**
+ * @brief Enumeration for type of the span.
+ */
+enum class Value : uint8_t
 {
-  Dali::Toolkit::Text::SpanType::Value mSpanTypeValue; ///< The span type value.
+  BASE = 0,
+  FOREGROUND_COLOR,
+  BACKGROUND_COLOR,
+  FONT,
+  BOLD,
+  ITALIC,
+  UNDERLINE,
+  STRIKETHROUGH,
+  CHARACTER_SPACING
+
 };
-
-BaseSpan::BaseSpan(Dali::Toolkit::Text::SpanType::Value spanType)
-{
-  mImpl                 = std::make_unique<Impl>();
-  mImpl->mSpanTypeValue = spanType;
-}
-
-BaseSpan::~BaseSpan()
-{
-}
-
-const Dali::Toolkit::Text::SpanType::Value BaseSpan::GetSpanType() const
-{
-  return mImpl->mSpanTypeValue;
-}
-
-} // namespace Internal
+} // namespace SpanType
 
 } // namespace Text
 
 } // namespace Toolkit
 
 } // namespace Dali
+
+#endif // DALI_SPAN_ENUMERATIONS_H

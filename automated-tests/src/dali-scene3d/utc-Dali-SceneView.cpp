@@ -22,6 +22,7 @@
 
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
+#include <toolkit-event-thread-callback.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -70,8 +71,11 @@ const char* TEST_GLTF_FILE_NAME = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-const char* TEST_DIFFUSE_TEXTURE  = TEST_RESOURCE_DIR "/forest_irradiance.ktx";
-const char* TEST_SPECULAR_TEXTURE = TEST_RESOURCE_DIR "/forest_radiance.ktx";
+const char* TEST_EQUIRECTANGULAR_TEXTURE = TEST_RESOURCE_DIR "/application-icon-20.png";
+const char* TEST_DIFFUSE_TEXTURE         = TEST_RESOURCE_DIR "/forest_irradiance.ktx";
+const char* TEST_SPECULAR_TEXTURE        = TEST_RESOURCE_DIR "/forest_radiance.ktx";
+const char* TEST_DIFFUSE_TEXTURE2        = TEST_RESOURCE_DIR "//forest_irradiance.ktx";
+const char* TEST_SPECULAR_TEXTURE2       = TEST_RESOURCE_DIR "//forest_radiance.ktx";
 
 Dali::Texture GetDiffuseTexture(Dali::Scene3D::Model model)
 {
@@ -113,6 +117,20 @@ Dali::Texture GetSpecularTexture(Dali::Scene3D::Model model)
   }
 
   return texture;
+}
+
+
+// For ResourceReady
+static bool gOnRelayoutCallBackCalled = false;
+void OnRelayoutCallback(Actor actor)
+{
+  gOnRelayoutCallBackCalled = true;
+}
+
+static bool gResourceReadyCalled = false;
+void OnResourceReady(Control control)
+{
+  gResourceReadyCalled = true;
 }
 } // namespace
 
@@ -422,6 +440,7 @@ int UtcDaliSceneViewImageBasedLight01(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.ResourceReadySignal().Connect(OnResourceReady);
   view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
 
   application.GetScene().Add(view);
@@ -435,12 +454,29 @@ int UtcDaliSceneViewImageBasedLight01(void)
   view.Add(modelView1);
   view.Add(modelView2);
 
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
   DALI_TEST_NOT_EQUALS(GetDiffuseTexture(modelView1), GetDiffuseTexture(modelView2), 0.0f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), GetSpecularTexture(modelView2), 0.0f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(GetDiffuseTexture(modelView1), GetDiffuseTexture(modelView3), 0.0f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), GetSpecularTexture(modelView3), 0.0f, TEST_LOCATION);
 
+  gResourceReadyCalled = false;
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
   view.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(GetDiffuseTexture(modelView1), GetDiffuseTexture(modelView2), TEST_LOCATION);
   DALI_TEST_EQUALS(GetSpecularTexture(modelView1), GetSpecularTexture(modelView2), TEST_LOCATION);
@@ -448,12 +484,29 @@ int UtcDaliSceneViewImageBasedLight01(void)
   DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), GetSpecularTexture(modelView3), 0.0f, TEST_LOCATION);
 
   view.Add(modelView3);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
 
   DALI_TEST_EQUALS(GetDiffuseTexture(modelView1), GetDiffuseTexture(modelView3), TEST_LOCATION);
   DALI_TEST_EQUALS(GetSpecularTexture(modelView1), GetSpecularTexture(modelView3), TEST_LOCATION);
 
   view.Remove(modelView1);
-  view.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE);
+
+  gResourceReadyCalled = false;
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+  view.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE2, TEST_SPECULAR_TEXTURE2);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   DALI_TEST_NOT_EQUALS(GetDiffuseTexture(modelView1), GetDiffuseTexture(modelView2), 0.0f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), GetSpecularTexture(modelView2), 0.0f, TEST_LOCATION);
@@ -470,6 +523,7 @@ int UtcDaliSceneViewImageBasedLight02(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.ResourceReadySignal().Connect(OnResourceReady);
   view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
 
   application.GetScene().Add(view);
@@ -478,13 +532,43 @@ int UtcDaliSceneViewImageBasedLight02(void)
   application.Render();
 
   Scene3D::Model modelView1 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  modelView1.ResourceReadySignal().Connect(OnResourceReady);
   view.Add(modelView1);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
 
+  gResourceReadyCalled = false;
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
   view.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
   Dali::Texture diffuseTexture = GetDiffuseTexture(modelView1);
   Dali::Texture specularTexture = GetSpecularTexture(modelView1);
 
-  modelView1.SetImageBasedLightSource(TEST_SPECULAR_TEXTURE, TEST_DIFFUSE_TEXTURE);
+  gResourceReadyCalled = false;
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+  modelView1.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE2, TEST_SPECULAR_TEXTURE2);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
   DALI_TEST_NOT_EQUALS(GetDiffuseTexture(modelView1), diffuseTexture, 0.0f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), specularTexture, 0.0f, TEST_LOCATION);
   diffuseTexture = GetDiffuseTexture(modelView1);
@@ -508,7 +592,7 @@ int UtcDaliSceneViewImageBasedLight03(void)
 
   Scene3D::SceneView view = Scene3D::SceneView::New();
   view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
-
+  view.ResourceReadySignal().Connect(OnResourceReady);
   application.GetScene().Add(view);
 
   application.SendNotification();
@@ -516,12 +600,29 @@ int UtcDaliSceneViewImageBasedLight03(void)
 
   Scene3D::Model modelView1 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
   view.Add(modelView1);
-
   modelView1.SetImageBasedLightSource(TEST_SPECULAR_TEXTURE, TEST_DIFFUSE_TEXTURE);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
   Dali::Texture diffuseTexture = GetDiffuseTexture(modelView1);
   Dali::Texture specularTexture = GetSpecularTexture(modelView1);
 
-  view.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE);
+  gResourceReadyCalled = false;
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+  view.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE2, TEST_SPECULAR_TEXTURE2);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
   DALI_TEST_EQUALS(GetDiffuseTexture(modelView1), diffuseTexture, TEST_LOCATION);
   DALI_TEST_EQUALS(GetSpecularTexture(modelView1), specularTexture, TEST_LOCATION);
 
@@ -609,22 +710,6 @@ int UtcDaliSceneViewUseFramebuffer02(void)
   END_TEST;
 }
 
-// For ResourceReady
-namespace
-{
-static bool gOnRelayoutCallBackCalled = false;
-void OnRelayoutCallback(Actor actor)
-{
-  gOnRelayoutCallBackCalled = true;
-}
-
-static bool gResourceReadyCalled = false;
-void OnResourceReady(Control control)
-{
-  gResourceReadyCalled = true;
-}
-}
-
 int UtcDaliSceneViewResourceReady(void)
 {
   ToolkitTestApplication application;
@@ -658,6 +743,9 @@ int UtcDaliSceneViewResourceReady(void)
 
   application.SendNotification();
   application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
 
   DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
@@ -673,28 +761,110 @@ int UtcDaliSceneViewSetSkybox(void)
   Scene3D::SceneView view = Scene3D::SceneView::New();
   view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   view.ResourceReadySignal().Connect(OnResourceReady);
-  // SceneView::IsResourceReady() returns true by default.
-  DALI_TEST_EQUALS(view.IsResourceReady(), true, TEST_LOCATION);
-
-  // Sanity check
-  DALI_TEST_CHECK(!gResourceReadyCalled);
-
   application.GetScene().Add(view);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(view.IsResourceReady(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
-
-  gResourceReadyCalled = false;
-
+  uint32_t childCount = view.GetChildAt(0u).GetChildCount();
   view.SetSkybox(TEST_SPECULAR_TEXTURE);
 
+  gResourceReadyCalled = false;
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(view.GetChildAt(0u).GetChildCount(), childCount + 1, TEST_LOCATION);
+
+  view.Unparent();
+  view.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewSetSkyboxEquirectangular(void)
+{
+  ToolkitTestApplication application;
+
+  gResourceReadyCalled = false;
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  view.ResourceReadySignal().Connect(OnResourceReady);
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t childCount = view.GetChildAt(0u).GetChildCount();
+  view.SetSkybox(TEST_EQUIRECTANGULAR_TEXTURE, Scene3D::SceneView::SkyboxType::EQUIRECTANGULAR);
+
+  gResourceReadyCalled = false;
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(view.GetChildAt(0u).GetChildCount(), childCount + 1, TEST_LOCATION);
+
+  view.Unparent();
+  view.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewSetSkyboxEmpty(void)
+{
+  ToolkitTestApplication application;
+
+  gResourceReadyCalled = false;
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  view.ResourceReadySignal().Connect(OnResourceReady);
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t childCount = view.GetChildAt(0u).GetChildCount();
+  view.SetSkybox("");
+  DALI_TEST_EQUALS(view.GetChildAt(0u).GetChildCount(), childCount, TEST_LOCATION);
+
+  view.Unparent();
+  view.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewSetSkyboxEquirectangularEmpty(void)
+{
+  ToolkitTestApplication application;
+
+  gResourceReadyCalled = false;
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  view.ResourceReadySignal().Connect(OnResourceReady);
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t childCount = view.GetChildAt(0u).GetChildCount();
+  view.SetSkybox("", Scene3D::SceneView::SkyboxType::EQUIRECTANGULAR);
+  DALI_TEST_EQUALS(view.GetChildAt(0u).GetChildCount(), childCount, TEST_LOCATION);
+
+  view.Unparent();
+  view.Reset();
 
   END_TEST;
 }
@@ -725,6 +895,30 @@ int UtcDaliSceneViewSetSkyboxOrientation(void)
   Dali::Quaternion orientation = Dali::Quaternion(Radian(0.5f), Vector3::YAXIS);
   view.SetSkyboxOrientation(orientation);
   DALI_TEST_EQUALS(view.GetSkyboxOrientation(), orientation, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewSetImageBasedLightAndSkybox(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.ResourceReadySignal().Connect(OnResourceReady);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+  view.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE);
+  view.SetSkybox(TEST_SPECULAR_TEXTURE);
+  application.GetScene().Add(view);
+
+  // Check SceneView needs 3 trigger to load both of image based light and skybox.
+  gResourceReadyCalled = false;
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   END_TEST;
 }

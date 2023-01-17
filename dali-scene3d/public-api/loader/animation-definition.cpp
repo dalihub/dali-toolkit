@@ -50,25 +50,25 @@ AnimationDefinition::AnimationDefinition(AnimationDefinition&& other)
 void AnimationDefinition::Animate(Animation& animation, AnimatedProperty::GetActor getActor)
 {
   DALI_ASSERT_ALWAYS(animation);
-  for(auto& ap : mProperties)
+  for(auto& property : mProperties)
   {
-    ap.Animate(animation, getActor);
+    property.Animate(animation, getActor);
   }
 }
 
 Animation AnimationDefinition::ReAnimate(AnimatedProperty::GetActor getActor)
 {
   // Create and configure new animation.
-  Animation a = Animation::New(mDuration);
-  a.SetLoopCount(mLoopCount);
-  a.SetDisconnectAction(mDisconnectAction);
-  a.SetEndAction(mEndAction);
+  Animation animation = Animation::New(mDuration);
+  animation.SetLoopCount(mLoopCount);
+  animation.SetDisconnectAction(mDisconnectAction);
+  animation.SetEndAction(mEndAction);
 
-  a.SetSpeedFactor(mSpeedFactor);
-  a.SetPlayRange(mPlayRange);
+  animation.SetSpeedFactor(mSpeedFactor);
+  animation.SetPlayRange(mPlayRange);
 
-  Animate(a, getActor);
-  return a;
+  Animate(animation, getActor);
+  return animation;
 }
 
 AnimationDefinition& AnimationDefinition::operator=(AnimationDefinition&& other)

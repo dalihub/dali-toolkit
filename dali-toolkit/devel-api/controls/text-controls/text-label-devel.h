@@ -230,6 +230,16 @@ DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextLabel textLabel, const uint32_t
 DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextLabel textLabel, const uint32_t startIndex, const uint32_t endIndex);
 
 /**
+ * @brief Gets the bounding box of a specific text range.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] startIndex start index of the text requested to get bounding box to.
+ * @param[in] endIndex end index(included) of the text requested to get bounding box to.
+ * @return bounding box of the requested text.
+ */
+DALI_TOOLKIT_API Rect<> GetTextBoundingRectangle(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex);
+
+/**
  * @brief Anchor clicked signal type.
  *
  * @note Signal

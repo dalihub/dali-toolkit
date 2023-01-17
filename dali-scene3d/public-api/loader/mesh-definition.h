@@ -268,18 +268,19 @@ struct DALI_SCENE3D_API MeshDefinition
   MeshGeometry Load(RawData&& raw) const;
 
 public: // DATA
-  uint32_t       mFlags         = 0x0;
-  Geometry::Type mPrimitiveType = Geometry::TRIANGLES;
-  std::string    mUri;
-  Accessor       mIndices;
-  Accessor       mPositions;
-  Accessor       mNormals; // data can be generated based on positions
-  Accessor       mTexCoords;
-  Accessor       mColors;
-  Accessor       mTangents; // data can be generated based on normals and texCoords (the latter isn't mandatory; the results will be better if available)
-  Accessor       mJoints0;
-  Accessor       mWeights0;
-  Property::Type mTangentType{Property::VECTOR3};
+  std::shared_ptr<RawData> mRawData;
+  uint32_t                 mFlags         = 0x0;
+  Geometry::Type           mPrimitiveType = Geometry::TRIANGLES;
+  std::string              mUri;
+  Accessor                 mIndices;
+  Accessor                 mPositions;
+  Accessor                 mNormals; // data can be generated based on positions
+  Accessor                 mTexCoords;
+  Accessor                 mColors;
+  Accessor                 mTangents; // data can be generated based on normals and texCoords (the latter isn't mandatory; the results will be better if available)
+  Accessor                 mJoints0;
+  Accessor                 mWeights0;
+  Property::Type           mTangentType{Property::VECTOR3};
 
   Blob                    mBlendShapeHeader;
   std::vector<BlendShape> mBlendShapes;

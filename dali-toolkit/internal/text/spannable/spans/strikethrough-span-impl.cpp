@@ -36,7 +36,7 @@ struct StrikethroughSpan::Impl
 };
 
 StrikethroughSpan::StrikethroughSpan()
-: BaseSpan()
+: BaseSpan(Dali::Toolkit::Text::SpanType::Value::STRIKETHROUGH)
 {
   mImpl = std::make_unique<Impl>();
 }

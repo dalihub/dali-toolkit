@@ -55,7 +55,8 @@ namespace
 {
 struct Context
 {
-  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type) {
+  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type)
+  {
     return TEST_RESOURCE_DIR "/";
   };
 
@@ -102,6 +103,7 @@ int UtcDaliGltfLoaderFailedToLoad(void)
   ShaderDefinitionFactory sdf;
   sdf.SetResources(ctx.resources);
 
+  InitializeGltfLoader();
   DALI_TEST_THROW(LoadGltfScene("non-existent.gltf", sdf, ctx.loadResult),
                   std::runtime_error,
                   ExceptionMessageStartsWith{"Failed to load"});
@@ -130,6 +132,7 @@ int UtcDaliGltfLoaderFailedToParse(void)
   ShaderDefinitionFactory sdf;
   sdf.SetResources(ctx.resources);
 
+  InitializeGltfLoader();
   DALI_TEST_THROW(LoadGltfScene(TEST_RESOURCE_DIR "/invalid.gltf", sdf, ctx.loadResult),
                   std::runtime_error,
                   ExceptionMessageStartsWith{"Failed to parse"});
@@ -173,6 +176,7 @@ int UtcDaliGltfLoaderSuccess1(void)
   ShaderDefinitionFactory sdf;
   sdf.SetResources(ctx.resources);
 
+  InitializeGltfLoader();
   LoadGltfScene(TEST_RESOURCE_DIR "/AnimatedCube.gltf", sdf, ctx.loadResult);
 
   DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
@@ -195,105 +199,155 @@ int UtcDaliGltfLoaderSuccess1(void)
   auto& materials = ctx.resources.mMaterials;
   DALI_TEST_EQUAL(2u, materials.size());
   const MaterialDefinition materialGroundTruth[]{
-    {MaterialDefinition::ALBEDO | MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
-       MaterialDefinition::NORMAL | MaterialDefinition::SPECULAR | MaterialDefinition::SPECULAR_COLOR |
-       (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
-     0,
-     Color::WHITE,
-     1.f,
-     0.f,
-     Vector4(1.000, 0.766, 0.336, 1.0),
-     1.f,
-     1.f,
-     Vector3(0.2, 0.1, 0.0),
-     0.0f,
-     0.5f,
-     Vector3(0, 0, 1),
-     true,
-     false,
-     true,
-     false,
-     true,
-     true,
-     {
-       {MaterialDefinition::ALBEDO,
-        {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-         ImageDimensions(256, 256),
-         SamplingMode::BOX_THEN_NEAREST}},
-       {MaterialDefinition::NORMAL,
-        {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-         ImageDimensions(256, 256),
-         SamplingMode::BOX_THEN_NEAREST}},
-       {MaterialDefinition::OCCLUSION,
-        {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-         ImageDimensions(256, 256),
-         SamplingMode::BOX_THEN_NEAREST}},
-       {MaterialDefinition::EMISSIVE,
-        {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-         ImageDimensions(256, 256),
-         SamplingMode::BOX_THEN_NEAREST}},
-       {MaterialDefinition::SPECULAR,
-        {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-         ImageDimensions(256, 256),
-         SamplingMode::BOX_THEN_NEAREST}},
-       {MaterialDefinition::SPECULAR_COLOR,
-        {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-         ImageDimensions(256, 256),
-         SamplingMode::BOX_THEN_NEAREST}},
-     }},
-    {MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
-       MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
-       MaterialDefinition::NORMAL | MaterialDefinition::GLTF_CHANNELS,
-     0,
-     Color::WHITE,
-     1.f,
-     0.f,
-     Vector4(1.000, 0.766, 0.336, 1.0),
-     1.f,
-     1.f,
-     Vector3(0.2, 0.1, 0.0),
-     0.04f,
-     1.0f,
-     Vector3::ONE,
-     true,
-     true,
-     true,
-     false,
-     true,
-     false,
-     {
-       {MaterialDefinition::ALBEDO,
-        {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-         ImageDimensions(256, 256),
-         SamplingMode::BOX_THEN_NEAREST}},
-       {MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS | MaterialDefinition::GLTF_CHANNELS,
-        {"AnimatedCube_MetallicRoughness.png",
-         SamplerFlags::Encode(FilterMode::NEAREST_MIPMAP_LINEAR, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::MIRRORED_REPEAT),
-         ImageDimensions(256, 256),
-         SamplingMode::NEAREST}},
-       {MaterialDefinition::NORMAL,
-        {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-         ImageDimensions(256, 256),
-         SamplingMode::BOX_THEN_NEAREST}},
-       {MaterialDefinition::OCCLUSION,
-        {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-         ImageDimensions(256, 256),
-         SamplingMode::BOX_THEN_NEAREST}},
-       {MaterialDefinition::EMISSIVE,
-        {"AnimatedCube_BaseColor.png",
-         SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-         ImageDimensions(256, 256),
-         SamplingMode::BOX_THEN_NEAREST}},
-     }},
+    {
+      nullptr,
+      MaterialDefinition::ALBEDO | MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
+        MaterialDefinition::NORMAL | MaterialDefinition::SPECULAR | MaterialDefinition::SPECULAR_COLOR |
+        (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
+      0,
+      Color::WHITE,
+      1.f,
+      0.f,
+      Vector4(1.000, 0.766, 0.336, 1.0),
+      1.f,
+      1.f,
+      Vector3(0.2, 0.1, 0.0),
+      0.0f,
+      0.5f,
+      Vector3(0, 0, 1),
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      {
+        {
+          MaterialDefinition::ALBEDO,
+          {
+            "AnimatedCube_BaseColor.png",
+            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+            ImageDimensions(256, 256),
+            SamplingMode::BOX_THEN_NEAREST,
+          },
+        },
+        {
+          MaterialDefinition::NORMAL,
+          {
+            "AnimatedCube_BaseColor.png",
+            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+            ImageDimensions(256, 256),
+            SamplingMode::BOX_THEN_NEAREST,
+          },
+        },
+        {
+          MaterialDefinition::OCCLUSION,
+          {
+            "AnimatedCube_BaseColor.png",
+            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+            ImageDimensions(256, 256),
+            SamplingMode::BOX_THEN_NEAREST,
+          },
+        },
+        {
+          MaterialDefinition::EMISSIVE,
+          {
+            "AnimatedCube_BaseColor.png",
+            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+            ImageDimensions(256, 256),
+            SamplingMode::BOX_THEN_NEAREST,
+          },
+        },
+        {
+          MaterialDefinition::SPECULAR,
+          {
+            "AnimatedCube_BaseColor.png",
+            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+            ImageDimensions(256, 256),
+            SamplingMode::BOX_THEN_NEAREST,
+          },
+        },
+        {
+          MaterialDefinition::SPECULAR_COLOR,
+          {
+            "AnimatedCube_BaseColor.png",
+            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+            ImageDimensions(256, 256),
+            SamplingMode::BOX_THEN_NEAREST,
+          },
+        },
+      },
+    },
+    {
+      nullptr,
+      MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
+        MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION | MaterialDefinition::NORMAL |
+        MaterialDefinition::GLTF_CHANNELS,
+      0,
+      Color::WHITE,
+      1.f,
+      0.f,
+      Vector4(1.000, 0.766, 0.336, 1.0),
+      1.f,
+      1.f,
+      Vector3(0.2, 0.1, 0.0),
+      0.04f,
+      1.0f,
+      Vector3::ONE,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      {
+        {
+          MaterialDefinition::ALBEDO,
+          {
+            "AnimatedCube_BaseColor.png",
+            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+            ImageDimensions(256, 256),
+            SamplingMode::BOX_THEN_NEAREST,
+          },
+        },
+        {
+          MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS | MaterialDefinition::GLTF_CHANNELS,
+          {
+            "AnimatedCube_MetallicRoughness.png",
+            SamplerFlags::Encode(FilterMode::NEAREST_MIPMAP_LINEAR, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::MIRRORED_REPEAT),
+            ImageDimensions(256, 256),
+            SamplingMode::NEAREST,
+          },
+        },
+        {
+          MaterialDefinition::NORMAL,
+          {
+            "AnimatedCube_BaseColor.png",
+            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+            ImageDimensions(256, 256),
+            SamplingMode::BOX_THEN_NEAREST,
+          },
+        },
+        {
+          MaterialDefinition::OCCLUSION,
+          {
+            "AnimatedCube_BaseColor.png",
+            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+            ImageDimensions(256, 256),
+            SamplingMode::BOX_THEN_NEAREST,
+          },
+        },
+        {
+          MaterialDefinition::EMISSIVE,
+          {
+            "AnimatedCube_BaseColor.png",
+            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+            ImageDimensions(256, 256),
+            SamplingMode::BOX_THEN_NEAREST,
+          },
+        },
+      },
+    },
   };
 
   auto iMaterial = materials.begin();
@@ -344,6 +398,7 @@ int UtcDaliGltfLoaderSuccess1(void)
   using Accessor = MeshDefinition::Accessor;
   const MeshDefinition meshGroundTruth[]{
     {
+      nullptr,
       0,
       Geometry::TRIANGLES,
       "AnimatedCube.bin",
@@ -355,6 +410,7 @@ int UtcDaliGltfLoaderSuccess1(void)
       Accessor{Blob{0, 0}, {}},
     },
     {
+      nullptr,
       0,
       Geometry::TRIANGLES,
       "AnimatedCube.bin",
@@ -407,10 +463,11 @@ int UtcDaliGltfLoaderSuccess1(void)
 
 int UtcDaliGltfLoaderSuccess2(void)
 {
-  Context ctx;
+  Context                 ctx;
   ShaderDefinitionFactory sdf;
   sdf.SetResources(ctx.resources);
 
+  InitializeGltfLoader();
   LoadGltfScene(TEST_RESOURCE_DIR "/AnimatedCubeStride.gltf", sdf, ctx.loadResult);
 
   DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
@@ -437,7 +494,8 @@ int UtcDaliGltfLoaderSuccessShort(void)
   TestApplication app;
 
   const std::string resourcePath = TEST_RESOURCE_DIR "/";
-  auto              pathProvider = [resourcePath](ResourceType::Value) {
+  auto              pathProvider = [resourcePath](ResourceType::Value)
+  {
     return resourcePath;
   };
 
@@ -468,6 +526,7 @@ int UtcDaliGltfLoaderSuccessShort(void)
     sdf.SetResources(resources);
 
     printf("%s\n", modelName);
+    InitializeGltfLoader();
     LoadGltfScene(resourcePath + modelName + ".gltf", sdf, ctx.loadResult);
     DALI_TEST_CHECK(ctx.scene.GetNodeCount() > 0);
 
@@ -529,6 +588,7 @@ int UtcDaliGltfLoaderMRendererTest(void)
   sdf.SetResources(ctx.resources);
   auto& resources = ctx.resources;
 
+  InitializeGltfLoader();
   LoadGltfScene(TEST_RESOURCE_DIR "/MRendererTest.gltf", sdf, ctx.loadResult);
 
   auto& scene = ctx.scene;
@@ -583,7 +643,6 @@ int UtcDaliGltfLoaderMRendererTest(void)
   END_TEST;
 }
 
-
 int UtcDaliGltfLoaderAnimationLoadingTest(void)
 {
   Context ctx;
@@ -592,6 +651,7 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
   sdf.SetResources(ctx.resources);
   auto& resources = ctx.resources;
 
+  InitializeGltfLoader();
   LoadGltfScene(TEST_RESOURCE_DIR "/BoxAnimated.gltf", sdf, ctx.loadResult);
 
   auto& scene = ctx.scene;

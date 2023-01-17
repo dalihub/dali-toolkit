@@ -36,7 +36,7 @@ struct UnderlineSpan::Impl
 };
 
 UnderlineSpan::UnderlineSpan()
-: BaseSpan()
+: BaseSpan(Dali::Toolkit::Text::SpanType::Value::UNDERLINE)
 {
   mImpl = std::make_unique<Impl>();
 }

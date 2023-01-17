@@ -92,6 +92,39 @@ namespace TextGeometry
    */
    DALI_TOOLKIT_API Rect<float> GetCharacterBoundingRectangle(TextEditor editor, const uint32_t charIndex);
 
+  /**
+   * @brief Get the character index.
+   * If the text is not yet rendered or the text is empty, -1 is returned.
+   *
+   * @param[in] label text model containing text info.
+   * @param[in] visualX visual x position.
+   * @param[in] visualY visual y position.
+   * @return character index.
+   */
+   DALI_TOOLKIT_API int GetCharacterIndexAtPosition(TextLabel label, float visualX, float visualY);
+
+  /**
+   * @brief Get the character index.
+   * If the text is not yet rendered or the text is empty, -1 is returned.
+   *
+   * @param[in] field text model containing text info.
+   * @param[in] visualX visual x position.
+   * @param[in] visualY visual y position.
+   * @return character index.
+   */
+  DALI_TOOLKIT_API int GetCharacterIndexAtPosition(TextField field, float visualX, float visualY);
+
+  /**
+   * @brief Get the character index.
+   * If the text is not yet rendered or the text is empty, -1 is returned.
+   *
+   * @param[in] editor text model containing text info.
+   * @param[in] visualX visual x position.
+   * @param[in] visualY visual y position.
+   * @return character index.
+   */
+  DALI_TOOLKIT_API int GetCharacterIndexAtPosition(TextEditor editor, float visualX, float visualY);
+
 
 } // namespace TextGeometry
 

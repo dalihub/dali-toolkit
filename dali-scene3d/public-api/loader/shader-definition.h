@@ -56,7 +56,7 @@ struct DALI_SCENE3D_API ShaderDefinition
   ShaderDefinition(const ShaderDefinition& other);
   ShaderDefinition& operator=(const ShaderDefinition& other);
 
-  ShaderDefinition(ShaderDefinition&&) = default;
+  ShaderDefinition(ShaderDefinition&&)            = default;
   ShaderDefinition& operator=(ShaderDefinition&&) = default;
 
   /*
@@ -75,7 +75,8 @@ struct DALI_SCENE3D_API ShaderDefinition
   Shader Load(RawData&& raw) const;
 
 public: // DATA
-  RendererState::Type mRendererState = RendererState::NONE;
+  std::shared_ptr<RawData> mRawData;
+  RendererState::Type      mRendererState = RendererState::NONE;
 
   std::string              mVertexShaderPath;
   std::string              mFragmentShaderPath;
@@ -89,4 +90,4 @@ public: // DATA
 } // namespace Scene3D
 } // namespace Dali
 
-#endif //DALI_SCENE3D_LOADER_SHADER_DEFINITION_H
+#endif // DALI_SCENE3D_LOADER_SHADER_DEFINITION_H

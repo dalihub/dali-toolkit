@@ -84,6 +84,17 @@ float GetLineTop(const Vector<LineRun>& lines, const LineRun& lineRun);
 Rect<> GetCharacterBoundingRect(ModelPtr textModel, const uint32_t charIndex);
 
 /**
+  * @brief Get the character index.
+  * If the text is not yet rendered or the text is empty, -1 is returned.
+  *
+  * @param[in] textModel text model containing text info.
+  * @param[in] visualX visual x position.
+  * @param[in] visualY visual y position.
+  * @return character index.
+  */
+int GetCharIndexAtPosition(ModelPtr textModel, float visualX, float visualY);
+
+/**
   * @brief Get the left point of the character (x).
   *
   * @param[in] glyph the requested character glyph.

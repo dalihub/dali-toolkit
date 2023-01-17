@@ -370,7 +370,10 @@ struct Controller::Impl
     mModel = Model::New();
 
     mFontClient = TextAbstraction::FontClient::Get();
-    mClipboard  = Clipboard::Get();
+    if(mEditableControlInterface != nullptr && Clipboard::IsAvailable())
+    {
+      mClipboard = Clipboard::Get();
+    }
 
     mView.SetVisualModel(mModel->mVisualModel);
     mView.SetLogicalModel(mModel->mLogicalModel);
@@ -551,15 +554,25 @@ struct Controller::Impl
    */
   void GetText(CharacterIndex index, std::string& text) const;
 
+  bool EnsureClipboardCreated()
+  {
+    if(!mClipboard)
+    {
+      mClipboard = Clipboard::Get();
+    }
+
+    return mClipboard != nullptr ? true : false;
+  }
+
   bool IsClipboardEmpty()
   {
-    bool result(mClipboard && mClipboard.NumberOfItems());
+    bool result(Clipboard::IsAvailable() && EnsureClipboardCreated() && mClipboard.NumberOfItems());
     return !result; // If NumberOfItems greater than 0, return false
   }
 
   bool IsClipboardVisible()
   {
-    bool result(mClipboard && mClipboard.IsVisible());
+    bool result(Clipboard::IsAvailable() && EnsureClipboardCreated() && mClipboard.IsVisible());
     return result;
   }
 

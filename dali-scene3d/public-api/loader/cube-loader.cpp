@@ -93,7 +93,6 @@ namespace Loader
 {
 bool LoadCubeData(const std::string& path, CubeData& cubedata)
 {
-  Texture cubeTexture;
   // Diffuse Cube Map
   if(path.empty())
   {

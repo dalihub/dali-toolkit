@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_INTERNAL_SCENE_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/window.h>
@@ -31,8 +32,9 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/common/image-based-light-observer.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
+#include <dali-scene3d/internal/common/environment-map-load-task.h>
+#include <dali-scene3d/internal/common/image-based-light-observer.h>
 
 namespace Dali
 {
@@ -241,6 +243,36 @@ private:
    */
   void RotateCamera();
 
+  /**
+   * @brief Asynchronously skybox (Equirectangular) loading finished.
+   */
+  void OnSkyboxEquirectangularLoadComplete(uint32_t loadedTaskId, PixelData pixelData);
+
+  /**
+   * @brief Asynchronously skybox loading finished.
+   */
+  void OnSkyboxLoadComplete();
+
+  /**
+   * @brief Asynchronously ibl diffusel image loading finished.
+   */
+  void OnIblDiffuseLoadComplete();
+
+  /**
+   * @brief Asynchronously ibl specular image loading finished.
+   */
+  void OnIblSpecularLoadComplete();
+
+  /**
+   * @brief Asynchronously ibl loading finished.
+   */
+  void OnIblLoadComplete();
+
+  /**
+   * @brief Notify the changes of Ibl textures to the child items.
+   */
+  void NotifyImageBasedLightTextureChange();
+
 private:
   Toolkit::Visual::Base mVisual;
 
@@ -260,12 +292,28 @@ private:
   Quaternion                                               mSkyboxOrientation;
   float                                                    mSkyboxIntensity{1.0f};
 
-  Dali::Texture mSpecularTexture;
-  Dali::Texture mDiffuseTexture;
-  float         mIblScaleFactor{1.0f};
-  bool          mUseFrameBuffer{false};
-  bool          mIBLResourceReady{true};
-  bool          mSkyboxResourceReady{true};
+  // Asynchronous Loading.
+  EnvironmentMapLoadTaskPtr       mSkyboxLoadTask;
+  EnvironmentMapLoadTaskPtr       mIblDiffuseLoadTask;
+  EnvironmentMapLoadTaskPtr       mIblSpecularLoadTask;
+  std::string                     mSkyboxUrl;
+  std::string                     mDiffuseIblUrl;
+  std::string                     mSpecularIblUrl;
+  Dali::Toolkit::AsyncImageLoader mSkyboxImageLoader;
+  uint32_t                        mSkyboxImageId{0u};
+
+  Scene3D::SceneView::SkyboxType mSkyboxEnvironmentMapType{Scene3D::SceneView::SkyboxType::CUBEMAP};
+  Dali::Texture                  mSkyboxTexture;
+  Dali::Texture                  mDiffuseTexture;
+  Dali::Texture                  mSpecularTexture;
+  float                          mIblScaleFactor{1.0f};
+  bool                           mUseFrameBuffer{false};
+  bool                           mSkyboxResourceReady{true};
+  bool                           mIblDiffuseResourceReady{true};
+  bool                           mIblSpecularResourceReady{true};
+  bool                           mSkyboxDirty{false};
+  bool                           mIblDiffuseDirty{false};
+  bool                           mIblSpecularDirty{false};
 
   // TODO : Light Source
 };

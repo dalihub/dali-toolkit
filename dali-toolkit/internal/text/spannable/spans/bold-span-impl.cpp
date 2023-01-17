@@ -30,7 +30,7 @@ namespace Text
 namespace Internal
 {
 BoldSpan::BoldSpan()
-: BaseSpan()
+: BaseSpan(Dali::Toolkit::Text::SpanType::Value::BOLD)
 {
 }
 

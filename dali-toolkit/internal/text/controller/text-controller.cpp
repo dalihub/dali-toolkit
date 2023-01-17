@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1434,6 +1434,11 @@ Rect<float> Controller::GetCharacterBoundingRectangle(const uint32_t charIndex)
   return GetCharacterBoundingRect(mImpl->mModel, charIndex);
 }
 
+int Controller::GetCharacterIndexAtPosition(float visualX, float visualY)
+{
+  return GetCharIndexAtPosition(mImpl->mModel, visualX, visualY);
+}
+
 Rect<> Controller::GetTextBoundingRectangle(CharacterIndex startIndex, CharacterIndex endIndex)
 {
   Vector<Vector2> sizeList;
@@ -1730,7 +1735,6 @@ Controller::Controller(ControlInterface*           controlInterface,
 
 Controller::~Controller()
 {
-  delete mImpl;
 }
 
 } // namespace Dali::Toolkit::Text

@@ -45,6 +45,11 @@ Vector<Vector2> GetTextPosition(TextLabel textLabel, const uint32_t startIndex, 
   return GetImpl(textLabel).GetTextPosition(startIndex, endIndex);
 }
 
+Rect<> GetTextBoundingRectangle(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex)
+{
+  return GetImpl(textLabel).GetTextBoundingRectangle(startIndex, endIndex);
+}
+
 } // namespace DevelTextLabel
 
 } // namespace Toolkit
