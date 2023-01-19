@@ -1085,6 +1085,12 @@ void TextureManager::ProcessQueuedTextures()
       {
         element.mObserver->LoadComplete(true, textureInfo.pixelBuffer, textureInfo.url, textureInfo.preMultiplied);
       }
+      else if(textureInfo.loadState == LoadState::LOADING)
+      {
+        // Note : LOADING state texture cannot be queue.
+        // This case be occured when same texture id are queue in mLoadQueue.
+        ObserveTexture( textureInfo, element.mObserver );
+      }
       else
       {
         LoadTexture(textureInfo, element.mObserver);
@@ -1249,8 +1255,16 @@ void TextureManager::PostLoad(TextureInfo& textureInfo, std::vector<Devel::Pixel
   else
   {
     textureInfo.loadState = LoadState::LOAD_FAILED;
-    CheckForWaitingTexture(textureInfo);
-    NotifyObservers(textureInfo, false);
+    if(textureInfo.storageType == StorageType::KEEP_PIXEL_BUFFER || textureInfo.storageType == StorageType::KEEP_TEXTURE)
+    {
+      // Check if there was another texture waiting for this load to complete
+      // (e.g. if this was an image mask, and its load is on a different thread)
+      CheckForWaitingTexture(textureInfo);
+    }
+    else
+    {
+      NotifyObservers(textureInfo, false);
+    }
   }
 }
 
@@ -1266,6 +1280,12 @@ void TextureManager::CheckForWaitingTexture(TextureInfo& maskTextureInfo)
   // Search the cache, checking if any texture has this texture id as a
   // maskTextureId:
   const unsigned int size = mTextureInfoContainer.size();
+
+  // Keep notify observer required textureIds.
+  // Note : NotifyObservers can change mTextureCacheManager cache struct. We should check id's validation before notify.
+  std::vector<TextureId> notifySuccessRequiredTextureIds;
+  std::vector<TextureId> notifyFailedRequiredTextureIds;
+
   for(unsigned int cacheIndex = 0; cacheIndex < size; ++cacheIndex)
   {
     if(mTextureInfoContainer[cacheIndex].maskTextureId == maskTextureInfo.textureId &&
@@ -1292,18 +1312,59 @@ void TextureManager::CheckForWaitingTexture(TextureInfo& maskTextureInfo)
             Texture maskTexture = maskTextureInfo.textureSet.GetTexture(0u);
             textureInfo.textureSet.SetTexture(1u, maskTexture);
           }
-          // notify mask texture set.
-          NotifyObservers(textureInfo, true);
+
+          // Increase reference counts for notify required textureId.
+          // Now we can assume that we don't remove & re-assign this textureId
+          // during NotifyObserver signal emit.
+          textureInfo.referenceCount++;
+
+          notifySuccessRequiredTextureIds.push_back(textureInfo.textureId);
         }
       }
-      else
+      else // maskTextureInfo.loadState == LoadState::LOAD_FAILED
       {
         // for the load fail.
         textureInfo.pixelBuffer.Reset();
         textureInfo.loadState = LoadState::LOAD_FAILED;
-        NotifyObservers(textureInfo, false);
+
+        // Increase reference counts for notify required textureId.
+        // Now we can assume that we don't remove & re-assign this textureId
+        // during NotifyObserver signal emit.
+        textureInfo.referenceCount++;
+
+        notifyFailedRequiredTextureIds.push_back(textureInfo.textureId);
       }
     }
+  }
+
+  // Notify textures are masked
+  for(const auto textureId : notifySuccessRequiredTextureIds)
+  {
+    int textureCacheIndex = GetCacheIndexFromId(textureId);
+    if(textureCacheIndex != INVALID_CACHE_INDEX)
+    {
+      TextureInfo& textureInfo(mTextureInfoContainer[textureCacheIndex]);
+      NotifyObservers(textureInfo, true);
+    }
+  }
+  for(const auto textureId : notifyFailedRequiredTextureIds)
+  {
+    int textureCacheIndex = GetCacheIndexFromId(textureId);
+    if(textureCacheIndex != INVALID_CACHE_INDEX)
+    {
+      TextureInfo& textureInfo(mTextureInfoContainer[textureCacheIndex]);
+      NotifyObservers(textureInfo, false);
+    }
+  }
+
+  // Decrease reference count
+  for(const auto textureId : notifySuccessRequiredTextureIds)
+  {
+    Remove(textureId, nullptr);
+  }
+  for(const auto textureId : notifyFailedRequiredTextureIds)
+  {
+    Remove(textureId, nullptr);
   }
 }
 
