@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@
 #include <vector>
 
 // GLES3+ is required for this to work!
-#include <GLES3/gl3.h>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
+#include <GLES3/gl3.h>
 
 #include <unistd.h>
 #include <any>
@@ -49,8 +49,8 @@ namespace
 /**
  * Vertices of quad to display when using offscreen rendering
  */
+// clang-format off
 constexpr float QUAD_VERTS[] = {
-  // positions          // colors           // texture coords
   1.0f,  1.0f,
   1.0f, -1.0f,
   -1.0f, -1.0f,
@@ -69,13 +69,13 @@ constexpr unsigned short QUAD_INDICES[] = {
  * UV coords of quad for offscreen rendering
  */
 constexpr float QUAD_UV[] = {
-  // positions          // colors           // texture coords
   1.0f, 1.0f,   // top right
   1.0f, 0.0f,   // bottom right
   0.0f, 0.0f,   // bottom left
   0.0f, 1.0f    // top left
 };
-}
+// clang-format on
+} // namespace
 
 namespace Dali::Internal
 {
@@ -92,7 +92,7 @@ struct DrawableViewNativeRenderer::Impl
   };
 
   // Queues management
-  bool DequeueTextureDrawBuffer( uint32_t& outIndex )
+  bool DequeueTextureDrawBuffer(uint32_t& outIndex)
   {
     std::scoped_lock<std::recursive_mutex> lock(mTextureQueueMutex);
     if(mTextureDrawQueue.empty())
@@ -242,12 +242,11 @@ struct DrawableViewNativeRenderer::Impl
       fb.framebufferId = offscreenFramebuffer;
 
       [[maybe_unused]] auto result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-      DALI_ASSERT_ALWAYS( result == GL_FRAMEBUFFER_COMPLETE && "Framebuffer incomplete!");
+      DALI_ASSERT_ALWAYS(result == GL_FRAMEBUFFER_COMPLETE && "Framebuffer incomplete!");
       return offscreenFramebuffer;
     }
     return 0u;
   }
-
 
   /**
    * Constructor
@@ -274,17 +273,20 @@ struct DrawableViewNativeRenderer::Impl
    */
   void InitializeThread()
   {
+    // Make mRunning true first
+    // Terminate() may be called before StartThread()
+    mRunning = true;
+
     mThread = std::make_unique<std::thread>(&Impl::StartThread, this);
   }
 
-  void PushRenderCallbackInputData( const Dali::RenderCallbackInput& renderCallbackInput )
+  void PushRenderCallbackInputData(const Dali::RenderCallbackInput& renderCallbackInput)
   {
-
     std::scoped_lock<std::mutex> lock(mRenderCallbackInputDataMutex);
     mRenderCallbackInputData = renderCallbackInput;
   }
 
-  void PopRenderCallbackInputData( Dali::RenderCallbackInput& renderCallbackInput )
+  void PopRenderCallbackInputData(Dali::RenderCallbackInput& renderCallbackInput)
   {
     std::scoped_lock<std::mutex> lock(mRenderCallbackInputDataMutex);
     renderCallbackInput = mRenderCallbackInputData;
@@ -303,8 +305,6 @@ struct DrawableViewNativeRenderer::Impl
    */
   void StartThread()
   {
-    mRunning = true;
-
     // We need to acquire shared context, while this is not done
     // it's necessary to wait for context to be bound.
     while(mRunning && !mEglContextBound)
@@ -352,8 +352,8 @@ struct DrawableViewNativeRenderer::Impl
         GL(glDeleteTextures(1, &fb.textureId))
         fb.textureId = 0u;
       }
-      fb.textureId = CreateOffscreenTexture( mWidth, mHeight );
-      fb.framebufferId = CreateFramebuffer( index, mWidth, mHeight );
+      fb.textureId     = CreateOffscreenTexture(mWidth, mHeight);
+      fb.framebufferId = CreateFramebuffer(index, mWidth, mHeight);
       index++;
     }
   }
@@ -371,10 +371,10 @@ struct DrawableViewNativeRenderer::Impl
 
       Dali::RenderCallbackInput input;
 
-      PopRenderCallbackInputData( input );
+      PopRenderCallbackInputData(input);
 
       uint32_t index{0u};
-      auto result = DequeueTextureDrawBuffer(index);
+      auto     result = DequeueTextureDrawBuffer(index);
       if(!result)
       {
         continue;
@@ -383,7 +383,6 @@ struct DrawableViewNativeRenderer::Impl
       auto& fb = mFramebufferTexture[index];
       GL(glBindFramebuffer(GL_FRAMEBUFFER, fb.framebufferId))
       GL(glClear(0));
-
 
       // Invoke callback
       if(mOnRenderCallback)
@@ -407,16 +406,16 @@ struct DrawableViewNativeRenderer::Impl
     }
   }
 
-  void Resize(uint32_t width, uint32_t height )
+  void Resize(uint32_t width, uint32_t height)
   {
-    mWidth = width;
-    mHeight = height;
+    mWidth         = width;
+    mHeight        = height;
     mResizeRequest = true;
   }
 
-  uint32_t mWidth {0u};
-  uint32_t mHeight {0u};
-  std::atomic_bool mResizeRequest { false };
+  uint32_t         mWidth{0u};
+  uint32_t         mHeight{0u};
+  std::atomic_bool mResizeRequest{false};
 
   /**
    * Clones current EGL context, this function must be called from the render callback
@@ -452,7 +451,7 @@ struct DrawableViewNativeRenderer::Impl
   }
 
   // Pre-, Post- functions are being called from the callbacks
-  void GlViewPreInit( const Dali::RenderCallbackInput& input )
+  void GlViewPreInit(const Dali::RenderCallbackInput& input)
   {
     // This runs on DALi RenderThread!!!
 
@@ -460,7 +459,7 @@ struct DrawableViewNativeRenderer::Impl
     if(mThread && !mEglContextBound)
     {
       // Store the shared context just once
-      if(!mEglSharedContext )
+      if(!mEglSharedContext)
       {
         // Store the shared context returned by the drawable callback
         mEglSharedContext = std::any_cast<EGLContext>(input.eglContext);
@@ -549,7 +548,7 @@ struct DrawableViewNativeRenderer::Impl
           {
             glGetShaderInfoLog(shader, infoLen, NULL, logBuffer);
 
-            DALI_ASSERT_ALWAYS( true && logBuffer);
+            DALI_ASSERT_ALWAYS(true && logBuffer);
 
             free(logBuffer);
             logBuffer = NULL;
@@ -584,9 +583,9 @@ struct DrawableViewNativeRenderer::Impl
       "    gl_FragColor = texture2D(tex, vTexCoords);\n"
       "}\n";
 
-    mBlitProgram = CreateProgram(glVertexShader, glFragmentShader);
-    mBlitVertexLocation       = glGetAttribLocation(mBlitProgram, "vertexPosition");
-    mBlitTexCoord = glGetAttribLocation(mBlitProgram, "texCoords");
+    mBlitProgram        = CreateProgram(glVertexShader, glFragmentShader);
+    mBlitVertexLocation = glGetAttribLocation(mBlitProgram, "vertexPosition");
+    mBlitTexCoord       = glGetAttribLocation(mBlitProgram, "texCoords");
   }
 
   GLuint mBlitProgram{0u};
@@ -607,7 +606,7 @@ struct DrawableViewNativeRenderer::Impl
       mTextureDrawQueue.push_back(i);
 
       // Create framebuffers
-      CreateFramebuffer( i, mWidth, mHeight);
+      CreateFramebuffer(i, mWidth, mHeight);
     }
   }
 
@@ -680,7 +679,7 @@ struct DrawableViewNativeRenderer::Impl
 
     // Deqeueue texture, there should be always something waiting to be drawn, if not, ignore
     FrameBufferTexture fb;
-    auto textureBufferIndex = DequeueTextureReadBuffer(fb);
+    auto               textureBufferIndex = DequeueTextureReadBuffer(fb);
 
     // Do nothing if frame not ready
     if(textureBufferIndex < 0)
@@ -700,7 +699,7 @@ struct DrawableViewNativeRenderer::Impl
       if(mLastTextureBufferIndex >= 0)
       {
         // return it to the queue
-        EnqueueTextureDrawBuffer( mLastTextureBufferIndex );
+        EnqueueTextureDrawBuffer(mLastTextureBufferIndex);
       }
     }
 
@@ -717,7 +716,7 @@ struct DrawableViewNativeRenderer::Impl
     }
     GL(glBindTexture(GL_TEXTURE_2D, mFramebufferTexture[textureBufferIndex].textureId));
 
-    GL(glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, QUAD_INDICES))
+    GL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, QUAD_INDICES))
 
     mLastTextureBufferIndex = textureBufferIndex;
   }
@@ -747,14 +746,14 @@ struct DrawableViewNativeRenderer::Impl
   std::deque<uint32_t> mTextureReadQueue;
 
   // Mutex guarding the queues reads/writes
-  std::recursive_mutex mTextureQueueMutex;
-  std::unique_ptr<std::thread> mThread; ///< Thread for parallel mode
-  bool                         mRunning{false}; ///< Thread running flag
+  std::recursive_mutex         mTextureQueueMutex;
+  std::unique_ptr<std::thread> mThread;              ///< Thread for parallel mode
+  bool                         mRunning{false};      ///< Thread running flag
   EGLContext                   mEglContext{nullptr}; ///< EGL context associated with the thread
   EGLContext                   mEglSharedContext{nullptr};
 
-  EGLDisplay       mEglDisplay{nullptr}; ///< Current EGL display
-  std::atomic_bool mEglContextBound{false}; ///< Flag indicating whether EGL context is bound
+  EGLDisplay       mEglDisplay{nullptr};         ///< Current EGL display
+  std::atomic_bool mEglContextBound{false};      ///< Flag indicating whether EGL context is bound
   EGLSurface       mDrawSurface{EGL_NO_SURFACE}; ///< Current EGL draw surface
   EGLSurface       mReadSurface{EGL_NO_SURFACE}; ///< Current EGL read surface
 
@@ -764,9 +763,9 @@ struct DrawableViewNativeRenderer::Impl
   std::unique_ptr<CallbackBase> mOnTerminateCallback{nullptr};
 
   int32_t mLastTextureBufferIndex{-1};
-  bool mBlitStateDone{false};
+  bool    mBlitStateDone{false};
 
-  std::mutex mRenderCallbackInputDataMutex{};
+  std::mutex                mRenderCallbackInputDataMutex{};
   Dali::RenderCallbackInput mRenderCallbackInputData{};
 
   NativeRendererCreateInfo mCreateInfo{};
@@ -810,7 +809,7 @@ void DrawableViewNativeRenderer::Resize(uint32_t width, uint32_t height)
   mImpl->Resize(width, height);
 }
 
-void DrawableViewNativeRenderer::PushRenderCallbackInputData( const Dali::RenderCallbackInput& renderCallbackInput )
+void DrawableViewNativeRenderer::PushRenderCallbackInputData(const Dali::RenderCallbackInput& renderCallbackInput)
 {
   mImpl->PushRenderCallbackInputData(renderCallbackInput);
 }
