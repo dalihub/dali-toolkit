@@ -22,7 +22,9 @@ SET(TC_SOURCES
   utc-Dali-SceneView.cpp
   utc-Dali-MatrixStack.cpp
   utc-Dali-MeshDefinition.cpp
+  utc-Dali-NavigationMesh.cpp
   utc-Dali-NodeDefinition.cpp
+  utc-Dali-PathFinding.cpp
   utc-Dali-RendererState.cpp
   utc-Dali-ResourceBundle.cpp
   utc-Dali-SceneDefinition.cpp
