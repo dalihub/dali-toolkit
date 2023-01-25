@@ -70,7 +70,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::CharacterSpacingSpan::GetCharacterSpacing()
    */
-  const float GetCharacterSpacing() const;
+  float GetCharacterSpacing() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::CharacterSpacingSpan::IsCharacterSpacingDefined()

@@ -72,7 +72,7 @@ public:
    * @copydoc Dali::Toolkit::Text::SpanType::Value GetSpanType
    */
 
-  const Dali::Toolkit::Text::SpanType::Value GetSpanType() const;
+  Dali::Toolkit::Text::SpanType::Value GetSpanType() const;
 
 public: //Methods for internal only
   /**

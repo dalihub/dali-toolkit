@@ -64,7 +64,7 @@ bool FontSpan::IsFamilyNameDefined() const
   return GetImplementation(*this).IsFamilyNameDefined();
 }
 
-const Dali::TextAbstraction::FontWeight::Type FontSpan::GetWeight() const
+Dali::TextAbstraction::FontWeight::Type FontSpan::GetWeight() const
 {
   return GetImplementation(*this).GetWeight();
 }
@@ -74,7 +74,7 @@ bool FontSpan::IsWeightDefined() const
   return GetImplementation(*this).IsWeightDefined();
 }
 
-const Dali::TextAbstraction::FontWidth::Type FontSpan::GetWidth() const
+Dali::TextAbstraction::FontWidth::Type FontSpan::GetWidth() const
 {
   return GetImplementation(*this).GetWidth();
 }
@@ -84,7 +84,7 @@ bool FontSpan::IsWidthDefined() const
   return GetImplementation(*this).IsWidthDefined();
 }
 
-const Dali::TextAbstraction::FontSlant::Type FontSpan::GetSlant() const
+Dali::TextAbstraction::FontSlant::Type FontSpan::GetSlant() const
 {
   return GetImplementation(*this).GetSlant();
 }
@@ -94,7 +94,7 @@ bool FontSpan::IsSlantDefined() const
   return GetImplementation(*this).IsSlantDefined();
 }
 
-const float FontSpan::GetSize() const
+float FontSpan::GetSize() const
 {
   return GetImplementation(*this).GetSize();
 }

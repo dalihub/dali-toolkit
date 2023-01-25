@@ -70,7 +70,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::ForegroundColorSpan::GetForegroundColor()
    */
-  const Vector4 GetForegroundColor() const;
+  Vector4 GetForegroundColor() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::ForegroundColorSpan::IsForegroundColorDefined()

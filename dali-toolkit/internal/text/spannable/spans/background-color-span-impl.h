@@ -77,7 +77,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::BackgroundColorSpan::GetBackgroundColor()
    */
-  const Vector4 GetBackgroundColor() const;
+  Vector4 GetBackgroundColor() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::BackgroundColorSpan::IsBackgroundColorDefined()

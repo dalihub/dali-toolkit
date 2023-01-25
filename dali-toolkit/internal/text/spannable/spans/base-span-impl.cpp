@@ -41,7 +41,7 @@ BaseSpan::~BaseSpan()
 {
 }
 
-const Dali::Toolkit::Text::SpanType::Value BaseSpan::GetSpanType() const
+Dali::Toolkit::Text::SpanType::Value BaseSpan::GetSpanType() const
 {
   return mImpl->mSpanTypeValue;
 }

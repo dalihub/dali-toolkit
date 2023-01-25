@@ -94,7 +94,7 @@ Dali::Toolkit::Text::UnderlineSpan UnderlineSpan::NewDouble(Vector4 color, float
 
 //Methods
 
-const Text::Underline::Type UnderlineSpan::GetType() const
+Text::Underline::Type UnderlineSpan::GetType() const
 {
   return mImpl->mUnderlineProperties.type;
 }
@@ -110,7 +110,7 @@ void UnderlineSpan::SetType(const Text::Underline::Type& type)
   mImpl->mUnderlineProperties.typeDefined = true;
 }
 
-const Vector4 UnderlineSpan::GetColor() const
+Vector4 UnderlineSpan::GetColor() const
 {
   return mImpl->mUnderlineProperties.color;
 }
@@ -126,7 +126,7 @@ void UnderlineSpan::SetColor(const Vector4& color)
   mImpl->mUnderlineProperties.colorDefined = true;
 }
 
-const float UnderlineSpan::GetHeight() const
+float UnderlineSpan::GetHeight() const
 {
   return mImpl->mUnderlineProperties.height;
 }
@@ -142,7 +142,7 @@ void UnderlineSpan::SetHeight(const float& height)
   mImpl->mUnderlineProperties.heightDefined = true;
 }
 
-const float UnderlineSpan::GetDashGap() const
+float UnderlineSpan::GetDashGap() const
 {
   return mImpl->mUnderlineProperties.dashGap;
 }
@@ -158,7 +158,7 @@ void UnderlineSpan::SetDashGap(const float& dashGap)
   mImpl->mUnderlineProperties.dashGapDefined = true;
 }
 
-const float UnderlineSpan::GetDashWidth() const
+float UnderlineSpan::GetDashWidth() const
 {
   return mImpl->mUnderlineProperties.dashWidth;
 }

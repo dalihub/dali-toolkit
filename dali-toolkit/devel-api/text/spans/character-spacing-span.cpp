@@ -50,7 +50,7 @@ CharacterSpacingSpan& CharacterSpacingSpan::operator=(CharacterSpacingSpan&& rhs
 CharacterSpacingSpan::~CharacterSpacingSpan() = default;
 
 //Methods
-const float CharacterSpacingSpan::GetCharacterSpacing() const
+float CharacterSpacingSpan::GetCharacterSpacing() const
 {
   return GetImplementation(*this).GetCharacterSpacing();
 }

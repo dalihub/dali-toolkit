@@ -113,7 +113,7 @@ public: //Methods
    *
    * @return A color value.
    */
-  const Vector4 GetColor() const;
+  Vector4 GetColor() const;
 
   /**
    * @brief Retrieve whether the color is defined.
@@ -127,7 +127,7 @@ public: //Methods
    *
    * @return A height value.
    */
-  const float GetHeight() const;
+  float GetHeight() const;
 
   /**
    * @brief Retrieve whether the height is defined.

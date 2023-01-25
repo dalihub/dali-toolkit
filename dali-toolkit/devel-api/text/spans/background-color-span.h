@@ -101,7 +101,7 @@ public: //Methods
    *
    * @return A background-color value.
    */
-  const Vector4 GetBackgroundColor() const;
+  Vector4 GetBackgroundColor() const;
 
   /**
    * @brief Retrieve whether the background-color is defined.

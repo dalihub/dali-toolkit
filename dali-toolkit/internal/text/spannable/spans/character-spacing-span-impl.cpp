@@ -57,7 +57,7 @@ Dali::Toolkit::Text::CharacterSpacingSpan CharacterSpacingSpan::New(const float&
 }
 
 //Methods
-const float CharacterSpacingSpan::GetCharacterSpacing() const
+float CharacterSpacingSpan::GetCharacterSpacing() const
 {
   return mImpl->mCharacterSpacing;
 }

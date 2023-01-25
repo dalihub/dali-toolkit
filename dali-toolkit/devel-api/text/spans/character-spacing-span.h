@@ -100,7 +100,7 @@ public: //Methods
    *
    * @return A CharacterSpacing value.
    */
-  const float GetCharacterSpacing() const;
+  float GetCharacterSpacing() const;
 
   /**
    * @brief Retrieve whether the CharacterSpacing is defined.

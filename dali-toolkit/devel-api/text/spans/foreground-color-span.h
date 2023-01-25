@@ -101,7 +101,7 @@ public: //Methods
    *
    * @return A foreground-color value.
    */
-  const Vector4 GetForegroundColor() const;
+  Vector4 GetForegroundColor() const;
 
   /**
    * @brief Retrieve whether the foreground-color is defined.

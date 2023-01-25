@@ -103,7 +103,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::UnderlineSpan::GetType()
    */
-  const Text::Underline::Type GetType() const;
+  Text::Underline::Type GetType() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::UnderlineSpan::IsTypeDefined()
@@ -113,7 +113,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::UnderlineSpan::GetColor()
    */
-  const Vector4 GetColor() const;
+  Vector4 GetColor() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::UnderlineSpan::IsColorDefined()
@@ -123,7 +123,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::UnderlineSpan::GetHeight()
    */
-  const float GetHeight() const;
+  float GetHeight() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::UnderlineSpan::IsHeightDefined()
@@ -133,7 +133,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::UnderlineSpan::GetDashGap()
    */
-  const float GetDashGap() const;
+  float GetDashGap() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::UnderlineSpan::IsDashGapDefined()
@@ -143,7 +143,7 @@ public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::UnderlineSpan::GetDashWidth()
    */
-  const float GetDashWidth() const;
+  float GetDashWidth() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::UnderlineSpan::IsDashWidthDefined()

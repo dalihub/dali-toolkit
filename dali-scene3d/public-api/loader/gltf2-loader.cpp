@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -426,9 +426,9 @@ SamplerFlags::Type ConvertSampler(const gt::Ref<gt::Sampler>& s)
 {
   if(s)
   {
-    return ((s->mMinFilter < gt::Filter::NEAREST_MIPMAP_NEAREST) ? (s->mMinFilter - gt::Filter::NEAREST) : ((s->mMinFilter - gt::Filter::NEAREST_MIPMAP_NEAREST) + 2)) | 
-           ((s->mMagFilter - gt::Filter::NEAREST) << SamplerFlags::FILTER_MAG_SHIFT) | 
-           (ConvertWrapMode(s->mWrapS) << SamplerFlags::WRAP_S_SHIFT) | 
+    return ((s->mMinFilter < gt::Filter::NEAREST_MIPMAP_NEAREST) ? (s->mMinFilter - gt::Filter::NEAREST) : ((s->mMinFilter - gt::Filter::NEAREST_MIPMAP_NEAREST) + 2)) |
+           ((s->mMagFilter - gt::Filter::NEAREST) << SamplerFlags::FILTER_MAG_SHIFT) |
+           (ConvertWrapMode(s->mWrapS) << SamplerFlags::WRAP_S_SHIFT) |
            (ConvertWrapMode(s->mWrapT) << SamplerFlags::WRAP_T_SHIFT);
   }
   else
@@ -670,7 +670,8 @@ void ConvertMeshes(const gt::Document& doc, ConversionContext& context)
           if(iFind->first == gt::Attribute::JOINTS_0)
           {
             meshDefinition.mFlags |= (iFind->second->mComponentType == gt::Component::UNSIGNED_SHORT) * MeshDefinition::U16_JOINT_IDS;
-            DALI_ASSERT_DEBUG(MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_JOINT_IDS) || iFind->second->mComponentType == gt::Component::FLOAT);
+            meshDefinition.mFlags |= (iFind->second->mComponentType == gt::Component::UNSIGNED_BYTE) * MeshDefinition::U8_JOINT_IDS;
+            DALI_ASSERT_DEBUG(MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_JOINT_IDS) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_JOINT_IDS) || iFind->second->mComponentType == gt::Component::FLOAT);
           }
         }
         else if(needNormalsTangents)
@@ -954,7 +955,7 @@ float LoadKeyFrames(const std::string& path, const gt::Animation::Channel& chann
   Vector<float> inputDataBuffer;
   Vector<T>     outputDataBuffer;
 
-  const float duration = LoadDataFromAccessors<T>(path, input, output, inputDataBuffer, outputDataBuffer);
+  const float duration = std::max(LoadDataFromAccessors<T>(path, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
 
   for(uint32_t i = 0; i < input.mCount; ++i)
   {
@@ -1030,8 +1031,8 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& context)
     Index propertyIndex = 0u;
     for(const auto& channel : animation.mChannels)
     {
-      Index nodeIndex    = context.mNodeIndices.GetRuntimeId(channel.mTarget.mNode.GetIndex());
-      float duration = 0.f;
+      Index nodeIndex = context.mNodeIndices.GetRuntimeId(channel.mTarget.mNode.GetIndex());
+      float duration  = 0.f;
 
       switch(channel.mTarget.mPath)
       {

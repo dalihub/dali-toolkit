@@ -63,7 +63,7 @@ Dali::Toolkit::Text::StrikethroughSpan StrikethroughSpan::New(Vector4 color, flo
 }
 
 //Methods
-const Vector4 StrikethroughSpan::GetColor() const
+Vector4 StrikethroughSpan::GetColor() const
 {
   return mImpl->mStrikethroughProperties.color;
 }
@@ -79,7 +79,7 @@ void StrikethroughSpan::SetColor(const Vector4& color)
   mImpl->mStrikethroughProperties.colorDefined = true;
 }
 
-const float StrikethroughSpan::GetHeight() const
+float StrikethroughSpan::GetHeight() const
 {
   return mImpl->mStrikethroughProperties.height;
 }
