@@ -34,7 +34,7 @@ OPTION(ENABLE_LINK_TEST          "Enable the link test" ON)
 OPTION(INSTALL_DOXYGEN_DOC       "Install doxygen doc" ON)
 OPTION(CONFIGURE_AUTOMATED_TESTS "Configure automated tests" ON)
 OPTION(USE_DEFAULT_RESOURCE_DIR  "Whether to use the default resource folders. Otherwise set environment variables for DALI_IMAGE_DIR, DALI_SOUND_DIR, DALI_STYLE_DIR, DALI_STYLE_IMAGE_DIR and DALI_DATA_READ_ONLY_DIR" ON)
-OPTION(BUILD_SCENE3D        "Whether to build dali-scene3d." ON)
+OPTION(BUILD_SCENE3D             "Whether to build dali-scene3d." ON)
 
 IF( ENABLE_PKG_CONFIGURE )
   FIND_PACKAGE( PkgConfig REQUIRED )
@@ -565,6 +565,17 @@ IF( DOXYGEN_FOUND )
   SET( doxygenEnabled ON )
   # 'prefix' is used by doxygen in-files.
   SET( prefix ${PREFIX} )
+
+  # Some doxygen properties not allowed at low version.
+  # We need to get doxygen version, and block in doxygen in-files.
+  EXECUTE_PROCESS( COMMAND bash -c "${DOXYGEN_EXECUTABLE} --version" OUTPUT_VARIABLE DOXYGEN_VERSION )
+
+  IF(${DOXYGEN_VERSION} VERSION_LESS "1.9.1")
+    SET( DOXYGEN_VERSION_LESS_1_9_1_BLOCKED "# ")
+  ELSE()
+    SET( DOXYGEN_VERSION_LESS_1_9_1_BLOCKED "")
+  ENDIF()
+
   SET( DOXYGEN_DOCS_DIR ${ROOT_SRC_DIR}/docs )
   SET( DOXYGEN_ROOT_DIR ${ROOT_SRC_DIR} )
   SET( DOXYGEN_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/docs )
