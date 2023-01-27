@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ const char* TEST_GLTF_FILE_NAME = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
  * These textures are based off version of Wave engine sample
  * Take from https://github.com/WaveEngine/Samples
  *
- * Copyright (c) 2022 Wave Coorporation
+ * Copyright (c) 2023 Wave Coorporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -119,16 +119,15 @@ Dali::Texture GetSpecularTexture(Dali::Scene3D::Model model)
   return texture;
 }
 
-
 // For ResourceReady
 static bool gOnRelayoutCallBackCalled = false;
-void OnRelayoutCallback(Actor actor)
+void        OnRelayoutCallback(Actor actor)
 {
   gOnRelayoutCallBackCalled = true;
 }
 
 static bool gResourceReadyCalled = false;
-void OnResourceReady(Control control)
+void        OnResourceReady(Control control)
 {
   gResourceReadyCalled = true;
 }
@@ -326,7 +325,6 @@ int UtcDaliSceneViewOnScene02(void)
 
   application.SendNotification();
   application.Render();
-
 
   renderTaskCount = application.GetScene().GetRenderTaskList().GetTaskCount();
   DALI_TEST_EQUALS(2u, renderTaskCount, TEST_LOCATION);
@@ -553,7 +551,7 @@ int UtcDaliSceneViewImageBasedLight02(void)
 
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
-  Dali::Texture diffuseTexture = GetDiffuseTexture(modelView1);
+  Dali::Texture diffuseTexture  = GetDiffuseTexture(modelView1);
   Dali::Texture specularTexture = GetSpecularTexture(modelView1);
 
   gResourceReadyCalled = false;
@@ -571,7 +569,7 @@ int UtcDaliSceneViewImageBasedLight02(void)
 
   DALI_TEST_NOT_EQUALS(GetDiffuseTexture(modelView1), diffuseTexture, 0.0f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), specularTexture, 0.0f, TEST_LOCATION);
-  diffuseTexture = GetDiffuseTexture(modelView1);
+  diffuseTexture  = GetDiffuseTexture(modelView1);
   specularTexture = GetSpecularTexture(modelView1);
 
   // reset SceneView IBL
@@ -608,7 +606,7 @@ int UtcDaliSceneViewImageBasedLight03(void)
   application.SendNotification();
   application.Render();
 
-  Dali::Texture diffuseTexture = GetDiffuseTexture(modelView1);
+  Dali::Texture diffuseTexture  = GetDiffuseTexture(modelView1);
   Dali::Texture specularTexture = GetSpecularTexture(modelView1);
 
   gResourceReadyCalled = false;
@@ -629,7 +627,7 @@ int UtcDaliSceneViewImageBasedLight03(void)
   modelView1.SetImageBasedLightSource("", "");
   DALI_TEST_NOT_EQUALS(GetDiffuseTexture(modelView1), diffuseTexture, 0.0f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), specularTexture, 0.0f, TEST_LOCATION);
-  diffuseTexture = GetDiffuseTexture(modelView1);
+  diffuseTexture  = GetDiffuseTexture(modelView1);
   specularTexture = GetSpecularTexture(modelView1);
 
   // reset SceneView IBL
@@ -710,13 +708,50 @@ int UtcDaliSceneViewUseFramebuffer02(void)
   END_TEST;
 }
 
+int UtcDaliSceneViewFramebufferMultiSamplingLevel(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  uint8_t expectValue        = 0u; // Default MultiSamplingLevel is 0.
+  uint8_t multiSamplingLevel = view.GetFramebufferMultiSamplingLevel();
+  DALI_TEST_EQUALS(multiSamplingLevel, expectValue, TEST_LOCATION);
+
+  expectValue = 4u; // Change value.
+  view.UseFramebuffer(true);
+  view.SetFramebufferMultiSamplingLevel(expectValue);
+
+  multiSamplingLevel = view.GetFramebufferMultiSamplingLevel();
+  DALI_TEST_EQUALS(multiSamplingLevel, expectValue, TEST_LOCATION);
+
+  // Note : we don't check multi sampling level is applied to framebuffer, or not.
+  view.UseFramebuffer(false);
+  expectValue = 2u; // Change value.
+  view.SetFramebufferMultiSamplingLevel(expectValue);
+
+  application.SendNotification();
+  application.Render();
+
+  multiSamplingLevel = view.GetFramebufferMultiSamplingLevel();
+  DALI_TEST_EQUALS(multiSamplingLevel, expectValue, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliSceneViewResourceReady(void)
 {
   ToolkitTestApplication application;
 
   gOnRelayoutCallBackCalled = false;
-  gResourceReadyCalled = false;
-  Scene3D::SceneView view = Scene3D::SceneView::New();
+  gResourceReadyCalled      = false;
+  Scene3D::SceneView view   = Scene3D::SceneView::New();
   view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   view.OnRelayoutSignal().Connect(OnRelayoutCallback);
   view.ResourceReadySignal().Connect(OnResourceReady);
@@ -737,7 +772,7 @@ int UtcDaliSceneViewResourceReady(void)
   DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
 
   gOnRelayoutCallBackCalled = false;
-  gResourceReadyCalled = false;
+  gResourceReadyCalled      = false;
 
   view.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE);
 
@@ -757,7 +792,7 @@ int UtcDaliSceneViewSetSkybox(void)
 {
   ToolkitTestApplication application;
 
-  gResourceReadyCalled = false;
+  gResourceReadyCalled    = false;
   Scene3D::SceneView view = Scene3D::SceneView::New();
   view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   view.ResourceReadySignal().Connect(OnResourceReady);
@@ -792,7 +827,7 @@ int UtcDaliSceneViewSetSkyboxEquirectangular(void)
 {
   ToolkitTestApplication application;
 
-  gResourceReadyCalled = false;
+  gResourceReadyCalled    = false;
   Scene3D::SceneView view = Scene3D::SceneView::New();
   view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   view.ResourceReadySignal().Connect(OnResourceReady);
@@ -828,7 +863,7 @@ int UtcDaliSceneViewSetSkyboxEmpty(void)
 {
   ToolkitTestApplication application;
 
-  gResourceReadyCalled = false;
+  gResourceReadyCalled    = false;
   Scene3D::SceneView view = Scene3D::SceneView::New();
   view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   view.ResourceReadySignal().Connect(OnResourceReady);
@@ -851,7 +886,7 @@ int UtcDaliSceneViewSetSkyboxEquirectangularEmpty(void)
 {
   ToolkitTestApplication application;
 
-  gResourceReadyCalled = false;
+  gResourceReadyCalled    = false;
   Scene3D::SceneView view = Scene3D::SceneView::New();
   view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   view.ResourceReadySignal().Connect(OnResourceReady);
@@ -927,7 +962,7 @@ int UtcDaliSceneViewSetImageBasedLightAndSkybox(void)
 int UtcDaliSceneViewCreateAndRemoveRenderTask(void)
 {
   ToolkitTestApplication application;
-  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTaskList         taskList = application.GetScene().GetRenderTaskList();
 
   uint32_t renderTaskCount = taskList.GetTaskCount();
 

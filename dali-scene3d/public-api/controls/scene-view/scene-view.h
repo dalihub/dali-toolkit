@@ -317,6 +317,28 @@ public:
   bool IsUsingFramebuffer() const;
 
   /**
+   * @brief Sets Multisampling level when we use Framebuffer.
+   * Default is 0.
+   *
+   * @SINCE_2_2.12
+   * @note Only applied if SceneView is using Framebuffer and Framebuffer Multisampling extension is supported.
+   *
+   * @param[in] multiSamplingLevel Level of multisampling if we use Framebuffer.
+   */
+  void SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel);
+
+  /**
+   * @brief Gets Multisampling level that user set.
+   * Default is 0.
+   *
+   * @SINCE_2_2.12
+   * @note This API doesn't check whether Multisampling extension is supported or not.
+   *
+   * @return MultisamplingLevel that user set.
+   */
+  uint8_t GetFramebufferMultiSamplingLevel() const;
+
+  /**
    * @brief Sets Skybox for this scene.
    * Skybox texture starts to be loaded when SceneView is onScene.
    * And Skybox texture is asynchronously loaded. When loading is finished, ResourceReady is emitted.

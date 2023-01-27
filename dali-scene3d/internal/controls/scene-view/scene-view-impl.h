@@ -31,9 +31,9 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 #include <dali-scene3d/internal/common/environment-map-load-task.h>
 #include <dali-scene3d/internal/common/image-based-light-observer.h>
+#include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
 namespace Dali
 {
@@ -137,6 +137,16 @@ public:
    * @copydoc SceneView::IsUsingFramebuffer()
    */
   bool IsUsingFramebuffer() const;
+
+  /**
+   * @copydoc SceneView::SetFramebufferMultiSamplingLevel()
+   */
+  void SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel);
+
+  /**
+   * @copydoc SceneView::GetFramebufferMultiSamplingLevel()
+   */
+  uint8_t GetFramebufferMultiSamplingLevel() const;
 
   /**
    * @copydoc SceneView::SetSkybox()
@@ -298,14 +308,15 @@ private:
   Dali::Actor                                              mSkybox;
   Quaternion                                               mSkyboxOrientation;
   float                                                    mSkyboxIntensity{1.0f};
+  uint8_t                                                  mFrameBufferMultiSamplingLevel{0u};
 
   // Asynchronous Loading.
-  EnvironmentMapLoadTaskPtr       mSkyboxLoadTask;
-  EnvironmentMapLoadTaskPtr       mIblDiffuseLoadTask;
-  EnvironmentMapLoadTaskPtr       mIblSpecularLoadTask;
-  std::string                     mSkyboxUrl;
-  std::string                     mDiffuseIblUrl;
-  std::string                     mSpecularIblUrl;
+  EnvironmentMapLoadTaskPtr mSkyboxLoadTask;
+  EnvironmentMapLoadTaskPtr mIblDiffuseLoadTask;
+  EnvironmentMapLoadTaskPtr mIblSpecularLoadTask;
+  std::string               mSkyboxUrl;
+  std::string               mDiffuseIblUrl;
+  std::string               mSpecularIblUrl;
 
   Scene3D::EnvironmentMapType mSkyboxEnvironmentMapType{Scene3D::EnvironmentMapType::AUTO};
   Dali::Texture               mSkyboxTexture;

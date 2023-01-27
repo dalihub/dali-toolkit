@@ -29,11 +29,11 @@
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <string_view>
 
 // INTERNAL INCLUDES
@@ -61,8 +61,6 @@ DALI_TYPE_REGISTRATION_END()
 
 Property::Index   RENDERING_BUFFER    = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
 constexpr int32_t DEFAULT_ORIENTATION = 0;
-
-constexpr uint8_t DEFAULT_FRAME_BUFFER_MULTI_SAMPLING_LEVEL = 4u;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
 
@@ -302,13 +300,13 @@ void SceneView::UnregisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* 
 void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
   bool needIblReset = false;
-  bool isOnScene = Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE);
+  bool isOnScene    = Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE);
   if(mDiffuseIblUrl != diffuseUrl)
   {
     mDiffuseIblUrl = diffuseUrl;
     if(mDiffuseIblUrl.empty())
     {
-      needIblReset             = true;
+      needIblReset = true;
     }
     else
     {
@@ -322,7 +320,7 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
     mSpecularIblUrl = specularUrl;
     if(mSpecularIblUrl.empty())
     {
-      needIblReset              = true;
+      needIblReset = true;
     }
     else
     {
@@ -425,6 +423,32 @@ void SceneView::UseFramebuffer(bool useFramebuffer)
 bool SceneView::IsUsingFramebuffer() const
 {
   return mUseFrameBuffer;
+}
+
+void SceneView::SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel)
+{
+  if(mFrameBufferMultiSamplingLevel != multiSamplingLevel)
+  {
+    mFrameBufferMultiSamplingLevel = multiSamplingLevel;
+
+    // Create new framebuffer with changed multiSamplingLevel.
+    if(mRenderTask && mFrameBuffer && mTexture)
+    {
+      Vector3 size = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+
+      mFrameBuffer = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
+      mFrameBuffer.AttachColorTexture(mTexture);
+      DevelFrameBuffer::SetMultiSamplingLevel(mFrameBuffer, mFrameBufferMultiSamplingLevel);
+      mRenderTask.SetFrameBuffer(mFrameBuffer);
+
+      // Note : we don't need to create new visual since visual's url is depend on mTexture.
+    }
+  }
+}
+
+uint8_t SceneView::GetFramebufferMultiSamplingLevel() const
+{
+  return mFrameBufferMultiSamplingLevel;
 }
 
 void SceneView::SetSkybox(const std::string& skyboxUrl)
@@ -638,7 +662,7 @@ void SceneView::UpdateRenderTask()
         mTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(size.width), unsigned(size.height));
         mFrameBuffer = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
         mFrameBuffer.AttachColorTexture(mTexture);
-        DevelFrameBuffer::SetMultiSamplingLevel(mFrameBuffer, DEFAULT_FRAME_BUFFER_MULTI_SAMPLING_LEVEL);
+        DevelFrameBuffer::SetMultiSamplingLevel(mFrameBuffer, mFrameBufferMultiSamplingLevel);
         Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(mFrameBuffer, 0u);
 
         Property::Map imagePropertyMap;
@@ -709,9 +733,9 @@ void SceneView::UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentM
   bool isOnScene = Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE);
   if(mSkyboxUrl != skyboxUrl || mSkyboxEnvironmentMapType != skyboxEnvironmentMapType)
   {
-    mSkyboxDirty         = true;
-    mSkyboxResourceReady = false;
-    mSkyboxUrl           = skyboxUrl;
+    mSkyboxDirty              = true;
+    mSkyboxResourceReady      = false;
+    mSkyboxUrl                = skyboxUrl;
     mSkyboxEnvironmentMapType = skyboxEnvironmentMapType;
   }
 
@@ -770,7 +794,7 @@ void SceneView::OnSkyboxLoadComplete()
   Shader skyboxShader;
   if(mSkyboxEnvironmentMapType == Scene3D::EnvironmentMapType::CUBEMAP)
   {
-    skyboxShader   = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
+    skyboxShader = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
   }
   else
   {
