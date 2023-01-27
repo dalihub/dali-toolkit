@@ -127,6 +127,16 @@ bool SceneView::IsUsingFramebuffer() const
   return GetImpl(*this).IsUsingFramebuffer();
 }
 
+void SceneView::SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel)
+{
+  GetImpl(*this).SetFramebufferMultiSamplingLevel(multiSamplingLevel);
+}
+
+uint8_t SceneView::GetFramebufferMultiSamplingLevel() const
+{
+  return GetImpl(*this).GetFramebufferMultiSamplingLevel();
+}
+
 } // namespace Scene3D
 
 } // namespace Dali

@@ -315,6 +315,26 @@ public:
    */
   bool IsUsingFramebuffer() const;
 
+  /**
+   * @brief Sets Multisampling level when we use Framebuffer.
+   * Default is 0.
+   *
+   * @note Only applied if SceneView is using Framebuffer and Framebuffer Multisampling extension is supported.
+   *
+   * @param[in] multiSamplingLevel Level of multisampling if we use Framebuffer.
+   */
+  void SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel);
+
+  /**
+   * @brief Gets Multisampling level that user set.
+   * Default is 0.
+   *
+   * @note This API doesn't check whether Multisampling extension is supported or not.
+   *
+   * @return MultisamplingLevel that user set.
+   */
+  uint8_t GetFramebufferMultiSamplingLevel() const;
+
 public: // Not intended for application developers
   /// @cond internal
   /**

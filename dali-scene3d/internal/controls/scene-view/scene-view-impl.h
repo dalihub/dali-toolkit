@@ -137,6 +137,16 @@ public:
    */
   bool IsUsingFramebuffer() const;
 
+  /**
+   * @copydoc SceneView::SetFramebufferMultiSamplingLevel()
+   */
+  void SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel);
+
+  /**
+   * @copydoc SceneView::GetFramebufferMultiSamplingLevel()
+   */
+  uint8_t GetFramebufferMultiSamplingLevel() const;
+
 protected:
   /**
    * @brief Constructs a new SceneView.
@@ -240,6 +250,7 @@ private:
   Dali::RenderTask                                         mRenderTask;
   Layer                                                    mRootLayer;
   int32_t                                                  mWindowOrientation;
+  uint8_t                                                  mFrameBufferMultiSamplingLevel{0u};
 
   CallbackBase* mIblLoadedCallback;
   std::string   mDiffuseIblUrl;

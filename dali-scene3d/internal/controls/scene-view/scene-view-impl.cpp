@@ -59,8 +59,6 @@ DALI_TYPE_REGISTRATION_END()
 
 Property::Index   RENDERING_BUFFER    = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
 constexpr int32_t DEFAULT_ORIENTATION = 0;
-
-constexpr uint8_t DEFAULT_FRAME_BUFFER_MULTI_SAMPLING_LEVEL = 4u;
 } // anonymous namespace
 
 SceneView::SceneView()
@@ -255,6 +253,32 @@ bool SceneView::IsUsingFramebuffer() const
   return mUseFrameBuffer;
 }
 
+void SceneView::SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel)
+{
+  if(mFrameBufferMultiSamplingLevel != multiSamplingLevel)
+  {
+    mFrameBufferMultiSamplingLevel = multiSamplingLevel;
+
+    // Create new framebuffer with changed multiSamplingLevel.
+    if(mRenderTask && mFrameBuffer && mTexture)
+    {
+      Vector3 size = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+
+      mFrameBuffer = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
+      mFrameBuffer.AttachColorTexture(mTexture);
+      DevelFrameBuffer::SetMultiSamplingLevel(mFrameBuffer, mFrameBufferMultiSamplingLevel);
+      mRenderTask.SetFrameBuffer(mFrameBuffer);
+
+      // Note : we don't need to create new visual since visual's url is depend on mTexture.
+    }
+  }
+}
+
+uint8_t SceneView::GetFramebufferMultiSamplingLevel() const
+{
+  return mFrameBufferMultiSamplingLevel;
+}
+
 ///////////////////////////////////////////////////////////
 //
 // Private methods
@@ -410,7 +434,7 @@ void SceneView::UpdateRenderTask()
         mTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(size.width), unsigned(size.height));
         mFrameBuffer = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
         mFrameBuffer.AttachColorTexture(mTexture);
-        DevelFrameBuffer::SetMultiSamplingLevel(mFrameBuffer, DEFAULT_FRAME_BUFFER_MULTI_SAMPLING_LEVEL);
+        DevelFrameBuffer::SetMultiSamplingLevel(mFrameBuffer, mFrameBufferMultiSamplingLevel);
         Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(mFrameBuffer, 0u);
 
         Property::Map imagePropertyMap;
