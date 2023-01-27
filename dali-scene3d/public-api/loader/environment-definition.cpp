@@ -58,6 +58,7 @@ EnvironmentDefinition::LoadRaw(const std::string& environmentsPath) const
       {
         face.push_back(PixelData::New(new uint8_t[3]{0xff, 0xff, 0xff}, 3, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY));
       }
+      environmentMapData.SetEnvironmentMapType(Dali::Scene3D::EnvironmentMapType::CUBEMAP);
     }
     else if(!LoadEnvironmentMap(environmentsPath + path, environmentMapData))
     {
