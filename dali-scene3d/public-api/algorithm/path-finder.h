@@ -18,13 +18,12 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
 #include <dali-scene3d/public-api/algorithm/path-finder-waypoint.h>
+#include <dali-scene3d/public-api/api.h>
 
 namespace Dali::Scene3D::Algorithm
 {
-
 using WayPointList = std::vector<Scene3D::Algorithm::WayPoint>;
 
 /**
@@ -34,6 +33,9 @@ using WayPointList = std::vector<Scene3D::Algorithm::WayPoint>;
 enum class PathFinderAlgorithm
 {
   DJIKSTRA_SHORTEST_PATH, ///< Using A* variant (Djikstra) finding a shortest path
+  SPFA,                   ///< Using SPFA-SLF (Shortest Path Fast Algorithm with Short Label First) finding a shortest path.
+  SPFA_DOUBLE_WAY,        ///< Using SPFA-SLF double way. It might not find shortest, but will use less memory.
+
   DEFAULT = DJIKSTRA_SHORTEST_PATH, ///< Default algorithm to use
 };
 
@@ -45,7 +47,6 @@ enum class PathFinderAlgorithm
 class DALI_SCENE3D_API PathFinderBase
 {
 public:
-
   /**
    * @brief Destructor
    */
@@ -79,14 +80,13 @@ public:
 class DALI_SCENE3D_API PathFinder
 {
 public:
-
   /**
    * @brief Creates new instance of path finder
    * @param[in] navigationMesh Navigation mesh to associate with
    * @param[in] algorithm algorithm to use
    * @return Valid pointer to PathFinder object or nullptr
    */
-  static std::unique_ptr<PathFinder> New( NavigationMesh& navigationMesh, PathFinderAlgorithm algorithm );
+  static std::unique_ptr<PathFinder> New(NavigationMesh& navigationMesh, PathFinderAlgorithm algorithm);
 
   /**
    * @brief Looks for a path from point A to point B.
@@ -122,7 +122,6 @@ public:
   WayPointList FindPath(uint32_t faceIndexFrom, uint32_t faceIndexTo);
 
 private:
-
   PathFinder() = delete;
 
   DALI_INTERNAL explicit PathFinder(std::unique_ptr<PathFinderBase>&& baseImpl);
@@ -130,6 +129,6 @@ private:
   std::unique_ptr<PathFinderBase> mImpl;
 };
 
-}
+} // namespace Dali::Scene3D::Algorithm
 
 #endif // DALI_SCENE3D_PATH_FINDER_H
