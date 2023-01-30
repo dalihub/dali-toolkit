@@ -1194,8 +1194,12 @@ void TextLabel::ScrollingFinished()
 {
   // Pure Virtual from TextScroller Interface
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::ScrollingFinished\n");
-  mController->SetAutoScrollEnabled(false);
-  RequestTextRelayout();
+
+  if(mController->IsAutoScrollEnabled() || mLastAutoScrollEnabled)
+  {
+    mController->SetAutoScrollEnabled(false);
+    RequestTextRelayout();
+  }
 }
 
 void TextLabel::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
