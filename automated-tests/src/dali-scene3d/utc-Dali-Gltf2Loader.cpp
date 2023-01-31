@@ -567,7 +567,7 @@ int UtcDaliGltfLoaderSuccessShort(void)
       {
         if(visitor.receiver.mCounts[i0])
         {
-          auto raw = resources.mMeshes[i0].first.LoadRaw(resourcePath);
+          auto raw = resources.mMeshes[i0].first.LoadRaw(resourcePath, resources.mBuffers);
           DALI_TEST_CHECK(!raw.mAttribs.empty());
 
           resources.mMeshes[i0].second = resources.mMeshes[i0].first.Load(std::move(raw));
@@ -652,7 +652,7 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
   auto& resources = ctx.resources;
 
   InitializeGltfLoader();
-  LoadGltfScene(TEST_RESOURCE_DIR "/BoxAnimated.gltf", sdf, ctx.loadResult);
+  LoadGltfScene(TEST_RESOURCE_DIR "/CesiumMan_e.gltf", sdf, ctx.loadResult);
 
   auto& scene = ctx.scene;
   auto& roots = scene.GetRoots();
@@ -689,12 +689,114 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
   }
 
   DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions.size(), 1u);
-  DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions[0].mProperties.size(), 2u);
+  DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions[0].mProperties.size(), 57u);
 
   uint32_t id = ctx.loadResult.mScene.GetNode(ctx.loadResult.mAnimationDefinitions[0].mProperties[0].mNodeIndex)->mNodeId;
-  DALI_TEST_EQUAL(id, root.FindChildByName("node2").GetProperty<int32_t>(Dali::Actor::Property::ID));
-  uint32_t id2 = ctx.loadResult.mScene.GetNode(ctx.loadResult.mAnimationDefinitions[0].mProperties[1].mNodeIndex)->mNodeId;
-  DALI_TEST_EQUAL(id2, root.FindChildByName("node0").GetProperty<int32_t>(Dali::Actor::Property::ID));
+  DALI_TEST_EQUAL(id, root.FindChildByName("Skeleton_torso_joint_1").GetProperty<int32_t>(Dali::Actor::Property::ID));
+
+  END_TEST;
+}
+
+int UtcDaliGltfLoaderImageFromBufferView(void)
+{
+  Context ctx;
+
+  ShaderDefinitionFactory sdf;
+  sdf.SetResources(ctx.resources);
+  auto& resources = ctx.resources;
+
+  InitializeGltfLoader();
+  LoadGltfScene(TEST_RESOURCE_DIR "/EnvironmentTest_b.gltf", sdf, ctx.loadResult);
+
+  auto& scene = ctx.scene;
+  auto& roots = scene.GetRoots();
+  DALI_TEST_EQUAL(roots.size(), 1u);
+
+  ViewProjection viewProjection;
+  Transforms     xforms{
+    MatrixStack{},
+    viewProjection};
+  NodeDefinition::CreateParams nodeParams{
+    resources,
+    xforms,
+  };
+
+  Customization::Choices choices;
+
+  TestApplication app;
+
+  Actor root = Actor::New();
+  SetActorCentered(root);
+  for(auto iRoot : roots)
+  {
+    auto resourceRefs = resources.CreateRefCounter();
+    scene.CountResourceRefs(iRoot, choices, resourceRefs);
+    resources.CountEnvironmentReferences(resourceRefs);
+    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
+    {
+      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
+      scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
+      scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
+      root.Add(actor);
+    }
+  }
+
+  DALI_TEST_CHECK(resources.mMaterials[0].second.GetTextureCount() > 1);
+  DALI_TEST_EQUAL(resources.mMaterials[0].second.GetTexture(0).GetWidth(), 256);
+  DALI_TEST_EQUAL(resources.mMaterials[0].second.GetTexture(0).GetHeight(), 256);
+
+  END_TEST;
+}
+
+int UtcDaliGltfLoaderUint8Indices(void)
+{
+  Context ctx;
+
+  ShaderDefinitionFactory sdf;
+  sdf.SetResources(ctx.resources);
+  auto& resources = ctx.resources;
+
+  InitializeGltfLoader();
+  LoadGltfScene(TEST_RESOURCE_DIR "/AlphaBlendModeTest.gltf", sdf, ctx.loadResult);
+
+  auto& scene = ctx.scene;
+  auto& roots = scene.GetRoots();
+  DALI_TEST_EQUAL(roots.size(), 1u);
+
+  ViewProjection viewProjection;
+  Transforms     xforms{
+    MatrixStack{},
+    viewProjection};
+  NodeDefinition::CreateParams nodeParams{
+    resources,
+    xforms,
+  };
+
+  Customization::Choices choices;
+
+  TestApplication app;
+
+  Actor root = Actor::New();
+  SetActorCentered(root);
+  for(auto iRoot : roots)
+  {
+    auto resourceRefs = resources.CreateRefCounter();
+    scene.CountResourceRefs(iRoot, choices, resourceRefs);
+    resources.CountEnvironmentReferences(resourceRefs);
+    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
+    {
+      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
+      scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
+      scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
+      root.Add(actor);
+    }
+  }
+
+  DALI_TEST_CHECK(root.FindChildByName("Bed"));
+  DALI_TEST_CHECK(root.FindChildByName("DecalBlend"));
+  DALI_TEST_CHECK(root.FindChildByName("DecalOpaque"));
 
   END_TEST;
 }
