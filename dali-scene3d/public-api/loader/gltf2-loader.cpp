@@ -669,7 +669,7 @@ MeshDefinition::Accessor ConvertMeshPrimitiveAccessor(const gt::Accessor& acc)
                                    acc.mMin,
                                    acc.mMax}),
     std::move(sparseBlob),
-    acc.mBufferView->mBuffer.GetIndex()};
+    acc.mBufferView ? acc.mBufferView->mBuffer.GetIndex() : 0};
 }
 
 void ConvertMeshes(const gt::Document& doc, ConversionContext& context)
