@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,9 +127,24 @@ bool SceneView::IsUsingFramebuffer() const
   return GetImpl(*this).IsUsingFramebuffer();
 }
 
-void SceneView::SetSkybox(const std::string& skyboxUrl, SkyboxType skyboxType)
+void SceneView::SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel)
 {
-  GetImpl(*this).SetSkybox(skyboxUrl, skyboxType);
+  GetImpl(*this).SetFramebufferMultiSamplingLevel(multiSamplingLevel);
+}
+
+uint8_t SceneView::GetFramebufferMultiSamplingLevel() const
+{
+  return GetImpl(*this).GetFramebufferMultiSamplingLevel();
+}
+
+void SceneView::SetSkybox(const std::string& skyboxUrl)
+{
+  GetImpl(*this).SetSkybox(skyboxUrl);
+}
+
+void SceneView::SetSkyboxEnvironmentMapType(Scene3D::EnvironmentMapType skyboxEnvironmentMapType)
+{
+  GetImpl(*this).SetSkyboxEnvironmentMapType(skyboxEnvironmentMapType);
 }
 
 void SceneView::SetSkyboxIntensity(float intensity)

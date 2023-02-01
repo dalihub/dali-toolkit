@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/loader/animation-definition.h>
 #include <dali-scene3d/public-api/loader/camera-parameters.h>
-#include <dali-scene3d/public-api/loader/cube-map-loader.h>
 #include <dali-scene3d/public-api/loader/dli-loader.h>
 #include <dali-scene3d/public-api/loader/gltf2-loader.h>
 #include <dali-scene3d/public-api/loader/light-parameters.h>
@@ -315,7 +314,7 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
         Dali::AsyncTaskManager::Get().RemoveTask(mIblDiffuseLoadTask);
         mIblDiffuseLoadTask.Reset();
       }
-      mIblDiffuseLoadTask = new EnvironmentMapLoadTask(mDiffuseIblUrl, MakeCallback(this, &Model::OnIblDiffuseLoadComplete));
+      mIblDiffuseLoadTask = new EnvironmentMapLoadTask(mDiffuseIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &Model::OnIblDiffuseLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblDiffuseLoadTask);
       mIblDiffuseDirty = false;
     }
@@ -327,7 +326,7 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
         Dali::AsyncTaskManager::Get().RemoveTask(mIblSpecularLoadTask);
         mIblSpecularLoadTask.Reset();
       }
-      mIblSpecularLoadTask = new EnvironmentMapLoadTask(mSpecularIblUrl, MakeCallback(this, &Model::OnIblSpecularLoadComplete));
+      mIblSpecularLoadTask = new EnvironmentMapLoadTask(mSpecularIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &Model::OnIblSpecularLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblSpecularLoadTask);
       mIblSpecularDirty = false;
     }
@@ -728,7 +727,7 @@ void Model::OnModelLoadComplete()
 
 void Model::OnIblDiffuseLoadComplete()
 {
-  mDiffuseTexture = (mIblDiffuseLoadTask->HasSucceeded()) ? mIblDiffuseLoadTask->GetEnvironmentMap().CreateTexture() : Texture();
+  mDiffuseTexture = (mIblDiffuseLoadTask->HasSucceeded()) ? mIblDiffuseLoadTask->GetEnvironmentMap().GetTexture() : Texture();
   mIblDiffuseResourceReady = true;
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
   {
@@ -739,7 +738,7 @@ void Model::OnIblDiffuseLoadComplete()
 
 void Model::OnIblSpecularLoadComplete()
 {
-  mSpecularTexture = (mIblSpecularLoadTask->HasSucceeded()) ? mIblSpecularLoadTask->GetEnvironmentMap().CreateTexture() : Texture();
+  mSpecularTexture = (mIblSpecularLoadTask->HasSucceeded()) ? mIblSpecularLoadTask->GetEnvironmentMap().GetTexture() : Texture();
   mIblSpecularResourceReady = true;
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
   {

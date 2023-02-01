@@ -12,8 +12,7 @@ SET(TC_SOURCES
   utc-Dali-AnimatedProperty.cpp
   utc-Dali-BvhLoader.cpp
   utc-Dali-CameraParameters.cpp
-  utc-Dali-CubeLoader.cpp
-  utc-Dali-CubeMapLoader.cpp
+  utc-Dali-EnvironmentMapLoader.cpp
   utc-Dali-DliLoader.cpp
   utc-Dali-EnvironmentDefinition.cpp
   utc-Dali-FacialAnimation.cpp
@@ -23,7 +22,9 @@ SET(TC_SOURCES
   utc-Dali-SceneView.cpp
   utc-Dali-MatrixStack.cpp
   utc-Dali-MeshDefinition.cpp
+  utc-Dali-NavigationMesh.cpp
   utc-Dali-NodeDefinition.cpp
+  utc-Dali-PathFinding.cpp
   utc-Dali-RendererState.cpp
   utc-Dali-ResourceBundle.cpp
   utc-Dali-SceneDefinition.cpp

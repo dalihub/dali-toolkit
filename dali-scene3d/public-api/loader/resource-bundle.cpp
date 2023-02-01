@@ -121,7 +121,7 @@ void ResourceBundle::LoadResources(const ResourceRefCounts& refCounts, PathProvi
     auto& iMesh    = mMeshes[i];
     if(refCount > 0 && (kForceLoad || !iMesh.second.geometry))
     {
-      auto raw     = iMesh.first.LoadRaw(modelsPath);
+      auto raw     = iMesh.first.LoadRaw(modelsPath, mBuffers);
       iMesh.second = iMesh.first.Load(std::move(raw));
     }
     else if(!kKeepUnused && refCount == 0 && iMesh.second.geometry)
@@ -184,7 +184,7 @@ void ResourceBundle::LoadRawResources(const ResourceRefCounts& refCounts, PathPr
     auto& iMesh    = mMeshes[i];
     if(refCount > 0 && (kForceLoad || !iMesh.second.geometry))
     {
-      iMesh.first.mRawData = std::make_shared<MeshDefinition::RawData>(iMesh.first.LoadRaw(modelsPath));
+      iMesh.first.mRawData = std::make_shared<MeshDefinition::RawData>(iMesh.first.LoadRaw(modelsPath, mBuffers));
     }
   }
 

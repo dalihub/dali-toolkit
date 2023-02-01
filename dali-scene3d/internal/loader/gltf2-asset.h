@@ -319,8 +319,8 @@ struct Sampler
 {
   Filter::Type mMinFilter = Filter::LINEAR;
   Filter::Type mMagFilter = Filter::LINEAR;
-  Wrap::Type   mWrapS     = Wrap::CLAMP_TO_EDGE;
-  Wrap::Type   mWrapT     = Wrap::CLAMP_TO_EDGE;
+  Wrap::Type   mWrapS     = Wrap::REPEAT;
+  Wrap::Type   mWrapT     = Wrap::REPEAT;
   //TODO: extensions
   //TODO: extras
 };

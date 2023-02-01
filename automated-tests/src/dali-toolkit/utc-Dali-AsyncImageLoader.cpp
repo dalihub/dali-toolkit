@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
  */
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 #include <dali/dali.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <stdlib.h>
 #include <toolkit-event-thread-callback.h>
 #include <unistd.h>
-#include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -212,25 +212,25 @@ int UtcDaliAsyncImageLoaderLoadAndLoadedSignal(void)
 
   loader.ImageLoadedSignal().Connect(&loadedSignalVerifier, &ImageLoadedSignalVerifier::ImageLoaded);
 
-  loader.Load(gImage_34_RGBA);
-  uint32_t id02 = loader.Load(gImage_50_RGBA, ImageDimensions(25, 25));
-  uint32_t id03 = loader.Load(gImage_128_RGB, ImageDimensions(100, 100), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true);
+  loader.Load(gImage_34_RGBA);                                                                                                             // Trigger 1
+  uint32_t id02 = loader.Load(gImage_50_RGBA, ImageDimensions(25, 25));                                                                    // Trigger 2
+  uint32_t id03 = loader.Load(gImage_128_RGB, ImageDimensions(100, 100), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true); // Trigger 3
 
   // Try load animted image
   Dali::AnimatedImageLoading animatedImageLoading = Dali::AnimatedImageLoading::New(gImage_gif, true);
-  DevelAsyncImageLoader::LoadAnimatedImage(loader, animatedImageLoading, 0, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
+  DevelAsyncImageLoader::LoadAnimatedImage(loader, animatedImageLoading, 0, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF); // Trigger 4
 
   // Try apply mask image
   Devel::PixelBuffer imageData = Devel::PixelBuffer::New(50, 50, Dali::Pixel::RGBA8888);
-  Devel::PixelBuffer maskData = Devel::PixelBuffer::New(50, 50, Dali::Pixel::RGBA8888);
-  DevelAsyncImageLoader::ApplyMask(loader, imageData, maskData, 0.0f, false, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
+  Devel::PixelBuffer maskData  = Devel::PixelBuffer::New(50, 50, Dali::Pixel::RGBA8888);
+  DevelAsyncImageLoader::ApplyMask(loader, imageData, maskData, 0.0f, false, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF); // Trigger 5 - ApplyMask also uses AsyncTask
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(5), true, TEST_LOCATION); // Wait for 5 triggers
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(loadedSignalVerifier.LoadedImageCount() == 4);
+  DALI_TEST_CHECK(loadedSignalVerifier.LoadedImageCount() == 5);
   DALI_TEST_CHECK(loadedSignalVerifier.Verify(id02, 25, 25));
   DALI_TEST_CHECK(loadedSignalVerifier.Verify(id03, 100, 100));
 
@@ -272,7 +272,7 @@ int UtcDaliAsyncImageLoaderCancel02(void)
   ToolkitTestApplication application;
 
   AsyncImageLoader loader = AsyncImageLoader::New();
-  uint32_t id01 = loader.Load(gImage_34_RGBA, ImageDimensions(34, 34));
+  uint32_t         id01   = loader.Load(gImage_34_RGBA, ImageDimensions(34, 34));
   DALI_TEST_CHECK(loader.Cancel(id01)); // Cancle a task
 
   application.SendNotification();

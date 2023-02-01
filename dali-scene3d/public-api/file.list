@@ -1,17 +1,20 @@
 set(scene3d_public_api_dir "${scene3d_dir}/public-api")
 
 set(scene3d_src_files ${scene3d_src_files}
+	${scene3d_public_api_dir}/algorithm/navigation-mesh.cpp
+	${scene3d_public_api_dir}/algorithm/path-finder.cpp
+	${scene3d_public_api_dir}/algorithm/path-finder-waypoint.cpp
 	${scene3d_public_api_dir}/controls/model/model.cpp
 	${scene3d_public_api_dir}/controls/scene-view/scene-view.cpp
 	${scene3d_public_api_dir}/loader/alpha-function-helper.cpp
 	${scene3d_public_api_dir}/loader/animated-property.cpp
 	${scene3d_public_api_dir}/loader/animation-definition.cpp
 	${scene3d_public_api_dir}/loader/blend-shape-details.cpp
+	${scene3d_public_api_dir}/loader/buffer-definition.cpp
 	${scene3d_public_api_dir}/loader/bvh-loader.cpp
 	${scene3d_public_api_dir}/loader/camera-parameters.cpp
-	${scene3d_public_api_dir}/loader/cube-data.cpp
-	${scene3d_public_api_dir}/loader/cube-loader.cpp
-	${scene3d_public_api_dir}/loader/cube-map-loader.cpp
+	${scene3d_public_api_dir}/loader/environment-map-data.cpp
+	${scene3d_public_api_dir}/loader/environment-map-loader.cpp
 	${scene3d_public_api_dir}/loader/customization.cpp
 	${scene3d_public_api_dir}/loader/dli-loader.cpp
 	${scene3d_public_api_dir}/loader/environment-definition.cpp
@@ -22,6 +25,7 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_public_api_dir}/loader/material-definition.cpp
 	${scene3d_public_api_dir}/loader/matrix-stack.cpp
 	${scene3d_public_api_dir}/loader/mesh-definition.cpp
+	${scene3d_public_api_dir}/loader/navigation-mesh-factory.cpp
 	${scene3d_public_api_dir}/loader/node-definition.cpp
 	${scene3d_public_api_dir}/loader/parse-renderer-state.cpp
 	${scene3d_public_api_dir}/loader/renderer-state.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1103,6 +1103,9 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask02(void)
     dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
+    Property::Map attributes;
+    DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::STOP, attributes);
+
     application.SendNotification();
     application.Render();
 
@@ -1112,7 +1115,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask02(void)
     application.SendNotification();
     application.Render(20);
 
-    DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 3, TEST_LOCATION);
+    DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 3, TEST_LOCATION);
 
     dummyControl.Unparent();
   }

@@ -1,7 +1,7 @@
-#ifndef DALI_SCENE3D_LOADER_CUBE_LOADER_H
-#define DALI_SCENE3D_LOADER_CUBE_LOADER_H
+#ifndef DALI_SCENE3D_LOADER_ENVIRONMENT_MAP_LOADER_H
+#define DALI_SCENE3D_LOADER_ENVIRONMENT_MAP_LOADER_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
-#include <dali-scene3d/public-api/loader/cube-data.h>
+#include <dali-scene3d/public-api/loader/environment-map-data.h>
+#include <dali-scene3d/public-api/common/environment-map.h>
 
 namespace Dali
 {
@@ -27,17 +28,18 @@ namespace Scene3D
 {
 namespace Loader
 {
+
 /**
- * @brief Loads cube map data texture from a cube style image file.
+ * @brief Loads environment map data from a environment map file.
  *
- * @param[in] path The file path.
- * @param[out] cubedata The data structure with all pixel data objects.
+ * @param[in] environmentMapUrl The environment map file url.
+ * @param[out] environmentMapData The data structure with all pixel data objects.
  * @return bool True if the loading is succeded.
  */
-bool LoadCubeData(const std::string& path, CubeData& cubedata);
+bool DALI_SCENE3D_API LoadEnvironmentMap(const std::string& environmentMapUrl, EnvironmentMapData& environmentMapData);
 
 } // namespace Loader
 } // namespace Scene3D
 } // namespace Dali
 
-#endif // DALI_SCENE3D_LOADER_CUBE_LOADER_H
+#endif // DALI_SCENE3D_LOADER_ENVIRONMENT_MAP_LOADER_H

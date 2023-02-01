@@ -80,9 +80,25 @@ bool DecodeBase64PropertyData(const Property::Value& value, std::vector<uint32_t
     bn::decode_b64(encodedString.begin(), encodedString.end(), std::back_inserter(outputTmpData));
 
     outputData.clear();
-    outputData.resize(outputTmpData.size() / sizeof(uint32_t));
+    uint32_t outputSize = outputTmpData.size() / sizeof(uint32_t) + static_cast<uint32_t>(!!(outputTmpData.size() % sizeof(uint32_t)));
+    outputData.resize(outputSize);
     // Treat as a block of data
     memcpy(&outputData[0], &outputTmpData[0], outputTmpData.size());
+
+    decoded = true;
+  }
+  return decoded;
+}
+
+bool DecodeBase64PropertyData(const Property::Value& value, std::vector<uint8_t>& outputData)
+{
+  bool        decoded = false;
+  std::string encodedString;
+
+  if(GetStringFromProperty(value, encodedString))
+  {
+    outputData.reserve(ceil(encodedString.size() * 0.75f));
+    bn::decode_b64(encodedString.begin(), encodedString.end(), std::back_inserter(outputData));
 
     decoded = true;
   }

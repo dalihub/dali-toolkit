@@ -18,18 +18,19 @@
  */
 
 // INTERNAL
-#include "dali-scene3d/public-api/loader/environment-definition.h"
-#include "dali-scene3d/public-api/loader/material-definition.h"
-#include "dali-scene3d/public-api/loader/mesh-definition.h"
-#include "dali-scene3d/public-api/loader/shader-definition.h"
-#include "dali-scene3d/public-api/loader/skeleton-definition.h"
+#include <dali-scene3d/public-api/loader/environment-definition.h>
+#include <dali-scene3d/public-api/loader/material-definition.h>
+#include <dali-scene3d/public-api/loader/mesh-definition.h>
+#include <dali-scene3d/public-api/loader/shader-definition.h>
+#include <dali-scene3d/public-api/loader/skeleton-definition.h>
+#include <dali-scene3d/public-api/loader/buffer-definition.h>
 
 // EXTERNAL
 #include <functional>
 #include <memory>
-#include "dali/public-api/common/vector-wrapper.h"
-#include "dali/public-api/rendering/shader.h"
-#include "dali/public-api/rendering/texture-set.h"
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/rendering/texture-set.h>
 
 namespace Dali
 {
@@ -155,6 +156,7 @@ public: // DATA
   MaterialDefinition::Vector    mMaterials;
 
   SkeletonDefinition::Vector mSkeletons;
+  BufferDefinition::Vector   mBuffers;
 };
 
 } // namespace Loader

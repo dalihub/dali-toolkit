@@ -23,7 +23,7 @@
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/devel-api/threading/mutex.h>
-#include <fstream>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/gltf2-asset.h>
@@ -407,9 +407,31 @@ struct ConversionContext
   NodeIndexMapper    mNodeIndices;
 };
 
-SamplerFlags::Type ConvertWrapMode(gt::Wrap::Type w)
+void ConvertBuffer(const gt::Buffer& buffer, decltype(ResourceBundle::mBuffers)& outBuffers, const std::string& resourcePath)
 {
-  switch(w)
+  BufferDefinition bufferDefinition;
+
+  bufferDefinition.mResourcePath = resourcePath;
+  bufferDefinition.mUri          = buffer.mUri;
+  bufferDefinition.mByteLength   = buffer.mByteLength;
+
+  outBuffers.emplace_back(std::move(bufferDefinition));
+}
+
+void ConvertBuffers(const gt::Document& doc, ConversionContext& context)
+{
+  auto& outBuffers = context.mOutput.mResources.mBuffers;
+  outBuffers.reserve(doc.mBuffers.size());
+
+  for(auto& buffer : doc.mBuffers)
+  {
+    ConvertBuffer(buffer, outBuffers, context.mPath);
+  }
+}
+
+SamplerFlags::Type ConvertWrapMode(gt::Wrap::Type wrapMode)
+{
+  switch(wrapMode)
   {
     case gt::Wrap::REPEAT:
       return SamplerFlags::WRAP_REPEAT;
@@ -422,14 +444,14 @@ SamplerFlags::Type ConvertWrapMode(gt::Wrap::Type w)
   }
 }
 
-SamplerFlags::Type ConvertSampler(const gt::Ref<gt::Sampler>& s)
+SamplerFlags::Type ConvertSampler(const gt::Ref<gt::Sampler>& sampler)
 {
-  if(s)
+  if(sampler)
   {
-    return ((s->mMinFilter < gt::Filter::NEAREST_MIPMAP_NEAREST) ? (s->mMinFilter - gt::Filter::NEAREST) : ((s->mMinFilter - gt::Filter::NEAREST_MIPMAP_NEAREST) + 2)) |
-           ((s->mMagFilter - gt::Filter::NEAREST) << SamplerFlags::FILTER_MAG_SHIFT) |
-           (ConvertWrapMode(s->mWrapS) << SamplerFlags::WRAP_S_SHIFT) |
-           (ConvertWrapMode(s->mWrapT) << SamplerFlags::WRAP_T_SHIFT);
+    return ((sampler->mMinFilter < gt::Filter::NEAREST_MIPMAP_NEAREST) ? (sampler->mMinFilter - gt::Filter::NEAREST) : ((sampler->mMinFilter - gt::Filter::NEAREST_MIPMAP_NEAREST) + 2)) |
+           ((sampler->mMagFilter - gt::Filter::NEAREST) << SamplerFlags::FILTER_MAG_SHIFT) |
+           (ConvertWrapMode(sampler->mWrapS) << SamplerFlags::WRAP_S_SHIFT) |
+           (ConvertWrapMode(sampler->mWrapT) << SamplerFlags::WRAP_T_SHIFT);
   }
   else
   {
@@ -442,22 +464,42 @@ SamplerFlags::Type ConvertSampler(const gt::Ref<gt::Sampler>& s)
   }
 }
 
-TextureDefinition ConvertTextureInfo(const gt::TextureInfo& mm, const ImageMetadata& metaData = ImageMetadata())
+TextureDefinition ConvertTextureInfo(const gt::TextureInfo& mm, ConversionContext& context, const ImageMetadata& metaData = ImageMetadata())
 {
-  return TextureDefinition{std::string(mm.mTexture->mSource->mUri), ConvertSampler(mm.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode};
+  TextureDefinition textureDefinition;
+  std::string uri = std::string(mm.mTexture->mSource->mUri);
+  if(uri.empty())
+  {
+    uint32_t bufferIndex = mm.mTexture->mSource->mBufferView->mBuffer.GetIndex();
+    if(bufferIndex != INVALID_INDEX && context.mOutput.mResources.mBuffers[bufferIndex].IsAvailable())
+    {
+      auto& stream = context.mOutput.mResources.mBuffers[bufferIndex].GetBufferStream();
+      stream.clear();
+      stream.seekg(mm.mTexture->mSource->mBufferView->mByteOffset, stream.beg);
+      std::vector<uint8_t> dataBuffer;
+      dataBuffer.resize(mm.mTexture->mSource->mBufferView->mByteLength);
+      stream.read(reinterpret_cast<char*>(dataBuffer.data()), mm.mTexture->mSource->mBufferView->mByteLength);
+      return TextureDefinition{std::move(dataBuffer), ConvertSampler(mm.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode};
+    }
+    return TextureDefinition();
+  }
+  else
+  {
+    return TextureDefinition{uri, ConvertSampler(mm.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode};
+  }
 }
 
-void ConvertMaterial(const gt::Material& material, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials)
+void ConvertMaterial(const gt::Material& material, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
   auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gt::TextureInfo& info) {
-    if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
+    if(!info.mTexture->mSource->mUri.empty())
     {
-      return search->second;
+      if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
+      {
+        return search->second;
+      }
     }
-    else
-    {
-      return ImageMetadata();
-    }
+    return ImageMetadata();
   };
 
   MaterialDefinition matDef;
@@ -480,7 +522,7 @@ void ConvertMaterial(const gt::Material& material, const std::unordered_map<std:
   if(pbr.mBaseColorTexture)
   {
     const auto semantic = MaterialDefinition::ALBEDO;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mBaseColorTexture, getTextureMetaData(imageMetaData, pbr.mBaseColorTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mBaseColorTexture, context, getTextureMetaData(imageMetaData, pbr.mBaseColorTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
@@ -496,7 +538,7 @@ void ConvertMaterial(const gt::Material& material, const std::unordered_map<std:
   {
     const auto semantic = MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
                           MaterialDefinition::GLTF_CHANNELS;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mMetallicRoughnessTexture, getTextureMetaData(imageMetaData, pbr.mMetallicRoughnessTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mMetallicRoughnessTexture, context, getTextureMetaData(imageMetaData, pbr.mMetallicRoughnessTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
@@ -509,7 +551,7 @@ void ConvertMaterial(const gt::Material& material, const std::unordered_map<std:
   if(material.mNormalTexture)
   {
     const auto semantic = MaterialDefinition::NORMAL;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mNormalTexture, getTextureMetaData(imageMetaData, material.mNormalTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mNormalTexture, context, getTextureMetaData(imageMetaData, material.mNormalTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
@@ -521,7 +563,7 @@ void ConvertMaterial(const gt::Material& material, const std::unordered_map<std:
   if(material.mOcclusionTexture)
   {
     const auto semantic = MaterialDefinition::OCCLUSION;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mOcclusionTexture, getTextureMetaData(imageMetaData, material.mOcclusionTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mOcclusionTexture, context, getTextureMetaData(imageMetaData, material.mOcclusionTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
     matDef.mOcclusionStrength = material.mOcclusionTexture.mStrength;
@@ -530,7 +572,7 @@ void ConvertMaterial(const gt::Material& material, const std::unordered_map<std:
   if(material.mEmissiveTexture)
   {
     const auto semantic = MaterialDefinition::EMISSIVE;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mEmissiveTexture, getTextureMetaData(imageMetaData, material.mEmissiveTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mEmissiveTexture, context, getTextureMetaData(imageMetaData, material.mEmissiveTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
     matDef.mEmissiveFactor = material.mEmissiveFactor;
@@ -547,14 +589,14 @@ void ConvertMaterial(const gt::Material& material, const std::unordered_map<std:
   if(material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture)
   {
     const auto semantic = MaterialDefinition::SPECULAR;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture, getTextureMetaData(imageMetaData, material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture, context, getTextureMetaData(imageMetaData, material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture))});
     matDef.mFlags |= semantic;
   }
 
   if(material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture)
   {
     const auto semantic = MaterialDefinition::SPECULAR_COLOR;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture, getTextureMetaData(imageMetaData, material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture, context, getTextureMetaData(imageMetaData, material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture))});
     matDef.mFlags |= semantic;
   }
 
@@ -572,7 +614,7 @@ void ConvertMaterials(const gt::Document& doc, ConversionContext& context)
 
   for(auto& m : doc.mMaterials)
   {
-    ConvertMaterial(m, imageMetaData, outMaterials);
+    ConvertMaterial(m, imageMetaData, outMaterials, context);
   }
 }
 
@@ -626,7 +668,8 @@ MeshDefinition::Accessor ConvertMeshPrimitiveAccessor(const gt::Accessor& acc)
                                    static_cast<uint16_t>(acc.GetElementSizeBytes()),
                                    acc.mMin,
                                    acc.mMax}),
-    std::move(sparseBlob)};
+    std::move(sparseBlob),
+    acc.mBufferView->mBuffer.GetIndex()};
 }
 
 void ConvertMeshes(const gt::Document& doc, ConversionContext& context)
@@ -648,7 +691,6 @@ void ConvertMeshes(const gt::Document& doc, ConversionContext& context)
       MeshDefinition meshDefinition;
 
       auto& attribs                 = primitive.mAttributes;
-      meshDefinition.mUri           = attribs.begin()->second->mBufferView->mBuffer->mUri;
       meshDefinition.mPrimitiveType = GLTF2_TO_DALI_PRIMITIVES[primitive.mMode];
 
       auto& accPositions        = *attribs.find(gt::Attribute::POSITION)->second;
@@ -663,7 +705,6 @@ void ConvertMeshes(const gt::Document& doc, ConversionContext& context)
         auto iFind = attribs.find(am.mType);
         if(iFind != attribs.end())
         {
-          DALI_ASSERT_DEBUG(iFind->second->mBufferView->mBuffer->mUri.compare(meshDefinition.mUri) == 0);
           auto& accessor = meshDefinition.*(am.mAccessor);
           accessor       = ConvertMeshPrimitiveAccessor(*iFind->second);
 
@@ -696,7 +737,8 @@ void ConvertMeshes(const gt::Document& doc, ConversionContext& context)
       {
         meshDefinition.mIndices = ConvertMeshPrimitiveAccessor(*primitive.mIndices);
         meshDefinition.mFlags |= (primitive.mIndices->mComponentType == gt::Component::UNSIGNED_INT) * MeshDefinition::U32_INDICES;
-        DALI_ASSERT_DEBUG(MaskMatch(meshDefinition.mFlags, MeshDefinition::U32_INDICES) || primitive.mIndices->mComponentType == gt::Component::UNSIGNED_SHORT);
+        meshDefinition.mFlags |= (primitive.mIndices->mComponentType == gt::Component::UNSIGNED_BYTE) * MeshDefinition::U8_INDICES;
+        DALI_ASSERT_DEBUG(MaskMatch(meshDefinition.mFlags, MeshDefinition::U32_INDICES) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_INDICES) || primitive.mIndices->mComponentType == gt::Component::UNSIGNED_SHORT);
       }
 
       if(!primitive.mTargets.empty())
@@ -753,7 +795,7 @@ ModelRenderable* MakeModelRenderable(const gt::Mesh::Primitive& prim, Conversion
       auto& outMaterials       = context.mOutput.mResources.mMaterials;
       context.mDefaultMaterial = outMaterials.size();
 
-      ConvertMaterial(gt::Material{}, context.mOutput.mSceneMetadata.mImageMetadata, outMaterials);
+      ConvertMaterial(gt::Material{}, context.mOutput.mSceneMetadata.mImageMetadata, outMaterials, context);
     }
 
     materialIdx = context.mDefaultMaterial;
@@ -916,22 +958,27 @@ void ConvertNodes(const gt::Document& doc, ConversionContext& context, bool isMR
 }
 
 template<typename T>
-void LoadDataFromAccessor(const std::string& path, Vector<T>& dataBuffer, uint32_t offset, uint32_t size)
+void LoadDataFromAccessor(ConversionContext& context, uint32_t bufferIndex, Vector<T>& dataBuffer, uint32_t offset, uint32_t size)
 {
-  std::ifstream animationBinaryFile(path, std::ifstream::binary);
-
-  if(!animationBinaryFile.is_open())
+  if(bufferIndex >= context.mOutput.mResources.mBuffers.size())
   {
-    throw std::runtime_error("Failed to load " + path);
+    DALI_LOG_ERROR("Invailid buffer index\n");
+    return;
   }
 
-  animationBinaryFile.seekg(offset);
-  animationBinaryFile.read(reinterpret_cast<char*>(dataBuffer.Begin()), size);
-  animationBinaryFile.close();
+  auto& buffer = context.mOutput.mResources.mBuffers[bufferIndex];
+  if(!buffer.IsAvailable())
+  {
+    DALI_LOG_ERROR("Failed to load from buffer stream.\n");
+  }
+  auto& stream = buffer.GetBufferStream();
+  stream.clear();
+  stream.seekg(offset, stream.beg);
+  stream.read(reinterpret_cast<char*>(dataBuffer.Begin()), size);
 }
 
 template<typename T>
-float LoadDataFromAccessors(const std::string& path, const gltf2::Accessor& input, const gltf2::Accessor& output, Vector<float>& inputDataBuffer, Vector<T>& outputDataBuffer)
+float LoadDataFromAccessors(ConversionContext& context, const gltf2::Accessor& input, const gltf2::Accessor& output, Vector<float>& inputDataBuffer, Vector<T>& outputDataBuffer)
 {
   inputDataBuffer.Resize(input.mCount);
   outputDataBuffer.Resize(output.mCount);
@@ -939,15 +986,15 @@ float LoadDataFromAccessors(const std::string& path, const gltf2::Accessor& inpu
   const uint32_t inputDataBufferSize  = input.GetBytesLength();
   const uint32_t outputDataBufferSize = output.GetBytesLength();
 
-  LoadDataFromAccessor<float>(path + std::string(input.mBufferView->mBuffer->mUri), inputDataBuffer, input.mBufferView->mByteOffset + input.mByteOffset, inputDataBufferSize);
-  LoadDataFromAccessor<T>(path + std::string(output.mBufferView->mBuffer->mUri), outputDataBuffer, output.mBufferView->mByteOffset + output.mByteOffset, outputDataBufferSize);
+  LoadDataFromAccessor<float>(context, output.mBufferView->mBuffer.GetIndex(), inputDataBuffer, input.mBufferView->mByteOffset + input.mByteOffset, inputDataBufferSize);
+  LoadDataFromAccessor<T>(context, output.mBufferView->mBuffer.GetIndex(), outputDataBuffer, output.mBufferView->mByteOffset + output.mByteOffset, outputDataBufferSize);
   ApplyAccessorMinMax(output, reinterpret_cast<float*>(outputDataBuffer.begin()));
 
   return inputDataBuffer[input.mCount - 1u];
 }
 
 template<typename T>
-float LoadKeyFrames(const std::string& path, const gt::Animation::Channel& channel, KeyFrames& keyFrames, gt::Animation::Channel::Target::Type type)
+float LoadKeyFrames(ConversionContext& context, const gt::Animation::Channel& channel, KeyFrames& keyFrames, gt::Animation::Channel::Target::Type type)
 {
   const gltf2::Accessor& input  = *channel.mSampler->mInput;
   const gltf2::Accessor& output = *channel.mSampler->mOutput;
@@ -955,7 +1002,7 @@ float LoadKeyFrames(const std::string& path, const gt::Animation::Channel& chann
   Vector<float> inputDataBuffer;
   Vector<T>     outputDataBuffer;
 
-  const float duration = std::max(LoadDataFromAccessors<T>(path, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
+  const float duration = std::max(LoadDataFromAccessors<T>(context, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
 
   for(uint32_t i = 0; i < input.mCount; ++i)
   {
@@ -965,7 +1012,7 @@ float LoadKeyFrames(const std::string& path, const gt::Animation::Channel& chann
   return duration;
 }
 
-float LoadBlendShapeKeyFrames(const std::string& path, const gt::Animation::Channel& channel, Index nodeIndex, uint32_t& propertyIndex, std::vector<Dali::Scene3D::Loader::AnimatedProperty>& properties)
+float LoadBlendShapeKeyFrames(ConversionContext& context, const gt::Animation::Channel& channel, Index nodeIndex, uint32_t& propertyIndex, std::vector<Dali::Scene3D::Loader::AnimatedProperty>& properties)
 {
   const gltf2::Accessor& input  = *channel.mSampler->mInput;
   const gltf2::Accessor& output = *channel.mSampler->mOutput;
@@ -973,7 +1020,7 @@ float LoadBlendShapeKeyFrames(const std::string& path, const gt::Animation::Chan
   Vector<float> inputDataBuffer;
   Vector<float> outputDataBuffer;
 
-  const float duration = LoadDataFromAccessors<float>(path, input, output, inputDataBuffer, outputDataBuffer);
+  const float duration = LoadDataFromAccessors<float>(context, input, output, inputDataBuffer, outputDataBuffer);
 
   char        weightNameBuffer[32];
   auto        prefixSize    = snprintf(weightNameBuffer, sizeof(weightNameBuffer), "%s[", BLEND_SHAPE_WEIGHTS_UNIFORM.c_str());
@@ -1044,7 +1091,7 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& context)
           animatedProperty.mPropertyName = POSITION_PROPERTY;
 
           animatedProperty.mKeyFrames = KeyFrames::New();
-          duration                    = LoadKeyFrames<Vector3>(context.mPath, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
+          duration                    = LoadKeyFrames<Vector3>(context, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
 
           animatedProperty.mTimePeriod = {0.f, duration};
           break;
@@ -1057,7 +1104,7 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& context)
           animatedProperty.mPropertyName = ORIENTATION_PROPERTY;
 
           animatedProperty.mKeyFrames = KeyFrames::New();
-          duration                    = LoadKeyFrames<Quaternion>(context.mPath, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
+          duration                    = LoadKeyFrames<Quaternion>(context, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
 
           animatedProperty.mTimePeriod = {0.f, duration};
           break;
@@ -1070,14 +1117,14 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& context)
           animatedProperty.mPropertyName = SCALE_PROPERTY;
 
           animatedProperty.mKeyFrames = KeyFrames::New();
-          duration                    = LoadKeyFrames<Vector3>(context.mPath, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
+          duration                    = LoadKeyFrames<Vector3>(context, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
 
           animatedProperty.mTimePeriod = {0.f, duration};
           break;
         }
         case gt::Animation::Channel::Target::WEIGHTS:
         {
-          duration = LoadBlendShapeKeyFrames(context.mPath, channel, nodeIndex, propertyIndex, animationDef.mProperties);
+          duration = LoadBlendShapeKeyFrames(context, channel, nodeIndex, propertyIndex, animationDef.mProperties);
 
           break;
         }
@@ -1112,17 +1159,21 @@ void ProcessSkins(const gt::Document& doc, ConversionContext& context)
 
   struct InverseBindMatrixAccessor : public IInverseBindMatrixProvider
   {
-    std::ifstream  mStream;
+    std::istream&  mStream;
     const uint32_t mElementSizeBytes;
 
-    InverseBindMatrixAccessor(const gt::Accessor& accessor, const std::string& path)
-    : mStream(path + std::string(accessor.mBufferView->mBuffer->mUri), std::ios::binary),
+    InverseBindMatrixAccessor(const gt::Accessor& accessor, ConversionContext& context)
+    : mStream(context.mOutput.mResources.mBuffers[accessor.mBufferView->mBuffer.GetIndex()].GetBufferStream()),
       mElementSizeBytes(accessor.GetElementSizeBytes())
     {
-      DALI_ASSERT_ALWAYS(mStream);
       DALI_ASSERT_DEBUG(accessor.mType == gt::AccessorType::MAT4 && accessor.mComponentType == gt::Component::FLOAT);
 
-      mStream.seekg(accessor.mBufferView->mByteOffset + accessor.mByteOffset);
+      if(!mStream.rdbuf()->in_avail())
+      {
+        DALI_LOG_ERROR("Failed to load from stream\n");
+      }
+      mStream.clear();
+      mStream.seekg(accessor.mBufferView->mByteOffset + accessor.mByteOffset, mStream.beg);
     }
 
     virtual void Provide(Matrix& ibm) override
@@ -1142,12 +1193,12 @@ void ProcessSkins(const gt::Document& doc, ConversionContext& context)
   auto& resources = context.mOutput.mResources;
   resources.mSkeletons.reserve(doc.mSkins.size());
 
-  for(auto& s : doc.mSkins)
+  for(auto& skin : doc.mSkins)
   {
     std::unique_ptr<IInverseBindMatrixProvider> ibmProvider;
-    if(s.mInverseBindMatrices)
+    if(skin.mInverseBindMatrices)
     {
-      ibmProvider.reset(new InverseBindMatrixAccessor(*s.mInverseBindMatrices, context.mPath));
+      ibmProvider.reset(new InverseBindMatrixAccessor(*skin.mInverseBindMatrices, context));
     }
     else
     {
@@ -1155,16 +1206,16 @@ void ProcessSkins(const gt::Document& doc, ConversionContext& context)
     }
 
     SkeletonDefinition skeleton;
-    if(s.mSkeleton.GetIndex() != INVALID_INDEX)
+    if(skin.mSkeleton.GetIndex() != INVALID_INDEX)
     {
-      skeleton.mRootNodeIdx = context.mNodeIndices.GetRuntimeId(s.mSkeleton.GetIndex());
+      skeleton.mRootNodeIdx = context.mNodeIndices.GetRuntimeId(skin.mSkeleton.GetIndex());
     }
 
-    skeleton.mJoints.resize(s.mJoints.size());
+    skeleton.mJoints.resize(skin.mJoints.size());
     auto iJoint = skeleton.mJoints.begin();
-    for(auto& j : s.mJoints)
+    for(auto& joint : skin.mJoints)
     {
-      iJoint->mNodeIdx = context.mNodeIndices.GetRuntimeId(j.GetIndex());
+      iJoint->mNodeIdx = context.mNodeIndices.GetRuntimeId(joint.GetIndex());
 
       ibmProvider->Provide(iJoint->mInverseBindMatrix);
 
@@ -1290,6 +1341,7 @@ void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactor
   auto              path = url.substr(0, url.rfind('/') + 1);
   ConversionContext context{params, path, INVALID_INDEX};
 
+  ConvertBuffers(doc, context);
   ConvertMaterials(doc, context);
   ConvertMeshes(doc, context);
   ConvertNodes(doc, context, isMRendererModel);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include <dali-scene3d/internal/common/environment-map-load-task.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/loader/cube-map-loader.h>
+#include <dali-scene3d/public-api/loader/environment-map-loader.h>
 
 
 namespace Dali
@@ -29,9 +29,10 @@ namespace Scene3D
 namespace Internal
 {
 
-EnvironmentMapLoadTask::EnvironmentMapLoadTask(const std::string& environmentMapUrl, CallbackBase* callback)
+EnvironmentMapLoadTask::EnvironmentMapLoadTask(const std::string& environmentMapUrl, Dali::Scene3D::EnvironmentMapType environmentMapType, CallbackBase* callback)
 : AsyncTask(callback),
   mEnvironmentMapUrl(environmentMapUrl),
+  mEnvironmentMapType(environmentMapType),
   mIsReady(true),
   mHasSucceeded(false)
 {
@@ -43,7 +44,8 @@ EnvironmentMapLoadTask::~EnvironmentMapLoadTask()
 
 void EnvironmentMapLoadTask::Process()
 {
-  mHasSucceeded = Scene3D::Loader::LoadCubeMapData(mEnvironmentMapUrl, mEnvironmentMapPixelData);
+  mEnvironmentMapData.SetEnvironmentMapType(mEnvironmentMapType);
+  mHasSucceeded = Scene3D::Loader::LoadEnvironmentMap(mEnvironmentMapUrl, mEnvironmentMapData);
 }
 
 bool EnvironmentMapLoadTask::IsReady()
@@ -56,14 +58,9 @@ bool EnvironmentMapLoadTask::HasSucceeded() const
   return mHasSucceeded;
 }
 
-Dali::Scene3D::Loader::CubeData EnvironmentMapLoadTask::GetEnvironmentMap() const
+Dali::Scene3D::Loader::EnvironmentMapData& EnvironmentMapLoadTask::GetEnvironmentMap()
 {
-  Dali::Scene3D::Loader::CubeData environmentMapPixelData;
-  if(mIsReady && mHasSucceeded && !mEnvironmentMapPixelData.data.empty())
-  {
-    environmentMapPixelData = mEnvironmentMapPixelData;
-  }
-  return environmentMapPixelData;
+  return mEnvironmentMapData;
 }
 
 } // namespace Internal

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 
 // INTERNAL INCLUDES
-#include "dali-scene3d/public-api/loader/cube-map-loader.h"
+#include "dali-scene3d/public-api/loader/environment-map-loader.h"
 #include "dali-scene3d/public-api/loader/environment-definition.h"
 #include "dali-scene3d/public-api/loader/utils.h"
 
@@ -50,16 +50,17 @@ EnvironmentDefinition::RawData
 EnvironmentDefinition::LoadRaw(const std::string& environmentsPath) const
 {
   RawData raw;
-  auto    loadFn = [&environmentsPath](const std::string& path, CubeData& cd) {
+  auto    loadFn = [&environmentsPath](const std::string& path, EnvironmentMapData& environmentMapData) {
     if(path.empty())
     {
-      cd.data.resize(6);
-      for(auto& face : cd.data)
+      environmentMapData.mPixelData.resize(6);
+      for(auto& face : environmentMapData.mPixelData)
       {
         face.push_back(PixelData::New(new uint8_t[3]{0xff, 0xff, 0xff}, 3, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY));
       }
+      environmentMapData.SetEnvironmentMapType(Dali::Scene3D::EnvironmentMapType::CUBEMAP);
     }
-    else if(!LoadCubeMapData(environmentsPath + path, cd)) // TODO: supporting EQUIRECTANGULAR
+    else if(!LoadEnvironmentMap(environmentsPath + path, environmentMapData))
     {
       ExceptionFlinger(ASSERT_LOCATION) << "Failed to load cubemap texture from '" << path << "'.";
     }
@@ -84,15 +85,15 @@ EnvironmentDefinition::Textures EnvironmentDefinition::Load(RawData&& raw) const
   Textures textures;
 
   // This texture should have 6 faces and only one mipmap
-  if(!raw.mDiffuse.data.empty())
+  if(!raw.mDiffuse.mPixelData.empty())
   {
-    textures.mDiffuse = raw.mDiffuse.CreateTexture();
+    textures.mDiffuse = raw.mDiffuse.GetTexture();
   }
 
   // This texture should have 6 faces and 6 mipmaps
-  if(!raw.mSpecular.data.empty())
+  if(!raw.mSpecular.mPixelData.empty())
   {
-    textures.mSpecular = raw.mSpecular.CreateTexture();
+    textures.mSpecular = raw.mSpecular.GetTexture();
   }
 
   if(raw.mBrdf)

@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_SCENE_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/common/environment-map.h>
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -103,16 +104,6 @@ class SceneView;
 class DALI_SCENE3D_API SceneView : public Dali::Toolkit::Control
 {
 public:
-  /**
-   * @brief The skybox types
-   * @SINCE_2_2.6
-   */
-  enum class SkyboxType
-  {
-    CUBEMAP,        ///< Skybox in cubemap
-    EQUIRECTANGULAR ///< Skybox in equirectangular projection
-  };
-
   /**
    * @brief Create an initialized SceneView.
    *
@@ -326,14 +317,46 @@ public:
   bool IsUsingFramebuffer() const;
 
   /**
+   * @brief Sets Multisampling level when we use Framebuffer.
+   * Default is 0.
+   *
+   * @SINCE_2_2.12
+   * @note Only applied if SceneView is using Framebuffer and Framebuffer Multisampling extension is supported.
+   *
+   * @param[in] multiSamplingLevel Level of multisampling if we use Framebuffer.
+   */
+  void SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel);
+
+  /**
+   * @brief Gets Multisampling level that user set.
+   * Default is 0.
+   *
+   * @SINCE_2_2.12
+   * @note This API doesn't check whether Multisampling extension is supported or not.
+   *
+   * @return MultisamplingLevel that user set.
+   */
+  uint8_t GetFramebufferMultiSamplingLevel() const;
+
+  /**
    * @brief Sets Skybox for this scene.
-   * Skybox texture is asynchronously loaded. When loading is finished, ResourceReady is emitted.
+   * Skybox texture starts to be loaded when SceneView is onScene.
+   * And Skybox texture is asynchronously loaded. When loading is finished, ResourceReady is emitted.
    *
    * @SINCE_2_2.0
    * @param[in] skyboxUrl image url for skybox.
-   * @param[in] skyboxType The environment type of skymap (by default it is cubemap).
+   * @note Default SkyboxEnvironmentMapType is Cube Map. Use SetSkyboxEnvironmentMapType method to set type explicitly.
    */
-  void SetSkybox(const std::string& skyboxUrl, SkyboxType skyboxType = SkyboxType::CUBEMAP);
+  void SetSkybox(const std::string& skyboxUrl);
+
+  /**
+   * @brief Sets Skybox environment map type for this skybox.
+   * If skybox texture already starts to be loaded, when the type is changed, the load request is canceled and re-starts to load with new type.
+   *
+   * @SINCE_2_2.11
+   * @param[in] skyboxEnvironmentMapType The environment type of skybox (by default it is cubemap).
+   */
+  void SetSkyboxEnvironmentMapType(Scene3D::EnvironmentMapType skyboxEnvironmentMapType);
 
   /**
    * @brief Sets Skybox intensity.
