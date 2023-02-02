@@ -11,6 +11,7 @@ SET(TC_SOURCES
   utc-Dali-Hash.cpp
   utc-Dali-JsonReader.cpp
   utc-Dali-JsonUtil.cpp
+  utc-Dali-ModelCacheManager.cpp
 )
 
 # List of test harness files (Won't get parsed for test cases)

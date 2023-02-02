@@ -32,6 +32,7 @@
 #include <dali-scene3d/internal/common/model-load-task.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
+#include <dali-scene3d/public-api/loader/load-result.h>
 
 namespace Dali
 {
@@ -51,9 +52,7 @@ public:
   using CameraData    = Loader::CameraParameters;
 
   /**
-   * @brief Creates a new Model.
-   *
-   * @return A public handle to the newly allocated Model.
+   * @copydoc Model::New()
    */
   static Dali::Scene3D::Model New(const std::string& modelUrl, const std::string& resourceDirectoryUrl);
 
@@ -135,6 +134,8 @@ public:
 protected:
   /**
    * @brief Constructs a new Model.
+   * @param[in] modelUrl model file path.(e.g., glTF, and DLI).
+   * @param[in] resourceDirectoryUrl resource file path that includes binary, image etc.
    */
   Model(const std::string& modelUrl, const std::string& resourceDirectoryUrl);
 

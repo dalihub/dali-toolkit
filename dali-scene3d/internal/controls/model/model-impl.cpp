@@ -31,6 +31,7 @@
 #include <filesystem>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/model-cache-manager.h>
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/loader/animation-definition.h>
@@ -192,6 +193,11 @@ Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUr
 
 Model::~Model()
 {
+  if(ModelCacheManager::Get())
+  {
+    ModelCacheManager::Get().UnreferenceModelCache(mModelUrl);
+  }
+
   ResetResourceTasks();
 }
 
@@ -437,6 +443,11 @@ void Model::OnSceneConnection(int depth)
 {
   if(!mModelLoadTask && !mModelRoot)
   {
+    if(ModelCacheManager::Get())
+    {
+      ModelCacheManager::Get().ReferenceModelCache(mModelUrl);
+    }
+
     Scene3D::Loader::InitializeGltfLoader();
     mModelLoadTask = new ModelLoadTask(mModelUrl, mResourceDirectoryUrl, MakeCallback(this, &Model::OnModelLoadComplete));
     Dali::AsyncTaskManager::Get().AddTask(mModelLoadTask);
@@ -592,10 +603,29 @@ void Model::UpdateImageBasedLightTexture()
       }
       uint32_t textureCount = textures.GetTextureCount();
       // EnvMap requires at least 2 texture, diffuse and specular
-      if(textureCount > 2u)
+      if(textureCount > 2u &&
+         (textures.GetTexture(textureCount - OFFSET_FOR_DIFFUSE_CUBE_TEXTURE) != currentDiffuseTexture ||
+          textures.GetTexture(textureCount - OFFSET_FOR_SPECULAR_CUBE_TEXTURE) != currentSpecularTexture))
       {
-        textures.SetTexture(textureCount - OFFSET_FOR_DIFFUSE_CUBE_TEXTURE, currentDiffuseTexture);
-        textures.SetTexture(textureCount - OFFSET_FOR_SPECULAR_CUBE_TEXTURE, currentSpecularTexture);
+        Dali::TextureSet newTextures = Dali::TextureSet::New();
+
+        for(uint32_t index = 0u; index < textureCount; ++index)
+        {
+          Dali::Texture texture = textures.GetTexture(index);
+          if(index == textureCount - OFFSET_FOR_DIFFUSE_CUBE_TEXTURE)
+          {
+            texture = currentDiffuseTexture;
+          }
+          else if(index == textureCount - OFFSET_FOR_SPECULAR_CUBE_TEXTURE)
+          {
+            texture = currentSpecularTexture;
+          }
+
+          newTextures.SetTexture(index, texture);
+          newTextures.SetSampler(index, textures.GetSampler(index));
+        }
+
+        renderer.SetTextures(newTextures);
       }
     }
     renderableActor.RegisterProperty(Dali::Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), currentIblScaleFactor);
@@ -689,6 +719,12 @@ void Model::OnModelLoadComplete()
   if(!mModelLoadTask->HasSucceeded())
   {
     ResetResourceTasks();
+
+    if(ModelCacheManager::Get())
+    {
+      ModelCacheManager::Get().UnreferenceModelCache(mModelUrl);
+    }
+
     return;
   }
 
@@ -696,15 +732,13 @@ void Model::OnModelLoadComplete()
   mRenderableActors.clear();
   CollectRenderableActor(mModelRoot);
 
-  auto* resources = &(mModelLoadTask->mResources);
-  auto* scene     = &(mModelLoadTask->mScene);
-  CreateAnimations(*scene);
+  CreateAnimations(mModelLoadTask->mLoadResult.mScene);
   ResetCameraParameters();
 
-  if(!resources->mEnvironmentMaps.empty())
+  if(!mModelLoadTask->mLoadResult.mResources.mEnvironmentMaps.empty())
   {
-    mDefaultDiffuseTexture  = resources->mEnvironmentMaps.front().second.mDiffuse;
-    mDefaultSpecularTexture = resources->mEnvironmentMaps.front().second.mSpecular;
+    mDefaultDiffuseTexture  = mModelLoadTask->mLoadResult.mResources.mEnvironmentMaps.front().second.mDiffuse;
+    mDefaultSpecularTexture = mModelLoadTask->mLoadResult.mResources.mEnvironmentMaps.front().second.mSpecular;
   }
 
   UpdateImageBasedLightTexture();
@@ -786,28 +820,26 @@ void Model::CreateModel()
   mModelRoot.SetProperty(Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR);
 
   BoundingVolume                                      AABB;
-  auto*                                               resources = &(mModelLoadTask->mResources);
-  auto*                                               scene     = &(mModelLoadTask->mScene);
   Dali::Scene3D::Loader::Transforms                   xforms{Dali::Scene3D::Loader::MatrixStack{}, Dali::Scene3D::Loader::ViewProjection{}};
-  Dali::Scene3D::Loader::NodeDefinition::CreateParams nodeParams{*resources, xforms, {}, {}, {}};
-  uint32_t                                            rootCount = 0u;
-  for(auto iRoot : scene->GetRoots())
+  Dali::Scene3D::Loader::NodeDefinition::CreateParams nodeParams{mModelLoadTask->mLoadResult.mResources, xforms, {}, {}, {}};
+
+  // Generate Dali handles from resource bundle. Note that we generate all scene's resouce immediatly.
+  mModelLoadTask->mLoadResult.mResources.GenerateResources(mModelLoadTask->mResourceRefCount);
+
+  for(auto iRoot : mModelLoadTask->mLoadResult.mScene.GetRoots())
   {
-    resources->GenerateResources(mModelLoadTask->mResourceRefCounts[rootCount]);
-
-    if(auto actor = scene->CreateNodes(iRoot, mModelLoadTask->mResourceChoices, nodeParams))
+    if(auto actor = mModelLoadTask->mLoadResult.mScene.CreateNodes(iRoot, mModelLoadTask->mResourceChoices, nodeParams))
     {
-      scene->ConfigureSkeletonJoints(iRoot, resources->mSkeletons, actor);
-      scene->ConfigureSkinningShaders(*resources, actor, std::move(nodeParams.mSkinnables));
-      ConfigureBlendShapeShaders(*resources, *scene, actor, std::move(nodeParams.mBlendshapeRequests));
+      mModelLoadTask->mLoadResult.mScene.ConfigureSkeletonJoints(iRoot, mModelLoadTask->mLoadResult.mResources.mSkeletons, actor);
+      mModelLoadTask->mLoadResult.mScene.ConfigureSkinningShaders(mModelLoadTask->mLoadResult.mResources, actor, std::move(nodeParams.mSkinnables));
+      ConfigureBlendShapeShaders(mModelLoadTask->mLoadResult.mResources, mModelLoadTask->mLoadResult.mScene, actor, std::move(nodeParams.mBlendshapeRequests));
 
-      scene->ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
+      mModelLoadTask->mLoadResult.mScene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
 
       mModelRoot.Add(actor);
     }
 
-    AddModelTreeToAABB(AABB, *scene, mModelLoadTask->mResourceChoices, iRoot, nodeParams, Matrix::IDENTITY);
-    rootCount++;
+    AddModelTreeToAABB(AABB, mModelLoadTask->mLoadResult.mScene, mModelLoadTask->mResourceChoices, iRoot, nodeParams, Matrix::IDENTITY);
   }
 
   mNaturalSize = AABB.CalculateSize();
@@ -825,7 +857,7 @@ void Model::CreateModel()
 void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
 {
   mAnimations.clear();
-  if(!mModelLoadTask->mAnimations.empty())
+  if(!mModelLoadTask->mLoadResult.mAnimationDefinitions.empty())
   {
     auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property) {
       if(property.mNodeIndex == Scene3D::Loader::INVALID_INDEX)
@@ -840,7 +872,7 @@ void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
       return mModelRoot.FindChildById(node->mNodeId);
     };
 
-    for(auto&& animation : mModelLoadTask->mAnimations)
+    for(auto&& animation : mModelLoadTask->mLoadResult.mAnimationDefinitions)
     {
       Dali::Animation anim = animation.ReAnimate(getActor);
       mAnimations.push_back({animation.mName, anim});
@@ -851,10 +883,10 @@ void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
 void Model::ResetCameraParameters()
 {
   mCameraParameters.clear();
-  if(!mModelLoadTask->mCameraParameters.empty())
+  if(!mModelLoadTask->mLoadResult.mCameraParameters.empty())
   {
     // Copy camera parameters.
-    std::copy(mModelLoadTask->mCameraParameters.begin(), mModelLoadTask->mCameraParameters.end(), std::back_inserter(mCameraParameters));
+    std::copy(mModelLoadTask->mLoadResult.mCameraParameters.begin(), mModelLoadTask->mLoadResult.mCameraParameters.end(), std::back_inserter(mCameraParameters));
   }
 }
 
