@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
  */
 
 // FILE HEADER
-#include "dali-scene3d/public-api/loader/resource-bundle.h"
+#include <dali-scene3d/public-api/loader/resource-bundle.h>
 
 // EXTERNAL
+#include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
+#include <dali/public-api/rendering/sampler.h>
 #include <cstring>
 #include <fstream>
 #include <istream>
-#include "dali-toolkit/public-api/image-loader/sync-image-loader.h"
-#include "dali/public-api/rendering/sampler.h"
 
 namespace Dali
 {
@@ -48,6 +48,14 @@ const char* GetResourceTypeName(ResourceType::Value type)
 {
   return RESOURCE_TYPE_NAMES[static_cast<int>(type)];
 }
+
+ResourceBundle::ResourceBundle()
+: mRawResourcesLoading(false),
+  mResourcesGenerating(false),
+  mRawResourcesLoaded(false),
+  mResourcesGenerated(false)
+{
+};
 
 ResourceRefCounts ResourceBundle::CreateRefCounter() const
 {
@@ -75,6 +83,9 @@ void ResourceBundle::CountEnvironmentReferences(ResourceRefCounts& refCounts) co
 
 void ResourceBundle::LoadResources(const ResourceRefCounts& refCounts, PathProvider pathProvider, Options::Type options)
 {
+  mRawResourcesLoading = true;
+  mResourcesGenerating = true;
+
   const auto kForceLoad  = MaskMatch(options, Options::ForceReload);
   const auto kKeepUnused = MaskMatch(options, Options::KeepUnused);
 
@@ -146,117 +157,186 @@ void ResourceBundle::LoadResources(const ResourceRefCounts& refCounts, PathProvi
       iMaterial.second = TextureSet();
     }
   }
+
+  mRawResourcesLoading = false;
+  mResourcesGenerating = false;
+
+  mRawResourcesLoaded = true;
+  mResourcesGenerated = true;
 }
 
 void ResourceBundle::LoadRawResources(const ResourceRefCounts& refCounts, PathProvider pathProvider, Options::Type options)
 {
-  const auto kForceLoad  = MaskMatch(options, Options::ForceReload);
+  const auto kForceLoad = MaskMatch(options, Options::ForceReload);
 
-  const auto& refCountEnvMaps  = refCounts[ResourceType::Environment];
-  auto        environmentsPath = pathProvider(ResourceType::Environment);
-  for(uint32_t i = 0, iEnd = refCountEnvMaps.Size(); i != iEnd; ++i)
+  if(kForceLoad || (!mRawResourcesLoaded && !mRawResourcesLoading))
   {
-    auto  refCount = refCountEnvMaps[i];
-    auto& iEnvMap  = mEnvironmentMaps[i];
-    if(refCount > 0 && (kForceLoad || !iEnvMap.second.IsLoaded()))
-    {
-      iEnvMap.first.mRawData = std::make_shared<EnvironmentDefinition::RawData>(iEnvMap.first.LoadRaw(environmentsPath));
-    }
-  }
+    mRawResourcesLoading = true;
 
-  const auto& refCountShaders = refCounts[ResourceType::Shader];
-  auto        shadersPath     = pathProvider(ResourceType::Shader);
-  for(uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
-  {
-    auto  refCount = refCountShaders[i];
-    auto& iShader  = mShaders[i];
-    if(refCount > 0 && (kForceLoad || !iShader.second))
+    const auto& refCountEnvMaps  = refCounts[ResourceType::Environment];
+    auto        environmentsPath = pathProvider(ResourceType::Environment);
+    for(uint32_t i = 0, iEnd = refCountEnvMaps.Size(); i != iEnd; ++i)
     {
-      iShader.first.mRawData = std::make_shared<ShaderDefinition::RawData>(iShader.first.LoadRaw(shadersPath));
+      auto  refCount = refCountEnvMaps[i];
+      auto& iEnvMap  = mEnvironmentMaps[i];
+      if(refCount > 0 && (kForceLoad || (!iEnvMap.first.mRawData && !iEnvMap.second.IsLoaded())))
+      {
+        iEnvMap.first.mRawData = std::make_shared<EnvironmentDefinition::RawData>(iEnvMap.first.LoadRaw(environmentsPath));
+      }
     }
-  }
 
-  const auto& refCountMeshes = refCounts[ResourceType::Mesh];
-  auto        modelsPath     = pathProvider(ResourceType::Mesh);
-  for(uint32_t i = 0, iEnd = refCountMeshes.Size(); i != iEnd; ++i)
-  {
-    auto  refCount = refCountMeshes[i];
-    auto& iMesh    = mMeshes[i];
-    if(refCount > 0 && (kForceLoad || !iMesh.second.geometry))
+    const auto& refCountShaders = refCounts[ResourceType::Shader];
+    auto        shadersPath     = pathProvider(ResourceType::Shader);
+    for(uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
     {
-      iMesh.first.mRawData = std::make_shared<MeshDefinition::RawData>(iMesh.first.LoadRaw(modelsPath, mBuffers));
+      auto  refCount = refCountShaders[i];
+      auto& iShader  = mShaders[i];
+      if(refCount > 0 && (kForceLoad || !iShader.second))
+      {
+        iShader.first.mRawData = std::make_shared<ShaderDefinition::RawData>(iShader.first.LoadRaw(shadersPath));
+      }
     }
-  }
 
-  const auto& refCountMaterials = refCounts[ResourceType::Material];
-  auto        imagesPath        = pathProvider(ResourceType::Material);
-  for(uint32_t i = 0, iEnd = refCountMaterials.Size(); i != iEnd; ++i)
-  {
-    auto  refCount  = refCountMaterials[i];
-    auto& iMaterial = mMaterials[i];
-    if(refCount > 0 && (kForceLoad || !iMaterial.second))
+    const auto& refCountMeshes = refCounts[ResourceType::Mesh];
+    auto        modelsPath     = pathProvider(ResourceType::Mesh);
+    for(uint32_t i = 0, iEnd = refCountMeshes.Size(); i != iEnd; ++i)
     {
-      iMaterial.first.mRawData = std::make_shared<MaterialDefinition::RawData>(iMaterial.first.LoadRaw(imagesPath));
+      auto  refCount = refCountMeshes[i];
+      auto& iMesh    = mMeshes[i];
+      if(refCount > 0 && (kForceLoad || (!iMesh.first.mRawData && !iMesh.second.geometry)))
+      {
+        iMesh.first.mRawData = std::make_shared<MeshDefinition::RawData>(iMesh.first.LoadRaw(modelsPath, mBuffers));
+      }
     }
+
+    const auto& refCountMaterials = refCounts[ResourceType::Material];
+    auto        imagesPath        = pathProvider(ResourceType::Material);
+    for(uint32_t i = 0, iEnd = refCountMaterials.Size(); i != iEnd; ++i)
+    {
+      auto  refCount  = refCountMaterials[i];
+      auto& iMaterial = mMaterials[i];
+      if(refCount > 0 && (kForceLoad || (!iMaterial.first.mRawData && !iMaterial.second)))
+      {
+        iMaterial.first.mRawData = std::make_shared<MaterialDefinition::RawData>(iMaterial.first.LoadRaw(imagesPath));
+      }
+    }
+
+    mRawResourcesLoading = false;
+    mRawResourcesLoaded  = true;
   }
 }
 
 void ResourceBundle::GenerateResources(const ResourceRefCounts& refCounts, Options::Type options)
 {
-  const auto& refCountEnvMaps = refCounts[ResourceType::Environment];
-  for(uint32_t i = 0, iEnd = refCountEnvMaps.Size(); i != iEnd; ++i)
-  {
-    auto& iEnvMap = mEnvironmentMaps[i];
-    if(iEnvMap.first.mRawData)
-    {
-      iEnvMap.second = iEnvMap.first.Load(std::move(*(iEnvMap.first.mRawData)));
-    }
-    else
-    {
-      iEnvMap.second.mDiffuse  = Texture();
-      iEnvMap.second.mSpecular = Texture();
-    }
-  }
+  const auto kForceLoad = MaskMatch(options, Options::ForceReload);
 
-  const auto& refCountShaders = refCounts[ResourceType::Shader];
-  for(uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
+  if(mRawResourcesLoaded)
   {
-    auto& iShader = mShaders[i];
-    if(iShader.first.mRawData)
+    if(kForceLoad || (!mResourcesGenerated && !mResourcesGenerating))
     {
-      iShader.second = iShader.first.Load(std::move(*(iShader.first.mRawData)));
-    }
-    else
-    {
-      iShader.second = Shader();
-    }
-  }
+      mResourcesGenerating = true;
 
-  const auto& refCountMeshes = refCounts[ResourceType::Mesh];
-  for(uint32_t i = 0, iEnd = refCountMeshes.Size(); i != iEnd; ++i)
-  {
-    auto& iMesh = mMeshes[i];
-    if(iMesh.first.mRawData)
-    {
-      iMesh.second = iMesh.first.Load(std::move(*(iMesh.first.mRawData)));
-    }
-    else
-    {
-      iMesh.second.geometry = Geometry();
-    }
-  }
+      const auto& refCountEnvMaps = refCounts[ResourceType::Environment];
+      for(uint32_t i = 0, iEnd = refCountEnvMaps.Size(); i != iEnd; ++i)
+      {
+        auto  refCount = refCountEnvMaps[i];
+        auto& iEnvMap  = mEnvironmentMaps[i];
+        if(refCount > 0 && (kForceLoad || !iEnvMap.second.IsLoaded()))
+        {
+          if(iEnvMap.first.mRawData)
+          {
+            iEnvMap.second = iEnvMap.first.Load(std::move(*(iEnvMap.first.mRawData)));
+          }
+          else
+          {
+            iEnvMap.second.mDiffuse  = Texture();
+            iEnvMap.second.mSpecular = Texture();
+          }
+        }
+      }
 
-  const auto& refCountMaterials = refCounts[ResourceType::Material];
-  for(uint32_t i = 0, iEnd = refCountMaterials.Size(); i != iEnd; ++i)
-  {
-    auto& iMaterial = mMaterials[i];
-    if(iMaterial.first.mRawData)
-    {
-      iMaterial.second = iMaterial.first.Load(mEnvironmentMaps, std::move(*(iMaterial.first.mRawData)));
+      const auto& refCountShaders = refCounts[ResourceType::Shader];
+      for(uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
+      {
+        auto  refCount = refCountShaders[i];
+        auto& iShader  = mShaders[i];
+        if(refCount > 0 && (kForceLoad || !iShader.second))
+        {
+          if(iShader.first.mRawData)
+          {
+            iShader.second = iShader.first.Load(std::move(*(iShader.first.mRawData)));
+          }
+          else
+          {
+            iShader.second = Shader();
+          }
+        }
+      }
+
+      const auto& refCountMeshes = refCounts[ResourceType::Mesh];
+      for(uint32_t i = 0, iEnd = refCountMeshes.Size(); i != iEnd; ++i)
+      {
+        auto  refCount = refCountMeshes[i];
+        auto& iMesh    = mMeshes[i];
+        if(refCount > 0 && (kForceLoad || !iMesh.second.geometry))
+        {
+          if(iMesh.first.mRawData)
+          {
+            iMesh.second = iMesh.first.Load(std::move(*(iMesh.first.mRawData)));
+          }
+          else
+          {
+            iMesh.second.geometry = Geometry();
+          }
+        }
+      }
+
+      const auto& refCountMaterials = refCounts[ResourceType::Material];
+      for(uint32_t i = 0, iEnd = refCountMaterials.Size(); i != iEnd; ++i)
+      {
+        auto  refCount  = refCountMaterials[i];
+        auto& iMaterial = mMaterials[i];
+        if(refCount > 0 && (kForceLoad || !iMaterial.second))
+        {
+          if(iMaterial.first.mRawData)
+          {
+            iMaterial.second = iMaterial.first.Load(mEnvironmentMaps, std::move(*(iMaterial.first.mRawData)));
+          }
+          else
+          {
+            iMaterial.second = TextureSet();
+          }
+        }
+      }
+
+      mResourcesGenerating = false;
+      mResourcesGenerated  = true;
     }
-    else
+    else if(mResourcesGenerated && !mResourcesGenerating)
     {
-      iMaterial.second = TextureSet();
+      mResourcesGenerating = true;
+
+      const auto& refCountShaders = refCounts[ResourceType::Shader];
+      for(uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
+      {
+        auto  refCount = refCountShaders[i];
+        auto& iShader  = mShaders[i];
+
+        // Always regenerating the Shader objects as they can't be shared between multiple models.
+        if(refCount > 0 || kForceLoad)
+        {
+          if(iShader.first.mRawData)
+          {
+            iShader.second = iShader.first.Load(std::move(*(iShader.first.mRawData)));
+          }
+          else
+          {
+            iShader.second = Shader();
+          }
+        }
+      }
+
+      mResourcesGenerating = false;
     }
   }
 }
