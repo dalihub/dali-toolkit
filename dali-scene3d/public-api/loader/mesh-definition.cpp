@@ -79,7 +79,7 @@ bool ReadBlob(const MeshDefinition::Blob& descriptor, std::istream& source, uint
 
   if(descriptor.IsConsecutive())
   {
-    return !!source.read(reinterpret_cast<char*>(target), descriptor.mLength);
+    return !!source.read(reinterpret_cast<char*>(target), static_cast<std::streamsize>(static_cast<size_t>(descriptor.mLength)));
   }
   else
   {
@@ -541,12 +541,9 @@ void MeshDefinition::Blob::ApplyMinMax(const std::vector<float>& min, const std:
   const auto numComponents = std::max(min.size(), max.size());
 
   using ClampFn   = void (*)(const float*, const float*, uint32_t, float&);
-  ClampFn clampFn = min.empty() ? (max.empty() ? static_cast<ClampFn>(nullptr) : [](const float* min, const float* max, uint32_t i, float& value)
-                                     { value = std::min(max[i], value); })
-                                : (max.empty() ? [](const float* min, const float* max, uint32_t i, float& value)
-                                     { value = std::max(min[i], value); }
-                                               : static_cast<ClampFn>([](const float* min, const float* max, uint32_t i, float& value)
-                                                                      { value = std::min(std::max(min[i], value), max[i]); }));
+  ClampFn clampFn = min.empty() ? (max.empty() ? static_cast<ClampFn>(nullptr) : [](const float* min, const float* max, uint32_t i, float& value) { value = std::min(max[i], value); })
+                                : (max.empty() ? [](const float* min, const float* max, uint32_t i, float& value) { value = std::max(min[i], value); }
+                                               : static_cast<ClampFn>([](const float* min, const float* max, uint32_t i, float& value) { value = std::min(std::max(min[i], value), max[i]); }));
 
   if(!clampFn)
   {
@@ -686,7 +683,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
       raw.mIndices.resize(indexCount); // NOTE: we need space for uint32_ts initially.
 
       std::string path;
-      auto u8s = reinterpret_cast<uint8_t*>(raw.mIndices.data()) + indexCount;
+      auto        u8s    = reinterpret_cast<uint8_t*>(raw.mIndices.data()) + indexCount;
       auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mIndices.mBufferIdx], path);
       if(!ReadAccessor(mIndices, stream, u8s))
       {
@@ -708,7 +705,6 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
                           mIndices.mBlob.mStride >= sizeof(unsigned short)) &&
                          "Index buffer length not a multiple of element size");
       raw.mIndices.resize(mIndices.mBlob.mLength / sizeof(unsigned short));
-
 
       std::string path;
       auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mIndices.mBufferIdx], path);

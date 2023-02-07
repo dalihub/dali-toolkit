@@ -19,10 +19,10 @@
 #include <dali-scene3d/public-api/loader/gltf2-loader.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/math/quaternion.h>
-#include <dali/devel-api/threading/mutex.h>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -467,7 +467,7 @@ SamplerFlags::Type ConvertSampler(const gt::Ref<gt::Sampler>& sampler)
 TextureDefinition ConvertTextureInfo(const gt::TextureInfo& mm, ConversionContext& context, const ImageMetadata& metaData = ImageMetadata())
 {
   TextureDefinition textureDefinition;
-  std::string uri = std::string(mm.mTexture->mSource->mUri);
+  std::string       uri = std::string(mm.mTexture->mSource->mUri);
   if(uri.empty())
   {
     uint32_t bufferIndex = mm.mTexture->mSource->mBufferView->mBuffer.GetIndex();
@@ -478,7 +478,7 @@ TextureDefinition ConvertTextureInfo(const gt::TextureInfo& mm, ConversionContex
       stream.seekg(mm.mTexture->mSource->mBufferView->mByteOffset, stream.beg);
       std::vector<uint8_t> dataBuffer;
       dataBuffer.resize(mm.mTexture->mSource->mBufferView->mByteLength);
-      stream.read(reinterpret_cast<char*>(dataBuffer.data()), mm.mTexture->mSource->mBufferView->mByteLength);
+      stream.read(reinterpret_cast<char*>(dataBuffer.data()), static_cast<std::streamsize>(static_cast<size_t>(mm.mTexture->mSource->mBufferView->mByteLength)));
       return TextureDefinition{std::move(dataBuffer), ConvertSampler(mm.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode};
     }
     return TextureDefinition();
@@ -974,7 +974,7 @@ void LoadDataFromAccessor(ConversionContext& context, uint32_t bufferIndex, Vect
   auto& stream = buffer.GetBufferStream();
   stream.clear();
   stream.seekg(offset, stream.beg);
-  stream.read(reinterpret_cast<char*>(dataBuffer.Begin()), size);
+  stream.read(reinterpret_cast<char*>(dataBuffer.Begin()), static_cast<std::streamsize>(static_cast<size_t>(size)));
 }
 
 template<typename T>
@@ -1178,7 +1178,7 @@ void ProcessSkins(const gt::Document& doc, ConversionContext& context)
 
     virtual void Provide(Matrix& ibm) override
     {
-      DALI_ASSERT_ALWAYS(mStream.read(reinterpret_cast<char*>(ibm.AsFloat()), mElementSizeBytes));
+      DALI_ASSERT_ALWAYS(mStream.read(reinterpret_cast<char*>(ibm.AsFloat()), static_cast<std::streamsize>(static_cast<size_t>(mElementSizeBytes))));
     }
   };
 
