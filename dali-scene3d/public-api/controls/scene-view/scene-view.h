@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_SCENE_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/common/environment-map.h>
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -319,6 +320,7 @@ public:
    * @brief Sets Multisampling level when we use Framebuffer.
    * Default is 0.
    *
+   * @SINCE_2_2.12
    * @note Only applied if SceneView is using Framebuffer and Framebuffer Multisampling extension is supported.
    *
    * @param[in] multiSamplingLevel Level of multisampling if we use Framebuffer.
@@ -329,11 +331,68 @@ public:
    * @brief Gets Multisampling level that user set.
    * Default is 0.
    *
+   * @SINCE_2_2.12
    * @note This API doesn't check whether Multisampling extension is supported or not.
    *
    * @return MultisamplingLevel that user set.
    */
   uint8_t GetFramebufferMultiSamplingLevel() const;
+
+  /**
+   * @brief Sets Skybox for this scene.
+   * Skybox texture starts to be loaded when SceneView is onScene.
+   * And Skybox texture is asynchronously loaded. When loading is finished, ResourceReady is emitted.
+   *
+   * @SINCE_2_2.0
+   * @param[in] skyboxUrl image url for skybox.
+   * @note Default SkyboxEnvironmentMapType is Cube Map. Use SetSkyboxEnvironmentMapType method to set type explicitly.
+   */
+  void SetSkybox(const std::string& skyboxUrl);
+
+  /**
+   * @brief Sets Skybox environment map type for this skybox.
+   * If skybox texture already starts to be loaded, when the type is changed, the load request is canceled and re-starts to load with new type.
+   *
+   * @SINCE_2_2.11
+   * @param[in] skyboxEnvironmentMapType The environment type of skybox (by default it is cubemap).
+   */
+  void SetSkyboxEnvironmentMapType(Scene3D::EnvironmentMapType skyboxEnvironmentMapType);
+
+  /**
+   * @brief Sets Skybox intensity.
+   * The skybox intensity is multiplied to the color of skybox texture.
+   * Default value is 1.0f.
+   *
+   * @SINCE_2_2.0
+   * @note Intensity should be positive value.
+   * @param[in] intensity Intensity value to be multiplied to the cube map color
+   */
+  void SetSkyboxIntensity(float intensity);
+
+  /**
+   * @brief Gets Skybox intensity.
+   * Default value is 1.0f.
+   *
+   * @SINCE_2_2.0
+   * @return skybox intensity
+   */
+  float GetSkyboxIntensity() const;
+
+  /**
+   * @brief Sets Orientation of Skybox.
+   *
+   * @SINCE_2_2.0
+   * @param[in] orientation Quaternion for orientation of Skybox.
+   */
+  void SetSkyboxOrientation(const Quaternion& orientation);
+
+  /**
+   * @brief Gets Skybox orientation.
+   *
+   * @SINCE_2_2.0
+   * @return skybox orientation
+   */
+  Quaternion GetSkyboxOrientation() const;
 
 public: // Not intended for application developers
   /// @cond internal

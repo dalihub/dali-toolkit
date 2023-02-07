@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,7 +185,7 @@ bool ConvertPixelFormat(const uint32_t ktxPixelFormat, Pixel::Format& format)
   return true;
 }
 
-bool LoadKtxData(const std::string& path, CubeData& cubedata)
+bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData)
 {
   std::fstream fp(path, std::ios::in | std::ios::binary);
   if(fp.is_open() == false)
@@ -215,10 +215,10 @@ bool LoadKtxData(const std::string& path, CubeData& cubedata)
   header.pixelDepth            = std::max(header.pixelDepth, 1u);
   header.pixelHeight           = std::max(header.pixelHeight, 1u);
 
-  cubedata.data.resize(header.numberOfFaces);
+  environmentMapData.mPixelData.resize(header.numberOfFaces);
   for(uint32_t face = 0u; face < header.numberOfFaces; ++face)
   {
-    cubedata.data[face].resize(header.numberOfMipmapLevels);
+    environmentMapData.mPixelData[face].resize(header.numberOfMipmapLevels);
   }
 
   Pixel::Format daliformat = Pixel::RGB888;
@@ -243,17 +243,18 @@ bool LoadKtxData(const std::string& path, CubeData& cubedata)
       for(uint32_t face = 0u; face < header.numberOfFaces; ++face)
       {
         std::unique_ptr<uint8_t, void (*)(uint8_t*)> img(new uint8_t[byteSize], FreeBuffer);
-        if(fp.read(reinterpret_cast<char*>(img.get()), byteSize).good() == false)
+        if(fp.read(reinterpret_cast<char*>(img.get()), static_cast<std::streamsize>(static_cast<size_t>(byteSize))).good() == false)
         {
           return false;
         }
-        cubedata.data[face][mipmapLevel] = PixelData::New(img.release(), byteSize, header.pixelWidth, header.pixelHeight, daliformat, PixelData::DELETE_ARRAY);
+        environmentMapData.mPixelData[face][mipmapLevel] = PixelData::New(img.release(), byteSize, header.pixelWidth, header.pixelHeight, daliformat, PixelData::DELETE_ARRAY);
       }
     }
 
     header.pixelHeight /= 2u;
     header.pixelWidth /= 2u;
   }
+  environmentMapData.SetEnvironmentMapType(Scene3D::EnvironmentMapType::CUBEMAP);
 
   return true;
 }

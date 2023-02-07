@@ -29,40 +29,40 @@ using namespace Dali::Scene3D::Loader;
 
 int UtcDaliKtxLoaderFailNonexistent(void)
 {
-  CubeData data;
-  DALI_TEST_CHECK(!LoadKtxData("non-existent.ktx", data));
+  EnvironmentMapData environmentMapData;
+  DALI_TEST_CHECK(!LoadKtxData("non-existent.ktx", environmentMapData));
   END_TEST;
 }
 
 int UtcDaliKtxLoaderFailInvalid1(void)
 {
-  CubeData data;
-  DALI_TEST_CHECK(!LoadKtxData(TEST_RESOURCE_DIR "/invalid.svg", data)); // file smaller than KTX header
+  EnvironmentMapData environmentMapData;
+  DALI_TEST_CHECK(!LoadKtxData(TEST_RESOURCE_DIR "/invalid.svg", environmentMapData)); // file smaller than KTX header
   END_TEST;
 }
 
 int UtcDaliKtxLoaderFailInvalid2(void)
 {
-  CubeData data;
-  DALI_TEST_CHECK(!LoadKtxData(TEST_RESOURCE_DIR "/anim.gif", data)); // not a KTX
+  EnvironmentMapData environmentMapData;
+  DALI_TEST_CHECK(!LoadKtxData(TEST_RESOURCE_DIR "/anim.gif", environmentMapData)); // not a KTX
   END_TEST;
 }
 
 int UtcDaliKtxLoaderFailTruncated(void)
 {
-  CubeData data;
-  DALI_TEST_CHECK(!LoadKtxData(TEST_RESOURCE_DIR "/truncated.ktx", data));
+  EnvironmentMapData environmentMapData;
+  DALI_TEST_CHECK(!LoadKtxData(TEST_RESOURCE_DIR "/truncated.ktx", environmentMapData));
   END_TEST;
 }
 
 int UtcDaliKtxLoaderSuccess(void)
 {
-  CubeData cubeData;
+  EnvironmentMapData environmentMapData;
   auto path = TEST_RESOURCE_DIR "/forest_radiance.ktx";
-  DALI_TEST_CHECK(LoadKtxData(path, cubeData));
+  DALI_TEST_CHECK(LoadKtxData(path, environmentMapData));
 
-  DALI_TEST_EQUAL(6u, cubeData.data.size());
-  for (auto& face: cubeData.data)
+  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.size());
+  for (auto& face: environmentMapData.mPixelData)
   {
     uint32_t size = 64;
     for (auto& mipData: face)
@@ -102,27 +102,27 @@ int UtcDaliKtxLoaderFormats(void)
   };
   for (auto i : pathFormats)
   {
-    CubeData cubeData;
-    DALI_TEST_CHECK(LoadKtxData(resPath + i.first + ".ktx", cubeData));
-    DALI_TEST_EQUAL(cubeData.data[0][0].GetPixelFormat(), i.second);
+    EnvironmentMapData environmentMapData;
+    DALI_TEST_CHECK(LoadKtxData(resPath + i.first + ".ktx", environmentMapData));
+    DALI_TEST_EQUAL(environmentMapData.mPixelData[0][0].GetPixelFormat(), i.second);
   }
 
   END_TEST;
 }
 
-int UtcDaliKtxLoaderCubeDataCreateTexture1(void)
+int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture1(void)
 {
   uint32_t pixelBufferSize = 3;
   uint8_t* pixelBuffer = new uint8_t[pixelBufferSize];
 
-  CubeData cubeData;
-  cubeData.data.push_back({});
+  EnvironmentMapData environmentMapData;
+  environmentMapData.mPixelData.push_back({});
 
   auto pixelData = PixelData::New(pixelBuffer, pixelBufferSize, 1, 1, Pixel::Format::RGB888, PixelData::DELETE_ARRAY);
-  cubeData.data[0].push_back(pixelData);
+  environmentMapData.mPixelData[0].push_back(pixelData);
 
   TestApplication app;
-  auto texture = cubeData.CreateTexture();
+  auto texture = environmentMapData.GetTexture();
 
   DALI_TEST_CHECK(texture);
   DALI_TEST_EQUAL(1u, texture.GetWidth());
@@ -131,14 +131,14 @@ int UtcDaliKtxLoaderCubeDataCreateTexture1(void)
   END_TEST;
 }
 
-int UtcDaliKtxLoaderCubeDataCreateTexture2(void)
+int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture2(void)
 {
-  CubeData cubeData;
+  EnvironmentMapData environmentMapData;
   auto path = TEST_RESOURCE_DIR "/forest_radiance.ktx";
-  DALI_TEST_CHECK(LoadKtxData(path, cubeData));
+  DALI_TEST_CHECK(LoadKtxData(path, environmentMapData));
 
   TestApplication app;
-  auto texture = cubeData.CreateTexture();
+  auto texture = environmentMapData.GetTexture();
 
   DALI_TEST_CHECK(texture);
   DALI_TEST_EQUAL(64u, texture.GetWidth());
@@ -147,14 +147,14 @@ int UtcDaliKtxLoaderCubeDataCreateTexture2(void)
   END_TEST;
 }
 
-int UtcDaliKtxLoaderCubeDataCreateTexture3(void)
+int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture3(void)
 {
-  CubeData cubeData;
+  EnvironmentMapData environmentMapData;
   auto path = TEST_RESOURCE_DIR "/papermill_E_diffuse-64.ktx";
-  DALI_TEST_CHECK(LoadKtxData(path, cubeData));
+  DALI_TEST_CHECK(LoadKtxData(path, environmentMapData));
 
   TestApplication app;
-  auto texture = cubeData.CreateTexture();
+  auto texture = environmentMapData.GetTexture();
 
   DALI_TEST_CHECK(texture);
   DALI_TEST_EQUAL(64u, texture.GetWidth());

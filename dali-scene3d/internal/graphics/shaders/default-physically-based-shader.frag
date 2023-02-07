@@ -23,7 +23,6 @@ precision highp float;
 precision mediump float;
 #endif
 
-#ifdef THREE_TEX
 #ifdef GLTF_CHANNELS
 #define METALLIC b
 #define ROUGHNESS g
@@ -31,7 +30,6 @@ precision mediump float;
 #define METALLIC r
 #define ROUGHNESS a
 #endif //GLTF_CHANNELS
-#endif //THREE_TEX
 
 uniform lowp vec4 uColor; // Color from SceneGraph
 uniform lowp vec4 uColorFactor; // Color from material
@@ -87,7 +85,7 @@ uniform lowp float uMask;
 uniform lowp float uAlphaThreshold;
 
 // TODO: Multiple texture coordinate will be supported.
-in lowp vec2 vUV;
+in mediump vec2 vUV;
 in lowp mat3 vTBN;
 #ifdef COLOR_ATTRIBUTE
 in lowp vec4 vColor;
@@ -156,8 +154,8 @@ void main()
 #endif // THREE_TEX
 
   // The value of uOpaque and uMask can be 0.0 or 1.0.
-  // If uMask is 0.0, a Pixel that has bigger alpha than uAlphaThreashold becomes fully opaque,
-  // in other hand, a pixel that has smaller alpha than uAlphaThreashold becomes fully transparent.
+  // If uMask is 1.0, a Pixel that has bigger alpha than uAlphaThreashold becomes fully opaque,
+  // and, a pixel that has smaller alpha than uAlphaThreashold becomes fully transparent.
   // If uOpaque is 1.0, alpha value of final color is 1.0;
   // https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#_material_alphamode
   if(uMask > 0.5 && baseColor.a < uAlphaThreshold)

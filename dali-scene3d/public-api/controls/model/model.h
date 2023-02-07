@@ -177,24 +177,26 @@ public:
   bool GetChildrenSensitive() const;
 
   /**
-   * @brief Whether allow this model's children actor to use keyboard focusable.
+   * @brief Whether allow this model's children actor to be keyboard focusable.
    *
    * Usually, 3D Model might have a lot of actors. And most of them don't need to check focusable.
    * To optimize traversal, we need to setup some flag that this model don't allow (or allow) to traversal
-   * children so that child can use keyboard focusable.
+   * children so that child can be keyboard focusable.
    *
+   * @SINCE_2_2.2
    * @note Even if we set children focusable as false, model itself's focusable
    * is depend on it's property.
    * @note If we don't call this API, default is false. (Don't allow to traversal model's children during focusable test)
    *
-   * @param[in] enable True to enable model's children can focusable.
+   * @param[in] enable True to enable model's children can be focusable.
    */
   void SetChildrenFocusable(bool enable);
 
   /**
-   * @brief Gets whether this Model allow model's children actor to use focusable or not.
+   * @brief Gets whether this Model allow model's children actor to be keyboard focusable or not.
    *
-   * @return bool True if this Model allow model children focusable.
+   * @SINCE_2_2.2
+   * @return bool True if this Model allow model children are focusable.
    */
   bool GetChildrenFocusable() const;
 
@@ -210,7 +212,6 @@ public:
 
   /**
    * @brief Sets Image Based Light Texture.
-   * @note This method doesn't load texture from file, so this work is performed synchronously.
    *
    * @SINCE_2_1.41
    * @param[in] diffuseTexture cube map texture that can be used as a diffuse IBL source.

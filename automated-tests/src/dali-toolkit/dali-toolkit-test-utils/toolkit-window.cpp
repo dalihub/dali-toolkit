@@ -22,6 +22,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
 
 #define DALI_WINDOW_H
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -218,6 +219,11 @@ Window::KeyEventSignalType& Window::KeyEventSignal()
 Window::TouchEventSignalType& Window::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();
+}
+
+Dali::RenderTaskList Window::GetRenderTaskList()
+{
+  return GetImplementation(*this).GetRenderTaskList();
 }
 
 namespace DevelWindow

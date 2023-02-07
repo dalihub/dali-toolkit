@@ -1,6 +1,8 @@
 set(scene3d_internal_dir "${scene3d_dir}/internal")
 
 set(scene3d_src_files ${scene3d_src_files}
+	${scene3d_internal_dir}/common/environment-map-load-task.cpp
+	${scene3d_internal_dir}/common/model-load-task.cpp
 	${scene3d_internal_dir}/controls/model/model-impl.cpp
 	${scene3d_internal_dir}/controls/scene-view/scene-view-impl.cpp
 	${scene3d_internal_dir}/loader/gltf2-asset.cpp

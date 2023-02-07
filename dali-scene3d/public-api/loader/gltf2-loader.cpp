@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@
 #include <dali-scene3d/public-api/loader/gltf2-loader.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/math/quaternion.h>
-#include <fstream>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/gltf2-asset.h>
@@ -43,6 +44,9 @@ namespace Loader
 {
 namespace
 {
+Dali::Mutex gInitializeMutex;
+Dali::Mutex gReadMutex;
+
 const std::string POSITION_PROPERTY("position");
 const std::string ORIENTATION_PROPERTY("orientation");
 const std::string SCALE_PROPERTY("scale");
@@ -76,9 +80,6 @@ struct AttributeMapping
 
 std::vector<gt::Animation> ReadAnimationArray(const json_value_s& j)
 {
-  gt::Animation proxy;
-  SetRefReaderObject(proxy);
-
   auto results = js::Read::Array<gt::Animation, js::ObjectReader<gt::Animation>::Read>(j);
 
   for(auto& animation : results)
@@ -406,9 +407,31 @@ struct ConversionContext
   NodeIndexMapper    mNodeIndices;
 };
 
-SamplerFlags::Type ConvertWrapMode(gt::Wrap::Type w)
+void ConvertBuffer(const gt::Buffer& buffer, decltype(ResourceBundle::mBuffers)& outBuffers, const std::string& resourcePath)
 {
-  switch(w)
+  BufferDefinition bufferDefinition;
+
+  bufferDefinition.mResourcePath = resourcePath;
+  bufferDefinition.mUri          = buffer.mUri;
+  bufferDefinition.mByteLength   = buffer.mByteLength;
+
+  outBuffers.emplace_back(std::move(bufferDefinition));
+}
+
+void ConvertBuffers(const gt::Document& doc, ConversionContext& context)
+{
+  auto& outBuffers = context.mOutput.mResources.mBuffers;
+  outBuffers.reserve(doc.mBuffers.size());
+
+  for(auto& buffer : doc.mBuffers)
+  {
+    ConvertBuffer(buffer, outBuffers, context.mPath);
+  }
+}
+
+SamplerFlags::Type ConvertWrapMode(gt::Wrap::Type wrapMode)
+{
+  switch(wrapMode)
   {
     case gt::Wrap::REPEAT:
       return SamplerFlags::WRAP_REPEAT;
@@ -421,11 +444,14 @@ SamplerFlags::Type ConvertWrapMode(gt::Wrap::Type w)
   }
 }
 
-SamplerFlags::Type ConvertSampler(const gt::Ref<gt::Sampler>& s)
+SamplerFlags::Type ConvertSampler(const gt::Ref<gt::Sampler>& sampler)
 {
-  if(s)
+  if(sampler)
   {
-    return ((s->mMinFilter < gt::Filter::NEAREST_MIPMAP_NEAREST) ? (s->mMinFilter - gt::Filter::NEAREST) : ((s->mMinFilter - gt::Filter::NEAREST_MIPMAP_NEAREST) + 2)) | ((s->mMagFilter - gt::Filter::NEAREST) << SamplerFlags::FILTER_MAG_SHIFT) | (ConvertWrapMode(s->mWrapS) << SamplerFlags::WRAP_S_SHIFT) | (ConvertWrapMode(s->mWrapT) << SamplerFlags::WRAP_T_SHIFT);
+    return ((sampler->mMinFilter < gt::Filter::NEAREST_MIPMAP_NEAREST) ? (sampler->mMinFilter - gt::Filter::NEAREST) : ((sampler->mMinFilter - gt::Filter::NEAREST_MIPMAP_NEAREST) + 2)) |
+           ((sampler->mMagFilter - gt::Filter::NEAREST) << SamplerFlags::FILTER_MAG_SHIFT) |
+           (ConvertWrapMode(sampler->mWrapS) << SamplerFlags::WRAP_S_SHIFT) |
+           (ConvertWrapMode(sampler->mWrapT) << SamplerFlags::WRAP_T_SHIFT);
   }
   else
   {
@@ -438,46 +464,65 @@ SamplerFlags::Type ConvertSampler(const gt::Ref<gt::Sampler>& s)
   }
 }
 
-TextureDefinition ConvertTextureInfo(const gt::TextureInfo& mm, const ImageMetadata& metaData = ImageMetadata())
+TextureDefinition ConvertTextureInfo(const gt::TextureInfo& mm, ConversionContext& context, const ImageMetadata& metaData = ImageMetadata())
 {
-  return TextureDefinition{std::string(mm.mTexture->mSource->mUri), ConvertSampler(mm.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode};
+  TextureDefinition textureDefinition;
+  std::string       uri = std::string(mm.mTexture->mSource->mUri);
+  if(uri.empty())
+  {
+    uint32_t bufferIndex = mm.mTexture->mSource->mBufferView->mBuffer.GetIndex();
+    if(bufferIndex != INVALID_INDEX && context.mOutput.mResources.mBuffers[bufferIndex].IsAvailable())
+    {
+      auto& stream = context.mOutput.mResources.mBuffers[bufferIndex].GetBufferStream();
+      stream.clear();
+      stream.seekg(mm.mTexture->mSource->mBufferView->mByteOffset, stream.beg);
+      std::vector<uint8_t> dataBuffer;
+      dataBuffer.resize(mm.mTexture->mSource->mBufferView->mByteLength);
+      stream.read(reinterpret_cast<char*>(dataBuffer.data()), static_cast<std::streamsize>(static_cast<size_t>(mm.mTexture->mSource->mBufferView->mByteLength)));
+      return TextureDefinition{std::move(dataBuffer), ConvertSampler(mm.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode};
+    }
+    return TextureDefinition();
+  }
+  else
+  {
+    return TextureDefinition{uri, ConvertSampler(mm.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode};
+  }
 }
 
-void ConvertMaterial(const gt::Material& m, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials)
+void ConvertMaterial(const gt::Material& material, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
   auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gt::TextureInfo& info) {
-    if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
+    if(!info.mTexture->mSource->mUri.empty())
     {
-      return search->second;
+      if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
+      {
+        return search->second;
+      }
     }
-    else
-    {
-      return ImageMetadata();
-    }
+    return ImageMetadata();
   };
 
   MaterialDefinition matDef;
 
-  auto& pbr = m.mPbrMetallicRoughness;
-  if(m.mAlphaMode == gt::AlphaMode::BLEND)
+  auto& pbr = material.mPbrMetallicRoughness;
+  if(material.mAlphaMode == gt::AlphaMode::BLEND)
   {
     matDef.mIsOpaque = false;
     matDef.mFlags |= MaterialDefinition::TRANSPARENCY;
   }
-
-  if(m.mAlphaMode == gt::AlphaMode::MASK)
+  else if(material.mAlphaMode == gt::AlphaMode::MASK)
   {
     matDef.mIsMask = true;
-    matDef.SetAlphaCutoff(std::min(1.f, std::max(0.f, m.mAlphaCutoff)));
+    matDef.SetAlphaCutoff(std::min(1.f, std::max(0.f, material.mAlphaCutoff)));
   }
 
   matDef.mBaseColorFactor = pbr.mBaseColorFactor;
 
-  matDef.mTextureStages.reserve(!!pbr.mBaseColorTexture + !!pbr.mMetallicRoughnessTexture + !!m.mNormalTexture + !!m.mOcclusionTexture + !!m.mEmissiveTexture);
+  matDef.mTextureStages.reserve(!!pbr.mBaseColorTexture + !!pbr.mMetallicRoughnessTexture + !!material.mNormalTexture + !!material.mOcclusionTexture + !!material.mEmissiveTexture);
   if(pbr.mBaseColorTexture)
   {
     const auto semantic = MaterialDefinition::ALBEDO;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mBaseColorTexture, getTextureMetaData(imageMetaData, pbr.mBaseColorTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mBaseColorTexture, context, getTextureMetaData(imageMetaData, pbr.mBaseColorTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
@@ -493,7 +538,7 @@ void ConvertMaterial(const gt::Material& m, const std::unordered_map<std::string
   {
     const auto semantic = MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
                           MaterialDefinition::GLTF_CHANNELS;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mMetallicRoughnessTexture, getTextureMetaData(imageMetaData, pbr.mMetallicRoughnessTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mMetallicRoughnessTexture, context, getTextureMetaData(imageMetaData, pbr.mMetallicRoughnessTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
@@ -502,11 +547,11 @@ void ConvertMaterial(const gt::Material& m, const std::unordered_map<std::string
     matDef.mNeedMetallicRoughnessTexture = false;
   }
 
-  matDef.mNormalScale = m.mNormalTexture.mScale;
-  if(m.mNormalTexture)
+  matDef.mNormalScale = material.mNormalTexture.mScale;
+  if(material.mNormalTexture)
   {
     const auto semantic = MaterialDefinition::NORMAL;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mNormalTexture, getTextureMetaData(imageMetaData, m.mNormalTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mNormalTexture, context, getTextureMetaData(imageMetaData, material.mNormalTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
   }
@@ -515,61 +560,61 @@ void ConvertMaterial(const gt::Material& m, const std::unordered_map<std::string
     matDef.mNeedNormalTexture = false;
   }
 
-  if(m.mOcclusionTexture)
+  if(material.mOcclusionTexture)
   {
     const auto semantic = MaterialDefinition::OCCLUSION;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mOcclusionTexture, getTextureMetaData(imageMetaData, m.mOcclusionTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mOcclusionTexture, context, getTextureMetaData(imageMetaData, material.mOcclusionTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
-    matDef.mOcclusionStrength = m.mOcclusionTexture.mStrength;
+    matDef.mOcclusionStrength = material.mOcclusionTexture.mStrength;
   }
 
-  if(m.mEmissiveTexture)
+  if(material.mEmissiveTexture)
   {
     const auto semantic = MaterialDefinition::EMISSIVE;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mEmissiveTexture, getTextureMetaData(imageMetaData, m.mEmissiveTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mEmissiveTexture, context, getTextureMetaData(imageMetaData, material.mEmissiveTexture))});
     // TODO: and there had better be one
     matDef.mFlags |= semantic;
-    matDef.mEmissiveFactor = m.mEmissiveFactor;
+    matDef.mEmissiveFactor = material.mEmissiveFactor;
   }
 
-  if(m.mMaterialExtensions.mMaterialIor.mIor < MAXFLOAT)
+  if(material.mMaterialExtensions.mMaterialIor.mIor < MAXFLOAT)
   {
-    float ior                  = m.mMaterialExtensions.mMaterialIor.mIor;
+    float ior                  = material.mMaterialExtensions.mMaterialIor.mIor;
     matDef.mDielectricSpecular = powf((ior - 1.0f) / (ior + 1.0f), 2.0f);
   }
-  matDef.mSpecularFactor      = m.mMaterialExtensions.mMaterialSpecular.mSpecularFactor;
-  matDef.mSpecularColorFactor = m.mMaterialExtensions.mMaterialSpecular.mSpecularColorFactor;
+  matDef.mSpecularFactor      = material.mMaterialExtensions.mMaterialSpecular.mSpecularFactor;
+  matDef.mSpecularColorFactor = material.mMaterialExtensions.mMaterialSpecular.mSpecularColorFactor;
 
-  if(m.mMaterialExtensions.mMaterialSpecular.mSpecularTexture)
+  if(material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture)
   {
     const auto semantic = MaterialDefinition::SPECULAR;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mMaterialExtensions.mMaterialSpecular.mSpecularTexture, getTextureMetaData(imageMetaData, m.mMaterialExtensions.mMaterialSpecular.mSpecularTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture, context, getTextureMetaData(imageMetaData, material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture))});
     matDef.mFlags |= semantic;
   }
 
-  if(m.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture)
+  if(material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture)
   {
     const auto semantic = MaterialDefinition::SPECULAR_COLOR;
-    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(m.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture, getTextureMetaData(imageMetaData, m.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture))});
+    matDef.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture, context, getTextureMetaData(imageMetaData, material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture))});
     matDef.mFlags |= semantic;
   }
 
-  matDef.mDoubleSided = m.mDoubleSided;
+  matDef.mDoubleSided = material.mDoubleSided;
 
   outMaterials.emplace_back(std::move(matDef), TextureSet());
 }
 
-void ConvertMaterials(const gt::Document& doc, ConversionContext& cctx)
+void ConvertMaterials(const gt::Document& doc, ConversionContext& context)
 {
-  auto& imageMetaData = cctx.mOutput.mSceneMetadata.mImageMetadata;
+  auto& imageMetaData = context.mOutput.mSceneMetadata.mImageMetadata;
 
-  auto& outMaterials = cctx.mOutput.mResources.mMaterials;
+  auto& outMaterials = context.mOutput.mResources.mMaterials;
   outMaterials.reserve(doc.mMaterials.size());
 
   for(auto& m : doc.mMaterials)
   {
-    ConvertMaterial(m, imageMetaData, outMaterials);
+    ConvertMaterial(m, imageMetaData, outMaterials, context);
   }
 }
 
@@ -623,36 +668,36 @@ MeshDefinition::Accessor ConvertMeshPrimitiveAccessor(const gt::Accessor& acc)
                                    static_cast<uint16_t>(acc.GetElementSizeBytes()),
                                    acc.mMin,
                                    acc.mMax}),
-    std::move(sparseBlob)};
+    std::move(sparseBlob),
+    acc.mBufferView ? acc.mBufferView->mBuffer.GetIndex() : 0};
 }
 
-void ConvertMeshes(const gt::Document& doc, ConversionContext& cctx)
+void ConvertMeshes(const gt::Document& doc, ConversionContext& context)
 {
   uint32_t meshCount = 0;
-  cctx.mMeshIds.reserve(doc.mMeshes.size());
-  for(auto& m : doc.mMeshes)
+  context.mMeshIds.reserve(doc.mMeshes.size());
+  for(auto& mesh : doc.mMeshes)
   {
-    cctx.mMeshIds.push_back(meshCount);
-    meshCount += m.mPrimitives.size();
+    context.mMeshIds.push_back(meshCount);
+    meshCount += mesh.mPrimitives.size();
   }
 
-  auto& outMeshes = cctx.mOutput.mResources.mMeshes;
+  auto& outMeshes = context.mOutput.mResources.mMeshes;
   outMeshes.reserve(meshCount);
-  for(auto& m : doc.mMeshes)
+  for(auto& mesh : doc.mMeshes)
   {
-    for(auto& p : m.mPrimitives)
+    for(auto& primitive : mesh.mPrimitives)
     {
-      MeshDefinition meshDef;
+      MeshDefinition meshDefinition;
 
-      auto& attribs          = p.mAttributes;
-      meshDef.mUri           = attribs.begin()->second->mBufferView->mBuffer->mUri;
-      meshDef.mPrimitiveType = GLTF2_TO_DALI_PRIMITIVES[p.mMode];
+      auto& attribs                 = primitive.mAttributes;
+      meshDefinition.mPrimitiveType = GLTF2_TO_DALI_PRIMITIVES[primitive.mMode];
 
-      auto& accPositions = *attribs.find(gt::Attribute::POSITION)->second;
-      meshDef.mPositions = ConvertMeshPrimitiveAccessor(accPositions);
+      auto& accPositions        = *attribs.find(gt::Attribute::POSITION)->second;
+      meshDefinition.mPositions = ConvertMeshPrimitiveAccessor(accPositions);
       // glTF2 support vector4 tangent for mesh.
       // https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#meshes-overview
-      meshDef.mTangentType = Property::VECTOR4;
+      meshDefinition.mTangentType = Property::VECTOR4;
 
       const bool needNormalsTangents = accPositions.mType == gt::AccessorType::VEC3;
       for(auto& am : ATTRIBUTE_MAPPINGS)
@@ -660,15 +705,14 @@ void ConvertMeshes(const gt::Document& doc, ConversionContext& cctx)
         auto iFind = attribs.find(am.mType);
         if(iFind != attribs.end())
         {
-          DALI_ASSERT_DEBUG(iFind->second->mBufferView->mBuffer->mUri.compare(meshDef.mUri) == 0);
-          auto& accessor = meshDef.*(am.mAccessor);
+          auto& accessor = meshDefinition.*(am.mAccessor);
           accessor       = ConvertMeshPrimitiveAccessor(*iFind->second);
 
           if(iFind->first == gt::Attribute::JOINTS_0)
           {
-            meshDef.mFlags |= (iFind->second->mComponentType == gt::Component::UNSIGNED_SHORT) * MeshDefinition::U16_JOINT_IDS;
-            meshDef.mFlags |= (iFind->second->mComponentType == gt::Component::UNSIGNED_BYTE) * MeshDefinition::U8_JOINT_IDS;
-            DALI_ASSERT_DEBUG(MaskMatch(meshDef.mFlags, MeshDefinition::U16_JOINT_IDS) || MaskMatch(meshDef.mFlags, MeshDefinition::U8_JOINT_IDS) || iFind->second->mComponentType == gt::Component::FLOAT);
+            meshDefinition.mFlags |= (iFind->second->mComponentType == gt::Component::UNSIGNED_SHORT) * MeshDefinition::U16_JOINT_IDS;
+            meshDefinition.mFlags |= (iFind->second->mComponentType == gt::Component::UNSIGNED_BYTE) * MeshDefinition::U8_JOINT_IDS;
+            DALI_ASSERT_DEBUG(MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_JOINT_IDS) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_JOINT_IDS) || iFind->second->mComponentType == gt::Component::FLOAT);
           }
         }
         else if(needNormalsTangents)
@@ -676,11 +720,11 @@ void ConvertMeshes(const gt::Document& doc, ConversionContext& cctx)
           switch(am.mType)
           {
             case gt::Attribute::NORMAL:
-              meshDef.RequestNormals();
+              meshDefinition.RequestNormals();
               break;
 
             case gt::Attribute::TANGENT:
-              meshDef.RequestTangents();
+              meshDefinition.RequestTangents();
               break;
 
             default:
@@ -689,18 +733,19 @@ void ConvertMeshes(const gt::Document& doc, ConversionContext& cctx)
         }
       }
 
-      if(p.mIndices)
+      if(primitive.mIndices)
       {
-        meshDef.mIndices = ConvertMeshPrimitiveAccessor(*p.mIndices);
-        meshDef.mFlags |= (p.mIndices->mComponentType == gt::Component::UNSIGNED_INT) * MeshDefinition::U32_INDICES;
-        DALI_ASSERT_DEBUG(MaskMatch(meshDef.mFlags, MeshDefinition::U32_INDICES) || p.mIndices->mComponentType == gt::Component::UNSIGNED_SHORT);
+        meshDefinition.mIndices = ConvertMeshPrimitiveAccessor(*primitive.mIndices);
+        meshDefinition.mFlags |= (primitive.mIndices->mComponentType == gt::Component::UNSIGNED_INT) * MeshDefinition::U32_INDICES;
+        meshDefinition.mFlags |= (primitive.mIndices->mComponentType == gt::Component::UNSIGNED_BYTE) * MeshDefinition::U8_INDICES;
+        DALI_ASSERT_DEBUG(MaskMatch(meshDefinition.mFlags, MeshDefinition::U32_INDICES) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_INDICES) || primitive.mIndices->mComponentType == gt::Component::UNSIGNED_SHORT);
       }
 
-      if(!p.mTargets.empty())
+      if(!primitive.mTargets.empty())
       {
-        meshDef.mBlendShapes.reserve(p.mTargets.size());
-        meshDef.mBlendShapeVersion = BlendShapes::Version::VERSION_2_0;
-        for(const auto& target : p.mTargets)
+        meshDefinition.mBlendShapes.reserve(primitive.mTargets.size());
+        meshDefinition.mBlendShapeVersion = BlendShapes::Version::VERSION_2_0;
+        for(const auto& target : primitive.mTargets)
         {
           MeshDefinition::BlendShape blendShape;
 
@@ -721,44 +766,44 @@ void ConvertMeshes(const gt::Document& doc, ConversionContext& cctx)
             blendShape.tangents = ConvertMeshPrimitiveAccessor(*it->second);
           }
 
-          if(!m.mWeights.empty())
+          if(!mesh.mWeights.empty())
           {
-            blendShape.weight = m.mWeights[meshDef.mBlendShapes.size()];
+            blendShape.weight = mesh.mWeights[meshDefinition.mBlendShapes.size()];
           }
 
-          meshDef.mBlendShapes.push_back(std::move(blendShape));
+          meshDefinition.mBlendShapes.push_back(std::move(blendShape));
         }
       }
 
-      outMeshes.push_back({std::move(meshDef), MeshGeometry{}});
+      outMeshes.push_back({std::move(meshDefinition), MeshGeometry{}});
     }
   }
 }
 
-ModelNode* MakeModelNode(const gt::Mesh::Primitive& prim, ConversionContext& cctx)
+ModelRenderable* MakeModelRenderable(const gt::Mesh::Primitive& prim, ConversionContext& context)
 {
-  auto modelNode = new ModelNode();
+  auto modelRenderable = new ModelRenderable();
 
-  modelNode->mShaderIdx = 0; // TODO: further thought
+  modelRenderable->mShaderIdx = 0; // TODO: further thought
 
   auto materialIdx = prim.mMaterial.GetIndex();
   if(INVALID_INDEX == materialIdx)
   {
     // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#default-material
-    if(INVALID_INDEX == cctx.mDefaultMaterial)
+    if(INVALID_INDEX == context.mDefaultMaterial)
     {
-      auto& outMaterials    = cctx.mOutput.mResources.mMaterials;
-      cctx.mDefaultMaterial = outMaterials.size();
+      auto& outMaterials       = context.mOutput.mResources.mMaterials;
+      context.mDefaultMaterial = outMaterials.size();
 
-      ConvertMaterial(gt::Material{}, cctx.mOutput.mSceneMetadata.mImageMetadata, outMaterials);
+      ConvertMaterial(gt::Material{}, context.mOutput.mSceneMetadata.mImageMetadata, outMaterials, context);
     }
 
-    materialIdx = cctx.mDefaultMaterial;
+    materialIdx = context.mDefaultMaterial;
   }
 
-  modelNode->mMaterialIdx = materialIdx;
+  modelRenderable->mMaterialIdx = materialIdx;
 
-  return modelNode;
+  return modelRenderable;
 }
 
 void ConvertCamera(const gt::Camera& camera, CameraParameters& camParams)
@@ -775,15 +820,16 @@ void ConvertCamera(const gt::Camera& camera, CameraParameters& camParams)
   else
   {
     auto& ortho                = camera.mOrthographic;
-    camParams.orthographicSize = Vector4(-ortho.mXMag, ortho.mXMag, ortho.mYMag, -ortho.mYMag) * .5f;
+    camParams.orthographicSize = ortho.mYMag * .5f;
+    camParams.aspectRatio      = ortho.mXMag / ortho.mYMag;
     camParams.zNear            = ortho.mZNear;
     camParams.zFar             = ortho.mZFar;
   }
 }
 
-void ConvertNode(gt::Node const& node, const Index gltfIdx, Index parentIdx, ConversionContext& cctx, bool isMRendererModel)
+void ConvertNode(gt::Node const& node, const Index gltfIdx, Index parentIdx, ConversionContext& context, bool isMRendererModel)
 {
-  auto& output    = cctx.mOutput;
+  auto& output    = context.mOutput;
   auto& scene     = output.mScene;
   auto& resources = output.mResources;
 
@@ -818,43 +864,27 @@ void ConvertNode(gt::Node const& node, const Index gltfIdx, Index parentIdx, Con
     ExceptionFlinger(ASSERT_LOCATION) << "Node name '" << node.mName << "' is not unique; scene is invalid.";
   }
 
-  cctx.mNodeIndices.RegisterMapping(gltfIdx, idx);
+  context.mNodeIndices.RegisterMapping(gltfIdx, idx);
 
   Index skeletonIdx = node.mSkin ? node.mSkin.GetIndex() : INVALID_INDEX;
-  if(node.mMesh && !node.mMesh->mPrimitives.empty())
+  if(node.mMesh)
   {
-    auto& mesh = *node.mMesh;
-
-    auto iPrim          = mesh.mPrimitives.begin();
-    auto modelNode      = MakeModelNode(*iPrim, cctx);
-    auto meshIdx        = cctx.mMeshIds[node.mMesh.GetIndex()];
-    modelNode->mMeshIdx = meshIdx;
-
-    weakNode->mRenderable.reset(modelNode);
-
-    DALI_ASSERT_DEBUG(resources.mMeshes[meshIdx].first.mSkeletonIdx == INVALID_INDEX ||
-                      resources.mMeshes[meshIdx].first.mSkeletonIdx == skeletonIdx);
-    resources.mMeshes[meshIdx].first.mSkeletonIdx = skeletonIdx;
-
-    // As does model-exporter, we'll create anonymous child nodes for additional mesh( primitiv)es.
-    while(++iPrim != mesh.mPrimitives.end())
+    auto&    mesh           = *node.mMesh;
+    uint32_t primitiveCount = mesh.mPrimitives.size();
+    auto     meshIdx        = context.mMeshIds[node.mMesh.GetIndex()];
+    weakNode->mRenderables.reserve(primitiveCount);
+    for(uint32_t i = 0; i < primitiveCount; ++i)
     {
-      std::unique_ptr<NodeDefinition> child{new NodeDefinition};
-      child->mParentIdx = idx;
+      std::unique_ptr<NodeDefinition::Renderable> renderable;
+      auto                                        modelRenderable = MakeModelRenderable(mesh.mPrimitives[i], context);
+      modelRenderable->mMeshIdx                                   = meshIdx + i;
 
-      auto childModel = MakeModelNode(*iPrim, cctx);
+      DALI_ASSERT_DEBUG(resources.mMeshes[modelRenderable->mMeshIdx].first.mSkeletonIdx == INVALID_INDEX ||
+                        resources.mMeshes[modelRenderable->mMeshIdx].first.mSkeletonIdx == skeletonIdx);
+      resources.mMeshes[modelRenderable->mMeshIdx].first.mSkeletonIdx = skeletonIdx;
 
-      ++meshIdx;
-      childModel->mMeshIdx = meshIdx;
-
-      child->mRenderable.reset(childModel);
-      child->mInheritColor = true;
-
-      scene.AddNode(std::move(child));
-
-      DALI_ASSERT_DEBUG(resources.mMeshes[meshIdx].first.mSkeletonIdx == INVALID_INDEX ||
-                        resources.mMeshes[meshIdx].first.mSkeletonIdx == skeletonIdx);
-      resources.mMeshes[meshIdx].first.mSkeletonIdx = skeletonIdx;
+      renderable.reset(modelRenderable);
+      weakNode->mRenderables.push_back(std::move(renderable));
     }
   }
 
@@ -869,13 +899,13 @@ void ConvertNode(gt::Node const& node, const Index gltfIdx, Index parentIdx, Con
 
   for(auto& n : node.mChildren)
   {
-    ConvertNode(*n, n.GetIndex(), idx, cctx, isMRendererModel);
+    ConvertNode(*n, n.GetIndex(), idx, context, isMRendererModel);
   }
 }
 
-void ConvertSceneNodes(const gt::Scene& scene, ConversionContext& cctx, bool isMRendererModel)
+void ConvertSceneNodes(const gt::Scene& scene, ConversionContext& context, bool isMRendererModel)
 {
-  auto& outScene = cctx.mOutput.mScene;
+  auto& outScene = context.mOutput.mScene;
   Index rootIdx  = outScene.GetNodeCount();
   switch(scene.mNodes.size())
   {
@@ -883,7 +913,7 @@ void ConvertSceneNodes(const gt::Scene& scene, ConversionContext& cctx, bool isM
       break;
 
     case 1:
-      ConvertNode(*scene.mNodes[0], scene.mNodes[0].GetIndex(), INVALID_INDEX, cctx, isMRendererModel);
+      ConvertNode(*scene.mNodes[0], scene.mNodes[0].GetIndex(), INVALID_INDEX, context, isMRendererModel);
       outScene.AddRootNode(rootIdx);
       break;
 
@@ -897,50 +927,58 @@ void ConvertSceneNodes(const gt::Scene& scene, ConversionContext& cctx, bool isM
 
       for(auto& n : scene.mNodes)
       {
-        ConvertNode(*n, n.GetIndex(), rootIdx, cctx, isMRendererModel);
+        ConvertNode(*n, n.GetIndex(), rootIdx, context, isMRendererModel);
       }
       break;
     }
   }
 }
 
-void ConvertNodes(const gt::Document& doc, ConversionContext& cctx, bool isMRendererModel)
+void ConvertNodes(const gt::Document& doc, ConversionContext& context, bool isMRendererModel)
 {
-  uint32_t rootSceneIndex = 0u;
-  if(doc.mScene)
+  if(!doc.mScenes.empty())
   {
-    rootSceneIndex = doc.mScene.GetIndex();
-  }
-  ConvertSceneNodes(doc.mScenes[rootSceneIndex], cctx, isMRendererModel);
+    uint32_t rootSceneIndex = 0u;
+    if(doc.mScene)
+    {
+      rootSceneIndex = doc.mScene.GetIndex();
+    }
+    ConvertSceneNodes(doc.mScenes[rootSceneIndex], context, isMRendererModel);
 
-  for(uint32_t i = 0, i1 = rootSceneIndex; i < i1; ++i)
-  {
-    ConvertSceneNodes(doc.mScenes[i], cctx, isMRendererModel);
-  }
+    for(uint32_t i = 0, i1 = rootSceneIndex; i < i1; ++i)
+    {
+      ConvertSceneNodes(doc.mScenes[i], context, isMRendererModel);
+    }
 
-  for(uint32_t i = rootSceneIndex + 1; i < doc.mScenes.size(); ++i)
-  {
-    ConvertSceneNodes(doc.mScenes[i], cctx, isMRendererModel);
+    for(uint32_t i = rootSceneIndex + 1; i < doc.mScenes.size(); ++i)
+    {
+      ConvertSceneNodes(doc.mScenes[i], context, isMRendererModel);
+    }
   }
 }
 
 template<typename T>
-void LoadDataFromAccessor(const std::string& path, Vector<T>& dataBuffer, uint32_t offset, uint32_t size)
+void LoadDataFromAccessor(ConversionContext& context, uint32_t bufferIndex, Vector<T>& dataBuffer, uint32_t offset, uint32_t size)
 {
-  std::ifstream animationBinaryFile(path, std::ifstream::binary);
-
-  if(!animationBinaryFile.is_open())
+  if(bufferIndex >= context.mOutput.mResources.mBuffers.size())
   {
-    throw std::runtime_error("Failed to load " + path);
+    DALI_LOG_ERROR("Invailid buffer index\n");
+    return;
   }
 
-  animationBinaryFile.seekg(offset);
-  animationBinaryFile.read(reinterpret_cast<char*>(dataBuffer.Begin()), size);
-  animationBinaryFile.close();
+  auto& buffer = context.mOutput.mResources.mBuffers[bufferIndex];
+  if(!buffer.IsAvailable())
+  {
+    DALI_LOG_ERROR("Failed to load from buffer stream.\n");
+  }
+  auto& stream = buffer.GetBufferStream();
+  stream.clear();
+  stream.seekg(offset, stream.beg);
+  stream.read(reinterpret_cast<char*>(dataBuffer.Begin()), static_cast<std::streamsize>(static_cast<size_t>(size)));
 }
 
 template<typename T>
-float LoadDataFromAccessors(const std::string& path, const gltf2::Accessor& input, const gltf2::Accessor& output, Vector<float>& inputDataBuffer, Vector<T>& outputDataBuffer)
+float LoadDataFromAccessors(ConversionContext& context, const gltf2::Accessor& input, const gltf2::Accessor& output, Vector<float>& inputDataBuffer, Vector<T>& outputDataBuffer)
 {
   inputDataBuffer.Resize(input.mCount);
   outputDataBuffer.Resize(output.mCount);
@@ -948,15 +986,15 @@ float LoadDataFromAccessors(const std::string& path, const gltf2::Accessor& inpu
   const uint32_t inputDataBufferSize  = input.GetBytesLength();
   const uint32_t outputDataBufferSize = output.GetBytesLength();
 
-  LoadDataFromAccessor<float>(path + std::string(input.mBufferView->mBuffer->mUri), inputDataBuffer, input.mBufferView->mByteOffset + input.mByteOffset, inputDataBufferSize);
-  LoadDataFromAccessor<T>(path + std::string(output.mBufferView->mBuffer->mUri), outputDataBuffer, output.mBufferView->mByteOffset + output.mByteOffset, outputDataBufferSize);
+  LoadDataFromAccessor<float>(context, output.mBufferView->mBuffer.GetIndex(), inputDataBuffer, input.mBufferView->mByteOffset + input.mByteOffset, inputDataBufferSize);
+  LoadDataFromAccessor<T>(context, output.mBufferView->mBuffer.GetIndex(), outputDataBuffer, output.mBufferView->mByteOffset + output.mByteOffset, outputDataBufferSize);
   ApplyAccessorMinMax(output, reinterpret_cast<float*>(outputDataBuffer.begin()));
 
   return inputDataBuffer[input.mCount - 1u];
 }
 
 template<typename T>
-float LoadKeyFrames(const std::string& path, const gt::Animation::Channel& channel, KeyFrames& keyFrames, gt::Animation::Channel::Target::Type type)
+float LoadKeyFrames(ConversionContext& context, const gt::Animation::Channel& channel, KeyFrames& keyFrames, gt::Animation::Channel::Target::Type type)
 {
   const gltf2::Accessor& input  = *channel.mSampler->mInput;
   const gltf2::Accessor& output = *channel.mSampler->mOutput;
@@ -964,7 +1002,7 @@ float LoadKeyFrames(const std::string& path, const gt::Animation::Channel& chann
   Vector<float> inputDataBuffer;
   Vector<T>     outputDataBuffer;
 
-  const float duration = std::max(LoadDataFromAccessors<T>(path, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
+  const float duration = std::max(LoadDataFromAccessors<T>(context, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
 
   for(uint32_t i = 0; i < input.mCount; ++i)
   {
@@ -974,7 +1012,7 @@ float LoadKeyFrames(const std::string& path, const gt::Animation::Channel& chann
   return duration;
 }
 
-float LoadBlendShapeKeyFrames(const std::string& path, const gt::Animation::Channel& channel, Index nodeIndex, uint32_t& propertyIndex, std::vector<Dali::Scene3D::Loader::AnimatedProperty>& properties)
+float LoadBlendShapeKeyFrames(ConversionContext& context, const gt::Animation::Channel& channel, Index nodeIndex, uint32_t& propertyIndex, std::vector<Dali::Scene3D::Loader::AnimatedProperty>& properties)
 {
   const gltf2::Accessor& input  = *channel.mSampler->mInput;
   const gltf2::Accessor& output = *channel.mSampler->mOutput;
@@ -982,7 +1020,7 @@ float LoadBlendShapeKeyFrames(const std::string& path, const gt::Animation::Chan
   Vector<float> inputDataBuffer;
   Vector<float> outputDataBuffer;
 
-  const float duration = LoadDataFromAccessors<float>(path, input, output, inputDataBuffer, outputDataBuffer);
+  const float duration = LoadDataFromAccessors<float>(context, input, output, inputDataBuffer, outputDataBuffer);
 
   char        weightNameBuffer[32];
   auto        prefixSize    = snprintf(weightNameBuffer, sizeof(weightNameBuffer), "%s[", BLEND_SHAPE_WEIGHTS_UNIFORM.c_str());
@@ -1008,9 +1046,9 @@ float LoadBlendShapeKeyFrames(const std::string& path, const gt::Animation::Chan
   return duration;
 }
 
-void ConvertAnimations(const gt::Document& doc, ConversionContext& cctx)
+void ConvertAnimations(const gt::Document& doc, ConversionContext& context)
 {
-  auto& output = cctx.mOutput;
+  auto& output = context.mOutput;
 
   output.mAnimationDefinitions.reserve(output.mAnimationDefinitions.size() + doc.mAnimations.size());
 
@@ -1040,9 +1078,8 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& cctx)
     Index propertyIndex = 0u;
     for(const auto& channel : animation.mChannels)
     {
-      Index nodeIndex    = cctx.mNodeIndices.GetRuntimeId(channel.mTarget.mNode.GetIndex());
-
-      float duration = 0.f;
+      Index nodeIndex = context.mNodeIndices.GetRuntimeId(channel.mTarget.mNode.GetIndex());
+      float duration  = 0.f;
 
       switch(channel.mTarget.mPath)
       {
@@ -1054,7 +1091,7 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& cctx)
           animatedProperty.mPropertyName = POSITION_PROPERTY;
 
           animatedProperty.mKeyFrames = KeyFrames::New();
-          duration                    = LoadKeyFrames<Vector3>(cctx.mPath, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
+          duration                    = LoadKeyFrames<Vector3>(context, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
 
           animatedProperty.mTimePeriod = {0.f, duration};
           break;
@@ -1067,7 +1104,7 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& cctx)
           animatedProperty.mPropertyName = ORIENTATION_PROPERTY;
 
           animatedProperty.mKeyFrames = KeyFrames::New();
-          duration                    = LoadKeyFrames<Quaternion>(cctx.mPath, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
+          duration                    = LoadKeyFrames<Quaternion>(context, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
 
           animatedProperty.mTimePeriod = {0.f, duration};
           break;
@@ -1080,14 +1117,14 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& cctx)
           animatedProperty.mPropertyName = SCALE_PROPERTY;
 
           animatedProperty.mKeyFrames = KeyFrames::New();
-          duration                    = LoadKeyFrames<Vector3>(cctx.mPath, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
+          duration                    = LoadKeyFrames<Vector3>(context, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
 
           animatedProperty.mTimePeriod = {0.f, duration};
           break;
         }
         case gt::Animation::Channel::Target::WEIGHTS:
         {
-          duration = LoadBlendShapeKeyFrames(cctx.mPath, channel, nodeIndex, propertyIndex, animationDef.mProperties);
+          duration = LoadBlendShapeKeyFrames(context, channel, nodeIndex, propertyIndex, animationDef.mProperties);
 
           break;
         }
@@ -1107,7 +1144,7 @@ void ConvertAnimations(const gt::Document& doc, ConversionContext& cctx)
   }
 }
 
-void ProcessSkins(const gt::Document& doc, ConversionContext& cctx)
+void ProcessSkins(const gt::Document& doc, ConversionContext& context)
 {
   // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#skininversebindmatrices
   // If an inverseBindMatrices accessor was provided, we'll load the joint data from the buffer,
@@ -1122,22 +1159,26 @@ void ProcessSkins(const gt::Document& doc, ConversionContext& cctx)
 
   struct InverseBindMatrixAccessor : public IInverseBindMatrixProvider
   {
-    std::ifstream  mStream;
+    std::istream&  mStream;
     const uint32_t mElementSizeBytes;
 
-    InverseBindMatrixAccessor(const gt::Accessor& accessor, const std::string& path)
-    : mStream(path + std::string(accessor.mBufferView->mBuffer->mUri), std::ios::binary),
+    InverseBindMatrixAccessor(const gt::Accessor& accessor, ConversionContext& context)
+    : mStream(context.mOutput.mResources.mBuffers[accessor.mBufferView->mBuffer.GetIndex()].GetBufferStream()),
       mElementSizeBytes(accessor.GetElementSizeBytes())
     {
-      DALI_ASSERT_ALWAYS(mStream);
       DALI_ASSERT_DEBUG(accessor.mType == gt::AccessorType::MAT4 && accessor.mComponentType == gt::Component::FLOAT);
 
-      mStream.seekg(accessor.mBufferView->mByteOffset + accessor.mByteOffset);
+      if(!mStream.rdbuf()->in_avail())
+      {
+        DALI_LOG_ERROR("Failed to load from stream\n");
+      }
+      mStream.clear();
+      mStream.seekg(accessor.mBufferView->mByteOffset + accessor.mByteOffset, mStream.beg);
     }
 
     virtual void Provide(Matrix& ibm) override
     {
-      DALI_ASSERT_ALWAYS(mStream.read(reinterpret_cast<char*>(ibm.AsFloat()), mElementSizeBytes));
+      DALI_ASSERT_ALWAYS(mStream.read(reinterpret_cast<char*>(ibm.AsFloat()), static_cast<std::streamsize>(static_cast<size_t>(mElementSizeBytes))));
     }
   };
 
@@ -1149,15 +1190,15 @@ void ProcessSkins(const gt::Document& doc, ConversionContext& cctx)
     }
   };
 
-  auto& resources = cctx.mOutput.mResources;
+  auto& resources = context.mOutput.mResources;
   resources.mSkeletons.reserve(doc.mSkins.size());
 
-  for(auto& s : doc.mSkins)
+  for(auto& skin : doc.mSkins)
   {
     std::unique_ptr<IInverseBindMatrixProvider> ibmProvider;
-    if(s.mInverseBindMatrices)
+    if(skin.mInverseBindMatrices)
     {
-      ibmProvider.reset(new InverseBindMatrixAccessor(*s.mInverseBindMatrices, cctx.mPath));
+      ibmProvider.reset(new InverseBindMatrixAccessor(*skin.mInverseBindMatrices, context));
     }
     else
     {
@@ -1165,16 +1206,16 @@ void ProcessSkins(const gt::Document& doc, ConversionContext& cctx)
     }
 
     SkeletonDefinition skeleton;
-    if(s.mSkeleton.GetIndex() != INVALID_INDEX)
+    if(skin.mSkeleton.GetIndex() != INVALID_INDEX)
     {
-      skeleton.mRootNodeIdx = cctx.mNodeIndices.GetRuntimeId(s.mSkeleton.GetIndex());
+      skeleton.mRootNodeIdx = context.mNodeIndices.GetRuntimeId(skin.mSkeleton.GetIndex());
     }
 
-    skeleton.mJoints.resize(s.mJoints.size());
+    skeleton.mJoints.resize(skin.mJoints.size());
     auto iJoint = skeleton.mJoints.begin();
-    for(auto& j : s.mJoints)
+    for(auto& joint : skin.mJoints)
     {
-      iJoint->mNodeIdx = cctx.mNodeIndices.GetRuntimeId(j.GetIndex());
+      iJoint->mNodeIdx = context.mNodeIndices.GetRuntimeId(joint.GetIndex());
 
       ibmProvider->Provide(iJoint->mInverseBindMatrix);
 
@@ -1187,12 +1228,16 @@ void ProcessSkins(const gt::Document& doc, ConversionContext& cctx)
 
 void ProduceShaders(ShaderDefinitionFactory& shaderFactory, SceneDefinition& scene)
 {
-  for(size_t i0 = 0, i1 = scene.GetNodeCount(); i0 != i1; ++i0)
+  uint32_t nodeCount = scene.GetNodeCount();
+  for(uint32_t i = 0; i < nodeCount; ++i)
   {
-    auto nodeDef = scene.GetNode(i0);
-    if(auto renderable = nodeDef->mRenderable.get())
+    auto nodeDef = scene.GetNode(i);
+    for(auto& renderable : nodeDef->mRenderables)
     {
-      renderable->mShaderIdx = shaderFactory.ProduceShader(*nodeDef);
+      if(shaderFactory.ProduceShader(*renderable) == INVALID_INDEX)
+      {
+        DALI_LOG_ERROR("Fail to produce shader\n");
+      }
     }
   }
 }
@@ -1228,15 +1273,30 @@ void SetObjectReaders()
   js::SetObjectReader(SCENE_READER);
 }
 
-void SetDefaultEnvironmentMap(const gt::Document& doc, ConversionContext& cctx)
+void SetDefaultEnvironmentMap(const gt::Document& doc, ConversionContext& context)
 {
   EnvironmentDefinition envDef;
   envDef.mUseBrdfTexture = true;
   envDef.mIblIntensity   = Scene3D::Loader::EnvironmentDefinition::GetDefaultIntensity();
-  cctx.mOutput.mResources.mEnvironmentMaps.push_back({std::move(envDef), EnvironmentDefinition::Textures()});
+  context.mOutput.mResources.mEnvironmentMaps.push_back({std::move(envDef), EnvironmentDefinition::Textures()});
 }
 
 } // namespace
+
+void InitializeGltfLoader()
+{
+  // Set ObjectReader only once (for all gltf loading).
+  static bool setObjectReadersRequired = true;
+  {
+    Mutex::ScopedLock lock(gInitializeMutex);
+    if(setObjectReadersRequired)
+    {
+      // NOTE: only referencing own, anonymous namespace, const objects; the pointers will never need to change.
+      SetObjectReaders();
+      setObjectReadersRequired = false;
+    }
+  }
+}
 
 void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactory, LoadResult& params)
 {
@@ -1251,14 +1311,6 @@ void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactor
   if(!root)
   {
     throw std::runtime_error("Failed to parse " + url);
-  }
-
-  static bool setObjectReaders = true;
-  if(setObjectReaders)
-  {
-    // NOTE: only referencing own, anonymous namespace, const objects; the pointers will never need to change.
-    SetObjectReaders();
-    setObjectReaders = false;
   }
 
   gt::Document doc;
@@ -1280,22 +1332,26 @@ void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactor
     isMRendererModel      = (doc.mAsset.mGenerator.find(MRENDERER_MODEL_IDENTIFICATION) != std::string_view::npos);
   }
 
-  gt::SetRefReaderObject(doc);
-  DOCUMENT_READER.Read(rootObj, doc);
+  {
+    Mutex::ScopedLock lock(gReadMutex);
+    gt::SetRefReaderObject(doc);
+    DOCUMENT_READER.Read(rootObj, doc);
+  }
 
   auto              path = url.substr(0, url.rfind('/') + 1);
-  ConversionContext cctx{params, path, INVALID_INDEX};
+  ConversionContext context{params, path, INVALID_INDEX};
 
-  ConvertMaterials(doc, cctx);
-  ConvertMeshes(doc, cctx);
-  ConvertNodes(doc, cctx, isMRendererModel);
-  ConvertAnimations(doc, cctx);
-  ProcessSkins(doc, cctx);
+  ConvertBuffers(doc, context);
+  ConvertMaterials(doc, context);
+  ConvertMeshes(doc, context);
+  ConvertNodes(doc, context, isMRendererModel);
+  ConvertAnimations(doc, context);
+  ProcessSkins(doc, context);
   ProduceShaders(shaderFactory, params.mScene);
   params.mScene.EnsureUniqueSkinningShaderInstances(params.mResources);
 
   // Set Default Environment map
-  SetDefaultEnvironmentMap(doc, cctx);
+  SetDefaultEnvironmentMap(doc, context);
 }
 
 } // namespace Loader

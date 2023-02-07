@@ -30,14 +30,14 @@ int UtcDaliEnvironmentDefinitionLoadRawDefault(void)
   EnvironmentDefinition envDef;
   auto rawData = envDef.LoadRaw("");
 
-  DALI_TEST_EQUAL(rawData.mDiffuse.data.size(), 6u);
-  for (auto& face: rawData.mDiffuse.data)
+  DALI_TEST_EQUAL(rawData.mDiffuse.mPixelData.size(), 6u);
+  for (auto& face: rawData.mDiffuse.mPixelData)
   {
     DALI_TEST_EQUAL(face.size(), 1u);
   }
 
-  DALI_TEST_EQUAL(rawData.mSpecular.data.size(), 6u);
-  for (auto& face: rawData.mSpecular.data)
+  DALI_TEST_EQUAL(rawData.mSpecular.mPixelData.size(), 6u);
+  for (auto& face: rawData.mSpecular.mPixelData)
   {
     DALI_TEST_EQUAL(face.size(), 1u);
   }
@@ -64,8 +64,8 @@ int UtcDaliEnvironmentDefinitionLoadRawSuccess(void)
   EnvironmentDefinition envDef { "forest_irradiance.ktx", "forest_radiance.ktx" };
   auto rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");
 
-  DALI_TEST_EQUAL(rawData.mDiffuse.data.size(), 6u);
-  for (auto& face: rawData.mDiffuse.data)
+  DALI_TEST_EQUAL(rawData.mDiffuse.mPixelData.size(), 6u);
+  for (auto& face: rawData.mDiffuse.mPixelData)
   {
     DALI_TEST_EQUAL(face.size(), 1u);
     uint32_t size = 64u;
@@ -78,8 +78,8 @@ int UtcDaliEnvironmentDefinitionLoadRawSuccess(void)
     }
   }
 
-  DALI_TEST_EQUAL(rawData.mSpecular.data.size(), 6u);
-  for (auto& face: rawData.mSpecular.data)
+  DALI_TEST_EQUAL(rawData.mSpecular.mPixelData.size(), 6u);
+  for (auto& face: rawData.mSpecular.mPixelData)
   {
     DALI_TEST_EQUAL(face.size(), 5u);
     uint32_t size = 64u;

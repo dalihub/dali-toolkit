@@ -12,8 +12,7 @@ SET(TC_SOURCES
   utc-Dali-AnimatedProperty.cpp
   utc-Dali-BvhLoader.cpp
   utc-Dali-CameraParameters.cpp
-  utc-Dali-CubeLoader.cpp
-  utc-Dali-CubeMapLoader.cpp
+  utc-Dali-EnvironmentMapLoader.cpp
   utc-Dali-DliLoader.cpp
   utc-Dali-EnvironmentDefinition.cpp
   utc-Dali-FacialAnimation.cpp

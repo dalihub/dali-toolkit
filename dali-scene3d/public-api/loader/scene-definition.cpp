@@ -422,7 +422,11 @@ const NodeDefinition* SceneDefinition::GetNode(Index iNode) const
 
 NodeDefinition* SceneDefinition::GetNode(Index iNode)
 {
-  return mNodes[iNode].get();
+  if(iNode != Scene3D::Loader::INVALID_INDEX && iNode < mNodes.size())
+  {
+    return mNodes[iNode].get();
+  }
+  return nullptr;
 }
 
 void SceneDefinition::Visit(Index iNode, const Customization::Choices& choices, NodeDefinition::IVisitor& v)
@@ -453,9 +457,9 @@ void SceneDefinition::CountResourceRefs(Index iNode, const Customization::Choice
 
     void Start(const NodeDefinition& n)
     {
-      if(n.mRenderable)
+      for(auto& renderable : n.mRenderables)
       {
-        n.mRenderable->RegisterResources(counter);
+        renderable->RegisterResources(counter);
       }
     }
 
@@ -957,7 +961,7 @@ void SceneDefinition::ConfigureSkeletonJoints(uint32_t iRoot, const SkeletonDefi
   }
 
   // 3, For each root, register joint matrices and constraints
-  for(auto r : rootsJoints)
+  for(const auto& r : rootsJoints)
   {
     auto node      = GetNode(r.first);
     auto rootJoint = root.FindChildByName(node->mName);
@@ -972,7 +976,7 @@ void SceneDefinition::ConfigureSkeletonJoints(uint32_t iRoot, const SkeletonDefi
     constraint.AddSource(Source(rootJoint, Actor::Property::POSITION));
     constraint.Apply();
 
-    for(auto j : r.second)
+    for(const auto j : r.second)
     {
       node       = GetNode(j);
       auto joint = rootJoint.FindChildByName(node->mName);
@@ -986,10 +990,10 @@ void SceneDefinition::EnsureUniqueSkinningShaderInstances(ResourceBundle& resour
   std::map<Index, std::map<Index, std::vector<Index*>>> skinningShaderUsers;
   for(auto& node : mNodes)
   {
-    if(node->mRenderable)
+    for(auto& renderable : node->mRenderables)
     {
       ResourceReflector reflector;
-      node->mRenderable->ReflectResources(reflector);
+      renderable->ReflectResources(reflector);
 
       if(reflector.iMesh)
       {
@@ -1040,21 +1044,21 @@ void SceneDefinition::ConfigureSkinningShaders(const ResourceBundle&            
 
   SortAndDeduplicateSkinningRequests(requests);
 
-  for(auto& i : requests)
+  for(auto& request : requests)
   {
-    auto& skeleton = resources.mSkeletons[i.mSkeletonIdx];
+    auto& skeleton = resources.mSkeletons[request.mSkeletonIdx];
     if(skeleton.mJoints.empty())
     {
-      LOGD(("Skeleton %d has no joints.", i.mSkeletonIdx));
+      LOGD(("Skeleton %d has no joints.", request.mSkeletonIdx));
       continue;
     }
 
     Index boneIdx = 0;
-    for(auto& j : skeleton.mJoints)
+    for(auto& joint : skeleton.mJoints)
     {
-      auto  node  = GetNode(j.mNodeIdx);
+      auto  node  = GetNode(joint.mNodeIdx);
       Actor actor = rootActor.FindChildByName(node->mName);
-      ConfigureBoneMatrix(j.mInverseBindMatrix, actor, i.mShader, boneIdx);
+      ConfigureBoneMatrix(joint.mInverseBindMatrix, actor, request.mShader, boneIdx);
     }
   }
 }
@@ -1124,10 +1128,10 @@ void SceneDefinition::EnsureUniqueBlendShapeShaderInstances(ResourceBundle& reso
   std::map<Index, std::map<std::string, std::vector<Index*>>> blendShapeShaderUsers;
   for(auto& node : mNodes)
   {
-    if(node->mRenderable)
+    for(auto& renderable : node->mRenderables)
     {
       ResourceReflector reflector;
-      node->mRenderable->ReflectResources(reflector);
+      renderable->ReflectResources(reflector);
 
       if(reflector.iMesh)
       {

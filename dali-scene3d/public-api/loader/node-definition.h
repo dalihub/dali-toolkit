@@ -260,10 +260,9 @@ public: // DATA
   Vector3    mScale       = Vector3::ONE;
   Vector3    mSize        = Vector3::ONE;
 
-  bool mIsVisible    = true;
-  bool mInheritColor = false;
+  bool mIsVisible = true;
 
-  std::unique_ptr<Renderable>              mRenderable;
+  std::vector<std::unique_ptr<Renderable>> mRenderables;
   std::unique_ptr<CustomizationDefinition> mCustomization;
   std::vector<Extra>                       mExtras;
   std::vector<ConstraintDefinition>        mConstraints;
@@ -272,7 +271,7 @@ public: // DATA
   Index              mParentIdx = INVALID_INDEX;
 };
 
-class DALI_SCENE3D_API ModelNode : public NodeDefinition::Renderable
+class DALI_SCENE3D_API ModelRenderable : public NodeDefinition::Renderable
 {
 public: // DATA
   Vector4 mColor       = Color::WHITE;
@@ -289,7 +288,7 @@ public: // METHODS
 /**
  * @brief Parameters for an Arc node.
  */
-class DALI_SCENE3D_API ArcNode : public ModelNode
+class DALI_SCENE3D_API ArcRenderable : public ModelRenderable
 {
 public: // DATA
   bool  mAntiAliasing      = true;
@@ -308,4 +307,4 @@ public: // METHODS
 } // namespace Scene3D
 } // namespace Dali
 
-#endif //DALI_SCENE3D_LOADER_NODE_DEFINITION_H_
+#endif // DALI_SCENE3D_LOADER_NODE_DEFINITION_H_

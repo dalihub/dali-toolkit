@@ -44,8 +44,8 @@ int UtcDaliAnimationDefinitionReAnimate(void)
   auto actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "ChristopherPlummer");
 
-  auto getActor = [&actor](const std::string& name) {
-    return actor.FindChildByName(name);
+  auto getActor = [&actor](const Dali::Scene3D::Loader::AnimatedProperty& property) {
+    return actor.FindChildByName(property.mNodeName);
   };
 
   for (bool b: { false, true })
@@ -57,6 +57,7 @@ int UtcDaliAnimationDefinitionReAnimate(void)
     animDef.mEndAction = Animation::BAKE_FINAL;
     animDef.mSpeedFactor = .7f;
     animDef.mProperties.push_back(AnimatedProperty{
+     INVALID_INDEX,
      "ChristopherPlummer",
      "position",
      KeyFrames(),
@@ -84,8 +85,8 @@ int UtcDaliAnimationDefinitionReAnimateKeyFrames(void)
   auto actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "ChristopherPlummer");
 
-  auto getActor = [&actor](const std::string& name) {
-    return actor.FindChildByName(name);
+  auto getActor = [&actor](const Dali::Scene3D::Loader::AnimatedProperty& property) {
+    return actor.FindChildByName(property.mNodeName);
   };
 
   KeyFrames kf = KeyFrames::New();
@@ -99,6 +100,7 @@ int UtcDaliAnimationDefinitionReAnimateKeyFrames(void)
   animDef.mEndAction = Animation::BAKE_FINAL;
   animDef.mSpeedFactor = .7f;
   animDef.mProperties.push_back(AnimatedProperty{
+   INVALID_INDEX,
    "ChristopherPlummer",
    "position",
    kf,

@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_ENVIRONMENT_DEFINITION_H
 #define DALI_SCENE3D_LOADER_ENVIRONMENT_DEFINITION_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@
 
 // INTERNAL INCLUDES
 #include "dali-scene3d/public-api/api.h"
-#include "dali-scene3d/public-api/loader/cube-data.h"
+#include "dali-scene3d/public-api/loader/environment-map-data.h"
 
 // EXTERNAL INCLUDES
+#include <memory>
 #include "dali/public-api/math/quaternion.h"
 #include "dali/public-api/rendering/texture.h"
 
@@ -51,9 +52,9 @@ struct DALI_SCENE3D_API EnvironmentDefinition
 
   struct RawData
   {
-    CubeData  mDiffuse;
-    CubeData  mSpecular;
-    PixelData mBrdf;
+    EnvironmentMapData mDiffuse;
+    EnvironmentMapData mSpecular;
+    PixelData          mBrdf;
   };
 
   using EnvironmentData = std::pair<EnvironmentDefinition, Textures>;
@@ -61,10 +62,10 @@ struct DALI_SCENE3D_API EnvironmentDefinition
 
   EnvironmentDefinition() = default;
 
-  EnvironmentDefinition(const EnvironmentDefinition&) = delete;
+  EnvironmentDefinition(const EnvironmentDefinition&)            = delete;
   EnvironmentDefinition& operator=(const EnvironmentDefinition&) = delete;
 
-  EnvironmentDefinition(EnvironmentDefinition&&) = default;
+  EnvironmentDefinition(EnvironmentDefinition&&)            = default;
   EnvironmentDefinition& operator=(EnvironmentDefinition&&) = default;
 
   /**
@@ -87,16 +88,17 @@ struct DALI_SCENE3D_API EnvironmentDefinition
   static float GetDefaultIntensity();
 
 public: // DATA
-  std::string mDiffuseMapPath;
-  std::string mSpecularMapPath;
-  Quaternion  mCubeOrientation = Quaternion::IDENTITY;
-  Vector3     mYDirection      = Vector3::ONE;
-  float       mIblIntensity    = 1.0f;
-  bool        mUseBrdfTexture  = false;
+  std::string              mDiffuseMapPath;
+  std::string              mSpecularMapPath;
+  std::shared_ptr<RawData> mRawData;
+  Quaternion               mCubeOrientation = Quaternion::IDENTITY;
+  Vector3                  mYDirection      = Vector3::ONE;
+  float                    mIblIntensity    = 1.0f;
+  bool                     mUseBrdfTexture  = false;
 };
 
 } // namespace Loader
 } // namespace Scene3D
 } // namespace Dali
 
-#endif //DALI_SCENE3D_LOADER_ENVIRONMENT_DEFINITION_H
+#endif // DALI_SCENE3D_LOADER_ENVIRONMENT_DEFINITION_H

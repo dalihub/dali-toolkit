@@ -145,7 +145,7 @@ RendererState::Type ReadRendererState(const TreeNode& tnRendererState)
 }
 
 ///@brief Reads arc properties.
-void ReadArcField(const TreeNode* eArc, ArcNode& arc)
+void ReadArcField(const TreeNode* eArc, ArcRenderable& arc)
 {
   ReadBool(eArc->GetChild("antiAliasing"), arc.mAntiAliasing);
   ReadInt(eArc->GetChild("arcCaps"), arc.mArcCaps);
@@ -301,7 +301,7 @@ void ParseProperties(const Toolkit::TreeNode& node, Property::Array& array)
   }
 }
 
-} //namespace
+} // namespace
 
 struct DliLoader::Impl
 {
@@ -485,8 +485,7 @@ void DliLoader::Impl::ParseScene(LoadParams& params)
 
 void DliLoader::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* tnScenes, const Toolkit::TreeNode* tnNodes, LoadParams& params)
 {
-  auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene)
-  {
+  auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene) {
     auto tn = GetNthChild(tnScenes, iScene); // now a "scene" object
     if(!tn)
     {
@@ -740,9 +739,10 @@ void DliLoader::Impl::ParseShaders(const TreeNode* shaders, ResourceBundle& reso
 
             default:
               mOnError(FormatString(
-                "shader %d: Ignoring uniform '%s': failed to infer type from %d elements.",
+                "shader %u: Ignoring uniform '%s': failed to infer type from %zu elements.",
                 iShader,
-                key.c_str()));
+                key.c_str(),
+                size));
               break;
           }
 
@@ -935,7 +935,7 @@ void DliLoader::Impl::ParseMaterials(const TreeNode* materials, ConvertColorCode
       }
     }
 
-    //TODO : need to consider AGIF
+    // TODO : need to consider AGIF
     std::vector<std::string> texturePaths;
     std::string              texturePath;
     if(ReadString(node.GetChild("albedoMap"), texturePath))
@@ -1078,9 +1078,7 @@ void DliLoader::Impl::ParseNodes(const TreeNode* const nodes, Index index, LoadP
 
     virtual unsigned int Resolve(Index iDli) override
     {
-      auto iFind = std::lower_bound(mIndices.begin(), mIndices.end(), iDli, [](const Entry& idx, Index iDli) {
-        return idx.iDli < iDli;
-      });
+      auto iFind = std::lower_bound(mIndices.begin(), mIndices.end(), iDli, [](const Entry& idx, Index iDli) { return idx.iDli < iDli; });
       DALI_ASSERT_ALWAYS(iFind != mIndices.end());
       return iFind->iScene;
     }
@@ -1160,7 +1158,7 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
     else // something renderable maybe
     {
       std::unique_ptr<NodeDefinition::Renderable> renderable;
-      ModelNode*                                  modelNode = nullptr; // no ownership, aliasing renderable for the right type.
+      ModelRenderable*                            modelRenderable = nullptr; // no ownership, aliasing renderable for the right type.
 
       const TreeNode* eRenderable = nullptr;
       if((eRenderable = node->GetChild("model")))
@@ -1172,10 +1170,10 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
           ExceptionFlinger(ASSERT_LOCATION) << "node " << nodeDef.mName << ": Missing mesh definition.";
         }
 
-        modelNode = new ModelNode();
-        renderable.reset(modelNode);
+        modelRenderable = new ModelRenderable();
+        renderable.reset(modelRenderable);
 
-        resourceIds.push_back({ResourceType::Mesh, eMesh, modelNode->mMeshIdx});
+        resourceIds.push_back({ResourceType::Mesh, eMesh, modelRenderable->mMeshIdx});
       }
       else if((eRenderable = node->GetChild("arc")))
       {
@@ -1186,13 +1184,13 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
           ExceptionFlinger(ASSERT_LOCATION) << "node " << nodeDef.mName << ": Missing mesh definition.";
         }
 
-        auto arcNode = new ArcNode;
-        renderable.reset(arcNode);
-        modelNode = arcNode;
+        auto arcRenderable = new ArcRenderable;
+        renderable.reset(arcRenderable);
+        modelRenderable = arcRenderable;
 
-        resourceIds.push_back({ResourceType::Mesh, eMesh, arcNode->mMeshIdx});
+        resourceIds.push_back({ResourceType::Mesh, eMesh, arcRenderable->mMeshIdx});
 
-        ReadArcField(eRenderable, *arcNode);
+        ReadArcField(eRenderable, *arcRenderable);
       }
 
       if(renderable && eRenderable != nullptr) // process common properties of all renderables + register payload
@@ -1206,22 +1204,22 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
         }
 
         // color
-        if(modelNode)
+        if(modelRenderable)
         {
-          modelNode->mMaterialIdx = 0; // must offer default of 0
-          auto eMaterial          = eRenderable->GetChild("material");
+          modelRenderable->mMaterialIdx = 0; // must offer default of 0
+          auto eMaterial                = eRenderable->GetChild("material");
           if(eMaterial)
           {
-            resourceIds.push_back({ResourceType::Material, eMaterial, modelNode->mMaterialIdx});
+            resourceIds.push_back({ResourceType::Material, eMaterial, modelRenderable->mMaterialIdx});
           }
 
-          if(!ReadColorCodeOrColor(eRenderable, modelNode->mColor, params.input.mConvertColorCode))
+          if(!ReadColorCodeOrColor(eRenderable, modelRenderable->mColor, params.input.mConvertColorCode))
           {
-            ReadColorCodeOrColor(node, modelNode->mColor, params.input.mConvertColorCode);
+            ReadColorCodeOrColor(node, modelRenderable->mColor, params.input.mConvertColorCode);
           }
         }
 
-        nodeDef.mRenderable = std::move(renderable);
+        nodeDef.mRenderables.push_back(std::move(renderable));
       }
     }
 
@@ -1356,7 +1354,7 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
     const unsigned int myIndex = output.mScene.GetNodeCount();
     if(!mapper.Map(index, myIndex))
     {
-      mOnError(FormatString("node %d: error mapping dli index %d: node has multiple parents. Ignoring subtree."));
+      mOnError(FormatString("node %d: error mapping dli index %d: node has multiple parents. Ignoring subtree.", index, myIndex));
       return;
     }
 
@@ -1427,9 +1425,7 @@ void DliLoader::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadParams& 
     AnimationDefinition animDef;
     ReadString(tnAnim.GetChild(NAME), animDef.mName);
 
-    auto       iFind     = std::lower_bound(definitions.begin(), definitions.end(), animDef, [](const AnimationDefinition& ad0, const AnimationDefinition& ad1) {
-      return ad0.mName < ad1.mName;
-    });
+    auto       iFind     = std::lower_bound(definitions.begin(), definitions.end(), animDef, [](const AnimationDefinition& ad0, const AnimationDefinition& ad1) { return ad0.mName < ad1.mName; });
     const bool overwrite = iFind != definitions.end() && iFind->mName == animDef.mName;
     if(overwrite)
     {
@@ -1557,10 +1553,10 @@ void DliLoader::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadParams& 
 
           animProp.mKeyFrames = KeyFrames::New();
 
-          //In binary animation file only is saved the position, rotation, scale and blend shape weight keys.
-          //so, if it is vector3 we assume is position or scale keys, if it is vector4 we assume is rotation,
-          // otherwise are blend shape weight keys.
-          // TODO support for binary header with size information
+          // In binary animation file only is saved the position, rotation, scale and blend shape weight keys.
+          // so, if it is vector3 we assume is position or scale keys, if it is vector4 we assume is rotation,
+          //  otherwise are blend shape weight keys.
+          //  TODO support for binary header with size information
           Property::Type propType = Property::FLOAT; // assume blend shape weights
           if(animProp.mPropertyName == "orientation")
           {
@@ -1571,8 +1567,8 @@ void DliLoader::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadParams& 
             propType = Property::VECTOR3;
           }
 
-          //alphafunction is reserved for future implementation
-          // NOTE: right now we're just using AlphaFunction::LINEAR.
+          // alphafunction is reserved for future implementation
+          //  NOTE: right now we're just using AlphaFunction::LINEAR.
           unsigned char dummyAlphaFunction;
 
           float           progress;
@@ -1695,9 +1691,7 @@ void DliLoader::Impl::ParseAnimationGroups(const Toolkit::TreeNode* tnAnimationG
       continue;
     }
 
-    auto iFind = std::lower_bound(animGroups.begin(), animGroups.end(), groupName, [](const AnimationGroupDefinition& group, const std::string& name) {
-      return group.mName < name;
-    });
+    auto iFind = std::lower_bound(animGroups.begin(), animGroups.end(), groupName, [](const AnimationGroupDefinition& group, const std::string& name) { return group.mName < name; });
     if(iFind != animGroups.end() && iFind->mName == groupName)
     {
       mOnError(FormatString("Animation group with name '%s' already exists; new entries will be merged.", groupName.c_str()));
@@ -1728,6 +1722,8 @@ void DliLoader::Impl::GetCameraParameters(std::vector<CameraParameters>& cameras
   {
     if(const TreeNode* jsonCameras = mParser.GetRoot()->GetChild("cameras"))
     {
+      float dummyFloatArray[4];
+
       cameras.resize(jsonCameras->Size());
       auto iCamera = cameras.begin();
       for(auto i0 = jsonCameras->CBegin(), i1 = jsonCameras->CEnd(); i0 != i1; ++i0)
@@ -1737,9 +1733,12 @@ void DliLoader::Impl::GetCameraParameters(std::vector<CameraParameters>& cameras
         ReadFloat(jsonCamera.GetChild("fov"), iCamera->yFov);
         ReadFloat(jsonCamera.GetChild("near"), iCamera->zNear);
         ReadFloat(jsonCamera.GetChild("far"), iCamera->zFar);
-        if(ReadVector(jsonCamera.GetChild("orthographic"), iCamera->orthographicSize.AsFloat(), 4u))
+        if(ReadVector(jsonCamera.GetChild("orthographic"), dummyFloatArray, 4u))
         {
           iCamera->isPerspective = false;
+
+          iCamera->orthographicSize = dummyFloatArray[2] * 0.5f;
+          iCamera->aspectRatio      = dummyFloatArray[1] / dummyFloatArray[2];
         }
 
         if(auto jsonMatrix = jsonCamera.GetChild("matrix"))

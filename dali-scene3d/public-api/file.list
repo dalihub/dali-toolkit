@@ -7,11 +7,11 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_public_api_dir}/loader/animated-property.cpp
 	${scene3d_public_api_dir}/loader/animation-definition.cpp
 	${scene3d_public_api_dir}/loader/blend-shape-details.cpp
+	${scene3d_public_api_dir}/loader/buffer-definition.cpp
 	${scene3d_public_api_dir}/loader/bvh-loader.cpp
 	${scene3d_public_api_dir}/loader/camera-parameters.cpp
-	${scene3d_public_api_dir}/loader/cube-data.cpp
-	${scene3d_public_api_dir}/loader/cube-loader.cpp
-	${scene3d_public_api_dir}/loader/cube-map-loader.cpp
+	${scene3d_public_api_dir}/loader/environment-map-data.cpp
+	${scene3d_public_api_dir}/loader/environment-map-loader.cpp
 	${scene3d_public_api_dir}/loader/customization.cpp
 	${scene3d_public_api_dir}/loader/dli-loader.cpp
 	${scene3d_public_api_dir}/loader/environment-definition.cpp

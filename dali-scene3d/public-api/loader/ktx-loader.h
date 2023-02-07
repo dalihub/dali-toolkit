@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_KTX_LOADER_H
 #define DALI_SCENE3D_LOADER_KTX_LOADER_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
-#include <dali-scene3d/public-api/loader/cube-data.h>
+#include <dali-scene3d/public-api/loader/environment-map-data.h>
 
 namespace Dali
 {
@@ -31,10 +31,10 @@ namespace Loader
  * @brief Loads cube map data texture from a ktx file.
  *
  * @param[in] path The file path.
- * @param[out] cubedata The data structure with all pixel data objects.
+ * @param[out] environmentMapData The data structure with all pixel data objects.
  * @return bool True if the loading is succeded.
  */
-bool LoadKtxData(const std::string& path, CubeData& cubedata);
+bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData);
 
 } // namespace Loader
 } // namespace Scene3D

@@ -53,7 +53,7 @@ void Apply(Type rendererState, Renderer& renderer)
 {
   RENDERER_SET_PROPERTY(DEPTH_TEST_MODE, MaskMatch(rendererState, DEPTH_TEST) ? DepthTestMode::ON : DepthTestMode::OFF);
 
-  RENDERER_SET_PROPERTY(BLEND_MODE, MaskMatch(rendererState, ALPHA_BLEND) ? BlendMode::ON : BlendMode::OFF_ONLY_OPAQUE);
+  RENDERER_SET_PROPERTY(BLEND_MODE, MaskMatch(rendererState, ALPHA_BLEND) ? BlendMode::ON : BlendMode::USE_ACTOR_OPACITY);
 
   const bool cullBack = MaskMatch(rendererState, CULL_BACK);
   RENDERER_SET_PROPERTY(FACE_CULLING_MODE, MaskMatch(rendererState, CULL_FRONT) ? (cullBack ? FaceCullingMode::FRONT_AND_BACK : FaceCullingMode::FRONT) : (cullBack ? FaceCullingMode::BACK : FaceCullingMode::NONE));

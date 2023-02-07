@@ -1,0 +1,84 @@
+{
+   "accessors" : [
+      {
+         "bufferView" : 0,
+         "byteOffset" : 0,
+         "componentType" : 5126,
+         "count" : 36,
+         "max" : [
+            1.000000,
+            1.000000,
+            1.000001
+         ],
+         "min" : [
+            -1.000000,
+            -1.000000,
+            -1.000000
+         ],
+         "type" : "VEC3"
+      }
+   ],
+   "asset" : {
+      "generator" : "VKTS glTF 2.0 exporter",
+      "version" : "2.0"
+   },
+   "bufferViews" : [
+      {
+         "buffer" : 0,
+         "byteLength" : 864,
+         "byteOffset" : 132,
+         "target" : 34962,
+         "byteStride": 24
+      }
+   ],
+   "buffers" : [
+      {
+         "byteLength" : 1860,
+         "uri" : "AnimatedCube.bin"
+      }
+   ],
+   "materials" : [
+      {
+         "name" : "AnimatedCube",
+         "pbrMetallicRoughness" : {
+         }
+      },
+      {
+         "name" : "AnimatedCube2",
+         "pbrMetallicRoughness" : {
+         }
+      }
+   ],
+   "meshes" : [
+      {
+         "name" : "AnimatedCube",
+         "primitives" : [
+            {
+               "attributes" : {
+                  "POSITION" : 0
+               }
+            }
+         ]
+      }
+   ],
+   "nodes" : [
+      {
+         "mesh" : 0,
+         "name" : "AnimatedCube",
+         "rotation" : [
+            0.000000,
+            -1.000000,
+            0.000000,
+            0.000000
+         ]
+      }
+   ],
+   "scene" : 0,
+   "scenes" : [
+      {
+         "nodes" : [
+            0
+         ]
+      }
+   ]
+}
