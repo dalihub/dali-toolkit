@@ -2279,13 +2279,6 @@ void Controller::InsertText(const std::string& text, Controller::InsertType type
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::InsertText %p %s (%s) mPrimaryCursorPosition %d mPreEditFlag %d mPreEditStartPosition %d mPreEditLength %d\n", this, text.c_str(), (COMMIT == type ? "COMMIT" : "PRE_EDIT"), mImpl->mEventData->mPrimaryCursorPosition, mImpl->mEventData->mPreEditFlag, mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength);
 
-  // Play the input text with the TTS player.
-  Dali::TtsPlayer player = Dali::TtsPlayer::Get(Dali::TtsPlayer::SCREEN_READER);
-  if (player)
-  {
-    player.Play(text);
-  }
-
   // TODO: At the moment the underline runs are only for pre-edit.
   mImpl->mModel->mVisualModel->mUnderlineRuns.Clear();
 
@@ -2323,6 +2316,28 @@ void Controller::InsertText(const std::string& text, Controller::InsertType type
 
     DALI_ASSERT_DEBUG(text.size() >= utf32Characters.Count() && "Invalid UTF32 conversion length");
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "UTF8 size %d, UTF32 size %d\n", text.size(), utf32Characters.Count());
+
+    // Play the input text with the TTS player.
+    Dali::TtsPlayer player = Dali::TtsPlayer::Get(Dali::TtsPlayer::SCREEN_READER);
+    if(player)
+    {
+      // PRE_EDIT text will inserted same time after this COMMIT, do not play tts.
+      if(!(type == COMMIT && mImpl->mEventData->mPreEditToCommitFlag && characterCount == 1u))
+      {
+        std::string ttsText = text;
+        if(type == COMMIT && mImpl->mEventData->mPreEditToCommitFlag && characterCount > 1u && text.length() > mImpl->mEventData->mPreEditTextLength)
+        {
+          ttsText = text.substr(mImpl->mEventData->mPreEditTextLength);
+        }
+        player.Play(ttsText);
+      }
+    }
+  }
+
+  // PRE_EDIT type empty text is inserted before the preedit input is converted to commit.
+  if(text.empty() && type == PRE_EDIT)
+  {
+    mImpl->mEventData->mPreEditToCommitFlag = true;
   }
 
   if(0u != utf32Characters.Count()) // Check if Utf8ToUtf32 conversion succeeded
@@ -2334,6 +2349,7 @@ void Controller::InsertText(const std::string& text, Controller::InsertType type
     }
 
     mImpl->ChangeState(EventData::EDITING);
+    mImpl->mEventData->mPreEditToCommitFlag = false;
 
     // Handle the InputMethodContext (predicitive text) state changes
     if(COMMIT == type)
@@ -2351,8 +2367,9 @@ void Controller::InsertText(const std::string& text, Controller::InsertType type
         mImpl->mEventData->mPreEditStartPosition = mImpl->mEventData->mPrimaryCursorPosition;
       }
 
-      mImpl->mEventData->mPreEditLength = utf32Characters.Count();
-      mImpl->mEventData->mPreEditFlag   = true;
+      mImpl->mEventData->mPreEditLength     = utf32Characters.Count();
+      mImpl->mEventData->mPreEditTextLength = text.length();
+      mImpl->mEventData->mPreEditFlag       = true;
 
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "mPreEditStartPosition %d mPreEditLength %d\n", mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength);
     }

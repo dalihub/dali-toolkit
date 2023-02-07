@@ -141,6 +141,7 @@ struct EventData
 
   CharacterIndex     mPreEditStartPosition;    ///< Used to remove the pre-edit text if necessary.
   Length             mPreEditLength;           ///< Used to remove the pre-edit text if necessary.
+  Length             mPreEditTextLength;       ///< Used to insert the pre-edit text if necessary.
 
   float              mCursorHookPositionX;     ///< Used to move the cursor with the keys or when scrolling the text vertically with the handles.
 
@@ -149,6 +150,7 @@ struct EventData
 
   bool mIsShowingPlaceholderText        : 1;   ///< True if the place-holder text is being displayed.
   bool mPreEditFlag                     : 1;   ///< True if the model contains text in pre-edit state.
+  bool mPreEditToCommitFlag             : 1;   ///< True if the old model contains text in pre-edit state.
   bool mDecoratorUpdated                : 1;   ///< True if the decorator was updated during event processing.
   bool mCursorBlinkEnabled              : 1;   ///< True if cursor should blink when active.
   bool mGrabHandleEnabled               : 1;   ///< True if grab handle is enabled.
