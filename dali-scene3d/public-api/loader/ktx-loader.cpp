@@ -243,7 +243,7 @@ bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData
       for(uint32_t face = 0u; face < header.numberOfFaces; ++face)
       {
         std::unique_ptr<uint8_t, void (*)(uint8_t*)> img(new uint8_t[byteSize], FreeBuffer);
-        if(fp.read(reinterpret_cast<char*>(img.get()), byteSize).good() == false)
+        if(fp.read(reinterpret_cast<char*>(img.get()), static_cast<std::streamsize>(static_cast<size_t>(byteSize))).good() == false)
         {
           return false;
         }
