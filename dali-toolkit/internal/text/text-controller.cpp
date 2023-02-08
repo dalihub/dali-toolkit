@@ -2321,15 +2321,21 @@ void Controller::InsertText(const std::string& text, Controller::InsertType type
     Dali::TtsPlayer player = Dali::TtsPlayer::Get(Dali::TtsPlayer::SCREEN_READER);
     if(player)
     {
-      // PRE_EDIT text will inserted same time after this COMMIT, do not play tts.
-      if(!(type == COMMIT && mImpl->mEventData->mPreEditToCommitFlag && characterCount == 1u))
+      if(type == COMMIT && mImpl->mEventData->mPreEditToCommitFlag)
       {
-        std::string ttsText = text;
-        if(type == COMMIT && mImpl->mEventData->mPreEditToCommitFlag && characterCount > 1u && text.length() > mImpl->mEventData->mPreEditTextLength)
+        if(characterCount > 1u)
         {
-          ttsText = text.substr(mImpl->mEventData->mPreEditTextLength);
+          std::string ttsText = text;
+          if(text.length() > mImpl->mEventData->mPreEditTextLength)
+          {
+            ttsText = text.substr(mImpl->mEventData->mPreEditTextLength);
+          }
+          player.Play(ttsText);
         }
-        player.Play(ttsText);
+      }
+      else
+      {
+        player.Play(text);
       }
     }
   }
