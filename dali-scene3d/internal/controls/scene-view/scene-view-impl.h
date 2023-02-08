@@ -250,7 +250,7 @@ private:
   Dali::RenderTask                                         mRenderTask;
   Layer                                                    mRootLayer;
   int32_t                                                  mWindowOrientation;
-  uint8_t                                                  mFrameBufferMultiSamplingLevel{0u};
+  uint8_t                                                  mFrameBufferMultiSamplingLevel{4u};
 
   CallbackBase* mIblLoadedCallback;
   std::string   mDiffuseIblUrl;
