@@ -44,14 +44,6 @@ namespace Text
 float GetGlyphCharacterSpacing(const GlyphIndex&                       index,
                                const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns,
                                const float                             modelCharacterSpacing);
-
-/**
- * @brief Create static empty vector and retrun it.
- *
- * @return The reference for the empty character-spacing glyph runs.
- */
-const Vector<CharacterSpacingGlyphRun>& GetEmptyCharacterSpacingGlyphRuns();
-
 } // namespace Text
 
 } // namespace Toolkit

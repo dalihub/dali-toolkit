@@ -917,24 +917,14 @@ const Vector<BoundedParagraphRun>& View::GetBoundedParagraphRuns() const
   return mImpl->mLogicalModel->GetBoundedParagraphRuns();
 }
 
-Length View::GetNumberOfCharacterSpacingGlyphRuns() const
-{
-  return (mImpl->mVisualModel) ? mImpl->mVisualModel->GetNumberOfCharacterSpacingGlyphRuns() : 0u;
-}
-
-const Vector<CharacterSpacingGlyphRun>& View::GetCharacterSpacingGlyphRuns() const
-{
-  return (mImpl->mVisualModel) ? mImpl->mVisualModel->GetCharacterSpacingGlyphRuns() : GetEmptyCharacterSpacingGlyphRuns();
-}
-
 float View::GetCharacterSpacing() const
 {
-  return (mImpl->mVisualModel) ? mImpl->mVisualModel->GetCharacterSpacing() : 0.f;
+  return mImpl->mVisualModel->GetCharacterSpacing();
 }
 
 const Character* View::GetTextBuffer() const
 {
-  return (mImpl->mVisualModel) ? mImpl->mLogicalModel->mText.Begin() : nullptr;
+  return mImpl->mLogicalModel->mText.Begin();
 }
 
 const Vector<CharacterIndex>& View::GetGlyphsToCharacters() const

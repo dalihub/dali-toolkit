@@ -35,11 +35,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-namespace
-{
-const Dali::AlphaFunction DEFAULT_ALPHA_FUNCTION(Dali::AlphaFunction::DEFAULT);
-} // anonymous namespace
-
 TransitionPtr Transition::New(Dali::Toolkit::Control source, Dali::Toolkit::Control destination, bool useDestinationTarget, TimePeriod timePeriod)
 {
   float delaySeconds = timePeriod.delaySeconds;
