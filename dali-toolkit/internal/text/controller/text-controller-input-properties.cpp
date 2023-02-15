@@ -38,7 +38,7 @@
 
 namespace
 {
-const std::string EMPTY_STRING("");
+const char* EMPTY_STRING = "";
 }
 
 namespace Dali::Toolkit::Text
@@ -116,7 +116,7 @@ void Controller::InputProperties::SetInputShadowProperties(Controller& controlle
   }
 }
 
-const std::string& Controller::InputProperties::GetInputShadowProperties(const Controller& controller)
+std::string Controller::InputProperties::GetInputShadowProperties(const Controller& controller)
 {
   return controller.mImpl->mEventData ? controller.mImpl->mEventData->mInputStyle.shadowProperties : EMPTY_STRING;
 }
@@ -129,7 +129,7 @@ void Controller::InputProperties::SetInputUnderlineProperties(Controller& contro
   }
 }
 
-const std::string& Controller::InputProperties::GetInputUnderlineProperties(const Controller& controller)
+std::string Controller::InputProperties::GetInputUnderlineProperties(const Controller& controller)
 {
   return controller.mImpl->mEventData ? controller.mImpl->mEventData->mInputStyle.underlineProperties : EMPTY_STRING;
 }
@@ -142,7 +142,7 @@ void Controller::InputProperties::SetInputEmbossProperties(Controller& controlle
   }
 }
 
-const std::string& Controller::InputProperties::GetInputEmbossProperties(const Controller& controller)
+std::string Controller::InputProperties::GetInputEmbossProperties(const Controller& controller)
 {
   return controller.mImpl->mEventData ? controller.mImpl->mEventData->mInputStyle.embossProperties : controller.GetDefaultEmbossProperties();
 }
@@ -155,7 +155,7 @@ void Controller::InputProperties::SetInputOutlineProperties(Controller& controll
   }
 }
 
-const std::string& Controller::InputProperties::GetInputOutlineProperties(const Controller& controller)
+std::string Controller::InputProperties::GetInputOutlineProperties(const Controller& controller)
 {
   return controller.mImpl->mEventData ? controller.mImpl->mEventData->mInputStyle.outlineProperties : controller.GetDefaultOutlineProperties();
 }

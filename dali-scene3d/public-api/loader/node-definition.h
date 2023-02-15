@@ -250,7 +250,7 @@ public: // METHODS
   static std::string_view GetIblYDirectionUniformName();
 
 public: // DATA
-  static const std::string ORIGINAL_MATRIX_PROPERTY_NAME;
+  static const char* ORIGINAL_MATRIX_PROPERTY_NAME;
 
   std::string mName;
   uint32_t    mNodeId = INVALID_INDEX;

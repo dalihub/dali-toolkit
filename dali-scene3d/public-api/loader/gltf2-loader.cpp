@@ -47,12 +47,12 @@ namespace
 Dali::Mutex gInitializeMutex;
 Dali::Mutex gReadMutex;
 
-const std::string POSITION_PROPERTY("position");
-const std::string ORIENTATION_PROPERTY("orientation");
-const std::string SCALE_PROPERTY("scale");
-const std::string BLEND_SHAPE_WEIGHTS_UNIFORM("uBlendShapeWeight");
-const std::string MRENDERER_MODEL_IDENTIFICATION("M-Renderer");
-const std::string ROOT_NODE_NAME("RootNode");
+const char* POSITION_PROPERTY("position");
+const char* ORIENTATION_PROPERTY("orientation");
+const char* SCALE_PROPERTY("scale");
+const char* BLEND_SHAPE_WEIGHTS_UNIFORM("uBlendShapeWeight");
+const char* MRENDERER_MODEL_IDENTIFICATION("M-Renderer");
+const char* ROOT_NODE_NAME("RootNode");
 const Vector3     SCALE_TO_ADJUST(100.0f, 100.0f, 100.0f);
 
 const Geometry::Type GLTF2_TO_DALI_PRIMITIVES[]{
@@ -1023,7 +1023,7 @@ float LoadBlendShapeKeyFrames(ConversionContext& context, const gt::Animation::C
   const float duration = LoadDataFromAccessors<float>(context, input, output, inputDataBuffer, outputDataBuffer);
 
   char        weightNameBuffer[32];
-  auto        prefixSize    = snprintf(weightNameBuffer, sizeof(weightNameBuffer), "%s[", BLEND_SHAPE_WEIGHTS_UNIFORM.c_str());
+  auto        prefixSize    = snprintf(weightNameBuffer, sizeof(weightNameBuffer), "%s[", BLEND_SHAPE_WEIGHTS_UNIFORM);
   char* const pWeightName   = weightNameBuffer + prefixSize;
   const auto  remainingSize = sizeof(weightNameBuffer) - prefixSize;
   for(uint32_t weightIndex = 0u, endWeightIndex = channel.mSampler->mOutput->mCount / channel.mSampler->mInput->mCount; weightIndex < endWeightIndex; ++weightIndex)

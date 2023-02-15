@@ -39,19 +39,19 @@ struct Controller::InputProperties
 
   static void SetInputShadowProperties(Controller& controller, const std::string& shadowProperties);
 
-  static const std::string& GetInputShadowProperties(const Controller& controller);
+  static std::string GetInputShadowProperties(const Controller& controller);
 
   static void SetInputUnderlineProperties(Controller& controller, const std::string& underlineProperties);
 
-  static const std::string& GetInputUnderlineProperties(const Controller& controller);
+  static std::string GetInputUnderlineProperties(const Controller& controller);
 
   static void SetInputEmbossProperties(Controller& controller, const std::string& embossProperties);
 
-  static const std::string& GetInputEmbossProperties(const Controller& controller);
+  static std::string GetInputEmbossProperties(const Controller& controller);
 
   static void SetInputOutlineProperties(Controller& controller, const std::string& outlineProperties);
 
-  static const std::string& GetInputOutlineProperties(const Controller& controller);
+  static std::string GetInputOutlineProperties(const Controller& controller);
 
   static void SetInputModePassword(Controller& controller, bool passwordInput);
 

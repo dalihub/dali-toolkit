@@ -65,7 +65,7 @@ private:
   uint16_t (*mFunc)(uintptr_t&);
 };
 
-const std::string QUAD("quad");
+const char* QUAD("quad");
 
 ///@brief Reads a blob from the given stream @a source into @a target, which must have
 /// at least @a descriptor.length bytes.

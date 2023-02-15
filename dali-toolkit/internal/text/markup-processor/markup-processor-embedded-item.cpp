@@ -35,8 +35,7 @@ namespace Text
 {
 namespace
 {
-const std::string NONE("none");
-const std::string MULTIPLY("multiply");
+const char* MULTIPLY = "multiply";
 } // namespace
 
 void ProcessEmbeddedItem(const Tag& tag, EmbeddedItem& embeddedItem)

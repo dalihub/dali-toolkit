@@ -40,7 +40,7 @@ struct DALI_SCENE3D_API Skinning
   /*
    * @brief Name of bone matrix uniform (array).
    */
-  static const std::string BONE_UNIFORM_NAME;
+  static const char* BONE_UNIFORM_NAME;
 
   Skinning() = delete;
 };

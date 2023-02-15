@@ -33,7 +33,7 @@ namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
-const std::string EMPTY_STRING("");
+const char* EMPTY_STRING = "";
 
 const char* const PLACEHOLDER_TEXT         = "text";
 const char* const PLACEHOLDER_TEXT_FOCUSED = "textFocused";
@@ -122,7 +122,7 @@ void Controller::PlaceholderHandler::SetPlaceholderFontFamily(Controller& contro
   }
 }
 
-const std::string& Controller::PlaceholderHandler::GetPlaceholderFontFamily(const Controller& controller)
+std::string Controller::PlaceholderHandler::GetPlaceholderFontFamily(const Controller& controller)
 {
   if((NULL != controller.mImpl->mEventData) && (NULL != controller.mImpl->mEventData->mPlaceholderFont))
   {

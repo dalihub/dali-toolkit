@@ -61,7 +61,7 @@ void NodeDefinition::Renderable::OnCreate(const NodeDefinition& node, CreatePara
   actor.AddRenderer(renderer);
 }
 
-const std::string NodeDefinition::ORIGINAL_MATRIX_PROPERTY_NAME = "originalMatrix";
+const char* NodeDefinition::ORIGINAL_MATRIX_PROPERTY_NAME = "originalMatrix";
 
 Actor NodeDefinition::CreateActor(CreateParams& params)
 {
