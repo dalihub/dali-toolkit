@@ -19,6 +19,8 @@
 
 // default algorithm
 #include <dali-scene3d/internal/algorithm/path-finder-djikstra.h>
+#include <dali-scene3d/internal/algorithm/path-finder-spfa-double-way.h>
+#include <dali-scene3d/internal/algorithm/path-finder-spfa.h>
 
 namespace Dali::Scene3D::Algorithm
 {
@@ -26,9 +28,23 @@ std::unique_ptr<PathFinder> PathFinder::New(NavigationMesh& navigationMesh, Path
 {
   PathFinderBase* impl = nullptr;
 
-  if(algorithm == PathFinderAlgorithm::DJIKSTRA_SHORTEST_PATH)
+  switch(algorithm)
   {
-    impl = new Dali::Scene3D::Internal::Algorithm::PathFinderAlgorithmDjikstra(navigationMesh);
+    case PathFinderAlgorithm::DJIKSTRA_SHORTEST_PATH:
+    {
+      impl = new Dali::Scene3D::Internal::Algorithm::PathFinderAlgorithmDjikstra(navigationMesh);
+      break;
+    }
+    case PathFinderAlgorithm::SPFA:
+    {
+      impl = new Dali::Scene3D::Internal::Algorithm::PathFinderAlgorithmSPFA(navigationMesh);
+      break;
+    }
+    case PathFinderAlgorithm::SPFA_DOUBLE_WAY:
+    {
+      impl = new Dali::Scene3D::Internal::Algorithm::PathFinderAlgorithmSPFADoubleWay(navigationMesh);
+      break;
+    }
   }
 
   if(!impl)
@@ -43,19 +59,17 @@ std::unique_ptr<PathFinder> PathFinder::New(NavigationMesh& navigationMesh, Path
 
 WayPointList PathFinder::FindPath(const Dali::Vector3& positionFrom, const Dali::Vector3& positionTo)
 {
-  return mImpl->FindPath( positionFrom, positionTo );
+  return mImpl->FindPath(positionFrom, positionTo);
 }
 
 WayPointList PathFinder::FindPath(uint32_t polyIndexFrom, uint32_t polyIndexTo)
 {
-  return mImpl->FindPath( polyIndexFrom, polyIndexTo );
+  return mImpl->FindPath(polyIndexFrom, polyIndexTo);
 }
-
 
 PathFinder::PathFinder(std::unique_ptr<PathFinderBase>&& baseImpl)
 {
   mImpl = std::move(baseImpl);
 }
-
 
 } // namespace Dali::Scene3D::Algorithm
