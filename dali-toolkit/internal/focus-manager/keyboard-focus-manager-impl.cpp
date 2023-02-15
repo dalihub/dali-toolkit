@@ -1097,13 +1097,16 @@ void KeyboardFocusManager::OnWindowFocusChanged(Window window, bool focusIn)
 
     // Get Current Focused Actor from window
     Actor currentFocusedActor = GetFocusActorFromCurrentWindow();
-    SetCurrentFocusActor(currentFocusedActor);
-
-    if(currentFocusedActor && (mEnableFocusIndicator == ENABLE))
+    if(currentFocusedActor)
     {
-      // Make sure the focused actor is highlighted
-      currentFocusedActor.Add(GetFocusIndicatorActor());
-      mIsFocusIndicatorShown = SHOW;
+      SetCurrentFocusActor(currentFocusedActor);
+
+      if(mEnableFocusIndicator == ENABLE)
+      {
+        // Make sure the focused actor is highlighted
+        currentFocusedActor.Add(GetFocusIndicatorActor());
+        mIsFocusIndicatorShown = SHOW;
+      }
     }
   }
 }
