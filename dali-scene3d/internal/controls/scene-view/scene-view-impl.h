@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_INTERNAL_SCENE_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/environment-map-load-task.h>
 #include <dali-scene3d/internal/common/image-based-light-observer.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
@@ -147,6 +148,36 @@ public:
    */
   uint8_t GetFramebufferMultiSamplingLevel() const;
 
+  /**
+   * @copydoc SceneView::SetSkybox()
+   */
+  void SetSkybox(const std::string& skyboxUrl);
+
+  /**
+   * @copydoc SceneView::SetSkyboxEnvironmentMapType()
+   */
+  void SetSkyboxEnvironmentMapType(Scene3D::EnvironmentMapType skyboxEnvironmentMapType);
+
+  /**
+   * @copydoc SceneView::SetSkyboxIntensity()
+   */
+  void SetSkyboxIntensity(float intensity);
+
+  /**
+   * @copydoc SceneView::GetSkyboxIntensity()
+   */
+  float GetSkyboxIntensity() const;
+
+  /**
+   * @copydoc SceneView::SetSkyboxOrientation()
+   */
+  void SetSkyboxOrientation(const Quaternion& orientation);
+
+  /**
+   * @copydoc SceneView::GetSkyboxOrientation()
+   */
+  Quaternion GetSkyboxOrientation() const;
+
 protected:
   /**
    * @brief Constructs a new SceneView.
@@ -222,25 +253,49 @@ private:
   void OnWindowResized(Window window, Window::WindowSize size);
 
   /**
-   * @brief Update camera's projection orientation according to the screen orientation.
+   * @brief Updates camera's projection orientation according to the screen orientation.
    */
   void RotateCamera();
 
   /**
-   * @brief Loads image based light from file.
+   * @brief UpdateSkybox with skybox url and skybox environment map type.
+   *
+   * @param[in] skyboxUrl image url for skybox.
+   * @param[in] skyboxEnvironmentMapType The environment type of skybox.
    */
-  void LoadImageBasedLight();
+  void UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentMapType skyboxEnvironmentMapType);
 
   /**
-   * @brief Asynchronously loading finished.
+   * @brief Asynchronously skybox loading finished.
    */
-  void OnLoadComplete();
+  void OnSkyboxLoadComplete();
+
+  /**
+   * @brief Asynchronously ibl diffusel image loading finished.
+   */
+  void OnIblDiffuseLoadComplete();
+
+  /**
+   * @brief Asynchronously ibl specular image loading finished.
+   */
+  void OnIblSpecularLoadComplete();
+
+  /**
+   * @brief Asynchronously ibl loading finished.
+   */
+  void OnIblLoadComplete();
+
+  /**
+   * @brief Notify the changes of Ibl textures to the child items.
+   */
+  void NotifyImageBasedLightTextureChange();
 
 private:
   Toolkit::Visual::Base mVisual;
 
   /////////////////////////////////////////////////////////////
   // FrameBuffer and Rendertask to render child objects as a 3D Scene
+  Dali::WeakHandle<Dali::Window>                           mWindow;
   CameraActor                                              mDefaultCamera;
   CameraActor                                              mSelectedCamera;
   std::vector<CameraActor>                                 mCameras;
@@ -250,17 +305,31 @@ private:
   Dali::RenderTask                                         mRenderTask;
   Layer                                                    mRootLayer;
   int32_t                                                  mWindowOrientation;
+  Dali::Actor                                              mSkybox;
+  Quaternion                                               mSkyboxOrientation;
+  float                                                    mSkyboxIntensity{1.0f};
   uint8_t                                                  mFrameBufferMultiSamplingLevel{4u};
 
-  CallbackBase* mIblLoadedCallback;
-  std::string   mDiffuseIblUrl;
-  std::string   mSpecularIblUrl;
+  // Asynchronous Loading.
+  EnvironmentMapLoadTaskPtr mSkyboxLoadTask;
+  EnvironmentMapLoadTaskPtr mIblDiffuseLoadTask;
+  EnvironmentMapLoadTaskPtr mIblSpecularLoadTask;
+  std::string               mSkyboxUrl;
+  std::string               mDiffuseIblUrl;
+  std::string               mSpecularIblUrl;
 
-  Dali::Texture mSpecularTexture;
-  Dali::Texture mDiffuseTexture;
-  float         mIblScaleFactor{1.0f};
-  bool          mUseFrameBuffer{false};
-  bool          mIBLResourceReady{true};
+  Scene3D::EnvironmentMapType mSkyboxEnvironmentMapType{Scene3D::EnvironmentMapType::AUTO};
+  Dali::Texture               mSkyboxTexture;
+  Dali::Texture               mDiffuseTexture;
+  Dali::Texture               mSpecularTexture;
+  float                       mIblScaleFactor{1.0f};
+  bool                        mUseFrameBuffer{false};
+  bool                        mSkyboxResourceReady{true};
+  bool                        mIblDiffuseResourceReady{true};
+  bool                        mIblSpecularResourceReady{true};
+  bool                        mSkyboxDirty{false};
+  bool                        mIblDiffuseDirty{false};
+  bool                        mIblSpecularDirty{false};
 
   // TODO : Light Source
 };

@@ -22,6 +22,7 @@
 
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <toolkit-event-thread-callback.h>
 
 #include <dali-scene3d/public-api/controls/model/model.h>
 
@@ -47,9 +48,11 @@ const bool DEFAULT_MODEL_CHILDREN_FOCUSABLE = false;
  * Donated by Norbert Nopper for glTF testing.
  * Take from https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/AnimatedCube
  */
-const char* TEST_GLTF_FILE_NAME                = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
-const char* TEST_GLTF_ANIMATION_TEST_FILE_NAME = TEST_RESOURCE_DIR "/animationTest.gltf";
-const char* TEST_DLI_FILE_NAME                 = TEST_RESOURCE_DIR "/arc.dli";
+const char* TEST_GLTF_FILE_NAME                    = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
+const char* TEST_GLTF_ANIMATION_TEST_FILE_NAME     = TEST_RESOURCE_DIR "/animationTest.gltf";
+const char* TEST_GLTF_MULTIPLE_PRIMITIVE_FILE_NAME = TEST_RESOURCE_DIR "/simpleMultiplePrimitiveTest.gltf";
+const char* TEST_DLI_FILE_NAME                     = TEST_RESOURCE_DIR "/arc.dli";
+const char* TEST_DLI_EXERCISE_FILE_NAME            = TEST_RESOURCE_DIR "/exercise.dli";
 /**
  * For the diffuse and specular cube map texture.
  * These textures are based off version of Wave engine sample
@@ -89,6 +92,19 @@ bool gFocusChangedCallBackCalled = false;
 void TestFocusChangedCallback(Actor, Actor)
 {
   gFocusChangedCallBackCalled = true;
+}
+
+// For ResourceReady
+static bool gOnRelayoutCallBackCalled = false;
+void        OnRelayoutCallback(Actor actor)
+{
+  gOnRelayoutCallBackCalled = true;
+}
+
+static bool gResourceReadyCalled = false;
+void        OnResourceReady(Control control)
+{
+  gResourceReadyCalled = true;
 }
 
 } // namespace
@@ -249,15 +265,23 @@ int UtcDaliModelOnScene01(void)
   ToolkitTestApplication application;
 
   Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
-
   application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
 
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
   uint32_t modelCount = model.GetModelRoot().GetChildCount();
   DALI_TEST_EQUALS(1, modelCount, TEST_LOCATION);
-
   END_TEST;
 }
 
@@ -266,11 +290,20 @@ int UtcDaliModelOnScene02(void)
   ToolkitTestApplication application;
 
   Scene3D::Model model = Scene3D::Model::New(TEST_DLI_FILE_NAME);
-
   application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   uint32_t modelCount = model.GetModelRoot().GetChildCount();
   DALI_TEST_EQUALS(1, modelCount, TEST_LOCATION);
@@ -311,7 +344,20 @@ int UtcDaliModelGetNaturalSize(void)
   Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
 
   Vector3 naturalSize = model.GetNaturalSize();
+  DALI_TEST_EQUALS(Vector3::ZERO, naturalSize, TEST_LOCATION);
 
+  application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  naturalSize = model.GetNaturalSize();
   DALI_TEST_EQUALS(Vector3(2, 2, 2), naturalSize, TEST_LOCATION);
 
   Actor root = model.GetModelRoot();
@@ -325,11 +371,20 @@ int UtcDaliModelSetImageBasedLightSource01(void)
   ToolkitTestApplication application;
 
   Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
-
   application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   Actor meshActor = model.FindChildByName("AnimatedCube");
   DALI_TEST_CHECK(meshActor);
@@ -338,19 +393,32 @@ int UtcDaliModelSetImageBasedLightSource01(void)
   DALI_TEST_CHECK(renderer);
 
   TextureSet textureSet = renderer.GetTextures();
-  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 7u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 9u, TEST_LOCATION);
 
-  Texture diffuseTexture  = textureSet.GetTexture(5u);
-  Texture specularTexture = textureSet.GetTexture(6u);
+  Texture diffuseTexture  = textureSet.GetTexture(7u);
+  Texture specularTexture = textureSet.GetTexture(8u);
 
+  gResourceReadyCalled = false;
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
   model.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE);
 
-  Texture newDiffuseTexture  = textureSet.GetTexture(5u);
-  Texture newSpecularTexture = textureSet.GetTexture(6u);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  Texture newDiffuseTexture  = textureSet.GetTexture(7u);
+  Texture newSpecularTexture = textureSet.GetTexture(8u);
 
   DALI_TEST_NOT_EQUALS(diffuseTexture, newDiffuseTexture, 0.0f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(specularTexture, newSpecularTexture, 0.0f, TEST_LOCATION);
 
+  model.Unparent();
+  model.Reset();
   END_TEST;
 }
 
@@ -359,11 +427,20 @@ int UtcDaliModelSetImageBasedLightSource02(void)
   ToolkitTestApplication application;
 
   Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
-
   application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   Actor meshActor = model.FindChildByName("AnimatedCube");
   DALI_TEST_CHECK(meshActor);
@@ -372,15 +449,16 @@ int UtcDaliModelSetImageBasedLightSource02(void)
   DALI_TEST_CHECK(renderer);
 
   TextureSet textureSet = renderer.GetTextures();
-  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 7u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 9u, TEST_LOCATION);
 
-  Texture diffuseTexture  = textureSet.GetTexture(5u);
-  Texture specularTexture = textureSet.GetTexture(6u);
+  Texture diffuseTexture  = textureSet.GetTexture(7u);
+  Texture specularTexture = textureSet.GetTexture(8u);
 
+  // if url is empty, loading is not requested.
   model.SetImageBasedLightSource("", "");
 
-  Texture newDiffuseTexture  = textureSet.GetTexture(5u);
-  Texture newSpecularTexture = textureSet.GetTexture(6u);
+  Texture newDiffuseTexture  = textureSet.GetTexture(7u);
+  Texture newSpecularTexture = textureSet.GetTexture(8u);
 
   DALI_TEST_EQUALS(diffuseTexture, newDiffuseTexture, TEST_LOCATION);
   DALI_TEST_EQUALS(specularTexture, newSpecularTexture, TEST_LOCATION);
@@ -393,11 +471,20 @@ int UtcDaliModelSetImageBasedLightSource03(void)
   ToolkitTestApplication application;
 
   Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
-
   application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   Actor meshActor = model.FindChildByName("AnimatedCube");
   DALI_TEST_CHECK(meshActor);
@@ -406,19 +493,53 @@ int UtcDaliModelSetImageBasedLightSource03(void)
   DALI_TEST_CHECK(renderer);
 
   TextureSet textureSet = renderer.GetTextures();
-  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 7u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 9u, TEST_LOCATION);
 
-  Texture diffuseTexture  = textureSet.GetTexture(5u);
-  Texture specularTexture = textureSet.GetTexture(6u);
+  Texture diffuseTexture  = textureSet.GetTexture(7u);
+  Texture specularTexture = textureSet.GetTexture(8u);
 
+  gResourceReadyCalled = false;
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
   model.SetImageBasedLightSource("dummy.ktx", "dummy.ktx");
 
-  Texture newDiffuseTexture  = textureSet.GetTexture(5u);
-  Texture newSpecularTexture = textureSet.GetTexture(6u);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  Texture newDiffuseTexture  = textureSet.GetTexture(7u);
+  Texture newSpecularTexture = textureSet.GetTexture(8u);
 
   DALI_TEST_EQUALS(diffuseTexture, newDiffuseTexture, TEST_LOCATION);
   DALI_TEST_EQUALS(specularTexture, newSpecularTexture, TEST_LOCATION);
 
+  END_TEST;
+}
+
+int UtcDaliModelSetImageBasedLightSource04(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  model.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE);
+  application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
   END_TEST;
 }
 
@@ -451,11 +572,20 @@ int UtcDaliModelChildrenSensitive01(void)
   // Allow children actor's event before on scene.
   view.SetChildrenSensitive(true);
   DALI_TEST_EQUALS(view.GetChildrenSensitive(), true, TEST_LOCATION);
-
   application.GetScene().Add(view);
+
+  gResourceReadyCalled = false;
+  view.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   Actor meshActor = view.FindChildByName("AnimatedCube");
   DALI_TEST_CHECK(meshActor);
@@ -539,11 +669,20 @@ int UtcDaliModelChildrenSensitive02(void)
   // Block children actor's event before on scene.
   view.SetChildrenSensitive(false);
   DALI_TEST_EQUALS(view.GetChildrenSensitive(), false, TEST_LOCATION);
-
   application.GetScene().Add(view);
+
+  gResourceReadyCalled = false;
+  view.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   Actor meshActor = view.FindChildByName("AnimatedCube");
   DALI_TEST_CHECK(meshActor);
@@ -610,11 +749,20 @@ int UtcDaliModelChildrenFocusable01(void)
   // Allow children actor's focus before on scene.
   view.SetChildrenFocusable(true);
   DALI_TEST_EQUALS(view.GetChildrenFocusable(), true, TEST_LOCATION);
-
   application.GetScene().Add(view);
+
+  gResourceReadyCalled = false;
+  view.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   Actor meshActor = view.FindChildByName("AnimatedCube");
   DALI_TEST_CHECK(meshActor);
@@ -709,11 +857,20 @@ int UtcDaliModelModelChildrenFocusable02(void)
   // Block children actor's focus before on scene.
   view.SetChildrenFocusable(false);
   DALI_TEST_EQUALS(view.GetChildrenFocusable(), false, TEST_LOCATION);
-
   application.GetScene().Add(view);
+
+  gResourceReadyCalled = false;
+  view.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   Actor meshActor = view.FindChildByName("AnimatedCube");
   DALI_TEST_CHECK(meshActor);
@@ -781,11 +938,20 @@ int UtcDaliModelAnimation01(void)
 
   Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
   model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
-
   application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   uint32_t animationCount = model.GetAnimationCount();
   DALI_TEST_EQUALS(1, animationCount, TEST_LOCATION);
@@ -806,9 +972,16 @@ int UtcDaliModelAnimation02(void)
 
   Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_ANIMATION_TEST_FILE_NAME);
   model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
-
   application.GetScene().Add(model);
 
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
   application.SendNotification();
   application.Render();
 
@@ -828,22 +1001,96 @@ int UtcDaliModelAnimation02(void)
   END_TEST;
 }
 
-// For ResourceReady
-namespace
+int UtcDaliModelAnimation03(void)
 {
-static bool gOnRelayoutCallBackCalled = false;
-void        OnRelayoutCallback(Actor actor)
-{
-  gOnRelayoutCallBackCalled = true;
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_DLI_EXERCISE_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+  application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  uint32_t animationCount = model.GetAnimationCount();
+  DALI_TEST_EQUALS(18, animationCount, TEST_LOCATION);
+
+  Animation animationByIndex = model.GetAnimation(0u);
+  DALI_TEST_CHECK(animationByIndex);
+
+  Animation animationByName = model.GetAnimation("idleClip");
+  DALI_TEST_CHECK(animationByName);
+  DALI_TEST_EQUALS(animationByIndex, animationByName, TEST_LOCATION);
+
+  END_TEST;
 }
 
-static bool gResourceReadyCalled = false;
-void        OnResourceReady(Control control)
+int UtcDaliModelMultiplePrimitives(void)
 {
-  gResourceReadyCalled = true;
-}
-} // namespace
+  ToolkitTestApplication application;
 
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_MULTIPLE_PRIMITIVE_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+  application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  Actor actor = model.FindChildByName("rootNode");
+
+  DALI_TEST_EQUALS(0, actor.GetChildCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(2, actor.GetRendererCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliModelColorMode(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+  model.SetProperty(Dali::Actor::Property::COLOR, Color::RED);
+  application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  Actor actor = model.FindChildByName("AnimatedCube");
+  Vector4 childColor = actor[Dali::Actor::Property::COLOR];
+  Vector4 childWorldColor = actor[Dali::Actor::Property::WORLD_COLOR];
+
+  DALI_TEST_EQUALS(childColor, Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(childWorldColor, Color::RED, TEST_LOCATION);
+
+  END_TEST;
+}
 int UtcDaliModelResourceReady(void)
 {
   ToolkitTestApplication application;
@@ -862,6 +1109,10 @@ int UtcDaliModelResourceReady(void)
 
   application.GetScene().Add(model);
 
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
   application.SendNotification();
   application.Render();
 

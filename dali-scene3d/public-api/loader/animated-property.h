@@ -21,6 +21,7 @@
 #include "dali-scene3d/public-api/api.h"
 #include "dali-scene3d/public-api/loader/index.h"
 
+
 // EXTERNAL INCLUDES
 #include <functional>
 #include <memory>
@@ -98,4 +99,4 @@ public: // DATA
 } // namespace Scene3D
 } // namespace Dali
 
-#endif // DALI_SCENE3D_LOADER_ANIMATED_PROPERTY_H
+#endif //DALI_SCENE3D_LOADER_ANIMATED_PROPERTY_H

@@ -29,9 +29,11 @@ uniform lowp float uHasVertexColor;
   uniform highp sampler2D sBlendShapeGeometry;
 #endif
 
-out lowp vec2 vUV;
+out mediump vec2 vUV;
 out lowp mat3 vTBN;
+#ifdef COLOR_ATTRIBUTE
 out lowp vec4 vColor;
+#endif
 out highp vec3 vPositionToCamera;
 
 uniform highp mat4 uViewMatrix;

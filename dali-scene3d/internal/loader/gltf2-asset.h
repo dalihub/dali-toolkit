@@ -319,8 +319,8 @@ struct Sampler
 {
   Filter::Type mMinFilter = Filter::LINEAR;
   Filter::Type mMagFilter = Filter::LINEAR;
-  Wrap::Type   mWrapS     = Wrap::CLAMP_TO_EDGE;
-  Wrap::Type   mWrapT     = Wrap::CLAMP_TO_EDGE;
+  Wrap::Type   mWrapS     = Wrap::REPEAT;
+  Wrap::Type   mWrapT     = Wrap::REPEAT;
   //TODO: extensions
   //TODO: extras
 };
@@ -344,11 +344,19 @@ struct TextureInfo
   }
 };
 
+/**
+ * Material Ior is supported with KHR_materials_ior extension.
+ * https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_ior
+ */
 struct MaterialIor
 {
   float mIor = MAXFLOAT;
 };
 
+/**
+ * Material Specular is supported with KHR_materials_ior extension.
+ * https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_specular
+ */
 struct MaterialSpecular
 {
   float         mSpecularFactor = 1.0f;

@@ -26,6 +26,7 @@
 
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <toolkit-adaptor-impl.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
 
 using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
 
@@ -128,6 +129,11 @@ Integration::Scene SceneHolder::GetScene()
 Dali::RenderSurfaceInterface& SceneHolder::GetRenderSurface()
 {
   return mRenderSurface;
+}
+
+Dali::RenderTaskList SceneHolder::GetRenderTaskList()
+{
+  return mScene.GetRenderTaskList();
 }
 
 } // namespace Adaptor

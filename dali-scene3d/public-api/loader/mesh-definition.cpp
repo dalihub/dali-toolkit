@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,13 @@
 #include "dali-scene3d/public-api/loader/mesh-definition.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/file-stream.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/integration-api/debug.h>
+#include <dali/public-api/math/compile-time-math.h>
 #include <cstring>
 #include <fstream>
-#include "dali/devel-api/adaptor-framework/pixel-buffer.h"
+#include <type_traits>
 
 namespace Dali
 {
@@ -69,6 +73,7 @@ const std::string QUAD("quad");
 /// at least @a descriptor.length bytes.
 bool ReadBlob(const MeshDefinition::Blob& descriptor, std::istream& source, uint8_t* target)
 {
+  source.clear();
   if(!source.seekg(descriptor.mOffset, std::istream::beg))
   {
     return false;
@@ -76,23 +81,26 @@ bool ReadBlob(const MeshDefinition::Blob& descriptor, std::istream& source, uint
 
   if(descriptor.IsConsecutive())
   {
-    return !!source.read(reinterpret_cast<char*>(target), descriptor.mLength);
+    return !!source.read(reinterpret_cast<char*>(target), static_cast<std::streamsize>(static_cast<size_t>(descriptor.mLength)));
   }
   else
   {
-    DALI_ASSERT_DEBUG(descriptor.mStride > descriptor.mElementSizeHint);
-    const uint32_t diff     = descriptor.mStride - descriptor.mElementSizeHint;
-    uint32_t       readSize = 0;
-    uint32_t totalSize = (descriptor.mLength / descriptor.mElementSizeHint) * descriptor.mStride;
-    while(readSize < totalSize &&
-          source.read(reinterpret_cast<char*>(target), descriptor.mElementSizeHint) &&
-          source.seekg(diff, std::istream::cur))
+    if(descriptor.mStride > descriptor.mElementSizeHint)
     {
-      readSize += descriptor.mStride;
-      target += descriptor.mElementSizeHint;
+      const uint32_t diff      = descriptor.mStride - descriptor.mElementSizeHint;
+      uint32_t       readSize  = 0;
+      uint32_t       totalSize = (descriptor.mLength / descriptor.mElementSizeHint) * descriptor.mStride;
+      while(readSize < totalSize &&
+            source.read(reinterpret_cast<char*>(target), descriptor.mElementSizeHint) &&
+            source.seekg(diff, std::istream::cur))
+      {
+        readSize += descriptor.mStride;
+        target += descriptor.mElementSizeHint;
+      }
+      return readSize == totalSize;
     }
-    return readSize == totalSize;
   }
+  return false;
 }
 
 template<typename T>
@@ -171,31 +179,31 @@ bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source
 }
 
 template<typename T>
-void ReadJointAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Accessor& accessor, std::ifstream& binFile, const std::string& meshPath)
+void ReadJointAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Accessor& accessor, std::istream& source, const std::string& meshPath)
 {
   constexpr auto sizeofBlobUnit = sizeof(T) * 4;
 
   DALI_ASSERT_ALWAYS(((accessor.mBlob.mLength % sizeofBlobUnit == 0) ||
                       accessor.mBlob.mStride >= sizeofBlobUnit) &&
-                      "Joints buffer length not a multiple of element size");
-  const auto inBufferSize = accessor.mBlob.GetBufferSize();
+                     "Joints buffer length not a multiple of element size");
+  const auto inBufferSize  = accessor.mBlob.GetBufferSize();
   const auto outBufferSize = (sizeof(Vector4) / sizeofBlobUnit) * inBufferSize;
 
   std::vector<uint8_t> buffer(outBufferSize);
   auto                 inBuffer = buffer.data() + outBufferSize - inBufferSize;
-  if(!ReadAccessor(accessor, binFile, inBuffer))
+  if(!ReadAccessor(accessor, source, inBuffer))
   {
     ExceptionFlinger(ASSERT_LOCATION) << "Failed to read joints from '" << meshPath << "'.";
   }
 
   if constexpr(sizeofBlobUnit != sizeof(Vector4))
   {
-    auto floats = reinterpret_cast<float*>(buffer.data());
+    auto       floats = reinterpret_cast<float*>(buffer.data());
     const auto end    = inBuffer + inBufferSize;
     while(inBuffer != end)
     {
       const auto value = *reinterpret_cast<T*>(inBuffer);
-      *floats    = static_cast<float>(value);
+      *floats          = static_cast<float>(value);
 
       inBuffer += sizeof(T);
       ++floats;
@@ -241,83 +249,90 @@ void GenerateNormals(MeshDefinition::RawData& raw)
   attribs.push_back({"aNormal", Property::VECTOR3, attribs[0].mNumElements, std::move(buffer)});
 }
 
-void GenerateTangentsWithUvs(MeshDefinition::RawData& raw)
+template<bool useVec3, bool hasUvs, typename T = std::conditional_t<useVec3, Vector3, Vector4>, typename = std::enable_if_t<(std::is_same<T, Vector3>::value || std::is_same<T, Vector4>::value)>>
+bool GenerateTangents(MeshDefinition::RawData& raw)
 {
   auto& attribs = raw.mAttribs;
-  DALI_ASSERT_DEBUG(attribs.size() > 2); // positions, normals, uvs
-  IndexProvider getIndex(raw.mIndices.data());
-
-  const uint32_t numIndices = raw.mIndices.empty() ? attribs[0].mNumElements : static_cast<uint32_t>(raw.mIndices.size());
-
-  auto* positions = reinterpret_cast<const Vector3*>(attribs[0].mData.data());
-  auto* uvs       = reinterpret_cast<const Vector2*>(attribs[2].mData.data());
-
-  std::vector<uint8_t> buffer(attribs[0].mNumElements * sizeof(Vector3));
-  auto                 tangents = reinterpret_cast<Vector3*>(buffer.data());
-
-  for(uint32_t i = 0; i < numIndices; i += 3)
+  // Required positions, normals, uvs (if we have). If not, skip generation
+  if(attribs.size() < (2 + static_cast<size_t>(hasUvs)))
   {
-    uint16_t indices[]{getIndex(), getIndex(), getIndex()};
-    Vector3  pos[]{positions[indices[0]], positions[indices[1]], positions[indices[2]]};
-    Vector2  uv[]{uvs[indices[0]], uvs[indices[1]], uvs[indices[2]]};
+    return false;
+  }
 
-    float x0 = pos[1].x - pos[0].x;
-    float y0 = pos[1].y - pos[0].y;
-    float z0 = pos[1].z - pos[0].z;
+  std::vector<uint8_t> buffer(attribs[0].mNumElements * sizeof(T));
+  auto                 tangents = reinterpret_cast<T*>(buffer.data());
 
-    float x1 = pos[2].x - pos[0].x;
-    float y1 = pos[2].y - pos[0].y;
-    float z1 = pos[2].z - pos[0].z;
+  if constexpr(hasUvs)
+  {
+    IndexProvider  getIndex(raw.mIndices.data());
+    const uint32_t numIndices = raw.mIndices.empty() ? attribs[0].mNumElements : static_cast<uint32_t>(raw.mIndices.size());
 
-    float s0 = uv[1].x - uv[0].x;
-    float t0 = uv[1].y - uv[0].y;
+    auto* positions = reinterpret_cast<const Vector3*>(attribs[0].mData.data());
+    auto* uvs       = reinterpret_cast<const Vector2*>(attribs[2].mData.data());
 
-    float s1 = uv[2].x - uv[0].x;
-    float t1 = uv[2].y - uv[0].y;
+    for(uint32_t i = 0; i < numIndices; i += 3)
+    {
+      uint16_t indices[]{getIndex(), getIndex(), getIndex()};
+      Vector3  pos[]{positions[indices[0]], positions[indices[1]], positions[indices[2]]};
+      Vector2  uv[]{uvs[indices[0]], uvs[indices[1]], uvs[indices[2]]};
 
-    float   r = 1.f / (s0 * t1 - t0 * s1);
-    Vector3 tangent((x0 * t1 - t0 * x1) * r, (y0 * t1 - t0 * y1) * r, (z0 * t1 - t0 * z1) * r);
-    tangents[indices[0]] += tangent;
-    tangents[indices[1]] += tangent;
-    tangents[indices[2]] += tangent;
+      float x0 = pos[1].x - pos[0].x;
+      float y0 = pos[1].y - pos[0].y;
+      float z0 = pos[1].z - pos[0].z;
+
+      float x1 = pos[2].x - pos[0].x;
+      float y1 = pos[2].y - pos[0].y;
+      float z1 = pos[2].z - pos[0].z;
+
+      float s0 = uv[1].x - uv[0].x;
+      float t0 = uv[1].y - uv[0].y;
+
+      float s1 = uv[2].x - uv[0].x;
+      float t1 = uv[2].y - uv[0].y;
+
+      float   det = (s0 * t1 - t0 * s1);
+      float   r   = 1.f / ((std::abs(det) < Dali::Epsilon<1000>::value) ? (Dali::Epsilon<1000>::value * (det > 0.0f ? 1.f : -1.f)) : det);
+      Vector3 tangent((x0 * t1 - t0 * x1) * r, (y0 * t1 - t0 * y1) * r, (z0 * t1 - t0 * z1) * r);
+      tangents[indices[0]] += T(tangent);
+      tangents[indices[1]] += T(tangent);
+      tangents[indices[2]] += T(tangent);
+    }
   }
 
   auto* normals = reinterpret_cast<const Vector3*>(attribs[1].mData.data());
   auto  iEnd    = normals + attribs[1].mNumElements;
   while(normals != iEnd)
   {
-    *tangents -= *normals * normals->Dot(*tangents);
-    tangents->Normalize();
+    Vector3 tangentVec3;
+    if constexpr(hasUvs)
+    {
+      // Calculated by indexs
+      tangentVec3 = Vector3((*tangents).x, (*tangents).y, (*tangents).z);
+    }
+    else
+    {
+      // Only choiced by normal vector. by indexs
+      Vector3 t[]{normals->Cross(Vector3::XAXIS), normals->Cross(Vector3::YAXIS)};
+      tangentVec3 = t[t[1].LengthSquared() > t[0].LengthSquared()];
+    }
+
+    tangentVec3 -= *normals * normals->Dot(tangentVec3);
+    tangentVec3.Normalize();
+    if constexpr(useVec3)
+    {
+      *tangents = tangentVec3;
+    }
+    else
+    {
+      *tangents = Vector4(tangentVec3.x, tangentVec3.y, tangentVec3.z, 1.0f);
+    }
 
     ++tangents;
     ++normals;
   }
-  attribs.push_back({"aTangent", Property::VECTOR3, attribs[0].mNumElements, std::move(buffer)});
-}
+  attribs.push_back({"aTangent", useVec3 ? Property::VECTOR3 : Property::VECTOR4, attribs[0].mNumElements, std::move(buffer)});
 
-void GenerateTangents(MeshDefinition::RawData& raw)
-{
-  auto& attribs = raw.mAttribs;
-  DALI_ASSERT_DEBUG(attribs.size() > 1); // positions, normals
-
-  auto* normals = reinterpret_cast<const Vector3*>(attribs[1].mData.data());
-
-  std::vector<uint8_t> buffer(attribs[0].mNumElements * sizeof(Vector3));
-  auto                 tangents = reinterpret_cast<Vector3*>(buffer.data());
-
-  auto iEnd = normals + attribs[1].mNumElements;
-  while(normals != iEnd)
-  {
-    Vector3 t[]{normals->Cross(Vector3::XAXIS), normals->Cross(Vector3::YAXIS)};
-
-    *tangents = t[t[1].LengthSquared() > t[0].LengthSquared()];
-    *tangents -= *normals * normals->Dot(*tangents);
-    tangents->Normalize();
-
-    ++tangents;
-    ++normals;
-  }
-  attribs.push_back({"aTangent", Property::VECTOR3, attribs[0].mNumElements, std::move(buffer)});
+  return true;
 }
 
 void CalculateTextureSize(uint32_t totalTextureSize, uint32_t& textureWidth, uint32_t& textureHeight)
@@ -344,7 +359,7 @@ void CalculateTextureSize(uint32_t totalTextureSize, uint32_t& textureWidth, uin
   textureHeight = 1u << powHeight;
 }
 
-void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::ifstream& binFile, const std::vector<MeshDefinition::BlendShape>& blendShapes, uint32_t numberOfVertices, float& blendShapeUnnormalizeFactor)
+void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDefinition::BlendShape>& blendShapes, uint32_t numberOfVertices, float& blendShapeUnnormalizeFactor, BufferDefinition::Vector& buffers)
 {
   uint32_t geometryBufferIndex = 0u;
   float    maxDistance         = 0.f;
@@ -359,7 +374,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::ifstream& binFile, 
 
       const auto           bufferSize = blendShape.deltas.mBlob.GetBufferSize();
       std::vector<uint8_t> buffer(bufferSize);
-      if(ReadAccessor(blendShape.deltas, binFile, buffer.data()))
+      if(ReadAccessor(blendShape.deltas, buffers[blendShape.deltas.mBufferIdx].GetBufferStream(), buffer.data()))
       {
         blendShape.deltas.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()));
         // Calculate the difference with the original mesh.
@@ -384,7 +399,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::ifstream& binFile, 
 
       const auto           bufferSize = blendShape.normals.mBlob.GetBufferSize();
       std::vector<uint8_t> buffer(bufferSize);
-      if(ReadAccessor(blendShape.normals, binFile, buffer.data()))
+      if(ReadAccessor(blendShape.normals, buffers[blendShape.normals.mBufferIdx].GetBufferStream(), buffer.data()))
       {
         blendShape.normals.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()));
 
@@ -415,7 +430,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::ifstream& binFile, 
 
       const auto           bufferSize = blendShape.tangents.mBlob.GetBufferSize();
       std::vector<uint8_t> buffer(bufferSize);
-      if(ReadAccessor(blendShape.tangents, binFile, buffer.data()))
+      if(ReadAccessor(blendShape.tangents, buffers[blendShape.tangents.mBufferIdx].GetBufferStream(), buffer.data()))
       {
         blendShape.tangents.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()));
 
@@ -473,6 +488,13 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::ifstream& binFile, 
   }
 }
 
+std::iostream& GetAvailableData(std::fstream& meshStream, const std::string& meshPath, BufferDefinition& buffer, std::string& availablePath)
+{
+  auto& stream  = (meshStream.is_open()) ? meshStream : buffer.GetBufferStream();
+  availablePath = (meshStream.is_open()) ? meshPath : buffer.GetUri();
+  return stream;
+}
+
 } // namespace
 
 MeshDefinition::SparseBlob::SparseBlob(const Blob& indices, const Blob& values, uint32_t count)
@@ -482,10 +504,28 @@ MeshDefinition::SparseBlob::SparseBlob(const Blob& indices, const Blob& values, 
 {
 }
 
+MeshDefinition::SparseBlob::SparseBlob(Blob&& indices, Blob&& values, uint32_t count)
+: mIndices(std::move(indices)),
+  mValues(std::move(values)),
+  mCount{count}
+{
+}
+
 MeshDefinition::Accessor::Accessor(const MeshDefinition::Blob&       blob,
-                                   const MeshDefinition::SparseBlob& sparse)
+                                   const MeshDefinition::SparseBlob& sparse,
+                                   Index                             bufferIndex)
 : mBlob{blob},
-  mSparse{(sparse.mIndices.IsDefined() && sparse.mValues.IsDefined()) ? new SparseBlob{sparse} : nullptr}
+  mSparse{(sparse.mIndices.IsDefined() && sparse.mValues.IsDefined()) ? new SparseBlob{sparse} : nullptr},
+  mBufferIdx(bufferIndex)
+{
+}
+
+MeshDefinition::Accessor::Accessor(MeshDefinition::Blob&&       blob,
+                                   MeshDefinition::SparseBlob&& sparse,
+                                   Index                        bufferIndex)
+: mBlob{std::move(blob)},
+  mSparse{(sparse.mIndices.IsDefined() && sparse.mValues.IsDefined()) ? new SparseBlob{std::move(sparse)} : nullptr},
+  mBufferIdx(bufferIndex)
 {
 }
 
@@ -510,15 +550,9 @@ void MeshDefinition::Blob::ApplyMinMax(const std::vector<float>& min, const std:
   const auto numComponents = std::max(min.size(), max.size());
 
   using ClampFn   = void (*)(const float*, const float*, uint32_t, float&);
-  ClampFn clampFn = min.empty() ? (max.empty() ? static_cast<ClampFn>(nullptr) : [](const float* min, const float* max, uint32_t i, float& value) {
-    value = std::min(max[i], value);
-  })
-                                : (max.empty() ? [](const float* min, const float* max, uint32_t i, float& value) {
-                                    value = std::max(min[i], value);
-                                  }
-                                               : static_cast<ClampFn>([](const float* min, const float* max, uint32_t i, float& value) {
-                                                   value = std::min(std::max(min[i], value), max[i]);
-                                                 }));
+  ClampFn clampFn = min.empty() ? (max.empty() ? static_cast<ClampFn>(nullptr) : [](const float* min, const float* max, uint32_t i, float& value) { value = std::min(max[i], value); })
+                                : (max.empty() ? [](const float* min, const float* max, uint32_t i, float& value) { value = std::max(min[i], value); }
+                                               : static_cast<ClampFn>([](const float* min, const float* max, uint32_t i, float& value) { value = std::min(std::max(min[i], value), max[i]); }));
 
   if(!clampFn)
   {
@@ -600,7 +634,7 @@ void MeshDefinition::RequestTangents()
 }
 
 MeshDefinition::RawData
-MeshDefinition::LoadRaw(const std::string& modelsPath)
+MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector& buffers)
 {
   RawData raw;
   if(IsQuad())
@@ -608,11 +642,16 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
     return raw;
   }
 
-  const std::string meshPath = modelsPath + mUri;
-  std::ifstream     binFile(meshPath, std::ios::binary);
-  if(!binFile)
+  std::string meshPath;
+  meshPath = modelsPath + mUri;
+  std::fstream fileStream;
+  if(!mUri.empty())
   {
-    ExceptionFlinger(ASSERT_LOCATION) << "Failed to read geometry data from '" << meshPath << "'";
+    fileStream.open(meshPath, std::ios::in | std::ios::binary);
+    if(!fileStream.is_open())
+    {
+      DALI_LOG_ERROR("Fail to open buffer from %s.\n", meshPath.c_str());
+    }
   }
 
   if(mIndices.IsDefined())
@@ -624,9 +663,12 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
                          "Index buffer length not a multiple of element size");
       const auto indexCount = mIndices.mBlob.GetBufferSize() / sizeof(uint32_t);
       raw.mIndices.resize(indexCount * 2); // NOTE: we need space for uint32_ts initially.
-      if(!ReadAccessor(mIndices, binFile, reinterpret_cast<uint8_t*>(raw.mIndices.data())))
+
+      std::string path;
+      auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mIndices.mBufferIdx], path);
+      if(!ReadAccessor(mIndices, stream, reinterpret_cast<uint8_t*>(raw.mIndices.data())))
       {
-        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << meshPath << "'.";
+        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << path << "'.";
       }
 
       auto u16s = raw.mIndices.data();
@@ -641,15 +683,43 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
 
       raw.mIndices.resize(indexCount);
     }
+    else if(MaskMatch(mFlags, U8_INDICES))
+    {
+      DALI_ASSERT_ALWAYS(((mIndices.mBlob.mLength % sizeof(uint8_t) == 0) ||
+                          mIndices.mBlob.mStride >= sizeof(uint8_t)) &&
+                         "Index buffer length not a multiple of element size");
+      const auto indexCount = mIndices.mBlob.GetBufferSize() / sizeof(uint8_t);
+      raw.mIndices.resize(indexCount); // NOTE: we need space for uint32_ts initially.
+
+      std::string path;
+      auto        u8s    = reinterpret_cast<uint8_t*>(raw.mIndices.data()) + indexCount;
+      auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mIndices.mBufferIdx], path);
+      if(!ReadAccessor(mIndices, stream, u8s))
+      {
+        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << path << "'.";
+      }
+
+      auto u16s = raw.mIndices.data();
+      auto end  = u8s + indexCount;
+      while(u8s != end)
+      {
+        *u16s = static_cast<uint16_t>(*u8s);
+        ++u16s;
+        ++u8s;
+      }
+    }
     else
     {
       DALI_ASSERT_ALWAYS(((mIndices.mBlob.mLength % sizeof(unsigned short) == 0) ||
                           mIndices.mBlob.mStride >= sizeof(unsigned short)) &&
                          "Index buffer length not a multiple of element size");
       raw.mIndices.resize(mIndices.mBlob.mLength / sizeof(unsigned short));
-      if(!ReadAccessor(mIndices, binFile, reinterpret_cast<uint8_t*>(raw.mIndices.data())))
+
+      std::string path;
+      auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mIndices.mBufferIdx], path);
+      if(!ReadAccessor(mIndices, stream, reinterpret_cast<uint8_t*>(raw.mIndices.data())))
       {
-        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << meshPath << "'.";
+        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << path << "'.";
       }
     }
   }
@@ -662,9 +732,12 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
                        "Position buffer length not a multiple of element size");
     const auto           bufferSize = mPositions.mBlob.GetBufferSize();
     std::vector<uint8_t> buffer(bufferSize);
-    if(!ReadAccessor(mPositions, binFile, buffer.data()))
+
+    std::string path;
+    auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mPositions.mBufferIdx], path);
+    if(!ReadAccessor(mPositions, stream, buffer.data()))
     {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read positions from '" << meshPath << "'.";
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read positions from '" << path << "'.";
     }
 
     uint32_t numVector3 = static_cast<uint32_t>(bufferSize / sizeof(Vector3));
@@ -695,9 +768,12 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
                        "Normal buffer length not a multiple of element size");
     const auto           bufferSize = mNormals.mBlob.GetBufferSize();
     std::vector<uint8_t> buffer(bufferSize);
-    if(!ReadAccessor(mNormals, binFile, buffer.data()))
+
+    std::string path;
+    auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mNormals.mBufferIdx], path);
+    if(!ReadAccessor(mNormals, stream, buffer.data()))
     {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read normals from '" << meshPath << "'.";
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read normals from '" << path << "'.";
     }
 
     mNormals.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()));
@@ -719,9 +795,12 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
                        "Normal buffer length not a multiple of element size");
     const auto           bufferSize = mTexCoords.mBlob.GetBufferSize();
     std::vector<uint8_t> buffer(bufferSize);
-    if(!ReadAccessor(mTexCoords, binFile, buffer.data()))
+
+    std::string path;
+    auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mTexCoords.mBufferIdx], path);
+    if(!ReadAccessor(mTexCoords, stream, buffer.data()))
     {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read uv-s from '" << meshPath << "'.";
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read uv-s from '" << path << "'.";
     }
 
     const auto uvCount = bufferSize / sizeof(Vector2);
@@ -749,9 +828,12 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
                        "Tangents buffer length not a multiple of element size");
     const auto           bufferSize = mTangents.mBlob.GetBufferSize();
     std::vector<uint8_t> buffer(bufferSize);
-    if(!ReadAccessor(mTangents, binFile, buffer.data()))
+
+    std::string path;
+    auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mTangents.mBufferIdx], path);
+    if(!ReadAccessor(mTangents, stream, buffer.data()))
     {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read tangents from '" << meshPath << "'.";
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read tangents from '" << path << "'.";
     }
     mTangents.mBlob.ApplyMinMax(bufferSize / propertySize, reinterpret_cast<float*>(buffer.data()));
 
@@ -760,7 +842,22 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
   else if(mTangents.mBlob.mLength != 0 && hasNormals && isTriangles)
   {
     DALI_ASSERT_DEBUG(mTangents.mBlob.mLength == mNormals.mBlob.GetBufferSize());
-    hasUvs ? GenerateTangentsWithUvs(raw) : GenerateTangents(raw);
+    static const std::function<bool(RawData&)> GenerateTangentsFunction[2][2] =
+      {
+        {
+          GenerateTangents<false, false>,
+          GenerateTangents<false, true>,
+        },
+        {
+          GenerateTangents<true, false>,
+          GenerateTangents<true, true>,
+        },
+      };
+    const bool generateSuccessed = GenerateTangentsFunction[mTangentType == Property::VECTOR3][hasUvs](raw);
+    if(!generateSuccessed)
+    {
+      DALI_LOG_ERROR("Failed to generate tangents\n");
+    }
   }
 
   if(mColors.IsDefined())
@@ -774,9 +871,12 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
                          "Colors buffer length not a multiple of element size");
       const auto           bufferSize = mColors.mBlob.GetBufferSize();
       std::vector<uint8_t> buffer(bufferSize);
-      if(!ReadAccessor(mColors, binFile, buffer.data()))
+
+      std::string path;
+      auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mColors.mBufferIdx], path);
+      if(!ReadAccessor(mColors, stream, buffer.data()))
       {
-        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read colors from '" << meshPath << "'.";
+        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read colors from '" << path << "'.";
       }
       mColors.mBlob.ApplyMinMax(bufferSize / propertySize, reinterpret_cast<float*>(buffer.data()));
 
@@ -786,17 +886,19 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
 
   if(IsSkinned())
   {
+    std::string pathJoint;
+    auto&       streamJoint = GetAvailableData(fileStream, meshPath, buffers[mJoints0.mBufferIdx], pathJoint);
     if(MaskMatch(mFlags, U16_JOINT_IDS))
     {
-      ReadJointAccessor<uint16_t>(raw, mJoints0, binFile, meshPath);
+      ReadJointAccessor<uint16_t>(raw, mJoints0, streamJoint, pathJoint);
     }
     else if(MaskMatch(mFlags, U8_JOINT_IDS))
     {
-      ReadJointAccessor<uint8_t>(raw, mJoints0, binFile, meshPath);
+      ReadJointAccessor<uint8_t>(raw, mJoints0, streamJoint, pathJoint);
     }
     else
     {
-      ReadJointAccessor<float>(raw, mJoints0, binFile, meshPath);
+      ReadJointAccessor<float>(raw, mJoints0, streamJoint, pathJoint);
     }
 
     DALI_ASSERT_ALWAYS(((mWeights0.mBlob.mLength % sizeof(Vector4) == 0) ||
@@ -804,9 +906,12 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
                        "Weights buffer length not a multiple of element size");
     const auto           bufferSize = mWeights0.mBlob.GetBufferSize();
     std::vector<uint8_t> buffer(bufferSize);
-    if(!ReadAccessor(mWeights0, binFile, buffer.data()))
+
+    std::string pathWeight;
+    auto&       streamWeight = GetAvailableData(fileStream, meshPath, buffers[mWeights0.mBufferIdx], pathWeight);
+    if(!ReadAccessor(mWeights0, streamWeight, buffer.data()))
     {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read weights from '" << meshPath << "'.";
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read weights from '" << pathWeight << "'.";
     }
 
     raw.mAttribs.push_back({"aWeights", Property::VECTOR4, static_cast<uint32_t>(bufferSize / sizeof(Vector4)), std::move(buffer)});
@@ -848,7 +953,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
     else
     {
       uint16_t header[2u];
-      ReadBlob(mBlendShapeHeader, binFile, reinterpret_cast<uint8_t*>(header));
+      ReadBlob(mBlendShapeHeader, fileStream, reinterpret_cast<uint8_t*>(header));
       textureWidth  = header[0u];
       textureHeight = header[1u];
     }
@@ -861,7 +966,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
 
     if(calculateGltf2BlendShapes)
     {
-      CalculateGltf2BlendShapes(geometryBuffer, binFile, mBlendShapes, numberOfVertices, raw.mBlendShapeUnnormalizeFactor[0u]);
+      CalculateGltf2BlendShapes(geometryBuffer, mBlendShapes, numberOfVertices, raw.mBlendShapeUnnormalizeFactor[0u], buffers);
     }
     else
     {
@@ -870,7 +975,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
 
       if(blendShapesBlob.IsDefined())
       {
-        if(ReadBlob(blendShapesBlob, binFile, geometryBuffer))
+        if(ReadBlob(blendShapesBlob, fileStream, geometryBuffer))
         {
           unnormalizeFactorBlob.mOffset = blendShapesBlob.mOffset + blendShapesBlob.mLength;
         }
@@ -879,7 +984,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath)
       // Read the unnormalize factors.
       if(unnormalizeFactorBlob.IsDefined())
       {
-        ReadBlob(unnormalizeFactorBlob, binFile, reinterpret_cast<uint8_t*>(&raw.mBlendShapeUnnormalizeFactor[0u]));
+        ReadBlob(unnormalizeFactorBlob, fileStream, reinterpret_cast<uint8_t*>(&raw.mBlendShapeUnnormalizeFactor[0u]));
       }
     }
     raw.mBlendShapeData = Devel::PixelBuffer::Convert(geometryPixelBuffer);
