@@ -988,6 +988,7 @@ float LoadDataFromAccessors(ConversionContext& context, const gltf2::Accessor& i
 
   LoadDataFromAccessor<float>(context, output.mBufferView->mBuffer.GetIndex(), inputDataBuffer, input.mBufferView->mByteOffset + input.mByteOffset, inputDataBufferSize);
   LoadDataFromAccessor<T>(context, output.mBufferView->mBuffer.GetIndex(), outputDataBuffer, output.mBufferView->mByteOffset + output.mByteOffset, outputDataBufferSize);
+  ApplyAccessorMinMax(input, reinterpret_cast<float*>(inputDataBuffer.begin()));
   ApplyAccessorMinMax(output, reinterpret_cast<float*>(outputDataBuffer.begin()));
 
   return inputDataBuffer[input.mCount - 1u];
@@ -1003,6 +1004,12 @@ float LoadKeyFrames(ConversionContext& context, const gt::Animation::Channel& ch
   Vector<T>     outputDataBuffer;
 
   const float duration = std::max(LoadDataFromAccessors<T>(context, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
+
+  // Set first frame value as first keyframe (gltf animation spec)
+  if(input.mCount > 0 && !Dali::EqualsZero(inputDataBuffer[0]))
+  {
+    keyFrames.Add(0.0f, outputDataBuffer[0]);
+  }
 
   for(uint32_t i = 0; i < input.mCount; ++i)
   {
@@ -1020,7 +1027,7 @@ float LoadBlendShapeKeyFrames(ConversionContext& context, const gt::Animation::C
   Vector<float> inputDataBuffer;
   Vector<float> outputDataBuffer;
 
-  const float duration = LoadDataFromAccessors<float>(context, input, output, inputDataBuffer, outputDataBuffer);
+  const float duration = std::max(LoadDataFromAccessors<float>(context, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
 
   char        weightNameBuffer[32];
   auto        prefixSize    = snprintf(weightNameBuffer, sizeof(weightNameBuffer), "%s[", BLEND_SHAPE_WEIGHTS_UNIFORM.c_str());
@@ -1035,6 +1042,13 @@ float LoadBlendShapeKeyFrames(ConversionContext& context, const gt::Animation::C
     animatedProperty.mPropertyName = std::string(weightNameBuffer);
 
     animatedProperty.mKeyFrames = KeyFrames::New();
+
+    // Set first frame value as first keyframe (gltf animation spec)
+    if(input.mCount > 0 && !Dali::EqualsZero(inputDataBuffer[0]))
+    {
+      animatedProperty.mKeyFrames.Add(0.0f, outputDataBuffer[weightIndex]);
+    }
+
     for(uint32_t i = 0; i < input.mCount; ++i)
     {
       animatedProperty.mKeyFrames.Add(inputDataBuffer[i] / duration, outputDataBuffer[i * endWeightIndex + weightIndex]);
