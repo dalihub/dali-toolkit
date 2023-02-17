@@ -570,10 +570,9 @@ void SceneView::OnInitialize()
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_SCALE, false);
   self.Add(mRootLayer);
 
-  mDefaultCamera = Dali::CameraActor::New();
+  mDefaultCamera = Dali::CameraActor::New3DCamera();
   mDefaultCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mDefaultCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  mDefaultCamera.SetNearClippingPlane(1.0f);
   AddCamera(mDefaultCamera);
   UpdateCamera(mDefaultCamera);
 }
