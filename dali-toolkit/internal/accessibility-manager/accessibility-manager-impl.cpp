@@ -360,11 +360,23 @@ bool AccessibilityManager::DoSetCurrentFocusActor(const unsigned int actorID)
         actor.Add( GetFocusIndicatorActor() );
       }
 
-      // Send Focused actor information
-      Vector2 windowSize = rootActor.GetCurrentProperty<Vector2>(Actor::Property::SIZE);
-      AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
-      adaptor.SetFocusedActorPosition( Vector2((actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION).x + (windowSize.width / 2)),
-                                             (actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION).y + (windowSize.height / 2))) );
+      auto adaptor = AccessibilityAdaptor::Get();
+      Vector2 readPosition = adaptor.GetReadPosition();
+      auto actorPosition = actor.GetCurrentProperty<Vector2>(Actor::Property::SCREEN_POSITION);
+      auto actorSize = actor.GetCurrentProperty<Vector2>(Actor::Property::SIZE);
+      Rect<> actorRect(actorPosition.x, actorPosition.y, actorSize.width, actorSize.height);
+
+      if(actorRect.Contains(Rect<>(readPosition.x, readPosition.y, 0, 0)))
+      {
+        // If the last touched position is within the extents of the actor,
+        // then use that position. (The center may be covered by some other actor).
+        adaptor.SetFocusedActorPosition(readPosition);
+      }
+      else
+      {
+        // Otherwise, use the center point.
+        adaptor.SetFocusedActorPosition(actorPosition + actorSize / 2);
+      }
 
       // Send notification for the change of focus actor
       mFocusChangedSignal.Emit( GetCurrentFocusActor(), actor );
