@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,12 +57,12 @@ namespace rs = RendererState;
 
 namespace
 {
-const char* NODES         = "nodes";
-const char* SCENES        = "scenes";
-const char* NODE          = "node";
-const char* URI           = "uri";
-const char* URL           = "url";
-const char* HINTS         = "hints";
+const char* NODES  = "nodes";
+const char* SCENES = "scenes";
+const char* NODE   = "node";
+const char* URI    = "uri";
+const char* URL    = "url";
+const char* HINTS  = "hints";
 const char* NAME("name");
 const char* BLEND_SHAPE_HEADER("blendShapeHeader");
 const char* BLEND_SHAPES("blendShapes");
@@ -1729,7 +1729,7 @@ void DliLoader::Impl::GetCameraParameters(std::vector<CameraParameters>& cameras
       {
         auto& jsonCamera = (*i0).second;
 
-        ReadFloat(jsonCamera.GetChild("fov"), iCamera->yFov);
+        ReadFloat(jsonCamera.GetChild("fov"), iCamera->yFovDegree.degree);
         ReadFloat(jsonCamera.GetChild("near"), iCamera->zNear);
         ReadFloat(jsonCamera.GetChild("far"), iCamera->zFar);
         if(ReadVector(jsonCamera.GetChild("orthographic"), dummyFloatArray, 4u))

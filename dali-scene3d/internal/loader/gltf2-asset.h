@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_GLTF2_ASSET_H_
 #define DALI_SCENE3D_LOADER_GLTF2_ASSET_H_
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@
  */
 
 // INTERNAL INCLUDES
-#include "dali-scene3d/internal/loader/json-reader.h"
-#include "dali-scene3d/public-api/loader/index.h"
+#include <dali-scene3d/internal/loader/json-reader.h>
+#include <dali-scene3d/public-api/loader/index.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/vector4.h>
 #include <cstdint>
 #include <memory>
-#include "dali/devel-api/common/map-wrapper.h"
-#include "dali/public-api/common/vector-wrapper.h"
-#include "dali/public-api/math/quaternion.h"
-#include "dali/public-api/math/vector4.h"
 
 #define ENUM_STRING_MAPPING(t, x) \
   {                               \
@@ -50,7 +50,8 @@
 
 namespace gltf2
 {
-using Index = Dali::Scene3D::Loader::Index;
+using Index                           = Dali::Scene3D::Loader::Index;
+constexpr float UNDEFINED_FLOAT_VALUE = -1.0f; ///< Special marker for some non-negative only float values.
 
 template<typename T>
 class Ref
@@ -350,7 +351,7 @@ struct TextureInfo
  */
 struct MaterialIor
 {
-  float mIor = MAXFLOAT;
+  float mIor = UNDEFINED_FLOAT_VALUE;
 };
 
 /**
@@ -446,20 +447,20 @@ struct Camera : Named
 {
   struct Perspective
   {
-    float mAspectRatio;
-    float mYFov;
-    float mZFar;
-    float mZNear;
+    float mAspectRatio = UNDEFINED_FLOAT_VALUE;
+    float mYFov        = UNDEFINED_FLOAT_VALUE;
+    float mZFar        = UNDEFINED_FLOAT_VALUE;
+    float mZNear       = UNDEFINED_FLOAT_VALUE;
     //TODO: extras
     //TODO: extensions
   };
 
   struct Orthographic
   {
-    float mXMag;
-    float mYMag;
-    float mZFar;
-    float mZNear;
+    float mXMag  = UNDEFINED_FLOAT_VALUE;
+    float mYMag  = UNDEFINED_FLOAT_VALUE;
+    float mZFar  = UNDEFINED_FLOAT_VALUE;
+    float mZNear = UNDEFINED_FLOAT_VALUE;
     //TODO: extras
     //TODO: extensions
   };

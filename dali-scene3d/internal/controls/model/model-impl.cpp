@@ -116,8 +116,7 @@ void ConfigureBlendShapeShaders(
   Dali::Scene3D::Loader::ResourceBundle& resources, const Dali::Scene3D::Loader::SceneDefinition& scene, Actor root, std::vector<Dali::Scene3D::Loader::BlendshapeShaderConfigurationRequest>&& requests)
 {
   std::vector<std::string> errors;
-  auto                     onError = [&errors](const std::string& msg)
-  { errors.push_back(msg); };
+  auto                     onError = [&errors](const std::string& msg) { errors.push_back(msg); };
   if(!scene.ConfigureBlendshapeShaders(resources, root, std::move(requests), onError))
   {
     Dali::Scene3D::Loader::ExceptionFlinger flinger(ASSERT_LOCATION);
@@ -384,6 +383,45 @@ Dali::Animation Model::GetAnimation(const std::string& name) const
   return animation;
 }
 
+uint32_t Model::GetCameraCount() const
+{
+  return mCameraParameters.size();
+}
+
+Dali::CameraActor Model::GenerateCamera(uint32_t index) const
+{
+  Dali::CameraActor camera;
+  if(mCameraParameters.size() > index)
+  {
+    camera = Dali::CameraActor::New3DCamera();
+    if(!mCameraParameters[index].ConfigureCamera(camera, false))
+    {
+      DALI_LOG_ERROR("Fail to generate %u's camera actor : Some property was not defined. Please check model file.\n", index);
+      camera.Reset();
+      return camera;
+    }
+
+    ApplyCameraTransform(camera);
+  }
+  return camera;
+}
+
+bool Model::ApplyCamera(uint32_t index, Dali::CameraActor camera) const
+{
+  if(camera && mCameraParameters.size() > index)
+  {
+    if(!mCameraParameters[index].ConfigureCamera(camera, false))
+    {
+      DALI_LOG_ERROR("Fail to apply %u's camera actor : Some property was not defined. Please check model file.\n", index);
+      return false;
+    }
+
+    ApplyCameraTransform(camera);
+    return true;
+  }
+  return false;
+}
+
 ///////////////////////////////////////////////////////////
 //
 // Private methods
@@ -583,6 +621,45 @@ void Model::UpdateImageBasedLightScaleFactor()
   }
 }
 
+void Model::ApplyCameraTransform(Dali::CameraActor camera) const
+{
+  Vector3    selfPosition    = Self().GetProperty<Vector3>(Actor::Property::POSITION);
+  Quaternion selfOrientation = Self().GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+  Vector3    selfScale       = Self().GetProperty<Vector3>(Actor::Property::SCALE);
+
+  Vector3    cameraPosition    = camera.GetProperty<Vector3>(Actor::Property::POSITION);
+  Quaternion cameraOrientation = camera.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+  Vector3    cameraScale       = camera.GetProperty<Vector3>(Actor::Property::SCALE);
+
+  // Models in glTF and dli are defined as right hand coordinate system.
+  // DALi uses left hand coordinate system. Scaling negative is for change winding order.
+  if(!Dali::Equals(Y_DIRECTION.Dot(Vector3::YAXIS), 1.0f))
+  {
+    // Reflect by XZ plane
+    cameraPosition.y = -cameraPosition.y;
+    Quaternion yDirectionQuaternion;
+    yDirectionQuaternion.mVector = Vector3::YAXIS;
+    // Reflect orientation
+    cameraOrientation = yDirectionQuaternion * cameraOrientation * yDirectionQuaternion;
+  }
+
+  Vector3    resultPosition;
+  Quaternion resultOrientation;
+  Vector3    resultScale;
+
+  Matrix selfMatrix(false);
+  Matrix cameraMatrix(false);
+  Matrix resultMatrix(false);
+  selfMatrix.SetTransformComponents(selfScale, selfOrientation, selfPosition);
+  cameraMatrix.SetTransformComponents(cameraScale, cameraOrientation, cameraPosition);
+  Matrix::Multiply(resultMatrix, cameraMatrix, selfMatrix);
+  resultMatrix.GetTransformComponents(resultPosition, resultOrientation, resultScale);
+
+  camera.SetProperty(Actor::Property::POSITION, resultPosition);
+  camera.SetProperty(Actor::Property::ORIENTATION, resultOrientation);
+  camera.SetProperty(Actor::Property::SCALE, resultScale);
+}
+
 void Model::NotifyImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor)
 {
   if(mSceneDiffuseTexture != diffuseTexture || mSceneSpecularTexture != specularTexture)
@@ -622,6 +699,8 @@ void Model::OnModelLoadComplete()
   auto* resources = &(mModelLoadTask->mResources);
   auto* scene     = &(mModelLoadTask->mScene);
   CreateAnimations(*scene);
+  ResetCameraParameters();
+
   if(!resources->mEnvironmentMaps.empty())
   {
     mDefaultDiffuseTexture  = resources->mEnvironmentMaps.front().second.mDiffuse;
@@ -745,10 +824,10 @@ void Model::CreateModel()
 
 void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
 {
+  mAnimations.clear();
   if(!mModelLoadTask->mAnimations.empty())
   {
-    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property)
-    {
+    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property) {
       if(property.mNodeIndex == Scene3D::Loader::INVALID_INDEX)
       {
         return mModelRoot.FindChildByName(property.mNodeName);
@@ -761,12 +840,21 @@ void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
       return mModelRoot.FindChildById(node->mNodeId);
     };
 
-    mAnimations.clear();
     for(auto&& animation : mModelLoadTask->mAnimations)
     {
       Dali::Animation anim = animation.ReAnimate(getActor);
       mAnimations.push_back({animation.mName, anim});
     }
+  }
+}
+
+void Model::ResetCameraParameters()
+{
+  mCameraParameters.clear();
+  if(!mModelLoadTask->mCameraParameters.empty())
+  {
+    // Copy camera parameters.
+    std::copy(mModelLoadTask->mCameraParameters.begin(), mModelLoadTask->mCameraParameters.end(), std::back_inserter(mCameraParameters));
   }
 }
 

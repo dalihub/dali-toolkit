@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@
 #include <toolkit-event-thread-callback.h>
 
 #include <dali-scene3d/public-api/controls/model/model.h>
+
+#include <dali/devel-api/actors/camera-actor-devel.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -58,7 +60,7 @@ const char* TEST_DLI_EXERCISE_FILE_NAME            = TEST_RESOURCE_DIR "/exercis
  * These textures are based off version of Wave engine sample
  * Take from https://github.com/WaveEngine/Samples
  *
- * Copyright (c) 2022 Wave Coorporation
+ * Copyright (c) 2023 Wave Coorporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -1035,6 +1037,114 @@ int UtcDaliModelAnimation03(void)
   END_TEST;
 }
 
+int UtcDaliModelCameraGenerate01(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_DLI_EXERCISE_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+  application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  uint32_t cameraCount = model.GetCameraCount();
+  DALI_TEST_EQUALS(1, cameraCount, TEST_LOCATION);
+
+  CameraActor generatedCamera = model.GenerateCamera(0u);
+  DALI_TEST_CHECK(generatedCamera);
+
+  generatedCamera = model.GenerateCamera(1u); // Fail to generate camera
+  DALI_TEST_CHECK(!generatedCamera);
+
+  END_TEST;
+}
+
+int UtcDaliModelCameraGenerate02(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+  application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  uint32_t cameraCount = model.GetCameraCount();
+  DALI_TEST_EQUALS(6, cameraCount, TEST_LOCATION);
+
+  CameraActor generatedCamera0 = model.GenerateCamera(0u);
+  DALI_TEST_CHECK(generatedCamera0);
+  CameraActor generatedCamera1 = model.GenerateCamera(1u);
+  DALI_TEST_CHECK(generatedCamera1);
+  CameraActor generatedCamera2 = model.GenerateCamera(2u);
+  DALI_TEST_CHECK(generatedCamera2);
+  CameraActor generatedCamera3 = model.GenerateCamera(3u); // Infinity far camera
+  DALI_TEST_CHECK(generatedCamera3);
+  CameraActor generatedCamera4 = model.GenerateCamera(4u); // Broken camera 1
+  DALI_TEST_CHECK(!generatedCamera4);
+  CameraActor generatedCamera5 = model.GenerateCamera(5u); // Broken camera 2
+  DALI_TEST_CHECK(!generatedCamera5);
+  CameraActor generatedCamera6 = model.GenerateCamera(6u); // Out of bound
+  DALI_TEST_CHECK(!generatedCamera6);
+
+  CameraActor appliedCamera;
+  DALI_TEST_EQUALS(model.ApplyCamera(0u, appliedCamera), false, TEST_LOCATION); // Cannot apply into empty camera.
+
+  auto CompareCameraProperties = [](CameraActor lhs, CameraActor rhs, const char* location) {
+    DALI_TEST_EQUALS(lhs.GetProperty<int>(Dali::CameraActor::Property::PROJECTION_MODE), rhs.GetProperty<int>(Dali::CameraActor::Property::PROJECTION_MODE), TEST_LOCATION);
+    DALI_TEST_EQUALS(lhs.GetProperty<float>(Dali::CameraActor::Property::NEAR_PLANE_DISTANCE), rhs.GetProperty<float>(Dali::CameraActor::Property::NEAR_PLANE_DISTANCE), TEST_LOCATION);
+
+    if(lhs.GetProperty<int>(Dali::CameraActor::Property::PROJECTION_MODE) == static_cast<int>(Dali::Camera::ProjectionMode::PERSPECTIVE_PROJECTION))
+    {
+      DALI_TEST_EQUALS(lhs.GetProperty<float>(Dali::CameraActor::Property::FIELD_OF_VIEW), rhs.GetProperty<float>(Dali::CameraActor::Property::FIELD_OF_VIEW), TEST_LOCATION);
+      // TODO : Open this test when infinity far projection implement.
+      //DALI_TEST_EQUALS(lhs.GetProperty<float>(Dali::CameraActor::Property::FAR_PLANE_DISTANCE), rhs.GetProperty<float>(Dali::CameraActor::Property::FAR_PLANE_DISTANCE), TEST_LOCATION);
+    }
+    else
+    {
+      DALI_TEST_EQUALS(lhs.GetProperty<float>(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), rhs.GetProperty<float>(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), TEST_LOCATION);
+      DALI_TEST_EQUALS(lhs.GetProperty<float>(Dali::CameraActor::Property::FAR_PLANE_DISTANCE), rhs.GetProperty<float>(Dali::CameraActor::Property::FAR_PLANE_DISTANCE), TEST_LOCATION);
+    }
+  };
+
+  appliedCamera = CameraActor::New();
+  DALI_TEST_EQUALS(model.ApplyCamera(0u, appliedCamera), true, TEST_LOCATION);
+  CompareCameraProperties(generatedCamera0, appliedCamera, TEST_LOCATION);
+  DALI_TEST_EQUALS(model.ApplyCamera(1u, appliedCamera), true, TEST_LOCATION);
+  CompareCameraProperties(generatedCamera1, appliedCamera, TEST_LOCATION);
+  DALI_TEST_EQUALS(model.ApplyCamera(2u, appliedCamera), true, TEST_LOCATION);
+  CompareCameraProperties(generatedCamera2, appliedCamera, TEST_LOCATION);
+  DALI_TEST_EQUALS(model.ApplyCamera(3u, appliedCamera), true, TEST_LOCATION);
+  CompareCameraProperties(generatedCamera3, appliedCamera, TEST_LOCATION);
+  DALI_TEST_EQUALS(model.ApplyCamera(4u, appliedCamera), false, TEST_LOCATION); // Broken camera 1
+  DALI_TEST_EQUALS(model.ApplyCamera(5u, appliedCamera), false, TEST_LOCATION); // Broken camera 2
+  DALI_TEST_EQUALS(model.ApplyCamera(6u, appliedCamera), false, TEST_LOCATION); // Cannot apply over the index.
+
+  END_TEST;
+}
+
 int UtcDaliModelMultiplePrimitives(void)
 {
   ToolkitTestApplication application;
@@ -1082,8 +1192,8 @@ int UtcDaliModelColorMode(void)
   application.SendNotification();
   application.Render();
 
-  Actor actor = model.FindChildByName("AnimatedCube");
-  Vector4 childColor = actor[Dali::Actor::Property::COLOR];
+  Actor   actor           = model.FindChildByName("AnimatedCube");
+  Vector4 childColor      = actor[Dali::Actor::Property::COLOR];
   Vector4 childWorldColor = actor[Dali::Actor::Property::WORLD_COLOR];
 
   DALI_TEST_EQUALS(childColor, Color::WHITE, TEST_LOCATION);
