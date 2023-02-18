@@ -178,7 +178,6 @@
                 {
                     "attributes": {
                         "POSITION": 0,
-                        "NORMAL": 1,
                         "TEXCOORD_0": 2
                     },
                     "indices": 3,
