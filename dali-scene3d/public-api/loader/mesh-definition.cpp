@@ -31,36 +31,39 @@ namespace Dali::Scene3D::Loader
 {
 namespace
 {
+template<bool use32BitIndices>
 class IndexProvider
 {
 public:
+  using IndexType = typename std::conditional_t<use32BitIndices, uint32_t, uint16_t>;
   IndexProvider(const uint16_t* indices)
   : mData(reinterpret_cast<uintptr_t>(indices)),
     mFunc(indices ? IncrementPointer : Increment)
   {
   }
 
-  uint16_t operator()()
+  IndexType operator()()
   {
     return mFunc(mData);
   }
 
 private:
-  static uint16_t Increment(uintptr_t& data)
+  static IndexType Increment(uintptr_t& data)
   {
-    return static_cast<uint16_t>(data++);
+    // mData was 'zero' at construct time. Just simply return counter start with 0.
+    return static_cast<IndexType>(data++);
   }
 
-  static uint16_t IncrementPointer(uintptr_t& data)
+  static IndexType IncrementPointer(uintptr_t& data)
   {
-    auto iPtr   = reinterpret_cast<const uint16_t*>(data);
+    auto iPtr   = reinterpret_cast<const IndexType*>(data);
     auto result = *iPtr;
     data        = reinterpret_cast<uintptr_t>(++iPtr);
     return result;
   }
 
   uintptr_t mData;
-  uint16_t (*mFunc)(uintptr_t&);
+  IndexType (*mFunc)(uintptr_t&);
 };
 
 const char* QUAD("quad");
@@ -208,13 +211,23 @@ void ReadJointAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Acces
   raw.mAttribs.push_back({"aJoints", Property::VECTOR4, static_cast<uint32_t>(outBufferSize / sizeof(Vector4)), std::move(buffer)});
 }
 
-void GenerateNormals(MeshDefinition::RawData& raw)
+template<bool use32BitsIndices, typename IndexProviderType = IndexProvider<use32BitsIndices>>
+bool GenerateNormals(MeshDefinition::RawData& raw)
 {
+  using IndexType = typename IndexProviderType::IndexType;
+
+  // mIndicies size must be even if we use 32bit indices.
+  if(DALI_UNLIKELY(use32BitsIndices && !raw.mIndices.empty() && !(raw.mIndices.size() % (sizeof(IndexType) / sizeof(uint16_t)) == 0)))
+  {
+    return false;
+  }
+
   auto& attribs = raw.mAttribs;
   DALI_ASSERT_DEBUG(attribs.size() > 0); // positions
-  IndexProvider getIndex(raw.mIndices.data());
 
-  const uint32_t numIndices = raw.mIndices.empty() ? attribs[0].mNumElements : static_cast<uint32_t>(raw.mIndices.size());
+  IndexProviderType getIndex(raw.mIndices.data());
+
+  const uint32_t numIndices = raw.mIndices.empty() ? attribs[0].mNumElements : static_cast<uint32_t>(raw.mIndices.size() / (sizeof(IndexType) / sizeof(uint16_t)));
 
   auto* positions = reinterpret_cast<const Vector3*>(attribs[0].mData.data());
 
@@ -223,8 +236,8 @@ void GenerateNormals(MeshDefinition::RawData& raw)
 
   for(uint32_t i = 0; i < numIndices; i += 3)
   {
-    uint16_t indices[]{getIndex(), getIndex(), getIndex()};
-    Vector3  pos[]{positions[indices[0]], positions[indices[1]], positions[indices[2]]};
+    IndexType indices[]{getIndex(), getIndex(), getIndex()};
+    Vector3   pos[]{positions[indices[0]], positions[indices[1]], positions[indices[2]]};
 
     Vector3 a = pos[1] - pos[0];
     Vector3 b = pos[2] - pos[0];
@@ -243,14 +256,24 @@ void GenerateNormals(MeshDefinition::RawData& raw)
   }
 
   attribs.push_back({"aNormal", Property::VECTOR3, attribs[0].mNumElements, std::move(buffer)});
+
+  return true;
 }
 
-template<bool useVec3, bool hasUvs, typename T = std::conditional_t<useVec3, Vector3, Vector4>, typename = std::enable_if_t<(std::is_same<T, Vector3>::value || std::is_same<T, Vector4>::value)>>
+template<bool use32BitsIndices, bool useVec3, bool hasUvs, typename T = std::conditional_t<useVec3, Vector3, Vector4>, typename = std::enable_if_t<(std::is_same<T, Vector3>::value || std::is_same<T, Vector4>::value)>, typename IndexProviderType = IndexProvider<use32BitsIndices>>
 bool GenerateTangents(MeshDefinition::RawData& raw)
 {
+  using IndexType = typename IndexProviderType::IndexType;
+
+  // mIndicies size must be even if we use 32bit indices.
+  if(DALI_UNLIKELY(use32BitsIndices && !raw.mIndices.empty() && !(raw.mIndices.size() % (sizeof(IndexType) / sizeof(uint16_t)) == 0)))
+  {
+    return false;
+  }
+
   auto& attribs = raw.mAttribs;
   // Required positions, normals, uvs (if we have). If not, skip generation
-  if(attribs.size() < (2 + static_cast<size_t>(hasUvs)))
+  if(DALI_UNLIKELY(attribs.size() < (2 + static_cast<size_t>(hasUvs))))
   {
     return false;
   }
@@ -260,17 +283,18 @@ bool GenerateTangents(MeshDefinition::RawData& raw)
 
   if constexpr(hasUvs)
   {
-    IndexProvider  getIndex(raw.mIndices.data());
-    const uint32_t numIndices = raw.mIndices.empty() ? attribs[0].mNumElements : static_cast<uint32_t>(raw.mIndices.size());
+    IndexProviderType getIndex(raw.mIndices.data());
+
+    const uint32_t numIndices = raw.mIndices.empty() ? attribs[0].mNumElements : static_cast<uint32_t>(raw.mIndices.size() / (sizeof(IndexType) / sizeof(uint16_t)));
 
     auto* positions = reinterpret_cast<const Vector3*>(attribs[0].mData.data());
     auto* uvs       = reinterpret_cast<const Vector2*>(attribs[2].mData.data());
 
     for(uint32_t i = 0; i < numIndices; i += 3)
     {
-      uint16_t indices[]{getIndex(), getIndex(), getIndex()};
-      Vector3  pos[]{positions[indices[0]], positions[indices[1]], positions[indices[2]]};
-      Vector2  uv[]{uvs[indices[0]], uvs[indices[1]], uvs[indices[2]]};
+      IndexType indices[]{getIndex(), getIndex(), getIndex()};
+      Vector3   pos[]{positions[indices[0]], positions[indices[1]], positions[indices[2]]};
+      Vector2   uv[]{uvs[indices[0]], uvs[indices[1]], uvs[indices[2]]};
 
       float x0 = pos[1].x - pos[0].x;
       float y0 = pos[1].y - pos[0].y;
@@ -666,18 +690,6 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
       {
         ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << path << "'.";
       }
-
-      auto u16s = raw.mIndices.data();
-      auto u32s = reinterpret_cast<uint32_t*>(raw.mIndices.data());
-      auto end  = u32s + indexCount;
-      while(u32s != end)
-      {
-        *u16s = static_cast<uint16_t>(*u32s);
-        ++u16s;
-        ++u32s;
-      }
-
-      raw.mIndices.resize(indexCount);
     }
     else if(MaskMatch(mFlags, U8_INDICES))
     {
@@ -685,7 +697,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
                           mIndices.mBlob.mStride >= sizeof(uint8_t)) &&
                          "Index buffer length not a multiple of element size");
       const auto indexCount = mIndices.mBlob.GetBufferSize() / sizeof(uint8_t);
-      raw.mIndices.resize(indexCount); // NOTE: we need space for uint32_ts initially.
+      raw.mIndices.resize(indexCount); // NOTE: we need space for uint16_ts initially.
 
       std::string path;
       auto        u8s    = reinterpret_cast<uint8_t*>(raw.mIndices.data()) + indexCount;
@@ -779,8 +791,20 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
   else if(mNormals.mBlob.mLength != 0 && isTriangles)
   {
     DALI_ASSERT_DEBUG(mNormals.mBlob.mLength == mPositions.mBlob.GetBufferSize());
-    GenerateNormals(raw);
-    hasNormals = true;
+    static const std::function<bool(RawData&)> GenerateNormalsFunction[2] =
+      {
+        GenerateNormals<false>,
+        GenerateNormals<true>,
+      };
+    const bool generateSuccessed = GenerateNormalsFunction[MaskMatch(mFlags, U32_INDICES)](raw);
+    if(!generateSuccessed)
+    {
+      DALI_LOG_ERROR("Failed to generate normal\n");
+    }
+    else
+    {
+      hasNormals = true;
+    }
   }
 
   const auto hasUvs = mTexCoords.IsDefined();
@@ -811,7 +835,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
       }
     }
 
-    mTexCoords.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector2)), reinterpret_cast<float*>(buffer.data()));
+    mTexCoords.mBlob.ApplyMinMax(static_cast<uint32_t>(uvCount), reinterpret_cast<float*>(buffer.data()));
 
     raw.mAttribs.push_back({"aTexCoord", Property::VECTOR2, static_cast<uint32_t>(uvCount), std::move(buffer)});
   }
@@ -838,18 +862,29 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
   else if(mTangents.mBlob.mLength != 0 && hasNormals && isTriangles)
   {
     DALI_ASSERT_DEBUG(mTangents.mBlob.mLength == mNormals.mBlob.GetBufferSize());
-    static const std::function<bool(RawData&)> GenerateTangentsFunction[2][2] =
+    static const std::function<bool(RawData&)> GenerateTangentsFunction[2][2][2] =
       {
         {
-          GenerateTangents<false, false>,
-          GenerateTangents<false, true>,
+          {
+            GenerateTangents<false, false, false>,
+            GenerateTangents<false, false, true>,
+          },
+          {
+            GenerateTangents<false, true, false>,
+            GenerateTangents<false, true, true>,
+          },
         },
         {
-          GenerateTangents<true, false>,
-          GenerateTangents<true, true>,
-        },
-      };
-    const bool generateSuccessed = GenerateTangentsFunction[mTangentType == Property::VECTOR3][hasUvs](raw);
+          {
+            GenerateTangents<true, false, false>,
+            GenerateTangents<true, false, true>,
+          },
+          {
+            GenerateTangents<true, true, false>,
+            GenerateTangents<true, true, true>,
+          },
+        }};
+    const bool generateSuccessed = GenerateTangentsFunction[MaskMatch(mFlags, U32_INDICES)][mTangentType == Property::VECTOR3][hasUvs](raw);
     if(!generateSuccessed)
     {
       DALI_LOG_ERROR("Failed to generate tangents\n");
@@ -1016,7 +1051,15 @@ MeshGeometry MeshDefinition::Load(RawData&& raw) const
   {
     if(!raw.mIndices.empty())
     {
-      meshGeometry.geometry.SetIndexBuffer(raw.mIndices.data(), raw.mIndices.size());
+      if(MaskMatch(mFlags, U32_INDICES))
+      {
+        // TODO : We can only store indeces as uint16_type. Send Dali::Geometry that we use it as uint32_t actual.
+        meshGeometry.geometry.SetIndexBuffer(reinterpret_cast<const uint32_t*>(raw.mIndices.data()), raw.mIndices.size() / 2);
+      }
+      else
+      {
+        meshGeometry.geometry.SetIndexBuffer(raw.mIndices.data(), raw.mIndices.size());
+      }
     }
 
     for(auto& a : raw.mAttribs)
