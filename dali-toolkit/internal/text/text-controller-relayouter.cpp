@@ -94,6 +94,13 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
 
   if(!isEditable)
   {
+    if(NO_OPERATION != (VALIDATE_FONTS & operationsPending) &&
+       textUpdateInfo.mCharacterIndex == static_cast<CharacterIndex>(-1))
+    {
+      impl.ClearFontData();
+      updateInfoCharIndexBackup = textUpdateInfo.mCharacterIndex;
+    }
+
     impl.UpdateModel(onlyOnceOperations);
 
     // Layout the text for the new width.
