@@ -70,23 +70,22 @@ namespace
 {
 #define TOKEN_STRING(x) #x
 
-const std::string KEYNAME_ACTORS           = "actors";
-const std::string KEYNAME_ENTRY_TRANSITION = "entryTransition";
-const std::string KEYNAME_EXIT_TRANSITION  = "exitTransition";
-const std::string KEYNAME_INCLUDES         = "includes";
-const std::string KEYNAME_INHERIT          = "inherit";
-const std::string KEYNAME_MAPPINGS         = "mappings";
-const std::string KEYNAME_NAME             = "name";
-const std::string KEYNAME_SIGNALS          = "signals";
-const std::string KEYNAME_STATES           = "states";
-const std::string KEYNAME_STYLES           = "styles";
-const std::string KEYNAME_TEMPLATES        = "templates";
-const std::string KEYNAME_TRANSITIONS      = "transitions";
-const std::string KEYNAME_TYPE             = "type";
-const std::string KEYNAME_VISUALS          = "visuals";
+const char* KEYNAME_ACTORS           = "actors";
+const char* KEYNAME_ENTRY_TRANSITION = "entryTransition";
+const char* KEYNAME_EXIT_TRANSITION  = "exitTransition";
+const char* KEYNAME_INCLUDES         = "includes";
+const char* KEYNAME_INHERIT          = "inherit";
+const char* KEYNAME_MAPPINGS         = "mappings";
+const char* KEYNAME_SIGNALS          = "signals";
+const char* KEYNAME_STATES           = "states";
+const char* KEYNAME_STYLES           = "styles";
+const char* KEYNAME_TEMPLATES        = "templates";
+const char* KEYNAME_TRANSITIONS      = "transitions";
+const char* KEYNAME_TYPE             = "type";
+const char* KEYNAME_VISUALS          = "visuals";
 
-const std::string PROPERTIES            = "properties";
-const std::string ANIMATABLE_PROPERTIES = "animatableProperties";
+const char* PROPERTIES            = "properties";
+const char* ANIMATABLE_PROPERTIES = "animatableProperties";
 
 typedef std::vector<const TreeNode*> TreeNodeList;
 

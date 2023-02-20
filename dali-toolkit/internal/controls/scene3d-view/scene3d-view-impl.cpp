@@ -36,7 +36,7 @@ namespace
 const char* const IMAGE_BRDF_FILE_NAME = "brdfLUT.png";
 
 // glTF file extension
-const std::string GLTF_EXT(".gltf");
+const char* GLTF_EXT(".gltf");
 
 /**
  * cube map face index

@@ -131,7 +131,7 @@ void Controller::InputFontHandler::SetInputFontFamily(Controller& controller, co
   }
 }
 
-const std::string& Controller::InputFontHandler::GetInputFontFamily(const Controller& controller)
+std::string Controller::InputFontHandler::GetInputFontFamily(const Controller& controller)
 {
   if(NULL != controller.mImpl->mEventData)
   {
