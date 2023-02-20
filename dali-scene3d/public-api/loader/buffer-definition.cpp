@@ -38,7 +38,7 @@ static constexpr std::string_view EMBEDDED_DATA_BASE64_ENCODING_TYPE   = "base64
 
 struct BufferDefinition::Impl
 {
-  std::vector<uint8_t>             buffer;
+  std::vector<uint8_t>              buffer;
   std::shared_ptr<Dali::FileStream> stream;
 };
 
@@ -85,9 +85,9 @@ void BufferDefinition::LoadBuffer()
       if(position != std::string::npos)
       {
         position += EMBEDDED_DATA_BASE64_ENCODING_TYPE.length();
-        std::string data = mUri.substr(position);
+        std::string_view data = std::string_view(mUri).substr(position);
         mImpl.get()->buffer.clear();
-        Dali::Toolkit::DecodeBase64PropertyData(data, mImpl.get()->buffer);
+        Dali::Toolkit::DecodeBase64FromString(data, mImpl.get()->buffer);
         mImpl.get()->stream = std::make_shared<Dali::FileStream>(reinterpret_cast<uint8_t*>(mImpl.get()->buffer.data()), mByteLength, FileStream::READ | FileStream::BINARY);
         mIsEmbedded         = true;
       }

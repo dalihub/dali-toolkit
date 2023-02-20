@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,9 +91,9 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
     if(position != std::string::npos)
     {
       position += EMBEDDED_DATA_BASE64_ENCODING_TYPE.length();
-      std::string          data = textureDefinition.mImageUri.substr(position);
+      std::string_view     data = std::string_view(textureDefinition.mImageUri).substr(position);
       std::vector<uint8_t> buffer;
-      Dali::Toolkit::DecodeBase64PropertyData(data, buffer);
+      Dali::Toolkit::DecodeBase64FromString(data, buffer);
       uint32_t bufferSize = buffer.size();
 
       Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(reinterpret_cast<uint8_t*>(buffer.data()), bufferSize, textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
@@ -187,8 +187,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
 
   // Load textures
   auto iTexture   = mTextureStages.begin();
-  auto checkStage = [&](uint32_t flags)
-  {
+  auto checkStage = [&](uint32_t flags) {
     return iTexture != mTextureStages.end() && MaskMatch(iTexture->mSemantic, flags);
   };
 
@@ -323,7 +322,7 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
   uint32_t n = 0;
   for(auto& tData : raw.mTextures)
   {
-    auto& pixels  = tData.mPixels;
+    auto&   pixels = tData.mPixels;
     Texture texture;
     if(pixels)
     {
@@ -379,8 +378,7 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
 
 bool MaterialDefinition::CheckTextures(uint32_t flags) const
 {
-  return std::find_if(mTextureStages.begin(), mTextureStages.end(), [flags](const TextureStage& ts)
-                      { return MaskMatch(ts.mSemantic, flags); }) != mTextureStages.end();
+  return std::find_if(mTextureStages.begin(), mTextureStages.end(), [flags](const TextureStage& ts) { return MaskMatch(ts.mSemantic, flags); }) != mTextureStages.end();
 }
 
 } // namespace Loader
