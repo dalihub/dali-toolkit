@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,7 @@ namespace
 {
 struct Context
 {
-  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type)
-  {
+  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type) {
     return TEST_RESOURCE_DIR "/";
   };
 
@@ -494,8 +493,7 @@ int UtcDaliGltfLoaderSuccessShort(void)
   TestApplication app;
 
   const std::string resourcePath = TEST_RESOURCE_DIR "/";
-  auto              pathProvider = [resourcePath](ResourceType::Value)
-  {
+  auto              pathProvider = [resourcePath](ResourceType::Value) {
     return resourcePath;
   };
 
@@ -503,6 +501,7 @@ int UtcDaliGltfLoaderSuccessShort(void)
   for(auto modelName : {
         "2CylinderEngine",
         "AnimatedMorphCube",
+        "AnimatedMorphCubeAnimateNonZeroFrame",
         "AnimatedMorphSphere",
         "AnimatedTriangle",
         "BoxAnimated",
