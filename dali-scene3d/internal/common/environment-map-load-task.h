@@ -71,10 +71,11 @@ public:
   bool HasSucceeded() const;
 
   /**
-   * Retrieves loaded Environment Map
-   * @return EnvironmentMapData that is loaded from url.
+   * Retrieves loaded Ibl Texture
+   * @return Texture that is loaded from url.
+   * @note Do not call this method in worker thread.
    */
-  Dali::Scene3D::Loader::EnvironmentMapData& GetEnvironmentMap();
+  Dali::Texture GetLoadedTexture();
 
 private:
   // Undefined

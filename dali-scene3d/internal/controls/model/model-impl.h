@@ -229,6 +229,31 @@ private:
    */
   void ResetResourceTasks();
 
+  /**
+   * @brief Reset a Resource loading task.
+   */
+  void ResetResourceTask(IntrusivePtr<AsyncTask> asyncTask);
+
+  /**
+   * @brief Request to load a Ibl texture asynchronously
+   */
+  void RequestLoadIblTexture(EnvironmentMapLoadTaskPtr asyncLoadTask, const std::string& url);
+
+  /**
+   * @brief Notify Resource Ready signal.
+   */
+  void NotifyResourceReady();
+
+  /**
+   * @brief Create Model from loaded SceneDefinition.
+   */
+  void CreateModel();
+
+  /**
+   * @brief Create Dali::Animation from loaded AnimationDefinitions.
+   */
+  void CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene);
+
 private:
   std::string                    mModelUrl;
   std::string                    mResourceDirectoryUrl;
