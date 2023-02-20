@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
+#include <dali-scene3d/internal/loader/dli-loader-impl.h>
 #include <dali-scene3d/internal/loader/json-util.h>
-#include <dali-scene3d/public-api/loader/dli-loader.h>
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
@@ -34,7 +34,8 @@ namespace
 void ConfigureBlendShapeShaders(ResourceBundle& resources, const SceneDefinition& scene, Actor root, std::vector<BlendshapeShaderConfigurationRequest>&& requests)
 {
   std::vector<std::string> errors;
-  auto                     onError = [&errors](const std::string& msg) {
+  auto                     onError = [&errors](const std::string& msg)
+  {
     errors.push_back(msg);
   };
 
@@ -50,7 +51,8 @@ void ConfigureBlendShapeShaders(ResourceBundle& resources, const SceneDefinition
 
 struct Context
 {
-  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type) {
+  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type)
+  {
     return TEST_RESOURCE_DIR "/";
   };
 
@@ -72,26 +74,21 @@ struct Context
     cameraParameters,
     lights};
 
-  DliLoader::InputParams input{
-    pathProvider(ResourceType::Mesh),
-    nullptr,
-    {},
-    {},
-    nullptr,
-  };
-  DliLoader::LoadParams loadParams{input, output};
+  Dali::Scene3D::Loader::DliInputParameter       input;
+  std::vector<std::string>                       errors;
+  Dali::Scene3D::Loader::Internal::DliLoaderImpl loader;
 
-  std::vector<std::string> errors;
-  DliLoader                loader;
-
-  StringCallback onError = [this](const std::string& error) {
+  StringCallback onError = [this](const std::string& error)
+  {
     errors.push_back(error);
     printf("%s\n", error.c_str());
   };
 
   Context()
   {
+    input.mAnimationsPath = pathProvider(ResourceType::Mesh);
     loader.SetErrorCallback(onError);
+    loader.SetInputParameter(input);
   }
 };
 
@@ -115,7 +112,7 @@ int UtcDaliDliLoaderLoadSceneNotFound(void)
 {
   Context ctx;
 
-  DALI_TEST_EQUAL(ctx.loader.LoadScene("does_not_exist.dli", ctx.loadParams), false);
+  DALI_TEST_EQUAL(ctx.loader.LoadModel("does_not_exist.dli", ctx.output), false);
 
   auto error = ctx.loader.GetParseError();
   DALI_TEST_CHECK(StringHasTokens(error.c_str(), {"Empty source buffer to parse."}));
@@ -128,7 +125,7 @@ int UtcDaliDliLoaderLoadSceneFailParse(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "invalid.gltf";
-  DALI_TEST_EQUAL(ctx.loader.LoadScene(path, ctx.loadParams), false);
+  DALI_TEST_EQUAL(ctx.loader.LoadModel(path, ctx.output), false);
 
   auto error = ctx.loader.GetParseError();
   DALI_TEST_CHECK(StringHasTokens(error.c_str(), {"Unexpected character."}));
@@ -177,7 +174,7 @@ int UtcDaliDliLoaderLoadSceneAssertions(void)
 
     auto path = ctx.pathProvider(ResourceType::Mesh) + "dli/" + i.first + ".dli";
     printf("\n\n%s: %s\n", path.c_str(), i.second.c_str());
-    DALI_TEST_ASSERTION(ctx.loader.LoadScene(path, ctx.loadParams), i.second.c_str());
+    DALI_TEST_ASSERTION(ctx.loader.LoadModel(path, ctx.output), i.second.c_str());
   }
 
   END_TEST;
@@ -188,7 +185,7 @@ int UtcDaliDliLoaderLoadSceneExercise(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "exercise.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadScene(path, ctx.loadParams));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
   DALI_TEST_CHECK(ctx.errors.empty());
 
   auto& scene = ctx.scene;
@@ -230,8 +227,9 @@ int UtcDaliDliLoaderLoadSceneExercise(void)
   {
     auto resourceRefs = resources.CreateRefCounter();
     scene.CountResourceRefs(iRoot, choices, resourceRefs);
-    resources.CountEnvironmentReferences(resourceRefs);
-    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    resources.mReferenceCounts = std::move(resourceRefs);
+    resources.CountEnvironmentReferences();
+    resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
       scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
@@ -256,7 +254,8 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
   std::vector<std::string> metadata;
   uint32_t                 metadataCount = 0;
   ctx.input.mPreNodeCategoryProcessors.push_back({"metadata",
-                                                  [&](const Property::Array& array, StringCallback) {
+                                                  [&](const Property::Array& array, StringCallback)
+                                                  {
                                                     std::string key, value;
                                                     for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
                                                     {
@@ -277,7 +276,8 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
   std::vector<std::string> behaviors;
   uint32_t                 behaviorCount = 0;
   ctx.input.mPostNodeCategoryProcessors.push_back({"behaviors",
-                                                   [&](const Property::Array& array, StringCallback) {
+                                                   [&](const Property::Array& array, StringCallback)
+                                                   {
                                                      for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
                                                      {
                                                        auto& data = array.GetElementAt(i0);
@@ -295,12 +295,13 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
                                                    }});
 
   size_t numNodes                  = 0;
-  ctx.input.mNodePropertyProcessor = [&](const NodeDefinition&, const Property::Map&, StringCallback) {
+  ctx.input.mNodePropertyProcessor = [&](const NodeDefinition&, const Property::Map&, StringCallback)
+  {
     ++numNodes;
   };
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "morph.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadScene(path, ctx.loadParams));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
   DALI_TEST_CHECK(ctx.errors.empty());
 
   auto& scene = ctx.scene;
@@ -345,8 +346,9 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
   {
     auto resourceRefs = resources.CreateRefCounter();
     scene.CountResourceRefs(iRoot, choices, resourceRefs);
-    resources.CountEnvironmentReferences(resourceRefs);
-    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    resources.mReferenceCounts = std::move(resourceRefs);
+    resources.CountEnvironmentReferences();
+    resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
       scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
@@ -368,7 +370,7 @@ int UtcDaliDliLoaderLoadSceneArc(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "arc.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadScene(path, ctx.loadParams));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
   DALI_TEST_CHECK(ctx.errors.empty());
 
   auto& scene = ctx.scene;
@@ -409,8 +411,9 @@ int UtcDaliDliLoaderLoadSceneArc(void)
   {
     auto resourceRefs = resources.CreateRefCounter();
     scene.CountResourceRefs(iRoot, choices, resourceRefs);
-    resources.CountEnvironmentReferences(resourceRefs);
-    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    resources.mReferenceCounts = std::move(resourceRefs);
+    resources.CountEnvironmentReferences();
+    resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
       scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
@@ -432,7 +435,7 @@ int UtcDaliDliLoaderLoadSceneShaderUniforms(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "dli/shader-uniforms.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadScene(path, ctx.loadParams));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
   DALI_TEST_EQUAL(ctx.errors.size(), 1u);
   DALI_TEST_CHECK(ctx.errors[0].find("failed to infer type") != std::string::npos);
 
@@ -475,7 +478,7 @@ int UtcDaliDliLoaderLoadSceneExtras(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "dli/extras.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadScene(path, ctx.loadParams));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
   DALI_TEST_EQUAL(ctx.errors.size(), 3u);
   DALI_TEST_CHECK(ctx.errors[0].find("already defined; overriding") != std::string::npos);
   DALI_TEST_CHECK(ctx.errors[1].find("empty string is invalid for name") != std::string::npos);
@@ -518,7 +521,7 @@ int UtcDaliDliLoaderLoadSceneConstraints(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "dli/constraints.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadScene(path, ctx.loadParams));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
   DALI_TEST_EQUAL(ctx.errors.size(), 1u);
   DALI_TEST_CHECK(ctx.errors[0].find("invalid", ctx.errors[0].find("node ID")) != std::string::npos);
 
@@ -576,12 +579,13 @@ int UtcDaliDliLoaderNodeProcessor(void)
   Context ctx;
 
   std::vector<Property::Map> nodeMaps;
-  ctx.input.mNodePropertyProcessor = [&](const NodeDefinition&, Property::Map&& map, StringCallback) {
+  ctx.input.mNodePropertyProcessor = [&](const NodeDefinition&, Property::Map&& map, StringCallback)
+  {
     nodeMaps.push_back(map);
   };
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "dli/node-processor.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadScene(path, ctx.loadParams));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
 
   DALI_TEST_EQUAL(nodeMaps.size(), 2u);
   DALI_TEST_EQUAL(nodeMaps[0].Count(), 5u);
@@ -636,7 +640,7 @@ int UtcDaliDliLoaderLoadCoverageTest(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "coverageTest.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadScene(path, ctx.loadParams));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
   DALI_TEST_CHECK(ctx.errors.empty());
 
   auto& scene = ctx.scene;
@@ -688,8 +692,9 @@ int UtcDaliDliLoaderLoadCoverageTest(void)
   {
     auto resourceRefs = resources.CreateRefCounter();
     scene.CountResourceRefs(iRoot, choices, resourceRefs);
-    resources.CountEnvironmentReferences(resourceRefs);
-    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    resources.mReferenceCounts = std::move(resourceRefs);
+    resources.CountEnvironmentReferences();
+    resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
       scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);

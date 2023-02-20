@@ -16,10 +16,9 @@
  */
 
 // FILE HEADER
-#include <dali-scene3d/public-api/loader/gltf2-loader.h>
+#include <dali-scene3d/internal/loader/gltf2-loader-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/math/quaternion.h>
@@ -42,10 +41,10 @@ namespace Scene3D
 {
 namespace Loader
 {
+namespace Internal
+{
 namespace
 {
-Dali::Mutex gInitializeMutex;
-Dali::Mutex gReadMutex;
 
 const std::string POSITION_PROPERTY("position");
 const std::string ORIENTATION_PROPERTY("orientation");
@@ -368,8 +367,8 @@ bool operator<(const NodeMapping& mapping, Index gltfIdx)
 class NodeIndexMapper
 {
 public:
-  NodeIndexMapper()                       = default;
-  NodeIndexMapper(const NodeIndexMapper&) = delete;
+  NodeIndexMapper()                                  = default;
+  NodeIndexMapper(const NodeIndexMapper&)            = delete;
   NodeIndexMapper& operator=(const NodeIndexMapper&) = delete;
 
   ///@brief Registers a mapping of the @a gltfIdx of a node to its @a runtimeIdx .
@@ -491,7 +490,8 @@ TextureDefinition ConvertTextureInfo(const gt::TextureInfo& mm, ConversionContex
 
 void ConvertMaterial(const gt::Material& material, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
-  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gt::TextureInfo& info) {
+  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gt::TextureInfo& info)
+  {
     if(!info.mTexture->mSource->mUri.empty())
     {
       if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
@@ -849,7 +849,8 @@ void ConvertNode(gt::Node const& node, const Index gltfIdx, Index parentIdx, Con
   auto& resources = output.mResources;
 
   const auto idx      = scene.GetNodeCount();
-  auto       weakNode = scene.AddNode([&]() {
+  auto       weakNode = scene.AddNode([&]()
+                                {
     std::unique_ptr<NodeDefinition> nodeDef{new NodeDefinition()};
 
     nodeDef->mParentIdx = parentIdx;
@@ -872,8 +873,7 @@ void ConvertNode(gt::Node const& node, const Index gltfIdx, Index parentIdx, Con
       }
     }
 
-    return nodeDef;
-  }());
+    return nodeDef; }());
   if(!weakNode)
   {
     ExceptionFlinger(ASSERT_LOCATION) << "Node name '" << node.mName << "' is not unique; scene is invalid.";
@@ -1312,12 +1312,13 @@ void SetDefaultEnvironmentMap(const gt::Document& doc, ConversionContext& contex
 
 } // namespace
 
-void InitializeGltfLoader()
+void Gltf2LoaderImpl::InitializeGltfLoader()
 {
+  static Dali::Mutex mInitializeMutex;
   // Set ObjectReader only once (for all gltf loading).
   static bool setObjectReadersRequired = true;
   {
-    Mutex::ScopedLock lock(gInitializeMutex);
+    Mutex::ScopedLock lock(mInitializeMutex);
     if(setObjectReadersRequired)
     {
       // NOTE: only referencing own, anonymous namespace, const objects; the pointers will never need to change.
@@ -1327,22 +1328,27 @@ void InitializeGltfLoader()
   }
 }
 
-void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactory, LoadResult& params)
+bool Gltf2LoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::LoadResult& result)
 {
   bool failed = false;
   auto js     = LoadTextFile(url.c_str(), &failed);
   if(failed)
   {
-    throw std::runtime_error("Failed to load " + url);
+    DALI_LOG_ERROR("Failed to load %s\n", url.c_str());
+    return false;
   }
 
   json::unique_ptr root(json_parse(js.c_str(), js.size()));
   if(!root)
   {
-    throw std::runtime_error("Failed to parse " + url);
+    DALI_LOG_ERROR("Failed to parse %s\n", url.c_str());
+    return false;
   }
 
   gt::Document doc;
+
+  Dali::Scene3D::Loader::ShaderDefinitionFactory shaderFactory;
+  shaderFactory.SetResources(result.mResources);
 
   auto& rootObj = js::Cast<json_object_s>(*root);
   auto  jsAsset = js::FindObjectChild("asset", rootObj);
@@ -1361,14 +1367,16 @@ void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactor
     isMRendererModel      = (doc.mAsset.mGenerator.find(MRENDERER_MODEL_IDENTIFICATION) != std::string_view::npos);
   }
 
+  InitializeGltfLoader();
   {
-    Mutex::ScopedLock lock(gReadMutex);
+    static Dali::Mutex mReadMutex;
+    Mutex::ScopedLock  lock(mReadMutex);
     gt::SetRefReaderObject(doc);
     DOCUMENT_READER.Read(rootObj, doc);
   }
 
   auto              path = url.substr(0, url.rfind('/') + 1);
-  ConversionContext context{params, path, INVALID_INDEX};
+  ConversionContext context{result, path, INVALID_INDEX};
 
   ConvertBuffers(doc, context);
   ConvertMaterials(doc, context);
@@ -1376,13 +1384,16 @@ void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactor
   ConvertNodes(doc, context, isMRendererModel);
   ConvertAnimations(doc, context);
   ProcessSkins(doc, context);
-  ProduceShaders(shaderFactory, params.mScene);
-  params.mScene.EnsureUniqueSkinningShaderInstances(params.mResources);
+  ProduceShaders(shaderFactory, result.mScene);
+  result.mScene.EnsureUniqueSkinningShaderInstances(result.mResources);
 
   // Set Default Environment map
   SetDefaultEnvironmentMap(doc, context);
+
+  return true;
 }
 
+} // namespace Internal
 } // namespace Loader
 } // namespace Scene3D
 } // namespace Dali

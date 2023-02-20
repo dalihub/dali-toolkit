@@ -7,7 +7,9 @@ SET(CAPI_LIB "dali-scene3d")
 
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
+  utc-Dali-DliLoaderImpl.cpp
   utc-Dali-Gltf2Asset.cpp
+  utc-Dali-Gltf2LoaderImpl.cpp
   utc-Dali-Hash.cpp
   utc-Dali-JsonReader.cpp
   utc-Dali-JsonUtil.cpp

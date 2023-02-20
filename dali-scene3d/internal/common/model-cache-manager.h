@@ -86,14 +86,6 @@ public:
   Dali::ConditionalWait& GetLoadSceneConditionalWaitInstance(std::string modelUri);
 
   /**
-   * @brief Retrieves the ConditionalWait object to synchronize the raw resources loading of the
-   * model with the given URI between multiple threads.
-   * @param[in] modelUri The unique model URI with its absolute path.
-   * @return The ConditionalWait object.
-   */
-  Dali::ConditionalWait& GetLoadRawResourceConditionalWaitInstance(std::string modelUri);
-
-  /**
    * @brief Reference the cache of the model with the given URI.
    * This will increment the reference count of the load result by 1.
    * @param[in] modelUri The model URI.

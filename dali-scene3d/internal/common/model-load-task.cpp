@@ -22,16 +22,6 @@
 #include <dali/integration-api/debug.h>
 #include <filesystem>
 
-// INTERNAL INCLUDES
-#include <dali-scene3d/internal/common/model-cache-manager.h>
-#include <dali-scene3d/public-api/loader/animation-definition.h>
-#include <dali-scene3d/public-api/loader/camera-parameters.h>
-#include <dali-scene3d/public-api/loader/dli-loader.h>
-#include <dali-scene3d/public-api/loader/gltf2-loader.h>
-#include <dali-scene3d/public-api/loader/light-parameters.h>
-#include <dali-scene3d/public-api/loader/node-definition.h>
-#include <dali-scene3d/public-api/loader/shader-definition-factory.h>
-
 namespace Dali
 {
 namespace Scene3D
@@ -41,20 +31,15 @@ namespace Internal
 namespace
 {
 static constexpr Vector3 Y_DIRECTION(1.0f, -1.0f, 1.0f);
-
-static constexpr std::string_view OBJ_EXTENSION      = ".obj";
-static constexpr std::string_view GLTF_EXTENSION     = ".gltf";
-static constexpr std::string_view DLI_EXTENSION      = ".dli";
-static constexpr std::string_view METADATA_EXTENSION = "metadata";
 } // namespace
 
 ModelLoadTask::ModelLoadTask(const std::string& modelUrl, const std::string& resourceDirectoryUrl, CallbackBase* callback)
 : AsyncTask(callback),
   mModelUrl(modelUrl),
   mResourceDirectoryUrl(resourceDirectoryUrl),
-  mHasSucceeded(false),
-  mModelCacheManager(ModelCacheManager::Get()),
-  mLoadResult(mModelCacheManager.GetModelLoadResult(modelUrl))
+  mModelCacheManager(Scene3D::Internal::ModelCacheManager::Get()),
+  mLoadResult(mModelCacheManager.GetModelLoadResult(mModelUrl)),
+  mHasSucceeded(false)
 {
 }
 
@@ -64,123 +49,50 @@ ModelLoadTask::~ModelLoadTask()
 
 void ModelLoadTask::Process()
 {
-  uint32_t               cacheRefCount                  = mModelCacheManager.GetModelCacheRefCount(mModelUrl);
-  Dali::ConditionalWait& loadSceneConditionalWait       = mModelCacheManager.GetLoadSceneConditionalWaitInstance(mModelUrl);
-  Dali::ConditionalWait& loadRawResourceConditionalWait = mModelCacheManager.GetLoadRawResourceConditionalWaitInstance(mModelUrl);
-
-  std::filesystem::path modelUrl(mModelUrl);
   if(mResourceDirectoryUrl.empty())
   {
+    std::filesystem::path modelUrl(mModelUrl);
     mResourceDirectoryUrl = std::string(modelUrl.parent_path()) + "/";
   }
-  std::string extension = modelUrl.extension();
-  std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
-  Dali::Scene3D::Loader::ResourceBundle::PathProvider pathProvider = [&](Dali::Scene3D::Loader::ResourceType::Value type) {
+  Dali::Scene3D::Loader::ResourceBundle::PathProvider pathProvider = [&](Dali::Scene3D::Loader::ResourceType::Value type)
+  {
     return mResourceDirectoryUrl;
   };
 
+  mModelLoader = std::make_shared<Dali::Scene3D::Loader::ModelLoader>(mModelUrl, mResourceDirectoryUrl, mLoadResult);
+
+  bool                   loadSucceeded            = false;
+  Dali::ConditionalWait& loadSceneConditionalWait = mModelCacheManager.GetLoadSceneConditionalWaitInstance(mModelUrl);
   {
     ConditionalWait::ScopedLock lock(loadSceneConditionalWait);
-
-    while(cacheRefCount > 1 && mModelCacheManager.IsSceneLoading(mModelUrl))
+    if(mModelCacheManager.IsSceneLoaded(mModelUrl))
     {
-      loadSceneConditionalWait.Wait();
+      loadSucceeded = true;
     }
-  }
-
-  {
-    ConditionalWait::ScopedLock lock(loadSceneConditionalWait);
-
-    if(!mModelCacheManager.IsSceneLoaded(mModelUrl))
+    else
     {
       mModelCacheManager.SetSceneLoading(mModelUrl, true);
 
-      std::filesystem::path metaDataUrl = modelUrl;
-      metaDataUrl.replace_extension(METADATA_EXTENSION.data());
+      loadSucceeded = mModelLoader->LoadModel(pathProvider, true);
 
-      Dali::Scene3D::Loader::LoadSceneMetadata(metaDataUrl.c_str(), mLoadResult.mSceneMetadata);
-
-      mLoadResult.mAnimationDefinitions.clear();
-
-      if(extension == DLI_EXTENSION)
+      // Mesh of glTF and dli is defined in right hand coordinate system, with positive Y for Up direction.
+      // Because DALi uses left hand system, Y direciton will be flipped for environment map sampling.
+      for(auto&& env : GetResources().mEnvironmentMaps)
       {
-        Dali::Scene3D::Loader::DliLoader              loader;
-        Dali::Scene3D::Loader::DliLoader::InputParams input{
-          pathProvider(Dali::Scene3D::Loader::ResourceType::Mesh),
-          nullptr,
-          {},
-          {},
-          nullptr,
-          {}};
-        Dali::Scene3D::Loader::DliLoader::LoadParams loadParams{input, mLoadResult};
-        if(!loader.LoadScene(mModelUrl, loadParams))
-        {
-          DALI_LOG_ERROR("Failed to load scene from '%s': %s\n", mModelUrl.c_str(), loader.GetParseError().c_str());
-
-          mModelCacheManager.SetSceneLoaded(mModelUrl, false);
-          mModelCacheManager.SetSceneLoading(mModelUrl, false);
-          mModelCacheManager.UnreferenceModelCache(mModelUrl);
-
-          return;
-        }
-      }
-      else if(extension == GLTF_EXTENSION)
-      {
-        Dali::Scene3D::Loader::ShaderDefinitionFactory sdf;
-        sdf.SetResources(mLoadResult.mResources);
-        Dali::Scene3D::Loader::LoadGltfScene(mModelUrl, sdf, mLoadResult);
-      }
-      else
-      {
-        DALI_LOG_ERROR("Unsupported model type.\n");
-
-        mModelCacheManager.SetSceneLoaded(mModelUrl, false);
-        mModelCacheManager.SetSceneLoading(mModelUrl, false);
-        mModelCacheManager.UnreferenceModelCache(mModelUrl);
-
-        return;
+        env.first.mYDirection = Y_DIRECTION;
       }
 
-      mModelCacheManager.SetSceneLoaded(mModelUrl, true);
       mModelCacheManager.SetSceneLoading(mModelUrl, false);
+      mModelCacheManager.SetSceneLoaded(mModelUrl, loadSucceeded);
     }
   }
 
-  loadSceneConditionalWait.Notify();
-
+  if(!loadSucceeded)
   {
-    ConditionalWait::ScopedLock lock(loadRawResourceConditionalWait);
-
-    while(cacheRefCount > 1 && mLoadResult.mResources.mRawResourcesLoading)
-    {
-      loadRawResourceConditionalWait.Wait();
-    }
+    DALI_LOG_ERROR("Failed to load scene from '%s'\n", mModelUrl.c_str());
+    return;
   }
-
-  {
-    ConditionalWait::ScopedLock lock(loadRawResourceConditionalWait);
-
-    mResourceRefCount = std::move(mLoadResult.mResources.CreateRefCounter());
-
-    for(auto iRoot : mLoadResult.mScene.GetRoots())
-    {
-      mLoadResult.mScene.CountResourceRefs(iRoot, mResourceChoices, mResourceRefCount);
-    }
-
-    mLoadResult.mResources.CountEnvironmentReferences(mResourceRefCount);
-
-    mLoadResult.mResources.LoadRawResources(mResourceRefCount, pathProvider);
-
-    // glTF Mesh is defined in right hand coordinate system, with positive Y for Up direction.
-    // Because DALi uses left hand system, Y direciton will be flipped for environment map sampling.
-    for(auto&& env : mLoadResult.mResources.mEnvironmentMaps)
-    {
-      env.first.mYDirection = Y_DIRECTION;
-    }
-  }
-
-  loadRawResourceConditionalWait.Notify();
 
   mHasSucceeded = true;
 }
@@ -193,6 +105,31 @@ bool ModelLoadTask::IsReady()
 bool ModelLoadTask::HasSucceeded() const
 {
   return mHasSucceeded;
+}
+
+Dali::Scene3D::Loader::SceneDefinition& ModelLoadTask::GetScene() const
+{
+  return mModelLoader->GetScene();
+}
+
+Dali::Scene3D::Loader::ResourceBundle& ModelLoadTask::GetResources() const
+{
+  return mModelLoader->GetResources();
+}
+
+std::vector<Dali::Scene3D::Loader::AnimationDefinition>& ModelLoadTask::GetAnimations() const
+{
+  return mModelLoader->GetAnimations();
+}
+
+std::vector<Dali::Scene3D::Loader::CameraParameters>& ModelLoadTask::GetCameras() const
+{
+  return mModelLoader->GetCameras();
+}
+
+Dali::Scene3D::Loader::Customization::Choices& ModelLoadTask::GetResourceChoices()
+{
+  return mModelLoader->GetResourceChoices();
 }
 
 } // namespace Internal

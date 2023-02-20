@@ -18,10 +18,10 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include "dali-scene3d/public-api/loader/resource-bundle.h"
-#include "dali-scene3d/public-api/loader/utils.h"
 #include <dali-test-suite-utils.h>
 #include <string_view>
+#include "dali-scene3d/public-api/loader/resource-bundle.h"
+#include "dali-scene3d/public-api/loader/utils.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
@@ -34,9 +34,9 @@ int UtcDaliResourceRefCounts(void)
   resourceBundle.mMeshes.resize(17);
   resourceBundle.mMaterials.resize(19);
 
-  int i = 0;
+  int              i = 0;
   std::vector<int> testEnvironmentReferences(resourceBundle.mEnvironmentMaps.size());
-  for (auto& m : resourceBundle.mMaterials)
+  for(auto& m : resourceBundle.mMaterials)
   {
     Index iEnv = 0;
     iEnv += (i % 3) == 0;
@@ -56,9 +56,12 @@ int UtcDaliResourceRefCounts(void)
   DALI_TEST_EQUAL(counter[ResourceType::Material].Size(), resourceBundle.mMaterials.size());
 
   std::fill(counter[ResourceType::Material].begin(), counter[ResourceType::Material].end(), 1u);
-  resourceBundle.CountEnvironmentReferences(counter);
-  i = 0;
-  for (auto& er: counter[ResourceType::Environment])
+  resourceBundle.mReferenceCounts = std::move(counter);
+  resourceBundle.CountEnvironmentReferences();
+
+  const ResourceRefCounts& referenceCounts = resourceBundle.mReferenceCounts;
+  i                                        = 0;
+  for(auto& er : referenceCounts[ResourceType::Environment])
   {
     DALI_TEST_EQUAL(er, testEnvironmentReferences[i]);
     ++i;
