@@ -94,8 +94,6 @@ struct FeedbackStyleInfo
   SignalFeedbackInfoContainer mSignalFeedbackInfoList;
 };
 
-static const FeedbackStyleInfo DEFAULT_FEEDBACK_STYLE_INFO;
-
 FeedbackStyle::FeedbackStyle()
 {
   mFeedback = Dali::FeedbackPlayer::Get();
@@ -180,6 +178,7 @@ const FeedbackStyleInfo& FeedbackStyle::GetStyleInfo(const std::string& type) co
   }
   else
   {
+    static const FeedbackStyleInfo DEFAULT_FEEDBACK_STYLE_INFO;
     return DEFAULT_FEEDBACK_STYLE_INFO;
   }
 }

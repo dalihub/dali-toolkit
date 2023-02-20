@@ -353,20 +353,6 @@ public:
   virtual const Vector<BoundedParagraphRun>& GetBoundedParagraphRuns() const = 0;
 
   /**
-   * @brief Retrieves the number of character-spacing glyph runs.
-   *
-   * @return The number of character-spacing glyph runs.
-   */
-  virtual Length GetNumberOfCharacterSpacingGlyphRuns() const = 0;
-
-  /**
-   * @brief Retrieves the reference for character-spacing glyph runs.
-   *
-   * @return The reference for character-spacing glyph runs.
-   */
-  virtual const Vector<CharacterSpacingGlyphRun>& GetCharacterSpacingGlyphRuns() const = 0;
-
-  /**
    * @brief Retrieves the strikethrough runs.
    *
    * @param[out] strikethroughRuns Pointer to a buffer where the strikethrough runs are copied.

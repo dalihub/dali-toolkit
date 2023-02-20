@@ -35,12 +35,6 @@ namespace
 {
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
-// global string variable to caching complate vertex shader
-static std::string gVertexShader;
-
-// global string variable to caching complate fragment shader (no atlas)
-static std::string gFragmentShaderNoAtlas;
-
 const int NATIVE_SHADER_TYPE_OFFSET = VisualFactoryCache::ShaderType::NATIVE_IMAGE_SHADER - VisualFactoryCache::ShaderType::IMAGE_SHADER;
 
 // enum of required list when we select shader
@@ -279,6 +273,8 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
 
 std::string_view ImageVisualShaderFactory::GetVertexShaderSource()
 {
+  // static string variable to cache complete vertex shader
+  static std::string gVertexShader;
   if(gVertexShader.empty())
   {
     gVertexShader = Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data();
@@ -289,6 +285,8 @@ std::string_view ImageVisualShaderFactory::GetVertexShaderSource()
 
 std::string_view ImageVisualShaderFactory::GetFragmentShaderSource()
 {
+  // static string variable to cache complete fragment shader (no atlas)
+  static std::string gFragmentShaderNoAtlas;
   if(gFragmentShaderNoAtlas.empty())
   {
     gFragmentShaderNoAtlas = Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_FRAG.data();

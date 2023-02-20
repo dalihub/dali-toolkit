@@ -269,16 +269,6 @@ public:
   virtual const Vector<BoundedParagraphRun>& GetBoundedParagraphRuns() const;
 
   /**
-   * @copydoc Dali::Toolkit::Text::ViewInterface::GetNumberOfCharacterSpacingGlyphRuns()
-   */
-  Length GetNumberOfCharacterSpacingGlyphRuns() const override;
-
-  /**
-   * @copydoc Dali::Toolkit::Text::ViewInterface::GetCharacterSpacingGlyphRuns()
-   */
-  const Vector<CharacterSpacingGlyphRun>& GetCharacterSpacingGlyphRuns() const override;
-
-  /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetCharacterSpacing()
    */
   float GetCharacterSpacing() const override;
