@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_INTERNAL_MODEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/weak-handle.h>
@@ -47,6 +48,7 @@ class Model : public Dali::Toolkit::Internal::Control, public ImageBasedLightObs
 {
 public:
   using AnimationData = std::pair<std::string, Dali::Animation>;
+  using CameraData    = Loader::CameraParameters;
 
   /**
    * @brief Creates a new Model.
@@ -115,6 +117,21 @@ public:
    */
   Dali::Animation GetAnimation(const std::string& name) const;
 
+  /**
+   * @copydoc Model::GetCameraCount()
+   */
+  uint32_t GetCameraCount() const;
+
+  /**
+   * @copydoc Model::GenerateCamera()
+   */
+  Dali::CameraActor GenerateCamera(uint32_t index) const;
+
+  /**
+   * @copydoc Model::ApplyCamera()
+   */
+  bool ApplyCamera(uint32_t index, Dali::CameraActor camera) const;
+
 protected:
   /**
    * @brief Constructs a new Model.
@@ -167,6 +184,7 @@ private:
    */
   bool IsResourceReady() const override;
 
+private:
   /**
    * @brief Scales the model to fit the control or to return to original size.
    */
@@ -191,6 +209,15 @@ private:
    * @brief Changes IBL scale factor of the input node.
    */
   void UpdateImageBasedLightScaleFactor();
+
+  /**
+   * @brief Apply self transform into inputed camera.
+   * Inputed camera must be configured by CameraParameter. Mean, inputed camera coordinate depend on Model.
+   * After this API finished, CameraActor coordinate system converted as DALi coordinate system.
+   *
+   * @param[in,out] camera CameraActor who need to apply model itself's transform
+   */
+  void ApplyCameraTransform(Dali::CameraActor camera) const;
 
 public: // Overrides ImageBasedLightObserver Methods.
   /**
@@ -229,11 +256,42 @@ private:
    */
   void ResetResourceTasks();
 
+  /**
+   * @brief Reset a Resource loading task.
+   */
+  void ResetResourceTask(IntrusivePtr<AsyncTask> asyncTask);
+
+  /**
+   * @brief Request to load a Ibl texture asynchronously
+   */
+  void RequestLoadIblTexture(EnvironmentMapLoadTaskPtr asyncLoadTask, const std::string& url);
+
+  /**
+   * @brief Notify Resource Ready signal.
+   */
+  void NotifyResourceReady();
+
+  /**
+   * @brief Create Model from loaded SceneDefinition.
+   */
+  void CreateModel();
+
+  /**
+   * @brief Create Dali::Animation from loaded AnimationDefinitions.
+   */
+  void CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene);
+
+  /**
+   * @brief Reset CameraData from loaded CameraParameters.
+   */
+  void ResetCameraParameters();
+
 private:
   std::string                    mModelUrl;
   std::string                    mResourceDirectoryUrl;
   Dali::Actor                    mModelRoot;
   std::vector<AnimationData>     mAnimations;
+  std::vector<CameraData>        mCameraParameters;
   std::vector<WeakHandle<Actor>> mRenderableActors;
   WeakHandle<Scene3D::SceneView> mParentSceneView;
 

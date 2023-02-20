@@ -23,11 +23,11 @@
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <filesystem>
 
 // INTERNAL INCLUDES
@@ -251,13 +251,13 @@ bool Model::GetChildrenFocusable() const
 void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
   bool needIblReset = false;
-  bool isOnScene = Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE);
+  bool isOnScene    = Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE);
   if(mDiffuseIblUrl != diffuseUrl)
   {
     mDiffuseIblUrl = diffuseUrl;
     if(mDiffuseIblUrl.empty())
     {
-      needIblReset             = true;
+      needIblReset = true;
     }
     else
     {
@@ -271,7 +271,7 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
     mSpecularIblUrl = specularUrl;
     if(mSpecularIblUrl.empty())
     {
-      needIblReset              = true;
+      needIblReset = true;
     }
     else
     {
@@ -284,17 +284,8 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
   // we don't need to request to load texture.
   if(needIblReset)
   {
-    if(mIblDiffuseLoadTask)
-    {
-      Dali::AsyncTaskManager::Get().RemoveTask(mIblDiffuseLoadTask);
-      mIblDiffuseLoadTask.Reset();
-    }
-
-    if(mIblSpecularLoadTask)
-    {
-      Dali::AsyncTaskManager::Get().RemoveTask(mIblSpecularLoadTask);
-      mIblSpecularLoadTask.Reset();
-    }
+    ResetResourceTask(mIblDiffuseLoadTask);
+    ResetResourceTask(mIblSpecularLoadTask);
 
     mIblDiffuseDirty          = false;
     mIblSpecularDirty         = false;
@@ -309,11 +300,7 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
   {
     if(isOnScene && mIblDiffuseDirty)
     {
-      if(mIblDiffuseLoadTask)
-      {
-        Dali::AsyncTaskManager::Get().RemoveTask(mIblDiffuseLoadTask);
-        mIblDiffuseLoadTask.Reset();
-      }
+      ResetResourceTask(mIblDiffuseLoadTask);
       mIblDiffuseLoadTask = new EnvironmentMapLoadTask(mDiffuseIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &Model::OnIblDiffuseLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblDiffuseLoadTask);
       mIblDiffuseDirty = false;
@@ -321,11 +308,7 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
 
     if(isOnScene && mIblSpecularDirty)
     {
-      if(mIblSpecularLoadTask)
-      {
-        Dali::AsyncTaskManager::Get().RemoveTask(mIblSpecularLoadTask);
-        mIblSpecularLoadTask.Reset();
-      }
+      ResetResourceTask(mIblSpecularLoadTask);
       mIblSpecularLoadTask = new EnvironmentMapLoadTask(mSpecularIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &Model::OnIblSpecularLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblSpecularLoadTask);
       mIblSpecularDirty = false;
@@ -339,10 +322,7 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
   }
 
   // If diffuse and specular textures are already loaded, emits resource ready signal here.
-  if(IsResourceReady())
-  {
-    Control::SetResourceReady(false);
-  }
+  NotifyResourceReady();
 }
 
 void Model::SetImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor)
@@ -401,6 +381,45 @@ Dali::Animation Model::GetAnimation(const std::string& name) const
     }
   }
   return animation;
+}
+
+uint32_t Model::GetCameraCount() const
+{
+  return mCameraParameters.size();
+}
+
+Dali::CameraActor Model::GenerateCamera(uint32_t index) const
+{
+  Dali::CameraActor camera;
+  if(mCameraParameters.size() > index)
+  {
+    camera = Dali::CameraActor::New3DCamera();
+    if(!mCameraParameters[index].ConfigureCamera(camera, false))
+    {
+      DALI_LOG_ERROR("Fail to generate %u's camera actor : Some property was not defined. Please check model file.\n", index);
+      camera.Reset();
+      return camera;
+    }
+
+    ApplyCameraTransform(camera);
+  }
+  return camera;
+}
+
+bool Model::ApplyCamera(uint32_t index, Dali::CameraActor camera) const
+{
+  if(camera && mCameraParameters.size() > index)
+  {
+    if(!mCameraParameters[index].ConfigureCamera(camera, false))
+    {
+      DALI_LOG_ERROR("Fail to apply %u's camera actor : Some property was not defined. Please check model file.\n", index);
+      return false;
+    }
+
+    ApplyCameraTransform(camera);
+    return true;
+  }
+  return false;
 }
 
 ///////////////////////////////////////////////////////////
@@ -493,30 +512,33 @@ bool Model::IsResourceReady() const
 
 void Model::ScaleModel()
 {
-  if(mModelRoot)
+  if(!mModelRoot)
   {
-    float   scale = 1.0f;
-    Vector3 size  = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-    if(size.x > 0.0f && size.y > 0.0f)
-    {
-      scale = MAXFLOAT;
-      scale = std::min(size.x / mNaturalSize.x, scale);
-      scale = std::min(size.y / mNaturalSize.y, scale);
-    }
-    // Models in glTF and dli are defined as right hand coordinate system.
-    // DALi uses left hand coordinate system. Scaling negative is for change winding order.
-    mModelRoot.SetProperty(Dali::Actor::Property::SCALE, Y_DIRECTION * scale);
+    return;
   }
+
+  float   scale = 1.0f;
+  Vector3 size  = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+  if(size.x > 0.0f && size.y > 0.0f)
+  {
+    scale = MAXFLOAT;
+    scale = std::min(size.x / mNaturalSize.x, scale);
+    scale = std::min(size.y / mNaturalSize.y, scale);
+  }
+  // Models in glTF and dli are defined as right hand coordinate system.
+  // DALi uses left hand coordinate system. Scaling negative is for change winding order.
+  mModelRoot.SetProperty(Dali::Actor::Property::SCALE, Y_DIRECTION * scale);
 }
 
 void Model::FitModelPosition()
 {
-  if(mModelRoot)
+  if(!mModelRoot)
   {
-    // Loaded model pivot is not the model center.
-    mModelRoot.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    mModelRoot.SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3::ONE - mModelPivot);
+    return;
   }
+  // Loaded model pivot is not the model center.
+  mModelRoot.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  mModelRoot.SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3::ONE - mModelPivot);
 }
 
 void Model::CollectRenderableActor(Actor actor)
@@ -550,29 +572,33 @@ void Model::UpdateImageBasedLightTexture()
   for(auto&& actor : mRenderableActors)
   {
     Actor renderableActor = actor.GetHandle();
-    if(renderableActor)
+    if(!renderableActor)
     {
-      uint32_t rendererCount = renderableActor.GetRendererCount();
-      for(uint32_t i = 0; i < rendererCount; ++i)
-      {
-        Dali::Renderer renderer = renderableActor.GetRendererAt(i);
-        if(renderer)
-        {
-          Dali::TextureSet textures = renderer.GetTextures();
-          if(textures)
-          {
-            uint32_t textureCount = textures.GetTextureCount();
-            // EnvMap requires at least 2 texture, diffuse and specular
-            if(textureCount > 2u)
-            {
-              textures.SetTexture(textureCount - OFFSET_FOR_DIFFUSE_CUBE_TEXTURE, currentDiffuseTexture);
-              textures.SetTexture(textureCount - OFFSET_FOR_SPECULAR_CUBE_TEXTURE, currentSpecularTexture);
-            }
-          }
-        }
-      }
-      renderableActor.RegisterProperty(Dali::Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), currentIblScaleFactor);
+      continue;
     }
+
+    uint32_t rendererCount = renderableActor.GetRendererCount();
+    for(uint32_t i = 0; i < rendererCount; ++i)
+    {
+      Dali::Renderer renderer = renderableActor.GetRendererAt(i);
+      if(!renderer)
+      {
+        continue;
+      }
+      Dali::TextureSet textures = renderer.GetTextures();
+      if(!textures)
+      {
+        continue;
+      }
+      uint32_t textureCount = textures.GetTextureCount();
+      // EnvMap requires at least 2 texture, diffuse and specular
+      if(textureCount > 2u)
+      {
+        textures.SetTexture(textureCount - OFFSET_FOR_DIFFUSE_CUBE_TEXTURE, currentDiffuseTexture);
+        textures.SetTexture(textureCount - OFFSET_FOR_SPECULAR_CUBE_TEXTURE, currentSpecularTexture);
+      }
+    }
+    renderableActor.RegisterProperty(Dali::Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), currentIblScaleFactor);
   }
 }
 
@@ -593,6 +619,45 @@ void Model::UpdateImageBasedLightScaleFactor()
       renderableActor.RegisterProperty(Dali::Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), currentIblScaleFactor);
     }
   }
+}
+
+void Model::ApplyCameraTransform(Dali::CameraActor camera) const
+{
+  Vector3    selfPosition    = Self().GetProperty<Vector3>(Actor::Property::POSITION);
+  Quaternion selfOrientation = Self().GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+  Vector3    selfScale       = Self().GetProperty<Vector3>(Actor::Property::SCALE);
+
+  Vector3    cameraPosition    = camera.GetProperty<Vector3>(Actor::Property::POSITION);
+  Quaternion cameraOrientation = camera.GetProperty<Quaternion>(Actor::Property::ORIENTATION);
+  Vector3    cameraScale       = camera.GetProperty<Vector3>(Actor::Property::SCALE);
+
+  // Models in glTF and dli are defined as right hand coordinate system.
+  // DALi uses left hand coordinate system. Scaling negative is for change winding order.
+  if(!Dali::Equals(Y_DIRECTION.Dot(Vector3::YAXIS), 1.0f))
+  {
+    // Reflect by XZ plane
+    cameraPosition.y = -cameraPosition.y;
+    Quaternion yDirectionQuaternion;
+    yDirectionQuaternion.mVector = Vector3::YAXIS;
+    // Reflect orientation
+    cameraOrientation = yDirectionQuaternion * cameraOrientation * yDirectionQuaternion;
+  }
+
+  Vector3    resultPosition;
+  Quaternion resultOrientation;
+  Vector3    resultScale;
+
+  Matrix selfMatrix(false);
+  Matrix cameraMatrix(false);
+  Matrix resultMatrix(false);
+  selfMatrix.SetTransformComponents(selfScale, selfOrientation, selfPosition);
+  cameraMatrix.SetTransformComponents(cameraScale, cameraOrientation, cameraPosition);
+  Matrix::Multiply(resultMatrix, cameraMatrix, selfMatrix);
+  resultMatrix.GetTransformComponents(resultPosition, resultOrientation, resultScale);
+
+  camera.SetProperty(Actor::Property::POSITION, resultPosition);
+  camera.SetProperty(Actor::Property::ORIENTATION, resultOrientation);
+  camera.SetProperty(Actor::Property::SCALE, resultScale);
 }
 
 void Model::NotifyImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor)
@@ -627,6 +692,96 @@ void Model::OnModelLoadComplete()
     return;
   }
 
+  CreateModel();
+  mRenderableActors.clear();
+  CollectRenderableActor(mModelRoot);
+
+  auto* resources = &(mModelLoadTask->mResources);
+  auto* scene     = &(mModelLoadTask->mScene);
+  CreateAnimations(*scene);
+  ResetCameraParameters();
+
+  if(!resources->mEnvironmentMaps.empty())
+  {
+    mDefaultDiffuseTexture  = resources->mEnvironmentMaps.front().second.mDiffuse;
+    mDefaultSpecularTexture = resources->mEnvironmentMaps.front().second.mSpecular;
+  }
+
+  UpdateImageBasedLightTexture();
+  UpdateImageBasedLightScaleFactor();
+
+  mModelRoot.SetProperty(Dali::Actor::Property::SENSITIVE, mModelChildrenSensitive);
+  mModelRoot.SetProperty(Dali::Actor::Property::KEYBOARD_FOCUSABLE, mModelChildrenFocusable);
+  mModelRoot.SetProperty(Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, mModelChildrenFocusable);
+
+  Self().Add(mModelRoot);
+  Self().SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3(mModelPivot.x, 1.0f - mModelPivot.y, mModelPivot.z));
+
+  mModelResourceReady = true;
+  NotifyResourceReady();
+  ResetResourceTask(mModelLoadTask);
+}
+
+void Model::OnIblDiffuseLoadComplete()
+{
+  mDiffuseTexture = mIblDiffuseLoadTask->GetLoadedTexture();
+  ResetResourceTask(mIblDiffuseLoadTask);
+  mIblDiffuseResourceReady = true;
+  if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
+  {
+    OnIblLoadComplete();
+  }
+}
+
+void Model::OnIblSpecularLoadComplete()
+{
+  mSpecularTexture = mIblSpecularLoadTask->GetLoadedTexture();
+  ResetResourceTask(mIblSpecularLoadTask);
+  mIblSpecularResourceReady = true;
+  if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
+  {
+    OnIblLoadComplete();
+  }
+}
+
+void Model::OnIblLoadComplete()
+{
+  UpdateImageBasedLightTexture();
+  NotifyResourceReady();
+}
+
+void Model::ResetResourceTasks()
+{
+  if(!Dali::Adaptor::IsAvailable())
+  {
+    return;
+  }
+  ResetResourceTask(mModelLoadTask);
+  ResetResourceTask(mIblDiffuseLoadTask);
+  ResetResourceTask(mIblSpecularLoadTask);
+}
+
+void Model::ResetResourceTask(IntrusivePtr<AsyncTask> asyncTask)
+{
+  if(!asyncTask)
+  {
+    return;
+  }
+  Dali::AsyncTaskManager::Get().RemoveTask(asyncTask);
+  asyncTask.Reset();
+}
+
+void Model::NotifyResourceReady()
+{
+  if(!IsResourceReady())
+  {
+    return;
+  }
+  Control::SetResourceReady(false);
+}
+
+void Model::CreateModel()
+{
   mModelRoot = Actor::New();
   mModelRoot.SetProperty(Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR);
 
@@ -635,7 +790,7 @@ void Model::OnModelLoadComplete()
   auto*                                               scene     = &(mModelLoadTask->mScene);
   Dali::Scene3D::Loader::Transforms                   xforms{Dali::Scene3D::Loader::MatrixStack{}, Dali::Scene3D::Loader::ViewProjection{}};
   Dali::Scene3D::Loader::NodeDefinition::CreateParams nodeParams{*resources, xforms, {}, {}, {}};
-  uint32_t rootCount = 0u;
+  uint32_t                                            rootCount = 0u;
   for(auto iRoot : scene->GetRoots())
   {
     resources->GenerateResources(mModelLoadTask->mResourceRefCounts[rootCount]);
@@ -655,47 +810,6 @@ void Model::OnModelLoadComplete()
     rootCount++;
   }
 
-  if(!resources->mEnvironmentMaps.empty())
-  {
-    mDefaultDiffuseTexture  = resources->mEnvironmentMaps.front().second.mDiffuse;
-    mDefaultSpecularTexture = resources->mEnvironmentMaps.front().second.mSpecular;
-  }
-
-  if(!mModelLoadTask->mAnimations.empty())
-  {
-    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property)
-    {
-      Dali::Actor actor;
-      if(property.mNodeIndex != Scene3D::Loader::INVALID_INDEX)
-      {
-        auto* node = scene->GetNode(property.mNodeIndex);
-        if(node != nullptr)
-        {
-          actor = mModelRoot.FindChildById(node->mNodeId);
-        }
-      }
-      else
-      {
-        actor = mModelRoot.FindChildByName(property.mNodeName);
-      }
-      return actor;
-    };
-
-    mAnimations.clear();
-    for(auto&& animation : mModelLoadTask->mAnimations)
-    {
-      Dali::Animation anim = animation.ReAnimate(getActor);
-
-      mAnimations.push_back({animation.mName, anim});
-    }
-  }
-
-  mRenderableActors.clear();
-  CollectRenderableActor(mModelRoot);
-
-  UpdateImageBasedLightTexture();
-  UpdateImageBasedLightScaleFactor();
-
   mNaturalSize = AABB.CalculateSize();
   mModelPivot  = AABB.CalculatePivot();
   mModelRoot.SetProperty(Dali::Actor::Property::SIZE, mNaturalSize);
@@ -704,78 +818,43 @@ void Model::OnModelLoadComplete()
   {
     Self().SetProperty(Dali::Actor::Property::SIZE, mNaturalSize);
   }
-
   FitModelPosition();
   ScaleModel();
-
-  mModelRoot.SetProperty(Dali::Actor::Property::SENSITIVE, mModelChildrenSensitive);
-  mModelRoot.SetProperty(Dali::Actor::Property::KEYBOARD_FOCUSABLE, mModelChildrenFocusable);
-  mModelRoot.SetProperty(Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, mModelChildrenFocusable);
-
-  Self().Add(mModelRoot);
-
-  Self().SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3(mModelPivot.x, 1.0f - mModelPivot.y, mModelPivot.z));
-
-  mModelResourceReady = true;
-
-  if(IsResourceReady())
-  {
-    Control::SetResourceReady(false);
-  }
-  mModelLoadTask.Reset();
 }
 
-void Model::OnIblDiffuseLoadComplete()
+void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
 {
-  mDiffuseTexture = (mIblDiffuseLoadTask->HasSucceeded()) ? mIblDiffuseLoadTask->GetEnvironmentMap().GetTexture() : Texture();
-  mIblDiffuseResourceReady = true;
-  if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
+  mAnimations.clear();
+  if(!mModelLoadTask->mAnimations.empty())
   {
-    OnIblLoadComplete();
-  }
-  mIblDiffuseLoadTask.Reset();
-}
+    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property) {
+      if(property.mNodeIndex == Scene3D::Loader::INVALID_INDEX)
+      {
+        return mModelRoot.FindChildByName(property.mNodeName);
+      }
+      auto* node = scene.GetNode(property.mNodeIndex);
+      if(node == nullptr)
+      {
+        return Dali::Actor();
+      }
+      return mModelRoot.FindChildById(node->mNodeId);
+    };
 
-void Model::OnIblSpecularLoadComplete()
-{
-  mSpecularTexture = (mIblSpecularLoadTask->HasSucceeded()) ? mIblSpecularLoadTask->GetEnvironmentMap().GetTexture() : Texture();
-  mIblSpecularResourceReady = true;
-  if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
-  {
-    OnIblLoadComplete();
-  }
-  mIblSpecularLoadTask.Reset();
-}
-
-void Model::OnIblLoadComplete()
-{
-  UpdateImageBasedLightTexture();
-
-  if(IsResourceReady())
-  {
-    Control::SetResourceReady(false);
-  }
-}
-
-void Model::ResetResourceTasks()
-{
-  if(Dali::Adaptor::IsAvailable())
-  {
-    if(mModelLoadTask)
+    for(auto&& animation : mModelLoadTask->mAnimations)
     {
-      Dali::AsyncTaskManager::Get().RemoveTask(mModelLoadTask);
-      mModelLoadTask.Reset();
+      Dali::Animation anim = animation.ReAnimate(getActor);
+      mAnimations.push_back({animation.mName, anim});
     }
-    if(mIblDiffuseLoadTask)
-    {
-      Dali::AsyncTaskManager::Get().RemoveTask(mIblDiffuseLoadTask);
-      mIblDiffuseLoadTask.Reset();
-    }
-    if(mIblSpecularLoadTask)
-    {
-      Dali::AsyncTaskManager::Get().RemoveTask(mIblSpecularLoadTask);
-      mIblSpecularLoadTask.Reset();
-    }
+  }
+}
+
+void Model::ResetCameraParameters()
+{
+  mCameraParameters.clear();
+  if(!mModelLoadTask->mCameraParameters.empty())
+  {
+    // Copy camera parameters.
+    std::copy(mModelLoadTask->mCameraParameters.begin(), mModelLoadTask->mCameraParameters.end(), std::back_inserter(mCameraParameters));
   }
 }
 

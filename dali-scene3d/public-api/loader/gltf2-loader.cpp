@@ -263,7 +263,7 @@ const auto CAMERA_PERSPECTIVE_READER = std::move(js::Reader<gt::Camera::Perspect
 
 const auto CAMERA_ORTHOGRAPHIC_READER = std::move(js::Reader<gt::Camera::Orthographic>()
                                                     .Register(*js::MakeProperty("xmag", js::Read::Number<float>, &gt::Camera::Orthographic::mXMag))
-                                                    .Register(*js::MakeProperty("ymag", js::Read::Number<float>, &gt::Camera::Orthographic::mXMag))
+                                                    .Register(*js::MakeProperty("ymag", js::Read::Number<float>, &gt::Camera::Orthographic::mYMag))
                                                     .Register(*js::MakeProperty("zfar", js::Read::Number<float>, &gt::Camera::Orthographic::mZFar))
                                                     .Register(*js::MakeProperty("znear", js::Read::Number<float>, &gt::Camera::Orthographic::mZNear)));
 
@@ -578,7 +578,7 @@ void ConvertMaterial(const gt::Material& material, const std::unordered_map<std:
     matDef.mEmissiveFactor = material.mEmissiveFactor;
   }
 
-  if(material.mMaterialExtensions.mMaterialIor.mIor < MAXFLOAT)
+  if(!Dali::Equals(material.mMaterialExtensions.mMaterialIor.mIor, gltf2::UNDEFINED_FLOAT_VALUE))
   {
     float ior                  = material.mMaterialExtensions.mMaterialIor.mIor;
     matDef.mDielectricSpecular = powf((ior - 1.0f) / (ior + 1.0f), 2.0f);
@@ -812,18 +812,33 @@ void ConvertCamera(const gt::Camera& camera, CameraParameters& camParams)
   if(camParams.isPerspective)
   {
     auto& perspective = camera.mPerspective;
-    camParams.yFov    = Degree(Radian(perspective.mYFov)).degree;
-    camParams.zNear   = perspective.mZNear;
-    camParams.zFar    = perspective.mZFar;
+    if(!Dali::Equals(perspective.mYFov, gltf2::UNDEFINED_FLOAT_VALUE))
+    {
+      camParams.yFovDegree = Degree(Radian(perspective.mYFov));
+    }
+    else
+    {
+      camParams.yFovDegree = Degree(gltf2::UNDEFINED_FLOAT_VALUE);
+    }
+    camParams.zNear = perspective.mZNear;
+    camParams.zFar  = perspective.mZFar;
     // TODO: yes, we seem to ignore aspectRatio in CameraParameters.
   }
   else
   {
-    auto& ortho                = camera.mOrthographic;
-    camParams.orthographicSize = ortho.mYMag * .5f;
-    camParams.aspectRatio      = ortho.mXMag / ortho.mYMag;
-    camParams.zNear            = ortho.mZNear;
-    camParams.zFar             = ortho.mZFar;
+    auto& ortho = camera.mOrthographic;
+    if(!Dali::Equals(ortho.mYMag, gltf2::UNDEFINED_FLOAT_VALUE) && !Dali::Equals(ortho.mXMag, gltf2::UNDEFINED_FLOAT_VALUE))
+    {
+      camParams.orthographicSize = ortho.mYMag * .5f;
+      camParams.aspectRatio      = ortho.mXMag / ortho.mYMag;
+    }
+    else
+    {
+      camParams.orthographicSize = gltf2::UNDEFINED_FLOAT_VALUE;
+      camParams.aspectRatio      = gltf2::UNDEFINED_FLOAT_VALUE;
+    }
+    camParams.zNear = ortho.mZNear;
+    camParams.zFar  = ortho.mZFar;
   }
 }
 

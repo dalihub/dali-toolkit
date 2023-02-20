@@ -789,7 +789,7 @@ void SceneView::OnSkyboxLoadComplete()
     Control::SetResourceReady(false);
   }
 
-  mSkyboxTexture = (mSkyboxLoadTask->HasSucceeded()) ? mSkyboxLoadTask->GetEnvironmentMap().GetTexture() : Texture();
+  mSkyboxTexture = mSkyboxLoadTask->GetLoadedTexture();
   Shader skyboxShader;
   if(mSkyboxEnvironmentMapType == Scene3D::EnvironmentMapType::CUBEMAP)
   {
@@ -814,7 +814,7 @@ void SceneView::OnSkyboxLoadComplete()
 
 void SceneView::OnIblDiffuseLoadComplete()
 {
-  mDiffuseTexture          = (mIblDiffuseLoadTask->HasSucceeded()) ? mIblDiffuseLoadTask->GetEnvironmentMap().GetTexture() : Texture();
+  mDiffuseTexture          = mIblDiffuseLoadTask->GetLoadedTexture();
   mIblDiffuseResourceReady = true;
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
   {
@@ -825,7 +825,7 @@ void SceneView::OnIblDiffuseLoadComplete()
 
 void SceneView::OnIblSpecularLoadComplete()
 {
-  mSpecularTexture          = (mIblSpecularLoadTask->HasSucceeded()) ? mIblSpecularLoadTask->GetEnvironmentMap().GetTexture() : Texture();
+  mSpecularTexture          = mIblSpecularLoadTask->GetLoadedTexture();
   mIblSpecularResourceReady = true;
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
   {

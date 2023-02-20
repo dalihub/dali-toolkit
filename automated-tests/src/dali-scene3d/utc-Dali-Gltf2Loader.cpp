@@ -180,7 +180,7 @@ int UtcDaliGltfLoaderSuccess1(void)
   LoadGltfScene(TEST_RESOURCE_DIR "/AnimatedCube.gltf", sdf, ctx.loadResult);
 
   DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
-  DALI_TEST_EQUAL(6u, ctx.scene.GetNodeCount());
+  DALI_TEST_EQUAL(9u, ctx.scene.GetNodeCount());
 
   // Default envmap is used
   DALI_TEST_EQUAL(1u, ctx.resources.mEnvironmentMaps.size());
@@ -453,7 +453,7 @@ int UtcDaliGltfLoaderSuccess1(void)
   DALI_TEST_EQUAL(2u, ctx.resources.mShaders.size());
   DALI_TEST_EQUAL(0u, ctx.resources.mSkeletons.size());
 
-  DALI_TEST_EQUAL(3u, ctx.cameras.size());
+  DALI_TEST_EQUAL(6u, ctx.cameras.size());
   DALI_TEST_EQUAL(0u, ctx.lights.size());
   DALI_TEST_EQUAL(1u, ctx.animations.size());
   DALI_TEST_EQUAL(0u, ctx.animationGroups.size());
