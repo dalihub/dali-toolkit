@@ -13,10 +13,8 @@ SET(TC_SOURCES
   utc-Dali-BvhLoader.cpp
   utc-Dali-CameraParameters.cpp
   utc-Dali-EnvironmentMapLoader.cpp
-  utc-Dali-DliLoader.cpp
   utc-Dali-EnvironmentDefinition.cpp
   utc-Dali-FacialAnimation.cpp
-  utc-Dali-Gltf2Loader.cpp
   utc-Dali-KtxLoader.cpp
   utc-Dali-Model.cpp
   utc-Dali-SceneView.cpp

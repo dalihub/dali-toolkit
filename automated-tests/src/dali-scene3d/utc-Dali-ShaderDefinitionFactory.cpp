@@ -24,7 +24,6 @@
 #include <dali-test-suite-utils.h>
 #include <set>
 #include <string_view>
-#include "dali-scene3d/public-api/loader/gltf2-loader.h"
 #include "dali-scene3d/public-api/loader/node-definition.h"
 #include "dali-scene3d/public-api/loader/resource-bundle.h"
 #include "dali-scene3d/public-api/loader/shader-definition-factory.h"

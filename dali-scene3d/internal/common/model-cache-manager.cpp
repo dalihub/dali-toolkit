@@ -57,12 +57,6 @@ public:
     return cache.loadSceneConditionalWait;
   }
 
-  Dali::ConditionalWait& GetLoadRawResourceConditionalWaitInstance(std::string modelUri)
-  {
-    ModelCache& cache = mModelCache[modelUri];
-    return cache.loadRawResourceConditionalWait;
-  }
-
   void ReferenceModelCache(std::string modelUri)
   {
     ModelCache& cache = mModelCache[modelUri];
@@ -129,7 +123,6 @@ private:
 
     uint32_t              refCount{0};                      ///< The reference count of this model cache.
     Dali::ConditionalWait loadSceneConditionalWait{};       ///< The conditionalWait instance used to synchronise the loading of the scene for the same model in different threads.
-    Dali::ConditionalWait loadRawResourceConditionalWait{}; ///< The conditionalWait instance used to synchronise the loading of the shared raw resources for the same model in different threads.
 
     bool isSceneLoaded{false};  ///< Whether the scene of the model has been loaded.
     bool isSceneLoading{false}; ///< Whether the scene loading of the model is in progress.
@@ -190,12 +183,6 @@ Dali::ConditionalWait& ModelCacheManager::GetLoadSceneConditionalWaitInstance(st
 {
   ModelCacheManager::Impl& impl = static_cast<ModelCacheManager::Impl&>(GetBaseObject());
   return impl.GetLoadSceneConditionalWaitInstance(modelUri);
-}
-
-Dali::ConditionalWait& ModelCacheManager::GetLoadRawResourceConditionalWaitInstance(std::string modelUri)
-{
-  ModelCacheManager::Impl& impl = static_cast<ModelCacheManager::Impl&>(GetBaseObject());
-  return impl.GetLoadRawResourceConditionalWaitInstance(modelUri);
 }
 
 void ModelCacheManager::ReferenceModelCache(std::string modelUri)
