@@ -447,24 +447,24 @@ bool AccessibilityManager::MoveFocusForward()
   mRecursiveFocusMoveCounter = 0;
 
   FocusIDIter focusIDIter = mFocusIDContainer.find(mCurrentFocusActor.first);
-  if(focusIDIter != mFocusIDContainer.end())
+  if (focusIDIter != mFocusIDContainer.end())
   {
-    DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] focus order : %d\n", __FUNCTION__, __LINE__, (*focusIDIter).first);
+    DALI_LOG_ERROR("[%s:%d] focus order : %d \n", __FUNCTION__, __LINE__, (*focusIDIter).first);
     ret = DoMoveFocus(focusIDIter, true, mIsWrapped);
   }
   else
   {
     // TODO: if there is not focused actor, move first actor
-    if(!mFocusIDContainer.empty())
+    if (!mFocusIDContainer.empty())
     {
       //if there is not focused actor, move 1st actor
       focusIDIter = mFocusIDContainer.begin(); // TODO: I'm not sure it was sorted.
-      DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] focus order : %d\n", __FUNCTION__, __LINE__, (*focusIDIter).first);
+      DALI_LOG_ERROR("[%s:%d] focus order : %d \n", __FUNCTION__, __LINE__, (*focusIDIter).first);
       ret = DoSetCurrentFocusActor((*focusIDIter).second);
     }
   }
 
-  DALI_LOG_INFO( gLogFilter, Debug::General, "[%s] %s\n", __FUNCTION__, ret?"SUCCEED!!!":"FAILED!!!");
+  DALI_LOG_ERROR("[%s] %s\n", __FUNCTION__, ret?"SUCCEED!!!":"FAILED!!!");
 
   return ret;
 }
@@ -475,25 +475,25 @@ bool AccessibilityManager::MoveFocusBackward()
   mRecursiveFocusMoveCounter = 0;
 
   FocusIDIter focusIDIter = mFocusIDContainer.find(mCurrentFocusActor.first);
-  if(focusIDIter != mFocusIDContainer.end())
+  if (focusIDIter != mFocusIDContainer.end())
   {
-    DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] focus order : %d\n", __FUNCTION__, __LINE__, (*focusIDIter).first);
+    DALI_LOG_ERROR("[%s:%d] focus order : %d \n", __FUNCTION__, __LINE__, (*focusIDIter).first);
     ret = DoMoveFocus(focusIDIter, false, mIsWrapped);
   }
   else
   {
     // TODO: if there is not focused actor, move last actor
-    if(!mFocusIDContainer.empty())
+    if (!mFocusIDContainer.empty())
     {
       //if there is not focused actor, move last actor
       focusIDIter = mFocusIDContainer.end();
       --focusIDIter;//We want forward iterator to the last element here
-      DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] focus order : %d\n", __FUNCTION__, __LINE__, (*focusIDIter).first);
+      DALI_LOG_ERROR("[%s:%d] focus order : %d \n", __FUNCTION__, __LINE__, (*focusIDIter).first);
       ret = DoSetCurrentFocusActor((*focusIDIter).second);
     }
   }
 
-  DALI_LOG_INFO( gLogFilter, Debug::General, "[%s] %s\n", __FUNCTION__, ret?"SUCCEED!!!":"FAILED!!!");
+  DALI_LOG_ERROR("[%s] %s\n", __FUNCTION__, ret?"SUCCEED!!!":"FAILED!!!");
 
   return ret;
 }
@@ -587,7 +587,7 @@ Vector2 AccessibilityManager::GetReadPosition() const
 
 void AccessibilityManager::EnableAccessibility(bool enabled)
 {
-  DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Set Enabled Forcibly : %d \n", __FUNCTION__, __LINE__, enabled );
+  DALI_LOG_ERROR("[%s:%d] Set Enabled Forcibly : %d\n", __FUNCTION__, __LINE__, enabled);
   AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
   adaptor.EnableAccessibility(enabled);
 }
@@ -662,8 +662,8 @@ Actor AccessibilityManager::GetFocusIndicatorActor()
 
 bool AccessibilityManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapped)
 {
-  DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] %d focusable actors\n", __FUNCTION__, __LINE__, mFocusIDContainer.size());
-  DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] focus order : %d\n", __FUNCTION__, __LINE__, (*focusIDIter).first);
+  DALI_LOG_ERROR("[%s:%d] %d focusable actors\n", __FUNCTION__, __LINE__, mFocusIDContainer.size());
+  DALI_LOG_ERROR("[%s:%d] focus order : %d\n", __FUNCTION__, __LINE__, (*focusIDIter).first);
 
   if( (forward && ++focusIDIter == mFocusIDContainer.end())
     || (!forward && focusIDIter-- == mFocusIDContainer.begin()) )
@@ -705,7 +705,7 @@ bool AccessibilityManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bo
     }
     else
     {
-      DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Overshot\n", __FUNCTION__, __LINE__);
+      DALI_LOG_ERROR("[%s:%d] Overshot\n", __FUNCTION__, __LINE__);
       // Send notification for handling overshooted situation
       mFocusOvershotSignal.Emit(GetCurrentFocusActor(), forward ? Toolkit::AccessibilityManager::OVERSHOT_NEXT : Toolkit::AccessibilityManager::OVERSHOT_PREVIOUS);
 
@@ -755,7 +755,7 @@ bool AccessibilityManager::ChangeAccessibilityStatus()
   mIsAccessibilityTtsEnabled = adaptor.IsEnabled();
   Dali::Toolkit::AccessibilityManager handle( this );
 
-  DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] TtsEnabled : %d \n", __FUNCTION__, __LINE__, mIsAccessibilityTtsEnabled );
+  DALI_LOG_ERROR("[%s:%d] TtsEnabled : %d \n", __FUNCTION__, __LINE__, mIsAccessibilityTtsEnabled);
 
   if(mIsAccessibilityTtsEnabled)
   {
@@ -856,40 +856,40 @@ bool AccessibilityManager::AccessibilityActionActivate()
 
 bool AccessibilityManager::AccessibilityActionRead(bool allowReadAgain)
 {
-  Dali::Toolkit::AccessibilityManager handle( this );
+  Dali::Toolkit::AccessibilityManager handle(this);
 
-  if( allowReadAgain )
+  if (allowReadAgain)
   {
-    if ( !mActionReadSignal.Empty() )
+    if (!mActionReadSignal.Empty())
     {
-      mActionReadSignal.Emit( handle );
+      mActionReadSignal.Emit(handle);
     }
   }
   else
   {
-    if ( !mActionOverSignal.Empty() )
+    if (!mActionOverSignal.Empty())
     {
-      mActionOverSignal.Emit( handle );
+      mActionOverSignal.Emit(handle);
     }
   }
 
   bool ret = false;
 
-  if(mIsAccessibilityTtsEnabled)
+  if (mIsAccessibilityTtsEnabled)
   {
     // Find the focusable actor at the read position
     AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
     Dali::HitTestAlgorithm::Results results;
-    Dali::HitTestAlgorithm::HitTest( Stage::GetCurrent(), adaptor.GetReadPosition(), results, IsActorFocusableFunction );
+    Dali::HitTestAlgorithm::HitTest(Stage::GetCurrent(), adaptor.GetReadPosition(), results, IsActorFocusableFunction);
 
     FocusIDIter focusIDIter = mFocusIDContainer.find(GetFocusOrder(results.actor));
-    if(focusIDIter != mFocusIDContainer.end())
+    if (focusIDIter != mFocusIDContainer.end())
     {
-      if( allowReadAgain || (results.actor != GetCurrentFocusActor()) )
+      if (allowReadAgain || (results.actor != GetCurrentFocusActor()))
       {
         // Move the focus to the actor
         ret = SetCurrentFocusActor(results.actor);
-        DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] SetCurrentFocusActor returns %s\n", __FUNCTION__, __LINE__, ret?"TRUE":"FALSE");
+        DALI_LOG_ERROR("[%s:%d] SetCurrentFocusActor returns %s\n", __FUNCTION__, __LINE__, ret?"TRUE":"FALSE");
       }
     }
   }
