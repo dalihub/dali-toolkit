@@ -57,19 +57,18 @@ namespace rs = RendererState;
 
 namespace
 {
-const std::string NODES         = "nodes";
-const std::string SCENES        = "scenes";
-const std::string NODE          = "node";
-const std::string URI           = "uri";
-const std::string URL           = "url";
-const std::string CUSTOMIZATION = "customization";
-const std::string HINTS         = "hints";
-const std::string NAME("name");
-const std::string BLEND_SHAPE_HEADER("blendShapeHeader");
-const std::string BLEND_SHAPES("blendShapes");
-const std::string BLEND_SHAPE_VERSION_1_0("1.0");
-const std::string BLEND_SHAPE_VERSION_2_0("2.0");
-const std::string VERSION("version");
+const char* NODES         = "nodes";
+const char* SCENES        = "scenes";
+const char* NODE          = "node";
+const char* URI           = "uri";
+const char* URL           = "url";
+const char* HINTS         = "hints";
+const char* NAME("name");
+const char* BLEND_SHAPE_HEADER("blendShapeHeader");
+const char* BLEND_SHAPES("blendShapes");
+const char* BLEND_SHAPE_VERSION_1_0("1.0");
+const char* BLEND_SHAPE_VERSION_2_0("2.0");
+const char* VERSION("version");
 
 const char* const SHADOW_MAP_SIZE   = "shadowMapSize";
 const char* const ORTHOGRAPHIC_SIZE = "orthographicSize";

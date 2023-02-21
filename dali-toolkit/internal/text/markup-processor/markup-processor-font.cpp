@@ -37,9 +37,6 @@ namespace Text
 {
 namespace
 {
-const std::string  FONT_PREFIX("font-");
-const unsigned int FONT_PREFIX_LENGTH      = 5u;
-const unsigned int MIN_FONT_ATTRIBUTE_SIZE = 4u;   ///< The minimum length of any of the possible 'weight', 'width' , 'slant' or 'size' values.
 const unsigned int MAX_FONT_ATTRIBUTE_SIZE = 15u;  ///< The maximum length of any of the possible 'weight', 'width' or 'slant' values.
 const float        PIXEL_FORMAT_64_FACTOR  = 64.f; ///< 64.f is used to convert from point size to 26.6 pixel format.
 } // namespace

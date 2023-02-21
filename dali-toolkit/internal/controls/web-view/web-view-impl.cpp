@@ -51,6 +51,7 @@
 
 #include <functional>
 #include <memory>
+#include <unordered_map>
 
 namespace Dali
 {
@@ -89,9 +90,12 @@ DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "loadProgressPercentage",  FLOAT,  
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
 
+std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>>& GetPluginWebViewTable()
+{
+  static std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>> pluginWebViewMap;
+  return pluginWebViewMap;
+}
 } // namespace
-
-std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>> WebView::mPluginWebViewMap;
 
 WebView::WebView(const std::string& locale, const std::string& timezoneId)
 : Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
@@ -144,10 +148,10 @@ WebView::~WebView()
 {
   if(mWebEngine)
   {
-    auto iter = mPluginWebViewMap.find(mWebEngine.GetPlugin());
-    if (iter != mPluginWebViewMap.end())
+    auto iter = GetPluginWebViewTable().find(mWebEngine.GetPlugin());
+    if (iter != GetPluginWebViewTable().end())
     {
-      mPluginWebViewMap.erase(iter);
+      GetPluginWebViewTable().erase(iter);
     }
     mWebEngine.Destroy();
   }
@@ -159,7 +163,7 @@ Toolkit::WebView WebView::New()
   Toolkit::WebView handle = Toolkit::WebView(*impl);
   if (impl->GetPlugin())
   {
-    mPluginWebViewMap[impl->GetPlugin()] = handle;
+    GetPluginWebViewTable()[impl->GetPlugin()] = handle;
   }
   impl->Initialize();
   return handle;
@@ -171,7 +175,7 @@ Toolkit::WebView WebView::New(const std::string& locale, const std::string& time
   Toolkit::WebView handle = Toolkit::WebView(*impl);
   if (impl->GetPlugin())
   {
-    mPluginWebViewMap[impl->GetPlugin()] = handle;
+    GetPluginWebViewTable()[impl->GetPlugin()] = handle;
   }
   impl->Initialize();
   return handle;
@@ -183,7 +187,7 @@ Toolkit::WebView WebView::New(uint32_t argc, char** argv)
   Toolkit::WebView handle = Toolkit::WebView(*impl);
   if (impl->GetPlugin())
   {
-    mPluginWebViewMap[impl->GetPlugin()] = handle;
+    GetPluginWebViewTable()[impl->GetPlugin()] = handle;
   }
   impl->Initialize();
   return handle;
@@ -191,8 +195,8 @@ Toolkit::WebView WebView::New(uint32_t argc, char** argv)
 
 Toolkit::WebView WebView::FindWebView(Dali::WebEnginePlugin* plugin)
 {
-  auto iter = mPluginWebViewMap.find(plugin);
-  if (iter != mPluginWebViewMap.end())
+  auto iter = GetPluginWebViewTable().find(plugin);
+  if (iter != GetPluginWebViewTable().end())
   {
     return iter->second.GetHandle();
   }

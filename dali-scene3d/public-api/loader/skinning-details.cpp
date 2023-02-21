@@ -27,8 +27,7 @@ namespace Loader
 {
 const unsigned int Skinning::MAX_JOINTS = 64;
 
-const std::string Skinning::BONE_UNIFORM_NAME = "uBone";
-
+const char* Skinning::BONE_UNIFORM_NAME = "uBone";
 } // namespace Loader
 } // namespace Scene3D
 } // namespace Dali

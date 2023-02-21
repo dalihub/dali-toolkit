@@ -850,6 +850,32 @@ int UtcDaliTextControllerCheckBufferIndices(void)
   const Size size( application.GetScene().GetSize() );
   controller->Relayout(size);
 
+  // Set the text
+  const std::string emptyText("");
+  controller->SetText(emptyText);
+
+  // Tweak some parameters to make the indices to access the text buffer invalid
+  mImpl.mTextUpdateInfo.mNumberOfCharactersToAdd = 10u;
+  mImpl.mTextUpdateInfo.mNumberOfCharactersToRemove = 0u;
+  mImpl.mTextUpdateInfo.mPreviousNumberOfCharacters = 0u;
+  mImpl.mOperationsPending = Controller::ALL_OPERATIONS;
+
+  // Perform a relayout
+  controller->Relayout(size);
+
+  // Set the text
+  controller->SetText(text);
+
+  // Set the text size
+  controller->SetDefaultFontSize(10.f, Controller::POINT_SIZE);
+
+  // Tweak some parameters to make the indices to access the text buffer invalid
+  mImpl.mTextUpdateInfo.Clear();
+
+  // Perform a relayout
+  controller->GetHeightForWidth(size.width / 2.f);
+  controller->Relayout(size);
+
   tet_result(TET_PASS);
 
   END_TEST;

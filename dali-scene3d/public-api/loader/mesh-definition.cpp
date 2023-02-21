@@ -20,10 +20,12 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/file-stream.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/math/compile-time-math.h>
 #include <cstring>
 #include <fstream>
-#include "dali/devel-api/adaptor-framework/pixel-buffer.h"
+#include <type_traits>
 
 namespace Dali
 {
@@ -65,7 +67,7 @@ private:
   uint16_t (*mFunc)(uintptr_t&);
 };
 
-const std::string QUAD("quad");
+const char* QUAD("quad");
 
 ///@brief Reads a blob from the given stream @a source into @a target, which must have
 /// at least @a descriptor.length bytes.
@@ -247,83 +249,90 @@ void GenerateNormals(MeshDefinition::RawData& raw)
   attribs.push_back({"aNormal", Property::VECTOR3, attribs[0].mNumElements, std::move(buffer)});
 }
 
-void GenerateTangentsWithUvs(MeshDefinition::RawData& raw)
+template<bool useVec3, bool hasUvs, typename T = std::conditional_t<useVec3, Vector3, Vector4>, typename = std::enable_if_t<(std::is_same<T, Vector3>::value || std::is_same<T, Vector4>::value)>>
+bool GenerateTangents(MeshDefinition::RawData& raw)
 {
   auto& attribs = raw.mAttribs;
-  DALI_ASSERT_DEBUG(attribs.size() > 2); // positions, normals, uvs
-  IndexProvider getIndex(raw.mIndices.data());
-
-  const uint32_t numIndices = raw.mIndices.empty() ? attribs[0].mNumElements : static_cast<uint32_t>(raw.mIndices.size());
-
-  auto* positions = reinterpret_cast<const Vector3*>(attribs[0].mData.data());
-  auto* uvs       = reinterpret_cast<const Vector2*>(attribs[2].mData.data());
-
-  std::vector<uint8_t> buffer(attribs[0].mNumElements * sizeof(Vector3));
-  auto                 tangents = reinterpret_cast<Vector3*>(buffer.data());
-
-  for(uint32_t i = 0; i < numIndices; i += 3)
+  // Required positions, normals, uvs (if we have). If not, skip generation
+  if(attribs.size() < (2 + static_cast<size_t>(hasUvs)))
   {
-    uint16_t indices[]{getIndex(), getIndex(), getIndex()};
-    Vector3  pos[]{positions[indices[0]], positions[indices[1]], positions[indices[2]]};
-    Vector2  uv[]{uvs[indices[0]], uvs[indices[1]], uvs[indices[2]]};
+    return false;
+  }
 
-    float x0 = pos[1].x - pos[0].x;
-    float y0 = pos[1].y - pos[0].y;
-    float z0 = pos[1].z - pos[0].z;
+  std::vector<uint8_t> buffer(attribs[0].mNumElements * sizeof(T));
+  auto                 tangents = reinterpret_cast<T*>(buffer.data());
 
-    float x1 = pos[2].x - pos[0].x;
-    float y1 = pos[2].y - pos[0].y;
-    float z1 = pos[2].z - pos[0].z;
+  if constexpr(hasUvs)
+  {
+    IndexProvider  getIndex(raw.mIndices.data());
+    const uint32_t numIndices = raw.mIndices.empty() ? attribs[0].mNumElements : static_cast<uint32_t>(raw.mIndices.size());
 
-    float s0 = uv[1].x - uv[0].x;
-    float t0 = uv[1].y - uv[0].y;
+    auto* positions = reinterpret_cast<const Vector3*>(attribs[0].mData.data());
+    auto* uvs       = reinterpret_cast<const Vector2*>(attribs[2].mData.data());
 
-    float s1 = uv[2].x - uv[0].x;
-    float t1 = uv[2].y - uv[0].y;
+    for(uint32_t i = 0; i < numIndices; i += 3)
+    {
+      uint16_t indices[]{getIndex(), getIndex(), getIndex()};
+      Vector3  pos[]{positions[indices[0]], positions[indices[1]], positions[indices[2]]};
+      Vector2  uv[]{uvs[indices[0]], uvs[indices[1]], uvs[indices[2]]};
 
-    float   r = 1.f / (s0 * t1 - t0 * s1);
-    Vector3 tangent((x0 * t1 - t0 * x1) * r, (y0 * t1 - t0 * y1) * r, (z0 * t1 - t0 * z1) * r);
-    tangents[indices[0]] += tangent;
-    tangents[indices[1]] += tangent;
-    tangents[indices[2]] += tangent;
+      float x0 = pos[1].x - pos[0].x;
+      float y0 = pos[1].y - pos[0].y;
+      float z0 = pos[1].z - pos[0].z;
+
+      float x1 = pos[2].x - pos[0].x;
+      float y1 = pos[2].y - pos[0].y;
+      float z1 = pos[2].z - pos[0].z;
+
+      float s0 = uv[1].x - uv[0].x;
+      float t0 = uv[1].y - uv[0].y;
+
+      float s1 = uv[2].x - uv[0].x;
+      float t1 = uv[2].y - uv[0].y;
+
+      float   det = (s0 * t1 - t0 * s1);
+      float   r   = 1.f / ((std::abs(det) < Dali::Epsilon<1000>::value) ? (Dali::Epsilon<1000>::value * (det > 0.0f ? 1.f : -1.f)) : det);
+      Vector3 tangent((x0 * t1 - t0 * x1) * r, (y0 * t1 - t0 * y1) * r, (z0 * t1 - t0 * z1) * r);
+      tangents[indices[0]] += T(tangent);
+      tangents[indices[1]] += T(tangent);
+      tangents[indices[2]] += T(tangent);
+    }
   }
 
   auto* normals = reinterpret_cast<const Vector3*>(attribs[1].mData.data());
   auto  iEnd    = normals + attribs[1].mNumElements;
   while(normals != iEnd)
   {
-    *tangents -= *normals * normals->Dot(*tangents);
-    tangents->Normalize();
+    Vector3 tangentVec3;
+    if constexpr(hasUvs)
+    {
+      // Calculated by indexs
+      tangentVec3 = Vector3((*tangents).x, (*tangents).y, (*tangents).z);
+    }
+    else
+    {
+      // Only choiced by normal vector. by indexs
+      Vector3 t[]{normals->Cross(Vector3::XAXIS), normals->Cross(Vector3::YAXIS)};
+      tangentVec3 = t[t[1].LengthSquared() > t[0].LengthSquared()];
+    }
+
+    tangentVec3 -= *normals * normals->Dot(tangentVec3);
+    tangentVec3.Normalize();
+    if constexpr(useVec3)
+    {
+      *tangents = tangentVec3;
+    }
+    else
+    {
+      *tangents = Vector4(tangentVec3.x, tangentVec3.y, tangentVec3.z, 1.0f);
+    }
 
     ++tangents;
     ++normals;
   }
-  attribs.push_back({"aTangent", Property::VECTOR3, attribs[0].mNumElements, std::move(buffer)});
-}
+  attribs.push_back({"aTangent", useVec3 ? Property::VECTOR3 : Property::VECTOR4, attribs[0].mNumElements, std::move(buffer)});
 
-void GenerateTangents(MeshDefinition::RawData& raw)
-{
-  auto& attribs = raw.mAttribs;
-  DALI_ASSERT_DEBUG(attribs.size() > 1); // positions, normals
-
-  auto* normals = reinterpret_cast<const Vector3*>(attribs[1].mData.data());
-
-  std::vector<uint8_t> buffer(attribs[0].mNumElements * sizeof(Vector3));
-  auto                 tangents = reinterpret_cast<Vector3*>(buffer.data());
-
-  auto iEnd = normals + attribs[1].mNumElements;
-  while(normals != iEnd)
-  {
-    Vector3 t[]{normals->Cross(Vector3::XAXIS), normals->Cross(Vector3::YAXIS)};
-
-    *tangents = t[t[1].LengthSquared() > t[0].LengthSquared()];
-    *tangents -= *normals * normals->Dot(*tangents);
-    tangents->Normalize();
-
-    ++tangents;
-    ++normals;
-  }
-  attribs.push_back({"aTangent", Property::VECTOR3, attribs[0].mNumElements, std::move(buffer)});
+  return true;
 }
 
 void CalculateTextureSize(uint32_t totalTextureSize, uint32_t& textureWidth, uint32_t& textureHeight)
@@ -833,7 +842,22 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
   else if(mTangents.mBlob.mLength != 0 && hasNormals && isTriangles)
   {
     DALI_ASSERT_DEBUG(mTangents.mBlob.mLength == mNormals.mBlob.GetBufferSize());
-    hasUvs ? GenerateTangentsWithUvs(raw) : GenerateTangents(raw);
+    static const std::function<bool(RawData&)> GenerateTangentsFunction[2][2] =
+      {
+        {
+          GenerateTangents<false, false>,
+          GenerateTangents<false, true>,
+        },
+        {
+          GenerateTangents<true, false>,
+          GenerateTangents<true, true>,
+        },
+      };
+    const bool generateSuccessed = GenerateTangentsFunction[mTangentType == Property::VECTOR3][hasUvs](raw);
+    if(!generateSuccessed)
+    {
+      DALI_LOG_ERROR("Failed to generate tangents\n");
+    }
   }
 
   if(mColors.IsDefined())

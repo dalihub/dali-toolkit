@@ -32,13 +32,13 @@ namespace Scene3D
 {
 namespace Loader
 {
-const std::string BlendShapes::NUMBER_OF_BLEND_SHAPES("uNumberOfBlendShapes");
-const std::string BlendShapes::UNNORMALIZE_FACTOR("uBlendShapeUnnormalizeFactor");
-const std::string BlendShapes::COMPONENT_SIZE("uBlendShapeComponentSize");
+const char* BlendShapes::NUMBER_OF_BLEND_SHAPES("uNumberOfBlendShapes");
+const char* BlendShapes::UNNORMALIZE_FACTOR("uBlendShapeUnnormalizeFactor");
+const char* BlendShapes::COMPONENT_SIZE("uBlendShapeComponentSize");
 
-const std::string BlendShapes::COMPONENTS("blendShapeComponents");
+const char* BlendShapes::COMPONENTS("blendShapeComponents");
 
-const std::string BlendShapes::WEIGHTS_UNIFORM("uBlendShapeWeight");
+const char* BlendShapes::WEIGHTS_UNIFORM("uBlendShapeWeight");
 
 void BlendShapes::ConfigureProperties(const std::pair<MeshDefinition, MeshGeometry>& mesh, Shader shader, Actor actor)
 {
@@ -46,8 +46,8 @@ void BlendShapes::ConfigureProperties(const std::pair<MeshDefinition, MeshGeomet
 
   char        weightNameBuffer[32];
   char        unnormalizeFactorNameBuffer[64];
-  char* const pWeightName = weightNameBuffer + snprintf(weightNameBuffer, sizeof(weightNameBuffer), "%s", WEIGHTS_UNIFORM.c_str());
-  char* const pFactorName = unnormalizeFactorNameBuffer + snprintf(unnormalizeFactorNameBuffer, sizeof(unnormalizeFactorNameBuffer), "%s", UNNORMALIZE_FACTOR.c_str());
+  char* const pWeightName = weightNameBuffer + snprintf(weightNameBuffer, sizeof(weightNameBuffer), "%s", WEIGHTS_UNIFORM);
+  char* const pFactorName = unnormalizeFactorNameBuffer + snprintf(unnormalizeFactorNameBuffer, sizeof(unnormalizeFactorNameBuffer), "%s", UNNORMALIZE_FACTOR);
   for(const auto& blendShape : mesh.first.mBlendShapes)
   {
     snprintf(pWeightName, sizeof(weightNameBuffer) - (pWeightName - weightNameBuffer), "[%d]", index);

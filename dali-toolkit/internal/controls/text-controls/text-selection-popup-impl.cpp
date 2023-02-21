@@ -57,7 +57,7 @@ namespace
 #define GET_LOCALE_TEXT(string) dgettext("dali-toolkit", string)
 #endif
 
-const std::string   TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME("TextSelectionPopupButton");
+const char*   TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME("TextSelectionPopupButton");
 const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR(Dali::Vector4(0.24f, 0.72f, 0.8f, 1.0f));
 const float         DEFAULT_OPTION_PRESSED_CORNER_RADIUS = 0.0f;
 const Dali::Vector4 DEFAULT_LABEL_PADDING(Dali::Vector4(24.0f, 24.0f, 14.0f, 14.0f));
@@ -93,8 +93,8 @@ const char* const OPTION_COPY("optionCopy");                 // "Copy" popup opt
 const char* const OPTION_PASTE("optionPaste");               // "Paste" popup option.
 const char* const OPTION_CLIPBOARD("optionClipboard");       // "Clipboard" popup option.
 
-const std::string IDS_LTR("IDS_LTR");
-const std::string RTL_DIRECTION("RTL");
+const char* IDS_LTR("IDS_LTR");
+const char* RTL_DIRECTION("RTL");
 
 BaseHandle Create()
 {
@@ -726,10 +726,10 @@ void TextSelectionPopup::AddPopupOptionsToToolbar(bool showIcons, bool showCapti
   // Whether to mirror the list of buttons (for right to left languages)
   bool mirror = false;
 #if defined(__GLIBC__)
-  char* idsLtr = GET_LOCALE_TEXT(IDS_LTR.c_str());
+  char* idsLtr = GET_LOCALE_TEXT(IDS_LTR);
   if(NULL != idsLtr)
   {
-    mirror = (0 == strcmp(idsLtr, RTL_DIRECTION.c_str()));
+    mirror = (0 == strcmp(idsLtr, RTL_DIRECTION));
 
     if(mirror)
     {

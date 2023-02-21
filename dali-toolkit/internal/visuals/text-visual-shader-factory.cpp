@@ -30,12 +30,6 @@ namespace Internal
 {
 namespace
 {
-// global string variable to caching complate vertex shader
-static std::string gVertexShader;
-
-// global string variable to caching complate fragment shader (no atlas)
-static std::string gFragmentShaderNoAtlas;
-
 // enum of required list when we select shader
 enum class TextVisualRequireFlag : uint32_t
 {

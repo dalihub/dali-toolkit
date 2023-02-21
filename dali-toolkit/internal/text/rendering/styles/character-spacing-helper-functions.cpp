@@ -24,10 +24,6 @@ namespace Toolkit
 {
 namespace Text
 {
-namespace
-{
-static const Vector<CharacterSpacingGlyphRun> EMPTY_CHARACTER_SPACING_GLYPH_RUNS;
-}
 float GetGlyphCharacterSpacing(const GlyphIndex&                       index,
                                const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns,
                                const float                             modelCharacterSpacing)
@@ -49,12 +45,6 @@ float GetGlyphCharacterSpacing(const GlyphIndex&                       index,
   }
 
   return characterSpacing;
-}
-
-const Vector<CharacterSpacingGlyphRun>& GetEmptyCharacterSpacingGlyphRuns()
-{
-  // This is needed to return a common empty vector for CharacterSpacingGlyphRun
-  return EMPTY_CHARACTER_SPACING_GLYPH_RUNS;
 }
 } // namespace Text
 

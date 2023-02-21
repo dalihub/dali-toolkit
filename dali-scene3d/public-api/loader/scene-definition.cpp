@@ -45,7 +45,7 @@ namespace Loader
 {
 namespace
 {
-const std::string JOINT_MATRIX{"jointMatrix"};
+const char* JOINT_MATRIX{"jointMatrix"};
 
 const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)> sConstraintFactory = {
   {Property::Type::BOOLEAN,
@@ -305,7 +305,7 @@ void ConfigureBoneMatrix(const Matrix& ibm, Actor joint, Shader& shader, Index& 
 {
   // Register bone transform on shader.
   char propertyNameBuffer[32];
-  snprintf(propertyNameBuffer, sizeof(propertyNameBuffer), "%s[%d]", Skinning::BONE_UNIFORM_NAME.c_str(), boneIdx);
+  snprintf(propertyNameBuffer, sizeof(propertyNameBuffer), "%s[%d]", Skinning::BONE_UNIFORM_NAME, boneIdx);
   DALI_ASSERT_DEBUG(shader.GetPropertyIndex(propertyNameBuffer) == Property::INVALID_INDEX);
   auto propBoneXform = shader.RegisterProperty(propertyNameBuffer, Matrix{false});
 

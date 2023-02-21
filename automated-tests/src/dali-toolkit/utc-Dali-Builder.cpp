@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1774,7 +1774,69 @@ int UtcDaliBase64EncodingP(void)
 
   std::string output;
   DALI_TEST_CHECK(value.Get(output));
-  DALI_TEST_EQUALS(output, "AAAAAAEAAAACAAAAAwAAAAQAAAAFAAAAAAAAAP////8", TEST_LOCATION);
+  DALI_TEST_EQUALS(output, "AAAAAAEAAAACAAAAAwAAAAQAAAAFAAAAAAAAAP////8=", TEST_LOCATION);
+
+  std::cout << "Output data:  " << output << std::endl;
+
+  END_TEST;
+}
+
+int UtcDaliBase64EncodingP2(void)
+{
+  std::vector<uint8_t> data = {0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0, std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max(), std::numeric_limits<uint8_t>::max(), std::numeric_limits<uint8_t>::max(), std::numeric_limits<uint8_t>::max()};
+
+  Property::Value value;
+  EncodeBase64PropertyData(value, data);
+
+  std::cout << "Input data:  ";
+  std::ostream_iterator<uint32_t> out_it(std::cout, ", ");
+  std::copy(data.begin(), data.end(), out_it);
+  std::cout << std::endl;
+
+  std::string output;
+  DALI_TEST_CHECK(value.Get(output));
+  DALI_TEST_EQUALS(output, "AAAAAAEAAAACAAAAAwAAAAQAAAAFAAAAAAAAAP////8=", TEST_LOCATION);
+
+  std::cout << "Output data:  " << output << std::endl;
+
+  END_TEST;
+}
+
+int UtcDaliBase64EncodingP3(void)
+{
+  std::string originalData = "Something Longer than 64 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/==  length is 106";
+  originalData.push_back(-4);
+  originalData.push_back(-7); // some kind of non-ascii.
+  originalData.push_back(0);
+  originalData.push_back(0);
+  originalData.push_back(2);
+  originalData.push_back(2);
+  originalData.push_back(2);
+
+  std::vector<uint8_t> data(originalData.begin(), originalData.end());
+
+  Dali::Property::Value value;
+  EncodeBase64PropertyData(value, data);
+
+  std::cout << "Input data:  ";
+  std::ostream_iterator<uint8_t> out_it(std::cout, ", ");
+  std::copy(data.begin(), data.end(), out_it);
+  std::cout << std::endl;
+
+  std::string           output;
+  Dali::Property::Array array;
+  DALI_TEST_CHECK(value.GetArray());
+  array = *value.GetArray();
+  DALI_TEST_EQUALS(array.Count(), 3, TEST_LOCATION);
+  DALI_TEST_CHECK(array[0].Get(output));
+  std::cout << "first string :  " << output << std::endl;
+  DALI_TEST_EQUALS(output, "U29tZXRoaW5nIExvbmdlciB0aGFuIDY0IEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZX", TEST_LOCATION);
+  DALI_TEST_CHECK(array[1].Get(output));
+  std::cout << "second string : " << output << std::endl;
+  DALI_TEST_EQUALS(output, "WFlaYWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXowMTIzNDU2Nzg5Ky89PSAgbGVu", TEST_LOCATION);
+  DALI_TEST_CHECK(array[2].Get(output));
+  std::cout << "third string : " << output << std::endl;
+  DALI_TEST_EQUALS(output, "Z3RoIGlzIDEwNvz5AAACAgI=", TEST_LOCATION);
 
   std::cout << "Output data:  " << output << std::endl;
 
@@ -1793,14 +1855,22 @@ int UtcDaliBase64EncodingN(void)
   DALI_TEST_CHECK(value.Get(output));
   DALI_TEST_EQUALS(output.empty(), true, TEST_LOCATION);
 
+  std::vector<uint8_t> data2;
+  EncodeBase64PropertyData(value, data2);
+
+  DALI_TEST_CHECK(value.Get(output));
+  DALI_TEST_EQUALS(output.empty(), true, TEST_LOCATION);
+
   END_TEST;
 }
 
 template<typename T>
 int b64l(std::vector<T>& data)
 {
-  auto lengthInBytes = 4 * data.size();
-  return ceil(lengthInBytes * 1.33333f);
+  auto lengthInBytes = sizeof(T) * data.size();
+  // base64 encode each 3-byte as 4-byte.
+  // return ceil(lengthInBytes / 3) * 4
+  return (lengthInBytes + 2) / 3 * 4;
 }
 
 int UtcDaliBase64EncodingP02(void)
@@ -1969,6 +2039,10 @@ int UtcDaliBase64DecodingN01(void)
   std::vector<uint32_t> outputData;
   DecodeBase64PropertyData(value, outputData);
   DALI_TEST_EQUALS(outputData.size(), 0, TEST_LOCATION);
+
+  std::vector<uint8_t> outputData2;
+  DecodeBase64PropertyData(value, outputData2);
+  DALI_TEST_EQUALS(outputData2.size(), 0, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1985,6 +2059,10 @@ int UtcDaliBase64DecodingN02(void)
   std::vector<uint32_t> outputData;
   DecodeBase64PropertyData(value, outputData);
   DALI_TEST_EQUALS(outputData.size(), 0, TEST_LOCATION);
+
+  std::vector<uint8_t> outputData2;
+  DecodeBase64PropertyData(value, outputData2);
+  DALI_TEST_EQUALS(outputData2.size(), 0, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1997,6 +2075,36 @@ int UtcDaliBase64DecodingP01(void)
 
   std::vector<uint32_t> outputData;
   DecodeBase64PropertyData(Property::Value(testInput), outputData);
+
+  DALI_TEST_EQUALS(std::equal(expectedResults.begin(), expectedResults.end(), outputData.begin()), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliBase64DecodingP02(void)
+{
+  tet_infoline("Test decoding string of known data gives expected result");
+
+  std::string          testInput("//////7+/v4DAgEA");
+  std::vector<uint8_t> expectedResults = {0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfe, 0x03, 0x02, 0x01, 0x00};
+
+  std::vector<uint8_t> outputData;
+  DecodeBase64PropertyData(Property::Value(testInput), outputData);
+
+  DALI_TEST_EQUALS(std::equal(expectedResults.begin(), expectedResults.end(), outputData.begin()), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliBase64DecodingFromString(void)
+{
+  tet_infoline("Test decoding string of known data gives expected result");
+
+  std::string          testInput("//////7+/v4DAgEA");
+  std::vector<uint8_t> expectedResults = {0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfe, 0x03, 0x02, 0x01, 0x00};
+
+  std::vector<uint8_t> outputData;
+  DecodeBase64FromString(testInput, outputData);
 
   DALI_TEST_EQUALS(std::equal(expectedResults.begin(), expectedResults.end(), outputData.begin()), true, TEST_LOCATION);
 

@@ -25,7 +25,6 @@
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/property-notification.h>
 #include <memory>
-#include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-accessible.h>
@@ -725,8 +724,6 @@ private:
 
   Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback mScreenshotCapturedCallback;
   Dali::WebEnginePlugin::WebEngineFrameRenderedCallback     mFrameRenderedCallback;
-
-  static std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>> mPluginWebViewMap;
 };
 
 } // namespace Internal

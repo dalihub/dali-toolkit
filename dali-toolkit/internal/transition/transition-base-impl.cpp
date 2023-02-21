@@ -36,20 +36,6 @@ namespace Internal
 {
 namespace
 {
-static constexpr float OPACITY_TRANSPARENT = 0.0f;
-
-const Dali::AlphaFunction DEFAULT_ALPHA_FUNCTION(Dali::AlphaFunction::DEFAULT);
-
-const Property::Map PROPERTY_MAP_INDEPENDENT_CONTROL{
-  {Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER},
-  {Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER},
-  {Dali::Actor::Property::POSITION_USES_ANCHOR_POINT, true},
-  {Dali::Actor::Property::INHERIT_POSITION, false},
-  {Dali::Actor::Property::INHERIT_ORIENTATION, false},
-  {Dali::Actor::Property::INHERIT_SCALE, false},
-  {Dali::Actor::Property::COLOR_MODE, Dali::ColorMode::USE_OWN_COLOR},
-};
-
 Property::Map GetOriginalProperties(Dali::Toolkit::Control control)
 {
   Property::Map propertyMap;
@@ -69,7 +55,6 @@ Property::Map GetOriginalProperties(Dali::Toolkit::Control control)
 
   return propertyMap;
 }
-
 } // anonymous namespace
 
 TransitionBasePtr TransitionBase::New()
@@ -83,7 +68,7 @@ TransitionBasePtr TransitionBase::New()
 }
 
 TransitionBase::TransitionBase()
-: mAlphaFunction(DEFAULT_ALPHA_FUNCTION),
+: mAlphaFunction(Dali::AlphaFunction::DEFAULT),
   mTimePeriod(TimePeriod(0.0f)),
   mTransitionWithChild(false),
   mMoveTargetChildren(false),
@@ -159,7 +144,14 @@ void TransitionBase::Play()
   targetWorldTransform.GetTransformComponents(targetPosition, targetOrientation, targetScale);
   Vector4 targetColor = DevelActor::GetWorldColor(mTarget);
 
-  mTarget.SetProperties(PROPERTY_MAP_INDEPENDENT_CONTROL);
+  mTarget[Dali::Actor::Property::ANCHOR_POINT]               = AnchorPoint::CENTER;
+  mTarget[Dali::Actor::Property::PARENT_ORIGIN]              = ParentOrigin::CENTER;
+  mTarget[Dali::Actor::Property::POSITION_USES_ANCHOR_POINT] = true;
+  mTarget[Dali::Actor::Property::INHERIT_POSITION]           = false;
+  mTarget[Dali::Actor::Property::INHERIT_ORIENTATION]        = false;
+  mTarget[Dali::Actor::Property::INHERIT_SCALE]              = false;
+  mTarget[Dali::Actor::Property::COLOR_MODE]                 = Dali::ColorMode::USE_OWN_COLOR;
+
   mTarget[Dali::Actor::Property::POSITION]    = targetPosition;
   mTarget[Dali::Actor::Property::SCALE]       = targetScale;
   mTarget[Dali::Actor::Property::ORIENTATION] = targetOrientation;

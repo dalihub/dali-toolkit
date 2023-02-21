@@ -43,7 +43,7 @@ namespace Loader
 {
 namespace
 {
-const std::string PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME = "brdfLUT.png";
+const char* PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME = "brdfLUT.png";
 }
 
 EnvironmentDefinition::RawData

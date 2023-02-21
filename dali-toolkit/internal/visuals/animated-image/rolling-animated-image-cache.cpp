@@ -43,9 +43,6 @@ Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "
 #else
 #define LOG_CACHE
 #endif
-
-static constexpr bool ENABLE_ORIENTATION_CORRECTION(true);
-
 } // namespace
 
 namespace Dali
