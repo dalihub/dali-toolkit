@@ -220,7 +220,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
     {
       if(!parent.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN))
       {
-        DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] Parent Actor has KEYBOARD_FOCUSABLE_CHILDREN false\n", __FUNCTION__, __LINE__);
+        DALI_LOG_DEBUG_INFO("Parent Actor has KEYBOARD_FOCUSABLE_CHILDREN false\n");
         return false;
       }
       parent = parent.GetParent();
@@ -228,6 +228,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
 
     // If developer set focus on same actor, doing nothing
     Actor currentFocusedActor = GetCurrentFocusActor();
+    DALI_LOG_DEBUG_INFO("current focused actor : [%p] new focused actor : [%p]\n", currentFocusedActor.GetObjectPtr(), actor.GetObjectPtr());
     if(actor == currentFocusedActor)
     {
       return true;
