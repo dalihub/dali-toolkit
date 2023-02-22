@@ -439,6 +439,12 @@ public:
    */
   bool IsEnabled() const;
 
+  /**
+   * @brief Checks whether Inside Fridge is shown or not.
+   * @param[in] isShown True if Inside Fridge is shown.
+   */
+  void ShowInsideFridge(bool isShown);
+
 public: // Signals
   /**
    * @brief This signal is emitted when the current focused actor is changed.

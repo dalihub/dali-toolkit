@@ -218,6 +218,11 @@ public:
    */
   bool IsEnabled() const;
 
+  /**
+   * @copydoc Toolkit::AccessibilityManager::ShowInsideFridge
+   */
+  void ShowInsideFridge(bool isShown);
+
 public:
 
   /**

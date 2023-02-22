@@ -205,6 +205,11 @@ bool AccessibilityManager::IsEnabled() const
   return GetImpl(*this).IsEnabled();
 }
 
+void AccessibilityManager::ShowInsideFridge(bool isShown)
+{
+  GetImpl(*this).ShowInsideFridge(isShown);
+}
+
 AccessibilityManager::FocusChangedSignalType& AccessibilityManager::FocusChangedSignal()
 {
   return GetImpl(*this).FocusChangedSignal();

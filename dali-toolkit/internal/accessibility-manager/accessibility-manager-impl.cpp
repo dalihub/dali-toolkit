@@ -598,6 +598,13 @@ bool AccessibilityManager::IsEnabled() const
   return adaptor.IsEnabled();
 }
 
+void AccessibilityManager::ShowInsideFridge(bool isShown)
+{
+  DALI_LOG_ERROR("[%s:%d] ShowInsideFridge : %d\n", __FUNCTION__, __LINE__, isShown);
+  AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
+  adaptor.ShowInsideFridge(isShown);
+}
+
 void AccessibilityManager::SetGroupMode(bool enabled)
 {
   mIsFocusWithinGroup = enabled;
