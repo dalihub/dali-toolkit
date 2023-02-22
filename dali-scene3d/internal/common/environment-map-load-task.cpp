@@ -58,9 +58,9 @@ bool EnvironmentMapLoadTask::HasSucceeded() const
   return mHasSucceeded;
 }
 
-Dali::Scene3D::Loader::EnvironmentMapData& EnvironmentMapLoadTask::GetEnvironmentMap()
+Dali::Texture EnvironmentMapLoadTask::GetLoadedTexture()
 {
-  return mEnvironmentMapData;
+  return (HasSucceeded()) ? mEnvironmentMapData.GetTexture() : Texture();;
 }
 
 } // namespace Internal
