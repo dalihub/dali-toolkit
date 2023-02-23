@@ -468,8 +468,10 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
   Vector<ScriptRun>::ConstIterator scriptRunEndIt          = scripts.End();
   bool                             isNewParagraphCharacter = false;
 
-  FontId                  previousEmojiFontId = 0u;
-  TextAbstraction::Script previousScript      = TextAbstraction::UNKNOWN;
+  FontId previousEmojiFontId = 0u;
+  FontId currentFontId       = 0u;
+  FontId previousFontId      = 0u;
+  TextAbstraction::Script previousScript = TextAbstraction::UNKNOWN;
 
   CharacterIndex lastCharacter = startIndex + numberOfCharacters - 1u;
   for(Length index = startIndex; index <= lastCharacter; ++index)
@@ -493,6 +495,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
 
     // Get the font for the current character.
     FontId fontId = fontClient.GetFontId(currentFontDescription, currentFontPointSize);
+    currentFontId = fontId;
 
     // Get the script for the current character.
     Script script = GetScript(index,
@@ -552,6 +555,15 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
         fontId      = previousEmojiFontId;
         isValidFont = true;
       }
+    }
+
+    if(TextAbstraction::IsSpace(character) &&
+       TextAbstraction::HasLigatureMustBreak(script) &&
+       isValidCachedDefaultFont &&
+       (isDefaultFont || (currentFontId == previousFontId)))
+    {
+      fontId      = cachedDefaultFontId;
+      isValidFont = true;
     }
 
     // If the given font is not valid, it means either:
@@ -776,6 +788,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
     // Whether the current character is a new paragraph character.
     isNewParagraphCharacter = TextAbstraction::IsNewParagraph(character);
     previousScript          = script;
+    previousFontId          = currentFontId;
   } // end traverse characters.
 
   if(0u != currentFontRun.characterRun.numberOfCharacters)
