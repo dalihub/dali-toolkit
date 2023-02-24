@@ -42,6 +42,14 @@ struct BufferDefinition::Impl
   std::shared_ptr<Dali::FileStream> stream;
 };
 
+BufferDefinition::BufferDefinition(std::vector<uint8_t>& buffer)
+: mImpl{new BufferDefinition::Impl}
+{
+  mImpl.get()->buffer = std::move(buffer);
+  mImpl.get()->stream = std::make_shared<Dali::FileStream>(reinterpret_cast<uint8_t*>(mImpl.get()->buffer.data()), mImpl.get()->buffer.size(), FileStream::READ | FileStream::BINARY);
+  mIsEmbedded         = true;
+}
+
 BufferDefinition::BufferDefinition()
 : mImpl{new BufferDefinition::Impl}
 {

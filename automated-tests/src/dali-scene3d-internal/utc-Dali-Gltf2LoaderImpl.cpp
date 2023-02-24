@@ -55,7 +55,8 @@ namespace
 {
 struct Context
 {
-  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type) {
+  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type)
+  {
     return TEST_RESOURCE_DIR "/";
   };
 
@@ -483,7 +484,8 @@ int UtcDaliGltfLoaderSuccessShort(void)
   TestApplication app;
 
   const std::string resourcePath = TEST_RESOURCE_DIR "/";
-  auto              pathProvider = [resourcePath](ResourceType::Value) {
+  auto              pathProvider = [resourcePath](ResourceType::Value)
+  {
     return resourcePath;
   };
 

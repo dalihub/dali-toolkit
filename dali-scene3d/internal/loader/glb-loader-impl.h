@@ -1,5 +1,5 @@
-#ifndef DALI_SCENE3D_LOADER_GLTF2_LOADER_IMPL_H
-#define DALI_SCENE3D_LOADER_GLTF2_LOADER_IMPL_H
+#ifndef DALI_SCENE3D_LOADER_GLB_LOADER_IMPL_H
+#define DALI_SCENE3D_LOADER_GLB_LOADER_IMPL_H
 /*
  * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
@@ -34,7 +34,7 @@ namespace Loader
 namespace Internal
 {
 
-class Gltf2LoaderImpl : public ModelLoaderImpl
+class GlbLoaderImpl : public ModelLoaderImpl
 {
 public:
 
@@ -49,4 +49,4 @@ public:
 } // namespace Scene3D
 } // namespace Dali
 
-#endif // DALI_SCENE3D_LOADER_GLTF2_LOADER_IMPL_H
+#endif // DALI_SCENE3D_LOADER_GLB_LOADER_IMPL_H
