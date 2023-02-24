@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_CAMERA_PARAMETERS_H
 #define DALI_SCENE3D_LOADER_CAMERA_PARAMETERS_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,13 @@
  */
 
 // INTERNAL INCLUDES
-#include "dali-scene3d/public-api/api.h"
-#include "dali-scene3d/public-api/loader/view-projection.h"
+#include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/loader/view-projection.h>
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/math/matrix.h"
-#include "dali/public-api/math/vector3.h"
+#include <dali/public-api/math/degree.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/vector3.h>
 
 namespace Dali
 {
@@ -35,10 +36,11 @@ namespace Loader
 {
 struct DALI_SCENE3D_API CameraParameters
 {
+  // TODO : Is these default value has is meaning?
   Matrix matrix           = Matrix::IDENTITY;
   float  orthographicSize = 1.f;
   float  aspectRatio      = 1.f;
-  float  yFov             = 60.f;
+  Degree yFovDegree       = Degree(60.f);
   float  zNear            = 0.1f;
   float  zFar             = 1000.f;
   bool   isPerspective    = true;
@@ -58,8 +60,10 @@ struct DALI_SCENE3D_API CameraParameters
    * @brief Configures the camera in the way that it is supposed to be used with
    *        scene3d scenes. This means inverted Y and a rotation of 180 degrees
    *        along the Y axis, plus whatever the parameters define.
+   *
+   * @return True if success to generate camera. False otherwise.
    */
-  void ConfigureCamera(CameraActor& camera) const;
+  bool ConfigureCamera(CameraActor& camera, bool invertY = true) const;
 };
 
 } // namespace Loader

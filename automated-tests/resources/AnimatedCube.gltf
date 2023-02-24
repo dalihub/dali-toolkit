@@ -333,7 +333,7 @@
         "camera" : 1,
         "translation" : [ 0.5, 0.5, 3.0 ],
         "children": [
-          4
+          4, 5, 6, 7
         ]
       },
       {
@@ -356,6 +356,18 @@
             0.0,
             1.0
         ]
+      },
+      {
+        "camera" : 3,
+        "translation" : [ 0.0, 0.0, 0.0 ]
+      },
+      {
+        "camera" : 4,
+        "translation" : [ 0.0, 0.0, 0.0 ]
+      },
+      {
+        "camera" : 5,
+        "translation" : [ 0.0, 0.0, 0.0 ]
       }
    ],
    "scene" : 0,
@@ -401,6 +413,30 @@
         "xmag": 1.0,
         "ymag": 1.0,
         "zfar": 100.0,
+        "znear": 0.01
+      }
+    },
+    {
+      "type": "perspective",
+      "perspective": {
+        "aspectRatio": 1.0,
+        "yfov": 0.7,
+        "znear": 0.01
+      }
+    },
+    {
+      "type": "perspective",
+      "perspective": {
+        "aspectRatio": 1.0,
+        "zfar": 100.0,
+        "znear": 0.01
+      }
+    },
+    {
+      "type": "orthographic",
+      "orthographic": {
+        "xmag": 1.0,
+        "ymag": 1.0,
         "znear": 0.01
       }
     }
