@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/dli-loader-impl.h>
 #include <dali-scene3d/internal/loader/gltf2-loader-impl.h>
+#include <dali-scene3d/internal/loader/glb-loader-impl.h>
 #include <dali-scene3d/internal/loader/model-loader-impl.h>
 
 namespace Dali
@@ -38,6 +39,7 @@ namespace
 {
 static constexpr std::string_view OBJ_EXTENSION      = ".obj";
 static constexpr std::string_view GLTF_EXTENSION     = ".gltf";
+static constexpr std::string_view GLB_EXTENSION      = ".glb";
 static constexpr std::string_view DLI_EXTENSION      = ".dli";
 static constexpr std::string_view METADATA_EXTENSION = "metadata";
 } // namespace
@@ -117,6 +119,10 @@ void ModelLoader::CreateModelLoader()
   else if(extension == GLTF_EXTENSION)
   {
     mImpl = std::make_shared<Dali::Scene3D::Loader::Internal::Gltf2LoaderImpl>();
+  }
+  else if(extension == GLB_EXTENSION)
+  {
+    mImpl = std::make_shared<Dali::Scene3D::Loader::Internal::GlbLoaderImpl>();
   }
   else
   {

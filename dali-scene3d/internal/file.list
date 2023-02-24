@@ -8,7 +8,9 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_internal_dir}/controls/scene-view/scene-view-impl.cpp
 	${scene3d_internal_dir}/loader/dli-loader-impl.cpp
 	${scene3d_internal_dir}/loader/gltf2-asset.cpp
+	${scene3d_internal_dir}/loader/gltf2-util.cpp
 	${scene3d_internal_dir}/loader/gltf2-loader-impl.cpp
+	${scene3d_internal_dir}/loader/glb-loader-impl.cpp
 	${scene3d_internal_dir}/loader/hash.cpp
 	${scene3d_internal_dir}/loader/json-reader.cpp
 	${scene3d_internal_dir}/loader/json-util.cpp

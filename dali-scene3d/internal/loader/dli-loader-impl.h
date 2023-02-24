@@ -28,7 +28,7 @@
 #include <dali-scene3d/public-api/loader/string-callback.h>
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/common/vector-wrapper.h"
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {
@@ -62,7 +62,7 @@ public:
   void SetErrorCallback(StringCallback onError);
 
   /**
-   * @copydoc Dali::Scene3D::Loader::Internal::ModelLoaderImpl()
+   * @copydoc Dali::Scene3D::Loader::Internal::ModelLoaderImpl::LoadMode()
    */
   bool LoadModel(const std::string& uri, Dali::Scene3D::Loader::LoadResult& result) override;
 
