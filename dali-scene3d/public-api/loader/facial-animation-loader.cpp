@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,57 +71,46 @@ std::vector<std::vector<float>> ReadBlendShapeKeys(const json_value_s& j)
   return result;
 }
 
-const auto BLEND_SHAPE_READER = std::move(js::Reader<BlendShape>()
-                                            .Register(*js::MakeProperty("key", ReadBlendShapeKeys, &BlendShape::mKeys))
-                                            .Register(*new js::Property<BlendShape, std::string_view>("name", js::Read::StringView, &BlendShape::mNodeName))
-                                            .Register(*js::MakeProperty("morphtarget", js::Read::Number<uint32_t>, &BlendShape::mNumberOfMorphTarget))
-                                            .Register(*new js::Property<BlendShape, std::string_view>("blendShapeVersion", js::Read::StringView, &BlendShape::mVersion))
-                                            .Register(*new js::Property<BlendShape, std::string_view>("fullName", js::Read::StringView, &BlendShape::mFullName))
-                                            .Register(*js::MakeProperty("morphname", js::Read::Array<std::string_view, js::Read::StringView>, &BlendShape::mMorphNames)));
-
-const auto FACIAL_ANIMATION_READER = std::move(js::Reader<FacialAnimation>()
-                                                 .Register(*new js::Property<FacialAnimation, std::string_view>("name", js::Read::StringView, &FacialAnimation::mName))
-                                                 .Register(*js::MakeProperty("blendShapes", js::Read::Array<BlendShape, js::ObjectReader<BlendShape>::Read>, &FacialAnimation::mBlendShapes))
-                                                 .Register(*new js::Property<FacialAnimation, std::string_view>("version", js::Read::StringView, &FacialAnimation::mVersion))
-                                                 .Register(*js::MakeProperty("shapesAmount", js::Read::Number<uint32_t>, &FacialAnimation::mNumberOfShapes))
-                                                 .Register(*js::MakeProperty("time", js::Read::Array<uint32_t, js::Read::Number>, &FacialAnimation::mTime))
-                                                 .Register(*js::MakeProperty("frames", js::Read::Number<uint32_t>, &FacialAnimation::mNumberOfFrames)));
-
-} // unnamed namespace
-
-namespace Scene3D
+const js::Reader<BlendShape>& GetBlendShapeReader()
 {
-namespace Loader
-{
-AnimationDefinition LoadFacialAnimation(const std::string& url)
-{
-  bool failed = false;
-  auto js     = LoadTextFile(url.c_str(), &failed);
-  if(failed)
-  {
-    ExceptionFlinger(ASSERT_LOCATION) << "Failed to load " << url << ".";
-  }
+  static const auto BLEND_SHAPE_READER = std::move(js::Reader<BlendShape>()
+                                                     .Register(*js::MakeProperty("key", ReadBlendShapeKeys, &BlendShape::mKeys))
+                                                     .Register(*new js::Property<BlendShape, std::string_view>("name", js::Read::StringView, &BlendShape::mNodeName))
+                                                     .Register(*js::MakeProperty("morphtarget", js::Read::Number<uint32_t>, &BlendShape::mNumberOfMorphTarget))
+                                                     .Register(*new js::Property<BlendShape, std::string_view>("blendShapeVersion", js::Read::StringView, &BlendShape::mVersion))
+                                                     .Register(*new js::Property<BlendShape, std::string_view>("fullName", js::Read::StringView, &BlendShape::mFullName))
+                                                     .Register(*js::MakeProperty("morphname", js::Read::Array<std::string_view, js::Read::StringView>, &BlendShape::mMorphNames)));
+  return BLEND_SHAPE_READER;
+}
 
-  json::unique_ptr root(json_parse(js.c_str(), js.size()));
-  if(!root)
-  {
-    ExceptionFlinger(ASSERT_LOCATION) << "Failed to parse " << url << ".";
-  }
+const js::Reader<FacialAnimation>& GetFacialAnimationReader()
+{
+  static const auto FACIAL_ANIMATION_READER = std::move(js::Reader<FacialAnimation>()
+                                                          .Register(*new js::Property<FacialAnimation, std::string_view>("name", js::Read::StringView, &FacialAnimation::mName))
+                                                          .Register(*js::MakeProperty("blendShapes", js::Read::Array<BlendShape, js::ObjectReader<BlendShape>::Read>, &FacialAnimation::mBlendShapes))
+                                                          .Register(*new js::Property<FacialAnimation, std::string_view>("version", js::Read::StringView, &FacialAnimation::mVersion))
+                                                          .Register(*js::MakeProperty("shapesAmount", js::Read::Number<uint32_t>, &FacialAnimation::mNumberOfShapes))
+                                                          .Register(*js::MakeProperty("time", js::Read::Array<uint32_t, js::Read::Number>, &FacialAnimation::mTime))
+                                                          .Register(*js::MakeProperty("frames", js::Read::Number<uint32_t>, &FacialAnimation::mNumberOfFrames)));
+  return FACIAL_ANIMATION_READER;
+}
 
+Dali::Scene3D::Loader::AnimationDefinition LoadFacialAnimationInternal(json::unique_ptr& root)
+{
   static bool setObjectReaders = true;
   if(setObjectReaders)
   {
     // NOTE: only referencing own, anonymous namespace, const objects; the pointers will never need to change.
-    js::SetObjectReader(BLEND_SHAPE_READER);
+    js::SetObjectReader(GetBlendShapeReader());
     setObjectReaders = false;
   }
 
   auto& rootObj = js::Cast<json_object_s>(*root);
 
   FacialAnimation facialAnimation;
-  FACIAL_ANIMATION_READER.Read(rootObj, facialAnimation);
+  GetFacialAnimationReader().Read(rootObj, facialAnimation);
 
-  AnimationDefinition animationDefinition;
+  Dali::Scene3D::Loader::AnimationDefinition animationDefinition;
   animationDefinition.SetName(facialAnimation.mName.data());
   animationDefinition.SetDuration(MILLISECONDS_TO_SECONDS * static_cast<float>(facialAnimation.mTime[facialAnimation.mNumberOfFrames - 1u]));
 
@@ -138,11 +127,11 @@ AnimationDefinition LoadFacialAnimation(const std::string& url)
   {
     for(uint32_t morphTargetIndex = 0u; morphTargetIndex < blendShape.mNumberOfMorphTarget; ++morphTargetIndex)
     {
-      AnimatedProperty animatedProperty;
+      Dali::Scene3D::Loader::AnimatedProperty animatedProperty;
       animatedProperty.mTimePeriod = Dali::TimePeriod(animationDefinition.GetDuration());
-      animatedProperty.mNodeName = blendShape.mNodeName;
+      animatedProperty.mNodeName   = blendShape.mNodeName;
       std::stringstream weightPropertyStream;
-      weightPropertyStream << BlendShapes::WEIGHTS_UNIFORM << "[" << morphTargetIndex << "]";
+      weightPropertyStream << Dali::Scene3D::Loader::BlendShapes::WEIGHTS_UNIFORM << "[" << morphTargetIndex << "]";
       animatedProperty.mPropertyName = weightPropertyStream.str();
 
       animatedProperty.mKeyFrames = Dali::KeyFrames::New();
@@ -159,7 +148,40 @@ AnimationDefinition LoadFacialAnimation(const std::string& url)
 
   return animationDefinition;
 }
+} // unnamed namespace
 
+namespace Scene3D
+{
+namespace Loader
+{
+AnimationDefinition LoadFacialAnimation(const std::string& url)
+{
+  bool failed   = false;
+  auto jsonData = LoadTextFile(url.c_str(), &failed);
+  if(failed)
+  {
+    ExceptionFlinger(ASSERT_LOCATION) << "Failed to load " << url << ".";
+  }
+
+  json::unique_ptr root(json_parse(jsonData.c_str(), jsonData.size()));
+  if(!root)
+  {
+    ExceptionFlinger(ASSERT_LOCATION) << "Failed to parse json " << url << ".";
+  }
+
+  return LoadFacialAnimationInternal(root);
+}
+
+AnimationDefinition LoadFacialAnimationFromBuffer(const uint8_t* rawBuffer, int rawBufferLength)
+{
+  json::unique_ptr root(json_parse(rawBuffer, static_cast<size_t>(static_cast<uint32_t>(rawBufferLength))));
+  if(!root)
+  {
+    ExceptionFlinger(ASSERT_LOCATION) << "Failed to parse json from buffer.";
+  }
+
+  return LoadFacialAnimationInternal(root);
+}
 } // namespace Loader
 } // namespace Scene3D
 } // namespace Dali
