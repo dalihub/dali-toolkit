@@ -83,9 +83,9 @@ public:
   std::string mModelUrl;
   std::string mResourceDirectoryUrl;
 
-  Dali::Scene3D::Loader::Customization::Choices         mResourceChoices;
-  std::vector<Dali::Scene3D::Loader::ResourceRefCounts> mResourceRefCounts;
-  bool                                                  mHasSucceeded;
+  Dali::Scene3D::Loader::Customization::Choices mResourceChoices;
+  Dali::Scene3D::Loader::ResourceRefCounts      mResourceRefCount;
+  bool                                          mHasSucceeded;
 
   ModelCacheManager                 mModelCacheManager;
   Dali::Scene3D::Loader::LoadResult mLoadResult;

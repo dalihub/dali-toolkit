@@ -822,12 +822,12 @@ void Model::CreateModel()
   BoundingVolume                                      AABB;
   Dali::Scene3D::Loader::Transforms                   xforms{Dali::Scene3D::Loader::MatrixStack{}, Dali::Scene3D::Loader::ViewProjection{}};
   Dali::Scene3D::Loader::NodeDefinition::CreateParams nodeParams{mModelLoadTask->mLoadResult.mResources, xforms, {}, {}, {}};
-  uint32_t                                            rootCount = 0u;
+
+  // Generate Dali handles from resource bundle. Note that we generate all scene's resouce immediatly.
+  mModelLoadTask->mLoadResult.mResources.GenerateResources(mModelLoadTask->mResourceRefCount);
 
   for(auto iRoot : mModelLoadTask->mLoadResult.mScene.GetRoots())
   {
-    mModelLoadTask->mLoadResult.mResources.GenerateResources(mModelLoadTask->mResourceRefCounts[rootCount]);
-
     if(auto actor = mModelLoadTask->mLoadResult.mScene.CreateNodes(iRoot, mModelLoadTask->mResourceChoices, nodeParams))
     {
       mModelLoadTask->mLoadResult.mScene.ConfigureSkeletonJoints(iRoot, mModelLoadTask->mLoadResult.mResources.mSkeletons, actor);
@@ -840,7 +840,6 @@ void Model::CreateModel()
     }
 
     AddModelTreeToAABB(AABB, mModelLoadTask->mLoadResult.mScene, mModelLoadTask->mResourceChoices, iRoot, nodeParams, Matrix::IDENTITY);
-    rootCount++;
   }
 
   mNaturalSize = AABB.CalculateSize();

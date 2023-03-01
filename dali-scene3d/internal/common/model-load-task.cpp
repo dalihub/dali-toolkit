@@ -161,20 +161,22 @@ void ModelLoadTask::Process()
   {
     ConditionalWait::ScopedLock lock(loadRawResourceConditionalWait);
 
+    mResourceRefCount = std::move(mLoadResult.mResources.CreateRefCounter());
+
     for(auto iRoot : mLoadResult.mScene.GetRoots())
     {
-      mResourceRefCounts.push_back(mLoadResult.mResources.CreateRefCounter());
-      mLoadResult.mScene.CountResourceRefs(iRoot, mResourceChoices, mResourceRefCounts.back());
-      mLoadResult.mResources.CountEnvironmentReferences(mResourceRefCounts.back());
+      mLoadResult.mScene.CountResourceRefs(iRoot, mResourceChoices, mResourceRefCount);
+    }
 
-      mLoadResult.mResources.LoadRawResources(mResourceRefCounts.back(), pathProvider);
+    mLoadResult.mResources.CountEnvironmentReferences(mResourceRefCount);
 
-      // glTF Mesh is defined in right hand coordinate system, with positive Y for Up direction.
-      // Because DALi uses left hand system, Y direciton will be flipped for environment map sampling.
-      for(auto&& env : mLoadResult.mResources.mEnvironmentMaps)
-      {
-        env.first.mYDirection = Y_DIRECTION;
-      }
+    mLoadResult.mResources.LoadRawResources(mResourceRefCount, pathProvider);
+
+    // glTF Mesh is defined in right hand coordinate system, with positive Y for Up direction.
+    // Because DALi uses left hand system, Y direciton will be flipped for environment map sampling.
+    for(auto&& env : mLoadResult.mResources.mEnvironmentMaps)
+    {
+      env.first.mYDirection = Y_DIRECTION;
     }
   }
 
