@@ -54,12 +54,8 @@ const char* TEST_GLTF_FILE_NAME                    = TEST_RESOURCE_DIR "/Animate
 const char* TEST_GLTF_ANIMATION_TEST_FILE_NAME     = TEST_RESOURCE_DIR "/animationTest.gltf";
 const char* TEST_GLTF_MULTIPLE_PRIMITIVE_FILE_NAME = TEST_RESOURCE_DIR "/simpleMultiplePrimitiveTest.gltf";
 const char* TEST_DLI_FILE_NAME                     = TEST_RESOURCE_DIR "/arc.dli";
-// @TODO: The test cases for loading the DLI model below is temporarily disabled.
-// Need to fix how resources are loaded when a model contains multiple scenes and
-// each scene has its own root node.
-#ifdef MULTIPLE_SCENES_MODEL_SUPPORT
 const char* TEST_DLI_EXERCISE_FILE_NAME = TEST_RESOURCE_DIR "/exercise.dli";
-#endif
+
 /**
  * For the diffuse and specular cube map texture.
  * These textures are based off version of Wave engine sample
@@ -1011,7 +1007,6 @@ int UtcDaliModelAnimation02(void)
 
 int UtcDaliModelAnimation03(void)
 {
-#ifdef MULTIPLE_SCENES_MODEL_SUPPORT
   ToolkitTestApplication application;
 
   Scene3D::Model model = Scene3D::Model::New(TEST_DLI_EXERCISE_FILE_NAME);
@@ -1040,16 +1035,12 @@ int UtcDaliModelAnimation03(void)
   Animation animationByName = model.GetAnimation("idleClip");
   DALI_TEST_CHECK(animationByName);
   DALI_TEST_EQUALS(animationByIndex, animationByName, TEST_LOCATION);
-#else
-  tet_result(TET_PASS);
-#endif
 
   END_TEST;
 }
 
 int UtcDaliModelCameraGenerate01(void)
 {
-#ifdef MULTIPLE_SCENES_MODEL_SUPPORT
   ToolkitTestApplication application;
 
   Scene3D::Model model = Scene3D::Model::New(TEST_DLI_EXERCISE_FILE_NAME);
@@ -1077,9 +1068,6 @@ int UtcDaliModelCameraGenerate01(void)
 
   generatedCamera = model.GenerateCamera(1u); // Fail to generate camera
   DALI_TEST_CHECK(!generatedCamera);
-#else
-  tet_result(TET_PASS);
-#endif
 
   END_TEST;
 }
