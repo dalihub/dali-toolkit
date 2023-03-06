@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ int UtcDaliCameraParameters(void)
                                           Vector3::ZAXIS * -100.f);
   camParams.orthographicSize = 3.0f;
   camParams.aspectRatio      = 1.0f;
-  camParams.yFov             = Degree(Radian(M_PI * .5)).degree;
+  camParams.yFovDegree       = Degree(Radian(M_PI * .5));
   camParams.zNear            = 1.f;
   camParams.zFar             = 1000.f;
 
@@ -70,7 +70,7 @@ int UtcDaliCameraParameters(void)
 
     if(camParams.isPerspective)
     {
-      DALI_TEST_EQUAL(camera.GetProperty(Dali::CameraActor::Property::FIELD_OF_VIEW).Get<float>(), Radian(Degree(camParams.yFov)).radian);
+      DALI_TEST_EQUAL(camera.GetProperty(Dali::CameraActor::Property::FIELD_OF_VIEW).Get<float>(), Radian(camParams.yFovDegree).radian);
     }
     else
     {

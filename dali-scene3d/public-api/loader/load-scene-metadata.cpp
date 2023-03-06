@@ -54,32 +54,43 @@ struct ImageData
   ImageData::SamplingMode::Type mSamplingMode{ImageData::SamplingMode::BOX_THEN_LINEAR}; ///< The sampling mode used to resize the image.
 };
 
-const std::map<std::string_view, ImageData::SamplingMode::Type> SAMPLING_MODE_TYPES{
-  ENUM_STRING_MAPPING(ImageData::SamplingMode, BOX),
-  ENUM_STRING_MAPPING(ImageData::SamplingMode, NEAREST),
-  ENUM_STRING_MAPPING(ImageData::SamplingMode, LINEAR),
-  ENUM_STRING_MAPPING(ImageData::SamplingMode, BOX_THEN_NEAREST),
-  ENUM_STRING_MAPPING(ImageData::SamplingMode, BOX_THEN_LINEAR),
-  ENUM_STRING_MAPPING(ImageData::SamplingMode, NO_FILTER),
-  ENUM_STRING_MAPPING(ImageData::SamplingMode, DONT_CARE),
-};
+const std::map<std::string_view, ImageData::SamplingMode::Type>& GetStringSamplingModeTable()
+{
+  static const std::map<std::string_view, ImageData::SamplingMode::Type> SAMPLING_MODE_TYPES{
+    ENUM_STRING_MAPPING(ImageData::SamplingMode, BOX),
+    ENUM_STRING_MAPPING(ImageData::SamplingMode, NEAREST),
+    ENUM_STRING_MAPPING(ImageData::SamplingMode, LINEAR),
+    ENUM_STRING_MAPPING(ImageData::SamplingMode, BOX_THEN_NEAREST),
+    ENUM_STRING_MAPPING(ImageData::SamplingMode, BOX_THEN_LINEAR),
+    ENUM_STRING_MAPPING(ImageData::SamplingMode, NO_FILTER),
+    ENUM_STRING_MAPPING(ImageData::SamplingMode, DONT_CARE),
+  };
+  return SAMPLING_MODE_TYPES;
+}
 
-ENUM_TYPE_FROM_STRING(ImageData::SamplingMode, SAMPLING_MODE_TYPES)
+ENUM_TYPE_FROM_STRING(ImageData::SamplingMode, GetStringSamplingModeTable())
 
 struct MetaData
 {
   std::vector<ImageData> mImageData;
 };
 
-const auto IMAGE_METADATA_READER = std::move(js::Reader<ImageData>()
-                                               .Register(*js::MakeProperty("uri", js::Read::String, &ImageData::mImageUri))
-                                               .Register(*js::MakeProperty("minWidth", js::Read::Number, &ImageData::mMinWidth))
-                                               .Register(*js::MakeProperty("minHeight", js::Read::Number, &ImageData::mMinHeight))
-                                               .Register(*js::MakeProperty("samplingMode", gt::ReadStringEnum<ImageData::SamplingMode>, &ImageData::mSamplingMode)));
+const js::Reader<ImageData>& GetImageMetaDataReader()
+{
+  static const auto IMAGE_METADATA_READER = std::move(js::Reader<ImageData>()
+                                                         .Register(*js::MakeProperty("uri", js::Read::String, &ImageData::mImageUri))
+                                                         .Register(*js::MakeProperty("minWidth", js::Read::Number, &ImageData::mMinWidth))
+                                                         .Register(*js::MakeProperty("minHeight", js::Read::Number, &ImageData::mMinHeight))
+                                                         .Register(*js::MakeProperty("samplingMode", gt::ReadStringEnum<ImageData::SamplingMode>, &ImageData::mSamplingMode)));
+  return IMAGE_METADATA_READER;
+}
 
-const auto METADATA_READER = std::move(js::Reader<MetaData>()
-                                         .Register(*js::MakeProperty("images", js::Read::Array<ImageData, js::ObjectReader<ImageData>::Read>, &MetaData::mImageData)));
-
+const js::Reader<MetaData>& GetMetaDataReader()
+{
+  static const auto METADATA_READER = std::move(js::Reader<MetaData>()
+                                                   .Register(*js::MakeProperty("images", js::Read::Array<ImageData, js::ObjectReader<ImageData>::Read>, &MetaData::mImageData)));
+  return METADATA_READER;
+}
 } // namespace
 
 void LoadSceneMetadata(const std::string& url, SceneMetadata& sceneMetadata)
@@ -101,13 +112,13 @@ void LoadSceneMetadata(const std::string& url, SceneMetadata& sceneMetadata)
   static bool setObjectReaders = true;
   if(setObjectReaders)
   {
-    js::SetObjectReader(IMAGE_METADATA_READER);
+    js::SetObjectReader(GetImageMetaDataReader());
 
     setObjectReaders = false;
   }
 
   MetaData metaData;
-  METADATA_READER.Read(rootObj, metaData);
+  GetMetaDataReader().Read(rootObj, metaData);
 
   sceneMetadata.mImageMetadata.reserve(metaData.mImageData.size() + metaData.mImageData.size());
   for(auto&& data : metaData.mImageData)

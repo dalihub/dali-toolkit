@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/rendering/texture.h>
 
@@ -269,6 +270,43 @@ public:
    * @note This method should be called after Model load finished.
    */
   Dali::Animation GetAnimation(const std::string& name) const;
+
+  /**
+   * @brief Gets number of camera parameters those loaded from model file.
+   *
+   * @SINCE_2_2.15
+   * @return The number of loaded camera parameters.
+   * @note This method should be called after Model load finished.
+   */
+  uint32_t GetCameraCount() const;
+
+  /**
+   * @brief Generate camera actor using camera parameters at the index.
+   * If camera parameter is valid, create new CameraActor.
+   * Camera parameter decide at initialized time and
+   * didn't apply model node's current position (like Animation).
+   *
+   * @SINCE_2_2.15
+   * @param[in] index Index of camera to be used for generation camera.
+   * @return Generated CameraActor by the index, or empty Handle if generation failed.
+   * @note This method should be called after Model load finished.
+   */
+  Dali::CameraActor GenerateCamera(uint32_t index) const;
+
+  /**
+   * @brief Apply camera parameters at the index to inputed camera actor.
+   * If camera parameter is valid and camera actor is not empty, apply parameters.
+   * It will change camera's transform and near / far / fov or orthographic size / aspect ratio (if defined)
+   * Camera parameter decide at initialized time and
+   * didn't apply model node's current position (like Animation).
+   *
+   * @SINCE_2_2.15
+   * @param[in] index Index of camera to be used for generation camera.
+   * @param[in,out] camera Index of camera to be used for generation camera.
+   * @return True if apply successed. False otherwise.
+   * @note This method should be called after Model load finished.
+   */
+  bool ApplyCamera(uint32_t index, Dali::CameraActor camera) const;
 
 public: // Not intended for application developers
   /// @cond internal

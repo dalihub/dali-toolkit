@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,19 @@
  * limitations under the License.
  *
  */
-#include "dali-scene3d/public-api/loader/camera-parameters.h"
-#include "dali-scene3d/public-api/loader/utils.h"
-#include "dali/devel-api/actors/camera-actor-devel.h"
-#include "dali/integration-api/debug.h"
-#include "dali/public-api/actors/camera-actor.h"
-#include "dali/public-api/math/quaternion.h"
+
+// CLASS HEADER
+#include <dali-scene3d/public-api/loader/camera-parameters.h>
+
+// EXTERNAL INCLUDES
+#include <dali/devel-api/actors/camera-actor-devel.h>
+#include <dali/integration-api/debug.h>
+#include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/math/quaternion.h>
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/internal/loader/gltf2-asset.h> // for gltf2::UNDEFINED_FLOAT_VALUE
+#include <dali-scene3d/public-api/loader/utils.h>
 
 namespace Dali
 {
@@ -143,11 +150,12 @@ void Orthographic(Matrix& result, float left, float right, float bottom, float t
 ViewProjection CameraParameters::GetViewProjection() const
 {
   ViewProjection viewProjection;
+
   // The projection matrix.
   if(isPerspective)
   {
     Perspective(viewProjection.GetProjection(),
-                Radian(Degree(yFov)),
+                Radian(yFovDegree),
                 1.f,
                 zNear,
                 zFar,
@@ -191,25 +199,62 @@ void CameraParameters::CalculateTransformComponents(Vector3& position, Quaternio
   orientation *= viewQuaternion;
 }
 
-void CameraParameters::ConfigureCamera(CameraActor& camera) const
+bool CameraParameters::ConfigureCamera(CameraActor& camera, bool invertY) const
 {
-  SetActorCentered(camera);
-
   if(isPerspective)
   {
+    if(Dali::Equals(zNear, gltf2::UNDEFINED_FLOAT_VALUE) ||
+       Dali::Equals(yFovDegree.degree, gltf2::UNDEFINED_FLOAT_VALUE))
+    {
+      return false;
+    }
+
     camera.SetProjectionMode(Camera::PERSPECTIVE_PROJECTION);
     camera.SetNearClippingPlane(zNear);
-    camera.SetFarClippingPlane(zFar);
-    camera.SetFieldOfView(Radian(Degree(yFov)));
+    camera.SetFieldOfView(Radian(yFovDegree));
+
+    if(!Dali::Equals(zFar, gltf2::UNDEFINED_FLOAT_VALUE))
+    {
+      camera.SetFarClippingPlane(zFar);
+    }
+    else
+    {
+      // TODO : Infinite perspective projection didn't support yet. Just set big enough value now
+      camera.SetFarClippingPlane(1000.0f);
+    }
+
+    if(!Dali::Equals(aspectRatio, gltf2::UNDEFINED_FLOAT_VALUE))
+    {
+      // TODO: By gltf 2.0 spec, we should not 'crop' and 'non-uniform scaling' by viewport.
+      // If we skip to setup this value, 'non-uniform scaling' problem fixed.
+      // But we need to resolve 'crop' case in future.
+      //camera.SetAspectRatio(aspectRatio);
+    }
   }
   else
   {
+    if(Dali::Equals(zNear, gltf2::UNDEFINED_FLOAT_VALUE) ||
+       Dali::Equals(zFar, gltf2::UNDEFINED_FLOAT_VALUE) ||
+       Dali::Equals(orthographicSize, gltf2::UNDEFINED_FLOAT_VALUE))
+    {
+      return false;
+    }
+
     camera.SetProjectionMode(Camera::ORTHOGRAPHIC_PROJECTION);
     camera.SetNearClippingPlane(zNear);
     camera.SetFarClippingPlane(zFar);
-    camera.SetAspectRatio(aspectRatio);
     camera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, orthographicSize);
+
+    if(!Dali::Equals(aspectRatio, gltf2::UNDEFINED_FLOAT_VALUE))
+    {
+      // TODO: By gltf 2.0 spec, we should not 'crop' and 'non-uniform scaling' by viewport.
+      // If we skip to setup this value, 'non-uniform scaling' problem fixed.
+      // But we need to resolve 'crop' case in future.
+      //camera.SetAspectRatio(aspectRatio);
+    }
   }
+
+  SetActorCentered(camera);
 
   // model
   Vector3    camTranslation;
@@ -217,10 +262,12 @@ void CameraParameters::ConfigureCamera(CameraActor& camera) const
   Quaternion camOrientation;
   CalculateTransformComponents(camTranslation, camOrientation, camScale);
 
-  camera.SetInvertYAxis(true);
+  camera.SetInvertYAxis(invertY);
   camera.SetProperty(Actor::Property::POSITION, camTranslation);
   camera.SetProperty(Actor::Property::ORIENTATION, camOrientation);
   camera.SetProperty(Actor::Property::SCALE, camScale);
+
+  return true;
 }
 
 } // namespace Loader

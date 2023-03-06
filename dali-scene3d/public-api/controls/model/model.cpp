@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,6 +120,21 @@ Dali::Animation Model::GetAnimation(uint32_t index) const
 Dali::Animation Model::GetAnimation(const std::string& name) const
 {
   return GetImpl(*this).GetAnimation(name);
+}
+
+uint32_t Model::GetCameraCount() const
+{
+  return GetImpl(*this).GetCameraCount();
+}
+
+Dali::CameraActor Model::GenerateCamera(uint32_t index) const
+{
+  return GetImpl(*this).GenerateCamera(index);
+}
+
+bool Model::ApplyCamera(uint32_t index, Dali::CameraActor camera) const
+{
+  return GetImpl(*this).ApplyCamera(index, camera);
 }
 
 } // namespace Scene3D

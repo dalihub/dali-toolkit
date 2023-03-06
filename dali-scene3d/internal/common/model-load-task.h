@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_LOAD_TASK_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,10 @@
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/model-cache-manager.h>
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/public-api/adaptor-framework/async-task-manager.h>
 
 namespace Dali
@@ -42,8 +44,8 @@ class ModelLoadTask : public AsyncTask
 public:
   /**
    * Constructor
-   * @param[in] modelUrl model file path.(e.g., glTF, and DLI).
-   * @param[in] resourceDirectoryUrl resource file path that includes binary, image etc.
+   * @param[in] modelUrl Model file path.(e.g., glTF, and DLI).
+   * @param[in] resourceDirectoryUrl Resource file path that includes binary, image etc.
    * @param[in] callback The callback that is called when the operation is completed.
    */
   ModelLoadTask(const std::string& modelUrl, const std::string& resourceDirectoryUrl, CallbackBase* callback);
@@ -81,17 +83,12 @@ public:
   std::string mModelUrl;
   std::string mResourceDirectoryUrl;
 
-  Dali::Scene3D::Loader::ResourceBundle                        mResources;
-  Dali::Scene3D::Loader::SceneDefinition                       mScene;
-  Dali::Scene3D::Loader::SceneMetadata                         mMetaData;
-  std::vector<Dali::Scene3D::Loader::AnimationGroupDefinition> mAnimGroups;
-  std::vector<Dali::Scene3D::Loader::CameraParameters>         mCameraParameters;
-  std::vector<Dali::Scene3D::Loader::LightParameters>          mLights;
-  std::vector<Dali::Scene3D::Loader::AnimationDefinition>      mAnimations;
+  Dali::Scene3D::Loader::Customization::Choices mResourceChoices;
+  Dali::Scene3D::Loader::ResourceRefCounts      mResourceRefCount;
+  bool                                          mHasSucceeded;
 
-  Dali::Scene3D::Loader::Customization::Choices         mResourceChoices;
-  std::vector<Dali::Scene3D::Loader::ResourceRefCounts> mResourceRefCounts;
-  bool                                                  mHasSucceeded;
+  ModelCacheManager                 mModelCacheManager;
+  Dali::Scene3D::Loader::LoadResult mLoadResult;
 };
 
 } // namespace Internal

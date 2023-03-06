@@ -71,21 +71,29 @@ std::vector<std::vector<float>> ReadBlendShapeKeys(const json_value_s& j)
   return result;
 }
 
-const auto BLEND_SHAPE_READER = std::move(js::Reader<BlendShape>()
-                                            .Register(*js::MakeProperty("key", ReadBlendShapeKeys, &BlendShape::mKeys))
-                                            .Register(*new js::Property<BlendShape, std::string_view>("name", js::Read::StringView, &BlendShape::mNodeName))
-                                            .Register(*js::MakeProperty("morphtarget", js::Read::Number<uint32_t>, &BlendShape::mNumberOfMorphTarget))
-                                            .Register(*new js::Property<BlendShape, std::string_view>("blendShapeVersion", js::Read::StringView, &BlendShape::mVersion))
-                                            .Register(*new js::Property<BlendShape, std::string_view>("fullName", js::Read::StringView, &BlendShape::mFullName))
-                                            .Register(*js::MakeProperty("morphname", js::Read::Array<std::string_view, js::Read::StringView>, &BlendShape::mMorphNames)));
+const js::Reader<BlendShape>& GetBlendShapeReader()
+{
+  static const auto BLEND_SHAPE_READER = std::move(js::Reader<BlendShape>()
+                                                      .Register(*js::MakeProperty("key", ReadBlendShapeKeys, &BlendShape::mKeys))
+                                                      .Register(*new js::Property<BlendShape, std::string_view>("name", js::Read::StringView, &BlendShape::mNodeName))
+                                                      .Register(*js::MakeProperty("morphtarget", js::Read::Number<uint32_t>, &BlendShape::mNumberOfMorphTarget))
+                                                      .Register(*new js::Property<BlendShape, std::string_view>("blendShapeVersion", js::Read::StringView, &BlendShape::mVersion))
+                                                      .Register(*new js::Property<BlendShape, std::string_view>("fullName", js::Read::StringView, &BlendShape::mFullName))
+                                                      .Register(*js::MakeProperty("morphname", js::Read::Array<std::string_view, js::Read::StringView>, &BlendShape::mMorphNames)));
+  return BLEND_SHAPE_READER;
+}
 
-const auto FACIAL_ANIMATION_READER = std::move(js::Reader<FacialAnimation>()
-                                                 .Register(*new js::Property<FacialAnimation, std::string_view>("name", js::Read::StringView, &FacialAnimation::mName))
-                                                 .Register(*js::MakeProperty("blendShapes", js::Read::Array<BlendShape, js::ObjectReader<BlendShape>::Read>, &FacialAnimation::mBlendShapes))
-                                                 .Register(*new js::Property<FacialAnimation, std::string_view>("version", js::Read::StringView, &FacialAnimation::mVersion))
-                                                 .Register(*js::MakeProperty("shapesAmount", js::Read::Number<uint32_t>, &FacialAnimation::mNumberOfShapes))
-                                                 .Register(*js::MakeProperty("time", js::Read::Array<uint32_t, js::Read::Number>, &FacialAnimation::mTime))
-                                                 .Register(*js::MakeProperty("frames", js::Read::Number<uint32_t>, &FacialAnimation::mNumberOfFrames)));
+const js::Reader<FacialAnimation>& GetFacialAnimationReader()
+{
+  static const auto FACIAL_ANIMATION_READER = std::move(js::Reader<FacialAnimation>()
+                                                           .Register(*new js::Property<FacialAnimation, std::string_view>("name", js::Read::StringView, &FacialAnimation::mName))
+                                                           .Register(*js::MakeProperty("blendShapes", js::Read::Array<BlendShape, js::ObjectReader<BlendShape>::Read>, &FacialAnimation::mBlendShapes))
+                                                           .Register(*new js::Property<FacialAnimation, std::string_view>("version", js::Read::StringView, &FacialAnimation::mVersion))
+                                                           .Register(*js::MakeProperty("shapesAmount", js::Read::Number<uint32_t>, &FacialAnimation::mNumberOfShapes))
+                                                           .Register(*js::MakeProperty("time", js::Read::Array<uint32_t, js::Read::Number>, &FacialAnimation::mTime))
+                                                           .Register(*js::MakeProperty("frames", js::Read::Number<uint32_t>, &FacialAnimation::mNumberOfFrames)));
+  return FACIAL_ANIMATION_READER;
+}
 
 } // unnamed namespace
 
@@ -112,14 +120,14 @@ AnimationDefinition LoadFacialAnimation(const std::string& url)
   if(setObjectReaders)
   {
     // NOTE: only referencing own, anonymous namespace, const objects; the pointers will never need to change.
-    js::SetObjectReader(BLEND_SHAPE_READER);
+    js::SetObjectReader(GetBlendShapeReader());
     setObjectReaders = false;
   }
 
   auto& rootObj = js::Cast<json_object_s>(*root);
 
   FacialAnimation facialAnimation;
-  FACIAL_ANIMATION_READER.Read(rootObj, facialAnimation);
+  GetFacialAnimationReader().Read(rootObj, facialAnimation);
 
   AnimationDefinition animationDefinition;
   animationDefinition.mName     = std::string(facialAnimation.mName.data());

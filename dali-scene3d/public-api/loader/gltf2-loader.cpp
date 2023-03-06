@@ -47,13 +47,13 @@ namespace
 Dali::Mutex gInitializeMutex;
 Dali::Mutex gReadMutex;
 
-const char* POSITION_PROPERTY("position");
-const char* ORIENTATION_PROPERTY("orientation");
-const char* SCALE_PROPERTY("scale");
-const char* BLEND_SHAPE_WEIGHTS_UNIFORM("uBlendShapeWeight");
-const char* MRENDERER_MODEL_IDENTIFICATION("M-Renderer");
-const char* ROOT_NODE_NAME("RootNode");
-const Vector3     SCALE_TO_ADJUST(100.0f, 100.0f, 100.0f);
+const char*   POSITION_PROPERTY("position");
+const char*   ORIENTATION_PROPERTY("orientation");
+const char*   SCALE_PROPERTY("scale");
+const char*   BLEND_SHAPE_WEIGHTS_UNIFORM("uBlendShapeWeight");
+const char*   MRENDERER_MODEL_IDENTIFICATION("M-Renderer");
+const char*   ROOT_NODE_NAME("RootNode");
+const Vector3 SCALE_TO_ADJUST(100.0f, 100.0f, 100.0f);
 
 const Geometry::Type GLTF2_TO_DALI_PRIMITIVES[]{
   Geometry::POINTS,
@@ -100,32 +100,54 @@ void ApplyAccessorMinMax(const gt::Accessor& acc, float* values)
   MeshDefinition::Blob::ApplyMinMax(acc.mMin, acc.mMax, acc.mCount, values);
 }
 
-const auto BUFFER_READER = std::move(js::Reader<gt::Buffer>()
-                                       .Register(*js::MakeProperty("byteLength", js::Read::Number<uint32_t>, &gt::Buffer::mByteLength))
-                                       .Register(*js::MakeProperty("uri", js::Read::StringView, &gt::Buffer::mUri)));
+const js::Reader<gt::Buffer>& GetBufferReader()
+{
+  static const auto BUFFER_READER = std::move(js::Reader<gt::Buffer>()
+                                                 .Register(*js::MakeProperty("byteLength", js::Read::Number<uint32_t>, &gt::Buffer::mByteLength))
+                                                 .Register(*js::MakeProperty("uri", js::Read::StringView, &gt::Buffer::mUri)));
+  return BUFFER_READER;
+}
 
-const auto BUFFER_VIEW_READER = std::move(js::Reader<gt::BufferView>()
-                                            .Register(*js::MakeProperty("buffer", gt::RefReader<gt::Document>::Read<gt::Buffer, &gt::Document::mBuffers>, &gt::BufferView::mBuffer))
-                                            .Register(*js::MakeProperty("byteOffset", js::Read::Number<uint32_t>, &gt::BufferView::mByteOffset))
-                                            .Register(*js::MakeProperty("byteLength", js::Read::Number<uint32_t>, &gt::BufferView::mByteLength))
-                                            .Register(*js::MakeProperty("byteStride", js::Read::Number<uint32_t>, &gt::BufferView::mByteStride))
-                                            .Register(*js::MakeProperty("target", js::Read::Number<uint32_t>, &gt::BufferView::mTarget)));
+const js::Reader<gt::BufferView>& GetBufferViewReader()
+{
+  static const auto BUFFER_VIEW_READER = std::move(js::Reader<gt::BufferView>()
+                                                      .Register(*js::MakeProperty("buffer", gt::RefReader<gt::Document>::Read<gt::Buffer, &gt::Document::mBuffers>, &gt::BufferView::mBuffer))
+                                                      .Register(*js::MakeProperty("byteOffset", js::Read::Number<uint32_t>, &gt::BufferView::mByteOffset))
+                                                      .Register(*js::MakeProperty("byteLength", js::Read::Number<uint32_t>, &gt::BufferView::mByteLength))
+                                                      .Register(*js::MakeProperty("byteStride", js::Read::Number<uint32_t>, &gt::BufferView::mByteStride))
+                                                      .Register(*js::MakeProperty("target", js::Read::Number<uint32_t>, &gt::BufferView::mTarget)));
+  return BUFFER_VIEW_READER;
+}
 
-const auto BUFFER_VIEW_CLIENT_READER = std::move(js::Reader<gt::BufferViewClient>()
+const js::Reader<gt::BufferViewClient>& GetBufferViewClientReader()
+{
+  static const auto BUFFER_VIEW_CLIENT_READER = std::move(js::Reader<gt::BufferViewClient>()
                                                    .Register(*js::MakeProperty("bufferView", gt::RefReader<gt::Document>::Read<gt::BufferView, &gt::Document::mBufferViews>, &gt::BufferViewClient::mBufferView))
                                                    .Register(*js::MakeProperty("byteOffset", js::Read::Number<uint32_t>, &gt::BufferViewClient::mByteOffset)));
+  return BUFFER_VIEW_CLIENT_READER;
+}
 
-const auto COMPONENT_TYPED_BUFFER_VIEW_CLIENT_READER = std::move(js::Reader<gt::ComponentTypedBufferViewClient>()
+const js::Reader<gt::ComponentTypedBufferViewClient>& GetComponentTypedBufferViewClientReader()
+{
+  static const auto COMPONENT_TYPED_BUFFER_VIEW_CLIENT_READER = std::move(js::Reader<gt::ComponentTypedBufferViewClient>()
                                                                    .Register(*new js::Property<gt::ComponentTypedBufferViewClient, gt::Ref<gt::BufferView>>("bufferView", gt::RefReader<gt::Document>::Read<gt::BufferView, &gt::Document::mBufferViews>, &gt::ComponentTypedBufferViewClient::mBufferView))
                                                                    .Register(*new js::Property<gt::ComponentTypedBufferViewClient, uint32_t>("byteOffset", js::Read::Number<uint32_t>, &gt::ComponentTypedBufferViewClient::mByteOffset))
                                                                    .Register(*js::MakeProperty("componentType", js::Read::Enum<gt::Component::Type>, &gt::ComponentTypedBufferViewClient::mComponentType)));
+  return COMPONENT_TYPED_BUFFER_VIEW_CLIENT_READER;
+}
 
-const auto ACCESSOR_SPARSE_READER = std::move(js::Reader<gt::Accessor::Sparse>()
+const js::Reader<gt::Accessor::Sparse>& GetAccessorSparseReader()
+{
+  static const auto ACCESSOR_SPARSE_READER = std::move(js::Reader<gt::Accessor::Sparse>()
                                                 .Register(*js::MakeProperty("count", js::Read::Number<uint32_t>, &gt::Accessor::Sparse::mCount))
                                                 .Register(*js::MakeProperty("indices", js::ObjectReader<gt::ComponentTypedBufferViewClient>::Read, &gt::Accessor::Sparse::mIndices))
                                                 .Register(*js::MakeProperty("values", js::ObjectReader<gt::BufferViewClient>::Read, &gt::Accessor::Sparse::mValues)));
+  return ACCESSOR_SPARSE_READER;
+}
 
-const auto ACCESSOR_READER = std::move(js::Reader<gt::Accessor>()
+const js::Reader<gt::Accessor>& GetAccessorReader()
+{
+  static const auto ACCESSOR_READER = std::move(js::Reader<gt::Accessor>()
                                          .Register(*new js::Property<gt::Accessor, gt::Ref<gt::BufferView>>("bufferView",
                                                                                                             gt::RefReader<gt::Document>::Read<gt::BufferView, &gt::Document::mBufferViews>,
                                                                                                             &gt::Accessor::mBufferView))
@@ -142,50 +164,86 @@ const auto ACCESSOR_READER = std::move(js::Reader<gt::Accessor>()
                                          .Register(*js::MakeProperty("min", js::Read::Array<float, js::Read::Number>, &gt::Accessor::mMin))
                                          .Register(*js::MakeProperty("max", js::Read::Array<float, js::Read::Number>, &gt::Accessor::mMax))
                                          .Register(*new js::Property<gt::Accessor, gt::Accessor::Sparse>("sparse", js::ObjectReader<gt::Accessor::Sparse>::Read, &gt::Accessor::SetSparse)));
+  return ACCESSOR_READER;
+}
 
-const auto IMAGE_READER = std::move(js::Reader<gt::Image>()
+const js::Reader<gt::Image>& GetImageReader()
+{
+  static const auto IMAGE_READER = std::move(js::Reader<gt::Image>()
                                       .Register(*new js::Property<gt::Image, std::string_view>("name", js::Read::StringView, &gt::Material::mName))
                                       .Register(*js::MakeProperty("uri", js::Read::StringView, &gt::Image::mUri))
                                       .Register(*js::MakeProperty("mimeType", js::Read::StringView, &gt::Image::mMimeType))
                                       .Register(*js::MakeProperty("bufferView", gt::RefReader<gt::Document>::Read<gt::BufferView, &gt::Document::mBufferViews>, &gt::Image::mBufferView)));
+  return IMAGE_READER;
+}
 
-const auto SAMPLER_READER = std::move(js::Reader<gt::Sampler>()
+const js::Reader<gt::Sampler>& GetSamplerReader()
+{
+  static const auto SAMPLER_READER = std::move(js::Reader<gt::Sampler>()
                                         .Register(*js::MakeProperty("minFilter", js::Read::Enum<gt::Filter::Type>, &gt::Sampler::mMinFilter))
                                         .Register(*js::MakeProperty("magFilter", js::Read::Enum<gt::Filter::Type>, &gt::Sampler::mMagFilter))
                                         .Register(*js::MakeProperty("wrapS", js::Read::Enum<gt::Wrap::Type>, &gt::Sampler::mWrapS))
                                         .Register(*js::MakeProperty("wrapT", js::Read::Enum<gt::Wrap::Type>, &gt::Sampler::mWrapT)));
+  return SAMPLER_READER;
+}
 
-const auto TEXURE_READER = std::move(js::Reader<gt::Texture>()
+const js::Reader<gt::Texture>& GetTextureReader()
+{
+  static const auto TEXURE_READER = std::move(js::Reader<gt::Texture>()
                                        .Register(*js::MakeProperty("source", gt::RefReader<gt::Document>::Read<gt::Image, &gt::Document::mImages>, &gt::Texture::mSource))
                                        .Register(*js::MakeProperty("sampler", gt::RefReader<gt::Document>::Read<gt::Sampler, &gt::Document::mSamplers>, &gt::Texture::mSampler)));
+  return TEXURE_READER;
+}
 
-const auto TEXURE_INFO_READER = std::move(js::Reader<gt::TextureInfo>()
+const js::Reader<gt::TextureInfo>& GetTextureInfoReader()
+{
+  static const auto TEXURE_INFO_READER = std::move(js::Reader<gt::TextureInfo>()
                                             .Register(*js::MakeProperty("index", gt::RefReader<gt::Document>::Read<gt::Texture, &gt::Document::mTextures>, &gt::TextureInfo::mTexture))
                                             .Register(*js::MakeProperty("texCoord", js::Read::Number<uint32_t>, &gt::TextureInfo::mTexCoord))
                                             .Register(*js::MakeProperty("scale", js::Read::Number<float>, &gt::TextureInfo::mScale))
                                             .Register(*js::MakeProperty("strength", js::Read::Number<float>, &gt::TextureInfo::mStrength)));
+  return TEXURE_INFO_READER;
+}
 
-const auto MATERIAL_PBR_READER = std::move(js::Reader<gt::Material::Pbr>()
+const js::Reader<gt::Material::Pbr>& GetMaterialPbrReader()
+{
+  static const auto MATERIAL_PBR_READER = std::move(js::Reader<gt::Material::Pbr>()
                                              .Register(*js::MakeProperty("baseColorFactor", gt::ReadDaliVector<Vector4>, &gt::Material::Pbr::mBaseColorFactor))
                                              .Register(*js::MakeProperty("baseColorTexture", js::ObjectReader<gt::TextureInfo>::Read, &gt::Material::Pbr::mBaseColorTexture))
                                              .Register(*js::MakeProperty("metallicFactor", js::Read::Number<float>, &gt::Material::Pbr::mMetallicFactor))
                                              .Register(*js::MakeProperty("roughnessFactor", js::Read::Number<float>, &gt::Material::Pbr::mRoughnessFactor))
                                              .Register(*js::MakeProperty("metallicRoughnessTexture", js::ObjectReader<gt::TextureInfo>::Read, &gt::Material::Pbr::mMetallicRoughnessTexture)));
+  return MATERIAL_PBR_READER;
+}
 
-const auto MATERIAL_SPECULAR_READER = std::move(js::Reader<gt::MaterialSpecular>()
+const js::Reader<gt::MaterialSpecular>& GetMaterialSpecularReader()
+{
+  static const auto MATERIAL_SPECULAR_READER = std::move(js::Reader<gt::MaterialSpecular>()
                                                   .Register(*js::MakeProperty("specularFactor", js::Read::Number<float>, &gt::MaterialSpecular::mSpecularFactor))
                                                   .Register(*js::MakeProperty("specularTexture", js::ObjectReader<gt::TextureInfo>::Read, &gt::MaterialSpecular::mSpecularTexture))
                                                   .Register(*js::MakeProperty("specularColorFactor", gt::ReadDaliVector<Vector3>, &gt::MaterialSpecular::mSpecularColorFactor))
                                                   .Register(*js::MakeProperty("specularColorTexture", js::ObjectReader<gt::TextureInfo>::Read, &gt::MaterialSpecular::mSpecularColorTexture)));
+  return MATERIAL_SPECULAR_READER;
+}
 
-const auto MATERIAL_IOR_READER = std::move(js::Reader<gt::MaterialIor>()
+const js::Reader<gt::MaterialIor>& GetMaterialIorReader()
+{
+  static const auto MATERIAL_IOR_READER = std::move(js::Reader<gt::MaterialIor>()
                                              .Register(*js::MakeProperty("ior", js::Read::Number<float>, &gt::MaterialIor::mIor)));
+  return MATERIAL_IOR_READER;
+}
 
-const auto MATERIAL_EXTENSION_READER = std::move(js::Reader<gt::MaterialExtensions>()
+const js::Reader<gt::MaterialExtensions>& GetMaterialExtensionsReader()
+{
+  static const auto MATERIAL_EXTENSION_READER = std::move(js::Reader<gt::MaterialExtensions>()
                                                    .Register(*js::MakeProperty("KHR_materials_ior", js::ObjectReader<gt::MaterialIor>::Read, &gt::MaterialExtensions::mMaterialIor))
                                                    .Register(*js::MakeProperty("KHR_materials_specular", js::ObjectReader<gt::MaterialSpecular>::Read, &gt::MaterialExtensions::mMaterialSpecular)));
+  return MATERIAL_EXTENSION_READER;
+}
 
-const auto MATERIAL_READER = std::move(js::Reader<gt::Material>()
+const js::Reader<gt::Material>& GetMaterialReader()
+{
+  static const auto MATERIAL_READER = std::move(js::Reader<gt::Material>()
                                          .Register(*new js::Property<gt::Material, std::string_view>("name", js::Read::StringView, &gt::Material::mName))
                                          .Register(*js::MakeProperty("pbrMetallicRoughness", js::ObjectReader<gt::Material::Pbr>::Read, &gt::Material::mPbrMetallicRoughness))
                                          .Register(*js::MakeProperty("normalTexture", js::ObjectReader<gt::TextureInfo>::Read, &gt::Material::mNormalTexture))
@@ -196,6 +254,8 @@ const auto MATERIAL_READER = std::move(js::Reader<gt::Material>()
                                          .Register(*js::MakeProperty("alphaCutoff", js::Read::Number<float>, &gt::Material::mAlphaCutoff))
                                          .Register(*js::MakeProperty("doubleSided", js::Read::Boolean, &gt::Material::mDoubleSided))
                                          .Register(*js::MakeProperty("extensions", js::ObjectReader<gt::MaterialExtensions>::Read, &gt::Material::mMaterialExtensions)));
+  return MATERIAL_READER;
+}
 
 std::map<gt::Attribute::Type, gt::Ref<gt::Accessor>> ReadMeshPrimitiveAttributes(const json_value_s& j)
 {
@@ -229,21 +289,31 @@ std::vector<std::map<gt::Attribute::Type, gt::Ref<gt::Accessor>>> ReadMeshPrimit
   return result;
 }
 
-const auto MESH_PRIMITIVE_READER = std::move(js::Reader<gt::Mesh::Primitive>()
+const js::Reader<gt::Mesh::Primitive>& GetMeshPrimitiveReader()
+{
+  static const auto MESH_PRIMITIVE_READER = std::move(js::Reader<gt::Mesh::Primitive>()
                                                .Register(*js::MakeProperty("attributes", ReadMeshPrimitiveAttributes, &gt::Mesh::Primitive::mAttributes))
                                                .Register(*js::MakeProperty("indices", gt::RefReader<gt::Document>::Read<gt::Accessor, &gt::Document::mAccessors>, &gt::Mesh::Primitive::mIndices))
                                                .Register(*js::MakeProperty("material", gt::RefReader<gt::Document>::Read<gt::Material, &gt::Document::mMaterials>, &gt::Mesh::Primitive::mMaterial))
                                                .Register(*js::MakeProperty("mode", js::Read::Enum<gt::Mesh::Primitive::Mode>, &gt::Mesh::Primitive::mMode))
                                                .Register(*js::MakeProperty("targets", ReadMeshPrimitiveTargets, &gt::Mesh::Primitive::mTargets)));
+  return MESH_PRIMITIVE_READER;
+}
 
-const auto MESH_READER = std::move(js::Reader<gt::Mesh>()
+const js::Reader<gt::Mesh>& GetMeshReader()
+{
+  static const auto MESH_READER = std::move(js::Reader<gt::Mesh>()
                                      .Register(*new js::Property<gt::Mesh, std::string_view>("name", js::Read::StringView, &gt::Mesh::mName))
                                      .Register(*js::MakeProperty("primitives",
                                                                  js::Read::Array<gt::Mesh::Primitive, js::ObjectReader<gt::Mesh::Primitive>::Read>,
                                                                  &gt::Mesh::mPrimitives))
                                      .Register(*js::MakeProperty("weights", js::Read::Array<float, js::Read::Number>, &gt::Mesh::mWeights)));
+  return MESH_READER;
+}
 
-const auto SKIN_READER = std::move(js::Reader<gt::Skin>()
+const js::Reader<gt::Skin>& GetSkinReader()
+{
+  static const auto SKIN_READER = std::move(js::Reader<gt::Skin>()
                                      .Register(*new js::Property<gt::Skin, std::string_view>("name", js::Read::StringView, &gt::Skin::mName))
                                      .Register(*js::MakeProperty("inverseBindMatrices",
                                                                  gt::RefReader<gt::Document>::Read<gt::Accessor, &gt::Document::mAccessors>,
@@ -254,26 +324,42 @@ const auto SKIN_READER = std::move(js::Reader<gt::Skin>()
                                      .Register(*js::MakeProperty("joints",
                                                                  js::Read::Array<gt::Ref<gt::Node>, gt::RefReader<gt::Document>::Read<gt::Node, &gt::Document::mNodes>>,
                                                                  &gt::Skin::mJoints)));
+  return SKIN_READER;
+}
 
-const auto CAMERA_PERSPECTIVE_READER = std::move(js::Reader<gt::Camera::Perspective>()
+const js::Reader<gt::Camera::Perspective>& GetCameraPerspectiveReader()
+{
+  static const auto CAMERA_PERSPECTIVE_READER = std::move(js::Reader<gt::Camera::Perspective>()
                                                    .Register(*js::MakeProperty("aspectRatio", js::Read::Number<float>, &gt::Camera::Perspective::mAspectRatio))
                                                    .Register(*js::MakeProperty("yfov", js::Read::Number<float>, &gt::Camera::Perspective::mYFov))
                                                    .Register(*js::MakeProperty("zfar", js::Read::Number<float>, &gt::Camera::Perspective::mZFar))
                                                    .Register(*js::MakeProperty("znear", js::Read::Number<float>, &gt::Camera::Perspective::mZNear))); // TODO: infinite perspective projection, where znear is omitted
+  return CAMERA_PERSPECTIVE_READER;
+}
 
-const auto CAMERA_ORTHOGRAPHIC_READER = std::move(js::Reader<gt::Camera::Orthographic>()
+const js::Reader<gt::Camera::Orthographic>& GetCameraOrthographicReader()
+{
+  static const auto CAMERA_ORTHOGRAPHIC_READER = std::move(js::Reader<gt::Camera::Orthographic>()
                                                     .Register(*js::MakeProperty("xmag", js::Read::Number<float>, &gt::Camera::Orthographic::mXMag))
-                                                    .Register(*js::MakeProperty("ymag", js::Read::Number<float>, &gt::Camera::Orthographic::mXMag))
+                                                    .Register(*js::MakeProperty("ymag", js::Read::Number<float>, &gt::Camera::Orthographic::mYMag))
                                                     .Register(*js::MakeProperty("zfar", js::Read::Number<float>, &gt::Camera::Orthographic::mZFar))
                                                     .Register(*js::MakeProperty("znear", js::Read::Number<float>, &gt::Camera::Orthographic::mZNear)));
+  return CAMERA_ORTHOGRAPHIC_READER;
+}
 
-const auto CAMERA_READER = std::move(js::Reader<gt::Camera>()
+const js::Reader<gt::Camera>& GetCameraReader()
+{
+  static const auto CAMERA_READER = std::move(js::Reader<gt::Camera>()
                                        .Register(*new js::Property<gt::Camera, std::string_view>("name", js::Read::StringView, &gt::Camera::mName))
                                        .Register(*js::MakeProperty("type", js::Read::StringView, &gt::Camera::mType))
                                        .Register(*js::MakeProperty("perspective", js::ObjectReader<gt::Camera::Perspective>::Read, &gt::Camera::mPerspective))
                                        .Register(*js::MakeProperty("orthographic", js::ObjectReader<gt::Camera::Orthographic>::Read, &gt::Camera::mOrthographic)));
+  return CAMERA_READER;
+}
 
-const auto NODE_READER = std::move(js::Reader<gt::Node>()
+const js::Reader<gt::Node>& GetNodeReader()
+{
+  static const auto NODE_READER = std::move(js::Reader<gt::Node>()
                                      .Register(*new js::Property<gt::Node, std::string_view>("name", js::Read::StringView, &gt::Node::mName))
                                      .Register(*js::MakeProperty("translation", gt::ReadDaliVector<Vector3>, &gt::Node::mTranslation))
                                      .Register(*js::MakeProperty("rotation", gt::ReadQuaternion, &gt::Node::mRotation))
@@ -283,21 +369,37 @@ const auto NODE_READER = std::move(js::Reader<gt::Node>()
                                      .Register(*js::MakeProperty("children", js::Read::Array<gt::Ref<gt::Node>, gt::RefReader<gt::Document>::Read<gt::Node, &gt::Document::mNodes>>, &gt::Node::mChildren))
                                      .Register(*js::MakeProperty("mesh", gt::RefReader<gt::Document>::Read<gt::Mesh, &gt::Document::mMeshes>, &gt::Node::mMesh))
                                      .Register(*js::MakeProperty("skin", gt::RefReader<gt::Document>::Read<gt::Skin, &gt::Document::mSkins>, &gt::Node::mSkin)));
+  return NODE_READER;
+}
 
-const auto ANIMATION_SAMPLER_READER = std::move(js::Reader<gt::Animation::Sampler>()
+const js::Reader<gt::Animation::Sampler>& GetAnimationSamplerReader()
+{
+  static const auto ANIMATION_SAMPLER_READER = std::move(js::Reader<gt::Animation::Sampler>()
                                                   .Register(*js::MakeProperty("input", gt::RefReader<gt::Document>::Read<gt::Accessor, &gt::Document::mAccessors>, &gt::Animation::Sampler::mInput))
                                                   .Register(*js::MakeProperty("output", gt::RefReader<gt::Document>::Read<gt::Accessor, &gt::Document::mAccessors>, &gt::Animation::Sampler::mOutput))
                                                   .Register(*js::MakeProperty("interpolation", gt::ReadStringEnum<gt::Animation::Sampler::Interpolation>, &gt::Animation::Sampler::mInterpolation)));
+  return ANIMATION_SAMPLER_READER;
+}
 
-const auto ANIMATION_TARGET_READER = std::move(js::Reader<gt::Animation::Channel::Target>()
+const js::Reader<gt::Animation::Channel::Target>& GetAnimationChannelTargetReader()
+{
+  static const auto ANIMATION_TARGET_READER = std::move(js::Reader<gt::Animation::Channel::Target>()
                                                  .Register(*js::MakeProperty("node", gt::RefReader<gt::Document>::Read<gt::Node, &gt::Document::mNodes>, &gt::Animation::Channel::Target::mNode))
                                                  .Register(*js::MakeProperty("path", gt::ReadStringEnum<gt::Animation::Channel::Target>, &gt::Animation::Channel::Target::mPath)));
+  return ANIMATION_TARGET_READER;
+}
 
-const auto ANIMATION_CHANNEL_READER = std::move(js::Reader<gt::Animation::Channel>()
+const js::Reader<gt::Animation::Channel>& GetAnimationChannelReader()
+{
+  static const auto ANIMATION_CHANNEL_READER = std::move(js::Reader<gt::Animation::Channel>()
                                                   .Register(*js::MakeProperty("target", js::ObjectReader<gt::Animation::Channel::Target>::Read, &gt::Animation::Channel::mTarget))
                                                   .Register(*js::MakeProperty("sampler", gt::RefReader<gt::Animation>::Read<gt::Animation::Sampler, &gt::Animation::mSamplers>, &gt::Animation::Channel::mSampler)));
+  return ANIMATION_CHANNEL_READER;
+}
 
-const auto ANIMATION_READER = std::move(js::Reader<gt::Animation>()
+const js::Reader<gt::Animation>& GetAnimationReader()
+{
+  static const auto ANIMATION_READER = std::move(js::Reader<gt::Animation>()
                                           .Register(*new js::Property<gt::Animation, std::string_view>("name", js::Read::StringView, &gt::Animation::mName))
                                           .Register(*js::MakeProperty("samplers",
                                                                       js::Read::Array<gt::Animation::Sampler, js::ObjectReader<gt::Animation::Sampler>::Read>,
@@ -305,14 +407,22 @@ const auto ANIMATION_READER = std::move(js::Reader<gt::Animation>()
                                           .Register(*js::MakeProperty("channels",
                                                                       js::Read::Array<gt::Animation::Channel, js::ObjectReader<gt::Animation::Channel>::Read>,
                                                                       &gt::Animation::mChannels)));
+  return ANIMATION_READER;
+}
 
-const auto SCENE_READER = std::move(js::Reader<gt::Scene>()
+const js::Reader<gt::Scene>& GetSceneReader()
+{
+  static const auto SCENE_READER = std::move(js::Reader<gt::Scene>()
                                       .Register(*new js::Property<gt::Scene, std::string_view>("name", js::Read::StringView, &gt::Scene::mName))
                                       .Register(*js::MakeProperty("nodes",
                                                                   js::Read::Array<gt::Ref<gt::Node>, gt::RefReader<gt::Document>::Read<gt::Node, &gt::Document::mNodes>>,
                                                                   &gt::Scene::mNodes)));
+  return SCENE_READER;
+}
 
-const auto DOCUMENT_READER = std::move(js::Reader<gt::Document>()
+const js::Reader<gt::Document>& GetDocumentReader()
+{
+  static const auto DOCUMENT_READER = std::move(js::Reader<gt::Document>()
                                          .Register(*js::MakeProperty("buffers",
                                                                      js::Read::Array<gt::Buffer, js::ObjectReader<gt::Buffer>::Read>,
                                                                      &gt::Document::mBuffers))
@@ -353,6 +463,8 @@ const auto DOCUMENT_READER = std::move(js::Reader<gt::Document>()
                                                                      js::Read::Array<gt::Scene, js::ObjectReader<gt::Scene>::Read>,
                                                                      &gt::Document::mScenes))
                                          .Register(*js::MakeProperty("scene", gt::RefReader<gt::Document>::Read<gt::Scene, &gt::Document::mScenes>, &gt::Document::mScene)));
+  return DOCUMENT_READER;
+}
 
 struct NodeMapping
 {
@@ -578,7 +690,7 @@ void ConvertMaterial(const gt::Material& material, const std::unordered_map<std:
     matDef.mEmissiveFactor = material.mEmissiveFactor;
   }
 
-  if(material.mMaterialExtensions.mMaterialIor.mIor < MAXFLOAT)
+  if(!Dali::Equals(material.mMaterialExtensions.mMaterialIor.mIor, gltf2::UNDEFINED_FLOAT_VALUE))
   {
     float ior                  = material.mMaterialExtensions.mMaterialIor.mIor;
     matDef.mDielectricSpecular = powf((ior - 1.0f) / (ior + 1.0f), 2.0f);
@@ -812,18 +924,33 @@ void ConvertCamera(const gt::Camera& camera, CameraParameters& camParams)
   if(camParams.isPerspective)
   {
     auto& perspective = camera.mPerspective;
-    camParams.yFov    = Degree(Radian(perspective.mYFov)).degree;
-    camParams.zNear   = perspective.mZNear;
-    camParams.zFar    = perspective.mZFar;
+    if(!Dali::Equals(perspective.mYFov, gltf2::UNDEFINED_FLOAT_VALUE))
+    {
+      camParams.yFovDegree = Degree(Radian(perspective.mYFov));
+    }
+    else
+    {
+      camParams.yFovDegree = Degree(gltf2::UNDEFINED_FLOAT_VALUE);
+    }
+    camParams.zNear = perspective.mZNear;
+    camParams.zFar  = perspective.mZFar;
     // TODO: yes, we seem to ignore aspectRatio in CameraParameters.
   }
   else
   {
-    auto& ortho                = camera.mOrthographic;
-    camParams.orthographicSize = ortho.mYMag * .5f;
-    camParams.aspectRatio      = ortho.mXMag / ortho.mYMag;
-    camParams.zNear            = ortho.mZNear;
-    camParams.zFar             = ortho.mZFar;
+    auto& ortho = camera.mOrthographic;
+    if(!Dali::Equals(ortho.mYMag, gltf2::UNDEFINED_FLOAT_VALUE) && !Dali::Equals(ortho.mXMag, gltf2::UNDEFINED_FLOAT_VALUE))
+    {
+      camParams.orthographicSize = ortho.mYMag * .5f;
+      camParams.aspectRatio      = ortho.mXMag / ortho.mYMag;
+    }
+    else
+    {
+      camParams.orthographicSize = gltf2::UNDEFINED_FLOAT_VALUE;
+      camParams.aspectRatio      = gltf2::UNDEFINED_FLOAT_VALUE;
+    }
+    camParams.zNear = ortho.mZNear;
+    camParams.zFar  = ortho.mZFar;
   }
 }
 
@@ -1258,33 +1385,33 @@ void ProduceShaders(ShaderDefinitionFactory& shaderFactory, SceneDefinition& sce
 
 void SetObjectReaders()
 {
-  js::SetObjectReader(BUFFER_READER);
-  js::SetObjectReader(BUFFER_VIEW_READER);
-  js::SetObjectReader(BUFFER_VIEW_CLIENT_READER);
-  js::SetObjectReader(COMPONENT_TYPED_BUFFER_VIEW_CLIENT_READER);
-  js::SetObjectReader(ACCESSOR_SPARSE_READER);
-  js::SetObjectReader(ACCESSOR_READER);
-  js::SetObjectReader(IMAGE_READER);
-  js::SetObjectReader(SAMPLER_READER);
-  js::SetObjectReader(TEXURE_READER);
-  js::SetObjectReader(TEXURE_INFO_READER);
-  js::SetObjectReader(MATERIAL_PBR_READER);
-  js::SetObjectReader(MATERIAL_SPECULAR_READER);
-  js::SetObjectReader(MATERIAL_IOR_READER);
-  js::SetObjectReader(MATERIAL_EXTENSION_READER);
-  js::SetObjectReader(MATERIAL_READER);
-  js::SetObjectReader(MESH_PRIMITIVE_READER);
-  js::SetObjectReader(MESH_READER);
-  js::SetObjectReader(SKIN_READER);
-  js::SetObjectReader(CAMERA_PERSPECTIVE_READER);
-  js::SetObjectReader(CAMERA_ORTHOGRAPHIC_READER);
-  js::SetObjectReader(CAMERA_READER);
-  js::SetObjectReader(NODE_READER);
-  js::SetObjectReader(ANIMATION_SAMPLER_READER);
-  js::SetObjectReader(ANIMATION_TARGET_READER);
-  js::SetObjectReader(ANIMATION_CHANNEL_READER);
-  js::SetObjectReader(ANIMATION_READER);
-  js::SetObjectReader(SCENE_READER);
+  js::SetObjectReader(GetBufferReader());
+  js::SetObjectReader(GetBufferViewReader());
+  js::SetObjectReader(GetBufferViewClientReader());
+  js::SetObjectReader(GetComponentTypedBufferViewClientReader());
+  js::SetObjectReader(GetAccessorSparseReader());
+  js::SetObjectReader(GetAccessorReader());
+  js::SetObjectReader(GetImageReader());
+  js::SetObjectReader(GetSamplerReader());
+  js::SetObjectReader(GetTextureReader());
+  js::SetObjectReader(GetTextureInfoReader());
+  js::SetObjectReader(GetMaterialPbrReader());
+  js::SetObjectReader(GetMaterialSpecularReader());
+  js::SetObjectReader(GetMaterialIorReader());
+  js::SetObjectReader(GetMaterialExtensionsReader());
+  js::SetObjectReader(GetMaterialReader());
+  js::SetObjectReader(GetMeshPrimitiveReader());
+  js::SetObjectReader(GetMeshReader());
+  js::SetObjectReader(GetSkinReader());
+  js::SetObjectReader(GetCameraPerspectiveReader());
+  js::SetObjectReader(GetCameraOrthographicReader());
+  js::SetObjectReader(GetCameraReader());
+  js::SetObjectReader(GetNodeReader());
+  js::SetObjectReader(GetAnimationSamplerReader());
+  js::SetObjectReader(GetAnimationChannelTargetReader());
+  js::SetObjectReader(GetAnimationChannelReader());
+  js::SetObjectReader(GetAnimationReader());
+  js::SetObjectReader(GetSceneReader());
 }
 
 void SetDefaultEnvironmentMap(const gt::Document& doc, ConversionContext& context)
@@ -1349,7 +1476,7 @@ void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactor
   {
     Mutex::ScopedLock lock(gReadMutex);
     gt::SetRefReaderObject(doc);
-    DOCUMENT_READER.Read(rootObj, doc);
+    GetDocumentReader().Read(rootObj, doc);
   }
 
   auto              path = url.substr(0, url.rfind('/') + 1);
