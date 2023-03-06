@@ -195,17 +195,10 @@ bool ControlAccessible::IsShowing()
     return true;
   }
 
-  auto childExtent = child->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
   while(parent)
   {
     auto control      = Dali::Toolkit::Control::DownCast(parent->Self());
     if(!control.GetProperty<bool>(Actor::Property::VISIBLE))
-    {
-      return false;
-    }
-    auto clipMode     = control.GetProperty(Actor::Property::CLIPPING_MODE).Get<bool>();
-    auto parentExtent = parent->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
-    if ((clipMode != ClippingMode::DISABLED) && !parentExtent.Intersects(childExtent))
     {
       return false;
     }
