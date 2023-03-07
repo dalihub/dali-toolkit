@@ -17,20 +17,16 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/api.h"
-#include "dali-scene3d/public-api/loader/environment-map-data.h"
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/rendering/texture.h>
 #include <memory>
-#include "dali/public-api/math/quaternion.h"
-#include "dali/public-api/rendering/texture.h"
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/loader/environment-map-data.h>
+
+namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Defines an environment map with either or both of radiance
@@ -62,10 +58,10 @@ struct DALI_SCENE3D_API EnvironmentDefinition
 
   EnvironmentDefinition() = default;
 
-  EnvironmentDefinition(const EnvironmentDefinition&)            = delete;
+  EnvironmentDefinition(const EnvironmentDefinition&) = delete;
   EnvironmentDefinition& operator=(const EnvironmentDefinition&) = delete;
 
-  EnvironmentDefinition(EnvironmentDefinition&&)            = default;
+  EnvironmentDefinition(EnvironmentDefinition&&) = default;
   EnvironmentDefinition& operator=(EnvironmentDefinition&&) = default;
 
   /**
@@ -97,8 +93,6 @@ public: // DATA
   bool                     mUseBrdfTexture  = false;
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_ENVIRONMENT_DEFINITION_H

@@ -15,7 +15,7 @@
  *
  */
 
-// INTERNAL INCLUDES
+// CLASS HEADER
 #include <dali-scene3d/public-api/loader/buffer-definition.h>
 
 // EXTERNAL INCLUDES
@@ -23,11 +23,7 @@
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <dali/integration-api/debug.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 namespace
 {
@@ -111,6 +107,4 @@ void BufferDefinition::LoadBuffer()
   }
 }
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

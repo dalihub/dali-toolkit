@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_ANIMATED_PROPERTY_H
 #define DALI_SCENE3D_LOADER_ANIMATED_PROPERTY_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,18 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/api.h"
-#include "dali-scene3d/public-api/loader/index.h"
-
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/object/property.h>
 #include <functional>
 #include <memory>
-#include "dali/public-api/actors/actor.h"
-#include "dali/public-api/animation/animation.h"
-#include "dali/public-api/object/property.h"
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/loader/index.h>
+
+namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Intermediate representation for a property that's given to
@@ -95,8 +90,6 @@ public: // DATA
   TimePeriod    mTimePeriod    = TimePeriod(0.f);
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_ANIMATED_PROPERTY_H

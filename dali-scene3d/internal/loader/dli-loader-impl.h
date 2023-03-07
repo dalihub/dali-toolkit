@@ -17,6 +17,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/model-loader-impl.h>
 #include <dali-scene3d/public-api/api.h>
@@ -27,16 +30,7 @@
 #include <dali-scene3d/public-api/loader/node-definition.h>
 #include <dali-scene3d/public-api/loader/string-callback.h>
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
-
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
-{
-namespace Internal
+namespace Dali::Scene3D::Loader::Internal
 {
 typedef std::pair<std::string, std::string> Metadata;
 
@@ -76,9 +70,6 @@ private:
   const std::unique_ptr<Impl> mImpl;
 };
 
-} // namespace Internal
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader::Internal
 
 #endif // DALI_SCENE3D_LOADER_DLI_LOADER_IMPL_H

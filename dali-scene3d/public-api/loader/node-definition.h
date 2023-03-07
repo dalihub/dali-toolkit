@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_NODE_DEFINITION_H_
 #define DALI_SCENE3D_LOADER_NODE_DEFINITION_H_
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,19 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/loader/customization.h"
-#include "dali-scene3d/public-api/loader/matrix-stack.h"
-#include "dali-scene3d/public-api/loader/resource-bundle.h"
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/vector4.h>
 #include <functional>
 #include <memory>
 #include <string>
-#include "dali/public-api/actors/actor.h"
-#include "dali/public-api/math/matrix.h"
-#include "dali/public-api/math/quaternion.h"
-#include "dali/public-api/math/vector4.h"
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/loader/customization.h>
+#include <dali-scene3d/public-api/loader/matrix-stack.h>
+#include <dali-scene3d/public-api/loader/resource-bundle.h>
 
 namespace Dali
 {

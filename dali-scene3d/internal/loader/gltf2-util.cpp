@@ -18,15 +18,12 @@
 // CLASS HEADER
 #include <dali-scene3d/internal/loader/gltf2-util.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
 using namespace Dali::Scene3D::Loader;
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
-{
-namespace Internal
+namespace Dali::Scene3D::Loader::Internal
 {
 namespace Gltf2Util
 {
@@ -49,7 +46,7 @@ static const Geometry::Type GLTF2_TO_DALI_PRIMITIVES[]{
 
 static struct AttributeMapping
 {
-  gltf2::Attribute::Type      mType;
+  gltf2::Attribute::Type   mType;
   MeshDefinition::Accessor MeshDefinition::*mAccessor;
   uint16_t                                  mElementSizeRequired;
 } ATTRIBUTE_MAPPINGS[]{
@@ -110,14 +107,14 @@ const auto ACCESSOR_SPARSE_READER = std::move(json::Reader<gltf2::Accessor::Spar
 
 const auto ACCESSOR_READER = std::move(json::Reader<gltf2::Accessor>()
                                          .Register(*new json::Property<gltf2::Accessor, gltf2::Ref<gltf2::BufferView>>("bufferView",
-                                                                                                            gltf2::RefReader<gltf2::Document>::Read<gltf2::BufferView, &gltf2::Document::mBufferViews>,
-                                                                                                            &gltf2::Accessor::mBufferView))
+                                                                                                                       gltf2::RefReader<gltf2::Document>::Read<gltf2::BufferView, &gltf2::Document::mBufferViews>,
+                                                                                                                       &gltf2::Accessor::mBufferView))
                                          .Register(*new json::Property<gltf2::Accessor, uint32_t>("byteOffset",
-                                                                                             json::Read::Number<uint32_t>,
-                                                                                             &gltf2::Accessor::mByteOffset))
+                                                                                                  json::Read::Number<uint32_t>,
+                                                                                                  &gltf2::Accessor::mByteOffset))
                                          .Register(*new json::Property<gltf2::Accessor, gltf2::Component::Type>("componentType",
-                                                                                                        json::Read::Enum<gltf2::Component::Type>,
-                                                                                                        &gltf2::Accessor::mComponentType))
+                                                                                                                json::Read::Enum<gltf2::Component::Type>,
+                                                                                                                &gltf2::Accessor::mComponentType))
                                          .Register(*new json::Property<gltf2::Accessor, std::string_view>("name", json::Read::StringView, &gltf2::Accessor::mName))
                                          .Register(*json::MakeProperty("count", json::Read::Number<uint32_t>, &gltf2::Accessor::mCount))
                                          .Register(*json::MakeProperty("normalized", json::Read::Boolean, &gltf2::Accessor::mNormalized))
@@ -182,22 +179,22 @@ const auto MATERIAL_READER = std::move(json::Reader<gltf2::Material>()
 
 std::map<gltf2::Attribute::Type, gltf2::Ref<gltf2::Accessor>> ReadMeshPrimitiveAttributes(const json_value_s& j)
 {
-  auto&                                                jo = json::Cast<json_object_s>(j);
+  auto&                                                         jo = json::Cast<json_object_s>(j);
   std::map<gltf2::Attribute::Type, gltf2::Ref<gltf2::Accessor>> result;
 
   auto i = jo.start;
   while(i)
   {
-    auto jstr                                                        = *i->name;
+    auto jstr                                                           = *i->name;
     result[gltf2::Attribute::FromString(jstr.string, jstr.string_size)] = gltf2::RefReader<gltf2::Document>::Read<gltf2::Accessor, &gltf2::Document::mAccessors>(*i->value);
-    i                                                                = i->next;
+    i                                                                   = i->next;
   }
   return result;
 }
 
 std::vector<std::map<gltf2::Attribute::Type, gltf2::Ref<gltf2::Accessor>>> ReadMeshPrimitiveTargets(const json_value_s& j)
 {
-  auto&                                                             jo = json::Cast<json_array_s>(j);
+  auto&                                                                      jo = json::Cast<json_array_s>(j);
   std::vector<std::map<gltf2::Attribute::Type, gltf2::Ref<gltf2::Accessor>>> result;
 
   result.reserve(jo.length);
@@ -222,21 +219,21 @@ const auto MESH_PRIMITIVE_READER = std::move(json::Reader<gltf2::Mesh::Primitive
 const auto MESH_READER = std::move(json::Reader<gltf2::Mesh>()
                                      .Register(*new json::Property<gltf2::Mesh, std::string_view>("name", json::Read::StringView, &gltf2::Mesh::mName))
                                      .Register(*json::MakeProperty("primitives",
-                                                                 json::Read::Array<gltf2::Mesh::Primitive, json::ObjectReader<gltf2::Mesh::Primitive>::Read>,
-                                                                 &gltf2::Mesh::mPrimitives))
+                                                                   json::Read::Array<gltf2::Mesh::Primitive, json::ObjectReader<gltf2::Mesh::Primitive>::Read>,
+                                                                   &gltf2::Mesh::mPrimitives))
                                      .Register(*json::MakeProperty("weights", json::Read::Array<float, json::Read::Number>, &gltf2::Mesh::mWeights)));
 
 const auto SKIN_READER = std::move(json::Reader<gltf2::Skin>()
                                      .Register(*new json::Property<gltf2::Skin, std::string_view>("name", json::Read::StringView, &gltf2::Skin::mName))
                                      .Register(*json::MakeProperty("inverseBindMatrices",
-                                                                 gltf2::RefReader<gltf2::Document>::Read<gltf2::Accessor, &gltf2::Document::mAccessors>,
-                                                                 &gltf2::Skin::mInverseBindMatrices))
+                                                                   gltf2::RefReader<gltf2::Document>::Read<gltf2::Accessor, &gltf2::Document::mAccessors>,
+                                                                   &gltf2::Skin::mInverseBindMatrices))
                                      .Register(*json::MakeProperty("skeleton",
-                                                                 gltf2::RefReader<gltf2::Document>::Read<gltf2::Node, &gltf2::Document::mNodes>,
-                                                                 &gltf2::Skin::mSkeleton))
+                                                                   gltf2::RefReader<gltf2::Document>::Read<gltf2::Node, &gltf2::Document::mNodes>,
+                                                                   &gltf2::Skin::mSkeleton))
                                      .Register(*json::MakeProperty("joints",
-                                                                 json::Read::Array<gltf2::Ref<gltf2::Node>, gltf2::RefReader<gltf2::Document>::Read<gltf2::Node, &gltf2::Document::mNodes>>,
-                                                                 &gltf2::Skin::mJoints)));
+                                                                   json::Read::Array<gltf2::Ref<gltf2::Node>, gltf2::RefReader<gltf2::Document>::Read<gltf2::Node, &gltf2::Document::mNodes>>,
+                                                                   &gltf2::Skin::mJoints)));
 
 const auto CAMERA_PERSPECTIVE_READER = std::move(json::Reader<gltf2::Camera::Perspective>()
                                                    .Register(*json::MakeProperty("aspectRatio", json::Read::Number<float>, &gltf2::Camera::Perspective::mAspectRatio))
@@ -283,58 +280,58 @@ const auto ANIMATION_CHANNEL_READER = std::move(json::Reader<gltf2::Animation::C
 const auto ANIMATION_READER = std::move(json::Reader<gltf2::Animation>()
                                           .Register(*new json::Property<gltf2::Animation, std::string_view>("name", json::Read::StringView, &gltf2::Animation::mName))
                                           .Register(*json::MakeProperty("samplers",
-                                                                      json::Read::Array<gltf2::Animation::Sampler, json::ObjectReader<gltf2::Animation::Sampler>::Read>,
-                                                                      &gltf2::Animation::mSamplers))
+                                                                        json::Read::Array<gltf2::Animation::Sampler, json::ObjectReader<gltf2::Animation::Sampler>::Read>,
+                                                                        &gltf2::Animation::mSamplers))
                                           .Register(*json::MakeProperty("channels",
-                                                                      json::Read::Array<gltf2::Animation::Channel, json::ObjectReader<gltf2::Animation::Channel>::Read>,
-                                                                      &gltf2::Animation::mChannels)));
+                                                                        json::Read::Array<gltf2::Animation::Channel, json::ObjectReader<gltf2::Animation::Channel>::Read>,
+                                                                        &gltf2::Animation::mChannels)));
 
 const auto SCENE_READER = std::move(json::Reader<gltf2::Scene>()
                                       .Register(*new json::Property<gltf2::Scene, std::string_view>("name", json::Read::StringView, &gltf2::Scene::mName))
                                       .Register(*json::MakeProperty("nodes",
-                                                                  json::Read::Array<gltf2::Ref<gltf2::Node>, gltf2::RefReader<gltf2::Document>::Read<gltf2::Node, &gltf2::Document::mNodes>>,
-                                                                  &gltf2::Scene::mNodes)));
+                                                                    json::Read::Array<gltf2::Ref<gltf2::Node>, gltf2::RefReader<gltf2::Document>::Read<gltf2::Node, &gltf2::Document::mNodes>>,
+                                                                    &gltf2::Scene::mNodes)));
 
 const auto DOCUMENT_READER = std::move(json::Reader<gltf2::Document>()
                                          .Register(*json::MakeProperty("buffers",
-                                                                     json::Read::Array<gltf2::Buffer, json::ObjectReader<gltf2::Buffer>::Read>,
-                                                                     &gltf2::Document::mBuffers))
+                                                                       json::Read::Array<gltf2::Buffer, json::ObjectReader<gltf2::Buffer>::Read>,
+                                                                       &gltf2::Document::mBuffers))
                                          .Register(*json::MakeProperty("bufferViews",
-                                                                     json::Read::Array<gltf2::BufferView, json::ObjectReader<gltf2::BufferView>::Read>,
-                                                                     &gltf2::Document::mBufferViews))
+                                                                       json::Read::Array<gltf2::BufferView, json::ObjectReader<gltf2::BufferView>::Read>,
+                                                                       &gltf2::Document::mBufferViews))
                                          .Register(*json::MakeProperty("accessors",
-                                                                     json::Read::Array<gltf2::Accessor, json::ObjectReader<gltf2::Accessor>::Read>,
-                                                                     &gltf2::Document::mAccessors))
+                                                                       json::Read::Array<gltf2::Accessor, json::ObjectReader<gltf2::Accessor>::Read>,
+                                                                       &gltf2::Document::mAccessors))
                                          .Register(*json::MakeProperty("images",
-                                                                     json::Read::Array<gltf2::Image, json::ObjectReader<gltf2::Image>::Read>,
-                                                                     &gltf2::Document::mImages))
+                                                                       json::Read::Array<gltf2::Image, json::ObjectReader<gltf2::Image>::Read>,
+                                                                       &gltf2::Document::mImages))
                                          .Register(*json::MakeProperty("samplers",
-                                                                     json::Read::Array<gltf2::Sampler, json::ObjectReader<gltf2::Sampler>::Read>,
-                                                                     &gltf2::Document::mSamplers))
+                                                                       json::Read::Array<gltf2::Sampler, json::ObjectReader<gltf2::Sampler>::Read>,
+                                                                       &gltf2::Document::mSamplers))
                                          .Register(*json::MakeProperty("textures",
-                                                                     json::Read::Array<gltf2::Texture, json::ObjectReader<gltf2::Texture>::Read>,
-                                                                     &gltf2::Document::mTextures))
+                                                                       json::Read::Array<gltf2::Texture, json::ObjectReader<gltf2::Texture>::Read>,
+                                                                       &gltf2::Document::mTextures))
                                          .Register(*json::MakeProperty("materials",
-                                                                     json::Read::Array<gltf2::Material, json::ObjectReader<gltf2::Material>::Read>,
-                                                                     &gltf2::Document::mMaterials))
+                                                                       json::Read::Array<gltf2::Material, json::ObjectReader<gltf2::Material>::Read>,
+                                                                       &gltf2::Document::mMaterials))
                                          .Register(*json::MakeProperty("meshes",
-                                                                     json::Read::Array<gltf2::Mesh, json::ObjectReader<gltf2::Mesh>::Read>,
-                                                                     &gltf2::Document::mMeshes))
+                                                                       json::Read::Array<gltf2::Mesh, json::ObjectReader<gltf2::Mesh>::Read>,
+                                                                       &gltf2::Document::mMeshes))
                                          .Register(*json::MakeProperty("skins",
-                                                                     json::Read::Array<gltf2::Skin, json::ObjectReader<gltf2::Skin>::Read>,
-                                                                     &gltf2::Document::mSkins))
+                                                                       json::Read::Array<gltf2::Skin, json::ObjectReader<gltf2::Skin>::Read>,
+                                                                       &gltf2::Document::mSkins))
                                          .Register(*json::MakeProperty("cameras",
-                                                                     json::Read::Array<gltf2::Camera, json::ObjectReader<gltf2::Camera>::Read>,
-                                                                     &gltf2::Document::mCameras))
+                                                                       json::Read::Array<gltf2::Camera, json::ObjectReader<gltf2::Camera>::Read>,
+                                                                       &gltf2::Document::mCameras))
                                          .Register(*json::MakeProperty("nodes",
-                                                                     json::Read::Array<gltf2::Node, json::ObjectReader<gltf2::Node>::Read>,
-                                                                     &gltf2::Document::mNodes))
+                                                                       json::Read::Array<gltf2::Node, json::ObjectReader<gltf2::Node>::Read>,
+                                                                       &gltf2::Document::mNodes))
                                          .Register(*json::MakeProperty("animations",
-                                                                     ReadAnimationArray,
-                                                                     &gltf2::Document::mAnimations))
+                                                                       ReadAnimationArray,
+                                                                       &gltf2::Document::mAnimations))
                                          .Register(*json::MakeProperty("scenes",
-                                                                     json::Read::Array<gltf2::Scene, json::ObjectReader<gltf2::Scene>::Read>,
-                                                                     &gltf2::Document::mScenes))
+                                                                       json::Read::Array<gltf2::Scene, json::ObjectReader<gltf2::Scene>::Read>,
+                                                                       &gltf2::Document::mScenes))
                                          .Register(*json::MakeProperty("scene", gltf2::RefReader<gltf2::Document>::Read<gltf2::Scene, &gltf2::Document::mScenes>, &gltf2::Document::mScene)));
 
 void ConvertBuffer(const gltf2::Buffer& buffer, decltype(ResourceBundle::mBuffers)& outBuffers, const std::string& resourcePath)
@@ -425,8 +422,7 @@ TextureDefinition ConvertTextureInfo(const gltf2::TextureInfo& mm, ConversionCon
 
 void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
-  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gltf2::TextureInfo& info)
-  {
+  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gltf2::TextureInfo& info) {
     if(!info.mTexture->mSource->mUri.empty())
     {
       if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
@@ -784,8 +780,7 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIdx, Index parentIdx, 
   auto& resources = output.mResources;
 
   const auto idx      = scene.GetNodeCount();
-  auto       weakNode = scene.AddNode([&]()
-                                {
+  auto       weakNode = scene.AddNode([&]() {
     std::unique_ptr<NodeDefinition> nodeDef{new NodeDefinition()};
 
     nodeDef->mParentIdx = parentIdx;
@@ -1323,7 +1318,4 @@ void ConvertGltfToContext(gt::Document& document, Gltf2Util::ConversionContext& 
 
 } // namespace Gltf2Util
 
-} // namespace Internal
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader::Internal

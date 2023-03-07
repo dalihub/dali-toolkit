@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,18 @@
  *
  */
 
-// EXTERNAL
-#include "dali/devel-api/common/map-wrapper.h"
-#include "dali/public-api/animation/constraints.h"
+// CLASS HEADER
+#include <dali-scene3d/public-api/loader/scene-definition.h>
+
+// EXTERNAL INCLUDES
+#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/public-api/animation/constraints.h>
 
 // INTERNAL
-#include "dali-scene3d/internal/graphics/builtin-shader-extern-gen.h"
-#include "dali-scene3d/public-api/loader/blend-shape-details.h"
-#include "dali-scene3d/public-api/loader/scene-definition.h"
-#include "dali-scene3d/public-api/loader/skinning-details.h"
-#include "dali-scene3d/public-api/loader/utils.h"
+#include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-scene3d/public-api/loader/blend-shape-details.h>
+#include <dali-scene3d/public-api/loader/skinning-details.h>
+#include <dali-scene3d/public-api/loader/utils.h>
 
 //#define DEBUG_SCENE_DEFINITION
 //#define DEBUG_JOINTS
@@ -37,11 +39,7 @@
 
 #define LOGD(x) DEBUG_ONLY(printf x; printf("\n"); fflush(stdout))
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 namespace
 {
@@ -1195,6 +1193,4 @@ bool SceneDefinition::FindNode(const std::string& name, std::unique_ptr<NodeDefi
   return success;
 }
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

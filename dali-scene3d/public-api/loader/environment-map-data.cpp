@@ -24,11 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 Texture EnvironmentMapData::GetTexture()
 {
@@ -67,6 +63,4 @@ Texture EnvironmentMapData::GetTexture()
   return mEnvironmentMapTexture;
 }
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_UTILS_H_
 #define DALI_SCENE3D_LOADER_UTILS_H_
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,17 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/api.h"
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <cctype>
 #include <sstream>
-#include "dali/public-api/actors/actor.h"
-#include "dali/public-api/common/dali-common.h"
-#include "dali/public-api/rendering/renderer.h"
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
+
+namespace Dali::Scene3D::Loader
 {
 /*
  * @brief Fixed size backing buffer to use with std::ostreams where control over
@@ -199,8 +195,6 @@ DALI_SCENE3D_API Geometry MakeTexturedQuadGeometry(TexturedQuadOptions::Type opt
  */
 DALI_SCENE3D_API void ToUnixFileSeparators(std::string& path);
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif /* DALI_SCENE3D_LOADER_UTILS_H_ */

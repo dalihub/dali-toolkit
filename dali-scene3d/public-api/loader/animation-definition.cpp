@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,11 @@
  * limitations under the License.
  *
  */
-#include "dali-scene3d/public-api/loader/animation-definition.h"
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// CLASS HEADER
+#include <dali-scene3d/public-api/loader/animation-definition.h>
+
+namespace Dali::Scene3D::Loader
 {
 const float AnimationDefinition::DEFAULT_DURATION_SECONDS = 1.f;
 const float AnimationDefinition::MIN_DURATION_SECONDS     = 1e-2f;
@@ -85,6 +83,4 @@ AnimationDefinition& AnimationDefinition::operator=(AnimationDefinition&& other)
   return *this;
 }
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

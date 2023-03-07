@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_RENDERER_STATE_H
 #define DALI_SCENE3D_LOADER_RENDERER_STATE_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,13 @@
  *
  */
 
-// INTERAL INCLUDES
-#include "dali-scene3d/public-api/api.h"
-
 // EXTERNAL INCLUDES
-#include "dali/public-api/rendering/renderer.h"
+#include <dali/public-api/rendering/renderer.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
+
+namespace Dali::Scene3D::Loader
 {
 /*
  * @brief Contains values for comparison functions used in depth and stencil testing.
@@ -158,8 +154,6 @@ DALI_SCENE3D_API void Apply(Type rendererState, Renderer& renderer);
 
 } // namespace RendererState
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_RENDERER_STATE_H

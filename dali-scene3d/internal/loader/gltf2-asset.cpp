@@ -37,7 +37,8 @@ constexpr uint32_t ACCESSOR_TYPE_ELEMENT_COUNT[]{
   4,
   9,
   16,
-  static_cast<uint32_t>(-1)};
+  static_cast<uint32_t>(-1),
+};
 
 const std::map<std::string_view, AccessorType::Type> ACCESSOR_TYPES{
   ENUM_STRING_MAPPING(AccessorType, SCALAR),

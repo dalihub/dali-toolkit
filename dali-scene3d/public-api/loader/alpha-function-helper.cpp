@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-#include "dali-scene3d/public-api/loader/alpha-function-helper.h"
+
+// CLASS HEADER
+#include <dali-scene3d/public-api/loader/alpha-function-helper.h>
+
+// EXTERNAL INCLUDES
 #include <unordered_map>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 namespace
 {
@@ -67,6 +67,4 @@ void RegisterAlphaFunction(const std::string& name, AlphaFunction alphaFn)
                      "Function with given key already exists.");
 }
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

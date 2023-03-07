@@ -18,13 +18,13 @@
 // FILE HEADER
 #include <dali-scene3d/public-api/loader/environment-map-loader.h>
 
-// INTERNAL INCLUDES
-#include <dali-scene3d/public-api/loader/ktx-loader.h>
-
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <string.h>
 #include <filesystem>
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/loader/ktx-loader.h>
 
 namespace Dali
 {
@@ -49,7 +49,7 @@ static constexpr Vector2 NUMBER_OF_CUBE_FACE[NUMBER_OF_CUBE_MAP_TYPE] =
   Vector2(4, 3),
   Vector2(6, 1),
   Vector2(3, 4),
-  Vector2(1, 6)
+  Vector2(1, 6),
 };
 
 static constexpr float expectedAspectRatios[NUMBER_OF_ENVIRONMENT_MAP_TYPE] =
@@ -58,7 +58,7 @@ static constexpr float expectedAspectRatios[NUMBER_OF_ENVIRONMENT_MAP_TYPE] =
   6.0f / 1.0f,
   3.0f / 4.0f,
   1.0f / 6.0f,
-  2.0f / 1.0f
+  2.0f / 1.0f,
 };
 
 enum CubeType
@@ -189,7 +189,6 @@ namespace Scene3D
 {
 namespace Loader
 {
-
 bool LoadEnvironmentMap(const std::string& environmentMapUrl, EnvironmentMapData& environmentMapData)
 {
   std::filesystem::path modelPath(environmentMapUrl);

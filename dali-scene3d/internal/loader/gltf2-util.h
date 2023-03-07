@@ -17,6 +17,10 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/threading/mutex.h>
+#include <dali/public-api/common/dali-common.h>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/gltf2-asset.h>
 #include <dali-scene3d/public-api/loader/load-result.h>
@@ -24,24 +28,13 @@
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-scene3d/public-api/loader/shader-definition-factory.h>
 
-// EXTERNAL INCLUDES
-#include <dali/devel-api/threading/mutex.h>
-#include <dali/integration-api/debug.h>
-
 namespace gt = gltf2;
 namespace js = json;
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
-{
-namespace Internal
+namespace Dali::Scene3D::Loader::Internal
 {
 namespace Gltf2Util
 {
-
 struct NodeMapping
 {
   Index gltfIdx;
@@ -56,8 +49,8 @@ struct NodeMapping
 class NodeIndexMapper
 {
 public:
-  NodeIndexMapper()                                  = default;
-  NodeIndexMapper(const NodeIndexMapper&)            = delete;
+  NodeIndexMapper()                       = default;
+  NodeIndexMapper(const NodeIndexMapper&) = delete;
   NodeIndexMapper& operator=(const NodeIndexMapper&) = delete;
 
   ///@brief Registers a mapping of the @a gltfIdx of a node to its @a runtimeIdx .
@@ -127,9 +120,6 @@ void ConvertGltfToContext(gt::Document& document, Gltf2Util::ConversionContext& 
 
 } // namespace Gltf2Util
 
-} // namespace Internal
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader::Internal
 
 #endif // DALI_SCENE3D_LOADER_GLTF2_UTIL_H

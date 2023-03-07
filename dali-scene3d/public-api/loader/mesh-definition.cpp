@@ -15,8 +15,8 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/loader/mesh-definition.h"
+// CLASS HEADER
+#include <dali-scene3d/public-api/loader/mesh-definition.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/file-stream.h>
@@ -27,11 +27,7 @@
 #include <fstream>
 #include <type_traits>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 namespace
 {
@@ -1032,6 +1028,4 @@ MeshGeometry MeshDefinition::Load(RawData&& raw) const
   return meshGeometry;
 }
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

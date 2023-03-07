@@ -25,11 +25,7 @@
 // EXTERNAL INCLUDES
 #include <string>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 namespace Internal
 {
@@ -119,8 +115,6 @@ private:
 
   std::shared_ptr<Internal::ModelLoaderImpl> mImpl;
 };
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_MODEL_LOADER_H

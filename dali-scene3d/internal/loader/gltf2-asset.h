@@ -17,10 +17,6 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-scene3d/internal/loader/json-reader.h>
-#include <dali-scene3d/public-api/loader/index.h>
-
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/common/vector-wrapper.h>
@@ -28,6 +24,10 @@
 #include <dali/public-api/math/vector4.h>
 #include <cstdint>
 #include <memory>
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/internal/loader/json-reader.h>
+#include <dali-scene3d/public-api/loader/index.h>
 
 #define ENUM_STRING_MAPPING(t, x) \
   {                               \

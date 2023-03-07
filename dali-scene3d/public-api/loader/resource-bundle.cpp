@@ -18,7 +18,7 @@
 // FILE HEADER
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 
-// EXTERNAL
+// EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <cstring>
@@ -53,9 +53,7 @@ ResourceBundle::ResourceBundle()
 : mRawResourcesLoading(false),
   mResourcesGenerating(false),
   mRawResourcesLoaded(false),
-  mResourcesGenerated(false)
-{
-};
+  mResourcesGenerated(false){};
 
 ResourceRefCounts ResourceBundle::CreateRefCounter() const
 {
