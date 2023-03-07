@@ -17,7 +17,14 @@
  *
  */
 
-// INTERNAL
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/rendering/texture-set.h>
+#include <functional>
+#include <memory>
+
+// INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/buffer-definition.h>
 #include <dali-scene3d/public-api/loader/environment-definition.h>
 #include <dali-scene3d/public-api/loader/material-definition.h>
@@ -25,18 +32,7 @@
 #include <dali-scene3d/public-api/loader/shader-definition.h>
 #include <dali-scene3d/public-api/loader/skeleton-definition.h>
 
-// EXTERNAL
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/rendering/shader.h>
-#include <dali/public-api/rendering/texture-set.h>
-#include <functional>
-#include <memory>
-
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 /*
  * @brief The types of resources that .dli may define.
@@ -160,8 +156,6 @@ public: // DATA
   bool mResourcesGenerated;
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADERERERERER_RESOURCE_BUNDLE_H_

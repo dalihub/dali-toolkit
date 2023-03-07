@@ -17,23 +17,19 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/api.h"
-#include "dali-scene3d/public-api/loader/blend-shape-details.h"
-#include "dali-scene3d/public-api/loader/index.h"
-#include "dali-scene3d/public-api/loader/mesh-geometry.h"
-#include "dali-scene3d/public-api/loader/utils.h"
-#include <dali-scene3d/public-api/loader/buffer-definition.h>
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <memory>
-#include "dali/public-api/common/vector-wrapper.h"
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/loader/blend-shape-details.h>
+#include <dali-scene3d/public-api/loader/buffer-definition.h>
+#include <dali-scene3d/public-api/loader/index.h>
+#include <dali-scene3d/public-api/loader/mesh-geometry.h>
+#include <dali-scene3d/public-api/loader/utils.h>
+
+namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Defines a mesh with its attributes, the primitive type to render it as,
@@ -177,10 +173,10 @@ struct DALI_SCENE3D_API MeshDefinition
 
     Accessor(const MeshDefinition::Blob&       blob,
              const MeshDefinition::SparseBlob& sparse,
-             Index bufferIndex = INVALID_INDEX);
+             Index                             bufferIndex = INVALID_INDEX);
     Accessor(MeshDefinition::Blob&&       blob,
              MeshDefinition::SparseBlob&& sparse,
-             Index bufferIndex = INVALID_INDEX);
+             Index                        bufferIndex = INVALID_INDEX);
 
     bool IsDefined() const
     {
@@ -295,8 +291,6 @@ public: // DATA
   Index mSkeletonIdx = INVALID_INDEX;
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_MESH_DEFINITION_H

@@ -15,14 +15,16 @@
  *
  */
 
+// CLASS HEADER
+#include <dali-scene3d/public-api/loader/environment-definition.h>
+
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 
 // INTERNAL INCLUDES
-#include "dali-scene3d/public-api/loader/environment-map-loader.h"
-#include "dali-scene3d/public-api/loader/environment-definition.h"
-#include "dali-scene3d/public-api/loader/utils.h"
+#include <dali-scene3d/public-api/loader/environment-map-loader.h>
+#include <dali-scene3d/public-api/loader/utils.h>
 
 namespace
 {
@@ -35,11 +37,7 @@ std::string GetDaliImagePath()
 static constexpr float DEFAULT_INTENSITY = 1.0f;
 } // unnamed namespace
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 namespace
 {
@@ -109,6 +107,4 @@ float EnvironmentDefinition::GetDefaultIntensity()
   return DEFAULT_INTENSITY;
 }
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

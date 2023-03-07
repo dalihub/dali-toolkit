@@ -17,19 +17,18 @@
 // CLASS HEADER
 #include <dali-scene3d/public-api/loader/navigation-mesh-factory.h>
 
-// INTERNAL INCLUDES
-#include <dali-scene3d/internal/algorithm/navigation-mesh-impl.h>
-
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
+// INTERNAL INCLUDES
+#include <dali-scene3d/internal/algorithm/navigation-mesh-impl.h>
+
 namespace Dali::Scene3D::Loader
 {
-
 std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(std::string filename)
 {
   std::vector<uint8_t> buffer;
-  auto fin = fopen(filename.c_str(), "rb");
+  auto                 fin = fopen(filename.c_str(), "rb");
   if(!fin)
   {
     DALI_LOG_ERROR("NavigationMesh: Can't open %s for reading: %s", filename.c_str(), strerror(errno));
@@ -50,14 +49,14 @@ std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile
     }
     fclose(fin);
 
-    return CreateFromBuffer( buffer );
+    return CreateFromBuffer(buffer);
   }
 }
 
 std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromBuffer(const std::vector<uint8_t>& buffer)
 {
   auto impl = new Scene3D::Internal::Algorithm::NavigationMesh(buffer);
-  return std::unique_ptr<Algorithm::NavigationMesh>( new Algorithm::NavigationMesh(impl));
+  return std::unique_ptr<Algorithm::NavigationMesh>(new Algorithm::NavigationMesh(impl));
 }
 
-}
+} // namespace Dali::Scene3D::Loader

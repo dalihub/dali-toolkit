@@ -29,15 +29,8 @@
 namespace gt = gltf2;
 namespace js = json;
 
-namespace Dali
+namespace Dali::Scene3D::Loader::Internal
 {
-namespace Scene3D
-{
-namespace Loader
-{
-namespace Internal
-{
-
 bool Gltf2LoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::LoadResult& result)
 {
   bool failed   = false;
@@ -71,7 +64,4 @@ bool Gltf2LoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::L
   return true;
 }
 
-} // namespace Internal
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader::Internal

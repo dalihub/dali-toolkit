@@ -25,15 +25,11 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/dli-loader-impl.h>
-#include <dali-scene3d/internal/loader/gltf2-loader-impl.h>
 #include <dali-scene3d/internal/loader/glb-loader-impl.h>
+#include <dali-scene3d/internal/loader/gltf2-loader-impl.h>
 #include <dali-scene3d/internal/loader/model-loader-impl.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 namespace
 {
@@ -156,6 +152,4 @@ void ModelLoader::LoadResource(Dali::Scene3D::Loader::ResourceBundle::PathProvid
   }
 }
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

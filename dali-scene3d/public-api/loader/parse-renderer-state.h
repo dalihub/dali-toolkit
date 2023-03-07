@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADERERER_INTERPRET_RENDERER_STATE_H
 #define DALI_SCENE3D_LOADERERER_INTERPRET_RENDERER_STATE_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,11 @@
  *
  */
 
-#include "dali-scene3d/public-api/loader/renderer-state.h"
-#include "dali-scene3d/public-api/loader/string-callback.h"
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/loader/renderer-state.h>
+#include <dali-scene3d/public-api/loader/string-callback.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 namespace RendererState
 {
@@ -44,8 +41,6 @@ namespace RendererState
 DALI_SCENE3D_API Type Parse(const char* string, size_t length = 0, StringCallback onError = DefaultErrorCallback);
 
 } // namespace RendererState
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADERERER_INTERPRET_RENDERER_STATE_H

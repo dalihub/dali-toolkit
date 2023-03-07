@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,21 @@
  * limitations under the License.
  *
  */
-#include "dali-scene3d/internal/loader/json-util.h"
+
+// CLASS HEADER
+#include <dali-scene3d/internal/loader/json-util.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/public-api/common/extents.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/matrix3.h>
+#include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/radian.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/object/property-value.h>
 #include <array>
-#include "dali/devel-api/common/map-wrapper.h"
-#include "dali/public-api/common/extents.h"
-#include "dali/public-api/math/matrix.h"
-#include "dali/public-api/math/matrix3.h"
-#include "dali/public-api/math/quaternion.h"
-#include "dali/public-api/math/radian.h"
-#include "dali/public-api/math/vector2.h"
-#include "dali/public-api/math/vector3.h"
-#include "dali/public-api/object/property-value.h"
 
 namespace Dali
 {

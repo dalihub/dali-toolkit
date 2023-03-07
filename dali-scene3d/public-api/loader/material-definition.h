@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_MATERIAL_DEFINITION_H
 #define DALI_SCENE3D_LOADER_MATERIAL_DEFINITION_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,19 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/api.h"
-#include "dali-scene3d/public-api/loader/environment-definition.h"
-#include "dali-scene3d/public-api/loader/index.h"
-#include "dali-scene3d/public-api/loader/utils.h"
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/math/vector4.h>
 #include <cmath>
-#include "dali/public-api/common/vector-wrapper.h"
-#include "dali/public-api/math/vector4.h"
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/loader/environment-definition.h>
+#include <dali-scene3d/public-api/loader/index.h>
+#include <dali-scene3d/public-api/loader/utils.h>
+
+namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Helper enum for encoding and decoding sampler states.
@@ -254,8 +250,6 @@ public: // DATA
   std::vector<TextureStage> mTextureStages;
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_MATERIAL_DEFINITION_H

@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_SHADER_DEFINITION_FACTORY_H_
 #define DALI_SCENE3D_LOADER_SHADER_DEFINITION_FACTORY_H_
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,15 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/api.h"
-#include "dali-scene3d/public-api/loader/index.h"
-#include <dali-scene3d/public-api/loader/node-definition.h>
-
 // EXTERNAL INCLUDER
 #include <memory>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/loader/index.h>
+#include <dali-scene3d/public-api/loader/node-definition.h>
+
+namespace Dali::Scene3D::Loader
 {
 struct NodeDefinition;
 class ResourceBundle;
@@ -59,8 +55,6 @@ private:
   const std::unique_ptr<Impl> mImpl;
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_SHADER_DEFINITION_FACTORY_H_

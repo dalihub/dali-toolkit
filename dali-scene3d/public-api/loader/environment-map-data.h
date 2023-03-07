@@ -17,21 +17,17 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/images/pixel-data.h>
+#include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/rendering/texture.h>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/common/environment-map.h>
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/images/pixel-data.h>
-#include <dali/public-api/rendering/texture.h>
-#include <dali/public-api/rendering/shader.h>
-
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Stores the pixel data objects for environment map texture.
@@ -78,8 +74,6 @@ private:
   Dali::Scene3D::EnvironmentMapType mEnvironmentMapType{Dali::Scene3D::EnvironmentMapType::AUTO};
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_ENVIRONMENT_MAP_DATA_H

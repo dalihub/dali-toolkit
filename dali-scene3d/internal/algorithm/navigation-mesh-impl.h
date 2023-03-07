@@ -17,12 +17,9 @@
  * limitations under the License.
  */
 
-// INTERNAL INCLUDES
-#include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
-#include <dali-scene3d/public-api/algorithm/path-finder.h>
-
-// INTERNAL EXTERNAL
+// EXTERNAL EXTERNAL
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
@@ -30,8 +27,11 @@
 #include <cinttypes>
 #include <cstdio>
 #include <mutex>
-#include <vector>
-#include "navigation-mesh-header.h"
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/internal/algorithm/navigation-mesh-header.h>
+#include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
+#include <dali-scene3d/public-api/algorithm/path-finder.h>
 
 namespace Dali::Scene3D::Loader
 {
@@ -40,7 +40,6 @@ class NavigationMeshFactory;
 
 namespace Dali::Scene3D::Internal::Algorithm
 {
-
 class NavigationRay;
 
 /**
@@ -54,7 +53,6 @@ public:
   using Vertex = Dali::Scene3D::Algorithm::NavigationMesh::Vertex;
 
 private:
-
   friend class Scene3D::Loader::NavigationMeshFactory;
 
   /**
@@ -63,7 +61,6 @@ private:
   NavigationMesh(const std::vector<uint8_t>& buffer);
 
 public:
-
   /**
    * Destructor
    */
@@ -157,11 +154,11 @@ public:
   [[nodiscard]] Dali::Vector3 GetGravityVector() const;
 
 private:
-  std::vector<uint8_t> mBuffer;                    //< Data buffer
-  NavigationMeshHeader_V10 mHeader;                //< Navigation mesh header
-  uint16_t             mCurrentFace;               //< Current face (last floor position)
-  Dali::Matrix         mTransform;                 //< Transform matrix
-  Dali::Matrix         mTransformInverse;          //< Inverse of the transform matrix
+  std::vector<uint8_t>     mBuffer;           //< Data buffer
+  NavigationMeshHeader_V10 mHeader;           //< Navigation mesh header
+  uint16_t                 mCurrentFace;      //< Current face (last floor position)
+  Dali::Matrix             mTransform;        //< Transform matrix
+  Dali::Matrix             mTransformInverse; //< Inverse of the transform matrix
 };
 
 inline Internal::Algorithm::NavigationMesh& GetImplementation(Dali::Scene3D::Algorithm::NavigationMesh& navigationMesh)

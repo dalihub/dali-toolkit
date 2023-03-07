@@ -17,18 +17,18 @@
  * limitations under the License.
  */
 
-// INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 
 #include <cinttypes>
 #include <cstdio>
-#include <vector>
 #include <memory>
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
 
 namespace Dali::Scene3D::Internal::Algorithm
 {
@@ -41,9 +41,9 @@ class NavigationMeshFactory;
 }
 
 constexpr auto NAVIGATION_MESH_MAX_VERTICES_PER_FACE = 3u;
-constexpr auto NAVIGATION_MESH_MAX_EDGES_PER_FACE = 3u;
-constexpr auto NAVIGATION_MESH_MAX_COMPONENTS_3D = 3u;
-constexpr auto NAVIGATION_MESH_MAX_COMPONENTS_2D = 2u;
+constexpr auto NAVIGATION_MESH_MAX_EDGES_PER_FACE    = 3u;
+constexpr auto NAVIGATION_MESH_MAX_COMPONENTS_3D     = 3u;
+constexpr auto NAVIGATION_MESH_MAX_COMPONENTS_2D     = 2u;
 
 namespace Dali::Scene3D::Algorithm
 {
@@ -72,7 +72,6 @@ using NavigationMeshImpl = Dali::Scene3D::Internal::Algorithm::NavigationMesh;
 class DALI_SCENE3D_API NavigationMesh
 {
 public:
-
   /**
    * @struct Face
    *
@@ -81,9 +80,9 @@ public:
   struct Face
   {
     uint16_t vertex[NAVIGATION_MESH_MAX_VERTICES_PER_FACE]; ///< Vertices per face
-    uint16_t edge[NAVIGATION_MESH_MAX_EDGES_PER_FACE]; ///< Edges per face
-    float    normal[NAVIGATION_MESH_MAX_COMPONENTS_3D]; ///< Normal vector
-    float    center[NAVIGATION_MESH_MAX_COMPONENTS_3D]; ///< Barycentric coordinates
+    uint16_t edge[NAVIGATION_MESH_MAX_EDGES_PER_FACE];      ///< Edges per face
+    float    normal[NAVIGATION_MESH_MAX_COMPONENTS_3D];     ///< Normal vector
+    float    center[NAVIGATION_MESH_MAX_COMPONENTS_3D];     ///< Barycentric coordinates
   };
 
   /**
@@ -118,7 +117,6 @@ public:
   NavigationMesh() = delete;
 
 public:
-
   /**
    * @brief Destructor
    */
@@ -170,7 +168,6 @@ public:
    * @return True on success, false otherwise
    */
   bool FindFloorForFace(const Dali::Vector3& position, uint32_t faceIndex, bool dontCheckNeighbours, Dali::Vector3& outPosition);
-
 
   /**
    * @brief Returns pointer to Face structure
@@ -253,8 +250,7 @@ public:
   static constexpr uint16_t NULL_EDGE{0xffff}; ///< represents null edge
 
 public:
-
-  DALI_INTERNAL explicit NavigationMesh( NavigationMeshImpl* impl );
+  DALI_INTERNAL explicit NavigationMesh(NavigationMeshImpl* impl);
 
   std::unique_ptr<NavigationMeshImpl> mImpl;
 };

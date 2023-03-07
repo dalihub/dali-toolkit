@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADERER_SKELETON_H
 #define DALI_SCENE3D_LOADERER_SKELETON_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,13 @@
  */
 
 // INTERNAL INCLUDES
-#include "dali-scene3d/public-api/loader/index.h"
+#include <dali-scene3d/public-api/loader/index.h>
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/common/vector-wrapper.h"
-#include "dali/public-api/math/matrix.h"
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/math/matrix.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 /*
  * @brief A set of joints (stored as node indices), and an optional root node index.
@@ -50,8 +46,6 @@ struct DALI_SCENE3D_API SkeletonDefinition
   std::vector<Joint> mJoints;
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADERER_SKELETON_H

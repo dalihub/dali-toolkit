@@ -17,36 +17,25 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-scene3d/internal/loader/model-loader-impl.h>
-#include <dali-scene3d/public-api/api.h>
-
 // EXTERNAL INCLUDES
 #include <dali/devel-api/threading/mutex.h>
 #include <string>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
-{
-namespace Internal
-{
+// INTERNAL INCLUDES
+#include <dali-scene3d/internal/loader/model-loader-impl.h>
+#include <dali-scene3d/public-api/api.h>
 
+namespace Dali::Scene3D::Loader::Internal
+{
 class Gltf2LoaderImpl : public ModelLoaderImpl
 {
 public:
-
   /**
    * @copydoc Dali::Scene3D::Loader::Internal::ModelLoaderImpl::LoadMode()
    */
   bool LoadModel(const std::string& url, Dali::Scene3D::Loader::LoadResult& result) override;
 };
 
-} // namespace Internal
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader::Internal
 
 #endif // DALI_SCENE3D_LOADER_GLTF2_LOADER_IMPL_H

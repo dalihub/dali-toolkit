@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
  *
  */
 
-#include "dali-scene3d/public-api/loader/parse-renderer-state.h"
-#include <cstring>
-#include "dali/devel-api/common/map-wrapper.h"
+// CLASS HEADER
+#include <dali-scene3d/public-api/loader/parse-renderer-state.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// EXTERNAL INCLUDES
+#include <dali/devel-api/common/map-wrapper.h>
+#include <cstring>
+
+namespace Dali::Scene3D::Loader
 {
 namespace RendererState
 {
@@ -168,6 +167,4 @@ Type Parse(const char* string, size_t length, StringCallback onError)
 }
 
 } // namespace RendererState
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

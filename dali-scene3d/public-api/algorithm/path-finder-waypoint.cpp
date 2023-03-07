@@ -17,16 +17,15 @@
 // CLASS HEADER
 #include <dali-scene3d/public-api/algorithm/path-finder-waypoint.h>
 
+// EXTERNAL INCLUDES
+#include <cinttypes>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/algorithm/navigation-mesh-impl.h>
 #include <dali-scene3d/internal/algorithm/path-finder-waypoint-data.h>
 
-// EXTERNAL INCLUDES
-#include <cinttypes>
-
 namespace Dali::Scene3D::Algorithm
 {
-
 WayPoint::WayPoint()
 {
   mImpl = std::make_unique<Scene3D::Internal::Algorithm::WayPointData>();
@@ -51,13 +50,13 @@ Dali::Vector3 WayPoint::GetScenePosition() const
 
 WayPoint::WayPoint(const WayPoint& wp)
 {
-  mImpl = std::make_unique<Internal::Algorithm::WayPointData>();
+  mImpl  = std::make_unique<Internal::Algorithm::WayPointData>();
   *mImpl = *wp.mImpl;
 }
 
 WayPoint& WayPoint::operator=(const WayPoint& wp)
 {
-  mImpl = std::make_unique<Internal::Algorithm::WayPointData>();
+  mImpl  = std::make_unique<Internal::Algorithm::WayPointData>();
   *mImpl = *wp.mImpl;
   return *this;
 }
@@ -67,4 +66,4 @@ WayPoint::operator Internal::Algorithm::WayPointData&()
   return *mImpl;
 }
 
-}
+} // namespace Dali::Scene3D::Algorithm

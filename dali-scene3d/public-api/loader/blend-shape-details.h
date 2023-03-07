@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_BLEND_SHAPE_DETAILS_H
 #define DALI_SCENE3D_LOADER_BLEND_SHAPE_DETAILS_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,15 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/api.h"
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/rendering/shader.h>
 #include <string>
-#include "dali/public-api/actors/actor.h"
-#include "dali/public-api/rendering/shader.h"
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
+
+namespace Dali::Scene3D::Loader
 {
 struct MeshDefinition;
 struct MeshGeometry;
@@ -73,8 +69,6 @@ struct DALI_SCENE3D_API BlendShapes
   BlendShapes() = delete;
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_BLEND_SHAPE_DETAILS_H
