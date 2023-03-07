@@ -21,14 +21,12 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/environment-map-loader.h>
 
-
 namespace Dali
 {
 namespace Scene3D
 {
 namespace Internal
 {
-
 EnvironmentMapLoadTask::EnvironmentMapLoadTask(const std::string& environmentMapUrl, Dali::Scene3D::EnvironmentMapType environmentMapType, CallbackBase* callback)
 : AsyncTask(callback),
   mEnvironmentMapUrl(environmentMapUrl),
@@ -60,7 +58,7 @@ bool EnvironmentMapLoadTask::HasSucceeded() const
 
 Dali::Texture EnvironmentMapLoadTask::GetLoadedTexture()
 {
-  return (HasSucceeded()) ? mEnvironmentMapData.GetTexture() : Texture();;
+  return (HasSucceeded()) ? mEnvironmentMapData.GetTexture() : Texture();
 }
 
 } // namespace Internal

@@ -55,8 +55,7 @@ void ModelLoadTask::Process()
     mResourceDirectoryUrl = std::string(modelUrl.parent_path()) + "/";
   }
 
-  Dali::Scene3D::Loader::ResourceBundle::PathProvider pathProvider = [&](Dali::Scene3D::Loader::ResourceType::Value type)
-  {
+  Dali::Scene3D::Loader::ResourceBundle::PathProvider pathProvider = [&](Dali::Scene3D::Loader::ResourceType::Value type) {
     return mResourceDirectoryUrl;
   };
 
