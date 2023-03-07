@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -267,9 +267,6 @@ void ImageView::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
     bool zeroPadding = (padding == Extents());
 
-    Vector2 naturalSize;
-    mVisual.GetNaturalSize(naturalSize);
-
     Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(
       Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
     if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
@@ -281,7 +278,7 @@ void ImageView::OnRelayout(const Vector2& size, RelayoutContainer& container)
     Vector2 finalSize   = size - Vector2(padding.start + padding.end, padding.top + padding.bottom);
     Vector2 finalOffset = Vector2(padding.start, padding.top);
 
-    ApplyFittingMode(finalSize, naturalSize, finalOffset, zeroPadding, transformMap);
+    ApplyFittingMode(finalSize, finalOffset, zeroPadding, transformMap);
 
     mVisual.SetTransformAndSize(transformMap, size);
 
@@ -413,7 +410,7 @@ void ImageView::SetTransformMapForFittingMode(Vector2 finalSize, Vector2 natural
   }
 }
 
-void ImageView::ApplyFittingMode(Vector2 finalSize, Vector2 naturalSize, Vector2 finalOffset, bool zeroPadding, Property::Map& transformMap)
+void ImageView::ApplyFittingMode(Vector2 finalSize, Vector2 finalOffset, bool zeroPadding, Property::Map& transformMap)
 {
   Visual::FittingMode fittingMode = Toolkit::GetImplementation(mVisual).GetFittingMode();
 
@@ -428,6 +425,14 @@ void ImageView::ApplyFittingMode(Vector2 finalSize, Vector2 naturalSize, Vector2
      (fittingMode != Visual::FittingMode::FILL))
   {
     mImageVisualPaddingSetByTransform = true;
+
+    Vector2 naturalSize;
+    // NaturalSize will not be used for FILL fitting mode, which is default.
+    // Skip GetNaturalSize
+    if(fittingMode != Visual::FittingMode::FILL)
+    {
+      mVisual.GetNaturalSize(naturalSize);
+    }
 
     // If FittingMode use FIT_WIDTH or FIT_HEIGTH, it need to change proper fittingMode
     if(fittingMode == Visual::FittingMode::FIT_WIDTH)
