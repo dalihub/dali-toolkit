@@ -24,6 +24,7 @@
 #include <fstream>
 #include <memory>
 #include <vector>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
@@ -40,6 +41,8 @@ struct DALI_SCENE3D_API BufferDefinition
   using Vector = std::vector<BufferDefinition>;
 
   BufferDefinition();
+  BufferDefinition(std::vector<uint8_t>& buffer);
+
   ~BufferDefinition();
 
   BufferDefinition(const BufferDefinition& other)            = default;

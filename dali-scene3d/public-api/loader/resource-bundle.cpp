@@ -67,11 +67,11 @@ ResourceRefCounts ResourceBundle::CreateRefCounter() const
   return refCounts;
 }
 
-void ResourceBundle::CountEnvironmentReferences(ResourceRefCounts& refCounts) const
+void ResourceBundle::CountEnvironmentReferences()
 {
-  auto& environmentRefCounts = refCounts[ResourceType::Environment];
+  auto& environmentRefCounts = mReferenceCounts[ResourceType::Environment];
 
-  const auto& materialRefs = refCounts[ResourceType::Material];
+  const auto& materialRefs = mReferenceCounts[ResourceType::Material];
   for(uint32_t i = 0, iEnd = materialRefs.Size(); i != iEnd; ++i)
   {
     if(materialRefs[i] > 0)
@@ -81,7 +81,7 @@ void ResourceBundle::CountEnvironmentReferences(ResourceRefCounts& refCounts) co
   }
 }
 
-void ResourceBundle::LoadResources(const ResourceRefCounts& refCounts, PathProvider pathProvider, Options::Type options)
+void ResourceBundle::LoadResources(PathProvider pathProvider, Options::Type options)
 {
   mRawResourcesLoading = true;
   mResourcesGenerating = true;
@@ -89,7 +89,7 @@ void ResourceBundle::LoadResources(const ResourceRefCounts& refCounts, PathProvi
   const auto kForceLoad  = MaskMatch(options, Options::ForceReload);
   const auto kKeepUnused = MaskMatch(options, Options::KeepUnused);
 
-  const auto& refCountEnvMaps  = refCounts[ResourceType::Environment];
+  const auto& refCountEnvMaps  = mReferenceCounts[ResourceType::Environment];
   auto        environmentsPath = pathProvider(ResourceType::Environment);
   for(uint32_t i = 0, iEnd = refCountEnvMaps.Size(); i != iEnd; ++i)
   {
@@ -107,7 +107,7 @@ void ResourceBundle::LoadResources(const ResourceRefCounts& refCounts, PathProvi
     }
   }
 
-  const auto& refCountShaders = refCounts[ResourceType::Shader];
+  const auto& refCountShaders = mReferenceCounts[ResourceType::Shader];
   auto        shadersPath     = pathProvider(ResourceType::Shader);
   for(uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
   {
@@ -124,7 +124,7 @@ void ResourceBundle::LoadResources(const ResourceRefCounts& refCounts, PathProvi
     }
   }
 
-  const auto& refCountMeshes = refCounts[ResourceType::Mesh];
+  const auto& refCountMeshes = mReferenceCounts[ResourceType::Mesh];
   auto        modelsPath     = pathProvider(ResourceType::Mesh);
   for(uint32_t i = 0, iEnd = refCountMeshes.Size(); i != iEnd; ++i)
   {
@@ -141,7 +141,7 @@ void ResourceBundle::LoadResources(const ResourceRefCounts& refCounts, PathProvi
     }
   }
 
-  const auto& refCountMaterials = refCounts[ResourceType::Material];
+  const auto& refCountMaterials = mReferenceCounts[ResourceType::Material];
   auto        imagesPath        = pathProvider(ResourceType::Material);
   for(uint32_t i = 0, iEnd = refCountMaterials.Size(); i != iEnd; ++i)
   {
@@ -165,7 +165,7 @@ void ResourceBundle::LoadResources(const ResourceRefCounts& refCounts, PathProvi
   mResourcesGenerated = true;
 }
 
-void ResourceBundle::LoadRawResources(const ResourceRefCounts& refCounts, PathProvider pathProvider, Options::Type options)
+void ResourceBundle::LoadRawResources(PathProvider pathProvider, Options::Type options)
 {
   const auto kForceLoad = MaskMatch(options, Options::ForceReload);
 
@@ -173,7 +173,7 @@ void ResourceBundle::LoadRawResources(const ResourceRefCounts& refCounts, PathPr
   {
     mRawResourcesLoading = true;
 
-    const auto& refCountEnvMaps  = refCounts[ResourceType::Environment];
+    const auto& refCountEnvMaps  = mReferenceCounts[ResourceType::Environment];
     auto        environmentsPath = pathProvider(ResourceType::Environment);
     for(uint32_t i = 0, iEnd = refCountEnvMaps.Size(); i != iEnd; ++i)
     {
@@ -185,7 +185,7 @@ void ResourceBundle::LoadRawResources(const ResourceRefCounts& refCounts, PathPr
       }
     }
 
-    const auto& refCountShaders = refCounts[ResourceType::Shader];
+    const auto& refCountShaders = mReferenceCounts[ResourceType::Shader];
     auto        shadersPath     = pathProvider(ResourceType::Shader);
     for(uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
     {
@@ -197,7 +197,7 @@ void ResourceBundle::LoadRawResources(const ResourceRefCounts& refCounts, PathPr
       }
     }
 
-    const auto& refCountMeshes = refCounts[ResourceType::Mesh];
+    const auto& refCountMeshes = mReferenceCounts[ResourceType::Mesh];
     auto        modelsPath     = pathProvider(ResourceType::Mesh);
     for(uint32_t i = 0, iEnd = refCountMeshes.Size(); i != iEnd; ++i)
     {
@@ -209,7 +209,7 @@ void ResourceBundle::LoadRawResources(const ResourceRefCounts& refCounts, PathPr
       }
     }
 
-    const auto& refCountMaterials = refCounts[ResourceType::Material];
+    const auto& refCountMaterials = mReferenceCounts[ResourceType::Material];
     auto        imagesPath        = pathProvider(ResourceType::Material);
     for(uint32_t i = 0, iEnd = refCountMaterials.Size(); i != iEnd; ++i)
     {
@@ -226,7 +226,7 @@ void ResourceBundle::LoadRawResources(const ResourceRefCounts& refCounts, PathPr
   }
 }
 
-void ResourceBundle::GenerateResources(const ResourceRefCounts& refCounts, Options::Type options)
+void ResourceBundle::GenerateResources(Options::Type options)
 {
   const auto kForceLoad = MaskMatch(options, Options::ForceReload);
 
@@ -236,7 +236,7 @@ void ResourceBundle::GenerateResources(const ResourceRefCounts& refCounts, Optio
     {
       mResourcesGenerating = true;
 
-      const auto& refCountEnvMaps = refCounts[ResourceType::Environment];
+      const auto& refCountEnvMaps = mReferenceCounts[ResourceType::Environment];
       for(uint32_t i = 0, iEnd = refCountEnvMaps.Size(); i != iEnd; ++i)
       {
         auto  refCount = refCountEnvMaps[i];
@@ -255,7 +255,7 @@ void ResourceBundle::GenerateResources(const ResourceRefCounts& refCounts, Optio
         }
       }
 
-      const auto& refCountShaders = refCounts[ResourceType::Shader];
+      const auto& refCountShaders = mReferenceCounts[ResourceType::Shader];
       for(uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
       {
         auto  refCount = refCountShaders[i];
@@ -273,7 +273,7 @@ void ResourceBundle::GenerateResources(const ResourceRefCounts& refCounts, Optio
         }
       }
 
-      const auto& refCountMeshes = refCounts[ResourceType::Mesh];
+      const auto& refCountMeshes = mReferenceCounts[ResourceType::Mesh];
       for(uint32_t i = 0, iEnd = refCountMeshes.Size(); i != iEnd; ++i)
       {
         auto  refCount = refCountMeshes[i];
@@ -291,7 +291,7 @@ void ResourceBundle::GenerateResources(const ResourceRefCounts& refCounts, Optio
         }
       }
 
-      const auto& refCountMaterials = refCounts[ResourceType::Material];
+      const auto& refCountMaterials = mReferenceCounts[ResourceType::Material];
       for(uint32_t i = 0, iEnd = refCountMaterials.Size(); i != iEnd; ++i)
       {
         auto  refCount  = refCountMaterials[i];
@@ -316,7 +316,7 @@ void ResourceBundle::GenerateResources(const ResourceRefCounts& refCounts, Optio
     {
       mResourcesGenerating = true;
 
-      const auto& refCountShaders = refCounts[ResourceType::Shader];
+      const auto& refCountShaders = mReferenceCounts[ResourceType::Shader];
       for(uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
       {
         auto  refCount = refCountShaders[i];

@@ -18,7 +18,7 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include <dali-scene3d/public-api/loader/gltf2-loader.h>
+#include <dali-scene3d/internal/loader/gltf2-loader-impl.h>
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
@@ -55,7 +55,8 @@ namespace
 {
 struct Context
 {
-  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type) {
+  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type)
+  {
     return TEST_RESOURCE_DIR "/";
   };
 
@@ -76,6 +77,8 @@ struct Context
     animationGroups,
     cameras,
     lights};
+
+  Dali::Scene3D::Loader::Internal::Gltf2LoaderImpl loader;
 };
 
 struct ExceptionMessageStartsWith
@@ -99,13 +102,7 @@ int UtcDaliGltfLoaderFailedToLoad(void)
 {
   Context ctx;
 
-  ShaderDefinitionFactory sdf;
-  sdf.SetResources(ctx.resources);
-
-  InitializeGltfLoader();
-  DALI_TEST_THROW(LoadGltfScene("non-existent.gltf", sdf, ctx.loadResult),
-                  std::runtime_error,
-                  ExceptionMessageStartsWith{"Failed to load"});
+  DALI_TEST_EQUAL(ctx.loader.LoadModel("non-existent.gltf", ctx.loadResult), false);
 
   DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
   DALI_TEST_EQUAL(0, ctx.scene.GetNodeCount());
@@ -131,10 +128,7 @@ int UtcDaliGltfLoaderFailedToParse(void)
   ShaderDefinitionFactory sdf;
   sdf.SetResources(ctx.resources);
 
-  InitializeGltfLoader();
-  DALI_TEST_THROW(LoadGltfScene(TEST_RESOURCE_DIR "/invalid.gltf", sdf, ctx.loadResult),
-                  std::runtime_error,
-                  ExceptionMessageStartsWith{"Failed to parse"});
+  DALI_TEST_EQUAL(ctx.loader.LoadModel(TEST_RESOURCE_DIR "/invalid.gltf", ctx.loadResult), false);
 
   DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
   DALI_TEST_EQUAL(0, ctx.scene.GetNodeCount());
@@ -172,11 +166,7 @@ int UtcDaliGltfLoaderSuccess1(void)
     ++metaData;
   }
 
-  ShaderDefinitionFactory sdf;
-  sdf.SetResources(ctx.resources);
-
-  InitializeGltfLoader();
-  LoadGltfScene(TEST_RESOURCE_DIR "/AnimatedCube.gltf", sdf, ctx.loadResult);
+  ctx.loader.LoadModel(TEST_RESOURCE_DIR "/AnimatedCube.gltf", ctx.loadResult);
 
   DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
   DALI_TEST_EQUAL(9u, ctx.scene.GetNodeCount());
@@ -191,8 +181,9 @@ int UtcDaliGltfLoaderSuccess1(void)
   {
     auto resourceRefs = ctx.resources.CreateRefCounter();
     ctx.scene.CountResourceRefs(iRoot, choices, resourceRefs);
-    ctx.resources.CountEnvironmentReferences(resourceRefs);
-    ctx.resources.LoadResources(resourceRefs, ctx.pathProvider);
+    ctx.resources.mReferenceCounts = std::move(resourceRefs);
+    ctx.resources.CountEnvironmentReferences();
+    ctx.resources.LoadResources(ctx.pathProvider);
   }
 
   auto& materials = ctx.resources.mMaterials;
@@ -466,8 +457,7 @@ int UtcDaliGltfLoaderSuccess2(void)
   ShaderDefinitionFactory sdf;
   sdf.SetResources(ctx.resources);
 
-  InitializeGltfLoader();
-  LoadGltfScene(TEST_RESOURCE_DIR "/AnimatedCubeStride.gltf", sdf, ctx.loadResult);
+  ctx.loader.LoadModel(TEST_RESOURCE_DIR "/AnimatedCubeStride.gltf", ctx.loadResult);
 
   DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
   DALI_TEST_EQUAL(1u, ctx.scene.GetNodeCount());
@@ -479,7 +469,8 @@ int UtcDaliGltfLoaderSuccess2(void)
   {
     auto resourceRefs = ctx.resources.CreateRefCounter();
     ctx.scene.CountResourceRefs(iRoot, choices, resourceRefs);
-    ctx.resources.LoadResources(resourceRefs, ctx.pathProvider);
+    ctx.resources.mReferenceCounts = std::move(resourceRefs);
+    ctx.resources.LoadResources(ctx.pathProvider);
   }
 
   DALI_TEST_EQUAL(true, ctx.resources.mMeshes[0u].first.mPositions.IsDefined());
@@ -493,7 +484,8 @@ int UtcDaliGltfLoaderSuccessShort(void)
   TestApplication app;
 
   const std::string resourcePath = TEST_RESOURCE_DIR "/";
-  auto              pathProvider = [resourcePath](ResourceType::Value) {
+  auto              pathProvider = [resourcePath](ResourceType::Value)
+  {
     return resourcePath;
   };
 
@@ -517,16 +509,11 @@ int UtcDaliGltfLoaderSuccessShort(void)
   {
     Context ctx;
 
-    ShaderDefinitionFactory sdf;
-
     auto& resources = ctx.resources;
     resources.mEnvironmentMaps.push_back({});
 
-    sdf.SetResources(resources);
-
     printf("%s\n", modelName);
-    InitializeGltfLoader();
-    LoadGltfScene(resourcePath + modelName + ".gltf", sdf, ctx.loadResult);
+    ctx.loader.LoadModel(resourcePath + modelName + ".gltf", ctx.loadResult);
     DALI_TEST_CHECK(ctx.scene.GetNodeCount() > 0);
 
     auto& scene = ctx.scene;
@@ -587,8 +574,7 @@ int UtcDaliGltfLoaderMRendererTest(void)
   sdf.SetResources(ctx.resources);
   auto& resources = ctx.resources;
 
-  InitializeGltfLoader();
-  LoadGltfScene(TEST_RESOURCE_DIR "/MRendererTest.gltf", sdf, ctx.loadResult);
+  ctx.loader.LoadModel(TEST_RESOURCE_DIR "/MRendererTest.gltf", ctx.loadResult);
 
   auto& scene = ctx.scene;
   auto& roots = scene.GetRoots();
@@ -617,8 +603,9 @@ int UtcDaliGltfLoaderMRendererTest(void)
   {
     auto resourceRefs = resources.CreateRefCounter();
     scene.CountResourceRefs(iRoot, choices, resourceRefs);
-    resources.CountEnvironmentReferences(resourceRefs);
-    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    ctx.resources.mReferenceCounts = std::move(resourceRefs);
+    ctx.resources.CountEnvironmentReferences();
+    ctx.resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
       scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
@@ -646,12 +633,9 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
 {
   Context ctx;
 
-  ShaderDefinitionFactory sdf;
-  sdf.SetResources(ctx.resources);
   auto& resources = ctx.resources;
 
-  InitializeGltfLoader();
-  LoadGltfScene(TEST_RESOURCE_DIR "/CesiumMan_e.gltf", sdf, ctx.loadResult);
+  ctx.loader.LoadModel(TEST_RESOURCE_DIR "/CesiumMan_e.gltf", ctx.loadResult);
 
   auto& scene = ctx.scene;
   auto& roots = scene.GetRoots();
@@ -676,8 +660,9 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
   {
     auto resourceRefs = resources.CreateRefCounter();
     scene.CountResourceRefs(iRoot, choices, resourceRefs);
-    resources.CountEnvironmentReferences(resourceRefs);
-    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    resources.mReferenceCounts = std::move(resourceRefs);
+    resources.CountEnvironmentReferences();
+    resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
       scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
@@ -704,8 +689,7 @@ int UtcDaliGltfLoaderImageFromBufferView(void)
   sdf.SetResources(ctx.resources);
   auto& resources = ctx.resources;
 
-  InitializeGltfLoader();
-  LoadGltfScene(TEST_RESOURCE_DIR "/EnvironmentTest_b.gltf", sdf, ctx.loadResult);
+  ctx.loader.LoadModel(TEST_RESOURCE_DIR "/EnvironmentTest_b.gltf", ctx.loadResult);
 
   auto& scene = ctx.scene;
   auto& roots = scene.GetRoots();
@@ -730,8 +714,9 @@ int UtcDaliGltfLoaderImageFromBufferView(void)
   {
     auto resourceRefs = resources.CreateRefCounter();
     scene.CountResourceRefs(iRoot, choices, resourceRefs);
-    resources.CountEnvironmentReferences(resourceRefs);
-    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    resources.mReferenceCounts = std::move(resourceRefs);
+    resources.CountEnvironmentReferences();
+    resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
       scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
@@ -752,12 +737,9 @@ int UtcDaliGltfLoaderUint8Indices(void)
 {
   Context ctx;
 
-  ShaderDefinitionFactory sdf;
-  sdf.SetResources(ctx.resources);
   auto& resources = ctx.resources;
 
-  InitializeGltfLoader();
-  LoadGltfScene(TEST_RESOURCE_DIR "/AlphaBlendModeTest.gltf", sdf, ctx.loadResult);
+  ctx.loader.LoadModel(TEST_RESOURCE_DIR "/AlphaBlendModeTest.gltf", ctx.loadResult);
 
   auto& scene = ctx.scene;
   auto& roots = scene.GetRoots();
@@ -782,8 +764,9 @@ int UtcDaliGltfLoaderUint8Indices(void)
   {
     auto resourceRefs = resources.CreateRefCounter();
     scene.CountResourceRefs(iRoot, choices, resourceRefs);
-    resources.CountEnvironmentReferences(resourceRefs);
-    resources.LoadResources(resourceRefs, ctx.pathProvider);
+    resources.mReferenceCounts = std::move(resourceRefs);
+    resources.CountEnvironmentReferences();
+    resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
       scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);

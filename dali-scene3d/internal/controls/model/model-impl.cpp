@@ -36,8 +36,6 @@
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/loader/animation-definition.h>
 #include <dali-scene3d/public-api/loader/camera-parameters.h>
-#include <dali-scene3d/public-api/loader/dli-loader.h>
-#include <dali-scene3d/public-api/loader/gltf2-loader.h>
 #include <dali-scene3d/public-api/loader/light-parameters.h>
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/node-definition.h>
@@ -117,7 +115,8 @@ void ConfigureBlendShapeShaders(
   Dali::Scene3D::Loader::ResourceBundle& resources, const Dali::Scene3D::Loader::SceneDefinition& scene, Actor root, std::vector<Dali::Scene3D::Loader::BlendshapeShaderConfigurationRequest>&& requests)
 {
   std::vector<std::string> errors;
-  auto                     onError = [&errors](const std::string& msg) { errors.push_back(msg); };
+  auto                     onError = [&errors](const std::string& msg)
+  { errors.push_back(msg); };
   if(!scene.ConfigureBlendshapeShaders(resources, root, std::move(requests), onError))
   {
     Dali::Scene3D::Loader::ExceptionFlinger flinger(ASSERT_LOCATION);
@@ -447,8 +446,6 @@ void Model::OnSceneConnection(int depth)
     {
       ModelCacheManager::Get().ReferenceModelCache(mModelUrl);
     }
-
-    Scene3D::Loader::InitializeGltfLoader();
     mModelLoadTask = new ModelLoadTask(mModelUrl, mResourceDirectoryUrl, MakeCallback(this, &Model::OnModelLoadComplete));
     Dali::AsyncTaskManager::Get().AddTask(mModelLoadTask);
   }
@@ -732,13 +729,14 @@ void Model::OnModelLoadComplete()
   mRenderableActors.clear();
   CollectRenderableActor(mModelRoot);
 
-  CreateAnimations(mModelLoadTask->mLoadResult.mScene);
+  auto& resources = mModelLoadTask->GetResources();
+  auto& scene     = mModelLoadTask->GetScene();
+  CreateAnimations(scene);
   ResetCameraParameters();
-
-  if(!mModelLoadTask->mLoadResult.mResources.mEnvironmentMaps.empty())
+  if(!resources.mEnvironmentMaps.empty())
   {
-    mDefaultDiffuseTexture  = mModelLoadTask->mLoadResult.mResources.mEnvironmentMaps.front().second.mDiffuse;
-    mDefaultSpecularTexture = mModelLoadTask->mLoadResult.mResources.mEnvironmentMaps.front().second.mSpecular;
+    mDefaultDiffuseTexture  = resources.mEnvironmentMaps.front().second.mDiffuse;
+    mDefaultSpecularTexture = resources.mEnvironmentMaps.front().second.mSpecular;
   }
 
   UpdateImageBasedLightTexture();
@@ -820,26 +818,28 @@ void Model::CreateModel()
   mModelRoot.SetProperty(Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR);
 
   BoundingVolume                                      AABB;
+  auto&                                               resources        = mModelLoadTask->GetResources();
+  auto&                                               scene            = mModelLoadTask->GetScene();
+  auto&                                               resourceChoices  = mModelLoadTask->GetResourceChoices();
   Dali::Scene3D::Loader::Transforms                   xforms{Dali::Scene3D::Loader::MatrixStack{}, Dali::Scene3D::Loader::ViewProjection{}};
-  Dali::Scene3D::Loader::NodeDefinition::CreateParams nodeParams{mModelLoadTask->mLoadResult.mResources, xforms, {}, {}, {}};
+  Dali::Scene3D::Loader::NodeDefinition::CreateParams nodeParams{resources, xforms, {}, {}, {}};
 
   // Generate Dali handles from resource bundle. Note that we generate all scene's resouce immediatly.
-  mModelLoadTask->mLoadResult.mResources.GenerateResources(mModelLoadTask->mResourceRefCount);
-
-  for(auto iRoot : mModelLoadTask->mLoadResult.mScene.GetRoots())
+  resources.GenerateResources();
+  for(auto iRoot : scene.GetRoots())
   {
-    if(auto actor = mModelLoadTask->mLoadResult.mScene.CreateNodes(iRoot, mModelLoadTask->mResourceChoices, nodeParams))
+    if(auto actor = scene.CreateNodes(iRoot, resourceChoices, nodeParams))
     {
-      mModelLoadTask->mLoadResult.mScene.ConfigureSkeletonJoints(iRoot, mModelLoadTask->mLoadResult.mResources.mSkeletons, actor);
-      mModelLoadTask->mLoadResult.mScene.ConfigureSkinningShaders(mModelLoadTask->mLoadResult.mResources, actor, std::move(nodeParams.mSkinnables));
-      ConfigureBlendShapeShaders(mModelLoadTask->mLoadResult.mResources, mModelLoadTask->mLoadResult.mScene, actor, std::move(nodeParams.mBlendshapeRequests));
+      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
+      scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
+      ConfigureBlendShapeShaders(resources, scene, actor, std::move(nodeParams.mBlendshapeRequests));
 
-      mModelLoadTask->mLoadResult.mScene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
+      scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
 
       mModelRoot.Add(actor);
     }
 
-    AddModelTreeToAABB(AABB, mModelLoadTask->mLoadResult.mScene, mModelLoadTask->mResourceChoices, iRoot, nodeParams, Matrix::IDENTITY);
+    AddModelTreeToAABB(AABB, scene, resourceChoices, iRoot, nodeParams, Matrix::IDENTITY);
   }
 
   mNaturalSize = AABB.CalculateSize();
@@ -857,9 +857,10 @@ void Model::CreateModel()
 void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
 {
   mAnimations.clear();
-  if(!mModelLoadTask->mLoadResult.mAnimationDefinitions.empty())
+  if(!mModelLoadTask->GetAnimations().empty())
   {
-    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property) {
+    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property)
+    {
       if(property.mNodeIndex == Scene3D::Loader::INVALID_INDEX)
       {
         return mModelRoot.FindChildByName(property.mNodeName);
@@ -872,7 +873,7 @@ void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
       return mModelRoot.FindChildById(node->mNodeId);
     };
 
-    for(auto&& animation : mModelLoadTask->mLoadResult.mAnimationDefinitions)
+    for(auto&& animation : mModelLoadTask->GetAnimations())
     {
       Dali::Animation anim = animation.ReAnimate(getActor);
       mAnimations.push_back({animation.mName, anim});
@@ -883,10 +884,10 @@ void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
 void Model::ResetCameraParameters()
 {
   mCameraParameters.clear();
-  if(!mModelLoadTask->mLoadResult.mCameraParameters.empty())
+  if(!mModelLoadTask->GetCameras().empty())
   {
     // Copy camera parameters.
-    std::copy(mModelLoadTask->mLoadResult.mCameraParameters.begin(), mModelLoadTask->mLoadResult.mCameraParameters.end(), std::back_inserter(mCameraParameters));
+    std::copy(mModelLoadTask->GetCameras().begin(), mModelLoadTask->GetCameras().end(), std::back_inserter(mCameraParameters));
   }
 }
 
