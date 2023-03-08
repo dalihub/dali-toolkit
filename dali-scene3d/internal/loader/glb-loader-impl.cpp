@@ -85,7 +85,7 @@ bool GlbLoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::Loa
 
   std::vector<uint8_t> jsonChunkData;
   jsonChunkData.resize(jsonChunkHeader.chunkLength);
-  stream.read(reinterpret_cast<char*>(&jsonChunkData[0]), jsonChunkHeader.chunkLength);
+  stream.read(reinterpret_cast<char*>(&jsonChunkData[0]), static_cast<std::streamsize>(static_cast<size_t>(jsonChunkHeader.chunkLength)));
   std::string gltfText(jsonChunkData.begin(), jsonChunkData.end());
 
   uint32_t             binaryChunkOffset = sizeof(GlbHeader) + sizeof(ChunkHeader) + jsonChunkHeader.chunkLength;
@@ -102,7 +102,7 @@ bool GlbLoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::Loa
     }
 
     binaryChunkData.resize(binaryChunkHeader.chunkLength);
-    stream.read(reinterpret_cast<char*>(&binaryChunkData[0]), binaryChunkHeader.chunkLength);
+    stream.read(reinterpret_cast<char*>(&binaryChunkData[0]), static_cast<std::streamsize>(static_cast<size_t>(binaryChunkHeader.chunkLength)));
   }
 
   json::unique_ptr root(json_parse(gltfText.c_str(), gltfText.size()));
