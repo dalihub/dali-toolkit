@@ -21,9 +21,6 @@
 #include <dali/integration-api/debug.h>
 
 #include <algorithm>
-#include <cerrno>
-#include <cstdio>
-#include <cstring>
 #include <filesystem>
 
 using Dali::Vector3;
