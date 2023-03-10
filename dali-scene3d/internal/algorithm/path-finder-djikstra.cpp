@@ -119,7 +119,14 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(uint32_t 
   do
   {
     // find minimum distance
-    [[maybe_unused]] auto minDistIndex = FindMinDistance(dist);
+    auto minDistIndex = FindMinDistance(dist);
+
+    // Failed to find minimum distance
+    if(minDistIndex == -1)
+    {
+      // Return empty WayPointList
+      return {};
+    }
 
     // remove from queue by assigning infinity to distance
     removeCount++;
