@@ -269,6 +269,15 @@ struct DALI_SCENE3D_API MeshDefinition
    */
   MeshGeometry Load(RawData&& raw) const;
 
+  /**
+   * @brief Retrieves what Components information is in this mesh's BlendShape.
+   *
+   * @param[out] hasPositions True if the BlendShape has position components
+   * @param[out] hasNormals True if the BlendShape has normal components
+   * @param[out] hasTangents True if the BlendShape has tangent components
+   */
+  void RetrieveBlendShapeComponents(bool& hasPositions, bool& hasNormals, bool& hasTangents) const;
+
 public: // DATA
   std::shared_ptr<RawData> mRawData;
   uint32_t                 mFlags         = 0x0;
@@ -288,7 +297,8 @@ public: // DATA
   std::vector<BlendShape> mBlendShapes;
   BlendShapes::Version    mBlendShapeVersion = BlendShapes::Version::INVALID;
 
-  Index mSkeletonIdx = INVALID_INDEX;
+  Index          mSkeletonIdx = INVALID_INDEX;
+  ModelPrimitive mModelPrimitive;
 };
 
 } // namespace Dali::Scene3D::Loader

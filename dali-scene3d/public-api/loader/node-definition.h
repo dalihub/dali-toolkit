@@ -30,6 +30,7 @@
 #include <dali-scene3d/public-api/loader/customization.h>
 #include <dali-scene3d/public-api/loader/matrix-stack.h>
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
+#include <dali-scene3d/public-api/model-components/model-node.h>
 
 namespace Dali
 {
@@ -101,8 +102,9 @@ struct DALI_SCENE3D_API Transforms
  */
 struct DALI_SCENE3D_API SkinningShaderConfigurationRequest
 {
-  Index  mSkeletonIdx;
-  Shader mShader;
+  Index          mSkeletonIdx;
+  Shader         mShader;
+  ModelPrimitive mPrimitive;
 
   bool operator<(const SkinningShaderConfigurationRequest& other) const
   {
@@ -115,9 +117,10 @@ struct DALI_SCENE3D_API SkinningShaderConfigurationRequest
  */
 struct DALI_SCENE3D_API BlendshapeShaderConfigurationRequest
 {
-  std::string mNodeName;
-  Index       mMeshIdx;
-  Shader      mShader;
+  std::string    mNodeName;
+  Index          mMeshIdx;
+  Shader         mShader;
+  ModelPrimitive mPrimitive;
 
   bool operator<(const BlendshapeShaderConfigurationRequest& other) const
   {
@@ -147,8 +150,8 @@ public: // TYPES
   struct CreateParams
   {
   public: // input
-    const ResourceBundle& mResources;
-    Transforms&           mXforms;
+    ResourceBundle& mResources;
+    Transforms&     mXforms;
 
   public: // output
     std::vector<ConstraintRequest>                    mConstrainables;
@@ -167,7 +170,7 @@ public: // TYPES
     virtual bool GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const;
     virtual void RegisterResources(IResourceReceiver& receiver) const;
     virtual void ReflectResources(IResourceReflector& reflector);
-    virtual void OnCreate(const NodeDefinition& node, CreateParams& params, Actor& actor) const;
+    virtual void OnCreate(const NodeDefinition& nodeDefinition, CreateParams& params, ModelNode& node) const;
   };
 
   struct CustomizationDefinition
@@ -215,10 +218,10 @@ public: // TYPES
 
 public: // METHODS
   /**
-   * @brief Creates a DALi Actor from this definition only.
+   * @brief Creates a ModelNode from this definition only.
    * @note Not recursive.
    */
-  Actor CreateActor(CreateParams& params);
+  ModelNode CreateModelNode(CreateParams& params);
 
   /**
    * @brief Gets local space matrix of this node
@@ -289,7 +292,7 @@ public: // METHODS
   bool GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const override;
   void RegisterResources(IResourceReceiver& receiver) const override;
   void ReflectResources(IResourceReflector& reflector) override;
-  void OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const override;
+  void OnCreate(const NodeDefinition& nodeDefinition, NodeDefinition::CreateParams& params, ModelNode& node) const override;
 };
 
 /**
@@ -307,7 +310,7 @@ public: // DATA
 public: // METHODS
   static void GetEndVectorWithDiffAngle(float startAngle, float endAngle, Vector2& endVector);
 
-  void OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const override;
+  void OnCreate(const NodeDefinition& nodeDefinition, NodeDefinition::CreateParams& params, ModelNode& node) const override;
 };
 
 } // namespace Loader

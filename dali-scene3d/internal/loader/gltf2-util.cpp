@@ -19,6 +19,7 @@
 #include <dali-scene3d/internal/loader/gltf2-util.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
 
 using namespace Dali::Scene3D::Loader;
@@ -540,7 +541,8 @@ void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, 
 
 void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
-  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gltf2::TextureInfo& info) {
+  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gltf2::TextureInfo& info)
+  {
     if(!info.mTexture->mSource->mUri.empty())
     {
       if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
@@ -556,12 +558,14 @@ void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<s
   auto& pbr = material.mPbrMetallicRoughness;
   if(material.mAlphaMode == gltf2::AlphaMode::BLEND)
   {
-    materialDefinition.mIsOpaque = false;
+    materialDefinition.mAlphaModeType = Scene3D::Material::AlphaModeType::BLEND;
+    materialDefinition.mIsOpaque      = false;
     materialDefinition.mFlags |= MaterialDefinition::TRANSPARENCY;
   }
   else if(material.mAlphaMode == gltf2::AlphaMode::MASK)
   {
-    materialDefinition.mIsMask = true;
+    materialDefinition.mAlphaModeType = Scene3D::Material::AlphaModeType::MASK;
+    materialDefinition.mIsMask        = true;
     materialDefinition.SetAlphaCutoff(std::min(1.f, std::max(0.f, material.mAlphaCutoff)));
   }
 
@@ -617,8 +621,8 @@ void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<s
 
   if(!Dali::Equals(material.mMaterialExtensions.mMaterialIor.mIor, gltf2::UNDEFINED_FLOAT_VALUE))
   {
-    float ior                              = material.mMaterialExtensions.mMaterialIor.mIor;
-    materialDefinition.mDielectricSpecular = powf((ior - 1.0f) / (ior + 1.0f), 2.0f);
+    materialDefinition.mIor                = material.mMaterialExtensions.mMaterialIor.mIor;
+    materialDefinition.mDielectricSpecular = powf((materialDefinition.mIor - 1.0f) / (materialDefinition.mIor + 1.0f), 2.0f);
   }
   materialDefinition.mSpecularFactor      = material.mMaterialExtensions.mMaterialSpecular.mSpecularFactor;
   materialDefinition.mSpecularColorFactor = material.mMaterialExtensions.mMaterialSpecular.mSpecularColorFactor;
@@ -890,7 +894,8 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentInd
   auto& resources = output.mResources;
 
   const auto index    = scene.GetNodeCount();
-  auto       weakNode = scene.AddNode([&]() {
+  auto       weakNode = scene.AddNode([&]()
+                                {
     std::unique_ptr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
     nodeDefinition->mParentIdx = parentIndex;

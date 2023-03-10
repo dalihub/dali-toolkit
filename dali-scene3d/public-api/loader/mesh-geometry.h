@@ -1,5 +1,5 @@
-#ifndef DALI_SCENE3D_LOADERER_MESH_GEOMETRY_H
-#define DALI_SCENE3D_LOADERER_MESH_GEOMETRY_H
+#ifndef DALI_SCENE3D_LOADER_MESH_GEOMETRY_H
+#define DALI_SCENE3D_LOADER_MESH_GEOMETRY_H
 /*
  * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
@@ -23,17 +23,18 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/model-components/model-primitive.h>
 
 namespace Dali::Scene3D::Loader
 {
 struct DALI_SCENE3D_API MeshGeometry
 {
-  Geometry      geometry;                    ///< The array of vertices.
-  Texture       blendShapeGeometry;          ///< The array of vertices of the different blend shapes encoded inside a texture with power of two dimensions.
-  Vector<float> blendShapeUnnormalizeFactor; ///< Factor used to unnormalize the geometry of the blend shape.
-  unsigned int  blendShapeBufferOffset{0};   ///< Offset used to calculate the start of each blend shape.
+  Geometry       geometry;                    ///< The array of vertices.
+  Texture        blendShapeGeometry;          ///< The array of vertices of the different blend shapes encoded inside a texture with power of two dimensions.
+  Vector<float>  blendShapeUnnormalizeFactor; ///< Factor used to unnormalize the geometry of the blend shape.
+  unsigned int   blendShapeBufferOffset{0};   ///< Offset used to calculate the start of each blend shape.
 };
 
 } // namespace Dali::Scene3D::Loader
 
-#endif // DALI_SCENE3D_LOADERER_MESH_GEOMETRY_H
+#endif // DALI_SCENE3D_LOADER_MESH_GEOMETRY_H
