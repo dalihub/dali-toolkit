@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_ANIMATION_DEFINITION_H
 #define DALI_SCENE3D_LOADER_ANIMATION_DEFINITION_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@
  *
  */
 
-#include "dali-scene3d/public-api/api.h"
-#include "dali-scene3d/public-api/loader/animated-property.h"
-#include "dali/public-api/common/vector-wrapper.h"
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/loader/animated-property.h>
+
+namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Animation handle + name + definition of properties.
@@ -83,8 +82,6 @@ struct AnimationGroupDefinition
   std::vector<std::string> mAnimations;
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_ANIMATION_DEFINITION_H

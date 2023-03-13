@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADERER_SCENE_DEFINITION_H_
 #define DALI_SCENE3D_LOADERER_SCENE_DEFINITION_H_
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,21 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/loader/customization.h"
-#include "dali-scene3d/public-api/loader/node-definition.h"
-#include "dali-scene3d/public-api/loader/string-callback.h"
-#include "dali-scene3d/public-api/loader/utils.h"
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/vector4.h>
 #include <memory>
 #include <string>
-#include "dali/public-api/actors/actor.h"
-#include "dali/public-api/math/matrix.h"
-#include "dali/public-api/math/quaternion.h"
-#include "dali/public-api/math/vector4.h"
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/loader/customization.h>
+#include <dali-scene3d/public-api/loader/node-definition.h>
+#include <dali-scene3d/public-api/loader/string-callback.h>
+#include <dali-scene3d/public-api/loader/utils.h>
+
+namespace Dali::Scene3D::Loader
 {
 class MatrixStack;
 
@@ -274,8 +270,6 @@ private:                                               // DATA
   std::vector<Index>                           mRootNodeIds;
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADERER_SCENE_DEFINITION_H_

@@ -18,10 +18,84 @@
 #include "dali-scene3d/public-api/algorithm/navigation-mesh.h"
 #include "dali-scene3d/public-api/loader/navigation-mesh-factory.h"
 #include <dali-test-suite-utils.h>
-
+#include <dlfcn.h>
 using namespace Dali;
 using namespace Dali::Scene3D::Algorithm;
 using namespace Dali::Scene3D::Loader;
+
+/**
+ * SysOverride allows overriding a system symbol and
+ * set the return value for n-th call of it.
+ *
+ * After invoking the symbol override is disabled.
+ */
+template<class R, class F>
+struct SysOverride
+{
+  SysOverride(const char* funcName)
+  {
+    funcNameStr = funcName;
+    if(!func)
+    {
+      func = decltype(func)(dlsym(RTLD_NEXT, funcName));
+    }
+  }
+
+  void SetReturnValue( R value, uint32_t n )
+  {
+    if(overrideEnabled)
+    {
+      tet_infoline("Warning! Overriding return value is already enabled! Ignoring!\n");
+      return;
+    }
+    result = value;
+    overrideCounter = n;
+    overrideEnabled = true;
+  }
+
+  template<class... Args>
+  R Invoke(Args&&... args)
+  {
+    auto retval = func(args...);
+    if(overrideEnabled)
+    {
+      if(!overrideCounter)
+      {
+        overrideEnabled = false;
+        return result;
+      }
+      overrideCounter--;
+    }
+    return retval;
+  }
+
+  std::string funcNameStr;
+  R result{R{}};
+  F* func{nullptr};
+  uint32_t overrideCounter = 0;
+  bool overrideEnabled = false;
+};
+
+// Override fseek()
+static thread_local SysOverride<int, decltype(fseek)> call_fseek("fseek");
+extern "C" int fseek (FILE *s, long int o, int w)
+{
+  return call_fseek.Invoke( s, o, w );
+}
+
+// Override ftell()
+static thread_local SysOverride<int, decltype(ftell)> call_ftell("ftell");
+extern "C" long int ftell(FILE *s)
+{
+  return call_ftell.Invoke( s );
+}
+
+// Override fread()
+static thread_local SysOverride<int, decltype(fread)> call_fread("fread");
+extern "C" size_t fread (void *__restrict p, size_t s, size_t n, FILE *__restrict st)
+{
+  return call_fread.Invoke(p, s, n, st);
+}
 
 int UtcDaliNavigationMeshCreateFromFileFail1(void)
 {
@@ -29,6 +103,58 @@ int UtcDaliNavigationMeshCreateFromFileFail1(void)
 
   // No such file, misspelled name
   auto result = NavigationMeshFactory::CreateFromFile("notexisting.bin");
+
+  DALI_TEST_CHECK(result == nullptr);
+
+  END_TEST;
+}
+
+int UtcDaliNavigationMeshCreateFromFileFail2(void)
+{
+  tet_infoline("UtcDaliNavigationMeshCreateFromFileFail2: Fails to create navigation mesh using file");
+
+  // Override next fseek to fail
+  call_fseek.SetReturnValue(-1, 0);
+  auto result = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
+
+  DALI_TEST_CHECK(result == nullptr);
+
+  END_TEST;
+}
+
+int UtcDaliNavigationMeshCreateFromFileFail3(void)
+{
+  tet_infoline("UtcDaliNavigationMeshCreateFromFileFail3: Fails to create navigation mesh using file");
+
+  // Override next ftell to fail
+  call_ftell.SetReturnValue(-1, 0);
+  auto result = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
+
+  DALI_TEST_CHECK(result == nullptr);
+
+  END_TEST;
+}
+
+int UtcDaliNavigationMeshCreateFromFileFail4(void)
+{
+  tet_infoline("UtcDaliNavigationMeshCreateFromFileFail4: Fails to create navigation mesh using file");
+
+  // Override 2nd fseek to fail
+  call_fseek.SetReturnValue(-1, 1);
+  auto result = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
+
+  DALI_TEST_CHECK(result == nullptr);
+
+  END_TEST;
+}
+
+int UtcDaliNavigationMeshCreateFromFileFail5(void)
+{
+  tet_infoline("UtcDaliNavigationMeshCreateFromFileFail5: Fails to create navigation mesh using file");
+
+  // Override fread() to fail reading file
+  call_fread.SetReturnValue(-1, 0);
+  auto result = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
   DALI_TEST_CHECK(result == nullptr);
 

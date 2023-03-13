@@ -16,15 +16,14 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_public_api_dir}/loader/environment-map-data.cpp
 	${scene3d_public_api_dir}/loader/environment-map-loader.cpp
 	${scene3d_public_api_dir}/loader/customization.cpp
-	${scene3d_public_api_dir}/loader/dli-loader.cpp
 	${scene3d_public_api_dir}/loader/environment-definition.cpp
 	${scene3d_public_api_dir}/loader/facial-animation-loader.cpp
-	${scene3d_public_api_dir}/loader/gltf2-loader.cpp
 	${scene3d_public_api_dir}/loader/ktx-loader.cpp
 	${scene3d_public_api_dir}/loader/load-scene-metadata.cpp
 	${scene3d_public_api_dir}/loader/material-definition.cpp
 	${scene3d_public_api_dir}/loader/matrix-stack.cpp
 	${scene3d_public_api_dir}/loader/mesh-definition.cpp
+	${scene3d_public_api_dir}/loader/model-loader.cpp
 	${scene3d_public_api_dir}/loader/navigation-mesh-factory.cpp
 	${scene3d_public_api_dir}/loader/node-definition.cpp
 	${scene3d_public_api_dir}/loader/parse-renderer-state.cpp

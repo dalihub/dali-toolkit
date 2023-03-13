@@ -28,11 +28,7 @@
 #include <dali-scene3d/internal/loader/gltf2-asset.h> // for gltf2::UNDEFINED_FLOAT_VALUE
 #include <dali-scene3d/public-api/loader/utils.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 namespace
 {
@@ -270,6 +266,4 @@ bool CameraParameters::ConfigureCamera(CameraActor& camera, bool invertY) const
   return true;
 }
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

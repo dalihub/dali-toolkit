@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_ALPHA_FUNCTION_HELPER_H_
 #define DALI_SCENE3D_LOADER_ALPHA_FUNCTION_HELPER_H_
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,14 @@
  *
  */
 
-#include "dali-scene3d/public-api/api.h"
-
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/alpha-function.h>
 #include <string>
-#include "dali/public-api/animation/alpha-function.h"
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
+
+namespace Dali::Scene3D::Loader
 {
 /**
  * @return Given a name, provide a AlphaFunction; if the name was not
@@ -40,8 +38,6 @@ AlphaFunction DALI_SCENE3D_API GetAlphaFunction(const std::string& name, bool* f
  */
 void DALI_SCENE3D_API RegisterAlphaFunction(const std::string& name, AlphaFunction alphaFn) noexcept(false);
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_ALPHA_FUNCTION_HELPER_H_

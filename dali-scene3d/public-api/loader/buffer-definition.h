@@ -17,19 +17,16 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <fstream>
+#include <memory>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
-// EXTERNAL INCLUDES
-#include <fstream>
-#include <memory>
-#include <vector>
-
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Defines a buffer that is loaded from input uri.
@@ -40,9 +37,11 @@ struct DALI_SCENE3D_API BufferDefinition
   using Vector = std::vector<BufferDefinition>;
 
   BufferDefinition();
+  BufferDefinition(std::vector<uint8_t>& buffer);
+
   ~BufferDefinition();
 
-  BufferDefinition(const BufferDefinition& other)            = default;
+  BufferDefinition(const BufferDefinition& other) = default;
   BufferDefinition& operator=(const BufferDefinition& other) = default;
 
   BufferDefinition(BufferDefinition&& other);
@@ -86,8 +85,6 @@ private:
   bool mIsEmbedded{false};
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_BUFFER_DEFINITION_H

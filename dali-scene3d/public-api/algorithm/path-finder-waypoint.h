@@ -17,15 +17,15 @@
  *  limitations under the License.
  */
 
-// INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
-
 // EXTERNAL INCLUDES
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 
 #include <cinttypes>
 #include <memory>
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
 
 namespace Dali::Scene3D::Internal::Algorithm
 {
@@ -42,7 +42,6 @@ namespace Dali::Scene3D::Algorithm
 class DALI_SCENE3D_API WayPoint
 {
 public:
-
   /**
    * @brief Constructor
    */
@@ -101,14 +100,11 @@ public:
   WayPoint& operator=(const WayPoint&);
 
 private:
-
   std::unique_ptr<Internal::Algorithm::WayPointData> mImpl;
 
 public:
-
   DALI_INTERNAL operator Internal::Algorithm::WayPointData&();
-
 };
-}
+} // namespace Dali::Scene3D::Algorithm
 
 #endif // DALI_SCENE3D_PATH_FINDER_WAYPOINT_H

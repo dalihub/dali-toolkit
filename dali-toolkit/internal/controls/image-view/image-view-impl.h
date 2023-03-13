@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,12 +177,11 @@ private:
   /**
    * @brief Apply fittingMode
    * param[in] finalSize The size for fittingMode
-   * param[in] textureSize The size of texture
    * param[in] offset The offset for fittingMode
    * param[in] zeroPadding whether padding is zero
    * param[in] transformMap  The map for fitting image
    */
-  void ApplyFittingMode(Vector2 finalSize, Vector2 textureSize, Vector2 offset, bool zeroPadding, Property::Map& transformMap);
+  void ApplyFittingMode(Vector2 finalSize, Vector2 offset, bool zeroPadding, Property::Map& transformMap);
 
 private:
   // Undefined

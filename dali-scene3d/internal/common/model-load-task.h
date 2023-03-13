@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/pixel-data.h>
@@ -26,9 +27,9 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/model-cache-manager.h>
 #include <dali-scene3d/public-api/loader/load-result.h>
+#include <dali-scene3d/public-api/loader/model-loader.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali/devel-api/threading/conditional-wait.h>
-#include <dali/public-api/adaptor-framework/async-task-manager.h>
 
 namespace Dali
 {
@@ -72,6 +73,36 @@ public:
    */
   bool HasSucceeded() const;
 
+  /**
+   * @brief Retrieves loaded scene
+   * @return SceneDefinition that is loaded from file
+   */
+  Dali::Scene3D::Loader::SceneDefinition& GetScene() const;
+
+  /**
+   * @brief Retrieves resource bunder that includes resource information
+   * @return ResourceBundle for model resources
+   */
+  Dali::Scene3D::Loader::ResourceBundle& GetResources() const;
+
+  /**
+   * @brief Retrieves loaded AnimationDefinition
+   * @return AnimationDefinition that is loaded from file
+   */
+  std::vector<Dali::Scene3D::Loader::AnimationDefinition>& GetAnimations() const;
+
+  /**
+   * @brief Retrieves loaded CameraParameters
+   * @return CameraParameters list that is loaded from file
+   */
+  std::vector<Dali::Scene3D::Loader::CameraParameters>& GetCameras() const;
+
+  /**
+   * @brief Retrieves ResourceChoices
+   * @return Choices for loaded Resources
+   */
+  Dali::Scene3D::Loader::Customization::Choices& GetResourceChoices();
+
 private:
   // Undefined
   ModelLoadTask(const ModelLoadTask& task) = delete;
@@ -79,16 +110,12 @@ private:
   // Undefined
   ModelLoadTask& operator=(const ModelLoadTask& task) = delete;
 
-public:
-  std::string mModelUrl;
-  std::string mResourceDirectoryUrl;
-
-  Dali::Scene3D::Loader::Customization::Choices mResourceChoices;
-  Dali::Scene3D::Loader::ResourceRefCounts      mResourceRefCount;
-  bool                                          mHasSucceeded;
-
-  ModelCacheManager                 mModelCacheManager;
-  Dali::Scene3D::Loader::LoadResult mLoadResult;
+  std::string                                         mModelUrl;
+  std::string                                         mResourceDirectoryUrl;
+  std::shared_ptr<Dali::Scene3D::Loader::ModelLoader> mModelLoader;
+  ModelCacheManager                                   mModelCacheManager;
+  Dali::Scene3D::Loader::LoadResult                   mLoadResult;
+  bool                                                mHasSucceeded;
 };
 
 } // namespace Internal

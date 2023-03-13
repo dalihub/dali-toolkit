@@ -17,11 +17,9 @@
  * limitations under the License.
  */
 
-// CLASS HEADER
-#include <dali-scene3d/public-api/algorithm/path-finder-waypoint.h>
-
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/algorithm/navigation-mesh-impl.h>
+#include <dali-scene3d/public-api/algorithm/path-finder-waypoint.h>
 
 // EXTERNAL INCLUDES
 #include <cinttypes>
@@ -51,6 +49,6 @@ struct WayPointData
   // internal data needed for processing
   const NavigationMesh::Edge* edge; ///< Edge between this face and next face
 };
-}
+} // namespace Dali::Scene3D::Internal::Algorithm
 
 #endif // DALI_SCENE3D_INTERNAL_PATH_FINDER_WAYPOINT_DATA_H

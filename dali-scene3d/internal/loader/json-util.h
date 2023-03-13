@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_JSON_UTIL_H_
 #define DALI_SCENE3D_LOADER_JSON_UTIL_H_
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,17 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/loader/index.h"
-
 // EXTERNAL INCLUDES
-#include "dali-toolkit/devel-api/builder/tree-node.h"
-#include "dali/public-api/animation/time-period.h"
-#include "dali/public-api/common/vector-wrapper.h"
-#include "dali/public-api/math/vector4.h"
-#include "dali/public-api/object/property.h"
+#include <dali-toolkit/devel-api/builder/tree-node.h>
+#include <dali/public-api/animation/time-period.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/public-api/object/property.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/loader/index.h>
+
+namespace Dali::Scene3D::Loader
 {
 bool ReadBool(const Toolkit::TreeNode* node, bool& num);
 
@@ -90,8 +86,6 @@ Property::Value ReadPropertyValue(const Property::Type& propType, const Toolkit:
  */
 Property::Value ReadPropertyValue(const Toolkit::TreeNode& tn);
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_JSON_UTIL_H_

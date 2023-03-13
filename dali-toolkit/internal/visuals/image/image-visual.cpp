@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,9 +96,6 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(RELEASE_POLICY)
 DALI_ENUM_TO_STRING_TABLE_END(RELEASE_POLICY)
 
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
-
-const float PIXEL_ALIGN_ON  = 1.0f;
-const float PIXEL_ALIGN_OFF = 0.0f;
 
 constexpr uint32_t TEXTURE_COUNT_FOR_GPU_ALPHA_MASK = 2u;
 
@@ -736,13 +733,6 @@ void ImageVisual::DoSetOnScene(Actor& actor)
   }
 
   mPlacementActor = actor;
-  // Search the Actor tree to find if Layer UI behaviour set.
-  Layer layer = actor.GetLayer();
-  if(layer && layer.GetProperty<Layer::Behavior>(Layer::Property::BEHAVIOR) == Layer::LAYER_3D)
-  {
-    // Layer 3D set, do not align pixels
-    mImpl->mRenderer.RegisterProperty(PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_OFF);
-  }
 
   if(mPixelArea != FULL_TEXTURE_RECT)
   {
@@ -762,7 +752,7 @@ void ImageVisual::DoSetOnScene(Actor& actor)
     Vector2 imageSize = Vector2::ZERO;
     if(actor)
     {
-      imageSize  = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+      imageSize           = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
       mPlacementActorSize = imageSize;
     }
 
@@ -912,7 +902,7 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
       Vector2 imageSize = Vector2::ZERO;
       if(actor)
       {
-        imageSize  = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+        imageSize           = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
         mPlacementActorSize = imageSize;
       }
       else
@@ -1160,11 +1150,6 @@ Shader ImageVisual::GenerateShader() const
   {
     shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
   }
-
-  // Set pixel align off as default.
-  // ToDo: Pixel align causes issues such as rattling image animation.
-  // We should trun it off until issues are resolved
-  shader.RegisterProperty(PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_OFF);
 
   return shader;
 }

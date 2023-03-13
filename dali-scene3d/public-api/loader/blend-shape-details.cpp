@@ -1,6 +1,6 @@
 
 /*
-* Copyright (c) 2022 Samsung Electronics Co., Ltd.
+* Copyright (c) 2023 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -26,11 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 const char* BlendShapes::NUMBER_OF_BLEND_SHAPES("uNumberOfBlendShapes");
 const char* BlendShapes::UNNORMALIZE_FACTOR("uBlendShapeUnnormalizeFactor");
@@ -85,6 +81,4 @@ void BlendShapes::ConfigureProperties(const std::pair<MeshDefinition, MeshGeomet
   }
 }
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

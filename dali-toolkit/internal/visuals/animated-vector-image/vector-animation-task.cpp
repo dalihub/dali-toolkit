@@ -46,7 +46,7 @@ Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, 
 } // unnamed namespace
 
 VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
-: AsyncTask(MakeCallback(this, &VectorAnimationTask::TaskCompleted), AsyncTask::ThreadType::WORKER_THREAD),
+: AsyncTask(MakeCallback(this, &VectorAnimationTask::TaskCompleted), AsyncTask::PriorityType::HIGH, AsyncTask::ThreadType::WORKER_THREAD),
   mUrl(),
   mVectorRenderer(VectorAnimationRenderer::New()),
   mAnimationData(),

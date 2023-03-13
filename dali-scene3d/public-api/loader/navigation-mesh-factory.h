@@ -17,19 +17,15 @@
 * limitations under the License.
 */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/api.h"
-#include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
-
 // EXTERNAL INCLUDES
-#include "dali/public-api/rendering/geometry.h"
-#include "dali/public-api/rendering/texture.h"
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/texture.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
+#include <dali-scene3d/public-api/api.h>
+
+namespace Dali::Scene3D::Loader
 {
 struct DALI_SCENE3D_API NavigationMeshFactory
 {
@@ -49,10 +45,7 @@ public:
    * @return Valid NavigationMesh or nullptr
    */
   static std::unique_ptr<Algorithm::NavigationMesh> CreateFromBuffer(const std::vector<uint8_t>& buffer);
-
 };
-}
-}
-}
+} // namespace Dali::Scene3D::Loader
 
 #endif // DALI_SCENE3D_INTERNAL_LOADER_NAVIGATION_MESH_FACTORY_H

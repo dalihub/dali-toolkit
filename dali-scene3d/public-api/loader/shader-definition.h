@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_SHADER_DEFINITION_H
 #define DALI_SCENE3D_LOADER_SHADER_DEFINITION_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,15 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/loader/renderer-state.h"
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/rendering/shader.h>
 #include <memory>
-#include "dali/public-api/common/vector-wrapper.h"
-#include "dali/public-api/rendering/shader.h"
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/loader/renderer-state.h>
+
+namespace Dali::Scene3D::Loader
 {
 /*
  * @brief Defines a shader with paths to the files which define its
@@ -56,7 +52,7 @@ struct DALI_SCENE3D_API ShaderDefinition
   ShaderDefinition(const ShaderDefinition& other);
   ShaderDefinition& operator=(const ShaderDefinition& other);
 
-  ShaderDefinition(ShaderDefinition&&)            = default;
+  ShaderDefinition(ShaderDefinition&&) = default;
   ShaderDefinition& operator=(ShaderDefinition&&) = default;
 
   /*
@@ -86,8 +82,6 @@ public: // DATA
   bool                     mUseBuiltInShader{false};
 };
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_SHADER_DEFINITION_H

@@ -16,32 +16,34 @@
  */
 
 // CLASS HEADER
-#include "dali-scene3d/public-api/loader/dli-loader.h"
+#include <dali-scene3d/internal/loader/dli-loader-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/devel-api/builder/json-parser.h>
+#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/integration-api/debug.h>
+#include <dali/public-api/object/property-array.h>
+
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 #include <fstream>
 #include <limits>
 #include <memory>
-#include "dali-toolkit/devel-api/builder/json-parser.h"
-#include "dali/devel-api/common/map-wrapper.h"
-#include "dali/integration-api/debug.h"
-#include "dali/public-api/object/property-array.h"
 
 // INTERNAL INCLUDES
-#include "dali-scene3d/internal/loader/json-util.h"
-#include "dali-scene3d/public-api/loader/alpha-function-helper.h"
-#include "dali-scene3d/public-api/loader/animation-definition.h"
-#include "dali-scene3d/public-api/loader/blend-shape-details.h"
-#include "dali-scene3d/public-api/loader/camera-parameters.h"
-#include "dali-scene3d/public-api/loader/ktx-loader.h"
-#include "dali-scene3d/public-api/loader/light-parameters.h"
-#include "dali-scene3d/public-api/loader/load-result.h"
-#include "dali-scene3d/public-api/loader/parse-renderer-state.h"
-#include "dali-scene3d/public-api/loader/scene-definition.h"
-#include "dali-scene3d/public-api/loader/skinning-details.h"
-#include "dali-scene3d/public-api/loader/utils.h"
+#include <dali-scene3d/internal/loader/json-util.h>
+#include <dali-scene3d/public-api/loader/alpha-function-helper.h>
+#include <dali-scene3d/public-api/loader/animation-definition.h>
+#include <dali-scene3d/public-api/loader/blend-shape-details.h>
+#include <dali-scene3d/public-api/loader/camera-parameters.h>
+#include <dali-scene3d/public-api/loader/ktx-loader.h>
+#include <dali-scene3d/public-api/loader/light-parameters.h>
+#include <dali-scene3d/public-api/loader/load-result.h>
+#include <dali-scene3d/public-api/loader/parse-renderer-state.h>
+#include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali-scene3d/public-api/loader/skinning-details.h>
+#include <dali-scene3d/public-api/loader/utils.h>
 
 #define DLI_0_1_COMPATIBILITY
 
@@ -52,6 +54,8 @@ using namespace Toolkit;
 namespace Scene3D
 {
 namespace Loader
+{
+namespace Internal
 {
 namespace rs = RendererState;
 
@@ -109,7 +113,7 @@ bool ReadAttribAccessor(const TreeNode* node, MeshDefinition::Accessor& accessor
   return ReadBlob(node, accessor.mBlob.mOffset, accessor.mBlob.mLength);
 }
 
-bool ReadColorCode(const TreeNode* node, Vector4& color, DliLoader::ConvertColorCode convertColorCode)
+bool ReadColorCode(const TreeNode* node, Vector4& color, DliInputParameter::ConvertColorCode convertColorCode)
 {
   if(!node || !convertColorCode)
   {
@@ -121,7 +125,7 @@ bool ReadColorCode(const TreeNode* node, Vector4& color, DliLoader::ConvertColor
   return true;
 }
 
-bool ReadColorCodeOrColor(const TreeNode* node, Vector4& color, DliLoader::ConvertColorCode convertColorCode)
+bool ReadColorCodeOrColor(const TreeNode* node, Vector4& color, DliInputParameter::ConvertColorCode convertColorCode)
 {
   return ReadColorCode(node->GetChild("colorCode"), color, convertColorCode) ||
          ReadColor(node->GetChild("color"), color);
@@ -302,7 +306,7 @@ void ParseProperties(const Toolkit::TreeNode& node, Property::Array& array)
 
 } // namespace
 
-struct DliLoader::Impl
+struct DliLoaderImpl::Impl
 {
   StringCallback      mOnError = DefaultErrorCallback;
   Toolkit::JsonParser mParser;
@@ -342,9 +346,9 @@ private:
    */
   void ParseSceneInternal(Index iScene, const Toolkit::TreeNode* tnScenes, const Toolkit::TreeNode* tnNodes, LoadParams& params);
 
-  void ParseSkeletons(const Toolkit::TreeNode* skeletons, SceneDefinition& scene, ResourceBundle& resources);
-  void ParseEnvironments(const Toolkit::TreeNode* environments, ResourceBundle& resources);
-  void ParseMaterials(const Toolkit::TreeNode* materials, ConvertColorCode convertColorCode, ResourceBundle& resources);
+  void ParseSkeletons(const Toolkit::TreeNode* skeletons, Dali::Scene3D::Loader::SceneDefinition& scene, Dali::Scene3D::Loader::ResourceBundle& resources);
+  void ParseEnvironments(const Toolkit::TreeNode* environments, Dali::Scene3D::Loader::ResourceBundle& resources);
+  void ParseMaterials(const Toolkit::TreeNode* materials, DliInputParameter::ConvertColorCode convertColorCode, Dali::Scene3D::Loader::ResourceBundle& resources);
 
   void ParseNodes(const Toolkit::TreeNode* nodes, Index index, LoadParams& params);
   void ParseNodesInternal(const Toolkit::TreeNode* nodes, Index index, std::vector<Index>& inOutParentStack, LoadParams& params, IIndexMapper& indexMapper);
@@ -352,26 +356,26 @@ private:
   void ParseAnimations(const Toolkit::TreeNode* animations, LoadParams& params);
   void ParseAnimationGroups(const Toolkit::TreeNode* animationGroups, LoadParams& params);
 
-  void ParseShaders(const Toolkit::TreeNode* shaders, ResourceBundle& resources);
-  void ParseMeshes(const Toolkit::TreeNode* meshes, ResourceBundle& resources);
+  void ParseShaders(const Toolkit::TreeNode* shaders, Dali::Scene3D::Loader::ResourceBundle& resources);
+  void ParseMeshes(const Toolkit::TreeNode* meshes, Dali::Scene3D::Loader::ResourceBundle& resources);
 
-  void GetCameraParameters(std::vector<CameraParameters>& cameras) const;
-  void GetLightParameters(std::vector<LightParameters>& lights) const;
+  void GetCameraParameters(std::vector<Dali::Scene3D::Loader::CameraParameters>& cameras) const;
+  void GetLightParameters(std::vector<Dali::Scene3D::Loader::LightParameters>& lights) const;
 };
 
-DliLoader::DliLoader()
+DliLoaderImpl::DliLoaderImpl()
 : mImpl{new Impl}
 {
 }
 
-DliLoader::~DliLoader() = default;
+DliLoaderImpl::~DliLoaderImpl() = default;
 
-void DliLoader::SetErrorCallback(StringCallback onError)
+void DliLoaderImpl::SetErrorCallback(StringCallback onError)
 {
   mImpl->mOnError = onError;
 }
 
-bool DliLoader::LoadScene(const std::string& uri, LoadParams& params)
+bool DliLoaderImpl::LoadModel(const std::string& uri, Dali::Scene3D::Loader::LoadResult& result)
 {
   std::string daliBuffer = LoadTextFile(uri.c_str());
 
@@ -382,11 +386,25 @@ bool DliLoader::LoadScene(const std::string& uri, LoadParams& params)
     return false;
   }
 
-  mImpl->ParseScene(params);
+  std::filesystem::path                    modelPath(uri);
+  Dali::Scene3D::Loader::DliInputParameter input;
+  LoadParams                               loadParams;
+  if(mInputParameter)
+  {
+    loadParams.input = static_cast<DliInputParameter*>(mInputParameter);
+  }
+  else
+  {
+    input.mAnimationsPath = std::string(modelPath.parent_path()) + "/";
+    loadParams.input      = &input;
+  }
+  loadParams.output = &result;
+
+  mImpl->ParseScene(loadParams);
   return true;
 }
 
-std::string DliLoader::GetParseError() const
+std::string DliLoaderImpl::GetParseError() const
 {
   std::stringstream stream;
 
@@ -399,10 +417,10 @@ std::string DliLoader::GetParseError() const
   return stream.str();
 }
 
-void DliLoader::Impl::ParseScene(LoadParams& params)
+void DliLoaderImpl::Impl::ParseScene(LoadParams& params)
 {
-  auto& input  = params.input;
-  auto& output = params.output;
+  auto& input  = *params.input;
+  auto& output = *params.output;
 
   // get index of root node.
   auto docRoot = mParser.GetRoot();
@@ -482,7 +500,7 @@ void DliLoader::Impl::ParseScene(LoadParams& params)
   }
 }
 
-void DliLoader::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* tnScenes, const Toolkit::TreeNode* tnNodes, LoadParams& params)
+void DliLoaderImpl::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* tnScenes, const Toolkit::TreeNode* tnNodes, LoadParams& params)
 {
   auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene) {
     auto tn = GetNthChild(tnScenes, iScene); // now a "scene" object
@@ -526,7 +544,7 @@ void DliLoader::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* 
   Index iRootNode = getSceneRootIdx(iScene);
   ParseNodes(tnNodes, iRootNode, params);
 
-  auto& scene = params.output.mScene;
+  auto& scene = params.output->mScene;
   scene.AddRootNode(0);
 
   for(Index i = 0; i < iScene; ++i)
@@ -547,7 +565,7 @@ void DliLoader::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* 
   }
 }
 
-void DliLoader::Impl::ParseSkeletons(const TreeNode* skeletons, SceneDefinition& scene, ResourceBundle& resources)
+void DliLoaderImpl::Impl::ParseSkeletons(const TreeNode* skeletons, Dali::Scene3D::Loader::SceneDefinition& scene, Dali::Scene3D::Loader::ResourceBundle& resources)
 {
   if(skeletons)
   {
@@ -611,7 +629,7 @@ void DliLoader::Impl::ParseSkeletons(const TreeNode* skeletons, SceneDefinition&
   }
 }
 
-void DliLoader::Impl::ParseEnvironments(const TreeNode* environments, ResourceBundle& resources)
+void DliLoaderImpl::Impl::ParseEnvironments(const TreeNode* environments, Dali::Scene3D::Loader::ResourceBundle& resources)
 {
   Matrix cubeOrientation(Matrix::IDENTITY);
 
@@ -641,7 +659,7 @@ void DliLoader::Impl::ParseEnvironments(const TreeNode* environments, ResourceBu
   }
 }
 
-void DliLoader::Impl::ParseShaders(const TreeNode* shaders, ResourceBundle& resources)
+void DliLoaderImpl::Impl::ParseShaders(const TreeNode* shaders, Dali::Scene3D::Loader::ResourceBundle& resources)
 {
   uint32_t iShader = 0;
   for(auto i0 = shaders->CBegin(), i1 = shaders->CEnd(); i0 != i1; ++i0, ++iShader)
@@ -760,7 +778,7 @@ void DliLoader::Impl::ParseShaders(const TreeNode* shaders, ResourceBundle& reso
   }
 }
 
-void DliLoader::Impl::ParseMeshes(const TreeNode* meshes, ResourceBundle& resources)
+void DliLoaderImpl::Impl::ParseMeshes(const TreeNode* meshes, Dali::Scene3D::Loader::ResourceBundle& resources)
 {
   for(auto i0 = meshes->CBegin(), i1 = meshes->CEnd(); i0 != i1; ++i0)
   {
@@ -918,7 +936,7 @@ void DliLoader::Impl::ParseMeshes(const TreeNode* meshes, ResourceBundle& resour
   }
 }
 
-void DliLoader::Impl::ParseMaterials(const TreeNode* materials, ConvertColorCode convertColorCode, ResourceBundle& resources)
+void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputParameter::ConvertColorCode convertColorCode, Dali::Scene3D::Loader::ResourceBundle& resources)
 {
   for(auto i0 = materials->CBegin(), i1 = materials->CEnd(); i0 != i1; ++i0)
   {
@@ -1048,7 +1066,7 @@ void DliLoader::Impl::ParseMaterials(const TreeNode* materials, ConvertColorCode
   }
 }
 
-void DliLoader::Impl::ParseNodes(const TreeNode* const nodes, Index index, LoadParams& params)
+void DliLoaderImpl::Impl::ParseNodes(const TreeNode* const nodes, Index index, LoadParams& params)
 {
   std::vector<Index> parents;
   parents.reserve(8);
@@ -1097,7 +1115,7 @@ void DliLoader::Impl::ParseNodes(const TreeNode* const nodes, Index index, LoadP
   } mapper(nodes->Size());
   ParseNodesInternal(nodes, index, parents, params, mapper);
 
-  auto& scene = params.output.mScene;
+  auto& scene = params.output->mScene;
   for(size_t i0 = 0, i1 = scene.GetNodeCount(); i0 < i1; ++i0)
   {
     for(auto& c : scene.GetNode(i0)->mConstraints)
@@ -1107,7 +1125,7 @@ void DliLoader::Impl::ParseNodes(const TreeNode* const nodes, Index index, LoadP
   }
 }
 
-void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index index, std::vector<Index>& inOutParentStack, LoadParams& params, IIndexMapper& mapper)
+void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index index, std::vector<Index>& inOutParentStack, LoadParams& params, IIndexMapper& mapper)
 {
   // Properties that may be resolved from a JSON value with ReadInt() -- or default to 0.
   struct IndexProperty
@@ -1121,7 +1139,7 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
 
   if(auto node = GetNthChild(nodes, index))
   {
-    NodeDefinition nodeDef;
+    Dali::Scene3D::Loader::NodeDefinition nodeDef;
     nodeDef.mParentIdx = inOutParentStack.empty() ? INVALID_INDEX : inOutParentStack.back();
 
     // name
@@ -1151,13 +1169,13 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
       std::string tag;
       if(ReadString(eCustomization->GetChild("tag"), tag))
       {
-        nodeDef.mCustomization.reset(new NodeDefinition::CustomizationDefinition{tag});
+        nodeDef.mCustomization.reset(new Dali::Scene3D::Loader::NodeDefinition::CustomizationDefinition{tag});
       }
     }
     else // something renderable maybe
     {
-      std::unique_ptr<NodeDefinition::Renderable> renderable;
-      ModelRenderable*                            modelRenderable = nullptr; // no ownership, aliasing renderable for the right type.
+      std::unique_ptr<Dali::Scene3D::Loader::NodeDefinition::Renderable> renderable;
+      ModelRenderable*                                                   modelRenderable = nullptr; // no ownership, aliasing renderable for the right type.
 
       const TreeNode* eRenderable = nullptr;
       if((eRenderable = node->GetChild("model")))
@@ -1212,9 +1230,9 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
             resourceIds.push_back({ResourceType::Material, eMaterial, modelRenderable->mMaterialIdx});
           }
 
-          if(!ReadColorCodeOrColor(eRenderable, modelRenderable->mColor, params.input.mConvertColorCode))
+          if(!ReadColorCodeOrColor(eRenderable, modelRenderable->mColor, params.input->mConvertColorCode))
           {
-            ReadColorCodeOrColor(node, modelRenderable->mColor, params.input.mConvertColorCode);
+            ReadColorCodeOrColor(node, modelRenderable->mColor, params.input->mConvertColorCode);
           }
         }
 
@@ -1230,15 +1248,15 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
       switch(idRes.type)
       {
         case ResourceType::Shader:
-          iCheck = output.mResources.mShaders.size();
+          iCheck = output->mResources.mShaders.size();
           break;
 
         case ResourceType::Mesh:
-          iCheck = output.mResources.mMeshes.size();
+          iCheck = output->mResources.mMeshes.size();
           break;
 
         case ResourceType::Material:
-          iCheck = output.mResources.mMaterials.size();
+          iCheck = output->mResources.mMaterials.size();
           break;
 
         default:
@@ -1273,7 +1291,7 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
 
       for(auto i0 = eExtras->CBegin(), i1 = eExtras->CEnd(); i0 != i1; ++i0)
       {
-        NodeDefinition::Extra e;
+        Dali::Scene3D::Loader::NodeDefinition::Extra e;
 
         auto eExtra = *i0;
         e.mKey      = eExtra.first;
@@ -1350,7 +1368,7 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
     }
 
     // Determine index for mapping
-    const unsigned int myIndex = output.mScene.GetNodeCount();
+    const unsigned int myIndex = output->mScene.GetNodeCount();
     if(!mapper.Map(index, myIndex))
     {
       mOnError(FormatString("node %d: error mapping dli index %d: node has multiple parents. Ignoring subtree.", index, myIndex));
@@ -1365,7 +1383,7 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
     }
 
     // Register nodeDef
-    auto rawDef = output.mScene.AddNode(std::make_unique<NodeDefinition>(std::move(nodeDef)));
+    auto rawDef = output->mScene.AddNode(std::make_unique<Dali::Scene3D::Loader::NodeDefinition>(std::move(nodeDef)));
     if(rawDef) // NOTE: no ownership. Guaranteed to stay in scope.
     {
       // ...And only then parse children.
@@ -1396,7 +1414,7 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
         mOnError(FormatString("node %d: not an actual customization without children.", index));
       }
 
-      if(auto proc = params.input.mNodePropertyProcessor) // optional processing
+      if(auto proc = params.input->mNodePropertyProcessor) // optional processing
       {
         // WARNING: constraint IDs are not resolved at this point.
         Property::Map nodeData;
@@ -1411,9 +1429,9 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
   }
 }
 
-void DliLoader::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadParams& params)
+void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadParams& params)
 {
-  auto& definitions = params.output.mAnimationDefinitions;
+  auto& definitions = params.output->mAnimationDefinitions;
   definitions.reserve(definitions.size() + tnAnimations->Size());
 
   for(TreeNode::ConstIterator iAnim = tnAnimations->CBegin(), iAnimEnd = tnAnimations->CEnd();
@@ -1532,7 +1550,7 @@ void DliLoader::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadParams& 
           std::string   animationFilename;
           if(ReadString(tnKeyFramesBin->GetChild(URL), animationFilename))
           {
-            std::string animationFullPath = params.input.mAnimationsPath + animationFilename;
+            std::string animationFullPath = params.input->mAnimationsPath + animationFilename;
             binAniFile.open(animationFullPath, std::ios::binary);
             if(binAniFile.fail())
             {
@@ -1663,7 +1681,7 @@ void DliLoader::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadParams& 
       iFind = definitions.insert(iFind, std::move(animDef));
     }
 
-    if(auto proc = params.input.mAnimationPropertyProcessor) // optional processing
+    if(auto proc = params.input->mAnimationPropertyProcessor) // optional processing
     {
       Property::Map map;
       ParseProperties(tnAnim, map);
@@ -1672,9 +1690,9 @@ void DliLoader::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadParams& 
   }
 }
 
-void DliLoader::Impl::ParseAnimationGroups(const Toolkit::TreeNode* tnAnimationGroups, LoadParams& params)
+void DliLoaderImpl::Impl::ParseAnimationGroups(const Toolkit::TreeNode* tnAnimationGroups, LoadParams& params)
 {
-  auto& animGroups = params.output.mAnimationGroupDefinitions;
+  auto& animGroups = params.output->mAnimationGroupDefinitions;
 
   int numGroups = 0;
   for(auto iGroups = tnAnimationGroups->CBegin(), iGroupsEnd = tnAnimationGroups->CEnd();
@@ -1715,7 +1733,7 @@ void DliLoader::Impl::ParseAnimationGroups(const Toolkit::TreeNode* tnAnimationG
   }
 }
 
-void DliLoader::Impl::GetCameraParameters(std::vector<CameraParameters>& cameras) const
+void DliLoaderImpl::Impl::GetCameraParameters(std::vector<Dali::Scene3D::Loader::CameraParameters>& cameras) const
 {
   if(mParser.GetRoot())
   {
@@ -1751,7 +1769,7 @@ void DliLoader::Impl::GetCameraParameters(std::vector<CameraParameters>& cameras
   }
 }
 
-void DliLoader::Impl::GetLightParameters(std::vector<LightParameters>& lights) const
+void DliLoaderImpl::Impl::GetLightParameters(std::vector<Dali::Scene3D::Loader::LightParameters>& lights) const
 {
   if(mParser.GetRoot())
   {
@@ -1821,6 +1839,7 @@ void DliLoader::Impl::GetLightParameters(std::vector<LightParameters>& lights) c
   }
 }
 
+} // namespace Internal
 } // namespace Loader
 } // namespace Scene3D
 } // namespace Dali

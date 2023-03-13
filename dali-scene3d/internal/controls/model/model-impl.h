@@ -263,11 +263,6 @@ private:
   void ResetResourceTask(IntrusivePtr<AsyncTask> asyncTask);
 
   /**
-   * @brief Request to load a Ibl texture asynchronously
-   */
-  void RequestLoadIblTexture(EnvironmentMapLoadTaskPtr asyncLoadTask, const std::string& url);
-
-  /**
    * @brief Notify Resource Ready signal.
    */
   void NotifyResourceReady();

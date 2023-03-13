@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-// INTERNAL INCLUDES
-#include <dali-scene3d/public-api/algorithm/path-finder-waypoint.h>
+// CLASS HEADER
 #include <dali-scene3d/internal/algorithm/path-finder-djikstra.h>
-#include <dali-scene3d/internal/algorithm/path-finder-waypoint-data.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <limits>
-#include <vector>
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/internal/algorithm/path-finder-waypoint-data.h>
+#include <dali-scene3d/public-api/algorithm/path-finder-waypoint.h>
 
 using WayPointList = Dali::Scene3D::Algorithm::WayPointList;
 
 namespace Dali::Scene3D::Internal::Algorithm
 {
-
 PathFinderAlgorithmDjikstra::PathFinderAlgorithmDjikstra(Dali::Scene3D::Algorithm::NavigationMesh& navMesh)
 : mNavigationMesh(&GetImplementation(navMesh))
 {
@@ -40,7 +41,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(const Dal
 {
   Dali::Vector3 outPosFrom;
   uint32_t      polyIndexFrom;
-  auto result = mNavigationMesh->FindFloor(positionFrom, outPosFrom, polyIndexFrom);
+  auto          result = mNavigationMesh->FindFloor(positionFrom, outPosFrom, polyIndexFrom);
 
   Scene3D::Algorithm::WayPointList waypoints;
 
@@ -57,7 +58,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(const Dal
 
       // replace first and last waypoint
       auto& wpFrom = static_cast<WayPointData&>(waypoints[0]);
-      auto& wpTo = static_cast<WayPointData&>(waypoints.back());
+      auto& wpTo   = static_cast<WayPointData&>(waypoints.back());
 
       Vector2 fromCenter(wpFrom.point3d.x, wpFrom.point3d.y);
       wpFrom.point3d = outPosFrom;
@@ -100,8 +101,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(uint32_t 
   dist[sourcePolyIndex] = 0.0f;
 
   // TO OPTIMIZE WITH PRIORITY QUEUE
-  auto FindMinDistance = [&nodeQueue](decltype(dist)& dist)
-  {
+  auto FindMinDistance = [&nodeQueue](decltype(dist)& dist) {
     float w     = std::numeric_limits<float>::max();
     int   index = -1;
     for(auto i = 0u; i < dist.size(); ++i)
@@ -119,7 +119,14 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(uint32_t 
   do
   {
     // find minimum distance
-    [[maybe_unused]] auto minDistIndex = FindMinDistance(dist);
+    auto minDistIndex = FindMinDistance(dist);
+
+    // Failed to find minimum distance
+    if(minDistIndex == -1)
+    {
+      // Return empty WayPointList
+      return {};
+    }
 
     // remove from queue by assigning infinity to distance
     removeCount++;
@@ -215,7 +222,7 @@ void PathFinderAlgorithmDjikstra::PrepareData()
       auto        p2   = edge->face[1];
 
       // One of faces is current face so ignore it
-      auto p                   = ((p1 != i) ? p1 : p2);
+      auto p                = ((p1 != i) ? p1 : p2);
       node.faces[edgeIndex] = p;
       if(p != ::Dali::Scene3D::Algorithm::NavigationMesh::NULL_FACE)
       {
@@ -248,7 +255,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::OptimizeWaypoints(
   bool finished = false;
   for(auto j = 0; !finished; ++j)
   {
-    auto& startWaypoint = optimizedWaypoints.back();
+    auto&       startWaypoint     = optimizedWaypoints.back();
     const auto& startWaypointData = static_cast<const WayPointData&>(startWaypoint);
 
     // add new-last waypoint which will be overriden as long as intersection takes place
@@ -277,8 +284,8 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::OptimizeWaypoints(
         {
           continue;
         }
-        auto Pb0 = mNavigationMesh->GetVertex(wp.edge->vertex[0]);
-        auto Pb1 = mNavigationMesh->GetVertex(wp.edge->vertex[1]);
+        auto Pb0  = mNavigationMesh->GetVertex(wp.edge->vertex[0]);
+        auto Pb1  = mNavigationMesh->GetVertex(wp.edge->vertex[1]);
         auto vPb0 = Dali::Vector2(Pb0->x, Pb0->y);
         auto vPb1 = Dali::Vector2(Pb1->x, Pb1->y);
 
@@ -292,7 +299,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::OptimizeWaypoints(
       if(!doesIntersect)
       {
         optimizedWaypoints.back() = waypoints[wpIndex - 1];
-        startIndex = wpIndex - 1;
+        startIndex                = wpIndex - 1;
         break;
       }
     }
@@ -300,11 +307,11 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::OptimizeWaypoints(
 
   for(auto& wp : optimizedWaypoints)
   {
-    auto& wpData = static_cast<WayPointData&>(wp);
+    auto& wpData   = static_cast<WayPointData&>(wp);
     wpData.point3d = mNavigationMesh->PointLocalToScene(Dali::Vector3(wpData.face->center));
     wpData.point2d = Vector2::ZERO;
   }
 
   return optimizedWaypoints;
 }
-}
+} // namespace Dali::Scene3D::Internal::Algorithm

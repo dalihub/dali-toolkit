@@ -18,14 +18,14 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
-
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/rendering/texture.h>
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
 
 namespace Dali
 {

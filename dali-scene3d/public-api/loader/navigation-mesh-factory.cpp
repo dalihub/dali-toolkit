@@ -17,19 +17,22 @@
 // CLASS HEADER
 #include <dali-scene3d/public-api/loader/navigation-mesh-factory.h>
 
-// INTERNAL INCLUDES
-#include <dali-scene3d/internal/algorithm/navigation-mesh-impl.h>
-
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
+// INTERNAL INCLUDES
+#include <dali-scene3d/internal/algorithm/navigation-mesh-impl.h>
+#include <dali/devel-api/adaptor-framework/file-stream.h>
+
 namespace Dali::Scene3D::Loader
 {
-
 std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(std::string filename)
 {
   std::vector<uint8_t> buffer;
-  auto fin = fopen(filename.c_str(), "rb");
+
+  Dali::FileStream fileStream(filename, Dali::FileStream::READ | Dali::FileStream::BINARY);
+  auto fin = fileStream.GetFile();
+
   if(!fin)
   {
     DALI_LOG_ERROR("NavigationMesh: Can't open %s for reading: %s", filename.c_str(), strerror(errno));
@@ -37,27 +40,38 @@ std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile
   }
   else
   {
-    fseek(fin, 0, SEEK_END);
+    if(fseek(fin, 0, SEEK_END))
+    {
+      return {};
+    }
+
     auto size = ftell(fin);
-    fseek(fin, 0, SEEK_SET);
+    if(size < 0)
+    {
+      return {};
+    }
+
+    auto fileSize = size_t(size);
+    if(fseek(fin, 0, SEEK_SET))
+    {
+      return {};
+    }
+
     buffer.resize(size);
-    auto count = fread(buffer.data(), 1, size, fin);
-    if(!count)
+    auto count = fread(buffer.data(), 1, fileSize, fin);
+    if(count != fileSize)
     {
       DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
-      fclose(fin);
       return nullptr;
     }
-    fclose(fin);
-
-    return CreateFromBuffer( buffer );
+    return CreateFromBuffer(buffer);
   }
 }
 
 std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromBuffer(const std::vector<uint8_t>& buffer)
 {
   auto impl = new Scene3D::Internal::Algorithm::NavigationMesh(buffer);
-  return std::unique_ptr<Algorithm::NavigationMesh>( new Algorithm::NavigationMesh(impl));
+  return std::unique_ptr<Algorithm::NavigationMesh>(new Algorithm::NavigationMesh(impl));
 }
 
-}
+} // namespace Dali::Scene3D::Loader

@@ -17,6 +17,7 @@
 // CLASS HEADER
 #include <dali-scene3d/public-api/algorithm/path-finder.h>
 
+// INTERNAL INCLUDES
 // default algorithm
 #include <dali-scene3d/internal/algorithm/path-finder-djikstra.h>
 #include <dali-scene3d/internal/algorithm/path-finder-spfa-double-way.h>

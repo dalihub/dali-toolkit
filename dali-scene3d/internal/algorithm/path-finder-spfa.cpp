@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-// INTERNAL INCLUDES
+// CLASS HEADER
 #include <dali-scene3d/internal/algorithm/path-finder-spfa.h>
-#include <dali-scene3d/internal/algorithm/path-finder-waypoint-data.h>
-#include <dali-scene3d/public-api/algorithm/path-finder-waypoint.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <limits>
-#include <vector>
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/internal/algorithm/path-finder-waypoint-data.h>
+#include <dali-scene3d/public-api/algorithm/path-finder-waypoint.h>
 
 using WayPointList = Dali::Scene3D::Algorithm::WayPointList;
 

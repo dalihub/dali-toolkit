@@ -15,7 +15,7 @@
  *
  */
 
-// INTERNAL INCLUDES
+// CLASS HEADER
 #include <dali-scene3d/public-api/loader/buffer-definition.h>
 
 // EXTERNAL INCLUDES
@@ -23,11 +23,7 @@
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <dali/integration-api/debug.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 namespace
 {
@@ -41,6 +37,14 @@ struct BufferDefinition::Impl
   std::vector<uint8_t>              buffer;
   std::shared_ptr<Dali::FileStream> stream;
 };
+
+BufferDefinition::BufferDefinition(std::vector<uint8_t>& buffer)
+: mImpl{new BufferDefinition::Impl}
+{
+  mImpl.get()->buffer = std::move(buffer);
+  mImpl.get()->stream = std::make_shared<Dali::FileStream>(reinterpret_cast<uint8_t*>(mImpl.get()->buffer.data()), mImpl.get()->buffer.size(), FileStream::READ | FileStream::BINARY);
+  mIsEmbedded         = true;
+}
 
 BufferDefinition::BufferDefinition()
 : mImpl{new BufferDefinition::Impl}
@@ -103,6 +107,4 @@ void BufferDefinition::LoadBuffer()
   }
 }
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

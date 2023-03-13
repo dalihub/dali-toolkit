@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  *
  */
 
-// INTERNAL
-#include "dali-scene3d/public-api/loader/node-definition.h"
-#include "dali-scene3d/public-api/loader/renderer-state.h"
-#include "dali-scene3d/public-api/loader/utils.h"
+// CLASS HEADER
+#include <dali-scene3d/public-api/loader/node-definition.h>
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/loader/renderer-state.h>
+#include <dali-scene3d/public-api/loader/utils.h>
 
 namespace Dali
 {

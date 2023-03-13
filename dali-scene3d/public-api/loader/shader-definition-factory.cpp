@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,20 @@
  * limitations under the License.
  *
  */
-#include "dali-scene3d/public-api/loader/shader-definition-factory.h"
-#include <cstring>
-#include "dali-scene3d/internal/loader/hash.h"
-#include "dali-scene3d/public-api/loader/blend-shape-details.h"
-#include "dali-scene3d/public-api/loader/node-definition.h"
-#include "dali/devel-api/common/map-wrapper.h"
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// CLASS HEADER
+#include <dali-scene3d/public-api/loader/shader-definition-factory.h>
+
+// EXTERNAL INCLUDES
+#include <dali/devel-api/common/map-wrapper.h>
+#include <cstring>
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/internal/loader/hash.h>
+#include <dali-scene3d/public-api/loader/blend-shape-details.h>
+#include <dali-scene3d/public-api/loader/node-definition.h>
+
+namespace Dali::Scene3D::Loader
 {
 namespace
 {
@@ -375,6 +377,4 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
   return renderable.mShaderIdx;
 }
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

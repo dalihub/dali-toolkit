@@ -19,16 +19,11 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
-#include <dali-scene3d/public-api/loader/environment-map-data.h>
 #include <dali-scene3d/public-api/common/environment-map.h>
+#include <dali-scene3d/public-api/loader/environment-map-data.h>
 
-namespace Dali
+namespace Dali::Scene3D::Loader
 {
-namespace Scene3D
-{
-namespace Loader
-{
-
 /**
  * @brief Loads environment map data from a environment map file.
  *
@@ -38,8 +33,6 @@ namespace Loader
  */
 bool DALI_SCENE3D_API LoadEnvironmentMap(const std::string& environmentMapUrl, EnvironmentMapData& environmentMapData);
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_ENVIRONMENT_MAP_LOADER_H

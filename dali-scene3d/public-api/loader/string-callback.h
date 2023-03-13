@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_STRING_CALLBACK_H
 #define DALI_SCENE3D_LOADER_STRING_CALLBACK_H
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,14 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include "dali-scene3d/public-api/api.h"
-
 // EXTERNAL INCLUDES
 #include <functional>
 #include <string>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/api.h>
+
+namespace Dali::Scene3D::Loader
 {
 /*
  * @brief A callback to post strings to.
@@ -40,8 +36,6 @@ using StringCallback = std::function<void(const std::string&)>;
  */
 DALI_SCENE3D_API void DefaultErrorCallback(const std::string& message);
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_STRING_CALLBACK_H

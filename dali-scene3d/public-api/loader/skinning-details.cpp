@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,18 @@
  * limitations under the License.
  *
  */
-#include "dali-scene3d/public-api/loader/skinning-details.h"
-#include "dali/public-api/animation/constraints.h"
-#include "dali/public-api/object/property.h"
-#include "dali/public-api/rendering/shader.h"
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+// CLASS HEADER
+#include <dali-scene3d/public-api/loader/skinning-details.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/object/property.h>
+#include <dali/public-api/rendering/shader.h>
+
+namespace Dali::Scene3D::Loader
 {
 const unsigned int Skinning::MAX_JOINTS = 64;
 
 const char* Skinning::BONE_UNIFORM_NAME = "uBone";
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader

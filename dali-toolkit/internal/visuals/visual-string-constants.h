@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_STRING_CONSTANTS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,6 @@ extern const char* const WRAP_MODE_UNIFORM_NAME;
 extern const char* const IMAGE_WRAP_MODE_U;
 extern const char* const IMAGE_WRAP_MODE_V;
 extern const char* const IMAGE_BORDER;
-extern const char* const PIXEL_ALIGNED_UNIFORM_NAME;
 extern const char* const ANIMATED_IMAGE_URLS_NAME;
 extern const char* const BATCH_SIZE_NAME;
 extern const char* const CACHE_SIZE_NAME;

@@ -14,31 +14,27 @@
  * limitations under the License.
  */
 
-// INTERNAL INCLUDES
+// CLASS HEADER
 #include <dali-scene3d/internal/algorithm/navigation-mesh-impl.h>
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
-#include <filesystem>
 #include <algorithm>
-#include <cerrno>
-#include <cstdio>
-#include <cstring>
+#include <filesystem>
 
 using Dali::Vector3;
 
 namespace Dali::Scene3D::Internal::Algorithm
 {
-
-using Poly = Dali::Scene3D::Algorithm::NavigationMesh::Face;
-using Edge = Dali::Scene3D::Algorithm::NavigationMesh::Edge;
+using Poly   = Dali::Scene3D::Algorithm::NavigationMesh::Face;
+using Edge   = Dali::Scene3D::Algorithm::NavigationMesh::Edge;
 using Vertex = Dali::Scene3D::Algorithm::NavigationMesh::Vertex;
 
 // Internal Navigation ray structure
 struct NavigationRay
 {
-  Dali::Vector3 origin; // Origin of ray
+  Dali::Vector3 origin;    // Origin of ray
   Dali::Vector3 direction; // Direction of ray
 };
 
@@ -96,7 +92,7 @@ NavigationMesh::NavigationMesh(const std::vector<uint8_t>& buffer)
   std::copy(buffer.begin(), buffer.end(), mBuffer.begin());
 
   // Setup header from the buffer
-  mHeader = *reinterpret_cast<NavigationMeshHeader_V10*>(mBuffer.data());
+  mHeader      = *reinterpret_cast<NavigationMeshHeader_V10*>(mBuffer.data());
   mCurrentFace = Scene3D::Algorithm::NavigationMesh::NULL_FACE;
 }
 
@@ -225,8 +221,7 @@ bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& out
     return false;
   }
 
-  std::sort(results.begin(), results.end(), [](const IntersectResult& lhs, const IntersectResult& rhs)
-            { return lhs.distance < rhs.distance; });
+  std::sort(results.begin(), results.end(), [](const IntersectResult& lhs, const IntersectResult& rhs) { return lhs.distance < rhs.distance; });
 
   outPosition  = PointLocalToScene(results.front().point);
   faceIndex    = results.front().faceIndex;
@@ -291,7 +286,7 @@ Dali::Vector3 NavigationMesh::PointLocalToScene(const Dali::Vector3& point)
 
 Dali::Vector3 NavigationMesh::GetGravityVector() const
 {
-  return Dali::Vector3( mHeader.gravityVector );
+  return Dali::Vector3(mHeader.gravityVector);
 }
 
-}
+} // namespace Dali::Scene3D::Internal::Algorithm

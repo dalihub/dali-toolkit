@@ -15,7 +15,7 @@
  *
  */
 
-// INTERNAL INCLUDES
+// CLASS HEADER
 #include <dali-scene3d/public-api/loader/material-definition.h>
 
 // EXTERNAL INCLUDES

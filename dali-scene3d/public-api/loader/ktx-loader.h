@@ -21,11 +21,7 @@
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/loader/environment-map-data.h>
 
-namespace Dali
-{
-namespace Scene3D
-{
-namespace Loader
+namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Loads cube map data texture from a ktx file.
@@ -36,8 +32,6 @@ namespace Loader
  */
 bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData);
 
-} // namespace Loader
-} // namespace Scene3D
-} // namespace Dali
+} // namespace Dali::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_KTX_LOADER_H
