@@ -37,12 +37,12 @@ namespace Gltf2Util
 {
 struct NodeMapping
 {
-  Index gltfIdx;
-  Index runtimeIdx;
+  Index gltfIndex;
+  Index runtimeIndex;
 
-  bool operator<(Index gltfIdx) const
+  bool operator<(Index gltfIndex) const
   {
-    return this->gltfIdx < gltfIdx;
+    return this->gltfIndex < gltfIndex;
   }
 };
 
@@ -53,24 +53,24 @@ public:
   NodeIndexMapper(const NodeIndexMapper&) = delete;
   NodeIndexMapper& operator=(const NodeIndexMapper&) = delete;
 
-  ///@brief Registers a mapping of the @a gltfIdx of a node to its @a runtimeIdx .
+  ///@brief Registers a mapping of the @a gltfIndex of a node to its @a runtimeIndex .
   ///@note If the indices are the same, the registration is omitted, in order to
   /// save growing a vector.
-  void RegisterMapping(Index gltfIdx, Index runtimeIdx)
+  void RegisterMapping(Index gltfIndex, Index runtimeIndex)
   {
-    if(gltfIdx != runtimeIdx)
+    if(gltfIndex != runtimeIndex)
     {
-      auto iInsert = std::lower_bound(mNodes.begin(), mNodes.end(), gltfIdx);
-      DALI_ASSERT_DEBUG(iInsert == mNodes.end() || iInsert->gltfIdx != gltfIdx);
-      mNodes.insert(iInsert, NodeMapping{gltfIdx, runtimeIdx});
+      auto iInsert = std::lower_bound(mNodes.begin(), mNodes.end(), gltfIndex);
+      DALI_ASSERT_DEBUG(iInsert == mNodes.end() || iInsert->gltfIndex != gltfIndex);
+      mNodes.insert(iInsert, NodeMapping{gltfIndex, runtimeIndex});
     }
   }
 
-  ///@brief Retrieves the runtime index of a Node, mapped to the given @a gltfIdx.
-  Index GetRuntimeId(Index gltfIdx) const
+  ///@brief Retrieves the runtime index of a Node, mapped to the given @a gltfIndex.
+  Index GetRuntimeId(Index gltfIndex) const
   {
-    auto iFind = std::lower_bound(mNodes.begin(), mNodes.end(), gltfIdx); // using custom operator<
-    return (iFind != mNodes.end() && iFind->gltfIdx == gltfIdx) ? iFind->runtimeIdx : gltfIdx;
+    auto iFind = std::lower_bound(mNodes.begin(), mNodes.end(), gltfIndex); // using custom operator<
+    return (iFind != mNodes.end() && iFind->gltfIndex == gltfIndex) ? iFind->runtimeIndex : gltfIndex;
   }
 
 private:
@@ -88,23 +88,23 @@ struct ConversionContext
   NodeIndexMapper    mNodeIndices;
 };
 
-void ConvertBuffers(const gt::Document& doc, ConversionContext& context);
+void ConvertBuffers(const gt::Document& document, ConversionContext& context);
 
-void ConvertMaterials(const gt::Document& doc, ConversionContext& context);
+void ConvertMaterials(const gt::Document& document, ConversionContext& context);
 
-void ConvertMeshes(const gt::Document& doc, ConversionContext& context);
+void ConvertMeshes(const gt::Document& document, ConversionContext& context);
 
-void ConvertCamera(const gt::Camera& camera, CameraParameters& camParams);
+void ConvertCamera(const gt::Camera& camera, CameraParameters& cameraParameters);
 
-void ConvertNodes(const gt::Document& doc, ConversionContext& context, bool isMRendererModel);
+void ConvertNodes(const gt::Document& document, ConversionContext& context, bool isMRendererModel);
 
-void ConvertAnimations(const gt::Document& doc, ConversionContext& context);
+void ConvertAnimations(const gt::Document& document, ConversionContext& context);
 
-void ProcessSkins(const gt::Document& doc, ConversionContext& context);
+void ProcessSkins(const gt::Document& document, ConversionContext& context);
 
 void ProduceShaders(ShaderDefinitionFactory& shaderFactory, SceneDefinition& scene);
 
-void SetDefaultEnvironmentMap(const gt::Document& doc, ConversionContext& context);
+void SetDefaultEnvironmentMap(const gt::Document& document, ConversionContext& context);
 
 const std::string_view GetRendererModelIdentification();
 
