@@ -514,6 +514,13 @@ public: // Configure the text controller.
   bool IsTextFitChanged() const;
 
   /**
+   * @brief Sets line size valid for text fit.
+   *
+   * @param[in] lineSize line size value
+   */
+  void SetTextFitLineSize(float lineSize);
+
+  /**
    * @brief Sets disabled color opacity.
    *
    * @param[in] opacity The color opacity value in disabled state.

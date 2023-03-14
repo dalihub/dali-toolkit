@@ -413,6 +413,11 @@ float Controller::GetTextFitPointSize() const
   return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFitPointSize : 0.0f;
 }
 
+void Controller::SetTextFitLineSize(float lineSize)
+{
+  mImpl->mTextFitLineSize = lineSize;
+}
+
 void Controller::SetPlaceholderTextElideEnabled(bool enabled)
 {
   PlaceholderHandler::SetPlaceholderTextElideEnabled(*this, enabled);
