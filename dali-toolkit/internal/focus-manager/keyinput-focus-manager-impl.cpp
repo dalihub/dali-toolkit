@@ -84,14 +84,15 @@ void KeyInputFocusManager::SetFocus(Toolkit::Control control)
   control.OffSceneSignal().Connect(mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection);
 
   Dali::Toolkit::Control previousFocusControl = GetCurrentFocusControl();
+
+  // Set control to currentFocusControl
+  mCurrentFocusControl = control;
+
   if(previousFocusControl)
   {
     // Notify the control that it has lost key input focus
     GetImplementation(previousFocusControl).OnKeyInputFocusLost();
   }
-
-  // Set control to currentFocusControl
-  mCurrentFocusControl = control;
 
   // Tell the new actor that it has gained focus.
   GetImplementation(control).OnKeyInputFocusGained();
@@ -109,10 +110,10 @@ void KeyInputFocusManager::RemoveFocus(Toolkit::Control control)
   {
     control.OffSceneSignal().Disconnect(mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection);
 
+    mCurrentFocusControl.Reset();
+
     // Notify the control that it has lost key input focus
     GetImplementation(control).OnKeyInputFocusLost();
-
-    mCurrentFocusControl.Reset();
   }
 }
 
