@@ -359,6 +359,7 @@ struct Controller::Impl
     mTextFitMinSize(DEFAULT_TEXTFIT_MIN),
     mTextFitMaxSize(DEFAULT_TEXTFIT_MAX),
     mTextFitStepSize(DEFAULT_TEXTFIT_STEP),
+    mTextFitLineSize(0.f),
     mFontSizeScale(DEFAULT_FONT_SIZE_SCALE),
     mDisabledColorOpacity(DEFAULT_DISABLED_COLOR_OPACITY),
     mFontSizeScaleEnabled(true),
@@ -1040,6 +1041,7 @@ public:
   float mTextFitMinSize;               ///< Minimum Font Size for text fit. Default 10
   float mTextFitMaxSize;               ///< Maximum Font Size for text fit. Default 100
   float mTextFitStepSize;              ///< Step Size for font intervalse. Default 1
+  float mTextFitLineSize;              ///< This is the LineSize that is the standard when performing TextFit.
   float mFontSizeScale;                ///< Scale value for Font Size. Default 1.0
   float mDisabledColorOpacity;         ///< Color opacity when disabled.
   bool  mFontSizeScaleEnabled : 1;     ///< Whether the font size scale is enabled.

@@ -261,11 +261,14 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
     DALI_TRACE_BEGIN(gTraceFilter, "DALI_TEXT_FIT_LAYOUT");
     ModelPtr& model = impl.mModel;
 
-    bool  actualellipsis      = model->mElideEnabled;
-    float minPointSize        = impl.mTextFitMinSize;
-    float maxPointSize        = impl.mTextFitMaxSize;
-    float pointInterval       = impl.mTextFitStepSize;
-    float currentFitPointSize = impl.mFontDefaults->mFitPointSize;
+    bool  actualellipsis         = model->mElideEnabled;
+    float minPointSize           = impl.mTextFitMinSize;
+    float maxPointSize           = impl.mTextFitMaxSize;
+    float pointInterval          = impl.mTextFitStepSize;
+    float currentFitPointSize    = impl.mFontDefaults->mFitPointSize;
+    float currentDefaultLineSize = impl.mLayoutEngine.GetDefaultLineSize();
+    // Instead of using the LineSize of the current TextLabel, the LineSize set in TextFit is used.
+    impl.SetDefaultLineSize(impl.mTextFitLineSize);
 
     model->mElideEnabled = false;
     Vector<float> pointSizeArray;
@@ -309,6 +312,8 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
     {
       impl.mTextFitChanged = true;
     }
+    // Revert back to the original TextLabel LineSize.
+    impl.SetDefaultLineSize(currentDefaultLineSize);
     impl.mFontDefaults->mFitPointSize = pointSizeArray[bestSizeIndex];
     impl.mFontDefaults->sizeDefined   = true;
     impl.ClearFontData();
