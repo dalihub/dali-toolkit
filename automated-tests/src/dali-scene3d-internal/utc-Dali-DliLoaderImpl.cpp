@@ -182,6 +182,7 @@ int UtcDaliDliLoaderLoadSceneAssertions(void)
 
 int UtcDaliDliLoaderLoadSceneExercise(void)
 {
+  TestApplication app;
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "exercise.dli";
@@ -218,8 +219,6 @@ int UtcDaliDliLoaderLoadSceneExercise(void)
   };
 
   Customization::Choices choices;
-
-  TestApplication app;
 
   Actor root = Actor::New();
   SetActorCentered(root);
