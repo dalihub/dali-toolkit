@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,14 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
-#include <dali-toolkit/internal/text/cursor-helper-functions.h>
-#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
-#include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/controller/text-controller-impl-data-clearer.h>
 #include <dali-toolkit/internal/text/controller/text-controller-impl-event-handler.h>
 #include <dali-toolkit/internal/text/controller/text-controller-impl-model-updater.h>
 #include <dali-toolkit/internal/text/controller/text-controller-placeholder-handler.h>
 #include <dali-toolkit/internal/text/controller/text-controller-relayouter.h>
+#include <dali-toolkit/internal/text/cursor-helper-functions.h>
+#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
@@ -520,6 +520,19 @@ void Controller::Impl::GetText(std::string& text) const
   else
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::GetText %p empty (but showing placeholder)\n", this);
+  }
+}
+
+Length Controller::Impl::GetNumberOfCharacters() const
+{
+  if(!IsShowingPlaceholderText())
+  {
+    return mModel->GetNumberOfCharacters();
+  }
+  else
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::GetNumberOfCharacters %p empty (but showing placeholder)\n", this);
+    return 0u;
   }
 }
 
@@ -1588,16 +1601,16 @@ bool Controller::Impl::IsScrollable(const Vector2& displacement)
   {
     const bool isHorizontalScrollEnabled = mEventData->mDecorator->IsHorizontalScrollEnabled();
     const bool isVerticalScrollEnabled   = mEventData->mDecorator->IsVerticalScrollEnabled();
-    if(isHorizontalScrollEnabled ||isVerticalScrollEnabled)
+    if(isHorizontalScrollEnabled || isVerticalScrollEnabled)
     {
-      const Vector2& targetSize = mModel->mVisualModel->mControlSize;
-      const Vector2& layoutSize = mModel->mVisualModel->GetLayoutSize();
+      const Vector2& targetSize     = mModel->mVisualModel->mControlSize;
+      const Vector2& layoutSize     = mModel->mVisualModel->GetLayoutSize();
       const Vector2& scrollPosition = mModel->mScrollPosition;
 
       if(isHorizontalScrollEnabled)
       {
         const float displacementX = displacement.x;
-        const float positionX = scrollPosition.x + displacementX;
+        const float positionX     = scrollPosition.x + displacementX;
         if(layoutSize.width > targetSize.width && -positionX > 0.f && -positionX < layoutSize.width - targetSize.width)
         {
           isScrollable = true;
@@ -1607,7 +1620,7 @@ bool Controller::Impl::IsScrollable(const Vector2& displacement)
       if(isVerticalScrollEnabled)
       {
         const float displacementY = displacement.y;
-        const float positionY = scrollPosition.y + displacementY;
+        const float positionY     = scrollPosition.y + displacementY;
         if(layoutSize.height > targetSize.height && -positionY > 0 && -positionY < layoutSize.height - targetSize.height)
         {
           isScrollable = true;
