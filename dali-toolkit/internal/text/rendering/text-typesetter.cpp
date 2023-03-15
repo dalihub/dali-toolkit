@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,18 +60,78 @@ inline uint8_t MultiplyAndNormalizeColor(const uint8_t x, const uint8_t y) noexc
   return ((xy << 15) + (xy << 7) + xy) >> 23;
 }
 
+/// Helper macro define for glyph typesetter. It will reduce some duplicated code line.
+// clang-format off
+/**
+ * @brief Prepare decode glyph bitmap data. It must be call END_GLYPH_BITMAP end of same scope.
+ */
+#define BEGIN_GLYPH_BITMAP(data)                                                                                                               \
+{                                                                                                                                              \
+  uint32_t   glyphOffet               = 0u;                                                                                                    \
+  const bool useLocalScanline         = data.glyphBitmap.compressionType != TextAbstraction::GlyphBufferData::CompressionType::NO_COMPRESSION; \
+  uint8_t* __restrict__ glyphScanline = useLocalScanline ? (uint8_t*)malloc(data.glyphBitmap.width * glyphPixelSize) : data.glyphBitmap.buffer;
+
+/**
+ * @brief Macro to skip useless line fast.
+ */
+#define SKIP_GLYPH_SCANLINE(skipLine)                                                                  \
+if(useLocalScanline)                                                                                   \
+{                                                                                                      \
+  for(int32_t lineIndex = 0; lineIndex < skipLine; ++lineIndex)                                        \
+  {                                                                                                    \
+    TextAbstraction::GlyphBufferData::DecompressScanline(data.glyphBitmap, glyphScanline, glyphOffet); \
+  }                                                                                                    \
+}                                                                                                      \
+else                                                                                                   \
+{                                                                                                      \
+  glyphScanline += skipLine * static_cast<int32_t>(data.glyphBitmap.width * glyphPixelSize);           \
+}
+
+/**
+ * @brief Prepare scanline of glyph bitmap data per each lines. It must be call END_GLYPH_SCANLINE_DECODE end of same scope.
+ */
+#define BEGIN_GLYPH_SCANLINE_DECODE(data)                                                              \
+{                                                                                                      \
+  if(useLocalScanline)                                                                                 \
+  {                                                                                                    \
+    TextAbstraction::GlyphBufferData::DecompressScanline(data.glyphBitmap, glyphScanline, glyphOffet); \
+  }
+
+/**
+ * @brief Finalize scanline of glyph bitmap data per each lines.
+ */
+#define END_GLYPH_SCANLINE_DECODE(data)                       \
+  if(!useLocalScanline)                                       \
+  {                                                           \
+    glyphScanline += data.glyphBitmap.width * glyphPixelSize; \
+  }                                                           \
+} // For ensure that we call BEGIN_GLYPH_SCANLINE_DECODE before
+
+/**
+ * @brief Finalize decode glyph bitmap data.
+ */
+#define END_GLYPH_BITMAP() \
+  if(useLocalScanline)     \
+  {                        \
+    free(glyphScanline);   \
+  }                        \
+} // For ensure that we call BEGIN_GLYPH_BITMAP before
+
+// clang-format on
+/// Helper macro define end.
+
 /**
  * @brief Data struct used to set the buffer of the glyph's bitmap into the final bitmap's buffer.
  */
 struct GlyphData
 {
-  Devel::PixelBuffer                           bitmapBuffer;     ///< The buffer of the whole bitmap. The format is RGBA8888.
-  Vector2*                                     position;         ///< The position of the glyph.
-  TextAbstraction::FontClient::GlyphBufferData glyphBitmap;      ///< The glyph's bitmap.
-  uint32_t                                     width;            ///< The bitmap's width.
-  uint32_t                                     height;           ///< The bitmap's height.
-  int32_t                                      horizontalOffset; ///< The horizontal offset to be added to the 'x' glyph's position.
-  int32_t                                      verticalOffset;   ///< The vertical offset to be added to the 'y' glyph's position.
+  Devel::PixelBuffer               bitmapBuffer;     ///< The buffer of the whole bitmap. The format is RGBA8888.
+  Vector2*                         position;         ///< The position of the glyph.
+  TextAbstraction::GlyphBufferData glyphBitmap;      ///< The glyph's bitmap.
+  uint32_t                         width;            ///< The bitmap's width.
+  uint32_t                         height;           ///< The bitmap's height.
+  int32_t                          horizontalOffset; ///< The horizontal offset to be added to the 'x' glyph's position.
+  int32_t                          verticalOffset;   ///< The vertical offset to be added to the 'y' glyph's position.
 };
 
 /**
@@ -137,13 +197,6 @@ void TypesetGlyph(GlyphData& __restrict__ data,
 
     const bool swapChannelsBR = Pixel::BGRA8888 == data.glyphBitmap.format;
 
-    // Offset byte value of glyph bitmap.
-    uint32_t glyphOffet = 0u;
-
-    // Allocate scanline memory for glyph bitmap if we need.
-    const bool useLocalScanline         = data.glyphBitmap.compressionType != TextAbstraction::FontClient::GlyphBufferData::CompressionType::NO_COMPRESSION;
-    uint8_t* __restrict__ glyphScanline = useLocalScanline ? (uint8_t*)malloc(data.glyphBitmap.width * glyphPixelSize) : data.glyphBitmap.buffer;
-
     // Precalculate input color's packed result.
     uint32_t packedInputColor                    = 0u;
     uint8_t* __restrict__ packedInputColorBuffer = reinterpret_cast<uint8_t*>(&packedInputColor);
@@ -153,28 +206,18 @@ void TypesetGlyph(GlyphData& __restrict__ data,
     *(packedInputColorBuffer + 1u) = static_cast<uint8_t>(color->g * 255);
     *(packedInputColorBuffer)      = static_cast<uint8_t>(color->r * 255);
 
+    // Prepare glyph bitmap
+    BEGIN_GLYPH_BITMAP(data);
+
     // Skip basic line of glyph.
-    if(useLocalScanline)
-    {
-      for(int32_t lineIndex = 0; lineIndex < lineIndexRangeMin; ++lineIndex)
-      {
-        TextAbstraction::FontClient::GlyphBufferData::DecompressScanline(data.glyphBitmap, glyphScanline, glyphOffet);
-      }
-    }
-    else
-    {
-      glyphScanline += lineIndexRangeMin * static_cast<int32_t>(data.glyphBitmap.width * glyphPixelSize);
-    }
+    SKIP_GLYPH_SCANLINE(lineIndexRangeMin);
 
     // Traverse the pixels of the glyph line per line.
     if(isColorGlyph)
     {
       for(int32_t lineIndex = lineIndexRangeMin; lineIndex < lineIndexRangeMax; ++lineIndex)
       {
-        if(useLocalScanline)
-        {
-          TextAbstraction::FontClient::GlyphBufferData::DecompressScanline(data.glyphBitmap, glyphScanline, glyphOffet);
-        }
+        BEGIN_GLYPH_SCANLINE_DECODE(data);
 
         for(int32_t index = indexRangeMin; index < indexRangeMax; ++index)
         {
@@ -219,20 +262,15 @@ void TypesetGlyph(GlyphData& __restrict__ data,
         }
 
         bitmapBuffer += data.width;
-        if(!useLocalScanline)
-        {
-          glyphScanline += data.glyphBitmap.width * glyphPixelSize;
-        }
+
+        END_GLYPH_SCANLINE_DECODE(data);
       }
     }
     else
     {
       for(int32_t lineIndex = lineIndexRangeMin; lineIndex < lineIndexRangeMax; ++lineIndex)
       {
-        if(useLocalScanline)
-        {
-          TextAbstraction::FontClient::GlyphBufferData::DecompressScanline(data.glyphBitmap, glyphScanline, glyphOffet);
-        }
+        BEGIN_GLYPH_SCANLINE_DECODE(data);
 
         for(int32_t index = indexRangeMin; index < indexRangeMax; ++index)
         {
@@ -279,17 +317,12 @@ void TypesetGlyph(GlyphData& __restrict__ data,
         }
 
         bitmapBuffer += data.width;
-        if(!useLocalScanline)
-        {
-          glyphScanline += data.glyphBitmap.width * glyphPixelSize;
-        }
+
+        END_GLYPH_SCANLINE_DECODE(data);
       }
     }
 
-    if(useLocalScanline)
-    {
-      free(glyphScanline);
-    }
+    END_GLYPH_BITMAP();
   }
   else // Pixel::L8
   {
@@ -297,37 +330,19 @@ void TypesetGlyph(GlyphData& __restrict__ data,
     if(!isColorGlyph)
     {
       uint8_t* __restrict__ bitmapBuffer = data.bitmapBuffer.GetBuffer();
-
-      // Offset byte value of glyph bitmap.
-      uint32_t glyphOffet = 0u;
-
-      // Allocate scanline memory for glyph bitmap if we need.
-      const bool useLocalScanline         = data.glyphBitmap.compressionType != TextAbstraction::FontClient::GlyphBufferData::CompressionType::NO_COMPRESSION;
-      uint8_t* __restrict__ glyphScanline = useLocalScanline ? (uint8_t*)malloc(data.glyphBitmap.width * glyphPixelSize) : data.glyphBitmap.buffer;
-
       // Skip basic line.
       bitmapBuffer += (lineIndexRangeMin + yOffset) * static_cast<int32_t>(data.width);
 
+      // Prepare glyph bitmap
+      BEGIN_GLYPH_BITMAP(data);
+
       // Skip basic line of glyph.
-      if(useLocalScanline)
-      {
-        for(int32_t lineIndex = 0; lineIndex < lineIndexRangeMin; ++lineIndex)
-        {
-          TextAbstraction::FontClient::GlyphBufferData::DecompressScanline(data.glyphBitmap, glyphScanline, glyphOffet);
-        }
-      }
-      else
-      {
-        glyphScanline += lineIndexRangeMin * static_cast<int32_t>(data.glyphBitmap.width * glyphPixelSize);
-      }
+      SKIP_GLYPH_SCANLINE(lineIndexRangeMin);
 
       // Traverse the pixels of the glyph line per line.
       for(int32_t lineIndex = lineIndexRangeMin; lineIndex < lineIndexRangeMax; ++lineIndex)
       {
-        if(useLocalScanline)
-        {
-          TextAbstraction::FontClient::GlyphBufferData::DecompressScanline(data.glyphBitmap, glyphScanline, glyphOffet);
-        }
+        BEGIN_GLYPH_SCANLINE_DECODE(data);
 
         for(int32_t index = indexRangeMin; index < indexRangeMax; ++index)
         {
@@ -351,16 +366,11 @@ void TypesetGlyph(GlyphData& __restrict__ data,
         }
 
         bitmapBuffer += data.width;
-        if(!useLocalScanline)
-        {
-          glyphScanline += data.glyphBitmap.width * glyphPixelSize;
-        }
+
+        END_GLYPH_SCANLINE_DECODE(data);
       }
 
-      if(useLocalScanline)
-      {
-        free(glyphScanline);
-      }
+      END_GLYPH_BITMAP();
     }
   }
 }
