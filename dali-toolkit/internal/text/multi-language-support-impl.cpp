@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/emoji-helper.h>
@@ -36,6 +37,8 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_MULTI_LANGUAGE_SUPPORT");
 #endif
+
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_FONT_PERFORMANCE_MARKER, false);
 
 const Dali::Toolkit::Text::Character UTF32_A = 0x0041;
 } // namespace
@@ -422,6 +425,8 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
     // Nothing to do if there are no characters.
     return;
   }
+
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_FONTS_VALIDATE");
 
   // Find the first index where to insert the font run.
   FontRunIndex fontIndex = 0u;
