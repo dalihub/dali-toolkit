@@ -31,11 +31,11 @@ ProgressBar::ProgressBar()
 
 ProgressBar::ProgressBar(const ProgressBar& handle) = default;
 
-ProgressBar::ProgressBar(ProgressBar&& rhs) = default;
+ProgressBar::ProgressBar(ProgressBar&& rhs) noexcept = default;
 
 ProgressBar& ProgressBar::operator=(const ProgressBar& handle) = default;
 
-ProgressBar& ProgressBar::operator=(ProgressBar&& rhs) = default;
+ProgressBar& ProgressBar::operator=(ProgressBar&& rhs) noexcept = default;
 
 ProgressBar::ProgressBar(Internal::ProgressBar& implementation)
 : Control(implementation)

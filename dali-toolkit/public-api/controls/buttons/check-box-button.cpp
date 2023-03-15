@@ -34,11 +34,11 @@ CheckBoxButton::CheckBoxButton()
 
 CheckBoxButton::CheckBoxButton(const CheckBoxButton& checkBox) = default;
 
-CheckBoxButton::CheckBoxButton(CheckBoxButton&& rhs) = default;
+CheckBoxButton::CheckBoxButton(CheckBoxButton&& rhs) noexcept = default;
 
 CheckBoxButton& CheckBoxButton::operator=(const CheckBoxButton& checkBox) = default;
 
-CheckBoxButton& CheckBoxButton::operator=(CheckBoxButton&& rhs) = default;
+CheckBoxButton& CheckBoxButton::operator=(CheckBoxButton&& rhs) noexcept = default;
 
 CheckBoxButton::~CheckBoxButton()
 {

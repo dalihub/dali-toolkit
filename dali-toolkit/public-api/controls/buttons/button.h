@@ -237,7 +237,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  Button(Button&& rhs);
+  Button(Button&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -254,7 +254,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  Button& operator=(Button&& rhs);
+  Button& operator=(Button&& rhs) noexcept;
 
   /**
    * @brief Downcasts a handle to Button handle.

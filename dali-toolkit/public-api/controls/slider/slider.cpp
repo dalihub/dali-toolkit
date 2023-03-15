@@ -33,11 +33,11 @@ Slider::Slider()
 
 Slider::Slider(const Slider& handle) = default;
 
-Slider::Slider(Slider&& rhs) = default;
+Slider::Slider(Slider&& rhs) noexcept = default;
 
 Slider& Slider::operator=(const Slider& handle) = default;
 
-Slider& Slider::operator=(Slider&& rhs) = default;
+Slider& Slider::operator=(Slider&& rhs) noexcept = default;
 
 Slider::Slider(Internal::Slider& implementation)
 : Control(implementation)

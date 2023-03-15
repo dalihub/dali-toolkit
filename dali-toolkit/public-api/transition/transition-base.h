@@ -94,7 +94,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  TransitionBase(TransitionBase&& rhs);
+  TransitionBase(TransitionBase&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -102,7 +102,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  TransitionBase& operator=(TransitionBase&& rhs);
+  TransitionBase& operator=(TransitionBase&& rhs) noexcept;
 
   /**
    * Set time period that contains delay and duration

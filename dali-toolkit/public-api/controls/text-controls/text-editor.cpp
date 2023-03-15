@@ -41,11 +41,11 @@ TextEditor::TextEditor()
 
 TextEditor::TextEditor(const TextEditor& handle) = default;
 
-TextEditor::TextEditor(TextEditor&& rhs) = default;
+TextEditor::TextEditor(TextEditor&& rhs) noexcept = default;
 
 TextEditor& TextEditor::operator=(const TextEditor& handle) = default;
 
-TextEditor& TextEditor::operator=(TextEditor&& rhs) = default;
+TextEditor& TextEditor::operator=(TextEditor&& rhs) noexcept = default;
 
 TextEditor::~TextEditor()
 {

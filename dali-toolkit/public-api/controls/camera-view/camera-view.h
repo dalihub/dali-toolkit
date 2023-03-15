@@ -86,7 +86,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  CameraView(CameraView&& rhs);
+  CameraView(CameraView&& rhs) noexcept;
 
   /**
    * @brief Update camera view
@@ -110,7 +110,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  CameraView& operator=(CameraView&& rhs);
+  CameraView& operator=(CameraView&& rhs) noexcept;
 
   /**
    * @brief Downcasts a handle to CameraView handle.

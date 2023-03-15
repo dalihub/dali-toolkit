@@ -243,7 +243,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  FlexContainer(FlexContainer&& rhs);
+  FlexContainer(FlexContainer&& rhs) noexcept;
 
   /**
    * @brief Assignment operator. Changes this handle to point to another real object.
@@ -260,7 +260,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  FlexContainer& operator=(FlexContainer&& rhs);
+  FlexContainer& operator=(FlexContainer&& rhs) noexcept;
 
   /**
    * @brief Destructor.

@@ -50,9 +50,9 @@ SlideTransition::SlideTransition(const SlideTransition& handle) = default;
 
 SlideTransition& SlideTransition::operator=(const SlideTransition& rhs) = default;
 
-SlideTransition::SlideTransition(SlideTransition&& rhs) = default;
+SlideTransition::SlideTransition(SlideTransition&& rhs) noexcept = default;
 
-SlideTransition& SlideTransition::operator=(SlideTransition&& rhs) = default;
+SlideTransition& SlideTransition::operator=(SlideTransition&& rhs) noexcept = default;
 
 void SlideTransition::SetDirection(const Vector2& direction)
 {

@@ -34,11 +34,11 @@ Model3dView::Model3dView()
 
 Model3dView::Model3dView(const Model3dView& model3dView) = default;
 
-Model3dView::Model3dView(Model3dView&& rhs) = default;
+Model3dView::Model3dView(Model3dView&& rhs) noexcept = default;
 
 Model3dView& Model3dView::operator=(const Model3dView& model3dView) = default;
 
-Model3dView& Model3dView::operator=(Model3dView&& rhs) = default;
+Model3dView& Model3dView::operator=(Model3dView&& rhs) noexcept = default;
 
 Model3dView::~Model3dView()
 {

@@ -28,11 +28,11 @@ GlView::GlView() = default;
 
 GlView::GlView(const GlView& GlView) = default;
 
-GlView::GlView(GlView&& rhs) = default;
+GlView::GlView(GlView&& rhs) noexcept = default;
 
 GlView& GlView::operator=(const GlView& GlView) = default;
 
-GlView& GlView::operator=(GlView&& rhs) = default;
+GlView& GlView::operator=(GlView&& rhs) noexcept = default;
 
 GlView::~GlView() = default;
 

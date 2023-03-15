@@ -45,7 +45,7 @@ Control::Control()
 
 Control::Control(const Control& uiControl) = default;
 
-Control::Control(Control&& rhs) = default;
+Control::Control(Control&& rhs) noexcept = default;
 
 Control::~Control()
 {
@@ -53,7 +53,7 @@ Control::~Control()
 
 Control& Control::operator=(const Control& handle) = default;
 
-Control& Control::operator=(Control&& rhs) = default;
+Control& Control::operator=(Control&& rhs) noexcept = default;
 
 Control Control::DownCast(BaseHandle handle)
 {

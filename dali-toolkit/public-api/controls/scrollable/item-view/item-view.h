@@ -216,7 +216,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  ItemView(ItemView&& rhs);
+  ItemView(ItemView&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -233,7 +233,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  ItemView& operator=(ItemView&& rhs);
+  ItemView& operator=(ItemView&& rhs) noexcept;
 
   /**
    * @brief Destructor.

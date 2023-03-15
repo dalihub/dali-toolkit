@@ -732,7 +732,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  ScrollView(ScrollView&& rhs);
+  ScrollView(ScrollView&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -751,7 +751,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  ScrollView& operator=(ScrollView&& rhs);
+  ScrollView& operator=(ScrollView&& rhs) noexcept;
 
   /**
    * @brief Destructor.

@@ -135,7 +135,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  PushButton(PushButton&& rhs);
+  PushButton(PushButton&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -152,7 +152,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  PushButton& operator=(PushButton&& rhs);
+  PushButton& operator=(PushButton&& rhs) noexcept;
 
   /**
    * @brief Destructor.
