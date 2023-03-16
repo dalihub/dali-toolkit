@@ -761,6 +761,13 @@ public: // Update.
   void GetText(std::string& text) const;
 
   /**
+   * @brief Retrieves number of characters previously set.
+   *
+   * @return A length of string of UTF-32 characters.
+   */
+  Length GetNumberOfCharacters() const;
+
+  /**
  * @brief Set the @p spannedText
  * the spanned text contains content (text) and  format (spans with ranges)
  * the text is copied into text-controller and the spans are applied on ranges

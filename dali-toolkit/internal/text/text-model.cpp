@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,6 +95,11 @@ Length Model::GetNumberOfScripts() const
 const ScriptRun* Model::GetScriptRuns() const
 {
   return mLogicalModel->mScriptRuns.Begin();
+}
+
+Length Model::GetNumberOfCharacters() const
+{
+  return mLogicalModel->mText.Count();
 }
 
 Length Model::GetNumberOfGlyphs() const
