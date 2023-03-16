@@ -420,7 +420,7 @@ TextureDefinition ConvertTextureInfo(const gltf2::TextureInfo& textureInfo, Conv
   }
 }
 
-void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, gltf2::TextureInfo textureInfo, const Dali::Scene3D::Loader::ImageMetadata &metaData, ConversionContext& context)
+void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, gltf2::TextureInfo textureInfo, const Dali::Scene3D::Loader::ImageMetadata& metaData, ConversionContext& context)
 {
   materialDefinition.mTextureStages.push_back({semantic, ConvertTextureInfo(textureInfo, context, metaData)});
   materialDefinition.mFlags |= semantic;
@@ -428,8 +428,7 @@ void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, 
 
 void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
-  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gltf2::TextureInfo& info)
-  {
+  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gltf2::TextureInfo& info) {
     if(!info.mTexture->mSource->mUri.empty())
     {
       if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
@@ -498,10 +497,10 @@ void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<s
     materialDefinition.mOcclusionStrength = material.mOcclusionTexture.mStrength;
   }
 
+  materialDefinition.mEmissiveFactor = material.mEmissiveFactor;
   if(material.mEmissiveTexture)
   {
     AddTextureStage(MaterialDefinition::EMISSIVE, materialDefinition, material.mEmissiveTexture, getTextureMetaData(imageMetaData, material.mEmissiveTexture), context);
-    materialDefinition.mEmissiveFactor = material.mEmissiveFactor;
   }
 
   if(!Dali::Equals(material.mMaterialExtensions.mMaterialIor.mIor, gltf2::UNDEFINED_FLOAT_VALUE))
@@ -771,8 +770,7 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentInd
   auto& resources = output.mResources;
 
   const auto index    = scene.GetNodeCount();
-  auto       weakNode = scene.AddNode([&]()
-                                {
+  auto       weakNode = scene.AddNode([&]() {
     std::unique_ptr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
     nodeDefinition->mParentIdx = parentIndex;

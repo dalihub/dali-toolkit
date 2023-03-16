@@ -291,7 +291,7 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
 
     if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
     {
-      shaderDef.mDefines.push_back("EMISSIVE");
+      shaderDef.mDefines.push_back("EMISSIVE_TEXTURE");
     }
 
     if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
