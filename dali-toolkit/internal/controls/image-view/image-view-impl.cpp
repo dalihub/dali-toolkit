@@ -45,6 +45,9 @@ namespace
 {
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
+constexpr float FULL_OPACITY = 1.0f;
+constexpr float LOW_OPACITY  = 0.2f;
+
 BaseHandle Create()
 {
   return Toolkit::ImageView::New();
@@ -54,7 +57,8 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN(Toolkit::ImageView, Toolkit::Control, Create);
 DALI_PROPERTY_REGISTRATION(Toolkit, ImageView, "image", MAP, IMAGE)
 DALI_PROPERTY_REGISTRATION(Toolkit, ImageView, "preMultipliedAlpha", BOOLEAN, PRE_MULTIPLIED_ALPHA)
-
+DALI_PROPERTY_REGISTRATION(Toolkit, ImageView, "placeholderImage", STRING, PLACEHOLDER_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, ImageView, "enableTransitionEffect", BOOLEAN, ENABLE_TRANSITION_EFFECT)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, ImageView, "pixelArea", Vector4(0.f, 0.f, 1.f, 1.f), PIXEL_AREA)
 DALI_TYPE_REGISTRATION_END()
 
@@ -65,8 +69,10 @@ using namespace Dali;
 ImageView::ImageView(ControlBehaviour additionalBehaviour)
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mImageSize(),
+  mTransitionTargetAlpha(FULL_OPACITY),
   mImageVisualPaddingSetByTransform(false),
-  mImageViewPixelAreaSetByFittingMode(false)
+  mImageViewPixelAreaSetByFittingMode(false),
+  mTransitionEffect(false)
 {
 }
 
@@ -100,9 +106,48 @@ void ImageView::OnInitialize()
 
 void ImageView::SetImage(const Property::Map& map)
 {
+  DALI_LOG_ERROR("tscholb : SetImage(map) !!! \n");
+  if(mTransitionEffect && mVisual)
+  {
+    // Clear previous transition effect if it is playing
+    if(mPreviousVisual)
+    {
+      if(mTransitionAnimation)
+      {
+        if(mTransitionAnimation.GetState() == Animation::PLAYING)
+        {
+          mTransitionAnimation.Stop();
+          ClearTransitionAnimation();
+        }
+      }
+    }
+
+    // Enable transition effect for previous visual.
+    // This previous visual will be deleted when transition effect is done.
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    controlDataImpl.EnableReadyTransitionOverriden(mVisual, true);
+    mPreviousVisual = mVisual;
+  }
+
   // Comparing a property map is too expensive so just creating a new visual
   mPropertyMap = map;
   mUrl.clear();
+
+  // keep alpha for transition effect
+  if(mTransitionEffect)
+  {
+    float            alpha      = FULL_OPACITY;
+    Property::Value* alphaValue = map.Find(Toolkit::Visual::Property::OPACITY);
+    if(alphaValue && alphaValue->Get(alpha))
+    {
+      mTransitionTargetAlpha = alpha;
+    }
+  }
+
+  if(!mVisual)
+  {
+    ShowPlaceholderImage();
+  }
 
   Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(mPropertyMap);
   if(visual)
@@ -135,10 +180,38 @@ void ImageView::SetImage(const Property::Map& map)
 
 void ImageView::SetImage(const std::string& url, ImageDimensions size)
 {
+  DALI_LOG_ERROR("tscholb : SetImage !!! \n");
+  if(mTransitionEffect && mVisual)
+  {
+    // Clear previous transition effect if it is playing
+    if(mPreviousVisual)
+    {
+      if(mTransitionAnimation)
+      {
+        if(mTransitionAnimation.GetState() == Animation::PLAYING)
+        {
+          mTransitionAnimation.Stop();
+          ClearTransitionAnimation();
+        }
+      }
+    }
+
+    // Enable transition effect for previous visual.
+    // This previous visual will be deleted when transition effect is done.
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    controlDataImpl.EnableReadyTransitionOverriden(mVisual, true);
+    mPreviousVisual = mVisual;
+  }
+
   // Don't bother comparing if we had a visual previously, just drop old visual and create new one
   mUrl       = url;
   mImageSize = size;
   mPropertyMap.Clear();
+
+  if(!mVisual)
+  {
+    ShowPlaceholderImage();
+  }
 
   // Don't set mVisual until it is ready and shown. Getters will still use current visual.
   Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(url, size);
@@ -166,6 +239,12 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
     RelayoutRequest();
   }
 
+  //tscholb DEBUG
+  Dali::Toolkit::Control handle(GetOwner());
+  auto                   check1 = handle.GetVisualResourceStatus(Toolkit::ImageView::Property::IMAGE);
+  auto                   check2 = handle.GetVisualResourceStatus(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE);
+  DALI_LOG_ERROR("tscholb : Resource status check >> %d,%d \n", check1, check2);
+
   // Signal that a Relayout may be needed
 }
 
@@ -174,6 +253,7 @@ void ImageView::ClearImageVisual()
   // Clear cached properties
   mPropertyMap.Clear();
   mUrl.clear();
+  mVisual.Reset();
 
   // Unregister the exsiting visual
   DevelControl::UnregisterVisual(*this, Toolkit::ImageView::Property::IMAGE);
@@ -205,6 +285,43 @@ void ImageView::SetDepthIndex(int depthIndex)
   {
     mVisual.SetDepthIndex(depthIndex);
   }
+}
+
+void ImageView::SetPlaceholderUrl(const std::string& url)
+{
+  mPlaceholderUrl = url;
+  if(!url.empty())
+  {
+    mPlaceholderVisual.Reset();
+    CreatePlaceholderImage();
+  }
+  else
+  {
+    // Clear current placeholder image
+    Toolkit::Visual::Base visual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE);
+    if(visual)
+    {
+      DevelControl::UnregisterVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE);
+    }
+
+    mPlaceholderVisual.Reset();
+    mPlaceholderUrl = url;
+  }
+}
+
+std::string ImageView::GetPlaceholderUrl() const
+{
+  return mPlaceholderUrl;
+}
+
+void ImageView::EnableTransitionEffect(bool effectEnable)
+{
+  mTransitionEffect = effectEnable;
+}
+
+bool ImageView::IsTransitionEffectEnabled() const
+{
+  return mTransitionEffect;
 }
 
 Vector3 ImageView::GetNaturalSize()
@@ -328,6 +445,39 @@ void ImageView::OnUpdateVisualProperties(const std::vector<std::pair<Dali::Prope
 
 void ImageView::OnResourceReady(Toolkit::Control control)
 {
+  DALI_LOG_ERROR("tscholb : OnResourceReady !!! \n");
+  // In case of placeholder, we need to skip this call.
+  // TODO: In case of placeholder, it needs to be modified not to call OnResourceReady()
+  if(control.GetVisualResourceStatus(Toolkit::ImageView::Property::IMAGE) != Toolkit::Visual::ResourceStatus::READY)
+  {
+    DALI_LOG_ERROR("tscholb : OnResourceReady() is called, but SKIP \n");
+    return;
+  }
+
+  // Do transition effect if need.
+  if(mTransitionEffect)
+  {
+    // TODO: Consider about placeholder image is loaded failed
+    Toolkit::Visual::Base placeholderVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE);
+    if(!placeholderVisual || control.GetVisualResourceStatus(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE) == Toolkit::Visual::ResourceStatus::READY)
+    {
+      // when placeholder is disabled or ready placeholder and image, we need to transition effect
+      DALI_LOG_ERROR("tscholb : Call TransitionEffect \n");
+      TransitionImageWithEffect();
+    }
+    else
+    {
+      DALI_LOG_ERROR("tscholb : Call ClearTransitionAnimation \n");
+      ClearTransitionAnimation();
+    }
+  }
+  else
+  {
+    // we don't need placeholder anymore because visual is replaced. so hide placeholder.
+    DALI_LOG_ERROR("tscholb : transition effect is DISABLE \n");
+    HidePlaceholderImage();
+  }
+
   // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.
   mVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
   // Signal that a Relayout may be needed
@@ -467,6 +617,115 @@ void ImageView::ApplyFittingMode(Vector2 finalSize, Vector2 finalOffset, bool ze
   }
 }
 
+void ImageView::CreatePlaceholderImage()
+{
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
+  propertyMap.Insert(Toolkit::ImageVisual::Property::URL, mPlaceholderUrl);
+  //propertyMap.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, Toolkit::ImageVisual::LoadPolicy::IMMEDIATE); // TODO: need to enable this property
+  propertyMap.Insert(Toolkit::ImageVisual::Property::RELEASE_POLICY, Toolkit::ImageVisual::ReleasePolicy::DESTROYED);
+  mPlaceholderVisual = Toolkit::VisualFactory::Get().CreateVisual(propertyMap);
+  if(mPlaceholderVisual)
+  {
+    mPlaceholderVisual.SetName("placeholder");
+  }
+  else
+  {
+    DevelControl::UnregisterVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE);
+    mPlaceholderVisual.Reset();
+  }
+}
+
+void ImageView::ShowPlaceholderImage()
+{
+  if(mPlaceholderVisual)
+  {
+    DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, mPlaceholderVisual, false);
+    Actor self = Self();
+    Toolkit::GetImplementation(mPlaceholderVisual).SetOnScene(self);
+  }
+}
+
+void ImageView::HidePlaceholderImage()
+{
+  if(mPlaceholderVisual)
+  {
+    DevelControl::UnregisterVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE);
+
+    // Hide placeholder
+    Actor self = Self();
+    Toolkit::GetImplementation(mPlaceholderVisual).SetOffScene(self);
+  }
+}
+
+void ImageView::TransitionImageWithEffect()
+{
+  Toolkit::ImageView handle = Toolkit::ImageView(GetOwner());
+
+  if(handle)
+  {
+    mTransitionAnimation = Animation::New(1.5f);
+    mTransitionAnimation.SetEndAction(Animation::EndAction::DISCARD);
+    float destinationAlpha = (mTransitionTargetAlpha > LOW_OPACITY) ? mTransitionTargetAlpha : LOW_OPACITY;
+
+    if(mPreviousVisual) // Transition previous image
+    {
+      DALI_LOG_ERROR("tscholb : mPreviousVisual !!! \n");
+      Dali::KeyFrames fadeoutKeyFrames = Dali::KeyFrames::New();
+      fadeoutKeyFrames.Add(0.0f, destinationAlpha);
+      fadeoutKeyFrames.Add(1.0f, LOW_OPACITY);
+      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mPreviousVisual);
+      mTransitionAnimation.AnimateBetween(visualImpl.GetPropertyObject(Toolkit::Visual::Property::OPACITY), fadeoutKeyFrames);
+    }
+    else if(mPlaceholderVisual) // Transition placeholder
+    {
+      DALI_LOG_ERROR("tscholb : mPlaceholderVisual !!! \n");
+      Dali::KeyFrames fadeoutKeyFrames = Dali::KeyFrames::New();
+      fadeoutKeyFrames.Add(0.0f, destinationAlpha);
+      fadeoutKeyFrames.Add(1.0f, LOW_OPACITY);
+      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mPlaceholderVisual);
+      mTransitionAnimation.AnimateBetween(visualImpl.GetPropertyObject(Toolkit::Visual::Property::OPACITY), fadeoutKeyFrames);
+    }
+
+    // Transition current image
+    Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
+    if(imageVisual)
+    {
+      DALI_LOG_ERROR("tscholb : imageVisual !!! \n");
+      Dali::KeyFrames fadeinKeyFrames = Dali::KeyFrames::New();
+      fadeinKeyFrames.Add(0.0f, LOW_OPACITY);
+      fadeinKeyFrames.Add(1.0f, destinationAlpha);
+      mTransitionAnimation.AnimateBetween(DevelControl::GetVisualProperty(handle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::OPACITY), fadeinKeyFrames);
+    }
+
+    // Play transition animation
+    mTransitionAnimation.FinishedSignal().Connect(this, &ImageView::OnTransitionAnimationFinishedCallback);
+    mTransitionAnimation.Play();
+  }
+}
+
+void ImageView::ClearTransitionAnimation()
+{
+  // Hide placeholder
+  HidePlaceholderImage();
+
+  // Clear PreviousVisual
+  if(mPreviousVisual)
+  {
+    Actor                    self            = Self();
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    controlDataImpl.EnableReadyTransitionOverriden(mVisual, false);
+    Toolkit::GetImplementation(mPreviousVisual).SetOffScene(self);
+    mPreviousVisual.Reset();
+  }
+
+  if(mTransitionAnimation)
+  {
+    mTransitionAnimation.FinishedSignal().Disconnect(this, &ImageView::OnTransitionAnimationFinishedCallback);
+    mTransitionAnimation.Clear();
+  }
+}
+
 ///////////////////////////////////////////////////////////
 //
 // Properties
@@ -546,6 +805,26 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
         }
         break;
       }
+
+      case Toolkit::ImageView::Property::PLACEHOLDER_IMAGE:
+      {
+        std::string placeholderUrl;
+        if(value.Get(placeholderUrl))
+        {
+          impl.SetPlaceholderUrl(placeholderUrl);
+        }
+        break;
+      }
+
+      case Toolkit::ImageView::Property::ENABLE_TRANSITION_EFFECT:
+      {
+        bool transitionEffect;
+        if(value.Get(transitionEffect))
+        {
+          impl.EnableTransitionEffect(transitionEffect);
+        }
+        break;
+      }
     }
   }
 }
@@ -585,10 +864,27 @@ Property::Value ImageView::GetProperty(BaseObject* object, Property::Index prope
         value = impl.IsPreMultipliedAlphaEnabled();
         break;
       }
+
+      case Toolkit::ImageView::Property::PLACEHOLDER_IMAGE:
+      {
+        value = impl.GetPlaceholderUrl();
+        break;
+      }
+
+      case Toolkit::ImageView::Property::ENABLE_TRANSITION_EFFECT:
+      {
+        value = impl.IsTransitionEffectEnabled();
+        break;
+      }
     }
   }
 
   return value;
+}
+
+void ImageView::OnTransitionAnimationFinishedCallback(Animation& animation)
+{
+  ClearTransitionAnimation();
 }
 
 } // namespace Internal

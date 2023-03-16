@@ -129,6 +129,22 @@ bool FindVisual(std::string visualName, const RegisteredVisualContainer& visuals
   return false;
 }
 
+/**
+ *  Finds visual in given array, returning true if found along with the iterator for that visual as a out parameter
+ */
+bool FindVisual(const Toolkit::Visual::Base findVisual , const RegisteredVisualContainer& visuals, RegisteredVisualContainer::Iterator& iter)
+{
+  for(iter = visuals.Begin(); iter != visuals.End(); iter++)
+  {
+    Toolkit::Visual::Base visual = (*iter)->visual;
+    if(visual && visual == findVisual)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 void FindChangableVisuals(Dictionary<Property::Map>& stateVisualsToAdd,
                           Dictionary<Property::Map>& stateVisualsToChange,
                           DictionaryKeys&            stateVisualsToRemove)
@@ -894,6 +910,23 @@ bool Control::Impl::IsVisualEnabled(Property::Index index) const
   return false;
 }
 
+void Control::Impl::EnableReadyTransitionOverriden(Toolkit::Visual::Base& visual, bool enable)
+{
+  DALI_LOG_INFO(gLogFilter, Debug::General, "Control::EnableReadyTransitionOverriden(%p, %s)\n", visual, enable ? "T" : "F");
+
+  RegisteredVisualContainer::Iterator iter;
+  if(FindVisual(visual, mVisuals, iter))
+  {
+    if((*iter)->overideReadyTransition == enable)
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::EnableReadyTransitionOverriden Visual %s(%p) already %s\n", (*iter)->visual.GetName().c_str(), visual, enable ? "enabled" : "disabled");
+      return;
+    }
+
+    (*iter)->overideReadyTransition  = enable;
+  }
+}
+
 void Control::Impl::StopObservingVisual(Toolkit::Visual::Base& visual)
 {
   Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
@@ -950,7 +983,10 @@ void Control::Impl::ResourceReady(Visual::Base& object)
       if(FindVisual((*registeredIter)->index, mRemoveVisuals, visualToRemoveIter))
       {
         (*registeredIter)->pending = false;
-        Toolkit::GetImplementation((*visualToRemoveIter)->visual).SetOffScene(self);
+        if(!((*visualToRemoveIter)->overideReadyTransition))
+        {
+          Toolkit::GetImplementation((*visualToRemoveIter)->visual).SetOffScene(self);
+        }
         mRemoveVisuals.Erase(visualToRemoveIter);
       }
       break;

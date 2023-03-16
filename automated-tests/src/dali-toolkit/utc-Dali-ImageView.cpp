@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -4366,6 +4366,314 @@ int UtcDaliImageViewNpatchImageCacheTest02(void)
 
   // Check we use cached npatch data so we don't generate new texture textures
   DALI_TEST_EQUALS(textureCallStack.CountMethod("GenTextures"), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageViewPlaceholderImage(void)
+{
+  tet_infoline("Test imageView use placeholder image");
+
+  ToolkitTestApplication application;
+  Property::Map          map;
+  map[Toolkit::ImageVisual::Property::URL] = gImage_600_RGB;
+
+  ImageView imageView = ImageView::New();
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  application.GetScene().Add(imageView);
+
+  Property::Value value = imageView.GetProperty(ImageView::Property::PLACEHOLDER_IMAGE);
+  std::string     url;
+  DALI_TEST_CHECK(value.Get(url));
+  DALI_TEST_CHECK(url.empty());
+  imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+
+  application.SendNotification();
+  application.Render();
+
+  value = imageView.GetProperty(ImageView::Property::PLACEHOLDER_IMAGE);
+  DALI_TEST_CHECK(value.Get(url));
+  DALI_TEST_CHECK(url == gImage_34_RGBA);
+
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  // Replace Image test
+  map[Toolkit::ImageVisual::Property::URL]    = TEST_IMAGE_1;
+  map[ImageView::Property::PLACEHOLDER_IMAGE] = gImage_34_RGBA;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = "";
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_2;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  // Replace Image test2
+  map[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_1;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_2;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = gImage_600_RGB;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render(900);
+
+  map[Toolkit::ImageVisual::Property::URL] = "";
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_1;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliImageViewTransitionEffect01(void)
+{
+  tet_infoline("Test imageView use transition effect");
+
+  ToolkitTestApplication application;
+  Property::Map          map;
+  map[Toolkit::ImageVisual::Property::URL] = gImage_600_RGB;
+  map[Toolkit::Visual::Property::OPACITY]  = 0.9f;
+
+  ImageView imageView = ImageView::New();
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  application.GetScene().Add(imageView);
+
+  Property::Value value = imageView.GetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT);
+  bool            transition;
+  DALI_TEST_CHECK(value.Get(transition));
+  DALI_TEST_CHECK(transition == false);
+  imageView.SetProperty(Toolkit::ImageView::Property::ENABLE_TRANSITION_EFFECT, true);
+
+  application.SendNotification();
+  application.Render();
+
+  value = imageView.GetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT);
+  DALI_TEST_CHECK(value.Get(transition));
+  DALI_TEST_CHECK(transition == true);
+
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  // Test transition effect with placeholder
+  map[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_1;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = "";
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = gImage_600_RGB;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_1;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  application.SendNotification();
+
+  map[Toolkit::ImageVisual::Property::URL] = "";
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = gImage_600_RGB;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, "");
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = gImage_600_RGB;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = "";
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  // Test transition effect without placeholder
+  map[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_1;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = gImage_600_RGB;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = "";
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  map[Toolkit::ImageVisual::Property::URL] = gImage_600_RGB;
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  imageView.SetImage(TEST_IMAGE_1);
+  application.SendNotification();
+  application.Render();
+
+  imageView.SetImage(gImage_600_RGB);
+  application.SendNotification();
+  application.Render(9000);
+
+  imageView.SetImage("");
+  application.SendNotification();
+  application.Render();
+
+  imageView.SetImage(TEST_IMAGE_1);
+  application.SendNotification();
+  application.Render();
+
+  // Clear all cached
+  imageView.Unparent();
+  imageView.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliImageViewTransitionEffect02(void)
+{
+  tet_infoline("Test imageView use transition effect with replace image");
+
+  ToolkitTestApplication application;
+
+  Property::Map map;
+
+  ImageView imageView = ImageView::New();
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  application.GetScene().Add(imageView);
+
+  Property::Value value;
+  value = imageView.GetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT);
+  bool transition;
+  DALI_TEST_CHECK(value.Get(transition));
+  DALI_TEST_CHECK(transition == false);
+  imageView.SetProperty(Toolkit::ImageView::Property::ENABLE_TRANSITION_EFFECT, true);
+
+  value = imageView.GetProperty(ImageView::Property::PLACEHOLDER_IMAGE);
+  std::string url;
+  DALI_TEST_CHECK(value.Get(url));
+  DALI_TEST_CHECK(url.empty());
+  imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  application.SendNotification();
+  application.Render();
+
+  imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, "");
+  application.SendNotification();
+  application.Render();
+
+  imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  application.SendNotification();
+  application.Render();
+
+  value = imageView.GetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT);
+  DALI_TEST_CHECK(value.Get(transition));
+  DALI_TEST_CHECK(transition == true);
+
+  value = imageView.GetProperty(ImageView::Property::PLACEHOLDER_IMAGE);
+  DALI_TEST_CHECK(value.Get(url));
+  DALI_TEST_CHECK(url == gImage_34_RGBA);
+
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  // Clear all cached
+  imageView.Unparent();
+  imageView.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliImageViewTransitionEffect03(void)
+{
+  tet_infoline("Test imageView use transition effect with placeholder");
+
+  ToolkitTestApplication application;
+  Property::Map          map;
+
+  ImageView imageView = ImageView::New();
+  imageView.SetImage("");
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  imageView.SetProperty(ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  imageView.SetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT, true);
+  application.GetScene().Add(imageView);
+
+  //DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  tet_infoline("(1)");
+  imageView.SetImage(gImage_600_RGB);
+  imageView.SetProperty(ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render(16);
+
+  Property::Value value;
+  value = imageView.GetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT);
+  bool transition;
+  DALI_TEST_CHECK(value.Get(transition));
+  DALI_TEST_CHECK(transition == true);
+
+  value = imageView.GetProperty(ImageView::Property::PLACEHOLDER_IMAGE);
+  std::string url;
+  DALI_TEST_CHECK(value.Get(url));
+  DALI_TEST_CHECK(url == gImage_34_RGBA);
+
+  imageView.SetImage("");
+  application.SendNotification();
+  application.Render(16);
+
+  imageView.SetImage(TEST_IMAGE_1);
+  imageView.SetProperty(ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render(16);
+
+  // Clear all cached
+  imageView.Unparent();
+  imageView.Reset();
 
   END_TEST;
 }
