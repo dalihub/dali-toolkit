@@ -87,11 +87,6 @@ public:
   void SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor);
 
   /**
-   * @copydoc Model::SetImageBasedLightTexture()
-   */
-  void SetImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor);
-
-  /**
    * @copydoc Model::SetImageBasedLightScaleFactor()
    */
   void SetImageBasedLightScaleFactor(float scaleFactor);
@@ -224,7 +219,7 @@ public: // Overrides ImageBasedLightObserver Methods.
   /**
    * @copydoc Dali::Scene3D::Internal::ImageBasedLightObserver::NotifyImageBasedLightTexture()
    */
-  void NotifyImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor) override;
+  void NotifyImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor, uint32_t specularMipmapLevels) override;
 
   /**
    * @copydoc Dali::Scene3D::Internal::ImageBasedLightObserver::NotifyImageBasedLightScaleFactor()
@@ -310,6 +305,8 @@ private:
   Vector3       mModelPivot;
   float         mSceneIblScaleFactor;
   float         mIblScaleFactor;
+  uint32_t      mSceneSpecularMipmapLevels;
+  uint32_t      mSpecularMipmapLevels;
   bool          mModelChildrenSensitive;
   bool          mModelChildrenFocusable;
   bool          mModelResourceReady;

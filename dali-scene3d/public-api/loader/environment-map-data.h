@@ -65,6 +65,16 @@ public:
     return mEnvironmentMapType;
   }
 
+  void SetMipmapLevels(uint32_t mipmapLevels)
+  {
+    mMipmapLevels = mipmapLevels;
+  }
+
+  uint32_t GetMipmapLevels()
+  {
+    return mMipmapLevels;
+  }
+
 public:
   std::vector<std::vector<PixelData> > mPixelData;
 
@@ -72,6 +82,7 @@ private:
   Dali::Texture                     mEnvironmentMapTexture;
   Dali::Shader                      mEnvironmentMapShader;
   Dali::Scene3D::EnvironmentMapType mEnvironmentMapType{Dali::Scene3D::EnvironmentMapType::AUTO};
+  uint32_t                          mMipmapLevels{1u};
 };
 
 } // namespace Dali::Scene3D::Loader

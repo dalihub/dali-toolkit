@@ -61,6 +61,11 @@ Dali::Texture EnvironmentMapLoadTask::GetLoadedTexture()
   return (HasSucceeded()) ? mEnvironmentMapData.GetTexture() : Texture();
 }
 
+uint32_t EnvironmentMapLoadTask::GetMipmapLevels()
+{
+  return (HasSucceeded()) ? mEnvironmentMapData.GetMipmapLevels() : 1u;
+}
+
 } // namespace Internal
 
 } // namespace Scene3D

@@ -212,22 +212,10 @@ public:
   void SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor = 1.0f);
 
   /**
-   * @brief Sets Image Based Light Texture.
-   *
-   * @SINCE_2_1.41
-   * @param[in] diffuseTexture cube map texture that can be used as a diffuse IBL source.
-   * @param[in] specularTexture cube map texture that can be used as a specular IBL source.
-   * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f]. Default value is 1.0f.
-   *
-   * @note Both of diffuse texture and specular texture should be available. If not, nothing applied.
-   */
-  void SetImageBasedLightTexture(Texture diffuseTexture, Texture specularTexture, float scaleFactor = 1.0f);
-
-  /**
    * @brief Sets Scale Factor of Image Based Light Source.
    *
    * @SINCE_2_1.41
-   * @note If SetImageBasedLightSource() or SetImageBasedLightTexture() method is called after this method, scaleFactor is overrided.
+   * @note If SetImageBasedLightSource() method is called after this method, scaleFactor is overrided.
    *
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f].
    */

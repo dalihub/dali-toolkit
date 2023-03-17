@@ -77,6 +77,12 @@ public:
    */
   Dali::Texture GetLoadedTexture();
 
+  /**
+   * Retrieves Mipmap levels of loaded Ibl texture
+   * @return mipmap levels of loaded Ibl texture
+   */
+  uint32_t GetMipmapLevels();
+
 private:
   // Undefined
   EnvironmentMapLoadTask(const EnvironmentMapLoadTask& task) = delete;

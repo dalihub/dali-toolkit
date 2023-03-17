@@ -180,6 +180,8 @@ Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUr
   mModelPivot(AnchorPoint::CENTER),
   mSceneIblScaleFactor(1.0f),
   mIblScaleFactor(1.0f),
+  mSceneSpecularMipmapLevels(1u),
+  mSpecularMipmapLevels(1u),
   mModelChildrenSensitive(DEFAULT_MODEL_CHILDREN_SENSITIVE),
   mModelChildrenFocusable(DEFAULT_MODEL_CHILDREN_FOCUSABLE),
   mModelResourceReady(false),
@@ -328,18 +330,6 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
 
   // If diffuse and specular textures are already loaded, emits resource ready signal here.
   NotifyResourceReady();
-}
-
-void Model::SetImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor)
-{
-  // If input texture is wrong, Model is rendered with SceneView's IBL.
-  if(mDiffuseTexture != diffuseTexture || mSpecularTexture != specularTexture)
-  {
-    mDiffuseTexture  = diffuseTexture;
-    mSpecularTexture = specularTexture;
-    mIblScaleFactor  = scaleFactor;
-    UpdateImageBasedLightTexture();
-  }
 }
 
 void Model::SetImageBasedLightScaleFactor(float scaleFactor)
@@ -566,15 +556,17 @@ void Model::CollectRenderableActor(Actor actor)
 
 void Model::UpdateImageBasedLightTexture()
 {
-  Dali::Texture currentDiffuseTexture  = (mDiffuseTexture && mSpecularTexture) ? mDiffuseTexture : mSceneDiffuseTexture;
-  Dali::Texture currentSpecularTexture = (mDiffuseTexture && mSpecularTexture) ? mSpecularTexture : mSceneSpecularTexture;
-  float         currentIblScaleFactor  = (mDiffuseTexture && mSpecularTexture) ? mIblScaleFactor : mSceneIblScaleFactor;
+  Dali::Texture currentDiffuseTexture          = (mDiffuseTexture && mSpecularTexture) ? mDiffuseTexture : mSceneDiffuseTexture;
+  Dali::Texture currentSpecularTexture         = (mDiffuseTexture && mSpecularTexture) ? mSpecularTexture : mSceneSpecularTexture;
+  float         currentIblScaleFactor          = (mDiffuseTexture && mSpecularTexture) ? mIblScaleFactor : mSceneIblScaleFactor;
+  uint32_t      currentIblSpecularMipmapLevels = (mDiffuseTexture && mSpecularTexture) ? mSpecularMipmapLevels : mSceneSpecularMipmapLevels;
 
   if(!currentDiffuseTexture || !currentSpecularTexture)
   {
-    currentDiffuseTexture  = mDefaultDiffuseTexture;
-    currentSpecularTexture = mDefaultSpecularTexture;
-    currentIblScaleFactor  = Dali::Scene3D::Loader::EnvironmentDefinition::GetDefaultIntensity();
+    currentDiffuseTexture          = mDefaultDiffuseTexture;
+    currentSpecularTexture         = mDefaultSpecularTexture;
+    currentIblScaleFactor          = Dali::Scene3D::Loader::EnvironmentDefinition::GetDefaultIntensity();
+    currentIblSpecularMipmapLevels = 1u;
   }
 
   for(auto&& actor : mRenderableActors)
@@ -626,6 +618,7 @@ void Model::UpdateImageBasedLightTexture()
       }
     }
     renderableActor.RegisterProperty(Dali::Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), currentIblScaleFactor);
+    renderableActor.RegisterProperty(Dali::Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName().data(), static_cast<float>(currentIblSpecularMipmapLevels));
   }
 }
 
@@ -687,13 +680,14 @@ void Model::ApplyCameraTransform(Dali::CameraActor camera) const
   camera.SetProperty(Actor::Property::SCALE, resultScale);
 }
 
-void Model::NotifyImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor)
+void Model::NotifyImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor, uint32_t specularMipmapLevels)
 {
   if(mSceneDiffuseTexture != diffuseTexture || mSceneSpecularTexture != specularTexture)
   {
-    mSceneDiffuseTexture  = diffuseTexture;
-    mSceneSpecularTexture = specularTexture;
-    mSceneIblScaleFactor  = scaleFactor;
+    mSceneDiffuseTexture       = diffuseTexture;
+    mSceneSpecularTexture      = specularTexture;
+    mSceneIblScaleFactor       = scaleFactor;
+    mSceneSpecularMipmapLevels = specularMipmapLevels;
     // If Model IBL is not set, use SceneView's IBL.
     if(!mDiffuseTexture || !mSpecularTexture)
     {
@@ -767,7 +761,8 @@ void Model::OnIblDiffuseLoadComplete()
 
 void Model::OnIblSpecularLoadComplete()
 {
-  mSpecularTexture = mIblSpecularLoadTask->GetLoadedTexture();
+  mSpecularTexture      = mIblSpecularLoadTask->GetLoadedTexture();
+  mSpecularMipmapLevels = mIblSpecularLoadTask->GetMipmapLevels();
   ResetResourceTask(mIblSpecularLoadTask);
   mIblSpecularResourceReady = true;
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
