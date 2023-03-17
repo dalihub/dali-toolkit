@@ -78,6 +78,7 @@ uniform samplerCube sDiffuseEnvSampler;
 uniform samplerCube sSpecularEnvSampler;
 uniform float uIblIntensity;
 uniform vec3 uYDirection;
+uniform float uMaxLOD;
 
 // For Alpha Mode.
 uniform lowp float uOpaque;
@@ -194,7 +195,9 @@ void main()
   vec3 FssEss = specularWeight * (k_S * brdf.x + brdf.y);
 
   // Specular Light
-  lowp vec3 specularLight = linear(texture(sSpecularEnvSampler, reflection * uYDirection).rgb);
+  // uMaxLOD that means mipmap level of specular texture is used for bluring of reflection of specular following roughness.
+  float lod = perceptualRoughness * (uMaxLOD - 1.0);
+  lowp vec3 specularLight = linear(textureLod(sSpecularEnvSampler, reflection * uYDirection, lod).rgb);
   lowp vec3 specular = specularLight * FssEss;
 
   // Diffuse Light

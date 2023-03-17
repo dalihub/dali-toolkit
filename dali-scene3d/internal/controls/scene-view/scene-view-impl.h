@@ -323,6 +323,7 @@ private:
   Dali::Texture               mDiffuseTexture;
   Dali::Texture               mSpecularTexture;
   float                       mIblScaleFactor{1.0f};
+  uint32_t                    mSpecularMipmapLevels{1u};
   bool                        mUseFrameBuffer{false};
   bool                        mSkyboxResourceReady{true};
   bool                        mIblDiffuseResourceReady{true};

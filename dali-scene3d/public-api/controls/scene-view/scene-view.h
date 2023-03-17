@@ -278,7 +278,7 @@ public:
    * @brief Sets Scale Factor of Image Based Light Source.
    *
    * @SINCE_2_1.41
-   * @note If SetImageBasedLightSource() or SetImageBasedLightTexture() method is called after this method, scaleFactor is overriden.
+   * @note If SetImageBasedLightSource() method is called after this method, scaleFactor is overriden.
    * @note Default value is 1.0f.
    *
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f].

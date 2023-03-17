@@ -249,6 +249,13 @@ public: // METHODS
    */
   static std::string_view GetIblYDirectionUniformName();
 
+  /**
+   * @brief Retrieves ibl MaxLod uniform name.
+   * This uniform name can be used to set max lod of ibl in shader.
+   * @return std::string_view of the Max Lod uniform name.
+   */
+  static std::string_view GetIblMaxLodUniformName();
+
 public: // DATA
   static const std::string ORIGINAL_MATRIX_PROPERTY_NAME;
 

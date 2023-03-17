@@ -363,7 +363,6 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
       }
     }
 
-    shaderDef.mUniforms["uMaxLOD"]     = 6.f;
     shaderDef.mUniforms["uCubeMatrix"] = Matrix::IDENTITY;
 
     Index result    = resources.mShaders.size();
