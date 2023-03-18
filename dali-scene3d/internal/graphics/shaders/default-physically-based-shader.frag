@@ -58,10 +58,10 @@ uniform sampler2D sOcclusion;
 uniform float uOcclusionStrength;
 #endif
 
-#ifdef EMISSIVE
+#ifdef EMISSIVE_TEXTURE
 uniform sampler2D sEmissive;
-uniform vec3 uEmissiveFactor;
 #endif
+uniform vec3 uEmissiveFactor;
 
 uniform float uSpecularFactor;
 uniform vec3  uSpecularColorFactor;
@@ -216,10 +216,12 @@ void main()
   color = mix(color, color * ao, uOcclusionStrength);
 #endif // OCCLUSION
 
-#ifdef EMISSIVE
+#ifdef EMISSIVE_TEXTURE
   lowp vec3 emissive = linear(texture(sEmissive, vUV).rgb) * uEmissiveFactor;
+#else
+  lowp vec3 emissive = uEmissiveFactor;
+#endif // EMISSIVE_TEXTURE
   color += emissive;
-#endif // EMISSIVE
 
   FragColor = vec4(pow(color, vec3(1.0 / 2.2)), baseColor.a) * uColor;
 }

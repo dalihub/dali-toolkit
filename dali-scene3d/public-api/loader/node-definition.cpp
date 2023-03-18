@@ -243,13 +243,10 @@ void ModelRenderable::OnCreate(const NodeDefinition& node, NodeDefinition::Creat
   actor.RegisterProperty("uSpecularFactor", matDef.mSpecularFactor);
   actor.RegisterProperty("uSpecularColorFactor", matDef.mSpecularColorFactor);
   actor.RegisterProperty("uNormalScale", matDef.mNormalScale);
+  actor.RegisterProperty("uEmissiveFactor", matDef.mEmissiveFactor);
   if(matDef.mFlags & MaterialDefinition::OCCLUSION)
   {
     renderer.RegisterProperty("uOcclusionStrength", matDef.mOcclusionStrength);
-  }
-  if(matDef.mFlags & MaterialDefinition::EMISSIVE)
-  {
-    renderer.RegisterProperty("uEmissiveFactor", matDef.mEmissiveFactor);
   }
 
   Index envIdx = matDef.mEnvironmentIdx;
