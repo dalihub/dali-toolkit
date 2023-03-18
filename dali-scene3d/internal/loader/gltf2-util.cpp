@@ -420,6 +420,12 @@ TextureDefinition ConvertTextureInfo(const gltf2::TextureInfo& textureInfo, Conv
   }
 }
 
+void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, gltf2::TextureInfo textureInfo, const Dali::Scene3D::Loader::ImageMetadata &metaData, ConversionContext& context)
+{
+  materialDefinition.mTextureStages.push_back({semantic, ConvertTextureInfo(textureInfo, context, metaData)});
+  materialDefinition.mFlags |= semantic;
+}
+
 void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
   auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gltf2::TextureInfo& info)
@@ -453,10 +459,7 @@ void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<s
   materialDefinition.mTextureStages.reserve(!!pbr.mBaseColorTexture + !!pbr.mMetallicRoughnessTexture + !!material.mNormalTexture + !!material.mOcclusionTexture + !!material.mEmissiveTexture);
   if(pbr.mBaseColorTexture)
   {
-    const auto semantic = MaterialDefinition::ALBEDO;
-    materialDefinition.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mBaseColorTexture, context, getTextureMetaData(imageMetaData, pbr.mBaseColorTexture))});
-    // TODO: and there had better be one
-    materialDefinition.mFlags |= semantic;
+    AddTextureStage(MaterialDefinition::ALBEDO, materialDefinition, pbr.mBaseColorTexture, getTextureMetaData(imageMetaData, pbr.mBaseColorTexture), context);
   }
   else
   {
@@ -468,11 +471,11 @@ void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<s
 
   if(pbr.mMetallicRoughnessTexture)
   {
-    const auto semantic = MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
-                          MaterialDefinition::GLTF_CHANNELS;
-    materialDefinition.mTextureStages.push_back({semantic, ConvertTextureInfo(pbr.mMetallicRoughnessTexture, context, getTextureMetaData(imageMetaData, pbr.mMetallicRoughnessTexture))});
-    // TODO: and there had better be one
-    materialDefinition.mFlags |= semantic;
+    AddTextureStage(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS | MaterialDefinition::GLTF_CHANNELS,
+                    materialDefinition,
+                    pbr.mMetallicRoughnessTexture,
+                    getTextureMetaData(imageMetaData, pbr.mMetallicRoughnessTexture),
+                    context);
   }
   else
   {
@@ -482,10 +485,7 @@ void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<s
   materialDefinition.mNormalScale = material.mNormalTexture.mScale;
   if(material.mNormalTexture)
   {
-    const auto semantic = MaterialDefinition::NORMAL;
-    materialDefinition.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mNormalTexture, context, getTextureMetaData(imageMetaData, material.mNormalTexture))});
-    // TODO: and there had better be one
-    materialDefinition.mFlags |= semantic;
+    AddTextureStage(MaterialDefinition::NORMAL, materialDefinition, material.mNormalTexture, getTextureMetaData(imageMetaData, material.mNormalTexture), context);
   }
   else
   {
@@ -494,19 +494,13 @@ void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<s
 
   if(material.mOcclusionTexture)
   {
-    const auto semantic = MaterialDefinition::OCCLUSION;
-    materialDefinition.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mOcclusionTexture, context, getTextureMetaData(imageMetaData, material.mOcclusionTexture))});
-    // TODO: and there had better be one
-    materialDefinition.mFlags |= semantic;
+    AddTextureStage(MaterialDefinition::OCCLUSION, materialDefinition, material.mOcclusionTexture, getTextureMetaData(imageMetaData, material.mOcclusionTexture), context);
     materialDefinition.mOcclusionStrength = material.mOcclusionTexture.mStrength;
   }
 
   if(material.mEmissiveTexture)
   {
-    const auto semantic = MaterialDefinition::EMISSIVE;
-    materialDefinition.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mEmissiveTexture, context, getTextureMetaData(imageMetaData, material.mEmissiveTexture))});
-    // TODO: and there had better be one
-    materialDefinition.mFlags |= semantic;
+    AddTextureStage(MaterialDefinition::EMISSIVE, materialDefinition, material.mEmissiveTexture, getTextureMetaData(imageMetaData, material.mEmissiveTexture), context);
     materialDefinition.mEmissiveFactor = material.mEmissiveFactor;
   }
 
@@ -520,16 +514,12 @@ void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<s
 
   if(material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture)
   {
-    const auto semantic = MaterialDefinition::SPECULAR;
-    materialDefinition.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture, context, getTextureMetaData(imageMetaData, material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture))});
-    materialDefinition.mFlags |= semantic;
+    AddTextureStage(MaterialDefinition::SPECULAR, materialDefinition, material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture, getTextureMetaData(imageMetaData, material.mMaterialExtensions.mMaterialSpecular.mSpecularTexture), context);
   }
 
   if(material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture)
   {
-    const auto semantic = MaterialDefinition::SPECULAR_COLOR;
-    materialDefinition.mTextureStages.push_back({semantic, ConvertTextureInfo(material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture, context, getTextureMetaData(imageMetaData, material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture))});
-    materialDefinition.mFlags |= semantic;
+    AddTextureStage(MaterialDefinition::SPECULAR_COLOR, materialDefinition, material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture, getTextureMetaData(imageMetaData, material.mMaterialExtensions.mMaterialSpecular.mSpecularColorTexture), context);
   }
 
   materialDefinition.mDoubleSided = material.mDoubleSided;
@@ -1007,6 +997,21 @@ float LoadBlendShapeKeyFrames(ConversionContext& context, const gltf2::Animation
   return duration;
 }
 
+template<typename T>
+float LoadAnimation(AnimationDefinition& animationDefinition, Index nodeIndex, Index propertyIndex, const std::string& propertyName, const gltf2::Animation::Channel& channel, ConversionContext& context)
+{
+  AnimatedProperty& animatedProperty = animationDefinition.mProperties[propertyIndex];
+
+  animatedProperty.mNodeIndex    = nodeIndex;
+  animatedProperty.mPropertyName = propertyName;
+
+  animatedProperty.mKeyFrames  = KeyFrames::New();
+  float duration               = LoadKeyFrames<T>(context, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
+  animatedProperty.mTimePeriod = {0.f, duration};
+
+  return duration;
+}
+
 void ConvertAnimations(const gltf2::Document& document, ConversionContext& context)
 {
   auto& output = context.mOutput;
@@ -1015,11 +1020,11 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
 
   for(const auto& animation : document.mAnimations)
   {
-    AnimationDefinition animationDef;
+    AnimationDefinition animationDefinition;
 
     if(!animation.mName.empty())
     {
-      animationDef.mName = animation.mName;
+      animationDefinition.mName = animation.mName;
     }
 
     uint32_t numberOfProperties = 0u;
@@ -1034,7 +1039,7 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
         numberOfProperties++;
       }
     }
-    animationDef.mProperties.resize(numberOfProperties);
+    animationDefinition.mProperties.resize(numberOfProperties);
 
     Index propertyIndex = 0u;
     for(const auto& channel : animation.mChannels)
@@ -1046,46 +1051,22 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
       {
         case gltf2::Animation::Channel::Target::TRANSLATION:
         {
-          AnimatedProperty& animatedProperty = animationDef.mProperties[propertyIndex];
-
-          animatedProperty.mNodeIndex    = nodeIndex;
-          animatedProperty.mPropertyName = POSITION_PROPERTY;
-
-          animatedProperty.mKeyFrames = KeyFrames::New();
-          duration                    = LoadKeyFrames<Vector3>(context, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
-
-          animatedProperty.mTimePeriod = {0.f, duration};
+          duration = LoadAnimation<Vector3>(animationDefinition, nodeIndex, propertyIndex, POSITION_PROPERTY.data(), channel, context);
           break;
         }
         case gltf2::Animation::Channel::Target::ROTATION:
         {
-          AnimatedProperty& animatedProperty = animationDef.mProperties[propertyIndex];
-
-          animatedProperty.mNodeIndex    = nodeIndex;
-          animatedProperty.mPropertyName = ORIENTATION_PROPERTY;
-
-          animatedProperty.mKeyFrames = KeyFrames::New();
-          duration                    = LoadKeyFrames<Quaternion>(context, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
-
-          animatedProperty.mTimePeriod = {0.f, duration};
+          duration = LoadAnimation<Quaternion>(animationDefinition, nodeIndex, propertyIndex, ORIENTATION_PROPERTY.data(), channel, context);
           break;
         }
         case gltf2::Animation::Channel::Target::SCALE:
         {
-          AnimatedProperty& animatedProperty = animationDef.mProperties[propertyIndex];
-
-          animatedProperty.mNodeIndex    = nodeIndex;
-          animatedProperty.mPropertyName = SCALE_PROPERTY;
-
-          animatedProperty.mKeyFrames = KeyFrames::New();
-          duration                    = LoadKeyFrames<Vector3>(context, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
-
-          animatedProperty.mTimePeriod = {0.f, duration};
+          duration = LoadAnimation<Vector3>(animationDefinition, nodeIndex, propertyIndex, SCALE_PROPERTY.data(), channel, context);
           break;
         }
         case gltf2::Animation::Channel::Target::WEIGHTS:
         {
-          duration = LoadBlendShapeKeyFrames(context, channel, nodeIndex, propertyIndex, animationDef.mProperties);
+          duration = LoadBlendShapeKeyFrames(context, channel, nodeIndex, propertyIndex, animationDefinition.mProperties);
 
           break;
         }
@@ -1096,12 +1077,12 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
         }
       }
 
-      animationDef.mDuration = std::max(duration, animationDef.mDuration);
+      animationDefinition.mDuration = std::max(duration, animationDefinition.mDuration);
 
       ++propertyIndex;
     }
 
-    output.mAnimationDefinitions.push_back(std::move(animationDef));
+    output.mAnimationDefinitions.push_back(std::move(animationDefinition));
   }
 }
 
