@@ -45,48 +45,52 @@ namespace
 {
 const char* JOINT_MATRIX{"jointMatrix"};
 
-const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)> sConstraintFactory = {
-  {Property::Type::BOOLEAN,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<bool>(a, i, [](bool& current, const PropertyInputContainer& inputs) {
-       current = inputs[0]->GetBoolean();
-     });
-   }},
-  {Property::Type::INTEGER,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<int>(a, i, [](int& current, const PropertyInputContainer& inputs) {
-       current = inputs[0]->GetInteger();
-     });
-   }},
-  {Property::Type::FLOAT,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<float>(a, i, EqualToConstraint());
-   }},
-  {Property::Type::VECTOR2,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<Vector2>(a, i, EqualToConstraint());
-   }},
-  {Property::Type::VECTOR3,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<Vector3>(a, i, EqualToConstraint());
-   }},
-  {Property::Type::VECTOR4,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<Vector4>(a, i, EqualToConstraint());
-   }},
-  {Property::Type::MATRIX,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<Matrix>(a, i, EqualToConstraint());
-   }},
-  {Property::Type::MATRIX3,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<Matrix3>(a, i, EqualToConstraint());
-   }},
-  {Property::Type::ROTATION,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<Quaternion>(a, i, EqualToConstraint());
-   }},
-};
+const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)>& GetConstraintFactory()
+{
+  static const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)> sConstraintFactory = {
+    {Property::Type::BOOLEAN,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<bool>(a, i, [](bool& current, const PropertyInputContainer& inputs) {
+         current = inputs[0]->GetBoolean();
+       });
+     }},
+    {Property::Type::INTEGER,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<int>(a, i, [](int& current, const PropertyInputContainer& inputs) {
+         current = inputs[0]->GetInteger();
+       });
+     }},
+    {Property::Type::FLOAT,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<float>(a, i, EqualToConstraint());
+     }},
+    {Property::Type::VECTOR2,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Vector2>(a, i, EqualToConstraint());
+     }},
+    {Property::Type::VECTOR3,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Vector3>(a, i, EqualToConstraint());
+     }},
+    {Property::Type::VECTOR4,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Vector4>(a, i, EqualToConstraint());
+     }},
+    {Property::Type::MATRIX,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Matrix>(a, i, EqualToConstraint());
+     }},
+    {Property::Type::MATRIX3,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Matrix3>(a, i, EqualToConstraint());
+     }},
+    {Property::Type::ROTATION,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Quaternion>(a, i, EqualToConstraint());
+     }},
+  };
+  return sConstraintFactory;
+}
 
 struct ResourceReflector : IResourceReflector
 {
@@ -777,8 +781,8 @@ void SceneDefinition::ApplyConstraints(Actor&                           root,
     if(iTarget != Property::INVALID_INDEX)
     {
       auto propertyType = cr.mTarget.GetPropertyType(iTarget);
-      auto iFind        = sConstraintFactory.find(propertyType);
-      if(iFind == sConstraintFactory.end())
+      auto iFind        = GetConstraintFactory().find(propertyType);
+      if(iFind == GetConstraintFactory().end())
       {
         onError(FormatString("node '%s': Property '%s' has unsupported type '%s'; ignored.",
                              sourceName,
