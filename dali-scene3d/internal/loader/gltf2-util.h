@@ -18,7 +18,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/common/dali-common.h>
 
 // INTERNAL INCLUDES

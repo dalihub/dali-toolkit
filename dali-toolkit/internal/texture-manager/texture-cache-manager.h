@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_CACHE_MANAGER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,13 +70,14 @@ public:
   static constexpr TextureId         INVALID_TEXTURE_ID  = TextureManagerType::INVALID_TEXTURE_ID;
   static constexpr TextureCacheIndex INVALID_CACHE_INDEX = TextureManagerType::INVALID_CACHE_INDEX;
 
-  using UseAtlas       = TextureManagerType::UseAtlas;
-  using StorageType    = TextureManagerType::StorageType;
-  using LoadType       = TextureManagerType::LoadType;
-  using LoadState      = TextureManagerType::LoadState;
-  using ReloadPolicy   = TextureManagerType::ReloadPolicy;
-  using MultiplyOnLoad = TextureManagerType::MultiplyOnLoad;
-  using TextureInfo    = TextureManagerType::TextureInfo;
+  using UseAtlas            = TextureManagerType::UseAtlas;
+  using StorageType         = TextureManagerType::StorageType;
+  using LoadType            = TextureManagerType::LoadType;
+  using LoadState           = TextureManagerType::LoadState;
+  using ReloadPolicy        = TextureManagerType::ReloadPolicy;
+  using MultiplyOnLoad      = TextureManagerType::MultiplyOnLoad;
+  using TextureInfo         = TextureManagerType::TextureInfo;
+  using ExternalTextureInfo = TextureManagerType::ExternalTextureInfo;
 
 public:
   /**
@@ -126,11 +127,11 @@ public:
   Texture GetTexture(const TextureCacheManager::TextureId& textureId, uint32_t textureIndex = 0);
 
   /**
-   * @brief Get the external texture set if the texture id is valid
+   * @brief Get the external texture set information if the texture id is valid
    * @param[in] textureId The texture Id to look up
-   * @return the external texture set, or an empty handle if textureId is not valid
+   * @return the external texture information. Assert if textureId is not valid
    */
-  TextureSet GetExternalTextureSet(const TextureCacheManager::TextureId& textureId);
+  TextureCacheManager::ExternalTextureInfo& GetExternalTextureInfo(const TextureCacheManager::TextureId& textureId);
 
   /**
    * @brief Get the encoded image buffer
@@ -149,9 +150,10 @@ public:
   /**
    * Adds an external texture to the texture manager
    * @param[in] texture The texture to add
+   * @param[in] preMultiplied Whether this external texture preMultiplied or not. Default as false.
    * @return string containing the URL for the texture
    */
-  std::string AddExternalTexture(const TextureSet& texture);
+  std::string AddExternalTexture(const TextureSet& texture, bool preMultiplied);
 
   /**
    * Adds an encoded image buffer to the texture manager
@@ -298,23 +300,6 @@ public:
 
 private:
   // Private defined structs.
-
-  /**
-   * @brief This struct is used to manage the life-cycle of ExternalTexture url.
-   */
-  struct ExternalTextureInfo
-  {
-    ExternalTextureInfo(const TextureCacheManager::TextureId& textureId,
-                        const TextureSet&                     textureSet)
-    : textureId(textureId),
-      textureSet(textureSet),
-      referenceCount(1u)
-    {
-    }
-    TextureCacheManager::TextureId textureId;
-    TextureSet                     textureSet;
-    std::int16_t                   referenceCount;
-  };
 
   /**
    * @brief This struct is used to manage the life-cycle of EncodedImageBuffer url.

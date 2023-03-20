@@ -34,7 +34,7 @@ namespace Text
 struct Controller::InputFontHandler
 {
   static void               SetInputFontFamily(Controller& controller, const std::string& fontFamily);
-  static const std::string& GetInputFontFamily(const Controller& controller);
+  static std::string        GetInputFontFamily(const Controller& controller);
   static void               SetInputFontWeight(const Controller& controller, FontWeight weight);
   static bool               IsInputFontWeightDefined(const Controller& controller);
   static FontWeight         GetInputFontWeight(const Controller& controller);

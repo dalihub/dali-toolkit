@@ -39,7 +39,7 @@ struct Controller::PlaceholderHandler
   static void               SetPlaceholderText(Controller& controller, PlaceholderType type, const std::string& text);
   static void               GetPlaceholderText(const Controller& controller, PlaceholderType type, std::string& text);
   static void               SetPlaceholderFontFamily(Controller& controller, const std::string& placeholderTextFontFamily);
-  static const std::string& GetPlaceholderFontFamily(const Controller& controller);
+  static std::string        GetPlaceholderFontFamily(const Controller& controller);
   static void               SetPlaceholderTextFontWeight(Controller& controller, FontWeight weight);
   static bool               IsPlaceholderTextFontWeightDefined(const Controller& controller);
   static FontWeight         GetPlaceholderTextFontWeight(const Controller& controller);

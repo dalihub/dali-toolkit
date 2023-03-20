@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "texture-cache-manager.h"
+#include <dali-toolkit/internal/texture-manager/texture-cache-manager.h>
 
 // EXTERNAL HEADERS
 #include <dali/devel-api/common/hash.h>
@@ -193,15 +193,12 @@ Texture TextureCacheManager::GetTexture(const TextureCacheManager::TextureId& te
   return texture;
 }
 
-TextureSet TextureCacheManager::GetExternalTextureSet(const TextureCacheManager::TextureId& textureId)
+TextureCacheManager::ExternalTextureInfo& TextureCacheManager::GetExternalTextureInfo(const TextureCacheManager::TextureId& textureId)
 {
-  TextureSet        textureSet; // empty handle
   TextureCacheIndex cacheIndex = GetCacheIndexFromExternalTextureId(textureId);
-  if(cacheIndex != INVALID_CACHE_INDEX)
-  {
-    textureSet = mExternalTextures[cacheIndex.GetIndex()].textureSet;
-  }
-  return textureSet;
+  DALI_ASSERT_ALWAYS(cacheIndex != INVALID_CACHE_INDEX);
+
+  return mExternalTextures[cacheIndex.GetIndex()];
 }
 
 EncodedImageBuffer TextureCacheManager::GetEncodedImageBuffer(const TextureCacheManager::TextureId& bufferId)
@@ -230,14 +227,14 @@ EncodedImageBuffer TextureCacheManager::GetEncodedImageBuffer(const VisualUrl& u
   return encodedImageBuffer;
 }
 
-std::string TextureCacheManager::AddExternalTexture(const TextureSet& textureSet)
+std::string TextureCacheManager::AddExternalTexture(const TextureSet& textureSet, bool preMultiplied)
 {
   TextureId textureId = GenerateTextureId(TextureCacheIndex(TextureCacheIndexType::TEXTURE_CACHE_INDEX_TYPE_TEXTURE, mExternalTextures.size()));
 
-  TextureCacheManager::ExternalTextureInfo textureInfo(textureId, textureSet);
+  TextureCacheManager::ExternalTextureInfo textureInfo(textureId, textureSet, preMultiplied);
   mExternalTextures.emplace_back(textureInfo);
 
-  DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureCacheManager::AddExternalTexture() : New texture registered. textureId:%d\n", textureInfo.textureId);
+  DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureCacheManager::AddExternalTexture() : New texture registered. textureId:%d, preMultiplied:%d\n", textureInfo.textureId, preMultiplied);
 
   return VisualUrl::CreateTextureUrl(std::to_string(textureInfo.textureId));
 }

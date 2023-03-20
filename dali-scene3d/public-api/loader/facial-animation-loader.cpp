@@ -122,8 +122,8 @@ AnimationDefinition LoadFacialAnimation(const std::string& url)
   FACIAL_ANIMATION_READER.Read(rootObj, facialAnimation);
 
   AnimationDefinition animationDefinition;
-  animationDefinition.mName     = std::string(facialAnimation.mName.data());
-  animationDefinition.mDuration = MILLISECONDS_TO_SECONDS * static_cast<float>(facialAnimation.mTime[facialAnimation.mNumberOfFrames - 1u]);
+  animationDefinition.SetName(facialAnimation.mName.data());
+  animationDefinition.SetDuration(MILLISECONDS_TO_SECONDS * static_cast<float>(facialAnimation.mTime[facialAnimation.mNumberOfFrames - 1u]));
 
   // Calculate the number of animated properties.
   uint32_t numberOfAnimatedProperties = 0u;
@@ -131,46 +131,29 @@ AnimationDefinition LoadFacialAnimation(const std::string& url)
   {
     numberOfAnimatedProperties += blendShape.mNumberOfMorphTarget;
   }
-  animationDefinition.mProperties.resize(numberOfAnimatedProperties);
+  animationDefinition.ReserveSize(numberOfAnimatedProperties);
 
-  // Create the key frame instances.
-  for(auto& animatedProperty : animationDefinition.mProperties)
-  {
-    animatedProperty.mKeyFrames = Dali::KeyFrames::New();
-  }
-
-  // Set the property names
   uint32_t targets = 0u;
   for(const auto& blendShape : facialAnimation.mBlendShapes)
   {
     for(uint32_t morphTargetIndex = 0u; morphTargetIndex < blendShape.mNumberOfMorphTarget; ++morphTargetIndex)
     {
-      AnimatedProperty& animatedProperty = animationDefinition.mProperties[targets + morphTargetIndex];
-      animatedProperty.mTimePeriod       = Dali::TimePeriod(animationDefinition.mDuration);
-
+      AnimatedProperty animatedProperty;
+      animatedProperty.mTimePeriod = Dali::TimePeriod(animationDefinition.GetDuration());
       animatedProperty.mNodeName = blendShape.mNodeName;
-
       std::stringstream weightPropertyStream;
       weightPropertyStream << BlendShapes::WEIGHTS_UNIFORM << "[" << morphTargetIndex << "]";
       animatedProperty.mPropertyName = weightPropertyStream.str();
-    }
-    targets += blendShape.mNumberOfMorphTarget;
-  }
 
-  targets = 0u;
-  for(const auto& blendShape : facialAnimation.mBlendShapes)
-  {
-    for(uint32_t timeIndex = 0u; timeIndex < facialAnimation.mNumberOfFrames; ++timeIndex)
-    {
-      const float progress = MILLISECONDS_TO_SECONDS * static_cast<float>(facialAnimation.mTime[timeIndex]) / animationDefinition.mDuration;
-
-      for(uint32_t morphTargetIndex = 0u; morphTargetIndex < blendShape.mNumberOfMorphTarget; ++morphTargetIndex)
+      animatedProperty.mKeyFrames = Dali::KeyFrames::New();
+      for(uint32_t timeIndex = 0u; timeIndex < facialAnimation.mNumberOfFrames; ++timeIndex)
       {
-        AnimatedProperty& animatedProperty = animationDefinition.mProperties[targets + morphTargetIndex];
-
+        const float progress = MILLISECONDS_TO_SECONDS * static_cast<float>(facialAnimation.mTime[timeIndex]) / animationDefinition.GetDuration();
         animatedProperty.mKeyFrames.Add(progress, blendShape.mKeys[timeIndex][morphTargetIndex]);
       }
+      animationDefinition.SetProperty(targets + morphTargetIndex, std::move(animatedProperty));
     }
+
     targets += blendShape.mNumberOfMorphTarget;
   }
 

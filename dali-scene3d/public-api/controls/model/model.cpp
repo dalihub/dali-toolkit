@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/controls/model/model-impl.h>
+#include <dali-scene3d/public-api/model-components/model-node.h>
 
 namespace Dali
 {
@@ -62,9 +63,19 @@ Model::Model(Dali::Internal::CustomActor* internal)
   VerifyCustomActorPointer<Internal::Model>(internal);
 }
 
-const Actor Model::GetModelRoot() const
+const ModelNode Model::GetModelRoot() const
 {
   return GetImpl(*this).GetModelRoot();
+}
+
+void Model::AddModelNode(ModelNode modelNode)
+{
+  return GetImpl(*this).AddModelNode(modelNode);
+}
+
+void Model::RemoveModelNode(ModelNode modelNode)
+{
+  return GetImpl(*this).RemoveModelNode(modelNode);
 }
 
 void Model::SetChildrenSensitive(bool enable)
@@ -130,6 +141,11 @@ Dali::CameraActor Model::GenerateCamera(uint32_t index) const
 bool Model::ApplyCamera(uint32_t index, Dali::CameraActor camera) const
 {
   return GetImpl(*this).ApplyCamera(index, camera);
+}
+
+ModelNode Model::FindChildModelNodeByName(std::string_view nodeName)
+{
+  return GetImpl(*this).FindChildModelNodeByName(nodeName);
 }
 
 } // namespace Scene3D

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,10 +77,10 @@ int UtcDaliImageConvertFrameBufferToUrl2(void)
   END_TEST;
 }
 
-int UtcDaliImageConvertPixelDataToUrl(void)
+int UtcDaliImageConvertPixelDataToUrl01(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliImageConvertPixelDataToUrl");
+  tet_infoline("UtcDaliImageConvertPixelDataToUrl01");
 
   unsigned int width(64);
   unsigned int height(64);
@@ -94,10 +94,27 @@ int UtcDaliImageConvertPixelDataToUrl(void)
   END_TEST;
 }
 
-int UtcDaliImageConvertNativeImageSourceToUrl(void)
+int UtcDaliImageConvertPixelDataToUrl02(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliImageConvertNativeImageSourceToUrl");
+  tet_infoline("UtcDaliImageConvertPixelDataToUrl02");
+
+  unsigned int width(64);
+  unsigned int height(64);
+  unsigned int bufferSize = width * height * Pixel::GetBytesPerPixel(Pixel::RGBA8888);
+
+  unsigned char* buffer    = reinterpret_cast<unsigned char*>(malloc(bufferSize));
+  PixelData      pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
+
+  DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(pixelData, true).GetUrl().size() > 0u);
+
+  END_TEST;
+}
+
+int UtcDaliImageConvertNativeImageSourceToUrl01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliImageConvertNativeImageSourceToUrl01");
 
   unsigned int width(64);
   unsigned int height(64);
@@ -106,6 +123,33 @@ int UtcDaliImageConvertNativeImageSourceToUrl(void)
     NativeImageSourcePtr nativeImageSource = NativeImageSource::New(width, height, NativeImageSource::COLOR_DEPTH_DEFAULT);
 
     DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImageSource).GetUrl().size() > 0u);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "Adaptor::IsAvailable()", TEST_LOCATION);
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliImageConvertNativeImageSourceToUrl02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliImageConvertNativeImageSourceToUrl02");
+
+  unsigned int width(64);
+  unsigned int height(64);
+  try
+  {
+    NativeImageSourcePtr nativeImageSource = NativeImageSource::New(width, height, NativeImageSource::COLOR_DEPTH_DEFAULT);
+
+    DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImageSource, true).GetUrl().size() > 0u);
   }
   catch(Dali::DaliException& e)
   {

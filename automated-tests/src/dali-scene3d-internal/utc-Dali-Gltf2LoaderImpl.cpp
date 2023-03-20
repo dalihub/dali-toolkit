@@ -202,6 +202,7 @@ int UtcDaliGltfLoaderSuccess1(void)
       1.f,
       1.f,
       Vector3(0.2, 0.1, 0.0),
+      1.0f,
       0.0f,
       0.5f,
       Vector3(0, 0, 1),
@@ -209,6 +210,7 @@ int UtcDaliGltfLoaderSuccess1(void)
       false,
       true,
       false,
+      Scene3D::Material::AlphaModeType::MASK,
       true,
       true,
       {
@@ -267,6 +269,7 @@ int UtcDaliGltfLoaderSuccess1(void)
           },
         },
       },
+      nullptr
     },
     {
       nullptr,
@@ -281,6 +284,7 @@ int UtcDaliGltfLoaderSuccess1(void)
       1.f,
       1.f,
       Vector3(0.2, 0.1, 0.0),
+      -1.0f,
       0.04f,
       1.0f,
       Vector3::ONE,
@@ -288,6 +292,7 @@ int UtcDaliGltfLoaderSuccess1(void)
       true,
       true,
       false,
+      Scene3D::Material::AlphaModeType::OPAQUE,
       true,
       false,
       {
@@ -337,6 +342,7 @@ int UtcDaliGltfLoaderSuccess1(void)
           },
         },
       },
+      nullptr,
     },
   };
 
@@ -355,12 +361,14 @@ int UtcDaliGltfLoaderSuccess1(void)
     DALI_TEST_EQUAL(md.mNormalScale, m.mNormalScale);
     DALI_TEST_EQUAL(md.mOcclusionStrength, m.mOcclusionStrength);
     DALI_TEST_EQUAL(md.mEmissiveFactor, m.mEmissiveFactor);
+    DALI_TEST_EQUAL(md.mIor, m.mIor);
     DALI_TEST_EQUAL(md.mDielectricSpecular, m.mDielectricSpecular);
     DALI_TEST_EQUAL(md.mSpecularFactor, m.mSpecularFactor);
     DALI_TEST_EQUAL(md.mSpecularColorFactor, m.mSpecularColorFactor);
     DALI_TEST_EQUAL(md.mNeedAlbedoTexture, m.mNeedAlbedoTexture);
     DALI_TEST_EQUAL(md.mNeedMetallicRoughnessTexture, m.mNeedMetallicRoughnessTexture);
     DALI_TEST_EQUAL(md.mNeedNormalTexture, m.mNeedNormalTexture);
+    DALI_TEST_EQUAL(md.mAlphaModeType, m.mAlphaModeType);
     DALI_TEST_EQUAL(md.mIsOpaque, m.mIsOpaque);
     DALI_TEST_EQUAL(md.mIsMask, m.mIsMask);
 
@@ -672,9 +680,9 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
   }
 
   DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions.size(), 1u);
-  DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions[0].mProperties.size(), 57u);
+  DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions[0].GetPropertyCount(), 57u);
 
-  uint32_t id = ctx.loadResult.mScene.GetNode(ctx.loadResult.mAnimationDefinitions[0].mProperties[0].mNodeIndex)->mNodeId;
+  uint32_t id = ctx.loadResult.mScene.GetNode(ctx.loadResult.mAnimationDefinitions[0].GetPropertyAt(0).mNodeIndex)->mNodeId;
   DALI_TEST_EQUAL(id, root.FindChildByName("Skeleton_torso_joint_1").GetProperty<int32_t>(Dali::Actor::Property::ID));
 
   END_TEST;

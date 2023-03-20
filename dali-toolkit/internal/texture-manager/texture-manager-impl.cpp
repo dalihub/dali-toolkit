@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "texture-manager-impl.h"
+#include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 
 // EXTERNAL HEADERS
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
@@ -320,12 +320,18 @@ TextureSet TextureManager::LoadTexture(
     if(location.size() > 0u)
     {
       TextureId id = std::stoi(location);
-      textureSet   = mTextureCacheManager.GetExternalTextureSet(id);
-      if(textureSet)
+      auto externalTextureInfo   = mTextureCacheManager.GetExternalTextureInfo(id);
+      if(externalTextureInfo.textureSet)
       {
-        preMultiplyOnLoad = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-        textureId         = id;
-        return textureSet;
+        textureId = id;
+
+        if(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD)
+        {
+          // Change preMultiplyOnLoad value so make caller determine to preMultiplyAlpha or not.
+          // TODO : Should we seperate input and output value?
+          preMultiplyOnLoad = externalTextureInfo.preMultiplied ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+        }
+        return externalTextureInfo.textureSet;
       }
     }
   }

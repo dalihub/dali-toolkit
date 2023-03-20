@@ -16,7 +16,10 @@ SET(TC_SOURCES
   utc-Dali-EnvironmentDefinition.cpp
   utc-Dali-FacialAnimation.cpp
   utc-Dali-KtxLoader.cpp
+  utc-Dali-Material.cpp
   utc-Dali-Model.cpp
+  utc-Dali-ModelNode.cpp
+  utc-Dali-ModelPrimitive.cpp
   utc-Dali-SceneView.cpp
   utc-Dali-MatrixStack.cpp
   utc-Dali-MeshDefinition.cpp

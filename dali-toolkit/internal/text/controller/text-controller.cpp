@@ -45,7 +45,7 @@ namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
-const std::string EMPTY_STRING("");
+const char* EMPTY_STRING = "";
 
 template<typename Type>
 void EnsureCreated(Type*& object)
@@ -538,7 +538,7 @@ void Controller::SetDefaultFontFamily(const std::string& defaultFontFamily)
   }
 }
 
-const std::string& Controller::GetDefaultFontFamily() const
+std::string Controller::GetDefaultFontFamily() const
 {
   return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFontDescription.family : EMPTY_STRING;
 }
@@ -548,7 +548,7 @@ void Controller::SetPlaceholderFontFamily(const std::string& placeholderTextFont
   PlaceholderHandler::SetPlaceholderFontFamily(*this, placeholderTextFontFamily);
 }
 
-const std::string& Controller::GetPlaceholderFontFamily() const
+std::string Controller::GetPlaceholderFontFamily() const
 {
   return PlaceholderHandler::GetPlaceholderFontFamily(*this);
 }
@@ -945,7 +945,7 @@ void Controller::SetDefaultEmbossProperties(const std::string& embossProperties)
   mImpl->mEmbossDefaults->properties = embossProperties;
 }
 
-const std::string& Controller::GetDefaultEmbossProperties() const
+std::string Controller::GetDefaultEmbossProperties() const
 {
   return mImpl->mEmbossDefaults ? mImpl->mEmbossDefaults->properties : EMPTY_STRING;
 }
@@ -956,7 +956,7 @@ void Controller::SetDefaultOutlineProperties(const std::string& outlinePropertie
   mImpl->mOutlineDefaults->properties = outlineProperties;
 }
 
-const std::string& Controller::GetDefaultOutlineProperties() const
+std::string Controller::GetDefaultOutlineProperties() const
 {
   return mImpl->mOutlineDefaults ? mImpl->mOutlineDefaults->properties : EMPTY_STRING;
 }
@@ -1006,7 +1006,7 @@ void Controller::SetInputFontFamily(const std::string& fontFamily)
   InputFontHandler::SetInputFontFamily(*this, fontFamily);
 }
 
-const std::string& Controller::GetInputFontFamily() const
+std::string Controller::GetInputFontFamily() const
 {
   return InputFontHandler::GetInputFontFamily(*this);
 }
@@ -1081,7 +1081,7 @@ void Controller::SetInputShadowProperties(const std::string& shadowProperties)
   InputProperties::SetInputShadowProperties(*this, shadowProperties);
 }
 
-const std::string& Controller::GetInputShadowProperties() const
+std::string Controller::GetInputShadowProperties() const
 {
   return InputProperties::GetInputShadowProperties(*this);
 }
@@ -1091,7 +1091,7 @@ void Controller::SetInputUnderlineProperties(const std::string& underlinePropert
   InputProperties::SetInputUnderlineProperties(*this, underlineProperties);
 }
 
-const std::string& Controller::GetInputUnderlineProperties() const
+std::string Controller::GetInputUnderlineProperties() const
 {
   return InputProperties::GetInputUnderlineProperties(*this);
 }
@@ -1101,7 +1101,7 @@ void Controller::SetInputEmbossProperties(const std::string& embossProperties)
   InputProperties::SetInputEmbossProperties(*this, embossProperties);
 }
 
-const std::string& Controller::GetInputEmbossProperties() const
+std::string Controller::GetInputEmbossProperties() const
 {
   return InputProperties::GetInputEmbossProperties(*this);
 }
@@ -1111,7 +1111,7 @@ void Controller::SetInputOutlineProperties(const std::string& outlineProperties)
   InputProperties::SetInputOutlineProperties(*this, outlineProperties);
 }
 
-const std::string& Controller::GetInputOutlineProperties() const
+std::string Controller::GetInputOutlineProperties() const
 {
   return InputProperties::GetInputOutlineProperties(*this);
 }
@@ -1236,7 +1236,7 @@ void Controller::SetInputStrikethroughProperties(const std::string& strikethroug
   }
 }
 
-const std::string& Controller::GetInputStrikethroughProperties() const
+std::string Controller::GetInputStrikethroughProperties() const
 {
   return (NULL != mImpl->mEventData) ? mImpl->mEventData->mInputStyle.strikethroughProperties : EMPTY_STRING;
 }

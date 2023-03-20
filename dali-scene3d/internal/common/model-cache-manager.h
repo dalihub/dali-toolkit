@@ -135,7 +135,7 @@ public:
   ModelCacheManager(const ModelCacheManager& rhs) = default;
   ModelCacheManager(ModelCacheManager&& rhs)      = default;
   ModelCacheManager& operator=(const ModelCacheManager& rhs) = default;
-  ModelCacheManager& operator=(ModelCacheManager&& rhs) = default;
+  ModelCacheManager& operator=(ModelCacheManager&& rhs) noexcept = default;
 
 private:
   class Impl;

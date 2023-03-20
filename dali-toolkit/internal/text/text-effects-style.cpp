@@ -32,17 +32,16 @@ namespace Text
 {
 namespace
 {
-const std::string COLOR_KEY("color");
-const std::string OFFSET_KEY("offset");
-const std::string BLUR_RADIUS_KEY("blurRadius");
-const std::string WIDTH_KEY("width");
-const std::string HEIGHT_KEY("height");
-const std::string ENABLE_KEY("enable");
-const std::string TYPE_KEY("type");
-const std::string DASH_WIDTH_KEY("dashWidth");
-const std::string DASH_GAP_KEY("dashGap");
-const std::string TRUE_TOKEN("true");
-const std::string FALSE_TOKEN("false");
+const char* COLOR_KEY = "color";
+const char* OFFSET_KEY = "offset";
+const char* BLUR_RADIUS_KEY = "blurRadius";
+const char* WIDTH_KEY = "width";
+const char* HEIGHT_KEY = "height";
+const char* ENABLE_KEY = "enable";
+const char* TYPE_KEY = "type";
+const char* DASH_WIDTH_KEY = "dashWidth";
+const char* DASH_GAP_KEY = "dashGap";
+const char* TRUE_TOKEN = "true";
 } // namespace
 
 bool ParseShadowProperties(const Property::Map& shadowPropertiesMap,

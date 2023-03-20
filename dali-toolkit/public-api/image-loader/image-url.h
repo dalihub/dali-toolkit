@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_URL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,9 +60,10 @@ public:
    * @brief Create an initialized ImageUrl.
    *
    * @param[in] texture The texture url is got from external buffer.
+   * @param[in] preMultiplied Whether this external texture preMultiplied or not. Default as false.
    * @return A handle to a newly allocated Dali resource.
    */
-  static ImageUrl New(Texture& texture);
+  static ImageUrl New(Texture& texture, bool preMultiplied = false);
 
   /**
    * @brief Create an initialized ImageUrl.

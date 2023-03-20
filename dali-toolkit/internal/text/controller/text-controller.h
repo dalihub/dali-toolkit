@@ -826,7 +826,7 @@ public: // Default style & Input style
    *
    * @return The default font family.
    */
-  const std::string& GetDefaultFontFamily() const;
+  std::string GetDefaultFontFamily() const;
 
   /**
    * @brief Sets the placeholder text font family.
@@ -839,7 +839,7 @@ public: // Default style & Input style
    *
    * @return The placeholder text font family
    */
-  const std::string& GetPlaceholderFontFamily() const;
+  std::string GetPlaceholderFontFamily() const;
 
   /**
    * @brief Sets the default font weight.
@@ -1255,7 +1255,7 @@ public: // Default style & Input style
    *
    * @return The emboss's properties string.
    */
-  const std::string& GetDefaultEmbossProperties() const;
+  std::string GetDefaultEmbossProperties() const;
 
   /**
    * @brief Sets the outline's properties string.
@@ -1271,7 +1271,7 @@ public: // Default style & Input style
    *
    * @return The outline's properties string.
    */
-  const std::string& GetDefaultOutlineProperties() const;
+  std::string GetDefaultOutlineProperties() const;
 
   /**
    * @brief Sets the default line spacing.
@@ -1347,7 +1347,7 @@ public: // Default style & Input style
    *
    * @return The input text's font family name.
    */
-  const std::string& GetInputFontFamily() const;
+  std::string GetInputFontFamily() const;
 
   /**
    * @brief Sets the input font's weight.
@@ -1448,7 +1448,7 @@ public: // Default style & Input style
    *
    * @return The shadow's properties string.
    */
-  const std::string& GetInputShadowProperties() const;
+  std::string GetInputShadowProperties() const;
 
   /**
    * @brief Sets the input underline's properties string.
@@ -1464,7 +1464,7 @@ public: // Default style & Input style
    *
    * @return The underline's properties string.
    */
-  const std::string& GetInputUnderlineProperties() const;
+  std::string GetInputUnderlineProperties() const;
 
   /**
    * @brief Sets the input emboss's properties string.
@@ -1480,7 +1480,7 @@ public: // Default style & Input style
    *
    * @return The emboss's properties string.
    */
-  const std::string& GetInputEmbossProperties() const;
+  std::string GetInputEmbossProperties() const;
 
   /**
    * @brief Sets input the outline's properties string.
@@ -1496,7 +1496,7 @@ public: // Default style & Input style
    *
    * @return The outline's properties string.
    */
-  const std::string& GetInputOutlineProperties() const;
+  std::string GetInputOutlineProperties() const;
 
   /**
    * @brief Sets the input strikethrough's properties string.
@@ -1512,7 +1512,7 @@ public: // Default style & Input style
    *
    * @return The strikethrough's properties string.
    */
-  const std::string& GetInputStrikethroughProperties() const;
+  std::string GetInputStrikethroughProperties() const;
 
   /**
    * @brief Set the control's interface.

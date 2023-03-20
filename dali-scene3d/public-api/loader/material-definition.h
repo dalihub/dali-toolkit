@@ -28,6 +28,7 @@
 #include <dali-scene3d/public-api/loader/environment-definition.h>
 #include <dali-scene3d/public-api/loader/index.h>
 #include <dali-scene3d/public-api/loader/utils.h>
+#include <dali-scene3d/public-api/model-components/material.h>
 
 namespace Dali::Scene3D::Loader
 {
@@ -111,6 +112,7 @@ struct DALI_SCENE3D_API SamplerFlags
 struct DALI_SCENE3D_API TextureDefinition
 {
   std::string          mImageUri; // When the texture is loaded from embedded resources, this URI is used as a data stream.
+  std::string          mDirectoryPath;
   SamplerFlags::Type   mSamplerFlags;
   ImageDimensions      mMinImageDimensions;
   SamplingMode::Type   mSamplingMode;
@@ -234,6 +236,7 @@ public: // DATA
   float   mNormalScale         = 1.f;
   float   mOcclusionStrength   = 1.f;
   Vector3 mEmissiveFactor      = Vector3::ZERO;
+  float   mIor                 = -1.0f;
   float   mDielectricSpecular  = 0.04f;
   float   mSpecularFactor      = 1.0f;
   Vector3 mSpecularColorFactor = Vector3::ONE;
@@ -244,10 +247,12 @@ public: // DATA
   bool mNeedNormalTexture            = true;
   bool mDoubleSided                  = false;
 
-  bool mIsOpaque = true;
-  bool mIsMask   = false;
+  Scene3D::Material::AlphaModeType mAlphaModeType = Scene3D::Material::AlphaModeType::OPAQUE;
+  bool                             mIsOpaque      = true;
+  bool                             mIsMask        = false;
 
   std::vector<TextureStage> mTextureStages;
+  Material                  mMaterial;
 };
 
 } // namespace Dali::Scene3D::Loader

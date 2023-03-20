@@ -114,7 +114,7 @@ int UtcDaliNodeDefinitionProperties(void)
   nodeDef.mExtras.push_back(NodeDefinition::Extra{"frobnicateFactor", frobnicateFactor});
 
   Context ctx;
-  auto    actor = nodeDef.CreateActor(ctx.createParams);
+  auto    actor = nodeDef.CreateModelNode(ctx.createParams);
   DALI_TEST_EQUAL(nodeDef.mName, actor.GetProperty(Actor::Property::NAME).Get<std::string>());
   DALI_TEST_EQUAL(nodeDef.mPosition, actor.GetProperty(Actor::Property::POSITION).Get<Vector3>());
   DALI_TEST_EQUAL(nodeDef.mOrientation, actor.GetProperty(Actor::Property::ORIENTATION).Get<Quaternion>());
@@ -220,7 +220,7 @@ int UtcDaliNodeDefinitionRenderable(void)
   auto       shader = Shader::New(VSH, FSH);
   ctx.resources.mShaders.push_back({ShaderDefinition{}, shader});
 
-  auto actor = nodeDef.CreateActor(ctx.createParams);
+  auto actor = nodeDef.CreateModelNode(ctx.createParams);
   DALI_TEST_EQUAL(1, actor.GetRendererCount());
 
   auto renderer = actor.GetRendererAt(0);

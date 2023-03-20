@@ -19,16 +19,76 @@
 #include <dali-scene3d/public-api/loader/node-definition.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/model-components/material-impl.h>
+#include <dali-scene3d/internal/model-components/model-primitive-impl.h>
 #include <dali-scene3d/public-api/loader/renderer-state.h>
 #include <dali-scene3d/public-api/loader/utils.h>
+
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
 namespace
 {
-constexpr std::string_view IBL_INTENSITY_STRING("uIblIntensity");
-constexpr std::string_view IBL_Y_DIRECTION("uYDirection");
-constexpr std::string_view IBL_MAXLOD("uMaxLOD");
+static constexpr std::string_view IBL_INTENSITY_STRING("uIblIntensity");
+static constexpr std::string_view IBL_Y_DIRECTION("uYDirection");
+static constexpr std::string_view IBL_MAXLOD("uMaxLOD");
+
+static constexpr uint32_t MAX_NUMBER_OF_MATERIAL_TEXTURE = 7;
+static constexpr uint32_t SEMANTICS[MAX_NUMBER_OF_MATERIAL_TEXTURE] =
+  {
+    Scene3D::Loader::MaterialDefinition::ALBEDO,
+    Scene3D::Loader::MaterialDefinition::METALLIC | Scene3D::Loader::MaterialDefinition::ROUGHNESS,
+    Scene3D::Loader::MaterialDefinition::NORMAL,
+    Scene3D::Loader::MaterialDefinition::OCCLUSION,
+    Scene3D::Loader::MaterialDefinition::EMISSIVE,
+    Scene3D::Loader::MaterialDefinition::SPECULAR,
+    Scene3D::Loader::MaterialDefinition::SPECULAR_COLOR,
+};
+
+static constexpr Scene3D::Material::TextureType TEXTURE_TYPES[MAX_NUMBER_OF_MATERIAL_TEXTURE] =
+  {
+    Scene3D::Material::TextureType::BASE_COLOR,
+    Scene3D::Material::TextureType::METALLIC_ROUGHNESS,
+    Scene3D::Material::TextureType::NORMAL,
+    Scene3D::Material::TextureType::OCCLUSION,
+    Scene3D::Material::TextureType::EMISSIVE,
+    Scene3D::Material::TextureType::SPECULAR,
+    Scene3D::Material::TextureType::SPECULAR_COLOR,
+};
+
+Vector4 GetTextureFactor(Scene3D::Loader::MaterialDefinition& materialDefinition, uint32_t semantic)
+{
+  Vector4 factor = Vector4::ONE;
+  switch(semantic)
+  {
+    case Scene3D::Loader::MaterialDefinition::ALBEDO:
+      factor = materialDefinition.mBaseColorFactor;
+      break;
+    case Scene3D::Loader::MaterialDefinition::METALLIC | Scene3D::Loader::MaterialDefinition::ROUGHNESS:
+      factor = Vector4(materialDefinition.mMetallic, materialDefinition.mRoughness, 0.0f, 0.0f);
+      break;
+    case Scene3D::Loader::MaterialDefinition::NORMAL:
+      factor.x = materialDefinition.mNormalScale;
+      break;
+    case Scene3D::Loader::MaterialDefinition::OCCLUSION:
+      factor.x = materialDefinition.mOcclusionStrength;
+      break;
+    case Scene3D::Loader::MaterialDefinition::EMISSIVE:
+      factor = materialDefinition.mEmissiveFactor;
+      break;
+    case Scene3D::Loader::MaterialDefinition::SPECULAR:
+      factor.x = materialDefinition.mSpecularFactor;
+      break;
+    case Scene3D::Loader::MaterialDefinition::SPECULAR_COLOR:
+      factor = materialDefinition.mSpecularColorFactor;
+      break;
+    default:
+      break;
+  }
+  return factor;
+}
+
 } // namespace
 
 namespace Scene3D
@@ -50,7 +110,7 @@ void NodeDefinition::Renderable::ReflectResources(IResourceReflector& reflector)
   reflector.Reflect(ResourceType::Shader, mShaderIdx);
 }
 
-void NodeDefinition::Renderable::OnCreate(const NodeDefinition& node, CreateParams& params, Actor& actor) const
+void NodeDefinition::Renderable::OnCreate(const NodeDefinition& nodeDefinition, CreateParams& params, ModelNode& node) const
 {
   DALI_ASSERT_DEBUG(mShaderIdx != INVALID_INDEX);
   auto&  resources = params.mResources;
@@ -61,45 +121,45 @@ void NodeDefinition::Renderable::OnCreate(const NodeDefinition& node, CreatePara
 
   RendererState::Apply(resources.mShaders[mShaderIdx].first.mRendererState, renderer);
 
-  actor.AddRenderer(renderer);
+  node.AddRenderer(renderer);
 }
 
-const std::string NodeDefinition::ORIGINAL_MATRIX_PROPERTY_NAME = "originalMatrix";
+const char* NodeDefinition::ORIGINAL_MATRIX_PROPERTY_NAME = "originalMatrix";
 
-Actor NodeDefinition::CreateActor(CreateParams& params)
+ModelNode NodeDefinition::CreateModelNode(CreateParams& params)
 {
-  Actor actor = Actor::New();
-  mNodeId     = actor.GetProperty<int32_t>(Dali::Actor::Property::ID);
+  ModelNode node = ModelNode::New();
+  mNodeId        = node.GetProperty<int32_t>(Dali::Actor::Property::ID);
 
-  SetActorCentered(actor);
+  SetActorCentered(node);
 
-  actor.SetProperty(Actor::Property::NAME, mName);
-  actor.SetProperty(Actor::Property::POSITION, mPosition);
-  actor.SetProperty(Actor::Property::ORIENTATION, mOrientation);
-  actor.SetProperty(Actor::Property::SCALE, mScale);
-  actor.SetProperty(Actor::Property::SIZE, mSize);
-  actor.SetProperty(Actor::Property::VISIBLE, mIsVisible);
+  node.SetProperty(Actor::Property::NAME, mName);
+  node.SetProperty(Actor::Property::POSITION, mPosition);
+  node.SetProperty(Actor::Property::ORIENTATION, mOrientation);
+  node.SetProperty(Actor::Property::SCALE, mScale);
+  node.SetProperty(Actor::Property::SIZE, mSize);
+  node.SetProperty(Actor::Property::VISIBLE, mIsVisible);
 
-  actor.RegisterProperty(ORIGINAL_MATRIX_PROPERTY_NAME, GetLocalSpace(), Property::AccessMode::READ_ONLY);
+  node.RegisterProperty(ORIGINAL_MATRIX_PROPERTY_NAME, GetLocalSpace(), Property::AccessMode::READ_ONLY);
 
-  actor.SetProperty(Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR);
+  node.SetProperty(Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR);
 
   for(auto& renderable : mRenderables)
   {
-    renderable->OnCreate(*this, params, actor);
+    renderable->OnCreate(*this, params, node);
   }
 
   for(auto& e : mExtras)
   {
-    actor.RegisterProperty(e.mKey, e.mValue);
+    node.RegisterProperty(e.mKey, e.mValue);
   }
 
   for(auto& c : mConstraints)
   {
-    params.mConstrainables.push_back(ConstraintRequest{&c, actor});
+    params.mConstrainables.push_back(ConstraintRequest{&c, node});
   }
 
-  return actor;
+  return node;
 }
 
 Matrix NodeDefinition::GetLocalSpace() const
@@ -190,32 +250,19 @@ void ModelRenderable::ReflectResources(IResourceReflector& reflector)
   reflector.Reflect(ResourceType::Material, mMaterialIdx);
 }
 
-void ModelRenderable::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const
+void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinition::CreateParams& params, ModelNode& node) const
 {
   DALI_ASSERT_DEBUG(mMeshIdx != INVALID_INDEX);
-  Renderable::OnCreate(node, params, actor);
+  Renderable::OnCreate(nodeDefinition, params, node);
 
   auto& resources = params.mResources;
   auto& mesh      = resources.mMeshes[mMeshIdx];
 
-  auto     renderer = actor.GetRendererAt(actor.GetRendererCount() - 1u);
+  auto     renderer = node.GetRendererAt(node.GetRendererCount() - 1u);
   Geometry geometry = mesh.second.geometry;
   renderer.SetGeometry(geometry);
 
-  auto shader = renderer.GetShader();
-
-  if(mesh.first.IsSkinned())
-  {
-    params.mSkinnables.push_back(SkinningShaderConfigurationRequest{mesh.first.mSkeletonIdx, shader});
-  }
-
-  if(mesh.first.HasBlendShapes())
-  {
-    params.mBlendshapeRequests.push_back(BlendshapeShaderConfigurationRequest{node.mName, mMeshIdx, shader});
-  }
-
   TextureSet textures = resources.mMaterials[mMaterialIdx].second;
-
   // Set the blend shape texture.
   if(mesh.second.blendShapeGeometry)
   {
@@ -232,26 +279,53 @@ void ModelRenderable::OnCreate(const NodeDefinition& node, NodeDefinition::Creat
 
     textures = newTextureSet;
   }
+  renderer.SetTextures(textures);
 
-  renderer.RegisterProperty("uHasVertexColor", static_cast<float>(mesh.first.mColors.IsDefined()));
+  {
+    mesh.first.mModelPrimitive = ModelPrimitive::New();
+    auto primitive            = mesh.first.mModelPrimitive;
+    GetImplementation(primitive).SetRenderer(renderer);
+
+    Index    envIndex         = resources.mMaterials[mMaterialIdx].first.mEnvironmentIdx;
+    uint32_t specularMipmap = resources.mEnvironmentMaps[envIndex].second.mSpecularMipmapLevels;
+    GetImplementation(primitive).SetImageBasedLightTexture(resources.mEnvironmentMaps[envIndex].second.mDiffuse,
+                                                           resources.mEnvironmentMaps[envIndex].second.mSpecular,
+                                                           resources.mEnvironmentMaps[envIndex].first.mIblIntensity,
+                                                           specularMipmap);
+
+    bool hasPositions = false;
+    bool hasNormals   = false;
+    bool hasTangents  = false;
+    mesh.first.RetrieveBlendShapeComponents(hasPositions, hasNormals, hasTangents);
+    GetImplementation(primitive).SetBlendShapeOptions(hasPositions, hasNormals, hasTangents);
+    GetImplementation(primitive).SetBlendShapeGeometry(mesh.second.blendShapeGeometry);
+    GetImplementation(primitive).SetSkinned(mesh.first.IsSkinned());
+  }
+
+  auto shader = renderer.GetShader();
+  if(mesh.first.IsSkinned())
+  {
+    params.mSkinnables.push_back(SkinningShaderConfigurationRequest{mesh.first.mSkeletonIdx, shader, mesh.first.mModelPrimitive});
+  }
+
+  if(mesh.first.HasBlendShapes())
+  {
+    params.mBlendshapeRequests.push_back(BlendshapeShaderConfigurationRequest{nodeDefinition.mName, mMeshIdx, shader, mesh.first.mModelPrimitive});
+  }
 
   auto& matDef = resources.mMaterials[mMaterialIdx].first;
-  actor.RegisterProperty("uColorFactor", matDef.mBaseColorFactor);
-  actor.RegisterProperty("uMetallicFactor", matDef.mMetallic);
-  actor.RegisterProperty("uRoughnessFactor", matDef.mRoughness);
-  actor.RegisterProperty("uDielectricSpecular", matDef.mDielectricSpecular);
-  actor.RegisterProperty("uSpecularFactor", matDef.mSpecularFactor);
-  actor.RegisterProperty("uSpecularColorFactor", matDef.mSpecularColorFactor);
-  actor.RegisterProperty("uNormalScale", matDef.mNormalScale);
-  actor.RegisterProperty("uEmissiveFactor", matDef.mEmissiveFactor);
+  renderer.RegisterProperty("uColorFactor", matDef.mBaseColorFactor);
+  renderer.RegisterProperty("uMetallicFactor", matDef.mMetallic);
+  renderer.RegisterProperty("uRoughnessFactor", matDef.mRoughness);
+  renderer.RegisterProperty("uDielectricSpecular", matDef.mDielectricSpecular);
+  renderer.RegisterProperty("uSpecularFactor", matDef.mSpecularFactor);
+  renderer.RegisterProperty("uSpecularColorFactor", matDef.mSpecularColorFactor);
+  renderer.RegisterProperty("uNormalScale", matDef.mNormalScale);
+  renderer.RegisterProperty("uEmissiveFactor", matDef.mEmissiveFactor);
   if(matDef.mFlags & MaterialDefinition::OCCLUSION)
   {
     renderer.RegisterProperty("uOcclusionStrength", matDef.mOcclusionStrength);
   }
-
-  Index envIdx = matDef.mEnvironmentIdx;
-  renderer.RegisterProperty(IBL_INTENSITY_STRING.data(), resources.mEnvironmentMaps[envIdx].first.mIblIntensity);
-  renderer.RegisterProperty(IBL_Y_DIRECTION.data(), resources.mEnvironmentMaps[envIdx].first.mYDirection);
 
   float opaque      = matDef.mIsOpaque ? 1.0f : 0.0f;
   float mask        = matDef.mIsMask ? 1.0f : 0.0f;
@@ -261,28 +335,58 @@ void ModelRenderable::OnCreate(const NodeDefinition& node, NodeDefinition::Creat
   renderer.RegisterProperty("uMask", mask);
   renderer.RegisterProperty("uAlphaThreshold", alphaCutoff);
 
-  renderer.SetTextures(textures);
+  Index    envIndex         = matDef.mEnvironmentIdx;
+  uint32_t specularMipmap = resources.mEnvironmentMaps[envIndex].second.mSpecularMipmapLevels;
+  renderer.RegisterProperty(IBL_MAXLOD.data(), static_cast<float>(specularMipmap));
+  renderer.RegisterProperty(IBL_INTENSITY_STRING.data(), resources.mEnvironmentMaps[envIndex].first.mIblIntensity);
+  renderer.RegisterProperty(IBL_Y_DIRECTION.data(), resources.mEnvironmentMaps[envIndex].first.mYDirection);
 
-  uint32_t specularMipmap = resources.mEnvironmentMaps[envIdx].second.mSpecularMipmapLevels;
-  actor.SetProperty(Actor::Property::COLOR, mColor);
-  actor.RegisterProperty(IBL_MAXLOD.data(), static_cast<float>(specularMipmap));
+  node.SetProperty(Actor::Property::COLOR, mColor);
+
+  {
+    matDef.mMaterial = Material::New();
+    auto material    = matDef.mMaterial;
+    uint32_t textureIndexOffset = (mesh.second.blendShapeGeometry) ? 1 : 0;
+    uint32_t textureIndex       = 0;
+    for(uint32_t i = 0; i < MAX_NUMBER_OF_MATERIAL_TEXTURE; ++i)
+    {
+      Internal::Material::TextureInformation textureInformation;
+      if(matDef.CheckTextures(SEMANTICS[i]))
+      {
+        textureInformation.mTexture = textures.GetTexture(textureIndex + textureIndexOffset);
+        textureInformation.mSampler = textures.GetSampler(textureIndex + textureIndexOffset);
+        textureInformation.mUrl     = matDef.mTextureStages[textureIndex].mTexture.mDirectoryPath + matDef.mTextureStages[textureIndex].mTexture.mImageUri;
+        textureIndex++;
+      }
+      textureInformation.mFactor = GetTextureFactor(matDef, SEMANTICS[i]);
+      GetImplementation(material).SetTextureInformation(TEXTURE_TYPES[i], std::move(textureInformation));
+    }
+    material.SetProperty(Scene3D::Material::Property::ALPHA_MODE, matDef.mAlphaModeType);
+    material.SetProperty(Scene3D::Material::Property::ALPHA_CUTOFF, matDef.GetAlphaCutoff());
+    material.SetProperty(Scene3D::Material::Property::DOUBLE_SIDED, matDef.mDoubleSided);
+    material.SetProperty(Scene3D::Material::Property::IOR, matDef.mIor);
+    GetImplementation(mesh.first.mModelPrimitive).SetMaterial(material, false);
+    GetImplementation(material).ResetFlag();
+  }
+
+  node.AddModelPrimitive(mesh.first.mModelPrimitive);
 }
 
-void ArcRenderable::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const
+void ArcRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinition::CreateParams& params, ModelNode& node) const
 {
-  ModelRenderable::OnCreate(node, params, actor);
+  ModelRenderable::OnCreate(nodeDefinition, params, node);
 
-  actor.RegisterProperty("antiAliasing", mAntiAliasing ? 1 : 0);
-  actor.RegisterProperty("arcCaps", mArcCaps);
-  actor.RegisterProperty("radius", mRadius);
+  node.RegisterProperty("antiAliasing", mAntiAliasing ? 1 : 0);
+  node.RegisterProperty("arcCaps", mArcCaps);
+  node.RegisterProperty("radius", mRadius);
 
   const float startAngleRadians = mStartAngleDegrees * Math::PI_OVER_180;
   Vector2     startPolar{std::cos(startAngleRadians), std::sin(startAngleRadians)};
-  actor.RegisterProperty("startAngle", startPolar);
+  node.RegisterProperty("startAngle", startPolar);
 
   const float endAngleRadians = mEndAngleDegrees * Math::PI_OVER_180;
   Vector2     endPolar{std::cos(endAngleRadians), std::sin(endAngleRadians)};
-  actor.RegisterProperty("endAngle", endPolar);
+  node.RegisterProperty("endAngle", endPolar);
 }
 
 void ArcRenderable::GetEndVectorWithDiffAngle(float startAngle, float diffAngle, Vector2& endVector)

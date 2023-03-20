@@ -26,9 +26,8 @@ namespace Dali::Scene3D::Loader
 {
 namespace
 {
-const std::string SHADER_HINT_OUTPUT_IS_TRANSPARENT("OUTPUT_IS_TRANSPARENT"); ///< Might generate transparent alpha from opaque inputs.
-const std::string SHADER_HINT_MODIFIES_GEOMETRY("MODIFIES_GEOMETRY");         ///< Might change position of vertices, this option disables any culling optimizations.
-
+const char* SHADER_HINT_OUTPUT_IS_TRANSPARENT("OUTPUT_IS_TRANSPARENT"); ///< Might generate transparent alpha from opaque inputs.
+const char* SHADER_HINT_MODIFIES_GEOMETRY("MODIFIES_GEOMETRY");         ///< Might change position of vertices, this option disables any culling optimizations.
 } // namespace
 
 ShaderDefinition::ShaderDefinition(const ShaderDefinition& other)

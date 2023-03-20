@@ -65,7 +65,11 @@ constexpr WrapMode::Type WRAP_MODES_TO_DALI[]{
   WrapMode::CLAMP_TO_EDGE,
   WrapMode::MIRRORED_REPEAT};
 
-const SamplerFlags::Type SINGLE_VALUE_SAMPLER = SamplerFlags::Encode(FilterMode::NEAREST, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::CLAMP_TO_EDGE);
+const SamplerFlags::Type GetSingleValueSampler()
+{
+  static const SamplerFlags::Type SINGLE_VALUE_SAMPLER = SamplerFlags::Encode(FilterMode::NEAREST, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::CLAMP_TO_EDGE);
+  return SINGLE_VALUE_SAMPLER;
+}
 
 static constexpr std::string_view EMBEDDED_DATA_PREFIX               = "data:";
 static constexpr std::string_view EMBEDDED_DATA_IMAGE_MEDIA_TYPE     = "image/";
@@ -105,6 +109,7 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
   }
   else
   {
+    textureDefinition.mDirectoryPath = resourcePath;
     pixelData = SyncImageLoader::Load(resourcePath + textureDefinition.mImageUri, textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
   }
   return pixelData;
@@ -206,7 +211,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
     {
       const auto bufferSize = 4;
       uint8_t*   buffer     = new uint8_t[bufferSize]{0x7f, 0x7f, 0xff, 0xff}; // normal of (0, 0, 1), roughness of 1
-      raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY), SINGLE_VALUE_SAMPLER});
+      raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
     }
   }
   else
@@ -240,7 +245,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
       buffer[0] = static_cast<uint8_t>(mColor.r * 255.f);
       buffer[1] = static_cast<uint8_t>(mColor.g * 255.f);
       buffer[2] = static_cast<uint8_t>(mColor.b * 255.f);
-      raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, format, PixelData::DELETE_ARRAY), SINGLE_VALUE_SAMPLER});
+      raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, format, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
     }
 
     // If we have transparency, or an image based albedo map, we will have to continue with separate metallicRoughness + normal.
@@ -256,7 +261,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
       // glTF2 uses B & G, so we might as well just set all components to 1.0.
       const auto bufferSize = 4;
       uint8_t*   buffer     = new uint8_t[bufferSize]{0xff, 0xff, 0xff, 0xff};
-      raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY), SINGLE_VALUE_SAMPLER});
+      raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
     }
 
     if(checkStage(NORMAL))
@@ -270,13 +275,13 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
       {
         const auto bufferSize = 3;
         uint8_t*   buffer     = new uint8_t[bufferSize]{0x7f, 0x7f, 0xff}; // normal of (0, 0, 1)
-        raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY), SINGLE_VALUE_SAMPLER});
+        raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
       }
       else // single-value normal-roughness
       {
         const auto bufferSize = 4;
         uint8_t*   buffer     = new uint8_t[bufferSize]{0x7f, 0x7f, 0xff, 0xff}; // normal of (0, 0, 1), roughness of 1.0
-        raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY), SINGLE_VALUE_SAMPLER});
+        raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
       }
     }
   }

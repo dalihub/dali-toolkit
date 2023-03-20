@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,18 @@ namespace Toolkit
 {
 namespace TextureManager
 {
-std::string AddTexture(Texture& texture)
+std::string AddTexture(Texture& texture, bool preMultiplied)
 {
   TextureSet set = TextureSet::New();
   set.SetTexture(0u, texture);
-  return AddTexture(set);
+  return AddTexture(set, preMultiplied);
 }
 
-std::string AddTexture(TextureSet& textureSet)
+std::string AddTexture(TextureSet& textureSet, bool preMultiplied)
 {
   auto  visualFactory = Toolkit::VisualFactory::Get();
   auto& textureMgr    = GetImplementation(visualFactory).GetTextureManager();
-  return textureMgr.AddExternalTexture(textureSet);
+  return textureMgr.AddExternalTexture(textureSet, preMultiplied);
 }
 
 TextureSet RemoveTexture(const std::string& textureUrl)

@@ -28,33 +28,37 @@
 
 namespace Dali::Scene3D::Loader
 {
-const std::string BlendShapes::NUMBER_OF_BLEND_SHAPES("uNumberOfBlendShapes");
-const std::string BlendShapes::UNNORMALIZE_FACTOR("uBlendShapeUnnormalizeFactor");
-const std::string BlendShapes::COMPONENT_SIZE("uBlendShapeComponentSize");
+const char* BlendShapes::NUMBER_OF_BLEND_SHAPES("uNumberOfBlendShapes");
+const char* BlendShapes::UNNORMALIZE_FACTOR("uBlendShapeUnnormalizeFactor");
+const char* BlendShapes::COMPONENT_SIZE("uBlendShapeComponentSize");
 
-const std::string BlendShapes::COMPONENTS("blendShapeComponents");
+const char* BlendShapes::COMPONENTS("blendShapeComponents");
 
-const std::string BlendShapes::WEIGHTS_UNIFORM("uBlendShapeWeight");
+const char* BlendShapes::WEIGHTS_UNIFORM("uBlendShapeWeight");
 
-void BlendShapes::ConfigureProperties(const std::pair<MeshDefinition, MeshGeometry>& mesh, Shader shader, Actor actor)
+void BlendShapes::ConfigureProperties(const BlendShapeData& data, Shader shader)
 {
   unsigned int index = 0u;
 
   char        weightNameBuffer[32];
   char        unnormalizeFactorNameBuffer[64];
-  char* const pWeightName = weightNameBuffer + snprintf(weightNameBuffer, sizeof(weightNameBuffer), "%s", WEIGHTS_UNIFORM.c_str());
-  char* const pFactorName = unnormalizeFactorNameBuffer + snprintf(unnormalizeFactorNameBuffer, sizeof(unnormalizeFactorNameBuffer), "%s", UNNORMALIZE_FACTOR.c_str());
-  for(const auto& blendShape : mesh.first.mBlendShapes)
+  char* const pWeightName = weightNameBuffer + snprintf(weightNameBuffer, sizeof(weightNameBuffer), "%s", WEIGHTS_UNIFORM);
+  char* const pFactorName = unnormalizeFactorNameBuffer + snprintf(unnormalizeFactorNameBuffer, sizeof(unnormalizeFactorNameBuffer), "%s", UNNORMALIZE_FACTOR);
+  for(const auto& weight : data.weights)
   {
     snprintf(pWeightName, sizeof(weightNameBuffer) - (pWeightName - weightNameBuffer), "[%d]", index);
     std::string weightName{weightNameBuffer};
-    actor.RegisterProperty(weightName, blendShape.weight);
+    Dali::Actor actor = data.mActor.GetHandle();
+    if(actor)
+    {
+      actor.RegisterProperty(weightName, weight);
+    }
 
-    if(shader && mesh.first.mBlendShapeVersion == Version::VERSION_1_0)
+    if(shader && data.version == Version::VERSION_1_0)
     {
       snprintf(pFactorName, sizeof(unnormalizeFactorNameBuffer) - (pFactorName - unnormalizeFactorNameBuffer), "[%d]", index);
       std::string factorName{unnormalizeFactorNameBuffer};
-      shader.RegisterProperty(factorName, mesh.second.blendShapeUnnormalizeFactor[index]);
+      shader.RegisterProperty(factorName, data.unnormalizeFactors[index]);
     }
 
     ++index;
@@ -62,22 +66,16 @@ void BlendShapes::ConfigureProperties(const std::pair<MeshDefinition, MeshGeomet
 
   if(shader)
   {
-    if(Version::VERSION_2_0 == mesh.first.mBlendShapeVersion)
+    if(Version::VERSION_2_0 == data.version)
     {
-      shader.RegisterProperty(UNNORMALIZE_FACTOR, mesh.second.blendShapeUnnormalizeFactor[0u]);
+      shader.RegisterProperty(UNNORMALIZE_FACTOR, data.unnormalizeFactors[0u]);
     }
 
     shader.RegisterProperty(NUMBER_OF_BLEND_SHAPES, Property::Value(static_cast<float>(index)));
-    shader.RegisterProperty(COMPONENT_SIZE, Property::Value(static_cast<float>(mesh.second.blendShapeBufferOffset)));
+    shader.RegisterProperty(COMPONENT_SIZE, Property::Value(static_cast<float>(data.bufferOffset)));
 
     // Create a read only property to preserve the components of the blend shape.
-    int32_t components = 0x0;
-    for(auto& bs : mesh.first.mBlendShapes)
-    {
-      components |= (bs.deltas.IsDefined() * Component::POSITIONS) |
-                    (bs.normals.IsDefined() * Component::NORMALS) | (bs.tangents.IsDefined() * Component::TANGENTS);
-    }
-    shader.RegisterProperty(COMPONENTS, components, Property::AccessMode::READ_ONLY);
+    shader.RegisterProperty(COMPONENTS, data.components, Property::AccessMode::READ_ONLY);
   }
 }
 

@@ -32,4 +32,7 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_public_api_dir}/loader/string-callback.cpp
 	${scene3d_public_api_dir}/loader/utils.cpp
 	${scene3d_public_api_dir}/loader/view-projection.cpp
+	${scene3d_public_api_dir}/model-components/material.cpp
+	${scene3d_public_api_dir}/model-components/model-node.cpp
+	${scene3d_public_api_dir}/model-components/model-primitive.cpp
 )

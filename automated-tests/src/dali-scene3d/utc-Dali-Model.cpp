@@ -25,6 +25,7 @@
 #include <toolkit-event-thread-callback.h>
 
 #include <dali-scene3d/public-api/controls/model/model.h>
+#include <dali-scene3d/public-api/model-components/model-node.h>
 
 #include <dali/devel-api/actors/camera-actor-devel.h>
 
@@ -54,12 +55,8 @@ const char* TEST_GLTF_FILE_NAME                    = TEST_RESOURCE_DIR "/Animate
 const char* TEST_GLTF_ANIMATION_TEST_FILE_NAME     = TEST_RESOURCE_DIR "/animationTest.gltf";
 const char* TEST_GLTF_MULTIPLE_PRIMITIVE_FILE_NAME = TEST_RESOURCE_DIR "/simpleMultiplePrimitiveTest.gltf";
 const char* TEST_DLI_FILE_NAME                     = TEST_RESOURCE_DIR "/arc.dli";
-// @TODO: The test cases for loading the DLI model below is temporarily disabled.
-// Need to fix how resources are loaded when a model contains multiple scenes and
-// each scene has its own root node.
-#ifdef MULTIPLE_SCENES_MODEL_SUPPORT
-const char* TEST_DLI_EXERCISE_FILE_NAME = TEST_RESOURCE_DIR "/exercise.dli";
-#endif
+const char* TEST_DLI_EXERCISE_FILE_NAME            = TEST_RESOURCE_DIR "/exercise.dli";
+
 /**
  * For the diffuse and specular cube map texture.
  * These textures are based off version of Wave engine sample
@@ -148,6 +145,26 @@ int UtcDaliModelNew(void)
 
   Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
   DALI_TEST_CHECK(model);
+  END_TEST;
+}
+
+// Positive test case for a method
+int UtcDaliModelNewP2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliModelNew without url");
+
+  Scene3D::Model model = Scene3D::Model::New();
+  DALI_TEST_CHECK(model);
+
+  application.GetScene().Add(model);
+
+  DALI_TEST_CHECK(model.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
+
+  application.GetScene().Remove(model);
+
+  DALI_TEST_CHECK(!model.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
+
   END_TEST;
 }
 
@@ -315,8 +332,8 @@ int UtcDaliModelOnScene02(void)
   uint32_t modelCount = model.GetModelRoot().GetChildCount();
   DALI_TEST_EQUALS(1, modelCount, TEST_LOCATION);
 
-  Actor   rootActor = model.GetModelRoot();
-  Vector3 rootSize  = rootActor.GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+  Scene3D::ModelNode rootNode = model.GetModelRoot();
+  Vector3            rootSize = rootNode.GetProperty<Vector3>(Dali::Actor::Property::SIZE);
   DALI_TEST_EQUALS(Vector3(2, 2, 1), rootSize, TEST_LOCATION);
 
   END_TEST;
@@ -367,8 +384,8 @@ int UtcDaliModelGetNaturalSize(void)
   naturalSize = model.GetNaturalSize();
   DALI_TEST_EQUALS(Vector3(2, 2, 2), naturalSize, TEST_LOCATION);
 
-  Actor root = model.GetModelRoot();
-  DALI_TEST_CHECK(root);
+  Scene3D::ModelNode rootNode = model.GetModelRoot();
+  DALI_TEST_CHECK(rootNode);
 
   END_TEST;
 }
@@ -1011,7 +1028,6 @@ int UtcDaliModelAnimation02(void)
 
 int UtcDaliModelAnimation03(void)
 {
-#ifdef MULTIPLE_SCENES_MODEL_SUPPORT
   ToolkitTestApplication application;
 
   Scene3D::Model model = Scene3D::Model::New(TEST_DLI_EXERCISE_FILE_NAME);
@@ -1040,16 +1056,12 @@ int UtcDaliModelAnimation03(void)
   Animation animationByName = model.GetAnimation("idleClip");
   DALI_TEST_CHECK(animationByName);
   DALI_TEST_EQUALS(animationByIndex, animationByName, TEST_LOCATION);
-#else
-  tet_result(TET_PASS);
-#endif
 
   END_TEST;
 }
 
 int UtcDaliModelCameraGenerate01(void)
 {
-#ifdef MULTIPLE_SCENES_MODEL_SUPPORT
   ToolkitTestApplication application;
 
   Scene3D::Model model = Scene3D::Model::New(TEST_DLI_EXERCISE_FILE_NAME);
@@ -1077,9 +1089,6 @@ int UtcDaliModelCameraGenerate01(void)
 
   generatedCamera = model.GenerateCamera(1u); // Fail to generate camera
   DALI_TEST_CHECK(!generatedCamera);
-#else
-  tet_result(TET_PASS);
-#endif
 
   END_TEST;
 }
@@ -1126,7 +1135,8 @@ int UtcDaliModelCameraGenerate02(void)
   CameraActor appliedCamera;
   DALI_TEST_EQUALS(model.ApplyCamera(0u, appliedCamera), false, TEST_LOCATION); // Cannot apply into empty camera.
 
-  auto CompareCameraProperties = [](CameraActor lhs, CameraActor rhs, const char* location) {
+  auto CompareCameraProperties = [](CameraActor lhs, CameraActor rhs, const char* location)
+  {
     DALI_TEST_EQUALS(lhs.GetProperty<int>(Dali::CameraActor::Property::PROJECTION_MODE), rhs.GetProperty<int>(Dali::CameraActor::Property::PROJECTION_MODE), TEST_LOCATION);
     DALI_TEST_EQUALS(lhs.GetProperty<float>(Dali::CameraActor::Property::NEAR_PLANE_DISTANCE), rhs.GetProperty<float>(Dali::CameraActor::Property::NEAR_PLANE_DISTANCE), TEST_LOCATION);
 
@@ -1134,7 +1144,7 @@ int UtcDaliModelCameraGenerate02(void)
     {
       DALI_TEST_EQUALS(lhs.GetProperty<float>(Dali::CameraActor::Property::FIELD_OF_VIEW), rhs.GetProperty<float>(Dali::CameraActor::Property::FIELD_OF_VIEW), TEST_LOCATION);
       // TODO : Open this test when infinity far projection implement.
-      //DALI_TEST_EQUALS(lhs.GetProperty<float>(Dali::CameraActor::Property::FAR_PLANE_DISTANCE), rhs.GetProperty<float>(Dali::CameraActor::Property::FAR_PLANE_DISTANCE), TEST_LOCATION);
+      // DALI_TEST_EQUALS(lhs.GetProperty<float>(Dali::CameraActor::Property::FAR_PLANE_DISTANCE), rhs.GetProperty<float>(Dali::CameraActor::Property::FAR_PLANE_DISTANCE), TEST_LOCATION);
     }
     else
     {
@@ -1339,7 +1349,7 @@ int UtcDaliModelResourceCacheCheck(void)
   DALI_TEST_EQUALS(textureSet2.GetTextureCount(), 9u, TEST_LOCATION);
   DALI_TEST_EQUALS(textureSet3.GetTextureCount(), 9u, TEST_LOCATION);
 
-  for (uint32_t i = 0; i < 7u; i++)
+  for(uint32_t i = 0; i < 7u; i++)
   {
     DALI_TEST_EQUALS(textureSet2.GetTexture(i), textureSet3.GetTexture(i), TEST_LOCATION);
   }
@@ -1350,3 +1360,68 @@ int UtcDaliModelResourceCacheCheck(void)
   END_TEST;
 }
 
+int UtcDaliModelAddRemoveModelNode(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New();
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+
+  Scene3D::ModelNode node1 = Scene3D::ModelNode::New();
+  Scene3D::ModelNode node2 = Scene3D::ModelNode::New();
+  Scene3D::ModelNode node3 = Scene3D::ModelNode::New();
+  Scene3D::ModelNode node4 = Scene3D::ModelNode::New();
+
+  model.AddModelNode(node1);
+  model.AddModelNode(node2);
+  model.AddModelNode(node3);
+  model.RemoveModelNode(node1); // Remove node before scene on
+
+  application.GetScene().Add(model);
+
+  Dali::Scene3D::ModelNode root = model.GetModelRoot();
+  DALI_TEST_CHECK(root);
+  DALI_TEST_EQUALS(2, root.GetChildCount(), TEST_LOCATION);
+
+  model.RemoveModelNode(node2); // Remove node after scene on
+
+  DALI_TEST_EQUALS(1, root.GetChildCount(), TEST_LOCATION);
+
+  model.AddModelNode(node4); // Add during scene on
+
+  DALI_TEST_EQUALS(2, root.GetChildCount(), TEST_LOCATION);
+
+  application.GetScene().Remove(model);
+
+  model.RemoveModelNode(node3); // Remove node after scene off
+
+  END_TEST;
+}
+
+int UtcDaliModelFindChildModelNodeByName(void)
+{
+  tet_infoline(" UtcDaliModelNodeFindChildModelNodeByName.");
+
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New();
+  application.GetScene().Add(model);
+
+  Scene3D::ModelNode modelNode1 = Scene3D::ModelNode::New();
+  Scene3D::ModelNode modelNode2 = Scene3D::ModelNode::New();
+
+  modelNode1.SetProperty(Dali::Actor::Property::NAME, "modelNode1");
+  modelNode2.SetProperty(Dali::Actor::Property::NAME, "modelNode2");
+  model.AddModelNode(modelNode1);
+  model.AddModelNode(modelNode2);
+
+  Scene3D::ModelNode child1 = model.FindChildModelNodeByName("modelNode1");
+  DALI_TEST_CHECK(child1);
+  DALI_TEST_EQUALS(child1, modelNode1, TEST_LOCATION);
+
+  Scene3D::ModelNode child2 = model.FindChildModelNodeByName("modelNode2");
+  DALI_TEST_CHECK(child2);
+  DALI_TEST_EQUALS(child2, modelNode2, TEST_LOCATION);
+
+  END_TEST;
+}

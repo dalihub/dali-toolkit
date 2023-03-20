@@ -24,12 +24,13 @@
 
 // INTERNAL
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-scene3d/internal/model-components/model-node-impl.h>
 #include <dali-scene3d/public-api/loader/blend-shape-details.h>
 #include <dali-scene3d/public-api/loader/skinning-details.h>
 #include <dali-scene3d/public-api/loader/utils.h>
 
-//#define DEBUG_SCENE_DEFINITION
-//#define DEBUG_JOINTS
+// #define DEBUG_SCENE_DEFINITION
+// #define DEBUG_JOINTS
 
 #if defined(DEBUG_SCENE_DEFINITION) || defined(DEBUG_JOINTS)
 #define DEBUG_ONLY(x) x
@@ -43,50 +44,53 @@ namespace Dali::Scene3D::Loader
 {
 namespace
 {
-const std::string JOINT_MATRIX{"jointMatrix"};
 
-const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)> sConstraintFactory = {
-  {Property::Type::BOOLEAN,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<bool>(a, i, [](bool& current, const PropertyInputContainer& inputs) {
-       current = inputs[0]->GetBoolean();
-     });
-   }},
-  {Property::Type::INTEGER,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<int>(a, i, [](int& current, const PropertyInputContainer& inputs) {
-       current = inputs[0]->GetInteger();
-     });
-   }},
-  {Property::Type::FLOAT,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<float>(a, i, EqualToConstraint());
-   }},
-  {Property::Type::VECTOR2,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<Vector2>(a, i, EqualToConstraint());
-   }},
-  {Property::Type::VECTOR3,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<Vector3>(a, i, EqualToConstraint());
-   }},
-  {Property::Type::VECTOR4,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<Vector4>(a, i, EqualToConstraint());
-   }},
-  {Property::Type::MATRIX,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<Matrix>(a, i, EqualToConstraint());
-   }},
-  {Property::Type::MATRIX3,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<Matrix3>(a, i, EqualToConstraint());
-   }},
-  {Property::Type::ROTATION,
-   [](Actor& a, Property::Index i) {
-     return Constraint::New<Quaternion>(a, i, EqualToConstraint());
-   }},
-};
+const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)>& GetConstraintFactory()
+{
+  static const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)> sConstraintFactory = {
+    {Property::Type::BOOLEAN,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<bool>(a, i, [](bool& current, const PropertyInputContainer& inputs) {
+         current = inputs[0]->GetBoolean();
+       });
+     }},
+    {Property::Type::INTEGER,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<int>(a, i, [](int& current, const PropertyInputContainer& inputs) {
+         current = inputs[0]->GetInteger();
+       });
+     }},
+    {Property::Type::FLOAT,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<float>(a, i, EqualToConstraint());
+     }},
+    {Property::Type::VECTOR2,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Vector2>(a, i, EqualToConstraint());
+     }},
+    {Property::Type::VECTOR3,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Vector3>(a, i, EqualToConstraint());
+     }},
+    {Property::Type::VECTOR4,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Vector4>(a, i, EqualToConstraint());
+     }},
+    {Property::Type::MATRIX,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Matrix>(a, i, EqualToConstraint());
+     }},
+    {Property::Type::MATRIX3,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Matrix3>(a, i, EqualToConstraint());
+     }},
+    {Property::Type::ROTATION,
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Quaternion>(a, i, EqualToConstraint());
+     }},
+  };
+  return sConstraintFactory;
+}
 
 struct ResourceReflector : IResourceReflector
 {
@@ -174,7 +178,7 @@ public:
   {
     mCreationContext.mXforms.modelStack.Push(n.GetLocalSpace());
 
-    Actor a = n.CreateActor(mCreationContext);
+    ModelNode a = n.CreateModelNode(mCreationContext);
     if(!mActorStack.empty())
     {
       mActorStack.back().Add(a);
@@ -192,15 +196,15 @@ public:
     mCreationContext.mXforms.modelStack.Pop();
   }
 
-  Actor GetRoot() const
+  ModelNode GetRoot() const
   {
     return mRoot;
   }
 
 private:
   NodeDefinition::CreateParams& mCreationContext;
-  std::vector<Actor>            mActorStack;
-  Actor                         mRoot;
+  std::vector<ModelNode>            mActorStack;
+  ModelNode                         mRoot;
 };
 
 bool IsAncestor(const SceneDefinition& scene, Index ancestor, Index node, Index rootHint = INVALID_INDEX)
@@ -240,10 +244,10 @@ Property::Index ConfigureJointMatrix(Actor actor, Actor ancestor, Property::Inde
     propJointMatrix = ConfigureJointMatrix(parent, ancestor, propJointMatrix);
   }
 
-  auto myPropJointMatrix = actor.GetPropertyIndex(JOINT_MATRIX);
+  auto myPropJointMatrix = actor.GetPropertyIndex(Skinning::JOINT_MATRIX);
   if(myPropJointMatrix == Property::INVALID_INDEX)
   {
-    myPropJointMatrix     = actor.RegisterProperty(JOINT_MATRIX, Matrix{false});
+    myPropJointMatrix     = actor.RegisterProperty(Skinning::JOINT_MATRIX, Matrix{false});
     Constraint constraint = Constraint::New<Matrix>(actor, propJointMatrix, [](Matrix& output, const PropertyInputContainer& inputs) {
       Matrix jointMatrix{false};
       jointMatrix.SetTransformComponents(Vector3::ONE, inputs[0]->GetQuaternion(), inputs[1]->GetVector3());
@@ -299,23 +303,10 @@ void SortAndDeduplicateSkinningRequests(std::vector<SkinningShaderConfigurationR
                  requests.end());
 }
 
-void ConfigureBoneMatrix(const Matrix& ibm, Actor joint, Shader& shader, Index& boneIdx)
+void ConfigureBoneMatrix(const Matrix& ibm, ModelNode joint, ModelPrimitive primitive, Index& boneIdx)
 {
   // Register bone transform on shader.
-  char propertyNameBuffer[32];
-  snprintf(propertyNameBuffer, sizeof(propertyNameBuffer), "%s[%d]", Skinning::BONE_UNIFORM_NAME.c_str(), boneIdx);
-  DALI_ASSERT_DEBUG(shader.GetPropertyIndex(propertyNameBuffer) == Property::INVALID_INDEX);
-  auto propBoneXform = shader.RegisterProperty(propertyNameBuffer, Matrix{false});
-
-  // Constrain bone matrix to joint transform.
-  Constraint constraint = Constraint::New<Matrix>(shader, propBoneXform, [ibm](Matrix& output, const PropertyInputContainer& inputs) {
-    Matrix::Multiply(output, ibm, inputs[0]->GetMatrix());
-  });
-
-  auto propJointMatrix = joint.GetPropertyIndex(JOINT_MATRIX);
-  constraint.AddSource(Source{joint, propJointMatrix});
-  constraint.Apply();
-
+  Internal::GetImplementation(joint).SetBoneMatrix(ibm, primitive, boneIdx);
   ++boneIdx;
 }
 
@@ -471,7 +462,7 @@ void SceneDefinition::CountResourceRefs(Index iNode, const Customization::Choice
   Visit(iNode, choices, refCounterVisitor);
 }
 
-Actor SceneDefinition::CreateNodes(Index iNode, const Customization::Choices& choices, NodeDefinition::CreateParams& params)
+ModelNode SceneDefinition::CreateNodes(Index iNode, const Customization::Choices& choices, NodeDefinition::CreateParams& params)
 {
   ActorCreatorVisitor actorCreatorVisitor(params);
 
@@ -777,8 +768,8 @@ void SceneDefinition::ApplyConstraints(Actor&                           root,
     if(iTarget != Property::INVALID_INDEX)
     {
       auto propertyType = cr.mTarget.GetPropertyType(iTarget);
-      auto iFind        = sConstraintFactory.find(propertyType);
-      if(iFind == sConstraintFactory.end())
+      auto iFind        = GetConstraintFactory().find(propertyType);
+      if(iFind == GetConstraintFactory().end())
       {
         onError(FormatString("node '%s': Property '%s' has unsupported type '%s'; ignored.",
                              sourceName,
@@ -965,8 +956,8 @@ void SceneDefinition::ConfigureSkeletonJoints(uint32_t iRoot, const SkeletonDefi
     auto rootJoint = root.FindChildByName(node->mName);
     DALI_ASSERT_ALWAYS(!!rootJoint);
 
-    DALI_ASSERT_DEBUG(rootJoint.GetPropertyIndex(JOINT_MATRIX) == Property::INVALID_INDEX);
-    auto       propJointMatrix = rootJoint.RegisterProperty(JOINT_MATRIX, Matrix{false});
+    DALI_ASSERT_DEBUG(rootJoint.GetPropertyIndex(Skinning::JOINT_MATRIX) == Property::INVALID_INDEX);
+    auto       propJointMatrix = rootJoint.RegisterProperty(Skinning::JOINT_MATRIX, Matrix{false});
     Constraint constraint      = Constraint::New<Matrix>(rootJoint, propJointMatrix, [](Matrix& output, const PropertyInputContainer& inputs) {
       output.SetTransformComponents(Vector3::ONE, inputs[0]->GetQuaternion(), inputs[1]->GetVector3());
     });
@@ -1055,8 +1046,12 @@ void SceneDefinition::ConfigureSkinningShaders(const ResourceBundle&            
     for(auto& joint : skeleton.mJoints)
     {
       auto  node  = GetNode(joint.mNodeIdx);
-      Actor actor = rootActor.FindChildByName(node->mName);
-      ConfigureBoneMatrix(joint.mInverseBindMatrix, actor, request.mShader, boneIdx);
+      ModelNode modelNode = ModelNode::DownCast(rootActor.FindChildByName(node->mName));
+      if(!modelNode)
+      {
+        continue;
+      }
+      ConfigureBoneMatrix(joint.mInverseBindMatrix, modelNode, request.mPrimitive, boneIdx);
     }
   }
 }
@@ -1111,9 +1106,27 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&          
       if(mesh.first.HasBlendShapes())
       {
         Actor actor = rootActor.FindChildByName(node->mName);
-
-        // Sets the property to be animated.
-        BlendShapes::ConfigureProperties(mesh, i.mShader, actor);
+        Scene3D::ModelNode node = Scene3D::ModelNode::DownCast(actor);
+        if(!node)
+        {
+          continue;
+        }
+        BlendShapes::BlendShapeData data;
+        data.components = 0x0;
+        for(auto&& blendShape : mesh.first.mBlendShapes)
+        {
+          data.weights.push_back(blendShape.weight);
+          data.components |= (blendShape.deltas.IsDefined() * BlendShapes::Component::POSITIONS) |
+                             (blendShape.normals.IsDefined() * BlendShapes::Component::NORMALS) | (blendShape.tangents.IsDefined() * BlendShapes::Component::TANGENTS);
+        }
+        for(auto&& factor : mesh.second.blendShapeUnnormalizeFactor)
+        {
+          data.unnormalizeFactors.push_back(factor);
+        }
+        data.version = mesh.first.mBlendShapeVersion;
+        data.bufferOffset = mesh.second.blendShapeBufferOffset;
+        data.mActor = actor;
+        Internal::GetImplementation(node).SetBlendShapeData(data, i.mPrimitive);
       }
     }
   }

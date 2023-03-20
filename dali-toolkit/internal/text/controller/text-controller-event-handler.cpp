@@ -39,11 +39,11 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
 
-const std::string KEY_C_NAME      = "c";
-const std::string KEY_V_NAME      = "v";
-const std::string KEY_X_NAME      = "x";
-const std::string KEY_A_NAME      = "a";
-const std::string KEY_INSERT_NAME = "Insert";
+const char* KEY_C_NAME      = "c";
+const char* KEY_V_NAME      = "v";
+const char* KEY_X_NAME      = "x";
+const char* KEY_A_NAME      = "a";
+const char* KEY_INSERT_NAME = "Insert";
 
 } // namespace
 

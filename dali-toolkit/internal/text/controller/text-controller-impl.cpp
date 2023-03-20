@@ -51,7 +51,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 
 constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
-const std::string EMPTY_STRING("");
+const char* EMPTY_STRING = "";
 
 } // namespace
 

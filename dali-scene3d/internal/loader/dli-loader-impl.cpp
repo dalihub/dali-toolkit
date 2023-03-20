@@ -61,19 +61,18 @@ namespace rs = RendererState;
 
 namespace
 {
-const std::string NODES         = "nodes";
-const std::string SCENES        = "scenes";
-const std::string NODE          = "node";
-const std::string URI           = "uri";
-const std::string URL           = "url";
-const std::string CUSTOMIZATION = "customization";
-const std::string HINTS         = "hints";
-const std::string NAME("name");
-const std::string BLEND_SHAPE_HEADER("blendShapeHeader");
-const std::string BLEND_SHAPES("blendShapes");
-const std::string BLEND_SHAPE_VERSION_1_0("1.0");
-const std::string BLEND_SHAPE_VERSION_2_0("2.0");
-const std::string VERSION("version");
+const char* NODES         = "nodes";
+const char* SCENES        = "scenes";
+const char* NODE          = "node";
+const char* URI           = "uri";
+const char* URL           = "url";
+const char* HINTS         = "hints";
+const char* NAME("name");
+const char* BLEND_SHAPE_HEADER("blendShapeHeader");
+const char* BLEND_SHAPES("blendShapes");
+const char* BLEND_SHAPE_VERSION_1_0("1.0");
+const char* BLEND_SHAPE_VERSION_2_0("2.0");
+const char* VERSION("version");
 
 const char* const SHADOW_MAP_SIZE   = "shadowMapSize";
 const char* const ORTHOGRAPHIC_SIZE = "orthographicSize";
@@ -1440,51 +1439,56 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
       ++iAnim)
   {
     const TreeNode&     tnAnim = (*iAnim).second;
+    uint32_t animationPropertyIndex = 0;
     AnimationDefinition animDef;
-    ReadString(tnAnim.GetChild(NAME), animDef.mName);
+    std::string animationName;
+    ReadString(tnAnim.GetChild(NAME), animationName);
+    animDef.SetName(animationName);
 
-    auto       iFind     = std::lower_bound(definitions.begin(), definitions.end(), animDef, [](const AnimationDefinition& ad0, const AnimationDefinition& ad1) { return ad0.mName < ad1.mName; });
-    const bool overwrite = iFind != definitions.end() && iFind->mName == animDef.mName;
+    auto       iFind     = std::lower_bound(definitions.begin(), definitions.end(), animDef, [](const AnimationDefinition& ad0, const AnimationDefinition& ad1) { return ad0.GetName() < ad1.GetName(); });
+    const bool overwrite = iFind != definitions.end() && iFind->GetName() == animDef.GetName();
     if(overwrite)
     {
-      mOnError(FormatString("Pre-existing animation with name '%s' is being overwritten.", animDef.mName.c_str()));
+      mOnError(FormatString("Pre-existing animation with name '%s' is being overwritten.", animDef.GetName().c_str()));
     }
 
     // Duration -- We need something that animated properties' delay / duration can
     // be expressed as a multiple of; 0 won't work. This is small enough (i.e. shorter
     // than our frame delay) to not be restrictive WRT replaying. If anything needs
     // to occur more frequently, then Animations are likely not your solution anyway.
-    animDef.mDuration = AnimationDefinition::MIN_DURATION_SECONDS;
-    if(!ReadFloat(tnAnim.GetChild("duration"), animDef.mDuration))
+    animDef.SetDuration(AnimationDefinition::MIN_DURATION_SECONDS);
+    float animationDuration;
+    if(!ReadFloat(tnAnim.GetChild("duration"), animationDuration))
     {
+      animDef.SetDuration(animationDuration);
       mOnError(FormatString("Animation '%s' fails to define '%s', defaulting to %f.",
-                            animDef.mName.c_str(),
+                            animDef.GetName().c_str(),
                             "duration",
-                            animDef.mDuration));
+                            animDef.GetDuration()));
     }
 
     // Get loop count - # of playbacks. Default is once. 0 means repeat indefinitely.
-    animDef.mLoopCount = 1;
-    if(ReadInt(tnAnim.GetChild("loopCount"), animDef.mLoopCount) &&
-       animDef.mLoopCount < 0)
+    int32_t animationLoopCount = 1;
+    if(ReadInt(tnAnim.GetChild("loopCount"), animationLoopCount) && animationLoopCount < 0)
     {
-      animDef.mLoopCount = 0;
+      animationLoopCount = 0;
     }
+    animDef.SetLoopCount(animationLoopCount);
 
     std::string endAction;
     if(ReadString(tnAnim.GetChild("endAction"), endAction))
     {
       if("BAKE" == endAction)
       {
-        animDef.mEndAction = Animation::BAKE;
+        animDef.SetEndAction(Animation::BAKE);
       }
       else if("DISCARD" == endAction)
       {
-        animDef.mEndAction = Animation::DISCARD;
+        animDef.SetEndAction(Animation::DISCARD);
       }
       else if("BAKE_FINAL" == endAction)
       {
-        animDef.mEndAction = Animation::BAKE_FINAL;
+        animDef.SetEndAction(Animation::BAKE_FINAL);
       }
     }
 
@@ -1492,21 +1496,21 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
     {
       if("BAKE" == endAction)
       {
-        animDef.mDisconnectAction = Animation::BAKE;
+        animDef.SetDisconnectAction(Animation::BAKE);
       }
       else if("DISCARD" == endAction)
       {
-        animDef.mDisconnectAction = Animation::DISCARD;
+        animDef.SetDisconnectAction(Animation::DISCARD);
       }
       else if("BAKE_FINAL" == endAction)
       {
-        animDef.mDisconnectAction = Animation::BAKE_FINAL;
+        animDef.SetDisconnectAction(Animation::BAKE_FINAL);
       }
     }
 
     if(const TreeNode* tnProperties = tnAnim.GetChild("properties"))
     {
-      animDef.mProperties.reserve(tnProperties->Size());
+      animDef.ReserveSize(tnProperties->Size());
       for(TreeNode::ConstIterator iProperty = tnProperties->CBegin(), iPropertyEnd = tnProperties->CEnd();
           iProperty != iPropertyEnd;
           ++iProperty)
@@ -1516,24 +1520,24 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
         AnimatedProperty animProp;
         if(!ReadString(tnProperty.GetChild("node"), animProp.mNodeName))
         {
-          mOnError(FormatString("Animation '%s': Failed to read the 'node' tag.", animDef.mName.c_str()));
+          mOnError(FormatString("Animation '%s': Failed to read the 'node' tag.", animDef.GetName().c_str()));
           continue;
         }
 
         if(!ReadString(tnProperty.GetChild("property"), animProp.mPropertyName))
         {
-          mOnError(FormatString("Animation '%s': Failed to read the 'property' tag", animDef.mName.c_str()));
+          mOnError(FormatString("Animation '%s': Failed to read the 'property' tag", animDef.GetName().c_str()));
           continue;
         }
 
         // these are the defaults
         animProp.mTimePeriod.delaySeconds    = 0.f;
-        animProp.mTimePeriod.durationSeconds = animDef.mDuration;
+        animProp.mTimePeriod.durationSeconds = animDef.GetDuration();
         if(!ReadTimePeriod(tnProperty.GetChild("timePeriod"), animProp.mTimePeriod))
         {
           mOnError(FormatString("Animation '%s': timePeriod missing in Property #%d: defaulting to %f.",
-                                animDef.mName.c_str(),
-                                animDef.mProperties.size(),
+                                animDef.GetName().c_str(),
+                                animDef.GetPropertyCount(),
                                 animProp.mTimePeriod.durationSeconds));
         }
 
@@ -1669,8 +1673,15 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
           }
         }
 
-        animDef.mProperties.push_back(std::move(animProp));
+        animDef.SetProperty(animationPropertyIndex++, std::move(animProp));
       }
+    }
+
+    if(auto proc = params.input->mAnimationPropertyProcessor) // optional processing
+    {
+      Property::Map map;
+      ParseProperties(tnAnim, map);
+      proc(animDef, std::move(map), mOnError);
     }
 
     if(overwrite)
@@ -1680,13 +1691,6 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
     else
     {
       iFind = definitions.insert(iFind, std::move(animDef));
-    }
-
-    if(auto proc = params.input->mAnimationPropertyProcessor) // optional processing
-    {
-      Property::Map map;
-      ParseProperties(tnAnim, map);
-      proc(animDef, std::move(map), mOnError);
     }
   }
 }

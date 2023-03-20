@@ -19,6 +19,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/shader.h>
 #include <string>
 
@@ -49,22 +51,32 @@ struct DALI_SCENE3D_API BlendShapes
     };
   };
 
+  struct BlendShapeData
+  {
+    std::vector<float>      weights;
+    std::vector<float>      unnormalizeFactors;
+    Version                 version{Scene3D::Loader::BlendShapes::Version::INVALID};
+    uint32_t                bufferOffset{0};
+    int32_t                 components{0x0};
+    Dali::WeakHandle<Actor> mActor;
+  };
+
   // shader properties - animatable (uniforms)
-  static const std::string NUMBER_OF_BLEND_SHAPES; ///< Integer number of blend shapes loaded.
-  static const std::string UNNORMALIZE_FACTOR;     ///< Scalar(s) for position components of blend shapes; Version 1.0: float array (1 per blend shape); Version 2.0: single float.
-  static const std::string COMPONENT_SIZE;         ///< Integer offset from one component (positions / normals / tangents) of a blend shape to the next.
+  static const char* NUMBER_OF_BLEND_SHAPES; ///< Integer number of blend shapes loaded.
+  static const char* UNNORMALIZE_FACTOR;     ///< Scalar(s) for position components of blend shapes; Version 1.0: float array (1 per blend shape); Version 2.0: single float.
+  static const char* COMPONENT_SIZE;         ///< Integer offset from one component (positions / normals / tangents) of a blend shape to the next.
 
   // shader properties - read-only (not available as uniforms)
-  static const std::string COMPONENTS; ///< Integer bitmask of the blend shape components that the shader uses; refer to the Components enum.
+  static const char* COMPONENTS; ///< Integer bitmask of the blend shape components that the shader uses; refer to the Components enum.
 
   // actor property (instance) - animatable (uniforms)
-  static const std::string WEIGHTS_UNIFORM; ///< The weight of each blend shape in a float array
+  static const char* WEIGHTS_UNIFORM; ///< The weight of each blend shape in a float array
 
   /**
    * @brief Registers properties based on the mesh definition (and geometry) and identified by the above string constants,
    *  on the given @a shader and @a actor.
    */
-  static void ConfigureProperties(const std::pair<MeshDefinition, MeshGeometry>& mesh, Shader shader, Actor actor);
+  static void ConfigureProperties(const BlendShapeData& data, Shader shader);
 
   BlendShapes() = delete;
 };

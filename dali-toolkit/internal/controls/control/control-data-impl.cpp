@@ -51,12 +51,12 @@
 
 namespace
 {
-const std::string READING_INFO_TYPE_NAME           = "name";
-const std::string READING_INFO_TYPE_ROLE           = "role";
-const std::string READING_INFO_TYPE_DESCRIPTION    = "description";
-const std::string READING_INFO_TYPE_STATE          = "state";
-const std::string READING_INFO_TYPE_ATTRIBUTE_NAME = "reading_info_type";
-const std::string READING_INFO_TYPE_SEPARATOR      = "|";
+const char* READING_INFO_TYPE_NAME           = "name";
+const char* READING_INFO_TYPE_ROLE           = "role";
+const char* READING_INFO_TYPE_DESCRIPTION    = "description";
+const char* READING_INFO_TYPE_STATE          = "state";
+const char* READING_INFO_TYPE_ATTRIBUTE_NAME = "reading_info_type";
+const char* READING_INFO_TYPE_SEPARATOR      = "|";
 } // namespace
 
 namespace Dali

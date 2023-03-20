@@ -33,14 +33,13 @@ namespace Text
 {
 namespace
 {
-const std::string STYLE_KEY("style");
-const std::string WEIGHT_KEY("weight");
-const std::string WIDTH_KEY("width");
-const std::string SLANT_KEY("slant");
-const std::string FAMILY_KEY("family");
-const std::string TYPE_KEY("type");
+const char* WEIGHT_KEY = "weight";
+const char* WIDTH_KEY = "width";
+const char* SLANT_KEY = "slant";
+const char* FAMILY_KEY = "family";
+const char* TYPE_KEY = "type";
 
-const std::string SYSTEM_TOKEN("system");
+const char* SYSTEM_TOKEN = "system";
 
 } // namespace
 

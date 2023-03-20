@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 // CLASS HEADER
-#include "image.h"
+#include <dali-toolkit/public-api/image-loader/image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
@@ -34,29 +34,31 @@ Dali::Toolkit::ImageUrl GenerateUrl(Dali::FrameBuffer frameBuffer, Pixel::Format
 {
   Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelFormat, width, height);
   frameBuffer.AttachColorTexture(texture, 0u, 0u);
-  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture);
+  // TODO : Need to check frameBuffer result use preMultiplied color or not. By default, we use premultiplied
+  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, true);
   return imageUrl;
 }
 
 Dali::Toolkit::ImageUrl GenerateUrl(const Dali::FrameBuffer frameBuffer, uint8_t index)
 {
   Texture texture = Dali::DevelFrameBuffer::GetColorTexture(frameBuffer, index);
-  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture);
+  // TODO : Need to check frameBuffer result use preMultiplied color or not. By default, we use premultiplied
+  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, true);
   return imageUrl;
 }
 
-Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixelData)
+Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixelData, bool preMultiplied)
 {
   Texture texture = Texture::New(TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
   texture.Upload(pixelData);
-  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture);
+  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, preMultiplied);
   return imageUrl;
 }
 
-Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource)
+Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource, bool preMultiplied)
 {
   Texture texture = Dali::Texture::New(*nativeImageSource);
-  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture);
+  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, preMultiplied);
   return imageUrl;
 }
 

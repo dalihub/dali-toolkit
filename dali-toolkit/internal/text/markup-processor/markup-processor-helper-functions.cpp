@@ -44,23 +44,23 @@ const char        WEB_COLOR_TOKEN('#');
 const char* const HEX_COLOR_TOKEN("0x");
 const char* const ALPHA_ONE("FF");
 
-const std::string BLACK_COLOR("black");
-const std::string WHITE_COLOR("white");
-const std::string RED_COLOR("red");
-const std::string GREEN_COLOR("green");
-const std::string BLUE_COLOR("blue");
-const std::string YELLOW_COLOR("yellow");
-const std::string MAGENTA_COLOR("magenta");
-const std::string CYAN_COLOR("cyan");
-const std::string TRANSPARENT_COLOR("transparent");
+const char* BLACK_COLOR("black");
+const char* WHITE_COLOR("white");
+const char* RED_COLOR("red");
+const char* GREEN_COLOR("green");
+const char* BLUE_COLOR("blue");
+const char* YELLOW_COLOR("yellow");
+const char* MAGENTA_COLOR("magenta");
+const char* CYAN_COLOR("cyan");
+const char* TRANSPARENT_COLOR("transparent");
 
-const std::string SOLID_UNDERLINE("solid");
-const std::string DASHED_UNDERLINE("dashed");
-const std::string DOUBLE_UNDERLINE("double");
+const char* SOLID_UNDERLINE("solid");
+const char* DASHED_UNDERLINE("dashed");
+const char* DOUBLE_UNDERLINE("double");
 
-const std::string BEGIN_HORIZONTAL_ALIGNMENT("begin");
-const std::string CENTER_HORIZONTAL_ALIGNMENT("center");
-const std::string END_HORIZONTAL_ALIGNMENT("end");
+const char* BEGIN_HORIZONTAL_ALIGNMENT("begin");
+const char* CENTER_HORIZONTAL_ALIGNMENT("center");
+const char* END_HORIZONTAL_ALIGNMENT("end");
 
 } // namespace
 

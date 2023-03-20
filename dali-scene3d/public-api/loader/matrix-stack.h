@@ -1,5 +1,5 @@
-#ifndef DALI_SCENE3D_LOADERER_MATRIX_STACK_H_
-#define DALI_SCENE3D_LOADERER_MATRIX_STACK_H_
+#ifndef DALI_SCENE3D_LOADER_MATRIX_STACK_H_
+#define DALI_SCENE3D_LOADER_MATRIX_STACK_H_
 /*
  * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
@@ -48,4 +48,4 @@ private:
 
 } // namespace Dali::Scene3D::Loader
 
-#endif //DALI_SCENE3D_LOADERER_MATRIX_STACK_H_
+#endif //DALI_SCENE3D_LOADER_MATRIX_STACK_H_

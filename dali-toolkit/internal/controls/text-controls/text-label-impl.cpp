@@ -70,25 +70,25 @@ const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::DevelText::DEFAULT
  * The alignment depends on the alignment value of the text label (Use Text::VerticalAlignment enumerations).
  */
 const float VERTICAL_ALIGNMENT_TABLE[Text::VerticalAlignment::BOTTOM + 1] =
-  {
+{
     0.0f, // VerticalAlignment::TOP
     0.5f, // VerticalAlignment::CENTER
     1.0f  // VerticalAlignment::BOTTOM
 };
 
-const std::string TEXT_FIT_ENABLE_KEY("enable");
-const std::string TEXT_FIT_MIN_SIZE_KEY("minSize");
-const std::string TEXT_FIT_MAX_SIZE_KEY("maxSize");
-const std::string TEXT_FIT_STEP_SIZE_KEY("stepSize");
-const std::string TEXT_FIT_FONT_SIZE_KEY("fontSize");
-const std::string TEXT_FIT_FONT_SIZE_TYPE_KEY("fontSizeType");
+const char* TEXT_FIT_ENABLE_KEY("enable");
+const char* TEXT_FIT_MIN_SIZE_KEY("minSize");
+const char* TEXT_FIT_MAX_SIZE_KEY("maxSize");
+const char* TEXT_FIT_STEP_SIZE_KEY("stepSize");
+const char* TEXT_FIT_FONT_SIZE_KEY("fontSize");
+const char* TEXT_FIT_FONT_SIZE_TYPE_KEY("fontSizeType");
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
 const Scripting::StringEnum AUTO_SCROLL_STOP_MODE_TABLE[] =
-  {
+{
     {"IMMEDIATE", Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE},
     {"FINISH_LOOP", Toolkit::TextLabel::AutoScrollStopMode::FINISH_LOOP},
 };

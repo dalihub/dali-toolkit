@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/threading/mutex.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/environment-map-loader.h>
@@ -35,20 +36,39 @@ std::string GetDaliImagePath()
 }
 
 static constexpr float DEFAULT_INTENSITY = 1.0f;
+
 } // unnamed namespace
 
 namespace Dali::Scene3D::Loader
 {
 namespace
 {
-const std::string PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME = "brdfLUT.png";
+const char* PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME = "brdfLUT.png";
+}
+PixelData EnvironmentDefinition::mBrdfPixelData;
+Texture   EnvironmentDefinition::mBrdfTexture;
+bool      EnvironmentDefinition::mIsBrdfLoaded = false;
+
+Dali::Texture EnvironmentDefinition::GetBrdfTexture()
+{
+  if(!mBrdfTexture)
+  {
+    if(!mIsBrdfLoaded)
+    {
+      LoadBrdfTexture();
+    }
+    mBrdfTexture = Texture::New(TextureType::TEXTURE_2D, mBrdfPixelData.GetPixelFormat(), mBrdfPixelData.GetWidth(), mBrdfPixelData.GetHeight());
+    mBrdfTexture.Upload(mBrdfPixelData);
+  }
+  return mBrdfTexture;
 }
 
 EnvironmentDefinition::RawData
-EnvironmentDefinition::LoadRaw(const std::string& environmentsPath) const
+EnvironmentDefinition::LoadRaw(const std::string& environmentsPath)
 {
   RawData raw;
-  auto    loadFn = [&environmentsPath](const std::string& path, EnvironmentMapData& environmentMapData) {
+  auto    loadFn = [&environmentsPath](const std::string& path, EnvironmentMapData& environmentMapData)
+  {
     if(path.empty())
     {
       environmentMapData.mPixelData.resize(6);
@@ -69,16 +89,12 @@ EnvironmentDefinition::LoadRaw(const std::string& environmentsPath) const
 
   if(mUseBrdfTexture)
   {
-    Devel::PixelBuffer pixelBuffer = LoadImageFromFile(GetDaliImagePath() + PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME);
-    if(pixelBuffer)
-    {
-      raw.mBrdf = Devel::PixelBuffer::Convert(pixelBuffer);
-    }
+    LoadBrdfTexture();
   }
   return raw;
 }
 
-EnvironmentDefinition::Textures EnvironmentDefinition::Load(RawData&& raw) const
+EnvironmentDefinition::Textures EnvironmentDefinition::Load(RawData&& raw)
 {
   Textures textures;
 
@@ -95,10 +111,9 @@ EnvironmentDefinition::Textures EnvironmentDefinition::Load(RawData&& raw) const
     textures.mSpecularMipmapLevels = raw.mSpecular.GetMipmapLevels();
   }
 
-  if(raw.mBrdf)
+  if(mUseBrdfTexture)
   {
-    textures.mBrdf = Texture::New(TextureType::TEXTURE_2D, raw.mBrdf.GetPixelFormat(), raw.mBrdf.GetWidth(), raw.mBrdf.GetHeight());
-    textures.mBrdf.Upload(raw.mBrdf);
+    textures.mBrdf = GetBrdfTexture();
   }
   return textures;
 }
@@ -106,6 +121,23 @@ EnvironmentDefinition::Textures EnvironmentDefinition::Load(RawData&& raw) const
 float EnvironmentDefinition::GetDefaultIntensity()
 {
   return DEFAULT_INTENSITY;
+}
+
+void EnvironmentDefinition::LoadBrdfTexture()
+{
+  static Dali::Mutex mutex;
+  {
+    Mutex::ScopedLock lock(mutex);
+    if(!mIsBrdfLoaded)
+    {
+      Devel::PixelBuffer pixelBuffer = LoadImageFromFile(GetDaliImagePath() + PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME);
+      if(pixelBuffer)
+      {
+        mBrdfPixelData = Devel::PixelBuffer::Convert(pixelBuffer);
+        mIsBrdfLoaded = true;
+      }
+    }
+  }
 }
 
 } // namespace Dali::Scene3D::Loader
