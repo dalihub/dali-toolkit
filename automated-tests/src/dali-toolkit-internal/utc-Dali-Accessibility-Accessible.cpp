@@ -114,7 +114,7 @@ int UtcDaliAccessibilityCheckShowingState(void)
   q = Dali::Accessibility::Accessible::Get(buttonB);
   DALI_TEST_CHECK(q);
   states = q->GetStates();
-  DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) false, TEST_LOCATION);
+  DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) true, TEST_LOCATION);
 
   q = Dali::Accessibility::Accessible::Get(buttonC);
   DALI_TEST_CHECK(q);
