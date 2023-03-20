@@ -631,6 +631,7 @@ int UtcDaliGltfLoaderMRendererTest(void)
 
 int UtcDaliGltfLoaderAnimationLoadingTest(void)
 {
+  TestApplication app;
   Context ctx;
 
   auto& resources = ctx.resources;
@@ -651,8 +652,6 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
   };
 
   Customization::Choices choices;
-
-  TestApplication app;
 
   Actor root = Actor::New();
   SetActorCentered(root);

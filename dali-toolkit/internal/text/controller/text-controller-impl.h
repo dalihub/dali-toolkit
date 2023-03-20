@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/styling/style-manager-devel.h>
-#include <dali-toolkit/internal/text/input-style.h>
 #include <dali-toolkit/internal/text/controller/text-controller.h>
+#include <dali-toolkit/internal/text/input-style.h>
 #include <dali-toolkit/internal/text/text-model.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
@@ -359,6 +359,7 @@ struct Controller::Impl
     mTextFitMinSize(DEFAULT_TEXTFIT_MIN),
     mTextFitMaxSize(DEFAULT_TEXTFIT_MAX),
     mTextFitStepSize(DEFAULT_TEXTFIT_STEP),
+    mTextFitLineSize(0.f),
     mFontSizeScale(DEFAULT_FONT_SIZE_SCALE),
     mDisabledColorOpacity(DEFAULT_DISABLED_COLOR_OPACITY),
     mFontSizeScaleEnabled(true),
@@ -553,6 +554,15 @@ struct Controller::Impl
    * @see Dali::Toolkit::Text::Controller::GetText()
    */
   void GetText(CharacterIndex index, std::string& text) const;
+
+  /**
+   * @brief Retrieves number of characters previously set.
+   *
+   * @return A length of UTF-32 characters.
+   *
+   * @see Dali::Toolkit::Text::Controller::GetNumberOfCharacters()
+   */
+  Length GetNumberOfCharacters() const;
 
   bool EnsureClipboardCreated()
   {
@@ -1040,6 +1050,7 @@ public:
   float mTextFitMinSize;               ///< Minimum Font Size for text fit. Default 10
   float mTextFitMaxSize;               ///< Maximum Font Size for text fit. Default 100
   float mTextFitStepSize;              ///< Step Size for font intervalse. Default 1
+  float mTextFitLineSize;              ///< This is the LineSize that is the standard when performing TextFit.
   float mFontSizeScale;                ///< Scale value for Font Size. Default 1.0
   float mDisabledColorOpacity;         ///< Color opacity when disabled.
   bool  mFontSizeScaleEnabled : 1;     ///< Whether the font size scale is enabled.

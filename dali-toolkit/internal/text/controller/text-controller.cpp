@@ -85,10 +85,15 @@ void EnsureCreated(Type*& object, Arg1 arg1, Arg2 arg2)
 
 float GetDpi()
 {
-  unsigned int                      horizontalDpi = 0u;
-  unsigned int                      verticalDpi   = 0u;
-  Dali::TextAbstraction::FontClient fontClient    = Dali::TextAbstraction::FontClient::Get();
-  fontClient.GetDpi(horizontalDpi, verticalDpi);
+  static uint32_t horizontalDpi = 0u;
+  static uint32_t verticalDpi   = 0u;
+
+  // TODO : How can we know when fontClient DPI changed case?
+  if(DALI_UNLIKELY(horizontalDpi == 0u))
+  {
+    Dali::TextAbstraction::FontClient fontClient = Dali::TextAbstraction::FontClient::Get();
+    fontClient.GetDpi(horizontalDpi, verticalDpi);
+  }
   return static_cast<float>(horizontalDpi);
 }
 
@@ -413,6 +418,11 @@ float Controller::GetTextFitPointSize() const
   return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFitPointSize : 0.0f;
 }
 
+void Controller::SetTextFitLineSize(float lineSize)
+{
+  mImpl->mTextFitLineSize = lineSize;
+}
+
 void Controller::SetPlaceholderTextElideEnabled(bool enabled)
 {
   PlaceholderHandler::SetPlaceholderTextElideEnabled(*this, enabled);
@@ -471,6 +481,11 @@ void Controller::SetText(const std::string& text)
 void Controller::GetText(std::string& text) const
 {
   mImpl->GetText(text);
+}
+
+Length Controller::GetNumberOfCharacters() const
+{
+  return mImpl->GetNumberOfCharacters();
 }
 
 void Controller::SetSpannedText(const Text::Spanned& spannedText)

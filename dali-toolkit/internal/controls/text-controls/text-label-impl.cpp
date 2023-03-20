@@ -206,6 +206,10 @@ void ParseTextFitProperty(Text::ControllerPtr& controller, const Property::Map* 
     }
 
     controller->SetTextFitEnabled(enabled);
+    // The TextFit operation is performed based on the MinLineSize set in the TextLabel at the moment when the TextFit property is set.
+    // So, if you change the TextLabel's MinLineSize after setting the TextFit property, it does not affect the operation of TextFit.
+    // This may require a new LineSize item in TextFit.
+    controller->SetTextFitLineSize(controller->GetDefaultLineSize());
     if(isMinSizeSet)
     {
       controller->SetTextFitMinSize(minSize, type);

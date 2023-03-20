@@ -25,19 +25,22 @@ void AnimatedProperty::Animate(Animation& anim, GetActor getActor)
   if(Actor actor = getActor(*this))
   {
     Property prop = GetProperty(actor);
-    if(mKeyFrames)
+    if(prop.propertyIndex != Property::INVALID_INDEX)
     {
-      anim.AnimateBetween(prop, mKeyFrames, mAlphaFunction, mTimePeriod);
-    }
-    else if(mValue)
-    {
-      if(mValue->mIsRelative)
+      if(mKeyFrames)
       {
-        anim.AnimateBy(prop, mValue->mValue, mAlphaFunction, mTimePeriod);
+        anim.AnimateBetween(prop, mKeyFrames, mAlphaFunction, mTimePeriod);
       }
-      else
+      else if(mValue)
       {
-        anim.AnimateTo(prop, mValue->mValue, mAlphaFunction, mTimePeriod);
+        if(mValue->mIsRelative)
+        {
+          anim.AnimateBy(prop, mValue->mValue, mAlphaFunction, mTimePeriod);
+        }
+        else
+        {
+          anim.AnimateTo(prop, mValue->mValue, mAlphaFunction, mTimePeriod);
+        }
       }
     }
   }

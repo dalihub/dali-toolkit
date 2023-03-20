@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MODEL_INTERFACE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,6 +136,13 @@ public:
    * @return A pointer to the vector with the runs of characters with the same script..
    */
   virtual const ScriptRun* GetScriptRuns() const = 0;
+
+  /**
+   * @brief Retrieves number of characters.
+   *
+   * @return The number of characters.
+   */
+  virtual Length GetNumberOfCharacters() const = 0;
 
   /**
    * @brief Retrieves the number of laid-out glyphs.

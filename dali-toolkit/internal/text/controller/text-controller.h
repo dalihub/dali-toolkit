@@ -514,6 +514,13 @@ public: // Configure the text controller.
   bool IsTextFitChanged() const;
 
   /**
+   * @brief Sets line size valid for text fit.
+   *
+   * @param[in] lineSize line size value
+   */
+  void SetTextFitLineSize(float lineSize);
+
+  /**
    * @brief Sets disabled color opacity.
    *
    * @param[in] opacity The color opacity value in disabled state.
@@ -752,6 +759,13 @@ public: // Update.
    * @param[out] text A string of UTF-8 characters.
    */
   void GetText(std::string& text) const;
+
+  /**
+   * @brief Retrieves number of characters previously set.
+   *
+   * @return A length of string of UTF-32 characters.
+   */
+  Length GetNumberOfCharacters() const;
 
   /**
  * @brief Set the @p spannedText

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,17 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
 
 SvgVisual::~SvgVisual()
 {
+  if(Stage::IsInstalled())
+  {
+    if(mLoadingTask)
+    {
+      Dali::AsyncTaskManager::Get().RemoveTask(mLoadingTask);
+    }
+    if(mRasterizingTask)
+    {
+      Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
+    }
+  }
 }
 
 void SvgVisual::OnInitialize()
@@ -98,6 +109,7 @@ void SvgVisual::OnInitialize()
   if(IsSynchronousLoadingRequired() && mImageUrl.IsLocalResource())
   {
     mLoadingTask->Process();
+    mLoadingTask.Reset(); // We don't need it now
   }
   else
   {
@@ -219,10 +231,16 @@ void SvgVisual::DoSetOnScene(Actor& actor)
 void SvgVisual::DoSetOffScene(Actor& actor)
 {
   // Remove loading & rasterizing task
-  Dali::AsyncTaskManager::Get().RemoveTask(mLoadingTask);
-  Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
-  mLoadingTask.Reset();
-  mRasterizingTask.Reset();
+  if(mLoadingTask)
+  {
+    Dali::AsyncTaskManager::Get().RemoveTask(mLoadingTask);
+    mLoadingTask.Reset();
+  }
+  if(mRasterizingTask)
+  {
+    Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
+    mRasterizingTask.Reset();
+  }
 
   actor.RemoveRenderer(mImpl->mRenderer);
   mPlacementActor.Reset();
@@ -301,6 +319,7 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
     {
       mRasterizingTask->Process();
       ApplyRasterizedImage(mRasterizingTask);
+      mRasterizingTask.Reset(); // We don't need it now
     }
     else
     {
