@@ -118,7 +118,6 @@ StyleManager::StyleManager()
   if(mStyleMonitor)
   {
     mStyleMonitor.StyleChangeSignal().Connect(this, &StyleManager::StyleMonitorChange);
-    mDefaultFontSize = mStyleMonitor.GetDefaultFontSize();
   }
 
   // Set the full path for the default style theme.
@@ -469,6 +468,11 @@ void StyleManager::ApplyStyle(Toolkit::Builder builder, Toolkit::Control control
   if(GetStyleNameForControl(builder, control, styleName))
   {
     builder.ApplyStyle(styleName, control);
+  }
+
+  if(mDefaultFontSize == -1 && mStyleMonitor.EnsureFontClientCreated())
+  {
+    mDefaultFontSize = mStyleMonitor.GetDefaultFontSize();
   }
 
   if(mDefaultFontSize >= 0)
