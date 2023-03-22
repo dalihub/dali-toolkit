@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2022 Samsung Electronics Co., Ltd.
+* Copyright (c) 2023 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -39,53 +39,73 @@ constexpr uint32_t ACCESSOR_TYPE_ELEMENT_COUNT[]{
   16,
   static_cast<uint32_t>(-1)};
 
-const std::map<std::string_view, AccessorType::Type> ACCESSOR_TYPES{
-  ENUM_STRING_MAPPING(AccessorType, SCALAR),
-  ENUM_STRING_MAPPING(AccessorType, VEC2),
-  ENUM_STRING_MAPPING(AccessorType, VEC3),
-  ENUM_STRING_MAPPING(AccessorType, VEC4),
-  ENUM_STRING_MAPPING(AccessorType, MAT2),
-  ENUM_STRING_MAPPING(AccessorType, MAT3),
-  ENUM_STRING_MAPPING(AccessorType, MAT4),
-};
+const std::map<std::string_view, AccessorType::Type>& GetAccessorTypes()
+{
+  static const std::map<std::string_view, AccessorType::Type> ACCESSOR_TYPES{
+    ENUM_STRING_MAPPING(AccessorType, SCALAR),
+    ENUM_STRING_MAPPING(AccessorType, VEC2),
+    ENUM_STRING_MAPPING(AccessorType, VEC3),
+    ENUM_STRING_MAPPING(AccessorType, VEC4),
+    ENUM_STRING_MAPPING(AccessorType, MAT2),
+    ENUM_STRING_MAPPING(AccessorType, MAT3),
+    ENUM_STRING_MAPPING(AccessorType, MAT4),
+  };
+  return ACCESSOR_TYPES;
+}
 
-const std::map<std::string_view, AlphaMode::Type> ALPHA_MODE_TYPES{
-  ENUM_STRING_MAPPING(AlphaMode::Type, OPAQUE),
-  ENUM_STRING_MAPPING(AlphaMode::Type, MASK),
-  ENUM_STRING_MAPPING(AlphaMode::Type, BLEND),
-};
+const std::map<std::string_view, AlphaMode::Type>& GetAlphaModeTypes()
+{
+  static const std::map<std::string_view, AlphaMode::Type> ALPHA_MODE_TYPES{
+    ENUM_STRING_MAPPING(AlphaMode::Type, OPAQUE),
+    ENUM_STRING_MAPPING(AlphaMode::Type, MASK),
+    ENUM_STRING_MAPPING(AlphaMode::Type, BLEND),
+  };
+  return ALPHA_MODE_TYPES;
+}
 
-const std::map<std::string_view, Attribute::Type> ATTRIBUTE_TYPES{
-  ENUM_STRING_MAPPING(Attribute::Type, POSITION),
-  ENUM_STRING_MAPPING(Attribute::Type, NORMAL),
-  ENUM_STRING_MAPPING(Attribute::Type, TANGENT),
-  ENUM_STRING_MAPPING(Attribute::Type, TEXCOORD_0),
-  ENUM_STRING_MAPPING(Attribute::Type, TEXCOORD_1),
-  ENUM_STRING_MAPPING(Attribute::Type, COLOR_0),
-  ENUM_STRING_MAPPING(Attribute::Type, JOINTS_0),
-  ENUM_STRING_MAPPING(Attribute::Type, WEIGHTS_0),
-};
+const std::map<std::string_view, Attribute::Type>& GetAttributeTypes()
+{
+  static const std::map<std::string_view, Attribute::Type> ATTRIBUTE_TYPES{
+    ENUM_STRING_MAPPING(Attribute::Type, POSITION),
+    ENUM_STRING_MAPPING(Attribute::Type, NORMAL),
+    ENUM_STRING_MAPPING(Attribute::Type, TANGENT),
+    ENUM_STRING_MAPPING(Attribute::Type, TEXCOORD_0),
+    ENUM_STRING_MAPPING(Attribute::Type, TEXCOORD_1),
+    ENUM_STRING_MAPPING(Attribute::Type, COLOR_0),
+    ENUM_STRING_MAPPING(Attribute::Type, JOINTS_0),
+    ENUM_STRING_MAPPING(Attribute::Type, WEIGHTS_0),
+  };
+  return ATTRIBUTE_TYPES;
+}
 
-const std::map<std::string_view, Animation::Sampler::Interpolation::Type> ANIMATION_SAMPLER_INTERPOLATION{
-  ENUM_STRING_MAPPING(Animation::Sampler::Interpolation::Type, STEP),
-  ENUM_STRING_MAPPING(Animation::Sampler::Interpolation::Type, LINEAR),
-  ENUM_STRING_MAPPING(Animation::Sampler::Interpolation::Type, CUBICSPLINE),
-};
+const std::map<std::string_view, Animation::Sampler::Interpolation::Type>& GetAnimationSamplerInterpolation()
+{
+  static const std::map<std::string_view, Animation::Sampler::Interpolation::Type> ANIMATION_SAMPLER_INTERPOLATION{
+    ENUM_STRING_MAPPING(Animation::Sampler::Interpolation::Type, STEP),
+    ENUM_STRING_MAPPING(Animation::Sampler::Interpolation::Type, LINEAR),
+    ENUM_STRING_MAPPING(Animation::Sampler::Interpolation::Type, CUBICSPLINE),
+  };
+  return ANIMATION_SAMPLER_INTERPOLATION;
+}
 
-const std::map<std::string_view, Animation::Channel::Target::Type> ANIMATION_CHANNEL_TARGET_PATH_TYPES{
-  ENUM_STRING_MAPPING(Animation::Channel::Target::Type, TRANSLATION),
-  ENUM_STRING_MAPPING(Animation::Channel::Target::Type, ROTATION),
-  ENUM_STRING_MAPPING(Animation::Channel::Target::Type, SCALE),
-  ENUM_STRING_MAPPING(Animation::Channel::Target::Type, WEIGHTS),
-};
+const std::map<std::string_view, Animation::Channel::Target::Type>& GetAnimationChannelTargetPathTypes()
+{
+  static const std::map<std::string_view, Animation::Channel::Target::Type> ANIMATION_CHANNEL_TARGET_PATH_TYPES{
+    ENUM_STRING_MAPPING(Animation::Channel::Target::Type, TRANSLATION),
+    ENUM_STRING_MAPPING(Animation::Channel::Target::Type, ROTATION),
+    ENUM_STRING_MAPPING(Animation::Channel::Target::Type, SCALE),
+    ENUM_STRING_MAPPING(Animation::Channel::Target::Type, WEIGHTS),
+  };
+  return ANIMATION_CHANNEL_TARGET_PATH_TYPES;
+}
 
 } // namespace
 
-ENUM_TYPE_FROM_STRING(AccessorType, ACCESSOR_TYPES)
-ENUM_TYPE_FROM_STRING(AlphaMode, ALPHA_MODE_TYPES)
-ENUM_TYPE_FROM_STRING(Attribute, ATTRIBUTE_TYPES)
-ENUM_TYPE_FROM_STRING(Animation::Sampler::Interpolation, ANIMATION_SAMPLER_INTERPOLATION)
-ENUM_TYPE_FROM_STRING(Animation::Channel::Target, ANIMATION_CHANNEL_TARGET_PATH_TYPES)
+ENUM_TYPE_FROM_STRING(AccessorType, GetAccessorTypes())
+ENUM_TYPE_FROM_STRING(AlphaMode, GetAlphaModeTypes())
+ENUM_TYPE_FROM_STRING(Attribute, GetAttributeTypes())
+ENUM_TYPE_FROM_STRING(Animation::Sampler::Interpolation, GetAnimationSamplerInterpolation())
+ENUM_TYPE_FROM_STRING(Animation::Channel::Target, GetAnimationChannelTargetPathTypes())
 
 bool Component::IsUnsigned(Type t)
 {
