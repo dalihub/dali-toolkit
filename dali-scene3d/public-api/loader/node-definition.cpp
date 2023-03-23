@@ -28,6 +28,7 @@ namespace
 {
 constexpr std::string_view IBL_INTENSITY_STRING("uIblIntensity");
 constexpr std::string_view IBL_Y_DIRECTION("uYDirection");
+constexpr std::string_view IBL_MAXLOD("uMaxLOD");
 } // namespace
 
 namespace Scene3D
@@ -116,6 +117,11 @@ std::string_view NodeDefinition::GetIblScaleFactorUniformName()
 std::string_view NodeDefinition::GetIblYDirectionUniformName()
 {
   return IBL_Y_DIRECTION;
+}
+
+std::string_view NodeDefinition::GetIblMaxLodUniformName()
+{
+  return IBL_MAXLOD;
 }
 
 bool NodeDefinition::GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const
@@ -257,7 +263,9 @@ void ModelRenderable::OnCreate(const NodeDefinition& node, NodeDefinition::Creat
 
   renderer.SetTextures(textures);
 
+  uint32_t specularMipmap = resources.mEnvironmentMaps[envIdx].second.mSpecularMipmapLevels;
   actor.SetProperty(Actor::Property::COLOR, mColor);
+  actor.RegisterProperty(IBL_MAXLOD.data(), static_cast<float>(specularMipmap));
 }
 
 void ArcRenderable::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const

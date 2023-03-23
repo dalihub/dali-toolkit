@@ -92,11 +92,6 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
   GetImpl(*this).SetImageBasedLightSource(diffuseUrl, specularUrl, scaleFactor);
 }
 
-void Model::SetImageBasedLightTexture(Texture diffuseTexture, Texture specularTexture, float scaleFactor)
-{
-  GetImpl(*this).SetImageBasedLightTexture(diffuseTexture, specularTexture, scaleFactor);
-}
-
 void Model::SetImageBasedLightScaleFactor(float scaleFactor)
 {
   GetImpl(*this).SetImageBasedLightScaleFactor(scaleFactor);

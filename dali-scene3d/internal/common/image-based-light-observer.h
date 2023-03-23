@@ -47,8 +47,9 @@ public:
    * @param[in] diffuseTexture cube map texture that can be used as a diffuse IBL source.
    * @param[in] specularTexture cube map texture that can be used as a specular IBL source.
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f]. Default value is 1.0f.
+   * @param[in] specularMipmapLevels mipmap levels of specular texture
    */
-  virtual void NotifyImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor) = 0;
+  virtual void NotifyImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor, uint32_t specularMipmapLevels) = 0;
 
   /**
    * @brief Notifies Scale Factor of Image Based Light is changed by parent SceneView.

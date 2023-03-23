@@ -277,7 +277,7 @@ void SceneView::RegisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* it
 {
   if(item)
   {
-    item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
+    item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor, mSpecularMipmapLevels);
     mItems.push_back(item);
   }
 }
@@ -353,6 +353,7 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
     mDiffuseTexture.Reset();
     mSpecularTexture.Reset();
 
+    mSpecularMipmapLevels = 1u;
     NotifyImageBasedLightTextureChange();
   }
   else
@@ -826,6 +827,7 @@ void SceneView::OnIblDiffuseLoadComplete()
 void SceneView::OnIblSpecularLoadComplete()
 {
   mSpecularTexture          = mIblSpecularLoadTask->GetLoadedTexture();
+  mSpecularMipmapLevels     = mIblSpecularLoadTask->GetMipmapLevels();
   mIblSpecularResourceReady = true;
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
   {
@@ -849,7 +851,7 @@ void SceneView::NotifyImageBasedLightTextureChange()
   {
     if(item)
     {
-      item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor);
+      item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor, mSpecularMipmapLevels);
     }
   }
 }

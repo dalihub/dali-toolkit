@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <string.h>
+#include <cmath>
 #include <filesystem>
 
 // INTERNAL INCLUDES
@@ -168,6 +169,8 @@ bool LoadEnvironmentMapData(const std::string& environmentMapUrl, Scene3D::Loade
       {
         environmentMapData.mPixelData[i][0] = GetCubeFace(pixelBuffer, i, cubeType, faceWidth, faceHeight);
       }
+      uint32_t mipmap = static_cast<uint32_t>(1 + std::floor(std::log2(std::max(environmentMapData.mPixelData[0][0].GetWidth(), environmentMapData.mPixelData[0][0].GetHeight()))));
+      environmentMapData.SetMipmapLevels(mipmap);
       environmentMapData.SetEnvironmentMapType(Scene3D::EnvironmentMapType::CUBEMAP);
     }
     else
@@ -193,7 +196,9 @@ bool LoadEnvironmentMap(const std::string& environmentMapUrl, EnvironmentMapData
   std::string           extension = modelPath.extension();
   std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
-  return (extension == KTX_EXTENSION) ? Dali::Scene3D::Loader::LoadKtxData(environmentMapUrl, environmentMapData) : LoadEnvironmentMapData(environmentMapUrl, environmentMapData);
+  bool successed = (extension == KTX_EXTENSION) ? Dali::Scene3D::Loader::LoadKtxData(environmentMapUrl, environmentMapData) : LoadEnvironmentMapData(environmentMapUrl, environmentMapData);
+
+  return successed;
 }
 
 } // namespace Loader

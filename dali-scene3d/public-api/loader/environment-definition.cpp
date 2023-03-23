@@ -91,7 +91,8 @@ EnvironmentDefinition::Textures EnvironmentDefinition::Load(RawData&& raw) const
   // This texture should have 6 faces and 6 mipmaps
   if(!raw.mSpecular.mPixelData.empty())
   {
-    textures.mSpecular = raw.mSpecular.GetTexture();
+    textures.mSpecular             = raw.mSpecular.GetTexture();
+    textures.mSpecularMipmapLevels = raw.mSpecular.GetMipmapLevels();
   }
 
   if(raw.mBrdf)
