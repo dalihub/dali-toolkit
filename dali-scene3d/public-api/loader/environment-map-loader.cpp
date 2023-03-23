@@ -169,8 +169,6 @@ bool LoadEnvironmentMapData(const std::string& environmentMapUrl, Scene3D::Loade
       {
         environmentMapData.mPixelData[i][0] = GetCubeFace(pixelBuffer, i, cubeType, faceWidth, faceHeight);
       }
-      uint32_t mipmap = static_cast<uint32_t>(1 + std::floor(std::log2(std::max(environmentMapData.mPixelData[0][0].GetWidth(), environmentMapData.mPixelData[0][0].GetHeight()))));
-      environmentMapData.SetMipmapLevels(mipmap);
       environmentMapData.SetEnvironmentMapType(Scene3D::EnvironmentMapType::CUBEMAP);
     }
     else
@@ -179,6 +177,18 @@ bool LoadEnvironmentMapData(const std::string& environmentMapUrl, Scene3D::Loade
       environmentMapData.mPixelData[0].resize(1);
       environmentMapData.mPixelData[0][0] = Devel::PixelBuffer::Convert(pixelBuffer);
       environmentMapData.SetEnvironmentMapType(Scene3D::EnvironmentMapType::EQUIRECTANGULAR);
+    }
+
+    if(!environmentMapData.mPixelData.empty() && !environmentMapData.mPixelData[0].empty() && environmentMapData.mPixelData[0][0])
+    {
+      const uint32_t pixelDataWidth  = environmentMapData.mPixelData[0][0].GetWidth();
+      const uint32_t pixelDataHeight = environmentMapData.mPixelData[0][0].GetHeight();
+
+      if(pixelDataWidth > 0u && pixelDataHeight > 0u)
+      {
+        uint32_t mipmap = static_cast<uint32_t>(1 + std::floor(std::log2(std::min(pixelDataWidth, pixelDataHeight))));
+        environmentMapData.SetMipmapLevels(mipmap);
+      }
     }
     return true;
   }

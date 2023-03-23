@@ -189,7 +189,7 @@ void main()
   mediump vec3 v = normalize(vPositionToCamera); // Vector from surface point to camera
   mediump float NdotV = clamp(abs(dot(n, v)), 0.001, 1.0);
   mediump vec3 reflection = -normalize(reflect(v, n));
-  lowp vec3 brdf = linear(texture(sbrdfLUT, vec2(NdotV, 1.0 - perceptualRoughness)).rgb);
+  lowp vec3 brdf = texture(sbrdfLUT, vec2(NdotV, 1.0 - perceptualRoughness)).rgb;
   vec3 Fr = max(vec3(1.0 - perceptualRoughness), f0) - f0;
   vec3 k_S = f0 + Fr * pow(1.0 - NdotV, 5.0);
   vec3 FssEss = specularWeight * (k_S * brdf.x + brdf.y);

@@ -46,18 +46,18 @@ Texture EnvironmentMapData::GetTexture()
           mEnvironmentMapTexture.Upload(side[iMipLevel], CubeMapLayer::POSITIVE_X + iSide, iMipLevel, 0u, 0u, side[iMipLevel].GetWidth(), side[iMipLevel].GetHeight());
         }
       }
-
-      // If mipmap is not defined explicitly, use GenerateMipmaps.
-      // TODO: Maybe we can use better way to know it already has mipmap or not.
-      if(mPixelData.size() > 0u && mPixelData[0].size() == 1u)
-      {
-        mEnvironmentMapTexture.GenerateMipmaps();
-      }
     }
     else
     {
       mEnvironmentMapTexture = Texture::New(TextureType::TEXTURE_2D, mPixelData[0][0].GetPixelFormat(), mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
       mEnvironmentMapTexture.Upload(mPixelData[0][0], 0, 0, 0, 0, mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
+    }
+
+    // If mipmap is not defined explicitly, use GenerateMipmaps.
+    // TODO: Maybe we can use better way to know it already has mipmap or not.
+    if(mPixelData.size() > 0u && mPixelData[0].size() == 1u)
+    {
+      mEnvironmentMapTexture.GenerateMipmaps();
     }
   }
   return mEnvironmentMapTexture;
