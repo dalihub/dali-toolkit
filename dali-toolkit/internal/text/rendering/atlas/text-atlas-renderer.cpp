@@ -205,7 +205,7 @@ struct AtlasRenderer::Impl
       if(!isOutline || (isOutline && !isColorGlyph))
       {
         // Retrieve the emoji's bitmap.
-        TextAbstraction::FontClient::GlyphBufferData glyphBufferData;
+        TextAbstraction::GlyphBufferData glyphBufferData;
         glyphBufferData.width  = isColorGlyph ? glyph.width : 0; // Desired width and height.
         glyphBufferData.height = isColorGlyph ? glyph.height : 0;
 
@@ -218,12 +218,12 @@ struct AtlasRenderer::Impl
 
         uint32_t glyphBufferSize = glyphBufferData.width * glyphBufferData.height * Pixel::GetBytesPerPixel(glyphBufferData.format);
         // If glyph buffer data don't have ownership, Or if we need to decompress, create new memory and replace ownership.
-        if(!glyphBufferData.isBufferOwned || glyphBufferData.compressionType != TextAbstraction::FontClient::GlyphBufferData::CompressionType::NO_COMPRESSION)
+        if(!glyphBufferData.isBufferOwned || glyphBufferData.compressionType != TextAbstraction::GlyphBufferData::CompressionType::NO_COMPRESSION)
         {
           uint8_t* newBuffer = (uint8_t*)malloc(glyphBufferSize);
           if(DALI_LIKELY(newBuffer != nullptr))
           {
-            TextAbstraction::FontClient::GlyphBufferData::Decompress(glyphBufferData, newBuffer);
+            TextAbstraction::GlyphBufferData::Decompress(glyphBufferData, newBuffer);
             if(glyphBufferData.isBufferOwned)
             {
               // Release previous buffer
@@ -231,7 +231,7 @@ struct AtlasRenderer::Impl
             }
             glyphBufferData.isBufferOwned   = true;
             glyphBufferData.buffer          = newBuffer;
-            glyphBufferData.compressionType = TextAbstraction::FontClient::GlyphBufferData::CompressionType::NO_COMPRESSION;
+            glyphBufferData.compressionType = TextAbstraction::GlyphBufferData::CompressionType::NO_COMPRESSION;
           }
         }
 
