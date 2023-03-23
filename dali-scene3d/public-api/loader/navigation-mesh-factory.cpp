@@ -31,41 +31,48 @@ std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile
   std::vector<uint8_t> buffer;
 
   Dali::FileStream fileStream(filename, Dali::FileStream::READ | Dali::FileStream::BINARY);
-  auto fin = fileStream.GetFile();
+  auto             fin = fileStream.GetFile();
 
-  if(!fin)
+  if(DALI_UNLIKELY(!fin))
   {
-    DALI_LOG_ERROR("NavigationMesh: Can't open %s for reading: %s", filename.c_str(), strerror(errno));
+    const int bufferLength = 128;
+    char      buffer[bufferLength];
+
+    // Return type of stderror_r is different between system type. We should not use return value.
+    [[maybe_unused]] auto ret = strerror_r(errno, buffer, bufferLength - 1);
+
+    DALI_LOG_ERROR("NavigationMesh: Can't open %s for reading: %s", filename.c_str(), buffer);
     return nullptr;
   }
-  else
+
+  if(DALI_UNLIKELY(fseek(fin, 0, SEEK_END)))
   {
-    if(fseek(fin, 0, SEEK_END))
-    {
-      return {};
-    }
-
-    auto size = ftell(fin);
-    if(size < 0)
-    {
-      return {};
-    }
-
-    auto fileSize = size_t(size);
-    if(fseek(fin, 0, SEEK_SET))
-    {
-      return {};
-    }
-
-    buffer.resize(size);
-    auto count = fread(buffer.data(), 1, fileSize, fin);
-    if(count != fileSize)
-    {
-      DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
-      return nullptr;
-    }
-    return CreateFromBuffer(buffer);
+    DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
+    return nullptr;
   }
+
+  auto size = ftell(fin);
+  if(DALI_UNLIKELY(size < 0))
+  {
+    DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
+    return nullptr;
+  }
+
+  auto fileSize = size_t(size);
+  if(DALI_UNLIKELY(fseek(fin, 0, SEEK_SET)))
+  {
+    DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
+    return nullptr;
+  }
+
+  buffer.resize(size);
+  auto count = fread(buffer.data(), 1, fileSize, fin);
+  if(DALI_UNLIKELY(count != fileSize))
+  {
+    DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
+    return nullptr;
+  }
+  return CreateFromBuffer(buffer);
 }
 
 std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromBuffer(const std::vector<uint8_t>& buffer)
