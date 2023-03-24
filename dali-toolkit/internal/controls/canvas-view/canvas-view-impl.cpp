@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,6 +204,8 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
       mTextureSet.SetTexture(0, rasterizedTexture);
     }
   }
+
+  mRasterizingTask.Reset(); // We don't need it anymore
 
   //If there are accumulated changes to CanvasRenderer during Rasterize, Rasterize once again.
   if(mCanvasRenderer && mCanvasRenderer.IsCanvasChanged())
