@@ -1672,6 +1672,13 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
       }
     }
 
+    if(auto proc = params.input->mAnimationPropertyProcessor) // optional processing
+    {
+      Property::Map map;
+      ParseProperties(tnAnim, map);
+      proc(animDef, std::move(map), mOnError);
+    }
+
     if(overwrite)
     {
       *iFind = std::move(animDef);
@@ -1679,13 +1686,6 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
     else
     {
       iFind = definitions.insert(iFind, std::move(animDef));
-    }
-
-    if(auto proc = params.input->mAnimationPropertyProcessor) // optional processing
-    {
-      Property::Map map;
-      ParseProperties(tnAnim, map);
-      proc(animDef, std::move(map), mOnError);
     }
   }
 }
