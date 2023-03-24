@@ -40,11 +40,11 @@ ItemView::ItemView(Dali::Internal::CustomActor* internal)
 
 ItemView::ItemView(const ItemView& itemView) = default;
 
-ItemView::ItemView(ItemView&& rhs) = default;
+ItemView::ItemView(ItemView&& rhs) noexcept = default;
 
 ItemView& ItemView::operator=(const ItemView& itemView) = default;
 
-ItemView& ItemView::operator=(ItemView&& rhs) = default;
+ItemView& ItemView::operator=(ItemView&& rhs) noexcept = default;
 
 ItemView ItemView::New(ItemFactory& factory)
 {

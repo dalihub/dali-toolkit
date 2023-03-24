@@ -57,9 +57,9 @@ ScaleTransition::ScaleTransition(const ScaleTransition& handle) = default;
 
 ScaleTransition& ScaleTransition::operator=(const ScaleTransition& rhs) = default;
 
-ScaleTransition::ScaleTransition(ScaleTransition&& rhs) = default;
+ScaleTransition::ScaleTransition(ScaleTransition&& rhs) noexcept = default;
 
-ScaleTransition& ScaleTransition::operator=(ScaleTransition&& rhs) = default;
+ScaleTransition& ScaleTransition::operator=(ScaleTransition&& rhs) noexcept = default;
 
 void ScaleTransition::SetScaleFactor(const Vector2& scaleFactor)
 {

@@ -39,11 +39,11 @@ RadioButton::RadioButton(Internal::RadioButton& implementation)
 
 RadioButton::RadioButton(const RadioButton& radioButton) = default;
 
-RadioButton::RadioButton(RadioButton&& rhs) = default;
+RadioButton::RadioButton(RadioButton&& rhs) noexcept = default;
 
 RadioButton& RadioButton::operator=(const RadioButton& radioButton) = default;
 
-RadioButton& RadioButton::operator=(RadioButton&& rhs) = default;
+RadioButton& RadioButton::operator=(RadioButton&& rhs) noexcept = default;
 
 RadioButton::RadioButton(Dali::Internal::CustomActor* internal)
 : Button(internal)

@@ -41,11 +41,11 @@ TextField::TextField()
 
 TextField::TextField(const TextField& handle) = default;
 
-TextField::TextField(TextField&& rhs) = default;
+TextField::TextField(TextField&& rhs) noexcept = default;
 
 TextField& TextField::operator=(const TextField& handle) = default;
 
-TextField& TextField::operator=(TextField&& rhs) = default;
+TextField& TextField::operator=(TextField&& rhs) noexcept = default;
 
 TextField::~TextField()
 {

@@ -50,9 +50,9 @@ TransitionBase::TransitionBase(const TransitionBase& handle) = default;
 
 TransitionBase& TransitionBase::operator=(const TransitionBase& rhs) = default;
 
-TransitionBase::TransitionBase(TransitionBase&& rhs) = default;
+TransitionBase::TransitionBase(TransitionBase&& rhs) noexcept = default;
 
-TransitionBase& TransitionBase::operator=(TransitionBase&& rhs) = default;
+TransitionBase& TransitionBase::operator=(TransitionBase&& rhs) noexcept = default;
 
 void TransitionBase::SetTimePeriod(TimePeriod timePeriod)
 {

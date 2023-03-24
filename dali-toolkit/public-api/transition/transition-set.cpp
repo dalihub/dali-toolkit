@@ -50,9 +50,9 @@ TransitionSet::TransitionSet(const TransitionSet& handle) = default;
 
 TransitionSet& TransitionSet::operator=(const TransitionSet& rhs) = default;
 
-TransitionSet::TransitionSet(TransitionSet&& rhs) = default;
+TransitionSet::TransitionSet(TransitionSet&& rhs) noexcept = default;
 
-TransitionSet& TransitionSet::operator=(TransitionSet&& rhs) = default;
+TransitionSet& TransitionSet::operator=(TransitionSet&& rhs) noexcept = default;
 
 void TransitionSet::AddTransition(TransitionBase transition)
 {

@@ -255,7 +255,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  VideoView(VideoView&& rhs);
+  VideoView(VideoView&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -273,7 +273,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  VideoView& operator=(VideoView&& rhs);
+  VideoView& operator=(VideoView&& rhs) noexcept;
 
   /**
    * @brief Downcasts a handle to VideoView handle.

@@ -41,11 +41,11 @@ Scrollable::Scrollable(Dali::Internal::CustomActor* internal)
 
 Scrollable::Scrollable(const Scrollable& handle) = default;
 
-Scrollable::Scrollable(Scrollable&& rhs) = default;
+Scrollable::Scrollable(Scrollable&& rhs) noexcept = default;
 
 Scrollable& Scrollable::operator=(const Scrollable& handle) = default;
 
-Scrollable& Scrollable::operator=(Scrollable&& rhs) = default;
+Scrollable& Scrollable::operator=(Scrollable&& rhs) noexcept = default;
 
 Scrollable::~Scrollable()
 {

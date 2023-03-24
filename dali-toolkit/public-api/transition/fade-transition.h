@@ -92,7 +92,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  FadeTransition(FadeTransition&& rhs);
+  FadeTransition(FadeTransition&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -100,7 +100,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  FadeTransition& operator=(FadeTransition&& rhs);
+  FadeTransition& operator=(FadeTransition&& rhs) noexcept;
 
 public: // Not intended for use by Application developers
   /// @cond internal

@@ -237,7 +237,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  ImageView(ImageView&& rhs);
+  ImageView(ImageView&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -255,7 +255,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  ImageView& operator=(ImageView&& rhs);
+  ImageView& operator=(ImageView&& rhs) noexcept;
 
   /**
    * @brief Downcasts a handle to ImageView handle.

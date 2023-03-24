@@ -35,11 +35,11 @@ VideoView::VideoView()
 
 VideoView::VideoView(const VideoView& videoView) = default;
 
-VideoView::VideoView(VideoView&& rhs) = default;
+VideoView::VideoView(VideoView&& rhs) noexcept = default;
 
 VideoView& VideoView::operator=(const VideoView& videoView) = default;
 
-VideoView& VideoView::operator=(VideoView&& rhs) = default;
+VideoView& VideoView::operator=(VideoView&& rhs) noexcept = default;
 
 VideoView::~VideoView()
 {

@@ -99,14 +99,14 @@ public:
    * @brief Move constructor.
    * @param[in] rhs A reference to the moved handle
    */
-  ImageUrl(ImageUrl&& rhs);
+  ImageUrl(ImageUrl&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  ImageUrl& operator=(ImageUrl&& rhs);
+  ImageUrl& operator=(ImageUrl&& rhs) noexcept;
 
   /**
    * Get the url

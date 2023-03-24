@@ -98,7 +98,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  Transition(Transition&& rhs);
+  Transition(Transition&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -106,7 +106,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Transition& operator=(Transition&& rhs);
+  Transition& operator=(Transition&& rhs) noexcept;
 
 public: // Not intended for use by Application developers
   /// @cond internal

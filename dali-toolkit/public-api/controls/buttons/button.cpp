@@ -37,11 +37,11 @@ Button::Button()
 
 Button::Button(const Button& button) = default;
 
-Button::Button(Button&& rhs) = default;
+Button::Button(Button&& rhs) noexcept = default;
 
 Button& Button::operator=(const Button& button) = default;
 
-Button& Button::operator=(Button&& rhs) = default;
+Button& Button::operator=(Button&& rhs) noexcept = default;
 
 Button::~Button()
 {

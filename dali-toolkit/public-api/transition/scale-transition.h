@@ -110,7 +110,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  ScaleTransition(ScaleTransition&& rhs);
+  ScaleTransition(ScaleTransition&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -118,7 +118,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  ScaleTransition& operator=(ScaleTransition&& rhs);
+  ScaleTransition& operator=(ScaleTransition&& rhs) noexcept;
 
   /**
    * @brief Sets scaleFactor to be used to scale target Control

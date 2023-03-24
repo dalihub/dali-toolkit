@@ -130,7 +130,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  AsyncImageLoader(AsyncImageLoader&& rhs);
+  AsyncImageLoader(AsyncImageLoader&& rhs) noexcept;
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -147,7 +147,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  AsyncImageLoader& operator=(AsyncImageLoader&& rhs);
+  AsyncImageLoader& operator=(AsyncImageLoader&& rhs) noexcept;
 
   /**
    * @brief Creates a new loader to load the image asynchronously in a worker thread.

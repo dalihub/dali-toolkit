@@ -541,7 +541,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  TextEditor(TextEditor&& rhs);
+  TextEditor(TextEditor&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -559,7 +559,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  TextEditor& operator=(TextEditor&& rhs);
+  TextEditor& operator=(TextEditor&& rhs) noexcept;
 
   /**
    * @brief Destructor.

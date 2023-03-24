@@ -125,7 +125,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  Scrollable(Scrollable&& rhs);
+  Scrollable(Scrollable&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -144,7 +144,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  Scrollable& operator=(Scrollable&& rhs);
+  Scrollable& operator=(Scrollable&& rhs) noexcept;
 
   /**
    * @brief Destructor.

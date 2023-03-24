@@ -31,11 +31,11 @@ CameraView::CameraView()
 
 CameraView::CameraView(const CameraView& cameraView) = default;
 
-CameraView::CameraView(CameraView&& rhs) = default;
+CameraView::CameraView(CameraView&& rhs) noexcept = default;
 
 CameraView& CameraView::operator=(const CameraView& cameraView) = default;
 
-CameraView& CameraView::operator=(CameraView&& rhs) = default;
+CameraView& CameraView::operator=(CameraView&& rhs) noexcept = default;
 
 CameraView::~CameraView()
 {

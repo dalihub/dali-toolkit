@@ -99,7 +99,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  CheckBoxButton(CheckBoxButton&& rhs);
+  CheckBoxButton(CheckBoxButton&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -116,7 +116,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  CheckBoxButton& operator=(CheckBoxButton&& rhs);
+  CheckBoxButton& operator=(CheckBoxButton&& rhs) noexcept;
 
   /**
    * @brief Destructor.

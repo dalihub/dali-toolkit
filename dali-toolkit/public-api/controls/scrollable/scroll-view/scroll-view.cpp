@@ -298,11 +298,11 @@ ScrollView::ScrollView(Dali::Internal::CustomActor* internal)
 
 ScrollView::ScrollView(const ScrollView& handle) = default;
 
-ScrollView::ScrollView(ScrollView&& rhs) = default;
+ScrollView::ScrollView(ScrollView&& rhs) noexcept = default;
 
 ScrollView& ScrollView::operator=(const ScrollView& handle) = default;
 
-ScrollView& ScrollView::operator=(ScrollView&& rhs) = default;
+ScrollView& ScrollView::operator=(ScrollView&& rhs) noexcept = default;
 
 ScrollView ScrollView::New()
 {

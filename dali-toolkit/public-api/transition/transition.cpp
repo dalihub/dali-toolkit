@@ -50,9 +50,9 @@ Transition::Transition(const Transition& handle) = default;
 
 Transition& Transition::operator=(const Transition& rhs) = default;
 
-Transition::Transition(Transition&& rhs) = default;
+Transition::Transition(Transition&& rhs) noexcept = default;
 
-Transition& Transition::operator=(Transition&& rhs) = default;
+Transition& Transition::operator=(Transition&& rhs) noexcept = default;
 
 } // namespace Toolkit
 

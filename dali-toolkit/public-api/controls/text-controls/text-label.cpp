@@ -57,11 +57,11 @@ TextLabel::TextLabel()
 
 TextLabel::TextLabel(const TextLabel& handle) = default;
 
-TextLabel::TextLabel(TextLabel&& rhs) = default;
+TextLabel::TextLabel(TextLabel&& rhs) noexcept = default;
 
 TextLabel& TextLabel::operator=(const TextLabel& handle) = default;
 
-TextLabel& TextLabel::operator=(TextLabel&& rhs) = default;
+TextLabel& TextLabel::operator=(TextLabel&& rhs) noexcept = default;
 
 TextLabel::~TextLabel()
 {
