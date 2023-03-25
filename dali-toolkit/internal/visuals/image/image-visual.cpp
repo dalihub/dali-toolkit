@@ -1000,7 +1000,7 @@ void ImageVisual::RemoveTexture()
 {
   if(mTextureId != TextureManager::INVALID_TEXTURE_ID)
   {
-    mFactoryCache.GetTextureManager().Remove(mTextureId, this);
+    mFactoryCache.GetTextureManager().RequestRemove(mTextureId, this);
     mTextureId = TextureManager::INVALID_TEXTURE_ID;
   }
   else

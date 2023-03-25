@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "npatch-visual.h"
+#include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
@@ -246,7 +246,7 @@ void NPatchVisual::DoSetOffScene(Actor& actor)
     if(mAuxiliaryTextureId != TextureManager::INVALID_TEXTURE_ID)
     {
       TextureManager& textureManager = mFactoryCache.GetTextureManager();
-      textureManager.Remove(mAuxiliaryTextureId, this);
+      textureManager.RequestRemove(mAuxiliaryTextureId, this);
       mAuxiliaryTextureId      = TextureManager::INVALID_TEXTURE_ID;
       mAuxiliaryResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
       mAuxiliaryTextureSet.Reset();
@@ -325,7 +325,8 @@ NPatchVisual::~NPatchVisual()
       if(mAuxiliaryTextureId != TextureManager::INVALID_TEXTURE_ID)
       {
         TextureManager& textureManager = mFactoryCache.GetTextureManager();
-        textureManager.Remove(mAuxiliaryTextureId, this);
+
+        textureManager.RequestRemove(mAuxiliaryTextureId, this);
         mAuxiliaryTextureId = TextureManager::INVALID_TEXTURE_ID;
         mAuxiliaryTextureSet.Reset();
       }
@@ -414,8 +415,8 @@ Shader NPatchVisual::CreateShader()
 
   auto fragmentShader = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG
                                                                                            : SHADER_NPATCH_VISUAL_SHADER_FRAG;
-  auto shaderType = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
-                                                                                       : VisualFactoryCache::NINE_PATCH_SHADER;
+  auto shaderType     = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
+                                                                                           : VisualFactoryCache::NINE_PATCH_SHADER;
 
   // ask loader for the regions
   if(mLoader.GetNPatchData(mId, data))
