@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_MANAGER_TYPE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -234,18 +234,18 @@ struct TextureInfo
               const TextureId&                  maskTextureId,
               const VisualUrl&                  url,
               const Dali::ImageDimensions&      desiredSize,
-              const float&                      scaleFactor,
+              float                             scaleFactor,
               const Dali::FittingMode::Type&    fittingMode,
               const Dali::SamplingMode::Type&   samplingMode,
-              const bool&                       loadSynchronously,
-              const bool&                       cropToMask,
+              bool                              loadSynchronously,
+              bool                              cropToMask,
               const UseAtlas&                   useAtlas,
               const TextureHash&                hash,
-              const bool&                       orientationCorrection,
-              const bool&                       preMultiplyOnLoad,
+              bool                              orientationCorrection,
+              bool                              preMultiplyOnLoad,
               const Dali::AnimatedImageLoading& animatedImageLoading,
-              const std::uint32_t&              frameIndex,
-              const bool&                       loadYuvPlanes)
+              std::uint32_t                     frameIndex,
+              bool                              loadYuvPlanes)
   : url(url),
     desiredSize(desiredSize),
     useSize(desiredSize),
@@ -309,6 +309,27 @@ struct TextureInfo
   bool preMultiplied : 1;         ///< True if the image's color was multiplied by it's alpha
   bool isAnimatedImageFormat : 1; ///< true if the image is requested from animated image visual.
   bool loadYuvPlanes : 1;         ///< true if the image should be loaded as yuv planes
+};
+
+/**
+ * @brief This struct is used to manage the life-cycle of ExternalTexture url.
+ */
+struct ExternalTextureInfo
+{
+  ExternalTextureInfo(const TextureId&  textureId,
+                      const TextureSet& textureSet,
+                      bool              preMultiplied)
+  : textureId(textureId),
+    textureSet(textureSet),
+    referenceCount(1u),
+    preMultiplied(preMultiplied)
+  {
+  }
+
+  TextureId    textureId;         ///< The TextureId associated with this ExternalTexture
+  TextureSet   textureSet;        ///< The external texture
+  std::int16_t referenceCount;    ///< The reference count of clients using this ExternalTexture
+  bool         preMultiplied : 1; ///< True if the image's color was multiplied by it's alpha
 };
 
 } // namespace TextureManagerType

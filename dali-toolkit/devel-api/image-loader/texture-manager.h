@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_TEXTURE_MANAGER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,9 +39,10 @@ namespace TextureManager
  * @note this method does not check for duplicates,
  *       if same Texture is added multiple times, a different URL is returned each time
  * @param[in] texture the Texture to add
+ * @param[in] preMultiplied Whether this external texture preMultiplied or not. Default as false.
  * @return the Url string representing this texture
  */
-DALI_TOOLKIT_API std::string AddTexture(Texture& texture);
+DALI_TOOLKIT_API std::string AddTexture(Texture& texture, bool preMultiplied = false);
 
 /**
  * @brief Add a TextureSet to texture manager
@@ -49,9 +50,10 @@ DALI_TOOLKIT_API std::string AddTexture(Texture& texture);
  * @note this method does not check for duplicates,
  *       if same TextureSet is added multiple times, a different URL is returned each time
  * @param[in] textureSet the TextureSet to add
+ * @param[in] preMultiplied Whether this external texture preMultiplied or not. Default as false.
  * @return the Url string representing this texture
  */
-DALI_TOOLKIT_API std::string AddTexture(TextureSet& textureSet);
+DALI_TOOLKIT_API std::string AddTexture(TextureSet& textureSet, bool preMultiplied = false);
 
 /**
  * @brief Removes a TextureSet from toolkit

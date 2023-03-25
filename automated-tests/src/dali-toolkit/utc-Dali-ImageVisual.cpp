@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -424,6 +424,198 @@ int UtcDaliImageVisualRemoteImageLoad(void)
   END_TEST;
 }
 
+int UtcDaliImageVisualWithFrameBufferPreMultipliedAlpha01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Use FrameBuffer as url");
+
+  uint32_t width(64);
+  uint32_t height(64);
+  FrameBuffer frameBuffer = Dali::FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+
+  DALI_TEST_CHECK(frameBuffer);
+  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(frameBuffer, Pixel::Format::RGBA8888, width, height);
+  std::string url      = imageUrl.GetUrl();
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, url);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  Renderer renderer = actor.GetRendererAt(0);
+
+  // Check whether preMultipliedAlpha is true.
+  auto preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+  DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualWithFrameBufferPreMultipliedAlpha02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Use FrameBuffer as url");
+
+  uint32_t width(64);
+  uint32_t height(64);
+  FrameBuffer frameBuffer = Dali::FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+
+  DALI_TEST_CHECK(frameBuffer);
+
+  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+  frameBuffer.AttachColorTexture(texture);
+
+  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(frameBuffer, 0u);
+  std::string url      = imageUrl.GetUrl();
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, url);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  Renderer renderer = actor.GetRendererAt(0);
+
+  // Check whether preMultipliedAlpha is true.
+  auto preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+  DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualWithPixelData(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Use PixelData as url");
+
+  uint32_t width(64);
+  uint32_t height(64);
+  uint32_t bufferSize = width * height * Pixel::GetBytesPerPixel(Pixel::RGBA8888);
+
+  uint8_t*  buffer    = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
+
+  DALI_TEST_CHECK(pixelData);
+
+  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  std::string url      = imageUrl.GetUrl();
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, url);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  Renderer renderer = actor.GetRendererAt(0);
+
+  // Check whether preMultipliedAlpha is false.
+  auto preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+  DALI_TEST_EQUALS(preMultipliedAlpha, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualWithPixelDataPreMultipliedAlpha(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Use PixelData as url");
+
+  uint32_t width(64);
+  uint32_t height(64);
+  uint32_t bufferSize = width * height * Pixel::GetBytesPerPixel(Pixel::RGBA8888);
+
+  uint8_t*  buffer    = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
+
+  DALI_TEST_CHECK(pixelData);
+
+  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  std::string url      = imageUrl.GetUrl();
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, url);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  Renderer renderer = actor.GetRendererAt(0);
+
+  // Check whether preMultipliedAlpha is true.
+  auto preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+  DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliImageVisualWithNativeImage(void)
 {
   ToolkitTestApplication application;
@@ -453,6 +645,9 @@ int UtcDaliImageVisualWithNativeImage(void)
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
+  application.SendNotification();
+  application.Render(16);
+
   Renderer renderer = actor.GetRendererAt(0);
   Shader   shader   = renderer.GetShader();
 
@@ -466,6 +661,62 @@ int UtcDaliImageVisualWithNativeImage(void)
 
   DALI_TEST_EQUALS(pos != std::string::npos, true, TEST_LOCATION);
 
+  // Check whether preMultipliedAlpha is false.
+  auto preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+  DALI_TEST_EQUALS(preMultipliedAlpha, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualWithNativeImagePreMultipliedAlpha(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Use Native Image as url");
+
+  NativeImageSourcePtr nativeImageSource = NativeImageSource::New(500, 500, NativeImageSource::COLOR_DEPTH_DEFAULT);
+  ImageUrl             imageUrl          = Dali::Toolkit::Image::GenerateUrl(nativeImageSource, true);
+  std::string          url               = imageUrl.GetUrl();
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, url);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  Renderer renderer = actor.GetRendererAt(0);
+  Shader   shader   = renderer.GetShader();
+
+  Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
+  DALI_TEST_CHECK(value.GetType() == Property::MAP);
+  const Property::Map* outMap         = value.GetMap();
+  std::string          fragmentShader = (*outMap)["fragment"].Get<std::string>();
+
+  const char* fragmentPrefix = Dali::NativeImageSourceTest::GetCustomFragmentPrefix();
+  size_t      pos            = fragmentShader.find(fragmentPrefix);
+
+  DALI_TEST_EQUALS(pos != std::string::npos, true, TEST_LOCATION);
+
+  // Check whether preMultipliedAlpha is true.
+  auto preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+  DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -475,7 +726,7 @@ int UtcDaliImageVisualWithNativeImageCustomShader(void)
   tet_infoline("Use Native Image as url and Use custom shader");
 
   NativeImageSourcePtr nativeImageSource = NativeImageSource::New(500, 500, NativeImageSource::COLOR_DEPTH_DEFAULT);
-  ImageUrl             imageUrl          = Dali::Toolkit::Image::GenerateUrl(nativeImageSource);
+  ImageUrl             imageUrl          = Dali::Toolkit::Image::GenerateUrl(nativeImageSource, true);
   std::string          url               = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
@@ -530,6 +781,11 @@ int UtcDaliImageVisualWithNativeImageCustomShader(void)
   DALI_TEST_EQUALS(pos != std::string::npos, true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(std::string(fragmentPrefix) + customFragmentShaderSource, fragmentShaderSource, TEST_LOCATION);
+
+  // Check whether preMultipliedAlpha is false.
+  // Note : We dont use preMultiplied alpha when app developer using custom shader.
+  auto preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+  DALI_TEST_EQUALS(preMultipliedAlpha, false, TEST_LOCATION);
 
   END_TEST;
 }

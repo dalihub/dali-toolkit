@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,18 +66,20 @@ DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::FrameBuffer fra
  * This Url can be used in visuals to render the pixel data.
  * @note This method does not check for duplicates, If same pixel data is entered multiple times, a different URL is returned each time.
  * @param[in] pixelData the pixel data to converted to Url
+ * @param[in] preMultiplied Whether this pixel data preMultiplied or not. Default as false.
  * @return the ImageUrl representing this pixel data
  */
-DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixelData);
+DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixelData, bool preMultiplied = false);
 
 /**
  * @brief Generate a Url from native image source.
  * This Url can be used in visuals to render the native image source.
  * @note This method does not check for duplicates, If same native image source is entered multiple times, a different URL is returned each time.
  * @param[in] nativeImageSource the native image source to converted to Url
+ * @param[in] preMultiplied Whether this native image source preMultiplied or not. Default as false.
  * @return the ImageUrl representing this native image source
  */
-DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource);
+DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource, bool preMultiplied = false);
 
 /**
  * @brief Generate a Url from encoded image buffer.
