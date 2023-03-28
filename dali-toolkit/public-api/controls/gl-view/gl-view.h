@@ -189,7 +189,7 @@ public:
    *
    * @SINCE_2_0.45
    */
-  GlView(GlView&& rhs);
+  GlView(GlView&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -209,7 +209,7 @@ public:
    *
    * @SINCE_2_0.45
    */
-  GlView& operator=(GlView&& rhs);
+  GlView& operator=(GlView&& rhs) noexcept;
 
   /**
    * @brief Downcasts a handle to GlView handle.

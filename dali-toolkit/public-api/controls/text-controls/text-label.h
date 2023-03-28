@@ -420,7 +420,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  TextLabel(TextLabel&& rhs);
+  TextLabel(TextLabel&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -438,7 +438,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  TextLabel& operator=(TextLabel&& rhs);
+  TextLabel& operator=(TextLabel&& rhs) noexcept;
 
   /**
    * @brief Destructor.

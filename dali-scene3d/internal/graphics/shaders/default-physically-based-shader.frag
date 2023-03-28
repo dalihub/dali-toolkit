@@ -58,10 +58,10 @@ uniform sampler2D sOcclusion;
 uniform float uOcclusionStrength;
 #endif
 
-#ifdef EMISSIVE
+#ifdef EMISSIVE_TEXTURE
 uniform sampler2D sEmissive;
-uniform vec3 uEmissiveFactor;
 #endif
+uniform vec3 uEmissiveFactor;
 
 uniform float uSpecularFactor;
 uniform vec3  uSpecularColorFactor;
@@ -78,6 +78,7 @@ uniform samplerCube sDiffuseEnvSampler;
 uniform samplerCube sSpecularEnvSampler;
 uniform float uIblIntensity;
 uniform vec3 uYDirection;
+uniform float uMaxLOD;
 
 // For Alpha Mode.
 uniform lowp float uOpaque;
@@ -188,13 +189,15 @@ void main()
   mediump vec3 v = normalize(vPositionToCamera); // Vector from surface point to camera
   mediump float NdotV = clamp(abs(dot(n, v)), 0.001, 1.0);
   mediump vec3 reflection = -normalize(reflect(v, n));
-  lowp vec3 brdf = linear(texture(sbrdfLUT, vec2(NdotV, 1.0 - perceptualRoughness)).rgb);
+  lowp vec3 brdf = texture(sbrdfLUT, vec2(NdotV, 1.0 - perceptualRoughness)).rgb;
   vec3 Fr = max(vec3(1.0 - perceptualRoughness), f0) - f0;
   vec3 k_S = f0 + Fr * pow(1.0 - NdotV, 5.0);
   vec3 FssEss = specularWeight * (k_S * brdf.x + brdf.y);
 
   // Specular Light
-  lowp vec3 specularLight = linear(texture(sSpecularEnvSampler, reflection * uYDirection).rgb);
+  // uMaxLOD that means mipmap level of specular texture is used for bluring of reflection of specular following roughness.
+  float lod = perceptualRoughness * (uMaxLOD - 1.0);
+  lowp vec3 specularLight = linear(textureLod(sSpecularEnvSampler, reflection * uYDirection, lod).rgb);
   lowp vec3 specular = specularLight * FssEss;
 
   // Diffuse Light
@@ -213,10 +216,12 @@ void main()
   color = mix(color, color * ao, uOcclusionStrength);
 #endif // OCCLUSION
 
-#ifdef EMISSIVE
+#ifdef EMISSIVE_TEXTURE
   lowp vec3 emissive = linear(texture(sEmissive, vUV).rgb) * uEmissiveFactor;
+#else
+  lowp vec3 emissive = uEmissiveFactor;
+#endif // EMISSIVE_TEXTURE
   color += emissive;
-#endif // EMISSIVE
 
   FragColor = vec4(pow(color, vec3(1.0 / 2.2)), baseColor.a) * uColor;
 }

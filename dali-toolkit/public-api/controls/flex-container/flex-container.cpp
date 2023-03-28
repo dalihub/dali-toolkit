@@ -36,11 +36,11 @@ FlexContainer::FlexContainer()
 
 FlexContainer::FlexContainer(const FlexContainer& handle) = default;
 
-FlexContainer::FlexContainer(FlexContainer&& rhs) = default;
+FlexContainer::FlexContainer(FlexContainer&& rhs) noexcept = default;
 
 FlexContainer& FlexContainer::operator=(const FlexContainer& handle) = default;
 
-FlexContainer& FlexContainer::operator=(FlexContainer&& rhs) = default;
+FlexContainer& FlexContainer::operator=(FlexContainer&& rhs) noexcept = default;
 
 FlexContainer::~FlexContainer()
 {

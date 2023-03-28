@@ -36,9 +36,10 @@ struct DALI_SCENE3D_API EnvironmentDefinition
 {
   struct Textures
   {
-    Texture mDiffuse;  // irradiance
-    Texture mSpecular; // radiance
-    Texture mBrdf;     // pre-computed brdf
+    Texture  mDiffuse;  // irradiance
+    Texture  mSpecular; // radiance
+    Texture  mBrdf;     // pre-computed brdf
+    uint32_t mSpecularMipmapLevels{1u};
 
     bool IsLoaded() const
     {

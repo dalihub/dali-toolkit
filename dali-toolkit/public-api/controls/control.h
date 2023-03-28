@@ -228,7 +228,7 @@ public: // Creation & Destruction
    * @SINCE_1_9.23
    * @param[in] rhs Handle to move
    */
-  Control(Control&& rhs);
+  Control(Control&& rhs) noexcept;
 
   /**
    * @brief Dali::Control is intended as a base class.
@@ -256,7 +256,7 @@ public: // operators
    * @param[in] rhs Object to assign this to
    * @return Reference to this
    */
-  Control& operator=(Control&& rhs);
+  Control& operator=(Control&& rhs) noexcept;
 
 public:
   /**

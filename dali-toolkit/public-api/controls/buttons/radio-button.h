@@ -106,7 +106,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  RadioButton(RadioButton&& rhs);
+  RadioButton(RadioButton&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -123,7 +123,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  RadioButton& operator=(RadioButton&& rhs);
+  RadioButton& operator=(RadioButton&& rhs) noexcept;
 
   /**
    * @brief Destructor.

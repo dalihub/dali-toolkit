@@ -551,7 +551,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  TextField(TextField&& rhs);
+  TextField(TextField&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -569,7 +569,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  TextField& operator=(TextField&& rhs);
+  TextField& operator=(TextField&& rhs) noexcept;
 
   /**
    * @brief Destructor.

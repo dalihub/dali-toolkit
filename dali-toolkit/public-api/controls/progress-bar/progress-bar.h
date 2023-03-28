@@ -181,7 +181,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  ProgressBar(ProgressBar&& rhs);
+  ProgressBar(ProgressBar&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -200,7 +200,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  ProgressBar& operator=(ProgressBar&& rhs);
+  ProgressBar& operator=(ProgressBar&& rhs) noexcept;
 
   /**
    * @brief Destructor.

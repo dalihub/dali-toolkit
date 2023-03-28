@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,20 +52,22 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 
-#include <dali-toolkit/public-api/image-loader/async-image-loader.h>
-#include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
-
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
+
+#include <dali-toolkit/public-api/image-loader/async-image-loader.h>
+#include <dali-toolkit/public-api/image-loader/image-url.h>
+#include <dali-toolkit/public-api/image-loader/image.h>
+#include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
 #include <dali-toolkit/public-api/transition/fade-transition.h>
-#include <dali-toolkit/public-api/transition/slide-transition.h>
 #include <dali-toolkit/public-api/transition/scale-transition.h>
-#include <dali-toolkit/public-api/transition/transition.h>
+#include <dali-toolkit/public-api/transition/slide-transition.h>
 #include <dali-toolkit/public-api/transition/transition-set.h>
+#include <dali-toolkit/public-api/transition/transition.h>
 
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>

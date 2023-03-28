@@ -214,6 +214,7 @@ bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData
   header.numberOfArrayElements = std::max(header.numberOfArrayElements, 1u);
   header.pixelDepth            = std::max(header.pixelDepth, 1u);
   header.pixelHeight           = std::max(header.pixelHeight, 1u);
+  environmentMapData.SetMipmapLevels(header.numberOfMipmapLevels);
 
   environmentMapData.mPixelData.resize(header.numberOfFaces);
   for(uint32_t face = 0u; face < header.numberOfFaces; ++face)

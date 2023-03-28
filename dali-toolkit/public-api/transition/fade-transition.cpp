@@ -50,9 +50,9 @@ FadeTransition::FadeTransition(const FadeTransition& handle) = default;
 
 FadeTransition& FadeTransition::operator=(const FadeTransition& rhs) = default;
 
-FadeTransition::FadeTransition(FadeTransition&& rhs) = default;
+FadeTransition::FadeTransition(FadeTransition&& rhs) noexcept = default;
 
-FadeTransition& FadeTransition::operator=(FadeTransition&& rhs) = default;
+FadeTransition& FadeTransition::operator=(FadeTransition&& rhs) noexcept = default;
 
 } // namespace Toolkit
 

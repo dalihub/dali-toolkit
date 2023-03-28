@@ -40,11 +40,11 @@ PushButton::PushButton(Internal::PushButton& implementation)
 
 PushButton::PushButton(const PushButton& pushButton) = default;
 
-PushButton::PushButton(PushButton&& rhs) = default;
+PushButton::PushButton(PushButton&& rhs) noexcept = default;
 
 PushButton& PushButton::operator=(const PushButton& pushButton) = default;
 
-PushButton& PushButton::operator=(PushButton&& rhs) = default;
+PushButton& PushButton::operator=(PushButton&& rhs) noexcept = default;
 
 PushButton::PushButton(Dali::Internal::CustomActor* internal)
 : Button(internal)

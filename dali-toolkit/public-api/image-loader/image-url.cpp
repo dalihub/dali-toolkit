@@ -53,9 +53,9 @@ ImageUrl::ImageUrl(const ImageUrl& rhs) = default;
 
 ImageUrl& ImageUrl::operator=(const ImageUrl& url) = default;
 
-ImageUrl::ImageUrl(ImageUrl&& rhs) = default;
+ImageUrl::ImageUrl(ImageUrl&& rhs) noexcept = default;
 
-ImageUrl& ImageUrl::operator=(ImageUrl&& rhs) = default;
+ImageUrl& ImageUrl::operator=(ImageUrl&& rhs) noexcept = default;
 
 const std::string& ImageUrl::GetUrl() const
 {

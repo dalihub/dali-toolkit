@@ -202,7 +202,7 @@ public:
   {
     return true;
   }
-  void CreateBitmap(FontId fontId, GlyphIndex glyphIndex, bool softwareItailc, bool softwareBold, Dali::TextAbstraction::FontClient::GlyphBufferData& data, int outlineWidth)
+  void CreateBitmap(FontId fontId, GlyphIndex glyphIndex, bool softwareItailc, bool softwareBold, Dali::TextAbstraction::GlyphBufferData& data, int outlineWidth)
   {
   }
   PixelData CreateBitmap(FontId fontId, GlyphIndex glyphIndex, int outlineWidth)
@@ -406,11 +406,11 @@ FontClient::FontClient(const FontClient& handle)
 {
 }
 
-FontClient::GlyphBufferData::GlyphBufferData()
+GlyphBufferData::GlyphBufferData()
 {
 }
 
-FontClient::GlyphBufferData::~GlyphBufferData()
+GlyphBufferData::~GlyphBufferData()
 {
 }
 
@@ -520,7 +520,7 @@ bool FontClient::GetGlyphMetrics(GlyphInfo* array, uint32_t size, GlyphType type
   return GetImplementation(*this).GetGlyphMetrics(array, size, horizontal);
 }
 
-void FontClient::CreateBitmap(FontId fontId, GlyphIndex glyphIndex, bool softwareItailc, bool softwareBold, Dali::TextAbstraction::FontClient::GlyphBufferData& data, int outlineWidth)
+void FontClient::CreateBitmap(FontId fontId, GlyphIndex glyphIndex, bool softwareItailc, bool softwareBold, Dali::TextAbstraction::GlyphBufferData& data, int outlineWidth)
 {
   GetImplementation(*this).CreateBitmap(fontId, glyphIndex, softwareItailc, softwareBold, data, outlineWidth);
 }

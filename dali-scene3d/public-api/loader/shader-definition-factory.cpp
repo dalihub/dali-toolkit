@@ -291,7 +291,7 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
 
     if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
     {
-      shaderDef.mDefines.push_back("EMISSIVE");
+      shaderDef.mDefines.push_back("EMISSIVE_TEXTURE");
     }
 
     if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
@@ -363,7 +363,6 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
       }
     }
 
-    shaderDef.mUniforms["uMaxLOD"]     = 6.f;
     shaderDef.mUniforms["uCubeMatrix"] = Matrix::IDENTITY;
 
     Index result    = resources.mShaders.size();

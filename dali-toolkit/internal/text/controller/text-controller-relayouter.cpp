@@ -242,7 +242,7 @@ bool Controller::Relayouter::CheckForTextFit(Controller& controller, float point
   textUpdateInfo.Clear();
   textUpdateInfo.mClearAll = true;
 
-  if(textSize.width >= layoutSize.width || textSize.height >= layoutSize.height)
+  if(textSize.width > layoutSize.width || textSize.height > layoutSize.height)
   {
     return false;
   }

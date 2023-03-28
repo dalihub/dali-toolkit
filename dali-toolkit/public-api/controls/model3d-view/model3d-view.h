@@ -143,7 +143,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  Model3dView(Model3dView&& rhs);
+  Model3dView(Model3dView&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -160,7 +160,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  Model3dView& operator=(Model3dView&& rhs);
+  Model3dView& operator=(Model3dView&& rhs) noexcept;
 
   /**
    * @brief Downcasts an Object handle to Model3dView.

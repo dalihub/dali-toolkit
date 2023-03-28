@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <string.h>
+#include <cmath>
 #include <filesystem>
 
 // INTERNAL INCLUDES
@@ -177,6 +178,18 @@ bool LoadEnvironmentMapData(const std::string& environmentMapUrl, Scene3D::Loade
       environmentMapData.mPixelData[0][0] = Devel::PixelBuffer::Convert(pixelBuffer);
       environmentMapData.SetEnvironmentMapType(Scene3D::EnvironmentMapType::EQUIRECTANGULAR);
     }
+
+    if(!environmentMapData.mPixelData.empty() && !environmentMapData.mPixelData[0].empty() && environmentMapData.mPixelData[0][0])
+    {
+      const uint32_t pixelDataWidth  = environmentMapData.mPixelData[0][0].GetWidth();
+      const uint32_t pixelDataHeight = environmentMapData.mPixelData[0][0].GetHeight();
+
+      if(pixelDataWidth > 0u && pixelDataHeight > 0u)
+      {
+        uint32_t mipmap = static_cast<uint32_t>(1 + std::floor(std::log2(std::min(pixelDataWidth, pixelDataHeight))));
+        environmentMapData.SetMipmapLevels(mipmap);
+      }
+    }
     return true;
   }
   return false;
@@ -193,7 +206,9 @@ bool LoadEnvironmentMap(const std::string& environmentMapUrl, EnvironmentMapData
   std::string           extension = modelPath.extension();
   std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
-  return (extension == KTX_EXTENSION) ? Dali::Scene3D::Loader::LoadKtxData(environmentMapUrl, environmentMapData) : LoadEnvironmentMapData(environmentMapUrl, environmentMapData);
+  bool successed = (extension == KTX_EXTENSION) ? Dali::Scene3D::Loader::LoadKtxData(environmentMapUrl, environmentMapData) : LoadEnvironmentMapData(environmentMapUrl, environmentMapData);
+
+  return successed;
 }
 
 } // namespace Loader

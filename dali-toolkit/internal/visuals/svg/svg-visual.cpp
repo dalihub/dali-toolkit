@@ -109,7 +109,11 @@ void SvgVisual::OnInitialize()
   if(IsSynchronousLoadingRequired() && mImageUrl.IsLocalResource())
   {
     mLoadingTask->Process();
-    mLoadingTask.Reset(); // We don't need it now
+    if(!mLoadingTask->HasSucceeded())
+    {
+      mLoadFailed = true;
+    }
+    mLoadingTask.Reset(); // We don't need it anymore.
   }
   else
   {
@@ -319,7 +323,7 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
     {
       mRasterizingTask->Process();
       ApplyRasterizedImage(mRasterizingTask);
-      mRasterizingTask.Reset(); // We don't need it now
+      mRasterizingTask.Reset(); // We don't need it anymore.
     }
     else
     {
@@ -420,6 +424,16 @@ void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
     }
 
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+  }
+
+  // We don't need to keep tasks anymore. reset now.
+  if(task == mLoadingTask)
+  {
+    mLoadingTask.Reset();
+  }
+  if(task == mRasterizingTask)
+  {
+    mRasterizingTask.Reset();
   }
 }
 

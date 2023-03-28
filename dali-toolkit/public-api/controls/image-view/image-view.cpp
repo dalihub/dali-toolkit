@@ -35,11 +35,11 @@ ImageView::ImageView()
 
 ImageView::ImageView(const ImageView& imageView) = default;
 
-ImageView::ImageView(ImageView&& rhs) = default;
+ImageView::ImageView(ImageView&& rhs) noexcept = default;
 
 ImageView& ImageView::operator=(const ImageView& imageView) = default;
 
-ImageView& ImageView::operator=(ImageView&& rhs) = default;
+ImageView& ImageView::operator=(ImageView&& rhs) noexcept = default;
 
 ImageView::~ImageView()
 {

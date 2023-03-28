@@ -103,7 +103,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  TransitionSet(TransitionSet&& rhs);
+  TransitionSet(TransitionSet&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -111,7 +111,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  TransitionSet& operator=(TransitionSet&& rhs);
+  TransitionSet& operator=(TransitionSet&& rhs) noexcept;
 
   /**
    * @brief Add a TransitionBase on this TransitionSet.

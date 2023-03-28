@@ -106,7 +106,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  SlideTransition(SlideTransition&& rhs);
+  SlideTransition(SlideTransition&& rhs) noexcept;
 
   /**
    * @brief Move assignment operator.
@@ -114,7 +114,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  SlideTransition& operator=(SlideTransition&& rhs);
+  SlideTransition& operator=(SlideTransition&& rhs) noexcept;
 
   /**
    * @brief Sets direction to be used to move target Control
