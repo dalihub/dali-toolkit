@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,8 @@ int UtcDaliTextureManagerAddRemoveP(void)
   std::string url2;
   std::string url3;
   std::string url4;
+  std::string url5;
+  std::string url6;
   // scope to ensure texturesets are kept alive by texture manager
   {
     auto texture = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, 88, 99);
@@ -71,6 +73,23 @@ int UtcDaliTextureManagerAddRemoveP(void)
     DALI_TEST_CHECK(url4 != url);
     DALI_TEST_CHECK(url4 != url2);
     DALI_TEST_CHECK(url4 != url3);
+
+    // add same texture again with preMultiplied, should give new Url
+    url5 = TextureManager::AddTexture(texture, true);
+    DALI_TEST_CHECK(url5.size() > 0u);
+    DALI_TEST_CHECK(url5 != url);
+    DALI_TEST_CHECK(url5 != url2);
+    DALI_TEST_CHECK(url5 != url3);
+    DALI_TEST_CHECK(url5 != url4);
+
+    textureSet = TextureSet::New();
+    url6       = TextureManager::AddTexture(textureSet, true);
+    DALI_TEST_CHECK(url6.size() > 0u);
+    DALI_TEST_CHECK(url6 != url);
+    DALI_TEST_CHECK(url6 != url2);
+    DALI_TEST_CHECK(url6 != url3);
+    DALI_TEST_CHECK(url6 != url4);
+    DALI_TEST_CHECK(url6 != url5);
   }
 
   auto textureSet = TextureManager::RemoveTexture(url);
@@ -100,6 +119,16 @@ int UtcDaliTextureManagerAddRemoveP(void)
   textureSet = TextureManager::RemoveTexture(url4);
   DALI_TEST_CHECK(textureSet && "Texture needs to be non empty handle");
   textureSet = TextureManager::RemoveTexture(url4);
+  DALI_TEST_CHECK(!textureSet && "Texture needs to be removed from texture manager");
+
+  textureSet = TextureManager::RemoveTexture(url5);
+  DALI_TEST_CHECK(textureSet && "Texture needs to be non empty handle");
+  textureSet = TextureManager::RemoveTexture(url5);
+  DALI_TEST_CHECK(!textureSet && "Texture needs to be removed from texture manager");
+
+  textureSet = TextureManager::RemoveTexture(url6);
+  DALI_TEST_CHECK(textureSet && "Texture needs to be non empty handle");
+  textureSet = TextureManager::RemoveTexture(url6);
   DALI_TEST_CHECK(!textureSet && "Texture needs to be removed from texture manager");
 
   END_TEST;

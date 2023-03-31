@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 using namespace Dali;
 using namespace Dali::Toolkit;
 
-int UtcImageUrlConstructor(void)
+int UtcImageUrlConstructor01(void)
 {
   ToolkitTestApplication application;
 
@@ -37,6 +37,33 @@ int UtcImageUrlConstructor(void)
   // Test object creation
   Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u); // test texture
   imageUrl      = ImageUrl::New(image);
+  DALI_TEST_CHECK(imageUrl);
+
+  // Test copy constructor
+  ImageUrl ImageUrlCopy(imageUrl);
+  DALI_TEST_CHECK(ImageUrlCopy);
+
+  // Test down cast
+  BaseHandle baseUrl;
+  baseUrl              = imageUrl;
+  ImageUrl downcastUrl = ImageUrl::DownCast(baseUrl);
+  DALI_TEST_CHECK(downcastUrl);
+  END_TEST;
+}
+
+int UtcImageUrlConstructor02(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcImageUrlValid ");
+
+  // Test default constructor.
+  ImageUrl imageUrl;
+  DALI_TEST_CHECK(!imageUrl);
+
+  // Test object creation
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u); // test texture
+  imageUrl      = ImageUrl::New(image, true);
   DALI_TEST_CHECK(imageUrl);
 
   // Test copy constructor

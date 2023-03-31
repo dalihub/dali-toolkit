@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_URL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public:
   /**
    * @brief Constructor.
    */
-  ImageUrl(Texture& texture);
+  ImageUrl(Texture& texture, bool preMultiplied);
 
   /**
    * @brief Constructor.
@@ -51,7 +51,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::ImageUrl::New
    */
-  static ImageUrlPtr New(Texture& texture);
+  static ImageUrlPtr New(Texture& texture, bool preMultiplied);
 
   /**
    * @copydoc Dali::Toolkit::ImageUrl::New

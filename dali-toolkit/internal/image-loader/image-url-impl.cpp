@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,9 @@ namespace Toolkit
 {
 namespace Internal
 {
-ImageUrl::ImageUrl(Texture& texture)
+ImageUrl::ImageUrl(Texture& texture, bool preMultiplied)
 {
-  mUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
+  mUrl = Dali::Toolkit::TextureManager::AddTexture(texture, preMultiplied);
 }
 
 ImageUrl::ImageUrl(const EncodedImageBuffer& encodedImageBuffer)
@@ -66,9 +66,9 @@ ImageUrl::~ImageUrl()
   }
 }
 
-ImageUrlPtr ImageUrl::New(Texture& texture)
+ImageUrlPtr ImageUrl::New(Texture& texture, bool preMultiplied)
 {
-  ImageUrlPtr imageUrlPtr = new ImageUrl(texture);
+  ImageUrlPtr imageUrlPtr = new ImageUrl(texture, preMultiplied);
   return imageUrlPtr;
 }
 
