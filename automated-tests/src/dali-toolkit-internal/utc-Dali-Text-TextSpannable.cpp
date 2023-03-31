@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -292,7 +292,7 @@ int UtcDaliToolkitTextLabelSetSpannedText_FontSpan(void)
 
   const Vector<Dali::Toolkit::Text::FontDescriptionRun>& validFontDescriptionRuns = labelImpl.GetTextController()->GetTextModel()->GetFontDescriptionRuns();
   DALI_TEST_EQUALS(validFontDescriptionRuns.Count(), 1u, TEST_LOCATION);
-  std::string familyName = validFontDescriptionRuns[0].familyName;
+  std::string familyName = std::string(validFontDescriptionRuns[0].familyName, validFontDescriptionRuns[0].familyLength);
 
   DALI_TEST_EQUALS(familyName, "TizenSans", TEST_LOCATION);
   DALI_TEST_EQUALS(validFontDescriptionRuns[0].size, expectedPointSize, TEST_LOCATION);
