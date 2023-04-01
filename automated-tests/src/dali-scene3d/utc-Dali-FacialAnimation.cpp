@@ -28,42 +28,43 @@ int UtcDaliLoadFacialAnimation(void)
 
   AnimationDefinition animDef = LoadFacialAnimation(TEST_RESOURCE_DIR "/facial-blendshape-animation.json");
 
-  DALI_TEST_EQUAL(animDef.mName, "Facial_Blendshape_Animation");
-  DALI_TEST_EQUAL(animDef.mDuration, 14.966001f);
-  DALI_TEST_EQUAL(animDef.mEndAction, Animation::BAKE);
-  DALI_TEST_EQUAL(animDef.mSpeedFactor, 1.0f);
-  DALI_TEST_EQUAL(animDef.mLoopCount, 1);
-  DALI_TEST_EQUAL(animDef.mProperties.size(), 122);
+  std::string name = animDef.GetName();
+  DALI_TEST_EQUAL(name, "Facial_Blendshape_Animation");
+  DALI_TEST_EQUAL(animDef.GetDuration(), 14.966001f);
+  DALI_TEST_EQUAL(animDef.GetEndAction(), Animation::BAKE);
+  DALI_TEST_EQUAL(animDef.GetSpeedFactor(), 1.0f);
+  DALI_TEST_EQUAL(animDef.GetLoopCount(), 1);
+  DALI_TEST_EQUAL(animDef.GetPropertyCount(), 122);
 
-  DALI_TEST_EQUAL(animDef.mProperties[0].mNodeName, "GEO_1");
-  DALI_TEST_EQUAL(animDef.mProperties[0].mPropertyName, "uBlendShapeWeight[0]");
-  DALI_TEST_EQUAL(animDef.mProperties[0].mKeyFrames.GetType(), Property::Type::FLOAT);
-  DALI_TEST_EQUAL(animDef.mProperties[0].mTimePeriod.delaySeconds, 0.0f);
-  DALI_TEST_EQUAL(animDef.mProperties[0].mTimePeriod.durationSeconds, 14.966001f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(0).mNodeName, "GEO_1");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(0).mPropertyName, "uBlendShapeWeight[0]");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(0).mKeyFrames.GetType(), Property::Type::FLOAT);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(0).mTimePeriod.delaySeconds, 0.0f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(0).mTimePeriod.durationSeconds, 14.966001f);
 
-  DALI_TEST_EQUAL(animDef.mProperties[69].mNodeName, "GEO_2");
-  DALI_TEST_EQUAL(animDef.mProperties[69].mPropertyName, "uBlendShapeWeight[1]");
-  DALI_TEST_EQUAL(animDef.mProperties[69].mKeyFrames.GetType(), Property::Type::FLOAT);
-  DALI_TEST_EQUAL(animDef.mProperties[69].mTimePeriod.delaySeconds, 0.0f);
-  DALI_TEST_EQUAL(animDef.mProperties[69].mTimePeriod.durationSeconds, 14.966001f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(69).mNodeName, "GEO_2");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(69).mPropertyName, "uBlendShapeWeight[1]");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(69).mKeyFrames.GetType(), Property::Type::FLOAT);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(69).mTimePeriod.delaySeconds, 0.0f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(69).mTimePeriod.durationSeconds, 14.966001f);
 
-  DALI_TEST_EQUAL(animDef.mProperties[86].mNodeName, "GEO_3");
-  DALI_TEST_EQUAL(animDef.mProperties[86].mPropertyName, "uBlendShapeWeight[2]");
-  DALI_TEST_EQUAL(animDef.mProperties[86].mKeyFrames.GetType(), Property::Type::FLOAT);
-  DALI_TEST_EQUAL(animDef.mProperties[86].mTimePeriod.delaySeconds, 0.0f);
-  DALI_TEST_EQUAL(animDef.mProperties[86].mTimePeriod.durationSeconds, 14.966001f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(86).mNodeName, "GEO_3");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(86).mPropertyName, "uBlendShapeWeight[2]");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(86).mKeyFrames.GetType(), Property::Type::FLOAT);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(86).mTimePeriod.delaySeconds, 0.0f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(86).mTimePeriod.durationSeconds, 14.966001f);
 
-  DALI_TEST_EQUAL(animDef.mProperties[100].mNodeName, "GEO_4");
-  DALI_TEST_EQUAL(animDef.mProperties[100].mPropertyName, "uBlendShapeWeight[7]");
-  DALI_TEST_EQUAL(animDef.mProperties[100].mKeyFrames.GetType(), Property::Type::FLOAT);
-  DALI_TEST_EQUAL(animDef.mProperties[100].mTimePeriod.delaySeconds, 0.0f);
-  DALI_TEST_EQUAL(animDef.mProperties[100].mTimePeriod.durationSeconds, 14.966001f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(100).mNodeName, "GEO_4");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(100).mPropertyName, "uBlendShapeWeight[7]");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(100).mKeyFrames.GetType(), Property::Type::FLOAT);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(100).mTimePeriod.delaySeconds, 0.0f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(100).mTimePeriod.durationSeconds, 14.966001f);
 
-  DALI_TEST_EQUAL(animDef.mProperties[121].mNodeName, "GEO_5");
-  DALI_TEST_EQUAL(animDef.mProperties[121].mPropertyName, "uBlendShapeWeight[19]");
-  DALI_TEST_EQUAL(animDef.mProperties[121].mKeyFrames.GetType(), Property::Type::FLOAT);
-  DALI_TEST_EQUAL(animDef.mProperties[121].mTimePeriod.delaySeconds, 0.0f);
-  DALI_TEST_EQUAL(animDef.mProperties[121].mTimePeriod.durationSeconds, 14.966001f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(121).mNodeName, "GEO_5");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(121).mPropertyName, "uBlendShapeWeight[19]");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(121).mKeyFrames.GetType(), Property::Type::FLOAT);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(121).mTimePeriod.delaySeconds, 0.0f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(121).mTimePeriod.durationSeconds, 14.966001f);
 
   auto actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "GEO_1");
@@ -82,10 +83,10 @@ int UtcDaliLoadFacialAnimation(void)
   };
 
   auto anim = animDef.ReAnimate(getActor);
-  DALI_TEST_EQUAL(anim.GetDuration(), animDef.mDuration);
-  DALI_TEST_EQUAL(anim.GetEndAction(), animDef.mEndAction);
-  DALI_TEST_EQUAL(anim.GetSpeedFactor(), animDef.mSpeedFactor);
-  DALI_TEST_EQUAL(anim.GetLoopCount(), animDef.mLoopCount);
+  DALI_TEST_EQUAL(anim.GetDuration(), animDef.GetDuration());
+  DALI_TEST_EQUAL(anim.GetEndAction(), animDef.GetEndAction());
+  DALI_TEST_EQUAL(anim.GetSpeedFactor(), animDef.GetSpeedFactor());
+  DALI_TEST_EQUAL(anim.GetLoopCount(), animDef.GetLoopCount());
 
   END_TEST;
 }
