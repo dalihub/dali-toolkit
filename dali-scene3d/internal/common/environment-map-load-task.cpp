@@ -30,10 +30,10 @@ namespace Internal
 EnvironmentMapLoadTask::EnvironmentMapLoadTask(const std::string& environmentMapUrl, Dali::Scene3D::EnvironmentMapType environmentMapType, CallbackBase* callback)
 : AsyncTask(callback),
   mEnvironmentMapUrl(environmentMapUrl),
-  mEnvironmentMapType(environmentMapType),
   mIsReady(true),
   mHasSucceeded(false)
 {
+  mEnvironmentMapData.SetEnvironmentMapType(environmentMapType);
 }
 
 EnvironmentMapLoadTask::~EnvironmentMapLoadTask()
@@ -42,7 +42,6 @@ EnvironmentMapLoadTask::~EnvironmentMapLoadTask()
 
 void EnvironmentMapLoadTask::Process()
 {
-  mEnvironmentMapData.SetEnvironmentMapType(mEnvironmentMapType);
   mHasSucceeded = Scene3D::Loader::LoadEnvironmentMap(mEnvironmentMapUrl, mEnvironmentMapData);
 }
 
@@ -64,6 +63,11 @@ Dali::Texture EnvironmentMapLoadTask::GetLoadedTexture()
 uint32_t EnvironmentMapLoadTask::GetMipmapLevels()
 {
   return (HasSucceeded()) ? mEnvironmentMapData.GetMipmapLevels() : 1u;
+}
+
+Dali::Scene3D::EnvironmentMapType EnvironmentMapLoadTask::GetEnvironmentMapType()
+{
+  return mEnvironmentMapData.GetEnvironmentMapType();
 }
 
 } // namespace Internal
