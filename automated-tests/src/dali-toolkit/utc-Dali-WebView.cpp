@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1423,7 +1423,7 @@ int UtcDaliWebViewLoadHtmlStringOverrideCurrentEntryAndContents(void)
   application.Render();
   Test::EmitGlobalTimerSignal();
 
-  result = view.LoadContents(html, html.length(), "html/text", "utf-8", basicUri);
+  result = view.LoadContents((const int8_t*)html.c_str(), html.length(), "html/text", "utf-8", basicUri);
   DALI_TEST_CHECK(result);
 
   END_TEST;
