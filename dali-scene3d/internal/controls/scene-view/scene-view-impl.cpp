@@ -792,7 +792,7 @@ void SceneView::OnSkyboxLoadComplete()
 
   mSkyboxTexture = mSkyboxLoadTask->GetLoadedTexture();
   Shader skyboxShader;
-  if(mSkyboxEnvironmentMapType == Scene3D::EnvironmentMapType::CUBEMAP)
+  if(mSkyboxLoadTask->GetEnvironmentMapType() == Scene3D::EnvironmentMapType::CUBEMAP)
   {
     skyboxShader = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
   }
