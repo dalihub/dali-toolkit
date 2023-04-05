@@ -18,16 +18,16 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/pixel-data.h>
-#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <memory>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/loader/load-result.h>
-#include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-scene3d/public-api/common/environment-map.h>
 #include <dali-scene3d/public-api/loader/environment-map-data.h>
+#include <dali-scene3d/public-api/loader/load-result.h>
+#include <dali-scene3d/public-api/loader/scene-definition.h>
 
 namespace Dali
 {
@@ -83,6 +83,12 @@ public:
    */
   uint32_t GetMipmapLevels();
 
+  /**
+   * Retrieves EnvironmentMap type of the loaded texture
+   * @return EnvironmentMap type of the loaded texture
+   */
+  Dali::Scene3D::EnvironmentMapType GetEnvironmentMapType();
+
 private:
   // Undefined
   EnvironmentMapLoadTask(const EnvironmentMapLoadTask& task) = delete;
@@ -93,7 +99,6 @@ private:
 private:
   std::string                               mEnvironmentMapUrl;
   Dali::Scene3D::Loader::EnvironmentMapData mEnvironmentMapData;
-  Dali::Scene3D::EnvironmentMapType         mEnvironmentMapType{Dali::Scene3D::EnvironmentMapType::AUTO};
 
   bool mIsReady;
   bool mHasSucceeded;

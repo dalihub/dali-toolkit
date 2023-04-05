@@ -27,6 +27,8 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/ktx-loader.h>
 
+#include <dali/integration-api/debug.h>
+
 namespace Dali
 {
 namespace
@@ -207,7 +209,6 @@ bool LoadEnvironmentMap(const std::string& environmentMapUrl, EnvironmentMapData
   std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
   bool successed = (extension == KTX_EXTENSION) ? Dali::Scene3D::Loader::LoadKtxData(environmentMapUrl, environmentMapData) : LoadEnvironmentMapData(environmentMapUrl, environmentMapData);
-
   return successed;
 }
 
