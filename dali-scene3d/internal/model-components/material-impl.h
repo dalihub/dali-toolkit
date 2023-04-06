@@ -278,19 +278,19 @@ private:
 
 private:
   // Delete copy & move operator
-  Material(const Material&)                = delete;
-  Material(Material&&)                     = delete;
+  Material(const Material&) = delete;
+  Material(Material&&)      = delete;
   Material& operator=(const Material& rhs) = delete;
-  Material& operator=(Material&& rhs)      = delete;
+  Material& operator=(Material&& rhs) = delete;
 
 private:
-  ObserverContainer mObservers{};     ///< List of observers who need to be notified after some properties are changed.
+  ObserverContainer mObservers{}; ///< List of observers who need to be notified after some properties are changed.
 
   TextureInformationContainer     mTextureInformations;
   Dali::Toolkit::AsyncImageLoader mAsyncImageLoader;
 
   std::string                            mName;                                                   ///< Material name
-  Dali::Scene3D::Material::AlphaModeType mAlphaMode;                                              ///< Alpha mode
+  Dali::Scene3D::Material::AlphaModeType mAlphaMode   = Scene3D::Material::AlphaModeType::OPAQUE; ///< Alpha mode
   float                                  mAlphaCutoff = 0.5f;                                     ///< Alpha cutoff value
   bool                                   mDoubleSided = false;                                    ///< Whether to render both sides
   float                                  mIor         = -1.0f;                                    ///< Index of refraction (TODO: Magic number)
@@ -298,8 +298,8 @@ private:
 
   Scene3D::Loader::ShaderDefinition::RawData mShaderData;
 
-  uint32_t                             mMaterialFlag;
-  Scene3D::Loader::RendererState::Type mRendererState;
+  uint32_t                             mMaterialFlag  = 0u;
+  Scene3D::Loader::RendererState::Type mRendererState = Scene3D::Loader::RendererState::NONE;
 
   bool mIsOpaque = true;
   bool mIsMask   = false;
