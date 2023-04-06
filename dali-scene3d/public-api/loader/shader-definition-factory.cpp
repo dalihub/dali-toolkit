@@ -60,16 +60,6 @@ struct ResourceReceiver : IResourceReceiver
   }
 };
 
-void RetrieveBlendShapeComponents(const std::vector<MeshDefinition::BlendShape>& blendShapes, bool& hasPositions, bool& hasNormals, bool& hasTangents)
-{
-  for(const auto& blendShape : blendShapes)
-  {
-    hasPositions = hasPositions || blendShape.deltas.IsDefined();
-    hasNormals   = hasNormals || blendShape.normals.IsDefined();
-    hasTangents  = hasTangents || blendShape.tangents.IsDefined();
-  }
-}
-
 uint64_t HashNode(const MaterialDefinition& materialDef, const MeshDefinition& meshDef)
 {
   Hash hash;
@@ -161,7 +151,7 @@ uint64_t HashNode(const MaterialDefinition& materialDef, const MeshDefinition& m
     bool hasPositions = false;
     bool hasNormals   = false;
     bool hasTangents  = false;
-    RetrieveBlendShapeComponents(meshDef.mBlendShapes, hasPositions, hasNormals, hasTangents);
+    meshDef.RetrieveBlendShapeComponents(hasPositions, hasNormals, hasTangents);
     if(hasPositions)
     {
       hash.Add("MORPHPOS");
@@ -335,7 +325,7 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
       bool hasPositions = false;
       bool hasNormals   = false;
       bool hasTangents  = false;
-      RetrieveBlendShapeComponents(meshDef.mBlendShapes, hasPositions, hasNormals, hasTangents);
+      meshDef.RetrieveBlendShapeComponents(hasPositions, hasNormals, hasTangents);
 
       if(hasPositions)
       {

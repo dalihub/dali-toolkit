@@ -1,5 +1,5 @@
-#ifndef DALI_SCENE3D_LOADERER_SCENE_DEFINITION_H_
-#define DALI_SCENE3D_LOADERER_SCENE_DEFINITION_H_
+#ifndef DALI_SCENE3D_LOADER_SCENE_DEFINITION_H_
+#define DALI_SCENE3D_LOADER_SCENE_DEFINITION_H_
 /*
  * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
@@ -105,11 +105,11 @@ public: // METHODS
 
   /*
    * @brief Given a bundle of @a resources that are loaded, and customization
-   *  @a choices, this method traverses the scene, creating the actors and renderers
+   *  @a choices, this method traverses the scene, creating the ModelNodes and renderers
    *  from node definitions.
-   * @return Handle to the root actor.
+   * @return Handle to the root node.
    */
-  Actor CreateNodes(Index iNode, const Customization::Choices& choices, NodeDefinition::CreateParams& params);
+  ModelNode CreateNodes(Index iNode, const Customization::Choices& choices, NodeDefinition::CreateParams& params);
 
   /*
    * @brief Creates / update a registry of mappings from customization tags to
@@ -272,4 +272,4 @@ private:                                               // DATA
 
 } // namespace Dali::Scene3D::Loader
 
-#endif //DALI_SCENE3D_LOADERER_SCENE_DEFINITION_H_
+#endif //DALI_SCENE3D_LOADER_SCENE_DEFINITION_H_

@@ -914,6 +914,18 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
       raw.mAttribs.push_back({"aVertexColor", propertyType, static_cast<uint32_t>(bufferSize / propertySize), std::move(buffer)});
     }
   }
+  else
+  {
+    std::vector<uint8_t> buffer(raw.mAttribs[0].mNumElements * sizeof(Vector4));
+    auto                 colors = reinterpret_cast<Vector4*>(buffer.data());
+
+    for(uint32_t i = 0; i < raw.mAttribs[0].mNumElements; i++)
+    {
+      colors[i] = Vector4::ONE;
+    }
+
+    raw.mAttribs.push_back({"aVertexColor", Property::VECTOR4, raw.mAttribs[0].mNumElements, std::move(buffer)});
+  }
 
   if(IsSkinned())
   {
@@ -1069,6 +1081,16 @@ MeshGeometry MeshDefinition::Load(RawData&& raw) const
   }
 
   return meshGeometry;
+}
+
+void MeshDefinition::RetrieveBlendShapeComponents(bool& hasPositions, bool& hasNormals, bool& hasTangents) const
+{
+  for(const auto& blendShape : mBlendShapes)
+  {
+    hasPositions = hasPositions || blendShape.deltas.IsDefined();
+    hasNormals   = hasNormals || blendShape.normals.IsDefined();
+    hasTangents  = hasTangents || blendShape.tangents.IsDefined();
+  }
 }
 
 } // namespace Dali::Scene3D::Loader

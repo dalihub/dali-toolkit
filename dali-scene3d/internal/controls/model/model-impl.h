@@ -33,6 +33,7 @@
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 #include <dali-scene3d/public-api/loader/load-result.h>
+#include <dali-scene3d/public-api/model-components/model-node.h>
 
 namespace Dali
 {
@@ -59,7 +60,17 @@ public:
   /**
    * @copydoc Model::GetModelRoot()
    */
-  const Actor GetModelRoot() const;
+  const Scene3D::ModelNode GetModelRoot() const;
+
+  /**
+   * @copydoc Model::AddModelNode()
+   */
+  void AddModelNode(Scene3D::ModelNode modelNode);
+
+  /**
+   * @copydoc Model::RemoveModelNode()
+   */
+  void RemoveModelNode(Scene3D::ModelNode modelNode);
 
   /**
    * @copydoc Model::SetChildrenSensitive()
@@ -126,6 +137,11 @@ public:
    */
   bool ApplyCamera(uint32_t index, Dali::CameraActor camera) const;
 
+  /**
+   * @copydoc Model::FindChildModelNodeByName()
+   */
+  Scene3D::ModelNode FindChildModelNodeByName(std::string_view nodeName);
+
 protected:
   /**
    * @brief Constructs a new Model.
@@ -182,6 +198,11 @@ private:
 
 private:
   /**
+   * @brief Create Model Root of this Model class.
+   */
+  void CreateModelRoot();
+
+  /**
    * @brief Scales the model to fit the control or to return to original size.
    */
   void ScaleModel();
@@ -194,7 +215,12 @@ private:
   /**
    * @brief Changes IBL information of the input node.
    */
-  void CollectRenderableActor(Actor actor);
+  void UpdateImageBasedLightTextureRecursively(Scene3D::ModelNode node, Dali::Texture diffuseTexture, Dali::Texture specularTexture, float iblScaleFactor, uint32_t specularMipmapLevels);
+
+  /**
+   * @brief Changes IBL factor of the input node.
+   */
+  void UpdateImageBasedLightScaleFactorRecursively(Scene3D::ModelNode node, float iblScaleFactor);
 
   /**
    * @brief Changes IBL textures of the input node.
@@ -278,13 +304,12 @@ private:
   void ResetCameraParameters();
 
 private:
-  std::string                    mModelUrl;
-  std::string                    mResourceDirectoryUrl;
-  Dali::Actor                    mModelRoot;
-  std::vector<AnimationData>     mAnimations;
-  std::vector<CameraData>        mCameraParameters;
-  std::vector<WeakHandle<Actor>> mRenderableActors;
-  WeakHandle<Scene3D::SceneView> mParentSceneView;
+  std::string                                 mModelUrl;
+  std::string                                 mResourceDirectoryUrl;
+  Scene3D::ModelNode                          mModelRoot;
+  std::vector<AnimationData>                  mAnimations;
+  std::vector<CameraData>                     mCameraParameters;
+  WeakHandle<Scene3D::SceneView>              mParentSceneView;
 
   // Asynchronous loading variable
   ModelLoadTaskPtr          mModelLoadTask;
@@ -294,7 +319,6 @@ private:
   std::string mDiffuseIblUrl;
   std::string mSpecularIblUrl;
 
-  // TODO: This default texture can be removed after 3D Resource Cache is added.
   Dali::Texture mDefaultSpecularTexture;
   Dali::Texture mDefaultDiffuseTexture;
   Dali::Texture mSceneSpecularTexture;

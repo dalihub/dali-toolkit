@@ -19,15 +19,28 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/animation/constraint.h>
 #include <string>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/loader/index.h>
+#include <dali-scene3d/public-api/model-components/model-primitive.h>
 
 namespace Dali::Scene3D::Loader
 {
 struct DALI_SCENE3D_API Skinning
 {
+public:
+  struct BoneData
+  {
+    Dali::Scene3D::ModelPrimitive primitive;
+    Dali::Constraint              constraint;
+    Scene3D::Loader::Index        boneIndex;
+    std::string                   propertyName;
+    Matrix                        inverseMatrix;
+  };
+
   /*
    * @brief Upper limit on the number of joints supported.
    */
@@ -37,6 +50,7 @@ struct DALI_SCENE3D_API Skinning
    * @brief Name of bone matrix uniform (array).
    */
   static const char* BONE_UNIFORM_NAME;
+  static const char* JOINT_MATRIX;
 
   Skinning() = delete;
 };
