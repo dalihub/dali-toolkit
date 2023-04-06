@@ -23,10 +23,10 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/rendering/sampler.h>
-#include "material-modify-observer.h"
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-scene3d/internal/model-components/material-modify-observer.h>
 #include <dali-scene3d/public-api/loader/node-definition.h>
 #include <dali-scene3d/public-api/loader/renderer-state.h>
 #include <dali-scene3d/public-api/loader/utils.h>
@@ -565,7 +565,7 @@ void Material::RemoveObserver(MaterialModifyObserver* observer)
   // Block during notifying to observer
   if(mObserverNotifying)
   {
-    for(uint32_t i = 0; i<mObservers.size(); ++i)
+    for(uint32_t i = 0; i < mObservers.size(); ++i)
     {
       if(mObservers[i].first == observer)
       {
@@ -576,7 +576,7 @@ void Material::RemoveObserver(MaterialModifyObserver* observer)
   }
   else
   {
-    for(uint32_t i = 0; i<mObservers.size(); ++i)
+    for(uint32_t i = 0; i < mObservers.size(); ++i)
     {
       if(mObservers[i].first == observer)
       {
@@ -593,13 +593,13 @@ void Material::UpdateMaterialData()
   if(mAlphaMode == Dali::Scene3D::Material::AlphaModeType::BLEND)
   {
     mIsOpaque = false;
-    mIsMask = false;
+    mIsMask   = false;
     materialFlag |= Scene3D::Loader::MaterialDefinition::TRANSPARENCY;
   }
   else if(mAlphaMode == Dali::Scene3D::Material::AlphaModeType::MASK)
   {
     mIsOpaque = true;
-    mIsMask = true;
+    mIsMask   = true;
   }
   const bool hasTransparency = MaskMatch(materialFlag, Scene3D::Loader::MaterialDefinition::TRANSPARENCY);
 
@@ -752,7 +752,7 @@ void Material::NotifyObserver()
     mObserverNotifying = false;
 
     // Resolve observer queue during notify
-    mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(), [](auto& e){return !e.second;}), mObservers.end());
+    mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(), [](auto& e) { return !e.second; }), mObservers.end());
   }
 }
 
