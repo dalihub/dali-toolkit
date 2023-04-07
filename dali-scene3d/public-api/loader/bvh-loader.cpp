@@ -287,8 +287,8 @@ AnimationDefinition GenerateAnimation(const std::string& animationName, std::sha
 {
   AnimationDefinition animationDefinition;
 
-  animationDefinition.mName     = animationName;
-  animationDefinition.mDuration = frameTime * (frameCount - 1);
+  animationDefinition.SetName(animationName);
+  animationDefinition.SetDuration(frameTime * (frameCount - 1));
   float keyFrameInterval        = (frameCount > 1u) ? 1.0f / static_cast<float>(frameCount - 1u) : Dali::Math::MACHINE_EPSILON_10;
 
   std::vector<std::shared_ptr<Joint>> jointList;
@@ -296,16 +296,16 @@ AnimationDefinition GenerateAnimation(const std::string& animationName, std::sha
 
   if(!jointList.empty())
   {
-    animationDefinition.mProperties.resize(jointList.size() * 2u); // translation and rotation
+    animationDefinition.ReserveSize(jointList.size() * 2u); // translation and rotation
     for(uint32_t i = 0; i < jointList.size(); ++i)
     {
-      AnimatedProperty& translationProperty = animationDefinition.mProperties[i * 2u];
-      translationProperty.mTimePeriod       = Dali::TimePeriod(animationDefinition.mDuration);
+      AnimatedProperty translationProperty;
+      translationProperty.mTimePeriod       = Dali::TimePeriod(animationDefinition.GetDuration());
       translationProperty.mNodeName         = jointList[i]->name;
       translationProperty.mPropertyName     = PROPERTY_NAME_POSITION.data();
 
-      AnimatedProperty& rotationProperty = animationDefinition.mProperties[i * 2u + 1];
-      rotationProperty.mTimePeriod       = Dali::TimePeriod(animationDefinition.mDuration);
+      AnimatedProperty rotationProperty;
+      rotationProperty.mTimePeriod       = Dali::TimePeriod(animationDefinition.GetDuration());
       rotationProperty.mNodeName         = jointList[i]->name;
       rotationProperty.mPropertyName     = PROPERTY_NAME_ORIENTATION.data();
 
@@ -316,6 +316,8 @@ AnimationDefinition GenerateAnimation(const std::string& animationName, std::sha
         translationProperty.mKeyFrames.Add(static_cast<float>(j) * keyFrameInterval, (jointList[i]->translations[j] * scale));
         rotationProperty.mKeyFrames.Add(static_cast<float>(j) * keyFrameInterval, jointList[i]->rotations[j]);
       }
+      animationDefinition.SetProperty(i * 2u, std::move(translationProperty));
+      animationDefinition.SetProperty(i * 2u + 1, std::move(rotationProperty));
     }
   }
 

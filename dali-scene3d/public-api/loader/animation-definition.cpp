@@ -45,6 +45,20 @@ AnimationDefinition::AnimationDefinition(AnimationDefinition&& other)
 {
 }
 
+AnimationDefinition& AnimationDefinition::operator=(AnimationDefinition&& other)
+{
+  AnimationDefinition tmp(std::move(other));
+  mName             = std::move(tmp.mName);
+  mDuration         = tmp.mDuration;
+  mLoopCount        = tmp.mLoopCount;
+  mDisconnectAction = tmp.mDisconnectAction;
+  mEndAction        = tmp.mEndAction;
+  mSpeedFactor      = tmp.mSpeedFactor;
+  mPlayRange        = tmp.mPlayRange;
+  mProperties.swap(tmp.mProperties);
+  return *this;
+}
+
 void AnimationDefinition::Animate(Animation& animation, AnimatedProperty::GetActor getActor)
 {
   DALI_ASSERT_ALWAYS(animation);
@@ -69,18 +83,98 @@ Animation AnimationDefinition::ReAnimate(AnimatedProperty::GetActor getActor)
   return animation;
 }
 
-AnimationDefinition& AnimationDefinition::operator=(AnimationDefinition&& other)
+void AnimationDefinition::SetName(const std::string& name)
 {
-  AnimationDefinition tmp(std::move(other));
-  mName             = std::move(tmp.mName);
-  mDuration         = tmp.mDuration;
-  mLoopCount        = tmp.mLoopCount;
-  mDisconnectAction = tmp.mDisconnectAction;
-  mEndAction        = tmp.mEndAction;
-  mSpeedFactor      = tmp.mSpeedFactor;
-  mPlayRange        = tmp.mPlayRange;
-  mProperties.swap(tmp.mProperties);
-  return *this;
+  mName = name;
+}
+
+const std::string& AnimationDefinition::GetName() const
+{
+  return mName;
+}
+
+void AnimationDefinition::SetDuration(float duration)
+{
+  mDuration = duration;
+}
+
+float AnimationDefinition::GetDuration() const
+{
+  return mDuration;
+}
+
+void AnimationDefinition::SetLoopCount(int32_t loopCount)
+{
+  mLoopCount = loopCount;
+}
+
+int AnimationDefinition::GetLoopCount() const
+{
+  return mLoopCount;
+}
+
+void AnimationDefinition::SetDisconnectAction(Animation::EndAction disconnectAction)
+{
+  mDisconnectAction = disconnectAction;
+}
+
+Animation::EndAction AnimationDefinition::GetDisconnectAction() const
+{
+  return mDisconnectAction;
+}
+
+void AnimationDefinition::SetEndAction(Animation::EndAction endAction)
+{
+  mEndAction = endAction;
+}
+
+Animation::EndAction AnimationDefinition::GetEndAction() const
+{
+  return mEndAction;
+}
+
+void AnimationDefinition::SetSpeedFactor(float speedFactor)
+{
+  mSpeedFactor = speedFactor;
+}
+
+float AnimationDefinition::GetSpeedFactor() const
+{
+  return mSpeedFactor;
+}
+
+void AnimationDefinition::SetPlayRange(const Vector2& playRange)
+{
+  mPlayRange = playRange;
+}
+
+Vector2 AnimationDefinition::GetPlayRange() const
+{
+  return mPlayRange;
+}
+
+void AnimationDefinition::ReserveSize(uint32_t size)
+{
+  mProperties.reserve(size);
+}
+
+uint32_t AnimationDefinition::GetPropertyCount()
+{
+  return mProperties.size();
+}
+
+void AnimationDefinition::SetProperty(uint32_t index, AnimatedProperty&& property)
+{
+  if(mProperties.size() <= index)
+  {
+    mProperties.resize(index + 1);
+  }
+  mProperties[index] = std::move(property);
+}
+
+const AnimatedProperty& AnimationDefinition::GetPropertyAt(uint32_t index)
+{
+  return mProperties[index];
 }
 
 } // namespace Dali::Scene3D::Loader

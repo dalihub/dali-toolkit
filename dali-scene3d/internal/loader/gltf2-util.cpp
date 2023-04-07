@@ -1079,7 +1079,7 @@ float LoadKeyFrames(ConversionContext& context, const gltf2::Animation::Channel&
   return duration;
 }
 
-float LoadBlendShapeKeyFrames(ConversionContext& context, const gltf2::Animation::Channel& channel, Index nodeIndex, uint32_t& propertyIndex, std::vector<Dali::Scene3D::Loader::AnimatedProperty>& properties)
+float LoadBlendShapeKeyFrames(ConversionContext& context, const gltf2::Animation::Channel& channel, Index nodeIndex, uint32_t& propertyIndex, AnimationDefinition& animationDefinition)
 {
   const gltf2::Accessor& input  = *channel.mSampler->mInput;
   const gltf2::Accessor& output = *channel.mSampler->mOutput;
@@ -1095,7 +1095,7 @@ float LoadBlendShapeKeyFrames(ConversionContext& context, const gltf2::Animation
   const auto  remainingSize = sizeof(weightNameBuffer) - prefixSize;
   for(uint32_t weightIndex = 0u, endWeightIndex = channel.mSampler->mOutput->mCount / channel.mSampler->mInput->mCount; weightIndex < endWeightIndex; ++weightIndex)
   {
-    AnimatedProperty& animatedProperty = properties[propertyIndex++];
+    AnimatedProperty animatedProperty;
 
     animatedProperty.mNodeIndex = nodeIndex;
     snprintf(pWeightName, remainingSize, "%d]", weightIndex);
@@ -1115,6 +1115,8 @@ float LoadBlendShapeKeyFrames(ConversionContext& context, const gltf2::Animation
     }
 
     animatedProperty.mTimePeriod = {0.f, duration};
+
+    animationDefinition.SetProperty(propertyIndex++, std::move(animatedProperty));
   }
 
   return duration;
@@ -1123,8 +1125,7 @@ float LoadBlendShapeKeyFrames(ConversionContext& context, const gltf2::Animation
 template<typename T>
 float LoadAnimation(AnimationDefinition& animationDefinition, Index nodeIndex, Index propertyIndex, const std::string& propertyName, const gltf2::Animation::Channel& channel, ConversionContext& context)
 {
-  AnimatedProperty& animatedProperty = animationDefinition.mProperties[propertyIndex];
-
+  AnimatedProperty animatedProperty;
   animatedProperty.mNodeIndex    = nodeIndex;
   animatedProperty.mPropertyName = propertyName;
 
@@ -1132,6 +1133,7 @@ float LoadAnimation(AnimationDefinition& animationDefinition, Index nodeIndex, I
   float duration               = LoadKeyFrames<T>(context, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);
   animatedProperty.mTimePeriod = {0.f, duration};
 
+  animationDefinition.SetProperty(propertyIndex, std::move(animatedProperty));
   return duration;
 }
 
@@ -1147,7 +1149,7 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
 
     if(!animation.mName.empty())
     {
-      animationDefinition.mName = animation.mName;
+      animationDefinition.SetName(animation.mName.data());
     }
 
     uint32_t numberOfProperties = 0u;
@@ -1162,7 +1164,7 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
         numberOfProperties++;
       }
     }
-    animationDefinition.mProperties.resize(numberOfProperties);
+    animationDefinition.ReserveSize(numberOfProperties);
 
     Index propertyIndex = 0u;
     for(const auto& channel : animation.mChannels)
@@ -1189,7 +1191,7 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
         }
         case gltf2::Animation::Channel::Target::WEIGHTS:
         {
-          duration = LoadBlendShapeKeyFrames(context, channel, nodeIndex, propertyIndex, animationDefinition.mProperties);
+          duration = LoadBlendShapeKeyFrames(context, channel, nodeIndex, propertyIndex, animationDefinition);
 
           break;
         }
@@ -1200,7 +1202,7 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
         }
       }
 
-      animationDefinition.mDuration = std::max(duration, animationDefinition.mDuration);
+      animationDefinition.SetDuration(std::max(duration, animationDefinition.GetDuration()));
 
       ++propertyIndex;
     }

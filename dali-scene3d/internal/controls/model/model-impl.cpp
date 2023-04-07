@@ -888,7 +888,7 @@ void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
     for(auto&& animation : mModelLoadTask->GetAnimations())
     {
       Dali::Animation anim = animation.ReAnimate(getActor);
-      mAnimations.push_back({animation.mName, anim});
+      mAnimations.push_back({animation.GetName(), anim});
     }
   }
 }

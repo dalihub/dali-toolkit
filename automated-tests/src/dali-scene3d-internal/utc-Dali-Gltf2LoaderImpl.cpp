@@ -680,9 +680,9 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
   }
 
   DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions.size(), 1u);
-  DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions[0].mProperties.size(), 57u);
+  DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions[0].GetPropertyCount(), 57u);
 
-  uint32_t id = ctx.loadResult.mScene.GetNode(ctx.loadResult.mAnimationDefinitions[0].mProperties[0].mNodeIndex)->mNodeId;
+  uint32_t id = ctx.loadResult.mScene.GetNode(ctx.loadResult.mAnimationDefinitions[0].GetPropertyAt(0).mNodeIndex)->mNodeId;
   DALI_TEST_EQUAL(id, root.FindChildByName("Skeleton_torso_joint_1").GetProperty<int32_t>(Dali::Actor::Property::ID));
 
   END_TEST;
