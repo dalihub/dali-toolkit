@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1162,7 +1162,7 @@ public:
   std::string GetUrl() const override { return std::string(); }
   void LoadHtmlString(const std::string& htmlString) override {}
   bool LoadHtmlStringOverrideCurrentEntry(const std::string& html, const std::string& basicUri, const std::string& unreachableUrl) override { return false; }
-  bool LoadContents(const std::string& contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri) override { return false; }
+  bool LoadContents(const int8_t* contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri) override { return false; }
   void Reload() override {}
   bool ReloadWithoutCache() override { return false; }
   void StopLoading() override {}
@@ -2208,7 +2208,7 @@ bool WebEngine::LoadHtmlStringOverrideCurrentEntry(const std::string& html, cons
   return true;
 }
 
-bool WebEngine::LoadContents(const std::string& contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri)
+bool WebEngine::LoadContents(const int8_t* contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri)
 {
   return true;
 }

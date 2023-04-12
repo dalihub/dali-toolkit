@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/model-components/model-node.h>
 
 namespace Dali
 {
@@ -75,10 +76,11 @@ public:
    * @SINCE_2_1.41
    * @param[in] modelUrl model file path.(e.g., glTF, and DLI).
    * @param[in] resourceDirectoryUrl resource file path that includes binary, image etc.
+   * @note If modelUrl is empty, it will not load resouces. Only ModelRoot will be created.
    * @note If resourceDirectoryUrl is empty, the parent directory path of modelUrl is used for resource path.
    * @return A handle to a newly allocated Dali resource
    */
-  static Model New(const std::string& modelUrl, const std::string& resourceDirectoryUrl = std::string());
+  static Model New(const std::string& modelUrl = std::string(), const std::string& resourceDirectoryUrl = std::string());
 
   /**
    * @brief Creates an uninitialized Model.
@@ -113,7 +115,7 @@ public:
    * @SINCE_2_1.41
    * @param[in] rhs A reference to the moved handle
    */
-  Model(Model&& rhs);
+  Model(Model&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -131,7 +133,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  Model& operator=(Model&& rhs);
+  Model& operator=(Model&& rhs) noexcept;
 
   /**
    * @brief Downcasts an Object handle to Model.
@@ -146,12 +148,29 @@ public:
   static Model DownCast(BaseHandle handle);
 
   /**
-   * @brief Retrieves model root Actor.
+   * @brief Retrieves model root Node.
    *
    * @SINCE_2_1.41
-   * @return Root Actor of the model.
+   * @return Root Node of the model.
    */
-  const Actor GetModelRoot() const;
+  const ModelNode GetModelRoot() const;
+
+  /**
+   * @brief Add new ModelNode to this Model.
+   * This modelNode will become child of ModelRoot.
+   *
+   * @SINCE_2_2.99
+   * @param[in] modelNode the root of ModelNode tree to be added.
+   */
+  void AddModelNode(ModelNode modelNode);
+
+  /**
+   * @brief Remove ModelNode from this Model.
+   *
+   * @SINCE_2_2.99
+   * @param[in] modelNode the root of ModelNode tree to be removed.
+   */
+  void RemoveModelNode(ModelNode modelNode);
 
   /**
    * @brief Whether allow this model's children actor to use events.
@@ -295,6 +314,14 @@ public:
    * @note This method should be called after Model load finished.
    */
   bool ApplyCamera(uint32_t index, Dali::CameraActor camera) const;
+
+  /**
+   * @brief Returns a child ModelNode object with a name that matches nodeName.
+   *
+   * @param[in] nodeName The name of the child ModelNode object you want to find.
+   * @return Returns a child ModelNode object with a name that matches nodeName. If there is no corresponding child ModelNode object, it returns an empty ModelNode object.
+   */
+  ModelNode FindChildModelNodeByName(std::string_view nodeName);
 
 public: // Not intended for application developers
   /// @cond internal

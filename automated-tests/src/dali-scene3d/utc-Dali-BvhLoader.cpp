@@ -27,28 +27,28 @@ int UtcDaliLoadBvh(void)
 
   AnimationDefinition animDef = LoadBvh(TEST_RESOURCE_DIR "/test.bvh", "testBvh");
 
-  DALI_TEST_EQUAL(animDef.mName, "testBvh");
-  DALI_TEST_EQUAL(animDef.mDuration, 0.3f);
+  DALI_TEST_EQUAL(animDef.GetName(), "testBvh");
+  DALI_TEST_EQUAL(animDef.GetDuration(), 0.3f);
 
-  DALI_TEST_EQUAL(animDef.mProperties[0].mNodeName, "root");
-  DALI_TEST_EQUAL(animDef.mProperties[0].mPropertyName, "position");
-  DALI_TEST_EQUAL(animDef.mProperties[0].mKeyFrames.GetType(), Property::Type::VECTOR3);
-  DALI_TEST_EQUAL(animDef.mProperties[0].mTimePeriod.durationSeconds, 0.3f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(0).mNodeName, "root");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(0).mPropertyName, "position");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(0).mKeyFrames.GetType(), Property::Type::VECTOR3);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(0).mTimePeriod.durationSeconds, 0.3f);
 
-  DALI_TEST_EQUAL(animDef.mProperties[1].mNodeName, "root");
-  DALI_TEST_EQUAL(animDef.mProperties[1].mPropertyName, "orientation");
-  DALI_TEST_EQUAL(animDef.mProperties[1].mKeyFrames.GetType(), Property::Type::ROTATION);
-  DALI_TEST_EQUAL(animDef.mProperties[1].mTimePeriod.durationSeconds, 0.3f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(1).mNodeName, "root");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(1).mPropertyName, "orientation");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(1).mKeyFrames.GetType(), Property::Type::ROTATION);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(1).mTimePeriod.durationSeconds, 0.3f);
 
-  DALI_TEST_EQUAL(animDef.mProperties[2].mNodeName, "first");
-  DALI_TEST_EQUAL(animDef.mProperties[2].mPropertyName, "position");
-  DALI_TEST_EQUAL(animDef.mProperties[2].mKeyFrames.GetType(), Property::Type::VECTOR3);
-  DALI_TEST_EQUAL(animDef.mProperties[2].mTimePeriod.durationSeconds, 0.3f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(2).mNodeName, "first");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(2).mPropertyName, "position");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(2).mKeyFrames.GetType(), Property::Type::VECTOR3);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(2).mTimePeriod.durationSeconds, 0.3f);
 
-  DALI_TEST_EQUAL(animDef.mProperties[3].mNodeName, "first");
-  DALI_TEST_EQUAL(animDef.mProperties[3].mPropertyName, "orientation");
-  DALI_TEST_EQUAL(animDef.mProperties[3].mKeyFrames.GetType(), Property::Type::ROTATION);
-  DALI_TEST_EQUAL(animDef.mProperties[3].mTimePeriod.durationSeconds, 0.3f);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(3).mNodeName, "first");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(3).mPropertyName, "orientation");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(3).mKeyFrames.GetType(), Property::Type::ROTATION);
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(3).mTimePeriod.durationSeconds, 0.3f);
 
   Actor root = Actor::New();
   root.SetProperty(Actor::Property::NAME, "root");
@@ -62,7 +62,7 @@ int UtcDaliLoadBvh(void)
   };
 
   Animation animation = animDef.ReAnimate(getActor);
-  DALI_TEST_EQUAL(animation.GetDuration(), animDef.mDuration);
+  DALI_TEST_EQUAL(animation.GetDuration(), animDef.GetDuration());
 
   application.GetScene().Add(root);
 
@@ -98,6 +98,6 @@ int UtcDaliLoadBvhFailed(void)
   TestApplication application;
 
   AnimationDefinition animDef = LoadBvh("/nothing.bvh", "testBvh");
-  DALI_TEST_EQUALS(0u, animDef.mProperties.size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
   END_TEST;
 }

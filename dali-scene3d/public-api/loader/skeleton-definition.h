@@ -1,5 +1,5 @@
-#ifndef DALI_SCENE3D_LOADERER_SKELETON_H
-#define DALI_SCENE3D_LOADERER_SKELETON_H
+#ifndef DALI_SCENE3D_LOADER_SKELETON_H
+#define DALI_SCENE3D_LOADER_SKELETON_H
 /*
  * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
@@ -48,4 +48,4 @@ struct DALI_SCENE3D_API SkeletonDefinition
 
 } // namespace Dali::Scene3D::Loader
 
-#endif //DALI_SCENE3D_LOADERER_SKELETON_H
+#endif //DALI_SCENE3D_LOADER_SKELETON_H

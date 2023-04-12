@@ -48,15 +48,16 @@ int UtcDaliAnimationDefinitionReAnimate(void)
     return actor.FindChildByName(property.mNodeName);
   };
 
+  uint32_t animatedPropertyIndex = 0;
   for (bool b: { false, true })
   {
     AnimationDefinition animDef;
-    animDef.mName = "WalkRight";
-    animDef.mDuration = 10.f;
-    animDef.mLoopCount = 2;
-    animDef.mEndAction = Animation::BAKE_FINAL;
-    animDef.mSpeedFactor = .7f;
-    animDef.mProperties.push_back(AnimatedProperty{
+    animDef.SetName("WalkRight");
+    animDef.SetDuration(10.f);
+    animDef.SetLoopCount(2);
+    animDef.SetEndAction(Animation::BAKE_FINAL);
+    animDef.SetSpeedFactor(.7f);
+    animDef.SetProperty(animatedPropertyIndex++,std::move(AnimatedProperty{
      INVALID_INDEX,
      "ChristopherPlummer",
      "position",
@@ -66,14 +67,14 @@ int UtcDaliAnimationDefinitionReAnimate(void)
        b
      } },
      AlphaFunction::EASE_OUT,
-     TimePeriod(animDef.mDuration)
-    });
+     TimePeriod(animDef.GetDuration())
+    }));
 
     auto anim = animDef.ReAnimate(getActor);
-    DALI_TEST_EQUAL(anim.GetDuration(), animDef.mDuration);
-    DALI_TEST_EQUAL(anim.GetEndAction(), animDef.mEndAction);
-    DALI_TEST_EQUAL(anim.GetSpeedFactor(), animDef.mSpeedFactor);
-    DALI_TEST_EQUAL(anim.GetLoopCount(), animDef.mLoopCount);
+    DALI_TEST_EQUAL(anim.GetDuration(), animDef.GetDuration());
+    DALI_TEST_EQUAL(anim.GetEndAction(), animDef.GetEndAction());
+    DALI_TEST_EQUAL(anim.GetSpeedFactor(), animDef.GetSpeedFactor());
+    DALI_TEST_EQUAL(anim.GetLoopCount(), animDef.GetLoopCount());
   }
 
   END_TEST;
@@ -93,27 +94,28 @@ int UtcDaliAnimationDefinitionReAnimateKeyFrames(void)
   kf.Add(0.f, Vector3::ZERO);
   kf.Add(1.f, Vector3::XAXIS * 100.f);
 
+  uint32_t animatedPropertyIndex = 0;
   AnimationDefinition animDef;
-  animDef.mName = "WalkRight";
-  animDef.mDuration = 10.f;
-  animDef.mLoopCount = 2;
-  animDef.mEndAction = Animation::BAKE_FINAL;
-  animDef.mSpeedFactor = .7f;
-  animDef.mProperties.push_back(AnimatedProperty{
+  animDef.SetName("WalkRight");
+  animDef.SetDuration(10.f);
+  animDef.SetLoopCount(2);
+  animDef.SetEndAction(Animation::BAKE_FINAL);
+  animDef.SetSpeedFactor(.7f);
+  animDef.SetProperty(animatedPropertyIndex++, std::move(AnimatedProperty{
    INVALID_INDEX,
    "ChristopherPlummer",
    "position",
    kf,
    nullptr,
    AlphaFunction::EASE_OUT,
-   TimePeriod(animDef.mDuration)
-  });
+   TimePeriod(animDef.GetDuration())
+  }));
 
   auto anim = animDef.ReAnimate(getActor);
-  DALI_TEST_EQUAL(anim.GetDuration(), animDef.mDuration);
-  DALI_TEST_EQUAL(anim.GetEndAction(), animDef.mEndAction);
-  DALI_TEST_EQUAL(anim.GetSpeedFactor(), animDef.mSpeedFactor);
-  DALI_TEST_EQUAL(anim.GetLoopCount(), animDef.mLoopCount);
+  DALI_TEST_EQUAL(anim.GetDuration(), animDef.GetDuration());
+  DALI_TEST_EQUAL(anim.GetEndAction(), animDef.GetEndAction());
+  DALI_TEST_EQUAL(anim.GetSpeedFactor(), animDef.GetSpeedFactor());
+  DALI_TEST_EQUAL(anim.GetLoopCount(), animDef.GetLoopCount());
 
   END_TEST;
 }

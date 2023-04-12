@@ -31,11 +31,11 @@ SceneView::SceneView()
 
 SceneView::SceneView(const SceneView& sceneView) = default;
 
-SceneView::SceneView(SceneView&& rhs) = default;
+SceneView::SceneView(SceneView&& rhs) noexcept = default;
 
 SceneView& SceneView::operator=(const SceneView& sceneView) = default;
 
-SceneView& SceneView::operator=(SceneView&& rhs) = default;
+SceneView& SceneView::operator=(SceneView&& rhs) noexcept = default;
 
 SceneView::~SceneView()
 {

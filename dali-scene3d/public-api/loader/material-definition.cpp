@@ -109,6 +109,7 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
   }
   else
   {
+    textureDefinition.mDirectoryPath = resourcePath;
     pixelData = SyncImageLoader::Load(resourcePath + textureDefinition.mImageUri, textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
   }
   return pixelData;

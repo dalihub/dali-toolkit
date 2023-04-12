@@ -65,24 +65,29 @@ struct DALI_SCENE3D_API EnvironmentDefinition
   EnvironmentDefinition(EnvironmentDefinition&&) = default;
   EnvironmentDefinition& operator=(EnvironmentDefinition&&) = default;
 
+  static Dali::Texture GetBrdfTexture();
+
   /**
    * @brief Loads raw pixel data for the given diffuse and specular maps.
    * @note This can be done on any thread.
    */
-  RawData LoadRaw(const std::string& environmentsPath) const;
+  RawData LoadRaw(const std::string& environmentsPath);
 
   /**
    * @brief Creates DALi cubemap Textures from the pixel data in @a raw, then
    *  returns them in a Textures object.
    * @note This must only be called from the event thread.
    */
-  Textures Load(RawData&& raw) const;
+  Textures Load(RawData&& raw);
 
   /**
    * @brief Get default intensity value.
    * @return Default intensity. (1.0f)
    */
   static float GetDefaultIntensity();
+
+private:
+  static void LoadBrdfTexture();
 
 public: // DATA
   std::string              mDiffuseMapPath;
@@ -92,6 +97,11 @@ public: // DATA
   Vector3                  mYDirection      = Vector3::ONE;
   float                    mIblIntensity    = 1.0f;
   bool                     mUseBrdfTexture  = false;
+
+private:
+  static PixelData mBrdfPixelData;
+  static Texture   mBrdfTexture;
+  static bool      mIsBrdfLoaded;
 };
 
 } // namespace Dali::Scene3D::Loader

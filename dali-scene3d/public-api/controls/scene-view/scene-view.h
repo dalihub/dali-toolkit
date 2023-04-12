@@ -145,7 +145,7 @@ public:
    * @SINCE_2_1.38
    * @param[in] rhs A reference to the moved handle
    */
-  SceneView(SceneView&& rhs);
+  SceneView(SceneView&& rhs) noexcept;
 
   /**
    * @brief Assignment operator.
@@ -163,7 +163,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  SceneView& operator=(SceneView&& rhs);
+  SceneView& operator=(SceneView&& rhs) noexcept;
 
   /**
    * @brief Downcasts an Object handle to SceneView.

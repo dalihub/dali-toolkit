@@ -20,10 +20,7 @@ in vec4 aTangent;
 in vec3 aTangent;
 #endif
 
-#ifdef COLOR_ATTRIBUTE
 in vec4 aVertexColor;
-uniform lowp float uHasVertexColor;
-#endif
 
 #ifdef MORPH
   uniform highp sampler2D sBlendShapeGeometry;
@@ -31,9 +28,7 @@ uniform lowp float uHasVertexColor;
 
 out mediump vec2 vUV;
 out lowp mat3 vTBN;
-#ifdef COLOR_ATTRIBUTE
 out lowp vec4 vColor;
-#endif
 out highp vec3 vPositionToCamera;
 
 uniform highp mat4 uViewMatrix;
@@ -164,9 +159,7 @@ void main()
   vUV = aTexCoord;
 #endif
 
-#ifdef COLOR_ATTRIBUTE
-  vColor = mix(vec4(1.0f), aVertexColor, uHasVertexColor);
-#endif
+  vColor = aVertexColor;
 
   gl_Position = uProjection * positionV;
 }
