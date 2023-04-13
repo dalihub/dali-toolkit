@@ -879,6 +879,11 @@ double ScrollBar::ScrollBarAccessible::GetCurrent() const
   return scrollableHandle ? scrollableHandle.GetCurrentProperty<float>(GetImpl(self).mPropertyScrollPosition) : 0.0f;
 }
 
+std::string ScrollBar::ScrollBarAccessible::GetValueText() const
+{
+  return {}; // Text mode is not used at the moment
+}
+
 double ScrollBar::ScrollBarAccessible::GetMaximum() const
 {
   auto self = Toolkit::ScrollBar::DownCast(Self());

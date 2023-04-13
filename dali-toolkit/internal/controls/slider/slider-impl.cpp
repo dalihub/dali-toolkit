@@ -1424,6 +1424,11 @@ double Slider::SliderAccessible::GetCurrent() const
   return self.GetProperty(Toolkit::Slider::Property::VALUE).Get<float>();
 }
 
+std::string Slider::SliderAccessible::GetValueText() const
+{
+  return {}; // Text mode is not used at the moment
+}
+
 double Slider::SliderAccessible::GetMaximum() const
 {
   auto self = Toolkit::Slider::DownCast(Self());
