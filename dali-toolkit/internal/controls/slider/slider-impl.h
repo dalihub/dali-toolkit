@@ -771,6 +771,11 @@ protected:
     double GetCurrent() const override;
 
     /**
+     * @copydoc Dali::Accessibility::Value::GetValueText()
+     */
+    std::string GetValueText() const override;
+
+    /**
      * @copydoc Dali::Accessibility::Value::GetMaximum()
      */
     double GetMaximum() const override;

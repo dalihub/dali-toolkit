@@ -96,6 +96,7 @@ int utcDaliAccessibilityProgressBarGetSetCurrent(void)
   DALI_TEST_EQUALS( x->SetCurrent( 2.0 ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( x->SetCurrent( 0.25 ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( x->GetCurrent(), 0.25, TEST_LOCATION );
+  DALI_TEST_EQUALS( x->GetValueText().empty(), true, TEST_LOCATION ); // not implemented
 
   END_TEST;
 }
@@ -192,6 +193,7 @@ int utcDaliAccessibilityScrollBarGetSetCurrent(void)
   DALI_TEST_EQUALS( x->SetCurrent( 1000.0 ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( x->SetCurrent( 50.0 ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( x->GetCurrent(), 0.0, TEST_LOCATION );
+  DALI_TEST_EQUALS( x->GetValueText().empty(), true, TEST_LOCATION ); // not implemented
 
   END_TEST;
 }
@@ -247,6 +249,7 @@ int utcDaliAccessibilitySliderGetSetCurrent(void)
   DALI_TEST_EQUALS( x->SetCurrent( 2.0 ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( x->SetCurrent( 0.25 ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( x->GetCurrent(), 0.25, TEST_LOCATION );
+  DALI_TEST_EQUALS( x->GetValueText().empty(), true, TEST_LOCATION ); // not implemented
 
   const float MIN_BOUND = 0.0f;
   const float MAX_BOUND = 1.0f;
