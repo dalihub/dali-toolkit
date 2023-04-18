@@ -113,6 +113,9 @@ void VectorAnimationManager::UnregisterEventCallback( CallbackBase* callback )
   {
     mEventCallbacks.erase( iter );
 
+    // Delete callback base memory
+    delete callback;
+
     if( mEventCallbacks.empty() )
     {
       if( Adaptor::IsAvailable() )
