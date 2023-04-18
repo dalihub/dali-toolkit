@@ -140,9 +140,13 @@ void main()
   position = bone * position;
   normal = (bone * vec4(normal, 0.0)).xyz;
   tangent = (bone * vec4(tangent, 0.0)).xyz;
-#endif
+  normal = normalize(normal);
+  tangent = normalize(tangent);
 
+  highp vec4 positionW = position;
+#else
   highp vec4 positionW = uModelMatrix * position;
+#endif
   highp vec4 positionV = uViewMatrix * positionW;
 
   vPositionToCamera = transpose(mat3(uViewMatrix)) * -vec3(positionV.xyz / positionV.w);

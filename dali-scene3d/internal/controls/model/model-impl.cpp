@@ -842,7 +842,6 @@ void Model::CreateModel()
   {
     if(auto actor = scene.CreateNodes(iRoot, resourceChoices, nodeParams))
     {
-      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
       scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
       ConfigureBlendShapeShaders(resources, scene, actor, std::move(nodeParams.mBlendshapeRequests));
 
