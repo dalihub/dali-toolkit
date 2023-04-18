@@ -247,10 +247,9 @@ void ModelNode::Impl::UpdateBoneMatrix(Scene3D::ModelPrimitive primitive)
       boneData.constraint = Constraint::New<Matrix>(shader, propBoneXform, [inverseMatrix](Matrix& output, const PropertyInputContainer& inputs)
                                                     { Matrix::Multiply(output, inverseMatrix, inputs[0]->GetMatrix()); });
 
-      Actor joint           = mModelNodeImpl.Self();
-      auto  propJointMatrix = joint.GetPropertyIndex(Dali::Scene3D::Loader::Skinning::JOINT_MATRIX);
-      boneData.constraint.AddSource(Source{joint, propJointMatrix});
-      boneData.constraint.Apply();
+      Actor joint = mModelNodeImpl.Self();
+      boneData.constraint.AddSource(Source{joint, Actor::Property::WORLD_MATRIX});
+      boneData.constraint.ApplyPost();
     }
     break;
   }

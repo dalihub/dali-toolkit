@@ -231,7 +231,6 @@ int UtcDaliDliLoaderLoadSceneExercise(void)
     resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
-      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
       scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
       ConfigureBlendShapeShaders(resources, scene, actor, std::move(nodeParams.mBlendshapeRequests));
       scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
@@ -350,7 +349,6 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
     resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
-      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
       scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
       ConfigureBlendShapeShaders(resources, scene, actor, std::move(nodeParams.mBlendshapeRequests));
       scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
@@ -415,7 +413,6 @@ int UtcDaliDliLoaderLoadSceneArc(void)
     resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
-      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
       scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
       ConfigureBlendShapeShaders(resources, scene, actor, std::move(nodeParams.mBlendshapeRequests));
       scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
@@ -696,7 +693,6 @@ int UtcDaliDliLoaderLoadCoverageTest(void)
     resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
-      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
       scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
       ConfigureBlendShapeShaders(resources, scene, actor, std::move(nodeParams.mBlendshapeRequests));
       scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));

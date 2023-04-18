@@ -50,7 +50,6 @@ public:
    * @brief Name of bone matrix uniform (array).
    */
   static const char* BONE_UNIFORM_NAME;
-  static const char* JOINT_MATRIX;
 
   Skinning() = delete;
 };
