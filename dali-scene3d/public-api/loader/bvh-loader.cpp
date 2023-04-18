@@ -19,6 +19,9 @@
 #include <dali-scene3d/public-api/loader/bvh-loader.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/file-stream.h>
+#include <dali/integration-api/debug.h>
+
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -84,7 +87,7 @@ void trim(std::string& s)
           s.end());
 }
 
-void ParseHierarchy(std::ifstream& file, std::shared_ptr<Joint>& joint)
+void ParseHierarchy(std::istream& file, std::shared_ptr<Joint>& joint)
 {
   std::string line;
   while(std::getline(file, line))
@@ -168,7 +171,7 @@ void MakeList(std::shared_ptr<Joint>& joint, std::vector<std::shared_ptr<Joint>>
   }
 }
 
-void ParseMotion(std::ifstream& file, std::shared_ptr<Joint>& hierarchy, uint32_t& frameCount, float& frameTime)
+void ParseMotion(std::istream& file, std::shared_ptr<Joint>& hierarchy, uint32_t& frameCount, float& frameTime)
 {
   std::vector<std::shared_ptr<Joint>> jointList;
   MakeList(hierarchy, jointList);
@@ -195,7 +198,7 @@ void ParseMotion(std::ifstream& file, std::shared_ptr<Joint>& hierarchy, uint32_
     }
   }
 
-  while(getline(file, line))
+  while(std::getline(file, line))
   {
     trim(line);
     std::istringstream stream(line);
@@ -242,16 +245,10 @@ void ParseMotion(std::ifstream& file, std::shared_ptr<Joint>& hierarchy, uint32_
   }
 }
 
-bool ParseBvh(const std::string& path, uint32_t& frameCount, float& frameTime, std::shared_ptr<Joint>& rootJoint)
+bool ParseBvh(std::istream& file, uint32_t& frameCount, float& frameTime, std::shared_ptr<Joint>& rootJoint)
 {
-  std::ifstream file(path.data());
-  if(!file.is_open())
-  {
-    return false;
-  }
-
   std::string line;
-  while(getline(file, line))
+  while(std::getline(file, line))
   {
     trim(line);
     std::istringstream stream(line);
@@ -260,7 +257,7 @@ bool ParseBvh(const std::string& path, uint32_t& frameCount, float& frameTime, s
     if(token == TOKEN_HIERARCHY.data())
     {
       std::string line;
-      while(getline(file, line))
+      while(std::getline(file, line))
       {
         trim(line);
         std::istringstream stream(line);
@@ -289,7 +286,7 @@ AnimationDefinition GenerateAnimation(const std::string& animationName, std::sha
 
   animationDefinition.SetName(animationName);
   animationDefinition.SetDuration(frameTime * (frameCount - 1));
-  float keyFrameInterval        = (frameCount > 1u) ? 1.0f / static_cast<float>(frameCount - 1u) : Dali::Math::MACHINE_EPSILON_10;
+  float keyFrameInterval = (frameCount > 1u) ? 1.0f / static_cast<float>(frameCount - 1u) : Dali::Math::MACHINE_EPSILON_10;
 
   std::vector<std::shared_ptr<Joint>> jointList;
   MakeList(hierarchy, jointList);
@@ -300,14 +297,14 @@ AnimationDefinition GenerateAnimation(const std::string& animationName, std::sha
     for(uint32_t i = 0; i < jointList.size(); ++i)
     {
       AnimatedProperty translationProperty;
-      translationProperty.mTimePeriod       = Dali::TimePeriod(animationDefinition.GetDuration());
-      translationProperty.mNodeName         = jointList[i]->name;
-      translationProperty.mPropertyName     = PROPERTY_NAME_POSITION.data();
+      translationProperty.mTimePeriod   = Dali::TimePeriod(animationDefinition.GetDuration());
+      translationProperty.mNodeName     = jointList[i]->name;
+      translationProperty.mPropertyName = PROPERTY_NAME_POSITION.data();
 
       AnimatedProperty rotationProperty;
-      rotationProperty.mTimePeriod       = Dali::TimePeriod(animationDefinition.GetDuration());
-      rotationProperty.mNodeName         = jointList[i]->name;
-      rotationProperty.mPropertyName     = PROPERTY_NAME_ORIENTATION.data();
+      rotationProperty.mTimePeriod   = Dali::TimePeriod(animationDefinition.GetDuration());
+      rotationProperty.mNodeName     = jointList[i]->name;
+      rotationProperty.mPropertyName = PROPERTY_NAME_ORIENTATION.data();
 
       translationProperty.mKeyFrames = Dali::KeyFrames::New();
       rotationProperty.mKeyFrames    = Dali::KeyFrames::New();
@@ -323,19 +320,57 @@ AnimationDefinition GenerateAnimation(const std::string& animationName, std::sha
 
   return animationDefinition;
 }
-} // namespace
 
-AnimationDefinition LoadBvh(const std::string& path, const std::string& animationName, const Vector3& scale)
+AnimationDefinition LoadBvhInternal(std::istream& stream, const std::string& animationName, const Vector3& scale)
 {
   uint32_t               frameCount = 0;
   float                  frameTime  = 0.0f;
   std::shared_ptr<Joint> rootJoint(new Joint);
-  if(!ParseBvh(path, frameCount, frameTime, rootJoint))
+
+  if(!ParseBvh(stream, frameCount, frameTime, rootJoint))
   {
     AnimationDefinition animationDefinition;
     return animationDefinition;
   }
 
   return GenerateAnimation(animationName, rootJoint, frameCount, frameTime, scale);
+}
+} // namespace
+
+AnimationDefinition LoadBvh(const std::string& path, const std::string& animationName, const Vector3& scale)
+{
+  Dali::FileStream fileStream(path);
+  std::iostream&   stream = fileStream.GetStream();
+
+  if(stream.fail())
+  {
+    DALI_LOG_ERROR("Fail to load bvh file : %s\n", path.c_str());
+    AnimationDefinition animationDefinition;
+    return animationDefinition;
+  }
+
+  return LoadBvhInternal(stream, animationName, scale);
+}
+
+AnimationDefinition LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, const std::string& animationName, const Vector3& scale)
+{
+  if(rawBuffer == nullptr || rawBufferLength == 0)
+  {
+    DALI_LOG_ERROR("Fail to load bvh buffer : buffer is empty!\n");
+    AnimationDefinition animationDefinition;
+    return animationDefinition;
+  }
+
+  Dali::FileStream fileStream(const_cast<uint8_t*>(rawBuffer), static_cast<size_t>(static_cast<uint32_t>(rawBufferLength)));
+  std::iostream&   stream = fileStream.GetStream();
+
+  if(stream.fail())
+  {
+    DALI_LOG_ERROR("Fail to load bvh buffer : buffer length : %d\n", rawBufferLength);
+    AnimationDefinition animationDefinition;
+    return animationDefinition;
+  }
+
+  return LoadBvhInternal(stream, animationName, scale);
 }
 } // namespace Dali::Scene3D::Loader
