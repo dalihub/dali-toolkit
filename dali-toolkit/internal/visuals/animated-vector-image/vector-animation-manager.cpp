@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,6 +108,9 @@ void VectorAnimationManager::UnregisterEventCallback(CallbackBase* callback)
   if(iter != mEventCallbacks.end())
   {
     mEventCallbacks.erase(iter);
+
+    // Delete callback base memory
+    delete callback;
 
     if(mEventCallbacks.empty())
     {
