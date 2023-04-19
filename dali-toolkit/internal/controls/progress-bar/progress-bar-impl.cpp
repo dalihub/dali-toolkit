@@ -689,6 +689,11 @@ double ProgressBar::ProgressBarAccessible::GetCurrent() const
   return self.GetProperty(Toolkit::ProgressBar::Property::PROGRESS_VALUE).Get<float>();
 }
 
+std::string ProgressBar::ProgressBarAccessible::GetValueText() const
+{
+  return {}; // Text mode is not used at the moment
+}
+
 double ProgressBar::ProgressBarAccessible::GetMaximum() const
 {
   return DEFAULT_UPPER_BOUND;

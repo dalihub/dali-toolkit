@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,10 +49,6 @@ VectorAnimationManager::VectorAnimationManager()
 
 VectorAnimationManager::~VectorAnimationManager()
 {
-  for(auto&& iter : mEventCallbacks)
-  {
-    delete iter;
-  }
   mEventCallbacks.clear();
 
   if(mProcessorRegistered)
@@ -93,7 +89,7 @@ VectorAnimationThread& VectorAnimationManager::GetVectorAnimationThread()
 
 void VectorAnimationManager::RegisterEventCallback(CallbackBase* callback)
 {
-  mEventCallbacks.push_back(callback);
+  mEventCallbacks.emplace_back(std::unique_ptr<Dali::CallbackBase>(callback));
 
   if(!mProcessorRegistered)
   {
@@ -104,7 +100,11 @@ void VectorAnimationManager::RegisterEventCallback(CallbackBase* callback)
 
 void VectorAnimationManager::UnregisterEventCallback(CallbackBase* callback)
 {
-  auto iter = std::find(mEventCallbacks.begin(), mEventCallbacks.end(), callback);
+  auto iter = std::find_if(mEventCallbacks.begin(),
+                           mEventCallbacks.end(),
+                           [callback](const std::unique_ptr<CallbackBase>& element) {
+                             return element.get() == callback;
+                           });
   if(iter != mEventCallbacks.end())
   {
     mEventCallbacks.erase(iter);
@@ -125,7 +125,6 @@ void VectorAnimationManager::Process(bool postProcessor)
   for(auto&& iter : mEventCallbacks)
   {
     CallbackBase::Execute(*iter);
-    delete iter;
   }
   mEventCallbacks.clear();
 
