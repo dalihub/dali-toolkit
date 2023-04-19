@@ -199,18 +199,6 @@ public: // METHODS
                         StringCallback                   onError = DefaultErrorCallback) const;
 
   /*
-   * @brief Sets up joint matrix properties and constraints on actors that are involved in skeletal
-   *  animation (i.e. those that are between (inclusive) the lower and upper bounds of any skeleton),
-   *  to ensure the correct update of meshes skinned to these skeletons.
-   * @param iRoot The index of the scene root node. Skeletons that aren't descendants of this node
-   *  will be ignored.
-   * @param skeletons The list of skeletons that require setting up.
-   * @param rootActor The Actor corresponding to the root node, which will be used to locate
-   *  other actors.
-   */
-  void ConfigureSkeletonJoints(uint32_t iRoot, const SkeletonDefinition::Vector& skeletons, Actor rootActor) const;
-
-  /*
    * @brief Ensures that there is no overlap between shaders used by nodes that have
    *  meshes skinned to different skeletons.
    */
