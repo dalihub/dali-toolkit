@@ -33,6 +33,17 @@ namespace Dali::Scene3D::Loader
  */
 DALI_SCENE3D_API AnimationDefinition LoadBvh(const std::string& path, const std::string& animationName, const Vector3& scale = Vector3::ONE);
 
+/**
+ * @brief Loads motion capture data from bvh data stream.
+ *
+ * @param[in] rawBuffer The bvh buffer.
+ * @param[in] rawBufferLength The length of buffer.
+ * @param[in] animationName Name of the motion capture animation
+ * @param[in] scale The scale factor to set on the position property manually.
+ * @return AnimationDefinition that includes joint animation information.
+ */
+DALI_SCENE3D_API AnimationDefinition LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, const std::string& animationName, const Vector3& scale = Vector3::ONE);
+
 } // namespace Dali::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_BVH_LOADER_H
