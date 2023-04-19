@@ -21,6 +21,7 @@
 #include <iostream>
 
 #include <dali-scene3d/public-api/model-components/model-node.h>
+#include "mesh-builder.h"
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -34,10 +35,6 @@ void model_components_model_node_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
-
-namespace
-{
-} // namespace
 
 // Negative test case for a method
 int UtcDaliModelNodeUninitialized(void)
@@ -291,6 +288,82 @@ int UtcDaliModelNodeFindChildModelNodeByName(void)
   Scene3D::ModelNode child2 = modelNode.FindChildModelNodeByName("modelNode2");
   DALI_TEST_CHECK(child2);
   DALI_TEST_EQUALS(child2, modelNode2, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliModelNodeCustomNode1(void)
+{
+  tet_infoline(" UtcDaliModelNodeCustomNode1.");
+
+  ToolkitTestApplication application;
+
+  Scene3D::ModelNode      modelNode      = Scene3D::ModelNode::New();
+  Scene3D::ModelPrimitive modelPrimitive = Scene3D::ModelPrimitive::New();
+  Scene3D::Material       material       = Scene3D::Material::New();
+  Geometry                geometry       = CreateQuadGeometry();
+
+  DALI_TEST_EQUALS(modelNode.GetRendererCount(), 0, TEST_LOCATION);
+
+  modelNode.AddModelPrimitive(modelPrimitive);
+
+  DALI_TEST_EQUALS(modelNode.GetRendererCount(), 0, TEST_LOCATION);
+  
+  modelPrimitive.SetGeometry(geometry);
+
+  DALI_TEST_EQUALS(modelNode.GetRendererCount(), 0, TEST_LOCATION);
+
+  modelPrimitive.SetMaterial(material);
+
+  DALI_TEST_EQUALS(modelNode.GetRendererCount(), 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliModelNodeCustomNode2(void)
+{
+  tet_infoline(" UtcDaliModelNodeCustomNode2.");
+
+  ToolkitTestApplication application;
+
+  Scene3D::ModelNode      modelNode      = Scene3D::ModelNode::New();
+  Scene3D::ModelPrimitive modelPrimitive = Scene3D::ModelPrimitive::New();
+  Scene3D::Material       material       = Scene3D::Material::New();
+  Geometry                geometry       = CreateQuadGeometry();
+  modelPrimitive.SetGeometry(geometry);
+  modelPrimitive.SetMaterial(material);
+
+  DALI_TEST_EQUALS(modelNode.GetRendererCount(), 0, TEST_LOCATION);
+
+  modelNode.AddModelPrimitive(modelPrimitive);
+
+  DALI_TEST_EQUALS(modelNode.GetRendererCount(), 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliModelNodeCustomNode3(void)
+{
+  tet_infoline(" UtcDaliModelNodeCustomNode3.");
+
+  ToolkitTestApplication application;
+
+  Scene3D::ModelNode      modelNode      = Scene3D::ModelNode::New();
+  Scene3D::ModelPrimitive modelPrimitive = Scene3D::ModelPrimitive::New();
+  Scene3D::Material       material       = Scene3D::Material::New();
+  Geometry                geometry       = CreateQuadGeometry();
+  modelPrimitive.SetGeometry(geometry);
+  modelPrimitive.SetMaterial(material);
+
+  DALI_TEST_EQUALS(modelNode.GetRendererCount(), 0, TEST_LOCATION);
+
+  modelNode.AddModelPrimitive(modelPrimitive);
+
+  DALI_TEST_EQUALS(modelNode.GetRendererCount(), 1, TEST_LOCATION);
+
+  modelNode.AddModelPrimitive(modelPrimitive);
+
+  DALI_TEST_EQUALS(modelNode.GetRendererCount(), 1, TEST_LOCATION);
 
   END_TEST;
 }
