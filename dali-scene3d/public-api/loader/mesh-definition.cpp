@@ -87,11 +87,11 @@ bool ReadBlob(const MeshDefinition::Blob& descriptor, std::istream& source, uint
       uint32_t       readSize  = 0;
       uint32_t       totalSize = (descriptor.mLength / descriptor.mElementSizeHint) * descriptor.mStride;
       while(readSize < totalSize &&
-            source.read(reinterpret_cast<char*>(target), descriptor.mElementSizeHint) &&
-            source.seekg(diff, std::istream::cur))
+            source.read(reinterpret_cast<char*>(target), descriptor.mElementSizeHint))
       {
         readSize += descriptor.mStride;
         target += descriptor.mElementSizeHint;
+        source.seekg(diff, std::istream::cur);
       }
       return readSize == totalSize;
     }
