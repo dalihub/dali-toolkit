@@ -26,7 +26,8 @@
 #include <dali-scene3d/internal/algorithm/path-finder-waypoint-data.h>
 #include <dali-scene3d/public-api/algorithm/path-finder-waypoint.h>
 
-using WayPointList = Dali::Scene3D::Algorithm::WayPointList;
+using WayPointList  = Dali::Scene3D::Algorithm::WayPointList;
+using FaceNodeIndex = Dali::Scene3D::Internal::Algorithm::PathFinderAlgorithmSPFADoubleWay::FaceNodeIndex;
 
 namespace
 {
@@ -38,16 +39,16 @@ constexpr float PRIORITY_SCALE_FACTOR = 0.7f; ///< The value of heuristic factor
  *
  * @param[in,out] components Container of components id stored.
  * @param[in] index index what we want to get components's id.
- * @return uint32_t top-value of this components.
+ * @return FaceIndex top-value of this components.
  */
-uint32_t GetComponentId(std::vector<uint32_t>& components, uint32_t index)
+FaceNodeIndex GetComponentId(std::vector<FaceNodeIndex>& components, FaceNodeIndex index)
 {
   if(components[index] == index)
   {
     return index;
   }
   // Get my parent's components id, and update myself.
-  uint32_t ret             = GetComponentId(components, components[index]);
+  FaceNodeIndex ret        = GetComponentId(components, components[index]);
   return components[index] = ret;
 }
 
@@ -59,25 +60,25 @@ uint32_t GetComponentId(std::vector<uint32_t>& components, uint32_t index)
  * @param[in] index0 index of components what we want to be combined.
  * @param[in] index1 index of components what we want to be combined.
  */
-void ComponentsCombine(std::vector<uint32_t>& components, std::vector<uint32_t>& componentsLevel, uint32_t index0, uint32_t index1)
+void ComponentsCombine(std::vector<FaceNodeIndex>& components, std::vector<FaceNodeIndex>& componentsLevel, FaceNodeIndex index0, FaceNodeIndex index1)
 {
-  uint32_t p0 = GetComponentId(components, index0);
-  uint32_t p1 = GetComponentId(components, index1);
-  if(p0 == p1)
+  FaceNodeIndex ancestor0 = GetComponentId(components, index0);
+  FaceNodeIndex ancestor1 = GetComponentId(components, index1);
+  if(ancestor0 == ancestor1)
   {
     return;
   }
 
-  if(componentsLevel[p0] < componentsLevel[p1])
+  if(componentsLevel[ancestor0] < componentsLevel[ancestor1])
   {
-    components[p0] = p1;
+    components[ancestor0] = ancestor1;
   }
   else
   {
-    components[p1] = p0;
-    if(componentsLevel[p0] == componentsLevel[p1])
+    components[ancestor1] = ancestor0;
+    if(componentsLevel[ancestor0] == componentsLevel[ancestor1])
     {
-      ++componentsLevel[p0];
+      ++componentsLevel[ancestor0];
     }
   }
 }
@@ -93,7 +94,7 @@ PathFinderAlgorithmSPFADoubleWay::PathFinderAlgorithmSPFADoubleWay(Dali::Scene3D
 
 PathFinderAlgorithmSPFADoubleWay::~PathFinderAlgorithmSPFADoubleWay() = default;
 
-float PathFinderAlgorithmSPFADoubleWay::DistancePanaltyCalculate(uint32_t index) const noexcept
+float PathFinderAlgorithmSPFADoubleWay::DistancePanaltyCalculate(FaceIndex index) const noexcept
 {
   return dist[index] - priority[index] * PRIORITY_SCALE_FACTOR;
 }
@@ -101,7 +102,7 @@ float PathFinderAlgorithmSPFADoubleWay::DistancePanaltyCalculate(uint32_t index)
 Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::FindPath(const Dali::Vector3& positionFrom, const Dali::Vector3& positionTo)
 {
   Dali::Vector3 outPosFrom;
-  uint32_t      polyIndexFrom;
+  FaceIndex     polyIndexFrom;
   auto          result = mNavigationMesh->FindFloor(positionFrom, outPosFrom, polyIndexFrom);
 
   Scene3D::Algorithm::WayPointList waypoints;
@@ -109,7 +110,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::FindPath(cons
   if(result)
   {
     Dali::Vector3 outPosTo;
-    uint32_t      polyIndexTo;
+    FaceIndex     polyIndexTo;
     result = mNavigationMesh->FindFloor(positionTo, outPosTo, polyIndexTo);
 
     if(result)
@@ -136,7 +137,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::FindPath(cons
   return waypoints;
 }
 
-Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::FindPath(uint32_t sourcePolyIndex, uint32_t targetPolyIndex)
+Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::FindPath(FaceIndex sourcePolyIndex, FaceIndex targetPolyIndex)
 {
   // Fast return if source and target index is same.
   if(sourcePolyIndex == targetPolyIndex)
@@ -160,11 +161,11 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::FindPath(uint
   }
 
   // pair<navimesh FaceIndex, is backward direction>
-  using queueItem = std::pair<uint32_t, uint8_t>;
+  using queueItem = std::pair<FaceIndex, uint8_t>;
 
   std::list<queueItem> nodeQueue;
 
-  std::unordered_set<uint32_t> usedPolyIndexs[2];
+  std::unordered_set<FaceIndex> usedPolyIndexs[2];
 
   // Set distance of source and target
   dist[sourcePolyIndex]     = 0.0f;
@@ -178,9 +179,9 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::FindPath(uint
   usedPolyIndexs[0].insert(sourcePolyIndex);
   usedPolyIndexs[1].insert(targetPolyIndex);
 
-  bool     foundPath          = false;
-  uint32_t forwardEndIndex    = Scene3D::Algorithm::NavigationMesh::NULL_FACE;
-  uint32_t backwardStartIndex = Scene3D::Algorithm::NavigationMesh::NULL_FACE;
+  bool      foundPath          = false;
+  FaceIndex forwardEndIndex    = Scene3D::Algorithm::NavigationMesh::NULL_FACE;
+  FaceIndex backwardStartIndex = Scene3D::Algorithm::NavigationMesh::NULL_FACE;
 
   const auto sourcePos = Dali::Vector3(Face(sourcePolyIndex)->center);
   const auto targetPos = Dali::Vector3(Face(targetPolyIndex)->center);
@@ -265,9 +266,9 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::FindPath(uint
   }
 
   // Build path of face index
-  std::list<uint32_t> q;
+  std::list<FaceIndex> q;
   {
-    uint32_t u = forwardEndIndex;
+    FaceIndex u = forwardEndIndex;
     while(u != Scene3D::Algorithm::NavigationMesh::NULL_FACE)
     {
       q.push_front(u);
@@ -275,7 +276,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::FindPath(uint
     }
   }
   {
-    uint32_t u = backwardStartIndex;
+    FaceIndex u = backwardStartIndex;
     while(u != Scene3D::Algorithm::NavigationMesh::NULL_FACE)
     {
       q.push_back(u);
@@ -350,10 +351,10 @@ void PathFinderAlgorithmSPFADoubleWay::PrepareData()
   queued.resize(faceCount);
 
   // Temperal container for components level. It will be used for Union-Find algorithm.
-  std::vector<uint32_t> componentLevels(faceCount);
+  std::vector<FaceNodeIndex> componentLevels(faceCount);
 
   // Initialize path informations.
-  for(auto i = 0u; i < faceCount; ++i)
+  for(FaceNodeIndex i = 0u; i < faceCount; ++i)
   {
     dist[i]         = std::numeric_limits<float>::infinity();
     priority[i]     = -1.0f;                                         // Initialize by negative value, that we didn't calculate yet.
@@ -366,7 +367,8 @@ void PathFinderAlgorithmSPFADoubleWay::PrepareData()
   }
 
   // for each face build the list
-  for(auto i = 0u; i < faceCount; ++i)
+  // TODO : Currently, we are assume that FaceNodeIndex is matched with FaceIndex 1:1. This might be changed in future.
+  for(FaceNodeIndex i = 0u; i < faceCount; ++i)
   {
     auto&       node = mNodes[i];
     const auto* face = mNavigationMesh->GetFace(i);

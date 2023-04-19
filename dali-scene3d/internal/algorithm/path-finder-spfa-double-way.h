@@ -54,11 +54,11 @@ public:
    * @param[in] polyIndexTo Index of end polygon
    * @return List of waypoints for path
    */
-  Scene3D::Algorithm::WayPointList FindPath(uint32_t sourcePolyIndex, uint32_t targetPolyIndex) override;
+  Scene3D::Algorithm::WayPointList FindPath(FaceIndex sourcePolyIndex, FaceIndex targetPolyIndex) override;
 
-  [[nodiscard]] inline const NavigationMesh::Face* Face(uint32_t i) const
+  [[nodiscard]] inline const NavigationMesh::Face* Face(FaceIndex faceIndex) const
   {
-    return mNavigationMesh->GetFace(i);
+    return mNavigationMesh->GetFace(faceIndex);
   }
 
   /**
@@ -75,31 +75,30 @@ public:
    *
    * @param[in] index index of node what we want to calculate panantly.
    */
-  float DistancePanaltyCalculate(uint32_t index) const noexcept;
+  float DistancePanaltyCalculate(FaceIndex index) const noexcept;
 
   /**
    * Structure describes single node of pathfinding algorithm
    */
   struct FaceNode
   {
-    uint32_t faceIndex; ///< Index of face which is associated with node
-
     // neighbours
-    uint32_t faces[3];  ///< List of neighbouring faces (max 3 for a triangle)
-    uint32_t edges[3];  ///< List of edges (max 3 for a triangle)
-    float    weight[3]; ///< List of weights (by distance) to each neighbour
+    FaceIndex faces[3];  ///< List of neighbouring faces (max 3 for a triangle)
+    EdgeIndex edges[3];  ///< List of edges (max 3 for a triangle)
+    float     weight[3]; ///< List of weights (by distance) to each neighbour
   };
+  using FaceNodeIndex = FaceIndex;
 
   NavigationMesh*       mNavigationMesh; ///< Pointer to a valid NavigationMesh
   std::vector<FaceNode> mNodes;          ///< List of nodes
 
 private:
-  std::vector<float>    dist;
-  std::vector<float>    priority; ///< Cached priority value. It will be calculated by source & target poly index per every queries.
-  std::vector<uint32_t> prevForward;
-  std::vector<uint32_t> prevBackward;
-  std::vector<uint32_t> componentIds; ///< Id of connected components per each nodes. It should be one of node's index.
-  std::vector<bool>     queued;
+  std::vector<float>         dist;
+  std::vector<float>         priority; ///< Cached priority value. It will be calculated by source & target poly index per every queries.
+  std::vector<FaceIndex>     prevForward;
+  std::vector<FaceIndex>     prevBackward;
+  std::vector<FaceNodeIndex> componentIds; ///< Id of connected components per each nodes. It should be one of node's index.
+  std::vector<bool>          queued;
 };
 } // namespace Dali::Scene3D::Internal::Algorithm
 #endif // DALI_SCENE3D_INTERNAL_PATH_FINDER_SPFA_DOUBLE_WAY_H

@@ -15,10 +15,10 @@
  *
  */
 
-#include "dali-scene3d/public-api/algorithm/navigation-mesh.h"
-#include "dali-scene3d/public-api/loader/navigation-mesh-factory.h"
 #include <dali-test-suite-utils.h>
 #include <dlfcn.h>
+#include "dali-scene3d/public-api/algorithm/navigation-mesh.h"
+#include "dali-scene3d/public-api/loader/navigation-mesh-factory.h"
 using namespace Dali;
 using namespace Dali::Scene3D::Algorithm;
 using namespace Dali::Scene3D::Loader;
@@ -41,14 +41,14 @@ struct SysOverride
     }
   }
 
-  void SetReturnValue( R value, uint32_t n )
+  void SetReturnValue(R value, uint32_t n)
   {
     if(overrideEnabled)
     {
       tet_infoline("Warning! Overriding return value is already enabled! Ignoring!\n");
       return;
     }
-    result = value;
+    result          = value;
     overrideCounter = n;
     overrideEnabled = true;
   }
@@ -70,29 +70,29 @@ struct SysOverride
   }
 
   std::string funcNameStr;
-  R result{R{}};
-  F* func{nullptr};
-  uint32_t overrideCounter = 0;
-  bool overrideEnabled = false;
+  R           result{R{}};
+  F*          func{nullptr};
+  uint32_t    overrideCounter = 0;
+  bool        overrideEnabled = false;
 };
 
 // Override fseek()
 static thread_local SysOverride<int, decltype(fseek)> call_fseek("fseek");
-extern "C" int fseek (FILE *s, long int o, int w)
+extern "C" int                                        fseek(FILE* s, long int o, int w)
 {
-  return call_fseek.Invoke( s, o, w );
+  return call_fseek.Invoke(s, o, w);
 }
 
 // Override ftell()
 static thread_local SysOverride<int, decltype(ftell)> call_ftell("ftell");
-extern "C" long int ftell(FILE *s)
+extern "C" long int                                   ftell(FILE* s)
 {
-  return call_ftell.Invoke( s );
+  return call_ftell.Invoke(s);
 }
 
 // Override fread()
 static thread_local SysOverride<int, decltype(fread)> call_fread("fread");
-extern "C" size_t fread (void *__restrict p, size_t s, size_t n, FILE *__restrict st)
+extern "C" size_t                                     fread(void* __restrict p, size_t s, size_t n, FILE* __restrict st)
 {
   return call_fread.Invoke(p, s, n, st);
 }
@@ -176,15 +176,15 @@ int UtcDaliNavigationMeshCreateFromBufferP(void)
 {
   tet_infoline("UtcDaliNavigationMeshCreateFromBufferP: Creates navigation mesh using binary buffer");
 
-  auto fin = fopen("resources/navmesh-test.bin", "rb");
-  [[maybe_unused]] auto err = fseek(fin, 0, SEEK_END);
-  auto length = ftell(fin);
-  fseek( fin, 0, SEEK_SET);
+  auto                  fin    = fopen("resources/navmesh-test.bin", "rb");
+  [[maybe_unused]] auto err    = fseek(fin, 0, SEEK_END);
+  auto                  length = ftell(fin);
+  fseek(fin, 0, SEEK_SET);
   std::vector<uint8_t> buffer;
   buffer.resize(length);
-  fread( buffer.data(), 1, length, fin );
+  fread(buffer.data(), 1, length, fin);
   fclose(fin);
-  auto result = NavigationMeshFactory::CreateFromBuffer( buffer );
+  auto result = NavigationMeshFactory::CreateFromBuffer(buffer);
   DALI_TEST_CHECK(result != nullptr);
 
   END_TEST;
@@ -199,12 +199,12 @@ int UtcDaliNavigationMeshCountersP(void)
   DALI_TEST_CHECK(result != nullptr);
 
   auto vertexCount = result->GetVertexCount();
-  auto edgeCount = result->GetEdgeCount();
-  auto faceCount = result->GetFaceCount();
+  auto edgeCount   = result->GetEdgeCount();
+  auto faceCount   = result->GetFaceCount();
 
-  DALI_TEST_EQUALS( vertexCount, 132, TEST_LOCATION );
-  DALI_TEST_EQUALS( edgeCount, 300, TEST_LOCATION );
-  DALI_TEST_EQUALS( faceCount, 165, TEST_LOCATION );
+  DALI_TEST_EQUALS(vertexCount, 132, TEST_LOCATION);
+  DALI_TEST_EQUALS(edgeCount, 300, TEST_LOCATION);
+  DALI_TEST_EQUALS(faceCount, 165, TEST_LOCATION);
 
   END_TEST;
 }
@@ -219,7 +219,7 @@ int UtcDaliNavigationMeshGetVertexP(void)
 
   auto vertexCount = navmesh->GetVertexCount();
 
-  DALI_TEST_EQUALS( vertexCount, 132, TEST_LOCATION );
+  DALI_TEST_EQUALS(vertexCount, 132, TEST_LOCATION);
 
   // List of coords, must be verified with Blender exporter
   // clang-format off
@@ -235,12 +235,12 @@ int UtcDaliNavigationMeshGetVertexP(void)
   // clang-format on
 
   auto j = 0;
-  for( auto i = 0u; i < 132; i+= 10, j+= 3)
+  for(auto i = 0u; i < 132; i += 10, j += 3)
   {
     const auto* vertex = navmesh->GetVertex(i);
-    Vector3 v0(vertex->co);
-    Vector3 v1(vertexData[j], vertexData[j+1], vertexData[j+2]);
-    DALI_TEST_EQUALS( v0, v1, TEST_LOCATION);
+    Vector3     v0(vertex->coordinates);
+    Vector3     v1(vertexData[j], vertexData[j + 1], vertexData[j + 2]);
+    DALI_TEST_EQUALS(v0, v1, TEST_LOCATION);
   }
 
   END_TEST;
@@ -256,11 +256,11 @@ int UtcDaliNavigationMeshGetEdgeP(void)
 
   auto edgeCount = navmesh->GetEdgeCount();
 
-  DALI_TEST_EQUALS( edgeCount, 300, TEST_LOCATION );
+  DALI_TEST_EQUALS(edgeCount, 300, TEST_LOCATION);
 
   // List of coords, must be verified with Blender exporter
   // clang-format off
-  std::vector<uint16_t> edgeData = {
+  std::vector<EdgeIndex> edgeData = {
     2, 65535, 8, 1,
     8, 109, 124, 108,
     10, 158, 32, 35,
@@ -274,18 +274,18 @@ int UtcDaliNavigationMeshGetEdgeP(void)
   };
   // clang-format on
   auto j = 0;
-  for( auto i = 0u; i < 300; i+= 30, j+= 4)
+  for(auto i = 0u; i < 300; i += 30, j += 4)
   {
     const auto* edge = navmesh->GetEdge(i);
-    auto e0 = edge->face[0];
-    auto e1 = edge->face[1];
-    auto v0 = edge->vertex[0];
-    auto v1 = edge->vertex[1];
+    auto        e0   = edge->face[0];
+    auto        e1   = edge->face[1];
+    auto        v0   = edge->vertex[0];
+    auto        v1   = edge->vertex[1];
 
-    DALI_TEST_EQUALS(e0, edgeData[j+0], TEST_LOCATION);
-    DALI_TEST_EQUALS(e1, edgeData[j+1], TEST_LOCATION);
-    DALI_TEST_EQUALS(v0, edgeData[j+2], TEST_LOCATION);
-    DALI_TEST_EQUALS(v1, edgeData[j+3], TEST_LOCATION);
+    DALI_TEST_EQUALS(e0, edgeData[j + 0], TEST_LOCATION);
+    DALI_TEST_EQUALS(e1, edgeData[j + 1], TEST_LOCATION);
+    DALI_TEST_EQUALS(v0, edgeData[j + 2], TEST_LOCATION);
+    DALI_TEST_EQUALS(v1, edgeData[j + 3], TEST_LOCATION);
   }
 
   END_TEST;
@@ -301,7 +301,7 @@ int UtcDaliNavigationMeshGetFaceP(void)
 
   auto faceCount = navmesh->GetFaceCount();
 
-  DALI_TEST_EQUALS( faceCount, 165, TEST_LOCATION );
+  DALI_TEST_EQUALS(faceCount, 165, TEST_LOCATION);
 
   // List of coords, must be verified with Blender exporter
   // clang-format off
@@ -321,30 +321,29 @@ int UtcDaliNavigationMeshGetFaceP(void)
   };
   // clang-format on
   auto j = 0;
-  for( auto i = 0u; i < 165; i+= 16, j++)
+  for(auto i = 0u; i < 165; i += 16, j++)
   {
     const auto* face = navmesh->GetFace(i);
-    Vector3 n0(face->normal);
-    Vector3 c0(face->center);
+    Vector3     n0(face->normal);
+    Vector3     c0(face->center);
 
     Vector3 n1(faceData[j].normal);
     Vector3 c1(faceData[j].center);
 
-    DALI_TEST_EQUALS( n0, n1, TEST_LOCATION);
-    DALI_TEST_EQUALS( c0, c1, TEST_LOCATION);
+    DALI_TEST_EQUALS(n0, n1, TEST_LOCATION);
+    DALI_TEST_EQUALS(c0, c1, TEST_LOCATION);
 
-    DALI_TEST_EQUALS( faceData[j].vertex[0], face->vertex[0], TEST_LOCATION);
-    DALI_TEST_EQUALS( faceData[j].vertex[1], face->vertex[1], TEST_LOCATION);
-    DALI_TEST_EQUALS( faceData[j].vertex[2], face->vertex[2], TEST_LOCATION);
+    DALI_TEST_EQUALS(faceData[j].vertex[0], face->vertex[0], TEST_LOCATION);
+    DALI_TEST_EQUALS(faceData[j].vertex[1], face->vertex[1], TEST_LOCATION);
+    DALI_TEST_EQUALS(faceData[j].vertex[2], face->vertex[2], TEST_LOCATION);
 
-    DALI_TEST_EQUALS( faceData[j].edge[0], face->edge[0], TEST_LOCATION);
-    DALI_TEST_EQUALS( faceData[j].edge[1], face->edge[1], TEST_LOCATION);
-    DALI_TEST_EQUALS( faceData[j].edge[2], face->edge[2], TEST_LOCATION);
+    DALI_TEST_EQUALS(faceData[j].edge[0], face->edge[0], TEST_LOCATION);
+    DALI_TEST_EQUALS(faceData[j].edge[1], face->edge[1], TEST_LOCATION);
+    DALI_TEST_EQUALS(faceData[j].edge[2], face->edge[2], TEST_LOCATION);
   }
 
   END_TEST;
 }
-
 
 int UtcDaliNavigationGetGravityP(void)
 {
@@ -353,9 +352,9 @@ int UtcDaliNavigationGetGravityP(void)
   auto gravity = navmesh->GetGravityVector();
 
   // navmesh-test.bin is exported in Blender and the default gravity is Z = -1
-  Dali::Vector3 expectedGravity( 0.0f, 0.0f, -1.0f );
+  Dali::Vector3 expectedGravity(0.0f, 0.0f, -1.0f);
 
-  DALI_TEST_EQUALS( gravity, expectedGravity, TEST_LOCATION);
+  DALI_TEST_EQUALS(gravity, expectedGravity, TEST_LOCATION);
 
   END_TEST;
 }
@@ -368,9 +367,9 @@ int UtcDaliNavigationSetTransformP(void)
 
   Matrix matrix;
   matrix.SetIdentity();
-  Quaternion q = Quaternion( Radian(Degree(-90)), Vector3(1.0, 0.0, 0.0));
-  Matrix newMatrix;
-  matrix.Multiply( newMatrix, matrix, q); // Rotate matrix along X-axis
+  Quaternion q = Quaternion(Radian(Degree(-90)), Vector3(1.0, 0.0, 0.0));
+  Matrix     newMatrix;
+  matrix.Multiply(newMatrix, matrix, q); // Rotate matrix along X-axis
 
   navmesh->SetSceneTransform(newMatrix);
 
@@ -384,12 +383,12 @@ int UtcDaliNavigationSetTransformP(void)
   auto gravityVector = navmesh->GetGravityVector();
 
   // 'point' should be turned into the gravity vector after transforming into the local space
-  DALI_TEST_EQUALS( navMeshLocalSpace, gravityVector, TEST_LOCATION);
+  DALI_TEST_EQUALS(navMeshLocalSpace, gravityVector, TEST_LOCATION);
 
   navMeshParentSpace = navmesh->PointLocalToScene(gravityVector);
 
   // The gravity should be transformed back into point
-  DALI_TEST_EQUALS( navMeshParentSpace, point, TEST_LOCATION);
+  DALI_TEST_EQUALS(navMeshParentSpace, point, TEST_LOCATION);
 
   END_TEST;
 }
@@ -403,21 +402,21 @@ int UtcDaliNavigationFindFloor0P(void)
   // All calculations in the navmesh local space
   navmesh->SetSceneTransform(Matrix(Matrix::IDENTITY));
 
-  std::vector<Vector3> inPositions;
-  std::vector<Vector3> expectedPositions;
-  std::vector<uint32_t> expectedFaceIndex;
-  std::vector<bool> expectedResult;
+  std::vector<Vector3>   inPositions;
+  std::vector<Vector3>   expectedPositions;
+  std::vector<FaceIndex> expectedFaceIndex;
+  std::vector<bool>      expectedResult;
 
   // Lift slightly over the floor level
   auto upFromGravity = navmesh->GetGravityVector() * (0.05f);
 
   auto size = navmesh->GetFaceCount();
-  for( auto i = 0u; i < size; ++i)
+  for(auto i = 0u; i < size; ++i)
   {
     const auto* face = navmesh->GetFace(i);
     Vector3(face->center);
     inPositions.emplace_back(Vector3(face->center));
-    inPositions.back() -= Vector3( upFromGravity );
+    inPositions.back() -= Vector3(upFromGravity);
     expectedResult.emplace_back(true);
 
     expectedPositions.emplace_back(face->center);
@@ -428,29 +427,29 @@ int UtcDaliNavigationFindFloor0P(void)
   // Middle 'circle' of scene
   inPositions.emplace_back(Vector3(-0.048838f, 0.039285f, 0.013085f));
   expectedPositions.emplace_back();
-  expectedFaceIndex.emplace_back( NavigationMesh::NULL_FACE );
+  expectedFaceIndex.emplace_back(NavigationMesh::NULL_FACE);
   expectedResult.emplace_back(false);
 
   // Triangle under stairs
   inPositions.emplace_back(Vector3(0.44365f, -1.787f, 0.13085f));
   expectedPositions.emplace_back();
-  expectedFaceIndex.emplace_back( NavigationMesh::NULL_FACE );
+  expectedFaceIndex.emplace_back(NavigationMesh::NULL_FACE);
   expectedResult.emplace_back(false);
 
   // Outside area
   inPositions.emplace_back(Vector3(0.77197f, -3.8596f, 0.13085f));
   expectedPositions.emplace_back();
-  expectedFaceIndex.emplace_back( NavigationMesh::NULL_FACE );
+  expectedFaceIndex.emplace_back(NavigationMesh::NULL_FACE);
   expectedResult.emplace_back(false);
 
-  for( auto i = 0u; i < inPositions.size(); ++i )
+  for(auto i = 0u; i < inPositions.size(); ++i)
   {
-    Vector3  outPosition;
-    uint32_t faceIndex {NavigationMesh::NULL_FACE};
-    auto result = navmesh->FindFloor(inPositions[i], outPosition, faceIndex);
-    DALI_TEST_EQUALS( bool(result), bool(expectedResult[i]), TEST_LOCATION);
-    DALI_TEST_EQUALS( faceIndex, expectedFaceIndex[i], TEST_LOCATION);
-    DALI_TEST_EQUALS( outPosition, expectedPositions[i], TEST_LOCATION);
+    Vector3   outPosition;
+    FaceIndex faceIndex{NavigationMesh::NULL_FACE};
+    auto      result = navmesh->FindFloor(inPositions[i], outPosition, faceIndex);
+    DALI_TEST_EQUALS(bool(result), bool(expectedResult[i]), TEST_LOCATION);
+    DALI_TEST_EQUALS(faceIndex, expectedFaceIndex[i], TEST_LOCATION);
+    DALI_TEST_EQUALS(outPosition, expectedPositions[i], TEST_LOCATION);
   }
 
   END_TEST;
@@ -466,49 +465,49 @@ int UtcDaliNavigationFindFloorForFace1P(void)
   navmesh->SetSceneTransform(Matrix(Matrix::IDENTITY));
 
   {
-    auto faceIndex = 0u;
-    auto position = Vector3( 0, 0, 0);
+    auto faceIndex           = FaceIndex(0u);
+    auto position            = Vector3(0, 0, 0);
     auto dontCheckNeighbours = true;
-    auto outPosition = Vector3();
-    auto expectedPosition = Vector3();
-    bool result = false;
+    auto outPosition         = Vector3();
+    auto expectedPosition    = Vector3();
+    bool result              = false;
 
     {
       // test 1. position lies within selected triangle
-      faceIndex = 137;
-      position = Vector3(-6.0767f, -1.7268f, 4.287f);
-      expectedPosition = Vector3(-6.0767f, -1.7268f, 3.83f);
+      faceIndex           = 137;
+      position            = Vector3(-6.0767f, -1.7268f, 4.287f);
+      expectedPosition    = Vector3(-6.0767f, -1.7268f, 3.83f);
       dontCheckNeighbours = true;
-      result = navmesh->FindFloorForFace(position, faceIndex, dontCheckNeighbours, outPosition);
+      result              = navmesh->FindFloorForFace(position, faceIndex, dontCheckNeighbours, outPosition);
 
-      DALI_TEST_EQUALS( result, true, TEST_LOCATION);
-      DALI_TEST_EQUALS( outPosition, expectedPosition, TEST_LOCATION);
+      DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+      DALI_TEST_EQUALS(outPosition, expectedPosition, TEST_LOCATION);
     }
 
     {
       // test 2. position lies outside selected triangle, not checking neighbours
-      faceIndex = 137;
-      position = Vector3(-5.3073f, -0.6023f, 4.287f);
-      expectedPosition = Vector3::ZERO;
-      outPosition = Vector3::ZERO;
+      faceIndex           = 137;
+      position            = Vector3(-5.3073f, -0.6023f, 4.287f);
+      expectedPosition    = Vector3::ZERO;
+      outPosition         = Vector3::ZERO;
       dontCheckNeighbours = true;
-      result = navmesh->FindFloorForFace(position, faceIndex, dontCheckNeighbours, outPosition);
+      result              = navmesh->FindFloorForFace(position, faceIndex, dontCheckNeighbours, outPosition);
 
-      DALI_TEST_EQUALS( result, false, TEST_LOCATION);
-      DALI_TEST_EQUALS( outPosition, expectedPosition, TEST_LOCATION);
+      DALI_TEST_EQUALS(result, false, TEST_LOCATION);
+      DALI_TEST_EQUALS(outPosition, expectedPosition, TEST_LOCATION);
     }
 
     {
       // test 3. position lies outside selected triangle but this time checking neighbours
-      faceIndex = 137;
-      position = Vector3(-5.3073f, -0.6023f, 4.287f);
-      expectedPosition = Vector3(-5.3073, -0.6023, 3.83);
-      outPosition = Vector3::ZERO;
+      faceIndex           = 137;
+      position            = Vector3(-5.3073f, -0.6023f, 4.287f);
+      expectedPosition    = Vector3(-5.3073, -0.6023, 3.83);
+      outPosition         = Vector3::ZERO;
       dontCheckNeighbours = false;
-      result = navmesh->FindFloorForFace(position, faceIndex, dontCheckNeighbours, outPosition);
+      result              = navmesh->FindFloorForFace(position, faceIndex, dontCheckNeighbours, outPosition);
 
-      DALI_TEST_EQUALS( result, true, TEST_LOCATION);
-      DALI_TEST_EQUALS( outPosition, expectedPosition, TEST_LOCATION);
+      DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+      DALI_TEST_EQUALS(outPosition, expectedPosition, TEST_LOCATION);
     }
   }
 
@@ -525,26 +524,25 @@ int UtcDaliNavigationFindFloorForFace2P(void)
   navmesh->SetSceneTransform(Matrix(Matrix::IDENTITY));
 
   {
-    [[maybe_unused]] auto faceIndex = 0u;
-    auto position = Vector3( 0, 0, 0);
-    auto dontCheckNeighbours = true;
-    auto outPosition = Vector3();
-    auto expectedPosition = Vector3();
-    bool result = false;
+    [[maybe_unused]] auto faceIndex           = 0u;
+    auto                  position            = Vector3(0, 0, 0);
+    auto                  dontCheckNeighbours = true;
+    auto                  outPosition         = Vector3();
+    auto                  expectedPosition    = Vector3();
+    bool                  result              = false;
 
     {
       // test 4. position lies within a triangle but this time full search forced,
       // the navmesh must have no previous searches (mCurrentFace shouldn't be set)
-      faceIndex = 137;
-      position = Vector3(-6.0767f, -1.7268f, 4.287f);
-      expectedPosition = Vector3(-6.0767f, -1.7268f, 3.83f);
+      faceIndex           = 137;
+      position            = Vector3(-6.0767f, -1.7268f, 4.287f);
+      expectedPosition    = Vector3(-6.0767f, -1.7268f, 3.83f);
       dontCheckNeighbours = true;
-      result = navmesh->FindFloorForFace(position, NavigationMesh::NULL_FACE, dontCheckNeighbours, outPosition);
+      result              = navmesh->FindFloorForFace(position, NavigationMesh::NULL_FACE, dontCheckNeighbours, outPosition);
 
-      DALI_TEST_EQUALS( result, true, TEST_LOCATION);
-      DALI_TEST_EQUALS( outPosition, expectedPosition, TEST_LOCATION);
+      DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+      DALI_TEST_EQUALS(outPosition, expectedPosition, TEST_LOCATION);
     }
-
   }
 
   END_TEST;
