@@ -382,7 +382,7 @@ void CalculateTextureSize(uint32_t totalTextureSize, uint32_t& textureWidth, uin
 void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDefinition::BlendShape>& blendShapes, uint32_t numberOfVertices, float& blendShapeUnnormalizeFactor, BufferDefinition::Vector& buffers)
 {
   uint32_t geometryBufferIndex = 0u;
-  float    maxDistance         = 0.f;
+  float    maxDistanceSquared  = 0.f;
   Vector3* geometryBufferV3    = reinterpret_cast<Vector3*>(geometryBuffer);
   for(const auto& blendShape : blendShapes)
   {
@@ -406,7 +406,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
           Vector3& delta = geometryBufferV3[geometryBufferIndex++];
           delta          = deltasBuffer[index];
 
-          maxDistance = std::max(maxDistance, delta.LengthSquared());
+          maxDistanceSquared = std::max(maxDistanceSquared, delta.LengthSquared());
         }
       }
     }
@@ -475,6 +475,14 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
   }
 
   geometryBufferIndex = 0u;
+
+  const float maxDistance = sqrtf(maxDistanceSquared);
+
+  const float normalizeFactor = (maxDistanceSquared < Math::MACHINE_EPSILON_1000) ? 1.f : (0.5f / maxDistance);
+
+  // Calculate and store the unnormalize factor.
+  blendShapeUnnormalizeFactor = maxDistance * 2.0f;
+
   for(const auto& blendShape : blendShapes)
   {
     // Normalize all the deltas and translate to a possitive value.
@@ -482,8 +490,6 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
     // whose values that are less than zero are clamped.
     if(blendShape.deltas.IsDefined())
     {
-      const float normalizeFactor = (fabsf(maxDistance) < Math::MACHINE_EPSILON_1000) ? 1.f : (0.5f / sqrtf(maxDistance));
-
       for(uint32_t index = 0u; index < numberOfVertices; ++index)
       {
         Vector3& delta = geometryBufferV3[geometryBufferIndex++];
@@ -491,9 +497,6 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
         delta.y        = Clamp(((delta.y * normalizeFactor) + 0.5f), 0.f, 1.f);
         delta.z        = Clamp(((delta.z * normalizeFactor) + 0.5f), 0.f, 1.f);
       }
-
-      // Calculate and store the unnormalize factor.
-      blendShapeUnnormalizeFactor = 1.f / normalizeFactor;
     }
 
     if(blendShape.normals.IsDefined())
