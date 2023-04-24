@@ -211,6 +211,41 @@ void ReadJointAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Acces
   raw.mAttribs.push_back({"aJoints", Property::VECTOR4, static_cast<uint32_t>(outBufferSize / sizeof(Vector4)), std::move(buffer)});
 }
 
+template<typename T>
+void ReadWeightAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Accessor& accessor, std::istream& source, const std::string& meshPath)
+{
+  constexpr auto sizeofBlobUnit = sizeof(T) * 4;
+
+  DALI_ASSERT_ALWAYS(((accessor.mBlob.mLength % sizeofBlobUnit == 0) ||
+                      accessor.mBlob.mStride >= sizeofBlobUnit) &&
+                     "weights buffer length not a multiple of element size");
+  const auto inBufferSize  = accessor.mBlob.GetBufferSize();
+  const auto outBufferSize = (sizeof(Vector4) / sizeofBlobUnit) * inBufferSize;
+
+  std::vector<uint8_t> buffer(outBufferSize);
+  auto                 inBuffer = buffer.data() + outBufferSize - inBufferSize;
+  if(!ReadAccessor(accessor, source, inBuffer))
+  {
+    ExceptionFlinger(ASSERT_LOCATION) << "Failed to read weights from '" << meshPath << "'.";
+  }
+
+  if constexpr(sizeofBlobUnit != sizeof(Vector4))
+  {
+    auto       floats = reinterpret_cast<float*>(buffer.data());
+    const auto end    = inBuffer + inBufferSize;
+    while(inBuffer != end)
+    {
+      const auto value = *reinterpret_cast<T*>(inBuffer);
+      // Normalize weight value. value /= 255 for uint8_t weight, and value /= 65535 for uint16_t weight.
+      *floats = static_cast<float>(value) / static_cast<float>((1 << (sizeof(T) * 8)) - 1);
+
+      inBuffer += sizeof(T);
+      ++floats;
+    }
+  }
+  raw.mAttribs.push_back({"aWeights", Property::VECTOR4, static_cast<uint32_t>(outBufferSize / sizeof(Vector4)), std::move(buffer)});
+}
+
 template<bool use32BitsIndices, typename IndexProviderType = IndexProvider<use32BitsIndices>>
 bool GenerateNormals(MeshDefinition::RawData& raw)
 {
@@ -947,20 +982,20 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
       ReadJointAccessor<float>(raw, mJoints0, streamJoint, pathJoint);
     }
 
-    DALI_ASSERT_ALWAYS(((mWeights0.mBlob.mLength % sizeof(Vector4) == 0) ||
-                        mWeights0.mBlob.mStride >= sizeof(Vector4)) &&
-                       "Weights buffer length not a multiple of element size");
-    const auto           bufferSize = mWeights0.mBlob.GetBufferSize();
-    std::vector<uint8_t> buffer(bufferSize);
-
     std::string pathWeight;
     auto&       streamWeight = GetAvailableData(fileStream, meshPath, buffers[mWeights0.mBufferIdx], pathWeight);
-    if(!ReadAccessor(mWeights0, streamWeight, buffer.data()))
+    if(MaskMatch(mFlags, U16_WEIGHT))
     {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read weights from '" << pathWeight << "'.";
+      ReadWeightAccessor<uint16_t>(raw, mWeights0, streamWeight, pathWeight);
     }
-
-    raw.mAttribs.push_back({"aWeights", Property::VECTOR4, static_cast<uint32_t>(bufferSize / sizeof(Vector4)), std::move(buffer)});
+    else if(MaskMatch(mFlags, U8_WEIGHT))
+    {
+      ReadWeightAccessor<uint8_t>(raw, mWeights0, streamWeight, pathWeight);
+    }
+    else
+    {
+      ReadWeightAccessor<float>(raw, mWeights0, streamWeight, pathWeight);
+    }
   }
 
   // Calculate the Blob for the blend shapes.
