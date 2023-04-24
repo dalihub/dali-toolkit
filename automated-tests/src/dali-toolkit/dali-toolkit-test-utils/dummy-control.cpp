@@ -268,8 +268,20 @@ void Impl::DummyControl::OnChildRemove(Actor& child) { childRemoveCalled = true;
 void Impl::DummyControl::OnSizeSet(const Vector3& targetSize) { Control::OnSizeSet( targetSize ); sizeSetCalled = true; }
 void Impl::DummyControl::OnSizeAnimation(Animation& animation, const Vector3& targetSize) { Control::OnSizeAnimation( animation, targetSize ); sizeAnimationCalled = true; }
 bool Impl::DummyControl::OnKeyEvent(const KeyEvent& event) { keyEventCalled = true; return false;}
-void Impl::DummyControl::OnKeyInputFocusGained() { keyInputFocusGained = true; }
-void Impl::DummyControl::OnKeyInputFocusLost() { keyInputFocusLost = true; }
+void Impl::DummyControl::OnKeyInputFocusGained()
+{
+  if(this->HasKeyInputFocus())
+  {
+    keyInputFocusGained = true;
+  }
+}
+void Impl::DummyControl::OnKeyInputFocusLost()
+{
+  if(!this->HasKeyInputFocus())
+  {
+    keyInputFocusLost = true;
+  }
+}
 
 void Impl::DummyControl::SetLayout( Property::Index visualIndex, Property::Map& map )
 {
