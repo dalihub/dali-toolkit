@@ -116,7 +116,7 @@ void main()
   // The albedo may be defined from a base texture or a flat color
 #ifdef BASECOLOR_TEX
   lowp vec4 baseColor = texture(sAlbedoAlpha, vUV);
-  baseColor = vec4(linear(baseColor.rgb), baseColor.w) * uColorFactor;
+  baseColor = vColor * vec4(linear(baseColor.rgb), baseColor.w) * uColorFactor;
 #else // BASECOLOR_TEX
   lowp vec4 baseColor = vColor * uColorFactor;
 #endif // BASECOLOR_TEX

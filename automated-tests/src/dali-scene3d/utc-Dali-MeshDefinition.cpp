@@ -17,7 +17,8 @@
 
 #include <vector>
 
-#include "dali-scene3d/public-api/loader/mesh-definition.h"
+#include <dali-scene3d/public-api/loader/mesh-definition.h>
+#include <dali-scene3d/public-api/loader/buffer-definition.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -99,3 +100,76 @@ int UtcDaliMeshDefinitionBlobApplyMinMaxBothEmpty(void)
   END_TEST;
 }
 
+int UtcDaliMeshDefinitionByteSkinWeight(void)
+{
+  float data8[8] = {0.003922, 0.062745, 0.250980, 0.098039, 0.937255, 0.749020, 0.741176, 0.937255};
+
+  BufferDefinition bufferDefinition;
+  bufferDefinition.mUri        = "data:application/base64,ARBAGe+/ve+/vT9hc2RmYXNkZmFzZGZhc2RmYXNkZmE=";
+  bufferDefinition.mByteLength = 32;
+  BufferDefinition::Vector buffers;
+  buffers.push_back(std::move(bufferDefinition));
+
+  MeshDefinition meshDefinition;
+  meshDefinition.mFlags = MeshDefinition::U16_JOINT_IDS | MeshDefinition::U8_WEIGHT;
+  MeshDefinition::SparseBlob sparseBlob;
+  meshDefinition.mPositions =
+    MeshDefinition::Accessor{
+      std::move(MeshDefinition::Blob{0, 12, 0, (uint16_t)12, std::vector<float>(), std::vector<float>()}), std::move(sparseBlob), 0};
+  meshDefinition.mJoints0 =
+    MeshDefinition::Accessor{
+      std::move(MeshDefinition::Blob{0, 16, 0, (uint16_t)16, std::vector<float>(), std::vector<float>()}), std::move(sparseBlob), 0};
+  meshDefinition.mWeights0 =
+    MeshDefinition::Accessor{
+      std::move(MeshDefinition::Blob{0, 8, 0, (uint16_t)8, std::vector<float>(), std::vector<float>()}), std::move(sparseBlob), 0};
+
+  MeshDefinition::RawData rawData = meshDefinition.LoadRaw("", buffers);
+
+  DALI_TEST_EQUALS(rawData.mAttribs.size(), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(rawData.mAttribs[3].mName, "aWeights", TEST_LOCATION);
+  DALI_TEST_EQUALS(rawData.mAttribs[3].mNumElements, 2, TEST_LOCATION);
+  float* value = reinterpret_cast<float*>(rawData.mAttribs[3].mData.data());
+  for(uint32_t i = 0; i < rawData.mAttribs[3].mNumElements * 4; ++i)
+  {
+    DALI_TEST_EQUALS(*value, data8[i], TEST_LOCATION);
+    value++;
+  }
+  END_TEST;
+}
+
+int UtcDaliMeshDefinitionShortSkinWeight(void)
+{
+    float data8[8] = {0.062516, 0.098634, 0.749752, 0.936492, 0.741207, 0.379873, 0.392386, 0.380468};
+
+  BufferDefinition bufferDefinition;
+  bufferDefinition.mUri        = "data:application/base64,ARBAGe+/ve+/vT9hc2RmYXNkZmFzZGZhc2RmYXNkZmE=";
+  bufferDefinition.mByteLength = 32;
+  BufferDefinition::Vector buffers;
+  buffers.push_back(std::move(bufferDefinition));
+
+  MeshDefinition meshDefinition;
+  meshDefinition.mFlags = MeshDefinition::U16_JOINT_IDS | MeshDefinition::U16_WEIGHT;
+  MeshDefinition::SparseBlob sparseBlob;
+  meshDefinition.mPositions =
+    MeshDefinition::Accessor{
+      std::move(MeshDefinition::Blob{0, 12, 0, (uint16_t)12, std::vector<float>(), std::vector<float>()}), std::move(sparseBlob), 0};
+  meshDefinition.mJoints0 =
+    MeshDefinition::Accessor{
+      std::move(MeshDefinition::Blob{0, 16, 0, (uint16_t)16, std::vector<float>(), std::vector<float>()}), std::move(sparseBlob), 0};
+  meshDefinition.mWeights0 =
+    MeshDefinition::Accessor{
+      std::move(MeshDefinition::Blob{0, 16, 0, (uint16_t)16, std::vector<float>(), std::vector<float>()}), std::move(sparseBlob), 0};
+
+  MeshDefinition::RawData rawData = meshDefinition.LoadRaw("", buffers);
+
+  DALI_TEST_EQUALS(rawData.mAttribs.size(), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(rawData.mAttribs[3].mName, "aWeights", TEST_LOCATION);
+  DALI_TEST_EQUALS(rawData.mAttribs[3].mNumElements, 2, TEST_LOCATION);
+  float* value = reinterpret_cast<float*>(rawData.mAttribs[3].mData.data());
+  for(uint32_t i = 0; i < rawData.mAttribs[3].mNumElements * 4; ++i)
+  {
+    DALI_TEST_EQUALS(*value, data8[i], TEST_LOCATION);
+    value++;
+  }
+  END_TEST;
+}
