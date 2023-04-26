@@ -616,7 +616,6 @@ int UtcDaliGltfLoaderMRendererTest(void)
     ctx.resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
-      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
       scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
       scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
       root.Add(actor);
@@ -672,7 +671,6 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
     resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
-      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
       scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
       scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
       root.Add(actor);
@@ -726,7 +724,6 @@ int UtcDaliGltfLoaderImageFromBufferView(void)
     resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
-      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
       scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
       scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
       root.Add(actor);
@@ -776,7 +773,6 @@ int UtcDaliGltfLoaderUint8Indices(void)
     resources.LoadResources(ctx.pathProvider);
     if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
     {
-      scene.ConfigureSkeletonJoints(iRoot, resources.mSkeletons, actor);
       scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
       scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
       root.Add(actor);

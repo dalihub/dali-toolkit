@@ -19,7 +19,6 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_internal_dir}/loader/json-reader.cpp
 	${scene3d_internal_dir}/loader/json-util.cpp
 	${scene3d_internal_dir}/model-components/material-impl.cpp
-	${scene3d_internal_dir}/model-components/model-node-data-impl.cpp
 	${scene3d_internal_dir}/model-components/model-node-impl.cpp
 	${scene3d_internal_dir}/model-components/model-primitive-impl.cpp
 )

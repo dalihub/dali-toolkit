@@ -24,7 +24,9 @@
 #include <memory> // for std::unique_ptr
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/model-components/model-primitive-modify-observer.h>
 #include <dali-scene3d/public-api/loader/mesh-definition.h>
+#include <dali-scene3d/public-api/loader/skinning-details.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
 
@@ -44,9 +46,12 @@ namespace Internal
  *
  * @SINCE_2_2.99
  */
-class DALI_SCENE3D_API ModelNode : public CustomActorImpl
+class DALI_SCENE3D_API ModelNode : public CustomActorImpl, public ModelPrimitiveModifyObserver
 {
 public:
+  using ModelPrimitiveContainer = std::vector<Scene3D::ModelPrimitive>;
+  using BoneDataContainer       = std::vector<Dali::Scene3D::Loader::Skinning::BoneData>;
+
   // Creation & Destruction
   /**
    * @brief Creates a new ModelNodeImpl instance that does not require touch by default.
@@ -244,6 +249,21 @@ public: // Public Method
    */
   void SetBoneMatrix(const Matrix& inverseMatrix, Scene3D::ModelPrimitive primitive, Scene3D::Loader::Index& boneIndex);
 
+  /**
+   * @brief Called when a Renderer of ModelPrimitive is created.
+   *
+   * @param[in] renderer The Renderer that is created.
+   */
+  void OnRendererCreated(Renderer renderer) override;
+
+private:
+  /**
+   * @brief Updates the bone matrix for a ModelPrimitive.
+   *
+   * @param[in] primitive The ModelPrimitive to set the bone matrix for.
+   */
+  void UpdateBoneMatrix(Scene3D::ModelPrimitive primitive);
+
 private:
   /// @cond internal
 
@@ -253,11 +273,13 @@ private:
   DALI_INTERNAL ModelNode& operator=(const ModelNode&) = delete; ///< Deleted copy assignment operator.
   DALI_INTERNAL ModelNode& operator=(ModelNode&&)      = delete; ///< Deleted move assignment operator.
 
-public:
-  class DALI_INTERNAL Impl; // Class declaration is public so we can internally add devel API's to the ModelNode's Impl
-
 private:
-  const std::unique_ptr<Impl> mImpl;
+  ModelPrimitiveContainer mModelPrimitiveContainer; ///< List of model primitives
+  BoneDataContainer       mBoneDataContainer;
+  Dali::Texture           mSpecularTexture;
+  Dali::Texture           mDiffuseTexture;
+  float                   mIblScaleFactor{1.0f};
+  uint32_t                mSpecularMipmapLevels{1u};
   /// @endcond
 };
 

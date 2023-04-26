@@ -128,9 +128,13 @@ void main()
   position = bone * position;
   normal = (bone * vec4(normal, 0.0)).xyz;
   tangent = (bone * vec4(tangent, 0.0)).xyz;
-#endif
 
+  normal = normalize(normal);
+  tangent = normalize(tangent);
+  vec4 vPosition = position;
+#else
   vec4 vPosition = uModelMatrix * position;
+#endif
 
   vNormal = normalize(uNormalMatrix * normal);
 
