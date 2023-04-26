@@ -53,10 +53,10 @@ struct Base::Impl
 
   enum Flags
   {
-    IS_ON_SCENE                     = 1,
-    IS_ATLASING_APPLIED             = 1 << 1,
-    IS_PREMULTIPLIED_ALPHA          = 1 << 2,
-    IS_SYNCHRONOUS_RESOURCE_LOADING = 1 << 3
+    IS_ON_SCENE                        = 1,
+    IS_ATLASING_APPLIED                = 1 << 1,
+    IS_PREMULTIPLIED_ALPHA             = 1 << 2,
+    IS_SYNCHRONOUS_RESOURCE_LOADING    = 1 << 3,
   };
 
   struct CustomShader
@@ -254,8 +254,8 @@ struct Base::Impl
   int                             mFlags;
   Toolkit::Visual::ResourceStatus mResourceStatus;
   const Toolkit::Visual::Type     mType;
-  bool                            mAlwaysUsingBorderline : 1;   ///< Whether we need the borderline in shader always.
-  bool                            mAlwaysUsingCornerRadius : 1; ///< Whether we need the corner radius in shader always.
+  bool                            mAlwaysUsingBorderline : 1;     ///< Whether we need the borderline in shader always.
+  bool                            mAlwaysUsingCornerRadius : 1;   ///< Whether we need the corner radius in shader always.
 };
 
 } // namespace Visual

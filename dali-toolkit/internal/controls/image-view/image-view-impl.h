@@ -118,6 +118,31 @@ public:
    */
   void SetDepthIndex(int depthIndex);
 
+  /**
+   * @brief Set the placeholder url
+   */
+  void SetPlaceholderUrl(const std::string& url);
+
+  /**
+   * @brief Get the placeholder url
+   */
+  std::string GetPlaceholderUrl() const;
+
+  /**
+   * @brief Enable the transition effect
+   */
+  void EnableTransitionEffect(bool effectEnable);
+
+  /**
+   * @brief Query whether transition effect is enabled
+   */
+  bool IsTransitionEffectEnabled() const;
+
+  /**
+   * @brief callback when animation for placeholder or previous visual transition effect is finished
+   */
+  void OnTransitionAnimationFinishedCallback(Animation& animation);
+
 private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize
@@ -183,6 +208,31 @@ private:
    */
   void ApplyFittingMode(Vector2 finalSize, Vector2 offset, bool zeroPadding, Property::Map& transformMap);
 
+   /**
+   * @brief Create placeholder image if it set. placeholder image is shown when image view is waiting for the image to load.
+   */
+  void CreatePlaceholderImage();
+
+  /**
+   * @brief Show placeholder image if it set. placeholder image is shown when image view is waiting for the image to load.
+   */
+  void ShowPlaceholderImage();
+
+  /**
+   * @brief Hide placeholder image if it set.
+   */
+  void HidePlaceholderImage();
+
+  /**
+   * @brief Transition image with effect when image is replaced.
+   */
+  void TransitionImageWithEffect();
+
+  /**
+   * @brief Clear the transition animation
+   */
+  void ClearTransitionAnimation();
+
 private:
   // Undefined
   ImageView(const ImageView&);
@@ -190,14 +240,20 @@ private:
 
 private:
   Toolkit::Visual::Base mVisual;
+  Toolkit::Visual::Base mPreviousVisual;
+  Toolkit::Visual::Base mPlaceholderVisual;
 
-  std::string     mUrl;         ///< the url for the image if the image came from a URL, empty otherwise
-  Property::Map   mPropertyMap; ///< the Property::Map if the image came from a Property::Map, empty otherwise
-  Property::Map   mShaderMap;   ///< the Property::Map if the custom shader is set, empty otherwise
-  ImageDimensions mImageSize;   ///< the image size
+  std::string     mUrl;                                    ///< the url for the image if the image came from a URL, empty otherwise
+  std::string     mPlaceholderUrl;                         ///< the url for the placeholder image if the image came from a PLACEHOLDER_IMAGE, empty otherwise
+  Property::Map   mPropertyMap;                            ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map   mShaderMap;                              ///< the Property::Map if the custom shader is set, empty otherwise
+  ImageDimensions mImageSize;                              ///< the image size
 
-  bool mImageVisualPaddingSetByTransform : 1;   //< Flag to indicate Padding was set using a transform.
-  bool mImageViewPixelAreaSetByFittingMode : 1; //< Flag to indicate pixel area was set by fitting Mode
+  Animation       mTransitionAnimation;                    ///< the animation for transition effect
+  float           mTransitionTargetAlpha;                  ///< Keep image's alpha value
+  bool            mImageVisualPaddingSetByTransform : 1;   ///< Flag to indicate Padding was set using a transform.
+  bool            mImageViewPixelAreaSetByFittingMode : 1; ///< Flag to indicate pixel area was set by fitting Mode
+  bool            mTransitionEffect :1;                    ///< Flag to indicate TransitionEffect is enabled
 };
 
 } // namespace Internal
