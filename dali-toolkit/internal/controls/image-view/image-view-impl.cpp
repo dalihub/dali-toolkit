@@ -106,7 +106,6 @@ void ImageView::OnInitialize()
 
 void ImageView::SetImage(const Property::Map& map)
 {
-  DALI_LOG_ERROR("tscholb : SetImage(map) !!! \n");
   if(mTransitionEffect && mVisual)
   {
     // Clear previous transition effect if it is playing
@@ -180,7 +179,6 @@ void ImageView::SetImage(const Property::Map& map)
 
 void ImageView::SetImage(const std::string& url, ImageDimensions size)
 {
-  DALI_LOG_ERROR("tscholb : SetImage !!! \n");
   if(mTransitionEffect && mVisual)
   {
     // Clear previous transition effect if it is playing
@@ -238,12 +236,6 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
     // Trigger a size negotiation request that may be needed when unregistering a visual.
     RelayoutRequest();
   }
-
-  //tscholb DEBUG
-  Dali::Toolkit::Control handle(GetOwner());
-  auto                   check1 = handle.GetVisualResourceStatus(Toolkit::ImageView::Property::IMAGE);
-  auto                   check2 = handle.GetVisualResourceStatus(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE);
-  DALI_LOG_ERROR("tscholb : Resource status check >> %d,%d \n", check1, check2);
 
   // Signal that a Relayout may be needed
 }
@@ -445,12 +437,10 @@ void ImageView::OnUpdateVisualProperties(const std::vector<std::pair<Dali::Prope
 
 void ImageView::OnResourceReady(Toolkit::Control control)
 {
-  DALI_LOG_ERROR("tscholb : OnResourceReady !!! \n");
   // In case of placeholder, we need to skip this call.
   // TODO: In case of placeholder, it needs to be modified not to call OnResourceReady()
   if(control.GetVisualResourceStatus(Toolkit::ImageView::Property::IMAGE) != Toolkit::Visual::ResourceStatus::READY)
   {
-    DALI_LOG_ERROR("tscholb : OnResourceReady() is called, but SKIP \n");
     return;
   }
 
@@ -462,19 +452,16 @@ void ImageView::OnResourceReady(Toolkit::Control control)
     if(!placeholderVisual || control.GetVisualResourceStatus(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE) == Toolkit::Visual::ResourceStatus::READY)
     {
       // when placeholder is disabled or ready placeholder and image, we need to transition effect
-      DALI_LOG_ERROR("tscholb : Call TransitionEffect \n");
       TransitionImageWithEffect();
     }
     else
     {
-      DALI_LOG_ERROR("tscholb : Call ClearTransitionAnimation \n");
       ClearTransitionAnimation();
     }
   }
   else
   {
     // we don't need placeholder anymore because visual is replaced. so hide placeholder.
-    DALI_LOG_ERROR("tscholb : transition effect is DISABLE \n");
     HidePlaceholderImage();
   }
 
@@ -670,7 +657,6 @@ void ImageView::TransitionImageWithEffect()
 
     if(mPreviousVisual) // Transition previous image
     {
-      DALI_LOG_ERROR("tscholb : mPreviousVisual !!! \n");
       Dali::KeyFrames fadeoutKeyFrames = Dali::KeyFrames::New();
       fadeoutKeyFrames.Add(0.0f, destinationAlpha);
       fadeoutKeyFrames.Add(1.0f, LOW_OPACITY);
@@ -679,7 +665,6 @@ void ImageView::TransitionImageWithEffect()
     }
     else if(mPlaceholderVisual) // Transition placeholder
     {
-      DALI_LOG_ERROR("tscholb : mPlaceholderVisual !!! \n");
       Dali::KeyFrames fadeoutKeyFrames = Dali::KeyFrames::New();
       fadeoutKeyFrames.Add(0.0f, destinationAlpha);
       fadeoutKeyFrames.Add(1.0f, LOW_OPACITY);
@@ -691,7 +676,6 @@ void ImageView::TransitionImageWithEffect()
     Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
     if(imageVisual)
     {
-      DALI_LOG_ERROR("tscholb : imageVisual !!! \n");
       Dali::KeyFrames fadeinKeyFrames = Dali::KeyFrames::New();
       fadeinKeyFrames.Add(0.0f, LOW_OPACITY);
       fadeinKeyFrames.Add(1.0f, destinationAlpha);
