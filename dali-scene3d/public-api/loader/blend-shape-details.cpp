@@ -36,7 +36,7 @@ const char* BlendShapes::COMPONENTS("blendShapeComponents");
 
 const char* BlendShapes::WEIGHTS_UNIFORM("uBlendShapeWeight");
 
-void BlendShapes::ConfigureProperties(const BlendShapeData& data, Shader shader)
+void BlendShapes::ConfigureProperties(const BlendShapeData& data, Renderer renderer)
 {
   unsigned int index = 0u;
 
@@ -54,28 +54,28 @@ void BlendShapes::ConfigureProperties(const BlendShapeData& data, Shader shader)
       actor.RegisterProperty(weightName, weight);
     }
 
-    if(shader && data.version == Version::VERSION_1_0)
+    if(renderer && data.version == Version::VERSION_1_0)
     {
       snprintf(pFactorName, sizeof(unnormalizeFactorNameBuffer) - (pFactorName - unnormalizeFactorNameBuffer), "[%d]", index);
       std::string factorName{unnormalizeFactorNameBuffer};
-      shader.RegisterProperty(factorName, data.unnormalizeFactors[index]);
+      renderer.RegisterProperty(factorName, data.unnormalizeFactors[index]);
     }
 
     ++index;
   }
 
-  if(shader)
+  if(renderer)
   {
     if(Version::VERSION_2_0 == data.version)
     {
-      shader.RegisterProperty(UNNORMALIZE_FACTOR, data.unnormalizeFactors[0u]);
+      renderer.RegisterProperty(UNNORMALIZE_FACTOR, data.unnormalizeFactors[0u]);
     }
 
-    shader.RegisterProperty(NUMBER_OF_BLEND_SHAPES, Property::Value(static_cast<float>(index)));
-    shader.RegisterProperty(COMPONENT_SIZE, Property::Value(static_cast<float>(data.bufferOffset)));
+    renderer.RegisterProperty(NUMBER_OF_BLEND_SHAPES, Property::Value(static_cast<float>(index)));
+    renderer.RegisterProperty(COMPONENT_SIZE, Property::Value(static_cast<float>(data.bufferOffset)));
 
     // Create a read only property to preserve the components of the blend shape.
-    shader.RegisterProperty(COMPONENTS, data.components, Property::AccessMode::READ_ONLY);
+    renderer.RegisterProperty(COMPONENTS, data.components, Property::AccessMode::READ_ONLY);
   }
 }
 
