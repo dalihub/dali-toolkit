@@ -759,6 +759,12 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
             meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::UNSIGNED_BYTE) * MeshDefinition::U8_JOINT_IDS;
             DALI_ASSERT_DEBUG(MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_JOINT_IDS) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_JOINT_IDS) || iFind->second->mComponentType == gltf2::Component::FLOAT);
           }
+          if(iFind->first == gltf2::Attribute::WEIGHTS_0)
+          {
+            meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::UNSIGNED_SHORT) * MeshDefinition::U16_WEIGHT;
+            meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::UNSIGNED_BYTE) * MeshDefinition::U8_WEIGHT;
+            DALI_ASSERT_DEBUG(MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_WEIGHT) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_WEIGHT) || iFind->second->mComponentType == gltf2::Component::FLOAT);
+          }
         }
         else if(needNormalsTangents)
         {

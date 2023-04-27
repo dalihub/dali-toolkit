@@ -52,6 +52,8 @@ struct DALI_SCENE3D_API MeshDefinition
     U8_INDICES        = NthBit(2), // default is unsigned short
     U16_JOINT_IDS     = NthBit(3), // default is floats
     U8_JOINT_IDS      = NthBit(4),
+    U16_WEIGHT        = NthBit(5), // default is floats
+    U8_WEIGHT         = NthBit(6),
   };
 
   enum Attributes
