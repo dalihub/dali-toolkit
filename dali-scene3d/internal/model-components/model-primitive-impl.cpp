@@ -19,9 +19,9 @@
 #include <dali-scene3d/internal/model-components/model-primitive-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/model-components/material-impl.h>
@@ -178,7 +178,7 @@ void ModelPrimitive::SetImageBasedLightScaleFactor(float iblScaleFactor)
 void ModelPrimitive::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData& data)
 {
   mBlendShapeData = std::move(data);
-  Scene3D::Loader::BlendShapes::ConfigureProperties(mBlendShapeData, mShader);
+  Scene3D::Loader::BlendShapes::ConfigureProperties(mBlendShapeData, mRenderer);
 }
 
 void ModelPrimitive::SetBlendShapeGeometry(Dali::Texture blendShapeGeometry)
@@ -248,7 +248,7 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
     mShader = Shader::New(vertexShader, fragmentShader);
     if(mBlendShapeData.version != Scene3D::Loader::BlendShapes::Version::INVALID && mBlendShapeData.mActor.GetHandle())
     {
-      Scene3D::Loader::BlendShapes::ConfigureProperties(mBlendShapeData, mShader);
+      Scene3D::Loader::BlendShapes::ConfigureProperties(mBlendShapeData, mRenderer);
     }
 
     if(!mRenderer)
@@ -383,7 +383,7 @@ void ModelPrimitive::UpdateImageBasedLightTexture()
 
       mRenderer.SetTextures(newTextures);
     }
-    mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightScaleFactorName() .data(), mIblScaleFactor);
+    mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightScaleFactorName().data(), mIblScaleFactor);
     mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightMaxLodUniformName().data(), static_cast<float>(mSpecularMipmapLevels));
   }
 }
