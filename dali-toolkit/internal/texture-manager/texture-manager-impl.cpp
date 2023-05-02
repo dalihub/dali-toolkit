@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/rendering/geometry.h>
 
@@ -113,9 +114,10 @@ TextureManager::TextureManager()
   mAsyncLoader(std::unique_ptr<TextureAsyncLoadingHelper>(new TextureAsyncLoadingHelper(*this))),
   mLifecycleObservers(),
   mLoadQueue(),
-  mRemoveQueue(),
   mLoadingQueueTextureId(INVALID_TEXTURE_ID),
-  mLoadYuvPlanes(NeedToLoadYuvPlanes())
+  mRemoveQueue(),
+  mLoadYuvPlanes(NeedToLoadYuvPlanes()),
+  mRemoveProcessorRegistered(false)
 {
   // Initialize the AddOn
   RenderingAddOn::Get();
@@ -123,6 +125,12 @@ TextureManager::TextureManager()
 
 TextureManager::~TextureManager()
 {
+  if(mRemoveProcessorRegistered && Adaptor::IsAvailable())
+  {
+    Adaptor::Get().UnregisterProcessor(*this, true);
+    mRemoveProcessorRegistered = false;
+  }
+
   for(auto iter = mLifecycleObservers.Begin(), endIter = mLifecycleObservers.End(); iter != endIter; ++iter)
   {
     (*iter)->TextureManagerDestroyed();
@@ -298,8 +306,8 @@ TextureSet TextureManager::LoadTexture(
     std::string location = url.GetLocation();
     if(location.size() > 0u)
     {
-      TextureId id = std::stoi(location);
-      auto externalTextureInfo   = mTextureCacheManager.GetExternalTextureInfo(id);
+      TextureId id                  = std::stoi(location);
+      auto      externalTextureInfo = mTextureCacheManager.GetExternalTextureInfo(id);
       if(externalTextureInfo.textureSet)
       {
         textureId = id;
@@ -640,8 +648,8 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 
       if(pixelBuffers.empty())
       {
-        // If pixelBuffer loading is failed in synchronously, call Remove() method.
-        Remove(textureId, nullptr);
+        // If pixelBuffer loading is failed in synchronously, call RequestRemove() method.
+        RequestRemove(textureId, nullptr);
         return INVALID_TEXTURE_ID;
       }
 
@@ -694,7 +702,34 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
   return textureId;
 }
 
-void TextureManager::Remove(const TextureManager::TextureId& textureId, TextureUploadObserver* observer)
+void TextureManager::RequestRemove(const TextureManager::TextureId& textureId, TextureUploadObserver* observer)
+{
+  DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestRemove( textureId=%d observer=%p )\n", textureId, observer);
+
+  // Queue to remove.
+  if(textureId != INVALID_TEXTURE_ID)
+  {
+    if(observer)
+    {
+      // Remove observer from cached texture info
+      TextureCacheIndex textureCacheIndex = mTextureCacheManager.GetCacheIndexFromId(textureId);
+      if(textureCacheIndex != INVALID_CACHE_INDEX)
+      {
+        TextureInfo& textureInfo(mTextureCacheManager[textureCacheIndex]);
+        RemoveTextureObserver(textureInfo, observer);
+      }
+    }
+    mRemoveQueue.PushBack(textureId);
+
+    if(!mRemoveProcessorRegistered && Adaptor::IsAvailable())
+    {
+      mRemoveProcessorRegistered = true;
+      Adaptor::Get().RegisterProcessor(*this, true);
+    }
+  }
+}
+
+void TextureManager::Remove(const TextureManager::TextureId& textureId)
 {
   if(textureId != INVALID_TEXTURE_ID)
   {
@@ -712,54 +747,48 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId, TextureU
         }
       }
 
-      DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::Remove( textureId=%d observer=%p ) cacheIndex:%d removal maskTextureId=%d, loadingQueueTextureId=%d, loadState=%s\n", textureId, observer, textureCacheIndex.GetIndex(), maskTextureId, mLoadingQueueTextureId, GET_LOAD_STATE_STRING(textureInfo.loadState));
+      DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::Remove( textureId=%d ) cacheIndex:%d removal maskTextureId=%d, loadingQueueTextureId=%d, loadState=%s\n", textureId, textureCacheIndex.GetIndex(), maskTextureId, mLoadingQueueTextureId, GET_LOAD_STATE_STRING(textureInfo.loadState));
 
-      // the case that LoadingQueue is working.
-      if(mLoadingQueueTextureId != INVALID_TEXTURE_ID)
+      // Remove textureId in CacheManager. Now, textureInfo is invalidate.
+      mTextureCacheManager.RemoveCache(textureInfo);
+
+      // Remove maskTextureId in CacheManager
+      if(maskTextureId != INVALID_TEXTURE_ID)
       {
-        // If textureId is not same, this observer need to delete when ProcessRemoveQueue() is called.
-        // If textureId is same, we should not call RemoveTextureObserver.
-        // Because ObserverDestroyed signal already disconnected in NotifyObservers
-        TextureUploadObserver* queueObserver = observer;
-        if(mLoadingQueueTextureId == textureId)
+        TextureCacheIndex maskCacheIndex = mTextureCacheManager.GetCacheIndexFromId(maskTextureId);
+        if(maskCacheIndex != INVALID_CACHE_INDEX)
         {
-          queueObserver = nullptr;
-        }
-
-        // Remove element from the mLoadQueue
-        for(auto&& element : mLoadQueue)
-        {
-          if(element.mTextureId == textureId && element.mObserver == observer)
-          {
-            // Do not erase the item. We will clear it later in ProcessLoadQueue().
-            element.mTextureId = INVALID_TEXTURE_ID;
-            element.mObserver  = nullptr;
-            break;
-          }
-        }
-
-        mRemoveQueue.PushBack(QueueElement(textureId, queueObserver));
-      }
-      else
-      {
-        // Remove its observer
-        RemoveTextureObserver(textureInfo, observer);
-
-        // Remove textureId in CacheManager. Now, textureInfo is invalidate.
-        mTextureCacheManager.RemoveCache(textureInfo);
-
-        // Remove maskTextureId in CacheManager
-        if(maskTextureId != INVALID_TEXTURE_ID)
-        {
-          TextureCacheIndex maskCacheIndex = mTextureCacheManager.GetCacheIndexFromId(maskTextureId);
-          if(maskCacheIndex != INVALID_CACHE_INDEX)
-          {
-            TextureInfo& maskTextureInfo(mTextureCacheManager[maskCacheIndex]);
-            mTextureCacheManager.RemoveCache(maskTextureInfo);
-          }
+          TextureInfo& maskTextureInfo(mTextureCacheManager[maskCacheIndex]);
+          mTextureCacheManager.RemoveCache(maskTextureInfo);
         }
       }
     }
+  }
+}
+
+void TextureManager::ProcessRemoveQueue()
+{
+  // Note that RemoveQueue is not be changed during Remove().
+  for(auto&& textureId : mRemoveQueue)
+  {
+    if(textureId != INVALID_TEXTURE_ID)
+    {
+      Remove(textureId);
+    }
+  }
+  mRemoveQueue.Clear();
+}
+
+void TextureManager::Process(bool postProcessor)
+{
+  DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::Process()\n");
+
+  ProcessRemoveQueue();
+
+  if(Adaptor::IsAvailable())
+  {
+    Adaptor::Get().UnregisterProcessor(*this, true);
+    mRemoveProcessorRegistered = false;
   }
 }
 
@@ -931,18 +960,6 @@ void TextureManager::ProcessLoadQueue()
   mLoadQueue.Clear();
 }
 
-void TextureManager::ProcessRemoveQueue()
-{
-  for(auto&& element : mRemoveQueue)
-  {
-    if(element.mTextureId != INVALID_TEXTURE_ID)
-    {
-      Remove(element.mTextureId, element.mObserver);
-    }
-  }
-  mRemoveQueue.Clear();
-}
-
 void TextureManager::ObserveTexture(TextureManager::TextureInfo& textureInfo,
                                     TextureUploadObserver*       observer)
 {
@@ -971,7 +988,7 @@ void TextureManager::AsyncLoadComplete(const TextureManager::TextureId& textureI
     }
     else
     {
-      Remove(textureInfo.textureId, nullptr);
+      RequestRemove(textureInfo.textureId, nullptr);
     }
   }
 }
@@ -1187,7 +1204,7 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
   // Decrease reference count
   for(const auto textureId : notifyRequiredTextureIds)
   {
-    Remove(textureId, nullptr);
+    RequestRemove(textureId, nullptr);
   }
 }
 
@@ -1298,11 +1315,10 @@ void TextureManager::NotifyObservers(TextureManager::TextureInfo& textureInfo, c
 
   mLoadingQueueTextureId = INVALID_TEXTURE_ID;
   ProcessLoadQueue();
-  ProcessRemoveQueue();
 
   if(info->storageType == StorageType::RETURN_PIXEL_BUFFER && info->observerList.Count() == 0)
   {
-    Remove(info->textureId, nullptr);
+    RequestRemove(info->textureId, nullptr);
   }
 }
 

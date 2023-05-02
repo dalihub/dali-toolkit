@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ public:
     mTextureSet     = textureInformation.textureSet;
 
     // Remove during LoadComplete
-    mTextureManagerPtr->Remove(textureInformation.textureId, nullptr);
+    mTextureManagerPtr->RequestRemove(textureInformation.textureId, nullptr);
 
     // ...And generate string which using texture id.
     mGeneratedExternalUrl = mTextureManagerPtr->AddExternalTexture(mTextureSet);
@@ -794,7 +794,7 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedLater(void)
   application.SendNotification();
   application.Render();
 
-  // CAPTION : HARD-CODING for coverage. If you are a good boy, Do not follow this code.
+  // CAPTION : HARD-CODING for coverage.
   {
     Dali::Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
       filename,
@@ -811,8 +811,8 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedLater(void)
     textureManager.AsyncLoadComplete(textureId, pixelBuffers);
     std::vector<Devel::PixelBuffer> maskBuffers;
     textureManager.AsyncLoadComplete(maskInfo->mAlphaMaskId, maskBuffers);
-    textureManager.Remove(maskInfo->mAlphaMaskId, nullptr);
-    textureManager.Remove(textureId, &observer);
+    textureManager.RequestRemove(maskInfo->mAlphaMaskId, nullptr);
+    textureManager.RequestRemove(textureId, &observer);
   }
 
   application.SendNotification();
@@ -1232,7 +1232,7 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
   DALI_TEST_EQUALS(observer1.mObserverCalled, false, TEST_LOCATION);
 
   // Remove current textureId1. and request new texture again.
-  textureManager.Remove(textureId1, &observer1);
+  textureManager.RequestRemove(textureId1, &observer1);
   auto textureId2 = textureManager.RequestLoad(
     filename,
     ImageDimensions(),
@@ -1259,7 +1259,7 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
   {
     std::vector<Devel::PixelBuffer> pixelBuffers;
     textureManager.AsyncLoadComplete(textureId2, pixelBuffers);
-    textureManager.Remove(textureId2, &observer2);
+    textureManager.RequestRemove(textureId2, &observer2);
   }
 
   DALI_TEST_EQUALS(observer2.mLoaded, false, TEST_LOCATION); ///< Note that we call AsyncLoadComplete hardly with empty pixelbuffer.
@@ -1372,8 +1372,15 @@ int UtcTextureManagerMaskCacheTest(void)
   try
   {
     // Remove textureId1 first, and then remove textureId2. Check whether segfault occured.
-    textureManager.Remove(textureId1, &observer1);
-    textureManager.Remove(textureId2, &observer2);
+    textureManager.RequestRemove(textureId1, &observer1);
+
+    application.SendNotification();
+    application.Render();
+
+    textureManager.RequestRemove(textureId2, &observer2);
+
+    application.SendNotification();
+    application.Render();
 
     TestObserver observer3;
     maskInfo.reset(new TextureManager::MaskingData());
@@ -1437,10 +1444,10 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
 
   TextureManager textureManager; // Create new texture manager
 
-  TestObserverWithCustomFunction observer1;
-  TestObserverWithCustomFunction observer2;
-  TestObserver                   observer3;
-  TestObserver                   observer4;
+  TestObserverWithCustomFunction  observer1;
+  TestObserverWithCustomFunction  observer2;
+  TestObserverWithCustomFunction* observer3 = new TestObserverWithCustomFunction(); // Deleted in observer1 loaded signal
+  TestObserver                    observer4;
 
   std::string filename1(TEST_IMAGE_FILE_NAME);
   std::string filename2(TEST_IMAGE_2_FILE_NAME);
@@ -1523,7 +1530,7 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
     atlasRectSize,
     atlasingStatus,
     loadingStatus,
-    &observer3,
+    observer3,
     atlasUploadObserver,
     atlasManager,
     true,
@@ -1534,8 +1541,8 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
   DALI_TEST_EQUALS(observer1.mObserverCalled, false, TEST_LOCATION);
   DALI_TEST_EQUALS(observer2.mLoaded, false, TEST_LOCATION);
   DALI_TEST_EQUALS(observer2.mObserverCalled, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(observer3.mLoaded, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(observer3.mObserverCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer3->mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer3->mObserverCalled, false, TEST_LOCATION);
   DALI_TEST_EQUALS(observer4.mLoaded, false, TEST_LOCATION);
   DALI_TEST_EQUALS(observer4.mObserverCalled, false, TEST_LOCATION);
 
@@ -1554,7 +1561,7 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
   CustomData1 data1;
   data1.textureManagerPtr     = &textureManager;
   data1.removeTextureId       = textureId3;
-  data1.removeTextureObserver = &observer3;
+  data1.removeTextureObserver = observer3;
 
   observer1.mData = &data1;
   observer1.ConnectFunction(
@@ -1566,8 +1573,11 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
       DALI_TEST_CHECK(data1.removeTextureId != TextureManager::INVALID_TEXTURE_ID);
       DALI_TEST_CHECK(data1.removeTextureObserver);
 
-      // Remove textureId3
-      data1.textureManagerPtr->Remove(data1.removeTextureId, data1.removeTextureObserver);
+      // Remove textureId3.
+      data1.textureManagerPtr->RequestRemove(data1.removeTextureId, data1.removeTextureObserver);
+
+      // Destroy observer3
+      delete data1.removeTextureObserver;
     });
 
   // Connect observer2 custom function
@@ -1610,6 +1620,34 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
         preMultiply);
     });
 
+  // Connect observer3 custom function
+  struct CustomData3
+  {
+    TestObserver* self{nullptr};
+    bool*         observerLoadedPtr{nullptr};
+    bool*         observerCalleddPtr{nullptr};
+  };
+  CustomData3 data3;
+  bool        observer3Loaded = false;
+  bool        observer3Called = false;
+  data3.self                  = observer3;
+  data3.observerLoadedPtr     = &observer3Loaded;
+  data3.observerCalleddPtr    = &observer3Called;
+
+  observer3->mData = &data3;
+  observer3->ConnectFunction(
+    [](void* data) {
+      DALI_TEST_CHECK(data);
+      CustomData3 data3 = *(CustomData3*)data;
+
+      DALI_TEST_CHECK(data3.self);
+      DALI_TEST_CHECK(data3.observerLoadedPtr);
+      DALI_TEST_CHECK(data3.observerCalleddPtr);
+
+      *data3.observerLoadedPtr  = data3.self->mLoaded;
+      *data3.observerCalleddPtr = data3.self->mObserverCalled;
+    });
+
   application.SendNotification();
   application.Render();
 
@@ -1630,12 +1668,14 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
     pixelBuffers.push_back(Devel::PixelBuffer::New(1, 1, Pixel::Format::RGB888));
     textureManager.AsyncLoadComplete(textureId3, pixelBuffers);
 
+    // Ensure textureId3 remove request processed.
+
     DALI_TEST_EQUALS(observer1.mLoaded, false, TEST_LOCATION);
     DALI_TEST_EQUALS(observer1.mObserverCalled, false, TEST_LOCATION);
     DALI_TEST_EQUALS(observer2.mLoaded, false, TEST_LOCATION);
     DALI_TEST_EQUALS(observer2.mObserverCalled, false, TEST_LOCATION);
-    DALI_TEST_EQUALS(observer3.mLoaded, false, TEST_LOCATION);
-    DALI_TEST_EQUALS(observer3.mObserverCalled, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3Loaded, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3Called, false, TEST_LOCATION);
     DALI_TEST_EQUALS(observer4.mLoaded, false, TEST_LOCATION);
     DALI_TEST_EQUALS(observer4.mObserverCalled, false, TEST_LOCATION);
 
@@ -1651,8 +1691,8 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
     DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
     DALI_TEST_EQUALS(observer2.mLoaded, true, TEST_LOCATION);
     DALI_TEST_EQUALS(observer2.mObserverCalled, true, TEST_LOCATION);
-    DALI_TEST_EQUALS(observer3.mLoaded, false, TEST_LOCATION);
-    DALI_TEST_EQUALS(observer3.mObserverCalled, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3Loaded, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3Called, false, TEST_LOCATION);
     DALI_TEST_EQUALS(observer4.mLoaded, false, TEST_LOCATION);
     DALI_TEST_EQUALS(observer4.mObserverCalled, false, TEST_LOCATION);
 
@@ -1668,10 +1708,313 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
     DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
     DALI_TEST_EQUALS(observer2.mLoaded, true, TEST_LOCATION);
     DALI_TEST_EQUALS(observer2.mObserverCalled, true, TEST_LOCATION);
-    DALI_TEST_EQUALS(observer3.mLoaded, false, TEST_LOCATION);
-    DALI_TEST_EQUALS(observer3.mObserverCalled, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3Loaded, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3Called, false, TEST_LOCATION);
     DALI_TEST_EQUALS(observer4.mLoaded, true, TEST_LOCATION);
     DALI_TEST_EQUALS(observer4.mObserverCalled, true, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcTextureManagerDestroyObserverDuringObserve(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcTextureManagerDestroyObserverDuringObserve");
+  tet_infoline("Request 3 different image.");
+  tet_infoline("Complete textureId1. After observer1 loaded done,");
+  tet_infoline(" - Remove and destroy observer2");
+  tet_infoline(" - Re-generate observer2 which has same address pointer with before.");
+  tet_infoline(" - Remove and Reqeust third file by observer3");
+  tet_infoline("Complete textureId2. and check old observer2 not emmited, and newly observer2 works.");
+  tet_infoline("Complete textureId3. and check observer3 comes");
+
+  TextureManager textureManager; // Create new texture manager
+
+  TestObserverWithCustomFunction  observer1;
+  TestObserverWithCustomFunction* observer2 = new TestObserverWithCustomFunction(); // Deleted in observer1 loaded signal.
+  TestObserver                    observer3;
+
+  std::string filename1(TEST_IMAGE_FILE_NAME);
+  std::string filename2(TEST_IMAGE_2_FILE_NAME);
+  std::string filename3(TEST_IMAGE_3_FILE_NAME);
+  std::string filename4(TEST_IMAGE_4_FILE_NAME);
+
+  auto textureId1(TextureManager::INVALID_TEXTURE_ID);
+  auto textureId2(TextureManager::INVALID_TEXTURE_ID);
+  auto textureId3(TextureManager::INVALID_TEXTURE_ID);
+  auto textureId4(TextureManager::INVALID_TEXTURE_ID);
+
+  // Dummy reference value
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
+  // Request image 1, 2, 3.
+  textureId1 = textureManager.RequestLoad(
+    filename1,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    TextureManager::UseAtlas::NO_ATLAS,
+    &observer1,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  textureId2 = textureManager.RequestLoad(
+    filename2,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    TextureManager::UseAtlas::NO_ATLAS,
+    observer2,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  textureId3 = textureManager.RequestLoad(
+    filename3,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    TextureManager::UseAtlas::NO_ATLAS,
+    &observer3,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  struct CustomData1
+  {
+    TextureManager*                  textureManagerPtr{nullptr};
+    TextureManager::TextureId        removeTextureId{TextureManager::INVALID_TEXTURE_ID};
+    TestObserverWithCustomFunction** removeTextureObserver{nullptr};
+    std::string                      resendFilename{};
+    TextureManager::TextureId        resendTextureId{TextureManager::INVALID_TEXTURE_ID};
+    TestObserver*                    resendTextureObserver{nullptr};
+    std::string                      newlyFilename{};
+    TextureManager::TextureId*       newlyTextureIdPtr{nullptr};
+  };
+  struct CustomData2
+  {
+    TextureManager* textureManagerPtr{nullptr};
+    TestObserver*   self{nullptr};
+    bool*           observerLoadedPtr{nullptr};
+    bool*           observerCalledPtr{nullptr};
+  };
+
+  bool        observer2Loaded    = false;
+  bool        observer2Called    = false;
+  bool        newObserver2Loaded = false;
+  bool        newObserver2Called = false;
+  CustomData2 newData2; // Used on observer1 function
+
+  // Connect observer1 custom function
+  CustomData1 data1;
+  data1.textureManagerPtr     = &textureManager;
+  data1.removeTextureId       = textureId2;
+  data1.removeTextureObserver = &observer2;
+  data1.resendFilename        = filename3;
+  data1.resendTextureId       = textureId3;
+  data1.resendTextureObserver = &observer3;
+  data1.newlyFilename         = filename2; // Same as observer2 filename
+  data1.newlyTextureIdPtr     = &textureId4;
+
+  observer1.mData = &data1;
+  observer1.ConnectFunction(
+    [&](void* data) {
+      DALI_TEST_CHECK(data);
+      CustomData1 data1 = *(CustomData1*)data;
+
+      DALI_TEST_CHECK(data1.textureManagerPtr);
+      DALI_TEST_CHECK(data1.removeTextureId != TextureManager::INVALID_TEXTURE_ID);
+      DALI_TEST_CHECK(data1.removeTextureObserver);
+      DALI_TEST_CHECK(*data1.removeTextureObserver);
+      DALI_TEST_CHECK(!data1.resendFilename.empty());
+      DALI_TEST_CHECK(data1.resendTextureId != TextureManager::INVALID_TEXTURE_ID);
+      DALI_TEST_CHECK(data1.resendTextureObserver);
+      DALI_TEST_CHECK(!data1.newlyFilename.empty());
+      DALI_TEST_CHECK(data1.newlyTextureIdPtr);
+      DALI_TEST_CHECK(*data1.newlyTextureIdPtr == TextureManager::INVALID_TEXTURE_ID);
+
+      // Remove textureId2.
+      data1.textureManagerPtr->RequestRemove(data1.removeTextureId, *data1.removeTextureObserver);
+
+      auto removedObserver = *data1.removeTextureObserver;
+
+      // Destroy observer2.
+      delete removedObserver;
+
+      // Create new observer. Make we use same pointer if we can.
+      uint32_t maxTryCount = 100u;
+      uint32_t tryCount    = 0u;
+
+      while(tryCount < maxTryCount)
+      {
+        *data1.removeTextureObserver = new TestObserverWithCustomFunction();
+        if(removedObserver == *data1.removeTextureObserver) break;
+        ++tryCount;
+        delete *data1.removeTextureObserver;
+      }
+
+      tet_printf("TryCount[%u] / Old observer2 : %p, newly observer2 : %p\n", tryCount, removedObserver, *data1.removeTextureObserver);
+
+      // Connect new observer2 custom function
+      newData2.textureManagerPtr = &textureManager;
+      newData2.self              = (*data1.removeTextureObserver);
+      newData2.observerLoadedPtr = &newObserver2Loaded;
+      newData2.observerCalledPtr = &newObserver2Called;
+
+      (*data1.removeTextureObserver)->mData = &newData2;
+      (*data1.removeTextureObserver)->ConnectFunction([](void* data) {
+        DALI_TEST_CHECK(data);
+        CustomData2 data2 = *(CustomData2*)data;
+
+        tet_printf("New created observer running\n");
+
+        DALI_TEST_CHECK(data2.self);
+        DALI_TEST_CHECK(data2.observerLoadedPtr);
+        DALI_TEST_CHECK(data2.observerCalledPtr);
+
+        *data2.observerLoadedPtr = data2.self->mLoaded;
+        *data2.observerCalledPtr = data2.self->mObserverCalled;
+      });
+
+      // Dummy reference value
+      auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
+      // Resend textureId3
+      data1.textureManagerPtr->RequestRemove(data1.resendTextureId, data1.resendTextureObserver);
+
+      TextureManager::TextureId tempId;
+      tempId = data1.textureManagerPtr->RequestLoad(
+        data1.resendFilename,
+        ImageDimensions(),
+        FittingMode::SCALE_TO_FILL,
+        SamplingMode::BOX_THEN_LINEAR,
+        TextureManager::UseAtlas::NO_ATLAS,
+        data1.resendTextureObserver,
+        true,
+        TextureManager::ReloadPolicy::CACHED,
+        preMultiply);
+
+      DALI_TEST_CHECK(tempId == data1.resendTextureId);
+
+      // Request new task
+
+      tempId = data1.textureManagerPtr->RequestLoad(
+        data1.newlyFilename,
+        ImageDimensions(),
+        FittingMode::SCALE_TO_FILL,
+        SamplingMode::BOX_THEN_LINEAR,
+        TextureManager::UseAtlas::NO_ATLAS,
+        *data1.removeTextureObserver,
+        true,
+        TextureManager::ReloadPolicy::CACHED,
+        preMultiply);
+
+      DALI_TEST_CHECK(tempId != TextureManager::INVALID_TEXTURE_ID);
+      *data1.newlyTextureIdPtr = tempId;
+    });
+
+  // Connect observer2 custom function
+  CustomData2 data2;
+  data2.textureManagerPtr = &textureManager;
+  data2.self              = observer2;
+  data2.observerLoadedPtr = &observer2Loaded;
+  data2.observerCalledPtr = &observer2Called;
+
+  observer2->mData = &data2;
+  observer2->ConnectFunction(
+    [](void* data) {
+      DALI_TEST_CHECK(data);
+      CustomData2 data2 = *(CustomData2*)data;
+
+      tet_printf("Old created observer running. Something error occured!\n");
+
+      DALI_TEST_CHECK(data2.self);
+      DALI_TEST_CHECK(data2.observerLoadedPtr);
+      DALI_TEST_CHECK(data2.observerCalledPtr);
+
+      *data2.observerLoadedPtr = data2.self->mLoaded;
+      *data2.observerCalledPtr = data2.self->mObserverCalled;
+    });
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Id info - 1 : {%d}, 2 : {%d}, 3 : {%d}, 4 : {%d}\n", static_cast<int>(textureId1), static_cast<int>(textureId2), static_cast<int>(textureId3), static_cast<int>(textureId4));
+
+  DALI_TEST_EQUALS(observer1.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mObserverCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2Loaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2Called, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(newObserver2Loaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(newObserver2Called, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer3.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer3.mObserverCalled, false, TEST_LOCATION);
+
+  DALI_TEST_CHECK(textureId4 == TextureManager::INVALID_TEXTURE_ID);
+
+  // CAPTION : HARD-CODING.
+  // Run codes without exception.
+  try
+  {
+    tet_printf("Complete async load 1 first.\n");
+    std::vector<Devel::PixelBuffer> pixelBuffers;
+
+    pixelBuffers.clear();
+    pixelBuffers.push_back(Devel::PixelBuffer::New(1, 1, Pixel::Format::RGB888));
+    textureManager.AsyncLoadComplete(textureId1, pixelBuffers);
+
+    tet_printf("Now observer2 deleted, observer3 resended, observer2 re-created.\n");
+    DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer2Loaded, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer2Called, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(newObserver2Loaded, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(newObserver2Called, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3.mLoaded, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3.mObserverCalled, false, TEST_LOCATION);
+
+    tet_printf("Id info - 1 : {%d}, 2 : {%d}, 3 : {%d}, 4 : {%d}\n", static_cast<int>(textureId1), static_cast<int>(textureId2), static_cast<int>(textureId3), static_cast<int>(textureId4));
+
+    DALI_TEST_CHECK(textureId4 == textureId2);
+
+    // Remove processor excute.
+    application.SendNotification();
+    application.Render();
+
+    tet_printf("Complete async load 2. Let we check old version observer2 ignored and newly observer2 loaded.\n");
+    pixelBuffers.clear();
+    pixelBuffers.push_back(Devel::PixelBuffer::New(1, 1, Pixel::Format::RGB888));
+    textureManager.AsyncLoadComplete(textureId2, pixelBuffers);
+
+    DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer2Loaded, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer2Called, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(newObserver2Loaded, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(newObserver2Called, true, TEST_LOCATION);
+    // We don't check observer3 not loaded case because SendNotification can process AsyncTask.
+    //DALI_TEST_EQUALS(observer3.mLoaded, false, TEST_LOCATION);
+    //DALI_TEST_EQUALS(observer3.mObserverCalled, false, TEST_LOCATION);
+
+    tet_printf("Complete async load 3.\n");
+    pixelBuffers.clear();
+    pixelBuffers.push_back(Devel::PixelBuffer::New(1, 1, Pixel::Format::RGB888));
+    textureManager.AsyncLoadComplete(textureId3, pixelBuffers);
+
+    DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer2Loaded, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer2Called, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(newObserver2Loaded, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(newObserver2Called, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3.mLoaded, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer3.mObserverCalled, true, TEST_LOCATION);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
   }
 
   END_TEST;

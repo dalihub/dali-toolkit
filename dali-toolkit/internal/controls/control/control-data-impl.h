@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DATA_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,12 +54,14 @@ struct RegisteredVisual
   Toolkit::Visual::Base visual;
   bool                  enabled : 1;
   bool                  pending : 1;
+  bool                  overideReadyTransition : 1;
 
   RegisteredVisual(Property::Index aIndex, Toolkit::Visual::Base& aVisual, bool aEnabled, bool aPendingReplacement)
   : index(aIndex),
     visual(aVisual),
     enabled(aEnabled),
-    pending(aPendingReplacement)
+    pending(aPendingReplacement),
+    overideReadyTransition(false)
   {
   }
 };
@@ -191,6 +193,15 @@ public:
    * @copydoc Dali::Toolkit::DevelControl::IsVisualEnabled()
    */
   bool IsVisualEnabled(Property::Index index) const;
+
+  /**
+   * @brief Sets the given visual to be ready transition
+   *
+   * @param[in] control The control
+   * @param[in] visual The visual to ready transition overriden
+   * @param[in] enable flag to set enabled or disabled.
+   */
+  void EnableReadyTransitionOverriden(Toolkit::Visual::Base& visual, bool enable);
 
   /**
    * @brief Stops observing the given visual.

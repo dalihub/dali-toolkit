@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/animated-image-loading.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/adaptor-framework/round-robin-container-view.h>
 #include <dali/public-api/common/dali-vector.h>
@@ -51,7 +52,7 @@ class TextureAsyncLoadingHelper;
  * Texture caching is provided and performed by TextureCacheManager.
  * TextureUploadObserver.LoadComplete called when async load completed.
  */
-class TextureManager : public ConnectionTracker
+class TextureManager : public ConnectionTracker, public Integration::Processor
 {
 public:
   // Copy enum and types and const values that TextureManager will use.
@@ -224,17 +225,6 @@ public:
     const bool&                         orientationCorrection,
     const TextureManager::ReloadPolicy& reloadPolicy,
     TextureManager::MultiplyOnLoad&     preMultiplyOnLoad);
-
-  /**
-   * @brief Remove a Texture from the TextureManager.
-   *
-   * Textures are cached and therefore only the removal of the last
-   * occurrence of a Texture will cause its removal internally.
-   *
-   * @param[in] textureId The ID of the Texture to remove.
-   * @param[in] textureObserver The texture observer.
-   */
-  void Remove(const TextureManager::TextureId& textureId, TextureUploadObserver* textureObserver);
 
   /**
    * Add an observer to the object.
@@ -515,6 +505,34 @@ private:
     const bool&                      loadYuvPlanes,
     std::vector<Devel::PixelBuffer>& pixelBuffers);
 
+public: // Remove Request API
+  /**
+   * @brief Request Remove a Texture from the TextureManager.
+   *
+   * Textures are cached and therefore only the removal of the last
+   * occurrence of a Texture will cause its removal internally.
+   *
+   * @param[in] textureId The ID of the Texture to remove.
+   * @param[in] textureObserver The texture observer.
+   */
+  void RequestRemove(const TextureManager::TextureId& textureId, TextureUploadObserver* textureObserver);
+
+private:
+  /**
+   * @brief Remove a Texture from the TextureManager.
+   *
+   * Textures are cached and therefore only the removal of the last
+   * occurrence of a Texture will cause its removal internally.
+   *
+   * @param[in] textureId The ID of the Texture to remove.
+   */
+  void Remove(const TextureManager::TextureId& textureId);
+
+  /**
+   * @brief Initiate remove of texture queued.
+   */
+  void ProcessRemoveQueue();
+
 private:
   // Load and queue
 
@@ -541,7 +559,7 @@ private:
   void LoadOrQueueTexture(TextureManager::TextureInfo& textureInfo, TextureUploadObserver* observer);
 
   /**
-   * @brief Queue a texture load to be subsequently handled by ProcessQueuedTextures.
+   * @brief Queue a texture load to be subsequently handled by ProcessLoadQueue.
    * @param[in] textureInfo The TextureInfo struct associated with the Texture
    * @param[in] observer The observer wishing to observe the texture upload
    */
@@ -558,11 +576,6 @@ private:
    * @brief Initiate load of textures queued whilst NotifyObservers invoking callbacks.
    */
   void ProcessLoadQueue();
-
-  /**
-   * @brief Initiate remove of texture queued whilst NotifyObservers invoking callbacks.
-   */
-  void ProcessRemoveQueue();
 
   /**
    * Add the observer to the observer list
@@ -633,6 +646,12 @@ public:
    */
   void AsyncLoadComplete(const TextureManager::TextureId& textureId, std::vector<Devel::PixelBuffer>& pixelBuffers);
 
+protected: // Implementation of Processor
+  /**
+   * @copydoc Dali::Integration::Processor::Process()
+   */
+  void Process(bool postProcessor) override;
+
 private:
   /**
    * Deleted copy constructor.
@@ -651,14 +670,19 @@ private:
    */
   void ObserverDestroyed(TextureUploadObserver* observer);
 
-private:                                                             // Member Variables:
-  TextureCacheManager                        mTextureCacheManager;   ///< Manager the life-cycle and caching of Textures
-  std::unique_ptr<TextureAsyncLoadingHelper> mAsyncLoader;           ///< The Asynchronous image loader used to provide all local async loads
-  Dali::Vector<LifecycleObserver*>           mLifecycleObservers;    ///< Lifecycle observers of texture manager
-  Dali::Vector<QueueElement>                 mLoadQueue;             ///< Queue of textures to load after NotifyObservers
-  Dali::Vector<QueueElement>                 mRemoveQueue;           ///< Queue of textures to remove after NotifyObservers
-  TextureManager::TextureId                  mLoadingQueueTextureId; ///< TextureId when it is loading. it causes Load Textures to be queued.
-  bool                                       mLoadYuvPlanes;         ///< A global flag to specify if the image should be loaded as yuv planes
+private:                                    // Member Variables:
+  TextureCacheManager mTextureCacheManager; ///< Manager the life-cycle and caching of Textures
+
+  std::unique_ptr<TextureAsyncLoadingHelper> mAsyncLoader;        ///< The Asynchronous image loader used to provide all local async loads
+  Dali::Vector<LifecycleObserver*>           mLifecycleObservers; ///< Lifecycle observers of texture manager
+
+  Dali::Vector<QueueElement> mLoadQueue;             ///< Queue of textures to load after NotifyObservers
+  TextureManager::TextureId  mLoadingQueueTextureId; ///< TextureId when it is loading. it causes Load Textures to be queued.
+
+  Dali::Vector<TextureManager::TextureId> mRemoveQueue; ///< Queue of textures to remove at PostProcess. It will be cleared after PostProcess.
+
+  bool mLoadYuvPlanes;             ///< A global flag to specify if the image should be loaded as yuv planes
+  bool mRemoveProcessorRegistered; ///< Flag if remove processor registered or not.
 };
 
 } // namespace Internal

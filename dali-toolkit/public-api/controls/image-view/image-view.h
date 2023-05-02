@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,6 +113,25 @@ public:
        * @pre image must be initialized.
        */
       PRE_MULTIPLIED_ALPHA,
+
+      /**
+       * @brief name "placeholderImage", type string.
+       *
+       * placeholder image is shown when image view is waiting for the image to load.
+       * @SINCE_2_2.24
+       */
+      PLACEHOLDER_IMAGE,
+
+      /**
+       * @brief name "enableTransitionEffect", type Boolean
+       *
+       * This effect is a crossfade effect when the image is replaced.
+       * the default duration of the crossfade effect is 1.5 seconds.
+       * if the placeholder is enabled, the cross effect applies when the image is changed from a placeholder image to a new image.
+       * if not, the cross effect applies when a new image is shown or is changed from the previous image to a new image.
+       * @SINCE_2_2.24
+       */
+      ENABLE_TRANSITION_EFFECT,
 
       // Animatable properties
 

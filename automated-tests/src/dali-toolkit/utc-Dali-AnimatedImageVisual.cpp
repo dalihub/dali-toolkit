@@ -1344,6 +1344,12 @@ int UtcDaliAnimatedImageVisualMultiImage02(void)
     dummyImpl1.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
     dummyControl.Unparent();
 
+    // Ensure to remove cached texture. (Since we support lazy cache removal)
+    application.SendNotification();
+    application.Render(16);
+    application.SendNotification();
+    application.Render(16);
+
     // Batch size is 9 and cache size is 4
     propertyMap.Clear();
     propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE);
