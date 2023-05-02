@@ -319,25 +319,19 @@ void ModelNode::UpdateBoneMatrix(Scene3D::ModelPrimitive primitive)
       continue;
     }
 
-    Dali::Shader shader = renderer.GetShader();
-    if(!shader)
-    {
-      continue;
-    }
-
     if(boneData.constraint)
     {
       boneData.constraint.Remove();
       boneData.constraint.Reset();
     }
 
-    if(shader.GetPropertyIndex(boneData.propertyName) == Property::INVALID_INDEX)
+    if(renderer.GetPropertyIndex(boneData.propertyName) == Property::INVALID_INDEX)
     {
-      auto propBoneXform = shader.RegisterProperty(boneData.propertyName, Matrix{false});
+      auto propBoneXform = renderer.RegisterProperty(boneData.propertyName, Matrix{false});
 
       Matrix inverseMatrix = boneData.inverseMatrix;
       // Constrain bone matrix to joint transform.
-      boneData.constraint = Constraint::New<Matrix>(shader, propBoneXform, [inverseMatrix](Matrix& output, const PropertyInputContainer& inputs)
+      boneData.constraint = Constraint::New<Matrix>(renderer, propBoneXform, [inverseMatrix](Matrix& output, const PropertyInputContainer& inputs)
                                                     { Matrix::Multiply(output, inverseMatrix, inputs[0]->GetMatrix()); });
 
       Actor joint = Self();
