@@ -188,7 +188,7 @@ public: // METHODS
    *
    * @param[in] index The index of property to be retrieved.
    */
-  const AnimatedProperty& GetPropertyAt(uint32_t index);
+  AnimatedProperty& GetPropertyAt(uint32_t index);
 
 private: // DATA
   std::string mName;
