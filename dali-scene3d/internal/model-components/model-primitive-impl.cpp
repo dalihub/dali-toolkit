@@ -246,10 +246,6 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
 
     mShader.Reset();
     mShader = Shader::New(vertexShader, fragmentShader);
-    if(mBlendShapeData.version != Scene3D::Loader::BlendShapes::Version::INVALID && mBlendShapeData.mActor.GetHandle())
-    {
-      Scene3D::Loader::BlendShapes::ConfigureProperties(mBlendShapeData, mRenderer);
-    }
 
     if(!mRenderer)
     {
