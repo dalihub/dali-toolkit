@@ -283,10 +283,10 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
 
   {
     mesh.first.mModelPrimitive = ModelPrimitive::New();
-    auto primitive            = mesh.first.mModelPrimitive;
+    auto primitive             = mesh.first.mModelPrimitive;
     GetImplementation(primitive).SetRenderer(renderer);
 
-    Index    envIndex         = resources.mMaterials[mMaterialIdx].first.mEnvironmentIdx;
+    Index    envIndex       = resources.mMaterials[mMaterialIdx].first.mEnvironmentIdx;
     uint32_t specularMipmap = resources.mEnvironmentMaps[envIndex].second.mSpecularMipmapLevels;
     GetImplementation(primitive).SetImageBasedLightTexture(resources.mEnvironmentMaps[envIndex].second.mDiffuse,
                                                            resources.mEnvironmentMaps[envIndex].second.mSpecular,
@@ -335,7 +335,7 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
   renderer.RegisterProperty("uMask", mask);
   renderer.RegisterProperty("uAlphaThreshold", alphaCutoff);
 
-  Index    envIndex         = matDef.mEnvironmentIdx;
+  Index    envIndex       = matDef.mEnvironmentIdx;
   uint32_t specularMipmap = resources.mEnvironmentMaps[envIndex].second.mSpecularMipmapLevels;
   renderer.RegisterProperty(IBL_MAXLOD.data(), static_cast<float>(specularMipmap));
   renderer.RegisterProperty(IBL_INTENSITY_STRING.data(), resources.mEnvironmentMaps[envIndex].first.mIblIntensity);
@@ -344,8 +344,8 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
   node.SetProperty(Actor::Property::COLOR, mColor);
 
   {
-    matDef.mMaterial = Material::New();
-    auto material    = matDef.mMaterial;
+    matDef.mMaterial            = Material::New();
+    auto     material           = matDef.mMaterial;
     uint32_t textureIndexOffset = (mesh.second.blendShapeGeometry) ? 1 : 0;
     uint32_t textureIndex       = 0;
     for(uint32_t i = 0; i < MAX_NUMBER_OF_MATERIAL_TEXTURE; ++i)
