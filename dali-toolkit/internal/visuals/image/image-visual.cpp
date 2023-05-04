@@ -427,7 +427,16 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
       if(value.Get(maskingType))
       {
         AllocateMaskData();
-        mMaskingData->mPreappliedMasking = Toolkit::DevelImageVisual::MaskingType::Type(maskingType) == Toolkit::DevelImageVisual::MaskingType::MASKING_ON_LOADING ? true : false;
+        if(mImageUrl.IsValid() && mImageUrl.GetProtocolType() == VisualUrl::TEXTURE)
+        {
+          // For external textures, only gpu masking is available.
+          // Therefore, MASKING_TYPE is set to MASKING_ON_RENDERING forcelly.
+          mMaskingData->mPreappliedMasking = false;
+        }
+        else
+        {
+          mMaskingData->mPreappliedMasking = Toolkit::DevelImageVisual::MaskingType::Type(maskingType) == Toolkit::DevelImageVisual::MaskingType::MASKING_ON_LOADING ? true : false;
+        }
       }
       break;
     }
@@ -464,6 +473,10 @@ void ImageVisual::AllocateMaskData()
   if(!mMaskingData)
   {
     mMaskingData.reset(new TextureManager::MaskingData());
+    if(mImageUrl.IsValid() && mImageUrl.GetProtocolType() == VisualUrl::TEXTURE)
+    {
+      mMaskingData->mPreappliedMasking = false;
+    }
   }
 }
 
