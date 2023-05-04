@@ -108,7 +108,7 @@ struct DALI_SCENE3D_API SkinningShaderConfigurationRequest
 
   bool operator<(const SkinningShaderConfigurationRequest& other) const
   {
-    return mShader < other.mShader;
+    return mShader < other.mShader || (mShader == other.mShader && mPrimitive < other.mPrimitive);
   }
 };
 
@@ -124,7 +124,7 @@ struct DALI_SCENE3D_API BlendshapeShaderConfigurationRequest
 
   bool operator<(const BlendshapeShaderConfigurationRequest& other) const
   {
-    return mShader < other.mShader;
+    return mShader < other.mShader || (mShader == other.mShader && mPrimitive < other.mPrimitive);
   }
 };
 

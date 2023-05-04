@@ -44,21 +44,16 @@ namespace Dali::Scene3D::Loader
 {
 namespace
 {
-
 const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)>& GetConstraintFactory()
 {
   static const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)> sConstraintFactory = {
     {Property::Type::BOOLEAN,
      [](Actor& a, Property::Index i) {
-       return Constraint::New<bool>(a, i, [](bool& current, const PropertyInputContainer& inputs) {
-         current = inputs[0]->GetBoolean();
-       });
+       return Constraint::New<bool>(a, i, [](bool& current, const PropertyInputContainer& inputs) { current = inputs[0]->GetBoolean(); });
      }},
     {Property::Type::INTEGER,
      [](Actor& a, Property::Index i) {
-       return Constraint::New<int>(a, i, [](int& current, const PropertyInputContainer& inputs) {
-         current = inputs[0]->GetInteger();
-       });
+       return Constraint::New<int>(a, i, [](int& current, const PropertyInputContainer& inputs) { current = inputs[0]->GetInteger(); });
      }},
     {Property::Type::FLOAT,
      [](Actor& a, Property::Index i) {
@@ -203,47 +198,43 @@ public:
 
 private:
   NodeDefinition::CreateParams& mCreationContext;
-  std::vector<ModelNode>            mActorStack;
-  ModelNode                         mRoot;
+  std::vector<ModelNode>        mActorStack;
+  ModelNode                     mRoot;
 };
 
-void SortAndDeduplicateSkinningRequests(std::vector<SkinningShaderConfigurationRequest>& requests)
+template<typename RequestType>
+void SortAndDeduplicateRequests(std::vector<RequestType>& requests)
 {
-  // Sort requests by shaders.
+  // Sort requests by shaders and primitives.
   std::sort(requests.begin(), requests.end());
 
   // Remove duplicates.
-  auto   i           = requests.begin();
-  auto   iEnd        = requests.end();
-  Shader s           = i->mShader;
-  Index  skeletonIdx = i->mSkeletonIdx;
-  ++i;
+  auto iter    = requests.begin();
+  auto iterEnd = requests.end();
+
+  Shader         shader         = iter->mShader;
+  ModelPrimitive modelPrimitive = iter->mPrimitive;
+  ++iter;
   do
   {
-    // Multiple identical shader instances are removed.
-    while(i != iEnd && i->mShader == s)
+    // Multiple identical shader and primitive instances are removed.
+    while(iter != iterEnd && iter->mShader == shader && iter->mPrimitive == modelPrimitive)
     {
-      // Cannot have multiple skeletons input to the same shader.
-      // NOTE: DliModel now makes sure this doesn't happen.
-      DALI_ASSERT_ALWAYS(i->mSkeletonIdx == skeletonIdx &&
-                         "Skinning shader must not be shared between different skeletons.");
-
-      i->mShader = Shader();
-      ++i;
+      // Mark as removed
+      iter->mShader = Shader();
+      ++iter;
     }
 
-    if(i == iEnd)
+    if(iter == iterEnd)
     {
       break;
     }
-    s           = i->mShader;
-    skeletonIdx = i->mSkeletonIdx;
-    ++i;
+    shader         = iter->mShader;
+    modelPrimitive = iter->mPrimitive;
+    ++iter;
   } while(true);
 
-  requests.erase(std::remove_if(requests.begin(), requests.end(), [](const SkinningShaderConfigurationRequest& sscr) {
-                   return !sscr.mShader;
-                 }),
+  requests.erase(std::remove_if(requests.begin(), requests.end(), [](const RequestType& sscr) { return !sscr.mShader; }),
                  requests.end());
 }
 
@@ -628,9 +619,7 @@ NodeDefinition* SceneDefinition::FindNode(const std::string& name, Index* outInd
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
-  auto iFind  = std::find_if(iBegin, iEnd, [&name](const std::unique_ptr<NodeDefinition>& nd) {
-    return nd->mName == name;
-  });
+  auto iFind  = std::find_if(iBegin, iEnd, [&name](const std::unique_ptr<NodeDefinition>& nd) { return nd->mName == name; });
 
   auto result = iFind != iEnd ? iFind->get() : nullptr;
   if(result && outIndex)
@@ -644,9 +633,7 @@ const NodeDefinition* SceneDefinition::FindNode(const std::string& name, Index* 
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
-  auto iFind  = std::find_if(iBegin, iEnd, [&name](const std::unique_ptr<NodeDefinition>& nd) {
-    return nd->mName == name;
-  });
+  auto iFind  = std::find_if(iBegin, iEnd, [&name](const std::unique_ptr<NodeDefinition>& nd) { return nd->mName == name; });
 
   auto result = iFind != iEnd ? iFind->get() : nullptr;
   if(result && outIndex)
@@ -660,9 +647,7 @@ Index SceneDefinition::FindNodeIndex(const NodeDefinition& node) const
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
-  auto iFind  = std::find_if(iBegin, iEnd, [&node](const std::unique_ptr<NodeDefinition>& n) {
-    return n.get() == &node;
-  });
+  auto iFind  = std::find_if(iBegin, iEnd, [&node](const std::unique_ptr<NodeDefinition>& n) { return n.get() == &node; });
   return iFind != iEnd ? std::distance(iBegin, iFind) : INVALID_INDEX;
 }
 
@@ -814,7 +799,7 @@ void SceneDefinition::ConfigureSkinningShaders(const ResourceBundle&            
     return;
   }
 
-  SortAndDeduplicateSkinningRequests(requests);
+  SortAndDeduplicateRequests(requests);
 
   for(auto& request : requests)
   {
@@ -828,7 +813,7 @@ void SceneDefinition::ConfigureSkinningShaders(const ResourceBundle&            
     Index boneIdx = 0;
     for(auto& joint : skeleton.mJoints)
     {
-      auto  node  = GetNode(joint.mNodeIdx);
+      auto      node      = GetNode(joint.mNodeIdx);
       ModelNode modelNode = ModelNode::DownCast(rootActor.FindChildByName(node->mName));
       if(!modelNode)
       {
@@ -849,47 +834,24 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&          
     return true;
   }
 
-  // Sort requests by shaders.
-  std::sort(requests.begin(), requests.end());
-
-  // Remove duplicates.
-  auto   i    = requests.begin();
-  auto   iEnd = requests.end();
-  Shader s    = i->mShader;
-  ++i;
-  do
-  {
-    // Multiple identical shader instances are removed.
-    while(i != iEnd && i->mShader == s)
-    {
-      i->mShader = Shader();
-      ++i;
-    }
-
-    if(i == iEnd)
-    {
-      break;
-    }
-    s = i->mShader;
-    ++i;
-  } while(true);
+  SortAndDeduplicateRequests(requests);
 
   // Configure the rest.
   bool ok = true;
 
-  for(auto& i : requests)
+  for(auto& request : requests)
   {
     Index iNode;
-    if(FindNode(i.mNodeName, &iNode))
+    if(FindNode(request.mNodeName, &iNode))
     {
       const auto& node = GetNode(iNode);
 
-      const auto& mesh = resources.mMeshes[i.mMeshIdx];
+      const auto& mesh = resources.mMeshes[request.mMeshIdx];
 
       if(mesh.first.HasBlendShapes())
       {
-        Actor actor = rootActor.FindChildByName(node->mName);
-        Scene3D::ModelNode node = Scene3D::ModelNode::DownCast(actor);
+        Actor              actor = rootActor.FindChildByName(node->mName);
+        Scene3D::ModelNode node  = Scene3D::ModelNode::DownCast(actor);
         if(!node)
         {
           continue;
@@ -906,10 +868,10 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&          
         {
           data.unnormalizeFactors.push_back(factor);
         }
-        data.version = mesh.first.mBlendShapeVersion;
+        data.version      = mesh.first.mBlendShapeVersion;
         data.bufferOffset = mesh.second.blendShapeBufferOffset;
-        data.mActor = actor;
-        Internal::GetImplementation(node).SetBlendShapeData(data, i.mPrimitive);
+        data.mActor       = actor;
+        Internal::GetImplementation(node).SetBlendShapeData(data, request.mPrimitive);
       }
     }
   }
@@ -975,9 +937,8 @@ bool SceneDefinition::FindNode(const std::string& name, std::unique_ptr<NodeDefi
   // We're searching from the end assuming a higher probability of operations targeting
   // recently added nodes. (conf.: root, which is immovable, cannot be removed, and was
   // the first to be added, is index 0.)
-  auto iFind = std::find_if(mNodes.rbegin(), mNodes.rend(), [&name](const std::unique_ptr<NodeDefinition>& nd) {
-                 return nd->mName == name;
-               }).base();
+  auto iFind = std::find_if(mNodes.rbegin(), mNodes.rend(), [&name](const std::unique_ptr<NodeDefinition>& nd) { return nd->mName == name; })
+                 .base();
 
   const bool success = iFind != mNodes.begin();
   if(success && result)
