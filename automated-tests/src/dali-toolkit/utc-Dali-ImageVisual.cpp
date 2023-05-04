@@ -429,8 +429,8 @@ int UtcDaliImageVisualWithFrameBufferPreMultipliedAlpha01(void)
   ToolkitTestApplication application;
   tet_infoline("Use FrameBuffer as url");
 
-  uint32_t width(64);
-  uint32_t height(64);
+  uint32_t    width(64);
+  uint32_t    height(64);
   FrameBuffer frameBuffer = Dali::FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
 
   DALI_TEST_CHECK(frameBuffer);
@@ -474,8 +474,8 @@ int UtcDaliImageVisualWithFrameBufferPreMultipliedAlpha02(void)
   ToolkitTestApplication application;
   tet_infoline("Use FrameBuffer as url");
 
-  uint32_t width(64);
-  uint32_t height(64);
+  uint32_t    width(64);
+  uint32_t    height(64);
   FrameBuffer frameBuffer = Dali::FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
 
   DALI_TEST_CHECK(frameBuffer);
@@ -612,6 +612,112 @@ int UtcDaliImageVisualWithPixelDataPreMultipliedAlpha(void)
   // Check whether preMultipliedAlpha is true.
   auto preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
   DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualWithPixelDataMasking(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Load external texture with mask");
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  uint32_t width(64);
+  uint32_t height(64);
+  uint32_t bufferSize = width * height * Pixel::GetBytesPerPixel(Pixel::RGBA8888);
+
+  uint8_t*  buffer    = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
+
+  DALI_TEST_CHECK(pixelData);
+
+  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  std::string url      = imageUrl.GetUrl();
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, url);
+  propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  Property::Map testMap;
+  visual.CreatePropertyMap(testMap);
+  DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL), Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+
+  dummyImpl.UnregisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualWithPixelDataMaskingSynchronously(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Load synchronously external texture with mask");
+
+  uint32_t width(64);
+  uint32_t height(64);
+  uint32_t bufferSize = width * height * Pixel::GetBytesPerPixel(Pixel::RGBA8888);
+
+  uint8_t*  buffer    = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
+
+  DALI_TEST_CHECK(pixelData);
+
+  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  std::string url      = imageUrl.GetUrl();
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, url);
+  propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  Property::Map testMap;
+  visual.CreatePropertyMap(testMap);
+  DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL), Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
 
   END_TEST;
 }
