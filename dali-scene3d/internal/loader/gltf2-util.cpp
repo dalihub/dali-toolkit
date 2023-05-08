@@ -281,6 +281,44 @@ const json::Reader<gltf2::Mesh::Primitive>& GetMeshPrimitiveReader()
   return MESH_PRIMITIVE_READER;
 }
 
+const json::Reader<gltf2::Mesh::Extras>& GetMeshExtrasReader()
+{
+  static const auto MESH_EXTRAS_READER = std::move(json::Reader<gltf2::Mesh::Extras>()
+                                                     .Register(*json::MakeProperty("targetNames", json::Read::Array<std::string_view, json::Read::StringView>, &gltf2::Mesh::Extras::mTargetNames)));
+  return MESH_EXTRAS_READER;
+}
+
+std::vector<std::string_view> ReadMeshExtensionsTargetsName(const json_value_s& j)
+{
+  auto&                         jsonObject = json::Cast<json_object_s>(j);
+  std::vector<std::string_view> result;
+
+  auto element = jsonObject.start;
+  while(element)
+  {
+    auto     jsonString = *element->name;
+    uint32_t index      = json::Read::Number<uint32_t>(*element->value);
+
+    if(result.size() <= index)
+    {
+      result.resize(index + 1u);
+    }
+
+    result[index] = json::Read::StringView(jsonString);
+
+    element = element->next;
+  }
+  return result;
+}
+
+const json::Reader<gltf2::Mesh::Extensions>& GetMeshExtensionsReader()
+{
+  static const auto MESH_EXTENSIONS_READER = std::move(json::Reader<gltf2::Mesh::Extensions>()
+                                                         .Register(*json::MakeProperty("SXR_targets_names", ReadMeshExtensionsTargetsName, &gltf2::Mesh::Extensions::mSXRTargetsNames))
+                                                         .Register(*json::MakeProperty("avatar_shape_names", ReadMeshExtensionsTargetsName, &gltf2::Mesh::Extensions::mAvatarShapeNames)));
+  return MESH_EXTENSIONS_READER;
+}
+
 const json::Reader<gltf2::Mesh>& GetMeshReader()
 {
   static const auto MESH_READER = std::move(json::Reader<gltf2::Mesh>()
@@ -288,7 +326,9 @@ const json::Reader<gltf2::Mesh>& GetMeshReader()
                                               .Register(*json::MakeProperty("primitives",
                                                                             json::Read::Array<gltf2::Mesh::Primitive, json::ObjectReader<gltf2::Mesh::Primitive>::Read>,
                                                                             &gltf2::Mesh::mPrimitives))
-                                              .Register(*json::MakeProperty("weights", json::Read::Array<float, json::Read::Number>, &gltf2::Mesh::mWeights)));
+                                              .Register(*json::MakeProperty("weights", json::Read::Array<float, json::Read::Number>, &gltf2::Mesh::mWeights))
+                                              .Register(*json::MakeProperty("extras", json::ObjectReader<gltf2::Mesh::Extras>::Read, &gltf2::Mesh::mExtras))
+                                              .Register(*json::MakeProperty("extensions", json::ObjectReader<gltf2::Mesh::Extensions>::Read, &gltf2::Mesh::mExtensions)));
   return MESH_READER;
 }
 
@@ -541,8 +581,7 @@ void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, 
 
 void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
-  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gltf2::TextureInfo& info)
-  {
+  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gltf2::TextureInfo& info) {
     if(!info.mTexture->mSource->mUri.empty())
     {
       if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
@@ -797,6 +836,7 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
       {
         meshDefinition.mBlendShapes.reserve(primitive.mTargets.size());
         meshDefinition.mBlendShapeVersion = BlendShapes::Version::VERSION_2_0;
+        uint32_t blendShapeIndex          = 0u;
         for(const auto& target : primitive.mTargets)
         {
           MeshDefinition::BlendShape blendShape;
@@ -823,7 +863,22 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
             blendShape.weight = mesh.mWeights[meshDefinition.mBlendShapes.size()];
           }
 
+          // Get blendshape name from extras / SXR_targets_names / avatar_shape_names.
+          if(blendShapeIndex < mesh.mExtras.mTargetNames.size())
+          {
+            blendShape.name = mesh.mExtras.mTargetNames[blendShapeIndex];
+          }
+          else if(blendShapeIndex < mesh.mExtensions.mSXRTargetsNames.size())
+          {
+            blendShape.name = mesh.mExtensions.mSXRTargetsNames[blendShapeIndex];
+          }
+          else if(blendShapeIndex < mesh.mExtensions.mAvatarShapeNames.size())
+          {
+            blendShape.name = mesh.mExtensions.mAvatarShapeNames[blendShapeIndex];
+          }
+
           meshDefinition.mBlendShapes.push_back(std::move(blendShape));
+          ++blendShapeIndex;
         }
       }
 
@@ -901,8 +956,7 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentInd
   auto& resources = output.mResources;
 
   const auto index    = scene.GetNodeCount();
-  auto       weakNode = scene.AddNode([&]()
-                                {
+  auto       weakNode = scene.AddNode([&]() {
     std::unique_ptr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
     nodeDefinition->mParentIdx = parentIndex;
@@ -1334,6 +1388,8 @@ void SetObjectReaders()
   json::SetObjectReader(GetMaterialExtensionsReader());
   json::SetObjectReader(GetMaterialReader());
   json::SetObjectReader(GetMeshPrimitiveReader());
+  json::SetObjectReader(GetMeshExtrasReader());
+  json::SetObjectReader(GetMeshExtensionsReader());
   json::SetObjectReader(GetMeshReader());
   json::SetObjectReader(GetSkinReader());
   json::SetObjectReader(GetCameraPerspectiveReader());

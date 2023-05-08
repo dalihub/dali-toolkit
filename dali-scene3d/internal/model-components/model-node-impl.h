@@ -19,9 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/common/dali-common.h>
 #include <memory> // for std::unique_ptr
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/model-components/model-primitive-modify-observer.h>
@@ -52,6 +54,7 @@ class DALI_SCENE3D_API ModelNode : public CustomActorImpl, public ModelPrimitive
 public:
   using ModelPrimitiveContainer = std::vector<Scene3D::ModelPrimitive>;
   using BoneDataContainer       = std::vector<Dali::Scene3D::Loader::Skinning::BoneData>;
+  using BlendShapeIndexMap      = std::map<std::string, Loader::BlendShapes::Index>;
 
   // Creation & Destruction
   /**
@@ -217,6 +220,16 @@ public: // Public Method
   Scene3D::ModelNode FindChildModelNodeByName(std::string_view nodeName);
 
   /**
+   * @copydoc Dali::Scene3D::ModelNode::RetrieveBlendShapeNames()
+   */
+  void RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const;
+
+  /**
+   * @copydoc Dali::Scene3D::ModelNode::GetBlendShapeIndexByName()
+   */
+  Loader::BlendShapes::Index GetBlendShapeIndexByName(std::string_view blendShapeName) const;
+
+  /**
    * @brief Sets the diffuse and specular image-based lighting textures for a ModelPrimitive.
    *
    * @param[in] diffuseTexture The diffuse texture.
@@ -272,14 +285,15 @@ private:
   /// @cond internal
 
   // Not copyable or movable
-  DALI_INTERNAL            ModelNode(const ModelNode&) = delete; ///< Deleted copy constructor.
-  DALI_INTERNAL            ModelNode(ModelNode&&)      = delete; ///< Deleted move constructor.
+  DALI_INTERNAL ModelNode(const ModelNode&) = delete;            ///< Deleted copy constructor.
+  DALI_INTERNAL ModelNode(ModelNode&&)      = delete;            ///< Deleted move constructor.
   DALI_INTERNAL ModelNode& operator=(const ModelNode&) = delete; ///< Deleted copy assignment operator.
-  DALI_INTERNAL ModelNode& operator=(ModelNode&&)      = delete; ///< Deleted move assignment operator.
+  DALI_INTERNAL ModelNode& operator=(ModelNode&&) = delete;      ///< Deleted move assignment operator.
 
 private:
   ModelPrimitiveContainer mModelPrimitiveContainer; ///< List of model primitives
   BoneDataContainer       mBoneDataContainer;
+  BlendShapeIndexMap      mBlendShapeIndexMap; ///< Index of blend shape by name
   Dali::Texture           mSpecularTexture;
   Dali::Texture           mDiffuseTexture;
   float                   mIblScaleFactor{1.0f};
