@@ -118,8 +118,7 @@ void ConfigureBlendShapeShaders(
   Dali::Scene3D::Loader::ResourceBundle& resources, const Dali::Scene3D::Loader::SceneDefinition& scene, Actor root, std::vector<Dali::Scene3D::Loader::BlendshapeShaderConfigurationRequest>&& requests)
 {
   std::vector<std::string> errors;
-  auto                     onError = [&errors](const std::string& msg)
-  { errors.push_back(msg); };
+  auto                     onError = [&errors](const std::string& msg) { errors.push_back(msg); };
   if(!scene.ConfigureBlendshapeShaders(resources, root, std::move(requests), onError))
   {
     Dali::Scene3D::Loader::ExceptionFlinger flinger(ASSERT_LOCATION);
@@ -178,7 +177,6 @@ void AddLightRecursively(Scene3D::ModelNode node, Scene3D::Light light, uint32_t
   {
     return;
   }
-
   GetImplementation(node).AddLight(light, lightIndex);
 
   uint32_t childrenCount = node.GetChildCount();
@@ -209,6 +207,27 @@ void RemoveLightRecursively(Scene3D::ModelNode node, uint32_t lightIndex)
     {
       RemoveLightRecursively(childNode, lightIndex);
     }
+  }
+}
+
+void UpdateBlendShapeNodeMapRecursively(Model::BlendShapeModelNodeMap& resultMap, const Scene3D::ModelNode& node)
+{
+  if(!node)
+  {
+    return;
+  }
+  const auto childCount = node.GetChildCount();
+  for(auto i = 0u; i < childCount; ++i)
+  {
+    UpdateBlendShapeNodeMapRecursively(resultMap, Scene3D::ModelNode::DownCast(node.GetChildAt(i)));
+  }
+
+  std::vector<std::string> blendShapeNames;
+  node.RetrieveBlendShapeNames(blendShapeNames);
+  for(const auto& iter : blendShapeNames)
+  {
+    // Append or create new list.
+    resultMap[iter].push_back(node);
   }
 }
 
@@ -514,6 +533,29 @@ Scene3D::ModelNode Model::FindChildModelNodeByName(std::string_view nodeName)
 {
   Actor childActor = Self().FindChildByName(nodeName);
   return Scene3D::ModelNode::DownCast(childActor);
+}
+
+void Model::RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const
+{
+  blendShapeNames.reserve(blendShapeNames.size() + mBlendShapeModelNodeMap.size());
+  for(const auto& iter : mBlendShapeModelNodeMap)
+  {
+    blendShapeNames.push_back(iter.first);
+  }
+}
+
+void Model::RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, std::vector<Scene3D::ModelNode>& modelNodes) const
+{
+  auto iter = mBlendShapeModelNodeMap.find(std::string(blendShapeName));
+  if(iter != mBlendShapeModelNodeMap.end())
+  {
+    const auto& modelNodeList = iter->second;
+    modelNodes.reserve(modelNodes.size() + modelNodeList.size());
+    for(const auto& nodeIter : modelNodeList)
+    {
+      modelNodes.push_back(nodeIter);
+    }
+  }
 }
 
 ///////////////////////////////////////////////////////////
@@ -941,18 +983,20 @@ void Model::CreateModel()
   resources.GenerateResources();
   for(auto iRoot : scene.GetRoots())
   {
-    if(auto actor = scene.CreateNodes(iRoot, resourceChoices, nodeParams))
+    if(auto modelNode = scene.CreateNodes(iRoot, resourceChoices, nodeParams))
     {
-      scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
-      ConfigureBlendShapeShaders(resources, scene, actor, std::move(nodeParams.mBlendshapeRequests));
+      scene.ConfigureSkinningShaders(resources, modelNode, std::move(nodeParams.mSkinnables));
+      ConfigureBlendShapeShaders(resources, scene, modelNode, std::move(nodeParams.mBlendshapeRequests));
 
-      scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
+      scene.ApplyConstraints(modelNode, std::move(nodeParams.mConstrainables));
 
-      mModelRoot.Add(actor);
+      mModelRoot.Add(modelNode);
     }
 
     AddModelTreeToAABB(AABB, scene, resourceChoices, iRoot, nodeParams, Matrix::IDENTITY);
   }
+
+  UpdateBlendShapeNodeMap();
 
   mNaturalSize = AABB.CalculateSize();
   mModelPivot  = AABB.CalculatePivot();
@@ -971,8 +1015,7 @@ void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
   mAnimations.clear();
   if(!mModelLoadTask->GetAnimations().empty())
   {
-    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property)
-    {
+    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property) {
       if(property.mNodeIndex == Scene3D::Loader::INVALID_INDEX)
       {
         return mModelRoot.FindChildByName(property.mNodeName);
@@ -1001,6 +1044,14 @@ void Model::ResetCameraParameters()
     // Copy camera parameters.
     std::copy(mModelLoadTask->GetCameras().begin(), mModelLoadTask->GetCameras().end(), std::back_inserter(mCameraParameters));
   }
+}
+
+void Model::UpdateBlendShapeNodeMap()
+{
+  // Remove privous node map
+  mBlendShapeModelNodeMap.clear();
+
+  UpdateBlendShapeNodeMapRecursively(mBlendShapeModelNodeMap, mModelRoot);
 }
 
 } // namespace Internal

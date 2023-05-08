@@ -318,10 +318,32 @@ public:
   /**
    * @brief Returns a child ModelNode object with a name that matches nodeName.
    *
+   * @SINCE_2_2.34
    * @param[in] nodeName The name of the child ModelNode object you want to find.
    * @return Returns a child ModelNode object with a name that matches nodeName. If there is no corresponding child ModelNode object, it returns an empty ModelNode object.
    */
   ModelNode FindChildModelNodeByName(std::string_view nodeName);
+
+  /**
+   * @brief Retrieve the list of blendshape name that current Model hold.
+   * The name will be appended end of input list.
+   *
+   * @SINCE_2_2.34
+   * @param[in, out] blendShapeNames The name of blendShape list collected.
+   * @note This method should be called after Model load finished.
+   */
+  void RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const;
+
+  /**
+   * @brief Retrieve the list of ModelNode that contains given blend shape name.
+   * The ModelNode will be appended end of input list.
+   *
+   * @SINCE_2_2.34
+   * @param[in] blendShapeName The name of blendShape that want to collect.
+   * @param[in, out] modelNodes The ModelNode list collected.
+   * @note This method should be called after Model load finished.
+   */
+  void RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, std::vector<ModelNode>& modelNodes) const;
 
 public: // Not intended for application developers
   /// @cond internal

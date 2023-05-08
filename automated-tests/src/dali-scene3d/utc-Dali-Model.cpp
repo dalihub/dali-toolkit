@@ -17,6 +17,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/common/map-wrapper.h>
 #include <stdlib.h>
 #include <iostream>
 
@@ -53,6 +54,7 @@ const bool DEFAULT_MODEL_CHILDREN_FOCUSABLE = false;
  */
 const char* TEST_GLTF_FILE_NAME                    = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
 const char* TEST_GLTF_ANIMATION_TEST_FILE_NAME     = TEST_RESOURCE_DIR "/animationTest.gltf";
+const char* TEST_GLTF_EXTRAS_FILE_NAME             = TEST_RESOURCE_DIR "/AnimatedMorphCubeAnimateNonZeroFrame.gltf";
 const char* TEST_GLTF_MULTIPLE_PRIMITIVE_FILE_NAME = TEST_RESOURCE_DIR "/simpleMultiplePrimitiveTest.gltf";
 const char* TEST_DLI_FILE_NAME                     = TEST_RESOURCE_DIR "/arc.dli";
 const char* TEST_DLI_EXERCISE_FILE_NAME            = TEST_RESOURCE_DIR "/exercise.dli";
@@ -1135,8 +1137,7 @@ int UtcDaliModelCameraGenerate02(void)
   CameraActor appliedCamera;
   DALI_TEST_EQUALS(model.ApplyCamera(0u, appliedCamera), false, TEST_LOCATION); // Cannot apply into empty camera.
 
-  auto CompareCameraProperties = [](CameraActor lhs, CameraActor rhs, const char* location)
-  {
+  auto CompareCameraProperties = [](CameraActor lhs, CameraActor rhs, const char* location) {
     DALI_TEST_EQUALS(lhs.GetProperty<int>(Dali::CameraActor::Property::PROJECTION_MODE), rhs.GetProperty<int>(Dali::CameraActor::Property::PROJECTION_MODE), TEST_LOCATION);
     DALI_TEST_EQUALS(lhs.GetProperty<float>(Dali::CameraActor::Property::NEAR_PLANE_DISTANCE), rhs.GetProperty<float>(Dali::CameraActor::Property::NEAR_PLANE_DISTANCE), TEST_LOCATION);
 
@@ -1485,6 +1486,56 @@ int UtcDaliModelSizeChange2(void)
 
   Vector3 scale2 = model.GetChildAt(0u).GetProperty<Vector3>(Dali::Actor::Property::SCALE);
   DALI_TEST_NOT_EQUALS(scale, scale2, 0.1f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliModelRetrieveBlendShapeNames(void)
+{
+  tet_infoline(" UtcDaliModelRetrieveBlendShapeByName.");
+
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_EXTRAS_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector3(300, 300, 300));
+  application.GetScene().Add(model);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(model.GetChildCount(), 1u, TEST_LOCATION);
+
+  // Get target ModelNode that has extras
+  Scene3D::ModelNode expectNode = model.FindChildModelNodeByName("AnimatedMorphCube");
+
+  // Pair of expected blend shape index from expectNode.
+  std::map<std::string, Scene3D::Loader::BlendShapes::Index> expectBlendShapeNames = {
+    {"Target_0", 0u},
+    {"Target_1", 1u},
+  };
+
+  std::vector<std::string> blendShapeNameList;
+  model.RetrieveBlendShapeNames(blendShapeNameList);
+
+  DALI_TEST_EQUALS(blendShapeNameList.size(), expectBlendShapeNames.size(), TEST_LOCATION);
+  for(auto i = 0u; i < blendShapeNameList.size(); ++i)
+  {
+    const auto& name = blendShapeNameList[i];
+    tet_printf("Check retrieved blendshape name : %s\n", name.c_str());
+
+    const auto& iter = expectBlendShapeNames.find(name);
+    DALI_TEST_CHECK(iter != expectBlendShapeNames.end());
+
+    std::vector<Scene3D::ModelNode> nodeList;
+    model.RetrieveModelNodesByBlendShapeName(name, nodeList);
+    DALI_TEST_EQUALS(nodeList.size(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(nodeList[0], expectNode, TEST_LOCATION);
+    DALI_TEST_EQUALS(nodeList[0].GetBlendShapeIndexByName(name), iter->second, TEST_LOCATION);
+  }
 
   END_TEST;
 }
