@@ -77,7 +77,7 @@ uniform sampler2D sbrdfLUT;
 uniform samplerCube sDiffuseEnvSampler;
 uniform samplerCube sSpecularEnvSampler;
 uniform float uIblIntensity;
-uniform vec3 uYDirection;
+uniform mediump vec3 uYDirection;
 uniform float uMaxLOD;
 
 // For Alpha Mode.
