@@ -41,6 +41,7 @@ uniform mat4 uProjection;
   in vec4 aWeights;
   #define MAX_BONES 64
   uniform mat4 uBone[MAX_BONES];
+  uniform mediump vec3 uYDirection;
 #endif
 
 #ifdef MORPH
@@ -141,10 +142,8 @@ void main()
     uBone[int(aJoints.z)] * aWeights.z +
     uBone[int(aJoints.w)] * aWeights.w;
   position = bone * position;
-  normal = (bone * vec4(normal, 0.0)).xyz;
-  tangent = (bone * vec4(tangent, 0.0)).xyz;
-  normal = normalize(normal);
-  tangent = normalize(tangent);
+  normal = uYDirection * (bone * vec4(normal, 0.0)).xyz;
+  tangent = uYDirection * (bone * vec4(tangent, 0.0)).xyz;
 
   highp vec4 positionW = position;
 #else
@@ -154,6 +153,8 @@ void main()
 
   vPositionToCamera = transpose(mat3(uViewMatrix)) * -vec3(positionV.xyz / positionV.w);
 
+  normal = normalize(normal);
+  tangent = normalize(tangent);
   vec3 bitangent = cross(normal, tangent);
 #ifdef VEC4_TANGENT
   bitangent *= aTangent.w;
