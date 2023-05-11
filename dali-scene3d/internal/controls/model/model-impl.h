@@ -23,6 +23,7 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/texture.h>
 
@@ -172,6 +173,11 @@ private:
   void OnSceneDisconnection() override;
 
   /**
+   * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
+   */
+  void OnSizeSet(const Vector3& size) override;
+
+  /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
   Vector3 GetNaturalSize() override;
@@ -205,7 +211,7 @@ private:
   /**
    * @brief Scales the model to fit the control or to return to original size.
    */
-  void ScaleModel();
+  void ScaleModel(bool useCurrentSize);
 
   /**
    * @brief Changes model anchor point to set the model at center or returns to the original model pivot.
@@ -274,6 +280,11 @@ private:
   void OnIblLoadComplete();
 
   /**
+   * @brief Update model root scale when Model size property is updated.
+   */
+  void OnSizeNotification(Dali::PropertyNotification& source);
+
+  /**
    * @brief Reset Resource loading tasks.
    */
   void ResetResourceTasks();
@@ -304,12 +315,13 @@ private:
   void ResetCameraParameters();
 
 private:
-  std::string                                 mModelUrl;
-  std::string                                 mResourceDirectoryUrl;
-  Scene3D::ModelNode                          mModelRoot;
-  std::vector<AnimationData>                  mAnimations;
-  std::vector<CameraData>                     mCameraParameters;
-  WeakHandle<Scene3D::SceneView>              mParentSceneView;
+  std::string                    mModelUrl;
+  std::string                    mResourceDirectoryUrl;
+  Scene3D::ModelNode             mModelRoot;
+  std::vector<AnimationData>     mAnimations;
+  std::vector<CameraData>        mCameraParameters;
+  WeakHandle<Scene3D::SceneView> mParentSceneView;
+  Dali::PropertyNotification     mSizeNotification;
 
   // Asynchronous loading variable
   ModelLoadTaskPtr          mModelLoadTask;

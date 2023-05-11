@@ -1425,3 +1425,66 @@ int UtcDaliModelFindChildModelNodeByName(void)
 
   END_TEST;
 }
+
+int UtcDaliModelSizeChange(void)
+{
+  tet_infoline(" UtcDaliModelSizeChange.");
+
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector3(300, 300, 300));
+  application.GetScene().Add(model);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(model.GetChildCount(), 1u, TEST_LOCATION);
+  Vector3 scale = model.GetChildAt(0u).GetProperty<Vector3>(Dali::Actor::Property::SCALE);
+
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector3(600, 600, 600));
+  Vector3 scale2 = model.GetChildAt(0u).GetProperty<Vector3>(Dali::Actor::Property::SCALE);
+
+  DALI_TEST_NOT_EQUALS(scale, scale2, 0.1f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliModelSizeChange2(void)
+{
+  tet_infoline(" UtcDaliModelSizeChange2.");
+
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector3(300, 300, 300));
+  application.GetScene().Add(model);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(model.GetChildCount(), 1u, TEST_LOCATION);
+  Vector3 scale = model.GetChildAt(0u).GetProperty<Vector3>(Dali::Actor::Property::SCALE);
+
+  Animation animation = Animation::New(0.5f);
+  animation.AnimateTo(Dali::Property(model, Dali::Actor::Property::SIZE), Vector3(600, 600, 600));
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+
+  application.SendNotification();
+
+  Vector3 scale2 = model.GetChildAt(0u).GetProperty<Vector3>(Dali::Actor::Property::SCALE);
+  DALI_TEST_NOT_EQUALS(scale, scale2, 0.1f, TEST_LOCATION);
+
+  END_TEST;
+}

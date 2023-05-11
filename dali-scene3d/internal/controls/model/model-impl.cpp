@@ -66,6 +66,7 @@ DALI_TYPE_REGISTRATION_BEGIN(Scene3D::Model, Toolkit::Control, Create);
 DALI_TYPE_REGISTRATION_END()
 
 static constexpr Vector3 Y_DIRECTION(1.0f, -1.0f, 1.0f);
+static constexpr float   SIZE_STEP_CONDITION = 0.1f;
 
 static constexpr bool DEFAULT_MODEL_CHILDREN_SENSITIVE = false;
 static constexpr bool DEFAULT_MODEL_CHILDREN_FOCUSABLE = false;
@@ -501,6 +502,9 @@ void Model::OnSceneConnection(int depth)
   }
 
   NotifyResourceReady();
+
+  mSizeNotification = Self().AddPropertyNotification(Actor::Property::SIZE, StepCondition(SIZE_STEP_CONDITION));
+  mSizeNotification.NotifySignal().Connect(this, &Model::OnSizeNotification);
   Control::OnSceneConnection(depth);
 }
 
@@ -512,7 +516,17 @@ void Model::OnSceneDisconnection()
     GetImpl(sceneView).UnregisterSceneItem(this);
     mParentSceneView.Reset();
   }
+
+  mSizeNotification.NotifySignal().Disconnect(this, &Model::OnSizeNotification);
+  Self().RemovePropertyNotification(mSizeNotification);
+  mSizeNotification.Reset();
+
   Control::OnSceneDisconnection();
+}
+
+void Model::OnSizeSet(const Vector3& size)
+{
+  ScaleModel(false);
 }
 
 Vector3 Model::GetNaturalSize()
@@ -543,7 +557,7 @@ float Model::GetWidthForHeight(float height)
 void Model::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   Control::OnRelayout(size, container);
-  ScaleModel();
+  ScaleModel(false);
 }
 
 bool Model::IsResourceReady() const
@@ -562,7 +576,7 @@ void Model::CreateModelRoot()
   Self().Add(mModelRoot);
 }
 
-void Model::ScaleModel()
+void Model::ScaleModel(bool useCurrentSize)
 {
   if(!mModelRoot)
   {
@@ -570,7 +584,7 @@ void Model::ScaleModel()
   }
 
   float   scale = 1.0f;
-  Vector3 size  = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+  Vector3 size  = (useCurrentSize) ? Self().GetCurrentProperty<Vector3>(Dali::Actor::Property::SIZE) : Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
   if(size.x > 0.0f && size.y > 0.0f)
   {
     scale = MAXFLOAT;
@@ -797,6 +811,11 @@ void Model::OnIblLoadComplete()
   NotifyResourceReady();
 }
 
+void Model::OnSizeNotification(Dali::PropertyNotification& source)
+{
+  ScaleModel(true);
+}
+
 void Model::ResetResourceTasks()
 {
   if(!Dali::Adaptor::IsAvailable())
@@ -862,7 +881,7 @@ void Model::CreateModel()
     Self().SetProperty(Dali::Actor::Property::SIZE, mNaturalSize);
   }
   FitModelPosition();
-  ScaleModel();
+  ScaleModel(false);
 }
 
 void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
