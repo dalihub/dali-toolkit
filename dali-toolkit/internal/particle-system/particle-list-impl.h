@@ -23,11 +23,12 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/common/list-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
 #include <algorithm>
-#include <list>
-#include <map>
 #include <memory>
-#include <vector>
+
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {

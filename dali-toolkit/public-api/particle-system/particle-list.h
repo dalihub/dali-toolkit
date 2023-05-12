@@ -22,8 +22,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/common/list-wrapper.h>
 #include <cinttypes>
-#include <list>
+
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {

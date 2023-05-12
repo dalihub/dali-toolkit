@@ -21,10 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/particle-system/particle-impl.h>
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
-#include <memory>
-
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
 
