@@ -13,6 +13,13 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/builder/style.cpp
    ${toolkit_src_dir}/builder/tree-node-manipulator.cpp
    ${toolkit_src_dir}/builder/replacement.cpp
+   ${toolkit_src_dir}/particle-system/particle-impl.cpp
+   ${toolkit_src_dir}/particle-system/particle-domain-impl.cpp
+   ${toolkit_src_dir}/particle-system/particle-emitter-impl.cpp
+   ${toolkit_src_dir}/particle-system/particle-list-impl.cpp
+   ${toolkit_src_dir}/particle-system/particle-modifier-impl.cpp
+   ${toolkit_src_dir}/particle-system/particle-renderer-impl.cpp
+   ${toolkit_src_dir}/particle-system/particle-source-impl.cpp
    ${toolkit_src_dir}/texture-manager/texture-async-loading-helper.cpp
    ${toolkit_src_dir}/texture-manager/texture-cache-manager.cpp
    ${toolkit_src_dir}/texture-manager/texture-manager-impl.cpp
