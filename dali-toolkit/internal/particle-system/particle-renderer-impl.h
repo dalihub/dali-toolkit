@@ -84,7 +84,7 @@ public:
   Dali::Geometry     mGeometry;
   Dali::VertexBuffer mVertexBuffer;
   Dali::VertexBuffer mStreamBuffer;
-  BlendingMode       mBlendingMode;
+  BlendingMode       mBlendingMode{BlendingMode::DEFAULT};
 
   std::unique_ptr<Dali::VertexBufferUpdateCallback> mStreamBufferUpdateCallback;
 
@@ -93,7 +93,6 @@ public:
 } // namespace Dali::Toolkit::ParticleSystem::Internal
 namespace Dali
 {
-
 inline Toolkit::ParticleSystem::Internal::ParticleRenderer& GetImplementation(Toolkit::ParticleSystem::ParticleRenderer& source)
 {
   DALI_ASSERT_ALWAYS(source && "ParticleRenderer handle is empty");
