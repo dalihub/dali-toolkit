@@ -40,7 +40,7 @@ PathFinderAlgorithmDjikstra::~PathFinderAlgorithmDjikstra() = default;
 Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(const Dali::Vector3& positionFrom, const Dali::Vector3& positionTo)
 {
   Dali::Vector3 outPosFrom;
-  uint32_t      polyIndexFrom;
+  FaceIndex     polyIndexFrom;
   auto          result = mNavigationMesh->FindFloor(positionFrom, outPosFrom, polyIndexFrom);
 
   Scene3D::Algorithm::WayPointList waypoints;
@@ -48,7 +48,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(const Dal
   if(result)
   {
     Dali::Vector3 outPosTo;
-    uint32_t      polyIndexTo;
+    FaceIndex     polyIndexTo;
     result = mNavigationMesh->FindFloor(positionTo, outPosTo, polyIndexTo);
 
     if(result)
@@ -75,11 +75,11 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(const Dal
   return waypoints;
 }
 
-Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(uint32_t sourcePolyIndex, uint32_t targetPolyIndex)
+Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(FaceIndex sourcePolyIndex, FaceIndex targetPolyIndex)
 {
-  auto                  nodeCount = uint32_t(mNodes.size());
-  std::vector<float>    dist;
-  std::vector<uint32_t> prev;
+  auto                   nodeCount = uint32_t(mNodes.size());
+  std::vector<float>     dist;
+  std::vector<FaceIndex> prev;
 
   dist.resize(mNodes.size());
   prev.resize(mNodes.size());
@@ -156,8 +156,8 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(uint32_t 
   } while(removeCount != nodeCount);
 
   // Compute distances for each node back to the source
-  auto                u = targetPolyIndex;
-  std::list<uint32_t> q;
+  auto                 u = targetPolyIndex;
+  std::list<FaceIndex> q;
   if(prev[u] != Scene3D::Algorithm::NavigationMesh::NULL_FACE || u == sourcePolyIndex)
   {
     while(u != Scene3D::Algorithm::NavigationMesh::NULL_FACE)
@@ -208,6 +208,7 @@ void PathFinderAlgorithmDjikstra::PrepareData()
   mNodes.resize(faceCount);
 
   // for each face build the list
+  // TODO : Currently, we are assume that FaceNodeIndex is matched with FaceIndex 1:1. This might be changed in future.
   for(auto i = 0u; i < faceCount; ++i)
   {
     auto&       node = mNodes[i];

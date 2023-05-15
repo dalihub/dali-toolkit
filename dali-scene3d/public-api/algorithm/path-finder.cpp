@@ -63,7 +63,7 @@ WayPointList PathFinder::FindPath(const Dali::Vector3& positionFrom, const Dali:
   return mImpl->FindPath(positionFrom, positionTo);
 }
 
-WayPointList PathFinder::FindPath(uint32_t polyIndexFrom, uint32_t polyIndexTo)
+WayPointList PathFinder::FindPath(FaceIndex polyIndexFrom, FaceIndex polyIndexTo)
 {
   return mImpl->FindPath(polyIndexFrom, polyIndexTo);
 }
