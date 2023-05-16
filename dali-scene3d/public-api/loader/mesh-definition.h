@@ -83,7 +83,7 @@ struct DALI_SCENE3D_API MeshDefinition
 
     static void ComputeMinMax(std::vector<float>& min, std::vector<float>& max, uint32_t numComponents, uint32_t count, const float* values);
 
-    static void ApplyMinMax(const std::vector<float>& min, const std::vector<float>& max, uint32_t count, float* values);
+    static void ApplyMinMax(const std::vector<float>& min, const std::vector<float>& max, uint32_t count, float* values, std::vector<uint32_t>* sparseIndices = nullptr);
 
     Blob() = default;
 
@@ -132,8 +132,10 @@ struct DALI_SCENE3D_API MeshDefinition
      *
      * @param[in] count The number of data.
      * @param[in] values Data for the mesh that min / max values will be applied.
+     * @param[in] sparseIndices Pointer to array of sparse indices (or nullptr if not provided)
+     *
      */
-    void ApplyMinMax(uint32_t count, float* values) const;
+    void ApplyMinMax(uint32_t count, float* values, std::vector<uint32_t>* sparseIndices = nullptr) const;
   };
 
   /**
