@@ -838,6 +838,7 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliAnimatedVectorImageVisualPlayRangeMarker");
 
+  // Set 1 marker as array
   Property::Array array;
   array.PushBack(VECTOR_ANIMATION_MARKER_NAME_1);
 
@@ -878,6 +879,31 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
 
   int              resultStartFrame, resultEndFrame;
   Property::Array* result = value->GetArray();
+  result->GetElementAt(0).Get(resultStartFrame);
+  result->GetElementAt(1).Get(resultEndFrame);
+
+  DALI_TEST_EQUALS(VECTOR_ANIMATION_MARKER_START_FRAME_1, resultStartFrame, TEST_LOCATION);
+  DALI_TEST_EQUALS(VECTOR_ANIMATION_MARKER_END_FRAME_1, resultEndFrame, TEST_LOCATION);
+
+  // Set 1 marker as string
+  array.Clear();
+
+  attributes.Clear();
+  attributes.Add(DevelImageVisual::Property::PLAY_RANGE, VECTOR_ANIMATION_MARKER_NAME_1);
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  // To make event trigger
+  actor.SetProperty(Actor::Property::SIZE, Vector2(40.0f, 40.0f));
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  value = map.Find(DevelImageVisual::Property::PLAY_RANGE);
+
+  result = value->GetArray();
   result->GetElementAt(0).Get(resultStartFrame);
   result->GetElementAt(1).Get(resultEndFrame);
 

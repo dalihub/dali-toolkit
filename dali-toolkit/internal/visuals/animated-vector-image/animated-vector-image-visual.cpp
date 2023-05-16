@@ -292,6 +292,17 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
         mAnimationData.playRange = *array;
         mAnimationData.resendFlag |= VectorAnimationTask::RESEND_PLAY_RANGE;
       }
+      else if(value.GetType() == Property::STRING)
+      {
+        std::string markerName;
+        if(value.Get(markerName))
+        {
+          Property::Array array;
+          array.Add(markerName);
+          mAnimationData.playRange = std::move(array);
+          mAnimationData.resendFlag |= VectorAnimationTask::RESEND_PLAY_RANGE;
+        }
+      }
       break;
     }
     case Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR:
