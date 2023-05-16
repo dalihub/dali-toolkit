@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_IMAGE_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,6 +150,9 @@ enum Type
   /**
    * @brief Whether to apply mask in loading time or rendering time.
    * @details Name "maskingType", type PlayState::Type (Property::INTEGER).
+   * In general, MASKING_ON_LOADING is the default behavior.
+   * However, if the visual uses an external texture, only MASKING_ON_RENDERING is possible.
+   * So we change its value to MASKING_ON_RENDERING even if the visual sets the MASKING_TYPE as MASKING_ON_LOADING when it uses external texture.
    * @note It is used in the ImageVisual and AnimatedImageVisual. The default is MASKING_ON_LOADING.
    */
   MASKING_TYPE = ORIENTATION_CORRECTION + 12
