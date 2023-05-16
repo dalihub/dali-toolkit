@@ -91,7 +91,7 @@ enum Type
    * Animation will play between the start frame and the end frame of the marker if one marker is specified.
    * Or animation will play between the start frame of the first marker and the end frame of the second marker if two markers are specified.
    *
-   * @details Name "playRange", Type Property::ARRAY of Property::INTEGER or Property::ARRAY of Property::STRING.
+   * @details Name "playRange", Type Property::ARRAY of Property::INTEGER or Property::ARRAY of Property::STRING or Property::STRING (one marker).
    * @note Default 0 and the total frame number.
    */
   PLAY_RANGE = ORIENTATION_CORRECTION + 4,
