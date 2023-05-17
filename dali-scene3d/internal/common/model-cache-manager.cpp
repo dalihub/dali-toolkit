@@ -19,9 +19,9 @@
 #include <dali-scene3d/internal/common/model-cache-manager.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/public-api/object/base-object.h>
-#include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/load-result.h>
@@ -121,14 +121,14 @@ private:
     std::vector<Dali::Scene3D::Loader::CameraParameters>         cameraParameters{};          ///< The camera parameters that were loaded from the scene.
     std::vector<Dali::Scene3D::Loader::LightParameters>          lights{};                    ///< The light parameters that were loaded from the scene.
 
-    uint32_t              refCount{0};                      ///< The reference count of this model cache.
-    Dali::ConditionalWait loadSceneConditionalWait{};       ///< The conditionalWait instance used to synchronise the loading of the scene for the same model in different threads.
+    uint32_t              refCount{0};                ///< The reference count of this model cache.
+    Dali::ConditionalWait loadSceneConditionalWait{}; ///< The conditionalWait instance used to synchronise the loading of the scene for the same model in different threads.
 
     bool isSceneLoaded{false};  ///< Whether the scene of the model has been loaded.
     bool isSceneLoading{false}; ///< Whether the scene loading of the model is in progress.
   };
 
-  using ModelResourceCache = std::unordered_map<std::string, ModelCache>;
+  using ModelResourceCache = std::map<std::string, ModelCache>;
   ModelResourceCache mModelCache;
 };
 
