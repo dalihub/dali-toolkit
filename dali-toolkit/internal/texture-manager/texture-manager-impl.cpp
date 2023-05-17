@@ -326,16 +326,16 @@ TextureSet TextureManager::LoadTexture(
           alphaMaskId            = maskInfo->mAlphaMaskId;
           textureId              = RequestLoad(url, alphaMaskId, 1.0f, desiredSize, fittingMode, samplingMode, UseAtlas::NO_ATLAS, false, textureObserver, orientationCorrection, reloadPolicy, preMultiplyOnLoad, synchronousLoading);
 
-          if(synchronousLoading)
+          TextureManager::LoadState loadState = mTextureCacheManager.GetTextureStateInternal(textureId);
+          if(loadState == TextureManager::LoadState::UPLOADED)
           {
-            auto textureSet = GetTextureSet(textureId);
-            textureSet.SetTexture(MASK_TEXTURE_INDEX, GetTextureSet(alphaMaskId).GetTexture(TEXTURE_INDEX));
-            return textureSet;
+            textureSet = GetTextureSet(textureId);
           }
         }
         else
         {
-          return externalTextureInfo.textureSet;
+          textureSet = TextureSet::New();
+          textureSet.SetTexture(TEXTURE_INDEX, externalTextureInfo.textureSet.GetTexture(TEXTURE_INDEX));
         }
       }
     }
@@ -707,14 +707,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
             TextureCacheIndex maskCacheIndex = mTextureCacheManager.GetCacheIndexFromId(maskTextureId);
             if(maskCacheIndex != INVALID_CACHE_INDEX)
             {
-              if(mTextureCacheManager[maskCacheIndex].storageType == StorageType::KEEP_TEXTURE)
-              {
-                if(!mTextureCacheManager[maskCacheIndex].textures.empty())
-                {
-                  maskTexture = mTextureCacheManager[maskCacheIndex].textures[0];
-                }
-              }
-              else if(mTextureCacheManager[maskCacheIndex].storageType == StorageType::KEEP_PIXEL_BUFFER)
+              if(mTextureCacheManager[maskCacheIndex].storageType == StorageType::KEEP_PIXEL_BUFFER)
               {
                 Devel::PixelBuffer maskPixelBuffer = mTextureCacheManager[maskCacheIndex].pixelBuffer;
                 if(maskPixelBuffer)
@@ -1204,6 +1197,7 @@ void TextureManager::CheckForWaitingTexture(TextureManager::TextureInfo& maskTex
               TextureId id                  = std::stoi(location);
               auto      externalTextureInfo = mTextureCacheManager.GetExternalTextureInfo(id);
               textureInfo.textures.push_back(externalTextureInfo.textureSet.GetTexture(0));
+              textureInfo.loadState = LoadState::UPLOADED;
             }
           }
           else
