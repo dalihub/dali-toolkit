@@ -554,7 +554,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
       std::vector<uint8_t>  buffer(bufferSize);
       std::vector<uint32_t> sparseIndices;
 
-      if(ReadAccessor(blendShape.tangents, buffers[blendShape.tangents.mBufferIdx].GetBufferStream(), buffer.data()), &sparseIndices)
+      if(ReadAccessor(blendShape.tangents, buffers[blendShape.tangents.mBufferIdx].GetBufferStream(), buffer.data(), &sparseIndices))
       {
         blendShape.tangents.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()), &sparseIndices);
 
