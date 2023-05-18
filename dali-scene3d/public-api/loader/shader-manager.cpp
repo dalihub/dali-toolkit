@@ -38,6 +38,9 @@ namespace
 static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG  = 10;
 static constexpr uint32_t INDEX_FOR_SHADOW_CONSTRAINT_TAG = 100;
 
+static const char* ADD_EXTRA_SKINNING_ATTRIBUTES{"ADD_EXTRA_SKINNING_ATTRIBUTES"};
+static const char* ADD_EXTRA_WEIGHTS{"ADD_EXTRA_WEIGHTS"};
+
 ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinition& meshDef)
 {
   ShaderOption option;
@@ -109,6 +112,27 @@ ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinit
   if(meshDef.IsSkinned())
   {
     option.AddOption(ShaderOption::Type::SKINNING);
+
+    // Add options for ADD_EXTRA_SKINNING_ATTRIBUTES and ADD_EXTRA_WEIGHTS:
+    size_t numberOfSets = meshDef.mJoints.size();
+    if(numberOfSets > 1)
+    {
+      std::ostringstream attributes;
+      std::ostringstream weights;
+      for(size_t i = 1; i < numberOfSets; ++i)
+      {
+        attributes << "in vec4 aJoints" << i << ";\n";
+        attributes << "in vec4 aWeights" << i << ";\n";
+
+        weights << "bone +=\n"
+                << "uBone[int(aJoints" << i << ".x)] * aWeights" << i << ".x +\n"
+                << "uBone[int(aJoints" << i << ".y)] * aWeights" << i << ".y +\n"
+                << "uBone[int(aJoints" << i << ".z)] * aWeights" << i << ".z +\n"
+                << "uBone[int(aJoints" << i << ".w)] * aWeights" << i << ".w;\n";
+      }
+      option.AddMacroDefinition(ADD_EXTRA_SKINNING_ATTRIBUTES, attributes.str());
+      option.AddMacroDefinition(ADD_EXTRA_WEIGHTS, weights.str());
+    }
   }
 
   if(MaskMatch(meshDef.mFlags, MeshDefinition::FLIP_UVS_VERTICAL))
@@ -116,7 +140,7 @@ ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinit
     option.AddOption(ShaderOption::Type::FLIP_UVS_VERTICAL);
   }
 
-  if(meshDef.mColors.IsDefined())
+  if(!meshDef.mColors.empty() && meshDef.mColors[0].IsDefined())
   {
     option.AddOption(ShaderOption::Type::COLOR_ATTRIBUTE);
   }
@@ -199,6 +223,7 @@ Dali::Shader ShaderManager::ProduceShader(const ShaderOption& shaderOption)
     shaderDef.mUseBuiltInShader = true;
 
     shaderOption.GetDefines(shaderDef.mDefines);
+    shaderDef.mMacros                  = shaderOption.GetMacroDefinitions();
     shaderDef.mUniforms["uCubeMatrix"] = Matrix::IDENTITY;
 
     shaderMap[hash] = mImpl->mShaders.size();
@@ -396,14 +421,12 @@ void ShaderManager::SetShadowConstraintToShader(Dali::Shader shader)
   std::string       shadowViewProjectionPropertyName(Scene3D::Internal::Light::GetShadowViewProjectionMatrixUniformName());
   auto              shadowViewProjectionPropertyIndex = shader.RegisterProperty(shadowViewProjectionPropertyName, Matrix::IDENTITY);
   Dali::CameraActor shadowLightCamera                 = Dali::Scene3D::Internal::GetImplementation(mImpl->mShadowLight).GetCamera();
-  auto tempViewProjectionMatrixIndex = shadowLightCamera.GetPropertyIndex("tempViewProjectionMatrix");
+  auto              tempViewProjectionMatrixIndex     = shadowLightCamera.GetPropertyIndex("tempViewProjectionMatrix");
   if(tempViewProjectionMatrixIndex != Dali::Property::INVALID_INDEX)
   {
     tempViewProjectionMatrixIndex = shadowLightCamera.RegisterProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
   }
-  Dali::Constraint shadowViewProjectionConstraint = Dali::Constraint::New<Matrix>(shader, shadowViewProjectionPropertyIndex, [](Matrix& output, const PropertyInputContainer& inputs)
-                                                                                  {
-                                                                                    output = inputs[0]->GetMatrix(); });
+  Dali::Constraint shadowViewProjectionConstraint = Dali::Constraint::New<Matrix>(shader, shadowViewProjectionPropertyIndex, [](Matrix& output, const PropertyInputContainer& inputs) { output = inputs[0]->GetMatrix(); });
   shadowViewProjectionConstraint.AddSource(Source{shadowLightCamera, tempViewProjectionMatrixIndex});
   shadowViewProjectionConstraint.ApplyPost();
   shadowViewProjectionConstraint.SetTag(INDEX_FOR_SHADOW_CONSTRAINT_TAG);

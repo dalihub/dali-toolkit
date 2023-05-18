@@ -198,10 +198,13 @@ struct DALI_SCENE3D_API MeshDefinition
 
     Accessor(const MeshDefinition::Blob&       blob,
              const MeshDefinition::SparseBlob& sparse,
-             Index                             bufferIndex = INVALID_INDEX);
+             Index                             bufferIndex = INVALID_INDEX,
+             bool                              normalized = false);
+
     Accessor(MeshDefinition::Blob&&       blob,
              MeshDefinition::SparseBlob&& sparse,
-             Index                        bufferIndex = INVALID_INDEX);
+             Index                        bufferIndex = INVALID_INDEX,
+             bool                         normalized = false);
 
     bool IsDefined() const
     {
@@ -311,12 +314,12 @@ public: // DATA
   std::string              mUri; // When the mesh data is loaded from embedded resources, this URI is used as a data stream.
   Accessor                 mIndices;
   Accessor                 mPositions;
-  Accessor                 mNormals; // data can be generated based on positions
-  Accessor                 mTexCoords;
-  Accessor                 mColors;
+  Accessor                 mNormals;  // data can be generated based on positions
   Accessor                 mTangents; // data can be generated based on normals and texCoords (the latter isn't mandatory; the results will be better if available)
-  Accessor                 mJoints0;
-  Accessor                 mWeights0;
+  std::vector<Accessor>    mTexCoords;
+  std::vector<Accessor>    mColors;
+  std::vector<Accessor>    mJoints;
+  std::vector<Accessor>    mWeights;
   Property::Type           mTangentType{Property::VECTOR3};
 
   Blob                    mBlendShapeHeader;

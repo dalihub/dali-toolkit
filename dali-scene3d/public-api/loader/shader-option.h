@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDER
 #include <dali/public-api/common/vector-wrapper.h>
 #include <memory>
+#include <string>
 #include <string_view>
 
 // INTERNAL INCLUDES
@@ -27,7 +28,6 @@
 
 namespace Dali::Scene3D::Loader
 {
-
 class DALI_SCENE3D_API ShaderOption
 {
 public:
@@ -54,6 +54,16 @@ public:
     MORPH_VERSION_2_0
   };
 
+  struct MacroDefinition
+  {
+    std::string macro;
+    std::string definition;
+  };
+
+  ShaderOption() = default;
+  ShaderOption(const ShaderOption& rhs);
+  ShaderOption& operator=(const ShaderOption& rhs);
+
 public:
   /**
    * @brief Sets transparency option.
@@ -67,6 +77,11 @@ public:
    * @param[in] shaderOptionType Option to be added,
    */
   void AddOption(Type shaderOptionType);
+
+  /**
+   * Enables empty preprocessor definitions to be defined to a value
+   */
+  void AddMacroDefinition(std::string macro, std::string definition);
 
   /**
    * @brief Retrieves current shader option hash
@@ -90,8 +105,15 @@ public:
    */
   static std::string_view GetDefineKeyword(Type shaderOptionType);
 
+  /**
+   * Get any macro definitions
+   */
+  const std::vector<MacroDefinition>& GetMacroDefinitions() const;
+
 private:
   uint64_t mOptionHash{0u};
+
+  std::vector<MacroDefinition> mMacros;
 };
 
 } // namespace Dali::Scene3D::Loader

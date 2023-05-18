@@ -48,30 +48,14 @@ static const Geometry::Type GLTF2_TO_DALI_PRIMITIVES[]{
   Geometry::TRIANGLE_STRIP,
   Geometry::TRIANGLE_FAN}; //...because Dali swaps the last two.
 
-static struct AttributeMapping
-{
-  gltf2::Attribute::Type   mType;
-  MeshDefinition::Accessor MeshDefinition::*mAccessor;
-  uint16_t                                  mElementSizeRequired;
-} ATTRIBUTE_MAPPINGS[]{
-  {gltf2::Attribute::NORMAL, &MeshDefinition::mNormals, sizeof(Vector3)},
-  {gltf2::Attribute::TANGENT, &MeshDefinition::mTangents, sizeof(Vector3)},
-  {gltf2::Attribute::TEXCOORD_0, &MeshDefinition::mTexCoords, sizeof(Vector2)},
-  {gltf2::Attribute::COLOR_0, &MeshDefinition::mColors, sizeof(Vector4)},
-  {gltf2::Attribute::JOINTS_0, &MeshDefinition::mJoints0, sizeof(Vector4)},
-  {gltf2::Attribute::WEIGHTS_0, &MeshDefinition::mWeights0, sizeof(Vector4)},
-};
-
 static const Dali::Scripting::StringEnum EXTENSION_STRING_TABLE[] =
-  {
-    {"NONE", gltf2::ExtensionFlags::NONE},
-    {"KHR_mesh_quantization", gltf2::ExtensionFlags::KHR_MESH_QUANTIZATION},
-    {"KHR_texture_transform", gltf2::ExtensionFlags::KHR_TEXTURE_TRANSFORM},
-    {"KHR_materials_ior", gltf2::ExtensionFlags::KHR_MATERIALS_IOR},
-    {"KHR_materials_specular", gltf2::ExtensionFlags::KHR_MATERIALS_SPECULAR},
-
+{
+  {"NONE", gltf2::ExtensionFlags::NONE},
+  {"KHR_mesh_quantization", gltf2::ExtensionFlags::KHR_MESH_QUANTIZATION},
+  {"KHR_texture_transform", gltf2::ExtensionFlags::KHR_TEXTURE_TRANSFORM},
+  {"KHR_materials_ior", gltf2::ExtensionFlags::KHR_MATERIALS_IOR},
+  {"KHR_materials_specular", gltf2::ExtensionFlags::KHR_MATERIALS_SPECULAR},
 };
-
 static const unsigned int EXTENSION_STRING_TABLE_COUNT = sizeof(EXTENSION_STRING_TABLE) / sizeof(EXTENSION_STRING_TABLE[0]);
 
 std::vector<gltf2::Animation> ReadAnimationArray(const json_value_s& j)
@@ -147,9 +131,7 @@ const json::Reader<gltf2::Accessor>& GetAccessorReader()
                                                   .Register(*new json::Property<gltf2::Accessor, gltf2::Ref<gltf2::BufferView>>("bufferView",
                                                                                                                                 gltf2::RefReader<gltf2::Document>::Read<gltf2::BufferView, &gltf2::Document::mBufferViews>,
                                                                                                                                 &gltf2::Accessor::mBufferView))
-                                                  .Register(*new json::Property<gltf2::Accessor, uint32_t>("byteOffset",
-                                                                                                           json::Read::Number<uint32_t>,
-                                                                                                           &gltf2::Accessor::mByteOffset))
+                                                  .Register(*new json::Property<gltf2::Accessor, uint32_t>("byteOffset", json::Read::Number<uint32_t>, &gltf2::Accessor::mByteOffset))
                                                   .Register(*new json::Property<gltf2::Accessor, gltf2::Component::Type>("componentType",
                                                                                                                          json::Read::Enum<gltf2::Component::Type>,
                                                                                                                          &gltf2::Accessor::mComponentType))
@@ -253,7 +235,26 @@ const json::Reader<gltf2::Material>& GetMaterialReader()
   return MATERIAL_READER;
 }
 
-std::map<gltf2::Attribute::Type, gltf2::Ref<gltf2::Accessor>> ReadMeshPrimitiveAttributes(const json_value_s& j)
+std::map<gltf2::Attribute::HashType, gltf2::Ref<gltf2::Accessor>> ReadMeshPrimitiveAttributes(const json_value_s& j)
+{
+  auto&                                                             jsonObject = json::Cast<json_object_s>(j);
+  std::map<gltf2::Attribute::HashType, gltf2::Ref<gltf2::Accessor>> result;
+
+  auto element = jsonObject.start;
+  while(element)
+  {
+    auto jsonString = *element->name;
+
+    gltf2::Attribute::HashType hash = gltf2::Attribute::HashFromString(jsonString.string, jsonString.string_size);
+
+    result[hash] =
+      gltf2::RefReader<gltf2::Document>::Read<gltf2::Accessor, &gltf2::Document::mAccessors>(*element->value);
+    element = element->next;
+  }
+  return result;
+}
+
+std::map<gltf2::Attribute::Type, gltf2::Ref<gltf2::Accessor>> ReadMeshPrimitiveAttributes2(const json_value_s& j)
 {
   auto&                                                         jsonObject = json::Cast<json_object_s>(j);
   std::map<gltf2::Attribute::Type, gltf2::Ref<gltf2::Accessor>> result;
@@ -261,9 +262,11 @@ std::map<gltf2::Attribute::Type, gltf2::Ref<gltf2::Accessor>> ReadMeshPrimitiveA
   auto element = jsonObject.start;
   while(element)
   {
-    auto jsonString                                                                 = *element->name;
-    result[gltf2::Attribute::FromString(jsonString.string, jsonString.string_size)] = gltf2::RefReader<gltf2::Document>::Read<gltf2::Accessor, &gltf2::Document::mAccessors>(*element->value);
-    element                                                                         = element->next;
+    auto jsonString = *element->name;
+
+    result[gltf2::Attribute::TargetFromString(jsonString.string, jsonString.string_size)] = gltf2::RefReader<gltf2::Document>::Read<gltf2::Accessor, &gltf2::Document::mAccessors>(*element->value);
+
+    element = element->next;
   }
   return result;
 }
@@ -278,7 +281,7 @@ std::vector<std::map<gltf2::Attribute::Type, gltf2::Ref<gltf2::Accessor>>> ReadM
   auto element = jsonObject.start;
   while(element)
   {
-    result.push_back(std::move(ReadMeshPrimitiveAttributes(*element->value)));
+    result.push_back(std::move(ReadMeshPrimitiveAttributes2(*element->value)));
     element = element->next;
   }
 
@@ -764,13 +767,155 @@ MeshDefinition::Accessor ConvertMeshPrimitiveAccessor(const gltf2::Accessor& acc
 
   return MeshDefinition::Accessor{
     std::move(MeshDefinition::Blob{bufferViewOffset + accessor.mByteOffset,
-                                   accessor.GetBytesLength(),
-                                   static_cast<uint16_t>(bufferViewStride),
-                                   static_cast<uint16_t>(accessor.GetElementSizeBytes()),
-                                   accessor.mMin,
-                                   accessor.mMax}),
-    std::move(sparseBlob),
-    accessor.mBufferView ? accessor.mBufferView->mBuffer.GetIndex() : 0};
+          accessor.GetBytesLength(),
+          static_cast<uint16_t>(bufferViewStride),
+          static_cast<uint16_t>(accessor.GetElementSizeBytes()),
+          accessor.mMin,
+          accessor.mMax}),
+      std::move(sparseBlob),
+      accessor.mBufferView ? accessor.mBufferView->mBuffer.GetIndex() : 0,
+      accessor.mNormalized};
+}
+
+MeshDefinition::Accessor* GetAccessorFromAttribute(gltf2::Attribute::HashType attributeHash,
+                                                   MeshDefinition& meshDefinition,
+                                                   bool& needNormals, bool& needTangents)
+{
+  MeshDefinition::Accessor* accessorDest{nullptr};
+
+  switch(gltf2::Attribute::TypeFromHash(attributeHash))
+  {
+    case gltf2::Attribute::POSITION:
+    {
+      accessorDest = &meshDefinition.mPositions;
+      break;
+    }
+    case gltf2::Attribute::NORMAL:
+    {
+      accessorDest = &meshDefinition.mNormals;
+      needNormals  = false;
+      break;
+    }
+    case gltf2::Attribute::TANGENT:
+    {
+      accessorDest = &meshDefinition.mTangents;
+      needTangents = false;
+      break;
+    }
+    case gltf2::Attribute::TEXCOORD_N:
+    {
+      meshDefinition.mTexCoords.emplace_back(MeshDefinition::Accessor{});
+      accessorDest = &meshDefinition.mTexCoords.back();
+      break;
+    }
+    case gltf2::Attribute::COLOR_N:
+    {
+      meshDefinition.mColors.emplace_back(MeshDefinition::Accessor{});
+      accessorDest = &meshDefinition.mColors.back();
+      break;
+    }
+    case gltf2::Attribute::JOINTS_N:
+    {
+      meshDefinition.mJoints.emplace_back(MeshDefinition::Accessor{});
+      accessorDest = &meshDefinition.mJoints.back();
+      break;
+    }
+    case gltf2::Attribute::WEIGHTS_N:
+    {
+      meshDefinition.mWeights.emplace_back(MeshDefinition::Accessor{});
+      accessorDest = &meshDefinition.mWeights.back();
+      break;
+    }
+    case gltf2::Attribute::INVALID:
+    {
+      accessorDest = nullptr;
+      break;
+    }
+  }
+  return accessorDest;
+}
+
+void SetFlagsFromComponentType(const gltf2::Accessor& accessor,
+                               gltf2::Attribute::HashType attributeHash,
+                               MeshDefinition& meshDefinition,
+                               bool isQuantized)
+{
+  switch(gltf2::Attribute::TypeFromHash(attributeHash))
+  {
+    case gltf2::Attribute::POSITION:
+    {
+      if(isQuantized)
+      {
+        meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_POSITION;
+        meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::UNSIGNED_BYTE) * MeshDefinition::U8_POSITION;
+        meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_POSITION;
+        meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::UNSIGNED_SHORT) * MeshDefinition::U16_POSITION;
+      }
+      DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(meshDefinition.mFlags, MeshDefinition::S8_POSITION) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_POSITION) || MaskMatch(meshDefinition.mFlags, MeshDefinition::S16_POSITION) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_POSITION))) || accessor.mComponentType == gltf2::Component::FLOAT);
+      break;
+    }
+    case gltf2::Attribute::NORMAL:
+    {
+      if(isQuantized)
+      {
+        meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_NORMAL;
+        meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_NORMAL;
+      }
+
+      DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(meshDefinition.mFlags, MeshDefinition::S8_NORMAL) || MaskMatch(meshDefinition.mFlags, MeshDefinition::S16_NORMAL))) || accessor.mComponentType == gltf2::Component::FLOAT);
+      break;
+    }
+    case gltf2::Attribute::TANGENT:
+    {
+      if(isQuantized)
+      {
+        meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_TANGENT;
+        meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_TANGENT;
+      }
+
+      DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(meshDefinition.mFlags, MeshDefinition::S8_TANGENT) || MaskMatch(meshDefinition.mFlags, MeshDefinition::S16_TANGENT))) || accessor.mComponentType == gltf2::Component::FLOAT);
+      break;
+    }
+    case gltf2::Attribute::TEXCOORD_N:
+    {
+      if(isQuantized)
+      {
+        meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_TEXCOORD;
+        meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::UNSIGNED_BYTE) * MeshDefinition::U8_TEXCOORD;
+        meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_TEXCOORD;
+        meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::UNSIGNED_SHORT) * MeshDefinition::U16_TEXCOORD;
+      }
+      DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(meshDefinition.mFlags, MeshDefinition::S8_TEXCOORD) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_TEXCOORD) || MaskMatch(meshDefinition.mFlags, MeshDefinition::S16_TEXCOORD) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_TEXCOORD))) || accessor.mComponentType == gltf2::Component::FLOAT);
+      break;
+    }
+    case gltf2::Attribute::COLOR_N:
+    {
+      break;
+    }
+    case gltf2::Attribute::JOINTS_N:
+    {
+      meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::UNSIGNED_SHORT) * MeshDefinition::U16_JOINT_IDS;
+      meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::UNSIGNED_BYTE) * MeshDefinition::U8_JOINT_IDS;
+      DALI_ASSERT_DEBUG(MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_JOINT_IDS) ||
+                        MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_JOINT_IDS) ||
+                        accessor.mComponentType == gltf2::Component::FLOAT);
+      break;
+    }
+    case gltf2::Attribute::WEIGHTS_N:
+    {
+      meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::UNSIGNED_SHORT) * MeshDefinition::U16_WEIGHT;
+      meshDefinition.mFlags |= (accessor.mComponentType == gltf2::Component::UNSIGNED_BYTE) * MeshDefinition::U8_WEIGHT;
+      DALI_ASSERT_DEBUG(MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_WEIGHT) ||
+                        MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_WEIGHT) ||
+                        accessor.mComponentType == gltf2::Component::FLOAT);
+
+      break;
+    }
+    case gltf2::Attribute::INVALID:
+    {
+      break;
+    }
+  }
 }
 
 void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
@@ -796,108 +941,40 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
       auto& attribs                 = primitive.mAttributes;
       meshDefinition.mPrimitiveType = GLTF2_TO_DALI_PRIMITIVES[primitive.mMode];
 
-      auto positionIter = attribs.find(gltf2::Attribute::POSITION);
-
+      auto positionIter = attribs.find(gltf2::Attribute::ToHash(gltf2::Attribute::POSITION, false, 0));
       if(positionIter == attribs.end())
       {
         DALI_LOG_ERROR("Primitive mesh dosn't have POSITION atrributes!");
         continue;
       }
 
-      auto& accPositions                    = *positionIter->second;
-      meshDefinition.mPositions             = ConvertMeshPrimitiveAccessor(accPositions);
-      meshDefinition.mPositions.mNormalized = accPositions.mNormalized;
-
-      if(isQuantized)
-      {
-        meshDefinition.mFlags |= (accPositions.mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_POSITION;
-        meshDefinition.mFlags |= (accPositions.mComponentType == gltf2::Component::UNSIGNED_BYTE) * MeshDefinition::U8_POSITION;
-        meshDefinition.mFlags |= (accPositions.mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_POSITION;
-        meshDefinition.mFlags |= (accPositions.mComponentType == gltf2::Component::UNSIGNED_SHORT) * MeshDefinition::U16_POSITION;
-      }
-
-      DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(meshDefinition.mFlags, MeshDefinition::S8_POSITION) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_POSITION) || MaskMatch(meshDefinition.mFlags, MeshDefinition::S16_POSITION) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_POSITION))) || accPositions.mComponentType == gltf2::Component::FLOAT);
+      auto& positionsAccessor = *positionIter->second;
 
       // glTF2 support vector4 tangent for mesh.
       // https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#meshes-overview
       meshDefinition.mTangentType = Property::VECTOR4;
 
-      const bool needNormalsTangents = accPositions.mType == gltf2::AccessorType::VEC3;
-      for(auto& attributeMapping : ATTRIBUTE_MAPPINGS)
+      bool needNormals  = (positionsAccessor.mType == gltf2::AccessorType::VEC3);
+      bool needTangents = (positionsAccessor.mType == gltf2::AccessorType::VEC3);
+
+      for(const auto& [attributeHash, accessor] : attribs)
       {
-        auto iFind = attribs.find(attributeMapping.mType);
-        if(iFind != attribs.end())
+        MeshDefinition::Accessor* accessorDest = GetAccessorFromAttribute(attributeHash, meshDefinition, needNormals, needTangents);
+        if(accessorDest == nullptr)
         {
-          auto& accessor = meshDefinition.*(attributeMapping.mAccessor);
-          accessor       = ConvertMeshPrimitiveAccessor(*iFind->second);
-
-          if(iFind->first == gltf2::Attribute::NORMAL)
-          {
-            meshDefinition.mNormals.mNormalized = iFind->second->mNormalized;
-
-            if(isQuantized)
-            {
-              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_NORMAL;
-              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_NORMAL;
-            }
-
-            DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(meshDefinition.mFlags, MeshDefinition::S8_NORMAL) || MaskMatch(meshDefinition.mFlags, MeshDefinition::S16_NORMAL))) || iFind->second->mComponentType == gltf2::Component::FLOAT);
-          }
-          if(iFind->first == gltf2::Attribute::TANGENT)
-          {
-            meshDefinition.mTangents.mNormalized = iFind->second->mNormalized;
-
-            if(isQuantized)
-            {
-              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_TANGENT;
-              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_TANGENT;
-            }
-
-            DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(meshDefinition.mFlags, MeshDefinition::S8_TANGENT) || MaskMatch(meshDefinition.mFlags, MeshDefinition::S16_TANGENT))) || iFind->second->mComponentType == gltf2::Component::FLOAT);
-          }
-          if(iFind->first == gltf2::Attribute::TEXCOORD_0 || iFind->first == gltf2::Attribute::TEXCOORD_1)
-          {
-            meshDefinition.mTexCoords.mNormalized = iFind->second->mNormalized;
-
-            if(isQuantized)
-            {
-              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_TEXCOORD;
-              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::UNSIGNED_BYTE) * MeshDefinition::U8_TEXCOORD;
-              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_TEXCOORD;
-              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::UNSIGNED_SHORT) * MeshDefinition::U16_TEXCOORD;
-            }
-
-            DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(meshDefinition.mFlags, MeshDefinition::S8_TEXCOORD) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_TEXCOORD) || MaskMatch(meshDefinition.mFlags, MeshDefinition::S16_TEXCOORD) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_TEXCOORD))) || iFind->second->mComponentType == gltf2::Component::FLOAT);
-          }
-          if(iFind->first == gltf2::Attribute::JOINTS_0)
-          {
-            meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::UNSIGNED_SHORT) * MeshDefinition::U16_JOINT_IDS;
-            meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::UNSIGNED_BYTE) * MeshDefinition::U8_JOINT_IDS;
-            DALI_ASSERT_DEBUG(MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_JOINT_IDS) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_JOINT_IDS) || iFind->second->mComponentType == gltf2::Component::FLOAT);
-          }
-          if(iFind->first == gltf2::Attribute::WEIGHTS_0)
-          {
-            meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::UNSIGNED_SHORT) * MeshDefinition::U16_WEIGHT;
-            meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::UNSIGNED_BYTE) * MeshDefinition::U8_WEIGHT;
-            DALI_ASSERT_DEBUG(MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_WEIGHT) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_WEIGHT) || iFind->second->mComponentType == gltf2::Component::FLOAT);
-          }
+          continue;
         }
-        else if(needNormalsTangents)
-        {
-          switch(attributeMapping.mType)
-          {
-            case gltf2::Attribute::NORMAL:
-              meshDefinition.RequestNormals();
-              break;
+        *accessorDest = ConvertMeshPrimitiveAccessor(*accessor);
+        SetFlagsFromComponentType(*accessor, attributeHash, meshDefinition, isQuantized);
+      }
 
-            case gltf2::Attribute::TANGENT:
-              meshDefinition.RequestTangents();
-              break;
-
-            default:
-              break;
-          }
-        }
+      if(needNormals)
+      {
+        meshDefinition.RequestNormals();
+      }
+      if(needTangents)
+      {
+        meshDefinition.RequestTangents();
       }
 
       if(primitive.mIndices)
