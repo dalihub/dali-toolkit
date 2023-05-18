@@ -129,9 +129,8 @@ public:
 
   /**
    * @brief Called when resources of control are ready.
-   * @param[in] relayoutRequest True to request relayout
    */
-  void ResourceReady(bool relayoutRequest);
+  void ResourceReady();
 
   /**
    * @brief Called when a resource is ready.

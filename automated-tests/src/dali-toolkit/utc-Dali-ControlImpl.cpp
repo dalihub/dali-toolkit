@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1172,25 +1172,25 @@ int UtcDaliControlImplOnPinch(void)
 namespace
 {
 static bool gOnRelayoutCallBackCalled = false;
-void OnRelayoutCallback(Actor actor)
+void        OnRelayoutCallback(Actor actor)
 {
   gOnRelayoutCallBackCalled = true;
 }
 
 static bool gResourceReadyCalled = false;
-void OnResourceReady(Control control)
+void        OnResourceReady(Control control)
 {
   gResourceReadyCalled = true;
 }
-}
+} // namespace
 
 int UtcDaliControlImplResourceReady(void)
 {
   ToolkitTestApplication application;
 
   gOnRelayoutCallBackCalled = false;
-  gResourceReadyCalled = false;
-  Control control = Control::New();
+  gResourceReadyCalled      = false;
+  Control control           = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   control.OnRelayoutSignal().Connect(OnRelayoutCallback);
@@ -1215,7 +1215,7 @@ int UtcDaliControlImplResourceReady(void)
   // ResourceReady is true when there is no visual in the default Toolkit::Internal::Control.
   DALI_TEST_EQUALS(impl.IsResourceReady(), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
-  impl.SetResourceReady(false);
+  impl.SetResourceReady();
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   application.SendNotification();
@@ -1224,13 +1224,13 @@ int UtcDaliControlImplResourceReady(void)
   DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
   gResourceReadyCalled = false;
   DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
-  impl.SetResourceReady(true);
+  impl.SetResourceReady();
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
 
   END_TEST;
 }

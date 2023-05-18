@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,12 +132,28 @@ bool FindVisual(std::string visualName, const RegisteredVisualContainer& visuals
 /**
  *  Finds visual in given array, returning true if found along with the iterator for that visual as a out parameter
  */
-bool FindVisual(const Toolkit::Visual::Base findVisual , const RegisteredVisualContainer& visuals, RegisteredVisualContainer::Iterator& iter)
+bool FindVisual(const Toolkit::Visual::Base findVisual, const RegisteredVisualContainer& visuals, RegisteredVisualContainer::Iterator& iter)
 {
   for(iter = visuals.Begin(); iter != visuals.End(); iter++)
   {
     Toolkit::Visual::Base visual = (*iter)->visual;
     if(visual && visual == findVisual)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ *  Finds internal visual in given array, returning true if found along with the iterator for that visual as a out parameter
+ */
+bool FindVisual(const Visual::Base& findInternalVisual, const RegisteredVisualContainer& visuals, RegisteredVisualContainer::Iterator& iter)
+{
+  for(iter = visuals.Begin(); iter != visuals.End(); iter++)
+  {
+    Visual::Base& visual = Toolkit::GetImplementation((*iter)->visual);
+    if((&visual == &findInternalVisual))
     {
       return true;
     }
@@ -821,7 +837,7 @@ void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base&
     {
       visualImpl.SetOnScene(self);
     }
-    else if(visualImpl.IsResourceReady()) // When not being staged, check if visual already 'ResourceReady' before it was Registered. ( Resource may have been loaded already )
+    else if(enabled && visualImpl.IsResourceReady()) // When not being staged, check if visual already 'ResourceReady' before it was Registered. ( Resource may have been loaded already )
     {
       ResourceReady(visualImpl);
     }
@@ -923,7 +939,7 @@ void Control::Impl::EnableReadyTransitionOverriden(Toolkit::Visual::Base& visual
       return;
     }
 
-    (*iter)->overideReadyTransition  = enable;
+    (*iter)->overideReadyTransition = enable;
   }
 }
 
@@ -943,15 +959,8 @@ void Control::Impl::StartObservingVisual(Toolkit::Visual::Base& visual)
   visualImpl.AddEventObserver(*this);
 }
 
-void Control::Impl::ResourceReady(bool relayoutRequest)
+void Control::Impl::ResourceReady()
 {
-  Actor self = mControlImpl.Self();
-  // A visual is ready so control may need relayouting if staged
-  if(relayoutRequest && self.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
-  {
-    mControlImpl.RelayoutRequest();
-  }
-
   // Emit signal if all enabled visuals registered by the control are ready or there are no visuals.
   if(IsResourceReady())
   {
@@ -968,33 +977,37 @@ void Control::Impl::ResourceReady(Visual::Base& object)
 
   Actor self = mControlImpl.Self();
 
-  // A resource is ready, find resource in the registered visuals container and get its index
-  for(auto registeredIter = mVisuals.Begin(), end = mVisuals.End(); registeredIter != end; ++registeredIter)
-  {
-    Internal::Visual::Base& registeredVisualImpl = Toolkit::GetImplementation((*registeredIter)->visual);
+  RegisteredVisualContainer::Iterator registeredIter;
 
-    if(&object == &registeredVisualImpl)
-    {
-      RegisteredVisualContainer::Iterator visualToRemoveIter;
-      // Find visual with the same index in the removal container
-      // Set if off stage as it's replacement is now ready.
-      // Remove if from removal list as now removed from stage.
-      // Set Pending flag on the ready visual to false as now ready.
-      if(FindVisual((*registeredIter)->index, mRemoveVisuals, visualToRemoveIter))
-      {
-        (*registeredIter)->pending = false;
-        if(!((*visualToRemoveIter)->overideReadyTransition))
-        {
-          Toolkit::GetImplementation((*visualToRemoveIter)->visual).SetOffScene(self);
-        }
-        mRemoveVisuals.Erase(visualToRemoveIter);
-      }
-      break;
-    }
+  // A resource is ready, find resource in the registered visuals container and get its index
+  if(!FindVisual(object, mVisuals, registeredIter))
+  {
+    return;
   }
 
+  RegisteredVisualContainer::Iterator visualToRemoveIter;
+  // Find visual with the same index in the removal container
+  // Set if off stage as it's replacement is now ready.
+  // Remove if from removal list as now removed from stage.
+  // Set Pending flag on the ready visual to false as now ready.
+  if(FindVisual((*registeredIter)->index, mRemoveVisuals, visualToRemoveIter))
+  {
+    (*registeredIter)->pending = false;
+    if(!((*visualToRemoveIter)->overideReadyTransition))
+    {
+      Toolkit::GetImplementation((*visualToRemoveIter)->visual).SetOffScene(self);
+    }
+    mRemoveVisuals.Erase(visualToRemoveIter);
+  }
+
+  // A visual is ready so control may need relayouting if staged
+  RelayoutRequest(object);
+
   // Called by a Visual when it's resource is ready
-  ResourceReady(true);
+  if(((*registeredIter)->enabled))
+  {
+    ResourceReady();
+  }
 }
 
 void Control::Impl::NotifyVisualEvent(Visual::Base& object, Property::Index signalId)
@@ -1013,7 +1026,10 @@ void Control::Impl::NotifyVisualEvent(Visual::Base& object, Property::Index sign
 
 void Control::Impl::RelayoutRequest(Visual::Base& object)
 {
-  mControlImpl.RelayoutRequest();
+  if(mControlImpl.Self().GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  {
+    mControlImpl.RelayoutRequest();
+  }
 }
 
 bool Control::Impl::IsResourceReady() const

@@ -4370,7 +4370,7 @@ int UtcDaliImageViewNpatchImageCacheTest02(void)
   END_TEST;
 }
 
-int UtcDaliImageViewPlaceholderImage(void)
+int UtcDaliImageViewPlaceholderImage01(void)
 {
   tet_infoline("Test imageView use placeholder image");
 
@@ -4442,6 +4442,52 @@ int UtcDaliImageViewPlaceholderImage(void)
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliImageViewPlaceholderImage02(void)
+{
+  tet_infoline("Test imageView use placeholder image without resource ready");
+
+  ToolkitTestApplication application;
+
+  Property::Map map;
+  map[Toolkit::ImageVisual::Property::URL] = gImage_600_RGB;
+
+  ImageView imageView = ImageView::New();
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), false, TEST_LOCATION);
+  imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
+  application.GetScene().Add(imageView);
+
+  Property::Value value = imageView.GetProperty(ImageView::Property::PLACEHOLDER_IMAGE);
+  std::string     url;
+  DALI_TEST_CHECK(value.Get(url));
+  DALI_TEST_CHECK(url.empty());
+
+  imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  value = imageView.GetProperty(ImageView::Property::PLACEHOLDER_IMAGE);
+  DALI_TEST_CHECK(value.Get(url));
+  DALI_TEST_CHECK(url == gImage_34_RGBA);
+
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+
+  gResourceReadySignalFired                = false;
+  map[Toolkit::ImageVisual::Property::URL] = "";
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
 
   END_TEST;
 }

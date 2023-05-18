@@ -3017,7 +3017,7 @@ int UtcDaliImageVisualLoadPolicy03(void)
 
   // Ensure texture has been uploaded
   DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -3055,7 +3055,7 @@ int UtcDaliImageVisualLoadPolicy04(void)
 
   tet_infoline("Testing texture is loaded and resource ready signal fired");
   DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
 
   tet_infoline("Original control correctly signalled, now testing for signal with new Control reusing the image");
 

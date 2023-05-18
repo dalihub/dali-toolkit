@@ -117,8 +117,7 @@ void ConfigureBlendShapeShaders(
   Dali::Scene3D::Loader::ResourceBundle& resources, const Dali::Scene3D::Loader::SceneDefinition& scene, Actor root, std::vector<Dali::Scene3D::Loader::BlendshapeShaderConfigurationRequest>&& requests)
 {
   std::vector<std::string> errors;
-  auto                     onError = [&errors](const std::string& msg)
-  { errors.push_back(msg); };
+  auto                     onError = [&errors](const std::string& msg) { errors.push_back(msg); };
   if(!scene.ConfigureBlendshapeShaders(resources, root, std::move(requests), onError))
   {
     Dali::Scene3D::Loader::ExceptionFlinger flinger(ASSERT_LOCATION);
@@ -843,7 +842,7 @@ void Model::NotifyResourceReady()
   {
     return;
   }
-  Control::SetResourceReady(false);
+  Control::SetResourceReady();
 }
 
 void Model::CreateModel()
@@ -889,8 +888,7 @@ void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
   mAnimations.clear();
   if(!mModelLoadTask->GetAnimations().empty())
   {
-    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property)
-    {
+    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property) {
       if(property.mNodeIndex == Scene3D::Loader::INVALID_INDEX)
       {
         return mModelRoot.FindChildByName(property.mNodeName);
