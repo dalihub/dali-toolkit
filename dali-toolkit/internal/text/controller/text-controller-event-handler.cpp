@@ -859,22 +859,10 @@ InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextE
 
   std::string    text;
   CharacterIndex cursorPosition      = 0u;
-  Length         numberOfWhiteSpaces = 0u;
 
   if(retrieveCursor)
   {
-    numberOfWhiteSpaces = controller.mImpl->GetNumberOfWhiteSpaces(0u);
-
     cursorPosition = controller.mImpl->GetLogicalCursorPosition();
-
-    if(cursorPosition < numberOfWhiteSpaces)
-    {
-      cursorPosition = 0u;
-    }
-    else
-    {
-      cursorPosition -= numberOfWhiteSpaces;
-    }
   }
 
   if(retrieveText)
@@ -882,7 +870,7 @@ InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextE
     if(!controller.mImpl->IsShowingPlaceholderText())
     {
       // Retrieves the normal text string.
-      controller.mImpl->GetText(numberOfWhiteSpaces, text);
+      controller.mImpl->GetText(0u, text);
     }
     else
     {

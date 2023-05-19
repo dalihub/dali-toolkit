@@ -444,19 +444,6 @@ void Controller::Impl::NotifyInputMethodContext()
   if(mEventData && mEventData->mInputMethodContext)
   {
     CharacterIndex cursorPosition = GetLogicalCursorPosition();
-
-    const Length numberOfWhiteSpaces = GetNumberOfWhiteSpaces(0u);
-
-    // Update the cursor position by removing the initial white spaces.
-    if(cursorPosition < numberOfWhiteSpaces)
-    {
-      cursorPosition = 0u;
-    }
-    else
-    {
-      cursorPosition -= numberOfWhiteSpaces;
-    }
-
     mEventData->mInputMethodContext.SetCursorPosition(cursorPosition);
     mEventData->mInputMethodContext.NotifyCursorPosition();
   }
