@@ -595,7 +595,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
 
   const float maxDistance = sqrtf(maxDistanceSquared);
 
-  const float normalizeFactor = (maxDistanceSquared < Math::MACHINE_EPSILON_1000) ? 1.f : (0.5f / maxDistance);
+  const float normalizeFactor = (maxDistanceSquared < Math::MACHINE_EPSILON_100) ? 1.f : (0.5f / maxDistance);
 
   // Calculate and store the unnormalize factor.
   blendShapeUnnormalizeFactor = maxDistance * 2.0f;
@@ -699,31 +699,16 @@ void MeshDefinition::Blob::ApplyMinMax(const std::vector<float>& min, const std:
     return;
   }
 
-  // If there are sparse indices then process only relevant data
-  if(sparseIndices && !sparseIndices->empty())
+  auto end = values + count * numComponents;
+  while(values != end)
   {
-    for(auto elementIndex : *sparseIndices)
+    auto     nextElement = values + numComponents;
+    uint32_t i           = 0;
+    while(values != nextElement)
     {
-      auto value = values + (elementIndex * numComponents);
-      for(auto i = 0u; i < numComponents; ++i)
-      {
-        clampFn(min.data(), max.data(), i, *value);
-      }
-    }
-  }
-  else // if there's no sparse indices process all vertices
-  {
-    auto end = values + count * numComponents;
-    while(values != end)
-    {
-      auto     nextElement = values + numComponents;
-      uint32_t i           = 0;
-      while(values != nextElement)
-      {
-        clampFn(min.data(), max.data(), i, *values);
-        ++values;
-        ++i;
-      }
+      clampFn(min.data(), max.data(), i, *values);
+      ++values;
+      ++i;
     }
   }
 }
