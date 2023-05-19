@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/multi-language-helper-functions.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
+#include <dali-toolkit/internal/text/multi-language-support-impl.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 #include <dali-toolkit-test-suite-utils.h>
@@ -32,6 +33,7 @@
 using namespace Dali;
 using namespace Toolkit;
 using namespace Text;
+
 
 // Tests the following functions with different scripts.
 //
@@ -1893,5 +1895,59 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
   }
 
   tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextMultiLanguageValidateFontsPerScriptCache(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextMultiLanguageValidateFontsPerScriptCache");
+
+  std::size_t MAX_VALIDATE_FONTS_PER_SCRIPT_CACHE_SIZE = 63u;
+  std::size_t VALIDATE_FONTS_PER_SCRIPT_REMAIN_COUNT   = 8u;
+
+  Dali::Toolkit::Text::Internal::ValidateFontsPerScript* validateFontsPerScript = new Dali::Toolkit::Text::Internal::ValidateFontsPerScript();
+
+  for(std::size_t i = 0u; i < MAX_VALIDATE_FONTS_PER_SCRIPT_CACHE_SIZE; i ++)
+  {
+    FontId fontId = i;
+    validateFontsPerScript->Cache(fontId);
+  }
+
+  DALI_TEST_EQUALS(MAX_VALIDATE_FONTS_PER_SCRIPT_CACHE_SIZE, validateFontsPerScript->mValidFonts.Count(), TEST_LOCATION);
+
+  FontId fontId = MAX_VALIDATE_FONTS_PER_SCRIPT_CACHE_SIZE;
+  validateFontsPerScript->Cache(fontId);
+
+  DALI_TEST_EQUALS(VALIDATE_FONTS_PER_SCRIPT_REMAIN_COUNT, validateFontsPerScript->mValidFonts.Count(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextMultiLanguageDefaultFontsCache(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextMultiLanguageDefaultFontsCache");
+
+  std::size_t MAX_DEFAULT_FONTS_CACHE_SIZE = 15;
+  std::size_t DEFAULT_FONTS_REMAIN_COUNT   = 2;
+
+  Dali::Toolkit::Text::Internal::DefaultFonts* defaultFontsPerScript = new Dali::Toolkit::Text::Internal::DefaultFonts();
+
+  for(std::size_t i = 0u; i < MAX_DEFAULT_FONTS_CACHE_SIZE; i ++)
+  {
+    TextAbstraction::FontDescription fontDescription;
+    FontId fontId = i;
+    defaultFontsPerScript->Cache(fontDescription, fontId);
+  }
+
+  DALI_TEST_EQUALS(MAX_DEFAULT_FONTS_CACHE_SIZE, defaultFontsPerScript->mFonts.size(), TEST_LOCATION);
+
+  TextAbstraction::FontDescription fontDescription;
+  FontId fontId = MAX_DEFAULT_FONTS_CACHE_SIZE;
+  defaultFontsPerScript->Cache(fontDescription, fontId);
+
+  DALI_TEST_EQUALS(DEFAULT_FONTS_REMAIN_COUNT, defaultFontsPerScript->mFonts.size(), TEST_LOCATION);
+
   END_TEST;
 }
