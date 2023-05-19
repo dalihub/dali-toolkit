@@ -1961,6 +1961,80 @@ int UtcDaliImageVisualSetInvalidRemoteImage(void)
   END_TEST;
 }
 
+int UtcDaliImageVisualSetInvalidImageWithDisabledBroken(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Request image visual with invalid images - should draw broken.png");
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  // Load invalid file
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, "InvalidImage.png");
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+  application.GetScene().Remove(actor);
+  DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
+  textureTrace.Reset();
+
+  // Load invalid file with disabled broken
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, "InvalidImage.png");
+  propertyMap.Insert(Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE, false);
+
+  visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  actor                        = DummyControl::New();
+  DummyControlImpl& dummyImpl2 = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl2.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), false, TEST_LOCATION);
+
+  application.GetScene().Remove(actor);
+  DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
+
+  END_TEST;
+}
+
 int UtcDaliImageVisualAlphaMask01(void)
 {
   ToolkitTestApplication application;
