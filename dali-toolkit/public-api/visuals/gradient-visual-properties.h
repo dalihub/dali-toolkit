@@ -51,6 +51,10 @@ enum
   /**
    * @brief The start position of a linear gradient.
    * @details Name "startPosition", type Property::VECTOR2.
+   * Gradient is drawn in a rectangular area, TopLeft is (-0.5, -0.5) and BottomRight is (0.5, 0.5).
+   * The outside of the entered Start Position and End Position is extended to the value of the border.
+   * Even if the range between Start Position and End Position is greater than (-0.5, -0.5) to (0.5, 0.5),
+   * only the corresponding area is drawn.
    * @SINCE_1_1.45
    * @note Mandatory for Linear.
    */
@@ -59,6 +63,10 @@ enum
   /**
    * @brief The end position of a linear gradient.
    * @details Name "endPosition", type Property::VECTOR2.
+   * Gradient is drawn in a rectangular area, TopLeft is (-0.5, -0.5) and BottomRight is (0.5, 0.5).
+   * The outside of the entered Start Position and End Position is extended to the value of the border.
+   * Even if the range between Start Position and End Position is greater than (-0.5, -0.5) to (0.5, 0.5),
+   * only the corresponding area is drawn.
    * @SINCE_1_1.45
    * @note Mandatory for Linear.
    */
