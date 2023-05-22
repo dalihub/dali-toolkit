@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/public-api/object/base-handle.h>
 
 // INTERNAL INCLUDES
@@ -71,19 +70,31 @@ public:
   Dali::Scene3D::Loader::LoadResult GetModelLoadResult(std::string modelUri);
 
   /**
+   * @brief Lock the mutex object to synchronize the scene loading of the model
+   * with the given URI between multiple threads.
+   * It will be used when we need to avoid multiple threads access to same cache.
+   *
+   * @param[in] modelUri The unique model RUI with its absolute path.
+   * @post UnlockModelLoadScene() should be called before call this API.
+   */
+  void LockModelLoadScene(std::string modelUri);
+
+  /**
+   * @brief Unlock the mutex object to synchronize the scene loading of the model
+   * with the given URI between multiple threads.
+   * It will be used when we need to avoid multiple threads access to same cache.
+   *
+   * @param[in] modelUri The unique model URI with its absolute path.
+   * @pre LockModelLoadScene() should be called before call this API.
+   */
+  void UnlockModelLoadScene(std::string modelUri);
+
+  /**
    * @brief Retrieves the reference count of the cache for the model with the given URI.
    * @param[in] modelUri The unique model URI with its absolute path.
    * @return The reference count of the cache.
    */
   uint32_t GetModelCacheRefCount(std::string modelUri);
-
-  /**
-   * @brief Retrieves the ConditionalWait object to synchronize the scene loading of the model
-   * with the given URI between multiple threads.
-   * @param[in] modelUri The unique model URI with its absolute path.
-   * @return The ConditionalWait object.
-   */
-  Dali::ConditionalWait& GetLoadSceneConditionalWaitInstance(std::string modelUri);
 
   /**
    * @brief Reference the cache of the model with the given URI.

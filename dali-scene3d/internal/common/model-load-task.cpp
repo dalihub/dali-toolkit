@@ -41,10 +41,12 @@ ModelLoadTask::ModelLoadTask(const std::string& modelUrl, const std::string& res
   mLoadResult(mModelCacheManager.GetModelLoadResult(mModelUrl)),
   mHasSucceeded(false)
 {
+  mModelCacheManager.ReferenceModelCache(mModelUrl);
 }
 
 ModelLoadTask::~ModelLoadTask()
 {
+  mModelCacheManager.UnreferenceModelCache(mModelUrl);
 }
 
 void ModelLoadTask::Process()
@@ -62,10 +64,10 @@ void ModelLoadTask::Process()
 
   mModelLoader = std::make_shared<Dali::Scene3D::Loader::ModelLoader>(mModelUrl, mResourceDirectoryUrl, mLoadResult);
 
-  bool                   loadSucceeded            = false;
-  Dali::ConditionalWait& loadSceneConditionalWait = mModelCacheManager.GetLoadSceneConditionalWaitInstance(mModelUrl);
+  bool loadSucceeded = false;
   {
-    ConditionalWait::ScopedLock lock(loadSceneConditionalWait);
+    // Lock model url during process, so let we do not try to load same model multiple times.
+    mModelCacheManager.LockModelLoadScene(mModelUrl);
     if(mModelCacheManager.IsSceneLoaded(mModelUrl))
     {
       loadSucceeded = true;
@@ -86,6 +88,7 @@ void ModelLoadTask::Process()
       mModelCacheManager.SetSceneLoading(mModelUrl, false);
       mModelCacheManager.SetSceneLoaded(mModelUrl, loadSucceeded);
     }
+    mModelCacheManager.UnlockModelLoadScene(mModelUrl);
   }
 
   if(!loadSucceeded)

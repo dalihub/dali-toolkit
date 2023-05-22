@@ -196,12 +196,12 @@ Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUr
 
 Model::~Model()
 {
+  ResetResourceTasks();
+
   if(ModelCacheManager::Get() && !mModelUrl.empty())
   {
     ModelCacheManager::Get().UnreferenceModelCache(mModelUrl);
   }
-
-  ResetResourceTasks();
 }
 
 Dali::Scene3D::Model Model::New(const std::string& modelUrl, const std::string& resourceDirectoryUrl)
