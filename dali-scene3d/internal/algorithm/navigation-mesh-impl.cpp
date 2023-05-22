@@ -111,7 +111,7 @@ NavigationMesh::NavigationMesh(const std::vector<uint8_t>& buffer)
   return mHeader.vertexCount;
 }
 
-bool NavigationMesh::FindFloorForFace(const Dali::Vector3& position, uint32_t faceIndex, bool dontCheckNeighbours, Dali::Vector3& outPosition)
+bool NavigationMesh::FindFloorForFace(const Dali::Vector3& position, FaceIndex faceIndex, bool dontCheckNeighbours, Dali::Vector3& outPosition)
 {
   if(faceIndex == ::Dali::Scene3D::Algorithm::NavigationMesh::NULL_FACE)
   {
@@ -130,7 +130,7 @@ bool NavigationMesh::FindFloorForFace(const Dali::Vector3& position, uint32_t fa
   // Ray direction matches gravity direction
   ray.direction = Vector3(mHeader.gravityVector);
 
-  IntersectResult result = NavigationRayFaceIntersection(ray, *GetFace(uint16_t(faceIndex)));
+  IntersectResult result = NavigationRayFaceIntersection(ray, *GetFace(faceIndex));
   if(result.result)
   {
     outPosition = PointLocalToScene(result.point);
@@ -144,35 +144,35 @@ bool NavigationMesh::FindFloorForFace(const Dali::Vector3& position, uint32_t fa
     }
 
     // Test neighbouring by edges
-    const auto& poly = GetFace(uint16_t(faceIndex));
+    const auto& poly = GetFace(faceIndex);
 
     // collect faces sharing edges
-    std::vector<uint32_t> faces;
+    std::vector<FaceIndex> neighbourFaces;
 
-    for(unsigned short i : poly->edge)
+    for(auto edgeIndex : poly->edge)
     {
-      const auto& edge = *GetEdge(i);
+      const auto& edge = *GetEdge(edgeIndex);
 
       // store faces
-      for(unsigned short j : edge.face)
+      for(auto edgeFaceIndex : edge.face)
       {
-        if(j != ::Dali::Scene3D::Algorithm::NavigationMesh::NULL_FACE && j != faceIndex)
+        if(edgeFaceIndex != ::Dali::Scene3D::Algorithm::NavigationMesh::NULL_FACE && edgeFaceIndex != faceIndex)
         {
-          faces.emplace_back(j);
+          neighbourFaces.emplace_back(edgeFaceIndex);
         }
       }
     }
 
-    if(faces.empty())
+    if(neighbourFaces.empty())
     {
       return false;
     }
 
-    for(const auto& p : faces)
+    for(const auto& neighbourFaceIndex : neighbourFaces)
     {
-      if(FindFloorForFace(position, p, true, outPosition))
+      if(FindFloorForFace(position, neighbourFaceIndex, true, outPosition))
       {
-        mCurrentFace = p;
+        mCurrentFace = neighbourFaceIndex;
         return true;
       }
     }
@@ -188,11 +188,11 @@ bool NavigationMesh::FindFloorForFace(const Dali::Vector3& position, uint32_t fa
  */
 bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition)
 {
-  uint32_t polyIndex = 0;
-  return FindFloor(position, outPosition, polyIndex);
+  FaceIndex faceIndex = 0u;
+  return FindFloor(position, outPosition, faceIndex);
 }
 
-bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, uint32_t& faceIndex)
+bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, FaceIndex& faceIndex)
 {
   [[maybe_unused]] auto newPos = PointSceneToLocal(Dali::Vector3(position));
 
@@ -205,12 +205,12 @@ bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& out
 
   const auto                   POLY_COUNT = GetFaceCount();
   std::vector<IntersectResult> results;
-  for(auto i = 0u; i < POLY_COUNT; ++i)
+  for(auto faceIndex = 0u; faceIndex < POLY_COUNT; ++faceIndex)
   {
-    auto result = NavigationRayFaceIntersection(ray, *GetFace(i));
+    auto result = NavigationRayFaceIntersection(ray, *GetFace(faceIndex));
     if(result.result)
     {
-      result.faceIndex = i;
+      result.faceIndex = faceIndex;
       results.emplace_back(result);
     }
   }
@@ -230,25 +230,25 @@ bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& out
   return true;
 }
 
-const Poly* NavigationMesh::GetFace(int index) const
+const Poly* NavigationMesh::GetFace(FaceIndex index) const
 {
   auto* basePtr = reinterpret_cast<const Poly*>(mBuffer.data() + mHeader.dataOffset + mHeader.polyDataOffset);
   return &basePtr[index];
 }
 
-const Edge* NavigationMesh::GetEdge(int index) const
+const Edge* NavigationMesh::GetEdge(EdgeIndex index) const
 {
   auto* basePtr = reinterpret_cast<const Edge*>(mBuffer.data() + mHeader.dataOffset + mHeader.edgeDataOffset);
   return &basePtr[index];
 }
 
-const Vertex* NavigationMesh::GetVertex(int index) const
+const Vertex* NavigationMesh::GetVertex(VertexIndex index) const
 {
   auto* basePtr = reinterpret_cast<const Vertex*>(mBuffer.data() + mHeader.dataOffset + mHeader.vertexDataOffset);
   return &basePtr[index];
 }
 
-NavigationMesh::IntersectResult NavigationMesh::NavigationRayFaceIntersection(NavigationRay& ray, const Face& face)
+NavigationMesh::IntersectResult NavigationMesh::NavigationRayFaceIntersection(NavigationRay& ray, const Face& face) const
 {
   auto vi0 = *GetVertex(face.vertex[0]);
   auto vi1 = *GetVertex(face.vertex[1]);
@@ -266,7 +266,7 @@ void NavigationMesh::SetTransform(const Dali::Matrix& transform)
   transform.InvertTransform(mTransformInverse);
 }
 
-Dali::Vector3 NavigationMesh::PointSceneToLocal(const Dali::Vector3& point)
+Dali::Vector3 NavigationMesh::PointSceneToLocal(const Dali::Vector3& point) const
 {
   // Transform point into navmesh space
   Dali::Vector4 invNewPos = mTransformInverse * Dali::Vector4(point.x, -point.y, point.z, 1.0f);
@@ -275,7 +275,7 @@ Dali::Vector3 NavigationMesh::PointSceneToLocal(const Dali::Vector3& point)
   return Dali::Vector3(invNewPos.AsFloat());
 }
 
-Dali::Vector3 NavigationMesh::PointLocalToScene(const Dali::Vector3& point)
+Dali::Vector3 NavigationMesh::PointLocalToScene(const Dali::Vector3& point) const
 {
   // Transform point into scene transform space
   Dali::Vector4 newPos = mTransform * Dali::Vector4(point.x, -point.y, point.z, 1.0f);

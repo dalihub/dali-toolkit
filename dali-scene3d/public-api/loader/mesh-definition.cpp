@@ -113,7 +113,7 @@ void ReadValues(const std::vector<uint8_t>& valuesBuffer, const std::vector<uint
   }
 }
 
-bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source, uint8_t* target)
+bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source, uint8_t* target, std::vector<uint32_t>* sparseIndices)
 {
   bool success = false;
 
@@ -152,29 +152,61 @@ bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source
       return false;
     }
 
+    // If non-null sparse indices vector, prepare it for output
+    if(sparseIndices)
+    {
+      sparseIndices->resize(accessor.mSparse->mCount);
+    }
+
     switch(indices.mElementSizeHint)
     {
       case 1u:
       {
         ReadValues<uint8_t>(valuesBuffer, indicesBuffer, target, accessor.mSparse->mCount, values.mElementSizeHint);
+        if(sparseIndices)
+        {
+          // convert 8-bit indices into 32-bit
+          std::transform(indicesBuffer.begin(), indicesBuffer.end(), sparseIndices->begin(), [](const uint8_t& value) { return uint32_t(value); });
+        }
         break;
       }
       case 2u:
       {
         ReadValues<uint16_t>(valuesBuffer, indicesBuffer, target, accessor.mSparse->mCount, values.mElementSizeHint);
+        if(sparseIndices)
+        {
+          // convert 16-bit indices into 32-bit
+          std::transform(reinterpret_cast<uint16_t*>(indicesBuffer.data()),
+                         reinterpret_cast<uint16_t*>(indicesBuffer.data()) + accessor.mSparse->mCount,
+                         sparseIndices->begin(),
+                         [](const uint16_t& value) {
+                           return uint32_t(value);
+                         });
+        }
         break;
       }
       case 4u:
       {
         ReadValues<uint32_t>(valuesBuffer, indicesBuffer, target, accessor.mSparse->mCount, values.mElementSizeHint);
+        if(sparseIndices)
+        {
+          std::copy(indicesBuffer.begin(), indicesBuffer.end(), reinterpret_cast<uint8_t*>(sparseIndices->data()));
+        }
         break;
       }
       default:
+      {
         DALI_ASSERT_DEBUG(!"Unsupported type for an index");
+      }
     }
   }
 
   return success;
+}
+
+bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source, uint8_t* target)
+{
+  return ReadAccessor(accessor, source, target, nullptr);
 }
 
 template<typename T>
@@ -427,21 +459,41 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
                           blendShape.deltas.mBlob.mStride >= sizeof(Vector3)) &&
                          "Blend Shape position buffer length not a multiple of element size");
 
-      const auto           bufferSize = blendShape.deltas.mBlob.GetBufferSize();
-      std::vector<uint8_t> buffer(bufferSize);
-      if(ReadAccessor(blendShape.deltas, buffers[blendShape.deltas.mBufferIdx].GetBufferStream(), buffer.data()))
+      const auto            bufferSize = blendShape.deltas.mBlob.GetBufferSize();
+      std::vector<uint8_t>  buffer(bufferSize);
+      std::vector<uint32_t> sparseIndices{};
+
+      if(ReadAccessor(blendShape.deltas, buffers[blendShape.deltas.mBufferIdx].GetBufferStream(), buffer.data(), &sparseIndices))
       {
-        blendShape.deltas.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()));
+        blendShape.deltas.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()), &sparseIndices);
+
         // Calculate the difference with the original mesh.
         // Find the max distance to normalize the deltas.
-        const Vector3* const deltasBuffer = reinterpret_cast<const Vector3* const>(buffer.data());
+        const auto* const deltasBuffer = reinterpret_cast<const Vector3* const>(buffer.data());
 
-        for(uint32_t index = 0u; index < numberOfVertices; ++index)
+        auto ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t geometryBufferIndex, uint32_t deltaIndex) {
+          Vector3& delta = geometryBufferV3[geometryBufferIndex] = deltasBuffer[deltaIndex];
+          delta                                                  = deltasBuffer[deltaIndex];
+          return std::max(maxDistanceSquared, delta.LengthSquared());
+        };
+
+        if(sparseIndices.empty())
         {
-          Vector3& delta = geometryBufferV3[geometryBufferIndex++];
-          delta          = deltasBuffer[index];
-
-          maxDistanceSquared = std::max(maxDistanceSquared, delta.LengthSquared());
+          for(uint32_t index = 0u; index < numberOfVertices; ++index)
+          {
+            maxDistanceSquared = ProcessVertex(geometryBufferIndex++, index);
+          }
+        }
+        else
+        {
+          // initialize blendshape texture
+          // TODO: there may be a case when sparse accessor uses a base buffer view for initial values.
+          std::fill(geometryBufferV3 + geometryBufferIndex, geometryBufferV3 + geometryBufferIndex + numberOfVertices, Vector3::ZERO);
+          for(auto index : sparseIndices)
+          {
+            maxDistanceSquared = ProcessVertex(geometryBufferIndex + index, index);
+          }
+          geometryBufferIndex += numberOfVertices;
         }
       }
     }
@@ -452,20 +504,18 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
                           blendShape.normals.mBlob.mStride >= sizeof(Vector3)) &&
                          "Blend Shape normals buffer length not a multiple of element size");
 
-      const auto           bufferSize = blendShape.normals.mBlob.GetBufferSize();
-      std::vector<uint8_t> buffer(bufferSize);
-      if(ReadAccessor(blendShape.normals, buffers[blendShape.normals.mBufferIdx].GetBufferStream(), buffer.data()))
+      const auto            bufferSize = blendShape.normals.mBlob.GetBufferSize();
+      std::vector<uint8_t>  buffer(bufferSize);
+      std::vector<uint32_t> sparseIndices;
+
+      if(ReadAccessor(blendShape.normals, buffers[blendShape.normals.mBufferIdx].GetBufferStream(), buffer.data(), &sparseIndices))
       {
-        blendShape.normals.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()));
+        blendShape.normals.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()), &sparseIndices);
 
         // Calculate the difference with the original mesh, and translate to make all values positive.
-        const Vector3* const deltasBuffer = reinterpret_cast<const Vector3* const>(buffer.data());
-
-        for(uint32_t index = 0u; index < numberOfVertices; ++index)
-        {
-          Vector3& delta = geometryBufferV3[geometryBufferIndex++];
-          delta          = deltasBuffer[index];
-
+        const Vector3* const deltasBuffer  = reinterpret_cast<const Vector3* const>(buffer.data());
+        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t geometryBufferIndex, uint32_t deltaIndex) {
+          Vector3& delta = geometryBufferV3[geometryBufferIndex] = deltasBuffer[deltaIndex];
           delta.x *= 0.5f;
           delta.y *= 0.5f;
           delta.z *= 0.5f;
@@ -473,6 +523,23 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
           delta.x += 0.5f;
           delta.y += 0.5f;
           delta.z += 0.5f;
+        };
+
+        if(sparseIndices.empty())
+        {
+          for(uint32_t index = 0u; index < numberOfVertices; ++index)
+          {
+            ProcessVertex(geometryBufferIndex++, index);
+          }
+        }
+        else
+        {
+          std::fill(geometryBufferV3 + geometryBufferIndex, geometryBufferV3 + geometryBufferIndex + numberOfVertices, Vector3(0.5, 0.5, 0.5));
+          for(auto index : sparseIndices)
+          {
+            ProcessVertex(geometryBufferIndex + index, index);
+          }
+          geometryBufferIndex += numberOfVertices;
         }
       }
     }
@@ -483,20 +550,18 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
                           blendShape.tangents.mBlob.mStride >= sizeof(Vector3)) &&
                          "Blend Shape tangents buffer length not a multiple of element size");
 
-      const auto           bufferSize = blendShape.tangents.mBlob.GetBufferSize();
-      std::vector<uint8_t> buffer(bufferSize);
-      if(ReadAccessor(blendShape.tangents, buffers[blendShape.tangents.mBufferIdx].GetBufferStream(), buffer.data()))
+      const auto            bufferSize = blendShape.tangents.mBlob.GetBufferSize();
+      std::vector<uint8_t>  buffer(bufferSize);
+      std::vector<uint32_t> sparseIndices;
+
+      if(ReadAccessor(blendShape.tangents, buffers[blendShape.tangents.mBufferIdx].GetBufferStream(), buffer.data(), &sparseIndices))
       {
-        blendShape.tangents.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()));
+        blendShape.tangents.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()), &sparseIndices);
 
         // Calculate the difference with the original mesh, and translate to make all values positive.
-        const Vector3* const deltasBuffer = reinterpret_cast<const Vector3* const>(buffer.data());
-
-        for(uint32_t index = 0u; index < numberOfVertices; ++index)
-        {
-          Vector3& delta = geometryBufferV3[geometryBufferIndex++];
-          delta          = deltasBuffer[index];
-
+        const Vector3* const deltasBuffer  = reinterpret_cast<const Vector3* const>(buffer.data());
+        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t geometryBufferIndex, uint32_t deltaIndex) {
+          Vector3& delta = geometryBufferV3[geometryBufferIndex] = deltasBuffer[deltaIndex];
           delta.x *= 0.5f;
           delta.y *= 0.5f;
           delta.z *= 0.5f;
@@ -504,6 +569,23 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
           delta.x += 0.5f;
           delta.y += 0.5f;
           delta.z += 0.5f;
+        };
+
+        if(sparseIndices.empty())
+        {
+          for(uint32_t index = 0u; index < numberOfVertices; ++index)
+          {
+            ProcessVertex(geometryBufferIndex++, index);
+          }
+        }
+        else
+        {
+          std::fill(geometryBufferV3 + geometryBufferIndex, geometryBufferV3 + geometryBufferIndex + numberOfVertices, Vector3(0.5, 0.5, 0.5));
+          for(auto index : sparseIndices)
+          {
+            ProcessVertex(geometryBufferIndex + index, index);
+          }
+          geometryBufferIndex += numberOfVertices;
         }
       }
     }
@@ -513,7 +595,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
 
   const float maxDistance = sqrtf(maxDistanceSquared);
 
-  const float normalizeFactor = (maxDistanceSquared < Math::MACHINE_EPSILON_1000) ? 1.f : (0.5f / maxDistance);
+  const float normalizeFactor = (maxDistanceSquared < Math::MACHINE_EPSILON_100) ? 1.f : (0.5f / maxDistance);
 
   // Calculate and store the unnormalize factor.
   blendShapeUnnormalizeFactor = maxDistance * 2.0f;
@@ -602,7 +684,7 @@ void MeshDefinition::Blob::ComputeMinMax(std::vector<float>& min, std::vector<fl
   }
 }
 
-void MeshDefinition::Blob::ApplyMinMax(const std::vector<float>& min, const std::vector<float>& max, uint32_t count, float* values)
+void MeshDefinition::Blob::ApplyMinMax(const std::vector<float>& min, const std::vector<float>& max, uint32_t count, float* values, std::vector<uint32_t>* sparseIndices)
 {
   DALI_ASSERT_DEBUG(max.size() == min.size() || max.size() * min.size() == 0);
   const auto numComponents = std::max(min.size(), max.size());
@@ -651,9 +733,9 @@ void MeshDefinition::Blob::ComputeMinMax(uint32_t numComponents, uint32_t count,
   ComputeMinMax(mMin, mMax, numComponents, count, values);
 }
 
-void MeshDefinition::Blob::ApplyMinMax(uint32_t count, float* values) const
+void MeshDefinition::Blob::ApplyMinMax(uint32_t count, float* values, std::vector<uint32_t>* sparseIndices) const
 {
-  ApplyMinMax(mMin, mMax, count, values);
+  ApplyMinMax(mMin, mMax, count, values, sparseIndices);
 }
 
 void MeshDefinition::RawData::Attrib::AttachBuffer(Geometry& g) const

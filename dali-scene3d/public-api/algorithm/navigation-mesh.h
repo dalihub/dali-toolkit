@@ -25,6 +25,7 @@
 
 #include <cinttypes>
 #include <cstdio>
+#include <limits>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -49,6 +50,11 @@ namespace Dali::Scene3D::Algorithm
 {
 // Using PImpling but not usual DALi handles as this object isn't supposed to be refcounted
 using NavigationMeshImpl = Dali::Scene3D::Internal::Algorithm::NavigationMesh;
+
+// Make each to change each index value's type here.
+using VertexIndex = uint16_t;
+using EdgeIndex   = uint16_t;
+using FaceIndex   = uint16_t;
 
 /**
  * @class NavigationMesh
@@ -75,14 +81,14 @@ public:
   /**
    * @struct Face
    *
-   * Describes a single polygon
+   * Describes a single polygon's face
    */
   struct Face
   {
-    uint16_t vertex[NAVIGATION_MESH_MAX_VERTICES_PER_FACE]; ///< Vertices per face
-    uint16_t edge[NAVIGATION_MESH_MAX_EDGES_PER_FACE];      ///< Edges per face
-    float    normal[NAVIGATION_MESH_MAX_COMPONENTS_3D];     ///< Normal vector
-    float    center[NAVIGATION_MESH_MAX_COMPONENTS_3D];     ///< Barycentric coordinates
+    VertexIndex vertex[NAVIGATION_MESH_MAX_VERTICES_PER_FACE]; ///< Vertices per face
+    EdgeIndex   edge[NAVIGATION_MESH_MAX_EDGES_PER_FACE];      ///< Edges per face
+    float       normal[NAVIGATION_MESH_MAX_COMPONENTS_3D];     ///< Normal vector
+    float       center[NAVIGATION_MESH_MAX_COMPONENTS_3D];     ///< Barycentric coordinates
   };
 
   /**
@@ -92,8 +98,8 @@ public:
    */
   struct Edge
   {
-    uint16_t vertex[NAVIGATION_MESH_MAX_COMPONENTS_2D]; ///< Vertices making the edge
-    uint16_t face[NAVIGATION_MESH_MAX_COMPONENTS_2D];   ///< Faces on both sides of edge
+    VertexIndex vertex[NAVIGATION_MESH_MAX_COMPONENTS_2D]; ///< Vertices making the edge
+    FaceIndex   face[NAVIGATION_MESH_MAX_COMPONENTS_2D];   ///< Faces on both sides of edge
   };
 
   /**
@@ -106,7 +112,7 @@ public:
   {
     union
     {
-      float co[NAVIGATION_MESH_MAX_COMPONENTS_3D]; ///< Coordinates of vertex
+      float coordinates[NAVIGATION_MESH_MAX_COMPONENTS_3D]; ///< Coordinates of vertex
       struct
       {
         float x, y, z;
@@ -147,11 +153,11 @@ public:
    * @brief Looks for the floor under specified position
    * @param[in] position Position to investigate
    * @param[in] outPosition Position on the floor in found
-   * @param[in] faceIndex Index of NavigationMesh face associated with floor
+   * @param[out] faceIndex Index of NavigationMesh face associated with floor
    *
    * @return True if floor has been found, False otherwise
    */
-  bool FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, uint32_t& faceIndex);
+  bool FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, FaceIndex& faceIndex);
 
   /**
    * @brief Looks for a floor starting from specified face
@@ -167,28 +173,28 @@ public:
    *
    * @return True on success, false otherwise
    */
-  bool FindFloorForFace(const Dali::Vector3& position, uint32_t faceIndex, bool dontCheckNeighbours, Dali::Vector3& outPosition);
+  bool FindFloorForFace(const Dali::Vector3& position, FaceIndex faceIndex, bool dontCheckNeighbours, Dali::Vector3& outPosition);
 
   /**
    * @brief Returns pointer to Face structure
    * @param[in] index Index of face to retrieve
    * @return Pointer to valid Face structure or nullptr
    */
-  [[nodiscard]] const Face* GetFace(int index) const;
+  [[nodiscard]] const Face* GetFace(FaceIndex index) const;
 
   /**
    * @brief Returns edge structure
    * @param[in] index Index of edge to retrieve
    * @return Pointer to valid Edge structure or nullptr
    */
-  [[nodiscard]] const Edge* GetEdge(int index) const;
+  [[nodiscard]] const Edge* GetEdge(EdgeIndex index) const;
 
   /**
    * @brief Returns vertex structure
    * @param[in] index Index of vertex to retrieve
    * @return Pointer to valid Vertex structure or nullptr
    */
-  [[nodiscard]] const Vertex* GetVertex(int index) const;
+  [[nodiscard]] const Vertex* GetVertex(VertexIndex index) const;
 
   /**
    * @brief Sets static transform for the navigation mesh object
@@ -225,7 +231,7 @@ public:
    * @param[in] point Point to transform
    * @return Point transformed to the local space
    */
-  Dali::Vector3 PointSceneToLocal(const Dali::Vector3& point);
+  Dali::Vector3 PointSceneToLocal(const Dali::Vector3& point) const;
 
   /**
    * @brief Transforms point into the parent transform space
@@ -235,7 +241,7 @@ public:
    * @param[in] point Point to transform
    * @return Point transformed into the parent space
    */
-  Dali::Vector3 PointLocalToScene(const Dali::Vector3& point);
+  Dali::Vector3 PointLocalToScene(const Dali::Vector3& point) const;
 
   /**
    * @brief Returns direction of the gravity vector
@@ -246,8 +252,8 @@ public:
    */
   Dali::Vector3 GetGravityVector() const;
 
-  static constexpr uint16_t NULL_FACE{0xffff}; ///< Represents null polygon
-  static constexpr uint16_t NULL_EDGE{0xffff}; ///< represents null edge
+  static constexpr FaceIndex NULL_FACE{std::numeric_limits<FaceIndex>::max()}; ///< Represents null face
+  static constexpr EdgeIndex NULL_EDGE{std::numeric_limits<EdgeIndex>::max()}; ///< Represents null edge
 
 public:
   DALI_INTERNAL explicit NavigationMesh(NavigationMeshImpl* impl);

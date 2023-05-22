@@ -172,7 +172,7 @@ void AnimationDefinition::SetProperty(uint32_t index, AnimatedProperty&& propert
   mProperties[index] = std::move(property);
 }
 
-const AnimatedProperty& AnimationDefinition::GetPropertyAt(uint32_t index)
+AnimatedProperty& AnimationDefinition::GetPropertyAt(uint32_t index)
 {
   return mProperties[index];
 }

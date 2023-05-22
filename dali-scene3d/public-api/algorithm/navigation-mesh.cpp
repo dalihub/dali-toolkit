@@ -24,10 +24,9 @@ using Dali::Vector3;
 
 namespace Dali::Scene3D::Algorithm
 {
-
-NavigationMesh::NavigationMesh( NavigationMeshImpl* impl )
+NavigationMesh::NavigationMesh(NavigationMeshImpl* impl)
 {
-  mImpl.reset( impl );
+  mImpl.reset(impl);
 }
 
 NavigationMesh::~NavigationMesh() = default;
@@ -47,27 +46,27 @@ NavigationMesh::~NavigationMesh() = default;
   return mImpl->GetVertexCount();
 }
 
-bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, uint32_t& polyIndex)
+bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, FaceIndex& faceIndex)
 {
-  return mImpl->FindFloor(position, outPosition, polyIndex);
+  return mImpl->FindFloor(position, outPosition, faceIndex);
 }
 
-bool NavigationMesh::FindFloorForFace(const Dali::Vector3& position, uint32_t faceIndex, bool dontCheckNeighbours, Dali::Vector3& outPosition)
+bool NavigationMesh::FindFloorForFace(const Dali::Vector3& position, FaceIndex faceIndex, bool dontCheckNeighbours, Dali::Vector3& outPosition)
 {
   return mImpl->FindFloorForFace(position, faceIndex, dontCheckNeighbours, outPosition);
 }
 
-[[nodiscard]] const NavigationMesh::Face* NavigationMesh::GetFace(int index) const
+[[nodiscard]] const NavigationMesh::Face* NavigationMesh::GetFace(FaceIndex index) const
 {
   return mImpl->GetFace(index);
 }
 
-[[nodiscard]] const NavigationMesh::Edge* NavigationMesh::GetEdge(int index) const
+[[nodiscard]] const NavigationMesh::Edge* NavigationMesh::GetEdge(EdgeIndex index) const
 {
   return mImpl->GetEdge(index);
 }
 
-[[nodiscard]] const NavigationMesh::Vertex* NavigationMesh::GetVertex(int index) const
+[[nodiscard]] const NavigationMesh::Vertex* NavigationMesh::GetVertex(VertexIndex index) const
 {
   return mImpl->GetVertex(index);
 }
@@ -77,12 +76,12 @@ void NavigationMesh::SetSceneTransform(const Dali::Matrix& transform)
   mImpl->SetTransform(transform);
 }
 
-Dali::Vector3 NavigationMesh::PointSceneToLocal(const Dali::Vector3& point)
+Dali::Vector3 NavigationMesh::PointSceneToLocal(const Dali::Vector3& point) const
 {
   return mImpl->PointSceneToLocal(point);
 }
 
-Dali::Vector3 NavigationMesh::PointLocalToScene(const Dali::Vector3& point)
+Dali::Vector3 NavigationMesh::PointLocalToScene(const Dali::Vector3& point) const
 {
   return mImpl->PointLocalToScene(point);
 }
@@ -92,4 +91,4 @@ Dali::Vector3 NavigationMesh::GetGravityVector() const
   return mImpl->GetGravityVector();
 }
 
-}
+} // namespace Dali::Scene3D::Algorithm

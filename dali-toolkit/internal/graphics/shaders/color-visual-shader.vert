@@ -24,7 +24,7 @@ uniform mediump float borderlineWidth;
 uniform mediump float borderlineOffset;
 #endif
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-uniform mediump vec4 cornerRadius;
+uniform highp vec4 cornerRadius;
 uniform mediump float cornerRadiusPolicy;
 #endif
 uniform mediump vec2 extraSize;

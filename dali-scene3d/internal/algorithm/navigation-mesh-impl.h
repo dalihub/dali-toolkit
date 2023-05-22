@@ -42,6 +42,11 @@ namespace Dali::Scene3D::Internal::Algorithm
 {
 class NavigationRay;
 
+// Make each to change each index value's type here.
+using VertexIndex = Dali::Scene3D::Algorithm::VertexIndex;
+using EdgeIndex   = Dali::Scene3D::Algorithm::EdgeIndex;
+using FaceIndex   = Dali::Scene3D::Algorithm::FaceIndex;
+
 /**
  * @class NavigationMesh
  */
@@ -73,7 +78,7 @@ public:
   {
     Dali::Vector3 point;
     float         distance;
-    uint16_t      faceIndex;
+    FaceIndex     faceIndex;
     bool          result;
   };
 
@@ -93,15 +98,9 @@ public:
   [[nodiscard]] uint32_t GetVertexCount() const;
 
   /**
-   * Looks for floor only within the face
-   * @param[in] position Position to be projected onto the face
-   * @param[in] faceIndex Face index
-   * @param[in] dontCheckNeighbours states whether to traverse onto neighbouring faces
-   * @param[out] outPosition Output position
-   *
-   * @return true if success
+   * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::FindFloorForFace()
    */
-  bool FindFloorForFace(const Dali::Vector3& position, uint32_t faceIndex, bool dontCheckNeighbours, Dali::Vector3& outPosition);
+  bool FindFloorForFace(const Dali::Vector3& position, FaceIndex faceIndex, bool dontCheckNeighbours, Dali::Vector3& outPosition);
 
   /**
    * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::FindFloor()
@@ -111,22 +110,22 @@ public:
   /**
    * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::FindFloor()
    */
-  bool FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, uint32_t& faceIndex);
+  bool FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, FaceIndex& faceIndex);
 
   /**
    * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::GetFace()
    */
-  [[nodiscard]] const Face* GetFace(int index) const;
+  [[nodiscard]] const Face* GetFace(FaceIndex index) const;
 
   /**
    * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::GetEdge()
    */
-  [[nodiscard]] const Edge* GetEdge(int index) const;
+  [[nodiscard]] const Edge* GetEdge(EdgeIndex index) const;
 
   /**
    * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::GetVertex()
    */
-  [[nodiscard]] const Vertex* GetVertex(int index) const;
+  [[nodiscard]] const Vertex* GetVertex(VertexIndex index) const;
 
   /**
    * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::SetSceneTransform()
@@ -136,17 +135,17 @@ public:
   /**
    * Tests intersection between navigation ray and face
    */
-  IntersectResult NavigationRayFaceIntersection(NavigationRay& ray, const Face& face);
+  IntersectResult NavigationRayFaceIntersection(NavigationRay& ray, const Face& face) const;
 
   /**
    * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::PointSceneToLocal()
    */
-  Dali::Vector3 PointSceneToLocal(const Dali::Vector3& point);
+  Dali::Vector3 PointSceneToLocal(const Dali::Vector3& point) const;
 
   /**
    * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::PointLocalToScene()
    */
-  Dali::Vector3 PointLocalToScene(const Dali::Vector3& point);
+  Dali::Vector3 PointLocalToScene(const Dali::Vector3& point) const;
 
   /**
    * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::GetGravityVector()
@@ -156,7 +155,7 @@ public:
 private:
   std::vector<uint8_t>     mBuffer;           //< Data buffer
   NavigationMeshHeader_V10 mHeader;           //< Navigation mesh header
-  uint16_t                 mCurrentFace;      //< Current face (last floor position)
+  FaceIndex                mCurrentFace;      //< Current face (last floor position)
   Dali::Matrix             mTransform;        //< Transform matrix
   Dali::Matrix             mTransformInverse; //< Inverse of the transform matrix
 };

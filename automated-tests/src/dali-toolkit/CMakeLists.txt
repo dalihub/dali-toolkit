@@ -31,6 +31,7 @@ SET(TC_SOURCES
   utc-Dali-JsonParser.cpp
   utc-Dali-KeyInputFocusManager.cpp
   utc-Dali-PageTurnView.cpp
+  utc-Dali-ParticleSystem.cpp
   utc-Dali-Scene3dView.cpp
   utc-Dali-ScrollBar.cpp
   utc-Dali-ScrollView.cpp
@@ -183,7 +184,7 @@ ADD_CUSTOM_COMMAND(
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.h ${EXEC_NAME}.cpp ${TC_SOURCES} ${TEST_HARNESS_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
-    -lpthread --coverage
+    -lpthread --coverage -ldl
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}

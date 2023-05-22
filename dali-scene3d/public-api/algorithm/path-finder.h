@@ -68,7 +68,7 @@ public:
    * @param[in] polyIndexTo Index of end polygon
    * @return List of waypoints for path or empty vector if no success
    */
-  virtual WayPointList FindPath(uint32_t polyIndexFrom, uint32_t polyIndexTo) = 0;
+  virtual WayPointList FindPath(FaceIndex polyIndexFrom, FaceIndex polyIndexTo) = 0;
 };
 
 /**
@@ -119,7 +119,7 @@ public:
    * @param[in] faceIndexTo Target face index
    * @return List of waypoints for path or empty list on failure
    */
-  WayPointList FindPath(uint32_t faceIndexFrom, uint32_t faceIndexTo);
+  WayPointList FindPath(FaceIndex faceIndexFrom, FaceIndex faceIndexTo);
 
 private:
   PathFinder() = delete;

@@ -15,16 +15,16 @@
  *
  */
 
+#include <dali-test-suite-utils.h>
 #include "dali-scene3d/public-api/algorithm/navigation-mesh.h"
 #include "dali-scene3d/public-api/algorithm/path-finder.h"
 #include "dali-scene3d/public-api/loader/navigation-mesh-factory.h"
-#include <dali-test-suite-utils.h>
 
 using namespace Dali;
 using namespace Dali::Scene3D::Algorithm;
 using namespace Dali::Scene3D::Loader;
 
-bool CompareResults( const std::vector<uint32_t>& nodes, const WayPointList& waypoints )
+bool CompareResults(const std::vector<FaceIndex>& nodes, const WayPointList& waypoints)
 {
   if(nodes.size() != waypoints.size())
   {
@@ -41,10 +41,10 @@ bool CompareResults( const std::vector<uint32_t>& nodes, const WayPointList& way
       oss << waypoint.GetNavigationMeshFaceIndex() << ", ";
     }
     oss << "]\n";
-    tet_printf("%s\n",oss.str().c_str());
+    tet_printf("%s\n", oss.str().c_str());
     return false;
   }
-  for(auto i = 0u; i < nodes.size(); ++i )
+  for(auto i = 0u; i < nodes.size(); ++i)
   {
     if(nodes[i] != waypoints[i].GetNavigationMeshFaceIndex())
     {
@@ -61,7 +61,7 @@ bool CompareResults( const std::vector<uint32_t>& nodes, const WayPointList& way
         oss << waypoint.GetNavigationMeshFaceIndex() << ", ";
       }
       oss << "]\n";
-      tet_printf("%s\n",oss.str().c_str());
+      tet_printf("%s\n", oss.str().c_str());
       return false;
     }
   }
@@ -70,9 +70,9 @@ bool CompareResults( const std::vector<uint32_t>& nodes, const WayPointList& way
 
 int UtcDaliPathFinderNewP(void)
 {
-  auto navmesh = NavigationMeshFactory::CreateFromFile( "resources/navmesh-test.bin");
+  auto navmesh = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
-  auto pathfinder = PathFinder::New( *navmesh, PathFinderAlgorithm::DEFAULT );
+  auto pathfinder = PathFinder::New(*navmesh, PathFinderAlgorithm::DEFAULT);
 
   DALI_TEST_CHECK(navmesh);
   DALI_TEST_CHECK(pathfinder);
@@ -82,9 +82,9 @@ int UtcDaliPathFinderNewP(void)
 
 int UtcDaliPathFinderNewFail(void)
 {
-  auto navmesh = NavigationMeshFactory::CreateFromFile( "resources/navmesh-test.bin");
+  auto navmesh = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
-  auto pathfinder = PathFinder::New( *navmesh, static_cast<PathFinderAlgorithm>(-1) );
+  auto pathfinder = PathFinder::New(*navmesh, static_cast<PathFinderAlgorithm>(-1));
 
   DALI_TEST_CHECK(navmesh);
   DALI_TEST_CHECK(!pathfinder);
@@ -92,21 +92,21 @@ int UtcDaliPathFinderNewFail(void)
   END_TEST;
 }
 
-void printWaypointForPython( WayPointList& waypoints)
+void printWaypointForPython(WayPointList& waypoints)
 {
-  tet_printf( "size: %d\n", waypoints.size());
-  tet_printf( "[");
+  tet_printf("size: %d\n", waypoints.size());
+  tet_printf("[");
   for(auto& wp : waypoints)
   {
     auto index = wp.GetNavigationMeshFaceIndex();
     tet_printf("%d, ", index);
   }
-  tet_printf( "]");
+  tet_printf("]");
 }
 
 int UtcDaliPathFinderFindShortestPath0(void)
 {
-  auto navmesh = NavigationMeshFactory::CreateFromFile( "resources/navmesh-test.bin");
+  auto navmesh = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
   std::vector<PathFinderAlgorithm> testAlgorithms = {
     PathFinderAlgorithm::DJIKSTRA_SHORTEST_PATH,
@@ -116,7 +116,7 @@ int UtcDaliPathFinderFindShortestPath0(void)
   for(const auto& algorithm : testAlgorithms)
   {
     tet_printf("Test algorithm type : %d\n", static_cast<int>(algorithm));
-    auto pathfinder = PathFinder::New( *navmesh, algorithm );
+    auto pathfinder = PathFinder::New(*navmesh, algorithm);
 
     DALI_TEST_CHECK(navmesh);
     DALI_TEST_CHECK(pathfinder);
@@ -126,7 +126,7 @@ int UtcDaliPathFinderFindShortestPath0(void)
       DALI_TEST_NOT_EQUALS(int(waypoints.size()), 0, 0, TEST_LOCATION);
 
       // Results are verified in the Blender
-      std::vector<uint32_t> expectedResults =
+      std::vector<FaceIndex> expectedResults =
         {18, 97, 106, 82, 50, 139};
 
       DALI_TEST_EQUALS(CompareResults(expectedResults, waypoints), true, TEST_LOCATION);
@@ -142,11 +142,10 @@ int UtcDaliPathFinderFindShortestPath0(void)
       //printWaypointForPython(waypoints);
 
       // Results are verified in the Blender
-      std::vector<uint32_t> expectedResults =
+      std::vector<FaceIndex> expectedResults =
         {18, 97, 106, 82, 50, 6, 89, 33, 157};
 
       DALI_TEST_EQUALS(CompareResults(expectedResults, waypoints), true, TEST_LOCATION);
-
     }
   }
 
@@ -155,9 +154,9 @@ int UtcDaliPathFinderFindShortestPath0(void)
 
 int UtcDaliPathFinderFindShortestPath1(void)
 {
-  auto navmesh = NavigationMeshFactory::CreateFromFile( "resources/navmesh-test.bin");
+  auto navmesh = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
   // All coordinates in navmesh local space
-  navmesh->SetSceneTransform( Matrix(Matrix::IDENTITY));
+  navmesh->SetSceneTransform(Matrix(Matrix::IDENTITY));
 
   std::vector<PathFinderAlgorithm> testAlgorithms = {
     PathFinderAlgorithm::DJIKSTRA_SHORTEST_PATH,
@@ -168,29 +167,29 @@ int UtcDaliPathFinderFindShortestPath1(void)
   for(const auto& algorithm : testAlgorithms)
   {
     tet_printf("Test algorithm type : %d\n", static_cast<int>(algorithm));
-    auto pathfinder = PathFinder::New( *navmesh, algorithm );
+    auto pathfinder = PathFinder::New(*navmesh, algorithm);
 
     DALI_TEST_CHECK(navmesh);
     DALI_TEST_CHECK(pathfinder);
 
     {
       Vector3 from(-6.0767, -1.7268, 0.1438); // ground floor
-      Vector3 to(-6.0767, -1.7268, 4.287); // first floor
+      Vector3 to(-6.0767, -1.7268, 4.287);    // first floor
 
       auto waypoints = pathfinder->FindPath(from, to);
       DALI_TEST_NOT_EQUALS(int(waypoints.size()), 0, 0, TEST_LOCATION);
 
       // Results are verified in the Blender
-      std::vector<uint32_t> expectedResults =
-      {154, 58, 85, 106, 128, 132, 137};
+      std::vector<FaceIndex> expectedResults =
+        {154, 58, 85, 106, 128, 132, 137};
 
       DALI_TEST_EQUALS(CompareResults(expectedResults, waypoints), true, TEST_LOCATION);
 
       // Verify last and first points by finding floor points
       {
-        Vector3  verifyPos = Vector3::ZERO;
-        uint32_t verifyIndex  = NavigationMesh::NULL_FACE;
-        auto     result = navmesh->FindFloor(from, verifyPos, verifyIndex);
+        Vector3   verifyPos   = Vector3::ZERO;
+        FaceIndex verifyIndex = NavigationMesh::NULL_FACE;
+        auto      result      = navmesh->FindFloor(from, verifyPos, verifyIndex);
 
         DALI_TEST_EQUALS(result, true, TEST_LOCATION);
         DALI_TEST_EQUALS(verifyPos, waypoints[0].GetScenePosition(), TEST_LOCATION);
@@ -202,9 +201,9 @@ int UtcDaliPathFinderFindShortestPath1(void)
       }
 
       {
-        Vector3  verifyPos = Vector3::ZERO;
-        uint32_t verifyIndex  = NavigationMesh::NULL_FACE;
-        auto     result = navmesh->FindFloor(to, verifyPos, verifyIndex);
+        Vector3   verifyPos   = Vector3::ZERO;
+        FaceIndex verifyIndex = NavigationMesh::NULL_FACE;
+        auto      result      = navmesh->FindFloor(to, verifyPos, verifyIndex);
 
         DALI_TEST_EQUALS(result, true, TEST_LOCATION);
         DALI_TEST_EQUALS(verifyPos, waypoints.back().GetScenePosition(), TEST_LOCATION);

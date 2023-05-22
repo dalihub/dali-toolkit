@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
  *
  */
 
-// EXTERNAL INCLUDES
+// CLASS HEADER
 #include <dali-toolkit/internal/text/spannable/span-ranges-container-impl.h>
-#include <map>
+
+// EXTERNAL INCLUDES
+#include <dali/devel-api/common/map-wrapper.h>
+#include <utility>
 
 namespace Dali
 {
@@ -30,7 +33,13 @@ namespace Internal
 {
 struct SpanRangesContainer::Impl
 {
-  std::map<Dali::Toolkit::Text::BaseSpan, Dali::Toolkit::Text::Range> mSpanWithRanges; ///< The list of style-span
+  using SpanId = uint32_t;
+
+  // Key : BaseSpan, Value : <Range, Added order>
+  using SpanRangeContainer = std::map<Dali::Toolkit::Text::BaseSpan, std::pair<Dali::Toolkit::Text::Range, SpanId>>;
+
+  SpanRangeContainer mSpanWithRanges{}; ///< The list of style-span
+  SpanId             mSpanId{0};        ///< The global id for each added Span. It will be used when we determine order of span.
 };
 
 SpanRangesContainer::SpanRangesContainer()
@@ -44,7 +53,7 @@ SpanRangesContainer::~SpanRangesContainer()
 
 void SpanRangesContainer::AddSpan(const Dali::Toolkit::Text::BaseSpan& span, const Dali::Toolkit::Text::Range& range)
 {
-  mImpl->mSpanWithRanges.insert(std::make_pair(span, range));
+  mImpl->mSpanWithRanges.insert(std::make_pair(span, std::make_pair(range, mImpl->mSpanId++)));
 }
 
 void SpanRangesContainer::RemoveSpan(const Dali::Toolkit::Text::BaseSpan& span)
@@ -54,29 +63,48 @@ void SpanRangesContainer::RemoveSpan(const Dali::Toolkit::Text::BaseSpan& span)
 
 bool SpanRangesContainer::Contains(const Dali::Toolkit::Text::BaseSpan& span) const
 {
-  std::map<Dali::Toolkit::Text::BaseSpan, Dali::Toolkit::Text::Range>::iterator it = mImpl->mSpanWithRanges.find(span);
+  const auto it = mImpl->mSpanWithRanges.find(span);
 
   return it != mImpl->mSpanWithRanges.end();
 }
 
 void SpanRangesContainer::GetSpans(std::vector<Dali::Toolkit::Text::BaseSpan>& listOfSpans) const
 {
-  for(std::map<Dali::Toolkit::Text::BaseSpan, Dali::Toolkit::Text::Range>::iterator it = mImpl->mSpanWithRanges.begin();
-      it != mImpl->mSpanWithRanges.end();
-      ++it)
+  std::map<Impl::SpanId, Dali::Toolkit::Text::BaseSpan> reorderedListOfSpans;
+
+  listOfSpans.reserve(listOfSpans.size() + mImpl->mSpanWithRanges.size());
+
+  // At first, sort the list of spans ordered by added time.
+  for(auto iter = mImpl->mSpanWithRanges.begin(), iterEnd = mImpl->mSpanWithRanges.end(); iter != iterEnd; ++iter)
   {
-    listOfSpans.push_back(it->first);
+    reorderedListOfSpans.insert(std::make_pair(iter->second.second, iter->first));
+  }
+
+  // Retrieve result.
+  for(auto iter = reorderedListOfSpans.begin(), iterEnd = reorderedListOfSpans.end(); iter != iterEnd; ++iter)
+  {
+    listOfSpans.push_back(iter->second);
   }
 }
 
 void SpanRangesContainer::GetSpansAndRanges(std::vector<Dali::Toolkit::Text::BaseSpan>& spans, std::vector<Dali::Toolkit::Text::Range>& ranges) const
 {
-  for(std::map<Dali::Toolkit::Text::BaseSpan, Dali::Toolkit::Text::Range>::iterator it = mImpl->mSpanWithRanges.begin();
-      it != mImpl->mSpanWithRanges.end();
-      ++it)
+  std::map<Impl::SpanId, std::pair<Dali::Toolkit::Text::BaseSpan, Dali::Toolkit::Text::Range>> reorderedListOfSpansWithRanges;
+
+  spans.reserve(spans.size() + mImpl->mSpanWithRanges.size());
+  ranges.reserve(ranges.size() + mImpl->mSpanWithRanges.size());
+
+  // At first, sort the list of spans ordered by added time.
+  for(auto iter = mImpl->mSpanWithRanges.begin(), iterEnd = mImpl->mSpanWithRanges.end(); iter != iterEnd; ++iter)
   {
-    spans.push_back(it->first);
-    ranges.push_back(it->second);
+    reorderedListOfSpansWithRanges.insert(std::make_pair(iter->second.second, std::make_pair(iter->first, iter->second.first)));
+  }
+
+  // Retrieve result.
+  for(auto iter = reorderedListOfSpansWithRanges.begin(), iterEnd = reorderedListOfSpansWithRanges.end(); iter != iterEnd; ++iter)
+  {
+    spans.push_back(iter->second.first);
+    ranges.push_back(iter->second.second);
   }
 }
 } // namespace Internal

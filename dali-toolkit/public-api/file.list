@@ -32,6 +32,13 @@ SET( public_api_src_files
   ${public_api_src_dir}/image-loader/image-url.cpp
   ${public_api_src_dir}/image-loader/async-image-loader.cpp
   ${public_api_src_dir}/image-loader/sync-image-loader.cpp
+  ${public_api_src_dir}/particle-system/particle.cpp
+  ${public_api_src_dir}/particle-system/particle-domain.cpp
+  ${public_api_src_dir}/particle-system/particle-emitter.cpp
+  ${public_api_src_dir}/particle-system/particle-list.cpp
+  ${public_api_src_dir}/particle-system/particle-modifier.cpp
+  ${public_api_src_dir}/particle-system/particle-renderer.cpp
+  ${public_api_src_dir}/particle-system/particle-source.cpp
   ${public_api_src_dir}/styling/style-manager.cpp
   ${public_api_src_dir}/transition/fade-transition.cpp
   ${public_api_src_dir}/transition/slide-transition.cpp
@@ -157,6 +164,17 @@ SET( public_api_visuals_header_files
   ${public_api_src_dir}/visuals/text-visual-properties.h
 )
 
+SET( public_api_particle_system_header_files
+  ${public_api_src_dir}/particle-system/particle-domain.h
+  ${public_api_src_dir}/particle-system/particle-emitter.h
+  ${public_api_src_dir}/particle-system/particle.h
+  ${public_api_src_dir}/particle-system/particle-list.h
+  ${public_api_src_dir}/particle-system/particle-modifier.h
+  ${public_api_src_dir}/particle-system/particle-renderer.h
+  ${public_api_src_dir}/particle-system/particle-source.h
+  ${public_api_src_dir}/particle-system/particle-types.h
+)
+
 SET( public_api_transition_header_files
   ${public_api_src_dir}/transition/fade-transition.h
   ${public_api_src_dir}/transition/slide-transition.h
@@ -192,4 +210,5 @@ SET( PUBLIC_API_HEADERS ${PUBLIC_API_HEADERS}
   ${public_api_visuals_header_files}
   ${public_api_camera_view_header_files}
   ${public_api_gl_view_header_files}
+  ${public_api_particle_system_header_files}
 )

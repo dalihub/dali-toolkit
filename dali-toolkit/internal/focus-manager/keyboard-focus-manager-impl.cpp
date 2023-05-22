@@ -1014,23 +1014,16 @@ void KeyboardFocusManager::OnTouch(const TouchEvent& touch)
     {
       return;
     }
+    // If mClearFocusOnTouch is false, do not clear the focus indicator even if user touch the screen.
+    if(mClearFocusOnTouch)
+    {
+      ClearFocusIndicator();
+    }
+
     // If KEYBOARD_FOCUSABLE and TOUCH_FOCUSABLE is true, set focus actor
     if(hitActor && hitActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && hitActor.GetProperty<bool>(DevelActor::Property::TOUCH_FOCUSABLE))
     {
-      // If mClearFocusOnTouch is false, do not clear the focus
-      if(mClearFocusOnTouch)
-      {
-        ClearFocus();
-      }
       SetCurrentFocusActor(hitActor);
-    }
-    else
-    {
-      // If mClearFocusOnTouch is false, do not clear the focus indicator even if user touch the screen.
-      if(mClearFocusOnTouch)
-      {
-        ClearFocusIndicator();
-      }
     }
   }
 }

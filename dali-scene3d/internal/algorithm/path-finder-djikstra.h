@@ -54,11 +54,11 @@ public:
    * @param[in] polyIndexTo Index of end polygon
    * @return List of waypoints for path
    */
-  Scene3D::Algorithm::WayPointList FindPath(uint32_t sourcePolyIndex, uint32_t targetPolyIndex) override;
+  Scene3D::Algorithm::WayPointList FindPath(FaceIndex sourcePolyIndex, FaceIndex targetPolyIndex) override;
 
-  [[nodiscard]] inline const NavigationMesh::Face* Face(uint32_t i) const
+  [[nodiscard]] inline const NavigationMesh::Face* Face(FaceIndex faceIndex) const
   {
-    return mNavigationMesh->GetFace(i);
+    return mNavigationMesh->GetFace(faceIndex);
   }
 
   /**
@@ -74,16 +74,15 @@ public:
    */
   struct FaceNode
   {
-    uint32_t faceIndex; ///< Index of face which is associated with node
-
     // neighbours
-    uint32_t faces[3]; ///< List of neighbouring faces (max 3 for a triangle)
-    uint32_t edges[3]; ///< List of edges (max 3 for a triangle)
-    float    weight[3]; ///< List of weights (by distance) to each neighbour
+    FaceIndex faces[3];  ///< List of neighbouring faces (max 3 for a triangle)
+    EdgeIndex edges[3];  ///< List of edges (max 3 for a triangle)
+    float     weight[3]; ///< List of weights (by distance) to each neighbour
   };
+  using FaceNodeIndex = FaceIndex;
 
   NavigationMesh*       mNavigationMesh; ///< Pointer to a valid NavigationMesh
-  std::vector<FaceNode> mNodes; ///< List of nodes
+  std::vector<FaceNode> mNodes;          ///< List of nodes
 };
 } // namespace Dali::Scene3D::Internal::Algorithm
 #endif // DALI_SCENE3D_INTERNAL_PATH_FINDER_DJIKSTRA_H
