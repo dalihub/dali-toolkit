@@ -34,6 +34,7 @@ SET(TC_SOURCES
   utc-Dali-StringCallback.cpp
   utc-Dali-Utils.cpp
   utc-Dali-ViewProjection.cpp
+  utc-Dali-Light.cpp
 )
 
 # List of test harness files (Won't get parsed for test cases)
