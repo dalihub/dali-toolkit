@@ -32,7 +32,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/environment-map-load-task.h>
-#include <dali-scene3d/internal/common/image-based-light-observer.h>
+#include <dali-scene3d/internal/common/light-observer.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
 namespace Dali
@@ -104,14 +104,14 @@ public:
    *
    * @param[in] item scene observer to be registered.
    */
-  void RegisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* item);
+  void RegisterSceneItem(Scene3D::Internal::LightObserver* item);
 
   /**
    * @brief Unregister an item
    *
    * @param[in] item scene observer to be unregistered.
    */
-  void UnregisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* item);
+  void UnregisterSceneItem(Scene3D::Internal::LightObserver* item);
 
   /**
    * @copydoc SceneView::SetImageBasedLightSource()
@@ -127,6 +127,30 @@ public:
    * @copydoc SceneView::GetImageBasedLightScaleFactor()
    */
   float GetImageBasedLightScaleFactor() const;
+
+  /**
+   * @brief Adds a Light object to this SceneView.
+   * Multiple light object can be added on this SceneView
+   * But the number of lights those actually turned on has limitation.
+   * Scene3D::Light::GetMaximumEnabledLightCount() method can be used to know the maximum namber.
+   *
+   * @param[in] light Light object to be added.
+   */
+  void AddLight(Scene3D::Light light);
+
+  /**
+   * @brief Removes a Light object to this SceneView.
+   * If the light is currently turned on, and SceneView has lights more than maximum number of enabled light.
+   * One of light in queue is turned on after this light is removed.
+   *
+   * @param[in] light Light object to be removed.
+   */
+  void RemoveLight(Scene3D::Light light);
+
+  /**
+   * @copydoc SceneView::GetActivatedLightCount()
+   */
+  uint32_t GetActivatedLightCount() const;
 
   /**
    * @copydoc SceneView::UseFramebuffer()
@@ -290,6 +314,22 @@ private:
    */
   void NotifyImageBasedLightTextureChange();
 
+  /**
+   * @brief Internal method to add an Light object to this SceneView.
+   *
+   * @param[in] light Light object to be added.
+   * @return True if successed to enable.
+   */
+  bool AddLightInternal(Scene3D::Light light);
+
+  /**
+   * @brief Internal method to remove an Light object to this SceneView.
+   *
+   * @param[in] light Light object to be added.
+   * @return Index of removed light in enabled light list. If failed to remove it returns negative value;
+   */
+  int32_t RemoveLightInternal(Scene3D::Light light);
+
 private:
   Toolkit::Visual::Base mVisual;
 
@@ -299,7 +339,7 @@ private:
   CameraActor                                              mDefaultCamera;
   CameraActor                                              mSelectedCamera;
   std::vector<CameraActor>                                 mCameras;
-  std::vector<Scene3D::Internal::ImageBasedLightObserver*> mItems;
+  std::vector<Scene3D::Internal::LightObserver*> mItems;
   Dali::FrameBuffer                                        mFrameBuffer;
   Dali::Texture                                            mTexture;
   Dali::RenderTask                                         mRenderTask;
@@ -309,6 +349,11 @@ private:
   Quaternion                                               mSkyboxOrientation;
   float                                                    mSkyboxIntensity{1.0f};
   uint8_t                                                  mFrameBufferMultiSamplingLevel{4u};
+
+  // Light
+  std::vector<std::pair<Scene3D::Light, bool>> mLights; // Pair of Light object and flag that denotes the light is currently activated or not.
+  std::vector<Scene3D::Light>                  mActivatedLights;
+  uint32_t                                     mActivatedLightCount{0u};  
 
   // Asynchronous Loading.
   EnvironmentMapLoadTaskPtr mSkyboxLoadTask;

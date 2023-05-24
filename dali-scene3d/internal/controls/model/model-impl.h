@@ -29,10 +29,11 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/environment-map-load-task.h>
-#include <dali-scene3d/internal/common/image-based-light-observer.h>
+#include <dali-scene3d/internal/common/light-observer.h>
 #include <dali-scene3d/internal/common/model-load-task.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
+#include <dali-scene3d/public-api/light/light.h>
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 
@@ -47,7 +48,7 @@ namespace Internal
 /**
  * @brief Impl class for Model.
  */
-class Model : public Dali::Toolkit::Internal::Control, public ImageBasedLightObserver
+class Model : public Dali::Toolkit::Internal::Control, public LightObserver
 {
 public:
   using AnimationData = std::pair<std::string, Dali::Animation>;
@@ -247,16 +248,26 @@ private:
    */
   void ApplyCameraTransform(Dali::CameraActor camera) const;
 
-public: // Overrides ImageBasedLightObserver Methods.
+public: // Overrides LightObserver Methods.
   /**
-   * @copydoc Dali::Scene3D::Internal::ImageBasedLightObserver::NotifyImageBasedLightTexture()
+   * @copydoc Dali::Scene3D::Internal::LightObserver::NotifyImageBasedLightTexture()
    */
   void NotifyImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor, uint32_t specularMipmapLevels) override;
 
   /**
-   * @copydoc Dali::Scene3D::Internal::ImageBasedLightObserver::NotifyImageBasedLightScaleFactor()
+   * @copydoc Dali::Scene3D::Internal::LightObserver::NotifyImageBasedLightScaleFactor()
    */
   void NotifyImageBasedLightScaleFactor(float scaleFactor) override;
+
+  /**
+   * @copydoc Dali::Scene3D::Internal::LightObserver::NotifyLightAdded()
+   */
+  void NotifyLightAdded(uint32_t lightIndex, Scene3D::Light light) override;
+
+  /**
+   * @copydoc Dali::Scene3D::Internal::LightObserver::NotifyLightRemoved()
+   */
+  void NotifyLightRemoved(uint32_t lightIndex) override;
 
 private:
   /**
@@ -322,6 +333,9 @@ private:
   std::vector<CameraData>        mCameraParameters;
   WeakHandle<Scene3D::SceneView> mParentSceneView;
   Dali::PropertyNotification     mSizeNotification;
+
+  // Light
+  std::vector<Scene3D::Light> mLights;
 
   // Asynchronous loading variable
   ModelLoadTaskPtr          mModelLoadTask;

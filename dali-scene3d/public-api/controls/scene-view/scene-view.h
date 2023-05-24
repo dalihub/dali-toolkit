@@ -295,6 +295,14 @@ public:
   float GetImageBasedLightScaleFactor() const;
 
   /**
+   * @brief Gets Enabled Light Count of this SceneView
+   *
+   * @SINCE_2_2.32
+   * @return The number of enabled light count;
+   */
+  uint32_t GetActivatedLightCount() const;
+
+  /**
    * @brief Sets whether to use FBO or not for the SceneView.
    * If useFramebuffer is true, rendering result of SceneView is drawn on FBO and it is mapping on this SceneView plane.
    * If useFramebuffer is false, each item in SceneView is rendered on window directly.

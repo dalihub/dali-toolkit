@@ -20,10 +20,12 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/material-impl.h>
 #include <dali-scene3d/public-api/loader/environment-definition.h>
 
@@ -52,6 +54,8 @@ constexpr std::string_view MORPH_POSITION_KEYWORD    = "MORPH_POSITION";
 constexpr std::string_view MORPH_NORMAL_KEYWORD      = "MORPH_NORMAL";
 constexpr std::string_view MORPH_TANGENT_KEYWORD     = "MORPH_TANGENT";
 constexpr std::string_view MORPH_VERSION_2_0_KEYWORD = "MORPH_VERSION_2_0";
+
+static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG = 10;
 } // unnamed namespace
 
 ModelPrimitivePtr ModelPrimitive::New()
@@ -78,6 +82,7 @@ ModelPrimitive::~ModelPrimitive()
 
 void ModelPrimitive::Initialize()
 {
+  mLights.resize(Scene3D::Internal::Light::GetMaximumEnabledLightCount());
 }
 
 void ModelPrimitive::SetRenderer(Dali::Renderer renderer)
@@ -173,6 +178,52 @@ void ModelPrimitive::SetImageBasedLightScaleFactor(float iblScaleFactor)
   {
     mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightScaleFactorName().data(), iblScaleFactor);
   }
+}
+
+void ModelPrimitive::AddLight(Scene3D::Light light, uint32_t lightIndex)
+{
+  if(mLights[lightIndex])
+  {
+    RemoveLight(lightIndex);
+  }
+
+  mLights[lightIndex] = light;
+  // TODO  Remove light at lightIndex if it is already set.
+  if(mRenderer && mMaterial)
+  {
+    mLightCount++;
+    std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
+    mRenderer.RegisterProperty(lightCountPropertyName, mLightCount);
+
+    std::string lightDirectionPropertyName(Scene3D::Internal::Light::GetLightDirectionUniformName());
+    lightDirectionPropertyName += "[" + std::to_string(lightIndex) + "]";
+    auto             lightDirectionPropertyIndex = mRenderer.RegisterProperty(lightDirectionPropertyName, Vector3::ZAXIS);
+    Dali::Constraint lightDirectionConstraint    = Dali::Constraint::New<Vector3>(mRenderer, lightDirectionPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
+                                                                               { output = inputs[0]->GetQuaternion().Rotate(Vector3::ZAXIS); });
+    lightDirectionConstraint.AddSource(Source{light, Dali::Actor::Property::WORLD_ORIENTATION});
+    lightDirectionConstraint.ApplyPost();
+    lightDirectionConstraint.SetTag(INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
+
+    std::string lightColorPropertyName(Scene3D::Internal::Light::GetLightColorUniformName());
+    lightColorPropertyName += "[" + std::to_string(lightIndex) + "]";
+    auto             lightColorPropertyIndex = mRenderer.RegisterProperty(lightColorPropertyName, Vector3(Color::WHITE));
+    Dali::Constraint lightColorConstraint    = Dali::Constraint::New<Vector3>(mRenderer, lightColorPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
+                                                                           { output = Vector3(inputs[0]->GetVector4()); });
+    lightColorConstraint.AddSource(Source{light, Dali::Actor::Property::COLOR});
+    lightColorConstraint.ApplyPost();
+    lightColorConstraint.SetTag(INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
+  }
+}
+
+void ModelPrimitive::RemoveLight(uint32_t lightIndex)
+{
+  mLightCount--;
+  std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
+  mRenderer.RegisterProperty(lightCountPropertyName, mLightCount);
+
+  mRenderer.RemoveConstraints(INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
+
+  mLights[lightIndex].Reset();
 }
 
 void ModelPrimitive::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData& data)
@@ -338,6 +389,16 @@ void ModelPrimitive::CreateRenderer()
   mRenderer = Renderer::New(mGeometry, mShader);
   mRenderer.SetTextures(mTextureSet);
   UpdateRendererUniform();
+
+  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
+  for(uint32_t i = 0; i < maxLightCount; ++i)
+  {
+    if(mLights[i])
+    {
+      AddLight(mLights[i], i);
+    }
+  }
+
   for(auto* observer : mObservers)
   {
     observer->OnRendererCreated(mRenderer);

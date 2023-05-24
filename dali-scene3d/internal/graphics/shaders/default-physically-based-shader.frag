@@ -72,6 +72,12 @@ uniform sampler2D sSpecular;
 uniform sampler2D sSpecularColor;
 #endif
 
+// For Light (Currently Directional Only)
+#define MAX_LIGHTS 5
+uniform mediump int uLightCount;
+uniform mediump vec3 uLightDirection[MAX_LIGHTS];
+uniform mediump vec3 uLightColor[MAX_LIGHTS];
+
 //// For IBL
 uniform sampler2D sbrdfLUT;
 uniform samplerCube sDiffuseEnvSampler;
@@ -94,6 +100,7 @@ in highp vec3 vPositionToCamera;
 out vec4 FragColor;
 
 const float c_MinRoughness = 0.04;
+const float M_PI = 3.141592653589793;
 
 vec3 linear(vec3 color)
 {
@@ -200,6 +207,42 @@ void main()
   lowp vec3 diffuse = (FmsEms + k_D) * irradiance;
 
   lowp vec3 color = (diffuse + specular) * uIblIntensity;
+
+  // Punctual Light
+  if(uLightCount > 0)
+  {
+    // Compute reflectance.
+    lowp float reflectance = max(max(f0.r, f0.g), f0.b);
+    lowp float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);
+    lowp float r = perceptualRoughness * perceptualRoughness;
+    lowp float attenuationV = 2.0 * NdotV / (NdotV + sqrt(r * r + (1.0 - r * r) * (NdotV * NdotV)));
+    mediump float roughnessSq = r * r;
+    lowp vec3 diffuseColorPunctual = baseColor.rgb * (vec3(1.0) - f0);
+    diffuseColorPunctual *= ( 1.0 - metallic );
+
+    for(int i = 0; i < uLightCount; ++i)
+    {
+      mediump vec3 l = normalize(-uLightDirection[i]);               // Vector from surface point to light
+      mediump vec3 h = normalize(l+v);                              // Half vector between both l and v
+      mediump float VdotH = dot(v, h);
+      lowp vec3 specularReflection = f0 + (reflectance90 - f0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
+
+      mediump float NdotL = clamp(dot(n, l), 0.001, 1.0);
+      lowp float attenuationL = 2.0 * NdotL / (NdotL + sqrt(r * r + (1.0 - r * r) * (NdotL * NdotL)));
+      lowp float geometricOcclusion = attenuationL * attenuationV;
+
+      mediump float NdotH = dot(n, h);
+      lowp float f = (NdotH * roughnessSq - NdotH) * NdotH + 1.0;
+      lowp float microfacetDistribution = roughnessSq / (M_PI * f * f);;
+
+      // Calculation of analytical lighting contribution
+      lowp vec3 diffuseContrib = ( 1.0 - specularReflection ) * ( diffuseColorPunctual / M_PI );
+      lowp vec3 specContrib = specularReflection * geometricOcclusion * microfacetDistribution / ( 4.0 * NdotL * NdotV );
+
+      // Obtain final intensity as reflectance (BRDF) scaled by the energy of the light (cosine law)
+      color += NdotL * uLightColor[i] * (diffuseContrib + specContrib);
+    }
+  }
 
 #ifdef OCCLUSION
   lowp float ao = texture(sOcclusion, vUV).r;

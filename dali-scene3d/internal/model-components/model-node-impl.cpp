@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/model-components/model-primitive-impl.h>
+#include <dali-scene3d/internal/light/light-impl.h>
 
 namespace Dali
 {
@@ -74,6 +75,7 @@ ModelNode::~ModelNode()
 void ModelNode::Initialize()
 {
   OnInitialize();
+  mLights.resize(Scene3D::Internal::Light::GetMaximumEnabledLightCount());
 }
 
 void ModelNode::OnInitialize()
@@ -191,6 +193,15 @@ void ModelNode::AddModelPrimitive(Dali::Scene3D::ModelPrimitive modelPrimitive)
     GetImplementation(modelPrimitive).SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor, mSpecularMipmapLevels);
   }
 
+  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
+  for(uint32_t i = 0; i < maxLightCount; ++i)
+  {
+    if(mLights[i])
+    {
+      GetImplementation(modelPrimitive).AddLight(mLights[i], i);
+    }
+  }
+
   Dali::Renderer renderer = GetImplementation(modelPrimitive).GetRenderer();
   if(renderer)
   {
@@ -220,6 +231,7 @@ void ModelNode::RemoveModelPrimitive(Dali::Scene3D::ModelPrimitive modelPrimitiv
     {
       continue;
     }
+
     RemoveModelPrimitive(i);
     break;
   }
@@ -230,6 +242,15 @@ void ModelNode::RemoveModelPrimitive(uint32_t index)
   if(index >= mModelPrimitiveContainer.size())
   {
     return;
+  }
+
+  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
+  for(uint32_t i = 0; i < maxLightCount; ++i)
+  {
+    if(mLights[i])
+    {
+      GetImplementation(mModelPrimitiveContainer[index]).RemoveLight(i);
+    }
   }
 
   Actor self = Self();
@@ -278,6 +299,24 @@ void ModelNode::SetImageBasedLightScaleFactor(float iblScaleFactor)
   {
     GetImplementation(primitive).SetImageBasedLightScaleFactor(iblScaleFactor);
   }
+}
+
+void ModelNode::AddLight(Scene3D::Light light, uint32_t lightIndex)
+{
+  mLights[lightIndex] = light;
+  for(auto&& primitive : mModelPrimitiveContainer)
+  {
+    GetImplementation(primitive).AddLight(light, lightIndex);
+  }
+}
+
+void ModelNode::RemoveLight(uint32_t lightIndex)
+{
+  for(auto&& primitive : mModelPrimitiveContainer)
+  {
+    GetImplementation(primitive).RemoveLight(lightIndex);
+  }
+  mLights[lightIndex].Reset();
 }
 
 void ModelNode::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData& data, Scene3D::ModelPrimitive primitive)

@@ -117,6 +117,11 @@ float SceneView::GetImageBasedLightScaleFactor() const
   return GetImpl(*this).GetImageBasedLightScaleFactor();
 }
 
+uint32_t SceneView::GetActivatedLightCount() const
+{
+  return GetImpl(*this).GetActivatedLightCount();
+}
+
 void SceneView::UseFramebuffer(bool useFramebuffer)
 {
   GetImpl(*this).UseFramebuffer(useFramebuffer);

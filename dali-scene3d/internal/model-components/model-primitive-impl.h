@@ -29,6 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/model-components/material-modify-observer.h>
 #include <dali-scene3d/internal/model-components/model-primitive-modify-observer.h>
+#include <dali-scene3d/public-api/light/light.h>
 #include <dali-scene3d/public-api/loader/blend-shape-details.h>
 #include <dali-scene3d/public-api/loader/mesh-definition.h>
 #include <dali-scene3d/public-api/model-components/material.h>
@@ -139,6 +140,21 @@ public:
   void SetImageBasedLightScaleFactor(float iblScaleFactor);
 
   /**
+   * @brief Adds a Light on this medel primitive
+   *
+   * @param[in] light Added light.
+   * @param[in] lightIndex Index of added light.
+   */
+  void AddLight(Scene3D::Light light, uint32_t lightIndex);
+
+  /**
+   * @brief Removes a light at the lightIndex of this model primitive
+   *
+   * @param[in] lightIndex Index of added light.
+   */
+  void RemoveLight(uint32_t lightIndex);
+
+  /**
    * @brief Sets the blend shape data for this model primitive.
    *
    * @param[in] data The blend shape data to set.
@@ -197,9 +213,9 @@ private:
 
 private:
   // Delete copy & move operator
-  ModelPrimitive(const ModelPrimitive&)                = delete;
-  ModelPrimitive(ModelPrimitive&&)                     = delete;
-  ModelPrimitive& operator=(const ModelPrimitive& rhs) = delete;
+  ModelPrimitive(const ModelPrimitive&)                    = delete;
+  ModelPrimitive(ModelPrimitive&&)                         = delete;
+  ModelPrimitive& operator=(const ModelPrimitive& rhs)     = delete;
   ModelPrimitive& operator=(ModelPrimitive&& rhs) noexcept = delete;
 
 private:
@@ -211,6 +227,10 @@ private:
   Dali::Shader            mShader;
   Dali::TextureSet        mTextureSet;
   Dali::Scene3D::Material mMaterial;
+
+  // Light
+  std::vector<Scene3D::Light> mLights;
+  int32_t                     mLightCount{0};
 
   // For IBL
   Dali::Texture mSpecularTexture;
