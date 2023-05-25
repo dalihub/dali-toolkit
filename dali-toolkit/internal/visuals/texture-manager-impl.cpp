@@ -540,7 +540,11 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     case TextureManager::MASK_APPLYING:
     case TextureManager::MASK_APPLIED:
     {
-      ObserveTexture( textureInfo, observer );
+      // Do not observe even we reload forced when texture is already loading state.
+      if(TextureManager::ReloadPolicy::FORCED != reloadPolicy)
+      {
+        ObserveTexture( textureInfo, observer );
+      }
       break;
     }
     case TextureManager::UPLOADED:
@@ -803,9 +807,12 @@ void TextureManager::LoadOrQueueTexture( TextureInfo& textureInfo, TextureUpload
       {
         // The Texture has already loaded. The other observers have already been notified.
         // We need to send a "late" loaded notification for this observer.
-        observer->UploadComplete( true, textureInfo.textureId, textureInfo.textureSet,
-                                  textureInfo.useAtlas, textureInfo.atlasRect,
-                                  textureInfo.preMultiplied );
+        if( observer )
+        {
+          observer->UploadComplete( true, textureInfo.textureId, textureInfo.textureSet,
+                                    textureInfo.useAtlas, textureInfo.atlasRect,
+                                    textureInfo.preMultiplied );
+        }
       }
       break;
     }
@@ -826,7 +833,10 @@ void TextureManager::QueueLoadTexture( TextureInfo& textureInfo, TextureUploadOb
   auto textureId = textureInfo.textureId;
   mLoadQueue.PushBack( LoadQueueElement( textureId, observer) );
 
-  observer->DestructionSignal().Connect( this, &TextureManager::ObserverDestroyed );
+  if( observer )
+  {
+    observer->DestructionSignal().Connect( this, &TextureManager::ObserverDestroyed );
+  }
 }
 
 void TextureManager::LoadTexture( TextureInfo& textureInfo, TextureUploadObserver* observer )
@@ -1153,8 +1163,8 @@ void TextureManager::NotifyObservers( TextureInfo& textureInfo, bool success )
     // invalidating the reference to the textureInfo struct.
     // Texture load requests for the same URL are deferred until the end of this
     // method.
-    DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "NotifyObservers() url:%s loadState:%s\n",
-                   textureInfo.url.GetUrl().c_str(), GET_LOAD_STATE_STRING(textureInfo.loadState ) );
+    DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "NotifyObservers() observer:%p url:%s loadState:%s\n",
+                   observer, textureInfo.url.GetUrl().c_str(), GET_LOAD_STATE_STRING(textureInfo.loadState ) );
 
     // It is possible for the observer to be deleted.
     // Disconnect and remove the observer first.
