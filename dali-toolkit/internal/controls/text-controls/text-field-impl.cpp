@@ -1104,6 +1104,7 @@ void TextField::EnableClipping()
     mStencil = Control::New();
     mStencil.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
     mStencil.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+    mStencil.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, true);
 
     // Creates a background visual. Even if the color is transparent it updates the stencil.
     mStencil.SetProperty(Toolkit::Control::Property::BACKGROUND,
