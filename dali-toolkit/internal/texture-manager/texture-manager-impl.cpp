@@ -625,7 +625,11 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
       case TextureManager::LoadState::MASK_APPLYING:
       case TextureManager::LoadState::MASK_APPLIED:
       {
-        ObserveTexture(textureInfo, observer);
+        // Do not observe even we reload forced when texture is already loading state.
+        if(TextureManager::ReloadPolicy::FORCED != reloadPolicy)
+        {
+          ObserveTexture(textureInfo, observer);
+        }
         break;
       }
       case TextureManager::LoadState::UPLOADED:
@@ -782,7 +786,7 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId)
         }
       }
 
-      DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::Remove( textureId=%d ) cacheIndex:%d removal maskTextureId=%d, loadingQueueTextureId=%d, loadState=%s\n", textureId, textureCacheIndex.GetIndex(), maskTextureId, mLoadingQueueTextureId, GET_LOAD_STATE_STRING(textureInfo.loadState));
+      DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::Remove( textureId=%d ) cacheIndex:%d removal maskTextureId=%d, loadState=%s\n", textureId, textureCacheIndex.GetIndex(), maskTextureId, GET_LOAD_STATE_STRING(textureInfo.loadState));
 
       // Remove textureId in CacheManager. Now, textureInfo is invalidate.
       mTextureCacheManager.RemoveCache(textureInfo);
@@ -794,6 +798,9 @@ void TextureManager::Remove(const TextureManager::TextureId& textureId)
         if(maskCacheIndex != INVALID_CACHE_INDEX)
         {
           TextureInfo& maskTextureInfo(mTextureCacheManager[maskCacheIndex]);
+
+          DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::Remove mask texture( maskTextureId=%d ) cacheIndex:%d, loadState=%s\n", maskTextureId, maskCacheIndex.GetIndex(), GET_LOAD_STATE_STRING(maskTextureInfo.loadState));
+
           mTextureCacheManager.RemoveCache(maskTextureInfo);
         }
       }
@@ -913,7 +920,10 @@ void TextureManager::LoadOrQueueTexture(TextureManager::TextureInfo& textureInfo
       {
         // The Texture has already loaded. The other observers have already been notified.
         // We need to send a "late" loaded notification for this observer.
-        EmitLoadComplete(observer, textureInfo, true);
+        if(observer)
+        {
+          EmitLoadComplete(observer, textureInfo, true);
+        }
       }
       break;
     }
@@ -937,6 +947,7 @@ void TextureManager::QueueLoadTexture(const TextureManager::TextureInfo& texture
 
   if(observer)
   {
+    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Connect DestructionSignal to observer:%p\n", observer);
     observer->DestructionSignal().Connect(this, &TextureManager::ObserverDestroyed);
   }
 }
@@ -973,6 +984,9 @@ void TextureManager::ProcessLoadQueue()
     if(cacheIndex != INVALID_CACHE_INDEX)
     {
       TextureInfo& textureInfo(mTextureCacheManager[cacheIndex]);
+
+      DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::ProcessLoadQueue() textureId=%d, observer=%p, cacheIndex=@%d, loadState:%s\n", element.mTextureId, element.mObserver, cacheIndex.GetIndex(), GET_LOAD_STATE_STRING(textureInfo.loadState));
+
       if((textureInfo.loadState == LoadState::UPLOADED) || (textureInfo.loadState == LoadState::LOAD_FINISHED && textureInfo.storageType == StorageType::RETURN_PIXEL_BUFFER))
       {
         if(element.mObserver)
@@ -1003,6 +1017,8 @@ void TextureManager::ObserveTexture(TextureManager::TextureInfo& textureInfo,
   if(observer)
   {
     textureInfo.observerList.PushBack(observer);
+
+    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Connect DestructionSignal to observer:%p\n", observer);
     observer->DestructionSignal().Connect(this, &TextureManager::ObserverDestroyed);
   }
 }
@@ -1345,9 +1361,10 @@ void TextureManager::NotifyObservers(TextureManager::TextureInfo& textureInfo, c
     // invalidating the reference to the textureInfo struct.
     // Texture load requests for the same URL are deferred until the end of this
     // method.
-    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureManager::NotifyObservers() textureId:%d url:%s loadState:%s\n", textureId, info->url.GetUrl().c_str(), GET_LOAD_STATE_STRING(info->loadState));
+    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureManager::NotifyObservers() observer:%p textureId:%d url:%s loadState:%s\n", observer, textureId, info->url.GetUrl().c_str(), GET_LOAD_STATE_STRING(info->loadState));
     // It is possible for the observer to be deleted.
     // Disconnect and remove the observer first.
+    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Disconnect DestructionSignal to observer:%p\n", observer);
     observer->DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);
 
     info->observerList.Erase(info->observerList.End() - 1u);
@@ -1374,6 +1391,8 @@ void TextureManager::NotifyObservers(TextureManager::TextureInfo& textureInfo, c
 
 void TextureManager::ObserverDestroyed(TextureUploadObserver* observer)
 {
+  DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "TextureManager::ObserverDestroyed() observer:%p\n", observer);
+
   const std::size_t size = mTextureCacheManager.size();
   for(TextureCacheIndex cacheIndex = TextureCacheIndex(TextureManagerType::TEXTURE_CACHE_INDEX_TYPE_LOCAL, 0u); cacheIndex.GetIndex() < size; ++cacheIndex.detailValue.index)
   {
@@ -1495,6 +1514,7 @@ void TextureManager::RemoveTextureObserver(TextureManager::TextureInfo& textureI
     if(iter != iterEnd)
     {
       // Disconnect and remove the observer.
+      DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Disconnect DestructionSignal to observer:%p\n", observer);
       observer->DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);
       textureInfo.observerList.Erase(iter);
     }
