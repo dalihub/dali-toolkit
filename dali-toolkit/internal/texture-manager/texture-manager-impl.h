@@ -181,7 +181,8 @@ public:
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in, out] maskInfo         Mask info structure
    * @param[in] synchronousLoading    true if the URL should be loaded synchronously
-   * @param[out] textureId,           The textureId of the URL
+   * @param[in, out] textureId        The textureId of the URL. It is also be used to check the previous textureId
+   *                                  what requestor had. It will be used only ReloadPolicy::FORCED for now.
    * @param[out] textureRect          The rectangle within the texture atlas that this URL occupies,
    *                                  this is the rectangle in normalized coordinates.
    * @param[out] textureRectSize      The rectangle within the texture atlas that this URL occupies,
@@ -371,6 +372,7 @@ public: // Load Request API
     TextureManager::MultiplyOnLoad&     preMultiplyOnLoad,
     const bool&                         synchronousLoading = false);
 
+private: // Internal Load Request API
   /**
    * @brief Requests an image load of the given URL, when the texture has
    * have loaded, it will perform a blend with the image mask, and upload
@@ -384,6 +386,7 @@ public: // Load Request API
    * @param[in] url                   The URL of the image to load
    * @param[in] maskTextureId         The texture id of an image to mask this with
    *                                  (can be INVALID if no masking required)
+   * @param[in] previousTextureId     The texture id of an image which the requestor already has before
    * @param[in] contentScale          The scale factor to apply to the image before masking
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
    * @param[in] fittingMode           The FittingMode to use
@@ -408,6 +411,7 @@ public: // Load Request API
   TextureId RequestLoad(
     const VisualUrl&                    url,
     const TextureManager::TextureId&    maskTextureId,
+    const TextureManager::TextureId&    previousTextureId,
     const float&                        contentScale,
     const ImageDimensions&              desiredSize,
     const Dali::FittingMode::Type&      fittingMode,
@@ -434,7 +438,6 @@ public: // Load Request API
     StorageType      storageType,
     const bool&      synchronousLoading = false);
 
-private:
   /**
    * @brief Requests an image load of the given URL, when the texture has
    * have loaded, if there is a valid maskTextureId, it will perform a
@@ -448,6 +451,8 @@ private:
    * @param[in] url                   The URL of the image to load
    * @param[in] maskTextureId         The texture id of an image to use as a mask. If no mask is required, then set
    *                                  to INVALID_TEXTURE_ID
+   * @param[in] previousTextureId     The texture id of an image which the requestor already has before. It will be used
+   *                                  when reloadPolicy is FORCED.
    * @param[in] contentScale          The scaling factor to apply to the content when masking
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
    * @param[in] fittingMode           The FittingMode to use
@@ -474,6 +479,7 @@ private:
   TextureId RequestLoadInternal(
     const VisualUrl&                    url,
     const TextureManager::TextureId&    maskTextureId,
+    const TextureManager::TextureId&    previousTextureId,
     const float&                        contentScale,
     const Dali::ImageDimensions&        desiredSize,
     const Dali::FittingMode::Type&      fittingMode,
