@@ -38,7 +38,7 @@ const char* BlendShapes::WEIGHTS_UNIFORM("uBlendShapeWeight");
 
 void BlendShapes::ConfigureProperties(const BlendShapeData& data, Renderer renderer)
 {
-  unsigned int index = 0u;
+  uint32_t index = 0u;
 
   char        weightNameBuffer[32];
   char        unnormalizeFactorNameBuffer[64];
@@ -71,8 +71,8 @@ void BlendShapes::ConfigureProperties(const BlendShapeData& data, Renderer rende
       renderer.RegisterProperty(UNNORMALIZE_FACTOR, data.unnormalizeFactors[0u]);
     }
 
-    renderer.RegisterProperty(NUMBER_OF_BLEND_SHAPES, Property::Value(static_cast<float>(index)));
-    renderer.RegisterProperty(COMPONENT_SIZE, Property::Value(static_cast<float>(data.bufferOffset)));
+    renderer.RegisterProperty(NUMBER_OF_BLEND_SHAPES, Property::Value(static_cast<int32_t>(index)));
+    renderer.RegisterProperty(COMPONENT_SIZE, Property::Value(static_cast<int32_t>(data.bufferOffset)));
 
     // Create a read only property to preserve the components of the blend shape.
     renderer.RegisterProperty(COMPONENTS, data.components, Property::AccessMode::READ_ONLY);

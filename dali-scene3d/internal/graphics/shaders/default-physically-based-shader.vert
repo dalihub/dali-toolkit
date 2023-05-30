@@ -46,14 +46,14 @@ uniform mat4 uProjection;
 
 #ifdef MORPH
 #define MAX_BLEND_SHAPE_NUMBER 128
-uniform float uNumberOfBlendShapes;                                       ///< Total number of blend shapes loaded.
+uniform int uNumberOfBlendShapes;                                         ///< Total number of blend shapes loaded.
 uniform highp float uBlendShapeWeight[MAX_BLEND_SHAPE_NUMBER];            ///< The weight of each blend shape.
 #ifdef MORPH_VERSION_2_0
 uniform highp float uBlendShapeUnnormalizeFactor;                         ///< Factor used to unnormalize the geometry of the blend shape.
 #else
 uniform highp float uBlendShapeUnnormalizeFactor[MAX_BLEND_SHAPE_NUMBER]; ///< Factor used to unnormalize the geometry of the blend shape.
 #endif
-uniform highp float uBlendShapeComponentSize;                             ///< The size in the texture of either the vertices, normals or tangents. Used to calculate the offset to address them.
+uniform highp int uBlendShapeComponentSize;                               ///< The size in the texture of either the vertices, normals or tangents. Used to calculate the offset to address them.
 #endif
 
 void main()
@@ -66,10 +66,8 @@ void main()
   int width = textureSize( sBlendShapeGeometry, 0 ).x;
 
   highp int blendShapeBufferOffset = 0;
-  highp int blendShapeComponentSize = int(uBlendShapeComponentSize);
-  int numberOfBlendShapes = int(uNumberOfBlendShapes);
 
-  for( int index = 0; index < numberOfBlendShapes; ++index )
+  for( int index = 0; index < uNumberOfBlendShapes; ++index )
   {
     highp vec3 diff = vec3(0.0);
     highp int vertexId = 0;
@@ -96,12 +94,12 @@ void main()
 
     position.xyz += diff;
 
-    blendShapeBufferOffset += blendShapeComponentSize;
+    blendShapeBufferOffset += uBlendShapeComponentSize;
 #endif
 
 #ifdef MORPH_NORMAL
     // Calculate the index to retrieve the normal from the texture.
-    vertexId = gl_VertexID + int(blendShapeBufferOffset);
+    vertexId = gl_VertexID + blendShapeBufferOffset;
     x = vertexId % width;
     y = vertexId / width;
 
@@ -113,7 +111,7 @@ void main()
 
     normal += diff.xyz;
 
-    blendShapeBufferOffset += blendShapeComponentSize;
+    blendShapeBufferOffset += uBlendShapeComponentSize;
 #endif
 
 #ifdef MORPH_TANGENT
@@ -130,7 +128,7 @@ void main()
 
     tangent += diff.xyz;
 
-    blendShapeBufferOffset += blendShapeComponentSize;
+    blendShapeBufferOffset += uBlendShapeComponentSize;
 #endif
   }
 
