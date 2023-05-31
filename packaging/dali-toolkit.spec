@@ -493,4 +493,5 @@ esac
 %files -n %{dali2_scene3d}-devel
 %defattr(-,root,root,-)
 %{_includedir}/dali-scene3d/public-api/*
+%{_includedir}/dali-scene3d/dali-scene3d.h
 %{_libdir}/pkgconfig/dali2-scene3d.pc

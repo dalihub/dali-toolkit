@@ -161,10 +161,14 @@ ELSE()
 ENDIF()
 
 file(GLOB scene3d_include_files ${scene3d_public_api_dir})
+
 install(DIRECTORY ${scene3d_include_files}
-	DESTINATION "${prefix_include_dir}/dali-scene3d"
+	DESTINATION "${INCLUDE_DIR}/dali-scene3d"
 	FILES_MATCHING PATTERN "*.h"
 )
+
+# Install dali-scene3d.h
+INSTALL( FILES ${scene3d_dir}/dali-scene3d.h DESTINATION ${INCLUDE_DIR}/dali-scene3d )
 
 if (ENABLE_PKG_CONFIGURE)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file}
