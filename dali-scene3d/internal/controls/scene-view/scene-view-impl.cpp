@@ -391,7 +391,7 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
   // If diffuse and specular textures are already loaded, emits resource ready signal here.
   if(IsResourceReady())
   {
-    Control::SetResourceReady(false);
+    Control::SetResourceReady();
   }
 }
 
@@ -758,7 +758,7 @@ void SceneView::UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentM
 
   if(IsResourceReady())
   {
-    Control::SetResourceReady(false);
+    Control::SetResourceReady();
   }
 }
 
@@ -778,7 +778,7 @@ void SceneView::OnSkyboxLoadComplete()
   mSkyboxResourceReady = true;
   if(IsResourceReady())
   {
-    Control::SetResourceReady(false);
+    Control::SetResourceReady();
   }
 
   mSkyboxTexture = mSkyboxLoadTask->GetLoadedTexture();
@@ -832,7 +832,7 @@ void SceneView::OnIblLoadComplete()
   NotifyImageBasedLightTextureChange();
   if(IsResourceReady())
   {
-    Control::SetResourceReady(false);
+    Control::SetResourceReady();
   }
 }
 

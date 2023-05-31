@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,8 @@ ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfa
   Graphics::RenderTargetCreateInfo rtInfo{};
   rtInfo.SetExtent({mSurfaceWidth, mSurfaceHeight});
   mScene.SetSurfaceRenderTarget(rtInfo);
+
+  mScenes.push_back(mScene);
 
   // Core needs to be initialized next before we start the adaptor
   InitializeCore();

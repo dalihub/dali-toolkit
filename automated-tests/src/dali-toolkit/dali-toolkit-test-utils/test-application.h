@@ -2,7 +2,7 @@
 #define DALI_TEST_APPLICATION_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public:
   void InitializeCore();
   ~TestApplication() override;
   static void              LogMessage(Dali::Integration::Log::DebugPriority level, std::string& message);
-  static void              LogContext(bool start, const char* tag);
+  static void              LogContext(bool start, const char* tag, const char* message);
   Dali::Integration::Core& GetCore();
   TestPlatformAbstraction& GetPlatform();
   TestRenderController&    GetRenderController();
@@ -75,6 +75,7 @@ public:
   bool        Render(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location = NULL, bool uploadOnly = false);
   bool        PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<Rect<int>>& damagedRects);
   bool        RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect);
+  bool        RenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location = NULL);
   uint32_t    GetUpdateStatus();
   bool        UpdateOnly(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL);
   bool        RenderOnly();
@@ -92,6 +93,9 @@ public:
     return mScene;
   }
 
+  void AddScene(Integration::Scene scene);
+  void RemoveScene(Integration::Scene scene);
+
 private:
   void DoUpdate(uint32_t intervalMilliseconds, const char* location = NULL, bool uploadOnly = false);
 
@@ -103,8 +107,9 @@ protected:
   Integration::UpdateStatus mStatus;
   Integration::RenderStatus mRenderStatus;
 
-  Integration::Core*       mCore;
-  Dali::Integration::Scene mScene;
+  Integration::Core*              mCore;
+  Dali::Integration::Scene        mScene;
+  std::vector<Integration::Scene> mScenes;
 
   uint32_t mSurfaceWidth;
   uint32_t mSurfaceHeight;
