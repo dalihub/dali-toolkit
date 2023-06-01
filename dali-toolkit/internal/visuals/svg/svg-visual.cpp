@@ -314,6 +314,13 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
 {
   if(mImpl->mRenderer)
   {
+    // Remove previous task
+    if(mRasterizingTask)
+    {
+      Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
+      mRasterizingTask.Reset();
+    }
+
     unsigned int width  = static_cast<unsigned int>(size.width);
     unsigned int height = static_cast<unsigned int>(size.height);
 

@@ -18,15 +18,15 @@
 #include "toolkit-event-thread-callback.h"
 
 // EXTERNAL INCLUDES
-#include <cstddef>
-#include <semaphore.h>
 #include <math.h>
-#include <ctime>
-#include <climits>
-#include <cstdio>
+#include <semaphore.h>
 #include <unistd.h>
-#include <vector>
 #include <algorithm>
+#include <climits>
+#include <cstddef>
+#include <cstdio>
+#include <ctime>
+#include <vector>
 
 namespace
 {
@@ -34,23 +34,21 @@ namespace
 // triggers from multiple threads - they should all be created on
 // event thread.
 std::vector<Dali::EventThreadCallback*> gEventThreadCallbacks;
-}
-
+} // namespace
 
 namespace Dali
 {
-
 struct EventThreadCallback::Impl
 {
   CallbackBase* callback;
-  sem_t mySemaphore;
+  sem_t         mySemaphore;
 };
 
-EventThreadCallback::EventThreadCallback( CallbackBase* callback )
-: mImpl( new Impl() )
+EventThreadCallback::EventThreadCallback(CallbackBase* callback)
+: mImpl(new Impl())
 {
   mImpl->callback = callback;
-  sem_init( &(mImpl->mySemaphore), 0, 0 );
+  sem_init(&(mImpl->mySemaphore), 0, 0);
 
   gEventThreadCallbacks.push_back(this);
 }
@@ -59,7 +57,7 @@ EventThreadCallback::~EventThreadCallback()
 {
   std::vector<EventThreadCallback*>::iterator iter =
     std::find(gEventThreadCallbacks.begin(), gEventThreadCallbacks.end(), this);
-  if( iter != gEventThreadCallbacks.end() )
+  if(iter != gEventThreadCallbacks.end())
   {
     gEventThreadCallbacks.erase(iter);
   }
@@ -68,15 +66,15 @@ EventThreadCallback::~EventThreadCallback()
 
 void EventThreadCallback::Trigger()
 {
-  sem_post( &(mImpl->mySemaphore) );
+  sem_post(&(mImpl->mySemaphore));
 }
 
 // returns true if timed out rather than triggered
 bool EventThreadCallback::WaitingForTrigger()
 {
   struct timespec now;
-  clock_gettime( CLOCK_REALTIME, &now );
-  if( now.tv_nsec < 999900000 ) // 999, 900, 000
+  clock_gettime(CLOCK_REALTIME, &now);
+  if(now.tv_nsec < 999900000) // 999, 900, 000
     now.tv_nsec += 1000;
   else
   {
@@ -84,7 +82,7 @@ bool EventThreadCallback::WaitingForTrigger()
     now.tv_nsec = 0;
   }
 
-  int error = sem_timedwait( &(mImpl->mySemaphore), &now );
+  int error = sem_timedwait(&(mImpl->mySemaphore), &now);
   return error != 0; // true if timeout
 }
 
@@ -93,57 +91,59 @@ CallbackBase* EventThreadCallback::GetCallback()
   return mImpl->callback;
 }
 
-}
-
+} // namespace Dali
 
 namespace Test
 {
-
-bool WaitForEventThreadTrigger( int triggerCount, int timeoutInSeconds )
+bool WaitForEventThreadTrigger(int triggerCount, int timeoutInSeconds, int executeCallbacks)
 {
   struct timespec startTime;
   struct timespec now;
-  clock_gettime( CLOCK_REALTIME, &startTime );
-  now.tv_sec = startTime.tv_sec;
+  clock_gettime(CLOCK_REALTIME, &startTime);
+  now.tv_sec  = startTime.tv_sec;
   now.tv_nsec = startTime.tv_nsec;
 
   // Round robin poll of each semaphore:
-  while ( triggerCount > 0 )
+  while(triggerCount > 0)
   {
-    if( gEventThreadCallbacks.size() > 0 )
+    if(gEventThreadCallbacks.size() > 0)
     {
-      for( std::vector<Dali::EventThreadCallback*>::iterator iter = gEventThreadCallbacks.begin();
-           iter != gEventThreadCallbacks.end(); ++iter )
+      for(std::vector<Dali::EventThreadCallback*>::iterator iter = gEventThreadCallbacks.begin();
+          iter != gEventThreadCallbacks.end();
+          ++iter)
       {
         Dali::EventThreadCallback* eventTrigger = (*iter);
-        Dali::CallbackBase* callback = eventTrigger->GetCallback();
-        bool timedout = eventTrigger->WaitingForTrigger();
-        if( ! timedout )
+        Dali::CallbackBase*        callback     = eventTrigger->GetCallback();
+        bool                       timedout     = eventTrigger->WaitingForTrigger();
+        if(!timedout)
         {
-          // Semaphore was unlocked - execute the trigger
-          Dali::CallbackBase::Execute( *callback );
+          if(executeCallbacks)
+          {
+            // Semaphore was unlocked - execute the trigger
+            Dali::CallbackBase::Execute(*callback);
+          }
           triggerCount--;
         }
-        if( triggerCount <= 0 )
+        if(triggerCount <= 0)
         {
           break;
         }
       }
     }
-    clock_gettime( CLOCK_REALTIME, &now );
-    if( now.tv_sec - startTime.tv_sec > timeoutInSeconds )
+    clock_gettime(CLOCK_REALTIME, &now);
+    if(now.tv_sec - startTime.tv_sec > timeoutInSeconds)
     {
       // Ensure we break out of the loop if elapsed time has passed
       break;
     }
   }
 
-  clock_gettime( CLOCK_REALTIME, &now );
-  if( now.tv_sec > startTime.tv_sec + 1 )
+  clock_gettime(CLOCK_REALTIME, &now);
+  if(now.tv_sec > startTime.tv_sec + 1)
   {
-    fprintf(stderr, "WaitForEventThreadTrigger took %ld seconds\n", now.tv_sec - startTime.tv_sec );
+    fprintf(stderr, "WaitForEventThreadTrigger took %ld seconds\n", now.tv_sec - startTime.tv_sec);
   }
   return triggerCount == 0;
 }
 
-}
+} // namespace Test

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_EVENT_THREAD_CALLBACK_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,10 @@
 
 namespace Dali
 {
-
 class DALI_TOOLKIT_API EventThreadCallback
 {
 public:
-
-  EventThreadCallback( CallbackBase* callback );
+  EventThreadCallback(CallbackBase* callback);
 
   ~EventThreadCallback();
 
@@ -41,24 +39,21 @@ public:
   CallbackBase* GetCallback();
 
 private:
-
   // undefined copy constructor.
-  EventThreadCallback( const EventThreadCallback& );
+  EventThreadCallback(const EventThreadCallback&);
 
   // undefined assignment operator
-  EventThreadCallback& operator=( const EventThreadCallback& );
+  EventThreadCallback& operator=(const EventThreadCallback&);
 
 private:
-
   struct Impl;
   Impl* mImpl;
 };
 
-}
+} // namespace Dali
 
 namespace Test
 {
-
 /**
  * Wait for the tested code to create an event trigger, then
  * wait for triggerCount Trigger calls to occur, and execute the trigger
@@ -66,9 +61,8 @@ namespace Test
  *
  * Will wait for a maximum of 30s before failing the test and returning.
  */
-bool WaitForEventThreadTrigger( int triggerCount, int timeoutInSeconds=30 );
+bool WaitForEventThreadTrigger(int triggerCount, int timeoutInSeconds = 30, int executeCallbacks = true);
 
-}
-
+} // namespace Test
 
 #endif // DALI_TOOLKIT_EVENT_THREAD_CALLBACK_H
