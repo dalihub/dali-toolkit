@@ -80,6 +80,7 @@ SET(TC_SOURCES
   utc-Dali-ToggleButton.cpp
   utc-Dali-ScrollViewEffect.cpp
   utc-Dali-SuperBlurView.cpp
+  utc-Dali-SvgVisual.cpp
   utc-Dali-Toolkit.cpp
   utc-Dali-Model3dView.cpp
   utc-Dali-Visual.cpp
