@@ -19,15 +19,14 @@
 #include <dali-toolkit/public-api/particle-system/particle-emitter.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/particle-system/particle-source.h>
 #include <dali-toolkit/internal/particle-system/particle-emitter-impl.h>
+#include <dali-toolkit/public-api/particle-system/particle-source.h>
 
 // EXTERNAL INCLUDES
 #include <utility>
 
 namespace Dali::Toolkit::ParticleSystem
 {
-
 ParticleEmitter ParticleEmitter::New()
 {
   return {new Dali::Toolkit::ParticleSystem::Internal::ParticleEmitter()};

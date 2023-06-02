@@ -224,17 +224,16 @@ void ParticleRenderer::CreateShader()
   {
     mTexture         = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 2u, 2u);
     auto* pixelArray = new uint32_t[4]{
-      0xFF0000FF, 0xFF0000FF, 0xFF0000FF, 0xFF0000FF};
+      0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
 
     auto pixelData = PixelData::New(reinterpret_cast<uint8_t*>(pixelArray), 16, 2, 2, Pixel::Format::RGBA8888, PixelData::DELETE_ARRAY);
     mTexture.Upload(pixelData);
   }
-
   mTextureSet = TextureSet::New();
   mTextureSet.SetTexture(0, mTexture);
-  // mTextureSet.SetSampler(0, Sampler());
-
   mRenderer.SetTextures(mTextureSet);
+  mTextureSet.SetSampler(0, Sampler());
+
 
   // Attach renderer to the parent actor
   mEmitter->GetActor().AddRenderer(mRenderer);
@@ -305,7 +304,7 @@ uint32_t ParticleRenderer::OnStreamBufferUpdate(void* streamData, size_t size)
   else
   {
     // Partial to handle
-    [[maybe_unused]] auto partialSize = (particleCount / workerCount);
+    auto partialSize = (particleCount / workerCount);
 
     struct UpdateTask
     {
@@ -348,8 +347,7 @@ uint32_t ParticleRenderer::OnStreamBufferUpdate(void* streamData, size_t size)
       }
 
       tasks.emplace_back(*this, list, index, count, streamData);
-      taskQueue.emplace_back([&t = tasks.back()](uint32_t threadId)
-                             { t.Update(); });
+      taskQueue.emplace_back([&t = tasks.back()](uint32_t threadId) { t.Update(); });
     }
 
     // Execute worker tasks

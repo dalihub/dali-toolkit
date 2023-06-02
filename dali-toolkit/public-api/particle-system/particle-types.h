@@ -29,16 +29,17 @@ using ParticleStreamTypeFlagBit = uint32_t;
 
 namespace ParticleStream DALI_TOOLKIT_API
 {
-constexpr ParticleStreamTypeFlagBit POSITION_STREAM_BIT = 1 << 0; ///< 3D Position stream
-constexpr ParticleStreamTypeFlagBit ROTATION_STREAM_BIT = 1 << 1; ///< 3D Rotation stream
-constexpr ParticleStreamTypeFlagBit SCALE_STREAM_BIT    = 1 << 2; ///< 3D Scale stream
-constexpr ParticleStreamTypeFlagBit SIZE_STREAM_BIT     = 1 << 3;
-constexpr ParticleStreamTypeFlagBit COLOR_STREAM_BIT    = 1 << 4;
-constexpr ParticleStreamTypeFlagBit OPACITY_STREAM_BIT  = 1 << 5;
-constexpr ParticleStreamTypeFlagBit VELOCITY_STREAM_BIT = 1 << 6;
-constexpr ParticleStreamTypeFlagBit LIFETIME_STREAM_BIT = 1 << 7;
-constexpr ParticleStreamTypeFlagBit ALL_STREAMS         = 255;
-constexpr ParticleStreamTypeFlagBit DEFAULT_STREAMS     = 255; ///< Default streams
+constexpr ParticleStreamTypeFlagBit POSITION_STREAM_BIT      = 1 << 0; ///< 3D Position stream
+constexpr ParticleStreamTypeFlagBit ROTATION_STREAM_BIT      = 1 << 1; ///< 3D Rotation stream
+constexpr ParticleStreamTypeFlagBit SCALE_STREAM_BIT         = 1 << 2; ///< 3D Scale stream
+constexpr ParticleStreamTypeFlagBit SIZE_STREAM_BIT          = 1 << 3;
+constexpr ParticleStreamTypeFlagBit COLOR_STREAM_BIT         = 1 << 4;
+constexpr ParticleStreamTypeFlagBit OPACITY_STREAM_BIT       = 1 << 5;
+constexpr ParticleStreamTypeFlagBit VELOCITY_STREAM_BIT      = 1 << 6;
+constexpr ParticleStreamTypeFlagBit LIFETIME_STREAM_BIT      = 1 << 7;
+constexpr ParticleStreamTypeFlagBit LIFETIME_BASE_STREAM_BIT = 1 << 8;
+constexpr ParticleStreamTypeFlagBit ALL_STREAMS              = 255;
+constexpr ParticleStreamTypeFlagBit DEFAULT_STREAMS          = 255; ///< Default streams
 
 /**
  * Stream data types
@@ -55,6 +56,6 @@ enum class StreamDataType
   INT4
 };
 
-} // namespace ParticleStream DALI_TOOLKIT_API
+} // namespace ParticleStream
 } // namespace Dali::Toolkit::ParticleSystem
 #endif // DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_TYPES_H
