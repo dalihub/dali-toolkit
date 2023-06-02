@@ -551,6 +551,7 @@ void SceneView::OnSceneDisconnection()
     if(mRenderTask)
     {
       taskList.RemoveTask(mRenderTask);
+      mRenderTask.Reset();
       mFrameBuffer.Reset();
     }
   }
