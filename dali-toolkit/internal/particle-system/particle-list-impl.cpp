@@ -87,9 +87,6 @@ ParticleList::ParticleList(uint32_t capacity, ParticleSystem::ParticleList::Part
   {
     AddStream(0.0f, "aStreamLifetime", true);
     mBuiltInStreamMap[uint32_t(ParticleStream::LIFETIME_STREAM_BIT)] = mDataStreams.size() - 1;
-  }
-  if(streamFlags & ParticleStream::LIFETIME_STREAM_BIT)
-  {
     AddStream(0.0f, "aStreamLifetimeBase", true);
     mBuiltInStreamMap[uint32_t(ParticleStream::LIFETIME_BASE_STREAM_BIT)] = mDataStreams.size() - 1;
   }

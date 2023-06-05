@@ -234,10 +234,6 @@ void ParticleRenderer::CreateShader()
   mRenderer.SetTextures(mTextureSet);
   mTextureSet.SetSampler(0, Sampler());
 
-
-  // Attach renderer to the parent actor
-  mEmitter->GetActor().AddRenderer(mRenderer);
-
   if(mBlendingMode == BlendingMode::SCREEN)
   {
     if(Dali::Capabilities::IsBlendEquationSupported(Dali::DevelBlendEquation::SCREEN))
