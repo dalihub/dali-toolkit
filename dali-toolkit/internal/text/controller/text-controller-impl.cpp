@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/text/controller/text-controller-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/rendering/renderer.h>
@@ -527,8 +527,8 @@ Dali::LayoutDirection::Type Controller::Impl::GetLayoutDirection(Dali::Actor& ac
   if(mModel->mMatchLayoutDirection == DevelText::MatchLayoutDirection::LOCALE ||
      (mModel->mMatchLayoutDirection == DevelText::MatchLayoutDirection::INHERIT && !mIsLayoutDirectionChanged))
   {
-    Window window = DevelWindow::Get(actor);
-    return static_cast<Dali::LayoutDirection::Type>(window ? window.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>() : LayoutDirection::LEFT_TO_RIGHT);
+    Integration::SceneHolder sceneHolder = Integration::SceneHolder::Get(actor);
+    return static_cast<Dali::LayoutDirection::Type>(sceneHolder ? sceneHolder.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>() : LayoutDirection::LEFT_TO_RIGHT);
   }
   else
   {

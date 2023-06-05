@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
  */
 
-#include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
+#include <dali/integration-api/events/touch-event-integ.h>
 
 #include <toolkit-scene-holder-impl.h>
 
@@ -25,14 +25,13 @@
 #include <dali/public-api/object/base-object.h>
 
 #include <dali/integration-api/adaptor-framework/adaptor.h>
-#include <toolkit-adaptor-impl.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <toolkit-adaptor-impl.h>
 
 using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
 
 namespace Dali
 {
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Dali::Internal::Adaptor::SceneHolder Stub
@@ -41,32 +40,30 @@ namespace Dali
 
 namespace Internal
 {
-
 namespace Adaptor
 {
-
-SceneHolder::SceneHolder( const Dali::Rect<int>& positionSize )
-: mRenderSurface( positionSize ),
-  mScene( Dali::Integration::Scene::New( Dali::Size( static_cast<float>( positionSize.width ), static_cast<float>( positionSize.height ) ) ) )
+SceneHolder::SceneHolder(const Dali::Rect<int>& positionSize)
+: mRenderSurface(positionSize),
+  mScene(Dali::Integration::Scene::New(Dali::Size(static_cast<float>(positionSize.width), static_cast<float>(positionSize.height))))
 {
 }
 
 SceneHolder::~SceneHolder()
 {
-  if ( Dali::Adaptor::IsAvailable() )
+  if(Dali::Adaptor::IsAvailable())
   {
-    AdaptorImpl::GetImpl( AdaptorImpl::Get() ).RemoveWindow( this );
+    AdaptorImpl::GetImpl(AdaptorImpl::Get()).RemoveWindow(this);
   }
 }
 
-void SceneHolder::Add( Dali::Actor actor )
+void SceneHolder::Add(Dali::Actor actor)
 {
-  mScene.Add( actor );
+  mScene.Add(actor);
 }
 
-void SceneHolder::Remove( Dali::Actor actor )
+void SceneHolder::Remove(Dali::Actor actor)
 {
-  mScene.Remove( actor );
+  mScene.Remove(actor);
 }
 
 Dali::Layer SceneHolder::GetRootLayer() const
@@ -74,9 +71,9 @@ Dali::Layer SceneHolder::GetRootLayer() const
   return mScene.GetRootLayer();
 }
 
-void SceneHolder::SetBackgroundColor( Vector4 color )
+void SceneHolder::SetBackgroundColor(Vector4 color)
 {
-  return mScene.SetBackgroundColor( color );
+  return mScene.SetBackgroundColor(color);
 }
 
 Vector4 SceneHolder::GetBackgroundColor() const
@@ -84,15 +81,15 @@ Vector4 SceneHolder::GetBackgroundColor() const
   return mScene.GetBackgroundColor();
 }
 
-void SceneHolder::FeedTouchPoint( Dali::TouchPoint& point, int timeStamp )
+void SceneHolder::FeedTouchPoint(Dali::TouchPoint& point, int timeStamp)
 {
 }
 
-void SceneHolder::FeedWheelEvent( Dali::WheelEvent& wheelEvent )
+void SceneHolder::FeedWheelEvent(Dali::WheelEvent& wheelEvent)
 {
 }
 
-void SceneHolder::FeedKeyEvent( Dali::KeyEvent& keyEvent )
+void SceneHolder::FeedKeyEvent(Dali::KeyEvent& keyEvent)
 {
 }
 
@@ -148,7 +145,6 @@ Dali::RenderTaskList SceneHolder::GetRenderTaskList()
 
 namespace Integration
 {
-
 SceneHolder::SceneHolder()
 {
   // Dali::Internal::Adaptor::Adaptor::Get().WindowCreatedSignal().Emit( *this );
@@ -158,99 +154,104 @@ SceneHolder::~SceneHolder()
 {
 }
 
-SceneHolder::SceneHolder( const SceneHolder& handle )
+SceneHolder::SceneHolder(const SceneHolder& handle)
 : BaseHandle(handle)
 {
 }
 
-SceneHolder::SceneHolder( Internal::Adaptor::SceneHolder* internal )
+SceneHolder::SceneHolder(Internal::Adaptor::SceneHolder* internal)
 : BaseHandle(internal)
 {
 }
 
-SceneHolder& SceneHolder::operator=( const SceneHolder& rhs )
+SceneHolder& SceneHolder::operator=(const SceneHolder& rhs)
 {
   BaseHandle::operator=(rhs);
   return *this;
 }
 
-Dali::Integration::SceneHolder SceneHolder::Get( Dali::Actor actor )
+Dali::Integration::SceneHolder SceneHolder::Get(Dali::Actor actor)
 {
   Internal::Adaptor::SceneHolder* sceneHolderImpl = nullptr;
 
-  if ( Dali::Adaptor::IsAvailable() )
+  if(Dali::Adaptor::IsAvailable())
   {
-    sceneHolderImpl = AdaptorImpl::GetImpl( AdaptorImpl::Get() ).GetWindow( actor );
+    sceneHolderImpl = AdaptorImpl::GetImpl(AdaptorImpl::Get()).GetWindow(actor);
   }
 
-  return Dali::Integration::SceneHolder( sceneHolderImpl );
+  return Dali::Integration::SceneHolder(sceneHolderImpl);
 }
 
-void SceneHolder::Add( Actor actor )
+void SceneHolder::Add(Actor actor)
 {
-  GetImplementation( *this ).Add( actor );
+  GetImplementation(*this).Add(actor);
 }
 
-void SceneHolder::Remove( Actor actor )
+void SceneHolder::Remove(Actor actor)
 {
-  GetImplementation( *this ).Remove( actor );
+  GetImplementation(*this).Remove(actor);
 }
 
 Dali::Layer SceneHolder::GetRootLayer() const
 {
-  return GetImplementation( *this ).GetRootLayer();
+  return GetImplementation(*this).GetRootLayer();
 }
 
-void SceneHolder::SetBackgroundColor( Vector4 color )
+void SceneHolder::SetBackgroundColor(Vector4 color)
 {
-  GetImplementation( *this ).SetBackgroundColor( color );
+  GetImplementation(*this).SetBackgroundColor(color);
 }
 
 Vector4 SceneHolder::GetBackgroundColor() const
 {
-  return GetImplementation( *this ).GetBackgroundColor();
+  return GetImplementation(*this).GetBackgroundColor();
 }
 
-void SceneHolder::FeedTouchPoint( Dali::TouchPoint& point, int timeStamp )
+void SceneHolder::FeedTouchPoint(Dali::TouchPoint& point, int timeStamp)
 {
-  GetImplementation( *this ).FeedTouchPoint( point, timeStamp );
+  GetImplementation(*this).FeedTouchPoint(point, timeStamp);
 }
 
-void SceneHolder::FeedWheelEvent( Dali::WheelEvent& wheelEvent )
+void SceneHolder::FeedWheelEvent(Dali::WheelEvent& wheelEvent)
 {
-  GetImplementation( *this ).FeedWheelEvent( wheelEvent );
+  GetImplementation(*this).FeedWheelEvent(wheelEvent);
 }
 
-void SceneHolder::FeedKeyEvent( Dali::KeyEvent& keyEvent )
+void SceneHolder::FeedKeyEvent(Dali::KeyEvent& keyEvent)
 {
-  GetImplementation( *this ).FeedKeyEvent( keyEvent );
+  GetImplementation(*this).FeedKeyEvent(keyEvent);
+}
+
+RenderTaskList SceneHolder::GetRenderTaskList()
+{
+  return GetImplementation(*this).GetRenderTaskList();
 }
 
 SceneHolder::KeyEventSignalType& SceneHolder::KeyEventSignal()
 {
-  return GetImplementation( *this ).KeyEventSignal();
+  return GetImplementation(*this).KeyEventSignal();
 }
 
 SceneHolder::KeyEventGeneratedSignalType& SceneHolder::KeyEventGeneratedSignal()
 {
-  return GetImplementation( *this ).KeyEventGeneratedSignal();
+  return GetImplementation(*this).KeyEventGeneratedSignal();
 }
 
 SceneHolder::TouchEventSignalType& SceneHolder::TouchedSignal()
 {
-  return GetImplementation( *this ).TouchedSignal();
+  return GetImplementation(*this).TouchedSignal();
 }
 
 SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()
 {
-  return GetImplementation( *this ).WheelEventSignal();
+  return GetImplementation(*this).WheelEventSignal();
 }
 
 SceneHolder::WheelEventGeneratedSignalType& SceneHolder::WheelEventGeneratedSignal()
 {
-  return GetImplementation( *this ).WheelEventGeneratedSignal();
+  return GetImplementation(*this).WheelEventGeneratedSignal();
 }
 
-} // Integration
+} // namespace Integration
 
-} // Dali
+} // namespace Dali
