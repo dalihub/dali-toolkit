@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/window.h>
@@ -296,6 +297,7 @@ private:
   /////////////////////////////////////////////////////////////
   // FrameBuffer and Rendertask to render child objects as a 3D Scene
   Dali::WeakHandle<Dali::Window>                           mWindow;
+  Integration::SceneHolder                                 mSceneHolder;
   CameraActor                                              mDefaultCamera;
   CameraActor                                              mSelectedCamera;
   std::vector<CameraActor>                                 mCameras;

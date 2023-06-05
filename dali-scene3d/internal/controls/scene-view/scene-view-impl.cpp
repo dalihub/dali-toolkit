@@ -523,8 +523,18 @@ void SceneView::OnSceneConnection(int depth)
   Window window = DevelWindow::Get(Self());
   if(window)
   {
+    // Only for on-screen window
     window.ResizeSignal().Connect(this, &SceneView::OnWindowResized);
-    RenderTaskList taskList = window.GetRenderTaskList();
+
+    mWindow            = window;
+    mWindowOrientation = DevelWindow::GetPhysicalOrientation(window);
+  }
+
+  // On-screen / Off-screen window
+  mSceneHolder = Integration::SceneHolder::Get(Self());
+  if(mSceneHolder)
+  {
+    RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
     mRenderTask             = taskList.CreateTask();
     mRenderTask.SetSourceActor(mRootLayer);
     mRenderTask.SetExclusive(true);
@@ -533,7 +543,6 @@ void SceneView::OnSceneConnection(int depth)
     mRenderTask.SetScreenToFrameBufferMappingActor(Self());
 
     UpdateRenderTask();
-    mWindow = window;
   }
 
   Control::OnSceneConnection(depth);
@@ -547,15 +556,20 @@ void SceneView::OnSceneDisconnection()
   if(window)
   {
     window.ResizeSignal().Disconnect(this, &SceneView::OnWindowResized);
-    RenderTaskList taskList = window.GetRenderTaskList();
-    if(mRenderTask)
-    {
-      taskList.RemoveTask(mRenderTask);
-      mRenderTask.Reset();
-      mFrameBuffer.Reset();
-    }
   }
   mWindow.Reset();
+
+  if(mSceneHolder)
+  {
+    if(mRenderTask)
+    {
+      RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
+      taskList.RemoveTask(mRenderTask);
+      mRenderTask.Reset();
+    }
+    mSceneHolder.Reset();
+  }
+  mFrameBuffer.Reset();
 
   Control::OnSceneDisconnection();
 }
