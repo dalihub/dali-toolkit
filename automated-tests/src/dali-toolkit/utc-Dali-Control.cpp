@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1242,6 +1242,253 @@ int UtcDaliControlDoActionWhenNotStage(void)
   DALI_TEST_EQUALS(textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION);
   DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION);
   textureTrace.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliControlDoActionMultipleWhenNotStage01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("DoAction on a visual registered with a control multiple times but not staged");
+
+  // Set up trace debug
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  //Created AnimatedImageVisual
+  VisualFactory factory     = VisualFactory::Get();
+  Visual::Base  imageVisual = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual);
+  dummyControl.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION);
+  textureTrace.Reset();
+
+  Property::Map  attributes;
+  const uint32_t repeatMax = 10u;
+  for(uint32_t repeatCnt = 0u; repeatCnt < repeatMax; ++repeatCnt)
+  {
+    // DoAction multiple times.
+    DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelImageVisual::Action::RELOAD, attributes);
+  }
+
+  tet_infoline("Perform RELOAD action. should reload Image and generate a texture");
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION);
+  textureTrace.Reset();
+
+  tet_infoline("Do not load image on more time even we request reload multiple times.");
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 1), false, TEST_LOCATION);
+
+  tet_infoline("Adding control to stage will in turn add the visual to the stage");
+
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+  tet_infoline("No change in textures could occurs as already loaded and cached texture will be used");
+
+  DALI_TEST_EQUALS(textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION);
+  textureTrace.Reset();
+
+  dummyControl.Unparent();
+  dummyControl.Reset();
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliControlDoActionMultipleWhenNotStage02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("DoAction on a visual registered with a control multiple times but not staged");
+
+  // Set up trace debug
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  //Created AnimatedImageVisual
+  VisualFactory factory      = VisualFactory::Get();
+  Visual::Base  imageVisual  = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
+  Visual::Base  imageVisual2 = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  gResourceReadySignalFired = false;
+
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual);
+  dummyControl.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  dummyControl.ResourceReadySignal().Connect(&ResourceReadySignal);
+
+  application.SendNotification();
+  application.Render();
+
+  // Dummy control to keep cache
+  DummyControl        keepCacheControl = DummyControl::New(true);
+  Impl::DummyControl& keepCacheImpl    = static_cast<Impl::DummyControl&>(keepCacheControl.GetImplementation());
+
+  keepCacheImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual2);
+  keepCacheControl.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+  // Load request for keep cache control.
+  application.GetScene().Add(keepCacheControl);
+
+  Property::Map  attributes;
+  const uint32_t repeatMax = 10u;
+  for(uint32_t repeatCnt = 0u; repeatCnt < repeatMax; ++repeatCnt)
+  {
+    // DoAction multiple times.
+    DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelImageVisual::Action::RELOAD, attributes);
+  }
+
+  application.SendNotification();
+  application.Render();
+
+  try
+  {
+    application.SendNotification();
+    application.Render();
+
+    tet_infoline("Async load completed. Sigabort should not be occured");
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    tet_infoline("ResourceReady signal must be fired!");
+    DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+
+    tet_infoline("Texture generation occured");
+    DALI_TEST_EQUALS(textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION);
+    DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION);
+    textureTrace.Reset();
+
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+    // Must not be throw exception.
+    tet_infoline("Exception occured!");
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliControlDoActionMultipleWhenNotStage03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("DoAction on a visual registered with a control multiple times but not staged");
+
+  // Set up trace debug
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  //Created AnimatedImageVisual
+  VisualFactory factory      = VisualFactory::Get();
+  Visual::Base  imageVisual  = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
+  Visual::Base  imageVisual2 = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  gResourceReadySignalFired = false;
+
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual);
+  dummyControl.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  dummyControl.ResourceReadySignal().Connect(&ResourceReadySignal);
+
+  application.SendNotification();
+  application.Render();
+
+  // Dummy control to keep cache
+  DummyControl        keepCacheControl = DummyControl::New(true);
+  Impl::DummyControl& keepCacheImpl    = static_cast<Impl::DummyControl&>(keepCacheControl.GetImplementation());
+
+  keepCacheImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual2);
+  keepCacheControl.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+  // Load request for keep cache control.
+  application.GetScene().Add(keepCacheControl);
+
+  Property::Map  attributes;
+  const uint32_t repeatMax = 10u;
+  for(uint32_t repeatCnt = 0u; repeatCnt < repeatMax; ++repeatCnt)
+  {
+    // DoAction multiple times.
+    DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelImageVisual::Action::RELOAD, attributes);
+  }
+
+  application.SendNotification();
+  application.Render();
+
+  try
+  {
+    tet_infoline("Destroy control without stage on. And create new object that as same visual pointer as previous control");
+
+    const auto*    imageVisualObjectPtr = imageVisual.GetObjectPtr();
+    const uint32_t tryCountMax          = 100u;
+    uint32_t       tryCount             = 0u;
+    do
+    {
+      dummyControl.Reset();
+      imageVisual.Reset();
+
+      imageVisual  = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
+      dummyControl = DummyControl::New(true);
+
+      Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+      dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual);
+      dummyControl.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+    } while(++tryCount < tryCountMax && imageVisualObjectPtr != imageVisual.GetObjectPtr());
+
+    tet_printf("Luck-trial count : %u. Success? %d\n", tryCount, imageVisualObjectPtr == imageVisual.GetObjectPtr());
+
+    // Connect signal
+    dummyControl.ResourceReadySignal().Connect(&ResourceReadySignal);
+
+    application.SendNotification();
+    application.Render();
+
+    tet_infoline("Async load completed after control destroyed. Sigabort should not be occured");
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    tet_infoline("ResourceReady signal must not be fired!");
+    DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+
+    tet_infoline("Texture generation occured");
+    DALI_TEST_EQUALS(textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION);
+    DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION);
+    textureTrace.Reset();
+
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+    // Must not be throw exception.
+    tet_infoline("Exception occured!");
+    tet_result(TET_FAIL);
+  }
 
   END_TEST;
 }
