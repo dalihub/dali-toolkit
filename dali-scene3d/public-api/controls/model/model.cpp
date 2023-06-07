@@ -158,6 +158,16 @@ void Model::RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, 
   GetImpl(*this).RetrieveModelNodesByBlendShapeName(blendShapeName, modelNodes);
 }
 
+Dali::Animation Model::GenerateMotionDataAnimation(MotionData motionData)
+{
+  return GetImpl(*this).GenerateMotionDataAnimation(motionData);
+}
+
+void Model::SetMotionData(MotionData motionData)
+{
+  GetImpl(*this).SetMotionData(motionData);
+}
+
 } // namespace Scene3D
 
 } // namespace Dali

@@ -28,6 +28,10 @@
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 
+#include <dali-scene3d/public-api/model-motion/motion-data.h>
+#include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
+#include <dali-scene3d/public-api/model-motion/motion-index/motion-transform-index.h>
+
 #include <dali/devel-api/actors/camera-actor-devel.h>
 
 using namespace Dali;
@@ -56,6 +60,7 @@ const char* TEST_GLTF_FILE_NAME                    = TEST_RESOURCE_DIR "/Animate
 const char* TEST_GLTF_ANIMATION_TEST_FILE_NAME     = TEST_RESOURCE_DIR "/animationTest.gltf";
 const char* TEST_GLTF_EXTRAS_FILE_NAME             = TEST_RESOURCE_DIR "/AnimatedMorphCubeAnimateNonZeroFrame.gltf";
 const char* TEST_GLTF_MULTIPLE_PRIMITIVE_FILE_NAME = TEST_RESOURCE_DIR "/simpleMultiplePrimitiveTest.gltf";
+const char* TEST_GLTF_MORPH_FILE_NAME              = TEST_RESOURCE_DIR "/AnimatedMorphCube.gltf";
 const char* TEST_DLI_FILE_NAME                     = TEST_RESOURCE_DIR "/arc.dli";
 const char* TEST_DLI_EXERCISE_FILE_NAME            = TEST_RESOURCE_DIR "/exercise.dli";
 
@@ -1536,6 +1541,149 @@ int UtcDaliModelRetrieveBlendShapeNames(void)
     DALI_TEST_EQUALS(nodeList[0], expectNode, TEST_LOCATION);
     DALI_TEST_EQUALS(nodeList[0].GetBlendShapeIndexByName(name), iter->second, TEST_LOCATION);
   }
+
+  END_TEST;
+}
+
+int UtcDaliModelGenerateMotionDataAnimation01(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_MORPH_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+  application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  KeyFrames floatKeyFrames = KeyFrames::New();
+  floatKeyFrames.Add(0.0f, 1.0f);
+  floatKeyFrames.Add(1.0f, 0.5f);
+
+  float               duration   = 3.0f;
+  Scene3D::MotionData motionData = Scene3D::MotionData::New(duration);
+  motionData.Add(Scene3D::MotionTransformIndex::New("AnimatedMorphCube", Scene3D::MotionTransformIndex::TransformType::SCALE_Y), Scene3D::MotionValue::New(2.0f));
+  motionData.Add(Scene3D::MotionTransformIndex::New("AnimatedMorphCube", Scene3D::MotionTransformIndex::TransformType::SCALE_Z), Scene3D::MotionValue::New(floatKeyFrames));
+  motionData.Add(Scene3D::BlendShapeIndex::New("AnimatedMorphCube", 0), Scene3D::MotionValue::New(0.5f));
+  motionData.Add(Scene3D::BlendShapeIndex::New("AnimatedMorphCube", 1), Scene3D::MotionValue::New(floatKeyFrames));
+
+  Animation generatedAnimation = model.GenerateMotionDataAnimation(motionData);
+  DALI_TEST_CHECK(generatedAnimation);
+  DALI_TEST_EQUALS(generatedAnimation.GetDuration(), duration, TEST_LOCATION);
+
+  Scene3D::MotionData invalidMotionData = Scene3D::MotionData::New(duration);
+  invalidMotionData.Add(Scene3D::MotionTransformIndex::New("NotAnimatedMorphCube", Scene3D::MotionTransformIndex::TransformType::SCALE_Y), Scene3D::MotionValue::New(2.0f));
+  invalidMotionData.Add(Scene3D::MotionTransformIndex::New("NotAnimatedMorphCube", Scene3D::MotionTransformIndex::TransformType::SCALE_Z), Scene3D::MotionValue::New(floatKeyFrames));
+  invalidMotionData.Add(Scene3D::BlendShapeIndex::New("NotAnimatedMorphCube", 0), Scene3D::MotionValue::New(0.5f));
+  invalidMotionData.Add(Scene3D::BlendShapeIndex::New("NotAnimatedMorphCube", 1), Scene3D::MotionValue::New(floatKeyFrames));
+
+  generatedAnimation = model.GenerateMotionDataAnimation(invalidMotionData);
+  DALI_TEST_CHECK(!generatedAnimation); // Animation should be empty if motion data have invalid index.
+
+  END_TEST;
+}
+
+int UtcDaliModelSetMotionData(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_MORPH_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+  application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  KeyFrames floatKeyFrames = KeyFrames::New();
+  floatKeyFrames.Add(0.0f, 1.0f);
+  floatKeyFrames.Add(1.0f, 0.5f);
+
+  float               duration   = 3.0f;
+  Scene3D::MotionData motionData = Scene3D::MotionData::New(duration);
+  motionData.Add(Scene3D::MotionTransformIndex::New("AnimatedMorphCube", Scene3D::MotionTransformIndex::TransformType::SCALE_Y), Scene3D::MotionValue::New(2.0f));
+  motionData.Add(Scene3D::MotionTransformIndex::New("AnimatedMorphCube", Scene3D::MotionTransformIndex::TransformType::SCALE_Z), Scene3D::MotionValue::New(floatKeyFrames));
+  motionData.Add(Scene3D::BlendShapeIndex::New("AnimatedMorphCube", 0), Scene3D::MotionValue::New(0.5f));
+  motionData.Add(Scene3D::BlendShapeIndex::New("AnimatedMorphCube", 1), Scene3D::MotionValue::New(floatKeyFrames));
+
+  auto cubeModelNode = model.FindChildModelNodeByName("AnimatedMorphCube");
+
+  float expectScaleX = cubeModelNode.GetProperty<float>(Actor::Property::SCALE_X);
+
+  model.SetMotionData(motionData);
+
+  DALI_TEST_EQUALS(cubeModelNode.GetProperty<float>(Actor::Property::SCALE_X), expectScaleX, TEST_LOCATION);
+  DALI_TEST_EQUALS(cubeModelNode.GetProperty<float>(Actor::Property::SCALE_Y), 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(cubeModelNode.GetProperty<float>(Actor::Property::SCALE_Z), 0.5f, TEST_LOCATION); ///< Last value of keyframes
+
+  END_TEST;
+}
+
+int UtcDaliModelBlendShapeMotionDataByName(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_EXTRAS_FILE_NAME);
+  model.SetProperty(Dali::Actor::Property::SIZE, Vector2(50, 50));
+  application.GetScene().Add(model);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+  KeyFrames floatKeyFrames = KeyFrames::New();
+  floatKeyFrames.Add(0.0f, 0.5f);
+  floatKeyFrames.Add(1.0f, 1.0f);
+
+  float               duration   = 3.0f;
+  Scene3D::MotionData motionData = Scene3D::MotionData::New(duration);
+  motionData.Add(Scene3D::BlendShapeIndex::New("Target_0"), Scene3D::MotionValue::New(0.5f));
+  motionData.Add(Scene3D::BlendShapeIndex::New("Target_1"), Scene3D::MotionValue::New(floatKeyFrames));
+
+  Animation generatedAnimation = model.GenerateMotionDataAnimation(motionData);
+  DALI_TEST_CHECK(generatedAnimation);
+  DALI_TEST_EQUALS(generatedAnimation.GetDuration(), duration, TEST_LOCATION);
+
+  model.SetMotionData(motionData);
+
+  // Get target ModelNode that has extras
+  Scene3D::ModelNode expectNode    = model.FindChildModelNodeByName("AnimatedMorphCube");
+  auto               propertyIndex = expectNode.GetPropertyIndex(motionData.GetIndex(0u).GetPropertyName(expectNode));
+
+  DALI_TEST_CHECK(propertyIndex != Property::INVALID_INDEX);
+  DALI_TEST_EQUALS(expectNode.GetProperty<float>(propertyIndex), 0.5f, TEST_LOCATION);
+
+  propertyIndex = expectNode.GetPropertyIndex(motionData.GetIndex(1u).GetPropertyName(expectNode));
+  DALI_TEST_CHECK(propertyIndex != Property::INVALID_INDEX);
+  DALI_TEST_EQUALS(expectNode.GetProperty<float>(propertyIndex), 1.0f, TEST_LOCATION);
 
   END_TEST;
 }
