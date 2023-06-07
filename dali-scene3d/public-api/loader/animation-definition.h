@@ -173,7 +173,7 @@ public: // METHODS
    *
    * @return The count of animated properties.
    */
-  uint32_t GetPropertyCount();
+  uint32_t GetPropertyCount() const;
 
   /**
    * @brief Add a property that will be animated by this AnimationDefinition
@@ -189,6 +189,13 @@ public: // METHODS
    * @param[in] index The index of property to be retrieved.
    */
   AnimatedProperty& GetPropertyAt(uint32_t index);
+
+  /**
+   * @brief Retrieves animated property at the index
+   *
+   * @param[in] index The index of property to be retrieved.
+   */
+  const AnimatedProperty& GetPropertyAt(uint32_t index) const;
 
 private: // DATA
   std::string mName;

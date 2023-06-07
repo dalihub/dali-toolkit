@@ -291,7 +291,15 @@
           ],
           "mode": 4
         }
-      ]
+      ],
+      "extensions": {
+        "SXR_targets_names": {
+          "Target_0": 0
+        },
+        "avatar_shape_names": {
+          "Target_0": 0
+        }
+      }
     }
   ],
   "nodes": [

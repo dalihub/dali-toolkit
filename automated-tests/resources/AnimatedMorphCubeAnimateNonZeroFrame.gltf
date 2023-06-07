@@ -209,6 +209,12 @@
   ],
   "meshes": [
     {
+      "extras": {
+        "targetNames": [
+          "Target_0",
+          "Target_1"
+        ]
+      },
       "primitives": [
         {
           "attributes": {
