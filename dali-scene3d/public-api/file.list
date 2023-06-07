@@ -37,4 +37,10 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_public_api_dir}/model-components/material.cpp
 	${scene3d_public_api_dir}/model-components/model-node.cpp
 	${scene3d_public_api_dir}/model-components/model-primitive.cpp
+	${scene3d_public_api_dir}/model-motion/motion-data.cpp
+	${scene3d_public_api_dir}/model-motion/motion-index/blend-shape-index.cpp
+	${scene3d_public_api_dir}/model-motion/motion-index/motion-index.cpp
+	${scene3d_public_api_dir}/model-motion/motion-index/motion-property-index.cpp
+	${scene3d_public_api_dir}/model-motion/motion-index/motion-transform-index.cpp
+	${scene3d_public_api_dir}/model-motion/motion-value.cpp
 )

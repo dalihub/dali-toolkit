@@ -156,6 +156,16 @@ public:
    */
   void RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, std::vector<Scene3D::ModelNode>& modelNodes) const;
 
+  /**
+   * @copydoc Model::GenerateMotionDataAnimation()
+   */
+  Dali::Animation GenerateMotionDataAnimation(Scene3D::MotionData motionData);
+
+  /**
+   * @copydoc Model::SetMotionData()
+   */
+  void SetMotionData(Scene3D::MotionData motionData);
+
 protected:
   /**
    * @brief Constructs a new Model.

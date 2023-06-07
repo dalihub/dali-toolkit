@@ -43,6 +43,7 @@
 #include <dali-scene3d/public-api/loader/node-definition.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-scene3d/public-api/loader/shader-definition-factory.h>
+#include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
 
 using namespace Dali;
 
@@ -554,6 +555,207 @@ void Model::RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, 
     for(const auto& nodeIter : modelNodeList)
     {
       modelNodes.push_back(nodeIter);
+    }
+  }
+}
+
+Dali::Animation Model::GenerateMotionDataAnimation(Scene3D::MotionData motionData)
+{
+  Dali::Animation animation;
+
+  // TODO : Need to collect duplicated codes with SetMotionData()
+
+  if(motionData)
+  {
+    const uint32_t motionCount = motionData.GetMotionCount();
+    for(uint32_t i = 0u; i < motionCount; ++i)
+    {
+      auto motionIndex = motionData.GetIndex(i);
+      auto motionValue = motionData.GetValue(i);
+      if(motionIndex && motionValue)
+      {
+        if(motionIndex.GetModelNodeId() != Property::INVALID_KEY)
+        {
+          Scene3D::ModelNode modelNode;
+          if(motionIndex.GetModelNodeId().type == Property::Key::Type::STRING)
+          {
+            modelNode = FindChildModelNodeByName(motionIndex.GetModelNodeId().stringKey);
+          }
+          else if(motionIndex.GetModelNodeId().type == Property::Key::Type::INDEX)
+          {
+            // TODO : Not implement yet.
+          }
+
+          if(modelNode)
+          {
+            KeyFrames keyFrames = motionValue.GetKeyFrames();
+
+            if(keyFrames)
+            {
+              // Try to use index first. If failed, try to use name
+              Property::Index animatedPropertyIndex = motionIndex.GetPropertyIndex(modelNode);
+              if(animatedPropertyIndex != Property::INVALID_INDEX)
+              {
+                if(DALI_UNLIKELY(!animation))
+                {
+                  animation = Animation::New(motionData.GetDuration());
+                }
+                animation.AnimateBetween(Dali::Property(modelNode, animatedPropertyIndex), keyFrames);
+              }
+              else
+              {
+                std::string    animatedPropertyName = motionIndex.GetPropertyName(modelNode);
+                Dali::Property property(modelNode, animatedPropertyName);
+                if(property.propertyIndex != Property::INVALID_INDEX)
+                {
+                  if(DALI_UNLIKELY(!animation))
+                  {
+                    animation = Animation::New(motionData.GetDuration());
+                  }
+                  animation.AnimateBetween(property, keyFrames);
+                }
+              }
+            }
+          }
+        }
+        else
+        {
+          Scene3D::BlendShapeIndex blendShapeIndex = Scene3D::BlendShapeIndex::DownCast(motionIndex);
+          if(blendShapeIndex && blendShapeIndex.GetBlendShapeId().type == Property::Key::Type::STRING)
+          {
+            // Special case : For BlendShapeIndex that doesn't have ModelNodeId and has string BlendShapeId,
+            // we need to animate all kind of blendshapes
+
+            KeyFrames keyFrames = motionValue.GetKeyFrames();
+
+            if(keyFrames)
+            {
+              std::vector<Scene3D::ModelNode> modelNodes;
+              RetrieveModelNodesByBlendShapeName(blendShapeIndex.GetBlendShapeId().stringKey, modelNodes);
+
+              for(auto& modelNode : modelNodes)
+              {
+                // Try to use index first. If failed, try to use name
+                Property::Index animatedPropertyIndex = motionIndex.GetPropertyIndex(modelNode);
+                if(animatedPropertyIndex != Property::INVALID_INDEX)
+                {
+                  if(DALI_UNLIKELY(!animation))
+                  {
+                    animation = Animation::New(motionData.GetDuration());
+                  }
+                  animation.AnimateBetween(Dali::Property(modelNode, animatedPropertyIndex), keyFrames);
+                }
+                else
+                {
+                  std::string    animatedPropertyName = motionIndex.GetPropertyName(modelNode);
+                  Dali::Property property(modelNode, animatedPropertyName);
+
+                  if(property.propertyIndex != Property::INVALID_INDEX)
+                  {
+                    if(DALI_UNLIKELY(!animation))
+                    {
+                      animation = Animation::New(motionData.GetDuration());
+                    }
+                    animation.AnimateBetween(property, keyFrames);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return animation;
+}
+
+void Model::SetMotionData(Scene3D::MotionData motionData)
+{
+  // TODO : Need to collect duplicated codes with GenerateMotionDataAnimation()
+
+  if(motionData)
+  {
+    const uint32_t motionCount = motionData.GetMotionCount();
+    for(uint32_t i = 0u; i < motionCount; ++i)
+    {
+      auto motionIndex = motionData.GetIndex(i);
+      auto motionValue = motionData.GetValue(i);
+      if(motionIndex && motionValue)
+      {
+        if(motionIndex.GetModelNodeId() != Property::INVALID_KEY)
+        {
+          Scene3D::ModelNode modelNode;
+          if(motionIndex.GetModelNodeId().type == Property::Key::Type::STRING)
+          {
+            modelNode = FindChildModelNodeByName(motionIndex.GetModelNodeId().stringKey);
+          }
+          else if(motionIndex.GetModelNodeId().type == Property::Key::Type::INDEX)
+          {
+            // TODO : Not implement yet.
+          }
+
+          if(modelNode)
+          {
+            Property::Value value = motionValue.GetPropertyValue();
+
+            if(value.GetType() != Property::Type::NONE)
+            {
+              // Try to use index first. If failed, try to use name
+              Property::Index propertyIndex = motionIndex.GetPropertyIndex(modelNode);
+              if(propertyIndex != Property::INVALID_INDEX)
+              {
+                modelNode.SetProperty(propertyIndex, value);
+              }
+              else
+              {
+                std::string    propertyName = motionIndex.GetPropertyName(modelNode);
+                Dali::Property property(modelNode, propertyName);
+                if(property.propertyIndex != Property::INVALID_INDEX)
+                {
+                  modelNode.SetProperty(property.propertyIndex, value);
+                }
+              }
+            }
+          }
+        }
+        else
+        {
+          Scene3D::BlendShapeIndex blendShapeIndex = Scene3D::BlendShapeIndex::DownCast(motionIndex);
+          if(blendShapeIndex && blendShapeIndex.GetBlendShapeId().type == Property::Key::Type::STRING)
+          {
+            // Special case : For BlendShapeIndex that doesn't have ModelNodeId and has string BlendShapeId,
+            // we need to animate all kind of blendshapes
+
+            Property::Value value = motionValue.GetPropertyValue();
+
+            if(value.GetType() != Property::Type::NONE)
+            {
+              std::vector<Scene3D::ModelNode> modelNodes;
+              RetrieveModelNodesByBlendShapeName(blendShapeIndex.GetBlendShapeId().stringKey, modelNodes);
+
+              for(auto& modelNode : modelNodes)
+              {
+                // Try to use index first. If failed, try to use name
+                Property::Index propertyIndex = motionIndex.GetPropertyIndex(modelNode);
+                if(propertyIndex != Property::INVALID_INDEX)
+                {
+                  modelNode.SetProperty(propertyIndex, value);
+                }
+                else
+                {
+                  std::string    propertyName = motionIndex.GetPropertyName(modelNode);
+                  Dali::Property property(modelNode, propertyName);
+                  if(property.propertyIndex != Property::INVALID_INDEX)
+                  {
+                    modelNode.SetProperty(property.propertyIndex, value);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
