@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MULTI_LANGUAGE_SUPPORT_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,14 +67,6 @@ struct ValidateFontsPerScript
    */
   bool IsValidFont(FontId fontId) const;
 
-  /**
-   * @brief Cache the given @p fontId in the vector of valid fonts.
-   * @note If cache size is big enough, we might remove some caches.
-   *
-   * @param[in] fontId The font id.
-   */
-  void Cache(FontId fontId);
-
   Vector<FontId> mValidFonts;
 };
 
@@ -117,13 +109,6 @@ struct DefaultFonts
                   const TextAbstraction::FontDescription& description,
                   PointSize26Dot6                         size) const;
 
-  /**
-   * @brief Cache a default font for the given @p size.
-   * @note If cache size is big enough, we might remove some caches.
-   *
-   * @param[in] description The font's description.
-   * @param[in] fontId The font id.
-   */
   void Cache(const TextAbstraction::FontDescription& description, FontId fontId);
 
   std::vector<CacheItem> mFonts;
