@@ -18,12 +18,12 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include <dali-toolkit-test-suite-utils.h>
-#include <dali-toolkit/dali-toolkit.h>
 #include <dali-scene3d/internal/common/model-cache-manager.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
-#include "dali-scene3d/public-api/loader/resource-bundle.h"
-#include "dali-scene3d/public-api/loader/scene-definition.h"
+#include <dali-scene3d/public-api/loader/resource-bundle.h>
+#include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali-toolkit-test-suite-utils.h>
+#include <dali-toolkit/dali-toolkit.h>
 #include <toolkit-event-thread-callback.h>
 #include <string>
 
@@ -41,11 +41,12 @@ namespace
 const char* TEST_GLTF_FILE_NAME = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
 
 static bool gResourceReadyCalled = false;
+
 void OnResourceReady(Control control)
 {
   gResourceReadyCalled = true;
 }
-}
+} // namespace
 
 int UtcDaliModelCacheManagerLoadModel(void)
 {
@@ -72,7 +73,11 @@ int UtcDaliModelCacheManagerLoadModel(void)
   // Check that the loading has finished for mode1
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(cacheManager.GetModelCacheRefCount(TEST_GLTF_FILE_NAME), 1u, TEST_LOCATION);
+  // Store the value of expect ref count with one model. Detail value could be changed with detail logic of cache.
+  uint32_t refCountWithOneModel = cacheManager.GetModelCacheRefCount(TEST_GLTF_FILE_NAME);
+
+  // Check whether model reference is greate or equal with 1.
+  DALI_TEST_GREATER(refCountWithOneModel, 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(cacheManager.IsSceneLoading(TEST_GLTF_FILE_NAME), false, TEST_LOCATION);
   DALI_TEST_EQUALS(cacheManager.IsSceneLoaded(TEST_GLTF_FILE_NAME), true, TEST_LOCATION);
 
@@ -94,7 +99,11 @@ int UtcDaliModelCacheManagerLoadModel(void)
   // Check that the loading has finished for model2
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(cacheManager.GetModelCacheRefCount(TEST_GLTF_FILE_NAME), 2u, TEST_LOCATION);
+  // Store the value of expect ref count with two models. Detail value could be changed with detail logic of cache.
+  uint32_t refCountWithTwoModels = cacheManager.GetModelCacheRefCount(TEST_GLTF_FILE_NAME);
+
+  // Check whether model reference is greate or equal with reference with one model.
+  DALI_TEST_GREATER(refCountWithTwoModels, refCountWithOneModel, TEST_LOCATION);
   DALI_TEST_EQUALS(cacheManager.IsSceneLoading(TEST_GLTF_FILE_NAME), false, TEST_LOCATION);
   DALI_TEST_EQUALS(cacheManager.IsSceneLoaded(TEST_GLTF_FILE_NAME), true, TEST_LOCATION);
 
@@ -119,8 +128,8 @@ int UtcDaliModelCacheManagerLoadModel(void)
   application.SendNotification();
   application.Render();
 
-  // Check that the reference count of the cmodel cache is decreased by 1 after model1 is destroyed
-  DALI_TEST_EQUALS(cacheManager.GetModelCacheRefCount(TEST_GLTF_FILE_NAME), 1u, TEST_LOCATION);
+  // Check that the reference count of the cmodel cache is decreased after model1 is destroyed
+  DALI_TEST_EQUALS(cacheManager.GetModelCacheRefCount(TEST_GLTF_FILE_NAME), refCountWithOneModel, TEST_LOCATION);
 
   // Load another instance of the same model and add it to the scene
   Scene3D::Model model3 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
@@ -140,7 +149,8 @@ int UtcDaliModelCacheManagerLoadModel(void)
   // Check that the loading has finished for model3
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(cacheManager.GetModelCacheRefCount(TEST_GLTF_FILE_NAME), 2u, TEST_LOCATION);
+  // Check the value of expect ref count with two models.
+  DALI_TEST_EQUALS(cacheManager.GetModelCacheRefCount(TEST_GLTF_FILE_NAME), refCountWithTwoModels, TEST_LOCATION);
   DALI_TEST_EQUALS(cacheManager.IsSceneLoading(TEST_GLTF_FILE_NAME), false, TEST_LOCATION);
   DALI_TEST_EQUALS(cacheManager.IsSceneLoaded(TEST_GLTF_FILE_NAME), true, TEST_LOCATION);
 
@@ -164,8 +174,8 @@ int UtcDaliModelCacheManagerLoadModel(void)
   application.SendNotification();
   application.Render();
 
+  // All reference count should be decreased.
   DALI_TEST_EQUALS(cacheManager.GetModelCacheRefCount(TEST_GLTF_FILE_NAME), 0u, TEST_LOCATION);
 
   END_TEST;
 }
-

@@ -23,7 +23,6 @@
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
-
 template<>
 ParticleStream::StreamDataType StreamDataTypeWrapper<Vector3>::GetType()
 {
@@ -86,8 +85,10 @@ ParticleList::ParticleList(uint32_t capacity, ParticleSystem::ParticleList::Part
   }
   if(streamFlags & ParticleStream::LIFETIME_STREAM_BIT)
   {
-    AddStream(0.0f, "aStreamLifetime", false);
+    AddStream(0.0f, "aStreamLifetime", true);
     mBuiltInStreamMap[uint32_t(ParticleStream::LIFETIME_STREAM_BIT)] = mDataStreams.size() - 1;
+    AddStream(0.0f, "aStreamLifetimeBase", true);
+    mBuiltInStreamMap[uint32_t(ParticleStream::LIFETIME_BASE_STREAM_BIT)] = mDataStreams.size() - 1;
   }
 
   // create free chain
@@ -187,6 +188,9 @@ ParticleSystem::Particle ParticleList::NewParticle(float lifetime)
 
     particle.Get<float>(ParticleStream::LIFETIME_STREAM_BIT) = lifetime;
 
+    // Store initial lifetime
+    particle.Get<float>(ParticleStream::LIFETIME_BASE_STREAM_BIT) = lifetime;
+
     return mParticles.back();
   }
   return {nullptr};
@@ -211,11 +215,11 @@ void ParticleList::ReleaseParticle(uint32_t particleIndex)
 
   // Point at this slot of memory as next free slot
   auto& p = *it;
-  if(mFreeIndex)
+  if(mFreeIndex > -1)
   {
     mFreeChain[p.GetIndex()] = mFreeIndex;
-    mFreeIndex               = p.GetIndex();
   }
+  mFreeIndex = p.GetIndex();
 
   // Remove particle from the list
   mParticles.erase(it);

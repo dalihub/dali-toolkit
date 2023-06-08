@@ -41,7 +41,7 @@ public:
 
   void* GetByIndex(uint32_t streamIndex);
 
-  uint32_t GetIndex() const;
+  [[nodiscard]] uint32_t GetIndex() const;
 
 private:
   Internal::ParticleList& mOwnerList;

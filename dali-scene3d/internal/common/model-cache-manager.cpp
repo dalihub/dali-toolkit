@@ -21,7 +21,10 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/common/singleton-service.h>
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/object/base-object.h>
+
+#include <mutex>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/load-result.h>
@@ -41,31 +44,43 @@ public:
 
   Dali::Scene3D::Loader::LoadResult GetModelLoadResult(std::string modelUri)
   {
-    ModelCache& cache = mModelCache[modelUri];
+    Dali::Mutex::ScopedLock lock(mModelCacheMutex);
+    ModelCache&             cache = mModelCache[modelUri];
     return Dali::Scene3D::Loader::LoadResult{cache.resources, cache.scene, cache.metaData, cache.animationDefinitions, cache.amimationGroupDefinitions, cache.cameraParameters, cache.lights};
+  }
+
+  void LockModelLoadScene(std::string modelUri)
+  {
+    // To avoid dead-lock, do not use mModelCacheMutex here
+    auto& modelMutex = GetLoadSceneMutexInstance(modelUri);
+    modelMutex.lock();
+  }
+
+  void UnlockModelLoadScene(std::string modelUri)
+  {
+    // To avoid dead-lock, do not use mModelCacheMutex here
+    auto& modelMutex = GetLoadSceneMutexInstance(modelUri);
+    modelMutex.unlock();
   }
 
   uint32_t GetModelCacheRefCount(std::string modelUri)
   {
-    ModelCache& cache = mModelCache[modelUri];
+    Dali::Mutex::ScopedLock lock(mModelCacheMutex);
+    ModelCache&             cache = mModelCache[modelUri];
     return cache.refCount;
-  }
-
-  Dali::ConditionalWait& GetLoadSceneConditionalWaitInstance(std::string modelUri)
-  {
-    ModelCache& cache = mModelCache[modelUri];
-    return cache.loadSceneConditionalWait;
   }
 
   void ReferenceModelCache(std::string modelUri)
   {
-    ModelCache& cache = mModelCache[modelUri];
+    Dali::Mutex::ScopedLock lock(mModelCacheMutex);
+    ModelCache&             cache = mModelCache[modelUri];
     cache.refCount++;
   }
 
   void UnreferenceModelCache(std::string modelUri)
   {
-    ModelCache& cache = mModelCache[modelUri];
+    Dali::Mutex::ScopedLock lock(mModelCacheMutex);
+    ModelCache&             cache = mModelCache[modelUri];
     if(cache.refCount > 0)
     {
       cache.refCount--;
@@ -79,26 +94,30 @@ public:
 
   bool IsSceneLoaded(std::string modelUri)
   {
-    ModelCache& cache = mModelCache[modelUri];
+    Dali::Mutex::ScopedLock lock(mModelCacheMutex);
+    ModelCache&             cache = mModelCache[modelUri];
     return cache.isSceneLoaded;
   }
 
   void SetSceneLoaded(std::string modelUri, bool isSceneLoaded)
   {
-    ModelCache& cache   = mModelCache[modelUri];
-    cache.isSceneLoaded = isSceneLoaded;
+    Dali::Mutex::ScopedLock lock(mModelCacheMutex);
+    ModelCache&             cache = mModelCache[modelUri];
+    cache.isSceneLoaded           = isSceneLoaded;
   }
 
   bool IsSceneLoading(std::string modelUri)
   {
-    ModelCache& cache = mModelCache[modelUri];
+    Dali::Mutex::ScopedLock lock(mModelCacheMutex);
+    ModelCache&             cache = mModelCache[modelUri];
     return cache.isSceneLoading;
   }
 
   void SetSceneLoading(std::string modelUri, bool isSceneLoading)
   {
-    ModelCache& cache    = mModelCache[modelUri];
-    cache.isSceneLoading = isSceneLoading;
+    Dali::Mutex::ScopedLock lock(mModelCacheMutex);
+    ModelCache&             cache = mModelCache[modelUri];
+    cache.isSceneLoading          = isSceneLoading;
   }
 
 protected:
@@ -107,6 +126,20 @@ protected:
    */
   virtual ~Impl()
   {
+  }
+
+private:
+  /**
+   * @brief Retrieves the mutex object to synchronize the scene loading of the model
+   * with the given URI between multiple threads.
+   * @param[in] modelUri The unique model URI with its absolute path.
+   * @return The mutex object.
+   */
+  std::mutex& GetLoadSceneMutexInstance(std::string modelUri)
+  {
+    Dali::Mutex::ScopedLock lock(mModelCacheMutex);
+    ModelCache&             cache = mModelCache[modelUri];
+    return cache.loadSceneMutex;
   }
 
 private:
@@ -121,15 +154,18 @@ private:
     std::vector<Dali::Scene3D::Loader::CameraParameters>         cameraParameters{};          ///< The camera parameters that were loaded from the scene.
     std::vector<Dali::Scene3D::Loader::LightParameters>          lights{};                    ///< The light parameters that were loaded from the scene.
 
-    uint32_t              refCount{0};                ///< The reference count of this model cache.
-    Dali::ConditionalWait loadSceneConditionalWait{}; ///< The conditionalWait instance used to synchronise the loading of the scene for the same model in different threads.
+    uint32_t   refCount{0};      ///< The reference count of this model cache.
+    std::mutex loadSceneMutex{}; ///< The mutex instance used to synchronise the loading of the scene for the same model in different threads.
 
     bool isSceneLoaded{false};  ///< Whether the scene of the model has been loaded.
     bool isSceneLoading{false}; ///< Whether the scene loading of the model is in progress.
   };
 
+  // Note : We should use some container that the element memory pointer is not changed due to LoadResult and loadSceneMutex validation.
   using ModelResourceCache = std::map<std::string, ModelCache>;
   ModelResourceCache mModelCache;
+
+  Dali::Mutex mModelCacheMutex;
 };
 
 ModelCacheManager::ModelCacheManager() = default;
@@ -173,16 +209,22 @@ Dali::Scene3D::Loader::LoadResult ModelCacheManager::GetModelLoadResult(std::str
   return impl.GetModelLoadResult(modelUri);
 }
 
+void ModelCacheManager::LockModelLoadScene(std::string modelUri)
+{
+  ModelCacheManager::Impl& impl = static_cast<ModelCacheManager::Impl&>(GetBaseObject());
+  return impl.LockModelLoadScene(modelUri);
+}
+
+void ModelCacheManager::UnlockModelLoadScene(std::string modelUri)
+{
+  ModelCacheManager::Impl& impl = static_cast<ModelCacheManager::Impl&>(GetBaseObject());
+  return impl.UnlockModelLoadScene(modelUri);
+}
+
 uint32_t ModelCacheManager::GetModelCacheRefCount(std::string modelUri)
 {
   ModelCacheManager::Impl& impl = static_cast<ModelCacheManager::Impl&>(GetBaseObject());
   return impl.GetModelCacheRefCount(modelUri);
-}
-
-Dali::ConditionalWait& ModelCacheManager::GetLoadSceneConditionalWaitInstance(std::string modelUri)
-{
-  ModelCacheManager::Impl& impl = static_cast<ModelCacheManager::Impl&>(GetBaseObject());
-  return impl.GetLoadSceneConditionalWaitInstance(modelUri);
 }
 
 void ModelCacheManager::ReferenceModelCache(std::string modelUri)
