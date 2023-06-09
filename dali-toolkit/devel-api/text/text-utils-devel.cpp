@@ -293,6 +293,7 @@ void ShapeTextPreprocess(const RendererParameters& textParameters, TextAbstracti
                                      fontDescriptionRuns,
                                      defaultFontDescription,
                                      defaultPointSize,
+                                     1.0f,
                                      0u,
                                      numberOfCharacters,
                                      validFonts);

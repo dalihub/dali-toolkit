@@ -153,6 +153,7 @@ public:
                      const Vector<FontDescriptionRun>&       fontDescriptions,
                      const TextAbstraction::FontDescription& defaultFontDescription,
                      TextAbstraction::PointSize26Dot6        defaultFontPointSize,
+                     float                                   fontSizeScale,
                      CharacterIndex                          startIndex,
                      Length                                  numberOfCharacters,
                      Vector<FontRun>&                        fonts);

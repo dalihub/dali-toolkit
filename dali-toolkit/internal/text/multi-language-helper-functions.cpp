@@ -30,6 +30,7 @@ namespace Text
 void MergeFontDescriptions(const Vector<FontDescriptionRun>&       fontDescriptions,
                            const TextAbstraction::FontDescription& defaultFontDescription,
                            TextAbstraction::PointSize26Dot6        defaultPointSize,
+                           float                                   fontSizeScale,
                            CharacterIndex                          characterIndex,
                            TextAbstraction::FontDescription&       fontDescription,
                            TextAbstraction::PointSize26Dot6&       fontPointSize,
@@ -133,7 +134,7 @@ void MergeFontDescriptions(const Vector<FontDescriptionRun>&       fontDescripti
     if(sizeOverriden)
     {
       const FontDescriptionRun& fontRun = *(fontDescriptionsBuffer + sizeIndex);
-      fontPointSize                     = fontRun.size;
+      fontPointSize                     = static_cast<PointSize26Dot6>(fontRun.size * fontSizeScale);
     }
   }
 }

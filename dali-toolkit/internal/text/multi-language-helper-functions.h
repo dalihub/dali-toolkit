@@ -37,6 +37,7 @@ namespace Text
  * @param[in] fontDescriptions The font's descriptions for the whole text.
  * @param[in] defaultFontDescription The default font's description.
  * @param[in] defaultPointSize The default font's point size.
+ * @param[in] fontSizeScale The font's size scale.
  * @param[in] characterIndex Index to the character to retrieve its font's description.
  * @param[out] fontDescription The font's description for the character.
  * @param[out] fontPointSize The font's point size for the character.
@@ -45,6 +46,7 @@ namespace Text
 void MergeFontDescriptions(const Vector<FontDescriptionRun>&       fontDescriptions,
                            const TextAbstraction::FontDescription& defaultFontDescription,
                            TextAbstraction::PointSize26Dot6        defaultPointSize,
+                           float                                   fontSizeScale,
                            CharacterIndex                          characterIndex,
                            TextAbstraction::FontDescription&       fontDescription,
                            TextAbstraction::PointSize26Dot6&       fontPointSize,
