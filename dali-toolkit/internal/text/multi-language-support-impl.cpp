@@ -413,6 +413,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
                                          const Vector<FontDescriptionRun>&       fontDescriptions,
                                          const TextAbstraction::FontDescription& defaultFontDescription,
                                          TextAbstraction::PointSize26Dot6        defaultFontPointSize,
+                                         float                                   fontSizeScale,
                                          CharacterIndex                          startIndex,
                                          Length                                  numberOfCharacters,
                                          Vector<FontRun>&                        fonts)
@@ -493,6 +494,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
     MergeFontDescriptions(fontDescriptions,
                           defaultFontDescription,
                           defaultFontPointSize,
+                          fontSizeScale,
                           index,
                           currentFontDescription,
                           currentFontPointSize,
