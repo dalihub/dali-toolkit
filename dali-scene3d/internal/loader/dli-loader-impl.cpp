@@ -1456,16 +1456,18 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
     // be expressed as a multiple of; 0 won't work. This is small enough (i.e. shorter
     // than our frame delay) to not be restrictive WRT replaying. If anything needs
     // to occur more frequently, then Animations are likely not your solution anyway.
-    animDef.SetDuration(AnimationDefinition::MIN_DURATION_SECONDS);
-    float animationDuration;
+    float animationDuration = 0.0f;
     if(!ReadFloat(tnAnim.GetChild("duration"), animationDuration))
     {
-      animDef.SetDuration(animationDuration);
-      mOnError(FormatString("Animation '%s' fails to define '%s', defaulting to %f.",
+      mOnError(FormatString("Animation '%s' fails to define '%s'.",
                             animDef.GetName().c_str(),
-                            "duration",
-                            animDef.GetDuration()));
+                            "duration"));
     }
+    if(animationDuration < AnimationDefinition::MIN_DURATION_SECONDS)
+    {
+      animationDuration = AnimationDefinition::MIN_DURATION_SECONDS;
+    }
+    animDef.SetDuration(animationDuration);
 
     // Get loop count - # of playbacks. Default is once. 0 means repeat indefinitely.
     int32_t animationLoopCount = 1;
