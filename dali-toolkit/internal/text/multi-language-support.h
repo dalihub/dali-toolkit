@@ -110,6 +110,7 @@ public:
    * @param[in] fontDescriptions The fonts set through the mark-up string or the input style set through the property system.
    * @param[in] defaultFontDescription The default font's description set through the property system.
    * @param[in] defaultFontPointSize The default font's point size set through the property system.
+   * @param[in] fontSizeScale The font's size scale.
    * @param[in] startIndex The character from where the font info is set.
    * @param[in] numberOfCharacters The number of characters to set the font.
    * @param[out] fonts The validated fonts.
@@ -119,6 +120,7 @@ public:
                      const Vector<FontDescriptionRun>&       fontDescriptions,
                      const TextAbstraction::FontDescription& defaultFontDescription,
                      TextAbstraction::PointSize26Dot6        defaultFontPointSize,
+                     float                                   fontSizeScale,
                      CharacterIndex                          startIndex,
                      Length                                  numberOfCharacters,
                      Vector<FontRun>&                        fonts);

@@ -268,6 +268,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
                                          fontDescriptionRuns,
                                          defaultFontDescription,
                                          defaultPointSize,
+                                         impl.GetFontSizeScale(),
                                          startIndex,
                                          requestedNumberOfCharacters,
                                          validFonts);
