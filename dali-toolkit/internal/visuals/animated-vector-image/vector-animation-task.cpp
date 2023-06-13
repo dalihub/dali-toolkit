@@ -50,10 +50,9 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mVectorRenderer(VectorAnimationRenderer::New()),
   mAnimationData(),
   mVectorAnimationThread(factoryCache.GetVectorAnimationManager().GetVectorAnimationThread()),
-  mConditionalWait(),
+  mMutex(),
   mResourceReadySignal(),
-  mAnimationFinishedTrigger(),
-  mLoadCompletedTrigger(new EventThreadCallback(MakeCallback(this, &VectorAnimationTask::OnLoadCompleted))),
+  mLoadCompletedCallback(MakeCallback(this, &VectorAnimationTask::OnLoadCompleted)),
   mPlayState(PlayState::STOPPED),
   mStopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
   mLoopingMode(DevelImageVisual::LoopingMode::RESTART),
@@ -90,21 +89,25 @@ VectorAnimationTask::~VectorAnimationTask()
 
 void VectorAnimationTask::Finalize()
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
+  {
+    Mutex::ScopedLock lock(mMutex);
 
-  // Release some objects in the main thread
-  if(mAnimationFinishedTrigger)
-  {
-    mAnimationFinishedTrigger.reset();
-  }
-  if(mLoadCompletedTrigger)
-  {
-    mLoadCompletedTrigger.reset();
+    // Release some objects in the main thread
+    if(mAnimationFinishedCallback)
+    {
+      mVectorAnimationThread.RemoveEventTriggerCallbacks(mAnimationFinishedCallback.get());
+      mAnimationFinishedCallback.reset();
+    }
+    if(mLoadCompletedCallback)
+    {
+      mVectorAnimationThread.RemoveEventTriggerCallbacks(mLoadCompletedCallback.get());
+      mLoadCompletedCallback.reset();
+    }
+
+    mDestroyTask = true;
   }
 
   mVectorRenderer.Finalize();
-
-  mDestroyTask = true;
 }
 
 bool VectorAnimationTask::Load(bool synchronousLoading)
@@ -113,10 +116,12 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   {
     DALI_LOG_ERROR("VectorAnimationTask::Load: Load failed [%s]\n", mUrl.c_str());
     mLoadRequest = false;
-    mLoadFailed  = true;
-    if(!synchronousLoading)
     {
-      mLoadCompletedTrigger->Trigger();
+      Mutex::ScopedLock lock(mMutex);
+      if(!synchronousLoading && mLoadCompletedCallback)
+      {
+        mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
+      }
     }
     return false;
   }
@@ -129,9 +134,12 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   mFrameDurationMicroSeconds = MICROSECONDS_PER_SECOND / mFrameRate;
 
   mLoadRequest = false;
-  if(!synchronousLoading)
   {
-    mLoadCompletedTrigger->Trigger();
+    Mutex::ScopedLock lock(mMutex);
+    if(!synchronousLoading && mLoadCompletedCallback)
+    {
+      mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
+    }
   }
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Load: file = %s [%d frames, %f fps] [%p]\n", mUrl.c_str(), mTotalFrame, mFrameRate, this);
@@ -141,8 +149,6 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
 
 void VectorAnimationTask::SetRenderer(Renderer renderer)
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-
   mVectorRenderer.SetRenderer(renderer);
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetRenderer [%p]\n", this);
@@ -173,7 +179,7 @@ bool VectorAnimationTask::IsLoadRequested() const
 
 void VectorAnimationTask::SetAnimationData(const AnimationData& data)
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
+  Mutex::ScopedLock lock(mMutex);
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetAnimationData [%p]\n", this);
 
@@ -249,13 +255,10 @@ void VectorAnimationTask::PauseAnimation()
   }
 }
 
-void VectorAnimationTask::SetAnimationFinishedCallback(EventThreadCallback* callback)
+void VectorAnimationTask::SetAnimationFinishedCallback(CallbackBase* callback)
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-  if(callback)
-  {
-    mAnimationFinishedTrigger = std::unique_ptr<EventThreadCallback>(callback);
-  }
+  Mutex::ScopedLock lock(mMutex);
+  mAnimationFinishedCallback = std::unique_ptr<CallbackBase>(callback);
 }
 
 void VectorAnimationTask::SetLoopCount(int32_t count)
@@ -427,7 +430,7 @@ bool VectorAnimationTask::Rasterize(bool& keepAnimation)
   keepAnimation = false;
 
   {
-    ConditionalWait::ScopedLock lock(mConditionalWait);
+    Mutex::ScopedLock lock(mMutex);
     if(mDestroyTask)
     {
       // The task will be destroyed. We don't need rasterization.
@@ -537,10 +540,10 @@ bool VectorAnimationTask::Rasterize(bool& keepAnimation)
 
     // Animation is finished
     {
-      ConditionalWait::ScopedLock lock(mConditionalWait);
-      if(mNeedAnimationFinishedTrigger && mAnimationFinishedTrigger)
+      Mutex::ScopedLock lock(mMutex);
+      if(mNeedAnimationFinishedTrigger && mAnimationFinishedCallback)
       {
-        mAnimationFinishedTrigger->Trigger();
+        mVectorAnimationThread.AddEventTriggerCallback(mAnimationFinishedCallback.get());
       }
     }
 
@@ -628,7 +631,7 @@ void VectorAnimationTask::ApplyAnimationData()
   uint32_t index;
 
   {
-    ConditionalWait::ScopedLock lock(mConditionalWait);
+    Mutex::ScopedLock lock(mMutex);
 
     if(!mAnimationDataUpdated || mAnimationData[mAnimationDataIndex].resendFlag != 0)
     {

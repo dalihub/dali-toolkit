@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/threading/conditional-wait.h>
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 #include <dali/public-api/signals/connection-tracker.h>
@@ -52,7 +53,7 @@ public:
   ~VectorAnimationThread() override;
 
   /**
-   * Add a animation task into the vector animation thread, called by main thread.
+   * @brief Add a animation task into the vector animation thread, called by main thread.
    *
    * @param[in] task The task added to the thread.
    */
@@ -60,6 +61,7 @@ public:
 
   /**
    * @brief Called when the rasterization is completed from the rasterize thread.
+   *
    * @param[in] task The completed task
    * @param[in] success true if the task succeeded, false otherwise.
    * @param[in] keepAnimation true if the animation is running, false otherwise.
@@ -71,6 +73,22 @@ public:
    */
   void OnAwakeFromSleep();
 
+  /**
+   * @brief Add an event trigger callback.
+   *
+   * @param callback The callback to add
+   * @note Ownership of the callback is NOT passed onto this class.
+   * @note The callback will be excuted in the main thread.
+   */
+  void AddEventTriggerCallback(CallbackBase* callback);
+
+  /**
+   * @brief Remove event trigger callbacks what we added before.
+   *
+   * @param callback The callback to remove
+   */
+  void RemoveEventTriggerCallbacks(CallbackBase* callback);
+
 protected:
   /**
    * @brief The entry function of the animation thread.
@@ -79,7 +97,7 @@ protected:
 
 private:
   /**
-   * Rasterizes the tasks.
+   * @brief Rasterizes the tasks.
    */
   void Rasterize();
 
@@ -121,6 +139,16 @@ private:
     std::unique_ptr<VectorRasterizeThread> mRasterizer;
     VectorAnimationThread&                 mAnimationThread;
   };
+
+  /**
+   * @brief Called when the event callback is triggered.
+   */
+  void OnEventCallbackTriggered();
+
+  /**
+   * @brief Gets next event callback to process.
+   */
+  CallbackBase* GetNextEventCallback();
 
   /**
    * @brief The thread to sleep until the next frame time.
@@ -174,10 +202,14 @@ private:
   std::vector<VectorAnimationTaskPtr>      mCompletedTasks;
   std::vector<VectorAnimationTaskPtr>      mWorkingTasks;
   RoundRobinContainerView<RasterizeHelper> mRasterizers;
+  std::vector<CallbackBase*>               mTriggerEventCallbacks{}; // Callbacks are not owned
   SleepThread                              mSleepThread;
   ConditionalWait                          mConditionalWait;
+  Mutex                                    mEventTriggerMutex;
+  std::unique_ptr<EventThreadCallback>     mEventTrigger{};
   bool                                     mNeedToSleep;
   bool                                     mDestroyThread;
+  bool                                     mEventTriggered{false};
   const Dali::LogFactoryInterface&         mLogFactory;
 };
 

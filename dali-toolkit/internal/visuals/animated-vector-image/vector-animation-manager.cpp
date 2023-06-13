@@ -55,7 +55,7 @@ VectorAnimationManager::~VectorAnimationManager()
   }
   mEventCallbacks.clear();
 
-  if(mProcessorRegistered)
+  if(mProcessorRegistered && Adaptor::IsAvailable())
   {
     Adaptor::Get().UnregisterProcessor(*this, true);
   }

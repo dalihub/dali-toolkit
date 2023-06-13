@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1056,8 +1056,7 @@ int UtcDaliAnimatedVectorImageVisualAnimationFinishedSignal(void)
 
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
-    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
-    .Add(DevelImageVisual::Property::LOOP_COUNT, 3);
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -1073,14 +1072,24 @@ int UtcDaliAnimatedVectorImageVisualAnimationFinishedSignal(void)
 
   application.GetScene().Add(actor);
 
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  propertyMap.Clear();
+  propertyMap.Add(DevelImageVisual::Property::LOOP_COUNT, 3);
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, propertyMap);
+
   Property::Map attributes;
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
 
   application.SendNotification();
   application.Render();
 
-  // Wait for animation finish - render, finish
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Wait for animation finish
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::PLAY_STATE);
@@ -1351,8 +1360,6 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
-    .Add(DevelImageVisual::Property::LOOP_COUNT, 3)
-    .Add(DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::FIRST_FRAME)
     .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
@@ -1367,14 +1374,25 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
 
   application.GetScene().Add(actor);
 
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  propertyMap.Clear();
+  propertyMap.Add(DevelImageVisual::Property::LOOP_COUNT, 3);
+  propertyMap.Add(DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::FIRST_FRAME);
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, propertyMap);
+
   Property::Map attributes;
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
 
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 3 - load, render, animation finished
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+  // Trigger count is 1 - animation finished
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1459,9 +1477,6 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
-    .Add(DevelImageVisual::Property::LOOP_COUNT, 3)
-    .Add(DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::LAST_FRAME)
-    .Add(DevelImageVisual::Property::LOOPING_MODE, DevelImageVisual::LoopingMode::AUTO_REVERSE)
     .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
@@ -1476,14 +1491,26 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
 
   application.GetScene().Add(actor);
 
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - load, render
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  propertyMap.Clear();
+  propertyMap.Add(DevelImageVisual::Property::LOOP_COUNT, 3);
+  propertyMap.Add(DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::LAST_FRAME);
+  propertyMap.Add(DevelImageVisual::Property::LOOPING_MODE, DevelImageVisual::LoopingMode::AUTO_REVERSE);
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, propertyMap);
+
   Property::Map attributes;
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
 
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 3 - load, render, animation finished
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+  // Trigger count is 1 - animation finished
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1648,6 +1675,12 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
 
   application.GetScene().Add(actor1);
 
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
   propertyMap.Clear();
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
@@ -1667,8 +1700,8 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 4 - load & render a frame for each instance
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   DevelControl::DoAction(actor2, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, Property::Map());
 
