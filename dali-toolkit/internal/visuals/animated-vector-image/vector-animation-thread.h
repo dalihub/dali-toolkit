@@ -51,7 +51,7 @@ public:
   ~VectorAnimationThread() override;
 
   /**
-   * Add a animation task into the vector animation thread, called by main thread.
+   * @brief Add a animation task into the vector animation thread, called by main thread.
    *
    * @param[in] task The task added to the thread.
    */
@@ -59,6 +59,7 @@ public:
 
   /**
    * @brief Called when the rasterization is completed from the rasterize thread.
+   *
    * @param[in] task The completed task
    * @param[in] success true if the task succeeded, false otherwise.
    * @param[in] keepAnimation true if the animation is running, false otherwise.
@@ -69,6 +70,22 @@ public:
    * @brief Called when the sleep thread is awaken.
    */
   void OnAwakeFromSleep();
+
+  /**
+   * @brief Add an event trigger callback.
+   *
+   * @param callback The callback to add
+   * @note Ownership of the callback is NOT passed onto this class.
+   * @note The callback will be excuted in the main thread.
+   */
+  void AddEventTriggerCallback(CallbackBase* callback);
+
+  /**
+   * @brief Remove an event trigger callback.
+   *
+   * @param callback The callback to remove
+   */
+  void RemoveEventTriggerCallback(CallbackBase* callback);
 
 protected:
   /**
@@ -81,6 +98,11 @@ private:
    * Rasterizes the tasks.
    */
   void Rasterize();
+
+  /**
+   * @brief Called when the event callback is triggered.
+   */
+  void OnEventCallbackTriggered();
 
   /**
    * @brief The thread to sleep until the next frame time.
@@ -130,15 +152,18 @@ private:
   VectorAnimationThread& operator=(const VectorAnimationThread& thread) = delete;
 
 private:
-  std::vector<VectorAnimationTaskPtr> mAnimationTasks;
-  std::vector<VectorAnimationTaskPtr> mCompletedTasks;
-  std::vector<VectorAnimationTaskPtr> mWorkingTasks;
-  SleepThread                         mSleepThread;
-  ConditionalWait                     mConditionalWait;
-  bool                                mNeedToSleep;
-  bool                                mDestroyThread;
-  const Dali::LogFactoryInterface&    mLogFactory;
-  Dali::AsyncTaskManager              mAsyncTaskManager;
+  std::vector<VectorAnimationTaskPtr>  mAnimationTasks;
+  std::vector<VectorAnimationTaskPtr>  mCompletedTasks;
+  std::vector<VectorAnimationTaskPtr>  mWorkingTasks;
+  std::vector<CallbackBase*>           mTriggerEventCallbacks{}; // Callbacks are not owned
+  SleepThread                          mSleepThread;
+  ConditionalWait                      mConditionalWait;
+  std::unique_ptr<EventThreadCallback> mEventTrigger{};
+  bool                                 mNeedToSleep;
+  bool                                 mDestroyThread;
+  bool                                 mEventTriggered{false};
+  const Dali::LogFactoryInterface&     mLogFactory;
+  Dali::AsyncTaskManager               mAsyncTaskManager;
 };
 
 } // namespace Internal

@@ -51,6 +51,8 @@ VectorAnimationThread::VectorAnimationThread()
 {
   mAsyncTaskManager = Dali::AsyncTaskManager::Get();
   mSleepThread.Start();
+
+  mEventTrigger = std::unique_ptr<EventThreadCallback>(new EventThreadCallback(MakeCallback(this, &VectorAnimationThread::OnEventCallbackTriggered)));
 }
 
 VectorAnimationThread::~VectorAnimationThread()
@@ -148,6 +150,28 @@ void VectorAnimationThread::OnAwakeFromSleep()
   }
 }
 
+void VectorAnimationThread::AddEventTriggerCallback(CallbackBase* callback)
+{
+  ConditionalWait::ScopedLock lock(mConditionalWait);
+  mTriggerEventCallbacks.push_back(callback);
+
+  if(!mEventTriggered)
+  {
+    mEventTrigger->Trigger();
+    mEventTriggered = true;
+  }
+}
+
+void VectorAnimationThread::RemoveEventTriggerCallback(CallbackBase* callback)
+{
+  ConditionalWait::ScopedLock lock(mConditionalWait);
+  auto                        iter = std::find(mTriggerEventCallbacks.begin(), mTriggerEventCallbacks.end(), callback);
+  if(iter != mTriggerEventCallbacks.end())
+  {
+    mTriggerEventCallbacks.erase(iter);
+  }
+}
+
 void VectorAnimationThread::Run()
 {
   SetThreadName("VectorAnimationThread");
@@ -235,6 +259,19 @@ void VectorAnimationThread::Rasterize()
       break;
     }
   }
+}
+
+void VectorAnimationThread::OnEventCallbackTriggered()
+{
+  ConditionalWait::ScopedLock lock(mConditionalWait);
+
+  for(auto&& iter : mTriggerEventCallbacks)
+  {
+    CallbackBase::Execute(*iter);
+  }
+
+  mTriggerEventCallbacks.clear();
+  mEventTriggered = false;
 }
 
 VectorAnimationThread::SleepThread::SleepThread(CallbackBase* callback)
