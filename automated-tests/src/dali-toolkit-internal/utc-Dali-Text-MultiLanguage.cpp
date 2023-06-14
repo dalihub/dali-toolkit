@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/multi-language-helper-functions.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
+#include <dali-toolkit/internal/text/multi-language-support-impl.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 #include <dali-toolkit-test-suite-utils.h>
@@ -33,35 +34,38 @@ using namespace Dali;
 using namespace Toolkit;
 using namespace Text;
 
+
 // Tests the following functions with different scripts.
 //
-// void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
-//                             const TextAbstraction::FontDescription& defaultFontDescription,
-//                             TextAbstraction::PointSize26Dot6 defaultPointSize,
-//                             CharacterIndex characterIndex,
-//                             TextAbstraction::FontDescription& fontDescription,
-//                             TextAbstraction::PointSize26Dot6& fontPointSize,
-//                             bool& isDefaultFont );
+// void MergeFontDescriptions(const Vector<FontDescriptionRun>&       fontDescriptions,
+//                            const TextAbstraction::FontDescription& defaultFontDescription,
+//                            TextAbstraction::PointSize26Dot6        defaultPointSize,
+//                            float                                   fontSizeScale,
+//                            CharacterIndex                          characterIndex,
+//                            TextAbstraction::FontDescription&       fontDescription,
+//                            TextAbstraction::PointSize26Dot6&       fontPointSize,
+//                            bool&                                   isDefaultFont);
 //
-// Script GetScript( Length index,
-//                   Vector<ScriptRun>::ConstIterator& scriptRunIt,
-//                   const Vector<ScriptRun>::ConstIterator& scriptRunEndIt );
+// Script GetScript(Length                                  index,
+//                  Vector<ScriptRun>::ConstIterator&       scriptRunIt,
+//                  const Vector<ScriptRun>::ConstIterator& scriptRunEndIt);
 //
 // Constructor, destructor and MultilanguageSupport::Get()
 //
-// void MultilanguageSupport::SetScripts( const Vector<Character>& text,
-//                                        CharacterIndex startIndex,
-//                                        Length numberOfCharacters,
-//                                        Vector<ScriptRun>& scripts );
+// void MultilanguageSupport::SetScripts(const Vector<Character>& text,
+//                                       CharacterIndex           startIndex,
+//                                       Length                   numberOfCharacters,
+//                                       Vector<ScriptRun>&       scripts);
 //
-// void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
-//                                           const Vector<ScriptRun>& scripts,
-//                                           const Vector<FontDescriptionRun>& fontDescriptions,
-//                                           const TextAbstraction::FontDescription& defaultFontDescription,
-//                                           TextAbstraction::PointSize26Dot6 defaultFontPointSize,
-//                                           CharacterIndex startIndex,
-//                                           Length numberOfCharacters,
-//                                           Vector<FontRun>& fonts );
+// void MultilanguageSupport::ValidateFonts(const Vector<Character>&                text,
+//                                          const Vector<ScriptRun>&                scripts,
+//                                          const Vector<FontDescriptionRun>&       fontDescriptions,
+//                                          const TextAbstraction::FontDescription& defaultFontDescription,
+//                                          TextAbstraction::PointSize26Dot6        defaultFontPointSize,
+//                                          float                                   fontSizeScale,
+//                                          CharacterIndex                          startIndex,
+//                                          Length                                  numberOfCharacters,
+//                                          Vector<FontRun>&                        fonts);
 
 //////////////////////////////////////////////////////////
 
@@ -78,6 +82,7 @@ struct MergeFontDescriptionsData
   Vector<FontDescriptionRun> fontDescriptionRuns;          ///< The font description runs.
   TextAbstraction::FontDescription defaultFontDescription; ///< The default font description.
   TextAbstraction::PointSize26Dot6 defaultPointSize;       ///< The default point size.
+  float        fontSizeScale;                              ///< The font's size scale.
   unsigned int startIndex;                                 ///< The start index.
   unsigned int numberOfCharacters;                         ///< The number of characters.
   Vector<FontId> expectedFontIds;                          ///< The expected font ids.
@@ -99,6 +104,7 @@ struct ValidateFontsData
   std::string                text;                ///< Input text.
   std::string                defaultFont;         ///< The default font.
   unsigned int               defaultFontSize;     ///< The default font size.
+  float                      fontSizeScale;       ///< The font's size scale.
   unsigned int               index;               ///< The index of the first character to update the script.
   unsigned int               numberOfCharacters;  ///< The numbers of characters to update the script.
   Vector<FontDescriptionRun> fontDescriptionRuns; ///< The font description runs.
@@ -123,6 +129,7 @@ bool MergeFontDescriptionsTest( const MergeFontDescriptionsData& data )
     MergeFontDescriptions( data.fontDescriptionRuns,
                            data.defaultFontDescription,
                            data.defaultPointSize,
+                           data.fontSizeScale,
                            index,
                            fontDescription,
                            fontPointSize,
@@ -290,6 +297,7 @@ bool ValidateFontTest( const ValidateFontsData& data )
                                       data.fontDescriptionRuns,
                                       defaultFontDescription,
                                       defaultPointSize,
+                                      data.fontSizeScale,
                                       0u,
                                       numberOfCharacters,
                                       fontRuns );
@@ -307,6 +315,7 @@ bool ValidateFontTest( const ValidateFontsData& data )
                                         data.fontDescriptionRuns,
                                         defaultFontDescription,
                                         defaultPointSize,
+                                        data.fontSizeScale,
                                         data.index,
                                         data.numberOfCharacters,
                                         fontRuns );
@@ -594,6 +603,7 @@ int UtcDaliTextMergeFontDescriptions(void)
       fontDescriptionRuns01,
       defaultFontDescription01,
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       0u,
       0u,
       expectedFontIds01,
@@ -604,6 +614,7 @@ int UtcDaliTextMergeFontDescriptions(void)
       fontDescriptionRuns02,
       defaultFontDescription02,
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       0u,
       2u,
       expectedFontIds02,
@@ -614,6 +625,7 @@ int UtcDaliTextMergeFontDescriptions(void)
       fontDescriptionRuns03,
       defaultFontDescription03,
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       0u,
       10u,
       expectedFontIds03,
@@ -1744,6 +1756,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       "",
       "/tizen/TizenSansRegular.ttf",
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       0u,
       0u,
       fontDescriptions01,
@@ -1754,6 +1767,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       "Hello world",
       "/tizen/TizenSansRegular.ttf",
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       0u,
       11u,
       fontDescriptions02,
@@ -1764,6 +1778,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       "Hello world\nhello world\ndemo",
       "/tizen/TizenSansRegular.ttf",
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       0u,
       28u,
       fontDescriptions03,
@@ -1774,6 +1789,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       "Hello world\nhello world\ndemo",
       "/tizen/TizenSansRegular.ttf",
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       0u,
       12u,
       fontDescriptions03,
@@ -1784,6 +1800,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       "Hello world\nhello world\ndemo",
       "/tizen/TizenSansRegular.ttf",
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       12u,
       12u,
       fontDescriptions03,
@@ -1794,6 +1811,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       "Hello world\nhello world\ndemo",
       "/tizen/TizenSansRegular.ttf",
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       24u,
       4u,
       fontDescriptions03,
@@ -1804,6 +1822,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       "שלום עולם",
       "/tizen/TizenSansRegular.ttf",
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       0u,
       9u,
       fontDescriptions07,
@@ -1814,6 +1833,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       "שלום עולם",
       "/tizen/TizenSansHebrewRegular.ttf",
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       0u,
       9u,
       fontDescriptions08,
@@ -1824,6 +1844,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       "\xF0\x9F\x98\x81\xF0\x9F\x98\x82\xF0\x9F\x98\x83\xF0\x9F\x98\x84",
       "/tizen/BreezeColorEmoji.ttf",
       EMOJI_FONT_SIZE,
+      1.0f,
       0u,
       4u,
       fontDescriptions09,
@@ -1834,6 +1855,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       "Hello world, שלום עולם, hello world, שלום עולם",
       "/tizen/TizenSansRegular.ttf",
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       0u,
       46u,
       fontDescriptions10,
@@ -1844,6 +1866,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       "WRC – The Official App",
       "/tizen/TizenSansRegular.ttf",
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       0u,
       22u,
       fontDescriptions11,
@@ -1854,6 +1877,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       "Hello \tworld",
       "/tizen/TizenSansRegular.ttf",
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      1.0f,
       0u,
       12u,
       fontDescriptions12,
@@ -1871,5 +1895,59 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
   }
 
   tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextMultiLanguageValidateFontsPerScriptCache(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextMultiLanguageValidateFontsPerScriptCache");
+
+  std::size_t MAX_VALIDATE_FONTS_PER_SCRIPT_CACHE_SIZE = 63u;
+  std::size_t VALIDATE_FONTS_PER_SCRIPT_REMAIN_COUNT   = 8u;
+
+  Dali::Toolkit::Text::Internal::ValidateFontsPerScript* validateFontsPerScript = new Dali::Toolkit::Text::Internal::ValidateFontsPerScript();
+
+  for(std::size_t i = 0u; i < MAX_VALIDATE_FONTS_PER_SCRIPT_CACHE_SIZE; i ++)
+  {
+    FontId fontId = i;
+    validateFontsPerScript->Cache(fontId);
+  }
+
+  DALI_TEST_EQUALS(MAX_VALIDATE_FONTS_PER_SCRIPT_CACHE_SIZE, validateFontsPerScript->mValidFonts.Count(), TEST_LOCATION);
+
+  FontId fontId = MAX_VALIDATE_FONTS_PER_SCRIPT_CACHE_SIZE;
+  validateFontsPerScript->Cache(fontId);
+
+  DALI_TEST_EQUALS(VALIDATE_FONTS_PER_SCRIPT_REMAIN_COUNT, validateFontsPerScript->mValidFonts.Count(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextMultiLanguageDefaultFontsCache(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextMultiLanguageDefaultFontsCache");
+
+  std::size_t MAX_DEFAULT_FONTS_CACHE_SIZE = 15;
+  std::size_t DEFAULT_FONTS_REMAIN_COUNT   = 2;
+
+  Dali::Toolkit::Text::Internal::DefaultFonts* defaultFontsPerScript = new Dali::Toolkit::Text::Internal::DefaultFonts();
+
+  for(std::size_t i = 0u; i < MAX_DEFAULT_FONTS_CACHE_SIZE; i ++)
+  {
+    TextAbstraction::FontDescription fontDescription;
+    FontId fontId = i;
+    defaultFontsPerScript->Cache(fontDescription, fontId);
+  }
+
+  DALI_TEST_EQUALS(MAX_DEFAULT_FONTS_CACHE_SIZE, defaultFontsPerScript->mFonts.size(), TEST_LOCATION);
+
+  TextAbstraction::FontDescription fontDescription;
+  FontId fontId = MAX_DEFAULT_FONTS_CACHE_SIZE;
+  defaultFontsPerScript->Cache(fontDescription, fontId);
+
+  DALI_TEST_EQUALS(DEFAULT_FONTS_REMAIN_COUNT, defaultFontsPerScript->mFonts.size(), TEST_LOCATION);
+
   END_TEST;
 }

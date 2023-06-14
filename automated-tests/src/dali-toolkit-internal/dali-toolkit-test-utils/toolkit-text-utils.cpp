@@ -229,6 +229,7 @@ void CreateTextModel(const std::string&                text,
                                      fontDescriptionRuns,
                                      fontDescription,
                                      TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+                                     1.0f,
                                      0u,
                                      characterCount,
                                      validFonts);
