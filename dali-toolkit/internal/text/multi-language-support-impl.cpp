@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,13 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_MULT
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_FONT_PERFORMANCE_MARKER, false);
 
 const Dali::Toolkit::Text::Character UTF32_A = 0x0041;
+
+// TODO : Customization required for these values.
+constexpr std::size_t MAX_VALIDATE_FONTS_PER_SCRIPT_CACHE_SIZE = 63;
+constexpr std::size_t MAX_DEFAULT_FONTS_CACHE_SIZE             = 15;
+
+constexpr int VALIDATE_FONTS_PER_SCRIPT_REMAIN_COUNT = 8;
+constexpr int DEFAULT_FONTS_REMAIN_COUNT             = 2;
 } // namespace
 
 namespace Text
@@ -61,6 +68,20 @@ bool ValidateFontsPerScript::IsValidFont(FontId fontId) const
   }
 
   return false;
+}
+void ValidateFontsPerScript::Cache(FontId fontId)
+{
+  mValidFonts.PushBack(fontId);
+  if(MAX_VALIDATE_FONTS_PER_SCRIPT_CACHE_SIZE < mValidFonts.Count())
+  {
+    // Clear cache but remaind some last items.
+    const auto offset = mValidFonts.Count() - VALIDATE_FONTS_PER_SCRIPT_REMAIN_COUNT;
+    for(int i = 0; i < VALIDATE_FONTS_PER_SCRIPT_REMAIN_COUNT; ++i)
+    {
+      mValidFonts[i] = std::move(mValidFonts[offset + i]);
+    }
+    mValidFonts.Resize(VALIDATE_FONTS_PER_SCRIPT_REMAIN_COUNT);
+  }
 }
 
 FontId DefaultFonts::FindFont(TextAbstraction::FontClient&            fontClient,
@@ -93,6 +114,16 @@ void DefaultFonts::Cache(const TextAbstraction::FontDescription& description, Fo
   item.description = description;
   item.fontId      = fontId;
   mFonts.push_back(item);
+  if(MAX_DEFAULT_FONTS_CACHE_SIZE < mFonts.size())
+  {
+    // Clear cache but remaind some last items.
+    const auto offset = mFonts.size() - DEFAULT_FONTS_REMAIN_COUNT;
+    for(int i = 0; i < DEFAULT_FONTS_REMAIN_COUNT; ++i)
+    {
+      mFonts[i] = std::move(mFonts[offset + i]);
+    }
+    mFonts.resize(DEFAULT_FONTS_REMAIN_COUNT);
+  }
 }
 
 MultilanguageSupport::MultilanguageSupport()
@@ -474,10 +505,10 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
   Vector<ScriptRun>::ConstIterator scriptRunEndIt          = scripts.End();
   bool                             isNewParagraphCharacter = false;
 
-  FontId previousEmojiFontId = 0u;
-  FontId currentFontId       = 0u;
-  FontId previousFontId      = 0u;
-  TextAbstraction::Script previousScript = TextAbstraction::UNKNOWN;
+  FontId                  previousEmojiFontId = 0u;
+  FontId                  currentFontId       = 0u;
+  FontId                  previousFontId      = 0u;
+  TextAbstraction::Script previousScript      = TextAbstraction::UNKNOWN;
 
   CharacterIndex lastCharacter = startIndex + numberOfCharacters - 1u;
   for(Length index = startIndex; index <= lastCharacter; ++index)
@@ -629,7 +660,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
             *(validFontsPerScriptCacheBuffer + script) = validateFontsPerScript;
           }
 
-          validateFontsPerScript->mValidFonts.PushBack(fontId);
+          validateFontsPerScript->Cache(fontId);
         }
 
         if(!isValidFont && (fontId != cachedDefaultFontId) && (!TextAbstraction::IsNewParagraph(character))) // (3)
@@ -646,7 +677,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
           if(isValidCachedFont)
           {
             // Use the cached default font for the script if there is one.
-            fontId = cachedDefaultFontId;
+            fontId      = cachedDefaultFontId;
             isValidFont = true;
           }
           else
