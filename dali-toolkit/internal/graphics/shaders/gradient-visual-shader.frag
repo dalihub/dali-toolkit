@@ -8,6 +8,9 @@ INPUT mediump vec4 vCornerRadius;
 #endif
 #endif
 
+// scale factor to fit start and end position of gradient.
+uniform mediump float uTextureCoordinateScaleFactor;
+
 uniform sampler2D sTexture; // sampler1D?
 uniform lowp vec4 uColor;
 uniform lowp vec3 mixColor;
@@ -188,7 +191,8 @@ mediump float calculateCornerOpacity()
 void main()
 {
 #ifdef RADIAL
-  lowp vec4 textureColor = TEXTURE(sTexture, vec2(length(vTexCoord), 0.5)) * vec4(mixColor, 1.0) * uColor;
+  mediump float radialTexCoord = ((length(vTexCoord) - 0.5) * uTextureCoordinateScaleFactor) + 0.5;
+  lowp vec4 textureColor = TEXTURE(sTexture, vec2(radialTexCoord, 0.5)) * vec4(mixColor, 1.0) * uColor;
 #else
   lowp vec4 textureColor = TEXTURE(sTexture, vec2(vTexCoord.y, 0.5)) * vec4(mixColor, 1.0) * uColor;
 #endif
