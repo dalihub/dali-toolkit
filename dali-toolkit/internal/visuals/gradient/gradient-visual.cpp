@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(1); // alignment
+static constexpr int32_t CUSTOM_PROPERTY_COUNT(1); // alignment
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN(UNITS)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::GradientVisual::Units, OBJECT_BOUNDING_BOX)
@@ -61,12 +61,12 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(SPREAD_METHOD)
 DALI_ENUM_TO_STRING_TABLE_END(SPREAD_METHOD)
 
 // uniform names
-const char* const UNIFORM_ALIGNMENT_MATRIX_NAME("uAlignmentMatrix");
+static constexpr std::string_view UNIFORM_ALIGNMENT_MATRIX_NAME("uAlignmentMatrix");
 static constexpr std::string_view UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME("uTextureCoordinateScaleFactor");
 
 // default offset value
-const unsigned int DEFAULT_OFFSET_MINIMUM = 0.0f;
-const unsigned int DEFAULT_OFFSET_MAXIMUM = 1.0f;
+static constexpr float DEFAULT_OFFSET_MINIMUM = 0.0f;
+static constexpr float DEFAULT_OFFSET_MAXIMUM = 1.0f;
 
 VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[16] =
   {
@@ -254,7 +254,7 @@ void GradientVisual::OnInitialize()
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
   Shader   shader   = GenerateShader();
 
-  //Set up the texture set
+  // Set up the texture set
   TextureSet    textureSet    = TextureSet::New();
   Dali::Texture lookupTexture = mGradient->GenerateLookupTexture();
   textureSet.SetTexture(0u, lookupTexture);
@@ -276,9 +276,9 @@ void GradientVisual::OnInitialize()
   mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform);
 
   float textureSize = static_cast<float>(lookupTexture.GetWidth());
-  mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME, (textureSize - 1.0f)/textureSize);
+  mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME, (textureSize - 1.0f) / textureSize);
 
-  //Register transform properties
+  // Register transform properties
   mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
