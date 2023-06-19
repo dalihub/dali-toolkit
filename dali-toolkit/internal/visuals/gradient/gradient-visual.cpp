@@ -62,6 +62,7 @@ DALI_ENUM_TO_STRING_TABLE_END(SPREAD_METHOD)
 
 // uniform names
 const char* const UNIFORM_ALIGNMENT_MATRIX_NAME("uAlignmentMatrix");
+static constexpr std::string_view UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME("uTextureCoordinateScaleFactor");
 
 // default offset value
 const unsigned int DEFAULT_OFFSET_MINIMUM = 0.0f;
@@ -273,6 +274,9 @@ void GradientVisual::OnInitialize()
   }
 
   mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform);
+
+  float textureSize = static_cast<float>(lookupTexture.GetWidth());
+  mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME, (textureSize - 1.0f)/textureSize);
 
   //Register transform properties
   mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
