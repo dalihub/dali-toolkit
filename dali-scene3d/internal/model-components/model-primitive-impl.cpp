@@ -29,6 +29,8 @@
 #include <dali-scene3d/internal/model-components/material-impl.h>
 #include <dali-scene3d/public-api/loader/environment-definition.h>
 
+#include <dali/integration-api/debug.h>
+
 namespace Dali
 {
 namespace Scene3D
@@ -49,11 +51,6 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::ModelPrimitive, Dali::BaseHandle, Create);
 DALI_TYPE_REGISTRATION_END()
 
-constexpr std::string_view MORPH_POSITION_KEYWORD    = "MORPH_POSITION";
-constexpr std::string_view MORPH_NORMAL_KEYWORD      = "MORPH_NORMAL";
-constexpr std::string_view MORPH_TANGENT_KEYWORD     = "MORPH_TANGENT";
-constexpr std::string_view MORPH_VERSION_2_0_KEYWORD = "MORPH_VERSION_2_0";
-
 static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG = 10;
 } // unnamed namespace
 
@@ -67,6 +64,7 @@ ModelPrimitivePtr ModelPrimitive::New()
 }
 
 ModelPrimitive::ModelPrimitive()
+: mShaderManager(new Scene3D::Loader::ShaderManager())
 {
 }
 
@@ -225,6 +223,18 @@ void ModelPrimitive::RemoveLight(uint32_t lightIndex)
   mLights[lightIndex].Reset();
 }
 
+void ModelPrimitive::UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager)
+{
+  if(mShaderManager != shaderManager)
+  {
+    mShaderManager = (shaderManager) ? shaderManager : new Scene3D::Loader::ShaderManager();
+    if(mMaterial && GetImplementation(mMaterial).IsResourceReady())
+    {
+      ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag::SHADER);
+    }
+  }
+}
+
 void ModelPrimitive::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData& data)
 {
   mBlendShapeData = std::move(data);
@@ -236,11 +246,12 @@ void ModelPrimitive::SetBlendShapeGeometry(Dali::Texture blendShapeGeometry)
   mBlendShapeGeometry = blendShapeGeometry;
 }
 
-void ModelPrimitive::SetBlendShapeOptions(bool hasPositions, bool hasNormals, bool hasTangents)
+void ModelPrimitive::SetBlendShapeOptions(bool hasPositions, bool hasNormals, bool hasTangents, Scene3D::Loader::BlendShapes::Version version)
 {
-  mHasPositions = hasPositions;
-  mHasNormals   = hasNormals;
-  mHasTangents  = hasTangents;
+  mHasPositions      = hasPositions;
+  mHasNormals        = hasNormals;
+  mHasTangents       = hasTangents;
+  mBlendShapeVersion = version;
 }
 
 void ModelPrimitive::SetSkinned(bool isSkinned)
@@ -257,44 +268,43 @@ void ModelPrimitive::OnMaterialModified(Dali::Scene3D::Material material, Materi
 
 void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag flag)
 {
+  if(!mMaterial)
+  {
+    return;
+  }
+
   uint32_t shaderFlag = (flag & static_cast<uint32_t>(MaterialModifyObserver::ModifyFlag::SHADER));
   if(mIsMaterialChanged || shaderFlag == static_cast<uint32_t>(MaterialModifyObserver::ModifyFlag::SHADER))
   {
-    std::string vertexShader   = GetImplementation(mMaterial).GetVertexShader();
-    std::string fragmentShader = GetImplementation(mMaterial).GetFragmentShader();
+    Scene3D::Loader::ShaderOption shaderOption = GetImplementation(mMaterial).GetShaderOption();
 
-    std::vector<std::string> defines;
-    defines.push_back("VEC4_TANGENT");
+    shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::VEC4_TANGENT);
     if(mHasSkinning)
     {
-      defines.push_back("SKINNING");
+      shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::SKINNING);
     }
     if(mHasPositions || mHasNormals || mHasTangents)
     {
       if(mHasPositions)
       {
-        defines.push_back(MORPH_POSITION_KEYWORD.data());
+        shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::MORPH_POSITION);
       }
       if(mHasNormals)
       {
-        defines.push_back(MORPH_NORMAL_KEYWORD.data());
+        shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::MORPH_NORMAL);
       }
       if(mHasTangents)
       {
-        defines.push_back(MORPH_TANGENT_KEYWORD.data());
+        shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::MORPH_TANGENT);
       }
-      if(mBlendShapeData.version == Scene3D::Loader::BlendShapes::Version::VERSION_2_0)
+      if(mBlendShapeVersion == Scene3D::Loader::BlendShapes::Version::VERSION_2_0)
       {
-        defines.push_back(MORPH_VERSION_2_0_KEYWORD.data());
+        shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::MORPH_VERSION_2_0);
       }
-    }
-    for(const auto& define : defines)
-    {
-      Scene3D::Loader::ShaderDefinition::ApplyDefine(vertexShader, define);
     }
 
     mShader.Reset();
-    mShader = Shader::New(vertexShader, fragmentShader);
+    mShader = mShaderManager->ProduceShader(shaderOption);
 
     if(!mRenderer)
     {
@@ -445,9 +455,12 @@ void ModelPrimitive::UpdateImageBasedLightTexture()
 
 void ModelPrimitive::UpdateRendererUniform()
 {
-  mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightScaleFactorName().data(), mIblScaleFactor);
-  mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightMaxLodUniformName().data(), static_cast<float>(mSpecularMipmapLevels));
-  GetImplementation(mMaterial).SetRendererUniform(mRenderer);
+  if(mMaterial)
+  {
+    mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightScaleFactorName().data(), mIblScaleFactor);
+    mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightMaxLodUniformName().data(), static_cast<float>(mSpecularMipmapLevels));
+    GetImplementation(mMaterial).SetRendererUniform(mRenderer);
+  }
 }
 
 } // namespace Internal

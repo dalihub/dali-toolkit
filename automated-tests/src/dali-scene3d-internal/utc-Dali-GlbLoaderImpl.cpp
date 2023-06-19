@@ -22,7 +22,7 @@
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
-#include <dali-scene3d/public-api/loader/shader-definition-factory.h>
+#include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-test-suite-utils.h>
 #include <string_view>
 
@@ -123,10 +123,6 @@ int UtcDaliGlbLoaderFailedToLoad(void)
 int UtcDaliGlbLoaderFailedToParse(void)
 {
   Context ctx;
-
-  ShaderDefinitionFactory sdf;
-  sdf.SetResources(ctx.resources);
-
   DALI_TEST_EQUAL(ctx.loader.LoadModel(TEST_RESOURCE_DIR "/invalid.glb", ctx.loadResult), false);
 
   DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
@@ -135,7 +131,6 @@ int UtcDaliGlbLoaderFailedToParse(void)
   DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.size());
   DALI_TEST_EQUAL(0, ctx.resources.mMaterials.size());
   DALI_TEST_EQUAL(0, ctx.resources.mMeshes.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mShaders.size());
   DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.size());
 
   DALI_TEST_EQUAL(0, ctx.cameras.size());
@@ -149,9 +144,6 @@ int UtcDaliGlbLoaderFailedToParse(void)
 int UtcDaliGlbLoaderSuccess1(void)
 {
   Context                 ctx;
-  ShaderDefinitionFactory sdf;
-  sdf.SetResources(ctx.resources);
-
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/BoxAnimated.glb", ctx.loadResult);
 
   DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());

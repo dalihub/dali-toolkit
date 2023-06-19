@@ -30,6 +30,7 @@
 #include <dali-scene3d/public-api/loader/customization.h>
 #include <dali-scene3d/public-api/loader/matrix-stack.h>
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
+#include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 
 namespace Dali
@@ -150,8 +151,9 @@ public: // TYPES
   struct CreateParams
   {
   public: // input
-    ResourceBundle& mResources;
-    Transforms&     mXforms;
+    ResourceBundle&                         mResources;
+    Transforms&                             mXforms;
+    Dali::Scene3D::Loader::ShaderManagerPtr mShaderManager;
 
   public: // output
     std::vector<ConstraintRequest>                    mConstrainables;

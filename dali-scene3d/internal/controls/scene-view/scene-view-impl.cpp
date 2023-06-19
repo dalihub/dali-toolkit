@@ -62,7 +62,7 @@ DALI_TYPE_REGISTRATION_END()
 
 Property::Index   RENDERING_BUFFER    = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
 constexpr int32_t DEFAULT_ORIENTATION = 0;
-constexpr int32_t INVALID_INDEX = -1;
+constexpr int32_t INVALID_INDEX       = -1;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
 
@@ -153,7 +153,8 @@ SceneView::SceneView()
   mWindowOrientation(DEFAULT_ORIENTATION),
   mSkybox(),
   mSkyboxOrientation(Quaternion()),
-  mSkyboxIntensity(1.0f)
+  mSkyboxIntensity(1.0f),
+  mShaderManager(new Scene3D::Loader::ShaderManager())
 {
 }
 
@@ -469,7 +470,7 @@ void SceneView::RemoveLight(Scene3D::Light light)
     uint32_t removedIndex = RemoveLightInternal(light);
     if(mActivatedLightCount < maxNumberOfLight && mLights.size() >= maxNumberOfLight)
     {
-      for(auto && lightItem : mLights)
+      for(auto&& lightItem : mLights)
       {
         if(lightItem.second == false)
         {
@@ -583,6 +584,11 @@ void SceneView::SetSkyboxOrientation(const Quaternion& orientation)
 Quaternion SceneView::GetSkyboxOrientation() const
 {
   return mSkyboxOrientation;
+}
+
+Dali::Scene3D::Loader::ShaderManagerPtr SceneView::GetShaderManager() const
+{
+  return mShaderManager;
 }
 
 ///////////////////////////////////////////////////////////
@@ -824,9 +830,9 @@ void SceneView::UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentM
 
     if(mSkybox)
     {
-        mSkybox.Unparent();
-        mSkybox.Reset();
-        mSkyboxTexture.Reset();
+      mSkybox.Unparent();
+      mSkybox.Reset();
+      mSkyboxTexture.Reset();
     }
 
     mSkyboxDirty         = false;
@@ -976,7 +982,7 @@ bool SceneView::AddLightInternal(Scene3D::Light light)
 
 int32_t SceneView::RemoveLightInternal(Scene3D::Light light)
 {
-  int32_t removedIndex = INVALID_INDEX;
+  int32_t  removedIndex     = INVALID_INDEX;
   uint32_t maxNumberOfLight = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
   for(uint32_t i = 0; i < maxNumberOfLight; ++i)
   {

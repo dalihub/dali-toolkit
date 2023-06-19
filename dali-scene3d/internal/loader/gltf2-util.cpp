@@ -594,6 +594,8 @@ void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<s
 
   MaterialDefinition materialDefinition;
 
+  materialDefinition.mFlags |= MaterialDefinition::GLTF_CHANNELS;
+
   auto& pbr = material.mPbrMetallicRoughness;
   if(material.mAlphaMode == gltf2::AlphaMode::BLEND)
   {
@@ -625,7 +627,7 @@ void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<s
 
   if(pbr.mMetallicRoughnessTexture)
   {
-    AddTextureStage(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS | MaterialDefinition::GLTF_CHANNELS,
+    AddTextureStage(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS,
                     materialDefinition,
                     pbr.mMetallicRoughnessTexture,
                     getTextureMetaData(imageMetaData, pbr.mMetallicRoughnessTexture),
@@ -890,8 +892,6 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
 ModelRenderable* MakeModelRenderable(const gltf2::Mesh::Primitive& primitive, ConversionContext& context)
 {
   auto modelRenderable = new ModelRenderable();
-
-  modelRenderable->mShaderIdx = 0; // TODO: further thought
 
   auto materialIdx = primitive.mMaterial.GetIndex();
   if(INVALID_INDEX == materialIdx)
@@ -1354,22 +1354,6 @@ void ProcessSkins(const gltf2::Document& document, ConversionContext& context)
   }
 }
 
-void ProduceShaders(ShaderDefinitionFactory& shaderFactory, Dali::Scene3D::Loader::SceneDefinition& scene)
-{
-  uint32_t nodeCount = scene.GetNodeCount();
-  for(uint32_t i = 0; i < nodeCount; ++i)
-  {
-    auto nodeDefinition = scene.GetNode(i);
-    for(auto& renderable : nodeDefinition->mRenderables)
-    {
-      if(shaderFactory.ProduceShader(*renderable) == INVALID_INDEX)
-      {
-        DALI_LOG_ERROR("Fail to produce shader\n");
-      }
-    }
-  }
-}
-
 void SetObjectReaders()
 {
   json::SetObjectReader(GetBufferReader());
@@ -1471,17 +1455,12 @@ bool GenerateDocument(json::unique_ptr& root, gt::Document& document, bool& isMR
 
 void ConvertGltfToContext(gt::Document& document, Gltf2Util::ConversionContext& context, bool isMRendererModel)
 {
-  Dali::Scene3D::Loader::ShaderDefinitionFactory shaderFactory;
-  shaderFactory.SetResources(context.mOutput.mResources);
-
   Gltf2Util::ConvertBuffers(document, context);
   Gltf2Util::ConvertMaterials(document, context);
   Gltf2Util::ConvertMeshes(document, context);
   Gltf2Util::ConvertNodes(document, context, isMRendererModel);
   Gltf2Util::ConvertAnimations(document, context);
   Gltf2Util::ProcessSkins(document, context);
-  Gltf2Util::ProduceShaders(shaderFactory, context.mOutput.mScene);
-  context.mOutput.mScene.EnsureUniqueSkinningShaderInstances(context.mOutput.mResources);
 
   // Set Default Environment map
   Gltf2Util::SetDefaultEnvironmentMap(document, context);

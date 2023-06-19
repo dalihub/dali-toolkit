@@ -23,7 +23,7 @@
 
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/internal/model-components/material-impl.h>
-#include <dali-scene3d/public-api/loader/shader-definition-option.h>
+#include <dali-scene3d/public-api/loader/shader-option.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -96,20 +96,14 @@ int UtcDaliMaterialImplSetGetTextureInformation(void)
   DALI_TEST_EQUALS(true, GetImplementation(material).IsResourceReady(), TEST_LOCATION);
   GetImplementation(material).UpdateMaterialData();
 
-  std::vector<std::string> defines;
-  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::THREE_TEXTURE).data());
-  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::GLTF_CHANNELS).data());
-  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::BASE_COLOR_TEXTURE).data());
-  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::METALLIC_ROUGHNESS_TEXTURE).data());
-  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::NORMAL_TEXTURE).data());
+  Scene3D::Loader::ShaderOption option;
+  option.AddOption(Scene3D::Loader::ShaderOption::Type::THREE_TEXTURE);
+  option.AddOption(Scene3D::Loader::ShaderOption::Type::GLTF_CHANNELS);
+  option.AddOption(Scene3D::Loader::ShaderOption::Type::BASE_COLOR_TEXTURE);
+  option.AddOption(Scene3D::Loader::ShaderOption::Type::METALLIC_ROUGHNESS_TEXTURE);
+  option.AddOption(Scene3D::Loader::ShaderOption::Type::NORMAL_TEXTURE);
 
-  std::string fragmentShader = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
-  for(const auto& define : defines)
-  {
-    Scene3D::Loader::ShaderDefinition::ApplyDefine(fragmentShader, define);
-  }
-
-  DALI_TEST_EQUALS(fragmentShader, GetImplementation(material).GetFragmentShader(), TEST_LOCATION);
+  DALI_TEST_EQUALS(option.GetOptionHash(), GetImplementation(material).GetShaderOption().GetOptionHash(), TEST_LOCATION);
 
   Scene3D ::Internal ::Material ::TextureInformation occlusion;
   Dali ::Texture                                     occlusiontexture = Dali ::Texture ::New(TextureType ::TEXTURE_2D, Pixel ::RGBA8888, 100, 100);
@@ -176,18 +170,12 @@ int UtcDaliMaterialImplSetGetTextureInformation(void)
   DALI_TEST_EQUALS(true, GetImplementation(material).IsResourceReady(), TEST_LOCATION);
   GetImplementation(material).UpdateMaterialData();
 
-  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::OCCLUSION).data());
-  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::EMISSIVE).data());
-  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::SPECULAR).data());
-  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::SPECULAR_COLOR).data());
+  option.AddOption(Scene3D::Loader::ShaderOption::Type::OCCLUSION);
+  option.AddOption(Scene3D::Loader::ShaderOption::Type::EMISSIVE);
+  option.AddOption(Scene3D::Loader::ShaderOption::Type::SPECULAR);
+  option.AddOption(Scene3D::Loader::ShaderOption::Type::SPECULAR_COLOR);
 
-  fragmentShader = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
-  for(const auto& define : defines)
-  {
-    Scene3D::Loader::ShaderDefinition::ApplyDefine(fragmentShader, define);
-  }
-
-  DALI_TEST_EQUALS(fragmentShader, GetImplementation(material).GetFragmentShader(), TEST_LOCATION);
+  DALI_TEST_EQUALS(option.GetOptionHash(), GetImplementation(material).GetShaderOption().GetOptionHash(), TEST_LOCATION);
 
   END_TEST;
 }

@@ -54,8 +54,8 @@
 #include <dali-scene3d/public-api/loader/renderer-state.h>
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
-#include <dali-scene3d/public-api/loader/shader-definition-factory.h>
 #include <dali-scene3d/public-api/loader/shader-definition.h>
+#include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-scene3d/public-api/loader/skeleton-definition.h>
 #include <dali-scene3d/public-api/loader/skinning-details.h>
 #include <dali-scene3d/public-api/loader/string-callback.h>
