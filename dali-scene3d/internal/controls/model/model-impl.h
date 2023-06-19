@@ -361,6 +361,8 @@ private:
   WeakHandle<Scene3D::SceneView> mParentSceneView;
   Dali::PropertyNotification     mSizeNotification;
 
+  Dali::Scene3D::Loader::ShaderManagerPtr mShaderManager;
+
   // Light
   std::vector<Scene3D::Light> mLights;
 

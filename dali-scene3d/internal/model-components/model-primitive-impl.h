@@ -32,6 +32,7 @@
 #include <dali-scene3d/public-api/light/light.h>
 #include <dali-scene3d/public-api/loader/blend-shape-details.h>
 #include <dali-scene3d/public-api/loader/mesh-definition.h>
+#include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-scene3d/public-api/model-components/material.h>
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
 
@@ -155,6 +156,13 @@ public:
   void RemoveLight(uint32_t lightIndex);
 
   /**
+   * @brief Updates shaders by using current material
+   *
+   * @param[in] shaderManager Shader manager to create shader.
+   */
+  void UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager);
+
+  /**
    * @brief Sets the blend shape data for this model primitive.
    *
    * @param[in] data The blend shape data to set.
@@ -174,8 +182,9 @@ public:
    * @param[in] hasPositions Whether or not this model primitive has positions for blend shapes.
    * @param[in] hasNormals Whether or not this model primitive has normals for blend shapes.
    * @param[in] hasTangents Whether or not this model primitive has tangents for blend shapes.
+   * @param[in] version blendShape version.
    */
-  void SetBlendShapeOptions(bool hasPositions, bool hasNormals, bool hasTangents);
+  void SetBlendShapeOptions(bool hasPositions, bool hasNormals, bool hasTangents, Scene3D::Loader::BlendShapes::Version version);
 
   /**
    * @brief Sets whether or not this model primitive is skinned.
@@ -228,6 +237,8 @@ private:
   Dali::TextureSet        mTextureSet;
   Dali::Scene3D::Material mMaterial;
 
+  Scene3D::Loader::ShaderManagerPtr mShaderManager;
+
   // Light
   std::vector<Scene3D::Light> mLights;
   int32_t                     mLightCount{0};
@@ -241,10 +252,11 @@ private:
   // For blend shape
   Scene3D::Loader::BlendShapes::BlendShapeData mBlendShapeData;
   Dali::Texture                                mBlendShapeGeometry;
-  bool                                         mHasSkinning  = false;
-  bool                                         mHasPositions = false;
-  bool                                         mHasNormals   = false;
-  bool                                         mHasTangents  = false;
+  bool                                         mHasSkinning       = false;
+  bool                                         mHasPositions      = false;
+  bool                                         mHasNormals        = false;
+  bool                                         mHasTangents       = false;
+  Scene3D::Loader::BlendShapes::Version        mBlendShapeVersion = Scene3D::Loader::BlendShapes::Version::INVALID;
 
   bool mIsMaterialChanged        = false;
   bool mNeedToSetRendererUniform = false;

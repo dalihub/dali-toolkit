@@ -34,6 +34,7 @@
 #include <dali-scene3d/internal/model-components/material-modify-observer.h>
 #include <dali-scene3d/public-api/loader/material-definition.h>
 #include <dali-scene3d/public-api/loader/shader-definition.h>
+#include <dali-scene3d/public-api/loader/shader-option.h>
 #include <dali-scene3d/public-api/model-components/material.h>
 
 namespace Dali
@@ -65,13 +66,13 @@ public:
       return mLoadingTaskId == 0u;
     }
 
-    std::string   mUrl;
-    Dali::Texture mTexture;
-    Vector4       mFactor{Vector4::ONE};
-    Dali::Sampler mSampler;
-    uint32_t      mLoadingTaskId{0u};
-    uint32_t      mSemantic;
-    std::string   mDefineKeyword;
+    std::string                         mUrl;
+    Dali::Texture                       mTexture;
+    Vector4                             mFactor{Vector4::ONE};
+    Dali::Sampler                       mSampler;
+    uint32_t                            mLoadingTaskId{0u};
+    uint32_t                            mSemantic;
+    Scene3D::Loader::ShaderOption::Type mShaderOptionType;
   };
 
   using TextureInformationContainer = std::vector<TextureInformation>;
@@ -112,7 +113,7 @@ public:
   Dali::Property::Value GetProperty(Dali::Property::Index index) const;
 
   /**
-   * @brief Set a texture information for the material.
+   * @brief Sets a texture information for the material.
    *
    * @param[in] index The index of the texture to set.
    * @param[in] textureInformation The texture information to set.
@@ -122,7 +123,7 @@ public:
   void SetTextureInformation(Scene3D::Material::TextureType index, TextureInformation&& textureInformation);
 
   /**
-   * @brief Set a texture for the material.
+   * @brief Sets a texture for the material.
    *
    * @param[in] index The index of the texture to set.
    * @param[in] texture The texture to set.
@@ -130,7 +131,7 @@ public:
   void SetTexture(Scene3D::Material::TextureType index, Dali::Texture texture);
 
   /**
-   * @brief Get texture for the material.
+   * @brief Retrieves texture for the material.
    *
    * @param[in] index The index of the texture to get.
    *
@@ -139,14 +140,14 @@ public:
   Dali::Texture GetTexture(Scene3D::Material::TextureType index);
 
   /**
-   * @brief Get the texture set for this material.
+   * @brief Retrieves the texture set for this material.
    *
    * @return The texture set for this material.
    */
   TextureSet GetTextureSet();
 
   /**
-   * @brief Set a sampler for the material.
+   * @brief Sets a sampler for the material.
    *
    * @param[in] index The index of the sampler to set.
    * @param[in] sampler The sampler to set.
@@ -154,104 +155,96 @@ public:
   void SetSampler(Scene3D::Material::TextureType index, Dali::Sampler sampler);
 
   /**
-   * @brief Get a sampler for the material.
-
-   * @param[in] index The index of the sampler to get.
+   * @brief Retrieves a sampler for the material.
    *
+   * @param[in] index The index of the sampler to get.
    * @return The sampler at the given index.
    */
   Dali::Sampler GetSampler(Scene3D::Material::TextureType index);
 
   /**
-   * @brief Get vertex shader code for this material.
+   * @brief Retrieves Shader Option of this Material.
    *
-   * @return Vertex shader code for this material.
+   * @return Shader Option of this Material.
    */
-  std::string GetVertexShader();
-
-  /**
-   * @brief Get fragment shader code for this material.
-   *
-   * @return Fragment shader code for this material.
-   */
-  std::string GetFragmentShader();
+  Scene3D::Loader::ShaderOption GetShaderOption() const;
 
 public:
   /**
-   * @brief Add observer to this material.
+   * @brief Adds observer to this material.
    *
    * @param[in] observer Pointer of observer.
    */
   void AddObserver(MaterialModifyObserver* observer);
 
   /**
-   * @brief Remove observer from this material.
+   * @brief Removes observer from this material.
    *
    * @param[in] observer Pointer of observer.
    */
   void RemoveObserver(MaterialModifyObserver* observer);
 
   /**
-   * @brief Update material data.
+   * @brief Updates material data.
    */
   void UpdateMaterialData();
 
   /**
-   * @brief Set uniform value to the Renderer.
+   * @brief Sets uniform value to the Renderer.
    *
    * @param[in] renderer Renderer object.
    */
   void SetRendererUniform(Dali::Renderer renderer);
 
   /**
-   * @brief Get specular image based light texture offset.
+   * @brief Retrieves specular image based light texture offset.
    *
    * @return Specular image based light texture offset.
    */
   uint32_t GetSpecularImageBasedLightTextureOffset();
 
   /**
-   * @brief Get diffuse image based light texture offset.
+   * @brief Retrieves diffuse image based light texture offset.
    *
    * @return Diffuse image based light texture offset.
    */
   uint32_t GetDiffuseImageBasedLightTextureOffset();
 
   /**
-   * @brief Get image based light scale factor name.
+   * @brief Retrieves image based light scale factor name.
    *
    * @return Image based light scale factor name.
    */
   std::string_view GetImageBasedLightScaleFactorName();
 
   /**
-   * @brief Get image based light max lod uniform name.
+   * @brief Retrieves image based light max lod uniform name.
    *
    * @return Image based light max lod uniform name.
    */
   std::string_view GetImageBasedLightMaxLodUniformName();
 
   /**
-   * @brief Check if resource is ready.
+   * @brief Checks if resource is ready.
    *
    * @return True if resource is ready, false otherwise.
    */
   bool IsResourceReady();
 
   /**
-   * @brief Reset dirty flag of this material.
+   * @brief Resets dirty flag of this material.
    */
   void ResetFlag();
 
 private:
   /**
-   * @brief Check modify flag and send observers the material changeness.
+   * @brief Checks modify flag and send observers the material changeness.
    * It will clean up modify flag
    */
   void NotifyObserver();
 
   /**
-   * @brief Request loading an image from a URL and store it in TextureInformation.
+   * @brief Requests loading an image from a URL and store it in TextureInformation.
    *
    * @param[in] textureInformation TextureInformation object to store loaded texture information.
    * @param[in] url URL of the image to load.
@@ -272,16 +265,16 @@ private:
   void ResourcesLoadComplete();
 
   /**
-   * @brief Update the material using each attribute of this material and send a notification to the ModelPrimitive class.
+   * @brief Updates the material using each attribute of this material and send a notification to the ModelPrimitive class.
    */
   void Apply();
 
 private:
   // Delete copy & move operator
-  Material(const Material&) = delete;
-  Material(Material&&)      = delete;
+  Material(const Material&)                = delete;
+  Material(Material&&)                     = delete;
   Material& operator=(const Material& rhs) = delete;
-  Material& operator=(Material&& rhs) = delete;
+  Material& operator=(Material&& rhs)      = delete;
 
 private:
   ObserverContainer mObservers{}; ///< List of observers who need to be notified after some properties are changed.
@@ -296,9 +289,8 @@ private:
   float                                  mIor         = -1.0f;                                    ///< Index of refraction (TODO: Magic number)
   MaterialModifyObserver::ModifyFlag     mModifyFlag  = MaterialModifyObserver::ModifyFlag::NONE; ///< Modified dirty flags
 
-  Scene3D::Loader::ShaderDefinition::RawData mShaderData;
-
-  uint32_t                             mMaterialFlag  = 0u;
+  Scene3D::Loader::ShaderOption        mShaderOption;
+  uint32_t                             mMaterialFlag  = std::numeric_limits<uint32_t>::max();
   Scene3D::Loader::RendererState::Type mRendererState = Scene3D::Loader::RendererState::NONE;
 
   bool mIsOpaque = true;

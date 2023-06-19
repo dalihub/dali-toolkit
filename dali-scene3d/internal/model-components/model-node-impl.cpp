@@ -202,6 +202,8 @@ void ModelNode::AddModelPrimitive(Dali::Scene3D::ModelPrimitive modelPrimitive)
     }
   }
 
+  GetImplementation(modelPrimitive).UpdateShader(mShaderManager);
+
   Dali::Renderer renderer = GetImplementation(modelPrimitive).GetRenderer();
   if(renderer)
   {
@@ -243,6 +245,8 @@ void ModelNode::RemoveModelPrimitive(uint32_t index)
   {
     return;
   }
+
+  GetImplementation(mModelPrimitiveContainer[index]).UpdateShader(nullptr);
 
   uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
   for(uint32_t i = 0; i < maxLightCount; ++i)
@@ -336,6 +340,18 @@ void ModelNode::RemoveLight(uint32_t lightIndex)
     GetImplementation(primitive).RemoveLight(lightIndex);
   }
   mLights[lightIndex].Reset();
+}
+
+void ModelNode::UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager)
+{
+  if(mShaderManager != shaderManager)
+  {
+    mShaderManager = shaderManager;
+    for(auto&& primitive : mModelPrimitiveContainer)
+    {
+      GetImplementation(primitive).UpdateShader(mShaderManager);
+    }
+  }
 }
 
 void ModelNode::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData& data, Scene3D::ModelPrimitive primitive)
