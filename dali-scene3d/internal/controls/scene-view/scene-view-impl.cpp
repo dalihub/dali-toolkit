@@ -39,6 +39,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/controls/model/model-impl.h>
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-scene3d/internal/light/light-impl.h>
 
 using namespace Dali;
 
@@ -61,6 +62,7 @@ DALI_TYPE_REGISTRATION_END()
 
 Property::Index   RENDERING_BUFFER    = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
 constexpr int32_t DEFAULT_ORIENTATION = 0;
+constexpr int32_t INVALID_INDEX = -1;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
 
@@ -273,16 +275,28 @@ void SceneView::SelectCamera(const std::string& name)
   UpdateCamera(GetCamera(name));
 }
 
-void SceneView::RegisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* item)
+void SceneView::RegisterSceneItem(Scene3D::Internal::LightObserver* item)
 {
   if(item)
   {
     item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor, mSpecularMipmapLevels);
+
+    if(mActivatedLightCount > 0)
+    {
+      uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
+      for(uint32_t i = 0; i < maxLightCount; ++i)
+      {
+        if(mActivatedLights[i])
+        {
+          item->NotifyLightAdded(i, mActivatedLights[i]);
+        }
+      }
+    }
     mItems.push_back(item);
   }
 }
 
-void SceneView::UnregisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* item)
+void SceneView::UnregisterSceneItem(Scene3D::Internal::LightObserver* item)
 {
   if(item)
   {
@@ -290,6 +304,17 @@ void SceneView::UnregisterSceneItem(Scene3D::Internal::ImageBasedLightObserver* 
     {
       if(mItems[i] == item)
       {
+        if(mActivatedLightCount > 0)
+        {
+          uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
+          for(uint32_t i = 0; i < maxLightCount; ++i)
+          {
+            if(mActivatedLights[i])
+            {
+              item->NotifyLightRemoved(i);
+            }
+          }
+        }
         mItems.erase(mItems.begin() + i);
         break;
       }
@@ -410,6 +435,64 @@ void SceneView::SetImageBasedLightScaleFactor(float scaleFactor)
 float SceneView::GetImageBasedLightScaleFactor() const
 {
   return mIblScaleFactor;
+}
+
+void SceneView::AddLight(Scene3D::Light light)
+{
+  bool enabled = AddLightInternal(light);
+  mLights.push_back(std::make_pair(light, enabled));
+}
+
+void SceneView::RemoveLight(Scene3D::Light light)
+{
+  if(mActivatedLights.empty())
+  {
+    return;
+  }
+
+  bool needToDisable = false;
+  for(uint32_t i = 0; i < mLights.size(); ++i)
+  {
+    if(mLights[i].first == light)
+    {
+      // If mLights[i].second is true, it means the light is currently activated in Scene.
+      // Then it should be removed from mActivatedLights list too.
+      needToDisable = mLights[i].second;
+      mLights.erase(mLights.begin() + i);
+      break;
+    }
+  }
+
+  uint32_t maxNumberOfLight = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
+  if(needToDisable)
+  {
+    uint32_t removedIndex = RemoveLightInternal(light);
+    if(mActivatedLightCount < maxNumberOfLight && mLights.size() >= maxNumberOfLight)
+    {
+      for(auto && lightItem : mLights)
+      {
+        if(lightItem.second == false)
+        {
+          lightItem.second = AddLightInternal(lightItem.first);
+          break;
+        }
+      }
+    }
+
+    // To remove empty entity of mActivatedLights, moves last object to empty position.
+    // Because one Light is removed, mActivatedLights[mActivatedLightCount] is current last object of the list.
+    if(!mActivatedLights[removedIndex] && mActivatedLightCount > 0 && removedIndex < mActivatedLightCount)
+    {
+      Scene3D::Light reorderingLight = mActivatedLights[mActivatedLightCount];
+      RemoveLightInternal(reorderingLight);
+      AddLightInternal(reorderingLight);
+    }
+  }
+}
+
+uint32_t SceneView::GetActivatedLightCount() const
+{
+  return mActivatedLightCount;
 }
 
 void SceneView::UseFramebuffer(bool useFramebuffer)
@@ -860,6 +943,66 @@ void SceneView::NotifyImageBasedLightTextureChange()
       item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor, mSpecularMipmapLevels);
     }
   }
+}
+
+bool SceneView::AddLightInternal(Scene3D::Light light)
+{
+  uint32_t maxNumberOfLight = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
+  if(mActivatedLightCount == 0)
+  {
+    mActivatedLights.resize(maxNumberOfLight);
+  }
+
+  bool enabled = false;
+  if(mActivatedLightCount < maxNumberOfLight)
+  {
+    uint32_t newLightIndex = 0u;
+    for(; newLightIndex < maxNumberOfLight; ++newLightIndex)
+    {
+      if(!mActivatedLights[newLightIndex])
+      {
+        mActivatedLights[newLightIndex] = light;
+        break;
+      }
+    }
+
+    for(auto&& item : mItems)
+    {
+      if(item)
+      {
+        item->NotifyLightAdded(newLightIndex, light);
+      }
+    }
+
+    mActivatedLightCount++;
+    enabled = true;
+  }
+  return enabled;
+}
+
+int32_t SceneView::RemoveLightInternal(Scene3D::Light light)
+{
+  int32_t removedIndex = INVALID_INDEX;
+  uint32_t maxNumberOfLight = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
+  for(uint32_t i = 0; i < maxNumberOfLight; ++i)
+  {
+    if(mActivatedLights[i] == light)
+    {
+      for(auto&& item : mItems)
+      {
+        if(item)
+        {
+          item->NotifyLightRemoved(i);
+        }
+      }
+      mActivatedLights[i].Reset();
+      mActivatedLightCount--;
+      removedIndex = i;
+      break;
+    }
+  }
+
+  return removedIndex;
 }
 
 } // namespace Internal

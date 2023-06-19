@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/model-components/model-primitive-modify-observer.h>
+#include <dali-scene3d/public-api/light/light.h>
 #include <dali-scene3d/public-api/loader/mesh-definition.h>
 #include <dali-scene3d/public-api/loader/skinning-details.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
@@ -232,6 +233,9 @@ public: // Public Method
    */
   void SetImageBasedLightScaleFactor(float iblScaleFactor);
 
+  void AddLight(Scene3D::Light light, uint32_t lightIndex);
+  void RemoveLight(uint32_t lightIndex);
+
   /**
    * @brief Sets the blend shape data for a ModelPrimitive.
    *
@@ -280,6 +284,9 @@ private:
   Dali::Texture           mDiffuseTexture;
   float                   mIblScaleFactor{1.0f};
   uint32_t                mSpecularMipmapLevels{1u};
+
+  // Light
+  std::vector<Scene3D::Light> mLights;
   /// @endcond
 };
 
