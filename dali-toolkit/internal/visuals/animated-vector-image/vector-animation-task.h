@@ -181,7 +181,7 @@ public:
    * @brief This callback is called after the animation is finished.
    * @param[in] callback The animation finished callback
    */
-  void SetAnimationFinishedCallback(EventThreadCallback* callback);
+  void SetAnimationFinishedCallback(CallbackBase* callback);
 
   /**
    * @brief Gets the playing range in frame number.
@@ -361,8 +361,8 @@ private:
   VectorAnimationThread&               mVectorAnimationThread;
   ConditionalWait                      mConditionalWait;
   ResourceReadySignalType              mResourceReadySignal;
-  std::unique_ptr<EventThreadCallback> mAnimationFinishedTrigger;
-  std::unique_ptr<EventThreadCallback> mLoadCompletedTrigger;
+  std::unique_ptr<CallbackBase>        mAnimationFinishedCallback{};
+  std::unique_ptr<CallbackBase>        mLoadCompletedCallback{};
   PlayState                            mPlayState;
   DevelImageVisual::StopBehavior::Type mStopBehavior;
   DevelImageVisual::LoopingMode::Type  mLoopingMode;

@@ -53,8 +53,7 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mVectorAnimationThread(factoryCache.GetVectorAnimationManager().GetVectorAnimationThread()),
   mConditionalWait(),
   mResourceReadySignal(),
-  mAnimationFinishedTrigger(),
-  mLoadCompletedTrigger(new EventThreadCallback(MakeCallback(this, &VectorAnimationTask::OnLoadCompleted))),
+  mLoadCompletedCallback(MakeCallback(this, &VectorAnimationTask::OnLoadCompleted)),
   mPlayState(PlayState::STOPPED),
   mStopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
   mLoopingMode(DevelImageVisual::LoopingMode::RESTART),
@@ -104,13 +103,13 @@ void VectorAnimationTask::Finalize()
   ConditionalWait::ScopedLock lock(mConditionalWait);
 
   // Release some objects in the main thread
-  if(mAnimationFinishedTrigger)
+  if(mAnimationFinishedCallback)
   {
-    mAnimationFinishedTrigger.reset();
+    mVectorAnimationThread.RemoveEventTriggerCallback(mAnimationFinishedCallback.get());
   }
-  if(mLoadCompletedTrigger)
+  if(mLoadCompletedCallback)
   {
-    mLoadCompletedTrigger.reset();
+    mVectorAnimationThread.RemoveEventTriggerCallback(mLoadCompletedCallback.get());
   }
 
   mVectorRenderer.Finalize();
@@ -142,7 +141,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
     mLoadFailed  = true;
     if(!synchronousLoading)
     {
-      mLoadCompletedTrigger->Trigger();
+      mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
     }
     return false;
   }
@@ -157,7 +156,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   mLoadRequest = false;
   if(!synchronousLoading)
   {
-    mLoadCompletedTrigger->Trigger();
+    mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
   }
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Load: file = %s [%d frames, %f fps] [%p]\n", mUrl.c_str(), mTotalFrame, mFrameRate, this);
@@ -263,13 +262,10 @@ void VectorAnimationTask::PauseAnimation()
   }
 }
 
-void VectorAnimationTask::SetAnimationFinishedCallback(EventThreadCallback* callback)
+void VectorAnimationTask::SetAnimationFinishedCallback(CallbackBase* callback)
 {
   ConditionalWait::ScopedLock lock(mConditionalWait);
-  if(callback)
-  {
-    mAnimationFinishedTrigger = std::unique_ptr<EventThreadCallback>(callback);
-  }
+  mAnimationFinishedCallback = std::unique_ptr<CallbackBase>(callback);
 }
 
 void VectorAnimationTask::SetLoopCount(int32_t count)
@@ -547,9 +543,9 @@ bool VectorAnimationTask::Rasterize()
     // Animation is finished
     {
       ConditionalWait::ScopedLock lock(mConditionalWait);
-      if(mNeedAnimationFinishedTrigger && mAnimationFinishedTrigger)
+      if(mNeedAnimationFinishedTrigger && mAnimationFinishedCallback)
       {
-        mAnimationFinishedTrigger->Trigger();
+        mVectorAnimationThread.AddEventTriggerCallback(mAnimationFinishedCallback.get());
       }
     }
 
