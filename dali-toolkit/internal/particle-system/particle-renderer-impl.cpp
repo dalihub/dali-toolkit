@@ -454,4 +454,12 @@ bool ParticleRenderer::Initialize()
   return false;
 }
 
+void ParticleRenderer::PrepareToDie()
+{
+  if(mStreamBuffer)
+  {
+    mStreamBuffer.ClearVertexBufferUpdateCallback();
+  }
+}
+
 } // namespace Dali::Toolkit::ParticleSystem::Internal

@@ -32,7 +32,6 @@
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
-
 constexpr uint32_t DEFAULT_PARTICLE_COUNT = 100u; ///< Default number of particles in system if not set by user
 
 /**
@@ -126,7 +125,7 @@ ParticleSystem::ParticleModifier ParticleEmitter::GetModifierAt(uint32_t index)
 
 void ParticleEmitter::RemoveModifierAt(uint32_t index)
 {
-  mModifiers.erase(mModifiers.begin()+index);
+  mModifiers.erase(mModifiers.begin() + index);
 }
 
 void ParticleEmitter::Start()
@@ -340,10 +339,7 @@ void ParticleEmitter::UpdateModifierMT(Dali::Toolkit::ParticleSystem::ParticleMo
     }
 
     updateTasks.emplace_back(GetImplementation(modifier), mParticleList, index, count);
-    tasks.emplace_back([&task = updateTasks.back()](uint32_t n)
-                       {
-      //printf("Updating modifier: %d\n", n);
-      task.Update(); });
+    tasks.emplace_back([&task = updateTasks.back()](uint32_t n) { task.Update(); });
   }
 
   auto future = threadPool.SubmitTasks(tasks, 0);
@@ -424,6 +420,14 @@ ParticleEmitter::ParticleEmitter()
   SetParticleCount(DEFAULT_PARTICLE_COUNT);
 }
 
+ParticleEmitter::~ParticleEmitter()
+{
+  if(mParticleRenderer)
+  {
+    GetImplementation(mParticleRenderer).PrepareToDie();
+  }
+}
+
 } // namespace Dali::Toolkit::ParticleSystem::Internal
 namespace Dali::Toolkit::ParticleSystem
 {
@@ -436,8 +440,7 @@ Dali::ThreadPool& GetThreadPool()
   // NOTE: this function shouldn't be called from multiple thread anyway
   if(!gThreadPool)
   {
-    std::call_once(onceFlag, [&threadPool = gThreadPool]
-                   { threadPool = std::make_unique<Dali::ThreadPool>();
+    std::call_once(onceFlag, [&threadPool = gThreadPool] { threadPool = std::make_unique<Dali::ThreadPool>();
                      threadPool->Initialize(4u); });
   }
 
