@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,8 @@ namespace Toolkit
 {
 namespace Internal
 {
-
-SvgTask::SvgTask(VectorImageRenderer vectorRenderer, CallbackBase* callback)
-: AsyncTask(callback),
+SvgTask::SvgTask(VectorImageRenderer vectorRenderer, CallbackBase* callback, AsyncTask::PriorityType priorityType)
+: AsyncTask(callback, priorityType),
   mVectorRenderer(vectorRenderer),
   mHasSucceeded(false)
 {
@@ -56,7 +55,7 @@ VectorImageRenderer SvgTask::GetRenderer()
 }
 
 SvgLoadingTask::SvgLoadingTask(VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, CallbackBase* callback)
-: SvgTask(vectorRenderer, callback),
+: SvgTask(vectorRenderer, callback, url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
   mUrl(url),
   mDpi(dpi)
 {

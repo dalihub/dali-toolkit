@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SVG_TASK_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,9 @@ public:
    * Constructor
    * @param[in] vectorRenderer The vector rasterizer.
    * @param[in] callback The callback that is called when the operation is completed.
+   * @param[in] priorityType The priority of this task.
    */
-  SvgTask(VectorImageRenderer vectorRenderer, CallbackBase* callback);
+  SvgTask(VectorImageRenderer vectorRenderer, CallbackBase* callback, AsyncTask::PriorityType priorityType = AsyncTask::PriorityType::DEFAULT);
 
   /**
    * Destructor.
