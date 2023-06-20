@@ -36,6 +36,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 #endif
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
+DALI_INIT_TRACE_FILTER(gTraceFilter2, DALI_TRACE_PERFORMANCE_MARKER, false);
 
 constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
@@ -557,7 +558,7 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
 bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size, OperationsMask operationsRequired, Size& layoutSize)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::Relayouter::DoRelayout %p size %f,%f\n", &impl, size.width, size.height);
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_DORELAYOUT");
+  DALI_TRACE_SCOPE(gTraceFilter2, "DALI_TEXT_DORELAYOUT");
   bool viewUpdated(false);
 
   // Calculate the operations to be done.
