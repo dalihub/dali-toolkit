@@ -62,6 +62,8 @@ public:
 
   bool Initialize();
 
+  void PrepareToDie();
+
   void SetEmitter(ParticleSystem::Internal::ParticleEmitter* emitter);
 
   void UpdateParticlesTask(Internal::ParticleList& list,
