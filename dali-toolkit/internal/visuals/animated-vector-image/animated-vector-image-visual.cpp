@@ -377,7 +377,7 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
 void AnimatedVectorImageVisual::OnInitialize(void)
 {
   mVectorAnimationTask->ResourceReadySignal().Connect(this, &AnimatedVectorImageVisual::OnResourceReady);
-  mVectorAnimationTask->SetAnimationFinishedCallback(new EventThreadCallback(MakeCallback(this, &AnimatedVectorImageVisual::OnAnimationFinished)));
+  mVectorAnimationTask->SetAnimationFinishedCallback(MakeCallback(this, &AnimatedVectorImageVisual::OnAnimationFinished));
 
   mVectorAnimationTask->RequestLoad(mUrl.GetUrl(), IsSynchronousLoadingRequired());
 

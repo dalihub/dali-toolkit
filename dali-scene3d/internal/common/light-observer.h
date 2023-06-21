@@ -1,5 +1,5 @@
-#ifndef DALI_SCENE3D_INTERNAL_IMAGE_BASED_LIGHT_OBSERVER_H
-#define DALI_SCENE3D_INTERNAL_IMAGE_BASED_LIGHT_OBSERVER_H
+#ifndef DALI_SCENE3D_INTERNAL_LIGHT_OBSERVER_H
+#define DALI_SCENE3D_INTERNAL_LIGHT_OBSERVER_H
 
 /*
  * Copyright (c) 2022 Samsung Electronics Co., Ltd.
@@ -22,24 +22,27 @@
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/rendering/texture.h>
 
+// INTERNAL INCLUDES
+#include <dali-scene3d/public-api/light/light.h>
+
 namespace Dali
 {
 namespace Scene3D
 {
 namespace Internal
 {
-class ImageBasedLightObserver
+class LightObserver
 {
 public:
   /**
    * @brief Constructor.
    */
-  ImageBasedLightObserver() = default;
+  LightObserver() = default;
 
   /**
    * @brief Virtual destructor.
    */
-  virtual ~ImageBasedLightObserver() = default;
+  virtual ~LightObserver() = default;
 
   /**
    * @brief Notifies Image Based Light Textures are changed by parent SceneView.
@@ -57,6 +60,21 @@ public:
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f].
    */
   virtual void NotifyImageBasedLightScaleFactor(float scaleFactor) = 0;
+
+  /**
+   * @brief Notifies new light is added on SceneView
+   *
+   * @param[in] lightIndex Index of added light.
+   * @param[in] light Added light.
+   */
+  virtual void NotifyLightAdded(uint32_t lightIndex, Scene3D::Light light) = 0;
+
+  /**
+   * @brief Notifies a light is removed from SceneView
+   *
+   * @param[in] lightIndex Index of light to be removed.
+   */
+  virtual void NotifyLightRemoved(uint32_t lightIndex) = 0;
 };
 
 } // namespace Internal
@@ -65,4 +83,4 @@ public:
 
 } // namespace Dali
 
-#endif // DALI_SCENE3D_INTERNAL_IMAGE_BASED_LIGHT_OBSERVER_H
+#endif // DALI_SCENE3D_INTERNAL_LIGHT_OBSERVER_H

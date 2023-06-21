@@ -360,7 +360,7 @@ Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect,
       Dali::Actor child = actor.GetChildAt(i-1);
       if(child && child != focusedActor && IsFocusable(child))
       {
-        Rect<float> candidateRect = DevelActor::CalculateScreenExtents(child);
+        Rect<float> candidateRect = DevelActor::CalculateCurrentScreenExtents(child);
 
         // convert x, y, width, height -> left, right, bottom, top
         ConvertCoordinate(candidateRect);
@@ -395,12 +395,12 @@ Actor GetNearestFocusableActor(Actor rootActor, Actor focusedActor, Toolkit::Con
   if (!focusedActor)
   {
     // If there is no currently focused actor, it is searched based on the upper left corner of the current window.
-    Rect<float> rootRect = DevelActor::CalculateScreenExtents(rootActor);
+    Rect<float> rootRect = DevelActor::CalculateCurrentScreenExtents(rootActor);
     focusedRect = Rect<float>(rootRect.x, rootRect.y, 0.f, 0.f);
   }
   else
   {
-    focusedRect = DevelActor::CalculateScreenExtents(focusedActor);
+    focusedRect = DevelActor::CalculateCurrentScreenExtents(focusedActor);
   }
 
 

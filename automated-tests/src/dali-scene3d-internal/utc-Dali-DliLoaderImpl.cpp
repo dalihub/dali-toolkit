@@ -320,6 +320,7 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
   DALI_TEST_EQUAL(ctx.cameraParameters.size(), 1u);
   DALI_TEST_EQUAL(ctx.lights.size(), 1u);
   DALI_TEST_EQUAL(ctx.animations.size(), 1u);
+  DALI_TEST_EQUAL(ctx.animations[0].GetDuration(), 1.0f);
   DALI_TEST_EQUAL(ctx.animGroups.size(), 0u);
 
   DALI_TEST_EQUAL(metadata.size(), 4u);
