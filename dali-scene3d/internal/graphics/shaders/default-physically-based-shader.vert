@@ -4,6 +4,8 @@
 // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/glTF-WebGL-PBR/shaders/pbr-vert.glsl
 // Commit dc84b5e374fb3d23153d2248a338ef88173f9eb6
 
+#define MORPH defined(MORPH_POSITION) || defined(MORPH_NORMAL) || defined(MORPH_TANGENT)
+
 #ifdef HIGHP
   precision highp float;
 #else

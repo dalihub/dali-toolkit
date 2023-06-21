@@ -31,6 +31,7 @@
 #include <dali-scene3d/public-api/loader/node-definition.h>
 #include <dali-scene3d/public-api/loader/renderer-state.h>
 #include <dali-scene3d/public-api/loader/utils.h>
+#include <dali-scene3d/public-api/loader/shader-definition-option.h>
 
 namespace Dali
 {
@@ -100,13 +101,13 @@ Material::Material()
   mTextureInformations[SPECULAR].mSemantic       = Scene3D::Loader::MaterialDefinition::SPECULAR;
   mTextureInformations[SPECULAR_COLOR].mSemantic = Scene3D::Loader::MaterialDefinition::SPECULAR_COLOR;
 
-  mTextureInformations[BASE_COLOR].mDefineKeyword         = "BASECOLOR_TEX";
-  mTextureInformations[METALLIC_ROUGHNESS].mDefineKeyword = "METALLIC_ROUGHNESS_TEX";
-  mTextureInformations[NORMAL].mDefineKeyword             = "NORMAL_TEX";
-  mTextureInformations[OCCLUSION].mDefineKeyword          = "OCCLUSION";
-  mTextureInformations[EMISSIVE].mDefineKeyword           = "EMISSIVE";
-  mTextureInformations[SPECULAR].mDefineKeyword           = "MATERIAL_SPECULAR_TEXTURE";
-  mTextureInformations[SPECULAR_COLOR].mDefineKeyword     = "MATERIAL_SPECULAR_COLOR_TEXTURE";
+  mTextureInformations[BASE_COLOR].mDefineKeyword         = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::BASE_COLOR_TEXTURE).data();
+  mTextureInformations[METALLIC_ROUGHNESS].mDefineKeyword = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::METALLIC_ROUGHNESS_TEXTURE).data();
+  mTextureInformations[NORMAL].mDefineKeyword             = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::NORMAL_TEXTURE).data();
+  mTextureInformations[OCCLUSION].mDefineKeyword          = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::OCCLUSION).data();
+  mTextureInformations[EMISSIVE].mDefineKeyword           = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::EMISSIVE).data();
+  mTextureInformations[SPECULAR].mDefineKeyword           = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::SPECULAR).data();
+  mTextureInformations[SPECULAR_COLOR].mDefineKeyword     = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::SPECULAR_COLOR).data();
 
   mTextureInformations[TextureIndex::EMISSIVE].mFactor = Vector4::ZERO;
 }
