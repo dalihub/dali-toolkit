@@ -835,6 +835,14 @@ void SceneView::UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentM
       Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
       mSkyboxLoadTask.Reset();
     }
+
+    if(mSkybox)
+    {
+        mSkybox.Unparent();
+        mSkybox.Reset();
+        mSkyboxTexture.Reset();
+    }
+
     mSkyboxDirty         = false;
     mSkyboxResourceReady = true;
   }

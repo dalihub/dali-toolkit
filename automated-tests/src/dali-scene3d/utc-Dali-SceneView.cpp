@@ -882,6 +882,38 @@ int UtcDaliSceneViewSetSkyboxEmpty(void)
   END_TEST;
 }
 
+int UtcDaliSceneViewSetSkyboxEmpty2(void)
+{
+  ToolkitTestApplication application;
+
+  gResourceReadyCalled    = false;
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  view.ResourceReadySignal().Connect(OnResourceReady);
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  view.SetSkybox(TEST_EQUIRECTANGULAR_TEXTURE);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  uint32_t childCount = view.GetChildAt(0u).GetChildCount();
+
+  view.SetSkybox("");
+  DALI_TEST_EQUALS(view.GetChildAt(0u).GetChildCount(), childCount - 1, TEST_LOCATION);
+
+  view.Unparent();
+  view.Reset();
+
+  END_TEST;
+}
+
 int UtcDaliSceneViewSetSkyboxEquirectangularEmpty(void)
 {
   ToolkitTestApplication application;
