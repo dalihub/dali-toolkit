@@ -23,7 +23,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/clipboard.h>
+#include <dali/devel-api/adaptor-framework/text-clipboard.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
@@ -2166,7 +2166,7 @@ int utcDaliTextEditorEvent03(void)
   application.Render();
 
   // Send some taps and check text controller with clipboard window
-  Dali::Clipboard clipboard = Clipboard::Get();
+  Dali::TextClipboard clipboard = TextClipboard::Get();
   clipboard.ShowClipboard();
   TestGenerateTap(application, 3.0f, 25.0f, 100);
   clipboard.HideClipboard();

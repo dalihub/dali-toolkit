@@ -19,7 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
-#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
+#include <dali/devel-api/adaptor-framework/text-clipboard-event-notifier.h>
 
 namespace Dali
 {
@@ -34,91 +34,91 @@ namespace Adaptor
  * Implementation of the Clip Board
  */
 
-class Clipboard :  public Dali::BaseObject
+class TextClipboard :  public Dali::BaseObject
 {
 public:
 
   /**
-   * @copydoc Dali::ClipboardEventNotifier::Get()
+   * @copydoc Dali::TextClipboardEventNotifier::Get()
    */
-  static Dali::Clipboard Get();
+  static Dali::TextClipboard Get();
 
   /**
    * Constructor
    * @param[in] ecoreXwin, The window is created by application.
    */
-  Clipboard(/*Ecore_X_Window ecoreXwin*/);
-  virtual ~Clipboard();
+  TextClipboard(/*Ecore_X_Window ecoreXwin*/);
+  virtual ~TextClipboard();
 
   /**
-   * @copydoc Dali::Clipboard::IsAvailable()
+   * @copydoc Dali::TextClipboard::IsAvailable()
    */
   static bool IsAvailable();
 
   /**
-   * @copydoc Dali::Clipboard::SetItem()
+   * @copydoc Dali::TextClipboard::SetItem()
    */
   bool SetItem(const std::string &itemData);
 
   /**
-   * @copydoc Dali::Clipboard::RequestItem()
+   * @copydoc Dali::TextClipboard::RequestItem()
    */
   void RequestItem();
 
   /**
-   * @copydoc Dali::Clipboard::NumberOfClipboardItems()
+   * @copydoc Dali::TextClipboard::NumberOfClipboardItems()
    */
   unsigned int NumberOfItems();
 
   /**
-   * @copydoc Dali::Clipboard::ShowClipboard()
+   * @copydoc Dali::TextClipboard::ShowClipboard()
    */
   void ShowClipboard();
 
   /**
-   * @copydoc Dali::Clipboard::HideClipboard()
+   * @copydoc Dali::TextClipboard::HideClipboard()
    */
   void HideClipboard();
 
   /**
-  * @copydoc Dali::Clipboard::IsVisible()
+  * @copydoc Dali::TextClipboard::IsVisible()
   */
   bool IsVisible() const;
 
 private:
-  Clipboard( const Clipboard& );
-  Clipboard& operator=( Clipboard& );
+  TextClipboard( const TextClipboard& );
+  TextClipboard& operator=( TextClipboard& );
 
-  static Dali::Clipboard mToolkitClipboard;
+  static Dali::TextClipboard mToolkitClipboard;
   bool mVisible;
   std::string mItem;
   int mCount;
-}; // class clipboard
+}; // class TextClipboard
 
 
-Dali::Clipboard Dali::Internal::Adaptor::Clipboard::mToolkitClipboard;
+Dali::TextClipboard Dali::Internal::Adaptor::TextClipboard::mToolkitClipboard;
 
 
-Clipboard::Clipboard()
+TextClipboard::TextClipboard()
 {
   mVisible = false;
   mCount = 0;
 }
 
-Clipboard::~Clipboard()
+TextClipboard::~TextClipboard()
 {
 }
 
-Dali::Clipboard Clipboard::Get()
+Dali::TextClipboard TextClipboard::Get()
 {
   if( ! mToolkitClipboard )
   {
-    mToolkitClipboard = Dali::Clipboard( new Dali::Internal::Adaptor::Clipboard() );
+    mToolkitClipboard = Dali::TextClipboard( new Dali::Internal::Adaptor::TextClipboard() );
   }
   return mToolkitClipboard;
 }
 
-bool Clipboard::IsAvailable()
+bool TextClipboard::IsAvailable()
 {
   if(mToolkitClipboard)
   {
@@ -127,16 +127,16 @@ bool Clipboard::IsAvailable()
   return false;
 }
 
-bool Clipboard::SetItem(const std::string &itemData )
+bool TextClipboard::SetItem(const std::string &itemData )
 {
   mItem = itemData;
   mCount = 1;
   return true;
 }
 
-void Clipboard::RequestItem()
+void TextClipboard::RequestItem()
 {
-  Dali::ClipboardEventNotifier clipboardEventNotifier(Dali::ClipboardEventNotifier::Get());
+  Dali::TextClipboardEventNotifier clipboardEventNotifier(Dali::TextClipboardEventNotifier::Get());
   if ( clipboardEventNotifier )
   {
     clipboardEventNotifier.SetContent( mItem );
@@ -144,22 +144,22 @@ void Clipboard::RequestItem()
   }
 }
 
-unsigned int Clipboard::NumberOfItems()
+unsigned int TextClipboard::NumberOfItems()
 {
   return mCount;
 }
 
-void Clipboard::ShowClipboard()
+void TextClipboard::ShowClipboard()
 {
   mVisible = true;
 }
 
-void Clipboard::HideClipboard()
+void TextClipboard::HideClipboard()
 {
   mVisible = false;
 }
 
-bool Clipboard::IsVisible() const
+bool TextClipboard::IsVisible() const
 {
   return mVisible;
 }
@@ -169,64 +169,64 @@ bool Clipboard::IsVisible() const
 } // namespace Internal
 
 
-inline static Internal::Adaptor::Clipboard& GetImplementation(Dali::Clipboard& clipboard)
+inline static Internal::Adaptor::TextClipboard& GetImplementation(Dali::TextClipboard& clipboard)
 {
   // Bypass any passed in clipboard handle - it probably won't be initialized
-  Dali::Clipboard theClipboard = Dali::Clipboard::Get();
+  Dali::TextClipboard theClipboard = Dali::TextClipboard::Get();
   BaseObject& object = theClipboard.GetBaseObject();
-  return static_cast<Internal::Adaptor::Clipboard&>(object);
+  return static_cast<Internal::Adaptor::TextClipboard&>(object);
 }
 
-inline static const  Internal::Adaptor::Clipboard& GetImplementation(const Dali::Clipboard& clipboard)
+inline static const  Internal::Adaptor::TextClipboard& GetImplementation(const Dali::TextClipboard& clipboard)
 {
   // Bypass any passed in clipboard handle - it probably won't be initialized
-  Dali::Clipboard theClipboard = Dali::Clipboard::Get();
+  Dali::TextClipboard theClipboard = Dali::TextClipboard::Get();
   const BaseObject& object = theClipboard.GetBaseObject();
-  return static_cast<const Internal::Adaptor::Clipboard&>(object);
+  return static_cast<const Internal::Adaptor::TextClipboard&>(object);
 }
 
 
-Clipboard::Clipboard()
+TextClipboard::TextClipboard()
 {
 }
-Clipboard::~Clipboard()
+TextClipboard::~TextClipboard()
 {
 }
-Clipboard::Clipboard(Internal::Adaptor::Clipboard *impl)
+TextClipboard::TextClipboard(Internal::Adaptor::TextClipboard *impl)
   : BaseHandle(impl)
 {
 }
 
-Clipboard Clipboard::Get()
+TextClipboard TextClipboard::Get()
 {
-  return Internal::Adaptor::Clipboard::Get();
+  return Internal::Adaptor::TextClipboard::Get();
 }
-bool Clipboard::SetItem( const std::string &itemData)
+bool TextClipboard::SetItem( const std::string &itemData)
 {
   return GetImplementation(*this).SetItem( itemData );
 }
 
-void Clipboard::RequestItem()
+void TextClipboard::RequestItem()
 {
   GetImplementation(*this).RequestItem();
 }
 
-unsigned int Clipboard::NumberOfItems()
+unsigned int TextClipboard::NumberOfItems()
 {
   return GetImplementation(*this).NumberOfItems();
 }
 
-void Clipboard::ShowClipboard()
+void TextClipboard::ShowClipboard()
 {
   GetImplementation(*this).ShowClipboard();
 }
 
-void Clipboard::HideClipboard()
+void TextClipboard::HideClipboard()
 {
   GetImplementation(*this).HideClipboard();
 }
 
-bool Clipboard::IsVisible() const
+bool TextClipboard::IsVisible() const
 {
   return GetImplementation(*this).IsVisible();
 }
