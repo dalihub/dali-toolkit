@@ -49,7 +49,6 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::ModelPrimitive, Dali::BaseHandle, Create);
 DALI_TYPE_REGISTRATION_END()
 
-constexpr std::string_view MORPH_KEYWORD             = "MORPH";
 constexpr std::string_view MORPH_POSITION_KEYWORD    = "MORPH_POSITION";
 constexpr std::string_view MORPH_NORMAL_KEYWORD      = "MORPH_NORMAL";
 constexpr std::string_view MORPH_TANGENT_KEYWORD     = "MORPH_TANGENT";
@@ -284,7 +283,6 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
       {
         defines.push_back(MORPH_TANGENT_KEYWORD.data());
       }
-      defines.push_back(MORPH_KEYWORD.data());
       if(mBlendShapeData.version == Scene3D::Loader::BlendShapes::Version::VERSION_2_0)
       {
         defines.push_back(MORPH_VERSION_2_0_KEYWORD.data());

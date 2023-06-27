@@ -31,6 +31,7 @@ SET(TC_SOURCES
   utc-Dali-SceneDefinition.cpp
   utc-Dali-ShaderDefinition.cpp
   utc-Dali-ShaderDefinitionFactory.cpp
+  utc-Dali-ShaderDefinitionOption.cpp
   utc-Dali-StringCallback.cpp
   utc-Dali-Utils.cpp
   utc-Dali-ViewProjection.cpp

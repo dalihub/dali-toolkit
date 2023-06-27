@@ -15,14 +15,15 @@
  *
  */
 
-#include <toolkit-event-thread-callback.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <stdlib.h>
+#include <toolkit-event-thread-callback.h>
 #include <iostream>
 
-#include <dali-scene3d/internal/model-components/material-impl.h>
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-scene3d/internal/model-components/material-impl.h>
+#include <dali-scene3d/public-api/loader/shader-definition-option.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -96,11 +97,11 @@ int UtcDaliMaterialImplSetGetTextureInformation(void)
   GetImplementation(material).UpdateMaterialData();
 
   std::vector<std::string> defines;
-  defines.push_back("THREE_TEX");
-  defines.push_back("GLTF_CHANNELS");
-  defines.push_back("BASECOLOR_TEX");
-  defines.push_back("METALLIC_ROUGHNESS_TEX");
-  defines.push_back("NORMAL_TEX");
+  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::THREE_TEXTURE).data());
+  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::GLTF_CHANNELS).data());
+  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::BASE_COLOR_TEXTURE).data());
+  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::METALLIC_ROUGHNESS_TEXTURE).data());
+  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::NORMAL_TEXTURE).data());
 
   std::string fragmentShader = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
   for(const auto& define : defines)
@@ -175,10 +176,10 @@ int UtcDaliMaterialImplSetGetTextureInformation(void)
   DALI_TEST_EQUALS(true, GetImplementation(material).IsResourceReady(), TEST_LOCATION);
   GetImplementation(material).UpdateMaterialData();
 
-  defines.push_back("OCCLUSION");
-  defines.push_back("EMISSIVE");
-  defines.push_back("MATERIAL_SPECULAR_TEXTURE");
-  defines.push_back("MATERIAL_SPECULAR_COLOR_TEXTURE");
+  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::OCCLUSION).data());
+  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::EMISSIVE).data());
+  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::SPECULAR).data());
+  defines.push_back(Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Scene3D::Loader::ShaderDefinitionOption::Type::SPECULAR_COLOR).data());
 
   fragmentShader = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
   for(const auto& define : defines)
