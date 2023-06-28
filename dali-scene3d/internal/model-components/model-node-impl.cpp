@@ -75,7 +75,6 @@ ModelNode::~ModelNode()
 void ModelNode::Initialize()
 {
   OnInitialize();
-  mLights.resize(Scene3D::Internal::Light::GetMaximumEnabledLightCount());
 }
 
 void ModelNode::OnInitialize()
@@ -193,15 +192,6 @@ void ModelNode::AddModelPrimitive(Dali::Scene3D::ModelPrimitive modelPrimitive)
     GetImplementation(modelPrimitive).SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor, mSpecularMipmapLevels);
   }
 
-  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  for(uint32_t i = 0; i < maxLightCount; ++i)
-  {
-    if(mLights[i])
-    {
-      GetImplementation(modelPrimitive).AddLight(mLights[i], i);
-    }
-  }
-
   GetImplementation(modelPrimitive).UpdateShader(mShaderManager);
 
   Dali::Renderer renderer = GetImplementation(modelPrimitive).GetRenderer();
@@ -247,15 +237,6 @@ void ModelNode::RemoveModelPrimitive(uint32_t index)
   }
 
   GetImplementation(mModelPrimitiveContainer[index]).UpdateShader(nullptr);
-
-  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  for(uint32_t i = 0; i < maxLightCount; ++i)
-  {
-    if(mLights[i])
-    {
-      GetImplementation(mModelPrimitiveContainer[index]).RemoveLight(i);
-    }
-  }
 
   Actor self = Self();
   GetImplementation(mModelPrimitiveContainer[index]).RemovePrimitiveObserver(this);
@@ -322,24 +303,6 @@ void ModelNode::SetImageBasedLightScaleFactor(float iblScaleFactor)
   {
     GetImplementation(primitive).SetImageBasedLightScaleFactor(iblScaleFactor);
   }
-}
-
-void ModelNode::AddLight(Scene3D::Light light, uint32_t lightIndex)
-{
-  mLights[lightIndex] = light;
-  for(auto&& primitive : mModelPrimitiveContainer)
-  {
-    GetImplementation(primitive).AddLight(light, lightIndex);
-  }
-}
-
-void ModelNode::RemoveLight(uint32_t lightIndex)
-{
-  for(auto&& primitive : mModelPrimitiveContainer)
-  {
-    GetImplementation(primitive).RemoveLight(lightIndex);
-  }
-  mLights[lightIndex].Reset();
 }
 
 void ModelNode::UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager)

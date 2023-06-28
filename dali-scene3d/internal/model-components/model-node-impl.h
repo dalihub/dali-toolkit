@@ -248,21 +248,6 @@ public: // Public Method
   void SetImageBasedLightScaleFactor(float iblScaleFactor);
 
   /**
-   * @brief Adds new Light.
-   *
-   * @param[in] light Newly added light.
-   * @param[in] lightIndex index of this light.
-   */
-  void AddLight(Scene3D::Light light, uint32_t lightIndex);
-
-  /**
-   * @brief Removes new Light.
-   *
-   * @param[in] lightIndex index of light that will be removed.
-   */
-  void RemoveLight(uint32_t lightIndex);
-
-  /**
    * @brief Updates shaders by using current material
    *
    * @param[in] shaderManager Shader manager to create shader.
@@ -319,9 +304,6 @@ private:
   Dali::Texture                     mDiffuseTexture;
   float                             mIblScaleFactor{1.0f};
   uint32_t                          mSpecularMipmapLevels{1u};
-
-  // Light
-  std::vector<Scene3D::Light> mLights;
   /// @endcond
 };
 
