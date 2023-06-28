@@ -33,6 +33,7 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_public_api_dir}/loader/scene-definition.cpp
 	${scene3d_public_api_dir}/loader/shader-definition.cpp
 	${scene3d_public_api_dir}/loader/shader-definition-factory.cpp
+	${scene3d_public_api_dir}/loader/shader-definition-option.cpp
 	${scene3d_public_api_dir}/loader/skinning-details.cpp
 	${scene3d_public_api_dir}/loader/string-callback.cpp
 	${scene3d_public_api_dir}/loader/utils.cpp

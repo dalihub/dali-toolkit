@@ -26,6 +26,7 @@
 #include <dali-scene3d/internal/loader/hash.h>
 #include <dali-scene3d/public-api/loader/blend-shape-details.h>
 #include <dali-scene3d/public-api/loader/node-definition.h>
+#include <dali-scene3d/public-api/loader/shader-definition-option.h>
 
 namespace Dali::Scene3D::Loader
 {
@@ -60,90 +61,92 @@ struct ResourceReceiver : IResourceReceiver
   }
 };
 
-uint64_t HashNode(const MaterialDefinition& materialDef, const MeshDefinition& meshDef)
+ShaderDefinitionOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinition& meshDef)
 {
-  Hash hash;
+  ShaderDefinitionOption option;
 
   const bool hasTransparency = MaskMatch(materialDef.mFlags, MaterialDefinition::TRANSPARENCY);
-  hash.Add(hasTransparency);
+  if(hasTransparency)
+  {
+    option.SetTransparency();
+  }
 
   if(hasTransparency ||
-     materialDef.CheckTextures(MaterialDefinition::ALBEDO) ||
-     materialDef.CheckTextures(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS) ||
-     materialDef.CheckTextures(MaterialDefinition::NORMAL))
+     !materialDef.CheckTextures(MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC) ||
+     !materialDef.CheckTextures(MaterialDefinition::NORMAL | MaterialDefinition::ROUGHNESS))
   {
-    hash.Add("3TEX");
+    option.AddOption(ShaderDefinitionOption::Type::THREE_TEXTURE);
 
     // For the glTF, each of basecolor, metallic_roughness, normal texture is not essential.
-    if(materialDef.CheckTextures(MaterialDefinition::ALBEDO))
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO))
     {
-      hash.Add("BCTEX");
+      option.AddOption(ShaderDefinitionOption::Type::BASE_COLOR_TEXTURE);
     }
 
     if(materialDef.CheckTextures(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS))
     {
-      hash.Add("MRTEX");
+      option.AddOption(ShaderDefinitionOption::Type::METALLIC_ROUGHNESS_TEXTURE);
     }
 
-    if(materialDef.CheckTextures(MaterialDefinition::NORMAL))
+    if(MaskMatch(materialDef.mFlags, MaterialDefinition::NORMAL))
     {
-      hash.Add("NTEX");
+      option.AddOption(ShaderDefinitionOption::Type::NORMAL_TEXTURE);
     }
   }
 
   if(materialDef.GetAlphaCutoff() > 0.f)
   {
-    hash.Add("ALPH" /*A_TEST*/);
+    option.AddOption(ShaderDefinitionOption::Type::ALPHA_TEST);
   }
 
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::SUBSURFACE))
   {
-    hash.Add("SSS");
+    option.AddOption(ShaderDefinitionOption::Type::SUBSURFACE);
   }
 
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
   {
-    hash.Add("OCCL" /*USION*/);
+    option.AddOption(ShaderDefinitionOption::Type::OCCLUSION);
   }
 
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
   {
-    hash.Add("EMIS" /*SIVE*/);
+    option.AddOption(ShaderDefinitionOption::Type::EMISSIVE);
   }
 
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
   {
-    hash.Add("SPECTEX");
+    option.AddOption(ShaderDefinitionOption::Type::SPECULAR);
   }
 
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
   {
-    hash.Add("SPECCOLTEX");
+    option.AddOption(ShaderDefinitionOption::Type::SPECULAR_COLOR);
   }
 
   if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))
   {
-    hash.Add("GLTF" /*_CHANNELS*/);
+    option.AddOption(ShaderDefinitionOption::Type::GLTF_CHANNELS);
   }
 
   if(meshDef.IsSkinned())
   {
-    hash.Add("SKIN" /*NING*/);
+    option.AddOption(ShaderDefinitionOption::Type::SKINNING);
   }
 
   if(MaskMatch(meshDef.mFlags, MeshDefinition::FLIP_UVS_VERTICAL))
   {
-    hash.Add("FLIP" /*_V*/);
+    option.AddOption(ShaderDefinitionOption::Type::FLIP_UVS_VERTICAL);
   }
 
   if(meshDef.mColors.IsDefined())
   {
-    hash.Add("COLATT");
+    option.AddOption(ShaderDefinitionOption::Type::COLOR_ATTRIBUTE);
   }
 
   if(meshDef.mTangentType == Property::VECTOR4)
   {
-    hash.Add("V4TAN");
+    option.AddOption(ShaderDefinitionOption::Type::VEC4_TANGENT);
   }
 
   if(meshDef.HasBlendShapes())
@@ -154,31 +157,29 @@ uint64_t HashNode(const MaterialDefinition& materialDef, const MeshDefinition& m
     meshDef.RetrieveBlendShapeComponents(hasPositions, hasNormals, hasTangents);
     if(hasPositions)
     {
-      hash.Add("MORPHPOS");
+      option.AddOption(ShaderDefinitionOption::Type::MORPH_POSITION);
     }
 
     if(hasNormals)
     {
-      hash.Add("MORPHNOR");
+      option.AddOption(ShaderDefinitionOption::Type::MORPH_NORMAL);
     }
 
     if(hasTangents)
     {
-      hash.Add("MORPHTAN");
+      option.AddOption(ShaderDefinitionOption::Type::MORPH_TANGENT);
     }
 
     if(hasPositions || hasNormals || hasTangents)
     {
-      hash.Add("MORPH");
-
       if(BlendShapes::Version::VERSION_2_0 == meshDef.mBlendShapeVersion)
       {
-        hash.Add("MORPHV2");
+        option.AddOption(ShaderDefinitionOption::Type::MORPH_VERSION_2_0);
       }
     }
   }
 
-  return hash;
+  return option;
 }
 } // namespace
 
@@ -214,9 +215,10 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
     return INVALID_INDEX;
   }
 
-  auto&    shaderMap = mImpl->mShaderMap;
-  uint64_t hash      = HashNode(*receiver.mMaterialDef, *receiver.mMeshDef);
-  auto     iFind     = shaderMap.find(hash);
+  auto&                  shaderMap = mImpl->mShaderMap;
+  ShaderDefinitionOption option    = MakeOption(*receiver.mMaterialDef, *receiver.mMeshDef);
+  uint64_t               hash      = option.GetOptionHash();
+  auto                   iFind     = shaderMap.find(hash);
   if(iFind != shaderMap.end())
   {
     renderable.mShaderIdx = iFind->second;
@@ -240,119 +242,7 @@ Index ShaderDefinitionFactory::ProduceShader(NodeDefinition::Renderable& rendera
       shaderDef.mRendererState = (shaderDef.mRendererState | RendererState::ALPHA_BLEND);
     }
 
-    if(hasTransparency ||
-       !materialDef.CheckTextures(MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC) ||
-       !materialDef.CheckTextures(MaterialDefinition::NORMAL | MaterialDefinition::ROUGHNESS))
-
-    {
-      shaderDef.mDefines.push_back("THREE_TEX");
-
-      // For the glTF, each of basecolor, metallic_roughness, normal texture is not essential.
-      if(MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO))
-      {
-        shaderDef.mDefines.push_back("BASECOLOR_TEX");
-      }
-
-      if(materialDef.CheckTextures(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS))
-      {
-        shaderDef.mDefines.push_back("METALLIC_ROUGHNESS_TEX");
-      }
-
-      if(MaskMatch(materialDef.mFlags, MaterialDefinition::NORMAL))
-      {
-        shaderDef.mDefines.push_back("NORMAL_TEX");
-      }
-    }
-
-    if(materialDef.GetAlphaCutoff() > 0.f)
-    {
-      shaderDef.mDefines.push_back("ALPHA_TEST");
-    }
-
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SUBSURFACE))
-    {
-      shaderDef.mDefines.push_back("SSS");
-    }
-
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::OCCLUSION))
-    {
-      shaderDef.mDefines.push_back("OCCLUSION");
-    }
-
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::EMISSIVE))
-    {
-      shaderDef.mDefines.push_back("EMISSIVE_TEXTURE");
-    }
-
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR))
-    {
-      shaderDef.mDefines.push_back("MATERIAL_SPECULAR_TEXTURE");
-    }
-
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::SPECULAR_COLOR))
-    {
-      shaderDef.mDefines.push_back("MATERIAL_SPECULAR_COLOR_TEXTURE");
-    }
-
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::GLTF_CHANNELS))
-    {
-      shaderDef.mDefines.push_back("GLTF_CHANNELS");
-    }
-
-    const auto& meshDef = *receiver.mMeshDef;
-    if(meshDef.IsSkinned())
-    {
-      shaderDef.mDefines.push_back("SKINNING");
-    }
-
-    if(MaskMatch(meshDef.mFlags, MeshDefinition::FLIP_UVS_VERTICAL))
-    {
-      shaderDef.mDefines.push_back("FLIP_V");
-    }
-
-    if(meshDef.mColors.IsDefined())
-    {
-      shaderDef.mDefines.push_back("COLOR_ATTRIBUTE");
-    }
-
-    if(meshDef.mTangentType == Property::VECTOR4)
-    {
-      shaderDef.mDefines.push_back("VEC4_TANGENT");
-    }
-
-    if(meshDef.HasBlendShapes())
-    {
-      bool hasPositions = false;
-      bool hasNormals   = false;
-      bool hasTangents  = false;
-      meshDef.RetrieveBlendShapeComponents(hasPositions, hasNormals, hasTangents);
-
-      if(hasPositions)
-      {
-        shaderDef.mDefines.push_back("MORPH_POSITION");
-      }
-
-      if(hasNormals)
-      {
-        shaderDef.mDefines.push_back("MORPH_NORMAL");
-      }
-
-      if(hasTangents)
-      {
-        shaderDef.mDefines.push_back("MORPH_TANGENT");
-      }
-
-      if(hasPositions || hasNormals || hasTangents)
-      {
-        shaderDef.mDefines.push_back("MORPH");
-
-        if(BlendShapes::Version::VERSION_2_0 == meshDef.mBlendShapeVersion)
-        {
-          shaderDef.mDefines.push_back("MORPH_VERSION_2_0");
-        }
-      }
-    }
-
+    option.GetDefines(shaderDef.mDefines);
     shaderDef.mUniforms["uCubeMatrix"] = Matrix::IDENTITY;
 
     Index result    = resources.mShaders.size();

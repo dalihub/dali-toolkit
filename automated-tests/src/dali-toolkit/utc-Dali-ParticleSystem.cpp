@@ -15,14 +15,14 @@
  *
  */
 
-#include <dali-toolkit/public-api/particle-system/particle-emitter.h>
-#include <dali-toolkit/public-api/particle-system/particle-domain.h>
-#include <dali-toolkit/public-api/particle-system/particle-modifier.h>
-#include <dali-toolkit/public-api/particle-system/particle-source.h>
-#include <dali-toolkit/public-api/particle-system/particle-renderer.h>
-#include <dali-toolkit/public-api/particle-system/particle-list.h>
-#include <dali-toolkit/public-api/particle-system/particle.h>
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit/public-api/particle-system/particle-domain.h>
+#include <dali-toolkit/public-api/particle-system/particle-emitter.h>
+#include <dali-toolkit/public-api/particle-system/particle-list.h>
+#include <dali-toolkit/public-api/particle-system/particle-modifier.h>
+#include <dali-toolkit/public-api/particle-system/particle-renderer.h>
+#include <dali-toolkit/public-api/particle-system/particle-source.h>
+#include <dali-toolkit/public-api/particle-system/particle.h>
 
 #include <dlfcn.h>
 
@@ -39,46 +39,41 @@ R InvokeNext(T* pObj, Args... args)
 {
   Dl_info info;
   dladdr(__builtin_return_address(0), &info);
-  using Func = R(*)(T*,Args...);
-  auto sym = (Func)(dlsym(RTLD_NEXT, info.dli_sname));
+  using Func = R (*)(T*, Args...);
+  auto sym   = (Func)(dlsym(RTLD_NEXT, info.dli_sname));
   return sym(pObj, args...);
 }
 
-// Create fake time getter
+static std::chrono::milliseconds currentTime(1u);
+static void                      AdvanceTimeByMs(uint32_t ms)
+{
+  currentTime += std::chrono::milliseconds(ms);
+}
+
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
+// Create fake time getter
 struct ParticleEmitter
 {
   [[nodiscard]] std::chrono::milliseconds GetCurrentTimeMillis() const;
-
-  static std::chrono::milliseconds currentTime;
-
-  static void AdvanceTimeByMs( uint32_t ms)
-  {
-    currentTime += std::chrono::milliseconds(ms);
-  }
 };
-
-std::chrono::milliseconds ParticleEmitter::currentTime(1u);
-
 std::chrono::milliseconds ParticleEmitter::GetCurrentTimeMillis() const
 {
   [[maybe_unused]] auto value = InvokeNext<std::chrono::milliseconds>(this);
-   return std::chrono::milliseconds(currentTime);
+  return std::chrono::milliseconds(currentTime);
 }
-}
+} // namespace Dali::Toolkit::ParticleSystem::Internal
 
 using ParticleEmitterWrapper = Dali::Toolkit::ParticleSystem::Internal::ParticleEmitter;
 
 Texture CreateTexture()
 {
-  Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, 100, 100);
-  uint8_t* data = reinterpret_cast<uint8_t*>(malloc(100*100*4));
-  PixelData pixelData = PixelData::New(data, 100*100*4, 100, 100, Pixel::Format::RGBA8888, PixelData::FREE);
+  Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, 100, 100);
+  uint8_t*  data      = reinterpret_cast<uint8_t*>(malloc(100 * 100 * 4));
+  PixelData pixelData = PixelData::New(data, 100 * 100 * 4, 100, 100, Pixel::Format::RGBA8888, PixelData::FREE);
   texture.Upload(pixelData);
   return texture;
 }
-
 
 /**
  * Test particle source
@@ -86,16 +81,15 @@ Texture CreateTexture()
 class TestSource : public ParticleSourceInterface
 {
 public:
-
   TestSource(ParticleEmitter* emitter)
+  : mEmitter(*emitter)
   {
-    mEmitter = *emitter;
   }
 
   void NewFrame()
   {
     mPromise = std::promise<uint32_t>();
-    mFuture = mPromise.get_future();
+    mFuture  = mPromise.get_future();
   }
 
   uint32_t Update(ParticleList& outList, uint32_t count) override
@@ -115,25 +109,24 @@ public:
     mInitialized = true;
   }
 
-  bool mInitialized{false};
-  std::future<uint32_t> mFuture;
+  bool                   mInitialized{false};
+  std::future<uint32_t>  mFuture;
   std::promise<uint32_t> mPromise;
-  ParticleEmitter mEmitter;
+  ParticleEmitter&       mEmitter;
 };
 
 class TestSource2 : public ParticleSourceInterface
 {
 public:
-
   TestSource2(ParticleEmitter* emitter)
+  : mEmitter(*emitter)
   {
-    mEmitter = *emitter;
   }
 
   void NewFrame()
   {
     mPromise = std::promise<uint32_t>();
-    mFuture = mPromise.get_future();
+    mFuture  = mPromise.get_future();
   }
 
   uint32_t Update(ParticleList& outList, uint32_t count) override
@@ -151,9 +144,9 @@ public:
       [[maybe_unused]] auto& pos = particle.GetByIndex<Vector3>(mStreamBasePos);
 
       [[maybe_unused]] auto& gpos = particle.Get<Vector3>(ParticleStream::POSITION_STREAM_BIT);
-      [[maybe_unused]] auto& col = particle.Get<Vector4>(ParticleStream::COLOR_STREAM_BIT);
-      [[maybe_unused]] auto& vel = particle.Get<Vector3>(ParticleStream::VELOCITY_STREAM_BIT);
-      [[maybe_unused]] auto& sca = particle.Get<Vector3>(ParticleStream::SCALE_STREAM_BIT);
+      [[maybe_unused]] auto& col  = particle.Get<Vector4>(ParticleStream::COLOR_STREAM_BIT);
+      [[maybe_unused]] auto& vel  = particle.Get<Vector3>(ParticleStream::VELOCITY_STREAM_BIT);
+      [[maybe_unused]] auto& sca  = particle.Get<Vector3>(ParticleStream::SCALE_STREAM_BIT);
       //auto& basePos = particle.Get<Vector3>(ParticleStream::SCALE_STREAM_BIT);
     }
 
@@ -164,15 +157,14 @@ public:
   {
     // calls initialized
     mStreamBasePos = mEmitter.GetParticleList().AddLocalStream<Vector3>(Vector3::ZERO);
-    mInitialized = true;
+    mInitialized   = true;
   }
 
-  bool mInitialized{false};
-  std::future<uint32_t> mFuture;
+  bool                   mInitialized{false};
+  std::future<uint32_t>  mFuture;
   std::promise<uint32_t> mPromise;
-  uint32_t mStreamBasePos{0u};
-  ParticleEmitter mEmitter;
-
+  uint32_t               mStreamBasePos{0u};
+  ParticleEmitter&       mEmitter;
 };
 /**
  * Sample of FlameModifier
@@ -181,7 +173,6 @@ struct TestModifier : public ParticleModifierInterface
 {
   void Update(ParticleList& particleList, uint32_t firstParticleIndex, uint32_t particleCount) override
   {
-
   }
 };
 
@@ -189,7 +180,6 @@ struct TestModifierMT : public ParticleModifierInterface
 {
   void Update(ParticleList& particleList, uint32_t firstParticleIndex, uint32_t particleCount) override
   {
-
   }
 
   bool IsMultiThreaded() override
@@ -205,16 +195,15 @@ struct TestModifier2 : public ParticleModifierInterface
 {
   void Update(ParticleList& particleList, uint32_t firstParticleIndex, uint32_t particleCount) override
   {
-
   }
 };
 
 struct EmitterGroup
 {
-  ParticleEmitter emitter;
+  ParticleEmitter  emitter;
   ParticleRenderer renderer;
   ParticleModifier modifier;
-  ParticleSource source;
+  ParticleSource   source;
 };
 
 // Helper function to create emitter (every test will be doing that)
@@ -224,7 +213,7 @@ ParticleEmitter CreateEmitter(EmitterGroup* output = nullptr)
   auto emitter = ParticleEmitter::New();
 
   bool result = (emitter != nullptr);
-  DALI_TEST_EQUALS( result, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
 
   // Create test source
   auto source = ParticleSource::New<SOURCE>(&emitter);
@@ -268,23 +257,23 @@ ParticleEmitter CreateEmitter(EmitterGroup* output = nullptr)
   DALI_TEST_EQUALS(ready, ParticleEmitter::Status::INCOMPLETE, TEST_LOCATION);
 
   // Attach all components to the emitter
-  emitter.SetSource( source );
-  emitter.SetRenderer( renderer );
-  emitter.AddModifier( modifier );
-  emitter.SetDomain( domain );
+  emitter.SetSource(source);
+  emitter.SetRenderer(renderer);
+  emitter.AddModifier(modifier);
+  emitter.SetDomain(domain);
 
-  auto domain0 = emitter.GetDomain();
+  auto domain0   = emitter.GetDomain();
   auto renderer0 = emitter.GetRenderer();
 
-  DALI_TEST_EQUALS( renderer0, renderer, TEST_LOCATION);
-  DALI_TEST_EQUALS( domain0, domain, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer0, renderer, TEST_LOCATION);
+  DALI_TEST_EQUALS(domain0, domain, TEST_LOCATION);
 
   if(output)
   {
-    output->emitter = emitter;
+    output->emitter  = emitter;
     output->renderer = renderer;
     output->modifier = modifier;
-    output->source = source;
+    output->source   = source;
   }
 
   return emitter;
@@ -296,7 +285,7 @@ int UtcDaliParticleSystemEmitterNew(void)
   auto emitter = ParticleEmitter::New();
 
   bool result = (emitter != nullptr);
-  DALI_TEST_EQUALS( result, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
 
   // Create test source
   auto source = ParticleSource::New<TestSource>(&emitter);
@@ -317,10 +306,10 @@ int UtcDaliParticleSystemEmitterNew(void)
   DALI_TEST_EQUALS(ready, ParticleEmitter::Status::INCOMPLETE, TEST_LOCATION);
 
   // Attach all components to the emitter
-  emitter.SetSource( source );
-  emitter.SetRenderer( renderer );
-  emitter.AddModifier( modifier );
-  emitter.SetDomain( domain );
+  emitter.SetSource(source);
+  emitter.SetRenderer(renderer);
+  emitter.AddModifier(modifier);
+  emitter.SetDomain(domain);
 
   // test status again (domain is optional);
   ready = emitter.GetStatus();
@@ -337,7 +326,7 @@ int UtcDaliParticleSystemEmitterModifierStack(void)
   auto emitter = ParticleEmitter::New();
 
   bool result = (emitter != nullptr);
-  DALI_TEST_EQUALS( result, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
 
   // Create test source
   auto source = ParticleSource::New<TestSource>(&emitter);
@@ -360,13 +349,13 @@ int UtcDaliParticleSystemEmitterModifierStack(void)
   DALI_TEST_EQUALS(ready, ParticleEmitter::Status::INCOMPLETE, TEST_LOCATION);
 
   // Attach all components to the emitter
-  emitter.SetSource( source );
-  emitter.SetRenderer( renderer );
-  emitter.AddModifier( modifier0 );
-  emitter.AddModifier( modifier1 );
-  emitter.AddModifier( modifier2 );
+  emitter.SetSource(source);
+  emitter.SetRenderer(renderer);
+  emitter.AddModifier(modifier0);
+  emitter.AddModifier(modifier1);
+  emitter.AddModifier(modifier2);
 
-  emitter.SetDomain( domain );
+  emitter.SetDomain(domain);
 
   // test status again (domain is optional);
   ready = emitter.GetStatus();
@@ -402,8 +391,8 @@ int UtcDaliParticleSystemTest(void)
   DALI_TEST_EQUALS(ready, ParticleEmitter::Status::READY, TEST_LOCATION);
 
   // Set initial parameters of system
-  emitter.SetInitialParticleCount( 1000 );
-  emitter.SetActiveParticlesLimit( 5000 );
+  emitter.SetInitialParticleCount(1000);
+  emitter.SetActiveParticlesLimit(5000);
 
   // Test getters
   auto initialParticleCount = emitter.GetInitialParticleCount();
@@ -434,19 +423,19 @@ int UtcDaliParticleSystemTest(void)
 
   // Run 3 more frames advancing by 1000ms which should
   // emit particles based on emission rate
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
 
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
 
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
@@ -470,8 +459,8 @@ int UtcDaliParticleSystemTestWithTextureScreen(void)
 
   // Blending mode with screen
   auto texture = CreateTexture();
-  group.renderer.SetTexture( texture );
-  group.renderer.SetBlendingMode( BlendingMode::SCREEN );
+  group.renderer.SetTexture(texture);
+  group.renderer.SetBlendingMode(BlendingMode::SCREEN);
 
   // test status again (domain is optional);
   auto ready = emitter.GetStatus();
@@ -480,8 +469,8 @@ int UtcDaliParticleSystemTestWithTextureScreen(void)
   DALI_TEST_EQUALS(ready, ParticleEmitter::Status::READY, TEST_LOCATION);
 
   // Set initial parameters of system
-  emitter.SetInitialParticleCount( 1000 );
-  emitter.SetActiveParticlesLimit( 5000 );
+  emitter.SetInitialParticleCount(1000);
+  emitter.SetActiveParticlesLimit(5000);
 
   // Test getters
   auto initialParticleCount = emitter.GetInitialParticleCount();
@@ -512,19 +501,19 @@ int UtcDaliParticleSystemTestWithTextureScreen(void)
 
   // Run 3 more frames advancing by 1000ms which should
   // emit particles based on emission rate
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
 
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
 
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
@@ -548,8 +537,8 @@ int UtcDaliParticleSystemTestWithTextureAdd(void)
 
   // Blending mode with screen
   auto texture = CreateTexture();
-  group.renderer.SetTexture( texture );
-  group.renderer.SetBlendingMode( BlendingMode::DEFAULT );
+  group.renderer.SetTexture(texture);
+  group.renderer.SetBlendingMode(BlendingMode::DEFAULT);
 
   // test status again (domain is optional);
   auto ready = emitter.GetStatus();
@@ -558,8 +547,8 @@ int UtcDaliParticleSystemTestWithTextureAdd(void)
   DALI_TEST_EQUALS(ready, ParticleEmitter::Status::READY, TEST_LOCATION);
 
   // Set initial parameters of system
-  emitter.SetInitialParticleCount( 1000 );
-  emitter.SetActiveParticlesLimit( 5000 );
+  emitter.SetInitialParticleCount(1000);
+  emitter.SetActiveParticlesLimit(5000);
 
   // Test getters
   auto initialParticleCount = emitter.GetInitialParticleCount();
@@ -590,19 +579,19 @@ int UtcDaliParticleSystemTestWithTextureAdd(void)
 
   // Run 3 more frames advancing by 1000ms which should
   // emit particles based on emission rate
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
 
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
 
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
@@ -624,22 +613,22 @@ int UtcDaliParticleSystemTestInitialSetup(void)
 
   auto emitter = CreateEmitter<TestSource, TestModifier>(&group);
 
-  emitter.SetEmissionRate( 1000 );
-  emitter.SetInitialParticleCount( 1000 );
-  emitter.SetActiveParticlesLimit( 10000 );
+  emitter.SetEmissionRate(1000);
+  emitter.SetInitialParticleCount(1000);
+  emitter.SetActiveParticlesLimit(10000);
 
   auto emissionRate = emitter.GetEmissionRate();
   auto initialCount = emitter.GetInitialParticleCount();
-  auto activeCount = emitter.GetActiveParticlesLimit();
+  auto activeCount  = emitter.GetActiveParticlesLimit();
 
-  DALI_TEST_EQUALS( emissionRate, 1000, TEST_LOCATION);
-  DALI_TEST_EQUALS( initialCount, 1000, TEST_LOCATION);
-  DALI_TEST_EQUALS( activeCount, 10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(emissionRate, 1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(initialCount, 1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(activeCount, 10000, TEST_LOCATION);
 
   // Blending mode with screen
   auto texture = CreateTexture();
-  group.renderer.SetTexture( texture );
-  group.renderer.SetBlendingMode( BlendingMode::DEFAULT );
+  group.renderer.SetTexture(texture);
+  group.renderer.SetBlendingMode(BlendingMode::DEFAULT);
 
   // test status again (domain is optional);
   auto ready = emitter.GetStatus();
@@ -648,8 +637,8 @@ int UtcDaliParticleSystemTestInitialSetup(void)
   DALI_TEST_EQUALS(ready, ParticleEmitter::Status::READY, TEST_LOCATION);
 
   // Set initial parameters of system
-  emitter.SetInitialParticleCount( 1000 );
-  emitter.SetActiveParticlesLimit( 5000 );
+  emitter.SetInitialParticleCount(1000);
+  emitter.SetActiveParticlesLimit(5000);
 
   // Test getters
   auto initialParticleCount = emitter.GetInitialParticleCount();
@@ -680,19 +669,19 @@ int UtcDaliParticleSystemTestInitialSetup(void)
 
   // Run 3 more frames advancing by 1000ms which should
   // emit particles based on emission rate
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
 
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
 
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
@@ -714,18 +703,18 @@ int UtcDaliParticleSystemTestMT(void)
 
   auto emitter = CreateEmitter<TestSource, TestModifierMT>(&group);
 
-  emitter.SetEmissionRate( 10000 );
-  emitter.SetInitialParticleCount( 10000 );
-  emitter.SetActiveParticlesLimit( 20000 );
-  emitter.SetParticleCount( 300000 );
+  emitter.SetEmissionRate(10000);
+  emitter.SetInitialParticleCount(10000);
+  emitter.SetActiveParticlesLimit(20000);
+  emitter.SetParticleCount(300000);
 
   auto emissionRate = emitter.GetEmissionRate();
   auto initialCount = emitter.GetInitialParticleCount();
-  auto activeCount = emitter.GetActiveParticlesLimit();
+  auto activeCount  = emitter.GetActiveParticlesLimit();
 
-  DALI_TEST_EQUALS( emissionRate, 10000, TEST_LOCATION);
-  DALI_TEST_EQUALS( initialCount, 10000, TEST_LOCATION);
-  DALI_TEST_EQUALS( activeCount, 20000, TEST_LOCATION);
+  DALI_TEST_EQUALS(emissionRate, 10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(initialCount, 10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(activeCount, 20000, TEST_LOCATION);
 
   emitter.EnableParallelProcessing(true);
 
@@ -734,9 +723,9 @@ int UtcDaliParticleSystemTestMT(void)
 
   // Blending mode with screen
   auto texture = CreateTexture();
-  group.renderer.SetTexture( texture );
-  group.renderer.SetBlendingMode( BlendingMode::DEFAULT );
-  
+  group.renderer.SetTexture(texture);
+  group.renderer.SetBlendingMode(BlendingMode::DEFAULT);
+
   // test status again (domain is optional);
   auto ready = emitter.GetStatus();
 
@@ -765,19 +754,19 @@ int UtcDaliParticleSystemTestMT(void)
 
   // Run 3 more frames advancing by 1000ms which should
   // emit particles based on emission rate
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
 
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
 
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
@@ -799,24 +788,24 @@ int UtcDaliParticleSystemTestParticleSource(void)
 
   auto emitter = CreateEmitter<TestSource2, TestModifier>(&group);
 
-  emitter.SetEmissionRate( 1000 );
-  emitter.SetInitialParticleCount( 1000 );
-  emitter.SetActiveParticlesLimit( 10000 );
+  emitter.SetEmissionRate(1000);
+  emitter.SetInitialParticleCount(1000);
+  emitter.SetActiveParticlesLimit(10000);
 
   auto emissionRate = emitter.GetEmissionRate();
   auto initialCount = emitter.GetInitialParticleCount();
-  auto activeCount = emitter.GetActiveParticlesLimit();
+  auto activeCount  = emitter.GetActiveParticlesLimit();
 
-  DALI_TEST_EQUALS( emissionRate, 1000, TEST_LOCATION);
-  DALI_TEST_EQUALS( initialCount, 1000, TEST_LOCATION);
-  DALI_TEST_EQUALS( activeCount, 10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(emissionRate, 1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(initialCount, 1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(activeCount, 10000, TEST_LOCATION);
 
   emitter.EnableParallelProcessing(true);
 
   // Blending mode with screen
   auto texture = CreateTexture();
-  group.renderer.SetTexture( texture );
-  group.renderer.SetBlendingMode( BlendingMode::DEFAULT );
+  group.renderer.SetTexture(texture);
+  group.renderer.SetBlendingMode(BlendingMode::DEFAULT);
 
   // test status again (domain is optional);
   auto ready = emitter.GetStatus();
@@ -825,8 +814,8 @@ int UtcDaliParticleSystemTestParticleSource(void)
   DALI_TEST_EQUALS(ready, ParticleEmitter::Status::READY, TEST_LOCATION);
 
   // Set initial parameters of system
-  emitter.SetInitialParticleCount( 1000 );
-  emitter.SetActiveParticlesLimit( 5000 );
+  emitter.SetInitialParticleCount(1000);
+  emitter.SetActiveParticlesLimit(5000);
 
   // Test getters
   auto initialParticleCount = emitter.GetInitialParticleCount();
@@ -857,19 +846,19 @@ int UtcDaliParticleSystemTestParticleSource(void)
 
   // Run 3 more frames advancing by 1000ms which should
   // emit particles based on emission rate
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
 
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
 
-  ParticleEmitterWrapper::AdvanceTimeByMs(1000);
+  AdvanceTimeByMs(1000);
 
   sourceCallback.NewFrame();
   application.SendNotification();
@@ -881,6 +870,93 @@ int UtcDaliParticleSystemTestParticleSource(void)
   sourceCallback.NewFrame();
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliParticleSystemReplaceEmitter(void)
+{
+  TestApplication application;
+
+  // Create actor to be used with emitter
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+
+  EmitterGroup group;
+
+  auto emitter = CreateEmitter<TestSource, TestModifier>(&group);
+
+  // Blending mode with screen
+  auto texture = CreateTexture();
+  group.renderer.SetTexture(texture);
+  group.renderer.SetBlendingMode(BlendingMode::DEFAULT);
+
+  // test status again (domain is optional);
+  auto ready = emitter.GetStatus();
+
+  // Emitter should return status incomplete
+  DALI_TEST_EQUALS(ready, ParticleEmitter::Status::READY, TEST_LOCATION);
+
+  // Set initial parameters of system
+  emitter.SetInitialParticleCount(1000);
+  emitter.SetActiveParticlesLimit(5000);
+
+  // Test getters
+  auto initialParticleCount = emitter.GetInitialParticleCount();
+  auto activeParticlesLimit = emitter.GetActiveParticlesLimit();
+
+  DALI_TEST_EQUALS(initialParticleCount, 1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(activeParticlesLimit, 5000, TEST_LOCATION);
+
+  // Attach emitter to actor
+  emitter.AttachTo(actor);
+
+  // Start emitter
+  emitter.Start();
+
+  auto status = emitter.GetStatus();
+  DALI_TEST_EQUALS(status, ParticleEmitter::Status::STARTED, TEST_LOCATION);
+
+  auto& sourceCallback = dynamic_cast<TestSource&>(emitter.GetSource().GetSourceCallback());
+
+  // Run simulation
+  sourceCallback.NewFrame();
+  application.SendNotification();
+  application.Render();
+
+  // First call into source callback should emit initial number of particles
+  auto emittedParticleCount = sourceCallback.mFuture.get();
+  DALI_TEST_EQUALS(emittedParticleCount, 1000, TEST_LOCATION);
+
+  // Run 3 more frames advancing by 1000ms which should
+  // emit particles based on emission rate
+  AdvanceTimeByMs(1000);
+
+  sourceCallback.NewFrame();
+  application.SendNotification();
+  application.Render();
+
+  AdvanceTimeByMs(1000);
+
+  sourceCallback.NewFrame();
+  application.SendNotification();
+  application.Render();
+
+  AdvanceTimeByMs(1000);
+
+  sourceCallback.NewFrame();
+  application.SendNotification();
+  application.Render();
+
+  // replace emitter
+  auto                  oldEmitter = emitter.GetObjectPtr(); // store old emitter
+  [[maybe_unused]] auto i          = oldEmitter->ReferenceCount();
+  // Reset group
+  group = {};
+
+  emitter = CreateEmitter<TestSource, TestModifier>(&group);
+  DALI_TEST_EQUALS(bool(emitter.GetObjectPtr() != oldEmitter), true, TEST_LOCATION);
 
   END_TEST;
 }

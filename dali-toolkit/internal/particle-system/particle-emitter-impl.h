@@ -49,7 +49,7 @@ public:
   /**
    * @brief Destructor
    */
-  ~ParticleEmitter() override = default;
+  ~ParticleEmitter() override;
 
   /**
    * @brief Tests whether emitter is complete (ready for simulation)

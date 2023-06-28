@@ -1,5 +1,5 @@
-#ifndef  TOOLKIT_CLIPBOARD_H
-#define  TOOLKIT_CLIPBOARD_H
+#ifndef  TOOLKIT_TEXT_CLIPBOARD_H
+#define  TOOLKIT_TEXT_CLIPBOARD_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -18,7 +18,7 @@
  *
  */
 
-#define DALI_CLIPBOARD_H
+#define DALI_TEXT_CLIPBOARD_H
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 
 namespace Adaptor
 {
-class Clipboard;
+class TextClipboard;
 }
 }
 
@@ -40,31 +40,31 @@ class Clipboard;
  * The Clipboard can operate using various funtion.
  * Clipboard can manage it's item and set show / hide status.
  */
-class Clipboard : public BaseHandle
+class TextClipboard : public BaseHandle
 {
 public:
   /**
    * Create an uninitialized Clipboard;
    *  this can be initialized with one of the derived Clipboard' New() methods
    */
-  Clipboard();
+  TextClipboard();
 
   /**
    * Non virtual destructor.
    */
-  ~Clipboard();
+  ~TextClipboard();
 
   /**
    * This constructor is used by Adaptor::GetClipboard().
    * @param[in] clipboard A pointer to the clipboard.
    */
-  Clipboard( Internal::Adaptor::Clipboard* clipboard );
+  TextClipboard( Internal::Adaptor::TextClipboard* clipboard );
 
   /**
-   * Retrieve a handle to the ClipboardEventNotifier instance
-   * @return A handle to the Clipboard
+   * Retrieve a handle to the TextClipboardEventNotifier instance
+   * @return A handle to the TextClipboard
    */
-  static Clipboard Get();
+  static TextClipboard Get();
 
   /**
    * @brief Checks whether the clipboard is available.
@@ -110,4 +110,4 @@ public:
 };
 } // namespace Dali
 
-#endif // TOOLKIT_CLIPBOARD_H
+#endif // TOOLKIT_TextCLIPBOARD_H
