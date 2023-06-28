@@ -60,21 +60,6 @@ public:
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f].
    */
   virtual void NotifyImageBasedLightScaleFactor(float scaleFactor) = 0;
-
-  /**
-   * @brief Notifies new light is added on SceneView
-   *
-   * @param[in] lightIndex Index of added light.
-   * @param[in] light Added light.
-   */
-  virtual void NotifyLightAdded(uint32_t lightIndex, Scene3D::Light light) = 0;
-
-  /**
-   * @brief Notifies a light is removed from SceneView
-   *
-   * @param[in] lightIndex Index of light to be removed.
-   */
-  virtual void NotifyLightRemoved(uint32_t lightIndex) = 0;
 };
 
 } // namespace Internal

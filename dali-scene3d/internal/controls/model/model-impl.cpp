@@ -172,45 +172,6 @@ void AddModelTreeToAABB(BoundingVolume& AABB, const Dali::Scene3D::Loader::Scene
   }
 }
 
-void AddLightRecursively(Scene3D::ModelNode node, Scene3D::Light light, uint32_t lightIndex)
-{
-  if(!node)
-  {
-    return;
-  }
-  GetImplementation(node).AddLight(light, lightIndex);
-
-  uint32_t childrenCount = node.GetChildCount();
-  for(uint32_t i = 0; i < childrenCount; ++i)
-  {
-    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
-    if(childNode)
-    {
-      AddLightRecursively(childNode, light, lightIndex);
-    }
-  }
-}
-
-void RemoveLightRecursively(Scene3D::ModelNode node, uint32_t lightIndex)
-{
-  if(!node)
-  {
-    return;
-  }
-
-  GetImplementation(node).RemoveLight(lightIndex);
-
-  uint32_t childrenCount = node.GetChildCount();
-  for(uint32_t i = 0; i < childrenCount; ++i)
-  {
-    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
-    if(childNode)
-    {
-      RemoveLightRecursively(childNode, lightIndex);
-    }
-  }
-}
-
 void UpdateBlendShapeNodeMapRecursively(Model::BlendShapeModelNodeMap& resultMap, const Scene3D::ModelNode& node)
 {
   if(!node)
@@ -325,15 +286,6 @@ void Model::AddModelNode(Scene3D::ModelNode modelNode)
     UpdateImageBasedLightScaleFactor();
   }
 
-  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  for(uint32_t i = 0; i < maxLightCount; ++i)
-  {
-    if(mLights[i])
-    {
-      AddLightRecursively(modelNode, mLights[i], i);
-    }
-  }
-
   if(Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE))
   {
     NotifyResourceReady();
@@ -345,15 +297,6 @@ void Model::RemoveModelNode(Scene3D::ModelNode modelNode)
   if(mModelRoot)
   {
     UpdateShaderRecursively(modelNode, nullptr);
-
-    uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-    for(uint32_t i = 0; i < maxLightCount; ++i)
-    {
-      if(mLights[i])
-      {
-        RemoveLightRecursively(modelNode, i);
-      }
-    }
     mModelRoot.Remove(modelNode);
   }
 }
@@ -794,7 +737,6 @@ void Model::OnInitialize()
 {
   // Make ParentOrigin as Center.
   Self().SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mLights.resize(Scene3D::Internal::Light::GetMaximumEnabledLightCount());
 }
 
 void Model::OnSceneConnection(int depth)
@@ -1090,21 +1032,6 @@ void Model::NotifyImageBasedLightScaleFactor(float scaleFactor)
   }
 }
 
-void Model::NotifyLightAdded(uint32_t lightIndex, Scene3D::Light light)
-{
-  mLights[lightIndex] = light;
-  AddLightRecursively(mModelRoot, light, lightIndex);
-}
-
-void Model::NotifyLightRemoved(uint32_t lightIndex)
-{
-  if(mLights[lightIndex])
-  {
-    RemoveLightRecursively(mModelRoot, lightIndex);
-    mLights[lightIndex].Reset();
-  }
-}
-
 void Model::OnModelLoadComplete()
 {
   if(!mModelLoadTask->HasSucceeded())
@@ -1133,15 +1060,6 @@ void Model::OnModelLoadComplete()
   {
     mDefaultDiffuseTexture  = resources.mEnvironmentMaps.front().second.mDiffuse;
     mDefaultSpecularTexture = resources.mEnvironmentMaps.front().second.mSpecular;
-  }
-
-  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  for(uint32_t i = 0; i < maxLightCount; ++i)
-  {
-    if(mLights[i])
-    {
-      AddLightRecursively(mModelRoot, mLights[i], i);
-    }
   }
 
   UpdateImageBasedLightTexture();

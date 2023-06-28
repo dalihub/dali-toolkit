@@ -141,21 +141,6 @@ public:
   void SetImageBasedLightScaleFactor(float iblScaleFactor);
 
   /**
-   * @brief Adds a Light on this medel primitive
-   *
-   * @param[in] light Added light.
-   * @param[in] lightIndex Index of added light.
-   */
-  void AddLight(Scene3D::Light light, uint32_t lightIndex);
-
-  /**
-   * @brief Removes a light at the lightIndex of this model primitive
-   *
-   * @param[in] lightIndex Index of added light.
-   */
-  void RemoveLight(uint32_t lightIndex);
-
-  /**
    * @brief Updates shaders by using current material
    *
    * @param[in] shaderManager Shader manager to create shader.
@@ -238,10 +223,6 @@ private:
   Dali::Scene3D::Material mMaterial;
 
   Scene3D::Loader::ShaderManagerPtr mShaderManager;
-
-  // Light
-  std::vector<Scene3D::Light> mLights;
-  int32_t                     mLightCount{0};
 
   // For IBL
   Dali::Texture mSpecularTexture;

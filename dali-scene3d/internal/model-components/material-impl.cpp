@@ -690,21 +690,6 @@ void Material::SetRendererUniform(Dali::Renderer renderer)
   renderer.RegisterProperty(Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), 1.0f);
   renderer.RegisterProperty(Scene3D::Loader::NodeDefinition::GetIblYDirectionUniformName().data(), Vector3(1.0f, -1.0, 1.0));
 
-  std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
-  renderer.RegisterProperty(lightCountPropertyName, 0);
-
-  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  for(uint32_t i = 0; i < maxLightCount; ++i)
-  {
-    std::string lightDirectionPropertyName(Scene3D::Internal::Light::GetLightDirectionUniformName());
-    lightDirectionPropertyName += "[" + std::to_string(i) + "]";
-    renderer.RegisterProperty(lightDirectionPropertyName, Vector3::ZAXIS);
-
-    std::string lightColorPropertyName(Scene3D::Internal::Light::GetLightColorUniformName());
-    lightColorPropertyName += "[" + std::to_string(i) + "]";
-    renderer.RegisterProperty(lightColorPropertyName, Vector3(Color::WHITE));
-  }
-
   Scene3D::Loader::RendererState::Apply(mRendererState, renderer);
 }
 

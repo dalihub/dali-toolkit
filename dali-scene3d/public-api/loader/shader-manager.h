@@ -29,6 +29,7 @@
 #include <dali-scene3d/public-api/loader/mesh-definition.h>
 #include <dali-scene3d/public-api/loader/renderer-state.h>
 #include <dali-scene3d/public-api/loader/shader-option.h>
+#include <dali-scene3d/public-api/light/light.h>
 
 namespace Dali::Scene3D::Loader
 {
@@ -73,6 +74,44 @@ public:
    */
   RendererState::Type GetRendererState(const MaterialDefinition& materialDefinition);
 
+  /**
+   * @brief Adds new lights for each of shaders.
+   * @param[in] light Light object to be newly added.
+   * @return True when the new light object is added successfully.
+   */
+  bool AddLight(Scene3D::Light light);
+
+  /**
+   * @brief Removes light from each of shaders.
+   * @param[in] light Light object to be removed.
+   */
+  void RemoveLight(Scene3D::Light light);
+
+  /**
+   * @brief Retrieves added light counts.
+   * @return The number of added light count.
+   */
+  uint32_t GetLightCount() const;
+
+private:
+  /**
+   * @brief Sets constraint to the shaders with light of light index.
+   * @param[in] lightIndex index of light that will be connected with shaders by constraint.
+   */
+  DALI_INTERNAL void SetLightConstraint(uint32_t lightIndex);
+
+  /**
+   * @brief Sets constraint to a shader with light of light index.
+   * @param[in] lightIndex index of light that will be connected with input shader by constraint.
+   * @param[in] shader Shader that the constraint will be applied.
+   */
+  DALI_INTERNAL void SetLightConstraintToShader(uint32_t lightIndex, Dali::Shader shader);
+
+  /**
+   * @brief Removes constraint of shaders and light of light index.
+   * @param[in] lightIndex index of light that will be disconnected with shaders.
+   */
+  DALI_INTERNAL void RemoveLightConstraint(uint32_t lightIndex);
 private:
   struct Impl;
   const std::unique_ptr<Impl> mImpl;
