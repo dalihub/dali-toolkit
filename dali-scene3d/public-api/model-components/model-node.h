@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/loader/blend-shape-details.h> ///< For Loader::BlendShapes::Index
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
 
 namespace Dali
@@ -136,7 +137,6 @@ public:
   static ModelNode DownCast(BaseHandle handle);
 
 public: // Public Method
-
   /**
    * @brief Gets the number of ModelPrimitives this node has.
    *
@@ -185,6 +185,22 @@ public: // Public Method
    * @return Returns a child ModelNode object with a name that matches nodeName. If there is no corresponding child ModelNode object, it returns an empty ModelNode object.
    */
   ModelNode FindChildModelNodeByName(std::string_view nodeName);
+
+  /**
+   * @brief Retrieve the list of blendshape name that current ModelNode hold.
+   * The name will be appended end of input list.
+   *
+   * @param[in, out] blendShapeNames The name of blendShape list collected.
+   */
+  void RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const;
+
+  /**
+   * @brief Get the index of blend shape by given name.
+   *
+   * @param[in] blendShapeName The name of blendshape that is not empty.
+   * @return Index of blendshape, or return invalid if there is no blendshape with given name.
+   */
+  Loader::BlendShapes::Index GetBlendShapeIndexByName(std::string_view blendShapeName) const;
 
 public: // Not intended for application developers
   /// @cond internal
