@@ -11,7 +11,6 @@ SET(TC_SOURCES
   utc-Dali-AnimationDefinition.cpp
   utc-Dali-AnimatedProperty.cpp
   utc-Dali-BvhLoader.cpp
-  utc-Dali-BlendShapeIndex.cpp
   utc-Dali-CameraParameters.cpp
   utc-Dali-EnvironmentMapLoader.cpp
   utc-Dali-EnvironmentDefinition.cpp
@@ -21,11 +20,6 @@ SET(TC_SOURCES
   utc-Dali-Model.cpp
   utc-Dali-ModelNode.cpp
   utc-Dali-ModelPrimitive.cpp
-  utc-Dali-MotionData.cpp
-  utc-Dali-MotionIndex.cpp
-  utc-Dali-MotionPropertyIndex.cpp
-  utc-Dali-MotionTransformIndex.cpp
-  utc-Dali-MotionValue.cpp
   utc-Dali-SceneView.cpp
   utc-Dali-MatrixStack.cpp
   utc-Dali-MeshDefinition.cpp

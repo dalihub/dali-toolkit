@@ -170,15 +170,10 @@ struct Read
     return static_cast<E>(number);
   }
 
-  static std::string_view StringView(const json_string_s& js)
-  {
-    return std::string_view(js.string, js.string_size);
-  }
-
   static std::string_view StringView(const json_value_s& j)
   {
     auto& js = Cast<json_string_s>(j);
-    return StringView(js);
+    return std::string_view(js.string, js.string_size);
   }
 
   static std::string String(const json_value_s& j)

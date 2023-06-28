@@ -148,26 +148,6 @@ ModelNode Model::FindChildModelNodeByName(std::string_view nodeName)
   return GetImpl(*this).FindChildModelNodeByName(nodeName);
 }
 
-void Model::RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const
-{
-  GetImpl(*this).RetrieveBlendShapeNames(blendShapeNames);
-}
-
-void Model::RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, std::vector<ModelNode>& modelNodes) const
-{
-  GetImpl(*this).RetrieveModelNodesByBlendShapeName(blendShapeName, modelNodes);
-}
-
-Dali::Animation Model::GenerateMotionDataAnimation(MotionData motionData)
-{
-  return GetImpl(*this).GenerateMotionDataAnimation(motionData);
-}
-
-void Model::SetMotionData(MotionData motionData)
-{
-  GetImpl(*this).SetMotionData(motionData);
-}
-
 } // namespace Scene3D
 
 } // namespace Dali

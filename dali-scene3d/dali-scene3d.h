@@ -71,11 +71,4 @@
 #include <dali-scene3d/public-api/model-components/model-node.h>
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
 
-#include <dali-scene3d/public-api/model-motion/motion-data.h>
-#include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
-#include <dali-scene3d/public-api/model-motion/motion-index/motion-index.h>
-#include <dali-scene3d/public-api/model-motion/motion-index/motion-property-index.h>
-#include <dali-scene3d/public-api/model-motion/motion-index/motion-transform-index.h>
-#include <dali-scene3d/public-api/model-motion/motion-value.h>
-
 #endif // DALI_SCENE3D_H

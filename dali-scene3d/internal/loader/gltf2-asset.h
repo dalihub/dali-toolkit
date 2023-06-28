@@ -426,25 +426,10 @@ struct Mesh : Named
     //TODO: extensions
   };
 
-  struct Extras
-  {
-    std::vector<std::string_view> mTargetNames;
-
-    //TODO: extras
-  };
-
-  struct Extensions
-  {
-    std::vector<std::string_view> mSXRTargetsNames;
-    std::vector<std::string_view> mAvatarShapeNames;
-
-    //TODO: extensions
-  };
-
   std::vector<Primitive> mPrimitives;
   std::vector<float>     mWeights;
-  Extras                 mExtras;
-  Extensions             mExtensions;
+  //TODO: extras
+  //TODO: extensions
 };
 
 struct Node;

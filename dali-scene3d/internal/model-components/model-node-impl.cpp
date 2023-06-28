@@ -24,8 +24,8 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/model-primitive-impl.h>
+#include <dali-scene3d/internal/light/light-impl.h>
 
 namespace Dali
 {
@@ -280,25 +280,6 @@ Scene3D::ModelNode ModelNode::FindChildModelNodeByName(std::string_view nodeName
   return Scene3D::ModelNode::DownCast(childActor);
 }
 
-void ModelNode::RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const
-{
-  blendShapeNames.reserve(blendShapeNames.size() + mBlendShapeIndexMap.size());
-  for(const auto& iter : mBlendShapeIndexMap)
-  {
-    blendShapeNames.push_back(iter.first);
-  }
-}
-
-Loader::BlendShapes::Index ModelNode::GetBlendShapeIndexByName(std::string_view blendShapeName) const
-{
-  auto iter = mBlendShapeIndexMap.find(std::string(blendShapeName));
-  if(iter != mBlendShapeIndexMap.end())
-  {
-    return iter->second;
-  }
-  return Loader::BlendShapes::INVALID_INDEX;
-}
-
 void ModelNode::SetImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float iblScaleFactor, uint32_t specularMipmapLevels)
 {
   mDiffuseTexture       = diffuseTexture;
@@ -340,18 +321,6 @@ void ModelNode::RemoveLight(uint32_t lightIndex)
 
 void ModelNode::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData& data, Scene3D::ModelPrimitive primitive)
 {
-  // Update mBlendShapeIndexMap
-  mBlendShapeIndexMap.clear();
-  const auto blendShapeCount = data.names.size();
-  for(Loader::BlendShapes::Index index = 0u; index < blendShapeCount; ++index)
-  {
-    auto& name = data.names[index];
-    if(!name.empty())
-    {
-      mBlendShapeIndexMap[name] = index;
-    }
-  }
-
   GetImplementation(primitive).SetBlendShapeData(data);
 }
 
@@ -403,7 +372,8 @@ void ModelNode::UpdateBoneMatrix(Scene3D::ModelPrimitive primitive)
 
     Matrix inverseMatrix = boneData.inverseMatrix;
     // Constrain bone matrix to joint transform.
-    boneData.constraint = Constraint::New<Matrix>(renderer, propBoneXform, [inverseMatrix](Matrix& output, const PropertyInputContainer& inputs) { Matrix::Multiply(output, inverseMatrix, inputs[0]->GetMatrix()); });
+    boneData.constraint = Constraint::New<Matrix>(renderer, propBoneXform, [inverseMatrix](Matrix& output, const PropertyInputContainer& inputs)
+                                                  { Matrix::Multiply(output, inverseMatrix, inputs[0]->GetMatrix()); });
 
     Actor joint = Self();
     boneData.constraint.AddSource(Source{joint, Actor::Property::WORLD_MATRIX});
