@@ -22,7 +22,7 @@
 #include <string>
 
 // PUBLIC INCLUDES
-#define DALI_CLIPBOARD_EVENT_NOTIFIER_H
+#define DALI_TEXT_CLIPBOARD_EVENT_NOTIFIER_H
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
 
@@ -34,27 +34,27 @@ namespace Internal
 {
 namespace Adaptor
 {
-class ClipboardEventNotifier;
+class TextClipboardEventNotifier;
 }
 }
 
-class ClipboardEventNotifier : public BaseHandle
+class TextClipboardEventNotifier : public BaseHandle
 {
 public:
-  typedef Signal< void ( ClipboardEventNotifier& ) > ClipboardEventSignalType;
+  typedef Signal< void ( TextClipboardEventNotifier& ) > TextClipboardEventSignalType;
 
-  ClipboardEventNotifier();
-  static ClipboardEventNotifier Get();
-  ~ClipboardEventNotifier();
+  TextClipboardEventNotifier();
+  static TextClipboardEventNotifier Get();
+  ~TextClipboardEventNotifier();
 
   const std::string& GetContent() const;
   void SetContent( const std::string& content );
   void ClearContent();
 
   void EmitContentSelectedSignal();
-  ClipboardEventSignalType& ContentSelectedSignal();
+  TextClipboardEventSignalType& ContentSelectedSignal();
 
-  ClipboardEventNotifier( Internal::Adaptor::ClipboardEventNotifier* notifier );
+  TextClipboardEventNotifier( Internal::Adaptor::TextClipboardEventNotifier* notifier );
 };
 
 } // namespace Dali

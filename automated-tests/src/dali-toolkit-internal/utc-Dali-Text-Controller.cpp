@@ -45,7 +45,7 @@ const char* const OPTION_CLIPBOARD("optionClipboard");    // "Clipboard" popup o
 const Size CONTROL_SIZE(300.f, 60.f);
 
 std::string gClipboardText;
-void        ContentSelectedCallback(ClipboardEventNotifier& notifier)
+void        ContentSelectedCallback(TextClipboardEventNotifier& notifier)
 {
   gClipboardText = notifier.GetContent();
 }
@@ -547,7 +547,7 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   controller->GetText(text);
   DALI_TEST_CHECK(text.empty());
 
-  ClipboardEventNotifier clipboardEventNotifier = ClipboardEventNotifier::Get();
+  TextClipboardEventNotifier clipboardEventNotifier = TextClipboardEventNotifier::Get();
   clipboardEventNotifier.ContentSelectedSignal().Connect(&ContentSelectedCallback);
 
   // Paste the text.

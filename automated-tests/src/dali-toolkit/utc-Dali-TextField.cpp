@@ -2981,7 +2981,7 @@ int utcDaliTextFieldEvent08(void)
   ToolkitTestApplication application;
   tet_infoline(" utcDaliTextFieldEvent08");
 
-  Dali::Clipboard clipboard = Clipboard::Get();
+  Dali::TextClipboard clipboard = TextClipboard::Get();
   clipboard.SetItem("testTextFieldEvent");
 
   // Checks Longpress when only place holder text
