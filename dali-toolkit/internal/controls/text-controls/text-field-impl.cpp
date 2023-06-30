@@ -765,12 +765,6 @@ void TextField::OnKeyInputFocusGained()
     // When window gain lost focus, the inputMethodContext is deactivated. Thus when window gain focus again, the inputMethodContext must be activated.
     mInputMethodContext.SetRestoreAfterFocusLost(true);
   }
-  TextClipboardEventNotifier notifier(TextClipboardEventNotifier::Get());
-
-  if(notifier)
-  {
-    notifier.ContentSelectedSignal().Connect(this, &TextField::OnClipboardTextSelected);
-  }
 
   if(IsEditable() && mController->IsUserInteractionEnabled())
   {
@@ -793,12 +787,6 @@ void TextField::OnKeyInputFocusLost()
     mInputMethodContext.Deactivate();
 
     mInputMethodContext.EventReceivedSignal().Disconnect(this, &TextField::OnInputMethodContextEvent);
-  }
-  TextClipboardEventNotifier notifier(TextClipboardEventNotifier::Get());
-
-  if(notifier)
-  {
-    notifier.ContentSelectedSignal().Disconnect(this, &TextField::OnClipboardTextSelected);
   }
 
   mController->KeyboardFocusLostEvent();
@@ -1116,11 +1104,6 @@ void TextField::EnableClipping()
 
     Self().Add(mStencil);
   }
-}
-
-void TextField::OnClipboardTextSelected(TextClipboardEventNotifier& clipboard)
-{
-  mController->PasteClipboardItemEvent();
 }
 
 void TextField::KeyboardStatusChanged(bool keyboardShown)

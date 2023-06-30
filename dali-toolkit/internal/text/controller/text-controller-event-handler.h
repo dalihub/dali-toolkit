@@ -115,12 +115,26 @@ struct Controller::EventHandler
    */
   static bool DeleteEvent(Controller& controller, int keyCode);
 
+  /// @copydoc Text::Controller::OnInputMethodContextEvent
+  /// @param[in] controller A reference to the controller class
   static InputMethodContext::CallbackData OnInputMethodContextEvent(Controller&                          controller,
                                                                     InputMethodContext&                  inputMethodContext,
                                                                     const InputMethodContext::EventData& inputMethodContextEvent);
 
-  static void PasteClipboardItemEvent(Controller& controller);
+  /**
+   * @brief This function executes the actual text update when a clipboard paste event occurs.
+   *
+   * @param[in] controller A reference to the controller class.
+   * @param[in] text The text data to be pasted into the text controller.
+   */
+  static void PasteClipboardItemEvent(Controller& controller, const std::string& text);
+
+  /// @copydoc Text::Controller::DecorationEvent
+  /// @param[in] controller A reference to the controller class
   static void DecorationEvent(Controller& controller, HandleType handleType, HandleState state, float x, float y);
+
+  /// @copydoc Text::Controller::TextPopupButtonTouched
+  /// @param[in] controller A reference to the controller class
   static void TextPopupButtonTouched(Controller& controller, Dali::Toolkit::TextSelectionPopup::Buttons button);
 };
 

@@ -31,7 +31,6 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-test-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-text-abstraction.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-timer.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-tts-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-video-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-virtual-keyboard.cpp

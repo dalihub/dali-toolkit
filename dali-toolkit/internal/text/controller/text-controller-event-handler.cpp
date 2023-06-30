@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/text/controller/text-controller-event-handler.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/text-clipboard-event-notifier.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
@@ -892,12 +891,8 @@ InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextE
   return callbackData;
 }
 
-void Controller::EventHandler::PasteClipboardItemEvent(Controller& controller)
+void Controller::EventHandler::PasteClipboardItemEvent(Controller& controller, const std::string& text)
 {
-  // Retrieve the clipboard contents first
-  TextClipboardEventNotifier notifier(TextClipboardEventNotifier::Get());
-  std::string            stringToPaste(notifier.GetContent());
-
   // Commit the current pre-edit text; the contents of the clipboard should be appended
   controller.mImpl->ResetInputMethodContext();
 
@@ -905,7 +900,7 @@ void Controller::EventHandler::PasteClipboardItemEvent(Controller& controller)
   controller.mImpl->SetClipboardHideEnable(false);
 
   // Paste
-  TextUpdater::PasteText(controller, stringToPaste);
+  TextUpdater::PasteText(controller, text);
 
   controller.mImpl->SetClipboardHideEnable(true);
 }
