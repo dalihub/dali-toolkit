@@ -4789,7 +4789,7 @@ int utcDaliTextFieldGeometryEllipsisStart(void)
   Vector<Vector2> expectedPositions;
 
   expectedPositions.PushBack(Vector2(14, 0));
-  expectedSizes.PushBack(Vector2(106, 25));
+  expectedSizes.PushBack(Vector2(107, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 
@@ -4836,7 +4836,7 @@ int utcDaliTextFieldGeometryEllipsisEnd(void)
   Vector<Vector2> expectedPositions;
 
   expectedPositions.PushBack(Vector2(-2, 0));
-  expectedSizes.PushBack(Vector2(122, 25));
+  expectedSizes.PushBack(Vector2(123, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 
@@ -4881,7 +4881,7 @@ int utcDaliTextFieldGeometryRTL(void)
   Vector<Vector2> expectedPositions;
 
   expectedPositions.PushBack(Vector2(38, 0));
-  expectedSizes.PushBack(Vector2(73, 25));
+  expectedSizes.PushBack(Vector2(75, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 
@@ -4926,7 +4926,7 @@ int utcDaliTextFieldGeometryGlyphMiddle(void)
   Vector<Vector2> expectedPositions;
 
   expectedPositions.PushBack(Vector2(6, 0));
-  expectedSizes.PushBack(Vector2(124, 25));
+  expectedSizes.PushBack(Vector2(125, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 

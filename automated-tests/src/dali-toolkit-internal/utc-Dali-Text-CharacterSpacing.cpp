@@ -310,7 +310,6 @@ bool LayoutTextTest(const LayoutTextData& data)
       Print(expectedLine);
       return false;
     }
-
     // Do not compare the alignment offset as it's not calculated in the layout.
     // Do not compare the line direction as it's not set in the layout.
   }
@@ -359,16 +358,18 @@ int UtcDaliTextCharacterSpacingSingleLineTextArea1(void)
   Size textArea(1.f, 1.f);
 
   //******* characterSpacing = 0.0f *******//
-  float positions[] = {
-    0.f, -12.f, 10.f, -9.f, 19.875f, -13.f, 23.8906f, -13.f, 26.9062f, -9.f, 36.1875f, -0.f, 40.1875f, -9.f, 52.1562f, -9.f, 62.4375f, -9.f, 68.5f, -13.f, 71.5156f, -13.f};
-  Size layoutSize(81.f, 20.f);
+  float positions[] =
+   {
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f
+   };
+  Size layoutSize(79.f, 20.f);
   //************************************//
 
   struct LineRun line =
     {
       {0u, 11u},
       {0u, 11u},
-      81.f,
+      79.f,
       15.f,
       -5.f,
       0.f,
@@ -434,16 +435,18 @@ int UtcDaliTextCharacterSpacingSingleLineTextArea2(void)
   Size textArea(1.f, 1.f);
 
   //******* characterSpacing = 2.0f *******//
-  float positions[] = {
-    0.f, -12.f, 12.f, -9.f, 23.875f, -13.f, 29.8906f, -13.f, 34.9062f, -9.f, 46.1875f, -0.f, 52.1875f, -9.f, 66.1562f, -9.f, 78.4375f, -9.f, 86.5f, -13.f, 91.5156f, -13.f};
-  Size layoutSize(101.f, 20.f);
+  float positions[] =
+   {
+     0.f, -12.f, 12.f, -9.f, 23.f, -13.f, 29.f, -13.f, 34.f, -9.f, 45.f, -0.f, 51.f, -9.f, 65.f, -9.f, 77.f, -9.f, 85.f, -13.f, 90.f, -13.f
+   };
+  Size layoutSize(99.f, 20.f);
   //************************************//
 
   struct LineRun line =
     {
       {0u, 11u},
       {0u, 11u},
-      101.f,
+      99.f,
       15.f,
       -5.f,
       0.f,
@@ -509,16 +512,18 @@ int UtcDaliTextCharacterSpacingSingleLineTextArea3(void)
   Size textArea(1.f, 1.f);
 
   //******* characterSpacing = 4.0f *******//
-  float positions[] = {
-    0.f, -12.f, 14.f, -9.f, 27.875f, -13.f, 35.8906f, -13.f, 42.9062f, -9.f, 56.1875f, -0.f, 64.1875f, -9.f, 80.1562f, -9.f, 94.4375f, -9.f, 104.5f, -13.f, 111.5156f, -13.f};
-  Size layoutSize(121.f, 20.f);
+  float positions[] =
+   {
+     0.f, -12.f, 14.f, -9.f, 27.f, -13.f, 35.f, -13.f, 42.f, -9.f, 55.f, -0.f, 63.f, -9.f, 79.f, -9.f, 93.f, -9.f, 103.f, -13.f, 110.f, -13.f
+   };
+  Size layoutSize(119.f, 20.f);
   //************************************//
 
   struct LineRun line =
     {
       {0u, 11u},
       {0u, 11u},
-      121.f,
+      119.f,
       15.f,
       -5.f,
       0.f,
@@ -595,15 +600,16 @@ int UtcDaliTextCharacterSpacingMultilineText1(void)
   fontDescriptionRuns.PushBack(fontDescriptionRun1);
   fontDescriptionRuns.PushBack(fontDescriptionRun2);
   Size  textArea(100.f, 300.f);
-  Size  layoutSize(98.f, 97.f);
+  Size  layoutSize(96.f, 97.f);
   float positions[] =
     {
-      0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f, 0.f, -13.f, 9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -2.f, 45.f, -12.f, 0.f, -12.f, 7.92188f, -9.f, 18.f, -9.f, 27.2031f, -9.f, 38.f, -9.f, 47.f, -11.f, 53.f, -0.f, 0.f, -12.f, 11.1562f, -12.f, 15.f, -12.f, 26.f, -9.f, 36.4844f, -9.f, 42.f, -9.f, 52.5469f, -9.f, 61.6875f, -11.f, 67.9688f, -0.f, 0.f, -12.f, 4.f, -12.f, 9.f, -9.f, 18.0469f, -9.f, 27.8906f, -9.f, 36.f, -0.f, 41.3281f, -9.f, 51.125f, -12.f, 57.f, -0.f, 62.f, -11.f, 68.1406f, -9.f, 77.7031f, -9.f, 87.f, -11.f, 94.4531f, -2.f};
+      0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f, 0.f, -13.f, 9.f, -9.f, 18.f, -9.f, 31.f, -9.f, 40.f, -2.f, 44.f, -12.f, 0.f, -12.f, 8.f, -9.f, 18.f, -9.f, 27.f, -9.f, 38.f, -9.f, 47.f, -11.f, 53.f, -0.f, 0.f, -12.f, 11.f, -12.f, 14.f, -12.f, 25.f, -9.f, 36.f, -9.f, 41.f, -9.f, 52.f, -9.f, 61.f, -11.f, 67.f, -0.f, 0.f, -12.f, 4.f, -12.f, 8.f, -9.f, 17.f, -9.f, 27.f, -9.f, 35.f, -0.f, 40.f, -9.f, 50.f, -12.f, 56.f, -0.f, 61.f, -11.f, 67.f, -9.f, 77.f, -9.f, 86.f, -11.f, 93.f, -2.f
+    };
   struct LineRun line0 =
     {
       {0u, 12u},
       {0u, 12u},
-      81.f,
+      79.f,
       15.f,
       -5.f,
       4.f,
@@ -615,7 +621,7 @@ int UtcDaliTextCharacterSpacingMultilineText1(void)
     {
       {12u, 6u},
       {12u, 6u},
-      44.f,
+      43.f,
       15.f,
       -5.f,
       0.f,
@@ -627,10 +633,10 @@ int UtcDaliTextCharacterSpacingMultilineText1(void)
     {
       {18u, 7u},
       {18u, 7u},
-      54.f,
+      53.f,
       15.f,
       -4.f,
-      6.f,
+      5.f,
       0.f,
       0.f,
       false,
@@ -639,10 +645,10 @@ int UtcDaliTextCharacterSpacingMultilineText1(void)
     {
       {25u, 9u},
       {25u, 10u},
-      68.f,
+      67.f,
       15.f,
       -4.f,
-      6.f,
+      5.f,
       0.f,
       0.f,
       false,
@@ -651,7 +657,7 @@ int UtcDaliTextCharacterSpacingMultilineText1(void)
     {
       {34u, 14u},
       {35u, 14u},
-      98.f,
+      96.f,
       15.f,
       -4.f,
       0.f,
@@ -733,15 +739,16 @@ int UtcDaliTextCharacterSpacingMultilineText2(void)
   fontDescriptionRuns.PushBack(fontDescriptionRun1);
   fontDescriptionRuns.PushBack(fontDescriptionRun2);
   Size  textArea(100.f, 300.f);
-  Size  layoutSize(82.f, 136.f);
+  Size  layoutSize(99.f, 116.f);
   float positions[] =
     {
-      0.f, -12.f, 12.f, -9.f, 24.f, -13.f, 30.f, -13.f, 35.f, -9.f, 46.f, -0.f, 0.f, -9.f, 13.9688f, -9.f, 26.25f, -9.f, 34.3125f, -13.f, 39.3281f, -13.f, 50.6406f, -0.f, 0.f, -13.f, 11.3125f, -9.f, 22.7031f, -9.f, 37.5625, -9.f, 48.8438f, -2.f, 54.8125, -12.f, 0.f, -12.f, 9.92188f, -9.f, 21.7344, -9.f, 33.2031f, -9.f, 46.f, -9.f, 57.1406f, -11.f, 65.4219f, -0.f, 0.f, -12.f, 13.1562f, -12.f, 18.6094f, -12.f, 31.6406f, -9.f, 44.4844f, -9.f, 51.7031f, -9.f, 64.5469f, -9.f, 75.6875f, -11.f, 83.9688, -0.f, 0.f, -12.f, 6.45312f, -12.f, 12.9062f, -9.f, 24.0469f, -9.f, 35.8906f, -9.f, 46.2344f, -0.f, 53.3281f, -9.f, 65.125f, -12.f, 72.7656f, -0.f, 0.f, -11.f, 8.28125f, -9.f, 19.8438f, -9.f, 31.3125f, -11.f, 40.5938f, -2.f};
+      0.f, -12.f, 12.f, -9.f, 23.f, -13.f, 29.f, -13.f, 34.f, -9.f, 45.f, -0.f, 51.f, -9.f, 65.f, -9.f, 77.f, -9.f, 85.f, -13.f, 90.f, -13.f, 101.f, -0.f, 0.f, -13.f, 11.f, -9.f, 22.f, -9.f, 37.f, -9.f, 48.f, -2.f, 54.f, -12.f, 0.f, -12.f, 10.f, -9.f, 22.f, -9.f, 33.f, -9.f, 46.f, -9.f, 57.f, -11.f, 65.f, -0.f, 0.f, -12.f, 13.f, -12.f, 18.f, -12.f, 31.f, -9.f, 44.f, -9.f, 51.f, -9.f, 64.f, -9.f, 75.f, -11.f, 83.f, -0.f, 0.f, -12.f, 6.f, -12.f, 12.f, -9.f, 23.f, -9.f, 35.f, -9.f, 45.f, -0.f, 52.f, -9.f, 64.f, -12.f, 72.f, -0.f, 0.f, -11.f, 8.f, -9.f, 20.f, -9.f, 31.f, -11.f, 40.f, -2.f
+    };
   struct LineRun line0 =
     {
-      {0u, 6u},
-      {0u, 6u},
-      44.f,
+      {0u, 12u},
+      {0u, 12u},
+      99.f,
       15.f,
       -5.f,
       6.f,
@@ -751,69 +758,57 @@ int UtcDaliTextCharacterSpacingMultilineText2(void)
       false};
   struct LineRun line1 =
     {
-      {6u, 6u},
-      {6u, 6u},
-      49.f,
+      {12u, 6u},
+      {12u, 6u},
+      51.f,
       15.f,
       -5.f,
-      6.f,
+      0.f,
       0.f,
       0.f,
       false,
       false};
   struct LineRun line2 =
     {
-      {12u, 6u},
-      {12u, 6u},
-      52.f,
+      {18u, 7u},
+      {18u, 7u},
+      63.f,
       15.f,
-      -5.f,
-      0.f,
+      -4.f,
+      7.f,
       0.f,
       0.f,
       false,
       false};
   struct LineRun line3 =
     {
-      {18u, 7u},
-      {18u, 7u},
-      64.f,
+      {25u, 9u},
+      {25u, 10u},
+      81.f,
       15.f,
       -4.f,
-      8.f,
+      7.f,
       0.f,
       0.f,
       false,
       false};
   struct LineRun line4 =
     {
-      {25u, 9u},
-      {25u, 10u},
-      82.f,
+      {34u, 9u},
+      {35u, 9u},
+      70.f,
       15.f,
       -4.f,
-      8.f,
+      7.f,
       0.f,
       0.f,
       false,
       false};
   struct LineRun line5 =
     {
-      {34u, 9u},
-      {35u, 9u},
-      72.f,
-      15.f,
-      -4.f,
-      8.f,
-      0.f,
-      0.f,
-      false,
-      false};
-  struct LineRun line6 =
-    {
       {43u, 5u},
       {44u, 5u},
-      44.f,
+      43.f,
       15.f,
       -4.f,
       0.f,
@@ -828,7 +823,6 @@ int UtcDaliTextCharacterSpacingMultilineText2(void)
   lines.PushBack(line3);
   lines.PushBack(line4);
   lines.PushBack(line5);
-  lines.PushBack(line6);
 
   LayoutTextData data =
     {
@@ -841,7 +835,7 @@ int UtcDaliTextCharacterSpacingMultilineText2(void)
       layoutSize,
       48u,
       positions,
-      7u,
+      6u,
       lines.Begin(),
       Layout::Engine::MULTI_LINE_BOX,
       0u,

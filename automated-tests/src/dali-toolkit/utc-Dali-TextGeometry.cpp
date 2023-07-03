@@ -70,7 +70,7 @@ int UtcDaliTextGeometryGetLineBoundingRectangleLabel(void)
 
   Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
 
-  Rect<> expectedLineGeometry = {0, 16, 420, 16};
+  Rect<> expectedLineGeometry = {0, 16, 418, 16};
 
   TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
 
@@ -123,7 +123,7 @@ int UtcDaliTextGeometryGetLineBoundingRectangleField(void)
 
   Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(field, 0);
 
-  Rect<> expectedLineGeometry = {0, 0, 163, 36};
+  Rect<> expectedLineGeometry = {0, 0, 162, 36};
 
   TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
 
@@ -179,7 +179,7 @@ int UtcDaliTextGeometryLineSpacingPositiveGetLineBoundingRectangleLabel(void)
 
   Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
 
-  Rect<> expectedLineGeometry = {0, 56, 420, 56};
+  Rect<> expectedLineGeometry = {0, 56, 418, 56};
 
   TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
 
@@ -207,7 +207,7 @@ int UtcDaliTextGeometryWithVerticalLineAlignmentTopGetLineBoundingRectangleLabel
 
   Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
 
-  Rect<> expectedLineGeometry = {0, 36, 420, 36};
+  Rect<> expectedLineGeometry = {0, 36, 418, 36};
 
   TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
 
@@ -235,7 +235,7 @@ int UtcDaliTextGeometryWithVerticalLineAlignmentBottomGetLineBoundingRectangleLa
 
   Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
 
-  Rect<> expectedLineGeometry = {0, 36, 420, 36};
+  Rect<> expectedLineGeometry = {0, 36, 418, 36};
 
   TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
 
@@ -263,7 +263,7 @@ int UtcDaliTextGeometryWithEllipsisMiddleGetLineBoundingRectangleLabel(void)
 
   Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
 
-  Rect<> expectedLineGeometry = {0, 36, 420, 36};
+  Rect<> expectedLineGeometry = {0, 36, 418, 36};
 
   TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
 
@@ -292,7 +292,7 @@ int UtcDaliTextGeometryWithEllipsisStartGetLineBoundingRectangleLabel(void)
 
   Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
 
-  Rect<> expectedLineGeometry = {0, 36, 420, 36};
+  Rect<> expectedLineGeometry = {0, 36, 418, 36};
 
   TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
 
@@ -321,7 +321,7 @@ int UtcDaliTextGeometryWithEllipsisEndGetLineBoundingRectangleLabel(void)
 
   Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
 
-  Rect<> expectedLineGeometry = {0, 36, 420, 36};
+  Rect<> expectedLineGeometry = {0, 36, 418, 36};
 
   TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
 
@@ -353,7 +353,7 @@ int UtcDaliTextGeometryGetCharacterBoundingRectangleLabel(void)
 
   std::cout << " characterGeometry "<< characterGeometry <<std::endl;
 
-  Rect<> expectedCharacterGeometry = {13.4844f, 16.0f, 18.7031f, 16.0f};
+  Rect<> expectedCharacterGeometry = {13.0f, 16.0f, 19.0f, 16.0f};
   std::cout<< " expectedCharacterGeometry " << characterGeometry <<std::endl;
 
   std:: cout << "if" << (characterGeometry == expectedCharacterGeometry) <<std::endl;
@@ -381,7 +381,7 @@ int UtcDaliTextGeometryGetCharacterBoundingRectangleEditor(void)
 
   Rect<> characterGeometry = TextGeometry::GetCharacterBoundingRectangle(editor, 1);
 
-  Rect<> expectedCharacterGeometry = {13.4844f, 16.0f, 18.7031f, 16.0f};
+  Rect<> expectedCharacterGeometry = {13.0f, 16.0f, 19.0f, 16.0f};
 
   TestTextGeometryUtils::CheckRectGeometryResult(characterGeometry, expectedCharacterGeometry);
 
@@ -408,7 +408,7 @@ int UtcDaliTextGeometryGetCharacterBoundingRectangleField(void)
 
   Rect<> characterGeometry = TextGeometry::GetCharacterBoundingRectangle(field, 0);
 
-  Rect<> expectedCharacterGeometry = {142.844f, 10.0f, 16.375f, 11.0f};
+  Rect<> expectedCharacterGeometry = {142.0f, 10.0f, 16.0f, 11.0f};
 
   TestTextGeometryUtils::CheckRectGeometryResult(characterGeometry, expectedCharacterGeometry);
 
@@ -465,7 +465,7 @@ int UtcDaliTextGeometryLineSpacingPositiveGetCharacterBoundingRectangleLabel(voi
 
   Rect<> charGeometry = TextGeometry::GetCharacterBoundingRectangle(label, 1);
 
-  Rect<> expectedCharGeometry = {13.4844f, 16.0f, 18.7031f, 16.0f};
+  Rect<> expectedCharGeometry = {13.0f, 16.0f, 19.0f, 16.0f};
 
   TestTextGeometryUtils::CheckRectGeometryResult(charGeometry, expectedCharGeometry);
 
@@ -493,7 +493,7 @@ int UtcDaliTextGeometryWithVerticalLineAlignmentTopGetCharacterBoundingRectangle
 
   Rect<> charGeometry = TextGeometry::GetCharacterBoundingRectangle(label, 1);
 
-  Rect<> expectedCharGeometry = {13.4844f, 16.0f, 18.7031f, 16.0f};
+  Rect<> expectedCharGeometry = {13.0, 16.0f, 19.0f, 16.0f};
 
   TestTextGeometryUtils::CheckRectGeometryResult(charGeometry, expectedCharGeometry);
 
@@ -521,7 +521,7 @@ int UtcDaliTextGeometryWithVerticalLineAlignmentBottomGetCharacterBoundingRectan
 
   Rect<> charGeometry = TextGeometry::GetCharacterBoundingRectangle(label, 1);
 
-  Rect<> expectedCharGeometry = {13.4844f, 16.0f, 18.7031f, 16.0f};
+  Rect<> expectedCharGeometry = {13.0, 16.0f, 19.0f, 16.0f};
 
   TestTextGeometryUtils::CheckRectGeometryResult(charGeometry, expectedCharGeometry);
 
