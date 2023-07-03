@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_STYLE_MANAGER_DEVEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/styling/style-manager.h>

@@ -25,6 +25,7 @@
 #include <dali/public-api/math/compile-time-math.h>
 #include <cstring>
 #include <fstream>
+#include <functional>
 #include <type_traits>
 
 namespace Dali::Scene3D::Loader
