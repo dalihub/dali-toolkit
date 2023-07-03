@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,21 @@ static int Wait(ToolkitTestApplication& application, int duration = 0)
 static Texture CreateSolidColorTexture(ToolkitTestApplication& application, const Vector4& color, unsigned int width, unsigned int height)
 {
   Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+
+  int      bufferSize = width * height * GetBytesPerPixel(Pixel::RGBA8888);
+  uint8_t* buffer     = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+
+  for(uint32_t i = 0; i < width * height; ++i)
+  {
+    buffer[i * 4 + 0] = static_cast<uint8_t>(color.r * 255.0f);
+    buffer[i * 4 + 1] = static_cast<uint8_t>(color.g * 255.0f);
+    buffer[i * 4 + 2] = static_cast<uint8_t>(color.b * 255.0f);
+    buffer[i * 4 + 3] = static_cast<uint8_t>(color.a * 255.0f);
+  }
+
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
+  texture.Upload(pixelData, 0u, 0u, 0u, 0u, width, height);
+
   return texture;
 }
 } //namespace
