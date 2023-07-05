@@ -118,16 +118,6 @@ ModelNode ModelNode::FindChildModelNodeByName(std::string_view nodeName)
   return Internal::GetImplementation(*this).FindChildModelNodeByName(nodeName);
 }
 
-void ModelNode::RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const
-{
-  return Internal::GetImplementation(*this).RetrieveBlendShapeNames(blendShapeNames);
-}
-
-Loader::BlendShapes::Index ModelNode::GetBlendShapeIndexByName(std::string_view blendShapeName) const
-{
-  return Internal::GetImplementation(*this).GetBlendShapeIndexByName(blendShapeName);
-}
-
 } // namespace Scene3D
 
 } // namespace Dali

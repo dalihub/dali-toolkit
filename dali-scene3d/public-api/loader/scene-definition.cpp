@@ -860,7 +860,6 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&          
         data.components = 0x0;
         for(auto&& blendShape : mesh.first.mBlendShapes)
         {
-          data.names.push_back(blendShape.name);
           data.weights.push_back(blendShape.weight);
           data.components |= (blendShape.deltas.IsDefined() * BlendShapes::Component::POSITIONS) |
                              (blendShape.normals.IsDefined() * BlendShapes::Component::NORMALS) | (blendShape.tangents.IsDefined() * BlendShapes::Component::TANGENTS);

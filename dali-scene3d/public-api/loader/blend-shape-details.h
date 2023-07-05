@@ -22,7 +22,6 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/shader.h>
-#include <limits> ///< for std::numeric_limits
 #include <string>
 
 // INTERNAL INCLUDES
@@ -35,9 +34,6 @@ struct MeshGeometry;
 
 struct DALI_SCENE3D_API BlendShapes
 {
-  using Index                          = uint32_t;
-  static constexpr Index INVALID_INDEX = std::numeric_limits<Index>::max();
-
   enum class Version
   {
     VERSION_1_0,
@@ -57,13 +53,12 @@ struct DALI_SCENE3D_API BlendShapes
 
   struct BlendShapeData
   {
-    std::vector<std::string> names;
-    std::vector<float>       weights;
-    std::vector<float>       unnormalizeFactors;
-    Version                  version{Scene3D::Loader::BlendShapes::Version::INVALID};
-    uint32_t                 bufferOffset{0};
-    int32_t                  components{0x0};
-    Dali::WeakHandle<Actor>  mActor;
+    std::vector<float>      weights;
+    std::vector<float>      unnormalizeFactors;
+    Version                 version{Scene3D::Loader::BlendShapes::Version::INVALID};
+    uint32_t                bufferOffset{0};
+    int32_t                 components{0x0};
+    Dali::WeakHandle<Actor> mActor;
   };
 
   // shader properties - animatable (uniforms)

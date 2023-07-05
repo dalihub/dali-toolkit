@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/animation.h>
@@ -52,9 +51,8 @@ namespace Internal
 class Model : public Dali::Toolkit::Internal::Control, public LightObserver
 {
 public:
-  using AnimationData          = std::pair<std::string, Dali::Animation>;
-  using CameraData             = Loader::CameraParameters;
-  using BlendShapeModelNodeMap = std::map<std::string, std::vector<Scene3D::ModelNode>>;
+  using AnimationData = std::pair<std::string, Dali::Animation>;
+  using CameraData    = Loader::CameraParameters;
 
   /**
    * @copydoc Model::New()
@@ -145,26 +143,6 @@ public:
    * @copydoc Model::FindChildModelNodeByName()
    */
   Scene3D::ModelNode FindChildModelNodeByName(std::string_view nodeName);
-
-  /**
-   * @copydoc Model::RetrieveBlendShapeNames()
-   */
-  void RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const;
-
-  /**
-   * @copydoc Model::RetrieveModelNodesByBlendShapeName()
-   */
-  void RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, std::vector<Scene3D::ModelNode>& modelNodes) const;
-
-  /**
-   * @copydoc Model::GenerateMotionDataAnimation()
-   */
-  Dali::Animation GenerateMotionDataAnimation(Scene3D::MotionData motionData);
-
-  /**
-   * @copydoc Model::SetMotionData()
-   */
-  void SetMotionData(Scene3D::MotionData motionData);
 
 protected:
   /**
@@ -347,11 +325,6 @@ private:
    */
   void ResetCameraParameters();
 
-  /**
-   * @brief Collect ModelNode list by blendshape name
-   */
-  void UpdateBlendShapeNodeMap();
-
 private:
   std::string                    mModelUrl;
   std::string                    mResourceDirectoryUrl;
@@ -363,9 +336,6 @@ private:
 
   // Light
   std::vector<Scene3D::Light> mLights;
-
-  // List of ModelNode for name of blend shape.
-  BlendShapeModelNodeMap mBlendShapeModelNodeMap;
 
   // Asynchronous loading variable
   ModelLoadTaskPtr          mModelLoadTask;

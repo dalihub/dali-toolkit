@@ -49,7 +49,7 @@ public: // METHODS
   /**
    * @return The Property object (of the given @a actor) whose value is being animated.
    */
-  Property GetProperty(Actor& actor) const
+  Property GetProperty(Actor& actor)
   {
     auto idx = actor.GetPropertyIndex(mPropertyName);
     return Property(actor, idx);
@@ -58,7 +58,7 @@ public: // METHODS
   /**
    * @brief The type of the Property (of the given @a actor) that is being animated.
    */
-  Property::Type GetPropertyType(Actor& actor) const
+  Property::Type GetPropertyType(Actor& actor)
   {
     auto idx = actor.GetPropertyIndex(mPropertyName);
     return actor.GetPropertyType(idx);
@@ -70,7 +70,7 @@ public: // METHODS
    *  Failing to find the actor purely means that this property will not be
    *  animated.
    */
-  void Animate(Animation& anim, GetActor getActor) const;
+  void Animate(Animation& anim, GetActor getActor);
 
 public: // DATA
   struct Value

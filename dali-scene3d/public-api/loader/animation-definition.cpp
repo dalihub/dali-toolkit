@@ -158,9 +158,9 @@ void AnimationDefinition::ReserveSize(uint32_t size)
   mProperties.reserve(size);
 }
 
-uint32_t AnimationDefinition::GetPropertyCount() const
+uint32_t AnimationDefinition::GetPropertyCount()
 {
-  return static_cast<uint32_t>(mProperties.size());
+  return mProperties.size();
 }
 
 void AnimationDefinition::SetProperty(uint32_t index, AnimatedProperty&& property)
@@ -173,11 +173,6 @@ void AnimationDefinition::SetProperty(uint32_t index, AnimatedProperty&& propert
 }
 
 AnimatedProperty& AnimationDefinition::GetPropertyAt(uint32_t index)
-{
-  return mProperties[index];
-}
-
-const AnimatedProperty& AnimationDefinition::GetPropertyAt(uint32_t index) const
 {
   return mProperties[index];
 }
