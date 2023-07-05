@@ -43,6 +43,8 @@ class MotionTransformIndex;
  * It will be used when app developer don't care about Dali::Actor::Property list,
  * but want to change the transform properties anyway fast enough.
  *
+ * Each TransformType has their own matched MotionValue type.
+ *
  * @code
  *
  * MotionTransformIndex position = MotionTransformIndex::New("nodeName", MotionTransformIndex::TransformType::POSITION);
