@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/animated-gradient/animated-gradient-visual.h>
 #include <dali-toolkit/internal/visuals/animated-image/animated-image-visual.h>
@@ -390,9 +391,8 @@ void VisualFactory::SetBrokenImageUrl(Toolkit::StyleManager& styleManager)
 
   if(styleManager)
   {
-    customBrokenImageUrlList                 = Toolkit::DevelStyleManager::GetBrokenImageUrlList(styleManager);
-    const Property::Map& config              = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
-    const auto           brokenImageUrlValue = config.Find("brokenImageUrl", Property::Type::STRING);
+    customBrokenImageUrlList       = Toolkit::DevelStyleManager::GetBrokenImageUrlList(styleManager);
+    const auto brokenImageUrlValue = Toolkit::DevelStyleManager::GetConfigurations(styleManager).Find("brokenImageUrl", Property::Type::STRING);
     if(brokenImageUrlValue)
     {
       brokenImageUrlValue->Get(brokenImageUrl);
