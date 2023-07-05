@@ -162,8 +162,8 @@ int UtcDaliTextHyphenWrapping(void)
 
   LineRun line1 =
     {
-      {0u, 5u},
-      {0u, 5u},
+      {0u, 8u},
+      {0u, 8u},
       0.f,
       0.f,
       0.f,
@@ -174,8 +174,8 @@ int UtcDaliTextHyphenWrapping(void)
       false};
   LineRun line2 =
     {
-      {5u, 8u},
-      {5u, 8u},
+      {8u, 5u},
+      {8u, 5u},
       0.f,
       0.f,
       0.f,

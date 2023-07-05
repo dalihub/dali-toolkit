@@ -87,7 +87,7 @@ bool IsEqualGlyph(const GlyphInfoData& glyphData, const GlyphInfo& glyph)
   {
     return false;
   }
-  if(glyphData.advance >= 0.0f && fabsf(glyphData.advance - floor(glyph.advance)) > Math::MACHINE_EPSILON_1000)
+  if(glyphData.advance >= 0.0f && fabsf(glyphData.advance - round(glyph.advance)) > Math::MACHINE_EPSILON_1000)
   {
     return false;
   }
@@ -253,7 +253,7 @@ bool ShapeInfoTest(const ShapeInfoData& data)
       std::cout << "            height : " << glyphInfo.height << std::endl;
       std::cout << "          xBearing : " << glyphInfo.xBearing << std::endl;
       std::cout << "          yBearing : " << glyphInfo.yBearing << std::endl;
-      std::cout << "           advance : " << floor(glyphInfo.advance) << std::endl;
+      std::cout << "           advance : " << round(glyphInfo.advance) << std::endl;
       std::cout << "       scaleFactor : " << glyphInfo.scaleFactor << std::endl;
       std::cout << "  isItalicRequired : " << glyphInfo.isItalicRequired << std::endl;
       std::cout << "    isBoldRequired : " << glyphInfo.isBoldRequired << std::endl;
@@ -382,7 +382,7 @@ int UtcDaliTextShape(void)
       {1u, 306u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
       {1u, 309u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 3u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
-      {1u, 317u, 0.f, 0.f, 0.f, 0.f, 11.f, 0.f},
+      {1u, 317u, 0.f, 0.f, 0.f, 0.f, 12.f, 0.f},
       {1u, 309u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 312u, 0.f, 0.f, 0.f, 0.f, 6.f, 0.f},
       {1u, 306u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
@@ -400,7 +400,7 @@ int UtcDaliTextShape(void)
       {1u, 306u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
       {1u, 309u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 3u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
-      {1u, 317u, 0.f, 0.f, 0.f, 0.f, 11.f, 0.f},
+      {1u, 317u, 0.f, 0.f, 0.f, 0.f, 12.f, 0.f},
       {1u, 309u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 312u, 0.f, 0.f, 0.f, 0.f, 6.f, 0.f},
       {1u, 306u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
@@ -408,7 +408,7 @@ int UtcDaliTextShape(void)
       {1u, 0u, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
       {1u, 298u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 299u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
-      {1u, 307u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f},
+      {1u, 307u, 0.f, 0.f, 0.f, 0.f, 14.f, 0.f},
       {1u, 309u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 0u, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
     };
@@ -419,16 +419,16 @@ int UtcDaliTextShape(void)
 
   struct GlyphInfoData glyphs04[] =
     {
-      {2u, 67u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
+      {2u, 67u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f},
       {2u, 27u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f},
       {2u, 59u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
-      {2u, 67u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
-      {2u, 55u, 0.f, 0.f, 0.f, 0.f, 19.f, 0.f},
+      {2u, 67u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f},
+      {2u, 55u, 0.f, 0.f, 0.f, 0.f, 20.f, 0.f},
       {2u, 59u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
-      {2u, 67u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
+      {2u, 67u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f},
       {2u, 56u, 0.f, 0.f, 0.f, 0.f, 19.f, 0.f},
       {2u, 59u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
-      {2u, 67u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
+      {2u, 67u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f},
       {2u, 52u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f},
       {2u, 59u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
     };
@@ -438,17 +438,17 @@ int UtcDaliTextShape(void)
 
   struct GlyphInfoData glyphs05[] =
     {
-      {1u, 280u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
+      {1u, 280u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 309u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
-      {1u, 312u, 0.f, 0.f, 0.f, 0.f, 5.f, 0.f},
+      {1u, 312u, 0.f, 0.f, 0.f, 0.f, 6.f, 0.f},
       {1u, 299u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
-      {1u, 307u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f},
+      {1u, 307u, 0.f, 0.f, 0.f, 0.f, 14.f, 0.f},
       {1u, 3u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
       {1u, 303u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
       {1u, 310u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 313u, 0.f, 0.f, 0.f, 0.f, 7.f, 0.f},
-      {1u, 315u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
-      {1u, 307u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f},
+      {1u, 315u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
+      {1u, 307u, 0.f, 0.f, 0.f, 0.f, 14.f, 0.f},
       {1u, 3u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
       {1u, 298u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 309u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
@@ -461,19 +461,19 @@ int UtcDaliTextShape(void)
       {1u, 314u, 0.f, 0.f, 0.f, 0.f, 6.f, 0.f},
       {1u, 3u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
       {1u, 295u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
-      {1u, 307u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f},
+      {1u, 307u, 0.f, 0.f, 0.f, 0.f, 14.f, 0.f},
       {1u, 299u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
       {1u, 314u, 0.f, 0.f, 0.f, 0.f, 6.f, 0.f},
       {1u, 0u, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
       {1u, 295u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
       {1u, 299u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
       {1u, 311u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
-      {1u, 315u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
+      {1u, 315u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 299u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
       {1u, 3u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
       {1u, 298u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 299u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
-      {1u, 403u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
+      {1u, 403u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f},
       {1u, 308u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 303u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
       {1u, 299u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
@@ -484,7 +484,7 @@ int UtcDaliTextShape(void)
       {1u, 299u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
       {1u, 295u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
       {1u, 3u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
-      {1u, 307u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f},
+      {1u, 307u, 0.f, 0.f, 0.f, 0.f, 14.f, 0.f},
       {1u, 299u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
       {1u, 303u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
       {1u, 0u, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
@@ -495,10 +495,10 @@ int UtcDaliTextShape(void)
       {1u, 299u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
       {1u, 3u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
       {1u, 303u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
-      {1u, 312u, 0.f, 0.f, 0.f, 0.f, 5.f, 0.f},
+      {1u, 312u, 0.f, 0.f, 0.f, 0.f, 6.f, 0.f},
       {1u, 295u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
-      {1u, 297u, 0.f, 0.f, 0.f, 0.f, 7.f, 0.f},
-      {1u, 315u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
+      {1u, 297u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
+      {1u, 315u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 308u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 298u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 303u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
@@ -507,10 +507,10 @@ int UtcDaliTextShape(void)
       {1u, 308u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
       {1u, 299u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
       {1u, 3u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
-      {1u, 297u, 0.f, 0.f, 0.f, 0.f, 7.f, 0.f},
-      {1u, 315u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
-      {1u, 307u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f},
-      {1u, 4u, 0.f, 0.f, 0.f, 0.f, 3.f, 0.f},
+      {1u, 297u, 0.f, 0.f, 0.f, 0.f, 8.f, 0.f},
+      {1u, 315u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f},
+      {1u, 307u, 0.f, 0.f, 0.f, 0.f, 14.f, 0.f},
+      {1u, 4u, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f},
       {1u, 0u, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
     };
 
@@ -769,8 +769,8 @@ int UtcDaliTextSoftwareStyling(void)
 
   struct GlyphInfoData glyphs01[] =
     {
-      {4u, 38u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f, true, true},
-      {4u, 39u, 0.f, 0.f, 0.f, 0.f, 9.f, 0.f, true, true},
+      {4u, 38u, 0.f, 0.f, 0.f, 0.f, 11.f, 0.f, true, true},
+      {4u, 39u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f, true, true},
       {4u, 40u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f, true, true},
       {4u, 41u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f, true, true},
     };

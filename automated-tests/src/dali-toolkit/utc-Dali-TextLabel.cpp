@@ -2013,7 +2013,7 @@ int UtcDaliToolkitTextlabelTextFit(void)
   application.SendNotification();
   application.Render();
 
-  const Vector3 EXPECTED_NATURAL_SIZE(450.0f, 96.0f, 0.0f);
+  const Vector3 EXPECTED_NATURAL_SIZE(448.0f, 96.0f, 0.0f);
   DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION);
 
   DALI_TEST_CHECK(gTextFitChangedCallBackCalled);
@@ -2069,7 +2069,7 @@ int UtcDaliToolkitTextlabelTextFitStressTest(void)
   application.SendNotification();
   application.Render();
 
-  const Vector3 EXPECTED_NATURAL_SIZE(450.0f, 96.0f, 0.0f);
+  const Vector3 EXPECTED_NATURAL_SIZE(448.0f, 96.0f, 0.0f);
   DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION);
 
   DALI_TEST_CHECK(gTextFitChangedCallBackCalled);
@@ -2587,7 +2587,6 @@ int utcDaliTextLabelGeometryRTL(void)
   label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   label.SetProperty(TextLabel::Property::TEXT, "line1 \nline2\nline 3\nالاخيرالسطر");
-
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
 
@@ -2608,16 +2607,16 @@ int utcDaliTextLabelGeometryRTL(void)
   Vector<Vector2> expectedSizes;
   Vector<Vector2> expectedPositions;
 
-  expectedPositions.PushBack(Vector2(24, 0));
-  expectedSizes.PushBack(Vector2(33, 25));
+  expectedPositions.PushBack(Vector2(25, 0));
+  expectedSizes.PushBack(Vector2(34, 25));
 
   expectedPositions.PushBack(Vector2(-1, 25));
-  expectedSizes.PushBack(Vector2(52, 25));
+  expectedSizes.PushBack(Vector2(53, 25));
 
   expectedPositions.PushBack(Vector2(-1, 50));
-  expectedSizes.PushBack(Vector2(59, 25));
+  expectedSizes.PushBack(Vector2(60, 25));
 
-  expectedPositions.PushBack(Vector2(73, 75));
+  expectedPositions.PushBack(Vector2(75, 75));
   expectedSizes.PushBack(Vector2(37, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
@@ -2663,7 +2662,7 @@ int utcDaliTextLabelGeometryGlyphMiddle(void)
   Vector<Vector2> expectedPositions;
 
   expectedPositions.PushBack(Vector2(6, 0));
-  expectedSizes.PushBack(Vector2(124, 25));
+  expectedSizes.PushBack(Vector2(125, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 

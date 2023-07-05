@@ -4867,11 +4867,11 @@ int utcDaliTextEditorGeometryEllipsisStart(void)
   Vector<Vector2> expectedSizes;
   Vector<Vector2> expectedPositions;
 
-  expectedPositions.PushBack(Vector2(37, 0));
-  expectedSizes.PushBack(Vector2(20, 25));
+  expectedPositions.PushBack(Vector2(38, 0));
+  expectedSizes.PushBack(Vector2(21, 25));
 
   expectedPositions.PushBack(Vector2(-1, 25));
-  expectedSizes.PushBack(Vector2(52, 25));
+  expectedSizes.PushBack(Vector2(53, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 
@@ -4919,10 +4919,10 @@ int utcDaliTextEditorGeometryEllipsisMiddle(void)
   Vector<Vector2> expectedPositions;
 
   expectedPositions.PushBack(Vector2(-1, 0));
-  expectedSizes.PushBack(Vector2(25, 25));
+  expectedSizes.PushBack(Vector2(26, 25));
 
   expectedPositions.PushBack(Vector2(-1, 25));
-  expectedSizes.PushBack(Vector2(52, 25));
+  expectedSizes.PushBack(Vector2(53, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 
@@ -4970,10 +4970,10 @@ int utcDaliTextEditorGeometryEllipsisEnd(void)
   Vector<Vector2> expectedPositions;
 
   expectedPositions.PushBack(Vector2(-1, 0));
-  expectedSizes.PushBack(Vector2(59, 25));
+  expectedSizes.PushBack(Vector2(60, 25));
 
   expectedPositions.PushBack(Vector2(-1, 25));
-  expectedSizes.PushBack(Vector2(38, 25));
+  expectedSizes.PushBack(Vector2(39, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 
@@ -5017,16 +5017,16 @@ int utcDaliTextEditorGeometryRTL(void)
   Vector<Vector2> expectedSizes;
   Vector<Vector2> expectedPositions;
 
-  expectedPositions.PushBack(Vector2(24, 0));
-  expectedSizes.PushBack(Vector2(33, 25));
+  expectedPositions.PushBack(Vector2(25, 0));
+  expectedSizes.PushBack(Vector2(34, 25));
 
   expectedPositions.PushBack(Vector2(-1, 25));
-  expectedSizes.PushBack(Vector2(52, 25));
+  expectedSizes.PushBack(Vector2(53, 25));
 
   expectedPositions.PushBack(Vector2(-1, 50));
-  expectedSizes.PushBack(Vector2(59, 25));
+  expectedSizes.PushBack(Vector2(60, 25));
 
-  expectedPositions.PushBack(Vector2(61, 75));
+  expectedPositions.PushBack(Vector2(63, 75));
   expectedSizes.PushBack(Vector2(37, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
@@ -5072,7 +5072,7 @@ int utcDaliTextEditorGeometryGlyphMiddle(void)
   Vector<Vector2> expectedPositions;
 
   expectedPositions.PushBack(Vector2(6, 0));
-  expectedSizes.PushBack(Vector2(124, 25));
+  expectedSizes.PushBack(Vector2(125, 25));
 
   TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 
