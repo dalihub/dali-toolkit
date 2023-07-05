@@ -133,7 +133,7 @@ void ModelLoader::LoadResource(Dali::Scene3D::Loader::ResourceBundle::PathProvid
     return;
   }
 
-  Dali::Scene3D::Loader::ResourceRefCounts resourceRefCount = std::move(mLoadResult.mResources.CreateRefCounter());
+  Dali::Scene3D::Loader::ResourceRefCounts resourceRefCount = mLoadResult.mResources.CreateRefCounter();
   for(auto iRoot : GetScene().GetRoots())
   {
     GetScene().CountResourceRefs(iRoot, mResourceChoices, resourceRefCount);

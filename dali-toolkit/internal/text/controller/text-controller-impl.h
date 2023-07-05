@@ -390,8 +390,7 @@ struct Controller::Impl
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
     if(styleManager)
     {
-      const Property::Map& config                  = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
-      const auto           clearFocusOnEscapeValue = config.Find("clearFocusOnEscape", Property::Type::BOOLEAN);
+      const auto clearFocusOnEscapeValue = Toolkit::DevelStyleManager::GetConfigurations(styleManager).Find("clearFocusOnEscape", Property::Type::BOOLEAN);
 
       // Default is true. If config don't have "clearFocusOnEscape" property, make it true.
       mShouldClearFocusOnEscape = (!clearFocusOnEscapeValue || clearFocusOnEscapeValue->Get<bool>());

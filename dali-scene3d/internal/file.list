@@ -22,4 +22,11 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_internal_dir}/model-components/material-impl.cpp
 	${scene3d_internal_dir}/model-components/model-node-impl.cpp
 	${scene3d_internal_dir}/model-components/model-primitive-impl.cpp
+	${scene3d_internal_dir}/model-motion/motion-data-impl.cpp
+	${scene3d_internal_dir}/model-motion/motion-data-load-task.cpp
+	${scene3d_internal_dir}/model-motion/motion-index/blend-shape-index-impl.cpp
+	${scene3d_internal_dir}/model-motion/motion-index/motion-index-impl.cpp
+	${scene3d_internal_dir}/model-motion/motion-index/motion-property-index-impl.cpp
+	${scene3d_internal_dir}/model-motion/motion-index/motion-transform-index-impl.cpp
+	${scene3d_internal_dir}/model-motion/motion-value-impl.cpp
 )

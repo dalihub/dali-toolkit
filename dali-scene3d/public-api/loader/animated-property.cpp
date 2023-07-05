@@ -20,7 +20,7 @@
 
 namespace Dali::Scene3D::Loader
 {
-void AnimatedProperty::Animate(Animation& anim, GetActor getActor)
+void AnimatedProperty::Animate(Animation& anim, GetActor getActor) const
 {
   if(Actor actor = getActor(*this))
   {

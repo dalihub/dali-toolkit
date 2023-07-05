@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -183,8 +183,7 @@ void KeyboardFocusManager::GetConfigurationFromStyleManger()
   Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
   if(styleManager)
   {
-    const Property::Map& config               = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
-    const auto           alwaysShowFocusValue = config.Find("alwaysShowFocus", Property::Type::BOOLEAN);
+    const auto alwaysShowFocusValue = Toolkit::DevelStyleManager::GetConfigurations(styleManager).Find("alwaysShowFocus", Property::Type::BOOLEAN);
 
     mAlwaysShowIndicator   = (alwaysShowFocusValue && alwaysShowFocusValue->Get<bool>()) ? ALWAYS_SHOW : NONE;
     mIsFocusIndicatorShown = (mAlwaysShowIndicator == ALWAYS_SHOW) ? SHOW : HIDE;
