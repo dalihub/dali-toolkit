@@ -67,6 +67,51 @@ public:
    */
   bool IsEnabled() const;
 
+  /**
+   * @copydoc Scene3D::Light::EnableShadow()
+   */
+  void EnableShadow(bool enable);
+
+  /**
+   * @copydoc Scene3D::Light::IsShadowEnabled()
+   */
+  bool IsShadowEnabled() const;
+
+  /**
+   * @copydoc Scene3D::Light::GetCamera()
+   */
+  CameraActor GetCamera() const;
+
+  /**
+   * @copydoc Scene3D::Light::EnableShadowSoftFiltering()
+   */
+  void EnableShadowSoftFiltering(bool useSoftFiltering);
+
+  /**
+   * @copydoc Scene3D::Light::IsShadowSoftFilteringEnabled()
+   */
+  bool IsShadowSoftFilteringEnabled() const;
+
+  /**
+   * @copydoc Scene3D::Light::SetShadowIntensity()
+   */
+  void SetShadowIntensity(float shadowIntensity);
+
+  /**
+   * @copydoc Scene3D::Light::GetShadowIntensity()
+   */
+  float GetShadowIntensity() const;
+
+  /**
+   * @copydoc Scene3D::Light::SetShadowBias()
+   */
+  void SetShadowBias(float shadowBias);
+
+  /**
+   * @copydoc Scene3D::Light::GetShadowBias()
+   */
+  float GetShadowBias() const;
+
 protected:
   /**
    * @brief Virtual destructor.
@@ -194,6 +239,21 @@ public: // Public Method
    */
   static std::string_view GetLightColorUniformName();
 
+  /**
+   * @brief Retrieves Uniform Name to define shadow is enabled or not.
+   * @return string_view for ShadowEnabledUniformName
+   */
+  static std::string_view GetShadowEnabledUniformName();
+
+  /**
+   * @brief Retrieves Uniform Name for View/Projection matrix of the Shadow.
+   * @return string_view for ShadowViewProjectionMatrixUniformName
+   */
+  static std::string_view GetShadowViewProjectionMatrixUniformName();
+
+private:
+  void UpdateShadowUniforms();
+
 private:
   /// @cond internal
 
@@ -204,8 +264,13 @@ private:
   DALI_INTERNAL Light& operator=(Light&&)      = delete; ///< Deleted move assignment operator.
 
 private:
+  Dali::CameraActor              mLightSourceActor;
   WeakHandle<Scene3D::SceneView> mParentSceneView;
-  bool mIsEnabled{true};
+  bool                           mIsEnabled{true};
+  bool                           mIsShadowEnabled{false};
+  bool                           mUseSoftFiltering{false};
+  float                          mShadowIntensity{0.5f};
+  float                          mShadowBias{0.001f};
   /// @endcond
 };
 

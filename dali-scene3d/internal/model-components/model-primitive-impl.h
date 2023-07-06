@@ -124,6 +124,13 @@ public:
   void RemovePrimitiveObserver(ModelPrimitiveModifyObserver* observer);
 
   /**
+   * @brief Sets shadow map texture for this model primitive.
+   *
+   * @param[in] shadowMapTexture The shadow map texture.
+   */
+  void SetShadowMapTexture(Dali::Texture shadowMapTexture);
+
+  /**
    * @brief Sets the image-based lighting texture for this model primitive.
    *
    * @param[in] diffuseTexture The diffuse texture.
@@ -200,6 +207,8 @@ private:
    */
   void CreateRenderer();
 
+  void UpdateShadowMapTexture();
+
   /**
    * @brief Updates the image-based lighting texture.
    */
@@ -223,6 +232,9 @@ private:
   Dali::Scene3D::Material mMaterial;
 
   Scene3D::Loader::ShaderManagerPtr mShaderManager;
+
+  // For Shadow
+  Dali::Texture mShadowMapTexture;
 
   // For IBL
   Dali::Texture mSpecularTexture;

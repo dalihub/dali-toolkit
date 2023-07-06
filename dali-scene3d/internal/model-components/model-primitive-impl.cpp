@@ -52,6 +52,15 @@ DALI_TYPE_REGISTRATION_BEGIN(Scene3D::ModelPrimitive, Dali::BaseHandle, Create);
 DALI_TYPE_REGISTRATION_END()
 
 static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG = 10;
+
+Texture MakeEmptyTexture()
+{
+  PixelData pixelData = PixelData::New(new uint8_t[3]{0xff, 0xff, 0xff}, 3, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY);
+  Texture texture            = Texture::New(TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
+  texture.Upload(pixelData, 0, 0, 0, 0, pixelData.GetWidth(), pixelData.GetHeight());
+
+  return texture;
+}
 } // unnamed namespace
 
 ModelPrimitivePtr ModelPrimitive::New()
@@ -138,6 +147,7 @@ void ModelPrimitive::SetMaterial(Dali::Scene3D::Material material, bool updateRe
         ApplyMaterialToRenderer();
       }
     }
+    UpdateShadowMapTexture();
     UpdateImageBasedLightTexture();
   }
 }
@@ -155,6 +165,13 @@ void ModelPrimitive::AddPrimitiveObserver(ModelPrimitiveModifyObserver* observer
 void ModelPrimitive::RemovePrimitiveObserver(ModelPrimitiveModifyObserver* observer)
 {
   mObservers.erase(observer);
+}
+
+void ModelPrimitive::SetShadowMapTexture(Dali::Texture shadowMapTexture)
+{
+  mShadowMapTexture = shadowMapTexture;
+
+  UpdateShadowMapTexture();
 }
 
 void ModelPrimitive::SetImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float iblScaleFactor, uint32_t specularMipmapLevels)
@@ -291,7 +308,14 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
     }
 
     uint32_t textureCount = mTextureSet.GetTextureCount();
-    Texture  brdfTexture  = Scene3D::Loader::EnvironmentDefinition::GetBrdfTexture();
+
+    if(!mShadowMapTexture)
+    {
+      mShadowMapTexture = MakeEmptyTexture();
+    }
+    mTextureSet.SetTexture(textureCount++, mShadowMapTexture);
+
+    Texture brdfTexture = Scene3D::Loader::EnvironmentDefinition::GetBrdfTexture();
     if(!mSpecularTexture || !mDiffuseTexture)
     {
       Scene3D::Loader::EnvironmentMapData environmentMapData;
@@ -354,6 +378,40 @@ void ModelPrimitive::CreateRenderer()
   for(auto* observer : mObservers)
   {
     observer->OnRendererCreated(mRenderer);
+  }
+}
+
+void ModelPrimitive::UpdateShadowMapTexture()
+{
+  if(mRenderer && mMaterial)
+  {
+    Dali::TextureSet textures = mRenderer.GetTextures();
+    if(!textures)
+    {
+      return;
+    }
+
+    uint32_t textureCount = textures.GetTextureCount();
+    if(mShadowMapTexture &&
+       textureCount >= GetImplementation(mMaterial).GetShadowMapTextureOffset() &&
+       textures.GetTexture(textureCount - GetImplementation(mMaterial).GetShadowMapTextureOffset()) != mShadowMapTexture)
+    {
+      Dali::TextureSet newTextures = Dali::TextureSet::New();
+
+      for(uint32_t index = 0u; index < textureCount; ++index)
+      {
+        Dali::Texture texture = textures.GetTexture(index);
+        if(index == textureCount - GetImplementation(mMaterial).GetShadowMapTextureOffset())
+        {
+          texture = (!!mShadowMapTexture) ? mShadowMapTexture : MakeEmptyTexture();
+        }
+
+        newTextures.SetTexture(index, texture);
+        newTextures.SetSampler(index, textures.GetSampler(index));
+      }
+
+      mRenderer.SetTextures(newTextures);
+    }
   }
 }
 

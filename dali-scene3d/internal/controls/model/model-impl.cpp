@@ -213,6 +213,26 @@ void UpdateShaderRecursively(Scene3D::ModelNode node, Scene3D::Loader::ShaderMan
   }
 }
 
+void UpdateShadowMapTextureRecursively(Scene3D::ModelNode node, Dali::Texture shadowMapTexture)
+{
+  if(!node)
+  {
+    return;
+  }
+
+  GetImplementation(node).SetShadowMapTexture(shadowMapTexture);
+
+  uint32_t childrenCount = node.GetChildCount();
+  for(uint32_t i = 0; i < childrenCount; ++i)
+  {
+    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
+    if(childNode)
+    {
+      UpdateShadowMapTextureRecursively(childNode, shadowMapTexture);
+    }
+  }
+}
+
 } // anonymous namespace
 
 Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUrl)
@@ -279,6 +299,11 @@ void Model::AddModelNode(Scene3D::ModelNode modelNode)
   }
 
   UpdateShaderRecursively(modelNode, mShaderManager);
+
+  if(mShadowMapTexture)
+  {
+    UpdateShadowMapTextureRecursively(modelNode, mShadowMapTexture);
+  }
 
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
   {
@@ -1007,6 +1032,15 @@ void Model::ApplyCameraTransform(Dali::CameraActor camera) const
   camera.SetProperty(Actor::Property::SCALE, resultScale);
 }
 
+void Model::NotifyShadowMapTexture(Dali::Texture shadowMapTexture)
+{
+  if(mShadowMapTexture != shadowMapTexture)
+  {
+    mShadowMapTexture = shadowMapTexture;
+    UpdateShadowMapTextureRecursively(mModelRoot, mShadowMapTexture);
+  }
+}
+
 void Model::NotifyImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor, uint32_t specularMipmapLevels)
 {
   if(mSceneDiffuseTexture != diffuseTexture || mSceneSpecularTexture != specularTexture)
@@ -1062,6 +1096,10 @@ void Model::OnModelLoadComplete()
     mDefaultSpecularTexture = resources.mEnvironmentMaps.front().second.mSpecular;
   }
 
+  if(mShadowMapTexture)
+  {
+    UpdateShadowMapTextureRecursively(mModelRoot, mShadowMapTexture);
+  }
   UpdateImageBasedLightTexture();
   UpdateImageBasedLightScaleFactor();
   Self().SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3(mModelPivot.x, 1.0f - mModelPivot.y, mModelPivot.z));
