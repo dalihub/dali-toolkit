@@ -51,9 +51,10 @@ public:
   ~FrameCallback() = default;
 
 private:
-  void Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
+  bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
   {
     mEmitter->Update();
+    return true;
   }
 
   Internal::ParticleEmitter* mEmitter;
