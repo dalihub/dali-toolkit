@@ -38,6 +38,8 @@ static constexpr uint32_t         MAX_NUMBER_OF_LIGHT = 5;
 static constexpr std::string_view LIGHT_COUNT_STRING("uLightCount");
 static constexpr std::string_view LIGHT_DIRECTION_STRING("uLightDirection");
 static constexpr std::string_view LIGHT_COLOR_STRING("uLightColor");
+static constexpr std::string_view SHADOW_ENABLED_STRING("uIsShadowEnabled");
+static constexpr std::string_view SHADOW_VIEW_PROJECTION_MATRIX_STRING("uShadowLightViewProjectionMatrix");
 
 /**
  * Creates control through type registry
@@ -79,6 +81,13 @@ Light::~Light()
 void Light::Initialize()
 {
   Self().SetProperty(Dali::Actor::Property::COLOR, Color::WHITE);
+
+  // Directional Light setting
+  mLightSourceActor = Dali::CameraActor::New();
+  mLightSourceActor.SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
+  mLightSourceActor.SetProperty(Dali::Actor::Property::POSITION, Vector3::ZERO);
+  mLightSourceActor.SetProperty(Dali::Actor::Property::ORIENTATION, Quaternion());
+  Self().Add(mLightSourceActor);
 }
 
 void Light::Enable(bool enable)
@@ -110,6 +119,73 @@ bool Light::IsEnabled() const
   return mIsEnabled;
 }
 
+void Light::EnableShadow(bool enable)
+{
+  if(enable == mIsShadowEnabled)
+  {
+    return;
+  }
+  mIsShadowEnabled = enable;
+
+  Scene3D::SceneView sceneView = mParentSceneView.GetHandle();
+  if(!sceneView)
+  {
+    return;
+  }
+
+  if(mIsShadowEnabled)
+  {
+    GetImpl(sceneView).SetShadow(Scene3D::Light::DownCast(Self()));
+  }
+  else
+  {
+    GetImpl(sceneView).RemoveShadow(Scene3D::Light::DownCast(Self()));
+  }
+}
+
+bool Light::IsShadowEnabled() const
+{
+  return mIsShadowEnabled;
+}
+
+CameraActor Light::GetCamera() const
+{
+  return mLightSourceActor;
+}
+
+void Light::EnableShadowSoftFiltering(bool useSoftFiltering)
+{
+  mUseSoftFiltering = useSoftFiltering;
+  UpdateShadowUniforms();
+}
+
+bool Light::IsShadowSoftFilteringEnabled() const
+{
+  return mUseSoftFiltering;
+}
+
+void Light::SetShadowIntensity(float shadowIntensity)
+{
+  mShadowIntensity = shadowIntensity;
+  UpdateShadowUniforms();
+}
+
+float Light::GetShadowIntensity() const
+{
+  return mShadowIntensity;
+}
+
+void Light::SetShadowBias(float shadowBias)
+{
+  mShadowBias = shadowBias;
+  UpdateShadowUniforms();
+}
+
+float Light::GetShadowBias() const
+{
+  return mShadowBias;
+}
+
 void Light::OnSceneConnection(int depth)
 {
   Actor parent = Self().GetParent();
@@ -122,6 +198,10 @@ void Light::OnSceneConnection(int depth)
       if(mIsEnabled)
       {
         GetImpl(sceneView).AddLight(Scene3D::Light::DownCast(Self()));
+      }
+      if(mIsShadowEnabled)
+      {
+        GetImpl(sceneView).SetShadow(Scene3D::Light::DownCast(Self()));
       }
       break;
     }
@@ -232,6 +312,30 @@ std::string_view Light::GetLightDirectionUniformName()
 std::string_view Light::GetLightColorUniformName()
 {
   return LIGHT_COLOR_STRING;
+}
+
+std::string_view Light::GetShadowEnabledUniformName()
+{
+  return SHADOW_ENABLED_STRING;
+}
+
+std::string_view Light::GetShadowViewProjectionMatrixUniformName()
+{
+  return SHADOW_VIEW_PROJECTION_MATRIX_STRING;
+}
+
+void Light::UpdateShadowUniforms()
+{
+  Scene3D::SceneView sceneView = mParentSceneView.GetHandle();
+  if(!sceneView)
+  {
+    return;
+  }
+
+  if(mIsShadowEnabled)
+  {
+    GetImpl(sceneView).UpdateShadowUniform(Scene3D::Light::DownCast(Self()));
+  }
 }
 
 } // namespace Internal

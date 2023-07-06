@@ -40,6 +40,8 @@ struct DALI_SCENE3D_API ShaderDefinition
   {
     std::string mVertexShaderSource;
     std::string mFragmentShaderSource;
+    std::string mShadowVertexShaderSource;
+    std::string mShadowFragmentShaderSource;
   };
 
   /*

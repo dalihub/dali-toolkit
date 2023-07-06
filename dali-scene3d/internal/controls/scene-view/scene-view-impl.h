@@ -150,6 +150,22 @@ public:
   void RemoveLight(Scene3D::Light light);
 
   /**
+   * @brief Set a shadow to this scene by input light.
+   * Currently, SceneView supports only one shadow.
+   *
+   * @param[in] light Light object to make shadow.
+   * @note The shadow will be drawn if the input light is turn on in current scene.
+   */
+  void SetShadow(Scene3D::Light light);
+
+  /**
+   * @brief Removes Shadow from this SceneView.
+   *
+   * @param[in] light Light object to be removed.
+   */
+  void RemoveShadow(Scene3D::Light light);
+
+  /**
    * @copydoc SceneView::GetActivatedLightCount()
    */
   uint32_t GetActivatedLightCount() const;
@@ -209,6 +225,12 @@ public:
    * @return ShaderManager of this SceneView.
    */
   Dali::Scene3D::Loader::ShaderManagerPtr GetShaderManager() const;
+
+  /**
+   * @brief Update shader uniforms about shadow.
+   * @param[in] light Light that makes shadow.
+   */
+  void UpdateShadowUniform(Scene3D::Light light);
 
 protected:
   /**
@@ -322,6 +344,12 @@ private:
    */
   void NotifyImageBasedLightTextureChange();
 
+  /**
+   * @brief Update shadowMap framebuffer when the size should be changed.
+   * @param[in] shadowMapSize The size of shadowMap texture. The texture's width and hight is equal.
+   */
+  void UpdateShadowMapBuffer(uint32_t shadowMapSize);
+
 private:
   Toolkit::Visual::Base mVisual;
 
@@ -348,6 +376,9 @@ private:
 
   // Light
   std::vector<std::pair<Scene3D::Light, bool>> mLights; // Pair of Light object and flag that denotes the light is currently activated or not.
+  Dali::FrameBuffer                            mShadowFrameBuffer;
+  Dali::RenderTask                             mShadowMapRenderTask;
+  Scene3D::Light                               mShadowLight;
 
   // Asynchronous Loading.
   EnvironmentMapLoadTaskPtr mSkyboxLoadTask;

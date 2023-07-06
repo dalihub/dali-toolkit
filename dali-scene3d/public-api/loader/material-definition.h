@@ -251,6 +251,8 @@ public: // DATA
   bool                             mIsOpaque      = true;
   bool                             mIsMask        = false;
 
+  bool mShadowAvailable = false;
+
   std::vector<TextureStage> mTextureStages;
   Material                  mMaterial;
 };

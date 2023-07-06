@@ -93,6 +93,24 @@ public:
    */
   uint32_t GetLightCount() const;
 
+  /**
+   * @brief Set a shadow to this scene by input light.
+   *
+   * @param[in] light Light object to make shadow.
+   */
+  void SetShadow(Scene3D::Light light);
+
+  /**
+   * @brief Removes Shadow from this SceneView.
+   */
+  void RemoveShadow();
+
+  /**
+   * @brief Update uniform properties of shadow for the input light.
+   * @param[in] light Light object to update shadow uniform.
+   */
+  void UpdateShadowUniform(Scene3D::Light light);
+
 private:
   /**
    * @brief Sets constraint to the shaders with light of light index.
@@ -112,6 +130,23 @@ private:
    * @param[in] lightIndex index of light that will be disconnected with shaders.
    */
   DALI_INTERNAL void RemoveLightConstraint(uint32_t lightIndex);
+
+  /**
+   * @brief Sets uniform about the shadow.
+   * @param[in] shader Shader that the constraint will be applied.
+   */
+  DALI_INTERNAL void SetShadowUniformToShader(Dali::Shader shader);
+
+  /**
+   * @brief Sets properties and constraint to the shaders.
+   */
+  DALI_INTERNAL void SetShadowProperty();
+
+  /**
+   * @brief Sets constraint to a shader about shadow
+   * @param[in] shader Shader that the constraint will be applied.
+   */
+  DALI_INTERNAL void SetShadowConstraintToShader(Dali::Shader shader);
 private:
   struct Impl;
   const std::unique_ptr<Impl> mImpl;
