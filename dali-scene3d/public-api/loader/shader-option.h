@@ -1,5 +1,5 @@
-#ifndef DALI_SCENE3D_LOADER_SHADER_DEFINITION_OPTION_H_
-#define DALI_SCENE3D_LOADER_SHADER_DEFINITION_OPTION_H_
+#ifndef DALI_SCENE3D_LOADER_SHADER_OPTION_H_
+#define DALI_SCENE3D_LOADER_SHADER_OPTION_H_
 /*
  * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
@@ -28,7 +28,7 @@
 namespace Dali::Scene3D::Loader
 {
 
-class DALI_SCENE3D_API ShaderDefinitionOption
+class DALI_SCENE3D_API ShaderOption
 {
 public:
   enum class Type
@@ -64,9 +64,9 @@ public:
    * @brief Adds new shader definition option.
    * If the option is already added, nothin is changed.
    *
-   * @param[in] shaderDefinitionOptionType Option to be added,
+   * @param[in] shaderOptionType Option to be added,
    */
-  void AddOption(Type shaderDefinitionOptionType);
+  void AddOption(Type shaderOptionType);
 
   /**
    * @brief Retrieves current shader option hash
@@ -85,10 +85,10 @@ public:
   /**
    * @brief Retrieves a single shader define keyword of input type.
    *
-   * @param[in] shaderDefinitionOptionType Shader definition option type to know its keyword.
+   * @param[in] shaderOptionType Shader definition option type to know its keyword.
    * @return string keyword of shader define.
    */
-  static std::string_view GetDefineKeyword(Type shaderDefinitionOptionType);
+  static std::string_view GetDefineKeyword(Type shaderOptionType);
 
 private:
   uint64_t mOptionHash{0u};
@@ -96,4 +96,4 @@ private:
 
 } // namespace Dali::Scene3D::Loader
 
-#endif // DALI_SCENE3D_LOADER_SHADER_DEFINITION_OPTION_H_
+#endif // DALI_SCENE3D_LOADER_SHADER_OPTION_H_

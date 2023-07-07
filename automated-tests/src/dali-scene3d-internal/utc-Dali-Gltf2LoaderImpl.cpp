@@ -22,7 +22,7 @@
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
-#include <dali-scene3d/public-api/loader/shader-definition-factory.h>
+#include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-test-suite-utils.h>
 #include <string_view>
 
@@ -125,9 +125,6 @@ int UtcDaliGltfLoaderFailedToParse(void)
 {
   Context ctx;
 
-  ShaderDefinitionFactory sdf;
-  sdf.SetResources(ctx.resources);
-
   DALI_TEST_EQUAL(ctx.loader.LoadModel(TEST_RESOURCE_DIR "/invalid.gltf", ctx.loadResult), false);
 
   DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
@@ -136,7 +133,6 @@ int UtcDaliGltfLoaderFailedToParse(void)
   DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.size());
   DALI_TEST_EQUAL(0, ctx.resources.mMaterials.size());
   DALI_TEST_EQUAL(0, ctx.resources.mMeshes.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mShaders.size());
   DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.size());
 
   DALI_TEST_EQUAL(0, ctx.cameras.size());
@@ -193,7 +189,7 @@ int UtcDaliGltfLoaderSuccess1(void)
       nullptr,
       MaterialDefinition::ALBEDO | MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
         MaterialDefinition::NORMAL | MaterialDefinition::SPECULAR | MaterialDefinition::SPECULAR_COLOR |
-        (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
+        MaterialDefinition::GLTF_CHANNELS | (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
       0,
       Color::WHITE,
       1.f,
@@ -306,7 +302,7 @@ int UtcDaliGltfLoaderSuccess1(void)
           },
         },
         {
-          MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS | MaterialDefinition::GLTF_CHANNELS,
+          MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS,
           {
             "AnimatedCube_MetallicRoughness.png",
             SamplerFlags::Encode(FilterMode::NEAREST_MIPMAP_LINEAR, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::MIRRORED_REPEAT),
@@ -448,7 +444,6 @@ int UtcDaliGltfLoaderSuccess1(void)
     ++iMesh;
   }
 
-  DALI_TEST_EQUAL(2u, ctx.resources.mShaders.size());
   DALI_TEST_EQUAL(0u, ctx.resources.mSkeletons.size());
 
   DALI_TEST_EQUAL(6u, ctx.cameras.size());
@@ -462,8 +457,6 @@ int UtcDaliGltfLoaderSuccess1(void)
 int UtcDaliGltfLoaderSuccess2(void)
 {
   Context                 ctx;
-  ShaderDefinitionFactory sdf;
-  sdf.SetResources(ctx.resources);
 
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/AnimatedCubeStride.gltf", ctx.loadResult);
 
@@ -577,9 +570,6 @@ int UtcDaliGltfLoaderSuccessShort(void)
 int UtcDaliGltfLoaderMRendererTest(void)
 {
   Context ctx;
-
-  ShaderDefinitionFactory sdf;
-  sdf.SetResources(ctx.resources);
   auto& resources = ctx.resources;
 
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/MRendererTest.gltf", ctx.loadResult);
@@ -592,6 +582,7 @@ int UtcDaliGltfLoaderMRendererTest(void)
 
   DALI_TEST_EQUAL(scene.GetNodeCount(), 1u);
 
+  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
   ViewProjection viewProjection;
   Transforms     xforms{
     MatrixStack{},
@@ -599,6 +590,7 @@ int UtcDaliGltfLoaderMRendererTest(void)
   NodeDefinition::CreateParams nodeParams{
     resources,
     xforms,
+    shaderManager,
   };
 
   Customization::Choices choices;
@@ -649,6 +641,7 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
   auto& roots = scene.GetRoots();
   DALI_TEST_EQUAL(roots.size(), 1u);
 
+  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
   ViewProjection viewProjection;
   Transforms     xforms{
     MatrixStack{},
@@ -656,6 +649,7 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
   NodeDefinition::CreateParams nodeParams{
     resources,
     xforms,
+    shaderManager,
   };
 
   Customization::Choices choices;
@@ -690,8 +684,6 @@ int UtcDaliGltfLoaderImageFromBufferView(void)
 {
   Context ctx;
 
-  ShaderDefinitionFactory sdf;
-  sdf.SetResources(ctx.resources);
   auto& resources = ctx.resources;
 
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/EnvironmentTest_b.gltf", ctx.loadResult);
@@ -700,6 +692,7 @@ int UtcDaliGltfLoaderImageFromBufferView(void)
   auto& roots = scene.GetRoots();
   DALI_TEST_EQUAL(roots.size(), 1u);
 
+  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
   ViewProjection viewProjection;
   Transforms     xforms{
     MatrixStack{},
@@ -707,6 +700,7 @@ int UtcDaliGltfLoaderImageFromBufferView(void)
   NodeDefinition::CreateParams nodeParams{
     resources,
     xforms,
+    shaderManager,
   };
 
   Customization::Choices choices;
@@ -749,6 +743,7 @@ int UtcDaliGltfLoaderUint8Indices(void)
   auto& roots = scene.GetRoots();
   DALI_TEST_EQUAL(roots.size(), 1u);
 
+  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
   ViewProjection viewProjection;
   Transforms     xforms{
     MatrixStack{},
@@ -756,6 +751,7 @@ int UtcDaliGltfLoaderUint8Indices(void)
   NodeDefinition::CreateParams nodeParams{
     resources,
     xforms,
+    shaderManager,
   };
 
   Customization::Choices choices;

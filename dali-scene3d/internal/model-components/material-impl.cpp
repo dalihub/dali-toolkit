@@ -30,8 +30,8 @@
 #include <dali-scene3d/internal/model-components/material-modify-observer.h>
 #include <dali-scene3d/public-api/loader/node-definition.h>
 #include <dali-scene3d/public-api/loader/renderer-state.h>
+#include <dali-scene3d/public-api/loader/shader-option.h>
 #include <dali-scene3d/public-api/loader/utils.h>
-#include <dali-scene3d/public-api/loader/shader-definition-option.h>
 
 namespace Dali
 {
@@ -101,13 +101,13 @@ Material::Material()
   mTextureInformations[SPECULAR].mSemantic       = Scene3D::Loader::MaterialDefinition::SPECULAR;
   mTextureInformations[SPECULAR_COLOR].mSemantic = Scene3D::Loader::MaterialDefinition::SPECULAR_COLOR;
 
-  mTextureInformations[BASE_COLOR].mDefineKeyword         = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::BASE_COLOR_TEXTURE).data();
-  mTextureInformations[METALLIC_ROUGHNESS].mDefineKeyword = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::METALLIC_ROUGHNESS_TEXTURE).data();
-  mTextureInformations[NORMAL].mDefineKeyword             = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::NORMAL_TEXTURE).data();
-  mTextureInformations[OCCLUSION].mDefineKeyword          = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::OCCLUSION).data();
-  mTextureInformations[EMISSIVE].mDefineKeyword           = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::EMISSIVE).data();
-  mTextureInformations[SPECULAR].mDefineKeyword           = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::SPECULAR).data();
-  mTextureInformations[SPECULAR_COLOR].mDefineKeyword     = Scene3D::Loader::ShaderDefinitionOption::GetDefineKeyword(Loader::ShaderDefinitionOption::Type::SPECULAR_COLOR).data();
+  mTextureInformations[BASE_COLOR].mShaderOptionType         = Loader::ShaderOption::Type::BASE_COLOR_TEXTURE;
+  mTextureInformations[METALLIC_ROUGHNESS].mShaderOptionType = Loader::ShaderOption::Type::METALLIC_ROUGHNESS_TEXTURE;
+  mTextureInformations[NORMAL].mShaderOptionType             = Loader::ShaderOption::Type::NORMAL_TEXTURE;
+  mTextureInformations[OCCLUSION].mShaderOptionType          = Loader::ShaderOption::Type::OCCLUSION;
+  mTextureInformations[EMISSIVE].mShaderOptionType           = Loader::ShaderOption::Type::EMISSIVE;
+  mTextureInformations[SPECULAR].mShaderOptionType           = Loader::ShaderOption::Type::SPECULAR;
+  mTextureInformations[SPECULAR_COLOR].mShaderOptionType     = Loader::ShaderOption::Type::SPECULAR_COLOR;
 
   mTextureInformations[TextureIndex::EMISSIVE].mFactor = Vector4::ZERO;
 }
@@ -517,14 +517,9 @@ Dali::Sampler Material::GetSampler(Scene3D::Material::TextureType index)
   return Dali::Sampler();
 }
 
-std::string Material::GetVertexShader()
+Scene3D::Loader::ShaderOption Material::GetShaderOption() const
 {
-  return mShaderData.mVertexShaderSource;
-}
-
-std::string Material::GetFragmentShader()
-{
-  return mShaderData.mFragmentShaderSource;
+  return mShaderOption;
 }
 
 void Material::Apply()
@@ -614,34 +609,31 @@ void Material::UpdateMaterialData()
     materialFlag |= textureInformation.mSemantic;
   }
 
-  if(mMaterialFlag != materialFlag || mShaderData.mVertexShaderSource.empty() || mShaderData.mFragmentShaderSource.empty())
+  if(mMaterialFlag != materialFlag)
   {
     mModifyFlag |= MaterialModifyObserver::ModifyFlag::SHADER;
 
-    mMaterialFlag                     = materialFlag;
-    mShaderData.mVertexShaderSource   = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_VERT.data();
-    mShaderData.mFragmentShaderSource = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
+    mMaterialFlag = materialFlag;
 
-    std::vector<std::string> defines;
-    defines.push_back(THREE_TEX_KEYWORD.data());
+    mShaderOption = Loader::ShaderOption();
     for(auto&& textureInformation : mTextureInformations)
     {
       if(!textureInformation.mTexture)
       {
         continue;
       }
-      defines.push_back(textureInformation.mDefineKeyword);
+      mShaderOption.AddOption(textureInformation.mShaderOptionType);
     }
-    defines.push_back(GLTF_CHANNELS_KEYWORD.data());
-
-    for(const auto& define : defines)
+    mShaderOption.AddOption(Loader::ShaderOption::Type::THREE_TEXTURE);
+    mShaderOption.AddOption(Loader::ShaderOption::Type::GLTF_CHANNELS);
+    if(materialFlag & Scene3D::Loader::MaterialDefinition::TRANSPARENCY)
     {
-      Scene3D::Loader::ShaderDefinition::ApplyDefine(mShaderData.mFragmentShaderSource, define);
+      mShaderOption.SetTransparency();
     }
   }
 
   // Finish to make all the material flag according to the gltf2-util.
-  // Then make defines as fallowing shader-definition-factory.
+  // Then make defines as fallowing shader-manager.
 
   // The renderer State below can be used in primitive to set renderer properties.
 
@@ -769,7 +761,9 @@ void Material::NotifyObserver()
     mObserverNotifying = false;
 
     // Resolve observer queue during notify
-    mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(), [](auto& e) { return !e.second; }), mObservers.end());
+    mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(), [](auto& e)
+                                    { return !e.second; }),
+                     mObservers.end());
   }
 }
 

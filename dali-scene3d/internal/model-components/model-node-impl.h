@@ -29,6 +29,7 @@
 #include <dali-scene3d/internal/model-components/model-primitive-modify-observer.h>
 #include <dali-scene3d/public-api/light/light.h>
 #include <dali-scene3d/public-api/loader/mesh-definition.h>
+#include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-scene3d/public-api/loader/skinning-details.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
@@ -246,8 +247,27 @@ public: // Public Method
    */
   void SetImageBasedLightScaleFactor(float iblScaleFactor);
 
+  /**
+   * @brief Adds new Light.
+   *
+   * @param[in] light Newly added light.
+   * @param[in] lightIndex index of this light.
+   */
   void AddLight(Scene3D::Light light, uint32_t lightIndex);
+
+  /**
+   * @brief Removes new Light.
+   *
+   * @param[in] lightIndex index of light that will be removed.
+   */
   void RemoveLight(uint32_t lightIndex);
+
+  /**
+   * @brief Updates shaders by using current material
+   *
+   * @param[in] shaderManager Shader manager to create shader.
+   */
+  void UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager);
 
   /**
    * @brief Sets the blend shape data for a ModelPrimitive.
@@ -291,13 +311,14 @@ private:
   DALI_INTERNAL ModelNode& operator=(ModelNode&&) = delete;      ///< Deleted move assignment operator.
 
 private:
-  ModelPrimitiveContainer mModelPrimitiveContainer; ///< List of model primitives
-  BoneDataContainer       mBoneDataContainer;
-  BlendShapeIndexMap      mBlendShapeIndexMap; ///< Index of blend shape by name
-  Dali::Texture           mSpecularTexture;
-  Dali::Texture           mDiffuseTexture;
-  float                   mIblScaleFactor{1.0f};
-  uint32_t                mSpecularMipmapLevels{1u};
+  Scene3D::Loader::ShaderManagerPtr mShaderManager;
+  ModelPrimitiveContainer           mModelPrimitiveContainer; ///< List of model primitives
+  BoneDataContainer                 mBoneDataContainer;
+  BlendShapeIndexMap                mBlendShapeIndexMap;      ///< Index of blend shape by name
+  Dali::Texture                     mSpecularTexture;
+  Dali::Texture                     mDiffuseTexture;
+  float                             mIblScaleFactor{1.0f};
+  uint32_t                          mSpecularMipmapLevels{1u};
 
   // Light
   std::vector<Scene3D::Light> mLights;

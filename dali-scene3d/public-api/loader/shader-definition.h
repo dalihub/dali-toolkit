@@ -52,7 +52,7 @@ struct DALI_SCENE3D_API ShaderDefinition
   ShaderDefinition(const ShaderDefinition& other);
   ShaderDefinition& operator=(const ShaderDefinition& other);
 
-  ShaderDefinition(ShaderDefinition&&) = default;
+  ShaderDefinition(ShaderDefinition&&)            = default;
   ShaderDefinition& operator=(ShaderDefinition&&) = default;
 
   /*

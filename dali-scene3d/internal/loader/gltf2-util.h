@@ -25,7 +25,6 @@
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
-#include <dali-scene3d/public-api/loader/shader-definition-factory.h>
 
 namespace gt = gltf2;
 namespace js = json;
@@ -48,8 +47,8 @@ struct NodeMapping
 class NodeIndexMapper
 {
 public:
-  NodeIndexMapper()                       = default;
-  NodeIndexMapper(const NodeIndexMapper&) = delete;
+  NodeIndexMapper()                                  = default;
+  NodeIndexMapper(const NodeIndexMapper&)            = delete;
   NodeIndexMapper& operator=(const NodeIndexMapper&) = delete;
 
   ///@brief Registers a mapping of the @a gltfIndex of a node to its @a runtimeIndex .
@@ -100,8 +99,6 @@ void ConvertNodes(const gt::Document& document, ConversionContext& context, bool
 void ConvertAnimations(const gt::Document& document, ConversionContext& context);
 
 void ProcessSkins(const gt::Document& document, ConversionContext& context);
-
-void ProduceShaders(ShaderDefinitionFactory& shaderFactory, SceneDefinition& scene);
 
 void SetDefaultEnvironmentMap(const gt::Document& document, ConversionContext& context);
 
