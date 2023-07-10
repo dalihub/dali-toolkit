@@ -20,9 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/public-api/animation/constraint.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/loader/hash.h>
 #include <dali-scene3d/public-api/loader/blend-shape-details.h>
 #include <dali-scene3d/public-api/loader/node-definition.h>
@@ -31,6 +33,7 @@ namespace Dali::Scene3D::Loader
 {
 namespace
 {
+static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG = 10;
 
 ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinition& meshDef)
 {
@@ -156,8 +159,9 @@ ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinit
 
 struct ShaderManager::Impl
 {
-  std::map<uint64_t, Index> mShaderMap;
-  std::vector<Dali::Shader> mShaders;
+  std::map<uint64_t, Index>   mShaderMap;
+  std::vector<Dali::Shader>   mShaders;
+  std::vector<Scene3D::Light> mLights;
 };
 
 ShaderManager::ShaderManager()
@@ -197,6 +201,14 @@ Dali::Shader ShaderManager::ProduceShader(const ShaderOption& shaderOption)
     auto raw = shaderDef.LoadRaw("");
     mImpl->mShaders.emplace_back(shaderDef.Load(std::move(raw)));
     result = mImpl->mShaders.back();
+
+    std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
+    result.RegisterProperty(lightCountPropertyName, static_cast<int32_t>(mImpl->mLights.size()));
+
+    for(uint32_t index = 0; index < mImpl->mLights.size(); ++index)
+    {
+      SetLightConstraintToShader(index, result);
+    }
   }
 
   return result;
@@ -218,6 +230,99 @@ RendererState::Type ShaderManager::GetRendererState(const MaterialDefinition& ma
     rendererState = (rendererState | RendererState::ALPHA_BLEND);
   }
   return rendererState;
+}
+
+bool ShaderManager::AddLight(Scene3D::Light light)
+{
+  if(!light || mImpl->mLights.size() >= Scene3D::Internal::Light::GetMaximumEnabledLightCount())
+  {
+    return false;
+  }
+
+  int32_t lightIndex = mImpl->mLights.size();
+  mImpl->mLights.push_back(light);
+
+  for(auto&& shader : mImpl->mShaders)
+  {
+    std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
+    shader.RegisterProperty(lightCountPropertyName, static_cast<int32_t>(mImpl->mLights.size()));
+  }
+
+  SetLightConstraint(lightIndex);
+
+  return true;
+}
+
+void ShaderManager::RemoveLight(Scene3D::Light light)
+{
+  uint32_t lightCount = mImpl->mLights.size();
+  for(uint32_t index = 0; index < lightCount; ++index)
+  {
+    if(mImpl->mLights[index] != light)
+    {
+      continue;
+    }
+
+    RemoveLightConstraint(index);
+
+    if(!mImpl->mLights.empty() && light != mImpl->mLights.back())
+    {
+      RemoveLightConstraint(mImpl->mLights.size() - 1);
+      mImpl->mLights[index] = mImpl->mLights.back();
+      SetLightConstraint(index);
+    }
+
+    mImpl->mLights.pop_back();
+
+    for(auto&& shader : mImpl->mShaders)
+    {
+      std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
+      shader.RegisterProperty(lightCountPropertyName, static_cast<int32_t>(mImpl->mLights.size()));
+    }
+    break;
+  }
+}
+
+uint32_t ShaderManager::GetLightCount() const
+{
+  return mImpl->mLights.size();
+}
+
+void ShaderManager::SetLightConstraint(uint32_t lightIndex)
+{
+  for(auto&& shader : mImpl->mShaders)
+  {
+    SetLightConstraintToShader(lightIndex, shader);
+  }
+}
+
+void ShaderManager::SetLightConstraintToShader(uint32_t lightIndex, Dali::Shader shader)
+{
+  std::string lightDirectionPropertyName(Scene3D::Internal::Light::GetLightDirectionUniformName());
+  lightDirectionPropertyName += "[" + std::to_string(lightIndex) + "]";
+  auto             lightDirectionPropertyIndex = shader.RegisterProperty(lightDirectionPropertyName, Vector3::ZAXIS);
+  Dali::Constraint lightDirectionConstraint    = Dali::Constraint::New<Vector3>(shader, lightDirectionPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
+                                                                             { output = inputs[0]->GetQuaternion().Rotate(Vector3::ZAXIS); });
+  lightDirectionConstraint.AddSource(Source{mImpl->mLights[lightIndex], Dali::Actor::Property::WORLD_ORIENTATION});
+  lightDirectionConstraint.ApplyPost();
+  lightDirectionConstraint.SetTag(INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
+
+  std::string lightColorPropertyName(Scene3D::Internal::Light::GetLightColorUniformName());
+  lightColorPropertyName += "[" + std::to_string(lightIndex) + "]";
+  auto             lightColorPropertyIndex = shader.RegisterProperty(lightColorPropertyName, Vector3(Color::WHITE));
+  Dali::Constraint lightColorConstraint    = Dali::Constraint::New<Vector3>(shader, lightColorPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
+                                                                         { output = Vector3(inputs[0]->GetVector4()); });
+  lightColorConstraint.AddSource(Source{mImpl->mLights[lightIndex], Dali::Actor::Property::COLOR});
+  lightColorConstraint.ApplyPost();
+  lightColorConstraint.SetTag(INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
+}
+
+void ShaderManager::RemoveLightConstraint(uint32_t lightIndex)
+{
+  for(auto&& shader : mImpl->mShaders)
+  {
+    shader.RemoveConstraints(INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
+  }
 }
 
 } // namespace Dali::Scene3D::Loader

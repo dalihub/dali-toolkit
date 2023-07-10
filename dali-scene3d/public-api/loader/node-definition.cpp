@@ -357,21 +357,6 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
   renderer.RegisterProperty(IBL_INTENSITY_STRING.data(), resources.mEnvironmentMaps[envIndex].first.mIblIntensity);
   renderer.RegisterProperty(IBL_Y_DIRECTION.data(), resources.mEnvironmentMaps[envIndex].first.mYDirection);
 
-  std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
-  renderer.RegisterProperty(lightCountPropertyName, 0);
-
-  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  for(uint32_t i = 0; i < maxLightCount; ++i)
-  {
-    std::string lightDirectionPropertyName(Scene3D::Internal::Light::GetLightDirectionUniformName());
-    lightDirectionPropertyName += "[" + std::to_string(i) + "]";
-    renderer.RegisterProperty(lightDirectionPropertyName, Vector3::ZAXIS);
-
-    std::string lightColorPropertyName(Scene3D::Internal::Light::GetLightColorUniformName());
-    lightColorPropertyName += "[" + std::to_string(i) + "]";
-    renderer.RegisterProperty(lightColorPropertyName, Vector3(Color::WHITE));
-  }
-
   node.SetProperty(Actor::Property::COLOR, mColor);
 
   // If user uses customshader, the properties of the shader could not be changed by Material.

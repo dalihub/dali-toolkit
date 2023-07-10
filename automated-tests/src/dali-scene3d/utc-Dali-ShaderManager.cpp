@@ -60,7 +60,7 @@ struct PermutationSet
 
 } // namespace
 
-int UtcDaliShaderDefinitionFactoryProduceShader(void)
+int UtcDaliShaderManagerProduceShader(void)
 {
   Context ctx;
   ctx.resources.mMaterials.push_back({});
@@ -280,6 +280,41 @@ int UtcDaliShaderDefinitionFactoryProduceShader(void)
     RendererState::Type rendererStateFromMaterialDefinition = shaderManager.GetRendererState(materialDefinition);
     DALI_TEST_EQUAL(rendererStateFromMaterialDefinition, rendererState);
   }
+
+  END_TEST;
+}
+
+int UtcDaliShaderManagerAddAndRemoveLights(void)
+{
+  TestApplication app;
+  ShaderManager   shaderManager;
+
+  ShaderOption option1;
+  option1.AddOption(ShaderOption::Type::THREE_TEXTURE);
+  Dali::Shader shader1 = shaderManager.ProduceShader(option1);
+
+  ShaderOption option2;
+  option2.AddOption(ShaderOption::Type::BASE_COLOR_TEXTURE);
+  Dali::Shader shader2 = shaderManager.ProduceShader(option2);
+
+  DALI_TEST_NOT_EQUALS(shader1, shader2, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(shader1.GetProperty<int>(shader1.GetPropertyIndex("uLightCount")), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(shader2.GetProperty<int>(shader2.GetPropertyIndex("uLightCount")), 0, TEST_LOCATION);
+
+  Scene3D::Light light = Scene3D::Light::New();
+  shaderManager.AddLight(light);
+
+  DALI_TEST_EQUALS(shader1.GetProperty<int>(shader1.GetPropertyIndex("uLightCount")), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(shader2.GetProperty<int>(shader2.GetPropertyIndex("uLightCount")), 1, TEST_LOCATION);
+  
+  ShaderOption option3;
+  option3.AddOption(ShaderOption::Type::METALLIC_ROUGHNESS_TEXTURE);
+  Dali::Shader shader3 = shaderManager.ProduceShader(option3);
+
+  DALI_TEST_NOT_EQUALS(shader1, shader3, 0.1f, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(shader2, shader3, 0.1f, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(shader3.GetProperty<int>(shader3.GetPropertyIndex("uLightCount")), 1, TEST_LOCATION);
 
   END_TEST;
 }

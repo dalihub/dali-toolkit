@@ -24,6 +24,7 @@
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 #include <dali-scene3d/public-api/light/light.h>
+#include <dali/public-api/object/property.h>
 #include <toolkit-event-thread-callback.h>
 
 using namespace Dali;
@@ -212,7 +213,7 @@ int UtcDaliLightOnScene01(void)
 int UtcDaliLightAdd01(void)
 {
   ToolkitTestApplication application;
-  Scene3D::SceneView sceneView = Scene3D::SceneView::New();
+  Scene3D::SceneView     sceneView = Scene3D::SceneView::New();
   sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -238,20 +239,22 @@ int UtcDaliLightAdd01(void)
 
   Renderer renderer = model.FindChildByName("node2").GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
+  Shader shader = renderer.GetShader();
+  DALI_TEST_CHECK(shader);
 
   DALI_TEST_EQUALS(1u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  auto countPropertyIndex = renderer.GetPropertyIndex("uLightCount");
-  DALI_TEST_CHECK(countPropertyIndex != DALI_KEY_INVALID);
-  DALI_TEST_EQUALS(1, renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
-  auto colorPropertyIndex = renderer.GetPropertyIndex("uLightColor[0]");
-  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 1.0f), renderer.GetCurrentProperty<Vector3>(colorPropertyIndex), 0.01f, TEST_LOCATION);
-  auto directionPropertyIndex = renderer.GetPropertyIndex("uLightDirection[0]");
-  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), renderer.GetCurrentProperty<Vector3>(directionPropertyIndex), 0.01f, TEST_LOCATION);
+  auto countPropertyIndex = shader.GetPropertyIndex("uLightCount");
+  DALI_TEST_CHECK(countPropertyIndex != Dali::Property::INVALID_INDEX);
+  DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+  auto colorPropertyIndex = shader.GetPropertyIndex("uLightColor[0]");
+  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 1.0f), shader.GetCurrentProperty<Vector3>(colorPropertyIndex), 0.01f, TEST_LOCATION);
+  auto directionPropertyIndex = shader.GetPropertyIndex("uLightDirection[0]");
+  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), shader.GetCurrentProperty<Vector3>(directionPropertyIndex), 0.01f, TEST_LOCATION);
 
   light.Enable(false);
 
   DALI_TEST_EQUALS(0u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(0, renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
 
   END_TEST;
 }
@@ -290,20 +293,22 @@ int UtcDaliLightAdd02(void)
 
   Renderer renderer = model.FindChildByName("node2").GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
+  Shader shader = renderer.GetShader();
+  DALI_TEST_CHECK(shader);
 
   DALI_TEST_EQUALS(1u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  auto countPropertyIndex = renderer.GetPropertyIndex("uLightCount");
+  auto countPropertyIndex = shader.GetPropertyIndex("uLightCount");
   DALI_TEST_CHECK(countPropertyIndex != DALI_KEY_INVALID);
-  DALI_TEST_EQUALS(1, renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
-  auto colorPropertyIndex = renderer.GetPropertyIndex("uLightColor[0]");
-  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 1.0f), renderer.GetCurrentProperty<Vector3>(colorPropertyIndex), 0.01f, TEST_LOCATION);
-  auto directionPropertyIndex = renderer.GetPropertyIndex("uLightDirection[0]");
-  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), renderer.GetCurrentProperty<Vector3>(directionPropertyIndex), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+  auto colorPropertyIndex = shader.GetPropertyIndex("uLightColor[0]");
+  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 1.0f), shader.GetCurrentProperty<Vector3>(colorPropertyIndex), 0.01f, TEST_LOCATION);
+  auto directionPropertyIndex = shader.GetPropertyIndex("uLightDirection[0]");
+  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), shader.GetCurrentProperty<Vector3>(directionPropertyIndex), 0.01f, TEST_LOCATION);
 
   light.Enable(false);
 
   DALI_TEST_EQUALS(0u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(0, renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
 
   END_TEST;
 }
@@ -340,11 +345,13 @@ int UtcDaliLightAdd03(void)
 
   Renderer renderer = model.FindChildByName("node2").GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
+  Shader shader = renderer.GetShader();
+  DALI_TEST_CHECK(shader);
 
   DALI_TEST_EQUALS(0u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  auto countPropertyIndex = renderer.GetPropertyIndex("uLightCount");
+  auto countPropertyIndex = shader.GetPropertyIndex("uLightCount");
   DALI_TEST_CHECK(countPropertyIndex != DALI_KEY_INVALID);
-  DALI_TEST_EQUALS(0, renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
 
   light.Enable(true);
 
@@ -352,11 +359,11 @@ int UtcDaliLightAdd03(void)
   application.Render();
 
   DALI_TEST_EQUALS(1u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(1, renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
-  auto colorPropertyIndex = renderer.GetPropertyIndex("uLightColor[0]");
-  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 1.0f), renderer.GetCurrentProperty<Vector3>(colorPropertyIndex), 0.01f, TEST_LOCATION);
-  auto directionPropertyIndex = renderer.GetPropertyIndex("uLightDirection[0]");
-  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), renderer.GetCurrentProperty<Vector3>(directionPropertyIndex), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+  auto colorPropertyIndex = shader.GetPropertyIndex("uLightColor[0]");
+  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 1.0f), shader.GetCurrentProperty<Vector3>(colorPropertyIndex), 0.01f, TEST_LOCATION);
+  auto directionPropertyIndex = shader.GetPropertyIndex("uLightDirection[0]");
+  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), shader.GetCurrentProperty<Vector3>(directionPropertyIndex), 0.01f, TEST_LOCATION);
 
   light.Enable(false);
 
@@ -364,7 +371,7 @@ int UtcDaliLightAdd03(void)
   application.Render();
 
   DALI_TEST_EQUALS(0u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(0, renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
 
   END_TEST;
 }
@@ -404,19 +411,21 @@ int UtcDaliLightAdd04(void)
 
   Renderer renderer = model.FindChildByName("node2").GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
+  Shader shader = renderer.GetShader();
+  DALI_TEST_CHECK(shader);
 
   DALI_TEST_EQUALS(2u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  auto countPropertyIndex = renderer.GetPropertyIndex("uLightCount");
+  auto countPropertyIndex = shader.GetPropertyIndex("uLightCount");
   DALI_TEST_CHECK(countPropertyIndex != DALI_KEY_INVALID);
-  DALI_TEST_EQUALS(2, renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
-  auto colorPropertyIndex1 = renderer.GetPropertyIndex("uLightColor[0]");
-  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 1.0f), renderer.GetCurrentProperty<Vector3>(colorPropertyIndex1), 0.01f, TEST_LOCATION);
-  auto directionPropertyIndex1 = renderer.GetPropertyIndex("uLightDirection[0]");
-  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), renderer.GetCurrentProperty<Vector3>(directionPropertyIndex1), 0.01f, TEST_LOCATION);
-  auto colorPropertyIndex2 = renderer.GetPropertyIndex("uLightColor[1]");
-  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), renderer.GetCurrentProperty<Vector3>(colorPropertyIndex2), 0.01f, TEST_LOCATION);
-  auto directionPropertyIndex2 = renderer.GetPropertyIndex("uLightDirection[1]");
-  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, -1.0f), renderer.GetCurrentProperty<Vector3>(directionPropertyIndex2), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(2, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+  auto colorPropertyIndex1 = shader.GetPropertyIndex("uLightColor[0]");
+  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 1.0f), shader.GetCurrentProperty<Vector3>(colorPropertyIndex1), 0.01f, TEST_LOCATION);
+  auto directionPropertyIndex1 = shader.GetPropertyIndex("uLightDirection[0]");
+  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), shader.GetCurrentProperty<Vector3>(directionPropertyIndex1), 0.01f, TEST_LOCATION);
+  auto colorPropertyIndex2 = shader.GetPropertyIndex("uLightColor[1]");
+  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), shader.GetCurrentProperty<Vector3>(colorPropertyIndex2), 0.01f, TEST_LOCATION);
+  auto directionPropertyIndex2 = shader.GetPropertyIndex("uLightDirection[1]");
+  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, -1.0f), shader.GetCurrentProperty<Vector3>(directionPropertyIndex2), 0.01f, TEST_LOCATION);
 
   light1.Enable(false);
 
@@ -424,11 +433,11 @@ int UtcDaliLightAdd04(void)
   application.Render();
 
   DALI_TEST_EQUALS(1u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(1, renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+  DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
 
   // After light1 is disable, shader uniforms of lights are reordered.
-  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), renderer.GetCurrentProperty<Vector3>(colorPropertyIndex1), 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, -1.0f), renderer.GetCurrentProperty<Vector3>(directionPropertyIndex1), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), shader.GetCurrentProperty<Vector3>(colorPropertyIndex1), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, -1.0f), shader.GetCurrentProperty<Vector3>(directionPropertyIndex1), 0.01f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -476,23 +485,22 @@ int UtcDaliLightAdd05(void)
 
   Renderer renderer = model.FindChildByName("node2").GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
-
-  std::vector<int32_t> enableAnswers;
-  enableAnswers.assign(maxLightCount, 1);
+  Shader shader = renderer.GetShader();
+  DALI_TEST_CHECK(shader);
 
   DALI_TEST_EQUALS(maxLightCount, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  auto countPropertyIndex = renderer.GetPropertyIndex("uLightCount");
+  auto countPropertyIndex = shader.GetPropertyIndex("uLightCount");
   DALI_TEST_CHECK(countPropertyIndex != DALI_KEY_INVALID);
-  DALI_TEST_EQUALS(static_cast<int32_t>(maxLightCount), renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<int32_t>(maxLightCount), shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
   for(uint32_t i = 0; i < maxLightCount; ++i)
   {
     std::string colorStringKey     = std::string("uLightColor[") + std::to_string(i) + "]";
-    auto        colorPropertyIndex = renderer.GetPropertyIndex(colorStringKey);
-    DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 1.0f), renderer.GetCurrentProperty<Vector3>(colorPropertyIndex), 0.01f, TEST_LOCATION);
+    auto        colorPropertyIndex = shader.GetPropertyIndex(colorStringKey);
+    DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 1.0f), shader.GetCurrentProperty<Vector3>(colorPropertyIndex), 0.01f, TEST_LOCATION);
 
     std::string directionStringKey     = std::string("uLightDirection[") + std::to_string(i) + "]";
-    auto        directionPropertyIndex = renderer.GetPropertyIndex(directionStringKey);
-    DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), renderer.GetCurrentProperty<Vector3>(directionPropertyIndex), 0.01f, TEST_LOCATION);
+    auto        directionPropertyIndex = shader.GetPropertyIndex(directionStringKey);
+    DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), shader.GetCurrentProperty<Vector3>(directionPropertyIndex), 0.01f, TEST_LOCATION);
   }
 
   lightList[2].Enable(false);
@@ -501,11 +509,12 @@ int UtcDaliLightAdd05(void)
   application.Render();
 
   DALI_TEST_EQUALS(maxLightCount, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(static_cast<int32_t>(maxLightCount), renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<int32_t>(maxLightCount), shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
   for(uint32_t i = 0; i < maxLightCount; ++i)
   {
+    tet_printf("i : %d\n", i);
     Vector3 color, direction;
-    if(i == 2)
+    if(i == maxLightCount - 1)
     {
       color     = Vector3(1.0f, 0.0f, 0.0f);
       direction = Vector3(0.0f, 0.0f, -1.0f);
@@ -516,12 +525,12 @@ int UtcDaliLightAdd05(void)
       direction = Vector3(1.0f, 0.0f, 0.0f);
     }
     std::string colorStringKey     = std::string("uLightColor[") + std::to_string(i) + "]";
-    auto        colorPropertyIndex = renderer.GetPropertyIndex(colorStringKey);
-    DALI_TEST_EQUALS(color, renderer.GetCurrentProperty<Vector3>(colorPropertyIndex), 0.01f, TEST_LOCATION);
+    auto        colorPropertyIndex = shader.GetPropertyIndex(colorStringKey);
+    DALI_TEST_EQUALS(color, shader.GetCurrentProperty<Vector3>(colorPropertyIndex), 0.01f, TEST_LOCATION);
 
     std::string directionStringKey     = std::string("uLightDirection[") + std::to_string(i) + "]";
-    auto        directionPropertyIndex = renderer.GetPropertyIndex(directionStringKey);
-    DALI_TEST_EQUALS(direction, renderer.GetCurrentProperty<Vector3>(directionPropertyIndex), 0.01f, TEST_LOCATION);
+    auto        directionPropertyIndex = shader.GetPropertyIndex(directionStringKey);
+    DALI_TEST_EQUALS(direction, shader.GetCurrentProperty<Vector3>(directionPropertyIndex), 0.01f, TEST_LOCATION);
   }
 
   for(uint32_t i = 0; i < lightList.size(); ++i)
@@ -569,23 +578,24 @@ int UtcDaliLightModelAddAndRemove(void)
 
   Renderer renderer = model.FindChildByName("node2").GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
+  Shader shader = renderer.GetShader();
+  DALI_TEST_CHECK(shader);
 
   DALI_TEST_EQUALS(1u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  auto countPropertyIndex = renderer.GetPropertyIndex("uLightCount");
+  auto countPropertyIndex = shader.GetPropertyIndex("uLightCount");
   DALI_TEST_CHECK(countPropertyIndex != DALI_KEY_INVALID);
-  DALI_TEST_EQUALS(1, renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+  DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
 
-  auto colorPropertyIndex = renderer.GetPropertyIndex("uLightColor[0]");
-  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 1.0f), renderer.GetCurrentProperty<Vector3>(colorPropertyIndex), 0.01f, TEST_LOCATION);
-  auto directionPropertyIndex = renderer.GetPropertyIndex("uLightDirection[0]");
-  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), renderer.GetCurrentProperty<Vector3>(directionPropertyIndex), 0.01f, TEST_LOCATION);
+  auto colorPropertyIndex = shader.GetPropertyIndex("uLightColor[0]");
+  DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 1.0f), shader.GetCurrentProperty<Vector3>(colorPropertyIndex), 0.01f, TEST_LOCATION);
+  auto directionPropertyIndex = shader.GetPropertyIndex("uLightDirection[0]");
+  DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), shader.GetCurrentProperty<Vector3>(directionPropertyIndex), 0.01f, TEST_LOCATION);
 
   DALI_TEST_EQUALS(1u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
 
   model.Unparent();
 
   DALI_TEST_EQUALS(1u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(0, renderer.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
 
   END_TEST;
 }
