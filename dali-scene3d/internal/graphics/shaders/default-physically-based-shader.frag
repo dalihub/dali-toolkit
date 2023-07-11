@@ -117,7 +117,7 @@ void main()
   lowp float metallic = uMetallicFactor;
   lowp float perceptualRoughness = uRoughnessFactor;
   // If there isn't normal texture, use surface normal
-  mediump vec3 n = normalize(vTBN[2].xyz);
+  highp vec3 n = normalize(vTBN[2].xyz);
 
 #ifdef THREE_TEX
   // The albedo may be defined from a base texture or a flat color
@@ -222,8 +222,8 @@ void main()
 
     for(int i = 0; i < uLightCount; ++i)
     {
-      mediump vec3 l = normalize(-uLightDirection[i]);               // Vector from surface point to light
-      mediump vec3 h = normalize(l+v);                              // Half vector between both l and v
+      highp vec3 l = normalize(-uLightDirection[i]); // Vector from surface point to light
+      mediump vec3 h = normalize(l+v);               // Half vector between both l and v
       mediump float VdotH = dot(v, h);
       lowp vec3 specularReflection = f0 + (reflectance90 - f0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
 
@@ -231,8 +231,8 @@ void main()
       lowp float attenuationL = 2.0 * NdotL / (NdotL + sqrt(r * r + (1.0 - r * r) * (NdotL * NdotL)));
       lowp float geometricOcclusion = attenuationL * attenuationV;
 
-      mediump float NdotH = dot(n, h);
-      lowp float f = (NdotH * roughnessSq - NdotH) * NdotH + 1.0;
+      highp float NdotH = dot(n, h);
+      highp float f = (NdotH * roughnessSq - NdotH) * NdotH + 1.0;
       lowp float microfacetDistribution = roughnessSq / (M_PI * f * f);;
 
       // Calculation of analytical lighting contribution
