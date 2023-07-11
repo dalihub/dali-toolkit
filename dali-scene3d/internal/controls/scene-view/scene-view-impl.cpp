@@ -41,6 +41,8 @@
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/internal/light/light-impl.h>
 
+#include <dali/integration-api/debug.h>
+
 using namespace Dali;
 
 namespace Dali
@@ -62,7 +64,7 @@ DALI_TYPE_REGISTRATION_END()
 
 Property::Index   RENDERING_BUFFER    = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
 constexpr int32_t DEFAULT_ORIENTATION = 0;
-constexpr int32_t INVALID_INDEX = -1;
+constexpr int32_t INVALID_INDEX       = -1;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
 
@@ -153,7 +155,8 @@ SceneView::SceneView()
   mWindowOrientation(DEFAULT_ORIENTATION),
   mSkybox(),
   mSkyboxOrientation(Quaternion()),
-  mSkyboxIntensity(1.0f)
+  mSkyboxIntensity(1.0f),
+  mShaderManager(new Scene3D::Loader::ShaderManager())
 {
 }
 
@@ -280,18 +283,6 @@ void SceneView::RegisterSceneItem(Scene3D::Internal::LightObserver* item)
   if(item)
   {
     item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor, mSpecularMipmapLevels);
-
-    if(mActivatedLightCount > 0)
-    {
-      uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-      for(uint32_t i = 0; i < maxLightCount; ++i)
-      {
-        if(mActivatedLights[i])
-        {
-          item->NotifyLightAdded(i, mActivatedLights[i]);
-        }
-      }
-    }
     mItems.push_back(item);
   }
 }
@@ -304,17 +295,6 @@ void SceneView::UnregisterSceneItem(Scene3D::Internal::LightObserver* item)
     {
       if(mItems[i] == item)
       {
-        if(mActivatedLightCount > 0)
-        {
-          uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-          for(uint32_t i = 0; i < maxLightCount; ++i)
-          {
-            if(mActivatedLights[i])
-            {
-              item->NotifyLightRemoved(i);
-            }
-          }
-        }
         mItems.erase(mItems.begin() + i);
         break;
       }
@@ -439,60 +419,40 @@ float SceneView::GetImageBasedLightScaleFactor() const
 
 void SceneView::AddLight(Scene3D::Light light)
 {
-  bool enabled = AddLightInternal(light);
+  bool enabled = mShaderManager->AddLight(light);
   mLights.push_back(std::make_pair(light, enabled));
 }
 
 void SceneView::RemoveLight(Scene3D::Light light)
 {
-  if(mActivatedLights.empty())
-  {
-    return;
-  }
-
-  bool needToDisable = false;
+  mShaderManager->RemoveLight(light);
   for(uint32_t i = 0; i < mLights.size(); ++i)
   {
     if(mLights[i].first == light)
     {
-      // If mLights[i].second is true, it means the light is currently activated in Scene.
-      // Then it should be removed from mActivatedLights list too.
-      needToDisable = mLights[i].second;
       mLights.erase(mLights.begin() + i);
       break;
     }
   }
 
-  uint32_t maxNumberOfLight = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  if(needToDisable)
+  if(mLights.size() > mShaderManager->GetLightCount())
   {
-    uint32_t removedIndex = RemoveLightInternal(light);
-    if(mActivatedLightCount < maxNumberOfLight && mLights.size() >= maxNumberOfLight)
+    for(auto && waitingLight : mLights)
     {
-      for(auto && lightItem : mLights)
+      if(waitingLight.second)
       {
-        if(lightItem.second == false)
-        {
-          lightItem.second = AddLightInternal(lightItem.first);
-          break;
-        }
+        continue;
       }
-    }
 
-    // To remove empty entity of mActivatedLights, moves last object to empty position.
-    // Because one Light is removed, mActivatedLights[mActivatedLightCount] is current last object of the list.
-    if(!mActivatedLights[removedIndex] && mActivatedLightCount > 0 && removedIndex < mActivatedLightCount)
-    {
-      Scene3D::Light reorderingLight = mActivatedLights[mActivatedLightCount];
-      RemoveLightInternal(reorderingLight);
-      AddLightInternal(reorderingLight);
+      waitingLight.second = mShaderManager->AddLight(waitingLight.first);
+      break;
     }
   }
 }
 
 uint32_t SceneView::GetActivatedLightCount() const
 {
-  return mActivatedLightCount;
+  return mShaderManager->GetLightCount();
 }
 
 void SceneView::UseFramebuffer(bool useFramebuffer)
@@ -583,6 +543,11 @@ void SceneView::SetSkyboxOrientation(const Quaternion& orientation)
 Quaternion SceneView::GetSkyboxOrientation() const
 {
   return mSkyboxOrientation;
+}
+
+Dali::Scene3D::Loader::ShaderManagerPtr SceneView::GetShaderManager() const
+{
+  return mShaderManager;
 }
 
 ///////////////////////////////////////////////////////////
@@ -838,9 +803,9 @@ void SceneView::UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentM
 
     if(mSkybox)
     {
-        mSkybox.Unparent();
-        mSkybox.Reset();
-        mSkyboxTexture.Reset();
+      mSkybox.Unparent();
+      mSkybox.Reset();
+      mSkyboxTexture.Reset();
     }
 
     mSkyboxDirty         = false;
@@ -951,66 +916,6 @@ void SceneView::NotifyImageBasedLightTextureChange()
       item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor, mSpecularMipmapLevels);
     }
   }
-}
-
-bool SceneView::AddLightInternal(Scene3D::Light light)
-{
-  uint32_t maxNumberOfLight = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  if(mActivatedLightCount == 0)
-  {
-    mActivatedLights.resize(maxNumberOfLight);
-  }
-
-  bool enabled = false;
-  if(mActivatedLightCount < maxNumberOfLight)
-  {
-    uint32_t newLightIndex = 0u;
-    for(; newLightIndex < maxNumberOfLight; ++newLightIndex)
-    {
-      if(!mActivatedLights[newLightIndex])
-      {
-        mActivatedLights[newLightIndex] = light;
-        break;
-      }
-    }
-
-    for(auto&& item : mItems)
-    {
-      if(item)
-      {
-        item->NotifyLightAdded(newLightIndex, light);
-      }
-    }
-
-    mActivatedLightCount++;
-    enabled = true;
-  }
-  return enabled;
-}
-
-int32_t SceneView::RemoveLightInternal(Scene3D::Light light)
-{
-  int32_t removedIndex = INVALID_INDEX;
-  uint32_t maxNumberOfLight = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  for(uint32_t i = 0; i < maxNumberOfLight; ++i)
-  {
-    if(mActivatedLights[i] == light)
-    {
-      for(auto&& item : mItems)
-      {
-        if(item)
-        {
-          item->NotifyLightRemoved(i);
-        }
-      }
-      mActivatedLights[i].Reset();
-      mActivatedLightCount--;
-      removedIndex = i;
-      break;
-    }
-  }
-
-  return removedIndex;
 }
 
 } // namespace Internal

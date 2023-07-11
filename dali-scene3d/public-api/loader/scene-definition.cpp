@@ -159,7 +159,7 @@ void AddJointDebugVisual(Actor aJoint)
 
   aJoint.SetVisible(true);
 }
-#endif //DEBUG_JOINTS
+#endif // DEBUG_JOINTS
 
 class ActorCreatorVisitor : public NodeDefinition::IVisitor
 {
@@ -371,7 +371,10 @@ void SceneDefinition::CountResourceRefs(Index iNode, const Customization::Choice
 
     void Register(ResourceType::Value type, Index id)
     {
-      ++(*refCounts)[type][id];
+      if((!(*refCounts)[type].Empty()) && ((*refCounts)[type].Size() > id))
+      {
+        ++(*refCounts)[type][id];
+      }
     }
   };
 
@@ -486,8 +489,7 @@ bool SceneDefinition::ReparentNode(const std::string& name, const std::string& n
     {
       stream << i << ", ";
     }
-    LOGD(("%s", stream.str().c_str()));
-  };)
+    LOGD(("%s", stream.str().c_str())); };)
 
   // Remove node from children of previous parent (if any).
   if(node->mParentIdx != INVALID_INDEX)

@@ -22,11 +22,12 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/material-impl.h>
+#include <dali-scene3d/internal/model-components/model-node-impl.h>
 #include <dali-scene3d/internal/model-components/model-primitive-impl.h>
 #include <dali-scene3d/public-api/loader/renderer-state.h>
 #include <dali-scene3d/public-api/loader/utils.h>
-#include <dali-scene3d/internal/light/light-impl.h>
 
 namespace Dali
 {
@@ -255,7 +256,20 @@ void ModelRenderable::ReflectResources(IResourceReflector& reflector)
 void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinition::CreateParams& params, ModelNode& node) const
 {
   DALI_ASSERT_DEBUG(mMeshIdx != INVALID_INDEX);
-  Renderable::OnCreate(nodeDefinition, params, node);
+  if(mShaderIdx == INVALID_INDEX)
+  {
+    Shader          shader          = params.mShaderManager->ProduceShader(params.mResources.mMaterials[mMaterialIdx].first, params.mResources.mMeshes[mMeshIdx].first);
+    static Geometry defaultGeometry = Geometry::New();
+    Renderer        renderer        = Renderer::New(defaultGeometry, shader);
+
+    RendererState::Apply(params.mShaderManager->GetRendererState(params.mResources.mMaterials[mMaterialIdx].first), renderer);
+    Internal::GetImplementation(node).UpdateShader(params.mShaderManager);
+    node.AddRenderer(renderer);
+  }
+  else
+  {
+    Renderable::OnCreate(nodeDefinition, params, node);
+  }
 
   auto& resources = params.mResources;
   auto& mesh      = resources.mMeshes[mMeshIdx];
@@ -299,7 +313,7 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
     bool hasNormals   = false;
     bool hasTangents  = false;
     mesh.first.RetrieveBlendShapeComponents(hasPositions, hasNormals, hasTangents);
-    GetImplementation(primitive).SetBlendShapeOptions(hasPositions, hasNormals, hasTangents);
+    GetImplementation(primitive).SetBlendShapeOptions(hasPositions, hasNormals, hasTangents, mesh.first.mBlendShapeVersion);
     GetImplementation(primitive).SetBlendShapeGeometry(mesh.second.blendShapeGeometry);
     GetImplementation(primitive).SetSkinned(mesh.first.IsSkinned());
   }
@@ -343,23 +357,10 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
   renderer.RegisterProperty(IBL_INTENSITY_STRING.data(), resources.mEnvironmentMaps[envIndex].first.mIblIntensity);
   renderer.RegisterProperty(IBL_Y_DIRECTION.data(), resources.mEnvironmentMaps[envIndex].first.mYDirection);
 
-  std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
-  renderer.RegisterProperty(lightCountPropertyName, 0);
-
-  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  for(uint32_t i = 0; i < maxLightCount; ++i)
-  {
-    std::string lightDirectionPropertyName(Scene3D::Internal::Light::GetLightDirectionUniformName());
-    lightDirectionPropertyName += "[" + std::to_string(i) + "]";
-    renderer.RegisterProperty(lightDirectionPropertyName, Vector3::ZAXIS);
-
-    std::string lightColorPropertyName(Scene3D::Internal::Light::GetLightColorUniformName());
-    lightColorPropertyName += "[" + std::to_string(i) + "]";
-    renderer.RegisterProperty(lightColorPropertyName, Vector3(Color::WHITE));
-  }
-
   node.SetProperty(Actor::Property::COLOR, mColor);
 
+  // If user uses customshader, the properties of the shader could not be changed by Material.
+  if(mShaderIdx == INVALID_INDEX)
   {
     matDef.mMaterial            = Material::New();
     auto     material           = matDef.mMaterial;

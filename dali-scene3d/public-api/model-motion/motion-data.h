@@ -71,7 +71,8 @@ class MotionData;
  * @endcode
  *
  * We can request to load MotionData from file or buffer asynchronously.
- * If load completed, LoadCompetedSignal will be emmited.
+ * If load completed, LoadCompletedSignal will be emitted.
+ * If we try to load before LoadCompletedSignal emitted, previous load request cancel and only latest request loaded.
  *
  * @code
  *
@@ -95,6 +96,7 @@ class MotionData;
  *
  * @endcode
  * @note We don't check duplicated MotionIndex internally.
+ * @note We don't check MotionValue type is matched with MotionIndex.
  * @SINCE_2_2.34
  */
 class DALI_SCENE3D_API MotionData : public Dali::BaseHandle

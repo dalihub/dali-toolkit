@@ -29,6 +29,8 @@
 #include <dali-scene3d/internal/model-components/material-impl.h>
 #include <dali-scene3d/public-api/loader/environment-definition.h>
 
+#include <dali/integration-api/debug.h>
+
 namespace Dali
 {
 namespace Scene3D
@@ -49,11 +51,6 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::ModelPrimitive, Dali::BaseHandle, Create);
 DALI_TYPE_REGISTRATION_END()
 
-constexpr std::string_view MORPH_POSITION_KEYWORD    = "MORPH_POSITION";
-constexpr std::string_view MORPH_NORMAL_KEYWORD      = "MORPH_NORMAL";
-constexpr std::string_view MORPH_TANGENT_KEYWORD     = "MORPH_TANGENT";
-constexpr std::string_view MORPH_VERSION_2_0_KEYWORD = "MORPH_VERSION_2_0";
-
 static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG = 10;
 } // unnamed namespace
 
@@ -67,6 +64,7 @@ ModelPrimitivePtr ModelPrimitive::New()
 }
 
 ModelPrimitive::ModelPrimitive()
+: mShaderManager(new Scene3D::Loader::ShaderManager())
 {
 }
 
@@ -81,7 +79,6 @@ ModelPrimitive::~ModelPrimitive()
 
 void ModelPrimitive::Initialize()
 {
-  mLights.resize(Scene3D::Internal::Light::GetMaximumEnabledLightCount());
 }
 
 void ModelPrimitive::SetRenderer(Dali::Renderer renderer)
@@ -179,50 +176,16 @@ void ModelPrimitive::SetImageBasedLightScaleFactor(float iblScaleFactor)
   }
 }
 
-void ModelPrimitive::AddLight(Scene3D::Light light, uint32_t lightIndex)
+void ModelPrimitive::UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager)
 {
-  if(mLights[lightIndex])
+  if(mShaderManager != shaderManager)
   {
-    RemoveLight(lightIndex);
+    mShaderManager = (shaderManager) ? shaderManager : new Scene3D::Loader::ShaderManager();
+    if(mMaterial && GetImplementation(mMaterial).IsResourceReady())
+    {
+      ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag::SHADER);
+    }
   }
-
-  mLights[lightIndex] = light;
-  // TODO  Remove light at lightIndex if it is already set.
-  if(mRenderer && mMaterial)
-  {
-    mLightCount++;
-    std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
-    mRenderer.RegisterProperty(lightCountPropertyName, mLightCount);
-
-    std::string lightDirectionPropertyName(Scene3D::Internal::Light::GetLightDirectionUniformName());
-    lightDirectionPropertyName += "[" + std::to_string(lightIndex) + "]";
-    auto             lightDirectionPropertyIndex = mRenderer.RegisterProperty(lightDirectionPropertyName, Vector3::ZAXIS);
-    Dali::Constraint lightDirectionConstraint    = Dali::Constraint::New<Vector3>(mRenderer, lightDirectionPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
-                                                                               { output = inputs[0]->GetQuaternion().Rotate(Vector3::ZAXIS); });
-    lightDirectionConstraint.AddSource(Source{light, Dali::Actor::Property::WORLD_ORIENTATION});
-    lightDirectionConstraint.ApplyPost();
-    lightDirectionConstraint.SetTag(INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
-
-    std::string lightColorPropertyName(Scene3D::Internal::Light::GetLightColorUniformName());
-    lightColorPropertyName += "[" + std::to_string(lightIndex) + "]";
-    auto             lightColorPropertyIndex = mRenderer.RegisterProperty(lightColorPropertyName, Vector3(Color::WHITE));
-    Dali::Constraint lightColorConstraint    = Dali::Constraint::New<Vector3>(mRenderer, lightColorPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
-                                                                           { output = Vector3(inputs[0]->GetVector4()); });
-    lightColorConstraint.AddSource(Source{light, Dali::Actor::Property::COLOR});
-    lightColorConstraint.ApplyPost();
-    lightColorConstraint.SetTag(INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
-  }
-}
-
-void ModelPrimitive::RemoveLight(uint32_t lightIndex)
-{
-  mLightCount--;
-  std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
-  mRenderer.RegisterProperty(lightCountPropertyName, mLightCount);
-
-  mRenderer.RemoveConstraints(INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
-
-  mLights[lightIndex].Reset();
 }
 
 void ModelPrimitive::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData& data)
@@ -236,11 +199,12 @@ void ModelPrimitive::SetBlendShapeGeometry(Dali::Texture blendShapeGeometry)
   mBlendShapeGeometry = blendShapeGeometry;
 }
 
-void ModelPrimitive::SetBlendShapeOptions(bool hasPositions, bool hasNormals, bool hasTangents)
+void ModelPrimitive::SetBlendShapeOptions(bool hasPositions, bool hasNormals, bool hasTangents, Scene3D::Loader::BlendShapes::Version version)
 {
-  mHasPositions = hasPositions;
-  mHasNormals   = hasNormals;
-  mHasTangents  = hasTangents;
+  mHasPositions      = hasPositions;
+  mHasNormals        = hasNormals;
+  mHasTangents       = hasTangents;
+  mBlendShapeVersion = version;
 }
 
 void ModelPrimitive::SetSkinned(bool isSkinned)
@@ -257,44 +221,43 @@ void ModelPrimitive::OnMaterialModified(Dali::Scene3D::Material material, Materi
 
 void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag flag)
 {
+  if(!mMaterial)
+  {
+    return;
+  }
+
   uint32_t shaderFlag = (flag & static_cast<uint32_t>(MaterialModifyObserver::ModifyFlag::SHADER));
   if(mIsMaterialChanged || shaderFlag == static_cast<uint32_t>(MaterialModifyObserver::ModifyFlag::SHADER))
   {
-    std::string vertexShader   = GetImplementation(mMaterial).GetVertexShader();
-    std::string fragmentShader = GetImplementation(mMaterial).GetFragmentShader();
+    Scene3D::Loader::ShaderOption shaderOption = GetImplementation(mMaterial).GetShaderOption();
 
-    std::vector<std::string> defines;
-    defines.push_back("VEC4_TANGENT");
+    shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::VEC4_TANGENT);
     if(mHasSkinning)
     {
-      defines.push_back("SKINNING");
+      shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::SKINNING);
     }
     if(mHasPositions || mHasNormals || mHasTangents)
     {
       if(mHasPositions)
       {
-        defines.push_back(MORPH_POSITION_KEYWORD.data());
+        shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::MORPH_POSITION);
       }
       if(mHasNormals)
       {
-        defines.push_back(MORPH_NORMAL_KEYWORD.data());
+        shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::MORPH_NORMAL);
       }
       if(mHasTangents)
       {
-        defines.push_back(MORPH_TANGENT_KEYWORD.data());
+        shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::MORPH_TANGENT);
       }
-      if(mBlendShapeData.version == Scene3D::Loader::BlendShapes::Version::VERSION_2_0)
+      if(mBlendShapeVersion == Scene3D::Loader::BlendShapes::Version::VERSION_2_0)
       {
-        defines.push_back(MORPH_VERSION_2_0_KEYWORD.data());
+        shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::MORPH_VERSION_2_0);
       }
-    }
-    for(const auto& define : defines)
-    {
-      Scene3D::Loader::ShaderDefinition::ApplyDefine(vertexShader, define);
     }
 
     mShader.Reset();
-    mShader = Shader::New(vertexShader, fragmentShader);
+    mShader = mShaderManager->ProduceShader(shaderOption);
 
     if(!mRenderer)
     {
@@ -388,15 +351,6 @@ void ModelPrimitive::CreateRenderer()
   mRenderer.SetTextures(mTextureSet);
   UpdateRendererUniform();
 
-  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  for(uint32_t i = 0; i < maxLightCount; ++i)
-  {
-    if(mLights[i])
-    {
-      AddLight(mLights[i], i);
-    }
-  }
-
   for(auto* observer : mObservers)
   {
     observer->OnRendererCreated(mRenderer);
@@ -445,9 +399,12 @@ void ModelPrimitive::UpdateImageBasedLightTexture()
 
 void ModelPrimitive::UpdateRendererUniform()
 {
-  mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightScaleFactorName().data(), mIblScaleFactor);
-  mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightMaxLodUniformName().data(), static_cast<float>(mSpecularMipmapLevels));
-  GetImplementation(mMaterial).SetRendererUniform(mRenderer);
+  if(mMaterial)
+  {
+    mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightScaleFactorName().data(), mIblScaleFactor);
+    mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightMaxLodUniformName().data(), static_cast<float>(mSpecularMipmapLevels));
+    GetImplementation(mMaterial).SetRendererUniform(mRenderer);
+  }
 }
 
 } // namespace Internal

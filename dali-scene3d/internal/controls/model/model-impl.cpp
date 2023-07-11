@@ -42,7 +42,7 @@
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/node-definition.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
-#include <dali-scene3d/public-api/loader/shader-definition-factory.h>
+#include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
 
 using namespace Dali;
@@ -172,45 +172,6 @@ void AddModelTreeToAABB(BoundingVolume& AABB, const Dali::Scene3D::Loader::Scene
   }
 }
 
-void AddLightRecursively(Scene3D::ModelNode node, Scene3D::Light light, uint32_t lightIndex)
-{
-  if(!node)
-  {
-    return;
-  }
-  GetImplementation(node).AddLight(light, lightIndex);
-
-  uint32_t childrenCount = node.GetChildCount();
-  for(uint32_t i = 0; i < childrenCount; ++i)
-  {
-    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
-    if(childNode)
-    {
-      AddLightRecursively(childNode, light, lightIndex);
-    }
-  }
-}
-
-void RemoveLightRecursively(Scene3D::ModelNode node, uint32_t lightIndex)
-{
-  if(!node)
-  {
-    return;
-  }
-
-  GetImplementation(node).RemoveLight(lightIndex);
-
-  uint32_t childrenCount = node.GetChildCount();
-  for(uint32_t i = 0; i < childrenCount; ++i)
-  {
-    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
-    if(childNode)
-    {
-      RemoveLightRecursively(childNode, lightIndex);
-    }
-  }
-}
-
 void UpdateBlendShapeNodeMapRecursively(Model::BlendShapeModelNodeMap& resultMap, const Scene3D::ModelNode& node)
 {
   if(!node)
@@ -232,6 +193,26 @@ void UpdateBlendShapeNodeMapRecursively(Model::BlendShapeModelNodeMap& resultMap
   }
 }
 
+void UpdateShaderRecursively(Scene3D::ModelNode node, Scene3D::Loader::ShaderManagerPtr shaderManager)
+{
+  if(!node)
+  {
+    return;
+  }
+
+  GetImplementation(node).UpdateShader(shaderManager);
+
+  uint32_t childrenCount = node.GetChildCount();
+  for(uint32_t i = 0; i < childrenCount; ++i)
+  {
+    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
+    if(childNode)
+    {
+      UpdateShaderRecursively(childNode, shaderManager);
+    }
+  }
+}
+
 } // anonymous namespace
 
 Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUrl)
@@ -239,6 +220,7 @@ Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUr
   mModelUrl(modelUrl),
   mResourceDirectoryUrl(resourceDirectoryUrl),
   mModelRoot(),
+  mShaderManager(new Scene3D::Loader::ShaderManager()),
   mNaturalSize(Vector3::ZERO),
   mModelPivot(AnchorPoint::CENTER),
   mSceneIblScaleFactor(1.0f),
@@ -296,19 +278,12 @@ void Model::AddModelNode(Scene3D::ModelNode modelNode)
     mModelResourceReady = true;
   }
 
+  UpdateShaderRecursively(modelNode, mShaderManager);
+
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
   {
     UpdateImageBasedLightTexture();
     UpdateImageBasedLightScaleFactor();
-  }
-
-  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  for(uint32_t i = 0; i < maxLightCount; ++i)
-  {
-    if(mLights[i])
-    {
-      AddLightRecursively(modelNode, mLights[i], i);
-    }
   }
 
   if(Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE))
@@ -321,14 +296,7 @@ void Model::RemoveModelNode(Scene3D::ModelNode modelNode)
 {
   if(mModelRoot)
   {
-    uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-    for(uint32_t i = 0; i < maxLightCount; ++i)
-    {
-      if(mLights[i])
-      {
-        RemoveLightRecursively(modelNode, i);
-      }
-    }
+    UpdateShaderRecursively(modelNode, nullptr);
     mModelRoot.Remove(modelNode);
   }
 }
@@ -769,11 +737,40 @@ void Model::OnInitialize()
 {
   // Make ParentOrigin as Center.
   Self().SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mLights.resize(Scene3D::Internal::Light::GetMaximumEnabledLightCount());
 }
 
 void Model::OnSceneConnection(int depth)
 {
+  Actor parent = Self().GetParent();
+  while(parent)
+  {
+    // If this Model has parent SceneView and the its ShaderManager is same with privious ShaderManager,
+    // this Model don't need to update shader.
+    Scene3D::SceneView sceneView = Scene3D::SceneView::DownCast(parent);
+    if(sceneView)
+    {
+      mParentSceneView = sceneView;
+      GetImpl(sceneView).RegisterSceneItem(this);
+      Scene3D::Loader::ShaderManagerPtr shaderManager = GetImpl(sceneView).GetShaderManager();
+      if(mShaderManager != shaderManager)
+      {
+        mShaderManager = shaderManager;
+        UpdateShaderRecursively(mModelRoot, mShaderManager);
+      }
+      break;
+    }
+    parent = parent.GetParent();
+  }
+
+  // Model can be added on Dali::Scene directly without SceneView.
+  // So, Model's mShaderManager and shaders of child ModelNodes are needed to be reset when this Model has not parent SceneView.
+  Scene3D::SceneView parentSceneView = mParentSceneView.GetHandle();
+  if(!parentSceneView)
+  {
+    mShaderManager = new Dali::Scene3D::Loader::ShaderManager();
+    UpdateShaderRecursively(mModelRoot, mShaderManager);
+  }
+
   if(!mModelLoadTask && !mModelResourceReady && !mModelUrl.empty())
   {
     // Request model load only if we setup url.
@@ -791,19 +788,6 @@ void Model::OnSceneConnection(int depth)
     SetImageBasedLightSource(mDiffuseIblUrl, mSpecularIblUrl, mIblScaleFactor);
   }
 
-  Actor parent = Self().GetParent();
-  while(parent)
-  {
-    Scene3D::SceneView sceneView = Scene3D::SceneView::DownCast(parent);
-    if(sceneView)
-    {
-      GetImpl(sceneView).RegisterSceneItem(this);
-      mParentSceneView = sceneView;
-      break;
-    }
-    parent = parent.GetParent();
-  }
-
   NotifyResourceReady();
 
   mSizeNotification = Self().AddPropertyNotification(Actor::Property::SIZE, StepCondition(SIZE_STEP_CONDITION));
@@ -813,8 +797,11 @@ void Model::OnSceneConnection(int depth)
 
 void Model::OnSceneDisconnection()
 {
+  // If mParentSceneView is still onScene, that means this model
+  // is disconnected from mParentSceneView's sub tree.
+  // So, Unregister this Model from SceneView.
   Scene3D::SceneView sceneView = mParentSceneView.GetHandle();
-  if(sceneView)
+  if(sceneView && sceneView.GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE))
   {
     GetImpl(sceneView).UnregisterSceneItem(this);
     mParentSceneView.Reset();
@@ -1045,21 +1032,6 @@ void Model::NotifyImageBasedLightScaleFactor(float scaleFactor)
   }
 }
 
-void Model::NotifyLightAdded(uint32_t lightIndex, Scene3D::Light light)
-{
-  mLights[lightIndex] = light;
-  AddLightRecursively(mModelRoot, light, lightIndex);
-}
-
-void Model::NotifyLightRemoved(uint32_t lightIndex)
-{
-  if(mLights[lightIndex])
-  {
-    RemoveLightRecursively(mModelRoot, lightIndex);
-    mLights[lightIndex].Reset();
-  }
-}
-
 void Model::OnModelLoadComplete()
 {
   if(!mModelLoadTask->HasSucceeded())
@@ -1088,15 +1060,6 @@ void Model::OnModelLoadComplete()
   {
     mDefaultDiffuseTexture  = resources.mEnvironmentMaps.front().second.mDiffuse;
     mDefaultSpecularTexture = resources.mEnvironmentMaps.front().second.mSpecular;
-  }
-
-  uint32_t maxLightCount = Scene3D::Internal::Light::GetMaximumEnabledLightCount();
-  for(uint32_t i = 0; i < maxLightCount; ++i)
-  {
-    if(mLights[i])
-    {
-      AddLightRecursively(mModelRoot, mLights[i], i);
-    }
   }
 
   UpdateImageBasedLightTexture();
@@ -1174,12 +1137,13 @@ void Model::NotifyResourceReady()
 
 void Model::CreateModel()
 {
-  BoundingVolume                                      AABB;
-  auto&                                               resources       = mModelLoadTask->GetResources();
-  auto&                                               scene           = mModelLoadTask->GetScene();
-  auto&                                               resourceChoices = mModelLoadTask->GetResourceChoices();
-  Dali::Scene3D::Loader::Transforms                   xforms{Dali::Scene3D::Loader::MatrixStack{}, Dali::Scene3D::Loader::ViewProjection{}};
-  Dali::Scene3D::Loader::NodeDefinition::CreateParams nodeParams{resources, xforms, {}, {}, {}};
+  BoundingVolume                    AABB;
+  auto&                             resources       = mModelLoadTask->GetResources();
+  auto&                             scene           = mModelLoadTask->GetScene();
+  auto&                             resourceChoices = mModelLoadTask->GetResourceChoices();
+  Dali::Scene3D::Loader::Transforms xforms{Dali::Scene3D::Loader::MatrixStack{}, Dali::Scene3D::Loader::ViewProjection{}};
+
+  Dali::Scene3D::Loader::NodeDefinition::CreateParams nodeParams{resources, xforms, mShaderManager, {}, {}, {}};
 
   // Generate Dali handles from resource bundle. Note that we generate all scene's resouce immediatly.
   resources.GenerateResources();

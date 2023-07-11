@@ -40,8 +40,10 @@ class BlendShapeIndex;
 
 /**
  * @brief Specialized MotionIndex to control blend shape.
- * We can control the blend shape by index (when we set BlendShapeId as IndexKey)
- * or by name (when we set BlendShapeId as StringKey)
+ * We can control the blend shape by index (when we set BlendShapeId as IndexKey),
+ * or by name (when we set BlendShapeId as StringKey).
+ *
+ * MotionValue should be float type.
  *
  * @code
  *

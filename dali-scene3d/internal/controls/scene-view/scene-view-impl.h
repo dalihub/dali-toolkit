@@ -35,6 +35,7 @@
 #include <dali-scene3d/internal/common/environment-map-load-task.h>
 #include <dali-scene3d/internal/common/light-observer.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
+#include <dali-scene3d/public-api/loader/shader-manager.h>
 
 namespace Dali
 {
@@ -203,6 +204,12 @@ public:
    */
   Quaternion GetSkyboxOrientation() const;
 
+  /**
+   * @brief Retrieves ShaderManager of this SceneView.
+   * @return ShaderManager of this SceneView.
+   */
+  Dali::Scene3D::Loader::ShaderManagerPtr GetShaderManager() const;
+
 protected:
   /**
    * @brief Constructs a new SceneView.
@@ -315,22 +322,6 @@ private:
    */
   void NotifyImageBasedLightTextureChange();
 
-  /**
-   * @brief Internal method to add an Light object to this SceneView.
-   *
-   * @param[in] light Light object to be added.
-   * @return True if successed to enable.
-   */
-  bool AddLightInternal(Scene3D::Light light);
-
-  /**
-   * @brief Internal method to remove an Light object to this SceneView.
-   *
-   * @param[in] light Light object to be added.
-   * @return Index of removed light in enabled light list. If failed to remove it returns negative value;
-   */
-  int32_t RemoveLightInternal(Scene3D::Light light);
-
 private:
   Toolkit::Visual::Base mVisual;
 
@@ -352,10 +343,11 @@ private:
   float                                          mSkyboxIntensity{1.0f};
   uint8_t                                        mFrameBufferMultiSamplingLevel{0u};
 
+  // Shader Factory
+  Dali::Scene3D::Loader::ShaderManagerPtr mShaderManager;
+
   // Light
   std::vector<std::pair<Scene3D::Light, bool>> mLights; // Pair of Light object and flag that denotes the light is currently activated or not.
-  std::vector<Scene3D::Light>                  mActivatedLights;
-  uint32_t                                     mActivatedLightCount{0u};
 
   // Asynchronous Loading.
   EnvironmentMapLoadTaskPtr mSkyboxLoadTask;
@@ -378,8 +370,6 @@ private:
   bool                        mSkyboxDirty{false};
   bool                        mIblDiffuseDirty{false};
   bool                        mIblSpecularDirty{false};
-
-  // TODO : Light Source
 };
 
 } // namespace Internal

@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-scene3d/public-api/loader/shader-definition-option.h>
+#include <dali-scene3d/public-api/loader/shader-option.h>
 
 // EXTERNAL INCLUDES
 #include <string>
@@ -50,22 +50,22 @@ static constexpr std::string_view OPTION_KEYWORD[] =
 static constexpr uint32_t NUMBER_OF_OPTIONS = sizeof(OPTION_KEYWORD) / sizeof(OPTION_KEYWORD[0]);
 } // namespace
 
-void ShaderDefinitionOption::SetTransparency()
+void ShaderOption::SetTransparency()
 {
   mOptionHash |= (1 << NUMBER_OF_OPTIONS);
 }
 
-void ShaderDefinitionOption::AddOption(Type shaderDefinitionOptionType)
+void ShaderOption::AddOption(Type shaderOptionType)
 {
-  mOptionHash |= (1 << static_cast<uint32_t>(shaderDefinitionOptionType));
+  mOptionHash |= (1 << static_cast<uint32_t>(shaderOptionType));
 }
 
-uint64_t ShaderDefinitionOption::GetOptionHash() const
+uint64_t ShaderOption::GetOptionHash() const
 {
   return mOptionHash;
 }
 
-void ShaderDefinitionOption::GetDefines(std::vector<std::string>& defines) const
+void ShaderOption::GetDefines(std::vector<std::string>& defines) const
 {
   defines.clear();
   for(uint32_t i = 0; i < NUMBER_OF_OPTIONS; ++i)
@@ -77,9 +77,9 @@ void ShaderDefinitionOption::GetDefines(std::vector<std::string>& defines) const
   }
 }
 
-std::string_view ShaderDefinitionOption::GetDefineKeyword(Type shaderDefinitionOptionType)
+std::string_view ShaderOption::GetDefineKeyword(Type shaderOptionType)
 {
-  return OPTION_KEYWORD[static_cast<uint32_t>(shaderDefinitionOptionType)];
+  return OPTION_KEYWORD[static_cast<uint32_t>(shaderOptionType)];
 }
 
 } // namespace Dali::Scene3D::Loader

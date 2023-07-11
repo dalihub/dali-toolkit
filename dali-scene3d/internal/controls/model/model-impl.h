@@ -281,16 +281,6 @@ public: // Overrides LightObserver Methods.
    */
   void NotifyImageBasedLightScaleFactor(float scaleFactor) override;
 
-  /**
-   * @copydoc Dali::Scene3D::Internal::LightObserver::NotifyLightAdded()
-   */
-  void NotifyLightAdded(uint32_t lightIndex, Scene3D::Light light) override;
-
-  /**
-   * @copydoc Dali::Scene3D::Internal::LightObserver::NotifyLightRemoved()
-   */
-  void NotifyLightRemoved(uint32_t lightIndex) override;
-
 private:
   /**
    * @brief Asynchronously model loading finished.
@@ -361,8 +351,7 @@ private:
   WeakHandle<Scene3D::SceneView> mParentSceneView;
   Dali::PropertyNotification     mSizeNotification;
 
-  // Light
-  std::vector<Scene3D::Light> mLights;
+  Dali::Scene3D::Loader::ShaderManagerPtr mShaderManager;
 
   // List of ModelNode for name of blend shape.
   BlendShapeModelNodeMap mBlendShapeModelNodeMap;
