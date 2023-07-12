@@ -113,6 +113,7 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
   dali-toolkit-test-utils/toolkit-style-monitor.cpp
   dali-toolkit-test-utils/toolkit-test-application.cpp
+  dali-toolkit-test-utils/toolkit-texture-upload-manager.cpp
   dali-toolkit-test-utils/toolkit-timer.cpp
   dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp
   dali-toolkit-test-utils/toolkit-tts-player.cpp

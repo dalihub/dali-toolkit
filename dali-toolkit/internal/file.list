@@ -141,6 +141,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/filters/spread-filter.cpp
    ${toolkit_src_dir}/image-loader/async-image-loader-impl.cpp
    ${toolkit_src_dir}/image-loader/atlas-packer.cpp
+   ${toolkit_src_dir}/image-loader/fast-track-loading-task.cpp
    ${toolkit_src_dir}/image-loader/image-atlas-impl.cpp
    ${toolkit_src_dir}/image-loader/loading-task.cpp
    ${toolkit_src_dir}/image-loader/image-url-impl.cpp

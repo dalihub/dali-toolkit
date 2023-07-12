@@ -18,10 +18,14 @@
 #include <iostream>
 #include <vector>
 
+#include <unistd.h>
+#include <thread>
+
 #include <dali-toolkit-test-suite-utils.h>
 
 #include <toolkit-environment-variable.h>
 #include <toolkit-event-thread-callback.h>
+#include <toolkit-texture-upload-manager.h>
 #include <toolkit-timer.h>
 
 #include <dali-toolkit/dali-toolkit.h>
@@ -29,9 +33,12 @@
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
+
+#include <dali/devel-api/adaptor-framework/texture-upload-manager.h>
 
 #include "dummy-control.h"
 #include "test-encoded-image-buffer.h"
@@ -3474,5 +3481,317 @@ int UtcDaliImageVisualLoadImagePlanes03(void)
   DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
   DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 3, TEST_LOCATION);
 
+  END_TEST;
+}
+
+int UtcDaliImageVisualLoadFastTrackImage01(void)
+{
+  tet_infoline("Test worker thread uploading with Local URL");
+  ToolkitTestApplication application;
+
+  Test::TextureUploadManager::InitalizeGraphicsController(application.GetGraphicsController());
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  // Pair of filename - expect GenTextures count.
+  std::vector<std::pair<std::string, int>> testCases = {
+    {TEST_IMAGE_FILE_NAME, 1},
+    {TEST_REMOTE_IMAGE_FILE_NAME, 1},
+    {TEST_INVALID_FILE_NAME, 0},
+  };
+
+  for(auto&& tc : testCases)
+  {
+    auto& filename    = tc.first;
+    auto& expectValue = tc.second;
+
+    tet_printf("Test %s\n", filename.c_str());
+
+    Property::Map propertyMap;
+    propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, filename.c_str());
+    propertyMap.Insert(DevelImageVisual::Property::FAST_TRACK_UPLOADING, true);
+
+    Visual::Base visual = factory.CreateVisual(propertyMap);
+    DALI_TEST_CHECK(visual);
+
+    DummyControl      actor     = DummyControl::New();
+    DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+    actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    application.GetScene().Add(actor);
+
+    application.SendNotification();
+    application.Render();
+
+    // EventThread without callback
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 30, false), true, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 0, TEST_LOCATION);
+
+    {
+      // TODO : There is no way to flush TextureUploadManager in test-application's Render() now.
+      // How can we make it? Should it be integration-api?
+      auto textureUploadManager = Dali::Devel::TextureUploadManager::Get();
+      DALI_TEST_EQUALS(textureUploadManager.ResourceUpload(), expectValue > 0, TEST_LOCATION);
+    }
+    // Render only without SendNotification(). And check whether glTexImage2D called or not.
+    application.Render();
+
+    DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), expectValue, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    textureTrace.Reset();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualLoadFastTrackImage02(void)
+{
+  tet_infoline("Test worker thread uploading with Local URL");
+  ToolkitTestApplication application;
+
+  Test::TextureUploadManager::InitalizeGraphicsController(application.GetGraphicsController());
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  {
+    auto filename    = std::string(TEST_IMAGE_FILE_NAME);
+    auto expectValue = 1;
+
+    tet_printf("Test %s\n", filename.c_str());
+
+    Property::Map propertyMap;
+    propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, filename.c_str());
+    propertyMap.Insert("fastTrackUploading", true);
+
+    Visual::Base visual = factory.CreateVisual(propertyMap);
+    DALI_TEST_CHECK(visual);
+
+    DummyControl      actor     = DummyControl::New();
+    DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+    actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    application.GetScene().Add(actor);
+
+    application.SendNotification();
+    application.Render();
+
+    // EventThread without callback
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 30, false), true, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 0, TEST_LOCATION);
+
+    {
+      // TODO : There is no way to flush TextureUploadManager in test-application's Render() now.
+      // How can we make it? Should it be integration-api?
+      auto textureUploadManager = Dali::Devel::TextureUploadManager::Get();
+      DALI_TEST_EQUALS(textureUploadManager.ResourceUpload(), expectValue > 0, TEST_LOCATION);
+    }
+    // Render only without SendNotification(). And check whether glTexImage2D called or not.
+    application.Render();
+
+    DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), expectValue, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    textureTrace.Reset();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualLoadFastTrackImageResourceReady(void)
+{
+  tet_infoline("Test worker thread uploading with Local URL");
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  propertyMap.Insert(DevelImageVisual::Property::FAST_TRACK_UPLOADING, true);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // EventThread with callback
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Check resource ready comes after
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualLoadFastTrackImageReload(void)
+{
+  tet_infoline("Test worker thread uploading with Local URL");
+  ToolkitTestApplication application;
+
+  Test::TextureUploadManager::InitalizeGraphicsController(application.GetGraphicsController());
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  propertyMap.Insert(DevelImageVisual::Property::FAST_TRACK_UPLOADING, true);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // EventThread without callback
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 30, false), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 0, TEST_LOCATION);
+
+  {
+    // TODO : There is no way to flush TextureUploadManager in test-application's Render() now.
+    // How can we make it? Should it be integration-api?
+    auto textureUploadManager = Dali::Devel::TextureUploadManager::Get();
+    DALI_TEST_EQUALS(textureUploadManager.ResourceUpload(), true, TEST_LOCATION);
+  }
+  // Render only without SendNotification(). And check whether glTexImage2D called or not.
+  application.Render();
+
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 1, TEST_LOCATION);
+
+  // Reload
+  Property::Map attributes;
+  DevelControl::DoAction(actor, Control::CONTROL_PROPERTY_END_INDEX + 1, DevelImageVisual::Action::RELOAD, attributes);
+
+  // EventThread with callback
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Check resource ready comes after
+  application.SendNotification();
+  application.Render();
+
+  // Check whether renderer count is 1 or not.
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualLoadFastTrackImagePlanes01(void)
+{
+#if 0 //< Do not open this UTC yet.
+  EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
+
+  ToolkitTestApplication application;
+
+  Test::TextureUploadManager::InitalizeGraphicsController(application.GetGraphicsController());
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_YUV420_IMAGE_FILE_NAME);
+  propertyMap.Insert(DevelImageVisual::Property::FAST_TRACK_UPLOADING, true);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // EventThread without callback
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 30, false), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 0, TEST_LOCATION);
+
+  {
+    // TODO : There is no way to flush TextureUploadManager in test-application's Render() now.
+    // How can we make it? Should it be integration-api?
+    auto textureUploadManager = Dali::Devel::TextureUploadManager::Get();
+    textureUploadManager.ResourceUpload();
+    application.Render();
+  }
+  // Render only without SendNotification(). And check whether glTexImage2D called or not.
+  application.Render();
+
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 3, TEST_LOCATION);
+
+  // Event thread don't know the result yet.
+  DALI_TEST_EQUALS(actor.IsResourceReady(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Check resource ready comes after
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+
+#else
+  DALI_TEST_CHECK(true);
+#endif
   END_TEST;
 }
