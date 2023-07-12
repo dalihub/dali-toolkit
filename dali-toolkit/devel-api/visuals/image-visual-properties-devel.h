@@ -158,6 +158,23 @@ enum Type
   MASKING_TYPE = ORIENTATION_CORRECTION + 12,
 
   /**
+   * @brief If true, uploads texture before ResourceReady signal is emitted. Otherwise uploads after texture load is completed.
+   * @details Name "fastTrackUploading", type Property::BOOLEAN
+   * If true, the upload happens without event-thread dependency, but the following need to be considered:
+   *  - Texture size is not valid until upload is fully complete.
+   *  - Texture cannot be cached (a new image is uploaded every time).
+   *  - Seamless visual change is not supported.
+   *  - The following, if set are also not supported and will be ignored:
+   *    - Alpha masking
+   *    - Synchronous loading
+   *    - Reload action
+   *    - Atlas loading
+   *    - Custom shader
+   * @note Used by the ImageVisual. The default is false.
+   */
+  FAST_TRACK_UPLOADING = ORIENTATION_CORRECTION + 13,
+
+  /**
    * @brief Whether to enable broken image in image visual.
    * Some of visual don't need to show broken image(ex. placeholder)
    * Disable broken image for these visuals.
