@@ -106,10 +106,12 @@ void VectorAnimationTask::Finalize()
   if(mAnimationFinishedCallback)
   {
     mVectorAnimationThread.RemoveEventTriggerCallback(mAnimationFinishedCallback.get());
+    mAnimationFinishedCallback.reset();
   }
   if(mLoadCompletedCallback)
   {
     mVectorAnimationThread.RemoveEventTriggerCallback(mLoadCompletedCallback.get());
+    mLoadCompletedCallback.reset();
   }
 
   mVectorRenderer.Finalize();
@@ -139,7 +141,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
     DALI_LOG_ERROR("VectorAnimationTask::Load: Load failed [%s]\n", mUrl.c_str());
     mLoadRequest = false;
     mLoadFailed  = true;
-    if(!synchronousLoading)
+    if(!synchronousLoading && mLoadCompletedCallback)
     {
       mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
     }
@@ -154,7 +156,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   mFrameDurationMicroSeconds = MICROSECONDS_PER_SECOND / mFrameRate;
 
   mLoadRequest = false;
-  if(!synchronousLoading)
+  if(!synchronousLoading && mLoadCompletedCallback)
   {
     mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
   }
