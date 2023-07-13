@@ -1,0 +1,12 @@
+prefix=@PREFIX@
+exec_prefix=@EXEC_PREFIX@
+apiversion=@DALI_PHYSICS_3D_VERSION@
+libdir=@LIB_DIR@
+includedir=@DEV_INCLUDE_PATH@
+
+Name: DALi Engine Physics Library
+Description: Dali Physics 3D library
+Version: ${apiversion}
+Requires: bullet3
+Libs: -L${libdir}
+Cflags: -I${includedir}

@@ -35,6 +35,7 @@ OPTION(INSTALL_DOXYGEN_DOC       "Install doxygen doc" ON)
 OPTION(CONFIGURE_AUTOMATED_TESTS "Configure automated tests" ON)
 OPTION(USE_DEFAULT_RESOURCE_DIR  "Whether to use the default resource folders. Otherwise set environment variables for DALI_IMAGE_DIR, DALI_SOUND_DIR, DALI_STYLE_DIR, DALI_STYLE_IMAGE_DIR and DALI_DATA_READ_ONLY_DIR" ON)
 OPTION(BUILD_SCENE3D             "Whether to build dali-scene3d." ON)
+OPTION(BUILD_PHYSICS             "Whether to build dali-physics." ON)
 
 IF( ENABLE_PKG_CONFIGURE )
   FIND_PACKAGE( PkgConfig REQUIRED )
@@ -218,19 +219,7 @@ ELSE()
   # Set up compiler flags and warnings
   ADD_COMPILE_OPTIONS( -Wno-ignored-qualifiers )
 
-  # TODO: Clang is a lot more strict with warnings, we should address
-  # those issues at some point.
-  # Matches "Clang" or "AppleClang"
-  IF( NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
-    ADD_COMPILE_OPTIONS( -Werror )
-  ENDIF()
-
   ADD_COMPILE_OPTIONS( -Wall -Wno-unused-parameter -Wno-float-equal )
-  ADD_COMPILE_OPTIONS( -Wall -Wno-unused-parameter -Wno-float-equal )
-  CHECK_CXX_COMPILER_FLAG(-Wno-class-memaccess HAVE_NO_CLASS_MEMACCESS)
-  IF (HAVE_NO_CLASS_MEMACCESS)
-    ADD_COMPILE_OPTIONS( -Wno-class-memaccess )
-  ENDIF()
 
   IF( ENABLE_COVERAGE OR "$ENV{CXXFLAGS}" MATCHES --coverage )
     ADD_COMPILE_OPTIONS( --coverage )
@@ -371,6 +360,23 @@ IF ( WIN32 )
 ENDIF()
 
 ADD_LIBRARY( ${name} ${LIBTYPE} ${SOURCES} )
+
+SET(CUSTOM_COMPILE_OPTIONS "")
+
+# TODO: Clang is a lot more strict with warnings, we should address
+# those issues at some point.
+# Matches "Clang" or "AppleClang"
+IF( NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
+  SET(CUSTOM_COMPILE_OPTIONS ${MY_COMPILE_OPTIONS} -Werror)
+ENDIF()
+
+CHECK_CXX_COMPILER_FLAG(-Wno-class-memaccess HAVE_NO_CLASS_MEMACCESS)
+IF (HAVE_NO_CLASS_MEMACCESS)
+  SET(CUSTOM_COMPILE_OPTIONS ${MY_COMPILE_OPTIONS} -Wno-class-memaccess)
+ENDIF()
+
+target_compile_options(${name} PRIVATE ${CUSTOM_COMPILE_OPTIONS})
+
 TARGET_LINK_LIBRARIES( ${name}
   ${DALICORE_LDFLAGS}
   ${DALIADAPTOR_LDFLAGS}
@@ -560,6 +566,9 @@ IF ( BUILD_SCENE3D )
   ADD_SUBDIRECTORY( ${CMAKE_CURRENT_SOURCE_DIR}/dali-scene3d )
 ENDIF()
 
+IF ( BUILD_PHYSICS )
+  ADD_SUBDIRECTORY( ${CMAKE_CURRENT_SOURCE_DIR}/dali-physics )
+ENDIF()
 
 # Build documentation if doxygen tool is available
 SET( doxygenEnabled OFF )
@@ -644,6 +653,7 @@ MESSAGE( STATUS "Vector Based Text Rendering:   " ${ENABLE_VECTOR_BASED_TEXT_REN
 MESSAGE( STATUS "Enable link test:              " ${ENABLE_LINK_TEST} )
 MESSAGE( STATUS "Configure automated tests:     " ${CONFIGURE_AUTOMATED_TESTS} )
 MESSAGE( STATUS "Build Dali Scene3D:            " ${BUILD_SCENE3D} )
+MESSAGE( STATUS "Build Dali Physics:            " ${BUILD_PHYSICS} )
 MESSAGE( STATUS "CXXFLAGS:                      " ${CMAKE_CXX_FLAGS} )
 MESSAGE( STATUS "LDFLAGS:                       " ${CMAKE_SHARED_LINKER_FLAGS_INIT}${CMAKE_SHARED_LINKER_FLAGS} )
 

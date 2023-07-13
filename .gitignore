@@ -40,6 +40,8 @@ install_manifest.txt
 /docs/generated/*
 /build/tizen/doc
 /build/tizen/.cov
+/build/tizen/CPack*.cmake
+/build/tizen/dali-physics/*
 /build/desktop
 /packaging/home*
 compile_commands.json

@@ -120,6 +120,46 @@ Requires:   %{dali2_scene3d} = %{version}-%{release}
 %description -n %{dali2_scene3d}-devel
 Development components for dali-scene3d.
 
+##############################
+# dali-physics-2d
+##############################
+%define dali2_physics2d dali2-physics-2d
+%package -n %{dali2_physics2d}
+Summary:    Physics library 2D
+Group:      System/Libraries
+License:    Apache-2.0
+
+%description -n %{dali2_physics2d}
+Provides functionality for 2D physics simulation. See README.md for more details.
+
+%package -n %{dali2_physics2d}-devel
+Summary:    Development components for dali2-physics-2d
+Group:      Development/Building
+Requires:   %{dali2_physics2d} = %{version}-%{release}
+
+%description -n %{dali2_physics2d}-devel
+Development components for dali2-physics-2d.
+
+##############################
+# dali-physics-3d
+##############################
+%define dali2_physics3d dali2-physics-3d
+%package -n %{dali2_physics3d}
+Summary:    Physics library 3D
+Group:      System/Libraries
+License:    Apache-2.0
+
+%description -n %{dali2_physics3d}
+Provides functionality for 3D physics simulation. See README.md for more details.
+
+%package -n %{dali2_physics3d}-devel
+Summary:    Development components for dali2-physics-3d
+Group:      Development/Building
+Requires:   %{dali2_physics3d} = %{version}-%{release}
+
+%description -n %{dali2_physics3d}-devel
+Development components for dali2-physics-3d.
+
 %define dali_data_rw_dir            %TZ_SYS_SHARE/dali/
 %define dali_data_ro_dir            %TZ_SYS_RO_SHARE/dali/
 
@@ -495,3 +535,36 @@ esac
 %{_includedir}/dali-scene3d/public-api/*
 %{_includedir}/dali-scene3d/dali-scene3d.h
 %{_libdir}/pkgconfig/dali2-scene3d.pc
+
+%files -n %{dali2_physics2d}
+%if 0%{?enable_dali_smack_rules}
+%manifest dali-physics-2d.manifest-smack
+%else
+%manifest dali-physics-2d.manifest
+%endif
+%defattr(-,root,root,-)
+%{_libdir}/libchipmunk.so*
+%license LICENSE
+
+%files -n %{dali2_physics2d}-devel
+%defattr(-,root,root,-)
+%{_includedir}/chipmunk/*
+%{_libdir}/pkgconfig/dali2-physics-2d.pc
+%{_libdir}/pkgconfig/chipmunk2d.pc
+
+%files -n %{dali2_physics3d}
+%if 0%{?enable_dali_smack_rules}
+%manifest dali-physics-3d.manifest-smack
+%else
+%manifest dali-physics-3d.manifest
+%endif
+%defattr(-,root,root,-)
+%{_libdir}/libbullet3.so*
+%license LICENSE
+
+%files -n %{dali2_physics3d}-devel
+%defattr(-,root,root,-)
+%{_includedir}/bullet/*
+%{_libdir}/pkgconfig/dali2-physics-3d.pc
+%{_libdir}/pkgconfig/bullet3.pc
+
