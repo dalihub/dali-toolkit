@@ -755,22 +755,23 @@ void TextureManager::RequestRemove(const TextureManager::TextureId& textureId, T
   // Queue to remove.
   if(textureId != INVALID_TEXTURE_ID)
   {
-    if(observer)
+    TextureCacheIndex textureCacheIndex = mTextureCacheManager.GetCacheIndexFromId(textureId);
+    if(textureCacheIndex != INVALID_CACHE_INDEX)
     {
-      // Remove observer from cached texture info
-      TextureCacheIndex textureCacheIndex = mTextureCacheManager.GetCacheIndexFromId(textureId);
-      if(textureCacheIndex != INVALID_CACHE_INDEX)
+      if(observer)
       {
+        // Remove observer from cached texture info
         TextureInfo& textureInfo(mTextureCacheManager[textureCacheIndex]);
         RemoveTextureObserver(textureInfo, observer);
       }
-    }
-    mRemoveQueue.PushBack(textureId);
 
-    if(!mRemoveProcessorRegistered && Adaptor::IsAvailable())
-    {
-      mRemoveProcessorRegistered = true;
-      Adaptor::Get().RegisterProcessor(*this, true);
+      mRemoveQueue.PushBack(textureId);
+
+      if(!mRemoveProcessorRegistered && Adaptor::IsAvailable())
+      {
+        mRemoveProcessorRegistered = true;
+        Adaptor::Get().RegisterProcessor(*this, true);
+      }
     }
   }
 }

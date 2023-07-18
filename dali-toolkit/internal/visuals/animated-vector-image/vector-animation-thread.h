@@ -95,7 +95,7 @@ protected:
 
 private:
   /**
-   * Rasterizes the tasks.
+   * @brief Rasterizes the tasks.
    */
   void Rasterize();
 
@@ -103,6 +103,11 @@ private:
    * @brief Called when the event callback is triggered.
    */
   void OnEventCallbackTriggered();
+
+  /**
+   * @brief Gets next event callback to process.
+   */
+  CallbackBase* GetNextEventCallback();
 
   /**
    * @brief The thread to sleep until the next frame time.
