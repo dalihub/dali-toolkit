@@ -98,11 +98,11 @@ void ParticleRenderer::CreateShader()
       char key[256];
       if(streamName.empty())
       {
-        sprintf(key, "aStreamAttr_%d", i);
+        snprintf(key, sizeof(key), "aStreamAttr_%d", i);
       }
       else
       {
-        sprintf(key, "%s", streamName.c_str());
+        snprintf(key, sizeof(key), "%s", streamName.c_str());
       }
       streamAtttributes.Add(key, ATTR_TYPES[dataTypeIndex]);
 
