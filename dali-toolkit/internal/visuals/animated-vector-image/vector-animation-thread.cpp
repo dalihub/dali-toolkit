@@ -263,25 +263,15 @@ void VectorAnimationThread::Rasterize()
 
 void VectorAnimationThread::OnEventCallbackTriggered()
 {
-  while(CallbackBase* callback = GetNextEventCallback())
-  {
-    CallbackBase::Execute(*callback);
-  }
-}
-
-CallbackBase* VectorAnimationThread::GetNextEventCallback()
-{
   ConditionalWait::ScopedLock lock(mConditionalWait);
 
-  if(!mTriggerEventCallbacks.empty())
+  for(auto&& iter : mTriggerEventCallbacks)
   {
-    auto          iter     = mTriggerEventCallbacks.begin();
-    CallbackBase* callback = *iter;
-    mTriggerEventCallbacks.erase(iter);
-    return callback;
+    CallbackBase::Execute(*iter);
   }
+
+  mTriggerEventCallbacks.clear();
   mEventTriggered = false;
-  return nullptr;
 }
 
 VectorAnimationThread::SleepThread::SleepThread(CallbackBase* callback)
