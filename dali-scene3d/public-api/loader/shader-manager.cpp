@@ -239,7 +239,7 @@ bool ShaderManager::AddLight(Scene3D::Light light)
     return false;
   }
 
-  int32_t lightIndex = mImpl->mLights.size();
+  uint32_t lightIndex = mImpl->mLights.size();
   mImpl->mLights.push_back(light);
 
   for(auto&& shader : mImpl->mShaders)
@@ -301,8 +301,7 @@ void ShaderManager::SetLightConstraintToShader(uint32_t lightIndex, Dali::Shader
   std::string lightDirectionPropertyName(Scene3D::Internal::Light::GetLightDirectionUniformName());
   lightDirectionPropertyName += "[" + std::to_string(lightIndex) + "]";
   auto             lightDirectionPropertyIndex = shader.RegisterProperty(lightDirectionPropertyName, Vector3::ZAXIS);
-  Dali::Constraint lightDirectionConstraint    = Dali::Constraint::New<Vector3>(shader, lightDirectionPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
-                                                                             { output = inputs[0]->GetQuaternion().Rotate(Vector3::ZAXIS); });
+  Dali::Constraint lightDirectionConstraint    = Dali::Constraint::New<Vector3>(shader, lightDirectionPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs) { output = inputs[0]->GetQuaternion().Rotate(Vector3::ZAXIS); });
   lightDirectionConstraint.AddSource(Source{mImpl->mLights[lightIndex], Dali::Actor::Property::WORLD_ORIENTATION});
   lightDirectionConstraint.ApplyPost();
   lightDirectionConstraint.SetTag(INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
@@ -310,8 +309,7 @@ void ShaderManager::SetLightConstraintToShader(uint32_t lightIndex, Dali::Shader
   std::string lightColorPropertyName(Scene3D::Internal::Light::GetLightColorUniformName());
   lightColorPropertyName += "[" + std::to_string(lightIndex) + "]";
   auto             lightColorPropertyIndex = shader.RegisterProperty(lightColorPropertyName, Vector3(Color::WHITE));
-  Dali::Constraint lightColorConstraint    = Dali::Constraint::New<Vector3>(shader, lightColorPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
-                                                                         { output = Vector3(inputs[0]->GetVector4()); });
+  Dali::Constraint lightColorConstraint    = Dali::Constraint::New<Vector3>(shader, lightColorPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs) { output = Vector3(inputs[0]->GetVector4()); });
   lightColorConstraint.AddSource(Source{mImpl->mLights[lightIndex], Dali::Actor::Property::COLOR});
   lightColorConstraint.ApplyPost();
   lightColorConstraint.SetTag(INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
