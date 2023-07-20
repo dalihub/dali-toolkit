@@ -557,6 +557,14 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
       }
       break;
     }
+    case DevelAnimatedVectorImageVisual::Action::FLUSH:
+    {
+      if(DALI_LIKELY(!mCoreShutdown))
+      {
+        SendAnimationData();
+      }
+      break;
+    }
   }
 
   TriggerVectorRasterization();
