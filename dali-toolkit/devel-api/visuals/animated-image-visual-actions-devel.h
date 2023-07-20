@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_IMAGE_VISUAL_ACTIONS_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  *
  */
 #include <dali-toolkit/devel-api/toolkit-action-index-ranges.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 
 namespace Dali
 {
@@ -35,10 +36,12 @@ namespace Action
  */
 enum Type
 {
-  PLAY = VISUAL_ACTION_START_INDEX, ///< Play the animated GIF. This is also Default playback mode.
-  PAUSE,                            ///< Pause the animated GIF.
-  STOP,                             ///< Stop the animated GIF.
-  JUMP_TO                           ///< Jump to the specified frame. Property::INTEGER value should be passed.
+  PLAY = DevelImageVisual::Action::IMAGE_VISUAL_ACTION_END_INDEX, ///< Play the animated GIF. This is also Default playback mode.
+  PAUSE,                                                          ///< Pause the animated GIF.
+  STOP,                                                           ///< Stop the animated GIF.
+  JUMP_TO,                                                        ///< Jump to the specified frame. Property::INTEGER value should be passed.
+
+  ANIMATED_IMAGE_VISUAL_ACTION_END_INDEX = DevelImageVisual::Action::IMAGE_VISUAL_ACTION_END_INDEX + 1000  ///< End of animated image visual action index.
 };
 
 } // namespace Action
