@@ -55,6 +55,7 @@ if(BUILD_SHARED)
       SOVERSION ${CHIPMUNK_VERSION_MAJOR}
       VERSION ${CHIPMUNK_VERSION})
   endif(NOT ANDROID)
+  target_compile_options(chipmunk PRIVATE -fvisibility=default)
   if(ANDROID OR UNIX)
     # need to explicitly link to the math library because the CMake/Android toolchains may not do it automatically
     target_link_libraries(chipmunk m ${COVERAGE})
@@ -62,9 +63,11 @@ if(BUILD_SHARED)
   if(ANDROID)
     target_link_libraries(chipmunk ${LOGLIB})
   endif(ANDROID)
-  install(TARGETS chipmunk RUNTIME DESTINATION ${BIN_INSTALL_DIR}
+  install(TARGETS chipmunk EXPORT chipmunk-targets
+                           RUNTIME DESTINATION ${BIN_INSTALL_DIR}
                            LIBRARY DESTINATION ${LIB_INSTALL_DIR}
-                           ARCHIVE DESTINATION ${LIB_INSTALL_DIR})
+                           ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+                           )
 endif(BUILD_SHARED)
 
 if(BUILD_STATIC)
@@ -78,12 +81,13 @@ if(BUILD_STATIC)
   endif(MSVC)
   # Sets chipmunk_static to output "libchipmunk.a" not "libchipmunk_static.a"
   set_target_properties(chipmunk_static PROPERTIES OUTPUT_NAME chipmunk)
+  target_compile_options(chipmunk PRIVATE -fvisibility=default)
   target_link_libraries(chipmunk m ${COVERAGE})
   if(ANDROID)
     target_link_libraries(chipmunk ${LOGLIB})
   endif(ANDROID)
   if(INSTALL_STATIC)
-    install(TARGETS chipmunk_static ARCHIVE DESTINATION ${LIB_INSTALL_DIR})
+    install(TARGETS chipmunk_static EXPORT chipmunk-targets ARCHIVE DESTINATION ${LIB_INSTALL_DIR})
   endif(INSTALL_STATIC)
 endif(BUILD_STATIC)
 
@@ -91,6 +95,21 @@ if(BUILD_SHARED OR INSTALL_STATIC)
   # FIXME: change to PUBLIC_HEADER to allow building frameworks
   install(FILES ${chipmunk_public_header} DESTINATION include/chipmunk)
   install(FILES ${chipmunk_constraint_header} DESTINATION include/chipmunk/constraints)
+
+  if(INSTALL_CMAKE_MODULES)
+    install(
+      EXPORT chipmunk-targets
+      NAMESPACE chipmunk::
+      FILE chipmunk-targets.cmake
+      DESTINATION share/chipmunk
+    )
+
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/chipmunk-config.cmake "
+      include(CMakeFindDependencyMacro)
+      include(\${CMAKE_CURRENT_LIST_DIR}/chipmunk-targets.cmake)
+    ")
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/chipmunk-config.cmake DESTINATION share/chipmunk)
+  endif()
 endif(BUILD_SHARED OR INSTALL_STATIC)
 
 if (ENABLE_PKG_CONFIGURE)
