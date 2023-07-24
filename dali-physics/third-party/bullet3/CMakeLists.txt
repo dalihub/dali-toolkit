@@ -21,6 +21,9 @@ endif()
 # Build options
 option(BULLET3_BUILD_SHARED "Build bullet3 as a shared library" ON)
 
+set(prefix ${CMAKE_INSTALL_PREFIX})
+option(ENABLE_PKG_CONFIGURE "Use pkgconfig" ON)
+
 ADD_DEFINITIONS(-DB3_USE_CLEW)
 
 if (WIN32)
@@ -95,20 +98,25 @@ endif()
 
 target_link_libraries(bullet3 ${COVERAGE})
 
-# Installation
-set (LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
-set (LIB_DESTINATION "lib${LIB_SUFFIX}" CACHE STRING "Library directory name")
-## the following are directories where stuff will be installed to
-set(INCLUDE_INSTALL_DIR "include/bullet/" CACHE PATH "The subdirectory to the header prefix")
-set(PKGCONFIG_INSTALL_PREFIX "lib${LIB_SUFFIX}/pkgconfig/" CACHE STRING "Base directory for pkgconfig files")
-if(NOT MSVC)
-  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/bullet3.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/bullet3.pc @ONLY)
-install(
-  FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/bullet3.pc
-  DESTINATION
-  ${PKGCONFIG_INSTALL_PREFIX})
-endif(NOT MSVC)
+if(ENABLE_PKG_CONFIGURE)
+    find_package(PkgConfig REQUIRED)
+
+    set( LIB_DIR $ENV{libdir} )
+    if( NOT LIB_DIR )
+        set( LIB_DIR ${CMAKE_INSTALL_LIBDIR} )
+    endif()
+    if( NOT LIB_DIR )
+        set( LIB_DIR ${prefix}/lib )
+    endif()
+
+    set(bullet_pkg_cfg_file bullet3.pc)
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/${bullet_pkg_cfg_file}.cmake ${bullet_pkg_cfg_file} @ONLY)
+
+    # Installation
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${bullet_pkg_cfg_file}
+        DESTINATION ${LIB_DIR}/pkgconfig
+    )
+endif(ENABLE_PKG_CONFIGURE)
 
 install(
     TARGETS bullet3

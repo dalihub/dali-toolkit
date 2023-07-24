@@ -94,7 +94,7 @@ if(BUILD_SHARED OR INSTALL_STATIC)
 endif(BUILD_SHARED OR INSTALL_STATIC)
 
 if (ENABLE_PKG_CONFIGURE)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${chipmunk_pkg_cfg_file} ${CMAKE_CURRENT_BINARY_DIR}/${chipmunk_pkg_cfg_file}
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${chipmunk_pkg_cfg_file}
         DESTINATION ${LIB_DIR}/pkgconfig
     )
 endif()
