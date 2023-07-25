@@ -1,0 +1,12 @@
+prefix=@PREFIX@
+exec_prefix=@EXEC_PREFIX@
+apiversion=@DALI_PHYSICS_2D_VERSION@
+libdir=@LIB_DIR@
+includedir=@DEV_INCLUDE_PATH@
+
+Name: DALi Engine Physics Library
+Description: Dali Physics 2D library
+Version: ${apiversion}
+Requires: chipmunk2d
+Libs: -L${libdir}
+Cflags: -I${includedir}
