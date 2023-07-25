@@ -27,7 +27,6 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <cstring> // for strlen()
 
@@ -200,8 +199,6 @@ ImageVisual::~ImageVisual()
     {
       RemoveTexture();
     }
-
-    ResetFastTrackLoadingTask();
   }
 }
 
@@ -280,10 +277,6 @@ void ImageVisual::DoSetProperties(const Property::Map& propertyMap)
       else if(keyValue.first == ORIENTATION_CORRECTION_NAME)
       {
         DoSetProperty(Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION, keyValue.second);
-      }
-      else if(keyValue.first == FAST_TRACK_UPLOADING_NAME)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::FAST_TRACK_UPLOADING, keyValue.second);
       }
     }
   }
@@ -469,16 +462,6 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
       }
       break;
     }
-
-    case Toolkit::DevelImageVisual::Property::FAST_TRACK_UPLOADING:
-    {
-      bool fastTrackUploading = false;
-      if(value.Get(fastTrackUploading))
-      {
-        mUseFastTrackUploading = fastTrackUploading;
-      }
-      break;
-    }
   }
 }
 
@@ -638,74 +621,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
   bool synchronousLoading = IsSynchronousLoadingRequired();
   bool loadingStatus;
 
-  // Remove previous loading task.
-  ResetFastTrackLoadingTask();
-
-  // Rare case. If someone call LoadTexture during fast track loading task running, (Ex : Action::RELOAD)
-  // we should remove previously added renderer now.
-  if(mRendererAdded)
-  {
-    Actor actor = mPlacementActor.GetHandle();
-    if(actor)
-    {
-      actor.RemoveRenderer(mImpl->mRenderer);
-      mRendererAdded = false;
-    }
-  }
-
-  /**
-   * @brief Check whether FastTrackUploading is avaliable or not.
-   * @return True if we can use fast track uploading feature. False otherwise.
-   */
-  auto IsFastTrackUploadingAvailable = [&]() {
-    if(mUseFastTrackUploading &&
-       mLoadPolicy == Toolkit::ImageVisual::LoadPolicy::ATTACHED &&
-       mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED &&
-       forceReload == TextureManager::ReloadPolicy::CACHED &&
-       (mImageUrl.GetProtocolType() == VisualUrl::LOCAL || mImageUrl.GetProtocolType() == VisualUrl::REMOTE) &&
-       !synchronousLoading &&
-       !atlasing &&
-       !mImpl->mCustomShader &&
-       !(mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()))
-    {
-      return true;
-    }
-    else if(mUseFastTrackUploading)
-    {
-      DALI_LOG_DEBUG_INFO("FastTrack : Fail to load fast track. mUrl : [%s]%s%s%s%s%s%s%s%s\n",
-                          mImageUrl.GetUrl().c_str(),
-                          (mLoadPolicy != Toolkit::ImageVisual::LoadPolicy::ATTACHED) ? "/ mLoadPolicy != ATTACHED" : "",
-                          (mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::DETACHED) ? "/ mReleasePolicy != DETACHED" : "",
-                          (forceReload != TextureManager::ReloadPolicy::CACHED) ? "/ forceReload != CACHED" : "",
-                          (!(mImageUrl.GetProtocolType() == VisualUrl::LOCAL || mImageUrl.GetProtocolType() == VisualUrl::REMOTE)) ? "/ url is not image" : "",
-                          (synchronousLoading) ? "/ synchronousLoading" : "",
-                          (atlasing) ? "/ atlasing" : "",
-                          (mImpl->mCustomShader) ? "/ use customs shader" : "",
-                          (mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()) ? "/ use masking url" : "");
-    }
-    return false;
-  };
-
-  if(IsFastTrackUploadingAvailable())
-  {
-    // Enable PremultipliedAlpha first.
-    EnablePreMultipliedAlpha(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
-
-    // Set new TextureSet with fast track loading task
-    mFastTrackLoadingTask = new FastTrackLoadingTask(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode, mOrientationCorrection, preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, MakeCallback(this, &ImageVisual::FastLoadComplete));
-
-    TextureSet textureSet = TextureSet::New();
-    textureSet.SetTexture(0u, mFastTrackLoadingTask->mTexture);
-    mImpl->mRenderer.SetTextures(textureSet);
-
-    Dali::AsyncTaskManager::Get().AddTask(mFastTrackLoadingTask);
-
-    mLoadState = TextureManager::LoadState::LOADING;
-  }
-  else
-  {
-    textures = textureManager.LoadTexture(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mTextureId, atlasRect, mAtlasRectSize, atlasing, loadingStatus, textureObserver, atlasUploadObserver, atlasManager, mOrientationCorrection, forceReload, preMultiplyOnLoad);
-  }
+  textures = textureManager.LoadTexture(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mTextureId, atlasRect, mAtlasRectSize, atlasing, loadingStatus, textureObserver, atlasUploadObserver, atlasManager, mOrientationCorrection, forceReload, preMultiplyOnLoad);
 
   if(textures)
   {
@@ -839,7 +755,6 @@ void ImageVisual::DoSetOnScene(Actor& actor)
   if(mLoadState == TextureManager::LoadState::LOAD_FINISHED)
   {
     actor.AddRenderer(mImpl->mRenderer);
-    mRendererAdded = true;
     mPlacementActor.Reset();
 
     // Image loaded and ready to display
@@ -856,19 +771,9 @@ void ImageVisual::DoSetOnScene(Actor& actor)
 
     mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
     actor.AddRenderer(mImpl->mRenderer);
-    mRendererAdded = true;
-
     mPlacementActor.Reset();
 
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
-  }
-  else
-  {
-    if(mFastTrackLoadingTask)
-    {
-      actor.AddRenderer(mImpl->mRenderer);
-      mRendererAdded = true;
-    }
   }
 }
 
@@ -878,8 +783,6 @@ void ImageVisual::DoSetOffScene(Actor& actor)
 
   // Image release is dependent on the ReleasePolicy, renderer is removed.
   actor.RemoveRenderer(mImpl->mRenderer);
-  mRendererAdded = false;
-
   if(mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED)
   {
     RemoveTexture(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
@@ -929,8 +832,6 @@ void ImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, mLoadPolicy);
   map.Insert(Toolkit::ImageVisual::Property::RELEASE_POLICY, mReleasePolicy);
   map.Insert(Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION, mOrientationCorrection);
-
-  map.Insert(Toolkit::DevelImageVisual::Property::FAST_TRACK_UPLOADING, mUseFastTrackUploading);
 }
 
 void ImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -986,7 +887,6 @@ void ImageVisual::UploadCompleted()
   {
     mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, mAtlasRect);
     actor.AddRenderer(mImpl->mRenderer);
-    mRendererAdded = true;
     // reset the weak handle so that the renderer only get added to actor once
     mPlacementActor.Reset();
   }
@@ -994,65 +894,6 @@ void ImageVisual::UploadCompleted()
   // Image loaded
   ResourceReady(Toolkit::Visual::ResourceStatus::READY);
   mLoadState = TextureManager::LoadState::LOAD_FINISHED;
-}
-
-// From FastTrackLoadingTask
-void ImageVisual::FastLoadComplete(FastTrackLoadingTaskPtr task)
-{
-  Toolkit::Visual::ResourceStatus resourceStatus;
-
-  DALI_ASSERT_ALWAYS(task.Get() == mFastTrackLoadingTask.Get() && "Task was not canceled successfully!");
-  DALI_ASSERT_ALWAYS(mRendererAdded && "Some FastTrack logic missed!");
-
-  Actor actor = mPlacementActor.GetHandle();
-
-  if(mFastTrackLoadingTask && mFastTrackLoadingTask->mLoadSuccess)
-  {
-    resourceStatus = Toolkit::Visual::ResourceStatus::READY;
-    mLoadState     = TextureManager::LoadState::LOAD_FINISHED;
-    if(mFastTrackLoadingTask->mLoadYuvImage)
-    {
-      // TODO : Implement here.
-    }
-    else
-    {
-      // TODO : Implement here.
-    }
-
-    // Change premultiplied alpha flag after change renderer.
-    EnablePreMultipliedAlpha(mFastTrackLoadingTask->mPremultiplied);
-  }
-  else
-  {
-    resourceStatus    = Toolkit::Visual::ResourceStatus::FAILED;
-    mLoadState        = TextureManager::LoadState::LOAD_FAILED;
-    Vector2 imageSize = Vector2::ZERO;
-    if(actor)
-    {
-      imageSize           = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-      mPlacementActorSize = imageSize;
-    }
-    else
-    {
-      imageSize = mPlacementActorSize;
-    }
-
-    // Change renderer as broken.
-    if(actor)
-    {
-      actor.RemoveRenderer(mImpl->mRenderer);
-    }
-    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
-    if(actor)
-    {
-      actor.AddRenderer(mImpl->mRenderer);
-    }
-  }
-
-  ResetFastTrackLoadingTask();
-
-  // Signal to observers ( control ) that resources are ready. Must be all resources.
-  ResourceReady(resourceStatus);
 }
 
 // From Texture Manager
@@ -1111,7 +952,6 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
     if(actor)
     {
       actor.AddRenderer(mImpl->mRenderer);
-      mRendererAdded = true;
       // reset the weak handle so that the renderer only get added to actor once
       mPlacementActor.Reset();
     }
@@ -1178,8 +1018,6 @@ void ImageVisual::RemoveTexture()
   }
   else
   {
-    ResetFastTrackLoadingTask();
-
     Vector4         atlasRect(0.f, 0.f, 1.f, 1.f);
     Property::Index index = mImpl->mRenderer.GetPropertyIndex(ATLAS_RECT_UNIFORM_NAME);
     if(index != Property::INVALID_INDEX)
@@ -1349,15 +1187,6 @@ void ImageVisual::CheckMaskTexture()
       mMaskingData->mMaskImageLoadingFailed = maskLoadFailed;
       UpdateShader();
     }
-  }
-}
-
-void ImageVisual::ResetFastTrackLoadingTask()
-{
-  if(mFastTrackLoadingTask)
-  {
-    Dali::AsyncTaskManager::Get().RemoveTask(mFastTrackLoadingTask);
-    mFastTrackLoadingTask.Reset();
   }
 }
 
