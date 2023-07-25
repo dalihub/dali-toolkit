@@ -155,23 +155,7 @@ enum Type
    * So we change its value to MASKING_ON_RENDERING even if the visual sets the MASKING_TYPE as MASKING_ON_LOADING when it uses external texture.
    * @note It is used in the ImageVisual and AnimatedImageVisual. The default is MASKING_ON_LOADING.
    */
-  MASKING_TYPE = ORIENTATION_CORRECTION + 12,
-
-  /**
-   * @brief Whether to uploading texture before ResourceReady signal emit or after texture load completed time.
-   * @details Name "fastTrackUploading", type Property::BOOLEAN.
-   * If we use fast track uploading feature, It can upload texture without event-thead dependency. But also,
-   *  - Texture size is invalid until upload completed.
-   *  - Texture cannot be cached (We always try to load new image).
-   *  - Seamless visual change didn't supported.
-   *  - Alpha masking didn't supported. If you try, It will load as normal case.
-   *  - Synchronous loading didn't supported. If you try, It will load as normal case.
-   *  - Reload action didn't supported. If you try, It will load as normal case.
-   *  - Atlas loading didn't supported. If you try, It will load as normal case.
-   *  - Custom shader didn't supported. If you try, It will load as normal case.
-   * @note It is used in the ImageVisual. The default is false.
-   */
-  FAST_TRACK_UPLOADING = ORIENTATION_CORRECTION + 13
+  MASKING_TYPE = ORIENTATION_CORRECTION + 12
 };
 
 } //namespace Property

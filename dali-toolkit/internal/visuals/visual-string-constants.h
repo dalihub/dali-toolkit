@@ -107,7 +107,6 @@ extern const char* const ALPHA_MASK_URL;
 extern const char* const REDRAW_IN_SCALING_DOWN_NAME;
 extern const char* const MASKING_TYPE_NAME;
 extern const char* const MASK_TEXTURE_RATIO_NAME;
-extern const char* const FAST_TRACK_UPLOADING_NAME;
 
 // Text visual
 extern const char* const TEXT_PROPERTY;
