@@ -49,6 +49,7 @@ static constexpr std::string_view TOKEN_ROOT                = "ROOT";
 static constexpr std::string_view TOKEN_MOTION              = "MOTION";
 static constexpr std::string_view PROPERTY_NAME_POSITION    = "position";
 static constexpr std::string_view PROPERTY_NAME_ORIENTATION = "orientation";
+static constexpr std::string_view TOKEN_OPENING_BRACE       = "{";
 static constexpr std::string_view TOKEN_CLOSING_BRACE       = "}";
 
 enum class Channel
@@ -87,9 +88,10 @@ void trim(std::string& s)
           s.end());
 }
 
-void ParseHierarchy(std::istream& file, std::shared_ptr<Joint>& joint)
+bool ParseHierarchy(std::istream& file, std::shared_ptr<Joint>& joint)
 {
   std::string line;
+  bool        braceExist = false;
   while(std::getline(file, line))
   {
     trim(line);
@@ -142,24 +144,68 @@ void ParseHierarchy(std::istream& file, std::shared_ptr<Joint>& joint)
       joint->children.push_back(child);
       std::getline(stream, token, ' ');
       child->name = token;
-      ParseHierarchy(file, child);
+
+      if(DALI_UNLIKELY(!ParseHierarchy(file, child)))
+      {
+        return false;
+      }
     }
     else if(line == TOKEN_END_SITE.data())
     {
+      bool braceExistEndSite = false;
       while(std::getline(file, line))
       {
         trim(line);
-        if(line == TOKEN_CLOSING_BRACE.data())
+        if(line == TOKEN_OPENING_BRACE.data())
         {
+          if(DALI_UNLIKELY(braceExistEndSite))
+          {
+            DALI_LOG_ERROR("Parsing error : Joint[%s] End Site opening brace not matched\n", joint->name.c_str());
+            return false;
+          }
+          braceExistEndSite = true;
+        }
+        else if(line == TOKEN_CLOSING_BRACE.data())
+        {
+          if(DALI_UNLIKELY(!braceExistEndSite))
+          {
+            DALI_LOG_ERROR("Parsing error : Joint[%s] End Site closing brace not matched\n", joint->name.c_str());
+            return false;
+          }
           break;
         }
       }
+      if(DALI_UNLIKELY(!braceExistEndSite))
+      {
+        DALI_LOG_ERROR("Parsing error : Joint[%s] End Site opening brace not exist\n", joint->name.c_str());
+        return false;
+      }
+    }
+    else if(line == TOKEN_OPENING_BRACE.data())
+    {
+      if(DALI_UNLIKELY(braceExist))
+      {
+        DALI_LOG_ERROR("Parsing error : Joint[%s] opening brace not matched\n", joint->name.c_str());
+        return false;
+      }
+      braceExist = true;
     }
     else if(token == TOKEN_CLOSING_BRACE.data())
     {
+      if(DALI_UNLIKELY(!braceExist))
+      {
+        DALI_LOG_ERROR("Parsing error : Joint[%s] closing brace not matched\n", joint->name.c_str());
+        return false;
+      }
       break;
     }
   }
+  if(DALI_UNLIKELY(!braceExist))
+  {
+    DALI_LOG_ERROR("Parsing error : Joint[%s] opening brace not exist\n", joint->name.c_str());
+    return false;
+  }
+  return true;
 }
 
 void MakeList(std::shared_ptr<Joint>& joint, std::vector<std::shared_ptr<Joint>>& jointList)
@@ -171,7 +217,7 @@ void MakeList(std::shared_ptr<Joint>& joint, std::vector<std::shared_ptr<Joint>>
   }
 }
 
-void ParseMotion(std::istream& file, std::shared_ptr<Joint>& hierarchy, uint32_t& frameCount, float& frameTime)
+bool ParseMotion(std::istream& file, std::shared_ptr<Joint>& hierarchy, uint32_t& frameCount, float& frameTime)
 {
   std::vector<std::shared_ptr<Joint>> jointList;
   MakeList(hierarchy, jointList);
@@ -198,10 +244,33 @@ void ParseMotion(std::istream& file, std::shared_ptr<Joint>& hierarchy, uint32_t
     }
   }
 
+  if(DALI_UNLIKELY(!frameCountLoaded))
+  {
+    DALI_LOG_ERROR("Parsing error : Frames not exist!\n");
+    return false;
+  }
+  if(DALI_UNLIKELY(!frameTimeLoaded))
+  {
+    DALI_LOG_ERROR("Parsing error : Frame Time not exist!\n");
+    return false;
+  }
+
+  uint32_t loadedFrameCount = 0u;
+
   while(std::getline(file, line))
   {
     trim(line);
+    if(DALI_UNLIKELY(line.empty()))
+    {
+      continue;
+    }
     std::istringstream stream(line);
+    if(DALI_UNLIKELY(++loadedFrameCount > frameCount))
+    {
+      // Parse failed. Just skip decoding, and get the number of line for debug.
+      continue;
+    }
+
     for(auto&& joint : jointList)
     {
       Vector3    translation;
@@ -243,11 +312,21 @@ void ParseMotion(std::istream& file, std::shared_ptr<Joint>& hierarchy, uint32_t
       joint->rotations.push_back(rotation[2] * rotation[0] * rotation[1]);
     }
   }
+
+  if(DALI_UNLIKELY(loadedFrameCount != frameCount))
+  {
+    DALI_LOG_ERROR("Parsing error : Motion frame count not matched! expect : %u, loaded : %u\n", frameCount, loadedFrameCount);
+    return false;
+  }
+
+  return true;
 }
 
 bool ParseBvh(std::istream& file, uint32_t& frameCount, float& frameTime, std::shared_ptr<Joint>& rootJoint)
 {
   std::string line;
+  bool        parseHierarchy = false;
+  bool        parseMotion    = false;
   while(std::getline(file, line))
   {
     trim(line);
@@ -267,17 +346,17 @@ bool ParseBvh(std::istream& file, uint32_t& frameCount, float& frameTime, std::s
         {
           std::getline(stream, token, ' ');
           rootJoint->name = token;
-          ParseHierarchy(file, rootJoint);
+          parseHierarchy  = ParseHierarchy(file, rootJoint);
           break;
         }
       }
     }
     if(token == TOKEN_MOTION.data())
     {
-      ParseMotion(file, rootJoint, frameCount, frameTime);
+      parseMotion = ParseMotion(file, rootJoint, frameCount, frameTime);
     }
   }
-  return true;
+  return parseHierarchy && parseMotion;
 }
 
 AnimationDefinition GenerateAnimation(const std::string& animationName, std::shared_ptr<Joint>& hierarchy, uint32_t frameCount, float frameTime, const Vector3& scale)
