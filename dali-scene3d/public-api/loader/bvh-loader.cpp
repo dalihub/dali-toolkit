@@ -181,7 +181,7 @@ bool ParseHierarchy(std::istream& file, std::shared_ptr<Joint>& joint)
         return false;
       }
     }
-    else if(line == TOKEN_OPENING_BRACE.data())
+    else if(token == TOKEN_OPENING_BRACE.data())
     {
       if(DALI_UNLIKELY(braceExist))
       {
