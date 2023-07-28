@@ -1047,7 +1047,7 @@ void TextureManager::AsyncLoadComplete(const TextureManager::TextureId& textureI
     }
     else
     {
-      RequestRemove(textureInfo.textureId, nullptr);
+      Remove(textureInfo.textureId);
     }
   }
 }
