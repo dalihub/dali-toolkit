@@ -8,7 +8,7 @@ set(${name}_VERSION_MINOR 0)
 set(${name}_VERSION_PATCH 0)
 set(${name}_VERSION ${${name}_VERSION_MAJOR}.${${name}_VERSION_MINOR}.${${name}_VERSION_PATCH} )
 
-SET(DALI_SCENE3D_VERSION ${${name}_VERSION} )
+SET(DALI_PHYSICS_VERSION ${${name}_VERSION} )
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     add_definitions("-DDEBUG_ENABLED")
@@ -76,8 +76,19 @@ if (ENABLE_PKG_CONFIGURE)
     )
 endif()
 
+if( INSTALL_CMAKE_MODULES )
 
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${name}-2d-config.cmake "
+    include(CMakeFindDependencyMacro)
+    include(\${CMAKE_CURRENT_LIST_DIR}/${name}-2d-targets.cmake)
+  ")
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-2d-config.cmake DESTINATION share/${name}-2d)
 
-
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${name}-3d-config.cmake "
+    include(CMakeFindDependencyMacro)
+    include(\${CMAKE_CURRENT_LIST_DIR}/${name}-3d-targets.cmake)
+  ")
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-3d-config.cmake DESTINATION share/${name}-3d)
+endif()
 
 
