@@ -393,8 +393,14 @@ int UtcDaliMotionDataLoadAsyncMultiple(void)
   // Check MotionData load successfully.
   DALI_TEST_GREATER(motionData.GetMotionCount(), 0u, TEST_LOCATION);
 
+  gLoadCompleted = false;
+
   // Check if completed request comes only 1 time.
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 1), false, TEST_LOCATION);
+  Test::WaitForEventThreadTrigger(1, 1);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gLoadCompleted, false, TEST_LOCATION);
 
   END_TEST;
 }
