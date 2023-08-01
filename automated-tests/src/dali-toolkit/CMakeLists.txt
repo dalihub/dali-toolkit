@@ -103,7 +103,6 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/toolkit-application.cpp
   dali-toolkit-test-utils/toolkit-canvas-renderer.cpp
   dali-toolkit-test-utils/toolkit-clipboard.cpp
-  dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
   dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
   dali-toolkit-test-utils/toolkit-environment-variable.cpp
   dali-toolkit-test-utils/toolkit-input-method-context.cpp

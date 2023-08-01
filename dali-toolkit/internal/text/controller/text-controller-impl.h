@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/text-clipboard.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/public-api/rendering/shader.h>
 
@@ -371,9 +370,9 @@ struct Controller::Impl
     mModel = Model::New();
 
     mFontClient = TextAbstraction::FontClient::Get();
-    if(mEditableControlInterface != nullptr && TextClipboard::IsAvailable())
+    if(mEditableControlInterface != nullptr && Clipboard::IsAvailable())
     {
-      mClipboard = TextClipboard::Get();
+      mClipboard = Clipboard::Get();
     }
 
     mView.SetVisualModel(mModel->mVisualModel);
@@ -567,7 +566,7 @@ struct Controller::Impl
   {
     if(!mClipboard)
     {
-      mClipboard = TextClipboard::Get();
+      mClipboard = Clipboard::Get();
     }
 
     return mClipboard != nullptr ? true : false;
@@ -575,13 +574,13 @@ struct Controller::Impl
 
   bool IsClipboardEmpty()
   {
-    bool result(TextClipboard::IsAvailable() && EnsureClipboardCreated() && mClipboard.NumberOfItems());
+    bool result(Clipboard::IsAvailable() && EnsureClipboardCreated() && mClipboard.NumberOfItems());
     return !result; // If NumberOfItems greater than 0, return false
   }
 
   bool IsClipboardVisible()
   {
-    bool result(TextClipboard::IsAvailable() && EnsureClipboardCreated() && mClipboard.IsVisible());
+    bool result(Clipboard::IsAvailable() && EnsureClipboardCreated() && mClipboard.IsVisible());
     return result;
   }
 
@@ -732,8 +731,6 @@ struct Controller::Impl
   bool CopyStringToClipboard(const std::string& source);
 
   void SendSelectionToClipboard(bool deleteAfterSending);
-
-  void RequestGetTextFromClipboard();
 
   void RepositionSelectionHandles();
   void RepositionSelectionHandles(float visualX, float visualY, Controller::NoTextTap::Action action);
@@ -1015,7 +1012,7 @@ public:
   OutlineDefaults*             mOutlineDefaults;            ///< Avoid allocating this when the user does not specify outline parameters.
   EventData*                   mEventData;                  ///< Avoid allocating everything for text input until EnableTextInput().
   TextAbstraction::FontClient  mFontClient;                 ///< Handle to the font client.
-  TextClipboard                mClipboard;                  ///< Handle to the system clipboard
+  Clipboard                    mClipboard;                  ///< Handle to the system clipboard
   View                         mView;                       ///< The view interface to the rendering back-end.
   MetricsPtr                   mMetrics;                    ///< A wrapper around FontClient used to get metrics & potentially down-scaled Emoji metrics.
   Layout::Engine               mLayoutEngine;               ///< The layout engine.

@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/spanned.h>
+#include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/events/gesture.h>
 
@@ -69,7 +70,7 @@ typedef IntrusivePtr<Controller> ControllerPtr;
  *
  * The text selection popup button callbacks are as well handled via the TextSelectionPopupCallbackInterface interface.
  */
-class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface, public HiddenText::Observer
+class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface, public HiddenText::Observer, public ConnectionTracker
 {
 public: // Enumerated types.
   /**
@@ -2000,8 +2001,14 @@ public: // Text-input Event Queuing.
 
   /**
    * @brief Event from Clipboard notifying an Item has been selected for pasting
+   *
+   * @param[in] id The id of the data request.
+   * @param[in] mimeType The mime type of data received.
+   * @param[in] data The data received.
+   * @note
+   * This event is executed by receiving the Clipboard's DataReceivedSignal.
    */
-  void PasteClipboardItemEvent();
+  void PasteClipboardItemEvent(uint32_t id, const char* mimeType, const char* data);
 
   /**
    * @brief Return true when text control should clear key input focus when escape key is pressed.
