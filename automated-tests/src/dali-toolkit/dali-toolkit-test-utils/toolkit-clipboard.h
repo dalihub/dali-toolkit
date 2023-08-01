@@ -1,5 +1,5 @@
-#ifndef  TOOLKIT_TEXT_CLIPBOARD_H
-#define  TOOLKIT_TEXT_CLIPBOARD_H
+#ifndef  TOOLKIT_CLIPBOARD_H
+#define  TOOLKIT_CLIPBOARD_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -18,11 +18,12 @@
  *
  */
 
-#define DALI_TEXT_CLIPBOARD_H
+#define DALI_CLIPBOARD_H
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -32,7 +33,7 @@ namespace Internal DALI_INTERNAL
 
 namespace Adaptor
 {
-class TextClipboard;
+class Clipboard;
 }
 }
 
@@ -40,56 +41,114 @@ class TextClipboard;
  * The Clipboard can operate using various funtion.
  * Clipboard can manage it's item and set show / hide status.
  */
-class TextClipboard : public BaseHandle
+class Clipboard : public BaseHandle
 {
 public:
+  /**
+   * @brief Structure that contains information about the clipboard data information.
+   */
+  struct ClipData
+  {
+    ClipData(const char* mimeType = nullptr, const char* data = nullptr)
+    {
+      this->mimeType = mimeType;
+      this->data     = data;
+    }
+    void SetMimeType(const char* mimeType)
+    {
+      this->mimeType = mimeType;
+    }
+    const char* GetMimeType() const
+    {
+      return mimeType;
+    }
+    void SetData(const char* data)
+    {
+      this->data = data;
+    }
+    const char* GetData() const
+    {
+      return data;
+    }
+
+  private:
+    const char* mimeType {nullptr}; ///< The mime type of clip data.
+    const char* data {nullptr};     ///< The clip data.
+  };
+
+  /// @brief Data send completed signal.
+  typedef Signal<void(const char*, const char*)> DataSentSignalType;
+
+  /// @brief Data receive completed signal.
+  typedef Signal<void(uint32_t, const char*, const char*)> DataReceivedSignalType;
+
+
   /**
    * Create an uninitialized Clipboard;
    *  this can be initialized with one of the derived Clipboard' New() methods
    */
-  TextClipboard();
+  Clipboard();
 
   /**
    * Non virtual destructor.
    */
-  ~TextClipboard();
+  ~Clipboard();
 
   /**
    * This constructor is used by Adaptor::GetClipboard().
    * @param[in] clipboard A pointer to the clipboard.
    */
-  TextClipboard( Internal::Adaptor::TextClipboard* clipboard );
+  Clipboard(Internal::Adaptor::Clipboard* clipboard);
 
   /**
-   * Retrieve a handle to the TextClipboardEventNotifier instance
-   * @return A handle to the TextClipboard
+   * Retrieve a handle to the ClipboardEventNotifier instance
+   * @return A handle to the Clipboard
    */
-  static TextClipboard Get();
+  static Clipboard Get();
 
   /**
    * @brief Checks whether the clipboard is available.
-   *
    * @return true, if it is available, false otherwise.
    */
   static bool IsAvailable();
 
   /**
-   * Send the given string to the clipboard
-   * @param[in] itemData string to send to clip board
-   * @return bool true if the internal clip board sending was successful.
+   * @brief This signal is emitted when the data send complete.
+   * @note
+   * SetData() opertion does not follow a synchronous call.
+   * It follows the sequence below.
+   * SetData() -> EcoreEventDataSend() -> SendData() -> DataSentSignal() Emit
    */
-  bool SetItem( const std::string& itemData );
+  DataSentSignalType& DataSentSignal();
 
   /**
-   * Request clipboard service to retrieve an item
+   * @brief This signal is emitted when the data receive complete.
+   * @note
+   * GetData() opertion does not follow a synchronous call.
+   * It follows the sequence below.
+   * GetData() -> EcoreEventOfferDataReady() -> ReceiveData() -> DataReceivedSignal() Emit
    */
-  void RequestItem();
+  DataReceivedSignalType& DataReceivedSignal();
 
   /**
-   * Returns the number of item currently in the clipboard
-   * @return unsigned int number of clipboard items
+   * @brief Send the given data to the clipboard.
+   * @param[in] clipData data to send to the clipboard
+   * @return bool true if the internal clipboard sending was successful.
    */
-  unsigned int NumberOfItems();
+  bool SetData(const ClipData& clipData);
+
+  /**
+   * @brief Request data from the clipboard.
+   * @param[in] mimeType mime type of data to request.
+   * @return uint32_t Returns the data request id.
+   */
+  uint32_t GetData(const std::string& mimeType);
+
+  /**
+   * @brief Returns the number of item currently in the clipboard.
+   * @return size_t number of clipboard items.
+   */
+  size_t NumberOfItems();
 
   /**
    * Show the clipboard window
@@ -110,4 +169,4 @@ public:
 };
 } // namespace Dali
 
-#endif // TOOLKIT_TextCLIPBOARD_H
+#endif // TOOLKIT_CLIPBOARD_H

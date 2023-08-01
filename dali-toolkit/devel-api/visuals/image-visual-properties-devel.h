@@ -155,7 +155,15 @@ enum Type
    * So we change its value to MASKING_ON_RENDERING even if the visual sets the MASKING_TYPE as MASKING_ON_LOADING when it uses external texture.
    * @note It is used in the ImageVisual and AnimatedImageVisual. The default is MASKING_ON_LOADING.
    */
-  MASKING_TYPE = ORIENTATION_CORRECTION + 12
+  MASKING_TYPE = ORIENTATION_CORRECTION + 12,
+
+  /**
+   * @brief Whether to enable broken image in image visual.
+   * Some of visual don't need to show broken image(ex. placeholder)
+   * Disable broken image for these visuals.
+   * default is true.
+   */
+  ENABLE_BROKEN_IMAGE = ORIENTATION_CORRECTION + 14
 };
 
 } //namespace Property

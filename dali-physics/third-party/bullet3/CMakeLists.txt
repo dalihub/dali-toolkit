@@ -96,6 +96,8 @@ else()
     target_compile_options(bullet3 PRIVATE -w)
 endif()
 
+target_compile_options(bullet3 PRIVATE -fvisibility=default)
+
 target_link_libraries(bullet3 ${COVERAGE})
 
 if(ENABLE_PKG_CONFIGURE)
@@ -121,8 +123,17 @@ endif(ENABLE_PKG_CONFIGURE)
 install(
     TARGETS bullet3
     DESTINATION ${LIB_DIR}
-    EXPORT Bullet3Targets
+    EXPORT bullet3-targets
 )
+
+if(INSTALL_CMAKE_MODULES)
+  install(
+      EXPORT bullet3-targets
+      NAMESPACE bullet3::
+      FILE bullet3-targets.cmake
+      DESTINATION share/bullet3
+  )
+endif()
 
 if(BULLET3_BUILD_SHARED AND MSVC)
     install(FILES $<TARGET_PDB_FILE:bullet3> DESTINATION lib)
@@ -140,3 +151,11 @@ foreach(SUB ${BULLET_SUBMODULES})
         FILES_MATCHING PATTERN "*.h"
     )
 endforeach()
+
+if(INSTALL_CMAKE_MODULES)
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/bullet3-config.cmake "
+    include(CMakeFindDependencyMacro)
+    include(\${CMAKE_CURRENT_LIST_DIR}/bullet3-targets.cmake)
+  ")
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/bullet3-config.cmake DESTINATION share/bullet3)
+endif()

@@ -31,6 +31,5 @@ std::ostream& operator<<( std::ostream& ostream, Dali::Toolkit::Visual::Resource
 #include "toolkit-test-application.h"
 #include "toolkit-application.h"
 #include "toolkit-input-method-context.h"
-#include "toolkit-clipboard-event-notifier.h"
 
 #endif // DALI_TOOLKIT_TEST_SUITE_UTILS_H

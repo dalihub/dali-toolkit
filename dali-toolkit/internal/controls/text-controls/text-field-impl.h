@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/text-clipboard-event-notifier.h>
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
 #include <dali/devel-api/atspi-interfaces/editable-text.h>
 #include <dali/devel-api/atspi-interfaces/hypertext.h>
@@ -418,12 +417,6 @@ private: // Implementation
    * @copydoc Dali::Toolkit::Text::Controller::(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
    */
   InputMethodContext::CallbackData OnInputMethodContextEvent(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
-
-  /**
-   * @brief Callback when Clipboard signals an item should be pasted
-   * @param[in] clipboard handle to TextClipboard Event Notifier
-   */
-  void OnClipboardTextSelected(TextClipboardEventNotifier& clipboard);
 
   /**
    * @brief Get a Property Map for the image used for the required Handle Image

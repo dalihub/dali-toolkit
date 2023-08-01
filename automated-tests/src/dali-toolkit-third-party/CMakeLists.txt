@@ -14,7 +14,6 @@ SET(TC_SOURCES
 SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-environment-variable.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-context.cpp

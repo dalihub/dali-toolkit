@@ -52,6 +52,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const char* EMPTY_STRING = "";
+const char* MIME_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
 
 } // namespace
 
@@ -1072,8 +1073,13 @@ void Controller::Impl::SetClipboardHideEnable(bool enable)
 
 bool Controller::Impl::CopyStringToClipboard(const std::string& source)
 {
-  //Send string to clipboard
-  return (EnsureClipboardCreated() && mClipboard.SetItem(source));
+  if(EnsureClipboardCreated())
+  {
+    Dali::Clipboard::ClipData data(MIME_TYPE_TEXT_PLAIN, source.c_str());
+    return mClipboard.SetData(data); // Send clipboard data to clipboard.
+  }
+
+  return false;
 }
 
 void Controller::Impl::SendSelectionToClipboard(bool deleteAfterSending)
@@ -1082,14 +1088,6 @@ void Controller::Impl::SendSelectionToClipboard(bool deleteAfterSending)
   RetrieveSelection(selectedText, deleteAfterSending);
   CopyStringToClipboard(selectedText);
   ChangeState(EventData::EDITING);
-}
-
-void Controller::Impl::RequestGetTextFromClipboard()
-{
-  if(EnsureClipboardCreated())
-  {
-    mClipboard.RequestItem();
-  }
 }
 
 void Controller::Impl::RepositionSelectionHandles()

@@ -155,3 +155,36 @@ int UtcDaliLoadBvhFailed02(void)
   DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliLoadBvhFailed03(void)
+{
+  TestApplication application;
+
+  tet_infoline("Parse error for hierarchy1");
+  uint32_t caseHierarchyCount = 8;
+  for(uint32_t tc = 0; tc < caseHierarchyCount; ++tc)
+  {
+    tet_printf("Parse error for hierarchy %u\n", tc);
+    std::ostringstream oss;
+    oss << TEST_RESOURCE_DIR << "/test-invalid-hierarchy" << tc << ".bvh";
+    AnimationDefinition animDef = LoadBvh(oss.str(), "testBvh");
+    DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
+  }
+
+  uint32_t caseMotionCount = 4;
+  for(uint32_t tc = 0; tc < caseMotionCount; ++tc)
+  {
+    tet_printf("Parse error for motion %u\n", tc);
+    std::ostringstream oss;
+    oss << TEST_RESOURCE_DIR << "/test-invalid-motion" << tc << ".bvh";
+    AnimationDefinition animDef = LoadBvh(oss.str(), "testBvh");
+    DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
+  }
+
+  {
+    tet_infoline("empty file");
+    AnimationDefinition animDef = LoadBvh(TEST_RESOURCE_DIR "/test-empty.bvh", "testBvh");
+    DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
+  }
+  END_TEST;
+}

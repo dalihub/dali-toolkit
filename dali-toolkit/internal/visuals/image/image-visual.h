@@ -322,6 +322,17 @@ private:
    */
   void CheckMaskTexture();
 
+  /**
+   * @brief Reset Renderer using empty texture
+   * For drawing empty visual, reset the renderer.
+   */
+  void ResetRenderer();
+
+  /**
+   * @brief Show broken image when image loading is failed.
+   */
+  void ShowBrokenImage();
+
 private:
   Vector4                            mPixelArea;
   WeakHandle<Actor>                  mPlacementActor;
@@ -348,6 +359,7 @@ private:
   bool                                            mAttemptAtlasing;       ///< If true will attempt atlasing, otherwise create unique texture
   bool                                            mOrientationCorrection; ///< true if the image will have it's orientation corrected.
   bool                                            mNeedYuvToRgb{false};   ///< true if we need to convert yuv to rgb.
+  bool                                            mEnableBrokenImage;
 };
 
 } // namespace Internal

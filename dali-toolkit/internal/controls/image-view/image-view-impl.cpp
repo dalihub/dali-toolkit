@@ -611,6 +611,7 @@ void ImageView::CreatePlaceholderImage()
   propertyMap.Insert(Toolkit::ImageVisual::Property::URL, mPlaceholderUrl);
   //propertyMap.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, Toolkit::ImageVisual::LoadPolicy::IMMEDIATE); // TODO: need to enable this property
   propertyMap.Insert(Toolkit::ImageVisual::Property::RELEASE_POLICY, Toolkit::ImageVisual::ReleasePolicy::DESTROYED);
+  propertyMap.Insert(Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE, false);
   mPlaceholderVisual = Toolkit::VisualFactory::Get().CreateVisual(propertyMap);
   if(mPlaceholderVisual)
   {

@@ -46,6 +46,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 #endif
 
 const char* EMPTY_STRING = "";
+const char* MIME_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
 
 template<typename Type>
 void EnsureCreated(Type*& object)
@@ -1613,19 +1614,40 @@ string Controller::CutText()
   return mImpl->CutText();
 }
 
+void Controller::PasteClipboardItemEvent(uint32_t id, const char* mimeType, const char* data)
+{
+  // Upon receiving the data, it is important to disconnect the signal
+  // to avoid potential unintended pasting caused by subsequent requests.
+  mImpl->mClipboard.DataReceivedSignal().Disconnect(this, &Controller::PasteClipboardItemEvent);
+
+  // If the id is 0u, it is an invalid response.
+  // text-controller allows only plain text type.
+  if(id != 0u && !strncmp(mimeType, MIME_TYPE_TEXT_PLAIN, strlen(MIME_TYPE_TEXT_PLAIN)))
+  {
+    EventHandler::PasteClipboardItemEvent(*this, data);
+  }
+}
+
 void Controller::PasteText()
 {
-  mImpl->RequestGetTextFromClipboard(); // Request clipboard service to retrieve an item
+  if(mImpl->EnsureClipboardCreated())
+  {
+    // Connect the signal before calling GetData() of the clipboard.
+    mImpl->mClipboard.DataReceivedSignal().Connect(this, &Controller::PasteClipboardItemEvent);
+
+    // Request clipboard service to retrieve an item.
+    uint id = mImpl->mClipboard.GetData(MIME_TYPE_TEXT_PLAIN);
+    if(id == 0u)
+    {
+      // If the return id is 0u, the signal is not emitted, we must disconnect signal here.
+      mImpl->mClipboard.DataReceivedSignal().Disconnect(this, &Controller::PasteClipboardItemEvent);
+    }
+  }
 }
 
 InputMethodContext::CallbackData Controller::OnInputMethodContextEvent(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
 {
   return EventHandler::OnInputMethodContextEvent(*this, inputMethodContext, inputMethodContextEvent);
-}
-
-void Controller::PasteClipboardItemEvent()
-{
-  EventHandler::PasteClipboardItemEvent(*this);
 }
 
 void Controller::GetTargetSize(Vector2& targetSize)

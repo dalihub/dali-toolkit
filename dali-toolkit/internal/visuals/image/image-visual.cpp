@@ -168,7 +168,8 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
   mAtlasRectSize(0, 0),
   mLoadState(TextureManager::LoadState::NOT_STARTED),
   mAttemptAtlasing(false),
-  mOrientationCorrection(true)
+  mOrientationCorrection(true),
+  mEnableBrokenImage(true)
 {
   EnablePreMultipliedAlpha(mFactoryCache.GetPreMultiplyOnLoad());
 }
@@ -265,6 +266,10 @@ void ImageVisual::DoSetProperties(const Property::Map& propertyMap)
       else if(keyValue.first == MASKING_TYPE_NAME)
       {
         DoSetProperty(Toolkit::DevelImageVisual::Property::MASKING_TYPE, keyValue.second);
+      }
+      else if(keyValue.first == ENABLE_BROKEN_IMAGE)
+      {
+        DoSetProperty(Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE, keyValue.second);
       }
       else if(keyValue.first == LOAD_POLICY_NAME)
       {
@@ -434,6 +439,16 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
         {
           mMaskingData->mPreappliedMasking = Toolkit::DevelImageVisual::MaskingType::Type(maskingType) == Toolkit::DevelImageVisual::MaskingType::MASKING_ON_LOADING ? true : false;
         }
+      }
+      break;
+    }
+
+    case Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE:
+    {
+      bool enableBrokenImage(mEnableBrokenImage);
+      if(value.Get(enableBrokenImage))
+      {
+        mEnableBrokenImage = enableBrokenImage;
       }
       break;
     }
@@ -762,17 +777,7 @@ void ImageVisual::DoSetOnScene(Actor& actor)
   }
   else if(mLoadState == TextureManager::LoadState::LOAD_FAILED)
   {
-    Vector2 imageSize = Vector2::ZERO;
-    if(actor)
-    {
-      imageSize           = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-      mPlacementActorSize = imageSize;
-    }
-
-    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
-    actor.AddRenderer(mImpl->mRenderer);
-    mPlacementActor.Reset();
-
+    ShowBrokenImage();
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
   }
 }
@@ -785,14 +790,7 @@ void ImageVisual::DoSetOffScene(Actor& actor)
   actor.RemoveRenderer(mImpl->mRenderer);
   if(mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED)
   {
-    RemoveTexture(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
-    mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
-
-    TextureSet textureSet = TextureSet::New();
-    mImpl->mRenderer.SetTextures(textureSet);
-    ComputeTextureSize();
-
-    mLoadState = TextureManager::LoadState::NOT_STARTED;
+    ResetRenderer();
   }
 
   mPlacementActor.Reset();
@@ -912,18 +910,7 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
     Actor actor = mPlacementActor.GetHandle();
     if(!loadingSuccess)
     {
-      Vector2 imageSize = Vector2::ZERO;
-      if(actor)
-      {
-        imageSize           = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-        mPlacementActorSize = imageSize;
-      }
-      else
-      {
-        imageSize = mPlacementActorSize;
-      }
-
-      mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+      ShowBrokenImage();
       textureInformation.textureSet = mImpl->mRenderer.GetTextures();
     }
     else
@@ -947,13 +934,13 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
           UpdateShader();
         }
       }
-    }
 
-    if(actor)
-    {
-      actor.AddRenderer(mImpl->mRenderer);
-      // reset the weak handle so that the renderer only get added to actor once
-      mPlacementActor.Reset();
+      if(actor)
+      {
+        actor.AddRenderer(mImpl->mRenderer);
+        // reset the weak handle so that the renderer only get added to actor once
+        mPlacementActor.Reset();
+      }
     }
   }
 
@@ -1187,6 +1174,44 @@ void ImageVisual::CheckMaskTexture()
       mMaskingData->mMaskImageLoadingFailed = maskLoadFailed;
       UpdateShader();
     }
+  }
+}
+
+void ImageVisual::ResetRenderer()
+{
+  RemoveTexture(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
+  mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
+
+  TextureSet textureSet = TextureSet::New();
+  mImpl->mRenderer.SetTextures(textureSet);
+  ComputeTextureSize();
+
+  mLoadState = TextureManager::LoadState::NOT_STARTED;
+}
+
+void ImageVisual::ShowBrokenImage()
+{
+  if(mEnableBrokenImage)
+  {
+    Actor actor = mPlacementActor.GetHandle();
+
+    Vector2 imageSize = Vector2::ZERO;
+    if(actor)
+    {
+      imageSize           = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+      mPlacementActorSize = imageSize;
+    }
+
+    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+    if(actor)
+    {
+      actor.AddRenderer(mImpl->mRenderer);
+      mPlacementActor.Reset();
+    }
+  }
+  else
+  {
+    ResetRenderer();
   }
 }
 

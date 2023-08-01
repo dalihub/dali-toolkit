@@ -44,12 +44,6 @@ const char* const OPTION_CLIPBOARD("optionClipboard");    // "Clipboard" popup o
 
 const Size CONTROL_SIZE(300.f, 60.f);
 
-std::string gClipboardText;
-void        ContentSelectedCallback(TextClipboardEventNotifier& notifier)
-{
-  gClipboardText = notifier.GetContent();
-}
-
 // Generate a KeyEvent to send to Core.
 Dali::KeyEvent GenerateKey(const std::string&           keyName,
                            const std::string&           keyString,
@@ -547,9 +541,6 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   controller->GetText(text);
   DALI_TEST_CHECK(text.empty());
 
-  TextClipboardEventNotifier clipboardEventNotifier = TextClipboardEventNotifier::Get();
-  clipboardEventNotifier.ContentSelectedSignal().Connect(&ContentSelectedCallback);
-
   // Paste the text.
   button = PushButton::DownCast(textPopup.FindChildByName(OPTION_PASTE));
   DALI_TEST_CHECK(button);
@@ -558,8 +549,9 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
 
   // Call relayout to process the input events.
   controller->Relayout(CONTROL_SIZE);
+  controller->GetText(text);
 
-  DALI_TEST_EQUALS("Hello world", gClipboardText, TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello world", text.c_str(), TEST_LOCATION);
 
   // Show the clipboard.
   button = PushButton::DownCast(textPopup.FindChildByName(OPTION_CLIPBOARD));
