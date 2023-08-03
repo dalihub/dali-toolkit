@@ -21,10 +21,9 @@
 #include <dali-toolkit/public-api/particle-system/particle.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/common/list-wrapper.h>
+#include <dali/public-api/object/base-handle.h>
 #include <cinttypes>
-
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
@@ -220,6 +219,14 @@ public:
    * @return Size of data structure
    */
   uint32_t GetParticleDataSize(bool includeLocalStreams);
+
+  /**
+   * @brief Returns index associated with specified default stream
+   *
+   * @param[in] defaultStreamBit Default stream bit
+   * @return Returns a valid index or -1 on error.
+   */
+  int GetDefaultStreamIndex(ParticleStreamTypeFlagBit defaultStreamBit);
 
   std::list<Particle>& GetActiveParticles();
 

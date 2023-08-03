@@ -89,13 +89,21 @@ void ParticleEmitter::SetRenderer(const ParticleSystem::ParticleRenderer& render
 
 void ParticleEmitter::SetParticleCount(uint32_t maxParticleCount)
 {
-  // Default particle list has no data streams, it will replace old list
-  mParticleList = ParticleSystem::ParticleList::New(maxParticleCount,
-                                                    ParticleStream::POSITION_STREAM_BIT |
-                                                      ParticleStream::COLOR_STREAM_BIT |
-                                                      ParticleStream::VELOCITY_STREAM_BIT |
-                                                      ParticleStream::SCALE_STREAM_BIT |
-                                                      ParticleStream::LIFETIME_STREAM_BIT);
+  if(!mParticleList || maxParticleCount != GetImplementation(mParticleList).GetParticleCount())
+  {
+    // Default particle list has no data streams, it will replace old list
+    mParticleList = ParticleSystem::ParticleList::New(maxParticleCount,
+                                                      ParticleStream::POSITION_STREAM_BIT |
+                                                        ParticleStream::COLOR_STREAM_BIT |
+                                                        ParticleStream::VELOCITY_STREAM_BIT |
+                                                        ParticleStream::SCALE_STREAM_BIT |
+                                                        ParticleStream::LIFETIME_STREAM_BIT);
+  }
+}
+
+uint32_t ParticleEmitter::GetParticleCount()
+{
+  return GetImplementation(mParticleList).GetParticleCount();
 }
 
 ParticleSystem::ParticleList& ParticleEmitter::GetParticleList()

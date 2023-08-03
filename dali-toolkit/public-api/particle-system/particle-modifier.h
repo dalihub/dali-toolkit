@@ -112,6 +112,12 @@ public:
   {
     return New(std::move(std::make_unique<T>(args...)));
   }
+  /**
+   * @brief Returns associated particle modifier callback
+   *
+   * @return Valid reference to associated callback
+   */
+  ParticleModifierInterface& GetModifierCallback();
 
   /**
    * @brief Downcasts a handle to ParticleModifier handle.

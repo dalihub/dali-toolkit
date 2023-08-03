@@ -94,12 +94,16 @@ uint32_t ParticleList::GetParticleDataSize(bool includeLocalStreams)
   return GetImplementation(*this).GetStreamElementSize(includeLocalStreams);
 }
 
+int ParticleList::GetDefaultStreamIndex(ParticleStreamTypeFlagBit defaultStreamBit)
+{
+  return GetImplementation(*this).GetDefaultStreamIndex(defaultStreamBit);
+}
+
 std::list<Particle>& ParticleList::GetActiveParticles()
 {
   return GetImplementation(*this).GetParticles();
 }
 
 ParticleList::ParticleList() = default;
-
 
 } // namespace Dali::Toolkit::ParticleSystem

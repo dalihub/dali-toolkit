@@ -66,6 +66,13 @@ public:
   void SetBlendingMode(BlendingMode blendingMode);
 
   /**
+   * @brief Sets blending mode for the renderer
+   *
+   * @return Current blending mode
+   */
+  BlendingMode GetBlendingMode() const;
+
+  /**
    * @brief Sets renderable as a 2D texture (sprites)
    *
    * @param[in] texture Valid texture
