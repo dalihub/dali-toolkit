@@ -334,7 +334,8 @@ void SvgRasterizeManager::RemoveTask(SvgVisual* visual)
     {
       for(std::vector<SvgTaskPtr>::iterator it = mRasterizeTasks.begin(); it != mRasterizeTasks.end();)
       {
-        if((*it) && (*it)->GetSvgVisual() == visual)
+        // We should not remove SvgLoadingTask now.
+        if((*it) && (*it)->GetSvgVisual() == visual && dynamic_cast<SvgRasterizingTask*>(it->Get()))
         {
           it = mRasterizeTasks.erase(it);
         }
