@@ -62,6 +62,11 @@ void ParticleEmitter::SetParticleCount(uint32_t maxParticleCount)
   GetImplementation(*this).SetParticleCount(maxParticleCount);
 }
 
+uint32_t ParticleEmitter::GetParticleCount()
+{
+  return GetImplementation(*this).GetParticleCount();
+}
+
 ParticleDomain ParticleEmitter::GetDomain() const
 {
   return GetImplementation(*this).GetDomain();

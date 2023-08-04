@@ -40,6 +40,11 @@ void ParticleRenderer::SetBlendingMode(BlendingMode blendingMode)
   GetImplementation(*this).SetBlendingMode(blendingMode);
 }
 
+BlendingMode ParticleRenderer::GetBlendingMode() const
+{
+  return GetImplementation(*this).GetBlendingMode();
+}
+
 ParticleRenderer ParticleRenderer::DownCast(BaseHandle handle)
 {
   return {dynamic_cast<Internal::ParticleRenderer*>(handle.GetObjectPtr())};
