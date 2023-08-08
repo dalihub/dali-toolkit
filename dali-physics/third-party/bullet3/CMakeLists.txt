@@ -110,6 +110,7 @@ if(ENABLE_PKG_CONFIGURE)
     if( NOT LIB_DIR )
         set( LIB_DIR ${prefix}/lib )
     endif()
+    set(DEV_INCLUDE_PATH ${prefix}/include/bullet)
 
     set(bullet_pkg_cfg_file bullet3.pc)
     configure_file(${CMAKE_CURRENT_LIST_DIR}/${bullet_pkg_cfg_file}.cmake ${bullet_pkg_cfg_file} @ONLY)
