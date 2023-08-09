@@ -49,6 +49,11 @@ void ParticleRenderer::SetBlendingMode(BlendingMode blendingMode)
   mBlendingMode = blendingMode;
 }
 
+BlendingMode ParticleRenderer::GetBlendingMode() const
+{
+  return mBlendingMode;
+}
+
 void ParticleRenderer::CreateShader()
 {
   // Create shader dynamically

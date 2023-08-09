@@ -320,6 +320,109 @@ int UtcDaliParticleSystemEmitterNew(void)
   END_TEST;
 }
 
+int UtcDaliParticleSystemEmitterNew2(void)
+{
+  // create particle emitter
+  auto emitter = ParticleEmitter::New();
+
+  bool result = (emitter != nullptr);
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+
+  // Create test source
+  auto source = ParticleSource::New<TestSource>(&emitter);
+
+  // Create test renderer
+  auto renderer = ParticleRenderer::New();
+
+  // Create modifier
+  auto modifier = ParticleModifier::New<TestModifier>();
+
+  // Create domain
+  auto domain = ParticleDomain::New();
+
+  // Test emitter readiness
+  auto ready = emitter.GetStatus();
+
+  // Emitter should return status incomplete
+  DALI_TEST_EQUALS(ready, ParticleEmitter::Status::INCOMPLETE, TEST_LOCATION);
+
+  // Attach all components to the emitter
+  emitter.SetSource(source);
+  emitter.SetRenderer(renderer);
+  emitter.AddModifier(modifier);
+  emitter.SetDomain(domain);
+
+  // test blending mode
+  DALI_TEST_EQUALS(renderer.GetBlendingMode(), Dali::Toolkit::ParticleSystem::BlendingMode::DEFAULT, TEST_LOCATION);
+
+  emitter.SetParticleCount(10000);
+  DALI_TEST_EQUALS(emitter.GetParticleCount(), 10000, TEST_LOCATION);
+
+  auto m = emitter.GetModifierAt(0);
+  DALI_TEST_EQUALS(m != nullptr, true, TEST_LOCATION);
+
+  m.GetModifierCallback();
+
+  // test status again (domain is optional);
+  ready = emitter.GetStatus();
+
+  // Emitter should return status incomplete
+  DALI_TEST_EQUALS(ready, ParticleEmitter::Status::READY, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliParticleSystemEmitterDefaultStreams(void)
+{
+  // create particle emitter
+  auto emitter = ParticleEmitter::New();
+
+  bool result = (emitter != nullptr);
+  DALI_TEST_EQUALS(result, true, TEST_LOCATION);
+
+  // Create test source
+  auto source = ParticleSource::New<TestSource>(&emitter);
+
+  // Create test renderer
+  auto renderer = ParticleRenderer::New();
+
+  // Create modifier
+  auto modifier = ParticleModifier::New<TestModifier>();
+
+  // Create domain
+  auto domain = ParticleDomain::New();
+
+  // Test emitter readiness
+  auto ready = emitter.GetStatus();
+
+  // Emitter should return status incomplete
+  DALI_TEST_EQUALS(ready, ParticleEmitter::Status::INCOMPLETE, TEST_LOCATION);
+
+  // Attach all components to the emitter
+  emitter.SetSource(source);
+  emitter.SetRenderer(renderer);
+  emitter.AddModifier(modifier);
+  emitter.SetDomain(domain);
+
+  auto                  particleList   = emitter.GetParticleList();
+  std::vector<uint32_t> expectedValues = {
+    ParticleStream::POSITION_STREAM_BIT, 0, ParticleStream::COLOR_STREAM_BIT, 3, ParticleStream::VELOCITY_STREAM_BIT, 2, ParticleStream::SCALE_STREAM_BIT, 1, ParticleStream::LIFETIME_STREAM_BIT, 4, ParticleStream::LIFETIME_BASE_STREAM_BIT, 5};
+
+  for(auto i = 0u; i < expectedValues.size(); i += 2)
+  {
+    auto index = particleList.GetDefaultStreamIndex(expectedValues[i]);
+    DALI_TEST_EQUALS(index, expectedValues[i + 1], TEST_LOCATION);
+  }
+
+  // test status again (domain is optional);
+  ready = emitter.GetStatus();
+
+  // Emitter should return status incomplete
+  DALI_TEST_EQUALS(ready, ParticleEmitter::Status::READY, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliParticleSystemEmitterModifierStack(void)
 {
   // create particle emitter

@@ -234,12 +234,7 @@ void SvgVisual::DoSetOnScene(Actor& actor)
 
 void SvgVisual::DoSetOffScene(Actor& actor)
 {
-  // Remove loading & rasterizing task
-  if(mLoadingTask)
-  {
-    Dali::AsyncTaskManager::Get().RemoveTask(mLoadingTask);
-    mLoadingTask.Reset();
-  }
+  // Remove rasterizing task
   if(mRasterizingTask)
   {
     Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);

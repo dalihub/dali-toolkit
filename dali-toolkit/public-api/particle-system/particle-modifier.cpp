@@ -37,4 +37,9 @@ ParticleModifier ParticleModifier::DownCast(BaseHandle handle)
   return {dynamic_cast<Internal::ParticleModifier*>(handle.GetObjectPtr())};
 }
 
+ParticleModifierInterface& ParticleModifier::GetModifierCallback()
+{
+  return GetImplementation(*this).GetUpdater();
+}
+
 } // namespace Dali::Toolkit::ParticleSystem

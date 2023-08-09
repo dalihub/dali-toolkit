@@ -200,6 +200,13 @@ public:
   void SetParticleCount(uint32_t maxParticleCount);
 
   /**
+   * @brief Returns maximum number of particles in the system
+   *
+   * @return Maximum number of particles
+   */
+  uint32_t GetParticleCount();
+
+  /**
    * @brief Returns currently used particle emitter domain
    *
    * @return Handle to the ParticleDomain object
@@ -212,7 +219,6 @@ public:
    * @return Handle to the ParticleRenderer object
    */
   [[nodiscard]] ParticleRenderer GetRenderer() const;
-
 
   /**
    * @brief Attaches particle system to an actor

@@ -60,6 +60,8 @@ public:
 
   void SetBlendingMode(BlendingMode blendingMode);
 
+  BlendingMode GetBlendingMode() const;
+
   bool Initialize();
 
   void PrepareToDie();

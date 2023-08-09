@@ -79,6 +79,8 @@ public:
 
   void SetParticleCount(uint32_t maxParticleCount);
 
+  uint32_t GetParticleCount();
+
   ParticleSystem::ParticleList& GetParticleList();
 
   uint32_t AddModifier(const ParticleSystem::ParticleModifier& modifier);

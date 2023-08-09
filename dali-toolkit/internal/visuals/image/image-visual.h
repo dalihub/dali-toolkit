@@ -24,10 +24,12 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/weak-handle.h>
+#include <dali/public-api/rendering/visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/internal/image-loader/fast-track-loading-task.h>
 #include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
@@ -250,6 +252,13 @@ public:
    */
   void LoadComplete(bool success, TextureInformation textureInformation) override;
 
+  /**
+   * @brief Test callback for FastTrackLoadingTask
+   *
+   * @param[in] task The pointer of task who call this callback.
+   */
+  void FastLoadComplete(FastTrackLoadingTaskPtr task);
+
 private:
   /**
    * Allocate the mask data when a masking property is defined in the property map
@@ -333,6 +342,11 @@ private:
    */
   void ShowBrokenImage();
 
+  /**
+   * @brief Remove current added fast track upload task.
+   */
+  void ResetFastTrackLoadingTask();
+
 private:
   Vector4                            mPixelArea;
   WeakHandle<Actor>                  mPlacementActor;
@@ -345,6 +359,8 @@ private:
   Vector2                   mTextureSize;
   Vector2                   mPlacementActorSize;
 
+  FastTrackLoadingTaskPtr mFastTrackLoadingTask; ///< For fast track uploading.
+
   ImageVisualShaderFactory& mImageVisualShaderFactory;
 
   Dali::FittingMode::Type                         mFittingMode : 3;
@@ -355,11 +371,13 @@ private:
   Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
   Vector4                                         mAtlasRect;
   Dali::ImageDimensions                           mAtlasRectSize;
-  TextureManager::LoadState                       mLoadState;             ///< The texture loading state
-  bool                                            mAttemptAtlasing;       ///< If true will attempt atlasing, otherwise create unique texture
-  bool                                            mOrientationCorrection; ///< true if the image will have it's orientation corrected.
-  bool                                            mNeedYuvToRgb{false};   ///< true if we need to convert yuv to rgb.
-  bool                                            mEnableBrokenImage;
+  TextureManager::LoadState                       mLoadState;                    ///< The texture loading state
+  bool                                            mAttemptAtlasing;              ///< If true will attempt atlasing, otherwise create unique texture
+  bool                                            mOrientationCorrection;        ///< true if the image will have it's orientation corrected.
+  bool                                            mNeedYuvToRgb{false};          ///< true if we need to convert yuv to rgb.
+  bool                                            mEnableBrokenImage{true};      ///< true if enable broken image.
+  bool                                            mUseFastTrackUploading{false}; ///< True if we use fast tack feature.
+  bool                                            mRendererAdded{false};         ///< True if renderer added into actor.
 };
 
 } // namespace Internal
