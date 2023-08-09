@@ -23,6 +23,11 @@
 #include <dali/devel-api/adaptor-framework/texture-upload-manager.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/texture-integ.h>
+#include <dali/integration-api/trace.h>
+
+#ifdef TRACE_ENABLED
+#include <sstream>
+#endif
 
 namespace Dali
 {
@@ -30,6 +35,11 @@ namespace Toolkit
 {
 namespace Internal
 {
+namespace
+{
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
+}
+
 FastTrackLoadingTask::FastTrackLoadingTask(const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
 : AsyncTask(MakeCallback(this, &FastTrackLoadingTask::OnComplete), url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
   mUrl(url),
@@ -91,6 +101,15 @@ bool FastTrackLoadingTask::IsReady()
 
 void FastTrackLoadingTask::Load()
 {
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream oss;
+    oss << "[url:" << mUrl.GetUrl() << "]";
+    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK", oss.str().c_str());
+  }
+#endif
+
   Devel::PixelBuffer              pixelBuffer;
   std::vector<Devel::PixelBuffer> pixelBuffers;
 
@@ -128,6 +147,21 @@ void FastTrackLoadingTask::Load()
       DALI_LOG_ERROR("FastTrackLoadingTask::Load: ??? Undefined case. PixelBuffers.size() : %zu : ResourceId : %d, url : [%s]\n", pixelBuffers.size(), mResourceId, mUrl.GetUrl().c_str());
     }
   }
+
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream oss;
+    oss << "[";
+    oss << "pixelBuffers: " << pixelBuffers.size() << " ";
+    if(!pixelBuffers.empty())
+    {
+      oss << "premult:" << mPremultiplied << " ";
+    }
+    oss << "url:" << mUrl.GetUrl() << "]";
+    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK", oss.str().c_str());
+  }
+#endif
 }
 
 void FastTrackLoadingTask::MultiplyAlpha(Dali::Devel::PixelBuffer pixelBuffer)

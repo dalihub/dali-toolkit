@@ -21,6 +21,7 @@
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
+#include <dali/integration-api/adaptor-framework/trace-factory-interface.h>
 #include <dali/public-api/adaptor-framework/round-robin-container-view.h>
 #include <dali/public-api/signals/connection-tracker.h>
 #include <memory>
@@ -145,6 +146,7 @@ private:
     std::unique_ptr<CallbackBase>                      mAwakeCallback;
     std::chrono::time_point<std::chrono::steady_clock> mSleepTimePoint;
     const Dali::LogFactoryInterface&                   mLogFactory;
+    const Dali::TraceFactoryInterface&                 mTraceFactory;
     bool                                               mNeedToSleep;
     bool                                               mDestroyThread;
   };
@@ -168,6 +170,7 @@ private:
   bool                                 mDestroyThread;
   bool                                 mEventTriggered{false};
   const Dali::LogFactoryInterface&     mLogFactory;
+  const Dali::TraceFactoryInterface&   mTraceFactory;
   Dali::AsyncTaskManager               mAsyncTaskManager;
 };
 

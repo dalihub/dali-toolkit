@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/property-array.h>
 
@@ -27,6 +28,10 @@
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-thread.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
+
+#ifdef TRACE_ENABLED
+#include <sstream>
+#endif
 
 namespace Dali
 {
@@ -42,6 +47,8 @@ constexpr auto MICROSECONDS_PER_SECOND(1e+6);
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VECTOR_ANIMATION");
 #endif
+
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
 
 } // unnamed namespace
 
@@ -136,6 +143,8 @@ bool VectorAnimationTask::IsAnimating()
 
 bool VectorAnimationTask::Load(bool synchronousLoading)
 {
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_LOTTIE_LOADING_TASK");
+
   if(!mVectorRenderer.Load(mUrl))
   {
     DALI_LOG_ERROR("VectorAnimationTask::Load: Load failed [%s]\n", mUrl.c_str());
@@ -452,6 +461,8 @@ bool VectorAnimationTask::Rasterize()
     return false;
   }
 
+  DALI_TRACE_BEGIN(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK");
+
   ApplyAnimationData();
 
   if(mPlayState == PlayState::PLAYING && mUpdateFrameNumber)
@@ -558,6 +569,18 @@ bool VectorAnimationTask::Rasterize()
   {
     mKeepAnimation = true;
   }
+
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream oss;
+    oss << "[size: " << mWidth << " x " << mHeight << ", ";
+    oss << "frame: " << mCurrentFrame << ", ";
+    oss << "loop: " << mCurrentLoop << ", ";
+    oss << "state : " << mPlayState << "]";
+    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", oss.str().c_str());
+  }
+#endif
 
   return true;
 }

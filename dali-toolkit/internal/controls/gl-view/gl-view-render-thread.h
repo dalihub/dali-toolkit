@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_GL_VIEW_THREAD_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 #include <dali/integration-api/adaptor-framework/native-image-surface.h>
+#include <dali/integration-api/adaptor-framework/trace-factory-interface.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/signals/callback.h>
 
@@ -145,11 +146,13 @@ private:
   void SleepUntil(uint64_t timeInNanoseconds);
 
 private:
-  const Dali::LogFactoryInterface& mLogFactory;
-  Dali::Vector2                    mSurfaceSize; ///< The size of mNativeImageQueue
-  Dali::NativeImageSurfacePtr      mNativeImageSurface;
-  Dali::NativeImageSourceQueuePtr  mNativeImageQueue;
-  Semaphore<>                      mSurfaceSemaphore; ///< The semaphore to avoid race condition to the render target
+  const Dali::LogFactoryInterface&   mLogFactory;
+  const Dali::TraceFactoryInterface& mTraceFactory;
+
+  Dali::Vector2                   mSurfaceSize; ///< The size of mNativeImageQueue
+  Dali::NativeImageSurfacePtr     mNativeImageSurface;
+  Dali::NativeImageSourceQueuePtr mNativeImageQueue;
+  Semaphore<>                     mSurfaceSemaphore; ///< The semaphore to avoid race condition to the render target
 
   std::unique_ptr<CallbackBase> mGlInitCallback;
   std::unique_ptr<CallbackBase> mGlRenderFrameCallback;

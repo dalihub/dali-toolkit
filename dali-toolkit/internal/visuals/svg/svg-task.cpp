@@ -22,9 +22,14 @@
 #include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
+
+#ifdef TRACE_ENABLED
+#include <sstream>
+#endif
 
 namespace Dali
 {
@@ -32,6 +37,11 @@ namespace Toolkit
 {
 namespace Internal
 {
+namespace
+{
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
+}
+
 SvgTask::SvgTask(VectorImageRenderer vectorRenderer, CallbackBase* callback, AsyncTask::PriorityType priorityType)
 : AsyncTask(callback, priorityType),
   mVectorRenderer(vectorRenderer),
@@ -73,6 +83,8 @@ void SvgLoadingTask::Process()
     mHasSucceeded = true;
     return;
   }
+
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_SVG_LOADING_TASK");
 
   Dali::Vector<uint8_t> buffer;
 
@@ -128,15 +140,26 @@ void SvgRasterizingTask::Process()
     return;
   }
 
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream oss;
+    oss << "[size: " << mWidth << " x " << mHeight << "]";
+    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", oss.str().c_str());
+  }
+#endif
+
   Devel::PixelBuffer pixelBuffer = mVectorRenderer.Rasterize(mWidth, mHeight);
   if(!pixelBuffer)
   {
     DALI_LOG_ERROR("Rasterize is failed!\n");
+    DALI_TRACE_END(gTraceFilter, "DALI_SVG_RASTERIZE_TASK");
     return;
   }
 
   mPixelData    = Devel::PixelBuffer::Convert(pixelBuffer);
   mHasSucceeded = true;
+  DALI_TRACE_END(gTraceFilter, "DALI_SVG_RASTERIZE_TASK");
 }
 
 bool SvgRasterizingTask::IsReady()
