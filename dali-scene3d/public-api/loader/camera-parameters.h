@@ -25,6 +25,7 @@
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
+#include <string>
 
 namespace Dali
 {
@@ -36,6 +37,8 @@ namespace Loader
 {
 struct DALI_SCENE3D_API CameraParameters
 {
+  std::string name;
+
   // TODO : Is these default value has is meaning?
   Matrix matrix           = Matrix::IDENTITY;
   float  orthographicSize = 1.f;

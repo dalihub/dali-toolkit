@@ -1,0 +1,11 @@
+set(physics3d_public_api_dir "${physics_dir}/public-api")
+
+set(physics3d_src_files ${physics3d_src_files}
+	${physics3d_public_api_dir}/physics-actor.cpp
+	${physics3d_public_api_dir}/physics-adaptor.cpp
+)
+
+set(physics3d_public_api_header_files
+	${physics3d_public_api_dir}/physics-actor.h
+	${physics3d_public_api_dir}/physics-adaptor.h
+)

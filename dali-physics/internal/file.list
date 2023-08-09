@@ -1,0 +1,8 @@
+set(physics3d_internal_dir "${physics_dir}/internal")
+
+set(physics3d_src_files ${physics3d_src_files}
+  ${physics3d_internal_dir}/physics-actor-impl.cpp
+  ${physics3d_internal_dir}/physics-adaptor-impl.cpp
+  ${physics3d_internal_dir}/physics-debug-renderer.cpp
+  ${physics3d_internal_dir}/physics-world-impl.cpp
+)

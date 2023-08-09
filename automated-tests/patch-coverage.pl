@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright (c) 2020 Samsung Electronics Co., Ltd.
+# Copyright (c) 2023 Samsung Electronics Co., Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -985,7 +985,7 @@ sub parse_diff
     $files{$file}->{"patch"} = [@checklines];
     $files{$file}->{"b_lines"} = {%b_lines};
 
-    my %filter = map { $_ => $files{$_} } grep {m!^dali(-toolkit|-scene3d)?/!} (keys(%files));
+    my %filter = map { $_ => $files{$_} } grep {m!^dali(-toolkit|-scene3d|-physics)?/!} (keys(%files));
 
     if($pd_debug)
     {

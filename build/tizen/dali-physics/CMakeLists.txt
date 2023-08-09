@@ -70,25 +70,86 @@ endif()
 add_subdirectory("${physics_dir}/third-party/chipmunk2d" chipmunk2d)
 add_subdirectory("${physics_dir}/third-party/bullet3" bullet3)
 
-if (ENABLE_PKG_CONFIGURE)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file_2d} ${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file_3d}
-        DESTINATION ${LIB_DIR}/pkgconfig
+# TODO: Split into 2 separate targets
+set(physics3d_src_files "")
+include("${physics_dir}/public-api/file.list")
+include("${physics_dir}/internal/file.list")
+
+set(prefix_include_dir "${prefix}/include")
+include_directories(${repo_root_dir}
+  "${prefix_include_dir}"
+  "${repo_root_dir}/dali-physics/third-party/bullet3/src"
+)
+
+MESSAGE( STATUS "SOURCES: " ${physics3d_src_files})
+
+ADD_LIBRARY("${name}-3d" SHARED ${physics3d_src_files} )
+TARGET_LINK_LIBRARIES("${name}-3d" ${DALICORE_LDFLAGS}
+  dali2-toolkit
+  bullet3
+  ${COVERAGE})
+
+IF (ENABLE_PKG_CONFIGURE)
+  INSTALL(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file_2d}
+    ${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file_3d}
+    DESTINATION ${LIB_DIR}/pkgconfig )
+ENDIF()
+
+
+IF( INSTALL_CMAKE_MODULES )
+  MESSAGE(STATUS "Installing cmake modules & libs")
+  SET_TARGET_PROPERTIES( ${name}-3d
+    PROPERTIES
+    VERSION ${DALI_PHYSICS_VERSION}
+    SOVERSION ${${name}_VERSION_MAJOR}
+    CLEAN_DIRECT_OUPUT 1
     )
-endif()
 
-if( INSTALL_CMAKE_MODULES )
+  IF( ENABLE_DEBUG )
+    SET( BIN_DIR "${BIN_DIR}/debug" )
+    SET( LIB_DIR "${LIB_DIR}/debug" )
+  ENDIF()
 
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${name}-2d-config.cmake "
+  # Install library
+  INSTALL( TARGETS ${name}-3d
+    EXPORT ${name}-3d-targets
+    LIBRARY DESTINATION ${LIB_DIR}
+    ARCHIVE DESTINATION ${LIB_DIR}
+    RUNTIME DESTINATION ${BIN_DIR}
+  )
+
+  # Install the cmake modules.
+  INSTALL(
+    EXPORT ${name}-3d-targets
+    NAMESPACE ${name}-3d::
+    FILE ${name}-3d-targets.cmake
+    DESTINATION share/${name}-3d
+  )
+
+  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${name}-2d-config.cmake "
     include(CMakeFindDependencyMacro)
     include(\${CMAKE_CURRENT_LIST_DIR}/${name}-2d-targets.cmake)
   ")
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-2d-config.cmake DESTINATION share/${name}-2d)
+  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-2d-config.cmake DESTINATION share/${name}-2d)
 
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${name}-3d-config.cmake "
+  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${name}-3d-config.cmake "
     include(CMakeFindDependencyMacro)
     include(\${CMAKE_CURRENT_LIST_DIR}/${name}-3d-targets.cmake)
   ")
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-3d-config.cmake DESTINATION share/${name}-3d)
-endif()
+  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-3d-config.cmake DESTINATION share/${name}-3d)
 
+ELSE()
+  MESSAGE(STATUS "Installing libs")
+  INSTALL( TARGETS ${name}-3d DESTINATION ${LIB_DIR} )
 
+ENDIF()
+
+# Install headers
+install( FILES ${physics3d_public_api_header_files}
+  DESTINATION "${INCLUDE_DIR}/dali-physics/public-api"
+  )
+
+install( FILES ${physics_dir}/dali-physics.h
+  DESTINATION "${INCLUDE_DIR}/dali-physics"
+  )
