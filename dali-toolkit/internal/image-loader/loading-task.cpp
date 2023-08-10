@@ -16,14 +16,19 @@
  */
 
 // CLASS HEADER
-#include "loading-task.h"
+#include <dali-toolkit/internal/image-loader/loading-task.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
+
+#ifdef TRACE_ENABLED
+#include <sstream>
+#endif
 
 namespace Dali
 {
@@ -31,6 +36,11 @@ namespace Toolkit
 {
 namespace Internal
 {
+namespace
+{
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
+}
+
 LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
 : AsyncTask(callback),
   url(),
@@ -148,6 +158,15 @@ LoadingTask::~LoadingTask()
 
 void LoadingTask::Process()
 {
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream oss;
+    oss << "[url:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetUrl()) << "]";
+    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_IMAGE_LOADING_TASK", oss.str().c_str());
+  }
+#endif
+
   isReady = false;
   if(!isMaskTask)
   {
@@ -159,6 +178,23 @@ void LoadingTask::Process()
   }
   MultiplyAlpha();
   isReady = true;
+
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream oss;
+    oss << "[";
+    oss << "masking:" << isMaskTask << " ";
+    oss << "index: " << frameIndex << " ";
+    oss << "pixelBuffers: " << pixelBuffers.size() << " ";
+    if(!pixelBuffers.empty())
+    {
+      oss << "premult:" << pixelBuffers[0].IsAlphaPreMultiplied() << " ";
+    }
+    oss << "url:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetUrl()) << "]";
+    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_IMAGE_LOADING_TASK", oss.str().c_str());
+  }
+#endif
 }
 
 bool LoadingTask::IsReady()

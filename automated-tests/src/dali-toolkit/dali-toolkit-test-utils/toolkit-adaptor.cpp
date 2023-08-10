@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,21 +24,19 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 
-#include <toolkit-scene-holder-impl.h>
-#include <toolkit-adaptor-impl.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/scene.h>
 #include <test-application.h>
+#include <toolkit-adaptor-impl.h>
+#include <toolkit-scene-holder-impl.h>
 #include <toolkit-test-application.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
 namespace Adaptor
 {
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Dali::Internal::Adaptor::Adaptor Stub
@@ -49,14 +47,14 @@ Dali::Adaptor* gAdaptor = nullptr;
 
 Dali::Adaptor& Adaptor::New()
 {
-  DALI_ASSERT_ALWAYS( ! gAdaptor );
+  DALI_ASSERT_ALWAYS(!gAdaptor);
   gAdaptor = new Dali::Adaptor;
   return *gAdaptor;
 }
 
 Dali::Adaptor& Adaptor::Get()
 {
-  DALI_ASSERT_ALWAYS( gAdaptor );
+  DALI_ASSERT_ALWAYS(gAdaptor);
   return *gAdaptor;
 }
 
@@ -69,33 +67,32 @@ Adaptor::~Adaptor()
   gAdaptor = nullptr;
 }
 
-void Adaptor::Start( Dali::Window window )
+void Adaptor::Start(Dali::Window window)
 {
-  AddWindow( &GetImplementation( window ) );
+  AddWindow(&GetImplementation(window));
 }
 
-Integration::Scene Adaptor::GetScene( Dali::Window window )
+Integration::Scene Adaptor::GetScene(Dali::Window window)
 {
   return window.GetScene();
 }
 
-bool Adaptor::AddIdle( CallbackBase* callback, bool hasReturnValue )
+bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
 {
-  mCallbacks.PushBack( callback );
+  mCallbacks.PushBack(callback);
   return true;
 }
 
-void Adaptor::RemoveIdle( CallbackBase* callback )
+void Adaptor::RemoveIdle(CallbackBase* callback)
 {
-  mCallbacks.Erase( std::find_if( mCallbacks.Begin(), mCallbacks.End(),
-                                  [ &callback ] ( CallbackBase* current ) { return callback == current; } ) );
+  mCallbacks.Erase(std::find_if(mCallbacks.Begin(), mCallbacks.End(), [&callback](CallbackBase* current) { return callback == current; }));
 }
 
 void Adaptor::RunIdles()
 {
-  for( auto& callback : mCallbacks )
+  for(auto& callback : mCallbacks)
   {
-    CallbackBase::Execute( *callback );
+    CallbackBase::Execute(*callback);
   }
 
   mCallbacks.Clear();
@@ -103,22 +100,22 @@ void Adaptor::RunIdles()
 
 Dali::RenderSurfaceInterface& Adaptor::GetSurface()
 {
-  DALI_ASSERT_ALWAYS( ! mWindows.empty() );
+  DALI_ASSERT_ALWAYS(!mWindows.empty());
 
-  return reinterpret_cast < Dali::RenderSurfaceInterface& >( mWindows.front()->GetRenderSurface() );
+  return reinterpret_cast<Dali::RenderSurfaceInterface&>(mWindows.front()->GetRenderSurface());
 }
 
 Dali::WindowContainer Adaptor::GetWindows()
 {
   Dali::WindowContainer windows;
 
-  for ( auto iter = mWindows.begin(); iter != mWindows.end(); ++iter )
+  for(auto iter = mWindows.begin(); iter != mWindows.end(); ++iter)
   {
     // Downcast to Dali::Window
-    Dali::Window window( dynamic_cast<Dali::Internal::Adaptor::Window*>( *iter ) );
-    if ( window )
+    Dali::Window window(dynamic_cast<Dali::Internal::Adaptor::Window*>(*iter));
+    if(window)
     {
-      windows.push_back( window );
+      windows.push_back(window);
     }
   }
 
@@ -129,21 +126,21 @@ Dali::SceneHolderList Adaptor::GetSceneHolders()
 {
   Dali::SceneHolderList sceneHolderList;
 
-  for( auto iter = mWindows.begin(); iter != mWindows.end(); ++iter )
+  for(auto iter = mWindows.begin(); iter != mWindows.end(); ++iter)
   {
-    sceneHolderList.push_back( Dali::Integration::SceneHolder( *iter ) );
+    sceneHolderList.push_back(Dali::Integration::SceneHolder(*iter));
   }
 
   return sceneHolderList;
 }
 
-Dali::Internal::Adaptor::SceneHolder* Adaptor::GetWindow( Dali::Actor& actor )
+Dali::Internal::Adaptor::SceneHolder* Adaptor::GetWindow(Dali::Actor& actor)
 {
-  Dali::Integration::Scene scene = Dali::Integration::Scene::Get( actor );
+  Dali::Integration::Scene scene = Dali::Integration::Scene::Get(actor);
 
-  for( auto window : mWindows )
+  for(auto window : mWindows)
   {
-    if ( scene == window->GetScene() )
+    if(scene == window->GetScene())
     {
       return window;
     }
@@ -152,39 +149,39 @@ Dali::Internal::Adaptor::SceneHolder* Adaptor::GetWindow( Dali::Actor& actor )
   return nullptr;
 }
 
-void Adaptor::AddWindow( Internal::Adaptor::SceneHolder* window )
+void Adaptor::AddWindow(Internal::Adaptor::SceneHolder* window)
 {
-  if ( window )
+  if(window)
   {
-    mWindows.push_back( window );
+    mWindows.push_back(window);
 
-    Dali::Integration::SceneHolder newWindow( window );
-    mWindowCreatedSignal.Emit( newWindow );
+    Dali::Integration::SceneHolder newWindow(window);
+    mWindowCreatedSignal.Emit(newWindow);
   }
 }
 
-void Adaptor::RemoveWindow( Internal::Adaptor::SceneHolder* window )
+void Adaptor::RemoveWindow(Internal::Adaptor::SceneHolder* window)
 {
-  auto iter = std::find( mWindows.begin(), mWindows.end(), window );
-  if( iter != mWindows.end() )
+  auto iter = std::find(mWindows.begin(), mWindows.end(), window);
+  if(iter != mWindows.end())
   {
-    mWindows.erase( iter );
+    mWindows.erase(iter);
   }
 }
 
-void Adaptor::RegisterProcessor( Integration::Processor& processor, bool postProcessor )
+void Adaptor::RegisterProcessor(Integration::Processor& processor, bool postProcessor)
 {
   Integration::Core& core = mTestApplication->GetCore();
-  core.RegisterProcessor( processor, postProcessor );
+  core.RegisterProcessor(processor, postProcessor);
 }
 
-void Adaptor::UnregisterProcessor( Integration::Processor& processor, bool postProcessor )
+void Adaptor::UnregisterProcessor(Integration::Processor& processor, bool postProcessor)
 {
   Integration::Core& core = mTestApplication->GetCore();
-  core.UnregisterProcessor( processor, postProcessor );
+  core.UnregisterProcessor(processor, postProcessor);
 }
 
-void Adaptor::SetApplication( Dali::TestApplication& testApplication )
+void Adaptor::SetApplication(Dali::TestApplication& testApplication)
 {
   mTestApplication = &testApplication;
 }
@@ -214,7 +211,7 @@ Dali::Adaptor::WindowCreatedSignalType& Adaptor::WindowCreatedSignal()
 ///////////////////////////////////////////////////////////////////////////////
 
 Adaptor::Adaptor()
-: mImpl( new Internal::Adaptor::Adaptor )
+: mImpl(new Internal::Adaptor::Adaptor)
 {
 }
 
@@ -240,21 +237,21 @@ void Adaptor::Stop()
 {
 }
 
-bool Adaptor::AddIdle( CallbackBase* callback, bool hasReturnValue )
+bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
 {
-  return mImpl->AddIdle( callback, hasReturnValue );
+  return mImpl->AddIdle(callback, hasReturnValue);
 }
 
-void Adaptor::RemoveIdle( CallbackBase* callback )
+void Adaptor::RemoveIdle(CallbackBase* callback)
 {
-  mImpl->RemoveIdle( callback );
+  mImpl->RemoveIdle(callback);
 }
 
-void Adaptor::ReplaceSurface( Window window, Dali::RenderSurfaceInterface& surface )
+void Adaptor::ReplaceSurface(Window window, Dali::RenderSurfaceInterface& surface)
 {
 }
 
-void Adaptor::ReplaceSurface( Dali::Integration::SceneHolder window, Dali::RenderSurfaceInterface& surface )
+void Adaptor::ReplaceSurface(Dali::Integration::SceneHolder window, Dali::RenderSurfaceInterface& surface)
 {
 }
 
@@ -294,7 +291,7 @@ Any Adaptor::GetNativeWindowHandle()
   return window;
 }
 
-Any Adaptor::GetNativeWindowHandle( Actor actor )
+Any Adaptor::GetNativeWindowHandle(Actor actor)
 {
   return GetNativeWindowHandle();
 }
@@ -303,7 +300,7 @@ void Adaptor::ReleaseSurfaceLock()
 {
 }
 
-void Adaptor::SetRenderRefreshRate( unsigned int numberOfVSyncsPerRender )
+void Adaptor::SetRenderRefreshRate(unsigned int numberOfVSyncsPerRender)
 {
 }
 
@@ -325,15 +322,15 @@ void Adaptor::NotifyLanguageChanged()
 {
 }
 
-void Adaptor::FeedTouchPoint( TouchPoint& point, int timeStamp )
+void Adaptor::FeedTouchPoint(TouchPoint& point, int timeStamp)
 {
 }
 
-void Adaptor::FeedWheelEvent( WheelEvent& wheelEvent )
+void Adaptor::FeedWheelEvent(WheelEvent& wheelEvent)
 {
 }
 
-void Adaptor::FeedKeyEvent( KeyEvent& keyEvent )
+void Adaptor::FeedKeyEvent(KeyEvent& keyEvent)
 {
 }
 
@@ -358,24 +355,51 @@ public:
   }
 };
 
-LogFactory* gLogFactory = NULL;
+LogFactory*                gLogFactory = NULL;
 const LogFactoryInterface& Adaptor::GetLogFactory()
 {
-  if( gLogFactory == NULL )
+  if(gLogFactory == NULL)
   {
     gLogFactory = new LogFactory;
   }
   return *gLogFactory;
 }
 
-void Adaptor::RegisterProcessor( Integration::Processor& processor, bool postProcessor)
+class TraceFactory : public TraceFactoryInterface
 {
-  mImpl->RegisterProcessor( processor, postProcessor );
+public:
+  virtual void InstallTraceFunction() const
+  {
+    Dali::Integration::Trace::LogContextFunction logContextFunction(&TestApplication::LogContext);
+    Dali::Integration::Trace::InstallLogContextFunction(logContextFunction);
+  }
+
+  TraceFactory()
+  {
+  }
+  virtual ~TraceFactory()
+  {
+  }
+};
+
+TraceFactory*                gTraceFactory = NULL;
+const TraceFactoryInterface& Adaptor::GetTraceFactory()
+{
+  if(gTraceFactory == NULL)
+  {
+    gTraceFactory = new TraceFactory;
+  }
+  return *gTraceFactory;
 }
 
-void Adaptor::UnregisterProcessor( Integration::Processor& processor, bool postProcessor)
+void Adaptor::RegisterProcessor(Integration::Processor& processor, bool postProcessor)
 {
-  mImpl->UnregisterProcessor( processor, postProcessor );
+  mImpl->RegisterProcessor(processor, postProcessor);
+}
+
+void Adaptor::UnregisterProcessor(Integration::Processor& processor, bool postProcessor)
+{
+  mImpl->UnregisterProcessor(processor, postProcessor);
 }
 
 } // namespace Dali
