@@ -47,7 +47,8 @@ VectorAnimationThread::VectorAnimationThread()
   mConditionalWait(),
   mNeedToSleep(false),
   mDestroyThread(false),
-  mLogFactory(Dali::Adaptor::Get().GetLogFactory())
+  mLogFactory(Dali::Adaptor::Get().GetLogFactory()),
+  mTraceFactory(Dali::Adaptor::Get().GetTraceFactory())
 {
   mAsyncTaskManager = Dali::AsyncTaskManager::Get();
   mSleepThread.Start();
@@ -176,6 +177,7 @@ void VectorAnimationThread::Run()
 {
   SetThreadName("VectorAnimationThread");
   mLogFactory.InstallLogFunction();
+  mTraceFactory.InstallTraceFunction();
 
   while(!mDestroyThread)
   {
@@ -289,6 +291,7 @@ VectorAnimationThread::SleepThread::SleepThread(CallbackBase* callback)
   mAwakeCallback(std::unique_ptr<CallbackBase>(callback)),
   mSleepTimePoint(),
   mLogFactory(Dali::Adaptor::Get().GetLogFactory()),
+  mTraceFactory(Dali::Adaptor::Get().GetTraceFactory()),
   mNeedToSleep(false),
   mDestroyThread(false)
 {
@@ -318,6 +321,7 @@ void VectorAnimationThread::SleepThread::Run()
 {
   SetThreadName("VectorSleepThread");
   mLogFactory.InstallLogFunction();
+  mTraceFactory.InstallTraceFunction();
 
   while(!mDestroyThread)
   {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ constexpr uint64_t DEFAULT_FRAME_DURATION_IN_NANOSECONDS(DEFAULT_FRAME_DURATION_
 
 GlViewRenderThread::GlViewRenderThread(Dali::NativeImageSourceQueuePtr queue)
 : mLogFactory(Dali::Adaptor::Get().GetLogFactory()),
+  mTraceFactory(Dali::Adaptor::Get().GetTraceFactory()),
   mSurfaceSize(1, 1),
   mNativeImageSurface(),
   mNativeImageQueue(queue),
@@ -154,6 +155,7 @@ void GlViewRenderThread::Run()
 {
   Dali::SetThreadName("GlViewRenderer");
   mLogFactory.InstallLogFunction();
+  mTraceFactory.InstallTraceFunction();
 
   int renderFrameResult = 0;
 

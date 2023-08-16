@@ -59,6 +59,7 @@ set(BULLET3_SOURCES
 foreach(SUB ${BULLET_SUBMODULES})
     file(GLOB_RECURSE SUBMODULE_SOURCES
         "${bullet_SOURCE_DIR}/src/${SUB}/*.h"
+        "${bullet_SOURCE_DIR}/src/${SUB}/*.hpp"
         "${bullet_SOURCE_DIR}/src/${SUB}/*.cpp"
         "${bullet_SOURCE_DIR}/src/${SUB}/*.c"
     )
@@ -149,7 +150,7 @@ foreach(SUB ${BULLET_SUBMODULES})
     install(
         DIRECTORY "${bullet_SOURCE_DIR}/src/${SUB}"
         DESTINATION "include/bullet"
-        FILES_MATCHING PATTERN "*.h"
+        FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
     )
 endforeach()
 

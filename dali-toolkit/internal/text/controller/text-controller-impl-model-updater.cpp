@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/text/controller/text-controller-impl-model-updater.h>
 
 // EXTERNAL INCLUDES
+#include <chrono>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/math/math-utils.h>
