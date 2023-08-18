@@ -1054,6 +1054,23 @@ void ResourceReadySignal(Control control)
   gResourceReadySignalFired = true;
 }
 
+void OnResourceReadySignalSVG(Control control)
+{
+  // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
+  Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
+  Property::Map               resultMap;
+  imageVisual.CreatePropertyMap(resultMap);
+
+  Property::Value* transformValue = resultMap.Find(Visual::Property::TRANSFORM);
+  DALI_TEST_CHECK(transformValue);
+  Property::Map* retMap = transformValue->GetMap();
+  DALI_TEST_CHECK(retMap);
+
+  // Fitting mode should not be applied at this point
+  DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::SIZE)->Get<Vector2>(),  Vector2::ZERO, TEST_LOCATION);
+}
+
 int UtcDaliImageViewCheckResourceReady(void)
 {
   ToolkitTestApplication application;
@@ -2810,6 +2827,51 @@ int UtcDaliImageViewSyncSVGLoading(void)
     application.SendNotification();
     Vector3 naturalSize = imageView.GetNaturalSize();
 
+    DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliImageViewSyncSVGLoading02(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("ImageView Testing SVG image sync loading");
+
+  {
+    ImageView imageView = ImageView::New();
+
+    // Sync loading is used
+    Property::Map syncLoadingMap;
+    syncLoadingMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
+    syncLoadingMap.Insert(Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/svg1.svg");
+    syncLoadingMap.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+    syncLoadingMap.Insert(DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO);
+    imageView.SetProperty(ImageView::Property::IMAGE, syncLoadingMap);
+    imageView.ResourceReadySignal().Connect(&OnResourceReadySignalSVG);
+
+    application.GetScene().Add(imageView);
+    DALI_TEST_CHECK(imageView);
+
+    application.SendNotification();
+    application.Render();
+
+    // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+    Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
+    Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
+    Property::Map               resultMap;
+    imageVisual.CreatePropertyMap(resultMap);
+
+    Property::Value* transformValue = resultMap.Find(Visual::Property::TRANSFORM);
+    DALI_TEST_CHECK(transformValue);
+    Property::Map* retMap = transformValue->GetMap();
+    DALI_TEST_CHECK(retMap);
+
+    // Image Visual should be positioned depending on ImageView's padding
+    DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::SIZE)->Get<Vector2>(),  Vector2(100, 100), TEST_LOCATION);
+
+    Vector3 naturalSize = imageView.GetNaturalSize();
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
   }
