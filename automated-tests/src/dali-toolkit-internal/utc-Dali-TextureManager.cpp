@@ -1046,9 +1046,6 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedLater(void)
   DALI_TEST_EQUALS(observer.mLoaded, false, TEST_LOCATION);
   DALI_TEST_EQUALS(observer.mObserverCalled, false, TEST_LOCATION);
 
-  application.SendNotification();
-  application.Render();
-
   // CAPTION : HARD-CODING for coverage.
   {
     Dali::Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
@@ -1500,9 +1497,6 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
     preMultiply,
     synchronousLoading);
 
-  application.SendNotification();
-  application.Render();
-
   DALI_TEST_EQUALS(observer1.mLoaded, false, TEST_LOCATION);
   DALI_TEST_EQUALS(observer1.mObserverCalled, false, TEST_LOCATION);
   DALI_TEST_EQUALS(observer2.mLoaded, false, TEST_LOCATION);
@@ -1903,9 +1897,6 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
       *data3.observerCalleddPtr = data3.self->mObserverCalled;
     });
 
-  application.SendNotification();
-  application.Render();
-
   tet_printf("Id info - mask : {%d}, 1 : {%d}, 2 : {%d}, 3 : {%d}, 4 : {%d}\n", static_cast<int>(maskInfo[0]->mAlphaMaskId), static_cast<int>(textureId1), static_cast<int>(textureId2), static_cast<int>(textureId3), static_cast<int>(textureId4));
 
   // CAPTION : HARD-CODING.
@@ -2192,9 +2183,6 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
       *data2.observerLoadedPtr = data2.self->mLoaded;
       *data2.observerCalledPtr = data2.self->mObserverCalled;
     });
-
-  application.SendNotification();
-  application.Render();
 
   tet_printf("Id info - 1 : {%d}, 2 : {%d}, 3 : {%d}, 4 : {%d}\n", static_cast<int>(textureId1), static_cast<int>(textureId2), static_cast<int>(textureId3), static_cast<int>(textureId4));
 
