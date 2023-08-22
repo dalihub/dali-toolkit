@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-#include "physics-debug-renderer.h"
+// Class header
+#include <dali-physics/internal/bullet-impl/bullet-physics-debug-renderer.h>
 
+// External Includes
 #include <dali/dali.h>
-#include "physics-adaptor-impl.h"
+
+// Internal Includes
+#include <dali-physics/internal/physics-adaptor-impl.h>
 
 using Dali::Degree;
 using Dali::Matrix;

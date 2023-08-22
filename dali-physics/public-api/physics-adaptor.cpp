@@ -38,7 +38,7 @@ PhysicsAdaptor& PhysicsAdaptor::operator=(PhysicsAdaptor&& handle) noexcept = de
 
 PhysicsAdaptor PhysicsAdaptor::New(const Dali::Matrix& transform, Uint16Pair size)
 {
-  Internal::PhysicsAdaptorPtr internal = Internal::PhysicsAdaptor::New(transform, size);
+  Internal::PhysicsAdaptorPtr internal = Internal::CreateNewPhysicsAdaptor(transform, size);
   return PhysicsAdaptor(internal.Get());
 }
 
@@ -52,7 +52,7 @@ void PhysicsAdaptor::SetTimestep(float timestep)
   GetImplementation(*this).SetTimestep(timestep);
 }
 
-float PhysicsAdaptor::GetTimestep()
+float PhysicsAdaptor::GetTimestep() const
 {
   return GetImplementation(*this).GetTimestep();
 }
@@ -67,27 +67,27 @@ Dali::Layer PhysicsAdaptor::CreateDebugLayer(Dali::Window window)
   return GetImplementation(*this).CreateDebugLayer(window);
 }
 
-Dali::Vector3 PhysicsAdaptor::TranslateToPhysicsSpace(Dali::Vector3 vector)
+Dali::Vector3 PhysicsAdaptor::TranslateToPhysicsSpace(Dali::Vector3 vector) const
 {
   return GetImplementation(*this).TranslateToPhysicsSpace(vector);
 }
 
-Dali::Quaternion PhysicsAdaptor::TranslateToPhysicsSpace(Dali::Quaternion rotation)
+Dali::Quaternion PhysicsAdaptor::TranslateToPhysicsSpace(Dali::Quaternion rotation) const
 {
   return GetImplementation(*this).TranslateToPhysicsSpace(rotation);
 }
 
-Dali::Vector3 PhysicsAdaptor::TranslateFromPhysicsSpace(Dali::Vector3 vector)
+Dali::Vector3 PhysicsAdaptor::TranslateFromPhysicsSpace(Dali::Vector3 vector) const
 {
   return GetImplementation(*this).TranslateFromPhysicsSpace(vector);
 }
 
-Dali::Vector3 PhysicsAdaptor::ConvertVectorToPhysicsSpace(Dali::Vector3 vector)
+Dali::Vector3 PhysicsAdaptor::ConvertVectorToPhysicsSpace(Dali::Vector3 vector) const
 {
   return GetImplementation(*this).ConvertVectorToPhysicsSpace(vector);
 }
 
-Dali::Vector3 PhysicsAdaptor::ConvertVectorFromPhysicsSpace(Dali::Vector3 vector)
+Dali::Vector3 PhysicsAdaptor::ConvertVectorFromPhysicsSpace(Dali::Vector3 vector) const
 {
   return GetImplementation(*this).ConvertVectorFromPhysicsSpace(vector);
 }
@@ -102,7 +102,7 @@ void PhysicsAdaptor::SetIntegrationState(Physics::PhysicsAdaptor::IntegrationSta
   GetImplementation(*this).SetIntegrationState(state);
 }
 
-Physics::PhysicsAdaptor::IntegrationState PhysicsAdaptor::GetIntegrationState()
+Physics::PhysicsAdaptor::IntegrationState PhysicsAdaptor::GetIntegrationState() const
 {
   return GetImplementation(*this).GetIntegrationState();
 }
@@ -112,7 +112,7 @@ void PhysicsAdaptor::SetDebugState(Physics::PhysicsAdaptor::DebugState state)
   GetImplementation(*this).SetDebugState(state);
 }
 
-Physics::PhysicsAdaptor::DebugState PhysicsAdaptor::GetDebugState()
+Physics::PhysicsAdaptor::DebugState PhysicsAdaptor::GetDebugState() const
 {
   return GetImplementation(*this).GetDebugState();
 }
@@ -123,13 +123,18 @@ PhysicsActor PhysicsAdaptor::AddActorBody(Dali::Actor actor, Dali::Any body)
   return PhysicsActor(physicsActor.Get());
 }
 
-PhysicsActor PhysicsAdaptor::GetPhysicsActor(Dali::Any body)
+void PhysicsAdaptor::RemoveActorBody(PhysicsActor physicsActor)
+{
+  GetImplementation(*this).RemoveActorBody(GetImplementation(physicsActor));
+}
+
+PhysicsActor PhysicsAdaptor::GetPhysicsActor(Dali::Any body) const
 {
   Internal::PhysicsActorPtr physicsActor = GetImplementation(*this).GetPhysicsActor(body);
   return PhysicsActor(physicsActor.Get());
 }
 
-Dali::Actor PhysicsAdaptor::GetRootActor()
+Dali::Actor PhysicsAdaptor::GetRootActor() const
 {
   return GetImplementation(*this).GetRootActor();
 }

@@ -34,7 +34,7 @@ extern btRigidBody* CreateBody(btDiscreteDynamicsWorld* bulletWorld);
 
 const char* BALL_IMAGE = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 
-int UtcDaliPhysicsActorNew(void)
+int UtcDaliPhysics3DActorNew(void)
 {
   ToolkitTestApplication application;
 
@@ -55,7 +55,7 @@ int UtcDaliPhysicsActorNew(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorDownCastP(void)
+int UtcDaliPhysics3DActorDownCastP(void)
 {
   ToolkitTestApplication application;
 
@@ -78,7 +78,7 @@ int UtcDaliPhysicsActorDownCastP(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorDownCastN(void)
+int UtcDaliPhysics3DActorDownCastN(void)
 {
   BaseHandle   uninitializedHandle;
   PhysicsActor actor = PhysicsActor::DownCast(uninitializedHandle);
@@ -86,7 +86,7 @@ int UtcDaliPhysicsActorDownCastN(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorMoveConstructor(void)
+int UtcDaliPhysics3DActorMoveConstructor(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Testing the move constructor");
@@ -114,7 +114,7 @@ int UtcDaliPhysicsActorMoveConstructor(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorCopyConstructor(void)
+int UtcDaliPhysics3DActorCopyConstructor(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Testing the move constructor");
@@ -142,7 +142,7 @@ int UtcDaliPhysicsActorCopyConstructor(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorCopyAssign(void)
+int UtcDaliPhysics3DActorCopyAssign(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Testing the copy assign");
@@ -170,7 +170,7 @@ int UtcDaliPhysicsActorCopyAssign(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorMoveAssignment(void)
+int UtcDaliPhysics3DActorMoveAssignment(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Testing the move constructor");
@@ -198,7 +198,7 @@ int UtcDaliPhysicsActorMoveAssignment(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorGetIdP(void)
+int UtcDaliPhysics3DActorGetIdP(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Testing the ID Getter");
@@ -220,7 +220,7 @@ int UtcDaliPhysicsActorGetIdP(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorGetIdN(void)
+int UtcDaliPhysics3DActorGetIdN(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Testing the ID Getter");
@@ -239,7 +239,7 @@ int UtcDaliPhysicsActorGetIdN(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorGetBodyP(void)
+int UtcDaliPhysics3DActorGetBodyP(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Testing the body Getter");
@@ -271,7 +271,7 @@ int UtcDaliPhysicsActorGetBodyP(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorGetBodyN(void)
+int UtcDaliPhysics3DActorGetBodyN(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Testing the ID Getter");
@@ -289,7 +289,7 @@ int UtcDaliPhysicsActorGetBodyN(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorSetPosition(void)
+int UtcDaliPhysics3DActorSetPosition(void)
 {
   tet_infoline("Test the AsyncSetPhysicsPosition() function");
 
@@ -333,7 +333,7 @@ int UtcDaliPhysicsActorSetPosition(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorSetRotation1(void)
+int UtcDaliPhysics3DActorSetRotation1(void)
 {
   tet_infoline("Test the AsyncSetPhysicsRotation() function");
 
@@ -379,7 +379,7 @@ int UtcDaliPhysicsActorSetRotation1(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorSetRotation2(void)
+int UtcDaliPhysics3DActorSetRotation2(void)
 {
   tet_infoline("Test the AsyncSetPhysicsRotation() function");
 
@@ -425,7 +425,7 @@ int UtcDaliPhysicsActorSetRotation2(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorGetActorPosition(void)
+int UtcDaliPhysics3DActorGetActorPosition(void)
 {
   tet_infoline("Test the GetActorPosition() function");
 
@@ -466,7 +466,7 @@ int UtcDaliPhysicsActorGetActorPosition(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorGetActorRotation(void)
+int UtcDaliPhysics3DActorGetActorRotation(void)
 {
   tet_infoline("Test the GetActorRotation() function");
 
@@ -507,7 +507,7 @@ int UtcDaliPhysicsActorGetActorRotation(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorGetPhysicsPosition(void)
+int UtcDaliPhysics3DActorGetPhysicsPosition(void)
 {
   tet_infoline("Test the GetPhysicsPosition() function");
 
@@ -550,7 +550,7 @@ int UtcDaliPhysicsActorGetPhysicsPosition(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsActorGetPhysicsRotation(void)
+int UtcDaliPhysics3DActorGetPhysicsRotation(void)
 {
   tet_infoline("Test the GetPhysicsRotation() function");
 

@@ -24,7 +24,6 @@
 
 #include <dali-physics/public-api/physics-adaptor.h>
 
-#include <btBulletDynamicsCommon.h>
 #include <functional>
 #include <queue>
 
@@ -33,17 +32,49 @@ namespace Dali::Toolkit::Physics::Internal
 class PhysicsWorld;
 class FrameCallback;
 
-class PhysicsWorld /* : public BaseObject */
+/**
+ * Abstract class that handles the update frame callback, queuing and calling
+ * functions before the integration step ; calling the integration step,
+ * and owning the mutex for the update callback.
+ *
+ * Implementing classes should also hold the physics world.
+ */
+class PhysicsWorld
 {
 public:
+  /**
+   * Create a new physics world.
+   */
   static std::unique_ptr<PhysicsWorld> New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback);
 
+  /**
+   * Constructor which takes the root actor and a callback from the PhysicsAdaptor
+   * @param[in] rootActor The root actor that physics actors will be added to
+   * @param[in] updateCallback A callback from the PhysicsAdaptor which updates the physics actors after the integration step
+   */
   PhysicsWorld(Dali::Actor rootActor, Dali::CallbackBase* updateCallback);
-  ~PhysicsWorld();
 
-  void Initialize(/*void* dynamicsWorld*/);
+  /**
+   * Virtual destructor.
+   * Note, removes the frame callback.
+   */
+  virtual ~PhysicsWorld();
 
-  Dali::Any GetNative();
+  /**
+   * Initialize derived classes and creates the frame callback
+   */
+  void Initialize();
+
+  /**
+   * Initialize the derived class
+   */
+  virtual void OnInitialize() = 0;
+
+  /**
+   * Get the native physics world / space.
+   * @return A pointer to the physics world / space
+   */
+  virtual Dali::Any GetNative() = 0;
 
   /**
    * Set how long the integration should take.
@@ -61,7 +92,6 @@ public:
    * Queue a function for execution in the update thread, prior to the physics integration.
    * Enables syncronization of DALi properties and physics controlled properties.
    */
-
   void Queue(std::function<void(void)> function);
 
   /**
@@ -85,7 +115,7 @@ public:
    * @param[out] distanceFromCamera The distance of the pick point from the camera
    * @return Empty value if no dynamic body found, otherwise a valid ptr to the hit body.
    */
-  Dali::Any HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Vector3& localPivot, float& distanceFromCamera);
+  virtual Dali::Any HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Vector3& localPivot, float& distanceFromCamera) = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::SetIntegrationState
@@ -112,25 +142,18 @@ public:
 
   bool OnUpdate(Dali::UpdateProxy& updateProxy, float elapsedSeconds);
 
-private:
-  void Integrate(float timestep);
+protected:
+  virtual void Integrate(float timestep) = 0;
 
-private:
-  Dali::Mutex mMutex;
-
-  btDiscreteDynamicsWorld*             mDynamicsWorld{nullptr};
-  btCollisionDispatcher*               mDispatcher{nullptr};
-  btDefaultCollisionConfiguration*     mCollisionConfiguration{nullptr};
-  btBroadphaseInterface*               mBroadphase{nullptr};
-  btSequentialImpulseConstraintSolver* mSolver{nullptr};
-
+protected:
+  Dali::Mutex                           mMutex;
   std::queue<std::function<void(void)>> commandQueue;
   Dali::UpdateProxy::NotifySyncPoint    mNotifySyncPoint;
   Dali::CallbackBase*                   mUpdateCallback{nullptr};
   std::unique_ptr<FrameCallback>        mFrameCallback;
   Dali::Actor                           mRootActor;
-  float                                 mPhysicsTimeStep{1.0 / 180.0};
 
+  float                                     mPhysicsTimeStep{1.0 / 180.0};
   Physics::PhysicsAdaptor::IntegrationState mPhysicsIntegrateState{Physics::PhysicsAdaptor::IntegrationState::ON};
   Physics::PhysicsAdaptor::DebugState       mPhysicsDebugState{Physics::PhysicsAdaptor::DebugState::OFF};
 };

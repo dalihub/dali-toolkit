@@ -16,6 +16,8 @@
 
 // Class Header
 #include <dali-physics/internal/physics-actor-impl.h>
+
+#include <btBulletDynamicsCommon.h>
 #include <dali-physics/internal/physics-adaptor-impl.h>
 
 namespace Dali::Toolkit::Physics::Internal
@@ -60,7 +62,6 @@ PhysicsActor::~PhysicsActor() = default;
 
 void PhysicsActor::Initialize(void)
 {
-  // RegisterObject?
 }
 
 void PhysicsActor::AsyncSetPhysicsPosition(Dali::Vector3 actorPosition)
@@ -105,7 +106,6 @@ Dali::Quaternion PhysicsActor::GetActorRotation() const
   const btTransform& transform = body->getWorldTransform();
   btQuaternion       q         = transform.getRotation();
   return mAdaptor.TranslateFromPhysicsSpace(Quaternion(q.w(), q.x(), q.y(), q.z()));
-
 }
 
 } // namespace Dali::Toolkit::Physics::Internal

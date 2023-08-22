@@ -24,7 +24,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-physics/internal/physics-actor-impl.h>
-#include <dali-physics/internal/physics-debug-renderer.h>
 #include <dali-physics/internal/physics-world-impl.h>
 #include <dali-physics/public-api/physics-adaptor.h>
 
@@ -33,7 +32,12 @@ namespace Dali::Toolkit::Physics
 namespace Internal
 {
 class PhysicsAdaptor;
+class PhysicsDebugRenderer;
+
 using PhysicsAdaptorPtr = IntrusivePtr<PhysicsAdaptor>;
+
+// Declaration of factory function, implemented by derived class
+PhysicsAdaptorPtr CreateNewPhysicsAdaptor(const Dali::Matrix& transform, Uint16Pair worldSize);
 
 class PhysicsAdaptor : public BaseObject
 {
@@ -49,12 +53,11 @@ public:
   PhysicsAdaptor(const PhysicsAdaptor& handle) = delete;
   PhysicsAdaptor& operator=(const PhysicsAdaptor& handle) = delete;
 
-  static PhysicsAdaptorPtr New(const Dali::Matrix& transform, Uint16Pair size);
-
   /**
    * 2nd stage initialization
    */
-  void Initialize(const Dali::Matrix& transform, Uint16Pair size);
+  void         Initialize(const Dali::Matrix& transform, Uint16Pair size);
+  virtual void OnInitialize(const Dali::Matrix& transform, Uint16Pair size) = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::SetTimestep
@@ -64,7 +67,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::GetTimestep
    */
-  float GetTimestep();
+  float GetTimestep() const;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::GetPhysicsAccessor
@@ -74,42 +77,42 @@ public:
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::CreateDebugLayer
    */
-  Dali::Layer CreateDebugLayer(Dali::Window window);
+  virtual Dali::Layer CreateDebugLayer(Dali::Window window) = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::TranslateToPhysicsSpace
    */
-  Dali::Vector3 TranslateToPhysicsSpace(Dali::Vector3 vector);
+  virtual Dali::Vector3 TranslateToPhysicsSpace(Dali::Vector3 vector) const = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::TranslateToPhysicsSpace
    */
-  Dali::Quaternion TranslateToPhysicsSpace(Dali::Quaternion rotation);
+  virtual Dali::Quaternion TranslateToPhysicsSpace(Dali::Quaternion rotation) const = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::TranslateFromPhysicsSpace
    */
-  Dali::Vector3 TranslateFromPhysicsSpace(Dali::Vector3 vector);
+  virtual Dali::Vector3 TranslateFromPhysicsSpace(Dali::Vector3 vector) const = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::TranslateFromPhysicsSpace
    */
-  Dali::Quaternion TranslateFromPhysicsSpace(Quaternion rotation);
+  virtual Dali::Quaternion TranslateFromPhysicsSpace(Quaternion rotation) const = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::ConvertVectorToPhysicsSpace
    */
-  Dali::Vector3 ConvertVectorToPhysicsSpace(Dali::Vector3 vector);
+  virtual Dali::Vector3 ConvertVectorToPhysicsSpace(Dali::Vector3 vector) const = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::ConvertVectorFromPhysicsSpace
    */
-  Dali::Vector3 ConvertVectorFromPhysicsSpace(Dali::Vector3 vector);
+  virtual Dali::Vector3 ConvertVectorFromPhysicsSpace(Dali::Vector3 vector) const = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::SetTransformAndSize
    */
-  void SetTransformAndSize(const Dali::Matrix& transform, Uint16Pair size);
+  virtual void SetTransformAndSize(const Dali::Matrix& transform, Uint16Pair size) = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::SetIntegrationState
@@ -119,7 +122,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::GetIntegrationState
    */
-  Physics::PhysicsAdaptor::IntegrationState GetIntegrationState();
+  Physics::PhysicsAdaptor::IntegrationState GetIntegrationState() const;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::SetDebugState
@@ -129,32 +132,37 @@ public:
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::GetDebugState
    */
-  Physics::PhysicsAdaptor::DebugState GetDebugState();
+  Physics::PhysicsAdaptor::DebugState GetDebugState() const;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::AddActorBody
    */
-  PhysicsActorPtr AddActorBody(Dali::Actor actor, Dali::Any body);
+  virtual PhysicsActorPtr AddActorBody(Dali::Actor actor, Dali::Any body) = 0;
+
+  /**
+   * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::RemoveActorBody
+   */
+  virtual void RemoveActorBody(PhysicsActor& physicsActor) = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::GetPhysicsActor
    */
-  PhysicsActorPtr GetPhysicsActor(Dali::Any body);
+  virtual PhysicsActorPtr GetPhysicsActor(Dali::Any body) const = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::GetRootActor
    */
-  Dali::Actor GetRootActor();
+  Dali::Actor GetRootActor() const;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::BuildPickingRay
    */
-  void BuildPickingRay(Dali::Vector3 origin, Dali::Vector3 direction, Dali::Vector3& rayFromWorld, Dali::Vector3& rayToWorld);
+  virtual void BuildPickingRay(Dali::Vector3 origin, Dali::Vector3 direction, Dali::Vector3& rayFromWorld, Dali::Vector3& rayToWorld) = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::ProjectPoint
    */
-  Dali::Vector3 ProjectPoint(Dali::Vector3 origin, Dali::Vector3 direction, float distance);
+  virtual Dali::Vector3 ProjectPoint(Dali::Vector3 origin, Dali::Vector3 direction, float distance) = 0;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::Queue
@@ -166,24 +174,21 @@ public:
    */
   void CreateSyncPoint();
 
-private:
   /**
    * Handle the update of all of the known bound actors
    */
   void OnUpdateActors(Dali::UpdateProxy* updateProxy);
 
-private:
+protected:
   std::unique_ptr<PhysicsWorld>                 mPhysicsWorld;
   std::unordered_map<uint32_t, PhysicsActorPtr> mPhysicsActors;
   Dali::Actor                                   mRootActor;
-  Dali::Actor                                   mDebugActor;
 
   Dali::Matrix     mTransform;
   Dali::Matrix     mInverseTransform;
   Dali::Uint16Pair mSize;
 
-  std::unique_ptr<PhysicsDebugRenderer> mDebugRenderer;
-  Dali::SlotDelegate<PhysicsAdaptor>    mSlotDelegate;
+  Dali::SlotDelegate<PhysicsAdaptor> mSlotDelegate;
 };
 
 } //namespace Internal

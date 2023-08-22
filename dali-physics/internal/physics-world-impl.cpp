@@ -18,12 +18,6 @@
 #include <dali-physics/internal/physics-world-impl.h>
 
 // External Headers
-#include <BulletCollision/NarrowPhaseCollision/btRaycastCallback.h>
-#include <btBulletCollisionCommon.h>
-#include <iostream>
-#include <map>
-#include <memory>
-#include <utility>
 
 // Internal Headers
 #include <dali/dali.h>
@@ -62,31 +56,16 @@ private: // Member variables
   PhysicsWorld& mPhysicsWorld;
 };
 
-using NativeWorld = btDiscreteDynamicsWorld*;
-
-std::unique_ptr<PhysicsWorld> PhysicsWorld::New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback)
-{
-  std::unique_ptr<PhysicsWorld> world = std::make_unique<PhysicsWorld>(rootActor, updateCallback);
-  world->Initialize();
-  return world;
-}
-
 PhysicsWorld::PhysicsWorld(Dali::Actor rootActor, Dali::CallbackBase* updateCallback)
 : mUpdateCallback(updateCallback),
   mRootActor(rootActor)
 {
-  Initialize();
 }
 
-void PhysicsWorld::Initialize(/*void* dynamicsWorld*/)
+void PhysicsWorld::Initialize()
 {
-  // @todo Should enable developer to supply their own created DynamicsWorld.
-
-  mCollisionConfiguration = new btDefaultCollisionConfiguration();
-  mDispatcher             = new btCollisionDispatcher(mCollisionConfiguration);
-  mBroadphase             = new btDbvtBroadphase();
-  mSolver                 = new btSequentialImpulseConstraintSolver;
-  mDynamicsWorld          = new btDiscreteDynamicsWorld(mDispatcher, mBroadphase, mSolver, mCollisionConfiguration);
+  // Call derived class's initializer
+  OnInitialize();
 
   // Automatically start the frame callback. This means everything should
   // be accessed with a mutex lock, which is automatically locked when
@@ -96,51 +75,12 @@ void PhysicsWorld::Initialize(/*void* dynamicsWorld*/)
   Dali::Stage::GetCurrent().KeepRendering(30); // @todo Remove!
 }
 
-Dali::Any PhysicsWorld::GetNative()
-{
-  return mDynamicsWorld;
-}
-
 PhysicsWorld::~PhysicsWorld()
 {
+  // Derived class's destructor should clean down physics objects under mutex lock
+  // On completion, can remove the callback.
+
   Dali::DevelStage::RemoveFrameCallback(Dali::Stage::GetCurrent(), *mFrameCallback);
-
-  Dali::Mutex::ScopedLock lock(mMutex);
-
-  if(mDynamicsWorld)
-  {
-    int i;
-    for(i = mDynamicsWorld->getNumConstraints() - 1; i >= 0; i--)
-    {
-      mDynamicsWorld->removeConstraint(mDynamicsWorld->getConstraint(i));
-    }
-    for(i = mDynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
-    {
-      btCollisionObject* obj  = mDynamicsWorld->getCollisionObjectArray()[i];
-      btRigidBody*       body = btRigidBody::upcast(obj);
-      if(body && body->getMotionState())
-      {
-        delete body->getMotionState();
-      }
-      mDynamicsWorld->removeCollisionObject(obj);
-      delete obj;
-    }
-  }
-
-  /*
-  for (int j = 0; j < m_collisionShapes.size(); j++)
-  {
-    btCollisionShape* shape = mCollisionShapes[j];
-    delete shape;
-  }
-  mCollisionShapes.clear();
-  */
-
-  delete mDynamicsWorld;
-  delete mSolver;
-  delete mBroadphase;
-  delete mDispatcher;
-  delete mCollisionConfiguration;
 }
 
 Dali::Mutex& PhysicsWorld::GetMutex()
@@ -184,18 +124,6 @@ bool PhysicsWorld::OnUpdate(Dali::UpdateProxy& updateProxy, float elapsedSeconds
   return true;
 }
 
-void PhysicsWorld::Integrate(float timestep)
-{
-  if(mPhysicsIntegrateState == Physics::PhysicsAdaptor::IntegrationState::ON)
-  {
-    mDynamicsWorld->stepSimulation(timestep);
-  }
-  if(mDynamicsWorld->getDebugDrawer() && mPhysicsDebugState == Physics::PhysicsAdaptor::DebugState::ON)
-  {
-    mDynamicsWorld->debugDrawWorld();
-  }
-}
-
 void PhysicsWorld::SetTimestep(float timeStep)
 {
   mPhysicsTimeStep = timeStep;
@@ -222,48 +150,6 @@ void PhysicsWorld::Queue(std::function<void(void)> function)
 void PhysicsWorld::CreateSyncPoint()
 {
   mNotifySyncPoint = Dali::DevelStage::NotifyFrameCallback(Dali::Stage::GetCurrent(), *mFrameCallback);
-}
-
-inline btVector3 ConvertVector(Dali::Vector3 vector)
-{
-  return btVector3(vector.x, vector.y, vector.z);
-}
-
-Dali::Any PhysicsWorld::HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Vector3& localPivot, float& distanceFromCamera)
-{
-  btRigidBody* hitBody{nullptr};
-
-  btVector3                                  origin = ConvertVector(rayFromWorld);
-  btVector3                                  end    = ConvertVector(rayToWorld);
-  btCollisionWorld::ClosestRayResultCallback rayResultCallback(origin, end);
-  rayResultCallback.m_flags |= btTriangleRaycastCallback::kF_UseGjkConvexCastRaytest;
-
-  mDynamicsWorld->rayTest(origin, end, rayResultCallback);
-  if(rayResultCallback.hasHit())
-  {
-    auto         pickPos = rayResultCallback.m_hitPointWorld;
-    btRigidBody* body    = (btRigidBody*)btRigidBody::upcast(rayResultCallback.m_collisionObject);
-    if(body)
-    {
-      if(!(body->isStaticObject() || body->isKinematicObject()))
-      {
-        hitBody            = body; // Found a dynamic body.
-        distanceFromCamera = (pickPos - origin).length();
-
-        btVector3 pivot = body->getCenterOfMassTransform().inverse() * pickPos;
-        localPivot.x    = pivot.x();
-        localPivot.y    = pivot.y();
-        localPivot.z    = pivot.z();
-      }
-    }
-  }
-  Dali::Any bodyPtr;
-  if(hitBody)
-  {
-    bodyPtr = hitBody;
-  }
-
-  return bodyPtr;
 }
 
 void PhysicsWorld::SetIntegrationState(Physics::PhysicsAdaptor::IntegrationState state)

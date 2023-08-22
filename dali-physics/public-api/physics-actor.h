@@ -53,16 +53,59 @@ class PhysicsActor;
 class DALI_TOOLKIT_API PhysicsActor : public Dali::BaseHandle
 {
 public:
+  /**
+   * @brief Constructor
+   *
+   * @SINCE_2_2.43
+   */
   PhysicsActor();
+
+  /**
+   * @brief Destructor.
+   *
+   * @SINCE_2_2.43
+   * This is non-virtual since derived Handle types must not contain data or virtual methods
+   */
   ~PhysicsActor();
+
+  /**
+   * @brief Copy Constructor.
+   *
+   * @SINCE_2_2.43
+   * @param[in] handle The handle to copy
+   * @note This creates a new handle, but does not create a new implementation object.
+   */
   PhysicsActor(const PhysicsActor& handle);
+
+  /**
+   * @brief Move Constructor.
+   *
+   * @SINCE_2_2.43
+   * @param[in] handle A reference to the handle to move
+   */
   PhysicsActor(PhysicsActor&& rhs) noexcept;
+
+  /**
+   * @brief Assignment operator.
+   *
+   * @SINCE_2_2.43
+   * @param[in] handle A reference to the handle to move
+   * @return a reference to this handle
+   */
   PhysicsActor& operator=(const PhysicsActor& handle);
+
+  /**
+   * @brief Move Assignment operator.
+   *
+   * @SINCE_2_2.43
+   * @param[in] handle A reference to the handle to move
+   * @return a reference to this handle
+   */
   PhysicsActor& operator=(PhysicsActor&& handle) noexcept;
 
   /**
    * New method.
-   * @SINCE_2.2.40
+   * @SINCE_2_2.43
    *
    * Binds the actor to the given body. This should be a body that has
    * been added to the physics world, and has physical postion and
@@ -87,7 +130,7 @@ public:
    * If handle points to an PhysicsActor object, the downcast produces valid handle.
    * If not, the returned handle is left uninitialized.
    *
-   * @SINCE_2.2.40
+   * @SINCE_2_2.43
    * @param[in] handle to an object
    * @return handle to a PhysicsActor object or an uninitialized handle
    */
@@ -95,10 +138,15 @@ public:
 
   /**
    * @brief Get the actor ID of the associated actor.
+   *
+   * @SINCE_2_2.43
    */
   uint32_t GetId() const;
 
   /**
+   * @brief Get the actual physics body of this object.
+   *
+   * @SINCE_2_2.43
    * Using ANY wrapper to enable this interface to be used for any
    * types of physics bodies from either 2d or 3d physics.
    * @return The physics body. It can be cast to an appropriate type,
@@ -112,39 +160,51 @@ public:
   Dali::Any GetBody() const;
 
   /**
-   * Queue a method to set the position on the associated physics body
+   * @brief Queue a method to set the position on the associated physics body
    * in the update thread before the next integration.
+   *
+   * @SINCE_2_2.43
    * @param[in] actorPosition The position of the actor in DALi space
    */
   void AsyncSetPhysicsPosition(Dali::Vector3 actorPosition);
 
   /**
-   * Queue a method to set the rotation of the associated physics body
+   * @brief Queue a method to set the rotation of the associated physics body
    * in the update thread before the next integration.
+   *
+   * @SINCE_2_2.43
    * @param[in] actorRotation The orientation of the actor in DALi space
    */
   void AsyncSetPhysicsRotation(Dali::Quaternion actorRotation);
 
   /**
-   * Get the current position of the physics body in Physics space.
+   * @brief Get the current position of the physics body in Physics space.
+   *
+   * @SINCE_2_2.43
    * @return the current position of the physics body in Physics space.
    */
   Dali::Vector3 GetPhysicsPosition() const;
 
   /**
-   * Get the current rotation of the physics body in Physics space.
+   * @brief Get the current rotation of the physics body in Physics space.
+   *
+   * @SINCE_2_2.43
    * @return the current rotation of the physics body in Physics space.
    */
   Dali::Quaternion GetPhysicsRotation() const;
 
   /**
-   * Get the current position of the physics body in DALi space.
+   * @brief Get the current position of the physics body in DALi space.
+   *
+   * @SINCE_2_2.43
    * @return the current position of the physics body in DALi space.
    */
   Dali::Vector3 GetActorPosition() const;
 
   /**
-   * Get the current rotation of the physics body in DALi space.
+   * @brief Get the current rotation of the physics body in DALi space.
+   *
+   * @SINCE_2_2.43
    * @return the current rotation of the physics body in DALi space.
    */
   Dali::Quaternion GetActorRotation() const;
@@ -152,7 +212,11 @@ public:
 public: // Not intended for developer use
   /// @cond internal
   /**
-   * @note Not intented for application developers
+   * @brief This constructor is used by PhysicsActor::New() methods.
+   *
+   * @SINCE_2_2.43
+   * @param[in] impl A pointer to a newly allocated Dali resource.
+   * @note Not intended for application developers
    */
   explicit DALI_INTERNAL PhysicsActor(Internal::PhysicsActor* impl);
   /// @endcond

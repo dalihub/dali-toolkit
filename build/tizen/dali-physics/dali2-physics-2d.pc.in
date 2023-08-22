@@ -8,5 +8,5 @@ Name: DALi Engine Physics Library
 Description: Dali Physics 2D library
 Version: ${apiversion}
 Requires: chipmunk2d
-Libs: -L${libdir}
+Libs: -L${libdir} -ldali2-physics-2d
 Cflags: -I${includedir}

@@ -35,7 +35,7 @@ class PhysicsAdaptor;
 
 using PhysicsActorPtr = Dali::IntrusivePtr<PhysicsActor>;
 
-class DALI_TOOLKIT_API PhysicsActor : public Dali::BaseObject
+class PhysicsActor : public Dali::BaseObject
 {
 public:
   PhysicsActor(Dali::Actor actor, Dali::Any body, PhysicsAdaptor& adaptor);

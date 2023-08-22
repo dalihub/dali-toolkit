@@ -62,7 +62,7 @@ btRigidBody* CreateBody(btDiscreteDynamicsWorld* bulletWorld)
   return body;
 }
 
-int UtcDaliPhysicsCreateAdaptorP1(void)
+int UtcDaliPhysics3DCreateAdaptorP1(void)
 {
   ToolkitTestApplication application;
 
@@ -75,7 +75,7 @@ int UtcDaliPhysicsCreateAdaptorP1(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsCreateAdaptorN1(void)
+int UtcDaliPhysics3DCreateAdaptorN1(void)
 {
   ToolkitTestApplication application;
 
@@ -85,7 +85,7 @@ int UtcDaliPhysicsCreateAdaptorN1(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsDowncastP1(void)
+int UtcDaliPhysics3DDowncastP1(void)
 {
   ToolkitTestApplication application;
 
@@ -101,7 +101,7 @@ int UtcDaliPhysicsDowncastP1(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsDowncastN1(void)
+int UtcDaliPhysics3DDowncastN1(void)
 {
   BaseHandle handle;
   auto       adaptor = PhysicsAdaptor::DownCast(handle);
@@ -111,7 +111,7 @@ int UtcDaliPhysicsDowncastN1(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorMoveConstructor(void)
+int UtcDaliPhysics3DAdaptorMoveConstructor(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Testing the move constructor");
@@ -129,7 +129,7 @@ int UtcDaliPhysicsAdaptorMoveConstructor(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorCopyConstructor(void)
+int UtcDaliPhysics3DAdaptorCopyConstructor(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Testing the move constructor");
@@ -148,7 +148,7 @@ int UtcDaliPhysicsAdaptorCopyConstructor(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorCopyAssign(void)
+int UtcDaliPhysics3DAdaptorCopyAssign(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Testing the copy assign");
@@ -166,7 +166,7 @@ int UtcDaliPhysicsAdaptorCopyAssign(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorMoveAssignment(void)
+int UtcDaliPhysics3DAdaptorMoveAssignment(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Testing the move constructor");
@@ -184,7 +184,7 @@ int UtcDaliPhysicsAdaptorMoveAssignment(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsSetTimestep(void)
+int UtcDaliPhysics3DSetTimestep(void)
 {
   ToolkitTestApplication application;
 
@@ -199,7 +199,7 @@ int UtcDaliPhysicsSetTimestep(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsGetTimestep(void)
+int UtcDaliPhysics3DGetTimestep(void)
 {
   ToolkitTestApplication application;
 
@@ -220,7 +220,7 @@ int UtcDaliPhysicsGetTimestep(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsGetPhysicsAccessorP1(void)
+int UtcDaliPhysics3DGetPhysicsAccessorP1(void)
 {
   ToolkitTestApplication application;
 
@@ -237,7 +237,7 @@ int UtcDaliPhysicsGetPhysicsAccessorP1(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsGetPhysicsAccessorN1(void)
+int UtcDaliPhysics3DGetPhysicsAccessorN1(void)
 {
   ToolkitTestApplication application;
 
@@ -259,7 +259,7 @@ int UtcDaliPhysicsGetPhysicsAccessorN1(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorGetRootActor(void)
+int UtcDaliPhysics3DAdaptorGetRootActor(void)
 {
   tet_infoline("Test that the root actor can be retrieved");
 
@@ -278,7 +278,7 @@ int UtcDaliPhysicsAdaptorGetRootActor(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorCreateDebugLayer(void)
+int UtcDaliPhysics3DAdaptorCreateDebugLayer(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(true);
@@ -315,7 +315,7 @@ int UtcDaliPhysicsAdaptorCreateDebugLayer(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorTranslateToPhysicsSpace1(void)
+int UtcDaliPhysics3DAdaptorTranslateToPhysicsSpace1(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
@@ -330,7 +330,7 @@ int UtcDaliPhysicsAdaptorTranslateToPhysicsSpace1(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorTranslateToPhysicsSpace2(void)
+int UtcDaliPhysics3DAdaptorTranslateToPhysicsSpace2(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
@@ -346,7 +346,7 @@ int UtcDaliPhysicsAdaptorTranslateToPhysicsSpace2(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorTranslateToPhysicsSpace3(void)
+int UtcDaliPhysics3DAdaptorTranslateToPhysicsSpace3(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
@@ -364,7 +364,7 @@ int UtcDaliPhysicsAdaptorTranslateToPhysicsSpace3(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorTranslateToPhysicsSpace4(void)
+int UtcDaliPhysics3DAdaptorTranslateToPhysicsSpace4(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
@@ -382,7 +382,7 @@ int UtcDaliPhysicsAdaptorTranslateToPhysicsSpace4(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorTranslateToPhysicsSpace5(void)
+int UtcDaliPhysics3DAdaptorTranslateToPhysicsSpace5(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
@@ -400,7 +400,7 @@ int UtcDaliPhysicsAdaptorTranslateToPhysicsSpace5(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorTranslateFromPhysicsSpace1(void)
+int UtcDaliPhysics3DAdaptorTranslateFromPhysicsSpace1(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
@@ -418,7 +418,7 @@ int UtcDaliPhysicsAdaptorTranslateFromPhysicsSpace1(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorConvertVectorToPhysicsSpace01(void)
+int UtcDaliPhysics3DAdaptorConvertVectorToPhysicsSpace01(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
@@ -434,7 +434,7 @@ int UtcDaliPhysicsAdaptorConvertVectorToPhysicsSpace01(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorConvertVectorToPhysicsSpace02(void)
+int UtcDaliPhysics3DAdaptorConvertVectorToPhysicsSpace02(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
@@ -451,7 +451,7 @@ int UtcDaliPhysicsAdaptorConvertVectorToPhysicsSpace02(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorConvertVectorFromPhysicsSpace01(void)
+int UtcDaliPhysics3DAdaptorConvertVectorFromPhysicsSpace01(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
@@ -467,7 +467,7 @@ int UtcDaliPhysicsAdaptorConvertVectorFromPhysicsSpace01(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorConvertVectorFromPhysicsSpace02(void)
+int UtcDaliPhysics3DAdaptorConvertVectorFromPhysicsSpace02(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
@@ -484,7 +484,7 @@ int UtcDaliPhysicsAdaptorConvertVectorFromPhysicsSpace02(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorSetTransformAndSize(void)
+int UtcDaliPhysics3DAdaptorSetTransformAndSize(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
@@ -506,7 +506,7 @@ int UtcDaliPhysicsAdaptorSetTransformAndSize(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorSetIntegrationState(void)
+int UtcDaliPhysics3DAdaptorSetIntegrationState(void)
 {
   tet_infoline("Test that changing the integration state is reflected");
 
@@ -527,7 +527,7 @@ int UtcDaliPhysicsAdaptorSetIntegrationState(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorGetIntegrationState(void)
+int UtcDaliPhysics3DAdaptorGetIntegrationState(void)
 {
   tet_infoline("Test that changing the integration state is reflected");
 
@@ -550,7 +550,7 @@ int UtcDaliPhysicsAdaptorGetIntegrationState(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorSetDebugState(void)
+int UtcDaliPhysics3DAdaptorSetDebugState(void)
 {
   tet_infoline("Test that changing the debug state is reflected");
 
@@ -574,7 +574,7 @@ int UtcDaliPhysicsAdaptorSetDebugState(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorGetDebugState(void)
+int UtcDaliPhysics3DAdaptorGetDebugState(void)
 {
   tet_infoline("Test that changing the debug state is reflected");
 
@@ -597,7 +597,7 @@ int UtcDaliPhysicsAdaptorGetDebugState(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorAddActorBody(void)
+int UtcDaliPhysics3DAdaptorAddActorBody(void)
 {
   tet_infoline("Test that an actor/body pair can be added");
 
@@ -626,7 +626,123 @@ int UtcDaliPhysicsAdaptorAddActorBody(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorGetPhysicsActor(void)
+int UtcDaliPhysics3DAdaptorRemoveActorBodyP01(void)
+{
+  tet_infoline("Test that an actor/body pair can be removed");
+
+  ToolkitTestApplication application;
+  Matrix                 transform(false);
+  transform.SetIdentityAndScale(Vector3(2.0f, 2.0f, 2.0f));
+  Uint16Pair     size(640, 480);
+  auto           scene     = application.GetScene();
+  PhysicsAdaptor adaptor   = PhysicsAdaptor::New(transform, size);
+  Actor          rootActor = adaptor.GetRootActor();
+  scene.Add(rootActor);
+
+  btRigidBody* body;
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+
+    body = CreateBody(bulletWorld);
+  }
+  Dali::Actor ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+  auto        physicsActor = adaptor.AddActorBody(ballActor, body);
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  adaptor.RemoveActorBody(physicsActor);
+  DALI_TEST_CHECK(!ballActor.GetParent());
+
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+
+    bulletWorld->removeRigidBody(body);
+    try
+    {
+      delete body;
+      tet_result(TET_PASS);
+    }
+    catch(std::exception& e)
+    {
+      tet_result(TET_FAIL);
+    }
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPhysics3DAdaptorRemoveActorBodyN01(void)
+{
+  tet_infoline("Test that an empty actor/body pair doesn't break adaptor");
+
+  ToolkitTestApplication application;
+  Matrix                 transform(false);
+  transform.SetIdentityAndScale(Vector3(2.0f, 2.0f, 2.0f));
+  Uint16Pair     size(640, 480);
+  auto           scene     = application.GetScene();
+  PhysicsAdaptor adaptor   = PhysicsAdaptor::New(transform, size);
+  Actor          rootActor = adaptor.GetRootActor();
+  scene.Add(rootActor);
+
+  tet_infoline("Test that removing a physics actor that hasn't been created with AddActorBody does nothing");
+
+  Dali::Actor  actor = Dali::Actor::New();
+  btRigidBody* body;
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+
+    body = CreateBody(bulletWorld);
+  }
+
+  PhysicsActor physicsActor = PhysicsActor::New(actor, body, adaptor);
+  ;
+  try
+  {
+    adaptor.RemoveActorBody(physicsActor);
+    tet_result(TET_PASS);
+  }
+  catch(std::exception& e)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPhysics3DAdaptorRemoveActorBodyN02(void)
+{
+  tet_infoline("Test that an empty actor/body pair doesn't break adaptor");
+
+  ToolkitTestApplication application;
+  Matrix                 transform(false);
+  transform.SetIdentityAndScale(Vector3(2.0f, 2.0f, 2.0f));
+  Uint16Pair     size(640, 480);
+  auto           scene     = application.GetScene();
+  PhysicsAdaptor adaptor   = PhysicsAdaptor::New(transform, size);
+  Actor          rootActor = adaptor.GetRootActor();
+  scene.Add(rootActor);
+
+  PhysicsActor physicsActor;
+  try
+  {
+    adaptor.RemoveActorBody(physicsActor);
+    tet_result(TET_FAIL);
+  }
+  catch(DaliException& e)
+  {
+    DALI_TEST_ASSERT(e, "Physics actor handle is empty", TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPhysics3DAdaptorGetPhysicsActor(void)
 {
   tet_infoline("Test that an actor/body pair can be retrieved");
 
@@ -655,7 +771,7 @@ int UtcDaliPhysicsAdaptorGetPhysicsActor(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorBuildPickingRay(void)
+int UtcDaliPhysics3DAdaptorBuildPickingRay(void)
 {
   tet_infoline("Test that a touch can be converted to a picking ray");
 
@@ -674,7 +790,7 @@ int UtcDaliPhysicsAdaptorBuildPickingRay(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorProjectPoint(void)
+int UtcDaliPhysics3DAdaptorProjectPoint(void)
 {
   tet_infoline("Test that a point is projected into physics space");
 
@@ -692,7 +808,7 @@ int UtcDaliPhysicsAdaptorProjectPoint(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorQueue(void)
+int UtcDaliPhysics3DAdaptorQueue(void)
 {
   tet_infoline("Test that Queue and CreateSyncPoint both work");
 
@@ -736,7 +852,7 @@ int UtcDaliPhysicsAdaptorQueue(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorCreateSyncPoint(void)
+int UtcDaliPhysics3DAdaptorCreateSyncPoint(void)
 {
   tet_infoline("Test that a delayed CreateSyncPoint delays update");
 
@@ -793,7 +909,7 @@ int UtcDaliPhysicsAdaptorCreateSyncPoint(void)
   END_TEST;
 }
 
-int UtcDaliPhysicsAdaptorHitTestP(void)
+int UtcDaliPhysics3DAdaptorHitTestP(void)
 {
   tet_infoline("Test that hit testing finds a body");
 
