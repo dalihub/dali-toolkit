@@ -1116,6 +1116,11 @@ float LoadDataFromAccessors(ConversionContext& context, const gltf2::Accessor& i
   return inputDataBuffer[input.mCount - 1u];
 }
 
+bool IsFirstFrameValueEmpty(const uint32_t inputCount, const Vector<float>& inputBuffer)
+{
+  return (inputCount > 0 && !Dali::EqualsZero(inputBuffer[0]));
+}
+
 template<typename T>
 float LoadKeyFrames(ConversionContext& context, const gltf2::Animation::Channel& channel, KeyFrames& keyFrames, gltf2::Animation::Channel::Target::Type type)
 {
@@ -1127,8 +1132,7 @@ float LoadKeyFrames(ConversionContext& context, const gltf2::Animation::Channel&
 
   const float duration = std::max(LoadDataFromAccessors<T>(context, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
 
-  // Set first frame value as first keyframe (gltf animation spec)
-  if(input.mCount > 0 && !Dali::EqualsZero(inputDataBuffer[0]))
+  if(IsFirstFrameValueEmpty(input.mCount, inputDataBuffer))
   {
     keyFrames.Add(0.0f, outputDataBuffer[0]);
   }
@@ -1165,8 +1169,7 @@ float LoadBlendShapeKeyFrames(ConversionContext& context, const gltf2::Animation
 
     animatedProperty.mKeyFrames = KeyFrames::New();
 
-    // Set first frame value as first keyframe (gltf animation spec)
-    if(input.mCount > 0 && !Dali::EqualsZero(inputDataBuffer[0]))
+    if(IsFirstFrameValueEmpty(input.mCount, inputDataBuffer))
     {
       animatedProperty.mKeyFrames.Add(0.0f, outputDataBuffer[weightIndex]);
     }
