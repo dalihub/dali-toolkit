@@ -71,6 +71,8 @@ const char* TEST_BROKEN_IMAGE_L       = TEST_RESOURCE_DIR "/broken_l.9.png";
 const char* TEST_BROKEN_IMAGE_01      = TEST_RESOURCE_DIR "/button-up.9.png";
 const char* TEST_BROKEN_IMAGE_02      = TEST_RESOURCE_DIR "/heartsframe.9.png";
 
+const char* TEST_INVALID_NPATCH_FILE_NAME_01 = "invalid1.9.png";
+
 // resolution: 34*34, pixel format: RGBA8888
 static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
 // resolution: 600*600, pixel format: RGB888
@@ -4359,6 +4361,11 @@ int UtcDaliImageViewNpatchImageCacheTest01(void)
     {
       imageView[index].Unparent();
     }
+
+    // Ensure remove npatch cache if required.
+    application.SendNotification();
+    application.Render();
+
     imageView[index] = ImageView::New(nPatchImageUrl);
     imageView[index].SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
     application.GetScene().Add(imageView[index]);

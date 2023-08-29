@@ -264,8 +264,8 @@ VisualUrl::Type VisualFactoryCache::GetBrokenImageVisualType(int index)
 
 Geometry VisualFactoryCache::GetNPatchGeometry(int index)
 {
-  Geometry          geometry;
-  const NPatchData* data;
+  Geometry                          geometry;
+  std::shared_ptr<const NPatchData> data;
   if(mNPatchLoader.GetNPatchData(mBrokenImageInfoContainer[index].npatchId, data) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
   {
     if(data->GetStretchPixelsX().Size() == 1 && data->GetStretchPixelsY().Size() == 1)
@@ -298,8 +298,8 @@ Geometry VisualFactoryCache::GetNPatchGeometry(int index)
 
 Shader VisualFactoryCache::GetNPatchShader(int index)
 {
-  Shader            shader;
-  const NPatchData* data;
+  Shader                            shader;
+  std::shared_ptr<const NPatchData> data;
   // 0 is either no data (load failed?) or no stretch regions on image
   // for both cases we use the default shader
   NPatchUtility::StretchRanges::SizeType xStretchCount = 0;
@@ -336,8 +336,8 @@ Shader VisualFactoryCache::GetNPatchShader(int index)
 
 void VisualFactoryCache::ApplyTextureAndUniforms(Renderer& renderer, int index)
 {
-  const NPatchData* data;
-  TextureSet        textureSet;
+  std::shared_ptr<const NPatchData> data;
+  TextureSet                        textureSet;
   if(mNPatchLoader.GetNPatchData(mBrokenImageInfoContainer[index].npatchId, data) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
   {
     textureSet                               = data->GetTextures();
@@ -366,8 +366,8 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
         mBrokenImageInfoContainer[index].visualType = visualUrl.GetType();
         if(mBrokenImageInfoContainer[index].visualType == VisualUrl::Type::N_PATCH)
         {
-          const NPatchData* data;
-          Rect<int>         border;
+          std::shared_ptr<const NPatchData> data;
+          Rect<int>                         border;
           mBrokenImageInfoContainer[index].npatchId = mNPatchLoader.Load(mTextureManager, NULL, mBrokenImageInfoContainer[index].url, border, mPreMultiplyOnLoad, true);
           if(mNPatchLoader.GetNPatchData(mBrokenImageInfoContainer[index].npatchId, data) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
           {

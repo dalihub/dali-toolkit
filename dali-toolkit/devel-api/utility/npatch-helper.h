@@ -22,6 +22,7 @@
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <memory> ///< for std::shared_ptr
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -86,7 +87,7 @@ void RegisterStretchProperties(Renderer& renderer, const char* uniformName, cons
  * @param[in,out] renderer The renderer for broken image
  * @param[in] data The pointer of npatch-data
  */
-void ApplyTextureAndUniforms(Renderer& renderer, const Internal::NPatchData* data);
+void ApplyTextureAndUniforms(Renderer& renderer, const std::shared_ptr<const Internal::NPatchData> data);
 
 } // namespace NPatchUtility
 

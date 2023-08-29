@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,9 @@ NPatchData::NPatchData()
   mCroppedHeight(0),
   mBorder(0, 0, 0, 0),
   mLoadingState(LoadingState::NOT_STARTED),
+  mRenderingMap{nullptr},
   mPreMultiplyOnLoad(false),
-  mRenderingMap{nullptr}
+  mObserverNotifying(false)
 {
 }
 
@@ -51,6 +52,8 @@ NPatchData::~NPatchData()
   {
     RenderingAddOn::Get().DestroyNPatch(mRenderingMap);
   }
+  mObserverList.Clear();
+  mQueuedObservers.Clear();
 }
 
 void NPatchData::SetId(const NPatchDataId id)
@@ -65,17 +68,33 @@ NPatchData::NPatchDataId NPatchData::GetId() const
 
 void NPatchData::AddObserver(TextureUploadObserver* textureObserver)
 {
-  mObserverList.PushBack(textureObserver);
+  if(textureObserver)
+  {
+    if(mObserverNotifying)
+    {
+      // Do not add it into observer list during observer notifying.
+      mQueuedObservers.PushBack(textureObserver);
+    }
+    else
+    {
+      mObserverList.PushBack(textureObserver);
+    }
+    textureObserver->DestructionSignal().Connect(this, &NPatchData::ObserverDestroyed);
+  }
 }
 
 void NPatchData::RemoveObserver(TextureUploadObserver* textureObserver)
 {
-  for(uint32_t index = 0; index < mObserverList.Count(); ++index)
+  if(textureObserver)
   {
-    if(textureObserver == mObserverList[index])
+    for(uint32_t index = 0; index < mObserverList.Count(); ++index)
     {
-      mObserverList.Erase(mObserverList.begin() + index);
-      break;
+      if(textureObserver == mObserverList[index])
+      {
+        textureObserver->DestructionSignal().Disconnect(this, &NPatchData::ObserverDestroyed);
+        mObserverList.Erase(mObserverList.begin() + index);
+        break;
+      }
     }
   }
 }
@@ -259,13 +278,57 @@ void NPatchData::LoadComplete(bool loadSuccess, TextureInformation textureInform
     }
   }
 
-  for(uint32_t index = 0; index < mObserverList.Count(); ++index)
+  mObserverNotifying = true;
+
+  // Reverse observer list that we can pop_back the observer.
+  std::reverse(mObserverList.Begin(), mObserverList.End());
+
+  while(mObserverList.Count() > 0u)
   {
-    TextureUploadObserver* observer = mObserverList[index];
+    TextureUploadObserver* observer = *(mObserverList.End() - 1u);
+    mObserverList.Erase(mObserverList.End() - 1u);
+
+    observer->DestructionSignal().Disconnect(this, &NPatchData::ObserverDestroyed);
+
     NotifyObserver(observer, loadSuccess);
   }
 
-  mObserverList.Clear();
+  mObserverNotifying = false;
+
+  // Swap observer list what we queued during notify observer.
+  // If mQueuedObserver is not empty, it mean mLoadingState was LOAD_FAILED, and we try to re-load for this data.
+  // (If mLoadingState was LOAD_COMPLETE, NotifyObserver will be called directly. @todo : Should we fix this logic, matched with texture manager?)
+  // So LoadComplete will be called.
+  mObserverList.Swap(mQueuedObservers);
+}
+
+void NPatchData::ObserverDestroyed(TextureUploadObserver* observer)
+{
+  for(auto iter = mObserverList.Begin(); iter != mObserverList.End();)
+  {
+    if(observer == (*iter))
+    {
+      iter = mObserverList.Erase(iter);
+    }
+    else
+    {
+      ++iter;
+    }
+  }
+  if(mObserverNotifying)
+  {
+    for(auto iter = mQueuedObservers.Begin(); iter != mQueuedObservers.End();)
+    {
+      if(observer == (*iter))
+      {
+        iter = mQueuedObservers.Erase(iter);
+      }
+      else
+      {
+        ++iter;
+      }
+    }
+  }
 }
 
 } // namespace Internal

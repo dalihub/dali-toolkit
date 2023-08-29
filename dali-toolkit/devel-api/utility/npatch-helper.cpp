@@ -250,7 +250,7 @@ void RegisterStretchProperties(Renderer& renderer, const char* uniformName, cons
   }
 }
 
-void ApplyTextureAndUniforms(Renderer& renderer, const Internal::NPatchData* data)
+void ApplyTextureAndUniforms(Renderer& renderer, const std::shared_ptr<const Internal::NPatchData> data)
 {
   TextureSet        textureSet;
   textureSet = data->GetTextures();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // EXTERNAL HEADERS
 #include <dali/devel-api/common/hash.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -39,24 +40,35 @@ constexpr auto UNINITIALIZED_ID    = int32_t{0};  ///< uninitialised id, use to 
 } // Anonymous namespace
 
 NPatchLoader::NPatchLoader()
-: mCurrentNPatchDataId(0)
+: mCurrentNPatchDataId(0),
+  mRemoveProcessorRegistered(false)
 {
 }
 
 NPatchLoader::~NPatchLoader()
 {
+  if(mRemoveProcessorRegistered && Adaptor::IsAvailable())
+  {
+    Adaptor::Get().UnregisterProcessor(*this, true);
+    mRemoveProcessorRegistered = false;
+  }
 }
 
 NPatchData::NPatchDataId NPatchLoader::GenerateUniqueNPatchDataId()
 {
+  // Skip invalid id generation.
+  if(DALI_UNLIKELY(mCurrentNPatchDataId == NPatchData::INVALID_NPATCH_DATA_ID))
+  {
+    mCurrentNPatchDataId = 0;
+  }
   return mCurrentNPatchDataId++;
 }
 
-std::size_t NPatchLoader::Load(TextureManager& textureManager, TextureUploadObserver* textureObserver, const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad, bool synchronousLoading)
+NPatchData::NPatchDataId NPatchLoader::Load(TextureManager& textureManager, TextureUploadObserver* textureObserver, const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad, bool synchronousLoading)
 {
-  NPatchData* data = GetNPatchData(url, border, preMultiplyOnLoad);
+  std::shared_ptr<NPatchData> data = GetNPatchData(url, border, preMultiplyOnLoad);
 
-  DALI_ASSERT_ALWAYS(data && "NPatchData creation failed!");
+  DALI_ASSERT_ALWAYS(data.get() && "NPatchData creation failed!");
 
   if(data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
   {
@@ -85,7 +97,7 @@ std::size_t NPatchLoader::Load(TextureManager& textureManager, TextureUploadObse
     auto preMultiplyOnLoading = preMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                                                   : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-    Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(url, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, synchronousLoading, data, true, preMultiplyOnLoading);
+    Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(url, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, synchronousLoading, data.get(), true, preMultiplyOnLoading);
 
     if(pixelBuffer)
     {
@@ -115,19 +127,42 @@ int32_t NPatchLoader::GetCacheIndexFromId(const NPatchData::NPatchDataId id)
   return INVALID_CACHE_INDEX;
 }
 
-bool NPatchLoader::GetNPatchData(const NPatchData::NPatchDataId id, const NPatchData*& data)
+bool NPatchLoader::GetNPatchData(const NPatchData::NPatchDataId id, std::shared_ptr<const NPatchData>& data)
 {
   int32_t cacheIndex = GetCacheIndexFromId(id);
   if(cacheIndex != INVALID_CACHE_INDEX)
   {
-    data = mCache[cacheIndex].mData.get();
+    data = mCache[cacheIndex].mData;
     return true;
   }
   data = nullptr;
   return false;
 }
 
-void NPatchLoader::Remove(std::size_t id, TextureUploadObserver* textureObserver)
+void NPatchLoader::RequestRemove(NPatchData::NPatchDataId id, TextureUploadObserver* textureObserver)
+{
+  // Remove observer first
+  if(textureObserver)
+  {
+    int32_t cacheIndex = GetCacheIndexFromId(id);
+    if(cacheIndex != INVALID_CACHE_INDEX)
+    {
+      NPatchInfo& info(mCache[cacheIndex]);
+
+      info.mData->RemoveObserver(textureObserver);
+    }
+  }
+
+  mRemoveQueue.push_back({id, nullptr});
+
+  if(!mRemoveProcessorRegistered && Adaptor::IsAvailable())
+  {
+    mRemoveProcessorRegistered = true;
+    Adaptor::Get().RegisterProcessor(*this, true);
+  }
+}
+
+void NPatchLoader::Remove(NPatchData::NPatchDataId id, TextureUploadObserver* textureObserver)
 {
   int32_t cacheIndex = GetCacheIndexFromId(id);
   if(cacheIndex == INVALID_CACHE_INDEX)
@@ -145,7 +180,22 @@ void NPatchLoader::Remove(std::size_t id, TextureUploadObserver* textureObserver
   }
 }
 
-NPatchData* NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad)
+void NPatchLoader::Process(bool postProcessor)
+{
+  for(auto& iter : mRemoveQueue)
+  {
+    Remove(iter.first, iter.second);
+  }
+  mRemoveQueue.clear();
+
+  if(Adaptor::IsAvailable())
+  {
+    Adaptor::Get().UnregisterProcessor(*this, true);
+    mRemoveProcessorRegistered = false;
+  }
+}
+
+std::shared_ptr<NPatchData> NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad)
 {
   std::size_t                              hash  = CalculateHash(url.GetUrl());
   std::vector<NPatchInfo>::size_type       index = UNINITIALIZED_ID;
@@ -164,7 +214,7 @@ NPatchData* NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>& b
         if(mCache[index].mData->GetBorder() == border)
         {
           mCache[index].mReferenceCount++;
-          return mCache[index].mData.get();
+          return mCache[index].mData;
         }
         else
         {
@@ -197,7 +247,7 @@ NPatchData* NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>& b
   // If this is new image loading, make new cache data
   if(infoPtr == nullptr)
   {
-    NPatchInfo info(new NPatchData());
+    NPatchInfo info(std::make_shared<NPatchData>());
     info.mData->SetId(GenerateUniqueNPatchDataId());
     info.mData->SetHash(hash);
     info.mData->SetUrl(url);
@@ -210,7 +260,7 @@ NPatchData* NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>& b
   // Else if LOAD_COMPLETE, Same url but border is different - use the existing texture
   else if(infoPtr->mData->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
   {
-    NPatchInfo info(new NPatchData());
+    NPatchInfo info(std::make_shared<NPatchData>());
 
     info.mData->SetId(GenerateUniqueNPatchDataId());
     info.mData->SetHash(hash);
@@ -245,7 +295,7 @@ NPatchData* NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>& b
 
   DALI_ASSERT_ALWAYS(infoPtr && "NPatchInfo creation failed!");
 
-  return infoPtr->mData.get();
+  return infoPtr->mData;
 }
 
 } // namespace Internal
