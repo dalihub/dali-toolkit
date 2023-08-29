@@ -1100,10 +1100,16 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
       layoutSize.width = maxTextureSize;
     }
 
+    // This affects font rendering quality.
+    // It need to be integerized.
+    Vector2 visualTransformOffset;
+    visualTransformOffset.x = roundf(padding.start + alignmentOffset.x);
+    visualTransformOffset.y = roundf(padding.top + alignmentOffset.y);
+
     Property::Map visualTransform;
     visualTransform.Add(Toolkit::Visual::Transform::Property::SIZE, layoutSize)
       .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
-      .Add(Toolkit::Visual::Transform::Property::OFFSET, Vector2(padding.start, padding.top) + alignmentOffset)
+      .Add(Toolkit::Visual::Transform::Property::OFFSET, visualTransformOffset)
       .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
       .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN)
       .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN);
