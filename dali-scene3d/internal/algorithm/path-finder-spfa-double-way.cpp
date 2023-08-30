@@ -118,18 +118,20 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::FindPath(cons
       // Get waypoints
       waypoints = FindPath(polyIndexFrom, polyIndexTo);
 
-      // replace first and last waypoint
-      auto& wpFrom = static_cast<WayPointData&>(waypoints[0]);
-      auto& wpTo   = static_cast<WayPointData&>(waypoints.back());
+      if(!waypoints.empty())
+      {
+        // replace first and last waypoint
+        auto& wpFrom = static_cast<WayPointData&>(waypoints[0]);
+        auto& wpTo   = static_cast<WayPointData&>(waypoints.back());
 
-      Vector2 fromCenter(wpFrom.point3d.x, wpFrom.point3d.y);
-      wpFrom.point3d = outPosFrom;
-      wpFrom.point2d = fromCenter - Vector2(outPosFrom.x, outPosFrom.y);
+        Vector2 fromCenter(wpFrom.point3d.x, wpFrom.point3d.y);
+        wpFrom.point3d = outPosFrom;
+        wpFrom.point2d = fromCenter - Vector2(outPosFrom.x, outPosFrom.y);
 
-      Vector2 toCenter(wpTo.point3d.x, wpTo.point3d.y);
-      wpTo.point3d = outPosTo;
-      wpTo.point2d = toCenter - Vector2(outPosTo.x, outPosTo.y);
-      wpTo.point3d = outPosTo;
+        Vector2 toCenter(wpTo.point3d.x, wpTo.point3d.y);
+        wpTo.point3d = outPosTo;
+        wpTo.point2d = toCenter - Vector2(outPosTo.x, outPosTo.y);
+      }
     }
   }
 
