@@ -1,5 +1,5 @@
-#ifndef DALI_SCENE3D_INTERNAL_PATH_FINDER_DJIKSTRA_H
-#define DALI_SCENE3D_INTERNAL_PATH_FINDER_DJIKSTRA_H
+#ifndef DALI_SCENE3D_INTERNAL_PATH_FINDER_DIJKSTRA_H
+#define DALI_SCENE3D_INTERNAL_PATH_FINDER_DIJKSTRA_H
 
 /*
  * Copyright (c) 2023 Samsung Electronics Co., Ltd.
@@ -23,7 +23,7 @@
 
 namespace Dali::Scene3D::Internal::Algorithm
 {
-class PathFinderAlgorithmDjikstra : public Dali::Scene3D::Algorithm::PathFinderBase
+class PathFinderAlgorithmDijkstra : public Dali::Scene3D::Algorithm::PathFinderBase
 {
 public:
   /**
@@ -31,12 +31,12 @@ public:
    *
    * @param[in] navMesh Navigation mesh to associate with the algorithm
    */
-  explicit PathFinderAlgorithmDjikstra(Dali::Scene3D::Algorithm::NavigationMesh& navMesh);
+  explicit PathFinderAlgorithmDijkstra(Dali::Scene3D::Algorithm::NavigationMesh& navMesh);
 
   /**
    * @brief Destructor
    */
-  ~PathFinderAlgorithmDjikstra() override;
+  ~PathFinderAlgorithmDijkstra() override;
 
   /**
    * @brief Looks for a path from point A to point B.
@@ -85,4 +85,4 @@ public:
   std::vector<FaceNode> mNodes;          ///< List of nodes
 };
 } // namespace Dali::Scene3D::Internal::Algorithm
-#endif // DALI_SCENE3D_INTERNAL_PATH_FINDER_DJIKSTRA_H
+#endif // DALI_SCENE3D_INTERNAL_PATH_FINDER_DIJKSTRA_H

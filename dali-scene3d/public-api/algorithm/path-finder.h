@@ -32,11 +32,11 @@ using WayPointList = std::vector<Scene3D::Algorithm::WayPoint>;
  */
 enum class PathFinderAlgorithm
 {
-  DJIKSTRA_SHORTEST_PATH, ///< Using A* variant (Djikstra) finding a shortest path
+  DIJKSTRA_SHORTEST_PATH, ///< Using A* variant (Dijkstra) finding a shortest path
   SPFA,                   ///< Using SPFA-SLF (Shortest Path Fast Algorithm with Short Label First) finding a shortest path.
   SPFA_DOUBLE_WAY,        ///< Using SPFA-SLF double way. It might not find shortest, but will use less memory.
 
-  DEFAULT = DJIKSTRA_SHORTEST_PATH, ///< Default algorithm to use
+  DEFAULT = DIJKSTRA_SHORTEST_PATH, ///< Default algorithm to use
 };
 
 /**

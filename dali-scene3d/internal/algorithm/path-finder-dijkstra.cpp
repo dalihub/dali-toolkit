@@ -15,7 +15,7 @@
  */
 
 // CLASS HEADER
-#include <dali-scene3d/internal/algorithm/path-finder-djikstra.h>
+#include <dali-scene3d/internal/algorithm/path-finder-dijkstra.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
@@ -52,15 +52,15 @@ struct DijkstraComparer
 
 namespace Dali::Scene3D::Internal::Algorithm
 {
-PathFinderAlgorithmDjikstra::PathFinderAlgorithmDjikstra(Dali::Scene3D::Algorithm::NavigationMesh& navMesh)
+PathFinderAlgorithmDijkstra::PathFinderAlgorithmDijkstra(Dali::Scene3D::Algorithm::NavigationMesh& navMesh)
 : mNavigationMesh(&GetImplementation(navMesh))
 {
   PrepareData();
 }
 
-PathFinderAlgorithmDjikstra::~PathFinderAlgorithmDjikstra() = default;
+PathFinderAlgorithmDijkstra::~PathFinderAlgorithmDijkstra() = default;
 
-Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(const Dali::Vector3& positionFrom, const Dali::Vector3& positionTo)
+Scene3D::Algorithm::WayPointList PathFinderAlgorithmDijkstra::FindPath(const Dali::Vector3& positionFrom, const Dali::Vector3& positionTo)
 {
   Dali::Vector3 outPosFrom;
   FaceIndex     polyIndexFrom;
@@ -100,7 +100,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(const Dal
   return waypoints;
 }
 
-Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(FaceIndex sourcePolyIndex, FaceIndex targetPolyIndex)
+Scene3D::Algorithm::WayPointList PathFinderAlgorithmDijkstra::FindPath(FaceIndex sourcePolyIndex, FaceIndex targetPolyIndex)
 {
   auto                   nodeCount = uint32_t(mNodes.size());
   std::vector<float>     dist;
@@ -218,7 +218,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(FaceIndex
   return OptimizeWaypoints(waypoints);
 }
 
-void PathFinderAlgorithmDjikstra::PrepareData()
+void PathFinderAlgorithmDijkstra::PrepareData()
 {
   // Build the list structure connecting the nodes
   auto faceCount = mNavigationMesh->GetFaceCount();
@@ -263,7 +263,7 @@ void PathFinderAlgorithmDjikstra::PrepareData()
   return ccw(A, C, D) != ccw(B, C, D) && ccw(A, B, C) != ccw(A, B, D);
 }
 
-Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::OptimizeWaypoints(WayPointList& waypoints) const
+Scene3D::Algorithm::WayPointList PathFinderAlgorithmDijkstra::OptimizeWaypoints(WayPointList& waypoints) const
 {
   WayPointList optimizedWaypoints;
   optimizedWaypoints.emplace_back(waypoints[0]);
