@@ -19,7 +19,7 @@
 
 // INTERNAL INCLUDES
 // default algorithm
-#include <dali-scene3d/internal/algorithm/path-finder-djikstra.h>
+#include <dali-scene3d/internal/algorithm/path-finder-dijkstra.h>
 #include <dali-scene3d/internal/algorithm/path-finder-spfa-double-way.h>
 #include <dali-scene3d/internal/algorithm/path-finder-spfa.h>
 
@@ -31,9 +31,9 @@ std::unique_ptr<PathFinder> PathFinder::New(NavigationMesh& navigationMesh, Path
 
   switch(algorithm)
   {
-    case PathFinderAlgorithm::DJIKSTRA_SHORTEST_PATH:
+    case PathFinderAlgorithm::DIJKSTRA_SHORTEST_PATH:
     {
-      impl = new Dali::Scene3D::Internal::Algorithm::PathFinderAlgorithmDjikstra(navigationMesh);
+      impl = new Dali::Scene3D::Internal::Algorithm::PathFinderAlgorithmDijkstra(navigationMesh);
       break;
     }
     case PathFinderAlgorithm::SPFA:
