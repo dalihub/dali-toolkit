@@ -81,6 +81,46 @@ uint32_t Light::GetMaximumEnabledLightCount()
   return Internal::Light::GetMaximumEnabledLightCount();
 }
 
+void Light::EnableShadow(bool enable)
+{
+  Internal::GetImplementation(*this).EnableShadow(enable);
+}
+
+bool Light::IsShadowEnabled() const
+{
+  return Internal::GetImplementation(*this).IsShadowEnabled();
+}
+
+void Light::EnableShadowSoftFiltering(bool useSoftFiltering)
+{
+  Internal::GetImplementation(*this).EnableShadowSoftFiltering(useSoftFiltering);
+}
+
+bool Light::IsShadowSoftFilteringEnabled() const
+{
+  return Internal::GetImplementation(*this).IsShadowSoftFilteringEnabled();
+}
+
+void Light::SetShadowIntensity(float shadowIntensity)
+{
+  Internal::GetImplementation(*this).SetShadowIntensity(shadowIntensity);
+}
+
+float Light::GetShadowIntensity() const
+{
+  return Internal::GetImplementation(*this).GetShadowIntensity();
+}
+
+void Light::SetShadowBias(float shadowBias)
+{
+  Internal::GetImplementation(*this).SetShadowBias(shadowBias);
+}
+
+float Light::GetShadowBias() const
+{
+  return Internal::GetImplementation(*this).GetShadowBias();
+}
+
 Light::Light(Internal::Light& implementation)
 : CustomActor(implementation)
 {

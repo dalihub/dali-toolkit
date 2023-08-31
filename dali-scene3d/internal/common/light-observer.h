@@ -60,6 +60,13 @@ public:
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f].
    */
   virtual void NotifyImageBasedLightScaleFactor(float scaleFactor) = 0;
+
+  /**
+   * @brief Notifies Shadow Map texture is changed by parent SceneView.
+   *
+   * @param[in] shadowMapTexture Shadow Map texture that will be used to compute shadow.
+   */
+  virtual void NotifyShadowMapTexture(Dali::Texture shadowMapTexture) = 0;
 };
 
 } // namespace Internal

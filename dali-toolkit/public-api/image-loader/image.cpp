@@ -67,6 +67,13 @@ Dali::Toolkit::ImageUrl GenerateUrl(const Dali::EncodedImageBuffer encodedImageB
   return Dali::Toolkit::ImageUrl::New(encodedImageBuffer);
 }
 
+Dali::Toolkit::ImageUrl GenerateDepthUrl(const Dali::FrameBuffer frameBuffer)
+{
+  Texture texture = Dali::DevelFrameBuffer::GetDepthTexture(frameBuffer);
+  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, false);
+  return imageUrl;
+}
+
 } // namespace Image
 
 } // namespace Toolkit

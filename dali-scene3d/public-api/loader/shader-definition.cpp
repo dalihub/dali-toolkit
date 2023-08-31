@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali-scene3d/public-api/loader/shader-definition.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/object/property-array.h>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/public-api/loader/utils.h>
@@ -100,8 +103,10 @@ ShaderDefinition::LoadRaw(const std::string& shadersPath) const
   }
   else
   {
-    raw.mVertexShaderSource   = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_VERT.data();
-    raw.mFragmentShaderSource = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
+    raw.mVertexShaderSource         = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_VERT.data();
+    raw.mFragmentShaderSource       = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
+    raw.mShadowVertexShaderSource   = SHADER_SHADOW_MAP_SHADER_VERT.data();
+    raw.mShadowFragmentShaderSource = SHADER_SHADOW_MAP_SHADER_FRAG.data();
   }
 
   if(!fail)
@@ -110,6 +115,7 @@ ShaderDefinition::LoadRaw(const std::string& shadersPath) const
     {
       ApplyDefine(raw.mVertexShaderSource, definevar);
       ApplyDefine(raw.mFragmentShaderSource, definevar);
+      ApplyDefine(raw.mShadowVertexShaderSource, definevar);
     }
   }
 
@@ -131,7 +137,21 @@ Shader ShaderDefinition::Load(RawData&& raw) const
     }
   }
 
-  Shader shader = Shader::New(raw.mVertexShaderSource, raw.mFragmentShaderSource, static_cast<Shader::Hint::Value>(hints));
+  Property::Map map[2];
+  map[0]["vertex"]        = raw.mVertexShaderSource;
+  map[0]["fragment"]      = raw.mFragmentShaderSource;
+  map[0]["renderPassTag"] = 0;
+  map[0]["hints"]         = static_cast<Shader::Hint::Value>(hints);
+
+  map[1]["vertex"]        = raw.mShadowVertexShaderSource;
+  map[1]["fragment"]      = raw.mShadowFragmentShaderSource;
+  map[1]["renderPassTag"] = 10;
+
+  Property::Array array;
+  array.PushBack(map[0]);
+  array.PushBack(map[1]);
+
+  Shader shader = Shader::New(array);
   for(Property::Map::SizeType i0 = 0, i1 = mUniforms.Count(); i0 != i1; ++i0)
   {
     auto pair = mUniforms.GetKeyValue(i0);

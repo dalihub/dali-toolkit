@@ -78,6 +78,11 @@ uniform mediump int uLightCount;
 uniform mediump vec3 uLightDirection[MAX_LIGHTS];
 uniform mediump vec3 uLightColor[MAX_LIGHTS];
 
+// For Shadow Map
+uniform lowp int uIsShadowEnabled;
+uniform sampler2D sShadowMap;
+in highp vec3 positionFromLightView;
+
 //// For IBL
 uniform sampler2D sbrdfLUT;
 uniform samplerCube sDiffuseEnvSampler;
@@ -101,6 +106,21 @@ out vec4 FragColor;
 
 const float c_MinRoughness = 0.04;
 const float M_PI = 3.141592653589793;
+
+// These properties can be used for circular sampling for PCF
+
+// Percentage Closer Filtering to mitigate the banding artifacts.
+const int kPcfSampleCount = 9;
+
+const float kPi = 3.141592653589f;
+const float kInvSampleCount = 1.0 / float(kPcfSampleCount);
+const float kPcfTheta = 2.f * kPi * kInvSampleCount;
+const float kSinPcfTheta = sin(kPcfTheta);
+const float kCosPcfTheta = cos(kPcfTheta);
+
+uniform lowp int uEnableShadowSoftFiltering;
+uniform mediump float uShadowIntensity;
+uniform mediump float uShadowBias;
 
 vec3 linear(vec3 color)
 {
@@ -242,6 +262,31 @@ void main()
       // Obtain final intensity as reflectance (BRDF) scaled by the energy of the light (cosine law)
       color += NdotL * uLightColor[i] * (diffuseContrib + specContrib);
     }
+  }
+
+  if(float(uIsShadowEnabled) * uShadowIntensity > 0.0)
+  {
+    mediump float exposureFactor = 0.0;
+    if(uEnableShadowSoftFiltering > 0)
+    {
+      ivec2 texSize = textureSize(sShadowMap, 0);
+      mediump vec2 texelSize = vec2(1.0) / vec2(texSize.x, texSize.y);
+      mediump vec2 pcfSample = vec2(1.f, 0.f);
+      for (int i = 0; i < kPcfSampleCount; ++i)
+      {
+        pcfSample = vec2(kCosPcfTheta * pcfSample.x - kSinPcfTheta * pcfSample.y,
+                         kSinPcfTheta * pcfSample.x + kCosPcfTheta * pcfSample.y);
+        lowp float depthValue = texture(sShadowMap, positionFromLightView.xy + pcfSample * texelSize).r;
+        exposureFactor += (depthValue < positionFromLightView.z - uShadowBias) ? 0.0 : 1.0;
+      }
+      exposureFactor *= kInvSampleCount;
+    }
+    else
+    {
+      mediump float depthValue = texture(sShadowMap, positionFromLightView.xy).r;
+      exposureFactor           = (depthValue < positionFromLightView.z - uShadowBias) ? 0.0 : 1.0;
+    }
+    color *= (1.0 - (1.0 - exposureFactor) * uShadowIntensity);
   }
 
 #ifdef OCCLUSION

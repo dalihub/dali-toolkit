@@ -77,6 +77,23 @@ int UtcDaliImageConvertFrameBufferToUrl2(void)
   END_TEST;
 }
 
+int UtcDaliImageConvertDepthTextureFrameBufferToUrl(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliImageConvertDepthTextureFrameBufferToUrl");
+
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
+
+  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::DEPTH_UNSIGNED_INT, width, height);
+  DevelFrameBuffer::AttachDepthTexture(frameBuffer, texture);
+
+  DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateDepthUrl(frameBuffer).GetUrl().size() > 0u);
+
+  END_TEST;
+}
+
 int UtcDaliImageConvertPixelDataToUrl01(void)
 {
   ToolkitTestApplication application;

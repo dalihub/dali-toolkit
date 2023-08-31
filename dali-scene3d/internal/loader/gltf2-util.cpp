@@ -597,6 +597,7 @@ void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<s
   MaterialDefinition materialDefinition;
 
   materialDefinition.mFlags |= MaterialDefinition::GLTF_CHANNELS;
+  materialDefinition.mShadowAvailable = true;
 
   auto& pbr = material.mPbrMetallicRoughness;
   if(material.mAlphaMode == gltf2::AlphaMode::BLEND)

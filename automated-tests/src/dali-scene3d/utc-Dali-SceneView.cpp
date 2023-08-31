@@ -88,9 +88,9 @@ Dali::Texture GetDiffuseTexture(Dali::Scene3D::Model model)
     if(renderer)
     {
       TextureSet textureSet = renderer.GetTextures();
-      if(textureSet.GetTextureCount() == 9u)
+      if(textureSet.GetTextureCount() == 10u)
       {
-        texture = textureSet.GetTexture(7u);
+        texture = textureSet.GetTexture(8u);
       }
     }
   }
@@ -109,9 +109,9 @@ Dali::Texture GetSpecularTexture(Dali::Scene3D::Model model)
     if(renderer)
     {
       TextureSet textureSet = renderer.GetTextures();
-      if(textureSet.GetTextureCount() == 9u)
+      if(textureSet.GetTextureCount() == 10u)
       {
-        texture = textureSet.GetTexture(8u);
+        texture = textureSet.GetTexture(9u);
       }
     }
   }
@@ -327,9 +327,9 @@ int UtcDaliSceneViewOnScene02(void)
   application.Render();
 
   renderTaskCount = application.GetScene().GetRenderTaskList().GetTaskCount();
-  DALI_TEST_EQUALS(2u, renderTaskCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(3u, renderTaskCount, TEST_LOCATION);
 
-  RenderTask  renderTask = application.GetScene().GetRenderTaskList().GetTask(1u);
+  RenderTask  renderTask = application.GetScene().GetRenderTaskList().GetTask(2u);
   CameraActor camera     = renderTask.GetCameraActor();
 
   CameraActor defaultCamera = renderTask.GetCameraActor();
@@ -693,7 +693,7 @@ int UtcDaliSceneViewUseFramebuffer02(void)
   application.SendNotification();
   application.Render();
 
-  RenderTask renderTask = application.GetScene().GetRenderTaskList().GetTask(1u);
+  RenderTask renderTask = application.GetScene().GetRenderTaskList().GetTask(2u);
   DALI_TEST_CHECK(!renderTask.GetFrameBuffer());
 
   view.UseFramebuffer(true);
@@ -1005,7 +1005,7 @@ int UtcDaliSceneViewCreateAndRemoveRenderTask(void)
 
   application.GetScene().Add(view);
 
-  DALI_TEST_EQUALS(renderTaskCount + 1, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTaskCount + 2, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
 
   view.Unparent();
 

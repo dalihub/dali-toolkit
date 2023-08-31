@@ -159,6 +159,79 @@ public:
    */
   static uint32_t GetMaximumEnabledLightCount();
 
+  /**
+   * @brief Enables shadow for this light.
+   * Dali::Scene3D generates shadow by using shadow map.
+   * For the Directional Light, the shadow map is created to cover view frustum of current selected camera.
+   * This means that if the distance between the near and far planes is too large,
+   * the shadow map has to cover an unnecessarily large area. This results in lower shadow quality.
+   * @SINCE_2_2.43
+   * @note This light should be already turned on in the SceneView.
+   * @note (When enable is true) If there is previous light already enabled shadow in the SceneView, this function call is ignored.
+   * @note (When enable is false, and this light is currently used for shader)
+   * If there are other lights those are turned on and shadow enabled, one of the light will be used for shadow automatically.
+   * @param[in] enable True to make this Light's shadow enable.
+   */
+  void EnableShadow(bool enable);
+
+  /**
+   * @brief Checks whether the shadow of this light is enabled or not.
+   * @SINCE_2_2.43
+   * @return True if the shadow of this light is enabled.
+   */
+  bool IsShadowEnabled() const;
+
+  /**
+   * @brief Enables filtering to soften the edge of shadow.
+   * Basically the shadow is hard shadow that has sharp edge.
+   * This method enables soft filtering to make the sharp edge to smoothing.
+   * @SINCE_2_2.43
+   * @note This soft filtering requires expensive computation power.
+   * @param[in] useSoftFiltering True to soften the shadow edge.
+   */
+  void EnableShadowSoftFiltering(bool useSoftFiltering);
+
+  /**
+   * @brief Checks whether the shadow uses soft filtering.
+   * @SINCE_2_2.43
+   * @return True if the shadow edge is soften.
+   */
+  bool IsShadowSoftFilteringEnabled() const;
+
+  /**
+   * @brief Sets shadow intensity.
+   * If the intensity is larger, the shadow area will be darker.
+   * The intensity value is between [0, 1].
+   * Default value is 0.5
+   * @SINCE_2_2.43
+   * @param[in] shadowIntensity Shadow intensity value
+   */
+  void SetShadowIntensity(float shadowIntensity);
+
+  /**
+   * @brief Retrieve shadow intensity.
+   * @SINCE_2_2.43
+   * @return Current shadow intensity value.
+   */
+  float GetShadowIntensity() const;
+
+  /**
+   * @brief Sets shadow bias.
+   * Shadow bias is an offset value to remove shadow acne that is a visual artifact can be shown on the Shadow
+   * Default value is 0.001
+   * @SINCE_2_2.43
+   * @param[in] shadowBias bias value to remove shadow acne.
+   * @note If the shadow bias is too large, the object will appear detached from the shadow.
+   */
+  void SetShadowBias(float shadowBias);
+
+  /**
+   * @brief Retrieves shadow bias value.
+   * @SINCE_2_2.43
+   * @return Shadow bias value.
+   */
+  float GetShadowBias() const;
+
 public: // Not intended for application developers
   /// @cond internal
   /**

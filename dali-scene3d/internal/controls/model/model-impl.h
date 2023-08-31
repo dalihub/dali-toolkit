@@ -272,6 +272,11 @@ private:
 
 public: // Overrides LightObserver Methods.
   /**
+   * @copydoc Dali::Scene3D::Internal::LightObserver::NotifyShadowMapTexture()
+   */
+  void NotifyShadowMapTexture(Dali::Texture shadowMapTexture) override;
+
+  /**
    * @copydoc Dali::Scene3D::Internal::LightObserver::NotifyImageBasedLightTexture()
    */
   void NotifyImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float scaleFactor, uint32_t specularMipmapLevels) override;
@@ -360,6 +365,9 @@ private:
   ModelLoadTaskPtr          mModelLoadTask;
   EnvironmentMapLoadTaskPtr mIblDiffuseLoadTask;
   EnvironmentMapLoadTaskPtr mIblSpecularLoadTask;
+
+  // Shadow
+  Dali::Texture mShadowMapTexture;
 
   std::string mDiffuseIblUrl;
   std::string mSpecularIblUrl;

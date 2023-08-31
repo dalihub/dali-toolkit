@@ -90,6 +90,15 @@ DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageSour
  */
 DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::EncodedImageBuffer encodedImageBuffer);
 
+/**
+ * @brief Generate a Url of depth texture from frame buffer.
+ * This Url can be used in visuals to render the frame buffer.
+ * This method does not check for duplicates, If same frame buffer is entered multiple times, a different URL is returned each time.
+ * @param[in] frameBuffer the frame buffer to converted to Url
+ * @return the ImageUrl representing this frame buffer
+ */
+DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateDepthUrl(const Dali::FrameBuffer frameBuffer);
+
 } // namespace Image
 
 } // namespace Toolkit

@@ -62,9 +62,10 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::SceneView, Toolkit::Control, Create);
 DALI_TYPE_REGISTRATION_END()
 
-Property::Index   RENDERING_BUFFER    = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
-constexpr int32_t DEFAULT_ORIENTATION = 0;
-constexpr int32_t INVALID_INDEX       = -1;
+Property::Index    RENDERING_BUFFER        = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
+constexpr int32_t  DEFAULT_ORIENTATION     = 0;
+constexpr int32_t  INVALID_INDEX           = -1;
+constexpr uint32_t MAXIMUM_SIZE_SHADOW_MAP = 2048;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
 
@@ -146,6 +147,143 @@ Dali::Actor CreateSkybox()
   skyboxActor.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
   skyboxActor.AddRenderer(skyboxRenderer);
   return skyboxActor;
+}
+
+void SetShadowLightConstraint(Dali::CameraActor selectedCamera, Dali::CameraActor shadowLightCamera)
+{
+  shadowLightCamera.SetProperty(Dali::CameraActor::Property::ASPECT_RATIO, 1.0f);
+
+  shadowLightCamera.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, 1.0f);
+  shadowLightCamera.SetProperty(Dali::CameraActor::Property::NEAR_PLANE_DISTANCE, 0.5f);
+  shadowLightCamera.SetProperty(Dali::CameraActor::Property::FAR_PLANE_DISTANCE, 3.5f);
+
+  //< Make constraint for above properties.
+  shadowLightCamera.RemoveConstraints();
+
+  // Compute View Matrix of ShadowLightCamera
+  // Input : ShadowLightCamera's world position, world orientation
+  auto       tempViewMatrixIndex  = shadowLightCamera.RegisterProperty("tempViewMatrix", Matrix::IDENTITY);
+  Constraint viewMatrixConstraint = Constraint::New<Matrix>(shadowLightCamera, tempViewMatrixIndex, [](Matrix& output, const PropertyInputContainer& inputs)
+                                                            {
+                                                              output = inputs[0]->GetMatrix();
+                                                              output.Invert(); });
+  viewMatrixConstraint.AddSource(Source{shadowLightCamera, Dali::Actor::Property::WORLD_MATRIX});
+  viewMatrixConstraint.ApplyPost();
+
+  // Compute Orthographic Size / Near / Far and store it to "TempCameraProperty" property that is a Vector3 property
+  auto       tempProjectionMatrixIndex  = shadowLightCamera.RegisterProperty("tempProjectionMatrix", Matrix::IDENTITY);
+  Constraint projectionMatrixConstraint = Constraint::New<Matrix>(shadowLightCamera, tempProjectionMatrixIndex, [](Matrix& output, const PropertyInputContainer& inputs)
+                                                                  {
+                                                                    Matrix worldMatrix = inputs[0]->GetMatrix();
+                                                                    float tangentFov_2 = tanf(inputs[4]->GetFloat());
+                                                                    float  nearDistance = inputs[5]->GetFloat();
+                                                                    float  farDistance  = inputs[6]->GetFloat();
+                                                                    float  aspectRatio  = inputs[7]->GetFloat();
+                                                                    float  nearY        = 0.0f;
+                                                                    float  nearX        = 0.0f;
+                                                                    float  farY         = 0.0f;
+                                                                    float  farX         = 0.0f;
+                                                                    if(inputs[1]->GetInteger() == Dali::Camera::ProjectionMode::PERSPECTIVE_PROJECTION)
+                                                                    {
+                                                                      if(inputs[2]->GetInteger() == Dali::DevelCameraActor::ProjectionDirection::VERTICAL)
+                                                                      {
+                                                                        nearY = tangentFov_2 * nearDistance;
+                                                                        nearX = nearY * aspectRatio;
+                                                                        farY  = tangentFov_2 * farDistance;
+                                                                        farX  = farY * aspectRatio;
+                                                                      }
+                                                                      else
+                                                                      {
+                                                                        nearX = tangentFov_2 * nearDistance;
+                                                                        nearY = nearX / aspectRatio;
+                                                                        farX  = tangentFov_2 * farDistance;
+                                                                        farY  = farX / aspectRatio;
+                                                                      }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                      if(inputs[2]->GetInteger() == Dali::DevelCameraActor::ProjectionDirection::VERTICAL)
+                                                                      {
+                                                                        nearY = inputs[3]->GetFloat();
+                                                                        nearX = nearY * aspectRatio;
+                                                                      }
+                                                                      else
+                                                                      {
+                                                                        nearX = inputs[3]->GetFloat();
+                                                                        nearY = nearX / aspectRatio;
+                                                                      }
+                                                                      farX = nearX;
+                                                                      farY = nearY;
+                                                                    }
+
+                                                                    std::vector<Vector4> points;
+                                                                    points.push_back(Vector4(nearX, nearY, nearDistance, 1.0f));
+                                                                    points.push_back(Vector4(-nearX, nearY, nearDistance, 1.0f));
+                                                                    points.push_back(Vector4(-nearX, -nearY, nearDistance, 1.0f));
+                                                                    points.push_back(Vector4(nearX, -nearY, nearDistance, 1.0f));
+                                                                    points.push_back(Vector4(farX, farY, farDistance, 1.0f));
+                                                                    points.push_back(Vector4(-farX, farY, farDistance, 1.0f));
+                                                                    points.push_back(Vector4(-farX, -farY, farDistance, 1.0f));
+                                                                    points.push_back(Vector4(farX, -farY, farDistance, 1.0f));
+
+                                                                    Vector3 areaMin = Vector3::ONE * MAXFLOAT, areaMax = Vector3::ONE * -MAXFLOAT;
+                                                                    for(auto&& point : points)
+                                                                    {
+                                                                      Vector4 pointW = worldMatrix * point;
+                                                                      Vector4 pointV = inputs[8]->GetMatrix() * pointW;
+                                                                      areaMin.x      = std::min(areaMin.x, pointV.x);
+                                                                      areaMin.y      = std::min(areaMin.y, pointV.y);
+                                                                      areaMin.z      = std::min(areaMin.z, pointV.z);
+                                                                      areaMax.x      = std::max(areaMax.x, pointV.x);
+                                                                      areaMax.y      = std::max(areaMax.y, pointV.y);
+                                                                      areaMax.z      = std::max(areaMax.z, pointV.z);
+                                                                    }
+
+                                                                    Vector2 center        = Vector2(areaMax + areaMin) / 2.0f;
+                                                                    float   delta         = std::max(std::abs(areaMax.x - areaMin.x), std::abs(areaMax.y - areaMin.y));
+                                                                    float   delta_2       = delta * 0.5f;
+                                                                    Vector2 squareAreaMin = center - Vector2::ONE * delta_2;
+                                                                    Vector2 squareAreaMax = center + Vector2::ONE * delta_2;
+                                                                    float   deltaZ        = areaMax.z - areaMin.z;
+
+                                                                    float right  = -squareAreaMin.x;
+                                                                    float left   = -squareAreaMax.x;
+                                                                    float top    = squareAreaMin.y;
+                                                                    float bottom = squareAreaMax.y;
+                                                                    float near   = areaMin.z;
+                                                                    float far    = areaMax.z;
+
+                                                                    float* projMatrix = output.AsFloat();
+
+                                                                    projMatrix[0] = -2.0f / delta;
+                                                                    projMatrix[1] = 0.0f;
+                                                                    projMatrix[2] = 0.0f;
+                                                                    projMatrix[3] = 0.0f;
+
+                                                                    projMatrix[4] = 0.0f;
+                                                                    projMatrix[5] = -2.0f / delta;
+                                                                    projMatrix[6] = 0.0f;
+                                                                    projMatrix[7] = 0.0f;
+
+                                                                    projMatrix[8]  = 0.0f;
+                                                                    projMatrix[9]  = 0.0f;
+                                                                    projMatrix[10] = 2.0f / deltaZ;
+                                                                    projMatrix[11] = 0.0f;
+
+                                                                    projMatrix[12] = -(right + left) / delta;
+                                                                    projMatrix[13] = -(top + bottom) / delta;
+                                                                    projMatrix[14] = -(near + far) / deltaZ;
+                                                                    projMatrix[15] = 1.0f; });
+  projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::Actor::Property::WORLD_MATRIX});
+  projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::CameraActor::Property::PROJECTION_MODE});
+  projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::DevelCameraActor::Property::PROJECTION_DIRECTION});
+  projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE});
+  projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::CameraActor::Property::FIELD_OF_VIEW});
+  projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::CameraActor::Property::NEAR_PLANE_DISTANCE});
+  projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::CameraActor::Property::FAR_PLANE_DISTANCE});
+  projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::CameraActor::Property::ASPECT_RATIO});
+  projectionMatrixConstraint.AddSource(Source{shadowLightCamera, tempViewMatrixIndex});
+  projectionMatrixConstraint.ApplyPost();
 }
 
 } // anonymous namespace
@@ -421,6 +559,11 @@ void SceneView::AddLight(Scene3D::Light light)
 {
   bool enabled = mShaderManager->AddLight(light);
   mLights.push_back(std::make_pair(light, enabled));
+
+  if(light.IsShadowEnabled())
+  {
+    SetShadow(light);
+  }
 }
 
 void SceneView::RemoveLight(Scene3D::Light light)
@@ -437,7 +580,7 @@ void SceneView::RemoveLight(Scene3D::Light light)
 
   if(mLights.size() > mShaderManager->GetLightCount())
   {
-    for(auto && waitingLight : mLights)
+    for(auto&& waitingLight : mLights)
     {
       if(waitingLight.second)
       {
@@ -447,6 +590,86 @@ void SceneView::RemoveLight(Scene3D::Light light)
       waitingLight.second = mShaderManager->AddLight(waitingLight.first);
       break;
     }
+  }
+
+  if(light == mShadowLight)
+  {
+    RemoveShadow(light);
+  }
+
+  if(!mShadowLight)
+  {
+    for(auto&& lightEntity : mLights)
+    {
+      if(!lightEntity.second || !lightEntity.first.IsShadowEnabled())
+      {
+        continue;
+      }
+      SetShadow(lightEntity.first);
+      break;
+    }
+  }
+}
+
+void SceneView::SetShadow(Scene3D::Light light)
+{
+  if(!!mShadowLight)
+  {
+    return;
+  }
+
+  auto foundLight = std::find_if(mLights.begin(), mLights.end(), [light](std::pair<Scene3D::Light, bool> lightEntity) -> bool
+                                 { return (lightEntity.second && lightEntity.first == light); });
+
+  if(foundLight == mLights.end())
+  {
+    return;
+  }
+
+  mShadowLight = light;
+
+  // Directional Light setting.
+  CameraActor lightCamera    = GetImplementation(light).GetCamera();
+  CameraActor selectedCamera = GetSelectedCamera();
+  SetShadowLightConstraint(selectedCamera, lightCamera);
+
+  // make framebuffer for depth map and set it to render task.
+  Vector3  size               = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+  uint32_t shadowMapBufferSize = std::min(static_cast<uint32_t>(std::max(size.width, size.height)), MAXIMUM_SIZE_SHADOW_MAP);
+  UpdateShadowMapBuffer(shadowMapBufferSize);
+
+  // use lightCamera as a camera of shadow render task.
+  mShadowMapRenderTask.SetCameraActor(lightCamera);
+
+  mShaderManager->SetShadow(light);
+}
+
+void SceneView::RemoveShadow(Scene3D::Light light)
+{
+  if(mShadowLight != light)
+  {
+    return;
+  }
+
+  // remove all constraint from light camera
+  CameraActor lightCamera = GetImplementation(mShadowLight).GetCamera();
+  lightCamera.RemoveConstraints();
+
+  // reset framebuffer and remove it from render task.
+  mShadowFrameBuffer.Reset();
+  mShaderManager->RemoveShadow();
+  mShadowMapRenderTask.SetCameraActor(CameraActor());
+
+  mShadowLight.Reset();
+
+  for(auto&& lightEntity : mLights)
+  {
+    if(!lightEntity.second || !lightEntity.first.IsShadowEnabled())
+    {
+      continue;
+    }
+    SetShadow(lightEntity.first);
+    break;
   }
 }
 
@@ -550,6 +773,11 @@ Dali::Scene3D::Loader::ShaderManagerPtr SceneView::GetShaderManager() const
   return mShaderManager;
 }
 
+void SceneView::UpdateShadowUniform(Scene3D::Light light)
+{
+  mShaderManager->UpdateShadowUniform(light);
+}
+
 ///////////////////////////////////////////////////////////
 //
 // Private methods
@@ -583,7 +811,17 @@ void SceneView::OnSceneConnection(int depth)
   if(mSceneHolder)
   {
     RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
-    mRenderTask             = taskList.CreateTask();
+    mShadowMapRenderTask    = taskList.CreateTask();
+    mShadowMapRenderTask.SetSourceActor(mRootLayer);
+    mShadowMapRenderTask.SetExclusive(true);
+    mShadowMapRenderTask.SetInputEnabled(false);
+    mShadowMapRenderTask.SetCullMode(false);
+    mShadowMapRenderTask.SetClearEnabled(true);
+    mShadowMapRenderTask.SetClearColor(Color::WHITE);
+    mShadowMapRenderTask.SetRenderPassTag(10);
+    mShadowMapRenderTask.SetCameraActor(CameraActor());
+
+    mRenderTask = taskList.CreateTask();
     mRenderTask.SetSourceActor(mRootLayer);
     mRenderTask.SetExclusive(true);
     mRenderTask.SetInputEnabled(true);
@@ -615,9 +853,16 @@ void SceneView::OnSceneDisconnection()
       taskList.RemoveTask(mRenderTask);
       mRenderTask.Reset();
     }
+    if(mShadowMapRenderTask)
+    {
+      RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
+      taskList.RemoveTask(mShadowMapRenderTask);
+      mShadowMapRenderTask.Reset();
+    }
     mSceneHolder.Reset();
   }
   mFrameBuffer.Reset();
+  mShadowFrameBuffer.Reset();
 
   Control::OnSceneDisconnection();
 }
@@ -694,6 +939,10 @@ void SceneView::UpdateCamera(CameraActor camera)
   }
 
   mSelectedCamera = camera;
+  if(mShadowLight)
+  {
+    SetShadowLightConstraint(mSelectedCamera, GetImplementation(mShadowLight).GetCamera());
+  }
   UpdateRenderTask();
 }
 
@@ -709,6 +958,9 @@ void SceneView::UpdateRenderTask()
     Vector3     size        = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
     const float aspectRatio = size.width / size.height;
     mSelectedCamera.SetAspectRatio(aspectRatio);
+
+    uint32_t shadowMapBufferSize = std::min(static_cast<uint32_t>(std::max(size.width, size.height)), MAXIMUM_SIZE_SHADOW_MAP);
+    UpdateShadowMapBuffer(shadowMapBufferSize);
 
     if(mUseFrameBuffer)
     {
@@ -914,6 +1166,29 @@ void SceneView::NotifyImageBasedLightTextureChange()
     if(item)
     {
       item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor, mSpecularMipmapLevels);
+    }
+  }
+}
+
+void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
+{
+  Dali::FrameBuffer currentShadowFrameBuffer = mShadowMapRenderTask.GetFrameBuffer();
+  if(mShadowLight &&
+     (!currentShadowFrameBuffer ||
+      !Dali::Equals(DevelFrameBuffer::GetDepthTexture(currentShadowFrameBuffer).GetWidth(), shadowMapSize)))
+  {
+    mShadowFrameBuffer.Reset();
+    Dali::Texture shadowTexture = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::DEPTH_UNSIGNED_INT, shadowMapSize, shadowMapSize);
+    mShadowFrameBuffer          = FrameBuffer::New(shadowMapSize, shadowMapSize, FrameBuffer::Attachment::NONE);
+    DevelFrameBuffer::AttachDepthTexture(mShadowFrameBuffer, shadowTexture);
+    mShadowMapRenderTask.SetFrameBuffer(mShadowFrameBuffer);
+
+    for(auto&& item : mItems)
+    {
+      if(item)
+      {
+        item->NotifyShadowMapTexture(shadowTexture);
+      }
     }
   }
 }

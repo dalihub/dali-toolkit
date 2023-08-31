@@ -187,6 +187,11 @@ void ModelNode::AddModelPrimitive(Dali::Scene3D::ModelPrimitive modelPrimitive)
 
   Actor self = Self();
   GetImplementation(modelPrimitive).AddPrimitiveObserver(this);
+  if(mShadowMapTexture)
+  {
+    GetImplementation(modelPrimitive).SetShadowMapTexture(mShadowMapTexture);
+  }
+
   if(mDiffuseTexture && mSpecularTexture)
   {
     GetImplementation(modelPrimitive).SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor, mSpecularMipmapLevels);
@@ -282,6 +287,15 @@ Loader::BlendShapes::Index ModelNode::GetBlendShapeIndexByName(std::string_view 
     return iter->second;
   }
   return Loader::BlendShapes::INVALID_INDEX;
+}
+
+void ModelNode::SetShadowMapTexture(Dali::Texture shadowMapTexture)
+{
+  mShadowMapTexture       = shadowMapTexture;
+  for(auto&& primitive : mModelPrimitiveContainer)
+  {
+    GetImplementation(primitive).SetShadowMapTexture(mShadowMapTexture);
+  }
 }
 
 void ModelNode::SetImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float iblScaleFactor, uint32_t specularMipmapLevels)
