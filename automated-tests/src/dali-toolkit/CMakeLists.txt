@@ -7,7 +7,6 @@ SET(CAPI_LIB "dali-toolkit")
 
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
-  toolkit-direct-rendering-egl.cpp
   utc-Dali-Alignment.cpp
   utc-Dali-AnimatedImageVisual.cpp
   utc-Dali-AnimatedVectorImageVisual.cpp
@@ -103,6 +102,7 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/toolkit-application.cpp
   dali-toolkit-test-utils/toolkit-canvas-renderer.cpp
   dali-toolkit-test-utils/toolkit-clipboard.cpp
+  dali-toolkit-test-utils/toolkit-direct-rendering-egl.cpp
   dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
   dali-toolkit-test-utils/toolkit-environment-variable.cpp
   dali-toolkit-test-utils/toolkit-input-method-context.cpp

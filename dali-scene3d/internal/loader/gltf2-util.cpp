@@ -949,6 +949,8 @@ void ConvertCamera(const gltf2::Camera& camera, CameraParameters& cameraParamete
     cameraParameters.zNear = ortho.mZNear;
     cameraParameters.zFar  = ortho.mZFar;
   }
+
+  cameraParameters.name = std::string(camera.mName);
 }
 
 void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentIndex, ConversionContext& context, bool isMRendererModel)
