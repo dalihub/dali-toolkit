@@ -1,0 +1,17 @@
+ {
+    "images": [
+        {
+            "uri": "AnimatedCube_BaseColor.png",
+            "minWidth": 256,
+            "minHeight": 256,
+            "samplingMode": "BOX_THEN_NEAREST"
+        },
+        {
+            "uri": "AnimatedCube_MetallicRoughness.png",
+            "minWidth": 256,
+            "minHeight": 256,
+            "samplingMode": "NEAREST"
+        }
+    ]
+}
+

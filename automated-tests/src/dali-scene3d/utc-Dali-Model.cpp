@@ -23,6 +23,7 @@
 
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <toolkit-environment-variable.h>
 #include <toolkit-event-thread-callback.h>
 
 #include <dali-scene3d/public-api/controls/model/model.h>
@@ -57,6 +58,8 @@ const bool DEFAULT_MODEL_CHILDREN_FOCUSABLE = false;
  * Take from https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/AnimatedCube
  */
 const char* TEST_GLTF_FILE_NAME                    = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
+const char* TEST_GLTF_FILE_NAME_SAME_FILE          = TEST_RESOURCE_DIR "/AnimatedCube2.gltf";
+const char* TEST_GLTF_FILE_NAME_DIFF_META_FILE     = TEST_RESOURCE_DIR "/AnimatedCube3.gltf";
 const char* TEST_GLTF_ANIMATION_TEST_FILE_NAME     = TEST_RESOURCE_DIR "/animationTest.gltf";
 const char* TEST_GLTF_EXTRAS_FILE_NAME             = TEST_RESOURCE_DIR "/AnimatedMorphCubeAnimateNonZeroFrame.gltf";
 const char* TEST_GLTF_MULTIPLE_PRIMITIVE_FILE_NAME = TEST_RESOURCE_DIR "/simpleMultiplePrimitiveTest.gltf";
@@ -171,6 +174,133 @@ int UtcDaliModelNewP2(void)
   application.GetScene().Remove(model);
 
   DALI_TEST_CHECK(!model.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
+
+  END_TEST;
+}
+
+int UtcDaliModelNewSameModelUrlCached(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliModelNew with same model");
+
+  // Set up trace debug
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  DALI_TEST_CHECK(model);
+  Scene3D::Model model2 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  DALI_TEST_CHECK(model2);
+
+  application.GetScene().Add(model);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Test if there is at least 1 texture.\n");
+  int expectTextureCount = textureTrace.CountMethod("GenTextures");
+  DALI_TEST_GREATER(expectTextureCount, 0, TEST_LOCATION);
+
+  application.GetScene().Add(model2);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Test if we reuse cached texture or not.\n");
+  int currentTextureCount = textureTrace.CountMethod("GenTextures");
+  DALI_TEST_EQUALS(currentTextureCount, expectTextureCount, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliModelNewSameResourceUrlCached01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliModelNew with difference url but same model");
+
+  // Set up trace debug
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+  textureTrace.EnableLogging(true);
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  DALI_TEST_CHECK(model);
+  Scene3D::Model model2 = Scene3D::Model::New(TEST_GLTF_FILE_NAME_SAME_FILE); // Difference model that use same Images.
+  DALI_TEST_CHECK(model2);
+  Scene3D::Model model3 = Scene3D::Model::New(TEST_GLTF_FILE_NAME_DIFF_META_FILE); // Difference model that use same Images, but difference metadata.
+  DALI_TEST_CHECK(model3);
+
+  application.GetScene().Add(model);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Test if there is at least 1 texture.\n");
+  int expectTextureCount = textureTrace.CountMethod("GenTextures");
+  DALI_TEST_GREATER(expectTextureCount, 0, TEST_LOCATION);
+
+  application.GetScene().Add(model2);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Test if we reuse cached texture or not.\n");
+  int currentTextureCount = textureTrace.CountMethod("GenTextures");
+  DALI_TEST_EQUALS(currentTextureCount, expectTextureCount, TEST_LOCATION);
+
+  application.GetScene().Add(model3);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Test if we don't reuse cached texture, due to the metadata difference.\n");
+  currentTextureCount = textureTrace.CountMethod("GenTextures");
+  DALI_TEST_GREATER(currentTextureCount, expectTextureCount, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliModelNewSameResourceUrlCached02(void)
+{
+  /// Make we don't use mutiple thread loading for this UTC.
+  EnvironmentVariable::SetTestEnvironmentVariable("DALI_ASYNC_MANAGER_THREAD_POOL_SIZE", "1");
+  EnvironmentVariable::SetTestEnvironmentVariable("DALI_ASYNC_MANAGER_LOW_PRIORITY_THREAD_POOL_SIZE", "1");
+
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliModelNew with difference url but same model");
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  DALI_TEST_CHECK(model);
+  Scene3D::Model model2 = Scene3D::Model::New(TEST_GLTF_FILE_NAME_SAME_FILE);
+  DALI_TEST_CHECK(model2);
+
+  application.GetScene().Add(model);
+  application.GetScene().Add(model2);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

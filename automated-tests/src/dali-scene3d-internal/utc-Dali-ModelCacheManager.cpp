@@ -18,13 +18,14 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/internal/common/model-cache-manager.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-toolkit-test-suite-utils.h>
-#include <dali-toolkit/dali-toolkit.h>
 #include <toolkit-event-thread-callback.h>
+#include <toolkit-timer.h>
 #include <string>
 
 using namespace Dali;
@@ -176,6 +177,10 @@ int UtcDaliModelCacheManagerLoadModel(void)
 
   // All reference count should be decreased.
   DALI_TEST_EQUALS(cacheManager.GetModelCacheRefCount(TEST_GLTF_FILE_NAME), 0u, TEST_LOCATION);
+
+  // Collect garbages hardly.
+  Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect(true);
+  Test::EmitGlobalTimerSignal();
 
   END_TEST;
 }
