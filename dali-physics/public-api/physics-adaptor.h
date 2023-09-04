@@ -22,6 +22,7 @@
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
+#include <functional> ///< for std::function
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
