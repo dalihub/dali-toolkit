@@ -148,7 +148,7 @@ protected:
 protected:
   Dali::Mutex                           mMutex;
   std::queue<std::function<void(void)>> commandQueue;
-  Dali::UpdateProxy::NotifySyncPoint    mNotifySyncPoint;
+  Dali::UpdateProxy::NotifySyncPoint    mNotifySyncPoint{Dali::UpdateProxy::INVALID_SYNC};
   Dali::CallbackBase*                   mUpdateCallback{nullptr};
   std::unique_ptr<FrameCallback>        mFrameCallback;
   Dali::Actor                           mRootActor;

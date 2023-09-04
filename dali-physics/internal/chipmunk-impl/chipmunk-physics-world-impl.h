@@ -40,7 +40,7 @@ public:
   Dali::Any HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Vector3& localPivot, float& distanceFromCamera) override;
 
 private:
-  cpSpace* mSpace;
+  cpSpace* mSpace{nullptr};
 };
 
 } //namespace Dali::Toolkit::Physics::Internal

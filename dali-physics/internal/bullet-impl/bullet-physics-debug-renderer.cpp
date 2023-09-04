@@ -115,7 +115,13 @@ PhysicsDebugRenderer::PhysicsDebugRenderer(uint32_t width, uint32_t height, Dali
 : mCamera(camera),
   mWidth(width),
   mHeight(height),
-  mAdaptor(*adaptor)
+  mAdaptor(*adaptor),
+  mVertexLocation(-1),
+  mVertexColourLocation(-1),
+  mProjectionLocation(-1),
+  mModelViewLocation(-1),
+  mBufferId(0u),
+  mProgramId(0u)
 {
 }
 
