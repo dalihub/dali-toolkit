@@ -29,11 +29,14 @@
 #include <dali-scene3d/public-api/loader/blend-shape-details.h>
 #include <dali-scene3d/public-api/loader/node-definition.h>
 
+#include <dali/integration-api/debug.h>
+
 namespace Dali::Scene3D::Loader
 {
 namespace
 {
-static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG = 10;
+static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG  = 10;
+static constexpr uint32_t INDEX_FOR_SHADOW_CONSTRAINT_TAG = 100;
 
 ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinition& meshDef)
 {
@@ -162,6 +165,8 @@ struct ShaderManager::Impl
   std::map<uint64_t, Index>   mShaderMap;
   std::vector<Dali::Shader>   mShaders;
   std::vector<Scene3D::Light> mLights;
+
+  Scene3D::Light mShadowLight;
 };
 
 ShaderManager::ShaderManager()
@@ -208,6 +213,13 @@ Dali::Shader ShaderManager::ProduceShader(const ShaderOption& shaderOption)
     for(uint32_t index = 0; index < mImpl->mLights.size(); ++index)
     {
       SetLightConstraintToShader(index, result);
+    }
+
+    result.RegisterProperty("uIsShadowEnabled", static_cast<int32_t>(!!mImpl->mShadowLight));
+    if(!!mImpl->mShadowLight)
+    {
+      SetShadowConstraintToShader(result);
+      SetShadowUniformToShader(result);
     }
   }
 
@@ -288,6 +300,42 @@ uint32_t ShaderManager::GetLightCount() const
   return mImpl->mLights.size();
 }
 
+void ShaderManager::SetShadow(Scene3D::Light light)
+{
+  mImpl->mShadowLight = light;
+  for(auto&& shader : mImpl->mShaders)
+  {
+    std::string shadowEnabledPropertyName(Scene3D::Internal::Light::GetShadowEnabledUniformName());
+    shader.RegisterProperty(shadowEnabledPropertyName, static_cast<int32_t>(true));
+  }
+
+  SetShadowProperty();
+}
+
+void ShaderManager::RemoveShadow()
+{
+  for(auto&& shader : mImpl->mShaders)
+  {
+    std::string shadowEnabledPropertyName(Scene3D::Internal::Light::GetShadowEnabledUniformName());
+    shader.RegisterProperty(shadowEnabledPropertyName, static_cast<int32_t>(false));
+    shader.RemoveConstraints(INDEX_FOR_SHADOW_CONSTRAINT_TAG);
+  }
+  mImpl->mShadowLight.Reset();
+}
+
+void ShaderManager::UpdateShadowUniform(Scene3D::Light light)
+{
+  if(light != mImpl->mShadowLight)
+  {
+    return;
+  }
+
+  for(auto&& shader : mImpl->mShaders)
+  {
+    SetShadowUniformToShader(shader);
+  }
+}
+
 void ShaderManager::SetLightConstraint(uint32_t lightIndex)
 {
   for(auto&& shader : mImpl->mShaders)
@@ -321,6 +369,51 @@ void ShaderManager::RemoveLightConstraint(uint32_t lightIndex)
   {
     shader.RemoveConstraints(INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
   }
+}
+
+void ShaderManager::SetShadowUniformToShader(Dali::Shader shader)
+{
+  shader.RegisterProperty("uShadowIntensity", mImpl->mShadowLight.GetShadowIntensity());
+  shader.RegisterProperty("uShadowBias", mImpl->mShadowLight.GetShadowBias());
+  shader.RegisterProperty("uEnableShadowSoftFiltering", static_cast<int>(mImpl->mShadowLight.IsShadowSoftFilteringEnabled()));
+}
+
+void ShaderManager::SetShadowProperty()
+{
+  for(auto&& shader : mImpl->mShaders)
+  {
+    SetShadowUniformToShader(shader);
+    SetShadowConstraintToShader(shader);
+  }
+}
+
+void ShaderManager::SetShadowConstraintToShader(Dali::Shader shader)
+{
+  // Constraint is applied before View/Projection Matrix is computed in update thread.
+  // So, it could show not plausible result if camera properties are changed discontinuesly.
+  // If we want to make it be synchronized, View/Projection matrix are needed to be conputed in below constraint.
+
+  std::string       shadowViewProjectionPropertyName(Scene3D::Internal::Light::GetShadowViewProjectionMatrixUniformName());
+  auto              shadowViewProjectionPropertyIndex = shader.RegisterProperty(shadowViewProjectionPropertyName, Matrix::IDENTITY);
+  Dali::CameraActor shadowLightCamera                 = Dali::Scene3D::Internal::GetImplementation(mImpl->mShadowLight).GetCamera();
+  auto              tempViewMatrixIndex               = shadowLightCamera.GetPropertyIndex("tempViewMatrix");
+  if(tempViewMatrixIndex != Dali::Property::INVALID_INDEX)
+  {
+    tempViewMatrixIndex = shadowLightCamera.RegisterProperty("tempViewMatrix", Matrix::IDENTITY);
+  }
+  auto tempProjectionMatrixIndex = shadowLightCamera.GetPropertyIndex("tempProjectionMatrix");
+  if(tempProjectionMatrixIndex != Dali::Property::INVALID_INDEX)
+  {
+    tempProjectionMatrixIndex = shadowLightCamera.RegisterProperty("tempProjectionMatrix", Matrix::IDENTITY);
+  }
+  Dali::Constraint shadowViewProjectionConstraint = Dali::Constraint::New<Matrix>(shader, shadowViewProjectionPropertyIndex, [](Matrix& output, const PropertyInputContainer& inputs)
+                                                                                  {
+                                                                                    output = inputs[1]->GetMatrix() * inputs[0]->GetMatrix(); });
+
+  shadowViewProjectionConstraint.AddSource(Source{shadowLightCamera, tempViewMatrixIndex});
+  shadowViewProjectionConstraint.AddSource(Source{shadowLightCamera, tempProjectionMatrixIndex});
+  shadowViewProjectionConstraint.ApplyPost();
+  shadowViewProjectionConstraint.SetTag(INDEX_FOR_SHADOW_CONSTRAINT_TAG);
 }
 
 } // namespace Dali::Scene3D::Loader

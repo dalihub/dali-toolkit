@@ -345,6 +345,14 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
     ++n;
   }
 
+  if(mShadowAvailable)
+  {
+    PixelData shadowMapPixelData = PixelData::New(new uint8_t[3]{0xff, 0xff, 0xff}, 3, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY);
+    Texture   shadowMapTexture   = Texture::New(TextureType::TEXTURE_2D, shadowMapPixelData.GetPixelFormat(), shadowMapPixelData.GetWidth(), shadowMapPixelData.GetHeight());
+    shadowMapTexture.Upload(shadowMapPixelData, 0, 0, 0, 0, shadowMapPixelData.GetWidth(), shadowMapPixelData.GetHeight());
+    textureSet.SetTexture(n++, shadowMapTexture);
+  }
+
   // Assign textures to slots -- starting with 2D ones, then cubemaps, if any.
   if(mEnvironmentIdx < static_cast<Index>(environments.size()))
   {

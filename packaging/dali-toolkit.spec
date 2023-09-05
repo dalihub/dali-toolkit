@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.2.41
+Version:    2.2.42
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -544,13 +544,16 @@ esac
 %endif
 %defattr(-,root,root,-)
 %{_libdir}/libchipmunk.so*
+%{_libdir}/libdali2-physics-2d.so*
 %license LICENSE
 
 %files -n %{dali2_physics2d}-devel
 %defattr(-,root,root,-)
+%{_includedir}/dali-physics/public-api/*
+%{_includedir}/dali-physics/dali-physics.h
 %{_includedir}/chipmunk/*
-%{_libdir}/pkgconfig/dali2-physics-2d.pc
 %{_libdir}/pkgconfig/chipmunk2d.pc
+%{_libdir}/pkgconfig/dali2-physics-2d.pc
 
 %files -n %{dali2_physics3d}
 %if 0%{?enable_dali_smack_rules}
@@ -560,11 +563,13 @@ esac
 %endif
 %defattr(-,root,root,-)
 %{_libdir}/libbullet3.so*
+%{_libdir}/libdali2-physics-3d.so*
 %license LICENSE
 
 %files -n %{dali2_physics3d}-devel
 %defattr(-,root,root,-)
+%{_includedir}/dali-physics/public-api/*
+%{_includedir}/dali-physics/dali-physics.h
 %{_includedir}/bullet/*
 %{_libdir}/pkgconfig/dali2-physics-3d.pc
 %{_libdir}/pkgconfig/bullet3.pc
-

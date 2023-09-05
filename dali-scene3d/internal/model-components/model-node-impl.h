@@ -231,7 +231,14 @@ public: // Public Method
   Loader::BlendShapes::Index GetBlendShapeIndexByName(std::string_view blendShapeName) const;
 
   /**
-   * @brief Sets the diffuse and specular image-based lighting textures for a ModelPrimitive.
+   * @brief Sets the shadow map textures for a ModelNode.
+   *
+   * @param[in] shadowMapTexture The shadow map texture.
+   */
+  void SetShadowMapTexture(Dali::Texture shadowMapTexture);
+
+  /**
+   * @brief Sets the diffuse and specular image-based lighting textures for a ModelNode.
    *
    * @param[in] diffuseTexture The diffuse texture.
    * @param[in] specularTexture The specular texture.
@@ -300,6 +307,7 @@ private:
   ModelPrimitiveContainer           mModelPrimitiveContainer; ///< List of model primitives
   BoneDataContainer                 mBoneDataContainer;
   BlendShapeIndexMap                mBlendShapeIndexMap;      ///< Index of blend shape by name
+  Dali::Texture                     mShadowMapTexture;
   Dali::Texture                     mSpecularTexture;
   Dali::Texture                     mDiffuseTexture;
   float                             mIblScaleFactor{1.0f};

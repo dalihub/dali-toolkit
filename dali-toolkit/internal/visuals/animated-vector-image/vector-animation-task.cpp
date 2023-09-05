@@ -215,7 +215,7 @@ void VectorAnimationTask::SetAnimationData(const AnimationData& data)
 
   uint32_t index = mAnimationDataIndex == 0 ? 1 : 0; // Use the other buffer
 
-  mAnimationData[index] = data;
+  mAnimationData[index].push_back(data);
   mAnimationDataUpdated = true;
 
   if(data.resendFlag & VectorAnimationTask::RESEND_SIZE)
@@ -660,7 +660,7 @@ void VectorAnimationTask::ApplyAnimationData()
   {
     ConditionalWait::ScopedLock lock(mConditionalWait);
 
-    if(!mAnimationDataUpdated || mAnimationData[mAnimationDataIndex].resendFlag != 0)
+    if(!mAnimationDataUpdated || mAnimationData[mAnimationDataIndex].size() != 0)
     {
       // Data is not updated or the previous data is not applied yet.
       return;
@@ -672,63 +672,65 @@ void VectorAnimationTask::ApplyAnimationData()
     index = mAnimationDataIndex;
   }
 
-  if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_LOOP_COUNT)
+  for(const auto& animationData : mAnimationData[index])
   {
-    SetLoopCount(mAnimationData[index].loopCount);
-  }
-
-  if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_PLAY_RANGE)
-  {
-    SetPlayRange(mAnimationData[index].playRange);
-  }
-
-  if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_STOP_BEHAVIOR)
-  {
-    SetStopBehavior(mAnimationData[index].stopBehavior);
-  }
-
-  if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_LOOPING_MODE)
-  {
-    SetLoopingMode(mAnimationData[index].loopingMode);
-  }
-
-  if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_CURRENT_FRAME)
-  {
-    SetCurrentFrameNumber(mAnimationData[index].currentFrame);
-  }
-
-  if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_NEED_RESOURCE_READY)
-  {
-    mVectorRenderer.InvalidateBuffer();
-  }
-
-  if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_DYNAMIC_PROPERTY)
-  {
-    for(auto&& iter : mAnimationData[index].dynamicProperties)
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_LOOP_COUNT)
     {
-      mVectorRenderer.AddPropertyValueCallback(iter.keyPath, static_cast<VectorAnimationRenderer::VectorProperty>(iter.property), iter.callback, iter.id);
+      SetLoopCount(animationData.loopCount);
+    }
+
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_PLAY_RANGE)
+    {
+      SetPlayRange(animationData.playRange);
+    }
+
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_STOP_BEHAVIOR)
+    {
+      SetStopBehavior(animationData.stopBehavior);
+    }
+
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_LOOPING_MODE)
+    {
+      SetLoopingMode(animationData.loopingMode);
+    }
+
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_CURRENT_FRAME)
+    {
+      SetCurrentFrameNumber(animationData.currentFrame);
+    }
+
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_NEED_RESOURCE_READY)
+    {
+      mVectorRenderer.InvalidateBuffer();
+    }
+
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_DYNAMIC_PROPERTY)
+    {
+      for(auto&& iter : animationData.dynamicProperties)
+      {
+        mVectorRenderer.AddPropertyValueCallback(iter.keyPath, static_cast<VectorAnimationRenderer::VectorProperty>(iter.property), iter.callback, iter.id);
+      }
+    }
+
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_PLAY_STATE)
+    {
+      if(animationData.playState == DevelImageVisual::PlayState::PLAYING)
+      {
+        PlayAnimation();
+      }
+      else if(animationData.playState == DevelImageVisual::PlayState::PAUSED)
+      {
+        PauseAnimation();
+      }
+      else if(animationData.playState == DevelImageVisual::PlayState::STOPPED)
+      {
+        StopAnimation();
+      }
     }
   }
 
-  if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_PLAY_STATE)
-  {
-    if(mAnimationData[index].playState == DevelImageVisual::PlayState::PLAYING)
-    {
-      PlayAnimation();
-    }
-    else if(mAnimationData[index].playState == DevelImageVisual::PlayState::PAUSED)
-    {
-      PauseAnimation();
-    }
-    else if(mAnimationData[index].playState == DevelImageVisual::PlayState::STOPPED)
-    {
-      StopAnimation();
-    }
-  }
-
-  // reset data
-  mAnimationData[index].dynamicProperties.clear();
-  mAnimationData[index].resendFlag = 0;
+  // reset data list
+  mAnimationData[index].clear();
 }
 
 void VectorAnimationTask::OnUploadCompleted()

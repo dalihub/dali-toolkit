@@ -4,3 +4,7 @@ dali.info
 dali2-*-config.cmake
 libdali2-scene3d.so*
 dali-shader-generator
+build.ninja
+rules.ninja
+.ninja_deps
+.ninja_log

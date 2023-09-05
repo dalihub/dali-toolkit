@@ -357,7 +357,7 @@ private:
 
   std::string                          mUrl;
   VectorAnimationRenderer              mVectorRenderer;
-  AnimationData                        mAnimationData[2];
+  std::vector<AnimationData>           mAnimationData[2];
   VectorAnimationThread&               mVectorAnimationThread;
   ConditionalWait                      mConditionalWait;
   ResourceReadySignalType              mResourceReadySignal;

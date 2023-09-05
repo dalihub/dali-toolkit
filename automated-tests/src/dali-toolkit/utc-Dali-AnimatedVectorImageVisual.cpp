@@ -2126,3 +2126,153 @@ int UtcDaliAnimatedVectorImageVisualDesiredSize(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimatedVectorImageVisualFlushAction(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("UtcDaliAnimatedVectorImageVisualFlushAction");
+
+  int startFrame = 1;
+  int endFrame   = 2;
+
+  int totalFrameCount = 0;
+
+  Property::Array playRange;
+  playRange.PushBack(startFrame);
+  playRange.PushBack(endFrame);
+
+  Property::Map    resultMap;
+  Property::Value* value = nullptr;
+
+  // request AnimatedVectorImageVisual with a property map
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base  visual  = factory.CreateVisual(
+    Property::Map()
+      .Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+      .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+      .Add(DevelImageVisual::Property::PLAY_RANGE, playRange)
+      .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, true));
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+  dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+
+  application.GetScene().Add(dummyControl);
+
+  // Retry function to get playrange until expect values comes.
+  auto CheckAndRetryPlayRange = [&](int expectStartFrame, int expectEndFrame, std::vector<std::pair<int, int>> retrialFrames) {
+    int tryCount    = 0;
+    int tryCountMax = 30;
+    while(++tryCount <= tryCountMax)
+    {
+      Property::Map resultMap = dummyControl.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+
+      Property::Value* value = resultMap.Find(DevelImageVisual::Property::PLAY_RANGE, Property::ARRAY);
+      DALI_TEST_CHECK(value);
+
+      Property::Array* result = value->GetArray();
+      DALI_TEST_CHECK(result);
+      DALI_TEST_EQUALS(result->Count(), 2, TEST_LOCATION);
+
+      bool tryAgain = false;
+      for(auto& framePair : retrialFrames)
+      {
+        if(result->GetElementAt(0).Get<int>() == framePair.first && result->GetElementAt(1).Get<int>() == framePair.second)
+        {
+          tryAgain = true;
+          break;
+        }
+      }
+      if(tryAgain)
+      {
+        tet_printf("Retry to get value again! [%d]\n", tryCount);
+        // Dummy sleep 1 second.
+        Test::WaitForEventThreadTrigger(1, 1);
+        continue;
+      }
+
+      DALI_TEST_EQUALS(result->GetElementAt(0).Get<int>(), expectStartFrame, TEST_LOCATION);
+      DALI_TEST_EQUALS(result->GetElementAt(1).Get<int>(), expectEndFrame, TEST_LOCATION);
+      break;
+    }
+    DALI_TEST_CHECK(tryCount <= tryCountMax);
+  };
+
+  tet_printf("Pause lottie first.\n");
+
+  Property::Map attributes;
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PAUSE, attributes);
+
+  application.SendNotification();
+  application.Render(16);
+
+  do
+  {
+    resultMap = dummyControl.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+
+    value = resultMap.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER, Property::INTEGER);
+    DALI_TEST_CHECK(value);
+    totalFrameCount = value->Get<int>();
+  } while(totalFrameCount == 0);
+
+  // Ensure that vector data sended well.
+  CheckAndRetryPlayRange(startFrame, endFrame, {{0, 0}, {0, totalFrameCount - 1}});
+
+  resultMap = dummyControl.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+
+  value = resultMap.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<int>(), startFrame, TEST_LOCATION);
+
+  tet_printf("Now logically, range : [%d~%d], current : %d\n", startFrame, endFrame, startFrame);
+
+  int changedStartFrame1 = startFrame + 2;
+  int changedEndFrame1   = endFrame + 2;
+
+  playRange.Clear();
+  playRange.Add(changedStartFrame1);
+  playRange.Add(changedEndFrame1);
+
+  tet_printf("Change play range\n");
+  attributes.Add(DevelImageVisual::Property::PLAY_RANGE, playRange);
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  tet_printf("Jump to changedEndFrame!\n");
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, changedEndFrame1);
+
+  attributes.Clear();
+  tet_infoline("Flush Action!");
+  tet_printf("Now logically, range : [%d~%d], current : %d\n", changedStartFrame1, changedEndFrame1, changedEndFrame1);
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::FLUSH, attributes);
+
+  int changedStartFrame2 = startFrame + 1;
+  int changedEndFrame2   = endFrame + 1;
+
+  playRange.Clear();
+  playRange.Add(changedStartFrame2);
+  playRange.Add(changedEndFrame2);
+
+  tet_printf("Change play range again\n");
+  tet_printf("Now logically, range : [%d~%d], current : %d\n", changedStartFrame2, changedEndFrame2, changedEndFrame2);
+  attributes.Add(DevelImageVisual::Property::PLAY_RANGE, playRange);
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Ensure that vector data sended well.
+  CheckAndRetryPlayRange(changedStartFrame2, changedEndFrame2, {{changedStartFrame1, changedEndFrame1}, {startFrame, endFrame}});
+
+  resultMap = dummyControl.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+
+  tet_printf("Test whether current frame number changed well. If Flush not works, current frame become startFrame.");
+  value = resultMap.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<int>(), changedEndFrame2, TEST_LOCATION);
+
+  dummyControl.Unparent();
+
+  END_TEST;
+}

@@ -109,7 +109,7 @@ int UtcDaliPathFinderFindShortestPath0(void)
   auto navmesh = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
   std::vector<PathFinderAlgorithm> testAlgorithms = {
-    PathFinderAlgorithm::DJIKSTRA_SHORTEST_PATH,
+    PathFinderAlgorithm::DIJKSTRA_SHORTEST_PATH,
     PathFinderAlgorithm::SPFA,
   };
 
@@ -159,7 +159,7 @@ int UtcDaliPathFinderFindShortestPath1(void)
   navmesh->SetSceneTransform(Matrix(Matrix::IDENTITY));
 
   std::vector<PathFinderAlgorithm> testAlgorithms = {
-    PathFinderAlgorithm::DJIKSTRA_SHORTEST_PATH,
+    PathFinderAlgorithm::DIJKSTRA_SHORTEST_PATH,
     PathFinderAlgorithm::SPFA,
     PathFinderAlgorithm::SPFA_DOUBLE_WAY, /* Note : Even this algorithm doesn't found shortest path, UTC will pass. */
   };

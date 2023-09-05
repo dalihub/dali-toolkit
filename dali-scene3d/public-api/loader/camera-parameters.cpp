@@ -197,6 +197,8 @@ void CameraParameters::CalculateTransformComponents(Vector3& position, Quaternio
 
 bool CameraParameters::ConfigureCamera(CameraActor& camera, bool invertY) const
 {
+  camera[Actor::Property::NAME] = name;
+
   if(isPerspective)
   {
     if(Dali::Equals(zNear, gltf2::UNDEFINED_FLOAT_VALUE) ||

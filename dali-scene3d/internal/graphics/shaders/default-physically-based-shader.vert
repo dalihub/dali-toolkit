@@ -58,6 +58,11 @@ uniform highp float uBlendShapeUnnormalizeFactor[MAX_BLEND_SHAPE_NUMBER]; ///< F
 uniform highp int uBlendShapeComponentSize;                               ///< The size in the texture of either the vertices, normals or tangents. Used to calculate the offset to address them.
 #endif
 
+// Shadow
+uniform lowp int uIsShadowEnabled;
+uniform highp mat4 uShadowLightViewProjectionMatrix;
+out highp vec3 positionFromLightView;
+
 void main()
 {
   highp vec4 position = vec4(aPosition, 1.0);
@@ -168,6 +173,13 @@ void main()
 #endif
 
   vColor = aVertexColor;
+
+  positionFromLightView = vec3(1.0);
+  if(uIsShadowEnabled > 0)
+  {
+    highp vec4 positionInLightView = uShadowLightViewProjectionMatrix * positionW;
+    positionFromLightView = ((positionInLightView.xyz / positionInLightView.w) * 0.5) + vec3(0.5);
+  }
 
   gl_Position = uProjection * positionV;
 }

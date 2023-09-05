@@ -53,6 +53,7 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::Material, Dali::BaseHandle, Create);
 DALI_TYPE_REGISTRATION_END()
 
+static constexpr uint32_t         OFFSET_FOR_SHADOW_MAP_TEXTURE    = 4u;
 static constexpr uint32_t         OFFSET_FOR_DIFFUSE_CUBE_TEXTURE  = 2u;
 static constexpr uint32_t         OFFSET_FOR_SPECULAR_CUBE_TEXTURE = 1u;
 static constexpr uint32_t         INVALID_INDEX                    = 0u;
@@ -691,6 +692,11 @@ void Material::SetRendererUniform(Dali::Renderer renderer)
   renderer.RegisterProperty(Scene3D::Loader::NodeDefinition::GetIblYDirectionUniformName().data(), Vector3(1.0f, -1.0, 1.0));
 
   Scene3D::Loader::RendererState::Apply(mRendererState, renderer);
+}
+
+uint32_t Material::GetShadowMapTextureOffset()
+{
+  return OFFSET_FOR_SHADOW_MAP_TEXTURE;
 }
 
 uint32_t Material::GetSpecularImageBasedLightTextureOffset()

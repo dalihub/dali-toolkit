@@ -424,10 +424,10 @@ int UtcDaliModelSetImageBasedLightSource01(void)
   DALI_TEST_CHECK(renderer);
 
   TextureSet textureSet = renderer.GetTextures();
-  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 9u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 10u, TEST_LOCATION);
 
-  Texture diffuseTexture  = textureSet.GetTexture(7u);
-  Texture specularTexture = textureSet.GetTexture(8u);
+  Texture diffuseTexture  = textureSet.GetTexture(8u);
+  Texture specularTexture = textureSet.GetTexture(9u);
 
   gResourceReadyCalled = false;
   DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
@@ -443,8 +443,8 @@ int UtcDaliModelSetImageBasedLightSource01(void)
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
   TextureSet newTextureSet      = renderer.GetTextures();
-  Texture    newDiffuseTexture  = newTextureSet.GetTexture(7u);
-  Texture    newSpecularTexture = newTextureSet.GetTexture(8u);
+  Texture    newDiffuseTexture  = newTextureSet.GetTexture(8u);
+  Texture    newSpecularTexture = newTextureSet.GetTexture(9u);
 
   DALI_TEST_NOT_EQUALS(diffuseTexture, newDiffuseTexture, 0.0f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(specularTexture, newSpecularTexture, 0.0f, TEST_LOCATION);
@@ -481,16 +481,16 @@ int UtcDaliModelSetImageBasedLightSource02(void)
   DALI_TEST_CHECK(renderer);
 
   TextureSet textureSet = renderer.GetTextures();
-  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 9u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 10u, TEST_LOCATION);
 
-  Texture diffuseTexture  = textureSet.GetTexture(7u);
-  Texture specularTexture = textureSet.GetTexture(8u);
+  Texture diffuseTexture  = textureSet.GetTexture(8u);
+  Texture specularTexture = textureSet.GetTexture(9u);
 
   // if url is empty, loading is not requested.
   model.SetImageBasedLightSource("", "");
 
-  Texture newDiffuseTexture  = textureSet.GetTexture(7u);
-  Texture newSpecularTexture = textureSet.GetTexture(8u);
+  Texture newDiffuseTexture  = textureSet.GetTexture(8u);
+  Texture newSpecularTexture = textureSet.GetTexture(9u);
 
   DALI_TEST_EQUALS(diffuseTexture, newDiffuseTexture, TEST_LOCATION);
   DALI_TEST_EQUALS(specularTexture, newSpecularTexture, TEST_LOCATION);
@@ -525,10 +525,10 @@ int UtcDaliModelSetImageBasedLightSource03(void)
   DALI_TEST_CHECK(renderer);
 
   TextureSet textureSet = renderer.GetTextures();
-  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 9u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet.GetTextureCount(), 10u, TEST_LOCATION);
 
-  Texture diffuseTexture  = textureSet.GetTexture(7u);
-  Texture specularTexture = textureSet.GetTexture(8u);
+  Texture diffuseTexture  = textureSet.GetTexture(8u);
+  Texture specularTexture = textureSet.GetTexture(9u);
 
   gResourceReadyCalled = false;
   DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
@@ -543,8 +543,8 @@ int UtcDaliModelSetImageBasedLightSource03(void)
 
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
-  Texture newDiffuseTexture  = textureSet.GetTexture(7u);
-  Texture newSpecularTexture = textureSet.GetTexture(8u);
+  Texture newDiffuseTexture  = textureSet.GetTexture(8u);
+  Texture newSpecularTexture = textureSet.GetTexture(9u);
 
   DALI_TEST_EQUALS(diffuseTexture, newDiffuseTexture, TEST_LOCATION);
   DALI_TEST_EQUALS(specularTexture, newSpecularTexture, TEST_LOCATION);
@@ -1352,16 +1352,16 @@ int UtcDaliModelResourceCacheCheck(void)
   // but all the other textures are still the same
   TextureSet textureSet2 = renderer2.GetTextures();
   TextureSet textureSet3 = renderer3.GetTextures();
-  DALI_TEST_EQUALS(textureSet2.GetTextureCount(), 9u, TEST_LOCATION);
-  DALI_TEST_EQUALS(textureSet3.GetTextureCount(), 9u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet2.GetTextureCount(), 10u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureSet3.GetTextureCount(), 10u, TEST_LOCATION);
 
   for(uint32_t i = 0; i < 7u; i++)
   {
     DALI_TEST_EQUALS(textureSet2.GetTexture(i), textureSet3.GetTexture(i), TEST_LOCATION);
   }
 
-  DALI_TEST_NOT_EQUALS(textureSet2.GetTexture(7u), textureSet3.GetTexture(7u), 0.0f, TEST_LOCATION);
-  DALI_TEST_NOT_EQUALS(textureSet2.GetTexture(8u), textureSet3.GetTexture(8u), 0.0f, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(textureSet2.GetTexture(8u), textureSet3.GetTexture(7u), 0.0f, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(textureSet2.GetTexture(9u), textureSet3.GetTexture(8u), 0.0f, TEST_LOCATION);
 
   END_TEST;
 }

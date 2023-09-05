@@ -15,11 +15,13 @@
  */
 
 // CLASS HEADER
-#include <dali-scene3d/internal/algorithm/path-finder-djikstra.h>
+#include <dali-scene3d/internal/algorithm/path-finder-dijkstra.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <limits>
+#include <algorithm> ///< for std::priority_queue
+#include <queue>     ///< for std::priority_queue
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/algorithm/path-finder-waypoint-data.h>
@@ -27,17 +29,38 @@
 
 using WayPointList = Dali::Scene3D::Algorithm::WayPointList;
 
+namespace
+{
+struct DijkstraComparer
+{
+  float                               distance{-1.0f};
+  Dali::Scene3D::Algorithm::FaceIndex index{Dali::Scene3D::Algorithm::NavigationMesh::NULL_FACE};
+
+  /**
+   * @brief Custom operator for Dijkstra comparer.
+   *
+   * @param[in] rhs Target to be compared.
+   * @return True if this has less priority than rhs.
+   */
+  bool operator<(const DijkstraComparer& rhs) const
+  {
+    // Shorter distance have higher prioirty.
+    return distance > rhs.distance;
+  }
+};
+} // namespace
+
 namespace Dali::Scene3D::Internal::Algorithm
 {
-PathFinderAlgorithmDjikstra::PathFinderAlgorithmDjikstra(Dali::Scene3D::Algorithm::NavigationMesh& navMesh)
+PathFinderAlgorithmDijkstra::PathFinderAlgorithmDijkstra(Dali::Scene3D::Algorithm::NavigationMesh& navMesh)
 : mNavigationMesh(&GetImplementation(navMesh))
 {
   PrepareData();
 }
 
-PathFinderAlgorithmDjikstra::~PathFinderAlgorithmDjikstra() = default;
+PathFinderAlgorithmDijkstra::~PathFinderAlgorithmDijkstra() = default;
 
-Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(const Dali::Vector3& positionFrom, const Dali::Vector3& positionTo)
+Scene3D::Algorithm::WayPointList PathFinderAlgorithmDijkstra::FindPath(const Dali::Vector3& positionFrom, const Dali::Vector3& positionTo)
 {
   Dali::Vector3 outPosFrom;
   FaceIndex     polyIndexFrom;
@@ -56,18 +79,20 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(const Dal
       // Get waypoints
       waypoints = FindPath(polyIndexFrom, polyIndexTo);
 
-      // replace first and last waypoint
-      auto& wpFrom = static_cast<WayPointData&>(waypoints[0]);
-      auto& wpTo   = static_cast<WayPointData&>(waypoints.back());
+      if(!waypoints.empty())
+      {
+        // replace first and last waypoint
+        auto& wpFrom = static_cast<WayPointData&>(waypoints[0]);
+        auto& wpTo   = static_cast<WayPointData&>(waypoints.back());
 
-      Vector2 fromCenter(wpFrom.point3d.x, wpFrom.point3d.y);
-      wpFrom.point3d = outPosFrom;
-      wpFrom.point2d = fromCenter - Vector2(outPosFrom.x, outPosFrom.y);
+        Vector2 fromCenter(wpFrom.point3d.x, wpFrom.point3d.y);
+        wpFrom.point3d = outPosFrom;
+        wpFrom.point2d = fromCenter - Vector2(outPosFrom.x, outPosFrom.y);
 
-      Vector2 toCenter(wpTo.point3d.x, wpTo.point3d.y);
-      wpTo.point3d = outPosTo;
-      wpTo.point2d = toCenter - Vector2(outPosTo.x, outPosTo.y);
-      wpTo.point3d = outPosTo;
+        Vector2 toCenter(wpTo.point3d.x, wpTo.point3d.y);
+        wpTo.point3d = outPosTo;
+        wpTo.point2d = toCenter - Vector2(outPosTo.x, outPosTo.y);
+      }
     }
   }
 
@@ -75,85 +100,78 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(const Dal
   return waypoints;
 }
 
-Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(FaceIndex sourcePolyIndex, FaceIndex targetPolyIndex)
+Scene3D::Algorithm::WayPointList PathFinderAlgorithmDijkstra::FindPath(FaceIndex sourcePolyIndex, FaceIndex targetPolyIndex)
 {
   auto                   nodeCount = uint32_t(mNodes.size());
   std::vector<float>     dist;
   std::vector<FaceIndex> prev;
+  std::vector<bool>      faceVisited;
+
+  std::priority_queue<DijkstraComparer> priorityDistanceHeap;
 
   dist.resize(mNodes.size());
   prev.resize(mNodes.size());
 
-  std::vector<FaceNode*> nodeQueue;
-  nodeQueue.reserve(nodeCount);
-
-  [[maybe_unused]] auto sourcePos = Dali::Vector3(Face(sourcePolyIndex)->center);
+  faceVisited.resize(nodeCount);
 
   for(auto i = 0u; i < nodeCount; ++i)
   {
     dist[i] = std::numeric_limits<float>::infinity();
     prev[i] = Scene3D::Algorithm::NavigationMesh::NULL_FACE; // set prev to null polygon
-    nodeQueue.emplace_back(&mNodes[i]);
+    faceVisited[i] = false;
   }
-  auto removeCount = 0u;
 
   // Set distance of source
   dist[sourcePolyIndex] = 0.0f;
 
-  // TO OPTIMIZE WITH PRIORITY QUEUE
-  auto FindMinDistance = [&nodeQueue](decltype(dist)& dist) {
-    float w     = std::numeric_limits<float>::max();
-    int   index = -1;
-    for(auto i = 0u; i < dist.size(); ++i)
-    {
-      // skip infinity
-      if(nodeQueue[i] && dist[i] != std::numeric_limits<float>::infinity() && dist[i] < w)
-      {
-        w     = dist[i];
-        index = int(i);
-      }
-    }
-    return index;
-  };
+  priorityDistanceHeap.push({dist[sourcePolyIndex], sourcePolyIndex});
 
-  do
+  while(!priorityDistanceHeap.empty())
   {
-    // find minimum distance
-    auto minDistIndex = FindMinDistance(dist);
+    // find minimum distance index
+    auto comparer = priorityDistanceHeap.top();
+    priorityDistanceHeap.pop();
 
-    // Failed to find minimum distance
-    if(minDistIndex == -1)
-    {
-      // Return empty WayPointList
-      return {};
-    }
+    auto  minDistanceIndex = comparer.index;
 
-    // remove from queue by assigning infinity to distance
-    removeCount++;
-    if(removeCount == nodeCount)
+    // Old item. just ignore.
+    if(faceVisited[minDistanceIndex])
     {
       continue;
     }
 
-    nodeQueue[minDistIndex] = nullptr;
+    faceVisited[minDistanceIndex] = true;
 
-    [[maybe_unused]] auto sizeTmp = nodeQueue.size() - removeCount;
+    // Fast break if we found solution.
+    if(minDistanceIndex == targetPolyIndex)
+    {
+      break;
+    }
 
     // check the neighbours
     for(auto i = 0u; i < 3; ++i)
     {
-      auto nIndex = mNodes[minDistIndex].faces[i];
-      if(nIndex != Scene3D::Algorithm::NavigationMesh::NULL_FACE && nodeQueue[nIndex] != nullptr)
+      auto nIndex = mNodes[minDistanceIndex].faces[i];
+      if(nIndex != Scene3D::Algorithm::NavigationMesh::NULL_FACE && !faceVisited[nIndex])
       {
-        auto alt = dist[minDistIndex] + mNodes[minDistIndex].weight[i];
+        auto alt = dist[minDistanceIndex] + mNodes[minDistanceIndex].weight[i];
         if(alt < dist[nIndex])
         {
           dist[nIndex] = alt;
-          prev[nIndex] = minDistIndex;
+          prev[nIndex] = minDistanceIndex;
+
+          priorityDistanceHeap.push({dist[nIndex], nIndex});
         }
       }
     }
-  } while(removeCount != nodeCount);
+  }
+
+  // Failed to find minimum distance
+  if(!faceVisited[targetPolyIndex])
+  {
+    // Return empty WayPointList
+    return {};
+  }
 
   // Compute distances for each node back to the source
   auto                 u = targetPolyIndex;
@@ -200,7 +218,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::FindPath(FaceIndex
   return OptimizeWaypoints(waypoints);
 }
 
-void PathFinderAlgorithmDjikstra::PrepareData()
+void PathFinderAlgorithmDijkstra::PrepareData()
 {
   // Build the list structure connecting the nodes
   auto faceCount = mNavigationMesh->GetFaceCount();
@@ -245,7 +263,7 @@ void PathFinderAlgorithmDjikstra::PrepareData()
   return ccw(A, C, D) != ccw(B, C, D) && ccw(A, B, C) != ccw(A, B, D);
 }
 
-Scene3D::Algorithm::WayPointList PathFinderAlgorithmDjikstra::OptimizeWaypoints(WayPointList& waypoints) const
+Scene3D::Algorithm::WayPointList PathFinderAlgorithmDijkstra::OptimizeWaypoints(WayPointList& waypoints) const
 {
   WayPointList optimizedWaypoints;
   optimizedWaypoints.emplace_back(waypoints[0]);

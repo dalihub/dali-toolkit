@@ -33,7 +33,7 @@ using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
 
 ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfaceHeight, float horizontalDpi, float verticalDpi)
 : TestApplication(surfaceWidth, surfaceHeight, horizontalDpi, verticalDpi, false /* Do not Initialize Core */),
-  mMainWindow(new Dali::Window),
+  mMainWindow(),
   mAdaptor(&AdaptorImpl::New()) // Need to create Adaptor first as many singletons in dali-adaptor need it
 {
   // Create Core next
@@ -41,8 +41,8 @@ ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfa
 
   // Override Scene creation in TestApplication by creating a window.
   // The window will create a Scene & surface and set up the scene's surface appropriately.
-  *mMainWindow = Window::New(PositionSize(0, 0, surfaceWidth, surfaceHeight), "");
-  mScene       = AdaptorImpl::GetScene(*mMainWindow);
+  mMainWindow = Window::New(PositionSize(0, 0, surfaceWidth, surfaceHeight), "");
+  mScene       = AdaptorImpl::GetScene(mMainWindow);
   mScene.SetDpi(Vector2(horizontalDpi, verticalDpi));
 
   // Create render target for the scene
@@ -57,7 +57,7 @@ ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfa
   Accessibility::Accessible::SetObjectRegistry(mCore->GetObjectRegistry());
 
   // This will also emit the window created signals
-  AdaptorImpl::GetImpl(*mAdaptor).Start(*mMainWindow);
+  AdaptorImpl::GetImpl(*mAdaptor).Start(mMainWindow);
   AdaptorImpl::GetImpl(*mAdaptor).SetApplication(*this);
 
   Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();

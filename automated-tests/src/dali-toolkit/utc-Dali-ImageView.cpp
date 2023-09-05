@@ -71,6 +71,8 @@ const char* TEST_BROKEN_IMAGE_L       = TEST_RESOURCE_DIR "/broken_l.9.png";
 const char* TEST_BROKEN_IMAGE_01      = TEST_RESOURCE_DIR "/button-up.9.png";
 const char* TEST_BROKEN_IMAGE_02      = TEST_RESOURCE_DIR "/heartsframe.9.png";
 
+const char* TEST_INVALID_NPATCH_FILE_NAME_01 = "invalid1.9.png";
+
 // resolution: 34*34, pixel format: RGBA8888
 static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
 // resolution: 600*600, pixel format: RGB888
@@ -3672,6 +3674,45 @@ void OnResourceReadySignal07(Control control)
   }
 }
 
+void OnResourceReadySignal08(Control control)
+{
+  gResourceReadySignalCounter++;
+
+  if(gImageView1)
+  {
+    gImageView1.Unparent();
+    gImageView1.Reset();
+  }
+  if(gImageView2)
+  {
+    gImageView2.Unparent();
+    gImageView2.Reset();
+  }
+}
+
+std::size_t gResourceReadySignal09Emitted = false;
+
+void OnResourceReadySignal09(Control control)
+{
+  gResourceReadySignalCounter++;
+
+  if(gImageView1 && !gResourceReadySignal09Emitted)
+  {
+    gResourceReadySignal09Emitted = true;
+    gImageView1.ResourceReadySignal().Disconnect(&OnResourceReadySignal09);
+
+    // Try to load cached invalid nine patch image. It will request load now.
+    gImageView1.SetImage(TEST_INVALID_NPATCH_FILE_NAME_01);
+    gImageView2.SetImage(TEST_INVALID_NPATCH_FILE_NAME_01);
+
+    // Destroy all visuals immediatly.
+    gImageView1.Unparent();
+    gImageView1.Reset();
+    gImageView2.Unparent();
+    gImageView2.Reset();
+  }
+}
+
 } // namespace
 
 int UtcDaliImageViewSetImageOnResourceReadySignal01(void)
@@ -4208,6 +4249,239 @@ int UtcDaliImageViewSetImageOnResourceReadySignal07(void)
   END_TEST;
 }
 
+int UtcDaliImageViewSetImageOnResourceReadySignal08(void)
+{
+  tet_infoline("Test remove npatch images during resource ready");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  Property::Map map;
+  map[Toolkit::ImageVisual::Property::URL] = TEST_BROKEN_IMAGE_M;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+  if(gImageView2)
+  {
+    gImageView2.Reset();
+  }
+
+  // Case 1 : Remove all images during resource ready.
+  try
+  {
+    gImageView1 = ImageView::New();
+    gImageView1.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+    gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal08);
+    application.GetScene().Add(gImageView1);
+
+    application.SendNotification();
+    application.Render();
+
+    // Load gImageView1
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    // Exception should not happened
+    DALI_TEST_CHECK(false);
+  }
+
+  // Clear cache.
+  application.SendNotification();
+  application.Render();
+
+  gResourceReadySignalCounter = 0;
+
+  // Case 2 : Remove all images when we use cached resource.
+  try
+  {
+    gImageView1 = ImageView::New();
+    gImageView1.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+    gImageView1.ResourceReadySignal().Connect(&OnSimpleResourceReadySignal);
+    application.GetScene().Add(gImageView1);
+
+    application.SendNotification();
+    application.Render();
+
+    // Load gImageView1
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    gImageView2 = ImageView::New();
+    gImageView2.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+    gImageView2.ResourceReadySignal().Connect(&OnResourceReadySignal08);
+    application.GetScene().Add(gImageView2);
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 2, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    // Exception should not happened
+    DALI_TEST_CHECK(false);
+  }
+  gResourceReadySignalCounter = 0;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+  if(gImageView2)
+  {
+    gImageView2.Reset();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliImageViewSetImageOnResourceReadySignal09(void)
+{
+  tet_infoline("Test load invalid npatch images during invalid resource ready");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  Property::Map map;
+  map[Toolkit::ImageVisual::Property::URL] = TEST_INVALID_NPATCH_FILE_NAME_01;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+  if(gImageView2)
+  {
+    gImageView2.Reset();
+  }
+  if(gImageView3)
+  {
+    gImageView3.Reset();
+  }
+
+  // Dummy view with npatch image
+  ImageView dummyView = ImageView::New(TEST_BROKEN_IMAGE_M);
+  application.GetScene().Add(dummyView);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  // Case 1 : Reload images during resource ready.
+  try
+  {
+    gResourceReadySignal09Emitted = false;
+
+    gImageView1 = ImageView::New();
+    gImageView1.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+    gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal09);
+    application.GetScene().Add(gImageView1);
+
+    gImageView2 = ImageView::New();
+    application.GetScene().Add(gImageView2);
+
+    // Load TEST_INVALID_NPATCH_FILE_NAME_01
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    // Load TEST_INVALID_NPATCH_FILE_NAME_01 one more times.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    // Exception should not happened
+    DALI_TEST_CHECK(false);
+  }
+
+  // Clear cache.
+  application.SendNotification();
+  application.Render();
+
+  gResourceReadySignalCounter = 0;
+
+  // Case 2 : Remove all images when we use cached resource.
+  try
+  {
+    gResourceReadySignal09Emitted = false;
+
+    gImageView3 = ImageView::New();
+    gImageView3.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+    gImageView3.ResourceReadySignal().Connect(&OnSimpleResourceReadySignal);
+    application.GetScene().Add(gImageView3);
+
+    gImageView2 = ImageView::New();
+    application.GetScene().Add(gImageView2);
+
+    // Load gImageView2
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    gImageView1 = ImageView::New();
+    gImageView1.SetProperty(Toolkit::ImageView::Property::IMAGE, map);
+    gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal09);
+    application.GetScene().Add(gImageView1);
+
+    // Load gImageView1
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    // Load TEST_INVALID_NPATCH_FILE_NAME_01 one more times.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    // Exception should not happened
+    DALI_TEST_CHECK(false);
+  }
+  gResourceReadySignalCounter = 0;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+  if(gImageView2)
+  {
+    gImageView2.Reset();
+  }
+  if(gImageView3)
+  {
+    gImageView3.Reset();
+  }
+
+  END_TEST;
+}
+
 int UtcDaliImageViewUseSameUrlWithAnimatedImageVisual(void)
 {
   tet_infoline("Test multiple views with same image in animated image visual");
@@ -4247,6 +4521,11 @@ int UtcDaliImageViewNpatchImageCacheTest01(void)
     {
       imageView[index].Unparent();
     }
+
+    // Ensure remove npatch cache if required.
+    application.SendNotification();
+    application.Render();
+
     imageView[index] = ImageView::New(nPatchImageUrl);
     imageView[index].SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
     application.GetScene().Add(imageView[index]);

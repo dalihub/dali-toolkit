@@ -197,6 +197,13 @@ public:
   void SetRendererUniform(Dali::Renderer renderer);
 
   /**
+   * @brief Retrieves shadow map texture offset.
+   *
+   * @return shadow map texture offset.
+   */
+  uint32_t GetShadowMapTextureOffset();
+
+  /**
    * @brief Retrieves specular image based light texture offset.
    *
    * @return Specular image based light texture offset.

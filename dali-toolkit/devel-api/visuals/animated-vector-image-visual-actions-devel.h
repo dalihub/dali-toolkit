@@ -20,8 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/toolkit-action-index-ranges.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/animated-image-visual-actions-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 #include <dali/public-api/signals/callback.h>
 #include <string>
 
@@ -48,7 +48,9 @@ enum Type
   JUMP_TO = DevelAnimatedImageVisual::Action::JUMP_TO, ///< Jump to the specified frame. Property::INTEGER value should be passed.
 
   // AnimatedVectorImageVisual only actions
-  SET_DYNAMIC_PROPERTY = DevelAnimatedImageVisual::Action::ANIMATED_IMAGE_VISUAL_ACTION_END_INDEX ///< Set the dynamic property.
+  SET_DYNAMIC_PROPERTY = DevelAnimatedImageVisual::Action::ANIMATED_IMAGE_VISUAL_ACTION_END_INDEX, ///< Set the dynamic property.
+
+  FLUSH, ///< Flush animation data. It will make ensure that changeness of animated vector image properties flushed.
 };
 
 } // namespace Action

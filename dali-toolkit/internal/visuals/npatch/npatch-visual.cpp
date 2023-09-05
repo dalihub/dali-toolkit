@@ -239,7 +239,7 @@ void NPatchVisual::DoSetOffScene(Actor& actor)
   {
     if(mId != NPatchData::INVALID_NPATCH_DATA_ID)
     {
-      mLoader.Remove(mId, this);
+      mLoader.RequestRemove(mId, this);
       mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
       mId                    = NPatchData::INVALID_NPATCH_DATA_ID;
     }
@@ -319,7 +319,7 @@ NPatchVisual::~NPatchVisual()
     {
       if(mId != NPatchData::INVALID_NPATCH_DATA_ID)
       {
-        mLoader.Remove(mId, this);
+        mLoader.RequestRemove(mId, this);
         mId = NPatchData::INVALID_NPATCH_DATA_ID;
       }
       if(mAuxiliaryTextureId != TextureManager::INVALID_TEXTURE_ID)

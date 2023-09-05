@@ -2,7 +2,7 @@ set(scene3d_internal_dir "${scene3d_dir}/internal")
 
 set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_internal_dir}/algorithm/navigation-mesh-impl.cpp
-	${scene3d_internal_dir}/algorithm/path-finder-djikstra.cpp
+	${scene3d_internal_dir}/algorithm/path-finder-dijkstra.cpp
 	${scene3d_internal_dir}/algorithm/path-finder-spfa.cpp
 	${scene3d_internal_dir}/algorithm/path-finder-spfa-double-way.cpp
 	${scene3d_internal_dir}/common/environment-map-load-task.cpp
