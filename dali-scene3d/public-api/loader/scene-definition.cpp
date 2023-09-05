@@ -383,7 +383,7 @@ void SceneDefinition::CountResourceRefs(Index iNode, const Customization::Choice
 
     void Register(ResourceType::Value type, Index id)
     {
-      if((!(*refCounts)[type].Empty()) && (id >= 0) && ((*refCounts)[type].Size() > id))
+      if((!(*refCounts)[type].Empty()) && ((*refCounts)[type].Size() > id))
       {
         ++(*refCounts)[type][id];
       }

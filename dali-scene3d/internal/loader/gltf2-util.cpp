@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
+#include <limits> ///< for std::numeric_limits
 
 using namespace Dali::Scene3D::Loader;
 
@@ -301,6 +302,7 @@ std::vector<std::string_view> ReadMeshExtensionsTargetsName(const json_value_s& 
 
     if(result.size() <= index)
     {
+      DALI_ASSERT_ALWAYS(index < std::numeric_limits<uint32_t>::max());
       result.resize(index + 1u);
     }
 
