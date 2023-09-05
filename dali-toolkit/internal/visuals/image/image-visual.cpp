@@ -707,10 +707,26 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
     EnablePreMultipliedAlpha(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
 
     // Set new TextureSet with fast track loading task
-    mFastTrackLoadingTask = new FastTrackLoadingTask(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode, mOrientationCorrection, preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, MakeCallback(this, &ImageVisual::FastLoadComplete));
+    mFastTrackLoadingTask = new FastTrackLoadingTask(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode, mOrientationCorrection, preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, mFactoryCache.GetLoadYuvPlanes(), MakeCallback(this, &ImageVisual::FastLoadComplete));
 
     TextureSet textureSet = TextureSet::New();
-    textureSet.SetTexture(0u, mFastTrackLoadingTask->mTexture);
+    if(!mFastTrackLoadingTask->mLoadPlanesAvaliable)
+    {
+      DALI_ASSERT_ALWAYS(mFastTrackLoadingTask->mTextures.size() >= 1u);
+      textureSet.SetTexture(0u, mFastTrackLoadingTask->mTextures[0]);
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS(mFastTrackLoadingTask->mTextures.size() >= 3u);
+      textureSet.SetTexture(0u, mFastTrackLoadingTask->mTextures[0]);
+      textureSet.SetTexture(1u, mFastTrackLoadingTask->mTextures[1]);
+      textureSet.SetTexture(2u, mFastTrackLoadingTask->mTextures[2]);
+
+      // We cannot determine what kind of shader will be used.
+      // Just use unified shader, and then change shader after load completed.
+      mNeedUnifiedYuvAndRgb = true;
+      UpdateShader();
+    }
     mImpl->mRenderer.SetTextures(textureSet);
 
     Dali::AsyncTaskManager::Get().AddTask(mFastTrackLoadingTask);
@@ -1009,6 +1025,31 @@ void ImageVisual::FastLoadComplete(FastTrackLoadingTaskPtr task)
 
     // Change premultiplied alpha flag after change renderer.
     EnablePreMultipliedAlpha(mFastTrackLoadingTask->mPremultiplied);
+
+    if(mFastTrackLoadingTask->mLoadPlanesAvaliable)
+    {
+      if(mFastTrackLoadingTask->mPlanesLoaded)
+      {
+        // Let we use regular yuv cases.
+        mNeedYuvToRgb = true;
+      }
+      else
+      {
+        // Let we use regular image cases.
+        mNeedYuvToRgb = false;
+
+        auto textureSet = mImpl->mRenderer.GetTextures();
+        DALI_ASSERT_ALWAYS(textureSet && textureSet.GetTextureCount() > 0u && "Previous texture set must exist!");
+
+        Dali::TextureSet newTextureSet = TextureSet::New();
+        newTextureSet.SetTexture(0u, textureSet.GetTexture(0u));
+        mImpl->mRenderer.SetTextures(newTextureSet);
+      }
+
+      // We can specify what kind of shader we need to use now. Update shader.
+      mNeedUnifiedYuvAndRgb = false;
+      UpdateShader();
+    }
   }
   else
   {
@@ -1230,7 +1271,7 @@ Shader ImageVisual::GenerateShader() const
         .EnableBorderline(IsBorderlineRequired())
         .SetTextureForFragmentShaderCheck(useNativeImage ? mTextures.GetTexture(0) : Dali::Texture())
         .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering)
-        .EnableYuvToRgb(mNeedYuvToRgb));
+        .EnableYuvToRgb(mNeedYuvToRgb, mNeedUnifiedYuvAndRgb));
   }
   else
   {

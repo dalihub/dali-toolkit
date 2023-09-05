@@ -3803,7 +3803,6 @@ int UtcDaliImageVisualLoadFastTrackImageReload(void)
 
 int UtcDaliImageVisualLoadFastTrackImagePlanes01(void)
 {
-#if 0 //< Do not open this UTC yet.
   EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
   EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
 
@@ -3853,19 +3852,65 @@ int UtcDaliImageVisualLoadFastTrackImagePlanes01(void)
 
   DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 3, TEST_LOCATION);
 
-  // Event thread don't know the result yet.
-  DALI_TEST_EQUALS(actor.IsResourceReady(), false, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  // Check resource ready comes after
   application.SendNotification();
+  application.Render();
 
-  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  END_TEST;
+}
 
-#else
-  DALI_TEST_CHECK(true);
-#endif
+int UtcDaliImageVisualLoadFastTrackImagePlanes02(void)
+{
+  EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
+
+  ToolkitTestApplication application;
+
+  Test::TextureUploadManager::InitalizeGraphicsController(application.GetGraphicsController());
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  propertyMap.Insert(DevelImageVisual::Property::FAST_TRACK_UPLOADING, true);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // EventThread without callback
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 30, false), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 0, TEST_LOCATION);
+
+  {
+    // TODO : There is no way to flush TextureUploadManager in test-application's Render() now.
+    // How can we make it? Should it be integration-api?
+    auto textureUploadManager = Dali::Devel::TextureUploadManager::Get();
+    textureUploadManager.ResourceUpload();
+    application.Render();
+  }
+  // Render only without SendNotification(). And check whether glTexImage2D called or not.
+  application.Render();
+
+  DALI_TEST_GREATER(textureTrace.CountMethod("GenTextures"), 0, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }

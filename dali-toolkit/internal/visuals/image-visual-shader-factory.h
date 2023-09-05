@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_SHADER_FACTORY_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,8 +114,9 @@ namespace ColorConversion
  */
 enum Type
 {
-  DONT_NEED = 0, ///< Not need to convert
-  YUV_TO_RGB     ///< Need yuv to rgb conversion
+  DONT_NEED = 0,      ///< Not need to convert
+  YUV_TO_RGB,         ///< Need yuv to rgb conversion
+  UNIFIED_YUV_AND_RGB ///< Need to support both yuv conversion case and normal case.
 };
 } // namespace ColorConversion
 
@@ -141,7 +142,7 @@ struct FeatureBuilder
   FeatureBuilder& EnableBorderline(bool enableBorderline);
   FeatureBuilder& SetTextureForFragmentShaderCheck(const Dali::Texture& texture);
   FeatureBuilder& EnableAlphaMaskingOnRendering(bool enableAlphaMaskingOnRendering);
-  FeatureBuilder& EnableYuvToRgb(bool enableYuvToRgb);
+  FeatureBuilder& EnableYuvToRgb(bool enableYuvToRgb, bool enableUnifiedYuvAndRgb = false);
 
   TextureAtlas::Type            mTextureAtlas : 2;            ///< Whether use texture with atlas, or not. default as TextureAtlas::DISABLED
   DefaultTextureWrapMode::Type  mDefaultTextureWrapMode : 2;  ///< Whether apply to texture wraping in default, or not. default as DefaultTextureWrapMode::APPLY

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include "visual-factory-cache.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/common/hash.h>
 #include <dali/integration-api/debug.h>
@@ -41,10 +42,21 @@ namespace Internal
 namespace
 {
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
+
+constexpr auto LOAD_IMAGE_YUV_PLANES_ENV = "DALI_LOAD_IMAGE_YUV_PLANES";
+
+bool NeedToLoadYuvPlanes()
+{
+  auto loadYuvPlanesString = Dali::EnvironmentVariable::GetEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV);
+  bool loadYuvPlanes       = loadYuvPlanesString ? std::atoi(loadYuvPlanesString) : false;
+  return loadYuvPlanes;
 }
+} // namespace
 
 VisualFactoryCache::VisualFactoryCache(bool preMultiplyOnLoad)
-: mVectorAnimationManager(nullptr),
+: mLoadYuvPlanes(NeedToLoadYuvPlanes()),
+  mTextureManager(mLoadYuvPlanes),
+  mVectorAnimationManager(nullptr),
   mPreMultiplyOnLoad(preMultiplyOnLoad),
   mBrokenImageInfoContainer(),
   mDefaultBrokenImageUrl(""),
@@ -230,9 +242,14 @@ void VisualFactoryCache::SetPreMultiplyOnLoad(bool preMultiply)
   mPreMultiplyOnLoad = preMultiply;
 }
 
-bool VisualFactoryCache::GetPreMultiplyOnLoad()
+bool VisualFactoryCache::GetPreMultiplyOnLoad() const
 {
   return mPreMultiplyOnLoad;
+}
+
+bool VisualFactoryCache::GetLoadYuvPlanes() const
+{
+  return mLoadYuvPlanes;
 }
 
 void VisualFactoryCache::SetBrokenImageUrl(std::string& defaultBrokenUrl, const std::vector<std::string>& brokenImageUrlList)

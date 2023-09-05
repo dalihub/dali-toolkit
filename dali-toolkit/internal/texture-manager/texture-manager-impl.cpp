@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 
 // EXTERNAL HEADERS
-#include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -38,17 +37,6 @@ constexpr auto INITIAL_HASH_NUMBER = size_t{0u};
 
 constexpr auto TEXTURE_INDEX      = 0u; ///< The Index for texture
 constexpr auto MASK_TEXTURE_INDEX = 1u; ///< The Index for mask texture
-
-constexpr auto NUMBER_OF_LOCAL_LOADER_THREADS_ENV  = "DALI_TEXTURE_LOCAL_THREADS";
-constexpr auto NUMBER_OF_REMOTE_LOADER_THREADS_ENV = "DALI_TEXTURE_REMOTE_THREADS";
-constexpr auto LOAD_IMAGE_YUV_PLANES_ENV           = "DALI_LOAD_IMAGE_YUV_PLANES";
-
-bool NeedToLoadYuvPlanes()
-{
-  auto loadYuvPlanesString = Dali::EnvironmentVariable::GetEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV);
-  bool loadYuvPlanes       = loadYuvPlanesString ? std::atoi(loadYuvPlanesString) : false;
-  return loadYuvPlanes;
-}
 } // namespace
 
 namespace Dali
@@ -109,14 +97,14 @@ TextureManager::MaskingData::MaskingData()
 {
 }
 
-TextureManager::TextureManager()
+TextureManager::TextureManager(bool loadYuvPlanes)
 : mTextureCacheManager(),
   mAsyncLoader(std::unique_ptr<TextureAsyncLoadingHelper>(new TextureAsyncLoadingHelper(*this))),
   mLifecycleObservers(),
   mLoadQueue(),
   mLoadingQueueTextureId(INVALID_TEXTURE_ID),
   mRemoveQueue(),
-  mLoadYuvPlanes(NeedToLoadYuvPlanes()),
+  mLoadYuvPlanes(loadYuvPlanes),
   mRemoveProcessorRegistered(false)
 {
   // Initialize the AddOn

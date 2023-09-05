@@ -9,7 +9,7 @@ INPUT mediump vec4 vCornerRadius;
 #endif
 
 uniform sampler2D sTexture;
-#ifdef IS_REQUIRED_YUV_TO_RGB
+#if defined(IS_REQUIRED_YUV_TO_RGB) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
 uniform sampler2D sTextureU;
 uniform sampler2D sTextureV;
 #endif
@@ -213,17 +213,27 @@ mediump float calculateCornerOpacity()
 }
 #endif
 
-#ifdef IS_REQUIRED_YUV_TO_RGB
-lowp vec3 ConvertYuvToRgb(mediump vec2 texCoord)
+#if defined(IS_REQUIRED_YUV_TO_RGB) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
+lowp vec4 ConvertYuvToRgba(mediump vec2 texCoord)
 {
+#ifdef IS_REQUIRED_UNIFIED_YUV_AND_RGB
+  // Special case when shader use YUV but actual textures are not YUV format.
+  // In this case, just resturn sTexture.
+  if(textureSize(sTextureU, 0) != textureSize(sTextureV, 0))
+  {
+    return texture(sTexture, texCoord);
+  }
+#endif
+
   lowp float y = texture(sTexture, texCoord).r;
   lowp float u = texture(sTextureU, texCoord).r - 0.5;
   lowp float v = texture(sTextureV, texCoord).r - 0.5;
-  lowp vec3 rgb;
-  rgb.r = y + (1.403 * v);
-  rgb.g = y - (0.344 * u) - (0.714 * v);
-  rgb.b = y + (1.770 * u);
-  return rgb;
+  lowp vec4 rgba;
+  rgba.r = y + (1.403 * v);
+  rgba.g = y - (0.344 * u) - (0.714 * v);
+  rgba.b = y + (1.770 * u);
+  rgba.a = 1.0;
+  return rgba;
 }
 #endif
 
@@ -238,8 +248,8 @@ void main()
   mediump vec2 texCoord = vTexCoord;
 #endif
 
-#ifdef IS_REQUIRED_YUV_TO_RGB
-  lowp vec4 textureColor = vec4(ConvertYuvToRgb(texCoord), 1.0) * vec4( mixColor, 1.0 ) * uColor;
+#if defined(IS_REQUIRED_YUV_TO_RGB) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
+  lowp vec4 textureColor = ConvertYuvToRgba(texCoord) * vec4( mixColor, 1.0 ) * uColor;
 #else
   lowp vec4 textureColor = TEXTURE( sTexture, texCoord ) * vec4( mixColor, 1.0 ) * uColor;
 #endif
