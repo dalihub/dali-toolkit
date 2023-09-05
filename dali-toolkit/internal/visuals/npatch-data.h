@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_NPATCH_DATA_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +33,11 @@ namespace Toolkit
 {
 namespace Internal
 {
-class NPatchData : public Dali::Toolkit::TextureUploadObserver
+class NPatchData : public ConnectionTracker, public Dali::Toolkit::TextureUploadObserver
 {
 public:
-  typedef int32_t  NPatchDataId;                ///< The NPatchDataId type. This is used as a handle to refer to a particular Npatch Data.
-  static const int INVALID_NPATCH_DATA_ID = -1; ///< Used to represent a null TextureId or error
+  typedef int32_t           NPatchDataId;                ///< The NPatchDataId type. This is used as a handle to refer to a particular Npatch Data.
+  static const NPatchDataId INVALID_NPATCH_DATA_ID = -1; ///< Used to represent a null TextureId or error
 
   /**
    * @brief Loading State of the NPatch image.
@@ -269,22 +269,32 @@ private:
    */
   void LoadComplete(bool loadSuccess, TextureInformation textureInformation) override;
 
+  /**
+   * This is called by the TextureUploadObserver when an observer is destroyed.
+   * We use the callback to know when to remove an observer from our notify list.
+   * @param[in] observer The observer that generated the callback
+   */
+  void ObserverDestroyed(TextureUploadObserver* observer);
+
 private:
   using ObserverListType = Dali::Vector<TextureUploadObserver*>;
 
   NPatchDataId                 mId;
-  ObserverListType             mObserverList;      ///< Container used to store all observer clients of this Texture
-  VisualUrl                    mUrl;               ///< Url of the N-Patch
-  TextureSet                   mTextureSet;        ///< Texture containing the cropped image
-  NPatchUtility::StretchRanges mStretchPixelsX;    ///< X stretch pixels
-  NPatchUtility::StretchRanges mStretchPixelsY;    ///< Y stretch pixels
-  std::size_t                  mHash;              ///< Hash code for the Url
-  uint32_t                     mCroppedWidth;      ///< Width of the cropped middle part of N-patch
-  uint32_t                     mCroppedHeight;     ///< Height of the cropped middle part of N-patch
-  Rect<int>                    mBorder;            ///< The size of the border
-  LoadingState                 mLoadingState;      ///< True if the data loading is completed
-  bool                         mPreMultiplyOnLoad; ///< Whether to multiply alpha into color channels on load
-  void*                        mRenderingMap;      ///< NPatch rendering data
+  ObserverListType             mObserverList;    ///< Container used to store all observer clients of this Texture
+  ObserverListType             mQueuedObservers; ///< Container observers when user try to add during notify observers
+  VisualUrl                    mUrl;             ///< Url of the N-Patch
+  TextureSet                   mTextureSet;      ///< Texture containing the cropped image
+  NPatchUtility::StretchRanges mStretchPixelsX;  ///< X stretch pixels
+  NPatchUtility::StretchRanges mStretchPixelsY;  ///< Y stretch pixels
+  std::size_t                  mHash;            ///< Hash code for the Url
+  uint32_t                     mCroppedWidth;    ///< Width of the cropped middle part of N-patch
+  uint32_t                     mCroppedHeight;   ///< Height of the cropped middle part of N-patch
+  Rect<int>                    mBorder;          ///< The size of the border
+  LoadingState                 mLoadingState;    ///< True if the data loading is completed
+  void*                        mRenderingMap;    ///< NPatch rendering data
+
+  bool mPreMultiplyOnLoad : 1; ///< Whether to multiply alpha into color channels on load
+  bool mObserverNotifying : 1; ///< Whether this NPatchData notifying observers or not.
 };
 
 } // namespace Internal
