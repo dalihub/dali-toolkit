@@ -19,6 +19,7 @@
 #include <dali-physics/internal/physics-world-impl.h>
 
 #include <chipmunk/chipmunk.h>
+#include <dali-physics/internal/chipmunk-impl/chipmunk-physics-debug-renderer.h>
 #include <memory>
 
 namespace Dali::Toolkit::Physics::Internal
@@ -39,8 +40,27 @@ public:
 
   Dali::Any HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Any nativeFilter, Dali::Vector3& localPivot, float& distanceFromCamera) override;
 
+  /**
+   * Set the debug renderer. PhysicsWorld will take ownership
+   */
+  void SetDebugRenderer(PhysicsDebugRenderer* renderer)
+  {
+    mDebugRenderer.reset(renderer);
+  }
+
+  PhysicsDebugRenderer& GetDebugRenderer()
+  {
+    return *mDebugRenderer.get();
+  }
+
+  bool HasDebugRenderer()
+  {
+    return mDebugRenderer.get() != nullptr;
+  }
+
 private:
-  cpSpace* mSpace{nullptr};
+  cpSpace*                              mSpace{nullptr};
+  std::unique_ptr<PhysicsDebugRenderer> mDebugRenderer;
 };
 
 } //namespace Dali::Toolkit::Physics::Internal

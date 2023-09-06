@@ -112,6 +112,14 @@ void ChipmunkPhysicsWorld::Integrate(float timestep)
   {
     cpSpaceStep(mSpace, timestep);
   }
+
+  if(mPhysicsDebugState == Physics::PhysicsAdaptor::DebugState::ON)
+  {
+    if(mDebugRenderer)
+    {
+      cpSpaceDebugDraw(mSpace, const_cast<cpSpaceDebugDrawOptions*>(&mDebugRenderer->GetDebugDrawOptions()));
+    }
+  }
 }
 
 Dali::Any ChipmunkPhysicsWorld::HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Any nativeFilter, Dali::Vector3& localPivot, float& distanceFromCamera)

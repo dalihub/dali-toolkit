@@ -39,6 +39,12 @@ if(ANDROID)
   FIND_LIBRARY(LOGLIB log)
 endif(ANDROID)
 
+# If you want to reduce the size of the library slightly, uncomment this section
+#
+#if(NOT ENABLE_DEBUG)
+#  add_definitions( "-DCP_SPACE_DISABLE_DEBUG_API")
+#endif()
+
 if(BUILD_SHARED)
   add_library(chipmunk SHARED
     ${chipmunk_source_files}
@@ -117,4 +123,3 @@ if (ENABLE_PKG_CONFIGURE)
         DESTINATION ${LIB_DIR}/pkgconfig
     )
 endif()
-

@@ -60,6 +60,49 @@ cpBody* CreateBody(cpSpace* space)
   return body;
 }
 
+// Defines a PolyShape
+cpBody* CreateHexBody(cpSpace* space)
+{
+  const float MASS       = 10.0f;
+  const float RADIUS     = 26.0f;
+  const float ELASTICITY = 0.5f;
+  const float FRICTION   = 0.5f;
+
+  cpVect hexagon[6];
+  for(int i = 0; i < 6; i++)
+  {
+    cpFloat angle = -CP_PI * 2.0f * i / 6.0f;
+    hexagon[i]    = cpvmult(cpv(cos(angle), sin(angle)), RADIUS - 1.0f);
+  }
+
+  cpBody*  body  = cpSpaceAddBody(space, cpBodyNew(MASS, cpMomentForPoly(MASS, 6, hexagon, cpvzero, 0.0f)));
+  cpShape* shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpTransformIdentity, 1.0f));
+
+  cpShapeSetElasticity(shape, ELASTICITY);
+  cpShapeSetFriction(shape, FRICTION);
+
+  return body;
+}
+
+// Defines a SegmentShape
+cpBody* CreateSegBody(cpSpace* space)
+{
+  const float MASS       = 10.0f;
+  const float RADIUS     = 26.0f;
+  const float ELASTICITY = 0.5f;
+  const float FRICTION   = 0.5f;
+
+  cpVect   a     = cpv(0, 100);
+  cpVect   b     = cpv(100, 0);
+  cpBody*  body  = cpSpaceAddBody(space, cpBodyNew(MASS, cpMomentForSegment(MASS, a, b, 0.0f)));
+  cpShape* shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, RADIUS));
+
+  cpShapeSetElasticity(shape, ELASTICITY);
+  cpShapeSetFriction(shape, FRICTION);
+
+  return body;
+}
+
 int UtcDaliPhysics2DCreateAdaptorP1(void)
 {
   ToolkitTestApplication application;
@@ -290,7 +333,46 @@ int UtcDaliPhysics2DAdaptorCreateDebugLayer(void)
   Window window = DevelWindow::Get(rootActor);
 
   Layer layer = adaptor.CreateDebugLayer(window);
-  DALI_TEST_CHECK(!layer);
+  DALI_TEST_CHECK(layer);
+
+  adaptor.SetDebugState(PhysicsAdaptor::DebugState::ON);
+
+  cpBody* body{nullptr};
+  cpBody* body2{nullptr};
+  cpBody* body3{nullptr};
+  {
+    auto accessor = adaptor.GetPhysicsAccessor();
+    auto space    = accessor->GetNative().Get<cpSpace*>();
+
+    body                     = CreateBody(space);
+    Dali::Actor ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    auto        physicsActor = adaptor.AddActorBody(ballActor, body);
+    cpBodySetPosition(body, cpv(0, 0));
+
+    // Constraint should create a dot in debug
+    cpBody* staticBody = cpSpaceGetStaticBody(space);
+    cpSpaceAddConstraint(space, cpPivotJointNew(staticBody, body, cpv(10, 10)));
+
+    body2                     = CreateHexBody(space);
+    Dali::Actor ballActor2    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    auto        physicsActor2 = adaptor.AddActorBody(ballActor2, body2);
+    cpBodySleep(body2);
+
+    body3                     = CreateSegBody(space);
+    Dali::Actor ballActor3    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    auto        physicsActor3 = adaptor.AddActorBody(ballActor3, body3);
+  }
+  Test::WaitForEventThreadTrigger(1);
+
+  // Render - if it doesn't crash, great!
+  application.SendNotification();
+  application.Render();
+
+  Uint16Pair size2(480, 640);
+  adaptor.SetTransformAndSize(transform, size2);
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
