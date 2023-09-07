@@ -321,7 +321,8 @@ int UtcDaliPhysics2DAdaptorTranslateToPhysicsSpace2(void)
 
   // Rotation shouldn't change under this scale
   Quaternion q(Degree(30.0f), Vector3::XAXIS);
-  DALI_TEST_EQUALS(adaptor.TranslateToPhysicsSpace(q), q, 0.0001f, TEST_LOCATION);
+  Quaternion expected(Degree(30.0f), Vector3::XAXIS);
+  DALI_TEST_EQUALS(adaptor.TranslateToPhysicsSpace(q), expected, 0.0001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -330,52 +331,16 @@ int UtcDaliPhysics2DAdaptorTranslateToPhysicsSpace3(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
-  tet_infoline("Test that using an inverted Y scale does nothing to rotation");
+  tet_infoline("Test that using an inverted Y scale inverts rotation");
 
   transform.SetIdentityAndScale(Vector3(1.0f, -1.0f, 1.0f));
   Uint16Pair     size(640, 480);
   PhysicsAdaptor adaptor = PhysicsAdaptor::New(transform, size);
 
   Quaternion q(Degree(30.0f), Vector3::ZAXIS);
-  Quaternion qp(Degree(30.0f), Vector3::ZAXIS);
+  Quaternion expected(Degree(-30.0f), Vector3::ZAXIS);
 
-  DALI_TEST_EQUALS(adaptor.TranslateToPhysicsSpace(q), qp, 0.0001f, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliPhysics2DAdaptorTranslateToPhysicsSpace4(void)
-{
-  ToolkitTestApplication application;
-  Matrix                 transform(false);
-  tet_infoline("Test that using an inverted Y scale does nothing to rotation");
-
-  transform.SetIdentityAndScale(Vector3(1.0f, -1.0f, 1.0f));
-  Uint16Pair     size(640, 480);
-  PhysicsAdaptor adaptor = PhysicsAdaptor::New(transform, size);
-
-  Quaternion q(Degree(30.0f), Vector3::XAXIS);
-  Quaternion qp(Degree(30.0f), Vector3::XAXIS);
-
-  DALI_TEST_EQUALS(adaptor.TranslateToPhysicsSpace(q), qp, 0.0001f, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliPhysics2DAdaptorTranslateToPhysicsSpace5(void)
-{
-  ToolkitTestApplication application;
-  Matrix                 transform(false);
-  tet_infoline("Test that using an inverted Y scale does nothing to rotation");
-
-  transform.SetIdentityAndScale(Vector3(1.0f, -1.0f, 1.0f));
-  Uint16Pair     size(640, 480);
-  PhysicsAdaptor adaptor = PhysicsAdaptor::New(transform, size);
-
-  Quaternion q(Degree(30.0f), Vector3::YAXIS);
-  Quaternion qp(Degree(30.0f), Vector3::YAXIS);
-
-  DALI_TEST_EQUALS(adaptor.TranslateToPhysicsSpace(q), qp, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(adaptor.TranslateToPhysicsSpace(q), expected, 0.0001f, TEST_LOCATION);
 
   END_TEST;
 }

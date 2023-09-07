@@ -75,9 +75,12 @@ include(${physics_dir}/public-api/file.list)
 include(${physics_dir}/internal/file.list)
 
 set(prefix_include_dir "${prefix}/include")
-include_directories(${repo_root_dir}
+
+include_directories(BEFORE
+  ${repo_root_dir}
   "${prefix_include_dir}"
   "${repo_root_dir}/dali-physics/third-party/bullet3/src"
+  "${repo_root_dir}/dali-physics/third-party/chipmunk2d/include"
 )
 
 MESSAGE(STATUS "2D sources: ${physics2d_src_files}")

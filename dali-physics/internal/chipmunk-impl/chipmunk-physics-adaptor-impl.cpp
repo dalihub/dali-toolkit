@@ -144,8 +144,22 @@ Vector3 ChipmunkPhysicsAdaptor::TranslateFromPhysicsSpace(Vector3 vector) const
 
 Quaternion ChipmunkPhysicsAdaptor::TranslateToPhysicsSpace(Quaternion orientation) const
 {
-  // It's complicated.
-  return orientation;
+  // Actors face outwards (+ve Z)
+  // In DALi world, +ve angle about +ve Z is clockwise.
+  // But, if physics is mirrored in Y axis, so +ve angle is anti-clockwise.
+
+  // Compute angle about Z axis
+  Vector3 axis;
+  Radian  angle;
+  orientation.ToAxisAngle(axis, angle);
+
+  // Check if Transform matrix is mirrored in X xor Y
+  if(std::signbit(mTransform.AsFloat()[0]) ^ std::signbit(mTransform.AsFloat()[5]))
+  {
+    return Quaternion(-angle, axis);
+  }
+
+  return Quaternion(angle, axis);
 }
 
 Quaternion ChipmunkPhysicsAdaptor::TranslateFromPhysicsSpace(Quaternion orientation) const
