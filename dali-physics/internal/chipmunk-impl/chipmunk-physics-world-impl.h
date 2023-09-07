@@ -37,7 +37,7 @@ public:
 
   void Integrate(float timestep) override;
 
-  Dali::Any HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Vector3& localPivot, float& distanceFromCamera) override;
+  Dali::Any HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Any nativeFilter, Dali::Vector3& localPivot, float& distanceFromCamera) override;
 
 private:
   cpSpace* mSpace{nullptr};

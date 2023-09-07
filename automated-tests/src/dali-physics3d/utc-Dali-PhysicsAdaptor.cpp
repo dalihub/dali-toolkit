@@ -947,10 +947,11 @@ int UtcDaliPhysics3DAdaptorHitTestP(void)
   adaptor.BuildPickingRay(origin, direction, from, to); // Hit test centre of screen
 
   {
-    auto    accessor = adaptor.GetPhysicsAccessor();
-    Vector3 localPivot;
-    float   distanceFromCamera;
-    auto    body = accessor->HitTest(from, to, localPivot, distanceFromCamera);
+    auto      accessor = adaptor.GetPhysicsAccessor();
+    Vector3   localPivot;
+    float     distanceFromCamera;
+    Dali::Any nullFilter;
+    auto      body = accessor->HitTest(from, to, nullFilter, localPivot, distanceFromCamera);
 
     DALI_TEST_CHECK(!body.Empty());
   }

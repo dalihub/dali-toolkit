@@ -114,7 +114,7 @@ inline btVector3 ConvertVector(Dali::Vector3 vector)
   return btVector3(vector.x, vector.y, vector.z);
 }
 
-Dali::Any BulletPhysicsWorld::HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Vector3& localPivot, float& distanceFromCamera)
+Dali::Any BulletPhysicsWorld::HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Any nativeFilter, Dali::Vector3& localPivot, float& distanceFromCamera)
 {
   btRigidBody* hitBody{nullptr};
 

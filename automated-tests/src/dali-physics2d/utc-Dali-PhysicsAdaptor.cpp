@@ -891,7 +891,11 @@ int UtcDaliPhysics2DAdaptorHitTestP(void)
     auto    accessor = adaptor.GetPhysicsAccessor();
     Vector3 localPivot;
     float   distanceFromCamera;
-    auto    body = accessor->HitTest(from, from, localPivot, distanceFromCamera);
+
+    cpShapeFilter GRAB_FILTER = {CP_NO_GROUP, 1u << 31, 1u << 31};
+    Dali::Any     nativeFilter{GRAB_FILTER};
+
+    auto body = accessor->HitTest(from, from, nativeFilter, localPivot, distanceFromCamera);
 
     DALI_TEST_CHECK(!body.Empty());
   }
