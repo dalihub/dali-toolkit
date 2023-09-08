@@ -98,11 +98,12 @@ public:
      * @SINCE_2_2.43
      * @param[in] rayFromWorld The origin in physics world space
      * @param[in] rayToWorld A point along the direction on the far side of the physics world
+     * @param[in] nativeFilter a native body / shape filter
      * @param[out] localPivot The hit point local to the body
      * @param[out] distanceFromCamera The distance of the pick point from the camera
      * @return Empty value if no dynamic body found, otherwise a valid ptr to the hit body.
      */
-    Dali::Any HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Vector3& localPivot, float& distanceFromCamera);
+    Dali::Any HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Any nativeFilter, Dali::Vector3& localPivot, float& distanceFromCamera);
 
     // Not copyable
     ScopedPhysicsAccessor(ScopedPhysicsAccessor&) = delete;
@@ -418,7 +419,8 @@ public:
    *     btVector3 rayFromWorld, rayToWorld;
    *     physicsAdaptor.BuildPickingRay(origin, direction, rayFromWorld, rayToWorld);
    *     auto scopedAccessor = physicsAdaptor.GetPhysicsAccessor();
-   *     body = scopedAccessor->Get().HitTest(rayFromWorld, rayToWorld, ..);
+   *     Dali::Any nativeFilter;
+   *     body = scopedAccessor->Get().HitTest(rayFromWorld, rayToWorld, nativeFilter, ..);
    *   }
    */
   void BuildPickingRay(Dali::Vector3 origin, Dali::Vector3 direction, Dali::Vector3& rayFromWorld, Dali::Vector3& rayToWorld);

@@ -26,9 +26,6 @@
 
 namespace
 {
-#define GRABBABLE_MASK_BIT (1u << 31)
-cpShapeFilter GRAB_FILTER = {CP_NO_GROUP, GRABBABLE_MASK_BIT, GRABBABLE_MASK_BIT};
-
 inline cpVect ConvertVector(Dali::Vector3 vector)
 {
   return cpv(vector.x, vector.y);
@@ -115,14 +112,23 @@ void ChipmunkPhysicsWorld::Integrate(float timestep)
   {
     cpSpaceStep(mSpace, timestep);
   }
+
+  if(mPhysicsDebugState == Physics::PhysicsAdaptor::DebugState::ON)
+  {
+    if(mDebugRenderer)
+    {
+      cpSpaceDebugDraw(mSpace, const_cast<cpSpaceDebugDrawOptions*>(&mDebugRenderer->GetDebugDrawOptions()));
+    }
+  }
 }
 
-Dali::Any ChipmunkPhysicsWorld::HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Vector3& localPivot, float& distanceFromCamera)
+Dali::Any ChipmunkPhysicsWorld::HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Any nativeFilter, Dali::Vector3& localPivot, float& distanceFromCamera)
 {
   cpVect           spacePosition = cpv(rayFromWorld.x, rayFromWorld.y);
   cpFloat          radius        = 5.0f;
   cpPointQueryInfo info          = {0};
-  cpShape*         shape         = cpSpacePointQueryNearest(mSpace, spacePosition, radius, GRAB_FILTER, &info);
+  cpShapeFilter    filter        = nativeFilter.Get<cpShapeFilter>();
+  cpShape*         shape         = cpSpacePointQueryNearest(mSpace, spacePosition, radius, filter, &info);
   cpBody*          hitBody{nullptr};
 
   if(shape && cpBodyGetMass(cpShapeGetBody(shape)) < INFINITY)

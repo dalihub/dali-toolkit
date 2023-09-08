@@ -52,9 +52,9 @@ Dali::Any PhysicsAdaptor::ScopedPhysicsAccessor::GetNative()
 }
 
 Dali::Any PhysicsAdaptor::ScopedPhysicsAccessor::HitTest(
-  Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Vector3& localPivot, float& distanceFromCamera)
+  Dali::Vector3 rayFromWorld, Dali::Vector3 rayToWorld, Dali::Any nativeFilter, Dali::Vector3& localPivot, float& distanceFromCamera)
 {
-  return mImpl->mPhysicsWorld.HitTest(rayFromWorld, rayToWorld, localPivot, distanceFromCamera);
+  return mImpl->mPhysicsWorld.HitTest(rayFromWorld, rayToWorld, nativeFilter, localPivot, distanceFromCamera);
 }
 
 } // namespace Dali::Toolkit::Physics

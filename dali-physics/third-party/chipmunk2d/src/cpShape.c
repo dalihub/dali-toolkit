@@ -109,6 +109,12 @@ cpFloat cpShapeGetMoment(cpShape *shape){ return shape->massInfo.m*shape->massIn
 cpFloat cpShapeGetArea(cpShape *shape){ return shape->massInfo.area; }
 cpVect cpShapeGetCenterOfGravity(cpShape *shape) { return shape->massInfo.cog; }
 
+cpHashValue
+cpShapeGetHashId(cpShape* shape)
+{
+  return shape->hashid;
+}
+
 cpBB
 cpShapeGetBB(const cpShape *shape)
 {

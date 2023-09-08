@@ -79,6 +79,9 @@ CP_EXPORT void cpShapeDestroy(cpShape *shape);
 /// Destroy and Free a shape.
 CP_EXPORT void cpShapeFree(cpShape *shape);
 
+/// Get the hash ID of the shape
+CP_EXPORT cpHashValue cpShapeGetHashId(cpShape* shape);
+
 /// Update, cache and return the bounding box of a shape based on the body it's attached to.
 CP_EXPORT cpBB cpShapeCacheBB(cpShape *shape);
 /// Update, cache and return the bounding box of a shape with an explicit transformation.

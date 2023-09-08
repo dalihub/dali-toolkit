@@ -133,6 +133,12 @@ cpBodyIsSleeping(const cpBody *body)
 	return (body->sleeping.root != ((cpBody*)0));
 }
 
+cpBool
+cpBodyIsSleepThresholdExceeded(const cpBody *body, const cpShape *shape)
+{
+  return body->sleeping.idleTime > shape->space->sleepTimeThreshold;
+}
+
 cpBodyType
 cpBodyGetType(cpBody *body)
 {
