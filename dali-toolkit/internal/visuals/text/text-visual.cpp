@@ -55,8 +55,6 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
 
 const int CUSTOM_PROPERTY_COUNT(5); // anim,premul,size,offset,multicol
 
-const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
-
 /**
  * Return Property index for the given string key
  * param[in] stringKey the string index key
@@ -848,7 +846,6 @@ Shader TextVisual::GetTextShader(VisualFactoryCache& factoryCache, const TextVis
   mTextShaderFeatureCache = featureBuilder;
 
   Shader shader = mTextVisualShaderFactory.GetShader(factoryCache, mTextShaderFeatureCache);
-  shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
   return shader;
 }
 

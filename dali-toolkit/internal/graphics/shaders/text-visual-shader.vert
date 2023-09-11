@@ -1,7 +1,6 @@
 INPUT mediump vec2 aPosition;
 uniform highp mat4 uMvpMatrix;
 uniform highp vec3 uSize;
-uniform mediump vec4 pixelArea;
 
 OUTPUT mediump vec2 vTexCoord;
 
@@ -21,6 +20,6 @@ vec4 ComputeVertexPosition()
 
 void main()
 {
+  vTexCoord = aPosition + vec2(0.5);
   gl_Position = uMvpMatrix * ComputeVertexPosition();
-  vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );
 }
