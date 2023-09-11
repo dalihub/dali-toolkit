@@ -24,6 +24,8 @@
 #include <dali/devel-api/common/stage-devel.h>
 #include <dali/devel-api/update/frame-callback-interface.h>
 
+thread_local int gLocked{0};
+
 namespace Dali::Toolkit::Physics::Internal
 {
 /**
@@ -83,14 +85,9 @@ PhysicsWorld::~PhysicsWorld()
   Dali::DevelStage::RemoveFrameCallback(Dali::Stage::GetCurrent(), *mFrameCallback);
 }
 
-Dali::Mutex& PhysicsWorld::GetMutex()
-{
-  return mMutex;
-}
-
 bool PhysicsWorld::OnUpdate(Dali::UpdateProxy& updateProxy, float elapsedSeconds)
 {
-  Dali::Mutex::ScopedLock lock(mMutex);
+  ScopedLock lock(*this);
 
   // Process command queue
   if(mNotifySyncPoint != Dali::UpdateProxy::INVALID_SYNC &&
@@ -134,17 +131,33 @@ float PhysicsWorld::GetTimestep()
   return mPhysicsTimeStep;
 }
 
+/**
+ * Lock the mutex.
+ */
+void PhysicsWorld::Lock()
+{
+  //@todo Could replace the mutex with an atomic flag, if it's not set,
+  // the queue and integration step could be skipped
+  if(!gLocked)
+  {
+    gLocked = true;
+    mMutex.lock();
+  }
+}
+
+/**
+ * Unlock the mutex
+ */
+void PhysicsWorld::Unlock()
+{
+  mMutex.unlock();
+  gLocked = false;
+}
+
 void PhysicsWorld::Queue(std::function<void(void)> function)
 {
-  if(!mMutex.IsLocked()) // Annoyingly, the dali mutex scoped lock doesn't prevent relocking in the same thread.
-  {
-    Dali::Mutex::ScopedLock lock(mMutex);
-    commandQueue.push(function);
-  }
-  else
-  {
-    commandQueue.push(function);
-  }
+  ScopedLock lock(*this);
+  commandQueue.push(function);
 }
 
 void PhysicsWorld::CreateSyncPoint()

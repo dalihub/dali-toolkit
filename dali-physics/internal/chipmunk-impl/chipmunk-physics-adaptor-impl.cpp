@@ -131,7 +131,7 @@ PhysicsActorPtr ChipmunkPhysicsAdaptor::AddActorBody(Dali::Actor actor, Dali::An
 {
   uint32_t id    = static_cast<uint32_t>(actor.GetProperty<int>(Actor::Property::ID));
   cpBody*  cBody = body.Get<cpBody*>();
-  cpBodySetUserData(cBody, this);
+  cpBodySetUserData2(cBody, this);
 
   mPhysicsActors.insert(std::make_pair(id, PhysicsActor::New(actor, body, *this)));
   actor[Actor::Property::PARENT_ORIGIN] = Dali::ParentOrigin::CENTER;
@@ -156,7 +156,7 @@ void ChipmunkPhysicsAdaptor::RemoveActorBody(PhysicsActor& physicsActor)
   cpBody* cBody = body.Get<cpBody*>();
   if(cBody)
   {
-    cpBodySetUserData(cBody, nullptr);
+    cpBodySetUserData2(cBody, nullptr);
   }
 }
 
@@ -165,7 +165,7 @@ PhysicsActorPtr ChipmunkPhysicsAdaptor::GetPhysicsActor(Dali::Any body) const
   cpBody* cBody = body.Get<cpBody*>();
   if(cBody)
   {
-    return reinterpret_cast<PhysicsActor*>(cpBodyGetUserData(cBody));
+    return reinterpret_cast<PhysicsActor*>(cpBodyGetUserData2(cBody));
   }
   DALI_LOG_ERROR("Body not found in physics actors");
   return nullptr;

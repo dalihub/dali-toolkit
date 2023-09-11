@@ -61,6 +61,7 @@ struct cpBody {
 	cpTransform transform;
 	
 	cpDataPointer userData;
+	cpDataPointer userData2;
 	
 	// "pseudo-velocities" used for eliminating overlap.
 	// Erin Catto has some papers that talk about what these are.
