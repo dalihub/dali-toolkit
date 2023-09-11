@@ -72,7 +72,8 @@ ImageView::ImageView(ControlBehaviour additionalBehaviour)
   mTransitionTargetAlpha(FULL_OPACITY),
   mImageVisualPaddingSetByTransform(false),
   mImageViewPixelAreaSetByFittingMode(false),
-  mTransitionEffect(false)
+  mTransitionEffect(false),
+  mNeedLazyFittingMode(false)
 {
 }
 
@@ -370,26 +371,15 @@ void ImageView::OnRelayout(const Vector2& size, RelayoutContainer& container)
   Control::OnRelayout(size, container);
   if(mVisual)
   {
-    Property::Map transformMap = Property::Map();
-
-    Extents padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-
-    bool zeroPadding = (padding == Extents());
-
-    Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(
-      Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-    if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
+    // If Resource is not ready, fittingMode is not working well.
+    // in this case, imageview set the flag for working applyFittingMode again when the resource is ready
+    if(!IsResourceReady())
     {
-      std::swap(padding.start, padding.end);
+      mNeedLazyFittingMode = true;
     }
 
-    // remove padding from the size to know how much is left for the visual
-    Vector2 finalSize   = size - Vector2(padding.start + padding.end, padding.top + padding.bottom);
-    Vector2 finalOffset = Vector2(padding.start, padding.top);
-
-    ApplyFittingMode(finalSize, finalOffset, zeroPadding, transformMap);
-
-    mVisual.SetTransformAndSize(transformMap, size);
+    // Apply FittingMode using actor's size
+    ApplyFittingMode(size);
 
     // mVisual is not updated util the resource is ready in the case of visual replacement.
     // in this case, the Property Map must be initialized so that the previous value is not reused.
@@ -467,6 +457,15 @@ void ImageView::OnResourceReady(Toolkit::Control control)
 
   // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.
   mVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
+
+  // Applying FittingMode again if it is not working well on OnRelayout().
+  if(mNeedLazyFittingMode)
+  {
+    const Vector2& size = Self().GetProperty(Dali::Actor::Property::SIZE).Get<Vector2>();
+    ApplyFittingMode(size);
+    mNeedLazyFittingMode = false;
+  }
+
   // Signal that a Relayout may be needed
 }
 
@@ -547,8 +546,25 @@ void ImageView::SetTransformMapForFittingMode(Vector2 finalSize, Vector2 natural
   }
 }
 
-void ImageView::ApplyFittingMode(Vector2 finalSize, Vector2 finalOffset, bool zeroPadding, Property::Map& transformMap)
+void ImageView::ApplyFittingMode(const Vector2& size)
 {
+  Property::Map transformMap = Property::Map();
+
+  Extents padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+
+  bool zeroPadding = (padding == Extents());
+
+  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(
+  Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+  if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
+  {
+    std::swap(padding.start, padding.end);
+  }
+
+  // remove padding from the size to know how much is left for the visual
+  Vector2 finalSize   = size - Vector2(padding.start + padding.end, padding.top + padding.bottom);
+  Vector2 finalOffset = Vector2(padding.start, padding.top);
+
   Visual::FittingMode fittingMode = Toolkit::GetImplementation(mVisual).GetFittingMode();
 
   // Reset PIXEL_AREA after using OVER_FIT_KEEP_ASPECT_RATIO
@@ -602,6 +618,8 @@ void ImageView::ApplyFittingMode(Vector2 finalSize, Vector2 finalOffset, bool ze
       .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY,
            Vector2(Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE));
   }
+
+  mVisual.SetTransformAndSize(transformMap, size);
 }
 
 void ImageView::CreatePlaceholderImage()

@@ -96,11 +96,11 @@ bool PhysicsWorld::OnUpdate(Dali::UpdateProxy& updateProxy, float elapsedSeconds
   if(mNotifySyncPoint != Dali::UpdateProxy::INVALID_SYNC &&
      mNotifySyncPoint == updateProxy.PopSyncPoint())
   {
-    do
+    while(!commandQueue.empty())
     {
       commandQueue.front()(); // Execute the queued methods
       commandQueue.pop();
-    } while(!commandQueue.empty());
+    }
 
     mNotifySyncPoint = Dali::UpdateProxy::INVALID_SYNC;
   }

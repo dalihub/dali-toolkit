@@ -1012,8 +1012,8 @@ void ImageVisual::FastLoadComplete(FastTrackLoadingTaskPtr task)
   }
   else
   {
-    resourceStatus    = Toolkit::Visual::ResourceStatus::FAILED;
-    mLoadState        = TextureManager::LoadState::LOAD_FAILED;
+    resourceStatus = Toolkit::Visual::ResourceStatus::FAILED;
+    mLoadState     = TextureManager::LoadState::LOAD_FAILED;
 
     // Change renderer as broken.
     ShowBrokenImage();
@@ -1214,7 +1214,6 @@ Shader ImageVisual::GenerateShader() const
 {
   Shader shader;
 
-  bool       usesWholeTexture  = true;
   const bool useStandardShader = !mImpl->mCustomShader;
   const bool useNativeImage    = (mTextures && DevelTexture::IsNative(mTextures.GetTexture(0)));
 
@@ -1235,6 +1234,7 @@ Shader ImageVisual::GenerateShader() const
   }
   else
   {
+    bool             usesWholeTexture = true;
     std::string_view vertexShaderView;
     std::string_view fragmentShaderView;
 
@@ -1278,11 +1278,11 @@ Shader ImageVisual::GenerateShader() const
     {
       shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints);
     }
-  }
 
-  if(usesWholeTexture)
-  {
-    shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+    if(usesWholeTexture)
+    {
+      shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+    }
   }
 
   return shader;

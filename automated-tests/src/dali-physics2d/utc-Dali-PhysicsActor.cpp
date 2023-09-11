@@ -372,7 +372,7 @@ int UtcDaliPhysics2DActorSetRotation1(void)
     // Warning - physics properties are never reflected in the event size cache.
     // Have to use GetCurrentProperty to see the updated values.
     Quaternion q = actor.GetCurrentProperty<Quaternion>(Actor::Property::ORIENTATION);
-    Quaternion expected(Degree(30), Vector3::ZAXIS);
+    Quaternion expected(Degree(-30), Vector3::ZAXIS);
     DALI_TEST_EQUALS(q, expected, 0.0001f, TEST_LOCATION);
   }
 
@@ -385,7 +385,7 @@ int UtcDaliPhysics2DActorSetRotation2(void)
 
   ToolkitTestApplication application;
   Matrix                 transform(false);
-  transform.SetIdentityAndScale(Vector3(2.0f, -2.0f, 1.0f));
+  transform.SetIdentityAndScale(Vector3(2.0f, 2.0f, 1.0f));
   Uint16Pair     size(640, 480);
   PhysicsAdaptor adaptor   = PhysicsAdaptor::New(transform, size);
   Actor          rootActor = adaptor.GetRootActor();

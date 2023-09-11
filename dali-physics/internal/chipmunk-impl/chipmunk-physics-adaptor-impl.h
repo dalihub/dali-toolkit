@@ -106,6 +106,10 @@ public:
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::ProjectPoint
    */
   Dali::Vector3 ProjectPoint(Dali::Vector3 origin, Dali::Vector3 direction, float distance) override;
+
+private:
+  Actor mDebugActor;
+  // Physics world owns debug renderer
 };
 
 } // namespace Dali::Toolkit::Physics::Internal

@@ -60,6 +60,49 @@ cpBody* CreateBody(cpSpace* space)
   return body;
 }
 
+// Defines a PolyShape
+cpBody* CreateHexBody(cpSpace* space)
+{
+  const float MASS       = 10.0f;
+  const float RADIUS     = 26.0f;
+  const float ELASTICITY = 0.5f;
+  const float FRICTION   = 0.5f;
+
+  cpVect hexagon[6];
+  for(int i = 0; i < 6; i++)
+  {
+    cpFloat angle = -CP_PI * 2.0f * i / 6.0f;
+    hexagon[i]    = cpvmult(cpv(cos(angle), sin(angle)), RADIUS - 1.0f);
+  }
+
+  cpBody*  body  = cpSpaceAddBody(space, cpBodyNew(MASS, cpMomentForPoly(MASS, 6, hexagon, cpvzero, 0.0f)));
+  cpShape* shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpTransformIdentity, 1.0f));
+
+  cpShapeSetElasticity(shape, ELASTICITY);
+  cpShapeSetFriction(shape, FRICTION);
+
+  return body;
+}
+
+// Defines a SegmentShape
+cpBody* CreateSegBody(cpSpace* space)
+{
+  const float MASS       = 10.0f;
+  const float RADIUS     = 26.0f;
+  const float ELASTICITY = 0.5f;
+  const float FRICTION   = 0.5f;
+
+  cpVect   a     = cpv(0, 100);
+  cpVect   b     = cpv(100, 0);
+  cpBody*  body  = cpSpaceAddBody(space, cpBodyNew(MASS, cpMomentForSegment(MASS, a, b, 0.0f)));
+  cpShape* shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, RADIUS));
+
+  cpShapeSetElasticity(shape, ELASTICITY);
+  cpShapeSetFriction(shape, FRICTION);
+
+  return body;
+}
+
 int UtcDaliPhysics2DCreateAdaptorP1(void)
 {
   ToolkitTestApplication application;
@@ -290,7 +333,46 @@ int UtcDaliPhysics2DAdaptorCreateDebugLayer(void)
   Window window = DevelWindow::Get(rootActor);
 
   Layer layer = adaptor.CreateDebugLayer(window);
-  DALI_TEST_CHECK(!layer);
+  DALI_TEST_CHECK(layer);
+
+  adaptor.SetDebugState(PhysicsAdaptor::DebugState::ON);
+
+  cpBody* body{nullptr};
+  cpBody* body2{nullptr};
+  cpBody* body3{nullptr};
+  {
+    auto accessor = adaptor.GetPhysicsAccessor();
+    auto space    = accessor->GetNative().Get<cpSpace*>();
+
+    body                     = CreateBody(space);
+    Dali::Actor ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    auto        physicsActor = adaptor.AddActorBody(ballActor, body);
+    cpBodySetPosition(body, cpv(0, 0));
+
+    // Constraint should create a dot in debug
+    cpBody* staticBody = cpSpaceGetStaticBody(space);
+    cpSpaceAddConstraint(space, cpPivotJointNew(staticBody, body, cpv(10, 10)));
+
+    body2                     = CreateHexBody(space);
+    Dali::Actor ballActor2    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    auto        physicsActor2 = adaptor.AddActorBody(ballActor2, body2);
+    cpBodySleep(body2);
+
+    body3                     = CreateSegBody(space);
+    Dali::Actor ballActor3    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    auto        physicsActor3 = adaptor.AddActorBody(ballActor3, body3);
+  }
+  Test::WaitForEventThreadTrigger(1);
+
+  // Render - if it doesn't crash, great!
+  application.SendNotification();
+  application.Render();
+
+  Uint16Pair size2(480, 640);
+  adaptor.SetTransformAndSize(transform, size2);
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
@@ -321,7 +403,8 @@ int UtcDaliPhysics2DAdaptorTranslateToPhysicsSpace2(void)
 
   // Rotation shouldn't change under this scale
   Quaternion q(Degree(30.0f), Vector3::XAXIS);
-  DALI_TEST_EQUALS(adaptor.TranslateToPhysicsSpace(q), q, 0.0001f, TEST_LOCATION);
+  Quaternion expected(Degree(30.0f), Vector3::XAXIS);
+  DALI_TEST_EQUALS(adaptor.TranslateToPhysicsSpace(q), expected, 0.0001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -330,52 +413,16 @@ int UtcDaliPhysics2DAdaptorTranslateToPhysicsSpace3(void)
 {
   ToolkitTestApplication application;
   Matrix                 transform(false);
-  tet_infoline("Test that using an inverted Y scale does nothing to rotation");
+  tet_infoline("Test that using an inverted Y scale inverts rotation");
 
   transform.SetIdentityAndScale(Vector3(1.0f, -1.0f, 1.0f));
   Uint16Pair     size(640, 480);
   PhysicsAdaptor adaptor = PhysicsAdaptor::New(transform, size);
 
   Quaternion q(Degree(30.0f), Vector3::ZAXIS);
-  Quaternion qp(Degree(30.0f), Vector3::ZAXIS);
+  Quaternion expected(Degree(-30.0f), Vector3::ZAXIS);
 
-  DALI_TEST_EQUALS(adaptor.TranslateToPhysicsSpace(q), qp, 0.0001f, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliPhysics2DAdaptorTranslateToPhysicsSpace4(void)
-{
-  ToolkitTestApplication application;
-  Matrix                 transform(false);
-  tet_infoline("Test that using an inverted Y scale does nothing to rotation");
-
-  transform.SetIdentityAndScale(Vector3(1.0f, -1.0f, 1.0f));
-  Uint16Pair     size(640, 480);
-  PhysicsAdaptor adaptor = PhysicsAdaptor::New(transform, size);
-
-  Quaternion q(Degree(30.0f), Vector3::XAXIS);
-  Quaternion qp(Degree(30.0f), Vector3::XAXIS);
-
-  DALI_TEST_EQUALS(adaptor.TranslateToPhysicsSpace(q), qp, 0.0001f, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliPhysics2DAdaptorTranslateToPhysicsSpace5(void)
-{
-  ToolkitTestApplication application;
-  Matrix                 transform(false);
-  tet_infoline("Test that using an inverted Y scale does nothing to rotation");
-
-  transform.SetIdentityAndScale(Vector3(1.0f, -1.0f, 1.0f));
-  Uint16Pair     size(640, 480);
-  PhysicsAdaptor adaptor = PhysicsAdaptor::New(transform, size);
-
-  Quaternion q(Degree(30.0f), Vector3::YAXIS);
-  Quaternion qp(Degree(30.0f), Vector3::YAXIS);
-
-  DALI_TEST_EQUALS(adaptor.TranslateToPhysicsSpace(q), qp, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(adaptor.TranslateToPhysicsSpace(q), expected, 0.0001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -926,7 +973,11 @@ int UtcDaliPhysics2DAdaptorHitTestP(void)
     auto    accessor = adaptor.GetPhysicsAccessor();
     Vector3 localPivot;
     float   distanceFromCamera;
-    auto    body = accessor->HitTest(from, from, localPivot, distanceFromCamera);
+
+    cpShapeFilter GRAB_FILTER = {CP_NO_GROUP, 1u << 31, 1u << 31};
+    Dali::Any     nativeFilter{GRAB_FILTER};
+
+    auto body = accessor->HitTest(from, from, nativeFilter, localPivot, distanceFromCamera);
 
     DALI_TEST_CHECK(!body.Empty());
   }
