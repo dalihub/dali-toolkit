@@ -125,4 +125,9 @@ void PhysicsAdaptor::CreateSyncPoint()
   mPhysicsWorld->CreateSyncPoint();
 }
 
+std::unique_ptr<PhysicsWorld>& PhysicsAdaptor::GetPhysicsWorld()
+{
+  return mPhysicsWorld;
+}
+
 } // namespace Dali::Toolkit::Physics::Internal
