@@ -519,7 +519,7 @@ IF( ENABLE_COVERAGE )
     ADD_CUSTOM_TARGET( ${DALI_TOOLKIT_PREFIX}rename_cov_data ./rename-cov-data )
 
     ADD_CUSTOM_TARGET( ${DALI_TOOLKIT_PREFIX}cov_data ${LCOV_BIN} ${LCOV_OPTS} --base-directory . --directory . -c -o dali.info
-      COMMAND ${LCOV_BIN} ${LCOV_OPTS} --remove dali.info \"*/dali-env/*\" \"/usr/include/*\" \"*/dali-env/*\" \"*solid-color-actor*\" \"*/dali-toolkit/third-party/*\" \"*/dali-scene3d/third-party/*\" -o dali.info )
+      COMMAND ${LCOV_BIN} ${LCOV_OPTS} --remove dali.info \"*/dali-env/*\" \"/usr/include/*\" \"*/third-party/*\" -o dali.info )
 
     ADD_CUSTOM_TARGET( ${DALI_TOOLKIT_PREFIX}coverage genhtml -p ${ROOT_SRC_DIR} ${LCOV_OPTS} -o ${COVERAGE_OUTPUT_DIR} dali.info
       DEPENDS cov_data )
