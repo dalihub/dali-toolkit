@@ -163,6 +163,7 @@ PhysicsDebugRenderer::PhysicsDebugRenderer(uint32_t width, uint32_t height, Dali
                                                                CP_SPACE_DEBUG_DRAW_CONSTRAINTS);
   mDebugDrawOptions.colorForShape       = DebugDrawColorForShapeImpl;
   mDebugDrawOptions.shapeOutlineColor   = cpSpaceDebugColor{0.0f, 1.0f, 1.0f, 0.9f};
+  mDebugDrawOptions.constraintColor     = cpSpaceDebugColor{0.5f, 0.5f, 0.5f, 0.9f};
   mDebugDrawOptions.collisionPointColor = cpSpaceDebugColor{1.0f, 0.0f, 0.0f, 1.0f};
   mDebugDrawOptions.data                = this;
 }
@@ -465,8 +466,6 @@ cpSpaceDebugColor PhysicsDebugRenderer::DrawColorForShape(cpShape* shape)
       return Colors[val & 0x7];
     }
   }
-
-  return cpSpaceDebugColor{1.0f, 1.0f, 1.0f, 1.0f};
 }
 
 } // namespace Dali::Toolkit::Physics::Internal
