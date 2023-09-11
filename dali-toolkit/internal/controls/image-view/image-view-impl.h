@@ -201,12 +201,8 @@ private:
 
   /**
    * @brief Apply fittingMode
-   * param[in] finalSize The size for fittingMode
-   * param[in] offset The offset for fittingMode
-   * param[in] zeroPadding whether padding is zero
-   * param[in] transformMap  The map for fitting image
    */
-  void ApplyFittingMode(Vector2 finalSize, Vector2 offset, bool zeroPadding, Property::Map& transformMap);
+  void ApplyFittingMode(const Vector2& size);
 
    /**
    * @brief Create placeholder image if it set. placeholder image is shown when image view is waiting for the image to load.
@@ -254,6 +250,7 @@ private:
   bool            mImageVisualPaddingSetByTransform : 1;   ///< Flag to indicate Padding was set using a transform.
   bool            mImageViewPixelAreaSetByFittingMode : 1; ///< Flag to indicate pixel area was set by fitting Mode
   bool            mTransitionEffect :1;                    ///< Flag to indicate TransitionEffect is enabled
+  bool            mNeedLazyFittingMode:1;                  ///< Flag to indicate FittingMode will be applying lazy
 };
 
 } // namespace Internal
