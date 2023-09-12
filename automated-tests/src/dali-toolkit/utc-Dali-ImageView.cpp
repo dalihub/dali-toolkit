@@ -3774,6 +3774,20 @@ void OnResourceReadySignal09(Control control)
     gImageView2.Reset();
   }
 }
+constexpr int gResourceReadySignal10MaxCounter = 5;
+
+void OnResourceReadySignal10(Control control)
+{
+  gResourceReadySignalCounter++;
+
+  tet_printf("OnResourceReadySignal10 comes!\n");
+  if(gResourceReadySignalCounter < gResourceReadySignal10MaxCounter)
+  {
+    tet_printf("OnResourceReadySignal10 Set image\n");
+    gImageView1.SetProperty(Toolkit::ImageView::Property::IMAGE, gImage_34_RGBA);
+    tet_printf("OnResourceReadySignal10 Set image done\n");
+  }
+}
 
 } // namespace
 
@@ -4539,6 +4553,81 @@ int UtcDaliImageViewSetImageOnResourceReadySignal09(void)
   if(gImageView3)
   {
     gImageView3.Reset();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliImageViewSetImageOnResourceReadySignal10(void)
+{
+  tet_infoline("Test ResourceReady signal comes more than 2 times.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+
+  // Dummy view to cache image.
+  ImageView dummyView = ImageView::New(gImage_34_RGBA);
+  application.GetScene().Add(dummyView);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  try
+  {
+    gImageView1 = ImageView::New();
+    gImageView1.SetProperty(Toolkit::ImageView::Property::IMAGE, gImage_34_RGBA);
+    gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal10);
+    application.GetScene().Add(gImageView1); // It will call resourceReady signal 1 time.
+
+    tet_printf("ResourceReady called %d times\n", gResourceReadySignalCounter);
+
+    DALI_TEST_GREATER(gResourceReadySignal10MaxCounter, gResourceReadySignalCounter, TEST_LOCATION); // Check whether resource ready call too much.
+
+    for(int i = 0; i < gResourceReadySignal10MaxCounter; ++i)
+    {
+      tet_printf("RunIdles\n");
+      // Executes the idle callbacks.
+      application.RunIdles();
+      application.SendNotification();
+      application.Render();
+      tet_printf("RunIdles done\n");
+    }
+    tet_printf("ResourceReady called %d times\n", gResourceReadySignalCounter);
+
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, gResourceReadySignal10MaxCounter, TEST_LOCATION);
+
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    // Exception should not happened
+    DALI_TEST_CHECK(false);
+  }
+
+  // Clear cache.
+  application.SendNotification();
+  application.Render();
+
+  gResourceReadySignalCounter = 0;
+
+  gResourceReadySignalCounter = 0;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
   }
 
   END_TEST;

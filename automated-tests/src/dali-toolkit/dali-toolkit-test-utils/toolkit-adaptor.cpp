@@ -79,23 +79,42 @@ Integration::Scene Adaptor::GetScene(Dali::Window window)
 
 bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
 {
-  mCallbacks.PushBack(callback);
+  if(hasReturnValue)
+  {
+    mReturnCallbacks.PushBack(callback);
+  }
+  else
+  {
+    mCallbacks.PushBack(callback);
+  }
   return true;
 }
 
 void Adaptor::RemoveIdle(CallbackBase* callback)
 {
   mCallbacks.Erase(std::find_if(mCallbacks.Begin(), mCallbacks.End(), [&callback](CallbackBase* current) { return callback == current; }));
+  mReturnCallbacks.Erase(std::find_if(mReturnCallbacks.Begin(), mReturnCallbacks.End(), [&callback](CallbackBase* current) { return callback == current; }));
 }
 
 void Adaptor::RunIdles()
 {
+  Dali::Vector<CallbackBase*> reusedCallbacks;
+  for(auto& callback : mReturnCallbacks)
+  {
+    bool retValue = CallbackBase::ExecuteReturn<bool>(*callback);
+    if(retValue)
+    {
+      reusedCallbacks.PushBack(callback);
+    }
+  }
   for(auto& callback : mCallbacks)
   {
     CallbackBase::Execute(*callback);
   }
 
   mCallbacks.Clear();
+  mReturnCallbacks.Clear();
+  mReturnCallbacks.Swap(reusedCallbacks);
 }
 
 Dali::RenderSurfaceInterface& Adaptor::GetSurface()
