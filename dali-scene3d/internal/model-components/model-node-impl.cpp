@@ -291,7 +291,7 @@ Loader::BlendShapes::Index ModelNode::GetBlendShapeIndexByName(std::string_view 
 
 void ModelNode::SetShadowMapTexture(Dali::Texture shadowMapTexture)
 {
-  mShadowMapTexture       = shadowMapTexture;
+  mShadowMapTexture = shadowMapTexture;
   for(auto&& primitive : mModelPrimitiveContainer)
   {
     GetImplementation(primitive).SetShadowMapTexture(mShadowMapTexture);

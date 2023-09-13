@@ -398,22 +398,15 @@ void ShaderManager::SetShadowConstraintToShader(Dali::Shader shader)
   std::string       shadowViewProjectionPropertyName(Scene3D::Internal::Light::GetShadowViewProjectionMatrixUniformName());
   auto              shadowViewProjectionPropertyIndex = shader.RegisterProperty(shadowViewProjectionPropertyName, Matrix::IDENTITY);
   Dali::CameraActor shadowLightCamera                 = Dali::Scene3D::Internal::GetImplementation(mImpl->mShadowLight).GetCamera();
-  auto              tempViewMatrixIndex               = shadowLightCamera.GetPropertyIndex("tempViewMatrix");
-  if(tempViewMatrixIndex != Dali::Property::INVALID_INDEX)
+  auto tempViewProjectionMatrixIndex = shadowLightCamera.GetPropertyIndex("tempViewProjectionMatrix");
+  if(tempViewProjectionMatrixIndex != Dali::Property::INVALID_INDEX)
   {
-    tempViewMatrixIndex = shadowLightCamera.RegisterProperty("tempViewMatrix", Matrix::IDENTITY);
-  }
-  auto tempProjectionMatrixIndex = shadowLightCamera.GetPropertyIndex("tempProjectionMatrix");
-  if(tempProjectionMatrixIndex != Dali::Property::INVALID_INDEX)
-  {
-    tempProjectionMatrixIndex = shadowLightCamera.RegisterProperty("tempProjectionMatrix", Matrix::IDENTITY);
+    tempViewProjectionMatrixIndex = shadowLightCamera.RegisterProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
   }
   Dali::Constraint shadowViewProjectionConstraint = Dali::Constraint::New<Matrix>(shader, shadowViewProjectionPropertyIndex, [](Matrix& output, const PropertyInputContainer& inputs)
                                                                                   {
-                                                                                    output = inputs[1]->GetMatrix() * inputs[0]->GetMatrix(); });
-
-  shadowViewProjectionConstraint.AddSource(Source{shadowLightCamera, tempViewMatrixIndex});
-  shadowViewProjectionConstraint.AddSource(Source{shadowLightCamera, tempProjectionMatrixIndex});
+                                                                                    output = inputs[0]->GetMatrix(); });
+  shadowViewProjectionConstraint.AddSource(Source{shadowLightCamera, tempViewProjectionMatrixIndex});
   shadowViewProjectionConstraint.ApplyPost();
   shadowViewProjectionConstraint.SetTag(INDEX_FOR_SHADOW_CONSTRAINT_TAG);
 }
