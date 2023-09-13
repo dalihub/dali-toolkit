@@ -379,6 +379,7 @@ private:
   Dali::FrameBuffer                            mShadowFrameBuffer;
   Dali::RenderTask                             mShadowMapRenderTask;
   Scene3D::Light                               mShadowLight;
+  Dali::Texture                                mShadowTexture;
 
   // Asynchronous Loading.
   EnvironmentMapLoadTaskPtr mSkyboxLoadTask;
