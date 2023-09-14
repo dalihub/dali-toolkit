@@ -90,7 +90,7 @@ void ChipmunkPhysicsWorld::OnInitialize(/*void* dynamicsWorld*/)
 
 ChipmunkPhysicsWorld::~ChipmunkPhysicsWorld()
 {
-  Dali::Mutex::ScopedLock lock(mMutex);
+  Lock();
   if(mSpace)
   {
     cpSpaceEachShape(mSpace, (cpSpaceShapeIteratorFunc)PostShapeFree, mSpace);
@@ -99,6 +99,7 @@ ChipmunkPhysicsWorld::~ChipmunkPhysicsWorld()
     cpSpaceFree(mSpace);
     mSpace = nullptr;
   }
+  Unlock();
 }
 
 Dali::Any ChipmunkPhysicsWorld::GetNative()

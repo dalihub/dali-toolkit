@@ -54,7 +54,7 @@ void BulletPhysicsWorld::OnInitialize(/*void* dynamicsWorld*/)
 
 BulletPhysicsWorld::~BulletPhysicsWorld()
 {
-  Dali::Mutex::ScopedLock lock(mMutex);
+  Lock();
 
   if(mDynamicsWorld)
   {
@@ -90,6 +90,8 @@ BulletPhysicsWorld::~BulletPhysicsWorld()
   delete mBroadphase;
   delete mDispatcher;
   delete mCollisionConfiguration;
+
+  Unlock();
 }
 
 Dali::Any BulletPhysicsWorld::GetNative()
