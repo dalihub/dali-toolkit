@@ -127,7 +127,6 @@ Visual::Base::Base(VisualFactoryCache& factoryCache, FittingMode fittingMode, To
 Visual::Base::~Base()
 {
   delete mImpl;
-  mImpl = nullptr;
 }
 
 void Visual::Base::Initialize()
