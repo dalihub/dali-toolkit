@@ -220,7 +220,7 @@ Dali::Accessibility::States ControlAccessible::CalculateStates()
   states[State::HIGHLIGHTABLE] = self.GetProperty<bool>(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE);
   states[State::HIGHLIGHTED]   = GetCurrentlyHighlightedActor() == self;
   states[State::ENABLED]       = true;
-  states[State::SENSITIVE]     = self.GetProperty<bool>(Actor::Property::SENSITIVE);
+  states[State::SENSITIVE]     = (Dali::DevelActor::IsHittable(self) && Dali::DevelActor::GetTouchRequired(self));
   states[State::VISIBLE]       = self.GetProperty<bool>(Actor::Property::VISIBLE);
   states[State::SHOWING]       = IsShowing();
   states[State::DEFUNCT]       = !self.GetProperty(Dali::DevelActor::Property::CONNECTED_TO_SCENE).Get<bool>();
