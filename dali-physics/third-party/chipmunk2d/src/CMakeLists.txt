@@ -1,7 +1,7 @@
 file(GLOB chipmunk_source_files "*.c")
 file(GLOB chipmunk_public_header "${chipmunk_SOURCE_DIR}/include/chipmunk/*.h")
 
-include_directories(BEFORE ${chipmunk_SOURCE_DIR}/include)
+include_directories(${chipmunk_SOURCE_DIR}/include)
 
 # Chipmunk2D 7.0.3
 set(CHIPMUNK_VERSION_MAJOR 7)

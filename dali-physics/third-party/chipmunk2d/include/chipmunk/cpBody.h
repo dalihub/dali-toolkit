@@ -140,11 +140,6 @@ CP_EXPORT cpDataPointer cpBodyGetUserData(const cpBody *body);
 /// Set the user data pointer assigned to the body.
 CP_EXPORT void cpBodySetUserData(cpBody *body, cpDataPointer userData);
 
-/// Get the 2nd user data pointer assigned to the body.
-CP_EXPORT cpDataPointer cpBodyGetUserData2(const cpBody *body);
-/// Set the 2nd user data pointer assigned to the body.
-CP_EXPORT void cpBodySetUserData2(cpBody *body, cpDataPointer userData);
-
 /// Set the callback used to update a body's velocity.
 CP_EXPORT void cpBodySetVelocityUpdateFunc(cpBody *body, cpBodyVelocityFunc velocityFunc);
 /// Set the callback used to update a body's position.

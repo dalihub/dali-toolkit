@@ -54,7 +54,7 @@ PhysicsActor::~PhysicsActor() = default;
 
 void PhysicsActor::Initialize(void)
 {
-  cpBodySetUserData2(mBody.Get<cpBody*>(), this);
+  cpBodySetUserData(mBody.Get<cpBody*>(), this);
 
   // RegisterObject?
 }
