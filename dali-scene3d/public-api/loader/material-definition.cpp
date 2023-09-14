@@ -20,8 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/builder/base64-encoding.h>
-#include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+
+// INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 
 namespace Dali
 {
@@ -110,7 +112,7 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
   else
   {
     textureDefinition.mDirectoryPath = resourcePath;
-    pixelData = SyncImageLoader::Load(resourcePath + textureDefinition.mImageUri, textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
+    pixelData                        = Internal::ImageResourceLoader::GetCachedPixelData(resourcePath + textureDefinition.mImageUri, textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
   }
   return pixelData;
 }
@@ -331,12 +333,7 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
     Texture texture;
     if(pixels)
     {
-      texture = Texture::New(TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight());
-      texture.Upload(tData.mPixels, 0, 0, 0, 0, pixels.GetWidth(), pixels.GetHeight());
-      if(tData.mSamplerFlags & SamplerFlags::MIPMAP_MASK)
-      {
-        texture.GenerateMipmaps();
-      }
+      texture = Dali::Scene3D::Internal::ImageResourceLoader::GetCachedTexture(pixels, tData.mSamplerFlags & SamplerFlags::MIPMAP_MASK);
     }
 
     textureSet.SetTexture(n, texture);
@@ -347,10 +344,7 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
 
   if(mShadowAvailable)
   {
-    PixelData shadowMapPixelData = PixelData::New(new uint8_t[3]{0xff, 0xff, 0xff}, 3, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY);
-    Texture   shadowMapTexture   = Texture::New(TextureType::TEXTURE_2D, shadowMapPixelData.GetPixelFormat(), shadowMapPixelData.GetWidth(), shadowMapPixelData.GetHeight());
-    shadowMapTexture.Upload(shadowMapPixelData, 0, 0, 0, 0, shadowMapPixelData.GetWidth(), shadowMapPixelData.GetHeight());
-    textureSet.SetTexture(n++, shadowMapTexture);
+    textureSet.SetTexture(n++, Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyTextureWhiteRGB());
   }
 
   // Assign textures to slots -- starting with 2D ones, then cubemaps, if any.

@@ -27,6 +27,7 @@
 #include <mutex>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 
@@ -89,6 +90,9 @@ public:
     if(cache.refCount == 0)
     {
       mModelCache.erase(modelUri);
+
+      // Request image resource GC
+      Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
     }
   }
 

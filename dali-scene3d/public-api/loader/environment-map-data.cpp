@@ -22,6 +22,7 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali::Scene3D::Loader
@@ -37,20 +38,11 @@ Texture EnvironmentMapData::GetTexture()
   {
     if(mEnvironmentMapType == Scene3D::EnvironmentMapType::CUBEMAP)
     {
-      mEnvironmentMapTexture = Texture::New(TextureType::TEXTURE_CUBE, mPixelData[0][0].GetPixelFormat(), mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
-      for(size_t iSide = 0u, iEndSize = mPixelData.size(); iSide < iEndSize; ++iSide)
-      {
-        auto& side = mPixelData[iSide];
-        for(size_t iMipLevel = 0u, iEndMipLevel = mPixelData[0].size(); iMipLevel < iEndMipLevel; ++iMipLevel)
-        {
-          mEnvironmentMapTexture.Upload(side[iMipLevel], CubeMapLayer::POSITIVE_X + iSide, iMipLevel, 0u, 0u, side[iMipLevel].GetWidth(), side[iMipLevel].GetHeight());
-        }
-      }
+      mEnvironmentMapTexture = Dali::Scene3D::Internal::ImageResourceLoader::GetCachedCubeTexture(mPixelData, mPixelData[0].size() == 1u);
     }
     else
     {
-      mEnvironmentMapTexture = Texture::New(TextureType::TEXTURE_2D, mPixelData[0][0].GetPixelFormat(), mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
-      mEnvironmentMapTexture.Upload(mPixelData[0][0], 0, 0, 0, 0, mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
+      mEnvironmentMapTexture = Dali::Scene3D::Internal::ImageResourceLoader::GetCachedTexture(mPixelData[0][0], mPixelData[0].size() == 1u);
     }
 
     // If mipmap is not defined explicitly, use GenerateMipmaps.

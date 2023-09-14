@@ -19,12 +19,13 @@
 #include <dali-scene3d/public-api/loader/environment-map-loader.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/integration-api/pixel-data-integ.h>
 #include <string.h>
 #include <cmath>
 #include <filesystem>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/public-api/loader/ktx-loader.h>
 
 #include <dali/integration-api/debug.h>
@@ -90,25 +91,29 @@ uint8_t* GetCroppedBuffer(uint8_t* sourceBuffer, uint32_t bytesPerPixel, uint32_
   return destBuffer;
 }
 
-PixelData GetCubeFace(Devel::PixelBuffer pixelBuffer, uint32_t faceIndex, CubeType cubeType, float faceWidth, float faceHeight)
+PixelData GetCubeFace(Dali::PixelData cubePixelData, uint32_t faceIndex, CubeType cubeType, float faceWidth, float faceHeight)
 {
-  PixelData pixelData;
+  PixelData cubeFacePixelData;
   if(cubeType != NONE)
   {
-    uint8_t* imageBuffer   = pixelBuffer.GetBuffer();
-    uint32_t bytesPerPixel = Pixel::GetBytesPerPixel(pixelBuffer.GetPixelFormat());
-    uint32_t imageWidth    = pixelBuffer.GetWidth();
-    uint32_t imageHeight   = pixelBuffer.GetHeight();
+    auto imagePixelFormat = cubePixelData.GetPixelFormat();
+    if(!Dali::Pixel::IsCompressed(imagePixelFormat))
+    {
+      uint8_t* imageBuffer   = Dali::Integration::GetPixelDataBuffer(cubePixelData).buffer;
+      uint32_t bytesPerPixel = Pixel::GetBytesPerPixel(imagePixelFormat);
+      uint32_t imageWidth    = cubePixelData.GetWidth();
+      uint32_t imageHeight   = cubePixelData.GetHeight();
 
-    uint32_t xOffset = CUBEMAP_INDEX_X[cubeType][faceIndex] * static_cast<uint32_t>(faceWidth);
-    uint32_t yOffset = CUBEMAP_INDEX_Y[cubeType][faceIndex] * static_cast<uint32_t>(faceHeight);
+      uint32_t xOffset = CUBEMAP_INDEX_X[cubeType][faceIndex] * static_cast<uint32_t>(faceWidth);
+      uint32_t yOffset = CUBEMAP_INDEX_Y[cubeType][faceIndex] * static_cast<uint32_t>(faceHeight);
 
-    uint32_t finalFaceWidth  = (xOffset + static_cast<uint32_t>(faceWidth) < imageWidth) ? static_cast<uint32_t>(faceWidth) : imageWidth - xOffset;
-    uint32_t finalFaceHeight = (yOffset + static_cast<uint32_t>(faceHeight) < imageHeight) ? static_cast<uint32_t>(faceHeight) : imageHeight - yOffset;
-    uint8_t* tempImageBuffer = GetCroppedBuffer(imageBuffer, bytesPerPixel, imageWidth, imageHeight, xOffset, yOffset, finalFaceWidth, finalFaceHeight);
-    pixelData                = PixelData::New(tempImageBuffer, finalFaceWidth * finalFaceHeight * bytesPerPixel, finalFaceWidth, finalFaceHeight, pixelBuffer.GetPixelFormat(), PixelData::FREE);
+      uint32_t finalFaceWidth  = (xOffset + static_cast<uint32_t>(faceWidth) < imageWidth) ? static_cast<uint32_t>(faceWidth) : imageWidth - xOffset;
+      uint32_t finalFaceHeight = (yOffset + static_cast<uint32_t>(faceHeight) < imageHeight) ? static_cast<uint32_t>(faceHeight) : imageHeight - yOffset;
+      uint8_t* tempImageBuffer = GetCroppedBuffer(imageBuffer, bytesPerPixel, imageWidth, imageHeight, xOffset, yOffset, finalFaceWidth, finalFaceHeight);
+      cubeFacePixelData        = PixelData::New(tempImageBuffer, finalFaceWidth * finalFaceHeight * bytesPerPixel, finalFaceWidth, finalFaceHeight, imagePixelFormat, PixelData::FREE);
+    }
   }
-  return pixelData;
+  return cubeFacePixelData;
 }
 
 /**
@@ -126,12 +131,12 @@ bool LoadEnvironmentMapData(const std::string& environmentMapUrl, Scene3D::Loade
     return false;
   }
 
-  Devel::PixelBuffer pixelBuffer = LoadImageFromFile(environmentMapUrl);
-  if(pixelBuffer)
+  Dali::PixelData pixelData = Dali::Scene3D::Internal::ImageResourceLoader::GetCachedPixelData(environmentMapUrl);
+  if(pixelData)
   {
     CubeType cubeType    = NONE;
-    uint32_t imageWidth  = pixelBuffer.GetWidth();
-    uint32_t imageHeight = pixelBuffer.GetHeight();
+    uint32_t imageWidth  = pixelData.GetWidth();
+    uint32_t imageHeight = pixelData.GetHeight();
     /**
      * If the environment map type is not EQUIRECTANGULAR,
      * The type should be defined internally.
@@ -169,7 +174,7 @@ bool LoadEnvironmentMapData(const std::string& environmentMapUrl, Scene3D::Loade
       }
       for(uint32_t i = 0; i < 6; ++i)
       {
-        environmentMapData.mPixelData[i][0] = GetCubeFace(pixelBuffer, i, cubeType, faceWidth, faceHeight);
+        environmentMapData.mPixelData[i][0] = GetCubeFace(pixelData, i, cubeType, faceWidth, faceHeight);
       }
       environmentMapData.SetEnvironmentMapType(Scene3D::EnvironmentMapType::CUBEMAP);
     }
@@ -177,7 +182,7 @@ bool LoadEnvironmentMapData(const std::string& environmentMapUrl, Scene3D::Loade
     {
       environmentMapData.mPixelData.resize(1);
       environmentMapData.mPixelData[0].resize(1);
-      environmentMapData.mPixelData[0][0] = Devel::PixelBuffer::Convert(pixelBuffer);
+      environmentMapData.mPixelData[0][0] = pixelData;
       environmentMapData.SetEnvironmentMapType(Scene3D::EnvironmentMapType::EQUIRECTANGULAR);
     }
 

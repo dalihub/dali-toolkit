@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,9 +45,11 @@ enum class ImageVisualRequireFlag : uint32_t
   BORDERLINE       = 1 << 1,
   ALPHA_MASKING    = 1 << 2,
   COLOR_CONVERSION = 1 << 3,
+
+  UNIFIED_YUV_AND_RGB = 1 << 2, // Special enum to trick unified YUV and RGB.
 };
 
-static constexpr auto          SHADER_TYPE_COUNT = 12u;
+static constexpr auto          SHADER_TYPE_COUNT = 16u;
 VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[SHADER_TYPE_COUNT] =
   {
     VisualFactoryCache::IMAGE_SHADER,
@@ -61,7 +63,11 @@ VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[SHADER_TYPE_COUNT] =
     VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
     VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
     VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUV_TO_RGB,
-    VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_TO_RGB};
+    VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_TO_RGB,
+    VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
+    VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
+    VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUV_AND_RGB,
+    VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_AND_RGB};
 } // unnamed namespace
 
 namespace ImageVisualShaderFeature
@@ -102,9 +108,9 @@ FeatureBuilder& FeatureBuilder::EnableAlphaMaskingOnRendering(bool enableAlphaMa
   return *this;
 }
 
-FeatureBuilder& FeatureBuilder::EnableYuvToRgb(bool enableYuvToRgb)
+FeatureBuilder& FeatureBuilder::EnableYuvToRgb(bool enableYuvToRgb, bool enableUnifiedYuvAndRgb)
 {
-  mColorConversion = (enableYuvToRgb ? ColorConversion::YUV_TO_RGB : ColorConversion::DONT_NEED);
+  mColorConversion = (enableUnifiedYuvAndRgb ? ColorConversion::UNIFIED_YUV_AND_RGB : (enableYuvToRgb ? ColorConversion::YUV_TO_RGB : ColorConversion::DONT_NEED));
   return *this;
 }
 } // namespace ImageVisualShaderFeature
@@ -163,6 +169,11 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     {
       shaderTypeFlag |= static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
     }
+    else if(colorConversion == ImageVisualShaderFeature::ColorConversion::UNIFIED_YUV_AND_RGB)
+    {
+      shaderTypeFlag |= static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
+      shaderTypeFlag |= static_cast<uint32_t>(ImageVisualRequireFlag::UNIFIED_YUV_AND_RGB);
+    }
     shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
   }
 
@@ -209,6 +220,10 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
       else if(colorConversion == ImageVisualShaderFeature::ColorConversion::YUV_TO_RGB)
       {
         fragmentShaderPrefixList += "#define IS_REQUIRED_YUV_TO_RGB\n";
+      }
+      else if(colorConversion == ImageVisualShaderFeature::ColorConversion::UNIFIED_YUV_AND_RGB)
+      {
+        fragmentShaderPrefixList += "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n";
       }
     }
 

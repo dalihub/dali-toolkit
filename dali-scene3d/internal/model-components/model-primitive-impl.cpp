@@ -25,6 +25,7 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/material-impl.h>
 #include <dali-scene3d/public-api/loader/environment-definition.h>
@@ -53,14 +54,6 @@ DALI_TYPE_REGISTRATION_END()
 
 static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG = 10;
 
-Texture MakeEmptyTexture()
-{
-  PixelData pixelData = PixelData::New(new uint8_t[3]{0xff, 0xff, 0xff}, 3, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY);
-  Texture texture            = Texture::New(TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
-  texture.Upload(pixelData, 0, 0, 0, 0, pixelData.GetWidth(), pixelData.GetHeight());
-
-  return texture;
-}
 } // unnamed namespace
 
 ModelPrimitivePtr ModelPrimitive::New()
@@ -170,7 +163,6 @@ void ModelPrimitive::RemovePrimitiveObserver(ModelPrimitiveModifyObserver* obser
 void ModelPrimitive::SetShadowMapTexture(Dali::Texture shadowMapTexture)
 {
   mShadowMapTexture = shadowMapTexture;
-
   UpdateShadowMapTexture();
 }
 
@@ -311,7 +303,7 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
 
     if(!mShadowMapTexture)
     {
-      mShadowMapTexture = MakeEmptyTexture();
+      mShadowMapTexture = Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyTextureWhiteRGB();
     }
     mTextureSet.SetTexture(textureCount++, mShadowMapTexture);
 
@@ -403,7 +395,7 @@ void ModelPrimitive::UpdateShadowMapTexture()
         Dali::Texture texture = textures.GetTexture(index);
         if(index == textureCount - GetImplementation(mMaterial).GetShadowMapTextureOffset())
         {
-          texture = (!!mShadowMapTexture) ? mShadowMapTexture : MakeEmptyTexture();
+          texture = (!!mShadowMapTexture) ? mShadowMapTexture : Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyTextureWhiteRGB();
         }
 
         newTextures.SetTexture(index, texture);

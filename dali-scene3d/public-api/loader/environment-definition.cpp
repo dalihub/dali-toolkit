@@ -24,6 +24,7 @@
 #include <dali/devel-api/threading/mutex.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/public-api/loader/environment-map-loader.h>
 #include <dali-scene3d/public-api/loader/utils.h>
 
@@ -67,14 +68,13 @@ EnvironmentDefinition::RawData
 EnvironmentDefinition::LoadRaw(const std::string& environmentsPath)
 {
   RawData raw;
-  auto    loadFn = [&environmentsPath](const std::string& path, EnvironmentMapData& environmentMapData)
-  {
+  auto    loadFn = [&environmentsPath](const std::string& path, EnvironmentMapData& environmentMapData) {
     if(path.empty())
     {
       environmentMapData.mPixelData.resize(6);
       for(auto& face : environmentMapData.mPixelData)
       {
-        face.push_back(PixelData::New(new uint8_t[3]{0xff, 0xff, 0xff}, 3, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY));
+        face.push_back(Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGB());
       }
       environmentMapData.SetEnvironmentMapType(Dali::Scene3D::EnvironmentMapType::CUBEMAP);
     }
@@ -134,7 +134,7 @@ void EnvironmentDefinition::LoadBrdfTexture()
       if(pixelBuffer)
       {
         mBrdfPixelData = Devel::PixelBuffer::Convert(pixelBuffer);
-        mIsBrdfLoaded = true;
+        mIsBrdfLoaded  = true;
       }
     }
   }
