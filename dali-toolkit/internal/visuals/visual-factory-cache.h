@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_CACHE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,6 +93,10 @@ public:
     IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
     IMAGE_SHADER_BORDERLINE_YUV_TO_RGB,
     IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_TO_RGB,
+    IMAGE_SHADER_YUV_AND_RGB,
+    IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
+    IMAGE_SHADER_BORDERLINE_YUV_AND_RGB,
+    IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_AND_RGB,
     NATIVE_IMAGE_SHADER,
     NATIVE_IMAGE_SHADER_ROUNDED_CORNER,
     NATIVE_IMAGE_SHADER_BORDERLINE,
@@ -206,7 +210,7 @@ public:
   /**
    * @copydoc Toolkit::VisualFactory::GetPreMultiplyOnLoad()
    */
-  bool GetPreMultiplyOnLoad();
+  bool GetPreMultiplyOnLoad() const;
 
   /**
    * @brief Set an image to be used when a visual has failed to correctly render
@@ -223,6 +227,13 @@ public:
    *                            Most of user experience use normal images. So It can reduce runtime.
    */
   void UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size, const bool& rendererIsImage = true);
+
+  /**
+   * @brief Get whether we support YUV Planes load or not.
+   *
+   * @return True if we support to load YUV Planes. False otherwise.
+   */
+  bool GetLoadYuvPlanes() const;
 
 public:
   /**
@@ -336,6 +347,8 @@ private:
 
   Geometry mGeometry[GEOMETRY_TYPE_MAX + 1];
   Shader   mShader[SHADER_TYPE_MAX + 1];
+
+  bool mLoadYuvPlanes; ///< A global flag to specify if the image should be loaded as yuv planes
 
   ImageAtlasManagerPtr mAtlasManager;
   TextureManager       mTextureManager;

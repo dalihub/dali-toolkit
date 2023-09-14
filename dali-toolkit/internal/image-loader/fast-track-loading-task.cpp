@@ -24,6 +24,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/texture-integ.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 #ifdef TRACE_ENABLED
 #include <sstream>
@@ -38,26 +39,41 @@ namespace Internal
 namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
+
+constexpr uint32_t CHROMINANCE_U_INDEX = 1u;
+constexpr uint32_t CHROMINANCE_V_INDEX = 2u;
+
+Dali::PixelData GetDummyChrominanceUPixelData()
+{
+  static Dali::PixelData pixelDataU = PixelData::New(new uint8_t[2]{0x00, 0x00}, 2, 1, 2, Pixel::L8, PixelData::DELETE_ARRAY);
+  return pixelDataU;
 }
 
-FastTrackLoadingTask::FastTrackLoadingTask(const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+Dali::PixelData GetDummyChrominanceVPixelData()
+{
+  static Dali::PixelData pixelDataV = PixelData::New(new uint8_t[2]{0x00, 0x00}, 2, 2, 1, Pixel::L8, PixelData::DELETE_ARRAY);
+  return pixelDataV;
+}
+
+} // namespace
+
+FastTrackLoadingTask::FastTrackLoadingTask(const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
 : AsyncTask(MakeCallback(this, &FastTrackLoadingTask::OnComplete), url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
   mUrl(url),
-  mTexture(),
+  mTextures(),
   mDimensions(dimensions),
   mFittingMode(fittingMode),
   mSamplingMode(samplingMode),
   mPreMultiplyOnLoad(preMultiplyOnLoad),
   mCallback(),
   mTextureUploadManager(Dali::Devel::TextureUploadManager::Get()),
-  mImageWidth(0u),
-  mImageHeight(0u),
-  mImageFormat(Pixel::INVALID),
+  mImageInformations(),
   mPixelData(),
-  mResourceId(0u),
   mOrientationCorrection(orientationCorrection),
   mLoadSuccess(false),
-  mPremultiplied(false)
+  mLoadPlanesAvaliable(loadPlanes),
+  mPremultiplied(false),
+  mPlanesLoaded(false)
 {
   mCallback = std::unique_ptr<CallbackBase>(callback);
   PrepareTexture();
@@ -69,17 +85,45 @@ FastTrackLoadingTask::~FastTrackLoadingTask()
 
 void FastTrackLoadingTask::PrepareTexture()
 {
-  mTexture    = mTextureUploadManager.GenerateTexture2D();
-  mResourceId = Integration::GetTextureResourceId(mTexture);
+  const uint32_t requiredTexturesCount = mLoadPlanesAvaliable ? 3u : 1u;
+
+  mTextures.resize(requiredTexturesCount);
+  mImageInformations.resize(requiredTexturesCount);
+  for(uint32_t index = 0u; index < requiredTexturesCount; ++index)
+  {
+    mTextures[index] = mTextureUploadManager.GenerateTexture2D();
+
+    mImageInformations[index].resourceId = Integration::GetTextureResourceId(mTextures[index]);
+  }
+
+  if(mLoadPlanesAvaliable)
+  {
+    // Create static dummy chrominance pixel data now, for thread safety.
+    [[maybe_unused]] auto pixelDataU = GetDummyChrominanceUPixelData();
+    [[maybe_unused]] auto pixelDataV = GetDummyChrominanceVPixelData();
+  }
 }
 
 void FastTrackLoadingTask::OnComplete(AsyncTaskPtr task)
 {
   if(mLoadSuccess)
   {
-    Dali::Integration::SetTextureSize(mTexture, Dali::ImageDimensions(mImageWidth, mImageHeight));
-    Dali::Integration::SetTexturePixelFormat(mTexture, mImageFormat);
+    for(uint32_t index = 0u; index < mImageInformations.size(); ++index)
+    {
+      Dali::Integration::SetTextureSize(mTextures[index], Dali::ImageDimensions(mImageInformations[index].width, mImageInformations[index].height));
+      Dali::Integration::SetTexturePixelFormat(mTextures[index], mImageInformations[index].format);
+    }
+    if(mLoadPlanesAvaliable && !mPlanesLoaded)
+    {
+      // We will not use ChrominanceU and ChrominanceV texture anymore.
+      mTextures.resize(1u);
+    }
   }
+  else
+  {
+    mTextures.clear();
+  }
+
   if(mCallback)
   {
     CallbackBase::Execute(*mCallback, FastTrackLoadingTaskPtr(reinterpret_cast<FastTrackLoadingTask*>(task.Get())));
@@ -115,10 +159,14 @@ void FastTrackLoadingTask::Load()
 
   if(mUrl.IsValid() && mUrl.IsLocalResource())
   {
-    // TODO : We need to consider YUV case in future.
-    //Dali::LoadImagePlanesFromFile(mUrl.GetUrl(), pixelBuffers, mDimensions, mFittingMode, mSamplingMode, mOrientationCorrection);
-
-    pixelBuffer = Dali::LoadImageFromFile(mUrl.GetUrl(), mDimensions, mFittingMode, mSamplingMode, mOrientationCorrection);
+    if(mLoadPlanesAvaliable)
+    {
+      Dali::LoadImagePlanesFromFile(mUrl.GetUrl(), pixelBuffers, mDimensions, mFittingMode, mSamplingMode, mOrientationCorrection);
+    }
+    else
+    {
+      pixelBuffer = Dali::LoadImageFromFile(mUrl.GetUrl(), mDimensions, mFittingMode, mSamplingMode, mOrientationCorrection);
+    }
   }
   else if(mUrl.IsValid())
   {
@@ -127,24 +175,43 @@ void FastTrackLoadingTask::Load()
 
   if(pixelBuffer)
   {
-    pixelBuffers.push_back(pixelBuffer);
+    pixelBuffers.emplace_back(std::move(pixelBuffer));
   }
 
   if(pixelBuffers.empty())
   {
-    DALI_LOG_ERROR("FastTrackLoadingTask::Load: Loading is failed: ResourceId : %d, url : [%s]\n", mResourceId, mUrl.GetUrl().c_str());
+    mLoadSuccess = false;
+    DALI_LOG_ERROR("FastTrackLoadingTask::Load: Loading is failed: ResourceId : %d url : [%s]\n", mImageInformations[0u].resourceId, mUrl.GetUrl().c_str());
   }
   else
   {
-    if(pixelBuffers.size() == 1u)
+    mPixelData.resize(pixelBuffers.size());
+
+    mLoadSuccess = true;
+    MultiplyAlpha(pixelBuffers[0]);
+    uint32_t index = 0u;
+    for(auto&& pixelBuffer : pixelBuffers)
     {
-      mLoadSuccess = true;
-      MultiplyAlpha(pixelBuffers[0]);
-      mPixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffers[0]);
+      mPixelData[index++] = Dali::Devel::PixelBuffer::Convert(pixelBuffer);
     }
-    else
+
+    if(pixelBuffers.size() > 1u)
     {
-      DALI_LOG_ERROR("FastTrackLoadingTask::Load: ??? Undefined case. PixelBuffers.size() : %zu : ResourceId : %d, url : [%s]\n", pixelBuffers.size(), mResourceId, mUrl.GetUrl().c_str());
+      mPlanesLoaded = true;
+    }
+    else if(mLoadPlanesAvaliable && pixelBuffers.size() == 1u && mTextures.size() == 3u) ///< Case when we prepare three textures to render YUV, but loaded image is not YUV.
+    {
+      // Dummy pixel data for fake shader that we don't use actual YUV format.
+      // To fake shader, let we use indivisual sizes of texture for U and V.
+      mPixelData.resize(3u);
+      mPixelData[CHROMINANCE_U_INDEX] = GetDummyChrominanceUPixelData();
+      mPixelData[CHROMINANCE_V_INDEX] = GetDummyChrominanceVPixelData();
+    }
+
+    if(DALI_UNLIKELY(mPixelData.size() != mImageInformations.size()))
+    {
+      DALI_LOG_ERROR("FastTrackLoadingTask::Load: Undefined case. pixelBuffers.size() : %zu, image size : %zu, ResourceId : %d, url : [%s]\n", pixelBuffers.size(), mImageInformations.size(), mImageInformations[0u].resourceId, mUrl.GetUrl().c_str());
+      mLoadSuccess = false;
     }
   }
 
@@ -177,14 +244,24 @@ void FastTrackLoadingTask::UploadToTexture()
 {
   if(mLoadSuccess)
   {
-    mImageWidth  = mPixelData.GetWidth();
-    mImageHeight = mPixelData.GetHeight();
-    mImageFormat = mPixelData.GetPixelFormat();
+    DALI_ASSERT_DEBUG(mPixelData.size() == mImageInformations.size());
 
-    mTextureUploadManager.RequestUpload(mResourceId, mPixelData);
+    uint32_t index = 0u;
+    for(auto&& pixelData : mPixelData)
+    {
+      mImageInformations[index].width  = pixelData.GetWidth();
+      mImageInformations[index].height = pixelData.GetHeight();
+      mImageInformations[index].format = pixelData.GetPixelFormat();
+
+      mTextureUploadManager.RequestUpload(mImageInformations[index].resourceId, pixelData);
+
+      pixelData.Reset();
+
+      ++index;
+    }
   }
 
-  mPixelData.Reset();
+  mPixelData.clear();
 }
 
 } // namespace Internal

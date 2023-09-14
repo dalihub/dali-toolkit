@@ -18,14 +18,17 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
-#include <dali-toolkit/internal/texture-manager/texture-manager-type.h>
-#include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/adaptor-framework/texture-upload-manager.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 #include <dali/public-api/adaptor-framework/async-task-manager.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/rendering/texture.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
+#include <dali-toolkit/internal/texture-manager/texture-manager-type.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -52,6 +55,7 @@ public:
                        SamplingMode::Type                       samplingMode,
                        bool                                     orientationCorrection,
                        DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+                       bool                                     loadPlanes,
                        CallbackBase*                            callback);
 
   /**
@@ -107,8 +111,8 @@ private:
   void OnComplete(AsyncTaskPtr task);
 
 public:
-  VisualUrl     mUrl;     ///< url of the image to load.
-  Dali::Texture mTexture; ///< texture for regular image.
+  VisualUrl                  mUrl;      ///< url of the image to load.
+  std::vector<Dali::Texture> mTextures; ///< textures for regular image.
 
 private:
   ImageDimensions                          mDimensions;   ///< dimensions to load
@@ -121,19 +125,25 @@ private:
   Dali::Devel::TextureUploadManager mTextureUploadManager;
 
   // Note : mPixelData is invalid after upload requested. We should keep image size informations.
-  uint32_t      mImageWidth;
-  uint32_t      mImageHeight;
-  Pixel::Format mImageFormat;
+  struct ImageInformation
+  {
+    uint32_t resourceId;
 
-  Dali::PixelData mPixelData;
+    uint32_t      width;
+    uint32_t      height;
+    Pixel::Format format;
+  };
+  std::vector<ImageInformation> mImageInformations;
 
-  uint32_t mResourceId;
+  std::vector<Dali::PixelData> mPixelData;
 
   bool mOrientationCorrection : 1; ///< If orientation correction is needed
 
 public:
-  bool mLoadSuccess : 1;   ///< Whether image load successed or not.
-  bool mPremultiplied : 1; ///< True if the image's color was multiplied by it's alpha
+  bool mLoadSuccess : 1;         ///< Whether image load successed or not.
+  bool mLoadPlanesAvaliable : 1; ///< If image valid to load as planes or not.
+  bool mPremultiplied : 1;       ///< True if the image's color was multiplied by it's alpha
+  bool mPlanesLoaded : 1;        ///< True if the image load as planes.
 };
 
 } // namespace Internal

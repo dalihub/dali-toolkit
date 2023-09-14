@@ -99,8 +99,10 @@ public:
 
   /**
    * Constructor.
+   *
+   * @param[in] loadYuvPlanes Whether we allow to load YuvPlanes or not. Default is false.
    */
-  TextureManager();
+  TextureManager(bool loadYuvPlanes = false);
 
   /**
    * Destructor.
@@ -687,8 +689,8 @@ private:                                    // Member Variables:
 
   Dali::Vector<TextureManager::TextureId> mRemoveQueue; ///< Queue of textures to remove at PostProcess. It will be cleared after PostProcess.
 
-  bool mLoadYuvPlanes;             ///< A global flag to specify if the image should be loaded as yuv planes
-  bool mRemoveProcessorRegistered; ///< Flag if remove processor registered or not.
+  const bool mLoadYuvPlanes;             ///< A global flag to specify if the image should be loaded as yuv planes
+  bool       mRemoveProcessorRegistered; ///< Flag if remove processor registered or not.
 };
 
 } // namespace Internal

@@ -375,6 +375,7 @@ private:
   bool                                            mAttemptAtlasing;              ///< If true will attempt atlasing, otherwise create unique texture
   bool                                            mOrientationCorrection;        ///< true if the image will have it's orientation corrected.
   bool                                            mNeedYuvToRgb{false};          ///< true if we need to convert yuv to rgb.
+  bool                                            mNeedUnifiedYuvAndRgb{false};  ///< true if we need to support both yuv and rgb.
   bool                                            mEnableBrokenImage{true};      ///< true if enable broken image.
   bool                                            mUseFastTrackUploading{false}; ///< True if we use fast tack feature.
   bool                                            mRendererAdded{false};         ///< True if renderer added into actor.
