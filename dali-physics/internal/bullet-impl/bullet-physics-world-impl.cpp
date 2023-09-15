@@ -54,7 +54,7 @@ void BulletPhysicsWorld::OnInitialize(/*void* dynamicsWorld*/)
 
 BulletPhysicsWorld::~BulletPhysicsWorld()
 {
-  Dali::Mutex::ScopedLock lock(mMutex);
+  Lock();
 
   if(mDynamicsWorld)
   {
@@ -76,20 +76,15 @@ BulletPhysicsWorld::~BulletPhysicsWorld()
     }
   }
 
-  /*
-  for (int j = 0; j < m_collisionShapes.size(); j++)
-  {
-    btCollisionShape* shape = mCollisionShapes[j];
-    delete shape;
-  }
-  mCollisionShapes.clear();
-  */
+  // @todo Should clear down known collision shapes
 
   delete mDynamicsWorld;
   delete mSolver;
   delete mBroadphase;
   delete mDispatcher;
   delete mCollisionConfiguration;
+
+  Unlock();
 }
 
 Dali::Any BulletPhysicsWorld::GetNative()
