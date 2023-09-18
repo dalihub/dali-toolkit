@@ -505,8 +505,8 @@ int UtcDaliGetMirroredText(void)
        " مرحبا بالعالم שלום עולם hello world hello world\nبالعالم שלום (hello) world demo (עולם)\nשלום (مرحبا بالعالم עולם) (hello)",
        0u,
        239u,
-       "Hello world demo\nhello world\nhello world (مرحبا بالعالم שלום( עולם\nשלום مرحبا بالعالم עולם )hello( مرحبا بالعالم world"
-       " مرحبا بالعالم שלום עולם hello world hello world\nبالعالم שלום )hello) world demo )עולם(\nשלום )مرحبا بالعالم עולם( )hello("},
+       "Hello world demo\nhello world\nhello world (مرحبا بالعالم שלום) עולם\nשלום مرحبا بالعالم עולם )hello( مرحبا بالعالم world"
+       " مرحبا بالعالم שלום עולם hello world hello world\nبالعالم שלום )hello( world demo )עולם(\nשלום )مرحبا بالعالم עולם( )hello("},
 
       {"Mix of bidirectional text. With more paragraphs. Update middle paragraphs.",
        "Hello world demo\nhello world\nhello world (مرحبا بالعالم שלום) עולם\nשלום مرحبا بالعالم עולם (hello) مرحبا بالعالم world"
