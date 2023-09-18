@@ -221,8 +221,11 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
       bool consumed = false;
       if(keyName == KEY_C_NAME || keyName == KEY_INSERT_NAME || logicalKey == KEY_C_NAME || logicalKey == KEY_INSERT_NAME)
       {
-        // Ctrl-C or Ctrl+Insert to copy the selected text
-        controller.TextPopupButtonTouched(Toolkit::TextSelectionPopup::COPY);
+        if(!keyEvent.IsRepeat())
+        {
+          // Ctrl-C or Ctrl+Insert to copy the selected text
+          controller.TextPopupButtonTouched(Toolkit::TextSelectionPopup::COPY);
+        }
         consumed = true;
       }
       else if(keyName == KEY_V_NAME || logicalKey == KEY_V_NAME)
