@@ -179,6 +179,8 @@ public:
    */
   void OnUpdateActors(Dali::UpdateProxy* updateProxy);
 
+  std::unique_ptr<PhysicsWorld>& GetPhysicsWorld();
+
 protected:
   std::unique_ptr<PhysicsWorld>                 mPhysicsWorld;
   std::unordered_map<uint32_t, PhysicsActorPtr> mPhysicsActors;

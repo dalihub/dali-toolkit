@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.2.43
+Version:    2.2.44
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -549,6 +549,7 @@ esac
 
 %files -n %{dali2_physics2d}-devel
 %defattr(-,root,root,-)
+%{_includedir}/dali-physics/integration-api/*
 %{_includedir}/dali-physics/public-api/*
 %{_includedir}/dali-physics/dali-physics.h
 %{_includedir}/chipmunk/*
@@ -568,6 +569,7 @@ esac
 
 %files -n %{dali2_physics3d}-devel
 %defattr(-,root,root,-)
+%{_includedir}/dali-physics/integration-api/*
 %{_includedir}/dali-physics/public-api/*
 %{_includedir}/dali-physics/dali-physics.h
 %{_includedir}/bullet/*
