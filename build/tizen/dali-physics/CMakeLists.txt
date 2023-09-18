@@ -72,19 +72,16 @@ add_subdirectory("${physics_dir}/third-party/bullet3" bullet3)
 
 set(physics_src_files "")
 include(${physics_dir}/public-api/file.list)
-include(${physics_dir}/integration-api/file.list)
-# Must come last!
 include(${physics_dir}/internal/file.list)
 
 set(prefix_include_dir "${prefix}/include")
 
 include_directories(BEFORE
   ${repo_root_dir}
+  "${prefix_include_dir}"
   "${repo_root_dir}/dali-physics/third-party/bullet3/src"
   "${repo_root_dir}/dali-physics/third-party/chipmunk2d/include"
 )
-
-include_directories(AFTER "${prefix_include_dir}")
 
 MESSAGE(STATUS "2D sources: ${physics2d_src_files}")
 MESSAGE(STATUS "3D sources: ${physics3d_src_files}")
@@ -184,9 +181,6 @@ ENDIF()
 # Install headers
 install( FILES ${physics_public_api_header_files}
   DESTINATION "${INCLUDE_DIR}/dali-physics/public-api"
-  )
-install( FILES ${physics_integration_api_header_files}
-  DESTINATION "${INCLUDE_DIR}/dali-physics/integration-api"
   )
 
 install( FILES ${physics_dir}/dali-physics.h

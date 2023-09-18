@@ -7,7 +7,6 @@ SET(RPM_NAME "core-${PKG_NAME}-tests")
 SET(TC_SOURCES
   utc-Dali-PhysicsAdaptor.cpp
   utc-Dali-PhysicsActor.cpp
-  utc-Dali-IntegPhysics.cpp
   )
 
 # List of test harness files (Won't get parsed for test cases)

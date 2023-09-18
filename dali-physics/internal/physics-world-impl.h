@@ -18,13 +18,13 @@
  */
 
 #include <dali/dali.h>
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/update/frame-callback-interface.h>
 #include <dali/devel-api/update/update-proxy.h>
 
 #include <dali-physics/public-api/physics-adaptor.h>
 
 #include <functional>
-#include <mutex>
 #include <queue>
 
 namespace Dali::Toolkit::Physics::Internal
@@ -89,31 +89,6 @@ public:
   float GetTimestep();
 
   /**
-   * Lock the mutex.
-   */
-  void Lock();
-
-  /**
-   * Unlock the mutex
-   */
-  void Unlock();
-
-  class ScopedLock
-  {
-  public:
-    ScopedLock(PhysicsWorld& world)
-    : mWorld(world)
-    {
-      mWorld.Lock();
-    }
-    ~ScopedLock()
-    {
-      mWorld.Unlock();
-    }
-    PhysicsWorld& mWorld;
-  };
-
-  /**
    * Queue a function for execution in the update thread, prior to the physics integration.
    * Enables syncronization of DALi properties and physics controlled properties.
    */
@@ -164,13 +139,15 @@ public:
   Physics::PhysicsAdaptor::DebugState GetDebugState();
 
 public:
+  Dali::Mutex& GetMutex(); // Only for use by adaptor in creating scoped accessor
+
   bool OnUpdate(Dali::UpdateProxy& updateProxy, float elapsedSeconds);
 
 protected:
   virtual void Integrate(float timestep) = 0;
 
 protected:
-  std::mutex                            mMutex;
+  Dali::Mutex                           mMutex;
   std::queue<std::function<void(void)>> commandQueue;
   Dali::UpdateProxy::NotifySyncPoint    mNotifySyncPoint{Dali::UpdateProxy::INVALID_SYNC};
   Dali::CallbackBase*                   mUpdateCallback{nullptr};

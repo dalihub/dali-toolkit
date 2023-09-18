@@ -24,17 +24,14 @@ namespace Dali::Toolkit::Physics
 struct PhysicsAdaptor::ScopedPhysicsAccessor::Impl
 {
   Impl(Internal::PhysicsWorld& world)
-  : mPhysicsWorld(world)
+  : mLock(world.GetMutex()),
+    mPhysicsWorld(world)
   {
-    mPhysicsWorld.Lock();
   }
   Impl(Impl&)         = delete;
   const Impl& operator=(const Impl&) = delete;
 
-  ~Impl()
-  {
-    mPhysicsWorld.Unlock();
-  }
+  Dali::Mutex::ScopedLock mLock;
   Internal::PhysicsWorld& mPhysicsWorld;
   friend Internal::PhysicsAdaptor;
 };

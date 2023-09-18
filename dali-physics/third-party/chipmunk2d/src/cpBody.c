@@ -56,7 +56,6 @@ cpBodyInit(cpBody *body, cpFloat mass, cpFloat moment)
 	body->w_bias = 0.0f;
 	
 	body->userData = NULL;
-	body->userData2 = NULL;
 	
 	// Setters must be called after full initialization so the sanity checks don't assert on garbage data.
 	cpBodySetMass(body, mass);
@@ -483,17 +482,6 @@ void
 cpBodySetUserData(cpBody *body, cpDataPointer userData)
 {
 	body->userData = userData;
-}
-cpDataPointer
-cpBodyGetUserData2(const cpBody *body)
-{
-	return body->userData2;
-}
-
-void
-cpBodySetUserData2(cpBody *body, cpDataPointer userData)
-{
-	body->userData2 = userData;
 }
 
 void
