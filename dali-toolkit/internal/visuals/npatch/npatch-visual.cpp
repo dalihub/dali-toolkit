@@ -30,6 +30,7 @@
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -338,9 +339,10 @@ void NPatchVisual::OnInitialize()
 {
   // Get basic geometry and shader
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
+  auto imageVisualShaderFeatureBuilder = ImageVisualShaderFeatureBuilder();
   Shader   shader   = mImageVisualShaderFactory.GetShader(
     mFactoryCache,
-    ImageVisualShaderFeature::FeatureBuilder());
+    imageVisualShaderFeatureBuilder);
 
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);

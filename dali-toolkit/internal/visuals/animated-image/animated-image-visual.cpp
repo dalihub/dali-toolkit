@@ -32,6 +32,7 @@
 #include <dali-toolkit/internal/visuals/animated-image/rolling-animated-image-cache.h>
 #include <dali-toolkit/internal/visuals/animated-image/rolling-image-cache.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -815,7 +816,7 @@ Shader AnimatedImageVisual::GenerateShader() const
   Shader shader;
   shader = mImageVisualShaderFactory.GetShader(
     mFactoryCache,
-    ImageVisualShaderFeature::FeatureBuilder()
+    ImageVisualShaderFeatureBuilder()
       .ApplyDefaultTextureWrapMode(defaultWrapMode)
       .EnableRoundedCorner(IsRoundedCornerRequired())
       .EnableBorderline(IsBorderlineRequired())
