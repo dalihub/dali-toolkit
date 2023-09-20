@@ -956,16 +956,18 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
         const Property::Map* map = value.GetMap();
         if( map && !map->Empty() )
         {
-          controlImpl.SetBackground( *map );
+          Property::Map newMap;
+          newMap[Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING] = true;
+          newMap.Merge(*map);
+          controlImpl.SetBackground( newMap );
         }
         else if( value.Get( url ) )
         {
           // don't know the size to load
-          Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( url, ImageDimensions() );
-          if( visual )
-          {
-            controlImpl.mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND );
-          }
+          Property::Map map;
+          map[Toolkit::ImageVisual::Property::URL] = url;
+          map[Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING] = true;
+          controlImpl.SetBackground(map);
         }
         else if( value.Get( color ) )
         {
