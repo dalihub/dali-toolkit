@@ -957,7 +957,11 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
         if( map && !map->Empty() )
         {
           Property::Map newMap;
-          newMap[Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING] = true;
+          Property::Value* typeValue = map->Find(Toolkit::Visual::Property::TYPE);
+          if(typeValue && typeValue->Get<Toolkit::Visual::Type>() == Toolkit::Visual::IMAGE)
+          {
+            newMap[Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING] = true;
+          }
           newMap.Merge(*map);
           controlImpl.SetBackground( newMap );
         }
@@ -965,7 +969,8 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
         {
           // don't know the size to load
           Property::Map map;
-          map[Toolkit::ImageVisual::Property::URL] = url;
+          map[Toolkit::Visual::Property::TYPE]                     = Toolkit::Visual::IMAGE;
+          map[Toolkit::ImageVisual::Property::URL]                 = url;
           map[Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING] = true;
           controlImpl.SetBackground(map);
         }
