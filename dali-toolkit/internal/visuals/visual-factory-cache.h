@@ -23,6 +23,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/shader.h>
+#include <dali/integration-api/shader-precompiler.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
