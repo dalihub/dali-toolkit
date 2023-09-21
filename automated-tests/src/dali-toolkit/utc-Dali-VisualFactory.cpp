@@ -29,6 +29,7 @@
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/adaptor-framework/shader-precompiler.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -2785,6 +2786,44 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual2(void)
 
   actor.Unparent();
   DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
+
+  END_TEST;
+}
+
+
+int UtcDaliVisualFactoryGetPreCompiler(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualFactoryGetAnimatedImageVisual2: Request animated image visual with a Property::Map, test custom wrap mode and pixel area");
+
+
+  std::vector<RawShaderData> precompiledShaderList;
+  DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // before Get Shader
+  ShaderPreCompiler::Get().GetPreCompileShaderList(precompiledShaderList);
+  DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // after Get Shader
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  factory.UsePreCompiledShader();
+
+  ShaderPreCompiler::Get().GetPreCompileShaderList(precompiledShaderList);
+  DALI_TEST_CHECK(precompiledShaderList.size() != 0u); // after Get Shader
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
