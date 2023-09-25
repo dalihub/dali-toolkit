@@ -68,27 +68,33 @@ NPatchData::NPatchDataId NPatchData::GetId() const
 
 void NPatchData::AddObserver(TextureUploadObserver* textureObserver)
 {
-  if(mObserverNotifying)
+  if(textureObserver)
   {
-    // Do not add it into observer list during observer notifying.
-    mQueuedObservers.PushBack(textureObserver);
+    if(mObserverNotifying)
+    {
+      // Do not add it into observer list during observer notifying.
+      mQueuedObservers.PushBack(textureObserver);
+    }
+    else
+    {
+      mObserverList.PushBack(textureObserver);
+    }
+    textureObserver->DestructionSignal().Connect(this, &NPatchData::ObserverDestroyed);
   }
-  else
-  {
-    mObserverList.PushBack(textureObserver);
-  }
-  textureObserver->DestructionSignal().Connect(this, &NPatchData::ObserverDestroyed);
 }
 
 void NPatchData::RemoveObserver(TextureUploadObserver* textureObserver)
 {
-  for(uint32_t index = 0; index < mObserverList.Count(); ++index)
+  if(textureObserver)
   {
-    if(textureObserver == mObserverList[index])
+    for(uint32_t index = 0; index < mObserverList.Count(); ++index)
     {
-      textureObserver->DestructionSignal().Disconnect(this, &NPatchData::ObserverDestroyed);
-      mObserverList.Erase(mObserverList.begin() + index);
-      break;
+      if(textureObserver == mObserverList[index])
+      {
+        textureObserver->DestructionSignal().Disconnect(this, &NPatchData::ObserverDestroyed);
+        mObserverList.Erase(mObserverList.begin() + index);
+        break;
+      }
     }
   }
 }
