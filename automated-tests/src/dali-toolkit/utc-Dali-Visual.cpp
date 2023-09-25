@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -5250,6 +5250,7 @@ int UtcDaliVisualGetVisualProperty03(void)
 
   static std::vector<UniformData> customUniforms =
     {
+      UniformData("pixelArea", Property::Type::VECTOR4),
       UniformData("cornerRadius", Property::Type::VECTOR4),
       UniformData("borderlineWidth", Property::Type::FLOAT),
       UniformData("borderlineColor", Property::Type::VECTOR4),
@@ -5279,6 +5280,7 @@ int UtcDaliVisualGetVisualProperty03(void)
   application.Render();
 
   float   targetOpacity = 0.5f;
+  Vector4 targetPixelArea(0.0f, 1.0f, 2.0f, -0.5f);
   Vector4 targetCornerRadius(20.0f, 20.0f, 0.0f, 0.0f);
   float   targetBorderlineWidth = 10.0f;
   Vector4 targetBorderlineColor(1.0f, 0.0f, 1.0f, 0.5f);
@@ -5286,6 +5288,7 @@ int UtcDaliVisualGetVisualProperty03(void)
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, ImageVisual::Property::PIXEL_AREA), targetPixelArea);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), targetBorderlineWidth);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), targetBorderlineColor);
@@ -5304,6 +5307,10 @@ int UtcDaliVisualGetVisualProperty03(void)
   DALI_TEST_CHECK(colorValue);
   DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(1.0f, 1.0f, 1.0f, targetOpacity), TEST_LOCATION);
 
+  Property::Value* pixelAreaValue = resultMap.Find(ImageVisual::Property::PIXEL_AREA, Property::VECTOR4);
+  DALI_TEST_CHECK(pixelAreaValue);
+  DALI_TEST_EQUALS(pixelAreaValue->Get<Vector4>(), targetPixelArea, TEST_LOCATION);
+
   Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
@@ -5321,10 +5328,14 @@ int UtcDaliVisualGetVisualProperty03(void)
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
   // Test uniform value
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", targetPixelArea), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
+
+  // Test non-animatable index, for coverage.
+  DALI_TEST_EQUALS(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, ImageVisual::Property::URL).propertyIndex, Property::INVALID_INDEX, TEST_LOCATION);
 
   END_TEST;
 }

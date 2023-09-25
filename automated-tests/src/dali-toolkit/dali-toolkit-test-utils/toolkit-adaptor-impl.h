@@ -99,6 +99,7 @@ public:
 private:
 
   Vector<CallbackBase*> mCallbacks;
+  Vector<CallbackBase*> mReturnCallbacks;
   std::vector<Internal::Adaptor::SceneHolder*> mWindows;
   Dali::Adaptor::AdaptorSignalType mResizedSignal;
   Dali::Adaptor::AdaptorSignalType mLanguageChangedSignal;

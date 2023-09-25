@@ -141,7 +141,19 @@ bool NPatchLoader::GetNPatchData(const NPatchData::NPatchDataId id, const NPatch
 
 void NPatchLoader::RequestRemove(NPatchData::NPatchDataId id, TextureUploadObserver* textureObserver)
 {
-  mRemoveQueue.push_back({id, textureObserver});
+  // Remove observer first
+  if(textureObserver)
+  {
+    int32_t cacheIndex = GetCacheIndexFromId(id);
+    if(cacheIndex != INVALID_CACHE_INDEX)
+    {
+      NPatchInfo& info(mCache[cacheIndex]);
+
+      info.mData->RemoveObserver(textureObserver);
+    }
+  }
+
+  mRemoveQueue.push_back({id, nullptr});
 
   if(!mRemoveProcessorRegistered && Adaptor::IsAvailable())
   {

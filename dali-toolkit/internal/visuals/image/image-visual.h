@@ -235,6 +235,11 @@ protected:
    */
   Shader GenerateShader() const override;
 
+  /**
+   * @copydoc Visual::Base::OnGetPropertyObject
+   */
+  Dali::Property OnGetPropertyObject(Dali::Property::Key key) override;
+
 public:
   /**
    * @copydoc AtlasUploadObserver::UploadCompleted
@@ -349,6 +354,7 @@ private:
 
 private:
   Vector4                            mPixelArea;
+  Property::Index                    mPixelAreaIndex;
   WeakHandle<Actor>                  mPlacementActor;
   VisualUrl                          mImageUrl;
   TextureManager::MaskingDataPointer mMaskingData;

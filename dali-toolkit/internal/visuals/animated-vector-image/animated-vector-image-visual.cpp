@@ -32,6 +32,7 @@
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -799,7 +800,7 @@ Shader AnimatedVectorImageVisual::GenerateShader() const
   {
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
-      ImageVisualShaderFeature::FeatureBuilder()
+      ImageVisualShaderFeatureBuilder()
         .EnableRoundedCorner(IsRoundedCornerRequired())
         .EnableBorderline(IsBorderlineRequired()));
   }

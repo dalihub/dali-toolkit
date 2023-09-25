@@ -556,7 +556,7 @@ Control::Impl::Impl(Control& controlImpl)
   mIsKeyboardNavigationSupported(false),
   mIsKeyboardFocusGroup(false),
   mIsEmittingResourceReadySignal(false),
-  mNeedToEmitResourceReady(false),
+  mIdleCallbackRegistered(false),
   mDispatchKeyEvents(true)
 {
   Dali::Accessibility::Accessible::RegisterExternalAccessibleGetter(&ExternalAccessibleGetter);
@@ -964,8 +964,6 @@ void Control::Impl::ResourceReady()
   // Emit signal if all enabled visuals registered by the control are ready or there are no visuals.
   if(IsResourceReady())
   {
-    // Reset the flag
-    mNeedToEmitResourceReady = false;
     EmitResourceReadySignal();
   }
 }
@@ -2132,48 +2130,51 @@ void Control::Impl::EmitResourceReadySignal()
     mIsEmittingResourceReadySignal = true;
 
     // If the signal handler changes visual, it may become ready during this call & therefore this method will
-    // get called again recursively. If so, mNeedToEmitResourceReady is set below, and we act on it after that secondary
+    // get called again recursively. If so, mIdleCallbackRegistered is set below, and we act on it after that secondary
     // invocation has completed by notifying in an Idle callback to prevent further recursion.
     Dali::Toolkit::Control handle(mControlImpl.GetOwner());
     mResourceReadySignal.Emit(handle);
-
-    if(mNeedToEmitResourceReady)
-    {
-      // Add idler to emit the signal again
-      if(!mIdleCallback)
-      {
-        // The callback manager takes the ownership of the callback object.
-        mIdleCallback = MakeCallback(this, &Control::Impl::OnIdleCallback);
-        Adaptor::Get().AddIdle(mIdleCallback, false);
-      }
-    }
 
     mIsEmittingResourceReadySignal = false;
   }
   else
   {
-    mNeedToEmitResourceReady = true;
+    if(!mIdleCallbackRegistered)
+    {
+      mIdleCallbackRegistered = true;
+
+      // Add idler to emit the signal again
+      if(!mIdleCallback)
+      {
+        // The callback manager takes the ownership of the callback object.
+        mIdleCallback = MakeCallback(this, &Control::Impl::OnIdleCallback);
+        Adaptor::Get().AddIdle(mIdleCallback, true);
+      }
+    }
   }
 }
 
-void Control::Impl::OnIdleCallback()
+bool Control::Impl::OnIdleCallback()
 {
-  if(mNeedToEmitResourceReady)
+  // Reset the flag
+  mIdleCallbackRegistered = false;
+
+  // A visual is ready so control may need relayouting if staged
+  if(mControlImpl.Self().GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
-    // Reset the flag
-    mNeedToEmitResourceReady = false;
-
-    // A visual is ready so control may need relayouting if staged
-    if(mControlImpl.Self().GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
-    {
-      mControlImpl.RelayoutRequest();
-    }
-
-    EmitResourceReadySignal();
+    mControlImpl.RelayoutRequest();
   }
 
-  // Set the pointer to null as the callback manager deletes the callback after execute it.
-  mIdleCallback = nullptr;
+  EmitResourceReadySignal();
+
+  if(!mIdleCallbackRegistered)
+  {
+    // Set the pointer to null as the callback manager deletes the callback after execute it.
+    mIdleCallback = nullptr;
+  }
+
+  // Repeat idle if mIdleCallbackRegistered become true one more time.
+  return mIdleCallbackRegistered;
 }
 
 Toolkit::DevelControl::ControlAccessible* Control::Impl::GetAccessibleObject()

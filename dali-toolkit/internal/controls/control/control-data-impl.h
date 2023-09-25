@@ -500,8 +500,10 @@ private:
 
   /**
    * @brief Callbacks called on idle.
+   *
+   * @return True if we need to call this idle callback one more time.
    */
-  void OnIdleCallback();
+  bool OnIdleCallback();
 
   /**
    * @brief Checks highlighted object geometry if it is showing or not
@@ -584,7 +586,7 @@ public:
   bool             mIsKeyboardNavigationSupported : 1;    ///< Stores whether keyboard navigation is supported by the control.
   bool             mIsKeyboardFocusGroup : 1;             ///< Stores whether the control is a focus group.
   bool             mIsEmittingResourceReadySignal : 1;    ///< True during ResourceReady().
-  bool             mNeedToEmitResourceReady : 1;          ///< True if need to emit the resource ready signal again.
+  bool             mIdleCallbackRegistered : 1;           ///< True if need to emit the resource ready signal again.
   bool             mDispatchKeyEvents : 1;                ///< Whether the actor emits key event signals
 
   RegisteredVisualContainer mRemoveVisuals; ///< List of visuals that are being replaced by another visual once ready

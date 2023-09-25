@@ -22,6 +22,6 @@
 
 namespace Dali::Toolkit::Physics::Integration
 {
-Integration::PhysicsWorld GetPhysicsWorld(PhysicsAdaptor adaptorHandle);
+DALI_TOOLKIT_API Integration::PhysicsWorld GetPhysicsWorld(PhysicsAdaptor adaptorHandle);
 
 } // namespace Dali::Toolkit::Physics::Integration

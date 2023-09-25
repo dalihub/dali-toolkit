@@ -36,6 +36,7 @@
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -152,6 +153,7 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
                          Dali::SamplingMode::Type  samplingMode)
 : Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::IMAGE),
   mPixelArea(FULL_TEXTURE_RECT),
+  mPixelAreaIndex(Property::INVALID_INDEX),
   mPlacementActor(),
   mImageUrl(imageUrl),
   mMaskingData(),
@@ -372,6 +374,13 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
     case Toolkit::ImageVisual::Property::PIXEL_AREA:
     {
       value.Get(mPixelArea);
+
+      if(DALI_UNLIKELY(mImpl->mRenderer))
+      {
+        // Unusual case. SetProperty called after OnInitialize().
+        // Assume that DoAction call UPDATE_PROPERTY.
+        mPixelAreaIndex = mImpl->mRenderer.RegisterProperty(mPixelAreaIndex, PIXEL_AREA_UNIFORM_NAME, mPixelArea);
+      }
       break;
     }
 
@@ -864,7 +873,7 @@ void ImageVisual::DoSetOnScene(Actor& actor)
 
   if(mPixelArea != FULL_TEXTURE_RECT)
   {
-    mImpl->mRenderer.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, mPixelArea);
+    mPixelAreaIndex = mImpl->mRenderer.RegisterProperty(mPixelAreaIndex, PIXEL_AREA_UNIFORM_NAME, mPixelArea);
   }
 
   if(mLoadState == TextureManager::LoadState::LOAD_FINISHED)
@@ -924,7 +933,17 @@ void ImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::FITTING_MODE, mFittingMode);
   map.Insert(Toolkit::ImageVisual::Property::SAMPLING_MODE, mSamplingMode);
 
-  map.Insert(Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea);
+  if(mImpl->mRenderer && mPixelAreaIndex != Property::INVALID_INDEX)
+  {
+    // Update values from Renderer
+    Vector4 pixelArea = mImpl->mRenderer.GetProperty<Vector4>(mPixelAreaIndex);
+    map.Insert(Toolkit::ImageVisual::Property::PIXEL_AREA, pixelArea);
+  }
+  else
+  {
+    map.Insert(Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea);
+  }
+
   map.Insert(Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU);
   map.Insert(Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV);
 
@@ -1264,7 +1283,7 @@ Shader ImageVisual::GenerateShader() const
     // Create and cache the standard shader
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
-      ImageVisualShaderFeature::FeatureBuilder()
+      ImageVisualShaderFeatureBuilder()
         .EnableTextureAtlas(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED && !useNativeImage)
         .ApplyDefaultTextureWrapMode(mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE)
         .EnableRoundedCorner(IsRoundedCornerRequired())
@@ -1327,6 +1346,24 @@ Shader ImageVisual::GenerateShader() const
   }
 
   return shader;
+}
+
+Dali::Property ImageVisual::OnGetPropertyObject(Dali::Property::Key key)
+{
+  if((key.type == Property::Key::INDEX && key.indexKey == Toolkit::ImageVisual::Property::PIXEL_AREA) || (key.type == Property::Key::STRING && key.stringKey == PIXEL_AREA_UNIFORM_NAME))
+  {
+    if(DALI_LIKELY(mImpl->mRenderer))
+    {
+      if(mPixelAreaIndex == Property::INVALID_INDEX)
+      {
+        mPixelAreaIndex = mImpl->mRenderer.RegisterProperty(mPixelAreaIndex, PIXEL_AREA_UNIFORM_NAME, mPixelArea);
+      }
+      return Dali::Property(mImpl->mRenderer, mPixelAreaIndex);
+    }
+  }
+
+  Handle handle;
+  return Dali::Property(handle, Property::INVALID_INDEX);
 }
 
 void ImageVisual::CheckMaskTexture()

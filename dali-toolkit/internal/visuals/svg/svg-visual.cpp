@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/svg/svg-task.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -484,7 +485,7 @@ Shader SvgVisual::GenerateShader() const
   {
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
-      ImageVisualShaderFeature::FeatureBuilder()
+      ImageVisualShaderFeatureBuilder()
         .EnableTextureAtlas(mAttemptAtlasing)
         .EnableRoundedCorner(IsRoundedCornerRequired())
         .EnableBorderline(IsBorderlineRequired()));
