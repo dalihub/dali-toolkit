@@ -341,7 +341,6 @@ struct Controller::Impl
     mMaximumNumberOfCharacters(50u),
     mHiddenInput(NULL),
     mInputFilter(nullptr),
-    mLastHeightForWidth(0.0f, 0.0f),
     mRecalculateNaturalSize(true),
     mMarkupProcessorEnabled(false),
     mClipboardHideEnabled(true),
@@ -1025,7 +1024,6 @@ public:
   HiddenText*                  mHiddenInput;                ///< Avoid allocating this when the user does not specify hidden input mode.
   std::unique_ptr<InputFilter> mInputFilter;                ///< Avoid allocating this when the user does not specify input filter mode.
   Vector2                      mTextFitContentSize;         ///< Size of Text fit content
-  Vector2                      mLastHeightForWidth;         ///< Size of Text content from GetHeightForWidth
 
   bool               mRecalculateNaturalSize : 1;         ///< Whether the natural size needs to be recalculated.
   bool               mMarkupProcessorEnabled : 1;         ///< Whether the mark-up procesor is enabled.
