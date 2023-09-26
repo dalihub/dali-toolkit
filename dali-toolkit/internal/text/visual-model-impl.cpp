@@ -340,6 +340,16 @@ const Vector2& VisualModel::GetLayoutSize() const
   return mLayoutSize;
 }
 
+void VisualModel::SetHeightForWidth(const Vector2& size)
+{
+  mHeightForWidth = size;
+}
+
+const Vector2& VisualModel::GetHeightForWidth() const
+{
+  return mHeightForWidth;
+}
+
 void VisualModel::SetTextColor(const Vector4& textColor)
 {
   mTextColor = textColor;
@@ -664,6 +674,7 @@ VisualModel::VisualModel()
   mOutlineWidth(0u),
   mNaturalSize(),
   mLayoutSize(),
+  mHeightForWidth(0.0f, 0.0f),
   mCachedLineIndex(0u),
   mEllipsisPosition(DevelText::EllipsisPosition::END),
   mStartIndexOfElidedGlyphs(0u),
