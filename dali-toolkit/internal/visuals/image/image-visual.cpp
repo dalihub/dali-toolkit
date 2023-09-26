@@ -101,6 +101,35 @@ const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 constexpr uint32_t TEXTURE_COUNT_FOR_GPU_ALPHA_MASK = 2u;
 
+struct NameIndexMatch
+{
+  const char* const name;
+  Property::Index  index;
+};
+
+const NameIndexMatch NAME_INDEX_MATCH_TABLE[] =
+{
+  {IMAGE_FITTING_MODE, Toolkit::ImageVisual::Property::FITTING_MODE},
+  {IMAGE_SAMPLING_MODE, Toolkit::ImageVisual::Property::SAMPLING_MODE},
+  {IMAGE_DESIRED_WIDTH, Toolkit::ImageVisual::Property::DESIRED_WIDTH},
+  {IMAGE_DESIRED_HEIGHT, Toolkit::ImageVisual::Property::DESIRED_HEIGHT},
+  {PIXEL_AREA_UNIFORM_NAME, Toolkit::ImageVisual::Property::PIXEL_AREA},
+  {IMAGE_WRAP_MODE_U, Toolkit::ImageVisual::Property::WRAP_MODE_U},
+  {IMAGE_WRAP_MODE_V, Toolkit::ImageVisual::Property::WRAP_MODE_V},
+  {SYNCHRONOUS_LOADING, Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING},
+  {IMAGE_ATLASING, Toolkit::ImageVisual::Property::ATLASING},
+  {ALPHA_MASK_URL, Toolkit::ImageVisual::Property::ALPHA_MASK_URL},
+  {MASK_CONTENT_SCALE_NAME, Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE},
+  {CROP_TO_MASK_NAME, Toolkit::ImageVisual::Property::CROP_TO_MASK},
+  {MASKING_TYPE_NAME, Toolkit::DevelImageVisual::Property::MASKING_TYPE},
+  {ENABLE_BROKEN_IMAGE, Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE},
+  {LOAD_POLICY_NAME, Toolkit::ImageVisual::Property::LOAD_POLICY},
+  {RELEASE_POLICY_NAME, Toolkit::ImageVisual::Property::RELEASE_POLICY},
+  {ORIENTATION_CORRECTION_NAME, Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION},
+  {FAST_TRACK_UPLOADING_NAME, Toolkit::DevelImageVisual::Property::FAST_TRACK_UPLOADING},
+};
+const int NAME_INDEX_MATCH_TABLE_SIZE = sizeof(NAME_INDEX_MATCH_TABLE)/sizeof(NAME_INDEX_MATCH_TABLE[0]);
+
 Geometry CreateGeometry(VisualFactoryCache& factoryCache, ImageDimensions gridSize)
 {
   Geometry geometry;
@@ -108,8 +137,7 @@ Geometry CreateGeometry(VisualFactoryCache& factoryCache, ImageDimensions gridSi
   if(gridSize == ImageDimensions(1, 1))
   {
     geometry = factoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
-  }
-  else
+  } else
   {
     geometry = VisualFactoryCache::CreateGridGeometry(gridSize);
   }
@@ -220,77 +248,13 @@ void ImageVisual::DoSetProperties(const Property::Map& propertyMap)
     }
     else
     {
-      if(keyValue.first == IMAGE_FITTING_MODE)
+      for(int i = 0; i < NAME_INDEX_MATCH_TABLE_SIZE; ++i)
       {
-        DoSetProperty(Toolkit::ImageVisual::Property::FITTING_MODE, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_SAMPLING_MODE)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::SAMPLING_MODE, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_DESIRED_WIDTH)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_WIDTH, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_DESIRED_HEIGHT)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second);
-      }
-      else if(keyValue.first == PIXEL_AREA_UNIFORM_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::PIXEL_AREA, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_WRAP_MODE_U)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::WRAP_MODE_U, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_WRAP_MODE_V)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::WRAP_MODE_V, keyValue.second);
-      }
-      else if(keyValue.first == SYNCHRONOUS_LOADING)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_ATLASING)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::ATLASING, keyValue.second);
-      }
-      else if(keyValue.first == ALPHA_MASK_URL)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, keyValue.second);
-      }
-      else if(keyValue.first == MASK_CONTENT_SCALE_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, keyValue.second);
-      }
-      else if(keyValue.first == CROP_TO_MASK_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::CROP_TO_MASK, keyValue.second);
-      }
-      else if(keyValue.first == MASKING_TYPE_NAME)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::MASKING_TYPE, keyValue.second);
-      }
-      else if(keyValue.first == ENABLE_BROKEN_IMAGE)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE, keyValue.second);
-      }
-      else if(keyValue.first == LOAD_POLICY_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::LOAD_POLICY, keyValue.second);
-      }
-      else if(keyValue.first == RELEASE_POLICY_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::RELEASE_POLICY, keyValue.second);
-      }
-      else if(keyValue.first == ORIENTATION_CORRECTION_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION, keyValue.second);
-      }
-      else if(keyValue.first == FAST_TRACK_UPLOADING_NAME)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::FAST_TRACK_UPLOADING, keyValue.second);
+        if(keyValue.first == NAME_INDEX_MATCH_TABLE[i].name)
+        {
+          DoSetProperty(NAME_INDEX_MATCH_TABLE[i].index, keyValue.second);
+          break;
+        }
       }
     }
   }
@@ -453,7 +417,7 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
         }
         else
         {
-          mMaskingData->mPreappliedMasking = Toolkit::DevelImageVisual::MaskingType::Type(maskingType) == Toolkit::DevelImageVisual::MaskingType::MASKING_ON_LOADING ? true : false;
+          mMaskingData->mPreappliedMasking = (Toolkit::DevelImageVisual::MaskingType::Type(maskingType) == Toolkit::DevelImageVisual::MaskingType::MASKING_ON_LOADING);
         }
       }
       break;
@@ -461,11 +425,7 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
 
     case Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE:
     {
-      bool enableBrokenImage(mEnableBrokenImage);
-      if(value.Get(enableBrokenImage))
-      {
-        mEnableBrokenImage = enableBrokenImage;
-      }
+      value.Get(mEnableBrokenImage);
       break;
     }
 
@@ -486,21 +446,13 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
     }
     case Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION:
     {
-      bool orientationCorrection(mOrientationCorrection);
-      if(value.Get(orientationCorrection))
-      {
-        mOrientationCorrection = orientationCorrection;
-      }
+      value.Get(mOrientationCorrection);
       break;
     }
 
     case Toolkit::DevelImageVisual::Property::FAST_TRACK_UPLOADING:
     {
-      bool fastTrackUploading = false;
-      if(value.Get(fastTrackUploading))
-      {
-        mUseFastTrackUploading = fastTrackUploading;
-      }
+      value.Get(mUseFastTrackUploading);
       break;
     }
   }

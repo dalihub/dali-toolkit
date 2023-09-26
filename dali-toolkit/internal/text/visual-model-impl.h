@@ -218,6 +218,20 @@ public:
   const Vector2& GetLayoutSize() const;
 
   /**
+   * @brief Sets the size of height for width.
+   *
+   * @param[in] size The text's height for width size.
+   */
+  void SetHeightForWidth(const Vector2& size);
+
+  /**
+   * @brief Retrieves the height for width size.
+   *
+   * @return The text's height for width size.
+   */
+  const Vector2& GetHeightForWidth() const;
+
+  /**
    * @brief Set the text's color
    *
    * @param[in] textColor The text's color
@@ -670,8 +684,9 @@ public:
   Vector<CharacterSpacingGlyphRun> mCharacterSpacingRuns;   ///< Runs of glyphs that have character-spacing.
 
 private:
-  Size mNaturalSize; ///< Size of the text with no line wrapping.
-  Size mLayoutSize;  ///< Size of the laid-out text considering the layout properties set.
+  Size mNaturalSize;    ///< Size of the text with no line wrapping.
+  Size mLayoutSize;     ///< Size of the laid-out text considering the layout properties set.
+  Size mHeightForWidth; ///< Size of the text last calculated using GetHeightForWidth.
 
   // Caches to increase performance in some consecutive operations.
   LineIndex mCachedLineIndex; ///< Used to increase performance in consecutive calls to GetLineOfGlyph() or GetLineOfCharacter() with consecutive glyphs or characters.

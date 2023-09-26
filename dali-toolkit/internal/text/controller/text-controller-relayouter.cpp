@@ -349,9 +349,10 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
   VisualModelPtr&   visualModel    = model->mVisualModel;
   TextUpdateInfo&   textUpdateInfo = impl.mTextUpdateInfo;
 
-  Size layoutSize;
+  // Get cached value.
+  Size layoutSize = visualModel->GetHeightForWidth();
 
-  if(fabsf(width - visualModel->mControlSize.width) > Math::MACHINE_EPSILON_1000 ||
+  if(fabsf(width - layoutSize.width) > Math::MACHINE_EPSILON_1000 ||
      textUpdateInfo.mFullRelayoutNeeded ||
      textUpdateInfo.mClearAll)
   {
@@ -361,11 +362,15 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
 
     layoutSize = CalculateLayoutSizeOnRequiredControllerSize(controller, sizeRequestedWidthAndMaxHeight, requestedOperationsMask);
 
+    // The calculated layout width may not be the same as the requested width.
+    // For cache efficiency, the requested width is stored.
+    layoutSize.width = width;
+    visualModel->SetHeightForWidth(layoutSize);
+
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth calculated %f\n", layoutSize.height);
   }
   else
   {
-    layoutSize = visualModel->GetLayoutSize();
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth cached %f\n", layoutSize.height);
   }
 

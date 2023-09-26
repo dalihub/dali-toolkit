@@ -127,12 +127,12 @@ int32_t NPatchLoader::GetCacheIndexFromId(const NPatchData::NPatchDataId id)
   return INVALID_CACHE_INDEX;
 }
 
-bool NPatchLoader::GetNPatchData(const NPatchData::NPatchDataId id, const NPatchData*& data)
+bool NPatchLoader::GetNPatchData(const NPatchData::NPatchDataId id, std::shared_ptr<const NPatchData>& data)
 {
   int32_t cacheIndex = GetCacheIndexFromId(id);
   if(cacheIndex != INVALID_CACHE_INDEX)
   {
-    data = mCache[cacheIndex].mData.get();
+    data = mCache[cacheIndex].mData;
     return true;
   }
   data = nullptr;
