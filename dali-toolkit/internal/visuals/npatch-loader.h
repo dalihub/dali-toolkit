@@ -79,7 +79,7 @@ public:
    * @param [out] data const pointer to the NPatchData
    * @return true if data matching to id was really found
    */
-  bool GetNPatchData(const NPatchData::NPatchDataId id, const NPatchData*& data);
+  bool GetNPatchData(const NPatchData::NPatchDataId id, std::shared_ptr<const NPatchData>& data);
 
   /**
    * @brief Request remove a texture matching id.
