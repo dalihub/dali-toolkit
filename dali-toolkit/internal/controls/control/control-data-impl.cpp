@@ -586,15 +586,11 @@ Control::Impl::~Impl()
 
 Control::Impl& Control::Impl::Get(Internal::Control& internalControl)
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreInstalled() && "Core is not installed. Might call this API from worker thread?");
-
   return *internalControl.mImpl;
 }
 
 const Control::Impl& Control::Impl::Get(const Internal::Control& internalControl)
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreInstalled() && "Core is not installed. Might call this API from worker thread?");
-
   return *internalControl.mImpl;
 }
 
@@ -719,8 +715,6 @@ void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base&
 
 void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex)
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreInstalled() && "Core is not installed. Might call this API from worker thread?");
-
   DALI_LOG_INFO(gLogFilter, Debug::Concise, "RegisterVisual:%d \n", index);
 
   bool  visualReplaced(false);
@@ -854,8 +848,6 @@ void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base&
 
 void Control::Impl::UnregisterVisual(Property::Index index)
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreInstalled() && "Core is not installed. Might call this API from worker thread?");
-
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(index, mVisuals, iter))
   {
@@ -969,8 +961,6 @@ void Control::Impl::StartObservingVisual(Toolkit::Visual::Base& visual)
 
 void Control::Impl::ResourceReady()
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreInstalled() && "Core is not installed. Might call this API from worker thread?");
-
   // Emit signal if all enabled visuals registered by the control are ready or there are no visuals.
   if(IsResourceReady())
   {
@@ -1187,8 +1177,6 @@ void Control::Impl::AppendAccessibilityAttribute(const std::string& key, const s
 
 void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreInstalled() && "Core is not installed. Might call this API from worker thread?");
-
   Toolkit::Control control = Toolkit::Control::DownCast(BaseHandle(object));
 
   if(control)
@@ -1489,8 +1477,6 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
 
 Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index index)
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreInstalled() && "Core is not installed. Might call this API from worker thread?");
-
   Property::Value value;
 
   Toolkit::Control control = Toolkit::Control::DownCast(BaseHandle(object));
@@ -1862,8 +1848,6 @@ void Control::Impl::RecreateChangedVisuals(Dictionary<Property::Map>& stateVisua
 
 void Control::Impl::ReplaceStateVisualsAndProperties(const StylePtr oldState, const StylePtr newState, const std::string& subState)
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreInstalled() && "Core is not installed. Might call this API from worker thread?");
-
   // Collect all old visual names
   DictionaryKeys stateVisualsToRemove;
   if(oldState)
