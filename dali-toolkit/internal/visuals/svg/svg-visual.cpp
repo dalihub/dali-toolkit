@@ -337,6 +337,11 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
 
 void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
 {
+  if(DALI_UNLIKELY(mImpl == nullptr))
+  {
+    DALI_LOG_ERROR("Fatal error!! already destroyed object callback called! SvgVisual : %p, url : %s, task : %p\n", this, mImageUrl.GetUrl().c_str(), task.Get());
+    return;
+  }
   if(task->HasSucceeded())
   {
     PixelData rasterizedPixelData = task->GetPixelData();
