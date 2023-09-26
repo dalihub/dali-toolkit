@@ -1089,11 +1089,6 @@ void ImageVisual::FastLoadComplete(FastTrackLoadingTaskPtr task)
 void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureInformation)
 {
   Toolkit::Visual::ResourceStatus resourceStatus;
-  if(DALI_UNLIKELY(mImpl == nullptr))
-  {
-    DALI_LOG_ERROR("Fatal error!! already destroyed object callback called! ImageVisual : %p, url : %s\n", this, mImageUrl.GetUrl().c_str());
-    return;
-  }
   if(mImpl->mRenderer)
   {
     if(textureInformation.useAtlasing)
