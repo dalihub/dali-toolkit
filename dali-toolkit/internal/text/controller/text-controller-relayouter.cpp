@@ -345,13 +345,11 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
   EventHandler::ProcessModifyEvents(controller);
 
   Controller::Impl& impl           = *controller.mImpl;
-  ModelPtr&         model          = impl.mModel;
-  VisualModelPtr&   visualModel    = model->mVisualModel;
   TextUpdateInfo&   textUpdateInfo = impl.mTextUpdateInfo;
 
   Size layoutSize;
 
-  if(fabsf(width - visualModel->mControlSize.width) > Math::MACHINE_EPSILON_1000 ||
+  if(fabsf(width - impl.mLastHeightForWidth.width) > Math::MACHINE_EPSILON_1000 ||
      textUpdateInfo.mFullRelayoutNeeded ||
      textUpdateInfo.mClearAll)
   {
@@ -360,12 +358,14 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
     Size           sizeRequestedWidthAndMaxHeight = Size(width, MAX_FLOAT);
 
     layoutSize = CalculateLayoutSizeOnRequiredControllerSize(controller, sizeRequestedWidthAndMaxHeight, requestedOperationsMask);
+    impl.mLastHeightForWidth.width  = width;
+    impl.mLastHeightForWidth.height = layoutSize.height;
 
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth calculated %f\n", layoutSize.height);
   }
   else
   {
-    layoutSize = visualModel->GetLayoutSize();
+    layoutSize = impl.mLastHeightForWidth;
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth cached %f\n", layoutSize.height);
   }
 
