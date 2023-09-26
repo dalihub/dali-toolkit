@@ -378,6 +378,20 @@ bool VisualFactory::GetPreMultiplyOnLoad() const
   return mPreMultiplyOnLoad;
 }
 
+void VisualFactory::UsePreCompiledShader()
+{
+  if(mPrecompiledShaderRequested)
+  {
+    return;
+  }
+  mPrecompiledShaderRequested = true;
+
+  RawShaderData rawShaderData;
+  Integration::ShaderPrecompiler::Get().Enable();
+  GetImageVisualShaderFactory().GetPrecompiledShader(rawShaderData);
+  Integration::ShaderPrecompiler::Get().SavePrecomipleShaderList(rawShaderData);
+}
+
 Internal::TextureManager& VisualFactory::GetTextureManager()
 {
   return GetFactoryCache().GetTextureManager();
@@ -416,6 +430,9 @@ Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
     }
     SetBrokenImageUrl(styleManager);
   }
+
+  //UsePreCompiledShader(); // Call forcelly
+
   return *mFactoryCache;
 }
 

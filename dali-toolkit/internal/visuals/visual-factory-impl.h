@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
+#include <dali/integration-api/shader-precompiler.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
@@ -85,6 +86,11 @@ public:
   bool GetPreMultiplyOnLoad() const;
 
   /**
+   * @copydoc Toolkit::VisualFactory::UsePreCompiledShader()
+   */
+  void UsePreCompiledShader();
+
+  /**
    * @return the reference to texture manager
    */
   Internal::TextureManager& GetTextureManager();
@@ -128,6 +134,7 @@ private:
   SlotDelegate<VisualFactory>               mSlotDelegate;
   bool                                      mDebugEnabled : 1;
   bool                                      mPreMultiplyOnLoad : 1; ///< Local store for this flag
+  bool                                      mPrecompiledShaderRequested{false};
 };
 
 /**
