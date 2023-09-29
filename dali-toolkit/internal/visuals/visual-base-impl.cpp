@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,6 +116,43 @@ static bool IsTypeAvailableForBorderline(Toolkit::Visual::Type type)
   }
 }
 
+struct StringProperty
+{
+  const char* const name;
+  Property::Index index;
+};
+StringProperty PROPERTY_NAME_INDEX_TABLE[]=
+{
+  {CUSTOM_SHADER, Toolkit::Visual::Property::SHADER},
+  {TRANSFORM, Toolkit::Visual::Property::TRANSFORM},
+  {PREMULTIPLIED_ALPHA, Toolkit::Visual::Property::PREMULTIPLIED_ALPHA},
+  {MIX_COLOR, Toolkit::Visual::Property::MIX_COLOR},
+  {OPACITY, Toolkit::Visual::Property::OPACITY},
+  {VISUAL_FITTING_MODE, Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE},
+  {BORDERLINE_WIDTH, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH},
+  {BORDERLINE_COLOR, Toolkit::DevelVisual::Property::BORDERLINE_COLOR},
+  {BORDERLINE_OFFSET, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET},
+  {CORNER_RADIUS, Toolkit::DevelVisual::Property::CORNER_RADIUS},
+  {CORNER_RADIUS_POLICY, Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY},
+};
+const uint16_t PROPERTY_NAME_INDEX_TABLE_COUNT = sizeof(PROPERTY_NAME_INDEX_TABLE) / sizeof(PROPERTY_NAME_INDEX_TABLE[0]);
+
+Property::Index GetVisualPropertyIndex(Property::Key key)
+{
+  if(key.type == Property::Key::STRING)
+  {
+    for(auto tableId = 0u; tableId < PROPERTY_NAME_INDEX_TABLE_COUNT; ++tableId)
+    {
+      if(key == PROPERTY_NAME_INDEX_TABLE[tableId].name)
+      {
+        return PROPERTY_NAME_INDEX_TABLE[tableId].index;
+        break;
+      }
+    }
+  }
+  return key.indexKey;
+}
+
 } // namespace
 
 Visual::Base::Base(VisualFactoryCache& factoryCache, FittingMode fittingMode, Toolkit::Visual::Type type)
@@ -174,56 +211,7 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
     const Property::Key&   key   = pair.first;
     const Property::Value& value = pair.second;
 
-    Property::Key matchKey = key;
-    if(matchKey.type == Property::Key::STRING)
-    {
-      if(matchKey == CUSTOM_SHADER)
-      {
-        matchKey = Property::Key(Toolkit::Visual::Property::SHADER);
-      }
-      else if(matchKey == TRANSFORM)
-      {
-        matchKey = Property::Key(Toolkit::Visual::Property::TRANSFORM);
-      }
-      else if(matchKey == PREMULTIPLIED_ALPHA)
-      {
-        matchKey = Property::Key(Toolkit::Visual::Property::PREMULTIPLIED_ALPHA);
-      }
-      else if(matchKey == MIX_COLOR)
-      {
-        matchKey = Property::Key(Toolkit::Visual::Property::MIX_COLOR);
-      }
-      else if(matchKey == OPACITY)
-      {
-        matchKey = Property::Key(Toolkit::Visual::Property::OPACITY);
-      }
-      else if(matchKey == VISUAL_FITTING_MODE)
-      {
-        matchKey = Property::Key(Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE);
-      }
-      else if(matchKey == BORDERLINE_WIDTH)
-      {
-        matchKey = Property::Key(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH);
-      }
-      else if(matchKey == BORDERLINE_COLOR)
-      {
-        matchKey = Property::Key(Toolkit::DevelVisual::Property::BORDERLINE_COLOR);
-      }
-      else if(matchKey == BORDERLINE_OFFSET)
-      {
-        matchKey = Property::Key(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET);
-      }
-      else if(matchKey == CORNER_RADIUS)
-      {
-        matchKey = Property::Key(Toolkit::DevelVisual::Property::CORNER_RADIUS);
-      }
-      else if(matchKey == CORNER_RADIUS_POLICY)
-      {
-        matchKey = Property::Key(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY);
-      }
-    }
-
-    switch(matchKey.indexKey)
+    switch(GetVisualPropertyIndex(key))
     {
       case Toolkit::Visual::Property::SHADER:
       {
@@ -291,12 +279,9 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
       case Toolkit::DevelVisual::Property::BORDERLINE_WIDTH:
       {
         float width;
-        if(value.Get(width))
+        if(value.Get(width) && (mImpl->mDecorationData != nullptr || !Dali::EqualsZero(width)))
         {
-          if(mImpl->mDecorationData != nullptr || !Dali::EqualsZero(width))
-          {
-            mImpl->SetBorderlineWidth(width);
-          }
+          mImpl->SetBorderlineWidth(width);
         }
 
         if(DALI_UNLIKELY(mImpl->mRenderer && IsTypeAvailableForBorderline(mImpl->mType)))
@@ -331,12 +316,9 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
       case Toolkit::DevelVisual::Property::BORDERLINE_COLOR:
       {
         Vector4 color;
-        if(value.Get(color))
+        if(value.Get(color) && (mImpl->mDecorationData != nullptr || color != Vector4::ZERO))
         {
-          if(mImpl->mDecorationData != nullptr || color != Vector4::ZERO)
-          {
-            mImpl->SetBorderlineColor(color);
-          }
+          mImpl->SetBorderlineColor(color);
         }
 
         if(DALI_UNLIKELY(mImpl->mRenderer && IsTypeAvailableForBorderline(mImpl->mType)))
@@ -350,12 +332,9 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
       case Toolkit::DevelVisual::Property::BORDERLINE_OFFSET:
       {
         float offset;
-        if(value.Get(offset))
+        if(value.Get(offset) && (mImpl->mDecorationData != nullptr || !Dali::EqualsZero(offset)))
         {
-          if(mImpl->mDecorationData != nullptr || !Dali::EqualsZero(offset))
-          {
-            mImpl->SetBorderlineOffset(offset);
-          }
+          mImpl->SetBorderlineOffset(offset);
         }
 
         if(DALI_UNLIKELY(mImpl->mRenderer && IsTypeAvailableForBorderline(mImpl->mType)))
@@ -374,12 +353,9 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           // Each values mean the radius of
           // (top-left, top-right, bottom-right, bottom-left)
           Vector4 radius;
-          if(value.Get(radius))
+          if(value.Get(radius) && (mImpl->mDecorationData != nullptr || radius != Vector4::ZERO))
           {
-            if(mImpl->mDecorationData != nullptr || radius != Vector4::ZERO)
-            {
-              mImpl->SetCornerRadius(radius);
-            }
+            mImpl->SetCornerRadius(radius);
           }
         }
         else
@@ -387,12 +363,9 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           // If CORNER_RADIUS Property is float,
           // Every corner radius have same value
           float radius;
-          if(value.Get(radius))
+          if(value.Get(radius) && (mImpl->mDecorationData != nullptr || !Dali::EqualsZero(radius)))
           {
-            if(mImpl->mDecorationData != nullptr || !Dali::EqualsZero(radius))
-            {
-              mImpl->SetCornerRadius(Vector4(radius, radius, radius, radius));
-            }
+            mImpl->SetCornerRadius(Vector4(radius, radius, radius, radius));
           }
         }
 
