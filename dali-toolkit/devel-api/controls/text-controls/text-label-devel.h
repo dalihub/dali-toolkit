@@ -205,6 +205,33 @@ enum Type
 
 } // namespace Property
 
+struct FitOption
+{
+  FitOption(float pointSize = 0.0f, float minLineSize = 0.0f)
+  : mPointSize(pointSize), mMinLineSize(minLineSize) {}
+
+  float GetPointSize() const
+  {
+    return mPointSize;
+  }
+  float GetMinLineSize() const
+  {
+    return mMinLineSize;
+  }
+  void SetPointSize(float pointSize)
+  {
+    mPointSize = pointSize;
+  }
+  void SetMinLineSize(float minLineSize)
+  {
+    mMinLineSize = minLineSize;
+  }
+
+private:
+  float mPointSize   = 0.0f;
+  float mMinLineSize = 0.0f;
+};
+
 /**
  * @brief Get the rendered size of a specific text range.
  * if the requested text is at multilines, multiple sizes will be returned for each text located in a separate line.
@@ -238,6 +265,30 @@ DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextLabel textLabel, const uint
  * @return bounding box of the requested text.
  */
 DALI_TOOLKIT_API Rect<> GetTextBoundingRectangle(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex);
+
+/**
+ * @brief Set text fit array to text label.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] enable Whether the text fit array is enabled or not.
+ * @param[in] fitOptions list of the fit options.
+ */
+DALI_TOOLKIT_API void SetTextFitArray(TextLabel textLabel, const bool enable, std::vector<FitOption>& fitOptions);
+
+/**
+ * @brief Get the text fit array of text label.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @return list of the fit options.
+ */
+DALI_TOOLKIT_API std::vector<FitOption>& GetTextFitArray(TextLabel textLabel);
+
+/**
+ * @brief Whether the text fit array is enabled or not.
+ *
+ * @return True if the text fit array is enabled.
+ */
+DALI_TOOLKIT_API bool IsTextFitArrayEnabled(TextLabel textLabel);
 
 /**
  * @brief Anchor clicked signal type.
