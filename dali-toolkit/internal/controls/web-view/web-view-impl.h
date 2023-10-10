@@ -443,6 +443,11 @@ private: // From Control
   DevelControl::ControlAccessible* CreateAccessibleObject() override;
 
   /**
+   * @copydoc Toolkit::Internal::Control::OnRelayout()
+   */
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
+
+  /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
   Vector3 GetNaturalSize() override;
@@ -678,6 +683,14 @@ private:
    */
   void OnScreenshotCaptured(Dali::PixelData pixel);
 
+  /**
+   * @brief Set DisplayArea by input value.
+   * It will send changes area infomations to webengine internally.
+   *
+   * @param[in] displayArea The display area for current webview want to show.
+   */
+  void SetDisplayArea(const Dali::Rect<int32_t>& displayArea);
+
 protected:
   class WebViewAccessible : public DevelControl::ControlAccessible
   {
@@ -711,6 +724,9 @@ private:
   Dali::Size                  mWebViewSize;
   Dali::WebEngine             mWebEngine;
 
+  uint32_t mLastRenderedNativeImageWidth;
+  uint32_t mLastRenderedNativeImageHeight;
+
   std::unique_ptr<Dali::Toolkit::WebSettings>        mWebSettings;
   std::unique_ptr<Dali::Toolkit::WebBackForwardList> mWebBackForwardList;
 
@@ -721,6 +737,8 @@ private:
   bool                       mVideoHoleEnabled;
   bool                       mMouseEventsEnabled;
   bool                       mKeyEventsEnabled;
+
+  bool mVisualChangeRequired;
 
   Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback mScreenshotCapturedCallback;
   Dali::WebEnginePlugin::WebEngineFrameRenderedCallback     mFrameRenderedCallback;

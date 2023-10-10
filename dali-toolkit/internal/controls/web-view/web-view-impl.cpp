@@ -16,10 +16,9 @@
  */
 
 // CLASS HEADER
-#include "web-view-impl.h"
+#include <dali-toolkit/internal/controls/web-view/web-view-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cstring>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-back-forward-list.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-certificate.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-console-message.h>
@@ -44,9 +43,11 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
+#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 #include <functional>
@@ -95,6 +96,57 @@ std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>>& 
   static std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>> pluginWebViewMap;
   return pluginWebViewMap;
 }
+
+enum class DisplayAreaCalculateOption
+{
+  PROPERTY         = 0, ///< Calculate display update area by property
+  CURRENT_PROPERTY = 1, ///< Calculate display update area by current property
+};
+
+/**
+ * @brief Helper function to calculate exact display area, offset and size.
+ * It will be useful when view size is not integer value, or view size is not matched with texture size.
+ *
+ * @param[in] self The view itself.
+ * @param[in] option Option of this calculation. Let we decide what kind of property will be used.
+ * @return DisplayArea for this view.
+ */
+Rect<int32_t> CalculateDisplayArea(Dali::Actor self, DisplayAreaCalculateOption option)
+{
+  bool    positionUsesAnchorPoint = self.GetProperty<bool>(Actor::Property::POSITION_USES_ANCHOR_POINT);
+  Vector3 actorSize               = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::SCALE)
+                                                                                             : self.GetProperty<Vector3>(Actor::Property::SIZE) * self.GetProperty<Vector3>(Actor::Property::SCALE);
+  Vector3 anchorPointOffSet       = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
+  Vector2 screenPosition          = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION)
+                                                                                             : Dali::DevelActor::CalculateScreenPosition(self);
+
+  Dali::Rect<int32_t> displayArea;
+  displayArea.x      = screenPosition.x - anchorPointOffSet.x;
+  displayArea.y      = screenPosition.y - anchorPointOffSet.y;
+  displayArea.width  = actorSize.x;
+  displayArea.height = actorSize.y;
+
+  return displayArea;
+}
+
+constexpr Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
+
+/**
+ * @brief Helper function to calculate exact pixel area value by view and texture size.
+ * It will be useful when view size is not integer value, or view size is not matched with texture size.
+ *
+ * @param[in] viewSize The size of view.
+ * @param[in] textureWidth The width of texture, that must be integer type.
+ * @param[in] textureHeight The height of texture, that must be integer type.
+ * @return PixelArea value that image visual can use.
+ */
+Vector4 CalculatePixelArea(const Size& viewSize, const uint32_t textureWidth, const uint32_t textureHeight)
+{
+  float widthRatio  = textureWidth == 0u ? 1.0f : viewSize.width / static_cast<float>(textureWidth);
+  float heightRatio = textureHeight == 0u ? 1.0f : viewSize.height / static_cast<float>(textureHeight);
+  return Vector4(0.0f, 0.0f, widthRatio, heightRatio);
+}
+
 } // namespace
 
 WebView::WebView(const std::string& locale, const std::string& timezoneId)
@@ -102,10 +154,13 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
   mWebEngine(),
+  mLastRenderedNativeImageWidth(0u),
+  mLastRenderedNativeImageHeight(0u),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
   mVideoHoleEnabled(false),
   mMouseEventsEnabled(true),
   mKeyEventsEnabled(true),
+  mVisualChangeRequired(false),
   mScreenshotCapturedCallback{nullptr},
   mFrameRenderedCallback{nullptr}
 {
@@ -123,10 +178,13 @@ WebView::WebView(uint32_t argc, char** argv)
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
   mWebEngine(),
+  mLastRenderedNativeImageWidth(0u),
+  mLastRenderedNativeImageHeight(0u),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
   mVideoHoleEnabled(false),
   mMouseEventsEnabled(true),
   mKeyEventsEnabled(true),
+  mVisualChangeRequired(false),
   mScreenshotCapturedCallback{nullptr},
   mFrameRenderedCallback{nullptr}
 {
@@ -149,7 +207,7 @@ WebView::~WebView()
   if(mWebEngine)
   {
     auto iter = GetPluginWebViewTable().find(mWebEngine.GetPlugin());
-    if (iter != GetPluginWebViewTable().end())
+    if(iter != GetPluginWebViewTable().end())
     {
       GetPluginWebViewTable().erase(iter);
     }
@@ -161,7 +219,7 @@ Toolkit::WebView WebView::New()
 {
   WebView*         impl   = new WebView();
   Toolkit::WebView handle = Toolkit::WebView(*impl);
-  if (impl->GetPlugin())
+  if(impl->GetPlugin())
   {
     GetPluginWebViewTable()[impl->GetPlugin()] = handle;
   }
@@ -173,7 +231,7 @@ Toolkit::WebView WebView::New(const std::string& locale, const std::string& time
 {
   WebView*         impl   = new WebView(locale, timezoneId);
   Toolkit::WebView handle = Toolkit::WebView(*impl);
-  if (impl->GetPlugin())
+  if(impl->GetPlugin())
   {
     GetPluginWebViewTable()[impl->GetPlugin()] = handle;
   }
@@ -185,7 +243,7 @@ Toolkit::WebView WebView::New(uint32_t argc, char** argv)
 {
   WebView*         impl   = new WebView(argc, argv);
   Toolkit::WebView handle = Toolkit::WebView(*impl);
-  if (impl->GetPlugin())
+  if(impl->GetPlugin())
   {
     GetPluginWebViewTable()[impl->GetPlugin()] = handle;
   }
@@ -196,7 +254,7 @@ Toolkit::WebView WebView::New(uint32_t argc, char** argv)
 Toolkit::WebView WebView::FindWebView(Dali::WebEnginePlugin* plugin)
 {
   auto iter = GetPluginWebViewTable().find(plugin);
-  if (iter != GetPluginWebViewTable().end())
+  if(iter != GetPluginWebViewTable().end())
   {
     return iter->second.GetHandle();
   }
@@ -244,6 +302,18 @@ void WebView::OnInitialize()
 DevelControl::ControlAccessible* WebView::CreateAccessibleObject()
 {
   return new WebViewAccessible(Self(), mWebEngine);
+}
+
+void WebView::OnRelayout(const Vector2& size, RelayoutContainer& container)
+{
+  if(!mWebEngine)
+  {
+    return;
+  }
+
+  auto displayArea = CalculateDisplayArea(Self(), DisplayAreaCalculateOption::PROPERTY);
+
+  SetDisplayArea(displayArea);
 }
 
 Dali::Toolkit::WebSettings* WebView::GetSettings() const
@@ -772,48 +842,44 @@ void WebView::OnFrameRendered()
     mFrameRenderedCallback();
   }
 
-  // Make sure that mVisual is created only once.
-  if (mVisual)
-    return;
-
-  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(mWebEngine.GetNativeImageSource());
-  mVisual                                = Toolkit::VisualFactory::Get().CreateVisual({{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE}, {Toolkit::ImageVisual::Property::URL, nativeImageUrl.GetUrl()}});
-  if(mVisual)
+  // Make sure that mVisual is created only if required.
+  if(mVisualChangeRequired || !mVisual)
   {
-    DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
-    EnableBlendMode(!mVideoHoleEnabled);
+    // Reset flag
+    mVisualChangeRequired = false;
+
+    auto nativeImageSourcePtr = mWebEngine.GetNativeImageSource();
+
+    mLastRenderedNativeImageWidth  = nativeImageSourcePtr->GetWidth();
+    mLastRenderedNativeImageHeight = nativeImageSourcePtr->GetHeight();
+
+    Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImageSourcePtr);
+
+    mVisual = Toolkit::VisualFactory::Get().CreateVisual(
+      {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
+       {Toolkit::ImageVisual::Property::URL, nativeImageUrl.GetUrl()},
+       {Toolkit::ImageVisual::Property::PIXEL_AREA, FULL_TEXTURE_RECT},
+       {Toolkit::ImageVisual::Property::WRAP_MODE_U, Dali::WrapMode::CLAMP_TO_EDGE},
+       {Toolkit::ImageVisual::Property::WRAP_MODE_V, Dali::WrapMode::CLAMP_TO_EDGE}});
+
+    if(mVisual)
+    {
+      DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
+      EnableBlendMode(!mVideoHoleEnabled);
+    }
   }
 }
 
 void WebView::OnDisplayAreaUpdated(Dali::PropertyNotification& /*source*/)
 {
   if(!mWebEngine)
+  {
     return;
-
-  Actor self(Self());
-
-  bool    positionUsesAnchorPoint = self.GetProperty<bool>(Actor::Property::POSITION_USES_ANCHOR_POINT);
-  Vector3 actorSize               = self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::SCALE);
-  Vector3 anchorPointOffSet       = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
-  Vector2 screenPosition          = self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION);
-
-  Dali::Rect<int32_t> displayArea;
-  displayArea.x      = screenPosition.x - anchorPointOffSet.x;
-  displayArea.y      = screenPosition.y - anchorPointOffSet.y;
-  displayArea.width  = actorSize.x;
-  displayArea.height = actorSize.y;
-
-  Size displaySize = Size(displayArea.width, displayArea.height);
-  if(mWebViewSize != displaySize)
-  {
-    mWebViewSize = displaySize;
   }
 
-  if(mWebViewArea != displayArea)
-  {
-    mWebViewArea = displayArea;
-    mWebEngine.UpdateDisplayArea(mWebViewArea);
-  }
+  auto displayArea = CalculateDisplayArea(Self(), DisplayAreaCalculateOption::CURRENT_PROPERTY);
+
+  SetDisplayArea(displayArea);
 }
 
 void WebView::OnVisibilityChanged(Actor actor, bool isVisible, Dali::DevelActor::VisibilityChange::Type type)
@@ -830,6 +896,31 @@ void WebView::OnScreenshotCaptured(Dali::PixelData pixel)
   {
     Dali::Toolkit::ImageView imageView = CreateImageView(pixel);
     mScreenshotCapturedCallback(imageView);
+  }
+}
+
+void WebView::SetDisplayArea(const Dali::Rect<int32_t>& displayArea)
+{
+  Size displaySize = Size(displayArea.width, displayArea.height);
+  if(mWebViewSize != displaySize)
+  {
+    mWebViewSize = displaySize;
+  }
+
+  if(mWebViewArea != displayArea)
+  {
+    // WebEngine visual size changed. we have to re-create visual.
+    mVisualChangeRequired = true;
+
+    // Change old visual's pixel area matched as changed web view size
+    if(mVisual)
+    {
+      auto pixelArea = CalculatePixelArea(mWebViewSize, mLastRenderedNativeImageWidth, mLastRenderedNativeImageHeight);
+      Toolkit::GetImplementation(mVisual).DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, {{Toolkit::ImageVisual::Property::PIXEL_AREA, pixelArea}});
+    }
+
+    mWebViewArea = displayArea;
+    mWebEngine.UpdateDisplayArea(mWebViewArea);
   }
 }
 
@@ -1258,7 +1349,9 @@ bool WebView::SetVisibility(bool visible)
 }
 
 WebView::WebViewAccessible::WebViewAccessible(Dali::Actor self, Dali::WebEngine& webEngine)
-: ControlAccessible(self), mRemoteChild{}, mWebEngine{webEngine}
+: ControlAccessible(self),
+  mRemoteChild{},
+  mWebEngine{webEngine}
 {
   mRemoteChild.SetParent(this);
 
