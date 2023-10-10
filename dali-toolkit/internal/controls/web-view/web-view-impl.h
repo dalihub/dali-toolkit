@@ -314,6 +314,11 @@ public:
   bool CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayingCallback callback);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::ExitFullscreen()
+   */
+  void ExitFullscreen();
+
+  /**
    * @copydoc Dali::Toolkit::WebView::RegisterGeolocationPermissionCallback()
    */
   void RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback);
@@ -379,6 +384,11 @@ public:
   void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::RegisterNewWindowPolicyDecidedCallback()
+   */
+  void RegisterNewWindowPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback callback);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::RegisterNewWindowCreatedCallback()
    */
   void RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback);
@@ -407,6 +417,21 @@ public:
    * @copydoc Dali::Toolkit::WebView::RegisterContextMenuHiddenCallback()
    */
   void RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterFullscreenEnteredCallback()
+   */
+  void RegisterFullscreenEnteredCallback(Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterFullscreenExitedCallback()
+   */
+  void RegisterFullscreenExitedCallback(Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterTextFoundCallback()
+   */
+  void RegisterTextFoundCallback(Dali::WebEnginePlugin::WebEngineTextFoundCallback callback);
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetPlainTextAsynchronously()
