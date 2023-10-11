@@ -337,11 +337,24 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
 
 void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
 {
+  SvgVisualPtr self = this; // Keep reference until this API finished
+
   if(DALI_UNLIKELY(mImpl == nullptr))
   {
     DALI_LOG_ERROR("Fatal error!! already destroyed object callback called! SvgVisual : %p, url : %s, task : %p\n", this, mImageUrl.GetUrl().c_str(), task.Get());
     return;
   }
+
+  // We don't need to keep tasks anymore. reset now.
+  if(task == mLoadingTask)
+  {
+    mLoadingTask.Reset();
+  }
+  if(task == mRasterizingTask)
+  {
+    mRasterizingTask.Reset();
+  }
+
   if(task->HasSucceeded())
   {
     PixelData rasterizedPixelData = task->GetPixelData();
@@ -432,16 +445,6 @@ void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
     }
 
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
-  }
-
-  // We don't need to keep tasks anymore. reset now.
-  if(task == mLoadingTask)
-  {
-    mLoadingTask.Reset();
-  }
-  if(task == mRasterizingTask)
-  {
-    mRasterizingTask.Reset();
   }
 }
 

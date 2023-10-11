@@ -162,6 +162,19 @@ void NPatchLoader::RequestRemove(NPatchData::NPatchDataId id, TextureUploadObser
   }
 }
 
+void NPatchLoader::IncreaseReference(NPatchData::NPatchDataId id)
+{
+  int32_t cacheIndex = GetCacheIndexFromId(id);
+  if(cacheIndex == INVALID_CACHE_INDEX)
+  {
+    return;
+  }
+
+  NPatchInfo& info(mCache[cacheIndex]);
+
+  ++info.mReferenceCount;
+}
+
 void NPatchLoader::Remove(NPatchData::NPatchDataId id, TextureUploadObserver* textureObserver)
 {
   int32_t cacheIndex = GetCacheIndexFromId(id);
@@ -247,7 +260,7 @@ std::shared_ptr<NPatchData> NPatchLoader::GetNPatchData(const VisualUrl& url, co
   // If this is new image loading, make new cache data
   if(infoPtr == nullptr)
   {
-    NPatchInfo info(std::make_shared<NPatchData>());
+    NPatchInfo info(std::make_shared<NPatchData>(*this));
     info.mData->SetId(GenerateUniqueNPatchDataId());
     info.mData->SetHash(hash);
     info.mData->SetUrl(url);
@@ -260,7 +273,7 @@ std::shared_ptr<NPatchData> NPatchLoader::GetNPatchData(const VisualUrl& url, co
   // Else if LOAD_COMPLETE, Same url but border is different - use the existing texture
   else if(infoPtr->mData->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
   {
-    NPatchInfo info(std::make_shared<NPatchData>());
+    NPatchInfo info(std::make_shared<NPatchData>(*this));
 
     info.mData->SetId(GenerateUniqueNPatchDataId());
     info.mData->SetHash(hash);

@@ -589,6 +589,8 @@ void AnimatedVectorImageVisual::OnDoActionExtension(const Property::Index action
 
 void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceStatus status)
 {
+  AnimatedVectorImageVisualPtr self = this; // Keep reference until this API finished
+
   if(status == VectorAnimationTask::ResourceStatus::LOADED)
   {
     if(mImpl->mEventObserver)
@@ -626,6 +628,8 @@ void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceSta
 
 void AnimatedVectorImageVisual::OnAnimationFinished()
 {
+  AnimatedVectorImageVisualPtr self = this; // Keep reference until this API finished
+
   if(DALI_UNLIKELY(mImpl == nullptr))
   {
     DALI_LOG_ERROR("Fatal error!! already destroyed object callback called! AnimatedVectorImageVisual : %p, url : %s\n", this, mUrl.GetUrl().c_str());

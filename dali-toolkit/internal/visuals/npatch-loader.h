@@ -90,6 +90,13 @@ public:
    */
   void RequestRemove(NPatchData::NPatchDataId id, TextureUploadObserver* textureObserver);
 
+  /**
+   * @brief Increase reference count of a texture matching id.
+   *
+   * @param [in] id cache data id
+   */
+  void IncreaseReference(NPatchData::NPatchDataId id);
+
 protected: // Implementation of Processor
   /**
    * @copydoc Dali::Integration::Processor::Process()

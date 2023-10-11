@@ -1068,6 +1068,8 @@ void Model::NotifyImageBasedLightScaleFactor(float scaleFactor)
 
 void Model::OnModelLoadComplete()
 {
+  IntrusivePtr<Model> self = this; // Keep reference until this API finished
+
   if(!mModelLoadTask->HasSucceeded())
   {
     ResetResourceTasks();
@@ -1105,8 +1107,8 @@ void Model::OnModelLoadComplete()
   Self().SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3(mModelPivot.x, 1.0f - mModelPivot.y, mModelPivot.z));
 
   mModelResourceReady = true;
-  NotifyResourceReady();
   ResetResourceTask(mModelLoadTask);
+  NotifyResourceReady();
 }
 
 void Model::OnIblDiffuseLoadComplete()

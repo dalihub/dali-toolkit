@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/visuals/npatch-data.h>
 
 // INTERNAL HEADERS
+#include <dali-toolkit/internal/visuals/npatch-loader.h> ///< for NPatchLoader
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
 
 // EXTERNAL HEADERS
@@ -30,8 +31,9 @@ namespace Toolkit
 {
 namespace Internal
 {
-NPatchData::NPatchData()
+NPatchData::NPatchData(NPatchLoader& loader)
 : mId(INVALID_NPATCH_DATA_ID),
+  mNPatchLoader(loader),
   mUrl(),
   mTextureSet(),
   mHash(0),
@@ -257,6 +259,9 @@ void NPatchData::NotifyObserver(TextureUploadObserver* observer, const bool& loa
 
 void NPatchData::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
 {
+  // Increase reference count of itself
+  mNPatchLoader.IncreaseReference(mId);
+
   if(loadSuccess)
   {
     if(mLoadingState != LoadingState::LOAD_COMPLETE)
@@ -300,6 +305,9 @@ void NPatchData::LoadComplete(bool loadSuccess, TextureInformation textureInform
   // (If mLoadingState was LOAD_COMPLETE, NotifyObserver will be called directly. @todo : Should we fix this logic, matched with texture manager?)
   // So LoadComplete will be called.
   mObserverList.Swap(mQueuedObservers);
+
+  // Decrease reference count of itself
+  mNPatchLoader.RequestRemove(mId, nullptr);
 }
 
 void NPatchData::ObserverDestroyed(TextureUploadObserver* observer)
