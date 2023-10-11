@@ -589,6 +589,8 @@ void AnimatedVectorImageVisual::OnDoActionExtension(const Property::Index action
 
 void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceStatus status)
 {
+  AnimatedVectorImageVisualPtr self = this; // Keep reference until this API finished
+
   if(status == VectorAnimationTask::ResourceStatus::LOADED)
   {
     if(mImpl->mEventObserver)
@@ -626,6 +628,8 @@ void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceSta
 
 void AnimatedVectorImageVisual::OnAnimationFinished()
 {
+  AnimatedVectorImageVisualPtr self = this; // Keep reference until this API finished
+
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnAnimationFinished: action state = %d [%p]\n", mPlayState, this);
 
   if(mPlayState != DevelImageVisual::PlayState::STOPPED)
