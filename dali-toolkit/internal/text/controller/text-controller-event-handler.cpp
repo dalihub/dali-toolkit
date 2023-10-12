@@ -390,14 +390,37 @@ void Controller::EventHandler::AnchorEvent(Controller& controller, float x, floa
                                                CharacterHitTest::TAP,
                                                matchedCharacter);
 
-  for(const auto& anchor : controller.mImpl->mModel->mLogicalModel->mAnchors)
+  for(auto& anchor : controller.mImpl->mModel->mLogicalModel->mAnchors)
   {
     // Anchor clicked if the calculated cursor position is within the range of anchor.
     if(cursorPosition >= anchor.startIndex && cursorPosition < anchor.endIndex)
     {
-      if(controller.mImpl->mAnchorControlInterface && anchor.href)
+      if(controller.mImpl->mAnchorControlInterface)
       {
-        std::string href(anchor.href);
+        if(!anchor.isClicked)
+        {
+          anchor.isClicked = true;
+          // TODO: in mutable text, the anchor color and underline run index should be able to be updated.
+          if(!controller.IsEditable())
+          {
+            if(controller.mImpl->mModel->mLogicalModel->mColorRuns.Count() > anchor.colorRunIndex)
+            {
+              ColorRun& colorRun = *(controller.mImpl->mModel->mLogicalModel->mColorRuns.Begin() + anchor.colorRunIndex);
+              colorRun.color = anchor.clickedColor;
+            }
+            if(controller.mImpl->mModel->mLogicalModel->mUnderlinedCharacterRuns.Count() > anchor.underlinedCharacterRunIndex)
+            {
+              UnderlinedCharacterRun& underlineRun = *(controller.mImpl->mModel->mLogicalModel->mUnderlinedCharacterRuns.Begin() + anchor.underlinedCharacterRunIndex);
+              underlineRun.properties.color = anchor.clickedColor;
+            }
+
+            controller.mImpl->ClearFontData();
+            controller.mImpl->mOperationsPending = static_cast<OperationsMask>(controller.mImpl->mOperationsPending | COLOR);
+            controller.mImpl->RequestRelayout();
+          }
+        }
+
+        std::string href = anchor.href == nullptr ? "" : anchor.href;
         controller.mImpl->mAnchorControlInterface->AnchorClicked(href);
         break;
       }

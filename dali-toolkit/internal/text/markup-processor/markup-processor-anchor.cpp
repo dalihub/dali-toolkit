@@ -24,6 +24,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/anchor.h>
+#include <dali-toolkit/internal/text/markup-processor/markup-processor-color.h>
+#include <dali-toolkit/internal/text/markup-processor/markup-processor-underline.h>
 #include <dali-toolkit/internal/text/markup-processor/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 
@@ -33,10 +35,12 @@ namespace Toolkit
 {
 namespace Text
 {
-void ProcessAnchor(const Tag& tag, Anchor& anchor)
-{
-  anchor.href = nullptr;
 
+void ProcessAnchorTag(const Tag&              tag,
+                      Anchor&                 anchor,
+                      ColorRun&               colorRun,
+                      UnderlinedCharacterRun& underlinedCharacterRun)
+{
   for(auto&& attribute : tag.attributes)
   {
     if(TokenComparison(MARKUP::ANCHOR_ATTRIBUTES::HREF, attribute.nameBuffer, attribute.nameLength))
@@ -46,6 +50,15 @@ void ProcessAnchor(const Tag& tag, Anchor& anchor)
       memcpy(anchor.href, attribute.valueBuffer, hrefLength);
       anchor.href[hrefLength - 1] = '\0';
       // The memory is freed when the font run is removed from the logical model.
+    }
+    else if(TokenComparison(MARKUP::ANCHOR_ATTRIBUTES::COLOR, attribute.nameBuffer, attribute.nameLength))
+    {
+      ProcessColor(attribute, colorRun);
+      ProcessColorAttribute(attribute, underlinedCharacterRun);
+    }
+    else if(TokenComparison(MARKUP::ANCHOR_ATTRIBUTES::CLICKED_COLOR, attribute.nameBuffer, attribute.nameLength))
+    {
+      ColorStringToVector4(attribute.valueBuffer, attribute.valueLength, anchor.clickedColor);
     }
   }
 }
