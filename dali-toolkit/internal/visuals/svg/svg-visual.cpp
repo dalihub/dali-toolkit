@@ -337,6 +337,18 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
 
 void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
 {
+  SvgVisualPtr self = this; // Keep reference until this API finished
+
+  // We don't need to keep tasks anymore. reset now.
+  if(task == mLoadingTask)
+  {
+    mLoadingTask.Reset();
+  }
+  if(task == mRasterizingTask)
+  {
+    mRasterizingTask.Reset();
+  }
+
   if(task->HasSucceeded())
   {
     PixelData rasterizedPixelData = task->GetPixelData();
@@ -427,16 +439,6 @@ void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
     }
 
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
-  }
-
-  // We don't need to keep tasks anymore. reset now.
-  if(task == mLoadingTask)
-  {
-    mLoadingTask.Reset();
-  }
-  if(task == mRasterizingTask)
-  {
-    mRasterizingTask.Reset();
   }
 }
 
