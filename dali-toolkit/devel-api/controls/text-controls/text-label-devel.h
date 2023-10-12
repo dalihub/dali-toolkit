@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
