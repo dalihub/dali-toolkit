@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -81,6 +82,7 @@ VisualFactory::VisualFactory(bool debugEnabled)
   mImageVisualShaderFactory(),
   mTextVisualShaderFactory(),
   mSlotDelegate(this),
+  mIdleCallback(nullptr),
   mDebugEnabled(debugEnabled),
   mPreMultiplyOnLoad(true)
 {
@@ -88,6 +90,12 @@ VisualFactory::VisualFactory(bool debugEnabled)
 
 VisualFactory::~VisualFactory()
 {
+  if(mIdleCallback && Adaptor::IsAvailable())
+  {
+    // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
+    Adaptor::Get().RemoveIdle(mIdleCallback);
+    mIdleCallback = nullptr;
+  }
 }
 
 void VisualFactory::OnStyleChangedSignal(Toolkit::StyleManager styleManager, StyleChange::Type type)
@@ -378,6 +386,13 @@ bool VisualFactory::GetPreMultiplyOnLoad() const
   return mPreMultiplyOnLoad;
 }
 
+void VisualFactory::DiscardVisual(Toolkit::Visual::Base visual)
+{
+  mDiscardedVisuals.emplace_back(visual);
+
+  RegisterDiscardCallback();
+}
+
 Internal::TextureManager& VisualFactory::GetTextureManager()
 {
   return GetFactoryCache().GetTextureManager();
@@ -435,6 +450,31 @@ TextVisualShaderFactory& VisualFactory::GetTextVisualShaderFactory()
     mTextVisualShaderFactory = std::unique_ptr<TextVisualShaderFactory>(new TextVisualShaderFactory());
   }
   return *mTextVisualShaderFactory;
+}
+
+void VisualFactory::OnDiscardCallback()
+{
+  mIdleCallback = nullptr;
+
+  // Discard visual now.
+  mDiscardedVisuals.clear();
+}
+
+void VisualFactory::RegisterDiscardCallback()
+{
+  if(!mIdleCallback && Adaptor::IsAvailable())
+  {
+    // The callback manager takes the ownership of the callback object.
+    mIdleCallback = MakeCallback(this, &VisualFactory::OnDiscardCallback);
+
+    Adaptor& adaptor = Adaptor::Get();
+
+    if(!adaptor.AddIdle(mIdleCallback, false))
+    {
+      // Fail to add idle. (Maybe adaptor is paused.)
+      mIdleCallback = nullptr;
+    }
+  }
 }
 
 } // namespace Internal
