@@ -435,6 +435,20 @@ public: // Configure the text controller.
   bool IsTextFitEnabled() const;
 
   /**
+   * @brief Sets current line size.
+   *
+   * @param[in] lineSize line size value to store the MinLineSize set by user when TextFitArray is enabled.
+   */
+  void SetCurrentLineSize(float lineSize);
+
+  /**
+   * @brief Retrieves the current line size.
+   *
+   * @return The current line size
+   */
+  float GetCurrentLineSize() const;
+
+  /**
    * @brief Sets minimum size valid for text fit.
    *
    * @param[in] minimum size value.
@@ -520,6 +534,34 @@ public: // Configure the text controller.
    * @param[in] lineSize line size value
    */
   void SetTextFitLineSize(float lineSize);
+
+  /**
+   * @brief Enable or disable the text fit array.
+   *
+   * @param[in] enabled Whether to enable the text fit array.
+   */
+  void SetTextFitArrayEnabled(bool enabled);
+
+  /**
+   * @brief Whether the text fit array is enabled or not.
+   *
+   * @return True if the text fit array is enabled.
+   */
+  bool IsTextFitArrayEnabled() const;
+
+  /**
+   * @brief Sets the text fit array.
+   *
+   * @param[in] fitOptions The list of text fit options.
+   */
+  void SetTextFitArray(std::vector<Toolkit::DevelTextLabel::FitOption>& fitOptions);
+
+  /**
+   * @brief Retrieve the text fit array.
+   *
+   * @return The list of text fit options.
+   */
+  std::vector<Toolkit::DevelTextLabel::FitOption>& GetTextFitArray();
 
   /**
    * @brief Sets disabled color opacity.
@@ -1593,6 +1635,11 @@ public: // Queries & retrieves.
    * @brief Calculates the point size for text for given layout()
    */
   void FitPointSizeforLayout(Size layoutSize);
+
+  /**
+   * @brief Calculates the point size for text for given layout() using fit array.
+   */
+  void FitArrayPointSizeforLayout(Size layoutSize);
 
   /**
    * @brief Checks if the point size fits within the layout size.

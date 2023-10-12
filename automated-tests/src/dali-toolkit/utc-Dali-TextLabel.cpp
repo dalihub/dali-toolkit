@@ -2078,6 +2078,72 @@ int UtcDaliToolkitTextlabelTextFitStressTest(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextlabelTextFitArray(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelTextFitArray");
+  TextLabel label = TextLabel::New();
+  Vector2   size(300.0f, 80.0f);
+  label.SetProperty(Actor::Property::SIZE, size);
+  label.SetProperty(TextLabel::Property::TEXT, "A Quick Brown Fox Jumps Over The Lazy Dog");
+  label.SetProperty(DevelTextLabel::Property::MIN_LINE_SIZE, 80.f);
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
+  application.GetScene().Add(label);
+
+  // make sorted options.
+  std::vector<DevelTextLabel::FitOption> fitOptions;
+  fitOptions.push_back(DevelTextLabel::FitOption(10, 12));
+  fitOptions.push_back(DevelTextLabel::FitOption(8, 10));
+  fitOptions.push_back(DevelTextLabel::FitOption(6, 8));
+  fitOptions.push_back(DevelTextLabel::FitOption(4, 6));
+  fitOptions.push_back(DevelTextLabel::FitOption(20, 22));
+  fitOptions.push_back(DevelTextLabel::FitOption(22, 24));
+  fitOptions.push_back(DevelTextLabel::FitOption(12, 14));
+
+  DevelTextLabel::SetTextFitArray(label, true, fitOptions);
+
+  application.SendNotification();
+  application.Render();
+
+  bool enable = Dali::Toolkit::DevelTextLabel::IsTextFitArrayEnabled(label);
+  DALI_TEST_EQUALS(true, enable, TEST_LOCATION);
+
+  std::vector<Dali::Toolkit::DevelTextLabel::FitOption> getFitOptions = Dali::Toolkit::DevelTextLabel::GetTextFitArray(label);
+  size_t numberOfFitOptions = getFitOptions.size();
+  DALI_TEST_EQUALS(7u, numberOfFitOptions, TEST_LOCATION);
+
+  const Vector3 EXPECTED_NATURAL_SIZE(276.0f, 16.0f, 0.0f);
+  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION);
+
+  std::vector<DevelTextLabel::FitOption> emptyFitOptions;
+  DevelTextLabel::SetTextFitArray(label, false, emptyFitOptions);
+
+  application.SendNotification();
+  application.Render();
+
+  enable = Dali::Toolkit::DevelTextLabel::IsTextFitArrayEnabled(label);
+  DALI_TEST_EQUALS(false, enable, TEST_LOCATION);
+
+  const Vector3 EXPECTED_NATURAL_SIZE_DISABLE(690.0f, 80.0f, 0.0f);
+  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE_DISABLE, label.GetNaturalSize(), TEST_LOCATION);
+
+  // make unsorted options.
+  std::vector<DevelTextLabel::FitOption> unorderedFitOptions;
+  unorderedFitOptions.push_back(DevelTextLabel::FitOption(4, 6));
+  unorderedFitOptions.push_back(DevelTextLabel::FitOption(6, 8));
+  unorderedFitOptions.push_back(DevelTextLabel::FitOption(8, 10));
+  unorderedFitOptions.push_back(DevelTextLabel::FitOption(10, 8));
+
+  DevelTextLabel::SetTextFitArray(label, true, unorderedFitOptions);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextlabelMaxTextureSet(void)
 {
   ToolkitTestApplication application;
