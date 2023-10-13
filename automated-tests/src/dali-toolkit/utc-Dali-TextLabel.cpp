@@ -2485,7 +2485,7 @@ int UtcDaliToolkitTextlabelAnchorClicked(void)
 
   // sets anchor text
   label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
-  label.SetProperty(TextLabel::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  label.SetProperty(TextLabel::Property::TEXT, "<a color='red' clicked-color='green' href='https://www.tizen.org'>TIZEN</a>");
   label.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);

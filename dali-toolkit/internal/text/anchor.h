@@ -35,6 +35,11 @@ struct Anchor
   CharacterIndex startIndex; ///< The character's start index of the anchor within the string.
   CharacterIndex endIndex;   ///< The character's end index of the anchor within the string.
   char*          href;       ///< The url path
+
+  bool     isClicked    = false;               ///< Whether the anchor is clicked or not.
+  Vector4  clickedColor = Color::DARK_MAGENTA; ///< The color of the anchor when clicked.
+  uint32_t colorRunIndex;                      ///< RunIndex of color run, used to change color when clicked.
+  uint32_t underlinedCharacterRunIndex;        ///< RunIndex of underline run, used to change color when clicked.
 };
 
 } // namespace Text

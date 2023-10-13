@@ -706,6 +706,16 @@ namespace ANCHOR_ATTRIBUTES
  */
 static const std::string HREF("href");
 
+/**
+ * @brief Sets the color for the characters and underlines inside the element.
+ */
+static const std::string COLOR("color");
+
+/**
+ * @brief Sets the clicked color for the characters and underlines inside the element.
+ */
+static const std::string CLICKED_COLOR("clicked-color");
+
 } // namespace ANCHOR_ATTRIBUTES
 
 } // namespace MARKUP

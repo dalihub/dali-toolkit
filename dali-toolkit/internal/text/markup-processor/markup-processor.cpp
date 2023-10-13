@@ -139,6 +139,15 @@ struct Span
 };
 
 /**
+ * @brief Struct used to retrieve anchors from the mark-up string.
+ */
+struct AnchorForStack
+{
+  RunIndex colorRunIndex;
+  RunIndex underlinedCharacterRunIndex;
+};
+
+/**
  * @brief Initializes a font run description to its defaults.
  *
  * @param[in,out] fontRun The font description run to initialize.
@@ -207,6 +216,17 @@ void Initialize(Span& span)
   //characterSpacing
   span.characterSpacingCharacterRunIndex = 0u;
   span.isCharacterSpacingDefined         = false;
+}
+
+/**
+ * @brief Initializes a anchor to its defaults.
+ *
+ * @param[in,out] anchor The anchor to be initialized.
+ */
+void Initialize(AnchorForStack& anchor)
+{
+  anchor.colorRunIndex               = 0u;
+  anchor.underlinedCharacterRunIndex = 0u;
 }
 
 /**
@@ -695,38 +715,6 @@ void ProcessParagraphTag(
 }
 
 /**
- * @brief Processes the anchor tag
- *
- * @param[in/out] markupProcessData The markup process data
- * @param[in] tag The current tag
- * @param[in/out] characterIndex The current character index
- */
-void ProcessAnchorTag(
-  MarkupProcessData& markupProcessData,
-  const Tag          tag,
-  CharacterIndex&    characterIndex)
-{
-  if(!tag.isEndTag)
-  {
-    // Create an anchor instance.
-    Anchor anchor;
-    anchor.startIndex = characterIndex;
-    anchor.endIndex   = 0u;
-    ProcessAnchor(tag, anchor);
-    markupProcessData.anchors.PushBack(anchor);
-  }
-  else
-  {
-    // Update end index.
-    unsigned int count = markupProcessData.anchors.Count();
-    if(count > 0)
-    {
-      markupProcessData.anchors[count - 1].endIndex = characterIndex;
-    }
-  }
-}
-
-/**
  * @brief Processes span tag for the color-run & font-run.
  *
  * @param[in] spanTag The tag we are currently processing
@@ -911,6 +899,105 @@ void ProcessSpanForRun(
 }
 
 /**
+ * @brief Processes anchor tag for the color-run & underline-run.
+ *
+ * @param[in,out] markupProcessData The markup process data
+ * @param[in] tag The tag we are currently processing
+ * @param[in,out] anchorStack The anchors stack
+ * @param[in,out] colorRuns The container containing all the color runs
+ * @param[in,out] underlinedCharacterRuns The container containing all the underlined character runs
+ * @param[in,out] colorRunIndex The color run index
+ * @param[in,out] underlinedCharacterRunIndex The underlined character run index
+ * @param[in] characterIndex The current character index
+ * @param[in] tagReference The tagReference we should increment/decrement
+ */
+void ProcessAnchorForRun(
+  MarkupProcessData&                    markupProcessData,
+  const Tag&                            tag,
+  StyleStack<AnchorForStack>&           anchorStack,
+  Vector<ColorRun>&                     colorRuns,
+  Vector<UnderlinedCharacterRun>&       underlinedCharacterRuns,
+  RunIndex&                             colorRunIndex,
+  RunIndex&                             underlinedCharacterRunIndex,
+  const CharacterIndex                  characterIndex,
+  int&                                  tagReference)
+{
+  if(!tag.isEndTag)
+  {
+    // Create an anchor instance.
+    Anchor anchor;
+    anchor.href                        = nullptr;
+    anchor.startIndex                  = characterIndex;
+    anchor.endIndex                    = 0u;
+    anchor.colorRunIndex               = colorRunIndex;
+    anchor.underlinedCharacterRunIndex = underlinedCharacterRunIndex;
+
+    // Create a new run.
+    ColorRun colorRun;
+    Initialize(colorRun);
+
+    UnderlinedCharacterRun underlinedCharacterRun;
+    Initialize(underlinedCharacterRun);
+
+    AnchorForStack anchorForStack;
+    Initialize(anchorForStack);
+
+    // Fill the run with the parameters.
+    colorRun.characterRun.characterIndex               = characterIndex;
+    underlinedCharacterRun.characterRun.characterIndex = characterIndex;
+
+    anchorForStack.colorRunIndex               = colorRunIndex;
+    anchorForStack.underlinedCharacterRunIndex = underlinedCharacterRunIndex;
+
+    // Init default color
+    colorRun.color                                 = Color::MEDIUM_BLUE;
+    underlinedCharacterRun.properties.color        = Color::MEDIUM_BLUE;
+    underlinedCharacterRun.properties.colorDefined = true;
+
+    ProcessAnchorTag(tag, anchor, colorRun, underlinedCharacterRun);
+
+    markupProcessData.anchors.PushBack(anchor);
+
+    // Push the anchor into the stack.
+    anchorStack.Push(anchorForStack);
+
+    // Push the run in the logical model.
+    colorRuns.PushBack(colorRun);
+    ++colorRunIndex;
+
+    // Push the run in the logical model.
+    underlinedCharacterRuns.PushBack(underlinedCharacterRun);
+    ++underlinedCharacterRunIndex;
+
+    // Increase reference
+    ++tagReference;
+  }
+  else
+  {
+    if(tagReference > 0)
+    {
+      // Update end index.
+      unsigned int count = markupProcessData.anchors.Count();
+      if(count > 0)
+      {
+        markupProcessData.anchors[count - 1].endIndex = characterIndex;
+      }
+
+      // Pop the top of the stack and set the number of characters of the run.
+      AnchorForStack anchorForStack = anchorStack.Pop();
+
+      ColorRun& colorRun                       = *(colorRuns.Begin() + anchorForStack.colorRunIndex);
+      colorRun.characterRun.numberOfCharacters = characterIndex - colorRun.characterRun.characterIndex;
+
+      UnderlinedCharacterRun& underlinedCharacterRun         = *(underlinedCharacterRuns.Begin() + anchorForStack.underlinedCharacterRunIndex);
+      underlinedCharacterRun.characterRun.numberOfCharacters = characterIndex - underlinedCharacterRun.characterRun.characterIndex;
+
+      --tagReference;
+    }
+  }
+}
+
+/**
  * @brief Resizes the model's vectors
  *
  * @param[inout] markupProcessData The markup process data
@@ -1060,6 +1147,8 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   // Stores a struct with the index to the first character of the color run & color font for the span.
   StyleStack<Span> spanStack;
 
+  StyleStack<AnchorForStack> anchorStack;
+
   // Points the next free position in the vector of runs.
   RunIndex colorRunIndex                     = 0u;
   RunIndex fontRunIndex                      = 0u;
@@ -1080,6 +1169,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   int sTagReference                = 0u;
   int pTagReference                = 0u;
   int characterSpacingTagReference = 0u;
+  int aTagReference                = 0u;
 
   // Give an initial default value to the model's vectors.
   markupProcessData.colorRuns.Reserve(DEFAULT_VECTOR_SIZE);
@@ -1135,21 +1225,15 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
       } // <font></font>
       else if(TokenComparison(MARKUP::TAG::ANCHOR, tag.buffer, tag.length))
       {
-        /* Anchor */
-        ProcessAnchorTag(markupProcessData, tag, characterIndex);
-        /* Color */
-        ProcessTagForRun<ColorRun>(
-          markupProcessData.colorRuns, styleStack, tag, characterIndex, colorRunIndex, colorTagReference, [](const Tag& tag, ColorRun& run) {
-            run.color = Color::BLUE;
-            ProcessColorTag(tag, run);
-          });
-        /* Underline */
-        ProcessTagForRun<UnderlinedCharacterRun>(
-          markupProcessData.underlinedCharacterRuns, styleStack, tag, characterIndex, underlinedCharacterRunIndex, uTagReference, [](const Tag& tag, UnderlinedCharacterRun& run) {
-            run.properties.color        = Color::BLUE;
-            run.properties.colorDefined = true;
-            ProcessUnderlineTag(tag, run);
-          });
+        ProcessAnchorForRun(markupProcessData,
+                            tag,
+                            anchorStack,
+                            markupProcessData.colorRuns,
+                            markupProcessData.underlinedCharacterRuns,
+                            colorRunIndex,
+                            underlinedCharacterRunIndex,
+                            characterIndex,
+                            aTagReference);
       } // <a href=https://www.tizen.org>tizen</a>
       else if(TokenComparison(MARKUP::TAG::SHADOW, tag.buffer, tag.length))
       {
