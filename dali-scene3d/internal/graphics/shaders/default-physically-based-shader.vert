@@ -24,6 +24,11 @@ in vec3 aTangent;
 
 in vec4 aVertexColor;
 
+#ifdef SKINNING
+in vec4 aJoints;
+in vec4 aWeights;
+#endif
+
 #ifdef MORPH
   uniform highp sampler2D sBlendShapeGeometry;
 #endif
@@ -39,11 +44,14 @@ uniform mat4 uModelMatrix;
 uniform mat4 uProjection;
 
 #ifdef SKINNING
-  in vec4 aJoints;
-  in vec4 aWeights;
-  #define MAX_BONES 80
-  uniform mat4 uBone[MAX_BONES];
-  uniform mediump vec3 uYDirection;
+
+#define MAX_BONES 256
+layout(std140) uniform Bones
+{
+  mat4 uBone[MAX_BONES];
+};
+
+uniform mediump vec3 uYDirection;
 #endif
 
 #ifdef MORPH
