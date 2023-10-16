@@ -2116,7 +2116,7 @@ Dali::Property Control::Impl::GetVisualProperty(Dali::Property::Index index, Dal
   if(visual)
   {
     Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
-    return visualImpl.GetPropertyObject(visualPropertyKey);
+    return visualImpl.GetPropertyObject(std::move(visualPropertyKey));
   }
 
   Handle handle;
