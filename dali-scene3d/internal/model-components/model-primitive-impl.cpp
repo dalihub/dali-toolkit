@@ -170,7 +170,6 @@ void ModelPrimitive::RemovePrimitiveObserver(ModelPrimitiveModifyObserver* obser
 void ModelPrimitive::SetShadowMapTexture(Dali::Texture shadowMapTexture)
 {
   mShadowMapTexture = shadowMapTexture;
-
   UpdateShadowMapTexture();
 }
 
