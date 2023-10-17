@@ -31,6 +31,7 @@
 #include <filesystem>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/internal/common/model-cache-manager.h>
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
 #include <dali-scene3d/internal/light/light-impl.h>
@@ -762,6 +763,9 @@ void Model::OnInitialize()
 {
   // Make ParentOrigin as Center.
   Self().SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  mDefaultDiffuseTexture  = ImageResourceLoader::GetEmptyTextureWhiteRGB();
+  mDefaultSpecularTexture = ImageResourceLoader::GetEmptyTextureWhiteRGB();
 }
 
 void Model::OnSceneConnection(int depth)
@@ -1094,8 +1098,14 @@ void Model::OnModelLoadComplete()
   ResetCameraParameters();
   if(!resources.mEnvironmentMaps.empty())
   {
-    mDefaultDiffuseTexture  = resources.mEnvironmentMaps.front().second.mDiffuse;
-    mDefaultSpecularTexture = resources.mEnvironmentMaps.front().second.mSpecular;
+    if(resources.mEnvironmentMaps.front().second.mDiffuse)
+    {
+      mDefaultDiffuseTexture = resources.mEnvironmentMaps.front().second.mDiffuse;
+    }
+    if(resources.mEnvironmentMaps.front().second.mSpecular)
+    {
+      mDefaultSpecularTexture = resources.mEnvironmentMaps.front().second.mSpecular;
+    }
   }
 
   if(mShadowMapTexture)
