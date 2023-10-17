@@ -505,7 +505,6 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
   Vector<ScriptRun>::ConstIterator scriptRunEndIt          = scripts.End();
   bool                             isNewParagraphCharacter = false;
 
-  FontId                  previousEmojiFontId = 0u;
   FontId                  currentFontId       = 0u;
   FontId                  previousFontId      = 0u;
   TextAbstraction::Script previousScript      = TextAbstraction::UNKNOWN;
@@ -582,15 +581,16 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
       isValidFont = fontClient.IsCharacterSupportedByFont(fontId, character);
     }
 
-    bool isCommonScript = false;
-    bool isEmojiScript  = TextAbstraction::IsOneOfEmojiScripts(script);
+    bool isEmojiScript = IsEmojiColorScript(script) || IsEmojiTextScript(script);
+    bool isZWJ         = TextAbstraction::IsZeroWidthJoiner(character);
 
-    if(isEmojiScript && (previousScript == script))
+    if((previousScript == script) &&
+       (isEmojiScript || isZWJ))
     {
-      // Emoji sequence should use the previous emoji font.
-      if(0u != previousEmojiFontId)
+      // This sequence should use the previous font.
+      if(0u != previousFontId)
       {
-        fontId      = previousEmojiFontId;
+        fontId      = previousFontId;
         isValidFont = true;
       }
     }
@@ -603,6 +603,9 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
       fontId      = cachedDefaultFontId;
       isValidFont = true;
     }
+
+    // This is valid after CheckFontSupportsCharacter();
+    bool isCommonScript = false;
 
     // If the given font is not valid, it means either:
     // - there is no cached font for the current script yet or,
@@ -755,19 +758,6 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
       }
     }
 
-    // Store the font id when the first character is an emoji.
-    if(isEmojiScript)
-    {
-      if(0u != fontId && previousScript != script)
-      {
-        previousEmojiFontId = fontId;
-      }
-    }
-    else
-    {
-      previousEmojiFontId = 0u;
-    }
-
 #ifdef DEBUG_ENABLED
     if(gLogFilter->IsEnabledFor(Debug::Verbose))
     {
@@ -826,6 +816,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
     // Whether the current character is a new paragraph character.
     isNewParagraphCharacter = TextAbstraction::IsNewParagraph(character);
     previousScript          = script;
+    currentFontId           = fontId;
     previousFontId          = currentFontId;
   } // end traverse characters.
 
