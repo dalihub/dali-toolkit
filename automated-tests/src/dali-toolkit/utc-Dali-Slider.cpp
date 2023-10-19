@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -346,10 +346,10 @@ int UtcDaliSliderSignals2(void)
   END_TEST;
 }
 
-int UtcDaliSetPropertyP(void)
+int UtcDaliSliderSetPropertyP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliSetPropertyP");
+  tet_infoline("UtcDaliSliderSetPropertyP");
 
   Slider slider = Slider::New();
   slider.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);

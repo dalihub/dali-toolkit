@@ -18,8 +18,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/base-object.h>
 #include <dali/integration-api/shader-precompiler.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
@@ -91,6 +92,11 @@ public:
   void UsePreCompiledShader();
 
   /**
+   * @copydoc Toolkit::VisualFactory::DiscardVisual()
+   */
+  void DiscardVisual(Toolkit::Visual::Base visual);
+
+  /**
    * @return the reference to texture manager
    */
   Internal::TextureManager& GetTextureManager();
@@ -129,6 +135,16 @@ private:
    */
   TextVisualShaderFactory& GetTextVisualShaderFactory();
 
+  /**
+   * @brief Callbacks called for clear discarded visuals.
+   */
+  void OnDiscardCallback();
+
+  /**
+   * @brief Register idle callback for discard visuals if need.
+   */
+  void RegisterDiscardCallback();
+
   VisualFactory(const VisualFactory&) = delete;
 
   VisualFactory& operator=(const VisualFactory& rhs) = delete;
@@ -138,9 +154,14 @@ private:
   std::unique_ptr<ImageVisualShaderFactory> mImageVisualShaderFactory;
   std::unique_ptr<TextVisualShaderFactory>  mTextVisualShaderFactory;
   SlotDelegate<VisualFactory>               mSlotDelegate;
-  bool                                      mDebugEnabled : 1;
-  bool                                      mPreMultiplyOnLoad : 1; ///< Local store for this flag
-  bool                                      mPrecompiledShaderRequested{false};
+  CallbackBase*                             mIdleCallback;
+
+  using DiscardedVisualContainer = std::vector<Toolkit::Visual::Base>;
+  DiscardedVisualContainer mDiscardedVisuals{};
+
+  bool mDebugEnabled : 1;
+  bool mPreMultiplyOnLoad : 1; ///< Local store for this flag
+  bool mPrecompiledShaderRequested{false};
 };
 
 /**

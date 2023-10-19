@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <string>
 
@@ -33,9 +34,10 @@ namespace Toolkit
 {
 namespace Internal
 {
-class NPatchLoader;
+class NPatchData;
+typedef IntrusivePtr<NPatchData> NPatchDataPtr;
 
-class NPatchData : public ConnectionTracker, public Dali::Toolkit::TextureUploadObserver
+class NPatchData : public ConnectionTracker, public Dali::Toolkit::TextureUploadObserver, public Dali::RefObject
 {
 public:
   typedef int32_t           NPatchDataId;                ///< The NPatchDataId type. This is used as a handle to refer to a particular Npatch Data.
@@ -55,10 +57,8 @@ public:
 public:
   /**
    * Constructor
-   *
-   * @param[in] loader NPatchLoader who create this data.
    */
-  NPatchData(NPatchLoader& loader);
+  NPatchData();
 
   /**
    * Destructor, non-virtual as not a base class
@@ -286,7 +286,6 @@ private:
   NPatchDataId     mId;
   ObserverListType mObserverList;    ///< Container used to store all observer clients of this Texture
   ObserverListType mQueuedObservers; ///< Container observers when user try to add during notify observers
-  NPatchLoader&    mNPatchLoader;    ///< NPatchLoader who keep this data
 
   VisualUrl                    mUrl;            ///< Url of the N-Patch
   TextureSet                   mTextureSet;     ///< Texture containing the cropped image
