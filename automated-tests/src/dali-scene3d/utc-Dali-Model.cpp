@@ -1465,7 +1465,7 @@ int UtcDaliModelResourceCacheCheck(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
   application.SendNotification();
   application.Render();
 
