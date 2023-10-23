@@ -1084,7 +1084,7 @@ const Vector4& Popup::GetBackingColor() const
 
 void Popup::SetTailUpImage(std::string image)
 {
-  mTailUpImage = image;
+  mTailUpImage = std::move(image);
   mLayoutDirty = true;
   LayoutTail();
 }
@@ -1096,7 +1096,7 @@ const std::string& Popup::GetTailUpImage() const
 
 void Popup::SetTailDownImage(std::string image)
 {
-  mTailDownImage = image;
+  mTailDownImage = std::move(image);
   mLayoutDirty   = true;
   LayoutTail();
 }
@@ -1108,7 +1108,7 @@ const std::string& Popup::GetTailDownImage() const
 
 void Popup::SetTailLeftImage(std::string image)
 {
-  mTailLeftImage = image;
+  mTailLeftImage = std::move(image);
   mLayoutDirty   = true;
   LayoutTail();
 }
@@ -1120,7 +1120,7 @@ const std::string& Popup::GetTailLeftImage() const
 
 void Popup::SetTailRightImage(std::string image)
 {
-  mTailRightImage = image;
+  mTailRightImage = std::move(image);
   mLayoutDirty    = true;
   LayoutTail();
 }
@@ -1306,7 +1306,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
         std::string valueString;
         if(value.Get(valueString))
         {
-          Toolkit::ImageView actor = Toolkit::ImageView::New(valueString);
+          Toolkit::ImageView actor = Toolkit::ImageView::New(std::move(valueString));
           popupImpl.SetPopupBackgroundImage(actor);
         }
         break;
@@ -1341,7 +1341,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
         std::string valueString;
         if(value.Get(valueString))
         {
-          popupImpl.SetTailUpImage(valueString);
+          popupImpl.SetTailUpImage(std::move(valueString));
         }
         break;
       }
@@ -1350,7 +1350,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
         std::string valueString;
         if(value.Get(valueString))
         {
-          popupImpl.SetTailDownImage(valueString);
+          popupImpl.SetTailDownImage(std::move(valueString));
         }
         break;
       }
@@ -1359,7 +1359,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
         std::string valueString;
         if(value.Get(valueString))
         {
-          popupImpl.SetTailLeftImage(valueString);
+          popupImpl.SetTailLeftImage(std::move(valueString));
         }
         break;
       }
@@ -1368,7 +1368,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
         std::string valueString;
         if(value.Get(valueString))
         {
-          popupImpl.SetTailRightImage(valueString);
+          popupImpl.SetTailRightImage(std::move(valueString));
         }
         break;
       }
@@ -1392,21 +1392,21 @@ Property::Value Popup::GetProperty(BaseObject* object, Property::Index propertyI
       {
         Property::Map map;
         Scripting::CreatePropertyMap(popupImpl.GetTitle(), map);
-        value = map;
+        value = std::move(map);
         break;
       }
       case Toolkit::Popup::Property::CONTENT:
       {
         Property::Map map;
         Scripting::CreatePropertyMap(popupImpl.GetContent(), map);
-        value = map;
+        value = std::move(map);
         break;
       }
       case Toolkit::Popup::Property::FOOTER:
       {
         Property::Map map;
         Scripting::CreatePropertyMap(popupImpl.GetFooter(), map);
-        value = map;
+        value = std::move(map);
         break;
       }
       case Toolkit::Popup::Property::DISPLAY_STATE:
@@ -1448,14 +1448,14 @@ Property::Value Popup::GetProperty(BaseObject* object, Property::Index propertyI
       {
         // Note: Cannot retrieve property map from animation.
         Property::Map map;
-        value = map;
+        value = std::move(map);
         break;
       }
       case Toolkit::Popup::Property::EXIT_ANIMATION:
       {
         // Note: Cannot retrieve property map from animation.
         Property::Map map;
-        value = map;
+        value = std::move(map);
         break;
       }
       case Toolkit::Popup::Property::AUTO_HIDE_DELAY:
@@ -2003,7 +2003,7 @@ std::string Popup::PopupAccessible::GetNameRaw() const
   if(popupTitle)
   {
     std::string titleText = popupTitle.GetProperty<std::string>(Toolkit::TextLabel::Property::TEXT);
-    title                 = titleText;
+    title                 = std::move(titleText);
   }
   else
   {
@@ -2011,7 +2011,7 @@ std::string Popup::PopupAccessible::GetNameRaw() const
     if(popupContent)
     {
       std::string contentText = popupContent.GetProperty<std::string>(Toolkit::TextLabel::Property::TEXT);
-      title                   = contentText;
+      title                   = std::move(contentText);
     }
   }
   return title;

@@ -203,7 +203,7 @@ Accessibility::Range TextControlAccessible::GetRangeOfSelection(std::size_t sele
   auto endOffset   = static_cast<std::size_t>(indices.second);
   auto text        = GetText(startOffset, endOffset);
 
-  return {startOffset, endOffset, text};
+  return {startOffset, endOffset, std::move(text)};
 }
 
 std::string TextControlAccessible::GetText(std::size_t startOffset, std::size_t endOffset) const

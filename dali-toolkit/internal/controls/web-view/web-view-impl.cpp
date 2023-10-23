@@ -490,7 +490,7 @@ void WebView::EvaluateJavaScript(const std::string& script, std::function<void(c
 {
   if(mWebEngine)
   {
-    mWebEngine.EvaluateJavaScript(script, resultHandler);
+    mWebEngine.EvaluateJavaScript(script, std::move(resultHandler));
   }
 }
 
@@ -498,7 +498,7 @@ void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, 
 {
   if(mWebEngine)
   {
-    mWebEngine.AddJavaScriptMessageHandler(exposedObjectName, handler);
+    mWebEngine.AddJavaScriptMessageHandler(exposedObjectName, std::move(handler));
   }
 }
 
@@ -506,7 +506,7 @@ void WebView::RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptA
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterJavaScriptAlertCallback(callback);
+    mWebEngine.RegisterJavaScriptAlertCallback(std::move(callback));
   }
 }
 
@@ -522,7 +522,7 @@ void WebView::RegisterJavaScriptConfirmCallback(Dali::WebEnginePlugin::JavaScrip
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterJavaScriptConfirmCallback(callback);
+    mWebEngine.RegisterJavaScriptConfirmCallback(std::move(callback));
   }
 }
 
@@ -538,7 +538,7 @@ void WebView::RegisterJavaScriptPromptCallback(Dali::WebEnginePlugin::JavaScript
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterJavaScriptPromptCallback(callback);
+    mWebEngine.RegisterJavaScriptPromptCallback(std::move(callback));
   }
 }
 
@@ -566,7 +566,7 @@ bool WebView::CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineH
   bool result = false;
   if(mWebEngine)
   {
-    result = mWebEngine.CreateHitTestAsynchronously(x, y, mode, callback);
+    result = mWebEngine.CreateHitTestAsynchronously(x, y, mode, std::move(callback));
   }
   return result;
 }
@@ -634,20 +634,20 @@ Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::Rect<int32_t> viewArea, fl
 
 bool WebView::GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback)
 {
-  mScreenshotCapturedCallback = callback;
+  mScreenshotCapturedCallback = std::move(callback);
   return mWebEngine ? mWebEngine.GetScreenshotAsynchronously(viewArea, scaleFactor, std::bind(&WebView::OnScreenshotCaptured, this, std::placeholders::_1)) : false;
 }
 
 bool WebView::CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayingCallback callback)
 {
-  return mWebEngine ? mWebEngine.CheckVideoPlayingAsynchronously(callback) : false;
+  return mWebEngine ? mWebEngine.CheckVideoPlayingAsynchronously(std::move(callback)) : false;
 }
 
 void WebView::RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback)
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterGeolocationPermissionCallback(callback);
+    mWebEngine.RegisterGeolocationPermissionCallback(std::move(callback));
   }
 }
 
@@ -698,7 +698,7 @@ void WebView::RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePa
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterPageLoadStartedCallback(callback);
+    mWebEngine.RegisterPageLoadStartedCallback(std::move(callback));
   }
 }
 
@@ -706,7 +706,7 @@ void WebView::RegisterPageLoadInProgressCallback(Dali::WebEnginePlugin::WebEngin
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterPageLoadInProgressCallback(callback);
+    mWebEngine.RegisterPageLoadInProgressCallback(std::move(callback));
   }
 }
 
@@ -714,7 +714,7 @@ void WebView::RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEngineP
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterPageLoadFinishedCallback(callback);
+    mWebEngine.RegisterPageLoadFinishedCallback(std::move(callback));
   }
 }
 
@@ -722,7 +722,7 @@ void WebView::RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePage
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterPageLoadErrorCallback(callback);
+    mWebEngine.RegisterPageLoadErrorCallback(std::move(callback));
   }
 }
 
@@ -730,7 +730,7 @@ void WebView::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngine
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterScrollEdgeReachedCallback(callback);
+    mWebEngine.RegisterScrollEdgeReachedCallback(std::move(callback));
   }
 }
 
@@ -738,7 +738,7 @@ void WebView::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChan
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterUrlChangedCallback(callback);
+    mWebEngine.RegisterUrlChangedCallback(std::move(callback));
   }
 }
 
@@ -746,20 +746,20 @@ void WebView::RegisterFormRepostDecidedCallback(Dali::WebEnginePlugin::WebEngine
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterFormRepostDecidedCallback(callback);
+    mWebEngine.RegisterFormRepostDecidedCallback(std::move(callback));
   }
 }
 
 void WebView::RegisterFrameRenderedCallback(Dali::WebEnginePlugin::WebEngineFrameRenderedCallback callback)
 {
-  mFrameRenderedCallback = callback;
+  mFrameRenderedCallback = std::move(callback);
 }
 
 void WebView::RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback)
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterConsoleMessageReceivedCallback(callback);
+    mWebEngine.RegisterConsoleMessageReceivedCallback(std::move(callback));
   }
 }
 
@@ -767,7 +767,7 @@ void WebView::RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEn
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterResponsePolicyDecidedCallback(callback);
+    mWebEngine.RegisterResponsePolicyDecidedCallback(std::move(callback));
   }
 }
 
@@ -775,7 +775,7 @@ void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::Web
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterNavigationPolicyDecidedCallback(callback);
+    mWebEngine.RegisterNavigationPolicyDecidedCallback(std::move(callback));
   }
 }
 
@@ -783,7 +783,7 @@ void WebView::RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineN
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterNewWindowCreatedCallback(callback);
+    mWebEngine.RegisterNewWindowCreatedCallback(std::move(callback));
   }
 }
 
@@ -791,7 +791,7 @@ void WebView::RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEng
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterCertificateConfirmedCallback(callback);
+    mWebEngine.RegisterCertificateConfirmedCallback(std::move(callback));
   }
 }
 
@@ -799,7 +799,7 @@ void WebView::RegisterSslCertificateChangedCallback(Dali::WebEnginePlugin::WebEn
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterSslCertificateChangedCallback(callback);
+    mWebEngine.RegisterSslCertificateChangedCallback(std::move(callback));
   }
 }
 
@@ -807,7 +807,7 @@ void WebView::RegisterHttpAuthHandlerCallback(Dali::WebEnginePlugin::WebEngineHt
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterHttpAuthHandlerCallback(callback);
+    mWebEngine.RegisterHttpAuthHandlerCallback(std::move(callback));
   }
 }
 
@@ -815,7 +815,7 @@ void WebView::RegisterContextMenuShownCallback(Dali::WebEnginePlugin::WebEngineC
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterContextMenuShownCallback(callback);
+    mWebEngine.RegisterContextMenuShownCallback(std::move(callback));
   }
 }
 
@@ -823,7 +823,7 @@ void WebView::RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngine
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterContextMenuHiddenCallback(callback);
+    mWebEngine.RegisterContextMenuHiddenCallback(std::move(callback));
   }
 }
 
@@ -831,7 +831,7 @@ void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceive
 {
   if(mWebEngine)
   {
-    mWebEngine.GetPlainTextAsynchronously(callback);
+    mWebEngine.GetPlainTextAsynchronously(std::move(callback));
   }
 }
 
