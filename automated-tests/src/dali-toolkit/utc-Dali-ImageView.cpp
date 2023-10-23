@@ -576,16 +576,8 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
   // loading is not started if the actor is offScene
 
   application.GetScene().Add(imageView);
-  application.SendNotification();
-  application.Render(16);
-  application.Render(16);
-  application.SendNotification();
 
   imageView.SetProperty(Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT);
-  application.SendNotification();
-  application.Render(16);
-  application.Render(16);
-  application.SendNotification();
 
   // loading started, this waits for the loader thread for max 30 seconds
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
@@ -623,10 +615,6 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing02(void)
   imageView.SetProperty(ImageView::Property::IMAGE, asyncLoadingMap);
 
   application.GetScene().Add(imageView);
-  application.SendNotification();
-  application.Render(16);
-  application.Render(16);
-  application.SendNotification();
 
   // loading started, this waits for the loader thread for max 30 seconds
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
@@ -831,10 +819,6 @@ int UtcDaliImageViewAsyncLoadingEncodedBufferWithAtlasing(void)
   imageView.SetProperty(ImageView::Property::IMAGE, imageMap);
 
   imageView.SetProperty(Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT);
-  application.SendNotification();
-  application.Render(16);
-  application.Render(16);
-  application.SendNotification();
 
   // loading started, this waits for the loader thread for max 30 seconds
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
@@ -1068,7 +1052,7 @@ void OnResourceReadySignalSVG(Control control)
   DALI_TEST_CHECK(retMap);
 
   // Fitting mode should not be applied at this point
-  DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::SIZE)->Get<Vector2>(),  Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::SIZE)->Get<Vector2>(), Vector2::ZERO, TEST_LOCATION);
 }
 
 int UtcDaliImageViewCheckResourceReady(void)
@@ -2869,7 +2853,7 @@ int UtcDaliImageViewSyncSVGLoading02(void)
     DALI_TEST_CHECK(retMap);
 
     // Image Visual should be positioned depending on ImageView's padding
-    DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::SIZE)->Get<Vector2>(),  Vector2(100, 100), TEST_LOCATION);
+    DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::SIZE)->Get<Vector2>(), Vector2(100, 100), TEST_LOCATION);
 
     Vector3 naturalSize = imageView.GetNaturalSize();
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
