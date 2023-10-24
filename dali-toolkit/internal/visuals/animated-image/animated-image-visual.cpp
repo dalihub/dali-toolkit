@@ -19,6 +19,7 @@
 #include "animated-image-visual.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
@@ -662,6 +663,14 @@ void AnimatedImageVisual::DoSetOnScene(Actor& actor)
   mStartFirstFrame = true;
   mPlacementActor  = actor;
   PrepareTextureSet();
+
+  DevelActor::VisibilityChangedSignal(actor).Connect(this, &AnimatedImageVisual::OnControlVisibilityChanged);
+
+  Window window = DevelWindow::Get(actor);
+  if(window)
+  {
+    DevelWindow::VisibilityChangedSignal(window).Connect(this, &AnimatedImageVisual::OnWindowVisibilityChanged);
+  }
 }
 
 void AnimatedImageVisual::DoSetOffScene(Actor& actor)
@@ -688,6 +697,14 @@ void AnimatedImageVisual::DoSetOffScene(Actor& actor)
   mStartFirstFrame   = false;
   mCurrentFrameIndex = FIRST_FRAME_INDEX;
   mCurrentLoopIndex  = FIRST_LOOP;
+
+  DevelActor::VisibilityChangedSignal(actor).Disconnect(this, &AnimatedImageVisual::OnControlVisibilityChanged);
+
+  Window window = DevelWindow::Get(actor);
+  if(window)
+  {
+    DevelWindow::VisibilityChangedSignal(window).Disconnect(this, &AnimatedImageVisual::OnWindowVisibilityChanged);
+  }
 }
 
 void AnimatedImageVisual::OnSetTransform()
@@ -991,6 +1008,26 @@ void AnimatedImageVisual::CheckMaskTexture()
       mMaskingData->mMaskImageLoadingFailed = maskLoadFailed;
       UpdateShader();
     }
+  }
+}
+
+void AnimatedImageVisual::OnControlVisibilityChanged(Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+{
+  if(!visible && mActionStatus != DevelAnimatedImageVisual::Action::STOP)
+  {
+    mActionStatus = DevelAnimatedImageVisual::Action::STOP;
+    DisplayNextFrame();
+    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Verbose, "AnimatedImageVisual::OnControlVisibilityChanged: invisibile. Pause animation [%p]\n", this);
+  }
+}
+
+void AnimatedImageVisual::OnWindowVisibilityChanged(Window window, bool visible)
+{
+  if(!visible && mActionStatus != DevelAnimatedImageVisual::Action::STOP)
+  {
+    mActionStatus = DevelAnimatedImageVisual::Action::STOP;
+    DisplayNextFrame();
+    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Verbose, "AnimatedImageVisual::OnWindowVisibilityChanged: invisibile. Pause animation [%p]\n", this);
   }
 }
 
