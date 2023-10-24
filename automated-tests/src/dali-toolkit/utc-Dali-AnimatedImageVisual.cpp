@@ -28,6 +28,7 @@
 #include <dali-toolkit/devel-api/visuals/animated-image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 
 #include "dummy-control.h"
 
@@ -1989,6 +1990,164 @@ int UtcDaliAnimatedImageVisualDesiredSize(void)
     out << GL_TEXTURE_2D << ", " << 0u << ", " << desiredWidth << ", " << desiredHeight;
     DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str())); // The size should not be changed
   }
+
+  END_TEST;
+}
+
+
+int UtcDaliAnimatedImageVisualControlVisibilityChanged(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualControlVisibilityChanged");
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_GIF_FILE_NAME)
+    .Add(DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::FIRST_FRAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  Property::Map attributes;
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::PLAY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check frame number
+  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  Renderer renderer = actor.GetRendererAt(0u);
+  DALI_TEST_CHECK(renderer);
+
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Map resultMap;
+  visual.CreatePropertyMap(resultMap);
+
+  // check the property values from the returned map from a visual
+  Property::Value* value = resultMap.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_NOT_EQUALS(value->Get<int>(), 0, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  actor.SetProperty(Actor::Property::VISIBLE, false);
+
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  visual.CreatePropertyMap(resultMap);
+
+  // check the property values from the returned map from a visual
+  value = resultMap.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<int>(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualWindowVisibilityChanged(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualWindowVisibilityChanged");
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_GIF_FILE_NAME)
+    .Add(DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::FIRST_FRAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  Property::Map attributes;
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::PLAY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check frame number
+  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  Renderer renderer = actor.GetRendererAt(0u);
+  DALI_TEST_CHECK(renderer);
+
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Map resultMap;
+  visual.CreatePropertyMap(resultMap);
+
+  // check the property values from the returned map from a visual
+  Property::Value* value = resultMap.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_NOT_EQUALS(value->Get<int>(), 0, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  Window window = DevelWindow::Get(actor);
+  window.Hide();
+
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  visual.CreatePropertyMap(resultMap);
+
+  // check the property values from the returned map from a visual
+  value = resultMap.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<int>(), 0, TEST_LOCATION);
 
   END_TEST;
 }
