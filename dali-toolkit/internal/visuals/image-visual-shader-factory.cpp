@@ -39,43 +39,23 @@ const int NATIVE_SHADER_TYPE_OFFSET = VisualFactoryCache::ShaderType::NATIVE_IMA
 
 } // unnamed namespace
 
-static constexpr auto SHADER_TYPE_COUNT = 16u;
+static constexpr auto SHADER_TYPE_COUNT = 6u;
 
 const std::string_view VertexPredefines[SHADER_TYPE_COUNT]{
-  "",                                                                                                        // VisualFactoryCache::IMAGE_SHADER,
-  "#define IS_REQUIRED_ROUNDED_CORNER\n",                                                                    //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
-  "#define IS_REQUIRED_BORDERLINE\n",                                                                        //VisualFactoryCache::IMAGE_SHADER_BORDERLINE,
-  "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_BORDERLINE\n",                                    //VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE,
-  "#define IS_REQUIRED_ALPHA_MASKING\n",                                                                     // VisualFactoryCache::IMAGE_SHADER_MASKING,
-  "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_ALPHA_MASKING\n",                                 //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_MASKING,
-  "#define IS_REQUIRED_BORDERLINE\n#define IS_REQUIRED_ALPHA_MASKING\n",                                     //VisualFactoryCache::IMAGE_SHADER_BORDERLINE_MASKING,
-  "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_BORDERLINE\n#define IS_REQUIRED_ALPHA_MASKING\n", //VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING,
-  "",                                                                                                        //VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
-  "#define IS_REQUIRED_ROUNDED_CORNER\n",                                                                    //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
-  "#define IS_REQUIRED_BORDERLINE\n",                                                                        //VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUV_TO_RGB,
-  "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_BORDERLINE\n",                                    //VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_TO_RGB};
-  "",                                                                                                        //VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
-  "#define IS_REQUIRED_ROUNDED_CORNER\n",                                                                    //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
-  "#define IS_REQUIRED_BORDERLINE\n",                                                                        //VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUV_AND_RGB,
-  "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_BORDERLINE\n"                                     //VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_AND_RGB};
+  "",                                     // VisualFactoryCache::IMAGE_SHADER,
+  "#define IS_REQUIRED_ROUNDED_CORNER\n", //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
+  "",                                     //VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
+  "#define IS_REQUIRED_ROUNDED_CORNER\n", //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
+  "",                                     //VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
+  "#define IS_REQUIRED_ROUNDED_CORNER\n", //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
 };
 const std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
-  "",                                                                                                             // VisualFactoryCache::IMAGE_SHADER,
-  "#define IS_REQUIRED_ROUNDED_CORNER\n",                                                                         //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
-  "#define IS_REQUIRED_BORDERLINE\n",                                                                             //VisualFactoryCache::IMAGE_SHADER_BORDERLINE,
-  "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_BORDERLINE\n",                                         //VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE,
-  "#define IS_REQUIRED_ALPHA_MASKING\n",                                                                          // VisualFactoryCache::IMAGE_SHADER_MASKING,
-  "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_ALPHA_MASKING\n",                                      //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_MASKING,
-  "#define IS_REQUIRED_BORDERLINE\n#define IS_REQUIRED_ALPHA_MASKING\n",                                          //VisualFactoryCache::IMAGE_SHADER_BORDERLINE_MASKING,
-  "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_BORDERLINE\n#define IS_REQUIRED_ALPHA_MASKING\n",      //VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING,
-  "#define IS_REQUIRED_YUV_TO_RGB\n",                                                                             //VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
-  "#define IS_REQUIRED_YUV_TO_RGB\n#define IS_REQUIRED_ROUNDED_CORNER\n",                                         //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
-  "#define IS_REQUIRED_YUV_TO_RGB\n#define IS_REQUIRED_BORDERLINE\n",                                             //VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUV_TO_RGB,
-  "#define IS_REQUIRED_YUV_TO_RGB\n#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_BORDERLINE\n",         //VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_TO_RGB};
-  "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n",                                                                    //VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
-  "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n#define IS_REQUIRED_ROUNDED_CORNER\n",                                //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
-  "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n#define IS_REQUIRED_BORDERLINE\n",                                    //VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUV_AND_RGB,
-  "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_BORDERLINE\n" //VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_AND_RGB};
+  "",                                                                              // VisualFactoryCache::IMAGE_SHADER,
+  "#define IS_REQUIRED_ROUNDED_CORNER\n",                                          //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
+  "#define IS_REQUIRED_YUV_TO_RGB\n",                                              //VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
+  "#define IS_REQUIRED_YUV_TO_RGB\n#define IS_REQUIRED_ROUNDED_CORNER\n",          //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
+  "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n",                                     //VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
+  "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n#define IS_REQUIRED_ROUNDED_CORNER\n", //VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
 };
 
 ImageVisualShaderFactory::ImageVisualShaderFactory()
@@ -184,7 +164,7 @@ void ImageVisualShaderFactory::GetPrecompiledShader(RawShaderData& shaders)
   shaders.fragmentPrefix = fragmentPrefix;
   shaders.vertexShader   = SHADER_IMAGE_VISUAL_SHADER_VERT;
   shaders.fragmentShader = SHADER_IMAGE_VISUAL_SHADER_FRAG;
-  shaders.shaderCount += shaderCount;
+  shaders.shaderCount    = shaderCount;
 }
 
 } // namespace Internal

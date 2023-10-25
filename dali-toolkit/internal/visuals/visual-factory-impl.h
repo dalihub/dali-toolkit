@@ -115,6 +115,12 @@ private:
   void SetBrokenImageUrl(Toolkit::StyleManager& styleManager);
 
   /**
+   * @brief Get the default shader source.
+   * @param[in] shaders shaderList for precompile
+   */
+  void GetPrecompiledShader(RawShaderData& shaders);
+
+  /**
    * Get the factory cache, creating it if necessary.
    */
   Internal::VisualFactoryCache& GetFactoryCache();
