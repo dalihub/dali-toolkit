@@ -341,8 +341,6 @@ struct Controller::Impl
     mMaximumNumberOfCharacters(50u),
     mHiddenInput(NULL),
     mInputFilter(nullptr),
-    mTextFitContentSize(),
-    mTextFitArray(),
     mRecalculateNaturalSize(true),
     mMarkupProcessorEnabled(false),
     mClipboardHideEnabled(true),
@@ -357,7 +355,6 @@ struct Controller::Impl
     mStrikethroughSetByString(false),
     mShouldClearFocusOnEscape(true),
     mLayoutDirection(LayoutDirection::LEFT_TO_RIGHT),
-    mCurrentLineSize(0.f),
     mTextFitMinSize(DEFAULT_TEXTFIT_MIN),
     mTextFitMaxSize(DEFAULT_TEXTFIT_MAX),
     mTextFitStepSize(DEFAULT_TEXTFIT_STEP),
@@ -367,7 +364,6 @@ struct Controller::Impl
     mFontSizeScaleEnabled(true),
     mTextFitEnabled(false),
     mTextFitChanged(false),
-    mTextFitArrayEnabled(false),
     mIsLayoutDirectionChanged(false),
     mIsUserInteractionEnabled(true)
   {
@@ -1029,8 +1025,6 @@ public:
   std::unique_ptr<InputFilter> mInputFilter;                ///< Avoid allocating this when the user does not specify input filter mode.
   Vector2                      mTextFitContentSize;         ///< Size of Text fit content
 
-  std::vector<Toolkit::DevelTextLabel::FitOption> mTextFitArray; ///< List of FitOption for TextFitArray operation.
-
   bool               mRecalculateNaturalSize : 1;         ///< Whether the natural size needs to be recalculated.
   bool               mMarkupProcessorEnabled : 1;         ///< Whether the mark-up procesor is enabled.
   bool               mClipboardHideEnabled : 1;           ///< Whether the ClipboardHide function work or not
@@ -1049,7 +1043,6 @@ public:
 
   Shader mShaderBackground; ///< The shader for text background.
 
-  float mCurrentLineSize;              ///< Used to store the MinLineSize set by user when TextFitArray is enabled.
   float mTextFitMinSize;               ///< Minimum Font Size for text fit. Default 10
   float mTextFitMaxSize;               ///< Maximum Font Size for text fit. Default 100
   float mTextFitStepSize;              ///< Step Size for font intervalse. Default 1
@@ -1059,7 +1052,6 @@ public:
   bool  mFontSizeScaleEnabled : 1;     ///< Whether the font size scale is enabled.
   bool  mTextFitEnabled : 1;           ///< Whether the text's fit is enabled.
   bool  mTextFitChanged : 1;           ///< Whether the text fit property has changed.
-  bool  mTextFitArrayEnabled : 1;      ///< Whether the text's fit array is enabled.
   bool  mIsLayoutDirectionChanged : 1; ///< Whether the layout has changed.
   bool  mIsUserInteractionEnabled : 1; ///< Whether the user interaction is enabled.
 

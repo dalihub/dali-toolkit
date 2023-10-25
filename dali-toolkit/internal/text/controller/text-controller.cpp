@@ -374,16 +374,6 @@ bool Controller::IsTextFitChanged() const
   return mImpl->mTextFitChanged;
 }
 
-void Controller::SetCurrentLineSize(float lineSize)
-{
-  mImpl->mCurrentLineSize = lineSize;
-}
-
-float Controller::GetCurrentLineSize() const
-{
-  return mImpl->mCurrentLineSize;
-}
-
 void Controller::SetTextFitMinSize(float minSize, FontSizeType type)
 {
   mImpl->mTextFitMinSize = (type == POINT_SIZE) ? minSize : ConvertPixelToPoint(minSize);
@@ -432,28 +422,6 @@ float Controller::GetTextFitPointSize() const
 void Controller::SetTextFitLineSize(float lineSize)
 {
   mImpl->mTextFitLineSize = lineSize;
-}
-
-void Controller::SetTextFitArrayEnabled(bool enabled)
-{
-  mImpl->mTextFitArrayEnabled = enabled;
-  mImpl->ClearFontData();
-  mImpl->RequestRelayout();
-}
-
-bool Controller::IsTextFitArrayEnabled() const
-{
-  return mImpl->mTextFitArrayEnabled;
-}
-
-void Controller::SetTextFitArray(std::vector<Toolkit::DevelTextLabel::FitOption>& fitOptions)
-{
-  mImpl->mTextFitArray = fitOptions;
-}
-
-std::vector<Toolkit::DevelTextLabel::FitOption>& Controller::GetTextFitArray()
-{
-  return mImpl->mTextFitArray;
 }
 
 void Controller::SetPlaceholderTextElideEnabled(bool enabled)
@@ -1322,11 +1290,6 @@ bool Controller::CheckForTextFit(float pointSize, Size& layoutSize)
 void Controller::FitPointSizeforLayout(Size layoutSize)
 {
   Relayouter::FitPointSizeforLayout(*this, layoutSize);
-}
-
-void Controller::FitArrayPointSizeforLayout(Size layoutSize)
-{
-  Relayouter::FitArrayPointSizeforLayout(*this, layoutSize);
 }
 
 float Controller::GetHeightForWidth(float width)

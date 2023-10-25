@@ -64,14 +64,6 @@ struct Controller::Relayouter
   static void FitPointSizeforLayout(Controller& controller, const Size& layoutSize);
 
   /**
-   * @brief Calculates the point size for text for given layout() using text fit array.
-   *
-   * @param[in] controller A reference to the controller class
-   * @param[in] layoutSize The layout size
-   */
-  static void FitArrayPointSizeforLayout(Controller& controller, const Size& layoutSize);
-
-  /**
    * @brief Called by the Controller to get the height for a particular width.
    *
    * @param[in] controller A reference to the controller class
@@ -135,11 +127,6 @@ private:
 
   static void DoRelayoutHorizontalAlignment(Controller::Impl& impl, const Size& size, const CharacterIndex startIndex, const Length requestedNumberOfCharacters);
 };
-
-inline bool compareByPointSize(Toolkit::DevelTextLabel::FitOption& lhs, Toolkit::DevelTextLabel::FitOption& rhs)
-{
-  return lhs.GetPointSize() < rhs.GetPointSize();
-}
 
 } // namespace Text
 

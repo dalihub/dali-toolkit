@@ -171,28 +171,6 @@ public:
    */
   void SetSpannedText(const Text::Spanned& spannedText);
 
-  /**
-   * @brief Set text fit array to text label.
-   *
-   * @param[in] enable Whether the text fit array is enabled or not.
-   * @param[in] fitOptions list of the fit options.
-   */
-  void SetTextFitArray(const bool enable, std::vector<Toolkit::DevelTextLabel::FitOption>& fitOptions);
-
-  /**
-   * @brief Get the text fit array of text label.
-   *
-   * @return list of the fit options.
-   */
-  std::vector<Toolkit::DevelTextLabel::FitOption>& GetTextFitArray();
-
-  /**
-   * @brief Whether the text fit array is enabled or not.
-   *
-   * @return True if the text fit array is enabled.
-   */
-  bool IsTextFitArrayEnabled() const;
-
 private: // From Control
   /**
    * @copydoc Control::OnInitialize()
