@@ -1305,12 +1305,11 @@ CharacterIndex Controller::Impl::CalculateNewCursorIndex(CharacterIndex index) c
 
   if(index < mEventData->mPrimaryCursorPosition)
   {
-    cursorIndex = cursorIndex < numberOfCharacters ? 0u : cursorIndex - numberOfCharacters;
+    cursorIndex -= numberOfCharacters;
   }
   else
   {
-    Length textLength = mModel->mVisualModel->mCharactersToGlyph.Count();
-    cursorIndex = cursorIndex + numberOfCharacters > textLength ? textLength : cursorIndex + numberOfCharacters;
+    cursorIndex += numberOfCharacters;
   }
 
   // Will update the cursor hook position.
