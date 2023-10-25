@@ -66,9 +66,9 @@ NPatchData::NPatchDataId NPatchLoader::GenerateUniqueNPatchDataId()
 
 NPatchData::NPatchDataId NPatchLoader::Load(TextureManager& textureManager, TextureUploadObserver* textureObserver, const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad, bool synchronousLoading)
 {
-  NPatchDataPtr data = GetNPatchData(url, border, preMultiplyOnLoad);
+  std::shared_ptr<NPatchData> data = GetNPatchData(url, border, preMultiplyOnLoad);
 
-  DALI_ASSERT_ALWAYS(data.Get() && "NPatchData creation failed!");
+  DALI_ASSERT_ALWAYS(data.get() && "NPatchData creation failed!");
 
   if(data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
   {
@@ -97,7 +97,7 @@ NPatchData::NPatchDataId NPatchLoader::Load(TextureManager& textureManager, Text
     auto preMultiplyOnLoading = preMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                                                   : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-    Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(url, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, synchronousLoading, data.Get(), true, preMultiplyOnLoading);
+    Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(url, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, synchronousLoading, data.get(), true, preMultiplyOnLoading);
 
     if(pixelBuffer)
     {
@@ -127,7 +127,7 @@ int32_t NPatchLoader::GetCacheIndexFromId(const NPatchData::NPatchDataId id)
   return INVALID_CACHE_INDEX;
 }
 
-bool NPatchLoader::GetNPatchData(const NPatchData::NPatchDataId id, NPatchDataPtr& data)
+bool NPatchLoader::GetNPatchData(const NPatchData::NPatchDataId id, std::shared_ptr<const NPatchData>& data)
 {
   int32_t cacheIndex = GetCacheIndexFromId(id);
   if(cacheIndex != INVALID_CACHE_INDEX)
@@ -160,6 +160,19 @@ void NPatchLoader::RequestRemove(NPatchData::NPatchDataId id, TextureUploadObser
     mRemoveProcessorRegistered = true;
     Adaptor::Get().RegisterProcessor(*this, true);
   }
+}
+
+void NPatchLoader::IncreaseReference(NPatchData::NPatchDataId id)
+{
+  int32_t cacheIndex = GetCacheIndexFromId(id);
+  if(cacheIndex == INVALID_CACHE_INDEX)
+  {
+    return;
+  }
+
+  NPatchInfo& info(mCache[cacheIndex]);
+
+  ++info.mReferenceCount;
 }
 
 void NPatchLoader::Remove(NPatchData::NPatchDataId id, TextureUploadObserver* textureObserver)
@@ -195,7 +208,7 @@ void NPatchLoader::Process(bool postProcessor)
   }
 }
 
-NPatchDataPtr NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad)
+std::shared_ptr<NPatchData> NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad)
 {
   std::size_t                              hash  = CalculateHash(url.GetUrl());
   std::vector<NPatchInfo>::size_type       index = UNINITIALIZED_ID;
@@ -247,7 +260,7 @@ NPatchDataPtr NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>&
   // If this is new image loading, make new cache data
   if(infoPtr == nullptr)
   {
-    NPatchInfo info(new NPatchData());
+    NPatchInfo info(std::make_shared<NPatchData>(*this));
     info.mData->SetId(GenerateUniqueNPatchDataId());
     info.mData->SetHash(hash);
     info.mData->SetUrl(url);
@@ -260,7 +273,7 @@ NPatchDataPtr NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>&
   // Else if LOAD_COMPLETE, Same url but border is different - use the existing texture
   else if(infoPtr->mData->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
   {
-    NPatchInfo info(new NPatchData());
+    NPatchInfo info(std::make_shared<NPatchData>(*this));
 
     info.mData->SetId(GenerateUniqueNPatchDataId());
     info.mData->SetHash(hash);

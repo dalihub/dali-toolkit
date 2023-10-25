@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_NPATCH_HELPER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,26 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/rendering/geometry.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
+#include <memory> ///< for std::shared_ptr
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
+#include <dali-toolkit/internal/visuals/npatch-data.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
-namespace Internal
-{
-class NPatchData;
-}
-
 namespace NPatchHelper
 {
+/**
+ * The list that includes stretch pixel ranges
+ */
+using StretchRanges = Dali::Vector<Uint16Pair>;
+
 /**
  * @brief Creates a Npatch Geometry object
  *
@@ -69,6 +70,7 @@ DALI_TOOLKIT_API Geometry CreateGridGeometry(Uint16Pair gridSize);
  */
 DALI_TOOLKIT_API Geometry CreateBorderGeometry(Uint16Pair gridSize);
 
+
 /**
  * @brief Registers a properties for Stretch Ranges
  *
@@ -85,9 +87,9 @@ void RegisterStretchProperties(Renderer& renderer, const char* uniformName, cons
  * @param[in,out] renderer The renderer for broken image
  * @param[in] data The pointer of npatch-data
  */
-void ApplyTextureAndUniforms(Renderer& renderer, const Internal::NPatchData* data);
+void ApplyTextureAndUniforms(Renderer& renderer, const std::shared_ptr<const Internal::NPatchData> data);
 
-} // namespace NPatchHelper
+} // namespace NPatchUtility
 
 } // namespace Toolkit
 

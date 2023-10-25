@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2023 Samsung Electronics Co., Ltd.
+* Copyright (c) 2022 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,9 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/npatch-data.h>
 
 namespace Dali
 {
@@ -253,7 +250,7 @@ void RegisterStretchProperties(Renderer& renderer, const char* uniformName, cons
   }
 }
 
-void ApplyTextureAndUniforms(Renderer& renderer, const Internal::NPatchData* data)
+void ApplyTextureAndUniforms(Renderer& renderer, const std::shared_ptr<const Internal::NPatchData> data)
 {
   TextureSet textureSet;
   textureSet = data->GetTextures();

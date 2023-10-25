@@ -21,6 +21,7 @@
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/rendering/texture-set.h>
+#include <memory> // for std::shared_ptr
 #include <string>
 #include <utility> // for std::pair
 
@@ -78,7 +79,7 @@ public:
    * @param [out] data const pointer to the NPatchData
    * @return true if data matching to id was really found
    */
-  bool GetNPatchData(const NPatchData::NPatchDataId id, NPatchDataPtr& data);
+  bool GetNPatchData(const NPatchData::NPatchDataId id, std::shared_ptr<const NPatchData>& data);
 
   /**
    * @brief Request remove a texture matching id.
@@ -88,6 +89,13 @@ public:
    * @param [in] textureObserver The NPatchVisual that requested loading.
    */
   void RequestRemove(NPatchData::NPatchDataId id, TextureUploadObserver* textureObserver);
+
+  /**
+   * @brief Increase reference count of a texture matching id.
+   *
+   * @param [in] id cache data id
+   */
+  void IncreaseReference(NPatchData::NPatchDataId id);
 
 protected: // Implementation of Processor
   /**
@@ -118,7 +126,7 @@ private:
    */
   struct NPatchInfo
   {
-    NPatchInfo(NPatchDataPtr data)
+    NPatchInfo(std::shared_ptr<NPatchData> data)
     : mData(data),
       mReferenceCount(1u)
     {
@@ -144,8 +152,8 @@ private:
     NPatchInfo(const NPatchInfo& info) = delete;            // Do not use copy constructor
     NPatchInfo& operator=(const NPatchInfo& info) = delete; // Do not use copy assign
 
-    NPatchDataPtr mData;
-    std::int16_t  mReferenceCount; ///< The number of N-patch visuals that use this data.
+    std::shared_ptr<NPatchData> mData;
+    std::int16_t                mReferenceCount; ///< The number of N-patch visuals that use this data.
   };
 
   /**
@@ -158,7 +166,7 @@ private:
    *                                   image has no alpha channel
    * @return NPatchData pointer that Load function will used.
    */
-  NPatchDataPtr GetNPatchData(const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad);
+  std::shared_ptr<NPatchData> GetNPatchData(const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad);
 
 protected:
   /**

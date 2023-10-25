@@ -80,7 +80,7 @@ void NPatchVisual::LoadImages()
     bool preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader ? true : false;
     mId                    = mLoader.Load(textureManager, this, mImageUrl, mBorder, preMultiplyOnLoad, synchronousLoading);
 
-    NPatchDataPtr data;
+    std::shared_ptr<const NPatchData> data;
     if(mLoader.GetNPatchData(mId, data) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
     {
       EnablePreMultipliedAlpha(data->IsPreMultiplied());
@@ -126,7 +126,7 @@ void NPatchVisual::GetNaturalSize(Vector2& naturalSize)
   naturalSize.y = 0u;
 
   // load now if not already loaded
-  NPatchDataPtr data;
+  std::shared_ptr<const NPatchData> data;
   if(mLoader.GetNPatchData(mId, data) && data->GetLoadingState() != NPatchData::LoadingState::LOADING)
   {
     naturalSize.x = data->GetCroppedWidth();
@@ -223,7 +223,7 @@ void NPatchVisual::DoSetOnScene(Actor& actor)
   // at this case, we try to SetResouce to mPlaceActor twice. so, we should avoid that case.
   mPlacementActor = actor;
 
-  NPatchDataPtr data;
+  std::shared_ptr<const NPatchData> data;
   if(mImpl->mRenderer && mLoader.GetNPatchData(mId, data) && data->GetLoadingState() != NPatchData::LoadingState::LOADING)
   {
     // If mAuxiliaryUrl need to be loaded, we should wait it until LoadComplete called.
@@ -338,9 +338,9 @@ NPatchVisual::~NPatchVisual()
 void NPatchVisual::OnInitialize()
 {
   // Get basic geometry and shader
-  Geometry geometry                        = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
-  auto     imageVisualShaderFeatureBuilder = ImageVisualShaderFeatureBuilder();
-  Shader   shader                          = mImageVisualShaderFactory.GetShader(
+  Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
+  auto imageVisualShaderFeatureBuilder = ImageVisualShaderFeatureBuilder();
+  Shader   shader   = mImageVisualShaderFactory.GetShader(
     mFactoryCache,
     imageVisualShaderFeatureBuilder);
 
@@ -353,8 +353,8 @@ void NPatchVisual::OnInitialize()
 
 Geometry NPatchVisual::CreateGeometry()
 {
-  Geometry      geometry;
-  NPatchDataPtr data;
+  Geometry                          geometry;
+  std::shared_ptr<const NPatchData> data;
   if(mLoader.GetNPatchData(mId, data) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
   {
     if(data->GetStretchPixelsX().Size() == 1 && data->GetStretchPixelsY().Size() == 1)
@@ -408,8 +408,8 @@ Geometry NPatchVisual::CreateGeometry()
 
 Shader NPatchVisual::CreateShader()
 {
-  Shader        shader;
-  NPatchDataPtr data;
+  Shader                            shader;
+  std::shared_ptr<const NPatchData> data;
   // 0 is either no data (load failed?) or no stretch regions on image
   // for both cases we use the default shader
   NPatchUtility::StretchRanges::SizeType xStretchCount = 0;
@@ -488,13 +488,13 @@ Shader NPatchVisual::CreateShader()
 
 void NPatchVisual::ApplyTextureAndUniforms()
 {
-  NPatchDataPtr data;
-  TextureSet    textureSet;
+  std::shared_ptr<const NPatchData> data;
+  TextureSet                        textureSet;
 
   if(mLoader.GetNPatchData(mId, data) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
   {
     textureSet = data->GetTextures();
-    NPatchHelper::ApplyTextureAndUniforms(mImpl->mRenderer, data.Get());
+    NPatchHelper::ApplyTextureAndUniforms(mImpl->mRenderer, data);
 
     if(mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY)
     {
@@ -551,7 +551,7 @@ Geometry NPatchVisual::GetNinePatchGeometry(VisualFactoryCache::GeometryType sub
 
 void NPatchVisual::SetResource()
 {
-  NPatchDataPtr data;
+  std::shared_ptr<const NPatchData> data;
   if(mImpl->mRenderer && mLoader.GetNPatchData(mId, data))
   {
     Geometry geometry = CreateGeometry();
@@ -628,7 +628,7 @@ void NPatchVisual::LoadComplete(bool loadSuccess, TextureInformation textureInfo
   // If auxiliaryUrl didn't required OR auxiliaryUrl load done.
   if(!mAuxiliaryUrl.IsValid() || mAuxiliaryResourceStatus != Toolkit::Visual::ResourceStatus::PREPARING)
   {
-    NPatchDataPtr data;
+    std::shared_ptr<const NPatchData> data;
     // and.. If Url loading done.
     if(mImpl->mRenderer && mLoader.GetNPatchData(mId, data) && data->GetLoadingState() != NPatchData::LoadingState::LOADING)
     {

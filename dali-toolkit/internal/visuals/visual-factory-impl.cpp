@@ -19,7 +19,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -29,7 +28,6 @@
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/animated-gradient/animated-gradient-visual.h>
 #include <dali-toolkit/internal/visuals/animated-image/animated-image-visual.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/animated-vector-image-visual.h>
@@ -43,6 +41,7 @@
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/text-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -52,6 +51,7 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+
 
 namespace Dali
 {
@@ -76,13 +76,15 @@ DALI_TYPE_REGISTRATION_BEGIN_CREATE(Toolkit::VisualFactory, Dali::BaseHandle, Cr
 DALI_TYPE_REGISTRATION_END()
 const char* const BROKEN_IMAGE_FILE_NAME = "broken.png"; ///< The file name of the broken image.
 
-static constexpr auto  SHADER_TYPE_COUNT = 2u;
-const std::string_view VertexPredefines[SHADER_TYPE_COUNT]{
-  "",                                     //VisualFactoryCache::COLOR_SHADER
+static constexpr auto          SHADER_TYPE_COUNT = 2u;
+const std::string_view VertexPredefines[SHADER_TYPE_COUNT]
+{
+  "", //VisualFactoryCache::COLOR_SHADER
   "#define IS_REQUIRED_ROUNDED_CORNER\n", //VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
 };
-const std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
-  "",                                     //VisualFactoryCache::COLOR_SHADER
+const std::string_view FragmentPredefines[SHADER_TYPE_COUNT]
+{
+  "", //VisualFactoryCache::COLOR_SHADER
   "#define IS_REQUIRED_ROUNDED_CORNER\n", //VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
 };
 
@@ -93,7 +95,6 @@ VisualFactory::VisualFactory(bool debugEnabled)
   mImageVisualShaderFactory(),
   mTextVisualShaderFactory(),
   mSlotDelegate(this),
-  mIdleCallback(nullptr),
   mDebugEnabled(debugEnabled),
   mPreMultiplyOnLoad(true)
 {
@@ -101,12 +102,6 @@ VisualFactory::VisualFactory(bool debugEnabled)
 
 VisualFactory::~VisualFactory()
 {
-  if(mIdleCallback && Adaptor::IsAvailable())
-  {
-    // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
-    Adaptor::Get().RemoveIdle(mIdleCallback);
-    mIdleCallback = nullptr;
-  }
 }
 
 void VisualFactory::OnStyleChangedSignal(Toolkit::StyleManager styleManager, StyleChange::Type type)
@@ -409,7 +404,7 @@ void VisualFactory::UsePreCompiledShader()
 
   // Get image shader
   std::vector<RawShaderData> rawShaderList;
-  RawShaderData              imageShaderData;
+  RawShaderData imageShaderData;
   GetImageVisualShaderFactory().GetPrecompiledShader(imageShaderData);
   rawShaderList.push_back(imageShaderData);
 
@@ -423,15 +418,9 @@ void VisualFactory::UsePreCompiledShader()
   GetPrecompiledShader(colorShaderData);
   rawShaderList.push_back(colorShaderData);
 
+
   // Save all shader
   Integration::ShaderPrecompiler::Get().SavePrecomipleShaderList(rawShaderList);
-}
-
-void VisualFactory::DiscardVisual(Toolkit::Visual::Base visual)
-{
-  mDiscardedVisuals.emplace_back(visual);
-
-  RegisterDiscardCallback();
 }
 
 Internal::TextureManager& VisualFactory::GetTextureManager()
@@ -463,20 +452,20 @@ void VisualFactory::GetPrecompiledShader(RawShaderData& shaders)
 {
   std::vector<std::string_view> vertexPrefix;
   std::vector<std::string_view> fragmentPrefix;
-  int                           shaderCount = 0;
-  shaders.shaderCount                       = 0;
-  for(int i = 0; i < SHADER_TYPE_COUNT; ++i)
+  int shaderCount = 0;
+  shaders.shaderCount = 0;
+  for(int i=0; i< SHADER_TYPE_COUNT; ++i)
   {
     vertexPrefix.push_back(VertexPredefines[i]);
     fragmentPrefix.push_back(FragmentPredefines[i]);
     shaderCount++;
   }
 
-  shaders.vertexPrefix   = vertexPrefix;
+  shaders.vertexPrefix = vertexPrefix;
   shaders.fragmentPrefix = fragmentPrefix;
-  shaders.vertexShader   = SHADER_COLOR_VISUAL_SHADER_VERT;
+  shaders.vertexShader = SHADER_COLOR_VISUAL_SHADER_VERT;
   shaders.fragmentShader = SHADER_COLOR_VISUAL_SHADER_FRAG;
-  shaders.shaderCount    = shaderCount;
+  shaders.shaderCount = shaderCount;
 }
 
 Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
@@ -514,31 +503,6 @@ TextVisualShaderFactory& VisualFactory::GetTextVisualShaderFactory()
     mTextVisualShaderFactory = std::unique_ptr<TextVisualShaderFactory>(new TextVisualShaderFactory());
   }
   return *mTextVisualShaderFactory;
-}
-
-void VisualFactory::OnDiscardCallback()
-{
-  mIdleCallback = nullptr;
-
-  // Discard visual now.
-  mDiscardedVisuals.clear();
-}
-
-void VisualFactory::RegisterDiscardCallback()
-{
-  if(!mIdleCallback && Adaptor::IsAvailable())
-  {
-    // The callback manager takes the ownership of the callback object.
-    mIdleCallback = MakeCallback(this, &VisualFactory::OnDiscardCallback);
-
-    Adaptor& adaptor = Adaptor::Get();
-
-    if(!adaptor.AddIdle(mIdleCallback, false))
-    {
-      // Fail to add idle. (Maybe adaptor is paused.)
-      mIdleCallback = nullptr;
-    }
-  }
 }
 
 } // namespace Internal

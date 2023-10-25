@@ -362,8 +362,6 @@ void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformatio
 
   MakeFrameReady(loadSuccess, textureInformation.textureSet, textureInformation.interval, textureInformation.preMultiplied);
 
-  // TODO : We need to remove some below logics, since user can remove Visual during ResourceReady callback.
-
   if(loadSuccess)
   {
     // The frames of a single animated image can not be loaded parallelly.

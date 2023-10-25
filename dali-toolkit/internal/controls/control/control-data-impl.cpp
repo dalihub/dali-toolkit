@@ -233,23 +233,6 @@ void MoveVisual(RegisteredVisualContainer::Iterator sourceIter, RegisteredVisual
 }
 
 /**
- * Discard visual from source to visual factory.
- */
-void DiscardVisual(RegisteredVisualContainer::Iterator sourceIter, RegisteredVisualContainer& source)
-{
-  Toolkit::Visual::Base visual = (*sourceIter)->visual;
-  if(visual)
-  {
-    if(Stage::IsInstalled())
-    {
-      Toolkit::VisualFactory::Get().DiscardVisual(visual);
-    }
-  }
-
-  source.Erase(sourceIter);
-}
-
-/**
  * Performs actions as requested using the action name.
  * @param[in] object The object on which to perform the action.
  * @param[in] actionName The action to perform.
@@ -890,9 +873,8 @@ void Control::Impl::UnregisterVisual(Property::Index index)
     Actor self(mControlImpl.Self());
     Toolkit::GetImplementation((*iter)->visual).SetOffScene(self);
     (*iter)->pending = false;
-
-    // Discard removed visual. It will be destroyed at next Idle time.
-    DiscardVisual(iter, mRemoveVisuals);
+    (*iter)->visual.Reset();
+    mRemoveVisuals.Erase(iter);
   }
 }
 
@@ -1023,9 +1005,7 @@ void Control::Impl::ResourceReady(Visual::Base& object)
     {
       Toolkit::GetImplementation((*visualToRemoveIter)->visual).SetOffScene(self);
     }
-
-    // Discard removed visual. It will be destroyed at next Idle time.
-    DiscardVisual(visualToRemoveIter, mRemoveVisuals);
+    mRemoveVisuals.Erase(visualToRemoveIter);
   }
 
   // A visual is ready so control may need relayouting if staged
@@ -2021,25 +2001,17 @@ void Control::Impl::OnSceneDisconnection()
 
   // Visuals pending replacement can now be taken out of the removal list and set off scene
   // Iterate through all replacement visuals and add to a move queue then set off scene
-
-  if(!mRemoveVisuals.Empty())
+  for(auto removalIter = mRemoveVisuals.Begin(), end = mRemoveVisuals.End(); removalIter != end; removalIter++)
   {
-    std::reverse(mRemoveVisuals.Begin(), mRemoveVisuals.End());
-
-    while(!mRemoveVisuals.Empty())
-    {
-      auto removalIter = mRemoveVisuals.End() - 1u;
-      Toolkit::GetImplementation((*removalIter)->visual).SetOffScene(self);
-
-      // Discard removed visual. It will be destroyed at next Idle time.
-      DiscardVisual(removalIter, mRemoveVisuals);
-    }
+    Toolkit::GetImplementation((*removalIter)->visual).SetOffScene(self);
   }
 
   for(auto replacedIter = mVisuals.Begin(), end = mVisuals.End(); replacedIter != end; replacedIter++)
   {
     (*replacedIter)->pending = false;
   }
+
+  mRemoveVisuals.Clear();
 }
 
 void Control::Impl::SetMargin(Extents margin)
