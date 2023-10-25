@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,6 +125,13 @@ public:
    * @return True if loaded images have pre-multiplied alpha applied on load, false otherwise.
    */
   bool GetPreMultiplyOnLoad() const;
+
+  /**
+   * @brief Discard visual base. It will keep reference of visual until idle callback called.
+   *
+   * @param[in] visual Discarded visual base.
+   */
+  void DiscardVisual(Visual::Base visual);
 
 private:
   explicit DALI_INTERNAL VisualFactory(Internal::VisualFactory* impl);

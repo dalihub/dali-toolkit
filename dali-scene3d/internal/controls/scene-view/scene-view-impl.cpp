@@ -160,123 +160,122 @@ void SetShadowLightConstraint(Dali::CameraActor selectedCamera, Dali::CameraActo
   shadowLightCamera.RemoveConstraints();
 
   // Compute ViewProjectionMatrix and store it to "tempViewProjectionMatrix" property
-  auto       tempViewProjectionMatrixIndex  = shadowLightCamera.RegisterProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
-  Constraint projectionMatrixConstraint = Constraint::New<Matrix>(shadowLightCamera, tempViewProjectionMatrixIndex, [](Matrix& output, const PropertyInputContainer& inputs)
-                                                                  {
-                                                                    Matrix worldMatrix = inputs[0]->GetMatrix();
-                                                                    float tangentFov_2 = tanf(inputs[4]->GetFloat());
-                                                                    float  nearDistance = inputs[5]->GetFloat();
-                                                                    float  farDistance  = inputs[6]->GetFloat();
-                                                                    float  aspectRatio  = inputs[7]->GetFloat();
-                                                                    float  nearY        = 0.0f;
-                                                                    float  nearX        = 0.0f;
-                                                                    float  farY         = 0.0f;
-                                                                    float  farX         = 0.0f;
-                                                                    if(inputs[1]->GetInteger() == Dali::Camera::ProjectionMode::PERSPECTIVE_PROJECTION)
-                                                                    {
-                                                                      if(inputs[2]->GetInteger() == Dali::DevelCameraActor::ProjectionDirection::VERTICAL)
-                                                                      {
-                                                                        nearY = tangentFov_2 * nearDistance;
-                                                                        nearX = nearY * aspectRatio;
-                                                                        farY  = tangentFov_2 * farDistance;
-                                                                        farX  = farY * aspectRatio;
-                                                                      }
-                                                                      else
-                                                                      {
-                                                                        nearX = tangentFov_2 * nearDistance;
-                                                                        nearY = nearX / aspectRatio;
-                                                                        farX  = tangentFov_2 * farDistance;
-                                                                        farY  = farX / aspectRatio;
-                                                                      }
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                      if(inputs[2]->GetInteger() == Dali::DevelCameraActor::ProjectionDirection::VERTICAL)
-                                                                      {
-                                                                        nearY = inputs[3]->GetFloat();
-                                                                        nearX = nearY * aspectRatio;
-                                                                      }
-                                                                      else
-                                                                      {
-                                                                        nearX = inputs[3]->GetFloat();
-                                                                        nearY = nearX / aspectRatio;
-                                                                      }
-                                                                      farX = nearX;
-                                                                      farY = nearY;
-                                                                    }
+  auto       tempViewProjectionMatrixIndex = shadowLightCamera.RegisterProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
+  Constraint projectionMatrixConstraint    = Constraint::New<Matrix>(shadowLightCamera, tempViewProjectionMatrixIndex, [](Matrix& output, const PropertyInputContainer& inputs) {
+    Matrix worldMatrix  = inputs[0]->GetMatrix();
+    float  tangentFov_2 = tanf(inputs[4]->GetFloat());
+    float  nearDistance = inputs[5]->GetFloat();
+    float  farDistance  = inputs[6]->GetFloat();
+    float  aspectRatio  = inputs[7]->GetFloat();
+    float  nearY        = 0.0f;
+    float  nearX        = 0.0f;
+    float  farY         = 0.0f;
+    float  farX         = 0.0f;
+    if(inputs[1]->GetInteger() == Dali::Camera::ProjectionMode::PERSPECTIVE_PROJECTION)
+    {
+      if(inputs[2]->GetInteger() == Dali::DevelCameraActor::ProjectionDirection::VERTICAL)
+      {
+        nearY = tangentFov_2 * nearDistance;
+        nearX = nearY * aspectRatio;
+        farY  = tangentFov_2 * farDistance;
+        farX  = farY * aspectRatio;
+      }
+      else
+      {
+        nearX = tangentFov_2 * nearDistance;
+        nearY = nearX / aspectRatio;
+        farX  = tangentFov_2 * farDistance;
+        farY  = farX / aspectRatio;
+      }
+    }
+    else
+    {
+      if(inputs[2]->GetInteger() == Dali::DevelCameraActor::ProjectionDirection::VERTICAL)
+      {
+        nearY = inputs[3]->GetFloat();
+        nearX = nearY * aspectRatio;
+      }
+      else
+      {
+        nearX = inputs[3]->GetFloat();
+        nearY = nearX / aspectRatio;
+      }
+      farX = nearX;
+      farY = nearY;
+    }
 
-                                                                    std::vector<Vector4> points;
-                                                                    points.push_back(Vector4(nearX, nearY, nearDistance, 1.0f));
-                                                                    points.push_back(Vector4(-nearX, nearY, nearDistance, 1.0f));
-                                                                    points.push_back(Vector4(-nearX, -nearY, nearDistance, 1.0f));
-                                                                    points.push_back(Vector4(nearX, -nearY, nearDistance, 1.0f));
-                                                                    points.push_back(Vector4(farX, farY, farDistance, 1.0f));
-                                                                    points.push_back(Vector4(-farX, farY, farDistance, 1.0f));
-                                                                    points.push_back(Vector4(-farX, -farY, farDistance, 1.0f));
-                                                                    points.push_back(Vector4(farX, -farY, farDistance, 1.0f));
+    std::vector<Vector4> points;
+    points.push_back(Vector4(nearX, nearY, nearDistance, 1.0f));
+    points.push_back(Vector4(-nearX, nearY, nearDistance, 1.0f));
+    points.push_back(Vector4(-nearX, -nearY, nearDistance, 1.0f));
+    points.push_back(Vector4(nearX, -nearY, nearDistance, 1.0f));
+    points.push_back(Vector4(farX, farY, farDistance, 1.0f));
+    points.push_back(Vector4(-farX, farY, farDistance, 1.0f));
+    points.push_back(Vector4(-farX, -farY, farDistance, 1.0f));
+    points.push_back(Vector4(farX, -farY, farDistance, 1.0f));
 
-                                                                    Matrix shadowCameraWorldMatrix = inputs[8]->GetMatrix();
-                                                                    Vector4 worldCenter;
-                                                                    for(auto&& point : points)
-                                                                    {
-                                                                      point = worldMatrix * point;
-                                                                      worldCenter += point;
-                                                                    }
-                                                                    worldCenter /= 8.0f;
-                                                                    shadowCameraWorldMatrix.SetTranslation(Vector3(worldCenter));
-                                                                    Matrix shadowCameraViewMatrix = shadowCameraWorldMatrix;
-                                                                    shadowCameraViewMatrix.Invert();
+    Matrix  shadowCameraWorldMatrix = inputs[8]->GetMatrix();
+    Vector4 worldCenter;
+    for(auto&& point : points)
+    {
+      point = worldMatrix * point;
+      worldCenter += point;
+    }
+    worldCenter /= 8.0f;
+    shadowCameraWorldMatrix.SetTranslation(Vector3(worldCenter));
+    Matrix shadowCameraViewMatrix = shadowCameraWorldMatrix;
+    shadowCameraViewMatrix.Invert();
 
-                                                                    Vector3 areaMin = Vector3::ONE * MAXFLOAT, areaMax = Vector3::ONE * -MAXFLOAT;
-                                                                    for(auto&& point : points)
-                                                                    {
-                                                                      Vector4 pointV = shadowCameraViewMatrix * point;
-                                                                      areaMin.x      = std::min(areaMin.x, pointV.x);
-                                                                      areaMin.y      = std::min(areaMin.y, pointV.y);
-                                                                      areaMin.z      = std::min(areaMin.z, pointV.z);
-                                                                      areaMax.x      = std::max(areaMax.x, pointV.x);
-                                                                      areaMax.y      = std::max(areaMax.y, pointV.y);
-                                                                      areaMax.z      = std::max(areaMax.z, pointV.z);
-                                                                    }
+    Vector3 areaMin = Vector3::ONE * MAXFLOAT, areaMax = Vector3::ONE * -MAXFLOAT;
+    for(auto&& point : points)
+    {
+      Vector4 pointV = shadowCameraViewMatrix * point;
+      areaMin.x      = std::min(areaMin.x, pointV.x);
+      areaMin.y      = std::min(areaMin.y, pointV.y);
+      areaMin.z      = std::min(areaMin.z, pointV.z);
+      areaMax.x      = std::max(areaMax.x, pointV.x);
+      areaMax.y      = std::max(areaMax.y, pointV.y);
+      areaMax.z      = std::max(areaMax.z, pointV.z);
+    }
 
-                                                                    Vector2 center        = Vector2(areaMax + areaMin) * 0.5;
-                                                                    float   delta         = std::max(std::abs(areaMax.x - areaMin.x), std::abs(areaMax.y - areaMin.y));
-                                                                    float   delta_2       = delta * 0.5f;
-                                                                    Vector2 squareAreaMin = center - Vector2::ONE * delta_2;
-                                                                    Vector2 squareAreaMax = center + Vector2::ONE * delta_2;
-                                                                    float   deltaZ        = areaMax.z - areaMin.z;
+    Vector2 center        = Vector2(areaMax + areaMin) * 0.5;
+    float   delta         = std::max(std::abs(areaMax.x - areaMin.x), std::abs(areaMax.y - areaMin.y));
+    float   delta_2       = delta * 0.5f;
+    Vector2 squareAreaMin = center - Vector2::ONE * delta_2;
+    Vector2 squareAreaMax = center + Vector2::ONE * delta_2;
+    float   deltaZ        = areaMax.z - areaMin.z;
 
-                                                                    float right  = -squareAreaMin.x;
-                                                                    float left   = -squareAreaMax.x;
-                                                                    float top    = squareAreaMin.y;
-                                                                    float bottom = squareAreaMax.y;
-                                                                    float near   = areaMin.z;
-                                                                    float far    = areaMax.z;
+    float right  = -squareAreaMin.x;
+    float left   = -squareAreaMax.x;
+    float top    = squareAreaMin.y;
+    float bottom = squareAreaMax.y;
+    float near   = areaMin.z;
+    float far    = areaMax.z;
 
-                                                                    float* projMatrix = output.AsFloat();
+    float* projMatrix = output.AsFloat();
 
-                                                                    projMatrix[0] = -2.0f / delta;
-                                                                    projMatrix[1] = 0.0f;
-                                                                    projMatrix[2] = 0.0f;
-                                                                    projMatrix[3] = 0.0f;
+    projMatrix[0] = -2.0f / delta;
+    projMatrix[1] = 0.0f;
+    projMatrix[2] = 0.0f;
+    projMatrix[3] = 0.0f;
 
-                                                                    projMatrix[4] = 0.0f;
-                                                                    projMatrix[5] = -2.0f / delta;
-                                                                    projMatrix[6] = 0.0f;
-                                                                    projMatrix[7] = 0.0f;
+    projMatrix[4] = 0.0f;
+    projMatrix[5] = -2.0f / delta;
+    projMatrix[6] = 0.0f;
+    projMatrix[7] = 0.0f;
 
-                                                                    projMatrix[8]  = 0.0f;
-                                                                    projMatrix[9]  = 0.0f;
-                                                                    projMatrix[10] = 2.0f / deltaZ;
-                                                                    projMatrix[11] = 0.0f;
+    projMatrix[8]  = 0.0f;
+    projMatrix[9]  = 0.0f;
+    projMatrix[10] = 2.0f / deltaZ;
+    projMatrix[11] = 0.0f;
 
-                                                                    projMatrix[12] = -(right + left) / delta;
-                                                                    projMatrix[13] = -(top + bottom) / delta;
-                                                                    projMatrix[14] = -(near + far) / deltaZ;
-                                                                    projMatrix[15] = 1.0f;
+    projMatrix[12] = -(right + left) / delta;
+    projMatrix[13] = -(top + bottom) / delta;
+    projMatrix[14] = -(near + far) / deltaZ;
+    projMatrix[15] = 1.0f;
 
-                                                                    output = output * shadowCameraViewMatrix;
-                                                                  });
+    output = output * shadowCameraViewMatrix;
+  });
   projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::Actor::Property::WORLD_MATRIX});
   projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::CameraActor::Property::PROJECTION_MODE});
   projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::DevelCameraActor::Property::PROJECTION_DIRECTION});
@@ -622,8 +621,7 @@ void SceneView::SetShadow(Scene3D::Light light)
     return;
   }
 
-  auto foundLight = std::find_if(mLights.begin(), mLights.end(), [light](std::pair<Scene3D::Light, bool> lightEntity) -> bool
-                                 { return (lightEntity.second && lightEntity.first == light); });
+  auto foundLight = std::find_if(mLights.begin(), mLights.end(), [light](std::pair<Scene3D::Light, bool> lightEntity) -> bool { return (lightEntity.second && lightEntity.first == light); });
 
   if(foundLight == mLights.end())
   {
@@ -638,7 +636,7 @@ void SceneView::SetShadow(Scene3D::Light light)
   SetShadowLightConstraint(selectedCamera, lightCamera);
 
   // make framebuffer for depth map and set it to render task.
-  Vector3  size               = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+  Vector3  size                = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
   uint32_t shadowMapBufferSize = std::min(static_cast<uint32_t>(std::max(size.width, size.height)), MAXIMUM_SIZE_SHADOW_MAP);
   UpdateShadowMapBuffer(shadowMapBufferSize);
 
@@ -1112,12 +1110,7 @@ void SceneView::OnSkyboxLoadComplete()
   }
 
   mSkyboxResourceReady = true;
-  if(IsResourceReady())
-  {
-    Control::SetResourceReady();
-  }
-
-  mSkyboxTexture = mSkyboxLoadTask->GetLoadedTexture();
+  mSkyboxTexture       = mSkyboxLoadTask->GetLoadedTexture();
   Shader skyboxShader;
   if(mSkyboxLoadTask->GetEnvironmentMapType() == Scene3D::EnvironmentMapType::CUBEMAP)
   {
@@ -1138,17 +1131,22 @@ void SceneView::OnSkyboxLoadComplete()
   }
 
   mSkyboxLoadTask.Reset();
+
+  if(IsResourceReady())
+  {
+    Control::SetResourceReady();
+  }
 }
 
 void SceneView::OnIblDiffuseLoadComplete()
 {
   mDiffuseTexture          = mIblDiffuseLoadTask->GetLoadedTexture();
   mIblDiffuseResourceReady = true;
+  mIblDiffuseLoadTask.Reset();
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
   {
     OnIblLoadComplete();
   }
-  mIblDiffuseLoadTask.Reset();
 }
 
 void SceneView::OnIblSpecularLoadComplete()
@@ -1156,11 +1154,11 @@ void SceneView::OnIblSpecularLoadComplete()
   mSpecularTexture          = mIblSpecularLoadTask->GetLoadedTexture();
   mSpecularMipmapLevels     = mIblSpecularLoadTask->GetMipmapLevels();
   mIblSpecularResourceReady = true;
+  mIblSpecularLoadTask.Reset();
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
   {
     OnIblLoadComplete();
   }
-  mIblSpecularLoadTask.Reset();
 }
 
 void SceneView::OnIblLoadComplete()

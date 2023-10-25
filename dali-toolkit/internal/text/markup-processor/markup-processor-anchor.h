@@ -18,6 +18,9 @@
  *
  */
 
+#include <dali-toolkit/internal/text/color-run.h>
+#include <dali-toolkit/internal/text/underlined-character-run.h>
+
 namespace Dali
 {
 
@@ -35,8 +38,13 @@ struct Anchor;
  *
  * @param[in] tag The anchor tag and its attributes.
  * @param[in,out] anchor The anchor.
+ * @param[out] colorRun the color run to be filled.
+ * @param[out] underlinedCharacterRun the underlined character run to be filled.
  */
-void ProcessAnchor( const Tag& tag, Anchor& anchor );
+void ProcessAnchorTag(const Tag&              tag,
+                      Anchor&                 anchor,
+                      ColorRun&               colorRun,
+                      UnderlinedCharacterRun& underlinedCharacterRun);
 
 } // namespace Text
 

@@ -257,6 +257,8 @@ void NPatchData::NotifyObserver(TextureUploadObserver* observer, const bool& loa
 
 void NPatchData::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
 {
+  NPatchDataPtr self = this; // Keep reference until this API finished
+
   if(loadSuccess)
   {
     if(mLoadingState != LoadingState::LOAD_COMPLETE)

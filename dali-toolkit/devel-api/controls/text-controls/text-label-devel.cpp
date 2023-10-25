@@ -50,6 +50,21 @@ Rect<> GetTextBoundingRectangle(TextLabel textLabel, uint32_t startIndex, uint32
   return GetImpl(textLabel).GetTextBoundingRectangle(startIndex, endIndex);
 }
 
+void SetTextFitArray(TextLabel textLabel, const bool enable, std::vector<FitOption>& fitOptions)
+{
+  GetImpl(textLabel).SetTextFitArray(enable, fitOptions);
+}
+
+std::vector<FitOption>& GetTextFitArray(TextLabel textLabel)
+{
+  return GetImpl(textLabel).GetTextFitArray();
+}
+
+bool IsTextFitArrayEnabled(TextLabel textLabel)
+{
+  return GetImpl(textLabel).IsTextFitArrayEnabled();
+}
+
 } // namespace DevelTextLabel
 
 } // namespace Toolkit

@@ -233,6 +233,23 @@ void MoveVisual(RegisteredVisualContainer::Iterator sourceIter, RegisteredVisual
 }
 
 /**
+ * Discard visual from source to visual factory.
+ */
+void DiscardVisual(RegisteredVisualContainer::Iterator sourceIter, RegisteredVisualContainer& source)
+{
+  Toolkit::Visual::Base visual = (*sourceIter)->visual;
+  if(visual)
+  {
+    if(Stage::IsInstalled())
+    {
+      Toolkit::VisualFactory::Get().DiscardVisual(visual);
+    }
+  }
+
+  source.Erase(sourceIter);
+}
+
+/**
  * Performs actions as requested using the action name.
  * @param[in] object The object on which to perform the action.
  * @param[in] actionName The action to perform.
@@ -586,11 +603,15 @@ Control::Impl::~Impl()
 
 Control::Impl& Control::Impl::Get(Internal::Control& internalControl)
 {
+  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+
   return *internalControl.mImpl;
 }
 
 const Control::Impl& Control::Impl::Get(const Internal::Control& internalControl)
 {
+  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+
   return *internalControl.mImpl;
 }
 
@@ -715,6 +736,8 @@ void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base&
 
 void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex)
 {
+  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+
   DALI_LOG_INFO(gLogFilter, Debug::Concise, "RegisterVisual:%d \n", index);
 
   bool  visualReplaced(false);
@@ -848,6 +871,8 @@ void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base&
 
 void Control::Impl::UnregisterVisual(Property::Index index)
 {
+  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(index, mVisuals, iter))
   {
@@ -865,8 +890,9 @@ void Control::Impl::UnregisterVisual(Property::Index index)
     Actor self(mControlImpl.Self());
     Toolkit::GetImplementation((*iter)->visual).SetOffScene(self);
     (*iter)->pending = false;
-    (*iter)->visual.Reset();
-    mRemoveVisuals.Erase(iter);
+
+    // Discard removed visual. It will be destroyed at next Idle time.
+    DiscardVisual(iter, mRemoveVisuals);
   }
 }
 
@@ -961,6 +987,8 @@ void Control::Impl::StartObservingVisual(Toolkit::Visual::Base& visual)
 
 void Control::Impl::ResourceReady()
 {
+  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+
   // Emit signal if all enabled visuals registered by the control are ready or there are no visuals.
   if(IsResourceReady())
   {
@@ -995,7 +1023,9 @@ void Control::Impl::ResourceReady(Visual::Base& object)
     {
       Toolkit::GetImplementation((*visualToRemoveIter)->visual).SetOffScene(self);
     }
-    mRemoveVisuals.Erase(visualToRemoveIter);
+
+    // Discard removed visual. It will be destroyed at next Idle time.
+    DiscardVisual(visualToRemoveIter, mRemoveVisuals);
   }
 
   // A visual is ready so control may need relayouting if staged
@@ -1177,6 +1207,8 @@ void Control::Impl::AppendAccessibilityAttribute(const std::string& key, const s
 
 void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
 {
+  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+
   Toolkit::Control control = Toolkit::Control::DownCast(BaseHandle(object));
 
   if(control)
@@ -1477,6 +1509,8 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
 
 Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index index)
 {
+  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+
   Property::Value value;
 
   Toolkit::Control control = Toolkit::Control::DownCast(BaseHandle(object));
@@ -1848,6 +1882,8 @@ void Control::Impl::RecreateChangedVisuals(Dictionary<Property::Map>& stateVisua
 
 void Control::Impl::ReplaceStateVisualsAndProperties(const StylePtr oldState, const StylePtr newState, const std::string& subState)
 {
+  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+
   // Collect all old visual names
   DictionaryKeys stateVisualsToRemove;
   if(oldState)
@@ -1985,17 +2021,25 @@ void Control::Impl::OnSceneDisconnection()
 
   // Visuals pending replacement can now be taken out of the removal list and set off scene
   // Iterate through all replacement visuals and add to a move queue then set off scene
-  for(auto removalIter = mRemoveVisuals.Begin(), end = mRemoveVisuals.End(); removalIter != end; removalIter++)
+
+  if(!mRemoveVisuals.Empty())
   {
-    Toolkit::GetImplementation((*removalIter)->visual).SetOffScene(self);
+    std::reverse(mRemoveVisuals.Begin(), mRemoveVisuals.End());
+
+    while(!mRemoveVisuals.Empty())
+    {
+      auto removalIter = mRemoveVisuals.End() - 1u;
+      Toolkit::GetImplementation((*removalIter)->visual).SetOffScene(self);
+
+      // Discard removed visual. It will be destroyed at next Idle time.
+      DiscardVisual(removalIter, mRemoveVisuals);
+    }
   }
 
   for(auto replacedIter = mVisuals.Begin(), end = mVisuals.End(); replacedIter != end; replacedIter++)
   {
     (*replacedIter)->pending = false;
   }
-
-  mRemoveVisuals.Clear();
 }
 
 void Control::Impl::SetMargin(Extents margin)
@@ -2072,7 +2116,7 @@ Dali::Property Control::Impl::GetVisualProperty(Dali::Property::Index index, Dal
   if(visual)
   {
     Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
-    return visualImpl.GetPropertyObject(visualPropertyKey);
+    return visualImpl.GetPropertyObject(std::move(visualPropertyKey));
   }
 
   Handle handle;

@@ -1920,8 +1920,7 @@ Property::Value ItemView::GetProperty(BaseObject* object, Property::Index index)
 
       case Toolkit::ItemView::Property::LAYOUT:
       {
-        Property::Array layouts = itemViewImpl.GetLayoutArray();
-        value                   = layouts;
+        value = itemViewImpl.GetLayoutArray();
         break;
       }
     }

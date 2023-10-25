@@ -396,10 +396,10 @@ void SetVertexBufferData(MeshInfo& meshInfo, std::string path, std::vector<Acces
   if(accessorIdx >= 0)
   {
     Dali::Vector<Vector3> bufferData;
-    LoadDataFromAccessor(accessorIdx, bufferData, path, accessorArray, bufferViewArray, bufferArray);
+    LoadDataFromAccessor(accessorIdx, bufferData, std::move(path), accessorArray, bufferViewArray, bufferArray);
     SetMeshInfoAndCanonize(meshInfo, bufferData);
 
-    VertexBuffer vertexBuffer = CreateVertexBuffer<Vector3>(bufferData, map, type);
+    VertexBuffer vertexBuffer = CreateVertexBuffer<Vector3>(bufferData, std::move(map), type);
     meshInfo.geometry.AddVertexBuffer(vertexBuffer);
   }
 }
@@ -410,9 +410,9 @@ void SetAttributeBufferData(MeshInfo& meshInfo, std::string path, std::vector<Ac
   if(accessorIdx >= 0)
   {
     Dali::Vector<T> bufferData;
-    LoadDataFromAccessor(accessorIdx, bufferData, path, accessorArray, bufferViewArray, bufferArray);
+    LoadDataFromAccessor(accessorIdx, bufferData, std::move(path), accessorArray, bufferViewArray, bufferArray);
 
-    VertexBuffer vertexBuffer = CreateVertexBuffer<T>(bufferData, map, type);
+    VertexBuffer vertexBuffer = CreateVertexBuffer<T>(bufferData, std::move(map), type);
     meshInfo.geometry.AddVertexBuffer(vertexBuffer);
   }
 }
@@ -420,7 +420,7 @@ void SetAttributeBufferData(MeshInfo& meshInfo, std::string path, std::vector<Ac
 void SetIndexBuffersData(MeshInfo& meshInfo, std::string path, std::vector<AccessorInfo>& accessorArray, std::vector<BufferViewInfo>& bufferViewArray, std::vector<BufferInfo>& bufferArray, int32_t indexIdx)
 {
   Dali::Vector<uint16_t> indexBufferData;
-  LoadDataFromAccessor(indexIdx, indexBufferData, path, accessorArray, bufferViewArray, bufferArray);
+  LoadDataFromAccessor(indexIdx, indexBufferData, std::move(path), accessorArray, bufferViewArray, bufferArray);
   meshInfo.geometry.SetIndexBuffer(&indexBufferData[0], indexBufferData.Size());
 }
 

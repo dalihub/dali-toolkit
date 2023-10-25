@@ -337,12 +337,24 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
 
 void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
 {
+  SvgVisualPtr self = this; // Keep reference until this API finished
+
   if(task->HasSucceeded())
   {
     PixelData rasterizedPixelData = task->GetPixelData();
     if(mDefaultWidth == 0 || mDefaultHeight == 0)
     {
       task->GetRenderer().GetDefaultSize(mDefaultWidth, mDefaultHeight);
+    }
+
+    // We don't need to keep tasks anymore. reset now.
+    if(task == mLoadingTask)
+    {
+      mLoadingTask.Reset();
+    }
+    if(task == mRasterizingTask)
+    {
+      mRasterizingTask.Reset();
     }
 
     // Rasterization success
@@ -417,6 +429,19 @@ void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
   {
     mLoadFailed = true;
 
+    // Remove rasterizing task if we requested before.
+    if(mRasterizingTask)
+    {
+      Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
+      mRasterizingTask.Reset();
+    }
+
+    // We don't need to keep tasks anymore. reset now.
+    if(task == mLoadingTask)
+    {
+      mLoadingTask.Reset();
+    }
+
     Actor actor = mPlacementActor.GetHandle();
     if(actor)
     {
@@ -427,16 +452,6 @@ void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
     }
 
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
-  }
-
-  // We don't need to keep tasks anymore. reset now.
-  if(task == mLoadingTask)
-  {
-    mLoadingTask.Reset();
-  }
-  if(task == mRasterizingTask)
-  {
-    mRasterizingTask.Reset();
   }
 }
 

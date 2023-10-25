@@ -496,14 +496,26 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       }
       case Toolkit::DevelTextLabel::Property::TEXT_FIT:
       {
+        // If TextFitArray is enabled, this should be disabled.
+        if(impl.mController->IsTextFitArrayEnabled())
+        {
+          impl.mController->SetDefaultLineSize(impl.mController->GetCurrentLineSize());
+          impl.mController->SetTextFitArrayEnabled(false);
+        }
+
         ParseTextFitProperty(impl.mController, value.GetMap());
         impl.mController->SetTextFitChanged(true);
         break;
       }
       case Toolkit::DevelTextLabel::Property::MIN_LINE_SIZE:
       {
-        const float lineSize   = value.Get<float>();
-        impl.mTextUpdateNeeded = impl.mController->SetDefaultLineSize(lineSize) || impl.mTextUpdateNeeded;
+        const float lineSize = value.Get<float>();
+        // If TextFitArray is enabled, do not update the default line size.
+        if(!impl.mController->IsTextFitArrayEnabled())
+        {
+          impl.mTextUpdateNeeded = impl.mController->SetDefaultLineSize(lineSize) || impl.mTextUpdateNeeded;
+        }
+        impl.mController->SetCurrentLineSize(lineSize);
         break;
       }
       case Toolkit::DevelTextLabel::Property::FONT_SIZE_SCALE:
@@ -785,7 +797,8 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       }
       case Toolkit::DevelTextLabel::Property::MIN_LINE_SIZE:
       {
-        value = impl.mController->GetDefaultLineSize();
+        // If TextFitArray is enabled, the stored value (MIN_LINE_SIZE set by the user) is retrun.
+        value = impl.mController->IsTextFitArrayEnabled() ? impl.mController->GetCurrentLineSize() : impl.mController->GetDefaultLineSize();
         break;
       }
       case Toolkit::DevelTextLabel::Property::FONT_SIZE_SCALE:
@@ -1050,7 +1063,12 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
   Vector2 contentSize(size.x - (padding.start + padding.end), size.y - (padding.top + padding.bottom));
 
-  if(mController->IsTextFitEnabled())
+  if(mController->IsTextFitArrayEnabled())
+  {
+    mController->FitArrayPointSizeforLayout(contentSize);
+    mController->SetTextFitContentSize(contentSize);
+  }
+  else if(mController->IsTextFitEnabled())
   {
     mController->FitPointSizeforLayout(contentSize);
     mController->SetTextFitContentSize(contentSize);
@@ -1273,6 +1291,27 @@ Rect<> TextLabel::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endInde
 void TextLabel::SetSpannedText(const Text::Spanned& spannedText)
 {
   mController->SetSpannedText(spannedText);
+}
+
+void TextLabel::SetTextFitArray(const bool enable, std::vector<Toolkit::DevelTextLabel::FitOption>& fitOptions)
+{
+  if(!enable)
+  {
+    // If TextFitArray is disabled, MinLineSize shoud be restored to its original size.
+    mController->SetDefaultLineSize(mController->GetCurrentLineSize());
+  }
+  mController->SetTextFitArrayEnabled(enable);
+  mController->SetTextFitArray(fitOptions);
+}
+
+std::vector<Toolkit::DevelTextLabel::FitOption>& TextLabel::GetTextFitArray()
+{
+  return mController->GetTextFitArray();
+}
+
+bool TextLabel::IsTextFitArrayEnabled() const
+{
+  return mController->IsTextFitArrayEnabled();
 }
 
 std::string TextLabel::TextLabelAccessible::GetNameRaw() const

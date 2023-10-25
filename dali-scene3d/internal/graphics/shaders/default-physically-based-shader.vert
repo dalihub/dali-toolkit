@@ -80,6 +80,7 @@ void main()
     highp int vertexId = 0;
     highp int x = 0;
     highp int y = 0;
+    highp float weight = clamp(uBlendShapeWeight[index], 0.0, 1.0);
 
 #ifdef MORPH_POSITION
     // Calculate the index to retrieve the geometry from the texture.
@@ -88,7 +89,7 @@ void main()
     y = vertexId / width;
 
     // Retrieves the blend shape geometry from the texture, unnormalizes it and multiply by the weight.
-    if( 0.0 != uBlendShapeWeight[index] )
+    if(0.0 != weight)
     {
 #ifdef MORPH_VERSION_2_0
        highp float unnormalizeFactor = uBlendShapeUnnormalizeFactor;
@@ -96,7 +97,7 @@ void main()
        highp float unnormalizeFactor = uBlendShapeUnnormalizeFactor[index];
 #endif
 
-      diff = uBlendShapeWeight[index] * unnormalizeFactor * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
+      diff = weight * unnormalizeFactor * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
     }
 
     position.xyz += diff;
@@ -111,9 +112,9 @@ void main()
     y = vertexId / width;
 
     // Retrieves the blend shape normal from the texture, unnormalizes it and multiply by the weight.
-    if( 0.0 != uBlendShapeWeight[index] )
+    if(0.0 != weight)
     {
-      diff = uBlendShapeWeight[index] * 2.0 * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
+      diff = weight * 2.0 * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
     }
 
     normal += diff.xyz;
@@ -128,9 +129,9 @@ void main()
     y = vertexId / width;
 
     // Retrieves the blend shape tangent from the texture, unnormalizes it and multiply by the weight.
-    if( 0.0 != uBlendShapeWeight[index] )
+    if(0.0 != weight)
     {
-      diff = uBlendShapeWeight[index] * 2.0 * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
+      diff = weight * 2.0 * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
     }
 
     tangent += diff.xyz;

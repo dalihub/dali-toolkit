@@ -176,8 +176,7 @@ Property::Value ToggleButton::GetProperty(BaseObject* object, Property::Index pr
     {
       case Toolkit::ToggleButton::Property::STATE_VISUALS:
       {
-        Property::Array array = toggleButtonImpl.GetToggleStates();
-        value                 = Property::Value(array);
+        value = toggleButtonImpl.GetToggleStates();
         break;
       }
       case Toolkit::ToggleButton::Property::TOOLTIPS:

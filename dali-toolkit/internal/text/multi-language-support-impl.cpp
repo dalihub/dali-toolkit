@@ -54,6 +54,134 @@ namespace Text
 {
 namespace Internal
 {
+
+namespace
+{
+void CheckFontSupportsCharacter(
+  bool& isValidFont,
+  bool& isCommonScript,
+  const Character& character,
+  ValidateFontsPerScript**& validFontsPerScriptCacheBuffer,
+  const Script& script,
+  FontId& fontId,
+  TextAbstraction::FontClient& fontClient,
+  const bool isValidCachedDefaultFont,
+  const FontId& cachedDefaultFontId,
+  const TextAbstraction::FontDescription& currentFontDescription,
+  const TextAbstraction::PointSize26Dot6& currentFontPointSize,
+  DefaultFonts**& defaultFontPerScriptCacheBuffer)
+{
+  // Need to check if the given font supports the current character.
+  if(!isValidFont) // (1)
+  {
+    // Whether the current character is common for all scripts (i.e. white spaces, ...)
+
+    // Is not desirable to cache fonts for the common script.
+    //
+    // i.e. Consider the text " हिंदी", the 'white space' has assigned the DEVANAGARI script.
+    //      The user may have set a font or the platform's default is used.
+    //
+    //      As the 'white space' is the first character, no font is cached so the font validation
+    //      retrieves a glyph from the given font.
+    //
+    //      Many fonts support 'white spaces' so probably the font set by the user or the platform's default
+    //      supports the 'white space'. However, that font may not support the DEVANAGARI script.
+    isCommonScript = TextAbstraction::IsCommonScript(character) || TextAbstraction::IsEmojiPresentationSelector(character);
+
+    // Check in the valid fonts cache.
+    ValidateFontsPerScript* validateFontsPerScript = *(validFontsPerScriptCacheBuffer + script);
+
+    if(NULL != validateFontsPerScript)
+    {
+      // This cache stores valid fonts set by the user.
+      isValidFont = validateFontsPerScript->IsValidFont(fontId);
+
+      // It may happen that a validated font for a script doesn't have all the glyphs for that script.
+      // i.e a font validated for the CJK script may contain glyphs for the chinese language but not for the Japanese.
+      if(isValidFont)
+      {
+        // Checks if the current character is supported by the font is needed.
+        isValidFont = fontClient.IsCharacterSupportedByFont(fontId, character);
+      }
+    }
+
+    if(!isValidFont) // (2)
+    {
+      // The selected font is not stored in any cache.
+
+      // Checks if the current character is supported by the selected font.
+      isValidFont = fontClient.IsCharacterSupportedByFont(fontId, character);
+
+      // If there is a valid font, cache it.
+      if(isValidFont && !isCommonScript)
+      {
+        if(NULL == validateFontsPerScript)
+        {
+          validateFontsPerScript = new ValidateFontsPerScript();
+
+          *(validFontsPerScriptCacheBuffer + script) = validateFontsPerScript;
+        }
+
+        validateFontsPerScript->Cache(fontId);
+      }
+
+      if(!isValidFont && (fontId != cachedDefaultFontId) && (!TextAbstraction::IsNewParagraph(character))) // (3)
+      {
+        // The selected font by the user or the platform's default font has failed to validate the character.
+
+        // Checks if the previously discarted cached default font supports the character.
+        bool isValidCachedFont = false;
+        if(isValidCachedDefaultFont)
+        {
+          isValidCachedFont = fontClient.IsCharacterSupportedByFont(cachedDefaultFontId, character);
+        }
+
+        if(isValidCachedFont)
+        {
+          // Use the cached default font for the script if there is one.
+          fontId      = cachedDefaultFontId;
+          isValidFont = true;
+        }
+        else
+        {
+          // There is no valid cached default font for the script.
+
+          DefaultFonts* defaultFontsPerScript = NULL;
+
+          // Find a fallback-font.
+          fontId = fontClient.FindFallbackFont(character,
+                                               currentFontDescription,
+                                               currentFontPointSize,
+                                               false);
+
+          if(0u == fontId)
+          {
+            fontId = fontClient.FindDefaultFont(UTF32_A, currentFontPointSize);
+          }
+
+          if(!isCommonScript && (script != TextAbstraction::UNKNOWN))
+          {
+            // Cache the font if it is not an unknown script
+            if(NULL == defaultFontsPerScript)
+            {
+              defaultFontsPerScript = *(defaultFontPerScriptCacheBuffer + script);
+
+              if(NULL == defaultFontsPerScript)
+              {
+                defaultFontsPerScript                       = new DefaultFonts();
+                *(defaultFontPerScriptCacheBuffer + script) = defaultFontsPerScript;
+              }
+            }
+            defaultFontsPerScript->Cache(currentFontDescription, fontId);
+            isValidFont = true;
+          }
+        }
+      } // !isValidFont (3)
+    }   // !isValidFont (2)
+  }     // !isValidFont (1)
+}
+} // unnamed namespace
+
 bool ValidateFontsPerScript::IsValidFont(FontId fontId) const
 {
   for(Vector<FontId>::ConstIterator it    = mValidFonts.Begin(),
@@ -505,7 +633,6 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
   Vector<ScriptRun>::ConstIterator scriptRunEndIt          = scripts.End();
   bool                             isNewParagraphCharacter = false;
 
-  FontId                  previousEmojiFontId = 0u;
   FontId                  currentFontId       = 0u;
   FontId                  previousFontId      = 0u;
   TextAbstraction::Script previousScript      = TextAbstraction::UNKNOWN;
@@ -582,15 +709,16 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
       isValidFont = fontClient.IsCharacterSupportedByFont(fontId, character);
     }
 
-    bool isCommonScript = false;
-    bool isEmojiScript  = TextAbstraction::IsOneOfEmojiScripts(script);
+    bool isEmojiScript = IsEmojiColorScript(script) || IsEmojiTextScript(script);
+    bool isZWJ         = TextAbstraction::IsZeroWidthJoiner(character);
 
-    if(isEmojiScript && (previousScript == script))
+    if((previousScript == script) &&
+       (isEmojiScript || isZWJ))
     {
-      // Emoji sequence should use the previous emoji font.
-      if(0u != previousEmojiFontId)
+      // This sequence should use the previous font.
+      if(0u != previousFontId)
       {
-        fontId      = previousEmojiFontId;
+        fontId      = previousFontId;
         isValidFont = true;
       }
     }
@@ -604,119 +732,17 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
       isValidFont = true;
     }
 
+    // This is valid after CheckFontSupportsCharacter();
+    bool isCommonScript = false;
+
     // If the given font is not valid, it means either:
     // - there is no cached font for the current script yet or,
     // - the user has set a different font than the default one for the current script or,
     // - the platform default font is different than the default font for the current script.
 
     // Need to check if the given font supports the current character.
-    if(!isValidFont) // (1)
-    {
-      // Whether the current character is common for all scripts (i.e. white spaces, ...)
-
-      // Is not desirable to cache fonts for the common script.
-      //
-      // i.e. Consider the text " हिंदी", the 'white space' has assigned the DEVANAGARI script.
-      //      The user may have set a font or the platform's default is used.
-      //
-      //      As the 'white space' is the first character, no font is cached so the font validation
-      //      retrieves a glyph from the given font.
-      //
-      //      Many fonts support 'white spaces' so probably the font set by the user or the platform's default
-      //      supports the 'white space'. However, that font may not support the DEVANAGARI script.
-      isCommonScript = TextAbstraction::IsCommonScript(character) || TextAbstraction::IsEmojiPresentationSelector(character);
-
-      // Check in the valid fonts cache.
-      ValidateFontsPerScript* validateFontsPerScript = *(validFontsPerScriptCacheBuffer + script);
-
-      if(NULL != validateFontsPerScript)
-      {
-        // This cache stores valid fonts set by the user.
-        isValidFont = validateFontsPerScript->IsValidFont(fontId);
-
-        // It may happen that a validated font for a script doesn't have all the glyphs for that script.
-        // i.e a font validated for the CJK script may contain glyphs for the chinese language but not for the Japanese.
-        if(isValidFont)
-        {
-          // Checks if the current character is supported by the font is needed.
-          isValidFont = fontClient.IsCharacterSupportedByFont(fontId, character);
-        }
-      }
-
-      if(!isValidFont) // (2)
-      {
-        // The selected font is not stored in any cache.
-
-        // Checks if the current character is supported by the selected font.
-        isValidFont = fontClient.IsCharacterSupportedByFont(fontId, character);
-
-        // If there is a valid font, cache it.
-        if(isValidFont && !isCommonScript)
-        {
-          if(NULL == validateFontsPerScript)
-          {
-            validateFontsPerScript = new ValidateFontsPerScript();
-
-            *(validFontsPerScriptCacheBuffer + script) = validateFontsPerScript;
-          }
-
-          validateFontsPerScript->Cache(fontId);
-        }
-
-        if(!isValidFont && (fontId != cachedDefaultFontId) && (!TextAbstraction::IsNewParagraph(character))) // (3)
-        {
-          // The selected font by the user or the platform's default font has failed to validate the character.
-
-          // Checks if the previously discarted cached default font supports the character.
-          bool isValidCachedFont = false;
-          if(isValidCachedDefaultFont)
-          {
-            isValidCachedFont = fontClient.IsCharacterSupportedByFont(cachedDefaultFontId, character);
-          }
-
-          if(isValidCachedFont)
-          {
-            // Use the cached default font for the script if there is one.
-            fontId      = cachedDefaultFontId;
-            isValidFont = true;
-          }
-          else
-          {
-            // There is no valid cached default font for the script.
-
-            DefaultFonts* defaultFontsPerScript = NULL;
-
-            // Find a fallback-font.
-            fontId = fontClient.FindFallbackFont(character,
-                                                 currentFontDescription,
-                                                 currentFontPointSize,
-                                                 false);
-
-            if(0u == fontId)
-            {
-              fontId = fontClient.FindDefaultFont(UTF32_A, currentFontPointSize);
-            }
-
-            if(!isCommonScript && (script != TextAbstraction::UNKNOWN))
-            {
-              // Cache the font if it is not an unknown script
-              if(NULL == defaultFontsPerScript)
-              {
-                defaultFontsPerScript = *(defaultFontPerScriptCacheBuffer + script);
-
-                if(NULL == defaultFontsPerScript)
-                {
-                  defaultFontsPerScript                       = new DefaultFonts();
-                  *(defaultFontPerScriptCacheBuffer + script) = defaultFontsPerScript;
-                }
-              }
-              defaultFontsPerScript->Cache(currentFontDescription, fontId);
-              isValidFont = true;
-            }
-          }
-        } // !isValidFont (3)
-      }   // !isValidFont (2)
-    }     // !isValidFont (1)
+    CheckFontSupportsCharacter(isValidFont, isCommonScript, character, validFontsPerScriptCacheBuffer, script, fontId, fontClient,
+                               isValidCachedDefaultFont, cachedDefaultFontId, currentFontDescription, currentFontPointSize, defaultFontPerScriptCacheBuffer);
 
     if(isEmojiScript && (previousScript != script))
     {
@@ -753,19 +779,6 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
           }
         }
       }
-    }
-
-    // Store the font id when the first character is an emoji.
-    if(isEmojiScript)
-    {
-      if(0u != fontId && previousScript != script)
-      {
-        previousEmojiFontId = fontId;
-      }
-    }
-    else
-    {
-      previousEmojiFontId = 0u;
     }
 
 #ifdef DEBUG_ENABLED
@@ -826,6 +839,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
     // Whether the current character is a new paragraph character.
     isNewParagraphCharacter = TextAbstraction::IsNewParagraph(character);
     previousScript          = script;
+    currentFontId           = fontId;
     previousFontId          = currentFontId;
   } // end traverse characters.
 

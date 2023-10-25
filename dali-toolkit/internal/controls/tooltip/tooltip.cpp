@@ -148,12 +148,12 @@ void Tooltip::CreatePropertyMap(Property::Map& map) const
   if(!mContentTextVisual.Empty())
   {
     Property::Map content = mContentTextVisual; // Need this copy as there's no Value constructor which takes in a 'const Property::Map&'.
-    map.Insert(Toolkit::Tooltip::Property::CONTENT, content);
+    map.Insert(Toolkit::Tooltip::Property::CONTENT, std::move(content));
   }
   else if(!mContentArray.Empty())
   {
     Property::Array content = mContentArray; // Need this copy as there's no Value constructor which takes in a 'const Property::Array&'.
-    map.Insert(Toolkit::Tooltip::Property::CONTENT, content);
+    map.Insert(Toolkit::Tooltip::Property::CONTENT, std::move(content));
   }
 
   map.Insert(Toolkit::Tooltip::Property::LAYOUT, mLayout);
