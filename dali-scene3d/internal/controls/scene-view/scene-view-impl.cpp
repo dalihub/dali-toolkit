@@ -60,6 +60,10 @@ BaseHandle Create()
 
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::SceneView, Toolkit::Control, Create);
+
+DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "AlphaMaskUrl", STRING, ALPHA_MASK_URL)
+DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "MaskContentScale", FLOAT, MASK_CONTENT_SCALE)
+DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CropToMask", BOOLEAN, CROP_TO_MASK)
 DALI_TYPE_REGISTRATION_END()
 
 Property::Index    RENDERING_BUFFER        = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
@@ -791,6 +795,113 @@ void SceneView::UpdateShadowUniform(Scene3D::Light light)
   mShaderManager->UpdateShadowUniform(light);
 }
 
+void SceneView::SetAlphaMaskUrl(std::string& alphaMaskUrl)
+{
+  if(mAlphaMaskUrl != alphaMaskUrl)
+  {
+    mAlphaMaskUrl = alphaMaskUrl;
+    mMaskingPropertyChanged = true;
+    UpdateRenderTask();
+  }
+}
+
+std::string SceneView::GetAlphaMaskUrl()
+{
+  return mAlphaMaskUrl;
+}
+
+void SceneView::SetMaskContentScaleFactor(float maskContentScaleFactor)
+{
+  if(mMaskContentScaleFactor != maskContentScaleFactor)
+  {
+    mMaskContentScaleFactor = maskContentScaleFactor;
+    mMaskingPropertyChanged = true;
+    UpdateRenderTask();
+  }
+}
+
+float SceneView::GetMaskContentScaleFactor()
+{
+  return mMaskContentScaleFactor;
+}
+
+void SceneView::EnableCropToMask(bool enableCropToMask)
+{
+  if(mCropToMask != enableCropToMask)
+  {
+    mCropToMask = enableCropToMask;
+    mMaskingPropertyChanged = true;
+    UpdateRenderTask();
+  }
+}
+
+bool SceneView::IsEnabledCropToMask()
+{
+  return mCropToMask;
+}
+
+void SceneView::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
+{
+  Scene3D::SceneView sceneView = Scene3D::SceneView::DownCast(Dali::BaseHandle(object));
+
+  if(sceneView)
+  {
+    SceneView& sceneViewImpl(GetImpl(sceneView));
+
+    switch(index)
+    {
+      case Scene3D::SceneView::Property::ALPHA_MASK_URL:
+      {
+        std::string alphaMaskUrl = value.Get<std::string>();
+        sceneViewImpl.SetAlphaMaskUrl(alphaMaskUrl);
+        break;
+      }
+      case Scene3D::SceneView::Property::MASK_CONTENT_SCALE:
+      {
+        sceneViewImpl.SetMaskContentScaleFactor(value.Get<float>());
+        break;
+      }
+      case Scene3D::SceneView::Property::CROP_TO_MASK:
+      {
+        sceneViewImpl.EnableCropToMask(value.Get<bool>());
+        break;
+      }
+    }
+  }
+}
+
+Property::Value SceneView::GetProperty(BaseObject* object, Property::Index index)
+{
+  Property::Value value;
+
+  Scene3D::SceneView sceneView = Scene3D::SceneView::DownCast(Dali::BaseHandle(object));
+
+  if(sceneView)
+  {
+    SceneView& sceneViewImpl(GetImpl(sceneView));
+
+    switch(index)
+    {
+      case Scene3D::SceneView::Property::ALPHA_MASK_URL:
+      {
+        value = sceneViewImpl.GetAlphaMaskUrl();
+        break;
+      }
+      case Scene3D::SceneView::Property::MASK_CONTENT_SCALE:
+      {
+        value = sceneViewImpl.GetMaskContentScaleFactor();
+        break;
+      }
+      case Scene3D::SceneView::Property::CROP_TO_MASK:
+      {
+        value = sceneViewImpl.IsEnabledCropToMask();
+        break;
+      }
+    }
+  }
+  return value;
+}
+
 ///////////////////////////////////////////////////////////
 //
 // Private methods
@@ -980,7 +1091,8 @@ void SceneView::UpdateRenderTask()
       Dali::FrameBuffer currentFrameBuffer = mRenderTask.GetFrameBuffer();
       if(!currentFrameBuffer ||
          !Dali::Equals(currentFrameBuffer.GetColorTexture().GetWidth(), size.width) ||
-         !Dali::Equals(currentFrameBuffer.GetColorTexture().GetHeight(), size.height))
+         !Dali::Equals(currentFrameBuffer.GetColorTexture().GetHeight(), size.height) ||
+         mMaskingPropertyChanged)
       {
         mRootLayer.SetProperty(Dali::Actor::Property::COLOR_MODE, ColorMode::USE_OWN_COLOR);
         mRenderTask.ResetViewportGuideActor();
@@ -998,6 +1110,14 @@ void SceneView::UpdateRenderTask()
         imagePropertyMap.Insert(Toolkit::ImageVisual::Property::URL, imageUrl.GetUrl());
         // To flip rendered scene without CameraActor::SetInvertYAxis() to avoid backface culling.
         imagePropertyMap.Insert(Toolkit::ImageVisual::Property::PIXEL_AREA, Vector4(0.0f, 1.0f, 1.0f, -1.0f));
+        imagePropertyMap.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mAlphaMaskUrl);
+        if(!mAlphaMaskUrl.empty())
+        {
+          imagePropertyMap.Insert(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, mMaskContentScaleFactor);
+          imagePropertyMap.Insert(Toolkit::ImageVisual::Property::CROP_TO_MASK, mCropToMask);
+          imagePropertyMap.Insert(Toolkit::DevelImageVisual::Property::MASKING_TYPE, Toolkit::DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+        }
+        mMaskingPropertyChanged = false;
         mVisual = Toolkit::VisualFactory::Get().CreateVisual(imagePropertyMap);
 
         Toolkit::DevelControl::RegisterVisual(*this, RENDERING_BUFFER, mVisual);
