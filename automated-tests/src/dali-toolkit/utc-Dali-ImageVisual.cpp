@@ -2175,6 +2175,7 @@ int UtcDaliImageVisualAlphaMask02(void)
   propertyMap.Insert(ImageVisual::Property::URL, TEST_LARGE_IMAGE_FILE_NAME);
   propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME);
   propertyMap.Insert(DevelImageVisual::Property::MASKING_TYPE, DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+  propertyMap.Insert(DevelImageVisual::Property::CROP_TO_MASK, false);
 
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -2219,6 +2220,10 @@ int UtcDaliImageVisualAlphaMask02(void)
 
   dummyImpl.UnregisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  auto index = renderer.GetPropertyIndex("maskTextureRatio");
+  DALI_TEST_NOT_EQUALS(index, Property::INVALID_INDEX, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(index), Vector2::ONE, TEST_LOCATION);
 
   END_TEST;
 }
