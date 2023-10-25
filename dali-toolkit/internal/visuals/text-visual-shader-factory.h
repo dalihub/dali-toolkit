@@ -149,12 +149,6 @@ public:
    */
   Shader GetShader(VisualFactoryCache& factoryCache, const TextVisualShaderFeature::FeatureBuilder& featureBuilder);
 
-  /**
-   * @brief Get the default shader source.
-   * @param[in] shaders shaderList for precompile
-   */
-  void GetPrecompiledShader(RawShaderData& shaders);
-
 protected:
   /**
    * Undefined copy constructor.
