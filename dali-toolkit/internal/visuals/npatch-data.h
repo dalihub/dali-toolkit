@@ -33,8 +33,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-class NPatchLoader;
-
 class NPatchData : public ConnectionTracker, public Dali::Toolkit::TextureUploadObserver
 {
 public:
@@ -55,10 +53,8 @@ public:
 public:
   /**
    * Constructor
-   *
-   * @param[in] loader NPatchLoader who create this data.
    */
-  NPatchData(NPatchLoader& loader);
+  NPatchData();
 
   /**
    * Destructor, non-virtual as not a base class
@@ -283,21 +279,19 @@ private:
 private:
   using ObserverListType = Dali::Vector<TextureUploadObserver*>;
 
-  NPatchDataId     mId;
-  ObserverListType mObserverList;    ///< Container used to store all observer clients of this Texture
-  ObserverListType mQueuedObservers; ///< Container observers when user try to add during notify observers
-  NPatchLoader&    mNPatchLoader;    ///< NPatchLoader who keep this data
-
-  VisualUrl                    mUrl;            ///< Url of the N-Patch
-  TextureSet                   mTextureSet;     ///< Texture containing the cropped image
-  NPatchUtility::StretchRanges mStretchPixelsX; ///< X stretch pixels
-  NPatchUtility::StretchRanges mStretchPixelsY; ///< Y stretch pixels
-  std::size_t                  mHash;           ///< Hash code for the Url
-  uint32_t                     mCroppedWidth;   ///< Width of the cropped middle part of N-patch
-  uint32_t                     mCroppedHeight;  ///< Height of the cropped middle part of N-patch
-  Rect<int>                    mBorder;         ///< The size of the border
-  LoadingState                 mLoadingState;   ///< True if the data loading is completed
-  void*                        mRenderingMap;   ///< NPatch rendering data
+  NPatchDataId                 mId;
+  ObserverListType             mObserverList;    ///< Container used to store all observer clients of this Texture
+  ObserverListType             mQueuedObservers; ///< Container observers when user try to add during notify observers
+  VisualUrl                    mUrl;             ///< Url of the N-Patch
+  TextureSet                   mTextureSet;      ///< Texture containing the cropped image
+  NPatchUtility::StretchRanges mStretchPixelsX;  ///< X stretch pixels
+  NPatchUtility::StretchRanges mStretchPixelsY;  ///< Y stretch pixels
+  std::size_t                  mHash;            ///< Hash code for the Url
+  uint32_t                     mCroppedWidth;    ///< Width of the cropped middle part of N-patch
+  uint32_t                     mCroppedHeight;   ///< Height of the cropped middle part of N-patch
+  Rect<int>                    mBorder;          ///< The size of the border
+  LoadingState                 mLoadingState;    ///< True if the data loading is completed
+  void*                        mRenderingMap;    ///< NPatch rendering data
 
   bool mPreMultiplyOnLoad : 1; ///< Whether to multiply alpha into color channels on load
   bool mObserverNotifying : 1; ///< Whether this NPatchData notifying observers or not.
