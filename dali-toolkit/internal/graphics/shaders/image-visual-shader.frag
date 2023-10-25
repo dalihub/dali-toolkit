@@ -17,6 +17,7 @@ uniform sampler2D sTextureV;
 
 #ifdef IS_REQUIRED_ALPHA_MASKING
 uniform sampler2D sMaskTexture;
+uniform lowp float uYFlipMaskTexture;
 INPUT mediump vec2 vMaskTexCoord;
 #endif
 
@@ -255,7 +256,9 @@ void main()
 #endif
 
 #ifdef IS_REQUIRED_ALPHA_MASKING
-  mediump float maskAlpha = TEXTURE(sMaskTexture, vMaskTexCoord).a;
+  mediump vec2 maskTexCoord = vMaskTexCoord;
+  maskTexCoord.y = mix(maskTexCoord.y, 1.0-maskTexCoord.y, uYFlipMaskTexture);
+  mediump float maskAlpha = TEXTURE(sMaskTexture, maskTexCoord).a;
   textureColor.a *= maskAlpha;
   textureColor.rgb *= mix(1.0, maskAlpha, preMultipliedAlpha);
 #endif

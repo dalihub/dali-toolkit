@@ -1328,6 +1328,10 @@ void ImageVisual::CheckMaskTexture()
       {
         mImpl->mRenderer.RegisterProperty(MASK_TEXTURE_RATIO_NAME, ComputeMaskTextureRatio());
       }
+      else
+      {
+        mImpl->mRenderer.RegisterProperty(MASK_TEXTURE_RATIO_NAME, Vector2::ONE);
+      }
       maskLoadFailed = false;
     }
 
