@@ -111,11 +111,6 @@ bool VisualFactory::GetPreMultiplyOnLoad() const
   return GetImplementation(*this).GetPreMultiplyOnLoad();
 }
 
-void VisualFactory::UsePreCompiledShader()
-{
-  GetImplementation(*this).UsePreCompiledShader();
-}
-
 } // namespace Toolkit
 
 } // namespace Dali
