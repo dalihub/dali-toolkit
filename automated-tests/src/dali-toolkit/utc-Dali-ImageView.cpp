@@ -4389,7 +4389,13 @@ int UtcDaliImageViewSetImageOnResourceReadySignal06(void)
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
     DALI_TEST_EQUALS(gResourceReadySignalCounter, 2, TEST_LOCATION);
 
-    tet_infoline("load done");
+    tet_infoline("Note that resource ready should not come now.");
+    tet_infoline("Try to load remained 2 valid image + apply masking");
+
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 4, TEST_LOCATION);
+
+    tet_infoline("Check all resource ready comes now.");
   }
   END_TEST;
 }

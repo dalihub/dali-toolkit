@@ -100,6 +100,7 @@ SET(TC_SOURCES
 SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/toolkit-adaptor.cpp
   dali-toolkit-test-utils/toolkit-application.cpp
+  dali-toolkit-test-utils/toolkit-async-task-manager.cpp
   dali-toolkit-test-utils/toolkit-canvas-renderer.cpp
   dali-toolkit-test-utils/toolkit-clipboard.cpp
   dali-toolkit-test-utils/toolkit-direct-rendering-egl.cpp
