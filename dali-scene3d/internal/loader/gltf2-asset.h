@@ -28,6 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/json-reader.h>
 #include <dali-scene3d/public-api/loader/index.h>
+#include <dali-scene3d/public-api/loader/utils.h>
 
 #define ENUM_STRING_MAPPING(t, x) \
   {                               \
@@ -563,6 +564,16 @@ struct Scene : Named
   std::vector<Ref<Node>> mNodes;
 };
 
+enum ExtensionFlags : uint32_t
+{
+  NONE                   = Dali::Scene3D::Loader::NthBit(0),
+  KHR_MESH_QUANTIZATION  = Dali::Scene3D::Loader::NthBit(1), // See https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_texture_transform
+  KHR_TEXTURE_TRANSFORM  = Dali::Scene3D::Loader::NthBit(2), // See https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_mesh_quantization
+  KHR_MATERIALS_IOR      = Dali::Scene3D::Loader::NthBit(3), // See https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_ior
+  KHR_MATERIALS_SPECULAR = Dali::Scene3D::Loader::NthBit(4), // See https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_specular
+
+};
+
 struct Document
 {
   Asset mAsset;
@@ -583,6 +594,11 @@ struct Document
   std::vector<Node>   mNodes;
 
   std::vector<Animation> mAnimations;
+
+  std::vector<std::string_view> mExtensionsUsed;
+  std::vector<std::string_view> mExtensionsRequired;
+
+  uint32_t mExtensionFlags{0};
 
   std::vector<Scene> mScenes;
   Ref<Scene>         mScene;

@@ -45,7 +45,7 @@ struct DALI_SCENE3D_API MeshDefinition
     INVALID = std::numeric_limits<uint32_t>::max()
   };
 
-  enum Flags : uint16_t
+  enum Flags : uint32_t
   {
     FLIP_UVS_VERTICAL = NthBit(0),
     U32_INDICES       = NthBit(1), // default is unsigned short
@@ -54,6 +54,26 @@ struct DALI_SCENE3D_API MeshDefinition
     U8_JOINT_IDS      = NthBit(4),
     U16_WEIGHT        = NthBit(5), // default is floats
     U8_WEIGHT         = NthBit(6),
+    S8_POSITION       = NthBit(7),  // default is floats
+    U8_POSITION       = NthBit(8),  // default is floats
+    S16_POSITION      = NthBit(9),  // default is floats
+    U16_POSITION      = NthBit(10), // default is floats
+    S8_NORMAL         = NthBit(11), // default is floats
+    S16_NORMAL        = NthBit(12), // default is floats
+    S8_TANGENT        = NthBit(13), // default is floats
+    S16_TANGENT       = NthBit(14), // default is floats
+    S8_TEXCOORD       = NthBit(15), // default is floats
+    U8_TEXCOORD       = NthBit(16), // default is floats
+    S16_TEXCOORD      = NthBit(17), // default is floats
+    U16_TEXCOORD      = NthBit(18), // default is floats
+  };
+
+  enum FlagMasks : uint32_t
+  {
+    POSITIONS_MASK = 0x780,
+    NORMALS_MASK   = 0x1800,
+    TANGENTS_MASK  = 0x6000,
+    TEXCOORDS_MASK = 0x78000,
   };
 
   enum Attributes
@@ -166,6 +186,7 @@ struct DALI_SCENE3D_API MeshDefinition
     Blob                        mBlob;
     std::unique_ptr<SparseBlob> mSparse;
     Index                       mBufferIdx = INVALID_INDEX;
+    bool                        mNormalized{false};
 
     Accessor() = default;
 
@@ -198,6 +219,7 @@ struct DALI_SCENE3D_API MeshDefinition
     Accessor    normals;
     Accessor    tangents;
     float       weight = 0.f;
+    uint32_t    mFlags = 0x0;
   };
 
   struct RawData
