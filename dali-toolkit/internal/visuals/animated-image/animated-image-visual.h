@@ -19,6 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/devel-api/adaptor-framework/animated-image-loading.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/common/dali-vector.h>
@@ -252,6 +254,16 @@ private:
    * If MaskingType is MASKING_ON_LOADING and mask texture is failed to load, update shader.
    */
   void CheckMaskTexture();
+
+  /**
+   * @brief Callback when the visibility of the actor is changed.
+   */
+  void OnControlVisibilityChanged(Actor actor, bool visible, DevelActor::VisibilityChange::Type type);
+
+  /**
+   * @brief Callback when the visibility of the window is changed.
+   */
+  void OnWindowVisibilityChanged(Window window, bool visible);
 
   // Undefined
   AnimatedImageVisual(const AnimatedImageVisual& animatedImageVisual);
