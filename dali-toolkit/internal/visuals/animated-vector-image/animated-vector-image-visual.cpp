@@ -100,7 +100,8 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   mLoadFailed(false),
   mRendererAdded(false),
   mCoreShutdown(false),
-  mRedrawInScalingDown(true)
+  mRedrawInScalingDown(true),
+  mUseFixedCache(false)
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Visual::Base::Impl::IS_PREMULTIPLIED_ALPHA;
@@ -217,6 +218,7 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, IsSynchronousLoadingRequired());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
+  map.Insert(Toolkit::DevelImageVisual::Property::USE_FIXED_CACHE, mUseFixedCache);
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -276,6 +278,10 @@ void AnimatedVectorImageVisual::DoSetProperties(const Property::Map& propertyMap
       else if(keyValue.first == IMAGE_DESIRED_HEIGHT)
       {
         DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second);
+      }
+      else if(keyValue.first == USE_FIXED_CACHE)
+      {
+        DoSetProperty(Toolkit::DevelImageVisual::Property::USE_FIXED_CACHE, keyValue.second);
       }
     }
   }
@@ -382,6 +388,20 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
       }
       break;
     }
+
+    case Toolkit::DevelImageVisual::Property::USE_FIXED_CACHE:
+    {
+      bool useFixedCache = false;
+      if(value.Get(useFixedCache))
+      {
+        mUseFixedCache = useFixedCache;
+        if(mVectorAnimationTask)
+        {
+          mVectorAnimationTask->KeepRasterizedBuffer(mUseFixedCache);
+        }
+      }
+      break;
+    }
   }
 }
 
@@ -403,6 +423,7 @@ void AnimatedVectorImageVisual::OnInitialize(void)
     encodedImageBuffer = textureManager.GetEncodedImageBuffer(mImageUrl.GetUrl());
   }
 
+  mVectorAnimationTask->KeepRasterizedBuffer(mUseFixedCache);
   mVectorAnimationTask->RequestLoad(mImageUrl, encodedImageBuffer, IsSynchronousLoadingRequired());
 
   auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
