@@ -227,6 +227,16 @@ public:
    */
   TimePoint GetNextFrameTime();
 
+  void KeepRasterizedBuffer(bool useFixedCache)
+  {
+    mUseFixedCache = useFixedCache;
+  }
+
+  bool IsKeptRasterizedBuffer()
+  {
+    return mUseFixedCache;
+  }
+
 private:
   /**
    * @brief Loads the animation file.
@@ -357,6 +367,8 @@ private:
   bool                                 mDestroyTask;
   bool                                 mLoadRequest;
   bool                                 mLoadFailed;
+  bool                                 mUseFixedCache;
+  bool                                 mSizeUpdated;
 };
 
 } // namespace Internal

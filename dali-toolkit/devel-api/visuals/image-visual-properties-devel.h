@@ -155,7 +155,17 @@ enum Type
    * So we change its value to MASKING_ON_RENDERING even if the visual sets the MASKING_TYPE as MASKING_ON_LOADING when it uses external texture.
    * @note It is used in the ImageVisual and AnimatedImageVisual. The default is MASKING_ON_LOADING.
    */
-  MASKING_TYPE = ORIENTATION_CORRECTION + 12
+  MASKING_TYPE = ORIENTATION_CORRECTION + 12,
+
+  /**
+   * @brief Whether to animated image visual uses fixed cache or not.
+   * @details Name "useFixedCache", type Property::BOOLEAN.
+   * If this property is true, animated image visual uses fixed cache for loading and keeps loaded frame
+   * until the visual is removed. It reduces CPU cost when the animated image will be looping.
+   * But it can spend a lot of memory if the resource has high resolution image or many frame count.
+   * @note It is used in the AnimatedImageVisual. The default is false
+   */
+  USE_FIXED_CACHE = ORIENTATION_CORRECTION + 13
 };
 
 } //namespace Property
