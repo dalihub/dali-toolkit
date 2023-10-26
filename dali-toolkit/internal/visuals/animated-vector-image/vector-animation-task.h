@@ -273,6 +273,16 @@ public: // Implementation of AsyncTask
     return "VectorAnimationTask";
   }
 
+  void KeepRasterizedBuffer(bool useFixedCache)
+  {
+    mUseFixedCache = useFixedCache;
+  }
+
+  bool IsKeptRasterizedBuffer()
+  {
+    return mUseFixedCache;
+  }
+
 private:
   /**
    * @brief Loads the animation file.
@@ -410,6 +420,8 @@ private:
   bool                                 mKeepAnimation : 1;
   mutable bool                         mLayerInfoCached : 1;
   mutable bool                         mMarkerInfoCached : 1;
+  bool                                 mUseFixedCache : 1;
+  bool                                 mSizeUpdated : 1;
 };
 
 } // namespace Internal

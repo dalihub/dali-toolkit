@@ -91,7 +91,9 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mRasterized(false),
   mKeepAnimation(false),
   mLayerInfoCached(false),
-  mMarkerInfoCached(false)
+  mMarkerInfoCached(false),
+  mUseFixedCache(false),
+  mSizeUpdated(false)
 {
   mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
 }
@@ -295,6 +297,20 @@ void VectorAnimationTask::SetSize(uint32_t width, uint32_t height)
 
     mWidth  = width;
     mHeight = height;
+
+    // If fixedCache is enabled, Call KeepRasterizedBuffer()
+    if(mUseFixedCache)
+    {
+      if(mTotalFrame > 0 && !mLoadFailed)
+      {
+        mVectorRenderer.KeepRasterizedBuffer();
+      }
+      else
+      {
+        // If Load is not yet, update the size later.
+        mSizeUpdated = true;
+      }
+    }
 
     DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetSize: width = %d, height = %d [%p]\n", width, height, this);
   }
@@ -832,6 +848,11 @@ void VectorAnimationTask::OnLoadCompleted()
 {
   if(!mLoadFailed)
   {
+    if(mUseFixedCache && mSizeUpdated)
+    {
+      mVectorRenderer.KeepRasterizedBuffer();
+      mSizeUpdated = false;
+    }
     mResourceReadySignal.Emit(ResourceStatus::LOADED);
   }
   else

@@ -211,6 +211,12 @@ public:
     mDynamicPropertyCallback = std::unique_ptr<CallbackBase>(callback);
   }
 
+  void KeepRasterizedBuffer()
+  {
+    Dali::Mutex::ScopedLock lock(mMutex);
+    mEnableFixedCache = true;
+  }
+
   Dali::VectorAnimationRenderer::UploadCompletedSignalType& UploadCompletedSignal()
   {
     return mUploadCompletedSignal;
@@ -256,6 +262,7 @@ public:
   bool     mLoadFailed{false};
   bool     mResourceReady{false};
   bool     mNeedTrigger{true};
+  bool     mEnableFixedCache{false};
 
   Dali::VectorAnimationRenderer::UploadCompletedSignalType mUploadCompletedSignal;
   std::unique_ptr<EventThreadCallback>                     mEventThreadCallback;
@@ -390,6 +397,12 @@ void VectorAnimationRenderer::AddPropertyValueCallback(const std::string& keyPat
 {
   Internal::Adaptor::GetImplementation(*this).AddPropertyValueCallback(keyPath, property, callback, id);
 }
+
+void VectorAnimationRenderer::KeepRasterizedBuffer()
+{
+  Internal::Adaptor::GetImplementation(*this).KeepRasterizedBuffer();
+}
+
 
 VectorAnimationRenderer::UploadCompletedSignalType& VectorAnimationRenderer::UploadCompletedSignal()
 {
