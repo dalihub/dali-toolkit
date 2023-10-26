@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "texture-upload-observer.h"
+#include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-type.h> // for INVALUD_TEXTURE_ID
@@ -25,48 +25,40 @@ namespace Dali
 {
 namespace Toolkit
 {
-TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied)
+TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const bool preMultiplied)
 : returnType(returnType),
   textureId(textureId),
   textureSet(textureSet),
-  useAtlasing(useAtlasing),
-  atlasRect(atlasRect),
   preMultiplied(preMultiplied),
   pixelBuffer(),
   url()
 {
 }
 
-TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, const std::string& url, bool preMultiplied)
+TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const std::string& url, const bool preMultiplied)
 : returnType(returnType),
   textureId(textureId),
   textureSet(textureSet),
-  useAtlasing(false),
-  atlasRect(Vector4::ZERO),
   preMultiplied(preMultiplied),
   pixelBuffer(),
   url(url)
 {
 }
 
-TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, bool preMultiplied)
+TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, const bool preMultiplied)
 : returnType(returnType),
   textureId(Internal::TextureManagerType::INVALID_TEXTURE_ID),
   textureSet(),
-  useAtlasing(false),
-  atlasRect(Vector4::ZERO),
   preMultiplied(preMultiplied),
   pixelBuffer(pixelBuffer),
   url(url)
 {
 }
 
-TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, uint32_t frameCount, uint32_t interval)
+TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const uint32_t frameCount, const uint32_t interval)
 : returnType(returnType),
   textureId(textureId),
   textureSet(textureSet),
-  useAtlasing(false),
-  atlasRect(Vector4::ZERO),
   preMultiplied(false),
   pixelBuffer(),
   url(),

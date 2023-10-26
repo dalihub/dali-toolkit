@@ -104,31 +104,31 @@ constexpr uint32_t TEXTURE_COUNT_FOR_GPU_ALPHA_MASK = 2u;
 struct NameIndexMatch
 {
   const char* const name;
-  Property::Index  index;
+  Property::Index   index;
 };
 
 const NameIndexMatch NAME_INDEX_MATCH_TABLE[] =
-{
-  {IMAGE_FITTING_MODE, Toolkit::ImageVisual::Property::FITTING_MODE},
-  {IMAGE_SAMPLING_MODE, Toolkit::ImageVisual::Property::SAMPLING_MODE},
-  {IMAGE_DESIRED_WIDTH, Toolkit::ImageVisual::Property::DESIRED_WIDTH},
-  {IMAGE_DESIRED_HEIGHT, Toolkit::ImageVisual::Property::DESIRED_HEIGHT},
-  {PIXEL_AREA_UNIFORM_NAME, Toolkit::ImageVisual::Property::PIXEL_AREA},
-  {IMAGE_WRAP_MODE_U, Toolkit::ImageVisual::Property::WRAP_MODE_U},
-  {IMAGE_WRAP_MODE_V, Toolkit::ImageVisual::Property::WRAP_MODE_V},
-  {SYNCHRONOUS_LOADING, Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING},
-  {IMAGE_ATLASING, Toolkit::ImageVisual::Property::ATLASING},
-  {ALPHA_MASK_URL, Toolkit::ImageVisual::Property::ALPHA_MASK_URL},
-  {MASK_CONTENT_SCALE_NAME, Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE},
-  {CROP_TO_MASK_NAME, Toolkit::ImageVisual::Property::CROP_TO_MASK},
-  {MASKING_TYPE_NAME, Toolkit::DevelImageVisual::Property::MASKING_TYPE},
-  {ENABLE_BROKEN_IMAGE, Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE},
-  {LOAD_POLICY_NAME, Toolkit::ImageVisual::Property::LOAD_POLICY},
-  {RELEASE_POLICY_NAME, Toolkit::ImageVisual::Property::RELEASE_POLICY},
-  {ORIENTATION_CORRECTION_NAME, Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION},
-  {FAST_TRACK_UPLOADING_NAME, Toolkit::DevelImageVisual::Property::FAST_TRACK_UPLOADING},
+  {
+    {IMAGE_FITTING_MODE, Toolkit::ImageVisual::Property::FITTING_MODE},
+    {IMAGE_SAMPLING_MODE, Toolkit::ImageVisual::Property::SAMPLING_MODE},
+    {IMAGE_DESIRED_WIDTH, Toolkit::ImageVisual::Property::DESIRED_WIDTH},
+    {IMAGE_DESIRED_HEIGHT, Toolkit::ImageVisual::Property::DESIRED_HEIGHT},
+    {PIXEL_AREA_UNIFORM_NAME, Toolkit::ImageVisual::Property::PIXEL_AREA},
+    {IMAGE_WRAP_MODE_U, Toolkit::ImageVisual::Property::WRAP_MODE_U},
+    {IMAGE_WRAP_MODE_V, Toolkit::ImageVisual::Property::WRAP_MODE_V},
+    {SYNCHRONOUS_LOADING, Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING},
+    {IMAGE_ATLASING, Toolkit::ImageVisual::Property::ATLASING},
+    {ALPHA_MASK_URL, Toolkit::ImageVisual::Property::ALPHA_MASK_URL},
+    {MASK_CONTENT_SCALE_NAME, Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE},
+    {CROP_TO_MASK_NAME, Toolkit::ImageVisual::Property::CROP_TO_MASK},
+    {MASKING_TYPE_NAME, Toolkit::DevelImageVisual::Property::MASKING_TYPE},
+    {ENABLE_BROKEN_IMAGE, Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE},
+    {LOAD_POLICY_NAME, Toolkit::ImageVisual::Property::LOAD_POLICY},
+    {RELEASE_POLICY_NAME, Toolkit::ImageVisual::Property::RELEASE_POLICY},
+    {ORIENTATION_CORRECTION_NAME, Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION},
+    {FAST_TRACK_UPLOADING_NAME, Toolkit::DevelImageVisual::Property::FAST_TRACK_UPLOADING},
 };
-const int NAME_INDEX_MATCH_TABLE_SIZE = sizeof(NAME_INDEX_MATCH_TABLE)/sizeof(NAME_INDEX_MATCH_TABLE[0]);
+const int NAME_INDEX_MATCH_TABLE_SIZE = sizeof(NAME_INDEX_MATCH_TABLE) / sizeof(NAME_INDEX_MATCH_TABLE[0]);
 
 Geometry CreateGeometry(VisualFactoryCache& factoryCache, ImageDimensions gridSize)
 {
@@ -137,7 +137,8 @@ Geometry CreateGeometry(VisualFactoryCache& factoryCache, ImageDimensions gridSi
   if(gridSize == ImageDimensions(1, 1))
   {
     geometry = factoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
-  } else
+  }
+  else
   {
     geometry = VisualFactoryCache::CreateGridGeometry(gridSize);
   }
@@ -1043,11 +1044,6 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
   Toolkit::Visual::ResourceStatus resourceStatus;
   if(mImpl->mRenderer)
   {
-    if(textureInformation.useAtlasing)
-    {
-      mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, mAtlasRect);
-    }
-
     EnablePreMultipliedAlpha(textureInformation.preMultiplied);
 
     Actor actor = mPlacementActor.GetHandle();
@@ -1058,12 +1054,9 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
     }
     else
     {
-      if(!textureInformation.useAtlasing)
-      {
-        Sampler sampler = Sampler::New();
-        sampler.SetWrapMode(mWrapModeU, mWrapModeV);
-        textureInformation.textureSet.SetSampler(0u, sampler);
-      }
+      Sampler sampler = Sampler::New();
+      sampler.SetWrapMode(mWrapModeU, mWrapModeV);
+      textureInformation.textureSet.SetSampler(0u, sampler);
 
       mImpl->mRenderer.SetTextures(textureInformation.textureSet);
       ComputeTextureSize();
