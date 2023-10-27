@@ -30,6 +30,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -163,7 +164,7 @@ public:
    * @param[in] url The url of the vector animation file
    * @param[in] synchronousLoading True if the url should be loaded synchronously
    */
-  void RequestLoad(const std::string& url, bool synchronousLoading);
+  void RequestLoad(const VisualUrl& url, bool synchronousLoading);
 
   /**
    * @brief Queries whether loading is requested.
@@ -355,7 +356,7 @@ private:
     PAUSED    ///< The animation is paused
   };
 
-  std::string                          mUrl;
+  VisualUrl                            mImageUrl;
   VectorAnimationRenderer              mVectorRenderer;
   std::vector<AnimationData>           mAnimationData[2];
   VectorAnimationThread&               mVectorAnimationThread;

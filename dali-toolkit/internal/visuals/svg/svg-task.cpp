@@ -66,7 +66,7 @@ VectorImageRenderer SvgTask::GetRenderer()
 
 SvgLoadingTask::SvgLoadingTask(VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, CallbackBase* callback)
 : SvgTask(vectorRenderer, callback, url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
-  mUrl(url),
+  mImageUrl(url),
   mDpi(dpi)
 {
 }
@@ -84,36 +84,57 @@ void SvgLoadingTask::Process()
     return;
   }
 
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_SVG_LOADING_TASK");
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream oss;
+    oss << "[url:" << mImageUrl.GetUrl() << "]";
+    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_SVG_LOADING_TASK", oss.str().c_str());
+  }
+#endif
+
+  bool loadFailed = false;
 
   Dali::Vector<uint8_t> buffer;
 
-  if(!mUrl.IsLocalResource())
+  if(!mImageUrl.IsLocalResource())
   {
-    if(!Dali::FileLoader::DownloadFileSynchronously(mUrl.GetUrl(), buffer))
+    if(!Dali::FileLoader::DownloadFileSynchronously(mImageUrl.GetUrl(), buffer))
     {
-      DALI_LOG_ERROR("Failed to download file! [%s]\n", mUrl.GetUrl().c_str());
-      return;
+      DALI_LOG_ERROR("Failed to download file! [%s]\n", mImageUrl.GetUrl().c_str());
+      loadFailed = true;
     }
   }
   else
   {
-    if(!Dali::FileLoader::ReadFile(mUrl.GetUrl(), buffer))
+    if(!Dali::FileLoader::ReadFile(mImageUrl.GetUrl(), buffer))
     {
-      DALI_LOG_ERROR("Failed to read file! [%s]\n", mUrl.GetUrl().c_str());
-      return;
+      DALI_LOG_ERROR("Failed to read file! [%s]\n", mImageUrl.GetUrl().c_str());
+      loadFailed = true;
     }
   }
 
-  buffer.PushBack('\0');
-
-  if(!mVectorRenderer.Load(buffer, mDpi))
+  if(!loadFailed)
   {
-    DALI_LOG_ERROR("Failed to load data! [%s]\n", mUrl.GetUrl().c_str());
-    return;
+    buffer.PushBack('\0');
+
+    if(!mVectorRenderer.Load(buffer, mDpi))
+    {
+      DALI_LOG_ERROR("Failed to load data! [%s]\n", mImageUrl.GetUrl().c_str());
+      loadFailed = true;
+    }
   }
 
-  mHasSucceeded = true;
+  mHasSucceeded = !loadFailed;
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream oss;
+    oss << "[success:" << mHasSucceeded << " ";
+    oss << "url:" << mImageUrl.GetUrl() << "]";
+    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_SVG_LOADING_TASK", oss.str().c_str());
+  }
+#endif
 }
 
 bool SvgLoadingTask::IsReady()
@@ -144,7 +165,8 @@ void SvgRasterizingTask::Process()
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     std::ostringstream oss;
-    oss << "[size: " << mWidth << " x " << mHeight << "]";
+    oss << "[size:" << mWidth << "x" << mHeight << " ";
+    oss << "url:" << mImageUrl.GetUrl() << "]";
     DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", oss.str().c_str());
   }
 #endif
@@ -153,13 +175,30 @@ void SvgRasterizingTask::Process()
   if(!pixelBuffer)
   {
     DALI_LOG_ERROR("Rasterize is failed!\n");
-    DALI_TRACE_END(gTraceFilter, "DALI_SVG_RASTERIZE_TASK");
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      std::ostringstream oss;
+      oss << "[size:" << mWidth << "x" << mHeight << " ";
+      oss << "url:" << mImageUrl.GetUrl() << "]";
+      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", oss.str().c_str());
+    }
+#endif
     return;
   }
 
   mPixelData    = Devel::PixelBuffer::Convert(pixelBuffer);
   mHasSucceeded = true;
-  DALI_TRACE_END(gTraceFilter, "DALI_SVG_RASTERIZE_TASK");
+
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream oss;
+    oss << "[size:" << mWidth << "x" << mHeight << " ";
+    oss << "url:" << mImageUrl.GetUrl() << "]";
+    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", oss.str().c_str());
+  }
+#endif
 }
 
 bool SvgRasterizingTask::IsReady()

@@ -185,10 +185,11 @@ void LoadingTask::Process()
     std::ostringstream oss;
     oss << "[";
     oss << "masking:" << isMaskTask << " ";
-    oss << "index: " << frameIndex << " ";
-    oss << "pixelBuffers: " << pixelBuffers.size() << " ";
+    oss << "index:" << frameIndex << " ";
+    oss << "pixelBuffers:" << pixelBuffers.size() << " ";
     if(!pixelBuffers.empty())
     {
+      oss << "size:" << pixelBuffers[0].GetWidth() << "x" << pixelBuffers[0].GetHeight() << " ";
       oss << "premult:" << pixelBuffers[0].IsAlphaPreMultiplied() << " ";
     }
     oss << "url:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetUrl()) << "]";

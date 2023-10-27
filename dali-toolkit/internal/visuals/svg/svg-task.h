@@ -141,7 +141,7 @@ private:
   SvgLoadingTask& operator=(const SvgLoadingTask& task) = delete;
 
 private:
-  VisualUrl mUrl;
+  VisualUrl mImageUrl;
   float     mDpi;
 };
 
@@ -179,6 +179,17 @@ public:
    */
   PixelData GetPixelData() const override;
 
+#ifdef TRACE_ENABLED
+  /**
+   * Set the url of rasterizatoin visual. Only for tracing
+   * @param[in] url The url of this visual
+   */
+  void SetUrl(VisualUrl url)
+  {
+    mImageUrl = std::move(url);
+  }
+#endif
+
 private:
   // Undefined
   SvgRasterizingTask(const SvgRasterizingTask& task) = delete;
@@ -187,6 +198,9 @@ private:
   SvgRasterizingTask& operator=(const SvgRasterizingTask& task) = delete;
 
 private:
+#ifdef TRACE_ENABLED
+  VisualUrl mImageUrl{};
+#endif
   PixelData mPixelData;
   uint32_t  mWidth;
   uint32_t  mHeight;

@@ -87,7 +87,7 @@ AnimatedVectorImageVisualPtr AnimatedVectorImageVisual::New(VisualFactoryCache& 
 
 AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, ImageDimensions size)
 : Visual::Base(factoryCache, Visual::FittingMode::FILL, static_cast<Toolkit::Visual::Type>(Toolkit::DevelVisual::ANIMATED_VECTOR_IMAGE)),
-  mUrl(imageUrl),
+  mImageUrl(imageUrl),
   mAnimationData(),
   mVectorAnimationTask(new VectorAnimationTask(factoryCache)),
   mImageVisualShaderFactory(shaderFactory),
@@ -178,9 +178,9 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap(Property::Map& map) const
 {
   map.Clear();
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::ANIMATED_VECTOR_IMAGE);
-  if(mUrl.IsValid())
+  if(mImageUrl.IsValid())
   {
-    map.Insert(Toolkit::ImageVisual::Property::URL, mUrl.GetUrl());
+    map.Insert(Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl());
   }
   map.Insert(Toolkit::DevelImageVisual::Property::LOOP_COUNT, mAnimationData.loopCount);
 
@@ -380,7 +380,7 @@ void AnimatedVectorImageVisual::OnInitialize(void)
   mVectorAnimationTask->ResourceReadySignal().Connect(this, &AnimatedVectorImageVisual::OnResourceReady);
   mVectorAnimationTask->SetAnimationFinishedCallback(MakeCallback(this, &AnimatedVectorImageVisual::OnAnimationFinished));
 
-  mVectorAnimationTask->RequestLoad(mUrl.GetUrl(), IsSynchronousLoadingRequired());
+  mVectorAnimationTask->RequestLoad(mImageUrl, IsSynchronousLoadingRequired());
 
   auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
   vectorAnimationManager.AddObserver(*this);
