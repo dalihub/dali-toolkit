@@ -21,6 +21,7 @@
 
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
+#include <dali/devel-api/adaptor-framework/native-image-source-queue.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/rendering/frame-buffer.h>
@@ -167,6 +168,60 @@ int UtcDaliImageConvertNativeImageSourceToUrl02(void)
     NativeImageSourcePtr nativeImageSource = NativeImageSource::New(width, height, NativeImageSource::COLOR_DEPTH_DEFAULT);
 
     DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImageSource, true).GetUrl().size() > 0u);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "Adaptor::IsAvailable()", TEST_LOCATION);
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliImageConvertNativeImageInterfaceToUrl01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliImageConvertNativeImageInterfaceToUrl01");
+
+  unsigned int width(64);
+  unsigned int height(64);
+  try
+  {
+    NativeImageSourceQueuePtr nativeImageQueue = NativeImageSourceQueue::New(width, height, (Dali::NativeImageSourceQueue::ColorFormat::BGR888));
+
+    DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImageQueue).GetUrl().size() > 0u);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "Adaptor::IsAvailable()", TEST_LOCATION);
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliImageConvertNativeImageInterfaceToUrl02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliImageConvertNativeImageInterfaceToUrl02");
+
+  unsigned int width(64);
+  unsigned int height(64);
+  try
+  {
+    NativeImageSourceQueuePtr nativeImageQueue = NativeImageSourceQueue::New(width, height, (Dali::NativeImageSourceQueue::ColorFormat::BGR888));
+
+    DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImageQueue, true).GetUrl().size() > 0u);
   }
   catch(Dali::DaliException& e)
   {
