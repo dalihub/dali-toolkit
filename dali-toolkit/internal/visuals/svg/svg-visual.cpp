@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "svg-visual.h"
+#include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
@@ -92,6 +92,12 @@ SvgVisual::~SvgVisual()
     {
       Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
     }
+
+    if(mImageUrl.IsBufferResource())
+    {
+      TextureManager& textureManager = mFactoryCache.GetTextureManager();
+      textureManager.RemoveEncodedImageBuffer(mImageUrl.GetUrl());
+    }
   }
 }
 
@@ -105,9 +111,22 @@ void SvgVisual::OnInitialize()
   Vector2 dpi     = Stage::GetCurrent().GetDpi();
   float   meanDpi = (dpi.height + dpi.width) * 0.5f;
 
-  mLoadingTask = new SvgLoadingTask(mVectorRenderer, mImageUrl, meanDpi, MakeCallback(this, &SvgVisual::ApplyRasterizedImage));
+  EncodedImageBuffer encodedImageBuffer;
 
-  if(IsSynchronousLoadingRequired() && mImageUrl.IsLocalResource())
+  if(mImageUrl.IsBufferResource())
+  {
+    // Increase reference count of External Resources :
+    // EncodedImageBuffer.
+    // Reference count will be decreased at destructor of the visual.
+    TextureManager& textureManager = mFactoryCache.GetTextureManager();
+    textureManager.UseExternalResource(mImageUrl.GetUrl());
+
+    encodedImageBuffer = textureManager.GetEncodedImageBuffer(mImageUrl.GetUrl());
+  }
+
+  mLoadingTask = new SvgLoadingTask(mVectorRenderer, mImageUrl, encodedImageBuffer, meanDpi, MakeCallback(this, &SvgVisual::ApplyRasterizedImage));
+
+  if(IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource()))
   {
     mLoadingTask->Process();
     if(!mLoadingTask->HasSucceeded())

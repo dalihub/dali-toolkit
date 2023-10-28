@@ -22,6 +22,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/pixel-data.h>
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -112,10 +113,11 @@ public:
    * Constructor
    * @param[in] vectorRenderer The vector rasterizer.
    * @param[in] url The URL to svg resource to use.
+   * @param[in] encodedImageBuffer The resource buffer if required.
    * @param[in] dpi The DPI of the screen.
    * @param[in] callback The callback that is called when the operation is completed.
    */
-  SvgLoadingTask(VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, CallbackBase* callback);
+  SvgLoadingTask(VectorImageRenderer vectorRenderer, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, CallbackBase* callback);
 
   /**
    * Destructor.
@@ -141,8 +143,9 @@ private:
   SvgLoadingTask& operator=(const SvgLoadingTask& task) = delete;
 
 private:
-  VisualUrl mImageUrl;
-  float     mDpi;
+  VisualUrl          mImageUrl;
+  EncodedImageBuffer mEncodedImageBuffer;
+  float              mDpi;
 };
 
 class SvgRasterizingTask : public SvgTask

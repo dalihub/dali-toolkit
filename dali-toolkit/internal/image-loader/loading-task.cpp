@@ -215,6 +215,9 @@ void LoadingTask::Load()
   else if(encodedImageBuffer)
   {
     pixelBuffer = Dali::LoadImageFromBuffer(encodedImageBuffer.GetRawBuffer(), dimensions, fittingMode, samplingMode, orientationCorrection);
+
+    // We don't need to hold image buffer anymore.
+    encodedImageBuffer.Reset();
   }
   else if(url.IsValid() && url.IsLocalResource())
   {

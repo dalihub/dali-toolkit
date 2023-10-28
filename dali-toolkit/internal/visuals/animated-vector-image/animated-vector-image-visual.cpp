@@ -113,6 +113,12 @@ AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
 {
   if(!mCoreShutdown)
   {
+    if(mImageUrl.IsBufferResource())
+    {
+      TextureManager& textureManager = mFactoryCache.GetTextureManager();
+      textureManager.RemoveEncodedImageBuffer(mImageUrl.GetUrl());
+    }
+
     auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
     vectorAnimationManager.RemoveObserver(*this);
 
@@ -380,7 +386,20 @@ void AnimatedVectorImageVisual::OnInitialize(void)
   mVectorAnimationTask->ResourceReadySignal().Connect(this, &AnimatedVectorImageVisual::OnResourceReady);
   mVectorAnimationTask->SetAnimationFinishedCallback(MakeCallback(this, &AnimatedVectorImageVisual::OnAnimationFinished));
 
-  mVectorAnimationTask->RequestLoad(mImageUrl, IsSynchronousLoadingRequired());
+  EncodedImageBuffer encodedImageBuffer;
+
+  if(mImageUrl.IsBufferResource())
+  {
+    // Increase reference count of External Resources :
+    // EncodedImageBuffer.
+    // Reference count will be decreased at destructor of the visual.
+    TextureManager& textureManager = mFactoryCache.GetTextureManager();
+    textureManager.UseExternalResource(mImageUrl.GetUrl());
+
+    encodedImageBuffer = textureManager.GetEncodedImageBuffer(mImageUrl.GetUrl());
+  }
+
+  mVectorAnimationTask->RequestLoad(mImageUrl, encodedImageBuffer, IsSynchronousLoadingRequired());
 
   auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
   vectorAnimationManager.AddObserver(*this);

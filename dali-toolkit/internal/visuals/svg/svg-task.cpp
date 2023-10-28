@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "svg-task.h"
+#include <dali-toolkit/internal/visuals/svg/svg-task.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/file-loader.h>
@@ -64,9 +64,10 @@ VectorImageRenderer SvgTask::GetRenderer()
   return mVectorRenderer;
 }
 
-SvgLoadingTask::SvgLoadingTask(VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, CallbackBase* callback)
+SvgLoadingTask::SvgLoadingTask(VectorImageRenderer vectorRenderer, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, CallbackBase* callback)
 : SvgTask(vectorRenderer, callback, url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
   mImageUrl(url),
+  mEncodedImageBuffer(encodedImageBuffer),
   mDpi(dpi)
 {
 }
@@ -98,15 +99,16 @@ void SvgLoadingTask::Process()
 
   Dali::Vector<uint8_t> buffer;
 
-  if(!mImageUrl.IsLocalResource())
+  if(mEncodedImageBuffer)
   {
-    if(!Dali::FileLoader::DownloadFileSynchronously(mImageUrl.GetUrl(), buffer))
-    {
-      DALI_LOG_ERROR("Failed to download file! [%s]\n", mImageUrl.GetUrl().c_str());
-      loadFailed = true;
-    }
+    // Copy raw buffer.
+    // TODO : Can't we load svg without copy buffer in future?
+    buffer = mEncodedImageBuffer.GetRawBuffer();
+
+    // We don't need to hold image buffer anymore.
+    mEncodedImageBuffer.Reset();
   }
-  else
+  else if(mImageUrl.IsLocalResource())
   {
     if(!Dali::FileLoader::ReadFile(mImageUrl.GetUrl(), buffer))
     {
@@ -114,9 +116,18 @@ void SvgLoadingTask::Process()
       loadFailed = true;
     }
   }
+  else
+  {
+    if(!Dali::FileLoader::DownloadFileSynchronously(mImageUrl.GetUrl(), buffer))
+    {
+      DALI_LOG_ERROR("Failed to download file! [%s]\n", mImageUrl.GetUrl().c_str());
+      loadFailed = true;
+    }
+  }
 
   if(!loadFailed)
   {
+    buffer.Reserve(buffer.Count() + 1u);
     buffer.PushBack('\0');
 
     if(!mVectorRenderer.Load(buffer, mDpi))

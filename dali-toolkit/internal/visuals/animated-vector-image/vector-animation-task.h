@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/public-api/adaptor-framework/async-task-manager.h>
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-array.h>
 #include <chrono>
@@ -162,9 +163,10 @@ public:
    * @brief Requests to load the animation file.
    *
    * @param[in] url The url of the vector animation file
+   * @param[in] encodedImageBuffer The resource buffer if required.
    * @param[in] synchronousLoading True if the url should be loaded synchronously
    */
-  void RequestLoad(const VisualUrl& url, bool synchronousLoading);
+  void RequestLoad(const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, bool synchronousLoading);
 
   /**
    * @brief Queries whether loading is requested.
@@ -357,6 +359,7 @@ private:
   };
 
   VisualUrl                            mImageUrl;
+  EncodedImageBuffer                   mEncodedImageBuffer;
   VectorAnimationRenderer              mVectorRenderer;
   std::vector<AnimationData>           mAnimationData[2];
   VectorAnimationThread&               mVectorAnimationThread;
