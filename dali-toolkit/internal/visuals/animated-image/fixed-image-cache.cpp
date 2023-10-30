@@ -47,7 +47,7 @@ FixedImageCache::FixedImageCache(TextureManager&                     textureMana
                                  bool                                preMultiplyOnLoad)
 : ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, interval, preMultiplyOnLoad),
   mImageUrls(urlList),
-  mFront(FIRST_FRAME_INDEX)
+  mCurrentFrameIndex(FIRST_FRAME_INDEX)
 {
   mReadyFlags.reserve(mImageUrls.size());
 }
@@ -67,17 +67,17 @@ TextureSet FixedImageCache::Frame(uint32_t frameIndex)
   }
 
   while(mReadyFlags.size() < mImageUrls.size() &&
-        (frameIndex > mFront || mReadyFlags.empty()))
+        (frameIndex > mCurrentFrameIndex || mReadyFlags.empty()))
   {
-    ++mFront;
+    ++mCurrentFrameIndex;
     LoadBatch();
   }
 
-  mFront = frameIndex;
+  mCurrentFrameIndex = frameIndex;
 
-  if(IsFrontReady() && mLoadState != TextureManager::LoadState::LOAD_FAILED)
+  if(IsFrameReady(mCurrentFrameIndex) && mLoadState != TextureManager::LoadState::LOAD_FAILED)
   {
-    textureSet = GetFrontTextureSet();
+    textureSet = GetTextureSet(mCurrentFrameIndex);
   }
 
   return textureSet;
@@ -97,7 +97,7 @@ uint32_t FixedImageCache::GetFrameInterval(uint32_t frameIndex) const
 
 int32_t FixedImageCache::GetCurrentFrameIndex() const
 {
-  return static_cast<int32_t>(mFront);
+  return static_cast<int32_t>(mCurrentFrameIndex);
 }
 
 int32_t FixedImageCache::GetTotalFrameCount() const
@@ -105,9 +105,9 @@ int32_t FixedImageCache::GetTotalFrameCount() const
   return mImageUrls.size();
 }
 
-bool FixedImageCache::IsFrontReady() const
+bool FixedImageCache::IsFrameReady(uint32_t frameIndex) const
 {
-  return (mReadyFlags.size() > 0 && mReadyFlags[mFront] == true);
+  return (mReadyFlags.size() > 0 && mReadyFlags[frameIndex] == true);
 }
 
 void FixedImageCache::LoadBatch()
@@ -143,9 +143,9 @@ void FixedImageCache::LoadBatch()
   }
 }
 
-TextureSet FixedImageCache::GetFrontTextureSet() const
+TextureSet FixedImageCache::GetTextureSet(uint32_t frameIndex) const
 {
-  TextureSet textureSet = mTextureManager.GetTextureSet(mImageUrls[mFront].mTextureId);
+  TextureSet textureSet = mTextureManager.GetTextureSet(mImageUrls[frameIndex].mTextureId);
   if(textureSet)
   {
     Sampler sampler = Sampler::New();
@@ -155,11 +155,11 @@ TextureSet FixedImageCache::GetFrontTextureSet() const
   return textureSet;
 }
 
-void FixedImageCache::CheckFrontFrame(bool wasReady, bool preMultiplied)
+void FixedImageCache::MakeReady(bool wasReady, uint32_t frameIndex, bool preMultiplied)
 {
-  if(wasReady == false && IsFrontReady())
+  if(wasReady == false && IsFrameReady(frameIndex))
   {
-    mObserver.FrameReady(GetFrontTextureSet(), mInterval, preMultiplied);
+    mObserver.FrameReady(GetTextureSet(frameIndex), mInterval, preMultiplied);
   }
 }
 
@@ -186,7 +186,7 @@ void FixedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureI
   if(loadSuccess)
   {
     mLoadState           = TextureManager::LoadState::LOAD_FINISHED;
-    bool frontFrameReady = IsFrontReady();
+    bool isCurrentFrameReady = IsFrameReady(mCurrentFrameIndex);
     if(!mRequestingLoad)
     {
       for(std::size_t i = 0; i < mImageUrls.size(); ++i)
@@ -202,7 +202,7 @@ void FixedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureI
     {
       mReadyFlags.back() = true;
     }
-    CheckFrontFrame(frontFrameReady, textureInformation.preMultiplied);
+    MakeReady(isCurrentFrameReady, mCurrentFrameIndex, textureInformation.preMultiplied);
   }
   else
   {
