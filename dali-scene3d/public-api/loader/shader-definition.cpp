@@ -26,6 +26,15 @@
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/public-api/loader/utils.h>
 
+#include <dali/integration-api/debug.h>
+
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_MODEL_SHADER_DEFINITION");
+#endif
+} // namespace
+
 namespace Dali::Scene3D::Loader
 {
 namespace
@@ -178,6 +187,7 @@ Shader ShaderDefinition::Load(RawData&& raw) const
   array.PushBack(map[0]);
   array.PushBack(map[1]);
 
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Vert Shader src: \n%s\n", raw.mVertexShaderSource.c_str());
   Shader shader = Shader::New(array);
   for(Property::Map::SizeType i0 = 0, i1 = mUniforms.Count(); i0 != i1; ++i0)
   {

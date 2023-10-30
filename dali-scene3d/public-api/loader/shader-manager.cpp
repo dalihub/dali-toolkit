@@ -31,6 +31,13 @@
 
 #include <dali/integration-api/debug.h>
 
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_MODEL_SHADER_MANAGER");
+#endif
+} // namespace
+
 namespace Dali::Scene3D::Loader
 {
 namespace
@@ -202,6 +209,7 @@ ShaderManager::~ShaderManager() = default;
 
 Dali::Shader ShaderManager::ProduceShader(const MaterialDefinition& materialDefinition, const MeshDefinition& meshDefinition)
 {
+  DALI_LOG_INFO(gLogFilter, Debug::Concise, "Defining shader from mat/mesh definitions\n");
   ShaderOption option = MakeOption(materialDefinition, meshDefinition);
   return ProduceShader(option);
 }
@@ -212,13 +220,34 @@ Dali::Shader ShaderManager::ProduceShader(const ShaderOption& shaderOption)
 
   auto&    shaderMap = mImpl->mShaderMap;
   uint64_t hash      = shaderOption.GetOptionHash();
-  auto     iFind     = shaderMap.find(hash);
+
+#if defined(DEBUG_ENABLED)
+  std::ostringstream oss;
+  oss << "  ShaderOption defines:";
+  std::vector<std::string> defines;
+  shaderOption.GetDefines(defines);
+  for(auto& def : defines)
+  {
+    oss << def << ", ";
+  }
+  oss << std::endl
+      << "  ShaderOption macro definitions:" << std::endl;
+  for(auto& macro : shaderOption.GetMacroDefinitions())
+  {
+    oss << macro.macro << " : " << macro.definition << std::endl;
+  }
+  DALI_LOG_INFO(gLogFilter, Debug::Concise, "ShaderOption:\n%s\n", oss.str().c_str());
+#endif
+
+  auto iFind = shaderMap.find(hash);
   if(iFind != shaderMap.end())
   {
+    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Defining Shader found: hash: %lx", hash);
     result = mImpl->mShaders[iFind->second];
   }
   else
   {
+    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Creating new shader: hash: %lx\n", hash);
     ShaderDefinition shaderDef;
     shaderDef.mUseBuiltInShader = true;
 
