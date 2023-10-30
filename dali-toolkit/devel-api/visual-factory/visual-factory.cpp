@@ -116,11 +116,6 @@ void VisualFactory::DiscardVisual(Visual::Base visual)
   GetImplementation(*this).DiscardVisual(visual);
 }
 
-void VisualFactory::UsePreCompiledShader()
-{
-  GetImplementation(*this).UsePreCompiledShader();
-}
-
 } // namespace Toolkit
 
 } // namespace Dali
