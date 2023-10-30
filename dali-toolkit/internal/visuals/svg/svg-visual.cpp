@@ -322,6 +322,10 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
 
     mRasterizingTask = new SvgRasterizingTask(mVectorRenderer, width, height, MakeCallback(this, &SvgVisual::ApplyRasterizedImage));
 
+#ifdef TRACE_ENABLED
+    reinterpret_cast<SvgRasterizingTask*>(mRasterizingTask.Get())->SetUrl(mImageUrl);
+#endif
+
     if(IsSynchronousLoadingRequired() && mImageUrl.IsLocalResource())
     {
       mRasterizingTask->Process();

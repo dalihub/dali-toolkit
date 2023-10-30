@@ -18,8 +18,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
+#include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 
@@ -33,7 +33,7 @@ namespace Toolkit
 {
 /**
  * API to interface with the toolkit image
- * Allows developers to add FrameBuffer, PixelData and NativeImageSource to toolkit so that visuals can use them to render
+ * Allows developers to add FrameBuffer, PixelData and NativeImageInterface to toolkit so that visuals can use them to render
  */
 namespace Image
 {
@@ -72,14 +72,14 @@ DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::FrameBuffer fra
 DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixelData, bool preMultiplied = false);
 
 /**
- * @brief Generate a Url from native image source.
- * This Url can be used in visuals to render the native image source.
- * @note This method does not check for duplicates, If same native image source is entered multiple times, a different URL is returned each time.
- * @param[in] nativeImageSource the native image source to converted to Url
- * @param[in] preMultiplied Whether this native image source preMultiplied or not. Default as false.
- * @return the ImageUrl representing this native image source
+ * @brief Generate a Url from native image interface.
+ * This Url can be used in visuals to render the native image interface.
+ * @note This method does not check for duplicates, If same native image interface is entered multiple times, a different URL is returned each time.
+ * @param[in] nativeImageInterface the native image interface to converted to Url
+ * @param[in] preMultiplied Whether this native image interface preMultiplied or not. Default as false.
+ * @return the ImageUrl representing this native image interface
  */
-DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource, bool preMultiplied = false);
+DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageInterfacePtr nativeImageInterface, bool preMultiplied = false);
 
 /**
  * @brief Generate a Url from encoded image buffer.

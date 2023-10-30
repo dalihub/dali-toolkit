@@ -55,9 +55,9 @@ Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixelData, bool preMul
   return imageUrl;
 }
 
-Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource, bool preMultiplied)
+Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageInterfacePtr nativeImageInterface, bool preMultiplied)
 {
-  Texture texture = Dali::Texture::New(*nativeImageSource);
+  Texture texture = Dali::Texture::New(*nativeImageInterface);
   Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, preMultiplied);
   return imageUrl;
 }

@@ -54,7 +54,7 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false)
 
 VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
 : AsyncTask(MakeCallback(this, &VectorAnimationTask::TaskCompleted), AsyncTask::PriorityType::HIGH, AsyncTask::ThreadType::WORKER_THREAD),
-  mUrl(),
+  mImageUrl(),
   mVectorRenderer(VectorAnimationRenderer::New()),
   mAnimationData(),
   mVectorAnimationThread(factoryCache.GetVectorAnimationManager().GetVectorAnimationThread()),
@@ -143,17 +143,36 @@ bool VectorAnimationTask::IsAnimating()
 
 bool VectorAnimationTask::Load(bool synchronousLoading)
 {
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_LOTTIE_LOADING_TASK");
-
-  if(!mVectorRenderer.Load(mUrl))
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
-    DALI_LOG_ERROR("VectorAnimationTask::Load: Load failed [%s]\n", mUrl.c_str());
+    std::ostringstream oss;
+    oss << "[url:" << mImageUrl.GetUrl() << "]";
+    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", oss.str().c_str());
+  }
+#endif
+
+  if(!mVectorRenderer.Load(mImageUrl.GetUrl()))
+  {
+    DALI_LOG_ERROR("VectorAnimationTask::Load: Load failed [%s]\n", mImageUrl.GetUrl().c_str());
+    mLoadFailed = true;
+  }
+
+  if(mLoadFailed)
+  {
     mLoadRequest = false;
-    mLoadFailed  = true;
     if(!synchronousLoading && mLoadCompletedCallback)
     {
       mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
     }
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      std::ostringstream oss;
+      oss << "[url:" << mImageUrl.GetUrl() << "]";
+      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", oss.str().c_str());
+    }
+#endif
     return false;
   }
 
@@ -170,7 +189,16 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
     mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
   }
 
-  DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Load: file = %s [%d frames, %f fps] [%p]\n", mUrl.c_str(), mTotalFrame, mFrameRate, this);
+  DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Load: file = %s [%d frames, %f fps] [%p]\n", mImageUrl.GetUrl().c_str(), mTotalFrame, mFrameRate, this);
+
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream oss;
+    oss << "[url:" << mImageUrl.GetUrl() << "]";
+    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", oss.str().c_str());
+  }
+#endif
 
   return true;
 }
@@ -184,9 +212,9 @@ void VectorAnimationTask::SetRenderer(Renderer renderer)
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetRenderer [%p]\n", this);
 }
 
-void VectorAnimationTask::RequestLoad(const std::string& url, bool synchronousLoading)
+void VectorAnimationTask::RequestLoad(const VisualUrl& url, bool synchronousLoading)
 {
-  mUrl = url;
+  mImageUrl = url;
 
   if(!synchronousLoading)
   {
@@ -366,7 +394,7 @@ void VectorAnimationTask::SetPlayRange(const Property::Array& playRange)
       mCurrentFrame = mEndFrame;
     }
 
-    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetPlayRange: [%d, %d] [%s] [%p]\n", mStartFrame, mEndFrame, mUrl.c_str(), this);
+    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetPlayRange: [%d, %d] [%s] [%p]\n", mStartFrame, mEndFrame, mImageUrl.GetUrl().c_str(), this);
   }
 }
 
@@ -461,7 +489,15 @@ bool VectorAnimationTask::Rasterize()
     return false;
   }
 
-  DALI_TRACE_BEGIN(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK");
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    std::ostringstream oss;
+    oss << "[size:" << mWidth << "x" << mHeight << " ";
+    oss << "url:" << mImageUrl.GetUrl() << "]";
+    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", oss.str().c_str());
+  }
+#endif
 
   ApplyAnimationData();
 
@@ -574,10 +610,11 @@ bool VectorAnimationTask::Rasterize()
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     std::ostringstream oss;
-    oss << "[size: " << mWidth << " x " << mHeight << ", ";
-    oss << "frame: " << mCurrentFrame << ", ";
-    oss << "loop: " << mCurrentLoop << ", ";
-    oss << "state : " << mPlayState << "]";
+    oss << "[size:" << mWidth << "x" << mHeight << " ";
+    oss << "frame:" << mCurrentFrame << " ";
+    oss << "loop:" << mCurrentLoop << " ";
+    oss << "state:" << mPlayState << " ";
+    oss << "url:" << mImageUrl.GetUrl() << "]";
     DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", oss.str().c_str());
   }
 #endif

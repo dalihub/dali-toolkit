@@ -803,10 +803,7 @@ bool TextField::OnAccessibilityActivated()
 void TextField::OnTap(const TapGesture& gesture)
 {
   DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField::OnTap %p\n", mController.Get());
-  if(mInputMethodContext && IsEditable())
-  {
-    mInputMethodContext.Activate();
-  }
+
   // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
   Extents padding;
   padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
