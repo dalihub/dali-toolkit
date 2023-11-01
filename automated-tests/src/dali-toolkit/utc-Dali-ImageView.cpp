@@ -3679,6 +3679,34 @@ void OnResourceReadySignal07(Control control)
   }
 }
 
+void OnResourceReadySignal11(Control control)
+{
+  gResourceReadySignalCounter++;
+
+  if(!gImageView2)
+  {
+    auto scene = gImageView1.GetParent();
+
+    // Try to load animated image visual here which is already cached, and then ignore forcely.
+
+    Property::Map map1;
+    map1[Toolkit::ImageVisual::Property::URL] = TEST_GIF_FILE_NAME;
+
+    gImageView2 = ImageView::New();
+    gImageView2.SetProperty(Toolkit::ImageView::Property::IMAGE, map1);
+
+    gImageView3 = ImageView::New();
+    gImageView3.SetProperty(Toolkit::ImageView::Property::IMAGE, map1);
+
+    scene.Add(gImageView2);
+    gImageView2.Unparent();
+
+    scene.Add(gImageView3);
+    gImageView3.Unparent();
+    gImageView3.Reset(); // Destroy visual
+  }
+}
+
 } // namespace
 
 int UtcDaliImageViewSetImageOnResourceReadySignal01(void)
@@ -4216,6 +4244,82 @@ int UtcDaliImageViewSetImageOnResourceReadySignal07(void)
   END_TEST;
 }
 
+int UtcDaliImageViewSetImageOnResourceReadySignal11(void)
+{
+  tet_infoline("Test ResourceReady Add AnimatedImageVisual and then Remove immediately.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+  if(gImageView2)
+  {
+    gImageView2.Reset();
+  }
+  if(gImageView3)
+  {
+    gImageView3.Reset();
+  }
+
+  try
+  {
+    gImageView1 = ImageView::New();
+    gImageView1.SetProperty(Toolkit::ImageView::Property::IMAGE, TEST_GIF_FILE_NAME);
+    gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal11);
+    application.GetScene().Add(gImageView1); // It will call resourceReady signal 1 time.
+
+    tet_printf("ResourceReady called %d times\n", gResourceReadySignalCounter);
+
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 0, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    // Load gImageView1
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    tet_printf("ResourceReady called %d times\n", gResourceReadySignalCounter);
+
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, TEST_LOCATION);
+
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    // Exception should not happened
+    DALI_TEST_CHECK(false);
+  }
+
+  // Clear cache.
+  application.SendNotification();
+  application.Render();
+
+  gResourceReadySignalCounter = 0;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+  if(gImageView2)
+  {
+    gImageView2.Reset();
+  }
+  if(gImageView3)
+  {
+    gImageView3.Reset();
+  }
+
+  END_TEST;
+}
+
 int UtcDaliImageViewUseSameUrlWithAnimatedImageVisual(void)
 {
   tet_infoline("Test multiple views with same image in animated image visual");
@@ -4347,7 +4451,6 @@ int UtcDaliImageViewNpatchImageCacheTest02(void)
     map[Toolkit::Visual::Property::TYPE]        = Toolkit::Visual::N_PATCH;
     map[Toolkit::ImageVisual::Property::URL]    = normalImageUrl;
     map[Toolkit::ImageVisual::Property::BORDER] = border;
-
     imageView[index] = ImageView::New();
     imageView[index].SetProperty(Toolkit::ImageView::Property::IMAGE, map);
     imageView[index].SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
