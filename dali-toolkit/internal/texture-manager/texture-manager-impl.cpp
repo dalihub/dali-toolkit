@@ -604,6 +604,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
   {
     if(textureInfo.loadState != LoadState::UPLOADED)
     {
+      textureInfo.preMultiplied = (preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
       textureInfo.loadState = TextureManager::LoadState::WAITING_FOR_MASK;
     }
   }
