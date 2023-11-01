@@ -761,6 +761,19 @@ void TextureManager::RequestRemove(const TextureManager::TextureId& textureId, T
         Adaptor::Get().RegisterProcessor(*this, true);
       }
     }
+    else
+    {
+      // Given textureId might exist at load queue.
+      // Remove observer from the LoadQueue
+      for(auto&& element : mLoadQueue)
+      {
+        if(element.mObserver == observer)
+        {
+          element.mObserver = nullptr;
+          break;
+        }
+      }
+    }
   }
 }
 
@@ -1513,6 +1526,19 @@ void TextureManager::RemoveTextureObserver(TextureManager::TextureInfo& textureI
       DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Disconnect DestructionSignal to observer:%p\n", observer);
       observer->DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);
       textureInfo.observerList.Erase(iter);
+    }
+    else
+    {
+      // Given textureId might exist at load queue.
+      // Remove observer from the LoadQueue
+      for(auto&& element : mLoadQueue)
+      {
+        if(element.mObserver == observer)
+        {
+          element.mObserver = nullptr;
+          break;
+        }
+      }
     }
   }
 }
