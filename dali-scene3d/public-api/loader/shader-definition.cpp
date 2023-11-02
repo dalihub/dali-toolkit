@@ -102,7 +102,7 @@ void RedefineMacro(std::string& shaderCode, const std::string& macro, const std:
     std::sregex_token_iterator first{value.begin(), value.end(), re, -1}, last;
     for(auto i = first; i != last; ++i)
     {
-      std::string line = std::string("\\\n") + (*i).str();
+      std::string line = std::string(" \\\n") + (*i).str();
       shaderCode.insert(insertionPoint, line);
       insertionPoint += line.length();
     }

@@ -315,7 +315,7 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
     mesh.first.RetrieveBlendShapeComponents(hasPositions, hasNormals, hasTangents);
     GetImplementation(primitive).SetBlendShapeOptions(hasPositions, hasNormals, hasTangents, mesh.first.mBlendShapeVersion);
     GetImplementation(primitive).SetBlendShapeGeometry(mesh.second.blendShapeGeometry);
-    GetImplementation(primitive).SetSkinned(mesh.first.IsSkinned());
+    GetImplementation(primitive).SetSkinned(mesh.first.IsSkinned(), mesh.first.GetNumberOfJointSets());
   }
 
   auto shader = renderer.GetShader();

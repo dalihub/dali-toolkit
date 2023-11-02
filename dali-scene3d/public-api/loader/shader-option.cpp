@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <ostream>
+#include <sstream>
 #include <string>
 
 namespace Dali::Scene3D::Loader
@@ -49,6 +51,8 @@ static constexpr std::string_view OPTION_KEYWORD[] =
     "MORPH_VERSION_2_0",
 };
 static constexpr uint32_t NUMBER_OF_OPTIONS = sizeof(OPTION_KEYWORD) / sizeof(OPTION_KEYWORD[0]);
+static const char*        ADD_EXTRA_SKINNING_ATTRIBUTES{"ADD_EXTRA_SKINNING_ATTRIBUTES"};
+static const char*        ADD_EXTRA_WEIGHTS{"ADD_EXTRA_WEIGHTS"};
 
 inline void HashString(std::uint64_t& hash, const char* string)
 {
@@ -90,6 +94,29 @@ void ShaderOption::SetTransparency()
 void ShaderOption::AddOption(Type shaderOptionType)
 {
   mOptionHash |= (1 << static_cast<uint32_t>(shaderOptionType));
+}
+
+void ShaderOption::AddJointMacros(size_t numberOfJointSets)
+{
+  // Add options for ADD_EXTRA_SKINNING_ATTRIBUTES and ADD_EXTRA_WEIGHTS:
+  if(numberOfJointSets > 1)
+  {
+    std::ostringstream attributes;
+    std::ostringstream weights;
+    for(size_t i = 1; i < numberOfJointSets; ++i)
+    {
+      attributes << "in vec4 aJoints" << i << ";\n";
+      attributes << "in vec4 aWeights" << i << ";\n";
+
+      weights << "bone +=\n"
+              << "uBone[int(aJoints" << i << ".x)] * aWeights" << i << ".x +\n"
+              << "uBone[int(aJoints" << i << ".y)] * aWeights" << i << ".y +\n"
+              << "uBone[int(aJoints" << i << ".z)] * aWeights" << i << ".z +\n"
+              << "uBone[int(aJoints" << i << ".w)] * aWeights" << i << ".w;\n";
+    }
+    AddMacroDefinition(ADD_EXTRA_SKINNING_ATTRIBUTES, attributes.str());
+    AddMacroDefinition(ADD_EXTRA_WEIGHTS, weights.str());
+  }
 }
 
 void ShaderOption::AddMacroDefinition(std::string macro, std::string definition)

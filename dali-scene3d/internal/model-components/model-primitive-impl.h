@@ -182,8 +182,9 @@ public:
    * @brief Sets whether or not this model primitive is skinned.
    *
    * @param[in] isSkinned Whether or not this model primitive is skinned.
+   * @param[in] numberOfJointSets How many joint sets the mesh expects in the shader
    */
-  void SetSkinned(bool isSkinned);
+  void SetSkinned(bool isSkinned, uint32_t numberOfJointSets);
 
 private: // From MaterialModifyObserver
   /**
@@ -216,9 +217,9 @@ private:
 
 private:
   // Delete copy & move operator
-  ModelPrimitive(const ModelPrimitive&)                    = delete;
-  ModelPrimitive(ModelPrimitive&&)                         = delete;
-  ModelPrimitive& operator=(const ModelPrimitive& rhs)     = delete;
+  ModelPrimitive(const ModelPrimitive&) = delete;
+  ModelPrimitive(ModelPrimitive&&)      = delete;
+  ModelPrimitive& operator=(const ModelPrimitive& rhs) = delete;
   ModelPrimitive& operator=(ModelPrimitive&& rhs) noexcept = delete;
 
 private:
@@ -241,6 +242,9 @@ private:
   Dali::Texture mDiffuseTexture;
   float         mIblScaleFactor{1.0f};
   uint32_t      mSpecularMipmapLevels{1u};
+
+  // For skinning
+  uint32_t mNumberOfJointSets{0};
 
   // For blend shape
   Scene3D::Loader::BlendShapes::BlendShapeData mBlendShapeData;

@@ -264,6 +264,11 @@ struct DALI_SCENE3D_API MeshDefinition
   bool IsSkinned() const;
 
   /**
+   * @brief Returns the number of joint sets defined by the mesh
+   */
+  uint32_t GetNumberOfJointSets() const;
+
+  /**
    * @brief Whether the mesh has blend shapes.
    */
   bool HasBlendShapes() const;

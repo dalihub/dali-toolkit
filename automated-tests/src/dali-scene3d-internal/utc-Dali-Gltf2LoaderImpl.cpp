@@ -419,14 +419,12 @@ int UtcDaliGltfLoaderSuccess1(void)
 
   using Blob     = MeshDefinition::Blob;
   using Accessor = MeshDefinition::Accessor;
-  const MeshDefinition meshGroundTruth[]{
+  MeshDefinition meshGroundTruth[]{
     {
       nullptr,
       0,
       Geometry::TRIANGLES,
       "AnimatedCube.bin",
-      Accessor{Blob{0, 0}, {}},
-      Accessor{Blob{0, 0}, {}},
       Accessor{Blob{0, 0}, {}},
       Accessor{Blob{0, 0}, {}},
       Accessor{Blob{0, 0}, {}},
@@ -437,14 +435,16 @@ int UtcDaliGltfLoaderSuccess1(void)
       0,
       Geometry::TRIANGLES,
       "AnimatedCube.bin",
-      Accessor{Blob{0, 0}, {}},
-      Accessor{Blob{0, 0}, {}},
       Accessor{Blob{0, 0}, {}},
       Accessor{Blob{0, 0}, {}},
       Accessor{Blob{0, 0}, {}},
       Accessor{Blob{0, 0}, {}},
     },
   };
+  meshGroundTruth[0].mColors.push_back(Accessor{Blob{0, 0}, {}});
+  meshGroundTruth[0].mTexCoords.push_back(Accessor{Blob{0, 0}, {}});
+  meshGroundTruth[1].mColors.push_back(Accessor{Blob{0, 0}, {}});
+  meshGroundTruth[1].mTexCoords.push_back(Accessor{Blob{0, 0}, {}});
 
   auto iMesh = meshes.begin();
   for(auto& m : meshGroundTruth)
@@ -454,19 +454,24 @@ int UtcDaliGltfLoaderSuccess1(void)
     auto& md = iMesh->first;
     DALI_TEST_EQUAL(md.mFlags, m.mFlags);
     DALI_TEST_EQUAL(md.mPrimitiveType, m.mPrimitiveType);
-    for(auto mp : {
-          &MeshDefinition::mIndices,
-          &MeshDefinition::mPositions,
-          &MeshDefinition::mNormals,
-          &MeshDefinition::mTexCoords,
-          &MeshDefinition::mColors,
-          &MeshDefinition::mTangents,
-          &MeshDefinition::mJoints0,
-          &MeshDefinition::mWeights0})
-    {
-      DALI_TEST_EQUAL((md.*mp).IsDefined(), (m.*mp).IsDefined());
-      DALI_TEST_EQUAL((md.*mp).mBlob.IsDefined(), (m.*mp).mBlob.IsDefined());
-    }
+
+    DALI_TEST_EQUAL((md.mIndices).IsDefined(), (m.mIndices).IsDefined());
+    DALI_TEST_EQUAL((md.mIndices).mBlob.IsDefined(), (m.mIndices).mBlob.IsDefined());
+
+    DALI_TEST_EQUAL((md.mPositions).IsDefined(), (m.mPositions).IsDefined());
+    DALI_TEST_EQUAL((md.mPositions).mBlob.IsDefined(), (m.mPositions).mBlob.IsDefined());
+
+    DALI_TEST_EQUAL((md.mNormals).IsDefined(), (m.mNormals).IsDefined());
+    DALI_TEST_EQUAL((md.mNormals).mBlob.IsDefined(), (m.mNormals).mBlob.IsDefined());
+
+    DALI_TEST_EQUAL((md.mTangents).IsDefined(), (m.mTangents).IsDefined());
+    DALI_TEST_EQUAL((md.mTangents).mBlob.IsDefined(), (m.mTangents).mBlob.IsDefined());
+
+    DALI_TEST_EQUAL(md.mTexCoords.empty(), m.mTexCoords.empty());
+    DALI_TEST_EQUAL(md.mColors.empty(), m.mColors.empty());
+
+    DALI_TEST_EQUAL(md.mJoints.empty(), (m.mJoints.empty()));
+    DALI_TEST_EQUAL(md.mWeights.empty(), (m.mWeights.empty()));
 
     DALI_TEST_EQUAL(md.mBlendShapeHeader.IsDefined(), m.mBlendShapeHeader.IsDefined());
 
@@ -928,13 +933,14 @@ int UtcDaliGltfLoaderQuantizedMesh(void)
   DALI_TEST_EQUAL(0u, md.mTangents.mBlob.mMin.size());
   DALI_TEST_EQUAL(0u, md.mTangents.mBlob.mMax.size());
 
-  DALI_TEST_EQUAL(true, md.mTexCoords.IsDefined());
-  DALI_TEST_EQUAL(false, md.mTexCoords.mNormalized);
-  DALI_TEST_EQUAL(sizeof(uint16_t) * 2, md.mTexCoords.mBlob.mElementSizeHint);
-  DALI_TEST_EQUAL(true, md.mTexCoords.mBlob.IsDefined());
-  DALI_TEST_EQUAL(1624, md.mTexCoords.mBlob.mLength);
-  DALI_TEST_EQUAL(0u, md.mTexCoords.mBlob.mMin.size());
-  DALI_TEST_EQUAL(0u, md.mTexCoords.mBlob.mMax.size());
+  DALI_TEST_EQUAL(false, md.mTexCoords.empty());
+  DALI_TEST_EQUAL(true, md.mTexCoords[0].IsDefined());
+  DALI_TEST_EQUAL(false, md.mTexCoords[0].mNormalized);
+  DALI_TEST_EQUAL(sizeof(uint16_t) * 2, md.mTexCoords[0].mBlob.mElementSizeHint);
+  DALI_TEST_EQUAL(true, md.mTexCoords[0].mBlob.IsDefined());
+  DALI_TEST_EQUAL(1624, md.mTexCoords[0].mBlob.mLength);
+  DALI_TEST_EQUAL(0u, md.mTexCoords[0].mBlob.mMin.size());
+  DALI_TEST_EQUAL(0u, md.mTexCoords[0].mBlob.mMax.size());
 
   END_TEST;
 }

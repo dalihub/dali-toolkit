@@ -79,6 +79,11 @@ public:
   void AddOption(Type shaderOptionType);
 
   /**
+   * Adds macro definitions for joints based on the number of joint sets.
+   */
+  void AddJointMacros(size_t numberOfJointSets);
+
+  /**
    * Enables empty preprocessor definitions to be defined to a value
    */
   void AddMacroDefinition(std::string macro, std::string definition);
