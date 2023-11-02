@@ -990,6 +990,9 @@ void TextureManager::ProcessLoadQueue()
       {
         if(element.mObserver)
         {
+          DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Disconnect DestructionSignal to observer:%p\n", element.mObserver);
+          element.mObserver->DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);
+
           EmitLoadComplete(element.mObserver, textureInfo, true);
         }
       }

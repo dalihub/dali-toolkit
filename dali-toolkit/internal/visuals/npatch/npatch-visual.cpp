@@ -505,8 +505,8 @@ void NPatchVisual::ApplyTextureAndUniforms()
       // If we call textureSet.SetTexture(1, texture) directly, the cached TextureSet also be changed.
       // We should make pass utc-Dali-VisualFactory.cpp UtcDaliNPatchVisualAuxiliaryImage02().
       TextureSet tempTextureSet = TextureSet::New();
-      tempTextureSet.SetTexture(0, textureSet.GetTexture(0));
       tempTextureSet.SetTexture(1, mAuxiliaryTextureSet.GetTexture(0));
+      tempTextureSet.SetTexture(0, textureSet.GetTexture(0));
       textureSet = tempTextureSet;
 
       mImpl->mRenderer.RegisterProperty(DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA,
