@@ -53,7 +53,7 @@ namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
 
-const int CUSTOM_PROPERTY_COUNT(5); // anim,premul,size,offset,multicol
+const int CUSTOM_PROPERTY_COUNT(2); // uTextColorAnimatable, uHasMultipleTextColors
 
 /**
  * Return Property index for the given string key
@@ -256,6 +256,7 @@ TextVisual::TextVisual(VisualFactoryCache& factoryCache, TextVisualShaderFactory
   mTypesetter(Text::Typesetter::New(mController->GetTextModel())),
   mTextVisualShaderFactory(shaderFactory),
   mTextShaderFeatureCache(),
+  mHasMultipleTextColorsIndex(Property::INVALID_INDEX),
   mAnimatableTextColorPropertyIndex(Property::INVALID_INDEX),
   mTextColorAnimatableIndex(Property::INVALID_INDEX),
   mRendererUpdateNeeded(false)
@@ -275,6 +276,7 @@ void TextVisual::OnInitialize()
 
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
+  mHasMultipleTextColorsIndex = mImpl->mRenderer.RegisterUniqueProperty("uHasMultipleTextColors", false);
 }
 
 void TextVisual::DoSetProperties(const Property::Map& propertyMap)
@@ -643,7 +645,7 @@ void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sa
 
   // Enable the pre-multiplied alpha to improve the text quality
   renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
-  renderer.RegisterProperty(PREMULTIPLIED_ALPHA, 1.0f);
+  renderer.SetProperty(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, true);
 
   // Set size and offset for the tiling.
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, Vector2(info.width, info.height));
@@ -672,7 +674,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     mImpl->mRenderer.SetTextures(textureSet);
     //Register transform properties
     mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-    mImpl->mRenderer.RegisterProperty("uHasMultipleTextColors", static_cast<float>(hasMultipleTextColors));
+    mImpl->mRenderer.SetProperty(mHasMultipleTextColorsIndex, static_cast<float>(hasMultipleTextColors));
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
 
     mRendererList.push_back(mImpl->mRenderer);

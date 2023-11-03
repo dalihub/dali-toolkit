@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_VISUAL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -315,6 +315,7 @@ private:
   WeakHandle<Actor> mControl;                          ///< The control where the renderer is added.
   Constraint        mColorConstraint{};                ///< Color constraint
   Constraint        mOpacityConstraint{};              ///< Opacity constraint
+  Property::Index   mHasMultipleTextColorsIndex;       ///< The index of uHasMultipleTextColors proeprty.
   Property::Index   mAnimatableTextColorPropertyIndex; ///< The index of animatable text color property registered by the control.
   Property::Index   mTextColorAnimatableIndex;         ///< The index of uTextColorAnimatable property.
   bool              mRendererUpdateNeeded : 1;         ///< The flag to indicate whether the renderer needs to be updated.
