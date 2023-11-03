@@ -1,0 +1,321 @@
+{
+  "buffers": [
+    {
+      "uri": "MorphPrimitivesTestQuantized.bin",
+      "byteLength": 912
+    }
+  ],
+  "asset": {
+    "version": "2.0",
+    "generator": "gltfpack 0.18",
+    "extras": {
+      "title": "multiple_primitives",
+      "author": "ft-lab",
+      "license": "CC BY-4.0 (https://creativecommons.org/licenses/by/4.0/)"
+    }
+  },
+  "extensionsUsed": [
+    "KHR_mesh_quantization",
+    "KHR_texture_transform"
+  ],
+  "extensionsRequired": [
+    "KHR_mesh_quantization"
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 240,
+      "byteStride": 8,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 240,
+      "byteLength": 240,
+      "byteStride": 8,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 480,
+      "byteLength": 120,
+      "byteStride": 4,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 600,
+      "byteLength": 120,
+      "byteStride": 4,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 720,
+      "byteLength": 192,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5122,
+      "count": 21,
+      "type": "VEC3",
+      "normalized": true
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 21,
+      "type": "VEC3",
+      "min": [
+        0,
+        0,
+        0
+      ],
+      "max": [
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 21,
+      "type": "VEC2",
+      "normalized": true
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5120,
+      "count": 21,
+      "type": "VEC3",
+      "min": [
+        0,
+        0,
+        0
+      ],
+      "max": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 72,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 168,
+      "componentType": 5123,
+      "count": 9,
+      "type": "VEC3",
+      "min": [
+        1,
+        0,
+        0
+      ],
+      "max": [
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 168,
+      "componentType": 5122,
+      "count": 9,
+      "type": "VEC3",
+      "normalized": true
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 84,
+      "componentType": 5123,
+      "count": 9,
+      "type": "VEC2",
+      "normalized": true
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 84,
+      "componentType": 5120,
+      "count": 9,
+      "type": "VEC3",
+      "min": [
+        0,
+        0,
+        0
+      ],
+      "max": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 144,
+      "componentType": 5123,
+      "count": 24,
+      "type": "SCALAR"
+    }
+  ],
+  "samplers": [
+    {
+      "minFilter": 9729
+    }
+  ],
+  "images": [
+    {
+      "uri": "uv_texture.jpg"
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    }
+  ],
+  "materials": [
+    {
+      "name": "red",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          0,
+          0,
+          1
+        ],
+        "baseColorTexture": {
+          "index": 0,
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                65535,
+                65535
+              ]
+            }
+          }
+        },
+        "metallicFactor": 0
+      }
+    },
+    {
+      "name": "green",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0,
+          1,
+          0,
+          1
+        ],
+        "baseColorTexture": {
+          "index": 0,
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                32767.5,
+                32767.5
+              ]
+            }
+          }
+        },
+        "metallicFactor": 0
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 0,
+            "POSITION": 1,
+            "TEXCOORD_0": 2
+          },
+          "targets": [
+            {
+              "POSITION": 3
+            }
+          ],
+          "indices": 4,
+          "material": 0
+        },
+        {
+          "attributes": {
+            "POSITION": 5,
+            "NORMAL": 6,
+            "TEXCOORD_0": 7
+          },
+          "targets": [
+            {
+              "POSITION": 8
+            }
+          ],
+          "indices": 9,
+          "material": 1
+        }
+      ],
+      "weights": [
+        0.5
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "translation": [
+        -0.5,
+        -0.400000006,
+        -0.5
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "ルートパート",
+      "children": [
+        2
+      ]
+    },
+    {
+      "name": "mesh",
+      "children": [
+        0
+      ]
+    }
+  ],
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        1
+      ]
+    }
+  ],
+  "scene": 0
+}

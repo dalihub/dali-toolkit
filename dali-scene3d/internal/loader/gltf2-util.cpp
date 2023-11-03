@@ -19,6 +19,8 @@
 #include <dali-scene3d/internal/loader/gltf2-util.h>
 
 // EXTERNAL INCLUDES
+#include <dali-scene3d/public-api/loader/utils.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
 #include <limits> ///< for std::numeric_limits
@@ -59,6 +61,18 @@ static struct AttributeMapping
   {gltf2::Attribute::JOINTS_0, &MeshDefinition::mJoints0, sizeof(Vector4)},
   {gltf2::Attribute::WEIGHTS_0, &MeshDefinition::mWeights0, sizeof(Vector4)},
 };
+
+static const Dali::Scripting::StringEnum EXTENSION_STRING_TABLE[] =
+  {
+    {"NONE", gltf2::ExtensionFlags::NONE},
+    {"KHR_mesh_quantization", gltf2::ExtensionFlags::KHR_MESH_QUANTIZATION},
+    {"KHR_texture_transform", gltf2::ExtensionFlags::KHR_TEXTURE_TRANSFORM},
+    {"KHR_materials_ior", gltf2::ExtensionFlags::KHR_MATERIALS_IOR},
+    {"KHR_materials_specular", gltf2::ExtensionFlags::KHR_MATERIALS_SPECULAR},
+
+};
+
+static const unsigned int EXTENSION_STRING_TABLE_COUNT = sizeof(EXTENSION_STRING_TABLE) / sizeof(EXTENSION_STRING_TABLE[0]);
 
 std::vector<gltf2::Animation> ReadAnimationArray(const json_value_s& j)
 {
@@ -482,6 +496,12 @@ const json::Reader<gltf2::Document>& GetDocumentReader()
                                                   .Register(*json::MakeProperty("animations",
                                                                                 ReadAnimationArray,
                                                                                 &gltf2::Document::mAnimations))
+                                                  .Register(*json::MakeProperty("extensionsRequired",
+                                                                                json::Read::Array<std::string_view, json::Read::StringView>,
+                                                                                &gltf2::Document::mExtensionsRequired))
+                                                  .Register(*json::MakeProperty("extensionsUsed",
+                                                                                json::Read::Array<std::string_view, json::Read::StringView>,
+                                                                                &gltf2::Document::mExtensionsUsed))
                                                   .Register(*json::MakeProperty("scenes",
                                                                                 json::Read::Array<gltf2::Scene, json::ObjectReader<gltf2::Scene>::Read>,
                                                                                 &gltf2::Document::mScenes))
@@ -755,6 +775,8 @@ MeshDefinition::Accessor ConvertMeshPrimitiveAccessor(const gltf2::Accessor& acc
 
 void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
 {
+  bool isQuantized = MaskMatch(document.mExtensionFlags, gltf2::ExtensionFlags::KHR_MESH_QUANTIZATION);
+
   uint32_t meshCount = 0;
   context.mMeshIds.reserve(document.mMeshes.size());
   for(auto& mesh : document.mMeshes)
@@ -782,8 +804,20 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
         continue;
       }
 
-      auto& accPositions        = *positionIter->second;
-      meshDefinition.mPositions = ConvertMeshPrimitiveAccessor(accPositions);
+      auto& accPositions                    = *positionIter->second;
+      meshDefinition.mPositions             = ConvertMeshPrimitiveAccessor(accPositions);
+      meshDefinition.mPositions.mNormalized = accPositions.mNormalized;
+
+      if(isQuantized)
+      {
+        meshDefinition.mFlags |= (accPositions.mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_POSITION;
+        meshDefinition.mFlags |= (accPositions.mComponentType == gltf2::Component::UNSIGNED_BYTE) * MeshDefinition::U8_POSITION;
+        meshDefinition.mFlags |= (accPositions.mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_POSITION;
+        meshDefinition.mFlags |= (accPositions.mComponentType == gltf2::Component::UNSIGNED_SHORT) * MeshDefinition::U16_POSITION;
+      }
+
+      DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(meshDefinition.mFlags, MeshDefinition::S8_POSITION) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_POSITION) || MaskMatch(meshDefinition.mFlags, MeshDefinition::S16_POSITION) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_POSITION))) || accPositions.mComponentType == gltf2::Component::FLOAT);
+
       // glTF2 support vector4 tangent for mesh.
       // https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#meshes-overview
       meshDefinition.mTangentType = Property::VECTOR4;
@@ -797,6 +831,44 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
           auto& accessor = meshDefinition.*(attributeMapping.mAccessor);
           accessor       = ConvertMeshPrimitiveAccessor(*iFind->second);
 
+          if(iFind->first == gltf2::Attribute::NORMAL)
+          {
+            meshDefinition.mNormals.mNormalized = iFind->second->mNormalized;
+
+            if(isQuantized)
+            {
+              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_NORMAL;
+              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_NORMAL;
+            }
+
+            DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(meshDefinition.mFlags, MeshDefinition::S8_NORMAL) || MaskMatch(meshDefinition.mFlags, MeshDefinition::S16_NORMAL))) || iFind->second->mComponentType == gltf2::Component::FLOAT);
+          }
+          if(iFind->first == gltf2::Attribute::TANGENT)
+          {
+            meshDefinition.mTangents.mNormalized = iFind->second->mNormalized;
+
+            if(isQuantized)
+            {
+              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_TANGENT;
+              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_TANGENT;
+            }
+
+            DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(meshDefinition.mFlags, MeshDefinition::S8_TANGENT) || MaskMatch(meshDefinition.mFlags, MeshDefinition::S16_TANGENT))) || iFind->second->mComponentType == gltf2::Component::FLOAT);
+          }
+          if(iFind->first == gltf2::Attribute::TEXCOORD_0 || iFind->first == gltf2::Attribute::TEXCOORD_1)
+          {
+            meshDefinition.mTexCoords.mNormalized = iFind->second->mNormalized;
+
+            if(isQuantized)
+            {
+              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_TEXCOORD;
+              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::UNSIGNED_BYTE) * MeshDefinition::U8_TEXCOORD;
+              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_TEXCOORD;
+              meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::UNSIGNED_SHORT) * MeshDefinition::U16_TEXCOORD;
+            }
+
+            DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(meshDefinition.mFlags, MeshDefinition::S8_TEXCOORD) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U8_TEXCOORD) || MaskMatch(meshDefinition.mFlags, MeshDefinition::S16_TEXCOORD) || MaskMatch(meshDefinition.mFlags, MeshDefinition::U16_TEXCOORD))) || iFind->second->mComponentType == gltf2::Component::FLOAT);
+          }
           if(iFind->first == gltf2::Attribute::JOINTS_0)
           {
             meshDefinition.mFlags |= (iFind->second->mComponentType == gltf2::Component::UNSIGNED_SHORT) * MeshDefinition::U16_JOINT_IDS;
@@ -849,17 +921,44 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
           auto it    = target.find(gltf2::Attribute::POSITION);
           if(it != endIt)
           {
-            blendShape.deltas = ConvertMeshPrimitiveAccessor(*it->second);
+            blendShape.deltas             = ConvertMeshPrimitiveAccessor(*it->second);
+            blendShape.deltas.mNormalized = it->second->mNormalized;
+
+            if(isQuantized)
+            {
+              blendShape.mFlags |= (it->second->mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_POSITION;
+              blendShape.mFlags |= (it->second->mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_POSITION;
+            }
+
+            DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(blendShape.mFlags, MeshDefinition::S8_POSITION) || MaskMatch(blendShape.mFlags, MeshDefinition::U8_POSITION) || MaskMatch(blendShape.mFlags, MeshDefinition::S16_POSITION) || MaskMatch(blendShape.mFlags, MeshDefinition::U16_POSITION))) || it->second->mComponentType == gltf2::Component::FLOAT);
           }
           it = target.find(gltf2::Attribute::NORMAL);
           if(it != endIt)
           {
-            blendShape.normals = ConvertMeshPrimitiveAccessor(*it->second);
+            blendShape.normals             = ConvertMeshPrimitiveAccessor(*it->second);
+            blendShape.normals.mNormalized = it->second->mNormalized;
+
+            if(isQuantized)
+            {
+              blendShape.mFlags |= (it->second->mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_NORMAL;
+              blendShape.mFlags |= (it->second->mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_NORMAL;
+            }
+
+            DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(blendShape.mFlags, MeshDefinition::S8_NORMAL) || MaskMatch(blendShape.mFlags, MeshDefinition::S16_NORMAL))) || it->second->mComponentType == gltf2::Component::FLOAT);
           }
           it = target.find(gltf2::Attribute::TANGENT);
           if(it != endIt)
           {
-            blendShape.tangents = ConvertMeshPrimitiveAccessor(*it->second);
+            blendShape.tangents             = ConvertMeshPrimitiveAccessor(*it->second);
+            blendShape.tangents.mNormalized = it->second->mNormalized;
+
+            if(isQuantized)
+            {
+              blendShape.mFlags |= (it->second->mComponentType == gltf2::Component::BYTE) * MeshDefinition::S8_TANGENT;
+              blendShape.mFlags |= (it->second->mComponentType == gltf2::Component::SHORT) * MeshDefinition::S16_TANGENT;
+            }
+
+            DALI_ASSERT_DEBUG((isQuantized && (MaskMatch(blendShape.mFlags, MeshDefinition::S8_TANGENT) || MaskMatch(blendShape.mFlags, MeshDefinition::S16_TANGENT))) || it->second->mComponentType == gltf2::Component::FLOAT);
           }
 
           if(!mesh.mWeights.empty())
@@ -1462,6 +1561,20 @@ bool GenerateDocument(json::unique_ptr& root, gt::Document& document, bool& isMR
 
 void ConvertGltfToContext(gt::Document& document, Gltf2Util::ConversionContext& context, bool isMRendererModel)
 {
+  for(auto& extension : document.mExtensionsRequired)
+  {
+    gltf2::ExtensionFlags flag;
+    if(Dali::Scripting::GetEnumeration<gltf2::ExtensionFlags>(extension.data(), EXTENSION_STRING_TABLE, EXTENSION_STRING_TABLE_COUNT, flag))
+    {
+      document.mExtensionFlags |= flag;
+    }
+    else
+    {
+      DALI_LOG_ERROR("Unsupported glTF extension required: %s\n", extension.data());
+      DALI_ASSERT_DEBUG(false && "Unsupported glTF extension required");
+    }
+  }
+
   Gltf2Util::ConvertBuffers(document, context);
   Gltf2Util::ConvertMaterials(document, context);
   Gltf2Util::ConvertMeshes(document, context);

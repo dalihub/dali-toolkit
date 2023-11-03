@@ -1,0 +1,509 @@
+{
+  "buffers": [
+    {
+      "uri": "CesiumMilkTruckQuantized.bin",
+      "byteLength": 93032
+    }
+  ],
+  "asset": {
+    "version": "2.0",
+    "generator": "gltfpack 0.18"
+  },
+  "extensionsUsed": [
+    "KHR_mesh_quantization",
+    "KHR_texture_transform"
+  ],
+  "extensionsRequired": [
+    "KHR_mesh_quantization"
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 31328,
+      "byteStride": 8,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 31328,
+      "byteLength": 31328,
+      "byteStride": 8,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 62656,
+      "byteLength": 12460,
+      "byteStride": 4,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 75116,
+      "byteLength": 17136,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 92252,
+      "byteLength": 156
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 92408,
+      "byteLength": 624
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 786,
+      "type": "VEC3",
+      "normalized": true,
+      "min": [
+        105,
+        18,
+        113
+      ],
+      "max": [
+        150,
+        129,
+        158
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5122,
+      "count": 786,
+      "type": "VEC3",
+      "normalized": true
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 786,
+      "type": "VEC2",
+      "normalized": true
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 2304,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 6288,
+      "componentType": 5123,
+      "count": 2329,
+      "type": "VEC3",
+      "normalized": true,
+      "min": [
+        0,
+        0,
+        0
+      ],
+      "max": [
+        255,
+        146,
+        121
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 6288,
+      "componentType": 5122,
+      "count": 2329,
+      "type": "VEC3",
+      "normalized": true
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 3144,
+      "componentType": 5123,
+      "count": 2329,
+      "type": "VEC2",
+      "normalized": true
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 4608,
+      "componentType": 5123,
+      "count": 5232,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 24920,
+      "componentType": 5123,
+      "count": 151,
+      "type": "VEC3",
+      "normalized": true,
+      "min": [
+        139,
+        0,
+        12
+      ],
+      "max": [
+        211,
+        146,
+        50
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 24920,
+      "componentType": 5122,
+      "count": 151,
+      "type": "VEC3",
+      "normalized": true
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 15072,
+      "componentType": 5123,
+      "count": 168,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 26128,
+      "componentType": 5123,
+      "count": 650,
+      "type": "VEC3",
+      "normalized": true,
+      "min": [
+        137,
+        15,
+        10
+      ],
+      "max": [
+        212,
+        131,
+        52
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 26128,
+      "componentType": 5122,
+      "count": 650,
+      "type": "VEC3",
+      "normalized": true
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 15408,
+      "componentType": 5123,
+      "count": 864,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "SCALAR",
+      "min": [
+        0
+      ],
+      "max": [
+        1.26666677
+      ]
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5122,
+      "count": 39,
+      "type": "VEC4",
+      "normalized": true
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 312,
+      "componentType": 5122,
+      "count": 39,
+      "type": "VEC4",
+      "normalized": true
+    }
+  ],
+  "images": [
+    {
+      "uri": "CesiumMilkTruck.jpg"
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    },
+    {
+      "source": 0
+    }
+  ],
+  "materials": [
+    {
+      "name": "wheels",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0,
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0.605093002,
+                0.00905001163
+              ],
+              "scale": [
+                99.8609467,
+                251.995087
+              ]
+            }
+          }
+        },
+        "metallicFactor": 0
+      }
+    },
+    {
+      "name": "truck",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1,
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0.00295638992,
+                0.0156720281
+              ],
+              "scale": [
+                229.629913,
+                252.264313
+              ]
+            }
+          }
+        },
+        "metallicFactor": 0
+      }
+    },
+    {
+      "name": "glass",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0,
+          0.0405062996,
+          0.0212407,
+          1
+        ],
+        "metallicFactor": 0
+      }
+    },
+    {
+      "name": "window_trim",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.064000003,
+          0.064000003,
+          0.064000003,
+          1
+        ],
+        "metallicFactor": 0
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "material": 1
+        },
+        {
+          "attributes": {
+            "POSITION": 8,
+            "NORMAL": 9
+          },
+          "indices": 10,
+          "material": 2
+        },
+        {
+          "attributes": {
+            "POSITION": 11,
+            "NORMAL": 12
+          },
+          "indices": 13,
+          "material": 3
+        }
+      ]
+    }
+  ],
+  "animations": [
+    {
+      "name": "Wheels",
+      "samplers": [
+        {
+          "input": 14,
+          "output": 15
+        },
+        {
+          "input": 14,
+          "output": 16
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 3,
+            "path": "rotation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 5,
+            "path": "rotation"
+          }
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "translation": [
+        -2.43091011,
+        -1.39600003,
+        -2.5843699
+      ],
+      "scale": [
+        1251.30994,
+        1251.30994,
+        1251.30994
+      ]
+    },
+    {
+      "mesh": 0,
+      "translation": [
+        -2.43091011,
+        -1.39600003,
+        -2.5843699
+      ],
+      "scale": [
+        1251.30994,
+        1251.30994,
+        1251.30994
+      ]
+    },
+    {
+      "mesh": 1,
+      "translation": [
+        -2.43091011,
+        -1.39600003,
+        -2.5843699
+      ],
+      "scale": [
+        1251.30994,
+        1251.30994,
+        1251.30994
+      ]
+    },
+    {
+      "name": "Wheels",
+      "rotation": [
+        0,
+        0.0884858891,
+        0,
+        -0.996077418
+      ],
+      "children": [
+        0
+      ]
+    },
+    {
+      "name": "Node",
+      "translation": [
+        1.43267,
+        0,
+        -0.427722007
+      ],
+      "children": [
+        3
+      ]
+    },
+    {
+      "name": "Wheels.001",
+      "rotation": [
+        0,
+        0.0884858891,
+        0,
+        -0.996077418
+      ],
+      "children": [
+        1
+      ]
+    },
+    {
+      "name": "Node.001",
+      "translation": [
+        -1.35232997,
+        0,
+        -0.427722007
+      ],
+      "children": [
+        5
+      ]
+    },
+    {
+      "name": "Cesium_Milk_Truck",
+      "children": [
+        4,
+        6,
+        2
+      ]
+    },
+    {
+      "name": "Yup2Zup",
+      "rotation": [
+        0.49999997,
+        -0.5,
+        0.5,
+        0.49999997
+      ],
+      "children": [
+        7
+      ]
+    }
+  ],
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        8
+      ]
+    }
+  ],
+  "scene": 0
+}

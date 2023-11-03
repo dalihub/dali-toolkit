@@ -55,8 +55,7 @@ namespace
 {
 struct Context
 {
-  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type)
-  {
+  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type) {
     return TEST_RESOURCE_DIR "/";
   };
 
@@ -98,11 +97,41 @@ struct ExceptionMessageStartsWith
 
 } // namespace
 
-int UtcDaliGltfLoaderFailedToLoad(void)
+int UtcDaliGltfLoaderFailedToLoad1(void)
 {
   Context ctx;
 
   DALI_TEST_EQUAL(ctx.loader.LoadModel("non-existent.gltf", ctx.loadResult), false);
+
+  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(0, ctx.scene.GetNodeCount());
+
+  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.size());
+  DALI_TEST_EQUAL(0, ctx.resources.mShaders.size());
+  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.size());
+
+  DALI_TEST_EQUAL(0, ctx.cameras.size());
+  DALI_TEST_EQUAL(0, ctx.lights.size());
+  DALI_TEST_EQUAL(0, ctx.animations.size());
+  DALI_TEST_EQUAL(0, ctx.animationGroups.size());
+
+  END_TEST;
+}
+
+int UtcDaliGltfLoaderFailedToLoad2(void)
+{
+  Context ctx;
+
+  try
+  {
+    DALI_TEST_EQUAL(ctx.loader.LoadModel(TEST_RESOURCE_DIR "/UnsupportedExtension.gltf", ctx.loadResult), false);
+  }
+  catch(...)
+  {
+    printf("Unsupported glTF extension required.\n");
+  }
 
   DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
   DALI_TEST_EQUAL(0, ctx.scene.GetNodeCount());
@@ -185,89 +214,87 @@ int UtcDaliGltfLoaderSuccess1(void)
   auto& materials = ctx.resources.mMaterials;
   DALI_TEST_EQUAL(2u, materials.size());
   const MaterialDefinition materialGroundTruth[]{
-    {
-      nullptr,
-      MaterialDefinition::ALBEDO | MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
-        MaterialDefinition::NORMAL | MaterialDefinition::SPECULAR | MaterialDefinition::SPECULAR_COLOR |
-        MaterialDefinition::GLTF_CHANNELS | (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
-      0,
-      Color::WHITE,
-      1.f,
-      0.f,
-      Vector4(1.000, 0.766, 0.336, 1.0),
-      1.f,
-      1.f,
-      Vector3(0.2, 0.1, 0.0),
-      1.0f,
-      0.0f,
-      0.5f,
-      Vector3(0, 0, 1),
-      true,
-      false,
-      true,
-      false,
-      Scene3D::Material::AlphaModeType::MASK,
-      true,
-      true,
-      true,
-      {
-        {
-          MaterialDefinition::ALBEDO,
-          {
-            "AnimatedCube_BaseColor.png",
-            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-            ImageDimensions(256, 256),
-            SamplingMode::BOX_THEN_NEAREST,
-          },
-        },
-        {
-          MaterialDefinition::NORMAL,
-          {
-            "AnimatedCube_BaseColor.png",
-            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-            ImageDimensions(256, 256),
-            SamplingMode::BOX_THEN_NEAREST,
-          },
-        },
-        {
-          MaterialDefinition::OCCLUSION,
-          {
-            "AnimatedCube_BaseColor.png",
-            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-            ImageDimensions(256, 256),
-            SamplingMode::BOX_THEN_NEAREST,
-          },
-        },
-        {
-          MaterialDefinition::EMISSIVE,
-          {
-            "AnimatedCube_BaseColor.png",
-            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-            ImageDimensions(256, 256),
-            SamplingMode::BOX_THEN_NEAREST,
-          },
-        },
-        {
-          MaterialDefinition::SPECULAR,
-          {
-            "AnimatedCube_BaseColor.png",
-            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-            ImageDimensions(256, 256),
-            SamplingMode::BOX_THEN_NEAREST,
-          },
-        },
-        {
-          MaterialDefinition::SPECULAR_COLOR,
-          {
-            "AnimatedCube_BaseColor.png",
-            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-            ImageDimensions(256, 256),
-            SamplingMode::BOX_THEN_NEAREST,
-          },
-        },
-      },
-      nullptr
-    },
+    {nullptr,
+     MaterialDefinition::ALBEDO | MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
+       MaterialDefinition::NORMAL | MaterialDefinition::SPECULAR | MaterialDefinition::SPECULAR_COLOR |
+       MaterialDefinition::GLTF_CHANNELS | (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
+     0,
+     Color::WHITE,
+     1.f,
+     0.f,
+     Vector4(1.000, 0.766, 0.336, 1.0),
+     1.f,
+     1.f,
+     Vector3(0.2, 0.1, 0.0),
+     1.0f,
+     0.0f,
+     0.5f,
+     Vector3(0, 0, 1),
+     true,
+     false,
+     true,
+     false,
+     Scene3D::Material::AlphaModeType::MASK,
+     true,
+     true,
+     true,
+     {
+       {
+         MaterialDefinition::ALBEDO,
+         {
+           "AnimatedCube_BaseColor.png",
+           SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+           ImageDimensions(256, 256),
+           SamplingMode::BOX_THEN_NEAREST,
+         },
+       },
+       {
+         MaterialDefinition::NORMAL,
+         {
+           "AnimatedCube_BaseColor.png",
+           SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+           ImageDimensions(256, 256),
+           SamplingMode::BOX_THEN_NEAREST,
+         },
+       },
+       {
+         MaterialDefinition::OCCLUSION,
+         {
+           "AnimatedCube_BaseColor.png",
+           SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+           ImageDimensions(256, 256),
+           SamplingMode::BOX_THEN_NEAREST,
+         },
+       },
+       {
+         MaterialDefinition::EMISSIVE,
+         {
+           "AnimatedCube_BaseColor.png",
+           SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+           ImageDimensions(256, 256),
+           SamplingMode::BOX_THEN_NEAREST,
+         },
+       },
+       {
+         MaterialDefinition::SPECULAR,
+         {
+           "AnimatedCube_BaseColor.png",
+           SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+           ImageDimensions(256, 256),
+           SamplingMode::BOX_THEN_NEAREST,
+         },
+       },
+       {
+         MaterialDefinition::SPECULAR_COLOR,
+         {
+           "AnimatedCube_BaseColor.png",
+           SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
+           ImageDimensions(256, 256),
+           SamplingMode::BOX_THEN_NEAREST,
+         },
+       },
+     },
+     nullptr},
     {
       nullptr,
       MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
@@ -458,7 +485,7 @@ int UtcDaliGltfLoaderSuccess1(void)
 
 int UtcDaliGltfLoaderSuccess2(void)
 {
-  Context                 ctx;
+  Context ctx;
 
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/AnimatedCubeStride.gltf", ctx.loadResult);
 
@@ -487,8 +514,7 @@ int UtcDaliGltfLoaderSuccessShort(void)
   TestApplication app;
 
   const std::string resourcePath = TEST_RESOURCE_DIR "/";
-  auto              pathProvider = [resourcePath](ResourceType::Value)
-  {
+  auto              pathProvider = [resourcePath](ResourceType::Value) {
     return resourcePath;
   };
 
@@ -508,6 +534,34 @@ int UtcDaliGltfLoaderSuccessShort(void)
         "MRendererTest",
         "SimpleSparseAccessor",
         "AnimatedCube",
+        /**
+         * For the Avocado glTF file and its Assets
+         * Donated by Microsoft for glTF testing
+         * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/Avocado/glTF-Quantized
+         */
+        "AvocadoQuantized",
+        /**
+         * For the AnimatedMorphCube glTF file and its Assets
+         * Donated by Microsoft for glTF testing
+         * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/AnimatedMorphCube/glTF-Quantized
+         */
+        "AnimatedMorphCubeQuantized",
+        /**
+         * For the MorphPrimitivesTest glTF file and its Assets
+         * Created by @ft-lab
+         * Licensed under the terms of the CC BY 4.0 license: https://creativecommons.org/licenses/by/4.0/
+         * Take from https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/MorphPrimitivesTest/glTF
+         * Modified using gltfpack 0.18.
+         */
+        "MorphPrimitivesTestQuantized",
+        /**
+         * For the CesiumMilkTruck glTF file and its Assets
+         * Donated by Cesium for glTF testing
+         * Licensed under the terms of the CC BY 4.0 license: http://creativecommons.org/licenses/by/4.0/
+         * Take from https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/CesiumMilkTruck/glTF
+         * Modified using gltfpack 0.18.
+         */
+        "CesiumMilkTruckQuantized",
       })
   {
     Context ctx;
@@ -572,7 +626,7 @@ int UtcDaliGltfLoaderSuccessShort(void)
 int UtcDaliGltfLoaderMRendererTest(void)
 {
   Context ctx;
-  auto& resources = ctx.resources;
+  auto&   resources = ctx.resources;
 
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/MRendererTest.gltf", ctx.loadResult);
 
@@ -585,8 +639,8 @@ int UtcDaliGltfLoaderMRendererTest(void)
   DALI_TEST_EQUAL(scene.GetNodeCount(), 1u);
 
   Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
-  ViewProjection viewProjection;
-  Transforms     xforms{
+  ViewProjection                    viewProjection;
+  Transforms                        xforms{
     MatrixStack{},
     viewProjection};
   NodeDefinition::CreateParams nodeParams{
@@ -633,7 +687,7 @@ int UtcDaliGltfLoaderMRendererTest(void)
 int UtcDaliGltfLoaderAnimationLoadingTest(void)
 {
   TestApplication app;
-  Context ctx;
+  Context         ctx;
 
   auto& resources = ctx.resources;
 
@@ -644,8 +698,8 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
   DALI_TEST_EQUAL(roots.size(), 1u);
 
   Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
-  ViewProjection viewProjection;
-  Transforms     xforms{
+  ViewProjection                    viewProjection;
+  Transforms                        xforms{
     MatrixStack{},
     viewProjection};
   NodeDefinition::CreateParams nodeParams{
@@ -695,8 +749,8 @@ int UtcDaliGltfLoaderImageFromBufferView(void)
   DALI_TEST_EQUAL(roots.size(), 1u);
 
   Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
-  ViewProjection viewProjection;
-  Transforms     xforms{
+  ViewProjection                    viewProjection;
+  Transforms                        xforms{
     MatrixStack{},
     viewProjection};
   NodeDefinition::CreateParams nodeParams{
@@ -746,8 +800,8 @@ int UtcDaliGltfLoaderUint8Indices(void)
   DALI_TEST_EQUAL(roots.size(), 1u);
 
   Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
-  ViewProjection viewProjection;
-  Transforms     xforms{
+  ViewProjection                    viewProjection;
+  Transforms                        xforms{
     MatrixStack{},
     viewProjection};
   NodeDefinition::CreateParams nodeParams{
@@ -780,6 +834,107 @@ int UtcDaliGltfLoaderUint8Indices(void)
   DALI_TEST_CHECK(root.FindChildByName("Bed"));
   DALI_TEST_CHECK(root.FindChildByName("DecalBlend"));
   DALI_TEST_CHECK(root.FindChildByName("DecalOpaque"));
+
+  END_TEST;
+}
+
+int UtcDaliGltfLoaderQuantizedMesh(void)
+{
+  Context ctx;
+
+  auto& resources = ctx.resources;
+
+  /**
+   * For the Avocado glTF file and its Assets
+   * Donated by Microsoft for glTF testing
+   * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/Avocado/glTF-Quantized
+   */
+  ctx.loader.LoadModel(TEST_RESOURCE_DIR "/AvocadoQuantized.gltf", ctx.loadResult);
+
+  auto& scene = ctx.scene;
+  DALI_TEST_EQUAL(1u, scene.GetRoots().size());
+  DALI_TEST_EQUAL(1u, scene.GetNodeCount());
+
+  auto& roots = scene.GetRoots();
+  DALI_TEST_EQUAL(roots.size(), 1u);
+
+  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
+  ViewProjection                    viewProjection;
+  Transforms                        xforms{
+    MatrixStack{},
+    viewProjection};
+  NodeDefinition::CreateParams nodeParams{
+    resources,
+    xforms,
+    shaderManager,
+  };
+
+  Customization::Choices choices;
+
+  TestApplication app;
+
+  Actor root = Actor::New();
+  SetActorCentered(root);
+  for(auto iRoot : roots)
+  {
+    auto resourceRefs = resources.CreateRefCounter();
+    scene.CountResourceRefs(iRoot, choices, resourceRefs);
+    resources.mReferenceCounts = std::move(resourceRefs);
+    resources.CountEnvironmentReferences();
+    resources.LoadResources(ctx.pathProvider);
+    if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
+    {
+      scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
+      scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
+      root.Add(actor);
+    }
+  }
+
+  auto& meshes = ctx.resources.mMeshes;
+  DALI_TEST_EQUAL(1u, meshes.size());
+
+  auto& md = meshes[0u].first;
+
+  DALI_TEST_EQUAL(MeshDefinition::Flags::U16_POSITION | MeshDefinition::Flags::S8_NORMAL | MeshDefinition::Flags::S8_TANGENT | MeshDefinition::Flags::U16_TEXCOORD, md.mFlags);
+
+  DALI_TEST_EQUAL(true, md.mPositions.IsDefined());
+  DALI_TEST_EQUAL(false, md.mPositions.mNormalized);
+  DALI_TEST_EQUAL(sizeof(uint16_t) * 3, md.mPositions.mBlob.mElementSizeHint);
+  DALI_TEST_EQUAL(true, md.mPositions.mBlob.IsDefined());
+  DALI_TEST_EQUAL(2436, md.mPositions.mBlob.mLength);
+  DALI_TEST_EQUAL(3u, md.mPositions.mBlob.mMin.size());
+  DALI_TEST_EQUAL(0.0f, md.mPositions.mBlob.mMin[0]);
+  DALI_TEST_EQUAL(0.0f, md.mPositions.mBlob.mMin[1]);
+  DALI_TEST_EQUAL(0.0f, md.mPositions.mBlob.mMin[2]);
+  DALI_TEST_EQUAL(3u, md.mPositions.mBlob.mMax.size());
+  DALI_TEST_EQUAL(11086.0f, md.mPositions.mBlob.mMax[0]);
+  DALI_TEST_EQUAL(16383.0f, md.mPositions.mBlob.mMax[1]);
+  DALI_TEST_EQUAL(7194.0f, md.mPositions.mBlob.mMax[2]);
+
+  DALI_TEST_EQUAL(true, md.mNormals.IsDefined());
+  DALI_TEST_EQUAL(true, md.mNormals.mNormalized);
+  DALI_TEST_EQUAL(sizeof(int8_t) * 3, md.mNormals.mBlob.mElementSizeHint);
+  DALI_TEST_EQUAL(true, md.mNormals.mBlob.IsDefined());
+  DALI_TEST_EQUAL(1218, md.mNormals.mBlob.mLength);
+  DALI_TEST_EQUAL(0u, md.mNormals.mBlob.mMin.size());
+  DALI_TEST_EQUAL(0u, md.mNormals.mBlob.mMax.size());
+
+  DALI_TEST_EQUAL(true, md.mTangents.IsDefined());
+  DALI_TEST_EQUAL(true, md.mTangents.mNormalized);
+  DALI_TEST_EQUAL(Property::VECTOR4, md.mTangentType);
+  DALI_TEST_EQUAL(sizeof(int8_t) * 4, md.mTangents.mBlob.mElementSizeHint);
+  DALI_TEST_EQUAL(true, md.mTangents.mBlob.IsDefined());
+  DALI_TEST_EQUAL(1624, md.mTangents.mBlob.mLength);
+  DALI_TEST_EQUAL(0u, md.mTangents.mBlob.mMin.size());
+  DALI_TEST_EQUAL(0u, md.mTangents.mBlob.mMax.size());
+
+  DALI_TEST_EQUAL(true, md.mTexCoords.IsDefined());
+  DALI_TEST_EQUAL(false, md.mTexCoords.mNormalized);
+  DALI_TEST_EQUAL(sizeof(uint16_t) * 2, md.mTexCoords.mBlob.mElementSizeHint);
+  DALI_TEST_EQUAL(true, md.mTexCoords.mBlob.IsDefined());
+  DALI_TEST_EQUAL(1624, md.mTexCoords.mBlob.mLength);
+  DALI_TEST_EQUAL(0u, md.mTexCoords.mBlob.mMin.size());
+  DALI_TEST_EQUAL(0u, md.mTexCoords.mBlob.mMax.size());
 
   END_TEST;
 }
