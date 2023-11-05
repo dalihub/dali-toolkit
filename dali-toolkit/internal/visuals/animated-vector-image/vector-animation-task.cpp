@@ -148,7 +148,8 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   {
     std::ostringstream oss;
     oss << "[url:" << mImageUrl.GetUrl() << "]";
-    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", oss.str().c_str());
+    DALI_TRACE_BEGIN(gTraceFilter, "DALI_LOTTIE_LOADING_TASK");
+    DALI_LOG_RELEASE_INFO("BEGIN: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
   }
 #endif
 
@@ -170,7 +171,8 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
     {
       std::ostringstream oss;
       oss << "[url:" << mImageUrl.GetUrl() << "]";
-      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", oss.str().c_str());
+      DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK");
+      DALI_LOG_RELEASE_INFO("END: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
     }
 #endif
     return false;
@@ -196,7 +198,8 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   {
     std::ostringstream oss;
     oss << "[url:" << mImageUrl.GetUrl() << "]";
-    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", oss.str().c_str());
+    DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK");
+    DALI_LOG_RELEASE_INFO("END: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
   }
 #endif
 
