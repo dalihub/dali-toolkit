@@ -975,7 +975,12 @@ bool MeshDefinition::HasVertexColor() const
 
 uint32_t MeshDefinition::GetNumberOfJointSets() const
 {
-  return static_cast<uint32_t>(mJoints.size());
+  uint32_t number = static_cast<uint32_t>(mJoints.size());
+  if(number > MeshDefinition::MAX_NUMBER_OF_JOINT_SETS)
+  {
+    number = MeshDefinition::MAX_NUMBER_OF_JOINT_SETS;
+  }
+  return number;
 }
 
 bool MeshDefinition::HasBlendShapes() const

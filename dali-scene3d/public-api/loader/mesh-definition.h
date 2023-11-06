@@ -45,6 +45,11 @@ struct DALI_SCENE3D_API MeshDefinition
     INVALID = std::numeric_limits<uint32_t>::max()
   };
 
+  enum : uint32_t
+  {
+    MAX_NUMBER_OF_JOINT_SETS = 4
+  };
+
   enum Flags : uint32_t
   {
     FLIP_UVS_VERTICAL = NthBit(0),
@@ -270,6 +275,8 @@ struct DALI_SCENE3D_API MeshDefinition
 
   /**
    * @brief Returns the number of joint sets defined by the mesh
+   *
+   * @note Clamped to 4 to minimise GPU attrs.
    */
   uint32_t GetNumberOfJointSets() const;
 

@@ -816,14 +816,20 @@ MeshDefinition::Accessor* GetAccessorFromAttribute(gltf2::Attribute::HashType at
     }
     case gltf2::Attribute::JOINTS_N:
     {
-      meshDefinition.mJoints.emplace_back(MeshDefinition::Accessor{});
-      accessorDest = &meshDefinition.mJoints.back();
+      if(meshDefinition.mJoints.size() < MeshDefinition::MAX_NUMBER_OF_JOINT_SETS)
+      {
+        meshDefinition.mJoints.emplace_back(MeshDefinition::Accessor{});
+        accessorDest = &meshDefinition.mJoints.back();
+      }
       break;
     }
     case gltf2::Attribute::WEIGHTS_N:
     {
-      meshDefinition.mWeights.emplace_back(MeshDefinition::Accessor{});
-      accessorDest = &meshDefinition.mWeights.back();
+      if(meshDefinition.mWeights.size() < MeshDefinition::MAX_NUMBER_OF_JOINT_SETS)
+      {
+        meshDefinition.mWeights.emplace_back(MeshDefinition::Accessor{});
+        accessorDest = &meshDefinition.mWeights.back();
+      }
       break;
     }
     case gltf2::Attribute::INVALID:
