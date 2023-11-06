@@ -628,12 +628,6 @@ void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceSta
 
 void AnimatedVectorImageVisual::OnAnimationFinished()
 {
-  if(DALI_UNLIKELY(mImpl == nullptr))
-  {
-    DALI_LOG_ERROR("Fatal error!! already destroyed object callback called! AnimatedVectorImageVisual : %p, url : %s\n", this, mImageUrl.GetUrl().c_str());
-    return;
-  }
-
   AnimatedVectorImageVisualPtr self = this; // Keep reference until this API finished
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnAnimationFinished: action state = %d [%p]\n", mPlayState, this);
@@ -658,12 +652,6 @@ void AnimatedVectorImageVisual::OnAnimationFinished()
 
 void AnimatedVectorImageVisual::SendAnimationData()
 {
-  if(DALI_UNLIKELY(mImpl == nullptr))
-  {
-    DALI_LOG_ERROR("Fatal error!! already destroyed object callback called! AnimatedVectorImageVisual : %p, url : %s\n", this, mImageUrl.GetUrl().c_str());
-    return;
-  }
-
   if(mAnimationData.resendFlag)
   {
     mVectorAnimationTask->SetAnimationData(mAnimationData);

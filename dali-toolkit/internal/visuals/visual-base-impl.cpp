@@ -119,21 +119,21 @@ static bool IsTypeAvailableForBorderline(Toolkit::Visual::Type type)
 struct StringProperty
 {
   const char* const name;
-  Property::Index   index;
+  Property::Index index;
 };
-StringProperty PROPERTY_NAME_INDEX_TABLE[] =
-  {
-    {CUSTOM_SHADER, Toolkit::Visual::Property::SHADER},
-    {TRANSFORM, Toolkit::Visual::Property::TRANSFORM},
-    {PREMULTIPLIED_ALPHA, Toolkit::Visual::Property::PREMULTIPLIED_ALPHA},
-    {MIX_COLOR, Toolkit::Visual::Property::MIX_COLOR},
-    {OPACITY, Toolkit::Visual::Property::OPACITY},
-    {VISUAL_FITTING_MODE, Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE},
-    {BORDERLINE_WIDTH, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH},
-    {BORDERLINE_COLOR, Toolkit::DevelVisual::Property::BORDERLINE_COLOR},
-    {BORDERLINE_OFFSET, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET},
-    {CORNER_RADIUS, Toolkit::DevelVisual::Property::CORNER_RADIUS},
-    {CORNER_RADIUS_POLICY, Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY},
+StringProperty PROPERTY_NAME_INDEX_TABLE[]=
+{
+  {CUSTOM_SHADER, Toolkit::Visual::Property::SHADER},
+  {TRANSFORM, Toolkit::Visual::Property::TRANSFORM},
+  {PREMULTIPLIED_ALPHA, Toolkit::Visual::Property::PREMULTIPLIED_ALPHA},
+  {MIX_COLOR, Toolkit::Visual::Property::MIX_COLOR},
+  {OPACITY, Toolkit::Visual::Property::OPACITY},
+  {VISUAL_FITTING_MODE, Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE},
+  {BORDERLINE_WIDTH, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH},
+  {BORDERLINE_COLOR, Toolkit::DevelVisual::Property::BORDERLINE_COLOR},
+  {BORDERLINE_OFFSET, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET},
+  {CORNER_RADIUS, Toolkit::DevelVisual::Property::CORNER_RADIUS},
+  {CORNER_RADIUS_POLICY, Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY},
 };
 const uint16_t PROPERTY_NAME_INDEX_TABLE_COUNT = sizeof(PROPERTY_NAME_INDEX_TABLE) / sizeof(PROPERTY_NAME_INDEX_TABLE[0]);
 
@@ -164,7 +164,6 @@ Visual::Base::Base(VisualFactoryCache& factoryCache, FittingMode fittingMode, To
 Visual::Base::~Base()
 {
   delete mImpl;
-  mImpl = nullptr;
 }
 
 void Visual::Base::Initialize()
