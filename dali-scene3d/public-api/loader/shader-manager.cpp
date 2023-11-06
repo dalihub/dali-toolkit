@@ -184,11 +184,10 @@ ShaderManager::ShaderManager()
 
 ShaderManager::~ShaderManager() = default;
 
-Dali::Shader ShaderManager::ProduceShader(const MaterialDefinition& materialDefinition, const MeshDefinition& meshDefinition)
+ShaderOption ShaderManager::ProduceShaderOption(const MaterialDefinition& materialDefinition, const MeshDefinition& meshDefinition)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Concise, "Defining shader from mat/mesh definitions\n");
-  ShaderOption option = MakeOption(materialDefinition, meshDefinition);
-  return ProduceShader(option);
+  return MakeOption(materialDefinition, meshDefinition);
 }
 
 Dali::Shader ShaderManager::ProduceShader(const ShaderOption& shaderOption)

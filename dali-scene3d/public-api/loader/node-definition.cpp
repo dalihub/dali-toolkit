@@ -253,12 +253,18 @@ void ModelRenderable::ReflectResources(IResourceReflector& reflector)
   reflector.Reflect(ResourceType::Material, mMaterialIdx);
 }
 
+// How many shader managers are there?!
 void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinition::CreateParams& params, ModelNode& node) const
 {
   DALI_ASSERT_DEBUG(mMeshIdx != INVALID_INDEX);
+  ShaderOption::HashType shaderOptionHash{0u};
   if(mShaderIdx == INVALID_INDEX)
   {
-    Shader          shader          = params.mShaderManager->ProduceShader(params.mResources.mMaterials[mMaterialIdx].first, params.mResources.mMeshes[mMeshIdx].first);
+    ShaderOption option = params.mShaderManager->ProduceShaderOption(params.mResources.mMaterials[mMaterialIdx].first,
+                                                                     params.mResources.mMeshes[mMeshIdx].first);
+    shaderOptionHash    = option.GetOptionHash();
+    Shader shader       = params.mShaderManager->ProduceShader(option);
+
     static Geometry defaultGeometry = Geometry::New();
     Renderer        renderer        = Renderer::New(defaultGeometry, shader);
 
@@ -299,23 +305,24 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
 
   {
     mesh.first.mModelPrimitive = ModelPrimitive::New();
-    auto primitive             = mesh.first.mModelPrimitive;
-    GetImplementation(primitive).SetRenderer(renderer);
+    auto& primitive            = GetImplementation(mesh.first.mModelPrimitive);
+    primitive.SetRenderer(renderer);
 
     Index    envIndex       = resources.mMaterials[mMaterialIdx].first.mEnvironmentIdx;
     uint32_t specularMipmap = resources.mEnvironmentMaps[envIndex].second.mSpecularMipmapLevels;
-    GetImplementation(primitive).SetImageBasedLightTexture(resources.mEnvironmentMaps[envIndex].second.mDiffuse,
-                                                           resources.mEnvironmentMaps[envIndex].second.mSpecular,
-                                                           resources.mEnvironmentMaps[envIndex].first.mIblIntensity,
-                                                           specularMipmap);
+    primitive.SetImageBasedLightTexture(resources.mEnvironmentMaps[envIndex].second.mDiffuse,
+                                        resources.mEnvironmentMaps[envIndex].second.mSpecular,
+                                        resources.mEnvironmentMaps[envIndex].first.mIblIntensity,
+                                        specularMipmap);
 
     bool hasPositions = false;
     bool hasNormals   = false;
     bool hasTangents  = false;
     mesh.first.RetrieveBlendShapeComponents(hasPositions, hasNormals, hasTangents);
-    GetImplementation(primitive).SetBlendShapeOptions(hasPositions, hasNormals, hasTangents, mesh.first.mBlendShapeVersion);
-    GetImplementation(primitive).SetBlendShapeGeometry(mesh.second.blendShapeGeometry);
-    GetImplementation(primitive).SetSkinned(mesh.first.IsSkinned(), mesh.first.GetNumberOfJointSets());
+    primitive.SetBlendShapeOptions(hasPositions, hasNormals, hasTangents, mesh.first.mBlendShapeVersion);
+    primitive.SetBlendShapeGeometry(mesh.second.blendShapeGeometry);
+    primitive.SetSkinned(mesh.first.IsSkinned(), mesh.first.GetNumberOfJointSets());
+    primitive.SetVertexColor(mesh.first.HasVertexColor());
   }
 
   auto shader = renderer.GetShader();
@@ -383,11 +390,13 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
     material.SetProperty(Scene3D::Material::Property::ALPHA_CUTOFF, matDef.GetAlphaCutoff());
     material.SetProperty(Scene3D::Material::Property::DOUBLE_SIDED, matDef.mDoubleSided);
     material.SetProperty(Scene3D::Material::Property::IOR, matDef.mIor);
+
+    // This _should_ keep the same shader as generated at the top of the method.
     GetImplementation(mesh.first.mModelPrimitive).SetMaterial(material, false);
     GetImplementation(material).ResetFlag();
   }
 
-  node.AddModelPrimitive(mesh.first.mModelPrimitive);
+  Internal::GetImplementation(node).AddModelPrimitive(mesh.first.mModelPrimitive, shaderOptionHash);
 }
 
 void ArcRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinition::CreateParams& params, ModelNode& node) const

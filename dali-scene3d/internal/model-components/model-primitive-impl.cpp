@@ -34,8 +34,12 @@
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
 
+#if defined(DEBUG_ENABLED)
+#include <sys/types.h>
+#include <unistd.h>
 #include <filesystem>
 namespace fs = std::filesystem;
+#endif
 
 namespace Dali
 {
@@ -47,6 +51,15 @@ namespace
 {
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_SCENE3D_MODEL_PRIMITIVE");
+
+std::string tmpFilename(std::string prefix, std::string suffix)
+{
+  static int id = 0;
+  id++;
+  std::ostringstream oss;
+  oss << prefix << getpid() << "_" << std::setfill('0') << std::setw(4) << id << suffix;
+  return oss.str();
+}
 
 #define DALI_LOG_WRITE_FILE(filename, stream) \
   {                                           \
@@ -230,14 +243,14 @@ void ModelPrimitive::SetImageBasedLightScaleFactor(float iblScaleFactor)
   }
 }
 
-void ModelPrimitive::UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager)
+void ModelPrimitive::UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager, Loader::ShaderOption::HashType hash)
 {
   if(mShaderManager != shaderManager)
   {
     mShaderManager = (shaderManager) ? shaderManager : new Scene3D::Loader::ShaderManager();
     if(mMaterial && GetImplementation(mMaterial).IsResourceReady())
     {
-      ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag::SHADER);
+      ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag::SHADER, hash);
     }
   }
 }
@@ -267,6 +280,11 @@ void ModelPrimitive::SetSkinned(bool isSkinned, uint32_t numberOfJointSets)
   mNumberOfJointSets = numberOfJointSets;
 }
 
+void ModelPrimitive::SetVertexColor(bool hasVertexColor)
+{
+  mHasVertexColor = hasVertexColor;
+}
+
 // From MaterialModifyObserver
 
 void ModelPrimitive::OnMaterialModified(Dali::Scene3D::Material material, MaterialModifyObserver::ModifyFlag flag)
@@ -274,7 +292,7 @@ void ModelPrimitive::OnMaterialModified(Dali::Scene3D::Material material, Materi
   ApplyMaterialToRenderer(flag);
 }
 
-void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag flag)
+void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag flag, Loader::ShaderOption::HashType oldHash)
 {
   if(!mMaterial)
   {
@@ -291,6 +309,10 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
     {
       shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::SKINNING);
       shaderOption.AddJointMacros(mNumberOfJointSets);
+    }
+    if(mHasVertexColor)
+    {
+      shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::COLOR_ATTRIBUTE);
     }
     if(mHasPositions || mHasNormals || mHasTangents)
     {
@@ -315,19 +337,20 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
     Shader newShader = mShaderManager->ProduceShader(shaderOption);
     if(mShader != newShader)
     {
-      DALI_LOG_INFO(gLogFilter, Debug::General, "Warning!  Model primitive shader changed\n");
+      DALI_LOG_INFO(gLogFilter, Debug::General, "Warning!  Model primitive shader changed: OldHash:%x NewHash:%x\n", oldHash, shaderOption.GetOptionHash());
+
 #if defined(DEBUG_ENABLED)
       if(mShader)
       {
         Property::Map oldMap = GetMap(mShader);
-        DALI_LOG_WRITE_FILE("oldShader.txt", "Vertex Shader:\n"
-                                               << oldMap["vertex"] << "\n\nFragmentShader: " << oldMap["fragment"] << "\n");
+        DALI_LOG_WRITE_FILE(tmpFilename("oldShader", ".txt"), "Vertex Shader:\n"
+                            << oldMap["vertex"] << "\n\nFragmentShader: " << oldMap["fragment"] << "\n");
       }
       if(newShader)
       {
         Property::Map newMap = GetMap(newShader);
-        DALI_LOG_WRITE_FILE("newShader.txt", "Vertex Shader:\n"
-                                               << newMap["vertex"] << "\n\nFragmentShader: " << newMap["fragment"] << "\n");
+        DALI_LOG_WRITE_FILE(tmpFilename("newShader", ".txt"), "Vertex Shader:\n"
+                            << newMap["vertex"] << "\n\nFragmentShader: " << newMap["fragment"] << "\n");
       }
 #endif
     }

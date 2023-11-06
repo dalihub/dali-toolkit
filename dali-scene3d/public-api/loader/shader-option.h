@@ -33,25 +33,25 @@ class DALI_SCENE3D_API ShaderOption
 public:
   enum class Type
   {
-    GLTF_CHANNELS = 0,
-    THREE_TEXTURE,
-    BASE_COLOR_TEXTURE,
-    METALLIC_ROUGHNESS_TEXTURE,
-    NORMAL_TEXTURE,
-    OCCLUSION,
-    EMISSIVE,
-    ALPHA_TEST,
-    SUBSURFACE,
-    SPECULAR,
-    SPECULAR_COLOR,
-    SKINNING,
-    FLIP_UVS_VERTICAL,
-    COLOR_ATTRIBUTE,
-    VEC4_TANGENT,
-    MORPH_POSITION,
-    MORPH_NORMAL,
-    MORPH_TANGENT,
-    MORPH_VERSION_2_0
+    GLTF_CHANNELS = 0,          // 00001
+    THREE_TEXTURE,              // 00002
+    BASE_COLOR_TEXTURE,         // 00004
+    METALLIC_ROUGHNESS_TEXTURE, // 00008
+    NORMAL_TEXTURE,             // 00010
+    OCCLUSION,                  // 00020
+    EMISSIVE,                   // 00040
+    ALPHA_TEST,                 // 00080
+    SUBSURFACE,                 // 00100
+    SPECULAR,                   // 00200
+    SPECULAR_COLOR,             // 00400
+    SKINNING,                   // 00800
+    FLIP_UVS_VERTICAL,          // 01000
+    COLOR_ATTRIBUTE,            // 02000
+    VEC4_TANGENT,               // 04000
+    MORPH_POSITION,             // 08000
+    MORPH_NORMAL,               // 10000
+    MORPH_TANGENT,              // 20000
+    MORPH_VERSION_2_0           // 40000
   };
 
   struct MacroDefinition
@@ -63,6 +63,8 @@ public:
   ShaderOption() = default;
   ShaderOption(const ShaderOption& rhs);
   ShaderOption& operator=(const ShaderOption& rhs);
+
+  using HashType = uint64_t;
 
 public:
   /**
@@ -93,7 +95,7 @@ public:
    *
    * @return Hash value of currently added options.
    */
-  uint64_t GetOptionHash() const;
+  HashType GetOptionHash() const;
 
   /**
    * @brief Retrieves a list of define keywords.
@@ -116,7 +118,7 @@ public:
   const std::vector<MacroDefinition>& GetMacroDefinitions() const;
 
 private:
-  uint64_t mOptionHash{0u};
+  HashType mOptionHash{0u};
 
   std::vector<MacroDefinition> mMacros;
 };

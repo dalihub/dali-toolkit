@@ -151,8 +151,9 @@ public:
    * @brief Updates shaders by using current material
    *
    * @param[in] shaderManager Shader manager to create shader.
+   * @param[in] hash of old shader option
    */
-  void UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager);
+  void UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager, Loader::ShaderOption::HashType hash);
 
   /**
    * @brief Sets the blend shape data for this model primitive.
@@ -186,6 +187,13 @@ public:
    */
   void SetSkinned(bool isSkinned, uint32_t numberOfJointSets);
 
+  /**
+   * @brief Set whether this model primitve has vertex color attributes
+   *
+   * @param[in] hasVertexColor Whether or not this model primitive has vertex color attributes
+   */
+  void SetVertexColor(bool hasVertexColor);
+
 private: // From MaterialModifyObserver
   /**
    * @copydoc Dali::Scene3D::Internal::Material::MaterialModifyObserver::OnMaterialModified()
@@ -196,7 +204,8 @@ private:
   /**
    * @brief Apply materials data into renderer.
    */
-  void ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag flag = MaterialModifyObserver::ModifyFlag::NONE);
+  void ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag flag    = MaterialModifyObserver::ModifyFlag::NONE,
+                               Loader::ShaderOption::HashType     oldHash = 0u);
 
   /**
    * @brief Updates the uniform of renderer.
@@ -250,6 +259,7 @@ private:
   Scene3D::Loader::BlendShapes::BlendShapeData mBlendShapeData;
   Dali::Texture                                mBlendShapeGeometry;
   bool                                         mHasSkinning       = false;
+  bool                                         mHasVertexColor    = false;
   bool                                         mHasPositions      = false;
   bool                                         mHasNormals        = false;
   bool                                         mHasTangents       = false;

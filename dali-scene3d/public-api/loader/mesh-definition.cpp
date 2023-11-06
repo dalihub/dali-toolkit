@@ -967,6 +967,12 @@ bool MeshDefinition::IsSkinned() const
 {
   return !mJoints.empty() && !mWeights.empty();
 }
+
+bool MeshDefinition::HasVertexColor() const
+{
+  return !mColors.empty();
+}
+
 uint32_t MeshDefinition::GetNumberOfJointSets() const
 {
   return static_cast<uint32_t>(mJoints.size());
