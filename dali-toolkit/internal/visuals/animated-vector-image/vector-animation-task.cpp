@@ -148,7 +148,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   {
     std::ostringstream oss;
     oss << "[url:" << mImageUrl.GetUrl() << "]";
-    DALI_TRACE_BEGIN(gTraceFilter, "DALI_LOTTIE_LOADING_TASK");
+    // DALI_TRACE_BEGIN(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("BEGIN: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
   }
 #endif
@@ -171,7 +171,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
     {
       std::ostringstream oss;
       oss << "[url:" << mImageUrl.GetUrl() << "]";
-      DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK");
+      // DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
       DALI_LOG_RELEASE_INFO("END: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
     }
 #endif
@@ -198,7 +198,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   {
     std::ostringstream oss;
     oss << "[url:" << mImageUrl.GetUrl() << "]";
-    DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK");
+    // DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("END: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
   }
 #endif
