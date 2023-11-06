@@ -150,7 +150,7 @@ void FastTrackLoadingTask::Load()
   {
     std::ostringstream oss;
     oss << "[url:" << mUrl.GetUrl() << "]";
-    DALI_TRACE_BEGIN(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK");
+    // DALI_TRACE_BEGIN(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("BEGIN: DALI_IMAGE_FAST_TRACK_UPLOADING_TASK %s", oss.str().c_str());
   }
 #endif
@@ -228,7 +228,7 @@ void FastTrackLoadingTask::Load()
       oss << "premult:" << mPremultiplied << " ";
     }
     oss << "url:" << mUrl.GetUrl() << "]";
-    DALI_TRACE_END(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK");
+    // DALI_TRACE_END(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("END: DALI_IMAGE_FAST_TRACK_UPLOADING_TASK %s", oss.str().c_str());
   }
 #endif
