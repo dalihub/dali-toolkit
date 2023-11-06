@@ -90,6 +90,16 @@ public:
     return true;
   }
 
+  bool Load(const Dali::Vector<uint8_t>& data)
+  {
+    Dali::Mutex::ScopedLock lock(mMutex);
+
+    mDefaultWidth  = 100;
+    mDefaultHeight = 100;
+
+    return true;
+  }
+
   void SetRenderer(Dali::Renderer renderer)
   {
     mRenderer = renderer;
@@ -314,6 +324,11 @@ void VectorAnimationRenderer::Finalize()
 bool VectorAnimationRenderer::Load(const std::string& url)
 {
   return Internal::Adaptor::GetImplementation(*this).Load(url);
+}
+
+bool VectorAnimationRenderer::Load(const Dali::Vector<uint8_t>& data)
+{
+  return Internal::Adaptor::GetImplementation(*this).Load(data);
 }
 
 void VectorAnimationRenderer::SetRenderer(Renderer renderer)

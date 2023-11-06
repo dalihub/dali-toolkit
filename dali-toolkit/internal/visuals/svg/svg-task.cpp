@@ -89,7 +89,8 @@ void SvgLoadingTask::Process()
   {
     std::ostringstream oss;
     oss << "[url:" << mImageUrl.GetUrl() << "]";
-    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_SVG_LOADING_TASK", oss.str().c_str());
+    // DALI_TRACE_BEGIN(gTraceFilter, "DALI_SVG_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
+    DALI_LOG_RELEASE_INFO("BEGIN: DALI_SVG_LOADING_TASK %s", oss.str().c_str());
   }
 #endif
 
@@ -132,7 +133,8 @@ void SvgLoadingTask::Process()
     std::ostringstream oss;
     oss << "[success:" << mHasSucceeded << " ";
     oss << "url:" << mImageUrl.GetUrl() << "]";
-    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_SVG_LOADING_TASK", oss.str().c_str());
+    // DALI_TRACE_END(gTraceFilter, "DALI_SVG_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
+    DALI_LOG_RELEASE_INFO("END: DALI_SVG_LOADING_TASK %s", oss.str().c_str());
   }
 #endif
 }

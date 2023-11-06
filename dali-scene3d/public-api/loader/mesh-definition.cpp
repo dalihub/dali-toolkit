@@ -447,26 +447,144 @@ void CalculateTextureSize(uint32_t totalTextureSize, uint32_t& textureWidth, uin
   textureHeight = 1u << powHeight;
 }
 
-void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDefinition::BlendShape>& blendShapes, uint32_t numberOfVertices, float& blendShapeUnnormalizeFactor, BufferDefinition::Vector& buffers)
+template<typename T>
+float GetNormalizedScale()
+{
+  return 1.0f / (std::numeric_limits<T>::max());
+}
+
+template<typename T>
+void DequantizeData(std::vector<uint8_t>& buffer, float* dequantizedValues, uint32_t numValues, bool normalized)
+{
+  // see https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_mesh_quantization#encoding-quantized-data
+
+  T* values = reinterpret_cast<T*>(buffer.data());
+
+  for(uint32_t i = 0; i < numValues; ++i)
+  {
+    *dequantizedValues = normalized ? std::max((*values) * GetNormalizedScale<T>(), -1.0f) : *values;
+
+    values++;
+    dequantizedValues++;
+  }
+}
+
+void GetDequantizedData(std::vector<uint8_t>& buffer, uint32_t numComponents, uint32_t count, uint32_t flags, bool normalized)
+{
+  bool dequantized = false;
+
+  std::vector<uint8_t> dequantizedBuffer(count * numComponents * sizeof(float));
+  float*               dequantizedValues = reinterpret_cast<float*>(dequantizedBuffer.data());
+
+  if(MaskMatch(flags, MeshDefinition::Flags::S8_POSITION) || MaskMatch(flags, MeshDefinition::Flags::S8_NORMAL) || MaskMatch(flags, MeshDefinition::Flags::S8_TANGENT) || MaskMatch(flags, MeshDefinition::Flags::S8_TEXCOORD))
+  {
+    DequantizeData<int8_t>(buffer, dequantizedValues, numComponents * count, normalized);
+    dequantized = true;
+  }
+  else if(MaskMatch(flags, MeshDefinition::Flags::U8_POSITION) || MaskMatch(flags, MeshDefinition::Flags::U8_TEXCOORD))
+  {
+    DequantizeData<uint8_t>(buffer, dequantizedValues, numComponents * count, normalized);
+    dequantized = true;
+  }
+  else if(MaskMatch(flags, MeshDefinition::Flags::S16_POSITION) || MaskMatch(flags, MeshDefinition::Flags::S16_NORMAL) || MaskMatch(flags, MeshDefinition::Flags::S16_TANGENT) || MaskMatch(flags, MeshDefinition::Flags::S16_TEXCOORD))
+  {
+    DequantizeData<int16_t>(buffer, dequantizedValues, numComponents * count, normalized);
+    dequantized = true;
+  }
+  else if(MaskMatch(flags, MeshDefinition::Flags::U16_POSITION) || MaskMatch(flags, MeshDefinition::Flags::U16_TEXCOORD))
+  {
+    DequantizeData<uint16_t>(buffer, dequantizedValues, numComponents * count, normalized);
+    dequantized = true;
+  }
+
+  if(dequantized)
+  {
+    buffer = std::move(dequantizedBuffer);
+  }
+}
+
+void GetDequantizedMinMax(std::vector<float>& min, std::vector<float>& max, uint32_t flags)
+{
+  float scale = 1.0f;
+
+  if(MaskMatch(flags, MeshDefinition::Flags::S8_POSITION) || MaskMatch(flags, MeshDefinition::Flags::S8_NORMAL) || MaskMatch(flags, MeshDefinition::Flags::S8_TANGENT) || MaskMatch(flags, MeshDefinition::Flags::S8_TEXCOORD))
+  {
+    scale = GetNormalizedScale<int8_t>();
+  }
+  else if(MaskMatch(flags, MeshDefinition::Flags::U8_POSITION) || MaskMatch(flags, MeshDefinition::Flags::U8_TEXCOORD))
+  {
+    scale = GetNormalizedScale<uint8_t>();
+  }
+  else if(MaskMatch(flags, MeshDefinition::Flags::S16_POSITION) || MaskMatch(flags, MeshDefinition::Flags::S16_NORMAL) || MaskMatch(flags, MeshDefinition::Flags::S16_TANGENT) || MaskMatch(flags, MeshDefinition::Flags::S16_TEXCOORD))
+  {
+    scale = GetNormalizedScale<int16_t>();
+  }
+  else if(MaskMatch(flags, MeshDefinition::Flags::U16_POSITION) || MaskMatch(flags, MeshDefinition::Flags::U16_TEXCOORD))
+  {
+    scale = GetNormalizedScale<uint16_t>();
+  }
+
+  if(scale != 1.0f)
+  {
+    for(float& value : min)
+    {
+      value = std::max(value * scale, -1.0f);
+    }
+
+    for(float& value : max)
+    {
+      value = std::min(value * scale, 1.0f);
+    }
+  }
+}
+
+void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::vector<MeshDefinition::BlendShape>& blendShapes, uint32_t numberOfVertices, float& blendShapeUnnormalizeFactor, BufferDefinition::Vector& buffers)
 {
   uint32_t geometryBufferIndex = 0u;
   float    maxDistanceSquared  = 0.f;
   Vector3* geometryBufferV3    = reinterpret_cast<Vector3*>(geometryBuffer);
-  for(const auto& blendShape : blendShapes)
+  for(auto& blendShape : blendShapes)
   {
     if(blendShape.deltas.IsDefined())
     {
-      DALI_ASSERT_ALWAYS(((blendShape.deltas.mBlob.mLength % sizeof(Vector3) == 0u) ||
-                          blendShape.deltas.mBlob.mStride >= sizeof(Vector3)) &&
-                         "Blend Shape position buffer length not a multiple of element size");
+      const auto bufferSize = blendShape.deltas.mBlob.GetBufferSize();
+      uint32_t   numVector3;
 
-      const auto            bufferSize = blendShape.deltas.mBlob.GetBufferSize();
+      if(MaskMatch(blendShape.mFlags, MeshDefinition::S8_POSITION))
+      {
+        DALI_ASSERT_ALWAYS(((blendShape.deltas.mBlob.mLength % (sizeof(uint8_t) * 3) == 0) ||
+                            blendShape.deltas.mBlob.mStride >= (sizeof(uint8_t) * 3)) &&
+                           "Blend Shape position buffer length not a multiple of element size");
+        numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(uint8_t) * 3));
+      }
+      else if(MaskMatch(blendShape.mFlags, MeshDefinition::S16_POSITION))
+      {
+        DALI_ASSERT_ALWAYS(((blendShape.deltas.mBlob.mLength % (sizeof(uint16_t) * 3) == 0) ||
+                            blendShape.deltas.mBlob.mStride >= (sizeof(uint16_t) * 3)) &&
+                           "Blend Shape position buffer length not a multiple of element size");
+        numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(uint16_t) * 3));
+      }
+      else
+      {
+        DALI_ASSERT_ALWAYS(((blendShape.deltas.mBlob.mLength % sizeof(Vector3) == 0) ||
+                            blendShape.deltas.mBlob.mStride >= sizeof(Vector3)) &&
+                           "Blend Shape position buffer length not a multiple of element size");
+        numVector3 = static_cast<uint32_t>(bufferSize / sizeof(Vector3));
+      }
+
       std::vector<uint8_t>  buffer(bufferSize);
       std::vector<uint32_t> sparseIndices{};
 
       if(ReadAccessor(blendShape.deltas, buffers[blendShape.deltas.mBufferIdx].GetBufferStream(), buffer.data(), &sparseIndices))
       {
-        blendShape.deltas.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()), &sparseIndices);
+        GetDequantizedData(buffer, 3u, numVector3, blendShape.mFlags & MeshDefinition::POSITIONS_MASK, blendShape.deltas.mNormalized);
+
+        if(blendShape.deltas.mNormalized)
+        {
+          GetDequantizedMinMax(blendShape.deltas.mBlob.mMin, blendShape.deltas.mBlob.mMax, blendShape.mFlags & MeshDefinition::POSITIONS_MASK);
+        }
+
+        blendShape.deltas.mBlob.ApplyMinMax(numVector3, reinterpret_cast<float*>(buffer.data()), &sparseIndices);
 
         // Calculate the difference with the original mesh.
         // Find the max distance to normalize the deltas.
@@ -501,17 +619,44 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
 
     if(blendShape.normals.IsDefined())
     {
-      DALI_ASSERT_ALWAYS(((blendShape.normals.mBlob.mLength % sizeof(Vector3) == 0u) ||
-                          blendShape.normals.mBlob.mStride >= sizeof(Vector3)) &&
-                         "Blend Shape normals buffer length not a multiple of element size");
+      const auto bufferSize = blendShape.normals.mBlob.GetBufferSize();
+      uint32_t   numVector3;
 
-      const auto            bufferSize = blendShape.normals.mBlob.GetBufferSize();
+      if(MaskMatch(blendShape.mFlags, MeshDefinition::S8_NORMAL))
+      {
+        DALI_ASSERT_ALWAYS(((blendShape.normals.mBlob.mLength % (sizeof(int8_t) * 3) == 0) ||
+                            blendShape.normals.mBlob.mStride >= (sizeof(int8_t) * 3)) &&
+                           "Blend Shape normals buffer length not a multiple of element size");
+        numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(int8_t) * 3));
+      }
+      else if(MaskMatch(blendShape.mFlags, MeshDefinition::S16_NORMAL))
+      {
+        DALI_ASSERT_ALWAYS(((blendShape.normals.mBlob.mLength % (sizeof(int16_t) * 3) == 0) ||
+                            blendShape.normals.mBlob.mStride >= (sizeof(int16_t) * 3)) &&
+                           "Blend Shape normals buffer length not a multiple of element size");
+        numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(int16_t) * 3));
+      }
+      else
+      {
+        DALI_ASSERT_ALWAYS(((blendShape.normals.mBlob.mLength % sizeof(Vector3) == 0) ||
+                            blendShape.normals.mBlob.mStride >= sizeof(Vector3)) &&
+                           "Blend Shape normals buffer length not a multiple of element size");
+        numVector3 = static_cast<uint32_t>(bufferSize / sizeof(Vector3));
+      }
+
       std::vector<uint8_t>  buffer(bufferSize);
       std::vector<uint32_t> sparseIndices;
 
       if(ReadAccessor(blendShape.normals, buffers[blendShape.normals.mBufferIdx].GetBufferStream(), buffer.data(), &sparseIndices))
       {
-        blendShape.normals.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()), &sparseIndices);
+        GetDequantizedData(buffer, 3u, numVector3, blendShape.mFlags & MeshDefinition::NORMALS_MASK, blendShape.normals.mNormalized);
+
+        if(blendShape.normals.mNormalized)
+        {
+          GetDequantizedMinMax(blendShape.normals.mBlob.mMin, blendShape.normals.mBlob.mMax, blendShape.mFlags & MeshDefinition::NORMALS_MASK);
+        }
+
+        blendShape.normals.mBlob.ApplyMinMax(numVector3, reinterpret_cast<float*>(buffer.data()), &sparseIndices);
 
         // Calculate the difference with the original mesh, and translate to make all values positive.
         const Vector3* const deltasBuffer  = reinterpret_cast<const Vector3* const>(buffer.data());
@@ -547,17 +692,45 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, const std::vector<MeshDe
 
     if(blendShape.tangents.IsDefined())
     {
-      DALI_ASSERT_ALWAYS(((blendShape.tangents.mBlob.mLength % sizeof(Vector3) == 0u) ||
-                          blendShape.tangents.mBlob.mStride >= sizeof(Vector3)) &&
-                         "Blend Shape tangents buffer length not a multiple of element size");
+      const auto bufferSize = blendShape.tangents.mBlob.GetBufferSize();
 
-      const auto            bufferSize = blendShape.tangents.mBlob.GetBufferSize();
+      uint32_t numVector3;
+
+      if(MaskMatch(blendShape.mFlags, MeshDefinition::S8_TANGENT))
+      {
+        DALI_ASSERT_ALWAYS(((blendShape.tangents.mBlob.mLength % (sizeof(int8_t) * 3) == 0) ||
+                            blendShape.tangents.mBlob.mStride >= (sizeof(int8_t) * 3)) &&
+                           "Blend Shape tangents buffer length not a multiple of element size");
+        numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(int8_t) * 3));
+      }
+      else if(MaskMatch(blendShape.mFlags, MeshDefinition::S16_TANGENT))
+      {
+        DALI_ASSERT_ALWAYS(((blendShape.tangents.mBlob.mLength % (sizeof(int16_t) * 3) == 0) ||
+                            blendShape.tangents.mBlob.mStride >= (sizeof(int16_t) * 3)) &&
+                           "Blend Shape tangents buffer length not a multiple of element size");
+        numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(int16_t) * 3));
+      }
+      else
+      {
+        DALI_ASSERT_ALWAYS(((blendShape.tangents.mBlob.mLength % sizeof(Vector3) == 0) ||
+                            blendShape.tangents.mBlob.mStride >= sizeof(Vector3)) &&
+                           "Blend Shape tangents buffer length not a multiple of element size");
+        numVector3 = static_cast<uint32_t>(bufferSize / sizeof(Vector3));
+      }
+
       std::vector<uint8_t>  buffer(bufferSize);
       std::vector<uint32_t> sparseIndices;
 
       if(ReadAccessor(blendShape.tangents, buffers[blendShape.tangents.mBufferIdx].GetBufferStream(), buffer.data(), &sparseIndices))
       {
-        blendShape.tangents.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()), &sparseIndices);
+        GetDequantizedData(buffer, 3u, numVector3, blendShape.mFlags & MeshDefinition::TANGENTS_MASK, blendShape.tangents.mNormalized);
+
+        if(blendShape.tangents.mNormalized)
+        {
+          GetDequantizedMinMax(blendShape.tangents.mBlob.mMin, blendShape.tangents.mBlob.mMax, blendShape.mFlags & MeshDefinition::TANGENTS_MASK);
+        }
+
+        blendShape.tangents.mBlob.ApplyMinMax(numVector3, reinterpret_cast<float*>(buffer.data()), &sparseIndices);
 
         // Calculate the difference with the original mesh, and translate to make all values positive.
         const Vector3* const deltasBuffer  = reinterpret_cast<const Vector3* const>(buffer.data());
@@ -853,13 +1026,38 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
     }
   }
 
+  uint32_t numberOfVertices = 0u;
+
   std::vector<Vector3> positions;
   if(mPositions.IsDefined())
   {
-    DALI_ASSERT_ALWAYS(((mPositions.mBlob.mLength % sizeof(Vector3) == 0) ||
-                        mPositions.mBlob.mStride >= sizeof(Vector3)) &&
-                       "Position buffer length not a multiple of element size");
-    const auto           bufferSize = mPositions.mBlob.GetBufferSize();
+    const auto bufferSize = mPositions.mBlob.GetBufferSize();
+    uint32_t   numVector3;
+
+    if(MaskMatch(mFlags, S8_POSITION) || MaskMatch(mFlags, U8_POSITION))
+    {
+      DALI_ASSERT_ALWAYS(((mPositions.mBlob.mLength % (sizeof(uint8_t) * 3) == 0) ||
+                          mPositions.mBlob.mStride >= (sizeof(uint8_t) * 3)) &&
+                         "Position buffer length not a multiple of element size");
+      numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(uint8_t) * 3));
+    }
+    else if(MaskMatch(mFlags, S16_POSITION) || MaskMatch(mFlags, U16_POSITION))
+    {
+      DALI_ASSERT_ALWAYS(((mPositions.mBlob.mLength % (sizeof(uint16_t) * 3) == 0) ||
+                          mPositions.mBlob.mStride >= (sizeof(uint16_t) * 3)) &&
+                         "Position buffer length not a multiple of element size");
+      numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(uint16_t) * 3));
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS(((mPositions.mBlob.mLength % sizeof(Vector3) == 0) ||
+                          mPositions.mBlob.mStride >= sizeof(Vector3)) &&
+                         "Position buffer length not a multiple of element size");
+      numVector3 = static_cast<uint32_t>(bufferSize / sizeof(Vector3));
+    }
+
+    numberOfVertices = numVector3;
+
     std::vector<uint8_t> buffer(bufferSize);
 
     std::string path;
@@ -869,7 +1067,13 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
       ExceptionFlinger(ASSERT_LOCATION) << "Failed to read positions from '" << path << "'.";
     }
 
-    uint32_t numVector3 = static_cast<uint32_t>(bufferSize / sizeof(Vector3));
+    GetDequantizedData(buffer, 3u, numVector3, mFlags & POSITIONS_MASK, mPositions.mNormalized);
+
+    if(mPositions.mNormalized)
+    {
+      GetDequantizedMinMax(mPositions.mBlob.mMin, mPositions.mBlob.mMax, mFlags & POSITIONS_MASK);
+    }
+
     if(mPositions.mBlob.mMin.size() != 3u || mPositions.mBlob.mMax.size() != 3u)
     {
       mPositions.mBlob.ComputeMinMax(3u, numVector3, reinterpret_cast<float*>(buffer.data()));
@@ -892,10 +1096,31 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
   auto       hasNormals  = mNormals.IsDefined();
   if(hasNormals)
   {
-    DALI_ASSERT_ALWAYS(((mNormals.mBlob.mLength % sizeof(Vector3) == 0) ||
-                        mNormals.mBlob.mStride >= sizeof(Vector3)) &&
-                       "Normal buffer length not a multiple of element size");
-    const auto           bufferSize = mNormals.mBlob.GetBufferSize();
+    const auto bufferSize = mNormals.mBlob.GetBufferSize();
+    uint32_t   numVector3;
+
+    if(MaskMatch(mFlags, S8_NORMAL))
+    {
+      DALI_ASSERT_ALWAYS(((mNormals.mBlob.mLength % (sizeof(int8_t) * 3) == 0) ||
+                          mNormals.mBlob.mStride >= (sizeof(int8_t) * 3)) &&
+                         "Normal buffer length not a multiple of element size");
+      numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(int8_t) * 3));
+    }
+    else if(MaskMatch(mFlags, S16_NORMAL))
+    {
+      DALI_ASSERT_ALWAYS(((mNormals.mBlob.mLength % (sizeof(int16_t) * 3) == 0) ||
+                          mNormals.mBlob.mStride >= (sizeof(int16_t) * 3)) &&
+                         "Normal buffer length not a multiple of element size");
+      numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(int16_t) * 3));
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS(((mNormals.mBlob.mLength % sizeof(Vector3) == 0) ||
+                          mNormals.mBlob.mStride >= sizeof(Vector3)) &&
+                         "Normal buffer length not a multiple of element size");
+      numVector3 = static_cast<uint32_t>(bufferSize / sizeof(Vector3));
+    }
+
     std::vector<uint8_t> buffer(bufferSize);
 
     std::string path;
@@ -905,9 +1130,16 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
       ExceptionFlinger(ASSERT_LOCATION) << "Failed to read normals from '" << path << "'.";
     }
 
-    mNormals.mBlob.ApplyMinMax(static_cast<uint32_t>(bufferSize / sizeof(Vector3)), reinterpret_cast<float*>(buffer.data()));
+    GetDequantizedData(buffer, 3u, numVector3, mFlags & NORMALS_MASK, mNormals.mNormalized);
 
-    raw.mAttribs.push_back({"aNormal", Property::VECTOR3, static_cast<uint32_t>(bufferSize / sizeof(Vector3)), std::move(buffer)});
+    if(mNormals.mNormalized)
+    {
+      GetDequantizedMinMax(mNormals.mBlob.mMin, mNormals.mBlob.mMax, mFlags & NORMALS_MASK);
+    }
+
+    mNormals.mBlob.ApplyMinMax(numVector3, reinterpret_cast<float*>(buffer.data()));
+
+    raw.mAttribs.push_back({"aNormal", Property::VECTOR3, numVector3, std::move(buffer)});
   }
   else if(mNormals.mBlob.mLength != 0 && isTriangles)
   {
@@ -931,10 +1163,32 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
   const auto hasUvs = mTexCoords.IsDefined();
   if(hasUvs)
   {
-    DALI_ASSERT_ALWAYS(((mTexCoords.mBlob.mLength % sizeof(Vector2) == 0) ||
-                        mTexCoords.mBlob.mStride >= sizeof(Vector2)) &&
-                       "Normal buffer length not a multiple of element size");
-    const auto           bufferSize = mTexCoords.mBlob.GetBufferSize();
+    const auto bufferSize = mTexCoords.mBlob.GetBufferSize();
+
+    uint32_t uvCount;
+
+    if(MaskMatch(mFlags, S8_TEXCOORD) || MaskMatch(mFlags, U8_TEXCOORD))
+    {
+      DALI_ASSERT_ALWAYS(((mTexCoords.mBlob.mLength % (sizeof(uint8_t) * 2) == 0) ||
+                          mTexCoords.mBlob.mStride >= (sizeof(uint8_t) * 2)) &&
+                         "TexCoords buffer length not a multiple of element size");
+      uvCount = static_cast<uint32_t>(bufferSize / (sizeof(uint8_t) * 2));
+    }
+    else if(MaskMatch(mFlags, S16_TEXCOORD) || MaskMatch(mFlags, U16_TEXCOORD))
+    {
+      DALI_ASSERT_ALWAYS(((mTexCoords.mBlob.mLength % (sizeof(uint16_t) * 2) == 0) ||
+                          mTexCoords.mBlob.mStride >= (sizeof(uint16_t) * 2)) &&
+                         "TexCoords buffer length not a multiple of element size");
+      uvCount = static_cast<uint32_t>(bufferSize / (sizeof(uint16_t) * 2));
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS(((mTexCoords.mBlob.mLength % sizeof(Vector2) == 0) ||
+                          mTexCoords.mBlob.mStride >= sizeof(Vector2)) &&
+                         "TexCoords buffer length not a multiple of element size");
+      uvCount = static_cast<uint32_t>(bufferSize / sizeof(Vector2));
+    }
+
     std::vector<uint8_t> buffer(bufferSize);
 
     std::string path;
@@ -944,7 +1198,8 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
       ExceptionFlinger(ASSERT_LOCATION) << "Failed to read uv-s from '" << path << "'.";
     }
 
-    const auto uvCount = bufferSize / sizeof(Vector2);
+    GetDequantizedData(buffer, 2u, uvCount, mFlags & TEXCOORDS_MASK, mTexCoords.mNormalized);
+
     if(MaskMatch(mFlags, FLIP_UVS_VERTICAL))
     {
       auto uv    = reinterpret_cast<Vector2*>(buffer.data());
@@ -956,6 +1211,11 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
       }
     }
 
+    if(mTexCoords.mNormalized)
+    {
+      GetDequantizedMinMax(mTexCoords.mBlob.mMin, mTexCoords.mBlob.mMax, mFlags & TEXCOORDS_MASK);
+    }
+
     mTexCoords.mBlob.ApplyMinMax(static_cast<uint32_t>(uvCount), reinterpret_cast<float*>(buffer.data()));
 
     raw.mAttribs.push_back({"aTexCoord", Property::VECTOR2, static_cast<uint32_t>(uvCount), std::move(buffer)});
@@ -963,11 +1223,35 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
 
   if(mTangents.IsDefined())
   {
-    uint32_t propertySize = static_cast<uint32_t>((mTangentType == Property::VECTOR4) ? sizeof(Vector4) : sizeof(Vector3));
-    DALI_ASSERT_ALWAYS(((mTangents.mBlob.mLength % propertySize == 0) ||
-                        mTangents.mBlob.mStride >= propertySize) &&
-                       "Tangents buffer length not a multiple of element size");
-    const auto           bufferSize = mTangents.mBlob.GetBufferSize();
+    const auto bufferSize = mTangents.mBlob.GetBufferSize();
+
+    uint32_t propertySize   = static_cast<uint32_t>((mTangentType == Property::VECTOR4) ? sizeof(Vector4) : sizeof(Vector3));
+    uint32_t componentCount = static_cast<uint32_t>(propertySize / sizeof(float));
+
+    uint32_t numTangents;
+
+    if(MaskMatch(mFlags, S8_TANGENT))
+    {
+      DALI_ASSERT_ALWAYS(((mTangents.mBlob.mLength % (sizeof(int8_t) * componentCount) == 0) ||
+                          mTangents.mBlob.mStride >= (sizeof(int8_t) * componentCount)) &&
+                         "Tangents buffer length not a multiple of element size");
+      numTangents = static_cast<uint32_t>(bufferSize / (sizeof(int8_t) * componentCount));
+    }
+    else if(MaskMatch(mFlags, S16_TANGENT))
+    {
+      DALI_ASSERT_ALWAYS(((mTangents.mBlob.mLength % (sizeof(int16_t) * componentCount) == 0) ||
+                          mTangents.mBlob.mStride >= (sizeof(int16_t) * componentCount)) &&
+                         "Tangents buffer length not a multiple of element size");
+      numTangents = static_cast<uint32_t>(bufferSize / (sizeof(int16_t) * componentCount));
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS(((mTangents.mBlob.mLength % propertySize == 0) ||
+                          mTangents.mBlob.mStride >= propertySize) &&
+                         "Tangents buffer length not a multiple of element size");
+      numTangents = static_cast<uint32_t>(bufferSize / propertySize);
+    }
+
     std::vector<uint8_t> buffer(bufferSize);
 
     std::string path;
@@ -976,9 +1260,17 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
     {
       ExceptionFlinger(ASSERT_LOCATION) << "Failed to read tangents from '" << path << "'.";
     }
-    mTangents.mBlob.ApplyMinMax(bufferSize / propertySize, reinterpret_cast<float*>(buffer.data()));
 
-    raw.mAttribs.push_back({"aTangent", mTangentType, static_cast<uint32_t>(bufferSize / propertySize), std::move(buffer)});
+    GetDequantizedData(buffer, componentCount, numTangents, mFlags & TANGENTS_MASK, mTangents.mNormalized);
+
+    if(mTangents.mNormalized)
+    {
+      GetDequantizedMinMax(mTangents.mBlob.mMin, mTangents.mBlob.mMax, mFlags & TANGENTS_MASK);
+    }
+
+    mTangents.mBlob.ApplyMinMax(numTangents, reinterpret_cast<float*>(buffer.data()));
+
+    raw.mAttribs.push_back({"aTangent", mTangentType, static_cast<uint32_t>(numTangents), std::move(buffer)});
   }
   else if(mTangents.mBlob.mLength != 0 && hasNormals && isTriangles)
   {
@@ -1086,22 +1378,31 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
   blendShapesBlob.mOffset = std::numeric_limits<unsigned int>::max();
   blendShapesBlob.mLength = 0u;
 
+  uint32_t totalTextureSize(0u);
+
+  auto processAccessor = [&](const Accessor& accessor, uint32_t vector3Size) {
+    if(accessor.IsDefined())
+    {
+      blendShapesBlob.mOffset = std::min(blendShapesBlob.mOffset, accessor.mBlob.mOffset);
+      blendShapesBlob.mLength += accessor.mBlob.mLength;
+
+      totalTextureSize += accessor.mBlob.mLength / vector3Size;
+    }
+  };
+
   for(const auto& blendShape : mBlendShapes)
   {
-    for(auto i : {&blendShape.deltas, &blendShape.normals, &blendShape.tangents})
-    {
-      if(i->IsDefined())
-      {
-        blendShapesBlob.mOffset = std::min(blendShapesBlob.mOffset, i->mBlob.mOffset);
-        blendShapesBlob.mLength += i->mBlob.mLength;
-      }
-    }
+    const auto positionMask = blendShape.mFlags & POSITIONS_MASK;
+    const auto normalMask   = blendShape.mFlags & NORMALS_MASK;
+    const auto tangentMask  = blendShape.mFlags & TANGENTS_MASK;
+
+    processAccessor(blendShape.deltas, MaskMatch(positionMask, S8_POSITION) ? sizeof(uint8_t) * 3 : (MaskMatch(positionMask, S16_POSITION) ? sizeof(uint16_t) * 3 : sizeof(Vector3)));
+    processAccessor(blendShape.normals, MaskMatch(normalMask, S8_NORMAL) ? sizeof(uint8_t) * 3 : (MaskMatch(normalMask, S16_NORMAL) ? sizeof(uint16_t) * 3 : sizeof(Vector3)));
+    processAccessor(blendShape.tangents, MaskMatch(tangentMask, S8_TANGENT) ? sizeof(uint8_t) * 3 : (MaskMatch(tangentMask, S16_TANGENT) ? sizeof(uint16_t) * 3 : sizeof(Vector3)));
   }
 
   if(HasBlendShapes())
   {
-    const uint32_t numberOfVertices = static_cast<uint32_t>(mPositions.mBlob.mLength / sizeof(Vector3));
-
     // Calculate the size of one buffer inside the texture.
     raw.mBlendShapeBufferOffset = numberOfVertices;
 
@@ -1111,7 +1412,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
 
     if(!mBlendShapeHeader.IsDefined())
     {
-      CalculateTextureSize(static_cast<uint32_t>(blendShapesBlob.mLength / sizeof(Vector3)), textureWidth, textureHeight);
+      CalculateTextureSize(totalTextureSize, textureWidth, textureHeight);
       calculateGltf2BlendShapes = true;
     }
     else

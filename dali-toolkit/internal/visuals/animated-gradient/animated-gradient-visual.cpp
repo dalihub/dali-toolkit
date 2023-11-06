@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(12); // 5 transform properties + Start point/color, end point/color, rotate center/angle, offset
+const int CUSTOM_PROPERTY_COUNT(7); // Start point/color, end point/color, rotate center/angle, offset
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN(GRADIENT_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelAnimatedGradientVisual::GradientType, LINEAR)

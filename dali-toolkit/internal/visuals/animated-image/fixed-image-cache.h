@@ -91,11 +91,12 @@ public:
 
 private:
   /**
-   * @brief Check whether the front frame is ready or not.
+   * @brief Check whether the frame is ready or not.
+   * @param[in] frameIndex The frame index to check the frame is ready or not.
    *
-   * @return true if the front frame is ready
+   * @return true if the frame is ready
    */
-  bool IsFrontReady() const;
+  bool IsFrameReady(uint32_t frameIndex) const;
 
   /**
    * @brief Load the next batch of images
@@ -103,19 +104,21 @@ private:
   void LoadBatch();
 
   /**
-   * @brief Get the texture set of the front frame.
+   * @brief Get the texture set at the input frame index
+   * @param[in] frameIndex The frame index to retrieve texture set.
    *
    * @return the texture set of the front of Cache.
    */
-  TextureSet GetFrontTextureSet() const;
+  TextureSet GetTextureSet(uint32_t frameIndex) const;
 
   /**
    * @brief Check if the front frame has become ready - if so, inform observer
    *
    * @param[in] wasReady Readiness before call.
+   * @param[in] frameIndex The frame index for this frame
    * @param[in] preMultiplied whether the texture is premultied alpha or not.
    */
-  void CheckFrontFrame(bool wasReady, bool preMultiplied);
+  void MakeReady(bool wasReady, uint32_t frameIndex, bool preMultiplied);
 
 protected:
   /**
@@ -127,7 +130,7 @@ private:
   std::vector<UrlStore>&                 mImageUrls;
   std::vector<bool>                      mReadyFlags;
   std::vector<TextureManager::LoadState> mLoadStates;
-  uint32_t                               mFront;
+  uint32_t                               mCurrentFrameIndex;
 };
 
 } //namespace Internal
