@@ -204,6 +204,10 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap(Property::Map& map) const
   mVectorAnimationTask->GetLayerInfo(layerInfo);
   map.Insert(Toolkit::DevelImageVisual::Property::CONTENT_INFO, layerInfo);
 
+  Property::Map markerInfo;
+  mVectorAnimationTask->GetMarkerInfo(markerInfo);
+  map.Insert(Toolkit::DevelImageVisual::Property::MARKER_INFO, markerInfo);
+
   map.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, IsSynchronousLoadingRequired());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());

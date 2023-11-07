@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/property-array.h>
 #include <toolkit-application.h>
 #include <toolkit-event-thread-callback.h>
 #include <toolkit-vector-animation-renderer.h>
@@ -372,6 +373,12 @@ void VectorAnimationRenderer::GetLayerInfo(Property::Map& map) const
 bool VectorAnimationRenderer::GetMarkerInfo(const std::string& marker, uint32_t& startFrame, uint32_t& endFrame) const
 {
   return Internal::Adaptor::GetImplementation(*this).GetMarkerInfo(marker, startFrame, endFrame);
+}
+
+void VectorAnimationRenderer::GetMarkerInfo(Property::Map& map) const
+{
+  map.Add(VECTOR_ANIMATION_MARKER_NAME_1, Property::Array({VECTOR_ANIMATION_MARKER_START_FRAME_1, VECTOR_ANIMATION_MARKER_END_FRAME_1}));
+  map.Add(VECTOR_ANIMATION_MARKER_NAME_2, Property::Array({VECTOR_ANIMATION_MARKER_START_FRAME_2, VECTOR_ANIMATION_MARKER_END_FRAME_2}));
 }
 
 void VectorAnimationRenderer::InvalidateBuffer()
