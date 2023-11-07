@@ -133,7 +133,7 @@ enum Type
 
   /**
    * @brief The content information the AnimatedVectorImageVisual will use.
-   * @details Name "contentInfo", Type Property::MAP.
+   * @details Type Property::MAP.
    * The map contains the layer name as a key and Property::Array as a value.
    * And the array contains 2 integer values which are the frame numbers, the start frame number and the end frame number of the layer.
    * @note This property is read-only.
@@ -165,7 +165,16 @@ enum Type
    * But it can spend a lot of memory if the resource has high resolution image or many frame count.
    * @note It is used in the AnimatedImageVisual. The default is false
    */
-  USE_FIXED_CACHE = ORIENTATION_CORRECTION + 13
+  USE_FIXED_CACHE = ORIENTATION_CORRECTION + 13,
+
+  /**
+   * @brief The marker information the AnimatedVectorImageVisual will use.
+   * @details Type Property::MAP.
+   * The map contains the marker name as a key and Property::Array as a value.
+   * And the array contains 2 integer values which are the frame numbers, the start frame number and the end frame number of the marker.
+   * @note This property is read-only.
+   */
+  MARKER_INFO = ORIENTATION_CORRECTION + 15,
 };
 
 } //namespace Property
