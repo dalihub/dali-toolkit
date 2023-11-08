@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -404,9 +404,11 @@ void ToggleButton::OnStateChange(State newState)
   if((Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor()) && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
     auto* accessible = GetAccessibleObject();
-
-    accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);
-    accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
+    if(DALI_LIKELY(accessible))
+    {
+      accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);
+      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
+    }
   }
 }
 

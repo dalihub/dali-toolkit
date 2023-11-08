@@ -597,6 +597,31 @@ DALI_TOOLKIT_API Dali::Accessibility::States GetAccessibilityStates(Toolkit::Con
  */
 DALI_TOOLKIT_API void NotifyAccessibilityStateChange(Toolkit::Control control, Dali::Accessibility::States states, bool recurse);
 
+/**
+ * @brief The method to get the control's accessibility created or not.
+ *
+ * @param[in] control object to append attribute to
+ * @return True if accessible were created. False otherwise.
+ */
+DALI_TOOLKIT_API bool IsAccessibleCreated(Toolkit::Control control);
+
+/**
+ * @brief The method to set creatable of control's accessibility.
+ * @note This method doesn't remove that already created accessible.
+ *
+ * @param[in] control object to append attribute to
+ * @param[in] enable True if we allow to create accessible. False otherwise.
+ */
+DALI_TOOLKIT_API void EnableCreateAccessible(Toolkit::Control control, bool enable);
+
+/**
+ * @brief The method to get creatable of control's accessibility.
+ *
+ * @param[in] control object to append attribute to
+ * @return True if we allow to create accessible. False otherwise.
+ */
+DALI_TOOLKIT_API bool IsCreateAccessibleEnabled(Toolkit::Control control);
+
 } // namespace DevelControl
 
 } // namespace Toolkit

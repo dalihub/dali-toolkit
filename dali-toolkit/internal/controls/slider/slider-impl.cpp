@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -951,7 +951,11 @@ void Slider::SetValue(float value)
   DisplayValue(mValue, true);
   if(Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
   {
-    GetAccessibleObject()->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
+    auto accessible = GetAccessibleObject();
+    if(DALI_LIKELY(accessible))
+    {
+      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
+    }
   }
 }
 
@@ -1440,7 +1444,7 @@ bool Slider::SliderAccessible::SetCurrent(double current)
   if(current < GetMinimum() || current > GetMaximum())
     return false;
 
-  auto self = Toolkit::Slider::DownCast(Self());
+  auto  self = Toolkit::Slider::DownCast(Self());
   auto& impl = Toolkit::GetImpl(self);
 
   const float prev = self.GetProperty<float>(Toolkit::Slider::Property::VALUE);

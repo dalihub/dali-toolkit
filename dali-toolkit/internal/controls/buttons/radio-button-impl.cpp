@@ -109,14 +109,18 @@ void RadioButton::OnStateChange(State newState)
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
   if((Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor() == Self()) && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
-    GetAccessibleObject()->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+    auto* accessible = GetAccessibleObject();
+    if(DALI_LIKELY(accessible))
+    {
+      accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+    }
   }
 }
 
 Dali::Accessibility::States RadioButton::RadioButtonAccessible::CalculateStates()
 {
   auto state = Button::ButtonAccessible::CalculateStates();
-  auto self = Toolkit::Button::DownCast(Self());
+  auto self  = Toolkit::Button::DownCast(Self());
 
   if(self.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
   {
