@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -563,58 +563,61 @@ const Control::Impl& Control::Impl::Get(const Internal::Control& internalControl
 
 void Control::Impl::CheckHighlightedObjectGeometry()
 {
-  auto accessible     = GetAccessibleObject();
-  auto lastPosition   = accessible->GetLastPosition();
-  auto accessibleRect = accessible->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
-  auto rect           = GetShowingGeometry(accessibleRect, accessible);
-
-  switch(mAccessibilityLastScreenRelativeMoveType)
+  auto accessible = GetAccessibleObject();
+  if(DALI_LIKELY(accessible))
   {
-    case Dali::Accessibility::ScreenRelativeMoveType::OUTSIDE:
-    {
-      if(IsShowingGeometryOnScreen(rect))
-      {
-        mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::INSIDE;
-      }
-      break;
-    }
-    case Dali::Accessibility::ScreenRelativeMoveType::INSIDE:
-    {
-      if(rect.width < 0 && accessibleRect.x != lastPosition.x)
-      {
-        mAccessibilityLastScreenRelativeMoveType = (accessibleRect.x < lastPosition.x) ? Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT : Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT;
-      }
-      if(rect.height < 0 && accessibleRect.y != lastPosition.y)
-      {
-        mAccessibilityLastScreenRelativeMoveType = (accessibleRect.y < lastPosition.y) ? Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT : Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT;
-      }
-      // notify AT-clients on outgoing moves only
-      if(mAccessibilityLastScreenRelativeMoveType != Dali::Accessibility::ScreenRelativeMoveType::INSIDE)
-      {
-        accessible->EmitMovedOutOfScreen(mAccessibilityLastScreenRelativeMoveType);
-      }
-      break;
-    }
-    case Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT:
-    case Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT:
-    {
-      if(IsShowingGeometryOnScreen(rect))
-      {
-        mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::INSIDE;
-      }
-      else
-      {
-        mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::OUTSIDE;
-      }
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
+    auto lastPosition   = accessible->GetLastPosition();
+    auto accessibleRect = accessible->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
+    auto rect           = GetShowingGeometry(accessibleRect, accessible);
 
-  accessible->SetLastPosition(Vector2(accessibleRect.x, accessibleRect.y));
+    switch(mAccessibilityLastScreenRelativeMoveType)
+    {
+      case Dali::Accessibility::ScreenRelativeMoveType::OUTSIDE:
+      {
+        if(IsShowingGeometryOnScreen(rect))
+        {
+          mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::INSIDE;
+        }
+        break;
+      }
+      case Dali::Accessibility::ScreenRelativeMoveType::INSIDE:
+      {
+        if(rect.width < 0 && accessibleRect.x != lastPosition.x)
+        {
+          mAccessibilityLastScreenRelativeMoveType = (accessibleRect.x < lastPosition.x) ? Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT : Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT;
+        }
+        if(rect.height < 0 && accessibleRect.y != lastPosition.y)
+        {
+          mAccessibilityLastScreenRelativeMoveType = (accessibleRect.y < lastPosition.y) ? Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT : Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT;
+        }
+        // notify AT-clients on outgoing moves only
+        if(mAccessibilityLastScreenRelativeMoveType != Dali::Accessibility::ScreenRelativeMoveType::INSIDE)
+        {
+          accessible->EmitMovedOutOfScreen(mAccessibilityLastScreenRelativeMoveType);
+        }
+        break;
+      }
+      case Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT:
+      case Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT:
+      {
+        if(IsShowingGeometryOnScreen(rect))
+        {
+          mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::INSIDE;
+        }
+        else
+        {
+          mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::OUTSIDE;
+        }
+        break;
+      }
+      default:
+      {
+        break;
+      }
+    }
+
+    accessible->SetLastPosition(Vector2(accessibleRect.x, accessibleRect.y));
+  }
 }
 
 void Control::Impl::RegisterAccessibilityPositionPropertyNotification()
@@ -1384,10 +1387,13 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
           controlImpl.mImpl->mAccessibilityHidden = hidden;
 
           auto* accessible = controlImpl.GetAccessibleObject();
-          auto* parent     = dynamic_cast<Dali::Accessibility::ActorAccessible*>(accessible->GetParent());
-          if(parent)
+          if(DALI_LIKELY(accessible))
           {
-            parent->OnChildrenChanged();
+            auto* parent = dynamic_cast<Dali::Accessibility::ActorAccessible*>(accessible->GetParent());
+            if(parent)
+            {
+              parent->OnChildrenChanged();
+            }
           }
         }
         break;
@@ -2125,12 +2131,27 @@ void Control::Impl::OnIdleCallback()
 
 Toolkit::DevelControl::ControlAccessible* Control::Impl::GetAccessibleObject()
 {
-  if(!mAccessibleObject)
+  if(mAccessibleCreatable && !mAccessibleObject)
   {
     mAccessibleObject.reset(mControlImpl.CreateAccessibleObject());
   }
 
   return mAccessibleObject.get();
+}
+
+bool Control::Impl::IsAccessibleCreated() const
+{
+  return !!mAccessibleObject;
+}
+
+void Control::Impl::EnableCreateAccessible(bool enable)
+{
+  mAccessibleCreatable = enable;
+}
+
+bool Control::Impl::IsCreateAccessibleEnabled() const
+{
+  return mAccessibleCreatable;
 }
 
 } // namespace Internal

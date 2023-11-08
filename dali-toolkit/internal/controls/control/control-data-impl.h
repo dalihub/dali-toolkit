@@ -445,6 +445,21 @@ public:
    */
   Toolkit::DevelControl::ControlAccessible* GetAccessibleObject();
 
+  /**
+   * @copydoc Dali::Toolkit::DevelControl::IsAccessibleCreated()
+   */
+  bool IsAccessibleCreated() const;
+
+  /**
+   * @copydoc Dali::Toolkit::DevelControl::EnableCreateAccessible()
+   */
+  void EnableCreateAccessible(bool enable);
+
+  /**
+   * @copydoc Dali::Toolkit::DevelControl::IsCreateAccessibleEnabled()
+   */
+  bool IsCreateAccessibleEnabled() const;
+
 private:
   /**
    * Used as an alternative to boolean so that it is obvious whether a visual is enabled/disabled.
@@ -552,6 +567,7 @@ public:
 
   bool mAccessibilityHighlightable = false;
   bool mAccessibilityHidden        = false;
+  bool mAccessibleCreatable        = true;
 
   Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
 
