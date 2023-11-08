@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,22 +21,22 @@
 
 namespace Dali
 {
-EncodedImageBuffer ConvertFileToEncodedImageBuffer(const char* url)
+EncodedImageBuffer ConvertFileToEncodedImageBuffer(const char* url, EncodedImageBuffer::ImageType imageType)
 {
   EncodedImageBuffer buffer;
-  FILE *fp;
+  FILE*              fp;
   fp = fopen(url, "rb");
   if(fp != NULL)
   {
     fseek(fp, 0, SEEK_END);
-    size_t size = ftell(fp);
+    size_t                size = ftell(fp);
     Dali::Vector<uint8_t> data;
     data.Resize(size);
     fseek(fp, 0, SEEK_SET);
     size_t realSize = fread(data.Begin(), sizeof(uint8_t), size, fp);
     fclose(fp);
     data.Resize(realSize);
-    buffer = EncodedImageBuffer::New(data);
+    buffer = EncodedImageBuffer::New(data, imageType);
   }
   return buffer;
 }

@@ -21,6 +21,8 @@
 // EXTERNAL HEADERS
 #include <dali/devel-api/common/hash.h>
 #include <dali/integration-api/debug.h>
+#include <string_view>
+#include <unordered_map>
 
 // INTERNAL HEADERS
 
@@ -30,6 +32,24 @@ namespace Toolkit
 {
 namespace Internal
 {
+namespace
+{
+const std::string_view& GetEncodedImageBufferExtensions(Dali::EncodedImageBuffer::ImageType imageType)
+{
+  static const std::unordered_map<Dali::EncodedImageBuffer::ImageType, const std::string_view> gEncodedImageBufferExtensionMap =
+    {
+      {Dali::EncodedImageBuffer::ImageType::REGULAR_IMAGE, ""},
+      {Dali::EncodedImageBuffer::ImageType::VECTOR_IMAGE, ".svg"},
+      {Dali::EncodedImageBuffer::ImageType::ANIMATED_VECTOR_IMAGE, ".json"},
+    };
+
+  const auto iter = gEncodedImageBufferExtensionMap.find(imageType);
+
+  DALI_ASSERT_DEBUG(iter != gEncodedImageBufferExtensionMap.end());
+
+  return iter->second;
+}
+} // namespace
 #ifdef DEBUG_ENABLED
 extern Debug::Filter* gTextureManagerLogFilter; ///< Define at texture-manager-impl.cpp
 
@@ -116,7 +136,10 @@ VisualUrl TextureCacheManager::GetVisualUrl(const TextureCacheManager::TextureId
     case TextureCacheIndexType::TEXTURE_CACHE_INDEX_TYPE_BUFFER:
     {
       DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureCacheManager::GetVisualUrl. Using cached buffer index=%d, bufferId=%d\n", cacheIndex.GetIndex(), textureId);
-      visualUrl = VisualUrl::CreateBufferUrl(std::to_string(textureId));
+
+      EncodedImageBufferInfo& cachedEncodedImageBufferInfo(mEncodedImageBuffers[cacheIndex.GetIndex()]);
+      const auto&             encodedImageBuffer = cachedEncodedImageBufferInfo.encodedImageBuffer;
+      visualUrl                                  = VisualUrl::CreateBufferUrl(std::to_string(textureId), GetEncodedImageBufferExtensions(encodedImageBuffer.GetImageType()));
       break;
     }
     default:
@@ -217,7 +240,7 @@ EncodedImageBuffer TextureCacheManager::GetEncodedImageBuffer(const VisualUrl& u
   EncodedImageBuffer encodedImageBuffer; // empty handle
   if(url.IsValid() && VisualUrl::BUFFER == url.GetProtocolType())
   {
-    std::string location = url.GetLocation();
+    std::string location = url.GetLocationWithoutExtension();
     if(location.size() > 0u)
     {
       TextureId bufferId = std::stoi(location);
@@ -252,7 +275,7 @@ std::string TextureCacheManager::AddEncodedImageBuffer(const EncodedImageBuffer&
 
     // If same buffer added, increase reference count and return.
     bufferInfo.referenceCount++;
-    return VisualUrl::CreateBufferUrl(std::to_string(bufferInfo.bufferId));
+    return VisualUrl::CreateBufferUrl(std::to_string(bufferInfo.bufferId), GetEncodedImageBufferExtensions(encodedImageBuffer.GetImageType()));
   }
 
   TextureId bufferId = GenerateTextureId(TextureCacheIndex(TextureCacheIndexType::TEXTURE_CACHE_INDEX_TYPE_BUFFER, mEncodedImageBuffers.size()));
@@ -268,7 +291,7 @@ std::string TextureCacheManager::AddEncodedImageBuffer(const EncodedImageBuffer&
 
   DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureCacheManager::AddExternalEncodedImageBuffer() : New buffer regested. bufferId:%d\n", info.bufferId);
 
-  return VisualUrl::CreateBufferUrl(std::to_string(info.bufferId));
+  return VisualUrl::CreateBufferUrl(std::to_string(info.bufferId), GetEncodedImageBufferExtensions(encodedImageBuffer.GetImageType()));
 }
 
 TextureSet TextureCacheManager::RemoveExternalTexture(const VisualUrl& url)
@@ -321,7 +344,7 @@ EncodedImageBuffer TextureCacheManager::RemoveEncodedImageBuffer(const VisualUrl
     if(VisualUrl::BUFFER == url.GetProtocolType())
     {
       // get the location from the Url
-      std::string location = url.GetLocation();
+      std::string location = url.GetLocationWithoutExtension();
       if(location.size() > 0u)
       {
         TextureId bufferId = std::stoi(location);
@@ -376,7 +399,7 @@ void TextureCacheManager::UseExternalResource(const VisualUrl& url)
   }
   else if(VisualUrl::BUFFER == url.GetProtocolType())
   {
-    std::string location = url.GetLocation();
+    std::string location = url.GetLocationWithoutExtension();
     if(location.size() > 0u)
     {
       TextureId         id         = std::stoi(location);

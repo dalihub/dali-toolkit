@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -418,6 +418,19 @@ int UtcDaliVisualUrlGetLocationP(void)
   END_TEST;
 }
 
+int UtcDaliVisualUrlGetLocationWithoutExtensionP(void)
+{
+  tet_infoline("UtcDaliVisualUrl GetLocationWithoutExtension Positive");
+
+  DALI_TEST_EQUAL("a", VisualUrl("http://a.png").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("1", VisualUrl("dali://1.jpg").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("4", VisualUrl("enbuf://4.svg").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("", VisualUrl("ftp://.png").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("http://a.jpg", VisualUrl("http://http://a.jpg.jpg").GetLocationWithoutExtension());
+
+  END_TEST;
+}
+
 int UtcDaliVisualUrlGetLocationN(void)
 {
   tet_infoline("UtcDaliVisualUrl GetLocation Negative");
@@ -428,6 +441,20 @@ int UtcDaliVisualUrlGetLocationN(void)
   DALI_TEST_EQUAL("dali//1", VisualUrl("dali//1").GetLocation());
   DALI_TEST_EQUAL("enbuf:/2", VisualUrl("enbuf:/2").GetLocation());
   DALI_TEST_EQUAL("", VisualUrl("http:/http://").GetLocation());
+
+  END_TEST;
+}
+
+int UtcDaliVisualUrlGetLocationWithoutExtensionN(void)
+{
+  tet_infoline("UtcDaliVisualUrl GetLocationWithoutExtension Negative");
+
+  DALI_TEST_EQUAL("", VisualUrl("").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("a", VisualUrl("a").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("dali:/1.jpg", VisualUrl("dali:/1.jpg").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("dali//1.jpg", VisualUrl("dali//1.jpg").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("enbuf:/2.png", VisualUrl("enbuf:/2.png").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("a.jpg", VisualUrl("http:/http://a.jpg.jpngif").GetLocationWithoutExtension());
 
   END_TEST;
 }
@@ -447,9 +474,20 @@ int UtcDaliVisualUrlCreateBufferUrl(void)
 {
   tet_infoline("UtcDaliVisualUrl CreateBufferUrl");
 
-  DALI_TEST_EQUAL("enbuf://a", VisualUrl::CreateBufferUrl("a"));
-  DALI_TEST_EQUAL("enbuf://1234", VisualUrl::CreateBufferUrl("1234"));
-  DALI_TEST_EQUAL("enbuf://", VisualUrl::CreateBufferUrl(""));
+  DALI_TEST_EQUAL("enbuf://a", VisualUrl::CreateBufferUrl("a", ""));
+  DALI_TEST_EQUAL("enbuf://1234", VisualUrl::CreateBufferUrl("1234", ""));
+  DALI_TEST_EQUAL("enbuf://", VisualUrl::CreateBufferUrl("", ""));
+
+  END_TEST;
+}
+
+int UtcDaliVisualUrlCreateBufferUrlWithExtension(void)
+{
+  tet_infoline("UtcDaliVisualUrl CreateBufferUrl with extension");
+
+  DALI_TEST_EQUAL("enbuf://a.jpg", VisualUrl::CreateBufferUrl("a", ".jpg"));
+  DALI_TEST_EQUAL("enbuf://1234567", VisualUrl::CreateBufferUrl("1234", "567"));
+  DALI_TEST_EQUAL("enbuf://b", VisualUrl::CreateBufferUrl("", "b"));
 
   END_TEST;
 }

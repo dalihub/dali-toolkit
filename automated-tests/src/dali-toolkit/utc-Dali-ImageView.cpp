@@ -879,6 +879,86 @@ int UtcDaliImageViewSyncLoadingEncodedBuffer(void)
   END_TEST;
 }
 
+int UtcDaliImageViewEncodedBufferWithSvg(void)
+{
+  ToolkitTestApplication     application;
+  TestGlAbstraction&         gl          = application.GetGlAbstraction();
+  const std::vector<GLuint>& textures    = gl.GetBoundTextures();
+  size_t                     numTextures = textures.size();
+
+  // Get encoded raw-buffer svg image and generate url
+  EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(TEST_SVG_FILE_NAME, EncodedImageBuffer::ImageType::VECTOR_IMAGE);
+  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+
+  // Async loading, no atlasing for big size image
+  ImageView imageView = ImageView::New(url.GetUrl());
+
+  // By default, Aysnc loading is used
+  application.GetScene().Add(imageView);
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Load svg image + rasterize.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+  application.SendNotification();
+
+  const std::vector<GLuint>& textures2 = gl.GetBoundTextures();
+  DALI_TEST_GREATER(textures2.size(), numTextures, TEST_LOCATION);
+
+  // Remove visual, for line coverage.
+  imageView.Unparent();
+  application.SendNotification();
+  application.Render(16);
+
+  END_TEST;
+}
+
+int UtcDaliImageViewEncodedBufferWithAnimatedVectorImage(void)
+{
+  ToolkitTestApplication     application;
+  TestGlAbstraction&         gl          = application.GetGlAbstraction();
+  const std::vector<GLuint>& textures    = gl.GetBoundTextures();
+  size_t                     numTextures = textures.size();
+
+  // Get encoded raw-buffer lottie image and generate url
+  EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, EncodedImageBuffer::ImageType::ANIMATED_VECTOR_IMAGE);
+  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+
+  // Async loading, no atlasing for big size image
+  ImageView imageView = ImageView::New(url.GetUrl());
+
+  // By default, Aysnc loading is used
+  application.GetScene().Add(imageView);
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Load lottie image is sync. Only wait rasterize.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+  application.SendNotification();
+
+  const std::vector<GLuint>& textures2 = gl.GetBoundTextures();
+  DALI_TEST_GREATER(textures2.size(), numTextures, TEST_LOCATION);
+
+  // Remove visual, for line coverage.
+  imageView.Unparent();
+  application.SendNotification();
+  application.Render(16);
+
+  END_TEST;
+}
+
 int UtcDaliImageViewAddedTexture(void)
 {
   ToolkitTestApplication application;
@@ -2784,6 +2864,34 @@ int UtcDaliImageViewLoadRemoteSVG(void)
     application.Render();
 
     DALI_TEST_EQUALS(imageView.GetRendererCount(), 1u, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliImageViewLoadRemoteLottie(void)
+{
+  tet_infoline("Test load from a remote server. (Note we don't support real download now. Just for line coverage)");
+
+  ToolkitTestApplication application;
+
+  {
+    Toolkit::ImageView imageView;
+    imageView = Toolkit::ImageView::New();
+    imageView.SetImage("https://lottie.json");
+    imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+    imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    imageView.SetProperty(Actor::Property::SIZE, Vector2(300, 300));
+    imageView.SetProperty(Actor::Property::POSITION, Vector3(150.0f, 150.0f, 0.0f));
+
+    application.GetScene().Add(imageView);
+
+    DALI_TEST_CHECK(imageView);
+
+    application.SendNotification();
+    application.Render();
+
+    // Do not check anything for here.
   }
 
   END_TEST;
