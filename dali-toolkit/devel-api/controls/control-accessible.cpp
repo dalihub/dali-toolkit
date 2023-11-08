@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,33 +69,6 @@ static Dali::Actor CreateHighlightIndicatorActor()
 ControlAccessible::ControlAccessible(Dali::Actor self)
 : ActorAccessible(self)
 {
-  auto control = Toolkit::Control::DownCast(self);
-
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
-
-  self.PropertySetSignal().Connect(&controlImpl, [this, &controlImpl](Dali::Handle& handle, Dali::Property::Index index, Dali::Property::Value value) {
-    if(this->Self() != Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
-    {
-      return;
-    }
-
-    if(index == DevelControl::Property::ACCESSIBILITY_NAME || (index == GetNamePropertyIndex() && controlImpl.mAccessibilityName.empty()))
-    {
-      if(controlImpl.mAccessibilityGetNameSignal.Empty())
-      {
-        Emit(Dali::Accessibility::ObjectPropertyChangeEvent::NAME);
-      }
-    }
-
-    if(index == DevelControl::Property::ACCESSIBILITY_DESCRIPTION || (index == GetDescriptionPropertyIndex() && controlImpl.mAccessibilityDescription.empty()))
-    {
-      if(controlImpl.mAccessibilityGetDescriptionSignal.Empty())
-      {
-        Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
-      }
-    }
-  });
 }
 
 std::string ControlAccessible::GetName() const
@@ -314,6 +287,22 @@ void ControlAccessible::UnregisterPositionPropertyNotification()
   controlImpl.UnregisterAccessibilityPositionPropertyNotification();
 }
 
+void ControlAccessible::RegisterPropertySetSignal()
+{
+  auto                     control         = Dali::Toolkit::Control::DownCast(Self());
+  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
+  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  controlImpl.RegisterAccessibilityPropertySetSignal();
+}
+
+void ControlAccessible::UnregisterPropertySetSignal()
+{
+  auto                     control         = Dali::Toolkit::Control::DownCast(Self());
+  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
+  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  controlImpl.UnregisterAccessibilityPropertySetSignal();
+}
+
 bool ControlAccessible::GrabHighlight()
 {
   Dali::Actor self                = Self();
@@ -363,6 +352,7 @@ bool ControlAccessible::GrabHighlight()
   SetCurrentlyHighlightedActor(self);
   EmitHighlighted(true);
   RegisterPositionPropertyNotification();
+  RegisterPropertySetSignal();
 
   return true;
 }
@@ -378,6 +368,7 @@ bool ControlAccessible::ClearHighlight()
 
   if(GetCurrentlyHighlightedActor() == self)
   {
+    UnregisterPropertySetSignal();
     UnregisterPositionPropertyNotification();
     self.Remove(mCurrentHighlightActor.GetHandle());
     mCurrentHighlightActor = {};

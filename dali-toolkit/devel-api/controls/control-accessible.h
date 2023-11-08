@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_ACCESSIBLE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
+#include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/actor-accessible.h>
 #include <dali/devel-api/atspi-interfaces/action.h>
 #include <dali/public-api/object/weak-handle.h>
@@ -28,8 +28,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali::Toolkit::DevelControl {
-
+namespace Dali::Toolkit::DevelControl
+{
 /**
  * @brief Represents the Accessible object for Dali::Toolkit::Control and derived classes
  *
@@ -62,6 +62,18 @@ protected:
    * @brief Remove property notification added by RegisterPropertyNotification
    */
   void UnregisterPositionPropertyNotification();
+
+  /**
+   * @brief Registers PropertySet signal to notify when ACCESSIBILITY_NAME or ACCESSIBILITY_DESCRIPTION is changed.
+   * Note that those two signals only need for highlighted control. So, let us ensure to connect PropertySet signal
+   * only if control has been grabbed.
+   */
+  void RegisterPropertySetSignal();
+
+  /**
+   * @brief Unregisters PropertySet signal to notify when ACCESSIBILITY_NAME or ACCESSIBILITY_DESCRIPTION is changed.
+   */
+  void UnregisterPropertySetSignal();
 
   /**
    * @brief Check if the actor is showing

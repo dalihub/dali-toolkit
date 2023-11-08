@@ -696,6 +696,47 @@ void Control::Impl::UnregisterAccessibilityPositionPropertyNotification()
   mIsAccessibilityPositionPropertyNotificationSet = false;
 }
 
+void Control::Impl::RegisterAccessibilityPropertySetSignal()
+{
+  if(mIsAccessibilityPropertySetSignalRegistered)
+  {
+    return;
+  }
+  mControlImpl.Self().PropertySetSignal().Connect(this, &Control::Impl::OnAccessibilityPropertySet);
+  mIsAccessibilityPropertySetSignalRegistered = true;
+}
+
+void Control::Impl::UnregisterAccessibilityPropertySetSignal()
+{
+  if(!mIsAccessibilityPropertySetSignalRegistered)
+  {
+    return;
+  }
+  mControlImpl.Self().PropertySetSignal().Disconnect(this, &Control::Impl::OnAccessibilityPropertySet);
+  mIsAccessibilityPropertySetSignalRegistered = false;
+}
+
+void Control::Impl::OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value)
+{
+  auto* accessible = GetAccessibleObject();
+
+  if(mAccessibilityGetNameSignal.Empty())
+  {
+    if(index == DevelControl::Property::ACCESSIBILITY_NAME || (mAccessibilityName.empty() && index == accessible->GetNamePropertyIndex()))
+    {
+      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::NAME);
+    }
+  }
+
+  if(mAccessibilityGetDescriptionSignal.Empty())
+  {
+    if(index == DevelControl::Property::ACCESSIBILITY_DESCRIPTION || (mAccessibilityDescription.empty() && index == accessible->GetDescriptionPropertyIndex()))
+    {
+      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
+    }
+  }
+}
+
 // Gesture Detection Methods
 void Control::Impl::PinchDetected(Actor actor, const PinchGesture& pinch)
 {
