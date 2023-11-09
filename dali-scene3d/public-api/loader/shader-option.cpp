@@ -19,6 +19,9 @@
 #include <dali-scene3d/public-api/loader/shader-option.h>
 
 // EXTERNAL INCLUDES
+#include <algorithm>
+#include <ostream>
+#include <sstream>
 #include <string>
 
 namespace Dali::Scene3D::Loader
@@ -48,7 +51,40 @@ static constexpr std::string_view OPTION_KEYWORD[] =
     "MORPH_VERSION_2_0",
 };
 static constexpr uint32_t NUMBER_OF_OPTIONS = sizeof(OPTION_KEYWORD) / sizeof(OPTION_KEYWORD[0]);
+static const char*        ADD_EXTRA_SKINNING_ATTRIBUTES{"ADD_EXTRA_SKINNING_ATTRIBUTES"};
+static const char*        ADD_EXTRA_WEIGHTS{"ADD_EXTRA_WEIGHTS"};
+
+inline void HashString(std::uint64_t& hash, const char* string)
+{
+  char c;
+  while((c = *string++))
+  {
+    hash = hash * 33 + c;
+  }
+}
 } // namespace
+
+ShaderOption::ShaderOption(const ShaderOption& rhs)
+{
+  mOptionHash = rhs.mOptionHash;
+  for(auto& macroDef : rhs.mMacros)
+  {
+    mMacros.emplace_back(macroDef);
+  }
+}
+
+ShaderOption& ShaderOption::operator=(const ShaderOption& rhs)
+{
+  if(this != &rhs)
+  {
+    mOptionHash = rhs.mOptionHash;
+    for(auto& macroDef : rhs.mMacros)
+    {
+      mMacros.emplace_back(macroDef);
+    }
+  }
+  return *this;
+}
 
 void ShaderOption::SetTransparency()
 {
@@ -60,9 +96,61 @@ void ShaderOption::AddOption(Type shaderOptionType)
   mOptionHash |= (1 << static_cast<uint32_t>(shaderOptionType));
 }
 
+void ShaderOption::AddJointMacros(size_t numberOfJointSets)
+{
+  // Add options for ADD_EXTRA_SKINNING_ATTRIBUTES and ADD_EXTRA_WEIGHTS:
+  if(numberOfJointSets > 1)
+  {
+    std::ostringstream attributes;
+    std::ostringstream weights;
+    for(size_t i = 1; i < numberOfJointSets; ++i)
+    {
+      attributes << "in vec4 aJoints" << i << ";\n";
+      attributes << "in vec4 aWeights" << i << ";\n";
+
+      weights << "bone +=\n"
+              << "uBone[int(aJoints" << i << ".x)] * aWeights" << i << ".x +\n"
+              << "uBone[int(aJoints" << i << ".y)] * aWeights" << i << ".y +\n"
+              << "uBone[int(aJoints" << i << ".z)] * aWeights" << i << ".z +\n"
+              << "uBone[int(aJoints" << i << ".w)] * aWeights" << i << ".w;\n";
+    }
+    AddMacroDefinition(ADD_EXTRA_SKINNING_ATTRIBUTES, attributes.str());
+    AddMacroDefinition(ADD_EXTRA_WEIGHTS, weights.str());
+  }
+}
+
+void ShaderOption::AddMacroDefinition(std::string macro, std::string definition)
+{
+  auto iter = std::find_if(mMacros.begin(), mMacros.end(), [macro](ShaderOption::MacroDefinition& md) { return md.macro == macro; });
+  if(iter != mMacros.end())
+  {
+    iter->definition = definition;
+  }
+  else
+  {
+    mMacros.emplace_back(MacroDefinition{macro, definition});
+  }
+}
+
+const std::vector<ShaderOption::MacroDefinition>& ShaderOption::GetMacroDefinitions() const
+{
+  return mMacros;
+}
+
 uint64_t ShaderOption::GetOptionHash() const
 {
-  return mOptionHash;
+  uint64_t optionHash = mOptionHash;
+  if(!mMacros.empty())
+  {
+    uint64_t hash = 5381;
+    for(auto& macroDef : mMacros)
+    {
+      HashString(hash, macroDef.macro.c_str());
+      HashString(hash, macroDef.definition.c_str());
+    }
+    optionHash |= (hash << 32 & 0xFFFFFFFF00000000);
+  }
+  return optionHash;
 }
 
 void ShaderOption::GetDefines(std::vector<std::string>& defines) const

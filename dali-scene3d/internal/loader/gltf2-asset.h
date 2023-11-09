@@ -180,15 +180,57 @@ struct Attribute
     POSITION,
     NORMAL,
     TANGENT,
-    TEXCOORD_0,
-    TEXCOORD_1,
-    COLOR_0,
-    JOINTS_0,
-    WEIGHTS_0,
+    TEXCOORD_N,
+    COLOR_N,
+    JOINTS_N,
+    WEIGHTS_N,
     INVALID
   };
 
-  static Type FromString(const char* s, size_t len);
+  using HashType = uint32_t;
+
+  // Hash bit layout
+  // +--+--+--+--+--+--+--+
+  // |31|30|29|28|27|..| 0| bit index
+  // +--+--+--+--+--+--+--+
+  //  \_/ - Set is used
+  //     \______/ - Type enum
+  //              \_______/ - Set ID
+  static const HashType SET_SHIFT{31};
+  static const HashType TYPE_SHIFT{28};
+  static const HashType SET_MASK{0x01u << SET_SHIFT};
+  static const HashType TYPE_MASK{0x07 << TYPE_SHIFT};
+  static const HashType SET_ID_MASK{0x0fffffff};
+
+  static HashType ToHash(Type type, bool set, HashType setIndex)
+  {
+    return ((set << SET_SHIFT) & SET_MASK) | ((static_cast<HashType>(type) << TYPE_SHIFT) & TYPE_MASK) | (setIndex & SET_ID_MASK);
+  }
+
+  static Attribute::Type TypeFromHash(HashType hash)
+  {
+    return static_cast<Type>((hash & TYPE_MASK) >> TYPE_SHIFT);
+  }
+
+  static bool SetFromHash(HashType hash)
+  {
+    return (hash & SET_SHIFT) != 0;
+  }
+
+  static HashType SetIdFromHash(HashType hash)
+  {
+    return (hash & SET_ID_MASK);
+  }
+
+  /**
+   * Convert to Type + setIndex, where setIndex is N for that attr, e.g. "JOINTS_1" => {JOINTS_N, 1}
+   */
+  static HashType HashFromString(const char* s, size_t len);
+
+  /**
+   * Convert to type only, there is no set for POSITION, NORMALS or TANGENT.
+   */
+  static Attribute::Type TargetFromString(const char* s, size_t len);
 
   Attribute() = delete;
 };
@@ -416,7 +458,7 @@ struct Mesh : Named
       INVALID
     };
 
-    std::map<Attribute::Type, Ref<Accessor>>              mAttributes;
+    std::map<Attribute::HashType, Ref<Accessor>>          mAttributes;
     std::vector<std::map<Attribute::Type, Ref<Accessor>>> mTargets;
     Ref<Accessor>                                         mIndices;
     Ref<Material>                                         mMaterial;

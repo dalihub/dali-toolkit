@@ -31,6 +31,13 @@
 
 #include <dali/integration-api/debug.h>
 
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_MODEL_SHADER_MANAGER");
+#endif
+} // namespace
+
 namespace Dali::Scene3D::Loader
 {
 namespace
@@ -109,6 +116,7 @@ ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinit
   if(meshDef.IsSkinned())
   {
     option.AddOption(ShaderOption::Type::SKINNING);
+    option.AddJointMacros(meshDef.mJoints.size());
   }
 
   if(MaskMatch(meshDef.mFlags, MeshDefinition::FLIP_UVS_VERTICAL))
@@ -116,7 +124,7 @@ ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinit
     option.AddOption(ShaderOption::Type::FLIP_UVS_VERTICAL);
   }
 
-  if(meshDef.mColors.IsDefined())
+  if(!meshDef.mColors.empty() && meshDef.mColors[0].IsDefined())
   {
     option.AddOption(ShaderOption::Type::COLOR_ATTRIBUTE);
   }
@@ -176,10 +184,10 @@ ShaderManager::ShaderManager()
 
 ShaderManager::~ShaderManager() = default;
 
-Dali::Shader ShaderManager::ProduceShader(const MaterialDefinition& materialDefinition, const MeshDefinition& meshDefinition)
+ShaderOption ShaderManager::ProduceShaderOption(const MaterialDefinition& materialDefinition, const MeshDefinition& meshDefinition)
 {
-  ShaderOption option = MakeOption(materialDefinition, meshDefinition);
-  return ProduceShader(option);
+  DALI_LOG_INFO(gLogFilter, Debug::Concise, "Defining shader from mat/mesh definitions\n");
+  return MakeOption(materialDefinition, meshDefinition);
 }
 
 Dali::Shader ShaderManager::ProduceShader(const ShaderOption& shaderOption)
@@ -188,17 +196,39 @@ Dali::Shader ShaderManager::ProduceShader(const ShaderOption& shaderOption)
 
   auto&    shaderMap = mImpl->mShaderMap;
   uint64_t hash      = shaderOption.GetOptionHash();
-  auto     iFind     = shaderMap.find(hash);
+
+#if defined(DEBUG_ENABLED)
+  std::ostringstream oss;
+  oss << "  ShaderOption defines:";
+  std::vector<std::string> defines;
+  shaderOption.GetDefines(defines);
+  for(auto& def : defines)
+  {
+    oss << def << ", ";
+  }
+  oss << std::endl
+      << "  ShaderOption macro definitions:" << std::endl;
+  for(auto& macro : shaderOption.GetMacroDefinitions())
+  {
+    oss << macro.macro << " : " << macro.definition << std::endl;
+  }
+  DALI_LOG_INFO(gLogFilter, Debug::Concise, "ShaderOption:\n%s\n", oss.str().c_str());
+#endif
+
+  auto iFind = shaderMap.find(hash);
   if(iFind != shaderMap.end())
   {
+    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Defining Shader found: hash: %lx", hash);
     result = mImpl->mShaders[iFind->second];
   }
   else
   {
+    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Creating new shader: hash: %lx\n", hash);
     ShaderDefinition shaderDef;
     shaderDef.mUseBuiltInShader = true;
 
     shaderOption.GetDefines(shaderDef.mDefines);
+    shaderDef.mMacros                  = shaderOption.GetMacroDefinitions();
     shaderDef.mUniforms["uCubeMatrix"] = Matrix::IDENTITY;
 
     shaderMap[hash] = mImpl->mShaders.size();
@@ -396,14 +426,12 @@ void ShaderManager::SetShadowConstraintToShader(Dali::Shader shader)
   std::string       shadowViewProjectionPropertyName(Scene3D::Internal::Light::GetShadowViewProjectionMatrixUniformName());
   auto              shadowViewProjectionPropertyIndex = shader.RegisterProperty(shadowViewProjectionPropertyName, Matrix::IDENTITY);
   Dali::CameraActor shadowLightCamera                 = Dali::Scene3D::Internal::GetImplementation(mImpl->mShadowLight).GetCamera();
-  auto tempViewProjectionMatrixIndex = shadowLightCamera.GetPropertyIndex("tempViewProjectionMatrix");
+  auto              tempViewProjectionMatrixIndex     = shadowLightCamera.GetPropertyIndex("tempViewProjectionMatrix");
   if(tempViewProjectionMatrixIndex != Dali::Property::INVALID_INDEX)
   {
     tempViewProjectionMatrixIndex = shadowLightCamera.RegisterProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
   }
-  Dali::Constraint shadowViewProjectionConstraint = Dali::Constraint::New<Matrix>(shader, shadowViewProjectionPropertyIndex, [](Matrix& output, const PropertyInputContainer& inputs)
-                                                                                  {
-                                                                                    output = inputs[0]->GetMatrix(); });
+  Dali::Constraint shadowViewProjectionConstraint = Dali::Constraint::New<Matrix>(shader, shadowViewProjectionPropertyIndex, [](Matrix& output, const PropertyInputContainer& inputs) { output = inputs[0]->GetMatrix(); });
   shadowViewProjectionConstraint.AddSource(Source{shadowLightCamera, tempViewProjectionMatrixIndex});
   shadowViewProjectionConstraint.ApplyPost();
   shadowViewProjectionConstraint.SetTag(INDEX_FOR_SHADOW_CONSTRAINT_TAG);

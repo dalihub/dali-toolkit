@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/renderer-state.h>
+#include <dali-scene3d/public-api/loader/shader-option.h>
 
 namespace Dali::Scene3D::Loader
 {
@@ -44,17 +45,12 @@ struct DALI_SCENE3D_API ShaderDefinition
     std::string mShadowFragmentShaderSource;
   };
 
-  /*
-   * @brief Apply the defines values to shader.
-   */
-  static void ApplyDefine(std::string& shaderCode, const std::string& definevar);
-
   ShaderDefinition() = default;
 
   ShaderDefinition(const ShaderDefinition& other);
   ShaderDefinition& operator=(const ShaderDefinition& other);
 
-  ShaderDefinition(ShaderDefinition&&)            = default;
+  ShaderDefinition(ShaderDefinition&&) = default;
   ShaderDefinition& operator=(ShaderDefinition&&) = default;
 
   /*
@@ -76,12 +72,13 @@ public: // DATA
   std::shared_ptr<RawData> mRawData;
   RendererState::Type      mRendererState = RendererState::NONE;
 
-  std::string              mVertexShaderPath;
-  std::string              mFragmentShaderPath;
-  std::vector<std::string> mDefines;
-  std::vector<std::string> mHints;
-  Property::Map            mUniforms;
-  bool                     mUseBuiltInShader{false};
+  std::string                                mVertexShaderPath;
+  std::string                                mFragmentShaderPath;
+  std::vector<std::string>                   mDefines;
+  std::vector<ShaderOption::MacroDefinition> mMacros;
+  std::vector<std::string>                   mHints;
+  Property::Map                              mUniforms;
+  bool                                       mUseBuiltInShader{false};
 };
 
 } // namespace Dali::Scene3D::Loader

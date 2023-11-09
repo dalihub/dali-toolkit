@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include "dali-scene3d/internal/loader/gltf2-asset.h"
 #include <dali-test-suite-utils.h>
 #include <string>
+#include "dali-scene3d/internal/loader/gltf2-asset.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
@@ -52,8 +52,12 @@ int UtcDaliGltf2AssetComponentSize(void)
 }
 
 #define FROM_STRING_HELPER(x) FromString(#x, strlen(#x))
+#define TARGET_FROM_STRING_HELPER(x) TargetFromString(#x, strlen(#x))
+#define HASH_FROM_STRING_HELPER(x) HashFromString(#x, strlen(#x))
 
-#define STRING_CHECK(type, x) DALI_TEST_EQUAL(gltf2::type:: FROM_STRING_HELPER(x), gltf2::type::x)
+#define STRING_CHECK(type, x) DALI_TEST_EQUAL(gltf2::type::FROM_STRING_HELPER(x), gltf2::type::x)
+#define TARGET_STRING_CHECK(type, x) DALI_TEST_EQUAL(gltf2::type::TARGET_FROM_STRING_HELPER(x), gltf2::type::x)
+#define HASH_STRING_CHECK(type, x, y, z) DALI_TEST_EQUAL(gltf2::type::HASH_FROM_STRING_HELPER(x), gltf2::type::ToHash(gltf2::type::y, true, z))
 
 int UtcDaliGltf2AssetAccessorType(void)
 {
@@ -81,15 +85,20 @@ int UtcDaliGltf2AssetAlphaMode(void)
 
 int UtcDaliGltf2AssetAttribute(void)
 {
-  STRING_CHECK(Attribute, POSITION);
-  STRING_CHECK(Attribute, NORMAL);
-  STRING_CHECK(Attribute, TANGENT);
-  STRING_CHECK(Attribute, TEXCOORD_0);
-  STRING_CHECK(Attribute, TEXCOORD_1);
-  STRING_CHECK(Attribute, COLOR_0);
-  STRING_CHECK(Attribute, JOINTS_0);
-  STRING_CHECK(Attribute, WEIGHTS_0);
-  DALI_TEST_EQUAL(gltf2::Attribute::FROM_STRING_HELPER(VISCOSITY), gltf2::Attribute::INVALID);
+  TARGET_STRING_CHECK(Attribute, POSITION);
+  TARGET_STRING_CHECK(Attribute, NORMAL);
+  TARGET_STRING_CHECK(Attribute, TANGENT);
+  HASH_STRING_CHECK(Attribute, TEXCOORD_0, TEXCOORD_N, 0);
+  HASH_STRING_CHECK(Attribute, TEXCOORD_1, TEXCOORD_N, 1);
+  HASH_STRING_CHECK(Attribute, COLOR_0, COLOR_N, 0);
+  HASH_STRING_CHECK(Attribute, COLOR_1, COLOR_N, 1);
+  HASH_STRING_CHECK(Attribute, JOINTS_0, JOINTS_N, 0);
+  HASH_STRING_CHECK(Attribute, JOINTS_1, JOINTS_N, 1);
+  HASH_STRING_CHECK(Attribute, JOINTS_2, JOINTS_N, 2);
+  HASH_STRING_CHECK(Attribute, WEIGHTS_0, WEIGHTS_N, 0);
+  HASH_STRING_CHECK(Attribute, WEIGHTS_1, WEIGHTS_N, 1);
+  HASH_STRING_CHECK(Attribute, WEIGHTS_2, WEIGHTS_N, 2);
+  DALI_TEST_EQUAL(gltf2::Attribute::TARGET_FROM_STRING_HELPER(VISCOSITY), gltf2::Attribute::INVALID);
 
   END_TEST;
 }
@@ -122,11 +131,11 @@ int UtcDaliGltf2AssetAccessorSparse(void)
 
   std::vector<gltf2::BufferView> bufferViews;
 
-  gltf2::Accessor::Sparse sparse{ 256u };
-  sparse.mIndices.mBufferView = gltf2::Ref<gltf2::BufferView>(bufferViews, 5u);
+  gltf2::Accessor::Sparse sparse{256u};
+  sparse.mIndices.mBufferView    = gltf2::Ref<gltf2::BufferView>(bufferViews, 5u);
   sparse.mIndices.mComponentType = gltf2::Component::FLOAT;
-  sparse.mValues.mBufferView = gltf2::Ref<gltf2::BufferView>(bufferViews, 284u);
-  sparse.mValues.mByteOffset = 16532;
+  sparse.mValues.mBufferView     = gltf2::Ref<gltf2::BufferView>(bufferViews, 284u);
+  sparse.mValues.mByteOffset     = 16532;
   acc.SetSparse(sparse);
 
   DALI_TEST_EQUAL(acc.mSparse->mCount, sparse.mCount);
@@ -138,4 +147,3 @@ int UtcDaliGltf2AssetAccessorSparse(void)
 
   END_TEST;
 }
-

@@ -20,10 +20,20 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/property-array.h>
+#include <regex>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/public-api/loader/utils.h>
+
+#include <dali/integration-api/debug.h>
+
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_MODEL_SHADER_DEFINITION");
+#endif
+} // namespace
 
 namespace Dali::Scene3D::Loader
 {
@@ -44,7 +54,7 @@ ShaderDefinition::ShaderDefinition(const ShaderDefinition& other)
 {
 }
 
-void ShaderDefinition::ApplyDefine(std::string& shaderCode, const std::string& definevar)
+void ApplyDefine(std::string& shaderCode, const std::string& definevar)
 {
   const std::string IF_1 = "#if 1";
 
@@ -76,6 +86,26 @@ void ShaderDefinition::ApplyDefine(std::string& shaderCode, const std::string& d
       found += definevar.length();
     }
     found = shaderCode.find(definevar, found);
+  }
+}
+
+void RedefineMacro(std::string& shaderCode, const std::string& macro, const std::string& value)
+{
+  std::string definition = "#define " + macro;
+  std::size_t found      = shaderCode.find(definition);
+  if(found != std::string::npos)
+  {
+    std::size_t insertionPoint = found + definition.length();
+
+    // Automatically insert line-continuation character into value
+    std::regex                 re("\n");
+    std::sregex_token_iterator first{value.begin(), value.end(), re, -1}, last;
+    for(auto i = first; i != last; ++i)
+    {
+      std::string line = std::string(" \\\n") + (*i).str();
+      shaderCode.insert(insertionPoint, line);
+      insertionPoint += line.length();
+    }
   }
 }
 
@@ -117,6 +147,12 @@ ShaderDefinition::LoadRaw(const std::string& shadersPath) const
       ApplyDefine(raw.mFragmentShaderSource, definevar);
       ApplyDefine(raw.mShadowVertexShaderSource, definevar);
     }
+    for(const auto& macroDef : mMacros)
+    {
+      RedefineMacro(raw.mVertexShaderSource, macroDef.macro, macroDef.definition);
+      RedefineMacro(raw.mFragmentShaderSource, macroDef.macro, macroDef.definition);
+      RedefineMacro(raw.mShadowVertexShaderSource, macroDef.macro, macroDef.definition);
+    }
   }
 
   return raw;
@@ -151,6 +187,7 @@ Shader ShaderDefinition::Load(RawData&& raw) const
   array.PushBack(map[0]);
   array.PushBack(map[1]);
 
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Vert Shader src: \n%s\n", raw.mVertexShaderSource.c_str());
   Shader shader = Shader::New(array);
   for(Property::Map::SizeType i0 = 0, i1 = mUniforms.Count(); i0 != i1; ++i0)
   {

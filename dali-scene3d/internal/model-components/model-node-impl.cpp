@@ -173,7 +173,7 @@ uint32_t ModelNode::GetModelPrimitiveCount() const
   return static_cast<uint32_t>(mModelPrimitiveContainer.size());
 }
 
-void ModelNode::AddModelPrimitive(Dali::Scene3D::ModelPrimitive modelPrimitive)
+void ModelNode::AddModelPrimitive(Dali::Scene3D::ModelPrimitive modelPrimitive, Loader::ShaderOption::HashType hash)
 {
   for(auto&& primitive : mModelPrimitiveContainer)
   {
@@ -197,7 +197,7 @@ void ModelNode::AddModelPrimitive(Dali::Scene3D::ModelPrimitive modelPrimitive)
     GetImplementation(modelPrimitive).SetImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor, mSpecularMipmapLevels);
   }
 
-  GetImplementation(modelPrimitive).UpdateShader(mShaderManager);
+  GetImplementation(modelPrimitive).UpdateShader(mShaderManager, hash);
 
   Dali::Renderer renderer = GetImplementation(modelPrimitive).GetRenderer();
   if(renderer)
@@ -241,7 +241,7 @@ void ModelNode::RemoveModelPrimitive(uint32_t index)
     return;
   }
 
-  GetImplementation(mModelPrimitiveContainer[index]).UpdateShader(nullptr);
+  GetImplementation(mModelPrimitiveContainer[index]).UpdateShader(nullptr, 0u);
 
   Actor self = Self();
   GetImplementation(mModelPrimitiveContainer[index]).RemovePrimitiveObserver(this);
@@ -326,7 +326,7 @@ void ModelNode::UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager)
     mShaderManager = shaderManager;
     for(auto&& primitive : mModelPrimitiveContainer)
     {
-      GetImplementation(primitive).UpdateShader(mShaderManager);
+      GetImplementation(primitive).UpdateShader(mShaderManager, 0u);
     }
   }
 }

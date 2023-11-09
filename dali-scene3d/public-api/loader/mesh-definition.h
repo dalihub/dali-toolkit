@@ -45,6 +45,11 @@ struct DALI_SCENE3D_API MeshDefinition
     INVALID = std::numeric_limits<uint32_t>::max()
   };
 
+  enum : uint32_t
+  {
+    MAX_NUMBER_OF_JOINT_SETS = 4
+  };
+
   enum Flags : uint32_t
   {
     FLIP_UVS_VERTICAL = NthBit(0),
@@ -198,10 +203,13 @@ struct DALI_SCENE3D_API MeshDefinition
 
     Accessor(const MeshDefinition::Blob&       blob,
              const MeshDefinition::SparseBlob& sparse,
-             Index                             bufferIndex = INVALID_INDEX);
+             Index                             bufferIndex = INVALID_INDEX,
+             bool                              normalized = false);
+
     Accessor(MeshDefinition::Blob&&       blob,
              MeshDefinition::SparseBlob&& sparse,
-             Index                        bufferIndex = INVALID_INDEX);
+             Index                        bufferIndex = INVALID_INDEX,
+             bool                         normalized = false);
 
     bool IsDefined() const
     {
@@ -261,6 +269,18 @@ struct DALI_SCENE3D_API MeshDefinition
   bool IsSkinned() const;
 
   /**
+   * @brief Determines if the mesh has any vertex colors
+   */
+  bool HasVertexColor() const;
+
+  /**
+   * @brief Returns the number of joint sets defined by the mesh
+   *
+   * @note Clamped to 4 to minimise GPU attrs.
+   */
+  uint32_t GetNumberOfJointSets() const;
+
+  /**
    * @brief Whether the mesh has blend shapes.
    */
   bool HasBlendShapes() const;
@@ -311,12 +331,12 @@ public: // DATA
   std::string              mUri; // When the mesh data is loaded from embedded resources, this URI is used as a data stream.
   Accessor                 mIndices;
   Accessor                 mPositions;
-  Accessor                 mNormals; // data can be generated based on positions
-  Accessor                 mTexCoords;
-  Accessor                 mColors;
+  Accessor                 mNormals;  // data can be generated based on positions
   Accessor                 mTangents; // data can be generated based on normals and texCoords (the latter isn't mandatory; the results will be better if available)
-  Accessor                 mJoints0;
-  Accessor                 mWeights0;
+  std::vector<Accessor>    mTexCoords;
+  std::vector<Accessor>    mColors;
+  std::vector<Accessor>    mJoints;
+  std::vector<Accessor>    mWeights;
   Property::Type           mTangentType{Property::VECTOR3};
 
   Blob                    mBlendShapeHeader;

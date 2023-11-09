@@ -667,8 +667,7 @@ void DliLoaderImpl::Impl::ParseShaders(const TreeNode* shaders, Dali::Scene3D::L
     auto&            node = (*i0).second;
     ShaderDefinition shaderDef;
     ReadStringVector(node.GetChild("defines"), shaderDef.mDefines);
-    auto sssIter = std::find_if(shaderDef.mDefines.begin(), shaderDef.mDefines.end(), [](std::string& item)
-                                { return (item == "SSS"); });
+    auto sssIter = std::find_if(shaderDef.mDefines.begin(), shaderDef.mDefines.end(), [](std::string& item) { return (item == "SSS"); });
     if(sssIter != shaderDef.mDefines.end())
     {
       shaderDef.mDefines.erase(sssIter);
@@ -843,10 +842,13 @@ void DliLoaderImpl::Impl::ParseMeshes(const TreeNode* meshes, Dali::Scene3D::Loa
         mOnError(FormatString("mesh %d: Failed to read %s.", resources.mMeshes.size(), "normals"));
       }
 
-      if(MaskMatch(attributes, MeshDefinition::TEX_COORDS) &&
-         !ReadAttribAccessor(node.GetChild("textures"), meshDef.mTexCoords))
+      if(MaskMatch(attributes, MeshDefinition::TEX_COORDS))
       {
-        mOnError(FormatString("mesh %d: Failed to read %s.", resources.mMeshes.size(), "textures"));
+        meshDef.mTexCoords.emplace_back(MeshDefinition::Accessor{});
+        if(!ReadAttribAccessor(node.GetChild("textures"), meshDef.mTexCoords[0]))
+        {
+          mOnError(FormatString("mesh %d: Failed to read %s.", resources.mMeshes.size(), "textures"));
+        }
       }
 
       if(MaskMatch(attributes, MeshDefinition::TANGENTS) &&
@@ -864,11 +866,16 @@ void DliLoaderImpl::Impl::ParseMeshes(const TreeNode* meshes, Dali::Scene3D::Loa
           mOnError(FormatString("mesh %d: Expected joints0 / weights0 attribute(s) missing.",
                                 resources.mMeshes.size()));
         }
-        else if(!ReadAttribAccessor(node.GetChild("joints0"), meshDef.mJoints0) ||
-                !ReadAttribAccessor(node.GetChild("weights0"), meshDef.mWeights0))
+        else
         {
-          mOnError(FormatString("mesh %d: Failed to read skinning information.",
-                                resources.mMeshes.size()));
+          meshDef.mJoints.emplace_back(MeshDefinition::Accessor{});
+          meshDef.mWeights.emplace_back(MeshDefinition::Accessor{});
+          if(!ReadAttribAccessor(node.GetChild("joints0"), meshDef.mJoints[0]) ||
+             !ReadAttribAccessor(node.GetChild("weights0"), meshDef.mWeights[0]))
+          {
+            mOnError(FormatString("mesh %d: Failed to read skinning information.",
+                                  resources.mMeshes.size()));
+          }
         }
       }
 
@@ -1033,17 +1040,17 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
       materialDef.mFlags |= semantic;
     }
 
-/// @TODO : Some dli shader don't implement this subsurfaceMp usage.
-///         To make visual test pass, Skip subsurfaceMap texture using
-///         until dli shaders are support it.
-//    if(ReadString(node.GetChild("subsurfaceMap"), texturePath))
-//    {
-//      ToUnixFileSeparators(texturePath);
-//
-//      const auto semantic = MaterialDefinition::SUBSURFACE;
-//      materialDef.mTextureStages.push_back({semantic, TextureDefinition{std::move(texturePath)}});
-//      materialDef.mFlags |= semantic;
-//    }
+    /// @TODO : Some dli shader don't implement this subsurfaceMp usage.
+    ///         To make visual test pass, Skip subsurfaceMap texture using
+    ///         until dli shaders are support it.
+    //    if(ReadString(node.GetChild("subsurfaceMap"), texturePath))
+    //    {
+    //      ToUnixFileSeparators(texturePath);
+    //
+    //      const auto semantic = MaterialDefinition::SUBSURFACE;
+    //      materialDef.mTextureStages.push_back({semantic, TextureDefinition{std::move(texturePath)}});
+    //      materialDef.mFlags |= semantic;
+    //    }
 
     if(ReadString(node.GetChild("occlusionMap"), texturePath))
     {
@@ -1447,10 +1454,10 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
       iAnim != iAnimEnd;
       ++iAnim)
   {
-    const TreeNode&     tnAnim = (*iAnim).second;
-    uint32_t animationPropertyIndex = 0;
+    const TreeNode&     tnAnim                 = (*iAnim).second;
+    uint32_t            animationPropertyIndex = 0;
     AnimationDefinition animDef;
-    std::string animationName;
+    std::string         animationName;
     ReadString(tnAnim.GetChild(NAME), animationName);
     animDef.SetName(animationName);
 
