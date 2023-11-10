@@ -63,6 +63,8 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mConditionalWait(),
   mResourceReadySignal(),
   mLoadCompletedCallback(MakeCallback(this, &VectorAnimationTask::OnLoadCompleted)),
+  mCachedLayerInfo(),
+  mCachedMarkerInfo(),
   mPlayState(PlayState::STOPPED),
   mStopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
   mLoopingMode(DevelImageVisual::LoopingMode::RESTART),
@@ -87,7 +89,9 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mLoadRequest(false),
   mLoadFailed(false),
   mRasterized(false),
-  mKeepAnimation(false)
+  mKeepAnimation(false),
+  mLayerInfoCached(false),
+  mMarkerInfoCached(false)
 {
   mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
 }
@@ -484,12 +488,38 @@ void VectorAnimationTask::SetLoopingMode(DevelImageVisual::LoopingMode::Type loo
 
 void VectorAnimationTask::GetLayerInfo(Property::Map& map) const
 {
-  mVectorRenderer.GetLayerInfo(map);
+  // Fast-out if file is loading, or load failed.
+  if(mLoadFailed || IsLoadRequested())
+  {
+    return;
+  }
+
+  if(DALI_UNLIKELY(!mLayerInfoCached))
+  {
+    // Update only 1 time.
+    mLayerInfoCached = true;
+    mVectorRenderer.GetLayerInfo(mCachedLayerInfo);
+  }
+
+  map = mCachedLayerInfo;
 }
 
 void VectorAnimationTask::GetMarkerInfo(Property::Map& map) const
 {
-  mVectorRenderer.GetMarkerInfo(map);
+  // Fast-out if file is loading, or load failed.
+  if(mLoadFailed || IsLoadRequested())
+  {
+    return;
+  }
+
+  if(DALI_UNLIKELY(!mMarkerInfoCached))
+  {
+    // Update only 1 time.
+    mMarkerInfoCached = true;
+    mVectorRenderer.GetMarkerInfo(mCachedMarkerInfo);
+  }
+
+  map = mCachedMarkerInfo;
 }
 
 VectorAnimationTask::ResourceReadySignalType& VectorAnimationTask::ResourceReadySignal()

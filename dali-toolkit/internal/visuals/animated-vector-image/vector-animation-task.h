@@ -373,6 +373,8 @@ private:
   ResourceReadySignalType              mResourceReadySignal;
   std::unique_ptr<CallbackBase>        mAnimationFinishedCallback{};
   std::unique_ptr<CallbackBase>        mLoadCompletedCallback{};
+  mutable Property::Map                mCachedLayerInfo;
+  mutable Property::Map                mCachedMarkerInfo;
   PlayState                            mPlayState;
   DevelImageVisual::StopBehavior::Type mStopBehavior;
   DevelImageVisual::LoopingMode::Type  mLoopingMode;
@@ -389,15 +391,17 @@ private:
   uint32_t                             mAnimationDataIndex;
   int32_t                              mLoopCount;
   int32_t                              mCurrentLoop;
-  bool                                 mForward;
-  bool                                 mUpdateFrameNumber;
-  bool                                 mNeedAnimationFinishedTrigger;
-  bool                                 mAnimationDataUpdated;
-  bool                                 mDestroyTask;
-  bool                                 mLoadRequest;
-  bool                                 mLoadFailed;
-  bool                                 mRasterized;
-  bool                                 mKeepAnimation;
+  bool                                 mForward : 1;
+  bool                                 mUpdateFrameNumber : 1;
+  bool                                 mNeedAnimationFinishedTrigger : 1;
+  bool                                 mAnimationDataUpdated : 1;
+  bool                                 mDestroyTask : 1;
+  bool                                 mLoadRequest : 1;
+  bool                                 mLoadFailed : 1;
+  bool                                 mRasterized : 1;
+  bool                                 mKeepAnimation : 1;
+  mutable bool                         mLayerInfoCached : 1;
+  mutable bool                         mMarkerInfoCached : 1;
 };
 
 } // namespace Internal
