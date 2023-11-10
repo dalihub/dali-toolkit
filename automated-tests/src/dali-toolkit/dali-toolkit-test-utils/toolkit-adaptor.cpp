@@ -28,6 +28,7 @@
 #include <dali/integration-api/scene.h>
 #include <test-application.h>
 #include <toolkit-adaptor-impl.h>
+#include <toolkit-async-task-manager.h>
 #include <toolkit-scene-holder-impl.h>
 #include <toolkit-test-application.h>
 
@@ -65,6 +66,10 @@ Adaptor::Adaptor()
 Adaptor::~Adaptor()
 {
   gAdaptor = nullptr;
+
+  // Ensure all threads and not-excuted tasks are destroyed.
+  // TODO : we'd better make some singletone service for toolkit UTC in future.
+  Test::AsyncTaskManager::DestroyAsyncTaskManager();
 }
 
 void Adaptor::Start(Dali::Window window)

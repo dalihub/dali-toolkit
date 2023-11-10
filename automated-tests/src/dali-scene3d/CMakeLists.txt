@@ -50,6 +50,7 @@ SET(TEST_HARNESS_DIR "../dali-toolkit/dali-toolkit-test-utils")
 SET(TEST_HARNESS_SOURCES
   ${TEST_HARNESS_DIR}/toolkit-adaptor.cpp
   ${TEST_HARNESS_DIR}/toolkit-application.cpp
+  ${TEST_HARNESS_DIR}/toolkit-async-task-manager.cpp
   ${TEST_HARNESS_DIR}/toolkit-event-thread-callback.cpp
   ${TEST_HARNESS_DIR}/toolkit-environment-variable.cpp
   ${TEST_HARNESS_DIR}/toolkit-input-method-context.cpp
