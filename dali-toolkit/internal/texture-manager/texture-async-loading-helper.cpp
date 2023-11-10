@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "texture-async-loading-helper.h"
+#include <dali-toolkit/internal/texture-manager/texture-async-loading-helper.h>
 
 // EXTERNAL HEADERS
 #include <dali/integration-api/debug.h>
@@ -41,27 +41,27 @@ TextureAsyncLoadingHelper::TextureAsyncLoadingHelper(TextureManager& textureMana
 {
 }
 
-void TextureAsyncLoadingHelper::LoadAnimatedImage(const TextureManager::TextureId&                textureId,
-                                                  Dali::AnimatedImageLoading                      animatedImageLoading,
-                                                  const std::uint32_t&                            frameIndex,
-                                                  const Dali::ImageDimensions&                    desiredSize,
-                                                  const Dali::FittingMode::Type&                  fittingMode,
-                                                  const Dali::SamplingMode::Type&                 samplingMode,
-                                                  const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad)
+void TextureAsyncLoadingHelper::LoadAnimatedImage(const TextureManager::TextureId                textureId,
+                                                  Dali::AnimatedImageLoading                     animatedImageLoading,
+                                                  const uint32_t                                 frameIndex,
+                                                  const Dali::ImageDimensions&                   desiredSize,
+                                                  const Dali::FittingMode::Type                  fittingMode,
+                                                  const Dali::SamplingMode::Type                 samplingMode,
+                                                  const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
   LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, fittingMode, samplingMode, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   loadingTask->SetTextureId(textureId);
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
 }
 
-void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId&                textureId,
-                                     const VisualUrl&                                url,
-                                     const Dali::ImageDimensions&                    desiredSize,
-                                     const Dali::FittingMode::Type&                  fittingMode,
-                                     const Dali::SamplingMode::Type&                 samplingMode,
-                                     const bool&                                     orientationCorrection,
-                                     const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad,
-                                     const bool&                                     loadYuvPlanes)
+void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId                textureId,
+                                     const VisualUrl&                               url,
+                                     const Dali::ImageDimensions&                   desiredSize,
+                                     const Dali::FittingMode::Type                  fittingMode,
+                                     const Dali::SamplingMode::Type                 samplingMode,
+                                     const bool                                     orientationCorrection,
+                                     const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+                                     const bool                                     loadYuvPlanes)
 {
   LoadingTaskPtr loadingTask;
   if(DALI_UNLIKELY(url.IsBufferResource()))
@@ -77,12 +77,12 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId&           
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
 }
 
-void TextureAsyncLoadingHelper::ApplyMask(const TextureManager::TextureId&                textureId,
-                                          Devel::PixelBuffer                              pixelBuffer,
-                                          Devel::PixelBuffer                              maskPixelBuffer,
-                                          const float&                                    contentScale,
-                                          const bool&                                     cropToMask,
-                                          const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad)
+void TextureAsyncLoadingHelper::ApplyMask(const TextureManager::TextureId                textureId,
+                                          Devel::PixelBuffer                             pixelBuffer,
+                                          Devel::PixelBuffer                             maskPixelBuffer,
+                                          const float                                    contentScale,
+                                          const bool                                     cropToMask,
+                                          const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
   LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   loadingTask->SetTextureId(textureId);

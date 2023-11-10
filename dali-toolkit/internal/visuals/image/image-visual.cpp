@@ -1044,11 +1044,6 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
   Toolkit::Visual::ResourceStatus resourceStatus;
   if(mImpl->mRenderer)
   {
-    if(textureInformation.useAtlasing)
-    {
-      mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, mAtlasRect);
-    }
-
     EnablePreMultipliedAlpha(textureInformation.preMultiplied);
 
     Actor actor = mPlacementActor.GetHandle();
@@ -1059,12 +1054,9 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
     }
     else
     {
-      if(!textureInformation.useAtlasing)
-      {
-        Sampler sampler = Sampler::New();
-        sampler.SetWrapMode(mWrapModeU, mWrapModeV);
-        textureInformation.textureSet.SetSampler(0u, sampler);
-      }
+      Sampler sampler = Sampler::New();
+      sampler.SetWrapMode(mWrapModeU, mWrapModeV);
+      textureInformation.textureSet.SetSampler(0u, sampler);
 
       mImpl->mRenderer.SetTextures(textureInformation.textureSet);
       ComputeTextureSize();

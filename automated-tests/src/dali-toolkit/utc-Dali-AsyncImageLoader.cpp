@@ -98,7 +98,7 @@ void dali_async_image_loader_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-int UtcDaliImageAtlasNew01(void)
+int UtcDaliAsyncImageLoaderNew01(void)
 {
   ToolkitTestApplication application;
 

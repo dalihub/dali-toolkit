@@ -94,7 +94,7 @@ std::size_t GenerateHash(const ImageInformation& info)
     *hashTargetPtr++ = info.mDimensions.GetHeight() & 0xff;
     *hashTargetPtr++ = (info.mDimensions.GetHeight() >> 8u) & 0xff;
 
-    // Bit-pack the FittingMode, SamplingMode and atlasing.
+    // Bit-pack the FittingMode, SamplingMode and orientation correction.
     // FittingMode=2bits, SamplingMode=3bits, orientationCorrection=1bit
     *hashTargetPtr = (info.mFittingMode << 4u) | (info.mSamplingMode << 1) | (info.mOrientationCorrection ? 1 : 0);
   }

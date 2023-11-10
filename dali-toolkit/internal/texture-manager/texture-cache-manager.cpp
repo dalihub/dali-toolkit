@@ -77,7 +77,7 @@ void TextureCacheManager::RemoveTextureInfoByIndex<TextureCacheManager::EncodedI
   if(static_cast<std::size_t>(removeContainerIndex.GetIndex() + 1) < cacheContainer.size())
   {
     // First, change the cache index infomations inside of converter
-    mTextureIdConverter[cacheContainer.back().bufferId] = static_cast<std::uint32_t>(removeContainerIndex);
+    mTextureIdConverter[cacheContainer.back().bufferId] = static_cast<uint32_t>(removeContainerIndex);
 
     // After change converter, swap the value between current data and last data.
     std::swap(cacheContainer[removeContainerIndex.GetIndex()], cacheContainer.back());
@@ -94,7 +94,7 @@ void TextureCacheManager::RemoveTextureInfoByIndex(ContainerType& cacheContainer
   if(static_cast<std::size_t>(removeContainerIndex.GetIndex() + 1) < cacheContainer.size())
   {
     // First, change the cache index infomations inside of converter
-    mTextureIdConverter[cacheContainer.back().textureId] = static_cast<std::uint32_t>(removeContainerIndex);
+    mTextureIdConverter[cacheContainer.back().textureId] = static_cast<uint32_t>(removeContainerIndex);
 
     // After change converter, swap the value between current data and last data.
     std::swap(cacheContainer[removeContainerIndex.GetIndex()], cacheContainer.back());
@@ -112,10 +112,10 @@ TextureCacheManager::~TextureCacheManager()
 {
 }
 
-VisualUrl TextureCacheManager::GetVisualUrl(const TextureCacheManager::TextureId& textureId)
+VisualUrl TextureCacheManager::GetVisualUrl(const TextureCacheManager::TextureId textureId)
 {
   VisualUrl         visualUrl("");
-  TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<std::uint32_t>(textureId)]);
+  TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<uint32_t>(textureId)]);
 
   switch(static_cast<TextureCacheIndexType>(cacheIndex.detailValue.type))
   {
@@ -151,10 +151,10 @@ VisualUrl TextureCacheManager::GetVisualUrl(const TextureCacheManager::TextureId
   return visualUrl;
 }
 
-TextureCacheManager::LoadState TextureCacheManager::GetTextureState(const TextureCacheManager::TextureId& textureId)
+TextureCacheManager::LoadState TextureCacheManager::GetTextureState(const TextureCacheManager::TextureId textureId)
 {
   LoadState         loadState  = TextureCacheManager::LoadState::NOT_STARTED;
-  TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<std::uint32_t>(textureId)]);
+  TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<uint32_t>(textureId)]);
 
   switch(static_cast<TextureCacheIndexType>(cacheIndex.detailValue.type))
   {
@@ -178,7 +178,7 @@ TextureCacheManager::LoadState TextureCacheManager::GetTextureState(const Textur
   return loadState;
 }
 
-TextureCacheManager::LoadState TextureCacheManager::GetTextureStateInternal(const TextureCacheManager::TextureId& textureId)
+TextureCacheManager::LoadState TextureCacheManager::GetTextureStateInternal(const TextureCacheManager::TextureId textureId)
 {
   LoadState         loadState  = TextureCacheManager::LoadState::NOT_STARTED;
   TextureCacheIndex cacheIndex = GetCacheIndexFromId(textureId);
@@ -191,7 +191,7 @@ TextureCacheManager::LoadState TextureCacheManager::GetTextureStateInternal(cons
   return loadState;
 }
 
-Texture TextureCacheManager::GetTexture(const TextureCacheManager::TextureId& textureId, uint32_t textureIndex)
+Texture TextureCacheManager::GetTexture(const TextureCacheManager::TextureId textureId, const uint32_t textureIndex)
 {
   Texture           texture; // empty handle
   TextureCacheIndex cacheIndex = GetCacheIndexFromId(textureId);
@@ -216,7 +216,7 @@ Texture TextureCacheManager::GetTexture(const TextureCacheManager::TextureId& te
   return texture;
 }
 
-TextureCacheManager::ExternalTextureInfo& TextureCacheManager::GetExternalTextureInfo(const TextureCacheManager::TextureId& textureId)
+TextureCacheManager::ExternalTextureInfo& TextureCacheManager::GetExternalTextureInfo(const TextureCacheManager::TextureId textureId)
 {
   TextureCacheIndex cacheIndex = GetCacheIndexFromExternalTextureId(textureId);
   DALI_ASSERT_ALWAYS(cacheIndex != INVALID_CACHE_INDEX);
@@ -224,7 +224,7 @@ TextureCacheManager::ExternalTextureInfo& TextureCacheManager::GetExternalTextur
   return mExternalTextures[cacheIndex.GetIndex()];
 }
 
-EncodedImageBuffer TextureCacheManager::GetEncodedImageBuffer(const TextureCacheManager::TextureId& bufferId)
+EncodedImageBuffer TextureCacheManager::GetEncodedImageBuffer(const TextureCacheManager::TextureId bufferId)
 {
   EncodedImageBuffer encodedImageBuffer; // empty handle
   TextureCacheIndex  cacheIndex = GetCacheIndexFromEncodedImageBufferId(bufferId);
@@ -250,7 +250,7 @@ EncodedImageBuffer TextureCacheManager::GetEncodedImageBuffer(const VisualUrl& u
   return encodedImageBuffer;
 }
 
-std::string TextureCacheManager::AddExternalTexture(const TextureSet& textureSet, bool preMultiplied)
+std::string TextureCacheManager::AddExternalTexture(const TextureSet& textureSet, const bool preMultiplied)
 {
   TextureId textureId = GenerateTextureId(TextureCacheIndex(TextureCacheIndexType::TEXTURE_CACHE_INDEX_TYPE_TEXTURE, mExternalTextures.size()));
 
@@ -418,14 +418,14 @@ void TextureCacheManager::UseExternalResource(const VisualUrl& url)
 
 TextureCacheManager::TextureId TextureCacheManager::GenerateTextureId(const TextureCacheIndex& textureCacheIndex)
 {
-  return mTextureIdConverter.Add(static_cast<std::uint32_t>(textureCacheIndex.indexValue));
+  return mTextureIdConverter.Add(static_cast<uint32_t>(textureCacheIndex.indexValue));
 }
 
-TextureCacheManager::TextureCacheIndex TextureCacheManager::GetCacheIndexFromId(const TextureCacheManager::TextureId& textureId)
+TextureCacheManager::TextureCacheIndex TextureCacheManager::GetCacheIndexFromId(const TextureCacheManager::TextureId textureId)
 {
   if(textureId == INVALID_TEXTURE_ID) return INVALID_CACHE_INDEX;
 
-  TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<std::uint32_t>(textureId)]);
+  TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<uint32_t>(textureId)]);
   if(DALI_UNLIKELY(cacheIndex.detailValue.type != TextureCacheIndexType::TEXTURE_CACHE_INDEX_TYPE_LOCAL))
   {
     return INVALID_CACHE_INDEX;
@@ -436,11 +436,11 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::GetCacheIndexFromId(
   return cacheIndex;
 }
 
-TextureCacheManager::TextureCacheIndex TextureCacheManager::GetCacheIndexFromExternalTextureId(const TextureCacheManager::TextureId& textureId)
+TextureCacheManager::TextureCacheIndex TextureCacheManager::GetCacheIndexFromExternalTextureId(const TextureCacheManager::TextureId textureId)
 {
   if(textureId == INVALID_TEXTURE_ID) return INVALID_CACHE_INDEX;
 
-  TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<std::uint32_t>(textureId)]);
+  TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<uint32_t>(textureId)]);
   if(DALI_UNLIKELY(cacheIndex.detailValue.type != TextureCacheIndexType::TEXTURE_CACHE_INDEX_TYPE_TEXTURE))
   {
     return INVALID_CACHE_INDEX;
@@ -451,11 +451,11 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::GetCacheIndexFromExt
   return cacheIndex;
 }
 
-TextureCacheManager::TextureCacheIndex TextureCacheManager::GetCacheIndexFromEncodedImageBufferId(const TextureCacheManager::TextureId& bufferId)
+TextureCacheManager::TextureCacheIndex TextureCacheManager::GetCacheIndexFromEncodedImageBufferId(const TextureCacheManager::TextureId bufferId)
 {
   if(bufferId == INVALID_TEXTURE_ID) return INVALID_CACHE_INDEX;
 
-  TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<std::uint32_t>(bufferId)]);
+  TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<uint32_t>(bufferId)]);
   if(DALI_UNLIKELY(cacheIndex.detailValue.type != TextureCacheIndexType::TEXTURE_CACHE_INDEX_TYPE_BUFFER))
   {
     return INVALID_CACHE_INDEX;
@@ -466,7 +466,7 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::GetCacheIndexFromEnc
   return cacheIndex;
 }
 
-TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedEncodedImageBuffer(const TextureCacheManager::TextureHash& hash, const EncodedImageBuffer& encodedImageBuffer)
+TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedEncodedImageBuffer(const TextureCacheManager::TextureHash hash, const EncodedImageBuffer& encodedImageBuffer)
 {
   // Iterate through our hashes to find a match.
   const auto& hashIterator = mTextureHashContainer.find(hash);
@@ -494,14 +494,13 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedEncodedIma
 }
 
 TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
-  const VisualUrl&                      url,
-  const Dali::ImageDimensions&          size,
-  const Dali::FittingMode::Type&        fittingMode,
-  const Dali::SamplingMode::Type&       samplingMode,
-  const TextureCacheManager::UseAtlas&  useAtlas,
-  const TextureCacheManager::TextureId& maskTextureId,
-  const bool&                           cropToMask,
-  const std::uint32_t&                  frameIndex)
+  const VisualUrl&                     url,
+  const Dali::ImageDimensions&         size,
+  const Dali::FittingMode::Type        fittingMode,
+  const Dali::SamplingMode::Type       samplingMode,
+  const TextureCacheManager::TextureId maskTextureId,
+  const bool                           cropToMask,
+  const uint32_t                       frameIndex)
 {
   std::vector<std::uint8_t> hashTarget;
   const uint16_t            width  = size.GetWidth();
@@ -520,29 +519,9 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
     *hashTargetPtr++ = size.GetHeight() & 0xff;
     *hashTargetPtr++ = (size.GetHeight() >> 8u) & 0xff;
 
-    // Bit-pack the FittingMode, SamplingMode and atlasing.
-    // FittingMode=2bits, SamplingMode=3bits, useAtlas=1bit
-    *hashTargetPtr = (fittingMode << 4u) | (samplingMode << 1) | (useAtlas == UseAtlas::USE_ATLAS ? 1 : 0);
-  }
-  else
-  {
-    // We are not including sizing information, but we still need an extra byte for atlasing.
-    hashTarget.resize(1u);
-
-    // Add the atlasing to the hash input.
-    switch(useAtlas)
-    {
-      case UseAtlas::NO_ATLAS:
-      {
-        hashTarget[0u] = 'f';
-        break;
-      }
-      case UseAtlas::USE_ATLAS:
-      {
-        hashTarget[0u] = 't';
-        break;
-      }
-    }
+    // Bit-pack the FittingMode, SamplingMode.
+    // FittingMode=2bits, SamplingMode=3bits
+    *hashTargetPtr = (fittingMode << 3u) | (samplingMode);
   }
 
   if(maskTextureId != INVALID_TEXTURE_ID)
@@ -566,12 +545,13 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
   if(frameIndex > 0u)
   {
     auto textureIdIndex = hashTarget.size();
-    hashTarget.resize(hashTarget.size() + sizeof(std::uint32_t));
+    hashTarget.resize(hashTarget.size() + sizeof(uint32_t));
     std::uint8_t* hashTargetPtr = reinterpret_cast<std::uint8_t*>(&(hashTarget[textureIdIndex]));
 
     // Append the frame index to the end of the URL byte by byte:
-    std::uint32_t saltedFrameIndex = frameIndex;
-    for(size_t byteIter = 0; byteIter < sizeof(std::uint8_t); ++byteIter)
+    // (to avoid SIGBUS / alignment issues)
+    uint32_t saltedFrameIndex = frameIndex;
+    for(size_t byteIter = 0; byteIter < sizeof(uint32_t); ++byteIter)
     {
       *hashTargetPtr++ = saltedFrameIndex & 0xff;
       saltedFrameIndex >>= 8u;
@@ -582,18 +562,17 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
 }
 
 TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
-  const TextureCacheManager::TextureHash&    hash,
-  const VisualUrl&                           url,
-  const Dali::ImageDimensions&               size,
-  const Dali::FittingMode::Type&             fittingMode,
-  const Dali::SamplingMode::Type&            samplingMode,
-  const TextureCacheManager::UseAtlas&       useAtlas,
-  const StorageType&                         storageType,
-  const TextureCacheManager::TextureId&      maskTextureId,
-  const bool&                                cropToMask,
-  const TextureCacheManager::MultiplyOnLoad& preMultiplyOnLoad,
-  const bool&                                isAnimatedImage,
-  const std::uint32_t&                       frameIndex)
+  const TextureCacheManager::TextureHash    hash,
+  const VisualUrl&                          url,
+  const Dali::ImageDimensions&              size,
+  const Dali::FittingMode::Type             fittingMode,
+  const Dali::SamplingMode::Type            samplingMode,
+  const TextureCacheManager::StorageType    storageType,
+  const TextureCacheManager::TextureId      maskTextureId,
+  const bool                                cropToMask,
+  const TextureCacheManager::MultiplyOnLoad preMultiplyOnLoad,
+  const bool                                isAnimatedImage,
+  const uint32_t                            frameIndex)
 {
   // Iterate through our hashes to find a match.
   const auto& hashIterator = mTextureHashContainer.find(hash);
@@ -608,7 +587,6 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
         TextureInfo& textureInfo(mTextureInfoContainer[cacheIndex.GetIndex()]);
 
         if((url.GetUrl() == textureInfo.url.GetUrl()) &&
-           (useAtlas == textureInfo.useAtlas) &&
            (maskTextureId == textureInfo.maskTextureId) &&
            (cropToMask == textureInfo.cropToMask) &&
            (size == textureInfo.desiredSize) &&
@@ -677,13 +655,9 @@ void TextureCacheManager::RemoveCache(TextureCacheManager::TextureInfo& textureI
     // This is the last remove for this Texture.
     textureInfo.referenceCount = 0;
 
-    // If loaded, we can remove the TextureInfo and the Atlas (if atlased).
+    // If loaded, we can remove the TextureInfo
     if(textureInfo.loadState == LoadState::UPLOADED)
     {
-      if(textureInfo.atlas)
-      {
-        textureInfo.atlas.Remove(textureInfo.atlasRect);
-      }
       removeTextureInfo = true;
     }
     else if(textureInfo.loadState == LoadState::LOADING)
@@ -730,7 +704,7 @@ void TextureCacheManager::RemoveCache(TextureCacheManager::TextureInfo& textureI
   }
 }
 
-void TextureCacheManager::RemoveHashId(const TextureCacheManager::TextureHash& textureHash, const TextureCacheManager::TextureId& textureId)
+void TextureCacheManager::RemoveHashId(const TextureCacheManager::TextureHash textureHash, const TextureCacheManager::TextureId textureId)
 {
   auto hashIterator = mTextureHashContainer.find(textureHash);
   if(hashIterator != mTextureHashContainer.end())

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXTURE_UPLOAD_OBSERVER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,18 +51,16 @@ public:
 
   struct TextureInformation
   {
-    TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied);
-    TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, const std::string& url, bool preMultiplied);
-    TextureInformation(ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, bool preMultiplied);
-    TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, uint32_t frameCount, uint32_t interval);
+    TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const bool preMultiplied);
+    TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const std::string& url, const bool preMultiplied);
+    TextureInformation(const ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, const bool preMultiplied);
+    TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const uint32_t frameCount, const uint32_t interval);
 
     TextureInformation();
 
     ReturnType         returnType;    ///< Returned Texture type.
     int32_t            textureId;     ///< The textureId of the loaded texture in the TextureManager
     TextureSet         textureSet;    ///< The TextureSet containing the Texture
-    bool               useAtlasing;   ///< True if atlasing was used (note: this may be different to what was requested)
-    const Vector4&     atlasRect;     ///< If using atlasing, this is the rectangle within the atlas to use.
     bool               preMultiplied; ///< True if the image had pre-multiplied alpha applied
     Devel::PixelBuffer pixelBuffer;   ///< The PixelBuffer of the loaded image.
     std::string_view   url;           ///< The url address of the loaded image.

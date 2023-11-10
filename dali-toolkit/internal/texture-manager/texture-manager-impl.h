@@ -46,7 +46,7 @@ class TextureAsyncLoadingHelper;
 /**
  * The TextureManager provides a common Image loading API for Visuals.
  *
- * The TextureManager is responsible for providing sync, async, atlased and non-atlased
+ * The TextureManager is responsible for providing sync, async,
  * CPU time alpha masking, animated image loads.
  *
  * Texture caching is provided and performed by TextureCacheManager.
@@ -63,9 +63,7 @@ public:
   static constexpr TextureId         INVALID_TEXTURE_ID  = TextureManagerType::INVALID_TEXTURE_ID;
   static constexpr TextureCacheIndex INVALID_CACHE_INDEX = TextureManagerType::INVALID_CACHE_INDEX;
 
-  using UseAtlas       = TextureManagerType::UseAtlas;
   using StorageType    = TextureManagerType::StorageType;
-  using LoadType       = TextureManagerType::LoadType;
   using LoadState      = TextureManagerType::LoadState;
   using ReloadPolicy   = TextureManagerType::ReloadPolicy;
   using MultiplyOnLoad = TextureManagerType::MultiplyOnLoad;
@@ -135,13 +133,13 @@ public:
    */
   TextureSet LoadAnimatedImageTexture(const VisualUrl&                url,
                                       Dali::AnimatedImageLoading      animatedImageLoading,
-                                      const uint32_t&                 frameIndex,
+                                      const uint32_t                  frameIndex,
                                       TextureManager::TextureId&      textureId,
                                       MaskingDataPointer&             maskInfo,
                                       const Dali::ImageDimensions&    desiredSize,
-                                      const Dali::FittingMode::Type&  fittingMode,
-                                      const Dali::SamplingMode::Type& samplingMode,
-                                      const bool&                     synchronousLoading,
+                                      const Dali::FittingMode::Type   fittingMode,
+                                      const Dali::SamplingMode::Type  samplingMode,
+                                      const bool                      synchronousLoading,
                                       TextureUploadObserver*          textureObserver,
                                       TextureManager::MultiplyOnLoad& preMultiplyOnLoad);
 
@@ -167,11 +165,11 @@ public:
   Devel::PixelBuffer LoadPixelBuffer(
     const VisualUrl&                url,
     const Dali::ImageDimensions&    desiredSize,
-    const Dali::FittingMode::Type&  fittingMode,
-    const Dali::SamplingMode::Type& samplingMode,
-    const bool&                     synchronousLoading,
+    const Dali::FittingMode::Type   fittingMode,
+    const Dali::SamplingMode::Type  samplingMode,
+    const bool                      synchronousLoading,
     TextureUploadObserver*          textureObserver,
-    const bool&                     orientationCorrection,
+    const bool                      orientationCorrection,
     TextureManager::MultiplyOnLoad& preMultiplyOnLoad);
 
   /**
@@ -194,7 +192,7 @@ public:
    *                                  this is the rectangle in normalized coordinates.
    * @param[out] textureRectSize      The rectangle within the texture atlas that this URL occupies,
    *                                  this is the same rectangle in pixels.
-   * @param[in,out] atlasingStatus    Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still
+   * @param[in,out] atlasingStatus    Set to true to attempt atlasing. If atlasing fails, the image will still
    *                                  be loaded, and marked successful, but this will be set to false.
    *                                  If atlasing succeeds, this will be set to true.
    * @param[out] loadingStatus        The loading status of the texture
@@ -211,23 +209,23 @@ public:
    * @return                          The texture set containing the image, or empty if still loading.
    */
   TextureSet LoadTexture(
-    const VisualUrl&                    url,
-    const Dali::ImageDimensions&        desiredSize,
-    const Dali::FittingMode::Type&      fittingMode,
-    const Dali::SamplingMode::Type&     samplingMode,
-    MaskingDataPointer&                 maskInfo,
-    const bool&                         synchronousLoading,
-    TextureManager::TextureId&          textureId,
-    Dali::Vector4&                      textureRect,
-    Dali::ImageDimensions&              textureRectSize,
-    bool&                               atlasingStatus,
-    bool&                               loadingStatus,
-    TextureUploadObserver*              textureObserver,
-    AtlasUploadObserver*                atlasObserver,
-    ImageAtlasManagerPtr                imageAtlasManager,
-    const bool&                         orientationCorrection,
-    const TextureManager::ReloadPolicy& reloadPolicy,
-    TextureManager::MultiplyOnLoad&     preMultiplyOnLoad);
+    const VisualUrl&                   url,
+    const Dali::ImageDimensions&       desiredSize,
+    const Dali::FittingMode::Type      fittingMode,
+    const Dali::SamplingMode::Type     samplingMode,
+    MaskingDataPointer&                maskInfo,
+    const bool                         synchronousLoading,
+    TextureManager::TextureId&         textureId,
+    Dali::Vector4&                     textureRect,
+    Dali::ImageDimensions&             textureRectSize,
+    bool&                              atlasingStatus,
+    bool&                              loadingStatus,
+    TextureUploadObserver*             textureObserver,
+    AtlasUploadObserver*               atlasObserver,
+    ImageAtlasManagerPtr               imageAtlasManager,
+    const bool                         orientationCorrection,
+    const TextureManager::ReloadPolicy reloadPolicy,
+    TextureManager::MultiplyOnLoad&    preMultiplyOnLoad);
 
   /**
    * Add an observer to the object.
@@ -249,14 +247,14 @@ public:
    * @param[out] backElements number of back elements
    * @return Returns valid geometry object
    */
-  Geometry GetRenderGeometry(const TextureManager::TextureId& textureId, std::uint32_t& frontElements, std::uint32_t& backElements);
+  Geometry GetRenderGeometry(const TextureManager::TextureId textureId, uint32_t& frontElements, uint32_t& backElements);
 
   /**
    * @brief Returns the textureSet in texture manager.
    * @param[in] textureId Id of the texture
    * @return The textureSet in texture manager. These textures include YUV textures or images and masks.
    */
-  TextureSet GetTextureSet(const TextureManager::TextureId& textureId);
+  TextureSet GetTextureSet(const TextureManager::TextureId textureId);
 
   /**
    * @brief Returns the textureSet in texture manager.
@@ -271,7 +269,7 @@ public:
   /**
    * @copydoc TextureCacheManager::GetVisualUrl
    */
-  inline VisualUrl GetVisualUrl(const TextureManager::TextureId& textureId)
+  inline VisualUrl GetVisualUrl(const TextureManager::TextureId textureId)
   {
     return mTextureCacheManager.GetVisualUrl(textureId);
   }
@@ -279,7 +277,7 @@ public:
   /**
    * @copydoc TextureCacheManager::GetTexture
    */
-  inline Texture GetTexture(const TextureManager::TextureId& textureId)
+  inline Texture GetTexture(const TextureManager::TextureId textureId)
   {
     return mTextureCacheManager.GetTexture(textureId);
   }
@@ -319,7 +317,7 @@ public:
   /**
    * @copydoc TextureCacheManager::AddExternalTexture
    */
-  inline std::string AddExternalTexture(const TextureSet& texture, bool preMultiplied = false)
+  inline std::string AddExternalTexture(const TextureSet& texture, const bool preMultiplied = false)
   {
     return mTextureCacheManager.AddExternalTexture(texture, preMultiplied);
   }
@@ -345,8 +343,6 @@ public: // Load Request API
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
    * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
-   * @param[in] useAtlasing           Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still be loaded, and marked successful,
-   *                                  but "useAtlasing" will be set to false in the "LoadCompleted" callback from the TextureManagerUploadObserver.
    * @param[in] observer              The client object should inherit from this and provide the "LoadCompleted" virtual.
    *                                  This is called when an image load completes (or fails).
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
@@ -357,16 +353,15 @@ public: // Load Request API
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoad(
-    const VisualUrl&                    url,
-    const ImageDimensions&              desiredSize,
-    const Dali::FittingMode::Type&      fittingMode,
-    const Dali::SamplingMode::Type&     samplingMode,
-    const TextureManager::UseAtlas&     useAtlasing,
-    TextureUploadObserver*              observer,
-    const bool&                         orientationCorrection,
-    const TextureManager::ReloadPolicy& reloadPolicy,
-    TextureManager::MultiplyOnLoad&     preMultiplyOnLoad,
-    const bool&                         synchronousLoading = false);
+    const VisualUrl&                   url,
+    const ImageDimensions&             desiredSize,
+    const Dali::FittingMode::Type      fittingMode,
+    const Dali::SamplingMode::Type     samplingMode,
+    TextureUploadObserver*             observer,
+    const bool                         orientationCorrection,
+    const TextureManager::ReloadPolicy reloadPolicy,
+    TextureManager::MultiplyOnLoad&    preMultiplyOnLoad,
+    const bool                         synchronousLoading = false);
 
 private: // Internal Load Request API
   /**
@@ -387,10 +382,6 @@ private: // Internal Load Request API
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
    * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
-   * @param[in] useAtlasing           Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still
-   *                                  be loaded, and marked successful,
-   *                                  but "useAtlasing" will be set to false in the "LoadCompleted" callback from
-   *                                  the TextureManagerUploadObserver.
    * @param[in] cropToMask            Only used with masking, this will crop the scaled image to the mask size.
    *                                  If false, then the mask will be scaled to fit the image before being applied.
    * @param[in] observer              The client object should inherit from this and provide the "LoadCompleted"
@@ -405,34 +396,33 @@ private: // Internal Load Request API
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoad(
-    const VisualUrl&                    url,
-    const TextureManager::TextureId&    maskTextureId,
-    const TextureManager::TextureId&    previousTextureId,
-    const float&                        contentScale,
-    const ImageDimensions&              desiredSize,
-    const Dali::FittingMode::Type&      fittingMode,
-    const Dali::SamplingMode::Type&     samplingMode,
-    const TextureManager::UseAtlas&     useAtlasing,
-    const bool&                         cropToMask,
-    TextureUploadObserver*              observer,
-    const bool&                         orientationCorrection,
-    const TextureManager::ReloadPolicy& reloadPolicy,
-    TextureManager::MultiplyOnLoad&     preMultiplyOnLoad,
-    const bool&                         synchronousLoading = false);
+    const VisualUrl&                   url,
+    const TextureManager::TextureId    maskTextureId,
+    const TextureManager::TextureId    previousTextureId,
+    const float                        contentScale,
+    const ImageDimensions&             desiredSize,
+    const Dali::FittingMode::Type      fittingMode,
+    const Dali::SamplingMode::Type     samplingMode,
+    const bool                         cropToMask,
+    TextureUploadObserver*             observer,
+    const bool                         orientationCorrection,
+    const TextureManager::ReloadPolicy reloadPolicy,
+    TextureManager::MultiplyOnLoad&    preMultiplyOnLoad,
+    const bool                         synchronousLoading = false);
 
   /**
    * @brief Requests a masking image to be loaded. This mask is not uploaded to GL,
    * instead, it is stored in CPU memory, and can be used for CPU blending.
    * @param[in] maskUrl            The URL of the mask image to load
-   * @param[in] storageType,       Whether the pixel data is stored in the cache or uploaded to the GPU
+   * @param[in] storageType        Whether the pixel data is stored in the cache or uploaded to the GPU
    * @param[in] synchronousLoading True if the frame should be loaded synchronously. If you skip this parameter,
    *                               default is false.
    * @return                       A TextureId to use as a handle to reference this mask Texture
    */
   TextureId RequestMaskLoad(
-    const VisualUrl& maskUrl,
-    StorageType      storageType,
-    const bool&      synchronousLoading = false);
+    const VisualUrl&                  maskUrl,
+    const TextureManager::StorageType storageType,
+    const bool                        synchronousLoading = false);
 
   /**
    * @brief Requests an image load of the given URL, when the texture has
@@ -453,12 +443,9 @@ private: // Internal Load Request API
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
    * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
-   * @param[in] useAtlasing           Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still be
-   *                                  loaded, and marked successful, but "useAtlasing" will be set to false in the
-   *                                  "LoadCompleted" callback from the TextureManagerUploadObserver.
    * @param[in] cropToMask            Whether to crop the target after masking, or scale the mask to the image before
    *                                  masking.
-   * @param[in] storageType,          Whether the pixel data is stored in the cache or uploaded to the GPU
+   * @param[in] storageType           Whether the pixel data is stored in the cache or uploaded to the GPU
    * @param[in] observer              The client object should inherit from this and provide the "LoadCompleted"
    *                                  virtual.
    *                                  This is called when an image load completes (or fails).
@@ -473,23 +460,22 @@ private: // Internal Load Request API
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoadInternal(
-    const VisualUrl&                    url,
-    const TextureManager::TextureId&    maskTextureId,
-    const TextureManager::TextureId&    previousTextureId,
-    const float&                        contentScale,
-    const Dali::ImageDimensions&        desiredSize,
-    const Dali::FittingMode::Type&      fittingMode,
-    const Dali::SamplingMode::Type&     samplingMode,
-    const TextureManager::UseAtlas&     useAtlas,
-    const bool&                         cropToMask,
-    const TextureManager::StorageType&  storageType,
-    TextureUploadObserver*              observer,
-    const bool&                         orientationCorrection,
-    const TextureManager::ReloadPolicy& reloadPolicy,
-    TextureManager::MultiplyOnLoad&     preMultiplyOnLoad,
-    Dali::AnimatedImageLoading          animatedImageLoading,
-    const std::uint32_t&                frameIndex,
-    const bool&                         synchronousLoading);
+    const VisualUrl&                   url,
+    const TextureManager::TextureId    maskTextureId,
+    const TextureManager::TextureId    previousTextureId,
+    const float                        contentScale,
+    const Dali::ImageDimensions&       desiredSize,
+    const Dali::FittingMode::Type      fittingMode,
+    const Dali::SamplingMode::Type     samplingMode,
+    const bool                         cropToMask,
+    const TextureManager::StorageType  storageType,
+    TextureUploadObserver*             observer,
+    const bool                         orientationCorrection,
+    const TextureManager::ReloadPolicy reloadPolicy,
+    TextureManager::MultiplyOnLoad&    preMultiplyOnLoad,
+    Dali::AnimatedImageLoading         animatedImageLoading,
+    const uint32_t                     frameIndex,
+    const bool                         synchronousLoading);
 
   /**
    * @brief Load a new image synchronously.
@@ -507,10 +493,10 @@ private: // Internal Load Request API
   void LoadImageSynchronously(
     const VisualUrl&                 url,
     const Dali::ImageDimensions&     desiredSize,
-    const Dali::FittingMode::Type&   fittingMode,
-    const Dali::SamplingMode::Type&  samplingMode,
-    const bool&                      orientationCorrection,
-    const bool&                      loadYuvPlanes,
+    const Dali::FittingMode::Type    fittingMode,
+    const Dali::SamplingMode::Type   samplingMode,
+    const bool                       orientationCorrection,
+    const bool                       loadYuvPlanes,
     std::vector<Devel::PixelBuffer>& pixelBuffers);
 
 public: // Remove Request API
@@ -523,7 +509,7 @@ public: // Remove Request API
    * @param[in] textureId The ID of the Texture to remove.
    * @param[in] textureObserver The texture observer.
    */
-  void RequestRemove(const TextureManager::TextureId& textureId, TextureUploadObserver* textureObserver);
+  void RequestRemove(const TextureManager::TextureId textureId, TextureUploadObserver* textureObserver);
 
 private:
   /**
@@ -534,7 +520,7 @@ private:
    *
    * @param[in] textureId The ID of the Texture to remove.
    */
-  void Remove(const TextureManager::TextureId& textureId);
+  void Remove(const TextureManager::TextureId textureId);
 
   /**
    * @brief Initiate remove of texture queued.
@@ -549,7 +535,7 @@ private:
    */
   struct QueueElement
   {
-    QueueElement(TextureManager::TextureId textureId, TextureUploadObserver* observer)
+    QueueElement(const TextureManager::TextureId textureId, TextureUploadObserver* observer)
     : mTextureId(textureId),
       mObserver(observer)
     {
@@ -593,7 +579,7 @@ private:
   void ObserveTexture(TextureManager::TextureInfo& textureInfo, TextureUploadObserver* observer);
 
   /**
-   * @brief Performs Post-Load steps including atlasing.
+   * @brief Performs Post-Load steps.
    * @param[in] textureInfo  The struct associated with this Texture
    * @param[in] pixelBuffers The image pixelBuffer
    * @return    True if successful
@@ -612,7 +598,7 @@ private:
    * @param[in] textureInfo The information of texture to apply the mask to
    * @param[in] maskTextureId The texture id of the mask.
    */
-  void ApplyMask(TextureManager::TextureInfo& textureInfo, const TextureManager::TextureId& maskTextureId);
+  void ApplyMask(TextureManager::TextureInfo& textureInfo, const TextureManager::TextureId maskTextureId);
 
   /**
    * Upload the texture specified in pixelBuffer to the appropriate location
@@ -627,7 +613,7 @@ private:
    * @param[in] textureInfo The struct associated with this Texture
    * @param[in] success If the pixel data was retrieved successfully and uploaded to GPU
    */
-  void NotifyObservers(TextureManager::TextureInfo& textureInfo, const bool& success);
+  void NotifyObservers(TextureManager::TextureInfo& textureInfo, const bool success);
 
   /**
    * Call LoadComplete to the observer.
@@ -635,7 +621,7 @@ private:
    * @param[in] textureInfo The struct associated with this Texture
    * @param[in] success     If the pixel data was retrieved successfully and uploaded to GPU
    */
-  void EmitLoadComplete(TextureUploadObserver* observer, TextureManager::TextureInfo& textureInfo, const bool& success);
+  void EmitLoadComplete(TextureUploadObserver* observer, TextureManager::TextureInfo& textureInfo, const bool success);
 
   /**
    * @brief Remove observer in textureInfo
@@ -652,7 +638,7 @@ public:
    * @param[in] textureId    The ID of the texture load complete.
    * @param[in] pixelBuffers The loaded image data
    */
-  void AsyncLoadComplete(const TextureManager::TextureId& textureId, std::vector<Devel::PixelBuffer>& pixelBuffers);
+  void AsyncLoadComplete(const TextureManager::TextureId textureId, std::vector<Devel::PixelBuffer>& pixelBuffers);
 
 protected: // Implementation of Processor
   /**
