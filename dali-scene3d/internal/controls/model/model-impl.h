@@ -27,11 +27,13 @@
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/texture.h>
+#include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/environment-map-load-task.h>
 #include <dali-scene3d/internal/common/light-observer.h>
 #include <dali-scene3d/internal/common/model-load-task.h>
+#include <dali-scene3d/internal/model-components/model-node-impl.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 #include <dali-scene3d/public-api/light/light.h>
@@ -55,6 +57,11 @@ public:
   using AnimationData          = std::pair<std::string, Dali::Animation>;
   using CameraData             = Loader::CameraParameters;
   using BlendShapeModelNodeMap = std::map<std::string, std::vector<Scene3D::ModelNode>>;
+
+  // ColliderMeshContainer doesn't hold actual collider meshes
+  // but pairs unique ModelNode id with ModelNode for lookup purposes.
+  // All model nodes in the container have collider mesh attached.
+  using ColliderMeshContainer = std::unordered_map<int, Scene3D::ModelNode>;
 
   /**
    * @copydoc Model::New()
@@ -165,6 +172,53 @@ public:
    * @copydoc Model::SetMotionData()
    */
   void SetMotionData(Scene3D::MotionData motionData);
+
+  /**
+   * @copydoc Scene3D::Model::MeshHitSignal()
+   */
+  Scene3D::Model::MeshHitSignalType& MeshHitSignal()
+  {
+    return mMeshHitSignal;
+  }
+
+  /**
+   * @brief Emits MeshHitSignal
+   * @param[in] modelNode ModelNode that has been hit
+   * @return Result of hit handling.
+   */
+  bool EmitMeshHitSignal(Scene3D::ModelNode modelNode)
+  {
+    bool retVal = false;
+    if(!mMeshHitSignal.Empty())
+    {
+      Scene3D::Model handle(GetOwner());
+      retVal = mMeshHitSignal.Emit(handle, modelNode);
+    }
+    return retVal;
+  }
+
+  /**
+   * @brief Returns collider mesh container
+   * @return Returns valid container
+   */
+  const ColliderMeshContainer& GetNodeColliderMeshContainer() const
+  {
+    return mColliderMeshes;
+  }
+
+  /**
+   * @brief Registers child node with collidier mesh
+   *
+   * @param[in] node ModelNode to register
+   * @param[in] mesh Collider mesh to associate with model node
+   */
+  void RegisterColliderMesh(Scene3D::ModelNode& node, const Dali::Scene3D::Algorithm::ColliderMesh& mesh);
+
+  /**
+   * @brief Removes node/collider mesh from the register
+   * @param[in] node Child node to remove from the register
+   */
+  void RemoveColliderMesh(Scene3D::ModelNode& node);
 
 protected:
   /**
@@ -356,7 +410,12 @@ private:
   WeakHandle<Scene3D::SceneView> mParentSceneView;
   Dali::PropertyNotification     mSizeNotification;
 
+  // Signals
+  Scene3D::Model::MeshHitSignalType mMeshHitSignal;
+
   Dali::Scene3D::Loader::ShaderManagerPtr mShaderManager;
+
+  ColliderMeshContainer mColliderMeshes;
 
   // List of ModelNode for name of blend shape.
   BlendShapeModelNodeMap mBlendShapeModelNodeMap;
