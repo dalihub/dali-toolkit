@@ -33,6 +33,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/model-cache-manager.h>
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
+#include <dali-scene3d/internal/event/collider-mesh-processor.h>
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/model-node-impl.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
@@ -44,7 +45,7 @@
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
-
+#include <dali-toolkit/public-api/controls/control-impl.h>
 using namespace Dali;
 
 namespace Dali
@@ -311,14 +312,48 @@ void Model::AddModelNode(Scene3D::ModelNode modelNode)
     UpdateImageBasedLightScaleFactor();
   }
 
+  GetImplementation(modelNode).SetRootModel(*this);
+
+  // If model has a collider mesh set, add it to the container
+  if(modelNode.HasColliderMesh())
+  {
+    Scene3D::ColliderMeshProcessor::Get().ColliderMeshChanged(Scene3D::Model::DownCast(Self()));
+  }
+
   if(Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE))
   {
     NotifyResourceReady();
   }
 }
 
+void Model::RegisterColliderMesh(Scene3D::ModelNode& modelNode, const Dali::Scene3D::Algorithm::ColliderMesh& mesh)
+{
+  mColliderMeshes[modelNode.GetProperty<int>(Actor::Property::ID)] = modelNode;
+
+  // Add processor
+  Scene3D::ColliderMeshProcessor::Get().ColliderMeshChanged(Scene3D::Model::DownCast(Self()));
+}
+
+void Model::RemoveColliderMesh(Scene3D::ModelNode& node)
+{
+  auto id   = node.GetProperty<int>(Actor::Property::ID);
+  auto iter = std::find_if(mColliderMeshes.begin(), mColliderMeshes.end(), [id](auto& item) {
+    return item.first == id;
+  });
+  if(iter != mColliderMeshes.end())
+  {
+    mColliderMeshes.erase(iter);
+  }
+}
+
 void Model::RemoveModelNode(Scene3D::ModelNode modelNode)
 {
+  // remove collider mesh from the list if node is being removed
+  if(modelNode.HasColliderMesh())
+  {
+    RemoveColliderMesh(modelNode);
+  }
+
   if(mModelRoot)
   {
     UpdateShaderRecursively(modelNode, nullptr);

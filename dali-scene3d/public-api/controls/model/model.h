@@ -19,12 +19,15 @@
  */
 
 // EXTERNAL INCLUDES
+#include <memory>
+
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 #include <dali-scene3d/public-api/model-motion/motion-data.h>
@@ -71,6 +74,10 @@ class Model;
 class DALI_SCENE3D_API Model : public Dali::Toolkit::Control
 {
 public:
+  // Typedefs
+  using MeshHitSignalType = Signal<bool(Model, Scene3D::ModelNode)>; ///< Mesh hit signal type @SINCE_2_2.99 TODO: See what parameters need to be added
+  using ColliderMeshPtr   = std::unique_ptr<Algorithm::NavigationMesh>;
+
   /**
    * @brief Create an initialized Model.
    *
@@ -365,6 +372,23 @@ public:
    * @note This method should be called after Model load finished.
    */
   void SetMotionData(Scene3D::MotionData motionData);
+
+  /**
+   * @brief This signal is emitted when the collider mesh is touched/hit.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool YourCallbackName(Model model, ModelNode modelNode);
+   * @endcode
+   * Here the model is the model that is hit and the ModelNode containing the collider mesh
+   * was applied to.
+   * The return value of True, indicates that the hover event should be consumed.
+   * Otherwise the signal will be emitted on the next sensitive parent of the actor.
+   *
+   * @SINCE_2_3.0
+   * @return The signal to connect to
+   */
+  MeshHitSignalType& MeshHitSignal();
 
 public: // Not intended for application developers
   /// @cond internal

@@ -27,12 +27,14 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/model-components/model-primitive-modify-observer.h>
+#include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
 #include <dali-scene3d/public-api/light/light.h>
 #include <dali-scene3d/public-api/loader/mesh-definition.h>
 #include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-scene3d/public-api/loader/skinning-details.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
+#include "dali-scene3d/public-api/controls/model/model.h"
 
 namespace Dali
 {
@@ -45,6 +47,7 @@ namespace Scene3D
 
 namespace Internal
 {
+using ColliderMeshUniquePtr = std::unique_ptr<Dali::Scene3D::Algorithm::ColliderMesh>;
 /**
  * @brief This is the internal base class for custom node of model.
  *
@@ -285,6 +288,30 @@ public: // Public Method
    */
   void OnRendererCreated(Renderer renderer) override;
 
+  /**
+   * @copydoc Dali::Scene3D::ModelNode::SetColliderMesh()
+   */
+  void SetColliderMesh(ColliderMeshUniquePtr&& colliderMesh);
+
+  /**
+   * @copydoc Dali::Scene3D::ModelNode::HasColliderMesh()
+   */
+  [[nodiscard]] bool HasColliderMesh() const;
+
+  /**
+   * @copydoc Dali::Scene3D::ModelNode::GetColliderMesh()
+   */
+  [[nodiscard]] const Scene3D::Algorithm::ColliderMesh& GetColliderMesh() const;
+
+  /**
+  * @brief Sets a root model for the ModelNode
+  * @param[in] model Valid Model to set
+  */
+  void SetRootModel(Dali::Scene3D::Internal::Model& model)
+  {
+    mParentModel = &model;
+  }
+
 private:
   /**
    * @brief Updates the bone matrix for a ModelPrimitive.
@@ -293,7 +320,6 @@ private:
    */
   void UpdateBoneMatrix(Scene3D::ModelPrimitive primitive);
 
-private:
   /// @cond internal
 
   // Not copyable or movable
@@ -310,8 +336,14 @@ private:
   Dali::Texture                     mShadowMapTexture;
   Dali::Texture                     mSpecularTexture;
   Dali::Texture                     mDiffuseTexture;
-  float                             mIblScaleFactor{1.0f};
-  uint32_t                          mSpecularMipmapLevels{1u};
+
+  Internal::Model* mParentModel{nullptr};
+
+  // Collider mesh
+  std::unique_ptr<Dali::Scene3D::Algorithm::ColliderMesh> mColliderMesh;
+
+  float    mIblScaleFactor{1.0f};
+  uint32_t mSpecularMipmapLevels{1u};
   /// @endcond
 };
 

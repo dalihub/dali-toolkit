@@ -128,6 +128,21 @@ Loader::BlendShapes::Index ModelNode::GetBlendShapeIndexByName(std::string_view 
   return Internal::GetImplementation(*this).GetBlendShapeIndexByName(blendShapeName);
 }
 
+void ModelNode::SetColliderMesh(std::unique_ptr<Algorithm::ColliderMesh>&& colliderMesh)
+{
+  Internal::GetImplementation(*this).SetColliderMesh(std::move(colliderMesh));
+}
+
+const Algorithm::ColliderMesh& ModelNode::GetColliderMesh()
+{
+  return Internal::GetImplementation(*this).GetColliderMesh();
+}
+
+bool ModelNode::HasColliderMesh() const
+{
+  return Internal::GetImplementation(*this).HasColliderMesh();
+}
+
 } // namespace Scene3D
 
 } // namespace Dali

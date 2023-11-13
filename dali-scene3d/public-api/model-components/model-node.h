@@ -23,10 +23,10 @@
 #include <dali/public-api/common/dali-common.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/loader/blend-shape-details.h> ///< For Loader::BlendShapes::Index
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
-
 namespace Dali
 {
 namespace Scene3D
@@ -204,6 +204,40 @@ public: // Public Method
    * @return Index of blendshape, or return invalid if there is no blendshape with given name.
    */
   Loader::BlendShapes::Index GetBlendShapeIndexByName(std::string_view blendShapeName) const;
+
+  /**
+   * @brief Sets collider mesh on the ModelNode
+   *
+   * The ownership of a collider mesh is taken over by the ModelNode.
+   *
+   * If there was a collider mesh set previously it will be erased.
+   *
+   * To remove collider mesh empty unique_ptr must be passed.
+   *
+   * @SINCE_2_3.0
+   * @param[in] colliderMesh r-value to unique pointer of ColliderMesh
+   */
+  void SetColliderMesh(std::unique_ptr<Algorithm::ColliderMesh>&& colliderMesh);
+
+  /**
+   * @brief Returns associated collider mesh
+   *
+   * HasColliderMesh() must be called to determine whether a valid
+   * collider mesh is associated. Calling GetColliderMesh() without
+   * previous check may produce undefined behaviour.
+   *
+   * @SINCE_2_3.0
+   * @return Associated collider mesh
+   */
+  const Algorithm::ColliderMesh& GetColliderMesh();
+
+  /**
+   * @brief Determines whether there is a valid collider mesh set
+   *
+   * @SINCE_2_3.0
+   * @return True if collider mesh is set, False otherwise
+   */
+  [[nodiscard]] bool HasColliderMesh() const;
 
 public: // Not intended for application developers
   /// @cond internal
