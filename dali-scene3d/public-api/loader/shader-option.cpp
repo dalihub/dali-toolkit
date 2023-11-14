@@ -54,7 +54,7 @@ static constexpr uint32_t NUMBER_OF_OPTIONS = sizeof(OPTION_KEYWORD) / sizeof(OP
 static const char*        ADD_EXTRA_SKINNING_ATTRIBUTES{"ADD_EXTRA_SKINNING_ATTRIBUTES"};
 static const char*        ADD_EXTRA_WEIGHTS{"ADD_EXTRA_WEIGHTS"};
 
-inline void HashString(std::uint64_t& hash, const char* string)
+inline void HashString(uint64_t& hash, const char* string)
 {
   char c;
   while((c = *string++))
