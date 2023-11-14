@@ -959,6 +959,46 @@ int UtcDaliImageViewEncodedBufferWithAnimatedVectorImage(void)
   END_TEST;
 }
 
+int UtcDaliImageViewEncodedBufferWithInvalidImageType(void)
+{
+  ToolkitTestApplication     application;
+  TestGlAbstraction&         gl          = application.GetGlAbstraction();
+  const std::vector<GLuint>& textures    = gl.GetBoundTextures();
+  size_t                     numTextures = textures.size();
+
+  // Get encoded raw-buffer jpg image with invalid image type, and generate url
+  EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_34_RGBA, static_cast<EncodedImageBuffer::ImageType>(-1));
+  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+
+  // Async loading, no atlasing for big size image
+  ImageView imageView = ImageView::New(url.GetUrl());
+
+  // By default, Aysnc loading is used
+  application.GetScene().Add(imageView);
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Load image
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+  application.SendNotification();
+
+  const std::vector<GLuint>& textures2 = gl.GetBoundTextures();
+  DALI_TEST_GREATER(textures2.size(), numTextures, TEST_LOCATION);
+
+  // Remove visual, for line coverage.
+  imageView.Unparent();
+  application.SendNotification();
+  application.Render(16);
+
+  END_TEST;
+}
+
 int UtcDaliImageViewAddedTexture(void)
 {
   ToolkitTestApplication application;

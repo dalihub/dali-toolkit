@@ -36,18 +36,22 @@ namespace
 {
 const std::string_view& GetEncodedImageBufferExtensions(Dali::EncodedImageBuffer::ImageType imageType)
 {
+  static constexpr std::string_view                                                            emptyString = "";
   static const std::unordered_map<Dali::EncodedImageBuffer::ImageType, const std::string_view> gEncodedImageBufferExtensionMap =
     {
-      {Dali::EncodedImageBuffer::ImageType::REGULAR_IMAGE, ""},
+      {Dali::EncodedImageBuffer::ImageType::REGULAR_IMAGE, emptyString},
       {Dali::EncodedImageBuffer::ImageType::VECTOR_IMAGE, ".svg"},
       {Dali::EncodedImageBuffer::ImageType::ANIMATED_VECTOR_IMAGE, ".json"},
     };
 
   const auto iter = gEncodedImageBufferExtensionMap.find(imageType);
 
-  DALI_ASSERT_DEBUG(iter != gEncodedImageBufferExtensionMap.end());
+  if(DALI_LIKELY(iter != gEncodedImageBufferExtensionMap.end()))
+  {
+    return iter->second;
+  }
 
-  return iter->second;
+  return emptyString;
 }
 } // namespace
 #ifdef DEBUG_ENABLED
