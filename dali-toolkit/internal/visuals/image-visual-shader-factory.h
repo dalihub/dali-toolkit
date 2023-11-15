@@ -20,8 +20,8 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/internal/visuals/image-visual-shader-feature-builder.h>
 #include <string_view>
 
 namespace Dali
@@ -30,6 +30,7 @@ namespace Toolkit
 {
 namespace Internal
 {
+
 /**
  * ImageVisualShaderFactory is an object that provides and shares shaders between image visuals
  */
@@ -65,12 +66,6 @@ public:
    * @return The default fragment shader source.
    */
   std::string_view GetFragmentShaderSource();
-
-  /**
-   * @brief Get the default shader source.
-   * @param[in] shaders shaderList for precompile
-   */
-  void GetPrecompiledShader(RawShaderData& shaders);
 
 protected:
   /**
