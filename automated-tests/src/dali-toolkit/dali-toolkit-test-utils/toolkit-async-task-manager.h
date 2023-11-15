@@ -1,5 +1,5 @@
-#ifndef TEST_ENCODED_IMAGE_BUFFER_H
-#define TEST_ENCODED_IMAGE_BUFFER_H
+#ifndef DALI_TOOLKIT_TOOLKIT_ASYNC_TASK_MANAGER_H
+#define DALI_TOOLKIT_TOOLKIT_ASYNC_TASK_MANAGER_H
 
 /*
  * Copyright (c) 2023 Samsung Electronics Co., Ltd.
@@ -19,13 +19,21 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
+#include <dali/public-api/adaptor-framework/async-task-manager.h>
 
-namespace Dali
+namespace Test
 {
-// util function to convert local file to EncodedImageBuffer
-EncodedImageBuffer ConvertFileToEncodedImageBuffer(const char* url, EncodedImageBuffer::ImageType imageType = EncodedImageBuffer::ImageType::DEFAULT);
+namespace AsyncTaskManager
+{
+// Destroy global static AsyncTaskManager, only for ~ToolkitApplication()
+void DestroyAsyncTaskManager();
 
-} // namespace Dali
+// Execute one completed processes synchronously.
+void ProcessSingleCompletedTasks();
 
-#endif // TEST_ENCODED_IMAGE_BUFFER_H
+// Execute all completed processes synchronously.
+void ProcessAllCompletedTasks();
+} // namespace AsyncTaskManager
+} // namespace Test
+
+#endif // DALI_TOOLKIT_TOOLKIT_ASYNC_TASK_MANAGER_H

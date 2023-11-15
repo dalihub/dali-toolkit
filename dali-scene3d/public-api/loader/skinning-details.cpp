@@ -25,7 +25,7 @@
 
 namespace Dali::Scene3D::Loader
 {
-const unsigned int Skinning::MAX_JOINTS = 80;
+const unsigned int Skinning::MAX_JOINTS = 256;
 
 const char* Skinning::BONE_UNIFORM_NAME = "uBone";
 } // namespace Dali::Scene3D::Loader

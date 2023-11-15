@@ -256,22 +256,56 @@ Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType(Toolkit::C
 
 bool ClearAccessibilityHighlight(Toolkit::Control control)
 {
-  return GetControlImplementation(control).GetAccessibleObject()->ClearHighlight();
+  auto* controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  if(DALI_LIKELY(controlAccessible))
+  {
+    return controlAccessible->ClearHighlight();
+  }
+  return false;
 }
 
 bool GrabAccessibilityHighlight(Toolkit::Control control)
 {
-  return GetControlImplementation(control).GetAccessibleObject()->GrabHighlight();
+  auto* controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  if(DALI_LIKELY(controlAccessible))
+  {
+    return controlAccessible->GrabHighlight();
+  }
+  return false;
 }
 
 Dali::Accessibility::States GetAccessibilityStates(Toolkit::Control control)
 {
-  return GetControlImplementation(control).GetAccessibleObject()->GetStates();
+  auto* controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  if(DALI_LIKELY(controlAccessible))
+  {
+    return controlAccessible->GetStates();
+  }
+  return Dali::Accessibility::States{};
 }
 
 void NotifyAccessibilityStateChange(Toolkit::Control control, Dali::Accessibility::States states, bool recurse)
 {
-  GetControlImplementation(control).GetAccessibleObject()->NotifyAccessibilityStateChange(std::move(states), recurse);
+  auto* controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  if(DALI_LIKELY(controlAccessible))
+  {
+    controlAccessible->NotifyAccessibilityStateChange(std::move(states), recurse);
+  }
+}
+
+bool IsAccessibleCreated(Toolkit::Control control)
+{
+  return GetControlImplementation(control).IsAccessibleCreated();
+}
+
+void EnableCreateAccessible(Toolkit::Control control, bool enable)
+{
+  GetControlImplementation(control).EnableCreateAccessible(enable);
+}
+
+bool IsCreateAccessibleEnabled(Toolkit::Control control)
+{
+  return GetControlImplementation(control).IsCreateAccessibleEnabled();
 }
 
 } // namespace DevelControl

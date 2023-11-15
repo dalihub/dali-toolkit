@@ -1,10 +1,19 @@
 #version 300 es
 
+#define ADD_EXTRA_SKINNING_ATTRIBUTES
+#define ADD_EXTRA_WEIGHTS
+
 precision highp float;
 
 in vec3 aPosition;
 in vec2 aTexCoord;
 in vec4 aVertexColor;
+
+#ifdef SKINNING
+in vec4 aJoints0;
+in vec4 aWeights0;
+ADD_EXTRA_SKINNING_ATTRIBUTES;
+#endif
 
 out mediump vec2 vUV;
 out lowp vec4 vColor;
@@ -14,11 +23,12 @@ uniform highp mat4 uModelMatrix;
 uniform highp mat4 uProjection;
 
 #ifdef SKINNING
-  in vec4 aJoints;
-  in vec4 aWeights;
-  #define MAX_BONES 64
-  uniform mat4 uBone[MAX_BONES];
-  uniform mediump vec3 uYDirection;
+#define MAX_BONES 256
+layout(std140) uniform Bones
+{
+  mat4 uBone[MAX_BONES];
+};
+uniform mediump vec3 uYDirection;
 #endif
 
 #ifdef MORPH
@@ -86,12 +96,14 @@ void main()
 #endif
 
 #ifdef SKINNING
-  highp mat4 bone = uBone[int(aJoints.x)] * aWeights.x +
-    uBone[int(aJoints.y)] * aWeights.y +
-    uBone[int(aJoints.z)] * aWeights.z +
-    uBone[int(aJoints.w)] * aWeights.w;
-  position = bone * position;
+  highp mat4 bone = uBone[int(aJoints0.x)] * aWeights0.x +
+    uBone[int(aJoints0.y)] * aWeights0.y +
+    uBone[int(aJoints0.z)] * aWeights0.z +
+    uBone[int(aJoints0.w)] * aWeights0.w;
 
+  ADD_EXTRA_WEIGHTS;
+
+  position = bone * position;
   highp vec4 positionW = position;
 #else
   highp vec4 positionW = uModelMatrix * position;

@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <cstdint>
 #include <string>
+#include <string_view>
 
 namespace Dali
 {
@@ -143,6 +144,11 @@ public:
   std::string GetLocation() const;
 
   /**
+   * @return the location part of the url without extension
+   */
+  std::string GetLocationWithoutExtension() const;
+
+  /**
    * Helper to create a URL of type TEXTURE
    * @param location the location of the texture
    * @return the Url
@@ -151,10 +157,11 @@ public:
 
   /**
    * Helper to create a URL of type BUFFER
-   * @param location the location of the texture
+   * @param[in] location the location of the texture
+   * @param[in] extension the extension of url
    * @return the Url
    */
-  static std::string CreateBufferUrl(const std::string& location);
+  static std::string CreateBufferUrl(const std::string& location, const std::string_view& extension);
 
   /**
    * Helper to get a ProtocolType from url
@@ -169,6 +176,13 @@ public:
    * @return the location
    */
   static std::string GetLocation(const std::string& url);
+
+  /**
+   * Helper to get a location from url without extension
+   * @param[in] url the location of the texture
+   * @return the location without extension
+   */
+  static std::string GetLocationWithoutExtension(const std::string& url);
 
 private:
   std::string  mUrl;

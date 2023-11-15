@@ -31,6 +31,15 @@
 #include <dali-scene3d/public-api/loader/environment-definition.h>
 
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/object/property-array.h>
+#include <dali/public-api/object/property-map.h>
+
+#if defined(DEBUG_ENABLED)
+#include <sys/types.h>
+#include <unistd.h>
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
 
 namespace Dali
 {
@@ -40,6 +49,55 @@ namespace Internal
 {
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_SCENE3D_MODEL_PRIMITIVE");
+
+std::string tmpFilename(std::string prefix, std::string suffix)
+{
+  static int id = 0;
+  id++;
+  std::ostringstream oss;
+  oss << prefix << getpid() << "_" << std::setfill('0') << std::setw(4) << id << suffix;
+  return oss.str();
+}
+
+#define DALI_LOG_WRITE_FILE(filename, stream) \
+  {                                           \
+    fs::path tmp = fs::temp_directory_path(); \
+    tmp /= filename;                          \
+    std::ofstream ostrm(tmp, std::ios::out);  \
+    ostrm << stream;                          \
+    ostrm.flush();                            \
+  }
+
+inline Property::Map GetMap(Shader shader)
+{
+  Property::Value program = shader[Shader::Property::PROGRAM];
+  Property::Map*  map{nullptr};
+  if(program.GetType() == Property::ARRAY)
+  {
+    Property::Array* array = program.GetArray();
+    if(array)
+    {
+      Property::Value& value = array->GetElementAt(0);
+      if(value.GetType() == Property::MAP)
+      {
+        map = value.GetMap();
+      }
+    }
+  }
+  else if(program.GetType() == Property::MAP)
+  {
+    map = program.GetMap();
+  }
+  if(map)
+  {
+    return *map;
+  }
+  return Property::Map();
+}
+
+#endif
 /**
  * Creates control through type registry
  */
@@ -185,14 +243,14 @@ void ModelPrimitive::SetImageBasedLightScaleFactor(float iblScaleFactor)
   }
 }
 
-void ModelPrimitive::UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager)
+void ModelPrimitive::UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager, Loader::ShaderOption::HashType hash)
 {
   if(mShaderManager != shaderManager)
   {
     mShaderManager = (shaderManager) ? shaderManager : new Scene3D::Loader::ShaderManager();
     if(mMaterial && GetImplementation(mMaterial).IsResourceReady())
     {
-      ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag::SHADER);
+      ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag::SHADER, hash);
     }
   }
 }
@@ -216,9 +274,15 @@ void ModelPrimitive::SetBlendShapeOptions(bool hasPositions, bool hasNormals, bo
   mBlendShapeVersion = version;
 }
 
-void ModelPrimitive::SetSkinned(bool isSkinned)
+void ModelPrimitive::SetSkinned(bool isSkinned, uint32_t numberOfJointSets)
 {
-  mHasSkinning = isSkinned;
+  mHasSkinning       = isSkinned;
+  mNumberOfJointSets = numberOfJointSets;
+}
+
+void ModelPrimitive::SetVertexColor(bool hasVertexColor)
+{
+  mHasVertexColor = hasVertexColor;
 }
 
 // From MaterialModifyObserver
@@ -228,7 +292,7 @@ void ModelPrimitive::OnMaterialModified(Dali::Scene3D::Material material, Materi
   ApplyMaterialToRenderer(flag);
 }
 
-void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag flag)
+void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag flag, Loader::ShaderOption::HashType oldHash)
 {
   if(!mMaterial)
   {
@@ -244,6 +308,11 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
     if(mHasSkinning)
     {
       shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::SKINNING);
+      shaderOption.AddJointMacros(mNumberOfJointSets);
+    }
+    if(mHasVertexColor)
+    {
+      shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::COLOR_ATTRIBUTE);
     }
     if(mHasPositions || mHasNormals || mHasTangents)
     {
@@ -265,8 +334,27 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
       }
     }
 
-    mShader.Reset();
-    mShader = mShaderManager->ProduceShader(shaderOption);
+    Shader newShader = mShaderManager->ProduceShader(shaderOption);
+    if(mShader != newShader)
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::General, "Warning!  Model primitive shader changed: OldHash:%x NewHash:%x\n", oldHash, shaderOption.GetOptionHash());
+
+#if defined(DEBUG_ENABLED)
+      if(mShader)
+      {
+        Property::Map oldMap = GetMap(mShader);
+        DALI_LOG_WRITE_FILE(tmpFilename("oldShader", ".txt"), "Vertex Shader:\n"
+                            << oldMap["vertex"] << "\n\nFragmentShader: " << oldMap["fragment"] << "\n");
+      }
+      if(newShader)
+      {
+        Property::Map newMap = GetMap(newShader);
+        DALI_LOG_WRITE_FILE(tmpFilename("newShader", ".txt"), "Vertex Shader:\n"
+                            << newMap["vertex"] << "\n\nFragmentShader: " << newMap["fragment"] << "\n");
+      }
+#endif
+    }
+    mShader = newShader;
 
     if(!mRenderer)
     {

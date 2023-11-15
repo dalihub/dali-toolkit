@@ -95,7 +95,7 @@ uint32_t ModelNode::GetModelPrimitiveCount() const
 
 void ModelNode::AddModelPrimitive(ModelPrimitive modelPrimitive)
 {
-  Internal::GetImplementation(*this).AddModelPrimitive(modelPrimitive);
+  Internal::GetImplementation(*this).AddModelPrimitive(modelPrimitive, 0u);
 }
 
 void ModelNode::RemoveModelPrimitive(Dali::Scene3D::ModelPrimitive modelPrimitive)

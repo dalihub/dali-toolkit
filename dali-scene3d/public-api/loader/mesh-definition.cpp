@@ -211,7 +211,7 @@ bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source
 }
 
 template<typename T>
-void ReadJointAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Accessor& accessor, std::istream& source, const std::string& meshPath)
+void ReadJointAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Accessor& accessor, std::istream& source, const std::string& meshPath, const std::string& name)
 {
   constexpr auto sizeofBlobUnit = sizeof(T) * 4;
 
@@ -241,11 +241,27 @@ void ReadJointAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Acces
       ++floats;
     }
   }
-  raw.mAttribs.push_back({"aJoints", Property::VECTOR4, static_cast<uint32_t>(outBufferSize / sizeof(Vector4)), std::move(buffer)});
+  raw.mAttribs.push_back({name, Property::VECTOR4, static_cast<uint32_t>(outBufferSize / sizeof(Vector4)), std::move(buffer)});
+}
+
+void ReadTypedJointAccessor(MeshDefinition::RawData& raw, uint32_t flags, MeshDefinition::Accessor& accessor, std::iostream& stream, std::string& path, const std::string& name)
+{
+  if(MaskMatch(flags, MeshDefinition::U16_JOINT_IDS))
+  {
+    ReadJointAccessor<uint16_t>(raw, accessor, stream, path, name);
+  }
+  else if(MaskMatch(flags, MeshDefinition::U8_JOINT_IDS))
+  {
+    ReadJointAccessor<uint8_t>(raw, accessor, stream, path, name);
+  }
+  else
+  {
+    ReadJointAccessor<float>(raw, accessor, stream, path, name);
+  }
 }
 
 template<typename T>
-void ReadWeightAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Accessor& accessor, std::istream& source, const std::string& meshPath)
+void ReadWeightAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Accessor& accessor, std::istream& source, const std::string& meshPath, const std::string& name)
 {
   constexpr auto sizeofBlobUnit = sizeof(T) * 4;
 
@@ -276,7 +292,23 @@ void ReadWeightAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Acce
       ++floats;
     }
   }
-  raw.mAttribs.push_back({"aWeights", Property::VECTOR4, static_cast<uint32_t>(outBufferSize / sizeof(Vector4)), std::move(buffer)});
+  raw.mAttribs.push_back({name, Property::VECTOR4, static_cast<uint32_t>(outBufferSize / sizeof(Vector4)), std::move(buffer)});
+}
+
+void ReadTypedWeightAccessor(MeshDefinition::RawData& raw, uint32_t flags, MeshDefinition::Accessor& accessor, std::iostream& stream, std::string& path, std::string name)
+{
+  if(MaskMatch(flags, MeshDefinition::U16_WEIGHT))
+  {
+    ReadWeightAccessor<uint16_t>(raw, accessor, stream, path, name);
+  }
+  else if(MaskMatch(flags, MeshDefinition::U8_WEIGHT))
+  {
+    ReadWeightAccessor<uint8_t>(raw, accessor, stream, path, name);
+  }
+  else
+  {
+    ReadWeightAccessor<float>(raw, accessor, stream, path, name);
+  }
 }
 
 template<bool use32BitsIndices, typename IndexProviderType = IndexProvider<use32BitsIndices>>
@@ -827,19 +859,23 @@ MeshDefinition::SparseBlob::SparseBlob(Blob&& indices, Blob&& values, uint32_t c
 
 MeshDefinition::Accessor::Accessor(const MeshDefinition::Blob&       blob,
                                    const MeshDefinition::SparseBlob& sparse,
-                                   Index                             bufferIndex)
+                                   Index                             bufferIndex,
+                                   bool                              normalized)
 : mBlob{blob},
   mSparse{(sparse.mIndices.IsDefined() && sparse.mValues.IsDefined()) ? new SparseBlob{sparse} : nullptr},
-  mBufferIdx(bufferIndex)
+  mBufferIdx(bufferIndex),
+  mNormalized(normalized)
 {
 }
 
 MeshDefinition::Accessor::Accessor(MeshDefinition::Blob&&       blob,
                                    MeshDefinition::SparseBlob&& sparse,
-                                   Index                        bufferIndex)
+                                   Index                        bufferIndex,
+                                   bool                         normalized)
 : mBlob{std::move(blob)},
   mSparse{(sparse.mIndices.IsDefined() && sparse.mValues.IsDefined()) ? new SparseBlob{std::move(sparse)} : nullptr},
-  mBufferIdx(bufferIndex)
+  mBufferIdx(bufferIndex),
+  mNormalized(normalized)
 {
 }
 
@@ -929,7 +965,22 @@ bool MeshDefinition::IsQuad() const
 
 bool MeshDefinition::IsSkinned() const
 {
-  return mJoints0.IsDefined() && mWeights0.IsDefined();
+  return !mJoints.empty() && !mWeights.empty();
+}
+
+bool MeshDefinition::HasVertexColor() const
+{
+  return !mColors.empty();
+}
+
+uint32_t MeshDefinition::GetNumberOfJointSets() const
+{
+  uint32_t number = static_cast<uint32_t>(mJoints.size());
+  if(number > MeshDefinition::MAX_NUMBER_OF_JOINT_SETS)
+  {
+    number = MeshDefinition::MAX_NUMBER_OF_JOINT_SETS;
+  }
+  return number;
 }
 
 bool MeshDefinition::HasBlendShapes() const
@@ -1160,31 +1211,30 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
     }
   }
 
-  const auto hasUvs = mTexCoords.IsDefined();
-  if(hasUvs)
+  if(!mTexCoords.empty() && mTexCoords[0].IsDefined())
   {
-    const auto bufferSize = mTexCoords.mBlob.GetBufferSize();
-
+    auto& texCoords = mTexCoords[0];
+    const auto bufferSize = texCoords.mBlob.GetBufferSize();
     uint32_t uvCount;
 
     if(MaskMatch(mFlags, S8_TEXCOORD) || MaskMatch(mFlags, U8_TEXCOORD))
     {
-      DALI_ASSERT_ALWAYS(((mTexCoords.mBlob.mLength % (sizeof(uint8_t) * 2) == 0) ||
-                          mTexCoords.mBlob.mStride >= (sizeof(uint8_t) * 2)) &&
+      DALI_ASSERT_ALWAYS(((texCoords.mBlob.mLength % (sizeof(uint8_t) * 2) == 0) ||
+                          texCoords.mBlob.mStride >= (sizeof(uint8_t) * 2)) &&
                          "TexCoords buffer length not a multiple of element size");
       uvCount = static_cast<uint32_t>(bufferSize / (sizeof(uint8_t) * 2));
     }
     else if(MaskMatch(mFlags, S16_TEXCOORD) || MaskMatch(mFlags, U16_TEXCOORD))
     {
-      DALI_ASSERT_ALWAYS(((mTexCoords.mBlob.mLength % (sizeof(uint16_t) * 2) == 0) ||
-                          mTexCoords.mBlob.mStride >= (sizeof(uint16_t) * 2)) &&
+      DALI_ASSERT_ALWAYS(((texCoords.mBlob.mLength % (sizeof(uint16_t) * 2) == 0) ||
+                          texCoords.mBlob.mStride >= (sizeof(uint16_t) * 2)) &&
                          "TexCoords buffer length not a multiple of element size");
       uvCount = static_cast<uint32_t>(bufferSize / (sizeof(uint16_t) * 2));
     }
     else
     {
-      DALI_ASSERT_ALWAYS(((mTexCoords.mBlob.mLength % sizeof(Vector2) == 0) ||
-                          mTexCoords.mBlob.mStride >= sizeof(Vector2)) &&
+      DALI_ASSERT_ALWAYS(((texCoords.mBlob.mLength % sizeof(Vector2) == 0) ||
+                          texCoords.mBlob.mStride >= sizeof(Vector2)) &&
                          "TexCoords buffer length not a multiple of element size");
       uvCount = static_cast<uint32_t>(bufferSize / sizeof(Vector2));
     }
@@ -1192,13 +1242,13 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
     std::vector<uint8_t> buffer(bufferSize);
 
     std::string path;
-    auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mTexCoords.mBufferIdx], path);
-    if(!ReadAccessor(mTexCoords, stream, buffer.data()))
+    auto&       stream = GetAvailableData(fileStream, meshPath, buffers[texCoords.mBufferIdx], path);
+    if(!ReadAccessor(texCoords, stream, buffer.data()))
     {
       ExceptionFlinger(ASSERT_LOCATION) << "Failed to read uv-s from '" << path << "'.";
     }
 
-    GetDequantizedData(buffer, 2u, uvCount, mFlags & TEXCOORDS_MASK, mTexCoords.mNormalized);
+    GetDequantizedData(buffer, 2u, uvCount, mFlags & TEXCOORDS_MASK, texCoords.mNormalized);
 
     if(MaskMatch(mFlags, FLIP_UVS_VERTICAL))
     {
@@ -1211,13 +1261,12 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
       }
     }
 
-    if(mTexCoords.mNormalized)
+    if(texCoords.mNormalized)
     {
-      GetDequantizedMinMax(mTexCoords.mBlob.mMin, mTexCoords.mBlob.mMax, mFlags & TEXCOORDS_MASK);
+      GetDequantizedMinMax(texCoords.mBlob.mMin, texCoords.mBlob.mMax, mFlags & TEXCOORDS_MASK);
     }
 
-    mTexCoords.mBlob.ApplyMinMax(static_cast<uint32_t>(uvCount), reinterpret_cast<float*>(buffer.data()));
-
+    texCoords.mBlob.ApplyMinMax(static_cast<uint32_t>(uvCount), reinterpret_cast<float*>(buffer.data()));
     raw.mAttribs.push_back({"aTexCoord", Property::VECTOR2, static_cast<uint32_t>(uvCount), std::move(buffer)});
   }
 
@@ -1297,6 +1346,7 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
             GenerateTangents<true, true, true>,
           },
         }};
+    const bool hasUvs            = !mTexCoords.empty() && mTexCoords[0].IsDefined();
     const bool generateSuccessed = GenerateTangentsFunction[MaskMatch(mFlags, U32_INDICES)][mTangentType == Property::VECTOR3][hasUvs](raw);
     if(!generateSuccessed)
     {
@@ -1304,25 +1354,26 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
     }
   }
 
-  if(mColors.IsDefined())
+  // Only support 1 vertex color
+  if(!mColors.empty() && mColors[0].IsDefined())
   {
-    uint32_t       propertySize = mColors.mBlob.mElementSizeHint;
+    uint32_t       propertySize = mColors[0].mBlob.mElementSizeHint;
     Property::Type propertyType = (propertySize == sizeof(Vector4)) ? Property::VECTOR4 : ((propertySize == sizeof(Vector3)) ? Property::VECTOR3 : Property::NONE);
     if(propertyType != Property::NONE)
     {
-      DALI_ASSERT_ALWAYS(((mColors.mBlob.mLength % propertySize == 0) ||
-                          mColors.mBlob.mStride >= propertySize) &&
+      DALI_ASSERT_ALWAYS(((mColors[0].mBlob.mLength % propertySize == 0) ||
+                          mColors[0].mBlob.mStride >= propertySize) &&
                          "Colors buffer length not a multiple of element size");
-      const auto           bufferSize = mColors.mBlob.GetBufferSize();
+      const auto           bufferSize = mColors[0].mBlob.GetBufferSize();
       std::vector<uint8_t> buffer(bufferSize);
 
       std::string path;
-      auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mColors.mBufferIdx], path);
-      if(!ReadAccessor(mColors, stream, buffer.data()))
+      auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mColors[0].mBufferIdx], path);
+      if(!ReadAccessor(mColors[0], stream, buffer.data()))
       {
         ExceptionFlinger(ASSERT_LOCATION) << "Failed to read colors from '" << path << "'.";
       }
-      mColors.mBlob.ApplyMinMax(bufferSize / propertySize, reinterpret_cast<float*>(buffer.data()));
+      mColors[0].mBlob.ApplyMinMax(bufferSize / propertySize, reinterpret_cast<float*>(buffer.data()));
 
       raw.mAttribs.push_back({"aVertexColor", propertyType, static_cast<uint32_t>(bufferSize / propertySize), std::move(buffer)});
     }
@@ -1342,34 +1393,25 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
 
   if(IsSkinned())
   {
-    std::string pathJoint;
-    auto&       streamJoint = GetAvailableData(fileStream, meshPath, buffers[mJoints0.mBufferIdx], pathJoint);
-    if(MaskMatch(mFlags, U16_JOINT_IDS))
+    int setIndex = 0;
+    for(auto& accessor : mJoints)
     {
-      ReadJointAccessor<uint16_t>(raw, mJoints0, streamJoint, pathJoint);
+      std::string        pathJoint;
+      auto&              streamJoint = GetAvailableData(fileStream, meshPath, buffers[accessor.mBufferIdx], pathJoint);
+      std::ostringstream jointName;
+      jointName << "aJoints" << setIndex;
+      ++setIndex;
+      ReadTypedJointAccessor(raw, mFlags, accessor, streamJoint, pathJoint, jointName.str());
     }
-    else if(MaskMatch(mFlags, U8_JOINT_IDS))
+    setIndex = 0;
+    for(auto& accessor : mWeights)
     {
-      ReadJointAccessor<uint8_t>(raw, mJoints0, streamJoint, pathJoint);
-    }
-    else
-    {
-      ReadJointAccessor<float>(raw, mJoints0, streamJoint, pathJoint);
-    }
-
-    std::string pathWeight;
-    auto&       streamWeight = GetAvailableData(fileStream, meshPath, buffers[mWeights0.mBufferIdx], pathWeight);
-    if(MaskMatch(mFlags, U16_WEIGHT))
-    {
-      ReadWeightAccessor<uint16_t>(raw, mWeights0, streamWeight, pathWeight);
-    }
-    else if(MaskMatch(mFlags, U8_WEIGHT))
-    {
-      ReadWeightAccessor<uint8_t>(raw, mWeights0, streamWeight, pathWeight);
-    }
-    else
-    {
-      ReadWeightAccessor<float>(raw, mWeights0, streamWeight, pathWeight);
+      std::string        pathWeight;
+      auto&              streamWeight = GetAvailableData(fileStream, meshPath, buffers[accessor.mBufferIdx], pathWeight);
+      std::ostringstream weightName;
+      weightName << "aWeights" << setIndex;
+      ++setIndex;
+      ReadTypedWeightAccessor(raw, mFlags, accessor, streamWeight, pathWeight, weightName.str());
     }
   }
 

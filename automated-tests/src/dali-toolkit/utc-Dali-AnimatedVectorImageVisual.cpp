@@ -386,6 +386,9 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   value = resultMap.Find(DevelImageVisual::Property::CONTENT_INFO, Property::MAP);
   DALI_TEST_CHECK(value);
 
+  value = resultMap.Find(DevelImageVisual::Property::MARKER_INFO, Property::MAP);
+  DALI_TEST_CHECK(value);
+
   value = resultMap.Find(DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, Property::BOOLEAN);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>() == true); // Check default value
@@ -963,6 +966,130 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
 
   DALI_TEST_EQUALS(VECTOR_ANIMATION_MARKER_START_FRAME_1, resultStartFrame, TEST_LOCATION); // Should not be changed
   DALI_TEST_EQUALS(VECTOR_ANIMATION_MARKER_END_FRAME_2, resultEndFrame, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualMarkerInfo(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualMarkerInfo");
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.GetScene().Add(actor);
+
+  Property::Map attributes;
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  // renderer is added to actor
+  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  Renderer renderer = actor.GetRendererAt(0u);
+  DALI_TEST_CHECK(renderer);
+
+  Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  Property::Value* value = map.Find(DevelImageVisual::Property::MARKER_INFO);
+
+  DALI_TEST_CHECK(value);
+
+  Property::Map* result = value->GetMap();
+  DALI_TEST_CHECK(result);
+
+  std::string resultMarkerName;
+  int         resultStartFrame, resultEndFrame;
+  DALI_TEST_EQUALS(2u, result->Count(), TEST_LOCATION);
+
+  for(uint32_t i = 0u; i < result->Count(); ++i)
+  {
+    if(result->GetKeyAt(i).stringKey == VECTOR_ANIMATION_MARKER_NAME_1)
+    {
+      Property::Array* frameArray = result->GetValue(i).GetArray();
+      DALI_TEST_CHECK(frameArray);
+      frameArray->GetElementAt(0).Get(resultStartFrame);
+      frameArray->GetElementAt(1).Get(resultEndFrame);
+
+      DALI_TEST_EQUALS(VECTOR_ANIMATION_MARKER_START_FRAME_1, resultStartFrame, TEST_LOCATION);
+      DALI_TEST_EQUALS(VECTOR_ANIMATION_MARKER_END_FRAME_1, resultEndFrame, TEST_LOCATION);
+    }
+    else if(result->GetKeyAt(i).stringKey == VECTOR_ANIMATION_MARKER_NAME_2)
+    {
+      Property::Array* frameArray = result->GetValue(i).GetArray();
+      DALI_TEST_CHECK(frameArray);
+      frameArray->GetElementAt(0).Get(resultStartFrame);
+      frameArray->GetElementAt(1).Get(resultEndFrame);
+
+      DALI_TEST_EQUALS(VECTOR_ANIMATION_MARKER_START_FRAME_2, resultStartFrame, TEST_LOCATION);
+      DALI_TEST_EQUALS(VECTOR_ANIMATION_MARKER_END_FRAME_2, resultEndFrame, TEST_LOCATION);
+    }
+    else
+    {
+      DALI_TEST_CHECK(false);
+    }
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualMarkerInfoFromInvalid(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualMarkerInfoFromInvalid");
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+    .Add(ImageVisual::Property::URL, "invalid.json")
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.GetScene().Add(actor);
+
+  Property::Map attributes;
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - load, and failed.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // renderer is added to actor
+  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  Renderer renderer = actor.GetRendererAt(0u);
+  DALI_TEST_CHECK(renderer);
+
+  Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  Property::Value* value = map.Find(DevelImageVisual::Property::MARKER_INFO);
+
+  // The values when load failed case is invalid.
+  DALI_TEST_CHECK(value == nullptr || (value->GetMap() == nullptr) || (value->GetMap()->Empty()));
 
   END_TEST;
 }

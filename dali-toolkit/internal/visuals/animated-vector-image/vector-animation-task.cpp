@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-task.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/math/math-utils.h>
@@ -55,12 +56,15 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false)
 VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
 : AsyncTask(MakeCallback(this, &VectorAnimationTask::TaskCompleted), AsyncTask::PriorityType::HIGH, AsyncTask::ThreadType::WORKER_THREAD),
   mImageUrl(),
+  mEncodedImageBuffer(),
   mVectorRenderer(VectorAnimationRenderer::New()),
   mAnimationData(),
   mVectorAnimationThread(factoryCache.GetVectorAnimationManager().GetVectorAnimationThread()),
   mConditionalWait(),
   mResourceReadySignal(),
   mLoadCompletedCallback(MakeCallback(this, &VectorAnimationTask::OnLoadCompleted)),
+  mCachedLayerInfo(),
+  mCachedMarkerInfo(),
   mPlayState(PlayState::STOPPED),
   mStopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
   mLoopingMode(DevelImageVisual::LoopingMode::RESTART),
@@ -85,7 +89,9 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mLoadRequest(false),
   mLoadFailed(false),
   mRasterized(false),
-  mKeepAnimation(false)
+  mKeepAnimation(false),
+  mLayerInfoCached(false),
+  mMarkerInfoCached(false)
 {
   mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
 }
@@ -153,14 +159,36 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   }
 #endif
 
-  if(!mVectorRenderer.Load(mImageUrl.GetUrl()))
+  if(mEncodedImageBuffer)
   {
-    DALI_LOG_ERROR("VectorAnimationTask::Load: Load failed [%s]\n", mImageUrl.GetUrl().c_str());
-    mLoadFailed = true;
+    if(!mVectorRenderer.Load(mEncodedImageBuffer.GetRawBuffer()))
+    {
+      mLoadFailed = true;
+    }
+
+    // We don't need to hold image buffer anymore.
+    mEncodedImageBuffer.Reset();
+  }
+  else if(mImageUrl.IsLocalResource())
+  {
+    if(!mVectorRenderer.Load(mImageUrl.GetUrl()))
+    {
+      mLoadFailed = true;
+    }
+  }
+  else
+  {
+    Dali::Vector<uint8_t> remoteData;
+    if(!Dali::FileLoader::DownloadFileSynchronously(mImageUrl.GetUrl(), remoteData) || // Failed if we fail to download json file,
+       !mVectorRenderer.Load(remoteData))                                              // or download data is not valid vector animation file.
+    {
+      mLoadFailed = true;
+    }
   }
 
   if(mLoadFailed)
   {
+    DALI_LOG_ERROR("VectorAnimationTask::Load: Load failed [%s]\n", mImageUrl.GetUrl().c_str());
     mLoadRequest = false;
     if(!synchronousLoading && mLoadCompletedCallback)
     {
@@ -215,9 +243,10 @@ void VectorAnimationTask::SetRenderer(Renderer renderer)
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetRenderer [%p]\n", this);
 }
 
-void VectorAnimationTask::RequestLoad(const VisualUrl& url, bool synchronousLoading)
+void VectorAnimationTask::RequestLoad(const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, bool synchronousLoading)
 {
-  mImageUrl = url;
+  mImageUrl           = url;
+  mEncodedImageBuffer = encodedImageBuffer;
 
   if(!synchronousLoading)
   {
@@ -459,7 +488,38 @@ void VectorAnimationTask::SetLoopingMode(DevelImageVisual::LoopingMode::Type loo
 
 void VectorAnimationTask::GetLayerInfo(Property::Map& map) const
 {
-  mVectorRenderer.GetLayerInfo(map);
+  // Fast-out if file is loading, or load failed.
+  if(mLoadFailed || IsLoadRequested())
+  {
+    return;
+  }
+
+  if(DALI_UNLIKELY(!mLayerInfoCached))
+  {
+    // Update only 1 time.
+    mLayerInfoCached = true;
+    mVectorRenderer.GetLayerInfo(mCachedLayerInfo);
+  }
+
+  map = mCachedLayerInfo;
+}
+
+void VectorAnimationTask::GetMarkerInfo(Property::Map& map) const
+{
+  // Fast-out if file is loading, or load failed.
+  if(mLoadFailed || IsLoadRequested())
+  {
+    return;
+  }
+
+  if(DALI_UNLIKELY(!mMarkerInfoCached))
+  {
+    // Update only 1 time.
+    mMarkerInfoCached = true;
+    mVectorRenderer.GetMarkerInfo(mCachedMarkerInfo);
+  }
+
+  map = mCachedMarkerInfo;
 }
 
 VectorAnimationTask::ResourceReadySignalType& VectorAnimationTask::ResourceReadySignal()

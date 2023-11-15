@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ DevelControl::ControlAccessible* CheckBoxButton::CreateAccessibleObject()
 Dali::Accessibility::States CheckBoxButton::CheckBoxButtonAccessible::CalculateStates()
 {
   auto state = Button::ButtonAccessible::CalculateStates();
-  auto self = Toolkit::Button::DownCast(Self());
+  auto self  = Toolkit::Button::DownCast(Self());
   if(self.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
   {
     state[Dali::Accessibility::State::CHECKED] = true;
@@ -101,7 +101,11 @@ void CheckBoxButton::OnStateChange(State newState)
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
   if((Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor() == Self()) && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
-    GetAccessibleObject()->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+    auto* accessible = GetAccessibleObject();
+    if(DALI_LIKELY(accessible))
+    {
+      accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+    }
   }
 }
 

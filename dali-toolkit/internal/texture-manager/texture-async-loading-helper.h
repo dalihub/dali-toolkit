@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_ASYNC_LOADING_HELPER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/signals/connection-tracker.h>
-#include <deque>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/image-loader/loading-task.h>
@@ -54,13 +53,13 @@ public:
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] preMultiplyOnLoad     if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
    */
-  void LoadAnimatedImage(const TextureManager::TextureId&                textureId,
-                         Dali::AnimatedImageLoading                      animatedImageLoading,
-                         const std::uint32_t&                            frameIndex,
-                         const Dali::ImageDimensions&                    desiredSize,
-                         const Dali::FittingMode::Type&                  fittingMode,
-                         const Dali::SamplingMode::Type&                 samplingMode,
-                         const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad);
+  void LoadAnimatedImage(const TextureManager::TextureId                textureId,
+                         Dali::AnimatedImageLoading                     animatedImageLoading,
+                         const uint32_t                                 frameIndex,
+                         const Dali::ImageDimensions&                   desiredSize,
+                         const Dali::FittingMode::Type                  fittingMode,
+                         const Dali::SamplingMode::Type                 samplingMode,
+                         const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
   /**
    * @brief Load a new texture.
@@ -75,14 +74,14 @@ public:
    * @param[in] preMultiplyOnLoad     if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
    * @param[in] loadYuvPlanes         True if the image should be loaded as yuv planes
    */
-  void Load(const TextureManager::TextureId&                textureId,
-            const VisualUrl&                                url,
-            const Dali::ImageDimensions&                    desiredSize,
-            const Dali::FittingMode::Type&                  fittingMode,
-            const Dali::SamplingMode::Type&                 samplingMode,
-            const bool&                                     orientationCorrection,
-            const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad,
-            const bool&                                     loadYuvPlanes);
+  void Load(const TextureManager::TextureId                textureId,
+            const VisualUrl&                               url,
+            const Dali::ImageDimensions&                   desiredSize,
+            const Dali::FittingMode::Type                  fittingMode,
+            const Dali::SamplingMode::Type                 samplingMode,
+            const bool                                     orientationCorrection,
+            const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+            const bool                                     loadYuvPlanes);
 
   /**
    * @brief Apply mask
@@ -93,12 +92,12 @@ public:
    * @param [in] cropToMask Whether to crop the content to the mask size
    * @param [in] preMultiplyOnLoad if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    */
-  void ApplyMask(const TextureManager::TextureId&                textureId,
-                 Devel::PixelBuffer                              pixelBuffer,
-                 Devel::PixelBuffer                              maskPixelBuffer,
-                 const float&                                    contentScale,
-                 const bool&                                     cropToMask,
-                 const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad);
+  void ApplyMask(const TextureManager::TextureId                textureId,
+                 Devel::PixelBuffer                             pixelBuffer,
+                 Devel::PixelBuffer                             maskPixelBuffer,
+                 const float                                    contentScale,
+                 const bool                                     cropToMask,
+                 const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
 public:
   TextureAsyncLoadingHelper(const TextureAsyncLoadingHelper&) = delete;

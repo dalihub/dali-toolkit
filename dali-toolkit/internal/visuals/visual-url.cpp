@@ -233,9 +233,9 @@ VisualUrl::VisualUrl(const std::string& url)
   if(!url.empty())
   {
     mLocation = ResolveLocation(url);
-    if(VisualUrl::TEXTURE != mLocation && VisualUrl::BUFFER != mLocation)
+    if(VisualUrl::TEXTURE != mLocation)
     {
-      // TEXTURE and BUFFER location url doesn't need type resolving, REGULAR_IMAGE is fine
+      // TEXTURE location url doesn't need type resolving, REGULAR_IMAGE is fine
       mType = ResolveType(url);
     }
   }
@@ -328,14 +328,19 @@ std::string VisualUrl::GetLocation() const
   return GetLocation(mUrl);
 }
 
+std::string VisualUrl::GetLocationWithoutExtension() const
+{
+  return GetLocationWithoutExtension(mUrl);
+}
+
 std::string VisualUrl::CreateTextureUrl(const std::string& location)
 {
   return "dali://" + location;
 }
 
-std::string VisualUrl::CreateBufferUrl(const std::string& location)
+std::string VisualUrl::CreateBufferUrl(const std::string& location, const std::string_view& extension)
 {
-  return "enbuf://" + location;
+  return "enbuf://" + location + std::string(extension);
 }
 
 VisualUrl::ProtocolType VisualUrl::GetProtocolType(const std::string& url)
@@ -349,6 +354,18 @@ std::string VisualUrl::GetLocation(const std::string& url)
   if(std::string::npos != location)
   {
     return url.substr(location + 3u); // 3 characters forwards from the start of ://
+  }
+  return url;
+}
+
+std::string VisualUrl::GetLocationWithoutExtension(const std::string& url)
+{
+  const auto location = url.find("://");
+  if(std::string::npos != location)
+  {
+    const auto extension = url.find_last_of("."); // Find last position of '.' keyword.
+    const auto locationLength = extension != std::string::npos ? extension - (location + 3u) : std::string::npos;
+    return url.substr(location + 3u, locationLength); // 3 characters forwards from the start of ://, and end of last '.' keyword.
   }
   return url;
 }

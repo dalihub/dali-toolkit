@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/public-api/adaptor-framework/async-task-manager.h>
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-array.h>
 #include <chrono>
@@ -162,9 +163,10 @@ public:
    * @brief Requests to load the animation file.
    *
    * @param[in] url The url of the vector animation file
+   * @param[in] encodedImageBuffer The resource buffer if required.
    * @param[in] synchronousLoading True if the url should be loaded synchronously
    */
-  void RequestLoad(const VisualUrl& url, bool synchronousLoading);
+  void RequestLoad(const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, bool synchronousLoading);
 
   /**
    * @brief Queries whether loading is requested.
@@ -214,6 +216,12 @@ public:
    * @param[out] map The layer information
    */
   void GetLayerInfo(Property::Map& map) const;
+
+  /**
+   * @brief Gets the all marker information.
+   * @param[out] map The marker information
+   */
+  void GetMarkerInfo(Property::Map& map) const;
 
   /**
    * @brief Connect to this signal to be notified when the resource is ready.
@@ -357,6 +365,7 @@ private:
   };
 
   VisualUrl                            mImageUrl;
+  EncodedImageBuffer                   mEncodedImageBuffer;
   VectorAnimationRenderer              mVectorRenderer;
   std::vector<AnimationData>           mAnimationData[2];
   VectorAnimationThread&               mVectorAnimationThread;
@@ -364,6 +373,8 @@ private:
   ResourceReadySignalType              mResourceReadySignal;
   std::unique_ptr<CallbackBase>        mAnimationFinishedCallback{};
   std::unique_ptr<CallbackBase>        mLoadCompletedCallback{};
+  mutable Property::Map                mCachedLayerInfo;
+  mutable Property::Map                mCachedMarkerInfo;
   PlayState                            mPlayState;
   DevelImageVisual::StopBehavior::Type mStopBehavior;
   DevelImageVisual::LoopingMode::Type  mLoopingMode;
@@ -380,15 +391,17 @@ private:
   uint32_t                             mAnimationDataIndex;
   int32_t                              mLoopCount;
   int32_t                              mCurrentLoop;
-  bool                                 mForward;
-  bool                                 mUpdateFrameNumber;
-  bool                                 mNeedAnimationFinishedTrigger;
-  bool                                 mAnimationDataUpdated;
-  bool                                 mDestroyTask;
-  bool                                 mLoadRequest;
-  bool                                 mLoadFailed;
-  bool                                 mRasterized;
-  bool                                 mKeepAnimation;
+  bool                                 mForward : 1;
+  bool                                 mUpdateFrameNumber : 1;
+  bool                                 mNeedAnimationFinishedTrigger : 1;
+  bool                                 mAnimationDataUpdated : 1;
+  bool                                 mDestroyTask : 1;
+  bool                                 mLoadRequest : 1;
+  bool                                 mLoadFailed : 1;
+  bool                                 mRasterized : 1;
+  bool                                 mKeepAnimation : 1;
+  mutable bool                         mLayerInfoCached : 1;
+  mutable bool                         mMarkerInfoCached : 1;
 };
 
 } // namespace Internal

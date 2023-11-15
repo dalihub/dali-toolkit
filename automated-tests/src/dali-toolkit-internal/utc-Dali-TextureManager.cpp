@@ -62,6 +62,9 @@ const char* TEST_IMAGE_3_FILE_NAME = TEST_RESOURCE_DIR "/icon-edit.png";
 const char* TEST_IMAGE_4_FILE_NAME = TEST_RESOURCE_DIR "/application-icon-20.png";
 const char* TEST_MASK_FILE_NAME    = TEST_RESOURCE_DIR "/mask.png";
 
+const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg";
+const char* TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
+
 class TestObserver : public Dali::Toolkit::TextureUploadObserver
 {
 public:
@@ -204,7 +207,6 @@ int UtcTextureManagerRequestLoad(void)
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
-    TextureManager::UseAtlas::NO_ATLAS,
     &observer,
     true,
     TextureManager::ReloadPolicy::CACHED,
@@ -231,7 +233,6 @@ int UtcTextureManagerGenerateHash(void)
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
-    TextureManager::UseAtlas::NO_ATLAS,
     &observer,
     true,
     TextureManager::ReloadPolicy::CACHED,
@@ -258,7 +259,7 @@ int UtcTextureManagerEncodedImageBuffer(void)
 
   std::string url1 = textureManager.AddEncodedImageBuffer(buffer1);
   std::string url2 = textureManager.AddEncodedImageBuffer(buffer1);
-  std::string url3 = VisualUrl::CreateBufferUrl(""); ///< Impossible Buffer URL. for coverage
+  std::string url3 = VisualUrl::CreateBufferUrl("", ""); ///< Impossible Buffer URL. for coverage
 
   // Check if same EncodedImageBuffer get same url
   DALI_TEST_CHECK(url1 == url2);
@@ -279,7 +280,6 @@ int UtcTextureManagerEncodedImageBuffer(void)
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
-    TextureManager::UseAtlas::NO_ATLAS,
     &observer1,
     true, ///< orientationCorrection
     TextureManager::ReloadPolicy::CACHED,
@@ -353,7 +353,6 @@ int UtcTextureManagerEncodedImageBuffer(void)
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
-    TextureManager::UseAtlas::NO_ATLAS,
     &observer3,
     true, ///< orientationCorrection
     TextureManager::ReloadPolicy::CACHED,
@@ -370,7 +369,6 @@ int UtcTextureManagerEncodedImageBuffer(void)
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
-    TextureManager::UseAtlas::NO_ATLAS,
     &observer4,
     true, ///< orientationCorrection
     TextureManager::ReloadPolicy::FORCED,
@@ -433,6 +431,72 @@ int UtcTextureManagerEncodedImageBuffer(void)
   DALI_TEST_EQUALS(observer6.mLoaded, false, TEST_LOCATION);
   DALI_TEST_EQUALS(observer6.mObserverCalled, true, TEST_LOCATION);
   DALI_TEST_EQUALS(observer6.mCompleteType, TestObserver::CompleteType::LOAD_COMPLETE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcTextureManagerEncodedImageBufferWithImageType(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcTextureManagerEncodedImageBufferWithImageType");
+
+  auto  visualFactory  = Toolkit::VisualFactory::Get();
+  auto& textureManager = GetImplementation(visualFactory).GetTextureManager(); // Use VisualFactory's texture manager
+
+  // Get encoded raw-buffer image and generate url
+  EncodedImageBuffer buffer1 = ConvertFileToEncodedImageBuffer(TEST_SVG_FILE_NAME);
+  EncodedImageBuffer buffer2 = ConvertFileToEncodedImageBuffer(TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME);
+
+  std::string url1 = textureManager.AddEncodedImageBuffer(buffer1);
+  std::string url2 = textureManager.AddEncodedImageBuffer(buffer1);
+
+  // Check if same EncodedImageBuffer get same url
+  DALI_TEST_CHECK(url1 == url2);
+  // Reduce reference count
+  textureManager.RemoveEncodedImageBuffer(url1);
+  // Check whethere url1 still valid
+  DALI_TEST_CHECK(textureManager.GetEncodedImageBuffer(url1));
+
+  url2 = textureManager.AddEncodedImageBuffer(buffer2);
+  // Check if difference EncodedImageBuffer get difference url
+  DALI_TEST_CHECK(url1 != url2);
+
+  buffer1.SetImageType(EncodedImageBuffer::ImageType::VECTOR_IMAGE);
+  buffer2.SetImageType(EncodedImageBuffer::ImageType::ANIMATED_VECTOR_IMAGE);
+
+  std::string url1AfterType = textureManager.AddEncodedImageBuffer(buffer1);
+  std::string url2AfterType = textureManager.AddEncodedImageBuffer(buffer2);
+
+  // Check if EncodedImageBuffer with imagetype get difference url.
+  DALI_TEST_CHECK(url1 != url1AfterType);
+  DALI_TEST_CHECK(url2 != url2AfterType);
+  DALI_TEST_CHECK(url1AfterType != url2AfterType);
+
+  int  bufferId      = std::atoi(VisualUrl::GetLocationWithoutExtension(url1AfterType).c_str());
+  auto urlFromBuffer = textureManager.GetVisualUrl(bufferId);
+
+  // Check url from buffer id is equal with what we know.
+  DALI_TEST_CHECK(url1AfterType == urlFromBuffer.GetUrl());
+
+  // Reduce reference count
+  textureManager.RemoveEncodedImageBuffer(url1AfterType);
+  // Check whethere url1 still valid
+  DALI_TEST_CHECK(textureManager.GetEncodedImageBuffer(url1AfterType));
+
+  // Reduce reference count
+  textureManager.RemoveEncodedImageBuffer(url1AfterType);
+  // Check whethere url1 is invalid
+  DALI_TEST_CHECK(!textureManager.GetEncodedImageBuffer(url1AfterType));
+
+  // Reduce reference count
+  textureManager.RemoveEncodedImageBuffer(url2);
+  // Check whethere url2 is still valid
+  DALI_TEST_CHECK(textureManager.GetEncodedImageBuffer(url2));
+
+  // Reduce reference count
+  textureManager.RemoveEncodedImageBuffer(url2);
+  // Check whethere url2 is invalid
+  DALI_TEST_CHECK(!textureManager.GetEncodedImageBuffer(url2));
 
   END_TEST;
 }
@@ -738,7 +802,6 @@ int UtcTextureManagerEncodedImageBufferReferenceCount(void)
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
-    TextureManager::UseAtlas::NO_ATLAS,
     &observer1,
     true, ///< orientationCorrection
     TextureManager::ReloadPolicy::CACHED,
@@ -817,7 +880,6 @@ int UtcTextureManagerCachingForDifferentLoadingType(void)
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
-    TextureManager::UseAtlas::NO_ATLAS,
     &observer1,
     true,
     TextureManager::ReloadPolicy::CACHED,
@@ -1383,7 +1445,6 @@ int UtcTextureManagerQueueRemoveDuringObserve(void)
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
-    TextureManager::UseAtlas::NO_ATLAS,
     &observer,
     true,
     TextureManager::ReloadPolicy::CACHED,
@@ -1490,7 +1551,6 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
-    TextureManager::UseAtlas::NO_ATLAS,
     &observer2,
     true, ///< orientationCorrection
     TextureManager::ReloadPolicy::CACHED,
@@ -1862,7 +1922,6 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
         ImageDimensions(),
         FittingMode::SCALE_TO_FILL,
         SamplingMode::BOX_THEN_LINEAR,
-        TextureManager::UseAtlas::NO_ATLAS,
         data2.addTextureObserver,
         true,
         TextureManager::ReloadPolicy::CACHED,
@@ -2000,7 +2059,6 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
-    TextureManager::UseAtlas::NO_ATLAS,
     &observer1,
     true,
     TextureManager::ReloadPolicy::CACHED,
@@ -2011,7 +2069,6 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
-    TextureManager::UseAtlas::NO_ATLAS,
     observer2,
     true,
     TextureManager::ReloadPolicy::CACHED,
@@ -2022,7 +2079,6 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
-    TextureManager::UseAtlas::NO_ATLAS,
     &observer3,
     true,
     TextureManager::ReloadPolicy::CACHED,
@@ -2136,7 +2192,6 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
         ImageDimensions(),
         FittingMode::SCALE_TO_FILL,
         SamplingMode::BOX_THEN_LINEAR,
-        TextureManager::UseAtlas::NO_ATLAS,
         data1.resendTextureObserver,
         true,
         TextureManager::ReloadPolicy::CACHED,
@@ -2151,7 +2206,6 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
         ImageDimensions(),
         FittingMode::SCALE_TO_FILL,
         SamplingMode::BOX_THEN_LINEAR,
-        TextureManager::UseAtlas::NO_ATLAS,
         *data1.removeTextureObserver,
         true,
         TextureManager::ReloadPolicy::CACHED,

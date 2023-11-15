@@ -151,8 +151,9 @@ public:
    * @brief Updates shaders by using current material
    *
    * @param[in] shaderManager Shader manager to create shader.
+   * @param[in] hash of old shader option
    */
-  void UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager);
+  void UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager, Loader::ShaderOption::HashType hash);
 
   /**
    * @brief Sets the blend shape data for this model primitive.
@@ -182,8 +183,16 @@ public:
    * @brief Sets whether or not this model primitive is skinned.
    *
    * @param[in] isSkinned Whether or not this model primitive is skinned.
+   * @param[in] numberOfJointSets How many joint sets the mesh expects in the shader
    */
-  void SetSkinned(bool isSkinned);
+  void SetSkinned(bool isSkinned, uint32_t numberOfJointSets);
+
+  /**
+   * @brief Set whether this model primitve has vertex color attributes
+   *
+   * @param[in] hasVertexColor Whether or not this model primitive has vertex color attributes
+   */
+  void SetVertexColor(bool hasVertexColor);
 
 private: // From MaterialModifyObserver
   /**
@@ -195,7 +204,8 @@ private:
   /**
    * @brief Apply materials data into renderer.
    */
-  void ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag flag = MaterialModifyObserver::ModifyFlag::NONE);
+  void ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag flag    = MaterialModifyObserver::ModifyFlag::NONE,
+                               Loader::ShaderOption::HashType     oldHash = 0u);
 
   /**
    * @brief Updates the uniform of renderer.
@@ -216,9 +226,9 @@ private:
 
 private:
   // Delete copy & move operator
-  ModelPrimitive(const ModelPrimitive&)                    = delete;
-  ModelPrimitive(ModelPrimitive&&)                         = delete;
-  ModelPrimitive& operator=(const ModelPrimitive& rhs)     = delete;
+  ModelPrimitive(const ModelPrimitive&) = delete;
+  ModelPrimitive(ModelPrimitive&&)      = delete;
+  ModelPrimitive& operator=(const ModelPrimitive& rhs) = delete;
   ModelPrimitive& operator=(ModelPrimitive&& rhs) noexcept = delete;
 
 private:
@@ -242,10 +252,14 @@ private:
   float         mIblScaleFactor{1.0f};
   uint32_t      mSpecularMipmapLevels{1u};
 
+  // For skinning
+  uint32_t mNumberOfJointSets{0};
+
   // For blend shape
   Scene3D::Loader::BlendShapes::BlendShapeData mBlendShapeData;
   Dali::Texture                                mBlendShapeGeometry;
   bool                                         mHasSkinning       = false;
+  bool                                         mHasVertexColor    = false;
   bool                                         mHasPositions      = false;
   bool                                         mHasNormals        = false;
   bool                                         mHasTangents       = false;

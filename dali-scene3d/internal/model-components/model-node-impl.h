@@ -30,6 +30,7 @@
 #include <dali-scene3d/public-api/light/light.h>
 #include <dali-scene3d/public-api/loader/mesh-definition.h>
 #include <dali-scene3d/public-api/loader/shader-manager.h>
+#include <dali-scene3d/public-api/loader/shader-option.h>
 #include <dali-scene3d/public-api/loader/skinning-details.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
@@ -198,7 +199,7 @@ public: // Public Method
   /**
    * @copydoc Dali::Scene3D::ModelNode::AddModelPrimitive()
    */
-  void AddModelPrimitive(Dali::Scene3D::ModelPrimitive modelPrimitive);
+  void AddModelPrimitive(Dali::Scene3D::ModelPrimitive modelPrimitive, Loader::ShaderOption::HashType hash);
 
   /**
    * @copydoc Dali::Scene3D::ModelNode::RemoveModelPrimitive(Dali::Scene3D::ModelPrimitive modelPrimitive)
@@ -306,7 +307,7 @@ private:
   Scene3D::Loader::ShaderManagerPtr mShaderManager;
   ModelPrimitiveContainer           mModelPrimitiveContainer; ///< List of model primitives
   BoneDataContainer                 mBoneDataContainer;
-  BlendShapeIndexMap                mBlendShapeIndexMap;      ///< Index of blend shape by name
+  BlendShapeIndexMap                mBlendShapeIndexMap; ///< Index of blend shape by name
   Dali::Texture                     mShadowMapTexture;
   Dali::Texture                     mSpecularTexture;
   Dali::Texture                     mDiffuseTexture;

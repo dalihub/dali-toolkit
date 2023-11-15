@@ -27,7 +27,7 @@ namespace Dali::Toolkit::ParticleSystem
 {
 using ParticleStreamTypeFlagBit = uint32_t;
 
-namespace ParticleStream DALI_TOOLKIT_API
+namespace ParticleStream
 {
 constexpr ParticleStreamTypeFlagBit POSITION_STREAM_BIT      = 1 << 0; ///< 3D Position stream
 constexpr ParticleStreamTypeFlagBit ROTATION_STREAM_BIT      = 1 << 1; ///< 3D Rotation stream

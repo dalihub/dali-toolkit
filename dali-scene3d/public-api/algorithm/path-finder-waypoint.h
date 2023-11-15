@@ -29,7 +29,7 @@
 
 namespace Dali::Scene3D::Internal::Algorithm
 {
-class WayPointData;
+struct WayPointData;
 }
 
 namespace Dali::Scene3D::Algorithm

@@ -24,12 +24,12 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/light/light.h>
 #include <dali-scene3d/public-api/loader/index.h>
 #include <dali-scene3d/public-api/loader/material-definition.h>
 #include <dali-scene3d/public-api/loader/mesh-definition.h>
 #include <dali-scene3d/public-api/loader/renderer-state.h>
 #include <dali-scene3d/public-api/loader/shader-option.h>
-#include <dali-scene3d/public-api/light/light.h>
 
 namespace Dali::Scene3D::Loader
 {
@@ -55,9 +55,9 @@ public:
    * (Although the input materialDefinition and meshDefinition are not identical to those used to create the cached Dali::Shader, they share the cached one.)
    * @param[in] materialDefinition MaterialDefinition that includes information of material to create Shader.
    * @param[in] meshDefinition meshDefinition that includes information of mesh to create Shader.
-   * @return Dali::Shader for the materialDefinition and meshDefinition.
+   * @return ShaderOption for the materialDefinition and meshDefinition.
    */
-  Dali::Shader ProduceShader(const MaterialDefinition& materialDefinition, const MeshDefinition& meshDefinition);
+  ShaderOption ProduceShaderOption(const MaterialDefinition& materialDefinition, const MeshDefinition& meshDefinition);
 
   /**
    * @brief Produces a Dali::Shader for the input ShaderOption
@@ -147,6 +147,7 @@ private:
    * @param[in] shader Shader that the constraint will be applied.
    */
   DALI_INTERNAL void SetShadowConstraintToShader(Dali::Shader shader);
+
 private:
   struct Impl;
   const std::unique_ptr<Impl> mImpl;
