@@ -67,7 +67,7 @@ struct DALI_TOOLKIT_API Glyph
   ~Glyph();
 
   std::string url;       ///< The url of the glyph.
-  uint8_t     utf8[4];   ///< the glyph encoded in utf8
+  uint8_t     utf8[6];   ///< the glyph encoded in utf8
   float       ascender;  ///< The ascender. The distance from the base line to the top of the glyph.
   float       descender; ///< The descender. The distance from the base line to the bottom of the glyph.
 };

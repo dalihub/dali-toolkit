@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,9 +45,12 @@ Glyph::Glyph(const std::string& url, const std::string utf8Character, float asce
   ascender{ascender},
   descender{descender}
 {
-  DALI_ASSERT_DEBUG(utf8Character.size() <= 4u);
+  DALI_ASSERT_DEBUG(utf8Character.size() <= 6u);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
   std::copy(utf8Character.begin(), utf8Character.end(), utf8);
+#pragma GCC diagnostic pop
 }
 
 Glyph::~Glyph()
