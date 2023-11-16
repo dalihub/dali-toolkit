@@ -45,6 +45,48 @@ public:
    * @return Valid NavigationMesh or nullptr
    */
   static std::unique_ptr<Algorithm::NavigationMesh> CreateFromBuffer(const std::vector<uint8_t>& buffer);
+
+  /**
+   * @brief Creates new mesh from lists of vertices and faces
+   *
+   * List of faces contains indices into the vertex list
+   *
+   * @SINCE_2_3.0
+   * @param[in] vertices List of Vector3 vertices
+   * @param[in] vertexNormals List of Vector3 vertices
+   * @param[in] faceIndices List of faces
+   * @return Valid NavigationMesh or nullptr
+   */
+  static std::unique_ptr<Algorithm::NavigationMesh> CreateFromVertexFaceList(const std::vector<Vector3>& vertices, const std::vector<Vector3>& vertexNormals, const std::vector<uint32_t>& faceIndices);
+
+  /**
+   * @brief Creates new mesh from lists of vertices and faces
+   *
+   * List of faces contains indices into the vertex list
+   *
+   * This function reduces number of array copys when called from NUI.
+   *
+   * @SINCE_2_3.0
+   * @param[in] vertices Pointer to C-style array of vertices
+   * @param[in] vertexCount Number of vertices
+   * @param[in] vertexNormals to C-style array of vertex normals
+   * @param[in] faceIndices Pointer to C-style array of face elements indices
+   * @param[in] indexCount Number of indices
+   * @return Valid NavigationMesh or nullptr
+   */
+  static std::unique_ptr<Algorithm::NavigationMesh> CreateFromVertexFaceList(const Vector3* vertices, const Vector3* vertexNormals, uint32_t vertexCount, const uint32_t* faceIndices, uint32_t indexCount);
+
+  /**
+   * @brief Serializes mesh data to the binary format.
+   *
+   * The binary data returned by the function can be used
+   * as an input for NavigationMeshFactory::CreateFromBuffer()
+   *
+   * @SINCE_2_3.0
+   * @param[in] navigationMesh Navigation mesh to serialize
+   * @return Buffer containing serialized mesh data
+   */
+  static std::vector<uint8_t> GetMeshBinary(const Dali::Scene3D::Algorithm::NavigationMesh& navigationMesh);
 };
 } // namespace Dali::Scene3D::Loader
 

@@ -40,7 +40,12 @@ class NavigationMeshFactory;
 
 namespace Dali::Scene3D::Internal::Algorithm
 {
-class NavigationRay;
+// Internal Navigation ray structure
+struct NavigationRay
+{
+  Dali::Vector3 origin;    // Origin of ray
+  Dali::Vector3 direction; // Direction of ray
+};
 
 // Make each to change each index value's type here.
 using VertexIndex = Dali::Scene3D::Algorithm::VertexIndex;
@@ -138,6 +143,14 @@ public:
   IntersectResult NavigationRayFaceIntersection(NavigationRay& ray, const Face& face) const;
 
   /**
+   * @brief Test ray against the mesh and returns intersection result
+   * @param[in] rayOrig Input ray to test collision
+   *
+   * @return Valid IntersectResult structure
+   */
+  IntersectResult RayCastIntersect(NavigationRay& rayOrig) const;
+
+  /**
    * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::PointSceneToLocal()
    */
   Dali::Vector3 PointSceneToLocal(const Dali::Vector3& point) const;
@@ -152,6 +165,15 @@ public:
    */
   [[nodiscard]] Dali::Vector3 GetGravityVector() const;
 
+  /**
+   * @brief Returns binary data of the mesh
+   * @return Reference to the binary buffer
+   */
+  [[nodiscard]] const std::vector<uint8_t>& GetData() const
+  {
+    return mBuffer;
+  }
+
 private:
   std::vector<uint8_t>     mBuffer;           //< Data buffer
   NavigationMeshHeader_V10 mHeader;           //< Navigation mesh header
@@ -161,6 +183,11 @@ private:
 };
 
 inline Internal::Algorithm::NavigationMesh& GetImplementation(Dali::Scene3D::Algorithm::NavigationMesh& navigationMesh)
+{
+  return *navigationMesh.mImpl;
+}
+
+inline const Internal::Algorithm::NavigationMesh& GetImplementation(const Dali::Scene3D::Algorithm::NavigationMesh& navigationMesh)
 {
   return *navigationMesh.mImpl;
 }
