@@ -38,17 +38,20 @@ namespace Dali::Scene3D::Algorithm
  * @class WayPoint
  *
  * The class represents a public interface to the WayPoint object
+ * @SINCE_2_2.12
  */
 class DALI_SCENE3D_API WayPoint
 {
 public:
   /**
    * @brief Constructor
+   * @SINCE_2_2.12
    */
   WayPoint();
 
   /**
    * @brief Destructor
+   * @SINCE_2_2.12
    */
   ~WayPoint();
 
@@ -58,6 +61,7 @@ public:
    * Function returns index of face withing the NavigationMesh
    * that the waypoint is associated with.
    *
+   * @SINCE_2_2.12
    * @return Valid index of the face
    */
   [[nodiscard]] uint32_t GetNavigationMeshFaceIndex() const;
@@ -68,6 +72,7 @@ public:
    * The face space uses the face barycentre as an origin. The x-axis is
    * aligned with x-axis of the NavigationMesh.
    *
+   * @SINCE_2_2.12
    * @return Valid 2D location vector
    */
   [[nodiscard]] Dali::Vector2 GetFaceLocalSpacePosition() const;
@@ -79,6 +84,7 @@ public:
    * of associated NavigationMesh object (using transformation set with
    * NavigationMesh::SetSceneTransform()).
    *
+   * @SINCE_2_2.12
    * @return Valid 3D location vector
    */
   [[nodiscard]] Dali::Vector3 GetScenePosition() const;
@@ -87,6 +93,7 @@ public:
    * @brief Copy constructor
    *
    * Only copy semantics is allowed on the WayPoint object
+   * @SINCE_2_2.12
    */
   WayPoint(const WayPoint&);
 
@@ -95,6 +102,7 @@ public:
    *
    * Only copy semantics is allowed on the WayPoint object
    *
+   * @SINCE_2_2.12
    * @return Copy of source object
    */
   WayPoint& operator=(const WayPoint&);

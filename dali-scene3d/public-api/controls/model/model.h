@@ -75,7 +75,7 @@ class DALI_SCENE3D_API Model : public Dali::Toolkit::Control
 {
 public:
   // Typedefs
-  using MeshHitSignalType = Signal<bool(Model, Scene3D::ModelNode)>; ///< Mesh hit signal type @SINCE_2_2.99 TODO: See what parameters need to be added
+  using MeshHitSignalType = Signal<bool(Model, Scene3D::ModelNode)>; ///< Mesh hit signal type @SINCE_2_2.53
   using ColliderMeshPtr   = std::unique_ptr<Algorithm::NavigationMesh>;
 
   /**
@@ -167,7 +167,7 @@ public:
    * @brief Add new ModelNode to this Model.
    * This modelNode will become child of ModelRoot.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] modelNode the root of ModelNode tree to be added.
    */
   void AddModelNode(ModelNode modelNode);
@@ -175,7 +175,7 @@ public:
   /**
    * @brief Remove ModelNode from this Model.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] modelNode the root of ModelNode tree to be removed.
    */
   void RemoveModelNode(ModelNode modelNode);
@@ -385,7 +385,7 @@ public:
    * The return value of True, indicates that the hover event should be consumed.
    * Otherwise the signal will be emitted on the next sensitive parent of the actor.
    *
-   * @SINCE_2_3.0
+   * @SINCE_2_2.53
    * @return The signal to connect to
    */
   MeshHitSignalType& MeshHitSignal();

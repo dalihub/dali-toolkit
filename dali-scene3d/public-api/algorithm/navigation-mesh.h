@@ -257,7 +257,7 @@ public:
    * @param[in] origin Origin of ray
    * @param[in] direction Direction of ray
    *
-   * @SINCE_2_3.0
+   * @SINCE_2_2.53
    * @return Valid FaceIndex on hit or NULL_FACE on miss
    */
   [[nodiscard]] FaceIndex RayFaceIntersect(const Vector3& origin, const Vector3& direction) const;
