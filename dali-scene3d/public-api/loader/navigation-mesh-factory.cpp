@@ -192,8 +192,7 @@ std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVert
               reinterpret_cast<uint8_t*>(meshFaces.data()),
               reinterpret_cast<uint8_t*>(meshFaces.data()) + (meshFaces.size() * sizeof(NavigationMesh::Face)));
 
-  auto retval = std::move(NavigationMeshFactory::CreateFromBuffer(navigationMeshBinary));
-  return retval;
+  return NavigationMeshFactory::CreateFromBuffer(navigationMeshBinary);
 }
 
 std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVertexFaceList(const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals, const std::vector<uint32_t>& faceIndices)
