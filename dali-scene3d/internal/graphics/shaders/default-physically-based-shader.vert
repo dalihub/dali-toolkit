@@ -6,7 +6,10 @@
 
 #define MORPH defined(MORPH_POSITION) || defined(MORPH_NORMAL) || defined(MORPH_TANGENT)
 
-// If needed, define these strings in code, insert after each.
+// These lines in the shader may be replaced with actual definitions by the model loader,
+// if they are needed. Note, some shader compilers have problems with spurious ";", so
+// the macro invocations don't have a trailing ";". The replacement strings in the model
+// loader will provide it instead.
 #define ADD_EXTRA_SKINNING_ATTRIBUTES
 #define ADD_EXTRA_WEIGHTS
 
@@ -31,7 +34,7 @@ in vec4 aVertexColor;
 #ifdef SKINNING
 in vec4 aJoints0;
 in vec4 aWeights0;
-ADD_EXTRA_SKINNING_ATTRIBUTES;
+ADD_EXTRA_SKINNING_ATTRIBUTES
 #endif
 
 #ifdef MORPH
@@ -165,7 +168,7 @@ void main()
     uBone[int(aJoints0.z)] * aWeights0.z +
     uBone[int(aJoints0.w)] * aWeights0.w;
 
-  ADD_EXTRA_WEIGHTS;
+  ADD_EXTRA_WEIGHTS
 
   position = bone * position;
   normal = uYDirection * (bone * vec4(normal, 0.0)).xyz;
