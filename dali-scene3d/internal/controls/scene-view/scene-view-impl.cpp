@@ -1111,6 +1111,7 @@ void SceneView::UpdateRenderTask()
         // To flip rendered scene without CameraActor::SetInvertYAxis() to avoid backface culling.
         imagePropertyMap.Insert(Toolkit::ImageVisual::Property::PIXEL_AREA, Vector4(0.0f, 1.0f, 1.0f, -1.0f));
         imagePropertyMap.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mAlphaMaskUrl);
+        imagePropertyMap.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, true);
         if(!mAlphaMaskUrl.empty())
         {
           imagePropertyMap.Insert(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, mMaskContentScaleFactor);
@@ -1119,6 +1120,7 @@ void SceneView::UpdateRenderTask()
         }
         mMaskingPropertyChanged = false;
         mVisual = Toolkit::VisualFactory::Get().CreateVisual(imagePropertyMap);
+        Self().RegisterProperty("uYFlipMaskTexture", 1.0f);
 
         Toolkit::DevelControl::RegisterVisual(*this, RENDERING_BUFFER, mVisual);
 

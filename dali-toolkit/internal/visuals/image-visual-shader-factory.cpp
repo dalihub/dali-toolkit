@@ -271,6 +271,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     }
     shader = Shader::New(vertexShader, fragmentShader);
     shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+    shader.RegisterProperty("uYFlipMaskTexture", 0.0f);
     factoryCache.SaveShader(shaderType, shader);
   }
 
