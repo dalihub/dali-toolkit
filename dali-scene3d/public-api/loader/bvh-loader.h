@@ -26,6 +26,7 @@ namespace Dali::Scene3D::Loader
 /**
  * @brief Loads motion capture data from bvh file format.
  *
+ * @SINCE_2_1.32
  * @param[in] path The file path.
  * @param[in] animationName Name of the motion capture animation
  * @param[in] scale The scale factor to set on the position property manually.
@@ -36,6 +37,7 @@ DALI_SCENE3D_API AnimationDefinition LoadBvh(const std::string& path, const std:
 /**
  * @brief Loads motion capture data from bvh data stream.
  *
+ * @SINCE_2_2.23
  * @param[in] rawBuffer The bvh buffer.
  * @param[in] rawBufferLength The length of buffer.
  * @param[in] animationName Name of the motion capture animation

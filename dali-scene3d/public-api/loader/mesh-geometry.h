@@ -29,10 +29,10 @@ namespace Dali::Scene3D::Loader
 {
 struct DALI_SCENE3D_API MeshGeometry
 {
-  Geometry       geometry;                    ///< The array of vertices.
-  Texture        blendShapeGeometry;          ///< The array of vertices of the different blend shapes encoded inside a texture with power of two dimensions.
-  Vector<float>  blendShapeUnnormalizeFactor; ///< Factor used to unnormalize the geometry of the blend shape.
-  unsigned int   blendShapeBufferOffset{0};   ///< Offset used to calculate the start of each blend shape.
+  Geometry       geometry;                    ///< The array of vertices. @SINCE_2_0.7
+  Texture        blendShapeGeometry;          ///< The array of vertices of the different blend shapes encoded inside a texture with power of two dimensions. @SINCE_2_0.7
+  Vector<float>  blendShapeUnnormalizeFactor; ///< Factor used to unnormalize the geometry of the blend shape. @SINCE_2_0.7
+  unsigned int   blendShapeBufferOffset{0};   ///< Offset used to calculate the start of each blend shape. @SINCE_2_0.20
 };
 
 } // namespace Dali::Scene3D::Loader

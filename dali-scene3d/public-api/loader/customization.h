@@ -31,6 +31,7 @@ namespace Dali::Scene3D::Loader
  * @brief Offers a description of an aspect of the scene that can be customized:
  *     the number of options, and the name of the nodes that are registered
  *     for the tag, whose children will be shown / hidden based on selection.
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API Customization
 {
@@ -39,6 +40,7 @@ struct DALI_SCENE3D_API Customization
 
   /**
    * @brief A mapping of customizations to tags.
+   * @SINCE_2_0.7
    */
   struct DALI_SCENE3D_API Map
   {
@@ -47,27 +49,32 @@ struct DALI_SCENE3D_API Customization
 
     /**
      * @brief Maps the given @a customization to the given @a tag, overwriting any previous mapping to the same tag.
+     * @SINCE_2_0.7
      * @return Pointer to the inserted (or pre-existing) Customization instance.
      */
     Customization* Set(Tag tag, Customization&& customization);
 
     /**
      * @brief Attempts to retrieve a const Customization based on the given @a tag.
+     * @SINCE_2_0.7
      */
     const Customization* Get(Tag tag) const;
 
     /**
      * @brief Attempts to retrieve a Customization based on the given @a tag.
+     * @SINCE_2_0.7
      */
     Customization* Get(Tag tag);
 
     /**
      * @brief Returns the number of elements.
+     * @SINCE_2_0.7
      */
     uint32_t Size() const;
 
-    /*
+    /**
      * @brief Removes every element from the Map.
+     * @SINCE_2_0.7
      */
     void Clear();
 
@@ -78,6 +85,7 @@ struct DALI_SCENE3D_API Customization
 
   /**
    * @brief A mapping of choices - indices of children of customization nodes to use - to tags.
+   * @SINCE_2_0.7
    */
   struct DALI_SCENE3D_API Choices
   {
@@ -86,21 +94,28 @@ struct DALI_SCENE3D_API Customization
 
     /**
      * @brief Maps the given @a option to the given @a tag, overwriting any previous mapping to the same tag.
+     * @SINCE_2_0.7
      */
     void Set(Tag tag, OptionType option);
 
     /**
-     * @brief Attempts to retrieve a Customization based on the given @a tag. Returns NONE if @a tag is not known.
+     * @brief Attempts to retrieve a Customization based on the given @a tag.
+     * @SINCE_2_0.7
+     * @return A Customization based on the given @a tag.
+     * @note Returns NONE if @a tag is not known.
      */
     OptionType Get(Tag tag) const;
 
     /**
      * @brief Returns the number of elements.
+     * @SINCE_2_0.7
+     * @return The number of elements.
      */
     uint32_t Size() const;
 
-    /*
+    /**
      * @brief Removes every element from the underlying map.
+     * @SINCE_2_0.7
      */
     void Clear();
 

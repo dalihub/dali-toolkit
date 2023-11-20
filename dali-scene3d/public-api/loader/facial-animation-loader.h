@@ -28,6 +28,7 @@ namespace Dali::Scene3D::Loader
  *
  * Throws a DaliException on error.
  *
+ * @SINCE_2_1.30
  * @param[in] url The url of the file containing the facial animation.
  *
  * @return An animation definition.
@@ -39,6 +40,7 @@ DALI_SCENE3D_API AnimationDefinition LoadFacialAnimation(const std::string& url)
  *
  * Throws a DaliException on error.
  *
+ * @SINCE_2_2.23
  * @param[in] rawBuffer The raw buffer containing the facial animation.
  * @param[in] rawBufferLength The length of raw buffer.
  *

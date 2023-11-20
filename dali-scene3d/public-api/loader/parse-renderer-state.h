@@ -25,13 +25,16 @@ namespace Dali::Scene3D::Loader
 {
 namespace RendererState
 {
-/*
- * @brief Attempts to interpret a string for renderer states, which can be a combination of the following
+/**
+ * @brief Attempts to interpret a string for renderer states.
+ *
+ * Wwhich can be a combination of the following:
  *  (using '|' as a delimiter, if multiple specified):<br/>
  *  - one of Value, exc. for NONE or those with the _BITS, _SHIFT, _MASK or _ITEMS suffix;<br/>
  *  - DEPTH_FUNC:${one of Comparison::Type, exc. OMIT};<br/>
  *  - BLEND_(SRC_DST)_(RGB|ALPHA):${one of BlendFactor::Type, exc. OMIT};<br/>
  *  - BUFFER_MODE:${one of BufferMode::Type, exc. OMIT};
+ * @SINCE_2_0.7
  * @param string The string to parse;
  * @param length The length of the string; If left at 0, strlen() will be called, which of
  *   course is only suitable i the string is null-terminated.

@@ -34,8 +34,9 @@
 
 namespace Dali::Scene3D::Loader
 {
-/*
+/**
  * @brief The types of resources that .dli may define.
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API ResourceType
 {
@@ -50,17 +51,20 @@ struct DALI_SCENE3D_API ResourceType
   ResourceType() = delete;
 };
 
-/*
- * @return The string value corresponding to the given resource @a type.
+/**
+ * @brief The string value corresponding to the given resource @a type.
+ * @SINCE_2_0.7
+ * @return The string value for type.
  */
 DALI_SCENE3D_API const char* GetResourceTypeName(ResourceType::Value type);
 
 using ResourceRefCounts = std::vector<Vector<uint32_t>>;
 
-/*
+/**
  * @brief Stores all resource definitions along with the DALi resources that
  *  could be created from them, directly indexible into with values from a dli
  *  document.
+ * @SINCE_2_0.7
  */
 class DALI_SCENE3D_API ResourceBundle
 {
@@ -88,9 +92,11 @@ public:
   ResourceBundle& operator=(ResourceBundle&&) = default;
 
   /**
-   * @return A ResourceRefCounts object with the correct number of entries for
+   * @brief A ResourceRefCounts object with the correct number of entries for
    *  all resource types (based on the various resource definition vectors),
    *  with all reference counts set to 0.
+   * @SINCE_2_0.7
+   * @return A ResourceRefCounts object.
    */
   ResourceRefCounts CreateRefCounter() const;
 
@@ -98,15 +104,19 @@ public:
    * @brief Based on a ResourceRefCounts, and more specifically the reference
    *  count of materials therein, it will calculate the reference count of
    *  environment maps.
+   * @SINCE_2_0.7
    */
   void CountEnvironmentReferences();
 
   /**
-   * @brief Performs the loading of all resources based on their respective
-   * reference count in @a refCounts. Resources that had a non-zero ref count will be
-   * loaded unless we already have a handle to them (OR the ForceReload option was specified).
+   * @brief Performs the loading of all resources based on their respective reference count in @a refCounts.
+   *
+   * Resources that had a non-zero ref count will be loaded unless we already have a handle to them
+   * (OR the ForceReload option was specified).
    * Any handles we have to resources that come in with a zero ref count will be reset,
    * UNLESS the KeepUnused option was specified.
+   *
+   * @SINCE_2_0.7
    * @param[in] pathProvider path provider for resource data.
    * @param[in] options Option to load resource
    * @note This method creates DALi objects like Dali::Texture, Dali::Geometry, etc.
@@ -115,11 +125,14 @@ public:
                      Options::Type options = Options::None);
 
   /**
-   * @brief Loads of all resources based on their respective
-   * reference count in @a refCounts. Resources that had a non-zero ref count will be
-   * loaded unless we already have a handle to them (OR the ForceReload option was specified).
+   * @brief Loads of all resources based on their respective reference count in @a refCounts.
+   *
+   * Resources that had a non-zero ref count will be loaded unless we already have a handle to them
+   * (OR the ForceReload option was specified).
    * Any handles we have to resources that come in with a zero ref count will be reset,
    * UNLESS the KeepUnused option was specified.
+   *
+   * @SINCE_2_2.9
    * @note This method don't create any of DALi objects.
    * @param[in] pathProvider path provider for resource data.
    * @param[in] options Option to load resource
@@ -132,6 +145,7 @@ public:
 
   /**
    * @brief Generates DALi objects from already loaded Raw Resources.
+   * @SINCE_2_2.9
    * @param[in] options Option to load resource
    * @note This method generates DALi objects from raw data that is already
    * loaded by LoadRawResources method. Therefore, LoadRawResources should be called first

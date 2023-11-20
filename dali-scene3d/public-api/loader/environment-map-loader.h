@@ -27,6 +27,7 @@ namespace Dali::Scene3D::Loader
 /**
  * @brief Loads environment map data from a environment map file.
  *
+ * @SINCE_2_1.32
  * @param[in] environmentMapUrl The environment map file url.
  * @param[out] environmentMapData The data structure with all pixel data objects.
  * @return bool True if the loading is succeded.

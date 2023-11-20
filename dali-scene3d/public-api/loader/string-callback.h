@@ -26,13 +26,15 @@
 
 namespace Dali::Scene3D::Loader
 {
-/*
+/**
  * @brief A callback to post strings to.
+ * @SINCE_2_0.7
  */
 using StringCallback = std::function<void(const std::string&)>;
 
-/*
+/**
  * @brief Simply passes the formatted message to LOGE().
+ * @SINCE_2_0.7
  */
 DALI_SCENE3D_API void DefaultErrorCallback(const std::string& message);
 

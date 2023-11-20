@@ -29,6 +29,7 @@ namespace Dali::Scene3D::Loader
 /**
  * @brief A stack of matrices whereby each newly pushed matrix is stored
  *  after being multiplied by the previous one (if any).
+ * @SINCE_2_0.7
  * @note Current implementation reserves space for 16 matrices.
  */
 class DALI_SCENE3D_API MatrixStack

@@ -27,14 +27,17 @@
 namespace Dali::Scene3D::Loader
 {
 /**
- * @return Given a name, provide a AlphaFunction; if the name was not
- *  recognised, get the default one.
+ * @brief Given a name, provides an AlphaFunction.
+ * @SINCE_2_0.7
+ * @return The AlphaFunction
+ * @note If the name was not recognised, the default one is returned
  */
 AlphaFunction DALI_SCENE3D_API GetAlphaFunction(const std::string& name, bool* found = nullptr);
 
 /**
- * @brief Registers an alpha function only if one with the same @a name has
- *  not yet been registered. Throws Exception the name isn't unique.
+ * @brief Registers an alpha function only if one with the same @a name has not yet been registered.
+ * @SINCE_2_0.7
+ * @note Throws an exception if the name is not unique
  */
 void DALI_SCENE3D_API RegisterAlphaFunction(const std::string& name, AlphaFunction alphaFn) noexcept(false);
 

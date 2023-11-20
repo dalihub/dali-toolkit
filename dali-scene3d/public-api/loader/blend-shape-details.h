@@ -80,6 +80,7 @@ struct DALI_SCENE3D_API BlendShapes
   /**
    * @brief Registers properties based on the mesh definition (and geometry) and identified by the above string constants,
    *  on the given @a renderer and @a actor.
+   * @SINCE_2_0.7
    */
   static void ConfigureProperties(const BlendShapeData& data, Renderer renderer);
 

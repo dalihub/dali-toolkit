@@ -43,11 +43,13 @@ public:
 public:
   /**
    * @brief The absolute path of animation binaries referenced in the .dli.
+   * @SINCE_2_2.17
    */
   std::string mAnimationsPath;
 
   /**
    * @brief Provides a facility to determine a color from a code instead of RGB(A) values.
+   * @SINCE_2_2.17
    */
   ConvertColorCode mConvertColorCode{nullptr};
 
@@ -56,6 +58,7 @@ public:
    *  root) element, whom they will attempt to process. This will take place before
    *  the parsing of scene Nodes and Animations, but after skeletons, environment, mesh,
    *  shader and material resources.
+   * @SINCE_2_2.17
    */
   CategoryProcessorVector mPreNodeCategoryProcessors;
 
@@ -63,12 +66,14 @@ public:
    * @brief A collection of handlers, mapped to the names of the top level (i.e. below
    *  root) element, whom they will attempt to process. This will take place after
    *  the parsing of the scene Nodes and Animations.
+   * @SINCE_2_2.17
    */
   CategoryProcessorVector mPostNodeCategoryProcessors;
 
   /**
    * @brief Provides an extension point to nodes. If provided, this function will be
    *  called with each JSON element and definition, of a scene node.
+   * @SINCE_2_2.17
    * @note Constraints rely on ID resolution (from .dli to scene definition), which
    *  takes place after the parsing of the nodes; therefore AT THIS POINT the node
    *  IDs seen in constraints will still be the .dli IDs - NOT to be relied on for
@@ -79,6 +84,7 @@ public:
   /**
    * @brief Provides an extension point to animations. If provided, this function will be
    *  called with each JSON element and fully processed definition, of an animation.
+   * @SINCE_2_2.17
    */
   AnimationProcessor mAnimationPropertyProcessor;
 };

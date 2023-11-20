@@ -31,22 +31,25 @@
 namespace Dali::Scene3D::Loader
 {
 /**
- * @brief Intermediate representation for a property that's given to
- *  a Animation to animate. Since there is no getting an
- *  animated property back from the Animation (i.e. past AnimateBetween/By/To()),
- *  changing properties (e.g. from the SDK) requires the whole Animation
- *  object to be recreated with all of its properties (incl. modifications).
+ * @brief Intermediate representation for a property that's given to a Animation to animate.
+ *
+ * Since there is no getting an animated property back from the Animation (i.e. past AnimateBetween/By/To()),
+ * changing properties (e.g. from the SDK) requires the whole Animation object to be recreated with all of
+ * its properties (incl. modifications).
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API AnimatedProperty
 {
 public: // METHODS
   /**
-   * @brief Function to obtain an Actor based on its property. Its processing will
-   *  ignore empty handles returned by it.
+   * @brief Function to obtain an Actor based on its property. Its processing will ignore empty handles returned by it.
+   * @SINCE_2_0.7
    */
   using GetActor = std::function<Actor(const AnimatedProperty&)>;
 
   /**
+   * @brief Get the property object of the given actor.
+   * @SINCE_2_0.7
    * @return The Property object (of the given @a actor) whose value is being animated.
    */
   Property GetProperty(Actor& actor) const
@@ -57,6 +60,7 @@ public: // METHODS
 
   /**
    * @brief The type of the Property (of the given @a actor) that is being animated.
+   * @SINCE_2_0.7
    */
   Property::Type GetPropertyType(Actor& actor) const
   {
@@ -66,9 +70,11 @@ public: // METHODS
 
   /**
    * @brief Registers the animation of this property against the given @a anim.
-   *  @a getActor will be used to obtain the Actor named by this property.
-   *  Failing to find the actor purely means that this property will not be
-   *  animated.
+   *
+   * @a getActor will be used to obtain the Actor named by this property.
+   * Failing to find the actor purely means that this property will not be
+   * animated.
+   * @SINCE_2_0.7
    */
   void Animate(Animation& anim, GetActor getActor) const;
 

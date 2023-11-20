@@ -29,11 +29,10 @@
 
 namespace Dali::Scene3D::Loader
 {
-/*
- * @brief Fixed size backing buffer to use with std::ostreams where control over
- *  allocations (which this does not make), is required.
- * @note All stream insertions that would overflow the buffer that StreamBuffer
- *  was created with, will fail.
+/**
+ * @brief Fixed size backing buffer to use with std::ostreams where control over allocations (which this does not make), is required.
+ * @SINCE_2_0.7
+ * @note All stream insertions that would overflow the buffer that StreamBuffer was created with, will fail.
  */
 class DALI_SCENE3D_API StreamBuffer : public std::basic_streambuf<char>
 {
@@ -41,10 +40,11 @@ public:
   StreamBuffer(char* buffer, size_t size) noexcept(true);
 };
 
-/*
- * @brief Wraps an ostream with a pre-allocated, fixed size backing buffer
- *  which a message can be formatted into. Upon destruction, it throws a
- *  DaliException with the message.
+/**
+ * @brief Wraps an ostream with a pre-allocated, fixed size backing buffer which a message can be formatted into.
+ *
+ * Upon destruction, it throws a DaliException with the message.
+ * @SINCE_2_0.7
  */
 class DALI_SCENE3D_API ExceptionFlinger
 {
@@ -80,39 +80,46 @@ private:
   std::ostream mStream;
 };
 
-/*
+/**
  * @brief Formats the given printf-style varargs into a std::string.
+ * @SINCE_2_0.7
  */
 DALI_SCENE3D_API std::string FormatString(const char* format, ...);
 
-/*
- * @return The @n th bit in a bitmask.
+/**
+ * @brief The @n th bit in a bitmask.
+ * @SINCE_2_0.7
+ * @return The @n th bit in a bitmask
  */
 DALI_SCENE3D_API constexpr size_t NthBit(size_t n)
 {
   return 1u << n;
 }
 
-/*
- * @return Whether all of @a mask 's bits are set on @a value.
+/**
+ * @brief Whether all of @a mask 's bits are set on @a value.
+ * @SINCE_2_0.7
+ * @return Whether all of @a mask 's bits are set on @a value
  */
 inline DALI_SCENE3D_API bool MaskMatch(uint32_t value, uint32_t mask)
 {
   return (value & mask) == mask;
 }
 
-/*
+/**
  * @brief Convert a four-letter(, null-terminated) string literal into a uint32_t.
+ * @SINCE_2_0.7
  */
 inline DALI_SCENE3D_API constexpr uint32_t FourCC(const char (&fourCC)[5])
 {
   return (fourCC[3] << 24) | (fourCC[2] << 16) | (fourCC[1] << 8) | fourCC[0];
 }
 
-/*
+/**
  * @brief Insensitive case compare function.
- * @param[in] a, compare string
- * @param[in] b, compare string
+ * @SINCE_2_0.7
+ * @param[in] a compare string
+ * @param[in] b compare string
  * @return true if strings are equal
  */
 inline DALI_SCENE3D_API bool CaseInsensitiveCharacterCompare(unsigned char a, unsigned char b)
@@ -121,10 +128,11 @@ inline DALI_SCENE3D_API bool CaseInsensitiveCharacterCompare(unsigned char a, un
   return std::tolower(a) == std::tolower(b);
 }
 
-/*
+/**
  * @return true if the lower cased ASCII strings are equal.
- * @param[in] a, compare string
- * @param[in] b, compare string
+ * @SINCE_2_0.7
+ * @param[in] a compare string
+ * @param[in] b compare string
  */
 inline DALI_SCENE3D_API bool CaseInsensitiveStringCompare(const std::string& a, const std::string& b)
 {
@@ -136,17 +144,19 @@ inline DALI_SCENE3D_API bool CaseInsensitiveStringCompare(const std::string& a, 
   return result;
 }
 
-/*
- * @brief Attempts to load the contents of a text file; returns empty string on
- *  failure. A pointer to a boolean may be passed in @a fail; this will be set
- *  to true in case of failure (should only be checked if the returned string
- *  was empty()).
+/**
+ * @brief Attempts to load the contents of a text file; returns empty string on failure.
+ *
+ * A pointer to a boolean may be passed in @a fail; this will be set to true in case of failure
+ * (should only be checked if the returned string was empty()).
+ * @SINCE_2_0.7
  */
 DALI_SCENE3D_API std::string LoadTextFile(const char* path, bool* fail = nullptr);
 
-/*
- * @brief Makes a number of calls to @a fn, passing to each one the given
- *  @a actor then each of its children, in depth-first traversal.
+/**
+ * @brief Makes a number of calls to @a fn, passing to each one the given @a actor then each of its children, in depth-first traversal.
+ *
+ * @SINCE_2_0.7
  * @note @a fn must not change the actor hierarchy during traversal.
  * @note Use of a @a fn that is itself recursing in @a is also discouraged
  *  for performance and stability reasons.
@@ -163,9 +173,9 @@ inline DALI_SCENE3D_API void VisitActor(Actor a, Func fn)
   }
 }
 
-/*
- * @brief Convenience function to set the given actor @a 's anchor point
- *  and parent origin to center.
+/**
+ * @brief Convenience function to set the given actor @a 's anchor point and parent origin to center.
+ * @SINCE_2_0.7
  */
 inline DALI_SCENE3D_API void SetActorCentered(Actor a)
 {
@@ -184,13 +194,15 @@ enum DALI_SCENE3D_API Values : Type
 };
 } // namespace TexturedQuadOptions
 
-/*
+/**
  * @brief Makes... geometry for a textured quad.
+ * @SINCE_2_0.7
  */
 DALI_SCENE3D_API Geometry MakeTexturedQuadGeometry(TexturedQuadOptions::Type options = TexturedQuadOptions::NONE);
 
-/*
+/**
  * @brief Fixes the path of a file. Replaces the '\\' separator by the '/' one.
+ * @SINCE_2_0.7
  * @param[in,out] path The path to be fixed.
  */
 DALI_SCENE3D_API void ToUnixFileSeparators(std::string& path);
