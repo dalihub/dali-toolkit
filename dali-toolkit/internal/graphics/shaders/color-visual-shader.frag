@@ -7,6 +7,11 @@ INPUT mediump vec4 vCornerRadius;
 #endif
 #endif
 
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
+// Be used when we calculate anti-alias range near 1 pixel.
+uniform highp vec3 uScale;
+#endif
+
 uniform lowp vec4 uColor;
 uniform lowp vec3 mixColor;
 #ifdef IS_REQUIRED_BLUR
@@ -17,7 +22,6 @@ uniform mediump float borderlineOffset;
 uniform lowp vec4 borderlineColor;
 uniform lowp vec4 uActorColor;
 #endif
-
 
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
 // Global values both rounded corner and borderline use
@@ -71,8 +75,10 @@ void calculatePotential()
 
 void setupMinMaxPotential()
 {
-  // Set soft anti-alias range at most 2% of visual size
-  gPotentialRange = min(1.0, max(vRectSize.x, vRectSize.y) * 0.02);
+  // Set soft anti-alias range at most 10% of visual size.
+  // The range should be inverse proportion with scale of view.
+  // To avoid divid-by-zero, let we allow minimum scale value is 0.001 (0.1%)
+  gPotentialRange = min(1.0, max(vRectSize.x, vRectSize.y) * 0.2) / max(0.001, max(uScale.x, uScale.y));
 
   gMaxOutlinePotential = gRadius + gPotentialRange;
   gMinOutlinePotential = gRadius - gPotentialRange;
@@ -89,8 +95,8 @@ void setupMinMaxPotential()
 #endif
 
   // reduce defect near edge of rounded corner.
-  gMaxOutlinePotential += clamp(-min(gDiff.x, gDiff.y)/ max(1.0, gRadius) , 0.0, 1.0);
-  gMinOutlinePotential += clamp(-min(gDiff.x, gDiff.y)/ max(1.0, gRadius) , 0.0, 1.0);
+  gMaxOutlinePotential += clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, 1.0);
+  gMinOutlinePotential += clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, 1.0);
 }
 
 void PreprocessPotential()
