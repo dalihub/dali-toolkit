@@ -255,6 +255,7 @@ int UtcDaliShaderManagerProduceShader(void)
     MeshDefinition     meshDefinition;
     MaterialDefinition materialDefinition;
     ShaderParameters   shaderParameter{meshDefinition, materialDefinition, nodeDefinition};
+
     // Only define skinning accessors for skinning test...
     if(permutationSet.permutations.size() > 1)
     {
@@ -280,6 +281,8 @@ int UtcDaliShaderManagerProduceShader(void)
       {
         option1.AddOption(optionType);
       }
+      // No permutation uses extra joint weights.
+      option1.AddJointMacros(0);
       rendererState = (rendererState | permutation->rendererStateSet) & ~permutation->rendererStateClear;
     }
     option1.AddOption(ShaderOption::Type::THREE_TEXTURE);
