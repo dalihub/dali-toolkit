@@ -106,12 +106,22 @@ float MotionData::GetDuration() const
 
 void MotionData::LoadBvh(const std::string& path, const Vector3& scale, bool synchronousLoad)
 {
-  GetImplementation(*this).LoadBvh(path, scale, synchronousLoad);
+  GetImplementation(*this).LoadBvh(path, false, scale, synchronousLoad);
+}
+
+void MotionData::LoadBvh(const std::string& path, bool useRootTranslationOnly, const Vector3& scale, bool synchronousLoad)
+{
+  GetImplementation(*this).LoadBvh(path, useRootTranslationOnly, scale, synchronousLoad);
 }
 
 void MotionData::LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, const Vector3& scale, bool synchronousLoad)
 {
-  GetImplementation(*this).LoadBvhFromBuffer(rawBuffer, rawBufferLength, scale, synchronousLoad);
+  GetImplementation(*this).LoadBvhFromBuffer(rawBuffer, rawBufferLength, false, scale, synchronousLoad);
+}
+
+void MotionData::LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, bool useRootTranslationOnly, const Vector3& scale, bool synchronousLoad)
+{
+  GetImplementation(*this).LoadBvhFromBuffer(rawBuffer, rawBufferLength, useRootTranslationOnly, scale, synchronousLoad);
 }
 
 void MotionData::LoadFacialAnimation(const std::string& url, bool synchronousLoad)

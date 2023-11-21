@@ -261,6 +261,19 @@ public: // Public Method
   void LoadBvh(const std::string& path, const Vector3& scale = Vector3::ONE, bool synchronousLoad = false);
 
   /**
+   * @brief Load MotionData from bvh file.
+   * It will use Dali::Scene3D::Loader::LoadBvh() internally.
+   * LoadCompleteSignal() will be emitted after load completed.
+   *
+   * @SINCE_2_2.34
+   * @param[in] path The file path.
+   * @param[in] scale The scale factor to set on the position property manually.
+   * @param[in] useRootTranslationOnly True to use only root translation with rotation animation.
+   * @param[in] synchronousLoad True if we want to load result synchronously. Default is false.
+   */
+  void LoadBvh(const std::string& path, bool useRootTranslationOnly, const Vector3& scale = Vector3::ONE, bool synchronousLoad = false);
+
+  /**
    * @brief Load MotionData from bvh buffer.
    * It will use Dali::Scene3D::Loader::LoadBvhFromBuffer() internally.
    * LoadCompleteSignal() will be emitted after load completed.
@@ -272,6 +285,20 @@ public: // Public Method
    * @param[in] synchronousLoad True if we want to load result synchronously. Default is false.
    */
   void LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, const Vector3& scale = Vector3::ONE, bool synchronousLoad = false);
+
+  /**
+   * @brief Load MotionData from bvh buffer.
+   * It will use Dali::Scene3D::Loader::LoadBvhFromBuffer() internally.
+   * LoadCompleteSignal() will be emitted after load completed.
+   *
+   * @SINCE_2_2.34
+   * @param[in] rawBuffer The bvh buffer containing the facial animation as bvh format string.
+   * @param[in] rawBufferLength The length of buffer.
+   * @param[in] useRootTranslationOnly True to use only root translation with rotation animation.
+   * @param[in] scale The scale factor to set on the position property manually.
+   * @param[in] synchronousLoad True if we want to load result synchronously. Default is false.
+   */
+  void LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, bool useRootTranslationOnly, const Vector3& scale = Vector3::ONE, bool synchronousLoad = false);
 
   /**
    * @brief Load MotionData from facial defined json file.
