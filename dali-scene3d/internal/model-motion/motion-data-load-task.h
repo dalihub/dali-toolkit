@@ -53,12 +53,12 @@ public:
   /**
    * Constructor for load bvh from file.
    */
-  MotionDataLoadTask(const std::string& path, const Vector3& scale, CallbackBase* callback);
+  MotionDataLoadTask(const std::string& path, bool useRootTranslationOnly, const Vector3& scale, CallbackBase* callback);
 
   /**
    * Constructor for load bvh from buffer.
    */
-  MotionDataLoadTask(const uint8_t* rawBuffer, int rawBufferLength, const Vector3& scale, CallbackBase* callback);
+  MotionDataLoadTask(const uint8_t* rawBuffer, int rawBufferLength, bool useRootTranslationOnly, const Vector3& scale, CallbackBase* callback);
 
   /**
    * Constructor for load facial from file.
@@ -101,6 +101,7 @@ private:
   uint8_t*    mRawBuffer;
   int         mRawBufferLength;
   Vector3     mScale;
+  bool        mUseRootTranslationOnly;
 
   Scene3D::Loader::AnimationDefinition mAnimationDefinition;
   LoadMethod                           mLoadMethod;

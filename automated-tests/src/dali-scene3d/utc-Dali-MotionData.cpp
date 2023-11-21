@@ -404,3 +404,39 @@ int UtcDaliMotionDataLoadAsyncMultiple(void)
 
   END_TEST;
 }
+
+int UtcDaliMotionDataLoadBvhUseRootTranslationOnly(void)
+{
+  ToolkitTestApplication application;
+
+  MotionData motionDataAllTranslation = MotionData::New();
+  motionDataAllTranslation.LoadBvh(TEST_BVH_FILE_NAME, false, Vector3::ONE, true);
+
+  DALI_TEST_EQUALS(motionDataAllTranslation.GetMotionCount(), 4, TEST_LOCATION);  
+
+  MotionData motionDataOnlyRootTranslation = MotionData::New();
+  motionDataOnlyRootTranslation.LoadBvh(TEST_BVH_FILE_NAME, true, Vector3::ONE, true);
+
+  DALI_TEST_EQUALS(motionDataOnlyRootTranslation.GetMotionCount(), 3, TEST_LOCATION);  
+
+  END_TEST;
+}
+
+int UtcDaliMotionDataLoadBvhFromBufferUseRootTranslationOnly(void)
+{
+  ToolkitTestApplication application;
+
+  std::string rawString = ReadBufferFromFile(TEST_BVH_FILE_NAME);
+
+  MotionData motionDataAllTranslation = MotionData::New();
+  motionDataAllTranslation.LoadBvhFromBuffer(reinterpret_cast<uint8_t*>(rawString.data()), static_cast<int>(rawString.length()), false, Vector3::ONE, true);
+
+  DALI_TEST_EQUALS(motionDataAllTranslation.GetMotionCount(), 4, TEST_LOCATION);  
+
+  MotionData motionDataOnlyRootTranslation = MotionData::New();
+  motionDataOnlyRootTranslation.LoadBvhFromBuffer(reinterpret_cast<uint8_t*>(rawString.data()), static_cast<int>(rawString.length()), true, Vector3::ONE, true);
+
+  DALI_TEST_EQUALS(motionDataOnlyRootTranslation.GetMotionCount(), 3, TEST_LOCATION);  
+
+  END_TEST;
+}

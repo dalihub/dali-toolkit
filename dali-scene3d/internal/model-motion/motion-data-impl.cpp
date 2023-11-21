@@ -117,17 +117,17 @@ float MotionData::GetDuration() const
   return mDurationSeconds;
 }
 
-void MotionData::LoadBvh(const std::string& path, const Vector3& scale, bool synchronousLoad)
+void MotionData::LoadBvh(const std::string& path, bool useRootTranslationOnly, const Vector3& scale, bool synchronousLoad)
 {
   CancelMotionDataLoad();
-  mMotionDataLoadTask = new MotionDataLoadTask(path, scale, MakeCallback(this, &MotionData::OnLoadCompleted));
+  mMotionDataLoadTask = new MotionDataLoadTask(path, useRootTranslationOnly, scale, MakeCallback(this, &MotionData::OnLoadCompleted));
   RequestMotionDataLoad(synchronousLoad);
 }
 
-void MotionData::LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, const Vector3& scale, bool synchronousLoad)
+void MotionData::LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, bool useRootTranslationOnly, const Vector3& scale, bool synchronousLoad)
 {
   CancelMotionDataLoad();
-  mMotionDataLoadTask = new MotionDataLoadTask(rawBuffer, rawBufferLength, scale, MakeCallback(this, &MotionData::OnLoadCompleted));
+  mMotionDataLoadTask = new MotionDataLoadTask(rawBuffer, rawBufferLength, useRootTranslationOnly, scale, MakeCallback(this, &MotionData::OnLoadCompleted));
   RequestMotionDataLoad(synchronousLoad);
 }
 
