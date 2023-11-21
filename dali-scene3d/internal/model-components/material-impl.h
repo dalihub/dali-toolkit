@@ -73,6 +73,7 @@ public:
     uint32_t                            mLoadingTaskId{0u};
     uint32_t                            mSemantic;
     Scene3D::Loader::ShaderOption::Type mShaderOptionType;
+    Matrix3                             mTransform{Scene3D::Loader::TextureDefinition::DEFAULT_TRANSFORM};
   };
 
   using TextureInformationContainer = std::vector<TextureInformation>;
@@ -278,10 +279,10 @@ private:
 
 private:
   // Delete copy & move operator
-  Material(const Material&)                = delete;
-  Material(Material&&)                     = delete;
+  Material(const Material&) = delete;
+  Material(Material&&)      = delete;
   Material& operator=(const Material& rhs) = delete;
-  Material& operator=(Material&& rhs)      = delete;
+  Material& operator=(Material&& rhs) = delete;
 
 private:
   ObserverContainer mObservers{}; ///< List of observers who need to be notified after some properties are changed.

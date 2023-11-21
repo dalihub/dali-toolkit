@@ -40,26 +40,42 @@ uniform lowp float uDielectricSpecular;
 #ifdef THREE_TEX
 #ifdef BASECOLOR_TEX
 uniform sampler2D sAlbedoAlpha;
+uniform float uBaseColorTextureTransformAvailable;
+uniform mat3 uBaseColorTextureTransform;
 #endif // BASECOLOR_TEX
 #ifdef METALLIC_ROUGHNESS_TEX
 uniform sampler2D sMetalRoughness;
+uniform float uMetalRoughnessTextureTransformAvailable;
+uniform mat3 uMetalRoughnessTextureTransform;
 #endif // METALLIC_ROUGHNESS_TEX
 #ifdef NORMAL_TEX
 uniform sampler2D sNormal;
+uniform float uNormalTextureTransformAvailable;
+uniform mat3 uNormalTextureTransform;
 uniform float uNormalScale;
 #endif // NORMAL_TEX
 #else // THREE_TEX
 uniform sampler2D sAlbedoMetal;
+uniform float uBaseColorTextureTransformAvailable;
+uniform mat3 uBaseColorTextureTransform;
 uniform sampler2D sNormalRoughness;
+uniform float uNormalRoughnessTextureTransformAvailable;
+uniform mat3 uNormalRoughnessTextureTransform;
 #endif
+
+
 
 #ifdef OCCLUSION
 uniform sampler2D sOcclusion;
+uniform float uOcclusionTextureTransformAvailable;
+uniform mat3 uOcclusionTextureTransform;
 uniform float uOcclusionStrength;
 #endif
 
 #ifdef EMISSIVE_TEXTURE
 uniform sampler2D sEmissive;
+uniform float uEmissiveTextureTransformAvailable;
+uniform mat3 uEmissiveTextureTransform;
 #endif
 uniform vec3 uEmissiveFactor;
 
@@ -127,6 +143,11 @@ vec3 linear(vec3 color)
   return pow(color, vec3(2.2));
 }
 
+vec2 computeTextureTransform(vec2 texCoord, mat3 textureTransform)
+{
+    return vec2(textureTransform * vec3(texCoord, 1.0));
+}
+
 void main()
 {
   // Metallic and Roughness material properties are packed together
@@ -142,29 +163,34 @@ void main()
 #ifdef THREE_TEX
   // The albedo may be defined from a base texture or a flat color
 #ifdef BASECOLOR_TEX
-  lowp vec4 baseColor = texture(sAlbedoAlpha, vUV);
+  mediump vec2 baseColorTexCoords = mix(vUV, computeTextureTransform(vUV, uBaseColorTextureTransform), uBaseColorTextureTransformAvailable);
+  lowp vec4 baseColor = texture(sAlbedoAlpha, baseColorTexCoords);
   baseColor = vColor * vec4(linear(baseColor.rgb), baseColor.w) * uColorFactor;
 #else // BASECOLOR_TEX
   lowp vec4 baseColor = vColor * uColorFactor;
 #endif // BASECOLOR_TEX
 
 #ifdef METALLIC_ROUGHNESS_TEX
-  lowp vec4 metrou = texture(sMetalRoughness, vUV);
+  mediump vec2 metalRoughnessTexCoords = mix(vUV, computeTextureTransform(vUV, uMetalRoughnessTextureTransform), uMetalRoughnessTextureTransformAvailable);
+  lowp vec4 metrou = texture(sMetalRoughness, metalRoughnessTexCoords);
   metallic = metrou.METALLIC * metallic;
   perceptualRoughness = metrou.ROUGHNESS * perceptualRoughness;
 #endif // METALLIC_ROUGHNESS_TEX
 
 #ifdef NORMAL_TEX
-  n = texture(sNormal, vUV).rgb;
+  mediump vec2 normalTexCoords = mix(vUV, computeTextureTransform(vUV, uNormalTextureTransform), uNormalTextureTransformAvailable);
+  n = texture(sNormal, normalTexCoords).rgb;
   n = normalize(vTBN * ((2.0 * n - 1.0) * vec3(uNormalScale, uNormalScale, 1.0)));
 #endif // NORMAL_TEX
 #else // THREE_TEX
-  vec4 albedoMetal = texture(sAlbedoMetal, vUV);
+  mediump vec2 baseColorTexCoords = mix(vUV, computeTextureTransform(vUV, uBaseColorTextureTransform), uBaseColorTextureTransformAvailable);
+  vec4 albedoMetal = texture(sAlbedoMetal, baseColorTexCoords);
   lowp vec4 baseColor = vec4(linear(albedoMetal.rgb), 1.0) * vColor * uColorFactor;
 
   metallic = albedoMetal.METALLIC * metallic;
 
-  vec4 normalRoughness = texture(sNormalRoughness, vUV);
+  mediump vec2 normalRoughnessTexCoords = mix(vUV, computeTextureTransform(vUV, uNormalRoughnessTextureTransform), uNormalRoughnessTextureTransformAvailable);
+  vec4 normalRoughness = texture(sNormalRoughness, normalRoughnessTexCoords);
   perceptualRoughness = normalRoughness.ROUGHNESS * perceptualRoughness;
 
   n = normalRoughness.rgb;
@@ -290,12 +316,14 @@ void main()
   }
 
 #ifdef OCCLUSION
-  lowp float ao = texture(sOcclusion, vUV).r;
+  mediump vec2 occlusionTexCoords = mix(vUV, computeTextureTransform(vUV, uOcclusionTextureTransform), uOcclusionTextureTransformAvailable);
+  lowp float ao = texture(sOcclusion, occlusionTexCoords).r;
   color = mix(color, color * ao, uOcclusionStrength);
 #endif // OCCLUSION
 
 #ifdef EMISSIVE_TEXTURE
-  lowp vec3 emissive = linear(texture(sEmissive, vUV).rgb) * uEmissiveFactor;
+  mediump vec2 emissiveTexCoords = mix(vUV, computeTextureTransform(vUV, uEmissiveTextureTransform), uEmissiveTextureTransformAvailable);
+  lowp vec3 emissive = linear(texture(sEmissive, emissiveTexCoords).rgb) * uEmissiveFactor;
 #else
   lowp vec3 emissive = uEmissiveFactor;
 #endif // EMISSIVE_TEXTURE

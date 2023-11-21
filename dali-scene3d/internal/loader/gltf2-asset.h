@@ -20,7 +20,9 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <cstdint>
 #include <memory>
@@ -375,6 +377,39 @@ struct Texture
   Ref<Sampler> mSampler;
 };
 
+struct TextureTransform
+{
+  float         mRotation = 0.0f;
+  Dali::Vector2 mUvOffset = Dali::Vector2::ZERO;
+  Dali::Vector2 mUvScale  = Dali::Vector2::ONE;
+  uint32_t      mTexCoord = 0u;
+
+  operator bool() const
+  {
+    return !Dali::EqualsZero(mRotation) || mUvOffset != Dali::Vector2::ZERO || mUvScale != Dali::Vector2::ONE || mTexCoord != 0u;
+  }
+
+  const Dali::Matrix3 GetTransform() const
+  {
+    // See: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_texture_transform
+    Dali::Matrix3 translation = Dali::Matrix3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, mUvOffset.x, mUvOffset.y, 1.0f);
+    Dali::Matrix3 rotation    = Dali::Matrix3(cos(-mRotation), sin(-mRotation), 0.0f, -sin(-mRotation), cos(-mRotation), 0.0f, 0.0f, 0.0f, 1.0f);
+    Dali::Matrix3 scale       = Dali::Matrix3(mUvScale.x, 0.0f, 0.0f, 0.0f, mUvScale.y, 0.0f, 0.0f, 0.0f, 1.0f);
+
+    return translation * rotation * scale;
+  }
+};
+
+struct TextureExtensions
+{
+  TextureTransform mTextureTransform;
+
+  operator bool() const
+  {
+    return mTextureTransform;
+  }
+};
+
 struct TextureInfo
 {
   Ref<gltf2::Texture> mTexture;
@@ -382,9 +417,11 @@ struct TextureInfo
   float               mScale    = 1.f;
   float               mStrength = 1.f;
 
+  TextureExtensions mTextureExtensions;
+
   operator bool() const
   {
-    return !!mTexture;
+    return mTexture;
   }
 };
 

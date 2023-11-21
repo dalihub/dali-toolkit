@@ -538,6 +538,7 @@ int UtcDaliGltfLoaderSuccessShort(void)
         "MorphPrimitivesTest",
         "MRendererTest",
         "SimpleSparseAccessor",
+        "TextureTransformMultiTest",
         "AnimatedCube",
         /**
          * For the Avocado glTF file and its Assets
@@ -941,6 +942,51 @@ int UtcDaliGltfLoaderQuantizedMesh(void)
   DALI_TEST_EQUAL(1624, md.mTexCoords[0].mBlob.mLength);
   DALI_TEST_EQUAL(0u, md.mTexCoords[0].mBlob.mMin.size());
   DALI_TEST_EQUAL(0u, md.mTexCoords[0].mBlob.mMax.size());
+
+  END_TEST;
+}
+
+int UtcDaliGltfLoaderTextureTransform(void)
+{
+  Context ctx;
+
+  auto& resources = ctx.resources;
+
+  /**
+   * For the Avocado glTF file and its Assets
+   * Donated by Microsoft for glTF testing
+   * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/Avocado/glTF-Quantized
+   */
+  ctx.loader.LoadModel(TEST_RESOURCE_DIR "/AvocadoQuantized.gltf", ctx.loadResult);
+
+  auto& scene = ctx.scene;
+  DALI_TEST_EQUAL(1u, scene.GetRoots().size());
+  DALI_TEST_EQUAL(1u, scene.GetNodeCount());
+
+  TestApplication app;
+
+  Customization::Choices choices;
+  for(auto iRoot : scene.GetRoots())
+  {
+    auto resourceRefs = resources.CreateRefCounter();
+    scene.CountResourceRefs(iRoot, choices, resourceRefs);
+    resources.mReferenceCounts = std::move(resourceRefs);
+    resources.CountEnvironmentReferences();
+    resources.LoadResources(ctx.pathProvider);
+  }
+
+  auto& materials = resources.mMaterials;
+  DALI_TEST_EQUAL(1u, materials.size());
+
+  auto  iMaterial = materials.begin();
+  auto& md        = iMaterial->first;
+
+  DALI_TEST_EQUAL(3u, md.mTextureStages.size());
+
+  Matrix3 textureTransformGroundTruth(0.000238f, 0.0f, 0.0f, 0.0f, 0.000242f, 0.0f, 0.00678f, 0.002982f, 1.0f);
+  DALI_TEST_EQUALS(md.mTextureStages[0].mTexture.mTransform, textureTransformGroundTruth, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(md.mTextureStages[1].mTexture.mTransform, textureTransformGroundTruth, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(md.mTextureStages[2].mTexture.mTransform, textureTransformGroundTruth, 0.01f, TEST_LOCATION);
 
   END_TEST;
 }
