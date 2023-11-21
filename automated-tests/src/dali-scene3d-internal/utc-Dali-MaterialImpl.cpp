@@ -265,6 +265,13 @@ int UtcDaliMaterialCheckUniform(void)
   DALI_TEST_EQUALS(FaceCullingMode::BACK, renderer.GetProperty<FaceCullingMode::Type>(Dali::Renderer::Property::FACE_CULLING_MODE), TEST_LOCATION);
   DALI_TEST_EQUALS(DepthTestMode::ON, renderer.GetProperty<DepthTestMode::Type>(Dali::Renderer::Property::DEPTH_TEST_MODE), TEST_LOCATION);
 
+  DALI_TEST_EQUALS(0.0f, renderer.GetProperty<float>(renderer.GetPropertyIndex("uBaseColorTextureTransformAvailable")), TEST_LOCATION);
+  DALI_TEST_EQUALS(0.0f, renderer.GetProperty<float>(renderer.GetPropertyIndex("uNormalTextureTransformAvailable")), TEST_LOCATION);
+  DALI_TEST_EQUALS(0.0f, renderer.GetProperty<float>(renderer.GetPropertyIndex("uNormalRoughnessTextureTransformAvailable")), TEST_LOCATION);
+  DALI_TEST_EQUALS(0.0f, renderer.GetProperty<float>(renderer.GetPropertyIndex("uMetalRoughnessTextureTransformAvailable")), TEST_LOCATION);
+  DALI_TEST_EQUALS(0.0f, renderer.GetProperty<float>(renderer.GetPropertyIndex("uOcclusionTextureTransformAvailable")), TEST_LOCATION);
+  DALI_TEST_EQUALS(0.0f, renderer.GetProperty<float>(renderer.GetPropertyIndex("uEmissiveTextureTransformAvailable")), TEST_LOCATION);
+
   END_TEST;
 }
 
