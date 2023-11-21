@@ -62,13 +62,13 @@ int UtcDaliLoadBvh(void)
     {
       case 0: // Load bvh from url
       {
-        animDef = LoadBvh(TEST_RESOURCE_DIR "/test.bvh", "testBvh");
+        animDef = LoadBvh(TEST_RESOURCE_DIR "/test.bvh", "testBvh", false);
         break;
       }
       case 1: // Load bvh from buffer stream.
       {
         std::string rawString = ReadBufferFromFile(TEST_RESOURCE_DIR "/test.bvh");
-        animDef               = LoadBvhFromBuffer(reinterpret_cast<uint8_t*>(rawString.data()), static_cast<int>(rawString.length()), "testBvh");
+        animDef               = LoadBvhFromBuffer(reinterpret_cast<uint8_t*>(rawString.data()), static_cast<int>(rawString.length()), "testBvh", false);
         break;
       }
     }
@@ -142,7 +142,7 @@ int UtcDaliLoadBvhFailed01(void)
 {
   TestApplication application;
 
-  AnimationDefinition animDef = LoadBvh("/nothing.bvh", "testBvh");
+  AnimationDefinition animDef = LoadBvh("/nothing.bvh", "testBvh", false);
   DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
   END_TEST;
 }
@@ -151,7 +151,7 @@ int UtcDaliLoadBvhFailed02(void)
 {
   TestApplication application;
 
-  AnimationDefinition animDef = LoadBvhFromBuffer(nullptr, 0, "testBvh");
+  AnimationDefinition animDef = LoadBvhFromBuffer(nullptr, 0, "testBvh", false);
   DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
   END_TEST;
 }
@@ -167,7 +167,7 @@ int UtcDaliLoadBvhFailed03(void)
     tet_printf("Parse error for hierarchy %u\n", tc);
     std::ostringstream oss;
     oss << TEST_RESOURCE_DIR << "/test-invalid-hierarchy" << tc << ".bvh";
-    AnimationDefinition animDef = LoadBvh(oss.str(), "testBvh");
+    AnimationDefinition animDef = LoadBvh(oss.str(), "testBvh", false);
     DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
   }
 
@@ -177,13 +177,13 @@ int UtcDaliLoadBvhFailed03(void)
     tet_printf("Parse error for motion %u\n", tc);
     std::ostringstream oss;
     oss << TEST_RESOURCE_DIR << "/test-invalid-motion" << tc << ".bvh";
-    AnimationDefinition animDef = LoadBvh(oss.str(), "testBvh");
+    AnimationDefinition animDef = LoadBvh(oss.str(), "testBvh", false);
     DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
   }
 
   {
     tet_infoline("empty file");
-    AnimationDefinition animDef = LoadBvh(TEST_RESOURCE_DIR "/test-empty.bvh", "testBvh");
+    AnimationDefinition animDef = LoadBvh(TEST_RESOURCE_DIR "/test-empty.bvh", "testBvh", false);
     DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
   }
   END_TEST;

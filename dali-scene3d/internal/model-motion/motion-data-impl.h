@@ -106,12 +106,12 @@ public: // Public Method
   /**
    * @copydoc Dali::Scene3D::MotionData::LoadBvh()
    */
-  void LoadBvh(const std::string& path, const Vector3& scale = Vector3::ONE, bool synchronousLoad = false);
+  void LoadBvh(const std::string& path, bool useRootTranslationOnly, const Vector3& scale = Vector3::ONE, bool synchronousLoad = false);
 
   /**
    * @copydoc Dali::Scene3D::MotionData::LoadBvhFromBuffer()
    */
-  void LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, const Vector3& scale = Vector3::ONE, bool synchronousLoad = false);
+  void LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, bool useRootTranslationOnly, const Vector3& scale = Vector3::ONE, bool synchronousLoad = false);
 
   /**
    * @copydoc Dali::Scene3D::MotionData::LoadFacialAnimation()
