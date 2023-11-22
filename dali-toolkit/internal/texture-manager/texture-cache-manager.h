@@ -306,13 +306,13 @@ private:
     : bufferId(bufferId),
       bufferHash(bufferHash),
       encodedImageBuffer(encodedImageBuffer),
-      referenceCount(1u)
+      referenceCount(1)
     {
     }
     TextureCacheManager::TextureId   bufferId;
     TextureCacheManager::TextureHash bufferHash;
     EncodedImageBuffer               encodedImageBuffer;
-    uint32_t                         referenceCount;
+    int32_t                          referenceCount;
   };
 
   typedef Dali::FreeList TextureIdConverterType; ///< The converter type from TextureId to index of TextureInfoContainer.

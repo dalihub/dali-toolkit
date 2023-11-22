@@ -49,21 +49,24 @@ struct DALI_SCENE3D_API CameraParameters
   bool   isPerspective    = true;
 
   /**
-   * @return The view-projection matrix of the camera.
+   * @brief Retrieves the view-projection of the camera.
+   * @SINCE_2_0.7
+   * @return The view-projection matrix of the camera
    */
   ViewProjection GetViewProjection() const;
 
   /**
-   * @brief Calculates the @a position, @a orientation and @a scale that's defined
-   *        for this camera, and writes it into the respective variable.
+   * @brief Calculates the @a position, @a orientation and @a scale that's defined for this camera,
+   * and writes it into the respective variable.
+   * @SINCE_2_0.7
    */
   void CalculateTransformComponents(Vector3& position, Quaternion& orientation, Vector3& scale) const;
 
   /**
-   * @brief Configures the camera in the way that it is supposed to be used with
-   *        scene3d scenes. This means inverted Y and a rotation of 180 degrees
-   *        along the Y axis, plus whatever the parameters define.
+   * @brief Configures the camera in the way that it is supposed to be used with scene3d scenes.
    *
+   * This means inverted Y and a rotation of 180 degrees along the Y axis, plus whatever the parameters define.
+   * @SINCE_2_0.7
    * @return True if success to generate camera. False otherwise.
    */
   bool ConfigureCamera(CameraActor& camera, bool invertY = true) const;

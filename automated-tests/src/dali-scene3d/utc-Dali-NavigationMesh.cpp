@@ -15,10 +15,18 @@
  *
  */
 
-#include <dali-test-suite-utils.h>
+#include <dali-scene3d/public-api/controls/model/model.h>
+#include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
+#include <dali-toolkit-test-suite-utils.h>
+#include <dali/devel-api/actors/camera-actor-devel.h>
+#include <dali/integration-api/events/touch-event-integ.h>
 #include <dlfcn.h>
 #include "dali-scene3d/public-api/algorithm/navigation-mesh.h"
 #include "dali-scene3d/public-api/loader/navigation-mesh-factory.h"
+
+// include collider mesh data
+#include "collider-mesh-data.h"
+
 using namespace Dali;
 using namespace Dali::Scene3D::Algorithm;
 using namespace Dali::Scene3D::Loader;
@@ -95,6 +103,86 @@ static thread_local SysOverride<int, decltype(fread)> call_fread("fread");
 extern "C" size_t                                     fread(void* __restrict p, size_t s, size_t n, FILE* __restrict st)
 {
   return call_fread.Invoke(p, s, n, st);
+}
+
+// Data to test factory
+static std::vector<Dali::Vector3> COLLIDER_0_VERTS = {
+  Dali::Vector3(-1.000000, -1.556106, 0.000000),
+  Dali::Vector3(1.000000, -1.556106, 0.000000),
+  Dali::Vector3(-1.000000, 1.000000, 0.000000),
+  Dali::Vector3(1.000000, 1.000000, 0.000000),
+  Dali::Vector3(3.026269, -1.556106, 0.000000),
+  Dali::Vector3(3.026269, 1.000000, 0.000000),
+  Dali::Vector3(-1.000000, 2.491248, 0.000000),
+  Dali::Vector3(1.000000, 2.491248, 0.000000),
+};
+static std::vector<uint32_t> COLLIDER_0_IDX = {
+  1,
+  2,
+  0,
+  1,
+  5,
+  3,
+  3,
+  6,
+  2,
+  1,
+  3,
+  2,
+  1,
+  4,
+  5,
+  3,
+  7,
+  6,
+};
+static std::vector<Dali::Vector3> COLLIDER_1_VERTS = {
+  Dali::Vector3(-1.000000, -3.386207, 0.000000),
+  Dali::Vector3(1.000000, -3.386207, 0.000000),
+  Dali::Vector3(-1.000000, 1.000000, 0.000000),
+  Dali::Vector3(1.000000, 1.000000, 0.000000),
+  Dali::Vector3(-3.393266, -3.386207, 0.000000),
+  Dali::Vector3(-3.393266, 1.000000, 0.000000),
+};
+static std::vector<uint32_t> COLLIDER_1_IDX = {
+  1,
+  2,
+  0,
+  2,
+  4,
+  0,
+  1,
+  3,
+  2,
+  2,
+  5,
+  4,
+};
+static std::vector<Dali::Vector3> COLLIDER_2_VERTS = {
+  Dali::Vector3(-3.393266, -1.000000, 0.000000),
+  Dali::Vector3(1.000000, -1.000000, 0.000000),
+  Dali::Vector3(-3.393266, 0.491248, 0.000000),
+  Dali::Vector3(1.000000, 0.491248, 0.000000),
+};
+static std::vector<uint32_t> COLLIDER_2_IDX = {
+  1,
+  2,
+  0,
+  1,
+  3,
+  2,
+};
+
+Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition)
+{
+  Integration::TouchEvent touchEvent;
+  Integration::Point      point;
+  point.SetState(state);
+  point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
+  return touchEvent;
 }
 
 int UtcDaliNavigationMeshCreateFromFileFail1(void)
@@ -373,7 +461,7 @@ int UtcDaliNavigationSetTransformP(void)
 
   navmesh->SetSceneTransform(newMatrix);
 
-  auto point = Vector3(0, 1, 0);
+  auto point = Vector3(0, -1, 0);
 
   [[maybe_unused]] Vector3 navMeshLocalSpace;
   [[maybe_unused]] Vector3 navMeshParentSpace;
@@ -383,12 +471,12 @@ int UtcDaliNavigationSetTransformP(void)
   auto gravityVector = navmesh->GetGravityVector();
 
   // 'point' should be turned into the gravity vector after transforming into the local space
-  DALI_TEST_EQUALS(navMeshLocalSpace, gravityVector, TEST_LOCATION);
+  DALI_TEST_EQUALS(navMeshLocalSpace, gravityVector, std::numeric_limits<float>::epsilon(), TEST_LOCATION);
 
   navMeshParentSpace = navmesh->PointLocalToScene(gravityVector);
 
   // The gravity should be transformed back into point
-  DALI_TEST_EQUALS(navMeshParentSpace, point, TEST_LOCATION);
+  DALI_TEST_EQUALS(navMeshParentSpace, point, std::numeric_limits<float>::epsilon(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -544,6 +632,184 @@ int UtcDaliNavigationFindFloorForFace2P(void)
       DALI_TEST_EQUALS(outPosition, expectedPosition, TEST_LOCATION);
     }
   }
+
+  END_TEST;
+}
+
+int UtcDaliNavigationMeshCreateFromVerticesAndFaces(void)
+{
+  tet_infoline("UtcDaliNavigationMeshCreateFromVerticesAndFaces: Creates NavigationMesh using vertices and faces");
+
+  auto buffer0 = COLLIDER_BUFFER(0);
+
+  // All calculations in the navmesh local space
+  auto fn = [&](const auto& vertices, const auto& normals, const auto& indices) {
+    auto navmesh = NavigationMeshFactory::CreateFromVertexFaceList(vertices, normals, indices);
+    navmesh->SetSceneTransform(Matrix(Matrix::IDENTITY));
+    DALI_TEST_EQUALS(navmesh->GetVertexCount(), vertices.size(), TEST_LOCATION);
+    DALI_TEST_EQUALS(navmesh->GetFaceCount(), indices.size() / 3, TEST_LOCATION);
+    DALI_TEST_EQUALS(navmesh->GetEdgeCount(), indices.size(), TEST_LOCATION);
+
+    // compare data
+    for(auto i = 0u; i < navmesh->GetVertexCount(); ++i)
+    {
+      Dali::Vector3 v(navmesh->GetVertex(i)->coordinates);
+      DALI_TEST_EQUALS(vertices[i], v, TEST_LOCATION);
+    }
+
+    for(auto i = 0u; i < navmesh->GetFaceCount() * 3; i += 3)
+    {
+      const auto& v = navmesh->GetFace(i / 3)->vertex;
+      DALI_TEST_EQUALS(indices[i], v[0], TEST_LOCATION);
+      DALI_TEST_EQUALS(indices[i + 1], v[1], TEST_LOCATION);
+      DALI_TEST_EQUALS(indices[i + 2], v[2], TEST_LOCATION);
+    }
+  };
+
+  std::vector<Vector3> normals;
+  normals.resize(COLLIDER_0_VERTS.size());
+  std::fill(normals.begin(), normals.end(), Vector3(0.0, 1.0, 0.0));
+  fn(COLLIDER_0_VERTS, normals, COLLIDER_0_IDX);
+
+  normals.resize(COLLIDER_1_VERTS.size());
+  std::fill(normals.begin(), normals.end(), Vector3(0.0, 1.0, 0.0));
+  fn(COLLIDER_1_VERTS, normals, COLLIDER_1_IDX);
+
+  normals.resize(COLLIDER_2_VERTS.size());
+  std::fill(normals.begin(), normals.end(), Vector3(0.0, 1.0, 0.0));
+  fn(COLLIDER_2_VERTS, normals, COLLIDER_2_IDX);
+  END_TEST;
+}
+
+int UtcDaliNavigationMeshCreateFromVerticesAndFacesNoNormals(void)
+{
+  tet_infoline("UtcDaliNavigationMeshCreateFromVerticesAndFacesNoNormals: Creates NavigationMesh using vertices and faces but recalculates normals");
+
+  auto buffer0 = COLLIDER_BUFFER(0);
+
+  // All calculations in the navmesh local space
+  auto fn = [&](const auto& vertices, const auto& indices) {
+    auto navmesh = NavigationMeshFactory::CreateFromVertexFaceList(vertices.data(), nullptr, vertices.size(), indices.data(), indices.size());
+    navmesh->SetSceneTransform(Matrix(Matrix::IDENTITY));
+    DALI_TEST_EQUALS(navmesh->GetVertexCount(), vertices.size(), TEST_LOCATION);
+    DALI_TEST_EQUALS(navmesh->GetFaceCount(), indices.size() / 3, TEST_LOCATION);
+    DALI_TEST_EQUALS(navmesh->GetEdgeCount(), indices.size(), TEST_LOCATION);
+
+    // compare data
+    for(auto i = 0u; i < navmesh->GetVertexCount(); ++i)
+    {
+      Dali::Vector3 v(navmesh->GetVertex(i)->coordinates);
+      DALI_TEST_EQUALS(vertices[i], v, TEST_LOCATION);
+    }
+
+    for(auto i = 0u; i < navmesh->GetFaceCount() * 3; i += 3)
+    {
+      const auto& v = navmesh->GetFace(i / 3)->vertex;
+      DALI_TEST_EQUALS(indices[i], v[0], TEST_LOCATION);
+      DALI_TEST_EQUALS(indices[i + 1], v[1], TEST_LOCATION);
+      DALI_TEST_EQUALS(indices[i + 2], v[2], TEST_LOCATION);
+    }
+  };
+
+  std::vector<Vector3> normals;
+  normals.resize(COLLIDER_0_VERTS.size());
+  std::fill(normals.begin(), normals.end(), Vector3(0.0, 1.0, 0.0));
+  fn(COLLIDER_0_VERTS, COLLIDER_0_IDX);
+
+  normals.resize(COLLIDER_1_VERTS.size());
+  std::fill(normals.begin(), normals.end(), Vector3(0.0, 1.0, 0.0));
+  fn(COLLIDER_1_VERTS, COLLIDER_1_IDX);
+
+  normals.resize(COLLIDER_2_VERTS.size());
+  std::fill(normals.begin(), normals.end(), Vector3(0.0, 1.0, 0.0));
+  fn(COLLIDER_2_VERTS, COLLIDER_2_IDX);
+  END_TEST;
+}
+
+int UtcDaliNavigationMeshGetBinaryTest(void)
+{
+  tet_infoline("UtcDaliNavigationMeshGetBinaryTest: Creates meshes dynamically, reloads binaries and compares");
+
+  // Test 10 collider meshes
+  for(auto i = 0u; i < 10; ++i)
+  {
+    auto colliderMesh = NavigationMeshFactory::CreateFromBuffer(GetTestColliderMesh(i));
+    auto binary       = NavigationMeshFactory::GetMeshBinary(*colliderMesh);
+    DALI_TEST_EQUALS(binary.size() > 0, true, TEST_LOCATION);
+
+    auto colliderMesh2 = NavigationMeshFactory::CreateFromBuffer(binary);
+
+    DALI_TEST_EQUALS(colliderMesh->GetFaceCount(), colliderMesh2->GetFaceCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(colliderMesh->GetVertexCount(), colliderMesh2->GetVertexCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(colliderMesh->GetEdgeCount(), colliderMesh2->GetEdgeCount(), TEST_LOCATION);
+
+    // test vertices
+    for(auto idx = 0u; idx < colliderMesh->GetFaceCount(); ++idx)
+    {
+      auto v0  = colliderMesh->GetVertex(idx);
+      auto v1  = colliderMesh2->GetVertex(idx);
+      auto co0 = Vector3(v0->coordinates);
+      auto co1 = Vector3(v1->coordinates);
+      DALI_TEST_EQUALS(co0, co1, std::numeric_limits<float>::epsilon(), TEST_LOCATION);
+    }
+
+    // test face
+    for(auto idx = 0u; idx < colliderMesh->GetFaceCount(); ++idx)
+    {
+      auto  f0  = colliderMesh->GetFace(idx);
+      auto  f1  = colliderMesh2->GetFace(idx);
+      auto& vi0 = f0->vertex;
+      auto& vi1 = f1->vertex;
+      DALI_TEST_EQUALS(vi0[0], vi1[0], TEST_LOCATION);
+      DALI_TEST_EQUALS(vi0[1], vi1[1], TEST_LOCATION);
+      DALI_TEST_EQUALS(vi0[2], vi1[2], TEST_LOCATION);
+    }
+  }
+
+  END_TEST;
+}
+
+int UtcDaliColliderMeshModelNodeSetup(void)
+{
+  tet_infoline("UtcDaliColliderMeshModelNodeSetup: Test different variants of setting up a collider mesh to the node");
+
+  ToolkitTestApplication   application;
+  Dali::Scene3D::ModelNode node  = Dali::Scene3D::ModelNode::New();
+  Dali::Scene3D::Model     model = Dali::Scene3D::Model::New();
+  model.AddModelNode(node);
+
+  application.GetWindow().Add(model);
+  application.SendNotification();
+  application.Render();
+
+  auto colliderMesh = NavigationMeshFactory::CreateFromBuffer(GetTestColliderMesh(0));
+
+  // Redundant setup test
+  DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
+  node.SetColliderMesh(nullptr);
+  DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
+  node.SetColliderMesh(std::move(colliderMesh));
+  DALI_TEST_EQUALS(node.HasColliderMesh(), true, TEST_LOCATION);
+
+  // Reset collider mesh
+  node.SetColliderMesh(nullptr);
+  DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
+
+  auto colliderMesh2 = NavigationMeshFactory::CreateFromBuffer(GetTestColliderMesh(1));
+  auto colliderMesh3 = NavigationMeshFactory::CreateFromBuffer(GetTestColliderMesh(2));
+
+  const auto& cm2 = *colliderMesh2;
+  const auto& cm3 = *colliderMesh3;
+
+  node.SetColliderMesh(std::move(colliderMesh2));
+  DALI_TEST_EQUALS(node.HasColliderMesh(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(&node.GetColliderMesh(), &cm2, TEST_LOCATION);
+  node.SetColliderMesh(std::move(colliderMesh3));
+  DALI_TEST_EQUALS(node.HasColliderMesh(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(&node.GetColliderMesh(), &cm3, TEST_LOCATION);
+
+  node.SetColliderMesh(nullptr);
+  DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
 
   END_TEST;
 }

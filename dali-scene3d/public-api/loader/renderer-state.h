@@ -25,8 +25,9 @@
 
 namespace Dali::Scene3D::Loader
 {
-/*
+/**
  * @brief Contains values for comparison functions used in depth and stencil testing.
+ * @SINCE_2_0.7
  * @note Relative order of members must match DepthFunction::Type and StencilFunction::Type.
  */
 struct DALI_SCENE3D_API Comparison
@@ -47,8 +48,9 @@ struct DALI_SCENE3D_API Comparison
   Comparison() = delete;
 };
 
-/*
+/**
  * @brief Determines the blend factor used.
+ * @SINCE_2_0.7
  * @note Relative order of members must match BlendFactor::Type.
  */
 struct DALI_SCENE3D_API BlendFactor
@@ -76,27 +78,29 @@ struct DALI_SCENE3D_API BlendFactor
   BlendFactor() = delete;
 };
 
-/*
+/**
  * @brief Determines which buffers shall the Renderer write into.
+ * @SINCE_2_0.7
  * @note Relative order of members must match RenderMode::Type.
  */
 struct DALI_SCENE3D_API BufferMode
 {
   enum Type
   {
-    OMIT,         ///< not specified - will not be updated
-    NONE,         ///< Don’t write to either color or stencil buffer (But will potentially render to depth buffer).
-    AUTO,         ///< Writes are managed by the Actor Clipping API. This is DALi's default.
-    COLOR,        ///< Ignore stencil properties.  Write to the color buffer.
-    STENCIL,      ///< Use the stencil properties. Do not write to the color buffer.
-    COLOR_STENCIL ///< Use the stencil properties AND Write to the color buffer.
+    OMIT,         ///< not specified - will not be updated. @SINCE_2_0.7
+    NONE,         ///< Don’t write to either color or stencil buffer (But will potentially render to depth buffer). @SINCE_2_0.7
+    AUTO,         ///< Writes are managed by the Actor Clipping API. This is DALi's default. @SINCE_2_0.7
+    COLOR,        ///< Ignore stencil properties.  Write to the color buffer. @SINCE_2_0.7
+    STENCIL,      ///< Use the stencil properties. Do not write to the color buffer. @SINCE_2_0.7
+    COLOR_STENCIL ///< Use the stencil properties AND Write to the color buffer. @SINCE_2_0.7
   };
 
   BufferMode() = delete;
 };
 
-/*
+/**
  * @brief Contains values and functionality for configuring Renderers.
+ * @SINCE_2_0.7
  */
 namespace RendererState
 {
@@ -133,9 +137,10 @@ enum DALI_SCENE3D_API Value : Type
   DEFAULT = DEPTH_WRITE | DEPTH_TEST | CULL_BACK | (Comparison::LESS_EQUAL << DEPTH_FUNCTION_SHIFT),
 };
 
-/*
+/**
  * @brief Encodes the given blend factors into a RenderMode value, maskable into other options,
- *  passable into ApplyRenderMode().
+ * passable into ApplyRenderMode().
+ * @SINCE_2_0.7
  */
 inline DALI_SCENE3D_API constexpr uint32_t FromBlendFactors(BlendFactor::Type srcRgb, BlendFactor::Type destRgb, BlendFactor::Type srcAlpha, BlendFactor::Type destAlpha)
 {
@@ -144,8 +149,9 @@ inline DALI_SCENE3D_API constexpr uint32_t FromBlendFactors(BlendFactor::Type sr
          << BLEND_FACTOR_BASE_SHIFT;
 }
 
-/*
+/**
  * @brief Applies the settings encoded in @a rendererState, to a @a renderer.
+ * @SINCE_2_0.7
  * @note Depth function is only set if not Comparison::OMIT.
  * @note Blend factors are only set if not BlendFactor::OMIT.
  * @note Buffer mode is only set is not BufferMode::OMIT.

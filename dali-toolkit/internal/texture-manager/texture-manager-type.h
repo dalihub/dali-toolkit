@@ -234,7 +234,7 @@ struct TextureInfo
     maskTextureId(maskTextureId),
     hash(hash),
     scaleFactor(scaleFactor),
-    referenceCount(1u),
+    referenceCount(1),
     loadState(LoadState::NOT_STARTED),
     fittingMode(fittingMode),
     samplingMode(samplingMode),
@@ -268,7 +268,7 @@ struct TextureInfo
   TextureId                  maskTextureId;        ///< The mask TextureId to be applied on load
   TextureHash                hash;                 ///< The hash used to cache this Texture
   float                      scaleFactor;          ///< The scale factor to apply to the Texture when masking
-  uint32_t                   referenceCount;       ///< The reference count of clients using this Texture
+  int32_t                    referenceCount;       ///< The reference count of clients using this Texture
   LoadState                  loadState;            ///< The load state showing the load progress of the Texture
   Dali::FittingMode::Type    fittingMode : 3;      ///< The requested FittingMode
   Dali::SamplingMode::Type   samplingMode : 3;     ///< The requested SamplingMode
@@ -297,14 +297,14 @@ struct ExternalTextureInfo
                       const bool        preMultiplied)
   : textureId(textureId),
     textureSet(textureSet),
-    referenceCount(1u),
+    referenceCount(1),
     preMultiplied(preMultiplied)
   {
   }
 
   TextureId  textureId;         ///< The TextureId associated with this ExternalTexture
   TextureSet textureSet;        ///< The external texture
-  uint32_t   referenceCount;    ///< The reference count of clients using this ExternalTexture
+  int32_t    referenceCount;    ///< The reference count of clients using this ExternalTexture
   bool       preMultiplied : 1; ///< True if the image's color was multiplied by it's alpha
 };
 

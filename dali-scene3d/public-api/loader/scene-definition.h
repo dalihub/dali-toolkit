@@ -35,9 +35,10 @@ namespace Dali::Scene3D::Loader
 {
 class MatrixStack;
 
-/*
+/**
  * @brief Intermediate representation of a scene with functionality required to
- *  create DALi objects (Actors, Renderers) from it.
+ * create DALi objects (Actors, Renderers) from it.
+ * @SINCE_2_0.7
  */
 class DALI_SCENE3D_API SceneDefinition
 {
@@ -51,87 +52,102 @@ public: // METHODS
   SceneDefinition(SceneDefinition&& other);
   ~SceneDefinition();
 
-  /*
+  /**
    * @brief Registers a scene root node.
+   * @SINCE_2_0.7
    * @return The index of the scene root node *registration*.
    */
   Index AddRootNode(Index iNode);
 
-  /*
-   * @return the list of scene root node IDs in the order of their loading.
+  /**
+   * @brief Retrieves a list of scene root node IDs in the order of loading.
+   * @SINCE_2_0.7
+   * @return List of scene root node IDs in the order of loading
    */
   const std::vector<Index>& GetRoots() const;
 
-  /*
+  /**
    * @brief Removes scene root registration at the given index @a iRoot.
-   * @note @a iRoot is the index of the registration (i.e. into the vector returned by GetRoots()),
-   *  not of the node.
+   * @SINCE_2_0.7
+   * @note @a iRoot is the index of the registration (i.e. into the vector returned by GetRoots()), not of the node.
    */
   void RemoveRootNode(Index iRoot);
 
-  /*
-   * @return The number of node( definition)s in the scene.
+  /**
+   * @brief Retrieve the number of node(definition)s in the scene.
+   * @SINCE_2_0.7
+   * @return The number of node(definition)s in the scene
    */
   uint32_t GetNodeCount() const;
 
-  /*
-   * @return Const pointer to the node (definition) at the given index.
+  /**
+   * @brief Retrieve a const pointer to the node (definition) at the given index.
+   * @SINCE_2_0.7
+   * @return Const pointer to the node (definition).
    */
   const NodeDefinition* GetNode(Index iNode) const;
 
-  /*
-   * @return Pointer to the node (definition) at the given index.
+  /**
+   * @brief Retrive a pointer to the node (definition) at the given index.
+   * @SINCE_2_0.7
+   * @return Pointer to the node (definition).
    */
   NodeDefinition* GetNode(Index iNode);
 
-  /*
-   * @brief Traverses the scene starting from the node at the given index into
-   *  nodes, using the given customization @a choices and the visitor @a v.
+  /**
+   * @brief Traverses the scene starting from the node at the given index into nodes,
+   * using the given customization @a choices and the visitor @a v.
+   * @SINCE_2_0.7
    */
   void Visit(Index iNode, const Customization::Choices& choices, NodeDefinition::IVisitor& v);
 
-  /*
-   * @brief Traverses the scene starting from the node at the given index into
-   *  nodes, using the given customization @a choices and the visitor @a v.
+  /**
+   * @brief Traverses the scene starting from the node at the given index into nodes,
+   * using the given customization @a choices and the visitor @a v.
+   * @SINCE_2_0.7
    */
   void Visit(Index iNode, const Customization::Choices& choices, NodeDefinition::IConstVisitor& v) const;
 
-  /*
-   * @brief Counts the references to meshes, shaders, materials that nodes in
-   *  the scene are holding, writing the results into @a refCounts.
+  /**
+   * @brief Counts the references to meshes, shaders, materials that nodes in the scene are holding,
+   * writing the results into @a refCounts.
+   * @SINCE_2_0.7
    * @note @a refCounts' entries must have the correct size. Use ResourceBundle::GetRefCounter().
    */
   void CountResourceRefs(Index iNode, const Customization::Choices& choices, ResourceRefCounts& refCounts) const;
 
-  /*
-   * @brief Given a bundle of @a resources that are loaded, and customization
-   *  @a choices, this method traverses the scene, creating the ModelNodes and renderers
-   *  from node definitions.
+  /**
+   * @brief Given a bundle of @a resources that are loaded, and customization @a choices,
+   * this method traverses the scene, creating the ModelNodes and renderers from node definitions.
+   * @SINCE_2_0.7
    * @return Handle to the root node.
    */
   ModelNode CreateNodes(Index iNode, const Customization::Choices& choices, NodeDefinition::CreateParams& params);
 
-  /*
-   * @brief Creates / update a registry of mappings from customization tags to
-   *  a lists of names of customizable nodes under each tag, and the number of
-   *  options. If @a outMissingChoices was specified, each tag that it encounters
-   *  in the scene but not in @a choices, will be registered on it with the default
-   *  choice of 0.
+  /**
+   * @brief Creates / update a registry of mappings from customization tags to a lists of names of
+   * customizable nodes under each tag, and the number of options.
+   *
+   * If @a outMissingChoices was specified, each tag that it encounters in the scene but not in @a choices,
+   * will be registered on it with the default choice of 0.
+   * @SINCE_2_0.7
    */
   void GetCustomizationOptions(const Customization::Choices& choices,
                                Customization::Map&           outCustomizationOptions,
                                Customization::Choices*       outMissingChoices) const;
 
-  /*
-   * @brief Attempts to add @a nodeDef to the end of nodes, and its index to the end of
-   *  its parent's list of children (if iParent != NodeDefinition::INVALID_PARENT).
+  /**
+   * @brief Attempts to add @a nodeDef to the end of nodes, and its index to the end of its parent's
+   * list of children (if iParent != NodeDefinition::INVALID_PARENT).
+   * @SINCE_2_0.7
    * @return If the operation was successful - which requires nodeDef->name to be unique -
    *  a pointer to the stored node definition; nullptr otherwise.
    */
   NodeDefinition* AddNode(std::unique_ptr<NodeDefinition>&& nodeDef);
 
-  /*
+  /**
    * @brief Moves the node to some other parent and / or to a different index.
+   * @SINCE_2_0.7
    * @return Whether the operation was successful.
    * @note This is currently breaking an assumption of never having a child of a node at a lower
    *  index as that of the node itself, due to the fact that we're only changing parent ids (and
@@ -142,82 +158,90 @@ public: // METHODS
    */
   bool ReparentNode(const std::string& name, const std::string& newParentName, Index siblingOrder);
 
-  /*
+  /**
    * @brief Removes a node with the given name, including all of its children, and updating
    *  the indices on all remaining node definitions.
+   * @SINCE_2_0.7
    * @return Whether the operation was successful.
    */
   bool RemoveNode(const std::string& name);
 
-  /*
+  /**
    * @brief Builds the model matrix stack for the node at the given @a index.
+   * @SINCE_2_0.7
    * @note It only pushes new matrices; does not require the stack to be empty (or cares if it was not).
    */
   void GetNodeModelStack(Index index, MatrixStack& model) const;
 
-  /*
+  /**
    * @brief Attempts to find the definition of a node with the given @a name. Only upon
    *  success, and if @a outIndex is non-null, the index of the node is written to it.
+   * @SINCE_2_0.7
    * @return Pointer to the node definition; nullptr if not found.
    * @note No ownership transfer.
    */
   NodeDefinition* FindNode(const std::string& name, Index* outIndex = nullptr);
 
-  /*
+  /**
    * @brief Attempts to find the definition of a node with the given @a name. Only upon
    *  success, and if @a outIndex is non-null, the index of the node is written to it.
+   * @SINCE_2_0.7
    * @return Pointer to the node definition; nullptr if not found.
    * @note No ownership transfer.
    */
   const NodeDefinition* FindNode(const std::string& name, Index* outIndex = nullptr) const;
 
-  /*
-   * @return The index of the given NodeDefinition@ a node, or -1 if the node definition
-   *  was not found.
+  /**
+   * @brief The index of the given NodeDefinition @a node, or -1 if the node definition was not found.
+   * @SINCE_2_0.7
+   * @return The index of the given NodeDefinition @a node, or -1 if the node definition was not found
    */
   Index FindNodeIndex(const NodeDefinition& node) const;
 
-  /*
+  /**
    * @brief Calls @a consumer with up to @a limit NodeDefinitions that evaluate to true
    *  with @a predicate.
+   * @SINCE_2_0.7
    * @note A @a limit value of 0 means no limit.
    */
   void FindNodes(NodePredicate predicate, NodeConsumer consumer, unsigned int limit = 0);
 
-  /*
-   * @brief Calls @a consumer with up to @a limit NodeDefinitions that evaluate to true
-   *  with @a predicate.
+  /**
+   * @brief Calls @a consumer with up to @a limit NodeDefinitions that evaluate to true with @a predicate.
+   * @SINCE_2_0.7
    * @note A @a limit value of 0 means no limit.
    */
   void FindNodes(NodePredicate predicate, ConstNodeConsumer consumer, unsigned int limit = 0) const;
 
-  /*
+  /**
    * @brief Applies constraints from the given requests.
+   * @SINCE_2_0.7
    */
   void ApplyConstraints(Actor&                           root,
                         std::vector<ConstraintRequest>&& constrainables,
                         StringCallback                   onError = DefaultErrorCallback) const;
 
-  /*
-   * @brief Ensures that there is no overlap between shaders used by nodes that have
-   *  meshes skinned to different skeletons.
+  /**
+   * @brief Ensures that there is no overlap between shaders used by nodes that have meshes skinned to different skeletons.
+   * @SINCE_2_0.7
    */
   void EnsureUniqueSkinningShaderInstances(ResourceBundle& resources) const;
 
-  /*
-   * @brief Performs the configuration of the given skinning shaders with the given skeleton
-   *   This means that the absolute transforms of the joints are calculated and set as one of
-   *   the uniforms in the mat4 @b uBone array (in depth first traversal). Further, the following
-   *   are created:<br />
-   *   - a @b jointMatrix property on each joint Actor;<br />
-   *   - constraint from the Actor's local position and rotation (and if it has a @e joint
-   *     parent, the jointMatrix of the parent) to its @b jointMatrix property;<br />
-   *   - a constraint from the the Actor's @b jointMatrix property to the related entry in
-   *     the shader's @b uBone property;<br />
-   *   This ensures the automatic update of the skeletal animation, should any of the joints'
-   *   transform changes, by whatever means.
-   * @return The success of the operations. Error messages will be posted to the optional
-   *   @a onError callback.
+  /**
+   * @brief Performs the configuration of the given skinning shaders with the given skeleton.
+   *
+   * This means that the absolute transforms of the joints are calculated and set as one of
+   * the uniforms in the mat4 @b uBone array (in depth first traversal). Further, the following
+   * are created:<br />
+   *  - a @b jointMatrix property on each joint Actor;<br />
+   *  - constraint from the Actor's local position and rotation (and if it has a @e joint
+   *    parent, the jointMatrix of the parent) to its @b jointMatrix property;<br />
+   *  - a constraint from the the Actor's @b jointMatrix property to the related entry in
+   *    the shader's @b uBone property;<br />
+   * This ensures the automatic update of the skeletal animation, should any of the joints' transform changes,
+   * by whatever means.
+   * @SINCE_2_0.7
+   * @note Error messages will be posted to the optional @a onError callback.
    * @note A maximum of SkinningDetails::MAX_JOINTS joints per skeleton are supported at the moment.
    * @note Even if multiple skinned meshes use the same skinning shader, the correct number
    *   of separate instances need to be declared in the .dli to avoid clashing uniform
@@ -227,8 +251,9 @@ public: // METHODS
                                 Actor                                             root,
                                 std::vector<SkinningShaderConfigurationRequest>&& requests) const;
 
-  /*
+  /**
    * @brief Ensures there is no two meshes with blend shapes sharing the same shader.
+   * @SINCE_2_0.7
    */
   void EnsureUniqueBlendShapeShaderInstances(ResourceBundle& resources) const;
 
@@ -237,7 +262,8 @@ public: // METHODS
    *
    * For each node with blend shapes it registers into the actor the weights properties for each morph target
    * and some needed uniforms into the shader.
-   * 
+   *
+   * @SINCE_2_0.7
    * @param[in] root The root actor.
    * @param[in] requests The requests to configure blend shapes.
    * @param[in] resources The resources bundle. Meshes need to be accessed to configure the blend shapes.

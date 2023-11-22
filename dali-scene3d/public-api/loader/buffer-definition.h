@@ -30,7 +30,9 @@ namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Defines a buffer that is loaded from input uri.
+ *
  * The buffer can contain 3D resource data such as mesh, animation, and texture.
+ * @SINCE_2_2.12
  */
 struct DALI_SCENE3D_API BufferDefinition
 {
@@ -49,28 +51,34 @@ struct DALI_SCENE3D_API BufferDefinition
 
   /**
    * @brief Retrieves data stream of this buffer.
+   * @SINCE_2_2.12
    * @return iostream of this buffer
    */
   std::iostream& GetBufferStream();
 
   /**
    * @brief Retrieves uri of this buffer
+   * @SINCE_2_2.12
    * @return uri of the buffer
    */
   std::string GetUri();
 
   /**
    * @brief Checks whether the buffer is available or not.
+   *
    * It is available, if the buffer is successfully loaded from file or base64 stream.
+   * @SINCE_2_2.12
    * @return True if it is available.
    */
   bool IsAvailable();
 
 private:
+  /// @cond internal
   /**
    * @brief Loads buffer from file or encoded stream.
    */
   void LoadBuffer();
+  /// @endcond
 
 public: // DATA
   std::string mResourcePath;

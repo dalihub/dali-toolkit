@@ -32,9 +32,9 @@ using WayPointList = std::vector<Scene3D::Algorithm::WayPoint>;
  */
 enum class PathFinderAlgorithm
 {
-  DIJKSTRA_SHORTEST_PATH, ///< Using A* variant (Dijkstra) finding a shortest path
-  SPFA,                   ///< Using SPFA-SLF (Shortest Path Fast Algorithm with Short Label First) finding a shortest path.
-  SPFA_DOUBLE_WAY,        ///< Using SPFA-SLF double way. It might not find shortest, but will use less memory.
+  DIJKSTRA_SHORTEST_PATH, ///< Using A* variant (Dijkstra) finding a shortest path. @SINCE_2_2.12
+  SPFA,                   ///< Using SPFA-SLF (Shortest Path Fast Algorithm with Short Label First) finding a shortest path. @SINCE_2_2.12
+  SPFA_DOUBLE_WAY,        ///< Using SPFA-SLF double way. It might not find shortest, but will use less memory. @SINCE_2_2.12
 
   DEFAULT = DIJKSTRA_SHORTEST_PATH, ///< Default algorithm to use
 };
@@ -43,18 +43,21 @@ enum class PathFinderAlgorithm
  * @class PathFinderBase
  *
  * Base class for implementation of pathfinding algorithms.
+ * @SINCE_2_2.12
  */
 class DALI_SCENE3D_API PathFinderBase
 {
 public:
   /**
    * @brief Destructor
+   * @SINCE_2_2.12
    */
   virtual ~PathFinderBase() = default;
 
   /**
    * @brief Looks for a path from point A to point B.
    *
+   * @SINCE_2_2.12
    * @param[in] positionFrom source position in NavigationMesh parent space
    * @param[in] positionTo target position in NavigationMesh parent space
    * @return List of waypoints for path or empty vector if no success
@@ -64,6 +67,7 @@ public:
   /**
    * @brief Finds path between NavigationMesh faces
    *
+   * @SINCE_2_2.12
    * @param[in] polyIndexFrom Index of start polygon
    * @param[in] polyIndexTo Index of end polygon
    * @return List of waypoints for path or empty vector if no success
@@ -76,12 +80,14 @@ public:
  *
  * PathFinder runs path finding algorithm on associated NavigationMesh
  * and returns a list of waypoints.
+ * @SINCE_2_2.12
  */
 class DALI_SCENE3D_API PathFinder
 {
 public:
   /**
    * @brief Creates new instance of path finder
+   * @SINCE_2_2.12
    * @param[in] navigationMesh Navigation mesh to associate with
    * @param[in] algorithm algorithm to use
    * @return Valid pointer to PathFinder object or nullptr
@@ -100,6 +106,7 @@ public:
    *
    * Both points should be defined in the same space as is used by the NavigationMesh.
    *
+   * @SINCE_2_2.12
    * @param[in] positionFrom Source position
    * @param[in] positionTo Target position
    * @return List of waypoints for path or empty list on failure
@@ -115,6 +122,7 @@ public:
    * - index < 0 or index > NavigationMesh::GetFaceCount()
    * - The path doesn't exist
    *
+   * @SINCE_2_2.12
    * @param[in] faceIndexFrom Source face index
    * @param[in] faceIndexTo Target face index
    * @return List of waypoints for path or empty list on failure

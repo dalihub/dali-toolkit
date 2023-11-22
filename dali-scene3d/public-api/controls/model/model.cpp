@@ -22,13 +22,9 @@
 #include <dali-scene3d/internal/controls/model/model-impl.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 
-namespace Dali
+namespace Dali::Scene3D
 {
-namespace Scene3D
-{
-Model::Model()
-{
-}
+Model::Model() = default;
 
 Model::Model(const Model& model) = default;
 
@@ -38,9 +34,7 @@ Model& Model::operator=(const Model& model) = default;
 
 Model& Model::operator=(Model&& rhs) noexcept = default;
 
-Model::~Model()
-{
-}
+Model::~Model() = default;
 
 Model Model::New(const std::string& modelUrl, const std::string& resourceDirectoryUrl)
 {
@@ -168,6 +162,9 @@ void Model::SetMotionData(MotionData motionData)
   GetImpl(*this).SetMotionData(motionData);
 }
 
-} // namespace Scene3D
+Model::MeshHitSignalType& Model::MeshHitSignal()
+{
+  return GetImpl(*this).MeshHitSignal();
+}
 
-} // namespace Dali
+} // namespace Dali::Scene3D

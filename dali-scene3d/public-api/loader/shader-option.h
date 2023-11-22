@@ -69,30 +69,35 @@ public:
 public:
   /**
    * @brief Sets transparency option.
+   * @SINCE_2_2.33
    */
   void SetTransparency();
 
   /**
    * @brief Adds new shader definition option.
-   * If the option is already added, nothin is changed.
    *
+   * If the option is already added, nothin is changed.
+   * @SINCE_2_2.33
    * @param[in] shaderOptionType Option to be added,
    */
   void AddOption(Type shaderOptionType);
 
   /**
-   * Adds macro definitions for joints based on the number of joint sets.
+   * @brief Adds macro definitions for joints based on the number of joint sets.
+   * @SINCE_2_2.52
    */
   void AddJointMacros(size_t numberOfJointSets);
 
   /**
-   * Enables empty preprocessor definitions to be defined to a value
+   * @brief Enables empty preprocessor definitions to be defined to a value.
+   * @SINCE_2_2.52
    */
   void AddMacroDefinition(std::string macro, std::string definition);
 
   /**
    * @brief Retrieves current shader option hash
    *
+   * @SINCE_2_2.33
    * @return Hash value of currently added options.
    */
   HashType GetOptionHash() const;
@@ -100,6 +105,7 @@ public:
   /**
    * @brief Retrieves a list of define keywords.
    *
+   * @SINCE_2_2.33
    * @param[out] defines A list of define keywords those are used in this option.
    */
   void GetDefines(std::vector<std::string>& defines) const;
@@ -107,13 +113,15 @@ public:
   /**
    * @brief Retrieves a single shader define keyword of input type.
    *
+   * @SINCE_2_2.33
    * @param[in] shaderOptionType Shader definition option type to know its keyword.
    * @return string keyword of shader define.
    */
   static std::string_view GetDefineKeyword(Type shaderOptionType);
 
   /**
-   * Get any macro definitions
+   * @brief Get any macro definitions.
+   * @SINCE_2_2.52
    */
   const std::vector<MacroDefinition>& GetMacroDefinitions() const;
 

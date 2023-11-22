@@ -24,6 +24,7 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/controls/model/model-impl.h>
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/model-primitive-impl.h>
 
@@ -403,6 +404,52 @@ void ModelNode::UpdateBoneMatrix(Scene3D::ModelPrimitive primitive)
     boneData.constraint.ApplyPost();
     break;
   }
+}
+
+void ModelNode::SetColliderMesh(ColliderMeshUniquePtr&& colliderMesh)
+{
+  if(!colliderMesh && !mColliderMesh)
+  {
+    return;
+  }
+
+  if(!mParentModel) // find parent model if not set
+  {
+    auto parent = Self().GetParent();
+    while(parent)
+    {
+      auto modelHandle = Scene3D::Model::DownCast(parent);
+      if(modelHandle)
+      {
+        mParentModel = &GetImpl(modelHandle);
+        break;
+      }
+      parent = parent.GetParent();
+    }
+  }
+
+  // Resetting collider mesh if argument is nullptr
+  auto handle = Scene3D::ModelNode::DownCast(Self());
+  if(mParentModel)
+  {
+    if(mColliderMesh || colliderMesh == nullptr)
+    {
+      mParentModel->RemoveColliderMesh(handle);
+    }
+    mParentModel->RegisterColliderMesh(handle, *colliderMesh);
+  }
+
+  mColliderMesh = std::move(colliderMesh);
+}
+
+bool ModelNode::HasColliderMesh() const
+{
+  return mColliderMesh != nullptr;
+}
+
+const Scene3D::Algorithm::ColliderMesh& ModelNode::GetColliderMesh() const
+{
+  return *mColliderMesh;
 }
 
 } // namespace Internal

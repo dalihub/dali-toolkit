@@ -34,6 +34,7 @@ namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Helper enum for encoding and decoding sampler states.
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API SamplerFlags
 {
@@ -76,38 +77,46 @@ struct DALI_SCENE3D_API SamplerFlags
   };
 
   /**
-   * @return SamplerFlags bit pattern calculated from the given Dali Sampler settings.
+   * @brief Retrieves the bit pattern calculated from the given Dali Sampler settings.
+   * @SINCE_2_0.7
+   * @return SamplerFlags bit pattern.
    */
   static Type Encode(FilterMode::Type minFilter, FilterMode::Type magFilter, WrapMode::Type wrapS, WrapMode::Type wrapT);
 
   /**
    * @brief Decodes the minification filter patter of @a flags into the corresponding FilterMode.
+   * @SINCE_2_0.7
    */
   static FilterMode::Type GetMinFilter(Type flags);
 
   /**
    * @brief Decodes the magnification filter patter of @a flags into the corresponding FilterMode.
+   * @SINCE_2_0.7
    */
   static FilterMode::Type GetMagFilter(Type flags);
 
   /**
    * @brief Decodes the horizontal wrap pattern of @a flags into the corresponding WrapMode.
+   * @SINCE_2_0.7
    */
   static WrapMode::Type GetWrapS(Type flags);
 
   /**
    * @brief Decodes the vertical wrap pattern of @a flags into the corresponding WrapMode.
+   * @SINCE_2_0.7
    */
   static WrapMode::Type GetWrapT(Type flags);
 
   /**
    * @brief Creates a Sampler with the settings encoded in @a flags.
+   * @SINCE_2_0.7
    */
   static Sampler MakeSampler(Type flags);
 };
 
 /**
  * @brief Defines a texture from a combination of an image URI and its sampler definition.
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API TextureDefinition
 {
@@ -128,6 +137,7 @@ struct DALI_SCENE3D_API TextureDefinition
  *  is enabled, and an index of an environment (usually of all environments in a
  *  scene). Textures from the environment are added last when the DALi TextureSet
  *  is being created.
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API MaterialDefinition
 {
@@ -156,6 +166,7 @@ struct DALI_SCENE3D_API MaterialDefinition
 
   /**
    * @brief A(n image based) texture that's used in a material.
+   * @SINCE_2_0.7
    */
   struct TextureStage
   {
@@ -187,6 +198,7 @@ struct DALI_SCENE3D_API MaterialDefinition
   /**
    * @brief Loads (or, in the case of solid color materials, creates) raw pixel data,
    *  which is then returned.
+   * @SINCE_2_0.7
    * @note This may be called from any thread.
    */
   RawData LoadRaw(const std::string& imagesPath);
@@ -195,6 +207,7 @@ struct DALI_SCENE3D_API MaterialDefinition
    * @brief Creates Textures from the pixel data in @a raw, gets the
    *  the cube maps from the iEnvironment'th element of @a environments,
    *  then creates a DALi TextureSet and returns it.
+   * @SINCE_2_0.7
    * @note This must be called from the event thread.
    * @note The textures are added in the following order: 2D, cube maps.
    */
@@ -202,11 +215,13 @@ struct DALI_SCENE3D_API MaterialDefinition
 
   /**
    * @brief Checks if the given mask matches any of the textures defined.
+   * @SINCE_2_0.7
    */
   bool CheckTextures(uint32_t flags) const;
 
   /**
    * @return The alpha test reference value.
+   * @SINCE_2_0.7
    * @note A value of 0.f means no alpha testing.
    */
   float GetAlphaCutoff() const
@@ -216,6 +231,7 @@ struct DALI_SCENE3D_API MaterialDefinition
 
   /**
    * @brief Encodes the alpha test reference @a value in flags.
+   * @SINCE_2_0.7
    * @note A value of 0.f means no alpha testing.
    */
   void SetAlphaCutoff(float value)

@@ -31,13 +31,6 @@ using Poly   = Dali::Scene3D::Algorithm::NavigationMesh::Face;
 using Edge   = Dali::Scene3D::Algorithm::NavigationMesh::Edge;
 using Vertex = Dali::Scene3D::Algorithm::NavigationMesh::Vertex;
 
-// Internal Navigation ray structure
-struct NavigationRay
-{
-  Dali::Vector3 origin;    // Origin of ray
-  Dali::Vector3 direction; // Direction of ray
-};
-
 /**
  * Helper function calculating intersection point between triangle and ray
  */
@@ -260,17 +253,61 @@ NavigationMesh::IntersectResult NavigationMesh::NavigationRayFaceIntersection(Na
   return result;
 }
 
+NavigationMesh::IntersectResult NavigationMesh::RayCastIntersect(NavigationRay& rayOrig) const
+{
+  auto                       faceCount = GetFaceCount();
+  std::list<IntersectResult> results;
+
+  NavigationRay ray;
+
+  ray.origin = PointSceneToLocal(rayOrig.origin); // origin is equal position
+
+  // Ray direction matches gravity direction
+  ray.direction = PointSceneToLocal(rayOrig.origin + rayOrig.direction) - ray.origin;
+  ray.direction.Normalize();
+  for(auto i = 0u; i < faceCount; ++i)
+  {
+    auto result = NavigationRayFaceIntersection(ray, *GetFace(i));
+    if(result.result)
+    {
+      result.faceIndex = i;
+      if(results.empty())
+      {
+        results.push_back(result);
+      }
+      else
+      {
+        for(auto it = results.begin(); it != results.end(); ++it)
+        {
+          if((*it).distance > result.distance)
+          {
+            results.insert(it, result);
+            break;
+          }
+        }
+      }
+    }
+  }
+  if(!results.empty())
+  {
+    return results.front();
+  }
+  else
+  {
+    return IntersectResult{Vector3::ZERO, 0.0f, 0u, false};
+  }
+}
+
 void NavigationMesh::SetTransform(const Dali::Matrix& transform)
 {
-  mTransform = transform;
-  transform.InvertTransform(mTransformInverse);
+  mTransform        = transform;
+  mTransformInverse = mTransform;
+  mTransformInverse.Invert();
 }
 
 Dali::Vector3 NavigationMesh::PointSceneToLocal(const Dali::Vector3& point) const
 {
-  // Transform point into navmesh space
-  Dali::Vector4 invNewPos = mTransformInverse * Dali::Vector4(point.x, -point.y, point.z, 1.0f);
-  invNewPos.y *= -1.0f;
+  Dali::Vector4 invNewPos = mTransformInverse * Dali::Vector4(point.x, point.y, point.z, 1.0f);
 
   return Dali::Vector3(invNewPos.AsFloat());
 }
@@ -278,8 +315,7 @@ Dali::Vector3 NavigationMesh::PointSceneToLocal(const Dali::Vector3& point) cons
 Dali::Vector3 NavigationMesh::PointLocalToScene(const Dali::Vector3& point) const
 {
   // Transform point into scene transform space
-  Dali::Vector4 newPos = mTransform * Dali::Vector4(point.x, -point.y, point.z, 1.0f);
-  newPos.y *= -1.0f;
+  Dali::Vector4 newPos = mTransform * Dali::Vector4(point.x, point.y, point.z, 1.0f);
 
   return Dali::Vector3(newPos.AsFloat());
 }

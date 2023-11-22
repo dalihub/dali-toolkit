@@ -29,16 +29,18 @@ namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Defines the matadata for an image.
+ * @SINCE_2_2.5
  */
 struct ImageMetadata
 {
-  ImageDimensions    mMinSize{};                                   ///< The minimum required image size for rendering
-  SamplingMode::Type mSamplingMode{SamplingMode::BOX_THEN_LINEAR}; ///< The sampling mode used to resize the image
+  ImageDimensions    mMinSize{};                                   ///< The minimum required image size for rendering. @SINCE_2_2.5
+  SamplingMode::Type mSamplingMode{SamplingMode::BOX_THEN_LINEAR}; ///< The sampling mode used to resize the image. @SINCE_2_2.5
 };
 
 /**
  * @brief Stores the metadata for a scene.
  *
+ * @SINCE_2_2.5
  * @note The supported format is the following:
  *  {
  *    "images": (optional) [ {
@@ -55,8 +57,10 @@ struct SceneMetadata
 };
 
 /**
- * @brief Attempts to load and process a json file specifying scene metadata
- * for pre-processing the scene resources: e.g. the minimum size required for rendering images, etc.
+ * @brief Attempts to load and process a json file specifying scene metadata for pre-processing the scene resources.
+ *
+ * e.g. the minimum size required for rendering images, etc.
+ * @SINCE_2_2.5
  * @note Will fail quietly if the file is not present.
  */
 DALI_SCENE3D_API void LoadSceneMetadata(const std::string& url, SceneMetadata& sceneMetadata);

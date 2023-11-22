@@ -31,20 +31,24 @@ namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Stores the pixel data objects for environment map texture.
+ *
  * EnvironmentMapData supports cube map that contains textures for 6 faces, or
  * an equirectangular image.
+ * @SINCE_2_2.11
  */
 class DALI_SCENE3D_API EnvironmentMapData
 {
 public:
   /**
    * @brief Retrieves environment map texture from image file
+   * @SINCE_2_2.11
    * @return texture for loaded environment map.
    */
   Texture GetTexture();
 
   /**
    * @brief Sets environment map type
+   * @SINCE_2_2.11
    * @param[in] environmentMapType environment map type
    */
   void SetEnvironmentMapType(Dali::Scene3D::EnvironmentMapType environmentMapType)
@@ -58,6 +62,7 @@ public:
 
   /**
    * @brief Retrieves environment map type.
+   * @SINCE_2_2.11
    * @return environment map type
    */
   Dali::Scene3D::EnvironmentMapType GetEnvironmentMapType() const
@@ -65,12 +70,22 @@ public:
     return mEnvironmentMapType;
   }
 
+  /**
+   * @brief Sets the mipmap levels
+   * @SINCE_2_2.19
+   * @param[in] mipmapLevels No. of mipmap levels
+   */
   void SetMipmapLevels(uint32_t mipmapLevels)
   {
     mMipmapLevels = mipmapLevels;
   }
 
-  uint32_t GetMipmapLevels()
+  /**
+   * @brief Retrieves the number of mipmap levels
+   * @SINCE_2_2.19
+   * @return No. of mipmap levels
+   */
+  uint32_t GetMipmapLevels() const
   {
     return mMipmapLevels;
   }

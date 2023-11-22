@@ -35,6 +35,7 @@ namespace Dali::Scene3D::Loader
  * @brief Defines a mesh with its attributes, the primitive type to render it as,
  *  and the file to load it from with the offset and length information for the
  *  individual attribute buffers.
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API MeshDefinition
 {
@@ -95,7 +96,9 @@ struct DALI_SCENE3D_API MeshDefinition
 
   /**
    * @brief Describes raw data in terms of its position and size in a buffer.
-   *  All units in bytes.
+   *
+   * All units in bytes.
+   * @SINCE_2_0.7
    */
   struct Blob
   {
@@ -122,11 +125,13 @@ struct DALI_SCENE3D_API MeshDefinition
 
     /**
      * @brief Calculates the size of a tightly-packed buffer for the elements from the blob.
+     * @SINCE_2_0.7
      */
     uint32_t GetBufferSize() const;
 
     /**
      * @brief Convenience method to tell whether a Blob has meaningful data.
+     * @SINCE_2_0.7
      */
     bool IsDefined() const
     {
@@ -134,8 +139,10 @@ struct DALI_SCENE3D_API MeshDefinition
     }
 
     /**
-     * @brief Convenience method to tell whether the elements stored in the blob follow each
-     *  other tightly. The opposite would be interleaving.
+     * @brief Convenience method to tell whether the elements stored in the blob follow each other tightly.
+     *
+     * The opposite would be interleaving.
+     * @SINCE_2_0.7
      */
     bool IsConsecutive() const
     {
@@ -144,8 +151,9 @@ struct DALI_SCENE3D_API MeshDefinition
 
     /**
      * @brief Computes the min / max of the input value data.
-     * The min and max are stored in mMin and mMax.
      *
+     * The min and max are stored in mMin and mMax.
+     * @SINCE_2_0.7
      * @param[in] numComponents number of components of data type. e.g., 3 for Vector3.
      * @param[in] count The number of data.
      * @param[in] values Data for the mesh.
@@ -155,10 +163,10 @@ struct DALI_SCENE3D_API MeshDefinition
     /**
      * @brief Applies the min / max values, if they're defined in the model
      *
+     * @SINCE_2_0.7
      * @param[in] count The number of data.
      * @param[in] values Data for the mesh that min / max values will be applied.
      * @param[in] sparseIndices Pointer to array of sparse indices (or nullptr if not provided)
-     *
      */
     void ApplyMinMax(uint32_t count, float* values, std::vector<uint32_t>* sparseIndices = nullptr) const;
   };
@@ -167,6 +175,7 @@ struct DALI_SCENE3D_API MeshDefinition
    * @brief A sparse blob describes a change in a reference Blob.
    * @p indices describe what positions of the reference Blob change and
    * @p values describe the new values.
+   * @SINCE_2_0.7
    */
   struct SparseBlob
   {
@@ -219,6 +228,7 @@ struct DALI_SCENE3D_API MeshDefinition
 
   /**
    * @brief Stores a blend shape.
+   * @SINCE_2_0.7
    */
   struct BlendShape
   {
@@ -260,11 +270,13 @@ struct DALI_SCENE3D_API MeshDefinition
 
   /**
    * @brief Determines whether the mesh definition is that of a quad.
+   * @SINCE_2_0.7
    */
   bool IsQuad() const;
 
   /**
    * @brief Determines whether the mesh is used for skeletal animation.
+   * @SINCE_2_0.7
    */
   bool IsSkinned() const;
 
@@ -276,17 +288,20 @@ struct DALI_SCENE3D_API MeshDefinition
   /**
    * @brief Returns the number of joint sets defined by the mesh
    *
+   * @SINCE_2_2.52
    * @note Clamped to 4 to minimise GPU attrs.
    */
   uint32_t GetNumberOfJointSets() const;
 
   /**
    * @brief Whether the mesh has blend shapes.
+   * @SINCE_2_0.7
    */
   bool HasBlendShapes() const;
 
   /**
    * @brief Requests normals to be generated.
+   * @SINCE_2_0.7
    * @note Generation happens in LoadRaw().
    * @note Must have Vector3 positions defined.
    */
@@ -294,14 +309,17 @@ struct DALI_SCENE3D_API MeshDefinition
 
   /**
    * @brief Requests tangents to be generated.
+   * @SINCE_2_0.7
    * @note Generation happens in LoadRaw().
    * @note Must have Vector3 normals defined.
    */
   void RequestTangents();
 
   /**
-   * @brief Loads raw geometry data, which includes index (optional) and
-   *  attribute buffers, as well as blend shape data. This is then returned.
+   * @brief Loads raw geometry data, which includes index (optional) and attribute buffers, as well as blend shape data.
+   *
+   * This is then returned.
+   * @SINCE_2_0.7
    * @note This can be done on any thread.
    */
   RawData LoadRaw(const std::string& modelsPath, BufferDefinition::Vector& buffers);
@@ -312,12 +330,14 @@ struct DALI_SCENE3D_API MeshDefinition
    *  attribute (and index) buffers and blend shape information (if available)
    *  from @a raw.
    *  If mFlipVertical was set, the UVs are flipped in Y, i.e. v = 1.0 - v.
+   * @SINCE_2_0.7
    */
   MeshGeometry Load(RawData&& raw) const;
 
   /**
    * @brief Retrieves what Components information is in this mesh's BlendShape.
    *
+   * @SINCE_2_2.21
    * @param[out] hasPositions True if the BlendShape has position components
    * @param[out] hasNormals True if the BlendShape has normal components
    * @param[out] hasTangents True if the BlendShape has tangent components

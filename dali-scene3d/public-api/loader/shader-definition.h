@@ -28,10 +28,11 @@
 
 namespace Dali::Scene3D::Loader
 {
-/*
+/**
  * @brief Defines a shader with paths to the files which define its
  *  vertex and fragment components, and a mapping of uniform names (which are
  *  used to refer to them in GLSL) to data.
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API ShaderDefinition
 {
@@ -48,22 +49,24 @@ struct DALI_SCENE3D_API ShaderDefinition
   ShaderDefinition() = default;
 
   ShaderDefinition(const ShaderDefinition& other);
-  ShaderDefinition& operator=(const ShaderDefinition& other);
+  ShaderDefinition& operator=(const ShaderDefinition& other) = delete;
 
   ShaderDefinition(ShaderDefinition&&) = default;
   ShaderDefinition& operator=(ShaderDefinition&&) = default;
 
-  /*
+  /**
    * @brief Attempts to load the source of the vertex and fragment shaders,
    *  then performs pre-processing of defines.
+   * @SINCE_2_0.7
    * @note This may be called from any thread.
    */
   RawData LoadRaw(const std::string& shadersPath) const;
 
-  /*
+  /**
    * @brief Creates a DALi Shader from the sources in @a raw, traverses
    *  uniforms to get them to register their data against their name,
    *  then returns the Shader.
+   * @SINCE_2_0.7
    * @note This must be called from the event thread.
    */
   Shader Load(RawData&& raw) const;

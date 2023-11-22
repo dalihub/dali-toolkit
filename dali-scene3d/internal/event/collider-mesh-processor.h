@@ -1,5 +1,5 @@
-#ifndef DALI_SCENE3D_LOADER_STRING_CALLBACK_H
-#define DALI_SCENE3D_LOADER_STRING_CALLBACK_H
+#pragma once
+
 /*
  * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
@@ -18,26 +18,30 @@
  */
 
 // EXTERNAL INCLUDES
-#include <functional>
-#include <string>
+#include <dali/public-api/object/base-handle.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/controls/model/model.h>
 
-namespace Dali::Scene3D::Loader
+namespace Dali::Scene3D
 {
-/**
- * @brief A callback to post strings to.
- * @SINCE_2_0.7
- */
-using StringCallback = std::function<void(const std::string&)>;
+namespace Internal
+{
+class ColliderMeshProcessor;
+}
 
-/**
- * @brief Simply passes the formatted message to LOGE().
- * @SINCE_2_0.7
- */
-DALI_SCENE3D_API void DefaultErrorCallback(const std::string& message);
+class ColliderMeshProcessor : public BaseHandle
+{
+public:
+  ColliderMeshProcessor()  = default;
+  ~ColliderMeshProcessor() = default;
 
-} // namespace Dali::Scene3D::Loader
+  static ColliderMeshProcessor Get();
 
-#endif //DALI_SCENE3D_LOADER_STRING_CALLBACK_H
+  void ColliderMeshChanged(Scene3D::Model model);
+
+private:
+  explicit ColliderMeshProcessor(Internal::ColliderMeshProcessor* impl);
+};
+
+} // namespace Dali::Scene3D

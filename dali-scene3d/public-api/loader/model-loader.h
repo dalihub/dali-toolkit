@@ -41,6 +41,7 @@ public:
 
   /**
    * @brief ModelLoader Constructor.
+   * @SINCE_2_2.17
    * @param[in] modelUrl Url of the model file to be loaded
    * @param[in] resourceDirectoryUrl Url of directory that contains resources.
    * @param[out] loadResult Loaded result that includes scene tree and resources.
@@ -49,6 +50,7 @@ public:
 
   /**
    * @brief Request to load model from model url.
+   * @SINCE_2_2.17
    * @param[in] pathProvider Path provider that defines resource paths.
    * @param[in] loadOnlyRawResource If true, load Raw resource only, and do not create Dali::Handle
    * If false, this loader load Raw resource and create Dali::Handle too.
@@ -59,38 +61,45 @@ public:
 
   /**
    * @brief Set InputParameter.
-   * Thie method store only a pointer of InputParameter.
+   *
+   * This method store only a pointer of InputParameter.
    * The object of InputParameter should not be deleted until it is no longer used.
+   * @SINCE_2_2.17
    * @param[in] inputParameter Input parameters that can be used in loading time.
    */
   void SetInputParameter(InputParameter& inputParameter);
 
   /**
-   * @brief Retrieves loaded scene
+   * @brief Retrieves loaded scene.
+   * @SINCE_2_2.17
    * @return SceneDefinition that is loaded from file
    */
   Dali::Scene3D::Loader::SceneDefinition& GetScene();
 
   /**
-   * @brief Retrieves resource bundle that includes resource information
+   * @brief Retrieves resource bundle that includes resource information.
+   * @SINCE_2_2.17
    * @return ResourceBundle for model resources
    */
   Dali::Scene3D::Loader::ResourceBundle& GetResources();
 
   /**
-   * @brief Retrieves loaded AnimationDefinition
+   * @brief Retrieves loaded AnimationDefinition.
+   * @SINCE_2_2.17
    * @return AnimationDefinition that is loaded from file
    */
   std::vector<Dali::Scene3D::Loader::AnimationDefinition>& GetAnimations();
 
   /**
-   * @brief Retrieves loaded CameraParameters
+   * @brief Retrieves loaded CameraParameters.
+   * @SINCE_2_2.17
    * @return CameraParameters list that is loaded from file
    */
   std::vector<Dali::Scene3D::Loader::CameraParameters>& GetCameras();
 
   /**
-   * @brief Retrieves ResourceChoices
+   * @brief Retrieves ResourceChoices.
+   * @SINCE_2_2.17
    * @return Choices for loaded Resources
    */
   Dali::Scene3D::Loader::Customization::Choices& GetResourceChoices();
@@ -98,11 +107,13 @@ public:
 private:
   /**
    * @brief Create model loader for each file format.
+   * @SINCE_2_2.17
    */
   void CreateModelLoader();
 
   /**
    * @brief Load resource of the model.
+   * @SINCE_2_2.17
    */
   void LoadResource(Dali::Scene3D::Loader::ResourceBundle::PathProvider& pathProvider, bool loadOnlyRawResource);
 

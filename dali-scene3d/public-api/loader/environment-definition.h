@@ -29,8 +29,8 @@
 namespace Dali::Scene3D::Loader
 {
 /**
- * @brief Defines an environment map with either or both of radiance
- *  and irradiance maps.
+ * @brief Defines an environment map with either or both of radiance and irradiance maps.
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API EnvironmentDefinition
 {
@@ -69,25 +69,31 @@ struct DALI_SCENE3D_API EnvironmentDefinition
 
   /**
    * @brief Loads raw pixel data for the given diffuse and specular maps.
+   * @SINCE_2_0.7
+   * @return The raw data for the given diffuse and specular maps
    * @note This can be done on any thread.
    */
   RawData LoadRaw(const std::string& environmentsPath);
 
   /**
-   * @brief Creates DALi cubemap Textures from the pixel data in @a raw, then
-   *  returns them in a Textures object.
+   * @brief Creates DALi cubemap Textures from the pixel data in @a raw, then returns them in a Textures object.
+   * @SINCE_2_0.7
+   * @return DALi cubemap Textures
    * @note This must only be called from the event thread.
    */
   Textures Load(RawData&& raw);
 
   /**
    * @brief Get default intensity value.
+   * @SINCE_2_2.1
    * @return Default intensity. (1.0f)
    */
   static float GetDefaultIntensity();
 
 private:
+  /// @cond internal
   static void LoadBrdfTexture();
+  /// @endcond internal
 
 public: // DATA
   std::string              mDiffuseMapPath;

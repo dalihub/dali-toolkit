@@ -597,7 +597,11 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
     }
     case Actor::Property::VISIBLE:
     {
-      GetAccessibleObject()->EmitVisible(Self().GetProperty<bool>(Actor::Property::VISIBLE));
+      auto* accessible = GetAccessibleObject();
+      if(DALI_LIKELY(accessible))
+      {
+        accessible->EmitVisible(Self().GetProperty<bool>(Actor::Property::VISIBLE));
+      }
       break;
     }
     case DevelActor::Property::USER_INTERACTION_ENABLED:

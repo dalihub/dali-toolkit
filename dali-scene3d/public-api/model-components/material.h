@@ -48,7 +48,7 @@ class Material;
 /**
  * @brief Class for setting Material properties of 3D models
  *
- * @SINCE_2_2.99
+ * @SINCE_2_2.22
  *
  * @note This Material class is for setting Material properties of 3D models.
  * This Material supports properties and textures for PBR.
@@ -67,21 +67,21 @@ class DALI_SCENE3D_API Material : public Dali::BaseHandle
 public:
   /**
    * @brief Enumeration for the start and end property ranges for material.
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX          = PROPERTY_REGISTRATION_START_INDEX,    ///< Start index is used by the property registration macro. @SINCE_2_2.99
-    MATERIAL_PROPERTY_START_INDEX = PROPERTY_START_INDEX,                 ///< Start index of Control properties. @SINCE_2_2.99
-    MATERIAL_PROPERTY_END_INDEX   = MATERIAL_PROPERTY_START_INDEX + 1000, ///< Reserving 1000 property indices. @SINCE_2_2.99
+    PROPERTY_START_INDEX          = PROPERTY_REGISTRATION_START_INDEX,    ///< Start index is used by the property registration macro. @SINCE_2_2.22
+    MATERIAL_PROPERTY_START_INDEX = PROPERTY_START_INDEX,                 ///< Start index of Control properties. @SINCE_2_2.22
+    MATERIAL_PROPERTY_END_INDEX   = MATERIAL_PROPERTY_START_INDEX + 1000, ///< Reserving 1000 property indices. @SINCE_2_2.22
 
-    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,        ///< @SINCE_2_2.99
-    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000, ///< Reserve animatable property indices, @SINCE_2_2.99
+    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,        ///< @SINCE_2_2.22
+    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000, ///< Reserve animatable property indices, @SINCE_2_2.22
   };
 
   /**
    * @brief Enumeration for the instance of properties belonging to the Material class.
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    */
   struct Property
   {
@@ -90,140 +90,140 @@ public:
       /**
        * @brief Name of material.
        * @details type Property::STRING.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       NAME = MATERIAL_PROPERTY_START_INDEX,
 
       /**
        * @brief Property for the URL of the base color texture.
        * @details Type Property::STRING.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       BASE_COLOR_URL,
 
       /**
        * @brief Property for the base color factor of the material surface.
        * @details Type Property::VECTOR4.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       BASE_COLOR_FACTOR,
 
       /**
        * @brief Property for the URL of the metallic-roughness texture.
        * @details Type Property::STRING.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       METALLIC_ROUGHNESS_URL,
 
       /**
        * @brief Property for the metallic factor of the material surface.
        * @details Type Property::FLOAT.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       METALLIC_FACTOR,
 
       /**
        * @brief Property for the roughness factor of the material surface.
        * @details Type Property::FLOAT.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       ROUGHNESS_FACTOR,
 
       /**
        * @brief Property for the URL of the normal texture.
        * @details Type Property::STRING.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       NORMAL_URL,
 
       /**
        * @brief Property for the scale factor applied to normal vectors.
        * @details Type Property::FLOAT.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       NORMAL_SCALE,
 
       /**
        * @brief Property for the URL of the occlusion texture.
        * @details Type Property::STRING.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       OCCLUSION_URL,
 
       /**
        * @brief Property for the occlusion strength of the material surface.
        * @details Type Property::FLOAT.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       OCCLUSION_STRENGTH,
 
       /**
        * @brief Property for the URL of the emissive texture.
        * @details Type Property::STRING.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       EMISSIVE_URL,
 
       /**
        * @brief Emissive factor Property.
        * @details type Property::VECTOR3.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       EMISSIVE_FACTOR,
 
       /**
        * @brief Alpha mode Property.
        * @details type Property::INTEGER.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       ALPHA_MODE,
 
       /**
        * @brief Alpha cutoff Property.
        * @details type Property::FLOAT.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       ALPHA_CUTOFF,
 
       /**
        * @brief Double sided Property.
        * @details type Property::BOOLEAN.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       DOUBLE_SIDED,
 
       /**
        *@brief Index of refraction (IOR) of the material surface
        *@details type Property::FLOAT
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       IOR,
 
       /**
        * @brief Property for the URL of the specular texture.
        * @details Type Property::STRING.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       SPECULAR_URL,
 
       /**
        *@brief Property for the specular factor of the material surface.
        *@details Type Property::FLOAT.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       SPECULAR_FACTOR,
 
       /**
        * @brief Property for the URL of the specular color texture.
        * @details Type Property::STRING.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       SPECULAR_COLOR_URL,
 
       /**
        *@brief Property for the specular color factor of the material surface.
        *@details Type Property::VECTOR3.
-       * @SINCE_2_2.99
+       * @SINCE_2_2.22
        */
       SPECULAR_COLOR_FACTOR,
     };
@@ -233,49 +233,49 @@ public:
   {
     /**
      * @brief Base Color Texture Property.
-     * @SINCE_2_2.99
+     * @SINCE_2_2.22
      * @note This texture represents the base color of the material. In most cases, this will be the diffuse color of the material.
      */
     BASE_COLOR,
 
     /**
      * @brief Metallic Roughness Texture Property.
-     * @SINCE_2_2.99
+     * @SINCE_2_2.22
      * @note This texture represents the metallicness and roughness of the material. This texture can be used to make the material look more metallic or rough.
      */
     METALLIC_ROUGHNESS,
 
     /**
      * @brief Normal Texture Property.
-     * @SINCE_2_2.99
+     * @SINCE_2_2.22
      * @note This texture represents the surface of the material. This texture can be used to make the surface of the material look smooth or rough.
      */
     NORMAL,
 
     /**
      * @brief Occlusion Texture Property.
-     * @SINCE_2_2.99
+     * @SINCE_2_2.22
      * @note This texture represents the depth of the material. This texture can be used to make the material look more three-dimensional.
      */
     OCCLUSION,
 
     /**
      * @brief Emissive Texture Property.
-     * @SINCE_2_2.99
+     * @SINCE_2_2.22
      * @note This texture makes the material look like it's emitting light. This texture can be used to make the material look like it's glowing.
      */
     EMISSIVE,
 
     /**
      * @brief Specular Texture Property.
-     * @SINCE_2_2.99
+     * @SINCE_2_2.22
      * @note This texture represents the specular reflection of the material. This texture can be used to make the material look more reflective.
      */
     SPECULAR,
 
     /**
      * @brief Specular Color Texture Property.
-     * @SINCE_2_2.99
+     * @SINCE_2_2.22
      * @note This texture represents the color of the specular reflection of the material. This texture can be used to set the color of the specular reflection of the material.
      */
     SPECULAR_COLOR,
@@ -285,19 +285,19 @@ public:
   {
     /**
      * @brief This indicates that the material is fully opaque and that the alpha value should be ignored.
-     * @SINCE_2_2.99
+     * @SINCE_2_2.22
      */
     OPAQUE,
 
     /**
      * @brief This indicates that the material is either fully opaque or fully transparent depending on the alpha value. The alpha value is used to mask out areas of the material that should be transparent.
-     * @SINCE_2_2.99
+     * @SINCE_2_2.22
      */
     MASK,
 
     /**
      * @brief This indicates that the material is transparent and that the alpha value should be used to blend the material with the background.
-     * @SINCE_2_2.99
+     * @SINCE_2_2.22
      */
     BLEND,
   };
@@ -306,7 +306,7 @@ public: // Creation & Destruction
   /**
    * @brief Create an initialized Material.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @return A handle to a newly allocated Dali resource
    */
   static Material New();
@@ -317,7 +317,7 @@ public: // Creation & Destruction
    * Only derived versions can be instantiated. Calling member
    * functions with an uninitialized Dali::Object is not allowed.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    */
   Material();
 
@@ -326,14 +326,14 @@ public: // Creation & Destruction
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    */
   ~Material();
 
   /**
    * @brief Copy constructor.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] material Handle to an object
    */
   Material(const Material& material);
@@ -341,7 +341,7 @@ public: // Creation & Destruction
   /**
    * @brief Move constructor
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] rhs A reference to the moved handle
    */
   Material(Material&& rhs) noexcept;
@@ -349,7 +349,7 @@ public: // Creation & Destruction
   /**
    * @brief Assignment operator.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] material Handle to an object
    * @return reference to this
    */
@@ -358,7 +358,7 @@ public: // Creation & Destruction
   /**
    * @brief Move assignment
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
@@ -370,7 +370,7 @@ public: // Creation & Destruction
    * If handle points to a Material, the downcast produces valid handle.
    * If not, the returned handle is left uninitialized.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] handle Handle to an object
    * @return Handle to a Material or an uninitialized handle
    */
@@ -381,7 +381,7 @@ public: // Public Method
    * @brief Sets the value of an existing property.
    * @note BaseHandle is not subclass of Handle. So this API is not use Handle.SetProperty
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] index The index of the property
    * @param[in] propertyValue The new value of the property
    */
@@ -391,7 +391,7 @@ public: // Public Method
    * @brief Retrieves a property value.
    * @note BaseHandle is not subclass of Handle. So this API is not use Handle.SetProperty
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] index The index of the property
    * @return The property value
    * @note This returns the value set by SetProperty() or the animation target value if it is being animated.
@@ -401,7 +401,7 @@ public: // Public Method
   /**
    * @brief Convenience function for obtaining a property of a known type.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] index The index of the property
    * @return The property value
    * @pre The property types match i.e. PropertyTypes::Get<T>() is equal to GetPropertyType(index).
@@ -418,7 +418,7 @@ public: // Public Method
   /**
    * @brief Sets the texture for a given texture type.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] index The texture type index
    * @param[in] texture The texture to set.
    */
@@ -427,7 +427,7 @@ public: // Public Method
   /**
    * @brief Gets the texture for a given texture type.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] index The texture type index
    * @return The texture at the given index.
    */
@@ -436,7 +436,7 @@ public: // Public Method
   /**
    * @brief Sets the sampler for a given texture type.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] index The texture type index
    * @param[in] sampler The sampler to use for this texture type
    */
@@ -445,7 +445,7 @@ public: // Public Method
   /**
    * @brief Gets the sampler for a given texture type.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] index The texture type index
    * @return The sampler used for this texture type
    */

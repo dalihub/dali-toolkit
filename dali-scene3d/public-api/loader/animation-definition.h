@@ -28,6 +28,7 @@ namespace Dali::Scene3D::Loader
 {
 /**
  * @brief Animation handle + name + definition of properties.
+ * @SINCE_2_0.7
  */
 class DALI_SCENE3D_API AnimationDefinition
 {
@@ -39,8 +40,9 @@ public: // STATIC
   static const float MIN_DURATION_SECONDS;
 
   /**
-   * @brief Saves the original end action of @a anim, sets the end action to
-   *  Discard, then stops the animation and returns the end action.
+   * @brief Saves the original end action of @a anim, sets the end action to Discard, then stops
+   * the animation and returns the end action.
+   * @SINCE_2_0.7
    */
   static Animation::EndAction StopForModification(Animation& anim);
 
@@ -52,20 +54,25 @@ public: // METHODS
   AnimationDefinition& operator=(AnimationDefinition&& other);
 
   /**
-   * @brief Registers the properties against the given @a animation. @a getActor
-   *  will be used to obtain the Actors for each AnimatedProperty.
+   * @brief Registers the properties against the given @a animation.
+   *
+   * @a getActor will be used to obtain the Actors for each AnimatedProperty.
+   * @SINCE_2_0.7
    */
   void Animate(Animation& animation, AnimatedProperty::GetActor getActor);
 
   /**
-   * @brief Creates a new Animation and Animates() its properties. @a getActor
-   *  will be used to obtain the Actors for each AnimatedProperty.
+   * @brief Creates a new Animation and Animates() its properties.
+   *
+   * @a getActor will be used to obtain the Actors for each AnimatedProperty.
+   * @SINCE_2_0.7
    */
   Animation ReAnimate(AnimatedProperty::GetActor getActor);
 
   /**
    * @brief Set the name of the animation.
    *
+   * @SINCE_2_2.22
    * @param[in] name The name of the animation.
    */
   void SetName(const std::string& name);
@@ -73,6 +80,7 @@ public: // METHODS
   /**
    * @brief Get the name of the animation.
    *
+   * @SINCE_2_2.22
    * @return The name of the animation.
    */
   const std::string& GetName() const;
@@ -80,6 +88,7 @@ public: // METHODS
   /**
    * @brief Set the duration of the animation in seconds.
    *
+   * @SINCE_2_2.22
    * @param[in] duration The duration of the animation in seconds.
    */
   void SetDuration(float duration);
@@ -87,6 +96,7 @@ public: // METHODS
   /**
    * @brief Get the duration of the animation in seconds.
    *
+   * @SINCE_2_2.22
    * @return The duration of the animation in seconds.
    */
   float GetDuration() const;
@@ -94,6 +104,7 @@ public: // METHODS
   /**
    * @brief Set the number of times to loop the animation.
    *
+   * @SINCE_2_2.22
    * @param[in] loopCount The number of times to loop the animation. Use -1 for infinite looping.
    */
   void SetLoopCount(int32_t loopCount);
@@ -101,6 +112,7 @@ public: // METHODS
   /**
    * @brief Get the number of times to loop the animation.
    *
+   * @SINCE_2_2.22
    * @return The number of times to loop the animation. Use -1 for infinite looping.
    */
   int GetLoopCount() const;
@@ -108,6 +120,7 @@ public: // METHODS
   /**
    * @brief Set what should happen when an animation is disconnected from an object.
    *
+   * @SINCE_2_2.22
    * @param[in] disconnectAction What should happen when an animation is disconnected from an object.
    */
   void SetDisconnectAction(Animation::EndAction disconnectAction);
@@ -115,6 +128,7 @@ public: // METHODS
   /**
    * @brief Get what should happen when an animation is disconnected from an object.
    *
+   * @SINCE_2_2.22
    * @return What should happen when an animation is disconnected from an object.
    */
   Animation::EndAction GetDisconnectAction() const;
@@ -122,6 +136,7 @@ public: // METHODS
   /**
    * @brief Set what should happen when an animation reaches its end.
    *
+   * @SINCE_2_2.22
    * @param[in] endAction What should happen when an animation reaches its end.
    */
   void SetEndAction(Animation::EndAction endAction);
@@ -129,6 +144,7 @@ public: // METHODS
   /**
    * @brief Get what should happen when an animation reaches its end.
    *
+   * @SINCE_2_2.22
    * @return What should happen when an animation reaches its end.
    */
   Animation::EndAction GetEndAction() const;
@@ -136,6 +152,7 @@ public: // METHODS
   /**
    * @brief Set a speed factor for this animation. This can be used to speed up or slow down playback of this animation relative to other animations in a scene.
    *
+   * @SINCE_2_2.22
    * @param[in] speedFactor The speed factor for this animation. 1.0 is normal speed, 2.0 is double speed, 0.5 is half speed, etc.
    */
   void SetSpeedFactor(float speedFactor);
@@ -143,6 +160,7 @@ public: // METHODS
   /**
    * @brief Get a speed factor for this animation. This can be used to speed up or slow down playback of this animation relative to other animations in a scene.
    *
+   * @SINCE_2_2.22
    * @return The speed factor for this animation. 1.0 is normal speed, 2.0 is double speed, 0.5 is half speed, etc.
    */
   float GetSpeedFactor() const;
@@ -150,6 +168,7 @@ public: // METHODS
   /**
    * @brief Set a range within which to play this animation. This can be used to play only part of an animation or to play it backwards by setting playRange.y < playRange.x
    *
+   * @SINCE_2_2.22
    * @param[in] playRange A range within which to play this animation. x = start time in seconds, y = end time in seconds
    */
   void SetPlayRange(const Vector2& playRange);
@@ -157,6 +176,7 @@ public: // METHODS
   /**
    * @brief Get a range within which to play this animation. This can be used to play only part of an animation or to play it backwards by setting playRange.y < playRange.x
    *
+   * @SINCE_2_2.22
    * @return A range within which to play this animation. x = start time in seconds, y = end time in seconds
    */
   Vector2 GetPlayRange() const;
@@ -164,6 +184,7 @@ public: // METHODS
   /**
    * @brief Reserves Animated property vector's size
    *
+   * @SINCE_2_2.22
    * @param[in] size The size to reserve property
    */
   void ReserveSize(uint32_t size);
@@ -171,6 +192,7 @@ public: // METHODS
   /**
    * @brief Retrieves the number of animated properties' count
    *
+   * @SINCE_2_2.22
    * @return The count of animated properties.
    */
   uint32_t GetPropertyCount() const;
@@ -178,6 +200,7 @@ public: // METHODS
   /**
    * @brief Add a property that will be animated by this AnimationDefinition
    *
+   * @SINCE_2_2.22
    * @param[in] index The index the property will be stored.
    * @param[in] property The property that will be animated by this AnimationDefinition
    */
@@ -186,6 +209,7 @@ public: // METHODS
   /**
    * @brief Retrieves animated property at the index
    *
+   * @SINCE_2_2.22
    * @param[in] index The index of property to be retrieved.
    */
   AnimatedProperty& GetPropertyAt(uint32_t index);
@@ -193,6 +217,7 @@ public: // METHODS
   /**
    * @brief Retrieves animated property at the index
    *
+   * @SINCE_2_2.34
    * @param[in] index The index of property to be retrieved.
    */
   const AnimatedProperty& GetPropertyAt(uint32_t index) const;

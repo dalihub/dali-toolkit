@@ -40,8 +40,10 @@ typedef IntrusivePtr<ShaderManager> ShaderManagerPtr;
 
 /**
  * @brief This class is to manage Shaders.
+ *
  * This class could be used as factory class to create Dali::Shader.
  * And once created Dali::Shader is kept in this manager and will be returned when the same Dali::Shader is requested to be created.
+ * @SINCE_2_2.34
  */
 class DALI_SCENE3D_API ShaderManager : public RefObject
 {
@@ -51,8 +53,10 @@ public:
 
   /**
    * @brief Produces a Dali::Shader for the input materialDefinition and meshDefinition.
+   *
    * Returns a cached Dali::Shader if the requested Dali::Shader has already been created once.
    * (Although the input materialDefinition and meshDefinition are not identical to those used to create the cached Dali::Shader, they share the cached one.)
+   * @SINCE_2_2.34
    * @param[in] materialDefinition MaterialDefinition that includes information of material to create Shader.
    * @param[in] meshDefinition meshDefinition that includes information of mesh to create Shader.
    * @return ShaderOption for the materialDefinition and meshDefinition.
@@ -60,8 +64,10 @@ public:
   ShaderOption ProduceShaderOption(const MaterialDefinition& materialDefinition, const MeshDefinition& meshDefinition);
 
   /**
-   * @brief Produces a Dali::Shader for the input ShaderOption
+   * @brief Produces a Dali::Shader for the input ShaderOption.
+   *
    * Returns a cached Dali::Shader if the requested Dali::Shader has already been created once.
+   * @SINCE_2_2.34
    * @param[in] shaderOption shader option to create Shader.
    * @return Dali::Shader of the shader option
    */
@@ -69,6 +75,7 @@ public:
 
   /**
    * @brief Returns RendererState of the input materialDefinition.
+   * @SINCE_2_2.34
    * @param[in] materialDefinition MaterialDefinition to get RendererState
    * @return RendererState of the materialDefinition.
    */
@@ -76,6 +83,7 @@ public:
 
   /**
    * @brief Adds new lights for each of shaders.
+   * @SINCE_2_2.34
    * @param[in] light Light object to be newly added.
    * @return True when the new light object is added successfully.
    */
@@ -83,35 +91,40 @@ public:
 
   /**
    * @brief Removes light from each of shaders.
+   * @SINCE_2_2.34
    * @param[in] light Light object to be removed.
    */
   void RemoveLight(Scene3D::Light light);
 
   /**
    * @brief Retrieves added light counts.
+   * @SINCE_2_2.34
    * @return The number of added light count.
    */
   uint32_t GetLightCount() const;
 
   /**
    * @brief Set a shadow to this scene by input light.
-   *
+   * @SINCE_2_2.34
    * @param[in] light Light object to make shadow.
    */
   void SetShadow(Scene3D::Light light);
 
   /**
    * @brief Removes Shadow from this SceneView.
+   * @SINCE_2_2.34
    */
   void RemoveShadow();
 
   /**
    * @brief Update uniform properties of shadow for the input light.
+   * @SINCE_2_2.34
    * @param[in] light Light object to update shadow uniform.
    */
   void UpdateShadowUniform(Scene3D::Light light);
 
 private:
+  /// @cond internal
   /**
    * @brief Sets constraint to the shaders with light of light index.
    * @param[in] lightIndex index of light that will be connected with shaders by constraint.
@@ -148,6 +161,7 @@ private:
    */
   DALI_INTERNAL void SetShadowConstraintToShader(Dali::Shader shader);
 
+  /// @endcond
 private:
   struct Impl;
   const std::unique_ptr<Impl> mImpl;

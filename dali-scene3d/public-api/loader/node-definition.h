@@ -43,6 +43,7 @@ class ViewProjection;
 
 /**
  * @brief Interface to report (const) resource ids to.
+ * @SINCE_2_0.7
  */
 class DALI_SCENE3D_API IResourceReceiver
 {
@@ -54,6 +55,7 @@ public:
 
 /**
  * @brief Interface to report modifiable resource ids to.
+ * @SINCE_2_0.7
  * @note These are supposed to be transient. Obviously, the references collected
  *  this way must not outlive the objects that they came from.
  */
@@ -69,6 +71,7 @@ public:
  * @brief Intermediate representation for a constraint that shall be
  *  set up after the Actors were created. The target of the constraint
  *  is the node definition that carries it.
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API ConstraintDefinition
 {
@@ -99,6 +102,7 @@ struct DALI_SCENE3D_API Transforms
 
 /**
  * @brief Information about a skeleton and the shader that needs to be configured with it.
+ * @SINCE_2_0.7
  * @note Multiple skeletons shalt not share the same shader.
  */
 struct DALI_SCENE3D_API SkinningShaderConfigurationRequest
@@ -115,6 +119,7 @@ struct DALI_SCENE3D_API SkinningShaderConfigurationRequest
 
 /**
  * @brief Needed to configure blend shape properties.
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API BlendshapeShaderConfigurationRequest
 {
@@ -131,6 +136,7 @@ struct DALI_SCENE3D_API BlendshapeShaderConfigurationRequest
 
 /**
  * @brief Request for creating a constraint, output from NodeDefinition::OnCreate.
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API ConstraintRequest
 {
@@ -142,6 +148,7 @@ struct DALI_SCENE3D_API ConstraintRequest
  * @brief Defines a node, consisting of a name, a transform, a size, a list of child nodes,
  *  and slots for customization and rendering logic, which are mutually exclusive in the
  *  current implementation.
+ * @SINCE_2_0.7
  */
 struct DALI_SCENE3D_API NodeDefinition
 {
@@ -221,18 +228,21 @@ public: // TYPES
 public: // METHODS
   /**
    * @brief Creates a ModelNode from this definition only.
+   * @SINCE_2_0.7
    * @note Not recursive.
    */
   ModelNode CreateModelNode(CreateParams& params);
 
   /**
    * @brief Gets local space matrix of this node
+   * @SINCE_2_1.32
    * @return Matrix of local space.
    */
   Matrix GetLocalSpace() const;
 
   /**
    * @brief Retrieves minimum and maximum position of this node in local space.
+   * @SINCE_2_1.32
    * @param[in] resources ResourceBundle that contains mesh information of this node.
    * @param[out] min Minimum position of the mesh of this node.
    * @param[out] max Maximum position of the mesh of this node.
@@ -242,21 +252,27 @@ public: // METHODS
 
   /**
    * @brief Retrieves Scale Factor uniform name.
+   *
    * This uniform name can be used to change scale factor for ibl.
+   * @SINCE_2_1.32
    * @return std::string_view of the scale factor uniform name.
    */
   static std::string_view GetIblScaleFactorUniformName();
 
   /**
    * @brief Retrieves ibl Ydirection uniform name.
+   *
    * This uniform name can be used to flip y direction of ibl in shader.
+   * @SINCE_2_1.32
    * @return std::string_view of the YDirection uniform name.
    */
   static std::string_view GetIblYDirectionUniformName();
 
   /**
    * @brief Retrieves ibl MaxLod uniform name.
+   *
    * This uniform name can be used to set max lod of ibl in shader.
+   * @SINCE_2_2.19
    * @return std::string_view of the Max Lod uniform name.
    */
   static std::string_view GetIblMaxLodUniformName();
@@ -299,6 +315,7 @@ public: // METHODS
 
 /**
  * @brief Parameters for an Arc node.
+ * @SINCE_2_0.7
  */
 class DALI_SCENE3D_API ArcRenderable : public ModelRenderable
 {

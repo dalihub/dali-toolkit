@@ -11,6 +11,11 @@ INPUT mediump vec4 vCornerRadius;
 // scale factor to fit start and end position of gradient.
 uniform mediump float uTextureCoordinateScaleFactor;
 
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+// Be used when we calculate anti-alias range near 1 pixel.
+uniform highp vec3 uScale;
+#endif
+
 uniform sampler2D sTexture; // sampler1D?
 uniform lowp vec4 uColor;
 uniform lowp vec3 mixColor;
@@ -72,8 +77,10 @@ void calculatePotential()
 
 void setupMinMaxPotential()
 {
-  // Set soft anti-alias range at most 2% of visual size
-  gPotentialRange = min(1.0, max(vRectSize.x, vRectSize.y) * 0.02);
+  // Set soft anti-alias range at most 10% of visual size.
+  // The range should be inverse proportion with scale of view.
+  // To avoid divid-by-zero, let we allow minimum scale value is 0.001 (0.1%)
+  gPotentialRange = min(1.0, max(vRectSize.x, vRectSize.y) * 0.2) / max(0.001, max(uScale.x, uScale.y));
 
   gMaxOutlinePotential = gRadius + gPotentialRange;
   gMinOutlinePotential = gRadius - gPotentialRange;
@@ -87,8 +94,8 @@ void setupMinMaxPotential()
 #endif
 
   // reduce defect near edge of rounded corner.
-  gMaxOutlinePotential += clamp(-min(gDiff.x, gDiff.y)/ max(1.0, gRadius) , 0.0, 1.0);
-  gMinOutlinePotential += clamp(-min(gDiff.x, gDiff.y)/ max(1.0, gRadius) , 0.0, 1.0);
+  gMaxOutlinePotential += clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, 1.0);
+  gMinOutlinePotential += clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, 1.0);
 }
 
 void PreprocessPotential()

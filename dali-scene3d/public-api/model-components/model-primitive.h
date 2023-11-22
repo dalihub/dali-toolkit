@@ -47,7 +47,7 @@ class ModelPrimitive;
  * Users can set Dali::Geometry and Material to ModelPrimitive using SetGeometry and SetMaterial methods respectively.
  * When ModelPrimitive added to ModelNode using ModelNode::AddModelPrimitive() method, the Geometry is rendered on the screen according to the Material settings.
  *
- * @SINCE_2_2.99
+ * @SINCE_2_2.22
  *
  * If you load resources from 3D format files such as glTF using Model class, ModelPrimitive is also created internally.
  * In this case, blendShape morphing or skeletal animation defined in the format can be used.
@@ -59,7 +59,7 @@ public: // Creation & Destruction
   /**
    * @brief Create an initialized ModelPrimitive.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @return A handle to a newly allocated Dali resource
    */
   static ModelPrimitive New();
@@ -70,7 +70,7 @@ public: // Creation & Destruction
    * Only derived versions can be instantiated. Calling member
    * functions with an uninitialized Dali::Object is not allowed.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    */
   ModelPrimitive();
 
@@ -79,14 +79,14 @@ public: // Creation & Destruction
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    */
   ~ModelPrimitive();
 
   /**
    * @brief Copy constructor.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] modelPrimtive Handle to an object
    */
   ModelPrimitive(const ModelPrimitive& modelPrimtive);
@@ -94,7 +94,7 @@ public: // Creation & Destruction
   /**
    * @brief Move constructor
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] rhs A reference to the moved handle
    */
   ModelPrimitive(ModelPrimitive&& rhs) noexcept;
@@ -102,7 +102,7 @@ public: // Creation & Destruction
   /**
    * @brief Assignment operator.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] modelPrimitive Handle to an object
    * @return reference to this
    */
@@ -111,7 +111,7 @@ public: // Creation & Destruction
   /**
    * @brief Move assignment
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
@@ -123,7 +123,7 @@ public: // Creation & Destruction
    * If handle points to a ModelPrimitive, the downcast produces valid handle.
    * If not, the returned handle is left uninitialized.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] handle Handle to an object
    * @return Handle to a ModelPrimitive or an uninitialized handle
    */
@@ -133,7 +133,7 @@ public: // Public Method
   /**
    * @brief Set the geometry for this renderer.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] geometry The geometry to set.
    */
   void SetGeometry(Dali::Geometry geometry);
@@ -141,7 +141,7 @@ public: // Public Method
   /**
    * @brief Get the geometry for this renderer.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @return The geometry for this renderer.
    */
   Dali::Geometry GetGeometry() const;
@@ -149,7 +149,7 @@ public: // Public Method
   /**
    * @brief Sets the material for this primitive.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @param[in] material The material
    */
   void SetMaterial(Material material);
@@ -157,7 +157,7 @@ public: // Public Method
   /**
    * @brief Retrieves a material.
    *
-   * @SINCE_2_2.99
+   * @SINCE_2_2.22
    * @return The material handle
    */
   Material GetMaterial() const;

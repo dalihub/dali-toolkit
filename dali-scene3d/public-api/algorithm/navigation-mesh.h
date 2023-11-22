@@ -252,6 +252,16 @@ public:
    */
   Dali::Vector3 GetGravityVector() const;
 
+  /**
+   * @brief Performs ray/face intersect test
+   * @param[in] origin Origin of ray
+   * @param[in] direction Direction of ray
+   *
+   * @SINCE_2_2.53
+   * @return Valid FaceIndex on hit or NULL_FACE on miss
+   */
+  [[nodiscard]] FaceIndex RayFaceIntersect(const Vector3& origin, const Vector3& direction) const;
+
   static constexpr FaceIndex NULL_FACE{std::numeric_limits<FaceIndex>::max()}; ///< Represents null face
   static constexpr EdgeIndex NULL_EDGE{std::numeric_limits<EdgeIndex>::max()}; ///< Represents null edge
 
@@ -260,5 +270,13 @@ public:
 
   std::unique_ptr<NavigationMeshImpl> mImpl;
 };
+
+// Alias name for collider mesh
+// TODO: currently ColliderMesh is NavigationMesh however
+//       there should be separation from data and algorithms.
+//       Both, NavigationMesh and ColliderMesh use the same
+//       data structures but differ in the way they use data.
+using ColliderMesh = NavigationMesh;
+
 } // namespace Dali::Scene3D::Algorithm
 #endif // DALI_SCENE3D_NAVIGATION_MESH_H

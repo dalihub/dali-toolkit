@@ -26,8 +26,8 @@
 namespace Dali::Scene3D::Loader
 {
 /**
- * @brief Contains view and projection matrices, also caching the view-projection
- *      and inverse projection matrices.
+ * @brief Contains view and projection matrices, also caching the view-projection and inverse projection matrices.
+ * @SINCE_2_0.7
  */
 class ViewProjection
 {
@@ -41,8 +41,9 @@ public:
     return mProjection;
   }
 
-  /*
+  /**
    * @brief Updates the cached view projection and inverse projection matrices.
+   * @SINCE_2_0.7
    */
   void Update();
 

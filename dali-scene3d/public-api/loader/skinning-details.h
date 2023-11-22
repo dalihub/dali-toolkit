@@ -18,8 +18,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/rendering/shader.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -41,13 +41,15 @@ public:
     Matrix                        inverseMatrix;
   };
 
-  /*
+  /**
    * @brief Upper limit on the number of joints supported.
+   * @SINCE_2_0.7
    */
   static const uint32_t MAX_JOINTS;
 
-  /*
+  /**
    * @brief Name of bone matrix uniform (array).
+   * @SINCE_2_0.7
    */
   static const char* BONE_UNIFORM_NAME;
 

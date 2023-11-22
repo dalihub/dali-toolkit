@@ -26,6 +26,7 @@ namespace Dali::Scene3D::Loader
 /**
  * @brief Loads cube map data texture from a ktx file.
  *
+ * @SINCE_2_0.7
  * @param[in] path The file path.
  * @param[out] environmentMapData The data structure with all pixel data objects.
  * @return bool True if the loading is succeded.

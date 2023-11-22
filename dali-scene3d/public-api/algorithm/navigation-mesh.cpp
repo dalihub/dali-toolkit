@@ -91,4 +91,18 @@ Dali::Vector3 NavigationMesh::GetGravityVector() const
   return mImpl->GetGravityVector();
 }
 
+FaceIndex NavigationMesh::RayFaceIntersect(const Vector3& origin, const Vector3& direction) const
+{
+  Internal::Algorithm::NavigationRay ray;
+  ray.origin    = origin;
+  ray.direction = direction;
+
+  auto result = mImpl->RayCastIntersect(ray);
+  if(result.result)
+  {
+    return result.faceIndex;
+  }
+  return NULL_FACE;
+}
+
 } // namespace Dali::Scene3D::Algorithm
