@@ -1190,6 +1190,7 @@ void ImageVisual::CheckMaskTexture()
     TextureSet textures       = mImpl->mRenderer.GetTextures();
     if(textures && textures.GetTextureCount() >= TEXTURE_COUNT_FOR_GPU_ALPHA_MASK)
     {
+      mImpl->mRenderer.RegisterProperty(MASK_TEXTURE_RATIO_NAME, Vector2::ONE);
       if(mMaskingData->mCropToMask)
       {
         mImpl->mRenderer.RegisterProperty(MASK_TEXTURE_RATIO_NAME, ComputeMaskTextureRatio());
