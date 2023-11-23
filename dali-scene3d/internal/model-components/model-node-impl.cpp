@@ -432,11 +432,15 @@ void ModelNode::SetColliderMesh(ColliderMeshUniquePtr&& colliderMesh)
   auto handle = Scene3D::ModelNode::DownCast(Self());
   if(mParentModel)
   {
-    if(mColliderMesh || colliderMesh == nullptr)
+    if(mColliderMesh)
     {
       mParentModel->RemoveColliderMesh(handle);
     }
-    mParentModel->RegisterColliderMesh(handle, *colliderMesh);
+
+    if(colliderMesh)
+    {
+      mParentModel->RegisterColliderMesh(handle, *colliderMesh);
+    }
   }
 
   mColliderMesh = std::move(colliderMesh);
