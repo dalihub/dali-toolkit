@@ -49,12 +49,12 @@ static const Geometry::Type GLTF2_TO_DALI_PRIMITIVES[]{
   Geometry::TRIANGLE_FAN}; //...because Dali swaps the last two.
 
 static const Dali::Scripting::StringEnum EXTENSION_STRING_TABLE[] =
-{
-  {"NONE", gltf2::ExtensionFlags::NONE},
-  {"KHR_mesh_quantization", gltf2::ExtensionFlags::KHR_MESH_QUANTIZATION},
-  {"KHR_texture_transform", gltf2::ExtensionFlags::KHR_TEXTURE_TRANSFORM},
-  {"KHR_materials_ior", gltf2::ExtensionFlags::KHR_MATERIALS_IOR},
-  {"KHR_materials_specular", gltf2::ExtensionFlags::KHR_MATERIALS_SPECULAR},
+  {
+    {"NONE", gltf2::ExtensionFlags::NONE},
+    {"KHR_mesh_quantization", gltf2::ExtensionFlags::KHR_MESH_QUANTIZATION},
+    {"KHR_texture_transform", gltf2::ExtensionFlags::KHR_TEXTURE_TRANSFORM},
+    {"KHR_materials_ior", gltf2::ExtensionFlags::KHR_MATERIALS_IOR},
+    {"KHR_materials_specular", gltf2::ExtensionFlags::KHR_MATERIALS_SPECULAR},
 };
 static const unsigned int EXTENSION_STRING_TABLE_COUNT = sizeof(EXTENSION_STRING_TABLE) / sizeof(EXTENSION_STRING_TABLE[0]);
 
@@ -173,13 +173,31 @@ const json::Reader<gltf2::Texture>& GetTextureReader()
   return TEXURE_READER;
 }
 
+const json::Reader<gltf2::TextureTransform>& GetTextureTransformReader()
+{
+  static const auto TEXURE_TRANSFORM_READER = std::move(json::Reader<gltf2::TextureTransform>()
+                                                          .Register(*json::MakeProperty("rotation", json::Read::Number<float>, &gltf2::TextureTransform::mRotation))
+                                                          .Register(*json::MakeProperty("offset", gltf2::ReadDaliVector<Vector2>, &gltf2::TextureTransform::mUvOffset))
+                                                          .Register(*json::MakeProperty("scale", gltf2::ReadDaliVector<Vector2>, &gltf2::TextureTransform::mUvScale))
+                                                          .Register(*json::MakeProperty("texCoord", json::Read::Number<uint32_t>, &gltf2::TextureTransform::mTexCoord)));
+  return TEXURE_TRANSFORM_READER;
+}
+
+const json::Reader<gltf2::TextureExtensions>& GetTextureExtensionsReader()
+{
+  static const auto TEXTURE_EXTENSION_READER = std::move(json::Reader<gltf2::TextureExtensions>()
+                                                           .Register(*json::MakeProperty("KHR_texture_transform", json::ObjectReader<gltf2::TextureTransform>::Read, &gltf2::TextureExtensions::mTextureTransform)));
+  return TEXTURE_EXTENSION_READER;
+}
+
 const json::Reader<gltf2::TextureInfo>& GetTextureInfoReader()
 {
   static const auto TEXURE_INFO_READER = std::move(json::Reader<gltf2::TextureInfo>()
                                                      .Register(*json::MakeProperty("index", gltf2::RefReader<gltf2::Document>::Read<gltf2::Texture, &gltf2::Document::mTextures>, &gltf2::TextureInfo::mTexture))
                                                      .Register(*json::MakeProperty("texCoord", json::Read::Number<uint32_t>, &gltf2::TextureInfo::mTexCoord))
                                                      .Register(*json::MakeProperty("scale", json::Read::Number<float>, &gltf2::TextureInfo::mScale))
-                                                     .Register(*json::MakeProperty("strength", json::Read::Number<float>, &gltf2::TextureInfo::mStrength)));
+                                                     .Register(*json::MakeProperty("strength", json::Read::Number<float>, &gltf2::TextureInfo::mStrength))
+                                                     .Register(*json::MakeProperty("extensions", json::ObjectReader<gltf2::TextureExtensions>::Read, &gltf2::TextureInfo::mTextureExtensions)));
   return TEXURE_INFO_READER;
 }
 
@@ -588,18 +606,23 @@ TextureDefinition ConvertTextureInfo(const gltf2::TextureInfo& textureInfo, Conv
       std::vector<uint8_t> dataBuffer;
       dataBuffer.resize(textureInfo.mTexture->mSource->mBufferView->mByteLength);
       stream.read(reinterpret_cast<char*>(dataBuffer.data()), static_cast<std::streamsize>(static_cast<size_t>(textureInfo.mTexture->mSource->mBufferView->mByteLength)));
-      return TextureDefinition{std::move(dataBuffer), ConvertSampler(textureInfo.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode};
+      return TextureDefinition{std::move(dataBuffer), ConvertSampler(textureInfo.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode, textureInfo.mTextureExtensions.mTextureTransform.GetTransform()};
     }
     return TextureDefinition();
   }
   else
   {
-    return TextureDefinition{uri, ConvertSampler(textureInfo.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode};
+    return TextureDefinition{uri, ConvertSampler(textureInfo.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode, textureInfo.mTextureExtensions.mTextureTransform.GetTransform()};
   }
 }
 
 void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, gltf2::TextureInfo textureInfo, const Dali::Scene3D::Loader::ImageMetadata& metaData, ConversionContext& context)
 {
+  // Overrides the textureInfo texCoord value if KHR_texture_transform extension is supported and texCoord value is supplied.
+  if(textureInfo.mTextureExtensions && textureInfo.mTexCoord != textureInfo.mTextureExtensions.mTextureTransform.mTexCoord && textureInfo.mTextureExtensions.mTextureTransform.mTexCoord != 0u)
+  {
+    textureInfo.mTexCoord = textureInfo.mTextureExtensions.mTextureTransform.mTexCoord;
+  }
   materialDefinition.mTextureStages.push_back({semantic, ConvertTextureInfo(textureInfo, context, metaData)});
   materialDefinition.mFlags |= semantic;
 }
@@ -767,19 +790,20 @@ MeshDefinition::Accessor ConvertMeshPrimitiveAccessor(const gltf2::Accessor& acc
 
   return MeshDefinition::Accessor{
     std::move(MeshDefinition::Blob{bufferViewOffset + accessor.mByteOffset,
-          accessor.GetBytesLength(),
-          static_cast<uint16_t>(bufferViewStride),
-          static_cast<uint16_t>(accessor.GetElementSizeBytes()),
-          accessor.mMin,
-          accessor.mMax}),
-      std::move(sparseBlob),
-      accessor.mBufferView ? accessor.mBufferView->mBuffer.GetIndex() : 0,
-      accessor.mNormalized};
+                                   accessor.GetBytesLength(),
+                                   static_cast<uint16_t>(bufferViewStride),
+                                   static_cast<uint16_t>(accessor.GetElementSizeBytes()),
+                                   accessor.mMin,
+                                   accessor.mMax}),
+    std::move(sparseBlob),
+    accessor.mBufferView ? accessor.mBufferView->mBuffer.GetIndex() : 0,
+    accessor.mNormalized};
 }
 
 MeshDefinition::Accessor* GetAccessorFromAttribute(gltf2::Attribute::HashType attributeHash,
-                                                   MeshDefinition& meshDefinition,
-                                                   bool& needNormals, bool& needTangents)
+                                                   MeshDefinition&            meshDefinition,
+                                                   bool&                      needNormals,
+                                                   bool&                      needTangents)
 {
   MeshDefinition::Accessor* accessorDest{nullptr};
 
@@ -841,10 +865,10 @@ MeshDefinition::Accessor* GetAccessorFromAttribute(gltf2::Attribute::HashType at
   return accessorDest;
 }
 
-void SetFlagsFromComponentType(const gltf2::Accessor& accessor,
+void SetFlagsFromComponentType(const gltf2::Accessor&     accessor,
                                gltf2::Attribute::HashType attributeHash,
-                               MeshDefinition& meshDefinition,
-                               bool isQuantized)
+                               MeshDefinition&            meshDefinition,
+                               bool                       isQuantized)
 {
   switch(gltf2::Attribute::TypeFromHash(attributeHash))
   {
@@ -1554,6 +1578,8 @@ void SetObjectReaders()
   json::SetObjectReader(GetImageReader());
   json::SetObjectReader(GetSamplerReader());
   json::SetObjectReader(GetTextureReader());
+  json::SetObjectReader(GetTextureTransformReader());
+  json::SetObjectReader(GetTextureExtensionsReader());
   json::SetObjectReader(GetTextureInfoReader());
   json::SetObjectReader(GetMaterialPbrReader());
   json::SetObjectReader(GetMaterialSpecularReader());
