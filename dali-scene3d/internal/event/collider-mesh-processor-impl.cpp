@@ -178,7 +178,7 @@ void ColliderMeshProcessor::Process(bool /* postProcess */)
   std::sort(mSceneViewsToProcess.begin(), mSceneViewsToProcess.end());
   mSceneViewsToProcess.erase(std::unique(mSceneViewsToProcess.begin(), mSceneViewsToProcess.end()), mSceneViewsToProcess.end());
 
-  for(auto sceneView : mSceneViewsToProcess)
+  for(auto& sceneView : mSceneViewsToProcess)
   {
     std::vector<ColliderMeshData> meshData;
     IterateThroughChildren(sceneView, meshData);
