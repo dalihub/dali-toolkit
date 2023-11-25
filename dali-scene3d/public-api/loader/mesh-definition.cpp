@@ -32,6 +32,34 @@ namespace Dali::Scene3D::Loader
 {
 namespace
 {
+
+enum class LoadDataType
+{
+  UNSIGNED_BYTE = 0,
+  UNSIGNED_SHORT,
+  FLOAT
+};
+
+struct LoadAccessorInputs
+{
+  MeshDefinition::RawData&  rawData;
+  MeshDefinition::Accessor& accessor;
+  uint32_t                  flags;
+  std::fstream&             fileStream;
+  std::string&              meshPath;
+  BufferDefinition::Vector& buffers;
+};
+
+struct LoadAccessorListInputs
+{
+  MeshDefinition::RawData&               rawData;
+  std::vector<MeshDefinition::Accessor>& accessors;
+  uint32_t                               flags;
+  std::fstream&                          fileStream;
+  std::string&                           meshPath;
+  BufferDefinition::Vector&              buffers;
+};
+
 template<bool use32BitIndices>
 class IndexProvider
 {
@@ -210,104 +238,59 @@ bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source
   return ReadAccessor(accessor, source, target, nullptr);
 }
 
-template<typename T>
-void ReadJointAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Accessor& accessor, std::istream& source, const std::string& meshPath, const std::string& name)
+template<typename T, bool needsNormalize>
+void ReadVectorAccessor(const MeshDefinition::Accessor& accessor, std::istream& source, std::vector<uint8_t>& buffer)
 {
   constexpr auto sizeofBlobUnit = sizeof(T) * 4;
 
   DALI_ASSERT_ALWAYS(((accessor.mBlob.mLength % sizeofBlobUnit == 0) ||
                       accessor.mBlob.mStride >= sizeofBlobUnit) &&
-                     "Joints buffer length not a multiple of element size");
+                     "Buffer length not a multiple of element size");
   const auto inBufferSize  = accessor.mBlob.GetBufferSize();
   const auto outBufferSize = (sizeof(Vector4) / sizeofBlobUnit) * inBufferSize;
 
-  std::vector<uint8_t> buffer(outBufferSize);
-  auto                 inBuffer = buffer.data() + outBufferSize - inBufferSize;
+  buffer.resize(outBufferSize);
+  auto inBuffer = buffer.data() + outBufferSize - inBufferSize;
   if(!ReadAccessor(accessor, source, inBuffer))
   {
-    ExceptionFlinger(ASSERT_LOCATION) << "Failed to read joints from '" << meshPath << "'.";
+    ExceptionFlinger(ASSERT_LOCATION) << "Failed to read vector data from Accessor.";
   }
 
-  if constexpr(sizeofBlobUnit != sizeof(Vector4))
+  if(sizeofBlobUnit != sizeof(Vector4))
   {
     auto       floats = reinterpret_cast<float*>(buffer.data());
     const auto end    = inBuffer + inBufferSize;
     while(inBuffer != end)
     {
       const auto value = *reinterpret_cast<T*>(inBuffer);
-      *floats          = static_cast<float>(value);
+      *floats          = (needsNormalize) ? static_cast<float>(value) / static_cast<float>((1 << (sizeof(T) * 8)) - 1) : static_cast<float>(value);
 
       inBuffer += sizeof(T);
       ++floats;
     }
   }
-  raw.mAttribs.push_back({name, Property::VECTOR4, static_cast<uint32_t>(outBufferSize / sizeof(Vector4)), std::move(buffer)});
 }
 
-void ReadTypedJointAccessor(MeshDefinition::RawData& raw, uint32_t flags, MeshDefinition::Accessor& accessor, std::iostream& stream, std::string& path, const std::string& name)
+template<bool needsNormalize>
+void ReadTypedVectorAccessor(LoadDataType loadDataType, MeshDefinition::Accessor& accessor, std::iostream& stream, std::vector<uint8_t>& buffer)
 {
-  if(MaskMatch(flags, MeshDefinition::U16_JOINT_IDS))
+  switch(loadDataType)
   {
-    ReadJointAccessor<uint16_t>(raw, accessor, stream, path, name);
-  }
-  else if(MaskMatch(flags, MeshDefinition::U8_JOINT_IDS))
-  {
-    ReadJointAccessor<uint8_t>(raw, accessor, stream, path, name);
-  }
-  else
-  {
-    ReadJointAccessor<float>(raw, accessor, stream, path, name);
-  }
-}
-
-template<typename T>
-void ReadWeightAccessor(MeshDefinition::RawData& raw, const MeshDefinition::Accessor& accessor, std::istream& source, const std::string& meshPath, const std::string& name)
-{
-  constexpr auto sizeofBlobUnit = sizeof(T) * 4;
-
-  DALI_ASSERT_ALWAYS(((accessor.mBlob.mLength % sizeofBlobUnit == 0) ||
-                      accessor.mBlob.mStride >= sizeofBlobUnit) &&
-                     "weights buffer length not a multiple of element size");
-  const auto inBufferSize  = accessor.mBlob.GetBufferSize();
-  const auto outBufferSize = (sizeof(Vector4) / sizeofBlobUnit) * inBufferSize;
-
-  std::vector<uint8_t> buffer(outBufferSize);
-  auto                 inBuffer = buffer.data() + outBufferSize - inBufferSize;
-  if(!ReadAccessor(accessor, source, inBuffer))
-  {
-    ExceptionFlinger(ASSERT_LOCATION) << "Failed to read weights from '" << meshPath << "'.";
-  }
-
-  if constexpr(sizeofBlobUnit != sizeof(Vector4))
-  {
-    auto       floats = reinterpret_cast<float*>(buffer.data());
-    const auto end    = inBuffer + inBufferSize;
-    while(inBuffer != end)
+    case LoadDataType::UNSIGNED_SHORT:
     {
-      const auto value = *reinterpret_cast<T*>(inBuffer);
-      // Normalize weight value. value /= 255 for uint8_t weight, and value /= 65535 for uint16_t weight.
-      *floats = static_cast<float>(value) / static_cast<float>((1 << (sizeof(T) * 8)) - 1);
-
-      inBuffer += sizeof(T);
-      ++floats;
+      ReadVectorAccessor<uint16_t, needsNormalize>(accessor, stream, buffer);
+      break;
     }
-  }
-  raw.mAttribs.push_back({name, Property::VECTOR4, static_cast<uint32_t>(outBufferSize / sizeof(Vector4)), std::move(buffer)});
-}
-
-void ReadTypedWeightAccessor(MeshDefinition::RawData& raw, uint32_t flags, MeshDefinition::Accessor& accessor, std::iostream& stream, std::string& path, std::string name)
-{
-  if(MaskMatch(flags, MeshDefinition::U16_WEIGHT))
-  {
-    ReadWeightAccessor<uint16_t>(raw, accessor, stream, path, name);
-  }
-  else if(MaskMatch(flags, MeshDefinition::U8_WEIGHT))
-  {
-    ReadWeightAccessor<uint8_t>(raw, accessor, stream, path, name);
-  }
-  else
-  {
-    ReadWeightAccessor<float>(raw, accessor, stream, path, name);
+    case LoadDataType::UNSIGNED_BYTE:
+    {
+      ReadVectorAccessor<uint8_t, needsNormalize>(accessor, stream, buffer);
+      break;
+    }
+    default:
+    {
+      ReadVectorAccessor<float, needsNormalize>(accessor, stream, buffer);
+      break;
+    }
   }
 }
 
@@ -841,6 +824,493 @@ std::iostream& GetAvailableData(std::fstream& meshStream, const std::string& mes
   return stream;
 }
 
+template<bool needsNormalize>
+void ReadTypedVectorAccessors(LoadAccessorListInputs loadAccessorListInputs, LoadDataType loadDataType, std::string attributeName)
+{
+  int setIndex = 0;
+  for(auto& accessor : loadAccessorListInputs.accessors)
+  {
+    std::string        pathJoint;
+    auto&              dataStream = GetAvailableData(loadAccessorListInputs.fileStream, loadAccessorListInputs.meshPath, loadAccessorListInputs.buffers[accessor.mBufferIdx], pathJoint);
+    std::ostringstream name;
+    name << attributeName << setIndex++;
+    std::vector<uint8_t> buffer;
+    ReadTypedVectorAccessor<needsNormalize>(loadDataType, accessor, dataStream, buffer);
+    loadAccessorListInputs.rawData.mAttribs.push_back({name.str(), Property::VECTOR4, static_cast<uint32_t>(buffer.size() / sizeof(Vector4)), std::move(buffer)});
+  }
+}
+
+void LoadIndices(LoadAccessorInputs indicesInput)
+{
+  if(indicesInput.accessor.IsDefined())
+  {
+    if(MaskMatch(indicesInput.flags, MeshDefinition::Flags::U32_INDICES))
+    {
+      DALI_ASSERT_ALWAYS(((indicesInput.accessor.mBlob.mLength % sizeof(uint32_t) == 0) ||
+                          indicesInput.accessor.mBlob.mStride >= sizeof(uint32_t)) &&
+                         "Index buffer length not a multiple of element size");
+      const auto indexCount = indicesInput.accessor.mBlob.GetBufferSize() / sizeof(uint32_t);
+      indicesInput.rawData.mIndices.resize(indexCount * 2); // NOTE: we need space for uint32_ts initially.
+
+      std::string path;
+      auto&       stream = GetAvailableData(indicesInput.fileStream, indicesInput.meshPath, indicesInput.buffers[indicesInput.accessor.mBufferIdx], path);
+      if(!ReadAccessor(indicesInput.accessor, stream, reinterpret_cast<uint8_t*>(indicesInput.rawData.mIndices.data())))
+      {
+        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << path << "'.";
+      }
+    }
+    else if(MaskMatch(indicesInput.flags, MeshDefinition::Flags::U8_INDICES))
+    {
+      DALI_ASSERT_ALWAYS(((indicesInput.accessor.mBlob.mLength % sizeof(uint8_t) == 0) ||
+                          indicesInput.accessor.mBlob.mStride >= sizeof(uint8_t)) &&
+                         "Index buffer length not a multiple of element size");
+      const auto indexCount = indicesInput.accessor.mBlob.GetBufferSize() / sizeof(uint8_t);
+      indicesInput.rawData.mIndices.resize(indexCount); // NOTE: we need space for uint16_ts initially.
+
+      std::string path;
+      auto        u8s    = reinterpret_cast<uint8_t*>(indicesInput.rawData.mIndices.data()) + indexCount;
+      auto&       stream = GetAvailableData(indicesInput.fileStream, indicesInput.meshPath, indicesInput.buffers[indicesInput.accessor.mBufferIdx], path);
+      if(!ReadAccessor(indicesInput.accessor, stream, u8s))
+      {
+        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << path << "'.";
+      }
+
+      auto u16s = indicesInput.rawData.mIndices.data();
+      auto end  = u8s + indexCount;
+      while(u8s != end)
+      {
+        *u16s = static_cast<uint16_t>(*u8s);
+        ++u16s;
+        ++u8s;
+      }
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS(((indicesInput.accessor.mBlob.mLength % sizeof(unsigned short) == 0) ||
+                          indicesInput.accessor.mBlob.mStride >= sizeof(unsigned short)) &&
+                         "Index buffer length not a multiple of element size");
+      indicesInput.rawData.mIndices.resize(indicesInput.accessor.mBlob.mLength / sizeof(unsigned short));
+
+      std::string path;
+      auto&       stream = GetAvailableData(indicesInput.fileStream, indicesInput.meshPath, indicesInput.buffers[indicesInput.accessor.mBufferIdx], path);
+      if(!ReadAccessor(indicesInput.accessor, stream, reinterpret_cast<uint8_t*>(indicesInput.rawData.mIndices.data())))
+      {
+        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indicesInput.accessor from '" << path << "'.";
+      }
+    }
+  }
+}
+
+uint32_t LoadPositions(LoadAccessorInputs positionsInput, bool hasBlendShape)
+{
+  uint32_t             numVector3 = 0u;
+  std::vector<Vector3> positions;
+  if(positionsInput.accessor.IsDefined())
+  {
+    const auto bufferSize = positionsInput.accessor.mBlob.GetBufferSize();
+
+    if(MaskMatch(positionsInput.flags, MeshDefinition::Flags::S8_POSITION) || MaskMatch(positionsInput.flags, MeshDefinition::Flags::U8_POSITION))
+    {
+      DALI_ASSERT_ALWAYS(((positionsInput.accessor.mBlob.mLength % (sizeof(uint8_t) * 3) == 0) ||
+                          positionsInput.accessor.mBlob.mStride >= (sizeof(uint8_t) * 3)) &&
+                         "Position buffer length not a multiple of element size");
+      numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(uint8_t) * 3));
+    }
+    else if(MaskMatch(positionsInput.flags, MeshDefinition::Flags::S16_POSITION) || MaskMatch(positionsInput.flags, MeshDefinition::Flags::U16_POSITION))
+    {
+      DALI_ASSERT_ALWAYS(((positionsInput.accessor.mBlob.mLength % (sizeof(uint16_t) * 3) == 0) ||
+                          positionsInput.accessor.mBlob.mStride >= (sizeof(uint16_t) * 3)) &&
+                         "Position buffer length not a multiple of element size");
+      numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(uint16_t) * 3));
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS(((positionsInput.accessor.mBlob.mLength % sizeof(Vector3) == 0) ||
+                          positionsInput.accessor.mBlob.mStride >= sizeof(Vector3)) &&
+                         "Position buffer length not a multiple of element size");
+      numVector3 = static_cast<uint32_t>(bufferSize / sizeof(Vector3));
+    }
+
+    std::vector<uint8_t> buffer(bufferSize);
+
+    std::string path;
+    auto&       stream = GetAvailableData(positionsInput.fileStream, positionsInput.meshPath, positionsInput.buffers[positionsInput.accessor.mBufferIdx], path);
+    if(!ReadAccessor(positionsInput.accessor, stream, buffer.data()))
+    {
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read positions from '" << path << "'.";
+    }
+
+    GetDequantizedData(buffer, 3u, numVector3, positionsInput.flags & MeshDefinition::FlagMasks::POSITIONS_MASK, positionsInput.accessor.mNormalized);
+
+    if(positionsInput.accessor.mNormalized)
+    {
+      GetDequantizedMinMax(positionsInput.accessor.mBlob.mMin, positionsInput.accessor.mBlob.mMax, positionsInput.flags & MeshDefinition::FlagMasks::POSITIONS_MASK);
+    }
+
+    if(positionsInput.accessor.mBlob.mMin.size() != 3u || positionsInput.accessor.mBlob.mMax.size() != 3u)
+    {
+      positionsInput.accessor.mBlob.ComputeMinMax(3u, numVector3, reinterpret_cast<float*>(buffer.data()));
+    }
+    else
+    {
+      positionsInput.accessor.mBlob.ApplyMinMax(numVector3, reinterpret_cast<float*>(buffer.data()));
+    }
+
+    if(hasBlendShape)
+    {
+      positions.resize(numVector3);
+      std::copy(buffer.data(), buffer.data() + buffer.size(), reinterpret_cast<uint8_t*>(positions.data()));
+    }
+
+    positionsInput.rawData.mAttribs.push_back({"aPosition", Property::VECTOR3, numVector3, std::move(buffer)});
+  }
+  return numVector3;
+}
+
+bool LoadNormals(LoadAccessorInputs normalsInput, bool isTriangles, uint32_t positionBufferSize)
+{
+  auto       hasNormals  = normalsInput.accessor.IsDefined();
+  if(hasNormals)
+  {
+    const auto bufferSize = normalsInput.accessor.mBlob.GetBufferSize();
+    uint32_t   numVector3;
+
+    if(MaskMatch(normalsInput.flags, MeshDefinition::Flags::S8_NORMAL))
+    {
+      DALI_ASSERT_ALWAYS(((normalsInput.accessor.mBlob.mLength % (sizeof(int8_t) * 3) == 0) ||
+                          normalsInput.accessor.mBlob.mStride >= (sizeof(int8_t) * 3)) &&
+                         "Normal buffer length not a multiple of element size");
+      numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(int8_t) * 3));
+    }
+    else if(MaskMatch(normalsInput.flags, MeshDefinition::Flags::S16_NORMAL))
+    {
+      DALI_ASSERT_ALWAYS(((normalsInput.accessor.mBlob.mLength % (sizeof(int16_t) * 3) == 0) ||
+                          normalsInput.accessor.mBlob.mStride >= (sizeof(int16_t) * 3)) &&
+                         "Normal buffer length not a multiple of element size");
+      numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(int16_t) * 3));
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS(((normalsInput.accessor.mBlob.mLength % sizeof(Vector3) == 0) ||
+                          normalsInput.accessor.mBlob.mStride >= sizeof(Vector3)) &&
+                         "Normal buffer length not a multiple of element size");
+      numVector3 = static_cast<uint32_t>(bufferSize / sizeof(Vector3));
+    }
+
+    std::vector<uint8_t> buffer(bufferSize);
+
+    std::string path;
+    auto&       stream = GetAvailableData(normalsInput.fileStream, normalsInput.meshPath, normalsInput.buffers[normalsInput.accessor.mBufferIdx], path);
+    if(!ReadAccessor(normalsInput.accessor, stream, buffer.data()))
+    {
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read normals from '" << path << "'.";
+    }
+
+    GetDequantizedData(buffer, 3u, numVector3, normalsInput.flags & MeshDefinition::FlagMasks::NORMALS_MASK, normalsInput.accessor.mNormalized);
+
+    if(normalsInput.accessor.mNormalized)
+    {
+      GetDequantizedMinMax(normalsInput.accessor.mBlob.mMin, normalsInput.accessor.mBlob.mMax, normalsInput.flags & MeshDefinition::FlagMasks::NORMALS_MASK);
+    }
+
+    normalsInput.accessor.mBlob.ApplyMinMax(numVector3, reinterpret_cast<float*>(buffer.data()));
+
+    normalsInput.rawData.mAttribs.push_back({"aNormal", Property::VECTOR3, numVector3, std::move(buffer)});
+  }
+  else if(normalsInput.accessor.mBlob.mLength != 0 && isTriangles)
+  {
+    DALI_ASSERT_DEBUG(normalsInput.accessor.mBlob.mLength == positionBufferSize);
+    static const std::function<bool(MeshDefinition::RawData&)> GenerateNormalsFunction[2] =
+      {
+        GenerateNormals<false>,
+        GenerateNormals<true>,
+      };
+    const bool generateSuccessed = GenerateNormalsFunction[MaskMatch(normalsInput.flags, MeshDefinition::Flags::U32_INDICES)](normalsInput.rawData);
+    if(!generateSuccessed)
+    {
+      DALI_LOG_ERROR("Failed to generate normal\n");
+    }
+    else
+    {
+      hasNormals = true;
+    }
+  }
+  return hasNormals;
+}
+
+void LoadTextureCoordinates(LoadAccessorListInputs textureCoordinatesInput)
+{
+  if(!textureCoordinatesInput.accessors.empty() && textureCoordinatesInput.accessors[0].IsDefined())
+  {
+    auto&      texCoords  = textureCoordinatesInput.accessors[0];
+    const auto bufferSize = texCoords.mBlob.GetBufferSize();
+    uint32_t uvCount;
+
+    if(MaskMatch(textureCoordinatesInput.flags, MeshDefinition::Flags::S8_TEXCOORD) || MaskMatch(textureCoordinatesInput.flags, MeshDefinition::Flags::U8_TEXCOORD))
+    {
+      DALI_ASSERT_ALWAYS(((texCoords.mBlob.mLength % (sizeof(uint8_t) * 2) == 0) ||
+                          texCoords.mBlob.mStride >= (sizeof(uint8_t) * 2)) &&
+                         "TexCoords buffer length not a multiple of element size");
+      uvCount = static_cast<uint32_t>(bufferSize / (sizeof(uint8_t) * 2));
+    }
+    else if(MaskMatch(textureCoordinatesInput.flags, MeshDefinition::Flags::S16_TEXCOORD) || MaskMatch(textureCoordinatesInput.flags, MeshDefinition::Flags::U16_TEXCOORD))
+    {
+      DALI_ASSERT_ALWAYS(((texCoords.mBlob.mLength % (sizeof(uint16_t) * 2) == 0) ||
+                          texCoords.mBlob.mStride >= (sizeof(uint16_t) * 2)) &&
+                         "TexCoords buffer length not a multiple of element size");
+      uvCount = static_cast<uint32_t>(bufferSize / (sizeof(uint16_t) * 2));
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS(((texCoords.mBlob.mLength % sizeof(Vector2) == 0) ||
+                          texCoords.mBlob.mStride >= sizeof(Vector2)) &&
+                         "TexCoords buffer length not a multiple of element size");
+      uvCount = static_cast<uint32_t>(bufferSize / sizeof(Vector2));
+    }
+
+    std::vector<uint8_t> buffer(bufferSize);
+
+    std::string path;
+    auto&       stream = GetAvailableData(textureCoordinatesInput.fileStream, textureCoordinatesInput.meshPath, textureCoordinatesInput.buffers[texCoords.mBufferIdx], path);
+    if(!ReadAccessor(texCoords, stream, buffer.data()))
+    {
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read uv-s from '" << path << "'.";
+    }
+
+    GetDequantizedData(buffer, 2u, uvCount, textureCoordinatesInput.flags & MeshDefinition::FlagMasks::TEXCOORDS_MASK, texCoords.mNormalized);
+
+    if(MaskMatch(textureCoordinatesInput.flags, MeshDefinition::Flags::FLIP_UVS_VERTICAL))
+    {
+      auto uv    = reinterpret_cast<Vector2*>(buffer.data());
+      auto uvEnd = uv + uvCount;
+      while(uv != uvEnd)
+      {
+        uv->y = 1.0f - uv->y;
+        ++uv;
+      }
+    }
+
+    if(texCoords.mNormalized)
+    {
+      GetDequantizedMinMax(texCoords.mBlob.mMin, texCoords.mBlob.mMax, textureCoordinatesInput.flags & MeshDefinition::FlagMasks::TEXCOORDS_MASK);
+    }
+
+    texCoords.mBlob.ApplyMinMax(static_cast<uint32_t>(uvCount), reinterpret_cast<float*>(buffer.data()));
+    textureCoordinatesInput.rawData.mAttribs.push_back({"aTexCoord", Property::VECTOR2, static_cast<uint32_t>(uvCount), std::move(buffer)});
+  }
+}
+
+void LoadTangents(LoadAccessorInputs tangentsInput, bool hasNormals, bool hasUvs, bool isTriangles, Property::Type tangentType, uint32_t normalBufferSize)
+{
+  if(tangentsInput.accessor.IsDefined())
+  {
+    const auto bufferSize = tangentsInput.accessor.mBlob.GetBufferSize();
+
+    uint32_t propertySize   = static_cast<uint32_t>((tangentType == Property::VECTOR4) ? sizeof(Vector4) : sizeof(Vector3));
+    uint32_t componentCount = static_cast<uint32_t>(propertySize / sizeof(float));
+
+    uint32_t numTangents;
+
+    if(MaskMatch(tangentsInput.flags, MeshDefinition::Flags::S8_TANGENT))
+    {
+      DALI_ASSERT_ALWAYS(((tangentsInput.accessor.mBlob.mLength % (sizeof(int8_t) * componentCount) == 0) ||
+                          tangentsInput.accessor.mBlob.mStride >= (sizeof(int8_t) * componentCount)) &&
+                         "Tangents buffer length not a multiple of element size");
+      numTangents = static_cast<uint32_t>(bufferSize / (sizeof(int8_t) * componentCount));
+    }
+    else if(MaskMatch(tangentsInput.flags, MeshDefinition::Flags::S16_TANGENT))
+    {
+      DALI_ASSERT_ALWAYS(((tangentsInput.accessor.mBlob.mLength % (sizeof(int16_t) * componentCount) == 0) ||
+                          tangentsInput.accessor.mBlob.mStride >= (sizeof(int16_t) * componentCount)) &&
+                         "Tangents buffer length not a multiple of element size");
+      numTangents = static_cast<uint32_t>(bufferSize / (sizeof(int16_t) * componentCount));
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS(((tangentsInput.accessor.mBlob.mLength % propertySize == 0) ||
+                          tangentsInput.accessor.mBlob.mStride >= propertySize) &&
+                         "Tangents buffer length not a multiple of element size");
+      numTangents = static_cast<uint32_t>(bufferSize / propertySize);
+    }
+
+    std::vector<uint8_t> buffer(bufferSize);
+
+    std::string path;
+    auto&       stream = GetAvailableData(tangentsInput.fileStream, tangentsInput.meshPath, tangentsInput.buffers[tangentsInput.accessor.mBufferIdx], path);
+    if(!ReadAccessor(tangentsInput.accessor, stream, buffer.data()))
+    {
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read tangents from '" << path << "'.";
+    }
+
+    GetDequantizedData(buffer, componentCount, numTangents, tangentsInput.flags & MeshDefinition::FlagMasks::TANGENTS_MASK, tangentsInput.accessor.mNormalized);
+
+    if(tangentsInput.accessor.mNormalized)
+    {
+      GetDequantizedMinMax(tangentsInput.accessor.mBlob.mMin, tangentsInput.accessor.mBlob.mMax, tangentsInput.flags & MeshDefinition::FlagMasks::TANGENTS_MASK);
+    }
+
+    tangentsInput.accessor.mBlob.ApplyMinMax(numTangents, reinterpret_cast<float*>(buffer.data()));
+
+    tangentsInput.rawData.mAttribs.push_back({"aTangent", tangentType, static_cast<uint32_t>(numTangents), std::move(buffer)});
+  }
+  else if(tangentsInput.accessor.mBlob.mLength != 0 && hasNormals && isTriangles)
+  {
+    DALI_ASSERT_DEBUG(tangentsInput.accessor.mBlob.mLength == normalBufferSize);
+    static const std::function<bool(MeshDefinition::RawData&)> GenerateTangentsFunction[2][2][2] =
+      {
+        {
+          {
+            GenerateTangents<false, false, false>,
+            GenerateTangents<false, false, true>,
+          },
+          {
+            GenerateTangents<false, true, false>,
+            GenerateTangents<false, true, true>,
+          },
+        },
+        {
+          {
+            GenerateTangents<true, false, false>,
+            GenerateTangents<true, false, true>,
+          },
+          {
+            GenerateTangents<true, true, false>,
+            GenerateTangents<true, true, true>,
+          },
+        }};
+    const bool generateSuccessed = GenerateTangentsFunction[MaskMatch(tangentsInput.flags, MeshDefinition::Flags::U32_INDICES)][tangentType == Property::VECTOR3][hasUvs](tangentsInput.rawData);
+    if(!generateSuccessed)
+    {
+      DALI_LOG_ERROR("Failed to generate tangents\n");
+    }
+  }
+}
+
+void LoadColors(LoadAccessorListInputs colorsInput)
+{
+  // Only support 1 vertex color
+  if(!colorsInput.accessors.empty() && colorsInput.accessors[0].IsDefined())
+  {
+    uint32_t       propertySize = colorsInput.accessors[0].mBlob.mElementSizeHint;
+    Property::Type propertyType = (propertySize == sizeof(Vector4)) ? Property::VECTOR4 : ((propertySize == sizeof(Vector3)) ? Property::VECTOR3 : Property::NONE);
+    if(propertyType != Property::NONE)
+    {
+      DALI_ASSERT_ALWAYS(((colorsInput.accessors[0].mBlob.mLength % propertySize == 0) ||
+                          colorsInput.accessors[0].mBlob.mStride >= propertySize) &&
+                         "Colors buffer length not a multiple of element size");
+      const auto           bufferSize = colorsInput.accessors[0].mBlob.GetBufferSize();
+      std::vector<uint8_t> buffer(bufferSize);
+
+      std::string path;
+      auto&       stream = GetAvailableData(colorsInput.fileStream, colorsInput.meshPath, colorsInput.buffers[colorsInput.accessors[0].mBufferIdx], path);
+      if(!ReadAccessor(colorsInput.accessors[0], stream, buffer.data()))
+      {
+        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read colors from '" << path << "'.";
+      }
+      colorsInput.accessors[0].mBlob.ApplyMinMax(bufferSize / propertySize, reinterpret_cast<float*>(buffer.data()));
+
+      colorsInput.rawData.mAttribs.push_back({"aVertexColor", propertyType, static_cast<uint32_t>(bufferSize / propertySize), std::move(buffer)});
+    }
+  }
+  else
+  {
+    std::vector<uint8_t> buffer(colorsInput.rawData.mAttribs[0].mNumElements * sizeof(Vector4));
+    auto                 colors = reinterpret_cast<Vector4*>(buffer.data());
+
+    for(uint32_t i = 0; i < colorsInput.rawData.mAttribs[0].mNumElements; i++)
+    {
+      colors[i] = Vector4::ONE;
+    }
+
+    colorsInput.rawData.mAttribs.push_back({"aVertexColor", Property::VECTOR4, colorsInput.rawData.mAttribs[0].mNumElements, std::move(buffer)});
+  }
+}
+
+void LoadBlendShapes(MeshDefinition::RawData& rawData, std::vector<MeshDefinition::BlendShape>& blendShapes, MeshDefinition::Blob& blendShapeHeader, BlendShapes::Version blendShapeVersion, uint32_t numberOfVertices, std::fstream& fileStream, BufferDefinition::Vector& buffers)
+{
+  // Calculate the Blob for the blend shapes.
+  MeshDefinition::Blob blendShapesBlob;
+  blendShapesBlob.mOffset = std::numeric_limits<unsigned int>::max();
+  blendShapesBlob.mLength = 0u;
+
+  uint32_t totalTextureSize(0u);
+
+  auto processAccessor = [&](const MeshDefinition::Accessor& accessor, uint32_t vector3Size) {
+    if(accessor.IsDefined())
+    {
+      blendShapesBlob.mOffset = std::min(blendShapesBlob.mOffset, accessor.mBlob.mOffset);
+      blendShapesBlob.mLength += accessor.mBlob.mLength;
+
+      totalTextureSize += accessor.mBlob.mLength / vector3Size;
+    }
+  };
+
+  for(const auto& blendShape : blendShapes)
+  {
+    const auto positionMask = blendShape.mFlags & MeshDefinition::FlagMasks::POSITIONS_MASK;
+    const auto normalMask   = blendShape.mFlags & MeshDefinition::FlagMasks::NORMALS_MASK;
+    const auto tangentMask  = blendShape.mFlags & MeshDefinition::FlagMasks::TANGENTS_MASK;
+
+    processAccessor(blendShape.deltas, MaskMatch(positionMask, MeshDefinition::S8_POSITION) ? sizeof(uint8_t) * 3 : (MaskMatch(positionMask, MeshDefinition::S16_POSITION) ? sizeof(uint16_t) * 3 : sizeof(Vector3)));
+    processAccessor(blendShape.normals, MaskMatch(normalMask, MeshDefinition::S8_NORMAL) ? sizeof(uint8_t) * 3 : (MaskMatch(normalMask, MeshDefinition::S16_NORMAL) ? sizeof(uint16_t) * 3 : sizeof(Vector3)));
+    processAccessor(blendShape.tangents, MaskMatch(tangentMask, MeshDefinition::S8_TANGENT) ? sizeof(uint8_t) * 3 : (MaskMatch(tangentMask, MeshDefinition::S16_TANGENT) ? sizeof(uint16_t) * 3 : sizeof(Vector3)));
+  }
+
+  if(!blendShapes.empty())
+  {
+    // Calculate the size of one buffer inside the texture.
+    rawData.mBlendShapeBufferOffset = numberOfVertices;
+
+    bool     calculateGltf2BlendShapes = false;
+    uint32_t textureWidth              = 0u;
+    uint32_t textureHeight             = 0u;
+
+    if(!blendShapeHeader.IsDefined())
+    {
+      CalculateTextureSize(totalTextureSize, textureWidth, textureHeight);
+      calculateGltf2BlendShapes = true;
+    }
+    else
+    {
+      uint16_t header[2u];
+      ReadBlob(blendShapeHeader, fileStream, reinterpret_cast<uint8_t*>(header));
+      textureWidth  = header[0u];
+      textureHeight = header[1u];
+    }
+
+    const uint32_t numberOfBlendShapes = blendShapes.size();
+    rawData.mBlendShapeUnnormalizeFactor.Resize(numberOfBlendShapes);
+
+    Devel::PixelBuffer geometryPixelBuffer = Devel::PixelBuffer::New(textureWidth, textureHeight, Pixel::RGB32F);
+    uint8_t*           geometryBuffer      = geometryPixelBuffer.GetBuffer();
+
+    if(calculateGltf2BlendShapes)
+    {
+      CalculateGltf2BlendShapes(geometryBuffer, blendShapes, numberOfVertices, rawData.mBlendShapeUnnormalizeFactor[0u], buffers);
+    }
+    else
+    {
+      MeshDefinition::Blob unnormalizeFactorBlob;
+      unnormalizeFactorBlob.mLength = static_cast<uint32_t>(sizeof(float) * ((BlendShapes::Version::VERSION_2_0 == blendShapeVersion) ? 1u : numberOfBlendShapes));
+
+      if(blendShapesBlob.IsDefined())
+      {
+        if(ReadBlob(blendShapesBlob, fileStream, geometryBuffer))
+        {
+          unnormalizeFactorBlob.mOffset = blendShapesBlob.mOffset + blendShapesBlob.mLength;
+        }
+      }
+
+      // Read the unnormalize factors.
+      if(unnormalizeFactorBlob.IsDefined())
+      {
+        ReadBlob(unnormalizeFactorBlob, fileStream, reinterpret_cast<uint8_t*>(&rawData.mBlendShapeUnnormalizeFactor[0u]));
+      }
+    }
+    rawData.mBlendShapeData = Devel::PixelBuffer::Convert(geometryPixelBuffer);
+  }
+}
+
 } // namespace
 
 MeshDefinition::SparseBlob::SparseBlob(const Blob& indices, const Blob& values, uint32_t count)
@@ -1019,483 +1489,38 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
     }
   }
 
-  if(mIndices.IsDefined())
-  {
-    if(MaskMatch(mFlags, U32_INDICES))
-    {
-      DALI_ASSERT_ALWAYS(((mIndices.mBlob.mLength % sizeof(uint32_t) == 0) ||
-                          mIndices.mBlob.mStride >= sizeof(uint32_t)) &&
-                         "Index buffer length not a multiple of element size");
-      const auto indexCount = mIndices.mBlob.GetBufferSize() / sizeof(uint32_t);
-      raw.mIndices.resize(indexCount * 2); // NOTE: we need space for uint32_ts initially.
+  LoadAccessorInputs indicesInput = {raw, mIndices, mFlags, fileStream, meshPath, buffers};
+  LoadIndices(indicesInput);
 
-      std::string path;
-      auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mIndices.mBufferIdx], path);
-      if(!ReadAccessor(mIndices, stream, reinterpret_cast<uint8_t*>(raw.mIndices.data())))
-      {
-        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << path << "'.";
-      }
-    }
-    else if(MaskMatch(mFlags, U8_INDICES))
-    {
-      DALI_ASSERT_ALWAYS(((mIndices.mBlob.mLength % sizeof(uint8_t) == 0) ||
-                          mIndices.mBlob.mStride >= sizeof(uint8_t)) &&
-                         "Index buffer length not a multiple of element size");
-      const auto indexCount = mIndices.mBlob.GetBufferSize() / sizeof(uint8_t);
-      raw.mIndices.resize(indexCount); // NOTE: we need space for uint16_ts initially.
+  LoadAccessorInputs positionsInput   = {raw, mPositions, mFlags, fileStream, meshPath, buffers};
+  uint32_t           numberOfVertices = LoadPositions(positionsInput, HasBlendShapes());
 
-      std::string path;
-      auto        u8s    = reinterpret_cast<uint8_t*>(raw.mIndices.data()) + indexCount;
-      auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mIndices.mBufferIdx], path);
-      if(!ReadAccessor(mIndices, stream, u8s))
-      {
-        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << path << "'.";
-      }
+  const auto         isTriangles  = mPrimitiveType == Geometry::TRIANGLES;
+  LoadAccessorInputs normalsInput = {raw, mNormals, mFlags, fileStream, meshPath, buffers};
+  auto               hasNormals   = LoadNormals(normalsInput, isTriangles, mPositions.mBlob.GetBufferSize());
 
-      auto u16s = raw.mIndices.data();
-      auto end  = u8s + indexCount;
-      while(u8s != end)
-      {
-        *u16s = static_cast<uint16_t>(*u8s);
-        ++u16s;
-        ++u8s;
-      }
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS(((mIndices.mBlob.mLength % sizeof(unsigned short) == 0) ||
-                          mIndices.mBlob.mStride >= sizeof(unsigned short)) &&
-                         "Index buffer length not a multiple of element size");
-      raw.mIndices.resize(mIndices.mBlob.mLength / sizeof(unsigned short));
+  LoadAccessorListInputs textureCoordinatesInput = {raw, mTexCoords, mFlags, fileStream, meshPath, buffers};
+  LoadTextureCoordinates(textureCoordinatesInput);
 
-      std::string path;
-      auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mIndices.mBufferIdx], path);
-      if(!ReadAccessor(mIndices, stream, reinterpret_cast<uint8_t*>(raw.mIndices.data())))
-      {
-        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << path << "'.";
-      }
-    }
-  }
+  const bool         hasUvs        = !mTexCoords.empty() && mTexCoords[0].IsDefined();
+  LoadAccessorInputs tangentsInput = {raw, mTangents, mFlags, fileStream, meshPath, buffers};
+  LoadTangents(tangentsInput, hasNormals, hasUvs, isTriangles, mTangentType, mNormals.mBlob.GetBufferSize());
 
-  uint32_t numberOfVertices = 0u;
-
-  std::vector<Vector3> positions;
-  if(mPositions.IsDefined())
-  {
-    const auto bufferSize = mPositions.mBlob.GetBufferSize();
-    uint32_t   numVector3;
-
-    if(MaskMatch(mFlags, S8_POSITION) || MaskMatch(mFlags, U8_POSITION))
-    {
-      DALI_ASSERT_ALWAYS(((mPositions.mBlob.mLength % (sizeof(uint8_t) * 3) == 0) ||
-                          mPositions.mBlob.mStride >= (sizeof(uint8_t) * 3)) &&
-                         "Position buffer length not a multiple of element size");
-      numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(uint8_t) * 3));
-    }
-    else if(MaskMatch(mFlags, S16_POSITION) || MaskMatch(mFlags, U16_POSITION))
-    {
-      DALI_ASSERT_ALWAYS(((mPositions.mBlob.mLength % (sizeof(uint16_t) * 3) == 0) ||
-                          mPositions.mBlob.mStride >= (sizeof(uint16_t) * 3)) &&
-                         "Position buffer length not a multiple of element size");
-      numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(uint16_t) * 3));
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS(((mPositions.mBlob.mLength % sizeof(Vector3) == 0) ||
-                          mPositions.mBlob.mStride >= sizeof(Vector3)) &&
-                         "Position buffer length not a multiple of element size");
-      numVector3 = static_cast<uint32_t>(bufferSize / sizeof(Vector3));
-    }
-
-    numberOfVertices = numVector3;
-
-    std::vector<uint8_t> buffer(bufferSize);
-
-    std::string path;
-    auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mPositions.mBufferIdx], path);
-    if(!ReadAccessor(mPositions, stream, buffer.data()))
-    {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read positions from '" << path << "'.";
-    }
-
-    GetDequantizedData(buffer, 3u, numVector3, mFlags & POSITIONS_MASK, mPositions.mNormalized);
-
-    if(mPositions.mNormalized)
-    {
-      GetDequantizedMinMax(mPositions.mBlob.mMin, mPositions.mBlob.mMax, mFlags & POSITIONS_MASK);
-    }
-
-    if(mPositions.mBlob.mMin.size() != 3u || mPositions.mBlob.mMax.size() != 3u)
-    {
-      mPositions.mBlob.ComputeMinMax(3u, numVector3, reinterpret_cast<float*>(buffer.data()));
-    }
-    else
-    {
-      mPositions.mBlob.ApplyMinMax(numVector3, reinterpret_cast<float*>(buffer.data()));
-    }
-
-    if(HasBlendShapes())
-    {
-      positions.resize(numVector3);
-      std::copy(buffer.data(), buffer.data() + buffer.size(), reinterpret_cast<uint8_t*>(positions.data()));
-    }
-
-    raw.mAttribs.push_back({"aPosition", Property::VECTOR3, numVector3, std::move(buffer)});
-  }
-
-  const auto isTriangles = mPrimitiveType == Geometry::TRIANGLES;
-  auto       hasNormals  = mNormals.IsDefined();
-  if(hasNormals)
-  {
-    const auto bufferSize = mNormals.mBlob.GetBufferSize();
-    uint32_t   numVector3;
-
-    if(MaskMatch(mFlags, S8_NORMAL))
-    {
-      DALI_ASSERT_ALWAYS(((mNormals.mBlob.mLength % (sizeof(int8_t) * 3) == 0) ||
-                          mNormals.mBlob.mStride >= (sizeof(int8_t) * 3)) &&
-                         "Normal buffer length not a multiple of element size");
-      numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(int8_t) * 3));
-    }
-    else if(MaskMatch(mFlags, S16_NORMAL))
-    {
-      DALI_ASSERT_ALWAYS(((mNormals.mBlob.mLength % (sizeof(int16_t) * 3) == 0) ||
-                          mNormals.mBlob.mStride >= (sizeof(int16_t) * 3)) &&
-                         "Normal buffer length not a multiple of element size");
-      numVector3 = static_cast<uint32_t>(bufferSize / (sizeof(int16_t) * 3));
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS(((mNormals.mBlob.mLength % sizeof(Vector3) == 0) ||
-                          mNormals.mBlob.mStride >= sizeof(Vector3)) &&
-                         "Normal buffer length not a multiple of element size");
-      numVector3 = static_cast<uint32_t>(bufferSize / sizeof(Vector3));
-    }
-
-    std::vector<uint8_t> buffer(bufferSize);
-
-    std::string path;
-    auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mNormals.mBufferIdx], path);
-    if(!ReadAccessor(mNormals, stream, buffer.data()))
-    {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read normals from '" << path << "'.";
-    }
-
-    GetDequantizedData(buffer, 3u, numVector3, mFlags & NORMALS_MASK, mNormals.mNormalized);
-
-    if(mNormals.mNormalized)
-    {
-      GetDequantizedMinMax(mNormals.mBlob.mMin, mNormals.mBlob.mMax, mFlags & NORMALS_MASK);
-    }
-
-    mNormals.mBlob.ApplyMinMax(numVector3, reinterpret_cast<float*>(buffer.data()));
-
-    raw.mAttribs.push_back({"aNormal", Property::VECTOR3, numVector3, std::move(buffer)});
-  }
-  else if(mNormals.mBlob.mLength != 0 && isTriangles)
-  {
-    DALI_ASSERT_DEBUG(mNormals.mBlob.mLength == mPositions.mBlob.GetBufferSize());
-    static const std::function<bool(RawData&)> GenerateNormalsFunction[2] =
-      {
-        GenerateNormals<false>,
-        GenerateNormals<true>,
-      };
-    const bool generateSuccessed = GenerateNormalsFunction[MaskMatch(mFlags, U32_INDICES)](raw);
-    if(!generateSuccessed)
-    {
-      DALI_LOG_ERROR("Failed to generate normal\n");
-    }
-    else
-    {
-      hasNormals = true;
-    }
-  }
-
-  if(!mTexCoords.empty() && mTexCoords[0].IsDefined())
-  {
-    auto& texCoords = mTexCoords[0];
-    const auto bufferSize = texCoords.mBlob.GetBufferSize();
-    uint32_t uvCount;
-
-    if(MaskMatch(mFlags, S8_TEXCOORD) || MaskMatch(mFlags, U8_TEXCOORD))
-    {
-      DALI_ASSERT_ALWAYS(((texCoords.mBlob.mLength % (sizeof(uint8_t) * 2) == 0) ||
-                          texCoords.mBlob.mStride >= (sizeof(uint8_t) * 2)) &&
-                         "TexCoords buffer length not a multiple of element size");
-      uvCount = static_cast<uint32_t>(bufferSize / (sizeof(uint8_t) * 2));
-    }
-    else if(MaskMatch(mFlags, S16_TEXCOORD) || MaskMatch(mFlags, U16_TEXCOORD))
-    {
-      DALI_ASSERT_ALWAYS(((texCoords.mBlob.mLength % (sizeof(uint16_t) * 2) == 0) ||
-                          texCoords.mBlob.mStride >= (sizeof(uint16_t) * 2)) &&
-                         "TexCoords buffer length not a multiple of element size");
-      uvCount = static_cast<uint32_t>(bufferSize / (sizeof(uint16_t) * 2));
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS(((texCoords.mBlob.mLength % sizeof(Vector2) == 0) ||
-                          texCoords.mBlob.mStride >= sizeof(Vector2)) &&
-                         "TexCoords buffer length not a multiple of element size");
-      uvCount = static_cast<uint32_t>(bufferSize / sizeof(Vector2));
-    }
-
-    std::vector<uint8_t> buffer(bufferSize);
-
-    std::string path;
-    auto&       stream = GetAvailableData(fileStream, meshPath, buffers[texCoords.mBufferIdx], path);
-    if(!ReadAccessor(texCoords, stream, buffer.data()))
-    {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read uv-s from '" << path << "'.";
-    }
-
-    GetDequantizedData(buffer, 2u, uvCount, mFlags & TEXCOORDS_MASK, texCoords.mNormalized);
-
-    if(MaskMatch(mFlags, FLIP_UVS_VERTICAL))
-    {
-      auto uv    = reinterpret_cast<Vector2*>(buffer.data());
-      auto uvEnd = uv + uvCount;
-      while(uv != uvEnd)
-      {
-        uv->y = 1.0f - uv->y;
-        ++uv;
-      }
-    }
-
-    if(texCoords.mNormalized)
-    {
-      GetDequantizedMinMax(texCoords.mBlob.mMin, texCoords.mBlob.mMax, mFlags & TEXCOORDS_MASK);
-    }
-
-    texCoords.mBlob.ApplyMinMax(static_cast<uint32_t>(uvCount), reinterpret_cast<float*>(buffer.data()));
-    raw.mAttribs.push_back({"aTexCoord", Property::VECTOR2, static_cast<uint32_t>(uvCount), std::move(buffer)});
-  }
-
-  if(mTangents.IsDefined())
-  {
-    const auto bufferSize = mTangents.mBlob.GetBufferSize();
-
-    uint32_t propertySize   = static_cast<uint32_t>((mTangentType == Property::VECTOR4) ? sizeof(Vector4) : sizeof(Vector3));
-    uint32_t componentCount = static_cast<uint32_t>(propertySize / sizeof(float));
-
-    uint32_t numTangents;
-
-    if(MaskMatch(mFlags, S8_TANGENT))
-    {
-      DALI_ASSERT_ALWAYS(((mTangents.mBlob.mLength % (sizeof(int8_t) * componentCount) == 0) ||
-                          mTangents.mBlob.mStride >= (sizeof(int8_t) * componentCount)) &&
-                         "Tangents buffer length not a multiple of element size");
-      numTangents = static_cast<uint32_t>(bufferSize / (sizeof(int8_t) * componentCount));
-    }
-    else if(MaskMatch(mFlags, S16_TANGENT))
-    {
-      DALI_ASSERT_ALWAYS(((mTangents.mBlob.mLength % (sizeof(int16_t) * componentCount) == 0) ||
-                          mTangents.mBlob.mStride >= (sizeof(int16_t) * componentCount)) &&
-                         "Tangents buffer length not a multiple of element size");
-      numTangents = static_cast<uint32_t>(bufferSize / (sizeof(int16_t) * componentCount));
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS(((mTangents.mBlob.mLength % propertySize == 0) ||
-                          mTangents.mBlob.mStride >= propertySize) &&
-                         "Tangents buffer length not a multiple of element size");
-      numTangents = static_cast<uint32_t>(bufferSize / propertySize);
-    }
-
-    std::vector<uint8_t> buffer(bufferSize);
-
-    std::string path;
-    auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mTangents.mBufferIdx], path);
-    if(!ReadAccessor(mTangents, stream, buffer.data()))
-    {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to read tangents from '" << path << "'.";
-    }
-
-    GetDequantizedData(buffer, componentCount, numTangents, mFlags & TANGENTS_MASK, mTangents.mNormalized);
-
-    if(mTangents.mNormalized)
-    {
-      GetDequantizedMinMax(mTangents.mBlob.mMin, mTangents.mBlob.mMax, mFlags & TANGENTS_MASK);
-    }
-
-    mTangents.mBlob.ApplyMinMax(numTangents, reinterpret_cast<float*>(buffer.data()));
-
-    raw.mAttribs.push_back({"aTangent", mTangentType, static_cast<uint32_t>(numTangents), std::move(buffer)});
-  }
-  else if(mTangents.mBlob.mLength != 0 && hasNormals && isTriangles)
-  {
-    DALI_ASSERT_DEBUG(mTangents.mBlob.mLength == mNormals.mBlob.GetBufferSize());
-    static const std::function<bool(RawData&)> GenerateTangentsFunction[2][2][2] =
-      {
-        {
-          {
-            GenerateTangents<false, false, false>,
-            GenerateTangents<false, false, true>,
-          },
-          {
-            GenerateTangents<false, true, false>,
-            GenerateTangents<false, true, true>,
-          },
-        },
-        {
-          {
-            GenerateTangents<true, false, false>,
-            GenerateTangents<true, false, true>,
-          },
-          {
-            GenerateTangents<true, true, false>,
-            GenerateTangents<true, true, true>,
-          },
-        }};
-    const bool hasUvs            = !mTexCoords.empty() && mTexCoords[0].IsDefined();
-    const bool generateSuccessed = GenerateTangentsFunction[MaskMatch(mFlags, U32_INDICES)][mTangentType == Property::VECTOR3][hasUvs](raw);
-    if(!generateSuccessed)
-    {
-      DALI_LOG_ERROR("Failed to generate tangents\n");
-    }
-  }
-
-  // Only support 1 vertex color
-  if(!mColors.empty() && mColors[0].IsDefined())
-  {
-    uint32_t       propertySize = mColors[0].mBlob.mElementSizeHint;
-    Property::Type propertyType = (propertySize == sizeof(Vector4)) ? Property::VECTOR4 : ((propertySize == sizeof(Vector3)) ? Property::VECTOR3 : Property::NONE);
-    if(propertyType != Property::NONE)
-    {
-      DALI_ASSERT_ALWAYS(((mColors[0].mBlob.mLength % propertySize == 0) ||
-                          mColors[0].mBlob.mStride >= propertySize) &&
-                         "Colors buffer length not a multiple of element size");
-      const auto           bufferSize = mColors[0].mBlob.GetBufferSize();
-      std::vector<uint8_t> buffer(bufferSize);
-
-      std::string path;
-      auto&       stream = GetAvailableData(fileStream, meshPath, buffers[mColors[0].mBufferIdx], path);
-      if(!ReadAccessor(mColors[0], stream, buffer.data()))
-      {
-        ExceptionFlinger(ASSERT_LOCATION) << "Failed to read colors from '" << path << "'.";
-      }
-      mColors[0].mBlob.ApplyMinMax(bufferSize / propertySize, reinterpret_cast<float*>(buffer.data()));
-
-      raw.mAttribs.push_back({"aVertexColor", propertyType, static_cast<uint32_t>(bufferSize / propertySize), std::move(buffer)});
-    }
-  }
-  else
-  {
-    std::vector<uint8_t> buffer(raw.mAttribs[0].mNumElements * sizeof(Vector4));
-    auto                 colors = reinterpret_cast<Vector4*>(buffer.data());
-
-    for(uint32_t i = 0; i < raw.mAttribs[0].mNumElements; i++)
-    {
-      colors[i] = Vector4::ONE;
-    }
-
-    raw.mAttribs.push_back({"aVertexColor", Property::VECTOR4, raw.mAttribs[0].mNumElements, std::move(buffer)});
-  }
+  LoadAccessorListInputs colorsInput = {raw, mColors, mFlags, fileStream, meshPath, buffers};
+  LoadColors(colorsInput);
 
   if(IsSkinned())
   {
-    int setIndex = 0;
-    for(auto& accessor : mJoints)
-    {
-      std::string        pathJoint;
-      auto&              streamJoint = GetAvailableData(fileStream, meshPath, buffers[accessor.mBufferIdx], pathJoint);
-      std::ostringstream jointName;
-      jointName << "aJoints" << setIndex;
-      ++setIndex;
-      ReadTypedJointAccessor(raw, mFlags, accessor, streamJoint, pathJoint, jointName.str());
-    }
-    setIndex = 0;
-    for(auto& accessor : mWeights)
-    {
-      std::string        pathWeight;
-      auto&              streamWeight = GetAvailableData(fileStream, meshPath, buffers[accessor.mBufferIdx], pathWeight);
-      std::ostringstream weightName;
-      weightName << "aWeights" << setIndex;
-      ++setIndex;
-      ReadTypedWeightAccessor(raw, mFlags, accessor, streamWeight, pathWeight, weightName.str());
-    }
+    LoadDataType           loadDataType = (MaskMatch(mFlags, MeshDefinition::U16_JOINT_IDS)) ? LoadDataType::UNSIGNED_SHORT : (MaskMatch(mFlags, MeshDefinition::U8_JOINT_IDS) ? LoadDataType::UNSIGNED_BYTE : LoadDataType::FLOAT);
+    LoadAccessorListInputs jointsInput  = {raw, mJoints, mFlags, fileStream, meshPath, buffers};
+    ReadTypedVectorAccessors<false>(jointsInput, loadDataType, "aJoints");
+
+    loadDataType                        = (MaskMatch(mFlags, MeshDefinition::U16_WEIGHT)) ? LoadDataType::UNSIGNED_SHORT : (MaskMatch(mFlags, MeshDefinition::U8_WEIGHT) ? LoadDataType::UNSIGNED_BYTE : LoadDataType::FLOAT);
+    LoadAccessorListInputs weightsInput = {raw, mWeights, mFlags, fileStream, meshPath, buffers};
+    ReadTypedVectorAccessors<true>(weightsInput, loadDataType, "aWeights");
   }
 
-  // Calculate the Blob for the blend shapes.
-  Blob blendShapesBlob;
-  blendShapesBlob.mOffset = std::numeric_limits<unsigned int>::max();
-  blendShapesBlob.mLength = 0u;
-
-  uint32_t totalTextureSize(0u);
-
-  auto processAccessor = [&](const Accessor& accessor, uint32_t vector3Size) {
-    if(accessor.IsDefined())
-    {
-      blendShapesBlob.mOffset = std::min(blendShapesBlob.mOffset, accessor.mBlob.mOffset);
-      blendShapesBlob.mLength += accessor.mBlob.mLength;
-
-      totalTextureSize += accessor.mBlob.mLength / vector3Size;
-    }
-  };
-
-  for(const auto& blendShape : mBlendShapes)
-  {
-    const auto positionMask = blendShape.mFlags & POSITIONS_MASK;
-    const auto normalMask   = blendShape.mFlags & NORMALS_MASK;
-    const auto tangentMask  = blendShape.mFlags & TANGENTS_MASK;
-
-    processAccessor(blendShape.deltas, MaskMatch(positionMask, S8_POSITION) ? sizeof(uint8_t) * 3 : (MaskMatch(positionMask, S16_POSITION) ? sizeof(uint16_t) * 3 : sizeof(Vector3)));
-    processAccessor(blendShape.normals, MaskMatch(normalMask, S8_NORMAL) ? sizeof(uint8_t) * 3 : (MaskMatch(normalMask, S16_NORMAL) ? sizeof(uint16_t) * 3 : sizeof(Vector3)));
-    processAccessor(blendShape.tangents, MaskMatch(tangentMask, S8_TANGENT) ? sizeof(uint8_t) * 3 : (MaskMatch(tangentMask, S16_TANGENT) ? sizeof(uint16_t) * 3 : sizeof(Vector3)));
-  }
-
-  if(HasBlendShapes())
-  {
-    // Calculate the size of one buffer inside the texture.
-    raw.mBlendShapeBufferOffset = numberOfVertices;
-
-    bool     calculateGltf2BlendShapes = false;
-    uint32_t textureWidth              = 0u;
-    uint32_t textureHeight             = 0u;
-
-    if(!mBlendShapeHeader.IsDefined())
-    {
-      CalculateTextureSize(totalTextureSize, textureWidth, textureHeight);
-      calculateGltf2BlendShapes = true;
-    }
-    else
-    {
-      uint16_t header[2u];
-      ReadBlob(mBlendShapeHeader, fileStream, reinterpret_cast<uint8_t*>(header));
-      textureWidth  = header[0u];
-      textureHeight = header[1u];
-    }
-
-    const uint32_t numberOfBlendShapes = mBlendShapes.size();
-    raw.mBlendShapeUnnormalizeFactor.Resize(numberOfBlendShapes);
-
-    Devel::PixelBuffer geometryPixelBuffer = Devel::PixelBuffer::New(textureWidth, textureHeight, Pixel::RGB32F);
-    uint8_t*           geometryBuffer      = geometryPixelBuffer.GetBuffer();
-
-    if(calculateGltf2BlendShapes)
-    {
-      CalculateGltf2BlendShapes(geometryBuffer, mBlendShapes, numberOfVertices, raw.mBlendShapeUnnormalizeFactor[0u], buffers);
-    }
-    else
-    {
-      Blob unnormalizeFactorBlob;
-      unnormalizeFactorBlob.mLength = static_cast<uint32_t>(sizeof(float) * ((BlendShapes::Version::VERSION_2_0 == mBlendShapeVersion) ? 1u : numberOfBlendShapes));
-
-      if(blendShapesBlob.IsDefined())
-      {
-        if(ReadBlob(blendShapesBlob, fileStream, geometryBuffer))
-        {
-          unnormalizeFactorBlob.mOffset = blendShapesBlob.mOffset + blendShapesBlob.mLength;
-        }
-      }
-
-      // Read the unnormalize factors.
-      if(unnormalizeFactorBlob.IsDefined())
-      {
-        ReadBlob(unnormalizeFactorBlob, fileStream, reinterpret_cast<uint8_t*>(&raw.mBlendShapeUnnormalizeFactor[0u]));
-      }
-    }
-    raw.mBlendShapeData = Devel::PixelBuffer::Convert(geometryPixelBuffer);
-  }
+  LoadBlendShapes(raw, mBlendShapes, mBlendShapeHeader, mBlendShapeVersion, numberOfVertices, fileStream, buffers);
 
   return raw;
 }
