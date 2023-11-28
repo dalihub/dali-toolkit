@@ -1,0 +1,49 @@
+//******************************************************************************
+//
+// Default debug image visual shader script for dali-toolkit
+// It will be used only if export DALI_DEBUG_IMAGE_VISUAL_SHADER=1
+//
+//******************************************************************************
+{
+  // Range of color rate for debug
+  "minimumColorRate": 0.2,
+  "maximumColorRate": "0.7",
+
+  // Logic for red. (It show if we use YUV image)
+  // We can use macro keyword was defined or not by ~~_BOOL value.
+  "redChannelCodes":
+  {
+    "triggerCode":
+    [
+      "return IS_REQUIRED_YUV_TO_RGB_BOOL;"
+    ],
+    "ratioCode": "return 1.0;"
+  },
+
+  // Logic for green. (It show if we use unified YUV and RGB shader)
+  "greenChannelCodes":
+  {
+    "triggerCode": "return IS_REQUIRED_UNIFIED_YUV_AND_RGB_BOOL;",
+    "ratioCode":
+    [
+      "return 1.0;"
+    ]
+  },
+
+  // Logic for blue. (It show when we use GPU masking)
+  // Note that we can seperate each line as array.
+  "blueChannelCodes":
+  {
+    "triggerCode":
+    [
+      "bool triggerReturn = IS_REQUIRED_ALPHA_MASKING_BOOL;",
+      "",
+      "return triggerReturn;"
+    ],
+    "ratioCode":
+    [
+      "mediump float alpha = originColor.a;",
+      "return step(0.5, alpha);"
+    ]
+  }
+}

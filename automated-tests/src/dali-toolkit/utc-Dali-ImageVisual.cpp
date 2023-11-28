@@ -25,6 +25,7 @@
 
 #include <toolkit-environment-variable.h>
 #include <toolkit-event-thread-callback.h>
+#include <toolkit-style-monitor.h>
 #include <toolkit-texture-upload-manager.h>
 #include <toolkit-timer.h>
 
@@ -73,6 +74,22 @@ const char* TEST_N_PATCH_IMAGE_FILE_NAME  = TEST_RESOURCE_DIR "/heartsframe.9.pn
 
 constexpr auto LOAD_IMAGE_YUV_PLANES_ENV         = "DALI_LOAD_IMAGE_YUV_PLANES";
 constexpr auto ENABLE_DECODE_JPEG_TO_YUV_420_ENV = "DALI_ENABLE_DECODE_JPEG_TO_YUV_420";
+
+constexpr auto DALI_DEBUG_IMAGE_VISUAL_SHADER_ENV = "DALI_DEBUG_IMAGE_VISUAL_SHADER";
+
+constexpr auto DALI_DEBUG_IMAGE_VISUAL_SHADER_SCRIPT_FILE_NAME_ENV = "DALI_DEBUG_IMAGE_VISUAL_SHADER_SCRIPT_FILE_NAME";
+
+const char* VALID_DEBUG_SHADER_SCRIPT =
+  "{\n"
+  "  \"maximumColorRate\": 0.5,\n"
+  "  \"redChannelCodes\":\n"
+  "  {\n"
+  "    \"triggerCode\":[\"return\",\" false;\"],\n"
+  "    \"ratioCode\":\"return 0.0;\"\n"
+  "  }\n"
+  "}\n";
+
+constexpr std::string_view THROW_EXCEPTION_STYLE_FILE_NAME = "throwException";
 
 bool             gResourceReadySignalFired = false;
 std::vector<int> gReadyIds                 = {};
@@ -3982,6 +3999,141 @@ int UtcDaliImageVisualLoadFastTrackImagePlanes02(void)
 
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualDebugImageVisualShaderP1(void)
+{
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_IMAGE_VISUAL_SHADER_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_IMAGE_VISUAL_SHADER_SCRIPT_FILE_NAME_ENV, "validFile"); // Try to load not exist file.
+
+  // Set valid script file
+  Test::StyleMonitor::SetThemeFileOutput("validFile", VALID_DEBUG_SHADER_SCRIPT);
+
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualDebugImageVisualShaderN1(void)
+{
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_IMAGE_VISUAL_SHADER_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_IMAGE_VISUAL_SHADER_SCRIPT_FILE_NAME_ENV, "notJsonFile"); // Try to load exist file, but not a json
+
+  // Set invalid script file
+  Test::StyleMonitor::SetThemeFileOutput("notJsonFile", "1");
+
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualDebugImageVisualShaderN2(void)
+{
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_IMAGE_VISUAL_SHADER_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_IMAGE_VISUAL_SHADER_SCRIPT_FILE_NAME_ENV, std::string(THROW_EXCEPTION_STYLE_FILE_NAME).c_str()); // Try to load file that throw some exception
+
+  // Set throw exception script file
+  Test::StyleMonitor::SetThemeFileOutput(std::string(THROW_EXCEPTION_STYLE_FILE_NAME), "1");
+
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 1, TEST_LOCATION);
 
   END_TEST;
 }
