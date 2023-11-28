@@ -1034,6 +1034,50 @@ int UtcDaliSceneViewColorMode(void)
   END_TEST;
 }
 
+int UtcDaliSceneViewSetResolution(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  application.GetScene().Add(view);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+
+  DALI_TEST_EQUALS(view.GetResolutionWidth(), 100u, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResolutionHeight(), 100u, TEST_LOCATION);
+
+  view.SetResolution(200u, 200u);
+
+  DALI_TEST_EQUALS(view.GetResolutionWidth(), 100u, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResolutionHeight(), 100u, TEST_LOCATION);
+
+  view.UseFramebuffer(true);
+
+  DALI_TEST_EQUALS(view.GetResolutionWidth(), 200u, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResolutionHeight(), 200u, TEST_LOCATION);
+
+  view.SetResolution(300u, 0u);
+
+  DALI_TEST_EQUALS(view.GetResolutionWidth(), 100u, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResolutionHeight(), 100u, TEST_LOCATION);
+
+  view.SetResolution(300u, 400u);
+
+  DALI_TEST_EQUALS(view.GetResolutionWidth(), 300u, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResolutionHeight(), 400u, TEST_LOCATION);
+
+  view.ResetResolution();
+
+  DALI_TEST_EQUALS(view.GetResolutionWidth(), 100u, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResolutionHeight(), 100u, TEST_LOCATION);
+
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(400, 400));
+
+  DALI_TEST_EQUALS(view.GetResolutionWidth(), 400u, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResolutionHeight(), 400u, TEST_LOCATION);
+
+  END_TEST;
+}
+
 namespace
 {
 const char* TEST_MASK_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/mask.png";
