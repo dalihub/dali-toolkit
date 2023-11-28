@@ -181,6 +181,26 @@ public:
   bool IsUsingFramebuffer() const;
 
   /**
+   * @copydoc SceneView::SetResolution()
+   */
+  void SetResolution(uint32_t width, uint32_t height);
+
+  /**
+   * @copydoc SceneView::GetResolutionWidth()
+   */
+  uint32_t GetResolutionWidth();
+
+  /**
+   * @copydoc SceneView::GetResolutionHeight()
+   */
+  uint32_t GetResolutionHeight();
+
+  /**
+   * @copydoc SceneView::ResetResolution()
+   */
+  void ResetResolution();
+
+  /**
    * @copydoc SceneView::SetFramebufferMultiSamplingLevel()
    */
   void SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel);
@@ -424,6 +444,10 @@ private:
   Quaternion                                     mSkyboxOrientation;
   float                                          mSkyboxIntensity{1.0f};
   uint8_t                                        mFrameBufferMultiSamplingLevel{0u};
+
+  bool mWindowSizeChanged{false};
+  uint32_t mWindowWidth{0};
+  uint32_t mWindowHeight{0};
 
   // Masking
   std::string mAlphaMaskUrl;
