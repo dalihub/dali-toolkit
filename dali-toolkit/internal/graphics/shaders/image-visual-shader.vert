@@ -1,6 +1,6 @@
 INPUT mediump vec2 aPosition;
 OUTPUT mediump vec2 vTexCoord;
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+#if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 OUTPUT mediump vec2 vPosition;
 OUTPUT mediump vec2 vRectSize;
 OUTPUT mediump vec2 vOptRectSize;
@@ -14,7 +14,7 @@ uniform highp mat4 uMvpMatrix;
 uniform highp vec3 uSize;
 uniform mediump vec4 pixelArea;
 
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+#if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 // Be used when we calculate anti-alias range near 1 pixel.
 uniform highp vec3 uScale;
 #endif
@@ -45,7 +45,7 @@ vec4 ComputeVertexPosition()
   vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw) + extraSize;
   vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
 
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+#if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
   vRectSize = visualSize * 0.5;
   vOptRectSize = vRectSize;
 
@@ -86,7 +86,7 @@ vec4 ComputeVertexPosition()
 #ifdef IS_REQUIRED_BORDERLINE
   vPosition = aPosition * (visualSize + outerBorderlineSize + vertexMargin);
   vOptRectSize -= (borderlineWidth - outerBorderlineSize * 0.5) + 1.0;
-#elif defined(IS_REQUIRED_ROUNDED_CORNER)
+#elif defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER)
   vPosition = aPosition * (visualSize + vertexMargin);
 #else
   mediump vec2 vPosition = aPosition * visualSize;

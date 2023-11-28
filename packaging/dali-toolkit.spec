@@ -275,6 +275,9 @@ cp -r dali-toolkit/styles/1920x1080_rpi/* %{buildroot}%{dali_toolkit_style_files
 
 # Copy default feedback theme
 cp dali-toolkit/styles/default-feedback-theme.json %{buildroot}%{dali_toolkit_style_files}
+
+# Copy default debug image visual shader script
+cp dali-toolkit/styles/debug-image-visual-shader-script.json %{buildroot}%{dali_toolkit_style_files}
 popd
 
 ##############################
@@ -494,6 +497,7 @@ esac
 %{dali_toolkit_image_files}/*
 %{dali_toolkit_sound_files}/*
 %{dali_toolkit_style_files}/360x360/*
+%{dali_toolkit_style_files}/debug-image-visual-shader-script.json
 %{dali_toolkit_style_files}/default-feedback-theme.json
 %{_datadir}/locale/*/LC_MESSAGES/*
 
@@ -503,6 +507,7 @@ esac
 %{dali_toolkit_image_files}/*
 %{dali_toolkit_sound_files}/*
 %{dali_toolkit_style_files}/480x800/*
+%{dali_toolkit_style_files}/debug-image-visual-shader-script.json
 %{dali_toolkit_style_files}/default-feedback-theme.json
 %{_datadir}/locale/*/LC_MESSAGES/*
 
@@ -512,6 +517,7 @@ esac
 %{dali_toolkit_image_files}/*
 %{dali_toolkit_sound_files}/*
 %{dali_toolkit_style_files}/720x1280/*
+%{dali_toolkit_style_files}/debug-image-visual-shader-script.json
 %{dali_toolkit_style_files}/default-feedback-theme.json
 %{_datadir}/locale/*/LC_MESSAGES/*
 
@@ -521,6 +527,7 @@ esac
 %{dali_toolkit_image_files}/*
 %{dali_toolkit_sound_files}/*
 %{dali_toolkit_style_files}/1920x1080/*
+%{dali_toolkit_style_files}/debug-image-visual-shader-script.json
 %{dali_toolkit_style_files}/default-feedback-theme.json
 %{_datadir}/locale/*/LC_MESSAGES/*
 
@@ -530,6 +537,7 @@ esac
 %{dali_toolkit_image_files}/*
 %{dali_toolkit_sound_files}/*
 %{dali_toolkit_style_files}/1920x1080_rpi/*
+%{dali_toolkit_style_files}/debug-image-visual-shader-script.json
 %{dali_toolkit_style_files}/default-feedback-theme.json
 %{_datadir}/locale/*/LC_MESSAGES/*
 
