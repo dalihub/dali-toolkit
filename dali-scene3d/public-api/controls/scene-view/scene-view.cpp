@@ -132,6 +132,26 @@ bool SceneView::IsUsingFramebuffer() const
   return GetImpl(*this).IsUsingFramebuffer();
 }
 
+void SceneView::SetResolution(uint32_t width, uint32_t height)
+{
+  GetImpl(*this).SetResolution(width, height);
+}
+
+uint32_t SceneView::GetResolutionWidth()
+{
+  return GetImpl(*this).GetResolutionWidth();
+}
+
+uint32_t SceneView::GetResolutionHeight()
+{
+  return GetImpl(*this).GetResolutionHeight();
+}
+
+void SceneView::ResetResolution()
+{
+  GetImpl(*this).ResetResolution();
+}
+
 void SceneView::SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel)
 {
   GetImpl(*this).SetFramebufferMultiSamplingLevel(multiSamplingLevel);

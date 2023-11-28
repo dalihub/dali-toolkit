@@ -709,6 +709,43 @@ bool SceneView::IsUsingFramebuffer() const
   return mUseFrameBuffer;
 }
 
+void SceneView::SetResolution(uint32_t width, uint32_t height)
+{
+  if(mWindowWidth != width || mWindowHeight != height)
+  {
+    mWindowWidth  = width;
+    mWindowHeight = height;
+    if(mUseFrameBuffer)
+    {
+      mWindowSizeChanged = true;
+      UpdateRenderTask();
+    }
+  }
+}
+
+uint32_t SceneView::GetResolutionWidth()
+{
+  if(!mUseFrameBuffer || mWindowWidth == 0u || mWindowHeight == 0u)
+  {
+    return static_cast<uint32_t>(Self().GetProperty<float>(Dali::Actor::Property::SIZE_WIDTH));
+  }
+  return mWindowWidth;
+}
+
+uint32_t SceneView::GetResolutionHeight()
+{
+  if(!mUseFrameBuffer || mWindowWidth == 0u || mWindowHeight == 0u)
+  {
+    return static_cast<uint32_t>(Self().GetProperty<float>(Dali::Actor::Property::SIZE_HEIGHT));
+  }
+  return mWindowHeight;
+}
+
+void SceneView::ResetResolution()
+{
+  SetResolution(0u, 0u);
+}
+
 void SceneView::SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel)
 {
   if(mFrameBufferMultiSamplingLevel != multiSamplingLevel)
@@ -1080,27 +1117,31 @@ void SceneView::UpdateRenderTask()
     }
 
     Vector3     size        = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-    const float aspectRatio = size.width / size.height;
-    mSelectedCamera.SetAspectRatio(aspectRatio);
+    float aspectRatio = size.width / size.height;
 
     uint32_t shadowMapBufferSize = std::min(static_cast<uint32_t>(std::max(size.width, size.height)), MAXIMUM_SIZE_SHADOW_MAP);
     UpdateShadowMapBuffer(shadowMapBufferSize);
 
     if(mUseFrameBuffer)
     {
+      uint32_t width  = (mWindowWidth == 0 || mWindowHeight == 0) ? static_cast<uint32_t>(size.width) : mWindowWidth;
+      uint32_t height = (mWindowWidth == 0 || mWindowHeight == 0) ? static_cast<uint32_t>(size.height) : mWindowHeight;
+      aspectRatio     = static_cast<float>(width) / static_cast<float>(height);
+
       Dali::FrameBuffer currentFrameBuffer = mRenderTask.GetFrameBuffer();
       if(!currentFrameBuffer ||
          !Dali::Equals(currentFrameBuffer.GetColorTexture().GetWidth(), size.width) ||
          !Dali::Equals(currentFrameBuffer.GetColorTexture().GetHeight(), size.height) ||
-         mMaskingPropertyChanged)
+         mMaskingPropertyChanged ||
+         mWindowSizeChanged)
       {
         mRootLayer.SetProperty(Dali::Actor::Property::COLOR_MODE, ColorMode::USE_OWN_COLOR);
         mRenderTask.ResetViewportGuideActor();
         mRenderTask.SetViewport(Dali::Viewport(Vector4::ZERO));
 
         // create offscreen buffer of new size to render our child actors to
-        mTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(size.width), unsigned(size.height));
-        mFrameBuffer = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
+        mTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+        mFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
         mFrameBuffer.AttachColorTexture(mTexture);
         DevelFrameBuffer::SetMultiSamplingLevel(mFrameBuffer, mFrameBufferMultiSamplingLevel);
         Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(mFrameBuffer, 0u);
@@ -1119,6 +1160,7 @@ void SceneView::UpdateRenderTask()
           imagePropertyMap.Insert(Toolkit::DevelImageVisual::Property::MASKING_TYPE, Toolkit::DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
         }
         mMaskingPropertyChanged = false;
+
         mVisual = Toolkit::VisualFactory::Get().CreateVisual(imagePropertyMap);
         Self().RegisterProperty("uYFlipMaskTexture", 1.0f);
 
@@ -1127,6 +1169,9 @@ void SceneView::UpdateRenderTask()
         mRenderTask.SetFrameBuffer(mFrameBuffer);
         mRenderTask.SetClearEnabled(true);
         mRenderTask.SetClearColor(Color::TRANSPARENT);
+
+        mMaskingPropertyChanged = false;
+        mWindowSizeChanged = false;
       }
     }
     else
@@ -1146,6 +1191,8 @@ void SceneView::UpdateRenderTask()
         mTexture.Reset();
       }
     }
+
+    mSelectedCamera.SetAspectRatio(aspectRatio);
 
     RotateCamera();
   }

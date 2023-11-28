@@ -369,6 +369,37 @@ public:
   bool IsUsingFramebuffer() const;
 
   /**
+   * @brief Sets SceneView's resolution manually.
+   * @note This manual resolution is only available when the SceneView uses FBO for rendering by using UseFrameBuffer(true).
+   * @note If the aspect ratio of input width/height is different with SceneView's aspect ratio, the rendered result is stretched to fill SceneView's area.
+   *
+   * @param[in] width The input width.
+   * @param[in] height The input height.
+   */
+  void SetResolution(uint32_t width, uint32_t height);
+
+  /**
+   * @brief Retrieves width of resolution of the SceneView.
+   * @note If the SceneView not uses FBO, this method returns SceneView's width.
+   *
+   * @return Width value of resolution of the SceneView.
+   */
+  uint32_t GetResolutionWidth();
+
+  /**
+   * @brief Retrieves height of resolution of the SceneView.
+   * @note If the SceneView not uses FBO, this method returns SceneView's height.
+   *
+   * @return Height value of resolution of the SceneView.
+   */
+  uint32_t GetResolutionHeight();
+
+  /**
+   * @brief Resets SceneView's resolution to the current size of SceneView.
+   */
+  void ResetResolution();
+
+  /**
    * @brief Sets Multisampling level when we use Framebuffer.
    * Default is 0.
    *
