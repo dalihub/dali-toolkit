@@ -42,6 +42,7 @@
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/text-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -51,6 +52,7 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+
 
 namespace Dali
 {
@@ -75,6 +77,18 @@ DALI_TYPE_REGISTRATION_BEGIN_CREATE(Toolkit::VisualFactory, Dali::BaseHandle, Cr
 DALI_TYPE_REGISTRATION_END()
 const char* const BROKEN_IMAGE_FILE_NAME = "broken.png"; ///< The file name of the broken image.
 
+static constexpr auto          SHADER_TYPE_COUNT = 2u;
+const std::string_view VertexPredefines[SHADER_TYPE_COUNT]
+{
+  "", //VisualFactoryCache::COLOR_SHADER
+  "#define IS_REQUIRED_ROUNDED_CORNER\n", //VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
+};
+const std::string_view FragmentPredefines[SHADER_TYPE_COUNT]
+{
+  "", //VisualFactoryCache::COLOR_SHADER
+  "#define IS_REQUIRED_ROUNDED_CORNER\n", //VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
+};
+
 } // namespace
 
 VisualFactory::VisualFactory(bool debugEnabled)
@@ -84,7 +98,8 @@ VisualFactory::VisualFactory(bool debugEnabled)
   mSlotDelegate(this),
   mIdleCallback(nullptr),
   mDebugEnabled(debugEnabled),
-  mPreMultiplyOnLoad(true)
+  mPreMultiplyOnLoad(true),
+  mPrecompiledShaderRequested(false)
 {
 }
 
@@ -393,6 +408,37 @@ void VisualFactory::DiscardVisual(Toolkit::Visual::Base visual)
   RegisterDiscardCallback();
 }
 
+void VisualFactory::UsePreCompiledShader()
+{
+  if(mPrecompiledShaderRequested)
+  {
+    return;
+  }
+  mPrecompiledShaderRequested = true;
+
+  ShaderPreCompiler::Get().Enable();
+
+  // Get image shader
+  std::vector<RawShaderData> rawShaderList;
+  RawShaderData imageShaderData;
+  GetImageVisualShaderFactory().GetPreCompiledShader(imageShaderData);
+  rawShaderList.push_back(imageShaderData);
+
+  // Get text shader
+  RawShaderData textShaderData;
+  GetTextVisualShaderFactory().GetPreCompiledShader(textShaderData);
+  rawShaderList.push_back(textShaderData);
+
+  // Get color shader
+  RawShaderData colorShaderData;
+  GetPreCompiledShader(colorShaderData);
+  rawShaderList.push_back(colorShaderData);
+
+
+  // Save all shader
+  ShaderPreCompiler::Get().SavePreCompileShaderList(rawShaderList);
+}
+
 Internal::TextureManager& VisualFactory::GetTextureManager()
 {
   return GetFactoryCache().GetTextureManager();
@@ -418,6 +464,26 @@ void VisualFactory::SetBrokenImageUrl(Toolkit::StyleManager& styleManager)
   mFactoryCache->SetBrokenImageUrl(brokenImageUrl, customBrokenImageUrlList);
 }
 
+void VisualFactory::GetPreCompiledShader(RawShaderData& shaders)
+{
+  std::vector<std::string_view> vertexPrefix;
+  std::vector<std::string_view> fragmentPrefix;
+  int shaderCount = 0;
+  shaders.shaderCount = 0;
+  for(uint32_t i=0u; i< SHADER_TYPE_COUNT; ++i)
+  {
+    vertexPrefix.push_back(VertexPredefines[i]);
+    fragmentPrefix.push_back(FragmentPredefines[i]);
+    shaderCount++;
+  }
+
+  shaders.vertexPrefix = vertexPrefix;
+  shaders.fragmentPrefix = fragmentPrefix;
+  shaders.vertexShader = SHADER_COLOR_VISUAL_SHADER_VERT;
+  shaders.fragmentShader = SHADER_COLOR_VISUAL_SHADER_FRAG;
+  shaders.shaderCount = shaderCount;
+}
+
 Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
 {
   if(!mFactoryCache)
@@ -431,6 +497,7 @@ Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
     }
     SetBrokenImageUrl(styleManager);
   }
+
   return *mFactoryCache;
 }
 
