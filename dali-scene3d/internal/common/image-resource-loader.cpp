@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
+#include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
@@ -31,6 +32,7 @@
 #include <dali/public-api/signals/connection-tracker.h>
 
 #include <functional> ///< for std::function
+#include <memory> ///< for std::shared_ptr
 #include <mutex>
 #include <string>
 #include <utility> ///< for std::pair
@@ -172,6 +174,10 @@ Dali::Texture CreateCubeTextureFromPixelDataList(const std::vector<std::vector<D
 
   return texture;
 }
+
+// Forward declare, for signal connection.
+void DestroyCacheImpl();
+
 class CacheImpl : public Dali::ConnectionTracker
 {
 public:
@@ -193,6 +199,10 @@ public:
     mDestroyed{false},
     mFullCollectRequested{false}
   {
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Create CacheImpl\n");
+
+    // We should create CacheImpl at main thread, To ensure delete this cache impl
+    Dali::LifecycleController::Get().TerminateSignal().Connect(DestroyCacheImpl);
   }
 
   /**
@@ -200,6 +210,7 @@ public:
    */
   ~CacheImpl()
   {
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Destroy CacheImpl\n");
     {
       mDataMutex.lock();
 
@@ -398,7 +409,7 @@ public: // Called by main thread.
    */
   void RequestGarbageCollect(bool fullCollect)
   {
-    if(DALI_LIKELY(!mDestroyed && Dali::Adaptor::IsAvailable()))
+    if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
     {
       if(!mTimer)
       {
@@ -456,20 +467,18 @@ private: // Called by main thread
   {
     bool continueTimer = false;
 
-    if(DALI_LIKELY(!mDestroyed))
-    {
-      // Try to collect Texture GC first, due to the reference count of pixelData who become key of textures.
-      // After all texture GC finished, then check PixelData cache.
-      uint32_t checkedCount = 0u;
-      // GC Cube Texture
-      continueTimer |= CollectGarbages<false>(mCubeTextureCache, fullCollect, mCubeTextureContainerUpdated, mLatestCollectedCubeTextureIter, checkedCount);
+    // Try to collect Texture GC first, due to the reference count of pixelData who become key of textures.
+    // After all texture GC finished, then check PixelData cache.
+    uint32_t checkedCount = 0u;
 
-      // GC Texture
-      continueTimer |= CollectGarbages<false>(mTextureCache, fullCollect, mTextureContainerUpdated, mLatestCollectedTextureIter, checkedCount);
+    // GC Cube Texture
+    continueTimer |= CollectGarbages<false>(mCubeTextureCache, fullCollect, mCubeTextureContainerUpdated, mLatestCollectedCubeTextureIter, checkedCount);
 
-      // GC PixelData. We should lock mutex during GC pixelData.
-      continueTimer |= CollectGarbages<true>(mPixelDataCache, fullCollect, mPixelDataContainerUpdated, mLatestCollectedPixelDataIter, checkedCount);
-    }
+    // GC Texture
+    continueTimer |= CollectGarbages<false>(mTextureCache, fullCollect, mTextureContainerUpdated, mLatestCollectedTextureIter, checkedCount);
+
+    // GC PixelData. We should lock mutex during GC pixelData.
+    continueTimer |= CollectGarbages<true>(mPixelDataCache, fullCollect, mPixelDataContainerUpdated, mLatestCollectedPixelDataIter, checkedCount);
 
     return continueTimer;
   }
@@ -496,10 +505,20 @@ private:
   bool mFullCollectRequested : 1;
 };
 
-CacheImpl& GetCacheImpl()
+static std::shared_ptr<CacheImpl> gCacheImpl{nullptr};
+
+std::shared_ptr<CacheImpl> GetCacheImpl()
 {
-  static CacheImpl gCacheImpl;
+  if(DALI_UNLIKELY(!gCacheImpl))
+  {
+    gCacheImpl = std::make_shared<CacheImpl>();
+  }
   return gCacheImpl;
+}
+
+void DestroyCacheImpl()
+{
+  gCacheImpl.reset();
 }
 
 } // namespace
@@ -529,17 +548,22 @@ Dali::Texture GetEmptyTextureWhiteRGB()
 
 Dali::Texture GetCachedTexture(Dali::PixelData pixelData, bool mipmapRequired)
 {
-  return GetCacheImpl().GetOrCreateCachedTexture(pixelData, mipmapRequired);
+  return GetCacheImpl()->GetOrCreateCachedTexture(pixelData, mipmapRequired);
 }
 
 Dali::Texture GetCachedCubeTexture(const std::vector<std::vector<Dali::PixelData>>& pixelDataList, bool mipmapRequired)
 {
-  return GetCacheImpl().GetOrCreateCachedCubeTexture(pixelDataList, mipmapRequired);
+  return GetCacheImpl()->GetOrCreateCachedCubeTexture(pixelDataList, mipmapRequired);
 }
 
 void RequestGarbageCollect(bool fullCollect)
 {
-  GetCacheImpl().RequestGarbageCollect(fullCollect);
+  GetCacheImpl()->RequestGarbageCollect(fullCollect);
+}
+
+void EnsureResourceLoaderCreated()
+{
+  GetCacheImpl();
 }
 
 // Can be called by worker thread.
@@ -555,7 +579,15 @@ Dali::PixelData GetCachedPixelData(const std::string& url,
                                    bool               orientationCorrection)
 {
   ImageInformation info(url, dimensions, fittingMode, samplingMode, orientationCorrection);
-  return GetCacheImpl().GetOrCreateCachedPixelData(info);
+  if(gCacheImpl == nullptr)
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "CacheImpl not prepared! load PixelData without cache.\n");
+    return CreatePixelDataFromImageInfo(info, false);
+  }
+  else
+  {
+    return GetCacheImpl()->GetOrCreateCachedPixelData(info);
+  }
 }
 } // namespace ImageResourceLoader
 } // namespace Dali::Scene3D::Internal
