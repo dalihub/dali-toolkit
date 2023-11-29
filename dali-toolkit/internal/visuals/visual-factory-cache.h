@@ -19,7 +19,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
-#include <dali/integration-api/shader-precompiler.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/geometry.h>
