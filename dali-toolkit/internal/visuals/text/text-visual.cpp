@@ -276,7 +276,7 @@ void TextVisual::OnInitialize()
 
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
-  mHasMultipleTextColorsIndex = mImpl->mRenderer.RegisterUniqueProperty("uHasMultipleTextColors", static_cast<float>(false));
+  mHasMultipleTextColorsIndex = mImpl->mRenderer.RegisterUniqueProperty("uHasMultipleTextColors", false);
 }
 
 void TextVisual::DoSetProperties(const Property::Map& propertyMap)
