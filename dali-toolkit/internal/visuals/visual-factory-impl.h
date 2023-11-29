@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/integration-api/adaptor-framework/shader-precompiler.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
@@ -91,6 +92,11 @@ public:
   void DiscardVisual(Toolkit::Visual::Base visual);
 
   /**
+   * @copydoc Toolkit::VisualFactory::UsePreCompiledShader()
+   */
+  void UsePreCompiledShader();
+
+  /**
    * @return the reference to texture manager
    */
   Internal::TextureManager& GetTextureManager();
@@ -107,6 +113,12 @@ private:
    * @param[in] styleManager The instance of StyleManager
    */
   void SetBrokenImageUrl(Toolkit::StyleManager& styleManager);
+
+  /**
+   * @brief Get the default shader source.
+   * @param[in] shaders shaderList for precompile
+   */
+  void GetPreCompiledShader(RawShaderData& shaders);
 
   /**
    * Get the factory cache, creating it if necessary.
@@ -143,12 +155,11 @@ private:
   std::unique_ptr<TextVisualShaderFactory>  mTextVisualShaderFactory;
   SlotDelegate<VisualFactory>               mSlotDelegate;
   CallbackBase*                             mIdleCallback;
-
   using DiscardedVisualContainer = std::vector<Toolkit::Visual::Base>;
   DiscardedVisualContainer mDiscardedVisuals{};
-
-  bool mDebugEnabled : 1;
-  bool mPreMultiplyOnLoad : 1; ///< Local store for this flag
+  bool                                      mDebugEnabled : 1;
+  bool                                      mPreMultiplyOnLoad : 1; ///< Local store for this flag
+  bool                                      mPrecompiledShaderRequested : 1;
 };
 
 /**

@@ -33,6 +33,8 @@ namespace Scene3D
 {
 namespace Loader
 {
+const Matrix3 TextureDefinition::DEFAULT_TRANSFORM = Matrix3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+
 namespace
 {
 constexpr SamplerFlags::Type FILTER_MODES_FROM_DALI[]{
@@ -152,27 +154,30 @@ Sampler SamplerFlags::MakeSampler(Type flags)
   return sampler;
 }
 
-TextureDefinition::TextureDefinition(const std::string& imageUri, SamplerFlags::Type samplerFlags, ImageDimensions minImageDimensions, SamplingMode::Type samplingMode)
+TextureDefinition::TextureDefinition(const std::string& imageUri, SamplerFlags::Type samplerFlags, ImageDimensions minImageDimensions, SamplingMode::Type samplingMode, Matrix3 transform)
 : mImageUri(imageUri),
   mSamplerFlags(samplerFlags),
   mMinImageDimensions(minImageDimensions),
-  mSamplingMode(samplingMode)
+  mSamplingMode(samplingMode),
+  mTransform(transform)
 {
 }
 
-TextureDefinition::TextureDefinition(std::string&& imageUri, SamplerFlags::Type samplerFlags, ImageDimensions minImageDimensions, SamplingMode::Type samplingMode)
+TextureDefinition::TextureDefinition(std::string&& imageUri, SamplerFlags::Type samplerFlags, ImageDimensions minImageDimensions, SamplingMode::Type samplingMode, Matrix3 transform)
 : mImageUri(std::move(imageUri)),
   mSamplerFlags(samplerFlags),
   mMinImageDimensions(minImageDimensions),
-  mSamplingMode(samplingMode)
+  mSamplingMode(samplingMode),
+  mTransform(transform)
 {
 }
 
-TextureDefinition::TextureDefinition(std::vector<uint8_t>&& textureBuffer, SamplerFlags::Type samplerFlags, ImageDimensions minImageDimensions, SamplingMode::Type samplingMode)
+TextureDefinition::TextureDefinition(std::vector<uint8_t>&& textureBuffer, SamplerFlags::Type samplerFlags, ImageDimensions minImageDimensions, SamplingMode::Type samplingMode, Matrix3 transform)
 : mImageUri(),
   mSamplerFlags(samplerFlags),
   mMinImageDimensions(minImageDimensions),
   mSamplingMode(samplingMode),
+  mTransform(transform),
   mTextureBuffer(std::move(textureBuffer))
 {
 }

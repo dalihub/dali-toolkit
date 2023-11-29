@@ -679,6 +679,14 @@ void Material::SetRendererUniform(Dali::Renderer renderer)
   renderer.RegisterProperty("uSpecularFactor", mTextureInformations[TextureIndex::SPECULAR].mFactor.x);
   renderer.RegisterProperty("uSpecularColorFactor", Vector3(mTextureInformations[TextureIndex::SPECULAR_COLOR].mFactor));
 
+  // No requirement to use texture transform for runtime generated models.
+  renderer.RegisterProperty("uBaseColorTextureTransformAvailable", 0.0f);
+  renderer.RegisterProperty("uNormalTextureTransformAvailable", 0.0f);
+  renderer.RegisterProperty("uNormalRoughnessTextureTransformAvailable", 0.0f);
+  renderer.RegisterProperty("uMetalRoughnessTextureTransformAvailable", 0.0f);
+  renderer.RegisterProperty("uOcclusionTextureTransformAvailable", 0.0f);
+  renderer.RegisterProperty("uEmissiveTextureTransformAvailable", 0.0f);
+
   float opaque = mIsOpaque ? 1.0f : 0.0f;
   float mask   = mIsMask ? 1.0f : 0.0f;
   renderer.RegisterProperty("uOpaque", opaque);
@@ -752,8 +760,7 @@ void Material::NotifyObserver()
     mObserverNotifying = false;
 
     // Resolve observer queue during notify
-    mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(), [](auto& e)
-                                    { return !e.second; }),
+    mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(), [](auto& e) { return !e.second; }),
                      mObservers.end());
   }
 }

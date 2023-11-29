@@ -310,6 +310,10 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
       shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::SKINNING);
       shaderOption.AddJointMacros(mNumberOfJointSets);
     }
+    else
+    {
+      shaderOption.AddJointMacros(0);
+    }
     if(mHasVertexColor)
     {
       shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::COLOR_ATTRIBUTE);
@@ -344,13 +348,13 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
       {
         Property::Map oldMap = GetMap(mShader);
         DALI_LOG_WRITE_FILE(tmpFilename("oldShader", ".txt"), "Vertex Shader:\n"
-                            << oldMap["vertex"] << "\n\nFragmentShader: " << oldMap["fragment"] << "\n");
+                                                                << oldMap["vertex"] << "\n\nFragmentShader: " << oldMap["fragment"] << "\n");
       }
       if(newShader)
       {
         Property::Map newMap = GetMap(newShader);
         DALI_LOG_WRITE_FILE(tmpFilename("newShader", ".txt"), "Vertex Shader:\n"
-                            << newMap["vertex"] << "\n\nFragmentShader: " << newMap["fragment"] << "\n");
+                                                                << newMap["vertex"] << "\n\nFragmentShader: " << newMap["fragment"] << "\n");
       }
 #endif
     }
