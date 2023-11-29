@@ -118,10 +118,6 @@ ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinit
     option.AddOption(ShaderOption::Type::SKINNING);
     option.AddJointMacros(meshDef.mJoints.size());
   }
-  else
-  {
-    option.AddJointMacros(0);
-  }
 
   if(MaskMatch(meshDef.mFlags, MeshDefinition::FLIP_UVS_VERTICAL))
   {

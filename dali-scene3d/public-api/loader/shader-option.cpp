@@ -117,11 +117,6 @@ void ShaderOption::AddJointMacros(size_t numberOfJointSets)
     AddMacroDefinition(ADD_EXTRA_SKINNING_ATTRIBUTES, attributes.str());
     AddMacroDefinition(ADD_EXTRA_WEIGHTS, weights.str());
   }
-  else
-  {
-    AddMacroDefinition(ADD_EXTRA_SKINNING_ATTRIBUTES, std::string{});
-    AddMacroDefinition(ADD_EXTRA_WEIGHTS, std::string{});
-  }
 }
 
 void ShaderOption::AddMacroDefinition(std::string macro, std::string definition)

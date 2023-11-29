@@ -91,33 +91,20 @@ void ApplyDefine(std::string& shaderCode, const std::string& definevar)
 
 void RedefineMacro(std::string& shaderCode, const std::string& macro, const std::string& value)
 {
-  if(!value.empty())
+  std::string definition = "#define " + macro;
+  std::size_t found      = shaderCode.find(definition);
+  if(found != std::string::npos)
   {
-    std::string definition = "#define " + macro;
-    std::size_t found      = shaderCode.find(definition);
-    if(found != std::string::npos)
-    {
-      std::size_t insertionPoint = found + definition.length();
+    std::size_t insertionPoint = found + definition.length();
 
-      // Automatically insert line-continuation character into value
-      std::regex                 re("\n");
-      std::sregex_token_iterator first{value.begin(), value.end(), re, -1}, last;
-      for(auto i = first; i != last; ++i)
-      {
-        std::string line = std::string(" \\\n") + (*i).str();
-        shaderCode.insert(insertionPoint, line);
-        insertionPoint += line.length();
-      }
-    }
-  }
-  else
-  {
-    std::size_t invocation = shaderCode.rfind(macro);
-    if(invocation != std::string::npos)
+    // Automatically insert line-continuation character into value
+    std::regex                 re("\n");
+    std::sregex_token_iterator first{value.begin(), value.end(), re, -1}, last;
+    for(auto i = first; i != last; ++i)
     {
-      std::size_t start = shaderCode.rfind("\n", invocation);
-      std::size_t end   = shaderCode.find("\n", invocation);
-      shaderCode.erase(start, end - start);
+      std::string line = std::string(" \\\n") + (*i).str();
+      shaderCode.insert(insertionPoint, line);
+      insertionPoint += line.length();
     }
   }
 }
