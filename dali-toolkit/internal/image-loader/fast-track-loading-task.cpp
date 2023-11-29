@@ -222,9 +222,9 @@ void FastTrackLoadingTask::Load()
     std::ostringstream oss;
     oss << "[";
     oss << "pixelBuffers:" << pixelBuffers.size() << " ";
-    if(!pixelBuffers.empty())
+    if(!mPixelData.empty())
     {
-      oss << "size:" << pixelBuffers[0].GetWidth() << "x" << pixelBuffers[0].GetHeight() << " ";
+      oss << "size:" << mPixelData[0].GetWidth() << "x" << mPixelData[0].GetHeight() << " ";
       oss << "premult:" << mPremultiplied << " ";
     }
     oss << "url:" << mUrl.GetUrl() << "]";

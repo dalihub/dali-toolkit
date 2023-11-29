@@ -3,6 +3,7 @@ INPUT mediump vec2 vTexCoord;
 INPUT mediump vec2 vPosition;
 INPUT mediump vec2 vRectSize;
 INPUT mediump vec2 vOptRectSize;
+INPUT mediump float vAliasMargin;
 #ifdef IS_REQUIRED_ROUNDED_CORNER
 INPUT mediump vec4 vCornerRadius;
 #endif
@@ -24,11 +25,6 @@ uniform mediump vec4 uAtlasRect;
 #elif defined(ATLAS_CUSTOM_WARP)
 // WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
 uniform lowp vec2 wrapMode;
-#endif
-
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
-// Be used when we calculate anti-alias range near 1 pixel.
-uniform highp vec3 uScale;
 #endif
 
 uniform lowp vec4 uColor;
@@ -104,10 +100,7 @@ void calculatePotential()
 
 void setupMinMaxPotential()
 {
-  // Set soft anti-alias range at most 10% of visual size.
-  // The range should be inverse proportion with scale of view.
-  // To avoid divid-by-zero, let we allow minimum scale value is 0.001 (0.1%)
-  gPotentialRange = min(1.0, max(vRectSize.x, vRectSize.y) * 0.2) / max(0.001, max(uScale.x, uScale.y));
+  gPotentialRange = vAliasMargin;
 
   gMaxOutlinePotential = gRadius + gPotentialRange;
   gMinOutlinePotential = gRadius - gPotentialRange;
