@@ -42,7 +42,7 @@ ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfa
   // Override Scene creation in TestApplication by creating a window.
   // The window will create a Scene & surface and set up the scene's surface appropriately.
   mMainWindow = Window::New(PositionSize(0, 0, surfaceWidth, surfaceHeight), "");
-  mScene       = AdaptorImpl::GetScene(mMainWindow);
+  mScene      = AdaptorImpl::GetScene(mMainWindow);
   mScene.SetDpi(Vector2(horizontalDpi, verticalDpi));
 
   // Create render target for the scene
@@ -73,6 +73,9 @@ ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfa
 
 ToolkitTestApplication::~ToolkitTestApplication()
 {
+  Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
+  lifecycleController.TerminateSignal().Emit();
+
   // Need to delete core before we delete the adaptor.
   delete mCore;
   mCore = NULL;

@@ -41,6 +41,8 @@ public:
    */
   Impl()
   {
+    // Try to create ResourceLoader here, to ensure that we create it on main thread.
+    Dali::Scene3D::Internal::ImageResourceLoader::EnsureResourceLoaderCreated();
   }
 
   Dali::Scene3D::Loader::LoadResult GetModelLoadResult(std::string modelUri)
