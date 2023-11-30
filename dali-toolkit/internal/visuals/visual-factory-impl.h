@@ -18,7 +18,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/shader-precompiler.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 
@@ -92,11 +91,6 @@ public:
   void DiscardVisual(Toolkit::Visual::Base visual);
 
   /**
-   * @copydoc Toolkit::VisualFactory::UsePreCompiledShader()
-   */
-  void UsePreCompiledShader();
-
-  /**
    * @return the reference to texture manager
    */
   Internal::TextureManager& GetTextureManager();
@@ -155,7 +149,6 @@ private:
 
   bool mDebugEnabled : 1;
   bool mPreMultiplyOnLoad : 1; ///< Local store for this flag
-  bool mPrecompiledShaderRequested{false};
 };
 
 /**
