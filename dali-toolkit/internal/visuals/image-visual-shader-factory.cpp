@@ -35,8 +35,9 @@ namespace
 {
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
-const int NATIVE_SHADER_TYPE_OFFSET = VisualFactoryCache::ShaderType::NATIVE_IMAGE_SHADER - VisualFactoryCache::ShaderType::IMAGE_SHADER;
-
+const int                         NATIVE_SHADER_TYPE_OFFSET = VisualFactoryCache::ShaderType::NATIVE_IMAGE_SHADER - VisualFactoryCache::ShaderType::IMAGE_SHADER;
+static constexpr std::string_view Y_FLIP_MASK_TEXTURE       = "uYFlipMaskTexture";
+static constexpr float            NOT_FLIP_MASK_TEXTURE     = 0.0f;
 } // unnamed namespace
 
 static constexpr auto          SHADER_TYPE_COUNT = 6u;
@@ -121,6 +122,10 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, Ima
 
   shader = Shader::New(vertexShader, fragmentShader);
   shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+  if(featureBuilder.IsEnabledAlphaMaskingOnRendering())
+  {
+    shader.RegisterProperty(Y_FLIP_MASK_TEXTURE, NOT_FLIP_MASK_TEXTURE);
+  }
   factoryCache.SaveShader(shaderType, shader);
 
   return shader;

@@ -154,6 +154,8 @@ public:
 
   Dali::Texture GetTexture();
 
+  bool IsEnabledAlphaMaskingOnRendering() const;
+
 private:
   ImageVisualShaderFeature::TextureAtlas::Type            mTextureAtlas : 2;            ///< Whether use texture with atlas, or not. default as TextureAtlas::DISABLED
   ImageVisualShaderFeature::DefaultTextureWrapMode::Type  mDefaultTextureWrapMode : 2;  ///< Whether apply to texture wraping in default, or not. default as DefaultTextureWrapMode::APPLY

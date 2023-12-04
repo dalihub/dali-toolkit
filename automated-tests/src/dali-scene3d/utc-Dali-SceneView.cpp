@@ -1033,3 +1033,39 @@ int UtcDaliSceneViewColorMode(void)
 
   END_TEST;
 }
+
+namespace
+{
+const char* TEST_MASK_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/mask.png";
+
+static constexpr std::string_view Y_FLIP_MASK_TEXTURE = "uYFlipMaskTexture";
+} // namespace
+
+int UtcDaliSceneViewMasking(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  application.GetScene().Add(view);
+
+  DALI_TEST_EQUALS(view.GetProperty<std::string>(Dali::Scene3D::SceneView::Property::ALPHA_MASK_URL), "", TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<bool>(Dali::Scene3D::SceneView::Property::CROP_TO_MASK), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<float>(Dali::Scene3D::SceneView::Property::MASK_CONTENT_SCALE), 1.0f, TEST_LOCATION);
+
+  auto yFlipMaskTextureIndex = view.GetPropertyIndex(Y_FLIP_MASK_TEXTURE.data());
+  DALI_TEST_EQUALS(yFlipMaskTextureIndex, Property::INVALID_INDEX, TEST_LOCATION);
+
+  view.UseFramebuffer(true);
+  view.SetProperty(Dali::Scene3D::SceneView::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME);
+  view.SetProperty(Dali::Scene3D::SceneView::Property::CROP_TO_MASK, false);
+  view.SetProperty(Dali::Scene3D::SceneView::Property::MASK_CONTENT_SCALE, 0.5f);
+
+  DALI_TEST_EQUALS(view.GetProperty<std::string>(Dali::Scene3D::SceneView::Property::ALPHA_MASK_URL), TEST_MASK_IMAGE_FILE_NAME, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<bool>(Dali::Scene3D::SceneView::Property::CROP_TO_MASK), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<float>(Dali::Scene3D::SceneView::Property::MASK_CONTENT_SCALE), 0.5f, TEST_LOCATION);
+
+  yFlipMaskTextureIndex = view.GetPropertyIndex(std::string(Y_FLIP_MASK_TEXTURE));
+  DALI_TEST_EQUALS(view.GetProperty<float>(yFlipMaskTextureIndex), 1.0f, TEST_LOCATION);
+
+  END_TEST;
+}

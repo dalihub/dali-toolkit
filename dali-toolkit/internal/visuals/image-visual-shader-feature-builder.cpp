@@ -224,6 +224,11 @@ Dali::Texture ImageVisualShaderFeatureBuilder::GetTexture()
   return mTexture;
 }
 
+bool ImageVisualShaderFeatureBuilder::IsEnabledAlphaMaskingOnRendering() const
+{
+  return mAlphaMaskingOnRendering == ImageVisualShaderFeature::AlphaMaskingOnRendering::ENABLED;
+}
+
 } // namespace Internal
 
 } // namespace Toolkit
