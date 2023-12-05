@@ -197,7 +197,7 @@ void PhysicsDebugRenderer::RenderLines(const Dali::RenderCallbackInput& input)
   // But, it appears to be bugged.
 
   glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
-  glBufferData(GL_ARRAY_BUFFER, mLines.size() * sizeof(VertexLine), &mLines[0], GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(mLines.size() * sizeof(VertexLine)), &mLines[0], GL_STATIC_DRAW);
 
   glVertexAttribPointer(mVertexLocation, 3, GL_FLOAT, GL_FALSE, 24, 0);
   glEnableVertexAttribArray(mVertexLocation);
