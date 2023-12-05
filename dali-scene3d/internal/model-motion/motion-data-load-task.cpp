@@ -31,23 +31,25 @@ namespace Scene3D
 {
 namespace Internal
 {
-MotionDataLoadTask::MotionDataLoadTask(const std::string& path, const Vector3& scale, CallbackBase* callback)
+MotionDataLoadTask::MotionDataLoadTask(const std::string& path, bool useRootTranslationOnly, const Vector3& scale, CallbackBase* callback)
 : AsyncTask(callback),
   mFileUrl(path),
   mRawBuffer(nullptr),
   mRawBufferLength(0),
   mScale(scale),
+  mUseRootTranslationOnly(useRootTranslationOnly),
   mAnimationDefinition{},
   mLoadMethod(MotionDataLoadTask::LoadMethod::BVH_FILE)
 {
 }
 
-MotionDataLoadTask::MotionDataLoadTask(const uint8_t* rawBuffer, int rawBufferLength, const Vector3& scale, CallbackBase* callback)
+MotionDataLoadTask::MotionDataLoadTask(const uint8_t* rawBuffer, int rawBufferLength, bool useRootTranslationOnly, const Vector3& scale, CallbackBase* callback)
 : AsyncTask(callback),
   mFileUrl(),
   mRawBuffer(nullptr),
   mRawBufferLength(rawBufferLength),
   mScale(scale),
+  mUseRootTranslationOnly(useRootTranslationOnly),
   mAnimationDefinition{},
   mLoadMethod(MotionDataLoadTask::LoadMethod::BVH_BUFFER)
 {
@@ -62,6 +64,7 @@ MotionDataLoadTask::MotionDataLoadTask(const std::string& url, CallbackBase* cal
   mRawBuffer(nullptr),
   mRawBufferLength(0),
   mScale(),
+  mUseRootTranslationOnly(false),
   mAnimationDefinition{},
   mLoadMethod(MotionDataLoadTask::LoadMethod::FACIAL_FILE)
 {
@@ -73,6 +76,7 @@ MotionDataLoadTask::MotionDataLoadTask(const uint8_t* rawBuffer, int rawBufferLe
   mRawBuffer(nullptr),
   mRawBufferLength(rawBufferLength),
   mScale(),
+  mUseRootTranslationOnly(false),
   mAnimationDefinition{},
   mLoadMethod(MotionDataLoadTask::LoadMethod::FACIAL_BUFFER)
 {
@@ -95,12 +99,12 @@ void MotionDataLoadTask::Process()
   {
     case LoadMethod::BVH_FILE:
     {
-      mAnimationDefinition = std::move(Loader::LoadBvh(mFileUrl, "LoadedBvhMotionData", mScale));
+      mAnimationDefinition = std::move(Loader::LoadBvh(mFileUrl, "LoadedBvhMotionData", mUseRootTranslationOnly, mScale));
       break;
     }
     case LoadMethod::BVH_BUFFER:
     {
-      mAnimationDefinition = std::move(Loader::LoadBvhFromBuffer(mRawBuffer, mRawBufferLength, "LoadedBvhMotionData", mScale));
+      mAnimationDefinition = std::move(Loader::LoadBvhFromBuffer(mRawBuffer, mRawBufferLength, "LoadedBvhMotionData", mUseRootTranslationOnly, mScale));
       break;
     }
     case LoadMethod::FACIAL_FILE:

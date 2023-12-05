@@ -306,11 +306,11 @@ public: // Public Method
 
   /**
   * @brief Sets a root model for the ModelNode
-  * @param[in] model Valid Model to set
+  * @param[in] model Valid Model or nullptr to disconnect node from tree
   */
-  void SetRootModel(Dali::Scene3D::Internal::Model& model)
+  void SetRootModel(Dali::Scene3D::Internal::Model* model)
   {
-    mParentModel = &model;
+    mParentModel = model;
   }
 
 private:

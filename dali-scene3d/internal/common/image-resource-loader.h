@@ -41,13 +41,6 @@ namespace Internal
 namespace ImageResourceLoader
 {
 // Called by main thread.
-
-/**
- * @brief Get cached pixelData handle filled as white with RGB888 format.
- * @return A PixelData object containing the white RGB888 color.
- */
-Dali::PixelData GetEmptyPixelDataWhiteRGB();
-
 /**
  * @brief Get cached texture handle filled as white with RGB888 format.
  * @return A Texture object containing the white RGB888 color.
@@ -77,10 +70,21 @@ Dali::Texture GetCachedCubeTexture(const std::vector<std::vector<Dali::PixelData
  */
 void RequestGarbageCollect(bool fullCollect = false);
 
+/**
+ * @brief Let we ensure to create a ResourceLoader cache handler.
+ */
+void EnsureResourceLoaderCreated();
+
 // Can be called by worker thread.
+/**
+ * @brief Get cached pixelData handle filled as white with RGB888 format.
+ * @return A PixelData object containing the white RGB888 color.
+ */
+Dali::PixelData GetEmptyPixelDataWhiteRGB();
 
 /**
  * @brief Get cached image, or loads an image synchronously.
+ * @note If cache handler is not created yet, or destroyed due to app terminated, it will load image synchronously without cache.
  * @param[in] url The URL of the image file to load
  * @return A PixelData object containing the image, or an invalid object on failure
  */
@@ -88,6 +92,7 @@ Dali::PixelData GetCachedPixelData(const std::string& url);
 
 /**
  * @brief Get cached image, or loads an image synchronously by specifying the target dimensions and options.
+ * @note If cache handler is not created yet, or destroyed due to app terminated, it will load image synchronously without cache.
  * @param[in] url The URL of the image file to load
  * @param[in] dimensions The width and height to fit the loaded image to
  * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter

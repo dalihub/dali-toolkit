@@ -105,6 +105,50 @@ class DALI_SCENE3D_API SceneView : public Dali::Toolkit::Control
 {
 public:
   /**
+   * @brief The start and end property ranges for this control.
+   * @SINCE_2_3.1
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000
+  };
+
+  struct Property
+  {
+    enum
+    {
+      /**
+       * @brief URL of a masking image
+       * @details Name "alphaMaskUrl", type Property::STRING, URL of image to apply as
+       * a mask after SceneView is drawn.
+       * @note Alpha masking is only available when framebuffer is used.
+       * @note Optional.
+       */
+      ALPHA_MASK_URL = PROPERTY_START_INDEX,
+
+      /**
+       * @brief The scale factor to apply to the content image before masking
+       * @details Name "maskContentScale", type Property::FLOAT, The scale factor
+       * to apply to the content before masking. Note, scaled result is cropped to
+       * the same size as the alpha mask.
+       * @note Optional.
+       */
+      MASK_CONTENT_SCALE,
+
+      /**
+       * @brief Whether to crop rendered result to mask or scale mask to fit result
+       * @details Name "cropToMask", type Property::BOOLEAN, True if the rendered result should
+       * be cropped to match the mask size, or false if the result should remain the same size.
+       * @note Optional, Default true
+       * @note If this is false, then the mask is scaled to fit the rendered result before being applied.
+       */
+      CROP_TO_MASK,
+    };
+  };
+
+public:
+  /**
    * @brief Create an initialized SceneView.
    *
    * @SINCE_2_1.38
@@ -323,6 +367,42 @@ public:
    * @return bool True if this SceneView uses Framebuffer.
    */
   bool IsUsingFramebuffer() const;
+
+  /**
+   * @brief Sets SceneView's resolution manually.
+   * @note This manual resolution is only available when the SceneView uses FBO for rendering by using UseFrameBuffer(true).
+   * @note If the aspect ratio of input width/height is different with SceneView's aspect ratio, the rendered result is stretched to fill SceneView's area.
+   *
+   * @SINCE_2_3.2
+   * @param[in] width The input width.
+   * @param[in] height The input height.
+   */
+  void SetResolution(uint32_t width, uint32_t height);
+
+  /**
+   * @brief Retrieves width of resolution of the SceneView.
+   * @note If the SceneView not uses FBO, this method returns SceneView's width.
+   *
+   * @SINCE_2_3.2
+   * @return Width value of resolution of the SceneView.
+   */
+  uint32_t GetResolutionWidth();
+
+  /**
+   * @brief Retrieves height of resolution of the SceneView.
+   * @note If the SceneView not uses FBO, this method returns SceneView's height.
+   *
+   * @SINCE_2_3.2
+   * @return Height value of resolution of the SceneView.
+   */
+  uint32_t GetResolutionHeight();
+
+  /**
+   * @brief Resets SceneView's resolution to the current size of SceneView.
+   *
+   * @SINCE_2_3.2
+   */
+  void ResetResolution();
 
   /**
    * @brief Sets Multisampling level when we use Framebuffer.

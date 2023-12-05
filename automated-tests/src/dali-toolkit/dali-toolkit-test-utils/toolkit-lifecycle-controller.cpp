@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 
 namespace Dali
 {
-
 /********************************************************************************
  * Stub for Dali::Internal::Adaptor::LifecycleController
  ********************************************************************************/
@@ -34,18 +33,18 @@ namespace Adaptor
 class LifecycleController : public BaseObject
 {
 public: // Creation & Destruction
-
   LifecycleController();
   ~LifecycleController();
   static Dali::LifecycleController Get();
 
-
 public: // Signals
   Dali::LifecycleController::LifecycleSignalType& InitSignal();
+  Dali::LifecycleController::LifecycleSignalType& TerminateSignal();
 
 private:
   Dali::LifecycleController::LifecycleSignalType mInitSignal;
-  static Dali::LifecycleController mLifecycleController;
+  Dali::LifecycleController::LifecycleSignalType mTerminateSignal;
+  static Dali::LifecycleController               mLifecycleController;
 };
 
 Dali::LifecycleController LifecycleController::mLifecycleController;
@@ -60,7 +59,7 @@ LifecycleController::~LifecycleController()
 
 Dali::LifecycleController LifecycleController::Get()
 {
-  if( ! mLifecycleController )
+  if(!mLifecycleController)
   {
     mLifecycleController = Dali::LifecycleController(new Internal::Adaptor::LifecycleController());
   }
@@ -72,16 +71,24 @@ Dali::LifecycleController::LifecycleSignalType& LifecycleController::InitSignal(
   return mInitSignal;
 }
 
+Dali::LifecycleController::LifecycleSignalType& LifecycleController::TerminateSignal()
+{
+  return mTerminateSignal;
+}
+
 } // namespace Adaptor
 } // namespace Internal
-
 
 /********************************************************************************
  * Stub for Dali::LifecycleController
  ********************************************************************************/
 
-LifecycleController::LifecycleController(){}
-LifecycleController::~LifecycleController(){}
+LifecycleController::LifecycleController()
+{
+}
+LifecycleController::~LifecycleController()
+{
+}
 
 LifecycleController LifecycleController::Get()
 {
@@ -92,12 +99,19 @@ LifecycleController LifecycleController::Get()
 
 LifecycleController::LifecycleSignalType& LifecycleController::InitSignal()
 {
-  BaseObject& object = GetBaseObject();
-  Internal::Adaptor::LifecycleController& controller = static_cast< Internal::Adaptor::LifecycleController& >( object );
+  BaseObject&                             object     = GetBaseObject();
+  Internal::Adaptor::LifecycleController& controller = static_cast<Internal::Adaptor::LifecycleController&>(object);
   return controller.InitSignal();
 }
 
-LifecycleController::LifecycleController( Internal::Adaptor::LifecycleController *impl )
+LifecycleController::LifecycleSignalType& LifecycleController::TerminateSignal()
+{
+  BaseObject&                             object     = GetBaseObject();
+  Internal::Adaptor::LifecycleController& controller = static_cast<Internal::Adaptor::LifecycleController&>(object);
+  return controller.TerminateSignal();
+}
+
+LifecycleController::LifecycleController(Internal::Adaptor::LifecycleController* impl)
 : BaseHandle(impl)
 {
 }

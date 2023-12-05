@@ -181,6 +181,26 @@ public:
   bool IsUsingFramebuffer() const;
 
   /**
+   * @copydoc SceneView::SetResolution()
+   */
+  void SetResolution(uint32_t width, uint32_t height);
+
+  /**
+   * @copydoc SceneView::GetResolutionWidth()
+   */
+  uint32_t GetResolutionWidth();
+
+  /**
+   * @copydoc SceneView::GetResolutionHeight()
+   */
+  uint32_t GetResolutionHeight();
+
+  /**
+   * @copydoc SceneView::ResetResolution()
+   */
+  void ResetResolution();
+
+  /**
    * @copydoc SceneView::SetFramebufferMultiSamplingLevel()
    */
   void SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel);
@@ -227,10 +247,64 @@ public:
   Dali::Scene3D::Loader::ShaderManagerPtr GetShaderManager() const;
 
   /**
-   * @brief Update shader uniforms about shadow.
+   * @brief Updates shader uniforms about shadow.
    * @param[in] light Light that makes shadow.
    */
   void UpdateShadowUniform(Scene3D::Light light);
+
+  /**
+   * @brief Sets alpha mask url
+   * @param[in] alphaMaskUrl Url for alpha mask.
+   */
+  void SetAlphaMaskUrl(std::string& alphaMaskUrl);
+
+  /**
+   * @brief Retrieves alpha mask url
+   * @return Alpha mask url.
+   */
+  std::string GetAlphaMaskUrl();
+
+  /**
+   * @brief Sets mask content scale factor
+   * @param[in] maskContentScaleFactor Scale factor for mask content.
+   */
+  void SetMaskContentScaleFactor(float maskContentScaleFactor);
+
+  /**
+   * @brief Retrieves mask content scale factor
+   * @return Scale factor for mask content.
+   */
+  float GetMaskContentScaleFactor();
+
+  /**
+   * @brief Sets whether the rendered result will be crop to mask or not.
+   * @param[in] enableCropToMask True for crop rendered result to mask.
+   */
+  void EnableCropToMask(bool enableCropToMask);
+
+  /**
+   * @brief Retrieves whether the crop to mask is enabled or not.
+   * @return True when rendered result is cropped to mask.
+   */
+  bool IsEnabledCropToMask();
+
+  // Properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
 protected:
   /**
@@ -370,6 +444,16 @@ private:
   Quaternion                                     mSkyboxOrientation;
   float                                          mSkyboxIntensity{1.0f};
   uint8_t                                        mFrameBufferMultiSamplingLevel{0u};
+
+  bool mWindowSizeChanged{false};
+  uint32_t mWindowWidth{0};
+  uint32_t mWindowHeight{0};
+
+  // Masking
+  std::string mAlphaMaskUrl;
+  float       mMaskContentScaleFactor{1.0f};
+  bool        mCropToMask{true};
+  bool        mMaskingPropertyChanged{false};
 
   // Shader Factory
   Dali::Scene3D::Loader::ShaderManagerPtr mShaderManager;

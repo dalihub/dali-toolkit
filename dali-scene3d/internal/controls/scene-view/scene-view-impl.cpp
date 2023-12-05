@@ -60,6 +60,10 @@ BaseHandle Create()
 
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::SceneView, Toolkit::Control, Create);
+
+DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "AlphaMaskUrl", STRING, ALPHA_MASK_URL)
+DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "MaskContentScale", FLOAT, MASK_CONTENT_SCALE)
+DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CropToMask", BOOLEAN, CROP_TO_MASK)
 DALI_TYPE_REGISTRATION_END()
 
 Property::Index    RENDERING_BUFFER        = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
@@ -68,6 +72,8 @@ constexpr int32_t  INVALID_INDEX           = -1;
 constexpr uint32_t MAXIMUM_SIZE_SHADOW_MAP = 2048;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
+static constexpr std::string_view Y_FLIP_MASK_TEXTURE = "uYFlipMaskTexture";
+static constexpr float FLIP_MASK_TEXTURE = 1.0f;
 
 Dali::Actor CreateSkybox()
 {
@@ -703,6 +709,43 @@ bool SceneView::IsUsingFramebuffer() const
   return mUseFrameBuffer;
 }
 
+void SceneView::SetResolution(uint32_t width, uint32_t height)
+{
+  if(mWindowWidth != width || mWindowHeight != height)
+  {
+    mWindowWidth  = width;
+    mWindowHeight = height;
+    if(mUseFrameBuffer)
+    {
+      mWindowSizeChanged = true;
+      UpdateRenderTask();
+    }
+  }
+}
+
+uint32_t SceneView::GetResolutionWidth()
+{
+  if(!mUseFrameBuffer || mWindowWidth == 0u || mWindowHeight == 0u)
+  {
+    return static_cast<uint32_t>(Self().GetProperty<float>(Dali::Actor::Property::SIZE_WIDTH));
+  }
+  return mWindowWidth;
+}
+
+uint32_t SceneView::GetResolutionHeight()
+{
+  if(!mUseFrameBuffer || mWindowWidth == 0u || mWindowHeight == 0u)
+  {
+    return static_cast<uint32_t>(Self().GetProperty<float>(Dali::Actor::Property::SIZE_HEIGHT));
+  }
+  return mWindowHeight;
+}
+
+void SceneView::ResetResolution()
+{
+  SetResolution(0u, 0u);
+}
+
 void SceneView::SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel)
 {
   if(mFrameBufferMultiSamplingLevel != multiSamplingLevel)
@@ -787,6 +830,113 @@ Dali::Scene3D::Loader::ShaderManagerPtr SceneView::GetShaderManager() const
 void SceneView::UpdateShadowUniform(Scene3D::Light light)
 {
   mShaderManager->UpdateShadowUniform(light);
+}
+
+void SceneView::SetAlphaMaskUrl(std::string& alphaMaskUrl)
+{
+  if(mAlphaMaskUrl != alphaMaskUrl)
+  {
+    mAlphaMaskUrl = alphaMaskUrl;
+    mMaskingPropertyChanged = true;
+    UpdateRenderTask();
+  }
+}
+
+std::string SceneView::GetAlphaMaskUrl()
+{
+  return mAlphaMaskUrl;
+}
+
+void SceneView::SetMaskContentScaleFactor(float maskContentScaleFactor)
+{
+  if(mMaskContentScaleFactor != maskContentScaleFactor)
+  {
+    mMaskContentScaleFactor = maskContentScaleFactor;
+    mMaskingPropertyChanged = true;
+    UpdateRenderTask();
+  }
+}
+
+float SceneView::GetMaskContentScaleFactor()
+{
+  return mMaskContentScaleFactor;
+}
+
+void SceneView::EnableCropToMask(bool enableCropToMask)
+{
+  if(mCropToMask != enableCropToMask)
+  {
+    mCropToMask = enableCropToMask;
+    mMaskingPropertyChanged = true;
+    UpdateRenderTask();
+  }
+}
+
+bool SceneView::IsEnabledCropToMask()
+{
+  return mCropToMask;
+}
+
+void SceneView::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
+{
+  Scene3D::SceneView sceneView = Scene3D::SceneView::DownCast(Dali::BaseHandle(object));
+
+  if(sceneView)
+  {
+    SceneView& sceneViewImpl(GetImpl(sceneView));
+
+    switch(index)
+    {
+      case Scene3D::SceneView::Property::ALPHA_MASK_URL:
+      {
+        std::string alphaMaskUrl = value.Get<std::string>();
+        sceneViewImpl.SetAlphaMaskUrl(alphaMaskUrl);
+        break;
+      }
+      case Scene3D::SceneView::Property::MASK_CONTENT_SCALE:
+      {
+        sceneViewImpl.SetMaskContentScaleFactor(value.Get<float>());
+        break;
+      }
+      case Scene3D::SceneView::Property::CROP_TO_MASK:
+      {
+        sceneViewImpl.EnableCropToMask(value.Get<bool>());
+        break;
+      }
+    }
+  }
+}
+
+Property::Value SceneView::GetProperty(BaseObject* object, Property::Index index)
+{
+  Property::Value value;
+
+  Scene3D::SceneView sceneView = Scene3D::SceneView::DownCast(Dali::BaseHandle(object));
+
+  if(sceneView)
+  {
+    SceneView& sceneViewImpl(GetImpl(sceneView));
+
+    switch(index)
+    {
+      case Scene3D::SceneView::Property::ALPHA_MASK_URL:
+      {
+        value = sceneViewImpl.GetAlphaMaskUrl();
+        break;
+      }
+      case Scene3D::SceneView::Property::MASK_CONTENT_SCALE:
+      {
+        value = sceneViewImpl.GetMaskContentScaleFactor();
+        break;
+      }
+      case Scene3D::SceneView::Property::CROP_TO_MASK:
+      {
+        value = sceneViewImpl.IsEnabledCropToMask();
+        break;
+      }
+    }
+  }
+  return value;
 }
 
 ///////////////////////////////////////////////////////////
@@ -967,26 +1117,31 @@ void SceneView::UpdateRenderTask()
     }
 
     Vector3     size        = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-    const float aspectRatio = size.width / size.height;
-    mSelectedCamera.SetAspectRatio(aspectRatio);
+    float aspectRatio = size.width / size.height;
 
     uint32_t shadowMapBufferSize = std::min(static_cast<uint32_t>(std::max(size.width, size.height)), MAXIMUM_SIZE_SHADOW_MAP);
     UpdateShadowMapBuffer(shadowMapBufferSize);
 
     if(mUseFrameBuffer)
     {
+      uint32_t width  = (mWindowWidth == 0 || mWindowHeight == 0) ? static_cast<uint32_t>(size.width) : mWindowWidth;
+      uint32_t height = (mWindowWidth == 0 || mWindowHeight == 0) ? static_cast<uint32_t>(size.height) : mWindowHeight;
+      aspectRatio     = static_cast<float>(width) / static_cast<float>(height);
+
       Dali::FrameBuffer currentFrameBuffer = mRenderTask.GetFrameBuffer();
       if(!currentFrameBuffer ||
          !Dali::Equals(currentFrameBuffer.GetColorTexture().GetWidth(), size.width) ||
-         !Dali::Equals(currentFrameBuffer.GetColorTexture().GetHeight(), size.height))
+         !Dali::Equals(currentFrameBuffer.GetColorTexture().GetHeight(), size.height) ||
+         mMaskingPropertyChanged ||
+         mWindowSizeChanged)
       {
         mRootLayer.SetProperty(Dali::Actor::Property::COLOR_MODE, ColorMode::USE_OWN_COLOR);
         mRenderTask.ResetViewportGuideActor();
         mRenderTask.SetViewport(Dali::Viewport(Vector4::ZERO));
 
         // create offscreen buffer of new size to render our child actors to
-        mTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(size.width), unsigned(size.height));
-        mFrameBuffer = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
+        mTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+        mFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
         mFrameBuffer.AttachColorTexture(mTexture);
         DevelFrameBuffer::SetMultiSamplingLevel(mFrameBuffer, mFrameBufferMultiSamplingLevel);
         Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(mFrameBuffer, 0u);
@@ -996,13 +1151,25 @@ void SceneView::UpdateRenderTask()
         imagePropertyMap.Insert(Toolkit::ImageVisual::Property::URL, imageUrl.GetUrl());
         // To flip rendered scene without CameraActor::SetInvertYAxis() to avoid backface culling.
         imagePropertyMap.Insert(Toolkit::ImageVisual::Property::PIXEL_AREA, Vector4(0.0f, 1.0f, 1.0f, -1.0f));
-        mVisual = Toolkit::VisualFactory::Get().CreateVisual(imagePropertyMap);
+        if(!mAlphaMaskUrl.empty())
+        {
+          imagePropertyMap.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mAlphaMaskUrl);
+          imagePropertyMap.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+          imagePropertyMap.Insert(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, mMaskContentScaleFactor);
+          imagePropertyMap.Insert(Toolkit::ImageVisual::Property::CROP_TO_MASK, mCropToMask);
+          imagePropertyMap.Insert(Toolkit::DevelImageVisual::Property::MASKING_TYPE, Toolkit::DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+          Self().RegisterProperty(Y_FLIP_MASK_TEXTURE, FLIP_MASK_TEXTURE);
+        }
 
+        mVisual = Toolkit::VisualFactory::Get().CreateVisual(imagePropertyMap);
         Toolkit::DevelControl::RegisterVisual(*this, RENDERING_BUFFER, mVisual);
 
         mRenderTask.SetFrameBuffer(mFrameBuffer);
         mRenderTask.SetClearEnabled(true);
         mRenderTask.SetClearColor(Color::TRANSPARENT);
+
+        mMaskingPropertyChanged = false;
+        mWindowSizeChanged = false;
       }
     }
     else
@@ -1022,6 +1189,8 @@ void SceneView::UpdateRenderTask()
         mTexture.Reset();
       }
     }
+
+    mSelectedCamera.SetAspectRatio(aspectRatio);
 
     RotateCamera();
   }
