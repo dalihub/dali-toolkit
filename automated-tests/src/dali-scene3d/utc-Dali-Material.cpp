@@ -224,6 +224,10 @@ int UtcDaliMaterialSetGetProperty(void)
   material.SetProperty(Scene3D::Material::Property::SPECULAR_COLOR_FACTOR, specularColorFactor);
   DALI_TEST_EQUALS(specularColorFactor, material.GetProperty<Vector3>(Scene3D::Material::Property::SPECULAR_COLOR_FACTOR), TEST_LOCATION);
 
+  int32_t depthIndex = 50;
+  material.SetProperty(Scene3D::Material::Property::DEPTH_INDEX, depthIndex);
+  DALI_TEST_EQUALS(depthIndex, material.GetProperty<int32_t>(Scene3D::Material::Property::DEPTH_INDEX), TEST_LOCATION);
+
   END_TEST;
 }
 

@@ -41,10 +41,11 @@ public:
    */
   enum ModifyFlag
   {
-    NONE    = 0,
-    TEXTURE = 1 << 0,
-    SHADER  = 1 << 1,
-    UNIFORM = 1 << 2,
+    NONE     = 0,
+    TEXTURE  = 1 << 0,
+    SHADER   = 1 << 1,
+    UNIFORM  = 1 << 2,
+    PROPERTY = 1 << 3,
   };
 
   /**
