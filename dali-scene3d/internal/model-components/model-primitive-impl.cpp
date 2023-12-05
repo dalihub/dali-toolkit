@@ -436,13 +436,18 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
   uint32_t uniformFlag = (flag & static_cast<uint32_t>(MaterialModifyObserver::ModifyFlag::UNIFORM));
   if(mIsMaterialChanged || uniformFlag == static_cast<uint32_t>(MaterialModifyObserver::ModifyFlag::UNIFORM))
   {
-    if(!mRenderer)
-    {
-      mNeedToSetRendererUniform = true;
-    }
-    else
+    if(mRenderer)
     {
       UpdateRendererUniform();
+    }
+  }
+
+  uint32_t propertyFlag = (flag & static_cast<uint32_t>(MaterialModifyObserver::ModifyFlag::PROPERTY));
+  if(mIsMaterialChanged || propertyFlag == static_cast<uint32_t>(MaterialModifyObserver::ModifyFlag::PROPERTY))
+  {
+    if(mRenderer)
+    {
+      UpdateRendererProperty();
     }
   }
   mIsMaterialChanged = false;
@@ -458,6 +463,7 @@ void ModelPrimitive::CreateRenderer()
   mRenderer = Renderer::New(mGeometry, mShader);
   mRenderer.SetTextures(mTextureSet);
   UpdateRendererUniform();
+  UpdateRendererProperty();
 
   for(auto* observer : mObservers)
   {
@@ -546,6 +552,14 @@ void ModelPrimitive::UpdateRendererUniform()
     mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightScaleFactorName().data(), mIblScaleFactor);
     mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightMaxLodUniformName().data(), static_cast<float>(mSpecularMipmapLevels));
     GetImplementation(mMaterial).SetRendererUniform(mRenderer);
+  }
+}
+
+void ModelPrimitive::UpdateRendererProperty()
+{
+  if(mMaterial)
+  {
+    GetImplementation(mMaterial).SetRendererProperty(mRenderer);
   }
 }
 
