@@ -85,7 +85,7 @@ public:
       std::vector<ColliderMeshData> meshData;
       IterateThroughChildren(sceneView, meshData);
 
-      auto renderTask  = touchEvent.GetRenderTask();
+      auto renderTask  = Stage::GetCurrent().GetRenderTaskList().GetTask(0);
       auto cameraActor = renderTask.GetCameraActor();
 
       const auto& result = touchEvent.GetScreenPosition(0);

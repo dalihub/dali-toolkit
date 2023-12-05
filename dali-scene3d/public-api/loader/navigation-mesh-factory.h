@@ -51,7 +51,6 @@ public:
    *
    * List of faces contains indices into the vertex list
    *
-   * @SINCE_2_3.0
    * @param[in] vertices List of Vector3 vertices
    * @param[in] vertexNormals List of Vector3 vertices
    * @param[in] faceIndices List of faces
@@ -66,7 +65,6 @@ public:
    *
    * This function reduces number of array copys when called from NUI.
    *
-   * @SINCE_2_3.0
    * @param[in] vertices Pointer to C-style array of vertices
    * @param[in] vertexCount Number of vertices
    * @param[in] vertexNormals to C-style array of vertex normals
@@ -82,7 +80,6 @@ public:
    * The binary data returned by the function can be used
    * as an input for NavigationMeshFactory::CreateFromBuffer()
    *
-   * @SINCE_2_3.0
    * @param[in] navigationMesh Navigation mesh to serialize
    * @return Buffer containing serialized mesh data
    */

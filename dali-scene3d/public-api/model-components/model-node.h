@@ -214,7 +214,6 @@ public: // Public Method
    *
    * To remove collider mesh empty unique_ptr must be passed.
    *
-   * @SINCE_2_3.0
    * @param[in] colliderMesh r-value to unique pointer of ColliderMesh
    */
   void SetColliderMesh(std::unique_ptr<Algorithm::ColliderMesh>&& colliderMesh);
@@ -226,7 +225,6 @@ public: // Public Method
    * collider mesh is associated. Calling GetColliderMesh() without
    * previous check may produce undefined behaviour.
    *
-   * @SINCE_2_3.0
    * @return Associated collider mesh
    */
   const Algorithm::ColliderMesh& GetColliderMesh();
@@ -234,7 +232,6 @@ public: // Public Method
   /**
    * @brief Determines whether there is a valid collider mesh set
    *
-   * @SINCE_2_3.0
    * @return True if collider mesh is set, False otherwise
    */
   [[nodiscard]] bool HasColliderMesh() const;

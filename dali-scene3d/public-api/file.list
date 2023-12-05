@@ -1,6 +1,7 @@
 set(scene3d_public_api_dir "${scene3d_dir}/public-api")
 
 set(scene3d_src_files ${scene3d_src_files}
+        ${scene3d_public_api_dir}/algorithm/navigation-mesh.cpp
 	${scene3d_public_api_dir}/controls/model/model.cpp
 	${scene3d_public_api_dir}/controls/scene-view/scene-view.cpp
 	${scene3d_public_api_dir}/light/light.cpp
@@ -33,6 +34,7 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_public_api_dir}/loader/skinning-details.cpp
 	${scene3d_public_api_dir}/loader/string-callback.cpp
 	${scene3d_public_api_dir}/loader/utils.cpp
+        ${scene3d_public_api_dir}/loader/navigation-mesh-factory.cpp
 	${scene3d_public_api_dir}/loader/view-projection.cpp
 	${scene3d_public_api_dir}/model-components/material.cpp
 	${scene3d_public_api_dir}/model-components/model-node.cpp

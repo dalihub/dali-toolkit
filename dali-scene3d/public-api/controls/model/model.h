@@ -385,7 +385,6 @@ public:
    * The return value of True, indicates that the hover event should be consumed.
    * Otherwise the signal will be emitted on the next sensitive parent of the actor.
    *
-   * @SINCE_2_3.0
    * @return The signal to connect to
    */
   MeshHitSignalType& MeshHitSignal();
