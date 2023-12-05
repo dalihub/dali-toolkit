@@ -313,12 +313,11 @@ void Model::AddModelNode(Scene3D::ModelNode modelNode)
     UpdateImageBasedLightScaleFactor();
   }
 
-  GetImplementation(modelNode).SetRootModel(this);
+  GetImplementation(modelNode).SetRootModel(*this);
 
   // If model has a collider mesh set, add it to the container
   if(modelNode.HasColliderMesh())
   {
-    RegisterColliderMesh(modelNode, modelNode.GetColliderMesh());
     Scene3D::ColliderMeshProcessor::Get().ColliderMeshChanged(Scene3D::Model::DownCast(Self()));
   }
 
@@ -354,7 +353,6 @@ void Model::RemoveModelNode(Scene3D::ModelNode modelNode)
   if(modelNode.HasColliderMesh())
   {
     RemoveColliderMesh(modelNode);
-    GetImplementation(modelNode).SetRootModel(nullptr);
   }
 
   if(mModelRoot)
