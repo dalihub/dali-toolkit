@@ -213,6 +213,11 @@ private:
   void UpdateRendererUniform();
 
   /**
+   * @brief Updates the property of renderer.
+   */
+  void UpdateRendererProperty();
+
+  /**
    * @brief Creates a renderer.
    */
   void CreateRenderer();
@@ -266,7 +271,6 @@ private:
   Scene3D::Loader::BlendShapes::Version        mBlendShapeVersion = Scene3D::Loader::BlendShapes::Version::INVALID;
 
   bool mIsMaterialChanged        = false;
-  bool mNeedToSetRendererUniform = false;
 };
 
 } // namespace Internal

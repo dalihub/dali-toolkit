@@ -324,6 +324,16 @@ void Material::SetProperty(Dali::Property::Index index, Dali::Property::Value pr
       }
       break;
     }
+    case Dali::Scene3D::Material::Property::DEPTH_INDEX:
+    {
+      int32_t depthIndex = 0;
+      if(propertyValue.Get(depthIndex) && mDepthIndex != depthIndex)
+      {
+        mDepthIndex = depthIndex;
+        mModifyFlag |= MaterialModifyObserver::ModifyFlag::PROPERTY;
+      }
+      break;
+    }
   }
 
   if(needToApply)
@@ -435,6 +445,11 @@ Dali::Property::Value Material::GetProperty(Dali::Property::Index index) const
     case Dali::Scene3D::Material::Property::SPECULAR_COLOR_FACTOR:
     {
       value = Vector3(mTextureInformations[TextureIndex::SPECULAR_COLOR].mFactor);
+      break;
+    }
+    case Dali::Scene3D::Material::Property::DEPTH_INDEX:
+    {
+      value = mDepthIndex;
       break;
     }
   }
@@ -700,6 +715,11 @@ void Material::SetRendererUniform(Dali::Renderer renderer)
   renderer.RegisterProperty(Scene3D::Loader::NodeDefinition::GetIblYDirectionUniformName().data(), Vector3(1.0f, -1.0, 1.0));
 
   Scene3D::Loader::RendererState::Apply(mRendererState, renderer);
+}
+
+void Material::SetRendererProperty(Dali::Renderer renderer)
+{
+  renderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, mDepthIndex);
 }
 
 uint32_t Material::GetShadowMapTextureOffset()
