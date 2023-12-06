@@ -31,7 +31,6 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/algorithm/navigation-mesh-header.h>
 #include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
-#include <dali-scene3d/public-api/algorithm/path-finder.h>
 
 namespace Dali::Scene3D::Loader
 {
