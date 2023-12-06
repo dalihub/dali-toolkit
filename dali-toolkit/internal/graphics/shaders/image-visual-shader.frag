@@ -1,5 +1,5 @@
 INPUT mediump vec2 vTexCoord;
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+#if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 INPUT mediump vec2 vPosition;
 INPUT mediump vec2 vRectSize;
 INPUT mediump vec2 vOptRectSize;
@@ -28,6 +28,11 @@ uniform mediump vec4 uAtlasRect;
 uniform lowp vec2 wrapMode;
 #endif
 
+
+#if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER)
+uniform highp vec3 uScale;
+#endif
+
 uniform lowp vec4 uColor;
 uniform lowp vec3 mixColor;
 uniform lowp float preMultipliedAlpha;
@@ -50,7 +55,7 @@ mediump float wrapCoordinate( mediump vec2 range, mediump float coordinate, lowp
 }
 #endif
 
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+#if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 // Global values both rounded corner and borderline use
 
 // radius of rounded corner on this quadrant
@@ -238,6 +243,122 @@ lowp vec4 ConvertYuvToRgba(mediump vec2 texCoord)
 }
 #endif
 
+#ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
+
+// Predefined values whether some macro defined or not.
+// Since we make debug codes replace by macro,
+// sharp if keyword cannot be used.
+// Instead, let we use bool values so we can use define checked in script
+#ifdef IS_REQUIRED_ROUNDED_CORNER
+const bool IS_REQUIRED_ROUNDED_CORNER_BOOL = true;
+#else
+const bool IS_REQUIRED_ROUNDED_CORNER_BOOL = false;
+#endif
+#ifdef IS_REQUIRED_BORDERLINE
+const bool IS_REQUIRED_BORDERLINE_BOOL = true;
+#else
+const bool IS_REQUIRED_BORDERLINE_BOOL = false;
+#endif
+#ifdef IS_REQUIRED_YUV_TO_RGB
+const bool IS_REQUIRED_YUV_TO_RGB_BOOL = true;
+#else
+const bool IS_REQUIRED_YUV_TO_RGB_BOOL = false;
+#endif
+#ifdef IS_REQUIRED_UNIFIED_YUV_AND_RGB
+const bool IS_REQUIRED_UNIFIED_YUV_AND_RGB_BOOL = true;
+#else
+const bool IS_REQUIRED_UNIFIED_YUV_AND_RGB_BOOL = false;
+#endif
+#ifdef IS_REQUIRED_ALPHA_MASKING
+const bool IS_REQUIRED_ALPHA_MASKING_BOOL = true;
+#else
+const bool IS_REQUIRED_ALPHA_MASKING_BOOL = false;
+#endif
+#ifdef ATLAS_DEFAULT_WARP
+const bool ATLAS_DEFAULT_WARP_BOOL = true;
+#else
+const bool ATLAS_DEFAULT_WARP_BOOL = false;
+#endif
+#ifdef ATLAS_CUSTOM_WARP
+const bool ATLAS_CUSTOM_WARP_BOOL = true;
+#else
+const bool ATLAS_CUSTOM_WARP_BOOL = false;
+#endif
+
+// These lines in the shader may be replaced with actual definitions by the debug-image-visual-shader-script.json.
+// DEBUG_TRIGGER_CODE return bool type, and DEBUG_RATIO_CODE return float value which will be clamped between 0.0 and 1.0
+// If DEBUG_TRIGGER_CODE return true, it mean we will change final color's channel value.
+// If ratio is 0.0, debug color rate become MINIMUM_DEBUG_COLOR_RATE, and 1.0 than MAXIMUM_DEBUG_COLOR_RATE.
+#define MINIMUM_DEBUG_COLOR_RATE
+#define MAXIMUM_DEBUG_COLOR_RATE
+#define DEBUG_TRIGGER_RED_CODE
+#define DEBUG_TRIGGER_GREEN_CODE
+#define DEBUG_TRIGGER_BLUE_CODE
+#define DEBUG_RATIO_RED_CODE
+#define DEBUG_RATIO_GREEN_CODE
+#define DEBUG_RATIO_BLUE_CODE
+
+const mediump float gMinDebugColorRate = MINIMUM_DEBUG_COLOR_RATE;
+const mediump float gMaxDebugColorRate = MAXIMUM_DEBUG_COLOR_RATE;
+
+bool DebugTriggerRed(mediump vec4 originColor)
+{
+  DEBUG_TRIGGER_RED_CODE
+}
+
+bool DebugTriggerGreen(mediump vec4 originColor)
+{
+  DEBUG_TRIGGER_GREEN_CODE
+}
+
+bool DebugTriggerBlue(mediump vec4 originColor)
+{
+  DEBUG_TRIGGER_BLUE_CODE
+}
+
+mediump float DebugRatioRed(mediump vec4 originColor)
+{
+  DEBUG_RATIO_RED_CODE
+}
+
+mediump float DebugRatioGreen(mediump vec4 originColor)
+{
+  DEBUG_RATIO_GREEN_CODE
+}
+
+mediump float DebugRatioBlue(mediump vec4 originColor)
+{
+  DEBUG_RATIO_BLUE_CODE
+}
+
+mediump vec3 ApplyDebugMixColor(mediump vec4 originColor)
+{
+  mediump float debugColorRateRed = 0.0;
+  mediump float debugColorRateGreen = 0.0;
+  mediump float debugColorRateBlue = 0.0;
+
+  if(DebugTriggerRed(originColor))
+  {
+    debugColorRateRed = mix(gMinDebugColorRate, gMaxDebugColorRate, smoothstep(0.0, 1.0, DebugRatioRed(originColor)));
+  }
+  if(DebugTriggerGreen(originColor))
+  {
+    debugColorRateGreen = mix(gMinDebugColorRate, gMaxDebugColorRate, smoothstep(0.0, 1.0, DebugRatioGreen(originColor)));
+  }
+  if(DebugTriggerBlue(originColor))
+  {
+    debugColorRateBlue = mix(gMinDebugColorRate, gMaxDebugColorRate, smoothstep(0.0, 1.0, DebugRatioBlue(originColor)));
+  }
+
+  mediump float colorRate = max(debugColorRateRed, max(debugColorRateGreen, debugColorRateBlue));
+  mediump vec3 debugColor = vec3(debugColorRateRed, debugColorRateGreen, debugColorRateBlue);
+
+  debugColor *= mix(1.0, originColor.a, preMultipliedAlpha);
+
+  return originColor.rgb * (1.0 - colorRate) + debugColor;
+}
+#endif
+
 void main()
 {
 #ifdef ATLAS_DEFAULT_WARP
@@ -263,13 +384,15 @@ void main()
   textureColor.rgb *= mix(1.0, maskAlpha, preMultipliedAlpha);
 #endif
 
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+#if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+#ifndef IS_REQUIRED_DEBUG_VISUAL_SHADER
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
     OUT_COLOR = textureColor;
   }
   else
+#endif
   {
     PreprocessPotential();
 #endif
@@ -285,7 +408,11 @@ void main()
     OUT_COLOR.rgb *= mix(1.0, opacity, preMultipliedAlpha);
 #endif
 
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+#if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
   }
+#endif
+
+#ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
+  OUT_COLOR.rgb = ApplyDebugMixColor(OUT_COLOR);
 #endif
 }
