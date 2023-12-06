@@ -163,14 +163,11 @@ void VectorAnimationThread::AddEventTriggerCallback(CallbackBase* callback)
   }
 }
 
-void VectorAnimationThread::RemoveEventTriggerCallback(CallbackBase* callback)
+void VectorAnimationThread::RemoveEventTriggerCallbacks(CallbackBase* callback)
 {
   ConditionalWait::ScopedLock lock(mConditionalWait);
-  auto                        iter = std::find(mTriggerEventCallbacks.begin(), mTriggerEventCallbacks.end(), callback);
-  if(iter != mTriggerEventCallbacks.end())
-  {
-    mTriggerEventCallbacks.erase(iter);
-  }
+  auto                        iter = std::remove(mTriggerEventCallbacks.begin(), mTriggerEventCallbacks.end(), callback);
+  mTriggerEventCallbacks.erase(iter, mTriggerEventCallbacks.end());
 }
 
 void VectorAnimationThread::Run()

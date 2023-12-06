@@ -82,11 +82,11 @@ public:
   void AddEventTriggerCallback(CallbackBase* callback);
 
   /**
-   * @brief Remove an event trigger callback.
+   * @brief Remove event trigger callbacks what we added before.
    *
    * @param callback The callback to remove
    */
-  void RemoveEventTriggerCallback(CallbackBase* callback);
+  void RemoveEventTriggerCallbacks(CallbackBase* callback);
 
 protected:
   /**
