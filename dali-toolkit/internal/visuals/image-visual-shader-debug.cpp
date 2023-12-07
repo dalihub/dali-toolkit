@@ -286,7 +286,7 @@ void ApplyImageVisualShaderDebugScriptCode(std::string& fragmentShader)
     auto key   = resultMap.GetKeyAt(i);
     auto value = resultMap.GetValue(i);
 
-    RedefineMacro(fragmentShader, std::move(key.stringKey), std::move(value.Get<std::string>()));
+    RedefineMacro(fragmentShader, std::move(key.stringKey), value.Get<std::string>());
   }
 }
 } // namespace ImageVisualShaderDebug
