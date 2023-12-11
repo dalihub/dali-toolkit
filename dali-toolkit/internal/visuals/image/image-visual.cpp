@@ -222,20 +222,13 @@ ImageVisual::~ImageVisual()
 {
   if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
-    if(mImageUrl.IsValid())
     {
-      // Decrease reference count of External Resources :
-      // EncodedImageBuffer or ExternalTextures.
-      // Ensure the stage is still valid before accessing texture manager.
-      if(mImageUrl.GetProtocolType() == VisualUrl::TEXTURE)
+      TextureManager& textureManager = mFactoryCache.GetTextureManager();
+
+      mImageUrl.DecreaseExternalResourceReference(textureManager);
+      if(mMaskingData)
       {
-        TextureManager& textureManager = mFactoryCache.GetTextureManager();
-        textureManager.RemoveExternalTexture(mImageUrl);
-      }
-      else if(mImageUrl.IsBufferResource())
-      {
-        TextureManager& textureManager = mFactoryCache.GetTextureManager();
-        textureManager.RemoveEncodedImageBuffer(mImageUrl);
+        mMaskingData->mAlphaMaskUrl.DecreaseExternalResourceReference(textureManager);
       }
     }
 
@@ -397,6 +390,20 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
       {
         AllocateMaskData();
         mMaskingData->mAlphaMaskUrl = alphaUrl;
+        if(mMaskingData->mAlphaMaskUrl.IsValid())
+        {
+          if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+          {
+            // Increase reference count of External Resources :
+            // EncodedImageBuffer or ExternalTextures.
+            // Reference count will be decreased at destructor of the visual.
+            mMaskingData->mAlphaMaskUrl.IncreaseExternalResourceReference(mFactoryCache.GetTextureManager());
+          }
+          if(mMaskingData->mAlphaMaskUrl.GetProtocolType() == VisualUrl::TEXTURE)
+          {
+            mMaskingData->mPreappliedMasking = false;
+          }
+        }
       }
       break;
     }
@@ -429,7 +436,18 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
       if(value.Get(maskingType))
       {
         AllocateMaskData();
+
+        bool externalTextureUsed = false;
         if(mImageUrl.IsValid() && mImageUrl.GetProtocolType() == VisualUrl::TEXTURE)
+        {
+          externalTextureUsed = true;
+        }
+        else if(mMaskingData->mAlphaMaskUrl.IsValid() && mMaskingData->mAlphaMaskUrl.GetProtocolType() == VisualUrl::TEXTURE)
+        {
+          externalTextureUsed = true;
+        }
+
+        if(externalTextureUsed)
         {
           // For external textures, only gpu masking is available.
           // Therefore, MASKING_TYPE is set to MASKING_ON_RENDERING forcelly.
@@ -615,13 +633,12 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
 
 void ImageVisual::OnInitialize()
 {
-  // Increase reference count of External Resources :
-  // EncodedImageBuffer or ExternalTextures.
-  // Reference count will be decreased at destructor of the visual.
-  if(mImageUrl.IsValid() && (mImageUrl.IsBufferResource() || mImageUrl.GetProtocolType() == VisualUrl::TEXTURE))
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
-    TextureManager& textureManager = mFactoryCache.GetTextureManager();
-    textureManager.UseExternalResource(mImageUrl);
+    // Increase reference count of External Resources :
+    // EncodedImageBuffer or ExternalTextures.
+    // Reference count will be decreased at destructor of the visual.
+    mImageUrl.IncreaseExternalResourceReference(mFactoryCache.GetTextureManager());
   }
 
   // Generate geometry and shader. Note that we should check AddOn when generate geometry, due to LoadPolicy::IMMEDIATE case

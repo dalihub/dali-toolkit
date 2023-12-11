@@ -118,7 +118,12 @@ TextureCacheManager::~TextureCacheManager()
 
 VisualUrl TextureCacheManager::GetVisualUrl(const TextureCacheManager::TextureId textureId)
 {
-  VisualUrl         visualUrl("");
+  VisualUrl visualUrl("");
+  if(textureId == INVALID_TEXTURE_ID)
+  {
+    return visualUrl;
+  }
+
   TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<uint32_t>(textureId)]);
 
   switch(static_cast<TextureCacheIndexType>(cacheIndex.detailValue.type))
@@ -157,7 +162,12 @@ VisualUrl TextureCacheManager::GetVisualUrl(const TextureCacheManager::TextureId
 
 TextureCacheManager::LoadState TextureCacheManager::GetTextureState(const TextureCacheManager::TextureId textureId)
 {
-  LoadState         loadState  = TextureCacheManager::LoadState::NOT_STARTED;
+  LoadState loadState = TextureCacheManager::LoadState::NOT_STARTED;
+  if(textureId == INVALID_TEXTURE_ID)
+  {
+    return loadState;
+  }
+
   TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<uint32_t>(textureId)]);
 
   switch(static_cast<TextureCacheIndexType>(cacheIndex.detailValue.type))
@@ -170,7 +180,8 @@ TextureCacheManager::LoadState TextureCacheManager::GetTextureState(const Textur
     }
     case TextureCacheIndexType::TEXTURE_CACHE_INDEX_TYPE_TEXTURE:
     {
-      loadState = LoadState::UPLOADED;
+      ExternalTextureInfo& cachedExternalTextureInfo(mExternalTextures[cacheIndex.GetIndex()]);
+      loadState = cachedExternalTextureInfo.textureSet ? LoadState::UPLOADED : LoadState::LOAD_FAILED;
       break;
     }
     default:
@@ -182,23 +193,15 @@ TextureCacheManager::LoadState TextureCacheManager::GetTextureState(const Textur
   return loadState;
 }
 
-TextureCacheManager::LoadState TextureCacheManager::GetTextureStateInternal(const TextureCacheManager::TextureId textureId)
-{
-  LoadState         loadState  = TextureCacheManager::LoadState::NOT_STARTED;
-  TextureCacheIndex cacheIndex = GetCacheIndexFromId(textureId);
-  if(cacheIndex != INVALID_CACHE_INDEX)
-  {
-    TextureInfo& cachedTextureInfo(mTextureInfoContainer[cacheIndex.GetIndex()]);
-    loadState = cachedTextureInfo.loadState;
-  }
-
-  return loadState;
-}
-
 Texture TextureCacheManager::GetTexture(const TextureCacheManager::TextureId textureId, const uint32_t textureIndex)
 {
-  Texture           texture; // empty handle
-  TextureCacheIndex cacheIndex = GetCacheIndexFromId(textureId);
+  Texture texture; // empty handle
+  if(textureId == INVALID_TEXTURE_ID)
+  {
+    return texture;
+  }
+
+  TextureCacheIndex cacheIndex = static_cast<TextureCacheIndex>(mTextureIdConverter[static_cast<uint32_t>(textureId)]);
 
   switch(static_cast<TextureCacheIndexType>(cacheIndex.detailValue.type))
   {
@@ -208,6 +211,15 @@ Texture TextureCacheManager::GetTexture(const TextureCacheManager::TextureId tex
       if(textureIndex < static_cast<uint32_t>(cachedTextureInfo.textures.size()))
       {
         texture = cachedTextureInfo.textures[textureIndex];
+      }
+      break;
+    }
+    case TextureCacheIndexType::TEXTURE_CACHE_INDEX_TYPE_TEXTURE:
+    {
+      ExternalTextureInfo& cachedExternalTextureInfo(mExternalTextures[cacheIndex.GetIndex()]);
+      if(cachedExternalTextureInfo.textureSet && textureIndex < static_cast<uint32_t>(cachedExternalTextureInfo.textureSet.GetTextureCount()))
+      {
+        texture = cachedExternalTextureInfo.textureSet.GetTexture(textureIndex);
       }
       break;
     }
@@ -244,10 +256,9 @@ EncodedImageBuffer TextureCacheManager::GetEncodedImageBuffer(const VisualUrl& u
   EncodedImageBuffer encodedImageBuffer; // empty handle
   if(url.IsValid() && VisualUrl::BUFFER == url.GetProtocolType())
   {
-    std::string location = url.GetLocationWithoutExtension();
-    if(location.size() > 0u)
+    TextureId bufferId = INVALID_TEXTURE_ID;
+    if(url.GetLocationAsInteger(bufferId) && bufferId != INVALID_TEXTURE_ID)
     {
-      TextureId bufferId = std::stoi(location);
       return GetEncodedImageBuffer(bufferId);
     }
   }
@@ -308,21 +319,20 @@ TextureSet TextureCacheManager::RemoveExternalTexture(const VisualUrl& url)
     if(VisualUrl::TEXTURE == url.GetProtocolType())
     {
       // get the location from the Url
-      std::string location = url.GetLocation();
-      if(location.size() > 0u)
+      TextureId externalTextureId = INVALID_TEXTURE_ID;
+      if(url.GetLocationAsInteger(externalTextureId) && externalTextureId != INVALID_TEXTURE_ID)
       {
-        TextureId textureId = std::stoi(location);
-        removeTextureIndex  = GetCacheIndexFromExternalTextureId(textureId);
+        removeTextureIndex = GetCacheIndexFromExternalTextureId(externalTextureId);
         if(removeTextureIndex != INVALID_CACHE_INDEX)
         {
           ExternalTextureInfo& textureInfo(mExternalTextures[removeTextureIndex.GetIndex()]);
-          DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureCacheManager::RemoveExternalTexture(url:%s) textureId:%d reference:%d\n", url.GetUrl().c_str(), textureId, static_cast<int>(textureInfo.referenceCount));
+          DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureCacheManager::RemoveExternalTexture(url:%s) textureId:%d reference:%d\n", url.GetUrl().c_str(), externalTextureId, static_cast<int>(textureInfo.referenceCount));
           textureSet = textureInfo.textureSet;
           if(--(textureInfo.referenceCount) <= 0)
           {
             removeTextureInfo = true;
             // id life is finished. Remove it at converter
-            mTextureIdConverter.Remove(textureId);
+            mTextureIdConverter.Remove(externalTextureId);
           }
         }
       }
@@ -348,11 +358,10 @@ EncodedImageBuffer TextureCacheManager::RemoveEncodedImageBuffer(const VisualUrl
     if(VisualUrl::BUFFER == url.GetProtocolType())
     {
       // get the location from the Url
-      std::string location = url.GetLocationWithoutExtension();
-      if(location.size() > 0u)
+      TextureId bufferId = INVALID_TEXTURE_ID;
+      if(url.GetLocationAsInteger(bufferId) && bufferId != INVALID_TEXTURE_ID)
       {
-        TextureId bufferId = std::stoi(location);
-        removeBufferIndex  = GetCacheIndexFromEncodedImageBufferId(bufferId);
+        removeBufferIndex = GetCacheIndexFromEncodedImageBufferId(bufferId);
 
         if(removeBufferIndex != INVALID_CACHE_INDEX)
         {
@@ -386,11 +395,10 @@ void TextureCacheManager::UseExternalResource(const VisualUrl& url)
 {
   if(VisualUrl::TEXTURE == url.GetProtocolType())
   {
-    std::string location = url.GetLocation();
-    if(location.size() > 0u)
+    TextureId externalTextureId = INVALID_TEXTURE_ID;
+    if(url.GetLocationAsInteger(externalTextureId) && externalTextureId != INVALID_TEXTURE_ID)
     {
-      TextureId         id         = std::stoi(location);
-      TextureCacheIndex cacheIndex = GetCacheIndexFromExternalTextureId(id);
+      TextureCacheIndex cacheIndex = GetCacheIndexFromExternalTextureId(externalTextureId);
       if(cacheIndex != INVALID_CACHE_INDEX)
       {
         ExternalTextureInfo& textureInfo(mExternalTextures[cacheIndex.GetIndex()]);
@@ -403,11 +411,10 @@ void TextureCacheManager::UseExternalResource(const VisualUrl& url)
   }
   else if(VisualUrl::BUFFER == url.GetProtocolType())
   {
-    std::string location = url.GetLocationWithoutExtension();
-    if(location.size() > 0u)
+    TextureId encodedImageBufferId = INVALID_TEXTURE_ID;
+    if(url.GetLocationAsInteger(encodedImageBufferId) && encodedImageBufferId != INVALID_TEXTURE_ID)
     {
-      TextureId         id         = std::stoi(location);
-      TextureCacheIndex cacheIndex = GetCacheIndexFromEncodedImageBufferId(id);
+      TextureCacheIndex cacheIndex = GetCacheIndexFromEncodedImageBufferId(encodedImageBufferId);
       if(cacheIndex != INVALID_CACHE_INDEX)
       {
         EncodedImageBufferInfo& bufferInfo(mEncodedImageBuffers[cacheIndex.GetIndex()]);

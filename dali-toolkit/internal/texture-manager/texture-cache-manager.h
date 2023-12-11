@@ -108,15 +108,6 @@ public:
   TextureCacheManager::LoadState GetTextureState(const TextureCacheManager::TextureId textureId);
 
   /**
-   * @brief Get the current state of a texture
-   * @note This API doesn't consider external & encodedimagebuffer.
-   * @param[in] textureId The texture id to query
-   * @return The loading state if the texture is valid, or NOT_STARTED if the textureId
-   * is not valid.
-   */
-  TextureCacheManager::LoadState GetTextureStateInternal(const TextureCacheManager::TextureId textureId);
-
-  /**
    * @brief Get the associated texture set if the texture id is valid
    * @param[in] textureId The texture Id to look up
    * @param[in] textureIndex The texture index to query

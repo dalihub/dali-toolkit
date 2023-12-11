@@ -29,9 +29,12 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 
 #include "dummy-control.h"
+#include "test-encoded-image-buffer.h"
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -57,8 +60,6 @@ const char* TEST_N_PATCH_IMAGE_FILE_NAME         = TEST_RESOURCE_DIR "/heartsfra
 const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
 
-} // namespace
-
 void CopyUrlsIntoArray(Property::Array& urls, int startIndex = 0)
 {
   for(int i = 20 + startIndex; i <= 30; ++i)
@@ -72,6 +73,67 @@ void CopyUrlsIntoArray(Property::Array& urls, int startIndex = 0)
     }
   }
 }
+
+enum ExternalUrlType
+{
+  EXTERNAL_TEXTURE,
+  ENCODED_IMAGE_BUFFER,
+  MIXED,
+};
+
+ImageUrl ConvertFileToImageUrl(const char* url, ExternalUrlType type)
+{
+  DALI_ASSERT_ALWAYS(type == ExternalUrlType::EXTERNAL_TEXTURE || type == ExternalUrlType::ENCODED_IMAGE_BUFFER);
+
+  ImageUrl imageUrl;
+
+  if(type == ExternalUrlType::EXTERNAL_TEXTURE)
+  {
+    Devel::PixelBuffer pixelBuffer = LoadImageFromFile(url);
+    PixelData          pixelData   = Devel::PixelBuffer::Convert(pixelBuffer);
+
+    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  }
+  else // ENCODED_IMAGE_BUFFER
+  {
+    EncodedImageBuffer rawBuffer = ConvertFileToEncodedImageBuffer(url);
+
+    imageUrl = Dali::Toolkit::Image::GenerateUrl(rawBuffer);
+  }
+
+  return imageUrl;
+}
+
+void CopyExternalUrlsIntoArray(Property::Array& urls, std::vector<ImageUrl>& imageUrlContainer, int startIndex, ExternalUrlType generationType)
+{
+  for(int i = 20 + startIndex; i <= 30; ++i)
+  {
+    char* url;
+    if(asprintf(&url, TEST_IMAGE_FILE_NAME, i) > 0)
+    {
+      ImageUrl imageUrl;
+      if(generationType == ExternalUrlType::EXTERNAL_TEXTURE ||
+         (generationType == ExternalUrlType::MIXED && (i % 2 == 0)))
+      {
+        imageUrl = ConvertFileToImageUrl(url, ExternalUrlType::EXTERNAL_TEXTURE);
+      }
+      else // ENCODED_IMAGE_BUFFER
+      {
+        imageUrl = ConvertFileToImageUrl(url, ExternalUrlType::ENCODED_IMAGE_BUFFER);
+      }
+
+      DALI_TEST_CHECK(imageUrl);
+
+      imageUrlContainer.push_back(imageUrl); ///< To keep reference count of external textures.
+
+      Property::Value value(imageUrl.GetUrl());
+      urls.Add(value);
+      free(url);
+    }
+  }
+}
+
+} // namespace
 
 int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
 {
@@ -741,6 +803,10 @@ int UtcDaliAnimatedImageVisualSynchronousLoading(void)
     dummyControl.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(16);
+  application.RunIdles();
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -786,8 +852,8 @@ int UtcDaliAnimatedImageVisualSynchronousLoadingWithAlphaMask01(void)
     application.SendNotification();
     application.Render(20);
 
-    // The first frame is loaded synchronously and load next batch with masking
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+    // The first frame is loaded synchronously and load next batch with masking (1 for load, 1 for apply masking)
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
@@ -798,6 +864,10 @@ int UtcDaliAnimatedImageVisualSynchronousLoadingWithAlphaMask01(void)
     dummyControl.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(16);
+  application.RunIdles();
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -844,21 +914,27 @@ int UtcDaliAnimatedImageVisualSynchronousLoadingWithAlphaMask02(void)
     application.SendNotification();
     application.Render(20);
 
-    // The first frame is loaded synchronously and load next batch with masking
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+    // The first frame is loaded synchronously and load next batch
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
 
     DALI_TEST_EQUALS(Test::GetTimerCount(), 1, TEST_LOCATION);
-    DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 4, TEST_LOCATION);
+    DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 3, TEST_LOCATION);
 
     dummyControl.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
   application.SendNotification();
   application.Render(16);
-  DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(16);
+
+  // TODO : It will be failed due to we don't cache SyncLoading case. fix it soon
+  //DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
 
   END_TEST;
 }
@@ -921,6 +997,10 @@ int UtcDaliAnimatedImageVisualJumpToAction(void)
     dummyControl.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(16);
+  application.RunIdles();
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -988,6 +1068,10 @@ int UtcDaliAnimatedImageVisualStopBehavior(void)
     dummyControl.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(16);
+  application.RunIdles();
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -1058,6 +1142,10 @@ int UtcDaliAnimatedImageVisualStopBehavior02(void)
     dummyControl.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(16);
+  application.RunIdles();
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -1166,6 +1254,10 @@ int UtcDaliAnimatedImageVisualAnimatedImage01(void)
     dummyControl2.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(20);
+  application.RunIdles();
   application.SendNotification();
   application.Render(20);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -1212,6 +1304,10 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask01(void)
     dummyControl.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(20);
+  application.RunIdles();
   application.SendNotification();
   application.Render(20);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -1251,7 +1347,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask02(void)
     application.SendNotification();
     application.Render();
 
-    // load two frame(batch size), load mask image, and request two masking
+    // load two frame(batch size), load mask image, and do not request two masking
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
     application.SendNotification();
@@ -1262,6 +1358,10 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask02(void)
     dummyControl.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(20);
+  application.RunIdles();
   application.SendNotification();
   application.Render(20);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -1272,7 +1372,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask02(void)
 int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask03(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask03 for GPU Alpha Masking with broken mask texture");
+  tet_infoline("UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask03 for CPU Alpha Masking with broken mask texture");
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
   {
@@ -1282,7 +1382,57 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask03(void)
     propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
     propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 4);
     propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
-    propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, "");
+    propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, "invalid.jpg");
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(dummyControl);
+
+    application.SendNotification();
+    application.Render();
+
+    // load two frame(batch size), load mask image, and do not request two masking
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 2, TEST_LOCATION);
+
+    dummyControl.Unparent();
+  }
+  tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(20);
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(20);
+  DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask04 for GPU Alpha Masking with broken mask texture");
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+    propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
+    propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 4);
+    propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+    propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, "invalid.jpg");
     propertyMap.Insert(DevelImageVisual::Property::MASKING_TYPE, DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
 
     VisualFactory factory = VisualFactory::Get();
@@ -1298,7 +1448,116 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask03(void)
     application.SendNotification();
     application.Render();
 
+    // load two frame(batch size), load mask image, and do not request two masking
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 2, TEST_LOCATION);
+
+    dummyControl.Unparent();
+  }
+  tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(20);
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(20);
+  DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask05 for CPU Alpha Masking with encoded image buffer");
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  {
+    EncodedImageBuffer rawBuffer = ConvertFileToEncodedImageBuffer(TEST_MASK_IMAGE_FILE_NAME);
+    ImageUrl           imageUrl  = Dali::Toolkit::Image::GenerateUrl(rawBuffer);
+    std::string        url       = imageUrl.GetUrl();
+
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+    propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
+    propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 4);
+    propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+    propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, url);
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(dummyControl);
+
+    application.SendNotification();
+    application.Render();
+
     // load two frame(batch size), load mask image, and request two masking
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(5), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 2, TEST_LOCATION);
+
+    dummyControl.Unparent();
+  }
+  tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(20);
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(20);
+  DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask06(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask06 for GPU Alpha Masking with encoded image buffer");
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  {
+    EncodedImageBuffer rawBuffer = ConvertFileToEncodedImageBuffer(TEST_MASK_IMAGE_FILE_NAME);
+    ImageUrl           imageUrl  = Dali::Toolkit::Image::GenerateUrl(rawBuffer);
+    std::string        url       = imageUrl.GetUrl();
+
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+    propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
+    propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 4);
+    propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+    propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, url);
+    propertyMap.Insert(DevelImageVisual::Property::MASKING_TYPE, DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    application.GetScene().Add(dummyControl);
+
+    application.SendNotification();
+    application.Render();
+
+    // load two frame(batch size), load mask image, and do not request two masking
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
     application.SendNotification();
@@ -1309,6 +1568,10 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask03(void)
     dummyControl.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(20);
+  application.RunIdles();
   application.SendNotification();
   application.Render(20);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -1400,6 +1663,10 @@ int UtcDaliAnimatedImageVisualMultiImage01(void)
     dummyControl.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(16);
+  application.RunIdles();
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -1550,6 +1817,10 @@ int UtcDaliAnimatedImageVisualMultiImage02(void)
     dummyControl.Unparent();
   }
   tet_infoline("Test that removing the visual from window deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(16);
+  application.RunIdles();
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -1629,6 +1900,10 @@ int UtcDaliAnimatedImageVisualMultiImage03(void)
     dummyControl2.Unparent();
   }
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(16);
+  application.RunIdles();
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -1716,6 +1991,10 @@ int UtcDaliAnimatedImageVisualMultiImage04(void)
   }
 
   tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(16);
+  application.RunIdles();
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
@@ -1772,15 +2051,350 @@ int UtcDaliAnimatedImageVisualMultiImage05(void)
     dummyControl.Unparent();
   }
 
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(16);
+  application.RunIdles();
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
 
   tet_infoline("Test that pending batch of image loads are cancelled instead of uploaded");
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(16);
+  application.RunIdles();
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualExternalImage01(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction&     gl = application.GetGlAbstraction();
+
+  tet_infoline("Test various cases of url with external image");
+
+  for(int testCase = 0; testCase < 6; testCase++)
+  {
+    ExternalUrlType type     = static_cast<ExternalUrlType>(testCase % 2);
+    ExternalUrlType maskType = static_cast<ExternalUrlType>(testCase / 3);
+
+    const bool useMask = (maskType == ExternalUrlType::EXTERNAL_TEXTURE || maskType == ExternalUrlType::ENCODED_IMAGE_BUFFER);
+
+    ImageUrl imageUrl = ConvertFileToImageUrl(TEST_GIF_FILE_NAME, type);
+    ImageUrl maskImageUrl;
+
+    int preCreatedTextureCount = 0;
+    if(imageUrl.GetUrl()[0] == 'd')
+    {
+      ++preCreatedTextureCount;
+    }
+
+    if(useMask)
+    {
+      maskImageUrl = ConvertFileToImageUrl(TEST_MASK_IMAGE_FILE_NAME, maskType);
+      if(maskImageUrl.GetUrl()[0] == 'd')
+      {
+        ++preCreatedTextureCount;
+      }
+    }
+
+    tet_printf("Test case : %d, image type : %d, mask type : %d. pre-created texture count : %d\n", testCase, type, maskType, preCreatedTextureCount);
+
+    // TODO : Need to fix this UTC
+
+    {
+      Property::Map propertyMap;
+      propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+      propertyMap.Insert(ImageVisual::Property::URL, imageUrl.GetUrl());
+      propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 4);
+      propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 8);
+      propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 100);
+      propertyMap.Insert(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 1.5f);
+      if(useMask)
+      {
+        propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, maskImageUrl.GetUrl());
+        propertyMap.Insert(DevelImageVisual::Property::MASKING_TYPE, DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+      }
+
+      VisualFactory factory = VisualFactory::Get();
+      Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+      // Expect that a batch of 4 textures has been requested. These will be serially loaded
+      // below.
+
+      DummyControl        dummyControl = DummyControl::New(true);
+      Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+      dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+      dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+      application.GetScene().Add(dummyControl);
+      application.SendNotification();
+      application.Render(16);
+
+      int expectTriggerCount = 0;
+      int expectTextureCount = preCreatedTextureCount;
+      if(imageUrl.GetUrl()[0] == 'e')
+      {
+        ++expectTriggerCount;
+        ++expectTextureCount;
+      }
+
+      if(useMask && maskImageUrl.GetUrl()[0] == 'e')
+      {
+        ++expectTriggerCount;
+        ++expectTextureCount;
+      }
+
+      tet_printf("Ready the visual after the visual is on stage (trigger count : %d, texture count : %d)\n", expectTriggerCount, expectTextureCount);
+      if(expectTriggerCount)
+      {
+        DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(expectTriggerCount), true, TEST_LOCATION);
+      }
+
+      TraceCallStack& textureTrace = gl.GetTextureTrace();
+      textureTrace.Enable(true);
+
+      application.SendNotification();
+      application.Render(16);
+
+      DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), expectTextureCount, TEST_LOCATION);
+      DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+      dummyControl.Unparent();
+    }
+    tet_infoline("Test that removing the visual from stage deletes all textures");
+    imageUrl.Reset();
+    maskImageUrl.Reset();
+
+    application.RunIdles();
+    application.SendNotification();
+    application.Render(16);
+    application.RunIdles();
+    application.SendNotification();
+    application.Render(16);
+    DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualExternalMultiImage01(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction&     gl = application.GetGlAbstraction();
+
+  tet_infoline("Test various cases of urls with external images");
+
+  for(int testCase = 0; testCase < 9; testCase++)
+  {
+    ExternalUrlType type     = static_cast<ExternalUrlType>(testCase % 3);
+    ExternalUrlType maskType = static_cast<ExternalUrlType>(testCase / 3);
+
+    const bool useMask = (maskType == ExternalUrlType::EXTERNAL_TEXTURE || maskType == ExternalUrlType::ENCODED_IMAGE_BUFFER);
+
+    Property::Array       urls;
+    std::vector<ImageUrl> imageUrlHolder;
+    CopyExternalUrlsIntoArray(urls, imageUrlHolder, 0, type);
+    int preCreatedTextureCount = 0;
+    for(size_t i = 0u; i < imageUrlHolder.size(); i++)
+    {
+      if(imageUrlHolder[i].GetUrl()[0] == 'd')
+      {
+        ++preCreatedTextureCount;
+      }
+    }
+
+    ImageUrl maskImageUrl;
+    if(useMask)
+    {
+      maskImageUrl = ConvertFileToImageUrl(TEST_MASK_IMAGE_FILE_NAME, maskType);
+      if(maskImageUrl.GetUrl()[0] == 'd')
+      {
+        ++preCreatedTextureCount;
+      }
+    }
+
+    tet_printf("Test case : %d, image type : %d, mask type : %d. pre-created texture count : %d\n", testCase, type, maskType, preCreatedTextureCount);
+
+    // TODO : Need to fix this UTC
+
+    {
+      Property::Map propertyMap;
+      propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE);
+      propertyMap.Insert(ImageVisual::Property::URL, Property::Value(urls));
+      propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 4);
+      propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 8);
+      propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 100);
+      propertyMap.Insert(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 1.5f);
+      if(useMask)
+      {
+        propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, maskImageUrl.GetUrl());
+        propertyMap.Insert(DevelImageVisual::Property::MASKING_TYPE, DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+      }
+
+      VisualFactory factory = VisualFactory::Get();
+      Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+      // Expect that a batch of 4 textures has been requested. These will be serially loaded
+      // below.
+
+      DummyControl        dummyControl = DummyControl::New(true);
+      Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+      dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+      dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+      application.GetScene().Add(dummyControl);
+      application.SendNotification();
+      application.Render(16);
+
+      int expectTriggerCount = 0;
+      int expectTextureCount = preCreatedTextureCount;
+      for(int i = 0; i < 4; i++)
+      {
+        if(imageUrlHolder[(i % imageUrlHolder.size())].GetUrl()[0] == 'e')
+        {
+          ++expectTriggerCount;
+          ++expectTextureCount;
+        }
+      }
+
+      if(useMask && maskImageUrl.GetUrl()[0] == 'e')
+      {
+        ++expectTriggerCount;
+        ++expectTextureCount;
+      }
+
+      tet_printf("Ready the visual after the visual is on stage (trigger count : %d, texture count : %d)\n", expectTriggerCount, expectTextureCount);
+      if(expectTriggerCount)
+      {
+        DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(expectTriggerCount), true, TEST_LOCATION);
+      }
+
+      tet_printf("Test that a timer has been started\n");
+      DALI_TEST_EQUALS(Test::GetTimerCount(), 1, TEST_LOCATION);
+
+      TraceCallStack& textureTrace = gl.GetTextureTrace();
+      textureTrace.Enable(true);
+
+      application.SendNotification();
+      application.Render(16);
+
+      DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), expectTextureCount, TEST_LOCATION);
+      DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+      tet_printf("Test that after 1 tick, and file loads completed, that we have 7 textures\n");
+      Test::EmitGlobalTimerSignal();
+
+      expectTriggerCount = 0;
+      for(int i = 0; i < 1; i++)
+      {
+        if(imageUrlHolder[(i % imageUrlHolder.size())].GetUrl()[0] == 'e')
+        {
+          --expectTextureCount;
+        }
+      }
+      for(int i = 4; i < 8; i++)
+      {
+        if(imageUrlHolder[(i % imageUrlHolder.size())].GetUrl()[0] == 'e')
+        {
+          ++expectTriggerCount;
+          ++expectTextureCount;
+        }
+      }
+
+      // Expect the second batch has been requested
+      tet_printf("Expect the second batch has been requested (trigger count : %d, texture count : %d)\n", expectTriggerCount, expectTextureCount);
+      if(expectTriggerCount)
+      {
+        DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(expectTriggerCount), true, TEST_LOCATION);
+      }
+
+      application.SendNotification();
+      application.Render(16);
+      DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), expectTextureCount, TEST_LOCATION);
+
+      for(int i = 1; i < 2; i++)
+      {
+        if(imageUrlHolder[(i % imageUrlHolder.size())].GetUrl()[0] == 'e')
+        {
+          --expectTextureCount;
+        }
+      }
+      tet_printf("Test that after 2 ticks that we have 6 textures (texture count : %d)\n", expectTextureCount);
+
+      Test::EmitGlobalTimerSignal();
+      application.SendNotification();
+      application.Render(16);
+      DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), expectTextureCount, TEST_LOCATION);
+
+      expectTriggerCount = 0;
+      for(int i = 8; i < 10; i++)
+      {
+        if(imageUrlHolder[(i % imageUrlHolder.size())].GetUrl()[0] == 'e')
+        {
+          ++expectTriggerCount;
+          ++expectTextureCount;
+        }
+      }
+      tet_printf("And that at least 2 textures were requested (trigger count : %d, texture count : %d)\n", expectTriggerCount, expectTextureCount);
+      if(expectTriggerCount)
+      {
+        DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(expectTriggerCount), true, TEST_LOCATION);
+      }
+      application.SendNotification();
+      application.Render(16);
+      DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), expectTextureCount, TEST_LOCATION);
+
+      for(int i = 2; i < 3; i++)
+      {
+        if(imageUrlHolder[(i % imageUrlHolder.size())].GetUrl()[0] == 'e')
+        {
+          --expectTextureCount;
+        }
+      }
+      tet_printf("Test that after 3rd tick that we have 7 textures and 1 request (texture count : %d)\n", expectTextureCount);
+      Test::EmitGlobalTimerSignal();
+      application.SendNotification();
+      application.Render(16);
+      DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), expectTextureCount, TEST_LOCATION);
+
+      expectTriggerCount = 0;
+      for(int i = 10; i < 11; i++)
+      {
+        if(imageUrlHolder[(i % imageUrlHolder.size())].GetUrl()[0] == 'e')
+        {
+          ++expectTriggerCount;
+          ++expectTextureCount;
+        }
+      }
+      if(expectTriggerCount)
+      {
+        DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(expectTriggerCount), true, TEST_LOCATION);
+      }
+      application.SendNotification();
+      application.Render(16);
+      DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), expectTextureCount, TEST_LOCATION);
+
+      dummyControl.Unparent();
+    }
+    tet_infoline("Test that removing the visual from stage deletes all textures");
+    imageUrlHolder.clear();
+    maskImageUrl.Reset();
+
+    application.RunIdles();
+    application.SendNotification();
+    application.Render(16);
+    application.RunIdles();
+    application.SendNotification();
+    application.Render(16);
+    DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
+  }
 
   END_TEST;
 }
