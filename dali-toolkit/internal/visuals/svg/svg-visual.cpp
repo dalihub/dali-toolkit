@@ -82,15 +82,18 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
 
 SvgVisual::~SvgVisual()
 {
+  DALI_LOG_RELEASE_INFO("SvgVisual is destructed: %p, mLoadingTask : %p, mRasterizingTask : %p, url : %s\n", this, mLoadingTask.Get(), mRasterizingTask.Get(), mImageUrl.GetUrl().c_str());
   if(Stage::IsInstalled())
   {
     if(mLoadingTask)
     {
       Dali::AsyncTaskManager::Get().RemoveTask(mLoadingTask);
+      mLoadingTask.Reset();
     }
     if(mRasterizingTask)
     {
       Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
+      mRasterizingTask.Reset();
     }
 
     if(mImageUrl.IsBufferResource())
@@ -99,7 +102,10 @@ SvgVisual::~SvgVisual()
       textureManager.RemoveEncodedImageBuffer(mImageUrl.GetUrl());
     }
   }
-  DALI_LOG_RELEASE_INFO("SvgVisual is destructed: %p\n", this);
+  else if(DALI_UNLIKELY(!Stage::IsShuttingDown()))
+  {
+    DALI_LOG_ERROR("SvgVisual maybe try to destruct on worker thread! %p, mLoadingTask : %p, mRasterizingTask : %p, url : %s\n", this, mLoadingTask.Get(), mRasterizingTask.Get(), mImageUrl.GetUrl().c_str());
+  }
 }
 
 void SvgVisual::OnInitialize()
