@@ -118,12 +118,12 @@ void VectorAnimationTask::Finalize()
   // Release some objects in the main thread
   if(mAnimationFinishedCallback)
   {
-    mVectorAnimationThread.RemoveEventTriggerCallback(mAnimationFinishedCallback.get());
+    mVectorAnimationThread.RemoveEventTriggerCallbacks(mAnimationFinishedCallback.get());
     mAnimationFinishedCallback.reset();
   }
   if(mLoadCompletedCallback)
   {
-    mVectorAnimationThread.RemoveEventTriggerCallback(mLoadCompletedCallback.get());
+    mVectorAnimationThread.RemoveEventTriggerCallbacks(mLoadCompletedCallback.get());
     mLoadCompletedCallback.reset();
   }
 

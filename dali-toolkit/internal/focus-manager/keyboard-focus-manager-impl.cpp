@@ -680,6 +680,7 @@ void KeyboardFocusManager::ClearFocus()
   Actor actor = GetCurrentFocusActor();
   if(actor)
   {
+    DALI_LOG_RELEASE_INFO("ClearFocus id:(%d)\n",  actor.GetProperty<int32_t>(Dali::Actor::Property::ID));
     // Send notification for the change of focus actor
     if(!mFocusChangedSignal.Empty())
     {

@@ -1,3 +1,6 @@
+#ifndef DALI_TOOLKIT_IMAGE_VISUAL_SHADER_DEBUG_H
+#define DALI_TOOLKIT_IMAGE_VISUAL_SHADER_DEBUG_H
+
 /*
  * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
@@ -12,41 +15,39 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-// HEADER
-#include <dali-toolkit/public-api/dali-toolkit-version.h>
-
 // EXTERNAL INCLUDES
-#ifdef DEBUG_ENABLED
-#include <iostream>
-#endif
+#include <string>
 
 namespace Dali
 {
 namespace Toolkit
 {
-const unsigned int TOOLKIT_MAJOR_VERSION = 2;
-const unsigned int TOOLKIT_MINOR_VERSION = 3;
-const unsigned int TOOLKIT_MICRO_VERSION = 2;
-const char* const  TOOLKIT_BUILD_DATE    = __DATE__ " " __TIME__;
+namespace Internal
+{
+namespace ImageVisualShaderDebug
+{
+/**
+ * @brief Check whether we need to use debug option for image visual.
+ *
+ * @return True if ImageVisualShader relative environment on. False otherwise.
+ */
+bool DebugImageVisualShaderEnabled();
 
-#ifdef DEBUG_ENABLED
-namespace
-{
-/// Allows the printing of the version number ONLY when debug is enabled
-struct PrintVersion
-{
-  PrintVersion()
-  {
-    std::cerr << "DALi Toolkit:   " << TOOLKIT_MAJOR_VERSION << "." << TOOLKIT_MINOR_VERSION << "." << TOOLKIT_MICRO_VERSION << " (" << TOOLKIT_BUILD_DATE << ")" << std::endl;
-  }
-};
-PrintVersion TOOLKIT_VERSION;
-} // unnamed namespace
-#endif
+/**
+ * @brief Apply fragment shader use debug script.
+ *
+ * @param[in, out] fragmentShader Shader code to apply debug script.
+ */
+void ApplyImageVisualShaderDebugScriptCode(std::string& fragmentShader);
+
+} // namespace ImageVisualShaderDebug
+
+} // namespace Internal
 
 } // namespace Toolkit
 
 } // namespace Dali
+
+#endif // DALI_TOOLKIT_IMAGE_VISUAL_SHADER_DEBUG_H

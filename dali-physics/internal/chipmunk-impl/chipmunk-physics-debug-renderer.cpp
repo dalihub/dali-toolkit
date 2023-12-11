@@ -267,9 +267,9 @@ void PhysicsDebugRenderer::RenderLines(const Dali::RenderCallbackInput& input)
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBufferId);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndices.size() * sizeof(uint16_t), &mIndices[0], GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(mIndices.size() * sizeof(uint16_t)), &mIndices[0], GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, mVertexBufferId);
-  glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(Vertex), &mVertices[0], GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(mVertices.size() * sizeof(Vertex)), &mVertices[0], GL_STATIC_DRAW);
 
   GLint stride = 52; // 4*(2 + 2 + 1 + 4 + 4) = 4*13=52
   glVertexAttribPointer(mPositionLocation, 2, GL_FLOAT, GL_FALSE, stride, 0);

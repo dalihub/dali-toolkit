@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 
 namespace
 {
-const char* DEFAULT_THEME=
+const char* DEFAULT_THEME =
   "{\n"
   "  \"config\":\n"
   "  {\n"
@@ -44,22 +44,37 @@ const char* DEFAULT_THEME=
 
 struct NamedTheme
 {
-  NamedTheme( const std::string& name, const std::string& theme )
-  : name(name), theme(theme)
+  NamedTheme(const std::string& name, const std::string& theme)
+  : name(name),
+    theme(theme)
   {
   }
 
   std::string name;
   std::string theme;
 };
-typedef std::vector< NamedTheme > NamedThemes;
-NamedThemes gThemes;
+typedef std::vector<NamedTheme> NamedThemes;
+NamedThemes                     gThemes;
 
 std::string gTheme;
 std::string gFontFamily("LucidaSans");
 std::string gFontStyle("Regular");
 int         gFontSize(1);
-}
+
+constexpr std::string_view THROW_EXCEPTION_STYLE_FILE_NAME = "throwException";
+class DummyException : public std::exception
+{
+public:
+  DummyException()
+  {
+  }
+
+  const char* what() const throw()
+  {
+    return "DummyException";
+  }
+};
+} // namespace
 
 namespace Dali
 {
@@ -78,12 +93,12 @@ public: // Creation & Destruction
   ~StyleMonitor();
 
 public: // Style Information
-  std::string GetDefaultFontFamily() const;
-  std::string GetDefaultFontStyle() const;
-  float GetDefaultFontSize() const;
+  std::string        GetDefaultFontFamily() const;
+  std::string        GetDefaultFontStyle() const;
+  float              GetDefaultFontSize() const;
   const std::string& GetTheme() const;
-  void SetTheme(std::string theme);
-  bool LoadThemeFile( const std::string& filename, std::string& output );
+  void               SetTheme(std::string theme);
+  bool               LoadThemeFile(const std::string& filename, std::string& output);
 
 public: // Signals
   Dali::StyleMonitor::StyleChangeSignalType& StyleChangeSignal();
@@ -95,18 +110,18 @@ public: // Signals
 
 private:
   Dali::StyleMonitor::StyleChangeSignalType mStyleChangeSignal;
-  static Dali::StyleMonitor mToolkitStyleMonitor;
+  static Dali::StyleMonitor                 mToolkitStyleMonitor;
 
-  std::string mTheme;  ///<< Current theme name
+  std::string mTheme; ///<< Current theme name
 };
 
 Dali::StyleMonitor StyleMonitor::mToolkitStyleMonitor;
 
 Dali::StyleMonitor StyleMonitor::Get()
 {
-  if( ! mToolkitStyleMonitor )
+  if(!mToolkitStyleMonitor)
   {
-    mToolkitStyleMonitor = Dali::StyleMonitor( new Dali::Internal::Adaptor::StyleMonitor() );
+    mToolkitStyleMonitor = Dali::StyleMonitor(new Dali::Internal::Adaptor::StyleMonitor());
   }
   return mToolkitStyleMonitor;
 }
@@ -143,22 +158,27 @@ const std::string& StyleMonitor::GetTheme() const
 void StyleMonitor::SetTheme(std::string path)
 {
   mTheme = path;
-  EmitStyleChangeSignal( StyleChange::THEME_CHANGE );
+  EmitStyleChangeSignal(StyleChange::THEME_CHANGE);
 }
 
-bool StyleMonitor::LoadThemeFile( const std::string& filename, std::string& output )
+bool StyleMonitor::LoadThemeFile(const std::string& filename, std::string& output)
 {
-  for( NamedThemes::iterator iter = gThemes.begin(); iter != gThemes.end(); ++iter )
+  // Throw something exceptions during load file
+  if(filename == THROW_EXCEPTION_STYLE_FILE_NAME)
+  {
+    throw DummyException();
+  }
+  for(NamedThemes::iterator iter = gThemes.begin(); iter != gThemes.end(); ++iter)
   {
     NamedTheme& theme = *iter;
-    if( theme.name == filename )
+    if(theme.name == filename)
     {
       output = theme.theme;
       return true;
     }
   }
 
-  if( !gTheme.empty() )
+  if(!gTheme.empty())
   {
     output = gTheme;
   }
@@ -238,14 +258,14 @@ StyleMonitor::StyleChangeSignalType& StyleMonitor::StyleChangeSignal()
   return GetImplementation(*this).StyleChangeSignal();
 }
 
-bool StyleMonitor::LoadThemeFile( const std::string& filename, std::string& output )
+bool StyleMonitor::LoadThemeFile(const std::string& filename, std::string& output)
 {
   return GetImplementation(*this).LoadThemeFile(filename, output);
 }
 
 StyleMonitor& StyleMonitor::operator=(const StyleMonitor& monitor)
 {
-  if( *this != monitor )
+  if(*this != monitor)
   {
     BaseHandle::operator=(monitor);
   }
@@ -263,20 +283,19 @@ namespace Test
 {
 namespace StyleMonitor
 {
-
-void SetThemeFileOutput( const std::string& name, const std::string& output )
+void SetThemeFileOutput(const std::string& name, const std::string& output)
 {
-  for( NamedThemes::iterator iter = gThemes.begin(); iter != gThemes.end(); ++iter )
+  for(NamedThemes::iterator iter = gThemes.begin(); iter != gThemes.end(); ++iter)
   {
     NamedTheme& theme = *iter;
-    if( theme.name == name )
+    if(theme.name == name)
     {
       theme.theme = output;
       return;
     }
   }
 
-  gThemes.push_back( NamedTheme( name, output ) );
+  gThemes.push_back(NamedTheme(name, output));
 }
 
 void SetDefaultFontFamily(const std::string& family)
@@ -289,10 +308,10 @@ void SetDefaultFontStyle(const std::string& style)
   gFontStyle = style;
 }
 
-void SetDefaultFontSize( float size )
+void SetDefaultFontSize(float size)
 {
   gFontSize = size;
 }
 
-} // StyleMonitor
-} // Test
+} // namespace StyleMonitor
+} // namespace Test
