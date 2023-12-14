@@ -210,9 +210,8 @@ public:
    * @brief Registers child node with collidier mesh
    *
    * @param[in] node ModelNode to register
-   * @param[in] mesh Collider mesh to associate with model node
    */
-  void RegisterColliderMesh(Scene3D::ModelNode& node, const Dali::Scene3D::Algorithm::ColliderMesh& mesh);
+  void RegisterColliderMesh(Scene3D::ModelNode& node);
 
   /**
    * @brief Removes node/collider mesh from the register
