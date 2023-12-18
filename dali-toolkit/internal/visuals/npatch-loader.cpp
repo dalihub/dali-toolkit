@@ -25,6 +25,7 @@
 #include <dali/devel-api/common/hash.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 
 namespace Dali
 {
@@ -37,6 +38,7 @@ namespace
 constexpr auto INVALID_CACHE_INDEX = int32_t{-1}; ///< Invalid Cache index
 constexpr auto UNINITIALIZED_ID    = int32_t{0};  ///< uninitialised id, use to initialize ids
 
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
 } // Anonymous namespace
 
 NPatchLoader::NPatchLoader()
@@ -182,10 +184,35 @@ void NPatchLoader::Remove(NPatchData::NPatchDataId id, TextureUploadObserver* te
 
 void NPatchLoader::Process(bool postProcessor)
 {
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    if(mRemoveQueue.size() > 0u)
+    {
+      std::ostringstream oss;
+      oss << "[" << mRemoveQueue.size() << "]";
+      DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_NPATCH_LOADER_PROCESS_REMOVE_QUEUE", oss.str().c_str());
+    }
+  }
+#endif
+
   for(auto& iter : mRemoveQueue)
   {
     Remove(iter.first, iter.second);
   }
+
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    if(mRemoveQueue.size() > 0u)
+    {
+      std::ostringstream oss;
+      oss << "[" << mRemoveQueue.size() << "]";
+      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_NPATCH_LOADER_PROCESS_REMOVE_QUEUE", oss.str().c_str());
+    }
+  }
+#endif
+
   mRemoveQueue.clear();
 
   if(Adaptor::IsAvailable())
