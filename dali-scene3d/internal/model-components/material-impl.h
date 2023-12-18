@@ -36,6 +36,7 @@
 #include <dali-scene3d/public-api/loader/shader-definition.h>
 #include <dali-scene3d/public-api/loader/shader-option.h>
 #include <dali-scene3d/public-api/model-components/material.h>
+#include <dali-scene3d/public-api/common/scene-depth-index-ranges.h>
 
 namespace Dali
 {
@@ -198,6 +199,13 @@ public:
   void SetRendererUniform(Dali::Renderer renderer);
 
   /**
+   * @brief Sets property value to the Renderer.
+   *
+   * @param[in] renderer Renderer object.
+   */
+  void SetRendererProperty(Dali::Renderer renderer);
+
+  /**
    * @brief Retrieves shadow map texture offset.
    *
    * @return shadow map texture offset.
@@ -300,6 +308,8 @@ private:
   Scene3D::Loader::ShaderOption        mShaderOption;
   uint32_t                             mMaterialFlag  = std::numeric_limits<uint32_t>::max();
   Scene3D::Loader::RendererState::Type mRendererState = Scene3D::Loader::RendererState::NONE;
+
+  int32_t mDepthIndex{Scene3D::DepthIndex::Ranges::SCENE};
 
   bool mIsOpaque = true;
   bool mIsMask   = false;

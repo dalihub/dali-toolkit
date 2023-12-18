@@ -21,6 +21,7 @@
 #include <iostream>
 
 #include <dali-scene3d/internal/model-components/model-primitive-impl.h>
+#include <dali-scene3d/public-api/common/scene-depth-index-ranges.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -60,6 +61,34 @@ int UtcDaliModelPrimitiveImplSetData(void)
   DALI_TEST_CHECK(geometry == modelPrimitive.GetGeometry());
   DALI_TEST_CHECK(material == modelPrimitive.GetMaterial());
   DALI_TEST_CHECK(GetImplementation(modelPrimitive).GetRenderer());
+
+  END_TEST;
+}
+
+int UtcDaliModelPrimitiveMaterialDepthIndex(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::ModelPrimitive modelPrimitive = Scene3D::ModelPrimitive::New();
+
+  tet_printf("Check primitive don't have material initial time\n");
+
+  DALI_TEST_CHECK(!modelPrimitive.GetMaterial());
+
+  Dali::Geometry geometry = Dali::Geometry::New();
+  Dali::Scene3D::Material material = Dali::Scene3D::Material::New();
+
+  modelPrimitive.SetGeometry(geometry);
+  modelPrimitive.SetMaterial(material);
+  DALI_TEST_CHECK(material == modelPrimitive.GetMaterial());
+
+  DALI_TEST_CHECK(GetImplementation(modelPrimitive).GetRenderer());
+
+  Dali::Renderer renderer = GetImplementation(modelPrimitive).GetRenderer();
+  DALI_TEST_CHECK(renderer.GetProperty<int32_t>(Dali::Renderer::Property::DEPTH_INDEX) == Scene3D::DepthIndex::Ranges::SCENE);
+
+  material.SetProperty(Scene3D::Material::Property::DEPTH_INDEX, 50);
+  DALI_TEST_CHECK(renderer.GetProperty<int32_t>(Dali::Renderer::Property::DEPTH_INDEX) == 50);
 
   END_TEST;
 }

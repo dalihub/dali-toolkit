@@ -437,9 +437,11 @@ void ModelNode::SetColliderMesh(ColliderMeshUniquePtr&& colliderMesh)
       mParentModel->RemoveColliderMesh(handle);
     }
 
+    // If collider mesh is to be set then register it with the parent model.
+    // If nullptr, ignore.
     if(colliderMesh)
     {
-      mParentModel->RegisterColliderMesh(handle, *colliderMesh);
+      mParentModel->RegisterColliderMesh(handle);
     }
   }
 

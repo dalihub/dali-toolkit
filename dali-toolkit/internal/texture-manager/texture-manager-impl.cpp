@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/public-api/rendering/geometry.h>
 
 // INTERNAL HEADERS
@@ -37,6 +38,8 @@ constexpr auto INITIAL_HASH_NUMBER = size_t{0u};
 
 constexpr auto TEXTURE_INDEX      = 0u; ///< The Index for texture
 constexpr auto MASK_TEXTURE_INDEX = 1u; ///< The Index for mask texture
+
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
 } // namespace
 
 namespace Dali
@@ -802,6 +805,18 @@ void TextureManager::Remove(const TextureManager::TextureId textureId)
 
 void TextureManager::ProcessRemoveQueue()
 {
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    if(mRemoveQueue.Count() > 0u)
+    {
+      std::ostringstream oss;
+      oss << "[" << mRemoveQueue.Count() << "]";
+      DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_TEXTURE_MANAGER_PROCESS_REMOVE_QUEUE", oss.str().c_str());
+    }
+  }
+#endif
+
   // Note that RemoveQueue is not be changed during Remove().
   for(auto&& textureId : mRemoveQueue)
   {
@@ -810,6 +825,19 @@ void TextureManager::ProcessRemoveQueue()
       Remove(textureId);
     }
   }
+
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    if(mRemoveQueue.Count() > 0u)
+    {
+      std::ostringstream oss;
+      oss << "[" << mRemoveQueue.Count() << "]";
+      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_TEXTURE_MANAGER_PROCESS_REMOVE_QUEUE", oss.str().c_str());
+    }
+  }
+#endif
+
   mRemoveQueue.Clear();
 }
 
@@ -1005,6 +1033,7 @@ void TextureManager::ProcessLoadQueue()
       }
     }
   }
+
   mLoadQueue.Clear();
 }
 

@@ -193,8 +193,8 @@ public:
       DOUBLE_SIDED,
 
       /**
-       *@brief Index of refraction (IOR) of the material surface
-       *@details type Property::FLOAT
+       * @brief Index of refraction (IOR) of the material surface
+       * @details type Property::FLOAT
        * @SINCE_2_2.22
        */
       IOR,
@@ -207,8 +207,8 @@ public:
       SPECULAR_URL,
 
       /**
-       *@brief Property for the specular factor of the material surface.
-       *@details Type Property::FLOAT.
+       * @brief Property for the specular factor of the material surface.
+       * @details Type Property::FLOAT.
        * @SINCE_2_2.22
        */
       SPECULAR_FACTOR,
@@ -221,11 +221,35 @@ public:
       SPECULAR_COLOR_URL,
 
       /**
-       *@brief Property for the specular color factor of the material surface.
-       *@details Type Property::VECTOR3.
+       * @brief Property for the specular color factor of the material surface.
+       * @details Type Property::VECTOR3.
        * @SINCE_2_2.22
        */
       SPECULAR_COLOR_FACTOR,
+
+      /**
+       * @brief Property to define rendering order.
+       * @details Depth index is used to define rendering order. This property
+       * is compatible with Dali::Renderer::Property::DepthIndex. Basically,
+       * a Renderer that has smaller depth index is rendered earlier.
+       * In the ordinary DALI UI components has 0 as depth index by default.
+       * (For the case of Toolkit::Control, its renderer has depth index
+       * value between [-20, 20] as fallowing the renderer's purpose)
+       *
+       * In the Scene3D cases, the rendering order of each Renderer may need
+       * to be manually defined to match scene developer's intent.
+       * Scene3D::DepthIndex::Ranges could be used to adjust rendering order
+       * between 3D Scene content.
+       * Or it also could be used to manage UI component in 3D Scene independently.
+       *
+       * Changing the depth index only affects the rendering order, and does not
+       * mean that objects drawn later will be drawn on top. To compute final
+       * rendering order, whether the object is opaque or non-opaque takes precedence
+       * over the depth index. Changing the rendering order among translucent objects
+       * has a significant impact on the rendering results.
+       * @SINCE_2_3.3
+       */
+      DEPTH_INDEX,
     };
   };
 
