@@ -123,7 +123,9 @@ void CreateTextModel(const std::string&                text,
   const uint8_t* utf8     = NULL;
   if(markupProcessorEnabled)
   {
-    ProcessMarkupString(text, markupProcessData);
+    MarkupPropertyData markupPropertyData(Color::MEDIUM_BLUE, Color::DARK_MAGENTA);
+
+    ProcessMarkupString(text, markupPropertyData, markupProcessData);
     textSize = markupProcessData.markupProcessedText.size();
 
     // This is a bit horrible but std::string returns a (signed) char*

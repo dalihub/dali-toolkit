@@ -403,15 +403,16 @@ void Controller::EventHandler::AnchorEvent(Controller& controller, float x, floa
           // TODO: in mutable text, the anchor color and underline run index should be able to be updated.
           if(!controller.IsEditable())
           {
+            // If there is a markup clicked color attribute, use it. Otherwise, use the property color.
             if(controller.mImpl->mModel->mLogicalModel->mColorRuns.Count() > anchor.colorRunIndex)
             {
               ColorRun& colorRun = *(controller.mImpl->mModel->mLogicalModel->mColorRuns.Begin() + anchor.colorRunIndex);
-              colorRun.color = anchor.clickedColor;
+              colorRun.color = anchor.isMarkupClickedColorSet ? anchor.markupClickedColor : controller.mImpl->mAnchorClickedColor;
             }
             if(controller.mImpl->mModel->mLogicalModel->mUnderlinedCharacterRuns.Count() > anchor.underlinedCharacterRunIndex)
             {
               UnderlinedCharacterRun& underlineRun = *(controller.mImpl->mModel->mLogicalModel->mUnderlinedCharacterRuns.Begin() + anchor.underlinedCharacterRunIndex);
-              underlineRun.properties.color = anchor.clickedColor;
+              underlineRun.properties.color = anchor.isMarkupClickedColorSet ? anchor.markupClickedColor : controller.mImpl->mAnchorClickedColor;
             }
 
             controller.mImpl->ClearFontData();

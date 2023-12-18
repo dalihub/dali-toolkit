@@ -76,7 +76,9 @@ const char* const PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY = "autoScrollLoopDelay";
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE        = "fontSizeScale";
 const char* const PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE = "enableFontSizeScale";
 
-const char* const PROPERTY_NAME_ELLIPSIS_POSITION = "ellipsisPosition";
+const char* const PROPERTY_NAME_ELLIPSIS_POSITION    = "ellipsisPosition";
+const char* const PROPERTY_NAME_ANCHOR_COLOR         = "anchorColor";
+const char* const PROPERTY_NAME_ANCHOR_CLICKED_COLOR = "anchorClickedColor";
 
 const std::string  DEFAULT_FONT_DIR("/resources/fonts");
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
@@ -356,6 +358,8 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE) == DevelTextLabel::Property::ENABLE_FONT_SIZE_SCALE);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ELLIPSIS_POSITION) == DevelTextLabel::Property::ELLIPSIS_POSITION);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_STRIKETHROUGH) == DevelTextLabel::Property::STRIKETHROUGH);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ANCHOR_COLOR) == DevelTextLabel::Property::ANCHOR_COLOR);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ANCHOR_CLICKED_COLOR) == DevelTextLabel::Property::ANCHOR_CLICKED_COLOR);
 
   END_TEST;
 }
@@ -463,6 +467,13 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // Check that text color can be properly set
   label.SetProperty(TextLabel::Property::TEXT_COLOR, Color::BLUE);
   DALI_TEST_EQUALS(label.GetProperty<Vector4>(TextLabel::Property::TEXT_COLOR), Color::BLUE, TEST_LOCATION);
+
+  // Check that anchor color can be properly set
+  label.SetProperty(DevelTextLabel::Property::ANCHOR_COLOR, Color::BLUE);
+  DALI_TEST_EQUALS(label.GetProperty<Vector4>(DevelTextLabel::Property::ANCHOR_COLOR), Color::BLUE, TEST_LOCATION);
+
+  label.SetProperty(DevelTextLabel::Property::ANCHOR_CLICKED_COLOR, Color::RED);
+  DALI_TEST_EQUALS(label.GetProperty<Vector4>(DevelTextLabel::Property::ANCHOR_CLICKED_COLOR), Color::RED, TEST_LOCATION);
 
   Property::Map strikethroughMapSet;
   Property::Map strikethroughMapGet;
@@ -2331,6 +2342,56 @@ int UtcDaliToolkitTextlabelFontSizeScale(void)
   scaledSize = labelScaled.GetNaturalSize();
 
   DALI_TEST_EQUALS(nonScaledSize, scaledSize, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelAnchorColor(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelAnchorColor");
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+
+  // connect to the anchor clicked signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextLabel::AnchorClickedSignal(label).Connect(&TestAnchorClickedCallback);
+  bool anchorClickedSignal = false;
+  label.ConnectSignal(testTracker, "anchorClicked", CallbackFunctor(&anchorClickedSignal));
+
+  gAnchorClickedCallBackCalled = false;
+  label.SetProperty(TextLabel::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+  label.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  // Check that anchor color can be properly set
+  label.SetProperty(DevelTextLabel::Property::ANCHOR_COLOR, Color::BLUE);
+  DALI_TEST_EQUALS(label.GetProperty<Vector4>(DevelTextLabel::Property::ANCHOR_COLOR), Color::BLUE, TEST_LOCATION);
+
+  label.SetProperty(DevelTextLabel::Property::ANCHOR_CLICKED_COLOR, Color::RED);
+  DALI_TEST_EQUALS(label.GetProperty<Vector4>(DevelTextLabel::Property::ANCHOR_CLICKED_COLOR), Color::RED, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Create a tap event to touch the text label.
+  TestGenerateTap(application, 5.0f, 25.0f, 100);
+  application.SendNotification();
+  application.Render();
+
+  // Update clicked color
+  label.SetProperty(DevelTextLabel::Property::ANCHOR_CLICKED_COLOR, Color::BLUE);
+  DALI_TEST_EQUALS(label.GetProperty<Vector4>(DevelTextLabel::Property::ANCHOR_CLICKED_COLOR), Color::BLUE, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+  DALI_TEST_CHECK(anchorClickedSignal);
 
   END_TEST;
 }

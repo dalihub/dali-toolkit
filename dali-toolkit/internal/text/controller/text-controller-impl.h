@@ -337,6 +337,8 @@ struct Controller::Impl
     mMetrics(),
     mModifyEvents(),
     mTextColor(Color::BLACK),
+    mAnchorColor(Color::MEDIUM_BLUE),
+    mAnchorClickedColor(Color::DARK_MAGENTA),
     mTextUpdateInfo(),
     mOperationsPending(NO_OPERATION),
     mMaximumNumberOfCharacters(50u),
@@ -511,6 +513,31 @@ struct Controller::Impl
   {
     return mFontSizeScaleEnabled ? mFontSizeScale : 1.0f;
   }
+
+  /**
+   * @copydoc Controller::SetAnchorColor()
+   */
+  void SetAnchorColor(const Vector4& color);
+
+  /**
+   * @copydoc Controller::GetAnchorColor()
+   */
+  const Vector4& GetAnchorColor() const;
+
+  /**
+   * @copydoc Controller::SetAnchorClickedColor()
+   */
+  void SetAnchorClickedColor(const Vector4& color);
+
+  /**
+   * @copydoc Controller::GetAnchorClickedColor()
+   */
+  const Vector4& GetAnchorClickedColor() const;
+
+  /**
+   * @brief Updates the color of anchors.
+   */
+  void UpdateAnchorColor();
 
   /**
    * @brief Helper to notify InputMethodContext with surrounding text & cursor changes.
@@ -1013,6 +1040,8 @@ public:
   Layout::Engine               mLayoutEngine;               ///< The layout engine.
   Vector<ModifyEvent>          mModifyEvents;               ///< Temporary stores the text set until the next relayout.
   Vector4                      mTextColor;                  ///< The regular text color
+  Vector4                      mAnchorColor;                ///< The anchor color
+  Vector4                      mAnchorClickedColor;         ///< The anchor clicked color
   TextUpdateInfo               mTextUpdateInfo;             ///< Info of the characters updated.
   OperationsMask               mOperationsPending;          ///< Operations pending to be done to layout the text.
   Length                       mMaximumNumberOfCharacters;  ///< Maximum number of characters that can be inserted.

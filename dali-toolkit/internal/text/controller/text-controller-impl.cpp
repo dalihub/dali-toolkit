@@ -439,6 +439,83 @@ bool Controller::Impl::ProcessInputEvents()
   return ControllerImplEventHandler::ProcessInputEvents(*this);
 }
 
+void Controller::Impl::SetAnchorColor(const Vector4& color)
+{
+  mAnchorColor = color;
+  UpdateAnchorColor();
+}
+
+const Vector4& Controller::Impl::GetAnchorColor() const
+{
+  return mAnchorColor;
+}
+
+void Controller::Impl::SetAnchorClickedColor(const Vector4& color)
+{
+  mAnchorClickedColor = color;
+  UpdateAnchorColor();
+}
+
+const Vector4& Controller::Impl::GetAnchorClickedColor() const
+{
+  return mAnchorClickedColor;
+}
+
+void Controller::Impl::UpdateAnchorColor()
+{
+  if(!mAnchorControlInterface ||
+     !mMarkupProcessorEnabled ||
+     !mModel->mLogicalModel->mAnchors.Count() ||
+     !IsShowingRealText())
+  {
+    return;
+  }
+
+  bool updateNeeded = false;
+
+  // The anchor color & clicked color needs to be updated with the property's color.
+  for(auto& anchor : mModel->mLogicalModel->mAnchors)
+  {
+    if(!anchor.isMarkupColorSet && !anchor.isClicked)
+    {
+      if(mModel->mLogicalModel->mColorRuns.Count() > anchor.colorRunIndex)
+      {
+        ColorRun& colorRun = *(mModel->mLogicalModel->mColorRuns.Begin() + anchor.colorRunIndex);
+        colorRun.color = mAnchorColor;
+        updateNeeded = true;
+      }
+      if(mModel->mLogicalModel->mUnderlinedCharacterRuns.Count() > anchor.underlinedCharacterRunIndex)
+      {
+        UnderlinedCharacterRun& underlineRun = *(mModel->mLogicalModel->mUnderlinedCharacterRuns.Begin() + anchor.underlinedCharacterRunIndex);
+        underlineRun.properties.color = mAnchorColor;
+        updateNeeded = true;
+      }
+    }
+    else if(!anchor.isMarkupClickedColorSet && anchor.isClicked)
+    {
+      if(mModel->mLogicalModel->mColorRuns.Count() > anchor.colorRunIndex)
+      {
+        ColorRun& colorRun = *(mModel->mLogicalModel->mColorRuns.Begin() + anchor.colorRunIndex);
+        colorRun.color = mAnchorClickedColor;
+        updateNeeded = true;
+      }
+      if(mModel->mLogicalModel->mUnderlinedCharacterRuns.Count() > anchor.underlinedCharacterRunIndex)
+      {
+        UnderlinedCharacterRun& underlineRun = *(mModel->mLogicalModel->mUnderlinedCharacterRuns.Begin() + anchor.underlinedCharacterRunIndex);
+        underlineRun.properties.color = mAnchorClickedColor;
+        updateNeeded = true;
+      }
+    }
+  }
+
+  if(updateNeeded)
+  {
+    ClearFontData();
+    mOperationsPending = static_cast<OperationsMask>(mOperationsPending | COLOR);
+    RequestRelayout();
+  }
+}
+
 void Controller::Impl::NotifyInputMethodContext()
 {
   if(mEventData && mEventData->mInputMethodContext)
@@ -1953,6 +2030,7 @@ void Controller::Impl::ClearStyleData()
   mModel->mLogicalModel->mColorRuns.Clear();
   mModel->mLogicalModel->ClearFontDescriptionRuns();
   mModel->mLogicalModel->ClearStrikethroughRuns();
+  mModel->mLogicalModel->ClearUnderlineRuns();
 }
 
 void Controller::Impl::ResetScrollPosition()
