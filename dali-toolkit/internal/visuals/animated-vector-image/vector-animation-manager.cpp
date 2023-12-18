@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-thread.h>
@@ -36,6 +37,8 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VECTOR_ANIMATION");
 #endif
+
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
 
 } // unnamed namespace
 
@@ -122,10 +125,34 @@ void VectorAnimationManager::UnregisterEventCallback(CallbackBase* callback)
 
 void VectorAnimationManager::Process(bool postProcessor)
 {
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    if(mEventCallbacks.size() > 0u)
+    {
+      std::ostringstream oss;
+      oss << "[" << mEventCallbacks.size() << "]";
+      DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_VECTOR_ANIMATION_MANAGER_PROCESS", oss.str().c_str());
+    }
+  }
+#endif
+
   for(auto&& iter : mEventCallbacks)
   {
     CallbackBase::Execute(*iter);
   }
+
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    if(mEventCallbacks.size() > 0u)
+    {
+      std::ostringstream oss;
+      oss << "[" << mEventCallbacks.size() << "]";
+      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_VECTOR_ANIMATION_MANAGER_PROCESS", oss.str().c_str());
+    }
+  }
+#endif
   mEventCallbacks.clear();
 
   Adaptor::Get().UnregisterProcessor(*this, true);
