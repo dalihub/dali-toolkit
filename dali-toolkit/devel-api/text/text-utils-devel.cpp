@@ -184,7 +184,9 @@ void ShapeTextPreprocess(const RendererParameters& textParameters, TextAbstracti
 
   if(textParameters.markupEnabled)
   {
-    ProcessMarkupString(textParameters.text, markupProcessData);
+    MarkupPropertyData markupPropertyData(Color::MEDIUM_BLUE, Color::DARK_MAGENTA);
+
+    ProcessMarkupString(textParameters.text, markupPropertyData, markupProcessData);
     textSize = markupProcessData.markupProcessedText.size();
 
     // This is a bit horrible but std::string returns a (signed) char*

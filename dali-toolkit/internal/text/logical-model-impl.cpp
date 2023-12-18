@@ -497,6 +497,11 @@ void LogicalModel::ClearStrikethroughRuns()
   mStrikethroughCharacterRuns.Clear();
 }
 
+void LogicalModel::ClearUnderlineRuns()
+{
+  mUnderlinedCharacterRuns.Clear();
+}
+
 void LogicalModel::CreateParagraphInfo(CharacterIndex startIndex,
                                        Length         numberOfCharacters)
 {

@@ -204,6 +204,20 @@ enum Type
    * @note If the value is less than 1, the lines could to be overlapped.
    */
   RELATIVE_LINE_SIZE,
+
+  /**
+   * @brief The anchor color that will be used by default in markup processing.
+   * @details Name "anchorColor", type Property::VECTOR4.
+   * @note If there is a color attribute in the anchor tag, the markup attribute takes precedence.
+   */
+  ANCHOR_COLOR,
+
+  /**
+   * @brief The anchor clicked color that will be used by default in markup processing.
+   * @details Name "anchorClickedColor", type Property::VECTOR4.
+   * @note If there is a color attribute in the anchor tag, the markup attribute takes precedence.
+   */
+  ANCHOR_CLICKED_COLOR,
 };
 
 } // namespace Property

@@ -160,6 +160,11 @@ public:
    */
   void ClearStrikethroughRuns();
 
+  /**
+   * @brief Clears the underline runs.
+   */
+  void ClearUnderlineRuns();
+
   // Paragraphs
 
   /**

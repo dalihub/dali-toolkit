@@ -808,6 +808,26 @@ const Vector4& Controller::GetDefaultColor() const
   return mImpl->mTextColor;
 }
 
+void Controller::SetAnchorColor(const Vector4& color)
+{
+  mImpl->SetAnchorColor(color);
+}
+
+const Vector4& Controller::GetAnchorColor() const
+{
+  return mImpl->GetAnchorColor();
+}
+
+void Controller::SetAnchorClickedColor(const Vector4& color)
+{
+  mImpl->SetAnchorClickedColor(color);
+}
+
+const Vector4& Controller::GetAnchorClickedColor() const
+{
+  return mImpl->GetAnchorClickedColor();
+}
+
 void Controller::SetDisabledColorOpacity(float opacity)
 {
   mImpl->mDisabledColorOpacity = opacity;
