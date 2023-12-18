@@ -141,6 +141,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "ellipsisPosition
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "strikethrough",                MAP,     STRIKETHROUGH                  )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "characterSpacing",             FLOAT,   CHARACTER_SPACING              )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "relativeLineSize",             FLOAT,   RELATIVE_LINE_SIZE             )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "anchorColor",                  VECTOR4, ANCHOR_COLOR                   )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "anchorClickedColor",           VECTOR4, ANCHOR_CLICKED_COLOR           )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR   )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0)
@@ -567,6 +569,26 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         impl.mController->SetRelativeLineSize(relativeLineSize);
         break;
       }
+      case Toolkit::DevelTextLabel::Property::ANCHOR_COLOR:
+      {
+        const Vector4& anchorColor = value.Get<Vector4>();
+        if(impl.mController->GetAnchorColor() != anchorColor)
+        {
+          impl.mController->SetAnchorColor(anchorColor);
+          impl.mTextUpdateNeeded = true;
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::ANCHOR_CLICKED_COLOR:
+      {
+        const Vector4& anchorClickedColor = value.Get<Vector4>();
+        if(impl.mController->GetAnchorClickedColor() != anchorClickedColor)
+        {
+          impl.mController->SetAnchorClickedColor(anchorClickedColor);
+          impl.mTextUpdateNeeded = true;
+        }
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -829,6 +851,16 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       case Toolkit::DevelTextLabel::Property::RELATIVE_LINE_SIZE:
       {
         value = impl.mController->GetRelativeLineSize();
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::ANCHOR_COLOR:
+      {
+        value = impl.mController->GetAnchorColor();
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::ANCHOR_CLICKED_COLOR:
+      {
+        value = impl.mController->GetAnchorClickedColor();
         break;
       }
     }

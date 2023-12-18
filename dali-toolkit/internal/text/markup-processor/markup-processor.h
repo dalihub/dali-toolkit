@@ -78,13 +78,27 @@ struct MarkupProcessData
   std::string markupProcessedText; ///< The mark-up string.
 };
 
+struct MarkupPropertyData
+{
+  MarkupPropertyData(Vector4 anchorColor,
+                     Vector4 anchorClickedColor)
+  : anchorColor(anchorColor),
+    anchorClickedColor(anchorClickedColor)
+  {
+  }
+
+  Vector4 anchorColor;        ///< The anchor color
+  Vector4 anchorClickedColor; ///< The anchor clicked color
+};
+
 /**
  * @brief Process the mark-up string.
  *
  * @param[in] markupString The mark-up string.
+ * @param[in] markupPropertyData The property data that will be used by default in markup processing.
  * @param[out] markupProcessData The plain text and the style.
  */
-void ProcessMarkupString(const std::string& markupString, MarkupProcessData& markupProcessData);
+void ProcessMarkupString(const std::string& markupString, MarkupPropertyData& markupPropertyData, MarkupProcessData& markupProcessData);
 
 } // namespace Text
 

@@ -188,7 +188,9 @@ bool XHTMLEntityToUTF8Test(const XHTMLEntityToUTF8Data& data)
   Vector<BoundedParagraphRun>          boundedParagraphRuns;
   Vector<CharacterSpacingCharacterRun> characterSpacingCharacterRuns;
   MarkupProcessData                    markupProcessData(colorRuns, fontRuns, items, anchors, underlinedCharacterRuns, backgroundColorRuns, strikethroughCharacterRuns, boundedParagraphRuns, characterSpacingCharacterRuns);
-  ProcessMarkupString(data.xHTMLEntityString, markupProcessData);
+
+  MarkupPropertyData markupPropertyData(Color::MEDIUM_BLUE, Color::DARK_MAGENTA);
+  ProcessMarkupString(data.xHTMLEntityString, markupPropertyData, markupProcessData);
 
   for(Vector<EmbeddedItem>::Iterator it    = items.Begin(),
                                      endIt = items.End();

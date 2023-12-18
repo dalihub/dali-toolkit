@@ -102,7 +102,9 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
     const uint8_t* utf8     = NULL;
     if(impl.mMarkupProcessorEnabled)
     {
-      ProcessMarkupString(text, markupProcessData);
+      MarkupPropertyData markupPropertyData(impl.mAnchorColor, impl.mAnchorClickedColor);
+
+      ProcessMarkupString(text, markupPropertyData, markupProcessData);
       textSize = markupProcessData.markupProcessedText.size();
 
       // This is a bit horrible but std::string returns a (signed) char*
