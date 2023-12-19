@@ -23,12 +23,12 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/public-api/actors/layer.h>
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-
 namespace Dali
 {
 namespace Toolkit
@@ -45,7 +45,8 @@ const char* const SIGNAL_KEY_INPUT_FOCUS_CHANGED = "keyInputFocusChanged";
 
 KeyInputFocusManager::KeyInputFocusManager()
 : mSlotDelegate(this),
-  mCurrentFocusControl()
+  mCurrentFocusControl(),
+  mCurrentWindowId(0)
 {
   // Retrieve all the existing widnows
   Dali::SceneHolderList sceneHolders = Adaptor::Get().GetSceneHolders();
@@ -87,6 +88,7 @@ void KeyInputFocusManager::SetFocus(Toolkit::Control control)
 
   // Set control to currentFocusControl
   mCurrentFocusControl = control;
+  mCurrentWindowId = static_cast<uint32_t>(Integration::SceneHolder::Get(control).GetNativeId());
 
   if(previousFocusControl)
   {
@@ -112,6 +114,7 @@ void KeyInputFocusManager::RemoveFocus(Toolkit::Control control)
     control.OffSceneSignal().Disconnect(mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection);
 
     mCurrentFocusControl.Reset();
+    mCurrentWindowId = 0;
 
     // Notify the control that it has lost key input focus
     GetImplementation(control).OnKeyInputFocusLost();
@@ -121,6 +124,11 @@ void KeyInputFocusManager::RemoveFocus(Toolkit::Control control)
 Toolkit::Control KeyInputFocusManager::GetCurrentFocusControl() const
 {
   return mCurrentFocusControl;
+}
+
+uint32_t KeyInputFocusManager::GetCurrentWindowId() const
+{
+  return mCurrentWindowId;
 }
 
 Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusManager::KeyInputFocusChangedSignal()
@@ -135,6 +143,14 @@ bool KeyInputFocusManager::OnKeyEvent(const KeyEvent& event)
   Toolkit::Control control = GetCurrentFocusControl();
   if(control)
   {
+    // Key events that occur in windows other than the currently focused control are skipped.
+    uint32_t eventWindowId = event.GetWindowId();
+    if(eventWindowId > 0 && GetCurrentWindowId() != eventWindowId)
+    {
+      DALI_LOG_RELEASE_INFO("Current control window id %d, window ID where key event occurred %d : key event skip\n", GetCurrentWindowId(), eventWindowId);
+      return consumed;
+    }
+
     Dali::Actor dispatch = control;
     while(dispatch)
     {

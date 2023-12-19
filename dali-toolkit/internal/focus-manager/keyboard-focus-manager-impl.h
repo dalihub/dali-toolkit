@@ -338,6 +338,11 @@ private:
    */
   void ClearFocusIndicator();
 
+  /**
+   * Gets the current native window id
+   */
+  uint32_t GetCurrentWindowId() const;
+
 private:
   // Undefined
   KeyboardFocusManager(const KeyboardFocusManager&);
@@ -381,6 +386,8 @@ private:
   bool mClearFocusOnTouch : 1; ///< Whether clear focus on touch.
 
   bool mEnableDefaultAlgorithm : 1; ///< Whether use default algorithm focus
+
+  uint32_t mCurrentWindowId; ///< The current native window id
 
 };
 

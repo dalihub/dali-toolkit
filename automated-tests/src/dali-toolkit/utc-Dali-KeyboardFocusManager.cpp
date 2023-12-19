@@ -2389,3 +2389,70 @@ int UtcDaliKeyboardFocusManagerFocusFinderRootActor(void)
 
   END_TEST;
 }
+
+int UtcDaliKeyboardFocusManagerKeyEventOtherWindow(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerKeyEventOtherWindow");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  // Register Type
+  TypeInfo type;
+  type = TypeRegistry::Get().GetTypeInfo("KeyboardFocusManager");
+  DALI_TEST_CHECK(type);
+  BaseHandle handle = type.CreateInstance();
+  DALI_TEST_CHECK(handle);
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+
+  PushButton button1 = PushButton::New();
+  PushButton button2 = PushButton::New();
+  button1.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  button2.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(button1);
+  application.GetScene().Add(button2);
+
+  // Set the focus to the button1
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(button1) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == button1);
+
+  // set the navigation properties of button1
+  button1.SetProperty(Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetProperty<int>(Actor::Property::ID)));
+  button1.SetProperty(Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetProperty<int>(Actor::Property::ID)));
+  button1.SetProperty(Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetProperty<int>(Actor::Property::ID)));
+  button1.SetProperty(Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetProperty<int>(Actor::Property::ID)));
+  button1.SetProperty(Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetProperty< int >( Actor::Property::ID)));
+  button1.SetProperty(Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetProperty< int >( Actor::Property::ID)));
+
+  Integration::KeyEvent event("Right", "", "Right", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  // It makes mIsFocusIndicatorEnabled true
+  application.ProcessEvent(event);
+
+  // Move the focus towards right
+  application.ProcessEvent(event);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == button2);
+
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(button1) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == button1);
+
+  Integration::KeyEvent event1("Right", "", "Right", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  event1.windowId = 3;
+  application.ProcessEvent(event1);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == button1);
+
+  END_TEST;
+}
