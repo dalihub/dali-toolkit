@@ -117,6 +117,11 @@ private:
     */
   bool EmitKeyEventSignal(Toolkit::Control control, const KeyEvent& event);
 
+  /**
+   * Gets the current native window id
+   */
+  uint32_t GetCurrentWindowId() const;
+
 private:
   // Undefined
   KeyInputFocusManager(const KeyInputFocusManager&);
@@ -130,6 +135,7 @@ private:
   SlotDelegate<KeyInputFocusManager> mSlotDelegate;
 
   Toolkit::Control mCurrentFocusControl; ///< The current focused control
+  uint32_t mCurrentWindowId; ///< The native window id of current focused control
 };
 
 } // namespace Internal
