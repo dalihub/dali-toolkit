@@ -343,8 +343,15 @@ void ParseAttributes(Tag& tag)
     }
     else if(EQUAL == character) // '='
     {
-      addToNameValue = false; // next read characters will be added to the value.
-      SkipWhiteSpace(tagBuffer, tagEndBuffer);
+      if(isQuotationOpen)
+      {
+        ++valueLength;
+      }
+      else
+      {
+        addToNameValue = false; // next read characters will be added to the value.
+        SkipWhiteSpace(tagBuffer, tagEndBuffer);
+      }
     }
     else if(QUOTATION_MARK == character) // '\''
     {
@@ -902,6 +909,7 @@ void ProcessSpanForRun(
  * @brief Processes anchor tag for the color-run & underline-run.
  *
  * @param[in,out] markupProcessData The markup process data
+ * @param[in] markupPropertyData The markup property data
  * @param[in] tag The tag we are currently processing
  * @param[in,out] anchorStack The anchors stack
  * @param[in,out] colorRuns The container containing all the color runs
@@ -913,6 +921,7 @@ void ProcessSpanForRun(
  */
 void ProcessAnchorForRun(
   MarkupProcessData&                    markupProcessData,
+  MarkupPropertyData&                   markupPropertyData,
   const Tag&                            tag,
   StyleStack<AnchorForStack>&           anchorStack,
   Vector<ColorRun>&                     colorRuns,
@@ -931,6 +940,7 @@ void ProcessAnchorForRun(
     anchor.endIndex                    = 0u;
     anchor.colorRunIndex               = colorRunIndex;
     anchor.underlinedCharacterRunIndex = underlinedCharacterRunIndex;
+    anchor.markupClickedColor          = markupPropertyData.anchorClickedColor;
 
     // Create a new run.
     ColorRun colorRun;
@@ -950,8 +960,8 @@ void ProcessAnchorForRun(
     anchorForStack.underlinedCharacterRunIndex = underlinedCharacterRunIndex;
 
     // Init default color
-    colorRun.color                                 = Color::MEDIUM_BLUE;
-    underlinedCharacterRun.properties.color        = Color::MEDIUM_BLUE;
+    colorRun.color                                 = markupPropertyData.anchorColor;
+    underlinedCharacterRun.properties.color        = markupPropertyData.anchorColor;
     underlinedCharacterRun.properties.colorDefined = true;
 
     ProcessAnchorTag(tag, anchor, colorRun, underlinedCharacterRun);
@@ -1133,7 +1143,7 @@ void ProcessMarkupStringBuffer(
 
 } // namespace
 
-void ProcessMarkupString(const std::string& markupString, MarkupProcessData& markupProcessData)
+void ProcessMarkupString(const std::string& markupString, MarkupPropertyData& markupPropertyData, MarkupProcessData& markupProcessData)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "markupString: %s\n", markupString.c_str());
 
@@ -1226,6 +1236,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
       else if(TokenComparison(MARKUP::TAG::ANCHOR, tag.buffer, tag.length))
       {
         ProcessAnchorForRun(markupProcessData,
+                            markupPropertyData,
                             tag,
                             anchorStack,
                             markupProcessData.colorRuns,

@@ -53,12 +53,18 @@ void ProcessAnchorTag(const Tag&              tag,
     }
     else if(TokenComparison(MARKUP::ANCHOR_ATTRIBUTES::COLOR, attribute.nameBuffer, attribute.nameLength))
     {
+      // The markup anchor color is set on the text and underline color runs.
+      // This takes precedence over the anchor color property of the text-label.
       ProcessColor(attribute, colorRun);
       ProcessColorAttribute(attribute, underlinedCharacterRun);
+      anchor.isMarkupColorSet = true;
     }
     else if(TokenComparison(MARKUP::ANCHOR_ATTRIBUTES::CLICKED_COLOR, attribute.nameBuffer, attribute.nameLength))
     {
-      ColorStringToVector4(attribute.valueBuffer, attribute.valueLength, anchor.clickedColor);
+      // The markup anchor clicked color is stored here.
+      // This is later used when the anchor's click event occurs.
+      ColorStringToVector4(attribute.valueBuffer, attribute.valueLength, anchor.markupClickedColor);
+      anchor.isMarkupClickedColorSet = true;
     }
   }
 }

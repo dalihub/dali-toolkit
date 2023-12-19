@@ -36,10 +36,14 @@ struct Anchor
   CharacterIndex endIndex;   ///< The character's end index of the anchor within the string.
   char*          href;       ///< The url path
 
-  bool     isClicked    = false;               ///< Whether the anchor is clicked or not.
-  Vector4  clickedColor = Color::DARK_MAGENTA; ///< The color of the anchor when clicked.
-  uint32_t colorRunIndex;                      ///< RunIndex of color run, used to change color when clicked.
-  uint32_t underlinedCharacterRunIndex;        ///< RunIndex of underline run, used to change color when clicked.
+  uint32_t colorRunIndex;               ///< RunIndex of color run, used to change color when property updated or clicked.
+  uint32_t underlinedCharacterRunIndex; ///< RunIndex of underline run, used to change color when property updated or clicked.
+
+  Vector4 markupClickedColor; ///< The markup color of the anchor when clicked. if there is no markup attribute, the default color stored in the controller is used.
+
+  bool     isClicked               = false; ///< Whether the anchor is clicked or not.
+  bool     isMarkupColorSet        = false; ///< Whether the markup color has been set or not.
+  bool     isMarkupClickedColorSet = false; ///< Whether the markup clicked color has been set or not.
 };
 
 } // namespace Text
