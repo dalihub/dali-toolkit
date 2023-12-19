@@ -137,17 +137,6 @@ public:
   ~VectorAnimationTask() override;
 
   /**
-   * Process the task accodring to the type
-   */
-  void Process() override;
-
-  /**
-   * Whether the task is ready to process.
-   * @return True if the task is ready to process.
-   */
-  bool IsReady() override;
-
-  /**
    * @brief Finalizes the task.
    */
   void Finalize();
@@ -264,6 +253,25 @@ public:
    * @return true if the animation is running, false otherwise.
    */
   bool IsAnimating();
+
+public: // Implementation of AsyncTask
+  /**
+   * @copydoc Dali::AsyncTask::Process()
+   */
+  void Process() override;
+
+  /**
+   * @copydoc Dali::AsyncTask::IsReady()
+   */
+  bool IsReady() override;
+
+  /**
+   * @copydoc Dali::AsyncTask::GetTaskName()
+   */
+  std::string_view GetTaskName() const override
+  {
+    return "VectorAnimationTask";
+  }
 
 private:
   /**
