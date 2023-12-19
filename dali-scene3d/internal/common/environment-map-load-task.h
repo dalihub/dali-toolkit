@@ -54,17 +54,6 @@ public:
   ~EnvironmentMapLoadTask();
 
   /**
-   * Process the task
-   */
-  void Process() override;
-
-  /**
-   * Whether the task is ready to process.
-   * @return True if the task is ready to process.
-   */
-  bool IsReady() override;
-
-  /**
    * Whether the task has succeeded.
    * @return True if the task has succeeded.
    */
@@ -88,6 +77,25 @@ public:
    * @return EnvironmentMap type of the loaded texture
    */
   Dali::Scene3D::EnvironmentMapType GetEnvironmentMapType();
+
+public: // Implementation of AsyncTask
+  /**
+   * @copydoc Dali::AsyncTask::Process()
+   */
+  void Process();
+
+  /**
+   * @copydoc Dali::AsyncTask::IsReady()
+   */
+  bool IsReady();
+
+  /**
+   * @copydoc Dali::AsyncTask::GetTaskName()
+   */
+  std::string_view GetTaskName() const override
+  {
+    return "EnvironmentMapLoadTask";
+  }
 
 private:
   // Undefined

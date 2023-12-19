@@ -31,6 +31,7 @@
 #include <toolkit-async-task-manager.h>
 #include <toolkit-scene-holder-impl.h>
 #include <toolkit-test-application.h>
+#include "dali-test-suite-utils.h"
 
 namespace Dali
 {
@@ -196,12 +197,14 @@ void Adaptor::RemoveWindow(Internal::Adaptor::SceneHolder* window)
 void Adaptor::RegisterProcessor(Integration::Processor& processor, bool postProcessor)
 {
   Integration::Core& core = mTestApplication->GetCore();
+  tet_printf("Adaptor::RegisterProcessor : %s\n", processor.GetProcessorName().data());
   core.RegisterProcessor(processor, postProcessor);
 }
 
 void Adaptor::UnregisterProcessor(Integration::Processor& processor, bool postProcessor)
 {
   Integration::Core& core = mTestApplication->GetCore();
+  tet_printf("Adaptor::UnregisterProcessor : %s\n", processor.GetProcessorName().data());
   core.UnregisterProcessor(processor, postProcessor);
 }
 

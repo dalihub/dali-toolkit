@@ -45,9 +45,21 @@ public:
 private:
   void ModelOnScene(Actor actor);
 
-  void Process(bool /*postProcessor*/);
-
   void AddSceneViewParentToProcessingQueue(Scene3D::Model model);
+
+protected: // Implementation of Processor
+  /**
+   * @copydoc Dali::Integration::Processor::Process()
+   */
+  void Process(bool /*postProcessor*/) override;
+
+  /**
+   * @copydoc Dali::Integration::Processor::GetProcessorName()
+   */
+  std::string_view GetProcessorName() const override
+  {
+    return "ColliderMeshProcessor";
+  }
 
 private:
   std::vector<Scene3D::SceneView> mSceneViewsToProcess;

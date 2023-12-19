@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CANVAS_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/canvas-view/canvas-view.h>
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/canvas-view/canvas-view-rasterize-task.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
@@ -131,6 +131,14 @@ protected:
    * @copydoc Dali::Integration::Processor::Process()
    */
   void Process(bool postProcessor) override;
+
+  /**
+   * @copydoc Dali::Integration::Processor::GetProcessorName()
+   */
+  std::string_view GetProcessorName() const override
+  {
+    return "CanvasView";
+  }
 
 public:
   /**

@@ -63,16 +63,24 @@ public:
    */
   ~FastTrackLoadingTask() override;
 
+public: // Implementation of AsyncTask
   /**
-   * @brief Process the task accodring to the type
+   * @copydoc Dali::AsyncTask::Process()
    */
   void Process() override;
 
   /**
-   * @brief Whether the task is ready to process.
-   * @return True if the task is ready to process.
+   * @copydoc Dali::AsyncTask::IsReady()
    */
   bool IsReady() override;
+
+  /**
+   * @copydoc Dali::AsyncTask::GetTaskName()
+   */
+  std::string_view GetTaskName() const override
+  {
+    return "FastTrackLoadingTask";
+  }
 
 private:
   // Undefined

@@ -34,6 +34,7 @@
 #include <toolkit-application.h>
 #include <toolkit-environment-variable.h>
 #include <toolkit-event-thread-callback.h>
+#include "dali-test-suite-utils.h"
 
 namespace Dali
 {
@@ -290,7 +291,9 @@ protected:
       }
       else
       {
+        tet_printf("BEGIN: AsyncTask[%s] Process\n", task->GetTaskName().data());
         task->Process();
+        tet_printf("END: AsyncTask[%s] Process\n", task->GetTaskName().data());
         if(!mDestroyThread)
         {
           mAsyncTaskManager.CompleteTask(std::move(task));
