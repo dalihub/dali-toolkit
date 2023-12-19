@@ -531,9 +531,28 @@ private:
   void RegisterAccessibilityPositionPropertyNotification();
 
   /**
-   * @brief Remove property notification added by RegisterPropertyNotification
+   * @brief Remove property notification added by RegisterAccessibilityPositionPropertyNotification
    */
   void UnregisterAccessibilityPositionPropertyNotification();
+
+  /**
+   * @brief Register PropertySet signal to check highlighted object name and description
+   */
+  void RegisterAccessibilityPropertySetSignal();
+
+  /**
+   * @brief Remove PropertySet signal added by RegisterAccessibilityPropertySetSignal
+   */
+  void UnregisterAccessibilityPropertySetSignal();
+
+  /**
+   * @brief Signal callback of PropertySet when this object is become highlighted, so RegisterAccessibilityPropertySetSignal called.
+   *
+   * @param[in] handle Handle of the control.
+   * @param[in] index The index of property.
+   * @param[in] value The value of property.
+   */
+  void OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value);
 
 public:
   Control&            mControlImpl;
@@ -638,6 +657,7 @@ public:
 private:
   // Accessibility - notification for highlighted object to check if it is showing.
   bool                                        mIsAccessibilityPositionPropertyNotificationSet{false};
+  bool                                        mIsAccessibilityPropertySetSignalRegistered{false};
   Dali::PropertyNotification                  mAccessibilityPositionNotification;
   Dali::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType{Accessibility::ScreenRelativeMoveType::OUTSIDE};
 };
