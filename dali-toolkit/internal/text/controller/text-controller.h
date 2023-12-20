@@ -1875,6 +1875,11 @@ public: // Queries & retrieves.
   void ChangedLayoutDirection();
 
   /**
+   * @brief Clear font and style data.
+   */
+  void ResetFontAndStyleData();
+
+  /**
    * @brief Retrieves if showing real text or not.
    * @return The value of showing real text.
    */

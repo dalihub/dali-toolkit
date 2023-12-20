@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -943,6 +944,11 @@ void TextLabel::OnInitialize()
 
   self.LayoutDirectionChangedSignal().Connect(this, &TextLabel::OnLayoutDirectionChanged);
 
+  if(Dali::Adaptor::IsAvailable())
+  {
+    Dali::Adaptor::Get().LocaleChangedSignal().Connect(this, &TextLabel::OnLocaleChanged);
+  }
+
   Layout::Engine& engine = mController->GetLayoutEngine();
   engine.SetCursorWidth(0u); // Do not layout space for the cursor.
 
@@ -1267,6 +1273,20 @@ void TextLabel::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type
   mController->ChangedLayoutDirection();
 }
 
+void TextLabel::OnLocaleChanged(std::string locale)
+{
+  if(mLocale != locale)
+  {
+    mLocale = locale;
+    mController->ResetFontAndStyleData();
+  }
+}
+
+std::string TextLabel::GetLocale()
+{
+  return mLocale;
+}
+
 void TextLabel::EmitTextFitChangedSignal()
 {
   Dali::Toolkit::TextLabel handle(GetOwner());
@@ -1282,7 +1302,8 @@ TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mTextUpdateNeeded(false),
-  mLastAutoScrollEnabled(false)
+  mLastAutoScrollEnabled(false),
+  mLocale(std::string())
 {
 }
 
