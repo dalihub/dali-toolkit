@@ -719,20 +719,22 @@ void Control::Impl::UnregisterAccessibilityPropertySetSignal()
 void Control::Impl::OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value)
 {
   auto* accessible = GetAccessibleObject();
-
-  if(mAccessibilityGetNameSignal.Empty())
+  if(DALI_LIKELY(accessible))
   {
-    if(index == DevelControl::Property::ACCESSIBILITY_NAME || (mAccessibilityName.empty() && index == accessible->GetNamePropertyIndex()))
+    if(mAccessibilityGetNameSignal.Empty())
     {
-      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::NAME);
+      if(index == DevelControl::Property::ACCESSIBILITY_NAME || (mAccessibilityName.empty() && index == accessible->GetNamePropertyIndex()))
+      {
+        accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::NAME);
+      }
     }
-  }
 
-  if(mAccessibilityGetDescriptionSignal.Empty())
-  {
-    if(index == DevelControl::Property::ACCESSIBILITY_DESCRIPTION || (mAccessibilityDescription.empty() && index == accessible->GetDescriptionPropertyIndex()))
+    if(mAccessibilityGetDescriptionSignal.Empty())
     {
-      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
+      if(index == DevelControl::Property::ACCESSIBILITY_DESCRIPTION || (mAccessibilityDescription.empty() && index == accessible->GetDescriptionPropertyIndex()))
+      {
+        accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
+      }
     }
   }
 }
