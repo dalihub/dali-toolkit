@@ -317,7 +317,7 @@ void Model::AddModelNode(Scene3D::ModelNode modelNode)
   // If model has a collider mesh set, add it to the container
   if(modelNode.HasColliderMesh())
   {
-    RegisterColliderMesh(modelNode, modelNode.GetColliderMesh());
+    RegisterColliderMesh(modelNode);
     Scene3D::ColliderMeshProcessor::Get().ColliderMeshChanged(Scene3D::Model::DownCast(Self()));
   }
 
@@ -327,7 +327,7 @@ void Model::AddModelNode(Scene3D::ModelNode modelNode)
   }
 }
 
-void Model::RegisterColliderMesh(Scene3D::ModelNode& modelNode, const Dali::Scene3D::Algorithm::ColliderMesh& mesh)
+void Model::RegisterColliderMesh(Scene3D::ModelNode& modelNode)
 {
   mColliderMeshes[modelNode.GetProperty<int>(Actor::Property::ID)] = modelNode;
 
