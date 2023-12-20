@@ -1951,3 +1951,22 @@ int UtcDaliTextMultiLanguageDefaultFontsCache(void)
 
   END_TEST;
 }
+
+int UtcDaliTextMultiLanguageLocaleChange(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextMultiLanguageLocaleChange");
+
+  Adaptor &adaptor = application.GetAdaptor();
+  MultilanguageSupport multilanguageSupport = MultilanguageSupport::Get();
+
+  std::string newLocale = "multi_TEST";
+  adaptor.LocaleChangedSignal().Emit(newLocale);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(newLocale.data(), GetImplementation(multilanguageSupport).GetLocale(), TEST_LOCATION);
+
+  END_TEST;
+}

@@ -308,6 +308,11 @@ void Controller::ChangedLayoutDirection()
   mImpl->mIsLayoutDirectionChanged = true;
 }
 
+void Controller::ResetFontAndStyleData()
+{
+  mImpl->ResetFontAndStyleData();
+}
+
 void Controller::SetMatchLayoutDirection(DevelText::MatchLayoutDirection type)
 {
   mImpl->mModel->mMatchLayoutDirection = type;

@@ -1338,3 +1338,26 @@ int UtcDaliTextLabelMarkupSpanCharacterSpacing(void)
 
   END_TEST;
 }
+
+int UtcDaliTextLabelLocaleChange(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLabelLocaleChange ");
+
+  Adaptor &adaptor = application.GetAdaptor();
+  TextLabel textLabel = TextLabel::New();
+  application.GetScene().Add(textLabel);
+
+  application.SendNotification();
+  application.Render();
+
+  std::string newLocale = "label_TEST";
+  adaptor.LocaleChangedSignal().Emit(newLocale);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(newLocale.data(), GetImpl(textLabel).GetLocale(), TEST_LOCATION);
+
+  END_TEST;
+}

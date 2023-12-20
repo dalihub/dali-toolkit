@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 #include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/input-style.h>
+#include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/text-model.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
@@ -436,6 +437,16 @@ struct Controller::Impl
     mModifyEvents.PushBack(event);
 
     // The event will be processed during relayout
+    RequestRelayout();
+  }
+
+  /**
+   * @copydoc Text::Controller::ResetFontAndStyleData()
+   */
+  void ResetFontAndStyleData()
+  {
+    ClearFontData();
+    ClearStyleData();
     RequestRelayout();
   }
 
