@@ -76,13 +76,14 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
   mLoadFailed(false),
   mAttemptAtlasing(false)
 {
+  DALI_LOG_RELEASE_INFO("SvgVisual is created: %p, mImpl : %p, url : %s\n", this, mImpl, mImageUrl.GetUrl().c_str());
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
 }
 
 SvgVisual::~SvgVisual()
 {
-  DALI_LOG_RELEASE_INFO("SvgVisual is destructed: %p, mLoadingTask : %p, mRasterizingTask : %p, url : %s\n", this, mLoadingTask.Get(), mRasterizingTask.Get(), mImageUrl.GetUrl().c_str());
+  DALI_LOG_RELEASE_INFO("SvgVisual is destructed: %p, mImpl : %p, mLoadingTask : %p, mRasterizingTask : %p, url : %s\n", this, mImpl, mLoadingTask.Get(), mRasterizingTask.Get(), mImageUrl.GetUrl().c_str());
   if(Stage::IsInstalled())
   {
     if(mLoadingTask)
