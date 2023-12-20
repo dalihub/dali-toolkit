@@ -646,6 +646,14 @@ protected: // Implementation of Processor
    */
   void Process(bool postProcessor) override;
 
+  /**
+   * @copydoc Dali::Integration::Processor::GetProcessorName()
+   */
+  std::string_view GetProcessorName() const override
+  {
+    return "TextureManager";
+  }
+
 private:
   /**
    * Deleted copy constructor.

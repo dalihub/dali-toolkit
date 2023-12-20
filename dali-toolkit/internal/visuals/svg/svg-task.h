@@ -19,10 +19,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/vector-image-renderer.h>
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/pixel-data.h>
-#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -64,17 +64,6 @@ public:
    * Destructor.
    */
   virtual ~SvgTask() = default;
-
-  /**
-   * Process the task
-   */
-  virtual void Process() = 0;
-
-  /**
-   * Whether the task is ready to process.
-   * @return True if the task is ready to process.
-   */
-  virtual bool IsReady() = 0;
 
   /**
    * Whether the task has succeeded.
@@ -124,16 +113,24 @@ public:
    */
   ~SvgLoadingTask() override;
 
+public: // Implementation of AsyncTask
   /**
-   * Process the task
+   * @copydoc Dali::AsyncTask::Process()
    */
-  void Process() override;
+  void Process();
 
   /**
-   * Whether the task is ready to process.
-   * @return True if the task is ready to process.
+   * @copydoc Dali::AsyncTask::IsReady()
    */
-  bool IsReady() override;
+  bool IsReady();
+
+  /**
+   * @copydoc Dali::AsyncTask::GetTaskName()
+   */
+  std::string_view GetTaskName() const override
+  {
+    return "SvgLoadingTask";
+  }
 
 private:
   // Undefined
@@ -166,17 +163,6 @@ public:
   ~SvgRasterizingTask() override;
 
   /**
-   * Process the task accodring to the type
-   */
-  void Process() override;
-
-  /**
-   * Whether the task is ready to process.
-   * @return True if the task is ready to process.
-   */
-  bool IsReady() override;
-
-  /**
    * Get the rasterization result.
    * @return The pixel data with the rasterized pixels.
    */
@@ -192,6 +178,25 @@ public:
     mImageUrl = std::move(url);
   }
 #endif
+
+public: // Implementation of AsyncTask
+  /**
+   * @copydoc Dali::AsyncTask::Process()
+   */
+  void Process();
+
+  /**
+   * @copydoc Dali::AsyncTask::IsReady()
+   */
+  bool IsReady();
+
+  /**
+   * @copydoc Dali::AsyncTask::GetTaskName()
+   */
+  std::string_view GetTaskName() const override
+  {
+    return "SvgRasterizingTask";
+  }
 
 private:
   // Undefined
