@@ -184,34 +184,14 @@ void NPatchLoader::Remove(NPatchData::NPatchDataId id, TextureUploadObserver* te
 
 void NPatchLoader::Process(bool postProcessor)
 {
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    if(mRemoveQueue.size() > 0u)
-    {
-      std::ostringstream oss;
-      oss << "[" << mRemoveQueue.size() << "]";
-      DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_NPATCH_LOADER_PROCESS_REMOVE_QUEUE", oss.str().c_str());
-    }
-  }
-#endif
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NPATCH_LOADER_PROCESS_REMOVE_QUEUE", [&](std::ostringstream& oss) {
+    oss << "[" << mRemoveQueue.size() << "]";
+  });
 
   for(auto& iter : mRemoveQueue)
   {
     Remove(iter.first, iter.second);
   }
-
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    if(mRemoveQueue.size() > 0u)
-    {
-      std::ostringstream oss;
-      oss << "[" << mRemoveQueue.size() << "]";
-      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_NPATCH_LOADER_PROCESS_REMOVE_QUEUE", oss.str().c_str());
-    }
-  }
-#endif
 
   mRemoveQueue.clear();
 
@@ -220,6 +200,8 @@ void NPatchLoader::Process(bool postProcessor)
     Adaptor::Get().UnregisterProcessor(*this, true);
     mRemoveProcessorRegistered = false;
   }
+
+  DALI_TRACE_END(gTraceFilter, "DALI_NPATCH_LOADER_PROCESS_REMOVE_QUEUE");
 }
 
 NPatchDataPtr NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad)

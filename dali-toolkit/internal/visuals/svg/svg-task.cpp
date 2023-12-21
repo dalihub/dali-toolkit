@@ -174,44 +174,29 @@ void SvgRasterizingTask::Process()
     return;
   }
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    std::ostringstream oss;
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
     oss << "[size:" << mWidth << "x" << mHeight << " ";
     oss << "url:" << mImageUrl.GetUrl() << "]";
-    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", oss.str().c_str());
-  }
-#endif
+  });
 
   Devel::PixelBuffer pixelBuffer = mVectorRenderer.Rasterize(mWidth, mHeight);
   if(!pixelBuffer)
   {
     DALI_LOG_ERROR("Rasterize is failed!\n");
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      std::ostringstream oss;
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
       oss << "[size:" << mWidth << "x" << mHeight << " ";
       oss << "url:" << mImageUrl.GetUrl() << "]";
-      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", oss.str().c_str());
-    }
-#endif
+    });
     return;
   }
 
   mPixelData    = Devel::PixelBuffer::Convert(pixelBuffer);
   mHasSucceeded = true;
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    std::ostringstream oss;
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
     oss << "[size:" << mWidth << "x" << mHeight << " ";
     oss << "url:" << mImageUrl.GetUrl() << "]";
-    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", oss.str().c_str());
-  }
-#endif
+  });
 }
 
 bool SvgRasterizingTask::IsReady()
