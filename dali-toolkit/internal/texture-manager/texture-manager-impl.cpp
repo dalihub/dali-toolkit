@@ -805,17 +805,9 @@ void TextureManager::Remove(const TextureManager::TextureId textureId)
 
 void TextureManager::ProcessRemoveQueue()
 {
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    if(mRemoveQueue.Count() > 0u)
-    {
-      std::ostringstream oss;
-      oss << "[" << mRemoveQueue.Count() << "]";
-      DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_TEXTURE_MANAGER_PROCESS_REMOVE_QUEUE", oss.str().c_str());
-    }
-  }
-#endif
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TEXTURE_MANAGER_PROCESS_REMOVE_QUEUE", [&](std::ostringstream& oss) {
+    oss << "[" << mRemoveQueue.Count() << "]";
+  });
 
   // Note that RemoveQueue is not be changed during Remove().
   for(auto&& textureId : mRemoveQueue)
@@ -826,19 +818,9 @@ void TextureManager::ProcessRemoveQueue()
     }
   }
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    if(mRemoveQueue.Count() > 0u)
-    {
-      std::ostringstream oss;
-      oss << "[" << mRemoveQueue.Count() << "]";
-      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_TEXTURE_MANAGER_PROCESS_REMOVE_QUEUE", oss.str().c_str());
-    }
-  }
-#endif
-
   mRemoveQueue.Clear();
+
+  DALI_TRACE_END(gTraceFilter, "DALI_TEXTURE_MANAGER_PROCESS_REMOVE_QUEUE");
 }
 
 void TextureManager::Process(bool postProcessor)
