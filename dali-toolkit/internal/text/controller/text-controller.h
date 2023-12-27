@@ -1094,6 +1094,34 @@ public: // Default style & Input style
   const Vector4& GetDefaultColor() const;
 
   /**
+   * @brief Sets the anchor's default color.
+   *
+   * @param color The anchor color.
+   */
+  void SetAnchorColor(const Vector4& color);
+
+  /**
+   * @brief Retrieves the anchor's default color.
+   *
+   * @return The anchor color.
+   */
+  const Vector4& GetAnchorColor() const;
+
+  /**
+   * @brief Sets the anchor's clicked color.
+   *
+   * @param color The anchor color.
+   */
+  void SetAnchorClickedColor(const Vector4& color);
+
+  /**
+   * @brief Retrieves the anchor's clicked color.
+   *
+   * @return The anchor color.
+   */
+  const Vector4& GetAnchorClickedColor() const;
+
+  /**
    * @brief Sets the user interaction enabled.
    *
    * @param enabled whether to enable the user interaction.

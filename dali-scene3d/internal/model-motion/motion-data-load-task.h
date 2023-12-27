@@ -75,16 +75,24 @@ public:
    */
   ~MotionDataLoadTask();
 
+public: // Implementation of AsyncTask
   /**
-   * Process the task
+   * @copydoc Dali::AsyncTask::Process()
    */
-  void Process() override;
+  void Process();
 
   /**
-   * Whether the task is ready to process.
-   * @return True if the task is ready to process.
+   * @copydoc Dali::AsyncTask::IsReady()
    */
-  bool IsReady() override;
+  bool IsReady();
+
+  /**
+   * @copydoc Dali::AsyncTask::GetTaskName()
+   */
+  std::string_view GetTaskName() const override
+  {
+    return "MotionDataLoadTask";
+  }
 
 public:
   const Scene3D::Loader::AnimationDefinition& GetAnimationDefinition() const;

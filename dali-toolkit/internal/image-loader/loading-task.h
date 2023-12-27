@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_LOADING_TASK_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,21 +148,28 @@ public:
   ~LoadingTask() override;
 
   /**
-   * Process the task accodring to the type
+   * @brief Set the Texture Id
+   */
+  void SetTextureId(TextureManagerType::TextureId id);
+
+public: // Implementation of AsyncTask
+  /**
+   * @copydoc Dali::AsyncTask::Process()
    */
   void Process() override;
 
   /**
-   * Whether the task is ready to process.
-   * @return True if the task is ready to process.
+   * @copydoc Dali::AsyncTask::IsReady()
    */
   bool IsReady() override;
 
   /**
-   * @brief Set the Texture Id
-   *
+   * @copydoc Dali::AsyncTask::GetTaskName()
    */
-  void SetTextureId(TextureManagerType::TextureId id);
+  std::string_view GetTaskName() const override
+  {
+    return "LoadingTask";
+  }
 
 private:
   // Undefined

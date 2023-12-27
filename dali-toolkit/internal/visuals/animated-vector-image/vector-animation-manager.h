@@ -94,6 +94,14 @@ protected: // Implementation of Processor
    */
   void Process(bool postProcessor) override;
 
+  /**
+   * @copydoc Dali::Integration::Processor::GetProcessorName()
+   */
+  std::string_view GetProcessorName() const override
+  {
+    return "VectorAnimationManager";
+  }
+
 private:
   // Undefined
   VectorAnimationManager(const VectorAnimationManager& manager) = delete;

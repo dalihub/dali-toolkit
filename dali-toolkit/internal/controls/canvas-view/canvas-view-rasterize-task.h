@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CANVAS_VIEW_RASTERIZE_TASK_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,17 +65,6 @@ public:
   ~CanvasRendererRasterizingTask() = default;
 
   /**
-   * Process the task
-   */
-  void Process() override;
-
-  /**
-   * Whether the task is ready to process.
-   * @return True if the task is ready to process.
-   */
-  bool IsReady() override;
-
-  /**
    * Do the rasterization with the mRasterizer.
    * @return Returns True when it's successful. False otherwise.
    */
@@ -92,6 +81,25 @@ public:
    * @return The texture with the rasterized pixels.
    */
   Texture GetRasterizedTexture();
+
+public: // Implementation of AsyncTask
+  /**
+   * @copydoc Dali::AsyncTask::Process()
+   */
+  void Process() override;
+
+  /**
+   * @copydoc Dali::AsyncTask::IsReady()
+   */
+  bool IsReady() override;
+
+  /**
+   * @copydoc Dali::AsyncTask::GetTaskName()
+   */
+  std::string_view GetTaskName() const override
+  {
+    return "CanvasRendererRasterizingTask";
+  }
 
 private:
   // Undefined
