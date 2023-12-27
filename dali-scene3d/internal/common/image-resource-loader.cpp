@@ -32,7 +32,7 @@
 #include <dali/public-api/signals/connection-tracker.h>
 
 #include <functional> ///< for std::function
-#include <memory> ///< for std::shared_ptr
+#include <memory>     ///< for std::shared_ptr
 #include <mutex>
 #include <string>
 #include <utility> ///< for std::pair
@@ -506,6 +506,7 @@ private:
 };
 
 static std::shared_ptr<CacheImpl> gCacheImpl{nullptr};
+static Dali::Texture              gEmptyTextureWhiteRGB{};
 
 std::shared_ptr<CacheImpl> GetCacheImpl()
 {
@@ -519,6 +520,9 @@ std::shared_ptr<CacheImpl> GetCacheImpl()
 void DestroyCacheImpl()
 {
   gCacheImpl.reset();
+
+  // Remove texture object when application stopped.
+  gEmptyTextureWhiteRGB.Reset();
 }
 
 } // namespace
@@ -536,14 +540,13 @@ Dali::PixelData GetEmptyPixelDataWhiteRGB()
 
 Dali::Texture GetEmptyTextureWhiteRGB()
 {
-  static Dali::PixelData emptyPixelData = GetEmptyPixelDataWhiteRGB();
-  static Dali::Texture   emptyTexture   = Dali::Texture();
-  if(!emptyTexture)
+  if(!gEmptyTextureWhiteRGB)
   {
-    emptyTexture = Texture::New(TextureType::TEXTURE_2D, emptyPixelData.GetPixelFormat(), emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
-    emptyTexture.Upload(emptyPixelData, 0, 0, 0, 0, emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
+    Dali::PixelData emptyPixelData = GetEmptyPixelDataWhiteRGB();
+    gEmptyTextureWhiteRGB          = Texture::New(TextureType::TEXTURE_2D, emptyPixelData.GetPixelFormat(), emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
+    gEmptyTextureWhiteRGB.Upload(emptyPixelData, 0, 0, 0, 0, emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
   }
-  return emptyTexture;
+  return gEmptyTextureWhiteRGB;
 }
 
 Dali::Texture GetCachedTexture(Dali::PixelData pixelData, bool mipmapRequired)
