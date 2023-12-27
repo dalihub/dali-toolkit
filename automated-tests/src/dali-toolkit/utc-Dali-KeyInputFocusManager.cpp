@@ -519,3 +519,32 @@ int UtcDaliKeyInputFocusManagerSignalKeyInputFocusChangedforNewWindow(void)
   window.Reset();
   END_TEST;
 }
+
+int UtcDaliKeyInputFocusManagerKeyEventOtherWindow(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyInputFocusManagerSignalKeyEventOtherWindow");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  KeyInputFocusManager   manager = KeyInputFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  PushButton pushButton1 = PushButton::New();
+  scene.Add(pushButton1);
+
+  KeyEventCallback windowCallback(false);
+  pushButton1.KeyEventSignal().Connect(&windowCallback, &KeyEventCallback::Callback);
+
+  manager.SetFocus(pushButton1);
+
+  Integration::KeyEvent event("a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "", "", Device::Class::TOUCH, Device::Subclass::NONE);
+  event.windowId = 3;
+
+  application.ProcessEvent(event);
+
+  DALI_TEST_CHECK(!windowCallback.mIsCalled);
+
+  END_TEST;
+}

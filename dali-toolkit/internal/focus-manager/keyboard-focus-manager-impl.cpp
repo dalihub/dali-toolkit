@@ -130,7 +130,8 @@ KeyboardFocusManager::KeyboardFocusManager()
   mFocusGroupLoopEnabled(false),
   mIsWaitingKeyboardFocusChangeCommit(false),
   mClearFocusOnTouch(true),
-  mEnableDefaultAlgorithm(false)
+  mEnableDefaultAlgorithm(false),
+  mCurrentWindowId(0)
 {
   // TODO: Get FocusIndicatorEnable constant from stylesheet to set mIsFocusIndicatorShown.
 
@@ -238,6 +239,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
     {
       Layer rootLayer       = currentWindow.GetRootLayer();
       mCurrentFocusedWindow = rootLayer;
+      mCurrentWindowId = static_cast<uint32_t>(currentWindow.GetNativeId());
     }
 
     if((mIsFocusIndicatorShown == SHOW) && (mEnableFocusIndicator == ENABLE))
@@ -799,8 +801,24 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
   return mFocusIndicatorActor;
 }
 
+uint32_t KeyboardFocusManager::GetCurrentWindowId() const
+{
+  return mCurrentWindowId;
+}
+
 void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 {
+  if(mCurrentFocusedWindow.GetHandle())
+  {
+    // If it is a key event that occurred in another window, it returns.
+    uint32_t eventWindowId = event.GetWindowId();
+    if(eventWindowId > 0 && GetCurrentWindowId() != eventWindowId)
+    {
+      DALI_LOG_RELEASE_INFO("CurrentFocusedWindow id %d, window ID where key event occurred %d : key event skip\n", GetCurrentWindowId(), eventWindowId);
+      return;
+    }
+  }
+
   const std::string& keyName    = event.GetKeyName();
   const std::string& deviceName = event.GetDeviceName();
 
@@ -1088,6 +1106,7 @@ void KeyboardFocusManager::OnWindowFocusChanged(Window window, bool focusIn)
     // Change Current Focused Window
     Layer rootLayer       = window.GetRootLayer();
     mCurrentFocusedWindow = rootLayer;
+    mCurrentWindowId = static_cast<uint32_t>(Integration::SceneHolder::Get(rootLayer).GetNativeId());
 
     // Get Current Focused Actor from window
     Actor currentFocusedActor = GetFocusActorFromCurrentWindow();
