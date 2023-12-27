@@ -99,7 +99,6 @@ SvgVisual::~SvgVisual()
       textureManager.RemoveEncodedImageBuffer(mImageUrl.GetUrl());
     }
   }
-  DALI_LOG_RELEASE_INFO("SvgVisual is destructed: %p\n", this);
 }
 
 void SvgVisual::OnInitialize()
@@ -363,7 +362,7 @@ void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
 {
   if(DALI_UNLIKELY(mImpl == nullptr))
   {
-    DALI_LOG_ERROR("Fatal error!! already destroyed object callback called! SvgVisual : %p, task : %p\n", this, task.Get());
+    DALI_LOG_ERROR("Fatal error!! already destroyed object callback called! SvgVisual : %p, url : %s, task : %p\n", this, mImageUrl.GetUrl().c_str(), task.Get());
     return;
   }
 
