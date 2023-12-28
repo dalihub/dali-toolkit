@@ -76,14 +76,12 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
   mLoadFailed(false),
   mAttemptAtlasing(false)
 {
-  DALI_LOG_RELEASE_INFO("SvgVisual is created: %p, mImpl : %p, url : %s\n", this, mImpl, mImageUrl.GetUrl().c_str());
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
 }
 
 SvgVisual::~SvgVisual()
 {
-  DALI_LOG_RELEASE_INFO("SvgVisual is destructed: %p, mImpl : %p, mLoadingTask : %p, mRasterizingTask : %p, url : %s\n", this, mImpl, mLoadingTask.Get(), mRasterizingTask.Get(), mImageUrl.GetUrl().c_str());
   if(Stage::IsInstalled())
   {
     if(mLoadingTask)
@@ -102,10 +100,6 @@ SvgVisual::~SvgVisual()
       TextureManager& textureManager = mFactoryCache.GetTextureManager();
       textureManager.RemoveEncodedImageBuffer(mImageUrl.GetUrl());
     }
-  }
-  else if(DALI_UNLIKELY(!Stage::IsShuttingDown()))
-  {
-    DALI_LOG_ERROR("SvgVisual maybe try to destruct on worker thread! %p, mLoadingTask : %p, mRasterizingTask : %p, url : %s\n", this, mLoadingTask.Get(), mRasterizingTask.Get(), mImageUrl.GetUrl().c_str());
   }
 }
 
@@ -368,12 +362,6 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
 
 void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
 {
-  if(DALI_UNLIKELY(mImpl == nullptr))
-  {
-    DALI_LOG_ERROR("Fatal error!! already destroyed object callback called! SvgVisual : %p, task : %p\n", this, task.Get());
-    return;
-  }
-
   if(task->HasSucceeded())
   {
     PixelData rasterizedPixelData = task->GetPixelData();

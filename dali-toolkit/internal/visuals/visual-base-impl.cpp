@@ -159,13 +159,11 @@ Visual::Base::Base(VisualFactoryCache& factoryCache, FittingMode fittingMode, To
 : mImpl(new Impl(fittingMode, type)),
   mFactoryCache(factoryCache)
 {
-  mImplOrigin = mImpl;
 }
 
 Visual::Base::~Base()
 {
   delete mImpl;
-  mImpl = nullptr;
 }
 
 void Visual::Base::Initialize()
@@ -660,12 +658,6 @@ void Visual::Base::DoSetOffScene(Actor& actor)
 
 bool Visual::Base::IsOnScene() const
 {
-  if(DALI_UNLIKELY(mImplOrigin != mImpl))
-  {
-    DALI_LOG_ERROR("Fatal error!! Memory corruption occured! this : %p\n", this);
-    DALI_LOG_ERROR("mImpl : %p, mImplOrigin : %p\n", mImpl, mImplOrigin);
-    DALI_ASSERT_ALWAYS(false && "Visual::Base might got memory corruption!");
-  }
   return mImpl->mFlags & Impl::IS_ON_SCENE;
 }
 

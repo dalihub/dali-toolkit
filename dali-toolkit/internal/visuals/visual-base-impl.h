@@ -511,7 +511,6 @@ private:
 protected:
   struct Impl;
   Impl*               mImpl;
-  Impl*               mImplOrigin{nullptr}; ///< Check for memory corruption
   VisualFactoryCache& mFactoryCache;
 };
 
