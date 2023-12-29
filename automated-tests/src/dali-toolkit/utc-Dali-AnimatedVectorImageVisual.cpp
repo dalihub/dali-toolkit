@@ -212,7 +212,8 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
     .Add("borderlineColor", borderlineColor)
     .Add("borderlineOffset", borderlineOffset)
     .Add("desiredWidth", desiredWidth)
-    .Add("desiredHeight", desiredHeight);
+    .Add("desiredHeight", desiredHeight)
+    .Add("useFixedCache", false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -388,6 +389,10 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
 
   value = resultMap.Find(DevelImageVisual::Property::MARKER_INFO, Property::MAP);
   DALI_TEST_CHECK(value);
+
+  value = resultMap.Find(DevelImageVisual::Property::USE_FIXED_CACHE, Property::BOOLEAN);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<bool>() == false); // Check default value
 
   value = resultMap.Find(DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, Property::BOOLEAN);
   DALI_TEST_CHECK(value);
@@ -1090,6 +1095,100 @@ int UtcDaliAnimatedVectorImageVisualMarkerInfoFromInvalid(void)
 
   // The values when load failed case is invalid.
   DALI_TEST_CHECK(value == nullptr || (value->GetMap() == nullptr) || (value->GetMap()->Empty()));
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualUsedFixedCache(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualUsedFixedCache");
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+    .Add(DevelImageVisual::Property::USE_FIXED_CACHE, true)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+  //actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  Vector2 controlSize(200.f, 200.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - load
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // renderer is added to actor
+  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  Renderer renderer = actor.GetRendererAt(0u);
+  DALI_TEST_CHECK(renderer);
+
+  Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  Property::Value* value = map.Find(DevelImageVisual::Property::USE_FIXED_CACHE);
+  DALI_TEST_CHECK(value->Get<bool>() == true);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualUsedFixedCacheFailed(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualUsedFixedCacheFailed");
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_INVALID_FILE_NAME)
+    .Add(DevelImageVisual::Property::USE_FIXED_CACHE, true)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Vector2 controlSize(200.f, 200.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - load, and failed.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // renderer is added to actor
+  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  Renderer renderer = actor.GetRendererAt(0u);
+  DALI_TEST_CHECK(renderer);
+
+  propertyMap.Clear();
+  propertyMap.Add(DevelImageVisual::Property::USE_FIXED_CACHE, true)
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+    .Add(ImageVisual::Property::DESIRED_WIDTH, 100)
+    .Add(ImageVisual::Property::DESIRED_HEIGHT, 100);
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, propertyMap);
+
+  Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  Property::Value* value = map.Find(DevelImageVisual::Property::USE_FIXED_CACHE);
+  DALI_TEST_CHECK(value->Get<bool>() == true);
 
   END_TEST;
 }
