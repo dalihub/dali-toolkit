@@ -19,8 +19,10 @@
 #include <dali-toolkit/internal/text/controller/text-controller-relayouter.h>
 
 // EXTERNAL INCLUDES
+#include <cmath>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/common/constants.h>
 #include <dali/public-api/math/math-utils.h>
 #include <limits>
 
@@ -379,61 +381,142 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
     float pointInterval          = impl.mTextFitStepSize;
     float currentFitPointSize    = impl.mFontDefaults->mFitPointSize;
     float currentDefaultLineSize = impl.mLayoutEngine.GetDefaultLineSize();
+    bool  isMultiLine            = impl.mLayoutEngine.GetLayout() == Layout::Engine::MULTI_LINE_BOX;
     // Instead of using the LineSize of the current TextLabel, the LineSize set in TextFit is used.
+
     impl.SetDefaultLineSize(impl.mTextFitLineSize);
 
     model->mElideEnabled = false;
+    float bestPointSize = minPointSize;
 
     // check zero value
     if(pointInterval < 1.f)
     {
       impl.mTextFitStepSize = pointInterval = 1.0f;
     }
+
     uint32_t pointSizeRange = static_cast<uint32_t>(ceil((maxPointSize - minPointSize) / pointInterval));
 
-    // Ensure minPointSize + pointSizeRange * pointInverval >= maxPointSize
-    while(minPointSize + static_cast<float>(pointSizeRange) * pointInterval < maxPointSize)
+    if(isMultiLine || pointSizeRange < 3)
     {
-      ++pointSizeRange;
-    }
-
-    uint32_t bestSizeIndex = 0;
-    uint32_t minIndex      = bestSizeIndex + 1u;
-    uint32_t maxIndex      = pointSizeRange + 1u;
-
-    bool bestSizeUpdatedLatest = false;
-    // Find best size as binary search.
-    // Range format as [l r). (left closed, right opened)
-    // It mean, we already check all i < l is valid, and r <= i is invalid.
-    // Below binary search will check m = (l+r)/2 point.
-    // Search area sperate as [l m) or [m+1 r)
-    //
-    // Basically, we can assume that 0 (minPointSize) is always valid.
-    // Now, we will check [1 pointSizeRange] range s.t. pointSizeRange mean the maxPointSize
-    while(minIndex < maxIndex)
-    {
-      uint32_t    testIndex     = minIndex + ((maxIndex - minIndex) >> 1u);
-      const float testPointSize = std::min(maxPointSize, minPointSize + static_cast<float>(testIndex) * pointInterval);
-
-      if(CheckForTextFit(controller, testPointSize, layoutSize))
+      // Ensure minPointSize + pointSizeRange * pointInverval >= maxPointSize
+      while(minPointSize + static_cast<float>(pointSizeRange) * pointInterval < maxPointSize)
       {
-        bestSizeUpdatedLatest = true;
-
-        bestSizeIndex = testIndex;
-        minIndex      = testIndex + 1u;
+        ++pointSizeRange;
       }
-      else
+
+      uint32_t bestSizeIndex = 0;
+      uint32_t minIndex      = bestSizeIndex + 1u;
+      uint32_t maxIndex      = pointSizeRange + 1u;
+
+      bool bestSizeUpdatedLatest = false;
+      // Find best size as binary search.
+      // Range format as [l r). (left closed, right opened)
+      // It mean, we already check all i < l is valid, and r <= i is invalid.
+      // Below binary search will check m = (l+r)/2 point.
+      // Search area sperate as [l m) or [m+1 r)
+      //
+      // Basically, we can assume that 0 (minPointSize) is always valid.
+      // Now, we will check [1 pointSizeRange] range s.t. pointSizeRange mean the maxPointSize
+      while(minIndex < maxIndex)
       {
-        bestSizeUpdatedLatest = false;
-        maxIndex              = testIndex;
+        uint32_t    testIndex     = minIndex + ((maxIndex - minIndex) >> 1u);
+        const float testPointSize = std::min(maxPointSize, minPointSize + static_cast<float>(testIndex) * pointInterval);
+
+        if(CheckForTextFit(controller, testPointSize, layoutSize))
+        {
+          bestSizeUpdatedLatest = true;
+
+          bestSizeIndex = testIndex;
+          minIndex      = testIndex + 1u;
+        }
+        else
+        {
+          bestSizeUpdatedLatest = false;
+          maxIndex              = testIndex;
+        }
+      }
+      bestPointSize = std::min(maxPointSize, minPointSize + static_cast<float>(bestSizeIndex) * pointInterval);
+
+      // Best point size was not updated. re-run so the TextFit should be fitted really.
+      if(!bestSizeUpdatedLatest)
+      {
+        CheckForTextFit(controller, bestPointSize, layoutSize);
       }
     }
-    const float bestPointSize = std::min(maxPointSize, minPointSize + static_cast<float>(bestSizeIndex) * pointInterval);
-
-    // Best point size was not updated. re-run so the TextFit should be fitted really.
-    if(!bestSizeUpdatedLatest)
+    else
     {
-      CheckForTextFit(controller, bestPointSize, layoutSize);
+      // assume textSize = a * pointSize + b, finding a and b.
+      Size              textSize;
+      TextUpdateInfo&   textUpdateInfo  = impl.mTextUpdateInfo;
+      const OperationsMask onlyOnceOperations = static_cast<OperationsMask>(CONVERT_TO_UTF32 |
+                                                                            GET_SCRIPTS |
+                                                                            VALIDATE_FONTS |
+                                                                            GET_LINE_BREAKS |
+                                                                            BIDI_INFO |
+                                                                            SHAPE_TEXT |
+                                                                            GET_GLYPH_METRICS);
+
+      float resultBasedX[2];
+      float resultBasedY[2];
+      float tmpPointSize[2] = {minPointSize, maxPointSize};
+
+      // Calculate a and b by creating simultaneous equations with two calculations.
+      for(int i=0;i<2;i++)
+      {
+        impl.mFontDefaults->mFitPointSize = tmpPointSize[i];
+        impl.mFontDefaults->sizeDefined = true;
+        impl.ClearFontData();
+
+        textUpdateInfo.mParagraphCharacterIndex     = 0u;
+        textUpdateInfo.mRequestedNumberOfCharacters = impl.mModel->mLogicalModel->mText.Count();
+
+
+        // Make sure the model is up-to-date before layouting
+        impl.UpdateModel(onlyOnceOperations);
+
+        DoRelayout(impl,
+                  Size(layoutSize.width, MAX_FLOAT),
+                  static_cast<OperationsMask>(onlyOnceOperations | LAYOUT),
+                  textSize);
+
+        // Clear the update info. This info will be set the next time the text is updated.
+        textUpdateInfo.Clear();
+        textUpdateInfo.mClearAll = true;
+
+        resultBasedX[i] = textSize.x;
+        resultBasedY[i] = textSize.y;
+      }
+
+      float aBasedX = (resultBasedX[1] - resultBasedX[0]) / (tmpPointSize[1] - tmpPointSize[0]);
+      float bBasedX = resultBasedX[1] - aBasedX * tmpPointSize[1];
+      aBasedX = std::max(aBasedX, Dali::Math::MACHINE_EPSILON_1000);
+
+      float aBasedY = (resultBasedY[1] - resultBasedY[0]) / (tmpPointSize[1] - tmpPointSize[0]);
+      float bBasedY = resultBasedY[1] - aBasedY * tmpPointSize[1];
+      aBasedY = std::max(aBasedY, Dali::Math::MACHINE_EPSILON_1000);
+
+      float bestPointSizeBasedX = (layoutSize.x - bBasedX) / aBasedX;
+      float bestPointSizeBasedY = (layoutSize.y - bBasedY) / aBasedY;
+
+      bestPointSize = std::min(bestPointSizeBasedX, bestPointSizeBasedY);
+      bestPointSize = std::min(std::max(bestPointSize, minPointSize), maxPointSize);
+      bestPointSize = std::floor((bestPointSize - minPointSize) / pointInterval) * pointInterval + minPointSize;
+
+      if(CheckForTextFit(controller, bestPointSize, layoutSize))
+      {
+        while(bestPointSize + pointInterval <= maxPointSize && CheckForTextFit(controller, bestPointSize + pointInterval, layoutSize))
+        {
+          bestPointSize += pointInterval;
+        }
+      }
+      else if(bestPointSize - pointInterval >= minPointSize)
+      {
+        do
+        {
+          bestPointSize -= pointInterval;
+        } while(bestPointSize - pointInterval >= minPointSize && !CheckForTextFit(controller, bestPointSize, layoutSize));
+      }
     }
 
     model->mElideEnabled = actualellipsis;
