@@ -732,7 +732,9 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
   }
   if(mCursorLayer)
   {
-    mCursorLayer.SetProperty(Actor::Property::POSITION, Vector2(padding.start, padding.top));
+    // The cursor layer is added to the stencil in RenderText.
+    // Do not calculate the position because the stencil has already been resized excluding the padding size.
+    // There is no case where the text editor does not have a stencil.
     ResizeActor(mCursorLayer, contentSize);
   }
 
