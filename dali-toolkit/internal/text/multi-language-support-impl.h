@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/signals/connection-tracker.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/multi-language-support.h>
@@ -132,7 +133,7 @@ struct DefaultFonts
 /**
  * @brief Multi-language support implementation. @see Text::MultilanguageSupport.
  */
-class MultilanguageSupport : public BaseObject
+class MultilanguageSupport : public BaseObject, public ConnectionTracker
 {
 public:
   /**
@@ -173,9 +174,27 @@ public:
                      Length                                  numberOfCharacters,
                      Vector<FontRun>&                        fonts);
 
+  /**
+   * @brief Callback function for when the locale is changed.
+   * @param[in] locale The new system locale.
+   */
+  void OnLocaleChanged(std::string locale);
+
+  /**
+   * @brief Clear font caches when locale changed.
+   */
+  void ClearCache();
+
+  /**
+   * @brief Gets the locale.
+   */
+  std::string GetLocale();
+
 private:
   Vector<DefaultFonts*>           mDefaultFontPerScriptCache; ///< Caches default fonts for a script.
   Vector<ValidateFontsPerScript*> mValidFontsPerScriptCache;  ///< Caches valid fonts for a script.
+
+  std::string mLocale;
 
   //Methods
 

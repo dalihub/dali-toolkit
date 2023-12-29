@@ -92,6 +92,7 @@ public:
   Dali::Adaptor::AdaptorSignalType& ResizedSignal();
   Dali::Adaptor::AdaptorSignalType& LanguageChangedSignal();
   Dali::Adaptor::WindowCreatedSignalType& WindowCreatedSignal();
+  Dali::Adaptor::LocaleChangedSignalType& LocaleChangedSignal();
 
   static Adaptor& GetImpl( Dali::Adaptor& adaptor ) { return *adaptor.mImpl; }
   static const Adaptor& GetImpl( const Dali::Adaptor& adaptor ) { return *adaptor.mImpl; }
@@ -104,6 +105,7 @@ private:
   Dali::Adaptor::AdaptorSignalType mResizedSignal;
   Dali::Adaptor::AdaptorSignalType mLanguageChangedSignal;
   Dali::Adaptor::WindowCreatedSignalType mWindowCreatedSignal;
+  Dali::Adaptor::LocaleChangedSignalType mLocaleChangedSignal;
   TestApplication* mTestApplication;
 };
 

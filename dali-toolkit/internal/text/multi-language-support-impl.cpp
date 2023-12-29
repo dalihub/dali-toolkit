@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 
@@ -256,7 +257,8 @@ void DefaultFonts::Cache(const TextAbstraction::FontDescription& description, Fo
 
 MultilanguageSupport::MultilanguageSupport()
 : mDefaultFontPerScriptCache(),
-  mValidFontsPerScriptCache()
+  mValidFontsPerScriptCache(),
+  mLocale(std::string())
 {
   // Initializes the default font cache to zero (invalid font).
   // Reserves space to cache the default fonts and access them with the script as an index.
@@ -265,6 +267,11 @@ MultilanguageSupport::MultilanguageSupport()
   // Initializes the valid fonts cache to NULL (no valid fonts).
   // Reserves space to cache the valid fonts and access them with the script as an index.
   mValidFontsPerScriptCache.Resize(TextAbstraction::GetNumberOfScripts(), NULL);
+
+  if(Dali::Adaptor::IsAvailable())
+  {
+    Dali::Adaptor::Get().LocaleChangedSignal().Connect(this, &MultilanguageSupport::OnLocaleChanged);
+  }
 }
 
 MultilanguageSupport::~MultilanguageSupport()
@@ -286,6 +293,29 @@ MultilanguageSupport::~MultilanguageSupport()
   {
     delete *it;
   }
+}
+
+void MultilanguageSupport::OnLocaleChanged(std::string locale)
+{
+  if(mLocale != locale)
+  {
+    mLocale = locale;
+    ClearCache();
+  }
+}
+
+void MultilanguageSupport::ClearCache()
+{
+  mDefaultFontPerScriptCache.Clear();
+  mValidFontsPerScriptCache.Clear();
+
+  mDefaultFontPerScriptCache.Resize(TextAbstraction::GetNumberOfScripts(), NULL);
+  mValidFontsPerScriptCache.Resize(TextAbstraction::GetNumberOfScripts(), NULL);
+}
+
+std::string MultilanguageSupport::GetLocale()
+{
+  return mLocale;
 }
 
 Text::MultilanguageSupport MultilanguageSupport::Get()
