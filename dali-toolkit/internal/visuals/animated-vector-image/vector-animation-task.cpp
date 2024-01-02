@@ -91,7 +91,9 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mRasterized(false),
   mKeepAnimation(false),
   mLayerInfoCached(false),
-  mMarkerInfoCached(false)
+  mMarkerInfoCached(false),
+  mUseFixedCache(false),
+  mSizeUpdated(false)
 {
   mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
 }
@@ -295,6 +297,20 @@ void VectorAnimationTask::SetSize(uint32_t width, uint32_t height)
 
     mWidth  = width;
     mHeight = height;
+
+    // If fixedCache is enabled, Call KeepRasterizedBuffer()
+    if(mUseFixedCache)
+    {
+      if(mTotalFrame > 0 && !mLoadFailed)
+      {
+        mVectorRenderer.KeepRasterizedBuffer();
+      }
+      else
+      {
+        // If Load is not yet, update the size later.
+        mSizeUpdated = true;
+      }
+    }
 
     DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetSize: width = %d, height = %d [%p]\n", width, height, this);
   }
@@ -552,15 +568,10 @@ bool VectorAnimationTask::Rasterize()
     return false;
   }
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    std::ostringstream oss;
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss) {
     oss << "[size:" << mWidth << "x" << mHeight << " ";
     oss << "url:" << mImageUrl.GetUrl() << "]";
-    DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", oss.str().c_str());
-  }
-#endif
+  });
 
   ApplyAnimationData();
 
@@ -669,18 +680,13 @@ bool VectorAnimationTask::Rasterize()
     mKeepAnimation = true;
   }
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    std::ostringstream oss;
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss) {
     oss << "[size:" << mWidth << "x" << mHeight << " ";
     oss << "frame:" << mCurrentFrame << " ";
     oss << "loop:" << mCurrentLoop << " ";
     oss << "state:" << mPlayState << " ";
     oss << "url:" << mImageUrl.GetUrl() << "]";
-    DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", oss.str().c_str());
-  }
-#endif
+  });
 
   return true;
 }
@@ -842,6 +848,11 @@ void VectorAnimationTask::OnLoadCompleted()
 {
   if(!mLoadFailed)
   {
+    if(mUseFixedCache && mSizeUpdated)
+    {
+      mVectorRenderer.KeepRasterizedBuffer();
+      mSizeUpdated = false;
+    }
     mResourceReadySignal.Emit(ResourceStatus::LOADED);
   }
   else

@@ -193,6 +193,11 @@ public:
    */
   bool IsTextFitArrayEnabled() const;
 
+  /**
+   * @brief Gets the locale.
+   */
+  std::string GetLocale();
+
 private: // From Control
   /**
    * @copydoc Control::OnInitialize()
@@ -307,6 +312,12 @@ private:
   void OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type);
 
   /**
+   * @brief Callback function for when the locale is changed.
+   * @param[in] locale The new system locale.
+   */
+  void OnLocaleChanged(std::string locale);
+
+  /**
    * @brief Emits TextFitChanged signal.
    */
   void EmitTextFitChangedSignal();
@@ -323,6 +334,8 @@ private: // Data
   // Signals
   Toolkit::DevelTextLabel::AnchorClickedSignalType  mAnchorClickedSignal;
   Toolkit::DevelTextLabel::TextFitChangedSignalType mTextFitChangedSignal;
+
+  std::string mLocale;
 
   int  mRenderingBackend;
   bool mTextUpdateNeeded : 1;

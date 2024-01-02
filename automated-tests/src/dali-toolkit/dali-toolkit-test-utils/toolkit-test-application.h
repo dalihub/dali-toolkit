@@ -66,6 +66,11 @@ public:
     return mMainWindow;
   }
 
+  Dali::Adaptor& GetAdaptor()
+  {
+    return *mAdaptor;
+  }
+
 private:
   Dali::Window mMainWindow;
   std::unique_ptr< Adaptor > mAdaptor;

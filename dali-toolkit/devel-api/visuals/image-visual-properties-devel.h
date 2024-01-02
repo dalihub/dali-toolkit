@@ -190,6 +190,16 @@ enum Type
    * @note This property is read-only.
    */
   MARKER_INFO = ORIENTATION_CORRECTION + 15,
+
+  /**
+   * @brief Whether to AnimatedVectorImageVisual fixed cache or not.
+   * @details Name "useFixedCache", type Property::BOOLEAN.
+   * If this property is true, AnimatedVectorImageVisual uses fixed cache for loading and keeps loaded frame
+   * until the visual is removed. It reduces CPU cost when the animated image will be looping.
+   * But it can spend a lot of memory if the resource has high resolution image or many frame count.
+   * @note It is used in the AnimatedImageVisual. The default is false
+   */
+  USE_FIXED_CACHE = ORIENTATION_CORRECTION + 16
 };
 
 } //namespace Property
