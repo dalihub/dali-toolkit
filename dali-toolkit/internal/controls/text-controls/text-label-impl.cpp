@@ -1300,10 +1300,10 @@ void TextLabel::OnAccessibilityStatusChanged()
 
 TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
+  mLocale(std::string()),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mTextUpdateNeeded(false),
-  mLastAutoScrollEnabled(false),
-  mLocale(std::string())
+  mLastAutoScrollEnabled(false)
 {
 }
 
