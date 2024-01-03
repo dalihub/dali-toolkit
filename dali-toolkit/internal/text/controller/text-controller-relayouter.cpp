@@ -234,16 +234,18 @@ bool Controller::Relayouter::CheckForTextFit(Controller& controller, float point
   // Make sure the model is up-to-date before layouting
   impl.UpdateModel(onlyOnceOperations);
 
+  bool layoutTooSmall = false;
   DoRelayout(impl,
              Size(layoutSize.width, MAX_FLOAT),
              static_cast<OperationsMask>(onlyOnceOperations | LAYOUT),
-             textSize);
+             textSize,
+             layoutTooSmall);
 
   // Clear the update info. This info will be set the next time the text is updated.
   textUpdateInfo.Clear();
   textUpdateInfo.mClearAll = true;
 
-  if(textSize.width > layoutSize.width || textSize.height > layoutSize.height)
+  if(layoutTooSmall || textSize.width > layoutSize.width || textSize.height > layoutSize.height)
   {
     return false;
   }
@@ -673,6 +675,12 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
 
 bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size, OperationsMask operationsRequired, Size& layoutSize)
 {
+  bool layoutTooSmall = false;
+  return DoRelayout(impl, size, operationsRequired, layoutSize, layoutTooSmall);
+}
+
+bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size, OperationsMask operationsRequired, Size& layoutSize, bool& layoutTooSmall)
+{
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::Relayouter::DoRelayout %p size %f,%f\n", &impl, size.width, size.height);
   DALI_TRACE_SCOPE(gTraceFilter2, "DALI_TEXT_DORELAYOUT");
   bool viewUpdated(false);
@@ -794,6 +802,7 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
                                                 isHiddenInputEnabled,
                                                 ellipsisPosition);
     impl.mIsAutoScrollEnabled = isAutoScrollEnabled;
+    layoutTooSmall = !viewUpdated;
 
     viewUpdated = viewUpdated || (newLayoutSize != layoutSize);
 
@@ -830,6 +839,7 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
   DALI_LOG_INFO(gLogFilter, Debug::Concise, "Controller::Relayouter::DoRelayout [%p] mImpl->mIsTextDirectionRTL[%s] [%s]\n", &impl, (impl.mIsTextDirectionRTL) ? "true" : "false", currentText.c_str());
 #endif
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::Relayouter::DoRelayout, view updated %s\n", (viewUpdated ? "true" : "false"));
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::Relayouter::DoRelayout, layout too small %s\n", (layoutTooSmall ? "true" : "false"));
   return viewUpdated;
 }
 
