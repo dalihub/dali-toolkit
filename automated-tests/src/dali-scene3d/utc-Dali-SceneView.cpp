@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ const char* TEST_GLTF_FILE_NAME = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
  * These textures are based off version of Wave engine sample
  * Take from https://github.com/WaveEngine/Samples
  *
- * Copyright (c) 2023 Wave Coorporation
+ * Copyright (c) 2024 Wave Coorporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -313,13 +313,12 @@ int UtcDaliSceneViewOnScene02(void)
 {
   ToolkitTestApplication application;
 
-  uint32_t renderTaskCount = application.GetScene().GetRenderTaskList().GetTaskCount();
-  DALI_TEST_EQUALS(1u, renderTaskCount, TEST_LOCATION);
+  uint32_t baseRenderTaskCount = application.GetScene().GetRenderTaskList().GetTaskCount();
 
   Scene3D::SceneView view = Scene3D::SceneView::New();
 
-  renderTaskCount = application.GetScene().GetRenderTaskList().GetTaskCount();
-  DALI_TEST_EQUALS(1u, renderTaskCount, TEST_LOCATION);
+  uint32_t renderTaskCount = application.GetScene().GetRenderTaskList().GetTaskCount();
+  DALI_TEST_EQUALS(baseRenderTaskCount, renderTaskCount, TEST_LOCATION);
 
   application.GetScene().Add(view);
 
@@ -327,9 +326,9 @@ int UtcDaliSceneViewOnScene02(void)
   application.Render();
 
   renderTaskCount = application.GetScene().GetRenderTaskList().GetTaskCount();
-  DALI_TEST_EQUALS(3u, renderTaskCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseRenderTaskCount + 2u, renderTaskCount, TEST_LOCATION);
 
-  RenderTask  renderTask = application.GetScene().GetRenderTaskList().GetTask(2u);
+  RenderTask  renderTask = application.GetScene().GetRenderTaskList().GetTask(baseRenderTaskCount + 1u);
   CameraActor camera     = renderTask.GetCameraActor();
 
   CameraActor defaultCamera = renderTask.GetCameraActor();
@@ -685,6 +684,8 @@ int UtcDaliSceneViewUseFramebuffer02(void)
 {
   ToolkitTestApplication application;
 
+  uint32_t baseRenderTaskCount = application.GetScene().GetRenderTaskList().GetTaskCount();
+
   Scene3D::SceneView view = Scene3D::SceneView::New();
   view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
 
@@ -693,7 +694,7 @@ int UtcDaliSceneViewUseFramebuffer02(void)
   application.SendNotification();
   application.Render();
 
-  RenderTask renderTask = application.GetScene().GetRenderTaskList().GetTask(2u);
+  RenderTask renderTask = application.GetScene().GetRenderTaskList().GetTask(baseRenderTaskCount + 1u);
   DALI_TEST_CHECK(!renderTask.GetFrameBuffer());
 
   view.UseFramebuffer(true);
@@ -996,20 +997,20 @@ int UtcDaliSceneViewCreateAndRemoveRenderTask(void)
   ToolkitTestApplication application;
   RenderTaskList         taskList = application.GetScene().GetRenderTaskList();
 
-  uint32_t renderTaskCount = taskList.GetTaskCount();
+  uint32_t baseRenderTaskCount = taskList.GetTaskCount();
 
   Scene3D::SceneView view = Scene3D::SceneView::New();
   view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
 
-  DALI_TEST_EQUALS(renderTaskCount, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(baseRenderTaskCount, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
 
   application.GetScene().Add(view);
 
-  DALI_TEST_EQUALS(renderTaskCount + 2, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(baseRenderTaskCount + 2, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
 
   view.Unparent();
 
-  DALI_TEST_EQUALS(renderTaskCount, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(baseRenderTaskCount, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -1074,6 +1075,87 @@ int UtcDaliSceneViewSetResolution(void)
 
   DALI_TEST_EQUALS(view.GetResolutionWidth(), 400u, TEST_LOCATION);
   DALI_TEST_EQUALS(view.GetResolutionHeight(), 400u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewSetResolution02(void)
+{
+  tet_infoline("Test whether framebuffer created well base on inputed resolution");
+  ToolkitTestApplication application;
+  RenderTaskList         renderTaskList = application.GetScene().GetRenderTaskList();
+
+  uint32_t baseRenderTaskCount = renderTaskList.GetTaskCount();
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  application.GetScene().Add(view);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+
+  DALI_TEST_EQUALS(view.GetResolutionWidth(), 100u, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResolutionHeight(), 100u, TEST_LOCATION);
+
+  uint32_t expectWidth  = 83u;
+  uint32_t expectHeight = 207u;
+
+  view.SetResolution(expectWidth, expectHeight);
+
+  DALI_TEST_EQUALS(view.GetResolutionWidth(), 100u, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResolutionHeight(), 100u, TEST_LOCATION);
+
+  tet_printf("Test Framebuffer result target created well\n");
+  view.UseFramebuffer(true);
+
+  RenderTask renderTask = renderTaskList.GetTask(baseRenderTaskCount + 1u);
+  DALI_TEST_CHECK(renderTask);
+
+  FrameBuffer frameBuffer = renderTask.GetFrameBuffer();
+  DALI_TEST_CHECK(frameBuffer);
+
+  DALI_TEST_EQUALS(view.GetResolutionWidth(), expectWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResolutionHeight(), expectHeight, TEST_LOCATION);
+
+  Texture renderTargetTexture = frameBuffer.GetColorTexture();
+  DALI_TEST_CHECK(renderTargetTexture);
+  DALI_TEST_EQUALS(renderTargetTexture.GetWidth(), expectWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTargetTexture.GetHeight(), expectHeight, TEST_LOCATION);
+
+  tet_printf("Test Framebuffer result target created well after create new FBO, by set multisampling level\n");
+  view.SetFramebufferMultiSamplingLevel(2u);
+
+  renderTask = renderTaskList.GetTask(baseRenderTaskCount + 1u);
+  DALI_TEST_CHECK(renderTask);
+
+  frameBuffer = renderTask.GetFrameBuffer();
+  DALI_TEST_CHECK(frameBuffer);
+
+  DALI_TEST_EQUALS(view.GetResolutionWidth(), expectWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResolutionHeight(), expectHeight, TEST_LOCATION);
+
+  renderTargetTexture = frameBuffer.GetColorTexture();
+  DALI_TEST_CHECK(renderTargetTexture);
+
+  DALI_TEST_EQUALS(renderTargetTexture.GetWidth(), expectWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTargetTexture.GetHeight(), expectHeight, TEST_LOCATION);
+
+  tet_printf("Test Framebuffer result target created well after change resolution\n");
+  expectWidth  = 421u;
+  expectHeight = 103u;
+  view.SetResolution(expectWidth, expectHeight);
+
+  renderTask = renderTaskList.GetTask(baseRenderTaskCount + 1u);
+  DALI_TEST_CHECK(renderTask);
+
+  frameBuffer = renderTask.GetFrameBuffer();
+  DALI_TEST_CHECK(frameBuffer);
+
+  DALI_TEST_EQUALS(view.GetResolutionWidth(), expectWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResolutionHeight(), expectHeight, TEST_LOCATION);
+
+  renderTargetTexture = frameBuffer.GetColorTexture();
+  DALI_TEST_CHECK(renderTargetTexture);
+
+  DALI_TEST_EQUALS(renderTargetTexture.GetWidth(), expectWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderTargetTexture.GetHeight(), expectHeight, TEST_LOCATION);
 
   END_TEST;
 }
