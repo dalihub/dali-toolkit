@@ -18,6 +18,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <stdlib.h>
 #include <iostream>
 
@@ -31,6 +32,8 @@
 #include <dali-scene3d/public-api/model-motion/motion-data.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/motion-transform-index.h>
+
+#include <dali-scene3d/public-api/loader/node-definition.h>
 
 #include <dali/devel-api/actors/camera-actor-devel.h>
 
@@ -116,6 +119,39 @@ static bool gResourceReadyCalled = false;
 void        OnResourceReady(Control control)
 {
   gResourceReadyCalled = true;
+}
+
+void ApplyAllMaterialPropertyRecursively(Scene3D::ModelNode modelNode, const std::vector<KeyValuePair>& materialPropertyValues)
+{
+  if(!modelNode)
+  {
+    return;
+  }
+
+  for(uint32_t primitiveIndex = 0u; primitiveIndex < modelNode.GetModelPrimitiveCount(); ++primitiveIndex)
+  {
+    Scene3D::ModelPrimitive primitive = modelNode.GetModelPrimitive(primitiveIndex);
+    if(primitive)
+    {
+      Scene3D::Material material = primitive.GetMaterial();
+      if(material)
+      {
+        for(const auto& keyValuePair : materialPropertyValues)
+        {
+          if(keyValuePair.first.type == Property::Key::Type::INDEX)
+          {
+            material.SetProperty(keyValuePair.first.indexKey, keyValuePair.second);
+          }
+        }
+      }
+    }
+  }
+
+  for(uint32_t childIndex = 0u; childIndex < modelNode.GetChildCount(); ++childIndex)
+  {
+    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(modelNode.GetChildAt(childIndex));
+    ApplyAllMaterialPropertyRecursively(childNode, materialPropertyValues);
+  }
 }
 
 } // namespace
@@ -1684,6 +1720,76 @@ int UtcDaliModelBlendShapeMotionDataByName(void)
   propertyIndex = expectNode.GetPropertyIndex(motionData.GetIndex(1u).GetPropertyName(expectNode));
   DALI_TEST_CHECK(propertyIndex != Property::INVALID_INDEX);
   DALI_TEST_EQUALS(expectNode.GetProperty<float>(propertyIndex), 1.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliModelMaterialUniformChange(void)
+{
+  ToolkitTestApplication application;
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("uColorFactor", Property::Type::VECTOR4),
+      UniformData("uBaseColorTextureTransformAvailable", Property::Type::FLOAT),
+      UniformData(Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName().data(), Property::Type::FLOAT),
+      UniformData(Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), Property::Type::FLOAT),
+    };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  auto& gl = application.GetGlAbstraction();
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+
+  gResourceReadyCalled = false;
+  model.ResourceReadySignal().Connect(&OnResourceReady);
+
+  float expectIblFactor = 0.5f;
+  model.SetImageBasedLightSource(TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE, expectIblFactor);
+  DALI_TEST_EQUALS(model.GetImageBasedLightScaleFactor(), expectIblFactor, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
+  application.GetScene().Add(model);
+
+  application.SendNotification();
+  application.Render();
+
+  // Wait 3 task. (Load 1 model + Load 2 IBL)
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(model.GetImageBasedLightScaleFactor(), expectIblFactor, TEST_LOCATION);
+
+  // Check uniform values before change material value
+  Vector4 expectBaseColorFactor = Vector4(1.000f, 0.766f, 0.336f, 1.0f); // Defined at AnimatedCube.gltf
+  float   expectTransformValid  = 1.0f; ///< Note : This value will be true when gltf have BaseColorTexture.
+  float   expectMaxLOD          = 5.0f; ///< Note : The number of LOD what TEST_SPECULAR_TEXTURE file has is 5.
+
+  tet_printf("Check uniform value result\n");
+  DALI_TEST_EQUALS(gl.CheckUniformValue<Vector4>("uColorFactor", expectBaseColorFactor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.CheckUniformValue<float>("uBaseColorTextureTransformAvailable", expectTransformValid), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.CheckUniformValue<float>(Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName().data(), expectMaxLOD), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.CheckUniformValue<float>(Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), expectIblFactor), true, TEST_LOCATION);
+
+  // Change all materials in Model.
+  expectBaseColorFactor = Color::BLUE;
+
+  Scene3D::ModelNode rootModelNode = model.GetModelRoot();
+  DALI_TEST_CHECK(rootModelNode);
+  ApplyAllMaterialPropertyRecursively(rootModelNode, {{Dali::Scene3D::Material::Property::BASE_COLOR_FACTOR, expectBaseColorFactor}});
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Check whether uniform values are not changed instead what we change now\n");
+  DALI_TEST_EQUALS(gl.CheckUniformValue<Vector4>("uColorFactor", expectBaseColorFactor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.CheckUniformValue<float>("uBaseColorTextureTransformAvailable", expectTransformValid), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.CheckUniformValue<float>(Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName().data(), expectMaxLOD), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.CheckUniformValue<float>(Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), expectIblFactor), true, TEST_LOCATION);
 
   END_TEST;
 }

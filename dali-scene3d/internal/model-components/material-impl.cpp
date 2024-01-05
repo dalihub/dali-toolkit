@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,8 @@ static constexpr uint32_t         ALPHA_CUTOFF_FLAG                = Scene3D::Lo
 static constexpr std::string_view THREE_TEX_KEYWORD                = "THREE_TEX";
 static constexpr std::string_view GLTF_CHANNELS_KEYWORD            = "GLTF_CHANNELS";
 
+static constexpr Vector3 Y_DIRECTION(1.0f, -1.0f, 1.0f);
+
 enum TextureIndex
 {
   BASE_COLOR,
@@ -72,6 +74,23 @@ enum TextureIndex
   SPECULAR_COLOR,
   TEXTURE_TYPE_NUMBER,
 };
+
+/**
+ * @brief Helper API to register uniform property only if don't register before.
+ *
+ * @tparam T Type of uniform value.
+ * @param[in] renderer The renderer what we want to check / register property.
+ * @param[in] uniformName The name of uniform.
+ * @param[in] defaultUniformValue The default value if renderer don't register given uniform before.
+ */
+template<typename T>
+void RegisterUniformIfNotDefinedBefore(Renderer renderer, const std::string_view& uniformName, const T& defaultUniformValue)
+{
+  if(renderer.GetPropertyIndex(uniformName.data()) == Property::INVALID_INDEX)
+  {
+    renderer.RegisterProperty(uniformName, defaultUniformValue);
+  }
+}
 
 } // unnamed namespace
 
@@ -700,11 +719,12 @@ void Material::SetRendererUniform(Dali::Renderer renderer)
   renderer.RegisterProperty("uMask", mask);
   renderer.RegisterProperty("uAlphaThreshold", mAlphaCutoff);
 
-  renderer.RegisterProperty("uCubeMatrix", Matrix::IDENTITY);
+  // Setup default uniform values what we might need.
+  RegisterUniformIfNotDefinedBefore(renderer, "uCubeMatrix", Matrix::IDENTITY);
 
-  renderer.RegisterProperty(Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName().data(), 6.f);
-  renderer.RegisterProperty(Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), 1.0f);
-  renderer.RegisterProperty(Scene3D::Loader::NodeDefinition::GetIblYDirectionUniformName().data(), Vector3(1.0f, -1.0, 1.0));
+  RegisterUniformIfNotDefinedBefore(renderer, Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName(), 1.0f);
+  RegisterUniformIfNotDefinedBefore(renderer, Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName(), 1.0f);
+  RegisterUniformIfNotDefinedBefore(renderer, Scene3D::Loader::NodeDefinition::GetIblYDirectionUniformName(), Y_DIRECTION);
 
   Scene3D::Loader::RendererState::Apply(mRendererState, renderer);
 }
