@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_COMPONENTS_MODEL_NODE_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/common/map-wrapper.h>
-#include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/common/dali-common.h>
 #include <memory> // for std::unique_ptr
 #include <string>
@@ -53,7 +53,7 @@ using ColliderMeshUniquePtr = std::unique_ptr<Dali::Scene3D::Algorithm::Collider
  *
  * @SINCE_2_2.99
  */
-class DALI_SCENE3D_API ModelNode : public CustomActorImpl, public ModelPrimitiveModifyObserver
+class DALI_SCENE3D_API ModelNode : public Toolkit::Internal::Control, public ModelPrimitiveModifyObserver
 {
 public:
   using ModelPrimitiveContainer = std::vector<Scene3D::ModelPrimitive>;

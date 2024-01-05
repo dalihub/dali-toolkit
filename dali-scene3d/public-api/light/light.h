@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_LIGHT_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ class Light;
  * @endcode
  * @SINCE_2_2.32
  */
-class DALI_SCENE3D_API Light : public Dali::CustomActor
+class DALI_SCENE3D_API Light : public Dali::Toolkit::Control
 {
 public:
   /**

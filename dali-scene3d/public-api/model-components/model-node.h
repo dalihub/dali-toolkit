@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_COMPONENTS_MODEL_NODE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/custom-actor.h>
+#include <dali-toolkit/public-api/controls/control.h>
 #include <dali/public-api/common/dali-common.h>
 
 // INTERNAL INCLUDES
@@ -60,7 +60,7 @@ class ModelNode;
  * material.SetProperty(PropertyIndex, PropertyValue);
  * @endcode
  */
-class DALI_SCENE3D_API ModelNode : public Dali::CustomActor
+class DALI_SCENE3D_API ModelNode : public Dali::Toolkit::Control
 {
 public:
   /**
