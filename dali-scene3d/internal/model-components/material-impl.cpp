@@ -61,6 +61,8 @@ static constexpr uint32_t         ALPHA_CUTOFF_FLAG                = Scene3D::Lo
 static constexpr std::string_view THREE_TEX_KEYWORD                = "THREE_TEX";
 static constexpr std::string_view GLTF_CHANNELS_KEYWORD            = "GLTF_CHANNELS";
 
+static constexpr Vector3 IBL_BASIS(1.0f, -1.0f, 1.0f);
+
 enum TextureIndex
 {
   BASE_COLOR,
@@ -72,6 +74,23 @@ enum TextureIndex
   SPECULAR_COLOR,
   TEXTURE_TYPE_NUMBER,
 };
+
+/**
+ * @brief Helper API to register uniform property only if don't register before.
+ *
+ * @tparam T Type of uniform value.
+ * @param[in] renderer The renderer what we want to check / register property.
+ * @param[in] uniformName The name of uniform.
+ * @param[in] defaultUniformValue The default value if renderer don't register given uniform before.
+ */
+template<typename T>
+void RegisterUniformIfNotDefinedBefore(Renderer renderer, const std::string_view& uniformName, const T& defaultUniformValue)
+{
+  if(renderer.GetPropertyIndex(uniformName.data()) == Property::INVALID_INDEX)
+  {
+    renderer.RegisterProperty(uniformName, defaultUniformValue);
+  }
+}
 
 } // unnamed namespace
 
@@ -694,32 +713,32 @@ void Material::SetRendererUniform(Dali::Renderer renderer)
   renderer.RegisterProperty("uSpecularFactor", mTextureInformations[TextureIndex::SPECULAR].mFactor.x);
   renderer.RegisterProperty("uSpecularColorFactor", Vector3(mTextureInformations[TextureIndex::SPECULAR_COLOR].mFactor));
 
-  // No requirement to use texture transform for runtime generated models.
-  renderer.RegisterProperty("uBaseColorTextureTransformAvailable", 0.0f);
-  renderer.RegisterProperty("uNormalTextureTransformAvailable", 0.0f);
-  renderer.RegisterProperty("uNormalRoughnessTextureTransformAvailable", 0.0f);
-  renderer.RegisterProperty("uMetalRoughnessTextureTransformAvailable", 0.0f);
-  renderer.RegisterProperty("uOcclusionTextureTransformAvailable", 0.0f);
-  renderer.RegisterProperty("uEmissiveTextureTransformAvailable", 0.0f);
-
-  renderer.RegisterProperty("uBaseColorTextureTransform", Matrix3::IDENTITY);
-  renderer.RegisterProperty("uNormalRoughnessTextureTransform", Matrix3::IDENTITY);
-  renderer.RegisterProperty("uNormalTextureTransform", Matrix3::IDENTITY);
-  renderer.RegisterProperty("uMetalRoughnessTextureTransform", Matrix3::IDENTITY);
-  renderer.RegisterProperty("uOcclusionTextureTransform", Matrix3::IDENTITY);
-  renderer.RegisterProperty("uEmissiveTextureTransform", Matrix3::IDENTITY);
-
   float opaque = mIsOpaque ? 1.0f : 0.0f;
   float mask   = mIsMask ? 1.0f : 0.0f;
   renderer.RegisterProperty("uOpaque", opaque);
   renderer.RegisterProperty("uMask", mask);
   renderer.RegisterProperty("uAlphaThreshold", mAlphaCutoff);
 
-  renderer.RegisterProperty("uCubeMatrix", Matrix::IDENTITY);
+  // Setup default uniform values what we might need.
+  RegisterUniformIfNotDefinedBefore(renderer, "uBaseColorTextureTransformAvailable", 0.0f);
+  RegisterUniformIfNotDefinedBefore(renderer, "uNormalTextureTransformAvailable", 0.0f);
+  RegisterUniformIfNotDefinedBefore(renderer, "uNormalRoughnessTextureTransformAvailable", 0.0f);
+  RegisterUniformIfNotDefinedBefore(renderer, "uMetalRoughnessTextureTransformAvailable", 0.0f);
+  RegisterUniformIfNotDefinedBefore(renderer, "uOcclusionTextureTransformAvailable", 0.0f);
+  RegisterUniformIfNotDefinedBefore(renderer, "uEmissiveTextureTransformAvailable", 0.0f);
 
-  renderer.RegisterProperty(Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName().data(), 6.f);
-  renderer.RegisterProperty(Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), 1.0f);
-  renderer.RegisterProperty(Scene3D::Loader::NodeDefinition::GetIblYDirectionUniformName().data(), Vector3(1.0f, -1.0, 1.0));
+  RegisterUniformIfNotDefinedBefore(renderer, "uBaseColorTextureTransform", Matrix3::IDENTITY);
+  RegisterUniformIfNotDefinedBefore(renderer, "uNormalRoughnessTextureTransform", Matrix3::IDENTITY);
+  RegisterUniformIfNotDefinedBefore(renderer, "uNormalTextureTransform", Matrix3::IDENTITY);
+  RegisterUniformIfNotDefinedBefore(renderer, "uMetalRoughnessTextureTransform", Matrix3::IDENTITY);
+  RegisterUniformIfNotDefinedBefore(renderer, "uOcclusionTextureTransform", Matrix3::IDENTITY);
+  RegisterUniformIfNotDefinedBefore(renderer, "uEmissiveTextureTransform", Matrix3::IDENTITY);
+
+  RegisterUniformIfNotDefinedBefore(renderer, "uCubeMatrix", Matrix::IDENTITY);
+
+  RegisterUniformIfNotDefinedBefore(renderer, Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName(), 1.0f);
+  RegisterUniformIfNotDefinedBefore(renderer, Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName(), 1.0f);
+  RegisterUniformIfNotDefinedBefore(renderer, Scene3D::Loader::NodeDefinition::GetIblYDirectionUniformName(), IBL_BASIS);
 
   Scene3D::Loader::RendererState::Apply(mRendererState, renderer);
 }
