@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,8 +72,8 @@ constexpr int32_t  INVALID_INDEX           = -1;
 constexpr uint32_t MAXIMUM_SIZE_SHADOW_MAP = 2048;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
-static constexpr std::string_view Y_FLIP_MASK_TEXTURE = "uYFlipMaskTexture";
-static constexpr float FLIP_MASK_TEXTURE = 1.0f;
+static constexpr std::string_view Y_FLIP_MASK_TEXTURE     = "uYFlipMaskTexture";
+static constexpr float            FLIP_MASK_TEXTURE       = 1.0f;
 
 Dali::Actor CreateSkybox()
 {
@@ -642,8 +642,7 @@ void SceneView::SetShadow(Scene3D::Light light)
   SetShadowLightConstraint(selectedCamera, lightCamera);
 
   // make framebuffer for depth map and set it to render task.
-  Vector3  size                = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-  uint32_t shadowMapBufferSize = std::min(static_cast<uint32_t>(std::max(size.width, size.height)), MAXIMUM_SIZE_SHADOW_MAP);
+  uint32_t shadowMapBufferSize = std::min(std::max(GetResolutionWidth(), GetResolutionHeight()), MAXIMUM_SIZE_SHADOW_MAP);
   UpdateShadowMapBuffer(shadowMapBufferSize);
 
   // use lightCamera as a camera of shadow render task.
@@ -755,9 +754,7 @@ void SceneView::SetFramebufferMultiSamplingLevel(uint8_t multiSamplingLevel)
     // Create new framebuffer with changed multiSamplingLevel.
     if(mRenderTask && mFrameBuffer && mTexture)
     {
-      Vector3 size = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-
-      mFrameBuffer = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
+      mFrameBuffer = FrameBuffer::New(GetResolutionWidth(), GetResolutionHeight(), FrameBuffer::Attachment::DEPTH_STENCIL);
       mFrameBuffer.AttachColorTexture(mTexture);
       DevelFrameBuffer::SetMultiSamplingLevel(mFrameBuffer, mFrameBufferMultiSamplingLevel);
       mRenderTask.SetFrameBuffer(mFrameBuffer);
@@ -836,7 +833,7 @@ void SceneView::SetAlphaMaskUrl(std::string& alphaMaskUrl)
 {
   if(mAlphaMaskUrl != alphaMaskUrl)
   {
-    mAlphaMaskUrl = alphaMaskUrl;
+    mAlphaMaskUrl           = alphaMaskUrl;
     mMaskingPropertyChanged = true;
     UpdateRenderTask();
   }
@@ -866,7 +863,7 @@ void SceneView::EnableCropToMask(bool enableCropToMask)
 {
   if(mCropToMask != enableCropToMask)
   {
-    mCropToMask = enableCropToMask;
+    mCropToMask             = enableCropToMask;
     mMaskingPropertyChanged = true;
     UpdateRenderTask();
   }
@@ -1115,23 +1112,18 @@ void SceneView::UpdateRenderTask()
     {
       mRenderTask.SetCameraActor(mSelectedCamera);
     }
+    uint32_t width  = GetResolutionWidth();
+    uint32_t height = GetResolutionHeight();
 
-    Vector3     size        = Self().GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-    float aspectRatio = size.width / size.height;
-
-    uint32_t shadowMapBufferSize = std::min(static_cast<uint32_t>(std::max(size.width, size.height)), MAXIMUM_SIZE_SHADOW_MAP);
+    uint32_t shadowMapBufferSize = std::min(std::max(width, height), MAXIMUM_SIZE_SHADOW_MAP);
     UpdateShadowMapBuffer(shadowMapBufferSize);
 
     if(mUseFrameBuffer)
     {
-      uint32_t width  = (mWindowWidth == 0 || mWindowHeight == 0) ? static_cast<uint32_t>(size.width) : mWindowWidth;
-      uint32_t height = (mWindowWidth == 0 || mWindowHeight == 0) ? static_cast<uint32_t>(size.height) : mWindowHeight;
-      aspectRatio     = static_cast<float>(width) / static_cast<float>(height);
-
       Dali::FrameBuffer currentFrameBuffer = mRenderTask.GetFrameBuffer();
       if(!currentFrameBuffer ||
-         !Dali::Equals(currentFrameBuffer.GetColorTexture().GetWidth(), size.width) ||
-         !Dali::Equals(currentFrameBuffer.GetColorTexture().GetHeight(), size.height) ||
+         !Dali::Equals(currentFrameBuffer.GetColorTexture().GetWidth(), width) ||
+         !Dali::Equals(currentFrameBuffer.GetColorTexture().GetHeight(), height) ||
          mMaskingPropertyChanged ||
          mWindowSizeChanged)
       {
@@ -1169,7 +1161,7 @@ void SceneView::UpdateRenderTask()
         mRenderTask.SetClearColor(Color::TRANSPARENT);
 
         mMaskingPropertyChanged = false;
-        mWindowSizeChanged = false;
+        mWindowSizeChanged      = false;
       }
     }
     else
@@ -1190,7 +1182,11 @@ void SceneView::UpdateRenderTask()
       }
     }
 
-    mSelectedCamera.SetAspectRatio(aspectRatio);
+    if(width > 0u && height > 0u)
+    {
+      float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+      mSelectedCamera.SetAspectRatio(aspectRatio);
+    }
 
     RotateCamera();
   }
