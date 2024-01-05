@@ -71,12 +71,12 @@ ModelNode ModelNode::DownCast(BaseHandle handle)
 }
 
 ModelNode::ModelNode(Internal::ModelNode& implementation)
-: CustomActor(implementation)
+: Control(implementation)
 {
 }
 
 ModelNode::ModelNode(Dali::Internal::CustomActor* internal)
-: CustomActor(internal)
+: Control(internal)
 {
   // Can have a NULL pointer so we only need to check if the internal implementation is our class
   // when there is a value.

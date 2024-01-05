@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/custom-actor.h>
+#include <dali-toolkit/public-api/controls/control.h>
 #include <dali/public-api/common/dali-common.h>
 
 // INTERNAL INCLUDES
@@ -60,7 +60,7 @@ class ModelNode;
  * material.SetProperty(PropertyIndex, PropertyValue);
  * @endcode
  */
-class DALI_SCENE3D_API ModelNode : public Dali::CustomActor
+class DALI_SCENE3D_API ModelNode : public Dali::Toolkit::Control
 {
 public:
   /**

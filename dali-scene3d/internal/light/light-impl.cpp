@@ -70,7 +70,7 @@ Dali::Scene3D::Light Light::New()
 }
 
 Light::Light()
-: CustomActorImpl(ActorFlags::DISABLE_SIZE_NEGOTIATION)
+: Control(static_cast<ControlBehaviour>(ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS | ActorFlags::DISABLE_SIZE_NEGOTIATION))
 {
 }
 

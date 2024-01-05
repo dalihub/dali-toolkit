@@ -60,7 +60,7 @@ class Light;
  * @endcode
  * @SINCE_2_2.32
  */
-class DALI_SCENE3D_API Light : public Dali::CustomActor
+class DALI_SCENE3D_API Light : public Dali::Toolkit::Control
 {
 public:
   /**

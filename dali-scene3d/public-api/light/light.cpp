@@ -122,12 +122,12 @@ float Light::GetShadowBias() const
 }
 
 Light::Light(Internal::Light& implementation)
-: CustomActor(implementation)
+: Control(implementation)
 {
 }
 
 Light::Light(Dali::Internal::CustomActor* internal)
-: CustomActor(internal)
+: Control(internal)
 {
   // Can have a NULL pointer so we only need to check if the internal implementation is our class
   // when there is a value.

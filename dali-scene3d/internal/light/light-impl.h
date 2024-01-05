@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/custom-actor-impl.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <string_view>
@@ -44,7 +44,7 @@ namespace Internal
  *
  * @SINCE_2_2.32
  */
-class DALI_SCENE3D_API Light : public CustomActorImpl
+class DALI_SCENE3D_API Light : public Toolkit::Internal::Control
 {
 public:
   // Creation & Destruction
