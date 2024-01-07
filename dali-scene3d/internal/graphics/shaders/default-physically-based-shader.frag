@@ -143,9 +143,14 @@ vec3 linear(vec3 color)
   return pow(color, vec3(2.2));
 }
 
-vec2 computeTextureTransform(vec2 texCoord, mat3 textureTransform)
+vec2 computeTextureTransform(vec2 texCoord, mat3 textureTransform, float transformAvailable)
 {
+  // TODO : We'd better branch out this code by macro in future
+  if(transformAvailable > 0.5)
+  {
     return vec2(textureTransform * vec3(texCoord, 1.0));
+  }
+  return texCoord;
 }
 
 void main()
@@ -163,7 +168,7 @@ void main()
 #ifdef THREE_TEX
   // The albedo may be defined from a base texture or a flat color
 #ifdef BASECOLOR_TEX
-  mediump vec2 baseColorTexCoords = mix(vUV, computeTextureTransform(vUV, uBaseColorTextureTransform), uBaseColorTextureTransformAvailable);
+  mediump vec2 baseColorTexCoords = computeTextureTransform(vUV, uBaseColorTextureTransform, uBaseColorTextureTransformAvailable);
   lowp vec4 baseColor = texture(sAlbedoAlpha, baseColorTexCoords);
   baseColor = vColor * vec4(linear(baseColor.rgb), baseColor.w) * uColorFactor;
 #else // BASECOLOR_TEX
@@ -171,25 +176,25 @@ void main()
 #endif // BASECOLOR_TEX
 
 #ifdef METALLIC_ROUGHNESS_TEX
-  mediump vec2 metalRoughnessTexCoords = mix(vUV, computeTextureTransform(vUV, uMetalRoughnessTextureTransform), uMetalRoughnessTextureTransformAvailable);
+  mediump vec2 metalRoughnessTexCoords = computeTextureTransform(vUV, uMetalRoughnessTextureTransform, uMetalRoughnessTextureTransformAvailable);
   lowp vec4 metrou = texture(sMetalRoughness, metalRoughnessTexCoords);
   metallic = metrou.METALLIC * metallic;
   perceptualRoughness = metrou.ROUGHNESS * perceptualRoughness;
 #endif // METALLIC_ROUGHNESS_TEX
 
 #ifdef NORMAL_TEX
-  mediump vec2 normalTexCoords = mix(vUV, computeTextureTransform(vUV, uNormalTextureTransform), uNormalTextureTransformAvailable);
+  mediump vec2 normalTexCoords = computeTextureTransform(vUV, uNormalTextureTransform, uNormalTextureTransformAvailable);
   n = texture(sNormal, normalTexCoords).rgb;
   n = normalize(vTBN * ((2.0 * n - 1.0) * vec3(uNormalScale, uNormalScale, 1.0)));
 #endif // NORMAL_TEX
 #else // THREE_TEX
-  mediump vec2 baseColorTexCoords = mix(vUV, computeTextureTransform(vUV, uBaseColorTextureTransform), uBaseColorTextureTransformAvailable);
+  mediump vec2 baseColorTexCoords = computeTextureTransform(vUV, uBaseColorTextureTransform, uBaseColorTextureTransformAvailable);
   vec4 albedoMetal = texture(sAlbedoMetal, baseColorTexCoords);
   lowp vec4 baseColor = vec4(linear(albedoMetal.rgb), 1.0) * vColor * uColorFactor;
 
   metallic = albedoMetal.METALLIC * metallic;
 
-  mediump vec2 normalRoughnessTexCoords = mix(vUV, computeTextureTransform(vUV, uNormalRoughnessTextureTransform), uNormalRoughnessTextureTransformAvailable);
+  mediump vec2 normalRoughnessTexCoords = computeTextureTransform(vUV, uNormalRoughnessTextureTransform, uNormalRoughnessTextureTransformAvailable);
   vec4 normalRoughness = texture(sNormalRoughness, normalRoughnessTexCoords);
   perceptualRoughness = normalRoughness.ROUGHNESS * perceptualRoughness;
 
@@ -316,13 +321,13 @@ void main()
   }
 
 #ifdef OCCLUSION
-  mediump vec2 occlusionTexCoords = mix(vUV, computeTextureTransform(vUV, uOcclusionTextureTransform), uOcclusionTextureTransformAvailable);
+  mediump vec2 occlusionTexCoords = computeTextureTransform(vUV, uOcclusionTextureTransform, uOcclusionTextureTransformAvailable);
   lowp float ao = texture(sOcclusion, occlusionTexCoords).r;
   color = mix(color, color * ao, uOcclusionStrength);
 #endif // OCCLUSION
 
 #ifdef EMISSIVE_TEXTURE
-  mediump vec2 emissiveTexCoords = mix(vUV, computeTextureTransform(vUV, uEmissiveTextureTransform), uEmissiveTextureTransformAvailable);
+  mediump vec2 emissiveTexCoords = computeTextureTransform(vUV, uEmissiveTextureTransform, uEmissiveTextureTransformAvailable);
   lowp vec3 emissive = linear(texture(sEmissive, emissiveTexCoords).rgb) * uEmissiveFactor;
 #else
   lowp vec3 emissive = uEmissiveFactor;
