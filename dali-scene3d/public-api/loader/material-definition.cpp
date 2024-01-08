@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/builder/base64-encoding.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/integration-api/pixel-data-integ.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/image-resource-loader.h>
@@ -107,7 +109,7 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
       Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(reinterpret_cast<uint8_t*>(buffer.data()), bufferSize, textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
       if(pixelBuffer)
       {
-        pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
+        pixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffer, true);
       }
     }
   }
@@ -216,9 +218,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
     }
     else // single value normal-roughness
     {
-      const auto bufferSize = 4;
-      uint8_t*   buffer     = new uint8_t[bufferSize]{0x7f, 0x7f, 0xff, 0xff}; // normal of (0, 0, 1), roughness of 1
-      raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
+      raw.mTextures.push_back({Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataZAxisAndAlphaRGBA(), GetSingleValueSampler()});
     }
   }
   else
@@ -252,7 +252,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
       buffer[0] = static_cast<uint8_t>(mColor.r * 255.f);
       buffer[1] = static_cast<uint8_t>(mColor.g * 255.f);
       buffer[2] = static_cast<uint8_t>(mColor.b * 255.f);
-      raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, format, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
+      raw.mTextures.push_back({Dali::Integration::NewPixelDataWithReleaseAfterUpload(buffer, bufferSize, 1, 1, 0, format, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
     }
 
     // If we have transparency, or an image based albedo map, we will have to continue with separate metallicRoughness + normal.
@@ -266,9 +266,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
     {
       // NOTE: we want to set both metallic and roughness to 1.0; dli uses the R & A channels,
       // glTF2 uses B & G, so we might as well just set all components to 1.0.
-      const auto bufferSize = 4;
-      uint8_t*   buffer     = new uint8_t[bufferSize]{0xff, 0xff, 0xff, 0xff};
-      raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
+      raw.mTextures.push_back({Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGBA(), GetSingleValueSampler()});
     }
 
     if(checkStage(NORMAL))
@@ -280,15 +278,11 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
     {
       if(createMetallicRoughnessAndNormal)
       {
-        const auto bufferSize = 3;
-        uint8_t*   buffer     = new uint8_t[bufferSize]{0x7f, 0x7f, 0xff}; // normal of (0, 0, 1)
-        raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
+        raw.mTextures.push_back({Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataZAxisRGB(), GetSingleValueSampler()});
       }
       else // single-value normal-roughness
       {
-        const auto bufferSize = 4;
-        uint8_t*   buffer     = new uint8_t[bufferSize]{0x7f, 0x7f, 0xff, 0xff}; // normal of (0, 0, 1), roughness of 1.0
-        raw.mTextures.push_back({PixelData::New(buffer, bufferSize, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
+        raw.mTextures.push_back({Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataZAxisAndAlphaRGBA(), GetSingleValueSampler()});
       }
     }
   }

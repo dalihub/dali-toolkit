@@ -406,7 +406,7 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
       environmentMapData.mPixelData.resize(6);
       for(auto& face : environmentMapData.mPixelData)
       {
-        face.push_back(PixelData::New(new uint8_t[3]{0xff, 0xff, 0xff}, 3, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY));
+        face.push_back(Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGB());
       }
       environmentMapData.SetEnvironmentMapType(Dali::Scene3D::EnvironmentMapType::CUBEMAP);
       Texture iblTexture = environmentMapData.GetTexture();
