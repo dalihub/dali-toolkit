@@ -37,6 +37,7 @@
 #include <string_view>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/internal/controls/model/model-impl.h>
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/internal/light/light-impl.h>
@@ -325,6 +326,9 @@ SceneView::~SceneView()
       Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
       mSkyboxLoadTask.Reset();
     }
+
+    // Request image resource GC
+    Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
   }
 }
 
@@ -507,6 +511,9 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
 
     mSpecularMipmapLevels = 1u;
     NotifyImageBasedLightTextureChange();
+
+    // Request image resource GC
+    Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
   }
   else
   {
@@ -516,6 +523,9 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
       {
         Dali::AsyncTaskManager::Get().RemoveTask(mIblDiffuseLoadTask);
         mIblDiffuseLoadTask.Reset();
+
+        // Request image resource GC
+        Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
       }
       mIblDiffuseLoadTask = new EnvironmentMapLoadTask(mDiffuseIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &SceneView::OnIblDiffuseLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblDiffuseLoadTask);
@@ -528,6 +538,9 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
       {
         Dali::AsyncTaskManager::Get().RemoveTask(mIblSpecularLoadTask);
         mIblSpecularLoadTask.Reset();
+
+        // Request image resource GC
+        Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
       }
       mIblSpecularLoadTask = new EnvironmentMapLoadTask(mSpecularIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &SceneView::OnIblSpecularLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblSpecularLoadTask);
@@ -1238,6 +1251,9 @@ void SceneView::UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentM
 
     mSkyboxDirty         = false;
     mSkyboxResourceReady = true;
+
+    // Request image resource GC
+    Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
   }
   else
   {
@@ -1247,6 +1263,9 @@ void SceneView::UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentM
       {
         Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
         mSkyboxLoadTask.Reset();
+
+        // Request image resource GC
+        Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
       }
 
       mSkyboxLoadTask = new EnvironmentMapLoadTask(mSkyboxUrl, mSkyboxEnvironmentMapType, MakeCallback(this, &SceneView::OnSkyboxLoadComplete));

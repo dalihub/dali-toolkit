@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -235,6 +235,16 @@ void UpdateShadowMapTextureRecursively(Scene3D::ModelNode node, Dali::Texture sh
   }
 }
 
+void ResetResourceTask(IntrusivePtr<AsyncTask>&& asyncTask)
+{
+  if(!asyncTask)
+  {
+    return;
+  }
+  Dali::AsyncTaskManager::Get().RemoveTask(asyncTask);
+  asyncTask.Reset();
+}
+
 } // anonymous namespace
 
 Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUrl)
@@ -446,6 +456,9 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
     mDiffuseTexture.Reset();
     mSpecularTexture.Reset();
     UpdateImageBasedLightTexture();
+
+    // Request image resource GC
+    Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
   }
   else
   {
@@ -455,6 +468,9 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
       mIblDiffuseLoadTask = new EnvironmentMapLoadTask(mDiffuseIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &Model::OnIblDiffuseLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblDiffuseLoadTask);
       mIblDiffuseDirty = false;
+
+      // Request image resource GC
+      Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
     }
 
     if(isOnScene && mIblSpecularDirty)
@@ -463,6 +479,9 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
       mIblSpecularLoadTask = new EnvironmentMapLoadTask(mSpecularIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &Model::OnIblSpecularLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblSpecularLoadTask);
       mIblSpecularDirty = false;
+
+      // Request image resource GC
+      Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
     }
   }
 
@@ -1201,16 +1220,6 @@ void Model::ResetResourceTasks()
   ResetResourceTask(mModelLoadTask);
   ResetResourceTask(mIblDiffuseLoadTask);
   ResetResourceTask(mIblSpecularLoadTask);
-}
-
-void Model::ResetResourceTask(IntrusivePtr<AsyncTask> asyncTask)
-{
-  if(!asyncTask)
-  {
-    return;
-  }
-  Dali::AsyncTaskManager::Get().RemoveTask(asyncTask);
-  asyncTask.Reset();
 }
 
 void Model::NotifyResourceReady()

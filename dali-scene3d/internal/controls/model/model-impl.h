@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_INTERNAL_MODEL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -369,11 +369,6 @@ private:
    * @brief Reset Resource loading tasks.
    */
   void ResetResourceTasks();
-
-  /**
-   * @brief Reset a Resource loading task.
-   */
-  void ResetResourceTask(IntrusivePtr<AsyncTask> asyncTask);
 
   /**
    * @brief Notify Resource Ready signal.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,15 @@
 #include <dali-scene3d/internal/common/image-resource-loader.h>
 
 // EXTERNAL INCLUDES
-#include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/pixel-data-integ.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
@@ -47,6 +49,41 @@ constexpr uint32_t GC_PERIOD_MILLISECONDS                     = 1000u;
 #ifdef DEBUG_ENABLED
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_IMAGE_RESOURCE_LOADER");
 #endif
+
+bool SupportPixelDataCache(Dali::PixelData pixelData)
+{
+  // Check given pixelData support to release data after upload.
+  // This is cause we need to reduce CPU memory usage.
+  if(Dali::Integration::IsPixelDataReleaseAfterUpload(pixelData))
+  {
+    return true;
+  }
+
+  // Check given pixelData is default pixelData.
+  if(pixelData == Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGB() ||
+     pixelData == Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGBA() ||
+     pixelData == Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataZAxisRGB() ||
+     pixelData == Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataZAxisAndAlphaRGBA())
+  {
+    return true;
+  }
+  return false;
+}
+
+bool SupportPixelDataListCache(const std::vector<std::vector<Dali::PixelData>>& pixelDataList)
+{
+  for(const auto& pixelDataListLevel0 : pixelDataList)
+  {
+    for(const auto& pixelData : pixelDataListLevel0)
+    {
+      if(!SupportPixelDataCache(pixelData))
+      {
+        return false;
+      }
+    }
+  }
+  return true;
+}
 
 struct ImageInformation
 {
@@ -132,9 +169,17 @@ std::size_t GenerateHash(const std::vector<std::vector<Dali::PixelData>>& pixelD
 
 // Item Creation functor list
 
-Dali::PixelData CreatePixelDataFromImageInfo(const ImageInformation& info, bool /* Not used */)
+Dali::PixelData CreatePixelDataFromImageInfo(const ImageInformation& info, bool releasePixelData)
 {
-  return Dali::Toolkit::SyncImageLoader::Load(info.mUrl, info.mDimensions, info.mFittingMode, info.mSamplingMode, info.mOrientationCorrection);
+  Dali::PixelData pixelData;
+
+  // Load the image synchronously (block the thread here).
+  Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(info.mUrl, info.mDimensions, info.mFittingMode, info.mSamplingMode, info.mOrientationCorrection);
+  if(pixelBuffer)
+  {
+    pixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffer, releasePixelData);
+  }
+  return pixelData;
 }
 
 Dali::Texture CreateTextureFromPixelData(const Dali::PixelData& pixelData, bool mipmapRequired)
@@ -439,12 +484,13 @@ public: // Can be called by worker thread
    * @brief Try to get cached pixel data, or newly create if there is no pixel data that already cached.
    *
    * @param[in] info The informations of image to load.
+   * @param[in] releasePixelData Whether we need to release pixel data after upload, or not.
    * @return Texture that has been cached. Or empty handle if we fail to found cached item.
    */
-  Dali::PixelData GetOrCreateCachedPixelData(const ImageInformation& info)
+  Dali::PixelData GetOrCreateCachedPixelData(const ImageInformation& info, bool releasePixelData)
   {
     auto hashValue = GenerateHash(info);
-    return GetOrCreateCachedItem<true, ImageInformation, Dali::PixelData, CreatePixelDataFromImageInfo>(mPixelDataCache, hashValue, info, false, mPixelDataContainerUpdated);
+    return GetOrCreateCachedItem<true, ImageInformation, Dali::PixelData, CreatePixelDataFromImageInfo>(mPixelDataCache, hashValue, info, releasePixelData, mPixelDataContainerUpdated);
   }
 
 private: // Called by main thread
@@ -532,12 +578,6 @@ namespace Dali::Scene3D::Internal
 namespace ImageResourceLoader
 {
 // Called by main thread..
-Dali::PixelData GetEmptyPixelDataWhiteRGB()
-{
-  static Dali::PixelData emptyPixelData = PixelData::New(new uint8_t[3]{0xff, 0xff, 0xff}, 3, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY);
-  return emptyPixelData;
-}
-
 Dali::Texture GetEmptyTextureWhiteRGB()
 {
   if(!gEmptyTextureWhiteRGB)
@@ -551,12 +591,26 @@ Dali::Texture GetEmptyTextureWhiteRGB()
 
 Dali::Texture GetCachedTexture(Dali::PixelData pixelData, bool mipmapRequired)
 {
-  return GetCacheImpl()->GetOrCreateCachedTexture(pixelData, mipmapRequired);
+  if(SupportPixelDataCache(pixelData))
+  {
+    return GetCacheImpl()->GetOrCreateCachedTexture(pixelData, mipmapRequired);
+  }
+  else
+  {
+    return CreateTextureFromPixelData(pixelData, mipmapRequired);
+  }
 }
 
 Dali::Texture GetCachedCubeTexture(const std::vector<std::vector<Dali::PixelData>>& pixelDataList, bool mipmapRequired)
 {
-  return GetCacheImpl()->GetOrCreateCachedCubeTexture(pixelDataList, mipmapRequired);
+  if(SupportPixelDataListCache(pixelDataList))
+  {
+    return GetCacheImpl()->GetOrCreateCachedCubeTexture(pixelDataList, mipmapRequired);
+  }
+  else
+  {
+    return CreateCubeTextureFromPixelDataList(pixelDataList, mipmapRequired);
+  }
 }
 
 void RequestGarbageCollect(bool fullCollect)
@@ -570,6 +624,30 @@ void EnsureResourceLoaderCreated()
 }
 
 // Can be called by worker thread.
+Dali::PixelData GetEmptyPixelDataWhiteRGB()
+{
+  static Dali::PixelData emptyPixelData = PixelData::New(new uint8_t[3]{0xff, 0xff, 0xff}, 3, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY);
+  return emptyPixelData;
+}
+
+Dali::PixelData GetEmptyPixelDataWhiteRGBA()
+{
+  static Dali::PixelData emptyPixelData = PixelData::New(new uint8_t[4]{0xff, 0xff, 0xff, 0xff}, 4, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
+  return emptyPixelData;
+}
+
+Dali::PixelData GetEmptyPixelDataZAxisRGB()
+{
+  static Dali::PixelData emptyPixelData = PixelData::New(new uint8_t[3]{0x7f, 0x7f, 0xff}, 3, 1, 1, Pixel::RGB888, PixelData::DELETE_ARRAY);
+  return emptyPixelData;
+}
+
+Dali::PixelData GetEmptyPixelDataZAxisAndAlphaRGBA()
+{
+  static Dali::PixelData emptyPixelData = PixelData::New(new uint8_t[4]{0x7f, 0x7f, 0xff, 0xff}, 4, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
+  return emptyPixelData;
+}
+
 Dali::PixelData GetCachedPixelData(const std::string& url)
 {
   return GetCachedPixelData(url, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true);
@@ -589,7 +667,7 @@ Dali::PixelData GetCachedPixelData(const std::string& url,
   }
   else
   {
-    return GetCacheImpl()->GetOrCreateCachedPixelData(info);
+    return GetCacheImpl()->GetOrCreateCachedPixelData(info, true);
   }
 }
 } // namespace ImageResourceLoader
