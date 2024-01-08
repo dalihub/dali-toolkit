@@ -192,9 +192,12 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   {
     DALI_LOG_ERROR("VectorAnimationTask::Load: Load failed [%s]\n", mImageUrl.GetUrl().c_str());
     mLoadRequest = false;
-    if(!synchronousLoading && mLoadCompletedCallback)
     {
-      mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
+      ConditionalWait::ScopedLock lock(mConditionalWait);
+      if(!synchronousLoading && mLoadCompletedCallback)
+      {
+        mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
+      }
     }
 #ifdef TRACE_ENABLED
     if(gTraceFilter && gTraceFilter->IsTraceEnabled())
@@ -216,9 +219,12 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   mFrameDurationMicroSeconds = MICROSECONDS_PER_SECOND / mFrameRate;
 
   mLoadRequest = false;
-  if(!synchronousLoading && mLoadCompletedCallback)
   {
-    mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
+    ConditionalWait::ScopedLock lock(mConditionalWait);
+    if(!synchronousLoading && mLoadCompletedCallback)
+    {
+      mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
+    }
   }
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Load: file = %s [%d frames, %f fps] [%p]\n", mImageUrl.GetUrl().c_str(), mTotalFrame, mFrameRate, this);
