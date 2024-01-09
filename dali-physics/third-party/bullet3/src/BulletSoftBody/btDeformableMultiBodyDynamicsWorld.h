@@ -62,6 +62,8 @@ protected:
 
 	void positionCorrection(btScalar timeStep);
 
+	// Modified by Samsung to compile under GCC13. 2024-01-10. eunkiki.hong@samsung.com
+	using btMultiBodyDynamicsWorld::solveConstraints;
 	void solveConstraints(btScalar timeStep);
 
 	void updateActivationState(btScalar timeStep);
