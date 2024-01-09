@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,8 @@ PixelData GetCubeFace(Dali::PixelData cubePixelData, uint32_t faceIndex, CubeTyp
       uint32_t finalFaceWidth  = (xOffset + static_cast<uint32_t>(faceWidth) < imageWidth) ? static_cast<uint32_t>(faceWidth) : imageWidth - xOffset;
       uint32_t finalFaceHeight = (yOffset + static_cast<uint32_t>(faceHeight) < imageHeight) ? static_cast<uint32_t>(faceHeight) : imageHeight - yOffset;
       uint8_t* tempImageBuffer = GetCroppedBuffer(imageBuffer, bytesPerPixel, imageWidth, imageHeight, xOffset, yOffset, finalFaceWidth, finalFaceHeight);
-      cubeFacePixelData        = PixelData::New(tempImageBuffer, finalFaceWidth * finalFaceHeight * bytesPerPixel, finalFaceWidth, finalFaceHeight, imagePixelFormat, PixelData::FREE);
+
+      cubeFacePixelData = Dali::Integration::NewPixelDataWithReleaseAfterUpload(tempImageBuffer, finalFaceWidth * finalFaceHeight * bytesPerPixel, finalFaceWidth, finalFaceHeight, 0u, imagePixelFormat, PixelData::FREE);
     }
   }
   return cubeFacePixelData;

@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_IMAGE_RESOURCE_LOADER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,24 @@ void EnsureResourceLoaderCreated();
  * @return A PixelData object containing the white RGB888 color.
  */
 Dali::PixelData GetEmptyPixelDataWhiteRGB();
+
+/**
+ * @brief Get cached pixelData handle filled as white with RGBA8888 format.
+ * @return A PixelData object containing the white RGBA8888 color.
+ */
+Dali::PixelData GetEmptyPixelDataWhiteRGBA();
+
+/**
+ * @brief Get cached pixelData handle that will be used for Z-Axis with RGB8888 format.
+ * @return A PixelData object containing the Z-Axis RGB8888 color.
+ */
+Dali::PixelData GetEmptyPixelDataZAxisRGB();
+
+/**
+ * @brief Get cached pixelData handle that will be used for Z-Axis and 1.0 alpha with RGBA8888 format.
+ * @return A PixelData object containing the Z-Axis and 1.0 alpha RGBA8888 color.
+ */
+Dali::PixelData GetEmptyPixelDataZAxisAndAlphaRGBA();
 
 /**
  * @brief Get cached image, or loads an image synchronously.

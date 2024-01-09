@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali-scene3d/public-api/loader/ktx-loader.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/pixel-data-integ.h>
 #include <dali/public-api/rendering/texture.h>
 #include <fstream>
 #include <memory>
@@ -248,7 +249,7 @@ bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData
         {
           return false;
         }
-        environmentMapData.mPixelData[face][mipmapLevel] = PixelData::New(img.release(), byteSize, header.pixelWidth, header.pixelHeight, daliformat, PixelData::DELETE_ARRAY);
+        environmentMapData.mPixelData[face][mipmapLevel] = Dali::Integration::NewPixelDataWithReleaseAfterUpload(img.release(), byteSize, header.pixelWidth, header.pixelHeight, 0u, daliformat, PixelData::DELETE_ARRAY);
       }
     }
 
