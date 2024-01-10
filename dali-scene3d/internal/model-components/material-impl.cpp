@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -701,6 +701,13 @@ void Material::SetRendererUniform(Dali::Renderer renderer)
   renderer.RegisterProperty("uMetalRoughnessTextureTransformAvailable", 0.0f);
   renderer.RegisterProperty("uOcclusionTextureTransformAvailable", 0.0f);
   renderer.RegisterProperty("uEmissiveTextureTransformAvailable", 0.0f);
+
+  renderer.RegisterProperty("uBaseColorTextureTransform", Matrix3::IDENTITY);
+  renderer.RegisterProperty("uNormalRoughnessTextureTransform", Matrix3::IDENTITY);
+  renderer.RegisterProperty("uNormalTextureTransform", Matrix3::IDENTITY);
+  renderer.RegisterProperty("uMetalRoughnessTextureTransform", Matrix3::IDENTITY);
+  renderer.RegisterProperty("uOcclusionTextureTransform", Matrix3::IDENTITY);
+  renderer.RegisterProperty("uEmissiveTextureTransform", Matrix3::IDENTITY);
 
   float opaque = mIsOpaque ? 1.0f : 0.0f;
   float mask   = mIsMask ? 1.0f : 0.0f;

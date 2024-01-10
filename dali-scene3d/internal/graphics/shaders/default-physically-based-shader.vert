@@ -63,7 +63,7 @@ uniform mediump vec3 uYDirection;
 #endif
 
 #ifdef MORPH
-#define MAX_BLEND_SHAPE_NUMBER 128
+#define MAX_BLEND_SHAPE_NUMBER 256
 uniform int uNumberOfBlendShapes;                                         ///< Total number of blend shapes loaded.
 uniform highp float uBlendShapeWeight[MAX_BLEND_SHAPE_NUMBER];            ///< The weight of each blend shape.
 #ifdef MORPH_VERSION_2_0

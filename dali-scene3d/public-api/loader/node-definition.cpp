@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -357,6 +357,13 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
   renderer.RegisterProperty("uOcclusionTextureTransformAvailable", 0.0f);
   renderer.RegisterProperty("uEmissiveTextureTransformAvailable", 0.0f);
 
+  renderer.RegisterProperty("uBaseColorTextureTransform", Matrix3::IDENTITY);
+  renderer.RegisterProperty("uNormalRoughnessTextureTransform", Matrix3::IDENTITY);
+  renderer.RegisterProperty("uNormalTextureTransform", Matrix3::IDENTITY);
+  renderer.RegisterProperty("uMetalRoughnessTextureTransform", Matrix3::IDENTITY);
+  renderer.RegisterProperty("uOcclusionTextureTransform", Matrix3::IDENTITY);
+  renderer.RegisterProperty("uEmissiveTextureTransform", Matrix3::IDENTITY);
+
   auto iTexture   = matDef.mTextureStages.begin();
   auto checkStage = [&](uint32_t flags) {
     return iTexture != matDef.mTextureStages.end() && MaskMatch(iTexture->mSemantic, flags);
@@ -364,48 +371,48 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
 
   if(checkStage(MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC))
   {
-    renderer.RegisterProperty("uBaseColorTextureTransformAvailable", 1.0f);
+    renderer.RegisterProperty("uBaseColorTextureTransformAvailable", iTexture->mTexture.mTransform != Matrix3::IDENTITY);
     renderer.RegisterProperty("uBaseColorTextureTransform", iTexture->mTexture.mTransform);
     ++iTexture;
 
     if(checkStage(MaterialDefinition::NORMAL | MaterialDefinition::ROUGHNESS))
     {
-      renderer.RegisterProperty("uNormalRoughnessTextureTransformAvailable", 1.0f);
+      renderer.RegisterProperty("uNormalRoughnessTextureTransformAvailable", iTexture->mTexture.mTransform != Matrix3::IDENTITY);
       renderer.RegisterProperty("uNormalRoughnessTextureTransform", iTexture->mTexture.mTransform);
       ++iTexture;
     }
   }
   else if(checkStage(MaterialDefinition::ALBEDO))
   {
-    renderer.RegisterProperty("uBaseColorTextureTransformAvailable", 1.0f);
+    renderer.RegisterProperty("uBaseColorTextureTransformAvailable", iTexture->mTexture.mTransform != Matrix3::IDENTITY);
     renderer.RegisterProperty("uBaseColorTextureTransform", iTexture->mTexture.mTransform);
     ++iTexture;
   }
 
   if(checkStage(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS))
   {
-    renderer.RegisterProperty("uMetalRoughnessTextureTransformAvailable", 1.0f);
+    renderer.RegisterProperty("uMetalRoughnessTextureTransformAvailable", iTexture->mTexture.mTransform != Matrix3::IDENTITY);
     renderer.RegisterProperty("uMetalRoughnessTextureTransform", iTexture->mTexture.mTransform);
     ++iTexture;
   }
 
   if(checkStage(MaterialDefinition::NORMAL))
   {
-    renderer.RegisterProperty("uNormalTextureTransformAvailable", 1.0f);
+    renderer.RegisterProperty("uNormalTextureTransformAvailable", iTexture->mTexture.mTransform != Matrix3::IDENTITY);
     renderer.RegisterProperty("uNormalTextureTransform", iTexture->mTexture.mTransform);
     ++iTexture;
   }
 
   if(checkStage(MaterialDefinition::OCCLUSION))
   {
-    renderer.RegisterProperty("uOcclusionTextureTransformAvailable", 1.0f);
+    renderer.RegisterProperty("uOcclusionTextureTransformAvailable", iTexture->mTexture.mTransform != Matrix3::IDENTITY);
     renderer.RegisterProperty("uOcclusionTextureTransform", iTexture->mTexture.mTransform);
     ++iTexture;
   }
 
   if(checkStage(MaterialDefinition::EMISSIVE))
   {
-    renderer.RegisterProperty("uEmissiveTextureTransformAvailable", 1.0f);
+    renderer.RegisterProperty("uEmissiveTextureTransformAvailable", iTexture->mTexture.mTransform != Matrix3::IDENTITY);
     renderer.RegisterProperty("uEmissiveTextureTransform", iTexture->mTexture.mTransform);
     ++iTexture;
   }
