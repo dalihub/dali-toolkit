@@ -2089,6 +2089,90 @@ int UtcDaliToolkitTextlabelTextFitStressTest(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextlabelFastTextFitStressTest(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelFastTextFitStressTest");
+  TextLabel label = TextLabel::New();
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world");
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 120.f);
+
+  // connect to the text git changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChangedCallback);
+  bool textFitChangedSignal = false;
+  label.ConnectSignal(testTracker, "textFitChanged", CallbackFunctor(&textFitChangedSignal));
+  gTextFitChangedCallBackCalled = false;
+
+  application.GetScene().Add(label);
+
+  // check text label width at range [100, 299]
+  for(int i=100; i<300; i++)
+  {
+    Vector2   size((float)i, 200.f);
+    label.SetProperty(Actor::Property::SIZE, size);
+
+    // check point size with veryvery big range
+    Property::Map textFitMapSet;
+    textFitMapSet["enable"]       = true;
+    textFitMapSet["minSize"]      = 10.f;
+    textFitMapSet["maxSize"]      = 10000.f;
+    textFitMapSet["stepSize"]     = -1.0f;
+    textFitMapSet["fontSizeType"] = "pointSize";
+
+    label.SetProperty(Toolkit::DevelTextLabel::Property::TEXT_FIT, textFitMapSet);
+
+    application.SendNotification();
+    application.Render();
+  }
+
+  DALI_TEST_CHECK(gTextFitChangedCallBackCalled);
+  DALI_TEST_CHECK(textFitChangedSignal);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelTextFitMultiLine(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelTextFitMultiLine");
+  TextLabel label = TextLabel::New();
+  Vector2   size(500.0f, 100.0f);
+  label.SetProperty(Actor::Property::SIZE, size);
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world\nHello world");
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+
+  // connect to the text git changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChangedCallback);
+  bool textFitChangedSignal = false;
+  label.ConnectSignal(testTracker, "textFitChanged", CallbackFunctor(&textFitChangedSignal));
+  gTextFitChangedCallBackCalled = false;
+
+  Property::Map textFitMapSet;
+  textFitMapSet["enable"]       = true;
+  textFitMapSet["minSize"]      = 10.f;
+  textFitMapSet["maxSize"]      = 100.f;
+  textFitMapSet["stepSize"]     = -1.0f;
+  textFitMapSet["fontSizeType"] = "pointSize";
+
+  label.SetProperty(Toolkit::DevelTextLabel::Property::TEXT_FIT, textFitMapSet);
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 120.f);
+
+  application.GetScene().Add(label);
+
+  application.SendNotification();
+  application.Render();
+
+  float textFitFontSize = (label.GetProperty(Dali::Toolkit::DevelTextLabel::Property::TEXT_FIT).Get<Property::Map>())["fontSize"].Get<float>();
+  DALI_TEST_EQUALS(textFitFontSize, 14.f, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gTextFitChangedCallBackCalled);
+  DALI_TEST_CHECK(textFitChangedSignal);
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextlabelTextFitArray(void)
 {
   ToolkitTestApplication application;
