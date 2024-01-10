@@ -283,8 +283,8 @@ void ApplyImageVisualShaderDebugScriptCode(std::string& fragmentShader)
 
   for(std::size_t i = 0u; i < resultMap.Count(); ++i)
   {
-    auto key   = resultMap.GetKeyAt(i);
-    auto value = resultMap.GetValue(i);
+    auto        key   = resultMap.GetKeyAt(i);
+    const auto& value = resultMap.GetValue(i);
 
     RedefineMacro(fragmentShader, std::move(key.stringKey), value.Get<std::string>());
   }
