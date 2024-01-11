@@ -1162,6 +1162,8 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
     visualTransformOffset.x = roundf(padding.start + alignmentOffset.x);
     visualTransformOffset.y = roundf(padding.top + alignmentOffset.y);
 
+    mController->SetVisualTransformOffset(visualTransformOffset);
+
     Property::Map visualTransform;
     visualTransform.Add(Toolkit::Visual::Transform::Property::SIZE, layoutSize)
       .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
