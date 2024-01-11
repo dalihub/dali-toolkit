@@ -1574,6 +1574,13 @@ public: // Default style & Input style
    */
   const float GetCharacterSpacing() const;
 
+  /**
+   * @brief Sets the visual transform offset.
+   *
+   * @param[in] offset The offset.
+   */
+  void SetVisualTransformOffset(Vector2 offset);
+
 public: // Queries & retrieves.
   /**
    * @brief Return the layout engine.
