@@ -1474,6 +1474,11 @@ const float Controller::GetCharacterSpacing() const
   return mImpl->mModel->mVisualModel->GetCharacterSpacing();
 }
 
+void Controller::SetVisualTransformOffset(Vector2 offset)
+{
+  mImpl->mModel->mVisualTransformOffset = offset;
+}
+
 Controller::UpdateTextType Controller::Relayout(const Size& size, Dali::LayoutDirection::Type layoutDirection)
 {
   return Relayouter::Relayout(*this, size, layoutDirection);

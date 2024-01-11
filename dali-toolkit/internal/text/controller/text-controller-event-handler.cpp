@@ -379,8 +379,11 @@ void Controller::EventHandler::AnchorEvent(Controller& controller, float x, floa
   CharacterIndex cursorPosition = 0u;
 
   // Convert from control's coords to text's coords.
+
   const float xPosition = x - controller.mImpl->mModel->mScrollPosition.x;
   const float yPosition = y - controller.mImpl->mModel->mScrollPosition.y;
+
+  Vector2 visualTransformOffset = controller.mImpl->mModel->mVisualTransformOffset;
 
   // Whether to touch point hits on a glyph.
   bool matchedCharacter = false;
@@ -388,7 +391,7 @@ void Controller::EventHandler::AnchorEvent(Controller& controller, float x, floa
                                                controller.mImpl->mModel->mLogicalModel,
                                                controller.mImpl->mMetrics,
                                                xPosition,
-                                               yPosition,
+                                               yPosition - visualTransformOffset.y,
                                                CharacterHitTest::TAP,
                                                matchedCharacter);
 
