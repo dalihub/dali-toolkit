@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ VectorAnimationThread::VectorAnimationThread()
   mWorkingTasks(),
   mSleepThread(MakeCallback(this, &VectorAnimationThread::OnAwakeFromSleep)),
   mConditionalWait(),
+  mEventTriggerMutex(),
   mNeedToSleep(false),
   mDestroyThread(false),
   mLogFactory(Dali::Adaptor::Get().GetLogFactory()),
@@ -61,10 +62,17 @@ VectorAnimationThread::~VectorAnimationThread()
   // Stop the thread
   {
     ConditionalWait::ScopedLock lock(mConditionalWait);
-    mDestroyThread = true;
-    mNeedToSleep   = false;
+    // Wait until some event thread trigger relative job finished.
+    {
+      Mutex::ScopedLock lock(mEventTriggerMutex);
+      mDestroyThread = true;
+    }
+    mNeedToSleep = false;
     mConditionalWait.Notify(lock);
   }
+
+  // Stop event trigger
+  mEventTrigger.reset();
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::~VectorAnimationThread: Join [%p]\n", this);
 
@@ -153,21 +161,27 @@ void VectorAnimationThread::OnAwakeFromSleep()
 
 void VectorAnimationThread::AddEventTriggerCallback(CallbackBase* callback)
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-  mTriggerEventCallbacks.push_back(callback);
-
-  if(!mEventTriggered)
+  Mutex::ScopedLock lock(mEventTriggerMutex);
+  if(!mDestroyThread)
   {
-    mEventTrigger->Trigger();
-    mEventTriggered = true;
+    mTriggerEventCallbacks.push_back(callback);
+
+    if(!mEventTriggered)
+    {
+      mEventTrigger->Trigger();
+      mEventTriggered = true;
+    }
   }
 }
 
 void VectorAnimationThread::RemoveEventTriggerCallbacks(CallbackBase* callback)
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-  auto                        iter = std::remove(mTriggerEventCallbacks.begin(), mTriggerEventCallbacks.end(), callback);
-  mTriggerEventCallbacks.erase(iter, mTriggerEventCallbacks.end());
+  Mutex::ScopedLock lock(mEventTriggerMutex);
+  if(!mDestroyThread)
+  {
+    auto iter = std::remove(mTriggerEventCallbacks.begin(), mTriggerEventCallbacks.end(), callback);
+    mTriggerEventCallbacks.erase(iter, mTriggerEventCallbacks.end());
+  }
 }
 
 void VectorAnimationThread::Run()
@@ -270,16 +284,18 @@ void VectorAnimationThread::OnEventCallbackTriggered()
 
 CallbackBase* VectorAnimationThread::GetNextEventCallback()
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-
-  if(!mTriggerEventCallbacks.empty())
+  Mutex::ScopedLock lock(mEventTriggerMutex);
+  if(!mDestroyThread)
   {
-    auto          iter     = mTriggerEventCallbacks.begin();
-    CallbackBase* callback = *iter;
-    mTriggerEventCallbacks.erase(iter);
-    return callback;
+    if(!mTriggerEventCallbacks.empty())
+    {
+      auto          iter     = mTriggerEventCallbacks.begin();
+      CallbackBase* callback = *iter;
+      mTriggerEventCallbacks.erase(iter);
+      return callback;
+    }
+    mEventTriggered = false;
   }
-  mEventTriggered = false;
   return nullptr;
 }
 
