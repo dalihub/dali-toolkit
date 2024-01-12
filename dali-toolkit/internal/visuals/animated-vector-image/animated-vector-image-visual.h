@@ -253,7 +253,7 @@ private:
   bool                               mRendererAdded;
   bool                               mCoreShutdown;
   bool                               mRedrawInScalingDown;
-  bool                               mUseFixedCache;
+  bool                               mEnableFrameCache;
 };
 
 } // namespace Internal

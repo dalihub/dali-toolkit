@@ -101,7 +101,7 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   mRendererAdded(false),
   mCoreShutdown(false),
   mRedrawInScalingDown(true),
-  mUseFixedCache(false)
+  mEnableFrameCache(false)
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Visual::Base::Impl::IS_PREMULTIPLIED_ALPHA;
@@ -218,7 +218,7 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, IsSynchronousLoadingRequired());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
-  map.Insert(Toolkit::DevelImageVisual::Property::USE_FIXED_CACHE, mUseFixedCache);
+  map.Insert(Toolkit::DevelImageVisual::Property::ENABLE_FRAME_CACHE, mEnableFrameCache);
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -279,9 +279,9 @@ void AnimatedVectorImageVisual::DoSetProperties(const Property::Map& propertyMap
       {
         DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second);
       }
-      else if(keyValue.first == USE_FIXED_CACHE)
+      else if(keyValue.first == ENABLE_FRAME_CACHE)
       {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::USE_FIXED_CACHE, keyValue.second);
+        DoSetProperty(Toolkit::DevelImageVisual::Property::ENABLE_FRAME_CACHE, keyValue.second);
       }
     }
   }
@@ -389,15 +389,15 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
       break;
     }
 
-    case Toolkit::DevelImageVisual::Property::USE_FIXED_CACHE:
+    case Toolkit::DevelImageVisual::Property::ENABLE_FRAME_CACHE:
     {
-      bool useFixedCache = false;
-      if(value.Get(useFixedCache))
+      bool enableFrameCache = false;
+      if(value.Get(enableFrameCache))
       {
-        mUseFixedCache = useFixedCache;
+        mEnableFrameCache = enableFrameCache;
         if(mVectorAnimationTask)
         {
-          mVectorAnimationTask->KeepRasterizedBuffer(mUseFixedCache);
+          mVectorAnimationTask->KeepRasterizedBuffer(mEnableFrameCache);
         }
       }
       break;
@@ -423,7 +423,7 @@ void AnimatedVectorImageVisual::OnInitialize(void)
     encodedImageBuffer = textureManager.GetEncodedImageBuffer(mImageUrl.GetUrl());
   }
 
-  mVectorAnimationTask->KeepRasterizedBuffer(mUseFixedCache);
+  mVectorAnimationTask->KeepRasterizedBuffer(mEnableFrameCache);
   mVectorAnimationTask->RequestLoad(mImageUrl, encodedImageBuffer, IsSynchronousLoadingRequired());
 
   auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
