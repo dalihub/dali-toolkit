@@ -549,9 +549,9 @@ void ModelPrimitive::UpdateRendererUniform()
 {
   if(mMaterial)
   {
+    GetImplementation(mMaterial).SetRendererUniform(mRenderer);
     mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightScaleFactorName().data(), mIblScaleFactor);
     mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightMaxLodUniformName().data(), static_cast<float>(mSpecularMipmapLevels));
-    GetImplementation(mMaterial).SetRendererUniform(mRenderer);
   }
 }
 
