@@ -209,7 +209,7 @@ const char* const MASKING_TYPE_NAME("maskingType");
 const char* const MASK_TEXTURE_RATIO_NAME("maskTextureRatio");
 const char* const FAST_TRACK_UPLOADING_NAME("fastTrackUploading");
 const char* const ENABLE_BROKEN_IMAGE("enableBrokenImage");
-const char* const USE_FIXED_CACHE("useFixedCache");
+const char* const ENABLE_FRAME_CACHE("enableFrameCache");
 
 // Text visual
 const char* const TEXT_PROPERTY("text");
