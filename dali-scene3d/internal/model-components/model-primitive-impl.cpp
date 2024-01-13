@@ -402,14 +402,7 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
     Texture brdfTexture = Scene3D::Loader::EnvironmentDefinition::GetBrdfTexture();
     if(!mSpecularTexture || !mDiffuseTexture)
     {
-      Scene3D::Loader::EnvironmentMapData environmentMapData;
-      environmentMapData.mPixelData.resize(6);
-      for(auto& face : environmentMapData.mPixelData)
-      {
-        face.push_back(Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGB());
-      }
-      environmentMapData.SetEnvironmentMapType(Dali::Scene3D::EnvironmentMapType::CUBEMAP);
-      Texture iblTexture = environmentMapData.GetTexture();
+      Texture iblTexture = Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyCubeTextureWhiteRGB();
       mDiffuseTexture    = iblTexture;
       mSpecularTexture   = iblTexture;
     }
