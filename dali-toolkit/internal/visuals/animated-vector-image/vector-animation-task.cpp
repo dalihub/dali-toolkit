@@ -92,7 +92,7 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mKeepAnimation(false),
   mLayerInfoCached(false),
   mMarkerInfoCached(false),
-  mUseFixedCache(false),
+  mEnableFrameCache(false),
   mSizeUpdated(false)
 {
   mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
@@ -305,7 +305,7 @@ void VectorAnimationTask::SetSize(uint32_t width, uint32_t height)
     mHeight = height;
 
     // If fixedCache is enabled, Call KeepRasterizedBuffer()
-    if(mUseFixedCache)
+    if(mEnableFrameCache)
     {
       if(mTotalFrame > 0 && !mLoadFailed)
       {
@@ -854,7 +854,7 @@ void VectorAnimationTask::OnLoadCompleted()
 {
   if(!mLoadFailed)
   {
-    if(mUseFixedCache && mSizeUpdated)
+    if(mEnableFrameCache && mSizeUpdated)
     {
       mVectorRenderer.KeepRasterizedBuffer();
       mSizeUpdated = false;

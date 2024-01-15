@@ -273,14 +273,14 @@ public: // Implementation of AsyncTask
     return "VectorAnimationTask";
   }
 
-  void KeepRasterizedBuffer(bool useFixedCache)
+  void KeepRasterizedBuffer(bool enableFrameCache)
   {
-    mUseFixedCache = useFixedCache;
+    mEnableFrameCache = enableFrameCache;
   }
 
   bool IsKeptRasterizedBuffer()
   {
-    return mUseFixedCache;
+    return mEnableFrameCache;
   }
 
 private:
@@ -420,7 +420,7 @@ private:
   bool                                 mKeepAnimation : 1;
   mutable bool                         mLayerInfoCached : 1;
   mutable bool                         mMarkerInfoCached : 1;
-  bool                                 mUseFixedCache : 1;
+  bool                                 mEnableFrameCache : 1;
   bool                                 mSizeUpdated : 1;
 };
 

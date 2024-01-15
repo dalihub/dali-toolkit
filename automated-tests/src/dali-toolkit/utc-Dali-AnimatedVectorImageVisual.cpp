@@ -390,7 +390,7 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   value = resultMap.Find(DevelImageVisual::Property::MARKER_INFO, Property::MAP);
   DALI_TEST_CHECK(value);
 
-  value = resultMap.Find(DevelImageVisual::Property::USE_FIXED_CACHE, Property::BOOLEAN);
+  value = resultMap.Find(DevelImageVisual::Property::ENABLE_FRAME_CACHE, Property::BOOLEAN);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>() == false); // Check default value
 
@@ -1107,7 +1107,7 @@ int UtcDaliAnimatedVectorImageVisualUsedFixedCache(void)
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
-    .Add(DevelImageVisual::Property::USE_FIXED_CACHE, true)
+    .Add(DevelImageVisual::Property::ENABLE_FRAME_CACHE, true)
     .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
@@ -1140,7 +1140,7 @@ int UtcDaliAnimatedVectorImageVisualUsedFixedCache(void)
   DALI_TEST_CHECK(renderer);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
-  Property::Value* value = map.Find(DevelImageVisual::Property::USE_FIXED_CACHE);
+  Property::Value* value = map.Find(DevelImageVisual::Property::ENABLE_FRAME_CACHE);
   DALI_TEST_CHECK(value->Get<bool>() == true);
 
   END_TEST;
@@ -1154,7 +1154,7 @@ int UtcDaliAnimatedVectorImageVisualUsedFixedCacheFailed(void)
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_INVALID_FILE_NAME)
-    .Add(DevelImageVisual::Property::USE_FIXED_CACHE, true)
+    .Add(DevelImageVisual::Property::ENABLE_FRAME_CACHE, true)
     .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
@@ -1180,14 +1180,14 @@ int UtcDaliAnimatedVectorImageVisualUsedFixedCacheFailed(void)
   DALI_TEST_CHECK(renderer);
 
   propertyMap.Clear();
-  propertyMap.Add(DevelImageVisual::Property::USE_FIXED_CACHE, true)
+  propertyMap.Add(DevelImageVisual::Property::ENABLE_FRAME_CACHE, true)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
     .Add(ImageVisual::Property::DESIRED_WIDTH, 100)
     .Add(ImageVisual::Property::DESIRED_HEIGHT, 100);
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, propertyMap);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
-  Property::Value* value = map.Find(DevelImageVisual::Property::USE_FIXED_CACHE);
+  Property::Value* value = map.Find(DevelImageVisual::Property::ENABLE_FRAME_CACHE);
   DALI_TEST_CHECK(value->Get<bool>() == true);
 
   END_TEST;
