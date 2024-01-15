@@ -61,7 +61,7 @@ static constexpr uint32_t         ALPHA_CUTOFF_FLAG                = Scene3D::Lo
 static constexpr std::string_view THREE_TEX_KEYWORD                = "THREE_TEX";
 static constexpr std::string_view GLTF_CHANNELS_KEYWORD            = "GLTF_CHANNELS";
 
-static constexpr Vector3 Y_DIRECTION(1.0f, -1.0f, 1.0f);
+static constexpr Vector3 IBL_BASIS(1.0f, -1.0f, 1.0f);
 
 enum TextureIndex
 {
@@ -727,11 +727,18 @@ void Material::SetRendererUniform(Dali::Renderer renderer)
   RegisterUniformIfNotDefinedBefore(renderer, "uOcclusionTextureTransformAvailable", 0.0f);
   RegisterUniformIfNotDefinedBefore(renderer, "uEmissiveTextureTransformAvailable", 0.0f);
 
+  RegisterUniformIfNotDefinedBefore(renderer, "uBaseColorTextureTransform", Matrix3::IDENTITY);
+  RegisterUniformIfNotDefinedBefore(renderer, "uNormalRoughnessTextureTransform", Matrix3::IDENTITY);
+  RegisterUniformIfNotDefinedBefore(renderer, "uNormalTextureTransform", Matrix3::IDENTITY);
+  RegisterUniformIfNotDefinedBefore(renderer, "uMetalRoughnessTextureTransform", Matrix3::IDENTITY);
+  RegisterUniformIfNotDefinedBefore(renderer, "uOcclusionTextureTransform", Matrix3::IDENTITY);
+  RegisterUniformIfNotDefinedBefore(renderer, "uEmissiveTextureTransform", Matrix3::IDENTITY);
+
   RegisterUniformIfNotDefinedBefore(renderer, "uCubeMatrix", Matrix::IDENTITY);
 
   RegisterUniformIfNotDefinedBefore(renderer, Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName(), 1.0f);
   RegisterUniformIfNotDefinedBefore(renderer, Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName(), 1.0f);
-  RegisterUniformIfNotDefinedBefore(renderer, Scene3D::Loader::NodeDefinition::GetIblYDirectionUniformName(), Y_DIRECTION);
+  RegisterUniformIfNotDefinedBefore(renderer, Scene3D::Loader::NodeDefinition::GetIblYDirectionUniformName(), IBL_BASIS);
 
   Scene3D::Loader::RendererState::Apply(mRendererState, renderer);
 }

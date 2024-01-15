@@ -35,7 +35,7 @@ namespace Scene3D
 {
 namespace Loader
 {
-const Matrix3 TextureDefinition::DEFAULT_TRANSFORM = Matrix3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+const Matrix3 TextureDefinition::DEFAULT_TRANSFORM = Matrix3::IDENTITY;
 
 namespace
 {

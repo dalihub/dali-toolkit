@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ const char* TEST_DLI_EXERCISE_FILE_NAME            = TEST_RESOURCE_DIR "/exercis
  * These textures are based off version of Wave engine sample
  * Take from https://github.com/WaveEngine/Samples
  *
- * Copyright (c) 2023 Wave Coorporation
+ * Copyright (c) 2024 Wave Coorporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -1896,8 +1896,8 @@ int UtcDaliModelMaterialUniformChange(void)
 
   // Check uniform values before change material value
   Vector4 expectBaseColorFactor = Vector4(1.000f, 0.766f, 0.336f, 1.0f); // Defined at AnimatedCube.gltf
-  float   expectTransformValid  = 1.0f; ///< Note : This value will be true when gltf have BaseColorTexture.
-  float   expectMaxLOD          = 5.0f; ///< Note : The number of LOD what TEST_SPECULAR_TEXTURE file has is 5.
+  float   expectTransformValid  = 0.0f;                                  ///< Note : This value will be true when gltf have BaseColorTexture, and use KHR_texture_transform extension.
+  float   expectMaxLOD          = 5.0f;                                  ///< Note : The number of LOD what TEST_SPECULAR_TEXTURE file has is 5.
 
   tet_printf("Check uniform value result\n");
   DALI_TEST_EQUALS(gl.CheckUniformValue<Vector4>("uColorFactor", expectBaseColorFactor), true, TEST_LOCATION);
