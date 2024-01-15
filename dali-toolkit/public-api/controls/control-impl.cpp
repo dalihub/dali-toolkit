@@ -448,7 +448,7 @@ void Control::Initialize()
   Self().GetTypeInfo(type);
   if(type)
   {
-    auto typeName = type.GetName();
+    const auto& typeName = type.GetName();
     DevelControl::AppendAccessibilityAttribute(Toolkit::Control::DownCast(Self()), "class", typeName);
   }
 }
