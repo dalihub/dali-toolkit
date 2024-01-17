@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include "dali-scene3d/public-api/loader/environment-definition.h"
 #include <dali-test-suite-utils.h>
 #include <string_view>
+#include "dali-scene3d/public-api/loader/environment-definition.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
@@ -28,16 +28,16 @@ using namespace Dali::Scene3D::Loader;
 int UtcDaliEnvironmentDefinitionLoadRawDefault(void)
 {
   EnvironmentDefinition envDef;
-  auto rawData = envDef.LoadRaw("");
+  auto                  rawData = envDef.LoadRaw("");
 
   DALI_TEST_EQUAL(rawData.mDiffuse.mPixelData.size(), 6u);
-  for (auto& face: rawData.mDiffuse.mPixelData)
+  for(auto& face : rawData.mDiffuse.mPixelData)
   {
     DALI_TEST_EQUAL(face.size(), 1u);
   }
 
   DALI_TEST_EQUAL(rawData.mSpecular.mPixelData.size(), 6u);
-  for (auto& face: rawData.mSpecular.mPixelData)
+  for(auto& face : rawData.mSpecular.mPixelData)
   {
     DALI_TEST_EQUAL(face.size(), 1u);
   }
@@ -47,9 +47,9 @@ int UtcDaliEnvironmentDefinitionLoadRawDefault(void)
 
 int UtcDaliEnvironmentDefinitionLoadRawFail(void)
 {
-  for (auto name: { "nonexistent.ktx", TEST_RESOURCE_DIR "Cobe.obj" , TEST_RESOURCE_DIR "truncated.ktx" })
+  for(auto name : {"nonexistent.ktx", TEST_RESOURCE_DIR "Cobe.obj", TEST_RESOURCE_DIR "truncated.ktx"})
   {
-    EnvironmentDefinition envDef { name, name };
+    EnvironmentDefinition envDef{name, name};
     DALI_TEST_ASSERTION(envDef.LoadRaw(""), "Failed to load cubemap texture");
 
     envDef.mDiffuseMapPath = "";
@@ -61,15 +61,15 @@ int UtcDaliEnvironmentDefinitionLoadRawFail(void)
 
 int UtcDaliEnvironmentDefinitionLoadRawSuccess(void)
 {
-  EnvironmentDefinition envDef { "forest_irradiance.ktx", "forest_radiance.ktx" };
-  auto rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");
+  EnvironmentDefinition envDef{"forest_irradiance.ktx", "forest_radiance.ktx"};
+  auto                  rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");
 
   DALI_TEST_EQUAL(rawData.mDiffuse.mPixelData.size(), 6u);
-  for (auto& face: rawData.mDiffuse.mPixelData)
+  for(auto& face : rawData.mDiffuse.mPixelData)
   {
     DALI_TEST_EQUAL(face.size(), 1u);
     uint32_t size = 64u;
-    for (auto& mipLevel : face)
+    for(auto& mipLevel : face)
     {
       DALI_TEST_EQUAL(mipLevel.GetPixelFormat(), Pixel::Format::RGB888);
       DALI_TEST_EQUAL(mipLevel.GetWidth(), size);
@@ -79,11 +79,11 @@ int UtcDaliEnvironmentDefinitionLoadRawSuccess(void)
   }
 
   DALI_TEST_EQUAL(rawData.mSpecular.mPixelData.size(), 6u);
-  for (auto& face: rawData.mSpecular.mPixelData)
+  for(auto& face : rawData.mSpecular.mPixelData)
   {
     DALI_TEST_EQUAL(face.size(), 5u);
     uint32_t size = 64u;
-    for (auto& mipLevel : face)
+    for(auto& mipLevel : face)
     {
       DALI_TEST_EQUAL(mipLevel.GetPixelFormat(), Pixel::Format::RGB888);
       DALI_TEST_EQUAL(mipLevel.GetWidth(), size);
@@ -98,8 +98,8 @@ int UtcDaliEnvironmentDefinitionLoadRawSuccess(void)
 int UtcDaliEnvironmentDefinitionLoadEmptyRaw(void)
 {
   EnvironmentDefinition::RawData rawData;
-  EnvironmentDefinition envDef;
-  auto textures = envDef.Load(std::move(rawData));
+  EnvironmentDefinition          envDef;
+  auto                           textures = envDef.Load(std::move(rawData));
   DALI_TEST_CHECK(!textures.mDiffuse);
   DALI_TEST_CHECK(!textures.mSpecular);
 
@@ -108,7 +108,6 @@ int UtcDaliEnvironmentDefinitionLoadEmptyRaw(void)
 
 namespace
 {
-
 void CheckTextureDefault(Texture texture)
 {
   DALI_TEST_CHECK(texture);
@@ -123,15 +122,16 @@ void CheckTextureNotDefault(Texture texture)
   DALI_TEST_CHECK(texture.GetHeight() > 1u);
 }
 
-}
+} // namespace
 
 int UtcDaliEnvironmentDefinitionLoadDefault(void)
 {
   EnvironmentDefinition envDef{};
-  auto rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");;
+  auto                  rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");
+  ;
 
   TestApplication app;
-  auto textures = envDef.Load(std::move(rawData));
+  auto            textures = envDef.Load(std::move(rawData));
 
   CheckTextureDefault(textures.mSpecular);
   CheckTextureDefault(textures.mDiffuse);
@@ -141,11 +141,12 @@ int UtcDaliEnvironmentDefinitionLoadDefault(void)
 
 int UtcDaliEnvironmentDefinitionLoadDiffuse(void)
 {
-  EnvironmentDefinition envDef{ "forest_irradiance.ktx" };
-  auto rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");;
+  EnvironmentDefinition envDef{"forest_irradiance.ktx"};
+  auto                  rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");
+  ;
 
   TestApplication app;
-  auto textures = envDef.Load(std::move(rawData));
+  auto            textures = envDef.Load(std::move(rawData));
 
   CheckTextureNotDefault(textures.mDiffuse);
   CheckTextureDefault(textures.mSpecular);
@@ -155,11 +156,12 @@ int UtcDaliEnvironmentDefinitionLoadDiffuse(void)
 
 int UtcDaliEnvironmentDefinitionLoadSpecular(void)
 {
-  EnvironmentDefinition envDef{ "", "forest_radiance.ktx" };
-  auto rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");;
+  EnvironmentDefinition envDef{"", "forest_radiance.ktx"};
+  auto                  rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");
+  ;
 
   TestApplication app;
-  auto textures = envDef.Load(std::move(rawData));
+  auto            textures = envDef.Load(std::move(rawData));
 
   CheckTextureDefault(textures.mDiffuse);
   CheckTextureNotDefault(textures.mSpecular);
@@ -169,11 +171,12 @@ int UtcDaliEnvironmentDefinitionLoadSpecular(void)
 
 int UtcDaliEnvironmentDefinitionLoadBoth(void)
 {
-  EnvironmentDefinition envDef{ "forest_irradiance.ktx", "forest_radiance.ktx" };
-  auto rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");;
+  EnvironmentDefinition envDef{"forest_irradiance.ktx", "forest_radiance.ktx"};
+  auto                  rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");
+  ;
 
   TestApplication app;
-  auto textures = envDef.Load(std::move(rawData));
+  auto            textures = envDef.Load(std::move(rawData));
 
   CheckTextureNotDefault(textures.mDiffuse);
   CheckTextureNotDefault(textures.mSpecular);
