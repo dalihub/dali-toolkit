@@ -170,8 +170,8 @@ static void LoadMarkerImages(ToolkitTestApplication& app, TextField textField)
   textField.SetProperty(Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, propertyMap);
   textField.SetProperty(Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT, propertyMap);
   textField.SetProperty(Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT, propertyMap);
-  textField.SetProperty(Toolkit::TextField::Property::GRAB_HANDLE_IMAGE, propertyMap);
-  textField.SetProperty(Toolkit::TextField::Property::GRAB_HANDLE_PRESSED_IMAGE, propertyMap);
+  textField.SetProperty(Toolkit::TextField::Property::GRAB_HANDLE_IMAGE, "image.png");
+  textField.SetProperty(Toolkit::TextField::Property::GRAB_HANDLE_PRESSED_IMAGE, "image.png");
 }
 
 /*

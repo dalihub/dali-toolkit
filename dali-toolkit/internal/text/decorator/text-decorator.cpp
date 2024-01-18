@@ -2052,6 +2052,15 @@ const float Decorator::GetGlyphOffset(Cursor cursor) const
 void Decorator::SetCursorColor(Cursor cursor, const Dali::Vector4& color)
 {
   mImpl->mCursor[cursor].color = color;
+
+  if(cursor == PRIMARY_CURSOR && mImpl->mPrimaryCursor)
+  {
+    mImpl->mPrimaryCursor.SetBackgroundColor(color);
+  }
+  else if(cursor == SECONDARY_CURSOR && mImpl->mSecondaryCursor)
+  {
+    mImpl->mSecondaryCursor.SetBackgroundColor(color);
+  }
 }
 
 const Dali::Vector4& Decorator::GetColor(Cursor cursor) const
@@ -2112,6 +2121,15 @@ float Decorator::GetCursorBlinkDuration() const
 void Decorator::SetCursorWidth(int width)
 {
   mImpl->mCursorWidth = static_cast<float>(width);
+
+  if(mImpl->mPrimaryCursorVisible && mImpl->mPrimaryCursor)
+  {
+    mImpl->mPrimaryCursor.SetProperty(Actor::Property::SIZE, Size(mImpl->mCursorWidth, mImpl->mCursor[PRIMARY_CURSOR].cursorHeight));
+  }
+  if(mImpl->mSecondaryCursorVisible && mImpl->mSecondaryCursor)
+  {
+    mImpl->mSecondaryCursor.SetProperty(Actor::Property::SIZE, Size(mImpl->mCursorWidth, mImpl->mCursor[SECONDARY_CURSOR].cursorHeight));
+  }
 }
 
 int Decorator::GetCursorWidth() const
@@ -2189,6 +2207,23 @@ const std::string& Decorator::GetHandleImage(HandleType handleType, HandleImageT
 void Decorator::SetHandleColor(const Vector4& color)
 {
   mImpl->mHandleColor = color;
+
+  Impl::HandleImpl& grabHandle      = mImpl->mHandle[GRAB_HANDLE];
+  Impl::HandleImpl& primaryHandle   = mImpl->mHandle[LEFT_SELECTION_HANDLE];
+  Impl::HandleImpl& secondaryHandle = mImpl->mHandle[RIGHT_SELECTION_HANDLE];
+
+  if(grabHandle.actor)
+  {
+    grabHandle.actor.SetProperty(Actor::Property::COLOR, color);
+  }
+  if(primaryHandle.actor)
+  {
+    primaryHandle.actor.SetProperty(Actor::Property::COLOR, color);
+  }
+  if(secondaryHandle.actor)
+  {
+    secondaryHandle.actor.SetProperty(Actor::Property::COLOR, color);
+  }
 }
 
 const Vector4& Decorator::GetHandleColor() const
@@ -2275,6 +2310,11 @@ void Decorator::ResizeHighlightQuads(unsigned int numberOfQuads)
 void Decorator::SetHighlightColor(const Vector4& color)
 {
   mImpl->mHighlightColor = color;
+
+  if(mImpl->mHighlightActor)
+  {
+    mImpl->mHighlightActor.SetProperty(Actor::Property::COLOR, color);
+  }
 }
 
 const Vector4& Decorator::GetHighlightColor() const
