@@ -170,8 +170,8 @@ static void LoadMarkerImages(ToolkitTestApplication& app, TextField textField)
   textField.SetProperty(Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, propertyMap);
   textField.SetProperty(Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT, propertyMap);
   textField.SetProperty(Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT, propertyMap);
-  textField.SetProperty(Toolkit::TextField::Property::GRAB_HANDLE_IMAGE, propertyMap);
-  textField.SetProperty(Toolkit::TextField::Property::GRAB_HANDLE_PRESSED_IMAGE, propertyMap);
+  textField.SetProperty(Toolkit::TextField::Property::GRAB_HANDLE_IMAGE, "image.png");
+  textField.SetProperty(Toolkit::TextField::Property::GRAB_HANDLE_PRESSED_IMAGE, "image.png");
 }
 
 /*
@@ -5818,6 +5818,73 @@ int utcDaliTextFieldGetTextBoundingRectangle(void)
   Rect<> expectedTextBoundingRectangle = {0, 0, 100, 25};
 
   TestTextGeometryUtils::CheckRectGeometryResult(textBoundingRectangle, expectedTextBoundingRectangle);
+
+  END_TEST;
+}
+
+
+int utcDaliTextFieldDecoratorColor(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldDecoratorColor");
+  TextField textField = TextField::New();
+  DALI_TEST_CHECK(textField);
+  LoadMarkerImages(application, textField);
+  application.GetScene().Add(textField);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  textField.SetProperty(TextField::Property::TEXT, "العالم Hello");
+  textField.SetProperty(TextField::Property::POINT_SIZE, 10.f);
+  textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
+  textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  textField.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  application.SendNotification();
+  application.Render();
+
+  textField.SetKeyInputFocus();
+
+  application.SendNotification();
+  application.Render();
+
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 1.0f, 25.0f, 100);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Double tap to select a word.
+  TestGenerateTap(application, 1.0f, 25.0f, 200);
+
+  application.SendNotification();
+  application.Render();
+
+  // At this point, the text decorator's primary/secondary cursor, grab/left/right handle and highlight actor were all created.
+  // Check some properties for coverage.
+  textField.SetProperty(TextField::Property::PRIMARY_CURSOR_COLOR, Color::RED);
+  DALI_TEST_EQUALS(textField.GetProperty<Vector4>(TextField::Property::PRIMARY_CURSOR_COLOR), Color::RED, TEST_LOCATION);
+
+  textField.SetProperty(TextField::Property::SECONDARY_CURSOR_COLOR, Color::BLUE);
+  DALI_TEST_EQUALS(textField.GetProperty<Vector4>(TextField::Property::SECONDARY_CURSOR_COLOR), Color::BLUE, TEST_LOCATION);
+
+  textField.SetProperty(DevelTextField::Property::GRAB_HANDLE_COLOR, Color::GREEN);
+  DALI_TEST_EQUALS(textField.GetProperty<Vector4>(DevelTextField::Property::GRAB_HANDLE_COLOR), Color::GREEN, TEST_LOCATION);
+
+  textField.SetProperty(TextField::Property::SELECTION_HIGHLIGHT_COLOR, Color::GREEN);
+  DALI_TEST_EQUALS(textField.GetProperty<Vector4>(TextField::Property::SELECTION_HIGHLIGHT_COLOR), Color::GREEN, TEST_LOCATION);
+
+  textField.SetProperty(TextField::Property::CURSOR_WIDTH, 3);
+  DALI_TEST_EQUALS(textField.GetProperty<int>(TextField::Property::CURSOR_WIDTH), 3, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
