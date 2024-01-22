@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,7 +155,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     std::ostringstream oss;
-    oss << "[url:" << mImageUrl.GetUrl() << "]";
+    oss << "[url:" << mImageUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_BEGIN(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("BEGIN: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
   }
@@ -203,7 +203,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
     if(gTraceFilter && gTraceFilter->IsTraceEnabled())
     {
       std::ostringstream oss;
-      oss << "[url:" << mImageUrl.GetUrl() << "]";
+      oss << "[url:" << mImageUrl.GetEllipsedUrl() << "]";
       // DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
       DALI_LOG_RELEASE_INFO("END: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
     }
@@ -233,7 +233,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     std::ostringstream oss;
-    oss << "[url:" << mImageUrl.GetUrl() << "]";
+    oss << "[url:" << mImageUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("END: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
   }
@@ -576,7 +576,7 @@ bool VectorAnimationTask::Rasterize()
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss) {
     oss << "[size:" << mWidth << "x" << mHeight << " ";
-    oss << "url:" << mImageUrl.GetUrl() << "]";
+    oss << "url:" << mImageUrl.GetEllipsedUrl() << "]";
   });
 
   ApplyAnimationData();
@@ -691,7 +691,7 @@ bool VectorAnimationTask::Rasterize()
     oss << "frame:" << mCurrentFrame << " ";
     oss << "loop:" << mCurrentLoop << " ";
     oss << "state:" << mPlayState << " ";
-    oss << "url:" << mImageUrl.GetUrl() << "]";
+    oss << "url:" << mImageUrl.GetEllipsedUrl() << "]";
   });
 
   return true;
