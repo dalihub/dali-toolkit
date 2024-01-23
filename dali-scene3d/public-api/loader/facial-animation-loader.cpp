@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali-scene3d/public-api/loader/facial-animation-loader.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/animation/key-frames-devel.h>
 #include <sstream>
 
 // INTERNAL INCLUDES
@@ -140,6 +141,8 @@ Dali::Scene3D::Loader::AnimationDefinition LoadFacialAnimationInternal(json::uni
         const float progress = MILLISECONDS_TO_SECONDS * static_cast<float>(facialAnimation.mTime[timeIndex]) / animationDefinition.GetDuration();
         animatedProperty.mKeyFrames.Add(progress, blendShape.mKeys[timeIndex][morphTargetIndex]);
       }
+      // Optimize keyframes, for heuristic!
+      DevelKeyFrames::OptimizeKeyFramesLinear(animatedProperty.mKeyFrames);
       animationDefinition.SetProperty(targets + morphTargetIndex, std::move(animatedProperty));
     }
 

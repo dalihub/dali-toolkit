@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/file-stream.h>
+#include <dali/devel-api/animation/key-frames-devel.h>
 #include <dali/integration-api/debug.h>
 
 #include <fstream>
@@ -373,7 +374,7 @@ AnimationDefinition GenerateAnimation(const std::string& animationName, std::sha
   if(!jointList.empty())
   {
     uint32_t animationSize = jointList.size();
-    animationSize = (useRootTranslationOnly) ? (animationSize + 1u) : (animationSize * 2u);
+    animationSize          = (useRootTranslationOnly) ? (animationSize + 1u) : (animationSize * 2u);
     animationDefinition.ReserveSize(animationSize);
     uint32_t animationIndex = 0u;
     for(uint32_t i = 0; i < jointList.size(); ++i)
@@ -403,8 +404,12 @@ AnimationDefinition GenerateAnimation(const std::string& animationName, std::sha
       }
       if(!useRootTranslationOnly || i == 0)
       {
+        // Optimize keyframes, for heuristic!
+        DevelKeyFrames::OptimizeKeyFramesLinear(translationProperty.mKeyFrames);
         animationDefinition.SetProperty(animationIndex++, std::move(translationProperty));
       }
+      // Optimize keyframes, for heuristic!
+      DevelKeyFrames::OptimizeKeyFramesLinear(rotationProperty.mKeyFrames);
       animationDefinition.SetProperty(animationIndex++, std::move(rotationProperty));
     }
   }
