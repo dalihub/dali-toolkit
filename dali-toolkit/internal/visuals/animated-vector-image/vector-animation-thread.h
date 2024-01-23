@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/threading/conditional-wait.h>
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 #include <dali/integration-api/adaptor-framework/trace-factory-interface.h>
@@ -165,6 +166,7 @@ private:
   std::vector<CallbackBase*>           mTriggerEventCallbacks{}; // Callbacks are not owned
   SleepThread                          mSleepThread;
   ConditionalWait                      mConditionalWait;
+  Mutex                                mEventTriggerMutex;
   std::unique_ptr<EventThreadCallback> mEventTrigger{};
   bool                                 mNeedToSleep;
   bool                                 mDestroyThread;
