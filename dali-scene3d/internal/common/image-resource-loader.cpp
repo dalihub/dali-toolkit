@@ -552,7 +552,7 @@ Dali::Texture GetEmptyCubeTextureWhiteRGB()
 
 Dali::Texture GetCachedTexture(Dali::PixelData pixelData, bool mipmapRequired)
 {
-  if(SupportPixelDataCache(pixelData))
+  if(Dali::Adaptor::IsAvailable() && SupportPixelDataCache(pixelData))
   {
     return GetCacheImpl()->GetOrCreateCachedTexture(pixelData, mipmapRequired);
   }
@@ -564,12 +564,18 @@ Dali::Texture GetCachedTexture(Dali::PixelData pixelData, bool mipmapRequired)
 
 void RequestGarbageCollect(bool fullCollect)
 {
-  GetCacheImpl()->RequestGarbageCollect(fullCollect);
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+  {
+    GetCacheImpl()->RequestGarbageCollect(fullCollect);
+  }
 }
 
 void EnsureResourceLoaderCreated()
 {
-  GetCacheImpl();
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+  {
+    GetCacheImpl();
+  }
 }
 
 // Can be called by worker thread.
