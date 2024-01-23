@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2241,7 +2241,12 @@ void Control::Impl::EmitResourceReadySignal()
       {
         // The callback manager takes the ownership of the callback object.
         mIdleCallback = MakeCallback(this, &Control::Impl::OnIdleCallback);
-        Adaptor::Get().AddIdle(mIdleCallback, true);
+        if(DALI_UNLIKELY(!Adaptor::Get().AddIdle(mIdleCallback, true)))
+        {
+          DALI_LOG_ERROR("Fail to add idle callback for control resource ready. Skip this callback.\n");
+          mIdleCallback           = nullptr;
+          mIdleCallbackRegistered = false;
+        }
       }
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -4780,6 +4780,86 @@ int UtcDaliImageViewSetImageOnResourceReadySignal10(void)
     // Exception should not happened
     DALI_TEST_CHECK(false);
   }
+
+  // Clear cache.
+  application.SendNotification();
+  application.Render();
+
+  gResourceReadySignalCounter = 0;
+
+  gResourceReadySignalCounter = 0;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliImageViewSetImageOnResourceReadySignal10WhenAddIdleFailed(void)
+{
+  tet_infoline("Test ResourceReady signal comes more than 2 times, but do not call again if AddIdle failed");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+
+  // Dummy view to cache image.
+  ImageView dummyView = ImageView::New(gImage_34_RGBA);
+  application.GetScene().Add(dummyView);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  // Make AddIdle failed.
+  ToolkitApplication::ADD_IDLE_SUCCESS = false;
+
+  try
+  {
+    gImageView1 = ImageView::New();
+    gImageView1.SetProperty(Toolkit::ImageView::Property::IMAGE, gImage_34_RGBA);
+    gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal10);
+    application.GetScene().Add(gImageView1); // It will call resourceReady signal 1 time.
+
+    tet_printf("ResourceReady called %d times\n", gResourceReadySignalCounter);
+
+    DALI_TEST_GREATER(gResourceReadySignal10MaxCounter, gResourceReadySignalCounter, TEST_LOCATION); // Check whether resource ready call too much.
+
+    for(int i = 0; i < gResourceReadySignal10MaxCounter; ++i)
+    {
+      tet_printf("RunIdles\n");
+      // Executes the idle callbacks.
+      application.RunIdles();
+      application.SendNotification();
+      application.Render();
+      tet_printf("RunIdles done\n");
+    }
+    tet_printf("ResourceReady called %d times\n", gResourceReadySignalCounter);
+
+    DALI_TEST_GREATER(gResourceReadySignal10MaxCounter, gResourceReadySignalCounter, TEST_LOCATION); // Check whether resource ready not called multiple times.
+
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    // Exception should not happened
+    DALI_TEST_CHECK(false);
+  }
+
+  ToolkitApplication::ADD_IDLE_SUCCESS = true;
 
   // Clear cache.
   application.SendNotification();
