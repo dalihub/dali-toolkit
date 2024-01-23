@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
-#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/public-api/rendering/renderer.h>
@@ -391,7 +391,6 @@ public:
   bool& mFinishedCalled;
 };
 
-
 // Stores data that is populated in the callback and will be read by the test cases
 struct SignalData
 {
@@ -440,7 +439,6 @@ struct GestureReceivedFunctor
 
   SignalData& signalData;
 };
-
 
 } // namespace
 
@@ -1918,6 +1916,207 @@ int utcDaliTextEditorInputStyleChanged02(void)
     DALI_TEST_EQUALS(color, Color::YELLOW, TEST_LOCATION);
   }
   DALI_TEST_CHECK(inputStyleChangedSignal);
+
+  END_TEST;
+}
+
+int utcDaliTextEditorInputStyleChanged03(void)
+{
+  // Test InputStyleCahnged signal emitted even if AddIdle failed.
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorInputStyleChanged03");
+
+  // Load some fonts.
+
+  char*             pathNamePtr = get_current_dir_name();
+  const std::string pathName(pathNamePtr);
+  free(pathNamePtr);
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi(93u, 93u);
+
+  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif.ttf", DEFAULT_FONT_SIZE);
+  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif-Bold.ttf", DEFAULT_FONT_SIZE);
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
+  editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+  editor.SetProperty(TextEditor::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>");
+
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  editor.InputStyleChangedSignal().Connect(&TestInputStyleChangedCallback);
+  bool inputStyleChangedSignal = false;
+  editor.ConnectSignal(testTracker, "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
+
+  application.GetScene().Add(editor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextEditor::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Create a tap event to touch the text editor.
+  TestGenerateTap(application, 18.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(gInputStyleChangedCallbackCalled);
+  if(gInputStyleChangedCallbackCalled)
+  {
+    DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask), static_cast<unsigned int>(TextEditor::InputStyle::FONT_FAMILY | TextEditor::InputStyle::POINT_SIZE), TEST_LOCATION);
+
+    const std::string fontFamily = editor.GetProperty(TextEditor::Property::INPUT_FONT_FAMILY).Get<std::string>();
+    DALI_TEST_EQUALS(fontFamily, "DejaVuSerif", TEST_LOCATION);
+
+    const float pointSize = editor.GetProperty(TextEditor::Property::INPUT_POINT_SIZE).Get<float>();
+    DALI_TEST_EQUALS(pointSize, 18.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  }
+  DALI_TEST_CHECK(inputStyleChangedSignal);
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextEditor::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Create a tap event to touch the text editor.
+  TestGenerateTap(application, 30.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(!gInputStyleChangedCallbackCalled);
+  DALI_TEST_CHECK(!inputStyleChangedSignal);
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextEditor::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Create a tap event to touch the text editor.
+  TestGenerateTap(application, 43.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(gInputStyleChangedCallbackCalled);
+  if(gInputStyleChangedCallbackCalled)
+  {
+    DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask), static_cast<unsigned int>(TextEditor::InputStyle::COLOR), TEST_LOCATION);
+
+    const Vector4 color = editor.GetProperty(TextEditor::Property::INPUT_COLOR).Get<Vector4>();
+    DALI_TEST_EQUALS(color, Color::GREEN, TEST_LOCATION);
+  }
+  DALI_TEST_CHECK(inputStyleChangedSignal);
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextEditor::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Make AddIdle return false.
+  ToolkitApplication::ADD_IDLE_SUCCESS = false;
+
+  // Create a tap event to touch the text editor.
+  TestGenerateTap(application, 88.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Execute the idle callbacks.
+  // And check whether we didn't change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(!gInputStyleChangedCallbackCalled);
+  DALI_TEST_CHECK(!inputStyleChangedSignal);
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextEditor::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Create a tap event to touch the text editor.
+  TestGenerateTap(application, 115.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Execute the idle callbacks.
+  // And check whether we didn't change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(!gInputStyleChangedCallbackCalled);
+  DALI_TEST_CHECK(!inputStyleChangedSignal);
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextEditor::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Revert AddIdle return true.
+  ToolkitApplication::ADD_IDLE_SUCCESS = true;
+
+  // Create a tap event to touch the text editor.
+  TestGenerateTap(application, 164.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(gInputStyleChangedCallbackCalled);
+  if(gInputStyleChangedCallbackCalled)
+  {
+    DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask), static_cast<unsigned int>(TextEditor::InputStyle::FONT_STYLE), TEST_LOCATION);
+
+    Property::Map fontStyleMapSet;
+    Property::Map fontStyleMapGet;
+
+    fontStyleMapGet = editor.GetProperty<Property::Map>(TextEditor::Property::INPUT_FONT_STYLE);
+    DALI_TEST_EQUALS(fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION);
+    DALI_TEST_EQUALS(DaliTestCheckMaps(fontStyleMapGet, fontStyleMapSet), true, TEST_LOCATION);
+  }
+  DALI_TEST_CHECK(inputStyleChangedSignal);
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextEditor::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Create a tap event to touch the text editor.
+  TestGenerateTap(application, 191.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(!gInputStyleChangedCallbackCalled);
+  DALI_TEST_CHECK(!inputStyleChangedSignal);
 
   END_TEST;
 }
@@ -5161,7 +5360,6 @@ int utcDaliTextEditorGeometryNullPtr(void)
   END_TEST;
 }
 
-
 int utcDaliTextEditorSelectionClearedSignal(void)
 {
   ToolkitTestApplication application;
@@ -6393,7 +6591,6 @@ int utcDaliTextEditorPanGesturePropagation(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
-
   END_TEST;
 }
 
@@ -6420,10 +6617,10 @@ int utcDaliTextEditorGetTextBoundingRectangle(void)
   application.SendNotification();
   application.Render();
 
-  unsigned int startIndex    = 0;
-  unsigned int endIndex      = 15;
+  unsigned int startIndex = 0;
+  unsigned int endIndex   = 15;
 
-  Rect<> textBoundingRectangle = DevelTextEditor::GetTextBoundingRectangle(editor, startIndex, endIndex);
+  Rect<> textBoundingRectangle         = DevelTextEditor::GetTextBoundingRectangle(editor, startIndex, endIndex);
   Rect<> expectedTextBoundingRectangle = {0, 0, 100, 50};
 
   TestTextGeometryUtils::CheckRectGeometryResult(textBoundingRectangle, expectedTextBoundingRectangle);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
-
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
@@ -405,7 +404,6 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
 
   return true;
 }
-
 
 // Stores data that is populated in the callback and will be read by the test cases
 struct SignalData
@@ -1820,16 +1818,16 @@ int utcDaliTextFieldInputFilterWithInputMethodContext(void)
 
   // input text
   gInputFilteredAcceptedCallbackCalled = false;
-  imfEvent = InputMethodContext::EventData(InputMethodContext::COMMIT, "Hello1234", 0, 9);
+  imfEvent                             = InputMethodContext::EventData(InputMethodContext::COMMIT, "Hello1234", 0, 9);
   inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gInputFilteredAcceptedCallbackCalled);
   DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("1234"), TEST_LOCATION);
 
-  inputFilteredSignal = false;
+  inputFilteredSignal                  = false;
   gInputFilteredRejectedCallbackCalled = false;
-  imfEvent = InputMethodContext::EventData(InputMethodContext::COMMIT, "1234567", 0, 7);
+  imfEvent                             = InputMethodContext::EventData(InputMethodContext::COMMIT, "1234567", 0, 7);
   inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
@@ -2480,6 +2478,203 @@ int utcDaliTextFieldInputStyleChanged02(void)
   END_TEST;
 }
 
+int utcDaliTextFieldInputStyleChanged03(void)
+{
+  // Test InputStyleCahnged signal emitted even if AddIdle failed.
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldInputStyleChanged03");
+
+  // Load some fonts.
+
+  char*             pathNamePtr = get_current_dir_name();
+  const std::string pathName(pathNamePtr);
+  free(pathNamePtr);
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi(93u, 93u);
+
+  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif.ttf", DEFAULT_FONT_SIZE);
+  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif-Bold.ttf", DEFAULT_FONT_SIZE);
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
+  field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
+  field.SetProperty(TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>");
+
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  field.InputStyleChangedSignal().Connect(&TestInputStyleChangedCallback);
+  bool inputStyleChangedSignal = false;
+  field.ConnectSignal(testTracker, "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
+
+  application.GetScene().Add(field);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextField::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 18.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(gInputStyleChangedCallbackCalled);
+  if(gInputStyleChangedCallbackCalled)
+  {
+    DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask), static_cast<unsigned int>(TextField::InputStyle::FONT_FAMILY | TextField::InputStyle::POINT_SIZE), TEST_LOCATION);
+
+    const std::string fontFamily = field.GetProperty(TextField::Property::INPUT_FONT_FAMILY).Get<std::string>();
+    DALI_TEST_EQUALS(fontFamily, "DejaVuSerif", TEST_LOCATION);
+
+    const float pointSize = field.GetProperty(TextField::Property::INPUT_POINT_SIZE).Get<float>();
+    DALI_TEST_EQUALS(pointSize, 18.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  }
+  DALI_TEST_CHECK(inputStyleChangedSignal);
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextField::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 30.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(!gInputStyleChangedCallbackCalled);
+  DALI_TEST_CHECK(!inputStyleChangedSignal);
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextField::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 43.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(gInputStyleChangedCallbackCalled);
+  if(gInputStyleChangedCallbackCalled)
+  {
+    DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask), static_cast<unsigned int>(TextField::InputStyle::COLOR), TEST_LOCATION);
+
+    const Vector4 color = field.GetProperty(TextField::Property::INPUT_COLOR).Get<Vector4>();
+    DALI_TEST_EQUALS(color, Color::GREEN, TEST_LOCATION);
+  }
+  DALI_TEST_CHECK(inputStyleChangedSignal);
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextField::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Make AddIdle return false.
+  ToolkitApplication::ADD_IDLE_SUCCESS = false;
+
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 88.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Execute the idle callbacks.
+  // And check whether we didn't change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(!gInputStyleChangedCallbackCalled);
+  DALI_TEST_CHECK(!inputStyleChangedSignal);
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextField::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 115.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Execute the idle callbacks.
+  // And check whether we didn't change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(!gInputStyleChangedCallbackCalled);
+  DALI_TEST_CHECK(!inputStyleChangedSignal);
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextField::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Revert AddIdle return true.
+  ToolkitApplication::ADD_IDLE_SUCCESS = true;
+
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 164.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(gInputStyleChangedCallbackCalled);
+  if(gInputStyleChangedCallbackCalled)
+  {
+    DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask), static_cast<unsigned int>(TextField::InputStyle::FONT_STYLE), TEST_LOCATION);
+
+    const std::string style = field.GetProperty(TextField::Property::INPUT_FONT_STYLE).Get<std::string>();
+    DALI_TEST_CHECK(style.empty());
+  }
+  DALI_TEST_CHECK(inputStyleChangedSignal);
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask                  = TextField::InputStyle::NONE;
+  inputStyleChangedSignal          = false;
+
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 191.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK(!gInputStyleChangedCallbackCalled);
+  DALI_TEST_CHECK(!inputStyleChangedSignal);
+
+  END_TEST;
+}
+
 int utcDaliTextFieldEvent01(void)
 {
   ToolkitTestApplication application;
@@ -2981,7 +3176,7 @@ int utcDaliTextFieldEvent08(void)
   ToolkitTestApplication application;
   tet_infoline(" utcDaliTextFieldEvent08");
 
-  Dali::Clipboard clipboard = Clipboard::Get();
+  Dali::Clipboard           clipboard = Clipboard::Get();
   Dali::Clipboard::ClipData data("text/plain;charset=utf-8", "testTextFieldEvent");
   clipboard.SetData(data);
 
@@ -4934,7 +5129,6 @@ int utcDaliTextFieldGeometryGlyphMiddle(void)
   END_TEST;
 }
 
-
 int utcDaliTextFieldGeometryNullPtr(void)
 {
   ToolkitTestApplication application;
@@ -5784,7 +5978,6 @@ int utcDaliTextFieldPanGesturePropagation(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
-
   END_TEST;
 }
 
@@ -5811,17 +6004,16 @@ int utcDaliTextFieldGetTextBoundingRectangle(void)
   application.SendNotification();
   application.Render();
 
-  unsigned int startIndex    = 0;
-  unsigned int endIndex      = 15;
+  unsigned int startIndex = 0;
+  unsigned int endIndex   = 15;
 
-  Rect<> textBoundingRectangle = DevelTextField::GetTextBoundingRectangle(field, startIndex, endIndex);
+  Rect<> textBoundingRectangle         = DevelTextField::GetTextBoundingRectangle(field, startIndex, endIndex);
   Rect<> expectedTextBoundingRectangle = {0, 0, 100, 25};
 
   TestTextGeometryUtils::CheckRectGeometryResult(textBoundingRectangle, expectedTextBoundingRectangle);
 
   END_TEST;
 }
-
 
 int utcDaliTextFieldDecoratorColor(void)
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <dali/integration-api/scene.h>
 #include <test-application.h>
 #include <toolkit-adaptor-impl.h>
+#include <toolkit-application.h>
 #include <toolkit-async-task-manager.h>
 #include <toolkit-scene-holder-impl.h>
 #include <toolkit-test-application.h>
@@ -85,15 +86,18 @@ Integration::Scene Adaptor::GetScene(Dali::Window window)
 
 bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
 {
-  if(hasReturnValue)
+  if(ToolkitApplication::ADD_IDLE_SUCCESS)
   {
-    mReturnCallbacks.PushBack(callback);
+    if(hasReturnValue)
+    {
+      mReturnCallbacks.PushBack(callback);
+    }
+    else
+    {
+      mCallbacks.PushBack(callback);
+    }
   }
-  else
-  {
-    mCallbacks.PushBack(callback);
-  }
-  return true;
+  return ToolkitApplication::ADD_IDLE_SUCCESS;
 }
 
 void Adaptor::RemoveIdle(CallbackBase* callback)
