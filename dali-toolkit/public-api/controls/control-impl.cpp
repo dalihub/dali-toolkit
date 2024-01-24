@@ -506,12 +506,15 @@ void Control::EmitKeyInputFocusSignal(bool focusGained)
 
   if(Accessibility::IsUp())
   {
-    auto self = GetAccessibleObject();
-    self->EmitFocused(focusGained);
-    auto parent = self->GetParent();
-    if(parent && !self->GetStates()[Dali::Accessibility::State::MANAGES_DESCENDANTS])
+    auto accessible = GetAccessibleObject();
+    if(DALI_LIKELY(accessible))
     {
-      parent->EmitActiveDescendantChanged(self);
+      accessible->EmitFocused(focusGained);
+      auto parent = accessible->GetParent();
+      if(parent && !accessible->GetStates()[Dali::Accessibility::State::MANAGES_DESCENDANTS])
+      {
+        parent->EmitActiveDescendantChanged(accessible);
+      }
     }
   }
 

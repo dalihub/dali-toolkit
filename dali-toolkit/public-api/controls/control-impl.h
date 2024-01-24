@@ -126,7 +126,7 @@ public:
   /**
    * @brief Gets the Accessible object that represents this control.
    *
-   * This method calls CreateAccessibleObject() if necessary, so a non-null return is expected.
+   * This method calls CreateAccessibleObject() if CreateAccessible is true.
    *
    * @return The Accessible object
    *

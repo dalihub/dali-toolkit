@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,8 +198,8 @@ Property::Value PushButton::GetProperty(BaseObject* object, Property::Index prop
 
 Dali::Accessibility::States PushButton::PushButtonAccessible::CalculateStates()
 {
-  auto state = Button::ButtonAccessible::CalculateStates();
-  auto self = Toolkit::Button::DownCast(Self());
+  auto state                                 = Button::ButtonAccessible::CalculateStates();
+  auto self                                  = Toolkit::Button::DownCast(Self());
   state[Dali::Accessibility::State::PRESSED] = self.GetProperty<bool>(Toolkit::Button::Property::SELECTED);
   return state;
 }
@@ -210,12 +210,14 @@ void PushButton::OnStateChange(State newState)
   if((Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor() == Self()) && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
     auto* accessible = GetAccessibleObject();
-
-    accessible->EmitStateChanged(Dali::Accessibility::State::PRESSED, newState == SELECTED_STATE ? 1 : 0, 0);
-
-    if(Self().GetProperty<bool>(Toolkit::Button::Property::TOGGLABLE))
+    if(DALI_LIKELY(accessible))
     {
-      accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+      accessible->EmitStateChanged(Dali::Accessibility::State::PRESSED, newState == SELECTED_STATE ? 1 : 0, 0);
+
+      if(Self().GetProperty<bool>(Toolkit::Button::Property::TOGGLABLE))
+      {
+        accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+      }
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -909,17 +909,29 @@ void TextField::SetEditable(bool editable)
 
 void TextField::TextInserted(unsigned int position, unsigned int length, const std::string& content)
 {
-  GetAccessibleObject()->EmitTextInserted(position, length, content);
+  auto accessible = GetAccessibleObject();
+  if(DALI_LIKELY(accessible))
+  {
+    accessible->EmitTextInserted(position, length, content);
+  }
 }
 
 void TextField::TextDeleted(unsigned int position, unsigned int length, const std::string& content)
 {
-  GetAccessibleObject()->EmitTextDeleted(position, length, content);
+  auto accessible = GetAccessibleObject();
+  if(DALI_LIKELY(accessible))
+  {
+    accessible->EmitTextDeleted(position, length, content);
+  }
 }
 
 void TextField::CursorPositionChanged(unsigned int oldPosition, unsigned int newPosition)
 {
-  GetAccessibleObject()->EmitTextCursorMoved(newPosition);
+  auto accessible = GetAccessibleObject();
+  if(DALI_LIKELY(accessible))
+  {
+    accessible->EmitTextCursorMoved(newPosition);
+  }
 
   if((oldPosition != newPosition) && !mCursorPositionChanged)
   {
