@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,7 +149,7 @@ void FastTrackLoadingTask::Load()
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     std::ostringstream oss;
-    oss << "[url:" << mUrl.GetUrl() << "]";
+    oss << "[url:" << mUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_BEGIN(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("BEGIN: DALI_IMAGE_FAST_TRACK_UPLOADING_TASK %s", oss.str().c_str());
   }
@@ -227,7 +227,7 @@ void FastTrackLoadingTask::Load()
       oss << "size:" << mPixelData[0].GetWidth() << "x" << mPixelData[0].GetHeight() << " ";
       oss << "premult:" << mPremultiplied << " ";
     }
-    oss << "url:" << mUrl.GetUrl() << "]";
+    oss << "url:" << mUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_END(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("END: DALI_IMAGE_FAST_TRACK_UPLOADING_TASK %s", oss.str().c_str());
   }
