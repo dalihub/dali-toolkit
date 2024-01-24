@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -192,7 +192,7 @@ int UtcDaliMotionValueGetSetValue(void)
   DALI_TEST_CHECK(motionValue.GetValueType() == MotionValue::ValueType::INVALID);
   DALI_TEST_CHECK(motionValue.GetPropertyValue().GetType() == Property::Type::NONE);
   DALI_TEST_CHECK(!motionValue.GetKeyFrames());
-  
+
   motionValue.SetValue(expectKeyFrames);
   DALI_TEST_CHECK(motionValue.GetValueType() == MotionValue::ValueType::KEY_FRAMES);
   DALI_TEST_CHECK(motionValue.GetKeyFrames() == expectKeyFrames);

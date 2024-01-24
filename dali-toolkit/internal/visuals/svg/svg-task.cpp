@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ void SvgLoadingTask::Process()
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     std::ostringstream oss;
-    oss << "[url:" << mImageUrl.GetUrl() << "]";
+    oss << "[url:" << mImageUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_BEGIN(gTraceFilter, "DALI_SVG_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("BEGIN: DALI_SVG_LOADING_TASK %s", oss.str().c_str());
   }
@@ -143,7 +143,7 @@ void SvgLoadingTask::Process()
   {
     std::ostringstream oss;
     oss << "[success:" << mHasSucceeded << " ";
-    oss << "url:" << mImageUrl.GetUrl() << "]";
+    oss << "url:" << mImageUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_END(gTraceFilter, "DALI_SVG_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("END: DALI_SVG_LOADING_TASK %s", oss.str().c_str());
   }
@@ -176,7 +176,7 @@ void SvgRasterizingTask::Process()
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
     oss << "[size:" << mWidth << "x" << mHeight << " ";
-    oss << "url:" << mImageUrl.GetUrl() << "]";
+    oss << "url:" << mImageUrl.GetEllipsedUrl() << "]";
   });
 
   Devel::PixelBuffer pixelBuffer = mVectorRenderer.Rasterize(mWidth, mHeight);
@@ -185,7 +185,7 @@ void SvgRasterizingTask::Process()
     DALI_LOG_ERROR("Rasterize is failed!\n");
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
       oss << "[size:" << mWidth << "x" << mHeight << " ";
-      oss << "url:" << mImageUrl.GetUrl() << "]";
+      oss << "url:" << mImageUrl.GetEllipsedUrl() << "]";
     });
     return;
   }
@@ -195,7 +195,7 @@ void SvgRasterizingTask::Process()
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
     oss << "[size:" << mWidth << "x" << mHeight << " ";
-    oss << "url:" << mImageUrl.GetUrl() << "]";
+    oss << "url:" << mImageUrl.GetEllipsedUrl() << "]";
   });
 }
 

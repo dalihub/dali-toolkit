@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,10 @@ namespace Internal
 {
 namespace
 {
+constexpr uint32_t URL_ELLIPSED_LENGTH = 20u;
+
+static_assert(URL_ELLIPSED_LENGTH < URL_ELLIPSED_LENGTH + 3u); ///< Guard overflow cases. (for svace)
+
 VisualUrl::ProtocolType ResolveLocation(const std::string& url)
 {
   const char*    urlCStr = url.c_str();
@@ -293,6 +297,17 @@ const std::string& VisualUrl::GetUrl() const
   return mUrl;
 }
 
+std::string VisualUrl::GetEllipsedUrl() const
+{
+  if(mUrl.size() > URL_ELLIPSED_LENGTH + 3)
+  {
+    std::string ellipsedUrl = "...";
+    ellipsedUrl += mUrl.substr(mUrl.size() - URL_ELLIPSED_LENGTH);
+    return ellipsedUrl;
+  }
+  return mUrl;
+}
+
 std::uint64_t VisualUrl::GetUrlHash() const
 {
   return DALI_UNLIKELY(mUrlHash == 0) ? (mUrlHash = Dali::CalculateHash(mUrl)) : mUrlHash;
@@ -363,7 +378,7 @@ std::string VisualUrl::GetLocationWithoutExtension(const std::string& url)
   const auto location = url.find("://");
   if(std::string::npos != location)
   {
-    const auto extension = url.find_last_of("."); // Find last position of '.' keyword.
+    const auto extension      = url.find_last_of("."); // Find last position of '.' keyword.
     const auto locationLength = extension != std::string::npos ? extension - (location + 3u) : std::string::npos;
     return url.substr(location + 3u, locationLength); // 3 characters forwards from the start of ://, and end of last '.' keyword.
   }

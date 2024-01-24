@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 
 // EXTERNAL INCLUDES
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <cstring>

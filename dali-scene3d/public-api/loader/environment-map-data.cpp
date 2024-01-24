@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,31 @@ Texture EnvironmentMapData::GetTexture()
   {
     if(mEnvironmentMapType == Scene3D::EnvironmentMapType::CUBEMAP)
     {
-      mEnvironmentMapTexture = Dali::Scene3D::Internal::ImageResourceLoader::GetCachedCubeTexture(mPixelData, mPixelData[0].size() == 1u);
+      // Check for the default case, that we might share the graphic resources
+      if(mPixelData[0].size() > 0u)
+      {
+        if(mPixelData[0][0] == Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGB())
+        {
+          mEnvironmentMapTexture = Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyCubeTextureWhiteRGB();
+        }
+        else
+        {
+          mEnvironmentMapTexture = Texture::New(TextureType::TEXTURE_CUBE, mPixelData[0][0].GetPixelFormat(), mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
+          for(size_t iSide = 0u, iEndSize = mPixelData.size(); iSide < iEndSize; ++iSide)
+          {
+            auto& side = mPixelData[iSide];
+            for(size_t iMipLevel = 0u, iEndMipLevel = mPixelData[0].size(); iMipLevel < iEndMipLevel; ++iMipLevel)
+            {
+              mEnvironmentMapTexture.Upload(side[iMipLevel], CubeMapLayer::POSITIVE_X + iSide, iMipLevel, 0u, 0u, side[iMipLevel].GetWidth(), side[iMipLevel].GetHeight());
+            }
+          }
+        }
+      }
     }
     else
     {
-      mEnvironmentMapTexture = Dali::Scene3D::Internal::ImageResourceLoader::GetCachedTexture(mPixelData[0][0], mPixelData[0].size() == 1u);
+      mEnvironmentMapTexture = Texture::New(TextureType::TEXTURE_2D, mPixelData[0][0].GetPixelFormat(), mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
+      mEnvironmentMapTexture.Upload(mPixelData[0][0], 0, 0, 0, 0, mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
     }
 
     // If mipmap is not defined explicitly, use GenerateMipmaps.

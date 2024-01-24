@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -650,7 +650,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
     else if(mUseFastTrackUploading)
     {
       DALI_LOG_DEBUG_INFO("FastTrack : Fail to load fast track. mUrl : [%s]%s%s%s%s%s%s%s%s\n",
-                          mImageUrl.GetUrl().c_str(),
+                          mImageUrl.GetEllipsedUrl().c_str(),
                           (mLoadPolicy != Toolkit::ImageVisual::LoadPolicy::ATTACHED) ? "/ mLoadPolicy != ATTACHED" : "",
                           (mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::DETACHED) ? "/ mReleasePolicy != DETACHED" : "",
                           (forceReload != TextureManager::ReloadPolicy::CACHED) ? "/ forceReload != CACHED" : "",

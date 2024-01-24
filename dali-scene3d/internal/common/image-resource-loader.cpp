@@ -36,6 +36,7 @@
 #include <functional> ///< for std::function
 #include <memory>     ///< for std::shared_ptr
 #include <mutex>
+#include <sstream>
 #include <string>
 #include <utility> ///< for std::pair
 
@@ -50,16 +51,8 @@ constexpr uint32_t GC_PERIOD_MILLISECONDS                     = 1000u;
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_IMAGE_RESOURCE_LOADER");
 #endif
 
-bool SupportPixelDataCache(Dali::PixelData pixelData)
+bool IsDefaultPixelData(const Dali::PixelData& pixelData)
 {
-  // Check given pixelData support to release data after upload.
-  // This is cause we need to reduce CPU memory usage.
-  if(Dali::Integration::IsPixelDataReleaseAfterUpload(pixelData))
-  {
-    return true;
-  }
-
-  // Check given pixelData is default pixelData.
   if(pixelData == Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGB() ||
      pixelData == Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGBA() ||
      pixelData == Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataZAxisRGB() ||
@@ -70,19 +63,21 @@ bool SupportPixelDataCache(Dali::PixelData pixelData)
   return false;
 }
 
-bool SupportPixelDataListCache(const std::vector<std::vector<Dali::PixelData>>& pixelDataList)
+bool SupportPixelDataCache(const Dali::PixelData& pixelData)
 {
-  for(const auto& pixelDataListLevel0 : pixelDataList)
+  // Check given pixelData support to release data after upload.
+  // This is cause we need to reduce CPU memory usage.
+  if(Dali::Integration::IsPixelDataReleaseAfterUpload(pixelData))
   {
-    for(const auto& pixelData : pixelDataListLevel0)
-    {
-      if(!SupportPixelDataCache(pixelData))
-      {
-        return false;
-      }
-    }
+    return true;
   }
-  return true;
+
+  // Check given pixelData is default pixelData.
+  if(IsDefaultPixelData(pixelData))
+  {
+    return true;
+  }
+  return false;
 }
 
 struct ImageInformation
@@ -152,21 +147,6 @@ std::size_t GenerateHash(const Dali::PixelData& pixelData, bool mipmapRequired)
   return reinterpret_cast<std::size_t>(static_cast<void*>(pixelData.GetObjectPtr())) ^ (static_cast<std::size_t>(mipmapRequired) << (sizeof(std::size_t) * 4));
 }
 
-std::size_t GenerateHash(const std::vector<std::vector<Dali::PixelData>>& pixelDataList, bool mipmapRequired)
-{
-  std::size_t result = 0x12345678u + pixelDataList.size();
-  for(const auto& mipmapPixelDataList : pixelDataList)
-  {
-    result += (result << 5) + mipmapPixelDataList.size();
-    for(const auto& pixelData : mipmapPixelDataList)
-    {
-      result += (result << 5) + GenerateHash(pixelData, false);
-    }
-  }
-
-  return result ^ (static_cast<std::size_t>(mipmapRequired) << (sizeof(std::size_t) * 4));
-}
-
 // Item Creation functor list
 
 Dali::PixelData CreatePixelDataFromImageInfo(const ImageInformation& info, bool releasePixelData)
@@ -197,27 +177,17 @@ Dali::Texture CreateTextureFromPixelData(const Dali::PixelData& pixelData, bool 
   return texture;
 }
 
-Dali::Texture CreateCubeTextureFromPixelDataList(const std::vector<std::vector<Dali::PixelData>>& pixelDataList, bool mipmapRequired)
+// Check function whether we can collect given data as garbage, or not.
+bool PixelDataCacheCollectable(const ImageInformation& info, const Dali::PixelData& pixelData)
 {
-  Dali::Texture texture;
-  if(!pixelDataList.empty() && !pixelDataList[0].empty())
-  {
-    texture = Dali::Texture::New(Dali::TextureType::TEXTURE_CUBE, pixelDataList[0][0].GetPixelFormat(), pixelDataList[0][0].GetWidth(), pixelDataList[0][0].GetHeight());
-    for(size_t iSide = 0u, iEndSize = pixelDataList.size(); iSide < iEndSize; ++iSide)
-    {
-      auto& side = pixelDataList[iSide];
-      for(size_t iMipLevel = 0u, iEndMipLevel = pixelDataList[0].size(); iMipLevel < iEndMipLevel; ++iMipLevel)
-      {
-        texture.Upload(side[iMipLevel], Dali::CubeMapLayer::POSITIVE_X + iSide, iMipLevel, 0u, 0u, side[iMipLevel].GetWidth(), side[iMipLevel].GetHeight());
-      }
-    }
-    if(mipmapRequired)
-    {
-      texture.GenerateMipmaps();
-    }
-  }
+  return pixelData.GetBaseObject().ReferenceCount() <= 1;
+}
 
-  return texture;
+bool TextureCacheCollectable(const Dali::PixelData& pixelData, const Dali::Texture& texture)
+{
+  return !IsDefaultPixelData(pixelData) &&                  ///< If key is not default pixelData
+         pixelData.GetBaseObject().ReferenceCount() <= 2 && ///< And it have reference count as 2 (1 is for the key of this container, and other is PixelData cache.)
+         texture.GetBaseObject().ReferenceCount() <= 1;     ///< And nobody use this texture, except this contianer.
 }
 
 // Forward declare, for signal connection.
@@ -232,15 +202,12 @@ public:
   CacheImpl()
   : mPixelDataCache{},
     mTextureCache{},
-    mCubeTextureCache{},
     mTimer{},
     mLatestCollectedPixelDataIter{mPixelDataCache.begin()},
     mLatestCollectedTextureIter{mTextureCache.begin()},
-    mLatestCollectedCubeTextureIter{mCubeTextureCache.begin()},
+    mDataMutex{},
     mPixelDataContainerUpdated{false},
     mTextureContainerUpdated{false},
-    mCubeTextureContainerUpdated{false},
-    mDataMutex{},
     mDestroyed{false},
     mFullCollectRequested{false}
   {
@@ -259,17 +226,14 @@ public:
     {
       mDataMutex.lock();
 
-      mDestroyed                      = true;
-      mPixelDataContainerUpdated      = false;
-      mTextureContainerUpdated        = false;
-      mCubeTextureContainerUpdated    = false;
-      mLatestCollectedPixelDataIter   = decltype(mLatestCollectedPixelDataIter)();   // Invalidate iterator
-      mLatestCollectedTextureIter     = decltype(mLatestCollectedTextureIter)();     // Invalidate iterator
-      mLatestCollectedCubeTextureIter = decltype(mLatestCollectedCubeTextureIter){}; // Invalidate iterator
+      mDestroyed                    = true;
+      mPixelDataContainerUpdated    = false;
+      mTextureContainerUpdated      = false;
+      mLatestCollectedPixelDataIter = decltype(mLatestCollectedPixelDataIter)(); // Invalidate iterator
+      mLatestCollectedTextureIter   = decltype(mLatestCollectedTextureIter)();   // Invalidate iterator
 
       mPixelDataCache.clear();
       mTextureCache.clear();
-      mCubeTextureCache.clear();
 
       mDataMutex.unlock();
     }
@@ -285,9 +249,8 @@ public:
 
 private: // Unified API for this class
   // Let compare with hash first. And then, check detail keys after.
-  using PixelDataCacheContainer   = std::map<std::size_t, std::vector<std::pair<ImageInformation, Dali::PixelData>>>;
-  using TextureCacheContainer     = std::map<std::size_t, std::vector<std::pair<Dali::PixelData, Dali::Texture>>>;
-  using CubeTextureCacheContainer = std::map<std::size_t, std::vector<std::pair<std::vector<std::vector<Dali::PixelData>>, Dali::Texture>>>;
+  using PixelDataCacheContainer = std::map<std::size_t, std::vector<std::pair<ImageInformation, Dali::PixelData>>>;
+  using TextureCacheContainer   = std::map<std::size_t, std::vector<std::pair<Dali::PixelData, Dali::Texture>>>;
 
   /**
    * @brief Try to get cached item, or create new handle if there is no item.
@@ -314,6 +277,7 @@ private: // Unified API for this class
       bool found = false;
 
       auto iter = cacheContainer.lower_bound(hashValue);
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "HashValue : %zu\n", hashValue);
       if((iter == cacheContainer.end()) || (hashValue != iter->first))
       {
         containerUpdated = true;
@@ -356,6 +320,7 @@ private: // Unified API for this class
 
     return returnItem;
   }
+
   /**
    * @brief Try to collect garbages, which reference counts are 1.
    *
@@ -367,15 +332,10 @@ private: // Unified API for this class
    * @oaram[in, out] checkedCount The number of iteration checked total.
    * @return True if we iterate whole container, so we don't need to check anymore. False otherwise
    */
-  template<bool needMutex, typename ContainerType, typename Iterator = typename ContainerType::iterator>
-  bool CollectGarbages(ContainerType& cacheContainer, bool fullCollect, bool& containerUpdated, Iterator& lastIterator, uint32_t& checkedCount)
+  template<typename KeyType, typename ValueType, bool (*Collectable)(const KeyType&, const ValueType&), typename ContainerType, typename Iterator = typename ContainerType::iterator>
+  bool CollectGarbages(ContainerType& cacheContainer, bool fullCollect, bool& containerUpdated, Iterator& lastIterator, uint32_t& checkedCount, uint32_t& collectedCount)
   {
-    if constexpr(needMutex)
-    {
-      mDataMutex.lock();
-    }
-
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Collect Garbages : %zu\n", cacheContainer.size());
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Collect Garbages : %zu (checkedCount : %d, fullCollect? %d)\n", cacheContainer.size(), checkedCount, fullCollect);
     // Container changed. We should re-collect garbage from begin again.
     if(fullCollect || containerUpdated)
     {
@@ -391,9 +351,11 @@ private: // Unified API for this class
       {
         auto& item = jter->second;
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "item : %p, ref count : %u\n", item.GetObjectPtr(), (item ? item.GetBaseObject().ReferenceCount() : 0u));
-        if(!item || (item.GetBaseObject().ReferenceCount() == 1u))
+        if(!item || Collectable(jter->first, item))
         {
+          DALI_LOG_INFO(gLogFilter, Debug::Verbose, "GC!!!\n");
           // This item is garbage! just remove it.
+          ++collectedCount;
           jter = cachePairList.erase(jter);
         }
         else
@@ -412,11 +374,6 @@ private: // Unified API for this class
       }
     }
 
-    if constexpr(needMutex)
-    {
-      mDataMutex.unlock();
-    }
-
     return (lastIterator != cacheContainer.end());
   }
 
@@ -432,19 +389,6 @@ public: // Called by main thread.
   {
     auto hashValue = GenerateHash(pixelData, mipmapRequired);
     return GetOrCreateCachedItem<false, Dali::PixelData, Dali::Texture, CreateTextureFromPixelData>(mTextureCache, hashValue, pixelData, mipmapRequired, mTextureContainerUpdated);
-  }
-
-  /**
-   * @brief Try to get cached cube texture, or newly create if there is no cube texture that already cached.
-   *
-   * @param[in] pixelDataList The pixelData list of image.
-   * @param[in] mipmapRequired True if result texture need to generate mipmap.
-   * @return Texture that has been cached. Or empty handle if we fail to found cached item.
-   */
-  Dali::Texture GetOrCreateCachedCubeTexture(const std::vector<std::vector<Dali::PixelData>>& pixelDataList, bool mipmapRequired)
-  {
-    auto hashValue = GenerateHash(pixelDataList, mipmapRequired);
-    return GetOrCreateCachedItem<false, std::vector<std::vector<Dali::PixelData>>, Dali::Texture, CreateCubeTextureFromPixelDataList>(mCubeTextureCache, hashValue, pixelDataList, mipmapRequired, mCubeTextureContainerUpdated);
   }
 
   /**
@@ -467,12 +411,9 @@ public: // Called by main thread.
       if(!mTimer.IsRunning())
       {
         // Restart container interating.
-        if(!mPixelDataContainerUpdated)
-        {
-          mDataMutex.lock();
-          mPixelDataContainerUpdated = true;
-          mDataMutex.unlock();
-        }
+        mDataMutex.lock();
+        mPixelDataContainerUpdated = true;
+        mDataMutex.unlock();
         mTextureContainerUpdated = true;
         mTimer.Start();
       }
@@ -512,40 +453,44 @@ private: // Called by main thread
   bool IncrementalGarbageCollect(bool fullCollect)
   {
     bool continueTimer = false;
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "GC start\n");
 
     // Try to collect Texture GC first, due to the reference count of pixelData who become key of textures.
     // After all texture GC finished, then check PixelData cache.
-    uint32_t checkedCount = 0u;
+    uint32_t checkedCount   = 0u;
+    uint32_t collectedCount = 0u;
 
-    // GC Cube Texture
-    continueTimer |= CollectGarbages<false>(mCubeTextureCache, fullCollect, mCubeTextureContainerUpdated, mLatestCollectedCubeTextureIter, checkedCount);
+    // We should lock mutex during GC pixelData.
+    mDataMutex.lock();
 
     // GC Texture
-    continueTimer |= CollectGarbages<false>(mTextureCache, fullCollect, mTextureContainerUpdated, mLatestCollectedTextureIter, checkedCount);
+    continueTimer |= CollectGarbages<Dali::PixelData, Dali::Texture, TextureCacheCollectable>(mTextureCache, fullCollect, mTextureContainerUpdated, mLatestCollectedTextureIter, checkedCount, collectedCount);
 
-    // GC PixelData. We should lock mutex during GC pixelData.
-    continueTimer |= CollectGarbages<true>(mPixelDataCache, fullCollect, mPixelDataContainerUpdated, mLatestCollectedPixelDataIter, checkedCount);
+    // GC PixelData last. If there are some collected Texture before, we should full-collect.
+    // (Since most of PixelData use 'ReleaseAfterUpload' flags).
+    continueTimer |= CollectGarbages<ImageInformation, Dali::PixelData, PixelDataCacheCollectable>(mPixelDataCache, fullCollect || (collectedCount > 0u), mPixelDataContainerUpdated, mLatestCollectedPixelDataIter, checkedCount, collectedCount);
+
+    mDataMutex.unlock();
+
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "GC finished. checkedCount : %u, continueTimer : %d\n", checkedCount, continueTimer);
 
     return continueTimer;
   }
 
 private:
-  PixelDataCacheContainer   mPixelDataCache;
-  TextureCacheContainer     mTextureCache;
-  CubeTextureCacheContainer mCubeTextureCache;
+  PixelDataCacheContainer mPixelDataCache;
+  TextureCacheContainer   mTextureCache;
 
   Dali::Timer mTimer;
 
   // Be used when we garbage collection.
-  PixelDataCacheContainer::iterator   mLatestCollectedPixelDataIter;
-  TextureCacheContainer::iterator     mLatestCollectedTextureIter;
-  CubeTextureCacheContainer::iterator mLatestCollectedCubeTextureIter;
+  PixelDataCacheContainer::iterator mLatestCollectedPixelDataIter;
+  TextureCacheContainer::iterator   mLatestCollectedTextureIter;
+
+  std::mutex mDataMutex;
 
   bool mPixelDataContainerUpdated;
   bool mTextureContainerUpdated;
-  bool mCubeTextureContainerUpdated;
-
-  std::mutex mDataMutex;
 
   bool mDestroyed : 1;
   bool mFullCollectRequested : 1;
@@ -553,6 +498,7 @@ private:
 
 static std::shared_ptr<CacheImpl> gCacheImpl{nullptr};
 static Dali::Texture              gEmptyTextureWhiteRGB{};
+static Dali::Texture              gEmptyCubeTextureWhiteRGB{};
 
 std::shared_ptr<CacheImpl> GetCacheImpl()
 {
@@ -569,6 +515,7 @@ void DestroyCacheImpl()
 
   // Remove texture object when application stopped.
   gEmptyTextureWhiteRGB.Reset();
+  gEmptyCubeTextureWhiteRGB.Reset();
 }
 
 } // namespace
@@ -589,9 +536,23 @@ Dali::Texture GetEmptyTextureWhiteRGB()
   return gEmptyTextureWhiteRGB;
 }
 
+Dali::Texture GetEmptyCubeTextureWhiteRGB()
+{
+  if(!gEmptyCubeTextureWhiteRGB)
+  {
+    Dali::PixelData emptyPixelData = GetEmptyPixelDataWhiteRGB();
+    gEmptyCubeTextureWhiteRGB      = Texture::New(TextureType::TEXTURE_CUBE, emptyPixelData.GetPixelFormat(), emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
+    for(size_t iSide = 0u; iSide < 6; ++iSide)
+    {
+      gEmptyCubeTextureWhiteRGB.Upload(emptyPixelData, CubeMapLayer::POSITIVE_X + iSide, 0u, 0u, 0u, emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
+    }
+  }
+  return gEmptyCubeTextureWhiteRGB;
+}
+
 Dali::Texture GetCachedTexture(Dali::PixelData pixelData, bool mipmapRequired)
 {
-  if(SupportPixelDataCache(pixelData))
+  if(Dali::Adaptor::IsAvailable() && SupportPixelDataCache(pixelData))
   {
     return GetCacheImpl()->GetOrCreateCachedTexture(pixelData, mipmapRequired);
   }
@@ -601,26 +562,20 @@ Dali::Texture GetCachedTexture(Dali::PixelData pixelData, bool mipmapRequired)
   }
 }
 
-Dali::Texture GetCachedCubeTexture(const std::vector<std::vector<Dali::PixelData>>& pixelDataList, bool mipmapRequired)
-{
-  if(SupportPixelDataListCache(pixelDataList))
-  {
-    return GetCacheImpl()->GetOrCreateCachedCubeTexture(pixelDataList, mipmapRequired);
-  }
-  else
-  {
-    return CreateCubeTextureFromPixelDataList(pixelDataList, mipmapRequired);
-  }
-}
-
 void RequestGarbageCollect(bool fullCollect)
 {
-  GetCacheImpl()->RequestGarbageCollect(fullCollect);
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+  {
+    GetCacheImpl()->RequestGarbageCollect(fullCollect);
+  }
 }
 
 void EnsureResourceLoaderCreated()
 {
-  GetCacheImpl();
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+  {
+    GetCacheImpl();
+  }
 }
 
 // Can be called by worker thread.

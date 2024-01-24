@@ -48,20 +48,18 @@ namespace ImageResourceLoader
 Dali::Texture GetEmptyTextureWhiteRGB();
 
 /**
+ * @brief Get cached cube texture handle filled as white with RGB888 format at 6 faces.
+ * @return A Texture object containing the white RGB888 color at 6 faces.
+ */
+Dali::Texture GetEmptyCubeTextureWhiteRGB();
+
+/**
  * @brief Get cached texture handle, or create new texture and upload.
  * @param[in] pixelData The PixelData of image to upload
  * @param[in] mipmapRequired True if this texture need to generate mipmap
  * @return A Texture object containing the pixelData, or an invalid object on failure
  */
 Dali::Texture GetCachedTexture(Dali::PixelData pixelData, bool mipmapRequired);
-
-/**
- * @brief Get cached cube texture handle, or create new texture and upload.
- * @param[in] pixelDataList The list of PixelData to upload. pixelDataList[FACE_OF_CUBE][MIPMAP_LEVEL].
- * @param[in] mipmapRequired True if this texture need to generate mipmap
- * @return A Texture object containing the pixelData, or an invalid object on failure
- */
-Dali::Texture GetCachedCubeTexture(const std::vector<std::vector<Dali::PixelData>>& pixelDataList, bool mipmapRequired);
 
 /**
  * @brief Request to remove unused Texture and PixelData. We can choose the collect garbages incrementally or fully.
