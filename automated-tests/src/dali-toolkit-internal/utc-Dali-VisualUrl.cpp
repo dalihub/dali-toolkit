@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,11 @@
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
 using namespace Dali::Toolkit::Internal;
+
+namespace
+{
+constexpr uint32_t URL_ELLIPSED_LENGTH = 20u;
+}
 
 int UtcDaliVisualUrlConstructor(void)
 {
@@ -516,6 +521,39 @@ int UtcDaliVisualUrlGetUrlHash(void)
     std::uint64_t visualHash = visualUrl.GetUrlHash();
 
     DALI_TEST_EQUAL(visualHash, exceptHash);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVisualUrlGetEllipsedUrl(void)
+{
+  tet_infoline("UtcDaliVisualUrl GetEllipsedUrl");
+
+  std::string inputString;
+
+  // Test shot url is same as what input used.
+  for(uint32_t i = 0; i < URL_ELLIPSED_LENGTH + 3; ++i)
+  {
+    inputString.push_back('a');
+
+    VisualUrl visualUrl(inputString);
+
+    DALI_TEST_EQUALS(visualUrl.GetUrl(), inputString, TEST_LOCATION);
+    DALI_TEST_EQUALS(visualUrl.GetEllipsedUrl(), inputString, TEST_LOCATION);
+  }
+
+  for(uint32_t i = 0; i < 10; ++i)
+  {
+    inputString.push_back('0' + i);
+
+    std::string expectString = "..." + inputString.substr(inputString.length() - URL_ELLIPSED_LENGTH);
+
+    VisualUrl visualUrl(inputString);
+
+    DALI_TEST_EQUALS(visualUrl.GetUrl(), inputString, TEST_LOCATION);
+    DALI_TEST_CHECK(visualUrl.GetEllipsedUrl() != inputString);
+    DALI_TEST_EQUALS(visualUrl.GetEllipsedUrl(), expectString, TEST_LOCATION);
   }
 
   END_TEST;

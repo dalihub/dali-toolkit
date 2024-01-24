@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_URL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,12 @@ public:
    * @return The url
    */
   const std::string& GetUrl() const;
+
+  /**
+   * Get the ellipsed URL.
+   * @return The ellipsed url
+   */
+  std::string GetEllipsedUrl() const;
 
   /**
    * Get the hash value of full URL
