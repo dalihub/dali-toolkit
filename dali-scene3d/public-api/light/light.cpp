@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,12 +122,12 @@ float Light::GetShadowBias() const
 }
 
 Light::Light(Internal::Light& implementation)
-: CustomActor(implementation)
+: Control(implementation)
 {
 }
 
 Light::Light(Dali::Internal::CustomActor* internal)
-: CustomActor(internal)
+: Control(internal)
 {
   // Can have a NULL pointer so we only need to check if the internal implementation is our class
   // when there is a value.
