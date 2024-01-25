@@ -19,6 +19,7 @@
 #include <dali-scene3d/internal/light/light-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -78,113 +79,26 @@ Light::~Light()
 {
 }
 
-void Light::Initialize()
+// From Internal::Control.
+
+void Light::OnInitialize()
 {
-  Self().SetProperty(Dali::Actor::Property::COLOR, Color::WHITE);
+  Actor self = Self();
+
+  // TODO : We need to check this is enough.
+  Toolkit::DevelControl::EnableCreateAccessible(Toolkit::Control::DownCast(self), false);
+
+  self.SetProperty(Dali::Actor::Property::COLOR, Color::WHITE);
 
   // Directional Light setting
   mLightSourceActor = Dali::CameraActor::New();
   mLightSourceActor.SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
   mLightSourceActor.SetProperty(Dali::Actor::Property::POSITION, Vector3::ZERO);
   mLightSourceActor.SetProperty(Dali::Actor::Property::ORIENTATION, Quaternion());
-  Self().Add(mLightSourceActor);
+  self.Add(mLightSourceActor);
 }
 
-void Light::Enable(bool enable)
-{
-  if(enable == mIsEnabled)
-  {
-    return;
-  }
-  mIsEnabled = enable;
-
-  Scene3D::SceneView sceneView = mParentSceneView.GetHandle();
-  if(!sceneView)
-  {
-    return;
-  }
-
-  if(mIsEnabled)
-  {
-    GetImpl(sceneView).AddLight(Scene3D::Light::DownCast(Self()));
-  }
-  else
-  {
-    GetImpl(sceneView).RemoveLight(Scene3D::Light::DownCast(Self()));
-  }
-}
-
-bool Light::IsEnabled() const
-{
-  return mIsEnabled;
-}
-
-void Light::EnableShadow(bool enable)
-{
-  if(enable == mIsShadowEnabled)
-  {
-    return;
-  }
-  mIsShadowEnabled = enable;
-
-  Scene3D::SceneView sceneView = mParentSceneView.GetHandle();
-  if(!sceneView)
-  {
-    return;
-  }
-
-  if(mIsShadowEnabled)
-  {
-    GetImpl(sceneView).SetShadow(Scene3D::Light::DownCast(Self()));
-  }
-  else
-  {
-    GetImpl(sceneView).RemoveShadow(Scene3D::Light::DownCast(Self()));
-  }
-}
-
-bool Light::IsShadowEnabled() const
-{
-  return mIsShadowEnabled;
-}
-
-CameraActor Light::GetCamera() const
-{
-  return mLightSourceActor;
-}
-
-void Light::EnableShadowSoftFiltering(bool useSoftFiltering)
-{
-  mUseSoftFiltering = useSoftFiltering;
-  UpdateShadowUniforms();
-}
-
-bool Light::IsShadowSoftFilteringEnabled() const
-{
-  return mUseSoftFiltering;
-}
-
-void Light::SetShadowIntensity(float shadowIntensity)
-{
-  mShadowIntensity = shadowIntensity;
-  UpdateShadowUniforms();
-}
-
-float Light::GetShadowIntensity() const
-{
-  return mShadowIntensity;
-}
-
-void Light::SetShadowBias(float shadowBias)
-{
-  mShadowBias = shadowBias;
-  UpdateShadowUniforms();
-}
-
-float Light::GetShadowBias() const
-{
-  return mShadowBias;
-}
+// From CustomActorImpl.
 
 void Light::OnSceneConnection(int depth)
 {
@@ -294,6 +208,104 @@ const Light& GetImplementation(const Dali::Scene3D::Light& handle)
 
 // Public Method
 
+void Light::Enable(bool enable)
+{
+  if(enable == mIsEnabled)
+  {
+    return;
+  }
+  mIsEnabled = enable;
+
+  Scene3D::SceneView sceneView = mParentSceneView.GetHandle();
+  if(!sceneView)
+  {
+    return;
+  }
+
+  if(mIsEnabled)
+  {
+    GetImpl(sceneView).AddLight(Scene3D::Light::DownCast(Self()));
+  }
+  else
+  {
+    GetImpl(sceneView).RemoveLight(Scene3D::Light::DownCast(Self()));
+  }
+}
+
+bool Light::IsEnabled() const
+{
+  return mIsEnabled;
+}
+
+void Light::EnableShadow(bool enable)
+{
+  if(enable == mIsShadowEnabled)
+  {
+    return;
+  }
+  mIsShadowEnabled = enable;
+
+  Scene3D::SceneView sceneView = mParentSceneView.GetHandle();
+  if(!sceneView)
+  {
+    return;
+  }
+
+  if(mIsShadowEnabled)
+  {
+    GetImpl(sceneView).SetShadow(Scene3D::Light::DownCast(Self()));
+  }
+  else
+  {
+    GetImpl(sceneView).RemoveShadow(Scene3D::Light::DownCast(Self()));
+  }
+}
+
+bool Light::IsShadowEnabled() const
+{
+  return mIsShadowEnabled;
+}
+
+CameraActor Light::GetCamera() const
+{
+  return mLightSourceActor;
+}
+
+void Light::EnableShadowSoftFiltering(bool useSoftFiltering)
+{
+  mUseSoftFiltering = useSoftFiltering;
+  UpdateShadowUniforms();
+}
+
+bool Light::IsShadowSoftFilteringEnabled() const
+{
+  return mUseSoftFiltering;
+}
+
+void Light::SetShadowIntensity(float shadowIntensity)
+{
+  mShadowIntensity = shadowIntensity;
+  UpdateShadowUniforms();
+}
+
+float Light::GetShadowIntensity() const
+{
+  return mShadowIntensity;
+}
+
+void Light::SetShadowBias(float shadowBias)
+{
+  mShadowBias = shadowBias;
+  UpdateShadowUniforms();
+}
+
+float Light::GetShadowBias() const
+{
+  return mShadowBias;
+}
+
+// Public Static Method
+
 uint32_t Light::GetMaximumEnabledLightCount()
 {
   return MAX_NUMBER_OF_LIGHT;
@@ -323,6 +335,8 @@ std::string_view Light::GetShadowViewProjectionMatrixUniformName()
 {
   return SHADOW_VIEW_PROJECTION_MATRIX_STRING;
 }
+
+// Private Method
 
 void Light::UpdateShadowUniforms()
 {
