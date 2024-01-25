@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -825,7 +825,13 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
       {
         // @note: The callback manager takes the ownership of the callback object.
         mIdleCallback = MakeCallback(this, &TextEditor::OnIdleSignal);
-        adaptor.AddIdle(mIdleCallback, false);
+        if(DALI_UNLIKELY(!adaptor.AddIdle(mIdleCallback, false)))
+        {
+          DALI_LOG_ERROR("Fail to add idle callback for text editor queue. Skip these callbacks\n");
+
+          // Set the pointer to null as the callback manager deletes the callback even AddIdle failed.
+          mIdleCallback = NULL;
+        }
       }
     }
   }
