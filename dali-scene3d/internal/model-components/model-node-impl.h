@@ -78,7 +78,13 @@ protected:
    */
   virtual ~ModelNode();
 
-protected: // From CustomActorImpl
+public: // From Internal::Control.
+  /**
+   * @copydoc Dali::Toolkit::Internal::Control::OnInitialize()
+   */
+  void OnInitialize() override;
+
+protected: // From CustomActorImpl. Note that it will make we can ignore many codes what Internal::Control using now.
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    * @note If overridden, then an up-call to ModelNode::OnSceneConnection MUST be made at the end.
@@ -175,23 +181,6 @@ protected:
    * @SINCE_2_2.99
    */
   ModelNode();
-
-  /**
-   * @brief Second phase initialization.
-   * @SINCE_2_2.99
-   */
-  void Initialize();
-
-public: // API for derived classes to override
-  // Lifecycle
-
-  /**
-   * @brief This method is called after the Node has been initialized.
-   *
-   * Derived classes should do any second phase initialization by overriding this method.
-   * @SINCE_2_2.99
-   */
-  virtual void OnInitialize();
 
 public: // Public Method
   /**

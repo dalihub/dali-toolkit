@@ -19,6 +19,7 @@
 #include <dali-scene3d/internal/model-components/model-node-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -73,17 +74,20 @@ ModelNode::~ModelNode()
 {
 }
 
-void ModelNode::Initialize()
-{
-  OnInitialize();
-}
+// From Internal::Control.
 
 void ModelNode::OnInitialize()
 {
   Actor self = Self();
+
+  // TODO : We need to check this is enough.
+  Toolkit::DevelControl::EnableCreateAccessible(Toolkit::Control::DownCast(self), false);
+
   self.RegisterProperty("uIsShadowCasting", static_cast<int>(mIsShadowCasting));
   self.RegisterProperty("uIsShadowReceiving", static_cast<int>(mIsShadowReceiving));
 }
+
+// From CustomActorImpl.
 
 void ModelNode::OnSceneConnection(int depth)
 {
