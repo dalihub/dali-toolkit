@@ -84,7 +84,7 @@ Dali::Toolkit::ControlWrapper ControlWrapper::New(const std::string& typeName, C
 }
 
 ControlWrapper::ControlWrapper(CustomControlBehaviour behaviourFlags)
-: Control(static_cast<ControlBehaviour>(behaviourFlags | DISABLE_STYLE_CHANGE_SIGNALS))
+: Control(static_cast<ControlBehaviour>(behaviourFlags))
 {
 }
 
