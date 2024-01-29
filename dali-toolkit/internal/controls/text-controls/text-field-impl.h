@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -447,13 +447,6 @@ private: // Implementation
   bool OnTouched(Actor actor, const TouchEvent& touch);
 
   /**
-   * @brief Callbacks called on idle.
-   *
-   * If there are notifications of change of input style on the queue, Toolkit::TextField::InputStyleChangedSignal() are emitted.
-   */
-  void OnIdleSignal();
-
-  /**
    * @brief Emits TextChanged signal.
    */
   void EmitTextChangedSignal();
@@ -548,11 +541,10 @@ private: // Data
   std::vector<Toolkit::TextAnchor> mAnchorActors;
   Dali::InputMethodOptions         mInputMethodOptions;
 
-  Actor         mRenderableActor;
-  Actor         mActiveLayer;
-  Actor         mCursorLayer;
-  Actor         mBackgroundActor;
-  CallbackBase* mIdleCallback;
+  Actor mRenderableActor;
+  Actor mActiveLayer;
+  Actor mCursorLayer;
+  Actor mBackgroundActor;
 
   float mAlignmentOffset;
   int   mRenderingBackend;

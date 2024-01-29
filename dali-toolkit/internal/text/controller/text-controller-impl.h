@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -331,6 +331,7 @@ struct Controller::Impl
     mEmbossDefaults(NULL),
     mOutlineDefaults(NULL),
     mEventData(NULL),
+    mIdleCallback(NULL),
     mFontClient(),
     mClipboard(),
     mView(),
@@ -372,7 +373,8 @@ struct Controller::Impl
     mTextFitChanged(false),
     mTextFitArrayEnabled(false),
     mIsLayoutDirectionChanged(false),
-    mIsUserInteractionEnabled(true)
+    mIsUserInteractionEnabled(true),
+    mProcessorRegistered(false)
   {
     mModel = Model::New();
 
@@ -1053,6 +1055,7 @@ public:
   EmbossDefaults*              mEmbossDefaults;             ///< Avoid allocating this when the user does not specify emboss parameters.
   OutlineDefaults*             mOutlineDefaults;            ///< Avoid allocating this when the user does not specify outline parameters.
   EventData*                   mEventData;                  ///< Avoid allocating everything for text input until EnableTextInput().
+  CallbackBase*                mIdleCallback;               ///< Callback what would be called at idler
   TextAbstraction::FontClient  mFontClient;                 ///< Handle to the font client.
   Clipboard                    mClipboard;                  ///< Handle to the system clipboard
   View                         mView;                       ///< The view interface to the rendering back-end.
@@ -1102,6 +1105,7 @@ public:
   bool  mTextFitArrayEnabled : 1;      ///< Whether the text's fit array is enabled.
   bool  mIsLayoutDirectionChanged : 1; ///< Whether the layout has changed.
   bool  mIsUserInteractionEnabled : 1; ///< Whether the user interaction is enabled.
+  bool  mProcessorRegistered : 1;      ///< Whether the text controller registered into processor or not.
 
 private:
   friend ControllerImplEventHandler;
