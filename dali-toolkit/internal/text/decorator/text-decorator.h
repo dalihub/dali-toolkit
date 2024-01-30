@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_DECORATOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/math/rect.h>
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/property-map.h>
+#include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
@@ -193,8 +193,10 @@ public:
    * @brief The decorator waits until a relayout before creating actors etc.
    *
    * @param[in] size The size of the parent control after size-negotiation.
+   * @param[in,out]  container  The control should add actors to this container that it is not able
+   *                            to allocate a size for.
    */
-  void Relayout(const Dali::Vector2& size);
+  void Relayout(const Dali::Vector2& size, RelayoutContainer& container);
 
   /**
    * @brief Updates the decorator's actor positions after scrolling.

@@ -691,7 +691,7 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
     if(mDecorator &&
        (Text::Controller::NONE_UPDATED != (Text::Controller::DECORATOR_UPDATED & updateTextType)))
     {
-      mDecorator->Relayout(contentSize);
+      mDecorator->Relayout(contentSize, container);
     }
 
     if(!mRenderer)
