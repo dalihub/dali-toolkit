@@ -72,6 +72,9 @@ constexpr int32_t  DEFAULT_ORIENTATION     = 0;
 constexpr int32_t  INVALID_INDEX           = -1;
 constexpr uint32_t MAXIMUM_SIZE_SHADOW_MAP = 2048;
 
+constexpr int32_t SCENE_ORDER_INDEX = 100;
+constexpr int32_t SHADOW_ORDER_INDEX = 99;
+
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
 static constexpr std::string_view Y_FLIP_MASK_TEXTURE     = "uYFlipMaskTexture";
 static constexpr float            FLIP_MASK_TEXTURE       = 1.0f;
@@ -659,9 +662,13 @@ void SceneView::SetShadow(Scene3D::Light light)
   UpdateShadowMapBuffer(shadowMapBufferSize);
 
   // use lightCamera as a camera of shadow render task.
-  mShadowMapRenderTask.SetCameraActor(lightCamera);
+  if(mShadowMapRenderTask)
+  {
+    mShadowMapRenderTask.SetCameraActor(lightCamera);
+  }
 
   mShaderManager->SetShadow(light);
+  UpdateShadowMapBuffer(shadowMapBufferSize);
 }
 
 void SceneView::RemoveShadow(Scene3D::Light light)
@@ -678,7 +685,10 @@ void SceneView::RemoveShadow(Scene3D::Light light)
   // reset framebuffer and remove it from render task.
   mShadowFrameBuffer.Reset();
   mShaderManager->RemoveShadow();
-  mShadowMapRenderTask.SetCameraActor(CameraActor());
+  if(mShadowMapRenderTask)
+  {
+    mShadowMapRenderTask.SetCameraActor(CameraActor());
+  }
 
   mShadowLight.Reset();
 
@@ -699,6 +709,13 @@ void SceneView::RemoveShadow(Scene3D::Light light)
     }
     SetShadow(lightEntity.first);
     break;
+  }
+
+  if(mShadowMapRenderTask)
+  {
+    RenderTaskList taskList = Integration::SceneHolder::Get(Self()).GetRenderTaskList();
+    taskList.RemoveTask(mShadowMapRenderTask);
+    mShadowMapRenderTask.Reset();
   }
 }
 
@@ -982,21 +999,12 @@ void SceneView::OnSceneConnection(int depth)
   if(mSceneHolder)
   {
     RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
-    mShadowMapRenderTask    = taskList.CreateTask();
-    mShadowMapRenderTask.SetSourceActor(mRootLayer);
-    mShadowMapRenderTask.SetExclusive(true);
-    mShadowMapRenderTask.SetInputEnabled(false);
-    mShadowMapRenderTask.SetCullMode(false);
-    mShadowMapRenderTask.SetClearEnabled(true);
-    mShadowMapRenderTask.SetClearColor(Color::WHITE);
-    mShadowMapRenderTask.SetRenderPassTag(10);
-    mShadowMapRenderTask.SetCameraActor(CameraActor());
-
     mRenderTask = taskList.CreateTask();
     mRenderTask.SetSourceActor(mRootLayer);
     mRenderTask.SetExclusive(true);
     mRenderTask.SetInputEnabled(true);
     mRenderTask.SetCullMode(false);
+    mRenderTask.SetOrderIndex(SCENE_ORDER_INDEX);
     mRenderTask.SetScreenToFrameBufferMappingActor(Self());
 
     UpdateRenderTask();
@@ -1367,11 +1375,30 @@ void SceneView::NotifyImageBasedLightTextureChange()
 
 void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
 {
+  if(!mShadowLight)
+  {
+    return;
+  }
+
+  if(!mShadowMapRenderTask)
+  {
+    RenderTaskList taskList = Integration::SceneHolder::Get(Self()).GetRenderTaskList();
+    mShadowMapRenderTask    = taskList.CreateTask();
+    mShadowMapRenderTask.SetSourceActor(mRootLayer);
+    mShadowMapRenderTask.SetExclusive(true);
+    mShadowMapRenderTask.SetInputEnabled(false);
+    mShadowMapRenderTask.SetCullMode(false);
+    mShadowMapRenderTask.SetClearEnabled(true);
+    mShadowMapRenderTask.SetClearColor(Color::WHITE);
+    mShadowMapRenderTask.SetRenderPassTag(10);
+    mShadowMapRenderTask.SetCameraActor(GetImplementation(mShadowLight).GetCamera());
+    mShadowMapRenderTask.SetOrderIndex(SHADOW_ORDER_INDEX);
+  }
+
   Dali::FrameBuffer currentShadowFrameBuffer = mShadowMapRenderTask.GetFrameBuffer();
-  if(mShadowLight &&
-     (!currentShadowFrameBuffer ||
-      !mShadowTexture ||
-      !Dali::Equals(DevelFrameBuffer::GetDepthTexture(currentShadowFrameBuffer).GetWidth(), shadowMapSize)))
+  if(!currentShadowFrameBuffer ||
+     !mShadowTexture ||
+     !Dali::Equals(DevelFrameBuffer::GetDepthTexture(currentShadowFrameBuffer).GetWidth(), shadowMapSize))
   {
     mShadowFrameBuffer.Reset();
     mShadowTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::DEPTH_UNSIGNED_INT, shadowMapSize, shadowMapSize);
