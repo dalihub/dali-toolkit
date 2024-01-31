@@ -1498,8 +1498,9 @@ public: // Default style & Input style
    * @brief Sets the input font's point size.
    *
    * @param[in] size The input font's point size.
+   * @param[in] defaultFontSizeUpdated True If the default font size is updated and sets the input point size, false otherwise.
    */
-  void SetInputFontPointSize(float size);
+  void SetInputFontPointSize(float size, bool defaultFontSizeUpdated = false);
 
   /**
    * @brief Retrieves the input font's point size.
