@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 
 constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
-const char* EMPTY_STRING = "";
+const char* EMPTY_STRING         = "";
 const char* MIME_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
 
 } // namespace
@@ -482,14 +482,14 @@ void Controller::Impl::UpdateAnchorColor()
       if(mModel->mLogicalModel->mColorRuns.Count() > anchor.colorRunIndex)
       {
         ColorRun& colorRun = *(mModel->mLogicalModel->mColorRuns.Begin() + anchor.colorRunIndex);
-        colorRun.color = mAnchorColor;
-        updateNeeded = true;
+        colorRun.color     = mAnchorColor;
+        updateNeeded       = true;
       }
       if(mModel->mLogicalModel->mUnderlinedCharacterRuns.Count() > anchor.underlinedCharacterRunIndex)
       {
         UnderlinedCharacterRun& underlineRun = *(mModel->mLogicalModel->mUnderlinedCharacterRuns.Begin() + anchor.underlinedCharacterRunIndex);
-        underlineRun.properties.color = mAnchorColor;
-        updateNeeded = true;
+        underlineRun.properties.color        = mAnchorColor;
+        updateNeeded                         = true;
       }
     }
     else if(!anchor.isMarkupClickedColorSet && anchor.isClicked)
@@ -497,14 +497,14 @@ void Controller::Impl::UpdateAnchorColor()
       if(mModel->mLogicalModel->mColorRuns.Count() > anchor.colorRunIndex)
       {
         ColorRun& colorRun = *(mModel->mLogicalModel->mColorRuns.Begin() + anchor.colorRunIndex);
-        colorRun.color = mAnchorClickedColor;
-        updateNeeded = true;
+        colorRun.color     = mAnchorClickedColor;
+        updateNeeded       = true;
       }
       if(mModel->mLogicalModel->mUnderlinedCharacterRuns.Count() > anchor.underlinedCharacterRunIndex)
       {
         UnderlinedCharacterRun& underlineRun = *(mModel->mLogicalModel->mUnderlinedCharacterRuns.Begin() + anchor.underlinedCharacterRunIndex);
-        underlineRun.properties.color = mAnchorClickedColor;
-        updateNeeded = true;
+        underlineRun.properties.color        = mAnchorClickedColor;
+        updateNeeded                         = true;
       }
     }
   }
@@ -1011,6 +1011,8 @@ void Controller::Impl::SetEditable(bool editable)
     {
       bool decoratorEditable = editable && mIsUserInteractionEnabled;
       mEventData->mDecorator->SetEditable(decoratorEditable);
+      mEventData->mDecoratorUpdated = true;
+      RequestRelayout();
     }
   }
 }
@@ -1387,7 +1389,7 @@ CharacterIndex Controller::Impl::CalculateNewCursorIndex(CharacterIndex index) c
   else
   {
     Length textLength = mModel->mVisualModel->mCharactersToGlyph.Count();
-    cursorIndex = cursorIndex + numberOfCharacters > textLength ? textLength : cursorIndex + numberOfCharacters;
+    cursorIndex       = cursorIndex + numberOfCharacters > textLength ? textLength : cursorIndex + numberOfCharacters;
   }
 
   // Will update the cursor hook position.
@@ -2013,6 +2015,8 @@ void Controller::Impl::SetUserInteractionEnabled(bool enabled)
   {
     bool editable = mEventData->mEditingEnabled && enabled;
     mEventData->mDecorator->SetEditable(editable);
+    mEventData->mDecoratorUpdated = true;
+    RequestRelayout();
   }
 }
 
