@@ -44,7 +44,7 @@ struct Controller::InputFontHandler
   static void               SetInputFontSlant(Controller& controller, FontSlant slant);
   static bool               IsInputFontSlantDefined(const Controller& controller);
   static FontSlant          GetInputFontSlant(const Controller& controller);
-  static void               SetInputFontPointSize(Controller& controller, float size);
+  static void               SetInputFontPointSize(Controller& controller, float size, bool defaultFontSizeUpdated);
   static float              GetInputFontPointSize(const Controller& controller);
 };
 
