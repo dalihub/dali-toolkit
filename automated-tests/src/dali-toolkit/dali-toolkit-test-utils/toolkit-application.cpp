@@ -18,14 +18,12 @@
 #include "toolkit-application.h"
 
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
-#include <dali/public-api/signals/dali-signal.h>
 #include <dali/devel-api/adaptor-framework/orientation.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 /**
  * Stub for the Application
@@ -33,24 +31,18 @@ namespace Dali
 class Application
 {
 public:
-
 public:
-
   Application(ToolkitApplication& toolkitApplication);
   ~Application();
 
 public:
-
   static std::string GetResourcePath();
 
   //Orientation& GetOrientation();
 
 public: // static methods
-
-public:  // Signals
-
+public: // Signals
 private:
-
   // Undefined
   Application(const Application&);
   Application& operator=(Application&);
@@ -88,6 +80,7 @@ std::string Application::GetResourcePath()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool ToolkitApplication::DECODED_IMAGES_SUPPORTED;
+bool ToolkitApplication::ADD_IDLE_SUCCESS = true;
 
 ToolkitApplication::ToolkitApplication()
 : mApplicationStub(new Application(*this))

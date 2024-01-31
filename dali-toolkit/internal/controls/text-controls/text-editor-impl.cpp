@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -817,17 +817,7 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
   // The text-editor adds an idle callback to the adaptor to emit the signals after the size negotiation.
   if(!mController->IsInputStyleChangedSignalsQueueEmpty())
   {
-    if(Adaptor::IsAvailable())
-    {
-      Adaptor& adaptor = Adaptor::Get();
-
-      if(NULL == mIdleCallback)
-      {
-        // @note: The callback manager takes the ownership of the callback object.
-        mIdleCallback = MakeCallback(this, &TextEditor::OnIdleSignal);
-        adaptor.AddIdle(mIdleCallback, false);
-      }
-    }
+    mController->RequestProcessInputStyleChangedSignals();
   }
 }
 
@@ -1319,15 +1309,6 @@ bool TextEditor::OnTouched(Actor actor, const TouchEvent& touch)
   return false;
 }
 
-void TextEditor::OnIdleSignal()
-{
-  // Emits the change of input style signals.
-  mController->ProcessInputStyleChangedSignals();
-
-  // Set the pointer to null as the callback manager deletes the callback after execute it.
-  mIdleCallback = NULL;
-}
-
 void TextEditor::ApplyScrollPosition()
 {
   const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
@@ -1378,7 +1359,6 @@ void TextEditor::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type typ
 TextEditor::TextEditor(ControlBehaviour additionalBehaviour)
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mAnimationPeriod(0.0f, 0.0f),
-  mIdleCallback(NULL),
   mAlignmentOffset(0.f),
   mScrollAnimationDuration(0.f),
   mLineSpacing(0.f),
@@ -1401,12 +1381,6 @@ TextEditor::TextEditor(ControlBehaviour additionalBehaviour)
 TextEditor::~TextEditor()
 {
   UnparentAndReset(mStencil);
-
-  if((NULL != mIdleCallback) && Adaptor::IsAvailable())
-  {
-    // Removes the callback from the callback manager in case the text-editor is destroyed before the callback is executed.
-    Adaptor::Get().RemoveIdle(mIdleCallback);
-  }
 }
 
 std::string TextEditor::TextEditorAccessible::GetName() const

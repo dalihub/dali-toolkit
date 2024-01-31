@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <memory.h>
 #include <cmath>
@@ -45,7 +46,7 @@ namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
-const char* EMPTY_STRING = "";
+const char* EMPTY_STRING         = "";
 const char* MIME_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
 
 template<typename Type>
@@ -1566,9 +1567,23 @@ bool Controller::IsInputStyleChangedSignalsQueueEmpty()
   return mImpl->IsInputStyleChangedSignalsQueueEmpty();
 }
 
-void Controller::ProcessInputStyleChangedSignals()
+void Controller::RequestProcessInputStyleChangedSignals()
 {
-  mImpl->ProcessInputStyleChangedSignals();
+  if(Dali::Adaptor::IsAvailable() && !mImpl->mProcessorRegistered)
+  {
+    mImpl->mProcessorRegistered = true;
+    Dali::Adaptor::Get().RegisterProcessor(*this, true);
+  }
+}
+
+void Controller::OnIdleSignal()
+{
+  if(mImpl->mIdleCallback)
+  {
+    mImpl->mIdleCallback = NULL;
+
+    mImpl->ProcessInputStyleChangedSignals();
+  }
 }
 
 void Controller::KeyboardFocusGainEvent()
@@ -1829,6 +1844,36 @@ int Controller::GetAnchorIndex(size_t characterOffset)
   return mImpl->GetAnchorIndex(characterOffset);
 }
 
+void Controller::Process(bool postProcess)
+{
+  if(Dali::Adaptor::IsAvailable() && mImpl->mProcessorRegistered)
+  {
+    Dali::Adaptor& adaptor = Dali::Adaptor::Get();
+
+    adaptor.UnregisterProcessor(*this, true);
+    mImpl->mProcessorRegistered = false;
+
+    if(NULL == mImpl->mIdleCallback)
+    {
+      // @note: The callback manager takes the ownership of the callback object.
+      mImpl->mIdleCallback = MakeCallback(this, &Controller::OnIdleSignal);
+      if(DALI_UNLIKELY(!adaptor.AddIdle(mImpl->mIdleCallback, false)))
+      {
+        DALI_LOG_ERROR("Fail to add idle callback for text controller style changed signals queue. Skip these callbacks\n");
+
+        // Clear queue forcely.
+        if(mImpl->mEventData)
+        {
+          mImpl->mEventData->mInputStyleChangedQueue.Clear();
+        }
+
+        // Set the pointer to null as the callback manager deletes the callback even AddIdle failed.
+        mImpl->mIdleCallback = NULL;
+      }
+    }
+  }
+}
+
 Controller::Controller(ControlInterface*           controlInterface,
                        EditableControlInterface*   editableControlInterface,
                        SelectableControlInterface* selectableControlInterface,
@@ -1839,6 +1884,17 @@ Controller::Controller(ControlInterface*           controlInterface,
 
 Controller::~Controller()
 {
+  if(Dali::Adaptor::IsAvailable())
+  {
+    if(mImpl->mProcessorRegistered)
+    {
+      Dali::Adaptor::Get().UnregisterProcessor(*this, true);
+    }
+    if(mImpl->mIdleCallback)
+    {
+      Dali::Adaptor::Get().RemoveIdle(mImpl->mIdleCallback);
+    }
+  }
 }
 
 } // namespace Dali::Toolkit::Text

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -352,6 +352,15 @@ private:
    */
   void ResetFastTrackLoadingTask();
 
+  /**
+   * @brief Update geometry information and get the generated result.
+   *
+   * @param[in] textureId Id of texture. It will be used when we use AddOn.
+   * @param[in] createForce True if we need to create geometry forcely. False if we don't re-generate geometry.
+   * @return Generated geometry, or empty handle if we don't need to update geometry.
+   */
+  Geometry GenerateGeometry(TextureManager::TextureId textureId, bool createForce);
+
 private:
   Vector4                            mPixelArea;
   Property::Index                    mPixelAreaIndex;
@@ -377,14 +386,15 @@ private:
   Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
   Vector4                                         mAtlasRect;
   Dali::ImageDimensions                           mAtlasRectSize;
-  TextureManager::LoadState                       mLoadState;                    ///< The texture loading state
-  bool                                            mAttemptAtlasing;              ///< If true will attempt atlasing, otherwise create unique texture
-  bool                                            mOrientationCorrection;        ///< true if the image will have it's orientation corrected.
-  bool                                            mNeedYuvToRgb{false};          ///< true if we need to convert yuv to rgb.
-  bool                                            mNeedUnifiedYuvAndRgb{false};  ///< true if we need to support both yuv and rgb.
-  bool                                            mEnableBrokenImage{true};      ///< true if enable broken image.
-  bool                                            mUseFastTrackUploading{false}; ///< True if we use fast tack feature.
-  bool                                            mRendererAdded{false};         ///< True if renderer added into actor.
+  TextureManager::LoadState                       mLoadState;                     ///< The texture loading state
+  bool                                            mAttemptAtlasing;               ///< If true will attempt atlasing, otherwise create unique texture
+  bool                                            mOrientationCorrection;         ///< true if the image will have it's orientation corrected.
+  bool                                            mNeedYuvToRgb{false};           ///< true if we need to convert yuv to rgb.
+  bool                                            mNeedUnifiedYuvAndRgb{false};   ///< true if we need to support both yuv and rgb.
+  bool                                            mEnableBrokenImage{true};       ///< true if enable broken image.
+  bool                                            mUseFastTrackUploading{false};  ///< True if we use fast tack feature.
+  bool                                            mRendererAdded{false};          ///< True if renderer added into actor.
+  bool                                            mUseBrokenImageRenderer{false}; ///< True if renderer changed as broken image.
 };
 
 } // namespace Internal

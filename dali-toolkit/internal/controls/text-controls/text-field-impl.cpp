@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -728,17 +728,7 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
   // The text-field adds an idle callback to the adaptor to emit the signals after the size negotiation.
   if(!mController->IsInputStyleChangedSignalsQueueEmpty())
   {
-    if(Adaptor::IsAvailable())
-    {
-      Adaptor& adaptor = Adaptor::Get();
-
-      if(NULL == mIdleCallback)
-      {
-        // @note: The callback manager takes the ownership of the callback object.
-        mIdleCallback = MakeCallback(this, &TextField::OnIdleSignal);
-        adaptor.AddIdle(mIdleCallback, false);
-      }
-    }
+    mController->RequestProcessInputStyleChangedSignals();
   }
 }
 
@@ -1157,18 +1147,8 @@ void TextField::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type
   mController->ChangedLayoutDirection();
 }
 
-void TextField::OnIdleSignal()
-{
-  // Emits the change of input style signals.
-  mController->ProcessInputStyleChangedSignals();
-
-  // Set the pointer to null as the callback manager deletes the callback after execute it.
-  mIdleCallback = NULL;
-}
-
 TextField::TextField(ControlBehaviour additionalBehaviour)
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
-  mIdleCallback(NULL),
   mAlignmentOffset(0.f),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mExceedPolicy(Dali::Toolkit::TextField::EXCEED_POLICY_CLIP),
@@ -1187,11 +1167,6 @@ TextField::TextField(ControlBehaviour additionalBehaviour)
 TextField::~TextField()
 {
   UnparentAndReset(mStencil);
-
-  if((NULL != mIdleCallback) && Adaptor::IsAvailable())
-  {
-    Adaptor::Get().RemoveIdle(mIdleCallback);
-  }
 }
 
 Vector<Vector2> TextField::GetTextSize(const uint32_t startIndex, const uint32_t endIndex) const

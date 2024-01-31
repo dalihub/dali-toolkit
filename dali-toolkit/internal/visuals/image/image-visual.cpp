@@ -534,6 +534,7 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
           imageSize = mPlacementActorSize;
         }
 
+        mUseBrokenImageRenderer = true;
         mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
         Texture brokenImage = mImpl->mRenderer.GetTextures().GetTexture(0);
         naturalSize.x       = brokenImage.GetWidth();
@@ -547,27 +548,6 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
 
 void ImageVisual::OnInitialize()
 {
-  Geometry geometry;
-
-  // Get the geometry
-  if(mImpl->mCustomShader)
-  {
-    geometry = CreateGeometry(mFactoryCache, mImpl->mCustomShader->mGridSize);
-  }
-  else // Get any geometry associated with the texture
-  {
-    TextureManager& textureManager = mFactoryCache.GetTextureManager();
-
-    uint32_t firstElementCount{0u};
-    uint32_t secondElementCount{0u};
-    geometry = textureManager.GetRenderGeometry(mTextureId, firstElementCount, secondElementCount);
-
-    if(!firstElementCount && !secondElementCount) // Otherwise use quad
-    {
-      geometry = CreateGeometry(mFactoryCache, ImageDimensions(1, 1));
-    }
-  }
-
   // Increase reference count of External Resources :
   // EncodedImageBuffer or ExternalTextures.
   // Reference count will be decreased at destructor of the visual.
@@ -577,7 +557,9 @@ void ImageVisual::OnInitialize()
     textureManager.UseExternalResource(mImageUrl.GetUrl());
   }
 
-  Shader shader = GenerateShader();
+  // Generate geometry and shader. Note that we should check AddOn when generate geometry, due to LoadPolicy::IMMEDIATE case
+  Geometry geometry = GenerateGeometry(mTextureId, true);
+  Shader   shader   = GenerateShader();
 
   // Create the renderer
   mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
@@ -777,7 +759,7 @@ void ImageVisual::InitializeRenderer()
     ComputeTextureSize();
     CheckMaskTexture();
 
-    bool needToUpdateShader = DevelTexture::IsNative(mTextures.GetTexture(0));
+    bool needToUpdateShader = DevelTexture::IsNative(mTextures.GetTexture(0)) || mUseBrokenImageRenderer;
 
     if(mTextures.GetTextureCount() == 3)
     {
@@ -793,6 +775,21 @@ void ImageVisual::InitializeRenderer()
       UpdateShader();
     }
     mTextures.Reset(); // Visual should not keep a handle to the texture after this point.
+
+    if(DALI_UNLIKELY(mUseBrokenImageRenderer))
+    {
+      // We need to re-generate geometry only if it was broken image before, and result changed after Reload.
+      auto geometry = GenerateGeometry(mTextureId, true);
+
+      // Update geometry only if we need.
+      if(geometry)
+      {
+        mImpl->mRenderer.SetGeometry(geometry);
+      }
+    }
+
+    // We don't use broken image anymore.
+    mUseBrokenImageRenderer = false;
   }
 
   if(attemptAtlasing) // the texture is packed inside atlas
@@ -1042,6 +1039,7 @@ void ImageVisual::FastLoadComplete(FastTrackLoadingTaskPtr task)
 void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureInformation)
 {
   Toolkit::Visual::ResourceStatus resourceStatus;
+
   if(mImpl->mRenderer)
   {
     EnablePreMultipliedAlpha(textureInformation.preMultiplied);
@@ -1062,13 +1060,20 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
       ComputeTextureSize();
       CheckMaskTexture();
 
+      bool needToUpdateShader = mUseBrokenImageRenderer;
+
       if(textureInformation.textureSet.GetTextureCount() == 3)
       {
         if(textureInformation.textureSet.GetTexture(0).GetPixelFormat() == Pixel::L8 && textureInformation.textureSet.GetTexture(1).GetPixelFormat() == Pixel::CHROMINANCE_U && textureInformation.textureSet.GetTexture(2).GetPixelFormat() == Pixel::CHROMINANCE_V)
         {
-          mNeedYuvToRgb = true;
-          UpdateShader();
+          mNeedYuvToRgb      = true;
+          needToUpdateShader = true;
         }
+      }
+
+      if(needToUpdateShader)
+      {
+        UpdateShader();
       }
 
       if(actor)
@@ -1078,6 +1083,19 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
         // reset the weak handle so that the renderer only get added to actor once
         mPlacementActor.Reset();
       }
+
+      auto geometry = GenerateGeometry(textureInformation.textureId, mUseBrokenImageRenderer);
+
+      if(DALI_UNLIKELY(geometry))
+      {
+        // Rare cases. If load successed image don't use quad geometry (i.e. Show some n-patch broken image, and call Reload(), and success)
+        // or If given texture use AddOn,
+        // then we need to make to use quad geometry and update shader agian.
+        mImpl->mRenderer.SetGeometry(geometry);
+      }
+
+      // We don't use broken image anymore.
+      mUseBrokenImageRenderer = false;
     }
   }
 
@@ -1097,36 +1115,6 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
   {
     resourceStatus = Toolkit::Visual::ResourceStatus::FAILED;
     mLoadState     = TextureManager::LoadState::LOAD_FAILED;
-  }
-
-  // use geometry if needed
-  if(loadingSuccess)
-  {
-    uint32_t firstElementCount{0u};
-    uint32_t secondElementCount{0u};
-    auto     geometry = mFactoryCache.GetTextureManager().GetRenderGeometry(mTextureId, firstElementCount, secondElementCount);
-    if(mImpl->mRenderer && geometry)
-    {
-      mImpl->mRenderer.SetGeometry(geometry);
-      Dali::DevelRenderer::DrawCommand drawCommand{};
-      drawCommand.drawType = DevelRenderer::DrawType::INDEXED;
-
-      if(firstElementCount)
-      {
-        drawCommand.firstIndex   = 0;
-        drawCommand.elementCount = firstElementCount;
-        drawCommand.queue        = DevelRenderer::RENDER_QUEUE_OPAQUE;
-        DevelRenderer::AddDrawCommand(mImpl->mRenderer, drawCommand);
-      }
-
-      if(secondElementCount)
-      {
-        drawCommand.firstIndex   = firstElementCount;
-        drawCommand.elementCount = secondElementCount;
-        drawCommand.queue        = DevelRenderer::RENDER_QUEUE_TRANSPARENT;
-        DevelRenderer::AddDrawCommand(mImpl->mRenderer, drawCommand);
-      }
-    }
   }
 
   // Signal to observers ( control ) that resources are ready. Must be all resources.
@@ -1369,6 +1357,7 @@ void ImageVisual::ShowBrokenImage()
       }
     }
 
+    mUseBrokenImageRenderer = true;
     mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
     if(actor)
     {
@@ -1399,6 +1388,59 @@ void ImageVisual::ResetFastTrackLoadingTask()
     Dali::AsyncTaskManager::Get().RemoveTask(mFastTrackLoadingTask);
     mFastTrackLoadingTask.Reset();
   }
+}
+
+Geometry ImageVisual::GenerateGeometry(TextureManager::TextureId textureId, bool createForce)
+{
+  Geometry geometry;
+  if(Stage::IsInstalled())
+  {
+    if(mImpl->mCustomShader)
+    {
+      if(createForce)
+      {
+        geometry = CreateGeometry(mFactoryCache, mImpl->mCustomShader->mGridSize);
+      }
+    }
+    else
+    {
+      uint32_t firstElementCount{0u};
+      uint32_t secondElementCount{0u};
+
+      geometry = mFactoryCache.GetTextureManager().GetRenderGeometry(textureId, firstElementCount, secondElementCount);
+      if(geometry)
+      {
+        if(mImpl->mRenderer)
+        {
+          Dali::DevelRenderer::DrawCommand drawCommand{};
+          drawCommand.drawType = DevelRenderer::DrawType::INDEXED;
+
+          if(firstElementCount)
+          {
+            drawCommand.firstIndex   = 0;
+            drawCommand.elementCount = firstElementCount;
+            drawCommand.queue        = DevelRenderer::RENDER_QUEUE_OPAQUE;
+            DevelRenderer::AddDrawCommand(mImpl->mRenderer, drawCommand);
+          }
+
+          if(secondElementCount)
+          {
+            drawCommand.firstIndex   = firstElementCount;
+            drawCommand.elementCount = secondElementCount;
+            drawCommand.queue        = DevelRenderer::RENDER_QUEUE_TRANSPARENT;
+            DevelRenderer::AddDrawCommand(mImpl->mRenderer, drawCommand);
+          }
+        }
+      }
+      else if(createForce)
+      {
+        // Create default quad geometry now
+        geometry = CreateGeometry(mFactoryCache, ImageDimensions(1, 1));
+      }
+    }
+  }
+
+  return geometry;
 }
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TOOLKIT_APPLICATION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 namespace Dali
 {
-
 class Application;
 
 /**
@@ -30,18 +29,14 @@ class Application;
 class ToolkitApplication
 {
 public: // Construction & Destruction
-
   ToolkitApplication();
   ~ToolkitApplication();
 
 public: // Getters
-
   Application& GetApplication();
 
 public: // Signal Emissions
-
 public: // TEST FUNCTIONS
-
   // Enumeration of Application methods
   enum TestFuncEnum
   {
@@ -68,7 +63,6 @@ public: // TEST FUNCTIONS
   }
 
 private:
-
   struct TestFunctions
   {
     TestFunctions()
@@ -88,6 +82,7 @@ private:
 
 public: // Test static member
   static bool DECODED_IMAGES_SUPPORTED;
+  static bool ADD_IDLE_SUCCESS; ///< Default as true.
 };
 
 } // namespace Dali

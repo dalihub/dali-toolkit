@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +85,8 @@ const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg"
 const char* TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
 const char* TEST_WEBP_FILE_NAME                  = TEST_RESOURCE_DIR "/dali-logo.webp";
 
+const char* TEST_OVERWRITABLE_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/overwritable-image.jpg";
+
 void TestUrl(ImageView imageView, const std::string url)
 {
   Property::Value value = imageView.GetProperty(imageView.GetPropertyIndex("image"));
@@ -92,6 +94,38 @@ void TestUrl(ImageView imageView, const std::string url)
   std::string urlActual;
   DALI_TEST_CHECK(value.Get(urlActual));
   DALI_TEST_EQUALS(urlActual, url, TEST_LOCATION);
+}
+
+void OverwriteImage(const char* sourceFilename)
+{
+  FILE* fpOut = fopen(TEST_OVERWRITABLE_IMAGE_FILE_NAME, "wb");
+  DALI_TEST_CHECK(fpOut);
+  if(fpOut)
+  {
+    FILE* fpIn = fopen(sourceFilename, "rb");
+    if(fpIn)
+    {
+      fseek(fpIn, 0, SEEK_END);
+      size_t size = ftell(fpIn);
+
+      tet_printf("Open %s success! file size : %zu byte\n", sourceFilename, size);
+      Dali::Vector<uint8_t> data;
+      data.Resize(size);
+      fseek(fpIn, 0, SEEK_SET);
+      size_t realSize = fread(data.Begin(), sizeof(uint8_t), size, fpIn);
+      fclose(fpIn);
+      data.Resize(realSize);
+
+      // Overwrite
+      fwrite(data.Begin(), sizeof(uint8_t), size, fpOut);
+    }
+    else
+    {
+      tet_printf("Open %s failed! write invalid\n", sourceFilename);
+      fprintf(fpOut, "invalid\n");
+    }
+    fclose(fpOut);
+  }
 }
 
 } // namespace
@@ -4799,6 +4833,86 @@ int UtcDaliImageViewSetImageOnResourceReadySignal10(void)
   END_TEST;
 }
 
+int UtcDaliImageViewSetImageOnResourceReadySignal10WhenAddIdleFailed(void)
+{
+  tet_infoline("Test ResourceReady signal comes more than 2 times, but do not call again if AddIdle failed");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+
+  // Dummy view to cache image.
+  ImageView dummyView = ImageView::New(gImage_34_RGBA);
+  application.GetScene().Add(dummyView);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  // Make AddIdle failed.
+  ToolkitApplication::ADD_IDLE_SUCCESS = false;
+
+  try
+  {
+    gImageView1 = ImageView::New();
+    gImageView1.SetProperty(Toolkit::ImageView::Property::IMAGE, gImage_34_RGBA);
+    gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal10);
+    application.GetScene().Add(gImageView1); // It will call resourceReady signal 1 time.
+
+    tet_printf("ResourceReady called %d times\n", gResourceReadySignalCounter);
+
+    DALI_TEST_GREATER(gResourceReadySignal10MaxCounter, gResourceReadySignalCounter, TEST_LOCATION); // Check whether resource ready call too much.
+
+    for(int i = 0; i < gResourceReadySignal10MaxCounter; ++i)
+    {
+      tet_printf("RunIdles\n");
+      // Executes the idle callbacks.
+      application.RunIdles();
+      application.SendNotification();
+      application.Render();
+      tet_printf("RunIdles done\n");
+    }
+    tet_printf("ResourceReady called %d times\n", gResourceReadySignalCounter);
+
+    DALI_TEST_GREATER(gResourceReadySignal10MaxCounter, gResourceReadySignalCounter, TEST_LOCATION); // Check whether resource ready not called multiple times.
+
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    // Exception should not happened
+    DALI_TEST_CHECK(false);
+  }
+
+  ToolkitApplication::ADD_IDLE_SUCCESS = true;
+
+  // Clear cache.
+  application.SendNotification();
+  application.Render();
+
+  gResourceReadySignalCounter = 0;
+
+  gResourceReadySignalCounter = 0;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+
+  END_TEST;
+}
+
 int UtcDaliImageViewSetImageOnResourceReadySignal11(void)
 {
   tet_infoline("Test ResourceReady Add AnimatedImageVisual and then Remove immediately.");
@@ -5392,6 +5506,125 @@ int UtcDaliImageViewTransitionEffect03(void)
   // Clear all cached
   imageView.Unparent();
   imageView.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliImageViewImageLoadFailureAndReload01(void)
+{
+  tet_infoline("Try to load invalid image first, and then reload after that image valid.");
+  ToolkitTestApplication application;
+
+  gResourceReadySignalFired = false;
+
+  // Make overwritable image invalid first.
+  OverwriteImage("");
+
+  ImageView imageView = ImageView::New(TEST_OVERWRITABLE_IMAGE_FILE_NAME);
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
+  imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
+
+  application.GetScene().Add(imageView);
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+  gResourceReadySignalFired = false;
+
+  // Make overwritable image valid now.
+  OverwriteImage(gImage_34_RGBA);
+
+  // Reload the image
+  Property::Map attributes;
+  DevelControl::DoAction(imageView, ImageView::Property::IMAGE, DevelImageVisual::Action::RELOAD, attributes);
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::READY, TEST_LOCATION);
+
+  // Make overwritable image invalid end of test (for clean).
+  OverwriteImage("");
+
+  gResourceReadySignalFired = false;
+
+  END_TEST;
+}
+
+int UtcDaliImageViewImageLoadFailureAndReload02(void)
+{
+  tet_infoline("Try to load invalid image first, and then reload after that image valid.");
+  tet_infoline("This case, broken image was n-patch. So we should check whether Geometry / Shader changed after reload");
+  ToolkitTestApplication application;
+
+  Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::SMALL, TEST_BROKEN_IMAGE_S);
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::NORMAL, TEST_BROKEN_IMAGE_M);
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::LARGE, TEST_BROKEN_IMAGE_L);
+
+  gResourceReadySignalFired = false;
+
+  // Make overwritable image invalid first.
+  OverwriteImage("");
+
+  ImageView imageView = ImageView::New(TEST_OVERWRITABLE_IMAGE_FILE_NAME);
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
+  imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
+
+  application.GetScene().Add(imageView);
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(imageView.GetRendererCount(), 1u, TEST_LOCATION);
+  Geometry brokenGeometry = imageView.GetRendererAt(0u).GetGeometry();
+  Shader   brokenShader   = imageView.GetRendererAt(0u).GetShader();
+  DALI_TEST_CHECK(brokenGeometry);
+  DALI_TEST_CHECK(brokenShader);
+
+  gResourceReadySignalFired = false;
+
+  // Make overwritable image valid now.
+  OverwriteImage(gImage_34_RGBA);
+
+  // Reload the image
+  Property::Map attributes;
+  DevelControl::DoAction(imageView, ImageView::Property::IMAGE, DevelImageVisual::Action::RELOAD, attributes);
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::READY, TEST_LOCATION);
+
+  // Check whether we don't use n-patch shader and geometry in this case.
+  DALI_TEST_EQUALS(imageView.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_CHECK(brokenGeometry != imageView.GetRendererAt(0u).GetGeometry());
+  DALI_TEST_CHECK(brokenShader != imageView.GetRendererAt(0u).GetShader());
+
+  // Make overwritable image invalid end of test (for clean).
+  OverwriteImage("");
+
+  gResourceReadySignalFired = false;
 
   END_TEST;
 }

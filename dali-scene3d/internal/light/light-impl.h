@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_LIGHT_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/custom-actor-impl.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <string_view>
@@ -44,7 +44,7 @@ namespace Internal
  *
  * @SINCE_2_2.32
  */
-class DALI_SCENE3D_API Light : public CustomActorImpl
+class DALI_SCENE3D_API Light : public Toolkit::Internal::Control
 {
 public:
   // Creation & Destruction
@@ -215,7 +215,6 @@ protected:
   void Initialize();
 
 public: // Public Method
-
   /**
    * @copydoc Scene3D::Light::GetMaximumEnabledLightCount()
    */
@@ -258,10 +257,10 @@ private:
   /// @cond internal
 
   // Not copyable or movable
-  DALI_INTERNAL        Light(const Light&)     = delete; ///< Deleted copy constructor.
-  DALI_INTERNAL        Light(Light&&)          = delete; ///< Deleted move constructor.
+  DALI_INTERNAL Light(const Light&) = delete;            ///< Deleted copy constructor.
+  DALI_INTERNAL Light(Light&&)      = delete;            ///< Deleted move constructor.
   DALI_INTERNAL Light& operator=(const Light&) = delete; ///< Deleted copy assignment operator.
-  DALI_INTERNAL Light& operator=(Light&&)      = delete; ///< Deleted move assignment operator.
+  DALI_INTERNAL Light& operator=(Light&&) = delete;      ///< Deleted move assignment operator.
 
 private:
   Dali::CameraActor              mLightSourceActor;

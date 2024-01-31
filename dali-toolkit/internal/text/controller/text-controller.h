@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali-toolkit/devel-api/text/spanned.h>
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
+#include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/events/gesture.h>
 
 // INTERNAL INCLUDES
@@ -70,7 +71,12 @@ typedef IntrusivePtr<Controller> ControllerPtr;
  *
  * The text selection popup button callbacks are as well handled via the TextSelectionPopupCallbackInterface interface.
  */
-class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface, public HiddenText::Observer, public ConnectionTracker
+class Controller : public RefObject,
+                   public Decorator::ControllerInterface,
+                   public TextSelectionPopupCallbackInterface,
+                   public HiddenText::Observer,
+                   public ConnectionTracker,
+                   public Integration::Processor
 {
 public: // Enumerated types.
   /**
@@ -1916,12 +1922,22 @@ public: // Input style change signals.
   bool IsInputStyleChangedSignalsQueueEmpty();
 
   /**
-   * @brief Process all pending input style changed signals.
+   * @brief Request process all pending input style changed signals.
    *
-   * Calls the Text::ControlInterface::InputStyleChanged() method which is overriden by the
+   * Request to calls the Text::ControlInterface::InputStyleChanged() method which is overriden by the
    * text controls. Text controls may send signals to state the input style has changed.
+   *
+   * The signal will be execute next idle time, or skip if we fail to add idler.
    */
-  void ProcessInputStyleChangedSignals();
+  void RequestProcessInputStyleChangedSignals();
+
+private:
+  /**
+   * @brief Callbacks called on idle.
+   *
+   * If there are notifications of change of input style on the queue, Toolkit::TextField::InputStyleChangedSignal() are emitted.
+   */
+  void OnIdleSignal();
 
 public: // Text-input Event Queuing.
   /**
@@ -2167,6 +2183,20 @@ protected: // Inherit from HiddenText.
    * @brief Invoked from HiddenText when showing time of the last character was expired
    */
   void DisplayTimeExpired() override;
+
+protected: // Inherit from Integration::Processor
+  /**
+   * @copydoc Dali::Integration::Processor::Process()
+   */
+  void Process(bool postProcess) override;
+
+  /**
+   * @copydoc Dali::Integration::Processor::GetProcessorName()
+   */
+  std::string_view GetProcessorName() const override
+  {
+    return "Text::Controller";
+  }
 
 private: // Private contructors & copy operator.
   /**
