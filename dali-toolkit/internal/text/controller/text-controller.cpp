@@ -782,6 +782,11 @@ void Controller::SetDefaultFontSize(float fontSize, FontSizeType type)
   mImpl->ClearFontData();
 
   mImpl->RequestRelayout();
+
+  if(mImpl->mEventData && EventData::INACTIVE != mImpl->mEventData->mState)
+  {
+    SetInputFontPointSize(fontSize, true);
+  }
 }
 
 float Controller::GetDefaultFontSize(FontSizeType type) const
@@ -1129,9 +1134,9 @@ FontSlant Controller::GetInputFontSlant() const
   return InputFontHandler::GetInputFontSlant(*this);
 }
 
-void Controller::SetInputFontPointSize(float size)
+void Controller::SetInputFontPointSize(float size, bool defaultFontSizeUpdated)
 {
-  InputFontHandler::SetInputFontPointSize(*this, size);
+  InputFontHandler::SetInputFontPointSize(*this, size, defaultFontSizeUpdated);
 }
 
 float Controller::GetInputFontPointSize() const

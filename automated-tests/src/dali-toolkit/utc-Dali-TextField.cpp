@@ -3027,6 +3027,10 @@ int utcDaliTextFieldEvent04(void)
 
   // Tap grab handle
   TestGenerateTap(application, 0.0f, 40.0f);
+
+  field.SetProperty(TextField::Property::POINT_SIZE, 12.f);
+  DALI_TEST_EQUALS(field.GetProperty<float>(TextField::Property::INPUT_POINT_SIZE), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
   END_TEST;
 }
 
