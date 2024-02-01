@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,13 @@
 
 #include "toolkit-timer.h"
 
-#include <dali/devel-api/adaptor-framework/web-engine/web-engine.h>
-#include <dali/devel-api/adaptor-framework/web-engine/web-engine-back-forward-list.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-back-forward-list-item.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-back-forward-list.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-certificate.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-console-message.h>
-#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context.h>
-#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context-menu.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-context-menu-item.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context-menu.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-form-repost-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-frame.h>
@@ -35,24 +34,22 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-request-interceptor.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-security-origin.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-settings.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h>
-#include <memory>
 #include <string.h>
 #include <toolkit-application.h>
+#include <memory>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace Adaptor
 {
-
 class WebEngine;
 class MockWebEngineContext;
 class MockWebEngineCookieManager;
@@ -61,9 +58,9 @@ namespace
 {
 // Generally only one WebEngine instance exists.
 // If > 1, a new web engine has been created by CreateWindowSignal.
-WebEngine* gInstance = nullptr;
-int gInstanceCount = 0;
-MockWebEngineContext* gWebEngineContextInstance = nullptr;
+WebEngine*                  gInstance                   = nullptr;
+int                         gInstanceCount              = 0;
+MockWebEngineContext*       gWebEngineContextInstance   = nullptr;
 MockWebEngineCookieManager* gMockWebEngineCookieManager = nullptr;
 
 bool OnGoBack();
@@ -88,24 +85,24 @@ bool OnRequestIntercepted();
 bool OnChangesWatch();
 bool OnPlainTextReceived();
 
-static void ConnectToGlobalSignal( bool ( *func )() )
+static void ConnectToGlobalSignal(bool (*func)())
 {
-  Dali::Timer timer = Dali::Timer::New( 0 );
-  timer.TickSignal().Connect( func );
+  Dali::Timer timer = Dali::Timer::New(0);
+  timer.TickSignal().Connect(func);
 }
 
-static void DisconnectFromGlobalSignal( bool ( *func )() )
+static void DisconnectFromGlobalSignal(bool (*func)())
 {
-  Dali::Timer timer = Dali::Timer::New( 0 );
-  timer.TickSignal().Disconnect( func );
+  Dali::Timer timer = Dali::Timer::New(0);
+  timer.TickSignal().Disconnect(func);
 }
-} // namespace anonymous
+} // namespace
 
 class MockWebEngineContext : public Dali::WebEngineContext
 {
 public:
   MockWebEngineContext()
-    : mockModel( Dali::WebEngineContext::CacheModel::DOCUMENT_VIEWER )
+  : mockModel(Dali::WebEngineContext::CacheModel::DOCUMENT_VIEWER)
   {
   }
 
@@ -114,12 +111,12 @@ public:
     return mockModel;
   }
 
-  void SetCacheModel( Dali::WebEngineContext::CacheModel cacheModel ) override
+  void SetCacheModel(Dali::WebEngineContext::CacheModel cacheModel) override
   {
     mockModel = cacheModel;
   }
 
-  void SetProxyUri( const std::string& uri ) override
+  void SetProxyUri(const std::string& uri) override
   {
     mockProxyUri = uri;
   }
@@ -139,11 +136,11 @@ public:
     return mockBypassRule;
   }
 
-  void SetDefaultProxyAuth( const std::string& username, const std::string& password ) override
+  void SetDefaultProxyAuth(const std::string& username, const std::string& password) override
   {
   }
 
-  void SetCertificateFilePath( const std::string& certificatePath ) override
+  void SetCertificateFilePath(const std::string& certificatePath) override
   {
     mockCertificateFilePath = certificatePath;
   }
@@ -159,7 +156,7 @@ public:
 
   bool GetWebDatabaseOrigins(Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback callback) override
   {
-    if (callback)
+    if(callback)
     {
       ConnectToGlobalSignal(&OnSecurityOriginAcquired);
       mSecurityOriginAcquiredCallback = callback;
@@ -174,7 +171,7 @@ public:
 
   bool GetWebStorageOrigins(Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback callback) override
   {
-    if (callback)
+    if(callback)
     {
       ConnectToGlobalSignal(&OnSecurityOriginAcquired);
       mSecurityOriginAcquiredCallback = callback;
@@ -184,7 +181,7 @@ public:
 
   bool GetWebStorageUsageForOrigin(Dali::WebEngineSecurityOrigin& origin, Dali::WebEngineContext::WebEngineStorageUsageAcquiredCallback callback) override
   {
-    if (callback)
+    if(callback)
     {
       ConnectToGlobalSignal(&OnStorageUsageAcquired);
       mStorageUsageAcquiredCallback = callback;
@@ -216,7 +213,7 @@ public:
 
   void GetFormPasswordList(Dali::WebEngineContext::WebEngineFormPasswordAcquiredCallback callback) override
   {
-    if (callback)
+    if(callback)
     {
       ConnectToGlobalSignal(&OnFormPasswordAcquired);
       mFormPasswordAcquiredCallback = callback;
@@ -225,7 +222,7 @@ public:
 
   void RegisterDownloadStartedCallback(Dali::WebEngineContext::WebEngineDownloadStartedCallback callback) override
   {
-    if (callback)
+    if(callback)
     {
       ConnectToGlobalSignal(&OnDownloadStarted);
       mDownloadStartedCallback = callback;
@@ -234,7 +231,7 @@ public:
 
   void RegisterMimeOverriddenCallback(Dali::WebEngineContext::WebEngineMimeOverriddenCallback callback) override
   {
-    if (callback)
+    if(callback)
     {
       ConnectToGlobalSignal(&OnMimeOverridden);
       mMimeOverriddenCallback = callback;
@@ -243,14 +240,14 @@ public:
 
   void RegisterRequestInterceptedCallback(Dali::WebEngineContext::WebEngineRequestInterceptedCallback callback) override
   {
-    if (callback)
+    if(callback)
     {
       ConnectToGlobalSignal(&OnRequestIntercepted);
       mRequestInterceptedCallback = callback;
     }
   }
 
-  void EnableCache( bool cacheEnabled ) override
+  void EnableCache(bool cacheEnabled) override
   {
     mockCacheEnabled = cacheEnabled;
   }
@@ -345,7 +342,7 @@ private:
 
 Dali::WebEngineContext* GetContext()
 {
-  if (!gWebEngineContextInstance)
+  if(!gWebEngineContextInstance)
   {
     gWebEngineContextInstance = new MockWebEngineContext();
   }
@@ -356,11 +353,11 @@ class MockWebEngineCookieManager : public Dali::WebEngineCookieManager
 {
 public:
   MockWebEngineCookieManager()
-    : mockCookieAcceptPolicy( Dali::WebEngineCookieManager::CookieAcceptPolicy::NO_THIRD_PARTY )
+  : mockCookieAcceptPolicy(Dali::WebEngineCookieManager::CookieAcceptPolicy::NO_THIRD_PARTY)
   {
   }
 
-  void SetCookieAcceptPolicy( Dali::WebEngineCookieManager::CookieAcceptPolicy policy ) override
+  void SetCookieAcceptPolicy(Dali::WebEngineCookieManager::CookieAcceptPolicy policy) override
   {
     mockCookieAcceptPolicy = policy;
   }
@@ -374,15 +371,15 @@ public:
   {
   }
 
-  void SetPersistentStorage( const std::string& path, Dali::WebEngineCookieManager::CookiePersistentStorage storage ) override
+  void SetPersistentStorage(const std::string& path, Dali::WebEngineCookieManager::CookiePersistentStorage storage) override
   {
   }
 
-  void ChangesWatch( Dali::WebEngineCookieManager::WebEngineCookieManagerChangesWatchCallback callback ) override
+  void ChangesWatch(Dali::WebEngineCookieManager::WebEngineCookieManagerChangesWatchCallback callback) override
   {
-    if ( callback )
+    if(callback)
     {
-      ConnectToGlobalSignal( &OnChangesWatch );
+      ConnectToGlobalSignal(&OnChangesWatch);
       mChangesWatchCallback = callback;
     }
   }
@@ -396,7 +393,7 @@ private:
 
 Dali::WebEngineCookieManager* GetCookieManager()
 {
-  if (!gMockWebEngineCookieManager)
+  if(!gMockWebEngineCookieManager)
   {
     gMockWebEngineCookieManager = new MockWebEngineCookieManager();
   }
@@ -407,9 +404,9 @@ class MockWebEngineBackForwardListItem : public Dali::WebEngineBackForwardListIt
 {
 public:
   MockWebEngineBackForwardListItem()
-    : mockUrl( "http://url" ),
-      mockTitle( "title" ),
-      mockOriginalUrl( "http://originalurl" )
+  : mockUrl("http://url"),
+    mockTitle("title"),
+    mockOriginalUrl("http://originalurl")
   {
   }
 
@@ -459,7 +456,7 @@ public:
     return ret;
   }
 
-  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetItemAtIndex( uint32_t index ) const override
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetItemAtIndex(uint32_t index) const override
   {
     std::unique_ptr<Dali::WebEngineBackForwardListItem> ret(new MockWebEngineBackForwardListItem());
     return ret;
@@ -473,7 +470,7 @@ public:
   std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> GetBackwardItems(int limit) override
   {
     std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> ret;
-    std::unique_ptr<Dali::WebEngineBackForwardListItem> item(new MockWebEngineBackForwardListItem());
+    std::unique_ptr<Dali::WebEngineBackForwardListItem>              item(new MockWebEngineBackForwardListItem());
     ret.push_back(std::move(item));
     return ret;
   }
@@ -481,7 +478,7 @@ public:
   std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> GetForwardItems(int limit) override
   {
     std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> ret;
-    std::unique_ptr<Dali::WebEngineBackForwardListItem> item(new MockWebEngineBackForwardListItem());
+    std::unique_ptr<Dali::WebEngineBackForwardListItem>              item(new MockWebEngineBackForwardListItem());
     ret.push_back(std::move(item));
     return ret;
   }
@@ -546,7 +543,9 @@ public:
   {
   }
 
-  void Reply(bool allowed) override {}
+  void Reply(bool allowed) override
+  {
+  }
 };
 
 class MockWebEngineFrame : public Dali::WebEngineFrame
@@ -660,7 +659,7 @@ class MockWebEngineLoadError : public Dali::WebEngineLoadError
 {
 public:
   MockWebEngineLoadError(const std::string& url)
-    : mockUrl(url)
+  : mockUrl(url)
   {
   }
 
@@ -753,7 +752,7 @@ public:
   std::vector<std::unique_ptr<WebEngineContextMenuItem>> GetItemList() const override
   {
     std::vector<std::unique_ptr<WebEngineContextMenuItem>> result;
-    std::unique_ptr<Dali::WebEngineContextMenuItem> webitem(new MockWebEngineContextMenuItem());
+    std::unique_ptr<Dali::WebEngineContextMenuItem>        webitem(new MockWebEngineContextMenuItem());
     result.push_back(std::move(webitem));
     return result;
   }
@@ -845,9 +844,7 @@ public:
   {
     uint8_t* imageData = new uint8_t[16];
     memset(imageData, 0xff, 16);
-    return Dali::PixelData::New(imageData, 16, 2, 2,
-                                Dali::Pixel::Format::RGBA8888,
-                                Dali::PixelData::ReleaseFunction::DELETE_ARRAY);
+    return Dali::PixelData::New(imageData, 16, 2, 2, Dali::Pixel::Format::RGBA8888, Dali::PixelData::ReleaseFunction::DELETE_ARRAY);
   }
 
 private:
@@ -858,8 +855,8 @@ class MockWebEngineSecurityOrigin : public Dali::WebEngineSecurityOrigin
 {
 public:
   MockWebEngineSecurityOrigin()
-    : mockUrl("https://test.html")
-    , mockPotocol("https")
+  : mockUrl("https://test.html"),
+    mockPotocol("https")
   {
   }
 
@@ -882,22 +879,22 @@ class MockWebEngineSettings : public WebEngineSettings
 {
 public:
   MockWebEngineSettings()
-    : mockDefaultFontSize( 16 ),
-      mockJavaScriptEnabled( true ),
-      mockAutoFittingEnabled ( true ),
-      mockPluginsEnabled ( true ),
-      mockPrivateBrowsingEnabled( true ),
-      mockLinkMagnifierEnabled( true ),
-      mockKeypadWithoutUserActionUsed( true ),
-      mockAutofillPasswordFormEnabled( true ),
-      mockFormCandidateDataEnabled( true ),
-      mockTextSelectionEnabled( true ),
-      mockTextAutosizingEnable( true ),
-      mockArrowScrollEnable( true ),
-      mockClipboardEnabled( true ),
-      mockImePanelEnabled( true ),
-      mockImageLoadedAutomatically( true ),
-      mockDefaultTextEncodingName()
+  : mockDefaultFontSize(16),
+    mockJavaScriptEnabled(true),
+    mockAutoFittingEnabled(true),
+    mockPluginsEnabled(true),
+    mockPrivateBrowsingEnabled(true),
+    mockLinkMagnifierEnabled(true),
+    mockKeypadWithoutUserActionUsed(true),
+    mockAutofillPasswordFormEnabled(true),
+    mockFormCandidateDataEnabled(true),
+    mockTextSelectionEnabled(true),
+    mockTextAutosizingEnable(true),
+    mockArrowScrollEnable(true),
+    mockClipboardEnabled(true),
+    mockImePanelEnabled(true),
+    mockImageLoadedAutomatically(true),
+    mockDefaultTextEncodingName()
   {
   }
 
@@ -906,7 +903,7 @@ public:
     return mockDefaultFontSize;
   }
 
-  void SetDefaultFontSize( uint32_t size ) override
+  void SetDefaultFontSize(uint32_t size) override
   {
     mockDefaultFontSize = size;
   }
@@ -916,7 +913,7 @@ public:
     return mockJavaScriptEnabled;
   }
 
-  void EnableJavaScript( bool enabled ) override
+  void EnableJavaScript(bool enabled) override
   {
     mockJavaScriptEnabled = enabled;
   }
@@ -926,7 +923,7 @@ public:
     return mockAutoFittingEnabled;
   }
 
-  void EnableAutoFitting( bool enabled ) override
+  void EnableAutoFitting(bool enabled) override
   {
     mockAutoFittingEnabled = enabled;
   }
@@ -936,7 +933,7 @@ public:
     return mockPluginsEnabled;
   }
 
-  void EnablePlugins( bool enabled ) override
+  void EnablePlugins(bool enabled) override
   {
     mockPluginsEnabled = enabled;
   }
@@ -946,7 +943,7 @@ public:
     return mockPrivateBrowsingEnabled;
   }
 
-  void EnablePrivateBrowsing( bool enabled ) override
+  void EnablePrivateBrowsing(bool enabled) override
   {
     mockPrivateBrowsingEnabled = enabled;
   }
@@ -956,7 +953,7 @@ public:
     return mockLinkMagnifierEnabled;
   }
 
-  void EnableLinkMagnifier( bool enabled ) override
+  void EnableLinkMagnifier(bool enabled) override
   {
     mockLinkMagnifierEnabled = enabled;
   }
@@ -966,7 +963,7 @@ public:
     return mockKeypadWithoutUserActionUsed;
   }
 
-  void UseKeypadWithoutUserAction( bool used ) override
+  void UseKeypadWithoutUserAction(bool used) override
   {
     mockKeypadWithoutUserActionUsed = used;
   }
@@ -976,7 +973,7 @@ public:
     return mockAutofillPasswordFormEnabled;
   }
 
-  void EnableAutofillPasswordForm( bool enabled ) override
+  void EnableAutofillPasswordForm(bool enabled) override
   {
     mockAutofillPasswordFormEnabled = enabled;
   }
@@ -986,7 +983,7 @@ public:
     return mockFormCandidateDataEnabled;
   }
 
-  void EnableFormCandidateData( bool enabled ) override
+  void EnableFormCandidateData(bool enabled) override
   {
     mockFormCandidateDataEnabled = enabled;
   }
@@ -996,7 +993,7 @@ public:
     return mockTextSelectionEnabled;
   }
 
-  void EnableTextSelection( bool enabled ) override
+  void EnableTextSelection(bool enabled) override
   {
     mockTextSelectionEnabled = enabled;
   }
@@ -1006,7 +1003,7 @@ public:
     return mockTextAutosizingEnable;
   }
 
-  void EnableTextAutosizing( bool enabled ) override
+  void EnableTextAutosizing(bool enabled) override
   {
     mockTextAutosizingEnable = enabled;
   }
@@ -1016,7 +1013,7 @@ public:
     return mockArrowScrollEnable;
   }
 
-  void EnableArrowScroll( bool enabled ) override
+  void EnableArrowScroll(bool enabled) override
   {
     mockArrowScrollEnable = enabled;
   }
@@ -1026,7 +1023,7 @@ public:
     return mockClipboardEnabled;
   }
 
-  void EnableClipboard( bool enabled ) override
+  void EnableClipboard(bool enabled) override
   {
     mockClipboardEnabled = enabled;
   }
@@ -1036,7 +1033,7 @@ public:
     return mockImePanelEnabled;
   }
 
-  void EnableImePanel( bool enabled ) override
+  void EnableImePanel(bool enabled) override
   {
     mockImePanelEnabled = enabled;
   }
@@ -1046,7 +1043,7 @@ public:
     return mockImageLoadedAutomatically;
   }
 
-  void AllowImagesLoadAutomatically( bool automatic ) override
+  void AllowImagesLoadAutomatically(bool automatic) override
   {
     mockImageLoadedAutomatically = automatic;
   }
@@ -1056,40 +1053,40 @@ public:
     return mockDefaultTextEncodingName;
   }
 
-  void SetDefaultTextEncodingName( const std::string& defaultTextEncodingName ) override
+  void SetDefaultTextEncodingName(const std::string& defaultTextEncodingName) override
   {
     mockDefaultTextEncodingName = defaultTextEncodingName;
   }
 
-  void AllowMixedContents( bool allowed ) override
+  void AllowMixedContents(bool allowed) override
   {
   }
 
-  void EnableSpatialNavigation( bool enabled ) override
+  void EnableSpatialNavigation(bool enabled) override
   {
   }
 
-  void EnableWebSecurity( bool enabled ) override
+  void EnableWebSecurity(bool enabled) override
   {
   }
 
-  void EnableCacheBuilder( bool enabled ) override
+  void EnableCacheBuilder(bool enabled) override
   {
   }
 
-  void UseScrollbarThumbFocusNotifications( bool used ) override
+  void UseScrollbarThumbFocusNotifications(bool used) override
   {
   }
 
-  void EnableDoNotTrack( bool enabled ) override
+  void EnableDoNotTrack(bool enabled) override
   {
   }
 
-  void AllowFileAccessFromExternalUrl( bool allowed ) override
+  void AllowFileAccessFromExternalUrl(bool allowed) override
   {
   }
 
-  void AllowScriptsOpenWindows( bool allowed ) override
+  void AllowScriptsOpenWindows(bool allowed) override
   {
   }
 
@@ -1124,131 +1121,365 @@ public:
 
   bool IsExtraFeatureEnabled(const std::string& feature) const override
   {
-    return  true;
+    return true;
   }
 
 private:
-  int mockDefaultFontSize;
-  bool mockJavaScriptEnabled;
-  bool mockAutoFittingEnabled;
-  bool mockPluginsEnabled;
-  bool mockPrivateBrowsingEnabled;
-  bool mockLinkMagnifierEnabled;
-  bool mockKeypadWithoutUserActionUsed;
-  bool mockAutofillPasswordFormEnabled;
-  bool mockFormCandidateDataEnabled;
-  bool mockTextSelectionEnabled;
-  bool mockTextAutosizingEnable;
-  bool mockArrowScrollEnable;
-  bool mockClipboardEnabled;
-  bool mockImePanelEnabled;
-  bool mockImageLoadedAutomatically;
+  int         mockDefaultFontSize;
+  bool        mockJavaScriptEnabled;
+  bool        mockAutoFittingEnabled;
+  bool        mockPluginsEnabled;
+  bool        mockPrivateBrowsingEnabled;
+  bool        mockLinkMagnifierEnabled;
+  bool        mockKeypadWithoutUserActionUsed;
+  bool        mockAutofillPasswordFormEnabled;
+  bool        mockFormCandidateDataEnabled;
+  bool        mockTextSelectionEnabled;
+  bool        mockTextAutosizingEnable;
+  bool        mockArrowScrollEnable;
+  bool        mockClipboardEnabled;
+  bool        mockImePanelEnabled;
+  bool        mockImageLoadedAutomatically;
   std::string mockDefaultTextEncodingName;
 };
 
 class MockWebEnginePlugin : public Dali::WebEnginePlugin
 {
 public:
-  MockWebEnginePlugin(){}
-  void Create(uint32_t width, uint32_t height, const std::string& locale, const std::string& timezoneId) override {}
-  void Create(uint32_t width, uint32_t height, uint32_t argc, char** argv) override {}
-  void Destroy() override {}
-  WebEngineSettings& GetSettings() const override { return *((WebEngineSettings*)&settings); }
-  WebEngineBackForwardList& GetBackForwardList() const override { return *((WebEngineBackForwardList*)&backForwardList); }
-  void LoadUrl(const std::string& url) override {}
-  std::string GetTitle() const override { return std::string(); }
-  Dali::PixelData GetFavicon() const override { return Dali::PixelData(); }
-  NativeImageSourcePtr GetNativeImageSource() override { return nullptr; }
-  std::string GetUrl() const override { return std::string(); }
-  void LoadHtmlString(const std::string& htmlString) override {}
-  bool LoadHtmlStringOverrideCurrentEntry(const std::string& html, const std::string& basicUri, const std::string& unreachableUrl) override { return false; }
-  bool LoadContents(const int8_t* contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri) override { return false; }
-  void Reload() override {}
-  bool ReloadWithoutCache() override { return false; }
-  void StopLoading() override {}
-  void Suspend() override {}
-  void Resume() override {}
-  void SuspendNetworkLoading() override {}
-  void ResumeNetworkLoading() override {}
-  bool AddCustomHeader(const std::string& name, const std::string& value) override { return false; }
-  bool RemoveCustomHeader(const std::string& name) override { return false; }
-  uint32_t StartInspectorServer(uint32_t port) override { return 0; }
-  bool StopInspectorServer() override { return false; }
-  void ScrollBy(int32_t deltaX, int32_t deltaY) override {}
-  bool ScrollEdgeBy(int32_t deltaX, int32_t deltaY) override { return false; }
-  void SetScrollPosition(int32_t x, int32_t y) override {}
-  Dali::Vector2 GetScrollPosition() const override { return Dali::Vector2(); }
-  Dali::Vector2 GetScrollSize() const override { return Dali::Vector2(); }
-  Dali::Vector2 GetContentSize() const override { return Dali::Vector2(); }
-  bool CanGoForward() override { return false; }
-  void GoForward() override {}
-  bool CanGoBack() override { return false; }
-  void GoBack() override {}
-  void EvaluateJavaScript(const std::string& script, JavaScriptMessageHandlerCallback resultHandler) override {}
-  void AddJavaScriptMessageHandler(const std::string& exposedObjectName, JavaScriptMessageHandlerCallback handler) override {}
-  void RegisterJavaScriptAlertCallback(JavaScriptAlertCallback callback) override {}
-  void JavaScriptAlertReply() override {}
-  void RegisterJavaScriptConfirmCallback(JavaScriptConfirmCallback callback) override {}
-  void JavaScriptConfirmReply(bool confirmed) override {}
-  void RegisterJavaScriptPromptCallback(JavaScriptPromptCallback callback) override {}
-  void JavaScriptPromptReply(const std::string& result) override {}
-  std::unique_ptr<Dali::WebEngineHitTest> CreateHitTest(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode) override { return nullptr; }
-  bool CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, WebEngineHitTestCreatedCallback callback) override { return false; }
-  void ClearHistory() override {}
-  void ClearAllTilesResources() override {}
-  std::string GetUserAgent() const override { return std::string(); }
-  void SetUserAgent(const std::string& userAgent) override {}
-  void SetSize(uint32_t width, uint32_t height) override {}
-  void SetDocumentBackgroundColor(Dali::Vector4 color) override {}
-  void ClearTilesWhenHidden(bool cleared) override {}
-  void SetTileCoverAreaMultiplier(float multiplier) override {}
-  void EnableCursorByClient(bool enabled) override {}
-  std::string GetSelectedText() const override { return std::string(); }
-  bool SendTouchEvent(const TouchEvent& touch) override { return false; }
-  bool SendKeyEvent(const KeyEvent& event) override { return false; }
-  void EnableMouseEvents(bool enabled) override {}
-  void EnableKeyEvents(bool enabled) override {}
-  void SetFocus(bool focused) override {}
-  void SetPageZoomFactor(float zoomFactor) override {}
-  float GetPageZoomFactor() const override { return 0.0f; }
-  void SetTextZoomFactor(float zoomFactor) override {}
-  float GetTextZoomFactor() const override { return 0.0f; }
-  float GetLoadProgressPercentage() const override { return 0.0f; }
-  void SetScaleFactor(float scaleFactor, Dali::Vector2 point) override {}
-  float GetScaleFactor() const override { return 0.0f; }
-  void ActivateAccessibility(bool activated) override {}
-  Accessibility::Address GetAccessibilityAddress() override { return Accessibility::Address(); }
-  bool SetVisibility(bool visible) override { return false; }
-  bool HighlightText(const std::string& text, FindOption options, uint32_t maxMatchCount) override { return false; }
-  void AddDynamicCertificatePath(const std::string& host, const std::string& certPath) override {}
-  Dali::PixelData GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor) override { return Dali::PixelData(); }
-  bool GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, ScreenshotCapturedCallback callback) override { return false; }
-  bool CheckVideoPlayingAsynchronously(VideoPlayingCallback callback) override { return false; }
-  void RegisterGeolocationPermissionCallback(GeolocationPermissionCallback callback) override {}
-  void UpdateDisplayArea(Dali::Rect<int32_t> displayArea) override {}
-  void EnableVideoHole(bool enabled) override {}
-  bool SendHoverEvent(const HoverEvent& event) override { return false; }
-  bool SendWheelEvent(const WheelEvent& event) override { return false; }
-  void RegisterFrameRenderedCallback(WebEngineFrameRenderedCallback callback) override {}
-  void RegisterPageLoadStartedCallback(WebEnginePageLoadCallback callback) override {}
-  void RegisterPageLoadInProgressCallback(WebEnginePageLoadCallback callback) override {}
-  void RegisterPageLoadFinishedCallback(WebEnginePageLoadCallback callback) override {}
-  void RegisterPageLoadErrorCallback(WebEnginePageLoadErrorCallback callback) override {}
-  void RegisterScrollEdgeReachedCallback(WebEngineScrollEdgeReachedCallback callback) override {}
-  void RegisterUrlChangedCallback(WebEngineUrlChangedCallback callback) override {}
-  void RegisterFormRepostDecidedCallback(WebEngineFormRepostDecidedCallback callback) override {}
-  void RegisterConsoleMessageReceivedCallback(WebEngineConsoleMessageReceivedCallback callback) override {}
-  void RegisterResponsePolicyDecidedCallback(WebEngineResponsePolicyDecidedCallback callback) override {}
-  void RegisterNavigationPolicyDecidedCallback(WebEngineNavigationPolicyDecidedCallback callback) override {}
-  void RegisterNewWindowCreatedCallback(WebEngineNewWindowCreatedCallback callback) override {}
-  void RegisterCertificateConfirmedCallback(WebEngineCertificateCallback callback) override {}
-  void RegisterSslCertificateChangedCallback(WebEngineCertificateCallback callback) override {}
-  void RegisterHttpAuthHandlerCallback(WebEngineHttpAuthHandlerCallback callback) override {}
-  void RegisterContextMenuShownCallback(WebEngineContextMenuShownCallback callback) override {}
-  void RegisterContextMenuHiddenCallback(WebEngineContextMenuHiddenCallback callback) override {}
-  void GetPlainTextAsynchronously(PlainTextReceivedCallback callback) override {}
+  MockWebEnginePlugin()
+  {
+  }
+  void Create(uint32_t width, uint32_t height, const std::string& locale, const std::string& timezoneId) override
+  {
+  }
+  void Create(uint32_t width, uint32_t height, uint32_t argc, char** argv) override
+  {
+  }
+  void Destroy() override
+  {
+  }
+  WebEngineSettings& GetSettings() const override
+  {
+    return *((WebEngineSettings*)&settings);
+  }
+  WebEngineBackForwardList& GetBackForwardList() const override
+  {
+    return *((WebEngineBackForwardList*)&backForwardList);
+  }
+  void LoadUrl(const std::string& url) override
+  {
+  }
+  std::string GetTitle() const override
+  {
+    return std::string();
+  }
+  Dali::PixelData GetFavicon() const override
+  {
+    return Dali::PixelData();
+  }
+  NativeImageSourcePtr GetNativeImageSource() override
+  {
+    return nullptr;
+  }
+  std::string GetUrl() const override
+  {
+    return std::string();
+  }
+  void LoadHtmlString(const std::string& htmlString) override
+  {
+  }
+  bool LoadHtmlStringOverrideCurrentEntry(const std::string& html, const std::string& basicUri, const std::string& unreachableUrl) override
+  {
+    return false;
+  }
+  bool LoadContents(const int8_t* contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri) override
+  {
+    return false;
+  }
+  void Reload() override
+  {
+  }
+  bool ReloadWithoutCache() override
+  {
+    return false;
+  }
+  void StopLoading() override
+  {
+  }
+  void Suspend() override
+  {
+  }
+  void Resume() override
+  {
+  }
+  void SuspendNetworkLoading() override
+  {
+  }
+  void ResumeNetworkLoading() override
+  {
+  }
+  bool AddCustomHeader(const std::string& name, const std::string& value) override
+  {
+    return false;
+  }
+  bool RemoveCustomHeader(const std::string& name) override
+  {
+    return false;
+  }
+  uint32_t StartInspectorServer(uint32_t port) override
+  {
+    return 0;
+  }
+  bool StopInspectorServer() override
+  {
+    return false;
+  }
+  void ScrollBy(int32_t deltaX, int32_t deltaY) override
+  {
+  }
+  bool ScrollEdgeBy(int32_t deltaX, int32_t deltaY) override
+  {
+    return false;
+  }
+  void SetScrollPosition(int32_t x, int32_t y) override
+  {
+  }
+  Dali::Vector2 GetScrollPosition() const override
+  {
+    return Dali::Vector2();
+  }
+  Dali::Vector2 GetScrollSize() const override
+  {
+    return Dali::Vector2();
+  }
+  Dali::Vector2 GetContentSize() const override
+  {
+    return Dali::Vector2();
+  }
+  bool CanGoForward() override
+  {
+    return false;
+  }
+  void GoForward() override
+  {
+  }
+  bool CanGoBack() override
+  {
+    return false;
+  }
+  void GoBack() override
+  {
+  }
+  void EvaluateJavaScript(const std::string& script, JavaScriptMessageHandlerCallback resultHandler) override
+  {
+  }
+  void AddJavaScriptMessageHandler(const std::string& exposedObjectName, JavaScriptMessageHandlerCallback handler) override
+  {
+  }
+  void RegisterJavaScriptAlertCallback(JavaScriptAlertCallback callback) override
+  {
+  }
+  void JavaScriptAlertReply() override
+  {
+  }
+  void RegisterJavaScriptConfirmCallback(JavaScriptConfirmCallback callback) override
+  {
+  }
+  void JavaScriptConfirmReply(bool confirmed) override
+  {
+  }
+  void RegisterJavaScriptPromptCallback(JavaScriptPromptCallback callback) override
+  {
+  }
+  void JavaScriptPromptReply(const std::string& result) override
+  {
+  }
+  std::unique_ptr<Dali::WebEngineHitTest> CreateHitTest(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode) override
+  {
+    return nullptr;
+  }
+  bool CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, WebEngineHitTestCreatedCallback callback) override
+  {
+    return false;
+  }
+  void ClearHistory() override
+  {
+  }
+  void ClearAllTilesResources() override
+  {
+  }
+  std::string GetUserAgent() const override
+  {
+    return std::string();
+  }
+  void SetUserAgent(const std::string& userAgent) override
+  {
+  }
+  void SetSize(uint32_t width, uint32_t height) override
+  {
+  }
+  void SetDocumentBackgroundColor(Dali::Vector4 color) override
+  {
+  }
+  void ClearTilesWhenHidden(bool cleared) override
+  {
+  }
+  void SetTileCoverAreaMultiplier(float multiplier) override
+  {
+  }
+  void EnableCursorByClient(bool enabled) override
+  {
+  }
+  std::string GetSelectedText() const override
+  {
+    return std::string();
+  }
+  bool SendTouchEvent(const TouchEvent& touch) override
+  {
+    return false;
+  }
+  bool SendKeyEvent(const KeyEvent& event) override
+  {
+    return false;
+  }
+  void EnableMouseEvents(bool enabled) override
+  {
+  }
+  void EnableKeyEvents(bool enabled) override
+  {
+  }
+  void SetFocus(bool focused) override
+  {
+  }
+  void SetPageZoomFactor(float zoomFactor) override
+  {
+  }
+  float GetPageZoomFactor() const override
+  {
+    return 0.0f;
+  }
+  void SetTextZoomFactor(float zoomFactor) override
+  {
+  }
+  float GetTextZoomFactor() const override
+  {
+    return 0.0f;
+  }
+  float GetLoadProgressPercentage() const override
+  {
+    return 0.0f;
+  }
+  void SetScaleFactor(float scaleFactor, Dali::Vector2 point) override
+  {
+  }
+  float GetScaleFactor() const override
+  {
+    return 0.0f;
+  }
+  void ActivateAccessibility(bool activated) override
+  {
+  }
+  Accessibility::Address GetAccessibilityAddress() override
+  {
+    return Accessibility::Address();
+  }
+  bool SetVisibility(bool visible) override
+  {
+    return false;
+  }
+  bool HighlightText(const std::string& text, FindOption options, uint32_t maxMatchCount) override
+  {
+    return false;
+  }
+  void AddDynamicCertificatePath(const std::string& host, const std::string& certPath) override
+  {
+  }
+  Dali::PixelData GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor) override
+  {
+    return Dali::PixelData();
+  }
+  bool GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, ScreenshotCapturedCallback callback) override
+  {
+    return false;
+  }
+  bool CheckVideoPlayingAsynchronously(VideoPlayingCallback callback) override
+  {
+    return false;
+  }
+  void RegisterGeolocationPermissionCallback(GeolocationPermissionCallback callback) override
+  {
+  }
+  void UpdateDisplayArea(Dali::Rect<int32_t> displayArea) override
+  {
+  }
+  void EnableVideoHole(bool enabled) override
+  {
+  }
+  bool SendHoverEvent(const HoverEvent& event) override
+  {
+    return false;
+  }
+  bool SendWheelEvent(const WheelEvent& event) override
+  {
+    return false;
+  }
+  void RegisterFrameRenderedCallback(WebEngineFrameRenderedCallback callback) override
+  {
+  }
+  void RegisterPageLoadStartedCallback(WebEnginePageLoadCallback callback) override
+  {
+  }
+  void RegisterPageLoadInProgressCallback(WebEnginePageLoadCallback callback) override
+  {
+  }
+  void RegisterPageLoadFinishedCallback(WebEnginePageLoadCallback callback) override
+  {
+  }
+  void RegisterPageLoadErrorCallback(WebEnginePageLoadErrorCallback callback) override
+  {
+  }
+  void RegisterScrollEdgeReachedCallback(WebEngineScrollEdgeReachedCallback callback) override
+  {
+  }
+  void RegisterUrlChangedCallback(WebEngineUrlChangedCallback callback) override
+  {
+  }
+  void RegisterFormRepostDecidedCallback(WebEngineFormRepostDecidedCallback callback) override
+  {
+  }
+  void RegisterConsoleMessageReceivedCallback(WebEngineConsoleMessageReceivedCallback callback) override
+  {
+  }
+  void RegisterResponsePolicyDecidedCallback(WebEngineResponsePolicyDecidedCallback callback) override
+  {
+  }
+  void RegisterNavigationPolicyDecidedCallback(WebEngineNavigationPolicyDecidedCallback callback) override
+  {
+  }
+  void RegisterNewWindowCreatedCallback(WebEngineNewWindowCreatedCallback callback) override
+  {
+  }
+  void RegisterCertificateConfirmedCallback(WebEngineCertificateCallback callback) override
+  {
+  }
+  void RegisterSslCertificateChangedCallback(WebEngineCertificateCallback callback) override
+  {
+  }
+  void RegisterHttpAuthHandlerCallback(WebEngineHttpAuthHandlerCallback callback) override
+  {
+  }
+  void RegisterContextMenuShownCallback(WebEngineContextMenuShownCallback callback) override
+  {
+  }
+  void RegisterContextMenuHiddenCallback(WebEngineContextMenuHiddenCallback callback) override
+  {
+  }
+  void GetPlainTextAsynchronously(PlainTextReceivedCallback callback) override
+  {
+  }
+
 private:
-  MockWebEngineSettings settings;
+  MockWebEngineSettings        settings;
   MockWebEngineBackForwardList backForwardList;
 };
 
@@ -1326,33 +1557,32 @@ private:
   Dali::Property::Map mockHeadersMap;
 };
 
-class WebEngine: public Dali::BaseObject
+class WebEngine : public Dali::BaseObject
 {
 public:
-
   WebEngine()
-    : mUrl()
-    , mCurrentPlusOnePos( 0 )
-    , mUserAgent()
-    , mEvaluating( false )
-    , mScrollPosition( 0, 0 )
-    , mScrollSize( 500, 500 )
-    , mContentSize( 500, 500 )
+  : mUrl(),
+    mCurrentPlusOnePos(0),
+    mUserAgent(),
+    mEvaluating(false),
+    mScrollPosition(0, 0),
+    mScrollSize(500, 500),
+    mContentSize(500, 500)
   {
     gInstanceCount++;
-    if ( gInstanceCount == 1 ) // only first web engine need be saved.
+    if(gInstanceCount == 1) // only first web engine need be saved.
     {
       gInstance = this;
     }
 
-    mockWebEngineSettings = new MockWebEngineSettings();
+    mockWebEngineSettings        = new MockWebEngineSettings();
     mockWebEngineBackForwardList = new MockWebEngineBackForwardList();
   }
 
   virtual ~WebEngine()
   {
     gInstanceCount--;
-    if( !gInstanceCount )
+    if(!gInstanceCount)
     {
       gInstance = nullptr;
     }
@@ -1371,10 +1601,10 @@ public:
     return *mockWebEngineBackForwardList;
   }
 
-  void LoadUrl( const std::string& url )
+  void LoadUrl(const std::string& url)
   {
     mUrl = url;
-    ConnectToGlobalSignal( &OnLoadUrl );
+    ConnectToGlobalSignal(&OnLoadUrl);
   }
 
   std::string GetUrl() const
@@ -1390,14 +1620,12 @@ public:
   Dali::PixelData GetFavicon() const
   {
     static int testGetFaviconCount = 0;
-    if (testGetFaviconCount == 0)
+    if(testGetFaviconCount == 0)
     {
       testGetFaviconCount++;
       uint8_t* faviconData = new uint8_t[16];
       memset(faviconData, 0xff, 16);
-      return Dali::PixelData::New(faviconData, 16, 2, 2,
-                                  Dali::Pixel::Format::RGBA8888,
-                                  Dali::PixelData::ReleaseFunction::DELETE_ARRAY);
+      return Dali::PixelData::New(faviconData, 16, 2, 2, Dali::Pixel::Format::RGBA8888, Dali::PixelData::ReleaseFunction::DELETE_ARRAY);
     }
     else
     {
@@ -1412,7 +1640,7 @@ public:
 
   void GoForward()
   {
-    ConnectToGlobalSignal( &OnGoForward );
+    ConnectToGlobalSignal(&OnGoForward);
   }
 
   bool CanGoBack() const
@@ -1422,44 +1650,44 @@ public:
 
   void GoBack()
   {
-    ConnectToGlobalSignal( &OnGoBack );
+    ConnectToGlobalSignal(&OnGoBack);
   }
 
-  void EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler )
+  void EvaluateJavaScript(const std::string& script, std::function<void(const std::string&)> resultHandler)
   {
-    if( resultHandler )
+    if(resultHandler)
     {
-      if( !mEvaluating )
+      if(!mEvaluating)
       {
-        ConnectToGlobalSignal( &OnEvaluteJavaScript );
+        ConnectToGlobalSignal(&OnEvaluteJavaScript);
       }
-      mResultCallbacks.push_back( resultHandler );
+      mResultCallbacks.push_back(resultHandler);
     }
   }
 
-  void RegisterJavaScriptAlertCallback( Dali::WebEnginePlugin::JavaScriptAlertCallback callback )
+  void RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptAlertCallback callback)
   {
-    if ( callback )
+    if(callback)
     {
-      ConnectToGlobalSignal( &OnJavaScriptAlert );
+      ConnectToGlobalSignal(&OnJavaScriptAlert);
       mJavaScriptAlertCallback = callback;
     }
   }
 
-  void RegisterJavaScriptConfirmCallback( Dali::WebEnginePlugin::JavaScriptConfirmCallback callback )
+  void RegisterJavaScriptConfirmCallback(Dali::WebEnginePlugin::JavaScriptConfirmCallback callback)
   {
-    if ( callback )
+    if(callback)
     {
-      ConnectToGlobalSignal( &OnJavaScriptConfirm );
+      ConnectToGlobalSignal(&OnJavaScriptConfirm);
       mJavaScriptConfirmCallback = callback;
     }
   }
 
-  void RegisterJavaScriptPromptCallback( Dali::WebEnginePlugin::JavaScriptPromptCallback callback )
+  void RegisterJavaScriptPromptCallback(Dali::WebEnginePlugin::JavaScriptPromptCallback callback)
   {
-    if ( callback )
+    if(callback)
     {
-      ConnectToGlobalSignal( &OnJavaScriptPrompt );
+      ConnectToGlobalSignal(&OnJavaScriptPrompt);
       mJavaScriptPromptCallback = callback;
     }
   }
@@ -1472,9 +1700,9 @@ public:
 
   bool CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback callback)
   {
-    if (callback)
+    if(callback)
     {
-      ConnectToGlobalSignal( &OnHitTestCreated );
+      ConnectToGlobalSignal(&OnHitTestCreated);
       mHitTestCreatedCallback = callback;
     }
     return true;
@@ -1482,7 +1710,7 @@ public:
 
   void ClearHistory()
   {
-    ConnectToGlobalSignal( &OnClearHistory );
+    ConnectToGlobalSignal(&OnClearHistory);
   }
 
   std::string GetUserAgent() const
@@ -1490,31 +1718,31 @@ public:
     return mUserAgent;
   }
 
-  void SetUserAgent( const std::string& userAgent )
+  void SetUserAgent(const std::string& userAgent)
   {
     mUserAgent = userAgent;
   }
 
-  void ScrollBy( int32_t dx, int32_t dy )
+  void ScrollBy(int32_t dx, int32_t dy)
   {
-    mScrollPosition += Dali::Vector2( dx, dy );
-    if ( mScrollPosition.y + mScrollSize.height > mContentSize.height )
+    mScrollPosition += Dali::Vector2(dx, dy);
+    if(mScrollPosition.y + mScrollSize.height > mContentSize.height)
     {
-      ConnectToGlobalSignal( &OnScrollEdge );
+      ConnectToGlobalSignal(&OnScrollEdge);
     }
   }
 
-  bool ScrollEdgeBy( int32_t dx, int32_t dy )
+  bool ScrollEdgeBy(int32_t dx, int32_t dy)
   {
-    mScrollPosition += Dali::Vector2( dx, dy );
-    if ( mScrollPosition.y + mScrollSize.height > mContentSize.height )
+    mScrollPosition += Dali::Vector2(dx, dy);
+    if(mScrollPosition.y + mScrollSize.height > mContentSize.height)
     {
-      ConnectToGlobalSignal( &OnScrollEdge );
+      ConnectToGlobalSignal(&OnScrollEdge);
     }
     return true;
   }
 
-  void SetScrollPosition( int32_t x, int32_t y )
+  void SetScrollPosition(int32_t x, int32_t y)
   {
     mScrollPosition.x = x;
     mScrollPosition.y = y;
@@ -1570,6 +1798,12 @@ public:
     return mScaleFactor;
   }
 
+  bool SetVisibility(bool visible)
+  {
+    mVisible = visible;
+    return true;
+  }
+
   Dali::Accessibility::Address GetAccessibilityAddress()
   {
     return {":9.99", "root"};
@@ -1577,19 +1811,17 @@ public:
 
   Dali::PixelData GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
   {
-    uint32_t bufferSize = viewArea.width * viewArea.height * 4 ;
-    uint8_t* pixel = new uint8_t[ bufferSize ];
+    uint32_t bufferSize = viewArea.width * viewArea.height * 4;
+    uint8_t* pixel      = new uint8_t[bufferSize];
     memset(pixel, 0xff, bufferSize);
-    return Dali::PixelData::New( pixel, bufferSize, viewArea.width, viewArea.height,
-                                 Dali::Pixel::Format::RGBA8888,
-                                 Dali::PixelData::ReleaseFunction::DELETE_ARRAY );
+    return Dali::PixelData::New(pixel, bufferSize, viewArea.width, viewArea.height, Dali::Pixel::Format::RGBA8888, Dali::PixelData::ReleaseFunction::DELETE_ARRAY);
   }
 
   bool GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::WebEnginePlugin::ScreenshotCapturedCallback callback)
   {
-    if ( callback )
+    if(callback)
     {
-      ConnectToGlobalSignal( &OnScreenshotCaptured );
+      ConnectToGlobalSignal(&OnScreenshotCaptured);
       mScreenshotCapturedCallback = callback;
     }
     return true;
@@ -1597,9 +1829,9 @@ public:
 
   bool CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayingCallback callback)
   {
-    if ( callback )
+    if(callback)
     {
-      ConnectToGlobalSignal( &OnVideoPlaying );
+      ConnectToGlobalSignal(&OnVideoPlaying);
       mVideoPlayingCallback = callback;
     }
     return true;
@@ -1607,9 +1839,9 @@ public:
 
   void RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback)
   {
-    if ( callback )
+    if(callback)
     {
-      ConnectToGlobalSignal( &OnGeolocationPermission );
+      ConnectToGlobalSignal(&OnGeolocationPermission);
       mGeolocationPermissionCallback = callback;
     }
   }
@@ -1701,7 +1933,7 @@ public:
 
   void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
   {
-    if (callback)
+    if(callback)
     {
       ConnectToGlobalSignal(&OnPlainTextReceived);
       mPlainTextReceivedCallback = callback;
@@ -1717,6 +1949,7 @@ public:
   float mPageZoomFactor;
   float mTextZoomFactor;
   float mScaleFactor;
+  bool  mVisible;
 
   Dali::Vector2             mScrollPosition;
   Dali::Vector2             mScrollSize;
@@ -1753,15 +1986,13 @@ public:
   Dali::WebEnginePlugin::PlainTextReceivedCallback                mPlainTextReceivedCallback;
 };
 
-
 namespace
 {
-
 bool OnGoBack()
 {
-  DisconnectFromGlobalSignal( &OnGoBack );
+  DisconnectFromGlobalSignal(&OnGoBack);
 
-  if( gInstance && gInstance->CanGoBack() )
+  if(gInstance && gInstance->CanGoBack())
   {
     gInstance->mCurrentPlusOnePos--;
   }
@@ -1770,9 +2001,9 @@ bool OnGoBack()
 
 bool OnGoForward()
 {
-  DisconnectFromGlobalSignal( &OnGoForward );
+  DisconnectFromGlobalSignal(&OnGoForward);
 
-  if( gInstance && gInstance->CanGoForward() )
+  if(gInstance && gInstance->CanGoForward())
   {
     gInstance->mCurrentPlusOnePos++;
   }
@@ -1781,87 +2012,87 @@ bool OnGoForward()
 
 bool OnLoadUrl()
 {
-  DisconnectFromGlobalSignal( &OnLoadUrl );
+  DisconnectFromGlobalSignal(&OnLoadUrl);
 
-  if( gInstance )
+  if(gInstance)
   {
-    if( gInstance->mHistory.size() > gInstance->mCurrentPlusOnePos )
+    if(gInstance->mHistory.size() > gInstance->mCurrentPlusOnePos)
     {
-      gInstance->mHistory.erase( gInstance->mHistory.begin() + gInstance->mCurrentPlusOnePos, gInstance->mHistory.end() );
+      gInstance->mHistory.erase(gInstance->mHistory.begin() + gInstance->mCurrentPlusOnePos, gInstance->mHistory.end());
     }
-    gInstance->mHistory.push_back( gInstance->mUrl );
+    gInstance->mHistory.push_back(gInstance->mUrl);
     gInstance->mCurrentPlusOnePos++;
-    if (gInstance->mPageLoadStartedCallback)
+    if(gInstance->mPageLoadStartedCallback)
     {
-      gInstance->mPageLoadStartedCallback( gInstance->mUrl );
+      gInstance->mPageLoadStartedCallback(gInstance->mUrl);
     }
-    if (gInstance->mPageLoadInProgressCallback)
+    if(gInstance->mPageLoadInProgressCallback)
     {
-      gInstance->mPageLoadInProgressCallback( gInstance->mUrl );
+      gInstance->mPageLoadInProgressCallback(gInstance->mUrl);
     }
-    if (gInstance->mPageLoadFinishedCallback)
+    if(gInstance->mPageLoadFinishedCallback)
     {
-      gInstance->mPageLoadFinishedCallback( gInstance->mUrl );
+      gInstance->mPageLoadFinishedCallback(gInstance->mUrl);
     }
-    if (gInstance->mPageLoadErrorCallback)
+    if(gInstance->mPageLoadErrorCallback)
     {
       std::unique_ptr<Dali::WebEngineLoadError> error(new MockWebEngineLoadError(gInstance->mUrl));
       gInstance->mPageLoadErrorCallback(std::move(error));
     }
-    if (gInstance->mUrlChangedCallback)
+    if(gInstance->mUrlChangedCallback)
     {
-      gInstance->mUrlChangedCallback( "http://new-test" );
+      gInstance->mUrlChangedCallback("http://new-test");
     }
-    if (gInstance->mFormRepostDecidedCallback)
+    if(gInstance->mFormRepostDecidedCallback)
     {
       std::unique_ptr<Dali::WebEngineFormRepostDecision> repostDecision(new MockWebEngineFormRepostDecision());
       gInstance->mFormRepostDecidedCallback(std::move(repostDecision));
     }
-    if (gInstance->mFrameRenderedCallback)
+    if(gInstance->mFrameRenderedCallback)
     {
       gInstance->mFrameRenderedCallback();
     }
-    if (gInstance->mConsoleMessageCallback)
+    if(gInstance->mConsoleMessageCallback)
     {
       std::unique_ptr<Dali::WebEngineConsoleMessage> message(new MockWebEngineConsoleMessage());
       gInstance->mConsoleMessageCallback(std::move(message));
     }
-    if (gInstance->mResponsePolicyDecisionCallback)
+    if(gInstance->mResponsePolicyDecisionCallback)
     {
       std::unique_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
       gInstance->mResponsePolicyDecisionCallback(std::move(policyDecision));
     }
-    if (gInstance->mNavigationPolicyDecisionCallback)
+    if(gInstance->mNavigationPolicyDecisionCallback)
     {
       std::unique_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
       gInstance->mNavigationPolicyDecisionCallback(std::move(policyDecision));
     }
-    if (gInstance->mNewWindowCreatedCallback)
+    if(gInstance->mNewWindowCreatedCallback)
     {
       Dali::WebEnginePlugin* plugin = 0;
       gInstance->mNewWindowCreatedCallback(plugin);
     }
-    if (gInstance->mCertificateConfirmCallback)
+    if(gInstance->mCertificateConfirmCallback)
     {
       std::unique_ptr<Dali::WebEngineCertificate> certificate(new MockWebEngineCertificate());
       gInstance->mCertificateConfirmCallback(std::move(certificate));
     }
-    if (gInstance->mSslCertificateChangedCallback)
+    if(gInstance->mSslCertificateChangedCallback)
     {
       std::unique_ptr<Dali::WebEngineCertificate> sslCertificate(new MockWebEngineCertificate());
       gInstance->mSslCertificateChangedCallback(std::move(sslCertificate));
     }
-    if (gInstance->mHttpAuthHandlerCallback)
+    if(gInstance->mHttpAuthHandlerCallback)
     {
       std::unique_ptr<Dali::WebEngineHttpAuthHandler> handler(new MockWebEngineHttpAuthHandler());
       gInstance->mHttpAuthHandlerCallback(std::move(handler));
     }
-    if (gInstance->mContextMenuShownCallback)
+    if(gInstance->mContextMenuShownCallback)
     {
       std::unique_ptr<Dali::WebEngineContextMenu> menu(new MockWebEngineContextMenu());
       gInstance->mContextMenuShownCallback(std::move(menu));
     }
-    if (gInstance->mContextMenuHiddenCallback)
+    if(gInstance->mContextMenuHiddenCallback)
     {
       std::unique_ptr<Dali::WebEngineContextMenu> hiddenMenu(new MockWebEngineContextMenu());
       gInstance->mContextMenuHiddenCallback(std::move(hiddenMenu));
@@ -1872,11 +2103,11 @@ bool OnLoadUrl()
 
 bool OnScrollEdge()
 {
-  DisconnectFromGlobalSignal( &OnScrollEdge );
+  DisconnectFromGlobalSignal(&OnScrollEdge);
 
-  if( gInstance && gInstance->mScrollEdgeReachedCallback )
+  if(gInstance && gInstance->mScrollEdgeReachedCallback)
   {
-    gInstance->mScrollEdgeReachedCallback( Dali::WebEnginePlugin::ScrollEdge::BOTTOM );
+    gInstance->mScrollEdgeReachedCallback(Dali::WebEnginePlugin::ScrollEdge::BOTTOM);
   }
 
   return false;
@@ -1884,11 +2115,11 @@ bool OnScrollEdge()
 
 bool OnEvaluteJavaScript()
 {
-  DisconnectFromGlobalSignal( &OnEvaluteJavaScript );
+  DisconnectFromGlobalSignal(&OnEvaluteJavaScript);
 
-  if( gInstance )
+  if(gInstance)
   {
-    for( auto& func : gInstance->mResultCallbacks )
+    for(auto& func : gInstance->mResultCallbacks)
     {
       func("undefined");
     }
@@ -1899,65 +2130,63 @@ bool OnEvaluteJavaScript()
 
 bool OnJavaScriptAlert()
 {
-  DisconnectFromGlobalSignal( &OnJavaScriptAlert );
-  if ( gInstance )
+  DisconnectFromGlobalSignal(&OnJavaScriptAlert);
+  if(gInstance)
   {
-    gInstance->mJavaScriptAlertCallback( "this is an alert popup." );
+    gInstance->mJavaScriptAlertCallback("this is an alert popup.");
   }
   return false;
 }
 
 bool OnJavaScriptConfirm()
 {
-  DisconnectFromGlobalSignal( &OnJavaScriptConfirm );
-  if ( gInstance )
+  DisconnectFromGlobalSignal(&OnJavaScriptConfirm);
+  if(gInstance)
   {
-    gInstance->mJavaScriptConfirmCallback( "this is a confirm popup." );
+    gInstance->mJavaScriptConfirmCallback("this is a confirm popup.");
   }
   return false;
 }
 
 bool OnJavaScriptPrompt()
 {
-  DisconnectFromGlobalSignal( &OnJavaScriptPrompt );
-  if ( gInstance )
+  DisconnectFromGlobalSignal(&OnJavaScriptPrompt);
+  if(gInstance)
   {
-    gInstance->mJavaScriptPromptCallback( "this is a prompt pompt.", "" );
+    gInstance->mJavaScriptPromptCallback("this is a prompt pompt.", "");
   }
   return false;
 }
 
 bool OnScreenshotCaptured()
 {
-  DisconnectFromGlobalSignal( &OnScreenshotCaptured );
-  if ( gInstance )
+  DisconnectFromGlobalSignal(&OnScreenshotCaptured);
+  if(gInstance)
   {
-    uint8_t* pixel = new uint8_t[ 2 * 2 * 4 ];
+    uint8_t* pixel = new uint8_t[2 * 2 * 4];
     memset(pixel, 0xff, 2 * 2 * 4);
-    Dali::PixelData data = Dali::PixelData::New( pixel, 2 * 2 * 4, 2, 2,
-                                 Dali::Pixel::Format::RGBA8888,
-                                 Dali::PixelData::ReleaseFunction::DELETE_ARRAY );
-    gInstance->mScreenshotCapturedCallback( data );
+    Dali::PixelData data = Dali::PixelData::New(pixel, 2 * 2 * 4, 2, 2, Dali::Pixel::Format::RGBA8888, Dali::PixelData::ReleaseFunction::DELETE_ARRAY);
+    gInstance->mScreenshotCapturedCallback(data);
   }
   return false;
 }
 
 bool OnVideoPlaying()
 {
-  DisconnectFromGlobalSignal( &OnVideoPlaying );
-  if ( gInstance )
+  DisconnectFromGlobalSignal(&OnVideoPlaying);
+  if(gInstance)
   {
-    gInstance->mVideoPlayingCallback( true );
+    gInstance->mVideoPlayingCallback(true);
   }
   return false;
 }
 
 bool OnGeolocationPermission()
 {
-  DisconnectFromGlobalSignal( &OnGeolocationPermission );
-  if ( gInstance )
+  DisconnectFromGlobalSignal(&OnGeolocationPermission);
+  if(gInstance)
   {
-    gInstance->mGeolocationPermissionCallback( "", "" );
+    gInstance->mGeolocationPermissionCallback("", "");
   }
   return false;
 }
@@ -1965,7 +2194,7 @@ bool OnGeolocationPermission()
 bool OnHitTestCreated()
 {
   DisconnectFromGlobalSignal(&OnHitTestCreated);
-  if (gInstance)
+  if(gInstance)
   {
     std::unique_ptr<Dali::WebEngineHitTest> test(new MockWebEngineHitTest());
     gInstance->mHitTestCreatedCallback(std::move(test));
@@ -1975,13 +2204,13 @@ bool OnHitTestCreated()
 
 bool OnClearHistory()
 {
-  DisconnectFromGlobalSignal( &OnClearHistory );
+  DisconnectFromGlobalSignal(&OnClearHistory);
 
-  if( gInstance && gInstance->mCurrentPlusOnePos )
+  if(gInstance && gInstance->mCurrentPlusOnePos)
   {
-    std::string url = gInstance->mHistory[ gInstance->mCurrentPlusOnePos - 1 ];
-    std::vector< std::string >().swap( gInstance->mHistory );
-    gInstance->mHistory.push_back( url );
+    std::string url = gInstance->mHistory[gInstance->mCurrentPlusOnePos - 1];
+    std::vector<std::string>().swap(gInstance->mHistory);
+    gInstance->mHistory.push_back(url);
     gInstance->mCurrentPlusOnePos = 1;
   }
   return false;
@@ -1990,10 +2219,10 @@ bool OnClearHistory()
 bool OnSecurityOriginAcquired()
 {
   DisconnectFromGlobalSignal(&OnSecurityOriginAcquired);
-  if (gWebEngineContextInstance)
+  if(gWebEngineContextInstance)
   {
     std::vector<std::unique_ptr<Dali::WebEngineSecurityOrigin>> securityOriginList;
-    std::unique_ptr<Dali::WebEngineSecurityOrigin> origin(new MockWebEngineSecurityOrigin());
+    std::unique_ptr<Dali::WebEngineSecurityOrigin>              origin(new MockWebEngineSecurityOrigin());
     securityOriginList.push_back(std::move(origin));
     gWebEngineContextInstance->mSecurityOriginAcquiredCallback(securityOriginList);
   }
@@ -2003,7 +2232,7 @@ bool OnSecurityOriginAcquired()
 bool OnStorageUsageAcquired()
 {
   DisconnectFromGlobalSignal(&OnStorageUsageAcquired);
-  if (gWebEngineContextInstance)
+  if(gWebEngineContextInstance)
   {
     gWebEngineContextInstance->mStorageUsageAcquiredCallback(0);
   }
@@ -2013,11 +2242,11 @@ bool OnStorageUsageAcquired()
 bool OnFormPasswordAcquired()
 {
   DisconnectFromGlobalSignal(&OnFormPasswordAcquired);
-  if (gWebEngineContextInstance)
+  if(gWebEngineContextInstance)
   {
     std::vector<std::unique_ptr<Dali::WebEngineContext::PasswordData>> formPasswordList;
-    std::unique_ptr<Dali::WebEngineContext::PasswordData> data(new Dali::WebEngineContext::PasswordData());
-    data->url = "http://test.html";
+    std::unique_ptr<Dali::WebEngineContext::PasswordData>              data(new Dali::WebEngineContext::PasswordData());
+    data->url            = "http://test.html";
     data->useFingerprint = false;
     formPasswordList.push_back(std::move(data));
     gWebEngineContextInstance->mFormPasswordAcquiredCallback(formPasswordList);
@@ -2028,7 +2257,7 @@ bool OnFormPasswordAcquired()
 bool OnDownloadStarted()
 {
   DisconnectFromGlobalSignal(&OnDownloadStarted);
-  if (gWebEngineContextInstance)
+  if(gWebEngineContextInstance)
   {
     gWebEngineContextInstance->mDownloadStartedCallback("http://test.html");
   }
@@ -2038,7 +2267,7 @@ bool OnDownloadStarted()
 bool OnMimeOverridden()
 {
   DisconnectFromGlobalSignal(&OnMimeOverridden);
-  if (gWebEngineContextInstance)
+  if(gWebEngineContextInstance)
   {
     std::string newMime;
     gWebEngineContextInstance->mMimeOverriddenCallback("http://test.html", "txt/xml", newMime);
@@ -2049,7 +2278,7 @@ bool OnMimeOverridden()
 bool OnRequestIntercepted()
 {
   DisconnectFromGlobalSignal(&OnRequestIntercepted);
-  if (gWebEngineContextInstance)
+  if(gWebEngineContextInstance)
   {
     Dali::WebEngineRequestInterceptorPtr interceptor = new MockWebEngineRequestInterceptor();
     gWebEngineContextInstance->mRequestInterceptedCallback(interceptor);
@@ -2060,7 +2289,7 @@ bool OnRequestIntercepted()
 bool OnChangesWatch()
 {
   DisconnectFromGlobalSignal(&OnChangesWatch);
-  if (gMockWebEngineCookieManager)
+  if(gMockWebEngineCookieManager)
   {
     gMockWebEngineCookieManager->mChangesWatchCallback();
   }
@@ -2070,7 +2299,7 @@ bool OnChangesWatch()
 bool OnPlainTextReceived()
 {
   DisconnectFromGlobalSignal(&OnPlainTextReceived);
-  if (gInstance)
+  if(gInstance)
   {
     std::string dummyResultText;
     gInstance->mPlainTextReceivedCallback(dummyResultText);
@@ -2080,18 +2309,18 @@ bool OnPlainTextReceived()
 
 } // namespace
 
-inline WebEngine& GetImplementation( Dali::WebEngine& webEngine )
+inline WebEngine& GetImplementation(Dali::WebEngine& webEngine)
 {
-  DALI_ASSERT_ALWAYS( webEngine && "WebEngine handle is empty." );
+  DALI_ASSERT_ALWAYS(webEngine && "WebEngine handle is empty.");
   BaseObject& handle = webEngine.GetBaseObject();
-  return static_cast< Internal::Adaptor::WebEngine& >( handle );
+  return static_cast<Internal::Adaptor::WebEngine&>(handle);
 }
 
-inline const WebEngine& GetImplementation( const Dali::WebEngine& webEngine )
+inline const WebEngine& GetImplementation(const Dali::WebEngine& webEngine)
 {
-  DALI_ASSERT_ALWAYS( webEngine && "WebEngine handle is empty." );
+  DALI_ASSERT_ALWAYS(webEngine && "WebEngine handle is empty.");
   const BaseObject& handle = webEngine.GetBaseObject();
-  return static_cast< const Internal::Adaptor::WebEngine& >( handle );
+  return static_cast<const Internal::Adaptor::WebEngine&>(handle);
 }
 
 } // namespace Adaptor
@@ -2103,8 +2332,8 @@ WebEngine::WebEngine()
 {
 }
 
-WebEngine::WebEngine( Internal::Adaptor::WebEngine* internal )
-: BaseHandle( internal )
+WebEngine::WebEngine(Internal::Adaptor::WebEngine* internal)
+: BaseHandle(internal)
 {
 }
 
@@ -2116,7 +2345,7 @@ WebEngine WebEngine::New()
 {
   Internal::Adaptor::WebEngine* baseObject = new Internal::Adaptor::WebEngine();
 
-  return WebEngine( baseObject );
+  return WebEngine(baseObject);
 }
 
 Dali::WebEngineContext* WebEngine::GetContext()
@@ -2129,27 +2358,27 @@ Dali::WebEngineCookieManager* WebEngine::GetCookieManager()
   return Internal::Adaptor::GetCookieManager();
 }
 
-WebEngine::WebEngine( const WebEngine& WebEngine )
-: BaseHandle( WebEngine )
+WebEngine::WebEngine(const WebEngine& WebEngine)
+: BaseHandle(WebEngine)
 {
 }
 
-WebEngine& WebEngine::operator=( const WebEngine& webEngine )
+WebEngine& WebEngine::operator=(const WebEngine& webEngine)
 {
-  BaseHandle::operator=( webEngine );
+  BaseHandle::operator=(webEngine);
   return *this;
 }
 
-WebEngine WebEngine::DownCast( BaseHandle handle )
+WebEngine WebEngine::DownCast(BaseHandle handle)
 {
-  return WebEngine( dynamic_cast< Internal::Adaptor::WebEngine* >( handle.GetObjectPtr() ) );
+  return WebEngine(dynamic_cast<Internal::Adaptor::WebEngine*>(handle.GetObjectPtr()));
 }
 
-void WebEngine::Create( uint32_t width, uint32_t height, const std::string& locale, const std::string& timezoneId )
+void WebEngine::Create(uint32_t width, uint32_t height, const std::string& locale, const std::string& timezoneId)
 {
 }
 
-void WebEngine::Create( uint32_t width, uint32_t height, uint32_t argc, char** argv )
+void WebEngine::Create(uint32_t width, uint32_t height, uint32_t argc, char** argv)
 {
 }
 
@@ -2159,32 +2388,32 @@ void WebEngine::Destroy()
 
 WebEngineSettings& WebEngine::GetSettings() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetSettings();
+  return Internal::Adaptor::GetImplementation(*this).GetSettings();
 }
 
 WebEngineBackForwardList& WebEngine::GetBackForwardList() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetBackForwardList();
+  return Internal::Adaptor::GetImplementation(*this).GetBackForwardList();
 }
 
-void WebEngine::LoadUrl( const std::string& url )
+void WebEngine::LoadUrl(const std::string& url)
 {
-  return Internal::Adaptor::GetImplementation( *this ).LoadUrl( url );
+  return Internal::Adaptor::GetImplementation(*this).LoadUrl(url);
 }
 
 std::string WebEngine::GetTitle() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetTitle();
+  return Internal::Adaptor::GetImplementation(*this).GetTitle();
 }
 
 Dali::PixelData WebEngine::GetFavicon() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetFavicon();
+  return Internal::Adaptor::GetImplementation(*this).GetFavicon();
 }
 
 std::string WebEngine::GetUrl() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetUrl();
+  return Internal::Adaptor::GetImplementation(*this).GetUrl();
 }
 
 Dali::WebEnginePlugin* WebEngine::GetPlugin() const
@@ -2194,12 +2423,12 @@ Dali::WebEnginePlugin* WebEngine::GetPlugin() const
 
 NativeImageSourcePtr WebEngine::GetNativeImageSource()
 {
-  Any source;
-  Dali::NativeImageSourcePtr sourcePtr = Dali::NativeImageSource::New( source );
+  Any                        source;
+  Dali::NativeImageSourcePtr sourcePtr = Dali::NativeImageSource::New(source);
   return sourcePtr;
 }
 
-void WebEngine::LoadHtmlString( const std::string& htmlString )
+void WebEngine::LoadHtmlString(const std::string& htmlString)
 {
 }
 
@@ -2264,57 +2493,57 @@ bool WebEngine::StopInspectorServer()
 
 bool WebEngine::CanGoForward()
 {
-  return Internal::Adaptor::GetImplementation( *this ).CanGoForward();
+  return Internal::Adaptor::GetImplementation(*this).CanGoForward();
 }
 
 void WebEngine::GoForward()
 {
-  Internal::Adaptor::GetImplementation( *this ).GoForward();
+  Internal::Adaptor::GetImplementation(*this).GoForward();
 }
 
 bool WebEngine::CanGoBack()
 {
-  return Internal::Adaptor::GetImplementation( *this ).CanGoBack();
+  return Internal::Adaptor::GetImplementation(*this).CanGoBack();
 }
 
 void WebEngine::GoBack()
 {
-  Internal::Adaptor::GetImplementation( *this ).GoBack();
+  Internal::Adaptor::GetImplementation(*this).GoBack();
 }
 
-void WebEngine::EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler )
+void WebEngine::EvaluateJavaScript(const std::string& script, std::function<void(const std::string&)> resultHandler)
 {
-  Internal::Adaptor::GetImplementation( *this ).EvaluateJavaScript( script, resultHandler );
+  Internal::Adaptor::GetImplementation(*this).EvaluateJavaScript(script, resultHandler);
 }
 
-void WebEngine::AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void(const std::string&) > handler )
+void WebEngine::AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler)
 {
 }
 
-void WebEngine::RegisterJavaScriptAlertCallback( Dali::WebEnginePlugin::JavaScriptAlertCallback callback )
+void WebEngine::RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptAlertCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterJavaScriptAlertCallback( callback );
+  Internal::Adaptor::GetImplementation(*this).RegisterJavaScriptAlertCallback(callback);
 }
 
 void WebEngine::JavaScriptAlertReply()
 {
 }
 
-void WebEngine::RegisterJavaScriptConfirmCallback( Dali::WebEnginePlugin::JavaScriptConfirmCallback callback )
+void WebEngine::RegisterJavaScriptConfirmCallback(Dali::WebEnginePlugin::JavaScriptConfirmCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterJavaScriptConfirmCallback( callback );
+  Internal::Adaptor::GetImplementation(*this).RegisterJavaScriptConfirmCallback(callback);
 }
 
-void WebEngine::JavaScriptConfirmReply( bool confirmed )
+void WebEngine::JavaScriptConfirmReply(bool confirmed)
 {
 }
 
-void WebEngine::RegisterJavaScriptPromptCallback( Dali::WebEnginePlugin::JavaScriptPromptCallback callback )
+void WebEngine::RegisterJavaScriptPromptCallback(Dali::WebEnginePlugin::JavaScriptPromptCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterJavaScriptPromptCallback( callback );
+  Internal::Adaptor::GetImplementation(*this).RegisterJavaScriptPromptCallback(callback);
 }
 
-void WebEngine::JavaScriptPromptReply( const std::string& result )
+void WebEngine::JavaScriptPromptReply(const std::string& result)
 {
 }
 
@@ -2334,17 +2563,22 @@ void WebEngine::ClearAllTilesResources()
 
 void WebEngine::ClearHistory()
 {
-  Internal::Adaptor::GetImplementation( *this ).ClearHistory();
+  Internal::Adaptor::GetImplementation(*this).ClearHistory();
 }
 
 void WebEngine::SetScaleFactor(float scaleFactor, Dali::Vector2 point)
 {
-  Internal::Adaptor::GetImplementation( *this ).SetScaleFactor(scaleFactor, point);
+  Internal::Adaptor::GetImplementation(*this).SetScaleFactor(scaleFactor, point);
 }
 
 float WebEngine::GetScaleFactor() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetScaleFactor();
+  return Internal::Adaptor::GetImplementation(*this).GetScaleFactor();
+}
+
+bool WebEngine::SetVisibility(bool visible)
+{
+  return Internal::Adaptor::GetImplementation(*this).SetVisibility(visible);
 }
 
 void WebEngine::ActivateAccessibility(bool activated)
@@ -2367,65 +2601,65 @@ void WebEngine::AddDynamicCertificatePath(const std::string& host, const std::st
 
 Dali::PixelData WebEngine::GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetScreenshot(viewArea, scaleFactor);
+  return Internal::Adaptor::GetImplementation(*this).GetScreenshot(viewArea, scaleFactor);
 }
 
 bool WebEngine::GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::WebEnginePlugin::ScreenshotCapturedCallback callback)
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetScreenshotAsynchronously(viewArea, scaleFactor, callback);
+  return Internal::Adaptor::GetImplementation(*this).GetScreenshotAsynchronously(viewArea, scaleFactor, callback);
 }
 
 bool WebEngine::CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayingCallback callback)
 {
-  return Internal::Adaptor::GetImplementation( *this ).CheckVideoPlayingAsynchronously(callback);
+  return Internal::Adaptor::GetImplementation(*this).CheckVideoPlayingAsynchronously(callback);
 }
 
 void WebEngine::RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterGeolocationPermissionCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterGeolocationPermissionCallback(callback);
 }
 
 std::string WebEngine::GetUserAgent() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetUserAgent();
+  return Internal::Adaptor::GetImplementation(*this).GetUserAgent();
 }
 
-void WebEngine::SetUserAgent( const std::string& userAgent )
+void WebEngine::SetUserAgent(const std::string& userAgent)
 {
-  Internal::Adaptor::GetImplementation( *this ).SetUserAgent( userAgent );
+  Internal::Adaptor::GetImplementation(*this).SetUserAgent(userAgent);
 }
 
-void WebEngine::ScrollBy( int32_t dx, int32_t dy )
+void WebEngine::ScrollBy(int32_t dx, int32_t dy)
 {
-  Internal::Adaptor::GetImplementation( *this ).ScrollBy( dx, dy );
+  Internal::Adaptor::GetImplementation(*this).ScrollBy(dx, dy);
 }
 
-bool WebEngine::ScrollEdgeBy( int32_t dx, int32_t dy )
+bool WebEngine::ScrollEdgeBy(int32_t dx, int32_t dy)
 {
-  return Internal::Adaptor::GetImplementation( *this ).ScrollEdgeBy( dx, dy );
+  return Internal::Adaptor::GetImplementation(*this).ScrollEdgeBy(dx, dy);
 }
 
-void WebEngine::SetScrollPosition( int32_t x, int32_t y )
+void WebEngine::SetScrollPosition(int32_t x, int32_t y)
 {
-  Internal::Adaptor::GetImplementation( *this ).SetScrollPosition( x, y );
+  Internal::Adaptor::GetImplementation(*this).SetScrollPosition(x, y);
 }
 
 Dali::Vector2 WebEngine::GetScrollPosition() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetScrollPosition();
+  return Internal::Adaptor::GetImplementation(*this).GetScrollPosition();
 }
 
 Dali::Vector2 WebEngine::GetScrollSize() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetScrollSize();
+  return Internal::Adaptor::GetImplementation(*this).GetScrollSize();
 }
 
 Dali::Vector2 WebEngine::GetContentSize() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetContentSize();
+  return Internal::Adaptor::GetImplementation(*this).GetContentSize();
 }
 
-void WebEngine::SetSize( uint32_t width, uint32_t height )
+void WebEngine::SetSize(uint32_t width, uint32_t height)
 {
 }
 
@@ -2450,68 +2684,68 @@ std::string WebEngine::GetSelectedText() const
   return "test";
 }
 
-bool WebEngine::SendTouchEvent( const TouchEvent& touch )
+bool WebEngine::SendTouchEvent(const TouchEvent& touch)
 {
   return true;
 }
 
-bool WebEngine::SendKeyEvent( const KeyEvent& event )
+bool WebEngine::SendKeyEvent(const KeyEvent& event)
 {
   return true;
 }
 
-bool WebEngine::SendHoverEvent( const HoverEvent& event )
+bool WebEngine::SendHoverEvent(const HoverEvent& event)
 {
   return true;
 }
 
-bool WebEngine::SendWheelEvent( const WheelEvent& event )
+bool WebEngine::SendWheelEvent(const WheelEvent& event)
 {
   return true;
 }
 
-void WebEngine::SetFocus( bool focused )
+void WebEngine::SetFocus(bool focused)
 {
 }
 
 void WebEngine::SetPageZoomFactor(float zoomFactor)
 {
-  Internal::Adaptor::GetImplementation( *this ).SetPageZoomFactor(zoomFactor);
+  Internal::Adaptor::GetImplementation(*this).SetPageZoomFactor(zoomFactor);
 }
 
 float WebEngine::GetPageZoomFactor() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetPageZoomFactor();
+  return Internal::Adaptor::GetImplementation(*this).GetPageZoomFactor();
 }
 
 void WebEngine::SetTextZoomFactor(float zoomFactor)
 {
-  Internal::Adaptor::GetImplementation( *this ).SetTextZoomFactor(zoomFactor);
+  Internal::Adaptor::GetImplementation(*this).SetTextZoomFactor(zoomFactor);
 }
 
 float WebEngine::GetTextZoomFactor() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetTextZoomFactor();
+  return Internal::Adaptor::GetImplementation(*this).GetTextZoomFactor();
 }
 
 float WebEngine::GetLoadProgressPercentage() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetLoadProgressPercentage();
+  return Internal::Adaptor::GetImplementation(*this).GetLoadProgressPercentage();
 }
 
-void WebEngine::UpdateDisplayArea( Dali::Rect< int32_t > displayArea )
+void WebEngine::UpdateDisplayArea(Dali::Rect<int32_t> displayArea)
 {
 }
 
-void WebEngine::EnableVideoHole( bool enabled )
+void WebEngine::EnableVideoHole(bool enabled)
 {
 }
 
-void WebEngine::EnableMouseEvents( bool enabled )
+void WebEngine::EnableMouseEvents(bool enabled)
 {
 }
 
-void WebEngine::EnableKeyEvents( bool enabled )
+void WebEngine::EnableKeyEvents(bool enabled)
 {
 }
 
@@ -2522,47 +2756,47 @@ void WebEngine::RegisterFrameRenderedCallback(Dali::WebEnginePlugin::WebEngineFr
 
 void WebEngine::RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterPageLoadStartedCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterPageLoadStartedCallback(callback);
 }
 
 void WebEngine::RegisterPageLoadInProgressCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterPageLoadInProgressCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterPageLoadInProgressCallback(callback);
 }
 
 void WebEngine::RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterPageLoadFinishedCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterPageLoadFinishedCallback(callback);
 }
 
 void WebEngine::RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterPageLoadErrorCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterPageLoadErrorCallback(callback);
 }
 
 void WebEngine::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterScrollEdgeReachedCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterScrollEdgeReachedCallback(callback);
 }
 
 void WebEngine::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterUrlChangedCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterUrlChangedCallback(callback);
 }
 
 void WebEngine::RegisterFormRepostDecidedCallback(Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterFormRepostDecidedCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterFormRepostDecidedCallback(callback);
 }
 
 void WebEngine::RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterConsoleMessageReceivedCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterConsoleMessageReceivedCallback(callback);
 }
 
 void WebEngine::RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterResponsePolicyDecidedCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterResponsePolicyDecidedCallback(callback);
 }
 
 void WebEngine::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
@@ -2577,27 +2811,27 @@ void WebEngine::RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngin
 
 void WebEngine::RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterCertificateConfirmedCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterCertificateConfirmedCallback(callback);
 }
 
 void WebEngine::RegisterSslCertificateChangedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterSslCertificateChangedCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterSslCertificateChangedCallback(callback);
 }
 
 void WebEngine::RegisterHttpAuthHandlerCallback(Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterHttpAuthHandlerCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterHttpAuthHandlerCallback(callback);
 }
 
 void WebEngine::RegisterContextMenuShownCallback(Dali::WebEnginePlugin::WebEngineContextMenuShownCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterContextMenuShownCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterContextMenuShownCallback(callback);
 }
 
 void WebEngine::RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback)
 {
-  Internal::Adaptor::GetImplementation( *this ).RegisterContextMenuHiddenCallback(callback);
+  Internal::Adaptor::GetImplementation(*this).RegisterContextMenuHiddenCallback(callback);
 }
 
 void WebEngine::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
@@ -2605,4 +2839,4 @@ void WebEngine::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextRecei
   Internal::Adaptor::GetImplementation(*this).GetPlainTextAsynchronously(callback);
 }
 
-} // namespace Dali;
+} // namespace Dali
