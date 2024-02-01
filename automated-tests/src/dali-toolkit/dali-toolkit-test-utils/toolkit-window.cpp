@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -190,10 +190,16 @@ void Window::Raise()
   GetImplementation(*this).mFocusChangeSignal.Emit(*this, true);
 }
 
+void Window::Show()
+{
+  GetImplementation(*this).mVisible = true;
+  GetImplementation(*this).mVisibilityChangedSignal.Emit(*this, true);
+}
+
 void Window::Hide()
 {
-  GetImplementation(*this).mVisibilityChangedSignal.Emit(*this, false);
   GetImplementation(*this).mVisible = false;
+  GetImplementation(*this).mVisibilityChangedSignal.Emit(*this, false);
 }
 
 bool Window::IsVisible() const

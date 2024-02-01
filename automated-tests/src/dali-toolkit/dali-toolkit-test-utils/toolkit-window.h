@@ -2,7 +2,7 @@
 #define TOOLKIT_WINDOW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,6 +79,7 @@ public:
   void                          SetBackgroundColor(const Vector4& color);
   Vector4                       GetBackgroundColor() const;
   void                          Raise();
+  void                          Show();
   void                          Hide();
   bool                          IsVisible() const;
   FocusChangeSignalType&        FocusChangeSignal();
