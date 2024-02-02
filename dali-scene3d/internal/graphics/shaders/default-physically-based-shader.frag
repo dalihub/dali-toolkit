@@ -136,7 +136,7 @@ const float kCosPcfTheta = cos(kPcfTheta);
 
 uniform lowp int uEnableShadowSoftFiltering;
 uniform mediump float uShadowIntensity;
-uniform mediump float uShadowBias;
+uniform highp float uShadowBias;
 
 vec3 linear(vec3 color)
 {
