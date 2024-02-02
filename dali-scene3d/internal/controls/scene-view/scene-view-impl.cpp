@@ -139,7 +139,7 @@ Dali::Actor CreateSkybox()
   skyboxGeometry.AddVertexBuffer(vertexBuffer);
   skyboxGeometry.SetType(Geometry::TRIANGLES);
 
-  Dali::Shader   shaderSkybox = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
+  Dali::Shader   shaderSkybox = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data(), Shader::Hint::NONE, "SCENE3D_SKYBOX_CUBE");
   Dali::Renderer skyboxRenderer;
   skyboxRenderer = Renderer::New(skyboxGeometry, shaderSkybox);
   skyboxRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, 2.0f);
@@ -1298,11 +1298,11 @@ void SceneView::OnSkyboxLoadComplete()
   Shader skyboxShader;
   if(mSkyboxLoadTask->GetEnvironmentMapType() == Scene3D::EnvironmentMapType::CUBEMAP)
   {
-    skyboxShader = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data());
+    skyboxShader = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_SHADER_FRAG.data(), Shader::Hint::NONE, "SCENE3D_SKYBOX_CUBE");
   }
   else
   {
-    skyboxShader = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_EQUIRECTANGULAR_SHADER_FRAG.data());
+    skyboxShader = Shader::New(SHADER_SKYBOX_SHADER_VERT.data(), SHADER_SKYBOX_EQUIRECTANGULAR_SHADER_FRAG.data(), Shader::Hint::NONE, "SCENE3D_SKYBOX_EQUIRECTANGULAR");
   }
 
   Renderer skyboxRenderer = (mSkybox.GetRendererCount() > 0u) ? mSkybox.GetRendererAt(0u) : Renderer();

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_STRING_CONSTANTS_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,10 @@ namespace Internal
 extern const char* const                 VISUAL_TYPE;
 extern const Dali::Scripting::StringEnum VISUAL_TYPE_TABLE[];
 extern const unsigned int                VISUAL_TYPE_TABLE_COUNT;
+
+// Visual Shader type
+extern const Dali::Scripting::StringEnum VISUAL_SHADER_TYPE_TABLE[];
+extern const unsigned int                VISUAL_SHADER_TYPE_TABLE_COUNT;
 
 // Custom shader
 extern const char* const CUSTOM_SHADER;

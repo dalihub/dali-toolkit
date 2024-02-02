@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,13 +56,11 @@ const VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] =
     VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE_AND_OVERLAY,
 };
 
-static constexpr auto          SHADER_TYPE_COUNT = 1u;
-const std::string_view VertexPredefines[SHADER_TYPE_COUNT]
-{
+static constexpr auto  SHADER_TYPE_COUNT = 1u;
+const std::string_view VertexPredefines[SHADER_TYPE_COUNT]{
   "", // VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT
 };
-const std::string_view FragmentPredefines[SHADER_TYPE_COUNT]
-{
+const std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
   "", // VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT
 };
 
@@ -158,8 +156,7 @@ Shader TextVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, cons
     std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_VERT.data());
     std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_FRAG.data());
 
-    shader = Shader::New(vertexShader, fragmentShader);
-    factoryCache.SaveShader(shaderType, shader);
+    shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
   }
   return shader;
 }
@@ -168,19 +165,19 @@ void TextVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
 {
   std::vector<std::string_view> vertexPrefix;
   std::vector<std::string_view> fragmentPrefix;
-  int shaderCount = 0;
-  for(uint32_t i=0; i< SHADER_TYPE_COUNT; ++i)
+  int                           shaderCount = 0;
+  for(uint32_t i = 0; i < SHADER_TYPE_COUNT; ++i)
   {
     vertexPrefix.push_back(VertexPredefines[i]);
     fragmentPrefix.push_back(FragmentPredefines[i]);
     shaderCount++;
   }
 
-  shaders.vertexPrefix= vertexPrefix;
+  shaders.vertexPrefix   = vertexPrefix;
   shaders.fragmentPrefix = fragmentPrefix;
-  shaders.vertexShader = SHADER_TEXT_VISUAL_SHADER_VERT;
+  shaders.vertexShader   = SHADER_TEXT_VISUAL_SHADER_VERT;
   shaders.fragmentShader = SHADER_TEXT_VISUAL_SHADER_FRAG;
-  shaders.shaderCount = shaderCount;
+  shaders.shaderCount    = shaderCount;
 }
 
 } // namespace Internal

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
  */
 
 // CLASS HEADER
-#include "visual-string-constants.h"
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
@@ -44,6 +45,89 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelVisual, ANIMATED_VECTOR_IMAGE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelVisual, ARC)
 DALI_ENUM_TO_STRING_TABLE_END(VISUAL_TYPE)
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_SHADER_TYPE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_ROUNDED_CORNER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_ROUNDED_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_BLUR_EDGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_ROUNDED_CORNER_BLUR_EDGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, BORDER_SHADER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, BORDER_SHADER_ANTI_ALIASING)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_LINEAR_BOUNDING_BOX)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_CORNER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_LINEAR_BOUNDING_BOX_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_LINEAR_USER_SPACE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_CORNER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_LINEAR_USER_SPACE_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_RADIAL_BOUNDING_BOX)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_CORNER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_RADIAL_BOUNDING_BOX_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_RADIAL_USER_SPACE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_CORNER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_RADIAL_USER_SPACE_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_CORNER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_MASKING)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_CORNER_MASKING)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_BORDERLINE_MASKING)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ATLAS_DEFAULT_WRAP)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ATLAS_CUSTOM_WRAP)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_YUV_TO_RGB)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_BORDERLINE_YUV_TO_RGB)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_TO_RGB)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_YUV_AND_RGB)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_BORDERLINE_YUV_AND_RGB)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_AND_RGB)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER_ROUNDED_CORNER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER_ROUNDED_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER_MASKING)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER_ROUNDED_CORNER_MASKING)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER_BORDERLINE_MASKING)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NINE_PATCH_SHADER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NINE_PATCH_MASK_SHADER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_SINGLE_COLOR_TEXT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_OVERLAY)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_OVERLAY)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_OVERLAY_AND_EMOJI)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_OVERLAY_AND_EMOJI)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_MULTI_COLOR_TEXT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_MULTI_COLOR_TEXT_WITH_OVERLAY)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE_AND_OVERLAY)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_BOUNDING_REFLECT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_BOUNDING_REPEAT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_BOUNDING_CLAMP)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_USER_REFLECT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_USER_REPEAT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_USER_REPEAT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_USER_CLAMP)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_RADIAL_BOUNDING_REFLECT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_RADIAL_BOUNDING_REPEAT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_RADIAL_BOUNDING_CLAMP)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_RADIAL_USER_REFLECT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_RADIAL_USER_REPEAT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_RADIAL_USER_CLAMP)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, WIREFRAME_SHADER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ARC_BUTT_CAP_SHADER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ARC_ROUND_CAP_SHADER)
+DALI_ENUM_TO_STRING_TABLE_END(VISUAL_SHADER_TYPE)
 
 // Visual Type
 const char* const VISUAL_TYPE("visualType");

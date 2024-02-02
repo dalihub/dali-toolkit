@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1589,7 +1589,9 @@ Actor Loader::AddNode(Scene3dView& scene3dView, uint32_t index)
     FRAGMENT_SHADER += SHADER_GLTF_PHYSICALLY_BASED_SHADER_FRAG.data();
     if(!mShaderCache[shaderTypeIndex])
     {
-      mShaderCache[shaderTypeIndex] = Shader::New(VERTEX_SHADER, FRAGMENT_SHADER);
+      std::ostringstream oss;
+      oss << "GLTF_VIEW_" << shaderTypeIndex;
+      mShaderCache[shaderTypeIndex] = Shader::New(VERTEX_SHADER, FRAGMENT_SHADER, Shader::Hint::NONE, oss.str());
       scene3dView.AddShader(mShaderCache[shaderTypeIndex]);
     }
     Shader shader = mShaderCache[shaderTypeIndex];

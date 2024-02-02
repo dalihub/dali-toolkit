@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,13 +130,12 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, Ima
     return shader;
   }
 
-  shader = Shader::New(vertexShader, fragmentShader);
+  shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
   shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
   if(featureBuilder.IsEnabledAlphaMaskingOnRendering())
   {
     shader.RegisterProperty(Y_FLIP_MASK_TEXTURE, NOT_FLIP_MASK_TEXTURE);
   }
-  factoryCache.SaveShader(shaderType, shader);
 
   return shader;
 }

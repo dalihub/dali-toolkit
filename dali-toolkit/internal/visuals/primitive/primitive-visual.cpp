@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -403,7 +403,7 @@ void PrimitiveVisual::UpdateShaderUniforms()
 
 void PrimitiveVisual::CreateShader()
 {
-  mShader = Shader::New(SHADER_PRIMITIVE_VISUAL_SHADER_VERT, SHADER_PRIMITIVE_VISUAL_SHADER_FRAG);
+  mShader = Shader::New(SHADER_PRIMITIVE_VISUAL_SHADER_VERT, SHADER_PRIMITIVE_VISUAL_SHADER_FRAG, Shader::Hint::NONE, "PRIMITIVE_VISUAL");
   UpdateShaderUniforms();
 }
 

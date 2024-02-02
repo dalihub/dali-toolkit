@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -226,7 +226,7 @@ void TextScroller::SetParameters(Actor scrollingTextActor, Renderer renderer, Te
   mTextureSet = mRenderer.GetTextures();
 
   // Set the shader and texture for scrolling
-  Shader shader = Shader::New(SHADER_TEXT_SCROLLER_SHADER_VERT, SHADER_TEXT_SCROLLER_SHADER_FRAG, Shader::Hint::NONE);
+  Shader shader = Shader::New(SHADER_TEXT_SCROLLER_SHADER_VERT, SHADER_TEXT_SCROLLER_SHADER_FRAG, Shader::Hint::NONE, "TEXT_SCROLLER");
   mRenderer.SetShader(shader);
   mRenderer.SetTextures(textureSet);
 
