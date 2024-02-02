@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -314,6 +314,14 @@ void WebView::OnRelayout(const Vector2& size, RelayoutContainer& container)
   auto displayArea = CalculateDisplayArea(Self(), DisplayAreaCalculateOption::PROPERTY);
 
   SetDisplayArea(displayArea);
+}
+
+void WebView::ChangeOrientation(int orientation)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.ChangeOrientation(orientation);
+  }
 }
 
 Dali::Toolkit::WebSettings* WebView::GetSettings() const
