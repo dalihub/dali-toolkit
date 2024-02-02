@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -435,9 +435,7 @@ Shader NPatchVisual::CreateShader()
       shader = mFactoryCache.GetShader(shaderType);
       if(DALI_UNLIKELY(!shader))
       {
-        shader = Shader::New(SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, fragmentShader);
-        // Only cache vanilla 9 patch shaders
-        mFactoryCache.SaveShader(shaderType, shader);
+        shader = mFactoryCache.GenerateAndSaveShader(shaderType, SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, fragmentShader);
       }
     }
     else if(xStretchCount > 0 || yStretchCount > 0)

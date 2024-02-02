@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,14 +187,16 @@ Shader ShaderDefinition::Load(RawData&& raw) const
   }
 
   Property::Map map[2];
-  map[0]["vertex"]        = raw.mVertexShaderSource;
-  map[0]["fragment"]      = raw.mFragmentShaderSource;
-  map[0]["renderPassTag"] = 0;
-  map[0]["hints"]         = static_cast<Shader::Hint::Value>(hints);
+  map[0]["vertex"]         = raw.mVertexShaderSource;
+  map[0]["fragment"]       = raw.mFragmentShaderSource;
+  map[0]["renderPassTag"]  = 0;
+  map[0]["hints"]          = static_cast<Shader::Hint::Value>(hints);
+  map[0]["renderPassName"] = "SCENE3D_PBR";
 
-  map[1]["vertex"]        = raw.mShadowVertexShaderSource;
-  map[1]["fragment"]      = raw.mShadowFragmentShaderSource;
-  map[1]["renderPassTag"] = 10;
+  map[1]["vertex"]         = raw.mShadowVertexShaderSource;
+  map[1]["fragment"]       = raw.mShadowFragmentShaderSource;
+  map[1]["renderPassTag"]  = 10;
+  map[1]["renderPassName"] = "SCENE3D_SHADOW_MAP";
 
   Property::Array array;
   array.PushBack(map[0]);

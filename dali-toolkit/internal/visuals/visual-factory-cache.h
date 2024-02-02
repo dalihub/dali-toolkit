@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_CACHE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/integration-api/adaptor-framework/shader-precompiler.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/shader.h>
-#include <dali/integration-api/adaptor-framework/shader-precompiler.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
@@ -184,11 +184,13 @@ public:
   Shader GetShader(ShaderType type);
 
   /**
-   * Cache the geometry of the give type.
-   * @param[in] type The geometry type.
-   * @param[in] geometry The geometry for caching.
+   * Generate and cache the shader of the give type. The name of shader will be installed to shader.
+   * @param[in] type The shder type.
+   * @param[in] vertexShader The vertex shader code.
+   * @param[in] fragmentShader The fragment shader code.
+   * @return The shader created by given vertex and fragment shader code.
    */
-  void SaveShader(ShaderType type, Shader shader);
+  Shader GenerateAndSaveShader(ShaderType type, std::string_view vertexShader, std::string_view fragmentShader);
 
   /*
    * Greate the quad geometry.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,7 +121,7 @@ void EnsureJointDebugShaderCreated()
 {
   if(0 == sNumScenes)
   {
-    sJointDebugShader = Shader::New(SHADER_SCENE3D_JOINT_DEBUG_VERT, SHADER_SCENE3D_JOINT_DEBUG_FRAG);
+    sJointDebugShader = Shader::New(SHADER_SCENE3D_JOINT_DEBUG_VERT, SHADER_SCENE3D_JOINT_DEBUG_FRAG, Shader::Hint::NONE, "SCENE3D_JOINT_DEBUG");
   }
   ++sNumScenes;
 }

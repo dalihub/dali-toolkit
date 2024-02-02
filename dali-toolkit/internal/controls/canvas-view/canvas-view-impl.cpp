@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,7 +194,7 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
 
         mTextureSet       = TextureSet::New();
         Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-        Shader   shader   = Shader::New(SHADER_CANVAS_VIEW_VERT, fragmentShader);
+        Shader   shader   = Shader::New(SHADER_CANVAS_VIEW_VERT, fragmentShader, Shader::Hint::NONE, "CANVAS_VIEW");
         Renderer renderer = Renderer::New(geometry, shader);
 
         renderer.SetTextures(mTextureSet);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,7 +204,7 @@ Shader GlView::CreateShader()
     mNativeImageQueue->ApplyNativeFragmentShader(fragmentShader);
   }
 
-  return Shader::New(SHADER_GL_VIEW_VERT, fragmentShader);
+  return Shader::New(SHADER_GL_VIEW_VERT, fragmentShader, Shader::Hint::NONE, "GL_VIEW");
 }
 
 void GlView::OnControlVisibilityChanged(Dali::Actor actor, bool visible, Dali::DevelActor::VisibilityChange::Type type)
