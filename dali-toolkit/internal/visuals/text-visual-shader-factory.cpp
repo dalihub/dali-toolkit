@@ -56,12 +56,15 @@ const VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] =
     VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE_AND_OVERLAY,
 };
 
-static constexpr auto  SHADER_TYPE_COUNT = 1u;
-const std::string_view VertexPredefines[SHADER_TYPE_COUNT]{
+static constexpr auto      SHADER_TYPE_COUNT = 1u;
+constexpr std::string_view VertexPredefines[SHADER_TYPE_COUNT]{
   "", // VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT
 };
-const std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
+constexpr std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
   "", // VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT
+};
+constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[SHADER_TYPE_COUNT]{
+  VisualFactoryCache::ShaderType::TEXT_SHADER_SINGLE_COLOR_TEXT,
 };
 
 } // unnamed namespace
@@ -165,16 +168,19 @@ void TextVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
 {
   std::vector<std::string_view> vertexPrefix;
   std::vector<std::string_view> fragmentPrefix;
+  std::vector<std::string_view> shaderName;
   int                           shaderCount = 0;
   for(uint32_t i = 0; i < SHADER_TYPE_COUNT; ++i)
   {
     vertexPrefix.push_back(VertexPredefines[i]);
     fragmentPrefix.push_back(FragmentPredefines[i]);
+    shaderName.push_back(Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
     shaderCount++;
   }
 
   shaders.vertexPrefix   = vertexPrefix;
   shaders.fragmentPrefix = fragmentPrefix;
+  shaders.shaderName     = shaderName;
   shaders.vertexShader   = SHADER_TEXT_VISUAL_SHADER_VERT;
   shaders.fragmentShader = SHADER_TEXT_VISUAL_SHADER_FRAG;
   shaders.shaderCount    = shaderCount;
