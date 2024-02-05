@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,8 @@ class Model;
  * The number of animation is also retrieved by GetAnimationCount() method.
  *
  * By default, The loaded model has its own position and size which are defined in vertex buffer regardless of the Control size.
+ *
+ * @note We support to render model well only if glsl version is higher than 300.
  *
  * @SINCE_2_1.41
  * @code

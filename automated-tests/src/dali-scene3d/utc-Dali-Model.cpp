@@ -1300,6 +1300,72 @@ int UtcDaliModelResourceReady(void)
   END_TEST;
 }
 
+int UtcDaliModelResourceReady02(void)
+{
+  tet_infoline("Test model load successfully even if shader language version is low\n");
+  ToolkitTestApplication application;
+
+  auto originalShaderVersion = application.GetGlAbstraction().GetShaderLanguageVersion();
+
+  // Change the shader language version forcely!
+  application.GetGlAbstraction().mShaderLanguageVersion = 200;
+
+  try
+  {
+    gOnRelayoutCallBackCalled = false;
+    gResourceReadyCalled      = false;
+    Scene3D::Model model      = Scene3D::Model::New(TEST_GLTF_MORPH_FILE_NAME);
+    model.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+    model.OnRelayoutSignal().Connect(OnRelayoutCallback);
+    model.ResourceReadySignal().Connect(OnResourceReady);
+    DALI_TEST_EQUALS(model.IsResourceReady(), false, TEST_LOCATION);
+
+    // Sanity check
+    DALI_TEST_CHECK(!gOnRelayoutCallBackCalled);
+    DALI_TEST_CHECK(!gResourceReadyCalled);
+
+    application.GetScene().Add(model);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
+    DALI_TEST_EQUALS(model.IsResourceReady(), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
+
+    // Change material information, for line coverage.
+    auto modelNode = model.FindChildModelNodeByName("AnimatedMorphCube");
+    DALI_TEST_CHECK(modelNode);
+    DALI_TEST_GREATER(modelNode.GetModelPrimitiveCount(), 0u, TEST_LOCATION);
+    auto modelPrimitive = modelNode.GetModelPrimitive(0u);
+    DALI_TEST_CHECK(modelPrimitive);
+    auto material = modelPrimitive.GetMaterial();
+    DALI_TEST_CHECK(material);
+
+    auto originBaseColorFactor = material.GetProperty<Dali::Vector4>(Dali::Scene3D::Material::Property::BASE_COLOR_FACTOR);
+    auto expectBaseColorFactor = Vector4(originBaseColorFactor.r + 0.05f, originBaseColorFactor.g - 0.05f, originBaseColorFactor.b, originBaseColorFactor.a);
+    material.SetProperty(Dali::Scene3D::Material::Property::BASE_COLOR_FACTOR, expectBaseColorFactor);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(material.GetProperty<Dali::Vector4>(Dali::Scene3D::Material::Property::BASE_COLOR_FACTOR), expectBaseColorFactor, TEST_LOCATION);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
+  }
+
+  // Revert shader version. We should revert it even if UTC failed.
+  application.GetGlAbstraction().mShaderLanguageVersion = originalShaderVersion;
+
+  END_TEST;
+}
+
 int UtcDaliModelResourceCacheCheck(void)
 {
   ToolkitTestApplication application;

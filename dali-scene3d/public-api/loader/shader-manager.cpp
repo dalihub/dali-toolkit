@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ namespace
 {
 static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG  = 10;
 static constexpr uint32_t INDEX_FOR_SHADOW_CONSTRAINT_TAG = 100;
+
+constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_TEXTURE_TEXEL_AND_SIZE = 300;
 
 ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinition& meshDef)
 {
@@ -154,6 +156,10 @@ ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinit
         option.AddOption(ShaderOption::Type::MORPH_VERSION_2_0);
       }
     }
+  }
+  if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_TEXTURE_TEXEL_AND_SIZE))
+  {
+    option.AddOption(ShaderOption::Type::GLSL_VERSION_1_0);
   }
 
   return option;

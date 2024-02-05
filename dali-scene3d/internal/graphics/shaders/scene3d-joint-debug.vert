@@ -1,10 +1,9 @@
-#version 300 es
 
 precision mediump float;
 uniform mat4 uMvpMatrix;
-in vec3 aPosition;
-in float aColor;
-flat out float vColor;
+INPUT vec3 aPosition;
+INPUT float aColor;
+flat OUTPUT float vColor;
 
 void main()
 {

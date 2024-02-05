@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_SHADER_OPTION_H_
 #define DALI_SCENE3D_LOADER_SHADER_OPTION_H_
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,25 +33,26 @@ class DALI_SCENE3D_API ShaderOption
 public:
   enum class Type
   {
-    GLTF_CHANNELS = 0,
-    THREE_TEXTURE,
-    BASE_COLOR_TEXTURE,
-    METALLIC_ROUGHNESS_TEXTURE,
-    NORMAL_TEXTURE,
-    OCCLUSION,
-    EMISSIVE,
-    ALPHA_TEST,
-    SUBSURFACE,
-    SPECULAR,
-    SPECULAR_COLOR,
-    SKINNING,
-    FLIP_UVS_VERTICAL,
-    COLOR_ATTRIBUTE,
-    VEC4_TANGENT,
-    MORPH_POSITION,
-    MORPH_NORMAL,
-    MORPH_TANGENT,
-    MORPH_VERSION_2_0
+    GLTF_CHANNELS = 0,          // 00001
+    THREE_TEXTURE,              // 00002
+    BASE_COLOR_TEXTURE,         // 00004
+    METALLIC_ROUGHNESS_TEXTURE, // 00008
+    NORMAL_TEXTURE,             // 00010
+    OCCLUSION,                  // 00020
+    EMISSIVE,                   // 00040
+    ALPHA_TEST,                 // 00080
+    SUBSURFACE,                 // 00100
+    SPECULAR,                   // 00200
+    SPECULAR_COLOR,             // 00400
+    SKINNING,                   // 00800
+    FLIP_UVS_VERTICAL,          // 01000
+    COLOR_ATTRIBUTE,            // 02000
+    VEC4_TANGENT,               // 04000
+    MORPH_POSITION,             // 08000
+    MORPH_NORMAL,               // 10000
+    MORPH_TANGENT,              // 20000
+    MORPH_VERSION_2_0,          // 40000
+    GLSL_VERSION_1_0,           // 80000
   };
 
 public:

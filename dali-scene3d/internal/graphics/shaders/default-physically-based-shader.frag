@@ -1,4 +1,3 @@
-#version 300 es
 
 // Original Code
 // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/glTF-WebGL-PBR/shaders/pbr-frag.glsl
@@ -81,7 +80,11 @@ uniform mediump vec3 uLightColor[MAX_LIGHTS];
 // For Shadow Map
 uniform lowp int uIsShadowEnabled;
 uniform sampler2D sShadowMap;
-in highp vec3 positionFromLightView;
+#ifdef GLSL_VERSION_1_0
+uniform int uShadowMapWidth;
+uniform int uShadowMapHeight;
+#endif
+INPUT highp vec3 positionFromLightView;
 
 //// For IBL
 uniform sampler2D sbrdfLUT;
@@ -97,12 +100,10 @@ uniform lowp float uMask;
 uniform lowp float uAlphaThreshold;
 
 // TODO: Multiple texture coordinate will be supported.
-in mediump vec2 vUV;
-in lowp mat3 vTBN;
-in lowp vec4 vColor;
-in highp vec3 vPositionToCamera;
-
-out vec4 FragColor;
+INPUT mediump vec2 vUV;
+INPUT lowp mat3 vTBN;
+INPUT lowp vec4 vColor;
+INPUT highp vec3 vPositionToCamera;
 
 const float c_MinRoughness = 0.04;
 const float M_PI = 3.141592653589793;
@@ -112,9 +113,9 @@ const float M_PI = 3.141592653589793;
 // Percentage Closer Filtering to mitigate the banding artifacts.
 const int kPcfSampleCount = 9;
 
-const float kPi = 3.141592653589f;
+const float kPi = 3.141592653589;
 const float kInvSampleCount = 1.0 / float(kPcfSampleCount);
-const float kPcfTheta = 2.f * kPi * kInvSampleCount;
+const float kPcfTheta = 2.0 * kPi * kInvSampleCount;
 const float kSinPcfTheta = sin(kPcfTheta);
 const float kCosPcfTheta = cos(kPcfTheta);
 
@@ -142,29 +143,29 @@ void main()
 #ifdef THREE_TEX
   // The albedo may be defined from a base texture or a flat color
 #ifdef BASECOLOR_TEX
-  lowp vec4 baseColor = texture(sAlbedoAlpha, vUV);
+  lowp vec4 baseColor = TEXTURE(sAlbedoAlpha, vUV);
   baseColor = vColor * vec4(linear(baseColor.rgb), baseColor.w) * uColorFactor;
 #else // BASECOLOR_TEX
   lowp vec4 baseColor = vColor * uColorFactor;
 #endif // BASECOLOR_TEX
 
 #ifdef METALLIC_ROUGHNESS_TEX
-  lowp vec4 metrou = texture(sMetalRoughness, vUV);
+  lowp vec4 metrou = TEXTURE(sMetalRoughness, vUV);
   metallic = metrou.METALLIC * metallic;
   perceptualRoughness = metrou.ROUGHNESS * perceptualRoughness;
 #endif // METALLIC_ROUGHNESS_TEX
 
 #ifdef NORMAL_TEX
-  n = texture(sNormal, vUV).rgb;
+  n = TEXTURE(sNormal, vUV).rgb;
   n = normalize(vTBN * ((2.0 * n - 1.0) * vec3(uNormalScale, uNormalScale, 1.0)));
 #endif // NORMAL_TEX
 #else // THREE_TEX
-  vec4 albedoMetal = texture(sAlbedoMetal, vUV);
+  vec4 albedoMetal = TEXTURE(sAlbedoMetal, vUV);
   lowp vec4 baseColor = vec4(linear(albedoMetal.rgb), 1.0) * vColor * uColorFactor;
 
   metallic = albedoMetal.METALLIC * metallic;
 
-  vec4 normalRoughness = texture(sNormalRoughness, vUV);
+  vec4 normalRoughness = TEXTURE(sNormalRoughness, vUV);
   perceptualRoughness = normalRoughness.ROUGHNESS * perceptualRoughness;
 
   n = normalRoughness.rgb;
@@ -194,10 +195,10 @@ void main()
   float specularWeight = 1.0;
   vec4 materialSpecularTexture = vec4(1.0);
 #ifdef MATERIAL_SPECULAR_TEXTURE
-  materialSpecularTexture.a = texture(sSpecular, vUV).a;
+  materialSpecularTexture.a = TEXTURE(sSpecular, vUV).a;
 #endif
 #ifdef MATERIAL_SPECULAR_COLOR_TEXTURE
-  materialSpecularTexture.rgb = texture(sSpecularColor, vUV).rgb;
+  materialSpecularTexture.rgb = TEXTURE(sSpecularColor, vUV).rgb;
 #endif
   specularWeight = uSpecularFactor * materialSpecularTexture.a;
   f0 = min(f0 * uSpecularColorFactor * materialSpecularTexture.rgb, vec3(1.0));
@@ -206,7 +207,7 @@ void main()
   mediump vec3 v = normalize(vPositionToCamera); // Vector from surface point to camera
   mediump float NdotV = clamp(abs(dot(n, v)), 0.001, 1.0);
   mediump vec3 reflection = -normalize(reflect(v, n));
-  lowp vec3 brdf = texture(sbrdfLUT, vec2(NdotV, 1.0 - perceptualRoughness)).rgb;
+  lowp vec3 brdf = TEXTURE(sbrdfLUT, vec2(NdotV, 1.0 - perceptualRoughness)).rgb;
   vec3 Fr = max(vec3(1.0 - perceptualRoughness), f0) - f0;
   vec3 k_S = f0 + Fr * pow(1.0 - NdotV, 5.0);
   vec3 FssEss = specularWeight * (k_S * brdf.x + brdf.y);
@@ -214,12 +215,21 @@ void main()
   // Specular Light
   // uMaxLOD that means mipmap level of specular texture is used for bluring of reflection of specular following roughness.
   float lod = perceptualRoughness * (uMaxLOD - 1.0);
+#ifdef GLSL_VERSION_1_0
+  // glsl 1.0 doesn't support textureLod. Let we just use textureCube instead.
+  lowp vec3 specularLight = linear(textureCube(sSpecularEnvSampler, reflection * uYDirection).rgb);
+#else
   lowp vec3 specularLight = linear(textureLod(sSpecularEnvSampler, reflection * uYDirection, lod).rgb);
+#endif
   lowp vec3 specular = specularLight * FssEss;
 
   // Diffuse Light
   lowp vec3 diffuseColor = mix(baseColor.rgb, vec3(0), metallic);
-  lowp vec3 irradiance = linear(texture(sDiffuseEnvSampler, n * uYDirection).rgb);
+#ifdef GLSL_VERSION_1_0
+  lowp vec3 irradiance = linear(textureCube(sDiffuseEnvSampler, n * uYDirection).rgb);
+#else
+  lowp vec3 irradiance = linear(TEXTURE(sDiffuseEnvSampler, n * uYDirection).rgb);
+#endif
   float Ems = (1.0 - (brdf.x + brdf.y));
   vec3 F_avg = specularWeight * (f0 + (1.0 - f0) / 21.0);
   vec3 FmsEms = Ems * FssEss * F_avg / (1.0 - F_avg * Ems);
@@ -269,37 +279,41 @@ void main()
     mediump float exposureFactor = 0.0;
     if(uEnableShadowSoftFiltering > 0)
     {
+#ifdef GLSL_VERSION_1_0
+      ivec2 texSize = ivec2(uShadowMapWidth, uShadowMapHeight);
+#else
       ivec2 texSize = textureSize(sShadowMap, 0);
+#endif
       mediump vec2 texelSize = vec2(1.0) / vec2(texSize.x, texSize.y);
-      mediump vec2 pcfSample = vec2(1.f, 0.f);
+      mediump vec2 pcfSample = vec2(1.0, 0.0);
       for (int i = 0; i < kPcfSampleCount; ++i)
       {
         pcfSample = vec2(kCosPcfTheta * pcfSample.x - kSinPcfTheta * pcfSample.y,
                          kSinPcfTheta * pcfSample.x + kCosPcfTheta * pcfSample.y);
-        lowp float depthValue = texture(sShadowMap, positionFromLightView.xy + pcfSample * texelSize).r;
+        lowp float depthValue = TEXTURE(sShadowMap, positionFromLightView.xy + pcfSample * texelSize).r;
         exposureFactor += (depthValue < positionFromLightView.z - uShadowBias) ? 0.0 : 1.0;
       }
       exposureFactor *= kInvSampleCount;
     }
     else
     {
-      mediump float depthValue = texture(sShadowMap, positionFromLightView.xy).r;
+      mediump float depthValue = TEXTURE(sShadowMap, positionFromLightView.xy).r;
       exposureFactor           = (depthValue < positionFromLightView.z - uShadowBias) ? 0.0 : 1.0;
     }
     color *= (1.0 - (1.0 - exposureFactor) * uShadowIntensity);
   }
 
 #ifdef OCCLUSION
-  lowp float ao = texture(sOcclusion, vUV).r;
+  lowp float ao = TEXTURE(sOcclusion, vUV).r;
   color = mix(color, color * ao, uOcclusionStrength);
 #endif // OCCLUSION
 
 #ifdef EMISSIVE_TEXTURE
-  lowp vec3 emissive = linear(texture(sEmissive, vUV).rgb) * uEmissiveFactor;
+  lowp vec3 emissive = linear(TEXTURE(sEmissive, vUV).rgb) * uEmissiveFactor;
 #else
   lowp vec3 emissive = uEmissiveFactor;
 #endif // EMISSIVE_TEXTURE
   color += emissive;
 
-  FragColor = vec4(pow(color, vec3(1.0 / 2.2)), baseColor.a) * uColor;
+  OUT_COLOR = vec4(pow(color, vec3(1.0 / 2.2)), baseColor.a) * uColor;
 }

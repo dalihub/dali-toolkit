@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,33 @@ namespace Dali::Scene3D::Loader
 {
 namespace
 {
+enum class LoadDataType
+{
+  UNSIGNED_BYTE = 0,
+  UNSIGNED_SHORT,
+  FLOAT
+};
+
+struct LoadAccessorInputs
+{
+  MeshDefinition::RawData&  rawData;
+  MeshDefinition::Accessor& accessor;
+  uint32_t                  flags;
+  std::fstream&             fileStream;
+  std::string&              meshPath;
+  BufferDefinition::Vector& buffers;
+};
+
+struct LoadAccessorListInputs
+{
+  MeshDefinition::RawData&               rawData;
+  std::vector<MeshDefinition::Accessor>& accessors;
+  uint32_t                               flags;
+  std::fstream&                          fileStream;
+  std::string&                           meshPath;
+  BufferDefinition::Vector&              buffers;
+};
+
 template<bool use32BitIndices>
 class IndexProvider
 {
@@ -635,6 +662,8 @@ std::iostream& GetAvailableData(std::fstream& meshStream, const std::string& mes
   return stream;
 }
 
+constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_VERTEX_ID = 300;
+
 } // namespace
 
 MeshDefinition::SparseBlob::SparseBlob(const Blob& indices, const Blob& values, uint32_t count)
@@ -1152,7 +1181,6 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
     }
     raw.mBlendShapeData = Devel::PixelBuffer::Convert(geometryPixelBuffer);
   }
-
   return raw;
 }
 
@@ -1180,6 +1208,29 @@ MeshGeometry MeshDefinition::Load(RawData&& raw) const
       {
         meshGeometry.geometry.SetIndexBuffer(raw.mIndices.data(), raw.mIndices.size());
       }
+    }
+
+    if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_VERTEX_ID && !raw.mAttribs.empty()))
+    {
+      auto numElements = raw.mAttribs[0].mNumElements;
+
+      // gl_VertexID not support. We should add buffer hard.
+      Property::Map attribMap;
+      attribMap["aVertexID"] = Property::FLOAT;
+
+      VertexBuffer attribBuffer = VertexBuffer::New(attribMap);
+
+      std::vector<uint8_t> buffer(numElements * sizeof(float));
+      auto                 ids = reinterpret_cast<float*>(buffer.data());
+
+      for(uint32_t i = 0; i < numElements; i++)
+      {
+        ids[i] = static_cast<float>(i);
+      }
+
+      attribBuffer.SetData(buffer.data(), numElements);
+
+      meshGeometry.geometry.AddVertexBuffer(attribBuffer);
     }
 
     for(auto& a : raw.mAttribs)

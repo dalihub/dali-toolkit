@@ -1,24 +1,35 @@
-#version 300 es
 
 precision highp float;
 
-in vec3 aPosition;
-in vec2 aTexCoord;
-in vec4 aVertexColor;
+INPUT vec3 aPosition;
+INPUT vec2 aTexCoord;
+INPUT vec4 aVertexColor;
 
-out mediump vec2 vUV;
-out lowp vec4 vColor;
+#ifdef GLSL_VERSION_1_0
+INPUT float aVertexID;
+#endif
+
+OUTPUT mediump vec2 vUV;
+OUTPUT lowp vec4 vColor;
+
+#ifdef MORPH
+uniform highp sampler2D sBlendShapeGeometry;
+#ifdef GLSL_VERSION_1_0
+uniform int uBlendShapeGeometryWidth;
+uniform int uBlendShapeGeometryHeight;
+#endif
+#endif
 
 uniform highp mat4 uViewMatrix;
 uniform highp mat4 uModelMatrix;
 uniform highp mat4 uProjection;
 
 #ifdef SKINNING
-  in vec4 aJoints;
-  in vec4 aWeights;
-  #define MAX_BONES 64
-  uniform mat4 uBone[MAX_BONES];
-  uniform mediump vec3 uYDirection;
+INPUT vec4 aJoints;
+INPUT vec4 aWeights;
+#define MAX_BONES 80
+uniform mat4 uBone[MAX_BONES];
+uniform mediump vec3 uYDirection;
 #endif
 
 #ifdef MORPH
@@ -40,9 +51,21 @@ void main()
   highp vec4 position = vec4(aPosition, 1.0);
 
 #ifdef MORPH
+
+#ifdef GLSL_VERSION_1_0
+  int width = uBlendShapeGeometryWidth;
+#else
   int width = textureSize( sBlendShapeGeometry, 0 ).x;
+#endif
 
   highp int blendShapeBufferOffset = 0;
+
+#ifdef GLSL_VERSION_1_0
+  highp float blendShapeWidth = float(uBlendShapeGeometryWidth);
+  highp float blendShapeHeight = float(uBlendShapeGeometryHeight);
+  highp float invertBlendShapeWidth = 1.0 / blendShapeWidth;
+  highp float invertBlendShapeHeight = 1.0 / blendShapeHeight;
+#endif
 
   for( int index = 0; index < uNumberOfBlendShapes; ++index )
   {
@@ -50,12 +73,19 @@ void main()
     highp int vertexId = 0;
     highp int x = 0;
     highp int y = 0;
+    highp float weight = clamp(uBlendShapeWeight[index], 0.0, 1.0);
 
 #ifdef MORPH_POSITION
     // Calculate the index to retrieve the geometry from the texture.
+#ifdef GLSL_VERSION_1_0
+    vertexId = int(floor(aVertexID + 0.5)) + blendShapeBufferOffset;
+    y = vertexId / width;
+    x = vertexId - y * width;
+#else
     vertexId = gl_VertexID + blendShapeBufferOffset;
     x = vertexId % width;
     y = vertexId / width;
+#endif
 
     // Retrieves the blend shape geometry from the texture, unnormalizes it and multiply by the weight.
     if( 0.0 != uBlendShapeWeight[index] )
@@ -66,7 +96,13 @@ void main()
        highp float unnormalizeFactor = uBlendShapeUnnormalizeFactor[index];
 #endif
 
-      diff = uBlendShapeWeight[index] * unnormalizeFactor * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
+#ifdef GLSL_VERSION_1_0
+      highp float floatX = float(x) + 0.5;
+      highp float floatY = float(y) + 0.5;
+      diff = weight * unnormalizeFactor * ( texture2D( sBlendShapeGeometry, vec2(floatX * invertBlendShapeWidth, floatY * invertBlendShapeHeight) ).xyz - 0.5 );
+#else
+      diff = weight * unnormalizeFactor * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
+#endif
     }
 
     position.xyz += diff;

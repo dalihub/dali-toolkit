@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ static constexpr std::string_view OPTION_KEYWORD[] =
     "MORPH_NORMAL",
     "MORPH_TANGENT",
     "MORPH_VERSION_2_0",
+    "GLSL_VERSION_1_0",
 };
 static constexpr uint32_t NUMBER_OF_OPTIONS = sizeof(OPTION_KEYWORD) / sizeof(OPTION_KEYWORD[0]);
 } // namespace
@@ -70,7 +71,7 @@ void ShaderOption::GetDefines(std::vector<std::string>& defines) const
   defines.clear();
   for(uint32_t i = 0; i < NUMBER_OF_OPTIONS; ++i)
   {
-    if(mOptionHash & 1 << i)
+    if(mOptionHash & (1 << i))
     {
       defines.push_back(OPTION_KEYWORD[i].data());
     }
