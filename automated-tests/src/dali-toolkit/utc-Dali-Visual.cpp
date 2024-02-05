@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -6461,6 +6461,144 @@ int UtcDaliVisualUpdatePropertyChangeShader04(void)
   callStack.Enable(false);
   // Shader changed
   DALI_TEST_CHECK(callStack.FindMethod("CreateShader"));
+
+  END_TEST;
+}
+
+int UtcDaliVisualUpdatePropertyChangeShader05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualUpdatePropertyChangeShader05: Test update property under glsl version is under 300");
+
+  auto originalShaderVersion = application.GetGlAbstraction().GetShaderLanguageVersion();
+
+  // Change the shader language version forcely!
+  application.GetGlAbstraction().mShaderLanguageVersion = 200;
+
+  try
+  {
+    TraceCallStack& callStack = application.GetGraphicsController().mCallStack;
+
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map propertyMap;
+    // Case ImageVisual
+    propertyMap[Visual::Property::TYPE]           = Visual::Type::COLOR;
+    propertyMap[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+
+    Visual::Base imageVisual = factory.CreateVisual(propertyMap);
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual);
+    dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+    application.GetScene().Add(dummyControl);
+
+    application.SendNotification();
+    application.Render();
+
+    application.SendNotification();
+    application.Render();
+
+    TestShaderCodeContainSubstrings(
+      dummyControl,
+      {
+        {"#define IS_REQUIRED_BLUR", false},
+        {"#define IS_REQUIRED_BORDERLINE", false},
+        {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+      },
+      TEST_LOCATION);
+
+    float   targetBlurRadius   = 15.0f;
+    Vector4 targetCornerRadius = Vector4(1.0f, 0.1f, 1.1f, 0.0f);
+
+    Property::Map targetPropertyMap;
+    targetPropertyMap[DevelColorVisual::Property::BLUR_RADIUS] = targetBlurRadius;
+    targetPropertyMap[DevelVisual::Property::CORNER_RADIUS]    = targetCornerRadius;
+    targetPropertyMap[DevelVisual::Property::BORDERLINE_WIDTH] = 10.0f; // Don't care. just dummy
+
+    callStack.Reset();
+    callStack.Enable(true);
+
+    // Update Properties with CornerRadius
+    DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
+
+    Property::Map resultMap;
+    imageVisual.CreatePropertyMap(resultMap);
+
+    // Test property values: they should be updated
+    Property::Value* blurRadiusValue = resultMap.Find(DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT);
+    DALI_TEST_CHECK(blurRadiusValue);
+    DALI_TEST_EQUALS(blurRadiusValue->Get<float>(), targetBlurRadius, TEST_LOCATION);
+
+    Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
+    DALI_TEST_CHECK(cornerRadiusValue);
+    DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
+
+    TestShaderCodeContainSubstrings(
+      dummyControl,
+      {
+        {"#define IS_REQUIRED_BLUR", true},
+        {"#define IS_REQUIRED_BORDERLINE", false},     // Note : We ignore borderline when blur radius occured
+        {"#define IS_REQUIRED_ROUNDED_CORNER", false}, // Note : low spec shader doesn't support rounded blur
+      },
+      TEST_LOCATION);
+
+    // Send shader compile signal
+    application.SendNotification();
+    application.Render();
+
+    callStack.Enable(false);
+
+    // Shader changed
+    DALI_TEST_CHECK((callStack.FindMethod("CreateShader")));
+    callStack.Reset();
+    callStack.Enable(true);
+
+    Property::Map targetPropertyMap2;
+    targetPropertyMap2[DevelColorVisual::Property::BLUR_RADIUS] = 0.0f;
+    targetPropertyMap2[DevelVisual::Property::CORNER_RADIUS]    = Vector4::ZERO;
+    targetPropertyMap2[DevelVisual::Property::BORDERLINE_WIDTH] = 15.0f; // Don't care. just dummy
+
+    // Update Properties with CornerRadius
+    DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap2);
+
+    Property::Map resultMap2;
+    imageVisual.CreatePropertyMap(resultMap2);
+
+    // Test property values: they should be updated
+    blurRadiusValue = resultMap2.Find(DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT);
+    DALI_TEST_CHECK(blurRadiusValue);
+    DALI_TEST_EQUALS(blurRadiusValue->Get<float>(), 0.0f, TEST_LOCATION);
+
+    cornerRadiusValue = resultMap2.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
+    DALI_TEST_CHECK(cornerRadiusValue);
+    DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), Vector4::ZERO, TEST_LOCATION);
+
+    TestShaderCodeContainSubstrings(
+      dummyControl,
+      {
+        {"#define IS_REQUIRED_BLUR", true},            // Note : mAlwaysUsingBlurRadius is true.
+        {"#define IS_REQUIRED_BORDERLINE", false},     // Note : We ignore borderline when blur radius occured
+        {"#define IS_REQUIRED_ROUNDED_CORNER", false}, // Note : mAlwaysUsingCornerRadius is true.
+      },
+      TEST_LOCATION);
+
+    // Send shader compile signal
+    application.SendNotification();
+    application.Render();
+
+    callStack.Enable(false);
+
+    // Shader not changed
+    DALI_TEST_CHECK(!(callStack.FindMethod("CreateShader")));
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
+  }
+
+  // Revert shader version. We should revert it even if UTC failed.
+  application.GetGlAbstraction().mShaderLanguageVersion = originalShaderVersion;
 
   END_TEST;
 }

@@ -359,6 +359,7 @@ ALIASES += SINCE_1_9="@since 1.9"
 ALIASES += SINCE_2_0="@since 2.0"
 ALIASES += SINCE_2_1="@since 2.1"
 ALIASES += SINCE_2_2="@since 2.2"
+ALIASES += SINCE_2_3="@since 2.3"
 
 # Extra tags for Tizen 3.0
 ALIASES += SINCE_1_2_2="@since 1.2.2"
