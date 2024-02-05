@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_SHADER_OPTION_H_
 #define DALI_SCENE3D_LOADER_SHADER_OPTION_H_
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,8 @@ public:
     MORPH_POSITION,             // 08000
     MORPH_NORMAL,               // 10000
     MORPH_TANGENT,              // 20000
-    MORPH_VERSION_2_0           // 40000
+    MORPH_VERSION_2_0,          // 40000
+    GLSL_VERSION_1_0,           // 80000
   };
 
   struct MacroDefinition

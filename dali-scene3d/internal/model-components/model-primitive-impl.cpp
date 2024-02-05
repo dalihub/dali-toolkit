@@ -112,6 +112,8 @@ DALI_TYPE_REGISTRATION_END()
 
 static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG = 10;
 
+constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_TEXTURE_TEXEL_AND_SIZE = 300;
+
 } // unnamed namespace
 
 ModelPrimitivePtr ModelPrimitive::New()
@@ -264,6 +266,14 @@ void ModelPrimitive::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeD
 void ModelPrimitive::SetBlendShapeGeometry(Dali::Texture blendShapeGeometry)
 {
   mBlendShapeGeometry = blendShapeGeometry;
+  if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_TEXTURE_TEXEL_AND_SIZE))
+  {
+    if(mRenderer && mBlendShapeGeometry)
+    {
+      mRenderer.RegisterProperty("uBlendShapeGeometryWidth", static_cast<int>(mBlendShapeGeometry.GetWidth()));
+      mRenderer.RegisterProperty("uBlendShapeGeometryHeight", static_cast<int>(mBlendShapeGeometry.GetHeight()));
+    }
+  }
 }
 
 void ModelPrimitive::SetBlendShapeOptions(bool hasPositions, bool hasNormals, bool hasTangents, Scene3D::Loader::BlendShapes::Version version)
@@ -337,6 +347,10 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
         shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::MORPH_VERSION_2_0);
       }
     }
+    if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_TEXTURE_TEXEL_AND_SIZE))
+    {
+      shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::GLSL_VERSION_1_0);
+    }
 
     Shader newShader = mShaderManager->ProduceShader(shaderOption);
     if(mShader != newShader)
@@ -379,6 +393,10 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
     {
       TextureSet newTextureSet = TextureSet::New();
       newTextureSet.SetTexture(0u, mBlendShapeGeometry);
+
+      Sampler blendShapeSampler = Sampler::New();
+      blendShapeSampler.SetFilterMode(Dali::FilterMode::NEAREST, Dali::FilterMode::NEAREST);
+      newTextureSet.SetSampler(0u, blendShapeSampler);
 
       const unsigned int numberOfTextures = mTextureSet.GetTextureCount();
       for(unsigned int index = 0u; index < numberOfTextures; ++index)
@@ -487,6 +505,11 @@ void ModelPrimitive::UpdateShadowMapTexture()
         if(index == textureCount - GetImplementation(mMaterial).GetShadowMapTextureOffset())
         {
           texture = (!!mShadowMapTexture) ? mShadowMapTexture : Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyTextureWhiteRGB();
+          if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_TEXTURE_TEXEL_AND_SIZE))
+          {
+            mRenderer.RegisterProperty("uShadowMapWidth", static_cast<int>(texture.GetWidth()));
+            mRenderer.RegisterProperty("uShadowMapHeight", static_cast<int>(texture.GetHeight()));
+          }
         }
 
         newTextures.SetTexture(index, texture);
@@ -545,6 +568,20 @@ void ModelPrimitive::UpdateRendererUniform()
     GetImplementation(mMaterial).SetRendererUniform(mRenderer);
     mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightScaleFactorName().data(), mIblScaleFactor);
     mRenderer.RegisterProperty(GetImplementation(mMaterial).GetImageBasedLightMaxLodUniformName().data(), static_cast<float>(mSpecularMipmapLevels));
+
+    if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_TEXTURE_TEXEL_AND_SIZE))
+    {
+      if(mShadowMapTexture)
+      {
+        mRenderer.RegisterProperty("uShadowMapWidth", static_cast<int>(mShadowMapTexture.GetWidth()));
+        mRenderer.RegisterProperty("uShadowMapHeight", static_cast<int>(mShadowMapTexture.GetHeight()));
+      }
+      if(mBlendShapeGeometry)
+      {
+        mRenderer.RegisterProperty("uBlendShapeGeometryWidth", static_cast<int>(mBlendShapeGeometry.GetWidth()));
+        mRenderer.RegisterProperty("uBlendShapeGeometryHeight", static_cast<int>(mBlendShapeGeometry.GetHeight()));
+      }
+    }
   }
 }
 

@@ -1,4 +1,3 @@
-#version 300 es
 
 // Original Code
 // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/glTF-WebGL-PBR/shaders/pbr-vert.glsl
@@ -19,32 +18,40 @@
   precision mediump float;
 #endif
 
-in vec3 aPosition;
-in vec2 aTexCoord;
-in vec3 aNormal;
+INPUT vec3 aPosition;
+INPUT vec2 aTexCoord;
+INPUT vec3 aNormal;
 
 #ifdef VEC4_TANGENT
-in vec4 aTangent;
+INPUT vec4 aTangent;
 #else
-in vec3 aTangent;
+INPUT vec3 aTangent;
 #endif
 
-in vec4 aVertexColor;
+INPUT vec4 aVertexColor;
+
+#ifdef GLSL_VERSION_1_0
+INPUT float aVertexID;
+#endif
 
 #ifdef SKINNING
-in vec4 aJoints0;
-in vec4 aWeights0;
+INPUT vec4 aJoints0;
+INPUT vec4 aWeights0;
 ADD_EXTRA_SKINNING_ATTRIBUTES
 #endif
 
 #ifdef MORPH
-  uniform highp sampler2D sBlendShapeGeometry;
+uniform highp sampler2D sBlendShapeGeometry;
+#ifdef GLSL_VERSION_1_0
+uniform int uBlendShapeGeometryWidth;
+uniform int uBlendShapeGeometryHeight;
+#endif
 #endif
 
-out mediump vec2 vUV;
-out lowp mat3 vTBN;
-out lowp vec4 vColor;
-out highp vec3 vPositionToCamera;
+OUTPUT mediump vec2 vUV;
+OUTPUT lowp mat3 vTBN;
+OUTPUT lowp vec4 vColor;
+OUTPUT highp vec3 vPositionToCamera;
 
 uniform highp mat4 uViewMatrix;
 uniform mat3 uNormalMatrix;
@@ -53,11 +60,16 @@ uniform mat4 uProjection;
 
 #ifdef SKINNING
 
+#ifdef GLSL_VERSION_1_0
+#define MAX_BONES 80
+uniform mat4 uBone[MAX_BONES];
+#else
 #define MAX_BONES 256
 layout(std140) uniform Bones
 {
   mat4 uBone[MAX_BONES];
 };
+#endif
 
 uniform mediump vec3 uYDirection;
 #endif
@@ -77,7 +89,7 @@ uniform highp int uBlendShapeComponentSize;                               ///< T
 // Shadow
 uniform lowp int uIsShadowEnabled;
 uniform highp mat4 uShadowLightViewProjectionMatrix;
-out highp vec3 positionFromLightView;
+OUTPUT highp vec3 positionFromLightView;
 
 void main()
 {
@@ -86,9 +98,20 @@ void main()
   highp vec3 tangent = aTangent.xyz;
 
 #ifdef MORPH
+#ifdef GLSL_VERSION_1_0
+  int width = uBlendShapeGeometryWidth;
+#else
   int width = textureSize( sBlendShapeGeometry, 0 ).x;
+#endif
 
   highp int blendShapeBufferOffset = 0;
+
+#ifdef GLSL_VERSION_1_0
+  highp float blendShapeWidth = float(uBlendShapeGeometryWidth);
+  highp float blendShapeHeight = float(uBlendShapeGeometryHeight);
+  highp float invertBlendShapeWidth = 1.0 / blendShapeWidth;
+  highp float invertBlendShapeHeight = 1.0 / blendShapeHeight;
+#endif
 
   for( int index = 0; index < uNumberOfBlendShapes; ++index )
   {
@@ -100,9 +123,15 @@ void main()
 
 #ifdef MORPH_POSITION
     // Calculate the index to retrieve the geometry from the texture.
+#ifdef GLSL_VERSION_1_0
+    vertexId = int(floor(aVertexID + 0.5)) + blendShapeBufferOffset;
+    y = vertexId / width;
+    x = vertexId - y * width;
+#else
     vertexId = gl_VertexID + blendShapeBufferOffset;
     x = vertexId % width;
     y = vertexId / width;
+#endif
 
     // Retrieves the blend shape geometry from the texture, unnormalizes it and multiply by the weight.
     if(0.0 != weight)
@@ -113,7 +142,13 @@ void main()
        highp float unnormalizeFactor = uBlendShapeUnnormalizeFactor[index];
 #endif
 
+#ifdef GLSL_VERSION_1_0
+      highp float floatX = float(x) + 0.5;
+      highp float floatY = float(y) + 0.5;
+      diff = weight * unnormalizeFactor * ( texture2D( sBlendShapeGeometry, vec2(floatX * invertBlendShapeWidth, floatY * invertBlendShapeHeight) ).xyz - 0.5 );
+#else
       diff = weight * unnormalizeFactor * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
+#endif
     }
 
     position.xyz += diff;
@@ -123,14 +158,26 @@ void main()
 
 #ifdef MORPH_NORMAL
     // Calculate the index to retrieve the normal from the texture.
+#ifdef GLSL_VERSION_1_0
+    vertexId = int(floor(aVertexID + 0.5)) + blendShapeBufferOffset;
+    y = vertexId / width;
+    x = vertexId - y * width;
+#else
     vertexId = gl_VertexID + blendShapeBufferOffset;
     x = vertexId % width;
     y = vertexId / width;
+#endif
 
     // Retrieves the blend shape normal from the texture, unnormalizes it and multiply by the weight.
     if(0.0 != weight)
     {
+#ifdef GLSL_VERSION_1_0
+      highp float floatX = float(x) + 0.5;
+      highp float floatY = float(y) + 0.5;
+      diff = weight * 2.0 * ( texture2D( sBlendShapeGeometry, vec2(floatX * invertBlendShapeWidth, floatY * invertBlendShapeHeight) ).xyz - 0.5 );
+#else
       diff = weight * 2.0 * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
+#endif
     }
 
     normal += diff.xyz;
@@ -140,14 +187,26 @@ void main()
 
 #ifdef MORPH_TANGENT
     // Calculate the index to retrieve the tangent from the texture.
+#ifdef GLSL_VERSION_1_0
+    vertexId = int(floor(aVertexID + 0.5)) + blendShapeBufferOffset;
+    y = vertexId / width;
+    x = vertexId - y * width;
+#else
     vertexId = gl_VertexID + blendShapeBufferOffset;
     x = vertexId % width;
     y = vertexId / width;
+#endif
 
     // Retrieves the blend shape tangent from the texture, unnormalizes it and multiply by the weight.
     if(0.0 != weight)
     {
+#ifdef GLSL_VERSION_1_0
+      highp float floatX = float(x) + 0.5;
+      highp float floatY = float(y) + 0.5;
+      diff = weight * 2.0 * ( texture2D( sBlendShapeGeometry, vec2(floatX * invertBlendShapeWidth, floatY * invertBlendShapeHeight) ).xyz - 0.5 );
+#else
       diff = weight * 2.0 * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
+#endif
     }
 
     tangent += diff.xyz;
@@ -181,7 +240,15 @@ void main()
 
   highp vec4 positionV = uViewMatrix * positionW;
 
+#ifdef GLSL_VERSION_1_0
+  highp vec3 i0 = uViewMatrix[0].xyz;
+  highp vec3 i1 = uViewMatrix[1].xyz;
+  highp vec3 i2 = uViewMatrix[2].xyz;
+
+  vPositionToCamera = mat3(vec3(i0.x, i1.x, i2.x), vec3(i0.y, i1.y, i2.y), vec3(i0.z, i1.z, i2.z)) * -vec3(positionV.xyz / positionV.w);
+#else
   vPositionToCamera = transpose(mat3(uViewMatrix)) * -vec3(positionV.xyz / positionV.w);
+#endif
 
   normal = normalize(normal);
   tangent = normalize(tangent);

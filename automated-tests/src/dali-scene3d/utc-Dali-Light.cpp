@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -748,6 +748,153 @@ int UtcDaliLightEnableShadowOnScene03(void)
   END_TEST;
 }
 
+int UtcDaliLightEnableShadowOnScene04(void)
+{
+  tet_infoline("Test when shader language version is low\n");
+  ToolkitTestApplication application;
+
+  auto originalShaderVersion = application.GetGlAbstraction().GetShaderLanguageVersion();
+
+  // Change the shader language version forcely!
+  application.GetGlAbstraction().mShaderLanguageVersion = 200;
+
+  try
+  {
+    Scene3D::SceneView sceneView = Scene3D::SceneView::New();
+    sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
+    sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
+    application.GetScene().Add(sceneView);
+
+    Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+    sceneView.Add(model);
+
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+
+    // Light is added on layer when on scene
+    DALI_TEST_EQUALS(true, model.GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE), TEST_LOCATION);
+
+    Renderer renderer = model.FindChildByName("node2").GetRendererAt(0u);
+    DALI_TEST_CHECK(renderer);
+    Shader shader = renderer.GetShader();
+    DALI_TEST_CHECK(shader);
+
+    auto shadowEnabledIndex = shader.GetPropertyIndex("uIsShadowEnabled");
+    DALI_TEST_CHECK(shadowEnabledIndex != DALI_KEY_INVALID);
+    DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
+
+    Scene3D::Light light = Scene3D::Light::New();
+    light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+    Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
+    sceneView.Add(light);
+
+    DALI_TEST_CHECK(shadowEnabledIndex != DALI_KEY_INVALID);
+    DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
+
+    light.EnableShadow(true);
+
+    DALI_TEST_CHECK(shadowEnabledIndex != DALI_KEY_INVALID);
+    DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
+
+    light.EnableShadow(true);
+
+    DALI_TEST_CHECK(shadowEnabledIndex != DALI_KEY_INVALID);
+    DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
+  }
+
+  // Revert shader version. We should revert it even if UTC failed.
+  application.GetGlAbstraction().mShaderLanguageVersion = originalShaderVersion;
+
+  END_TEST;
+}
+
+int UtcDaliLightEnableShadowOnScene05(void)
+{
+  tet_infoline("Test when shader language version is low\n");
+  ToolkitTestApplication application;
+
+  auto originalShaderVersion = application.GetGlAbstraction().GetShaderLanguageVersion();
+
+  // Change the shader language version forcely!
+  application.GetGlAbstraction().mShaderLanguageVersion = 200;
+
+  try
+  {
+    Scene3D::SceneView sceneView = Scene3D::SceneView::New();
+    sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
+    sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
+    application.GetScene().Add(sceneView);
+
+    Scene3D::Light light = Scene3D::Light::New();
+    light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+    Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
+    light.EnableShadow(true);
+    sceneView.Add(light);
+
+    application.SendNotification();
+    application.Render();
+
+    Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+    sceneView.Add(model);
+
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+
+    // Light is added on layer when on scene
+    DALI_TEST_EQUALS(true, model.GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE), TEST_LOCATION);
+
+    Renderer renderer = model.FindChildByName("node2").GetRendererAt(0u);
+    DALI_TEST_CHECK(renderer);
+    Shader shader = renderer.GetShader();
+    DALI_TEST_CHECK(shader);
+
+    auto shadowEnabledIndex = shader.GetPropertyIndex("uIsShadowEnabled");
+    DALI_TEST_CHECK(shadowEnabledIndex != DALI_KEY_INVALID);
+    DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
+
+    // Change material information, for line coverage.
+    auto modelNode = model.FindChildModelNodeByName("node2");
+    DALI_TEST_CHECK(modelNode);
+    DALI_TEST_GREATER(modelNode.GetModelPrimitiveCount(), 0u, TEST_LOCATION);
+    auto modelPrimitive = modelNode.GetModelPrimitive(0u);
+    DALI_TEST_CHECK(modelPrimitive);
+    auto material = modelPrimitive.GetMaterial();
+    DALI_TEST_CHECK(material);
+
+    auto originBaseColorFactor = material.GetProperty<Dali::Vector4>(Dali::Scene3D::Material::Property::BASE_COLOR_FACTOR);
+    auto expectBaseColorFactor = Vector4(originBaseColorFactor.r + 0.05f, originBaseColorFactor.g - 0.05f, originBaseColorFactor.b, originBaseColorFactor.a);
+    material.SetProperty(Dali::Scene3D::Material::Property::BASE_COLOR_FACTOR, expectBaseColorFactor);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(material.GetProperty<Dali::Vector4>(Dali::Scene3D::Material::Property::BASE_COLOR_FACTOR), expectBaseColorFactor, TEST_LOCATION);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
+  }
+
+  // Revert shader version. We should revert it even if UTC failed.
+  application.GetGlAbstraction().mShaderLanguageVersion = originalShaderVersion;
+
+  END_TEST;
+}
+
 // Disable Shadow
 int UtcDaliLightDisableShadow01(void)
 {
@@ -905,7 +1052,7 @@ int UtcDaliLightEnableShadowOfNotEnabledLight(void)
   Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
   sceneView.Add(model);
 
-  uint32_t maxLightCount = Scene3D::Light::GetMaximumEnabledLightCount();
+  uint32_t                    maxLightCount = Scene3D::Light::GetMaximumEnabledLightCount();
   std::vector<Scene3D::Light> lights;
   for(uint32_t i = 0; i < maxLightCount; ++i)
   {
