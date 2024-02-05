@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_SCENE_VIEW_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +85,8 @@ class SceneView;
  * And it can be used in case window's CameraActor is transformed.
  *
  * And since SceneView is a Control, it can be placed together with other 2D UI components in the DALi window.
+ *
+ * @note We support to render model well only if glsl version is higher than 300.
  *
  * @SINCE_2_1.38
  * @code
