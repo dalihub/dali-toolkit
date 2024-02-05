@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,8 +62,8 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_FITTING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, FILL)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, OVER_FIT_KEEP_ASPECT_RATIO)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, CENTER)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, FIT_WIDTH)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, FIT_HEIGHT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, FIT_WIDTH)
 DALI_ENUM_TO_STRING_TABLE_END(VISUAL_FITTING_MODE)
 
 /**
@@ -119,21 +119,21 @@ static bool IsTypeAvailableForBorderline(Toolkit::Visual::Type type)
 struct StringProperty
 {
   const char* const name;
-  Property::Index index;
+  Property::Index   index;
 };
-StringProperty PROPERTY_NAME_INDEX_TABLE[]=
-{
-  {CUSTOM_SHADER, Toolkit::Visual::Property::SHADER},
-  {TRANSFORM, Toolkit::Visual::Property::TRANSFORM},
-  {PREMULTIPLIED_ALPHA, Toolkit::Visual::Property::PREMULTIPLIED_ALPHA},
-  {MIX_COLOR, Toolkit::Visual::Property::MIX_COLOR},
-  {OPACITY, Toolkit::Visual::Property::OPACITY},
-  {VISUAL_FITTING_MODE, Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE},
-  {BORDERLINE_WIDTH, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH},
-  {BORDERLINE_COLOR, Toolkit::DevelVisual::Property::BORDERLINE_COLOR},
-  {BORDERLINE_OFFSET, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET},
-  {CORNER_RADIUS, Toolkit::DevelVisual::Property::CORNER_RADIUS},
-  {CORNER_RADIUS_POLICY, Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY},
+StringProperty PROPERTY_NAME_INDEX_TABLE[] =
+  {
+    {CUSTOM_SHADER, Toolkit::Visual::Property::SHADER},
+    {TRANSFORM, Toolkit::Visual::Property::TRANSFORM},
+    {PREMULTIPLIED_ALPHA, Toolkit::Visual::Property::PREMULTIPLIED_ALPHA},
+    {MIX_COLOR, Toolkit::Visual::Property::MIX_COLOR},
+    {OPACITY, Toolkit::Visual::Property::OPACITY},
+    {VISUAL_FITTING_MODE, Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE},
+    {BORDERLINE_WIDTH, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH},
+    {BORDERLINE_COLOR, Toolkit::DevelVisual::Property::BORDERLINE_COLOR},
+    {BORDERLINE_OFFSET, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET},
+    {CORNER_RADIUS, Toolkit::DevelVisual::Property::CORNER_RADIUS},
+    {CORNER_RADIUS_POLICY, Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY},
 };
 const uint16_t PROPERTY_NAME_INDEX_TABLE_COUNT = sizeof(PROPERTY_NAME_INDEX_TABLE) / sizeof(PROPERTY_NAME_INDEX_TABLE[0]);
 
