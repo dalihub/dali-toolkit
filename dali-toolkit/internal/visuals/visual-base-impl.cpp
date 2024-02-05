@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,8 +62,8 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_FITTING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, FILL)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, OVER_FIT_KEEP_ASPECT_RATIO)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, CENTER)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, FIT_WIDTH)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, FIT_HEIGHT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, FIT_WIDTH)
 DALI_ENUM_TO_STRING_TABLE_END(VISUAL_FITTING_MODE)
 
 /**
