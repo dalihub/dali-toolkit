@@ -54,9 +54,9 @@ constexpr std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
   "",                                                                              // VisualFactoryCache::IMAGE_SHADER,
   "#define IS_REQUIRED_ROUNDED_CORNER\n",                                          // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
   "#define IS_REQUIRED_YUV_TO_RGB\n",                                              // VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
-  "#define IS_REQUIRED_YUV_TO_RGB\n#define IS_REQUIRED_ROUNDED_CORNER\n",          // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
+  "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_YUV_TO_RGB\n",          // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
   "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n",                                     // VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
-  "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n#define IS_REQUIRED_ROUNDED_CORNER\n", // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
+  "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n", // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
 };
 constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[SHADER_TYPE_COUNT]{
   VisualFactoryCache::ShaderType::IMAGE_SHADER,

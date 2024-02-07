@@ -336,11 +336,14 @@ Shader VisualFactoryCache::GetNPatchShader(int index)
   }
   else if(xStretchCount > 0 || yStretchCount > 0)
   {
+    std::stringstream shaderName;
+    shaderName << "N_PATCH_" << xStretchCount << "x" << yStretchCount;
+
     std::stringstream vertexShader;
     vertexShader << "#define FACTOR_SIZE_X " << xStretchCount + 2 << "\n"
                  << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
                  << SHADER_NPATCH_VISUAL_SHADER_VERT;
-    shader = Shader::New(vertexShader.str(), SHADER_NPATCH_VISUAL_SHADER_FRAG);
+    shader = Shader::New(vertexShader.str(), SHADER_NPATCH_VISUAL_SHADER_FRAG, Dali::Shader::Hint::NONE, shaderName.str());
   }
   return shader;
 }
