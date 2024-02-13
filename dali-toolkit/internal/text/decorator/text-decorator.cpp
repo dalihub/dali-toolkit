@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/size-negotiation/relayout-container.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -251,7 +252,7 @@ struct Decorator::Impl : public ConnectionTracker
    * Relayout of the decorations owned by the decorator.
    * @param[in] size The Size of the UI control the decorator is adding it's decorations to.
    */
-  void Relayout(const Vector2& size)
+  void Relayout(const Vector2& size, RelayoutContainer& container)
   {
     mControlSize = size;
 
@@ -273,6 +274,8 @@ struct Decorator::Impl : public ConnectionTracker
       {
         mPrimaryCursor.SetProperty(Actor::Property::POSITION, Vector2(cursor.position.x, cursor.position.y));
         mPrimaryCursor.SetProperty(Actor::Property::SIZE, Size(mCursorWidth, cursor.cursorHeight));
+
+        container.Add(mPrimaryCursor, Size(mCursorWidth, cursor.cursorHeight));
       }
       mPrimaryCursor.SetProperty(Actor::Property::VISIBLE, mPrimaryCursorVisible && mCursorBlinkStatus);
     }
@@ -287,6 +290,8 @@ struct Decorator::Impl : public ConnectionTracker
       {
         mSecondaryCursor.SetProperty(Actor::Property::POSITION, Vector2(cursor.position.x, cursor.position.y));
         mSecondaryCursor.SetProperty(Actor::Property::SIZE, Size(mCursorWidth, cursor.cursorHeight));
+
+        container.Add(mSecondaryCursor, Size(mCursorWidth, cursor.cursorHeight));
       }
       mSecondaryCursor.SetProperty(Actor::Property::VISIBLE, mSecondaryCursorVisible && mCursorBlinkStatus);
     }
@@ -301,7 +306,7 @@ struct Decorator::Impl : public ConnectionTracker
       grabHandle.horizontallyVisible = ((mControlSize.width - (grabHandle.position.x + floor(0.5f * mCursorWidth)) > -Math::MACHINE_EPSILON_1000) &&
                                         (grabHandle.position.x > -Math::MACHINE_EPSILON_1000));
       grabHandle.verticallyVisible   = ((fabsf(mControlSize.height - grabHandle.lineHeight) - grabHandle.position.y > -Math::MACHINE_EPSILON_1000) &&
-                                        (grabHandle.position.y + grabHandle.lineHeight > -Math::MACHINE_EPSILON_1000));
+                                      (grabHandle.position.y + grabHandle.lineHeight > -Math::MACHINE_EPSILON_1000));
 
       const bool isVisible = grabHandle.horizontallyVisible && grabHandle.verticallyVisible && (!mHidePrimaryCursorAndGrabHandle);
       if(isVisible)
@@ -954,9 +959,9 @@ struct Decorator::Impl : public ConnectionTracker
     if(!mCopyPastePopup.actor)
     {
       mCopyPastePopup.actor = TextSelectionPopup::New(&mTextSelectionPopupCallbackInterface);
-  #ifdef DECORATOR_DEBUG
+#ifdef DECORATOR_DEBUG
       mCopyPastePopup.actor.SetProperty(Dali::Actor::Property::NAME, "mCopyPastePopup");
-  #endif
+#endif
       mCopyPastePopup.actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
       mCopyPastePopup.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
       mCopyPastePopup.actor.OnRelayoutSignal().Connect(this, &Decorator::Impl::SetPopupPosition); // Position popup after size negotiation
@@ -1096,11 +1101,11 @@ struct Decorator::Impl : public ConnectionTracker
 
   void ApplyDisplacement(HandleImpl& handle, float yLocalPosition)
   {
-    if( handle.actor )
+    if(handle.actor)
     {
       float adjustedDisplacementX = 0.0f;
       float adjustedDisplacementY = 0.0f;
-      if (mSmoothHandlePanEnabled)
+      if(mSmoothHandlePanEnabled)
       {
         adjustedDisplacementX = CalculateAdjustedDisplacement(handle.position.x, handle.grabDisplacementX, mControlSize.x);
         adjustedDisplacementY = CalculateAdjustedDisplacement(handle.position.y, handle.grabDisplacementY, (mControlSize.y - handle.lineHeight));
@@ -1994,9 +1999,9 @@ void Decorator::GetBoundingBox(Rect<int>& boundingBox) const
   WorldToLocalCoordinatesBoundingBox(mImpl->mBoundingBox, boundingBox);
 }
 
-void Decorator::Relayout(const Vector2& size)
+void Decorator::Relayout(const Vector2& size, RelayoutContainer& container)
 {
-  mImpl->Relayout(size);
+  mImpl->Relayout(size, container);
 }
 
 void Decorator::UpdatePositions(const Vector2& scrollOffset)
@@ -2164,8 +2169,6 @@ void Decorator::SetEditable(bool editable)
       SetPopupActive(false);
     }
   }
-
-  mImpl->Relayout(mImpl->mControlSize);
 }
 /** Handles **/
 

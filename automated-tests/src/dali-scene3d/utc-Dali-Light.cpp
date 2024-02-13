@@ -1046,3 +1046,55 @@ int UtcDaliLightShadowSoftFiltering(void)
 
   END_TEST;
 }
+
+namespace
+{
+constexpr int32_t SCENE_ORDER_INDEX = 100;
+constexpr int32_t SHADOW_ORDER_INDEX = 99;
+}
+
+int UtcDaliLightShadowRenderTask(void)
+{
+  ToolkitTestApplication application;
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  DALI_TEST_EQUALS(1, taskList.GetTaskCount(), TEST_LOCATION);
+
+  Scene3D::SceneView sceneView = Scene3D::SceneView::New();
+  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
+  sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
+  application.GetScene().Add(sceneView);
+
+  DALI_TEST_EQUALS(2, taskList.GetTaskCount(), TEST_LOCATION);
+
+  sceneView.UseFramebuffer(true);
+
+  DALI_TEST_EQUALS(2, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, taskList.GetTask(0u).GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(SCENE_ORDER_INDEX, taskList.GetTask(1u).GetOrderIndex(), TEST_LOCATION);
+
+  Scene3D::Light light = Scene3D::Light::New();
+  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
+  light.EnableShadow(true);
+  sceneView.Add(light);
+
+  DALI_TEST_EQUALS(3, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, taskList.GetTask(0u).GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(SCENE_ORDER_INDEX, taskList.GetTask(1u).GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(SHADOW_ORDER_INDEX, taskList.GetTask(2u).GetOrderIndex(), TEST_LOCATION);
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(SHADOW_ORDER_INDEX, taskList.GetTask(1u).GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(SCENE_ORDER_INDEX, taskList.GetTask(2u).GetOrderIndex(), TEST_LOCATION);
+
+  light.EnableShadow(false);
+
+  DALI_TEST_EQUALS(2, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, taskList.GetTask(0u).GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(SCENE_ORDER_INDEX, taskList.GetTask(1u).GetOrderIndex(), TEST_LOCATION);
+
+  END_TEST;
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ static constexpr Vector3 Y_DIRECTION(1.0f, -1.0f, 1.0f);
 } // namespace
 
 ModelLoadTask::ModelLoadTask(const std::string& modelUrl, const std::string& resourceDirectoryUrl, CallbackBase* callback)
-: AsyncTask(callback),
+: AsyncTask(callback, AsyncTask::PriorityType::LOW),
   mModelUrl(modelUrl),
   mResourceDirectoryUrl(resourceDirectoryUrl),
   mModelCacheManager(Scene3D::Internal::ModelCacheManager::Get()),

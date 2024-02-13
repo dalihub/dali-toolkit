@@ -326,9 +326,9 @@ int UtcDaliSceneViewOnScene02(void)
   application.Render();
 
   renderTaskCount = application.GetScene().GetRenderTaskList().GetTaskCount();
-  DALI_TEST_EQUALS(baseRenderTaskCount + 2u, renderTaskCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseRenderTaskCount + 1u, renderTaskCount, TEST_LOCATION);
 
-  RenderTask  renderTask = application.GetScene().GetRenderTaskList().GetTask(baseRenderTaskCount + 1u);
+  RenderTask  renderTask = application.GetScene().GetRenderTaskList().GetTask(baseRenderTaskCount);
   CameraActor camera     = renderTask.GetCameraActor();
 
   CameraActor defaultCamera = renderTask.GetCameraActor();
@@ -694,7 +694,7 @@ int UtcDaliSceneViewUseFramebuffer02(void)
   application.SendNotification();
   application.Render();
 
-  RenderTask renderTask = application.GetScene().GetRenderTaskList().GetTask(baseRenderTaskCount + 1u);
+  RenderTask renderTask = application.GetScene().GetRenderTaskList().GetTask(baseRenderTaskCount);
   DALI_TEST_CHECK(!renderTask.GetFrameBuffer());
 
   view.UseFramebuffer(true);
@@ -1006,7 +1006,7 @@ int UtcDaliSceneViewCreateAndRemoveRenderTask(void)
 
   application.GetScene().Add(view);
 
-  DALI_TEST_EQUALS(baseRenderTaskCount + 2, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(baseRenderTaskCount + 1, application.GetScene().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
 
   view.Unparent();
 
@@ -1105,7 +1105,7 @@ int UtcDaliSceneViewSetResolution02(void)
   tet_printf("Test Framebuffer result target created well\n");
   view.UseFramebuffer(true);
 
-  RenderTask renderTask = renderTaskList.GetTask(baseRenderTaskCount + 1u);
+  RenderTask renderTask = renderTaskList.GetTask(baseRenderTaskCount);
   DALI_TEST_CHECK(renderTask);
 
   FrameBuffer frameBuffer = renderTask.GetFrameBuffer();
@@ -1122,7 +1122,7 @@ int UtcDaliSceneViewSetResolution02(void)
   tet_printf("Test Framebuffer result target created well after create new FBO, by set multisampling level\n");
   view.SetFramebufferMultiSamplingLevel(2u);
 
-  renderTask = renderTaskList.GetTask(baseRenderTaskCount + 1u);
+  renderTask = renderTaskList.GetTask(baseRenderTaskCount);
   DALI_TEST_CHECK(renderTask);
 
   frameBuffer = renderTask.GetFrameBuffer();
@@ -1142,7 +1142,7 @@ int UtcDaliSceneViewSetResolution02(void)
   expectHeight = 103u;
   view.SetResolution(expectWidth, expectHeight);
 
-  renderTask = renderTaskList.GetTask(baseRenderTaskCount + 1u);
+  renderTask = renderTaskList.GetTask(baseRenderTaskCount);
   DALI_TEST_CHECK(renderTask);
 
   frameBuffer = renderTask.GetFrameBuffer();

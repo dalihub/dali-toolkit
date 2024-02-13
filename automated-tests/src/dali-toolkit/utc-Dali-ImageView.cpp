@@ -2220,6 +2220,10 @@ int UtcDaliImageViewFittingModesFitHeight01(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<Vector2>(), Vector2(0, 0), TEST_LOCATION); // OFFSET is zero
 
+  value = returnedMap.Find(DevelVisual::Property::VISUAL_FITTING_MODE);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<std::string>(), "FIT_HEIGHT", TEST_LOCATION); // OFFSET is zero
+
   END_TEST;
 }
 
@@ -2309,6 +2313,10 @@ int UtcDaliImageViewFittingModesFitWidth01(void)
   value = map->Find(Toolkit::Visual::Transform::Property::OFFSET);
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<Vector2>(), Vector2(0, 50), TEST_LOCATION);
+
+  value = returnedMap.Find(DevelVisual::Property::VISUAL_FITTING_MODE);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<std::string>(), "FIT_WIDTH", TEST_LOCATION); // OFFSET is zero
 
   END_TEST;
 }

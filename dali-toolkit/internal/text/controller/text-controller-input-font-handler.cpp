@@ -373,7 +373,7 @@ FontSlant Controller::InputFontHandler::GetInputFontSlant(const Controller& cont
   return controller.GetDefaultFontSlant();
 }
 
-void Controller::InputFontHandler::SetInputFontPointSize(Controller& controller, float size)
+void Controller::InputFontHandler::SetInputFontPointSize(Controller& controller, float size, bool defaultFontSizeUpdated)
 {
   if(NULL != controller.mImpl->mEventData)
   {
@@ -385,7 +385,7 @@ void Controller::InputFontHandler::SetInputFontPointSize(Controller& controller,
       CharacterIndex startOfSelectedText  = 0u;
       Length         lengthOfSelectedText = 0u;
 
-      if(EventData::SELECTING == controller.mImpl->mEventData->mState)
+      if(EventData::SELECTING == controller.mImpl->mEventData->mState && !defaultFontSizeUpdated)
       {
         // Update a font description run for the selecting state.
         FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun(controller.mImpl->mEventData,
