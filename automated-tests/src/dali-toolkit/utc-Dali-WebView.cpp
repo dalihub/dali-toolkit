@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@
 #include <dali.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-certificate.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-console-message.h>
-#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-context-menu-item.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-context-menu.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-form-repost-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-frame.h>
@@ -153,7 +153,7 @@ static void OnNewWindowCreated(Dali::WebEnginePlugin*& outPlugin)
 {
   gNewWindowCreatedCallbackCalled++;
   WebView newView = WebView::New();
-  outPlugin = newView.GetPlugin();
+  outPlugin       = newView.GetPlugin();
 }
 
 static void OnUrlChanged(const std::string& url)
@@ -2364,6 +2364,53 @@ int UtcDaliWebViewGetPlainText(void)
   view.GetPlainTextAsynchronously(&OnPlainTextReceived);
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS(gPlainTextReceivedCallbackCalled, 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliWebViewVisibilityChange(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view  = WebView::New();
+  Control dummy = Control::New();
+  DALI_TEST_CHECK(view);
+  DALI_TEST_CHECK(dummy);
+
+  view.LoadUrl(TEST_URL1);
+
+  dummy.Add(view);
+  auto window = application.GetWindow();
+  window.Add(dummy);
+
+  application.SendNotification();
+  application.Render();
+
+  try
+  {
+    // TODO : There is no way to check visiblity setting result from web engine.
+    // Just call API and exception check.
+    view.SetProperty(Actor::Property::VISIBLE, false);
+    view.SetProperty(Actor::Property::VISIBLE, true);
+    dummy.SetProperty(Actor::Property::VISIBLE, false);
+    dummy.SetProperty(Actor::Property::VISIBLE, true);
+    dummy.Unparent();
+    window.Hide();
+    window.Add(dummy);
+    window.Show();
+    window.Hide();
+    window.Show();
+    dummy.SetProperty(Actor::Property::VISIBLE, false);
+    view.SetProperty(Actor::Property::VISIBLE, false);
+    dummy.SetProperty(Actor::Property::VISIBLE, true);
+    view.SetProperty(Actor::Property::VISIBLE, true);
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+    // Should not throw exception
+    tet_result(TET_FAIL);
+  }
 
   END_TEST;
 }

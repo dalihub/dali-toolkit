@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_WEB_VIEW_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -472,6 +472,11 @@ private: // From Control
    */
   void OnSceneConnection(int depth) override;
 
+  /**
+   * @copydoc Toolkit::Control::OnSceneDisconnection()
+   */
+  void OnSceneDisconnection() override;
+
 private:
   // Undefined
   WebView(const WebView& webView);
@@ -678,6 +683,13 @@ private:
   void OnVisibilityChanged(Actor actor, bool isVisible, Dali::DevelActor::VisibilityChange::Type type);
 
   /**
+   * @brief Callback when the visibility of the window is changed.
+   * @param[in] window The window whose visibility has changed
+   * @param[in] visible Whether the window is now visible or not
+   */
+  void OnWindowVisibilityChanged(Window window, bool visible);
+
+  /**
    * @brief callback for screen shot captured.
    * @param[in] pixel Pixel data of screen shot.
    */
@@ -690,6 +702,11 @@ private:
    * @param[in] displayArea The display area for current webview want to show.
    */
   void SetDisplayArea(const Dali::Rect<int32_t>& displayArea);
+
+  /**
+   * @brief Apply self visibility state and send visibility chagend to web engine.
+   */
+  void ApplyVisibilityCheck();
 
 protected:
   class WebViewAccessible : public DevelControl::ControlAccessible
@@ -726,6 +743,19 @@ private:
 
   uint32_t mLastRenderedNativeImageWidth;
   uint32_t mLastRenderedNativeImageHeight;
+
+  enum WebViewVisibleStateFlag
+  {
+    NONE        = 0,
+    SCENE_ON    = 1 << 0,
+    WINDOW_SHOW = 1 << 1,
+    SELF_SHOW   = 1 << 2,
+    PARENT_SHOW = 1 << 3,
+
+    VISIBLE = SCENE_ON | WINDOW_SHOW | SELF_SHOW | PARENT_SHOW,
+  };
+  uint32_t           mWebViewVisibleState{WebViewVisibleStateFlag::NONE}; /// Flag of web view visible.
+  WeakHandle<Window> mPlacementWindow;
 
   std::unique_ptr<Dali::Toolkit::WebSettings>        mWebSettings;
   std::unique_ptr<Dali::Toolkit::WebBackForwardList> mWebBackForwardList;
