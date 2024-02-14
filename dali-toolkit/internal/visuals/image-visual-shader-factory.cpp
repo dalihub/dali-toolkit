@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,9 +54,17 @@ constexpr std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
   "",                                                                              // VisualFactoryCache::IMAGE_SHADER,
   "#define IS_REQUIRED_ROUNDED_CORNER\n",                                          // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
   "#define IS_REQUIRED_YUV_TO_RGB\n",                                              // VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
-  "#define IS_REQUIRED_YUV_TO_RGB\n#define IS_REQUIRED_ROUNDED_CORNER\n",          // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
+  "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_YUV_TO_RGB\n",          // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
   "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n",                                     // VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
-  "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n#define IS_REQUIRED_ROUNDED_CORNER\n", // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
+  "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n", // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
+};
+constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[SHADER_TYPE_COUNT]{
+  VisualFactoryCache::ShaderType::IMAGE_SHADER,
+  VisualFactoryCache::ShaderType::IMAGE_SHADER_ROUNDED_CORNER,
+  VisualFactoryCache::ShaderType::IMAGE_SHADER_YUV_TO_RGB,
+  VisualFactoryCache::ShaderType::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
+  VisualFactoryCache::ShaderType::IMAGE_SHADER_YUV_AND_RGB,
+  VisualFactoryCache::ShaderType::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
 };
 } // unnamed namespace
 
@@ -130,13 +138,12 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, Ima
     return shader;
   }
 
-  shader = Shader::New(vertexShader, fragmentShader);
+  shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
   shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
   if(featureBuilder.IsEnabledAlphaMaskingOnRendering())
   {
     shader.RegisterProperty(Y_FLIP_MASK_TEXTURE, NOT_FLIP_MASK_TEXTURE);
   }
-  factoryCache.SaveShader(shaderType, shader);
 
   return shader;
 }
@@ -168,17 +175,20 @@ void ImageVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
 {
   std::vector<std::string_view> vertexPrefix;
   std::vector<std::string_view> fragmentPrefix;
+  std::vector<std::string_view> shaderName;
   shaders.shaderCount = 0;
   int shaderCount     = 0;
   for(uint32_t i = 0; i < SHADER_TYPE_COUNT; ++i)
   {
     vertexPrefix.push_back(VertexPredefines[i]);
     fragmentPrefix.push_back(FragmentPredefines[i]);
+    shaderName.push_back(Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
     shaderCount++;
   }
 
   shaders.vertexPrefix   = vertexPrefix;
   shaders.fragmentPrefix = fragmentPrefix;
+  shaders.shaderName     = shaderName;
   shaders.vertexShader   = SHADER_IMAGE_VISUAL_SHADER_VERT;
   shaders.fragmentShader = SHADER_IMAGE_VISUAL_SHADER_FRAG;
   shaders.shaderCount    = shaderCount;

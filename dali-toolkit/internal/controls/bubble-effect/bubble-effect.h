@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUBBLE_EFFECT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ inline Shader CreateBubbleShader(unsigned int numBubble)
   std::ostringstream vertexShaderStringStream;
   vertexShaderStringStream << "#define NUMBER_OF_BUBBLE " << numBubble << "\n"
                            << SHADER_BUBBLE_EFFECT_VERT;
-  Shader shader = Shader::New(vertexShaderStringStream.str(), SHADER_BUBBLE_EFFECT_FRAG);
+  Shader shader = Shader::New(vertexShaderStringStream.str(), SHADER_BUBBLE_EFFECT_FRAG, Shader::Hint::NONE, "BUBBLE_EFFECT");
 
   return shader;
 }

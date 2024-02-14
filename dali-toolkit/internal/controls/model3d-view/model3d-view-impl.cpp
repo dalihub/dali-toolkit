@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -277,7 +277,7 @@ void Model3dView::OnInitialize()
 {
   //Create empty versions of the geometry and material so we always have a Renderer
   Geometry mesh   = Geometry::New();
-  Shader   shader = Shader::New(SHADER_MODEL3D_VIEW_SIMPLE_SHADER_VERT, SHADER_MODEL3D_VIEW_SIMPLE_SHADER_FRAG);
+  Shader   shader = Shader::New(SHADER_MODEL3D_VIEW_SIMPLE_SHADER_VERT, SHADER_MODEL3D_VIEW_SIMPLE_SHADER_FRAG, Shader::Hint::NONE, "MODEL3D_VIEW_SIMPLE");
   mRenderer       = Renderer::New(mesh, shader);
 
   Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::IMAGE);
@@ -387,21 +387,21 @@ void Model3dView::CreateMaterial()
   {
     if((mTexture2Url != "") && (mTexture1Url != "") && (mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP))
     {
-      mShader = Shader::New(SHADER_MODEL3D_VIEW_NRMMAP_SHADER_VERT, SHADER_MODEL3D_VIEW_NRMMAP_SHADER_FRAG);
+      mShader = Shader::New(SHADER_MODEL3D_VIEW_NRMMAP_SHADER_VERT, SHADER_MODEL3D_VIEW_NRMMAP_SHADER_FRAG, Shader::Hint::NONE, "MODEL3D_VIEW_NRMMAP");
     }
     else if(mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE ||
             mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP)
     {
-      mShader = Shader::New(SHADER_MODEL3D_VIEW_SHADER_VERT, SHADER_MODEL3D_VIEW_SHADER_FRAG);
+      mShader = Shader::New(SHADER_MODEL3D_VIEW_SHADER_VERT, SHADER_MODEL3D_VIEW_SHADER_FRAG, Shader::Hint::NONE, "MODEL3D_VIEW");
     }
     else
     {
-      mShader = Shader::New(SHADER_MODEL3D_VIEW_SIMPLE_SHADER_VERT, SHADER_MODEL3D_VIEW_SIMPLE_SHADER_FRAG);
+      mShader = Shader::New(SHADER_MODEL3D_VIEW_SIMPLE_SHADER_VERT, SHADER_MODEL3D_VIEW_SIMPLE_SHADER_FRAG, Shader::Hint::NONE, "MODEL3D_VIEW_SIMPLE");
     }
   }
   else
   {
-    mShader = Shader::New(SHADER_MODEL3D_VIEW_SIMPLE_SHADER_VERT, SHADER_MODEL3D_VIEW_SIMPLE_SHADER_FRAG);
+    mShader = Shader::New(SHADER_MODEL3D_VIEW_SIMPLE_SHADER_VERT, SHADER_MODEL3D_VIEW_SIMPLE_SHADER_FRAG, Shader::Hint::NONE, "MODEL3D_VIEW_NRMMAP");
   }
 
   mTextureSet = TextureSet::New();

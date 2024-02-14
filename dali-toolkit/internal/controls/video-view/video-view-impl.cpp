@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -645,7 +645,7 @@ void VideoView::SetWindowSurfaceTarget()
   {
     // For underlay rendering mode, video display area have to be transparent.
     Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-    Shader   shader   = Shader::New(SHADER_VIDEO_VIEW_VERT, SHADER_VIDEO_VIEW_FRAG);
+    Shader   shader   = Shader::New(SHADER_VIDEO_VIEW_VERT, SHADER_VIDEO_VIEW_FRAG, Shader::Hint::NONE, "VIDEO_VIEW_OVERLAY");
     mOverlayRenderer  = Renderer::New(geometry, shader);
     mOverlayRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::OFF);
   }
@@ -887,7 +887,7 @@ Dali::Shader VideoView::CreateShader()
     DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader);
   }
 
-  return Dali::Shader::New(vertexShader, fragmentShader);
+  return Dali::Shader::New(vertexShader, fragmentShader, Shader::Hint::NONE, "VIDEO_VIEW");
 }
 
 bool VideoView::GetStringFromProperty(const Dali::Property::Value& value, std::string& output)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  */
 
 // CLASS HEADER
-#include "visual-factory-cache.h"
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/common/hash.h>
+#include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/math/math-utils.h>
 
@@ -51,6 +53,7 @@ bool NeedToLoadYuvPlanes()
   bool loadYuvPlanes       = loadYuvPlanesString ? std::atoi(loadYuvPlanesString) : false;
   return loadYuvPlanes;
 }
+
 } // namespace
 
 VisualFactoryCache::VisualFactoryCache(bool preMultiplyOnLoad)
@@ -88,9 +91,11 @@ Shader VisualFactoryCache::GetShader(ShaderType type)
   return mShader[type];
 }
 
-void VisualFactoryCache::SaveShader(ShaderType type, Shader shader)
+Shader VisualFactoryCache::GenerateAndSaveShader(ShaderType type, std::string_view vertexShader, std::string_view fragmentShader)
 {
+  Shader shader = Shader::New(vertexShader, fragmentShader, Shader::Hint::NONE, Scripting::GetLinearEnumerationName<ShaderType>(type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
   mShader[type] = shader;
+  return shader;
 }
 
 Geometry VisualFactoryCache::CreateQuadGeometry()
@@ -325,19 +330,20 @@ Shader VisualFactoryCache::GetNPatchShader(int index)
     shader = GetShader(VisualFactoryCache::NINE_PATCH_SHADER);
     if(DALI_UNLIKELY(!shader))
     {
-      shader = Shader::New(SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, SHADER_NPATCH_VISUAL_SHADER_FRAG);
-
       // Only cache vanilla 9 patch shaders
-      SaveShader(VisualFactoryCache::NINE_PATCH_SHADER, shader);
+      shader = GenerateAndSaveShader(VisualFactoryCache::NINE_PATCH_SHADER, SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, SHADER_NPATCH_VISUAL_SHADER_FRAG);
     }
   }
   else if(xStretchCount > 0 || yStretchCount > 0)
   {
+    std::stringstream shaderName;
+    shaderName << "N_PATCH_" << xStretchCount << "x" << yStretchCount;
+
     std::stringstream vertexShader;
     vertexShader << "#define FACTOR_SIZE_X " << xStretchCount + 2 << "\n"
                  << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
                  << SHADER_NPATCH_VISUAL_SHADER_VERT;
-    shader = Shader::New(vertexShader.str(), SHADER_NPATCH_VISUAL_SHADER_FRAG);
+    shader = Shader::New(vertexShader.str(), SHADER_NPATCH_VISUAL_SHADER_FRAG, Dali::Shader::Hint::NONE, shaderName.str());
   }
   return shader;
 }
@@ -434,11 +440,8 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
       Shader   shader   = GetShader(IMAGE_SHADER);
       if(!shader)
       {
-        std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data());
-        std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_FRAG.data());
-        shader                     = Shader::New(vertexShader, fragmentShader);
+        shader = GenerateAndSaveShader(IMAGE_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_FRAG.data());
         shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-        SaveShader(IMAGE_SHADER, shader);
       }
       renderer.SetGeometry(geometry);
       renderer.SetShader(shader);

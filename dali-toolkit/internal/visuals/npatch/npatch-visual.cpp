@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -435,19 +435,20 @@ Shader NPatchVisual::CreateShader()
       shader = mFactoryCache.GetShader(shaderType);
       if(DALI_UNLIKELY(!shader))
       {
-        shader = Shader::New(SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, fragmentShader);
-        // Only cache vanilla 9 patch shaders
-        mFactoryCache.SaveShader(shaderType, shader);
+        shader = mFactoryCache.GenerateAndSaveShader(shaderType, SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, fragmentShader);
       }
     }
     else if(xStretchCount > 0 || yStretchCount > 0)
     {
+      std::stringstream shaderName;
+      shaderName << "N_PATCH_" << xStretchCount << "x" << yStretchCount;
+
       std::stringstream vertexShader;
       vertexShader << "#define FACTOR_SIZE_X " << xStretchCount + 2 << "\n"
                    << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
                    << SHADER_NPATCH_VISUAL_SHADER_VERT;
 
-      shader = Shader::New(vertexShader.str(), fragmentShader);
+      shader = Shader::New(vertexShader.str(), fragmentShader, Dali::Shader::Hint::NONE, shaderName.str());
     }
   }
   else
@@ -474,12 +475,15 @@ Shader NPatchVisual::CreateShader()
     }
     else if(xStretchCount > 0 || yStretchCount > 0)
     {
+      std::stringstream shaderName;
+      shaderName << "N_PATCH_" << xStretchCount << "x" << yStretchCount;
+
       std::stringstream vertexShader;
       vertexShader << "#define FACTOR_SIZE_X " << xStretchCount + 2 << "\n"
                    << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
                    << SHADER_NPATCH_VISUAL_SHADER_VERT;
 
-      shader = Shader::New(vertexShader.str(), fragmentShader, hints);
+      shader = Shader::New(vertexShader.str(), fragmentShader, hints, shaderName.str());
     }
   }
 
