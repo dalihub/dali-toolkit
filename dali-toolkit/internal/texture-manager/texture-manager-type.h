@@ -268,7 +268,7 @@ struct TextureInfo
     cropToMask(cropToMask),
     orientationCorrection(true),
     preMultiplyOnLoad(preMultiplyOnLoad),
-    preMultiplied(false),
+    preMultiplied(preMultiplyOnLoad),
     loadYuvPlanes(loadYuvPlanes)
   {
     isAnimatedImageFormat = (animatedImageLoading) ? true : false;
