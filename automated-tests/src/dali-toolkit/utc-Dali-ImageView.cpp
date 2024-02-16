@@ -5636,3 +5636,49 @@ int UtcDaliImageViewImageLoadFailureAndReload02(void)
 
   END_TEST;
 }
+
+int UtcDaliImageViewImageLoadSuccessAndReload01(void)
+{
+  tet_infoline("Try to load valid image first, and then reload again. Check whether ResourceReady signal comes well");
+  ToolkitTestApplication application;
+
+  gResourceReadySignalFired = false;
+
+  ImageView imageView = ImageView::New(gImage_34_RGBA);
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
+  imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
+
+  application.GetScene().Add(imageView);
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::READY, TEST_LOCATION);
+
+  gResourceReadySignalFired = false;
+
+  // Reload the image
+  Property::Map attributes;
+  DevelControl::DoAction(imageView, ImageView::Property::IMAGE, DevelImageVisual::Action::RELOAD, attributes);
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::PREPARING, TEST_LOCATION);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::READY, TEST_LOCATION);
+
+  gResourceReadySignalFired = false;
+
+  END_TEST;
+}
