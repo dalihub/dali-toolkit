@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_GL_VIEW_H
 #define DALI_TOOLKIT_GL_VIEW_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,11 +54,12 @@ public:
   {
     /**
      * DIRECT_RENDERING mode executes GL code within DALi graphics
-     * pipeline. When Renderer is about to be drawn, the callback
+     * pipeline but creates isolated context hence it doesn't alter any
+     * DALi rendering state. When Renderer is about to be drawn, the callback
      * will be executed and the custom code "injected" into the pipeline.
      * This allows rendering directly to the surface rather than offscreen.
      *
-     * * @SINCE_2_1.18
+     * @SINCE_2_3.12
      */
     DIRECT_RENDERING = 0,
 
@@ -80,6 +81,21 @@ public:
      * @SINCE_2_1.18
      */
     EGL_IMAGE_OFFSCREEN_RENDERING,
+
+    /**
+     * UNSAFE_DIRECT_RENDERING mode executes GL code within DALi graphics
+     * pipeline WITHOUT isolating the GL context so should be used with caution!
+     * The custom rendering code is executed within current window context and
+     * may alter the GL state. This mode is considered unsafe and should be used
+     * only when drawing on main GL context is necessary!
+     *
+     * When Renderer is about to be drawn, the callback
+     * will be executed and the custom code "injected" into the pipeline.
+     * This allows rendering directly to the surface rather than offscreen.
+     *
+     * @SINCE_2_3.12
+     */
+    UNSAFE_DIRECT_RENDERING,
 
     /**
      * The default mode is set to EGL_IMAGE_OFFSCREEN_RENDERING for backwards

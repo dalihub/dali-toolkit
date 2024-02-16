@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,14 +43,16 @@ DrawableView::DrawableView(GlView::BackendMode backendMode)
   mStencil(false),
   mMSAA(0)
 {
-  mRenderCallback = RenderCallback::New(this, &DrawableView::OnRenderCallback);
-
   // Create NativeRenderer
   Dali::Internal::NativeRendererCreateInfo createInfo;
   createInfo.maxOffscreenBuffers = 2u;
   createInfo.threadEnabled       = (backendMode == GlView::BackendMode::DIRECT_RENDERING_THREADED);
+  createInfo.directExecution     = (backendMode == GlView::BackendMode::UNSAFE_DIRECT_RENDERING);
   createInfo.presentationMode    = Dali::Internal::NativeRendererCreateInfo::PresentationMode::FIFO;
-  mNativeRenderer                = std::make_unique<Dali::Internal::DrawableViewNativeRenderer>(createInfo);
+
+  mRenderCallback = RenderCallback::New(this, &DrawableView::OnRenderCallback, createInfo.directExecution ? RenderCallback::ExecutionMode::UNSAFE : RenderCallback::ExecutionMode::ISOLATED);
+
+  mNativeRenderer = std::make_unique<Dali::Internal::DrawableViewNativeRenderer>(createInfo);
 }
 
 DrawableView::~DrawableView() = default;
