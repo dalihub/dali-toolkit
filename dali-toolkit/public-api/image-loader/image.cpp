@@ -74,6 +74,12 @@ Dali::Toolkit::ImageUrl GenerateDepthUrl(const Dali::FrameBuffer frameBuffer)
   return imageUrl;
 }
 
+Dali::Toolkit::ImageUrl GenerateUrl(Dali::Texture texture, bool preMultiplied)
+{
+  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, preMultiplied);
+  return imageUrl;
+}
+
 } // namespace Image
 
 } // namespace Toolkit

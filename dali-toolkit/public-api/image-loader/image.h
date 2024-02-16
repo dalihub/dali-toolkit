@@ -99,6 +99,17 @@ DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::EncodedImageBuf
  */
 DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateDepthUrl(const Dali::FrameBuffer frameBuffer);
 
+
+/**
+ * @brief Generate a Url of texture
+ * This Url can be used in visuals to render the texture
+ * This method does not check for duplicates, If same texture is entered multiple times, a different URL is returned each time.
+ * @param[in] texture the texture to converted to Url
+ * @param[in] preMultiplied Whether this pixel data preMultiplied or not. Default as false.
+ * @return the ImageUrl representing this frame buffer
+ */
+DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(Dali::Texture texture, bool preMultiplied = false);
+
 } // namespace Image
 
 } // namespace Toolkit
