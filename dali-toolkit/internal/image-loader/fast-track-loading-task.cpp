@@ -149,7 +149,7 @@ void FastTrackLoadingTask::Load()
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     std::ostringstream oss;
-    oss << "[url:" << mUrl.GetEllipsedUrl() << "]";
+    oss << "[u:" << mUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_BEGIN(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("BEGIN: DALI_IMAGE_FAST_TRACK_UPLOADING_TASK %s", oss.str().c_str());
   }
@@ -221,13 +221,13 @@ void FastTrackLoadingTask::Load()
   {
     std::ostringstream oss;
     oss << "[";
-    oss << "pixelBuffers:" << pixelBuffers.size() << " ";
+    oss << "b:" << pixelBuffers.size() << " ";
     if(!mPixelData.empty())
     {
-      oss << "size:" << mPixelData[0].GetWidth() << "x" << mPixelData[0].GetHeight() << " ";
-      oss << "premult:" << mPremultiplied << " ";
+      oss << "s:" << mPixelData[0].GetWidth() << "x" << mPixelData[0].GetHeight() << " ";
+      oss << "p:" << mPremultiplied << " ";
     }
-    oss << "url:" << mUrl.GetEllipsedUrl() << "]";
+    oss << "u:" << mUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_END(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("END: DALI_IMAGE_FAST_TRACK_UPLOADING_TASK %s", oss.str().c_str());
   }

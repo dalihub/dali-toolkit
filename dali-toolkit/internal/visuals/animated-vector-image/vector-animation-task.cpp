@@ -155,7 +155,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     std::ostringstream oss;
-    oss << "[url:" << mImageUrl.GetEllipsedUrl() << "]";
+    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_BEGIN(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("BEGIN: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
   }
@@ -203,7 +203,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
     if(gTraceFilter && gTraceFilter->IsTraceEnabled())
     {
       std::ostringstream oss;
-      oss << "[url:" << mImageUrl.GetEllipsedUrl() << "]";
+      oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
       // DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
       DALI_LOG_RELEASE_INFO("END: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
     }
@@ -233,7 +233,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     std::ostringstream oss;
-    oss << "[url:" << mImageUrl.GetEllipsedUrl() << "]";
+    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("END: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
   }
@@ -575,8 +575,8 @@ bool VectorAnimationTask::Rasterize()
   }
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss) {
-    oss << "[size:" << mWidth << "x" << mHeight << " ";
-    oss << "url:" << mImageUrl.GetEllipsedUrl() << "]";
+    oss << "[s:" << mWidth << "x" << mHeight << " ";
+    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
   });
 
   ApplyAnimationData();
@@ -687,11 +687,11 @@ bool VectorAnimationTask::Rasterize()
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss) {
-    oss << "[size:" << mWidth << "x" << mHeight << " ";
-    oss << "frame:" << mCurrentFrame << " ";
-    oss << "loop:" << mCurrentLoop << " ";
-    oss << "state:" << mPlayState << " ";
-    oss << "url:" << mImageUrl.GetEllipsedUrl() << "]";
+    oss << "[s:" << mWidth << "x" << mHeight << " ";
+    oss << "f:" << mCurrentFrame << " ";
+    oss << "l:" << mCurrentLoop << " ";
+    oss << "p:" << mPlayState << " ";
+    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
   });
 
   return true;
