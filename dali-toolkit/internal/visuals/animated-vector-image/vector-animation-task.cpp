@@ -31,7 +31,10 @@
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 
 #ifdef TRACE_ENABLED
+#include <chrono>
+#include <iomanip>
 #include <sstream>
+#include <thread>
 #endif
 
 namespace Dali
@@ -50,6 +53,16 @@ Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, 
 #endif
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
+
+#ifdef TRACE_ENABLED
+uint64_t GetNanoseconds()
+{
+  // Get the time of a monotonic clock since its epoch.
+  auto epoch    = std::chrono::steady_clock::now().time_since_epoch();
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch);
+  return static_cast<uint64_t>(duration.count());
+}
+#endif
 
 } // unnamed namespace
 
@@ -152,8 +165,11 @@ bool VectorAnimationTask::IsAnimating()
 bool VectorAnimationTask::Load(bool synchronousLoading)
 {
 #ifdef TRACE_ENABLED
+  uint64_t mStartTimeNanoSceonds = 0;
+  uint64_t mEndTimeNanoSceonds   = 0;
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
+    mStartTimeNanoSceonds = GetNanoseconds();
     std::ostringstream oss;
     oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_BEGIN(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
@@ -202,8 +218,12 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
 #ifdef TRACE_ENABLED
     if(gTraceFilter && gTraceFilter->IsTraceEnabled())
     {
+      mEndTimeNanoSceonds = GetNanoseconds();
       std::ostringstream oss;
-      oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
+      oss << std::fixed << std::setprecision(3);
+      oss << "[";
+      oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
+      oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
       // DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
       DALI_LOG_RELEASE_INFO("END: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
     }
@@ -232,8 +252,12 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
 #ifdef TRACE_ENABLED
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
+    mEndTimeNanoSceonds = GetNanoseconds();
     std::ostringstream oss;
-    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
+    oss << std::fixed << std::setprecision(3);
+    oss << "[";
+    oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
+    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("END: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
   }
@@ -574,7 +598,12 @@ bool VectorAnimationTask::Rasterize()
     return false;
   }
 
+#ifdef TRACE_ENABLED
+  uint64_t mStartTimeNanoSceonds = 0;
+  uint64_t mEndTimeNanoSceonds   = 0;
+#endif
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss) {
+    mStartTimeNanoSceonds = GetNanoseconds();
     oss << "[s:" << mWidth << "x" << mHeight << " ";
     oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
   });
@@ -687,7 +716,11 @@ bool VectorAnimationTask::Rasterize()
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss) {
-    oss << "[s:" << mWidth << "x" << mHeight << " ";
+    mEndTimeNanoSceonds = GetNanoseconds();
+    oss << std::fixed << std::setprecision(3);
+    oss << "[";
+    oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
+    oss << "s:" << mWidth << "x" << mHeight << " ";
     oss << "f:" << mCurrentFrame << " ";
     oss << "l:" << mCurrentLoop << " ";
     oss << "p:" << mPlayState << " ";
