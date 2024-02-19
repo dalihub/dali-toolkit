@@ -57,10 +57,6 @@ enum
 
 } // namespace ColorVisual
 
-/**
- * @}
- */
-
 } // namespace Toolkit
 
 } // namespace Dali

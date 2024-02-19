@@ -131,7 +131,6 @@ DALI_TOOLKIT_API InputMethodContext GetInputMethodContext( TextField textField )
  * @brief Select the whole text of TextField.
  *
  * @param[in] textField The instance of TextField.
- * @return InputMethodContext instance.
  */
 DALI_TOOLKIT_API void SelectWholeText( TextField textField );
 

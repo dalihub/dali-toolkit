@@ -36,7 +36,8 @@ namespace
 
 bool ApproximatelyEqual( uint32_t a, uint32_t b  )
 {
-  return abs( a-b ) <= 1;
+  if(a<b) return (b-a) <= 1;
+  else return (a-b) <= 1;
 }
 
 uint16_t MaxDimension( const Uint16Pair& dimensions )

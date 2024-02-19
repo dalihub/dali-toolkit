@@ -493,11 +493,10 @@ public:
 public: // Intended for control developers
 
   /**
-   * @brief Creates an initialized Control.
+   * @brief Creates an initialized Control to a newly allocated Dali resource
    *
    * @SINCE_1_0.0
    * @param[in] implementation The implementation for this control
-   * @return A handle to a newly allocated Dali resource
    * @note Should NOT be called to create a handle from the implementation. As stated, this allocates a NEW Dali resource.
    */
   explicit Control(Internal::Control& implementation);

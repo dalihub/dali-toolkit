@@ -109,6 +109,9 @@ if test "x$enable_i18n" = "xyes"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDGETTEXT_ENABLED "
 fi
 
+# Temporary - will migrate build system to cmake
+DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -Wno-class-memaccess "
+
 # Tizen Profile options
 AC_ARG_ENABLE([profile],
               [AC_HELP_STRING([--enable-profile=UBUNTU,TIZEN],
