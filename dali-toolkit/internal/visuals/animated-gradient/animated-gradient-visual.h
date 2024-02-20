@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_GRADIENT_VISUAL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,11 +243,11 @@ private:
   void SetupGradientAnimationData(const Property::Map& propertyMap);
 
   /**
-   * @brief Create new shader
+   * @brief Get or Create new shader
    *
    * return A Shader which made by non-animated properties
    */
-  Shader CreateShader();
+  Shader GetOrCreateShader();
 
   // Undefined
   AnimatedGradientVisual(const AnimatedGradientVisual& gradientRenderer);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,8 +199,7 @@ void ArcVisual::OnInitialize()
     shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER);
     if(!shader)
     {
-      shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_BUTT_CAP_SHADER_FRAG.data());
-      mFactoryCache.SaveShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER, shader);
+      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_BUTT_CAP_SHADER_FRAG.data());
     }
   }
   else
@@ -208,8 +207,7 @@ void ArcVisual::OnInitialize()
     shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER);
     if(!shader)
     {
-      shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_ROUND_CAP_SHADER_FRAG.data());
-      mFactoryCache.SaveShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER, shader);
+      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_ROUND_CAP_SHADER_FRAG.data());
     }
   }
 

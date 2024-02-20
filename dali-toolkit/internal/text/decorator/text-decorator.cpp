@@ -244,7 +244,7 @@ struct Decorator::Impl : public ConnectionTracker
     mHidePrimaryCursorAndGrabHandle(false)
   {
     mQuadVertexFormat["aPosition"] = Property::VECTOR2;
-    mHighlightShader               = Shader::New(SHADER_TEXT_DECORATOR_SHADER_VERT, SHADER_TEXT_DECORATOR_SHADER_FRAG);
+    mHighlightShader               = Shader::New(SHADER_TEXT_DECORATOR_SHADER_VERT, SHADER_TEXT_DECORATOR_SHADER_FRAG, Shader::Hint::NONE, "TEXT_DECORATOR");
     SetupGestures();
   }
 

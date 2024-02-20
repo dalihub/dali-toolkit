@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,8 @@ enum ColorVisualRequireFlag
   BORDERLINE     = 1 << 1,
   BLUR           = 1 << 2,
 };
+
+constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_ROUNDED_BLUR = 300;
 } // unnamed namespace
 ColorVisualPtr ColorVisual::New(VisualFactoryCache& factoryCache, const Property::Map& properties)
 {
@@ -235,15 +237,21 @@ Shader ColorVisual::GenerateShader() const
   bool blur           = IsBlurRequired();
   int  shaderTypeFlag = ColorVisualRequireFlag::DEFAULT;
 
-  if(roundedCorner)
-  {
-    shaderTypeFlag |= ColorVisualRequireFlag::ROUNDED_CORNER;
-  }
   if(blur)
   {
     // If we use blur, just ignore borderline
     borderline = false;
     shaderTypeFlag |= ColorVisualRequireFlag::BLUR;
+
+    // If shader version doesn't support blur with corner radius, ignore corner radius
+    if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_ROUNDED_BLUR))
+    {
+      roundedCorner = false;
+    }
+  }
+  if(roundedCorner)
+  {
+    shaderTypeFlag |= ColorVisualRequireFlag::ROUNDED_CORNER;
   }
   if(borderline)
   {
@@ -271,9 +279,10 @@ Shader ColorVisual::GenerateShader() const
       vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
       fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
     }
-    shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_VERT.data(),
-                         Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
-    mFactoryCache.SaveShader(shaderType, shader);
+
+    shader = mFactoryCache.GenerateAndSaveShader(shaderType,
+                                                 Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_VERT.data(),
+                                                 Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
   }
 
   return shader;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -591,9 +591,11 @@ void AnimatedGradientVisual::DoCreateInstancePropertyMap(Property::Map& map) con
 {
 }
 
-Shader AnimatedGradientVisual::CreateShader()
+Shader AnimatedGradientVisual::GetOrCreateShader()
 {
   Shader shader;
+
+  VisualFactoryCache::ShaderType shaderType = GetShaderType(mGradientType, mUnitType, mSpreadType);
 
   std::string tagUnit;
   std::string tagGrad;
@@ -649,20 +651,14 @@ Shader AnimatedGradientVisual::CreateShader()
   vert = "#define " + tagUnit + "\n" + SHADER_ANIMATED_GRADIENT_VISUAL_SHADER_VERT.data();
   frag = "#define " + tagGrad + "\n" + "#define " + tagSpread + "\n" + SHADER_ANIMATED_GRADIENT_VISUAL_SHADER_FRAG.data();
 
-  shader = Shader::New(vert, frag);
+  shader = mFactoryCache.GenerateAndSaveShader(shaderType, vert, frag);
   return shader;
 }
 
 void AnimatedGradientVisual::OnInitialize()
 {
-  Geometry                       geometry   = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
-  VisualFactoryCache::ShaderType shaderType = GetShaderType(mGradientType, mUnitType, mSpreadType);
-  Shader                         shader     = mFactoryCache.GetShader(shaderType);
-  if(!shader)
-  {
-    shader = CreateShader();
-    mFactoryCache.SaveShader(shaderType, shader);
-  }
+  Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
+  Shader   shader   = GetOrCreateShader();
 
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);

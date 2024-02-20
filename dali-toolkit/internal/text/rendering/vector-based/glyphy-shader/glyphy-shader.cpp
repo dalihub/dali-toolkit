@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,8 @@ GlyphyShader GlyphyShader::New(const Dali::Vector4& atlasInfo)
 
   Shader shaderEffectCustom = Shader::New(vertexShaderStringStream.str(),
                                           fragmentShaderStringStream.str(),
-                                          Shader::Hint::OUTPUT_IS_TRANSPARENT);
+                                          Shader::Hint::OUTPUT_IS_TRANSPARENT,
+                                          "GLYPHY_SHADER");
 
   GlyphyShader handle(shaderEffectCustom);
 

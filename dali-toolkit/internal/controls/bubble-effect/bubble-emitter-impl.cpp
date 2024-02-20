@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -213,7 +213,7 @@ void BubbleEmitter::SetBackground(Texture bgTexture, const Vector3& hsvDelta)
 
   //Create renderer
   Dali::Geometry geometry   = CreateTexturedQuad();
-  Shader         shader     = Shader::New(SHADER_BUBBLE_EMITTER_VERT, SHADER_BUBBLE_EMITTER_FRAG);
+  Shader         shader     = Shader::New(SHADER_BUBBLE_EMITTER_VERT, SHADER_BUBBLE_EMITTER_FRAG, Shader::Hint::NONE, "BUBBLE_EMITTER");
   Renderer       renderer   = Renderer::New(geometry, shader);
   TextureSet     textureSet = TextureSet::New();
   textureSet.SetTexture(0u, bgTexture);

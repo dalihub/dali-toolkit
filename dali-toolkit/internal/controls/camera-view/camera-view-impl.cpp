@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ void CameraView::SetWindowSurfaceTarget()
 
   // For underlay rendering mode, camera display area have to be transparent.
   Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-  Shader   shader   = Shader::New(SHADER_VIDEO_VIEW_VERT, SHADER_VIDEO_VIEW_FRAG);
+  Shader   shader   = Shader::New(SHADER_VIDEO_VIEW_VERT, SHADER_VIDEO_VIEW_FRAG, Shader::Hint::NONE, "CAMERA_VIEW_OVERLAY");
   mOverlayRenderer  = Renderer::New(geometry, shader);
   mOverlayRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::OFF);
 
@@ -183,12 +183,12 @@ void CameraView::UpdateDisplayArea(Dali::PropertyNotification& source)
 
 Dali::Shader CameraView::CreateShader(Dali::NativeImageSourcePtr nativeImageSourcePtr)
 {
-  std::string vertexShader = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
+  std::string vertexShader   = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
   std::string fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
 
   nativeImageSourcePtr->ApplyNativeFragmentShader(fragmentShader);
 
-  return Dali::Shader::New(vertexShader, fragmentShader);
+  return Dali::Shader::New(vertexShader, fragmentShader, Shader::Hint::NONE, "CAMERA_VIEW");
 }
 
 } // namespace Internal

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -847,7 +847,7 @@ struct AtlasRenderer::Impl
       // The glyph is an emoji and is not a shadow.
       if(!mShaderRgba)
       {
-        mShaderRgba = Shader::New(SHADER_TEXT_ATLAS_SHADER_VERT, SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG);
+        mShaderRgba = Shader::New(SHADER_TEXT_ATLAS_SHADER_VERT, SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG, Shader::Hint::NONE, "TEXT_ATLAS_RGBA");
       }
       shader = mShaderRgba;
     }
@@ -856,7 +856,7 @@ struct AtlasRenderer::Impl
       // The glyph is text or a shadow.
       if(!mShaderL8)
       {
-        mShaderL8 = Shader::New(SHADER_TEXT_ATLAS_SHADER_VERT, SHADER_TEXT_ATLAS_L8_SHADER_FRAG);
+        mShaderL8 = Shader::New(SHADER_TEXT_ATLAS_SHADER_VERT, SHADER_TEXT_ATLAS_L8_SHADER_FRAG, Shader::Hint::NONE, "TEXT_ATLAS_L8");
       }
       shader = mShaderL8;
     }
