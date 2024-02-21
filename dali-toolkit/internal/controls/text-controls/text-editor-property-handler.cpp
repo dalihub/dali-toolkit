@@ -751,6 +751,18 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       }
       break;
     }
+    case Toolkit::DevelTextEditor::Property::REMOVE_FRONT_INSET:
+    {
+      const bool remove = value.Get<bool>();
+      impl.mController->SetRemoveFrontInset(remove);
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::REMOVE_BACK_INSET:
+    {
+      const bool remove = value.Get<bool>();
+      impl.mController->SetRemoveBackInset(remove);
+      break;
+    }
   }
 }
 
@@ -1178,6 +1190,16 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
       Property::Map map;
       impl.mDecorator->GetSelectionPopupStyle(map);
       value = map;
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::REMOVE_FRONT_INSET:
+    {
+      value = impl.mController->IsRemoveFrontInset();
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::REMOVE_BACK_INSET:
+    {
+      value = impl.mController->IsRemoveBackInset();
       break;
     }
   } //switch

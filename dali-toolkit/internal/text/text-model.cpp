@@ -368,6 +368,8 @@ Model::Model()
   mAlignmentOffset(0.0f),
   mElideEnabled(false),
   mIgnoreSpacesAfterText(true),
+  mRemoveFrontInset(true),
+  mRemoveBackInset(true),
   mMatchLayoutDirection(DevelText::MatchLayoutDirection::INHERIT),
   mEllipsisPosition(DevelText::EllipsisPosition::END)
 {

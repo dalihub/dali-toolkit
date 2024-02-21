@@ -218,6 +218,18 @@ enum Type
    * @note If there is a color attribute in the anchor tag, the markup attribute takes precedence.
    */
   ANCHOR_CLICKED_COLOR,
+
+  /**
+   * @brief Whether to trim the xBearing of first glyph of the text.
+   * @details Name "removeFrontInset", type Property::BOOLEAN.
+   */
+  REMOVE_FRONT_INSET,
+
+  /**
+   * @brief Whether to trim the advance of last glyph of the text.
+   * @details Name "removeBackInset", type Property::BOOLEAN.
+   */
+  REMOVE_BACK_INSET,
 };
 
 } // namespace Property
@@ -306,6 +318,38 @@ DALI_TOOLKIT_API std::vector<FitOption>& GetTextFitArray(TextLabel textLabel);
  * @return True if the text fit array is enabled.
  */
 DALI_TOOLKIT_API bool IsTextFitArrayEnabled(TextLabel textLabel);
+
+/**
+ * @brief Set removing front inset to text label.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] remove Whether front inset of text label has to be removed or not.
+ */
+DALI_TOOLKIT_API void SetRemoveFrontInset(TextLabel textLabel, const bool remove);
+
+/**
+ * @brief Whether front inset of text label is removed or not.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @return True if the front inset of text label is removed.
+ */
+DALI_TOOLKIT_API bool IsRemoveFrontInset(TextLabel textLabel);
+
+/**
+ * @brief Set removing back inset to text label.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] remove Whether back inset of text label has to be removed or not.
+ */
+DALI_TOOLKIT_API void SetRemoveBackInset(TextLabel textLabel, const bool remove);
+
+/**
+ * @brief Whether back inset of text label is removed or not.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @return True if the back inset of text label is removed.
+ */
+DALI_TOOLKIT_API bool IsRemoveBackInset(TextLabel textLabel);
 
 /**
  * @brief Anchor clicked signal type.

@@ -412,6 +412,34 @@ public:
    */
   void SetSpannedText(const Text::Spanned& spannedText);
 
+  /**
+   * @brief Set removing front inset to TextField.
+   *
+   * @param[in] remove Whether front inset of TextField has to be removed or not.
+   */
+  void SetRemoveFrontInset(const bool remove);
+
+  /**
+   * @brief Whether front inset of TextField is removed or not.
+   *
+   * @return True if the front inset of TextField is removed.
+   */
+  bool IsRemoveFrontInset() const;
+
+  /**
+   * @brief Set removing back inset to TextField.
+   *
+   * @param[in] remove Whether back inset of TextField has to be removed or not.
+   */
+  void SetRemoveBackInset(const bool remove);
+
+  /**
+   * @brief Whether back inset of TextField is removed or not.
+   *
+   * @return True if the back inset of TextField is removed.
+   */
+  bool IsRemoveBackInset() const;
+
 private: // Implementation
   /**
    * @copydoc Dali::Toolkit::Text::Controller::(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)

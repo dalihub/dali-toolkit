@@ -65,6 +65,26 @@ bool IsTextFitArrayEnabled(TextLabel textLabel)
   return GetImpl(textLabel).IsTextFitArrayEnabled();
 }
 
+void SetRemoveFrontInset(TextLabel textLabel, const bool remove)
+{
+  GetImpl(textLabel).SetRemoveFrontInset(remove);
+}
+
+bool IsRemoveFrontInset(TextLabel textLabel)
+{
+  return GetImpl(textLabel).IsRemoveFrontInset();
+}
+
+void SetRemoveBackInset(TextLabel textLabel, const bool remove)
+{
+  GetImpl(textLabel).SetRemoveBackInset(remove);
+}
+
+bool IsRemoveBackInset(TextLabel textLabel)
+{
+  return GetImpl(textLabel).IsRemoveBackInset();
+}
+
 } // namespace DevelTextLabel
 
 } // namespace Toolkit

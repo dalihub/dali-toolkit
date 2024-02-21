@@ -162,6 +162,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "characterSpacin
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "relativeLineSize",                     FLOAT,     RELATIVE_LINE_SIZE                  )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "verticalAlignment",                    STRING,    VERTICAL_ALIGNMENT                  )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "selectionPopupStyle",                  MAP,       SELECTION_POPUP_STYLE               )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "removeFrontInset",                     BOOLEAN,   REMOVE_FRONT_INSET                  )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "removeBackInset",                      BOOLEAN,   REMOVE_BACK_INSET                   )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",     SIGNAL_INPUT_STYLE_CHANGED    )
@@ -1379,6 +1381,26 @@ void TextEditor::SetEditable(bool editable)
 void TextEditor::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
 {
   mController->ChangedLayoutDirection();
+}
+
+void TextEditor::SetRemoveFrontInset(bool remove)
+{
+  mController->SetRemoveFrontInset(remove);
+}
+
+bool TextEditor::IsRemoveFrontInset() const
+{
+  return mController->IsRemoveFrontInset();
+}
+
+void TextEditor::SetRemoveBackInset(bool remove)
+{
+  mController->SetRemoveBackInset(remove);
+}
+
+bool TextEditor::IsRemoveBackInset() const
+{
+  return mController->IsRemoveBackInset();
 }
 
 TextEditor::TextEditor(ControlBehaviour additionalBehaviour)

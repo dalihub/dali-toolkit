@@ -304,6 +304,26 @@ void Controller::SetIgnoreSpacesAfterText(bool ignore)
   mImpl->mModel->mIgnoreSpacesAfterText = ignore;
 }
 
+bool Controller::IsRemoveFrontInset() const
+{
+  return mImpl->mModel->mRemoveFrontInset;
+}
+
+void Controller::SetRemoveFrontInset(bool remove)
+{
+  mImpl->mModel->mRemoveFrontInset = remove;
+}
+
+bool Controller::IsRemoveBackInset() const
+{
+  return mImpl->mModel->mRemoveBackInset;
+}
+
+void Controller::SetRemoveBackInset(bool remove)
+{
+  mImpl->mModel->mRemoveBackInset = remove;
+}
+
 void Controller::ChangedLayoutDirection()
 {
   mImpl->mIsLayoutDirectionChanged = true;
