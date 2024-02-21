@@ -670,6 +670,22 @@ void Control::OnRelayout(const Vector2& size, RelayoutContainer& container)
     container.Add(child, newChildSize);
   }
 
+  if(Accessibility::IsUp())
+  {
+    auto accessible = GetAccessibleObject();
+    if(DALI_LIKELY(accessible))
+    {
+      auto highlightFrame = accessible->GetHighlightActor();
+      if(accessible->GetCurrentlyHighlightedActor() == this->Self() &&
+         highlightFrame.GetProperty<Vector3>(Dali::Actor::Property::SIZE).GetVectorXY() != size)
+      {
+        // TODO : Need to consider how we can reduce this cost
+        highlightFrame.SetProperty(Actor::Property::SIZE, size);
+        container.Add(highlightFrame, size);
+      }
+    }
+  }
+
   Toolkit::Visual::Base visual = mImpl->GetVisual(Toolkit::Control::Property::BACKGROUND);
   if(visual)
   {
