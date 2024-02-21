@@ -198,6 +198,34 @@ public:
    */
   std::string GetLocale();
 
+  /**
+   * @brief Set removing front inset to text label.
+   *
+   * @param[in] remove Whether front inset of text label has to be removed or not.
+   */
+  void SetRemoveFrontInset(const bool remove);
+
+  /**
+   * @brief Whether front inset of text label is removed or not.
+   *
+   * @return True if the front inset of text label is removed.
+   */
+  bool IsRemoveFrontInset() const;
+
+  /**
+   * @brief Set removing back inset to text label.
+   *
+   * @param[in] remove Whether back inset of text label has to be removed or not.
+   */
+  void SetRemoveBackInset(const bool remove);
+
+  /**
+   * @brief Whether back inset of text label is removed or not.
+   *
+   * @return True if the back inset of text label is removed.
+   */
+  bool IsRemoveBackInset() const;
+
 private: // From Control
   /**
    * @copydoc Control::OnInitialize()

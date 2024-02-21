@@ -449,7 +449,16 @@ struct Engine::Impl
           {
             whiteSpaceLengthEndOfLine = 0.f;
           }
-          length = std::max(length, penX + glyphMetrics.xBearing + glyphMetrics.width);
+
+          if(parameters.textModel->mRemoveBackInset)
+          {
+            length = std::max(length, penX + glyphMetrics.xBearing + glyphMetrics.width);
+          }
+          else
+          {
+            length = std::max(length, penX + glyphMetrics.advance);
+          }
+
           penX += (glyphMetrics.advance + parameters.interGlyphExtraAdvance);
         }
       }
@@ -512,7 +521,15 @@ struct Engine::Impl
         {
           whiteSpaceLengthEndOfLine = 0.f;
         }
-        length = std::max(length, penX + glyphMetrics.xBearing + glyphMetrics.width);
+
+        if(parameters.textModel->mRemoveBackInset)
+        {
+          length = std::max(length, penX + glyphMetrics.xBearing + glyphMetrics.width);
+        }
+        else
+        {
+          length = std::max(length, penX + glyphMetrics.advance);
+        }
         penX += (glyphMetrics.advance + parameters.interGlyphExtraAdvance);
       }
     }
@@ -745,7 +762,12 @@ struct Engine::Impl
     // The initial start point is zero. However it needs a correction according the 'x' bearing of the first glyph.
     // i.e. if the bearing of the first glyph is negative it may exceed the boundaries of the text area.
     // It needs to add as well space for the cursor if the text is in edit mode and extra space in case the text is outlined.
-    tmpLineLayout.penX = -glyphMetrics.xBearing + mCursorWidth + outlineWidth;
+
+    tmpLineLayout.penX = mCursorWidth + outlineWidth;
+    if(parameters.textModel->mRemoveFrontInset)
+    {
+      tmpLineLayout.penX -= glyphMetrics.xBearing;
+    }
 
     tmpLineLayout.relativeLineSize = lineLayout.relativeLineSize;
 
@@ -842,7 +864,14 @@ struct Engine::Impl
         tmpLineLayout.penX += tmpLineLayout.previousAdvance + tmpLineLayout.whiteSpaceLengthEndOfLine;
         tmpLineLayout.previousAdvance = (glyphMetrics.advance + parameters.interGlyphExtraAdvance);
 
-        tmpLineLayout.length = std::max(tmpLineLayout.length, tmpLineLayout.penX + glyphMetrics.xBearing + glyphMetrics.width);
+        if(parameters.textModel->mRemoveBackInset)
+        {
+          tmpLineLayout.length = std::max(tmpLineLayout.length, tmpLineLayout.penX + glyphMetrics.xBearing + glyphMetrics.width);
+        }
+        else
+        {
+          tmpLineLayout.length = std::max(tmpLineLayout.length, tmpLineLayout.penX + glyphMetrics.advance);
+        }
 
         // Clear the white space length at the end of the line.
         tmpLineLayout.whiteSpaceLengthEndOfLine = 0.f;
@@ -1105,7 +1134,12 @@ struct Engine::Impl
     // If it has a negative x bearing, it will exceed the boundaries of the actor,
     // so the penX position needs to be moved to the right.
     const GlyphInfo& glyph = *(glyphsBuffer + startIndexForGlyph);
-    float            penX  = -glyph.xBearing + mCursorWidth + outlineWidth; //
+    float            penX  = mCursorWidth + outlineWidth; //
+
+    if(layoutParameters.textModel->mRemoveFrontInset)
+    {
+      penX -= glyph.xBearing;
+    }
 
     CalculateGlyphPositionsLTR(layoutParameters.textModel->mVisualModel,
                                layoutParameters.textModel->mLogicalModel,

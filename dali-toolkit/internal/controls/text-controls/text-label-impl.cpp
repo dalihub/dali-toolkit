@@ -144,6 +144,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "characterSpacing
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "relativeLineSize",             FLOAT,   RELATIVE_LINE_SIZE             )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "anchorColor",                  VECTOR4, ANCHOR_COLOR                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "anchorClickedColor",           VECTOR4, ANCHOR_CLICKED_COLOR           )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "removeFrontInset",             BOOLEAN, REMOVE_FRONT_INSET             )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "removeBackInset",              BOOLEAN, REMOVE_BACK_INSET              )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR   )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0)
@@ -590,6 +592,18 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::REMOVE_FRONT_INSET:
+      {
+        const bool remove = value.Get<bool>();
+        impl.mController->SetRemoveFrontInset(remove);
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::REMOVE_BACK_INSET:
+      {
+        const bool remove = value.Get<bool>();
+        impl.mController->SetRemoveBackInset(remove);
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -862,6 +876,16 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       case Toolkit::DevelTextLabel::Property::ANCHOR_CLICKED_COLOR:
       {
         value = impl.mController->GetAnchorClickedColor();
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::REMOVE_FRONT_INSET:
+      {
+        value = impl.mController->IsRemoveFrontInset();
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::REMOVE_BACK_INSET:
+      {
+        value = impl.mController->IsRemoveBackInset();
         break;
       }
     }
@@ -1367,6 +1391,26 @@ std::vector<Toolkit::DevelTextLabel::FitOption>& TextLabel::GetTextFitArray()
 bool TextLabel::IsTextFitArrayEnabled() const
 {
   return mController->IsTextFitArrayEnabled();
+}
+
+void TextLabel::SetRemoveFrontInset(bool remove)
+{
+  mController->SetRemoveFrontInset(remove);
+}
+
+bool TextLabel::IsRemoveFrontInset() const
+{
+  return mController->IsRemoveFrontInset();
+}
+
+void TextLabel::SetRemoveBackInset(bool remove)
+{
+  mController->SetRemoveBackInset(remove);
+}
+
+bool TextLabel::IsRemoveBackInset() const
+{
+  return mController->IsRemoveBackInset();
 }
 
 std::string TextLabel::TextLabelAccessible::GetNameRaw() const
