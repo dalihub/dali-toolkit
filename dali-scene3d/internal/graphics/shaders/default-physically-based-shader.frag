@@ -242,32 +242,32 @@ void main()
   if(uLightCount > 0)
   {
     // Compute reflectance.
-    lowp float reflectance = max(max(f0.r, f0.g), f0.b);
-    lowp float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);
-    lowp float r = perceptualRoughness * perceptualRoughness;
-    lowp float attenuationV = 2.0 * NdotV / (NdotV + sqrt(r * r + (1.0 - r * r) * (NdotV * NdotV)));
-    mediump float roughnessSq = r * r;
-    lowp vec3 diffuseColorPunctual = baseColor.rgb * (vec3(1.0) - f0);
+    highp float reflectance = max(max(f0.r, f0.g), f0.b);
+    highp float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);
+    highp float r = perceptualRoughness * perceptualRoughness;
+    highp float attenuationV = 2.0 * NdotV / (NdotV + sqrt(r * r + (1.0 - r * r) * (NdotV * NdotV)));
+    highp float roughnessSq = r * r;
+    highp vec3 diffuseColorPunctual = baseColor.rgb * (vec3(1.0) - f0);
     diffuseColorPunctual *= ( 1.0 - metallic );
 
     for(int i = 0; i < uLightCount; ++i)
     {
       highp vec3 l = normalize(-uLightDirection[i]); // Vector from surface point to light
-      mediump vec3 h = normalize(l+v);               // Half vector between both l and v
-      mediump float VdotH = dot(v, h);
-      lowp vec3 specularReflection = f0 + (reflectance90 - f0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
+      highp vec3 h = normalize(l+v);               // Half vector between both l and v
+      highp float VdotH = dot(v, h);
+      highp vec3 specularReflection = f0 + (reflectance90 - f0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
 
-      mediump float NdotL = clamp(dot(n, l), 0.001, 1.0);
-      lowp float attenuationL = 2.0 * NdotL / (NdotL + sqrt(r * r + (1.0 - r * r) * (NdotL * NdotL)));
-      lowp float geometricOcclusion = attenuationL * attenuationV;
+      highp float NdotL = clamp(dot(n, l), 0.001, 1.0);
+      highp float attenuationL = 2.0 * NdotL / (NdotL + sqrt(r * r + (1.0 - r * r) * (NdotL * NdotL)));
+      highp float geometricOcclusion = attenuationL * attenuationV;
 
       highp float NdotH = dot(n, h);
       highp float f = (NdotH * roughnessSq - NdotH) * NdotH + 1.0;
-      lowp float microfacetDistribution = roughnessSq / (M_PI * f * f);;
+      highp float microfacetDistribution = roughnessSq / (M_PI * f * f);;
 
       // Calculation of analytical lighting contribution
-      lowp vec3 diffuseContrib = ( 1.0 - specularReflection ) * ( diffuseColorPunctual / M_PI );
-      lowp vec3 specContrib = specularReflection * geometricOcclusion * microfacetDistribution / ( 4.0 * NdotL * NdotV );
+      highp vec3 diffuseContrib = ( 1.0 - specularReflection ) * ( diffuseColorPunctual / M_PI );
+      highp vec3 specContrib = specularReflection * geometricOcclusion * microfacetDistribution / ( 4.0 * NdotL * NdotV );
 
       // Obtain final intensity as reflectance (BRDF) scaled by the energy of the light (cosine law)
       color += NdotL * uLightColor[i] * (diffuseContrib + specContrib);
