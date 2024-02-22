@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ namespace Dali::Scene3D::Loader
 {
 namespace
 {
-
 enum class LoadDataType
 {
   UNSIGNED_BYTE = 0,
@@ -969,7 +968,7 @@ uint32_t LoadPositions(LoadAccessorInputs positionsInput, bool hasBlendShape)
 
 bool LoadNormals(LoadAccessorInputs normalsInput, bool isTriangles, uint32_t positionBufferSize)
 {
-  auto       hasNormals  = normalsInput.accessor.IsDefined();
+  auto hasNormals = normalsInput.accessor.IsDefined();
   if(hasNormals)
   {
     const auto bufferSize = normalsInput.accessor.mBlob.GetBufferSize();
@@ -1044,7 +1043,7 @@ void LoadTextureCoordinates(LoadAccessorListInputs textureCoordinatesInput)
   {
     auto&      texCoords  = textureCoordinatesInput.accessors[0];
     const auto bufferSize = texCoords.mBlob.GetBufferSize();
-    uint32_t uvCount;
+    uint32_t   uvCount;
 
     if(MaskMatch(textureCoordinatesInput.flags, MeshDefinition::Flags::S8_TEXCOORD) || MaskMatch(textureCoordinatesInput.flags, MeshDefinition::Flags::U8_TEXCOORD))
     {
@@ -1311,6 +1310,8 @@ void LoadBlendShapes(MeshDefinition::RawData& rawData, std::vector<MeshDefinitio
   }
 }
 
+constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_VERTEX_ID = 300;
+
 } // namespace
 
 MeshDefinition::SparseBlob::SparseBlob(const Blob& indices, const Blob& values, uint32_t count)
@@ -1521,7 +1522,6 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
   }
 
   LoadBlendShapes(raw, mBlendShapes, mBlendShapeHeader, mBlendShapeVersion, numberOfVertices, fileStream, buffers);
-
   return raw;
 }
 
@@ -1549,6 +1549,29 @@ MeshGeometry MeshDefinition::Load(RawData&& raw) const
       {
         meshGeometry.geometry.SetIndexBuffer(raw.mIndices.data(), raw.mIndices.size());
       }
+    }
+
+    if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_VERTEX_ID && !raw.mAttribs.empty()))
+    {
+      auto numElements = raw.mAttribs[0].mNumElements;
+
+      // gl_VertexID not support. We should add buffer hard.
+      Property::Map attribMap;
+      attribMap["aVertexID"] = Property::FLOAT;
+
+      VertexBuffer attribBuffer = VertexBuffer::New(attribMap);
+
+      std::vector<uint8_t> buffer(numElements * sizeof(float));
+      auto                 ids = reinterpret_cast<float*>(buffer.data());
+
+      for(uint32_t i = 0; i < numElements; i++)
+      {
+        ids[i] = static_cast<float>(i);
+      }
+
+      attribBuffer.SetData(buffer.data(), numElements);
+
+      meshGeometry.geometry.AddVertexBuffer(attribBuffer);
     }
 
     for(auto& a : raw.mAttribs)

@@ -1,14 +1,13 @@
-#version 300 es
 
 uniform lowp vec4 uColorFactor; // Color from material
 uniform lowp float uMask;
 uniform lowp float uAlphaThreshold;
 
-in mediump vec2 vUV;
-in lowp vec4 vColor;
+INPUT mediump vec2 vUV;
+INPUT lowp vec4 vColor;
 
-//in highp float depth;
-//out highp vec4 FragColor;
+//INPUT highp float depth;
+//OUTPUT highp vec4 FragColor;
 
 #ifdef THREE_TEX
 #ifdef BASECOLOR_TEX
@@ -28,13 +27,13 @@ void main()
 #ifdef THREE_TEX
   // The albedo may be defined from a base texture or a flat color
 #ifdef BASECOLOR_TEX
-  lowp vec4 baseColor = texture(sAlbedoAlpha, vUV);
+  lowp vec4 baseColor = TEXTURE(sAlbedoAlpha, vUV);
   baseColor = vColor * vec4(linear(baseColor.rgb), baseColor.w) * uColorFactor;
 #else // BASECOLOR_TEX
   lowp vec4 baseColor = vColor * uColorFactor;
 #endif // BASECOLOR_TEX
 #else // THREE_TEX
-  lowp vec4 albedoMetal = texture(sAlbedoMetal, vUV);
+  lowp vec4 albedoMetal = TEXTURE(sAlbedoMetal, vUV);
   lowp vec4 baseColor = vec4(linear(albedoMetal.rgb), 1.0) * vColor * uColorFactor;
 #endif // THREE_TEX
 

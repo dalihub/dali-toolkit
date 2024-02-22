@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ static constexpr std::string_view OPTION_KEYWORD[] =
     "MORPH_NORMAL",
     "MORPH_TANGENT",
     "MORPH_VERSION_2_0",
+    "GLSL_VERSION_1_0",
 };
 static constexpr uint32_t NUMBER_OF_OPTIONS = sizeof(OPTION_KEYWORD) / sizeof(OPTION_KEYWORD[0]);
 static const char*        ADD_EXTRA_SKINNING_ATTRIBUTES{"ADD_EXTRA_SKINNING_ATTRIBUTES"};
@@ -105,8 +106,8 @@ void ShaderOption::AddJointMacros(size_t numberOfJointSets)
     std::ostringstream weights;
     for(size_t i = 1; i < numberOfJointSets; ++i)
     {
-      attributes << "in vec4 aJoints" << i << ";\n";
-      attributes << "in vec4 aWeights" << i << ";\n";
+      attributes << "INPUT vec4 aJoints" << i << ";\n";
+      attributes << "INPUT vec4 aWeights" << i << ";\n";
 
       weights << "bone +=\n"
               << "uBone[int(aJoints" << i << ".x)] * aWeights" << i << ".x +\n"
@@ -153,7 +154,7 @@ uint64_t ShaderOption::GetOptionHash() const
       HashString(hash, macroDef.macro.c_str());
       HashString(hash, macroDef.definition.c_str());
     }
-    optionHash |= (hash << 32 & 0xFFFFFFFF00000000);
+    optionHash |= ((hash << 32) & 0xFFFFFFFF00000000);
   }
   return optionHash;
 }
@@ -163,7 +164,7 @@ void ShaderOption::GetDefines(std::vector<std::string>& defines) const
   defines.clear();
   for(uint32_t i = 0; i < NUMBER_OF_OPTIONS; ++i)
   {
-    if(mOptionHash & 1 << i)
+    if(mOptionHash & (1 << i))
     {
       defines.push_back(OPTION_KEYWORD[i].data());
     }
