@@ -1,0 +1,12 @@
+prefix=@PREFIX@
+exec_prefix=@EXEC_PREFIX@
+apiversion=@DALI_TOOLKIT_VERSION@
+libdir=@LIB_DIR@
+includedir=@DEV_INCLUDE_PATH@
+
+Name: Dali 3D Engine Toolkit
+Description: Cross platform 3D Engine Toolkit
+Version: ${apiversion}
+Requires: dali2-core
+Libs: -L${libdir} -ldali2-toolkit
+Cflags: -I${includedir}

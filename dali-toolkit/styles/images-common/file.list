@@ -1,4 +1,5 @@
 # Files to install here
 
-dali_toolkit_image_files =\
-    $(toolkit_images_dir)/*.png
+SET( dali_toolkit_image_files
+    ${toolkit_images_dir}/*.png
+)
