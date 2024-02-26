@@ -1,20 +1,20 @@
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
-INPUT mediump vec2 vPosition;
-INPUT mediump vec2 vRectSize;
-INPUT mediump vec2 vOptRectSize;
-INPUT mediump float vAliasMargin;
+INPUT highp vec2 vPosition;
+INPUT highp vec2 vRectSize;
+INPUT highp vec2 vOptRectSize;
+INPUT highp float vAliasMargin;
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-INPUT mediump vec4 vCornerRadius;
+INPUT highp vec4 vCornerRadius;
 #endif
 #endif
 
 uniform lowp vec4 uColor;
 uniform lowp vec3 mixColor;
 #ifdef IS_REQUIRED_BLUR
-uniform mediump float blurRadius;
+uniform highp float blurRadius;
 #elif defined(IS_REQUIRED_BORDERLINE)
-uniform mediump float borderlineWidth;
-uniform mediump float borderlineOffset;
+uniform highp float borderlineWidth;
+uniform highp float borderlineOffset;
 uniform lowp vec4 borderlineColor;
 uniform lowp vec4 uActorColor;
 #endif
@@ -23,23 +23,23 @@ uniform lowp vec4 uActorColor;
 // Global values both rounded corner and borderline use
 
 // radius of rounded corner on this quadrant
-mediump float gRadius = 0.0;
+highp float gRadius = 0.0;
 
 // fragment coordinate. NOTE : vec2(0.0, 0.0) is vRectSize, the corner of visual
-mediump vec2 gFragmentPosition = vec2(0.0, 0.0);
+highp vec2 gFragmentPosition = vec2(0.0, 0.0);
 // center coordinate of rounded corner circle. vec2(gCenterPosition, gCenterPosition).
-mediump float gCenterPosition = 0.0;
+highp float gCenterPosition = 0.0;
 // relative coordinate of gFragmentPosition from gCenterPosition.
-mediump vec2 gDiff = vec2(0.0, 0.0);
+highp vec2 gDiff = vec2(0.0, 0.0);
 // potential value what our algorithm use.
-mediump float gPotential = 0.0;
+highp float gPotential = 0.0;
 
 // threshold of potential
-mediump float gPotentialRange = 0.0;
-mediump float gMaxOutlinePotential = 0.0;
-mediump float gMinOutlinePotential = 0.0;
-mediump float gMaxInlinePotential = 0.0;
-mediump float gMinInlinePotential = 0.0;
+highp float gPotentialRange = 0.0;
+highp float gMaxOutlinePotential = 0.0;
+highp float gMinOutlinePotential = 0.0;
+highp float gMaxInlinePotential = 0.0;
+highp float gMinInlinePotential = 0.0;
 
 void calculateCornerRadius()
 {
@@ -106,7 +106,7 @@ void PreprocessPotential()
 #elif defined(IS_REQUIRED_BORDERLINE)
 lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 {
-  mediump float potential = gPotential;
+  highp float potential = gPotential;
 
   // default opacity of borderline is 0.0
   mediump float borderlineOpacity = 0.0;
@@ -130,9 +130,9 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
   // But if borderlineOpacity > 0.0 and borderlineColor.a == 0.0, we need to apply tCornerRadius.
   if(borderlineOpacity > 0.0 && borderlineColor.a * borderlineOpacity < 1.0)
   {
-    mediump float tCornerRadius = -gCenterPosition + gPotentialRange;
-    mediump float MaxTexturelinePotential = tCornerRadius + gPotentialRange;
-    mediump float MinTexturelinePotential = tCornerRadius - gPotentialRange;
+    highp float tCornerRadius = -gCenterPosition + gPotentialRange;
+    highp float MaxTexturelinePotential = tCornerRadius + gPotentialRange;
+    highp float MinTexturelinePotential = tCornerRadius - gPotentialRange;
     if(potential > MaxTexturelinePotential)
     {
       // potential is out of texture range.
@@ -171,7 +171,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 #elif defined(IS_REQUIRED_ROUNDED_CORNER)
 mediump float calculateCornerOpacity()
 {
-  mediump float potential = gPotential;
+  highp float potential = gPotential;
 
   // default opacity is 1.0
   mediump float opacity = 1.0;
@@ -194,9 +194,9 @@ mediump float calculateCornerOpacity()
 mediump float calculateBlurOpacity()
 {
 // Don't use borderline!
-  mediump vec2 v = gDiff;
-  mediump float cy = gRadius + blurRadius;
-  mediump float cr = gRadius + blurRadius;
+  highp vec2 v = gDiff;
+  highp float cy = gRadius + blurRadius;
+  highp float cr = gRadius + blurRadius;
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
   // This routine make perfect circle. If corner radius is not exist, we don't consider prefect circle.
@@ -205,17 +205,17 @@ mediump float calculateBlurOpacity()
   v = vec2(min(v.x, v.y), max(v.x, v.y));
   v = v + cy;
 
-  mediump float potential = 0.0;
-  mediump float alias = min(gRadius, 1.0);
-  mediump float potentialMin = cy + gRadius - blurRadius - alias;
-  mediump float potentialMax = cy + gRadius + blurRadius + alias;
+  highp float potential = 0.0;
+  highp float alias = min(gRadius, 1.0);
+  highp float potentialMin = cy + gRadius - blurRadius - alias;
+  highp float potentialMax = cy + gRadius + blurRadius + alias;
 
   // move center of circles for reduce defact
-  mediump float cyDiff = min(cy, 0.2 * blurRadius);
+  highp float cyDiff = min(cy, 0.2 * blurRadius);
   cy -= cyDiff;
   cr += cyDiff;
 
-  mediump float diffFromBaseline = cy * v.y - (cy + cr) * v.x;
+  highp float diffFromBaseline = cy * v.y - (cy + cr) * v.x;
 
   if(diffFromBaseline > 0.0)
   {
@@ -223,8 +223,8 @@ mediump float calculateBlurOpacity()
     potential = v.y;
 
     // for anti-alias when blurRaidus = 0.0
-    mediump float heuristicBaselineScale = max(1.0 , cr * (cr + cy));
-    mediump float potentialDiff = min(alias, diffFromBaseline / heuristicBaselineScale);
+    highp float heuristicBaselineScale = max(1.0 , cr * (cr + cy));
+    highp float potentialDiff = min(alias, diffFromBaseline / heuristicBaselineScale);
     potentialMin += potentialDiff;
     potentialMax -= potentialDiff;
   }
@@ -250,7 +250,7 @@ mediump float calculateBlurOpacity()
     //          ~= 10.0*(v.x+v.y) * (0.11803399 - 0.44721360x + 0.35777088x^2 - 0.14310x^3 + O(x^5)) (Taylor series)
     //          ~= -1.0557281 * (v.x + v.y) + 2.236068 * length(v) - ~~~ (here, x <= 0.5 * (1.0 - sqrt(0.5)) < 0.1464467)
     // Note : This simplify need cause we should use it on lowspec HW.
-    mediump float x = 0.5 * (1.0 - length(v) / (v.x + v.y));
+    highp float x = 0.5 * (1.0 - length(v) / (v.x + v.y));
     potential = -1.0557281 * (v.x + v.y) + 2.236068 * length(v) + 10.0 * (v.x + v.y) * (0.35777088 - 0.14310 * x) * x * x;
 #endif
   }
