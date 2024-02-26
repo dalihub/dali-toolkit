@@ -72,7 +72,7 @@ constexpr int32_t  DEFAULT_ORIENTATION     = 0;
 constexpr int32_t  INVALID_INDEX           = -1;
 constexpr uint32_t MAXIMUM_SIZE_SHADOW_MAP = 2048;
 
-constexpr int32_t SCENE_ORDER_INDEX = 100;
+constexpr int32_t SCENE_ORDER_INDEX  = 100;
 constexpr int32_t SHADOW_ORDER_INDEX = 99;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
@@ -711,9 +711,9 @@ void SceneView::RemoveShadow(Scene3D::Light light)
     break;
   }
 
-  if(mShadowMapRenderTask)
+  if(mSceneHolder && mShadowMapRenderTask)
   {
-    RenderTaskList taskList = Integration::SceneHolder::Get(Self()).GetRenderTaskList();
+    RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
     taskList.RemoveTask(mShadowMapRenderTask);
     mShadowMapRenderTask.Reset();
   }
@@ -999,7 +999,7 @@ void SceneView::OnSceneConnection(int depth)
   if(mSceneHolder)
   {
     RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
-    mRenderTask = taskList.CreateTask();
+    mRenderTask             = taskList.CreateTask();
     mRenderTask.SetSourceActor(mRootLayer);
     mRenderTask.SetExclusive(true);
     mRenderTask.SetInputEnabled(true);
@@ -1375,14 +1375,14 @@ void SceneView::NotifyImageBasedLightTextureChange()
 
 void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
 {
-  if(!mShadowLight)
+  if(!mShadowLight || !mSceneHolder)
   {
     return;
   }
 
   if(!mShadowMapRenderTask)
   {
-    RenderTaskList taskList = Integration::SceneHolder::Get(Self()).GetRenderTaskList();
+    RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
     mShadowMapRenderTask    = taskList.CreateTask();
     mShadowMapRenderTask.SetSourceActor(mRootLayer);
     mShadowMapRenderTask.SetExclusive(true);
