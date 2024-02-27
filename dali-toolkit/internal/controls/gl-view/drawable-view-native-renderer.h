@@ -2,7 +2,7 @@
 #define DALI_PROJECT_DRAWABLE_VIEW_NATIVE_RENDERER_H
 
 /*
-* Copyright (c) 2021 Samsung Electronics Co., Ltd.
+* Copyright (c) 2024 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ struct NativeRendererCreateInfo
   };
 
   bool threadEnabled { false };
+  bool directExecution { false };
+
   uint32_t maxOffscreenBuffers { 3u };
   PresentationMode presentationMode {PresentationMode::FIFO};
 };

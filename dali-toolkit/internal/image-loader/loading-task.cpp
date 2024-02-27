@@ -27,7 +27,10 @@
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
 #ifdef TRACE_ENABLED
+#include <chrono>
+#include <iomanip>
 #include <sstream>
+#include <thread>
 #endif
 
 namespace Dali
@@ -39,7 +42,17 @@ namespace Internal
 namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
+
+#ifdef TRACE_ENABLED
+uint64_t GetNanoseconds()
+{
+  // Get the time of a monotonic clock since its epoch.
+  auto epoch    = std::chrono::steady_clock::now().time_since_epoch();
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch);
+  return static_cast<uint64_t>(duration.count());
 }
+#endif
+} // namespace
 
 LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
 : AsyncTask(callback),
@@ -159,10 +172,13 @@ LoadingTask::~LoadingTask()
 void LoadingTask::Process()
 {
 #ifdef TRACE_ENABLED
+  uint64_t mStartTimeNanoSceonds = 0;
+  uint64_t mEndTimeNanoSceonds   = 0;
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
+    mStartTimeNanoSceonds = GetNanoseconds();
     std::ostringstream oss;
-    oss << "[url:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]";
+    oss << "[u:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]";
     // DALI_TRACE_BEGIN(gTraceFilter, "DALI_IMAGE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("BEGIN: DALI_IMAGE_LOADING_TASK %s", oss.str().c_str());
   }
@@ -183,17 +199,20 @@ void LoadingTask::Process()
 #ifdef TRACE_ENABLED
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
+    mEndTimeNanoSceonds = GetNanoseconds();
     std::ostringstream oss;
+    oss << std::fixed << std::setprecision(3);
     oss << "[";
-    oss << "masking:" << isMaskTask << " ";
-    oss << "index:" << frameIndex << " ";
-    oss << "pixelBuffers:" << pixelBuffers.size() << " ";
+    oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
+    oss << "m:" << isMaskTask << " ";
+    oss << "i:" << frameIndex << " ";
+    oss << "b:" << pixelBuffers.size() << " ";
     if(!pixelBuffers.empty())
     {
-      oss << "size:" << pixelBuffers[0].GetWidth() << "x" << pixelBuffers[0].GetHeight() << " ";
-      oss << "premult:" << pixelBuffers[0].IsAlphaPreMultiplied() << " ";
+      oss << "s:" << pixelBuffers[0].GetWidth() << "x" << pixelBuffers[0].GetHeight() << " ";
+      oss << "p:" << pixelBuffers[0].IsAlphaPreMultiplied() << " ";
     }
-    oss << "url:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]";
+    oss << "u:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]";
     // DALI_TRACE_END(gTraceFilter, "DALI_IMAGE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("END: DALI_IMAGE_LOADING_TASK %s", oss.str().c_str());
   }

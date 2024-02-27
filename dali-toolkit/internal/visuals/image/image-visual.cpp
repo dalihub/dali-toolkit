@@ -934,6 +934,11 @@ void ImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::P
     case DevelImageVisual::Action::RELOAD:
     {
       auto attemptAtlasing = AttemptAtlasing();
+
+      // Reset resource ready status when we call reload.
+      ResourceReady(Toolkit::Visual::ResourceStatus::PREPARING);
+      mLoadState = TextureManager::LoadState::NOT_STARTED;
+
       LoadTexture(attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection, TextureManager::ReloadPolicy::FORCED);
       break;
     }

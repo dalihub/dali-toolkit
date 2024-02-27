@@ -146,10 +146,10 @@ ShaderDefinition::LoadRaw(const std::string& shadersPath) const
   }
   else
   {
-    raw.mVertexShaderSource         = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_VERT.data();
-    raw.mFragmentShaderSource       = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
-    raw.mShadowVertexShaderSource   = SHADER_SHADOW_MAP_SHADER_VERT.data();
-    raw.mShadowFragmentShaderSource = SHADER_SHADOW_MAP_SHADER_FRAG.data();
+    raw.mVertexShaderSource         = Dali::Shader::GetVertexShaderPrefix() + SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_VERT.data();
+    raw.mFragmentShaderSource       = Dali::Shader::GetFragmentShaderPrefix() + SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
+    raw.mShadowVertexShaderSource   = Dali::Shader::GetVertexShaderPrefix() + SHADER_SHADOW_MAP_SHADER_VERT.data();
+    raw.mShadowFragmentShaderSource = Dali::Shader::GetFragmentShaderPrefix() + SHADER_SHADOW_MAP_SHADER_FRAG.data();
   }
 
   if(!fail)
@@ -159,12 +159,14 @@ ShaderDefinition::LoadRaw(const std::string& shadersPath) const
       ApplyDefine(raw.mVertexShaderSource, definevar);
       ApplyDefine(raw.mFragmentShaderSource, definevar);
       ApplyDefine(raw.mShadowVertexShaderSource, definevar);
+      ApplyDefine(raw.mShadowFragmentShaderSource, definevar);
     }
     for(const auto& macroDef : mMacros)
     {
       RedefineMacro(raw.mVertexShaderSource, macroDef.macro, macroDef.definition);
       RedefineMacro(raw.mFragmentShaderSource, macroDef.macro, macroDef.definition);
       RedefineMacro(raw.mShadowVertexShaderSource, macroDef.macro, macroDef.definition);
+      RedefineMacro(raw.mShadowFragmentShaderSource, macroDef.macro, macroDef.definition);
     }
   }
 

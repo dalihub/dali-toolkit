@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <stdlib.h>
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <toolkit-environment-variable.h>
 #include <toolkit-event-thread-callback.h>
 #include <toolkit-timer.h>
 
@@ -2313,6 +2314,102 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
   {
     DALI_TEST_CHECK(false);
   }
+
+  END_TEST;
+}
+
+int UtcTextureManagerCachingForDifferentMultiplyOnLoad(void)
+{
+  /// To insture the order of callback, Make we don't use mutiple thread loading for this UTC.
+  EnvironmentVariable::SetTestEnvironmentVariable("DALI_ASYNC_MANAGER_THREAD_POOL_SIZE", "1");
+  EnvironmentVariable::SetTestEnvironmentVariable("DALI_ASYNC_MANAGER_LOW_PRIORITY_THREAD_POOL_SIZE", "1");
+
+  ToolkitTestApplication application;
+  tet_infoline("UtcTextureManagerCachingForDifferentMultiplyOnLoad");
+  tet_infoline("Observe1 multiply on load, and Observer2, 3 don't multiply on load.");
+  tet_infoline("We will use jpg image, with will not premultiply alpha even if we try to load without multiply.");
+
+  tet_infoline("Let we request Observer1 and Observer2 sequencely.");
+  tet_infoline("After Observer1 complete, we will cache -premultiplyOnLoad = true, premultiplied = false;");
+  tet_infoline("Before Observer2 complete, let we request Observer3. It will cache-hit with Observer1 item (since image is not premultiplied.)");
+  tet_infoline("At this time, Observer1 and Observer3 loaded, but Observer2 still not.");
+
+  TextureManager textureManager; // Create new texture manager
+
+  TestObserver observer1;
+  TestObserver observer2;
+  TestObserver observer3;
+  std::string  filename(TEST_IMAGE_FILE_NAME);
+  auto         preMultiply = TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD;
+  textureManager.RequestLoad(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    &observer1,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  DALI_TEST_EQUALS(observer1.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mObserverCalled, false, TEST_LOCATION);
+
+  preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  textureManager.RequestLoad(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    &observer2,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  DALI_TEST_EQUALS(observer2.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mObserverCalled, false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  tet_printf("We can ensure that observer1 loaded first. (since the number of thread pool is 1)\n");
+  DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mObserverCalled, false, TEST_LOCATION);
+
+  preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  textureManager.RequestLoad(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    &observer3,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  tet_printf("Request Observer3. It will cache-hit with Observer1.\n");
+  DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mObserverCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer3.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer3.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer3.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer3.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer3.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer3.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
 
   END_TEST;
 }

@@ -28,7 +28,10 @@
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 
 #ifdef TRACE_ENABLED
+#include <chrono>
+#include <iomanip>
 #include <sstream>
+#include <thread>
 #endif
 
 namespace Dali
@@ -40,7 +43,17 @@ namespace Internal
 namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
+
+#ifdef TRACE_ENABLED
+uint64_t GetNanoseconds()
+{
+  // Get the time of a monotonic clock since its epoch.
+  auto epoch    = std::chrono::steady_clock::now().time_since_epoch();
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch);
+  return static_cast<uint64_t>(duration.count());
 }
+#endif
+} // namespace
 
 SvgTask::SvgTask(VectorImageRenderer vectorRenderer, CallbackBase* callback, AsyncTask::PriorityType priorityType)
 : AsyncTask(callback, priorityType),
@@ -86,10 +99,13 @@ void SvgLoadingTask::Process()
   }
 
 #ifdef TRACE_ENABLED
+  uint64_t mStartTimeNanoSceonds = 0;
+  uint64_t mEndTimeNanoSceonds   = 0;
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
+    mStartTimeNanoSceonds = GetNanoseconds();
     std::ostringstream oss;
-    oss << "[url:" << mImageUrl.GetEllipsedUrl() << "]";
+    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_BEGIN(gTraceFilter, "DALI_SVG_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("BEGIN: DALI_SVG_LOADING_TASK %s", oss.str().c_str());
   }
@@ -141,9 +157,13 @@ void SvgLoadingTask::Process()
 #ifdef TRACE_ENABLED
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
+    mEndTimeNanoSceonds = GetNanoseconds();
     std::ostringstream oss;
-    oss << "[success:" << mHasSucceeded << " ";
-    oss << "url:" << mImageUrl.GetEllipsedUrl() << "]";
+    oss << std::fixed << std::setprecision(3);
+    oss << "[";
+    oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
+    oss << "s:" << mHasSucceeded << " ";
+    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
     // DALI_TRACE_END(gTraceFilter, "DALI_SVG_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("END: DALI_SVG_LOADING_TASK %s", oss.str().c_str());
   }
@@ -174,9 +194,14 @@ void SvgRasterizingTask::Process()
     return;
   }
 
+#ifdef TRACE_ENABLED
+  uint64_t mStartTimeNanoSceonds = 0;
+  uint64_t mEndTimeNanoSceonds   = 0;
+#endif
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
-    oss << "[size:" << mWidth << "x" << mHeight << " ";
-    oss << "url:" << mImageUrl.GetEllipsedUrl() << "]";
+    mStartTimeNanoSceonds = GetNanoseconds();
+    oss << "[s:" << mWidth << "x" << mHeight << " ";
+    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
   });
 
   Devel::PixelBuffer pixelBuffer = mVectorRenderer.Rasterize(mWidth, mHeight);
@@ -184,8 +209,8 @@ void SvgRasterizingTask::Process()
   {
     DALI_LOG_ERROR("Rasterize is failed!\n");
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
-      oss << "[size:" << mWidth << "x" << mHeight << " ";
-      oss << "url:" << mImageUrl.GetEllipsedUrl() << "]";
+      oss << "[s:" << mWidth << "x" << mHeight << " ";
+      oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
     });
     return;
   }
@@ -194,8 +219,12 @@ void SvgRasterizingTask::Process()
   mHasSucceeded = true;
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
-    oss << "[size:" << mWidth << "x" << mHeight << " ";
-    oss << "url:" << mImageUrl.GetEllipsedUrl() << "]";
+    mEndTimeNanoSceonds = GetNanoseconds();
+    oss << std::fixed << std::setprecision(3);
+    oss << "[";
+    oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
+    oss << "s:" << mWidth << "x" << mHeight << " ";
+    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
   });
 }
 

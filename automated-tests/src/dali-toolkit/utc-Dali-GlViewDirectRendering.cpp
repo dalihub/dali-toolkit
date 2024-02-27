@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -363,6 +363,32 @@ int UtcDaliGlViewDirectRenderingResize(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliGlViewDirectRenderingResize");
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
+
+  application.GetScene().Add(view);
+  view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
+  view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInit), Dali::MakeCallback(DirectRenderingCode::glRenderFrame), Dali::MakeCallback(DirectRenderingCode::glTerminate));
+  view.SetResizeCallback(Dali::MakeCallback(DirectRenderingCode::resizeCB));
+  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::SIZE, Vector2(360.0f, 360.0f));
+
+  application.SendNotification();
+  application.Render();
+
+  //To GlViewRenderThread can recognize Resize signal the main thread have to sleep.
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(true);
+  END_TEST;
+}
+
+int UtcDaliGlViewDirectRenderingDirectResize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliGlViewDirectRenderingResize");
+  GlView view = Toolkit::GlView::New(GlView::BackendMode::UNSAFE_DIRECT_RENDERING, GlView::ColorFormat::RGB888);
 
   application.GetScene().Add(view);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
