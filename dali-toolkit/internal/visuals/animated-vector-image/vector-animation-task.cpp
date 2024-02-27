@@ -73,7 +73,7 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mVectorRenderer(VectorAnimationRenderer::New()),
   mAnimationData(),
   mVectorAnimationThread(factoryCache.GetVectorAnimationManager().GetVectorAnimationThread()),
-  mConditionalWait(),
+  mMutex(),
   mResourceReadySignal(),
   mLoadCompletedCallback(MakeCallback(this, &VectorAnimationTask::OnLoadCompleted)),
   mCachedLayerInfo(),
@@ -128,23 +128,25 @@ bool VectorAnimationTask::IsReady()
 
 void VectorAnimationTask::Finalize()
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
+  {
+    Mutex::ScopedLock lock(mMutex);
 
-  // Release some objects in the main thread
-  if(mAnimationFinishedCallback)
-  {
-    mVectorAnimationThread.RemoveEventTriggerCallbacks(mAnimationFinishedCallback.get());
-    mAnimationFinishedCallback.reset();
-  }
-  if(mLoadCompletedCallback)
-  {
-    mVectorAnimationThread.RemoveEventTriggerCallbacks(mLoadCompletedCallback.get());
-    mLoadCompletedCallback.reset();
+    // Release some objects in the main thread
+    if(mAnimationFinishedCallback)
+    {
+      mVectorAnimationThread.RemoveEventTriggerCallbacks(mAnimationFinishedCallback.get());
+      mAnimationFinishedCallback.reset();
+    }
+    if(mLoadCompletedCallback)
+    {
+      mVectorAnimationThread.RemoveEventTriggerCallbacks(mLoadCompletedCallback.get());
+      mLoadCompletedCallback.reset();
+    }
+
+    mDestroyTask = true;
   }
 
   mVectorRenderer.Finalize();
-
-  mDestroyTask = true;
 }
 
 void VectorAnimationTask::TaskCompleted(VectorAnimationTaskPtr task)
@@ -209,7 +211,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
     DALI_LOG_ERROR("VectorAnimationTask::Load: Load failed [%s]\n", mImageUrl.GetUrl().c_str());
     mLoadRequest = false;
     {
-      ConditionalWait::ScopedLock lock(mConditionalWait);
+      Mutex::ScopedLock lock(mMutex);
       if(!synchronousLoading && mLoadCompletedCallback)
       {
         mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
@@ -240,7 +242,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
 
   mLoadRequest = false;
   {
-    ConditionalWait::ScopedLock lock(mConditionalWait);
+    Mutex::ScopedLock lock(mMutex);
     if(!synchronousLoading && mLoadCompletedCallback)
     {
       mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
@@ -268,8 +270,6 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
 
 void VectorAnimationTask::SetRenderer(Renderer renderer)
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-
   mVectorRenderer.SetRenderer(renderer);
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetRenderer [%p]\n", this);
@@ -301,7 +301,7 @@ bool VectorAnimationTask::IsLoadRequested() const
 
 void VectorAnimationTask::SetAnimationData(const AnimationData& data)
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
+  Mutex::ScopedLock lock(mMutex);
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetAnimationData [%p]\n", this);
 
@@ -381,7 +381,7 @@ void VectorAnimationTask::PauseAnimation()
 
 void VectorAnimationTask::SetAnimationFinishedCallback(CallbackBase* callback)
 {
-  ConditionalWait::ScopedLock lock(mConditionalWait);
+  Mutex::ScopedLock lock(mMutex);
   mAnimationFinishedCallback = std::unique_ptr<CallbackBase>(callback);
 }
 
@@ -580,7 +580,7 @@ bool VectorAnimationTask::Rasterize()
   mKeepAnimation = false;
 
   {
-    ConditionalWait::ScopedLock lock(mConditionalWait);
+    Mutex::ScopedLock lock(mMutex);
     if(mDestroyTask)
     {
       // The task will be destroyed. We don't need rasterization.
@@ -700,7 +700,7 @@ bool VectorAnimationTask::Rasterize()
 
     // Animation is finished
     {
-      ConditionalWait::ScopedLock lock(mConditionalWait);
+      Mutex::ScopedLock lock(mMutex);
       if(mNeedAnimationFinishedTrigger && mAnimationFinishedCallback)
       {
         mVectorAnimationThread.AddEventTriggerCallback(mAnimationFinishedCallback.get());
@@ -803,7 +803,7 @@ void VectorAnimationTask::ApplyAnimationData()
   uint32_t index;
 
   {
-    ConditionalWait::ScopedLock lock(mConditionalWait);
+    Mutex::ScopedLock lock(mMutex);
 
     if(!mAnimationDataUpdated || mAnimationData[mAnimationDataIndex].size() != 0)
     {
