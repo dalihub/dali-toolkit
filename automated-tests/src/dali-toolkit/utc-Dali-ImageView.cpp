@@ -2896,10 +2896,12 @@ int UtcDaliImageViewLoadRemoteSVG(void)
 
   ToolkitTestApplication application;
 
+  const std::string svgImageUrl("https://dalihub.github.io/images/check.svg");
+
   {
     Toolkit::ImageView imageView;
     imageView = Toolkit::ImageView::New();
-    imageView.SetImage("https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/check.svg");
+    imageView.SetImage(svgImageUrl);
     imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
     imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
     imageView.SetProperty(Actor::Property::SIZE, Vector2(300, 300));
@@ -2926,7 +2928,7 @@ int UtcDaliImageViewLoadRemoteSVG(void)
   {
     Toolkit::ImageView imageView;
     imageView = Toolkit::ImageView::New();
-    imageView.SetImage("https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/check.svg");
+    imageView.SetImage(svgImageUrl);
     imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
     imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
     imageView.SetProperty(Actor::Property::POSITION, Vector3(150.0f, 150.0f, 0.0f));
