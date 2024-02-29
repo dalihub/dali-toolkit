@@ -10,6 +10,14 @@ OUTPUT highp vec4 vCornerRadius;
 #endif
 #endif
 
+#ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
+#define DEBUG_EXTRA_ATTRIBUTES
+#define DEBUG_EXTRA_VARYINGS
+
+DEBUG_EXTRA_ATTRIBUTES
+DEBUG_EXTRA_VARYINGS
+#endif
+
 uniform highp mat4 uMvpMatrix;
 uniform highp vec3 uSize;
 uniform highp vec4 pixelArea;
@@ -119,7 +127,23 @@ vec4 ComputeVertexPosition()
   return vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
 }
 
+#ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
+// These lines in the shader may be replaced with actual definitions by the debug-image-visual-shader-script.json.
+#define DEBUG_APPLY_VARYING_CODE
+#define DEBUG_EXTRA_UNIFORMS
+
+DEBUG_EXTRA_UNIFORMS
+
+void ApplyDebugVarying()
+{
+  DEBUG_APPLY_VARYING_CODE
+}
+#endif
 void main()
 {
   gl_Position = uMvpMatrix * ComputeVertexPosition();
+
+#ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
+  ApplyDebugVarying();
+#endif
 }

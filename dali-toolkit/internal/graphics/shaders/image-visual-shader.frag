@@ -8,6 +8,10 @@ INPUT highp float vAliasMargin;
 INPUT highp vec4 vCornerRadius;
 #endif
 #endif
+#ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
+#define DEBUG_EXTRA_VARYINGS
+DEBUG_EXTRA_VARYINGS
+#endif
 
 uniform sampler2D sTexture;
 #if defined(IS_REQUIRED_YUV_TO_RGB) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
@@ -297,6 +301,9 @@ const bool ATLAS_CUSTOM_WARP_BOOL = false;
 #define DEBUG_RATIO_RED_CODE
 #define DEBUG_RATIO_GREEN_CODE
 #define DEBUG_RATIO_BLUE_CODE
+#define DEBUG_EXTRA_UNIFORMS
+
+DEBUG_EXTRA_UNIFORMS
 
 const mediump float gMinDebugColorRate = MINIMUM_DEBUG_COLOR_RATE;
 const mediump float gMaxDebugColorRate = MAXIMUM_DEBUG_COLOR_RATE;

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_SHADER_DEBUG_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,11 +36,12 @@ namespace ImageVisualShaderDebug
 bool DebugImageVisualShaderEnabled();
 
 /**
- * @brief Apply fragment shader use debug script.
+ * @brief Apply vertex / fragment shader use debug script.
  *
- * @param[in, out] fragmentShader Shader code to apply debug script.
+ * @param[in, out] vertexShader Vertex shader code to apply debug script.
+ * @param[in, out] fragmentShader Fragment shader code to apply debug script.
  */
-void ApplyImageVisualShaderDebugScriptCode(std::string& fragmentShader);
+void ApplyImageVisualShaderDebugScriptCode(std::string& vertexShader, std::string& fragmentShader);
 
 } // namespace ImageVisualShaderDebug
 

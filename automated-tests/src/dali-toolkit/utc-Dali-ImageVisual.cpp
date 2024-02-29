@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,11 @@ constexpr auto DALI_DEBUG_IMAGE_VISUAL_SHADER_SCRIPT_FILE_NAME_ENV = "DALI_DEBUG
 
 const char* VALID_DEBUG_SHADER_SCRIPT =
   "{\n"
+  "  \"version\": \"1.0.0\",\n"
   "  \"maximumColorRate\": 0.5,\n"
+  "  \"extraVaryings\": [\"mediump vec3 vDebug;\"],\n"
+  "  \"extraUniforms\": \"mediump float uDebug;\",\n"
+  "  \"applyVaryingsCode\": \"vDebug = gl_Position.xyz / gl_Position.w;\",\n"
   "  \"redChannelCodes\":\n"
   "  {\n"
   "    \"triggerCode\":[\"return\",\" false;\"],\n"

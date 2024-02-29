@@ -111,7 +111,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, Ima
 
   if(Dali::Toolkit::Internal::ImageVisualShaderDebug::DebugImageVisualShaderEnabled())
   {
-    Dali::Toolkit::Internal::ImageVisualShaderDebug::ApplyImageVisualShaderDebugScriptCode(fragmentShader);
+    Dali::Toolkit::Internal::ImageVisualShaderDebug::ApplyImageVisualShaderDebugScriptCode(vertexShader, fragmentShader);
   }
 
   if(featureBuilder.NeedToChangeFragmentShader() == ImageVisualShaderFeature::ChangeFragmentShader::NEED_CHANGE)
