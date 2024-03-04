@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ void BubbleRenderer::Initialize(unsigned int numberOfBubble, const Vector2& move
   mIndexInvertedMovementArea = mRenderer.RegisterUniqueProperty("uInvertedMovementArea", Vector2(1.f, 1.f) / movementArea);
 
   mIndicesOffset.resize(9);
-  int offset = movementArea.Length() / 10.f;
+  int offset = std::max(static_cast<int>(movementArea.Length() / 10.f), 1); // To avoid divide by zero issue.
 
   uint32_t seed = static_cast<uint32_t>(time(NULL));
 

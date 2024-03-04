@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,9 +46,9 @@ NavigationMesh::~NavigationMesh() = default;
   return mImpl->GetVertexCount();
 }
 
-bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, FaceIndex& faceIndex)
+bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, FaceIndex& outFaceIndex)
 {
-  return mImpl->FindFloor(position, outPosition, faceIndex);
+  return mImpl->FindFloor(position, outPosition, outFaceIndex);
 }
 
 bool NavigationMesh::FindFloorForFace(const Dali::Vector3& position, FaceIndex faceIndex, bool dontCheckNeighbours, Dali::Vector3& outPosition)

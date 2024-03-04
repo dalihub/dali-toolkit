@@ -38,6 +38,8 @@ namespace Gltf
 {
 namespace
 {
+constexpr float MIN_DURATION_SECONDS = 1e-2f;
+
 // Utility functions
 const TreeNode* Tidx(const TreeNode* node, uint32_t index)
 {
@@ -434,7 +436,7 @@ float LoadKeyFrames(const AnimationSamplerInfo& currentSampler, const Property::
   LoadDataFromAccessor<T>(currentSampler.output, outputBufferData, path, accessorArray, bufferViewArray, bufferArray);
 
   uint32_t keyframeNum     = inputBufferData.Size();
-  float    lengthAnimation = inputBufferData[inputBufferData.Size() - 1];
+  float    lengthAnimation = std::max((inputBufferData.Size() > 0u ? inputBufferData[inputBufferData.Size() - 1] : MIN_DURATION_SECONDS), MIN_DURATION_SECONDS);
   for(uint32_t i = 0; i < keyframeNum; i++)
   {
     if(propIndex == Dali::Actor::Property::ORIENTATION)

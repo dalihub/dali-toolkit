@@ -559,7 +559,8 @@ struct AtlasRenderer::Impl
     {
       GlyphInfo glyph;
       bool      addHyphen = ((hyphenIndex < hyphensCount) && hyphenIndices && ((i + startIndexOfGlyphs) == hyphenIndices[hyphenIndex]));
-      if(addHyphen && hyphens)
+      // TODO : Shouldn't we have to control here when i == 0 cases?
+      if(addHyphen && hyphens && i > 0u)
       {
         glyph = hyphens[hyphenIndex];
         i--;

@@ -163,7 +163,7 @@ void TypesetGlyph(GlyphData& __restrict__ data,
   // Whether the given glyph is a color one.
   const bool     isColorGlyph    = data.glyphBitmap.isColorEmoji || data.glyphBitmap.isColorBitmap;
   const uint32_t glyphPixelSize  = Pixel::GetBytesPerPixel(data.glyphBitmap.format);
-  const uint32_t glyphAlphaIndex = glyphPixelSize - 1u;
+  const uint32_t glyphAlphaIndex = (glyphPixelSize > 0u) ? glyphPixelSize - 1u : 0u;
 
   // Determinate iterator range.
   const int32_t lineIndexRangeMin = std::max(0, -yOffset);
