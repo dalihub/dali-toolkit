@@ -174,6 +174,26 @@ public:
   void SetMotionData(Scene3D::MotionData motionData);
 
   /**
+   * @copydoc Model::CastShadow()
+   */
+  void CastShadow(bool castShadow);
+
+  /**
+   * @copydoc Model::IsShadowCasting()
+   */
+  bool IsShadowCasting() const;
+
+  /**
+   * @copydoc Model::ReceiveShadow()
+   */
+  void ReceiveShadow(bool receiveShadow);
+
+  /**
+   * @copydoc Model::IsShadowReceiving()
+   */
+  bool IsShadowReceiving() const;
+
+  /**
    * @copydoc Scene3D::Model::MeshHitSignal()
    */
   Scene3D::Model::MeshHitSignalType& MeshHitSignal()
@@ -293,6 +313,16 @@ private:
    * @brief Changes model anchor point to set the model at center or returns to the original model pivot.
    */
   void FitModelPosition();
+
+  /**
+   * @brief Makes the input node cast shadow or not.
+   */
+  void UpdateCastShadowRecursively(Scene3D::ModelNode node, bool castShadow);
+
+  /**
+   * @brief Makes the input node receive shadow or not.
+   */
+  void UpdateReceiveShadowRecursively(Scene3D::ModelNode node, bool receiveShadow);
 
   /**
    * @brief Changes IBL information of the input node.
@@ -444,6 +474,8 @@ private:
   bool          mIblSpecularResourceReady;
   bool          mIblDiffuseDirty;
   bool          mIblSpecularDirty;
+  bool          mIsShadowCasting;
+  bool          mIsShadowReceiving;
 };
 
 } // namespace Internal

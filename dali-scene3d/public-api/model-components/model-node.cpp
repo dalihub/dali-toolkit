@@ -143,6 +143,26 @@ bool ModelNode::HasColliderMesh() const
   return Internal::GetImplementation(*this).HasColliderMesh();
 }
 
+void ModelNode::CastShadow(bool castShadow)
+{
+  Internal::GetImplementation(*this).CastShadow(castShadow);
+}
+
+bool ModelNode::IsShadowCasting() const
+{
+  return Internal::GetImplementation(*this).IsShadowCasting();
+}
+
+void ModelNode::ReceiveShadow(bool receiveShadow)
+{
+  Internal::GetImplementation(*this).ReceiveShadow(receiveShadow);
+}
+
+bool ModelNode::IsShadowReceiving() const
+{
+  return Internal::GetImplementation(*this).IsShadowReceiving();
+}
+
 } // namespace Scene3D
 
 } // namespace Dali

@@ -80,6 +80,9 @@ void ModelNode::Initialize()
 
 void ModelNode::OnInitialize()
 {
+  Actor self = Self();
+  self.RegisterProperty("uIsShadowCasting", static_cast<int>(mIsShadowCasting));
+  self.RegisterProperty("uIsShadowReceiving", static_cast<int>(mIsShadowReceiving));
 }
 
 void ModelNode::OnSceneConnection(int depth)
@@ -297,6 +300,42 @@ void ModelNode::SetShadowMapTexture(Dali::Texture shadowMapTexture)
   {
     GetImplementation(primitive).SetShadowMapTexture(mShadowMapTexture);
   }
+}
+
+void ModelNode::CastShadow(bool castShadow)
+{
+  if(mIsShadowCasting == castShadow)
+  {
+    return;
+  }
+
+  mIsShadowCasting = castShadow;
+
+  Actor self = Self();
+  self.RegisterProperty("uIsShadowCasting", static_cast<int>(mIsShadowCasting));
+}
+
+bool ModelNode::IsShadowCasting() const
+{
+  return mIsShadowCasting;
+}
+
+void ModelNode::ReceiveShadow(bool receiveShadow)
+{
+  if(mIsShadowReceiving == receiveShadow)
+  {
+    return;
+  }
+
+  mIsShadowReceiving = receiveShadow;
+
+  Actor self = Self();
+  self.RegisterProperty("uIsShadowReceiving", static_cast<int>(mIsShadowReceiving));
+}
+
+bool ModelNode::IsShadowReceiving() const
+{
+  return mIsShadowReceiving;
 }
 
 void ModelNode::SetImageBasedLightTexture(Dali::Texture diffuseTexture, Dali::Texture specularTexture, float iblScaleFactor, uint32_t specularMipmapLevels)

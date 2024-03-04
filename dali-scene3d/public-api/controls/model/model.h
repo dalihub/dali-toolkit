@@ -335,7 +335,7 @@ public:
   ModelNode FindChildModelNodeByName(std::string_view nodeName);
 
   /**
-   * @brief Retrieve the list of blendshape name that current Model hold.
+   * @brief Retrieves the list of blendshape name that current Model hold.
    * The name will be appended end of input list.
    *
    * @SINCE_2_2.34
@@ -345,7 +345,7 @@ public:
   void RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const;
 
   /**
-   * @brief Retrieve the list of ModelNode that contains given blend shape name.
+   * @brief Retrieves the list of ModelNode that contains given blend shape name.
    * The ModelNode will be appended end of input list.
    *
    * @SINCE_2_2.34
@@ -356,7 +356,7 @@ public:
   void RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, std::vector<ModelNode>& modelNodes) const;
 
   /**
-   * @brief Generate specific animation of this Model by inputed MotionData.
+   * @brief Generates specific animation of this Model by inputed MotionData.
    *
    * @SINCE_2_2.34
    * @param[in] motionData the data of motion animation.
@@ -366,7 +366,7 @@ public:
   Dali::Animation GenerateMotionDataAnimation(MotionData motionData);
 
   /**
-   * @brief Set specific values of this Model by inputed MotionData.
+   * @brief Sets specific values of this Model by inputed MotionData.
    * @note If MotionValue's ValueType is ValueType::KEY_FRAMES, the last value will be set.
    *
    * @SINCE_2_2.34
@@ -374,6 +374,45 @@ public:
    * @note This method should be called after Model load finished.
    */
   void SetMotionData(Scene3D::MotionData motionData);
+
+  /**
+   * @brief Sets whether this Model casts shadow or not.
+   * If it is true, this model is drawn on Shadow Map.
+   *
+   * @SINCE_2_3.99
+   * @param[in] castShadow Whether this Model casts shadow or not.
+   * @note This method affects all of the child ModelNode.
+   * However, same property of each child ModelNode can be changed respectively and it not changes parent's property.
+   */
+  void CastShadow(bool castShadow);
+
+  /**
+   * @brief Retrieves whether the Model casts shadow or not for Light.
+   *
+   * @SINCE_2_3.99
+   * @return True if this model casts shadow.
+   * @note IBL does not cast any shadow.
+   */
+  bool IsShadowCasting() const;
+
+  /**
+   * @brief Sets whether this Model receives shadow or not.
+   * If it is true, shadows are drawn on this model.
+   *
+   * @SINCE_2_3.99
+   * @param[in] receiveShadow Whether this Model receives shadow or not.
+   * @note This method affects all of the child ModelNode.
+   * However, same property of each child ModelNode can be changed respectively and it not changes parent's property.
+   */
+  void ReceiveShadow(bool receiveShadow);
+
+  /**
+   * @brief Retrieves whether the Model receives shadow or not for Light.
+   *
+   * @SINCE_2_3.99
+   * @return True if this model receives shadow.
+   */
+  bool IsShadowReceiving() const;
 
   /**
    * @brief This signal is emitted when the collider mesh is touched/hit.

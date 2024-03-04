@@ -1989,3 +1989,105 @@ int UtcDaliModelMaterialUniformChange(void)
 
   END_TEST;
 }
+
+int UtcDaliModelCastShadow(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New();
+  application.GetScene().Add(model);
+
+  Scene3D::ModelNode modelNode = Scene3D::ModelNode::New();
+  model.AddModelNode(modelNode);
+
+  DALI_TEST_EQUALS(model.IsShadowCasting(), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(modelNode.IsShadowCasting(), true, TEST_LOCATION);
+
+  auto shadowCastingIndex = modelNode.GetPropertyIndex("uIsShadowCasting");
+  DALI_TEST_EQUALS(modelNode.GetProperty<int>(shadowCastingIndex), 1, TEST_LOCATION);
+
+  model.CastShadow(false);
+
+  DALI_TEST_EQUALS(model.IsShadowCasting(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(modelNode.IsShadowCasting(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(modelNode.GetProperty<int>(shadowCastingIndex), 0, TEST_LOCATION);
+
+  Scene3D::ModelNode modelNode2 = Scene3D::ModelNode::New();
+  model.AddModelNode(modelNode2);
+
+  DALI_TEST_EQUALS(modelNode2.IsShadowCasting(), true, TEST_LOCATION);
+
+  auto shadowCastingIndex2 = modelNode2.GetPropertyIndex("uIsShadowCasting");
+  DALI_TEST_EQUALS(modelNode2.GetProperty<int>(shadowCastingIndex2), 1, TEST_LOCATION);
+
+  modelNode.CastShadow(true);
+
+  DALI_TEST_EQUALS(modelNode.IsShadowCasting(), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(model.IsShadowCasting(), false, TEST_LOCATION);
+
+  model.CastShadow(false);
+
+  DALI_TEST_EQUALS(model.IsShadowCasting(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(modelNode.IsShadowCasting(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(modelNode.GetProperty<int>(shadowCastingIndex), 0, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(modelNode2.GetProperty<int>(shadowCastingIndex2), 0, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliModelReceiveShadow(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New();
+  application.GetScene().Add(model);
+
+  Scene3D::ModelNode modelNode = Scene3D::ModelNode::New();
+  model.AddModelNode(modelNode);
+
+  DALI_TEST_EQUALS(model.IsShadowReceiving(), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(modelNode.IsShadowReceiving(), true, TEST_LOCATION);
+
+  auto shadowReceivingIndex = modelNode.GetPropertyIndex("uIsShadowReceiving");
+  DALI_TEST_EQUALS(modelNode.GetProperty<int>(shadowReceivingIndex), 1, TEST_LOCATION);
+
+  model.ReceiveShadow(false);
+
+  DALI_TEST_EQUALS(model.IsShadowReceiving(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(modelNode.IsShadowReceiving(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(modelNode.GetProperty<int>(shadowReceivingIndex), 0, TEST_LOCATION);
+
+  Scene3D::ModelNode modelNode2 = Scene3D::ModelNode::New();
+  model.AddModelNode(modelNode2);
+
+  DALI_TEST_EQUALS(modelNode2.IsShadowReceiving(), true, TEST_LOCATION);
+
+  auto shadowReceivingIndex2 = modelNode2.GetPropertyIndex("uIsShadowReceiving");
+  DALI_TEST_EQUALS(modelNode2.GetProperty<int>(shadowReceivingIndex2), 1, TEST_LOCATION);
+
+  modelNode.ReceiveShadow(true);
+
+  DALI_TEST_EQUALS(modelNode.IsShadowReceiving(), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(model.IsShadowReceiving(), false, TEST_LOCATION);
+
+  model.ReceiveShadow(false);
+
+  DALI_TEST_EQUALS(model.IsShadowReceiving(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(modelNode.IsShadowReceiving(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(modelNode.GetProperty<int>(shadowReceivingIndex), 0, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(modelNode2.GetProperty<int>(shadowReceivingIndex2), 0, TEST_LOCATION);
+  END_TEST;
+}

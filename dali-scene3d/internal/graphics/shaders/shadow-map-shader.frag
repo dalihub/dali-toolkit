@@ -17,6 +17,8 @@ uniform sampler2D sAlbedoAlpha;
 uniform sampler2D sAlbedoMetal;
 #endif
 
+uniform int uIsShadowCasting;
+
 lowp vec3 linear(lowp vec3 color)
 {
   return pow(color, vec3(2.2));
@@ -24,6 +26,11 @@ lowp vec3 linear(lowp vec3 color)
 
 void main()
 {
+  if(uIsShadowCasting == 0)
+  {
+    discard;
+  }
+
 #ifdef THREE_TEX
   // The albedo may be defined from a base texture or a flat color
 #ifdef BASECOLOR_TEX

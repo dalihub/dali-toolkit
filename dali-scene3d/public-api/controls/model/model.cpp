@@ -162,6 +162,26 @@ void Model::SetMotionData(MotionData motionData)
   GetImpl(*this).SetMotionData(motionData);
 }
 
+void Model::CastShadow(bool castShadow)
+{
+  GetImpl(*this).CastShadow(castShadow);
+}
+
+bool Model::IsShadowCasting() const
+{
+  return GetImpl(*this).IsShadowCasting();
+}
+
+void Model::ReceiveShadow(bool receiveShadow)
+{
+  GetImpl(*this).ReceiveShadow(receiveShadow);
+}
+
+bool Model::IsShadowReceiving() const
+{
+  return GetImpl(*this).IsShadowReceiving();
+}
+
 Model::MeshHitSignalType& Model::MeshHitSignal()
 {
   return GetImpl(*this).MeshHitSignal();

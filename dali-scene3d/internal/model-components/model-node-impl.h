@@ -242,6 +242,26 @@ public: // Public Method
   void SetShadowMapTexture(Dali::Texture shadowMapTexture);
 
   /**
+   * @copydoc Dali::Scene3D::ModelNode::CastShadow()
+   */
+  void CastShadow(bool castShadow);
+
+  /**
+   * @copydoc Dali::Scene3D::ModelNode::IsShadowCasting()
+   */
+  bool IsShadowCasting() const;
+
+  /**
+   * @copydoc Dali::Scene3D::ModelNode::ReceiveShadow()
+   */
+  void ReceiveShadow(bool receiveShadow);
+
+  /**
+   * @copydoc Dali::Scene3D::ModelNode::IsShadowReceiving()
+   */
+  bool IsShadowReceiving() const;
+
+  /**
    * @brief Sets the diffuse and specular image-based lighting textures for a ModelNode.
    *
    * @param[in] diffuseTexture The diffuse texture.
@@ -345,6 +365,8 @@ private:
 
   float    mIblScaleFactor{1.0f};
   uint32_t mSpecularMipmapLevels{1u};
+  bool     mIsShadowCasting{true};
+  bool     mIsShadowReceiving{true};
   /// @endcond
 };
 
