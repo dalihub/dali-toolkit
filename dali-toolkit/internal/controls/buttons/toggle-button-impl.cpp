@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,11 +144,22 @@ void ToggleButton::SetProperty(BaseObject* object, Property::Index propertyIndex
           std::vector<std::string> tips;
           size_t                   tipsCount = tipArray->Count();
           tips.resize(tipsCount);
+
+          bool valid = true;
           for(size_t i = 0; i != tipsCount; ++i)
           {
-            tipArray->GetElementAt(i).Get(tips[i]);
+            if(DALI_UNLIKELY(!tipArray->GetElementAt(i).Get(tips[i])))
+            {
+              // Given array is invalid. Fast out.
+              valid = false;
+              break;
+            }
           }
-          toggleButtonImpl.SetToggleTooltips(tips);
+
+          if(DALI_LIKELY(valid))
+          {
+            toggleButtonImpl.SetToggleTooltips(tips);
+          }
         }
         break;
       }

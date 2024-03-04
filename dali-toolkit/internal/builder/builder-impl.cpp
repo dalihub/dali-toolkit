@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -773,7 +773,7 @@ void Builder::LoadConfiguration(const TreeNode& root, Property::Map& intoMap)
                 {
                   // If we find "{","}" pair but can't find matched constant
                   // try to find other "{","}" pair after current left position.
-                  pos = leftPos + 1;
+                  pos = rightPos + 1;
 
                   for(uint32_t i = 0; i < mReplacementMap.Count(); i++)
                   {
@@ -784,11 +784,12 @@ void Builder::LoadConfiguration(const TreeNode& root, Property::Map& intoMap)
                     if(0 == stringConfigValue.compare(leftPos + 1, rightPos - leftPos - 1, constant.stringKey))
                     {
                       std::string replaceString;
-                      mReplacementMap.GetValue(i).Get(replaceString);
-
-                      stringConfigValue.replace(leftPos, rightPos - leftPos + 1, replaceString);
-                      pos = leftPos + replaceString.size();
-                      break;
+                      if(DALI_LIKELY(mReplacementMap.GetValue(i).Get(replaceString)))
+                      {
+                        stringConfigValue.replace(leftPos, rightPos - leftPos + 1, replaceString);
+                        pos = leftPos + replaceString.size();
+                        break;
+                      }
                     }
                   }
                 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1224,31 +1224,50 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
       std::istringstream(map->GetKey(i)) >> index;
       if(childMap)
       {
-        Property::Value* policy        = childMap->Find("policy");
-        Property::Value* childMapValue = childMap->Find("value");
-        if(policy && childMapValue)
+        Property::Value* policy = childMap->Find("policy");
+        if(policy)
         {
           std::string policyValue;
-          policy->Get(policyValue);
-          Toolkit::TableView::LayoutPolicy policy;
-          if(Scripting::GetEnumeration<Toolkit::TableView::LayoutPolicy>(policyValue.c_str(),
-                                                                         LAYOUT_POLICY_STRING_TABLE,
-                                                                         LAYOUT_POLICY_STRING_TABLE_COUNT,
-                                                                         policy))
+          if(DALI_LIKELY(policy->Get(policyValue)))
           {
-            if(policy == Toolkit::TableView::FIXED)
+            Toolkit::TableView::LayoutPolicy policy;
+            if(Scripting::GetEnumeration<Toolkit::TableView::LayoutPolicy>(policyValue.c_str(),
+                                                                           LAYOUT_POLICY_STRING_TABLE,
+                                                                           LAYOUT_POLICY_STRING_TABLE_COUNT,
+                                                                           policy))
             {
-              (tableViewImpl.*funcFixed)(index, childMapValue->Get<float>());
+              switch(policy)
+              {
+                case Toolkit::TableView::FIXED:
+                case Toolkit::TableView::RELATIVE:
+                {
+                  Property::Value* childMapValue = childMap->Find("value");
+                  float            childValue    = 0.0f;
+                  if(DALI_LIKELY(childMapValue && childMapValue->Get(childValue)))
+                  {
+                    if(policy == Toolkit::TableView::FIXED)
+                    {
+                      (tableViewImpl.*funcFixed)(index, childValue);
+                    }
+                    else // if(policy == Toolkit::TableView::RELATIVE)
+                    {
+                      (tableViewImpl.*funcRelative)(index, childValue);
+                    }
+                  }
+                  break;
+                }
+                case Toolkit::TableView::FIT:
+                {
+                  (tableViewImpl.*funcFit)(index);
+                  break;
+                }
+                default:
+                {
+                  // do nothing for FILL policy
+                  break;
+                }
+              }
             }
-            else if(policy == Toolkit::TableView::RELATIVE)
-            {
-              (tableViewImpl.*funcRelative)(index, childMapValue->Get<float>());
-            }
-            else if(policy == Toolkit::TableView::FIT)
-            {
-              (tableViewImpl.*funcFit)(index);
-            }
-            // do nothing for FILL policy
           }
         }
       }
