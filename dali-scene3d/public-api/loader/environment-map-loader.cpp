@@ -77,15 +77,22 @@ uint8_t* GetCroppedBuffer(uint8_t* sourceBuffer, uint32_t bytesPerPixel, uint32_
   uint32_t byteSize   = bytesPerPixel * xFaceSize * yFaceSize;
   uint8_t* destBuffer = reinterpret_cast<uint8_t*>(malloc(byteSize + 4u));
 
-  int32_t srcStride  = width * bytesPerPixel;
-  int32_t destStride = xFaceSize * bytesPerPixel;
-  int32_t srcOffset  = xOffset * bytesPerPixel + yOffset * srcStride;
-  int32_t destOffset = 0;
-  for(uint16_t row = yOffset; row < yOffset + yFaceSize; ++row)
+  if(DALI_LIKELY(destBuffer))
   {
-    memcpy(destBuffer + destOffset, sourceBuffer + srcOffset, destStride);
-    srcOffset += srcStride;
-    destOffset += destStride;
+    int32_t srcStride  = width * bytesPerPixel;
+    int32_t destStride = xFaceSize * bytesPerPixel;
+    int32_t srcOffset  = xOffset * bytesPerPixel + yOffset * srcStride;
+    int32_t destOffset = 0;
+    for(uint16_t row = yOffset; row < yOffset + yFaceSize; ++row)
+    {
+      memcpy(destBuffer + destOffset, sourceBuffer + srcOffset, destStride);
+      srcOffset += srcStride;
+      destOffset += destStride;
+    }
+  }
+  else
+  {
+    DALI_LOG_ERROR("malloc is failed. request malloc size : %u\n", byteSize + 4u);
   }
 
   return destBuffer;
@@ -111,7 +118,10 @@ PixelData GetCubeFace(Dali::PixelData cubePixelData, uint32_t faceIndex, CubeTyp
       uint32_t finalFaceHeight = (yOffset + static_cast<uint32_t>(faceHeight) < imageHeight) ? static_cast<uint32_t>(faceHeight) : imageHeight - yOffset;
       uint8_t* tempImageBuffer = GetCroppedBuffer(imageBuffer, bytesPerPixel, imageWidth, imageHeight, xOffset, yOffset, finalFaceWidth, finalFaceHeight);
 
-      cubeFacePixelData = Dali::Integration::NewPixelDataWithReleaseAfterUpload(tempImageBuffer, finalFaceWidth * finalFaceHeight * bytesPerPixel, finalFaceWidth, finalFaceHeight, 0u, imagePixelFormat, PixelData::FREE);
+      if(DALI_LIKELY(tempImageBuffer))
+      {
+        cubeFacePixelData = Dali::Integration::NewPixelDataWithReleaseAfterUpload(tempImageBuffer, finalFaceWidth * finalFaceHeight * bytesPerPixel, finalFaceWidth, finalFaceHeight, 0u, imagePixelFormat, PixelData::FREE);
+      }
     }
   }
   return cubeFacePixelData;
