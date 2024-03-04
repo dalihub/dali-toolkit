@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1585,7 +1585,7 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
           ReadInt(tnKeyFramesBin->GetChild("byteOffset"), byteOffset);
           DALI_ASSERT_ALWAYS(byteOffset >= 0);
 
-          binAniFile.seekg(byteOffset, std::ios::beg);
+          binAniFile.seekg(static_cast<std::streamoff>(byteOffset), std::ios::beg);
 
           int numKeys = 0;
           ReadInt(tnKeyFramesBin->GetChild("numKeys"), numKeys);

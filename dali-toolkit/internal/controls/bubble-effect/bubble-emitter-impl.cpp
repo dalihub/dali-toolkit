@@ -351,11 +351,14 @@ void BubbleEmitter::SetBubbleParameter(BubbleRenderer& bubbleRenderer, unsigned 
 {
   Vector2 dir(direction);
 
-  int halfRange = displacement.x / 2;
+  int rangeX = std::max(static_cast<int>(displacement.x), 1); // To avoid divide by zero issue.
+  int rangeY = std::max(static_cast<int>(displacement.y), 1); // To avoid divide by zero issue.
+
+  int halfRangeX = displacement.x / 2;
   // for the y coordinate, always negative, so bubbles always go upwards
-  Vector2 randomVec(rand_r(&mRandomSeed) % static_cast<int>(displacement.x) - halfRange, -rand_r(&mRandomSeed) % static_cast<int>(displacement.y));
+  Vector2 randomVec(rand_r(&mRandomSeed) % rangeX - halfRangeX, -rand_r(&mRandomSeed) % rangeY);
   dir.Normalize();
-  randomVec.x -= dir.x * halfRange;
+  randomVec.x -= dir.x * halfRangeX;
   randomVec.y *= 1.0f - fabsf(dir.x) * 0.33f;
 
   if(randomVec.y > 0.0f)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -602,7 +602,7 @@ TextureDefinition ConvertTextureInfo(const gltf2::TextureInfo& textureInfo, Conv
     {
       auto& stream = context.mOutput.mResources.mBuffers[bufferIndex].GetBufferStream();
       stream.clear();
-      stream.seekg(textureInfo.mTexture->mSource->mBufferView->mByteOffset, stream.beg);
+      stream.seekg(static_cast<std::streamoff>(static_cast<std::size_t>(textureInfo.mTexture->mSource->mBufferView->mByteOffset)), stream.beg);
       std::vector<uint8_t> dataBuffer;
       dataBuffer.resize(textureInfo.mTexture->mSource->mBufferView->mByteLength);
       stream.read(reinterpret_cast<char*>(dataBuffer.data()), static_cast<std::streamsize>(static_cast<size_t>(textureInfo.mTexture->mSource->mBufferView->mByteLength)));
@@ -1304,7 +1304,7 @@ void LoadDataFromAccessor(ConversionContext& context, uint32_t bufferIndex, Vect
   }
   auto& stream = buffer.GetBufferStream();
   stream.clear();
-  stream.seekg(offset, stream.beg);
+  stream.seekg(static_cast<std::streamoff>(static_cast<std::size_t>(offset)), stream.beg);
   stream.read(reinterpret_cast<char*>(dataBuffer.Begin()), static_cast<std::streamsize>(static_cast<size_t>(size)));
 }
 
@@ -1514,7 +1514,7 @@ void ProcessSkins(const gltf2::Document& document, ConversionContext& context)
         DALI_LOG_ERROR("Failed to load from stream\n");
       }
       mStream.clear();
-      mStream.seekg(accessor.mBufferView->mByteOffset + accessor.mByteOffset, mStream.beg);
+      mStream.seekg(static_cast<std::streamoff>(static_cast<std::size_t>(accessor.mBufferView->mByteOffset + accessor.mByteOffset)), mStream.beg);
     }
 
     virtual void Provide(Matrix& inverseBindMatrix) override

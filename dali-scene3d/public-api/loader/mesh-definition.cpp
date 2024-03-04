@@ -101,7 +101,7 @@ const char* QUAD("quad");
 bool ReadBlob(const MeshDefinition::Blob& descriptor, std::istream& source, uint8_t* target)
 {
   source.clear();
-  if(!source.seekg(descriptor.mOffset, std::istream::beg))
+  if(!source.seekg(static_cast<std::streamoff>(static_cast<std::size_t>(descriptor.mOffset)), std::istream::beg))
   {
     return false;
   }
@@ -122,7 +122,7 @@ bool ReadBlob(const MeshDefinition::Blob& descriptor, std::istream& source, uint
       {
         readSize += descriptor.mStride;
         target += descriptor.mElementSizeHint;
-        source.seekg(diff, std::istream::cur);
+        source.seekg(static_cast<std::streamoff>(static_cast<std::size_t>(diff)), std::istream::cur);
       }
       return readSize == totalSize;
     }

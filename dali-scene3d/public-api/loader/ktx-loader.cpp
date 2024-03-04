@@ -206,7 +206,7 @@ bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData
   }
 
   // Skip the key-values:
-  if(fp.seekg(header.bytesOfKeyValueData, fp.cur).good() == false)
+  if(fp.seekg(static_cast<std::streamoff>(static_cast<std::size_t>(header.bytesOfKeyValueData)), fp.cur).good() == false)
   {
     return false;
   }

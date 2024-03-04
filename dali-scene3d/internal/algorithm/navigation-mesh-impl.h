@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_INTERNAL_NAVIGATION_MESH_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ public:
   /**
    * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::FindFloor()
    */
-  bool FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, FaceIndex& faceIndex);
+  bool FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, FaceIndex& outFaceIndex);
 
   /**
    * @copydoc Dali::Scene3D::Algorithm::NavigationMesh::GetFace()
