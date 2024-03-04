@@ -239,6 +239,43 @@ public: // Public Method
    */
   [[nodiscard]] bool HasColliderMesh() const;
 
+  /**
+   * @brief Sets whether this ModelNode casts shadow or not.
+   * If it is true, this ModelNode is drawn on Shadow Map.
+   *
+   * @SINCE_2_3.99
+   * @param[in] castShadow Whether this ModelNode casts shadow or not.
+   * @note This method affects only for this ModelNode.
+   */
+  void CastShadow(bool castShadow);
+
+  /**
+   * @brief Retrieves whether the ModelNode cast shadow or not for Light.
+   *
+   * @SINCE_2_3.99
+   * @return True if this ModelNode cast shadow.
+   * @note IBL does not cast any shadow.
+   */
+  bool IsShadowCasting() const;
+
+  /**
+   * @brief Sets whether this ModelNode receives shadow or not.
+   * If it is true, shadows are drawn on this ModelNode.
+   *
+   * @SINCE_2_3.99
+   * @param[in] receiveShadow Whether this ModelNode receives shadow or not.
+   * @note This method affects only for this ModelNode.
+   */
+  void ReceiveShadow(bool receiveShadow);
+
+  /**
+   * @brief Retrieves whether the ModelNode receives shadow or not for Light.
+   *
+   * @SINCE_2_3.99
+   * @return True if this ModelNode receives shadow.
+   */
+  bool IsShadowReceiving() const;
+
 public: // Not intended for application developers
   /// @cond internal
   /**

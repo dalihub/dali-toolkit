@@ -96,6 +96,7 @@ uniform mediump vec3 uLightColor[MAX_LIGHTS];
 // For Shadow Map
 uniform lowp int uIsShadowEnabled;
 uniform sampler2D sShadowMap;
+uniform lowp int uIsShadowReceiving;
 #ifdef SL_VERSION_LOW
 uniform int uShadowMapWidth;
 uniform int uShadowMapHeight;
@@ -300,7 +301,7 @@ void main()
     }
   }
 
-  if(float(uIsShadowEnabled) * uShadowIntensity > 0.0)
+  if(float(uIsShadowReceiving) * float(uIsShadowEnabled) * uShadowIntensity > 0.0)
   {
     mediump float exposureFactor = 0.0;
     if(uEnableShadowSoftFiltering > 0)
