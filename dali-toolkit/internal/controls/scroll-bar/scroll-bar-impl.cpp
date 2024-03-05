@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -707,12 +707,22 @@ void ScrollBar::SetProperty(BaseObject* object, Property::Index index, const Pro
           Dali::Vector<float> positions;
           size_t              positionCount = array->Count();
           positions.Resize(positionCount);
+
+          bool valid = true;
           for(size_t i = 0; i != positionCount; ++i)
           {
-            array->GetElementAt(i).Get(positions[i]);
+            if(DALI_UNLIKELY(!array->GetElementAt(i).Get(positions[i])))
+            {
+              // Given array is invalid. Fast out.
+              valid = false;
+              break;
+            }
           }
 
-          scrollBarImpl.SetScrollPositionIntervals(positions);
+          if(DALI_LIKELY(valid))
+          {
+            scrollBarImpl.SetScrollPositionIntervals(positions);
+          }
         }
         break;
       }
