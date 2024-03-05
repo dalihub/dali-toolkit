@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,54 @@ const char* const PLACEHOLDER_FONT_STYLE   = "fontStyle";
 const char* const PLACEHOLDER_POINT_SIZE   = "pointSize";
 const char* const PLACEHOLDER_PIXEL_SIZE   = "pixelSize";
 const char* const PLACEHOLDER_ELLIPSIS     = "ellipsis";
+
+/**
+ * Convert all string keys to int keys
+ * @param[in] key The key to convert
+ * @return the index key supplied or matching, or INVALID_INDEX if no match
+ */
+static Dali::Property::Index GetIntKey(const Dali::Property::Key& key)
+{
+  if(key.type == Dali::Property::Key::INDEX)
+  {
+    return key.indexKey;
+  }
+
+  if(key.stringKey == PLACEHOLDER_TEXT)
+  {
+    return Dali::Toolkit::Text::PlaceHolder::Property::TEXT;
+  }
+  else if(key.stringKey == PLACEHOLDER_TEXT_FOCUSED)
+  {
+    return Dali::Toolkit::Text::PlaceHolder::Property::TEXT_FOCUSED;
+  }
+  else if(key.stringKey == PLACEHOLDER_COLOR)
+  {
+    return Dali::Toolkit::Text::PlaceHolder::Property::COLOR;
+  }
+  else if(key.stringKey == PLACEHOLDER_FONT_FAMILY)
+  {
+    return Dali::Toolkit::Text::PlaceHolder::Property::FONT_FAMILY;
+  }
+  else if(key.stringKey == PLACEHOLDER_FONT_STYLE)
+  {
+    return Dali::Toolkit::Text::PlaceHolder::Property::FONT_STYLE;
+  }
+  else if(key.stringKey == PLACEHOLDER_POINT_SIZE)
+  {
+    return Dali::Toolkit::Text::PlaceHolder::Property::POINT_SIZE;
+  }
+  else if(key.stringKey == PLACEHOLDER_PIXEL_SIZE)
+  {
+    return Dali::Toolkit::Text::PlaceHolder::Property::PIXEL_SIZE;
+  }
+  else if(key.stringKey == PLACEHOLDER_ELLIPSIS)
+  {
+    return Dali::Toolkit::Text::PlaceHolder::Property::ELLIPSIS;
+  }
+
+  return Dali::Property::INVALID_INDEX;
+}
 
 } // namespace
 
@@ -344,64 +392,76 @@ void Controller::PlaceholderHandler::SetPlaceholderProperty(Controller& controll
 
   for(Property::Map::SizeType position = 0; position < count; ++position)
   {
-    KeyValuePair     keyValue = map.GetKeyValue(position);
-    Property::Key&   key      = keyValue.first;
-    Property::Value& value    = keyValue.second;
+    const KeyValuePair&    keyValue = map.GetKeyValue(position);
+    const Property::Key&   key      = keyValue.first;
+    const Property::Value& value    = keyValue.second;
 
-    if(key == Toolkit::Text::PlaceHolder::Property::TEXT || key == PLACEHOLDER_TEXT)
+    Property::Index indexKey = GetIntKey(key);
+
+    switch(indexKey)
     {
-      std::string text = "";
-      value.Get(text);
-      SetPlaceholderText(controller, Controller::PLACEHOLDER_TYPE_INACTIVE, text);
-    }
-    else if(key == Toolkit::Text::PlaceHolder::Property::TEXT_FOCUSED || key == PLACEHOLDER_TEXT_FOCUSED)
-    {
-      std::string text = "";
-      value.Get(text);
-      SetPlaceholderText(controller, Controller::PLACEHOLDER_TYPE_ACTIVE, text);
-    }
-    else if(key == Toolkit::Text::PlaceHolder::Property::COLOR || key == PLACEHOLDER_COLOR)
-    {
-      Vector4 textColor;
-      value.Get(textColor);
-      if(GetPlaceholderTextColor(controller) != textColor)
+      case Toolkit::Text::PlaceHolder::Property::TEXT:
+      case Toolkit::Text::PlaceHolder::Property::TEXT_FOCUSED:
       {
-        SetPlaceholderTextColor(controller, textColor);
+        PlaceholderType placeHolderType = (indexKey == PlaceHolder::Property::TEXT) ? Controller::PLACEHOLDER_TYPE_INACTIVE : Controller::PLACEHOLDER_TYPE_ACTIVE;
+
+        std::string text = "";
+        if(value.Get(text))
+        {
+          SetPlaceholderText(controller, placeHolderType, text);
+        }
+        break;
       }
-    }
-    else if(key == Toolkit::Text::PlaceHolder::Property::FONT_FAMILY || key == PLACEHOLDER_FONT_FAMILY)
-    {
-      std::string fontFamily = "";
-      value.Get(fontFamily);
-      SetPlaceholderFontFamily(controller, fontFamily);
-    }
-    else if(key == Toolkit::Text::PlaceHolder::Property::FONT_STYLE || key == PLACEHOLDER_FONT_STYLE)
-    {
-      SetFontStyleProperty(&controller, value, Text::FontStyle::PLACEHOLDER);
-    }
-    else if(key == Toolkit::Text::PlaceHolder::Property::POINT_SIZE || key == PLACEHOLDER_POINT_SIZE)
-    {
-      float pointSize;
-      value.Get(pointSize);
-      if(!Equals(GetPlaceholderTextFontSize(controller, Text::Controller::POINT_SIZE), pointSize))
+      case Toolkit::Text::PlaceHolder::Property::COLOR:
       {
-        SetPlaceholderTextFontSize(controller, pointSize, Text::Controller::POINT_SIZE);
+        Vector4 textColor;
+        if(value.Get(textColor))
+        {
+          if(GetPlaceholderTextColor(controller) != textColor)
+          {
+            SetPlaceholderTextColor(controller, textColor);
+          }
+        }
+        break;
       }
-    }
-    else if(key == Toolkit::Text::PlaceHolder::Property::PIXEL_SIZE || key == PLACEHOLDER_PIXEL_SIZE)
-    {
-      float pixelSize;
-      value.Get(pixelSize);
-      if(!Equals(GetPlaceholderTextFontSize(controller, Text::Controller::PIXEL_SIZE), pixelSize))
+      case Toolkit::Text::PlaceHolder::Property::FONT_FAMILY:
       {
-        SetPlaceholderTextFontSize(controller, pixelSize, Text::Controller::PIXEL_SIZE);
+        std::string fontFamily = "";
+        if(value.Get(fontFamily))
+        {
+          SetPlaceholderFontFamily(controller, fontFamily);
+        }
+        break;
       }
-    }
-    else if(key == Toolkit::Text::PlaceHolder::Property::ELLIPSIS || key == PLACEHOLDER_ELLIPSIS)
-    {
-      bool ellipsis;
-      value.Get(ellipsis);
-      SetPlaceholderTextElideEnabled(controller, ellipsis);
+      case Toolkit::Text::PlaceHolder::Property::FONT_STYLE:
+      {
+        SetFontStyleProperty(&controller, value, Text::FontStyle::PLACEHOLDER);
+        break;
+      }
+      case Toolkit::Text::PlaceHolder::Property::POINT_SIZE:
+      case Toolkit::Text::PlaceHolder::Property::PIXEL_SIZE:
+      {
+        FontSizeType fontSizeType = (indexKey == PlaceHolder::Property::POINT_SIZE) ? Text::Controller::POINT_SIZE : Text::Controller::PIXEL_SIZE;
+
+        float fontSizeValue = 0.0f;
+        if(value.Get(fontSizeValue))
+        {
+          if(!Equals(GetPlaceholderTextFontSize(controller, fontSizeType), fontSizeValue))
+          {
+            SetPlaceholderTextFontSize(controller, fontSizeValue, fontSizeType);
+          }
+        }
+        break;
+      }
+      case Toolkit::Text::PlaceHolder::Property::ELLIPSIS:
+      {
+        bool ellipsis = false;
+        if(value.Get(ellipsis))
+        {
+          SetPlaceholderTextElideEnabled(controller, ellipsis);
+        }
+        break;
+      }
     }
   }
 }
