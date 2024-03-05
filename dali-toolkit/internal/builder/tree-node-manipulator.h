@@ -223,7 +223,7 @@ struct DeleteNodesWithoutSelf
   : mSelf(self){};
 
   /*
-   * Call operator to add nodes to the list
+   * Call operator to delete object if given node is not self
    */
   void operator()(TreeNode*& n)
   {
