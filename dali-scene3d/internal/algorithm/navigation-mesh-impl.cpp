@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,7 +185,7 @@ bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& out
   return FindFloor(position, outPosition, faceIndex);
 }
 
-bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, FaceIndex& faceIndex)
+bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, FaceIndex& outFaceIndex)
 {
   [[maybe_unused]] auto newPos = PointSceneToLocal(Dali::Vector3(position));
 
@@ -217,8 +217,8 @@ bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& out
   std::sort(results.begin(), results.end(), [](const IntersectResult& lhs, const IntersectResult& rhs) { return lhs.distance < rhs.distance; });
 
   outPosition  = PointLocalToScene(results.front().point);
-  faceIndex    = results.front().faceIndex;
-  mCurrentFace = results.front().faceIndex;
+  outFaceIndex = results.front().faceIndex;
+  mCurrentFace = outFaceIndex;
 
   return true;
 }

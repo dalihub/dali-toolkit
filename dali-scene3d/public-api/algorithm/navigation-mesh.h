@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_NAVIGATION_MESH_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,12 +152,12 @@ public:
   /**
    * @brief Looks for the floor under specified position
    * @param[in] position Position to investigate
-   * @param[in] outPosition Position on the floor in found
-   * @param[out] faceIndex Index of NavigationMesh face associated with floor
+   * @param[out] outPosition Position on the floor in found
+   * @param[out] outFaceIndex Index of NavigationMesh face associated with floor
    *
    * @return True if floor has been found, False otherwise
    */
-  bool FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, FaceIndex& faceIndex);
+  bool FindFloor(const Dali::Vector3& position, Dali::Vector3& outPosition, FaceIndex& outFaceIndex);
 
   /**
    * @brief Looks for a floor starting from specified face

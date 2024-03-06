@@ -1,12 +1,16 @@
 INPUT mediump vec2 vTexCoord;
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
-INPUT mediump vec2 vPosition;
-INPUT mediump vec2 vRectSize;
-INPUT mediump vec2 vOptRectSize;
-INPUT mediump float vAliasMargin;
+INPUT highp vec2 vPosition;
+INPUT highp vec2 vRectSize;
+INPUT highp vec2 vOptRectSize;
+INPUT highp float vAliasMargin;
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-INPUT mediump vec4 vCornerRadius;
+INPUT highp vec4 vCornerRadius;
 #endif
+#endif
+#ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
+#define DEBUG_EXTRA_VARYINGS
+DEBUG_EXTRA_VARYINGS
 #endif
 
 uniform sampler2D sTexture;
@@ -37,8 +41,8 @@ uniform lowp vec4 uColor;
 uniform lowp vec3 mixColor;
 uniform lowp float preMultipliedAlpha;
 #ifdef IS_REQUIRED_BORDERLINE
-uniform mediump float borderlineWidth;
-uniform mediump float borderlineOffset;
+uniform highp float borderlineWidth;
+uniform highp float borderlineOffset;
 uniform lowp vec4 borderlineColor;
 uniform lowp vec4 uActorColor;
 #endif
@@ -59,23 +63,23 @@ mediump float wrapCoordinate( mediump vec2 range, mediump float coordinate, lowp
 // Global values both rounded corner and borderline use
 
 // radius of rounded corner on this quadrant
-mediump float gRadius = 0.0;
+highp float gRadius = 0.0;
 
 // fragment coordinate. NOTE : vec2(0.0, 0.0) is vRectSize, the corner of visual
-mediump vec2 gFragmentPosition = vec2(0.0, 0.0);
+highp vec2 gFragmentPosition = vec2(0.0, 0.0);
 // center coordinate of rounded corner circle. vec2(gCenterPosition, gCenterPosition).
-mediump float gCenterPosition = 0.0;
+highp float gCenterPosition = 0.0;
 // relative coordinate of gFragmentPosition from gCenterPosition.
-mediump vec2 gDiff = vec2(0.0, 0.0);
+highp vec2 gDiff = vec2(0.0, 0.0);
 // potential value what our algorithm use.
-mediump float gPotential = 0.0;
+highp float gPotential = 0.0;
 
 // threshold of potential
-mediump float gPotentialRange = 0.0;
-mediump float gMaxOutlinePotential = 0.0;
-mediump float gMinOutlinePotential = 0.0;
-mediump float gMaxInlinePotential = 0.0;
-mediump float gMinInlinePotential = 0.0;
+highp float gPotentialRange = 0.0;
+highp float gMaxOutlinePotential = 0.0;
+highp float gMinOutlinePotential = 0.0;
+highp float gMaxInlinePotential = 0.0;
+highp float gMinInlinePotential = 0.0;
 
 void calculateCornerRadius()
 {
@@ -137,7 +141,7 @@ void PreprocessPotential()
 #ifdef IS_REQUIRED_BORDERLINE
 lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 {
-  mediump float potential = gPotential;
+  highp float potential = gPotential;
 
   // default opacity of borderline is 0.0
   mediump float borderlineOpacity = 0.0;
@@ -161,9 +165,9 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
   // But if borderlineOpacity > 0.0 and borderlineColor.a == 0.0, we need to apply tCornerRadius.
   if(borderlineOpacity > 0.0 && borderlineColor.a * borderlineOpacity < 1.0)
   {
-    mediump float tCornerRadius = -gCenterPosition + gPotentialRange;
-    mediump float MaxTexturelinePotential = tCornerRadius + gPotentialRange;
-    mediump float MinTexturelinePotential = tCornerRadius - gPotentialRange;
+    highp float tCornerRadius = -gCenterPosition + gPotentialRange;
+    highp float MaxTexturelinePotential = tCornerRadius + gPotentialRange;
+    highp float MinTexturelinePotential = tCornerRadius - gPotentialRange;
     if(potential > MaxTexturelinePotential)
     {
       // potential is out of texture range.
@@ -200,7 +204,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 #ifdef IS_REQUIRED_ROUNDED_CORNER
 mediump float calculateCornerOpacity()
 {
-  mediump float potential = gPotential;
+  highp float potential = gPotential;
 
   // default opacity is 1.0
   mediump float opacity = 1.0;
@@ -297,6 +301,9 @@ const bool ATLAS_CUSTOM_WARP_BOOL = false;
 #define DEBUG_RATIO_RED_CODE
 #define DEBUG_RATIO_GREEN_CODE
 #define DEBUG_RATIO_BLUE_CODE
+#define DEBUG_EXTRA_UNIFORMS
+
+DEBUG_EXTRA_UNIFORMS
 
 const mediump float gMinDebugColorRate = MINIMUM_DEBUG_COLOR_RATE;
 const mediump float gMaxDebugColorRate = MAXIMUM_DEBUG_COLOR_RATE;

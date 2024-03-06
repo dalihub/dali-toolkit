@@ -162,17 +162,9 @@ void TreeNodeManipulator::RemoveChildren()
 {
   DALI_ASSERT_DEBUG(mNode && "Operation on NULL JSON node");
 
-  CollectNodes collector;
+  DeleteNodesWithoutSelf otherDeletor(mNode);
 
-  DepthFirst(mNode, collector);
-
-  for(CollectNodes::iterator iter = collector.nodes.begin(); iter != collector.nodes.end(); ++iter)
-  {
-    if(*iter != mNode)
-    {
-      delete *iter;
-    }
-  }
+  DepthFirst(mNode, otherDeletor);
 
   mNode->mFirstChild = NULL;
   mNode->mLastChild  = NULL;

@@ -2,7 +2,7 @@
 #define DALI_SCRIPT_TREE_NODE_MANIPULATOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,6 +212,29 @@ struct CollectNodes
   typedef VectorNodes::iterator        iterator;
 
   VectorNodes nodes; ///< List of collected nodes
+};
+
+/*
+ * Delete nodes immediately, instead of self
+ */
+struct DeleteNodesWithoutSelf
+{
+  DeleteNodesWithoutSelf(TreeNode* self)
+  : mSelf(self){};
+
+  /*
+   * Call operator to delete object if given node is not self
+   */
+  void operator()(TreeNode*& n)
+  {
+    DALI_ASSERT_DEBUG(n && "Operation on NULL JSON node");
+    if(mSelf != n)
+    {
+      delete n;
+    }
+  }
+
+  const TreeNode* mSelf; ///< self node what we should not remove.
 };
 
 /*

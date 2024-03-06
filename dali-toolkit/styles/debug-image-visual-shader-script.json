@@ -5,9 +5,40 @@
 //
 //******************************************************************************
 {
+  // Version of this debug script
+  "version" : "1.0.0",
+
   // Range of color rate for debug
   "minimumColorRate": 0.2,
   "maximumColorRate": "0.7",
+
+  // Extra attributes for debug
+  // It is list of attributes' type and name what you want to add, include semi-colon.
+  // For example, "extraAttributes": ["mediump float aDebug;", "highp vec3 aDebug2;"]
+  "extraAttributes":
+  [
+  ],
+
+  // Extra varyings for debug
+  // It is list of varyings' type and name what you want to add, include semi-colon.
+  // For example, "extraVaryings": ["mediump float vDebug;", "highp vec3 vDebug2;"]
+  "extraVaryings":
+  [
+  ],
+
+  // Extra uniforms for debug
+  // It is list of uniforms' type and name what you want to add, include semi-colon.
+  // For example, "extraUniforms": ["mediump float uDebug;", "highp vec3 uDebug2;"]
+  "extraUniforms":
+  [
+  ],
+
+  // Logic for varying calculation
+  // For example, "applyVaryingsCode" : ["vDebug = aDebug;", "vDebug2 = aDebug2 * gl_Position.xyz / gl_Position.w;"]
+  "applyVaryingsCode":
+  [
+  ],
+
 
   // Logic for red. (It show if we use YUV image)
   // We can use macro keyword was defined or not by ~~_BOOL value.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,8 @@ Dali::Texture Gradient::GenerateLookupTexture()
 {
   std::sort(mGradientStops.Begin(), mGradientStops.End());
 
-  unsigned int numStops = mGradientStops.Count();
+  uint32_t numStops = mGradientStops.Count();
+  DALI_ASSERT_ALWAYS(numStops > 0u && "The number of gradient stop should not be zero!");
 
   /**
    * If the stops have not covered the whole zero to one range,
@@ -179,8 +180,10 @@ Dali::Texture Gradient::GenerateLookupTexture()
 
 unsigned int Gradient::EstimateTextureResolution()
 {
-  float minInterval = 1.0;
-  for(unsigned int i = 0, numStops = mGradientStops.Count(); i < numStops - 1u; i++)
+  float          minInterval = 1.0;
+  const uint32_t numStops    = mGradientStops.Count();
+  DALI_ASSERT_ALWAYS(numStops > 0u && "The number of gradient stop should not be zero!");
+  for(uint32_t i = 0; i < numStops - 1u; i++)
   {
     float interval = mGradientStops[i + 1].mOffset - mGradientStops[i].mOffset;
     minInterval    = interval > minInterval ? minInterval : interval;

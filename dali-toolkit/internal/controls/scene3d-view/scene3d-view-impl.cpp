@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,15 +154,22 @@ uint8_t* Scene3dView::GetCroppedBuffer(uint8_t* sourceBuffer, uint32_t bytesPerP
   uint32_t byteSize   = bytesPerPixel * xFaceSize * yFaceSize;
   uint8_t* destBuffer = reinterpret_cast<uint8_t*>(malloc(byteSize + 4u));
 
-  int32_t srcStride  = width * bytesPerPixel;
-  int32_t destStride = xFaceSize * bytesPerPixel;
-  int32_t srcOffset  = xOffset * bytesPerPixel + yOffset * srcStride;
-  int32_t destOffset = 0;
-  for(uint16_t row = yOffset; row < yOffset + yFaceSize; ++row)
+  if(DALI_LIKELY(destBuffer))
   {
-    memcpy(destBuffer + destOffset, sourceBuffer + srcOffset, destStride);
-    srcOffset += srcStride;
-    destOffset += destStride;
+    int32_t srcStride  = width * bytesPerPixel;
+    int32_t destStride = xFaceSize * bytesPerPixel;
+    int32_t srcOffset  = xOffset * bytesPerPixel + yOffset * srcStride;
+    int32_t destOffset = 0;
+    for(uint16_t row = yOffset; row < yOffset + yFaceSize; ++row)
+    {
+      memcpy(destBuffer + destOffset, sourceBuffer + srcOffset, destStride);
+      srcOffset += srcStride;
+      destOffset += destStride;
+    }
+  }
+  else
+  {
+    DALI_LOG_ERROR("malloc is failed. request malloc size : %u\n", byteSize + 4u);
   }
 
   return destBuffer;
@@ -194,9 +201,12 @@ void Scene3dView::UploadTextureFace(Texture& texture, Devel::PixelBuffer pixelBu
   uint32_t xOffset = CUBEMAP_INDEX_X[cubeType][faceIndex] * faceSize;
   uint32_t yOffset = CUBEMAP_INDEX_Y[cubeType][faceIndex] * faceSize;
 
-  uint8_t*  tempImageBuffer = GetCroppedBuffer(imageBuffer, bytesPerPixel, imageWidth, imageHeight, xOffset, yOffset, faceSize, faceSize);
-  PixelData pixelData       = PixelData::New(tempImageBuffer, faceSize * faceSize * bytesPerPixel, faceSize, faceSize, pixelBuffer.GetPixelFormat(), PixelData::FREE);
-  texture.Upload(pixelData, CubeMapLayer::POSITIVE_X + faceIndex, 0, 0, 0, faceSize, faceSize);
+  uint8_t* tempImageBuffer = GetCroppedBuffer(imageBuffer, bytesPerPixel, imageWidth, imageHeight, xOffset, yOffset, faceSize, faceSize);
+  if(DALI_LIKELY(tempImageBuffer))
+  {
+    PixelData pixelData = PixelData::New(tempImageBuffer, faceSize * faceSize * bytesPerPixel, faceSize, faceSize, pixelBuffer.GetPixelFormat(), PixelData::FREE);
+    texture.Upload(pixelData, CubeMapLayer::POSITIVE_X + faceIndex, 0, 0, 0, faceSize, faceSize);
+  }
 }
 
 void Scene3dView::SetCubeMap(const std::string& diffuseTexturePath, const std::string& specularTexturePath, Vector4 scaleFactor)

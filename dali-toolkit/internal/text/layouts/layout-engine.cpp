@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1477,6 +1477,12 @@ struct Engine::Impl
                         Length&           numberOfLines)
   {
     const Vector<GlyphInfo>& glyphs = layoutParameters.textModel->mVisualModel->mGlyphs;
+
+    if(glyphs.Size() == 0u)
+    {
+      // Do nothing.
+      return;
+    }
 
     // Need to add a new line with no characters but with height to increase the layoutSize.height
     const GlyphInfo& glyphInfo = glyphs[glyphs.Count() - 1u];

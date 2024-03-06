@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,11 +65,12 @@ inline uint8_t MultiplyAndNormalizeColor(const uint8_t x, const uint8_t y) noexc
 /**
  * @brief Prepare decode glyph bitmap data. It must be call END_GLYPH_BITMAP end of same scope.
  */
-#define BEGIN_GLYPH_BITMAP(data)                                                                                                               \
-{                                                                                                                                              \
-  uint32_t   glyphOffet               = 0u;                                                                                                    \
-  const bool useLocalScanline         = data.glyphBitmap.compressionType != TextAbstraction::GlyphBufferData::CompressionType::NO_COMPRESSION; \
-  uint8_t* __restrict__ glyphScanline = useLocalScanline ? (uint8_t*)malloc(data.glyphBitmap.width * glyphPixelSize) : data.glyphBitmap.buffer;
+#define BEGIN_GLYPH_BITMAP(data)                                                                                                                \
+{                                                                                                                                               \
+  uint32_t   glyphOffet               = 0u;                                                                                                     \
+  const bool useLocalScanline         = data.glyphBitmap.compressionType != TextAbstraction::GlyphBufferData::CompressionType::NO_COMPRESSION;  \
+  uint8_t* __restrict__ glyphScanline = useLocalScanline ? (uint8_t*)malloc(data.glyphBitmap.width * glyphPixelSize) : data.glyphBitmap.buffer; \
+  DALI_ASSERT_ALWAYS(glyphScanline && "Glyph scanline for buffer is null!");
 
 /**
  * @brief Macro to skip useless line fast.
@@ -162,7 +163,7 @@ void TypesetGlyph(GlyphData& __restrict__ data,
   // Whether the given glyph is a color one.
   const bool     isColorGlyph    = data.glyphBitmap.isColorEmoji || data.glyphBitmap.isColorBitmap;
   const uint32_t glyphPixelSize  = Pixel::GetBytesPerPixel(data.glyphBitmap.format);
-  const uint32_t glyphAlphaIndex = glyphPixelSize - 1u;
+  const uint32_t glyphAlphaIndex = (glyphPixelSize > 0u) ? glyphPixelSize - 1u : 0u;
 
   // Determinate iterator range.
   const int32_t lineIndexRangeMin = std::max(0, -yOffset);

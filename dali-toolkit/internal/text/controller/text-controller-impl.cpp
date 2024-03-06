@@ -701,7 +701,7 @@ void Controller::Impl::CalculateTextUpdateIndices(Length& numberOfCharacters)
       mTextUpdateInfo.mRequestedNumberOfCharacters = mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
 
       mTextUpdateInfo.mStartGlyphIndex = mModel->mVisualModel->mGlyphs.Count();
-      mTextUpdateInfo.mStartLineIndex  = mModel->mVisualModel->mLines.Count() - 1u;
+      mTextUpdateInfo.mStartLineIndex  = (mModel->mVisualModel->mLines.Count() > 0u) ? mModel->mVisualModel->mLines.Count() - 1u : 0u;
 
       // Nothing else to do;
       return;

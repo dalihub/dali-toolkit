@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/style-monitor.h> ///< for load json file.
+#include <dali/public-api/common/vector-wrapper.h>
 
 #include <regex> ///< for redefine shader
 #include <string_view>
@@ -106,17 +107,31 @@ bool LoadJsonScript(std::string& stringOut)
   return false;
 }
 // Json keywords what we will get information from json.
+constexpr std::string_view DEBUG_SCRIPT_VERSION_JSON_KEY = "version";
+
+constexpr std::string_view DEBUG_EXTRA_ATTRIBUTES_JSON_KEY    = "extraAttributes";
+constexpr std::string_view DEBUG_EXTRA_VARYINGS_JSON_KEY      = "extraVaryings";
+constexpr std::string_view DEBUG_EXTRA_UNIFORMS_JSON_KEY      = "extraUniforms";
+constexpr std::string_view DEBUG_APPLY_VARYINGS_CODE_JSON_KEY = "applyVaryingsCode";
+
 constexpr std::string_view MINIMUM_DEBUG_COLOR_RATE_JSON_KEY = "minimumColorRate";
 constexpr std::string_view MAXIMUM_DEBUG_COLOR_RATE_JSON_KEY = "maximumColorRate";
+
 constexpr std::string_view DEBUG_RED_CHANNEL_CODE_JSON_KEY   = "redChannelCodes";
 constexpr std::string_view DEBUG_GREEN_CHANNEL_CODE_JSON_KEY = "greenChannelCodes";
 constexpr std::string_view DEBUG_BLUE_CHANNEL_CODE_JSON_KEY  = "blueChannelCodes";
 constexpr std::string_view DEBUG_TRIGGER_CODE_JSON_KEY       = "triggerCode";
 constexpr std::string_view DEBUG_RATIO_CODE_JSON_KEY         = "ratioCode";
 
-// Macro keywords what we will replace at fragment shader.
+// Macro keywords what we will replace at vertex/fragment shader.
+constexpr std::string_view DEBUG_EXTRA_ATTRIBUTES_MACRO_KEY    = "DEBUG_EXTRA_ATTRIBUTES";
+constexpr std::string_view DEBUG_EXTRA_VARYINGS_MACRO_KEY      = "DEBUG_EXTRA_VARYINGS";
+constexpr std::string_view DEBUG_EXTRA_UNIFORMS_MACRO_KEY      = "DEBUG_EXTRA_UNIFORMS";
+constexpr std::string_view DEBUG_APPLY_VARYINGS_CODE_MACRO_KEY = "DEBUG_APPLY_VARYING_CODE";
+
 constexpr std::string_view MINIMUM_DEBUG_COLOR_RATE_MACRO_KEY = "MINIMUM_DEBUG_COLOR_RATE";
 constexpr std::string_view MAXIMUM_DEBUG_COLOR_RATE_MACRO_KEY = "MAXIMUM_DEBUG_COLOR_RATE";
+
 constexpr std::string_view DEBUG_TRIGGER_RED_CODE_MACRO_KEY   = "DEBUG_TRIGGER_RED_CODE";
 constexpr std::string_view DEBUG_TRIGGER_GREEN_CODE_MACRO_KEY = "DEBUG_TRIGGER_GREEN_CODE";
 constexpr std::string_view DEBUG_TRIGGER_BLUE_CODE_MACRO_KEY  = "DEBUG_TRIGGER_BLUE_CODE";
@@ -125,11 +140,18 @@ constexpr std::string_view DEBUG_RATIO_GREEN_CODE_MACRO_KEY   = "DEBUG_RATIO_GRE
 constexpr std::string_view DEBUG_RATIO_BLUE_CODE_MACRO_KEY    = "DEBUG_RATIO_BLUE_CODE";
 
 // Default macro keywords when we fail to parse script.
-constexpr std::string_view DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE   = "0.0";
-constexpr std::string_view DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE = "return false;";
-constexpr std::string_view DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE   = "return 0.0;";
+constexpr std::string_view DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE          = "0.0";
+constexpr std::string_view DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE        = "return false;";
+constexpr std::string_view DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE          = "return 0.0;";
+constexpr std::string_view DEFAULT_DEBUG_APPLY_VARYINGS_CODE_MACRO_VALUE = "return;";
 
-bool ParseScriptInfomation(Property::Map& result)
+constexpr std::string_view EMPTY_STRING                    = "";
+constexpr std::string_view VERTEX_SHADER_ATTRIBUTES_PREFIX = "INPUT";
+constexpr std::string_view VERTEX_SHADER_VARYINGS_PREFIX   = "OUTPUT";
+constexpr std::string_view FRAGMENT_SHADER_VARYINGS_PREFIX = "INPUT";
+constexpr std::string_view UNIFORMS_PREFIX                 = "uniform";
+
+bool ParseScriptInfomation(Property::Map& vertexResult, Property::Map& fragmentResult)
 {
   std::string stringOut;
   if(!LoadJsonScript(stringOut))
@@ -158,7 +180,7 @@ bool ParseScriptInfomation(Property::Map& result)
     return false;
   }
 
-  auto InsertScriptMap = [](Property::Map& result, const TreeNode* node, const std::string_view& jsonKey, const std::string_view& macroKey, const std::string_view& defaultValue) {
+  auto InsertScriptMap = [](Property::Map& result, const TreeNode* node, const std::string_view& jsonKey, const std::string_view& macroKey, const std::string_view& defaultValue, const std::string_view& prefixString) {
     std::ostringstream oss;
     oss.clear();
 
@@ -174,6 +196,10 @@ bool ParseScriptInfomation(Property::Map& result)
         }
         else if(childNode->GetType() == TreeNode::STRING)
         {
+          if(!prefixString.empty())
+          {
+            oss << prefixString << " ";
+          }
           oss << childNode->GetString();
         }
         else if(childNode->GetType() == TreeNode::ARRAY)
@@ -192,6 +218,10 @@ bool ParseScriptInfomation(Property::Map& result)
               {
                 oss << "\n";
               }
+              if(!prefixString.empty())
+              {
+                oss << prefixString << " ";
+              }
               oss << (*iter).second.GetString();
             }
           }
@@ -199,54 +229,80 @@ bool ParseScriptInfomation(Property::Map& result)
       }
     }
 
-    if(oss.str().empty())
+    if(oss.str().empty() && !defaultValue.empty())
     {
       oss << defaultValue;
     }
-    result.Insert(std::string(macroKey), oss.str());
+
+    if(!oss.str().empty())
+    {
+      result.Insert(std::string(macroKey), oss.str());
+    }
   };
 
   auto InsertChannelScriptMap = [&InsertScriptMap](Property::Map& result, const TreeNode* node, const std::string_view& channelJsonKey, const std::string_view& triggerMacroKey, const std::string_view& ratioMacroKey) {
     const auto* channelNode = node->GetChild(channelJsonKey);
-    InsertScriptMap(result, channelNode, DEBUG_TRIGGER_CODE_JSON_KEY, triggerMacroKey, DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE);
-    InsertScriptMap(result, channelNode, DEBUG_RATIO_CODE_JSON_KEY, ratioMacroKey, DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE);
+    InsertScriptMap(result, channelNode, DEBUG_TRIGGER_CODE_JSON_KEY, triggerMacroKey, DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE, EMPTY_STRING);
+    InsertScriptMap(result, channelNode, DEBUG_RATIO_CODE_JSON_KEY, ratioMacroKey, DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE, EMPTY_STRING);
   };
 
+  // Get attribute value code
+  InsertScriptMap(vertexResult, rootNode, DEBUG_EXTRA_ATTRIBUTES_JSON_KEY, DEBUG_EXTRA_ATTRIBUTES_MACRO_KEY, EMPTY_STRING, VERTEX_SHADER_ATTRIBUTES_PREFIX);
+
+  // Get varying value code
+  InsertScriptMap(vertexResult, rootNode, DEBUG_EXTRA_VARYINGS_JSON_KEY, DEBUG_EXTRA_VARYINGS_MACRO_KEY, EMPTY_STRING, VERTEX_SHADER_VARYINGS_PREFIX);
+  InsertScriptMap(fragmentResult, rootNode, DEBUG_EXTRA_VARYINGS_JSON_KEY, DEBUG_EXTRA_VARYINGS_MACRO_KEY, EMPTY_STRING, FRAGMENT_SHADER_VARYINGS_PREFIX);
+
+  // Get uniform value code
+  InsertScriptMap(vertexResult, rootNode, DEBUG_EXTRA_UNIFORMS_JSON_KEY, DEBUG_EXTRA_UNIFORMS_MACRO_KEY, EMPTY_STRING, UNIFORMS_PREFIX);
+  InsertScriptMap(fragmentResult, rootNode, DEBUG_EXTRA_UNIFORMS_JSON_KEY, DEBUG_EXTRA_UNIFORMS_MACRO_KEY, EMPTY_STRING, UNIFORMS_PREFIX);
+
+  // Get apply varying code
+  InsertScriptMap(vertexResult, rootNode, DEBUG_APPLY_VARYINGS_CODE_JSON_KEY, DEBUG_APPLY_VARYINGS_CODE_MACRO_KEY, DEFAULT_DEBUG_APPLY_VARYINGS_CODE_MACRO_VALUE, EMPTY_STRING);
+
   // Get color rate
-  InsertScriptMap(result, rootNode, MINIMUM_DEBUG_COLOR_RATE_JSON_KEY, MINIMUM_DEBUG_COLOR_RATE_MACRO_KEY, DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE);
-  InsertScriptMap(result, rootNode, MAXIMUM_DEBUG_COLOR_RATE_JSON_KEY, MAXIMUM_DEBUG_COLOR_RATE_MACRO_KEY, DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE);
+  InsertScriptMap(fragmentResult, rootNode, MINIMUM_DEBUG_COLOR_RATE_JSON_KEY, MINIMUM_DEBUG_COLOR_RATE_MACRO_KEY, DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE, EMPTY_STRING);
+  InsertScriptMap(fragmentResult, rootNode, MAXIMUM_DEBUG_COLOR_RATE_JSON_KEY, MAXIMUM_DEBUG_COLOR_RATE_MACRO_KEY, DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE, EMPTY_STRING);
 
   // Get each color ChannelCodes
-  InsertChannelScriptMap(result, rootNode, DEBUG_RED_CHANNEL_CODE_JSON_KEY, DEBUG_TRIGGER_RED_CODE_MACRO_KEY, DEBUG_RATIO_RED_CODE_MACRO_KEY);
-  InsertChannelScriptMap(result, rootNode, DEBUG_GREEN_CHANNEL_CODE_JSON_KEY, DEBUG_TRIGGER_GREEN_CODE_MACRO_KEY, DEBUG_RATIO_GREEN_CODE_MACRO_KEY);
-  InsertChannelScriptMap(result, rootNode, DEBUG_BLUE_CHANNEL_CODE_JSON_KEY, DEBUG_TRIGGER_BLUE_CODE_MACRO_KEY, DEBUG_RATIO_BLUE_CODE_MACRO_KEY);
+  InsertChannelScriptMap(fragmentResult, rootNode, DEBUG_RED_CHANNEL_CODE_JSON_KEY, DEBUG_TRIGGER_RED_CODE_MACRO_KEY, DEBUG_RATIO_RED_CODE_MACRO_KEY);
+  InsertChannelScriptMap(fragmentResult, rootNode, DEBUG_GREEN_CHANNEL_CODE_JSON_KEY, DEBUG_TRIGGER_GREEN_CODE_MACRO_KEY, DEBUG_RATIO_GREEN_CODE_MACRO_KEY);
+  InsertChannelScriptMap(fragmentResult, rootNode, DEBUG_BLUE_CHANNEL_CODE_JSON_KEY, DEBUG_TRIGGER_BLUE_CODE_MACRO_KEY, DEBUG_RATIO_BLUE_CODE_MACRO_KEY);
 
   return true;
 }
 
-const Property::Map& GetScriptInfomation()
+const std::vector<Property::Map>& GetScriptInfomation()
 {
-  static Property::Map result;
+  static std::vector<Property::Map> results;
 
-  if(DALI_UNLIKELY(result.Empty()))
+  if(DALI_UNLIKELY(results.empty()))
   {
-    if(!ParseScriptInfomation(result))
+    results.resize(2);
+
+    auto& vertexShaderResult   = results[0];
+    auto& fragmentShaderResult = results[1];
+
+    if(!ParseScriptInfomation(vertexShaderResult, fragmentShaderResult))
     {
       // Use default script information if parse failed.
-      result.Clear();
+      vertexShaderResult.Clear();
+      fragmentShaderResult.Clear();
 
-      result.Insert(std::string(MINIMUM_DEBUG_COLOR_RATE_MACRO_KEY), std::string(DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE));
-      result.Insert(std::string(MAXIMUM_DEBUG_COLOR_RATE_MACRO_KEY), std::string(DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE));
-      result.Insert(std::string(DEBUG_TRIGGER_RED_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE));
-      result.Insert(std::string(DEBUG_TRIGGER_GREEN_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE));
-      result.Insert(std::string(DEBUG_TRIGGER_BLUE_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE));
-      result.Insert(std::string(DEBUG_RATIO_RED_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE));
-      result.Insert(std::string(DEBUG_RATIO_GREEN_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE));
-      result.Insert(std::string(DEBUG_RATIO_BLUE_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE));
+      vertexShaderResult.Insert(std::string(DEBUG_APPLY_VARYINGS_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_APPLY_VARYINGS_CODE_MACRO_VALUE));
+
+      fragmentShaderResult.Insert(std::string(MINIMUM_DEBUG_COLOR_RATE_MACRO_KEY), std::string(DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE));
+      fragmentShaderResult.Insert(std::string(MAXIMUM_DEBUG_COLOR_RATE_MACRO_KEY), std::string(DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE));
+      fragmentShaderResult.Insert(std::string(DEBUG_TRIGGER_RED_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE));
+      fragmentShaderResult.Insert(std::string(DEBUG_TRIGGER_GREEN_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE));
+      fragmentShaderResult.Insert(std::string(DEBUG_TRIGGER_BLUE_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE));
+      fragmentShaderResult.Insert(std::string(DEBUG_RATIO_RED_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE));
+      fragmentShaderResult.Insert(std::string(DEBUG_RATIO_GREEN_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE));
+      fragmentShaderResult.Insert(std::string(DEBUG_RATIO_BLUE_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE));
     }
   }
 
-  return result;
+  return results;
 }
 
 void RedefineMacro(std::string& shaderCode, std::string macro, std::string value)
@@ -277,14 +333,22 @@ bool DebugImageVisualShaderEnabled()
   return DebugImageVisualShaderEnvironmentEnabled();
 }
 
-void ApplyImageVisualShaderDebugScriptCode(std::string& fragmentShader)
+void ApplyImageVisualShaderDebugScriptCode(std::string& vertexShader, std::string& fragmentShader)
 {
-  const auto& resultMap = GetScriptInfomation();
+  const auto& resultMaps = GetScriptInfomation();
 
-  for(std::size_t i = 0u; i < resultMap.Count(); ++i)
+  for(std::size_t i = 0u; i < resultMaps[0].Count(); ++i)
   {
-    auto        key   = resultMap.GetKeyAt(i);
-    const auto& value = resultMap.GetValue(i);
+    auto        key   = resultMaps[0].GetKeyAt(i);
+    const auto& value = resultMaps[0].GetValue(i);
+
+    RedefineMacro(vertexShader, std::move(key.stringKey), value.Get<std::string>());
+  }
+
+  for(std::size_t i = 0u; i < resultMaps[1].Count(); ++i)
+  {
+    auto        key   = resultMaps[1].GetKeyAt(i);
+    const auto& value = resultMaps[1].GetValue(i);
 
     RedefineMacro(fragmentShader, std::move(key.stringKey), value.Get<std::string>());
   }
