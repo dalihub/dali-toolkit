@@ -242,12 +242,6 @@ Shader ColorVisual::GenerateShader() const
     // If we use blur, just ignore borderline
     borderline = false;
     shaderTypeFlag |= ColorVisualRequireFlag::BLUR;
-
-    // If shader version doesn't support blur with corner radius, ignore corner radius
-    if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_ROUNDED_BLUR))
-    {
-      roundedCorner = false;
-    }
   }
   if(roundedCorner)
   {
@@ -279,6 +273,13 @@ Shader ColorVisual::GenerateShader() const
       vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
       fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
     }
+
+    // If shader version doesn't support blur with corner radius, Let we use legacy code.
+    if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_ROUNDED_BLUR))
+    {
+      fragmentShaderPrefixList += "#define GLSL_VERSION_1_0\n";
+    }
+
     shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_VERT.data(),
                          Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
     mFactoryCache.SaveShader(shaderType, shader);
