@@ -349,7 +349,7 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
     }
     if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_TEXTURE_TEXEL_AND_SIZE))
     {
-      shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::GLSL_VERSION_1_0);
+      shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::SL_VERSION_LOW);
     }
 
     Shader newShader = mShaderManager->ProduceShader(shaderOption);

@@ -96,7 +96,7 @@ uniform mediump vec3 uLightColor[MAX_LIGHTS];
 // For Shadow Map
 uniform lowp int uIsShadowEnabled;
 uniform sampler2D sShadowMap;
-#ifdef GLSL_VERSION_1_0
+#ifdef SL_VERSION_LOW
 uniform int uShadowMapWidth;
 uniform int uShadowMapHeight;
 #endif
@@ -241,7 +241,7 @@ void main()
   // Specular Light
   // uMaxLOD that means mipmap level of specular texture is used for bluring of reflection of specular following roughness.
   float lod = perceptualRoughness * (uMaxLOD - 1.0);
-#ifdef GLSL_VERSION_1_0
+#ifdef SL_VERSION_LOW
   // glsl 1.0 doesn't support textureLod. Let we just use textureCube instead.
   lowp vec3 specularLight = linear(textureCube(sSpecularEnvSampler, reflection * uYDirection).rgb);
 #else
@@ -251,7 +251,7 @@ void main()
 
   // Diffuse Light
   lowp vec3 diffuseColor = mix(baseColor.rgb, vec3(0), metallic);
-#ifdef GLSL_VERSION_1_0
+#ifdef SL_VERSION_LOW
   lowp vec3 irradiance = linear(textureCube(sDiffuseEnvSampler, n * uYDirection).rgb);
 #else
   lowp vec3 irradiance = linear(TEXTURE(sDiffuseEnvSampler, n * uYDirection).rgb);
@@ -305,7 +305,7 @@ void main()
     mediump float exposureFactor = 0.0;
     if(uEnableShadowSoftFiltering > 0)
     {
-#ifdef GLSL_VERSION_1_0
+#ifdef SL_VERSION_LOW
       ivec2 texSize = ivec2(uShadowMapWidth, uShadowMapHeight);
 #else
       ivec2 texSize = textureSize(sShadowMap, 0);

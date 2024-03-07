@@ -49,7 +49,7 @@ static constexpr std::string_view OPTION_KEYWORD[] =
     "MORPH_NORMAL",
     "MORPH_TANGENT",
     "MORPH_VERSION_2_0",
-    "GLSL_VERSION_1_0",
+    "SL_VERSION_LOW",
 };
 static constexpr uint32_t NUMBER_OF_OPTIONS = sizeof(OPTION_KEYWORD) / sizeof(OPTION_KEYWORD[0]);
 static const char*        ADD_EXTRA_SKINNING_ATTRIBUTES{"ADD_EXTRA_SKINNING_ATTRIBUTES"};

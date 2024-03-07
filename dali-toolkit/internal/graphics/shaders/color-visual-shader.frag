@@ -191,6 +191,19 @@ mediump float calculateCornerOpacity()
 #endif
 
 #ifdef IS_REQUIRED_BLUR
+#ifdef SL_VERSION_LOW
+// Legacy code for low version glsl
+mediump float calculateBlurOpacity()
+{
+  highp float potential = gPotential;
+
+  highp float alias = min(gRadius, vAliasMargin);
+  highp float potentialMin = gMinOutlinePotential - blurRadius - alias;
+  highp float potentialMax = gMaxOutlinePotential + blurRadius + alias;
+
+  return 1.0 - smoothstep(potentialMin, potentialMax, potential);
+}
+#else
 mediump float calculateBlurOpacity()
 {
 // Don't use borderline!
@@ -206,7 +219,7 @@ mediump float calculateBlurOpacity()
   v = v + cy;
 
   highp float potential = 0.0;
-  highp float alias = min(gRadius, 1.0);
+  highp float alias = min(gRadius, vAliasMargin);
   highp float potentialMin = cy + gRadius - blurRadius - alias;
   highp float potentialMax = cy + gRadius + blurRadius + alias;
 
@@ -223,7 +236,7 @@ mediump float calculateBlurOpacity()
     potential = v.y;
 
     // for anti-alias when blurRaidus = 0.0
-    highp float heuristicBaselineScale = max(1.0 , cr * (cr + cy));
+    highp float heuristicBaselineScale = max(vAliasMargin , cr * (cr + cy));
     highp float potentialDiff = min(alias, diffFromBaseline / heuristicBaselineScale);
     potentialMin += potentialDiff;
     potentialMax -= potentialDiff;
@@ -257,6 +270,7 @@ mediump float calculateBlurOpacity()
 
   return 1.0 - smoothstep(potentialMin, potentialMax, potential);
 }
+#endif
 #endif
 
 void main()
