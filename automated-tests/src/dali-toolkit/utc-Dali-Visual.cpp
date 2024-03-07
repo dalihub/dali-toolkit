@@ -141,7 +141,6 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
 
   return true;
 }
-
 void TestShaderCodeContainSubstrings(Control control, std::vector<std::pair<std::string, bool>> substringCheckList, const char* location)
 {
   Renderer        renderer = control.GetRendererAt(0);
@@ -149,6 +148,17 @@ void TestShaderCodeContainSubstrings(Control control, std::vector<std::pair<std:
   Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
   Property::Map*  map      = value.GetMap();
   DALI_TEST_CHECK(map);
+
+  Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
+  std::string      vertexShader;
+  DALI_TEST_CHECK(vertex->Get(vertexShader));
+  for(const auto& checkPair : substringCheckList)
+  {
+    const auto& keyword = checkPair.first;
+    const auto& expect  = checkPair.second;
+    tet_printf("check [%s] %s exist in vertex shader\n", keyword.c_str(), expect ? "is" : "is not");
+    DALI_TEST_EQUALS((vertexShader.find(keyword.c_str()) != std::string::npos), expect, location);
+  }
 
   Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
   DALI_TEST_CHECK(fragment);
@@ -161,6 +171,15 @@ void TestShaderCodeContainSubstrings(Control control, std::vector<std::pair<std:
     tet_printf("check [%s] %s exist in fragment shader\n", keyword.c_str(), expect ? "is" : "is not");
     DALI_TEST_EQUALS((fragmentShader.find(keyword.c_str()) != std::string::npos), expect, location);
   }
+}
+
+void TestShaderCodeContainSubstringsForEachShader(Control control, std::vector<std::pair<std::string, std::pair<bool, bool>>> substringCheckList, const char* location)
+{
+  Renderer        renderer = control.GetRendererAt(0);
+  Shader          shader   = renderer.GetShader();
+  Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
+  Property::Map*  map      = value.GetMap();
+  DALI_TEST_CHECK(map);
 
   Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
   std::string      vertexShader;
@@ -168,9 +187,21 @@ void TestShaderCodeContainSubstrings(Control control, std::vector<std::pair<std:
   for(const auto& checkPair : substringCheckList)
   {
     const auto& keyword = checkPair.first;
-    const auto& expect  = checkPair.second;
+    const auto& expect  = checkPair.second.first;
     tet_printf("check [%s] %s exist in vertex shader\n", keyword.c_str(), expect ? "is" : "is not");
     DALI_TEST_EQUALS((vertexShader.find(keyword.c_str()) != std::string::npos), expect, location);
+  }
+
+  Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
+  DALI_TEST_CHECK(fragment);
+  std::string fragmentShader;
+  DALI_TEST_CHECK(fragment->Get(fragmentShader));
+  for(const auto& checkPair : substringCheckList)
+  {
+    const auto& keyword = checkPair.first;
+    const auto& expect  = checkPair.second.second;
+    tet_printf("check [%s] %s exist in fragment shader\n", keyword.c_str(), expect ? "is" : "is not");
+    DALI_TEST_EQUALS((fragmentShader.find(keyword.c_str()) != std::string::npos), expect, location);
   }
 }
 
@@ -6545,12 +6576,13 @@ int UtcDaliVisualUpdatePropertyChangeShader05(void)
     DALI_TEST_CHECK(cornerRadiusValue);
     DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
 
-    TestShaderCodeContainSubstrings(
+    TestShaderCodeContainSubstringsForEachShader(
       dummyControl,
       {
-        {"#define IS_REQUIRED_BLUR", true},
-        {"#define IS_REQUIRED_BORDERLINE", false},     // Note : We ignore borderline when blur radius occured
-        {"#define IS_REQUIRED_ROUNDED_CORNER", false}, // Note : low spec shader doesn't support rounded blur
+        {"#define IS_REQUIRED_BLUR", {true, true}},
+        {"#define IS_REQUIRED_BORDERLINE", {false, false}}, // Note : We ignore borderline when blur radius occured
+        {"#define IS_REQUIRED_ROUNDED_CORNER", {true, true}},
+        {"#define SL_VERSION_LOW", {false, true}},
       },
       TEST_LOCATION);
 
@@ -6585,12 +6617,13 @@ int UtcDaliVisualUpdatePropertyChangeShader05(void)
     DALI_TEST_CHECK(cornerRadiusValue);
     DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), Vector4::ZERO, TEST_LOCATION);
 
-    TestShaderCodeContainSubstrings(
+    TestShaderCodeContainSubstringsForEachShader(
       dummyControl,
       {
-        {"#define IS_REQUIRED_BLUR", true},            // Note : mAlwaysUsingBlurRadius is true.
-        {"#define IS_REQUIRED_BORDERLINE", false},     // Note : We ignore borderline when blur radius occured
-        {"#define IS_REQUIRED_ROUNDED_CORNER", false}, // Note : mAlwaysUsingCornerRadius is true.
+        {"#define IS_REQUIRED_BLUR", {true, true}},           // Note : mAlwaysUsingBlurRadius is true.
+        {"#define IS_REQUIRED_BORDERLINE", {false, false}},   // Note : We ignore borderline when blur radius occured
+        {"#define IS_REQUIRED_ROUNDED_CORNER", {true, true}}, // Note : mAlwaysUsingCornerRadius is true.
+        {"#define SL_VERSION_LOW", {false, true}},
       },
       TEST_LOCATION);
 

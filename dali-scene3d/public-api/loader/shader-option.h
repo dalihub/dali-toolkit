@@ -52,7 +52,7 @@ public:
     MORPH_NORMAL,               // 10000
     MORPH_TANGENT,              // 20000
     MORPH_VERSION_2_0,          // 40000
-    GLSL_VERSION_1_0,           // 80000
+    SL_VERSION_LOW,             // 80000
   };
 
   struct MacroDefinition
