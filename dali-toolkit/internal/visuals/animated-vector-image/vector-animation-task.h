@@ -203,6 +203,12 @@ public:
   void GetLayerInfo(Property::Map& map) const;
 
   /**
+   * @brief Gets the all marker information.
+   * @param[out] map The marker information
+   */
+  void GetMarkerInfo(Property::Map& map) const;
+
+  /**
    * @brief Connect to this signal to be notified when the resource is ready.
    * @return The signal to connect to.
    */

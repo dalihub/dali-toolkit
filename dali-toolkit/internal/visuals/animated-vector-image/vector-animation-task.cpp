@@ -410,6 +410,11 @@ void VectorAnimationTask::GetLayerInfo(Property::Map& map) const
   mVectorRenderer.GetLayerInfo(map);
 }
 
+void VectorAnimationTask::GetMarkerInfo(Property::Map& map) const
+{
+  mVectorRenderer.GetMarkerInfo(map);
+}
+
 VectorAnimationTask::ResourceReadySignalType& VectorAnimationTask::ResourceReadySignal()
 {
   return mResourceReadySignal;
