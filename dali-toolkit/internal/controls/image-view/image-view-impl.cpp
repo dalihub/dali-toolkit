@@ -47,6 +47,7 @@ const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 constexpr float FULL_OPACITY = 1.0f;
 constexpr float LOW_OPACITY  = 0.2f;
+constexpr float TRANSITION_EFFECT_SPEED = 0.3f;
 
 BaseHandle Create()
 {
@@ -670,26 +671,9 @@ void ImageView::TransitionImageWithEffect()
 
   if(handle)
   {
-    mTransitionAnimation = Animation::New(1.5f);
+    mTransitionAnimation = Animation::New(TRANSITION_EFFECT_SPEED);
     mTransitionAnimation.SetEndAction(Animation::EndAction::DISCARD);
     float destinationAlpha = (mTransitionTargetAlpha > LOW_OPACITY) ? mTransitionTargetAlpha : LOW_OPACITY;
-
-    if(mPreviousVisual) // Transition previous image
-    {
-      Dali::KeyFrames fadeoutKeyFrames = Dali::KeyFrames::New();
-      fadeoutKeyFrames.Add(0.0f, destinationAlpha);
-      fadeoutKeyFrames.Add(1.0f, LOW_OPACITY);
-      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mPreviousVisual);
-      mTransitionAnimation.AnimateBetween(visualImpl.GetPropertyObject(Toolkit::Visual::Property::OPACITY), fadeoutKeyFrames);
-    }
-    else if(mPlaceholderVisual) // Transition placeholder
-    {
-      Dali::KeyFrames fadeoutKeyFrames = Dali::KeyFrames::New();
-      fadeoutKeyFrames.Add(0.0f, destinationAlpha);
-      fadeoutKeyFrames.Add(1.0f, LOW_OPACITY);
-      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mPlaceholderVisual);
-      mTransitionAnimation.AnimateBetween(visualImpl.GetPropertyObject(Toolkit::Visual::Property::OPACITY), fadeoutKeyFrames);
-    }
 
     // Transition current image
     Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
@@ -698,7 +682,7 @@ void ImageView::TransitionImageWithEffect()
       Dali::KeyFrames fadeinKeyFrames = Dali::KeyFrames::New();
       fadeinKeyFrames.Add(0.0f, LOW_OPACITY);
       fadeinKeyFrames.Add(1.0f, destinationAlpha);
-      mTransitionAnimation.AnimateBetween(DevelControl::GetVisualProperty(handle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::OPACITY), fadeinKeyFrames);
+      mTransitionAnimation.AnimateBetween(DevelControl::GetVisualProperty(handle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::OPACITY), fadeinKeyFrames,  AlphaFunction::EASE_IN_OUT);
     }
 
     // Play transition animation
