@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEST_VECTOR_ANIMATION_RENDERER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ namespace VectorAnimationRenderer
 
 void     DelayRendering(uint32_t delay);
 uint32_t GetDroppedFrames();
+void     UseNativeImageTexture(bool useNativeImage);
 
 } // namespace VectorAnimationRenderer
 } // namespace Test
