@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/threading/mutex.h>
+#include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-array.h>
 #include <toolkit-application.h>
@@ -55,6 +56,7 @@ public:
     mFrameRate(60.0f),
     mTestFrameDrop(false),
     mNeedDroppedFrames(false),
+    mUseNativeImage(false),
     mEventThreadCallback(new EventThreadCallback(MakeCallback(this, &VectorAnimationRenderer::OnTriggered)))
   {
     mCount++;
@@ -229,12 +231,22 @@ public:
       mResourceReady = true;
 
       Dali::TextureSet textureSet = mRenderer.GetTextures();
-      Dali::Texture    texture    = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, mWidth, mHeight);
-      textureSet.SetTexture(0, texture);
 
-      Devel::PixelBuffer pixelBuffer = Devel::PixelBuffer::New(mWidth, mHeight, Pixel::RGBA8888);
-      Dali::PixelData    pixelData   = Devel::PixelBuffer::Convert(pixelBuffer);
-      texture.Upload(pixelData);
+      if(mUseNativeImage)
+      {
+        Dali::NativeImageSourcePtr nativeImageSource = Dali::NativeImageSource::New(mWidth, mHeight, Dali::NativeImageSource::COLOR_DEPTH_32);
+        Dali::Texture              texture           = Dali::Texture::New(*nativeImageSource);
+        textureSet.SetTexture(0, texture);
+      }
+      else
+      {
+        Dali::Texture texture = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, mWidth, mHeight);
+        textureSet.SetTexture(0, texture);
+
+        Devel::PixelBuffer pixelBuffer = Devel::PixelBuffer::New(mWidth, mHeight, Pixel::RGBA8888);
+        Dali::PixelData    pixelData   = Devel::PixelBuffer::Convert(pixelBuffer);
+        texture.Upload(pixelData);
+      }
 
       mUploadCompletedSignal.Emit();
     }
@@ -263,6 +275,7 @@ public:
   bool     mResourceReady{false};
   bool     mNeedTrigger{true};
   bool     mEnableFixedCache{false};
+  bool     mUseNativeImage{false};
 
   Dali::VectorAnimationRenderer::UploadCompletedSignalType mUploadCompletedSignal;
   std::unique_ptr<EventThreadCallback>                     mEventThreadCallback;
@@ -403,7 +416,6 @@ void VectorAnimationRenderer::KeepRasterizedBuffer()
   Internal::Adaptor::GetImplementation(*this).KeepRasterizedBuffer();
 }
 
-
 VectorAnimationRenderer::UploadCompletedSignalType& VectorAnimationRenderer::UploadCompletedSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).UploadCompletedSignal();
@@ -424,6 +436,11 @@ void DelayRendering(uint32_t delay)
 uint32_t GetDroppedFrames()
 {
   return Dali::Internal::Adaptor::gVectorAnimationRenderer->mDroppedFrames;
+}
+
+void UseNativeImageTexture(bool useNativeImage)
+{
+  Dali::Internal::Adaptor::gVectorAnimationRenderer->mUseNativeImage = useNativeImage;
 }
 
 } // namespace VectorAnimationRenderer

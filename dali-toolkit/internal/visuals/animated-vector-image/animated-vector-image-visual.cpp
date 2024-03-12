@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,8 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   mRendererAdded(false),
   mCoreShutdown(false),
   mRedrawInScalingDown(true),
-  mEnableFrameCache(false)
+  mEnableFrameCache(false),
+  mUseNativeImage(false)
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Visual::Base::Impl::IS_PREMULTIPLIED_ALPHA;
@@ -457,6 +458,7 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
     Vector2 imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
     mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize, false);
     actor.AddRenderer(mImpl->mRenderer);
+    mRendererAdded = true;
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
   }
   else
@@ -645,6 +647,29 @@ void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceSta
   else
   {
     mLoadFailed = status == VectorAnimationTask::ResourceStatus::FAILED ? true : false;
+    if(status == VectorAnimationTask::ResourceStatus::READY)
+    {
+      // Texture was ready. Change the shader if we need.
+      bool useNativeImage = false;
+      if(mImpl->mRenderer)
+      {
+        auto textureSet = mImpl->mRenderer.GetTextures();
+        if(textureSet && textureSet.GetTextureCount() > 0)
+        {
+          auto texture = textureSet.GetTexture(0u);
+          if(texture)
+          {
+            useNativeImage = DevelTexture::IsNative(texture);
+
+            if(mUseNativeImage != useNativeImage)
+            {
+              mUseNativeImage = useNativeImage;
+              UpdateShader();
+            }
+          }
+        }
+      }
+    }
 
     // If weak handle is holding a placement actor, it is the time to add the renderer to actor.
     Actor actor = mPlacementActor.GetHandle();
@@ -862,7 +887,8 @@ Shader AnimatedVectorImageVisual::GenerateShader() const
       mFactoryCache,
       ImageVisualShaderFeatureBuilder()
         .EnableRoundedCorner(IsRoundedCornerRequired())
-        .EnableBorderline(IsBorderlineRequired()));
+        .EnableBorderline(IsBorderlineRequired())
+        .SetTextureForFragmentShaderCheck(mUseNativeImage ? mImpl->mRenderer.GetTextures().GetTexture(0) : Dali::Texture()));
   }
   return shader;
 }
