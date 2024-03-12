@@ -265,7 +265,9 @@ Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUr
   mIblDiffuseResourceReady(true),
   mIblSpecularResourceReady(true),
   mIblDiffuseDirty(false),
-  mIblSpecularDirty(false)
+  mIblSpecularDirty(false),
+  mIsShadowCasting(true),
+  mIsShadowReceiving(true)
 {
 }
 
@@ -810,6 +812,29 @@ void Model::SetMotionData(Scene3D::MotionData motionData)
   }
 }
 
+void Model::CastShadow(bool castShadow)
+{
+  mIsShadowCasting = castShadow;
+  UpdateCastShadowRecursively(mModelRoot, mIsShadowCasting);
+}
+
+bool Model::IsShadowCasting() const
+{
+  return mIsShadowCasting;
+}
+
+void Model::ReceiveShadow(bool receiveShadow)
+{
+  mIsShadowReceiving = receiveShadow;
+  UpdateReceiveShadowRecursively(mModelRoot, mIsShadowReceiving);
+}
+
+bool Model::IsShadowReceiving() const
+{
+  return mIsShadowReceiving;
+}
+
+
 ///////////////////////////////////////////////////////////
 //
 // Private methods
@@ -980,6 +1005,46 @@ void Model::FitModelPosition()
   // Loaded model pivot is not the model center.
   mModelRoot.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mModelRoot.SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3::ONE - mModelPivot);
+}
+
+void Model::UpdateCastShadowRecursively(Scene3D::ModelNode node, bool castShadow)
+{
+  if(!node)
+  {
+    return;
+  }
+
+  GetImplementation(node).CastShadow(castShadow);
+  uint32_t childrenCount = node.GetChildCount();
+  for(uint32_t i = 0; i < childrenCount; ++i)
+  {
+    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
+    if(!childNode)
+    {
+      continue;
+    }
+    UpdateCastShadowRecursively(childNode, castShadow);
+  }
+}
+
+void Model::UpdateReceiveShadowRecursively(Scene3D::ModelNode node, bool receiveShadow)
+{
+  if(!node)
+  {
+    return;
+  }
+
+  GetImplementation(node).ReceiveShadow(receiveShadow);
+  uint32_t childrenCount = node.GetChildCount();
+  for(uint32_t i = 0; i < childrenCount; ++i)
+  {
+    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
+    if(!childNode)
+    {
+      continue;
+    }
+    UpdateReceiveShadowRecursively(childNode, receiveShadow);
+  }
 }
 
 void Model::UpdateImageBasedLightTextureRecursively(Scene3D::ModelNode node, Dali::Texture diffuseTexture, Dali::Texture specularTexture, float iblScaleFactor, uint32_t specularMipmapLevels)

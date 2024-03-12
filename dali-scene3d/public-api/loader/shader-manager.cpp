@@ -171,7 +171,7 @@ ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinit
   }
   if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_TEXTURE_TEXEL_AND_SIZE))
   {
-    option.AddOption(ShaderOption::Type::GLSL_VERSION_1_0);
+    option.AddOption(ShaderOption::Type::SL_VERSION_LOW);
   }
 
   return option;

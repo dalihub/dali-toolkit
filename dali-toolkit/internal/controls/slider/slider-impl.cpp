@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -862,14 +862,16 @@ float Slider::SnapToMark(float value)
   for(MarkList::SizeType i = 0; i < mMarks.Count(); ++i)
   {
     const Property::Value& propertyValue = mMarks[i];
-    propertyValue.Get(mark);
-    mark = MapValuePercentage(mark);
-
-    float dist = fabsf(mark - value);
-    if(dist < closestDist)
+    if(propertyValue.Get(mark))
     {
-      closestDist = dist;
-      closestMark = mark;
+      mark = MapValuePercentage(mark);
+
+      float dist = fabsf(mark - value);
+      if(dist < closestDist)
+      {
+        closestDist = dist;
+        closestMark = mark;
+      }
     }
   }
 
@@ -891,22 +893,24 @@ bool Slider::MarkReached(float value, int& outIndex)
     current = head + (tail - head) / 2;
 
     const Property::Value& propertyValue = mMarks[current];
-    propertyValue.Get(mark);
-    mark = MapValuePercentage(mark);
+    if(propertyValue.Get(mark))
+    {
+      mark = MapValuePercentage(mark);
 
-    if(fabsf(mark - value) < MARK_TOLERANCE)
-    {
-      outIndex = current;
-      return true;
-    }
+      if(fabsf(mark - value) < MARK_TOLERANCE)
+      {
+        outIndex = current;
+        return true;
+      }
 
-    if(value < mark)
-    {
-      tail = current - 1;
-    }
-    else
-    {
-      head = current + 1;
+      if(value < mark)
+      {
+        tail = current - 1;
+      }
+      else
+      {
+        head = current + 1;
+      }
     }
   }
 

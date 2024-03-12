@@ -398,6 +398,8 @@ public:
   float                                  mAlignmentOffset;           ///< The alignment offset.
   bool                                   mElideEnabled : 1;          ///< Whether the text's elide is enabled.
   bool                                   mIgnoreSpacesAfterText : 1; ///< Whether ignoring spaces after text or not. Default is true.
+  bool                                   mRemoveFrontInset : 1;      ///< Whether to ignore xBearing of the first glyph. Default is true.
+  bool                                   mRemoveBackInset : 1;       ///< Whether to ignore advance of the last glyph. Default is true.
   DevelText::MatchLayoutDirection        mMatchLayoutDirection;      ///< Whether to match text alignment with layout direction or not.
   DevelText::EllipsisPosition::Type      mEllipsisPosition;          ///< Where is the location the text elide
   Vector2                                mVisualTransformOffset;     ///< The offset of the layout based on the controller due to alignment.

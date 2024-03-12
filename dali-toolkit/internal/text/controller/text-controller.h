@@ -1800,6 +1800,30 @@ public: // Queries & retrieves.
   void SetIgnoreSpacesAfterText(bool ignore);
 
   /**
+   * @brief Retrieves removeFrontInset value from model
+   * @return The value of removeFrontInset
+   */
+  bool IsRemoveFrontInset() const;
+
+  /**
+   * @brief Sets removeFrontInset value to model
+   * @param[in] remove The value of removeFrontInset for the text
+   */
+  void SetRemoveFrontInset(bool remove);
+
+  /**
+   * @brief Retrieves removeBackInset value from model
+   * @return The value of removeBackInset
+   */
+  bool IsRemoveBackInset() const;
+
+  /**
+   * @brief Sets removeBackInset value to model
+   * @param[in] remove The value of removeBackInset for the text
+   */
+  void SetRemoveBackInset(bool remove);
+
+  /**
    * @brief Sets SetMatchLayoutDirection value to model
    * @param[in] match The value of matchLayoutDirection for the text
    */

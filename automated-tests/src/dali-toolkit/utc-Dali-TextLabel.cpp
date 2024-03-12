@@ -80,6 +80,9 @@ const char* const PROPERTY_NAME_ELLIPSIS_POSITION    = "ellipsisPosition";
 const char* const PROPERTY_NAME_ANCHOR_COLOR         = "anchorColor";
 const char* const PROPERTY_NAME_ANCHOR_CLICKED_COLOR = "anchorClickedColor";
 
+const char* const PROPERTY_NAME_REMOVE_FRONT_INSET    = "removeFrontInset";
+const char* const PROPERTY_NAME_REMOVE_BACK_INSET     = "removeBackInset";
+
 const std::string  DEFAULT_FONT_DIR("/resources/fonts");
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
 
@@ -360,6 +363,8 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_STRIKETHROUGH) == DevelTextLabel::Property::STRIKETHROUGH);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ANCHOR_COLOR) == DevelTextLabel::Property::ANCHOR_COLOR);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ANCHOR_CLICKED_COLOR) == DevelTextLabel::Property::ANCHOR_CLICKED_COLOR);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_REMOVE_FRONT_INSET) == DevelTextLabel::Property::REMOVE_FRONT_INSET);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_REMOVE_BACK_INSET) == DevelTextLabel::Property::REMOVE_BACK_INSET);
 
   END_TEST;
 }
@@ -1015,6 +1020,18 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS(label.GetProperty<float>(DevelTextLabel::Property::MIN_LINE_SIZE), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   label.SetProperty(DevelTextLabel::Property::MIN_LINE_SIZE, 50.f);
   DALI_TEST_EQUALS(label.GetProperty<float>(DevelTextLabel::Property::MIN_LINE_SIZE), 50.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check Remove Front/Back Inset Property
+  DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::REMOVE_FRONT_INSET));
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, false);
+  DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::REMOVE_FRONT_INSET));
+
+  DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::REMOVE_BACK_INSET));
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, false);
+  DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::REMOVE_BACK_INSET));
 
   application.SendNotification();
   application.Render();
@@ -3321,6 +3338,42 @@ int utcDaliTextLabelGetTextBoundingRectangle(void)
   Rect<> expectedTextBoundingRectangle = {0, 0, 100, 25};
 
   TestTextGeometryUtils::CheckRectGeometryResult(textBoundingRectangle, expectedTextBoundingRectangle);
+
+  END_TEST;
+}
+
+int utcDaliTextLabelRemoveFrontInset(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextLabelRemoveFrontInset");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+  application.SendNotification();
+  application.Render();
+
+  DevelTextLabel::SetRemoveFrontInset(label, false);
+  DALI_TEST_CHECK(!DevelTextLabel::IsRemoveFrontInset(label));
+
+  END_TEST;
+}
+
+int utcDaliTextLabelRemoveBackInset(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextLabelRemoveBackInset");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+  application.SendNotification();
+  application.Render();
+
+  DevelTextLabel::SetRemoveBackInset(label, false);
+  DALI_TEST_CHECK(!DevelTextLabel::IsRemoveBackInset(label));
 
   END_TEST;
 }
