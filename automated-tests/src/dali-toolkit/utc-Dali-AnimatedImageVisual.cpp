@@ -1937,6 +1937,10 @@ int UtcDaliAnimatedImageVisualDesiredSize(void)
   int desiredWidth  = 15;
   int desiredHeight = 20;
 
+  // texture size have to keep it's ratio. So, the size of texture should be 20x20.
+  const int resultWidth = 20;
+  const int resultHeight = 20;
+
   Visual::Base visual = VisualFactory::Get().CreateVisual(TEST_GIF_FILE_NAME, ImageDimensions(desiredWidth, desiredHeight));
   DALI_TEST_CHECK(visual);
 
@@ -1960,7 +1964,7 @@ int UtcDaliAnimatedImageVisualDesiredSize(void)
 
   {
     std::stringstream out;
-    out << GL_TEXTURE_2D << ", " << 0u << ", " << desiredWidth << ", " << desiredHeight;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << resultWidth << ", " << resultHeight;
     DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
   }
 
@@ -1987,8 +1991,8 @@ int UtcDaliAnimatedImageVisualDesiredSize(void)
 
   {
     std::stringstream out;
-    out << GL_TEXTURE_2D << ", " << 0u << ", " << desiredWidth << ", " << desiredHeight;
-    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str())); // The size should not be changed
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << resultWidth << ", " << resultHeight;
+    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str())); // The size should be changed for keeping the aspect ratio.
   }
 
   END_TEST;

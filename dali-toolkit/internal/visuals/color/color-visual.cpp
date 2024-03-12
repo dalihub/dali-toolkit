@@ -74,7 +74,7 @@ ColorVisualPtr ColorVisual::New(VisualFactoryCache& factoryCache, const Property
 }
 
 ColorVisual::ColorVisual(VisualFactoryCache& factoryCache)
-: Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::COLOR),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::COLOR),
   mBlurRadius(0.0f),
   mAlwaysUsingBlurRadius(false)
 {

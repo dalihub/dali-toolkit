@@ -1194,7 +1194,7 @@ void ResourceReadySignal(Control control)
 
 void OnResourceReadySignalSVG(Control control)
 {
-  // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+  // Check whether Image Visual transforms on ImageView::OnRelayout()
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
   Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
   Property::Map               resultMap;
@@ -1205,8 +1205,8 @@ void OnResourceReadySignalSVG(Control control)
   Property::Map* retMap = transformValue->GetMap();
   DALI_TEST_CHECK(retMap);
 
-  // Fitting mode should not be applied at this point
-  DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::SIZE)->Get<Vector2>(), Vector2::ZERO, TEST_LOCATION);
+  // Fitting mode is applied at this point. because we do FittingMode in control
+  DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::SIZE)->Get<Vector2>(), Vector2::ONE, TEST_LOCATION);
 }
 
 int UtcDaliImageViewCheckResourceReady(void)

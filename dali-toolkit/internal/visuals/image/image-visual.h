@@ -131,7 +131,7 @@ public:
                             const VisualUrl&          imageUrl,
                             const Property::Map&      properties,
                             ImageDimensions           size         = ImageDimensions(),
-                            FittingMode::Type         fittingMode  = FittingMode::DEFAULT,
+                            FittingMode::Type         fittingMode  = FittingMode::VISUAL_FITTING,
                             Dali::SamplingMode::Type  samplingMode = SamplingMode::BOX_THEN_LINEAR);
 
   /**
@@ -151,7 +151,7 @@ public:
                             ImageVisualShaderFactory& shaderFactory,
                             const VisualUrl&          imageUrl,
                             ImageDimensions           size         = ImageDimensions(),
-                            FittingMode::Type         fittingMode  = FittingMode::DEFAULT,
+                            FittingMode::Type         fittingMode  = FittingMode::VISUAL_FITTING,
                             Dali::SamplingMode::Type  samplingMode = SamplingMode::BOX_THEN_LINEAR);
 
 public: // from Visual

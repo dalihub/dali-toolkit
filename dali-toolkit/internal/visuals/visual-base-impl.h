@@ -264,6 +264,42 @@ public:
   FittingMode GetFittingMode() const;
 
   /**
+   * @brief Set the fitting mode for the visual
+   *
+   * @param[in] fittingMode The fitting mode for the visual
+   */
+  void SetFittingMode(FittingMode fittingMode);
+
+  /**
+   * @brief Query whether the fittingMode is ignored.
+   *
+   * @return Returns true if the fittingMode is ignored, false otherwise.
+   */
+  bool IsIgnoreFittingMode() const;
+
+  /**
+   * @brief Query whether the pixel area is set by fitting mode.
+   */
+  bool IsPixelAreaSetForFittingMode() const;
+
+  /**
+   * @brief Set the pixel area of the visual.
+   *
+   * @param[in] pixelArea The pixel area of the visual.
+   */
+  void SetPixelAreaForFittingMode(const Vector4& pixelArea);
+
+  /**
+   * @brief Checks whether the trasformMap is being used in the FittingMode situation.
+   */
+  bool IsTransformMapSetForFittingMode() const;
+
+  /**
+   * @brief Set the flag to use transformMap in the FittingMode.
+   */
+  void SetTransformMapUsageForFittingMode(bool used);
+
+  /**
    * @brief Get the actual Visual Object.
    * @return The actual visual object
    * @note Should be overridden by deriving controls if they are acting as a proxy to other visual objects.

@@ -254,8 +254,11 @@ struct Base::Impl
   int                             mFlags;
   Toolkit::Visual::ResourceStatus mResourceStatus;
   const Toolkit::Visual::Type     mType;
-  bool                            mAlwaysUsingBorderline : 1;     ///< Whether we need the borderline in shader always.
-  bool                            mAlwaysUsingCornerRadius : 1;   ///< Whether we need the corner radius in shader always.
+  bool                            mAlwaysUsingBorderline : 1;        ///< Whether we need the borderline in shader always.
+  bool                            mAlwaysUsingCornerRadius : 1;      ///< Whether we need the corner radius in shader always.
+  bool                            mIgnoreFittingMode : 1;            ///< Whether we need to ignore fitting mode.
+  bool                            mPixelAreaSetByFittingMode : 1;    ///< Whether the pixel area is set for fitting mode.
+  bool                            mTransformMapSetForFittingMode :1; ///< Whether the transformMap is set for fitting mode.
 };
 
 } // namespace Visual

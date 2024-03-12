@@ -100,7 +100,7 @@ PrimitiveVisualPtr PrimitiveVisual::New(VisualFactoryCache& factoryCache, const 
 }
 
 PrimitiveVisual::PrimitiveVisual(VisualFactoryCache& factoryCache)
-: Visual::Base(factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO, Toolkit::Visual::PRIMITIVE),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::PRIMITIVE),
   mScaleDimensions(Vector3::ONE),
   mScaleTopRadius(DEFAULT_SCALE_TOP_RADIUS),
   mScaleBottomRadius(DEFAULT_SCALE_BOTTOM_RADIUS),

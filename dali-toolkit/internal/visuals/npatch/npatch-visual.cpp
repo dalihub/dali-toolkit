@@ -287,7 +287,7 @@ void NPatchVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 }
 
 NPatchVisual::NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory)
-: Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::N_PATCH),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::N_PATCH),
   mPlacementActor(),
   mLoader(factoryCache.GetNPatchLoader()),
   mImageVisualShaderFactory(shaderFactory),

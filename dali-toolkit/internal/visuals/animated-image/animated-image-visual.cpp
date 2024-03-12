@@ -226,7 +226,7 @@ void AnimatedImageVisual::CreateImageCache()
 }
 
 AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, ImageDimensions desiredSize)
-: Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::ANIMATED_IMAGE),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::ANIMATED_IMAGE),
   mFrameDelayTimer(),
   mPlacementActor(),
   mImageVisualShaderFactory(shaderFactory),
@@ -251,7 +251,7 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mActionStatus(DevelAnimatedImageVisual::Action::PLAY),
   mWrapModeU(WrapMode::DEFAULT),
   mWrapModeV(WrapMode::DEFAULT),
-  mFittingMode(FittingMode::SCALE_TO_FILL),
+  mFittingMode(FittingMode::VISUAL_FITTING),
   mSamplingMode(SamplingMode::BOX_THEN_LINEAR),
   mStopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
   mStartFirstFrame(false),
@@ -276,6 +276,26 @@ void AnimatedImageVisual::GetNaturalSize(Vector2& naturalSize)
 {
   if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
   {
+    if(mImpl->mRenderer)
+    {
+      auto textureSet = mImpl->mRenderer.GetTextures();
+      if(textureSet && textureSet.GetTextureCount())
+      {
+        auto texture = textureSet.GetTexture(0);
+        if(texture)
+        {
+          Dali::Vector2 textureSize;
+          textureSize.x = texture.GetWidth();
+          textureSize.y = texture.GetHeight();
+          if(textureSize != Vector2::ZERO)
+          {
+            naturalSize = textureSize;
+            return;
+          }
+        }
+      }
+    }
+
     naturalSize.x = mDesiredSize.GetWidth();
     naturalSize.y = mDesiredSize.GetHeight();
     return;

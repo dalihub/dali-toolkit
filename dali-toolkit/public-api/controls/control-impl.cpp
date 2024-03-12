@@ -37,6 +37,7 @@
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
@@ -601,12 +602,16 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
 
 void Control::OnSizeSet(const Vector3& targetSize)
 {
+  Vector2 size(targetSize);
   Toolkit::Visual::Base visual = mImpl->GetVisual(Toolkit::Control::Property::BACKGROUND);
   if(visual)
   {
-    Vector2 size(targetSize);
     visual.SetTransformAndSize(Property::Map(), size); // Send an empty map as we do not want to modify the visual's set transform
   }
+
+  // Apply FittingMode here
+  mImpl->mSize = size;
+  mImpl->RegisterProcessorOnce();
 }
 
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
@@ -654,11 +659,8 @@ void Control::OnRelayout(const Vector2& size, RelayoutContainer& container)
     container.Add(child, newChildSize);
   }
 
-  Toolkit::Visual::Base visual = mImpl->GetVisual(Toolkit::Control::Property::BACKGROUND);
-  if(visual)
-  {
-    visual.SetTransformAndSize(Property::Map(), size); // Send an empty map as we do not want to modify the visual's set transform
-  }
+  // Apply FittingMode here
+  mImpl->ApplyFittingMode(size);
 }
 
 void Control::OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
