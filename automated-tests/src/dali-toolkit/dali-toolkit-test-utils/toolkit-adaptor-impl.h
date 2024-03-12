@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ADAPTOR_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,10 +37,8 @@ using WindowContainer = std::vector<Window>;
 
 namespace Internal
 {
-
 namespace Adaptor
 {
-
 class GraphicsInterface;
 class SceneHolder;
 
@@ -50,7 +48,6 @@ class SceneHolder;
 
 namespace Integration
 {
-
 class GlAbstraction;
 
 } // namespace Integration
@@ -59,7 +56,6 @@ namespace Internal
 {
 namespace Adaptor
 {
-
 class Adaptor
 {
 public:
@@ -68,45 +64,57 @@ public:
   Adaptor();
   ~Adaptor();
 
-  void Start( Dali::Window window );
+  void Start(Dali::Window window);
+  void Stop();
 
-  bool AddIdle( CallbackBase* callback, bool hasReturnValue );
-  void RemoveIdle( CallbackBase* callback );
+  bool AddIdle(CallbackBase* callback, bool hasReturnValue);
+  void RemoveIdle(CallbackBase* callback);
   void RunIdles();
 
-  static Integration::Scene GetScene( Dali::Window window );
+  static Integration::Scene GetScene(Dali::Window window);
 
   Dali::RenderSurfaceInterface& GetSurface();
-  Dali::WindowContainer GetWindows();
-  Dali::SceneHolderList GetSceneHolders();
+  Dali::WindowContainer         GetWindows();
+  Dali::SceneHolderList         GetSceneHolders();
 
-  Dali::Internal::Adaptor::SceneHolder* GetWindow( Dali::Actor& actor );
-  void AddWindow( Internal::Adaptor::SceneHolder* window );
-  void RemoveWindow( Internal::Adaptor::SceneHolder* window );
+  Dali::Internal::Adaptor::SceneHolder* GetWindow(Dali::Actor& actor);
+  void                                  AddWindow(Internal::Adaptor::SceneHolder* window);
+  void                                  RemoveWindow(Internal::Adaptor::SceneHolder* window);
 
-  void RegisterProcessor( Integration::Processor& processor, bool postProcessor = false);
-  void UnregisterProcessor( Integration::Processor& processor, bool postProcessor = false);
+  void RegisterProcessor(Integration::Processor& processor, bool postProcessor = false);
+  void UnregisterProcessor(Integration::Processor& processor, bool postProcessor = false);
 
-  void SetApplication( Dali::TestApplication& testApplication );
+  void SetApplication(Dali::TestApplication& testApplication);
 
-  Dali::Adaptor::AdaptorSignalType& ResizedSignal();
-  Dali::Adaptor::AdaptorSignalType& LanguageChangedSignal();
+  bool IsStopped() const
+  {
+    return mStopped;
+  }
+
+  Dali::Adaptor::AdaptorSignalType&       ResizedSignal();
+  Dali::Adaptor::AdaptorSignalType&       LanguageChangedSignal();
   Dali::Adaptor::WindowCreatedSignalType& WindowCreatedSignal();
   Dali::Adaptor::LocaleChangedSignalType& LocaleChangedSignal();
 
-  static Adaptor& GetImpl( Dali::Adaptor& adaptor ) { return *adaptor.mImpl; }
-  static const Adaptor& GetImpl( const Dali::Adaptor& adaptor ) { return *adaptor.mImpl; }
+  static Adaptor& GetImpl(Dali::Adaptor& adaptor)
+  {
+    return *adaptor.mImpl;
+  }
+  static const Adaptor& GetImpl(const Dali::Adaptor& adaptor)
+  {
+    return *adaptor.mImpl;
+  }
 
 private:
-
-  Vector<CallbackBase*> mCallbacks;
-  Vector<CallbackBase*> mReturnCallbacks;
+  Vector<CallbackBase*>                        mCallbacks;
+  Vector<CallbackBase*>                        mReturnCallbacks;
   std::vector<Internal::Adaptor::SceneHolder*> mWindows;
-  Dali::Adaptor::AdaptorSignalType mResizedSignal;
-  Dali::Adaptor::AdaptorSignalType mLanguageChangedSignal;
-  Dali::Adaptor::WindowCreatedSignalType mWindowCreatedSignal;
-  Dali::Adaptor::LocaleChangedSignalType mLocaleChangedSignal;
-  TestApplication* mTestApplication;
+  Dali::Adaptor::AdaptorSignalType             mResizedSignal;
+  Dali::Adaptor::AdaptorSignalType             mLanguageChangedSignal;
+  Dali::Adaptor::WindowCreatedSignalType       mWindowCreatedSignal;
+  Dali::Adaptor::LocaleChangedSignalType       mLocaleChangedSignal;
+  TestApplication*                             mTestApplication;
+  bool                                         mStopped{false};
 };
 
 } // namespace Adaptor
