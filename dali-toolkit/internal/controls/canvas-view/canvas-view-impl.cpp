@@ -46,6 +46,7 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN(Toolkit::CanvasView, Toolkit::Control, Create);
 DALI_PROPERTY_REGISTRATION(Toolkit, CanvasView, "viewBox", VECTOR2, VIEW_BOX)
+DALI_PROPERTY_REGISTRATION(Toolkit, CanvasView, "synchronousLoading", BOOLEAN, SYNCHRONOUS_LOADING)
 DALI_TYPE_REGISTRATION_END()
 } // anonymous namespace
 
@@ -56,7 +57,8 @@ CanvasView::CanvasView(const Vector2& viewBox)
   mCanvasRenderer(CanvasRenderer::New(viewBox)),
   mTexture(),
   mTextureSet(),
-  mSize(viewBox)
+  mSize(viewBox),
+  mIsSynchronous(true)
 {
 }
 
@@ -136,6 +138,15 @@ void CanvasView::SetProperty(BaseObject* object, Property::Index propertyIndex, 
         }
         break;
       }
+      case Toolkit::CanvasView::Property::SYNCHRONOUS_LOADING:
+      {
+        bool isSynchronous;
+        if(value.Get(isSynchronous))
+        {
+          canvasViewImpl.SetSynchronous(isSynchronous);
+        }
+        break;
+      }
     }
   }
 }
@@ -157,6 +168,11 @@ Property::Value CanvasView::GetProperty(BaseObject* object, Property::Index prop
         value = canvasViewImpl.GetViewBox();
         break;
       }
+      case Toolkit::CanvasView::Property::SYNCHRONOUS_LOADING:
+      {
+        value = canvasViewImpl.IsSynchronous();
+        break;
+      }
     }
   }
   return value;
@@ -176,7 +192,16 @@ void CanvasView::AddRasterizationTask()
 
   if(mCanvasRenderer.Commit())
   {
-    AsyncTaskManager::Get().AddTask(mRasterizingTask);
+    if(mIsSynchronous)
+    {
+      mRasterizingTask->Process();
+      ApplyRasterizedImage(mRasterizingTask);
+      mRasterizingTask.Reset(); // We don't need it anymore.
+    }
+    else
+    {
+      AsyncTaskManager::Get().AddTask(mRasterizingTask);
+    }
   }
 }
 
@@ -208,7 +233,7 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
   mRasterizingTask.Reset(); // We don't need it anymore
 
   //If there are accumulated changes to CanvasRenderer during Rasterize, Rasterize once again.
-  if(mCanvasRenderer && mCanvasRenderer.IsCanvasChanged())
+  if(!mIsSynchronous && mCanvasRenderer && mCanvasRenderer.IsCanvasChanged())
   {
     AddRasterizationTask();
   }
@@ -258,6 +283,17 @@ const Vector2& CanvasView::GetViewBox()
   }
   return Vector2::ZERO;
 }
+
+void CanvasView::SetSynchronous(const bool isSynchronous)
+{
+  mIsSynchronous = isSynchronous;
+}
+
+const bool CanvasView::IsSynchronous()
+{
+  return mIsSynchronous;
+}
+
 } // namespace Internal
 } // namespace Toolkit
 } // namespace Dali
