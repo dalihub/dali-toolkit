@@ -83,6 +83,12 @@ public:
        * @details Name "viewBox", type Property::VECTOR2.
        */
       VIEW_BOX = PROPERTY_START_INDEX,
+
+      /**
+       * @brief Whether to load the canvas synchronously.
+       * @details Name "synchronousLoading", type Property::BOOLEAN.
+       */
+      SYNCHRONOUS_LOADING,
     };
   };
 public:

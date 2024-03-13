@@ -120,6 +120,20 @@ private: // From Control
   const Vector2& GetViewBox();
 
   /**
+   * @brief Set to load the canvas synchronously.
+   *
+   * @param isSynchronous The synchronous
+   */
+  void SetSynchronous(const bool isSynchronous);
+
+  /**
+   * @brief Whether to load the canvas synchronously.
+   *
+   * @return Returns true if synchronously.
+   */
+  const bool IsSynchronous();
+
+  /**
    * @bried Rasterize the canvas, and add it to the view.
    *
    * @param[in] size The target size of the canvas view rasterization.
@@ -158,6 +172,7 @@ private:
   TextureSet                       mTextureSet;
   Vector2                          mSize;
   CanvasRendererRasterizingTaskPtr mRasterizingTask;
+  bool                             mIsSynchronous;
 };
 
 } // namespace Internal
