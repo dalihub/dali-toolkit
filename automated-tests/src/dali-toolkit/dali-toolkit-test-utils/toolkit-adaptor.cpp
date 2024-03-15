@@ -79,6 +79,18 @@ void Adaptor::Start(Dali::Window window)
   AddWindow(&GetImplementation(window));
 }
 
+void Adaptor::Stop()
+{
+  if(mTestApplication)
+  {
+    Integration::Core& core = mTestApplication->GetCore();
+    tet_printf("Adaptor::UnregisterProcessors\n");
+    core.UnregisterProcessors();
+  }
+
+  mStopped = true;
+}
+
 Integration::Scene Adaptor::GetScene(Dali::Window window)
 {
   return window.GetScene();
@@ -266,6 +278,7 @@ void Adaptor::Resume()
 
 void Adaptor::Stop()
 {
+  mImpl->Stop();
 }
 
 bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
@@ -342,7 +355,7 @@ Adaptor& Adaptor::Get()
 
 bool Adaptor::IsAvailable()
 {
-  return Internal::Adaptor::gAdaptor;
+  return Internal::Adaptor::gAdaptor && (!Internal::Adaptor::Adaptor::GetImpl(*Internal::Adaptor::gAdaptor).IsStopped());
 }
 
 void Adaptor::NotifySceneCreated()
