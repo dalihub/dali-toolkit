@@ -353,20 +353,21 @@ void SuperBlurView::SetProperty(BaseObject* object, Property::Index propertyInde
 
     if(propertyIndex == Toolkit::SuperBlurView::Property::IMAGE_URL)
     {
-      value.Get(superBlurViewImpl.mUrl);
-
-      PixelData pixels = SyncImageLoader::Load(superBlurViewImpl.mUrl);
-
-      if(pixels)
+      if(DALI_LIKELY(value.Get(superBlurViewImpl.mUrl)))
       {
-        Texture texture = Texture::New(TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight());
-        texture.Upload(pixels, 0, 0, 0, 0, pixels.GetWidth(), pixels.GetHeight());
+        PixelData pixels = SyncImageLoader::Load(superBlurViewImpl.mUrl);
 
-        superBlurViewImpl.SetTexture(texture);
-      }
-      else
-      {
-        DALI_LOG_ERROR("Cannot create image from property value\n");
+        if(pixels)
+        {
+          Texture texture = Texture::New(TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight());
+          texture.Upload(pixels, 0, 0, 0, 0, pixels.GetWidth(), pixels.GetHeight());
+
+          superBlurViewImpl.SetTexture(texture);
+        }
+        else
+        {
+          DALI_LOG_ERROR("Cannot create image from property value\n");
+        }
       }
     }
   }

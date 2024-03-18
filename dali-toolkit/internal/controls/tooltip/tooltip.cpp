@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -289,8 +289,10 @@ void Tooltip::SetBackground(const Property::Value& value)
 
   if(type == Property::STRING)
   {
-    value.Get(mBackgroundImage);
-    mBackgroundBorder.Set(0, 0, 0, 0);
+    if(DALI_LIKELY(value.Get(mBackgroundImage)))
+    {
+      mBackgroundBorder.Set(0, 0, 0, 0);
+    }
   }
   else if(type == Property::MAP)
   {
