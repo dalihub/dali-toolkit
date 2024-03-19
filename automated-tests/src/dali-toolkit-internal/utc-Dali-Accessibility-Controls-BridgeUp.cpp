@@ -461,6 +461,10 @@ int utcDaliAccessibilityControlAttributes(void)
   auto ptr                  = Dali::Accessibility::Accessible::Get(check_box_button);
   auto attribute_map_bridge = TestGetAttributes(ptr->GetAddress());
   auto counter              = 0u;
+
+  // Refresh the attributes since ControlAccessible::GetAttributes() might have added something
+  attributes     = check_box_button.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
+  attributes_map = attributes.GetMap();
   for(auto i = 0u; i < attributes_map->Count(); ++i)
     if((attributes_map->GetValue(i)).GetType() != Property::NONE)
       ++counter;
