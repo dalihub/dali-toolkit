@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/public-api/object/type-info.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
@@ -208,36 +209,49 @@ Dali::Accessibility::States ControlAccessible::GetStates()
 
 Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
 {
-  std::unordered_map<std::string, std::string> attributeMap;
-  auto                                         control   = Dali::Toolkit::Control::DownCast(Self());
-  auto                                         attribute = control.GetProperty(Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
-  auto                                         map       = attribute.GetMap();
+  static const std::string automationIdKey = "automationId";
+  static const std::string classKey        = "class";
 
-  if(map)
+  Accessibility::Attributes result;
+  Toolkit::Control          control        = Toolkit::Control::DownCast(Self());
+  Dali::Property::Value     property       = control.GetProperty(DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
+  Dali::Property::Map*      attributeMap   = property.GetMap();
+  std::size_t               attributeCount = attributeMap ? attributeMap->Count() : 0U;
+
+  for(std::size_t i = 0; i < attributeCount; i++)
   {
-    auto mapSize = map->Count();
+    Dali::Property::Key mapKey = attributeMap->GetKeyAt(i);
+    std::string         mapValue;
 
-    for(unsigned int i = 0; i < mapSize; i++)
+    if(mapKey.type == Dali::Property::Key::STRING && attributeMap->GetValue(i).Get(mapValue))
     {
-      auto mapKey = map->GetKeyAt(i);
-      if(mapKey.type == Dali::Property::Key::STRING)
-      {
-        std::string mapValue;
-        if(map->GetValue(i).Get(mapValue))
-        {
-          attributeMap.emplace(std::move(mapKey.stringKey), std::move(mapValue));
-        }
-      }
+      result.emplace(std::move(mapKey.stringKey), std::move(mapValue));
     }
   }
 
-  auto automationId = control.GetProperty<std::string>(Dali::Toolkit::DevelControl::Property::AUTOMATION_ID);
+  auto automationId = control.GetProperty<std::string>(DevelControl::Property::AUTOMATION_ID);
   if(!automationId.empty())
   {
-    attributeMap.emplace("automationId", std::move(automationId));
+    result.emplace(automationIdKey, std::move(automationId));
   }
 
-  return attributeMap;
+  // Add "class" if not present already
+  if(result.find(classKey) == result.end())
+  {
+    Dali::TypeInfo typeInfo;
+    Self().GetTypeInfo(typeInfo);
+    if(typeInfo)
+    {
+      const std::string& typeName = typeInfo.GetName();
+
+      result.emplace(classKey, typeName);
+
+      // Save the 'typeName' so we don't have to calculate it again
+      DevelControl::AppendAccessibilityAttribute(control, classKey, typeName);
+    }
+  }
+
+  return result;
 }
 
 bool ControlAccessible::IsHidden() const

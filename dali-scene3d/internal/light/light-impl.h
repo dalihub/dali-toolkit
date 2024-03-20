@@ -57,61 +57,6 @@ public:
    */
   static Scene3D::Light New();
 
-  /**
-   * @copydoc Scene3D::Light::Enable()
-   */
-  void Enable(bool enable);
-
-  /**
-   * @copydoc Scene3D::Light::IsEnabled()
-   */
-  bool IsEnabled() const;
-
-  /**
-   * @copydoc Scene3D::Light::EnableShadow()
-   */
-  void EnableShadow(bool enable);
-
-  /**
-   * @copydoc Scene3D::Light::IsShadowEnabled()
-   */
-  bool IsShadowEnabled() const;
-
-  /**
-   * @copydoc Scene3D::Light::GetCamera()
-   */
-  CameraActor GetCamera() const;
-
-  /**
-   * @copydoc Scene3D::Light::EnableShadowSoftFiltering()
-   */
-  void EnableShadowSoftFiltering(bool useSoftFiltering);
-
-  /**
-   * @copydoc Scene3D::Light::IsShadowSoftFilteringEnabled()
-   */
-  bool IsShadowSoftFilteringEnabled() const;
-
-  /**
-   * @copydoc Scene3D::Light::SetShadowIntensity()
-   */
-  void SetShadowIntensity(float shadowIntensity);
-
-  /**
-   * @copydoc Scene3D::Light::GetShadowIntensity()
-   */
-  float GetShadowIntensity() const;
-
-  /**
-   * @copydoc Scene3D::Light::SetShadowBias()
-   */
-  void SetShadowBias(float shadowBias);
-
-  /**
-   * @copydoc Scene3D::Light::GetShadowBias()
-   */
-  float GetShadowBias() const;
-
 protected:
   /**
    * @brief Virtual destructor.
@@ -119,7 +64,13 @@ protected:
    */
   virtual ~Light();
 
-protected: // From CustomActorImpl
+public: // From Internal::Control.
+  /**
+   * @copydoc Dali::Toolkit::Internal::Control::OnInitialize()
+   */
+  void OnInitialize() override;
+
+protected: // From CustomActorImpl. Note that it will make we can ignore many codes what Internal::Control using now.
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    * @note If overridden, then an up-call to Light::OnSceneConnection MUST be made at the end.
@@ -209,12 +160,63 @@ protected:
    */
   Light();
 
-  /**
-   * @brief Second phase initialization.
-   */
-  void Initialize();
-
 public: // Public Method
+  /**
+   * @copydoc Scene3D::Light::Enable()
+   */
+  void Enable(bool enable);
+
+  /**
+   * @copydoc Scene3D::Light::IsEnabled()
+   */
+  bool IsEnabled() const;
+
+  /**
+   * @copydoc Scene3D::Light::EnableShadow()
+   */
+  void EnableShadow(bool enable);
+
+  /**
+   * @copydoc Scene3D::Light::IsShadowEnabled()
+   */
+  bool IsShadowEnabled() const;
+
+  /**
+   * @copydoc Scene3D::Light::GetCamera()
+   */
+  CameraActor GetCamera() const;
+
+  /**
+   * @copydoc Scene3D::Light::EnableShadowSoftFiltering()
+   */
+  void EnableShadowSoftFiltering(bool useSoftFiltering);
+
+  /**
+   * @copydoc Scene3D::Light::IsShadowSoftFilteringEnabled()
+   */
+  bool IsShadowSoftFilteringEnabled() const;
+
+  /**
+   * @copydoc Scene3D::Light::SetShadowIntensity()
+   */
+  void SetShadowIntensity(float shadowIntensity);
+
+  /**
+   * @copydoc Scene3D::Light::GetShadowIntensity()
+   */
+  float GetShadowIntensity() const;
+
+  /**
+   * @copydoc Scene3D::Light::SetShadowBias()
+   */
+  void SetShadowBias(float shadowBias);
+
+  /**
+   * @copydoc Scene3D::Light::GetShadowBias()
+   */
+  float GetShadowBias() const;
+
+public: // Public Static Method
   /**
    * @copydoc Scene3D::Light::GetMaximumEnabledLightCount()
    */

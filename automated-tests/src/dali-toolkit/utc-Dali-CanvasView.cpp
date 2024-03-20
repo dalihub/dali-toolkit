@@ -402,6 +402,33 @@ int UtcDaliCanvasViewSetSizeAndAddDrawable(void)
   application.SendNotification();
   application.Render();
 
+  END_TEST;
+}
+
+int UtcDaliCanvasViewSetSizeAndAddDrawableAsync(void)
+{
+  ToolkitTestApplication application;
+
+  CanvasView canvasView = CanvasView::New(Vector2(100, 100));
+  DALI_TEST_CHECK(canvasView);
+
+  application.GetScene().Add(canvasView);
+
+  canvasView.SetProperty(Toolkit::CanvasView::Property::SYNCHRONOUS_LOADING, false);
+  canvasView.SetProperty(Actor::Property::SIZE, Vector2(300, 300));
+
+  application.SendNotification();
+  application.Render();
+
+  Dali::CanvasRenderer::Shape shape = Dali::CanvasRenderer::Shape::New();
+
+  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+
+  canvasView.AddDrawable(shape);
+
+  application.SendNotification();
+  application.Render();
+
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   application.SendNotification();
@@ -445,6 +472,34 @@ int UtcDaliCanvasViewViewBoxN(void)
 
   Vector2 viewBox = canvasView.GetProperty(Toolkit::CanvasView::Property::VIEW_BOX).Get<Vector2>();
   DALI_TEST_EQUALS(viewBox, Vector2(-999, -999), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCanvasViewSychronousLoading(void)
+{
+  ToolkitTestApplication application;
+
+  CanvasView canvasView = CanvasView::New(Vector2(300, 300));
+  DALI_TEST_CHECK(canvasView);
+
+  application.GetScene().Add(canvasView);
+
+  canvasView.SetProperty(Actor::Property::SIZE, Vector2(300, 300));
+
+  application.SendNotification();
+  application.Render();
+
+  bool isSynchronous = canvasView.GetProperty(Toolkit::CanvasView::Property::SYNCHRONOUS_LOADING).Get<bool>();
+  DALI_TEST_EQUALS(isSynchronous, true, TEST_LOCATION);
+
+  canvasView.SetProperty(Toolkit::CanvasView::Property::SYNCHRONOUS_LOADING, false);
+
+  application.SendNotification();
+  application.Render();
+
+  isSynchronous = canvasView.GetProperty(Toolkit::CanvasView::Property::SYNCHRONOUS_LOADING).Get<bool>();
+  DALI_TEST_EQUALS(isSynchronous, false, TEST_LOCATION);
 
   END_TEST;
 }

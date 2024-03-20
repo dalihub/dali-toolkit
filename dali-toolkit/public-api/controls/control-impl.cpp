@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,10 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/math/math-utils.h>
-#include <dali/public-api/object/type-info.h>
-#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <cstring> // for strcmp
 #include <limits>
 #include <stack>
-#include <typeinfo>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/dali-toolkit.h>
@@ -442,14 +439,6 @@ void Control::Initialize()
   if(mImpl->mFlags & REQUIRES_KEYBOARD_NAVIGATION_SUPPORT)
   {
     SetKeyboardNavigationSupport(true);
-  }
-
-  Dali::TypeInfo type;
-  Self().GetTypeInfo(type);
-  if(type)
-  {
-    const auto& typeName = type.GetName();
-    DevelControl::AppendAccessibilityAttribute(Toolkit::Control::DownCast(Self()), "class", typeName);
   }
 }
 

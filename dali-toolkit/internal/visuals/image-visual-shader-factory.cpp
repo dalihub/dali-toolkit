@@ -86,6 +86,9 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, Ima
      (mFragmentShaderNeedChange == ImageVisualShaderFeature::ChangeFragmentShader::UNDECIDED ||
       mFragmentShaderNeedChange == ImageVisualShaderFeature::ChangeFragmentShader::NEED_CHANGE))
   {
+    DALI_ASSERT_DEBUG((static_cast<int>(shaderType) >= static_cast<int>(VisualFactoryCache::IMAGE_SHADER)) &&
+                      (static_cast<int>(shaderType) <= static_cast<int>(VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP)) &&
+                      "Do not support native image shader for given feature!!");
     shaderType = static_cast<VisualFactoryCache::ShaderType>(static_cast<int>(shaderType) + NATIVE_SHADER_TYPE_OFFSET);
   }
 

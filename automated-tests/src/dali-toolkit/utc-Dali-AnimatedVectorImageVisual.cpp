@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <toolkit-timer.h>
 #include <toolkit-vector-animation-renderer.h>
 #include "dummy-control.h"
+#include "test-native-image-source.h"
 
 #include <dali-toolkit/dali-toolkit.h>
 
@@ -2499,6 +2500,50 @@ int UtcDaliAnimatedVectorImageVisualFlushAction(void)
   DALI_TEST_EQUALS(value->Get<int>(), changedEndFrame2, TEST_LOCATION);
 
   dummyControl.Unparent();
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageNativeTextureChangeShader(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageNativeTextureChangeShader");
+
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base  visual  = factory.CreateVisual(TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions());
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  // Make we use native texture now.
+  Test::VectorAnimationRenderer::UseNativeImageTexture(true);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - resource ready
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  Renderer        renderer = actor.GetRendererAt(0);
+  Shader          shader   = renderer.GetShader();
+  Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
+  Property::Map*  map      = value.GetMap();
+  DALI_TEST_CHECK(map);
+
+  std::string      resultFragmentShader, resultVertexShader;
+  Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
+  fragment->Get(resultFragmentShader);
+  DALI_TEST_CHECK(resultFragmentShader.find(NativeImageSourceTest::GetCustomFragmentPrefix()) != std::string::npos);
+
+  // Reset to make we use normal texture again.
+  Test::VectorAnimationRenderer::UseNativeImageTexture(false);
 
   END_TEST;
 }
