@@ -54,7 +54,7 @@ public:
     TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const bool preMultiplied);
     TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const std::string& url, const bool preMultiplied);
     TextureInformation(const ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, const bool preMultiplied);
-    TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const uint32_t frameCount, const uint32_t interval);
+    TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const uint32_t frameCount, const uint32_t interval, const bool preMultiplied);
 
     TextureInformation();
 
