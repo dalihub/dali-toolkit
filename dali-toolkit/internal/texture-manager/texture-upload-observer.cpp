@@ -55,11 +55,11 @@ TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType r
 {
 }
 
-TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const uint32_t frameCount, const uint32_t interval)
+TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const uint32_t frameCount, const uint32_t interval, const bool preMultiplied)
 : returnType(returnType),
   textureId(textureId),
   textureSet(textureSet),
-  preMultiplied(false),
+  preMultiplied(preMultiplied),
   pixelBuffer(),
   url(),
   frameCount(frameCount),
