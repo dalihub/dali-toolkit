@@ -1441,7 +1441,7 @@ void TextureManager::EmitLoadComplete(TextureUploadObserver* observer, TextureMa
     TextureSet textureSet = GetTextureSet(textureInfo);
     if(textureInfo.isAnimatedImageFormat)
     {
-      observer->LoadComplete(success, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::ANIMATED_IMAGE_TEXTURE, textureInfo.textureId, textureSet, textureInfo.frameCount, textureInfo.frameInterval));
+      observer->LoadComplete(success, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::ANIMATED_IMAGE_TEXTURE, textureInfo.textureId, textureSet, textureInfo.frameCount, textureInfo.frameInterval, textureInfo.preMultiplied));
     }
     else
     {
