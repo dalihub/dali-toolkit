@@ -49,6 +49,10 @@ constexpr float FULL_OPACITY = 1.0f;
 constexpr float LOW_OPACITY  = 0.2f;
 constexpr float TRANSITION_EFFECT_SPEED = 0.3f;
 
+constexpr int PLACEHOLDER_DEPTH_INDEX = -2;
+constexpr int PREVIOUS_VISUAL_DEPTH_INDEX  = -1;
+constexpr int CURRENT_VISUAL_DEPTH_INDEX = 0;
+
 BaseHandle Create()
 {
   return Toolkit::ImageView::New();
@@ -74,7 +78,8 @@ ImageView::ImageView(ControlBehaviour additionalBehaviour)
   mImageVisualPaddingSetByTransform(false),
   mImageViewPixelAreaSetByFittingMode(false),
   mTransitionEffect(false),
-  mNeedLazyFittingMode(false)
+  mNeedLazyFittingMode(false),
+  mImageReplaced(false)
 {
 }
 
@@ -117,7 +122,8 @@ void ImageView::SetImage(const Property::Map& map)
       {
         if(mTransitionAnimation.GetState() == Animation::PLAYING)
         {
-          mTransitionAnimation.Stop();
+          // Hide placeholder
+          HidePlaceholderImage();
           ClearTransitionAnimation();
         }
       }
@@ -133,6 +139,8 @@ void ImageView::SetImage(const Property::Map& map)
   // Comparing a property map is too expensive so just creating a new visual
   mPropertyMap = map;
   mUrl.clear();
+
+  mImageReplaced = true;
 
   // keep alpha for transition effect
   if(mTransitionEffect)
@@ -175,7 +183,6 @@ void ImageView::SetImage(const Property::Map& map)
     // Trigger a size negotiation request that may be needed when unregistering a visual.
     RelayoutRequest();
   }
-
   // Signal that a Relayout may be needed
 }
 
@@ -190,7 +197,7 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
       {
         if(mTransitionAnimation.GetState() == Animation::PLAYING)
         {
-          mTransitionAnimation.Stop();
+          HidePlaceholderImage();
           ClearTransitionAnimation();
         }
       }
@@ -203,10 +210,14 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
     mPreviousVisual = mVisual;
   }
 
+  
+
   // Don't bother comparing if we had a visual previously, just drop old visual and create new one
   mUrl       = url;
   mImageSize = size;
   mPropertyMap.Clear();
+
+  mImageReplaced = true;
 
   if(!mVisual)
   {
@@ -238,7 +249,6 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
     // Trigger a size negotiation request that may be needed when unregistering a visual.
     RelayoutRequest();
   }
-
   // Signal that a Relayout may be needed
 }
 
@@ -390,6 +400,12 @@ void ImageView::OnRelayout(const Vector2& size, RelayoutContainer& container)
     {
       visual.SetTransformAndSize(Property::Map(), size);
     }
+
+    if(!mTransitionEffect)
+    {
+      // we don't need placeholder anymore because visual is replaced. so hide placeholder.
+      HidePlaceholderImage();
+    }
   }
 }
 
@@ -445,15 +461,6 @@ void ImageView::OnResourceReady(Toolkit::Control control)
       // when placeholder is disabled or ready placeholder and image, we need to transition effect
       TransitionImageWithEffect();
     }
-    else
-    {
-      ClearTransitionAnimation();
-    }
-  }
-  else
-  {
-    // we don't need placeholder anymore because visual is replaced. so hide placeholder.
-    HidePlaceholderImage();
   }
 
   // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.
@@ -635,6 +642,7 @@ void ImageView::CreatePlaceholderImage()
   if(mPlaceholderVisual)
   {
     mPlaceholderVisual.SetName("placeholder");
+    mPlaceholderVisual.SetDepthIndex(mPlaceholderVisual.GetDepthIndex() + PLACEHOLDER_DEPTH_INDEX);
   }
   else
   {
@@ -671,6 +679,23 @@ void ImageView::TransitionImageWithEffect()
 
   if(handle)
   {
+    if(!mImageReplaced)
+    {
+      // If the image is not replaced, the transition effect is not required.
+      return;
+    }
+
+    if(mTransitionAnimation)
+    {
+      ClearTransitionAnimation();
+    }
+
+    // Control visual's depth for transition effect
+    if(mPreviousVisual)
+    {
+      mPreviousVisual.SetDepthIndex(mPreviousVisual.GetDepthIndex() + PREVIOUS_VISUAL_DEPTH_INDEX);
+    }
+
     mTransitionAnimation = Animation::New(TRANSITION_EFFECT_SPEED);
     mTransitionAnimation.SetEndAction(Animation::EndAction::DISCARD);
     float destinationAlpha = (mTransitionTargetAlpha > LOW_OPACITY) ? mTransitionTargetAlpha : LOW_OPACITY;
@@ -683,6 +708,7 @@ void ImageView::TransitionImageWithEffect()
       fadeinKeyFrames.Add(0.0f, LOW_OPACITY);
       fadeinKeyFrames.Add(1.0f, destinationAlpha);
       mTransitionAnimation.AnimateBetween(DevelControl::GetVisualProperty(handle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::OPACITY), fadeinKeyFrames,  AlphaFunction::EASE_IN_OUT);
+      imageVisual.SetDepthIndex(imageVisual.GetDepthIndex() + CURRENT_VISUAL_DEPTH_INDEX);
     }
 
     // Play transition animation
@@ -693,9 +719,6 @@ void ImageView::TransitionImageWithEffect()
 
 void ImageView::ClearTransitionAnimation()
 {
-  // Hide placeholder
-  HidePlaceholderImage();
-
   // Clear PreviousVisual
   if(mPreviousVisual)
   {
@@ -708,8 +731,16 @@ void ImageView::ClearTransitionAnimation()
 
   if(mTransitionAnimation)
   {
+    if(mTransitionAnimation.GetState() == Animation::PLAYING)
+    {
+      mTransitionAnimation.Stop();
+    }
     mTransitionAnimation.FinishedSignal().Disconnect(this, &ImageView::OnTransitionAnimationFinishedCallback);
     mTransitionAnimation.Clear();
+    mTransitionAnimation.Reset();
+
+    // After transition effect is cleared, we don't need transition effect until image is replaced.
+    mImageReplaced = false;
   }
 }
 
@@ -871,6 +902,8 @@ Property::Value ImageView::GetProperty(BaseObject* object, Property::Index prope
 
 void ImageView::OnTransitionAnimationFinishedCallback(Animation& animation)
 {
+  // Hide placeholder
+  HidePlaceholderImage();
   ClearTransitionAnimation();
 }
 
