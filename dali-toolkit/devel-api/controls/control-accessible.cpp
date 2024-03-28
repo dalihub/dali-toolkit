@@ -233,38 +233,23 @@ Dali::Accessibility::States ControlAccessible::GetStates()
   return CalculateStates();
 }
 
-Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
+void ControlAccessible::UpdateAttributes(Accessibility::Attributes& attributes) const
 {
-  std::unordered_map<std::string, std::string> attributeMap;
-  auto control = Dali::Toolkit::Control::DownCast(Self());
-  auto attribute = control.GetProperty(Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
-  auto map = attribute.GetMap();
+  static const std::string automationIdKey = "automationId";
 
-  if(map)
+  ActorAccessible::UpdateAttributes(attributes);
+
+  Toolkit::Control control      = Toolkit::Control::DownCast(Self());
+  auto             automationId = control.GetProperty<std::string>(DevelControl::Property::AUTOMATION_ID);
+
+  if(automationId.empty())
   {
-    auto mapSize = map->Count();
-
-    for(unsigned int i = 0; i < mapSize; i++)
-    {
-      auto mapKey = map->GetKeyAt(i);
-      if(mapKey.type == Dali::Property::Key::STRING)
-      {
-        std::string mapValue;
-        if(map->GetValue(i).Get(mapValue))
-        {
-          attributeMap.emplace(std::move(mapKey.stringKey), std::move(mapValue));
-        }
-      }
-    }
+    attributes.erase(automationIdKey);
   }
-
-  auto automationId = control.GetProperty<std::string>(Dali::Toolkit::DevelControl::Property::AUTOMATION_ID);
-  if(!automationId.empty())
+  else
   {
-    attributeMap.emplace("automationId", std::move(automationId));
+    attributes.insert_or_assign(automationIdKey, std::move(automationId));
   }
-
-  return attributeMap;
 }
 
 bool ControlAccessible::IsHidden() const

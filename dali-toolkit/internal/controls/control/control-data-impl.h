@@ -354,43 +354,6 @@ public:
   bool FilterKeyEvent(const KeyEvent& event);
 
   /**
-   * @brief Adds accessibility attribute
-   * @param[in] key Attribute name to set
-   * @param[in] value Attribute value to set
-   *
-   * Attribute is added if not existed previously or updated
-   * if existed.
-   */
-  void AppendAccessibilityAttribute(const std::string& key, const std::string value);
-
-  /**
-   * @brief Removes accessibility attribute
-   * @param[in] key Attribute name to remove
-   *
-   * Function does nothing if attribute doesn't exist.
-   */
-  void RemoveAccessibilityAttribute(const std::string& key);
-
-  /**
-   * @brief Removes all accessibility attributes
-   */
-  void ClearAccessibilityAttributes();
-
-  /**
-   * @brief Sets reading info type attributes
-   * @param[in] types info type attributes to set
-   *
-   * This function sets, which part of object will be read out
-   * by screen-reader.
-   */
-  void SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types);
-
-  /**
-   * @brief Gets currently active reading info type attributes
-   */
-  Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType() const;
-
-  /**
    * @copydoc DevelControl::VisualEventSignal()
    */
   DevelControl::VisualEventSignalType& VisualEventSignal();
@@ -527,7 +490,6 @@ public:
   Control&            mControlImpl;
   DevelControl::State mState;
   std::string         mSubStateName;
-  Property::Map       mAccessibilityAttributes;
 
   int mLeftFocusableActorId;             ///< Actor ID of Left focusable control.
   int mRightFocusableActorId;            ///< Actor ID of Right focusable control.

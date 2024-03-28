@@ -719,9 +719,9 @@ protected:
 
   protected:
     /**
-     * @copydoc Dali::Accessibility::Accessible::GetAttributes()
+     * @copydoc Dali::Accessibility::Accessible::UpdateAttributes()
      */
-    Dali::Accessibility::Attributes GetAttributes() const override;
+    void UpdateAttributes(Dali::Accessibility::Attributes& attributes) const override;
 
     /**
      * @copydoc Dali::Accessibility::ActorAccessible::DoGetChildren()

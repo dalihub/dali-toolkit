@@ -183,12 +183,6 @@ enum
   ACCESSIBILITY_HIGHLIGHTABLE,
 
   /**
-   * @brief Set of accessibility attributes describing object in accessibility hierarchy
-   * @details Name "accessibilityAttributes", type Property::MAP
-   */
-  ACCESSIBILITY_ATTRIBUTES,
-
-  /**
    * @brief Whether a Control and its descendants can emit key signals.
    * @details Name "dispatchKeyEvents", type Property::BOOLEAN
    * @note If a control's dispatchKeyEvents is set to false, then it's children will not emit a key event signal either.
@@ -554,7 +548,7 @@ DALI_TOOLKIT_API void ClearAccessibilityAttributes(Toolkit::Control control);
  * @param control object to append attribute to
  * @param types Reading information types
  */
-DALI_TOOLKIT_API void SetAccessibilityReadingInfoType(Toolkit::Control control, const Dali::Accessibility::ReadingInfoTypes types);
+DALI_TOOLKIT_API void SetAccessibilityReadingInfoType(Toolkit::Control control, Dali::Accessibility::ReadingInfoTypes types);
 
 /**
  * @brief The method returns reading information of an accessible object

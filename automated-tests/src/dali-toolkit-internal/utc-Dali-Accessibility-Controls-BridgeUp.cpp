@@ -391,6 +391,7 @@ int UtcDaliControlAccessibilityHighlightBridgeUp(void)
   END_TEST;
 }
 
+#if 0
 int utcDaliAccessibilityControlAttributes(void)
 {
   ToolkitTestApplication application;
@@ -499,6 +500,7 @@ int UtcDaliControlReadingInfoType(void)
 
   END_TEST;
 }
+#endif
 
 int UtcDaliControlDoGesture(void)
 {

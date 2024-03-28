@@ -49,16 +49,6 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
-namespace
-{
-const char* READING_INFO_TYPE_NAME           = "name";
-const char* READING_INFO_TYPE_ROLE           = "role";
-const char* READING_INFO_TYPE_DESCRIPTION    = "description";
-const char* READING_INFO_TYPE_STATE          = "state";
-const char* READING_INFO_TYPE_ATTRIBUTE_NAME = "reading_info_type";
-const char* READING_INFO_TYPE_SEPARATOR      = "|";
-} // namespace
-
 namespace Dali
 {
 namespace Toolkit
@@ -480,7 +470,6 @@ const PropertyRegistration Control::Impl::PROPERTY_17(typeRegistration, "accessi
 const PropertyRegistration Control::Impl::PROPERTY_18(typeRegistration, "accessibilityTranslationDomain", Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN, Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_19(typeRegistration, "accessibilityRole",              Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE,               Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_20(typeRegistration, "accessibilityHighlightable",     Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE,      Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_21(typeRegistration, "accessibilityAttributes",        Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES,         Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_22(typeRegistration, "dispatchKeyEvents",              Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS,              Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_23(typeRegistration, "accessibilityHidden",            Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN,             Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_24(typeRegistration, "clockwiseFocusableActorId",      Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID,     Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
@@ -1114,19 +1103,6 @@ void Control::Impl::DoActionExtension(Dali::Property::Index visualIndex, Dali::P
   }
 }
 
-void Control::Impl::AppendAccessibilityAttribute(const std::string& key, const std::string value)
-{
-  Property::Value* checkedValue = mAccessibilityAttributes.Find(key);
-  if(checkedValue)
-  {
-    mAccessibilityAttributes[key] = Property::Value(value);
-  }
-  else
-  {
-    mAccessibilityAttributes.Insert(key, value);
-  }
-}
-
 void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
 {
   Toolkit::Control control = Toolkit::Control::DownCast(BaseHandle(object));
@@ -1359,16 +1335,6 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         break;
       }
 
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
-      {
-        const Property::Map* map = value.GetMap();
-        if(map && !map->Empty())
-        {
-          controlImpl.mImpl->mAccessibilityAttributes = *map;
-        }
-        break;
-      }
-
       case Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS:
       {
         bool dispatch;
@@ -1569,12 +1535,6 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
         break;
       }
 
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
-      {
-        value = controlImpl.mImpl->mAccessibilityAttributes;
-        break;
-      }
-
       case Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS:
       {
         value = controlImpl.mImpl->mDispatchKeyEvents;
@@ -1608,99 +1568,6 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
   }
 
   return value;
-}
-
-void Control::Impl::RemoveAccessibilityAttribute(const std::string& key)
-{
-  Property::Value* value = mAccessibilityAttributes.Find(key);
-  if(value)
-  {
-    mAccessibilityAttributes[key] = Property::Value();
-  }
-}
-
-void Control::Impl::ClearAccessibilityAttributes()
-{
-  mAccessibilityAttributes.Clear();
-}
-
-void Control::Impl::SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types)
-{
-  std::string value{};
-  if(types[Dali::Accessibility::ReadingInfoType::NAME])
-  {
-    value += READING_INFO_TYPE_NAME;
-  }
-  if(types[Dali::Accessibility::ReadingInfoType::ROLE])
-  {
-    if(!value.empty())
-    {
-      value += READING_INFO_TYPE_SEPARATOR;
-    }
-    value += READING_INFO_TYPE_ROLE;
-  }
-  if(types[Dali::Accessibility::ReadingInfoType::DESCRIPTION])
-  {
-    if(!value.empty())
-    {
-      value += READING_INFO_TYPE_SEPARATOR;
-    }
-    value += READING_INFO_TYPE_DESCRIPTION;
-  }
-  if(types[Dali::Accessibility::ReadingInfoType::STATE])
-  {
-    if(!value.empty())
-    {
-      value += READING_INFO_TYPE_SEPARATOR;
-    }
-    value += READING_INFO_TYPE_STATE;
-  }
-  AppendAccessibilityAttribute(READING_INFO_TYPE_ATTRIBUTE_NAME, value);
-}
-
-Dali::Accessibility::ReadingInfoTypes Control::Impl::GetAccessibilityReadingInfoType() const
-{
-  std::string value{};
-  auto        place = mAccessibilityAttributes.Find(READING_INFO_TYPE_ATTRIBUTE_NAME);
-  if(place)
-  {
-    place->Get(value);
-  }
-  else
-  {
-    Dali::Accessibility::ReadingInfoTypes types;
-    types[Dali::Accessibility::ReadingInfoType::NAME]        = true;
-    types[Dali::Accessibility::ReadingInfoType::ROLE]        = true;
-    types[Dali::Accessibility::ReadingInfoType::DESCRIPTION] = true;
-    types[Dali::Accessibility::ReadingInfoType::STATE]       = true;
-    return types;
-  }
-
-  if(value.empty())
-  {
-    return {};
-  }
-
-  Dali::Accessibility::ReadingInfoTypes types;
-
-  if(value.find(READING_INFO_TYPE_NAME) != std::string::npos)
-  {
-    types[Dali::Accessibility::ReadingInfoType::NAME] = true;
-  }
-  if(value.find(READING_INFO_TYPE_ROLE) != std::string::npos)
-  {
-    types[Dali::Accessibility::ReadingInfoType::ROLE] = true;
-  }
-  if(value.find(READING_INFO_TYPE_DESCRIPTION) != std::string::npos)
-  {
-    types[Dali::Accessibility::ReadingInfoType::DESCRIPTION] = true;
-  }
-  if(value.find(READING_INFO_TYPE_STATE) != std::string::npos)
-  {
-    types[Dali::Accessibility::ReadingInfoType::STATE] = true;
-  }
-
-  return types;
 }
 
 void Control::Impl::CopyInstancedProperties(RegisteredVisualContainer& visuals, Dictionary<Property::Map>& instancedProperties)

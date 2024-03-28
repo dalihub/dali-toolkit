@@ -69,6 +69,11 @@ protected:
    */
   bool IsShowing();
 
+  /**
+   * @copydoc Dali::Accessibility::Accessible::UpdateAttributes()
+   */
+  void UpdateAttributes(Dali::Accessibility::Attributes& attributes) const override;
+
 public:
   ControlAccessible(Dali::Actor self);
 
@@ -106,11 +111,6 @@ public:
    * @copydoc Dali::Accessibility::Accessible::GetStates()
    */
   Dali::Accessibility::States GetStates() override;
-
-  /**
-   * @copydoc Dali::Accessibility::Accessible::GetAttributes()
-   */
-  Dali::Accessibility::Attributes GetAttributes() const override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::IsHidden()

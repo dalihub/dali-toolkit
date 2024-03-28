@@ -1358,16 +1358,20 @@ WebView::WebViewAccessible::WebViewAccessible(Dali::Actor self, Dali::WebEngine&
   }
 }
 
-Dali::Accessibility::Attributes WebView::WebViewAccessible::GetAttributes() const
+void WebView::WebViewAccessible::UpdateAttributes(Dali::Accessibility::Attributes& attributes) const
 {
-  auto attributes = DevelControl::ControlAccessible::GetAttributes();
+  static const std::string childBusKey = "child_bus";
+
+  ControlAccessible::UpdateAttributes(attributes);
 
   if(mRemoteChild.GetAddress())
   {
-    attributes.insert_or_assign("child_bus", mRemoteChild.GetAddress().GetBus());
+    attributes.insert_or_assign(childBusKey, mRemoteChild.GetAddress().GetBus());
   }
-
-  return attributes;
+  else
+  {
+    attributes.erase(childBusKey);
+  }
 }
 
 void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::Accessible*>& children)
