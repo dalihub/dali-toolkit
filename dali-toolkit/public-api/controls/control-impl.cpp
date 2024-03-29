@@ -308,12 +308,6 @@ bool Control::IsKeyboardFocusGroup()
   return Toolkit::KeyboardFocusManager::Get().IsFocusGroup(Self());
 }
 
-void Control::AccessibilityActivate()
-{
-  // Inform deriving classes
-  OnAccessibilityActivated();
-}
-
 void Control::KeyboardEnter()
 {
   // Inform deriving classes
