@@ -53,7 +53,7 @@ namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
 
-const int CUSTOM_PROPERTY_COUNT(2); // uTextColorAnimatable, uHasMultipleTextColors
+const int CUSTOM_PROPERTY_COUNT(3); // uTextColorAnimatable, uHasMultipleTextColors, requireRender
 
 /**
  * Return Property index for the given string key
@@ -137,7 +137,7 @@ void TextColorConstraint(Vector4& current, const PropertyInputContainer& inputs)
 void OpacityConstraint(float& current, const PropertyInputContainer& inputs)
 {
   // Make zero if the alpha value of text color is zero to skip rendering text
-  if(EqualsZero(inputs[0]->GetVector4().a))
+  if(EqualsZero(inputs[0]->GetVector4().a) && !inputs[1]->GetBoolean())
   {
     current = 0.0f;
   }
@@ -259,7 +259,9 @@ TextVisual::TextVisual(VisualFactoryCache& factoryCache, TextVisualShaderFactory
   mHasMultipleTextColorsIndex(Property::INVALID_INDEX),
   mAnimatableTextColorPropertyIndex(Property::INVALID_INDEX),
   mTextColorAnimatableIndex(Property::INVALID_INDEX),
-  mRendererUpdateNeeded(false)
+  mTextRequireRenderPropertyIndex(Property::INVALID_INDEX),
+  mRendererUpdateNeeded(false),
+  mTextRequireRender(false)
 {
   // Enable the pre-multiplied alpha to improve the text quality
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -276,6 +278,7 @@ void TextVisual::OnInitialize()
 
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
+  mTextRequireRenderPropertyIndex = mImpl->mRenderer.RegisterUniqueProperty("requireRender", mTextRequireRender);
   mHasMultipleTextColorsIndex = mImpl->mRenderer.RegisterUniqueProperty("uHasMultipleTextColors", static_cast<float>(false));
 }
 
@@ -340,6 +343,7 @@ void TextVisual::DoSetOnScene(Actor& actor)
       // VisualRenderer::Property::OPACITY uses same animatable property internally.
       mOpacityConstraint = Constraint::New<float>(mImpl->mRenderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint);
       mOpacityConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
+      mOpacityConstraint.AddSource(Source(mImpl->mRenderer, mTextRequireRenderPropertyIndex));
     }
     mOpacityConstraint.Apply();
   }
@@ -503,9 +507,12 @@ void TextVisual::UpdateRenderer()
   const bool isWidthRelative  = fabsf(mImpl->mTransform.mOffsetSizeMode.z) < Math::MACHINE_EPSILON_1000;
   const bool isHeightRelative = fabsf(mImpl->mTransform.mOffsetSizeMode.w) < Math::MACHINE_EPSILON_1000;
 
+  const float controlWidth = mImpl->mControlSize.width;
+  const float controlHeight = mImpl->mControlSize.height;
+
   // Round the size and offset to avoid pixel alignement issues.
-  relayoutSize.width  = floorf(0.5f + (isWidthRelative ? mImpl->mControlSize.width * mImpl->mTransform.mSize.x : mImpl->mTransform.mSize.width));
-  relayoutSize.height = floorf(0.5f + (isHeightRelative ? mImpl->mControlSize.height * mImpl->mTransform.mSize.y : mImpl->mTransform.mSize.height));
+  relayoutSize.width  = floorf(0.5f + (isWidthRelative ? controlWidth * mImpl->mTransform.mSize.x : mImpl->mTransform.mSize.width));
+  relayoutSize.height = floorf(0.5f + (isHeightRelative ? controlHeight * mImpl->mTransform.mSize.y : mImpl->mTransform.mSize.height));
 
   auto textLengthUtf32 = mController->GetNumberOfCharacters();
 
@@ -566,16 +573,28 @@ void TextVisual::UpdateRenderer()
         shadowEnabled = true;
       }
 
-      const bool outlineEnabled             = (mController->GetTextModel()->GetOutlineWidth() > Math::MACHINE_EPSILON_1);
-      const bool backgroundEnabled          = mController->GetTextModel()->IsBackgroundEnabled();
-      const bool markupOrSpannedText        = mController->IsMarkupProcessorEnabled() || mController->GetTextModel()->IsSpannedTextPlaced();
-      const bool markupUnderlineEnabled     = markupOrSpannedText && mController->GetTextModel()->IsMarkupUnderlineSet();
-      const bool markupStrikethroughEnabled = markupOrSpannedText && mController->GetTextModel()->IsMarkupStrikethroughSet();
-      const bool underlineEnabled           = mController->GetTextModel()->IsUnderlineEnabled() || markupUnderlineEnabled;
-      const bool strikethroughEnabled       = mController->GetTextModel()->IsStrikethroughEnabled() || markupStrikethroughEnabled;
-      const bool backgroundMarkupSet        = mController->GetTextModel()->IsMarkupBackgroundColorSet();
-      const bool styleEnabled               = (shadowEnabled || outlineEnabled || backgroundEnabled || markupOrSpannedText || backgroundMarkupSet);
-      const bool isOverlayStyle             = underlineEnabled || strikethroughEnabled;
+      const bool outlineEnabled               = (mController->GetTextModel()->GetOutlineWidth() > Math::MACHINE_EPSILON_1);
+      const bool backgroundEnabled            = mController->GetTextModel()->IsBackgroundEnabled();
+      const bool markupOrSpannedText          = mController->IsMarkupProcessorEnabled() || mController->GetTextModel()->IsSpannedTextPlaced();
+      const bool markupUnderlineEnabled       = markupOrSpannedText && mController->GetTextModel()->IsMarkupUnderlineSet();
+      const bool markupStrikethroughEnabled   = markupOrSpannedText && mController->GetTextModel()->IsMarkupStrikethroughSet();
+      const bool underlineEnabled             = mController->GetTextModel()->IsUnderlineEnabled() || markupUnderlineEnabled;
+      const bool strikethroughEnabled         = mController->GetTextModel()->IsStrikethroughEnabled() || markupStrikethroughEnabled;
+      const bool backgroundMarkupSet          = mController->GetTextModel()->IsMarkupBackgroundColorSet();
+      const bool cutoutEnabled                = mController->IsTextCutout();
+      const bool backgroundWithCutoutEnabled  = mController->GetTextModel()->IsBackgroundWithCutoutEnabled();
+      const bool styleEnabled                 = (shadowEnabled || outlineEnabled || backgroundEnabled || markupOrSpannedText || backgroundMarkupSet || cutoutEnabled || backgroundWithCutoutEnabled);
+      const bool isOverlayStyle               = underlineEnabled || strikethroughEnabled;
+
+      // if background with cutout is enabled, This text visual must render the entire control size.
+      if(backgroundWithCutoutEnabled)
+      {
+        relayoutSize = Vector2(controlWidth, controlHeight);
+        mImpl->mTransform.mSize.width = controlWidth;
+        mImpl->mTransform.mSize.height = controlHeight;
+        mImpl->mTransform.mOffset.x = 0;
+        mImpl->mTransform.mOffset.y = 0;
+      }
 
       AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
 
@@ -790,6 +809,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
           // VisualRenderer::Property::OPACITY uses same animatable property internally.
           Constraint opacityConstraint = Constraint::New<float>(renderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint);
           opacityConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
+          opacityConstraint.AddSource(Source(mImpl->mRenderer, mTextRequireRenderPropertyIndex));
           opacityConstraint.Apply();
         }
       }
@@ -799,6 +819,8 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
 
 TextureSet TextVisual::GetTextTexture(const Vector2& size)
 {
+  const bool cutoutEnabled = mController->IsTextCutout();
+
   // Filter mode needs to be set to linear to produce better quality while scaling.
   Sampler sampler = Sampler::New();
   sampler.SetFilterMode(FilterMode::LINEAR, FilterMode::LINEAR);
@@ -806,22 +828,48 @@ TextureSet TextVisual::GetTextTexture(const Vector2& size)
   TextureSet textureSet = TextureSet::New();
 
   // Create RGBA texture if the text contains emojis or multiple text colors, otherwise L8 texture
-  Pixel::Format textPixelFormat = (mTextShaderFeatureCache.IsEnabledEmoji() || mTextShaderFeatureCache.IsEnabledMultiColor()) ? Pixel::RGBA8888 : Pixel::L8;
+  Pixel::Format textPixelFormat = (mTextShaderFeatureCache.IsEnabledEmoji() || mTextShaderFeatureCache.IsEnabledMultiColor() || cutoutEnabled) ? Pixel::RGBA8888 : Pixel::L8;
 
   // Check the text direction
   Toolkit::DevelText::TextDirection::Type textDirection = mController->GetTextDirection();
-
-  // Create a texture for the text without any styles
-  PixelData data = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_NO_STYLES, false, textPixelFormat);
-
   uint32_t textureSetIndex = 0u;
-  AddTexture(textureSet, data, sampler, textureSetIndex);
-  ++textureSetIndex;
+  // Create a texture for the text without any styles
+
+  Devel::PixelBuffer cutoutData;
+  float cutoutAlpha = mController->GetTextModel()->GetDefaultColor().a;
+  if(cutoutEnabled)
+  {
+    cutoutData = mTypesetter->RenderWithPixelBuffer(size, textDirection, Text::Typesetter::RENDER_NO_STYLES, false, textPixelFormat);
+
+    // Make transparent buffer.
+    // If the cutout is enabled, a separate texture is not used for the text.
+    Devel::PixelBuffer buffer = mTypesetter->CreateFullBackgroundBuffer(1, 1, Vector4(0.f, 0.f ,0.f ,0.f));
+    PixelData data = Devel::PixelBuffer::Convert(buffer);
+    AddTexture(textureSet, data, sampler, textureSetIndex);
+    ++textureSetIndex;
+  }
+  else
+  {
+    PixelData data = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_NO_STYLES, false, textPixelFormat);
+    AddTexture(textureSet, data, sampler, textureSetIndex);
+    ++textureSetIndex;
+  }
+
 
   if(mTextShaderFeatureCache.IsEnabledStyle())
   {
     // Create RGBA texture for all the text styles that render in the background (without the text itself)
-    PixelData styleData = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888);
+    PixelData styleData;
+
+    if(cutoutEnabled && cutoutData)
+    {
+      styleData = mTypesetter->RenderWithCutout(size, textDirection, cutoutData, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888, cutoutAlpha);
+    }
+    else
+    {
+      styleData = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888);
+    }
+
     AddTexture(textureSet, styleData, sampler, textureSetIndex);
     ++textureSetIndex;
   }
@@ -852,6 +900,12 @@ Shader TextVisual::GetTextShader(VisualFactoryCache& factoryCache, const TextVis
 
   Shader shader = mTextVisualShaderFactory.GetShader(factoryCache, mTextShaderFeatureCache);
   return shader;
+}
+
+void TextVisual::SetRequireRender(bool requireRender)
+{
+  mTextRequireRender = requireRender;
+  mImpl->mRenderer.SetProperty(mTextRequireRenderPropertyIndex, mTextRequireRender);
 }
 
 } // namespace Internal

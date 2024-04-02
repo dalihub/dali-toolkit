@@ -288,6 +288,11 @@ public:
    */
   const Vector<CharacterIndex>& GetGlyphsToCharacters() const override;
 
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::IsCutoutEnabled()
+   */
+  bool IsCutoutEnabled() const override;
+
 private:
   // Undefined
   View(const View& handle);

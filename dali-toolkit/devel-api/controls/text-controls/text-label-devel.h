@@ -230,6 +230,12 @@ enum Type
    * @details Name "removeBackInset", type Property::BOOLEAN.
    */
   REMOVE_BACK_INSET,
+
+  /**
+   * @brief Whether to make the elements transparent, such as background or outline behind the text.
+   * @details Name "cutout", type Property::BOOLEAN.
+   */
+  CUTOUT,
 };
 
 } // namespace Property
