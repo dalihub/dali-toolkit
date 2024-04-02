@@ -116,6 +116,16 @@ public:
   };
 
   /**
+   * @brief Set the text to be always rendered
+   * @param[in] visual The text visual.
+   * @param[in] requireRender Whether to text always rendered.
+   */
+  static void SetRequireRender(Toolkit::Visual::Base visual, bool requireRender)
+  {
+    GetVisualObject(visual).SetRequireRender(requireRender);
+  };
+
+  /**
    * @brief Instantly updates the renderer
    * @param[in] visual The text visual.
    */
@@ -293,6 +303,12 @@ private:
   Shader GetTextShader(VisualFactoryCache& factoryCache, const TextVisualShaderFeature::FeatureBuilder& featureBuilder);
 
   /**
+   * @brief Set the text to be always rendered
+   * @param[in] requireRender Whether to text always rendered.
+   */
+  void SetRequireRender(bool requireRender);
+
+  /**
    * @brief Retrieve the TextVisual object.
    * @param[in] visual A handle to the TextVisual
    * @return The TextVisual object
@@ -318,7 +334,9 @@ private:
   Property::Index   mHasMultipleTextColorsIndex;       ///< The index of uHasMultipleTextColors proeprty.
   Property::Index   mAnimatableTextColorPropertyIndex; ///< The index of animatable text color property registered by the control.
   Property::Index   mTextColorAnimatableIndex;         ///< The index of uTextColorAnimatable property.
+  Property::Index   mTextRequireRenderPropertyIndex;   ///< The index of requireRender property.
   bool              mRendererUpdateNeeded : 1;         ///< The flag to indicate whether the renderer needs to be updated.
+  bool              mTextRequireRender : 1;            ///< The flag to indicate whether the text needs to be rendered.
   RendererContainer mRendererList;
 };
 

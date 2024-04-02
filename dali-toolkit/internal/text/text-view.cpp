@@ -1024,4 +1024,13 @@ const Vector<CharacterIndex>& View::GetGlyphsToCharacters() const
   return mImpl->mVisualModel->GetGlyphsToCharacters();
 }
 
+bool View::IsCutoutEnabled() const
+{
+  if(mImpl->mVisualModel)
+  {
+    return mImpl->mVisualModel->IsCutoutEnabled();
+  }
+  return false;
+}
+
 } // namespace Dali::Toolkit::Text

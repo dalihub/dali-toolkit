@@ -110,6 +110,61 @@ public:
    */
   PixelData Render(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888);
 
+  /**
+   * @brief After the Render, use the pixel information of the given cutoutBuffer to make the part where the pixel is drawn transparent.
+   *
+   * @param[in] size The renderer size.
+   * @param[in] textDirection The direction of the text.
+   * @param[in] cutoutBuffer The buffer to use pixel information to cutout.
+   * @param[in] behaviour The behaviour of how to render the text (i.e. whether to render the text only or the styles only or both).
+   * @param[in] ignoreHorizontalAlignment Whether to ignore the horizontal alignment (i.e. always render as if HORIZONTAL_ALIGN_BEGIN).
+   * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
+   * @param[in] originAlpha The original alpha of text.
+   *
+   * @return A pixel data with the text rendered.
+   */
+  PixelData RenderWithCutout(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, Devel::PixelBuffer cutoutBuffer, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888, float originAlpha = 1.f);
+
+  /**
+   * @brief Renders the text, return as Devel::PixelBuffer.
+   *
+   * This function is used to obtain the PixelBuffer required for cutout.
+   *
+   * @param[in] size The renderer size.
+   * @param[in] textDirection The direction of the text.
+   * @param[in] cutoutBuffer The buffer to use pixel information to cutout.
+   * @param[in] behaviour The behaviour of how to render the text (i.e. whether to render the text only or the styles only or both).
+   * @param[in] ignoreHorizontalAlignment Whether to ignore the horizontal alignment (i.e. always render as if HORIZONTAL_ALIGN_BEGIN).
+   * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
+   *
+   * @return A pixel data with the text rendered.
+   */
+  Devel::PixelBuffer RenderWithPixelBuffer(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888);
+
+  /**
+   * @brief Create & draw the image buffer of single background color.
+   *
+   * @param[in] bufferWidth The width of the image buffer.
+   * @param[in] bufferHeight The height of the image buffer.
+   * @param[in] backgroundColor The backgroundColor of image buffer.
+   *
+   * @return An image buffer with the text.
+   */
+  Devel::PixelBuffer CreateFullBackgroundBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Vector4& backgroundColor);
+
+  /**
+   * @brief Set Mask for two pixel buffer.
+   *
+   * The alpha value of bottomPixelBuffer is decreased as the alpha value of topPixelBuffer is higher.
+   *
+   * @param[in, out] topPixelBuffer The top layer buffer.
+   * @param[in, out] bottomPixelBuffer The bottom layer buffer.
+   * @param[in] bufferWidth The width of the image buffer.
+   * @param[in] bufferHeight The height of the image buffer.
+   * @param[in] originAlpha The original alpha value of the text.
+   */
+  void SetMaskForImageBuffer(Devel::PixelBuffer& __restrict__ topPixelBuffer, Devel::PixelBuffer& __restrict__ bottomPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, float originAlpha);
+
 private:
   /**
    * @brief Private constructor.

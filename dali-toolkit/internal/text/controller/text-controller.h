@@ -1670,6 +1670,34 @@ public: // Default style & Input style
    */
   void SetVisualTransformOffset(Vector2 offset);
 
+  /**
+   * @brief Sets whether background color with cutout is enabled.
+   *
+   * @param[in] enable True if enabled.
+   */
+  void SetBackgroundWithCutoutEnabled(bool enable);
+
+  /**
+   * @brief Whether background color with cutout is enabled.
+   *
+   * @return True if enabled.
+   */
+  bool IsBackgroundWithCutoutEnabled() const;
+
+  /**
+   * @brief Sets whether background color with cutout.
+   *
+   * @param[in] color The color to set.
+   */
+  void SetBackgroundColorWithCutout(const Vector4& color);
+
+  /**
+   * @brief Retrieves background color with cutout.
+   *
+   * @return The color.
+   */
+  const Vector4 GetBackgroundColorWithCutout() const;
+
 public: // Queries & retrieves.
   /**
    * @brief Return the layout engine.
@@ -1844,6 +1872,18 @@ public: // Queries & retrieves.
    * @param[in] remove The value of removeBackInset for the text
    */
   void SetRemoveBackInset(bool remove);
+
+  /**
+   * @brief Retrieves cutout value to model
+   * @return The value of cutout for the text
+   */
+  bool IsTextCutout() const;
+
+  /**
+   * @brief Sets cutout value to model
+   * @param[in] cutout The value of cutout for the text
+   */
+  void SetTextCutout(bool cutout);
 
   /**
    * @brief Sets SetMatchLayoutDirection value to model

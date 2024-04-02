@@ -82,6 +82,7 @@ const char* const PROPERTY_NAME_ANCHOR_CLICKED_COLOR = "anchorClickedColor";
 
 const char* const PROPERTY_NAME_REMOVE_FRONT_INSET    = "removeFrontInset";
 const char* const PROPERTY_NAME_REMOVE_BACK_INSET     = "removeBackInset";
+const char* const PROPERTY_NAME_REMOVE_CUTOUT         = "cutout";
 
 const std::string  DEFAULT_FONT_DIR("/resources/fonts");
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
@@ -365,6 +366,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ANCHOR_CLICKED_COLOR) == DevelTextLabel::Property::ANCHOR_CLICKED_COLOR);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_REMOVE_FRONT_INSET) == DevelTextLabel::Property::REMOVE_FRONT_INSET);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_REMOVE_BACK_INSET) == DevelTextLabel::Property::REMOVE_BACK_INSET);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_REMOVE_CUTOUT) == DevelTextLabel::Property::CUTOUT);
 
   END_TEST;
 }
@@ -1037,6 +1039,14 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::REMOVE_BACK_INSET));
   label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, false);
   DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::REMOVE_BACK_INSET));
+
+  application.SendNotification();
+  application.Render();
+
+  // Check cutout Property
+  DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::CUTOUT));
+  label.SetProperty(DevelTextLabel::Property::CUTOUT, true);
+  DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::CUTOUT));
 
   application.SendNotification();
   application.Render();
@@ -1794,6 +1804,16 @@ int UtcDaliToolkitTextLabelColorComponents(void)
 
   DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION); // Rendering should be skipped
 
+  label.SetProperty(DevelTextLabel::Property::CUTOUT, true);
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), true, TEST_LOCATION); // When cutout is enabled, should not be skipped
+
+  label.SetProperty(DevelTextLabel::Property::CUTOUT, false);
   label.SetProperty(TextLabel::Property::TEXT_COLOR, Color::RED);
 
   drawTrace.Reset();

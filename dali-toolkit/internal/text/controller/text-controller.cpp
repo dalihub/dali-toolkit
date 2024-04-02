@@ -324,6 +324,21 @@ void Controller::SetRemoveBackInset(bool remove)
   mImpl->mModel->mRemoveBackInset = remove;
 }
 
+bool Controller::IsTextCutout() const
+{
+  return mImpl->mTextCutout;
+}
+
+void Controller::SetTextCutout(bool cutout)
+{
+  if(cutout != mImpl->mTextCutout)
+  {
+    mImpl->mModel->mVisualModel->SetCutoutEnabled(cutout);
+    mImpl->mTextCutout = cutout;
+    mImpl->RequestRelayout();
+  }
+}
+
 void Controller::ChangedLayoutDirection()
 {
   mImpl->mIsLayoutDirectionChanged = true;
@@ -1528,6 +1543,28 @@ const float Controller::GetCharacterSpacing() const
 void Controller::SetVisualTransformOffset(Vector2 offset)
 {
   mImpl->mModel->mVisualTransformOffset = offset;
+}
+
+void Controller::SetBackgroundWithCutoutEnabled(bool cutout)
+{
+  mImpl->mModel->mVisualModel->SetBackgroundWithCutoutEnabled(cutout);
+  RequestRelayout();
+}
+
+bool Controller::IsBackgroundWithCutoutEnabled() const
+{
+  return mImpl->mModel->mVisualModel->IsBackgroundWithCutoutEnabled();
+}
+
+void Controller::SetBackgroundColorWithCutout(const Vector4& color)
+{
+  mImpl->mModel->mVisualModel->SetBackgroundColorWithCutout(color);
+  mImpl->RequestRelayout();
+}
+
+const Vector4 Controller::GetBackgroundColorWithCutout() const
+{
+  return mImpl->mModel->mVisualModel->GetBackgroundColorWithCutout();
 }
 
 Controller::UpdateTextType Controller::Relayout(const Size& size, Dali::LayoutDirection::Type layoutDirection)

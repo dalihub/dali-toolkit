@@ -508,6 +508,41 @@ public:
    * @return The reference for font description runs.
    */
   virtual const Vector<FontDescriptionRun>& GetFontDescriptionRuns() const = 0;
+
+  /**
+   * @brief Retrieves the remove front inset is enabled or not.
+   *
+   * @return boolean if it is enabled.
+   */
+  virtual bool IsRemoveFrontInset() const = 0;
+
+  /**
+   * @brief Retrieves the remove back inset is enabled or not.
+   *
+   * @return boolean if it is enabled.
+   */
+  virtual bool IsRemoveBackInset() const = 0;
+
+  /**
+   * @brief Retrieves the cutout is enabled or not.
+   *
+   * @return boolean if it is enabled.
+   */
+  virtual bool IsCutoutEnabled() const = 0;
+
+  /**
+   * @brief Retrieves the background with cutout is enabled or not.
+   *
+   * @return boolean if it is enabled.
+   */
+  virtual const bool IsBackgroundWithCutoutEnabled() const = 0;
+
+  /**
+   * @brief Retrieves the color of the background with cutout.
+   *
+   * @return The color of the background with cutout.
+   */
+  virtual const Vector4& GetBackgroundColorWithCutout() const = 0;
 };
 
 } // namespace Text

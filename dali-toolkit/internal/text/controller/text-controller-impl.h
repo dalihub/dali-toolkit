@@ -372,7 +372,8 @@ struct Controller::Impl
     mTextFitChanged(false),
     mTextFitArrayEnabled(false),
     mIsLayoutDirectionChanged(false),
-    mIsUserInteractionEnabled(true)
+    mIsUserInteractionEnabled(true),
+    mTextCutout(false)
   {
     mModel = Model::New();
 
@@ -1104,6 +1105,7 @@ public:
   bool  mTextFitArrayEnabled : 1;      ///< Whether the text's fit array is enabled.
   bool  mIsLayoutDirectionChanged : 1; ///< Whether the layout has changed.
   bool  mIsUserInteractionEnabled : 1; ///< Whether the user interaction is enabled.
+  bool  mTextCutout : 1;               ///< Whether the text cutout enabled.
 
 private:
   friend ControllerImplEventHandler;

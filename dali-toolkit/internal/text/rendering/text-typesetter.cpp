@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/math/math-utils.h>
@@ -584,6 +585,8 @@ Devel::PixelBuffer DrawGlyphsBackground(const ViewModel* model, Devel::PixelBuff
   const Vector2* const    positionBuffer               = model->GetLayout();
   const Vector4* const    backgroundColorsBuffer       = model->GetBackgroundColors();
   const ColorIndex* const backgroundColorIndicesBuffer = model->GetBackgroundColorIndices();
+  const bool              removeFrontInset             = model->IsRemoveFrontInset();
+  const bool              removeBackInset              = model->IsRemoveBackInset();
 
   const DevelText::VerticalLineAlignment::Type verLineAlign = model->GetVerticalLineAlignment();
 
@@ -653,14 +656,36 @@ Devel::PixelBuffer DrawGlyphsBackground(const ViewModel* model, Devel::PixelBuff
       }
 
       // Calculate the positions of leftmost and rightmost glyphs in the current line
-      if((position->x < left) || (backgroundColorIndex != prevBackgroundColorIndex))
+      if(removeFrontInset)
       {
-        left = position->x - glyphInfo->xBearing;
+        if((position->x < left) || (backgroundColorIndex != prevBackgroundColorIndex))
+        {
+          left = position->x;
+        }
+      }
+      else
+      {
+        const float originPositionLeft = position->x - glyphInfo->xBearing;
+        if((originPositionLeft < left) || (backgroundColorIndex != prevBackgroundColorIndex))
+        {
+          left = originPositionLeft;
+        }
       }
 
-      if(position->x + glyphInfo->width > right)
+      if(removeBackInset)
       {
-        right = position->x - glyphInfo->xBearing + glyphInfo->advance;
+        if(position->x + glyphInfo->width > right)
+        {
+          right = position->x - position->x + glyphInfo->width;
+        }
+      }
+      else
+      {
+        const float originPositionRight = position->x - glyphInfo->xBearing + glyphInfo->advance;
+        if(originPositionRight > right)
+        {
+          right = originPositionRight;
+        }
       }
 
       prevBackgroundColorIndex = backgroundColorIndex;
@@ -896,6 +921,24 @@ ViewModel* Typesetter::GetViewModel()
 
 PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat)
 {
+  Devel::PixelBuffer result = RenderWithPixelBuffer(size, textDirection, behaviour, ignoreHorizontalAlignment, pixelFormat);
+  PixelData pixelData = Devel::PixelBuffer::Convert(result);
+
+  return pixelData;
+}
+
+PixelData Typesetter::RenderWithCutout(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, Devel::PixelBuffer mask, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, float originAlpha)
+{
+  Devel::PixelBuffer result = RenderWithPixelBuffer(size, textDirection, behaviour, ignoreHorizontalAlignment, pixelFormat);
+  SetMaskForImageBuffer(mask, result, size.width, size.height, originAlpha);
+
+  PixelData pixelData = Devel::PixelBuffer::Convert(result);
+
+  return pixelData;
+}
+
+Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat)
+{
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_RENDERING_TYPESETTER");
   // @todo. This initial implementation for a TextLabel has only one visible page.
 
@@ -904,12 +947,10 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
 
   // Retrieves the layout size.
   const Size& layoutSize = mModel->GetLayoutSize();
-
   const int32_t outlineWidth = static_cast<int32_t>(mModel->GetOutlineWidth());
 
   // Set the offset for the horizontal alignment according to the text direction and outline width.
   int32_t penX = 0;
-
   switch(mModel->GetHorizontalAlignment())
   {
     case HorizontalAlignment::BEGIN:
@@ -931,7 +972,6 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
 
   // Set the offset for the vertical alignment.
   int32_t penY = 0u;
-
   switch(mModel->GetVerticalAlignment())
   {
     case VerticalAlignment::TOP:
@@ -1054,6 +1094,18 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
       CombineImageBuffer(imageBuffer, backgroundImageBuffer, bufferWidth, bufferHeight, true);
     }
 
+    // Generate the background_with_mask if enabled
+    const bool backgroundWithCutoutEnabled   = mModel->IsBackgroundWithCutoutEnabled();
+    if((backgroundWithCutoutEnabled) && RENDER_OVERLAY_STYLE != behaviour)
+    {
+      Devel::PixelBuffer backgroundImageBuffer;
+
+      backgroundImageBuffer = CreateFullBackgroundBuffer(bufferWidth, bufferHeight, mModel->GetBackgroundColorWithCutout());
+
+      // Combine the two buffers
+      CombineImageBuffer(imageBuffer, backgroundImageBuffer, bufferWidth, bufferHeight, true);
+    }
+
     if(RENDER_OVERLAY_STYLE == behaviour)
     {
       if(mModel->IsUnderlineEnabled())
@@ -1090,10 +1142,30 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
     }
   }
 
-  // Create the final PixelData for the combined image buffer
-  PixelData pixelData = Devel::PixelBuffer::Convert(imageBuffer);
+  return imageBuffer;
+}
 
-  return pixelData;
+Devel::PixelBuffer Typesetter::CreateFullBackgroundBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Vector4& backgroundColor)
+{
+  const uint32_t bufferSizeInt = bufferWidth * bufferHeight;
+  uint8_t backgroundColorAlpha = static_cast<uint8_t>(backgroundColor.a * 255.f);
+
+  Devel::PixelBuffer buffer = Devel::PixelBuffer::New(bufferWidth, bufferHeight, Pixel::RGBA8888);
+
+  uint32_t* bitmapBuffer = reinterpret_cast<uint32_t*>(buffer.GetBuffer());
+
+  uint32_t packedBackgroundColor       = 0u;
+  uint8_t* packedBackgroundColorBuffer = reinterpret_cast<uint8_t*>(&packedBackgroundColor);
+
+  // Write the color to the pixel buffer
+  *(packedBackgroundColorBuffer + 3u) = backgroundColorAlpha;
+  *(packedBackgroundColorBuffer + 2u) = static_cast<uint8_t>(backgroundColor.b * backgroundColorAlpha);
+  *(packedBackgroundColorBuffer + 1u) = static_cast<uint8_t>(backgroundColor.g * backgroundColorAlpha);
+  *(packedBackgroundColorBuffer)      = static_cast<uint8_t>(backgroundColor.r * backgroundColorAlpha);
+
+  std::fill(bitmapBuffer, bitmapBuffer + bufferSizeInt, packedBackgroundColor);
+
+  return buffer;
 }
 
 Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Typesetter::Style style, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset, const GlyphIndex fromGlyphIndex, const GlyphIndex toGlyphIndex)
@@ -1108,6 +1180,9 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t bufferWidth, con
   const GlyphInfo* __restrict__ hyphens                 = mModel->GetHyphens();
   const Length* __restrict__ hyphenIndices              = mModel->GetHyphenIndices();
   const Length hyphensCount                             = mModel->GetHyphensCount();
+  const bool removeFrontInset                           = mModel->IsRemoveFrontInset();
+  const bool removeBackInset                            = mModel->IsRemoveBackInset();
+  const bool cutoutEnabled                              = mModel->IsCutoutEnabled();
 
   // Elided text info. Indices according to elided text and Ellipsis position.
   const auto startIndexOfGlyphs              = mModel->GetStartIndexOfElidedGlyphs();
@@ -1336,14 +1411,36 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t bufferWidth, con
       }
 
       // Calculate the positions of leftmost and rightmost glyphs in the current line
-      if(position.x < lineExtentLeft)
+      if(removeFrontInset)
       {
-        lineExtentLeft = position.x;
+        if(position.x < lineExtentLeft)
+        {
+          lineExtentLeft = position.x;
+        }
+      }
+      else
+      {
+        const float originPositionLeft = position.x - glyphInfo->xBearing;
+        if(originPositionLeft < lineExtentLeft)
+        {
+          lineExtentLeft = originPositionLeft;
+        }
       }
 
-      if(position.x + glyphInfo->width > lineExtentRight)
+      if(removeBackInset)
       {
-        lineExtentRight = position.x + glyphInfo->width;
+        if(position.x + glyphInfo->width > lineExtentRight)
+        {
+          lineExtentRight = position.x + glyphInfo->width;
+        }
+      }
+      else
+      {
+        const float originPositionRight = position.x - glyphInfo->xBearing + glyphInfo->advance;
+        if(originPositionRight > lineExtentRight)
+        {
+          lineExtentRight = originPositionRight;
+        }
       }
 
       // Retrieves the glyph's color.
@@ -1361,6 +1458,12 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t bufferWidth, con
       else
       {
         color = (useDefaultColor || (0u == colorIndex)) ? defaultColor : *(colorsBuffer + (colorIndex - 1u));
+      }
+
+      if(style == Typesetter::STYLE_NONE && cutoutEnabled)
+      {
+        // Temporarily adjust the transparency to 1.f
+        color.a = 1.f;
       }
 
       // Premultiply alpha
@@ -1526,6 +1629,58 @@ Devel::PixelBuffer Typesetter::ApplyStrikethroughMarkupImageBuffer(Devel::PixelB
   }
 
   return topPixelBuffer;
+}
+
+void Typesetter::SetMaskForImageBuffer(Devel::PixelBuffer& __restrict__ topPixelBuffer, Devel::PixelBuffer& __restrict__ bottomPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, float originAlpha)
+{
+  // Assume that we always combine two RGBA images
+  // Jump with 4bytes for optimize runtime.
+  uint32_t* topBuffer    = reinterpret_cast<uint32_t*>(topPixelBuffer.GetBuffer());
+  uint32_t* bottomBuffer = reinterpret_cast<uint32_t*>(bottomPixelBuffer.GetBuffer());
+
+  if(topBuffer == NULL || bottomBuffer == NULL)
+  {
+    // Nothing to do if one of both buffers are empty.
+    return;
+  }
+
+  const uint32_t bufferSizeInt = bufferWidth * bufferHeight;
+
+  for(uint32_t pixelIndex = 0; pixelIndex < bufferSizeInt; ++pixelIndex)
+  {
+    uint32_t topBufferColor = *(topBuffer);
+    uint32_t bottomBufferColor = *(bottomBuffer);
+    uint8_t* __restrict__ topBufferColorBuffer = reinterpret_cast<uint8_t*>(&topBufferColor);
+    uint8_t* __restrict__ bottomBufferColorBuffer = reinterpret_cast<uint8_t*>(&bottomBufferColor);
+
+    uint8_t topAlpha = topBufferColorBuffer[3];
+    uint8_t bottomAlpha = 255 - topAlpha;
+
+    float tempTop[4], tempBottom[4];
+
+    // Return the transparency of the text to original.
+    tempTop[0] = static_cast<float>(topBufferColorBuffer[0]) * originAlpha;
+    tempTop[1] = static_cast<float>(topBufferColorBuffer[1]) * originAlpha;
+    tempTop[2] = static_cast<float>(topBufferColorBuffer[2]) * originAlpha;
+    tempTop[3] = static_cast<float>(topBufferColorBuffer[3]) * originAlpha;
+
+    // Manual blending.
+    tempBottom[0] = static_cast<float>(bottomBufferColorBuffer[0]) * static_cast<float>(bottomAlpha) / 255.f;
+    tempBottom[1] = static_cast<float>(bottomBufferColorBuffer[1]) * static_cast<float>(bottomAlpha) / 255.f;
+    tempBottom[2] = static_cast<float>(bottomBufferColorBuffer[2]) * static_cast<float>(bottomAlpha) / 255.f;
+    tempBottom[3] = static_cast<float>(bottomBufferColorBuffer[3]) * static_cast<float>(bottomAlpha) / 255.f;
+
+    bottomBufferColorBuffer[0] = static_cast<uint8_t>(std::min(255u, static_cast<uint32_t>(tempBottom[0] + tempTop[0])));
+    bottomBufferColorBuffer[1] = static_cast<uint8_t>(std::min(255u, static_cast<uint32_t>(tempBottom[1] + tempTop[1])));
+    bottomBufferColorBuffer[2] = static_cast<uint8_t>(std::min(255u, static_cast<uint32_t>(tempBottom[2] + tempTop[2])));
+    bottomBufferColorBuffer[3] = static_cast<uint8_t>(std::min(255u, static_cast<uint32_t>(tempBottom[3] + tempTop[3])));
+
+    *(bottomBuffer) = bottomBufferColor;
+
+    // Increase each buffer's pointer.
+    ++topBuffer;
+    ++bottomBuffer;
+  }
 }
 
 Typesetter::Typesetter(const ModelInterface* const model)
