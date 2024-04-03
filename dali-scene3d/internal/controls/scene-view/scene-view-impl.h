@@ -288,6 +288,11 @@ public:
    */
   bool IsEnabledCropToMask();
 
+  /**
+   * @brief Gets current RenderTask
+   */
+  Dali::RenderTask GetRenderTask();
+
   // Properties
 
   /**
