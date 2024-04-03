@@ -264,12 +264,6 @@ public:
 
   /// @cond internal
   /**
-   * @brief Called by the AccessibilityManager to activate the Control.
-   * @SINCE_1_0.0
-   */
-  DALI_INTERNAL void AccessibilityActivate();
-
-  /**
    * @brief Called by the KeyboardFocusManager.
    * @SINCE_1_0.0
    */
