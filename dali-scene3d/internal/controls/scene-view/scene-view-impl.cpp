@@ -874,6 +874,11 @@ bool SceneView::IsEnabledCropToMask()
   return mCropToMask;
 }
 
+Dali::RenderTask SceneView::GetRenderTask()
+{
+  return mRenderTask;
+}
+
 void SceneView::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
 {
   Scene3D::SceneView sceneView = Scene3D::SceneView::DownCast(Dali::BaseHandle(object));
