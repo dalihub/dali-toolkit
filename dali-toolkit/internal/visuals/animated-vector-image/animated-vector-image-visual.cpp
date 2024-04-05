@@ -97,6 +97,7 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   mPlacementActor(),
   mPlayState(DevelImageVisual::PlayState::STOPPED),
   mEventCallback(nullptr),
+  mLastSentPlayStateId(0u),
   mLoadFailed(false),
   mRendererAdded(false),
   mCoreShutdown(false),
@@ -565,11 +566,9 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
     {
       if(IsOnScene() && mVisualSize != Vector2::ZERO)
       {
-        if(mAnimationData.playState != DevelImageVisual::PlayState::PLAYING)
-        {
-          mAnimationData.playState = DevelImageVisual::PlayState::PLAYING;
-          mAnimationData.resendFlag |= VectorAnimationTask::RESEND_PLAY_STATE;
-        }
+        // Always resend Playing state. If task is already playing, it will be ignored at Rasterize time.
+        mAnimationData.playState = DevelImageVisual::PlayState::PLAYING;
+        mAnimationData.resendFlag |= VectorAnimationTask::RESEND_PLAY_STATE;
       }
       mPlayState = DevelImageVisual::PlayState::PLAYING;
       break;
@@ -695,11 +694,17 @@ void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceSta
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "status = %d [%p]\n", status, this);
 }
 
-void AnimatedVectorImageVisual::OnAnimationFinished()
+void AnimatedVectorImageVisual::OnAnimationFinished(uint32_t playStateId)
 {
   if(DALI_UNLIKELY(mImpl == nullptr))
   {
     DALI_LOG_ERROR("Fatal error!! already destroyed object callback called! AnimatedVectorImageVisual : %p, url : %s\n", this, mImageUrl.GetUrl().c_str());
+    return;
+  }
+
+  // Only send event when animation is finished by the last Play/Pause/Stop request.
+  if(mLastSentPlayStateId != playStateId)
+  {
     return;
   }
 
@@ -735,6 +740,13 @@ void AnimatedVectorImageVisual::SendAnimationData()
 
   if(mAnimationData.resendFlag)
   {
+    if(mAnimationData.resendFlag & VectorAnimationTask::RESEND_PLAY_STATE)
+    {
+      // Keep last sent playId. It will be used when we try to emit AnimationFinished signal.
+      // The OnAnimationFinished signal what before Play/Pause/Stop action send could be come after action sent.
+      // To ensure the OnAnimationFinished signal comes belong to what we sent, we need to keep last sent playId.
+      mAnimationData.playStateId = ++mLastSentPlayStateId;
+    }
     mVectorAnimationTask->SetAnimationData(mAnimationData);
 
     if(mImpl->mRenderer)

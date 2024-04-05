@@ -93,7 +93,8 @@ public:
       currentFrame(0),
       width(0),
       height(0),
-      loopCount(-1)
+      loopCount(-1),
+      playStateId(0)
     {
     }
 
@@ -108,6 +109,7 @@ public:
       width        = rhs.width;
       height       = rhs.height;
       loopCount    = rhs.loopCount;
+      playStateId  = rhs.playStateId;
       dynamicProperties.insert(dynamicProperties.end(), rhs.dynamicProperties.begin(), rhs.dynamicProperties.end());
       return *this;
     }
@@ -122,6 +124,7 @@ public:
     uint32_t                             width;
     uint32_t                             height;
     int32_t                              loopCount;
+    uint32_t                             playStateId;
   };
 
   /**
@@ -365,7 +368,7 @@ private:
   /**
    * @brief Event callback from rasterize thread. This is called when the file loading is completed.
    */
-  void OnLoadCompleted();
+  void OnLoadCompleted(uint32_t argument);
 
   // Undefined
   VectorAnimationTask(const VectorAnimationTask& task) = delete;
@@ -407,6 +410,7 @@ private:
   uint32_t                             mWidth;
   uint32_t                             mHeight;
   uint32_t                             mAnimationDataIndex;
+  uint32_t                             mAppliedPlayStateId;
   int32_t                              mLoopCount;
   int32_t                              mCurrentLoop;
   bool                                 mForward : 1;
