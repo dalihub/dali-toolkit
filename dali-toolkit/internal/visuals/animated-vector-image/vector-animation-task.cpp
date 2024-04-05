@@ -92,6 +92,7 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mWidth(0),
   mHeight(0),
   mAnimationDataIndex(0),
+  mAppliedPlayStateId(0u),
   mLoopCount(LOOP_FOREVER),
   mCurrentLoop(0),
   mForward(true),
@@ -214,7 +215,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
       Mutex::ScopedLock lock(mMutex);
       if(!synchronousLoading && mLoadCompletedCallback)
       {
-        mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
+        mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get(), 0u);
       }
     }
 #ifdef TRACE_ENABLED
@@ -245,7 +246,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
     Mutex::ScopedLock lock(mMutex);
     if(!synchronousLoading && mLoadCompletedCallback)
     {
-      mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
+      mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get(), 0u);
     }
   }
 
@@ -290,7 +291,7 @@ void VectorAnimationTask::RequestLoad(const VisualUrl& url, EncodedImageBuffer e
   {
     Load(true);
 
-    OnLoadCompleted();
+    OnLoadCompleted(0u);
   }
 }
 
@@ -703,7 +704,7 @@ bool VectorAnimationTask::Rasterize()
       Mutex::ScopedLock lock(mMutex);
       if(mNeedAnimationFinishedTrigger && mAnimationFinishedCallback)
       {
-        mVectorAnimationThread.AddEventTriggerCallback(mAnimationFinishedCallback.get());
+        mVectorAnimationThread.AddEventTriggerCallback(mAnimationFinishedCallback.get(), mAppliedPlayStateId);
       }
     }
 
@@ -859,6 +860,7 @@ void VectorAnimationTask::ApplyAnimationData()
 
     if(animationData.resendFlag & VectorAnimationTask::RESEND_PLAY_STATE)
     {
+      mAppliedPlayStateId = animationData.playStateId;
       if(animationData.playState == DevelImageVisual::PlayState::PLAYING)
       {
         PlayAnimation();
@@ -883,7 +885,7 @@ void VectorAnimationTask::OnUploadCompleted()
   mResourceReadySignal.Emit(ResourceStatus::READY);
 }
 
-void VectorAnimationTask::OnLoadCompleted()
+void VectorAnimationTask::OnLoadCompleted(uint32_t /* not used */)
 {
   if(!mLoadFailed)
   {
