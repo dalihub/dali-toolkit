@@ -114,6 +114,7 @@ extern const char* const MASK_TEXTURE_RATIO_NAME;
 extern const char* const FAST_TRACK_UPLOADING_NAME;
 extern const char* const ENABLE_BROKEN_IMAGE;
 extern const char* const ENABLE_FRAME_CACHE;
+extern const char* const NOTIFY_AFTER_RASTERIZATION;
 
 // Text visual
 extern const char* const TEXT_PROPERTY;

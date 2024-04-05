@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_IMAGE_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,13 +193,24 @@ enum Type
 
   /**
    * @brief Whether to AnimatedVectorImageVisual fixed cache or not.
-   * @details Name "EnableFrameCache", type Property::BOOLEAN.
+   * @details Name "enableFrameCache", type Property::BOOLEAN.
    * If this property is true, AnimatedVectorImageVisual enable frame cache for loading and keeps loaded frame
    * until the visual is removed. It reduces CPU cost when the animated image will be looping.
    * But it can spend a lot of memory if the resource has high resolution image or many frame count.
-   * @note It is used in the AnimatedImageVisual. The default is false
+   * @note It is used in the AnimatedVectorImageVisual. The default is false
    */
-  ENABLE_FRAME_CACHE = ORIENTATION_CORRECTION + 16
+  ENABLE_FRAME_CACHE = ORIENTATION_CORRECTION + 16,
+
+  /**
+   * @brief Whether notify AnimatedVectorImageVisual to render thread after every rasterization or not.
+   * @details Name "notifyAfterRasterization", type Property::BOOLEAN.
+   * If this property is true, AnimatedVectorImageVisual send notify to render thread after every rasterization.
+   * If false, AnimatedVectorImageVisual set Renderer's Behaviour as Continouly (mean, always update the render thread.)
+   *
+   * This flag is useful if given resource has low fps, so we don't need to render every frame.
+   * @note It is used in the AnimatedVectorImageVisual. The default is false.
+   */
+  NOTIFY_AFTER_RASTERIZATION = ORIENTATION_CORRECTION + 17
 };
 
 } //namespace Property

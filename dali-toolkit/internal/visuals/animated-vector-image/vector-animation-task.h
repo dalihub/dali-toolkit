@@ -67,15 +67,16 @@ public:
    */
   enum ResendFlags
   {
-    RESEND_PLAY_RANGE          = 1 << 0,
-    RESEND_LOOP_COUNT          = 1 << 1,
-    RESEND_STOP_BEHAVIOR       = 1 << 2,
-    RESEND_LOOPING_MODE        = 1 << 3,
-    RESEND_CURRENT_FRAME       = 1 << 4,
-    RESEND_SIZE                = 1 << 5,
-    RESEND_PLAY_STATE          = 1 << 6,
-    RESEND_NEED_RESOURCE_READY = 1 << 7,
-    RESEND_DYNAMIC_PROPERTY    = 1 << 8
+    RESEND_PLAY_RANGE                 = 1 << 0,
+    RESEND_LOOP_COUNT                 = 1 << 1,
+    RESEND_STOP_BEHAVIOR              = 1 << 2,
+    RESEND_LOOPING_MODE               = 1 << 3,
+    RESEND_CURRENT_FRAME              = 1 << 4,
+    RESEND_SIZE                       = 1 << 5,
+    RESEND_PLAY_STATE                 = 1 << 6,
+    RESEND_NEED_RESOURCE_READY        = 1 << 7,
+    RESEND_DYNAMIC_PROPERTY           = 1 << 8,
+    RESEND_NOTIFY_AFTER_RASTERIZATION = 1 << 9,
   };
 
   /**
@@ -94,22 +95,24 @@ public:
       width(0),
       height(0),
       loopCount(-1),
-      playStateId(0)
+      playStateId(0),
+      notifyAfterRasterization(false)
     {
     }
 
     AnimationData& operator=(const AnimationData& rhs)
     {
       resendFlag |= rhs.resendFlag; // OR resend flag
-      playRange    = rhs.playRange;
-      playState    = rhs.playState;
-      stopBehavior = rhs.stopBehavior;
-      loopingMode  = rhs.loopingMode;
-      currentFrame = rhs.currentFrame;
-      width        = rhs.width;
-      height       = rhs.height;
-      loopCount    = rhs.loopCount;
-      playStateId  = rhs.playStateId;
+      playRange                = rhs.playRange;
+      playState                = rhs.playState;
+      stopBehavior             = rhs.stopBehavior;
+      loopingMode              = rhs.loopingMode;
+      currentFrame             = rhs.currentFrame;
+      width                    = rhs.width;
+      height                   = rhs.height;
+      loopCount                = rhs.loopCount;
+      playStateId              = rhs.playStateId;
+      notifyAfterRasterization = rhs.notifyAfterRasterization;
       dynamicProperties.insert(dynamicProperties.end(), rhs.dynamicProperties.begin(), rhs.dynamicProperties.end());
       return *this;
     }
@@ -125,6 +128,7 @@ public:
     uint32_t                             height;
     int32_t                              loopCount;
     uint32_t                             playStateId;
+    bool                                 notifyAfterRasterization;
   };
 
   /**
@@ -263,6 +267,16 @@ public:
    */
   bool IsAnimating();
 
+  void KeepRasterizedBuffer(bool enableFrameCache)
+  {
+    mEnableFrameCache = enableFrameCache;
+  }
+
+  bool IsKeptRasterizedBuffer() const
+  {
+    return mEnableFrameCache;
+  }
+
 public: // Implementation of AsyncTask
   /**
    * @copydoc Dali::AsyncTask::Process()
@@ -280,16 +294,6 @@ public: // Implementation of AsyncTask
   std::string_view GetTaskName() const override
   {
     return "VectorAnimationTask";
-  }
-
-  void KeepRasterizedBuffer(bool enableFrameCache)
-  {
-    mEnableFrameCache = enableFrameCache;
-  }
-
-  bool IsKeptRasterizedBuffer()
-  {
-    return mEnableFrameCache;
   }
 
 private:
@@ -433,6 +437,7 @@ private:
   mutable bool                         mLayerInfoCached : 1;
   mutable bool                         mMarkerInfoCached : 1;
   bool                                 mEnableFrameCache : 1;
+  bool                                 mNotifyAfterRasterization : 1;
   bool                                 mSizeUpdated : 1;
 };
 

@@ -208,13 +208,14 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
     .Add("stopBehavior", DevelImageVisual::StopBehavior::FIRST_FRAME)
     .Add("loopingMode", DevelImageVisual::LoopingMode::AUTO_REVERSE)
     .Add("redrawInScalingDown", false)
+    .Add("enableFrameCache", false)
+    .Add("notifyAfterRasterization", false)
     .Add("cornerRadius", cornerRadius)
     .Add("borderlineWidth", borderlineWidth)
     .Add("borderlineColor", borderlineColor)
     .Add("borderlineOffset", borderlineOffset)
     .Add("desiredWidth", desiredWidth)
-    .Add("desiredHeight", desiredHeight)
-    .Add("useFixedCache", false);
+    .Add("desiredHeight", desiredHeight);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -267,6 +268,14 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   DALI_TEST_CHECK(value->Get<int>() == DevelImageVisual::LoopingMode::AUTO_REVERSE);
 
   value = resultMap.Find(DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, Property::BOOLEAN);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<bool>() == false);
+
+  value = resultMap.Find(DevelImageVisual::Property::ENABLE_FRAME_CACHE, Property::BOOLEAN);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<bool>() == false);
+
+  value = resultMap.Find(DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, Property::BOOLEAN);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>() == false);
 
@@ -392,6 +401,10 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   DALI_TEST_CHECK(value);
 
   value = resultMap.Find(DevelImageVisual::Property::ENABLE_FRAME_CACHE, Property::BOOLEAN);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<bool>() == false); // Check default value
+
+  value = resultMap.Find(DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, Property::BOOLEAN);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>() == false); // Check default value
 
@@ -1123,7 +1136,7 @@ int UtcDaliAnimatedVectorImageVisualUsedFixedCache(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
+  // Trigger count is 1 - load
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   Vector2 controlSize(200.f, 200.f);
@@ -1132,7 +1145,7 @@ int UtcDaliAnimatedVectorImageVisualUsedFixedCache(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - load
+  // Trigger count is 1 - render a frame
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   // renderer is added to actor
@@ -1189,6 +1202,91 @@ int UtcDaliAnimatedVectorImageVisualUsedFixedCacheFailed(void)
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::ENABLE_FRAME_CACHE);
+  DALI_TEST_CHECK(value->Get<bool>() == true);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualNotifyAfterRasterization(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualNotifyAfterRasterization");
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+    .Add(DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, true)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - load
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  Vector2 controlSize(200.f, 200.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Play animation
+  Property::Map attributes;
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  // renderer is added to actor
+  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  Renderer renderer = actor.GetRendererAt(0u);
+  DALI_TEST_CHECK(renderer);
+
+  // Check renderer behavior
+  DALI_TEST_CHECK(renderer.GetProperty<int>(DevelRenderer::Property::RENDERING_BEHAVIOR) == DevelRenderer::Rendering::IF_REQUIRED);
+
+  Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  Property::Value* value = map.Find(DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION);
+  DALI_TEST_CHECK(value->Get<bool>() == true);
+
+  propertyMap.Clear();
+  propertyMap.Add(DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, false);
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, propertyMap);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check renderer behavior again
+  DALI_TEST_CHECK(renderer.GetProperty<int>(DevelRenderer::Property::RENDERING_BEHAVIOR) == DevelRenderer::Rendering::CONTINUOUSLY);
+
+  map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  value = map.Find(DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION);
+  DALI_TEST_CHECK(value->Get<bool>() == false);
+
+  propertyMap.Clear();
+  propertyMap.Add(DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, true);
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, propertyMap);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check renderer behavior again
+  DALI_TEST_CHECK(renderer.GetProperty<int>(DevelRenderer::Property::RENDERING_BEHAVIOR) == DevelRenderer::Rendering::IF_REQUIRED);
+
+  map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  value = map.Find(DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION);
   DALI_TEST_CHECK(value->Get<bool>() == true);
 
   END_TEST;

@@ -267,6 +267,7 @@ private:
   bool mRedrawInScalingDown : 1;
   bool mEnableFrameCache : 1;
   bool mUseNativeImage : 1;
+  bool mNotifyAfterRasterization : 1;
 };
 
 } // namespace Internal
