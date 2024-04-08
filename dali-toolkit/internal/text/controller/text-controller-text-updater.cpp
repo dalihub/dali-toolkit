@@ -208,7 +208,8 @@ void Controller::TextUpdater::InsertText(Controller& controller, const std::stri
     removedPrevious = RemoveText(controller,
                                  -static_cast<int>(eventData->mPrimaryCursorPosition - eventData->mPreEditStartPosition),
                                  eventData->mPreEditLength,
-                                 DONT_UPDATE_INPUT_STYLE);
+                                 DONT_UPDATE_INPUT_STYLE,
+                                 true);
 
     eventData->mPrimaryCursorPosition = eventData->mPreEditStartPosition;
     eventData->mPreEditLength         = 0u;
@@ -495,7 +496,8 @@ bool Controller::TextUpdater::RemoveText(
   Controller&          controller,
   int                  cursorOffset,
   int                  numberOfCharacters,
-  UpdateInputStyleType type)
+  UpdateInputStyleType type,
+  bool                 isDeletingPreEdit)
 {
   bool removed   = false;
   bool removeAll = false;
@@ -608,7 +610,10 @@ bool Controller::TextUpdater::RemoveText(
       if(removeAll)
       {
         impl.ClearPreEditFlag();
-        textUpdateInfo.mNumberOfCharactersToAdd = 0;
+        if(!isDeletingPreEdit)
+        {
+          textUpdateInfo.mNumberOfCharactersToAdd = 0;
+        }
       }
 
       // Updates the text style runs by removing characters. Runs with no characters are removed.
