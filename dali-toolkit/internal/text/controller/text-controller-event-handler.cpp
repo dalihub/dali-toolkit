@@ -768,13 +768,13 @@ bool Controller::EventHandler::DeleteEvent(Controller& controller, int keyCode)
   else if((controller.mImpl->mEventData->mPrimaryCursorPosition > 0) && (keyCode == Dali::DALI_KEY_BACKSPACE))
   {
     // Remove the character before the current cursor position
-    removed = TextUpdater::RemoveText(controller, -1, 1, UPDATE_INPUT_STYLE);
+    removed = TextUpdater::RemoveText(controller, -1, 1, UPDATE_INPUT_STYLE, false);
   }
   else if((controller.mImpl->mEventData->mPrimaryCursorPosition < controller.mImpl->mModel->mLogicalModel->mText.Count()) &&
           (keyCode == Dali::DevelKey::DALI_KEY_DELETE))
   {
     // Remove the character after the current cursor position
-    removed = TextUpdater::RemoveText(controller, 0, 1, UPDATE_INPUT_STYLE);
+    removed = TextUpdater::RemoveText(controller, 0, 1, UPDATE_INPUT_STYLE, false);
   }
 
   if(removed)
@@ -825,7 +825,8 @@ InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextE
       const bool textDeleted = TextUpdater::RemoveText(controller,
                                                        inputMethodContextEvent.cursorOffset,
                                                        inputMethodContextEvent.numberOfChars,
-                                                       DONT_UPDATE_INPUT_STYLE);
+                                                       DONT_UPDATE_INPUT_STYLE,
+                                                       false);
 
       if(textDeleted)
       {
