@@ -251,6 +251,7 @@ private:
   bool            mImageViewPixelAreaSetByFittingMode : 1; ///< Flag to indicate pixel area was set by fitting Mode
   bool            mTransitionEffect :1;                    ///< Flag to indicate TransitionEffect is enabled
   bool            mNeedLazyFittingMode:1;                  ///< Flag to indicate FittingMode will be applying lazy
+  bool            mImageReplaced:1;                        ///< Flag to indicate image is replaced
 };
 
 } // namespace Internal
