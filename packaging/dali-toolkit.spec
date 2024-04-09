@@ -21,13 +21,6 @@ BuildRequires:  pkgconfig(egl)
 BuildRequires:  gettext
 BuildRequires:  pkgconfig(libtzplatform-config)
 
-# For ASAN test
-%if "%{vd_asan}" == "1" || "%{asan}" == "1"
-BuildRequires: asan-force-options
-BuildRequires: asan-build-env
-BuildRequires: libasan
-%endif
-
 #############################
 # profile setup
 #############################
@@ -208,12 +201,6 @@ LDFLAGS+=" --coverage "
 
 %ifarch %{arm}
 CXXFLAGS+=" -D_ARCH_ARM_"
-%endif
-
-%if "%{vd_asan}" == "1" || "%{asan}" == "1"
-CFLAGS+=" -fsanitize=address"
-CXXFLAGS+=" -fsanitize=address"
-LDFLAGS+=" -fsanitize=address"
 %endif
 
 libtoolize --force
