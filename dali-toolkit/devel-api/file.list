@@ -1,210 +1,286 @@
-# Add local source files here
+# Set the source directory
+SET( devel_api_src_dir ${ROOT_SRC_DIR}/dali-toolkit/devel-api )
 
-devel_api_src_files = \
-  $(devel_api_src_dir)/builder/base64-encoding.cpp \
-  $(devel_api_src_dir)/builder/builder.cpp \
-  $(devel_api_src_dir)/builder/json-parser.cpp \
-  $(devel_api_src_dir)/builder/tree-node.cpp \
-  $(devel_api_src_dir)/controls/control-devel.cpp \
-  $(devel_api_src_dir)/controls/control-wrapper.cpp \
-  $(devel_api_src_dir)/controls/control-wrapper-impl.cpp \
-  $(devel_api_src_dir)/controls/bloom-view/bloom-view.cpp \
-  $(devel_api_src_dir)/controls/bubble-effect/bubble-emitter.cpp \
-  $(devel_api_src_dir)/controls/buttons/toggle-button.cpp \
-  $(devel_api_src_dir)/controls/effects-view/effects-view.cpp \
-  $(devel_api_src_dir)/controls/magnifier/magnifier.cpp \
-  $(devel_api_src_dir)/controls/navigation-view/navigation-view.cpp \
-  $(devel_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.cpp \
-  $(devel_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.cpp \
-  $(devel_api_src_dir)/controls/page-turn-view/page-turn-view.cpp \
-  $(devel_api_src_dir)/controls/popup/confirmation-popup.cpp \
-  $(devel_api_src_dir)/controls/popup/popup.cpp \
-  $(devel_api_src_dir)/controls/scene3d-view/scene3d-view.cpp \
-  $(devel_api_src_dir)/controls/shadow-view/shadow-view.cpp \
-  $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
-  $(devel_api_src_dir)/controls/text-controls/text-editor-devel.cpp \
-  $(devel_api_src_dir)/controls/text-controls/text-field-devel.cpp \
-  $(devel_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
-  $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.cpp \
-  $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
-  $(devel_api_src_dir)/controls/web-view/web-view.cpp \
-  $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
-  $(devel_api_src_dir)/focus-manager/keyboard-focus-manager-devel.cpp \
-  $(devel_api_src_dir)/image-loader/async-image-loader-devel.cpp \
-  $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
-  $(devel_api_src_dir)/image-loader/image-atlas.cpp \
-  $(devel_api_src_dir)/image-loader/texture-manager.cpp \
-  $(devel_api_src_dir)/layouting/absolute-layout.cpp \
-  $(devel_api_src_dir)/layouting/bin-layout.cpp \
-  $(devel_api_src_dir)/layouting/flex-layout.cpp \
-  $(devel_api_src_dir)/layouting/grid.cpp \
-  $(devel_api_src_dir)/layouting/layout-item.cpp \
-  $(devel_api_src_dir)/layouting/layout-item-impl.cpp \
-  $(devel_api_src_dir)/layouting/layout-controller.cpp \
-  $(devel_api_src_dir)/layouting/layout-group.cpp \
-  $(devel_api_src_dir)/layouting/layout-group-impl.cpp \
-  $(devel_api_src_dir)/layouting/linear-layout.cpp \
-  $(devel_api_src_dir)/layouting/layout-transition-data.cpp \
-  $(devel_api_src_dir)/scripting/script.cpp \
-  $(devel_api_src_dir)/styling/style-manager-devel.cpp \
-  $(devel_api_src_dir)/text/bitmap-font.cpp \
-  $(devel_api_src_dir)/text/text-utils-devel.cpp \
-  $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
-  $(devel_api_src_dir)/transition-effects/cube-transition-effect.cpp \
-  $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.cpp \
-  $(devel_api_src_dir)/transition-effects/cube-transition-wave-effect.cpp \
-  $(devel_api_src_dir)/visual-factory/transition-data.cpp \
-  $(devel_api_src_dir)/visual-factory/visual-factory.cpp \
-  $(devel_api_src_dir)/visual-factory/visual-base.cpp \
-  $(devel_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp \
-  $(devel_api_src_dir)/drag-drop-detector/drag-and-drop-detector.cpp
+# Add local source files here
+SET( devel_api_src_files
+  ${devel_api_src_dir}/builder/base64-encoding.cpp
+  ${devel_api_src_dir}/builder/builder.cpp
+  ${devel_api_src_dir}/builder/json-parser.cpp
+  ${devel_api_src_dir}/builder/tree-node.cpp
+  ${devel_api_src_dir}/controls/control-devel.cpp
+  ${devel_api_src_dir}/controls/control-wrapper.cpp
+  ${devel_api_src_dir}/controls/control-wrapper-impl.cpp
+  ${devel_api_src_dir}/controls/bloom-view/bloom-view.cpp
+  ${devel_api_src_dir}/controls/bubble-effect/bubble-emitter.cpp
+  ${devel_api_src_dir}/controls/buttons/toggle-button.cpp
+  ${devel_api_src_dir}/controls/effects-view/effects-view.cpp
+  ${devel_api_src_dir}/controls/magnifier/magnifier.cpp
+  ${devel_api_src_dir}/controls/navigation-view/navigation-view.cpp
+  ${devel_api_src_dir}/controls/page-turn-view/page-turn-landscape-view.cpp
+  ${devel_api_src_dir}/controls/page-turn-view/page-turn-portrait-view.cpp
+  ${devel_api_src_dir}/controls/page-turn-view/page-turn-view.cpp
+  ${devel_api_src_dir}/controls/popup/confirmation-popup.cpp
+  ${devel_api_src_dir}/controls/popup/popup.cpp
+  ${devel_api_src_dir}/controls/scene3d-view/scene3d-view.cpp
+  ${devel_api_src_dir}/controls/shadow-view/shadow-view.cpp
+  ${devel_api_src_dir}/controls/super-blur-view/super-blur-view.cpp
+  ${devel_api_src_dir}/controls/text-controls/text-editor-devel.cpp
+  ${devel_api_src_dir}/controls/text-controls/text-field-devel.cpp
+  ${devel_api_src_dir}/controls/text-controls/text-selection-popup.cpp
+  ${devel_api_src_dir}/controls/text-controls/text-selection-toolbar.cpp
+  ${devel_api_src_dir}/controls/tool-bar/tool-bar.cpp
+  ${devel_api_src_dir}/controls/web-view/web-view.cpp
+  ${devel_api_src_dir}/focus-manager/keyinput-focus-manager.cpp
+  ${devel_api_src_dir}/focus-manager/keyboard-focus-manager-devel.cpp
+  ${devel_api_src_dir}/image-loader/async-image-loader-devel.cpp
+  ${devel_api_src_dir}/image-loader/atlas-upload-observer.cpp
+  ${devel_api_src_dir}/image-loader/image-atlas.cpp
+  ${devel_api_src_dir}/image-loader/texture-manager.cpp
+  ${devel_api_src_dir}/layouting/absolute-layout.cpp
+  ${devel_api_src_dir}/layouting/bin-layout.cpp
+  ${devel_api_src_dir}/layouting/flex-layout.cpp
+  ${devel_api_src_dir}/layouting/grid.cpp
+  ${devel_api_src_dir}/layouting/layout-item.cpp
+  ${devel_api_src_dir}/layouting/layout-item-impl.cpp
+  ${devel_api_src_dir}/layouting/layout-controller.cpp
+  ${devel_api_src_dir}/layouting/layout-group.cpp
+  ${devel_api_src_dir}/layouting/layout-group-impl.cpp
+  ${devel_api_src_dir}/layouting/linear-layout.cpp
+  ${devel_api_src_dir}/layouting/layout-transition-data.cpp
+  ${devel_api_src_dir}/scripting/script.cpp
+  ${devel_api_src_dir}/styling/style-manager-devel.cpp
+  ${devel_api_src_dir}/text/bitmap-font.cpp
+  ${devel_api_src_dir}/text/text-utils-devel.cpp
+  ${devel_api_src_dir}/transition-effects/cube-transition-cross-effect.cpp
+  ${devel_api_src_dir}/transition-effects/cube-transition-effect.cpp
+  ${devel_api_src_dir}/transition-effects/cube-transition-fold-effect.cpp
+  ${devel_api_src_dir}/transition-effects/cube-transition-wave-effect.cpp
+  ${devel_api_src_dir}/visual-factory/transition-data.cpp
+  ${devel_api_src_dir}/visual-factory/visual-factory.cpp
+  ${devel_api_src_dir}/visual-factory/visual-base.cpp
+  ${devel_api_src_dir}/controls/gaussian-blur-view/gaussian-blur-view.cpp
+  ${devel_api_src_dir}/drag-drop-detector/drag-and-drop-detector.cpp
+)
 
 # Add devel header files here
+SET( devel_api_header_files
+  ${devel_api_src_dir}/direction-enums.h
+  ${devel_api_src_dir}/toolkit-property-index-ranges.h
+)
 
-devel_api_header_files = \
-  $(devel_api_src_dir)/direction-enums.h \
-  $(devel_api_src_dir)/toolkit-property-index-ranges.h
+SET( devel_api_controls_header_files
+  ${devel_api_src_dir}/controls/control-depth-index-ranges.h
+  ${devel_api_src_dir}/controls/control-devel.h
+  ${devel_api_src_dir}/controls/control-wrapper.h
+  ${devel_api_src_dir}/controls/control-wrapper-impl.h
+)
 
-devel_api_controls_header_files = \
-  $(devel_api_src_dir)/controls/control-depth-index-ranges.h \
-  $(devel_api_src_dir)/controls/control-devel.h \
-  $(devel_api_src_dir)/controls/control-wrapper.h \
-  $(devel_api_src_dir)/controls/control-wrapper-impl.h
+SET( devel_api_bloom_view_header_files
+  ${devel_api_src_dir}/controls/bloom-view/bloom-view.h
+)
 
-devel_api_bloom_view_header_files = \
-  $(devel_api_src_dir)/controls/bloom-view/bloom-view.h
+SET( devel_api_bubble_emitter_header_files
+  ${devel_api_src_dir}/controls/bubble-effect/bubble-emitter.h
+)
 
-devel_api_bubble_emitter_header_files = \
-  $(devel_api_src_dir)/controls/bubble-effect/bubble-emitter.h
+SET( devel_api_buttons_header_files
+  ${devel_api_src_dir}/controls/buttons/button-devel.h
+  ${devel_api_src_dir}/controls/buttons/toggle-button.h
+)
 
-devel_api_buttons_header_files = \
-  $(devel_api_src_dir)/controls/buttons/button-devel.h \
-  $(devel_api_src_dir)/controls/buttons/toggle-button.h
+SET( devel_api_builder_header_files
+  ${devel_api_src_dir}/builder/base64-encoding.h
+  ${devel_api_src_dir}/builder/builder.h
+  ${devel_api_src_dir}/builder/json-parser.h
+  ${devel_api_src_dir}/builder/tree-node.h
+)
 
-devel_api_builder_header_files = \
-  $(devel_api_src_dir)/builder/base64-encoding.h \
-  $(devel_api_src_dir)/builder/builder.h \
-  $(devel_api_src_dir)/builder/json-parser.h \
-  $(devel_api_src_dir)/builder/tree-node.h
+SET( devel_api_effects_view_header_files
+  ${devel_api_src_dir}/controls/effects-view/effects-view.h
+)
 
-devel_api_effects_view_header_files = \
-  $(devel_api_src_dir)/controls/effects-view/effects-view.h
+SET( devel_api_layouting_header_files
+  ${devel_api_src_dir}/layouting/absolute-layout.h
+  ${devel_api_src_dir}/layouting/child-layout-data.h
+  ${devel_api_src_dir}/layouting/flex-layout.h
+  ${devel_api_src_dir}/layouting/grid.h
+  ${devel_api_src_dir}/layouting/linear-layout.h
+  ${devel_api_src_dir}/layouting/layout-child-impl.h
+  ${devel_api_src_dir}/layouting/layout-controller.h
+  ${devel_api_src_dir}/layouting/layout-group.h
+  ${devel_api_src_dir}/layouting/layout-group-impl.h
+  ${devel_api_src_dir}/layouting/layout-item.h
+  ${devel_api_src_dir}/layouting/layout-item-impl.h
+  ${devel_api_src_dir}/layouting/layout-length.h
+  ${devel_api_src_dir}/layouting/layout-parent-impl.h
+  ${devel_api_src_dir}/layouting/layout-size.h
+  ${devel_api_src_dir}/layouting/layout-transition-data.h
+  ${devel_api_src_dir}/layouting/measured-size.h
+  ${devel_api_src_dir}/layouting/measure-spec.h
+)
 
-devel_api_layouting_header_files = \
-  $(devel_api_src_dir)/layouting/absolute-layout.h \
-  $(devel_api_src_dir)/layouting/child-layout-data.h \
-  $(devel_api_src_dir)/layouting/flex-layout.h \
-  $(devel_api_src_dir)/layouting/grid.h \
-  $(devel_api_src_dir)/layouting/linear-layout.h \
-  $(devel_api_src_dir)/layouting/layout-child-impl.h \
-  $(devel_api_src_dir)/layouting/layout-controller.h \
-  $(devel_api_src_dir)/layouting/layout-group.h \
-  $(devel_api_src_dir)/layouting/layout-group-impl.h \
-  $(devel_api_src_dir)/layouting/layout-item.h \
-  $(devel_api_src_dir)/layouting/layout-item-impl.h \
-  $(devel_api_src_dir)/layouting/layout-length.h \
-  $(devel_api_src_dir)/layouting/layout-parent-impl.h \
-  $(devel_api_src_dir)/layouting/layout-size.h \
-  $(devel_api_src_dir)/layouting/layout-transition-data.h \
-  $(devel_api_src_dir)/layouting/measured-size.h \
-  $(devel_api_src_dir)/layouting/measure-spec.h
+SET( devel_api_magnifier_header_files
+  ${devel_api_src_dir}/controls/magnifier/magnifier.h
+)
 
-devel_api_magnifier_header_files = \
-  $(devel_api_src_dir)/controls/magnifier/magnifier.h
+SET( devel_api_navigation_view_header_files
+  ${devel_api_src_dir}/controls/navigation-view/navigation-view.h
+)
 
-devel_api_navigation_view_header_files = \
-  $(devel_api_src_dir)/controls/navigation-view/navigation-view.h
+SET( devel_api_page_turn_view_header_files
+  ${devel_api_src_dir}/controls/page-turn-view/page-factory.h
+  ${devel_api_src_dir}/controls/page-turn-view/page-turn-landscape-view.h
+  ${devel_api_src_dir}/controls/page-turn-view/page-turn-portrait-view.h
+  ${devel_api_src_dir}/controls/page-turn-view/page-turn-view.h
+)
 
-devel_api_page_turn_view_header_files = \
-  $(devel_api_src_dir)/controls/page-turn-view/page-factory.h \
-  $(devel_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.h \
-  $(devel_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.h \
-  $(devel_api_src_dir)/controls/page-turn-view/page-turn-view.h
+SET( devel_api_popup_header_files
+  ${devel_api_src_dir}/controls/popup/confirmation-popup.h
+  ${devel_api_src_dir}/controls/popup/popup.h
+)
 
-devel_api_popup_header_files = \
-  $(devel_api_src_dir)/controls/popup/confirmation-popup.h \
-  $(devel_api_src_dir)/controls/popup/popup.h
+SET( devel_api_visual_factory_header_files
+  ${devel_api_src_dir}/visual-factory/transition-data.h
+  ${devel_api_src_dir}/visual-factory/visual-factory.h
+  ${devel_api_src_dir}/visual-factory/visual-base.h
+)
 
-devel_api_visual_factory_header_files = \
-  $(devel_api_src_dir)/visual-factory/transition-data.h \
-  $(devel_api_src_dir)/visual-factory/visual-factory.h \
-  $(devel_api_src_dir)/visual-factory/visual-base.h
+SET( devel_api_visuals_header_files
+  ${devel_api_src_dir}/visuals/animated-gradient-visual-properties-devel.h
+  ${devel_api_src_dir}/visuals/animated-image-visual-actions-devel.h
+  ${devel_api_src_dir}/visuals/animated-vector-image-visual-actions-devel.h
+  ${devel_api_src_dir}/visuals/animated-vector-image-visual-signals-devel.h
+  ${devel_api_src_dir}/visuals/color-visual-properties-devel.h
+  ${devel_api_src_dir}/visuals/image-visual-properties-devel.h
+  ${devel_api_src_dir}/visuals/image-visual-actions-devel.h
+  ${devel_api_src_dir}/visuals/text-visual-properties-devel.h
+  ${devel_api_src_dir}/visuals/visual-properties-devel.h
+)
 
-devel_api_visuals_header_files = \
-  $(devel_api_src_dir)/visuals/animated-gradient-visual-properties-devel.h \
-  $(devel_api_src_dir)/visuals/animated-image-visual-actions-devel.h \
-  $(devel_api_src_dir)/visuals/animated-vector-image-visual-actions-devel.h \
-  $(devel_api_src_dir)/visuals/animated-vector-image-visual-signals-devel.h \
-  $(devel_api_src_dir)/visuals/color-visual-properties-devel.h \
-  $(devel_api_src_dir)/visuals/image-visual-properties-devel.h \
-  $(devel_api_src_dir)/visuals/image-visual-actions-devel.h \
-  $(devel_api_src_dir)/visuals/text-visual-properties-devel.h \
-  $(devel_api_src_dir)/visuals/visual-properties-devel.h
+SET( devel_api_scene3d_view_header_files
+  ${devel_api_src_dir}/controls/scene3d-view/scene3d-view.h
+)
 
-devel_api_scene3d_view_header_files = \
-  $(devel_api_src_dir)/controls/scene3d-view/scene3d-view.h
+SET( devel_api_shadow_view_header_files
+  ${devel_api_src_dir}/controls/shadow-view/shadow-view.h
+)
 
-devel_api_shadow_view_header_files = \
-  $(devel_api_src_dir)/controls/shadow-view/shadow-view.h
+SET( devel_api_focus_manager_header_files
+  ${devel_api_src_dir}/focus-manager/keyinput-focus-manager.h
+  ${devel_api_src_dir}/focus-manager/keyboard-focus-manager-devel.h
+)
 
-devel_api_focus_manager_header_files = \
-  $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.h \
-  $(devel_api_src_dir)/focus-manager/keyboard-focus-manager-devel.h
+SET( devel_api_image_loader_header_files
+  ${devel_api_src_dir}/image-loader/async-image-loader-devel.h
+  ${devel_api_src_dir}/image-loader/atlas-upload-observer.h
+  ${devel_api_src_dir}/image-loader/image-atlas.h
+  ${devel_api_src_dir}/image-loader/texture-manager.h
+)
 
-devel_api_image_loader_header_files = \
-  $(devel_api_src_dir)/image-loader/async-image-loader-devel.h \
-  $(devel_api_src_dir)/image-loader/atlas-upload-observer.h \
-  $(devel_api_src_dir)/image-loader/image-atlas.h \
-  $(devel_api_src_dir)/image-loader/texture-manager.h
+SET( devel_api_scripting_header_files
+  ${devel_api_src_dir}/scripting/script.h
+  ${devel_api_src_dir}/scripting/script-plugin.h
+)
 
-devel_api_scripting_header_files = \
-  $(devel_api_src_dir)/scripting/script.h \
-  $(devel_api_src_dir)/scripting/script-plugin.h
+SET( devel_api_shader_effects_header_files
+  ${devel_api_src_dir}/shader-effects/alpha-discard-effect.h
+  ${devel_api_src_dir}/shader-effects/dissolve-effect.h
+  ${devel_api_src_dir}/shader-effects/distance-field-effect.h
+  ${devel_api_src_dir}/shader-effects/image-region-effect.h
+  ${devel_api_src_dir}/shader-effects/motion-blur-effect.h
+  ${devel_api_src_dir}/shader-effects/motion-stretch-effect.h
+)
 
-devel_api_shader_effects_header_files = \
-  $(devel_api_src_dir)/shader-effects/alpha-discard-effect.h \
-  $(devel_api_src_dir)/shader-effects/dissolve-effect.h \
-  $(devel_api_src_dir)/shader-effects/distance-field-effect.h \
-  $(devel_api_src_dir)/shader-effects/image-region-effect.h \
-  $(devel_api_src_dir)/shader-effects/motion-blur-effect.h \
-  $(devel_api_src_dir)/shader-effects/motion-stretch-effect.h
+SET( devel_api_styling_header_files
+  ${devel_api_src_dir}/styling/style-manager-devel.h
+)
 
-devel_api_styling_header_files= \
-  $(devel_api_src_dir)/styling/style-manager-devel.h
+SET( devel_api_super_blur_view_header_files
+  ${devel_api_src_dir}/controls/super-blur-view/super-blur-view.h
+)
 
-devel_api_super_blur_view_header_files = \
-  $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.h
+SET( devel_api_text_controls_header_files
+  ${devel_api_src_dir}/controls/text-controls/text-editor-devel.h
+  ${devel_api_src_dir}/controls/text-controls/text-field-devel.h
+  ${devel_api_src_dir}/controls/text-controls/text-label-devel.h
+  ${devel_api_src_dir}/controls/text-controls/text-selection-popup.h
+  ${devel_api_src_dir}/controls/text-controls/text-selection-toolbar.h
+  ${devel_api_src_dir}/controls/text-controls/text-style-properties-devel.h
+)
 
-devel_api_text_controls_header_files = \
-  $(devel_api_src_dir)/controls/text-controls/text-editor-devel.h \
-  $(devel_api_src_dir)/controls/text-controls/text-field-devel.h \
-  $(devel_api_src_dir)/controls/text-controls/text-label-devel.h \
-  $(devel_api_src_dir)/controls/text-controls/text-selection-popup.h \
-  $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.h \
-  $(devel_api_src_dir)/controls/text-controls/text-style-properties-devel.h
+SET( devel_api_text_header_files
+  ${devel_api_src_dir}/text/text-enumerations-devel.h
+  ${devel_api_src_dir}/text/bitmap-font.h
+  ${devel_api_src_dir}/text/text-utils-devel.h
+)
 
-devel_api_text_header_files = \
-  $(devel_api_src_dir)/text/text-enumerations-devel.h \
-  $(devel_api_src_dir)/text/bitmap-font.h \
-  $(devel_api_src_dir)/text/text-utils-devel.h
+SET( devel_api_tool_bar_header_files
+  ${devel_api_src_dir}/controls/tool-bar/tool-bar.h
+)
 
-devel_api_tool_bar_header_files = \
-  $(devel_api_src_dir)/controls/tool-bar/tool-bar.h
+SET( devel_api_tooltip_header_files
+  ${devel_api_src_dir}/controls/tooltip/tooltip-properties.h
+)
 
-devel_api_tooltip_header_files = \
-  $(devel_api_src_dir)/controls/tooltip/tooltip-properties.h
+SET( devel_api_transition_effects_header_files
+  ${devel_api_src_dir}/transition-effects/cube-transition-effect.h
+  ${devel_api_src_dir}/transition-effects/cube-transition-cross-effect.h
+  ${devel_api_src_dir}/transition-effects/cube-transition-fold-effect.h
+  ${devel_api_src_dir}/transition-effects/cube-transition-wave-effect.h
+)
 
-devel_api_transition_effects_header_files = \
-  $(devel_api_src_dir)/transition-effects/cube-transition-effect.h \
-  $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.h \
-  $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.h \
-  $(devel_api_src_dir)/transition-effects/cube-transition-wave-effect.h
+SET( devel_api_gaussian_blur_view_header_files
+  ${devel_api_src_dir}/controls/gaussian-blur-view/gaussian-blur-view.h
+)
 
-devel_api_gaussian_blur_view_header_files = \
-  $(devel_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.h
+SET( devel_api_web_view_header_files
+  ${devel_api_src_dir}/controls/web-view/web-view.h
+)
 
-devel_api_web_view_header_files = \
-  $(devel_api_src_dir)/controls/web-view/web-view.h
+SET( devel_api_drag_and_drop_detector_header_files
+  ${devel_api_src_dir}/drag-drop-detector/drag-and-drop-detector.h
+)
 
-devel_api_drag_and_drop_detector_header_files = \
-  $(devel_api_src_dir)/drag-drop-detector/drag-and-drop-detector.h
+SET( SOURCES ${SOURCES}
+  ${devel_api_src_files}
+)
+
+SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
+  ${devel_api_header_files}
+#  ${devel_api_accessibility-manager_header_files}
+  ${devel_api_alignment_header_files}
+  ${devel_api_controls_header_files}
+  ${devel_api_bloom_view_header_files}
+  ${devel_api_bubble_emitter_header_files}
+  ${devel_api_buttons_header_files}
+  ${devel_api_builder_header_files}
+  ${devel_api_effects_view_header_files}
+  ${devel_api_layouting_header_files}
+  ${devel_api_magnifier_header_files}
+  ${devel_api_navigation_view_header_files}
+  ${devel_api_page_turn_view_header_files}
+  ${devel_api_popup_header_files}
+  ${devel_api_progress_bar_header_files}
+  ${devel_api_scroll_bar_header_files}
+  ${devel_api_table_view_header_files}
+  ${devel_api_visual_factory_header_files}
+  ${devel_api_visuals_header_files}
+  ${devel_api_scene3d_view_header_files}
+  ${devel_api_shadow_view_header_files}
+  ${devel_api_focus_manager_header_files}
+  ${devel_api_image_loader_header_files}
+  ${devel_api_scripting_header_files}
+  ${devel_api_shader_effects_header_files}
+  ${devel_api_styling_header_files}
+  ${devel_api_super_blur_view_header_files}
+  ${devel_api_text_controls_header_files}
+  ${devel_api_text_header_files}
+  ${devel_api_tool_bar_header_files}
+  ${devel_api_tooltip_header_files}
+  ${devel_api_transition_effects_header_files}
+  ${devel_api_gaussian_blur_view_header_files}
+#  ${devel_api_video_view_header_files}
+  ${devel_api_web_view_header_files}
+  ${devel_api_drag_and_drop_detector_header_files}
+#  ${devel_api_utility_header_files}
+)

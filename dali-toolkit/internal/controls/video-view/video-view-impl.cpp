@@ -25,7 +25,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
-#include <dali/integration-api/adaptors/adaptor.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/devel-api/actors/actor-devel.h>

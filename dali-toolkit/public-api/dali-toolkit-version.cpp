@@ -46,6 +46,7 @@ struct PrintVersion
   }
 };
 PrintVersion TOOLKIT_VERSION;
+
 } // unnamed namespace
 #endif
 

@@ -1,180 +1,183 @@
-# Add local source files here
+# Set the source directory
+SET( toolkit_src_dir ${ROOT_SRC_DIR}/dali-toolkit/internal )
 
-toolkit_src_files = \
-   $(toolkit_src_dir)/builder/builder-animations.cpp \
-   $(toolkit_src_dir)/builder/builder-impl.cpp \
-   $(toolkit_src_dir)/builder/builder-impl-debug.cpp \
-   $(toolkit_src_dir)/builder/builder-set-property.cpp \
-   $(toolkit_src_dir)/builder/builder-signals.cpp \
-   $(toolkit_src_dir)/builder/json-parser-state.cpp \
-   $(toolkit_src_dir)/builder/json-parser-impl.cpp \
-   $(toolkit_src_dir)/builder/style.cpp \
-   $(toolkit_src_dir)/builder/tree-node-manipulator.cpp \
-   $(toolkit_src_dir)/builder/replacement.cpp \
-   $(toolkit_src_dir)/layouting/absolute-layout-impl.cpp \
-   $(toolkit_src_dir)/layouting/bin-layout-impl.cpp \
-   $(toolkit_src_dir)/layouting/flex-layout-impl.cpp \
-   $(toolkit_src_dir)/layouting/grid-locations.cpp \
-   $(toolkit_src_dir)/layouting/grid-impl.cpp \
-   $(toolkit_src_dir)/layouting/layout-item-data-impl.cpp \
-   $(toolkit_src_dir)/layouting/layout-group-data-impl.cpp \
-   $(toolkit_src_dir)/layouting/layout-controller-debug.cpp \
-   $(toolkit_src_dir)/layouting/layout-controller-impl.cpp \
-   $(toolkit_src_dir)/layouting/linear-layout-impl.cpp \
-   $(toolkit_src_dir)/layouting/layout-transition-data-impl.cpp \
-   $(toolkit_src_dir)/layouting/size-negotiation-mapper.cpp \
-   $(toolkit_src_dir)/visuals/animated-image/animated-image-visual.cpp \
-   $(toolkit_src_dir)/visuals/animated-image/image-cache.cpp \
-   $(toolkit_src_dir)/visuals/animated-image/fixed-image-cache.cpp \
-   $(toolkit_src_dir)/visuals/animated-image/rolling-image-cache.cpp \
-   $(toolkit_src_dir)/visuals/animated-image/rolling-gif-image-cache.cpp \
-   $(toolkit_src_dir)/visuals/animated-vector-image/animated-vector-image-visual.cpp \
-   $(toolkit_src_dir)/visuals/animated-vector-image/vector-rasterize-thread.cpp \
-   $(toolkit_src_dir)/visuals/border/border-visual.cpp \
-   $(toolkit_src_dir)/visuals/color/color-visual.cpp \
-   $(toolkit_src_dir)/visuals/gradient/gradient-visual.cpp \
-   $(toolkit_src_dir)/visuals/gradient/gradient.cpp \
-   $(toolkit_src_dir)/visuals/gradient/linear-gradient.cpp \
-   $(toolkit_src_dir)/visuals/gradient/radial-gradient.cpp \
-   $(toolkit_src_dir)/visuals/animated-gradient/animated-gradient-visual.cpp \
-   $(toolkit_src_dir)/visuals/image-atlas-manager.cpp \
-   $(toolkit_src_dir)/visuals/image/image-visual.cpp \
-   $(toolkit_src_dir)/visuals/mesh/mesh-visual.cpp \
-   $(toolkit_src_dir)/visuals/npatch-loader.cpp \
-   $(toolkit_src_dir)/visuals/npatch/npatch-visual.cpp \
-   $(toolkit_src_dir)/visuals/primitive/primitive-visual.cpp \
-   $(toolkit_src_dir)/visuals/svg/svg-rasterize-thread.cpp \
-   $(toolkit_src_dir)/visuals/svg/svg-visual.cpp \
-   $(toolkit_src_dir)/visuals/text/text-visual.cpp \
-   $(toolkit_src_dir)/visuals/transition-data-impl.cpp \
-   $(toolkit_src_dir)/visuals/texture-manager-impl.cpp \
-   $(toolkit_src_dir)/visuals/texture-upload-observer.cpp \
-   $(toolkit_src_dir)/visuals/image-visual-shader-factory.cpp \
-   $(toolkit_src_dir)/visuals/visual-base-data-impl.cpp \
-   $(toolkit_src_dir)/visuals/visual-base-impl.cpp \
-   $(toolkit_src_dir)/visuals/visual-factory-cache.cpp \
-   $(toolkit_src_dir)/visuals/visual-factory-impl.cpp \
-   $(toolkit_src_dir)/visuals/visual-string-constants.cpp \
-   $(toolkit_src_dir)/visuals/visual-url.cpp \
-   $(toolkit_src_dir)/visuals/wireframe/wireframe-visual.cpp \
-   $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
-   $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
-   $(toolkit_src_dir)/controls/bubble-effect/bubble-emitter-impl.cpp \
-   $(toolkit_src_dir)/controls/bubble-effect/bubble-renderer.cpp \
-   $(toolkit_src_dir)/controls/buttons/button-impl.cpp \
-   $(toolkit_src_dir)/controls/buttons/check-box-button-impl.cpp \
-   $(toolkit_src_dir)/controls/buttons/push-button-impl.cpp \
-   $(toolkit_src_dir)/controls/buttons/radio-button-impl.cpp \
-   $(toolkit_src_dir)/controls/buttons/toggle-button-impl.cpp \
-   $(toolkit_src_dir)/controls/control/control-data-impl.cpp \
-   $(toolkit_src_dir)/controls/control/control-debug.cpp \
-   $(toolkit_src_dir)/controls/effects-view/effects-view-impl.cpp \
-   $(toolkit_src_dir)/controls/flex-container/flex-container-impl.cpp \
-   $(toolkit_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \
-   $(toolkit_src_dir)/controls/image-view/image-view-impl.cpp \
-   $(toolkit_src_dir)/controls/magnifier/magnifier-impl.cpp \
-   $(toolkit_src_dir)/controls/navigation-view/navigation-view-impl.cpp \
-   $(toolkit_src_dir)/controls/popup/confirmation-popup-impl.cpp \
-   $(toolkit_src_dir)/controls/model3d-view/model3d-view-impl.cpp \
-   $(toolkit_src_dir)/controls/model3d-view/obj-loader.cpp \
-   $(toolkit_src_dir)/controls/popup/popup-impl.cpp \
-   $(toolkit_src_dir)/controls/page-turn-view/page-turn-portrait-view-impl.cpp \
-   $(toolkit_src_dir)/controls/page-turn-view/page-turn-effect.cpp \
-   $(toolkit_src_dir)/controls/page-turn-view/page-turn-landscape-view-impl.cpp \
-   $(toolkit_src_dir)/controls/page-turn-view/page-turn-view-impl.cpp \
-   $(toolkit_src_dir)/controls/progress-bar/progress-bar-impl.cpp \
-   $(toolkit_src_dir)/controls/scroll-bar/scroll-bar-impl.cpp \
-   $(toolkit_src_dir)/controls/scrollable/bouncing-effect-actor.cpp \
-   $(toolkit_src_dir)/controls/scrollable/item-view/depth-layout.cpp \
-   $(toolkit_src_dir)/controls/scrollable/item-view/grid-layout.cpp \
-   $(toolkit_src_dir)/controls/scrollable/item-view/item-view-impl.cpp \
-   $(toolkit_src_dir)/controls/scrollable/item-view/spiral-layout.cpp \
-   $(toolkit_src_dir)/controls/scrollable/scrollable-impl.cpp \
-   $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-base-impl.cpp \
-   $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.cpp \
-   $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-view-effect-impl.cpp \
-   $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-view-impl.cpp \
-   $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-view-page-path-effect-impl.cpp \
-   $(toolkit_src_dir)/controls/scene3d-view/scene3d-view-impl.cpp \
-   $(toolkit_src_dir)/controls/scene3d-view/gltf-loader.cpp \
-   $(toolkit_src_dir)/controls/shadow-view/shadow-view-impl.cpp \
-   $(toolkit_src_dir)/controls/slider/slider-impl.cpp \
-   $(toolkit_src_dir)/controls/super-blur-view/super-blur-view-impl.cpp \
-   $(toolkit_src_dir)/controls/table-view/table-view-impl.cpp \
-   $(toolkit_src_dir)/controls/text-controls/text-editor-impl.cpp \
-   $(toolkit_src_dir)/controls/text-controls/text-field-impl.cpp \
-   $(toolkit_src_dir)/controls/text-controls/text-label-impl.cpp \
-   $(toolkit_src_dir)/controls/text-controls/text-selection-popup-impl.cpp \
-   $(toolkit_src_dir)/controls/text-controls/text-selection-toolbar-impl.cpp \
-   $(toolkit_src_dir)/controls/tool-bar/tool-bar-impl.cpp \
-   $(toolkit_src_dir)/controls/tooltip/tooltip.cpp \
-   $(toolkit_src_dir)/controls/video-view/video-view-impl.cpp \
-   $(toolkit_src_dir)/controls/web-view/web-view-impl.cpp \
-   $(toolkit_src_dir)/accessibility-manager/accessibility-manager-impl.cpp \
-   \
-   $(toolkit_src_dir)/feedback/feedback-style.cpp \
-   \
-   $(toolkit_src_dir)/focus-manager/keyboard-focus-manager-impl.cpp \
-   $(toolkit_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp \
-   $(toolkit_src_dir)/helpers/color-conversion.cpp \
-   $(toolkit_src_dir)/helpers/property-helper.cpp \
-   $(toolkit_src_dir)/filters/blur-two-pass-filter.cpp \
-   $(toolkit_src_dir)/filters/emboss-filter.cpp \
-   $(toolkit_src_dir)/filters/image-filter.cpp \
-   $(toolkit_src_dir)/filters/spread-filter.cpp \
-   $(toolkit_src_dir)/image-loader/async-image-loader-impl.cpp \
-   $(toolkit_src_dir)/image-loader/atlas-packer.cpp \
-   $(toolkit_src_dir)/image-loader/image-atlas-impl.cpp \
-   $(toolkit_src_dir)/image-loader/image-load-thread.cpp \
-   $(toolkit_src_dir)/styling/style-manager-impl.cpp \
-   $(toolkit_src_dir)/text/bidirectional-support.cpp \
-   $(toolkit_src_dir)/text/character-set-conversion.cpp \
-   $(toolkit_src_dir)/text/color-segmentation.cpp \
-   $(toolkit_src_dir)/text/cursor-helper-functions.cpp \
-   $(toolkit_src_dir)/text/glyph-metrics-helper.cpp \
-   $(toolkit_src_dir)/text/logical-model-impl.cpp \
-   $(toolkit_src_dir)/text/markup-processor.cpp \
-   $(toolkit_src_dir)/text/markup-processor-color.cpp \
-   $(toolkit_src_dir)/text/markup-processor-embedded-item.cpp \
-   $(toolkit_src_dir)/text/markup-processor-font.cpp \
-   $(toolkit_src_dir)/text/markup-processor-helper-functions.cpp \
-   $(toolkit_src_dir)/text/multi-language-support.cpp \
-   $(toolkit_src_dir)/text/hidden-text.cpp \
-   $(toolkit_src_dir)/text/property-string-parser.cpp \
-   $(toolkit_src_dir)/text/segmentation.cpp \
-   $(toolkit_src_dir)/text/shaper.cpp \
-   $(toolkit_src_dir)/text/text-enumerations-impl.cpp \
-   $(toolkit_src_dir)/text/text-controller.cpp \
-   $(toolkit_src_dir)/text/text-controller-impl.cpp \
-   $(toolkit_src_dir)/text/text-effects-style.cpp \
-   $(toolkit_src_dir)/text/text-font-style.cpp \
-   $(toolkit_src_dir)/text/text-io.cpp \
-   $(toolkit_src_dir)/text/text-model.cpp \
-   $(toolkit_src_dir)/text/text-scroller.cpp \
-   $(toolkit_src_dir)/text/text-vertical-scroller.cpp \
-   $(toolkit_src_dir)/text/text-view.cpp \
-   $(toolkit_src_dir)/text/text-view-interface.cpp \
-   $(toolkit_src_dir)/text/visual-model-impl.cpp \
-   $(toolkit_src_dir)/text/decorator/text-decorator.cpp \
-   $(toolkit_src_dir)/text/layouts/layout-engine.cpp \
-   $(toolkit_src_dir)/text/multi-language-helper-functions.cpp \
-   $(toolkit_src_dir)/text/multi-language-support-impl.cpp \
-   $(toolkit_src_dir)/text/rendering/text-backend.cpp \
-   $(toolkit_src_dir)/text/rendering/text-renderer.cpp \
-   $(toolkit_src_dir)/text/rendering/atlas/text-atlas-renderer.cpp \
-   $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager.cpp \
-   $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager-impl.cpp \
-   $(toolkit_src_dir)/text/rendering/atlas/atlas-manager.cpp \
-   $(toolkit_src_dir)/text/rendering/atlas/atlas-manager-impl.cpp \
-   $(toolkit_src_dir)/text/rendering/atlas/atlas-mesh-factory.cpp \
-   $(toolkit_src_dir)/text/rendering/text-backend-impl.cpp \
-   $(toolkit_src_dir)/text/rendering/text-typesetter.cpp \
-   $(toolkit_src_dir)/text/rendering/view-model.cpp \
-   $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \
-   $(toolkit_src_dir)/transition-effects/cube-transition-cross-effect-impl.cpp \
-   $(toolkit_src_dir)/transition-effects/cube-transition-fold-effect-impl.cpp \
-   $(toolkit_src_dir)/transition-effects/cube-transition-wave-effect-impl.cpp \
-   $(toolkit_src_dir)/scripting/script-impl.cpp \
-   $(toolkit_src_dir)/scripting/script-plugin-proxy.cpp \
-   $(toolkit_src_dir)/text/xhtml-entities.cpp \
-   $(toolkit_src_dir)/drag-drop-detector/drag-and-drop-detector-impl.cpp
+# Add local source files here
+SET( toolkit_src_files
+   ${toolkit_src_dir}/builder/builder-animations.cpp
+   ${toolkit_src_dir}/builder/builder-impl.cpp
+   ${toolkit_src_dir}/builder/builder-impl-debug.cpp
+   ${toolkit_src_dir}/builder/builder-set-property.cpp
+   ${toolkit_src_dir}/builder/builder-signals.cpp
+   ${toolkit_src_dir}/builder/json-parser-state.cpp
+   ${toolkit_src_dir}/builder/json-parser-impl.cpp
+   ${toolkit_src_dir}/builder/style.cpp
+   ${toolkit_src_dir}/builder/tree-node-manipulator.cpp
+   ${toolkit_src_dir}/builder/replacement.cpp
+   ${toolkit_src_dir}/layouting/absolute-layout-impl.cpp
+   ${toolkit_src_dir}/layouting/bin-layout-impl.cpp
+   ${toolkit_src_dir}/layouting/flex-layout-impl.cpp
+   ${toolkit_src_dir}/layouting/grid-locations.cpp
+   ${toolkit_src_dir}/layouting/grid-impl.cpp
+   ${toolkit_src_dir}/layouting/layout-item-data-impl.cpp
+   ${toolkit_src_dir}/layouting/layout-group-data-impl.cpp
+   ${toolkit_src_dir}/layouting/layout-controller-debug.cpp
+   ${toolkit_src_dir}/layouting/layout-controller-impl.cpp
+   ${toolkit_src_dir}/layouting/linear-layout-impl.cpp
+   ${toolkit_src_dir}/layouting/layout-transition-data-impl.cpp
+   ${toolkit_src_dir}/layouting/size-negotiation-mapper.cpp
+   ${toolkit_src_dir}/visuals/animated-image/animated-image-visual.cpp
+   ${toolkit_src_dir}/visuals/animated-image/image-cache.cpp
+   ${toolkit_src_dir}/visuals/animated-image/fixed-image-cache.cpp
+   ${toolkit_src_dir}/visuals/animated-image/rolling-image-cache.cpp
+   ${toolkit_src_dir}/visuals/animated-image/rolling-gif-image-cache.cpp
+   ${toolkit_src_dir}/visuals/animated-vector-image/animated-vector-image-visual.cpp
+   ${toolkit_src_dir}/visuals/animated-vector-image/vector-rasterize-thread.cpp
+   ${toolkit_src_dir}/visuals/border/border-visual.cpp
+   ${toolkit_src_dir}/visuals/color/color-visual.cpp
+   ${toolkit_src_dir}/visuals/gradient/gradient-visual.cpp
+   ${toolkit_src_dir}/visuals/gradient/gradient.cpp
+   ${toolkit_src_dir}/visuals/gradient/linear-gradient.cpp
+   ${toolkit_src_dir}/visuals/gradient/radial-gradient.cpp
+   ${toolkit_src_dir}/visuals/animated-gradient/animated-gradient-visual.cpp
+   ${toolkit_src_dir}/visuals/image-atlas-manager.cpp
+   ${toolkit_src_dir}/visuals/image/image-visual.cpp
+   ${toolkit_src_dir}/visuals/mesh/mesh-visual.cpp
+   ${toolkit_src_dir}/visuals/npatch-loader.cpp
+   ${toolkit_src_dir}/visuals/npatch/npatch-visual.cpp
+   ${toolkit_src_dir}/visuals/primitive/primitive-visual.cpp
+   ${toolkit_src_dir}/visuals/svg/svg-rasterize-thread.cpp
+   ${toolkit_src_dir}/visuals/svg/svg-visual.cpp
+   ${toolkit_src_dir}/visuals/text/text-visual.cpp
+   ${toolkit_src_dir}/visuals/transition-data-impl.cpp
+   ${toolkit_src_dir}/visuals/texture-manager-impl.cpp
+   ${toolkit_src_dir}/visuals/texture-upload-observer.cpp
+   ${toolkit_src_dir}/visuals/image-visual-shader-factory.cpp
+   ${toolkit_src_dir}/visuals/visual-base-data-impl.cpp
+   ${toolkit_src_dir}/visuals/visual-base-impl.cpp
+   ${toolkit_src_dir}/visuals/visual-factory-cache.cpp
+   ${toolkit_src_dir}/visuals/visual-factory-impl.cpp
+   ${toolkit_src_dir}/visuals/visual-string-constants.cpp
+   ${toolkit_src_dir}/visuals/visual-url.cpp
+   ${toolkit_src_dir}/visuals/wireframe/wireframe-visual.cpp
+   ${toolkit_src_dir}/controls/alignment/alignment-impl.cpp
+   ${toolkit_src_dir}/controls/bloom-view/bloom-view-impl.cpp
+   ${toolkit_src_dir}/controls/bubble-effect/bubble-emitter-impl.cpp
+   ${toolkit_src_dir}/controls/bubble-effect/bubble-renderer.cpp
+   ${toolkit_src_dir}/controls/buttons/button-impl.cpp
+   ${toolkit_src_dir}/controls/buttons/check-box-button-impl.cpp
+   ${toolkit_src_dir}/controls/buttons/push-button-impl.cpp
+   ${toolkit_src_dir}/controls/buttons/radio-button-impl.cpp
+   ${toolkit_src_dir}/controls/buttons/toggle-button-impl.cpp
+   ${toolkit_src_dir}/controls/control/control-data-impl.cpp
+   ${toolkit_src_dir}/controls/control/control-debug.cpp
+   ${toolkit_src_dir}/controls/effects-view/effects-view-impl.cpp
+   ${toolkit_src_dir}/controls/flex-container/flex-container-impl.cpp
+   ${toolkit_src_dir}/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp
+   ${toolkit_src_dir}/controls/image-view/image-view-impl.cpp
+   ${toolkit_src_dir}/controls/magnifier/magnifier-impl.cpp
+   ${toolkit_src_dir}/controls/navigation-view/navigation-view-impl.cpp
+   ${toolkit_src_dir}/controls/popup/confirmation-popup-impl.cpp
+   ${toolkit_src_dir}/controls/model3d-view/model3d-view-impl.cpp
+   ${toolkit_src_dir}/controls/model3d-view/obj-loader.cpp
+   ${toolkit_src_dir}/controls/popup/popup-impl.cpp
+   ${toolkit_src_dir}/controls/page-turn-view/page-turn-portrait-view-impl.cpp
+   ${toolkit_src_dir}/controls/page-turn-view/page-turn-effect.cpp
+   ${toolkit_src_dir}/controls/page-turn-view/page-turn-landscape-view-impl.cpp
+   ${toolkit_src_dir}/controls/page-turn-view/page-turn-view-impl.cpp
+   ${toolkit_src_dir}/controls/progress-bar/progress-bar-impl.cpp
+   ${toolkit_src_dir}/controls/scroll-bar/scroll-bar-impl.cpp
+   ${toolkit_src_dir}/controls/scrollable/bouncing-effect-actor.cpp
+   ${toolkit_src_dir}/controls/scrollable/item-view/depth-layout.cpp
+   ${toolkit_src_dir}/controls/scrollable/item-view/grid-layout.cpp
+   ${toolkit_src_dir}/controls/scrollable/item-view/item-view-impl.cpp
+   ${toolkit_src_dir}/controls/scrollable/item-view/spiral-layout.cpp
+   ${toolkit_src_dir}/controls/scrollable/scrollable-impl.cpp
+   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-base-impl.cpp
+   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.cpp
+   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-effect-impl.cpp
+   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-impl.cpp
+   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-page-path-effect-impl.cpp
+   ${toolkit_src_dir}/controls/scene3d-view/scene3d-view-impl.cpp
+   ${toolkit_src_dir}/controls/scene3d-view/gltf-loader.cpp
+   ${toolkit_src_dir}/controls/shadow-view/shadow-view-impl.cpp
+   ${toolkit_src_dir}/controls/slider/slider-impl.cpp
+   ${toolkit_src_dir}/controls/super-blur-view/super-blur-view-impl.cpp
+   ${toolkit_src_dir}/controls/table-view/table-view-impl.cpp
+   ${toolkit_src_dir}/controls/text-controls/text-editor-impl.cpp
+   ${toolkit_src_dir}/controls/text-controls/text-field-impl.cpp
+   ${toolkit_src_dir}/controls/text-controls/text-label-impl.cpp
+   ${toolkit_src_dir}/controls/text-controls/text-selection-popup-impl.cpp
+   ${toolkit_src_dir}/controls/text-controls/text-selection-toolbar-impl.cpp
+   ${toolkit_src_dir}/controls/tool-bar/tool-bar-impl.cpp
+   ${toolkit_src_dir}/controls/tooltip/tooltip.cpp
+   ${toolkit_src_dir}/controls/video-view/video-view-impl.cpp
+   ${toolkit_src_dir}/controls/web-view/web-view-impl.cpp
+   ${toolkit_src_dir}/accessibility-manager/accessibility-manager-impl.cpp
+   ${toolkit_src_dir}/feedback/feedback-style.cpp
+   ${toolkit_src_dir}/focus-manager/keyboard-focus-manager-impl.cpp
+   ${toolkit_src_dir}/focus-manager/keyinput-focus-manager-impl.cpp
+   ${toolkit_src_dir}/helpers/color-conversion.cpp
+   ${toolkit_src_dir}/helpers/property-helper.cpp
+   ${toolkit_src_dir}/filters/blur-two-pass-filter.cpp
+   ${toolkit_src_dir}/filters/emboss-filter.cpp
+   ${toolkit_src_dir}/filters/image-filter.cpp
+   ${toolkit_src_dir}/filters/spread-filter.cpp
+   ${toolkit_src_dir}/image-loader/async-image-loader-impl.cpp
+   ${toolkit_src_dir}/image-loader/atlas-packer.cpp
+   ${toolkit_src_dir}/image-loader/image-atlas-impl.cpp
+   ${toolkit_src_dir}/image-loader/image-load-thread.cpp
+   ${toolkit_src_dir}/styling/style-manager-impl.cpp
+   ${toolkit_src_dir}/text/bidirectional-support.cpp
+   ${toolkit_src_dir}/text/character-set-conversion.cpp
+   ${toolkit_src_dir}/text/color-segmentation.cpp
+   ${toolkit_src_dir}/text/cursor-helper-functions.cpp
+   ${toolkit_src_dir}/text/glyph-metrics-helper.cpp
+   ${toolkit_src_dir}/text/logical-model-impl.cpp
+   ${toolkit_src_dir}/text/markup-processor.cpp
+   ${toolkit_src_dir}/text/markup-processor-color.cpp
+   ${toolkit_src_dir}/text/markup-processor-embedded-item.cpp
+   ${toolkit_src_dir}/text/markup-processor-font.cpp
+   ${toolkit_src_dir}/text/markup-processor-helper-functions.cpp
+   ${toolkit_src_dir}/text/multi-language-support.cpp
+   ${toolkit_src_dir}/text/hidden-text.cpp
+   ${toolkit_src_dir}/text/property-string-parser.cpp
+   ${toolkit_src_dir}/text/segmentation.cpp
+   ${toolkit_src_dir}/text/shaper.cpp
+   ${toolkit_src_dir}/text/text-enumerations-impl.cpp
+   ${toolkit_src_dir}/text/text-controller.cpp
+   ${toolkit_src_dir}/text/text-controller-impl.cpp
+   ${toolkit_src_dir}/text/text-effects-style.cpp
+   ${toolkit_src_dir}/text/text-font-style.cpp
+   ${toolkit_src_dir}/text/text-io.cpp
+   ${toolkit_src_dir}/text/text-model.cpp
+   ${toolkit_src_dir}/text/text-scroller.cpp
+   ${toolkit_src_dir}/text/text-vertical-scroller.cpp
+   ${toolkit_src_dir}/text/text-view.cpp
+   ${toolkit_src_dir}/text/text-view-interface.cpp
+   ${toolkit_src_dir}/text/visual-model-impl.cpp
+   ${toolkit_src_dir}/text/decorator/text-decorator.cpp
+   ${toolkit_src_dir}/text/layouts/layout-engine.cpp
+   ${toolkit_src_dir}/text/multi-language-helper-functions.cpp
+   ${toolkit_src_dir}/text/multi-language-support-impl.cpp
+   ${toolkit_src_dir}/text/rendering/text-backend.cpp
+   ${toolkit_src_dir}/text/rendering/text-renderer.cpp
+   ${toolkit_src_dir}/text/rendering/atlas/text-atlas-renderer.cpp
+   ${toolkit_src_dir}/text/rendering/atlas/atlas-glyph-manager.cpp
+   ${toolkit_src_dir}/text/rendering/atlas/atlas-glyph-manager-impl.cpp
+   ${toolkit_src_dir}/text/rendering/atlas/atlas-manager.cpp
+   ${toolkit_src_dir}/text/rendering/atlas/atlas-manager-impl.cpp
+   ${toolkit_src_dir}/text/rendering/atlas/atlas-mesh-factory.cpp
+   ${toolkit_src_dir}/text/rendering/text-backend-impl.cpp
+   ${toolkit_src_dir}/text/rendering/text-typesetter.cpp
+   ${toolkit_src_dir}/text/rendering/view-model.cpp
+   ${toolkit_src_dir}/transition-effects/cube-transition-effect-impl.cpp
+   ${toolkit_src_dir}/transition-effects/cube-transition-cross-effect-impl.cpp
+   ${toolkit_src_dir}/transition-effects/cube-transition-fold-effect-impl.cpp
+   ${toolkit_src_dir}/transition-effects/cube-transition-wave-effect-impl.cpp
+   ${toolkit_src_dir}/scripting/script-impl.cpp
+   ${toolkit_src_dir}/scripting/script-plugin-proxy.cpp
+   ${toolkit_src_dir}/text/xhtml-entities.cpp
+   ${toolkit_src_dir}/drag-drop-detector/drag-and-drop-detector-impl.cpp
+)
+
+SET( SOURCES ${SOURCES} ${toolkit_src_files} )

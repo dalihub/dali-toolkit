@@ -27,7 +27,6 @@ namespace Dali
 namespace Toolkit
 {
 
-
 namespace DevelColorVisual
 {
 
@@ -56,10 +55,6 @@ enum
 } // namespace Property
 
 } // namespace ColorVisual
-
-/**
- * @}
- */
 
 } // namespace Toolkit
 

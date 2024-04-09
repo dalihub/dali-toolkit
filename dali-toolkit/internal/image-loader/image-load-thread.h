@@ -26,7 +26,7 @@
 #include <dali/devel-api/threading/thread.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
-#include <dali/integration-api/adaptors/log-factory-interface.h>
+#include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
