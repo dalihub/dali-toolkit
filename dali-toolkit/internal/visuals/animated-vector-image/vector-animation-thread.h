@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VECTOR_ANIMATION_THREAD_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,10 +77,11 @@ public:
    * @brief Add an event trigger callback.
    *
    * @param callback The callback to add
+   * @param argument The argument to pass to the callback
    * @note Ownership of the callback is NOT passed onto this class.
    * @note The callback will be excuted in the main thread.
    */
-  void AddEventTriggerCallback(CallbackBase* callback);
+  void AddEventTriggerCallback(CallbackBase* callback, uint32_t argument);
 
   /**
    * @brief Remove event trigger callbacks what we added before.
@@ -109,7 +110,7 @@ private:
   /**
    * @brief Gets next event callback to process.
    */
-  CallbackBase* GetNextEventCallback();
+  std::pair<CallbackBase*, uint32_t> GetNextEventCallback();
 
   /**
    * @brief The thread to sleep until the next frame time.
@@ -160,20 +161,20 @@ private:
   VectorAnimationThread& operator=(const VectorAnimationThread& thread) = delete;
 
 private:
-  std::vector<VectorAnimationTaskPtr>  mAnimationTasks;
-  std::vector<VectorAnimationTaskPtr>  mCompletedTasks;
-  std::vector<VectorAnimationTaskPtr>  mWorkingTasks;
-  std::vector<CallbackBase*>           mTriggerEventCallbacks{}; // Callbacks are not owned
-  SleepThread                          mSleepThread;
-  ConditionalWait                      mConditionalWait;
-  Mutex                                mEventTriggerMutex;
-  std::unique_ptr<EventThreadCallback> mEventTrigger{};
-  bool                                 mNeedToSleep;
-  bool                                 mDestroyThread;
-  bool                                 mEventTriggered{false};
-  const Dali::LogFactoryInterface&     mLogFactory;
-  const Dali::TraceFactoryInterface&   mTraceFactory;
-  Dali::AsyncTaskManager               mAsyncTaskManager;
+  std::vector<VectorAnimationTaskPtr>             mAnimationTasks;
+  std::vector<VectorAnimationTaskPtr>             mCompletedTasks;
+  std::vector<VectorAnimationTaskPtr>             mWorkingTasks;
+  std::vector<std::pair<CallbackBase*, uint32_t>> mTriggerEventCallbacks{}; // Callbacks are not owned
+  SleepThread                                     mSleepThread;
+  ConditionalWait                                 mConditionalWait;
+  Mutex                                           mEventTriggerMutex;
+  std::unique_ptr<EventThreadCallback>            mEventTrigger{};
+  bool                                            mNeedToSleep;
+  bool                                            mDestroyThread;
+  bool                                            mEventTriggered{false};
+  const Dali::LogFactoryInterface&                mLogFactory;
+  const Dali::TraceFactoryInterface&              mTraceFactory;
+  Dali::AsyncTaskManager                          mAsyncTaskManager;
 };
 
 } // namespace Internal

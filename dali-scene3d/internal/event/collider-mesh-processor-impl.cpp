@@ -94,11 +94,9 @@ public:
       Vector3     direction;
       cameraActor.ScreenToLocal(x, y, result.x, result.y);
 
-      auto                  list      = Stage::GetCurrent().GetRenderTaskList();
-      [[maybe_unused]] auto taskCount = list.GetTaskCount();
-      renderTask                      = list.GetTask(list.GetTaskCount() - 1);
+      auto sceneViewRenderTask = GetImpl(sceneView).GetRenderTask();
 
-      if(HitTestAlgorithm::BuildPickingRay(renderTask, result, origin, direction))
+      if(sceneViewRenderTask && HitTestAlgorithm::BuildPickingRay(sceneViewRenderTask, result, origin, direction))
       {
         for(auto& mesh : meshData)
         {

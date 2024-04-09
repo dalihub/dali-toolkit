@@ -182,8 +182,10 @@ private:
 
   /**
    * @brief Event callback from rasterize thread. This is called after the animation is finished.
+   *
+   * @param[in] playStateId The play state id
    */
-  void OnAnimationFinished();
+  void OnAnimationFinished(uint32_t playStateId);
 
   /**
    * @brief Send animation data to the rasterize thread.
@@ -249,6 +251,8 @@ private:
   WeakHandle<Actor>                  mPlacementActor;
   DevelImageVisual::PlayState::Type  mPlayState;
   CallbackBase*                      mEventCallback; // Not owned
+
+  uint32_t mLastSentPlayStateId;
 
   bool mLoadFailed : 1;
   bool mRendererAdded : 1;

@@ -159,12 +159,12 @@ void VectorAnimationThread::OnAwakeFromSleep()
   }
 }
 
-void VectorAnimationThread::AddEventTriggerCallback(CallbackBase* callback)
+void VectorAnimationThread::AddEventTriggerCallback(CallbackBase* callback, uint32_t argument)
 {
   Mutex::ScopedLock lock(mEventTriggerMutex);
   if(!mDestroyThread)
   {
-    mTriggerEventCallbacks.push_back(callback);
+    mTriggerEventCallbacks.emplace_back(callback, argument);
 
     if(!mEventTriggered)
     {
@@ -179,7 +179,7 @@ void VectorAnimationThread::RemoveEventTriggerCallbacks(CallbackBase* callback)
   Mutex::ScopedLock lock(mEventTriggerMutex);
   if(!mDestroyThread)
   {
-    auto iter = std::remove(mTriggerEventCallbacks.begin(), mTriggerEventCallbacks.end(), callback);
+    auto iter = std::remove_if(mTriggerEventCallbacks.begin(), mTriggerEventCallbacks.end(), [&callback](std::pair<CallbackBase*, uint32_t>& item) { return item.first == callback; });
     mTriggerEventCallbacks.erase(iter, mTriggerEventCallbacks.end());
   }
 }
@@ -276,27 +276,32 @@ void VectorAnimationThread::Rasterize()
 
 void VectorAnimationThread::OnEventCallbackTriggered()
 {
-  while(CallbackBase* callback = GetNextEventCallback())
+  while(true)
   {
-    CallbackBase::Execute(*callback);
+    auto callbackPair = GetNextEventCallback();
+    if(callbackPair.first == nullptr)
+    {
+      break;
+    }
+    CallbackBase::Execute(*callbackPair.first, callbackPair.second);
   }
 }
 
-CallbackBase* VectorAnimationThread::GetNextEventCallback()
+std::pair<CallbackBase*, uint32_t> VectorAnimationThread::GetNextEventCallback()
 {
   Mutex::ScopedLock lock(mEventTriggerMutex);
   if(!mDestroyThread)
   {
     if(!mTriggerEventCallbacks.empty())
     {
-      auto          iter     = mTriggerEventCallbacks.begin();
-      CallbackBase* callback = *iter;
+      auto iter           = mTriggerEventCallbacks.begin();
+      auto callbackIdPair = *iter;
       mTriggerEventCallbacks.erase(iter);
-      return callback;
+      return callbackIdPair;
     }
     mEventTriggered = false;
   }
-  return nullptr;
+  return std::make_pair(nullptr, 0u);
 }
 
 VectorAnimationThread::SleepThread::SleepThread(CallbackBase* callback)

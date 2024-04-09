@@ -5520,6 +5520,66 @@ int UtcDaliImageViewTransitionEffect03(void)
   END_TEST;
 }
 
+int UtcDaliImageViewTransitionEffect04(void)
+{
+  tet_infoline("Test transitoin effect operation when image is changed quickly ");
+
+  ToolkitTestApplication application;
+  Property::Map          map;
+
+  ImageView imageView = ImageView::New();
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  imageView.SetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT, true);
+  imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  imageView.SetImage("");
+  application.GetScene().Add(imageView);
+
+  ImageView imageView2 = ImageView::New();
+  imageView2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  imageView2.SetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT, true);
+  imageView2.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  imageView2.SetImage("");
+  application.GetScene().Add(imageView2);
+  application.SendNotification();
+  application.Render();
+
+  //PLACEHOLDER_IMAGE is not call WaitForEventThreadTrigger because it is not shown url is null.
+  //DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  imageView.SetImage(gImage_600_RGB);
+  imageView.SetProperty(ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
+  imageView2.SetImage(TEST_IMAGE_1);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  imageView.SetImage(TEST_IMAGE_1);
+  imageView2.SetImage(gImage_600_RGB);
+  application.SendNotification();
+  application.Render(3000);
+
+  imageView.SetImage("");
+  application.SendNotification();
+  application.Render();
+
+  imageView.SetImage(TEST_IMAGE_2);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  Property::Value value;
+  value = imageView.GetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT);
+  bool transition;
+  DALI_TEST_CHECK(value.Get(transition));
+  DALI_TEST_CHECK(transition == true);
+
+  // Clear all cached
+  imageView.Unparent();
+  imageView.Reset();
+
+  END_TEST;
+}
+
 int UtcDaliImageViewImageLoadFailureAndReload01(void)
 {
   tet_infoline("Try to load invalid image first, and then reload after that image valid.");
