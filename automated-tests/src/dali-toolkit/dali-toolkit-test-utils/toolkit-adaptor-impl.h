@@ -74,7 +74,9 @@ public:
   void RemoveIdle( CallbackBase* callback );
   void RunIdles();
 
-  static Integration::Scene GetScene( Dali::Window window );
+  void RequestUpdateOnce();
+
+  static Integration::Scene GetScene(Dali::Window window);
 
   Dali::RenderSurfaceInterface& GetSurface();
   Dali::WindowContainer GetWindows();

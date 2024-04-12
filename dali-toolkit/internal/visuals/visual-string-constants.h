@@ -109,6 +109,7 @@ extern const char* const REDRAW_IN_SCALING_DOWN_NAME;
 extern const char* const MASKING_TYPE_NAME;
 extern const char* const MASK_TEXTURE_RATIO_NAME;
 extern const char* const USE_FIXED_CACHE;
+extern const char* const NOTIFY_AFTER_RASTERIZATION;
 
 // Text visual
 extern const char* const TEXT_PROPERTY;

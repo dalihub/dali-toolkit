@@ -125,6 +125,7 @@ const char* const REDRAW_IN_SCALING_DOWN_NAME("redrawInScalingDown");
 const char* const MASKING_TYPE_NAME("maskingType");
 const char* const MASK_TEXTURE_RATIO_NAME("maskTextureRatio");
 const char* const USE_FIXED_CACHE("useFixedCache");
+const char* const NOTIFY_AFTER_RASTERIZATION("notifyAfterRasterization");
 
 // Text visual
 const char* const TEXT_PROPERTY("text");

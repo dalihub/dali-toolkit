@@ -67,16 +67,19 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mWidth(0),
   mHeight(0),
   mAnimationDataIndex(0),
+  mAppliedPlayStateId(0u),
   mLoopCount(LOOP_FOREVER),
   mCurrentLoop(0),
   mForward(true),
   mUpdateFrameNumber(false),
   mNeedAnimationFinishedTrigger(true),
+  mNeedForceRenderOnceTrigger(false),
   mAnimationDataUpdated(false),
   mDestroyTask(false),
   mLoadRequest(false),
   mLoadFailed(false),
   mUseFixedCache(false),
+  mNotifyAfterRasterization(false),
   mSizeUpdated(false)
 {
   mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
@@ -120,7 +123,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
       Mutex::ScopedLock lock(mMutex);
       if(!synchronousLoading && mLoadCompletedCallback)
       {
-        mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
+        mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get(), 0u);
       }
     }
     return false;
@@ -138,7 +141,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
     Mutex::ScopedLock lock(mMutex);
     if(!synchronousLoading && mLoadCompletedCallback)
     {
-      mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get());
+      mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get(), 0u);
     }
   }
 
@@ -168,7 +171,7 @@ void VectorAnimationTask::RequestLoad(const std::string& url, bool synchronousLo
   {
     Load(true);
 
-    OnLoadCompleted();
+    OnLoadCompleted(0u);
   }
 }
 
@@ -250,6 +253,9 @@ void VectorAnimationTask::PauseAnimation()
   if(mPlayState == PlayState::PLAYING)
   {
     mPlayState = PlayState::PAUSED;
+
+    // Ensure to render paused frame.
+    mNeedForceRenderOnceTrigger = true;
 
     DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::PauseAnimation: Pause [%p]\n", this);
   }
@@ -342,10 +348,22 @@ void VectorAnimationTask::SetPlayRange(const Property::Array& playRange)
     if(mStartFrame > mCurrentFrame)
     {
       mCurrentFrame = mStartFrame;
+
+      if(mPlayState != PlayState::PLAYING)
+      {
+        // Ensure to render current frame.
+        mNeedForceRenderOnceTrigger = true;
+      }
     }
     else if(mEndFrame < mCurrentFrame)
     {
       mCurrentFrame = mEndFrame;
+
+      if(mPlayState != PlayState::PLAYING)
+      {
+        // Ensure to render current frame.
+        mNeedForceRenderOnceTrigger = true;
+      }
     }
 
     DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetPlayRange: [%d, %d] [%s] [%p]\n", mStartFrame, mEndFrame, mUrl.c_str(), this);
@@ -370,6 +388,12 @@ void VectorAnimationTask::SetCurrentFrameNumber(uint32_t frameNumber)
   {
     mCurrentFrame      = frameNumber;
     mUpdateFrameNumber = false;
+
+    if(mPlayState != PlayState::PLAYING)
+    {
+      // Ensure to render current frame.
+      mNeedForceRenderOnceTrigger = true;
+    }
 
     DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetCurrentFrameNumber: frame number = %d [%p]\n", mCurrentFrame, this);
   }
@@ -532,6 +556,8 @@ bool VectorAnimationTask::Rasterize(bool& keepAnimation)
     mForward     = true;
     mCurrentLoop = 0;
 
+    mNeedForceRenderOnceTrigger = true;
+
     if(mVectorRenderer)
     {
       // Notify the Renderer that rendering is stopped.
@@ -543,11 +569,19 @@ bool VectorAnimationTask::Rasterize(bool& keepAnimation)
       Mutex::ScopedLock lock(mMutex);
       if(mNeedAnimationFinishedTrigger && mAnimationFinishedCallback)
       {
-        mVectorAnimationThread.AddEventTriggerCallback(mAnimationFinishedCallback.get());
+        mVectorAnimationThread.AddEventTriggerCallback(mAnimationFinishedCallback.get(), mAppliedPlayStateId);
       }
     }
 
     DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Rasterize: Animation is finished [current = %d] [%p]\n", currentFrame, this);
+  }
+
+  // Forcely trigger render once if need.
+  if(mNotifyAfterRasterization || mNeedForceRenderOnceTrigger)
+  {
+    Mutex::ScopedLock lock(mMutex);
+    mVectorAnimationThread.RequestForceRenderOnce();
+    mNeedForceRenderOnceTrigger = false;
   }
 
   if(mPlayState != PlayState::PAUSED && mPlayState != PlayState::STOPPED)
@@ -670,6 +704,11 @@ void VectorAnimationTask::ApplyAnimationData()
     SetCurrentFrameNumber(mAnimationData[index].currentFrame);
   }
 
+  if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_NOTIFY_AFTER_RASTERIZATION)
+  {
+    mNotifyAfterRasterization = mAnimationData[index].notifyAfterRasterization;
+  }
+
   if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_NEED_RESOURCE_READY)
   {
     mVectorRenderer.InvalidateBuffer();
@@ -685,6 +724,7 @@ void VectorAnimationTask::ApplyAnimationData()
 
   if(mAnimationData[index].resendFlag & VectorAnimationTask::RESEND_PLAY_STATE)
   {
+    mAppliedPlayStateId = mAnimationData[index].playStateId;
     if(mAnimationData[index].playState == DevelImageVisual::PlayState::PLAYING)
     {
       PlayAnimation();
@@ -709,7 +749,7 @@ void VectorAnimationTask::OnUploadCompleted()
   mResourceReadySignal.Emit(ResourceStatus::READY);
 }
 
-void VectorAnimationTask::OnLoadCompleted()
+void VectorAnimationTask::OnLoadCompleted(uint32_t /* not used */)
 {
   if(!mLoadFailed)
   {

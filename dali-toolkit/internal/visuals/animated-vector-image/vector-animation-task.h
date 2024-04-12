@@ -64,15 +64,16 @@ public:
    */
   enum ResendFlags
   {
-    RESEND_PLAY_RANGE          = 1 << 0,
-    RESEND_LOOP_COUNT          = 1 << 1,
-    RESEND_STOP_BEHAVIOR       = 1 << 2,
-    RESEND_LOOPING_MODE        = 1 << 3,
-    RESEND_CURRENT_FRAME       = 1 << 4,
-    RESEND_SIZE                = 1 << 5,
-    RESEND_PLAY_STATE          = 1 << 6,
-    RESEND_NEED_RESOURCE_READY = 1 << 7,
-    RESEND_DYNAMIC_PROPERTY    = 1 << 8
+    RESEND_PLAY_RANGE                 = 1 << 0,
+    RESEND_LOOP_COUNT                 = 1 << 1,
+    RESEND_STOP_BEHAVIOR              = 1 << 2,
+    RESEND_LOOPING_MODE               = 1 << 3,
+    RESEND_CURRENT_FRAME              = 1 << 4,
+    RESEND_SIZE                       = 1 << 5,
+    RESEND_PLAY_STATE                 = 1 << 6,
+    RESEND_NEED_RESOURCE_READY        = 1 << 7,
+    RESEND_DYNAMIC_PROPERTY           = 1 << 8,
+    RESEND_NOTIFY_AFTER_RASTERIZATION = 1 << 9,
   };
 
   /**
@@ -90,21 +91,25 @@ public:
       currentFrame(0),
       width(0),
       height(0),
-      loopCount(-1)
+      loopCount(-1),
+      playStateId(0),
+      notifyAfterRasterization(false)
     {
     }
 
     AnimationData& operator=(const AnimationData& rhs)
     {
       resendFlag |= rhs.resendFlag; // OR resend flag
-      playRange    = rhs.playRange;
-      playState    = rhs.playState;
-      stopBehavior = rhs.stopBehavior;
-      loopingMode  = rhs.loopingMode;
-      currentFrame = rhs.currentFrame;
-      width        = rhs.width;
-      height       = rhs.height;
-      loopCount    = rhs.loopCount;
+      playRange                = rhs.playRange;
+      playState                = rhs.playState;
+      stopBehavior             = rhs.stopBehavior;
+      loopingMode              = rhs.loopingMode;
+      currentFrame             = rhs.currentFrame;
+      width                    = rhs.width;
+      height                   = rhs.height;
+      loopCount                = rhs.loopCount;
+      playStateId              = rhs.playStateId;
+      notifyAfterRasterization = rhs.notifyAfterRasterization;
       dynamicProperties.insert(dynamicProperties.end(), rhs.dynamicProperties.begin(), rhs.dynamicProperties.end());
       return *this;
     }
@@ -119,6 +124,8 @@ public:
     uint32_t                             width;
     uint32_t                             height;
     int32_t                              loopCount;
+    uint32_t                             playStateId;
+    bool                                 notifyAfterRasterization;
   };
 
   /**
@@ -233,6 +240,24 @@ public:
    */
   TimePoint GetNextFrameTime();
 
+  /**
+   * @brief Called when the rasterization is completed from the asyncTaskManager
+   * @param[in] task The completed task
+   */
+  void TaskCompleted(VectorAnimationTaskPtr task);
+
+  /**
+   * @brief Check the rasterization succeeded
+   * @return true if the rasterization succeeded, false otherwise.
+   */
+  bool IsRasterized();
+
+  /**
+   * @brief Check the animation is running
+   * @return true if the animation is running, false otherwise.
+   */
+  bool IsAnimating();
+
   void KeepRasterizedBuffer(bool useFixedCache)
   {
     mUseFixedCache = useFixedCache;
@@ -325,7 +350,7 @@ private:
   /**
    * @brief Event callback from rasterize thread. This is called when the file loading is completed.
    */
-  void OnLoadCompleted();
+  void OnLoadCompleted(uint32_t argument);
 
   // Undefined
   VectorAnimationTask(const VectorAnimationTask& task) = delete;
@@ -364,17 +389,20 @@ private:
   uint32_t                             mWidth;
   uint32_t                             mHeight;
   uint32_t                             mAnimationDataIndex;
+  uint32_t                             mAppliedPlayStateId;
   int32_t                              mLoopCount;
   int32_t                              mCurrentLoop;
-  bool                                 mForward;
-  bool                                 mUpdateFrameNumber;
-  bool                                 mNeedAnimationFinishedTrigger;
-  bool                                 mAnimationDataUpdated;
-  bool                                 mDestroyTask;
-  bool                                 mLoadRequest;
-  bool                                 mLoadFailed;
-  bool                                 mUseFixedCache;
-  bool                                 mSizeUpdated;
+  bool                                 mForward : 1;
+  bool                                 mUpdateFrameNumber : 1;
+  bool                                 mNeedAnimationFinishedTrigger : 1;
+  bool                                 mNeedForceRenderOnceTrigger : 1;
+  bool                                 mAnimationDataUpdated : 1;
+  bool                                 mDestroyTask : 1;
+  bool                                 mLoadRequest : 1;
+  bool                                 mLoadFailed : 1;
+  bool                                 mUseFixedCache : 1;
+  bool                                 mNotifyAfterRasterization : 1;
+  bool                                 mSizeUpdated : 1;
 };
 
 } // namespace Internal

@@ -101,6 +101,19 @@ void Adaptor::RunIdles()
   mCallbacks.Clear();
 }
 
+void Adaptor::RequestUpdateOnce()
+{
+  if(mTestApplication)
+  {
+    auto scene = mTestApplication->GetScene();
+    if(scene)
+    {
+      tet_printf("Adaptor::RequestUpdateOnce()\n");
+      scene.KeepRendering(0.0f);
+    }
+  }
+}
+
 Dali::RenderSurfaceInterface& Adaptor::GetSurface()
 {
   DALI_ASSERT_ALWAYS( ! mWindows.empty() );

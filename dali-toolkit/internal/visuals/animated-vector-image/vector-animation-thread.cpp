@@ -60,9 +60,11 @@ VectorAnimationThread::VectorAnimationThread()
   mSleepThread(MakeCallback(this, &VectorAnimationThread::OnAwakeFromSleep)),
   mConditionalWait(),
   mEventTriggerMutex(),
+  mLogFactory(Dali::Adaptor::Get().GetLogFactory()),
   mNeedToSleep(false),
   mDestroyThread(false),
-  mLogFactory(Dali::Adaptor::Get().GetLogFactory())
+  mEventTriggered(false),
+  mForceRenderOnce(false)
 {
   mSleepThread.Start();
 
@@ -171,12 +173,12 @@ void VectorAnimationThread::OnAwakeFromSleep()
   }
 }
 
-void VectorAnimationThread::AddEventTriggerCallback(CallbackBase* callback)
+void VectorAnimationThread::AddEventTriggerCallback(CallbackBase* callback, uint32_t argument)
 {
   Mutex::ScopedLock lock(mEventTriggerMutex);
   if(!mDestroyThread)
   {
-    mTriggerEventCallbacks.push_back(callback);
+    mTriggerEventCallbacks.emplace_back(callback, argument);
 
     if(!mEventTriggered)
     {
@@ -191,8 +193,23 @@ void VectorAnimationThread::RemoveEventTriggerCallbacks(CallbackBase* callback)
   Mutex::ScopedLock lock(mEventTriggerMutex);
   if(!mDestroyThread)
   {
-    auto iter = std::remove(mTriggerEventCallbacks.begin(), mTriggerEventCallbacks.end(), callback);
+    auto iter = std::remove_if(mTriggerEventCallbacks.begin(), mTriggerEventCallbacks.end(), [&callback](std::pair<CallbackBase*, uint32_t>& item) { return item.first == callback; });
     mTriggerEventCallbacks.erase(iter, mTriggerEventCallbacks.end());
+  }
+}
+
+void VectorAnimationThread::RequestForceRenderOnce()
+{
+  Mutex::ScopedLock lock(mEventTriggerMutex);
+  if(!mDestroyThread)
+  {
+    mForceRenderOnce = true;
+
+    if(!mEventTriggered)
+    {
+      mEventTrigger->Trigger();
+      mEventTriggered = true;
+    }
   }
 }
 
@@ -292,27 +309,44 @@ void VectorAnimationThread::Rasterize()
 
 void VectorAnimationThread::OnEventCallbackTriggered()
 {
-  while(CallbackBase* callback = GetNextEventCallback())
+  while(true)
   {
-    CallbackBase::Execute(*callback);
+    auto callbackPair = GetNextEventCallback();
+    if(callbackPair.first == nullptr)
+    {
+      break;
+    }
+    CallbackBase::Execute(*callbackPair.first, callbackPair.second);
+  }
+  // Request update once if we need.
+  {
+    Mutex::ScopedLock lock(mEventTriggerMutex);
+    if(!mDestroyThread && mForceRenderOnce)
+    {
+      mForceRenderOnce = false;
+      if(Dali::Adaptor::IsAvailable())
+      {
+        Dali::Adaptor::Get().UpdateOnce();
+      }
+    }
   }
 }
 
-CallbackBase* VectorAnimationThread::GetNextEventCallback()
+std::pair<CallbackBase*, uint32_t> VectorAnimationThread::GetNextEventCallback()
 {
   Mutex::ScopedLock lock(mEventTriggerMutex);
   if(!mDestroyThread)
   {
     if(!mTriggerEventCallbacks.empty())
     {
-      auto          iter     = mTriggerEventCallbacks.begin();
-      CallbackBase* callback = *iter;
+      auto iter           = mTriggerEventCallbacks.begin();
+      auto callbackIdPair = *iter;
       mTriggerEventCallbacks.erase(iter);
-      return callback;
+      return callbackIdPair;
     }
     mEventTriggered = false;
   }
-  return nullptr;
+  return std::make_pair(nullptr, 0u);
 }
 
 VectorAnimationThread::RasterizeHelper::RasterizeHelper(VectorAnimationThread& animationThread)
