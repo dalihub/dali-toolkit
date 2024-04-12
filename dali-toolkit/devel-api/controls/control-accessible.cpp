@@ -25,10 +25,13 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/public-api/object/property-map.h>
+#include <dali/public-api/object/type-info.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
@@ -38,7 +41,9 @@ namespace Dali::Toolkit::DevelControl
 {
 namespace
 {
-static std::string GetLocaleText(std::string string, const char* domain = "dali-toolkit")
+constexpr const char* ATTR_IMG_SRC_KEY = "imgSrc";
+
+std::string GetLocaleText(std::string string, const char* domain = "dali-toolkit")
 {
 #ifdef DGETTEXT_ENABLED
   /*TODO: currently non-localized string is used as a key for translation lookup. In case the lookup key formatting is forced
@@ -49,7 +54,7 @@ static std::string GetLocaleText(std::string string, const char* domain = "dali-
 #endif
 }
 
-static Dali::Actor CreateHighlightIndicatorActor()
+Dali::Actor CreateHighlightIndicatorActor()
 {
   std::string focusBorderImagePath(AssetManager::GetDaliImagePath());
   focusBorderImagePath += "/keyboard_focus.9.png";
@@ -64,6 +69,45 @@ static Dali::Actor CreateHighlightIndicatorActor()
 
   return actor;
 }
+
+std::string FetchImageSrcFromMap(const Dali::Property::Map& imageMap)
+{
+  auto urlVal = imageMap.Find(Toolkit::ImageVisual::Property::URL);
+  if(urlVal)
+  {
+    if(urlVal->GetType() == Dali::Property::STRING)
+    {
+      return urlVal->Get<std::string>();
+    }
+    else if(urlVal->GetType() == Dali::Property::ARRAY)
+    {
+      auto urlArray = urlVal->GetArray();
+      if(urlArray && !urlArray->Empty())
+      {
+        // Returns first element if url is an array
+        return (*urlArray)[0].Get<std::string>();
+      }
+    }
+  }
+  return {};
+}
+
+std::string FetchImageSrc(const Toolkit::ImageView& imageView)
+{
+  const auto imageUrl = imageView.GetProperty<std::string>(Toolkit::ImageView::Property::IMAGE);
+  if(!imageUrl.empty())
+  {
+    return imageUrl;
+  }
+
+  const auto imageMap = imageView.GetProperty<Dali::Property::Map>(Toolkit::ImageView::Property::IMAGE);
+  if(!imageMap.Empty())
+  {
+    return FetchImageSrcFromMap(imageMap);
+  }
+  return {};
+}
+
 } // unnamed namespace
 
 ControlAccessible::ControlAccessible(Dali::Actor self)
@@ -235,6 +279,15 @@ Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
   if(!automationId.empty())
   {
     attributeMap.emplace("automationId", std::move(automationId));
+  }
+
+  if(auto imageView = Toolkit::ImageView::DownCast(Self()))
+  {
+    auto imageSrc = FetchImageSrc(imageView);
+    if(!imageSrc.empty())
+    {
+      attributeMap.emplace(ATTR_IMG_SRC_KEY, std::move(imageSrc));
+    }
   }
 
   return attributeMap;
