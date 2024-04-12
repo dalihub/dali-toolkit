@@ -1334,6 +1334,9 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 
   // Wait for animation finish
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // EventThread will be triggered after animation finished (For render forcibly).
+  // TODO : Is this logic will works well on server-side?
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   // Jump to 3
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3);
