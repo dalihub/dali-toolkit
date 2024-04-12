@@ -88,6 +88,7 @@ class SceneView;
  * And since SceneView is a Control, it can be placed together with other 2D UI components in the DALi window.
  *
  * @note We support to render model well only if glsl version is higher than 300.
+ * @note We do not support Toolkit::RenderEffect when UseFrameBuffer(false).
  *
  * @SINCE_2_1.38
  * @code
@@ -377,6 +378,7 @@ public:
    * @brief Sets whether to use FBO or not for the SceneView.
    * If useFramebuffer is true, rendering result of SceneView is drawn on FBO and it is mapping on this SceneView plane.
    * If useFramebuffer is false, each item in SceneView is rendered on window directly.
+   * Note that Toolkit::RenderEffect is not supported in this case.
    * Default is false.
    *
    * @SINCE_2_1.38

@@ -64,6 +64,8 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/visual-url.cpp
    ${toolkit_src_dir}/visuals/wireframe/wireframe-visual.cpp
    ${toolkit_src_dir}/controls/alignment/alignment-impl.cpp
+   ${toolkit_src_dir}/controls/render-effects/render-effect-impl.cpp
+   ${toolkit_src_dir}/controls/render-effects/blur-effect-impl.cpp
    ${toolkit_src_dir}/controls/bloom-view/bloom-view-impl.cpp
    ${toolkit_src_dir}/controls/bubble-effect/bubble-emitter-impl.cpp
    ${toolkit_src_dir}/controls/bubble-effect/bubble-renderer.cpp

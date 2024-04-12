@@ -37,10 +37,11 @@
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/public-api/controls/control.h>
@@ -164,6 +165,36 @@ void Control::ClearBackground()
 
   // Trigger a size negotiation request that may be needed when unregistering a visual.
   RelayoutRequest();
+}
+
+void Control::SetRenderEffect(Toolkit::RenderEffect effect)
+{
+  if(mImpl->mRenderEffect == effect)
+  {
+    return;
+  }
+  mImpl->mRenderEffect = effect;
+
+  BaseObject&                          handle = effect.GetBaseObject();
+  Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(&handle);
+
+  Dali::Toolkit::Control ownerControl(GetOwner());
+  object->SetOwnerControl(ownerControl);
+  object->Activate();
+}
+
+void Control::ClearRenderEffect()
+{
+  BaseObject&                          handle = mImpl->mRenderEffect.GetBaseObject();
+  Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(&handle);
+
+  if(!object)
+  {
+    DALI_ASSERT_ALWAYS(false && "Set any render effect before you clear.");
+  }
+
+  object->Deactivate();
+  object->SetOwnerControl(Toolkit::Control());
 }
 
 void Control::SetResourceReady()
@@ -602,7 +633,7 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
 
 void Control::OnSizeSet(const Vector3& targetSize)
 {
-  Vector2 size(targetSize);
+  Vector2               size(targetSize);
   Toolkit::Visual::Base visual = mImpl->GetVisual(Toolkit::Control::Property::BACKGROUND);
   if(visual)
   {

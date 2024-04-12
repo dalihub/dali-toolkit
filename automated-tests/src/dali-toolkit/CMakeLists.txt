@@ -11,6 +11,7 @@ SET(TC_SOURCES
   utc-Dali-AnimatedImageVisual.cpp
   utc-Dali-AnimatedVectorImageVisual.cpp
   utc-Dali-ArcVisual.cpp
+  utc-Dali-RenderEffect.cpp
   utc-Dali-BloomView.cpp
   utc-Dali-BubbleEmitter.cpp
   utc-Dali-Builder.cpp
