@@ -179,6 +179,12 @@ public:
   void SetAnimationFinishedCallback(CallbackBase* callback);
 
   /**
+   * @brief This callback is called when we want to force render next frame.
+   * @param[in] callback The force render once callback
+   */
+  void SetForceRenderOnceCallback(CallbackBase* callback);
+
+  /**
    * @brief Gets the playing range in frame number.
    * @param[out] startFrame The frame number to specify minimum progress.
    * @param[out] endFrame The frame number to specify maximum progress.
@@ -393,6 +399,7 @@ private:
   Mutex                                mMutex;
   ResourceReadySignalType              mResourceReadySignal;
   std::unique_ptr<CallbackBase>        mAnimationFinishedCallback{};
+  std::unique_ptr<CallbackBase>        mForceRenderOnceCallback{};
   std::unique_ptr<CallbackBase>        mLoadCompletedCallback{};
   mutable Property::Map                mCachedLayerInfo;
   mutable Property::Map                mCachedMarkerInfo;
@@ -416,6 +423,7 @@ private:
   bool                                 mForward : 1;
   bool                                 mUpdateFrameNumber : 1;
   bool                                 mNeedAnimationFinishedTrigger : 1;
+  bool                                 mNeedForceRenderOnceTrigger : 1;
   bool                                 mAnimationDataUpdated : 1;
   bool                                 mDestroyTask : 1;
   bool                                 mLoadRequest : 1;

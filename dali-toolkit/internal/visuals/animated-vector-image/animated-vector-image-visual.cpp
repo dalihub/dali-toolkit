@@ -411,6 +411,7 @@ void AnimatedVectorImageVisual::OnInitialize(void)
 {
   mVectorAnimationTask->ResourceReadySignal().Connect(this, &AnimatedVectorImageVisual::OnResourceReady);
   mVectorAnimationTask->SetAnimationFinishedCallback(MakeCallback(this, &AnimatedVectorImageVisual::OnAnimationFinished));
+  mVectorAnimationTask->SetForceRenderOnceCallback(MakeCallback(this, &AnimatedVectorImageVisual::OnForceRendering));
 
   EncodedImageBuffer encodedImageBuffer;
 
@@ -727,6 +728,14 @@ void AnimatedVectorImageVisual::OnAnimationFinished(uint32_t playStateId)
   if(mImpl->mRenderer)
   {
     mImpl->mRenderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED);
+  }
+}
+
+void AnimatedVectorImageVisual::OnForceRendering(uint32_t playStateId)
+{
+  if(!mCoreShutdown)
+  {
+    Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
   }
 }
 
