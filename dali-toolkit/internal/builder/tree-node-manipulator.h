@@ -215,29 +215,6 @@ struct CollectNodes
 };
 
 /*
- * Delete nodes immediately, instead of self
- */
-struct DeleteNodesWithoutSelf
-{
-  DeleteNodesWithoutSelf(TreeNode* self)
-  : mSelf(self){};
-
-  /*
-   * Call operator to delete object if given node is not self
-   */
-  void operator()(TreeNode*& n)
-  {
-    DALI_ASSERT_DEBUG(n && "Operation on NULL JSON node");
-    if(mSelf != n)
-    {
-      delete n;
-    }
-  }
-
-  const TreeNode* mSelf; ///< self node what we should not remove.
-};
-
-/*
  * Depth first walk of nodes applying given operation (unary_function)
  */
 template<typename Operation>
