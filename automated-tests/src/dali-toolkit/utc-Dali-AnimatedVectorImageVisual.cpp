@@ -69,6 +69,100 @@ void VisualEventSignal(Control control, Dali::Property::Index visualIndex, Dali:
   }
 }
 
+/**
+ * @brief Retry function to get playrange until expect values comes.
+ * @note This function might consume EventThreadTrigger.
+ *
+ * @param[in] dummyControl The control for test.
+ * @param[in] expectStartFrame Expect start frame.
+ * @param[in] expectEndFrame Expect end frame.
+ * @param[in] retrialFrames Retry required frame value list.
+ * @param[in] testLocation Location info of UTC. It will be used when UTC failed.
+ */
+void CheckAndRetryPlayRange(DummyControl dummyControl, int expectStartFrame, int expectEndFrame, std::vector<std::pair<int, int>> retrialFrames, const char* testLocation)
+{
+  int tryCount    = 0;
+  int tryCountMax = 25;
+  while(++tryCount <= tryCountMax)
+  {
+    Property::Map resultMap = dummyControl.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+
+    Property::Value* value = resultMap.Find(DevelImageVisual::Property::PLAY_RANGE, Property::ARRAY);
+    DALI_TEST_CHECK(value);
+
+    Property::Array* result = value->GetArray();
+    DALI_TEST_CHECK(result);
+    DALI_TEST_EQUALS(result->Count(), 2, TEST_LOCATION);
+
+    bool tryAgain = false;
+    for(auto& framePair : retrialFrames)
+    {
+      if(result->GetElementAt(0).Get<int>() == framePair.first && result->GetElementAt(1).Get<int>() == framePair.second)
+      {
+        tryAgain = true;
+        break;
+      }
+    }
+    if(tryAgain)
+    {
+      tet_printf("Retry to get value again! [%d]\n", tryCount);
+      // Dummy sleep 1 second.
+      Test::WaitForEventThreadTrigger(1, 1);
+      continue;
+    }
+
+    DALI_TEST_EQUALS(result->GetElementAt(0).Get<int>(), expectStartFrame, testLocation);
+    DALI_TEST_EQUALS(result->GetElementAt(1).Get<int>(), expectEndFrame, testLocation);
+    break;
+  }
+  DALI_TEST_CHECK(tryCount <= tryCountMax);
+}
+
+/**
+ * @brief Retry function to get current frame until expect values comes.
+ * @note This function might consume EventThreadTrigger.
+ *
+ * @param[in] dummyControl The control for test.
+ * @param[in] expectCurrentFrame Expect current frame.
+ * @param[in] retrialFrames Retry required frame value list.
+ * @param[in] testLocation Location info of UTC. It will be used when UTC failed.
+ */
+void CheckAndRetryCurrentFrame(DummyControl dummyControl, int expectCurrentFrame, std::vector<int> retrialFrames, const char* testLocation)
+{
+  int tryCount    = 0;
+  int tryCountMax = 25;
+  while(++tryCount <= tryCountMax)
+  {
+    Property::Map resultMap = dummyControl.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+
+    Property::Value* value = resultMap.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER, Property::INTEGER);
+    DALI_TEST_CHECK(value);
+
+    int32_t result = value->Get<int32_t>();
+
+    bool tryAgain = false;
+    for(auto& frame : retrialFrames)
+    {
+      if(result == frame)
+      {
+        tryAgain = true;
+        break;
+      }
+    }
+    if(tryAgain)
+    {
+      tet_printf("Retry to get value again! [%d]\n", tryCount);
+      // Dummy sleep 1 second.
+      Test::WaitForEventThreadTrigger(1, 1);
+      continue;
+    }
+
+    DALI_TEST_EQUALS(result, expectCurrentFrame, testLocation);
+    break;
+  }
+  DALI_TEST_CHECK(tryCount <= tryCountMax);
+}
+
 } // namespace
 
 int UtcDaliVisualFactoryGetAnimatedVectorImageVisual01(void)
@@ -174,8 +268,17 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual03(void)
   // Trigger count is 2 - load & render a frame
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
+  // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  if(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 1);
+  }
+
   // renderer is added to actor
-  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   Renderer renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
 
@@ -232,8 +335,17 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   // Trigger count is 1 - render a frame
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
+  // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  if(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 1);
+  }
+
   // renderer is added to actor
-  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
@@ -716,7 +828,7 @@ int UtcDaliAnimatedVectorImageVisualLoopCount(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // renderer is added to actor
-  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   Renderer renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
 
@@ -760,8 +872,17 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   // Trigger count is 2 - load & render a frame
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
+  // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  if(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 1);
+  }
+
   // renderer is added to actor
-  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   Renderer renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
 
@@ -780,7 +901,7 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   // Set invalid play range
   array.Clear();
   array.PushBack(1);
-  array.PushBack(100);
+  array.PushBack(totalFrameNumber + 100);
 
   attributes.Clear();
   attributes.Add(DevelImageVisual::Property::PLAY_RANGE, array);
@@ -794,15 +915,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
 
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
-  map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
-  value = map.Find(DevelImageVisual::Property::PLAY_RANGE);
-
-  result = value->GetArray();
-  result->GetElementAt(0).Get(resultStartFrame);
-  result->GetElementAt(1).Get(resultEndFrame);
-
-  DALI_TEST_EQUALS(resultStartFrame, 1, TEST_LOCATION);
-  DALI_TEST_EQUALS(resultEndFrame, totalFrameNumber - 1, TEST_LOCATION); // Should be clamped
+  // Should be clamped.
+  CheckAndRetryPlayRange(actor, 1, totalFrameNumber - 1, {{startFrame, endFrame}}, TEST_LOCATION);
 
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PAUSE, Property::Map());
 
@@ -811,17 +925,14 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
 
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3);
 
-  // To make event trigger
-  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
-
   application.SendNotification();
   application.Render();
 
+  // Jump to action when paused, will make one or more event trigger
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
-  map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
-  value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
-  DALI_TEST_EQUALS(value->Get<int>(), 3, TEST_LOCATION);
+  // Test whether current frame is 3.
+  CheckAndRetryCurrentFrame(actor, 3, {0, 1}, TEST_LOCATION);
 
   array.Clear();
   array.PushBack(0);
@@ -832,23 +943,16 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
 
   // To make event trigger
-  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
 
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
+  CheckAndRetryPlayRange(actor, 0, 2, {{1, totalFrameNumber - 1}}, TEST_LOCATION);
+
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
-  value = map.Find(DevelImageVisual::Property::PLAY_RANGE);
-
-  result = value->GetArray();
-  result->GetElementAt(0).Get(resultStartFrame);
-  result->GetElementAt(1).Get(resultEndFrame);
-
-  DALI_TEST_EQUALS(0, resultStartFrame, TEST_LOCATION);
-  DALI_TEST_EQUALS(2, resultEndFrame, TEST_LOCATION);
-
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
   DALI_TEST_EQUALS(value->Get<int>(), 2, TEST_LOCATION); // CURRENT_FRAME_NUMBER should be changed also.
 
@@ -891,8 +995,17 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
   // Trigger count is 2 - load & render a frame
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
+  // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  if(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 1);
+  }
+
   // renderer is added to actor
-  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   Renderer renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
 
@@ -1021,7 +1134,7 @@ int UtcDaliAnimatedVectorImageVisualMarkerInfo(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // renderer is added to actor
-  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   Renderer renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
 
@@ -1113,10 +1226,10 @@ int UtcDaliAnimatedVectorImageVisualMarkerInfoFromInvalid(void)
   END_TEST;
 }
 
-int UtcDaliAnimatedVectorImageVisualUsedFixedCache(void)
+int UtcDaliAnimatedVectorImageVisualEnableFrameCache(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliAnimatedVectorImageVisualUsedFixedCache");
+  tet_infoline("UtcDaliAnimatedVectorImageVisualEnableFrameCache");
 
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
@@ -1130,7 +1243,6 @@ int UtcDaliAnimatedVectorImageVisualUsedFixedCache(void)
   DummyControl      actor     = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
-  //actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -1160,10 +1272,10 @@ int UtcDaliAnimatedVectorImageVisualUsedFixedCache(void)
   END_TEST;
 }
 
-int UtcDaliAnimatedVectorImageVisualUsedFixedCacheFailed(void)
+int UtcDaliAnimatedVectorImageVisualEnableFrameCacheFailed(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliAnimatedVectorImageVisualUsedFixedCacheFailed");
+  tet_infoline("UtcDaliAnimatedVectorImageVisualEnableFrameCacheFailed");
 
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
@@ -1248,6 +1360,15 @@ int UtcDaliAnimatedVectorImageVisualNotifyAfterRasterization(void)
 
   application.SendNotification();
   application.Render();
+
+  // There might be 1 event triggered if render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  if(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 1);
+  }
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -1376,12 +1497,10 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 2);
 
-  // To make event trigger
-  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
-
   application.SendNotification();
   application.Render();
 
+  // Trigger count is 1 - Jump to during stopped
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
@@ -1401,7 +1520,7 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3);
 
   // To make event trigger
-  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
 
   application.SendNotification();
   application.Render();
@@ -1432,19 +1551,16 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 
   // Wait for animation finish
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-  // EventThread will be triggered after animation finished (For render forcibly).
-  // TODO : Is this logic will works well on server-side?
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Note : AnimationFinished will occure force-render, and it might required another trigger. Test one more trigger now.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   // Jump to 3
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3);
 
-  // To make event trigger
-  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
-
   application.SendNotification();
   application.Render();
 
+  // Trigger count is 1 - Jump to during stopped.
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
@@ -1518,8 +1634,8 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   Property::Array* result = value->GetArray();
   DALI_TEST_CHECK(result);
 
-  DALI_TEST_CHECK(result->GetElementAt(0).Get<int>() == startFrame);
-  DALI_TEST_CHECK(result->GetElementAt(1).Get<int>() == endFrame);
+  DALI_TEST_EQUALS(result->GetElementAt(0).Get<int>(), startFrame, TEST_LOCATION);
+  DALI_TEST_EQUALS(result->GetElementAt(1).Get<int>(), endFrame, TEST_LOCATION);
 
   playRange.Clear();
   playRange.PushBack(0);
@@ -1547,8 +1663,8 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   result = value->GetArray();
   DALI_TEST_CHECK(result);
 
-  DALI_TEST_CHECK(result->GetElementAt(0).Get<int>() == 0);
-  DALI_TEST_CHECK(result->GetElementAt(1).Get<int>() == 2);
+  // Ensure that vector data sended well.
+  CheckAndRetryPlayRange(actor, 0, 2, {{startFrame, endFrame}}, TEST_LOCATION);
 
   attributes.Clear();
 
@@ -1574,8 +1690,8 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   result = value->GetArray();
   DALI_TEST_CHECK(result);
 
-  DALI_TEST_CHECK(result->GetElementAt(0).Get<int>() == startFrame);
-  DALI_TEST_CHECK(result->GetElementAt(1).Get<int>() == endFrame);
+  // Ensure that vector data sended well.
+  CheckAndRetryPlayRange(actor, startFrame, endFrame, {{0, 2}}, TEST_LOCATION);
 
   // Play and update property
   attributes.Clear();
@@ -2489,45 +2605,6 @@ int UtcDaliAnimatedVectorImageVisualFlushAction(void)
 
   application.GetScene().Add(dummyControl);
 
-  // Retry function to get playrange until expect values comes.
-  auto CheckAndRetryPlayRange = [&](int expectStartFrame, int expectEndFrame, std::vector<std::pair<int, int>> retrialFrames) {
-    int tryCount    = 0;
-    int tryCountMax = 30;
-    while(++tryCount <= tryCountMax)
-    {
-      Property::Map resultMap = dummyControl.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
-
-      Property::Value* value = resultMap.Find(DevelImageVisual::Property::PLAY_RANGE, Property::ARRAY);
-      DALI_TEST_CHECK(value);
-
-      Property::Array* result = value->GetArray();
-      DALI_TEST_CHECK(result);
-      DALI_TEST_EQUALS(result->Count(), 2, TEST_LOCATION);
-
-      bool tryAgain = false;
-      for(auto& framePair : retrialFrames)
-      {
-        if(result->GetElementAt(0).Get<int>() == framePair.first && result->GetElementAt(1).Get<int>() == framePair.second)
-        {
-          tryAgain = true;
-          break;
-        }
-      }
-      if(tryAgain)
-      {
-        tet_printf("Retry to get value again! [%d]\n", tryCount);
-        // Dummy sleep 1 second.
-        Test::WaitForEventThreadTrigger(1, 1);
-        continue;
-      }
-
-      DALI_TEST_EQUALS(result->GetElementAt(0).Get<int>(), expectStartFrame, TEST_LOCATION);
-      DALI_TEST_EQUALS(result->GetElementAt(1).Get<int>(), expectEndFrame, TEST_LOCATION);
-      break;
-    }
-    DALI_TEST_CHECK(tryCount <= tryCountMax);
-  };
-
   tet_printf("Pause lottie first.\n");
 
   Property::Map attributes;
@@ -2546,7 +2623,7 @@ int UtcDaliAnimatedVectorImageVisualFlushAction(void)
   } while(totalFrameCount == 0);
 
   // Ensure that vector data sended well.
-  CheckAndRetryPlayRange(startFrame, endFrame, {{0, 0}, {0, totalFrameCount - 1}});
+  CheckAndRetryPlayRange(dummyControl, startFrame, endFrame, {{0, 0}, {0, totalFrameCount - 1}}, TEST_LOCATION);
 
   resultMap = dummyControl.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
 
@@ -2591,7 +2668,7 @@ int UtcDaliAnimatedVectorImageVisualFlushAction(void)
   application.Render(16);
 
   // Ensure that vector data sended well.
-  CheckAndRetryPlayRange(changedStartFrame2, changedEndFrame2, {{changedStartFrame1, changedEndFrame1}, {startFrame, endFrame}});
+  CheckAndRetryPlayRange(dummyControl, changedStartFrame2, changedEndFrame2, {{changedStartFrame1, changedEndFrame1}, {startFrame, endFrame}}, TEST_LOCATION);
 
   resultMap = dummyControl.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
 
