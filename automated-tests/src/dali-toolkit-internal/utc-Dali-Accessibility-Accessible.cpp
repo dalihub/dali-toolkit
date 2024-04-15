@@ -19,12 +19,13 @@
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
 
-#include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali.h>
 
-#include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
+#include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
@@ -45,10 +46,10 @@ int utcDaliAccessibilityCheckBoxButtonGetStates(void)
   ToolkitTestApplication application;
 
   auto check_box_button = Toolkit::CheckBoxButton::New();
-  auto q = Dali::Accessibility::Accessible::Get( check_box_button );
-  DALI_TEST_CHECK( q );
+  auto q                = Dali::Accessibility::Accessible::Get(check_box_button);
+  DALI_TEST_CHECK(q);
   auto states = q->GetStates();
-  DALI_TEST_EQUALS( (int) states[ Dali::Accessibility::State::SELECTABLE ], (int) true, TEST_LOCATION );
+  DALI_TEST_EQUALS((int)states[Dali::Accessibility::State::SELECTABLE], (int)true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -60,9 +61,9 @@ int utcDaliAccessibilityCheckLabelText(void)
   auto check_box_button = Toolkit::CheckBoxButton::New();
   //check_box_button.SetLabelText( "button" );
   check_box_button.SetProperty(Toolkit::Button::Property::LABEL, "button");
-  auto q = Dali::Accessibility::Accessible::Get( check_box_button );
-  DALI_TEST_CHECK( q );
-  DALI_TEST_EQUALS( q->GetName(), "button", TEST_LOCATION );
+  auto q = Dali::Accessibility::Accessible::Get(check_box_button);
+  DALI_TEST_CHECK(q);
+  DALI_TEST_EQUALS(q->GetName(), "button", TEST_LOCATION);
 
   END_TEST;
 }
@@ -77,7 +78,7 @@ int UtcDaliAccessibilityCheckShowingState(void)
   parentButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   parentButton.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f));
   parentButton.SetProperty(Actor::Property::SIZE, Dali::Vector2(200.0f, 200.0f));
-  application.GetScene().Add( parentButton );
+  application.GetScene().Add(parentButton);
 
   // Toatally inside of parent
   auto buttonA = Toolkit::PushButton::New();
@@ -99,7 +100,7 @@ int UtcDaliAccessibilityCheckShowingState(void)
   auto buttonC = Toolkit::PushButton::New();
   buttonC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   buttonC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  buttonC.SetProperty(Actor::Property::POSITION, Dali::Vector2(100.0f,100.0f));
+  buttonC.SetProperty(Actor::Property::POSITION, Dali::Vector2(100.0f, 100.0f));
   buttonC.SetProperty(Actor::Property::SIZE, Dali::Vector2(200.0f, 200.0f));
   parentButton.Add(buttonC);
 
@@ -109,17 +110,17 @@ int UtcDaliAccessibilityCheckShowingState(void)
   auto q = Dali::Accessibility::Accessible::Get(buttonA);
   DALI_TEST_CHECK(q);
   auto states = q->GetStates();
-  DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) true, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)states[Dali::Accessibility::State::SHOWING], (int)true, TEST_LOCATION);
 
   q = Dali::Accessibility::Accessible::Get(buttonB);
   DALI_TEST_CHECK(q);
   states = q->GetStates();
-  DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) true, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)states[Dali::Accessibility::State::SHOWING], (int)true, TEST_LOCATION);
 
   q = Dali::Accessibility::Accessible::Get(buttonC);
   DALI_TEST_CHECK(q);
   states = q->GetStates();
-  DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) true, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)states[Dali::Accessibility::State::SHOWING], (int)true, TEST_LOCATION);
 
   // Make SHOWING object invisible
   buttonC.SetProperty(Actor::Property::VISIBLE, false);
@@ -128,7 +129,7 @@ int UtcDaliAccessibilityCheckShowingState(void)
   application.Render(16);
 
   states = q->GetStates();
-  DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) false, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)states[Dali::Accessibility::State::SHOWING], (int)false, TEST_LOCATION);
 
   // Make SHOWING parent invisible
   parentButton.SetProperty(Actor::Property::VISIBLE, false);
@@ -139,7 +140,7 @@ int UtcDaliAccessibilityCheckShowingState(void)
   q = Dali::Accessibility::Accessible::Get(buttonA);
   DALI_TEST_CHECK(q);
   states = q->GetStates();
-  DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) false, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)states[Dali::Accessibility::State::SHOWING], (int)false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -203,6 +204,73 @@ int utcDaliAutomationId(void)
   DALI_TEST_CHECK(control.GetProperty<std::string>(automationIdIndex).empty());
   attributes = controlAccessible->GetAttributes();
   DALI_TEST_CHECK(attributes.find(automationIdKey) == attributes.end());
+
+  END_TEST;
+}
+
+int utcDaliImgSrc(void)
+{
+  ToolkitTestApplication application;
+  const std::string      imageSrcKey = "imgSrc";
+  // Check that imgSrc is NOT added for non-image view w/ no additional property
+  {
+    const auto checkBoxButton    = Toolkit::CheckBoxButton::New();
+    const auto controlAccessible = Dali::Accessibility::Accessible::Get(checkBoxButton);
+    auto       attributes        = controlAccessible->GetAttributes();
+    DALI_TEST_CHECK(attributes.find(imageSrcKey) == attributes.end());
+  }
+
+  // Check that imgSrc is NOT added for non-image view w/ additional properties
+  {
+    const auto textLabel         = Toolkit::TextLabel::New("Hello");
+    const auto controlAccessible = Dali::Accessibility::Accessible::Get(textLabel);
+    auto       attributes        = controlAccessible->GetAttributes();
+    DALI_TEST_CHECK(attributes.find(imageSrcKey) == attributes.end());
+  }
+
+  // Check that imgSrc is added for image view w/ Url
+  {
+    const std::string imagePath         = "gallery-small-1.jpg";
+    const auto        imageView         = Toolkit::ImageView::New(imagePath);
+    const auto        controlAccessible = Dali::Accessibility::Accessible::Get(imageView);
+    auto              attributes        = controlAccessible->GetAttributes();
+    DALI_TEST_CHECK(attributes.find(imageSrcKey) != attributes.end());
+    DALI_TEST_EQUALS(attributes[imageSrcKey], imagePath, TEST_LOCATION);
+  }
+
+  // Check that imgSrc is added for image view w/ imageMap; single url case
+  {
+    const std::string imagePathForImageMap = "icon-edit.png";
+    Property::Map     imageMap;
+    imageMap[Toolkit::ImageVisual::Property::URL]            = imagePathForImageMap;
+    imageMap[Toolkit::ImageVisual::Property::RELEASE_POLICY] = Toolkit::ImageVisual::ReleasePolicy::DETACHED;
+
+    auto imageView = Toolkit::ImageView::New();
+    imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imageMap);
+
+    const auto controlAccessible = Dali::Accessibility::Accessible::Get(imageView);
+    auto       attributes        = controlAccessible->GetAttributes();
+    DALI_TEST_CHECK(attributes.find(imageSrcKey) != attributes.end());
+    DALI_TEST_EQUALS(attributes[imageSrcKey], imagePathForImageMap, TEST_LOCATION);
+  }
+
+  // Check that imgSrc is added for image view w/ imageMap; url array returns first element
+  {
+    const std::string image1 = "application-icon-20.png";
+    const std::string image2 = "application-icon-21.png";
+    Property::Map     imageMap;
+    Property::Array   urls{image1, image2};
+    imageMap[Toolkit::ImageVisual::Property::URL]            = urls;
+    imageMap[Toolkit::ImageVisual::Property::RELEASE_POLICY] = Toolkit::ImageVisual::ReleasePolicy::DETACHED;
+
+    auto imageView = Toolkit::ImageView::New();
+    imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imageMap);
+
+    const auto controlAccessible = Dali::Accessibility::Accessible::Get(imageView);
+    auto       attributes        = controlAccessible->GetAttributes();
+    DALI_TEST_CHECK(attributes.find(imageSrcKey) != attributes.end());
+    DALI_TEST_EQUALS(attributes[imageSrcKey], image1, TEST_LOCATION);
+  }
 
   END_TEST;
 }
