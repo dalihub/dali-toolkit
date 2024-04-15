@@ -108,6 +108,7 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mLayerInfoCached(false),
   mMarkerInfoCached(false),
   mEnableFrameCache(false),
+  mNotifyAfterRasterization(false),
   mSizeUpdated(false)
 {
   mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
@@ -747,7 +748,7 @@ bool VectorAnimationTask::Rasterize()
   }
 
   // Forcely trigger render once if need.
-  if(mNeedForceRenderOnceTrigger)
+  if(mNotifyAfterRasterization || mNeedForceRenderOnceTrigger)
   {
     Mutex::ScopedLock lock(mMutex);
     if(mForceRenderOnceCallback)
@@ -889,6 +890,11 @@ void VectorAnimationTask::ApplyAnimationData()
     if(animationData.resendFlag & VectorAnimationTask::RESEND_CURRENT_FRAME)
     {
       SetCurrentFrameNumber(animationData.currentFrame);
+    }
+
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_NOTIFY_AFTER_RASTERIZATION)
+    {
+      mNotifyAfterRasterization = animationData.notifyAfterRasterization;
     }
 
     if(animationData.resendFlag & VectorAnimationTask::RESEND_NEED_RESOURCE_READY)

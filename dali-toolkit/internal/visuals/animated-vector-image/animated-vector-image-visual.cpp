@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
@@ -103,7 +104,8 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   mCoreShutdown(false),
   mRedrawInScalingDown(true),
   mEnableFrameCache(false),
-  mUseNativeImage(false)
+  mUseNativeImage(false),
+  mNotifyAfterRasterization(false)
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Visual::Base::Impl::IS_PREMULTIPLIED_ALPHA;
@@ -221,6 +223,7 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
   map.Insert(Toolkit::DevelImageVisual::Property::ENABLE_FRAME_CACHE, mEnableFrameCache);
+  map.Insert(Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, mNotifyAfterRasterization);
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -284,6 +287,10 @@ void AnimatedVectorImageVisual::DoSetProperties(const Property::Map& propertyMap
       else if(keyValue.first == ENABLE_FRAME_CACHE)
       {
         DoSetProperty(Toolkit::DevelImageVisual::Property::ENABLE_FRAME_CACHE, keyValue.second);
+      }
+      else if(keyValue.first == NOTIFY_AFTER_RASTERIZATION)
+      {
+        DoSetProperty(Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, keyValue.second);
       }
     }
   }
@@ -400,6 +407,22 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
         if(mVectorAnimationTask)
         {
           mVectorAnimationTask->KeepRasterizedBuffer(mEnableFrameCache);
+        }
+      }
+      break;
+    }
+
+    case Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION:
+    {
+      bool notifyAfterRasterization = false;
+      if(value.Get(notifyAfterRasterization))
+      {
+        if(mNotifyAfterRasterization != notifyAfterRasterization)
+        {
+          mNotifyAfterRasterization = notifyAfterRasterization;
+
+          mAnimationData.notifyAfterRasterization = mNotifyAfterRasterization;
+          mAnimationData.resendFlag |= VectorAnimationTask::RESEND_NOTIFY_AFTER_RASTERIZATION;
         }
       }
       break;
@@ -719,7 +742,7 @@ void AnimatedVectorImageVisual::OnAnimationFinished(uint32_t playStateId)
     }
   }
 
-  if(mImpl->mRenderer)
+  if(!mNotifyAfterRasterization && mImpl->mRenderer)
   {
     mImpl->mRenderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED);
   }
@@ -727,9 +750,9 @@ void AnimatedVectorImageVisual::OnAnimationFinished(uint32_t playStateId)
 
 void AnimatedVectorImageVisual::OnForceRendering(uint32_t playStateId)
 {
-  if(!mCoreShutdown)
+  if(!mCoreShutdown && Dali::Adaptor::IsAvailable())
   {
-    Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
+    Dali::Adaptor::Get().UpdateOnce();
   }
 }
 
@@ -746,14 +769,18 @@ void AnimatedVectorImageVisual::SendAnimationData()
     }
     mVectorAnimationTask->SetAnimationData(mAnimationData);
 
-    if(mImpl->mRenderer)
+    if(mImpl->mRenderer &&
+       ((mAnimationData.resendFlag & VectorAnimationTask::RESEND_PLAY_STATE) ||
+        (mAnimationData.resendFlag & VectorAnimationTask::RESEND_NOTIFY_AFTER_RASTERIZATION)))
     {
-      if(mAnimationData.playState == DevelImageVisual::PlayState::PLAYING)
+      if(!mNotifyAfterRasterization && mPlayState == DevelImageVisual::PlayState::PLAYING)
       {
+        // Make rendering behaviour if we don't notify after rasterization, but animation playing.
         mImpl->mRenderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY);
       }
       else
       {
+        // Otherwise, notify will be sended after rasterization. Make behaviour as required.
         mImpl->mRenderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED);
       }
     }
