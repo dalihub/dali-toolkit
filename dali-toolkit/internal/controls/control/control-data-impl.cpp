@@ -798,6 +798,10 @@ void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base&
     requiredDepthIndex = depthIndex;
   }
 
+  // Change the depth index value automatically if the visual has DepthIndex to AUTO_INDEX
+  // or if RegisterVisual set DepthIndex to AUTO_INDEX.
+  const bool requiredDepthIndexChanged = (requiredDepthIndex == DepthIndex::AUTO_INDEX);
+
   // Visual replacement, existing visual should only be removed from stage when replacement ready.
   if(!mVisuals.Empty())
   {
@@ -839,11 +843,11 @@ void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base&
           mVisuals.Erase(registeredVisualsiter);
         }
 
-        // If we've not set the depth-index value and the new visual does not have a depth index applied to it, then use the previously set depth-index for this index
-        if((depthIndexValueSet == DepthIndexValue::NOT_SET) &&
-           (visual.GetDepthIndex() == 0))
+        // If the visual have a depth index as AUTO_INDEX and the new visual does not have a depth index applied to it, then use the previously set depth-index for this index
+        if(requiredDepthIndexChanged)
         {
           requiredDepthIndex = currentDepthIndex;
+          DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Use replaced visual index. VisualDepthIndex AUTO_INDEX set as: %d\n", requiredDepthIndex);
         }
       }
 
@@ -866,12 +870,10 @@ void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base&
 
   if(!visualReplaced) // New registration entry
   {
-    // If we've not set the depth-index value, we have more than one visual and the visual does not have a depth index, then set it to be the highest
-    if((depthIndexValueSet == DepthIndexValue::NOT_SET) &&
-       (mVisuals.Size() > 0) &&
-       (visual.GetDepthIndex() == 0))
+    // If we have more than one visual and the visual have a depth index as AUTO_INDEX, then set it to be the highest
+    if((mVisuals.Size() > 0) && requiredDepthIndexChanged)
     {
-      int maxDepthIndex = std::numeric_limits<int>::min();
+      int maxDepthIndex = static_cast<int>(DepthIndex::CONTENT) - 1; // Start at DepthIndex::CONTENT if maxDepth index belongs to a background or no visuals have been added yet.
 
       RegisteredVisualContainer::ConstIterator       iter;
       const RegisteredVisualContainer::ConstIterator endIter = mVisuals.End();
@@ -883,13 +885,20 @@ void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base&
           maxDepthIndex = visualDepthIndex;
         }
       }
-      ++maxDepthIndex;                                 // Add one to the current maximum depth index so that our added visual appears on top
-      requiredDepthIndex = std::max(0, maxDepthIndex); // Start at zero if maxDepth index belongs to a background
+      requiredDepthIndex = ++maxDepthIndex; // Add one to the current maximum depth index so that our added visual appears on top.
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Use top of all visuals. VisualDepthIndex AUTO_INDEX set as: %d\n", requiredDepthIndex);
     }
   }
 
   if(visual)
   {
+    // If required depth index still DepthIndex::AUTO_INDEX, Make it as DepthIndex::CONTENT now
+    if(requiredDepthIndex == static_cast<int>(DepthIndex::AUTO_INDEX))
+    {
+      requiredDepthIndex = static_cast<int>(DepthIndex::CONTENT);
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Some strange cases. VisualDepthIndex AUTO_INDEX set as: %d\n", requiredDepthIndex);
+    }
+
     // Set determined depth index
     visual.SetDepthIndex(requiredDepthIndex);
 

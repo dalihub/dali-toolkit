@@ -41,6 +41,7 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
@@ -867,7 +868,7 @@ void WebView::OnFrameRendered()
 
     if(mVisual)
     {
-      DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
+      DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual, DepthIndex::CONTENT);
       EnableBlendMode(!mVideoHoleEnabled);
     }
   }

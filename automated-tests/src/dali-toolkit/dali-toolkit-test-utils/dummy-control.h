@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEST_DUMMY_CONTROL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class DummyControlImpl;
 class TransitionData;
 
@@ -47,7 +45,7 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property index
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000              ///< Reserve property index
   };
 
   struct Property
@@ -66,17 +64,15 @@ public:
   DummyControl(const DummyControl& control);
   ~DummyControl();
 
-  static DummyControl New( bool override = false );
+  static DummyControl New(bool override = false);
 
-  static DummyControl DownCast( BaseHandle handle );
-
+  static DummyControl DownCast(BaseHandle handle);
 
   DummyControl& operator=(const DummyControl& control);
 
 public: // Not intended for application developers
-
-  DummyControl( DummyControlImpl& implementation );
-  DummyControl( Dali::Internal::CustomActor* internal );
+  DummyControl(DummyControlImpl& implementation);
+  DummyControl(Dali::Internal::CustomActor* internal);
 };
 
 /**
@@ -86,40 +82,57 @@ public: // Not intended for application developers
 class DummyControlImpl : public Toolkit::Internal::Control
 {
 public:
-
   static DummyControl New();
 
 public:
-  inline void EnableGestureDetection(GestureType::Value type) { Internal::Control::EnableGestureDetection(type); }
-  inline void DisableGestureDetection(GestureType::Value type) { Internal::Control::DisableGestureDetection(type); }
-  inline PinchGestureDetector GetPinchGestureDetector() const { return Internal::Control::GetPinchGestureDetector(); }
-  inline PanGestureDetector GetPanGestureDetector() const { return Internal::Control::GetPanGestureDetector(); }
-  inline TapGestureDetector GetTapGestureDetector() const { return Internal::Control::GetTapGestureDetector(); }
-  inline LongPressGestureDetector GetLongPressGestureDetector() const { return Internal::Control::GetLongPressGestureDetector(); }
+  inline void EnableGestureDetection(GestureType::Value type)
+  {
+    Internal::Control::EnableGestureDetection(type);
+  }
+  inline void DisableGestureDetection(GestureType::Value type)
+  {
+    Internal::Control::DisableGestureDetection(type);
+  }
+  inline PinchGestureDetector GetPinchGestureDetector() const
+  {
+    return Internal::Control::GetPinchGestureDetector();
+  }
+  inline PanGestureDetector GetPanGestureDetector() const
+  {
+    return Internal::Control::GetPanGestureDetector();
+  }
+  inline TapGestureDetector GetTapGestureDetector() const
+  {
+    return Internal::Control::GetTapGestureDetector();
+  }
+  inline LongPressGestureDetector GetLongPressGestureDetector() const
+  {
+    return Internal::Control::GetLongPressGestureDetector();
+  }
 
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base visual);
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base visual, bool enabled );
-  void UnregisterVisual( Property::Index index );
-  void EnableVisual( Property::Index index, bool enabled );
-  bool IsVisualEnabled( Property::Index index );
-  int GetVisualCount();
-  Toolkit::Visual::Base GetVisual( Property::Index index );
-  Animation CreateTransition( const Toolkit::TransitionData& transition );
-  void DoAction( Dali::Property::Index index, Dali::Property::Index action, const Dali::Property::Value attributes );
+  void                  RegisterVisual(Property::Index index, Toolkit::Visual::Base visual);
+  void                  RegisterVisual(Property::Index index, Toolkit::Visual::Base visual, bool enabled);
+  void                  RegisterVisual(Property::Index index, Toolkit::Visual::Base visual, int depthIndex);
+  void                  UnregisterVisual(Property::Index index);
+  void                  EnableVisual(Property::Index index, bool enabled);
+  bool                  IsVisualEnabled(Property::Index index);
+  int                   GetVisualCount();
+  Toolkit::Visual::Base GetVisual(Property::Index index);
+  Animation             CreateTransition(const Toolkit::TransitionData& transition);
+  void                  DoAction(Dali::Property::Index index, Dali::Property::Index action, const Dali::Property::Value attributes);
 
-  static void SetProperty( BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value );
+  static void SetProperty(BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value);
 
-  static Property::Value GetProperty( BaseObject* object, Dali::Property::Index propertyIndex );
+  static Property::Value GetProperty(BaseObject* object, Dali::Property::Index propertyIndex);
 
   // Used to test signal connections
-  void CustomSlot1( Actor actor );
+  void CustomSlot1(Actor actor);
 
-  bool mCustomSlot1Called;
+  bool                                 mCustomSlot1Called;
   typedef std::vector<Property::Index> VisualIndices;
-  VisualIndices mRegisteredVisualIndices;
+  VisualIndices                        mRegisteredVisualIndices;
 
 protected:
-
   DummyControlImpl();
 
   ~DummyControlImpl() override;
@@ -127,7 +140,6 @@ protected:
 
 namespace Impl
 {
-
 /**
  * Cannot create an instance of Internal::Control, so use this dummy class for the implementation.
  * This class DOES override Internal::Control's behaviour.
@@ -135,38 +147,34 @@ namespace Impl
 class DummyControl : public Toolkit::DummyControlImpl
 {
 public:
-
-  typedef std::function<void( Size )> RelayoutCallbackFunc;
+  typedef std::function<void(Size)> RelayoutCallbackFunc;
 
   static Toolkit::DummyControl New();
 
-  void SetLayout( Property::Index visualIndex, Property::Map& map );
+  void SetLayout(Property::Index visualIndex, Property::Map& map);
 
-  void SetRelayoutCallback( RelayoutCallbackFunc callback );
+  void SetRelayoutCallback(RelayoutCallbackFunc callback);
 
 private:
-
   DummyControl();
 
   ~DummyControl() override;
 
 private: // From Internal::Control
-
   void OnInitialize() override;
   bool OnAccessibilityActivated() override;
-  bool OnAccessibilityValueChange( bool isIncrease ) override;
+  bool OnAccessibilityValueChange(bool isIncrease) override;
 
-  void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change ) override;
-  void OnPinch(const PinchGesture& pinch) override;
-  void OnPan(const PanGesture& pan) override;
-  void OnTap(const TapGesture& tap) override;
-  void OnLongPress(const LongPressGesture& longPress) override;
+  void    OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change) override;
+  void    OnPinch(const PinchGesture& pinch) override;
+  void    OnPan(const PanGesture& pan) override;
+  void    OnTap(const TapGesture& tap) override;
+  void    OnLongPress(const LongPressGesture& longPress) override;
   Vector3 GetNaturalSize() override;
-  bool OnKeyEvent(const KeyEvent& event) override;
+  bool    OnKeyEvent(const KeyEvent& event) override;
 
 private: // From CustomActorImpl
-
-  void OnSceneConnection( int depth ) override;
+  void OnSceneConnection(int depth) override;
   void OnSceneDisconnection() override;
   void OnChildAdd(Actor& child) override;
   void OnChildRemove(Actor& child) override;
@@ -174,39 +182,37 @@ private: // From CustomActorImpl
   void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override;
   void OnKeyInputFocusGained() override;
   void OnKeyInputFocusLost() override;
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
-  DALI_INTERNAL DummyControl( const DummyControl& );
-  DALI_INTERNAL DummyControl& operator=( const DummyControl& );
+  DALI_INTERNAL DummyControl(const DummyControl&);
+  DALI_INTERNAL DummyControl& operator=(const DummyControl&);
 
 public:
-
-  bool initializeCalled;
-  bool activatedCalled;
-  bool onAccValueChangeCalled;
-  bool themeChangeCalled;
-  bool fontChangeCalled;
-  bool pinchCalled;
-  bool panCalled;
-  bool tapCalled;
-  bool longPressCalled;
-  bool stageConnectionCalled;
-  bool stageDisconnectionCalled;
-  bool childAddCalled;
-  bool childRemoveCalled;
-  bool sizeSetCalled;
-  bool sizeAnimationCalled;
-  bool hoverEventCalled;
-  bool wheelEventCalled;
-  bool keyEventCalled;
-  bool keyInputFocusGained;
-  bool keyInputFocusLost;
+  bool       initializeCalled;
+  bool       activatedCalled;
+  bool       onAccValueChangeCalled;
+  bool       themeChangeCalled;
+  bool       fontChangeCalled;
+  bool       pinchCalled;
+  bool       panCalled;
+  bool       tapCalled;
+  bool       longPressCalled;
+  bool       stageConnectionCalled;
+  bool       stageDisconnectionCalled;
+  bool       childAddCalled;
+  bool       childRemoveCalled;
+  bool       sizeSetCalled;
+  bool       sizeAnimationCalled;
+  bool       hoverEventCalled;
+  bool       wheelEventCalled;
+  bool       keyEventCalled;
+  bool       keyInputFocusGained;
+  bool       keyInputFocusLost;
   static int constructorCount;
   static int destructorCount;
 
-  Property::Map mLayouts;
+  Property::Map        mLayouts;
   RelayoutCallbackFunc mRelayoutCallback;
-
 };
 
 } // namespace Impl
