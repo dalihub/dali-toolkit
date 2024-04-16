@@ -188,13 +188,6 @@ private:
   void OnAnimationFinished(uint32_t playStateId);
 
   /**
-   * @brief Event callback from rasterize thread. This is called when we want to ensure rendering next frame.
-   *
-   * @param[in] argument Not using arguments
-   */
-  void OnForceRendering(uint32_t argument);
-
-  /**
    * @brief Send animation data to the rasterize thread.
    */
   void SendAnimationData();

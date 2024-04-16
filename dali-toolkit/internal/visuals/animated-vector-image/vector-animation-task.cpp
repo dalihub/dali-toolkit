@@ -140,11 +140,6 @@ void VectorAnimationTask::Finalize()
       mVectorAnimationThread.RemoveEventTriggerCallbacks(mAnimationFinishedCallback.get());
       mAnimationFinishedCallback.reset();
     }
-    if(mForceRenderOnceCallback)
-    {
-      mVectorAnimationThread.RemoveEventTriggerCallbacks(mForceRenderOnceCallback.get());
-      mForceRenderOnceCallback.reset();
-    }
     if(mLoadCompletedCallback)
     {
       mVectorAnimationThread.RemoveEventTriggerCallbacks(mLoadCompletedCallback.get());
@@ -394,12 +389,6 @@ void VectorAnimationTask::SetAnimationFinishedCallback(CallbackBase* callback)
 {
   Mutex::ScopedLock lock(mMutex);
   mAnimationFinishedCallback = std::unique_ptr<CallbackBase>(callback);
-}
-
-void VectorAnimationTask::SetForceRenderOnceCallback(CallbackBase* callback)
-{
-  Mutex::ScopedLock lock(mMutex);
-  mForceRenderOnceCallback = std::unique_ptr<CallbackBase>(callback);
 }
 
 void VectorAnimationTask::SetLoopCount(int32_t count)
@@ -751,10 +740,7 @@ bool VectorAnimationTask::Rasterize()
   if(mNotifyAfterRasterization || mNeedForceRenderOnceTrigger)
   {
     Mutex::ScopedLock lock(mMutex);
-    if(mForceRenderOnceCallback)
-    {
-      mVectorAnimationThread.AddEventTriggerCallback(mForceRenderOnceCallback.get(), mAppliedPlayStateId);
-    }
+    mVectorAnimationThread.RequestForceRenderOnce();
     mNeedForceRenderOnceTrigger = false;
   }
 
