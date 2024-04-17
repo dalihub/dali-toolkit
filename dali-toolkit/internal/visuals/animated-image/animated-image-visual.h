@@ -276,6 +276,7 @@ private:
 
 private:
   Timer                     mFrameDelayTimer;
+  WeakHandle<Window>        mPlacementWindow;
   WeakHandle<Actor>         mPlacementActor;
   ImageVisualShaderFactory& mImageVisualShaderFactory;
 

@@ -239,6 +239,7 @@ private:
   AnimatedVectorImageVisual& operator=(const AnimatedVectorImageVisual& visual) = delete;
 
 private:
+  WeakHandle<Window>                 mPlacementWindow;
   VisualUrl                          mImageUrl;
   VectorAnimationTask::AnimationData mAnimationData;
   VectorAnimationTaskPtr             mVectorAnimationTask;

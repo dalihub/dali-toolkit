@@ -499,6 +499,7 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
     Window window = DevelWindow::Get(actor);
     if(window)
     {
+      mPlacementWindow = window;
       DevelWindow::VisibilityChangedSignal(window).Connect(this, &AnimatedVectorImageVisual::OnWindowVisibilityChanged);
     }
 
@@ -532,10 +533,11 @@ void AnimatedVectorImageVisual::DoSetOffScene(Actor& actor)
 
   DevelActor::VisibilityChangedSignal(actor).Disconnect(this, &AnimatedVectorImageVisual::OnControlVisibilityChanged);
 
-  Window window = DevelWindow::Get(actor);
+  Window window = mPlacementWindow.GetHandle();
   if(window)
   {
     DevelWindow::VisibilityChangedSignal(window).Disconnect(this, &AnimatedVectorImageVisual::OnWindowVisibilityChanged);
+    mPlacementWindow.Reset();
   }
 
   mPlacementActor.Reset();

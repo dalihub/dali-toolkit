@@ -250,6 +250,7 @@ void GlView::OnSceneConnection(int depth)
 
   if(window)
   {
+    mPlacementWindow = window;
     DevelWindow::VisibilityChangedSignal(window).Connect(this, &GlView::OnWindowVisibilityChanged);
   }
 
@@ -268,6 +269,13 @@ void GlView::OnSceneDisconnection()
   if(mRenderThread)
   {
     mRenderThread->Pause();
+  }
+
+  Window window = mPlacementWindow.GetHandle();
+  if(window)
+  {
+    DevelWindow::VisibilityChangedSignal(window).Disconnect(this, &GlView::OnWindowVisibilityChanged);
+    mPlacementWindow.Reset();
   }
 }
 

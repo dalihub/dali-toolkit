@@ -22,6 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/native-image-source-queue.h>
 #include <dali/public-api/adaptor-framework/window.h>
+#include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/shader.h>
 
@@ -147,6 +148,7 @@ private:
   Dali::NativeImageSourceQueue::ColorFormat GetColorFormat(Dali::Toolkit::GlView::ColorFormat format);
 
 private:
+  WeakHandle<Window>                   mPlacementWindow;
   std::unique_ptr<GlViewRenderThread>  mRenderThread;
   Dali::NativeImageSourceQueuePtr      mNativeImageQueue;
   Dali::Toolkit::GlView::RenderingMode mRenderingMode;
