@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_RANGE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,16 +143,6 @@ public: //Methods
 } // namespace Text
 
 } // namespace Toolkit
-
-// Allow Range to be treated as a POD type
-template<>
-struct TypeTraits<Dali::Toolkit::Text::Range> : public BasicTypes<Dali::Toolkit::Text::Range>
-{
-  enum
-  {
-    IS_TRIVIAL_TYPE = true
-  };
-};
 
 } // namespace Dali
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_RANGE_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,16 +125,6 @@ inline const Internal::Range& GetImplementation(const Dali::Toolkit::Text::Range
 } // namespace Text
 
 } // namespace Toolkit
-
-// Allow Range to be treated as a POD type
-template<>
-struct TypeTraits<Dali::Toolkit::Text::Internal::Range> : public Dali::BasicTypes<Dali::Toolkit::Text::Internal::Range>
-{
-  enum
-  {
-    IS_TRIVIAL_TYPE = true
-  };
-};
 
 } // namespace Dali
 

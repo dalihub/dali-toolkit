@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_SPANNED_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,16 +102,6 @@ inline const Internal::Spanned& GetImplementation(const Dali::Toolkit::Text::Spa
 } // namespace Text
 
 } // namespace Toolkit
-
-// Allow Spanned to be treated as a POD type
-template<>
-struct TypeTraits<Dali::Toolkit::Text::Internal::Spanned> : public Dali::BasicTypes<Dali::Toolkit::Text::Internal::Spanned>
-{
-  enum
-  {
-    IS_TRIVIAL_TYPE = true
-  };
-};
 
 } // namespace Dali
 
