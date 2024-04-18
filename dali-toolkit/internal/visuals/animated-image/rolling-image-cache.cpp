@@ -258,12 +258,6 @@ void RollingImageCache::LoadComplete(bool loadSuccess, TextureInformation textur
 
     if(!frontFrameReady && IsFrontReady())
     {
-      if(textureInformation.textureSet)
-      {
-        Sampler sampler = Sampler::New();
-        sampler.SetWrapMode(Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT);
-        textureInformation.textureSet.SetSampler(0u, sampler);
-      }
       mObserver.FrameReady(textureInformation.textureSet, mInterval, textureInformation.preMultiplied);
     }
   }

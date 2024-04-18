@@ -258,10 +258,13 @@ void GradientVisual::OnInitialize()
   TextureSet    textureSet    = TextureSet::New();
   Dali::Texture lookupTexture = mGradient->GenerateLookupTexture();
   textureSet.SetTexture(0u, lookupTexture);
-  Dali::WrapMode::Type wrap    = GetWrapMode(mGradient->GetSpreadMethod());
-  Sampler              sampler = Sampler::New();
-  sampler.SetWrapMode(wrap, wrap);
-  textureSet.SetSampler(0u, sampler);
+  Dali::WrapMode::Type wrap = GetWrapMode(mGradient->GetSpreadMethod());
+  if(wrap != Dali::WrapMode::DEFAULT)
+  {
+    Sampler sampler = Sampler::New();
+    sampler.SetWrapMode(wrap, wrap);
+    textureSet.SetSampler(0u, sampler);
+  }
 
   mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);

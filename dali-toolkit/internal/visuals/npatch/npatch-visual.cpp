@@ -105,13 +105,6 @@ void NPatchVisual::LoadImages()
     // Load the auxiliary image
     mAuxiliaryTextureSet = textureManager.LoadTexture(mAuxiliaryUrl, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, maskingDataPtr, synchronousLoading, mAuxiliaryTextureId, atlasRect, atlasRectSize, atlasing, loadingStatus, this, nullptr, imageAtlasManagerPtr, true, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoad);
 
-    if(mAuxiliaryTextureSet)
-    {
-      Sampler sampler = Sampler::New();
-      sampler.SetWrapMode(WrapMode::DEFAULT, WrapMode::DEFAULT);
-      mAuxiliaryTextureSet.SetSampler(0u, sampler);
-    }
-
     // If synchronousLoading is true, we can check the auxiliaryResource's status now.
     if(synchronousLoading)
     {
@@ -613,14 +606,7 @@ void NPatchVisual::LoadComplete(bool loadSuccess, TextureInformation textureInfo
     }
     if(loadSuccess)
     {
-      mAuxiliaryTextureSet = textureInformation.textureSet;
-      if(mAuxiliaryTextureSet)
-      {
-        Sampler sampler = Sampler::New();
-        sampler.SetWrapMode(WrapMode::DEFAULT, WrapMode::DEFAULT);
-        mAuxiliaryTextureSet.SetSampler(0u, sampler);
-      }
-
+      mAuxiliaryTextureSet     = textureInformation.textureSet;
       mAuxiliaryResourceStatus = Toolkit::Visual::ResourceStatus::READY;
     }
     else

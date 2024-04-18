@@ -147,12 +147,6 @@ void FixedImageCache::LoadBatch()
 TextureSet FixedImageCache::GetTextureSet(uint32_t frameIndex) const
 {
   TextureSet textureSet = mTextureManager.GetTextureSet(mImageUrls[frameIndex].mTextureId);
-  if(textureSet)
-  {
-    Sampler sampler = Sampler::New();
-    sampler.SetWrapMode(Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT);
-    textureSet.SetSampler(0u, sampler);
-  }
   return textureSet;
 }
 
