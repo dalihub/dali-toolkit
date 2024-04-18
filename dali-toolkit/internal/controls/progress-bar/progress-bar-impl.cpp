@@ -271,13 +271,11 @@ void ProgressBar::SetProgressValue(float value)
 
     Toolkit::ProgressBar self = Toolkit::ProgressBar::DownCast(Self());
     mValueChangedSignal.Emit(self, mProgressValue, mSecondaryProgressValue);
-    if(Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
+
+    auto accessible = GetAccessibleObject();
+    if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
     {
-      auto accessible = GetAccessibleObject();
-      if(DALI_LIKELY(accessible))
-      {
-        accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
-      }
+      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
     }
     RelayoutRequest();
   }

@@ -888,7 +888,7 @@ void TextField::SetEditable(bool editable)
 void TextField::TextInserted(unsigned int position, unsigned int length, const std::string& content)
 {
   auto accessible = GetAccessibleObject();
-  if(DALI_LIKELY(accessible))
+  if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
   {
     accessible->EmitTextInserted(position, length, content);
   }
@@ -897,7 +897,7 @@ void TextField::TextInserted(unsigned int position, unsigned int length, const s
 void TextField::TextDeleted(unsigned int position, unsigned int length, const std::string& content)
 {
   auto accessible = GetAccessibleObject();
-  if(DALI_LIKELY(accessible))
+  if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
   {
     accessible->EmitTextDeleted(position, length, content);
   }
@@ -906,7 +906,7 @@ void TextField::TextDeleted(unsigned int position, unsigned int length, const st
 void TextField::CursorPositionChanged(unsigned int oldPosition, unsigned int newPosition)
 {
   auto accessible = GetAccessibleObject();
-  if(DALI_LIKELY(accessible))
+  if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
   {
     accessible->EmitTextCursorMoved(newPosition);
   }

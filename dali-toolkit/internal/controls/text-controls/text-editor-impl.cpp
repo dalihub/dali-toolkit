@@ -962,7 +962,7 @@ void TextEditor::RequestTextRelayout()
 void TextEditor::TextInserted(unsigned int position, unsigned int length, const std::string& content)
 {
   auto accessible = GetAccessibleObject();
-  if(DALI_LIKELY(accessible))
+  if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
   {
     accessible->EmitTextInserted(position, length, content);
   }
@@ -971,7 +971,7 @@ void TextEditor::TextInserted(unsigned int position, unsigned int length, const 
 void TextEditor::TextDeleted(unsigned int position, unsigned int length, const std::string& content)
 {
   auto accessible = GetAccessibleObject();
-  if(DALI_LIKELY(accessible))
+  if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
   {
     accessible->EmitTextDeleted(position, length, content);
   }
@@ -980,7 +980,7 @@ void TextEditor::TextDeleted(unsigned int position, unsigned int length, const s
 void TextEditor::CursorPositionChanged(unsigned int oldPosition, unsigned int newPosition)
 {
   auto accessible = GetAccessibleObject();
-  if(DALI_LIKELY(accessible))
+  if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
   {
     accessible->EmitTextCursorMoved(newPosition);
   }
