@@ -65,6 +65,11 @@ public:
   Dali::Clipboard::DataReceivedSignalType& DataReceivedSignal();
 
   /**
+   * @copydoc Dali::Clipboard::HasType()
+   */
+  bool HasType(const std::string& mimeType);
+
+  /**
    * @copydoc Dali::Clipboard::SetData()
    */
   bool SetData(const Dali::Clipboard::ClipData& clipData);
@@ -150,6 +155,11 @@ Dali::Clipboard::DataSentSignalType& Clipboard::DataSentSignal()
 Dali::Clipboard::DataReceivedSignalType& Clipboard::DataReceivedSignal()
 {
   return mDataReceivedSignal;
+}
+
+bool Clipboard::HasType(const std::string& mimeType)
+{
+  return mMimeType == mimeType ? true : false;
 }
 
 bool Clipboard::SetData(const Dali::Clipboard::ClipData& clipData)

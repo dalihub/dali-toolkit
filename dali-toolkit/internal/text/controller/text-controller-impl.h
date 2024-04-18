@@ -614,17 +614,19 @@ struct Controller::Impl
     return mClipboard != nullptr ? true : false;
   }
 
-  bool IsClipboardEmpty()
-  {
-    bool result(Clipboard::IsAvailable() && EnsureClipboardCreated() && mClipboard.NumberOfItems());
-    return !result; // If NumberOfItems greater than 0, return false
-  }
-
   bool IsClipboardVisible()
   {
     bool result(Clipboard::IsAvailable() && EnsureClipboardCreated() && mClipboard.IsVisible());
     return result;
   }
+
+  /**
+   * @brief Whether the clipboard is empty or not.
+   * Checks the types that the text controller can paste and returns the result.
+   *
+   * @return Return whether or not the clipboard is empty.
+   */
+  bool IsClipboardEmpty();
 
   /**
    * @copydoc Controller::GetLayoutDirection()

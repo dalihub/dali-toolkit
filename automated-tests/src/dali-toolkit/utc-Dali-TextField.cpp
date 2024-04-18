@@ -3245,7 +3245,56 @@ int utcDaliTextFieldEvent08(void)
     event.AddPoint(GetPointUpInside(position));
     application.ProcessEvent(event);
   }
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextEditor::Property::TEXT), std::string("testTextFieldEvent"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("testTextFieldEvent"), TEST_LOCATION);
+
+  Dali::Clipboard::ClipData htmlData("application/xhtml+xml", "testTextFieldEventHtml");
+  clipboard.SetData(htmlData);
+
+  field.SetProperty(TextField::Property::TEXT, "");
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Long Press
+  TestGenerateLongPress(application, 1.0f, 25.0f, 20);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Wait(application, 500);
+
+  TestEndLongPress(application, 1.0f, 25.0f, 520);
+
+  // Long Press
+  TestGenerateLongPress(application, 1.0f, 25.0f, 600);
+
+  // Render and notify
+  application.Render();
+
+  Wait(application, 500);
+
+  stage = application.GetScene();
+  layer = stage.GetRootLayer();
+  actor = layer.FindChildByName("optionPaste");
+
+  if(actor)
+  {
+    Vector3 worldPosition = actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION);
+    Vector2 halfStageSize = stage.GetSize() / 2.0f;
+    Vector2 position(worldPosition.x + halfStageSize.width, worldPosition.y + halfStageSize.height);
+
+    Dali::Integration::TouchEvent event;
+    event = Dali::Integration::TouchEvent();
+    event.AddPoint(GetPointDownInside(position));
+    application.ProcessEvent(event);
+
+    event = Dali::Integration::TouchEvent();
+    event.AddPoint(GetPointUpInside(position));
+    application.ProcessEvent(event);
+  }
+  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("testTextFieldEventHtml"), TEST_LOCATION);
 
   END_TEST;
 }
