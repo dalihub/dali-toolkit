@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/ordered-set.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/signals/callback.h>
@@ -93,9 +94,10 @@ private:
   VectorAnimationManager& operator=(const VectorAnimationManager& manager) = delete;
 
 private:
-  std::vector<std::unique_ptr<CallbackBase>> mEventCallbacks;
-  std::unique_ptr<VectorAnimationThread>     mVectorAnimationThread;
-  bool                                       mProcessorRegistered;
+  Dali::Integration::OrderedSet<CallbackBase> mEventCallbacks; ///< Event triggered callback lists (owned)
+
+  std::unique_ptr<VectorAnimationThread> mVectorAnimationThread;
+  bool                                   mProcessorRegistered : 1;
 };
 
 } // namespace Internal
