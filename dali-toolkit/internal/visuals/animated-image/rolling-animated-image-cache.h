@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ROLLING_ANIMATED_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,10 +169,11 @@ private:
    *
    * @param[in] loadSuccess whether the loading is succeded or not.
    * @param[in] textureSet textureSet for this frame.
+   * @param[in] frameCount Total frame count for this image.
    * @param[in] interval interval between this frame and next frame.
    * @param[in] preMultiplied whether the texture is premultied alpha or not.
    */
-  void MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t interval, bool preMultiplied);
+  void MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t frameCount, uint32_t interval, bool preMultiplied);
 
   /**
    * @brief Pop front entity of Cache.
