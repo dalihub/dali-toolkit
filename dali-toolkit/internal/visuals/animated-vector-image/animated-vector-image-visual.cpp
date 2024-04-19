@@ -101,7 +101,6 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   mLastSentPlayStateId(0u),
   mLoadFailed(false),
   mRendererAdded(false),
-  mCoreShutdown(false),
   mRedrawInScalingDown(true),
   mEnableFrameCache(false),
   mUseNativeImage(false),
@@ -116,16 +115,13 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
 
 AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
 {
-  if(!mCoreShutdown)
+  if(Dali::Adaptor::IsAvailable())
   {
     if(mImageUrl.IsBufferResource())
     {
       TextureManager& textureManager = mFactoryCache.GetTextureManager();
       textureManager.RemoveEncodedImageBuffer(mImageUrl.GetUrl());
     }
-
-    auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
-    vectorAnimationManager.RemoveObserver(*this);
 
     if(mEventCallback)
     {
@@ -137,12 +133,6 @@ AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
     mVectorAnimationTask->ResourceReadySignal().Disconnect(this, &AnimatedVectorImageVisual::OnResourceReady);
     mVectorAnimationTask->Finalize();
   }
-}
-
-void AnimatedVectorImageVisual::VectorAnimationManagerDestroyed()
-{
-  // Core is shutting down. Don't talk to the plugin any more.
-  mCoreShutdown = true;
 }
 
 void AnimatedVectorImageVisual::GetNaturalSize(Vector2& naturalSize)
@@ -451,9 +441,6 @@ void AnimatedVectorImageVisual::OnInitialize(void)
   mVectorAnimationTask->KeepRasterizedBuffer(mEnableFrameCache);
   mVectorAnimationTask->RequestLoad(mImageUrl, encodedImageBuffer, IsSynchronousLoadingRequired());
 
-  auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
-  vectorAnimationManager.AddObserver(*this);
-
   Shader shader = GenerateShader();
 
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
@@ -630,7 +617,7 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
     }
     case DevelAnimatedVectorImageVisual::Action::FLUSH:
     {
-      if(DALI_LIKELY(!mCoreShutdown))
+      if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
       {
         SendAnimationData();
       }
@@ -817,7 +804,7 @@ void AnimatedVectorImageVisual::StopAnimation()
 
 void AnimatedVectorImageVisual::TriggerVectorRasterization()
 {
-  if(!mEventCallback && !mCoreShutdown)
+  if(!mEventCallback && Dali::Adaptor::IsAvailable())
   {
     mEventCallback               = MakeCallback(this, &AnimatedVectorImageVisual::OnProcessEvents);
     auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();

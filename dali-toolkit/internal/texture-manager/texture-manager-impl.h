@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_MANAGER_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,17 +83,6 @@ public:
     bool                      mMaskImageLoadingFailed;
   };
   using MaskingDataPointer = std::unique_ptr<MaskingData>;
-
-  /**
-   * Class to provide lifecycle event on destruction of texture manager.
-   */
-  struct LifecycleObserver
-  {
-    /**
-     * Called shortly before the texture manager is destroyed.
-     */
-    virtual void TextureManagerDestroyed() = 0;
-  };
 
   /**
    * Constructor.
@@ -226,19 +215,6 @@ public:
     const bool                         orientationCorrection,
     const TextureManager::ReloadPolicy reloadPolicy,
     TextureManager::MultiplyOnLoad&    preMultiplyOnLoad);
-
-  /**
-   * Add an observer to the object.
-   * @param[in] observer The observer to add.
-   */
-  void AddObserver(TextureManager::LifecycleObserver& observer);
-
-  /**
-   * Remove an observer from the object
-   * @pre The observer has already been added.
-   * @param[in] observer The observer to remove.
-   */
-  void RemoveObserver(TextureManager::LifecycleObserver& observer);
 
   /**
    * @brief Returns the geometry associated with texture.
@@ -675,8 +651,7 @@ private:
 private:                                    // Member Variables:
   TextureCacheManager mTextureCacheManager; ///< Manager the life-cycle and caching of Textures
 
-  std::unique_ptr<TextureAsyncLoadingHelper> mAsyncLoader;        ///< The Asynchronous image loader used to provide all local async loads
-  Dali::Vector<LifecycleObserver*>           mLifecycleObservers; ///< Lifecycle observers of texture manager
+  std::unique_ptr<TextureAsyncLoadingHelper> mAsyncLoader; ///< The Asynchronous image loader used to provide all local async loads
 
   Dali::Vector<QueueElement> mLoadQueue;             ///< Queue of textures to load after NotifyObservers
   TextureManager::TextureId  mLoadingQueueTextureId; ///< TextureId when it is loading. it causes Load Textures to be queued.

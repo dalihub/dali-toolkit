@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 // INTERNAL HEADERS
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h> // For ImageAtlasManagerPtr
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 namespace
@@ -306,7 +307,7 @@ void RollingAnimatedImageCache::PopFrontCache()
 
 void RollingAnimatedImageCache::ClearCache()
 {
-  while(mTextureManagerAlive && !mQueue.IsEmpty())
+  while(Dali::Adaptor::IsAvailable() && !mQueue.IsEmpty())
   {
     PopFrontCache();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,6 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false)
 
 VectorAnimationManager::VectorAnimationManager()
 : mEventCallbacks(),
-  mLifecycleObservers(),
   mVectorAnimationThread(nullptr),
   mProcessorRegistered(false)
 {
@@ -57,26 +56,6 @@ VectorAnimationManager::~VectorAnimationManager()
   if(mProcessorRegistered && Adaptor::IsAvailable())
   {
     Adaptor::Get().UnregisterProcessor(*this, true);
-  }
-
-  for(auto observer : mLifecycleObservers)
-  {
-    observer->VectorAnimationManagerDestroyed();
-  }
-}
-
-void VectorAnimationManager::AddObserver(VectorAnimationManager::LifecycleObserver& observer)
-{
-  DALI_ASSERT_DEBUG(mLifecycleObservers.end() == std::find(mLifecycleObservers.begin(), mLifecycleObservers.end(), &observer));
-  mLifecycleObservers.push_back(&observer);
-}
-
-void VectorAnimationManager::RemoveObserver(VectorAnimationManager::LifecycleObserver& observer)
-{
-  auto iterator = std::find(mLifecycleObservers.begin(), mLifecycleObservers.end(), &observer);
-  if(iterator != mLifecycleObservers.end())
-  {
-    mLifecycleObservers.erase(iterator);
   }
 }
 

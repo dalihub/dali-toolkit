@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,6 @@ TextureManager::MaskingData::MaskingData()
 TextureManager::TextureManager(bool loadYuvPlanes)
 : mTextureCacheManager(),
   mAsyncLoader(std::unique_ptr<TextureAsyncLoadingHelper>(new TextureAsyncLoadingHelper(*this))),
-  mLifecycleObservers(),
   mLoadQueue(),
   mLoadingQueueTextureId(INVALID_TEXTURE_ID),
   mRemoveQueue(),
@@ -119,11 +118,6 @@ TextureManager::~TextureManager()
   {
     Adaptor::Get().UnregisterProcessor(*this, true);
     mRemoveProcessorRegistered = false;
-  }
-
-  for(auto iter = mLifecycleObservers.Begin(), endIter = mLifecycleObservers.End(); iter != endIter; ++iter)
-  {
-    (*iter)->TextureManagerDestroyed();
   }
 }
 
@@ -870,29 +864,6 @@ void TextureManager::LoadImageSynchronously(
   {
     pixelBuffers.push_back(pixelBuffer);
   }
-}
-
-void TextureManager::AddObserver(TextureManager::LifecycleObserver& observer)
-{
-  // make sure an observer doesn't observe the same object twice
-  // otherwise it will get multiple calls to ObjectDestroyed()
-  DALI_ASSERT_DEBUG(mLifecycleObservers.End() == std::find(mLifecycleObservers.Begin(), mLifecycleObservers.End(), &observer));
-  mLifecycleObservers.PushBack(&observer);
-}
-
-void TextureManager::RemoveObserver(TextureManager::LifecycleObserver& observer)
-{
-  // Find the observer...
-  auto endIter = mLifecycleObservers.End();
-  for(auto iter = mLifecycleObservers.Begin(); iter != endIter; ++iter)
-  {
-    if((*iter) == &observer)
-    {
-      mLifecycleObservers.Erase(iter);
-      break;
-    }
-  }
-  DALI_ASSERT_DEBUG(endIter != mLifecycleObservers.End());
 }
 
 void TextureManager::LoadOrQueueTexture(TextureManager::TextureInfo& textureInfo, TextureUploadObserver* observer)
