@@ -53,7 +53,7 @@ using AnimatedVectorImageVisualPtr = IntrusivePtr<AnimatedVectorImageVisual>;
  * | url                      | STRING           |
  *
  */
-class AnimatedVectorImageVisual : public Visual::Base, public ConnectionTracker, public VectorAnimationManager::LifecycleObserver
+class AnimatedVectorImageVisual : public Visual::Base, public ConnectionTracker
 {
 public:
   /**
@@ -98,12 +98,6 @@ public: // from Visual
    * @copydoc Visual::Base::EnablePreMultipliedAlpha
    */
   void EnablePreMultipliedAlpha(bool preMultiplied) override;
-
-protected: // From VectorAnimationManager::LifecycleObserver:
-  /**
-   * @copydoc VectorAnimationManager::LifecycleObserver::VectorAnimationManagerDestroyed()
-   */
-  void VectorAnimationManagerDestroyed() override;
 
 protected:
   /**
@@ -257,7 +251,6 @@ private:
 
   bool mLoadFailed : 1;
   bool mRendererAdded : 1;
-  bool mCoreShutdown : 1;
   bool mRedrawInScalingDown : 1;
   bool mEnableFrameCache : 1;
   bool mUseNativeImage : 1;
