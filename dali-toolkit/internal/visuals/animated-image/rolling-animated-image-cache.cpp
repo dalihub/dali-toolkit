@@ -118,7 +118,7 @@ TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
       synchronouslyLoaded = true;
       interval            = mAnimatedImageLoading.GetFrameInterval(mQueue.Back().mFrameNumber);
     }
-    MakeFrameReady(synchronouslyLoaded, textureSet, interval, preMultiplyOnLoading == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
+    MakeFrameReady(synchronouslyLoaded, textureSet, mAnimatedImageLoading.GetImageCount(), interval, preMultiplyOnLoading == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
   }
 
   if(popExist || mQueue.IsEmpty() || synchronouslyLoaded)
@@ -314,7 +314,7 @@ void RollingAnimatedImageCache::ClearCache()
   mLoadState = TextureManager::LoadState::NOT_STARTED;
 }
 
-void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t interval, bool preMultiplied)
+void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t frameCount, uint32_t interval, bool preMultiplied)
 {
   if(!loadSuccess)
   {
@@ -327,9 +327,9 @@ void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet text
     mLoadState = TextureManager::LoadState::LOAD_FINISHED;
 
     // Reset size of Queue according to the real frame count.
-    if(mFrameCount != mAnimatedImageLoading.GetImageCount())
+    if(mFrameCount != frameCount)
     {
-      mFrameCount = mAnimatedImageLoading.GetImageCount();
+      mFrameCount = frameCount;
       mTextureIds.resize(mFrameCount);
       mIntervals.assign(mFrameCount, 0u);
     }
@@ -360,7 +360,7 @@ void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformatio
     textureInformation.textureSet.SetSampler(0u, sampler);
   }
 
-  MakeFrameReady(loadSuccess, textureInformation.textureSet, textureInformation.interval, textureInformation.preMultiplied);
+  MakeFrameReady(loadSuccess, textureInformation.textureSet, textureInformation.frameCount, textureInformation.interval, textureInformation.preMultiplied);
 
   // TODO : We need to remove some below logics, since user can remove Visual during ResourceReady callback.
 

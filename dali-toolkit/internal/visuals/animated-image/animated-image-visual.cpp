@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #include <dali-toolkit/internal/visuals/animated-image/animated-image-visual.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <memory>
@@ -344,7 +344,27 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::FRAME_DELAY, static_cast<int>(mFrameDelay));
   map.Insert(Toolkit::DevelImageVisual::Property::LOOP_COUNT, static_cast<int>(mLoopCount));
   map.Insert(Toolkit::DevelImageVisual::Property::CURRENT_FRAME_NUMBER, (mImageCache) ? static_cast<int32_t>(mImageCache->GetCurrentFrameIndex()) : -1);
-  map.Insert(Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, (mImageCache) ? static_cast<int32_t>((mAnimatedImageLoading) ? mAnimatedImageLoading.GetImageCount() : mImageCache->GetTotalFrameCount()) : -1);
+
+  // 1. Get cached mFrameCount if mFrameCount != 0.
+  // 2. If we are not using animated image loading, ask to image cache.
+  // 2-1. If image cache return SINGLE_IMAGE_COUNT or less, It might not a valid value
+  //      (since default frameCount of image cache is SINGLE_IMAGE_COUNT)
+  //      So, let we ask to animated image loader again.
+  // 2-1-1. If animated image loader return 0, it means that it is not a valid animated image.
+  // 2-1-2. Otherwise, we can assume that it is valid frame count.
+  // 2-2. Otherwise, we can assume that it is valid frame count.
+  uint32_t frameCount = mFrameCount;
+  if(mImageCache && frameCount == 0)
+  {
+    frameCount = mImageCache->GetTotalFrameCount();
+
+    if(frameCount <= SINGLE_IMAGE_COUNT && mAnimatedImageLoading)
+    {
+      frameCount = mAnimatedImageLoading.GetImageCount();
+    }
+  }
+
+  map.Insert(Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, (frameCount >= SINGLE_IMAGE_COUNT) ? static_cast<int>(frameCount) : -1);
 
   map.Insert(Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, mStopBehavior);
 
