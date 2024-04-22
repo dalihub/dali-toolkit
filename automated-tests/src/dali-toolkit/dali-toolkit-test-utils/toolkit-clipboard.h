@@ -131,6 +131,13 @@ public:
   DataReceivedSignalType& DataReceivedSignal();
 
   /**
+   * @brief Check if there is data in the clipboard with a given mime type.
+   * @param[in] mimeType mime type to search for.
+   * @return bool true if there is data, otherwise false.
+   */
+  bool HasType(const std::string& mimeType);
+
+  /**
    * @brief Send the given data to the clipboard.
    * @param[in] clipData data to send to the clipboard
    * @return bool true if the internal clipboard sending was successful.
