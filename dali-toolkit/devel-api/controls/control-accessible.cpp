@@ -235,7 +235,7 @@ Dali::Accessibility::States ControlAccessible::CalculateStates()
   states[State::FOCUSABLE]     = self.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE);
   states[State::FOCUSED]       = Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor() == self;
   states[State::HIGHLIGHTABLE] = self.GetProperty<bool>(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE);
-  states[State::HIGHLIGHTED]   = GetCurrentlyHighlightedActor() == self;
+  states[State::HIGHLIGHTED]   = IsHighlighted();
   states[State::ENABLED]       = true;
   states[State::SENSITIVE]     = (Dali::DevelActor::IsHittable(self) && Dali::DevelActor::GetTouchRequired(self));
   states[State::VISIBLE]       = self.GetProperty<bool>(Actor::Property::VISIBLE);
@@ -425,18 +425,16 @@ bool ControlAccessible::GrabHighlight()
 
 bool ControlAccessible::ClearHighlight()
 {
-  Dali::Actor self = Self();
-
   if(!Dali::Accessibility::IsUp())
   {
     return false;
   }
 
-  if(GetCurrentlyHighlightedActor() == self)
+  if(IsHighlighted())
   {
     UnregisterPropertySetSignal();
     UnregisterPositionPropertyNotification();
-    self.Remove(mCurrentHighlightActor.GetHandle());
+    Self().Remove(mCurrentHighlightActor.GetHandle());
     mCurrentHighlightActor = {};
     SetCurrentlyHighlightedActor({});
     EmitHighlighted(false);

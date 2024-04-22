@@ -363,13 +363,11 @@ void ScrollBar::OnScrollPositionIntervalReached(PropertyNotification& source)
   if(scrollableHandle)
   {
     mScrollPositionIntervalReachedSignal.Emit(scrollableHandle.GetCurrentProperty<float>(mPropertyScrollPosition));
-    if(Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
+
+    auto accessible = GetAccessibleObject();
+    if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
     {
-      auto accessible = GetAccessibleObject();
-      if(DALI_LIKELY(accessible))
-      {
-        accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
-      }
+      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
     }
   }
 }

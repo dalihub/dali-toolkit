@@ -581,7 +581,7 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
     case Actor::Property::VISIBLE:
     {
       auto* accessible = GetAccessibleObject();
-      if(DALI_LIKELY(accessible))
+      if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
       {
         accessible->EmitVisible(Self().GetProperty<bool>(Actor::Property::VISIBLE));
       }
