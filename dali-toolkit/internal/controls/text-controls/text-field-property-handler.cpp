@@ -709,6 +709,18 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       }
       break;
     }
+    case Toolkit::DevelTextField::Property::REMOVE_FRONT_INSET:
+    {
+      const bool remove = value.Get<bool>();
+      impl.mController->SetRemoveFrontInset(remove);
+      break;
+    }
+    case Toolkit::DevelTextField::Property::REMOVE_BACK_INSET:
+    {
+      const bool remove = value.Get<bool>();
+      impl.mController->SetRemoveBackInset(remove);
+      break;
+    }
   }
 }
 
@@ -1096,6 +1108,17 @@ Property::Value TextField::PropertyHandler::GetProperty(Toolkit::TextField textF
       value = map;
       break;
     }
+    case Toolkit::DevelTextField::Property::REMOVE_FRONT_INSET:
+    {
+      value = impl.mController->IsRemoveFrontInset();
+      break;
+    }
+    case Toolkit::DevelTextField::Property::REMOVE_BACK_INSET:
+    {
+      value = impl.mController->IsRemoveBackInset();
+      break;
+    }
+
   } //switch
   return value;
 }
