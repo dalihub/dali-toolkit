@@ -115,6 +115,9 @@ const char* const PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE          = "enableFontSiz
 const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR               = "grabHandleColor";
 const char* const PROPERTY_NAME_INPUT_FILTER                    = "inputFilter";
 
+const char* const PROPERTY_NAME_REMOVE_FRONT_INSET    = "removeFrontInset";
+const char* const PROPERTY_NAME_REMOVE_BACK_INSET     = "removeBackInset";
+
 const Vector4       PLACEHOLDER_TEXT_COLOR(0.8f, 0.8f, 0.8f, 0.8f);
 const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f); // The text highlight color.
 
@@ -643,6 +646,8 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_STRIKETHROUGH) == DevelTextField::Property::STRIKETHROUGH);
   DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_INPUT_STRIKETHROUGH) == DevelTextField::Property::INPUT_STRIKETHROUGH);
   DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_SELECTION_POPUP_STYLE) == DevelTextField::Property::SELECTION_POPUP_STYLE);
+  DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_REMOVE_FRONT_INSET) == DevelTextField::Property::REMOVE_FRONT_INSET);
+  DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_REMOVE_BACK_INSET) == DevelTextField::Property::REMOVE_BACK_INSET);
 
   END_TEST;
 }
@@ -1266,6 +1271,19 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   application.SendNotification();
   application.Render();
+
+  // Check Remove Front/Back Inset Property
+  DALI_TEST_CHECK(field.GetProperty<bool>(DevelTextField::Property::REMOVE_FRONT_INSET));
+  field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, false);
+  DALI_TEST_CHECK(!field.GetProperty<bool>(DevelTextField::Property::REMOVE_FRONT_INSET));
+
+  DALI_TEST_CHECK(field.GetProperty<bool>(DevelTextField::Property::REMOVE_BACK_INSET));
+  field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, false);
+  DALI_TEST_CHECK(!field.GetProperty<bool>(DevelTextField::Property::REMOVE_BACK_INSET));
+
+  application.SendNotification();
+  application.Render();
+
 
   END_TEST;
 }
@@ -6130,6 +6148,42 @@ int utcDaliTextFieldDecoratorColor(void)
 
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int utcDaliTextFieldRemoveFrontInset(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldRemoveFrontInset");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+  application.SendNotification();
+  application.Render();
+
+  DevelTextField::SetRemoveFrontInset(field, false);
+  DALI_TEST_CHECK(!DevelTextField::IsRemoveFrontInset(field));
+
+  END_TEST;
+}
+
+int utcDaliTextFieldRemoveBackInset(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldRemoveBackInset");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+  application.SendNotification();
+  application.Render();
+
+  DevelTextField::SetRemoveBackInset(field, false);
+  DALI_TEST_CHECK(!DevelTextField::IsRemoveBackInset(field));
 
   END_TEST;
 }

@@ -147,6 +147,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "strikethrough", 
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "inputStrikethrough",               MAP,       INPUT_STRIKETHROUGH                 )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "characterSpacing",                 FLOAT,     CHARACTER_SPACING                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "selectionPopupStyle",              MAP,       SELECTION_POPUP_STYLE               )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "removeFrontInset",                 BOOLEAN,   REMOVE_FRONT_INSET                  )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "removeBackInset",                  BOOLEAN,   REMOVE_BACK_INSET                   )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "maxLengthReached",      SIGNAL_MAX_LENGTH_REACHED     )
@@ -1202,6 +1204,26 @@ Rect<> TextField::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endInde
 void TextField::SetSpannedText(const Text::Spanned& spannedText)
 {
   mController->SetSpannedText(spannedText);
+}
+
+void TextField::SetRemoveFrontInset(bool remove)
+{
+  mController->SetRemoveFrontInset(remove);
+}
+
+bool TextField::IsRemoveFrontInset() const
+{
+  return mController->IsRemoveFrontInset();
+}
+
+void TextField::SetRemoveBackInset(bool remove)
+{
+  mController->SetRemoveBackInset(remove);
+}
+
+bool TextField::IsRemoveBackInset() const
+{
+  return mController->IsRemoveBackInset();
 }
 
 std::string TextField::TextFieldAccessible::GetName() const
