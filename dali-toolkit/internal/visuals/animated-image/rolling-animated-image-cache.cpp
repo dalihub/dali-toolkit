@@ -221,7 +221,7 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                    synchronousLoading,
                                                                    this,
                                                                    preMultiplyOnLoading);
-  if(textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeU != Dali::WrapMode::DEFAULT))
+  if(textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
   {
     Sampler sampler = Sampler::New();
     sampler.SetWrapMode(mWrapModeU, mWrapModeV);
@@ -275,7 +275,7 @@ TextureSet RollingAnimatedImageCache::GetFrontTextureSet() const
 
   TextureManager::TextureId textureId  = GetCachedTextureId(0);
   TextureSet                textureSet = mTextureManager.GetTextureSet(textureId);
-  if(textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeU != Dali::WrapMode::DEFAULT))
+  if(textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
   {
     Sampler sampler = Sampler::New();
     sampler.SetWrapMode(mWrapModeU, mWrapModeV);
@@ -354,7 +354,7 @@ void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformatio
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::LoadComplete(textureId:%d) start\n", textureInformation.textureId);
   LOG_CACHE;
 
-  if(textureInformation.textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeU != Dali::WrapMode::DEFAULT))
+  if(textureInformation.textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
   {
     Sampler sampler = Sampler::New();
     sampler.SetWrapMode(mWrapModeU, mWrapModeV);

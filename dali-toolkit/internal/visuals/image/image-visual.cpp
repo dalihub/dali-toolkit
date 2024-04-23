@@ -694,7 +694,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
     }
 
     EnablePreMultipliedAlpha(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
-    if(!atlasing && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeU != Dali::WrapMode::DEFAULT))
+    if(!atlasing && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
     {
       Sampler sampler = Sampler::New();
       sampler.SetWrapMode(mWrapModeU, mWrapModeV);
@@ -746,7 +746,7 @@ void ImageVisual::InitializeRenderer()
       mTextures = mFactoryCache.GetTextureManager().GetTextureSet(mTextureId);
       if(!(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED) &&
          mTextures &&
-         (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeU != Dali::WrapMode::DEFAULT))
+         (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
       {
         Sampler sampler = Sampler::New();
         sampler.SetWrapMode(mWrapModeU, mWrapModeV);
@@ -1059,7 +1059,7 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
     }
     else
     {
-      if(mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeU != Dali::WrapMode::DEFAULT)
+      if(mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT)
       {
         Sampler sampler = Sampler::New();
         sampler.SetWrapMode(mWrapModeU, mWrapModeV);
