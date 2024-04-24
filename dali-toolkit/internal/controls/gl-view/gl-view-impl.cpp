@@ -176,7 +176,7 @@ void GlView::OnInitialize()
   }
 
   //Adding VisibilityChange Signal.
-  Dali::DevelActor::VisibilityChangedSignal(self).Connect(this, &GlView::OnControlVisibilityChanged);
+  self.InheritedVisibilityChangedSignal().Connect(this, &GlView::OnControlInheritedVisibilityChanged);
 }
 
 void GlView::OnSizeSet(const Vector3& targetSize)
@@ -207,21 +207,18 @@ Shader GlView::CreateShader()
   return Shader::New(SHADER_GL_VIEW_VERT, fragmentShader, Shader::Hint::NONE, "GL_VIEW");
 }
 
-void GlView::OnControlVisibilityChanged(Dali::Actor actor, bool visible, Dali::DevelActor::VisibilityChange::Type type)
+void GlView::OnControlInheritedVisibilityChanged(Dali::Actor actor, bool visible)
 {
   Actor self = Self();
-  if(self.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  if(mRenderThread)
   {
-    if(mRenderThread)
+    if(visible && DevelWindow::Get(self).IsVisible())
     {
-      if(visible && DevelWindow::Get(self).IsVisible())
-      {
-        mRenderThread->Resume();
-      }
-      else
-      {
-        mRenderThread->Pause();
-      }
+      mRenderThread->Resume();
+    }
+    else
+    {
+      mRenderThread->Pause();
     }
   }
 }
@@ -253,24 +250,11 @@ void GlView::OnSceneConnection(int depth)
     mPlacementWindow = window;
     DevelWindow::VisibilityChangedSignal(window).Connect(this, &GlView::OnWindowVisibilityChanged);
   }
-
-  if(mRenderThread)
-  {
-    if(self.GetProperty<bool>(Actor::Property::VISIBLE) && window.IsVisible())
-    {
-      mRenderThread->Resume();
-    }
-  }
 }
 
 void GlView::OnSceneDisconnection()
 {
   Control::OnSceneDisconnection();
-  if(mRenderThread)
-  {
-    mRenderThread->Pause();
-  }
-
   Window window = mPlacementWindow.GetHandle();
   if(window)
   {

@@ -214,7 +214,7 @@ private:
   /**
    * @brief Callback when the visibility of the actor is changed.
    */
-  void OnControlVisibilityChanged(Actor actor, bool visible, DevelActor::VisibilityChange::Type type);
+  void OnControlInheritedVisibilityChanged(Actor actor, bool visible);
 
   /**
    * @brief Callback when the visibility of the window is changed.
