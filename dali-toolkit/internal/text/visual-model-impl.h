@@ -384,11 +384,25 @@ public:
   Length GetNumberOfUnderlineRuns() const;
 
   /**
+   * @brief Sets the text's outline offset.
+   *
+   * @param[in] outlineOffset The outline offset.
+   */
+  void SetOutlineOffset(const Vector2& outlineOffset);
+
+  /**
    * @brief Set the outline color.
    *
    * @param[in] color color of outline.
    */
   void SetOutlineColor(const Vector4& color);
+
+  /**
+   * @brief Retrieves the text's outline offset.
+   *
+   * @return The text's outline offset.
+   */
+  const Vector2& GetOutlineOffset() const;
 
   /**
    * @brief Retrieve the outline color.
@@ -673,6 +687,7 @@ public:
   Vector4                          mStrikethroughColor;     ///< Color of text background
   Size                             mControlSize;            ///< The size of the UI control.
   Vector2                          mShadowOffset;           ///< Offset for drop shadow, 0 indicates no shadow
+  Vector2                          mOutlineOffset;          ///< Offset for outline
   float                            mUnderlineHeight;        ///< Fixed height for underline to override font metrics.
   float                            mStrikethroughHeight;    ///< Fixed height for strikethrough to override font metrics.
   Text::Underline::Type            mUnderlineType;          ///< The type of the underline.

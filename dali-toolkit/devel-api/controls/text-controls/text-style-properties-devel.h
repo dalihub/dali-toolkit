@@ -137,7 +137,14 @@ enum
    * @details Name "width", type Property::STRING or Property::FLOAT i.e. "1.0" or 1.f
    * @note Optional. If not provided then the outline is not enabled.
    */
-  WIDTH
+  WIDTH,
+
+  /**
+   * @brief The offset in pixels of the outline.
+   * @details Name "offset", type Property::STRING or Property::VECTOR2. i.e "3.0 3.0" or Vector2( 3.f, 3.f )
+   * @note Optional. If not provided then the outline is not enabled.
+   */
+  OFFSET
 };
 
 } // namespace Property

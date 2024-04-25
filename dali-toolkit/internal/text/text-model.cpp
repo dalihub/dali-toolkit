@@ -227,6 +227,11 @@ void Model::GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns, UnderlineRunInde
   mVisualModel->GetUnderlineRuns(underlineRuns, index, numberOfRuns);
 }
 
+const Vector2& Model::GetOutlineOffset() const
+{
+  return mVisualModel->GetOutlineOffset();
+}
+
 const Vector4& Model::GetOutlineColor() const
 {
   return mVisualModel->GetOutlineColor();

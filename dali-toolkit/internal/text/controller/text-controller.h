@@ -1274,6 +1274,20 @@ public: // Default style & Input style
   float GetDashedUnderlineGap() const;
 
   /**
+   * @brief Set the outline offset.
+   *
+   * @param[in] outlineOffset The outline offset.
+   */
+  void SetOutlineOffset(const Vector2& outlineOffset);
+
+  /**
+   * @brief Retrieve the outline offset.
+   *
+   * @return The outline offset.
+   */
+  const Vector2& GetOutlineOffset() const;
+
+  /**
    * @brief Set the outline color.
    *
    * @param[in] color color of outline.

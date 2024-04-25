@@ -322,6 +322,13 @@ public:
   virtual void GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns) const = 0;
 
   /**
+   * @brief Retrieves the outline offset.
+   *
+   * @return The outline offset.
+   */
+  virtual const Vector2& GetOutlineOffset() const = 0;
+
+  /**
    * @brief Retrieve the outline color.
    *
    * @return The outline color.
