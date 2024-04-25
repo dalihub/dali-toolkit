@@ -381,6 +381,11 @@ void VisualModel::SetUnderlineColor(const Vector4& color)
   mUnderlineColorSet = true;
 }
 
+void VisualModel::SetOutlineOffset(const Vector2& outlineOffset)
+{
+  mOutlineOffset = outlineOffset;
+}
+
 void VisualModel::SetOutlineColor(const Vector4& color)
 {
   mOutlineColor = color;
@@ -504,6 +509,11 @@ const float& VisualModel::GetShadowBlurRadius() const
 const Vector4& VisualModel::GetUnderlineColor() const
 {
   return mUnderlineColor;
+}
+
+const Vector2& VisualModel::GetOutlineOffset() const
+{
+  return mOutlineOffset;
 }
 
 const Vector4& VisualModel::GetOutlineColor() const
@@ -665,6 +675,7 @@ VisualModel::VisualModel()
   mStrikethroughColor(Color::BLACK),
   mControlSize(),
   mShadowOffset(),
+  mOutlineOffset(),
   mUnderlineHeight(0.0f),
   mStrikethroughHeight(0.0f),
   mUnderlineType(Text::Underline::SOLID),

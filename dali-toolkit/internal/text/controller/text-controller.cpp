@@ -995,6 +995,17 @@ float Controller::GetDashedUnderlineGap() const
   return mImpl->mModel->mVisualModel->GetDashedUnderlineGap();
 }
 
+void Controller::SetOutlineOffset(const Vector2& outlineOffset)
+{
+  mImpl->mModel->mVisualModel->SetOutlineOffset(outlineOffset);
+  mImpl->RequestRelayout();
+}
+
+const Vector2& Controller::GetOutlineOffset() const
+{
+  return mImpl->mModel->mVisualModel->GetOutlineOffset();
+}
+
 void Controller::SetOutlineColor(const Vector4& color)
 {
   mImpl->mModel->mVisualModel->SetOutlineColor(color);

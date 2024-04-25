@@ -229,7 +229,9 @@ bool ParseOutlineProperties(const Property::Map& underlinePropertiesMap,
                             bool&                colorDefined,
                             Vector4&             color,
                             bool&                widthDefined,
-                            uint16_t&            width)
+                            uint16_t&            width,
+                            bool&                offsetDefined,
+                            Vector2&             offset)
 {
   const unsigned int numberOfItems = underlinePropertiesMap.Count();
 
@@ -249,6 +251,21 @@ bool ParseOutlineProperties(const Property::Map& underlinePropertiesMap,
       /// Width key.
       widthDefined = true;
       width        = static_cast<uint16_t>(valueGet.second.Get<float>());
+    }
+    else if((DevelText::Outline::Property::OFFSET == valueGet.first.indexKey) || (OFFSET_KEY == valueGet.first.stringKey))
+    {
+      /// Offset key.
+      offsetDefined = true;
+
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string offsetStr = valueGet.second.Get<std::string>();
+        StringToVector2(offsetStr.c_str(), offsetStr.size(), offset);
+      }
+      else
+      {
+        offset = valueGet.second.Get<Vector2>();
+      }
     }
   }
 
@@ -752,10 +769,12 @@ bool SetOutlineProperties(ControllerPtr controller, const Property::Value& value
       {
         const Property::Map& propertiesMap = value.Get<Property::Map>();
 
-        bool     colorDefined = false;
+        bool     colorDefined  = false;
         Vector4  color;
-        bool     widthDefined = false;
-        uint16_t width        = 0u;
+        bool     widthDefined  = false;
+        uint16_t width         = 0u;
+        bool     offsetDefined = false;
+        Vector2  offset;
 
         bool empty = true;
 
@@ -776,7 +795,9 @@ bool SetOutlineProperties(ControllerPtr controller, const Property::Value& value
                                          colorDefined,
                                          color,
                                          widthDefined,
-                                         width);
+                                         width,
+                                         offsetDefined,
+                                         offset);
 
           controller->OutlineSetByString(false);
         }
@@ -793,6 +814,12 @@ bool SetOutlineProperties(ControllerPtr controller, const Property::Value& value
           if(widthDefined && (controller->GetOutlineWidth() != width))
           {
             controller->SetOutlineWidth(width);
+            update = true;
+          }
+
+          if(offsetDefined && (controller->GetOutlineOffset() != offset))
+          {
+            controller->SetOutlineOffset(offset);
             update = true;
           }
         }
@@ -835,12 +862,15 @@ void GetOutlineProperties(ControllerPtr controller, Property::Value& value, Effe
         }
         else
         {
-          const Vector4& color = controller->GetOutlineColor();
-          const uint16_t width = controller->GetOutlineWidth();
+          const Vector4& color  = controller->GetOutlineColor();
+          const uint16_t width  = controller->GetOutlineWidth();
+          const Vector2& offset = controller->GetOutlineOffset();
+
 
           Property::Map map;
           map.Insert(COLOR_KEY, color);
           map.Insert(WIDTH_KEY, static_cast<int>(width));
+          map.Insert(OFFSET_KEY, offset);
 
           value = map;
 
