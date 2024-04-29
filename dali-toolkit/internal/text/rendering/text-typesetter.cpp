@@ -1149,11 +1149,15 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t bufferWidth, con
 
     if(style == Typesetter::STYLE_OUTLINE)
     {
+      const Vector2& outlineOffset = mModel->GetOutlineOffset();
+
       glyphData.horizontalOffset -= outlineWidth;
+      glyphData.horizontalOffset += outlineOffset.x;
       if(lineIndex == 0u)
       {
         // Only need to add the vertical outline offset for the first line
         glyphData.verticalOffset -= outlineWidth;
+        glyphData.verticalOffset += outlineOffset.y;
       }
     }
     else if(style == Typesetter::STYLE_SHADOW)

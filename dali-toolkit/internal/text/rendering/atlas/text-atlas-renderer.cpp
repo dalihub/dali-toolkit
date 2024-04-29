@@ -450,6 +450,7 @@ struct AtlasRenderer::Impl
     const bool       underlineEnabled = view.IsUnderlineEnabled();
     const uint16_t   outlineWidth     = view.GetOutlineWidth();
     const Vector4&   outlineColor(view.GetOutlineColor());
+    const Vector2&   outlineOffset(view.GetOutlineOffset());
     const bool       isOutline            = 0u != outlineWidth;
     const GlyphInfo* hyphens              = view.GetHyphens();
     const Length*    hyphenIndices        = view.GetHyphenIndices();
@@ -656,7 +657,7 @@ struct AtlasRenderer::Impl
 
         if(0u != slot.mImageId) // invalid slot id, glyph has failed to be added to atlas
         {
-          Vector2 positionPlusOutlineOffset = position;
+          Vector2 positionPlusOutlineOffset = position + outlineOffset;
           if(isOutline)
           {
             // Add an offset to the text.

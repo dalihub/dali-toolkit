@@ -1042,6 +1042,7 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   outlineMapSet["color"] = Color::RED;
   outlineMapSet["width"] = 2.0f;
+  outlineMapSet["offset"] = Vector2(0.0f, 0.0f);
 
   editor.SetProperty(TextEditor::Property::OUTLINE, outlineMapSet);
 

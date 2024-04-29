@@ -845,6 +845,18 @@ void View::GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns,
   }
 }
 
+const Vector2& View::GetOutlineOffset() const
+{
+// TODO : We should support outline offset to editable text.
+/*
+  if(mImpl->mVisualModel)
+  {
+    return mImpl->mVisualModel->GetOutlineOffset();
+  }
+*/
+  return Vector2::ZERO;
+}
+
 const Vector4& View::GetOutlineColor() const
 {
   if(mImpl->mVisualModel)
