@@ -116,9 +116,9 @@ private:
   GlView& operator=(const GlView& GlView);
 
   /**
-   * Callback when the visibility of the GlView is changed
+   * Callback when the inherited visibility of the GlView is changed
    */
-  void OnControlVisibilityChanged(Dali::Actor actor, bool visible, Dali::DevelActor::VisibilityChange::Type type);
+  void OnControlInheritedVisibilityChanged(Dali::Actor actor, bool visible);
 
   /**
    * Callback when the visibility of the window is changed

@@ -481,7 +481,7 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
     mSizeNotification = actor.AddPropertyNotification(Actor::Property::SIZE, StepCondition(3.0f));
     mSizeNotification.NotifySignal().Connect(this, &AnimatedVectorImageVisual::OnSizeNotification);
 
-    DevelActor::VisibilityChangedSignal(actor).Connect(this, &AnimatedVectorImageVisual::OnControlVisibilityChanged);
+    actor.InheritedVisibilityChangedSignal().Connect(this, &AnimatedVectorImageVisual::OnControlInheritedVisibilityChanged);
 
     Window window = DevelWindow::Get(actor);
     if(window)
@@ -518,7 +518,7 @@ void AnimatedVectorImageVisual::DoSetOffScene(Actor& actor)
   actor.RemovePropertyNotification(mScaleNotification);
   actor.RemovePropertyNotification(mSizeNotification);
 
-  DevelActor::VisibilityChangedSignal(actor).Disconnect(this, &AnimatedVectorImageVisual::OnControlVisibilityChanged);
+  actor.InheritedVisibilityChangedSignal().Disconnect(this, &AnimatedVectorImageVisual::OnControlInheritedVisibilityChanged);
 
   Window window = mPlacementWindow.GetHandle();
   if(window)
@@ -857,14 +857,14 @@ void AnimatedVectorImageVisual::OnSizeNotification(PropertyNotification& source)
   }
 }
 
-void AnimatedVectorImageVisual::OnControlVisibilityChanged(Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+void AnimatedVectorImageVisual::OnControlInheritedVisibilityChanged(Actor actor, bool visible)
 {
   if(!visible)
   {
     StopAnimation();
     TriggerVectorRasterization();
 
-    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnControlVisibilityChanged: invisibile. Pause animation [%p]\n", this);
+    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnControlInheritedVisibilityChanged: invisibile. Pause animation [%p]\n", this);
   }
 }
 
