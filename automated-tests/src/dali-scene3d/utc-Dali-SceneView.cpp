@@ -16,13 +16,16 @@
  */
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <toolkit-event-thread-callback.h>
+#include <toolkit-timer.h>
+
 #include <dali-toolkit/dali-toolkit.h>
 #include <stdlib.h>
 #include <iostream>
 
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
-#include <toolkit-event-thread-callback.h>
+
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -1192,6 +1195,299 @@ int UtcDaliSceneViewMasking(void)
 
   yFlipMaskTextureIndex = view.GetPropertyIndex(std::string(Y_FLIP_MASK_TEXTURE));
   DALI_TEST_EQUALS(view.GetProperty<float>(yFlipMaskTextureIndex), 1.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+namespace
+{
+static bool                                   gCaptureFinishedCalled{false};
+static int32_t                                gCaptureId{-1};
+static Toolkit::ImageUrl                      gCapturedImageUrl;
+static Scene3D::SceneView::CaptureFinishState gCaptureFinishState{Scene3D::SceneView::CaptureFinishState::FAILED};
+
+void OnCaptureFinished(Scene3D::SceneView sceneView, Scene3D::SceneView::CaptureResult& captureResult)
+{
+  gCaptureFinishedCalled = true;
+  gCaptureId             = captureResult.captureId;
+  gCapturedImageUrl      = captureResult.imageUrl;
+  gCaptureFinishState    = captureResult.state;
+}
+
+static int32_t                                             gCapturedCount{0};
+static std::vector<int32_t>                                gCaptureIds;
+static std::vector<Toolkit::ImageUrl>                      gCapturedImageUrls;
+static std::vector<Scene3D::SceneView::CaptureFinishState> gCaptureFinishStates;
+
+void OnCaptureMultipleFinished(Scene3D::SceneView sceneView, Scene3D::SceneView::CaptureResult& captureResult)
+{
+  gCapturedCount++;
+  gCaptureIds.push_back(captureResult.captureId);
+  gCapturedImageUrls.push_back(captureResult.imageUrl);
+  gCaptureFinishStates.push_back(captureResult.state);
+}
+} // namespace
+
+int UtcDaliSceneViewCapture01(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.CaptureFinishedSignal().Connect(OnCaptureFinished);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Scene3D::Model modelView1 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  view.Add(modelView1);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  CameraActor camera = Dali::CameraActor::New();
+  camera.SetProperty(Dali::Actor::Property::NAME, "camera");
+  camera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  camera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  camera.SetFieldOfView(0.5f);
+  camera.SetNearClippingPlane(1.0f);
+  camera.SetFarClippingPlane(5000.0f);
+  camera.SetProperty(Dali::Actor::Property::POSITION, Vector3(20, 30, 40));
+
+  view.Add(camera);
+
+  gCaptureFinishedCalled = false;
+  gCaptureId = -1;
+  gCapturedImageUrl.Reset();
+  gCaptureFinishState = Scene3D::SceneView::CaptureFinishState::FAILED;
+  int32_t captureId = view.Capture(camera, Vector2(300, 300));
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(gCaptureFinishedCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureId, captureId, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCapturedImageUrl.GetUrl().empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureFinishState, Scene3D::SceneView::CaptureFinishState::SUCCEEDED, TEST_LOCATION);
+
+  Toolkit::ImageUrl tempImageUrl = gCapturedImageUrl;
+
+  gCaptureFinishedCalled = false;
+  gCaptureId = -1;
+  gCapturedImageUrl.Reset();
+  gCaptureFinishState = Scene3D::SceneView::CaptureFinishState::FAILED;
+  int32_t captureId2 = view.Capture(camera, Vector2(400, 400));
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(gCaptureFinishedCalled, true, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(captureId, captureId2, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureId, captureId2, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCapturedImageUrl.GetUrl().empty(), false, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(gCapturedImageUrl, tempImageUrl, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureFinishState, Scene3D::SceneView::CaptureFinishState::SUCCEEDED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewCaptureCancel(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.CaptureFinishedSignal().Connect(OnCaptureFinished);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Scene3D::Model modelView1 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  view.Add(modelView1);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  CameraActor camera = Dali::CameraActor::New();
+  camera.SetProperty(Dali::Actor::Property::NAME, "camera");
+  camera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  camera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  camera.SetFieldOfView(0.5f);
+  camera.SetNearClippingPlane(1.0f);
+  camera.SetFarClippingPlane(5000.0f);
+  camera.SetProperty(Dali::Actor::Property::POSITION, Vector3(20, 30, 40));
+
+  view.Add(camera);
+
+  gCaptureFinishedCalled = false;
+  gCaptureId = -1;
+  gCapturedImageUrl.Reset();
+  gCaptureFinishState = Scene3D::SceneView::CaptureFinishState::FAILED;
+  int32_t captureId = view.Capture(camera, Vector2(300, 300));
+
+  view.Unparent();
+
+  DALI_TEST_EQUALS(gCaptureFinishedCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureId, captureId, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!gCapturedImageUrl, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureFinishState, Scene3D::SceneView::CaptureFinishState::FAILED, TEST_LOCATION);
+
+
+  gCaptureFinishedCalled = false;
+  gCaptureId = -1;
+  gCapturedImageUrl.Reset();
+  gCaptureFinishState = Scene3D::SceneView::CaptureFinishState::FAILED;
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(gCaptureFinishedCalled, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewCaptureFailed(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.CaptureFinishedSignal().Connect(OnCaptureFinished);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Scene3D::Model modelView1 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  view.Add(modelView1);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  CameraActor camera = Dali::CameraActor::New();
+  camera.SetProperty(Dali::Actor::Property::NAME, "camera");
+  camera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  camera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  camera.SetFieldOfView(0.5f);
+  camera.SetNearClippingPlane(1.0f);
+  camera.SetFarClippingPlane(5000.0f);
+  camera.SetProperty(Dali::Actor::Property::POSITION, Vector3(20, 30, 40));
+
+  view.Add(camera);
+
+  gCaptureFinishedCalled = false;
+  gCaptureId = -1;
+  gCapturedImageUrl.Reset();
+  gCaptureFinishState = Scene3D::SceneView::CaptureFinishState::FAILED;
+  int32_t captureId = view.Capture(camera, Vector2(300, 300));
+
+  Test::EmitGlobalTimerSignal();
+  Test::EmitGlobalTimerSignal();
+  Test::EmitGlobalTimerSignal();
+
+  DALI_TEST_EQUALS(gCaptureFinishedCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureId, captureId, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!gCapturedImageUrl, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureFinishState, Scene3D::SceneView::CaptureFinishState::FAILED, TEST_LOCATION);
+
+  gCaptureFinishedCalled = false;
+  gCaptureId = -1;
+  gCapturedImageUrl.Reset();
+  gCaptureFinishState = Scene3D::SceneView::CaptureFinishState::FAILED;
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(gCaptureFinishedCalled, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewCapture02(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.CaptureFinishedSignal().Connect(OnCaptureMultipleFinished);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Scene3D::Model modelView1 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  view.Add(modelView1);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  CameraActor camera = Dali::CameraActor::New();
+  camera.SetProperty(Dali::Actor::Property::NAME, "camera");
+  camera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  camera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  camera.SetFieldOfView(0.5f);
+  camera.SetNearClippingPlane(1.0f);
+  camera.SetFarClippingPlane(5000.0f);
+  camera.SetProperty(Dali::Actor::Property::POSITION, Vector3(20, 30, 40));
+
+  view.Add(camera);
+
+  gCapturedCount = 0;
+  gCaptureIds.clear();
+  gCapturedImageUrls.clear();
+  gCaptureFinishStates.clear();
+  int32_t captureId = view.Capture(camera, Vector2(300, 300));
+  int32_t captureId2 = view.Capture(camera, Vector2(300, 300));
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(gCapturedCount, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureIds.size(), 2, TEST_LOCATION);
+  auto idIter1 = std::find(gCaptureIds.begin(), gCaptureIds.end(), captureId);
+  bool isIter1 = idIter1 != gCaptureIds.end();
+  DALI_TEST_EQUALS(isIter1, true, TEST_LOCATION);
+  auto idIter2 = std::find(gCaptureIds.begin(), gCaptureIds.end(), captureId2);
+  bool isIter2 = idIter2 != gCaptureIds.end();
+  DALI_TEST_EQUALS(isIter2, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gCapturedImageUrls.size(), 2, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(gCapturedImageUrls[0], gCapturedImageUrls[1], 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureFinishStates[0], Scene3D::SceneView::CaptureFinishState::SUCCEEDED, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureFinishStates[1], Scene3D::SceneView::CaptureFinishState::SUCCEEDED, TEST_LOCATION);
 
   END_TEST;
 }
