@@ -144,18 +144,19 @@ void TextScroller::SetStopMode(TextLabel::AutoScrollStopMode::Type stopMode)
 
 void TextScroller::StopScrolling()
 {
-  if(mScrollAnimation && mScrollAnimation.GetState() == Animation::PLAYING)
+  if(IsScrolling())
   {
     switch(mStopMode)
     {
       case TextLabel::AutoScrollStopMode::IMMEDIATE:
       {
+        mIsStop = true;
         mScrollAnimation.Stop();
-        mScrollerInterface.ScrollingFinished();
         break;
       }
       case TextLabel::AutoScrollStopMode::FINISH_LOOP:
       {
+        mIsStop = true;
         mScrollAnimation.SetLoopCount(1); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
         break;
       }
@@ -171,6 +172,16 @@ void TextScroller::StopScrolling()
   }
 }
 
+bool TextScroller::IsStop()
+{
+  return mIsStop;
+}
+
+bool TextScroller::IsScrolling()
+{
+  return (mScrollAnimation && mScrollAnimation.GetState() == Animation::PLAYING);
+}
+
 TextLabel::AutoScrollStopMode::Type TextScroller::GetStopMode() const
 {
   return mStopMode;
@@ -183,7 +194,8 @@ TextScroller::TextScroller(ScrollerInterface& scrollerInterface)
   mLoopCount(1),
   mLoopDelay(0.0f),
   mWrapGap(0.0f),
-  mStopMode(TextLabel::AutoScrollStopMode::FINISH_LOOP)
+  mStopMode(TextLabel::AutoScrollStopMode::FINISH_LOOP),
+  mIsStop(false)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextScroller Default Constructor\n");
 }
@@ -195,7 +207,6 @@ TextScroller::~TextScroller()
 void TextScroller::SetParameters(Actor scrollingTextActor, Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] textureSize[%f,%f] direction[%d]\n", controlSize.x, controlSize.y, textureSize.x, textureSize.y, direction);
-
   mRenderer = renderer;
 
   float animationProgress = 0.0f;
@@ -209,7 +220,7 @@ void TextScroller::SetParameters(Actor scrollingTextActor, Renderer renderer, Te
       if(mLoopCount > 0) // If not a ininity loop, then calculate remained loop
       {
         remainedLoop = mLoopCount - (mScrollAnimation.GetCurrentLoop());
-        remainedLoop = (remainedLoop <= 0 ? 1 : remainedLoop);
+        remainedLoop = mIsStop ? 1 : (remainedLoop <= 0 ? 1 : remainedLoop);
       }
     }
     mScrollAnimation.Clear();
@@ -269,6 +280,7 @@ void TextScroller::SetParameters(Actor scrollingTextActor, Renderer renderer, Te
 void TextScroller::AutoScrollAnimationFinished(Dali::Animation& animation)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextScroller::AutoScrollAnimationFinished\n");
+  mIsStop = false;
   mScrollerInterface.ScrollingFinished();
 
   // Revert to the original shader and texture after scrolling
@@ -282,7 +294,6 @@ void TextScroller::AutoScrollAnimationFinished(Dali::Animation& animation)
 void TextScroller::StartScrolling(Actor scrollingTextActor, float scrollAmount, float scrollDuration, int loopCount)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextScroller::StartScrolling scrollAmount[%f] scrollDuration[%f], loop[%d] speed[%d]\n", scrollAmount, scrollDuration, loopCount, mScrollSpeed);
-
   Shader shader    = mRenderer.GetShader();
   mScrollAnimation = Animation::New(scrollDuration);
   mScrollAnimation.AnimateTo(Property(shader, mScrollDeltaIndex), scrollAmount, TimePeriod(mLoopDelay, scrollDuration));
@@ -290,6 +301,8 @@ void TextScroller::StartScrolling(Actor scrollingTextActor, float scrollAmount, 
   mScrollAnimation.SetLoopCount(loopCount);
   mScrollAnimation.FinishedSignal().Connect(this, &TextScroller::AutoScrollAnimationFinished);
   mScrollAnimation.Play();
+
+  mIsStop = false;
 }
 
 } // namespace Text

@@ -129,6 +129,16 @@ public:
   void StopScrolling();
 
   /**
+   * @brief Whether the stop scrolling has been triggered or not.
+   */
+  bool IsStop();
+
+  /**
+   * @brief Whether the scroll animation is playing or not.
+   */
+  bool IsScrolling();
+
+  /**
    * @brief Get the mode of scrolling stop
    * @return stopMode type when text scrolling is stoped.
    */
@@ -179,6 +189,7 @@ private:
   float                               mLoopDelay;   ///< Time delay of loop start
   float                               mWrapGap;     ///< Gap before text wraps around when scrolling
   TextLabel::AutoScrollStopMode::Type mStopMode;    ///< Stop mode of scrolling text, when loop count is 0.
+  bool                                mIsStop : 1;  ///< Whether the stop scrolling has been triggered or not.
 
 }; // TextScroller class
 
