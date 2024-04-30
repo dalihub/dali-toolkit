@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/common/dali-common.h>
 
@@ -149,7 +150,31 @@ public:
     };
   };
 
+  /**
+   * @brief The enumerations used for checking capture success
+   * @SINCE_2_3.25
+   */
+  enum class CaptureFinishState
+  {
+    SUCCEEDED, ///< Succeeded to capture
+    FAILED     ///< Failed to capture by time out
+  };
+
 public:
+  struct CaptureResult
+  {
+    int32_t                 captureId;
+    Dali::Toolkit::ImageUrl imageUrl;
+    CaptureFinishState      state;
+  };
+
+  /**
+   * @brief Typedef for capture finished signals sent by this class.
+   *
+   * @SINCE_2_3.25
+   */
+  typedef Signal<void(SceneView, CaptureResult&)> CaptureFinishedSignalType;
+
   /**
    * @brief Create an initialized SceneView.
    *
@@ -478,6 +503,26 @@ public:
    * @return skybox orientation
    */
   Quaternion GetSkyboxOrientation() const;
+
+  /**
+   * @brief Requests to capture this SceneView with the Camera.
+   *
+   * @SINCE_2_3.25
+   * @param[in] camera CameraActor to be used for capture.
+   * @param[in] size captured size.
+   * @note The camera is required to be added in this SceneView. (Not need to be a selected camera)
+   * @note If the SceneView is disconnected from Scene, the left capture requests are canceled.
+   * @return capture id that id unique value to distinguish each requiest.
+   */
+  int32_t Capture(Dali::CameraActor camera, const Vector2& size);
+
+  /**
+   * @brief Get capture finished signal.
+   *
+   * @SINCE_2_3.25
+   * @return finished signal instance.
+   */
+  CaptureFinishedSignalType& CaptureFinishedSignal();
 
 public: // Not intended for application developers
   /// @cond internal

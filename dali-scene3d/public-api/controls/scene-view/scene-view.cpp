@@ -192,6 +192,16 @@ Quaternion SceneView::GetSkyboxOrientation() const
   return GetImpl(*this).GetSkyboxOrientation();
 }
 
+int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
+{
+  return GetImpl(*this).Capture(camera, size);
+}
+
+SceneView::CaptureFinishedSignalType& SceneView::CaptureFinishedSignal()
+{
+  return GetImpl(*this).CaptureFinishedSignal();
+}
+
 } // namespace Scene3D
 
 } // namespace Dali
