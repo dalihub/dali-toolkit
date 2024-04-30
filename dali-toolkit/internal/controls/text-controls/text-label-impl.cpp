@@ -1106,10 +1106,13 @@ void TextLabel::OnSceneDisconnection()
       mLastAutoScrollEnabled = false;
     }
 
-    const Toolkit::TextLabel::AutoScrollStopMode::Type stopMode = mTextScroller->GetStopMode();
-    mTextScroller->SetStopMode(Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE);
-    mTextScroller->StopScrolling();
-    mTextScroller->SetStopMode(stopMode);
+    if(mTextScroller->IsScrolling())
+    {
+      const Toolkit::TextLabel::AutoScrollStopMode::Type stopMode = mTextScroller->GetStopMode();
+      mTextScroller->SetStopMode(Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE);
+      mTextScroller->StopScrolling();
+      mTextScroller->SetStopMode(stopMode);
+    }
   }
   Control::OnSceneDisconnection();
 }
@@ -1117,6 +1120,12 @@ void TextLabel::OnSceneDisconnection()
 void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::OnRelayout\n");
+
+  if(mTextScroller && mTextScroller->IsStop())
+  {
+    // When auto scroll is playing, it triggers a relayout only when an update is absolutely necessary.
+    return;
+  }
 
   Actor self = Self();
 
@@ -1286,12 +1295,8 @@ void TextLabel::ScrollingFinished()
 {
   // Pure Virtual from TextScroller Interface
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::ScrollingFinished\n");
-
-  if(mController->IsAutoScrollEnabled() || !mController->IsMultiLineEnabled())
-  {
-    mController->SetAutoScrollEnabled(false);
-    RequestTextRelayout();
-  }
+  mController->SetAutoScrollEnabled(false);
+  RequestTextRelayout();
 }
 
 void TextLabel::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
