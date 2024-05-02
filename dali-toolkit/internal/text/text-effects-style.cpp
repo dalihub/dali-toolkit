@@ -231,7 +231,9 @@ bool ParseOutlineProperties(const Property::Map& underlinePropertiesMap,
                             bool&                widthDefined,
                             uint16_t&            width,
                             bool&                offsetDefined,
-                            Vector2&             offset)
+                            Vector2&             offset,
+                            bool&                blurRadiusDefined,
+                            float&               blurRadius)
 {
   const unsigned int numberOfItems = underlinePropertiesMap.Count();
 
@@ -265,6 +267,21 @@ bool ParseOutlineProperties(const Property::Map& underlinePropertiesMap,
       else
       {
         offset = valueGet.second.Get<Vector2>();
+      }
+    }
+    else if((DevelText::Outline::Property::BLUR_RADIUS == valueGet.first.indexKey) || (BLUR_RADIUS_KEY == valueGet.first.stringKey))
+    {
+      /// Blur radius key.
+      blurRadiusDefined = true;
+
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string blurRadiusStr = valueGet.second.Get<std::string>();
+        blurRadius                      = StringToFloat(blurRadiusStr.c_str());
+      }
+      else
+      {
+        blurRadius = valueGet.second.Get<float>();
       }
     }
   }
@@ -775,6 +792,8 @@ bool SetOutlineProperties(ControllerPtr controller, const Property::Value& value
         uint16_t width         = 0u;
         bool     offsetDefined = false;
         Vector2  offset;
+        bool     blurRadiusDefined = false;
+        float    blurRadius;
 
         bool empty = true;
 
@@ -797,7 +816,9 @@ bool SetOutlineProperties(ControllerPtr controller, const Property::Value& value
                                          widthDefined,
                                          width,
                                          offsetDefined,
-                                         offset);
+                                         offset,
+                                         blurRadiusDefined,
+                                         blurRadius);
 
           controller->OutlineSetByString(false);
         }
@@ -820,6 +841,12 @@ bool SetOutlineProperties(ControllerPtr controller, const Property::Value& value
           if(offsetDefined && (controller->GetOutlineOffset() != offset))
           {
             controller->SetOutlineOffset(offset);
+            update = true;
+          }
+
+          if(blurRadiusDefined && (!Dali::Equals(controller->GetOutlineBlurRadius(), blurRadius)))
+          {
+            controller->SetOutlineBlurRadius(blurRadius);
             update = true;
           }
         }
@@ -862,15 +889,16 @@ void GetOutlineProperties(ControllerPtr controller, Property::Value& value, Effe
         }
         else
         {
-          const Vector4& color  = controller->GetOutlineColor();
-          const uint16_t width  = controller->GetOutlineWidth();
-          const Vector2& offset = controller->GetOutlineOffset();
-
+          const Vector4& color      = controller->GetOutlineColor();
+          const uint16_t width      = controller->GetOutlineWidth();
+          const Vector2& offset     = controller->GetOutlineOffset();
+          const float&   blurRadius = controller->GetOutlineBlurRadius();
 
           Property::Map map;
           map.Insert(COLOR_KEY, color);
           map.Insert(WIDTH_KEY, static_cast<int>(width));
           map.Insert(OFFSET_KEY, offset);
+          map.Insert(BLUR_RADIUS_KEY, blurRadius);
 
           value = map;
 

@@ -953,6 +953,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   outlineMapSet["color"] = Color::RED;
   outlineMapSet["width"] = 2.0f;
   outlineMapSet["offset"] = Vector2(2.0f, 2.0f);
+  outlineMapSet["blurRadius"] = 3.0f;
   label.SetProperty(TextLabel::Property::OUTLINE, outlineMapSet);
 
   outlineMapGet = label.GetProperty<Property::Map>(TextLabel::Property::OUTLINE);
@@ -963,12 +964,13 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   outlineMapSet[Toolkit::DevelText::Outline::Property::COLOR] = Color::BLUE;
   outlineMapSet[Toolkit::DevelText::Outline::Property::WIDTH] = 3.0f;
   outlineMapSet[Toolkit::DevelText::Outline::Property::OFFSET] = Vector2(3.0f, 3.0f);
+  outlineMapSet[Toolkit::DevelText::Outline::Property::BLUR_RADIUS] = 4.0f;
 
   label.SetProperty(TextLabel::Property::OUTLINE, outlineMapSet);
 
   outlineMapGet = label.GetProperty<Property::Map>(TextLabel::Property::OUTLINE);
   DALI_TEST_EQUALS(outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION);
-  std::vector<std::string> outlineIndicesConversionTable = {"color", "width", "offset"};
+  std::vector<std::string> outlineIndicesConversionTable = {"color", "width", "offset", "blurRadius"};
   DALI_TEST_EQUALS(DaliTestCheckMaps(outlineMapGet, outlineMapSet, outlineIndicesConversionTable), true, TEST_LOCATION);
 
   // Check the background property
@@ -1821,6 +1823,7 @@ int UtcDaliToolkitTextlabelTextStyle01(void)
   outlineMapSet["color"] = Color::BLUE;
   outlineMapSet["width"] = 2.0f;
   outlineMapSet["offset"] = "2 2";
+  outlineMapSet["blurRadius"] = "3";
   label.SetProperty(TextLabel::Property::OUTLINE, outlineMapSet);
 
   application.SendNotification();

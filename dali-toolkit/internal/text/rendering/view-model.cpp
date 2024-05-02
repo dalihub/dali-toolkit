@@ -300,6 +300,11 @@ uint16_t ViewModel::GetOutlineWidth() const
   return mModel->GetOutlineWidth();
 }
 
+const float& ViewModel::GetOutlineBlurRadius() const
+{
+  return mModel->GetOutlineBlurRadius();
+}
+
 const Vector4& ViewModel::GetBackgroundColor() const
 {
   return mModel->GetBackgroundColor();

@@ -343,6 +343,13 @@ public:
   virtual uint16_t GetOutlineWidth() const = 0;
 
   /**
+   * @brief Retrieve the outline blur radius.
+   *
+   * @return The outline blur radius.
+   */
+  virtual const float& GetOutlineBlurRadius() const = 0;
+
+  /**
    * @brief Retrieves the background color.
    *
    * @return The background color.
