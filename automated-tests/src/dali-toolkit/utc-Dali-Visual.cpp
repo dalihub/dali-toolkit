@@ -1290,7 +1290,7 @@ int UtcDaliVisualGetPropertyMap10(void)
   propertyMap.Insert("underline", underlineMapSet.Add("enable", true).Add("color", Color::GREEN).Add("height", 1).Add("type", Text::Underline::Type::SOLID).Add("dashWidth", 2).Add("dashGap", 1));
 
   Property::Map outlineMapSet;
-  propertyMap.Insert("outline", outlineMapSet.Add("color", Color::YELLOW).Add("width", 1).Add("offset", Vector2(2.0f, 2.0f)));
+  propertyMap.Insert("outline", outlineMapSet.Add("color", Color::YELLOW).Add("width", 1).Add("offset", Vector2(2.0f, 2.0f)).Add("blurRadius", 3.0f));
 
   Property::Map backgroundMapSet;
   propertyMap.Insert("textBackground", backgroundMapSet.Add("enable", true).Add("color", Color::CYAN));

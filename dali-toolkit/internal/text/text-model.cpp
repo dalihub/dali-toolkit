@@ -242,6 +242,11 @@ uint16_t Model::GetOutlineWidth() const
   return mVisualModel->GetOutlineWidth();
 }
 
+const float& Model::GetOutlineBlurRadius() const
+{
+  return mVisualModel->mOutlineBlurRadius;
+}
+
 const Vector4& Model::GetBackgroundColor() const
 {
   return mVisualModel->GetBackgroundColor();

@@ -1007,6 +1007,20 @@ uint16_t Controller::GetOutlineWidth() const
   return mImpl->mModel->mVisualModel->GetOutlineWidth();
 }
 
+void Controller::SetOutlineBlurRadius(const float& outlineBlurRadius)
+{
+  if(fabsf(GetOutlineBlurRadius() - outlineBlurRadius) > Math::MACHINE_EPSILON_1)
+  {
+    mImpl->mModel->mVisualModel->SetOutlineBlurRadius(outlineBlurRadius);
+    mImpl->RequestRelayout();
+  }
+}
+
+const float& Controller::GetOutlineBlurRadius() const
+{
+  return mImpl->mModel->mVisualModel->GetOutlineBlurRadius();
+}
+
 void Controller::SetBackgroundColor(const Vector4& color)
 {
   mImpl->mModel->mVisualModel->SetBackgroundColor(color);

@@ -262,6 +262,11 @@ public:
   uint16_t GetOutlineWidth() const override;
 
   /**
+   * @copydoc ModelInterface::GetOutlineBlurRadius()
+   */
+  const float& GetOutlineBlurRadius() const override;
+
+  /**
    * @copydoc ModelInterface::GetBackgroundColor()
    */
   const Vector4& GetBackgroundColor() const override;

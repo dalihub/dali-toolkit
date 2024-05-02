@@ -1316,6 +1316,20 @@ public: // Default style & Input style
   uint16_t GetOutlineWidth() const;
 
   /**
+   * @brief Set the outline blur radius.
+   *
+   * @param[in] outlineBlurRadius The outline blur radius, 0,0 indicates no blur.
+   */
+  void SetOutlineBlurRadius(const float& outlineBlurRadius);
+
+  /**
+   * @brief Retrieve the outline blur radius.
+   *
+   * @return The outline blur radius.
+   */
+  const float& GetOutlineBlurRadius() const;
+
+  /**
    * @brief Set the background color.
    *
    * @param[in] color color of background.

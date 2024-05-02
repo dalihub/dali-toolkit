@@ -144,7 +144,14 @@ enum
    * @details Name "offset", type Property::STRING or Property::VECTOR2. i.e "3.0 3.0" or Vector2( 3.f, 3.f )
    * @note Optional. If not provided then the outline is not enabled.
    */
-  OFFSET
+  OFFSET,
+
+  /**
+   * @brief The radius of the Gaussian blur for the outline.
+   * @details Name "blurRadius", type Property::STRING or Property::FLOAT. i.e "5.0" or 5.f
+   * @note Optional. If not provided then the outline is not enabled.
+   */
+  BLUR_RADIUS
 };
 
 } // namespace Property
