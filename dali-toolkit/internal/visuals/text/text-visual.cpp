@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -350,12 +350,13 @@ void TextVisual::DoSetOnScene(Actor& actor)
   UpdateRenderer();
 }
 
-void TextVisual::RemoveRenderer(Actor& actor)
+void TextVisual::RemoveRenderer(Actor& actor, bool removeDefaultRenderer)
 {
   for(RendererContainer::iterator iter = mRendererList.begin(); iter != mRendererList.end(); ++iter)
   {
     Renderer renderer = (*iter);
-    if(renderer)
+    if(renderer &&
+       (removeDefaultRenderer || (renderer != mImpl->mRenderer)))
     {
       // Removes the renderer from the actor.
       actor.RemoveRenderer(renderer);
@@ -376,7 +377,7 @@ void TextVisual::DoSetOffScene(Actor& actor)
     mOpacityConstraint.Remove();
   }
 
-  RemoveRenderer(actor);
+  RemoveRenderer(actor, true);
 
   // Resets the control handle.
   mControl.Reset();
@@ -511,7 +512,7 @@ void TextVisual::UpdateRenderer()
   if((fabsf(relayoutSize.width) < Math::MACHINE_EPSILON_1000) || (fabsf(relayoutSize.height) < Math::MACHINE_EPSILON_1000) || textLengthUtf32 == 0u)
   {
     // Remove the texture set and any renderer previously set.
-    RemoveRenderer(control);
+    RemoveRenderer(control, true);
 
     // Nothing else to do if the relayout size is zero.
     ResourceReady(Toolkit::Visual::ResourceStatus::READY);
@@ -527,7 +528,8 @@ void TextVisual::UpdateRenderer()
     mRendererUpdateNeeded = false;
 
     // Remove the texture set and any renderer previously set.
-    RemoveRenderer(control);
+    // Note, we don't need to remove the mImpl->Renderer, since it will be added again after AddRenderer call.
+    RemoveRenderer(control, false);
 
     if((relayoutSize.width > Math::MACHINE_EPSILON_1000) &&
        (relayoutSize.height > Math::MACHINE_EPSILON_1000))
@@ -765,6 +767,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     Renderer renderer = (*iter);
     if(renderer)
     {
+      // Note, AddRenderer will ignore renderer if it is already added. @SINCE 2_3.22
       actor.AddRenderer(renderer);
 
       if(renderer != mImpl->mRenderer)
