@@ -835,11 +835,15 @@ void TextField::OnTap(const TapGesture& gesture)
 
 void TextField::OnPan(const PanGesture& gesture)
 {
-  mController->PanEvent(gesture.GetState(), gesture.GetDisplacement());
-  if(gesture.GetState() == GestureState::STARTED && !mController->IsScrollable(gesture.GetDisplacement()))
+  if(!mController->IsScrollable(gesture.GetDisplacement()))
   {
     Dali::DevelActor::SetNeedGesturePropagation(Self(), true);
   }
+  else
+  {
+    Dali::DevelActor::SetNeedGesturePropagation(Self(), false);
+  }
+  mController->PanEvent(gesture.GetState(), gesture.GetDisplacement());
 }
 
 void TextField::OnLongPress(const LongPressGesture& gesture)
