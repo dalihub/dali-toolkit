@@ -325,7 +325,7 @@ void ToggleButton::PrepareVisual(Property::Index index, Toolkit::Visual::Base& v
     DevelControl::UnregisterVisual(*this, index);
   }
 
-  DevelControl::RegisterVisual(*this, index, visual, enabled);
+  DevelControl::RegisterVisual(*this, index, visual, enabled, DepthIndex::CONTENT);
 }
 
 void ToggleButton::RelayoutVisual(Property::Index index, const Vector2& size)

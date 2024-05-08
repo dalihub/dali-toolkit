@@ -27,6 +27,7 @@
 #include <dali/public-api/rendering/visual-renderer.h>
 
 //INTERNAL HEARDER
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -519,10 +520,16 @@ void Visual::Base::DoActionExtension(const Dali::Property::Index actionId, const
 
 void Visual::Base::SetDepthIndex(int index)
 {
-  mImpl->mDepthIndex = index;
-  if(mImpl->mRenderer)
+  // Clamp input value as valid range.
+  Dali::ClampInPlace(index, static_cast<int>(Toolkit::DepthIndex::MINIMUM_DEPTH_INDEX), static_cast<int>(Toolkit::DepthIndex::MAXIMUM_DEPTH_INDEX));
+
+  if(mImpl->mDepthIndex != index)
   {
-    mImpl->mRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex);
+    mImpl->mDepthIndex = index;
+    if(mImpl->mRenderer)
+    {
+      mImpl->mRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex);
+    }
   }
 }
 
@@ -542,7 +549,14 @@ void Visual::Base::SetOnScene(Actor& actor)
     if(mImpl->mRenderer)
     {
       mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
-      mImpl->mRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex);
+      if(mImpl->mDepthIndex == static_cast<int>(DepthIndex::AUTO_INDEX))
+      {
+        mImpl->mRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, static_cast<int>(DepthIndex::CONTENT));
+      }
+      else
+      {
+        mImpl->mRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex);
+      }
     }
 
     mImpl->mFlags |= Impl::IS_ON_SCENE;

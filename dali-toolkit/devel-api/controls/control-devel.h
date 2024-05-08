@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DEVEL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -236,8 +236,7 @@ enum
  *
  * @note Derived class should not call visual.SetOnScene(actor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
  *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
- * @note If the depth-index is not set on the visual, then it is set to be above the currently registered visuals.
- * @note If replacing a visual, then the depth-index of the visual being replaced is used for the visual.
+ * @note depth-index be used to Dali::Toolkit::DepthIndex::Ranges::AUTO_INDEX.
  */
 DALI_TOOLKIT_API void RegisterVisual(Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual);
 
@@ -247,7 +246,9 @@ DALI_TOOLKIT_API void RegisterVisual(Internal::Control& control, Dali::Property:
  * @param[in] control The control
  * @param[in] index The Property index of the visual, used to reference visual
  * @param[in] visual The visual to register
- * @param[in] depthIndex The visual's depth-index is set to this
+ * @param[in] depthIndex The visual's depth-index is set to this. If the depth-index is set to DepthIndex::Ranges::AUTO_INDEX,
+ *                       the actual depth-index of visual will be determind automatically (Use previous visuals depth-index, or placed on top of all other visuals.)
+ *                       Otherwise, the visual's depth-index is set to clamped value, between DepthIndex::Ranges::MINIMUM_DEPTH_INDEX and DepthIndex::Ranges::MAXIMUM_DEPTH_INDEX.
  *
  * @note Derived class should not call visual.SetOnScene(actor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
  *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
@@ -265,8 +266,7 @@ DALI_TOOLKIT_API void RegisterVisual(Internal::Control& control, Dali::Property:
  * @param[in] visual The visual to register
  * @param[in] enabled false if derived class wants to control when visual is set on stage.
  *
- * @note If the depth-index is not set on the visual, then it is set to be above the currently registered visuals.
- * @note If replacing a visual, then the depth-index of the visual being replaced is used for the visual.
+ * @note depth-index be used to Dali::Toolkit::DepthIndex::Ranges::AUTO_INDEX.
  *
  * @see EnableVisual()
  */
@@ -279,7 +279,9 @@ DALI_TOOLKIT_API void RegisterVisual(Internal::Control& control, Dali::Property:
  * @param[in] index The Property index of the visual, used to reference visual
  * @param[in] visual The visual to register
  * @param[in] enabled false if derived class wants to control when visual is set on stage.
- * @param[in] depthIndex The visual's depth-index is set to this
+ * @param[in] depthIndex The visual's depth-index is set to this. If the depth-index is set to DepthIndex::Ranges::AUTO_INDEX,
+ *                       the actual depth-index of visual will be determind automatically (Use previous visuals depth-index, or placed on top of all other visuals.)
+ *                       Otherwise, the visual's depth-index is set to clamped value, between DepthIndex::Ranges::MINIMUM_DEPTH_INDEX and DepthIndex::Ranges::MAXIMUM_DEPTH_INDEX.
  *
  * @see EnableVisual()
  * @see Visual::Base::GetDepthIndex()
