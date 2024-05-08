@@ -1,3 +1,4 @@
+#define MORPH defined(MORPH_POSITION) || defined(MORPH_NORMAL) || defined(MORPH_TANGENT)
 
 precision highp float;
 
