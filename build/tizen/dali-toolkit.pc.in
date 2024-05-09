@@ -7,6 +7,6 @@ includedir=@DEV_INCLUDE_PATH@
 Name: Dali 3D Engine Toolkit
 Description: Cross platform 3D Engine Toolkit
 Version: ${apiversion}
-Requires: dali2-core
-Libs: -L${libdir} -ldali2-toolkit
+Requires: dali-core
+Libs: -L${libdir} -ldali-toolkit
 Cflags: -I${includedir}

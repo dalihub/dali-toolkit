@@ -23,7 +23,7 @@
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
-#include <dali/integration-api/adaptors/log-factory-interface.h>
+#include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 #include <string>
 #include <memory>
 

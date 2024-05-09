@@ -22,7 +22,7 @@
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/devel-api/adaptor-framework/video-player.h>
-#include <dali/integration-api/adaptors/trigger-event-factory.h>
+#include <dali/integration-api/adaptor-framework/trigger-event-factory.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/rendering/renderer.h>
