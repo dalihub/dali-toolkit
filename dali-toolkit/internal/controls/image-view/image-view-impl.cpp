@@ -65,6 +65,7 @@ DALI_PROPERTY_REGISTRATION(Toolkit, ImageView, "image", MAP, IMAGE)
 DALI_PROPERTY_REGISTRATION(Toolkit, ImageView, "preMultipliedAlpha", BOOLEAN, PRE_MULTIPLIED_ALPHA)
 DALI_PROPERTY_REGISTRATION(Toolkit, ImageView, "placeholderImage", STRING, PLACEHOLDER_IMAGE)
 DALI_PROPERTY_REGISTRATION(Toolkit, ImageView, "enableTransitionEffect", BOOLEAN, ENABLE_TRANSITION_EFFECT)
+DALI_PROPERTY_REGISTRATION(Toolkit, ImageView, "transitionEffectOption", MAP, TRANSITION_EFFECT_OPTION)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, ImageView, "pixelArea", Vector4(0.f, 0.f, 1.f, 1.f), PIXEL_AREA)
 DALI_TYPE_REGISTRATION_END()
 
@@ -325,6 +326,11 @@ void ImageView::EnableTransitionEffect(bool effectEnable)
 bool ImageView::IsTransitionEffectEnabled() const
 {
   return mTransitionEffect;
+}
+
+void ImageView::SetTransitionEffectOption(const Property::Map& map)
+{
+  mTransitionEffectOptionMap = map;
 }
 
 Vector3 ImageView::GetNaturalSize()
@@ -695,24 +701,50 @@ void ImageView::TransitionImageWithEffect()
       mPreviousVisual.SetDepthIndex(mPreviousVisual.GetDepthIndex() + PREVIOUS_VISUAL_DEPTH_INDEX);
     }
 
-    mTransitionAnimation = Animation::New(TRANSITION_EFFECT_SPEED);
-    mTransitionAnimation.SetEndAction(Animation::EndAction::DISCARD);
-    float destinationAlpha = (mTransitionTargetAlpha > LOW_OPACITY) ? mTransitionTargetAlpha : LOW_OPACITY;
-
     // Transition current image
     Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
     if(imageVisual)
     {
-      Dali::KeyFrames fadeinKeyFrames = Dali::KeyFrames::New();
-      fadeinKeyFrames.Add(0.0f, LOW_OPACITY);
-      fadeinKeyFrames.Add(1.0f, destinationAlpha);
-      mTransitionAnimation.AnimateBetween(DevelControl::GetVisualProperty(handle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::OPACITY), fadeinKeyFrames, AlphaFunction::EASE_IN_OUT);
       imageVisual.SetDepthIndex(imageVisual.GetDepthIndex() + CURRENT_VISUAL_DEPTH_INDEX);
-    }
+      if(!mTransitionEffectOptionMap.Empty())
+      {
+        // Set user's transition effect options
+        Dali::Toolkit::TransitionData transition = Toolkit::TransitionData::New(mTransitionEffectOptionMap);
+        Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+        mTransitionAnimation  = controlDataImpl.CreateTransition(transition);
+        if(mTransitionAnimation)
+        {
+          mTransitionAnimation.SetEndAction(Animation::EndAction::DISCARD);
+          mTransitionAnimation.FinishedSignal().Connect(this, &ImageView::OnTransitionAnimationFinishedCallback);
+          mTransitionAnimation.Play();
+        }
+        else
+        {
+          DALI_LOG_ERROR("Create Transition Animation failed");
+        }
+      }
+      else
+      {
+        mTransitionAnimation = Animation::New(TRANSITION_EFFECT_SPEED);
+        mTransitionAnimation.SetEndAction(Animation::EndAction::DISCARD);
+        float destinationAlpha = (mTransitionTargetAlpha > LOW_OPACITY) ? mTransitionTargetAlpha : LOW_OPACITY;
 
-    // Play transition animation
-    mTransitionAnimation.FinishedSignal().Connect(this, &ImageView::OnTransitionAnimationFinishedCallback);
-    mTransitionAnimation.Play();
+        // Transition current image
+        Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
+        if(imageVisual)
+        {
+          Dali::KeyFrames fadeinKeyFrames = Dali::KeyFrames::New();
+          fadeinKeyFrames.Add(0.0f, LOW_OPACITY);
+          fadeinKeyFrames.Add(1.0f, destinationAlpha);
+          mTransitionAnimation.AnimateBetween(DevelControl::GetVisualProperty(handle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::OPACITY), fadeinKeyFrames,  AlphaFunction::EASE_IN_OUT);
+          imageVisual.SetDepthIndex(imageVisual.GetDepthIndex() + CURRENT_VISUAL_DEPTH_INDEX);
+        }
+
+        // Play transition animation
+        mTransitionAnimation.FinishedSignal().Connect(this, &ImageView::OnTransitionAnimationFinishedCallback);
+        mTransitionAnimation.Play();
+      }
+    }
   }
 }
 
@@ -841,6 +873,14 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
           impl.EnableTransitionEffect(transitionEffect);
         }
         break;
+      }
+      case Toolkit::ImageView::Property::TRANSITION_EFFECT_OPTION:
+      {
+        Property::Map map;
+        if(value.Get(map))
+        {
+          impl.SetTransitionEffectOption(map);
+        }
       }
     }
   }

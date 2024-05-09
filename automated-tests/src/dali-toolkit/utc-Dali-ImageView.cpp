@@ -5580,6 +5580,86 @@ int UtcDaliImageViewTransitionEffect04(void)
   END_TEST;
 }
 
+int UtcDaliImageViewTransitionEffect05(void)
+{
+  tet_printf("Testing user's transition effect in ImageView \n");
+  ToolkitTestApplication application;
+
+  Property::Map map;
+  map["target"]      = "image";
+  map["property"]    = "opacity";
+  map["initialValue"] = 0.2f;
+  map["targetValue"] = 1.0f;
+  map["animator"]    = Property::Map()
+                      .Add("alphaFunction", "EASE_IN_OUT")
+                      .Add("timePeriod", Property::Map().Add("delay", 0.0f).Add("duration", 2.0f))
+                      .Add("animationType", "BETWEEN");
+
+  ImageView imageView = ImageView::New();
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  imageView.SetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT, true);
+  imageView.SetProperty(ImageView::Property::TRANSITION_EFFECT_OPTION, map);
+  imageView.SetImage(gImage_600_RGB);
+  application.GetScene().Add(imageView);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  Property::Value value;
+  value = imageView.GetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT);
+  bool transition;
+  DALI_TEST_CHECK(value.Get(transition));
+  DALI_TEST_CHECK(transition == true);
+
+  // Clear all cached
+  imageView.Unparent();
+  imageView.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliImageViewTransitionEffect06(void)
+{
+  tet_printf("Testing user's transition effect in ImageView \n");
+  ToolkitTestApplication application;
+
+  Property::Map map;
+  map["target"]      = "image";
+  map["property"]    = "opacity";
+  map["initialValue"] = 0.2f;
+  map["targetValue"] = 1.0f;
+  map["animator"]    = Property::Map()
+                      .Add("alphaFunction", "EASE_IN_OUT")
+                      .Add("timePeriod", Property::Map().Add("delay", 0.0f).Add("duration", 2.0f))
+                      .Add("animationType", "TO");
+
+  ImageView imageView = ImageView::New();
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  imageView.SetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT, true);
+  imageView.SetProperty(ImageView::Property::TRANSITION_EFFECT_OPTION, map);
+  imageView.SetImage(gImage_600_RGB);
+  application.GetScene().Add(imageView);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  Property::Value value;
+  value = imageView.GetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT);
+  bool transition;
+  DALI_TEST_CHECK(value.Get(transition));
+  DALI_TEST_CHECK(transition == true);
+
+  // Clear all cached
+  imageView.Unparent();
+  imageView.Reset();
+
+  END_TEST;
+}
+
+
+
 int UtcDaliImageViewImageLoadFailureAndReload01(void)
 {
   tet_infoline("Try to load invalid image first, and then reload after that image valid.");

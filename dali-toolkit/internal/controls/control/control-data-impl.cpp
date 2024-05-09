@@ -1161,7 +1161,6 @@ void Control::Impl::AddTransitions(Dali::Animation&               animation,
     TransitionData::Animator* animator = (*iter);
 
     Toolkit::Visual::Base visual = GetVisualByName(mVisuals, animator->objectName);
-
     if(visual)
     {
 #if defined(DEBUG_ENABLED)
@@ -1207,10 +1206,10 @@ void Control::Impl::AddTransitions(Dali::Animation&               animation,
             }
 
             animation.AnimateTo(Property(child, propertyIndex),
-                                animator->targetValue,
-                                animator->alphaFunction,
-                                TimePeriod(animator->timePeriodDelay,
-                                           animator->timePeriodDuration));
+                  animator->targetValue,
+                  animator->alphaFunction,
+                  TimePeriod(animator->timePeriodDelay,
+                            animator->timePeriodDuration));
           }
         }
       }

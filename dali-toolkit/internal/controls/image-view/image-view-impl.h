@@ -139,6 +139,11 @@ public:
   bool IsTransitionEffectEnabled() const;
 
   /**
+   * @brief Set the transition effect option.
+  */
+  void SetTransitionEffectOption(const Property::Map& map);
+
+  /**
    * @brief callback when animation for placeholder or previous visual transition effect is finished
    */
   void OnTransitionAnimationFinishedCallback(Animation& animation);
@@ -243,6 +248,7 @@ private:
   std::string     mPlaceholderUrl;                         ///< the url for the placeholder image if the image came from a PLACEHOLDER_IMAGE, empty otherwise
   Property::Map   mPropertyMap;                            ///< the Property::Map if the image came from a Property::Map, empty otherwise
   Property::Map   mShaderMap;                              ///< the Property::Map if the custom shader is set, empty otherwise
+  Property::Map   mTransitionEffectOptionMap;              ///< the Property::Map if the transition effect option is set, empty otherwise
   ImageDimensions mImageSize;                              ///< the image size
 
   Animation       mTransitionAnimation;                    ///< the animation for transition effect
