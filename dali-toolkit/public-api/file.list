@@ -164,6 +164,8 @@ SET( SOURCES ${SOURCES}
 SET( PUBLIC_API_HEADERS ${PUBLIC_API_HEADERS}
   ${public_api_header_files}
   ${public_api_controls_header_files}
+  ${public_api_accessibility_manager_header_files}
+  ${public_api_alignment_header_files}
   ${public_api_buttons_header_files}
   ${public_api_model3d_view_header_files}
   ${public_api_flex_container_header_files}
@@ -171,10 +173,12 @@ SET( PUBLIC_API_HEADERS ${PUBLIC_API_HEADERS}
   ${public_api_item_view_header_files}
   ${public_api_image_loader_header_files}
   ${public_api_progress_bar_header_files}
+  ${public_api_scroll_bar_header_files}
   ${public_api_scrollable_header_files}
   ${public_api_scroll_view_header_files}
   ${public_api_slider_header_files}
   ${public_api_styling_header_files}
+  ${public_api_table_view_header_files}
   ${public_api_text_controls_header_files}
   ${public_api_transition_header_files}
   ${public_api_focus_manager_header_files}
