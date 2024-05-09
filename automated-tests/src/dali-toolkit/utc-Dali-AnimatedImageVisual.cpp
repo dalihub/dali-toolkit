@@ -481,7 +481,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap04(void)
 
   value = resultMap.Find(Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, "totalFrameNumber");
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<int>(), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(value->Get<int>(), -1, TEST_LOCATION);
 
   value = resultMap.Find(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, "borderlineWidth");
   DALI_TEST_CHECK(value);
@@ -1994,7 +1994,6 @@ int UtcDaliAnimatedImageVisualDesiredSize(void)
   END_TEST;
 }
 
-
 int UtcDaliAnimatedImageVisualControlVisibilityChanged(void)
 {
   ToolkitTestApplication application;
@@ -2148,6 +2147,55 @@ int UtcDaliAnimatedImageVisualWindowVisibilityChanged(void)
   value = resultMap.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<int>(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualFrameCountBeforeLoadingFinished(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualFrameCountBeforeLoadingFinished");
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_GIF_FILE_NAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  Property::Map resultMap1;
+  visual.CreatePropertyMap(resultMap1);
+  Property::Value* value1 = resultMap1.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER);
+  DALI_TEST_CHECK(value1);
+  DALI_TEST_EQUALS(value1->Get<int>(), -1, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Property::Map resultMap2;
+  visual.CreatePropertyMap(resultMap2);
+  Property::Value* value2 = resultMap2.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER);
+  DALI_TEST_CHECK(value2);
+  DALI_TEST_EQUALS(value2->Get<int>(), -1, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  Property::Map resultMap3;
+  visual.CreatePropertyMap(resultMap3);
+  Property::Value* value3 = resultMap3.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER);
+  DALI_TEST_CHECK(value3);
+  DALI_TEST_EQUALS(value3->Get<int>(), 4, Math::MACHINE_EPSILON_100, TEST_LOCATION);
 
   END_TEST;
 }
