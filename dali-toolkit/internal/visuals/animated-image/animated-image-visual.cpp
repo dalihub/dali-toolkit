@@ -345,26 +345,23 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::DevelImageVisual::Property::LOOP_COUNT, static_cast<int>(mLoopCount));
   map.Insert(Toolkit::DevelImageVisual::Property::CURRENT_FRAME_NUMBER, (mImageCache) ? static_cast<int32_t>(mImageCache->GetCurrentFrameIndex()) : -1);
 
-  // 1. Get cached mFrameCount if mFrameCount != 0.
-  // 2. If we are not using animated image loading, ask to image cache.
-  // 2-1. If image cache return SINGLE_IMAGE_COUNT or less, It might not a valid value
-  //      (since default frameCount of image cache is SINGLE_IMAGE_COUNT)
-  //      So, let we ask to animated image loader again.
-  // 2-1-1. If animated image loader return 0, it means that it is not a valid animated image.
-  // 2-1-2. Otherwise, we can assume that it is valid frame count.
-  // 2-2. Otherwise, we can assume that it is valid frame count.
-  uint32_t frameCount = mFrameCount;
+  // This returns -1 until the loading is finished.
+  int32_t frameCount = mFrameCount;
   if(mImageCache && frameCount == 0)
   {
     frameCount = mImageCache->GetTotalFrameCount();
 
-    if(frameCount <= SINGLE_IMAGE_COUNT && mAnimatedImageLoading)
+    if(frameCount <= SINGLE_IMAGE_COUNT && mAnimatedImageLoading && mAnimatedImageLoading.HasLoadingSucceeded())
     {
       frameCount = mAnimatedImageLoading.GetImageCount();
     }
+    else
+    {
+      frameCount = -1;
+    }
   }
 
-  map.Insert(Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, (frameCount >= SINGLE_IMAGE_COUNT) ? static_cast<int>(frameCount) : -1);
+  map.Insert(Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, static_cast<int>(frameCount));
 
   map.Insert(Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, mStopBehavior);
 
