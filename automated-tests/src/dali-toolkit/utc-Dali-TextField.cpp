@@ -115,6 +115,9 @@ const char* const PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE          = "enableFontSiz
 const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR               = "grabHandleColor";
 const char* const PROPERTY_NAME_INPUT_FILTER                    = "inputFilter";
 
+const char* const PROPERTY_NAME_REMOVE_FRONT_INSET    = "removeFrontInset";
+const char* const PROPERTY_NAME_REMOVE_BACK_INSET     = "removeBackInset";
+
 const Vector4       PLACEHOLDER_TEXT_COLOR(0.8f, 0.8f, 0.8f, 0.8f);
 const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f); // The text highlight color.
 
@@ -643,6 +646,8 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_STRIKETHROUGH) == DevelTextField::Property::STRIKETHROUGH);
   DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_INPUT_STRIKETHROUGH) == DevelTextField::Property::INPUT_STRIKETHROUGH);
   DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_SELECTION_POPUP_STYLE) == DevelTextField::Property::SELECTION_POPUP_STYLE);
+  DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_REMOVE_FRONT_INSET) == DevelTextField::Property::REMOVE_FRONT_INSET);
+  DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_REMOVE_BACK_INSET) == DevelTextField::Property::REMOVE_BACK_INSET);
 
   END_TEST;
 }
@@ -1103,6 +1108,8 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   outlineMapSet["color"] = Color::RED;
   outlineMapSet["width"] = 2.0f;
+  outlineMapSet["offset"] = Vector2(0.0f, 0.0f);
+  outlineMapSet["blurRadius"] = 0.0f;
 
   field.SetProperty(TextField::Property::OUTLINE, outlineMapSet);
 
@@ -1266,6 +1273,19 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   application.SendNotification();
   application.Render();
+
+  // Check Remove Front/Back Inset Property
+  DALI_TEST_CHECK(field.GetProperty<bool>(DevelTextField::Property::REMOVE_FRONT_INSET));
+  field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, false);
+  DALI_TEST_CHECK(!field.GetProperty<bool>(DevelTextField::Property::REMOVE_FRONT_INSET));
+
+  DALI_TEST_CHECK(field.GetProperty<bool>(DevelTextField::Property::REMOVE_BACK_INSET));
+  field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, false);
+  DALI_TEST_CHECK(!field.GetProperty<bool>(DevelTextField::Property::REMOVE_BACK_INSET));
+
+  application.SendNotification();
+  application.Render();
+
 
   END_TEST;
 }
@@ -3244,7 +3264,56 @@ int utcDaliTextFieldEvent08(void)
     event.AddPoint(GetPointUpInside(position));
     application.ProcessEvent(event);
   }
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextEditor::Property::TEXT), std::string("testTextFieldEvent"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("testTextFieldEvent"), TEST_LOCATION);
+
+  Dali::Clipboard::ClipData htmlData("application/xhtml+xml", "testTextFieldEventHtml");
+  clipboard.SetData(htmlData);
+
+  field.SetProperty(TextField::Property::TEXT, "");
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Long Press
+  TestGenerateLongPress(application, 1.0f, 25.0f, 20);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Wait(application, 500);
+
+  TestEndLongPress(application, 1.0f, 25.0f, 520);
+
+  // Long Press
+  TestGenerateLongPress(application, 1.0f, 25.0f, 600);
+
+  // Render and notify
+  application.Render();
+
+  Wait(application, 500);
+
+  stage = application.GetScene();
+  layer = stage.GetRootLayer();
+  actor = layer.FindChildByName("optionPaste");
+
+  if(actor)
+  {
+    Vector3 worldPosition = actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION);
+    Vector2 halfStageSize = stage.GetSize() / 2.0f;
+    Vector2 position(worldPosition.x + halfStageSize.width, worldPosition.y + halfStageSize.height);
+
+    Dali::Integration::TouchEvent event;
+    event = Dali::Integration::TouchEvent();
+    event.AddPoint(GetPointDownInside(position));
+    application.ProcessEvent(event);
+
+    event = Dali::Integration::TouchEvent();
+    event.AddPoint(GetPointUpInside(position));
+    application.ProcessEvent(event);
+  }
+  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("testTextFieldEventHtml"), TEST_LOCATION);
 
   END_TEST;
 }
@@ -6081,6 +6150,42 @@ int utcDaliTextFieldDecoratorColor(void)
 
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int utcDaliTextFieldRemoveFrontInset(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldRemoveFrontInset");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+  application.SendNotification();
+  application.Render();
+
+  DevelTextField::SetRemoveFrontInset(field, false);
+  DALI_TEST_CHECK(!DevelTextField::IsRemoveFrontInset(field));
+
+  END_TEST;
+}
+
+int utcDaliTextFieldRemoveBackInset(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldRemoveBackInset");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+  application.SendNotification();
+  application.Render();
+
+  DevelTextField::SetRemoveBackInset(field, false);
+  DALI_TEST_CHECK(!DevelTextField::IsRemoveBackInset(field));
 
   END_TEST;
 }

@@ -384,11 +384,25 @@ public:
   Length GetNumberOfUnderlineRuns() const;
 
   /**
+   * @brief Sets the text's outline offset.
+   *
+   * @param[in] outlineOffset The outline offset.
+   */
+  void SetOutlineOffset(const Vector2& outlineOffset);
+
+  /**
    * @brief Set the outline color.
    *
    * @param[in] color color of outline.
    */
   void SetOutlineColor(const Vector4& color);
+
+  /**
+   * @brief Retrieves the text's outline offset.
+   *
+   * @return The text's outline offset.
+   */
+  const Vector2& GetOutlineOffset() const;
 
   /**
    * @brief Retrieve the outline color.
@@ -410,6 +424,20 @@ public:
    * @return The width of the outline.
    */
   uint16_t GetOutlineWidth() const;
+
+  /**
+   * @brief Set the outline blur radius.
+   *
+   * @param[in] outlineBlurRadius The outline blur radius, 0,0 indicates no blur.
+   */
+  void SetOutlineBlurRadius(const float& outlineBlurRadius);
+
+  /**
+   * @brief Retrieve the outline blur radius.
+   *
+   * @return The outline blur radius.
+   */
+  const float& GetOutlineBlurRadius() const;
 
   /**
    * @brief Sets the text's background color.
@@ -673,12 +701,14 @@ public:
   Vector4                          mStrikethroughColor;     ///< Color of text background
   Size                             mControlSize;            ///< The size of the UI control.
   Vector2                          mShadowOffset;           ///< Offset for drop shadow, 0 indicates no shadow
+  Vector2                          mOutlineOffset;          ///< Offset for outline
   float                            mUnderlineHeight;        ///< Fixed height for underline to override font metrics.
   float                            mStrikethroughHeight;    ///< Fixed height for strikethrough to override font metrics.
   Text::Underline::Type            mUnderlineType;          ///< The type of the underline.
   float                            mDashedUnderlineWidth;   ///< The width of the dashes of the dashed underline.
   float                            mDashedUnderlineGap;     ///< The gap between the dashes of the dashed underline.
   float                            mShadowBlurRadius;       ///< Blur radius of shadow, 0 indicates no blur.
+  float                            mOutlineBlurRadius;      ///< Blur radius of outline, 0 indicates no blur.
   uint16_t                         mOutlineWidth;           ///< Width of outline.
   Vector<StrikethroughGlyphRun>    mStrikethroughRuns;      ///< Runs of glyphs that have strikethrough.
   Vector<CharacterSpacingGlyphRun> mCharacterSpacingRuns;   ///< Runs of glyphs that have character-spacing.

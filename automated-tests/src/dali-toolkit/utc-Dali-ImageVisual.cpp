@@ -1384,6 +1384,93 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   END_TEST;
 }
 
+
+int UtcDaliImageVisualCustomWrapModePixelArea02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Request image visual with a Property::Map, test custom wrap mode and pixel area");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("pixelArea", Property::Type::VECTOR4),
+      UniformData("wrapMode", Property::Type::VECTOR2),
+    };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  // Test wrap mode with atlasing. Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
+  const int     width  = 34;
+  const int     height = 34;
+  const Vector4 pixelArea(-0.5f, -0.5f, 2.f, 2.f);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_SMALL_IMAGE_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::DESIRED_WIDTH, width);
+  propertyMap.Insert(ImageVisual::Property::DESIRED_HEIGHT, height);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
+  propertyMap.Insert(ImageVisual::Property::PIXEL_AREA, pixelArea);
+  propertyMap.Insert(ImageVisual::Property::WRAP_MODE_U, WrapMode::MIRRORED_REPEAT);
+  propertyMap.Insert(ImageVisual::Property::WRAP_MODE_V, WrapMode::CLAMP_TO_EDGE);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Enable(true);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(2000, 2000));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  application.GetScene().Add(actor);
+
+  // loading started
+  application.SendNotification();
+  application.Render();
+
+  // Wait image load complete.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
+
+  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+  // Following gl function should not be called
+  std::stringstream out;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_MIRRORED_REPEAT;
+  DALI_TEST_CHECK(texParameterTrace.FindMethodAndParams("TexParameteri", out.str()));
+  out.str("");
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_CLAMP_TO_EDGE;
+  DALI_TEST_CHECK(texParameterTrace.FindMethodAndParams("TexParameteri", out.str()));
+
+  // test the uniforms which used to handle the wrap mode
+  Renderer renderer = actor.GetRendererAt(0u);
+  DALI_TEST_CHECK(renderer);
+
+  Property::Value pixelAreaValue = renderer.GetProperty(renderer.GetPropertyIndex("pixelArea"));
+  DALI_TEST_EQUALS(pixelAreaValue.Get<Vector4>(), pixelArea, TEST_LOCATION);
+  Vector4 pixelAreaUniform;
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("pixelArea", pixelAreaUniform));
+  DALI_TEST_EQUALS(pixelArea, pixelAreaUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  actor.Unparent();
+  DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
+
+  END_TEST;
+}
+
 int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
 {
   ToolkitTestApplication application;

@@ -306,6 +306,7 @@ SceneView::SceneView()
   mSkybox(),
   mSkyboxOrientation(Quaternion()),
   mSkyboxIntensity(1.0f),
+  mLightObservers(),
   mShaderManager(new Scene3D::Loader::ShaderManager())
 {
 }
@@ -437,7 +438,7 @@ void SceneView::RegisterSceneItem(Scene3D::Internal::LightObserver* item)
   {
     item->NotifyImageBasedLightTexture(mDiffuseTexture, mSpecularTexture, mIblScaleFactor, mSpecularMipmapLevels);
     item->NotifyShadowMapTexture(mShadowTexture);
-    mItems.push_back(item);
+    mLightObservers.PushBack(item);
   }
 }
 
@@ -445,13 +446,10 @@ void SceneView::UnregisterSceneItem(Scene3D::Internal::LightObserver* item)
 {
   if(item)
   {
-    for(uint32_t i = 0; i < mItems.size(); ++i)
+    auto iter = mLightObservers.Find(item);
+    if(iter != mLightObservers.End())
     {
-      if(mItems[i] == item)
-      {
-        mItems.erase(mItems.begin() + i);
-        break;
-      }
+      mLightObservers.Erase(iter);
     }
   }
 }
@@ -566,7 +564,7 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
 void SceneView::SetImageBasedLightScaleFactor(float scaleFactor)
 {
   mIblScaleFactor = scaleFactor;
-  for(auto&& item : mItems)
+  for(auto&& item : mLightObservers)
   {
     if(item)
     {
@@ -693,7 +691,7 @@ void SceneView::RemoveShadow(Scene3D::Light light)
   mShadowLight.Reset();
 
   mShadowTexture.Reset();
-  for(auto&& item : mItems)
+  for(auto&& item : mLightObservers)
   {
     if(item)
     {
@@ -1020,7 +1018,7 @@ void SceneView::OnSceneConnection(int depth)
 
 void SceneView::OnSceneDisconnection()
 {
-  mItems.clear();
+  mLightObservers.Clear();
 
   Window window = mWindow.GetHandle();
   if(window)
@@ -1369,7 +1367,7 @@ void SceneView::OnIblLoadComplete()
 
 void SceneView::NotifyImageBasedLightTextureChange()
 {
-  for(auto&& item : mItems)
+  for(auto&& item : mLightObservers)
   {
     if(item)
     {
@@ -1411,7 +1409,7 @@ void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
     DevelFrameBuffer::AttachDepthTexture(mShadowFrameBuffer, mShadowTexture);
     mShadowMapRenderTask.SetFrameBuffer(mShadowFrameBuffer);
 
-    for(auto&& item : mItems)
+    for(auto&& item : mLightObservers)
     {
       if(item)
       {

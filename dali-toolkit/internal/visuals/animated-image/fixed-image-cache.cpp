@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h> // For ImageAtlasManagerPtr
 
 // EXTERNAL HEADERS
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -146,12 +147,6 @@ void FixedImageCache::LoadBatch()
 TextureSet FixedImageCache::GetTextureSet(uint32_t frameIndex) const
 {
   TextureSet textureSet = mTextureManager.GetTextureSet(mImageUrls[frameIndex].mTextureId);
-  if(textureSet)
-  {
-    Sampler sampler = Sampler::New();
-    sampler.SetWrapMode(Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT);
-    textureSet.SetSampler(0u, sampler);
-  }
   return textureSet;
 }
 
@@ -165,7 +160,7 @@ void FixedImageCache::MakeReady(bool wasReady, uint32_t frameIndex, bool preMult
 
 void FixedImageCache::ClearCache()
 {
-  if(mTextureManagerAlive)
+  if(Dali::Adaptor::IsAvailable())
   {
     for(std::size_t i = 0; i < mImageUrls.size(); ++i)
     {
@@ -185,7 +180,7 @@ void FixedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureI
 {
   if(loadSuccess)
   {
-    mLoadState           = TextureManager::LoadState::LOAD_FINISHED;
+    mLoadState               = TextureManager::LoadState::LOAD_FINISHED;
     bool isCurrentFrameReady = IsFrameReady(mCurrentFrameIndex);
     if(!mRequestingLoad)
     {

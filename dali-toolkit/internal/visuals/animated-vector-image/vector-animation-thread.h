@@ -90,6 +90,11 @@ public:
    */
   void RemoveEventTriggerCallbacks(CallbackBase* callback);
 
+  /**
+   * @brief Request to event callback from rasterize thread. This is called when we want to ensure rendering next frame.
+   */
+  void RequestForceRenderOnce();
+
 protected:
   /**
    * @brief The entry function of the animation thread.
@@ -149,8 +154,9 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> mSleepTimePoint;
     const Dali::LogFactoryInterface&                   mLogFactory;
     const Dali::TraceFactoryInterface&                 mTraceFactory;
-    bool                                               mNeedToSleep;
-    bool                                               mDestroyThread;
+
+    bool mNeedToSleep : 1;
+    bool mDestroyThread : 1;
   };
 
 private:
@@ -169,12 +175,14 @@ private:
   ConditionalWait                                 mConditionalWait;
   Mutex                                           mEventTriggerMutex;
   std::unique_ptr<EventThreadCallback>            mEventTrigger{};
-  bool                                            mNeedToSleep;
-  bool                                            mDestroyThread;
-  bool                                            mEventTriggered{false};
   const Dali::LogFactoryInterface&                mLogFactory;
   const Dali::TraceFactoryInterface&              mTraceFactory;
   Dali::AsyncTaskManager                          mAsyncTaskManager;
+
+  bool mNeedToSleep : 1;
+  bool mDestroyThread : 1;
+  bool mEventTriggered : 1;
+  bool mForceRenderOnce : 1;
 };
 
 } // namespace Internal

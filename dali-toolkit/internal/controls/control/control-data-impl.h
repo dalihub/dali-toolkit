@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DATA_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,14 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/type-registry.h>
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/internal/builder/dictionary.h>
 #include <dali-toolkit/internal/builder/style.h>
@@ -501,12 +502,14 @@ private:
    * @param[in,out] visual The visual to register, which can be altered in this function
    * @param[in] enabled false if derived class wants to control when visual is set on stage
    * @param[in] depthIndexValueSet Set to true if the depthIndex has actually been set manually
-   * @param[in] depthIndex The visual's depth-index is set to this
+   * @param[in] depthIndex The visual's depth-index is set to this. If the depth-index is set to DepthIndex::Ranges::AUTO_INDEX,
+   *                       the actual depth-index of visual will be determind automatically (Use previous visuals depth-index, or placed on top of all other visuals.)
+   *                       Otherwise, the visual's depth-index is set to clamped value, between DepthIndex::Ranges::MINIMUM_DEPTH_INDEX and DepthIndex::Ranges::MAXIMUM_DEPTH_INDEX.
    *
    * @note Registering a visual with an index that already has a registered visual will replace it. The replacement will
    *       occur once the replacement visual is ready (loaded).
    */
-  void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex = 0);
+  void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex = static_cast<int>(Toolkit::DepthIndex::AUTO_INDEX));
 
   /**
    * @brief Emits the resource ready signal.

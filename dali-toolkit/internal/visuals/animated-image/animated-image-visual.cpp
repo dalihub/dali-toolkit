@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #include <dali-toolkit/internal/visuals/animated-image/animated-image-visual.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <memory>
@@ -344,7 +344,24 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::FRAME_DELAY, static_cast<int>(mFrameDelay));
   map.Insert(Toolkit::DevelImageVisual::Property::LOOP_COUNT, static_cast<int>(mLoopCount));
   map.Insert(Toolkit::DevelImageVisual::Property::CURRENT_FRAME_NUMBER, (mImageCache) ? static_cast<int32_t>(mImageCache->GetCurrentFrameIndex()) : -1);
-  map.Insert(Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, (mImageCache) ? static_cast<int32_t>((mAnimatedImageLoading) ? mAnimatedImageLoading.GetImageCount() : mImageCache->GetTotalFrameCount()) : -1);
+
+  // This returns -1 until the loading is finished.
+  int32_t frameCount = mFrameCount;
+  if(mImageCache && frameCount == 0)
+  {
+    frameCount = mImageCache->GetTotalFrameCount();
+
+    if(frameCount <= SINGLE_IMAGE_COUNT && mAnimatedImageLoading && mAnimatedImageLoading.HasLoadingSucceeded())
+    {
+      frameCount = mAnimatedImageLoading.GetImageCount();
+    }
+    else
+    {
+      frameCount = -1;
+    }
+  }
+
+  map.Insert(Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, static_cast<int>(frameCount));
 
   map.Insert(Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, mStopBehavior);
 
@@ -766,11 +783,12 @@ void AnimatedImageVisual::DoSetOnScene(Actor& actor)
   mPlacementActor  = actor;
   PrepareTextureSet();
 
-  DevelActor::VisibilityChangedSignal(actor).Connect(this, &AnimatedImageVisual::OnControlVisibilityChanged);
+  actor.InheritedVisibilityChangedSignal().Connect(this, &AnimatedImageVisual::OnControlInheritedVisibilityChanged);
 
   Window window = DevelWindow::Get(actor);
   if(window)
   {
+    mPlacementWindow = window;
     DevelWindow::VisibilityChangedSignal(window).Connect(this, &AnimatedImageVisual::OnWindowVisibilityChanged);
   }
 }
@@ -800,12 +818,13 @@ void AnimatedImageVisual::DoSetOffScene(Actor& actor)
   mCurrentFrameIndex = FIRST_FRAME_INDEX;
   mCurrentLoopIndex  = FIRST_LOOP;
 
-  DevelActor::VisibilityChangedSignal(actor).Disconnect(this, &AnimatedImageVisual::OnControlVisibilityChanged);
+  actor.InheritedVisibilityChangedSignal().Disconnect(this, &AnimatedImageVisual::OnControlInheritedVisibilityChanged);
 
-  Window window = DevelWindow::Get(actor);
+  Window window = mPlacementWindow.GetHandle();
   if(window)
   {
     DevelWindow::VisibilityChangedSignal(window).Disconnect(this, &AnimatedImageVisual::OnWindowVisibilityChanged);
+    mPlacementWindow.Reset();
   }
 }
 
@@ -1115,13 +1134,13 @@ void AnimatedImageVisual::CheckMaskTexture()
   }
 }
 
-void AnimatedImageVisual::OnControlVisibilityChanged(Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+void AnimatedImageVisual::OnControlInheritedVisibilityChanged(Actor actor, bool visible)
 {
   if(!visible && mActionStatus != DevelAnimatedImageVisual::Action::STOP)
   {
     mActionStatus = DevelAnimatedImageVisual::Action::STOP;
     DisplayNextFrame();
-    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Verbose, "AnimatedImageVisual::OnControlVisibilityChanged: invisibile. Pause animation [%p]\n", this);
+    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Verbose, "AnimatedImageVisual::OnControlInheritedVisibilityChanged: invisibile. Pause animation [%p]\n", this);
   }
 }
 

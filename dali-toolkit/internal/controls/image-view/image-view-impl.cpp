@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
@@ -45,13 +46,13 @@ namespace
 {
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
-constexpr float FULL_OPACITY = 1.0f;
-constexpr float LOW_OPACITY  = 0.2f;
+constexpr float FULL_OPACITY            = 1.0f;
+constexpr float LOW_OPACITY             = 0.2f;
 constexpr float TRANSITION_EFFECT_SPEED = 0.3f;
 
-constexpr int PLACEHOLDER_DEPTH_INDEX = -2;
-constexpr int PREVIOUS_VISUAL_DEPTH_INDEX  = -1;
-constexpr int CURRENT_VISUAL_DEPTH_INDEX = 0;
+constexpr int PLACEHOLDER_DEPTH_INDEX     = -2;
+constexpr int PREVIOUS_VISUAL_DEPTH_INDEX = -1;
+constexpr int CURRENT_VISUAL_DEPTH_INDEX  = 0;
 
 BaseHandle Create()
 {
@@ -173,7 +174,7 @@ void ImageView::SetImage(const Property::Map& map)
       visualImpl.SetCustomShader(mShaderMap);
     }
 
-    DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual);
+    DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
   }
   else
   {
@@ -210,8 +211,6 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
     mPreviousVisual = mVisual;
   }
 
-  
-
   // Don't bother comparing if we had a visual previously, just drop old visual and create new one
   mUrl       = url;
   mImageSize = size;
@@ -239,7 +238,7 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
       visualImpl.SetCustomShader(mShaderMap);
     }
 
-    DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual);
+    DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
   }
   else
   {
@@ -563,7 +562,7 @@ void ImageView::ApplyFittingMode(const Vector2& size)
   bool zeroPadding = (padding == Extents());
 
   Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(
-  Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+    Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
   if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
   {
     std::swap(padding.start, padding.end);
@@ -707,7 +706,7 @@ void ImageView::TransitionImageWithEffect()
       Dali::KeyFrames fadeinKeyFrames = Dali::KeyFrames::New();
       fadeinKeyFrames.Add(0.0f, LOW_OPACITY);
       fadeinKeyFrames.Add(1.0f, destinationAlpha);
-      mTransitionAnimation.AnimateBetween(DevelControl::GetVisualProperty(handle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::OPACITY), fadeinKeyFrames,  AlphaFunction::EASE_IN_OUT);
+      mTransitionAnimation.AnimateBetween(DevelControl::GetVisualProperty(handle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::OPACITY), fadeinKeyFrames, AlphaFunction::EASE_IN_OUT);
       imageVisual.SetDepthIndex(imageVisual.GetDepthIndex() + CURRENT_VISUAL_DEPTH_INDEX);
     }
 

@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_VISUAL_BASE_H
 #define DALI_TOOLKIT_VISUAL_BASE_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,14 +167,20 @@ public:
    * @brief Set the depth index of this visual.
    *
    * Depth-index controls draw-order for overlapping visuals.
-   * Visuals with higher depth indices are rendered in front of other visual with smaller values
+   * Visuals with higher depth indices are rendered in front of other visual with smaller values.
+   *
+   * @note The value of index will be clamped between DepthIndex::Ranges::MINIMUM_DEPTH_INDEX and
+   * DepthIndex::Ranges::MAXIMUM_DEPTH_INDEX.
+   * @note If we call this API at least 1 time, we cannot set as DepthIndex::AUTO_INDEX after.
    *
    * @param[in] index The depth index of this visual.
    */
   void SetDepthIndex(int index);
 
   /**
-   * @brief Get the depth index of this visual
+   * @brief Get the depth index of this visual which clamped between
+   * DepthIndex::Ranges::MINIMUM_DEPTH_INDEX and DepthIndex::Ranges::MAXIMUM_DEPTH_INDEX.
+   * Or DepthIndex::Ranges::AUTO_INDEX if we never set depth index before.
    *
    * @return The depth index of this visual.
    */

@@ -105,6 +105,26 @@ void PasteText(TextField textField)
   GetImpl(textField).PasteText();
 }
 
+void SetRemoveFrontInset(TextField textField, const bool remove)
+{
+  GetImpl(textField).SetRemoveFrontInset(remove);
+}
+
+bool IsRemoveFrontInset(TextField textField)
+{
+  return GetImpl(textField).IsRemoveFrontInset();
+}
+
+void SetRemoveBackInset(TextField textField, const bool remove)
+{
+  GetImpl(textField).SetRemoveBackInset(remove);
+}
+
+bool IsRemoveBackInset(TextField textField)
+{
+  return GetImpl(textField).IsRemoveBackInset();
+}
+
 } // namespace DevelTextField
 
 } // namespace Toolkit

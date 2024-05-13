@@ -249,6 +249,18 @@ enum
    * @see Dali::Toolkit::TextSelectionPopup::Property
    */
   SELECTION_POPUP_STYLE,
+
+  /**
+   * @brief Whether to trim the xBearing of first glyph of the text.
+   * @details Name "removeFrontInset", type Property::BOOLEAN.
+   */
+  REMOVE_FRONT_INSET,
+
+  /**
+   * @brief Whether to trim the advance of last glyph of the text.
+   * @details Name "removeBackInset", type Property::BOOLEAN.
+   */
+  REMOVE_BACK_INSET,
 };
 
 } // namespace Property
@@ -473,6 +485,38 @@ DALI_TOOLKIT_API std::string CutText(TextField textField);
  * @param[in] textField The instance of TextField.
  */
 DALI_TOOLKIT_API void PasteText(TextField textField);
+
+/**
+ * @brief Set removing front inset to TextField.
+ *
+ * @param[in] textField The instance of TextField.
+ * @param[in] remove Whether front inset of TextField has to be removed or not.
+ */
+DALI_TOOLKIT_API void SetRemoveFrontInset(TextField textField, const bool remove);
+
+/**
+ * @brief Whether front inset of TextField is removed or not.
+ *
+ * @param[in] textField The instance of TextField.
+ * @return True if the front inset of TextField is removed.
+ */
+DALI_TOOLKIT_API bool IsRemoveFrontInset(TextField textField);
+
+/**
+ * @brief Set removing back inset to TextField.
+ *
+ * @param[in] textField The instance of TextField.
+ * @param[in] remove Whether back inset of TextField has to be removed or not.
+ */
+DALI_TOOLKIT_API void SetRemoveBackInset(TextField textField, const bool remove);
+
+/**
+ * @brief Whether back inset of TextField is removed or not.
+ *
+ * @param[in] textField The instance of TextField.
+ * @return True if the back inset of TextField is removed.
+ */
+DALI_TOOLKIT_API bool IsRemoveBackInset(TextField textField);
 
 } // namespace DevelTextField
 

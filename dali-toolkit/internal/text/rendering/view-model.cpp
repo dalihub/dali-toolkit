@@ -285,6 +285,11 @@ void ViewModel::GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns, UnderlineRun
   mModel->GetUnderlineRuns(underlineRuns, index, numberOfRuns);
 }
 
+const Vector2& ViewModel::GetOutlineOffset() const
+{
+  return mModel->GetOutlineOffset();
+}
+
 const Vector4& ViewModel::GetOutlineColor() const
 {
   return mModel->GetOutlineColor();
@@ -293,6 +298,11 @@ const Vector4& ViewModel::GetOutlineColor() const
 uint16_t ViewModel::GetOutlineWidth() const
 {
   return mModel->GetOutlineWidth();
+}
+
+const float& ViewModel::GetOutlineBlurRadius() const
+{
+  return mModel->GetOutlineBlurRadius();
 }
 
 const Vector4& ViewModel::GetBackgroundColor() const

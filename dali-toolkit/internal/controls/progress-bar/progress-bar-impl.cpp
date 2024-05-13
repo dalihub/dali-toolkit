@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/progress-bar/progress-bar-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
@@ -77,7 +78,7 @@ struct ProgressDepthIndex
   // Enum to make sure the visual order
   enum
   {
-    TRACK_VISUAL,
+    TRACK_VISUAL = Toolkit::DepthIndex::CONTENT,
     SECONDARY_PROGRESS_VISUAL,
     PROGRESS_VISUAL,
     LABEL_VISUAL,
@@ -271,13 +272,11 @@ void ProgressBar::SetProgressValue(float value)
 
     Toolkit::ProgressBar self = Toolkit::ProgressBar::DownCast(Self());
     mValueChangedSignal.Emit(self, mProgressValue, mSecondaryProgressValue);
-    if(Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
+
+    auto accessible = GetAccessibleObject();
+    if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
     {
-      auto accessible = GetAccessibleObject();
-      if(DALI_LIKELY(accessible))
-      {
-        accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
-      }
+      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
     }
     RelayoutRequest();
   }

@@ -117,6 +117,9 @@ const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP        = "enableGrabHan
 const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS           = "inputMethodSettings";
 const char* const PROPERTY_NAME_INPUT_FILTER                    = "inputFilter";
 
+const char* const PROPERTY_NAME_REMOVE_FRONT_INSET    = "removeFrontInset";
+const char* const PROPERTY_NAME_REMOVE_BACK_INSET     = "removeBackInset";
+
 const Vector4       PLACEHOLDER_TEXT_COLOR(0.8f, 0.8f, 0.8f, 0.8f);
 const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f); // The text highlight color.
 
@@ -634,6 +637,8 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_STRIKETHROUGH) == DevelTextEditor::Property::STRIKETHROUGH);
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_INPUT_STRIKETHROUGH) == DevelTextEditor::Property::INPUT_STRIKETHROUGH);
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_SELECTION_POPUP_STYLE) == DevelTextEditor::Property::SELECTION_POPUP_STYLE);
+  DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_REMOVE_FRONT_INSET) == DevelTextEditor::Property::REMOVE_FRONT_INSET);
+  DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_REMOVE_BACK_INSET) == DevelTextEditor::Property::REMOVE_BACK_INSET);
 
   END_TEST;
 }
@@ -1037,6 +1042,8 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   outlineMapSet["color"] = Color::RED;
   outlineMapSet["width"] = 2.0f;
+  outlineMapSet["offset"] = Vector2(0.0f, 0.0f);
+  outlineMapSet["blurRadius"] = 0.0f;
 
   editor.SetProperty(TextEditor::Property::OUTLINE, outlineMapSet);
 
@@ -1264,6 +1271,18 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS(editor.GetProperty<float>(DevelTextEditor::Property::MIN_LINE_SIZE), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   editor.SetProperty(DevelTextEditor::Property::MIN_LINE_SIZE, 50.f);
   DALI_TEST_EQUALS(editor.GetProperty<float>(DevelTextEditor::Property::MIN_LINE_SIZE), 50.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  // Check Remove Front/Back Inset Property
+  DALI_TEST_CHECK(editor.GetProperty<bool>(DevelTextEditor::Property::REMOVE_FRONT_INSET));
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, false);
+  DALI_TEST_CHECK(!editor.GetProperty<bool>(DevelTextEditor::Property::REMOVE_FRONT_INSET));
+
+  DALI_TEST_CHECK(editor.GetProperty<bool>(DevelTextEditor::Property::REMOVE_BACK_INSET));
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, false);
+  DALI_TEST_CHECK(!editor.GetProperty<bool>(DevelTextEditor::Property::REMOVE_BACK_INSET));
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
@@ -6625,5 +6644,32 @@ int utcDaliTextEditorGetTextBoundingRectangle(void)
 
   TestTextGeometryUtils::CheckRectGeometryResult(textBoundingRectangle, expectedTextBoundingRectangle);
 
+  END_TEST;
+}
+
+int utcDaliTextEditorRemoveFrontInset(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorRemoveFrontInset");
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+  application.GetScene().Add(editor);
+  application.SendNotification();
+  application.Render();
+  DevelTextEditor::SetRemoveFrontInset(editor, false);
+  DALI_TEST_CHECK(!DevelTextEditor::IsRemoveFrontInset(editor));
+  END_TEST;
+}
+int utcDaliTextEditorRemoveBackInset(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorRemoveBackInset");
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+  application.GetScene().Add(editor);
+  application.SendNotification();
+  application.Render();
+  DevelTextEditor::SetRemoveBackInset(editor, false);
+  DALI_TEST_CHECK(!DevelTextEditor::IsRemoveBackInset(editor));
   END_TEST;
 }

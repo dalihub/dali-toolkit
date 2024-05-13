@@ -22,6 +22,7 @@
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
+#include <dali/integration-api/ordered-set.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/window.h>
@@ -434,21 +435,22 @@ private:
 
   /////////////////////////////////////////////////////////////
   // FrameBuffer and Rendertask to render child objects as a 3D Scene
-  Dali::WeakHandle<Dali::Window>                 mWindow;
-  Integration::SceneHolder                       mSceneHolder;
-  CameraActor                                    mDefaultCamera;
-  CameraActor                                    mSelectedCamera;
-  std::vector<CameraActor>                       mCameras;
-  std::vector<Scene3D::Internal::LightObserver*> mItems;
-  Dali::FrameBuffer                              mFrameBuffer;
-  Dali::Texture                                  mTexture;
-  Dali::RenderTask                               mRenderTask;
-  Layer                                          mRootLayer;
-  int32_t                                        mWindowOrientation;
-  Dali::Actor                                    mSkybox;
-  Quaternion                                     mSkyboxOrientation;
-  float                                          mSkyboxIntensity{1.0f};
-  uint8_t                                        mFrameBufferMultiSamplingLevel{0u};
+  Dali::WeakHandle<Dali::Window> mWindow;
+  Integration::SceneHolder       mSceneHolder;
+  CameraActor                    mDefaultCamera;
+  CameraActor                    mSelectedCamera;
+  std::vector<CameraActor>       mCameras;
+  Dali::FrameBuffer              mFrameBuffer;
+  Dali::Texture                  mTexture;
+  Dali::RenderTask               mRenderTask;
+  Layer                          mRootLayer;
+  int32_t                        mWindowOrientation;
+  Dali::Actor                    mSkybox;
+  Quaternion                     mSkyboxOrientation;
+  float                          mSkyboxIntensity{1.0f};
+  uint8_t                        mFrameBufferMultiSamplingLevel{0u};
+
+  Dali::Integration::OrderedSet<Scene3D::Internal::LightObserver, false> mLightObservers; ///< The set of items to be notified when light properties change. (not owned)
 
   bool     mWindowSizeChanged{false};
   uint32_t mWindowWidth{0};

@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
@@ -100,10 +101,10 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   mLastSentPlayStateId(0u),
   mLoadFailed(false),
   mRendererAdded(false),
-  mCoreShutdown(false),
   mRedrawInScalingDown(true),
   mEnableFrameCache(false),
-  mUseNativeImage(false)
+  mUseNativeImage(false),
+  mNotifyAfterRasterization(false)
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Visual::Base::Impl::IS_PREMULTIPLIED_ALPHA;
@@ -114,16 +115,13 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
 
 AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
 {
-  if(!mCoreShutdown)
+  if(Dali::Adaptor::IsAvailable())
   {
     if(mImageUrl.IsBufferResource())
     {
       TextureManager& textureManager = mFactoryCache.GetTextureManager();
       textureManager.RemoveEncodedImageBuffer(mImageUrl.GetUrl());
     }
-
-    auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
-    vectorAnimationManager.RemoveObserver(*this);
 
     if(mEventCallback)
     {
@@ -135,12 +133,6 @@ AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
     mVectorAnimationTask->ResourceReadySignal().Disconnect(this, &AnimatedVectorImageVisual::OnResourceReady);
     mVectorAnimationTask->Finalize();
   }
-}
-
-void AnimatedVectorImageVisual::VectorAnimationManagerDestroyed()
-{
-  // Core is shutting down. Don't talk to the plugin any more.
-  mCoreShutdown = true;
 }
 
 void AnimatedVectorImageVisual::GetNaturalSize(Vector2& naturalSize)
@@ -221,6 +213,7 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
   map.Insert(Toolkit::DevelImageVisual::Property::ENABLE_FRAME_CACHE, mEnableFrameCache);
+  map.Insert(Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, mNotifyAfterRasterization);
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -284,6 +277,10 @@ void AnimatedVectorImageVisual::DoSetProperties(const Property::Map& propertyMap
       else if(keyValue.first == ENABLE_FRAME_CACHE)
       {
         DoSetProperty(Toolkit::DevelImageVisual::Property::ENABLE_FRAME_CACHE, keyValue.second);
+      }
+      else if(keyValue.first == NOTIFY_AFTER_RASTERIZATION)
+      {
+        DoSetProperty(Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, keyValue.second);
       }
     }
   }
@@ -404,6 +401,22 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
       }
       break;
     }
+
+    case Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION:
+    {
+      bool notifyAfterRasterization = false;
+      if(value.Get(notifyAfterRasterization))
+      {
+        if(mNotifyAfterRasterization != notifyAfterRasterization)
+        {
+          mNotifyAfterRasterization = notifyAfterRasterization;
+
+          mAnimationData.notifyAfterRasterization = mNotifyAfterRasterization;
+          mAnimationData.resendFlag |= VectorAnimationTask::RESEND_NOTIFY_AFTER_RASTERIZATION;
+        }
+      }
+      break;
+    }
   }
 }
 
@@ -427,9 +440,6 @@ void AnimatedVectorImageVisual::OnInitialize(void)
 
   mVectorAnimationTask->KeepRasterizedBuffer(mEnableFrameCache);
   mVectorAnimationTask->RequestLoad(mImageUrl, encodedImageBuffer, IsSynchronousLoadingRequired());
-
-  auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
-  vectorAnimationManager.AddObserver(*this);
 
   Shader shader = GenerateShader();
 
@@ -471,11 +481,12 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
     mSizeNotification = actor.AddPropertyNotification(Actor::Property::SIZE, StepCondition(3.0f));
     mSizeNotification.NotifySignal().Connect(this, &AnimatedVectorImageVisual::OnSizeNotification);
 
-    DevelActor::VisibilityChangedSignal(actor).Connect(this, &AnimatedVectorImageVisual::OnControlVisibilityChanged);
+    actor.InheritedVisibilityChangedSignal().Connect(this, &AnimatedVectorImageVisual::OnControlInheritedVisibilityChanged);
 
     Window window = DevelWindow::Get(actor);
     if(window)
     {
+      mPlacementWindow = window;
       DevelWindow::VisibilityChangedSignal(window).Connect(this, &AnimatedVectorImageVisual::OnWindowVisibilityChanged);
     }
 
@@ -507,12 +518,13 @@ void AnimatedVectorImageVisual::DoSetOffScene(Actor& actor)
   actor.RemovePropertyNotification(mScaleNotification);
   actor.RemovePropertyNotification(mSizeNotification);
 
-  DevelActor::VisibilityChangedSignal(actor).Disconnect(this, &AnimatedVectorImageVisual::OnControlVisibilityChanged);
+  actor.InheritedVisibilityChangedSignal().Disconnect(this, &AnimatedVectorImageVisual::OnControlInheritedVisibilityChanged);
 
-  Window window = DevelWindow::Get(actor);
+  Window window = mPlacementWindow.GetHandle();
   if(window)
   {
     DevelWindow::VisibilityChangedSignal(window).Disconnect(this, &AnimatedVectorImageVisual::OnWindowVisibilityChanged);
+    mPlacementWindow.Reset();
   }
 
   mPlacementActor.Reset();
@@ -605,7 +617,7 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
     }
     case DevelAnimatedVectorImageVisual::Action::FLUSH:
     {
-      if(DALI_LIKELY(!mCoreShutdown))
+      if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
       {
         SendAnimationData();
       }
@@ -718,7 +730,7 @@ void AnimatedVectorImageVisual::OnAnimationFinished(uint32_t playStateId)
     }
   }
 
-  if(mImpl->mRenderer)
+  if(!mNotifyAfterRasterization && mImpl->mRenderer)
   {
     mImpl->mRenderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED);
   }
@@ -737,14 +749,18 @@ void AnimatedVectorImageVisual::SendAnimationData()
     }
     mVectorAnimationTask->SetAnimationData(mAnimationData);
 
-    if(mImpl->mRenderer)
+    if(mImpl->mRenderer &&
+       ((mAnimationData.resendFlag & VectorAnimationTask::RESEND_PLAY_STATE) ||
+        (mAnimationData.resendFlag & VectorAnimationTask::RESEND_NOTIFY_AFTER_RASTERIZATION)))
     {
-      if(mAnimationData.playState == DevelImageVisual::PlayState::PLAYING)
+      if(!mNotifyAfterRasterization && mPlayState == DevelImageVisual::PlayState::PLAYING)
       {
+        // Make rendering behaviour if we don't notify after rasterization, but animation playing.
         mImpl->mRenderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY);
       }
       else
       {
+        // Otherwise, notify will be sended after rasterization. Make behaviour as required.
         mImpl->mRenderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED);
       }
     }
@@ -788,7 +804,7 @@ void AnimatedVectorImageVisual::StopAnimation()
 
 void AnimatedVectorImageVisual::TriggerVectorRasterization()
 {
-  if(!mEventCallback && !mCoreShutdown)
+  if(!mEventCallback && Dali::Adaptor::IsAvailable())
   {
     mEventCallback               = MakeCallback(this, &AnimatedVectorImageVisual::OnProcessEvents);
     auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
@@ -841,14 +857,14 @@ void AnimatedVectorImageVisual::OnSizeNotification(PropertyNotification& source)
   }
 }
 
-void AnimatedVectorImageVisual::OnControlVisibilityChanged(Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+void AnimatedVectorImageVisual::OnControlInheritedVisibilityChanged(Actor actor, bool visible)
 {
   if(!visible)
   {
     StopAnimation();
     TriggerVectorRasterization();
 
-    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnControlVisibilityChanged: invisibile. Pause animation [%p]\n", this);
+    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnControlInheritedVisibilityChanged: invisibile. Pause animation [%p]\n", this);
   }
 }
 

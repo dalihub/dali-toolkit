@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ namespace Toolkit
 {
 namespace Internal
 {
-class ImageCache : public TextureManager::LifecycleObserver
+class ImageCache
 {
 public:
   /**
@@ -137,11 +137,6 @@ public:
   virtual void SetInterval(uint32_t interval);
 
 private:
-  /**
-   * @brief Called before the texture manager is destroyed.
-   */
-  void TextureManagerDestroyed() final;
-
   void AllocateMaskData();
 
 protected:
@@ -156,7 +151,6 @@ protected:
   TextureManager::LoadState           mLoadState;
   bool                                mRequestingLoad : 1;
   bool                                mPreMultiplyOnLoad : 1;
-  bool                                mTextureManagerAlive : 1;
 };
 
 } // namespace Internal

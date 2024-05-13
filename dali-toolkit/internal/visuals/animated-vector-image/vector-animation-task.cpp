@@ -98,6 +98,7 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mForward(true),
   mUpdateFrameNumber(false),
   mNeedAnimationFinishedTrigger(true),
+  mNeedForceRenderOnceTrigger(false),
   mAnimationDataUpdated(false),
   mDestroyTask(false),
   mLoadRequest(false),
@@ -107,6 +108,7 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mLayerInfoCached(false),
   mMarkerInfoCached(false),
   mEnableFrameCache(false),
+  mNotifyAfterRasterization(false),
   mSizeUpdated(false)
 {
   mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
@@ -376,6 +378,9 @@ void VectorAnimationTask::PauseAnimation()
   {
     mPlayState = PlayState::PAUSED;
 
+    // Ensure to render paused frame.
+    mNeedForceRenderOnceTrigger = true;
+
     DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::PauseAnimation: Pause [%p]\n", this);
   }
 }
@@ -467,10 +472,22 @@ void VectorAnimationTask::SetPlayRange(const Property::Array& playRange)
     if(mStartFrame > mCurrentFrame)
     {
       mCurrentFrame = mStartFrame;
+
+      if(mPlayState != PlayState::PLAYING)
+      {
+        // Ensure to render current frame.
+        mNeedForceRenderOnceTrigger = true;
+      }
     }
     else if(mEndFrame < mCurrentFrame)
     {
       mCurrentFrame = mEndFrame;
+
+      if(mPlayState != PlayState::PLAYING)
+      {
+        // Ensure to render current frame.
+        mNeedForceRenderOnceTrigger = true;
+      }
     }
 
     DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetPlayRange: [%d, %d] [%s] [%p]\n", mStartFrame, mEndFrame, mImageUrl.GetUrl().c_str(), this);
@@ -495,6 +512,12 @@ void VectorAnimationTask::SetCurrentFrameNumber(uint32_t frameNumber)
   {
     mCurrentFrame      = frameNumber;
     mUpdateFrameNumber = false;
+
+    if(mPlayState != PlayState::PLAYING)
+    {
+      // Ensure to render current frame.
+      mNeedForceRenderOnceTrigger = true;
+    }
 
     DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetCurrentFrameNumber: frame number = %d [%p]\n", mCurrentFrame, this);
   }
@@ -693,6 +716,8 @@ bool VectorAnimationTask::Rasterize()
     mForward     = true;
     mCurrentLoop = 0;
 
+    mNeedForceRenderOnceTrigger = true;
+
     if(mVectorRenderer)
     {
       // Notify the Renderer that rendering is stopped.
@@ -709,6 +734,14 @@ bool VectorAnimationTask::Rasterize()
     }
 
     DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Rasterize: Animation is finished [current = %d] [%p]\n", currentFrame, this);
+  }
+
+  // Forcely trigger render once if need.
+  if(mNotifyAfterRasterization || mNeedForceRenderOnceTrigger)
+  {
+    Mutex::ScopedLock lock(mMutex);
+    mVectorAnimationThread.RequestForceRenderOnce();
+    mNeedForceRenderOnceTrigger = false;
   }
 
   if(mPlayState != PlayState::PAUSED && mPlayState != PlayState::STOPPED)
@@ -843,6 +876,11 @@ void VectorAnimationTask::ApplyAnimationData()
     if(animationData.resendFlag & VectorAnimationTask::RESEND_CURRENT_FRAME)
     {
       SetCurrentFrameNumber(animationData.currentFrame);
+    }
+
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_NOTIFY_AFTER_RASTERIZATION)
+    {
+      mNotifyAfterRasterization = animationData.notifyAfterRasterization;
     }
 
     if(animationData.resendFlag & VectorAnimationTask::RESEND_NEED_RESOURCE_READY)

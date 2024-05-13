@@ -46,10 +46,12 @@ VectorAnimationThread::VectorAnimationThread()
   mSleepThread(MakeCallback(this, &VectorAnimationThread::OnAwakeFromSleep)),
   mConditionalWait(),
   mEventTriggerMutex(),
+  mLogFactory(Dali::Adaptor::Get().GetLogFactory()),
+  mTraceFactory(Dali::Adaptor::Get().GetTraceFactory()),
   mNeedToSleep(false),
   mDestroyThread(false),
-  mLogFactory(Dali::Adaptor::Get().GetLogFactory()),
-  mTraceFactory(Dali::Adaptor::Get().GetTraceFactory())
+  mEventTriggered(false),
+  mForceRenderOnce(false)
 {
   mAsyncTaskManager = Dali::AsyncTaskManager::Get();
   mSleepThread.Start();
@@ -184,6 +186,21 @@ void VectorAnimationThread::RemoveEventTriggerCallbacks(CallbackBase* callback)
   }
 }
 
+void VectorAnimationThread::RequestForceRenderOnce()
+{
+  Mutex::ScopedLock lock(mEventTriggerMutex);
+  if(!mDestroyThread)
+  {
+    mForceRenderOnce = true;
+
+    if(!mEventTriggered)
+    {
+      mEventTrigger->Trigger();
+      mEventTriggered = true;
+    }
+  }
+}
+
 void VectorAnimationThread::Run()
 {
   SetThreadName("VectorAnimationThread");
@@ -284,6 +301,18 @@ void VectorAnimationThread::OnEventCallbackTriggered()
       break;
     }
     CallbackBase::Execute(*callbackPair.first, callbackPair.second);
+  }
+  // Request update once if we need.
+  {
+    Mutex::ScopedLock lock(mEventTriggerMutex);
+    if(!mDestroyThread && mForceRenderOnce)
+    {
+      mForceRenderOnce = false;
+      if(Dali::Adaptor::IsAvailable())
+      {
+        Dali::Adaptor::Get().UpdateOnce();
+      }
+    }
   }
 }
 

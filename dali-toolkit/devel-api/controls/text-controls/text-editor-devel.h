@@ -325,6 +325,18 @@ enum Type
    * @see Dali::Toolkit::TextSelectionPopup::Property
    */
   SELECTION_POPUP_STYLE,
+
+  /**
+   * @brief Whether to trim the xBearing of first glyph of the text.
+   * @details Name "removeFrontInset", type Property::BOOLEAN.
+   */
+  REMOVE_FRONT_INSET,
+
+  /**
+   * @brief Whether to trim the advance of last glyph of the text.
+   * @details Name "removeBackInset", type Property::BOOLEAN.
+   */
+  REMOVE_BACK_INSET,
 };
 
 } // namespace Property
@@ -574,6 +586,39 @@ DALI_TOOLKIT_API std::string CutText(TextEditor textEditor);
  * @param[in] textEditor The instance of TextEditor.
  */
 DALI_TOOLKIT_API void PasteText(TextEditor textEditor);
+
+/**
+ * @brief Set removing front inset to text label.
+ *
+ * @param[in] textEditor The instance of TextLabel.
+ * @param[in] remove Whether front inset of text label has to be removed or not.
+ */
+DALI_TOOLKIT_API void SetRemoveFrontInset(TextEditor textEditor, const bool remove);
+
+/**
+ * @brief Whether front inset of text label is removed or not.
+ *
+ * @param[in] textEditor The instance of TextLabel.
+ * @return True if the front inset of text label is removed.
+ */
+DALI_TOOLKIT_API bool IsRemoveFrontInset(TextEditor textEditor);
+
+/**
+ * @brief Set removing back inset to text label.
+ *
+ * @param[in] textEditor The instance of TextLabel.
+ * @param[in] remove Whether back inset of text label has to be removed or not.
+ */
+DALI_TOOLKIT_API void SetRemoveBackInset(TextEditor textEditor, const bool remove);
+
+/**
+ * @brief Whether back inset of text label is removed or not.
+ *
+ * @param[in] textEditor The instance of TextLabel.
+ * @return True if the back inset of text label is removed.
+ */
+DALI_TOOLKIT_API bool IsRemoveBackInset(TextEditor textEditor);
+
 
 } // namespace DevelTextEditor
 

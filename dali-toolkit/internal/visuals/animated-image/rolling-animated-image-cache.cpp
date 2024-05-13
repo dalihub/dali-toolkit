@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 // INTERNAL HEADERS
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h> // For ImageAtlasManagerPtr
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 namespace
@@ -118,7 +119,7 @@ TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
       synchronouslyLoaded = true;
       interval            = mAnimatedImageLoading.GetFrameInterval(mQueue.Back().mFrameNumber);
     }
-    MakeFrameReady(synchronouslyLoaded, textureSet, interval, preMultiplyOnLoading == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
+    MakeFrameReady(synchronouslyLoaded, textureSet, mAnimatedImageLoading.GetImageCount(), interval, preMultiplyOnLoading == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
   }
 
   if(popExist || mQueue.IsEmpty() || synchronouslyLoaded)
@@ -220,7 +221,7 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                    synchronousLoading,
                                                                    this,
                                                                    preMultiplyOnLoading);
-  if(textureSet)
+  if(textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
   {
     Sampler sampler = Sampler::New();
     sampler.SetWrapMode(mWrapModeU, mWrapModeV);
@@ -274,7 +275,7 @@ TextureSet RollingAnimatedImageCache::GetFrontTextureSet() const
 
   TextureManager::TextureId textureId  = GetCachedTextureId(0);
   TextureSet                textureSet = mTextureManager.GetTextureSet(textureId);
-  if(textureSet)
+  if(textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
   {
     Sampler sampler = Sampler::New();
     sampler.SetWrapMode(mWrapModeU, mWrapModeV);
@@ -306,7 +307,7 @@ void RollingAnimatedImageCache::PopFrontCache()
 
 void RollingAnimatedImageCache::ClearCache()
 {
-  while(mTextureManagerAlive && !mQueue.IsEmpty())
+  while(Dali::Adaptor::IsAvailable() && !mQueue.IsEmpty())
   {
     PopFrontCache();
   }
@@ -314,7 +315,7 @@ void RollingAnimatedImageCache::ClearCache()
   mLoadState = TextureManager::LoadState::NOT_STARTED;
 }
 
-void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t interval, bool preMultiplied)
+void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet textureSet, uint32_t frameCount, uint32_t interval, bool preMultiplied)
 {
   if(!loadSuccess)
   {
@@ -327,9 +328,9 @@ void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet text
     mLoadState = TextureManager::LoadState::LOAD_FINISHED;
 
     // Reset size of Queue according to the real frame count.
-    if(mFrameCount != mAnimatedImageLoading.GetImageCount())
+    if(mFrameCount != frameCount)
     {
-      mFrameCount = mAnimatedImageLoading.GetImageCount();
+      mFrameCount = frameCount;
       mTextureIds.resize(mFrameCount);
       mIntervals.assign(mFrameCount, 0u);
     }
@@ -353,14 +354,14 @@ void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformatio
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::LoadComplete(textureId:%d) start\n", textureInformation.textureId);
   LOG_CACHE;
 
-  if(textureInformation.textureSet)
+  if(textureInformation.textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
   {
     Sampler sampler = Sampler::New();
     sampler.SetWrapMode(mWrapModeU, mWrapModeV);
     textureInformation.textureSet.SetSampler(0u, sampler);
   }
 
-  MakeFrameReady(loadSuccess, textureInformation.textureSet, textureInformation.interval, textureInformation.preMultiplied);
+  MakeFrameReady(loadSuccess, textureInformation.textureSet, textureInformation.frameCount, textureInformation.interval, textureInformation.preMultiplied);
 
   // TODO : We need to remove some below logics, since user can remove Visual during ResourceReady callback.
 

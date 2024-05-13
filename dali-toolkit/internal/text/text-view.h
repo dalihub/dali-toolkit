@@ -187,6 +187,11 @@ public:
                                 Length              numberOfRuns) const;
 
   /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetOutlineOffset()
+   */
+  const Vector2& GetOutlineOffset() const override;
+
+  /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetOutlineColor()
    */
   const Vector4& GetOutlineColor() const override;

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_BASE_SPAN_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,16 +115,6 @@ inline const Internal::BaseSpan& GetImplementation(const Dali::Toolkit::Text::Ba
 } // namespace Text
 
 } // namespace Toolkit
-
-// Allow BaseSpan to be treated as a POD type
-template<>
-struct TypeTraits<Dali::Toolkit::Text::Internal::BaseSpan> : public Dali::BasicTypes<Dali::Toolkit::Text::Internal::BaseSpan>
-{
-  enum
-  {
-    IS_TRIVIAL_TYPE = true
-  };
-};
 
 } // namespace Dali
 

@@ -48,6 +48,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 
 const char* EMPTY_STRING         = "";
 const char* MIME_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
+const char* MIME_TYPE_HTML       = "application/xhtml+xml";
 
 template<typename Type>
 void EnsureCreated(Type*& object)
@@ -994,6 +995,17 @@ float Controller::GetDashedUnderlineGap() const
   return mImpl->mModel->mVisualModel->GetDashedUnderlineGap();
 }
 
+void Controller::SetOutlineOffset(const Vector2& outlineOffset)
+{
+  mImpl->mModel->mVisualModel->SetOutlineOffset(outlineOffset);
+  mImpl->RequestRelayout();
+}
+
+const Vector2& Controller::GetOutlineOffset() const
+{
+  return mImpl->mModel->mVisualModel->GetOutlineOffset();
+}
+
 void Controller::SetOutlineColor(const Vector4& color)
 {
   mImpl->mModel->mVisualModel->SetOutlineColor(color);
@@ -1014,6 +1026,20 @@ void Controller::SetOutlineWidth(uint16_t width)
 uint16_t Controller::GetOutlineWidth() const
 {
   return mImpl->mModel->mVisualModel->GetOutlineWidth();
+}
+
+void Controller::SetOutlineBlurRadius(const float& outlineBlurRadius)
+{
+  if(fabsf(GetOutlineBlurRadius() - outlineBlurRadius) > Math::MACHINE_EPSILON_1)
+  {
+    mImpl->mModel->mVisualModel->SetOutlineBlurRadius(outlineBlurRadius);
+    mImpl->RequestRelayout();
+  }
+}
+
+const float& Controller::GetOutlineBlurRadius() const
+{
+  return mImpl->mModel->mVisualModel->GetOutlineBlurRadius();
 }
 
 void Controller::SetBackgroundColor(const Vector4& color)
@@ -1728,10 +1754,26 @@ void Controller::PasteClipboardItemEvent(uint32_t id, const char* mimeType, cons
   mImpl->mClipboard.DataReceivedSignal().Disconnect(this, &Controller::PasteClipboardItemEvent);
 
   // If the id is 0u, it is an invalid response.
+  if(id == 0u)
+  {
+    return;
+  }
+
   // text-controller allows only plain text type.
-  if(id != 0u && !strncmp(mimeType, MIME_TYPE_TEXT_PLAIN, strlen(MIME_TYPE_TEXT_PLAIN)))
+  if(!strncmp(mimeType, MIME_TYPE_TEXT_PLAIN, strlen(MIME_TYPE_TEXT_PLAIN)))
   {
     EventHandler::PasteClipboardItemEvent(*this, data);
+  }
+  else if(!strncmp(mimeType, MIME_TYPE_HTML, strlen(MIME_TYPE_HTML)))
+  {
+    // This does not mean that text controls can parse html.
+    // This is temporary code, as text controls do not support html type data.
+    // Simply remove the tags inside the angle brackets.
+    // Once multiple types and data can be stored in the clipboard, this code should be removed.
+    std::regex reg("<[^>]*>");
+    std::string result = regex_replace(data, reg, "");
+
+    EventHandler::PasteClipboardItemEvent(*this, result.c_str());
   }
 }
 
@@ -1742,8 +1784,11 @@ void Controller::PasteText()
     // Connect the signal before calling GetData() of the clipboard.
     mImpl->mClipboard.DataReceivedSignal().Connect(this, &Controller::PasteClipboardItemEvent);
 
+    // If there is no plain text type data on the clipboard, request html type data.
+    std::string mimeType = mImpl->mClipboard.HasType(MIME_TYPE_TEXT_PLAIN) ? MIME_TYPE_TEXT_PLAIN : MIME_TYPE_HTML;
+
     // Request clipboard service to retrieve an item.
-    uint id = mImpl->mClipboard.GetData(MIME_TYPE_TEXT_PLAIN);
+    uint id = mImpl->mClipboard.GetData(mimeType);
     if(id == 0u)
     {
       // If the return id is 0u, the signal is not emitted, we must disconnect signal here.

@@ -996,6 +996,13 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
       // Create the image buffer for outline
       Devel::PixelBuffer outlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_OUTLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
 
+      const float& blurRadius = mModel->GetOutlineBlurRadius();
+
+      if(blurRadius > Math::MACHINE_EPSILON_1)
+      {
+        outlineImageBuffer.ApplyGaussianBlur(blurRadius);
+      }
+
       // Combine the two buffers
       CombineImageBuffer(imageBuffer, outlineImageBuffer, bufferWidth, bufferHeight, true);
     }
@@ -1149,11 +1156,15 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t bufferWidth, con
 
     if(style == Typesetter::STYLE_OUTLINE)
     {
+      const Vector2& outlineOffset = mModel->GetOutlineOffset();
+
       glyphData.horizontalOffset -= outlineWidth;
+      glyphData.horizontalOffset += outlineOffset.x;
       if(lineIndex == 0u)
       {
         // Only need to add the vertical outline offset for the first line
         glyphData.verticalOffset -= outlineWidth;
+        glyphData.verticalOffset += outlineOffset.y;
       }
     }
     else if(style == Typesetter::STYLE_SHADOW)

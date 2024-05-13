@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,6 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false)
 
 VectorAnimationManager::VectorAnimationManager()
 : mEventCallbacks(),
-  mLifecycleObservers(),
   mVectorAnimationThread(nullptr),
   mProcessorRegistered(false)
 {
@@ -52,31 +51,11 @@ VectorAnimationManager::VectorAnimationManager()
 
 VectorAnimationManager::~VectorAnimationManager()
 {
-  mEventCallbacks.clear();
+  mEventCallbacks.Clear();
 
   if(mProcessorRegistered && Adaptor::IsAvailable())
   {
     Adaptor::Get().UnregisterProcessor(*this, true);
-  }
-
-  for(auto observer : mLifecycleObservers)
-  {
-    observer->VectorAnimationManagerDestroyed();
-  }
-}
-
-void VectorAnimationManager::AddObserver(VectorAnimationManager::LifecycleObserver& observer)
-{
-  DALI_ASSERT_DEBUG(mLifecycleObservers.end() == std::find(mLifecycleObservers.begin(), mLifecycleObservers.end(), &observer));
-  mLifecycleObservers.push_back(&observer);
-}
-
-void VectorAnimationManager::RemoveObserver(VectorAnimationManager::LifecycleObserver& observer)
-{
-  auto iterator = std::find(mLifecycleObservers.begin(), mLifecycleObservers.end(), &observer);
-  if(iterator != mLifecycleObservers.end())
-  {
-    mLifecycleObservers.erase(iterator);
   }
 }
 
@@ -92,7 +71,7 @@ VectorAnimationThread& VectorAnimationManager::GetVectorAnimationThread()
 
 void VectorAnimationManager::RegisterEventCallback(CallbackBase* callback)
 {
-  mEventCallbacks.emplace_back(std::unique_ptr<Dali::CallbackBase>(callback));
+  mEventCallbacks.PushBack(callback); ///< Take ownership of callback.
 
   if(!mProcessorRegistered)
   {
@@ -103,16 +82,12 @@ void VectorAnimationManager::RegisterEventCallback(CallbackBase* callback)
 
 void VectorAnimationManager::UnregisterEventCallback(CallbackBase* callback)
 {
-  auto iter = std::find_if(mEventCallbacks.begin(),
-                           mEventCallbacks.end(),
-                           [callback](const std::unique_ptr<CallbackBase>& element) {
-                             return element.get() == callback;
-                           });
-  if(iter != mEventCallbacks.end())
+  auto iter = mEventCallbacks.Find(callback);
+  if(iter != mEventCallbacks.End())
   {
-    mEventCallbacks.erase(iter);
+    mEventCallbacks.Erase(iter);
 
-    if(mEventCallbacks.empty())
+    if(mEventCallbacks.Count() == 0u)
     {
       if(Adaptor::IsAvailable())
       {
@@ -128,10 +103,10 @@ void VectorAnimationManager::Process(bool postProcessor)
 #ifdef TRACE_ENABLED
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
-    if(mEventCallbacks.size() > 0u)
+    if(mEventCallbacks.Count() > 0u)
     {
       std::ostringstream oss;
-      oss << "[" << mEventCallbacks.size() << "]";
+      oss << "[" << mEventCallbacks.Count() << "]";
       DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_VECTOR_ANIMATION_MANAGER_PROCESS", oss.str().c_str());
     }
   }
@@ -145,15 +120,15 @@ void VectorAnimationManager::Process(bool postProcessor)
 #ifdef TRACE_ENABLED
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
-    if(mEventCallbacks.size() > 0u)
+    if(mEventCallbacks.Count() > 0u)
     {
       std::ostringstream oss;
-      oss << "[" << mEventCallbacks.size() << "]";
+      oss << "[" << mEventCallbacks.Count() << "]";
       DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_VECTOR_ANIMATION_MANAGER_PROCESS", oss.str().c_str());
     }
   }
 #endif
-  mEventCallbacks.clear();
+  mEventCallbacks.Clear();
 
   Adaptor::Get().UnregisterProcessor(*this, true);
   mProcessorRegistered = false;

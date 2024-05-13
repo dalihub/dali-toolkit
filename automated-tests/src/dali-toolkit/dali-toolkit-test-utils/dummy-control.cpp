@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,19 @@
 #include "dummy-control.h"
 
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 DummyControl::DummyControl()
 {
 }
 
 DummyControl::DummyControl(const DummyControl& control)
-: Control( control )
+: Control(control)
 {
 }
 
@@ -40,60 +38,60 @@ DummyControl::~DummyControl()
 {
 }
 
-DummyControl DummyControl::DownCast( BaseHandle handle )
+DummyControl DummyControl::DownCast(BaseHandle handle)
 {
   return Control::DownCast<DummyControl, DummyControlImpl>(handle);
 }
 
 DummyControl& DummyControl::operator=(const DummyControl& control)
 {
-  Control::operator=( control );
+  Control::operator=(control);
   return *this;
 }
 
 // Used to test signal connections
-void DummyControlImpl::CustomSlot1( Actor actor )
+void DummyControlImpl::CustomSlot1(Actor actor)
 {
   mCustomSlot1Called = true;
 }
 
-namespace {
-
+namespace
+{
 BaseHandle Create()
 {
   return DummyControlImpl::New();
 }
 
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::DummyControl, Toolkit::Control, Create );
+DALI_TYPE_REGISTRATION_BEGIN(Toolkit::DummyControl, Toolkit::Control, Create);
 DALI_TYPE_REGISTRATION_END()
 
 Dali::PropertyRegistration dummyControlVisualProperty01(
-  typeRegistration, "testVisual", Dali::Toolkit::DummyControl::Property::TEST_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
+  typeRegistration, "testVisual", Dali::Toolkit::DummyControl::Property::TEST_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty);
 
 Dali::PropertyRegistration dummyControlVisualProperty02(
-  typeRegistration, "testVisual2", Dali::Toolkit::DummyControl::Property::TEST_VISUAL2, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
+  typeRegistration, "testVisual2", Dali::Toolkit::DummyControl::Property::TEST_VISUAL2, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty);
 
 Dali::PropertyRegistration dummyControlVisualProperty03(
-  typeRegistration, "foregroundVisual", Dali::Toolkit::DummyControl::Property::FOREGROUND_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
+  typeRegistration, "foregroundVisual", Dali::Toolkit::DummyControl::Property::FOREGROUND_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty);
 
 Dali::PropertyRegistration dummyControlVisualProperty04(
-  typeRegistration, "focusVisual", Dali::Toolkit::DummyControl::Property::FOCUS_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
+  typeRegistration, "focusVisual", Dali::Toolkit::DummyControl::Property::FOCUS_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty);
 
 Dali::PropertyRegistration dummyControlVisualProperty05(
-  typeRegistration, "labelVisual", Dali::Toolkit::DummyControl::Property::LABEL_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
+  typeRegistration, "labelVisual", Dali::Toolkit::DummyControl::Property::LABEL_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty);
 
-}
+} // namespace
 
 DummyControl DummyControlImpl::New()
 {
-  IntrusivePtr< DummyControlImpl > impl = new DummyControlImpl;
-  DummyControl control( *impl );
+  IntrusivePtr<DummyControlImpl> impl = new DummyControlImpl;
+  DummyControl                   control(*impl);
   impl->Initialize();
   return control;
 }
 
 DummyControlImpl::DummyControlImpl()
-: Control( ControlBehaviour() ),
+: Control(ControlBehaviour()),
   mCustomSlot1Called(false)
 {
 }
@@ -102,69 +100,80 @@ DummyControlImpl::~DummyControlImpl()
 {
 }
 
-void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::Base visual )
+void DummyControlImpl::RegisterVisual(Property::Index index, Toolkit::Visual::Base visual)
 {
-  DevelControl::RegisterVisual( *this, index, visual );
+  DevelControl::RegisterVisual(*this, index, visual);
 
-  VisualIndices::iterator iter = std::find( mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index );
-  if( iter == mRegisteredVisualIndices.end() )
+  VisualIndices::iterator iter = std::find(mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index);
+  if(iter == mRegisteredVisualIndices.end())
   {
     mRegisteredVisualIndices.push_back(index);
   }
 }
 
-void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::Base visual, bool enabled )
+void DummyControlImpl::RegisterVisual(Property::Index index, Toolkit::Visual::Base visual, bool enabled)
 {
-  DevelControl::RegisterVisual( *this, index, visual, enabled );
+  DevelControl::RegisterVisual(*this, index, visual, enabled);
 
-  VisualIndices::iterator iter = std::find( mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index );
-  if( iter == mRegisteredVisualIndices.end() )
+  VisualIndices::iterator iter = std::find(mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index);
+  if(iter == mRegisteredVisualIndices.end())
   {
     mRegisteredVisualIndices.push_back(index);
   }
 }
 
-void DummyControlImpl::UnregisterVisual( Property::Index index )
+void DummyControlImpl::RegisterVisual(Property::Index index, Toolkit::Visual::Base visual, int depthIndex)
 {
-  DevelControl::UnregisterVisual( *this, index );
+  DevelControl::RegisterVisual(*this, index, visual, depthIndex);
 
-  VisualIndices::iterator iter = std::find( mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index );
-  if( iter != mRegisteredVisualIndices.end() )
+  VisualIndices::iterator iter = std::find(mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index);
+  if(iter == mRegisteredVisualIndices.end())
+  {
+    mRegisteredVisualIndices.push_back(index);
+  }
+}
+
+void DummyControlImpl::UnregisterVisual(Property::Index index)
+{
+  DevelControl::UnregisterVisual(*this, index);
+
+  VisualIndices::iterator iter = std::find(mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index);
+  if(iter != mRegisteredVisualIndices.end())
   {
     mRegisteredVisualIndices.erase(iter);
   }
 }
 
-Toolkit::Visual::Base DummyControlImpl::GetVisual( Property::Index index )
+Toolkit::Visual::Base DummyControlImpl::GetVisual(Property::Index index)
 {
-  return DevelControl::GetVisual( *this, index );
+  return DevelControl::GetVisual(*this, index);
 }
 
-void DummyControlImpl::EnableVisual( Property::Index index, bool enabled )
+void DummyControlImpl::EnableVisual(Property::Index index, bool enabled)
 {
-  DevelControl::EnableVisual( *this, index, enabled );
+  DevelControl::EnableVisual(*this, index, enabled);
 }
 
-bool DummyControlImpl::IsVisualEnabled( Property::Index index )
+bool DummyControlImpl::IsVisualEnabled(Property::Index index)
 {
-  return DevelControl::IsVisualEnabled( *this, index );
+  return DevelControl::IsVisualEnabled(*this, index);
 }
 
-Animation DummyControlImpl::CreateTransition( const Toolkit::TransitionData& transition )
+Animation DummyControlImpl::CreateTransition(const Toolkit::TransitionData& transition)
 {
-  return DevelControl::CreateTransition( *this, transition );
+  return DevelControl::CreateTransition(*this, transition);
 }
 
-void DummyControlImpl::DoAction( Dali::Property::Index index, Dali::Property::Index action, const Dali::Property::Value attributes )
+void DummyControlImpl::DoAction(Dali::Property::Index index, Dali::Property::Index action, const Dali::Property::Value attributes)
 {
-  DummyControl control( *this );
-  DevelControl::DoAction(  control, index, action, attributes);
+  DummyControl control(*this);
+  DevelControl::DoAction(control, index, action, attributes);
 }
 
-void DummyControlImpl::SetProperty( BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value )
+void DummyControlImpl::SetProperty(BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value)
 {
-  Toolkit::DummyControl control = Toolkit::DummyControl::DownCast( Dali::BaseHandle( object ) );
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(control.GetImplementation());
+  Toolkit::DummyControl control   = Toolkit::DummyControl::DownCast(Dali::BaseHandle(object));
+  DummyControlImpl&     dummyImpl = static_cast<DummyControlImpl&>(control.GetImplementation());
 
   switch(index)
   {
@@ -175,10 +184,10 @@ void DummyControlImpl::SetProperty( BaseObject* object, Dali::Property::Index in
     case Toolkit::DummyControl::Property::LABEL_VISUAL:
     {
       const Property::Map* map = value.GetMap();
-      if( map != NULL )
+      if(map != NULL)
       {
         VisualFactory visualFactory = VisualFactory::Get();
-        Visual::Base visual = visualFactory.CreateVisual(*map);
+        Visual::Base  visual        = visualFactory.CreateVisual(*map);
         dummyImpl.RegisterVisual(index, visual);
       }
       break;
@@ -186,27 +195,26 @@ void DummyControlImpl::SetProperty( BaseObject* object, Dali::Property::Index in
   }
 }
 
-Property::Value DummyControlImpl::GetProperty( BaseObject* object, Dali::Property::Index propertyIndex )
+Property::Value DummyControlImpl::GetProperty(BaseObject* object, Dali::Property::Index propertyIndex)
 {
-  Toolkit::DummyControl control = Toolkit::DummyControl::DownCast( Dali::BaseHandle( object ) );
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>( control.GetImplementation() );
+  Toolkit::DummyControl control   = Toolkit::DummyControl::DownCast(Dali::BaseHandle(object));
+  DummyControlImpl&     dummyImpl = static_cast<DummyControlImpl&>(control.GetImplementation());
 
-  Visual::Base visual = dummyImpl.GetVisual( propertyIndex );
+  Visual::Base  visual = dummyImpl.GetVisual(propertyIndex);
   Property::Map map;
-  if( visual )
+  if(visual)
   {
-    visual.CreatePropertyMap( map );
+    visual.CreatePropertyMap(map);
   }
   Dali::Property::Value value = map;
 
   return value;
 }
 
-
 Toolkit::DummyControl Impl::DummyControl::New()
 {
-  IntrusivePtr< Toolkit::Impl::DummyControl > impl = new Toolkit::Impl::DummyControl;
-  Toolkit::DummyControl control( *impl );
+  IntrusivePtr<Toolkit::Impl::DummyControl> impl = new Toolkit::Impl::DummyControl;
+  Toolkit::DummyControl                     control(*impl);
   impl->Initialize();
   return control;
 }
@@ -245,29 +253,75 @@ Impl::DummyControl::~DummyControl()
   ++destructorCount;
 }
 
-void Impl::DummyControl::OnInitialize() { initializeCalled = true; }
-bool Impl::DummyControl::OnAccessibilityActivated() { activatedCalled = true; return true; }
-bool Impl::DummyControl::OnAccessibilityValueChange( bool isIncrease )
+void Impl::DummyControl::OnInitialize()
 {
-  onAccValueChangeCalled = true; return true;
+  initializeCalled = true;
+}
+bool Impl::DummyControl::OnAccessibilityActivated()
+{
+  activatedCalled = true;
+  return true;
+}
+bool Impl::DummyControl::OnAccessibilityValueChange(bool isIncrease)
+{
+  onAccValueChangeCalled = true;
+  return true;
 }
 
-void Impl::DummyControl::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
+void Impl::DummyControl::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)
 {
   themeChangeCalled = change == StyleChange::THEME_CHANGE;
-  fontChangeCalled = change == StyleChange::DEFAULT_FONT_SIZE_CHANGE;
+  fontChangeCalled  = change == StyleChange::DEFAULT_FONT_SIZE_CHANGE;
 }
-void Impl::DummyControl::OnPinch(const PinchGesture& pinch) { pinchCalled = true; }
-void Impl::DummyControl::OnPan(const PanGesture& pan) { panCalled = true; }
-void Impl::DummyControl::OnTap(const TapGesture& tap) { tapCalled = true; }
-void Impl::DummyControl::OnLongPress(const LongPressGesture& longPress) { longPressCalled = true; }
-void Impl::DummyControl::OnSceneConnection( int depth ) { Control::OnSceneConnection( depth ); stageConnectionCalled = true; }
-void Impl::DummyControl::OnSceneDisconnection() { stageDisconnectionCalled = true; Control::OnSceneDisconnection(); }
-void Impl::DummyControl::OnChildAdd(Actor& child) { childAddCalled = true; }
-void Impl::DummyControl::OnChildRemove(Actor& child) { childRemoveCalled = true; }
-void Impl::DummyControl::OnSizeSet(const Vector3& targetSize) { Control::OnSizeSet( targetSize ); sizeSetCalled = true; }
-void Impl::DummyControl::OnSizeAnimation(Animation& animation, const Vector3& targetSize) { Control::OnSizeAnimation( animation, targetSize ); sizeAnimationCalled = true; }
-bool Impl::DummyControl::OnKeyEvent(const KeyEvent& event) { keyEventCalled = true; return false;}
+void Impl::DummyControl::OnPinch(const PinchGesture& pinch)
+{
+  pinchCalled = true;
+}
+void Impl::DummyControl::OnPan(const PanGesture& pan)
+{
+  panCalled = true;
+}
+void Impl::DummyControl::OnTap(const TapGesture& tap)
+{
+  tapCalled = true;
+}
+void Impl::DummyControl::OnLongPress(const LongPressGesture& longPress)
+{
+  longPressCalled = true;
+}
+void Impl::DummyControl::OnSceneConnection(int depth)
+{
+  Control::OnSceneConnection(depth);
+  stageConnectionCalled = true;
+}
+void Impl::DummyControl::OnSceneDisconnection()
+{
+  stageDisconnectionCalled = true;
+  Control::OnSceneDisconnection();
+}
+void Impl::DummyControl::OnChildAdd(Actor& child)
+{
+  childAddCalled = true;
+}
+void Impl::DummyControl::OnChildRemove(Actor& child)
+{
+  childRemoveCalled = true;
+}
+void Impl::DummyControl::OnSizeSet(const Vector3& targetSize)
+{
+  Control::OnSizeSet(targetSize);
+  sizeSetCalled = true;
+}
+void Impl::DummyControl::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
+{
+  Control::OnSizeAnimation(animation, targetSize);
+  sizeAnimationCalled = true;
+}
+bool Impl::DummyControl::OnKeyEvent(const KeyEvent& event)
+{
+  keyEventCalled = true;
+  return false;
+}
 void Impl::DummyControl::OnKeyInputFocusGained()
 {
   if(this->HasKeyInputFocus())
@@ -283,41 +337,41 @@ void Impl::DummyControl::OnKeyInputFocusLost()
   }
 }
 
-void Impl::DummyControl::SetLayout( Property::Index visualIndex, Property::Map& map )
+void Impl::DummyControl::SetLayout(Property::Index visualIndex, Property::Map& map)
 {
-  Property::Value value( map );
+  Property::Value value(map);
   mLayouts[visualIndex] = value;
 }
 
-void Impl::DummyControl::OnRelayout( const Vector2& size, RelayoutContainer& container )
+void Impl::DummyControl::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
-  if ( mRelayoutCallback )
+  if(mRelayoutCallback)
   {
-    mRelayoutCallback( size );  // Execute callback if set
+    mRelayoutCallback(size); // Execute callback if set
   }
 
   Property::Map emptyMap;
 
-  for( VisualIndices::iterator iter = mRegisteredVisualIndices.begin(); iter != mRegisteredVisualIndices.end() ; ++iter )
+  for(VisualIndices::iterator iter = mRegisteredVisualIndices.begin(); iter != mRegisteredVisualIndices.end(); ++iter)
   {
-    Visual::Base visual = GetVisual(*iter);
-    Property::Value value = mLayouts[*iter];
-    Property::Map* map = NULL;
+    Visual::Base    visual = GetVisual(*iter);
+    Property::Value value  = mLayouts[*iter];
+    Property::Map*  map    = NULL;
 
-    if( value.GetType() != Property::NONE )
+    if(value.GetType() != Property::NONE)
     {
       map = value.GetMap();
     }
-    if( map == NULL )
+    if(map == NULL)
     {
       map = &emptyMap;
     }
 
-    visual.SetTransformAndSize( *map, size );
+    visual.SetTransformAndSize(*map, size);
   }
 }
 
-void Impl::DummyControl::SetRelayoutCallback( RelayoutCallbackFunc callback  )
+void Impl::DummyControl::SetRelayoutCallback(RelayoutCallbackFunc callback)
 {
   mRelayoutCallback = callback;
 }
@@ -326,25 +380,23 @@ Vector3 Impl::DummyControl::GetNaturalSize()
 {
   Vector2 currentSize;
 
-  for( auto elem : mRegisteredVisualIndices )
+  for(auto elem : mRegisteredVisualIndices)
   {
-    Vector2 naturalSize;
+    Vector2      naturalSize;
     Visual::Base visual = GetVisual(elem);
-    visual.GetNaturalSize( naturalSize );
-    currentSize.width = std::max( naturalSize.width, currentSize.width );
-    currentSize.height = std::max( naturalSize.height, currentSize.height );
+    visual.GetNaturalSize(naturalSize);
+    currentSize.width  = std::max(naturalSize.width, currentSize.width);
+    currentSize.height = std::max(naturalSize.height, currentSize.height);
   }
 
-  return Vector3( currentSize );
+  return Vector3(currentSize);
 }
 
-
-
-DummyControl DummyControl::New( bool override )
+DummyControl DummyControl::New(bool override)
 {
   DummyControl control;
 
-  if (override)
+  if(override)
   {
     control = Impl::DummyControl::New();
   }
@@ -356,13 +408,13 @@ DummyControl DummyControl::New( bool override )
   return control;
 }
 
-DummyControl::DummyControl( DummyControlImpl& implementation )
-: Control( implementation )
+DummyControl::DummyControl(DummyControlImpl& implementation)
+: Control(implementation)
 {
 }
 
-DummyControl::DummyControl( Dali::Internal::CustomActor* internal )
-: Control( internal )
+DummyControl::DummyControl(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<DummyControlImpl>(internal);
 }

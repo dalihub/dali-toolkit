@@ -115,6 +115,26 @@ void PasteText(TextEditor textEditor)
   GetImpl(textEditor).PasteText();
 }
 
+void SetRemoveFrontInset(TextEditor textEditor, const bool remove)
+{
+  GetImpl(textEditor).SetRemoveFrontInset(remove);
+}
+
+bool IsRemoveFrontInset(TextEditor textEditor)
+{
+  return GetImpl(textEditor).IsRemoveFrontInset();
+}
+
+void SetRemoveBackInset(TextEditor textEditor, const bool remove)
+{
+  GetImpl(textEditor).SetRemoveBackInset(remove);
+}
+
+bool IsRemoveBackInset(TextEditor textEditor)
+{
+  return GetImpl(textEditor).IsRemoveBackInset();
+}
+
 } // namespace DevelTextEditor
 
 } // namespace Toolkit

@@ -247,6 +247,11 @@ public:
   void GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns) const override;
 
   /**
+   * @copydoc ModelInterface::GetOutlineOffset()
+   */
+  const Vector2& GetOutlineOffset() const override;
+
+  /**
    * @copydoc ModelInterface::GetOutlineColor()
    */
   const Vector4& GetOutlineColor() const override;
@@ -255,6 +260,11 @@ public:
    * @copydoc ModelInterface::GetOutlineWidth()
    */
   uint16_t GetOutlineWidth() const override;
+
+  /**
+   * @copydoc ModelInterface::GetOutlineBlurRadius()
+   */
+  const float& GetOutlineBlurRadius() const override;
 
   /**
    * @copydoc ModelInterface::GetBackgroundColor()

@@ -53,6 +53,7 @@ constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const char* EMPTY_STRING         = "";
 const char* MIME_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
+const char* MIME_TYPE_HTML       = "application/xhtml+xml";
 
 } // namespace
 
@@ -1159,6 +1160,12 @@ bool Controller::Impl::CopyStringToClipboard(const std::string& source)
   }
 
   return false;
+}
+
+bool Controller::Impl::IsClipboardEmpty()
+{
+  bool result(Clipboard::IsAvailable() && EnsureClipboardCreated() && (mClipboard.HasType(MIME_TYPE_TEXT_PLAIN) || mClipboard.HasType(MIME_TYPE_HTML)));
+  return !result;
 }
 
 void Controller::Impl::SendSelectionToClipboard(bool deleteAfterSending)

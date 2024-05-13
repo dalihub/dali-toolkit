@@ -1280,6 +1280,20 @@ public: // Default style & Input style
   float GetDashedUnderlineGap() const;
 
   /**
+   * @brief Set the outline offset.
+   *
+   * @param[in] outlineOffset The outline offset.
+   */
+  void SetOutlineOffset(const Vector2& outlineOffset);
+
+  /**
+   * @brief Retrieve the outline offset.
+   *
+   * @return The outline offset.
+   */
+  const Vector2& GetOutlineOffset() const;
+
+  /**
    * @brief Set the outline color.
    *
    * @param[in] color color of outline.
@@ -1306,6 +1320,20 @@ public: // Default style & Input style
    * @return The width of the outline.
    */
   uint16_t GetOutlineWidth() const;
+
+  /**
+   * @brief Set the outline blur radius.
+   *
+   * @param[in] outlineBlurRadius The outline blur radius, 0,0 indicates no blur.
+   */
+  void SetOutlineBlurRadius(const float& outlineBlurRadius);
+
+  /**
+   * @brief Retrieve the outline blur radius.
+   *
+   * @return The outline blur radius.
+   */
+  const float& GetOutlineBlurRadius() const;
 
   /**
    * @brief Set the background color.

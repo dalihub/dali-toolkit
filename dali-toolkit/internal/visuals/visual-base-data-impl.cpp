@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/helpers/property-helper.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -121,7 +122,7 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Typ
   mMixColor(Color::WHITE),
   mControlSize(Vector2::ZERO),
   mDecorationData(nullptr),
-  mDepthIndex(0.0f),
+  mDepthIndex(Toolkit::DepthIndex::AUTO_INDEX),
   mFittingMode(fittingMode),
   mFlags(0),
   mResourceStatus(Toolkit::Visual::ResourceStatus::PREPARING),

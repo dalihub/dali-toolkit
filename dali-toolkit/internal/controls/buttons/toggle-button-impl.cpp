@@ -325,7 +325,7 @@ void ToggleButton::PrepareVisual(Property::Index index, Toolkit::Visual::Base& v
     DevelControl::UnregisterVisual(*this, index);
   }
 
-  DevelControl::RegisterVisual(*this, index, visual, enabled);
+  DevelControl::RegisterVisual(*this, index, visual, enabled, DepthIndex::CONTENT);
 }
 
 void ToggleButton::RelayoutVisual(Property::Index index, const Vector2& size)
@@ -412,10 +412,10 @@ Property::Index ToggleButton::ToggleButtonAccessible::GetDescriptionPropertyInde
 void ToggleButton::OnStateChange(State newState)
 {
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
-  if((Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor()) && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  if(newState == SELECTED_STATE || newState == UNSELECTED_STATE)
   {
     auto* accessible = GetAccessibleObject();
-    if(DALI_LIKELY(accessible))
+    if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
     {
       accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);
       accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);

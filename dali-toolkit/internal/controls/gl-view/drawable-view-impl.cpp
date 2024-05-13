@@ -151,6 +151,7 @@ void DrawableView::OnSceneConnection(int depth)
   // the designed behaviour of GlView so signal is connected regardless
   if(window)
   {
+    mPlacementWindow = window;
     DevelWindow::VisibilityChangedSignal(window).Connect(this, &DrawableView::OnWindowVisibilityChanged);
   }
 }
@@ -160,6 +161,13 @@ void DrawableView::OnSceneDisconnection()
   Control::OnSceneDisconnection();
 
   mNativeRenderer->Terminate();
+
+  Window window = mPlacementWindow.GetHandle();
+  if(window)
+  {
+    DevelWindow::VisibilityChangedSignal(window).Disconnect(this, &DrawableView::OnWindowVisibilityChanged);
+    mPlacementWindow.Reset();
+  }
 }
 
 void DrawableView::AddRenderer()

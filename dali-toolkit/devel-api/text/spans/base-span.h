@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_BASE_SPAN_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,16 +121,6 @@ public: // Not intended for application developers
 } // namespace Text
 
 } // namespace Toolkit
-
-// Allow BaseSpan to be treated as a POD type
-template<>
-struct TypeTraits<Dali::Toolkit::Text::BaseSpan> : public BasicTypes<Dali::Toolkit::Text::BaseSpan>
-{
-  enum
-  {
-    IS_TRIVIAL_TYPE = true
-  };
-};
 
 } // namespace Dali
 

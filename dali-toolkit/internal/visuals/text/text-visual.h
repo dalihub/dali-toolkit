@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_VISUAL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -239,7 +239,7 @@ private:
   /**
    * @brief Removes the text's renderer.
    */
-  void RemoveRenderer(Actor& actor);
+  void RemoveRenderer(Actor& actor, bool removeDefaultRenderer);
 
   /**
    * @brief Create a texture in textureSet and add it.

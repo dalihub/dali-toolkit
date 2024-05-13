@@ -22,6 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/native-image-source-queue.h>
 #include <dali/public-api/adaptor-framework/window.h>
+#include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/signals/render-callback.h>
@@ -142,6 +143,7 @@ private:
   bool OnRenderCallback(const RenderCallbackInput& renderCallbackInput);
 
 private:
+  WeakHandle<Window>                   mPlacementWindow;
   Dali::Toolkit::GlView::RenderingMode mRenderingMode;
 
   bool mDepth;

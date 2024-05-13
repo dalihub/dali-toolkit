@@ -259,9 +259,9 @@ private:
   void CheckMaskTexture();
 
   /**
-   * @brief Callback when the visibility of the actor is changed.
+   * @brief Callback when the inherited visibility of the actor is changed.
    */
-  void OnControlVisibilityChanged(Actor actor, bool visible, DevelActor::VisibilityChange::Type type);
+  void OnControlInheritedVisibilityChanged(Actor actor, bool visible);
 
   /**
    * @brief Callback when the visibility of the window is changed.
@@ -276,6 +276,7 @@ private:
 
 private:
   Timer                     mFrameDelayTimer;
+  WeakHandle<Window>        mPlacementWindow;
   WeakHandle<Actor>         mPlacementActor;
   ImageVisualShaderFactory& mImageVisualShaderFactory;
 

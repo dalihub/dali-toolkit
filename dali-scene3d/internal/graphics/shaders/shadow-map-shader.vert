@@ -1,3 +1,4 @@
+#define MORPH defined(MORPH_POSITION) || defined(MORPH_NORMAL) || defined(MORPH_TANGENT)
 
 #define ADD_EXTRA_SKINNING_ATTRIBUTES
 #define ADD_EXTRA_WEIGHTS
