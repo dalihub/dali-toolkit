@@ -63,10 +63,9 @@ struct Controller::TextUpdater
    * @param[in] cursorOffset Start position from the current cursor position to start deleting characters.
    * @param[in] numberOfCharacters The number of characters to delete from the cursorOffset.
    * @param[in] type Whether to update the input style.
-   * @param[in] isDeletingPreEdit Whether to remove pre-edit when inserting text.
    * @return True if the remove was successful.
    */
-  static bool RemoveText(Controller& controller, int cursorOffset, int numberOfCharacters, UpdateInputStyleType type, bool isDeletingPreEdit);
+  static bool RemoveText(Controller& controller, int cursorOffset, int numberOfCharacters, UpdateInputStyleType type);
 
   /**
    * @brief Checks if text is selected and if so removes it.
