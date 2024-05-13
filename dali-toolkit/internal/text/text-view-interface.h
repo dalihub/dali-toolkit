@@ -392,6 +392,13 @@ public:
    * @return GetGlyphsToCharacters.
    */
   virtual const Vector<CharacterIndex>& GetGlyphsToCharacters() const = 0;
+
+  /**
+   * @brief Returns whether cutout is enabled or not.
+   *
+   * @return The cutout state.
+   */
+  virtual bool IsCutoutEnabled() const = 0;
 };
 
 } // namespace Text
