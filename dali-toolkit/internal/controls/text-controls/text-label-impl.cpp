@@ -46,9 +46,9 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 
 // DEVEL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
@@ -1121,8 +1121,8 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       {
         Vector4 backgroundColor = Vector4::ZERO;
 
-        const Property::Map backgroundMap = Self().GetProperty(Toolkit::Control::Property::BACKGROUND).Get<Property::Map>();
-        Property::Value* backgroundValue = backgroundMap.Find(ColorVisual::Property::MIX_COLOR);
+        const Property::Map backgroundMap   = Self().GetProperty(Toolkit::Control::Property::BACKGROUND).Get<Property::Map>();
+        Property::Value*    backgroundValue = backgroundMap.Find(ColorVisual::Property::MIX_COLOR);
         if(backgroundValue)
         {
           backgroundColor = backgroundValue->Get<Vector4>();
@@ -1141,6 +1141,7 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       }
 
       TextVisual::SetRequireRender(mVisual, cutoutEnabled);
+      break;
     }
     default:
     {

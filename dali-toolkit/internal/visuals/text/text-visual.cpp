@@ -587,7 +587,8 @@ void TextVisual::UpdateRenderer()
       const bool isOverlayStyle               = underlineEnabled || strikethroughEnabled;
 
       // if background with cutout is enabled, This text visual must render the entire control size.
-      if(backgroundWithCutoutEnabled)
+
+      if(cutoutEnabled)
       {
         relayoutSize = Vector2(controlWidth, controlHeight);
         mImpl->mTransform.mSize.width = controlWidth;
@@ -905,7 +906,10 @@ Shader TextVisual::GetTextShader(VisualFactoryCache& factoryCache, const TextVis
 void TextVisual::SetRequireRender(bool requireRender)
 {
   mTextRequireRender = requireRender;
-  mImpl->mRenderer.SetProperty(mTextRequireRenderPropertyIndex, mTextRequireRender);
+  if(mImpl->mRenderer)
+  {
+    mImpl->mRenderer.SetProperty(mTextRequireRenderPropertyIndex, mTextRequireRender);
+  }
 }
 
 } // namespace Internal

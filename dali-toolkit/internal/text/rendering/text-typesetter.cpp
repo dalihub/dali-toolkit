@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 
 // EXTERNAL INCLUDES
+#include <cmath>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
@@ -981,8 +982,9 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
     }
     case VerticalAlignment::CENTER:
     {
-      penY = static_cast<int32_t>(0.5f * (size.height - layoutSize.height));
+      penY = static_cast<int32_t>(std::round(0.5f * (size.height - layoutSize.height)));
       penY = penY < 0.f ? 0.f : penY;
+
       break;
     }
     case VerticalAlignment::BOTTOM:
