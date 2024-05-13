@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -287,6 +287,7 @@ int GenerateShaderSources(fs::path inDir, fs::path outDir, const bool generateBu
   cout << "====================================================================" << endl;
 
   BuiltInFilesGenerator generator(outDir);
+  bool shaderGenerated = false;
 
   for(auto& file : fs::directory_iterator(inDir))
   {
@@ -303,8 +304,19 @@ int GenerateShaderSources(fs::path inDir, fs::path outDir, const bool generateBu
           if(shaderFile.is_open())
           {
             fs::path outFilePath(GetShaderOutputFilePath(outDir, filename));
-            GenerateHeaderFile(shaderFile, shaderVariableName, outFilePath);
             generator.Add(std::move(shaderVariableName), outFilePath.filename().string());
+            if(fs::exists(outFilePath))
+            {
+              // Only overwrite if input file is newer than output file
+              fs::file_time_type inFileTime = fs::last_write_time(path);
+              fs::file_time_type outFileTime = fs::last_write_time(outFilePath);
+              if(outFileTime > inFileTime)
+              {
+                continue;
+              }
+            }
+            GenerateHeaderFile(shaderFile, shaderVariableName, outFilePath);
+            shaderGenerated = true;
           }
           break;
         }
@@ -312,7 +324,7 @@ int GenerateShaderSources(fs::path inDir, fs::path outDir, const bool generateBu
     }
   }
 
-  if(generateBuiltInFiles)
+  if(generateBuiltInFiles && shaderGenerated)
   {
     generator.Generate();
   }
