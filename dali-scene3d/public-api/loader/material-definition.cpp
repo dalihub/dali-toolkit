@@ -97,7 +97,7 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
   }
   else if(textureDefinition.mImageUri.find(EMBEDDED_DATA_PREFIX.data()) == 0 && textureDefinition.mImageUri.find(EMBEDDED_DATA_IMAGE_MEDIA_TYPE.data(), EMBEDDED_DATA_PREFIX.length()) == EMBEDDED_DATA_PREFIX.length())
   {
-    uint32_t position = textureDefinition.mImageUri.find(EMBEDDED_DATA_BASE64_ENCODING_TYPE.data(), EMBEDDED_DATA_PREFIX.length() + EMBEDDED_DATA_IMAGE_MEDIA_TYPE.length());
+    auto position = textureDefinition.mImageUri.find(EMBEDDED_DATA_BASE64_ENCODING_TYPE.data(), EMBEDDED_DATA_PREFIX.length() + EMBEDDED_DATA_IMAGE_MEDIA_TYPE.length());
     if(position != std::string::npos)
     {
       position += EMBEDDED_DATA_BASE64_ENCODING_TYPE.length();
