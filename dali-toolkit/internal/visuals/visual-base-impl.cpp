@@ -494,7 +494,7 @@ void Visual::Base::GetNaturalSize(Vector2& naturalSize)
   naturalSize = Vector2::ZERO;
 }
 
-void Visual::Base::DoAction(const Property::Index actionId, const Property::Value attributes)
+void Visual::Base::DoAction(const Property::Index actionId, const Property::Value& attributes)
 {
   OnDoAction(actionId, attributes);
 
@@ -513,7 +513,7 @@ void Visual::Base::DoAction(const Property::Index actionId, const Property::Valu
   }
 }
 
-void Visual::Base::DoActionExtension(const Dali::Property::Index actionId, const Dali::Any attributes)
+void Visual::Base::DoActionExtension(const Dali::Property::Index actionId, const Dali::Any& attributes)
 {
   OnDoActionExtension(actionId, attributes);
 }
@@ -728,7 +728,7 @@ void Visual::Base::OnDoAction(const Property::Index actionId, const Property::Va
   // May be overriden by derived class
 }
 
-void Visual::Base::OnDoActionExtension(const Property::Index actionId, const Dali::Any attributes)
+void Visual::Base::OnDoActionExtension(const Property::Index actionId, const Dali::Any& attributes)
 {
   // May be overriden by derived class
 }

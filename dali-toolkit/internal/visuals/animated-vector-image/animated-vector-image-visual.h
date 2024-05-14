@@ -158,7 +158,7 @@ protected:
   /**
    * @copydoc Visual::Base::OnDoActionExtension
    */
-  void OnDoActionExtension(const Property::Index actionId, Dali::Any attributes) override;
+  void OnDoActionExtension(const Property::Index actionId, const Dali::Any& attributes) override;
 
 private:
   /**

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEST_DUMMY_VISUAL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
@@ -30,16 +30,13 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class DummyVisual;
 
-typedef IntrusivePtr< DummyVisual > DummyVisualPtr;
+typedef IntrusivePtr<DummyVisual> DummyVisualPtr;
 
 /**
  * Dummy Visual that can be used for testing
@@ -48,23 +45,22 @@ typedef IntrusivePtr< DummyVisual > DummyVisualPtr;
 class DummyVisual : public Visual::Base
 {
 public:
-
   // Actions that the dummy visual can perform.  These actions are called through the Visual::Base::DoAction API.
   enum Type
   {
-    TEST_ACTION = 0,  ///< Updates the action counter
+    TEST_ACTION           = 0, ///< Updates the action counter
+    TEST_ACTION_EXTENSION = 1, ///< Updates the action counter when we call DoActionExtension
   };
 
 public:
-
   // Constructor for DummyVisual
-  static DummyVisualPtr New( const Property::Map& properties );
+  static DummyVisualPtr New(const Property::Map& properties);
 
   // Prevent default methods being used.
-  DummyVisual( const DummyVisual& dummyVisual ) = delete;
-  DummyVisual( const DummyVisual&& dummyVisual ) = delete;
-  DummyVisual& operator=( const DummyVisual& dummyVisual ) = delete;
-  DummyVisual& operator=( const DummyVisual&& dummyVisual ) = delete;
+  DummyVisual(const DummyVisual& dummyVisual)  = delete;
+  DummyVisual(const DummyVisual&& dummyVisual) = delete;
+  DummyVisual& operator=(const DummyVisual& dummyVisual) = delete;
+  DummyVisual& operator=(const DummyVisual&& dummyVisual) = delete;
 
   // Get the Action counter, action counter incremented with every successful Action
   unsigned int GetActionCounter() const;
@@ -72,24 +68,22 @@ public:
   void ResetActionCounter();
 
 protected:
-
-  DummyVisual( VisualFactoryCache& factoryCache );
+  DummyVisual(VisualFactoryCache& factoryCache);
 
   void OnInitialize() override;
-  void DoCreatePropertyMap( Property::Map& map ) const override;
-  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
-  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void DoCreatePropertyMap(Property::Map& map) const override;
+  void DoCreateInstancePropertyMap(Property::Map& map) const override;
+  void DoSetProperties(const Property::Map& propertyMap) override;
   void OnSetTransform() override;
-  void DoSetOnScene( Actor& actor ) override;
-  void OnDoAction( const Property::Index actionName, const Property::Value& attributes ) override;
+  void DoSetOnScene(Actor& actor) override;
+  void OnDoAction(const Property::Index actionName, const Property::Value& attributes) override;
+  void OnDoActionExtension(const Property::Index actionName, const Dali::Any& attributes) override;
 
 private:
   unsigned int mActionCounter;
-
 };
 
-
-} // Internal
+} // namespace Internal
 
 } // namespace Toolkit
 
