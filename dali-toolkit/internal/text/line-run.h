@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LINE_RUN_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,19 +33,19 @@ namespace Text
  */
 struct LineRun
 {
-  GlyphRun           glyphRun;                      ///< The initial glyph index and the number of glyphs of the run.
-  CharacterRun       characterRun;                  ///< The initial character index and the number of characters of the run.
-  float              width;                         ///< The line's width.
-  float              ascender;                      ///< The line's ascender.
-  float              descender;                     ///< The line's descender.
-  float              extraLength;                   ///< The length of the white spaces at the end of the line.
-  float              alignmentOffset;               ///< The horizontal alignment offset.
-  float              lineSpacing;                   ///< The line's spacing
-  CharacterDirection direction : 1;                 ///< Direction of the first character of the paragraph.
-  bool               ellipsis : 1;                  ///< Wheter ellipsis is added to the line.
-  bool               isSplitToTwoHalves;            ///< Whether the second half is defined. When split line to two halves to set Ellipsis in the MIDDLE of line. The second half is the second part of line after Ellipsis.
-  GlyphRun           glyphRunSecondHalf;            ///< The initial glyph index and the number of glyphs of the run for the second half of line.
-  CharacterRun       characterRunForSecondHalfLine; ///< The initial character index and the number of characters of the run for the second half of line.
+  GlyphRun           glyphRun{};                      ///< The initial glyph index and the number of glyphs of the run.
+  CharacterRun       characterRun{};                  ///< The initial character index and the number of characters of the run.
+  float              width;                           ///< The line's width.
+  float              ascender;                        ///< The line's ascender.
+  float              descender;                       ///< The line's descender.
+  float              extraLength;                     ///< The length of the white spaces at the end of the line.
+  float              alignmentOffset;                 ///< The horizontal alignment offset.
+  float              lineSpacing;                     ///< The line's spacing
+  CharacterDirection direction : 1;                   ///< Direction of the first character of the paragraph.
+  bool               ellipsis : 1;                    ///< Wheter ellipsis is added to the line.
+  bool               isSplitToTwoHalves;              ///< Whether the second half is defined. When split line to two halves to set Ellipsis in the MIDDLE of line. The second half is the second part of line after Ellipsis.
+  GlyphRun           glyphRunSecondHalf{};            ///< The initial glyph index and the number of glyphs of the run for the second half of line.
+  CharacterRun       characterRunForSecondHalfLine{}; ///< The initial character index and the number of characters of the run for the second half of line.
 };
 
 /**
