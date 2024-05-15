@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,9 +96,19 @@ Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap)
   return GetImplementation(*this).CreateVisual(propertyMap);
 }
 
+Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap, CreationOptions creationOptions)
+{
+  return GetImplementation(*this).CreateVisual(propertyMap, creationOptions);
+}
+
 Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageDimensions size)
 {
   return GetImplementation(*this).CreateVisual(url, size);
+}
+
+Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageDimensions size, CreationOptions creationOptions)
+{
+  return GetImplementation(*this).CreateVisual(url, size, creationOptions);
 }
 
 void VisualFactory::SetPreMultiplyOnLoad(bool preMultiply)
@@ -109,6 +119,16 @@ void VisualFactory::SetPreMultiplyOnLoad(bool preMultiply)
 bool VisualFactory::GetPreMultiplyOnLoad() const
 {
   return GetImplementation(*this).GetPreMultiplyOnLoad();
+}
+
+void VisualFactory::SetDefaultCreationOptions(VisualFactory::CreationOptions creationOptions)
+{
+  GetImplementation(*this).SetDefaultCreationOptions(creationOptions);
+}
+
+VisualFactory::CreationOptions VisualFactory::GetDefaultCreationOptions() const
+{
+  return GetImplementation(*this).GetDefaultCreationOptions();
 }
 
 void VisualFactory::DiscardVisual(Visual::Base visual)
