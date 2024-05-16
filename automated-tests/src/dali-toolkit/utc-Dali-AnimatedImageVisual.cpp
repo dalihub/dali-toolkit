@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -545,6 +545,114 @@ int UtcDaliAnimatedImageVisualImageLoadingFail01(void)
   END_TEST;
 }
 
+int UtcDaliAnimatedImageVisualImageLoadingFail02(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Test with non-animated single image. We should show broken image than.");
+
+  for(int isSynchronousLoading = 0; isSynchronousLoading < 2; ++isSynchronousLoading)
+  {
+    tet_printf("Test to load non-animatable image %s\n", (isSynchronousLoading == 1) ? "Synchronously" : "Asynchronously");
+
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, "dummy");
+    propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, (isSynchronousLoading == 1));
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
+
+    application.GetScene().Add(dummyControl);
+
+    application.SendNotification();
+    application.Render(20);
+
+    // TODO : Since fixed-image-cache didn't support synchronous loading now, we need to wait for a while.
+    // We have to remove it in future!
+    //if(!(isSynchronousLoading == 1))
+    {
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    }
+
+    application.SendNotification();
+    application.Render(20);
+
+    // Check broken image uploaded.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 1u, TEST_LOCATION);
+
+    dummyControl.Unparent();
+
+    // Remove cached image at TextureManager.
+    application.SendNotification();
+    application.Render(20);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualImageLoadingFail03(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Test with invalid image that suffix is .gif, and AnimatedImageLoading not supported. We should show broken image than.");
+
+  for(int isSynchronousLoading = 0; isSynchronousLoading < 2; ++isSynchronousLoading)
+  {
+    tet_printf("Test to load non-animatable image %s\n", (isSynchronousLoading == 1) ? "Synchronously" : "Asynchronously");
+
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, "dummy.Gif"); ///< Suffix is gif so visual become AnimatedImageVisual. But AnimatedImageLoading become null.
+    propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, (isSynchronousLoading == 1));
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
+
+    application.GetScene().Add(dummyControl);
+
+    application.SendNotification();
+    application.Render(20);
+
+    // TODO : Since fixed-image-cache didn't support synchronous loading now, we need to wait for a while.
+    // We have to remove it in future!
+    //if(!(isSynchronousLoading == 1))
+    {
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    }
+
+    application.SendNotification();
+    application.Render(20);
+
+    // Check broken image uploaded.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 1u, TEST_LOCATION);
+
+    dummyControl.Unparent();
+
+    // Remove cached image at TextureManager.
+    application.SendNotification();
+    application.Render(20);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliAnimatedImageVisualSynchronousLoading(void)
 {
   ToolkitTestApplication application;
@@ -775,7 +883,7 @@ int UtcDaliAnimatedImageVisualJumpToAction(void)
 
     DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::JUMP_TO, 6);
 
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(6), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
     DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 4, TEST_LOCATION);
 
     dummyControl.Unparent();
@@ -1643,6 +1751,8 @@ int UtcDaliAnimatedImageVisualMultiImage05(void)
   END_TEST;
 }
 
+namespace
+{
 void TestLoopCount(ToolkitTestApplication& application, DummyControl& dummyControl, uint16_t frameCount, uint16_t loopCount, const char* location)
 {
   TestGlAbstraction& gl           = application.GetGlAbstraction();
@@ -1693,6 +1803,7 @@ void TestLoopCount(ToolkitTestApplication& application, DummyControl& dummyContr
 
   dummyControl.Unparent();
 }
+} // namespace
 
 int UtcDaliAnimatedImageVisualLoopCount(void)
 {

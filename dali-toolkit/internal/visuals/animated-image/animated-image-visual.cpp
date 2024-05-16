@@ -190,6 +190,22 @@ void AnimatedImageVisual::InitializeAnimatedImage(const VisualUrl& imageUrl)
 {
   mImageUrl             = imageUrl;
   mAnimatedImageLoading = AnimatedImageLoading::New(imageUrl.GetUrl(), imageUrl.IsLocalResource());
+
+  // If we fail to load the animated image, we will try to load as a normal image.
+  if(!mAnimatedImageLoading)
+  {
+    mImageUrls = new ImageCache::UrlList();
+    mImageUrls->reserve(SINGLE_IMAGE_COUNT);
+
+    for(unsigned int i = 0; i < SINGLE_IMAGE_COUNT; ++i)
+    {
+      ImageCache::UrlStore urlStore;
+      urlStore.mTextureId = TextureManager::INVALID_TEXTURE_ID;
+      urlStore.mUrl       = imageUrl;
+      mImageUrls->push_back(urlStore);
+    }
+    mFrameCount = SINGLE_IMAGE_COUNT;
+  }
 }
 
 void AnimatedImageVisual::CreateImageCache()
@@ -219,7 +235,7 @@ void AnimatedImageVisual::CreateImageCache()
     }
   }
 
-  if(!mImageCache)
+  if(DALI_UNLIKELY(!mImageCache))
   {
     DALI_LOG_ERROR("mImageCache is null\n");
   }
@@ -266,7 +282,10 @@ AnimatedImageVisual::~AnimatedImageVisual()
   // If this is animated image, clear cache. Else if this is single frame image, this is affected be release policy.
   if(mFrameCount > SINGLE_IMAGE_COUNT || mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER)
   {
-    mImageCache->ClearCache();
+    if(DALI_LIKELY(mImageCache))
+    {
+      mImageCache->ClearCache();
+    }
   }
   delete mImageCache;
   delete mImageUrls;
@@ -297,7 +316,7 @@ void AnimatedImageVisual::GetNaturalSize(Vector2& naturalSize)
       }
     }
 
-    if(mImageUrl.IsValid())
+    if(mImageUrl.IsValid() && mAnimatedImageLoading)
     {
       mImageSize = mAnimatedImageLoading.GetImageSize();
     }
@@ -385,11 +404,8 @@ void AnimatedImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 {
   map.Clear();
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::ANIMATED_IMAGE);
-  if(mImageUrl.IsValid())
-  {
-    map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
-    map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
-  }
+  map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
+  map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
 }
 
 void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes)
@@ -628,7 +644,7 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
       if(value.Get(frameDelay))
       {
         mFrameDelay = frameDelay;
-        if(mImageCache)
+        if(DALI_LIKELY(mImageCache))
         {
           mImageCache->SetInterval(static_cast<uint32_t>(mFrameDelay));
         }
@@ -806,7 +822,10 @@ void AnimatedImageVisual::DoSetOffScene(Actor& actor)
   actor.RemoveRenderer(mImpl->mRenderer);
   if(mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED)
   {
-    mImageCache->ClearCache(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
+    if(DALI_LIKELY(mImageCache))
+    {
+      mImageCache->ClearCache(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
+    }
     mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
 
     TextureSet textureSet = TextureSet::New();
@@ -936,9 +955,14 @@ void AnimatedImageVisual::StartFirstFrame(TextureSet& textureSet, uint32_t first
 void AnimatedImageVisual::PrepareTextureSet()
 {
   TextureSet textureSet;
-  if(mImageCache)
+  if(DALI_LIKELY(mImageCache))
   {
     textureSet = mImageCache->FirstFrame();
+  }
+  else
+  {
+    // preMultiplied should be false because broken image don't premultiply alpha on load
+    FrameReady(TextureSet(), 0, false);
   }
 
   // Check whether synchronous loading is true or false for the first frame.
@@ -990,7 +1014,10 @@ void AnimatedImageVisual::FrameReady(TextureSet textureSet, uint32_t interval, b
 
   if(mStartFirstFrame)
   {
-    mFrameCount = mImageCache->GetTotalFrameCount();
+    if(DALI_LIKELY(mImageCache))
+    {
+      mFrameCount = mImageCache->GetTotalFrameCount();
+    }
     StartFirstFrame(textureSet, interval);
   }
   else
@@ -1012,7 +1039,7 @@ bool AnimatedImageVisual::DisplayNextFrame()
   TextureSet textureSet;
   bool       continueTimer = false;
 
-  if(mImageCache)
+  if(DALI_LIKELY(mImageCache))
   {
     uint32_t frameIndex = mImageCache->GetCurrentFrameIndex();
 
@@ -1094,8 +1121,13 @@ TextureSet AnimatedImageVisual::SetLoadingFailed()
   {
     imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
   }
-  mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
-  TextureSet textureSet = mImpl->mRenderer.GetTextures();
+
+  TextureSet textureSet;
+  if(DALI_LIKELY(mImpl->mRenderer))
+  {
+    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+    textureSet = mImpl->mRenderer.GetTextures();
+  }
 
   if(mFrameDelayTimer)
   {
