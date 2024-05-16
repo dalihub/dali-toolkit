@@ -10,6 +10,7 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_internal_dir}/common/model-cache-manager.cpp
 	${scene3d_internal_dir}/common/model-load-task.cpp
 	${scene3d_internal_dir}/controls/model/model-impl.cpp
+	${scene3d_internal_dir}/controls/panel/panel-impl.cpp
 	${scene3d_internal_dir}/controls/scene-view/scene-view-impl.cpp
 	${scene3d_internal_dir}/event/collider-mesh-processor.cpp
 	${scene3d_internal_dir}/event/collider-mesh-processor-impl.cpp
@@ -24,6 +25,7 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_internal_dir}/loader/json-util.cpp
 	${scene3d_internal_dir}/model-components/material-impl.cpp
 	${scene3d_internal_dir}/model-components/model-node-impl.cpp
+	${scene3d_internal_dir}/model-components/model-node-tree-utility.cpp
 	${scene3d_internal_dir}/model-components/model-primitive-impl.cpp
 	${scene3d_internal_dir}/model-motion/motion-data-impl.cpp
 	${scene3d_internal_dir}/model-motion/motion-data-load-task.cpp

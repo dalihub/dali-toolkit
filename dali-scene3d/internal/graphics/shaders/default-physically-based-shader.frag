@@ -136,6 +136,8 @@ const float kPcfTheta = 2.0 * kPi * kInvSampleCount;
 const float kSinPcfTheta = sin(kPcfTheta);
 const float kCosPcfTheta = cos(kPcfTheta);
 
+
+uniform mediump int uShadowLightIndex;
 uniform lowp int uEnableShadowSoftFiltering;
 uniform mediump float uShadowIntensity;
 uniform highp float uShadowBias;
@@ -280,7 +282,7 @@ void main()
     for(int i = 0; i < uLightCount; ++i)
     {
       highp vec3 l = normalize(-uLightDirection[i]); // Vector from surface point to light
-      highp vec3 h = normalize(l+v);               // Half vector between both l and v
+      highp vec3 h = normalize(l+v);                 // Half vector between both l and v
       highp float VdotH = dot(v, h);
       highp vec3 specularReflection = f0 + (reflectance90 - f0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
 
@@ -304,6 +306,9 @@ void main()
   if(float(uIsShadowReceiving) * float(uIsShadowEnabled) * uShadowIntensity > 0.0)
   {
     mediump float exposureFactor = 0.0;
+
+    highp vec3 l = normalize(-uLightDirection[uShadowLightIndex]);
+    highp float NdotL = dot(n, l);
     if(uEnableShadowSoftFiltering > 0)
     {
 #ifdef SL_VERSION_LOW
@@ -321,12 +326,20 @@ void main()
         exposureFactor += (depthValue < positionFromLightView.z - uShadowBias) ? 0.0 : 1.0;
       }
       exposureFactor *= kInvSampleCount;
+
+      // Blend filtered shadow and shadow from fragment normal to allow soft filtering nearby where the NdotL is zero.
+      highp float shadowFactor = clamp((NdotL + 0.5) * 2.0, 0.0f, 1.0);
+      exposureFactor = mix(0.0, exposureFactor, shadowFactor);
     }
     else
     {
-      mediump float depthValue = TEXTURE(sShadowMap, positionFromLightView.xy).r;
-      exposureFactor           = (depthValue < positionFromLightView.z - uShadowBias) ? 0.0 : 1.0;
+      if(NdotL > 0.0)
+      {
+        mediump float depthValue = TEXTURE(sShadowMap, positionFromLightView.xy).r;
+        exposureFactor           = (depthValue < positionFromLightView.z - uShadowBias) ? 0.0 : 1.0;
+      }
     }
+
     color *= (1.0 - (1.0 - exposureFactor) * uShadowIntensity);
   }
 

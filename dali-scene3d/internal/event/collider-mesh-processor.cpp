@@ -52,9 +52,9 @@ ColliderMeshProcessor ColliderMeshProcessor::Get()
   return processor;
 }
 
-void ColliderMeshProcessor::ColliderMeshChanged(Scene3D::Model model)
+void ColliderMeshProcessor::ColliderMeshChanged(Collidable* collidable)
 {
-  GetImpl(*this).ColliderMeshChanged(model);
+  GetImpl(*this).ColliderMeshChanged(collidable);
 }
 
 ColliderMeshProcessor::ColliderMeshProcessor(Internal::ColliderMeshProcessor* impl)

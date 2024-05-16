@@ -132,16 +132,25 @@ ColliderMeshProcessor::~ColliderMeshProcessor()
   }
 }
 
-void ColliderMeshProcessor::ColliderMeshChanged(Scene3D::Model model)
+void ColliderMeshProcessor::ColliderMeshChanged(Collidable* collidable)
 {
-  if(model.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  if(!collidable)
   {
-    AddSceneViewParentToProcessingQueue(model);
+    DALI_LOG_ERROR("The collider should not be null.\n");
   }
-  else
+
+  Actor actor = collidable->GetCollidableActor();
+  if(actor)
   {
-    // TODO: Check if signal already connected
-    model.OnSceneSignal().Connect(this, &ColliderMeshProcessor::ModelOnScene);
+    if(actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+    {
+      AddSceneViewParentToProcessingQueue(collidable->GetCollidableActor());
+    }
+    else
+    {
+      // TODO: Check if signal already connected
+      collidable->GetCollidableActor().OnSceneSignal().Connect(this, &ColliderMeshProcessor::ModelOnScene);
+    }
   }
 }
 
@@ -155,19 +164,19 @@ void ColliderMeshProcessor::ModelOnScene(Actor actor)
   model.OnSceneSignal().Disconnect(this, &ColliderMeshProcessor::ModelOnScene);
 }
 
-void ColliderMeshProcessor::AddSceneViewParentToProcessingQueue(Scene3D::Model model)
+void ColliderMeshProcessor::AddSceneViewParentToProcessingQueue(Actor actor)
 {
-  Actor actor = model;
+  Actor currentActor = actor;
   do
   {
-    actor = actor.GetParent();
-    Scene3D::SceneView sceneView(Scene3D::SceneView::DownCast(actor));
+    currentActor = currentActor.GetParent();
+    Scene3D::SceneView sceneView(Scene3D::SceneView::DownCast(currentActor));
     if(sceneView)
     {
       mSceneViewsToProcess.push_back(sceneView);
       break;
     }
-  } while(actor);
+  } while(currentActor);
 }
 
 void ColliderMeshProcessor::Process(bool /* postProcess */)

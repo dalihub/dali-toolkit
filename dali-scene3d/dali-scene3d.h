@@ -28,6 +28,7 @@
 #include <dali-scene3d/public-api/common/environment-map.h>
 
 #include <dali-scene3d/public-api/controls/model/model.h>
+#include <dali-scene3d/public-api/controls/panel/panel.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
 #include <dali-scene3d/public-api/loader/alpha-function-helper.h>

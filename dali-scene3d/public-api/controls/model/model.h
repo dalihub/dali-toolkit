@@ -379,7 +379,7 @@ public:
    * @brief Sets whether this Model casts shadow or not.
    * If it is true, this model is drawn on Shadow Map.
    *
-   * @SINCE_2_3.99
+   * @SINCE_2_3.37
    * @param[in] castShadow Whether this Model casts shadow or not.
    * @note This method affects all of the child ModelNode.
    * However, same property of each child ModelNode can be changed respectively and it not changes parent's property.
@@ -389,7 +389,7 @@ public:
   /**
    * @brief Retrieves whether the Model casts shadow or not for Light.
    *
-   * @SINCE_2_3.99
+   * @SINCE_2_3.37
    * @return True if this model casts shadow.
    * @note IBL does not cast any shadow.
    */
@@ -399,7 +399,7 @@ public:
    * @brief Sets whether this Model receives shadow or not.
    * If it is true, shadows are drawn on this model.
    *
-   * @SINCE_2_3.99
+   * @SINCE_2_3.37
    * @param[in] receiveShadow Whether this Model receives shadow or not.
    * @note This method affects all of the child ModelNode.
    * However, same property of each child ModelNode can be changed respectively and it not changes parent's property.
@@ -409,7 +409,7 @@ public:
   /**
    * @brief Retrieves whether the Model receives shadow or not for Light.
    *
-   * @SINCE_2_3.99
+   * @SINCE_2_3.37
    * @return True if this model receives shadow.
    */
   bool IsShadowReceiving() const;
@@ -423,7 +423,7 @@ public:
    * @endcode
    * Here the model is the model that is hit and the ModelNode containing the collider mesh
    * was applied to.
-   * The return value of True, indicates that the hover event should be consumed.
+   * The return value of True, indicates that the event should be consumed.
    * Otherwise the signal will be emitted on the next sensitive parent of the actor.
    *
    * @SINCE_2_2.53
