@@ -51,6 +51,11 @@ const char* TEST_IMAGE_FILE_NAME      = TEST_RESOURCE_DIR "/application-icon-%02
 const char* TEST_GIF_FILE_NAME        = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_MASK_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/mask.png";
 const char* TEST_WEBP_FILE_NAME       = TEST_RESOURCE_DIR "/dali-logo.webp";
+
+const char* TEST_N_PATCH_IMAGE_FILE_NAME         = TEST_RESOURCE_DIR "/heartsframe.9.png";
+const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg";
+const char* TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
+
 } // namespace
 
 void CopyUrlsIntoArray(Property::Array& urls, int startIndex = 0)
@@ -576,9 +581,7 @@ int UtcDaliAnimatedImageVisualImageLoadingFail02(void)
     application.SendNotification();
     application.Render(20);
 
-    // TODO : Since fixed-image-cache didn't support synchronous loading now, we need to wait for a while.
-    // We have to remove it in future!
-    //if(!(isSynchronousLoading == 1))
+    if(!(isSynchronousLoading == 1))
     {
       DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
     }
@@ -2307,6 +2310,40 @@ int UtcDaliAnimatedImageVisualFrameCountBeforeLoadingFinished(void)
   Property::Value* value3 = resultMap3.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER);
   DALI_TEST_CHECK(value3);
   DALI_TEST_EQUALS(value3->Get<int>(), 4, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualLoadNonRegularImage(void)
+{
+  ToolkitTestApplication application;
+
+  std::vector<std::pair<std::string, DevelVisual::Type>> urlAndExpectVisualTypes = {
+    {TEST_MASK_IMAGE_FILE_NAME, DevelVisual::IMAGE},
+    {TEST_N_PATCH_IMAGE_FILE_NAME, DevelVisual::N_PATCH},
+    {TEST_SVG_FILE_NAME, DevelVisual::SVG},
+    {TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, DevelVisual::ANIMATED_VECTOR_IMAGE},
+  };
+
+  for(const auto& urlAndExpectVisualTypePair : urlAndExpectVisualTypes)
+  {
+    tet_printf("Test AnimatedImageVisual with url: %s\n", urlAndExpectVisualTypePair.first.c_str());
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, urlAndExpectVisualTypePair.first);
+    propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+
+    Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+    DALI_TEST_CHECK(visual);
+
+    Property::Map resultMap;
+    visual.CreatePropertyMap(resultMap);
+
+    Property::Value* typeValue = resultMap.Find(Toolkit::Visual::Property::TYPE, Property::INTEGER);
+    DALI_TEST_CHECK(typeValue);
+    int type = typeValue->Get<int>();
+    DALI_TEST_EQUALS(type, static_cast<int>(urlAndExpectVisualTypePair.second), TEST_LOCATION);
+  }
 
   END_TEST;
 }

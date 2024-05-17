@@ -166,6 +166,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
     }
 
     case Toolkit::Visual::IMAGE:
+    case Toolkit::Visual::ANIMATED_IMAGE:
     {
       Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
       std::string      imageUrl;
@@ -198,7 +199,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
               case VisualUrl::GIF:
               case VisualUrl::WEBP:
               {
-                if(!(creationOptions & Toolkit::VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY))
+                if(visualType == Toolkit::DevelVisual::ANIMATED_IMAGE || !(creationOptions & Toolkit::VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY))
                 {
                   visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap);
                   break;
@@ -272,31 +273,6 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
         if(!imageUrl.empty())
         {
           visualPtr = SvgVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
-        }
-      }
-      break;
-    }
-
-    case Toolkit::Visual::ANIMATED_IMAGE:
-    {
-      Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
-      std::string      imageUrl;
-      if(imageURLValue)
-      {
-        if(imageURLValue->Get(imageUrl))
-        {
-          if(!imageUrl.empty())
-          {
-            visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
-          }
-        }
-        else
-        {
-          Property::Array* array = imageURLValue->GetArray();
-          if(array && array->Count() > 0)
-          {
-            visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), *array, propertyMap);
-          }
         }
       }
       break;
