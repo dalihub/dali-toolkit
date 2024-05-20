@@ -126,12 +126,21 @@ public:
        * @brief name "enableTransitionEffect", type Boolean
        *
        * This effect is a crossfade effect when the image is replaced.
-       * the default duration of the crossfade effect is 1.5 seconds.
+       * the default duration of the crossfade effect is 0.3 seconds.
        * if the placeholder is enabled, the cross effect applies when the image is changed from a placeholder image to a new image.
        * if not, the cross effect applies when a new image is shown or is changed from the previous image to a new image.
        * @SINCE_2_2.24
        */
       ENABLE_TRANSITION_EFFECT,
+
+      /**
+       * @brief name "transitionEffectOption", type Map
+       *
+       * This option is for transition effect when the image is replaced.
+       * if not, the cross effect use default option.
+       * @SINCE_2_2.24
+       */
+      TRANSITION_EFFECT_OPTION,
 
       // Animatable properties
 

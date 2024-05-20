@@ -356,6 +356,31 @@ const Vector<FontDescriptionRun>& Model::GetFontDescriptionRuns() const
   return mLogicalModel->mFontDescriptionRuns;
 }
 
+bool Model::IsRemoveFrontInset() const
+{
+  return mRemoveFrontInset;
+}
+
+bool Model::IsRemoveBackInset() const
+{
+  return mRemoveBackInset;
+}
+
+bool Model::IsCutoutEnabled() const
+{
+  return mVisualModel->IsCutoutEnabled();
+}
+
+const bool Model::IsBackgroundWithCutoutEnabled() const
+{
+  return mVisualModel->IsBackgroundWithCutoutEnabled();
+}
+
+const Vector4& Model::GetBackgroundColorWithCutout() const
+{
+  return mVisualModel->GetBackgroundColorWithCutout();
+}
+
 Model::Model()
 : mLogicalModel(),
   mVisualModel(),

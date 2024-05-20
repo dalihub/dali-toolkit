@@ -41,6 +41,13 @@ typedef IntrusivePtr<TransitionData> TransitionDataPtr;
 class TransitionData : public BaseObject
 {
 public:
+    enum class AnimationType : uint8_t
+  {
+    TO,     ///< Animating TO the given value
+    BY,     ///< Animating BY the given value
+    BETWEEN ///< Animating BETWEEN key-frames
+  };
+
   /**
    * @brief TransitionDataElement Describes one animator of an transition.
    */
@@ -51,6 +58,7 @@ public:
       alphaFunction(AlphaFunction::DEFAULT),
       timePeriodDelay(0.0f),
       timePeriodDuration(1.0f),
+      animationType(AnimationType::TO),
       animate(false)
     {
     }
@@ -62,6 +70,7 @@ public:
     Dali::AlphaFunction alphaFunction;
     float               timePeriodDelay;
     float               timePeriodDuration;
+    AnimationType       animationType;
     bool                animate;
   };
 

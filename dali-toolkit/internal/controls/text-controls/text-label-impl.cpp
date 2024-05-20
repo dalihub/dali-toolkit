@@ -46,6 +46,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
@@ -146,6 +147,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "anchorColor",   
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "anchorClickedColor",           VECTOR4, ANCHOR_CLICKED_COLOR           )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "removeFrontInset",             BOOLEAN, REMOVE_FRONT_INSET             )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "removeBackInset",              BOOLEAN, REMOVE_BACK_INSET              )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "cutout",                       BOOLEAN, CUTOUT                         )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR   )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0)
@@ -604,6 +606,19 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         impl.mController->SetRemoveBackInset(remove);
         break;
       }
+      case Toolkit::DevelTextLabel::Property::CUTOUT:
+      {
+        const bool cutout = value.Get<bool>();
+
+        impl.mController->SetTextCutout(cutout);
+
+        // Property doesn't affect the layout, only Visual must be updated
+        TextVisual::EnableRendererUpdate(impl.mVisual);
+
+        // No need to trigger full re-layout. Instead call UpdateRenderer() directly
+        TextVisual::UpdateRenderer(impl.mVisual);
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -888,6 +903,11 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
         value = impl.mController->IsRemoveBackInset();
         break;
       }
+      case Toolkit::DevelTextLabel::Property::CUTOUT:
+      {
+        value = impl.mController->IsTextCutout();
+        break;
+      }
     }
   }
 
@@ -1078,6 +1098,49 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
     case Toolkit::TextLabel::Property::ENABLE_MARKUP:
     {
       CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
+      break;
+    }
+    case Toolkit::Control::Property::BACKGROUND:
+    {
+      const Vector4 backgroundColor = propertyValue.Get<Vector4>();
+
+      if(mController->IsTextCutout())
+      {
+        DevelControl::EnableVisual(*this, Toolkit::Control::Property::BACKGROUND, false);
+        mController->SetBackgroundWithCutoutEnabled(true);
+        mController->SetBackgroundColorWithCutout(backgroundColor);
+      }
+
+      break;
+    }
+    case Toolkit::DevelTextLabel::Property::CUTOUT:
+    {
+      const bool cutoutEnabled = propertyValue.Get<bool>();
+
+      if(cutoutEnabled)
+      {
+        Vector4 backgroundColor = Vector4::ZERO;
+
+        const Property::Map backgroundMap   = Self().GetProperty(Toolkit::Control::Property::BACKGROUND).Get<Property::Map>();
+        Property::Value*    backgroundValue = backgroundMap.Find(ColorVisual::Property::MIX_COLOR);
+        if(backgroundValue)
+        {
+          backgroundColor = backgroundValue->Get<Vector4>();
+        }
+
+        DevelControl::EnableVisual(*this, Toolkit::Control::Property::BACKGROUND, false);
+        mController->SetBackgroundWithCutoutEnabled(true);
+        mController->SetBackgroundColorWithCutout(backgroundColor);
+      }
+      else
+      {
+        DevelControl::EnableVisual(*this, Toolkit::Control::Property::BACKGROUND, true);
+
+        Property::Map backgroundMapSet;
+        mController->SetBackgroundWithCutoutEnabled(false);
+      }
+
+      TextVisual::SetRequireRender(mVisual, cutoutEnabled);
       break;
     }
     default:

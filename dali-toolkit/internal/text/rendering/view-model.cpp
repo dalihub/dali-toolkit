@@ -769,6 +769,31 @@ const Vector<FontDescriptionRun>& ViewModel::GetFontDescriptionRuns() const
   return mModel->GetFontDescriptionRuns();
 }
 
+bool ViewModel::IsRemoveFrontInset() const
+{
+  return mModel->IsRemoveFrontInset();
+}
+
+bool ViewModel::IsRemoveBackInset() const
+{
+  return mModel->IsRemoveBackInset();
+}
+
+bool ViewModel::IsCutoutEnabled() const
+{
+  return mModel->IsCutoutEnabled();
+}
+
+const bool ViewModel::IsBackgroundWithCutoutEnabled() const
+{
+  return mModel->IsBackgroundWithCutoutEnabled();
+}
+
+const Vector4& ViewModel::GetBackgroundColorWithCutout() const
+{
+  return mModel->GetBackgroundColorWithCutout();
+}
+
 } // namespace Text
 
 } // namespace Toolkit

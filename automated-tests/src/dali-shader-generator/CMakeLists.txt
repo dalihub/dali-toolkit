@@ -110,25 +110,37 @@ ADD_CUSTOM_TARGET(test_invalid_indir ALL COMMAND ${SHADER_GENERATOR} ONE TWO > /
 ADD_CUSTOM_TARGET(
   test_check_built_in_created
   ALL
-  COMMAND ${SHADER_GENERATOR} . ${GENERATED_FOLDER} | grep builtin-shader | wc -l | grep 2 > /dev/null 2>&1 && echo "test_check_built_in_created Succeeded"
+  COMMAND rm -rf ${GENERATED_FOLDER}/check_built_in
+  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER}/check_built_in/generated | grep builtin-shader | wc -l | grep 2 > /dev/null 2>&1 && echo "test_check_built_in_created Succeeded"
   VERBATIM)
 ADD_CUSTOM_TARGET(
   test_check_built_in_not_created
   ALL
-  COMMAND ${SHADER_GENERATOR} --skip . ${GENERATED_FOLDER} | grep builtin-shader > /dev/null 2>&1 || echo "test_check_built_in_not_created Succeeded"
+  COMMAND rm -rf ${GENERATED_FOLDER}/skip_built_in
+  COMMAND ${SHADER_GENERATOR} --skip ${SHADER_FOLDER} ${GENERATED_FOLDER}/skip_built_in/generated | grep builtin-shader > /dev/null 2>&1 && exit 1 || echo "test_check_built_in_not_created Succeeded"
   VERBATIM)
 ADD_CUSTOM_TARGET(
   test_frag_correct
   ALL
-  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER} | grep "SHADER_FRAGMENT_SHADER_FRAG" | grep "fragment-shader-frag.h" > /dev/null 2>&1 && echo "test_frag_correct Succeeded"
+  COMMAND rm -rf ${GENERATED_FOLDER}/frag_correct
+  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER}/frag_correct/generated | grep "SHADER_FRAGMENT_SHADER_FRAG" | grep "fragment-shader-frag.h" > /dev/null 2>&1 && echo "test_frag_correct Succeeded"
   VERBATIM)
 ADD_CUSTOM_TARGET(
   test_vert_correct
   ALL
-  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER} | grep "SHADER_VERTEX_SHADER_VERT" | grep "vertex-shader-vert.h" > /dev/null 2>&1 && echo "test_vert_correct Succeeded"
+  COMMAND rm -rf ${GENERATED_FOLDER}/vert_correct
+  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER}/vert_correct/generated | grep "SHADER_VERTEX_SHADER_VERT" | grep "vertex-shader-vert.h" > /dev/null 2>&1 && echo "test_vert_correct Succeeded"
   VERBATIM)
 ADD_CUSTOM_TARGET(
   test_def_correct
   ALL
-  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER} | grep "SHADER_SHADER_DEFINE_DEF" | grep "shader-define-def.h" > /dev/null 2>&1 && echo "test_def_correct Succeeded"
+  COMMAND rm -rf ${GENERATED_FOLDER}/def_correct
+  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER}/def_correct/generated | grep "SHADER_SHADER_DEFINE_DEF" | grep "shader-define-def.h" > /dev/null 2>&1 && echo "test_def_correct Succeeded"
+  VERBATIM)
+ADD_CUSTOM_TARGET(
+  test_no_overwrite
+  ALL
+  COMMAND rm -rf ${GENERATED_FOLDER}/no_overwrite
+  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER}/no_overwrite/generated | grep "SHADER_SHADER_DEFINE_DEF" | grep "shader-define-def.h" > /dev/null 2>&1
+  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER}/no_overwrite/generated | grep "SHADER_SHADER_DEFINE_DEF" | grep "shader-define-def.h" > /dev/null 2>&1 && exit 1 || echo "test_no_overwrite Succeeded"
   VERBATIM)

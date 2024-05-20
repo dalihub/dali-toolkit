@@ -388,6 +388,31 @@ public:
    */
   const Vector<FontDescriptionRun>& GetFontDescriptionRuns() const override;
 
+  /**
+   * @copydoc ModelInterface::IsRemoveFrontInset()
+   */
+  bool IsRemoveFrontInset() const override;
+
+  /**
+   * @copydoc ModelInterface::IsRemoveBackInset()
+   */
+  bool IsRemoveBackInset() const override;
+
+  /**
+   * @copydoc ModelInterface::IsCutoutEnabled()
+   */
+  bool IsCutoutEnabled() const override;
+
+  /**
+   * @copydoc ModelInterface::IsBackgroundWithCutoutEnabled()
+   */
+  const bool IsBackgroundWithCutoutEnabled() const override;
+
+  /**
+   * @copydoc ModelInterface::GetBackgroundColorWithCutout()
+   */
+  const Vector4& GetBackgroundColorWithCutout() const override;
+
 private:
   const ModelInterface* const mModel;                           ///< Pointer to the text's model.
   Vector<GlyphInfo>           mElidedGlyphs;                    ///< Stores the glyphs of the elided text.

@@ -662,6 +662,48 @@ public:
    */
   const Vector<CharacterSpacingGlyphRun>& GetCharacterSpacingGlyphRuns() const;
 
+  /**
+   * @brief Sets the cutout flag.
+   *
+   * @param[in] enable true if cutouted.
+   */
+  void SetCutoutEnabled(bool enable);
+
+  /**
+   * @brief Returns whether the text is cutouted or not.
+   *
+   * @return cutout state.
+   */
+  bool IsCutoutEnabled() const;
+
+  /**
+   * @brief Sets the background with cutout flag.
+   *
+   * @param[in] enable true if background enabled.
+   */
+  void SetBackgroundWithCutoutEnabled(bool enable);
+
+  /**
+   * @brief Returns whether the text is cutouted or not.
+   *
+   * @return True if enabled.
+   */
+  bool IsBackgroundWithCutoutEnabled() const;
+
+  /**
+   * @brief Sets the Color of background with cutout.
+   *
+   * @param[in] color The color to set.
+   */
+  void SetBackgroundColorWithCutout(const Vector4& color);
+
+  /**
+   * @brief Retrieves the Color of background with cutout.
+   *
+   * @return The color.
+   */
+  const Vector4& GetBackgroundColorWithCutout() const;
+
 protected:
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -681,37 +723,38 @@ private:
   VisualModel& operator=(const VisualModel& handle);
 
 public:
-  Vector<GlyphInfo>                mGlyphs;                 ///< For each glyph, the font's id, glyph's index within the font and glyph's metrics.
-  Vector<CharacterIndex>           mGlyphsToCharacters;     ///< For each glyph, the index of the first character.
-  Vector<GlyphIndex>               mCharactersToGlyph;      ///< For each character, the index of the first glyph.
-  Vector<Length>                   mCharactersPerGlyph;     ///< For each glyph, the number of characters that form the glyph.
-  Vector<Length>                   mGlyphsPerCharacter;     ///< For each character, the number of glyphs that are shaped.
-  Vector<Vector2>                  mGlyphPositions;         ///< For each glyph, the position.
-  Vector<LineRun>                  mLines;                  ///< The laid out lines.
-  Vector<UnderlinedGlyphRun>       mUnderlineRuns;          ///< Runs of glyphs that are underlined.
-  Vector<Vector4>                  mColors;                 ///< Colors of the glyphs.
-  Vector<ColorIndex>               mColorIndices;           ///< Indices to the vector of colors for each glyphs.
-  Vector<Vector4>                  mBackgroundColors;       ///< Background colors of the glyphs.
-  Vector<ColorIndex>               mBackgroundColorIndices; ///< Indices to the vector of background colors for each glyphs.
-  Vector4                          mTextColor;              ///< The text color
-  Vector4                          mShadowColor;            ///< Color of drop shadow
-  Vector4                          mUnderlineColor;         ///< Color of underline
-  Vector4                          mOutlineColor;           ///< Color of outline
-  Vector4                          mBackgroundColor;        ///< Color of text background
-  Vector4                          mStrikethroughColor;     ///< Color of text background
-  Size                             mControlSize;            ///< The size of the UI control.
-  Vector2                          mShadowOffset;           ///< Offset for drop shadow, 0 indicates no shadow
-  Vector2                          mOutlineOffset;          ///< Offset for outline
-  float                            mUnderlineHeight;        ///< Fixed height for underline to override font metrics.
-  float                            mStrikethroughHeight;    ///< Fixed height for strikethrough to override font metrics.
-  Text::Underline::Type            mUnderlineType;          ///< The type of the underline.
-  float                            mDashedUnderlineWidth;   ///< The width of the dashes of the dashed underline.
-  float                            mDashedUnderlineGap;     ///< The gap between the dashes of the dashed underline.
-  float                            mShadowBlurRadius;       ///< Blur radius of shadow, 0 indicates no blur.
+  Vector<GlyphInfo>                mGlyphs;                     ///< For each glyph, the font's id, glyph's index within the font and glyph's metrics.
+  Vector<CharacterIndex>           mGlyphsToCharacters;         ///< For each glyph, the index of the first character.
+  Vector<GlyphIndex>               mCharactersToGlyph;          ///< For each character, the index of the first glyph.
+  Vector<Length>                   mCharactersPerGlyph;         ///< For each glyph, the number of characters that form the glyph.
+  Vector<Length>                   mGlyphsPerCharacter;         ///< For each character, the number of glyphs that are shaped.
+  Vector<Vector2>                  mGlyphPositions;             ///< For each glyph, the position.
+  Vector<LineRun>                  mLines;                      ///< The laid out lines.
+  Vector<UnderlinedGlyphRun>       mUnderlineRuns;              ///< Runs of glyphs that are underlined.
+  Vector<Vector4>                  mColors;                     ///< Colors of the glyphs.
+  Vector<ColorIndex>               mColorIndices;               ///< Indices to the vector of colors for each glyphs.
+  Vector<Vector4>                  mBackgroundColors;           ///< Background colors of the glyphs.
+  Vector<ColorIndex>               mBackgroundColorIndices;     ///< Indices to the vector of background colors for each glyphs.
+  Vector4                          mTextColor;                  ///< The text color
+  Vector4                          mShadowColor;                ///< Color of drop shadow
+  Vector4                          mUnderlineColor;             ///< Color of underline
+  Vector4                          mOutlineColor;               ///< Color of outline
+  Vector4                          mBackgroundColor;            ///< Color of text background
+  Vector4                          mStrikethroughColor;         ///< Color of text background
+  Size                             mControlSize;                ///< The size of the UI control.
+  Vector2                          mShadowOffset;               ///< Offset for drop shadow, 0 indicates no shadow
+  Vector2                          mOutlineOffset;              ///< Offset for outline
+  float                            mUnderlineHeight;            ///< Fixed height for underline to override font metrics.
+  float                            mStrikethroughHeight;        ///< Fixed height for strikethrough to override font metrics.
+  Text::Underline::Type            mUnderlineType;              ///< The type of the underline.
+  float                            mDashedUnderlineWidth;       ///< The width of the dashes of the dashed underline.
+  float                            mDashedUnderlineGap;         ///< The gap between the dashes of the dashed underline.
+  float                            mShadowBlurRadius;           ///< Blur radius of shadow, 0 indicates no blur.
   float                            mOutlineBlurRadius;      ///< Blur radius of outline, 0 indicates no blur.
-  uint16_t                         mOutlineWidth;           ///< Width of outline.
-  Vector<StrikethroughGlyphRun>    mStrikethroughRuns;      ///< Runs of glyphs that have strikethrough.
-  Vector<CharacterSpacingGlyphRun> mCharacterSpacingRuns;   ///< Runs of glyphs that have character-spacing.
+  uint16_t                         mOutlineWidth;               ///< Width of outline.
+  Vector<StrikethroughGlyphRun>    mStrikethroughRuns;          ///< Runs of glyphs that have strikethrough.
+  Vector<CharacterSpacingGlyphRun> mCharacterSpacingRuns;       ///< Runs of glyphs that have character-spacing.
+  Vector4                          mBackgroundColorWithCutout;  ///< Background color with cutout.
 
 private:
   Size mNaturalSize;    ///< Size of the text with no line wrapping.
@@ -729,13 +772,15 @@ private:
   bool                              mTextElideEnabled : 1;            ///< Whether the text's elide is enabled.
 
 public:
-  bool       mUnderlineEnabled : 1;       ///< Underline enabled flag
-  bool       mUnderlineColorSet : 1;      ///< Has the underline color been explicitly set?
-  bool       mBackgroundEnabled : 1;      ///< Background enabled flag
-  bool       mMarkupProcessorEnabled : 1; ///< Markup-processor enabled flag
-  HyphenInfo mHyphen;                     ///< Contains hyphen glyph info & the character index to draw hyphen after.
-  bool       mStrikethroughEnabled : 1;   ///< Strikethrough enabled flag
-  float      mCharacterSpacing;           ///< Contains the value of the character spacing.
+  bool       mUnderlineEnabled : 1;             ///< Underline enabled flag
+  bool       mUnderlineColorSet : 1;            ///< Has the underline color been explicitly set?
+  bool       mBackgroundEnabled : 1;            ///< Background enabled flag
+  bool       mMarkupProcessorEnabled : 1;       ///< Markup-processor enabled flag
+  HyphenInfo mHyphen;                           ///< Contains hyphen glyph info & the character index to draw hyphen after.
+  bool       mStrikethroughEnabled : 1;         ///< Strikethrough enabled flag
+  float      mCharacterSpacing;                 ///< Contains the value of the character spacing.
+  bool       mCutoutEnabled : 1;                ///< Cutout enabled flag
+  bool       mBackgroundWithCutoutEnabled : 1;  ///< Background with cutout enabled flag.
 };
 
 } // namespace Text

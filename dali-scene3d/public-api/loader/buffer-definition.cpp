@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ void BufferDefinition::LoadBuffer()
   {
     if(mUri.find(EMBEDDED_DATA_PREFIX.data()) == 0 && mUri.find(EMBEDDED_DATA_APPLICATION_MEDIA_TYPE.data(), EMBEDDED_DATA_PREFIX.length()) == EMBEDDED_DATA_PREFIX.length())
     {
-      uint32_t position = mUri.find(EMBEDDED_DATA_BASE64_ENCODING_TYPE.data(), EMBEDDED_DATA_PREFIX.length() + EMBEDDED_DATA_APPLICATION_MEDIA_TYPE.length());
+      auto position = mUri.find(EMBEDDED_DATA_BASE64_ENCODING_TYPE.data(), EMBEDDED_DATA_PREFIX.length() + EMBEDDED_DATA_APPLICATION_MEDIA_TYPE.length());
       if(position != std::string::npos)
       {
         position += EMBEDDED_DATA_BASE64_ENCODING_TYPE.length();

@@ -665,6 +665,36 @@ const Vector<CharacterIndex>& VisualModel::GetGlyphsToCharacters() const
   return mGlyphsToCharacters;
 }
 
+void VisualModel::SetCutoutEnabled(bool enable)
+{
+  mCutoutEnabled = enable;
+}
+
+bool VisualModel::IsCutoutEnabled() const
+{
+  return mCutoutEnabled;
+}
+
+void VisualModel::SetBackgroundWithCutoutEnabled(bool enable)
+{
+  mBackgroundWithCutoutEnabled = enable;
+}
+
+bool VisualModel::IsBackgroundWithCutoutEnabled() const
+{
+  return mBackgroundWithCutoutEnabled;
+}
+
+void VisualModel::SetBackgroundColorWithCutout(const Vector4& color)
+{
+  mBackgroundColorWithCutout = color;
+}
+
+const Vector4& VisualModel::GetBackgroundColorWithCutout() const
+{
+  return mBackgroundColorWithCutout;
+}
+
 VisualModel::~VisualModel()
 {
 }
@@ -709,8 +739,9 @@ VisualModel::VisualModel()
   mBackgroundEnabled(false),
   mMarkupProcessorEnabled(false),
   mStrikethroughEnabled(false),
-  mCharacterSpacing(0.0f)
-
+  mCharacterSpacing(0.0f),
+  mCutoutEnabled(false),
+  mBackgroundWithCutoutEnabled(false)
 {
 }
 
