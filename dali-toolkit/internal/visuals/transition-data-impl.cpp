@@ -39,6 +39,7 @@ const char* TOKEN_TIME_PERIOD("timePeriod");
 const char* TOKEN_DURATION("duration");
 const char* TOKEN_DELAY("delay");
 const char* TOKEN_ALPHA_FUNCTION("alphaFunction");
+const char* TOKEN_ANIMATION_TYPE("animationType");
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN(ALPHA_FUNCTION_BUILTIN)
   DALI_ENUM_TO_STRING_WITH_SCOPE(AlphaFunction, LINEAR)
@@ -312,6 +313,24 @@ TransitionData::Animator* TransitionData::ConvertMap(const Property::Map& map)
             else if(key == TOKEN_DURATION)
             {
               animator->timePeriodDuration = pair.second.Get<float>();
+            }
+          }
+        }
+        else if(key == TOKEN_ANIMATION_TYPE)
+        {
+          if((value.GetType() == Property::STRING))
+          {
+            if(value.Get<std::string>() == "TO")
+            {
+              animator->animationType = AnimationType::TO;
+            }
+            else if(value.Get<std::string>() == "BETWEEN")
+            {
+              animator->animationType = AnimationType::BETWEEN;
+            }
+            else if(value.Get<std::string>() == "BY")
+            {
+              animator->animationType = AnimationType::BY;
             }
           }
         }

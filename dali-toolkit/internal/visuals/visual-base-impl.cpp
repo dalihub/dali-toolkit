@@ -1043,7 +1043,10 @@ void Visual::Base::SetupTransition(
       {
         if(animator.initialValue.GetType() != Property::NONE)
         {
-          mImpl->mRenderer.SetProperty(index, initialValue);
+          if(animator.animationType != TransitionData::AnimationType::BETWEEN)
+          {
+            mImpl->mRenderer.SetProperty(index, initialValue);
+          }
         }
 
         if(!transition)
@@ -1051,11 +1054,26 @@ void Visual::Base::SetupTransition(
           transition = Dali::Animation::New(0.1f);
         }
 
-        transition.AnimateTo(Property(mImpl->mRenderer, index),
-                             targetValue,
-                             animator.alphaFunction,
-                             TimePeriod(animator.timePeriodDelay,
-                                        animator.timePeriodDuration));
+        if(animator.animationType == TransitionData::AnimationType::BETWEEN)
+        {
+          Dali::KeyFrames keyFrames = Dali::KeyFrames::New();
+          keyFrames.Add(0.0f, animator.initialValue);
+          keyFrames.Add(1.0f, animator.targetValue);
+          transition.AnimateBetween(Property(mImpl->mRenderer, index),keyFrames, TimePeriod(animator.timePeriodDelay, animator.timePeriodDuration));
+        }
+        else if(animator.animationType == TransitionData::AnimationType::BY)
+        {
+          // To Do
+          DALI_LOG_WARNING("AnimationType::By is not supported yet. \n");
+        }
+        else
+        {
+          transition.AnimateTo(Property(mImpl->mRenderer, index),
+                      targetValue,
+                      animator.alphaFunction,
+                      TimePeriod(animator.timePeriodDelay,
+                                animator.timePeriodDuration));
+        }
       }
     }
   }
