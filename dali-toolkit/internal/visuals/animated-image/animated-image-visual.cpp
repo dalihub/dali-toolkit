@@ -346,14 +346,14 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::DevelImageVisual::Property::CURRENT_FRAME_NUMBER, (mImageCache) ? static_cast<int32_t>(mImageCache->GetCurrentFrameIndex()) : -1);
 
   // This returns -1 until the loading is finished.
-  int32_t frameCount = mFrameCount;
+  auto frameCount = int32_t(mFrameCount);
   if(mImageCache && frameCount == 0)
   {
     frameCount = mImageCache->GetTotalFrameCount();
 
-    if(frameCount <= SINGLE_IMAGE_COUNT && mAnimatedImageLoading && mAnimatedImageLoading.HasLoadingSucceeded())
+    if(frameCount <= int32_t(SINGLE_IMAGE_COUNT) && mAnimatedImageLoading && mAnimatedImageLoading.HasLoadingSucceeded())
     {
-      frameCount = mAnimatedImageLoading.GetImageCount();
+      frameCount = int32_t(mAnimatedImageLoading.GetImageCount());
     }
     else
     {
