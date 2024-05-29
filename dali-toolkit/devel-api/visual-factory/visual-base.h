@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
 
 // INTERNAL INCLUDES
@@ -192,6 +193,22 @@ public:
    * @param[out] map The visual property map.
    */
   void CreatePropertyMap(Dali::Property::Map& map) const;
+
+  /**
+   * @brief Performs an action on the visual with the given action id and attributes.
+   *
+   * @param[in] actionId The id of the action to perform this API only takes an Index
+   * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
+   */
+  void DoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes);
+
+  /**
+   * @brief Performs an action on the visual with the given action id and attributes.
+   *
+   * @param[in] actionId The id of the action to perform this API only takes an Index
+   * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
+   */
+  void DoActionExtension(const Dali::Property::Index actionId, const Dali::Any& attributes);
 
   /**
    * @brief Get the type of this visual.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,9 +71,8 @@ int UtcDaliVisualAction(void)
 
   tet_infoline("Perform TEST_ACTION action on Visual. Should increase the action counter");
 
-  Property::Map                    attributes;
-  Toolkit::Internal::Visual::Base& internalVisualBase = GetImplementation(visualBaseHandle);
-  internalVisualBase.DoAction(Dali::Toolkit::Internal::DummyVisual::TEST_ACTION, attributes);
+  Property::Map attributes;
+  visualBaseHandle.DoAction(Dali::Toolkit::Internal::DummyVisual::TEST_ACTION, attributes);
   application.SendNotification();
   DALI_TEST_EQUALS(dummyVisualPtr->GetActionCounter(), 1, TEST_LOCATION);
 
@@ -113,7 +112,82 @@ int UtcDaliVisualActionNotImplemented(void)
 
   tet_infoline("Perform TEST_ACTION action on Color Visual which does not support it.. Should not increment the action counter");
   Property::Map attributes;
-  GetImplementation(visual).DoAction(Dali::Toolkit::Internal::DummyVisual::TEST_ACTION, attributes);
+  visual.DoAction(Dali::Toolkit::Internal::DummyVisual::TEST_ACTION, attributes);
+  application.SendNotification();
+  DALI_TEST_EQUALS(dummyVisualPtr->GetActionCounter(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVisualActionExtension(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Register an ImageVisual and and perform an Action with Any attributes on Visual directly");
+  Vector2 controlSize(20.f, 30.f);
+
+  //Created DummyVisual
+  Property::Map                     settings;
+  Toolkit::Internal::DummyVisualPtr dummyVisualPtr = Toolkit::Internal::DummyVisual::New(settings);
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  tet_infoline("Register visual and stage control");
+
+  Toolkit::Visual::Base visualBaseHandle = Toolkit::Visual::Base(dummyVisualPtr.Get());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visualBaseHandle);
+  dummyControl.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Check action counter is 0 before DoAction");
+  DALI_TEST_EQUALS(dummyVisualPtr->GetActionCounter(), 0, TEST_LOCATION);
+
+  tet_infoline("Perform TEST_ACTION_EXTENSION action on Visual. Should increase the action counter");
+  Dali::Any attributes;
+  visualBaseHandle.DoActionExtension(Dali::Toolkit::Internal::DummyVisual::TEST_ACTION_EXTENSION, attributes);
+  application.SendNotification();
+  DALI_TEST_EQUALS(dummyVisualPtr->GetActionCounter(), 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVisualActionExtensionNotImplemented(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Register an ImageVisual and and perform an ActionExtension on a Visual which does not support any Actions");
+  Vector2 controlSize(20.f, 30.f);
+
+  //Created DummyVisual
+  Property::Map                     settings;
+  Toolkit::Internal::DummyVisualPtr dummyVisualPtr = Toolkit::Internal::DummyVisual::New(settings);
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  tet_infoline("Register visual and stage control");
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR, Color::BLUE);
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+  dummyControl.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Check action counter is 0 before DoActionExtension");
+  DALI_TEST_EQUALS(dummyVisualPtr->GetActionCounter(), 0, TEST_LOCATION);
+
+  tet_infoline("Perform TEST_ACTION_EXTENSION action on Color Visual which does not support it.. Should not increment the action counter");
+  Dali::Any attributes;
+  visual.DoActionExtension(Dali::Toolkit::Internal::DummyVisual::TEST_ACTION_EXTENSION, attributes);
   application.SendNotification();
   DALI_TEST_EQUALS(dummyVisualPtr->GetActionCounter(), 0, TEST_LOCATION);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,16 @@ int Visual::Base::GetDepthIndex() const
 void Visual::Base::CreatePropertyMap(Dali::Property::Map& map) const
 {
   GetImplementation(*this).CreatePropertyMap(map);
+}
+
+void Visual::Base::DoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes)
+{
+  GetImplementation(*this).DoAction(actionId, attributes);
+}
+
+void Visual::Base::DoActionExtension(const Dali::Property::Index actionId, const Dali::Any& attributes)
+{
+  GetImplementation(*this).DoActionExtension(actionId, attributes);
 }
 
 Visual::Type Visual::Base::GetType() const

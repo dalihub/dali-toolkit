@@ -99,6 +99,7 @@ VisualFactory::VisualFactory(bool debugEnabled)
   mTextVisualShaderFactory(),
   mSlotDelegate(this),
   mIdleCallback(nullptr),
+  mDefaultCreationOptions(Toolkit::VisualFactory::CreationOptions::NONE),
   mDebugEnabled(debugEnabled),
   mPreMultiplyOnLoad(true),
   mPrecompiledShaderRequested(false)
@@ -130,6 +131,11 @@ void VisualFactory::OnBrokenImageChangedSignal(Toolkit::StyleManager styleManage
 
 Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap)
 {
+  return CreateVisual(propertyMap, mDefaultCreationOptions);
+}
+
+Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap, Toolkit::VisualFactory::CreationOptions creationOptions)
+{
   Visual::BasePtr visualPtr;
 
   Property::Value*           typeValue  = propertyMap.Find(Toolkit::Visual::Property::TYPE, VISUAL_TYPE);
@@ -160,6 +166,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
     }
 
     case Toolkit::Visual::IMAGE:
+    case Toolkit::Visual::ANIMATED_IMAGE:
     {
       Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
       std::string      imageUrl;
@@ -184,16 +191,20 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
                 visualPtr = SvgVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap);
                 break;
               }
-              case VisualUrl::GIF:
-              case VisualUrl::WEBP:
-              {
-                visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap);
-                break;
-              }
               case VisualUrl::JSON:
               {
                 visualPtr = AnimatedVectorImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
                 break;
+              }
+              case VisualUrl::GIF:
+              case VisualUrl::WEBP:
+              {
+                if(visualType == Toolkit::DevelVisual::ANIMATED_IMAGE || !(creationOptions & Toolkit::VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY))
+                {
+                  visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap);
+                  break;
+                }
+                DALI_FALLTHROUGH;
               }
               case VisualUrl::REGULAR_IMAGE:
               {
@@ -267,31 +278,6 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
       break;
     }
 
-    case Toolkit::Visual::ANIMATED_IMAGE:
-    {
-      Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
-      std::string      imageUrl;
-      if(imageURLValue)
-      {
-        if(imageURLValue->Get(imageUrl))
-        {
-          if(!imageUrl.empty())
-          {
-            visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
-          }
-        }
-        else
-        {
-          Property::Array* array = imageURLValue->GetArray();
-          if(array && array->Count() > 0)
-          {
-            visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), *array, propertyMap);
-          }
-        }
-      }
-      break;
-    }
-
     case Toolkit::DevelVisual::ANIMATED_GRADIENT:
     {
       visualPtr = AnimatedGradientVisual::New(GetFactoryCache(), propertyMap);
@@ -342,6 +328,11 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
 
 Toolkit::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageDimensions size)
 {
+  return CreateVisual(url, size, mDefaultCreationOptions);
+}
+
+Toolkit::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageDimensions size, Toolkit::VisualFactory::CreationOptions creationOptions)
+{
   Visual::BasePtr visualPtr;
 
   if(!url.empty())
@@ -361,16 +352,20 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageD
         visualPtr = SvgVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, size);
         break;
       }
-      case VisualUrl::GIF:
-      case VisualUrl::WEBP:
-      {
-        visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, size);
-        break;
-      }
       case VisualUrl::JSON:
       {
         visualPtr = AnimatedVectorImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, size);
         break;
+      }
+      case VisualUrl::GIF:
+      case VisualUrl::WEBP:
+      {
+        if(!(creationOptions & Toolkit::VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY))
+        {
+          visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, size);
+          break;
+        }
+        DALI_FALLTHROUGH;
       }
       case VisualUrl::REGULAR_IMAGE:
       {
@@ -401,6 +396,16 @@ void VisualFactory::SetPreMultiplyOnLoad(bool preMultiply)
 bool VisualFactory::GetPreMultiplyOnLoad() const
 {
   return mPreMultiplyOnLoad;
+}
+
+void VisualFactory::SetDefaultCreationOptions(Toolkit::VisualFactory::CreationOptions creationOptions)
+{
+  mDefaultCreationOptions = creationOptions;
+}
+
+Toolkit::VisualFactory::CreationOptions VisualFactory::GetDefaultCreationOptions() const
+{
+  return mDefaultCreationOptions;
 }
 
 void VisualFactory::DiscardVisual(Toolkit::Visual::Base visual)

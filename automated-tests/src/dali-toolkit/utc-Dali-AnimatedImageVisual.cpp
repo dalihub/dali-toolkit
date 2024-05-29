@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,11 @@ const char* TEST_IMAGE_FILE_NAME      = TEST_RESOURCE_DIR "/application-icon-%02
 const char* TEST_GIF_FILE_NAME        = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_MASK_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/mask.png";
 const char* TEST_WEBP_FILE_NAME       = TEST_RESOURCE_DIR "/dali-logo.webp";
+
+const char* TEST_N_PATCH_IMAGE_FILE_NAME         = TEST_RESOURCE_DIR "/heartsframe.9.png";
+const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg";
+const char* TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
+
 } // namespace
 
 void CopyUrlsIntoArray(Property::Array& urls, int startIndex = 0)
@@ -545,6 +550,112 @@ int UtcDaliAnimatedImageVisualImageLoadingFail01(void)
   END_TEST;
 }
 
+int UtcDaliAnimatedImageVisualImageLoadingFail02(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Test with non-animated single image. We should show broken image than.");
+
+  for(int isSynchronousLoading = 0; isSynchronousLoading < 2; ++isSynchronousLoading)
+  {
+    tet_printf("Test to load non-animatable image %s\n", (isSynchronousLoading == 1) ? "Synchronously" : "Asynchronously");
+
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, "dummy");
+    propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, (isSynchronousLoading == 1));
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
+
+    application.GetScene().Add(dummyControl);
+
+    application.SendNotification();
+    application.Render(20);
+
+    if(!(isSynchronousLoading == 1))
+    {
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    }
+
+    application.SendNotification();
+    application.Render(20);
+
+    // Check broken image uploaded.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 1u, TEST_LOCATION);
+
+    dummyControl.Unparent();
+
+    // Remove cached image at TextureManager.
+    application.SendNotification();
+    application.Render(20);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualImageLoadingFail03(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Test with invalid image that suffix is .gif, and AnimatedImageLoading not supported. We should show broken image than.");
+
+  for(int isSynchronousLoading = 0; isSynchronousLoading < 2; ++isSynchronousLoading)
+  {
+    tet_printf("Test to load non-animatable image %s\n", (isSynchronousLoading == 1) ? "Synchronously" : "Asynchronously");
+
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, "dummy.Gif"); ///< Suffix is gif so visual become AnimatedImageVisual. But AnimatedImageLoading become null.
+    propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, (isSynchronousLoading == 1));
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
+
+    application.GetScene().Add(dummyControl);
+
+    application.SendNotification();
+    application.Render(20);
+
+    // TODO : Since fixed-image-cache didn't support synchronous loading now, we need to wait for a while.
+    // We have to remove it in future!
+    //if(!(isSynchronousLoading == 1))
+    {
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    }
+
+    application.SendNotification();
+    application.Render(20);
+
+    // Check broken image uploaded.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 1u, TEST_LOCATION);
+
+    dummyControl.Unparent();
+
+    // Remove cached image at TextureManager.
+    application.SendNotification();
+    application.Render(20);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliAnimatedImageVisualSynchronousLoading(void)
 {
   ToolkitTestApplication application;
@@ -775,7 +886,7 @@ int UtcDaliAnimatedImageVisualJumpToAction(void)
 
     DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::JUMP_TO, 6);
 
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(6), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
     DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 4, TEST_LOCATION);
 
     dummyControl.Unparent();
@@ -1643,6 +1754,8 @@ int UtcDaliAnimatedImageVisualMultiImage05(void)
   END_TEST;
 }
 
+namespace
+{
 void TestLoopCount(ToolkitTestApplication& application, DummyControl& dummyControl, uint16_t frameCount, uint16_t loopCount, const char* location)
 {
   TestGlAbstraction& gl           = application.GetGlAbstraction();
@@ -1693,6 +1806,7 @@ void TestLoopCount(ToolkitTestApplication& application, DummyControl& dummyContr
 
   dummyControl.Unparent();
 }
+} // namespace
 
 int UtcDaliAnimatedImageVisualLoopCount(void)
 {
@@ -2200,6 +2314,40 @@ int UtcDaliAnimatedImageVisualFrameCountBeforeLoadingFinished(void)
   Property::Value* value3 = resultMap3.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER);
   DALI_TEST_CHECK(value3);
   DALI_TEST_EQUALS(value3->Get<int>(), 4, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualLoadNonRegularImage(void)
+{
+  ToolkitTestApplication application;
+
+  std::vector<std::pair<std::string, DevelVisual::Type>> urlAndExpectVisualTypes = {
+    {TEST_MASK_IMAGE_FILE_NAME, DevelVisual::IMAGE},
+    {TEST_N_PATCH_IMAGE_FILE_NAME, DevelVisual::N_PATCH},
+    {TEST_SVG_FILE_NAME, DevelVisual::SVG},
+    {TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, DevelVisual::ANIMATED_VECTOR_IMAGE},
+  };
+
+  for(const auto& urlAndExpectVisualTypePair : urlAndExpectVisualTypes)
+  {
+    tet_printf("Test AnimatedImageVisual with url: %s\n", urlAndExpectVisualTypePair.first.c_str());
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, urlAndExpectVisualTypePair.first);
+    propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+
+    Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+    DALI_TEST_CHECK(visual);
+
+    Property::Map resultMap;
+    visual.CreatePropertyMap(resultMap);
+
+    Property::Value* typeValue = resultMap.Find(Toolkit::Visual::Property::TYPE, Property::INTEGER);
+    DALI_TEST_CHECK(typeValue);
+    int type = typeValue->Get<int>();
+    DALI_TEST_EQUALS(type, static_cast<int>(urlAndExpectVisualTypePair.second), TEST_LOCATION);
+  }
 
   END_TEST;
 }

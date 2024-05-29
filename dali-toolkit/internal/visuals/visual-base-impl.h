@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,22 +92,6 @@ public:
   void SetTransformAndSize(const Property::Map& transform, Size controlSize);
 
   /**
-   * @brief Performs an action on the visual with the given action id and attributes.
-   *
-   * @param[in] actionId The id of the action to perform this API only takes an Index
-   * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
-   */
-  void DoAction(const Dali::Property::Index actionId, const Dali::Property::Value attributes);
-
-  /**
-   * @brief Performs an action on the visual with the given action id and attributes.
-   *
-   * @param[in] actionId The id of the action to perform this API only takes an Index
-   * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
-   */
-  void DoActionExtension(const Dali::Property::Index actionId, const Dali::Any attributes);
-
-  /**
    * @copydoc Toolkit::Visual::Base::GetHeightForWidth
    */
   virtual float GetHeightForWidth(float width);
@@ -147,6 +131,16 @@ public:
    * @copydoc Toolkit::Visual::Base::CreatePropertyMap
    */
   void CreatePropertyMap(Property::Map& map) const;
+
+  /**
+   * @copydoc Toolkit::Visual::Base::DoAction
+   */
+  void DoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes);
+
+  /**
+   * @copydoc Toolkit::Visual::Base::DoActionExtension
+   */
+  void DoActionExtension(const Dali::Property::Index actionId, const Dali::Any& attributes);
 
   /**
    * @brief Create a property map containing per-instance visual properties.
@@ -412,7 +406,7 @@ protected:
    * @param[in] actionId The action to perform
    * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
    */
-  virtual void OnDoActionExtension(const Property::Index actionId, Dali::Any attributes);
+  virtual void OnDoActionExtension(const Property::Index actionId, const Dali::Any& attributes);
 
   /**
    * @brief Update the shader when some properties are changed.

@@ -628,7 +628,7 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
   TriggerVectorRasterization();
 }
 
-void AnimatedVectorImageVisual::OnDoActionExtension(const Property::Index actionId, Dali::Any attributes)
+void AnimatedVectorImageVisual::OnDoActionExtension(const Property::Index actionId, const Dali::Any& attributes)
 {
   switch(actionId)
   {

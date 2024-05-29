@@ -67,14 +67,22 @@ TextureSet FixedImageCache::Frame(uint32_t frameIndex)
     return textureSet;
   }
 
-  while(mReadyFlags.size() < mImageUrls.size() &&
-        (frameIndex > mCurrentFrameIndex || mReadyFlags.empty()))
+  mCurrentFrameIndex = frameIndex;
+
+  bool batchRequested = false;
+
+  // Make ensure that current frameIndex load requested.
+  while(mReadyFlags.size() <= frameIndex)
   {
-    ++mCurrentFrameIndex;
+    batchRequested = true;
     LoadBatch();
   }
 
-  mCurrentFrameIndex = frameIndex;
+  // Request batch only 1 times for this function.
+  if(!batchRequested && mReadyFlags.size() < mImageUrls.size())
+  {
+    LoadBatch();
+  }
 
   if(IsFrameReady(mCurrentFrameIndex) && mLoadState != TextureManager::LoadState::LOAD_FAILED)
   {
@@ -108,7 +116,7 @@ int32_t FixedImageCache::GetTotalFrameCount() const
 
 bool FixedImageCache::IsFrameReady(uint32_t frameIndex) const
 {
-  return (mReadyFlags.size() > 0 && mReadyFlags[frameIndex] == true);
+  return ((mReadyFlags.size() > 0) && (mReadyFlags[frameIndex] == true));
 }
 
 void FixedImageCache::LoadBatch()
@@ -139,8 +147,10 @@ void FixedImageCache::LoadBatch()
     auto preMultiplyOnLoading = mPreMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                                                    : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-    mTextureManager.LoadTexture(url, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mImageUrls[frameIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
-    mRequestingLoad = false;
+    TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
+    mTextureManager.LoadTexture(url, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
+    mImageUrls[frameIndex].mTextureId = loadTextureId;
+    mRequestingLoad                   = false;
   }
 }
 
@@ -180,8 +190,8 @@ void FixedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureI
 {
   if(loadSuccess)
   {
-    mLoadState               = TextureManager::LoadState::LOAD_FINISHED;
-    bool isCurrentFrameReady = IsFrameReady(mCurrentFrameIndex);
+    mLoadState                = TextureManager::LoadState::LOAD_FINISHED;
+    bool wasCurrentFrameReady = IsFrameReady(mCurrentFrameIndex);
     if(!mRequestingLoad)
     {
       for(std::size_t i = 0; i < mImageUrls.size(); ++i)
@@ -195,9 +205,14 @@ void FixedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureI
     }
     else
     {
-      mReadyFlags.back() = true;
+      DALI_ASSERT_ALWAYS(mReadyFlags.size() > 0u && "Some FixedImageCache::LoadBatch() called mismatched!");
+      size_t i = mReadyFlags.size() - 1u;
+
+      // texture id might not setup yet. Update it now.
+      mImageUrls[i].mTextureId = textureInformation.textureId;
+      mReadyFlags[i]           = true;
     }
-    MakeReady(isCurrentFrameReady, mCurrentFrameIndex, textureInformation.preMultiplied);
+    MakeReady(wasCurrentFrameReady, mCurrentFrameIndex, textureInformation.preMultiplied);
   }
   else
   {
