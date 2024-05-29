@@ -336,8 +336,8 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
       mRasterizingTask.Reset();
     }
 
-    unsigned int width  = static_cast<unsigned int>(size.width);
-    unsigned int height = static_cast<unsigned int>(size.height);
+    uint32_t width  = static_cast<uint32_t>(roundf(size.width));
+    uint32_t height = static_cast<uint32_t>(roundf(size.height));
 
     mRasterizingTask = new SvgRasterizingTask(mVectorRenderer, width, height, MakeCallback(this, &SvgVisual::ApplyRasterizedImage));
 
@@ -493,6 +493,10 @@ void SvgVisual::OnSetTransform()
       // Use visual size
       size = mImpl->mTransform.GetVisualSize(mImpl->mControlSize);
     }
+
+    // roundf and change as integer scale.
+    size.width  = static_cast<uint32_t>(roundf(size.width));
+    size.height = static_cast<uint32_t>(roundf(size.height));
 
     if(size != mRasterizedSize || mDefaultWidth == 0 || mDefaultHeight == 0)
     {
