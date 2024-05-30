@@ -42,13 +42,6 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_MULT
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_FONT_PERFORMANCE_MARKER, false);
 
 const Dali::Toolkit::Text::Character UTF32_A = 0x0041;
-
-// TODO : Customization required for these values.
-constexpr std::size_t MAX_VALIDATE_FONTS_PER_SCRIPT_CACHE_SIZE = 63;
-constexpr std::size_t MAX_DEFAULT_FONTS_CACHE_SIZE             = 15;
-
-constexpr int VALIDATE_FONTS_PER_SCRIPT_REMAIN_COUNT = 8;
-constexpr int DEFAULT_FONTS_REMAIN_COUNT             = 2;
 } // namespace
 
 namespace Text
@@ -173,7 +166,13 @@ void CheckFontSupportsCharacter(
                 *(defaultFontPerScriptCacheBuffer + script) = defaultFontsPerScript;
               }
             }
-            defaultFontsPerScript->Cache(currentFontDescription, fontId);
+
+            // the fontId is cached only if it has not been cached before.
+            if(!isValidCachedDefaultFont)
+            {
+              defaultFontsPerScript->Cache(currentFontDescription, fontId);
+            }
+
             isValidFont = true;
           }
         }
@@ -201,21 +200,14 @@ bool ValidateFontsPerScript::IsValidFont(FontId fontId) const
 void ValidateFontsPerScript::Cache(FontId fontId)
 {
   mValidFonts.PushBack(fontId);
-  if(MAX_VALIDATE_FONTS_PER_SCRIPT_CACHE_SIZE < mValidFonts.Count())
-  {
-    // Clear cache but remaind some last items.
-    const auto offset = mValidFonts.Count() - VALIDATE_FONTS_PER_SCRIPT_REMAIN_COUNT;
-    for(int i = 0; i < VALIDATE_FONTS_PER_SCRIPT_REMAIN_COUNT; ++i)
-    {
-      mValidFonts[i] = std::move(mValidFonts[offset + i]);
-    }
-    mValidFonts.Resize(VALIDATE_FONTS_PER_SCRIPT_REMAIN_COUNT);
-  }
+
+  return;
 }
 
 FontId DefaultFonts::FindFont(TextAbstraction::FontClient&            fontClient,
                               const TextAbstraction::FontDescription& description,
-                              PointSize26Dot6                         size) const
+                              PointSize26Dot6                         size,
+                              Character                               character) const
 {
   for(std::vector<CacheItem>::const_iterator it    = mFonts.begin(),
                                              endIt = mFonts.end();
@@ -228,7 +220,8 @@ FontId DefaultFonts::FindFont(TextAbstraction::FontClient&            fontClient
        ((TextAbstraction::FontWidth::NONE == description.width) || (description.width == item.description.width)) &&
        ((TextAbstraction::FontSlant::NONE == description.slant) || (description.slant == item.description.slant)) &&
        (size == fontClient.GetPointSize(item.fontId)) &&
-       (description.family.empty() || (description.family == item.description.family)))
+       (description.family.empty() || (description.family == item.description.family)) &&
+       fontClient.IsCharacterSupportedByFont(item.fontId, character))
     {
       return item.fontId;
     }
@@ -243,16 +236,8 @@ void DefaultFonts::Cache(const TextAbstraction::FontDescription& description, Fo
   item.description = description;
   item.fontId      = fontId;
   mFonts.push_back(item);
-  if(MAX_DEFAULT_FONTS_CACHE_SIZE < mFonts.size())
-  {
-    // Clear cache but remaind some last items.
-    const auto offset = mFonts.size() - DEFAULT_FONTS_REMAIN_COUNT;
-    for(int i = 0; i < DEFAULT_FONTS_REMAIN_COUNT; ++i)
-    {
-      mFonts[i] = std::move(mFonts[offset + i]);
-    }
-    mFonts.resize(DEFAULT_FONTS_REMAIN_COUNT);
-  }
+
+  return;
 }
 
 MultilanguageSupport::MultilanguageSupport()
@@ -724,7 +709,8 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
       // This cache stores fall-back fonts.
       cachedDefaultFontId = defaultFonts->FindFont(fontClient,
                                                    currentFontDescription,
-                                                   currentFontPointSize);
+                                                   currentFontPointSize,
+                                                   character);
     }
 
     // Whether the cached default font is valid.

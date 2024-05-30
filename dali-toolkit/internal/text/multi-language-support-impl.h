@@ -116,7 +116,8 @@ struct DefaultFonts
    */
   FontId FindFont(TextAbstraction::FontClient&            fontClient,
                   const TextAbstraction::FontDescription& description,
-                  PointSize26Dot6                         size) const;
+                  PointSize26Dot6                         size,
+                  Character                               character) const;
 
   /**
    * @brief Cache a default font for the given @p size.
