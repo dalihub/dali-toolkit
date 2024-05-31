@@ -2340,7 +2340,10 @@ void Control::Impl::ApplyFittingMode(const Vector2& size)
       // If the fittingMode is DONT_CARE, we don't need to apply fittingMode, just Set empty transformMap
       if(fittingMode == Visual::FittingMode::DONT_CARE)
       {
-        ((*iter)->visual).SetTransformAndSize(transformMap, size);
+        if(visualImpl.GetType() != Toolkit::Visual::Type::TEXT)
+        {
+          ((*iter)->visual).SetTransformAndSize(transformMap, size);
+        }
         continue;
       }
 
