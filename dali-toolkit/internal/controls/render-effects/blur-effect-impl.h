@@ -131,6 +131,11 @@ private:
    */
   std::string GetSampleWeightsPropertyName(unsigned int index) const;
 
+  /**
+   * @brief Synchronize mOwnerControl's background corner radius to the blurred output.
+   */
+  void SynchronizeBackgroundCornerRadius();
+
   BlurEffectImpl(const BlurEffectImpl&) = delete;
   BlurEffectImpl(BlurEffectImpl&&)      = delete;
   BlurEffectImpl& operator=(BlurEffectImpl&&) = delete;      // no move()
@@ -155,12 +160,11 @@ private:
   RenderTask  mSourceRenderTask;
 
   // Variables
-  Pixel::Format mPixelFormat;
-  float         mDownscaleFactor;
-  uint32_t      mPixelRadius;
-  float         mBellCurveWidth;
-  float         mMultiplierForFraction;
-  float         mDenominator;
+  float    mDownscaleFactor;
+  uint32_t mPixelRadius;
+  float    mBellCurveWidth;
+  float    mMultiplierForFraction;
+  float    mDenominator;
 
   bool mIsActivated : 1;
   bool mIsBackground : 1;

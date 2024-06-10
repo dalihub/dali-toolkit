@@ -16,6 +16,7 @@
  */
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/public-api/controls/render-effects/background-blur-effect.h>
 
 using namespace Dali;
@@ -42,7 +43,7 @@ int UtcDaliRenderEffectNewN(void)
 
   try
   {
-    BackgroundBlurEffect blurEffect = BackgroundBlurEffect::New(-0.5f, 10.0f, 10.0f);
+    BackgroundBlurEffect blurEffect  = BackgroundBlurEffect::New(-0.5f, 10.0f, 10.0f);
     BackgroundBlurEffect blurEffect2 = BackgroundBlurEffect::New(10.0f, 10.0f, 10.0f);
     DALI_TEST_CHECK(!blurEffect && !blurEffect2);
   }
@@ -186,6 +187,44 @@ int UtcDaliRenderEffectRepeatActivateDeactivate(void)
     DALI_TEST_CHECK(4u == taskList.GetTaskCount());
     //control.ClearRenderEffect(); // Deactivate, Done automatically on duplicated jobs.
   }
+
+  END_TEST;
+}
+
+int UtcDaliRenderEffectSynchronizeBackgroundCornerRadius(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRenderEffectSynchronizeBackgroundCornerRadius");
+
+  Integration::Scene scene = application.GetScene();
+
+  Property::Map blackDimmerMap;
+  blackDimmerMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+  blackDimmerMap.Insert(Toolkit::Visual::Property::MIX_COLOR, Color::BLACK);
+  blackDimmerMap.Insert(Toolkit::Visual::Property::OPACITY, 0.2f);
+  blackDimmerMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, 30.0f);
+
+  RenderEffect effect = BackgroundBlurEffect::New(0.4f, 40, 10.0f);
+
+  Control control = Control::New();
+  DALI_TEST_CHECK(control.GetRendererCount() == 0u);
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  scene.Add(control);
+
+  control.SetProperty(Toolkit::Control::Property::BACKGROUND, blackDimmerMap);
+  DALI_TEST_CHECK(control.GetRendererCount() == 1u);
+  control.SetRenderEffect(effect);
+  DALI_TEST_CHECK(control.GetRendererCount() == 2u);
+
+  Renderer renderer = control.GetRendererAt(1u);
+  Vector4  radius   = Vector4::ZERO;
+  renderer.GetProperty(renderer.GetPropertyIndex(std::string("uRadius"))).Get(radius);
+
+  DALI_TEST_CHECK(radius.x == 30.0f);
+  DALI_TEST_CHECK(radius.y == 30.0f);
+  DALI_TEST_CHECK(radius.z == 30.0f);
+  DALI_TEST_CHECK(radius.w == 30.0f);
 
   END_TEST;
 }

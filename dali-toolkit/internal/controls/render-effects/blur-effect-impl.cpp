@@ -28,6 +28,7 @@
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
@@ -56,7 +57,6 @@ namespace Internal
 BlurEffectImpl::BlurEffectImpl(bool isBackground)
 : RenderEffectImpl(),
   mInternalRoot(Actor::New()),
-  mPixelFormat(Pixel::Format::INVALID),
   mDownscaleFactor(BLUR_EFFECT_DOWNSCALE_FACTOR),
   mPixelRadius(BLUR_EFFECT_PIXEL_RADIUS),
   mBellCurveWidth(BLUR_EFFECT_BELL_CURVE_WIDTH),
@@ -70,7 +70,6 @@ BlurEffectImpl::BlurEffectImpl(bool isBackground)
 BlurEffectImpl::BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, float bellCurveWidth, bool isBackground)
 : RenderEffectImpl(),
   mInternalRoot(Actor::New()),
-  mPixelFormat(Pixel::Format::INVALID),
   mDownscaleFactor(downscaleFactor),
   mPixelRadius((blurRadius >> 2) + 1),
   mBellCurveWidth(std::max(bellCurveWidth, BLUR_EFFECT_DIVIDE_ZERO_EPSILON)),
@@ -102,8 +101,6 @@ BlurEffectImplPtr BlurEffectImpl::New(float downscaleFactor, uint32_t blurRadius
 
 void BlurEffectImpl::Initialize()
 {
-  RegisterObject(); // of parent's parent class
-
   mRenderFullSizeCamera = CameraActor::New();
   mRenderFullSizeCamera.SetInvertYAxis(true);
   mRenderFullSizeCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -318,6 +315,11 @@ void BlurEffectImpl::SetShaderConstants(float downsampledWidth, float downsample
     mVerticalBlurActor.RegisterProperty(GetSampleOffsetsPropertyName(i), Vector2(0.0f, uvOffsets[i] / downsampledHeight));
     mVerticalBlurActor.RegisterProperty(GetSampleWeightsPropertyName(i), weights[i]);
   }
+
+  if(mIsBackground)
+  {
+    SynchronizeBackgroundCornerRadius();
+  }
 }
 
 std::string BlurEffectImpl::GetSampleOffsetsPropertyName(unsigned int index) const
@@ -332,6 +334,18 @@ std::string BlurEffectImpl::GetSampleWeightsPropertyName(unsigned int index) con
   std::ostringstream oss;
   oss << "uSampleWeights[" << index << "]";
   return oss.str();
+}
+
+void BlurEffectImpl::SynchronizeBackgroundCornerRadius()
+{
+  DALI_ASSERT_ALWAYS(GetOwnerControl() && "You should first SetRenderEffect(), then set its background property map");
+
+  Property::Map map    = GetOwnerControl().GetProperty<Property::Map>(Toolkit::Control::Property::BACKGROUND);
+  Vector4       radius = Vector4::ZERO;
+  map[Toolkit::DevelVisual::Property::CORNER_RADIUS].Get(radius);
+
+  Renderer renderer = GetTargetRenderer();
+  renderer.RegisterProperty("uRadius", radius);
 }
 
 } // namespace Internal
