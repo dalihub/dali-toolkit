@@ -5,11 +5,7 @@
 
 #define MORPH defined(MORPH_POSITION) || defined(MORPH_NORMAL) || defined(MORPH_TANGENT)
 
-#ifdef HIGHP
-  precision highp float;
-#else
-  precision mediump float;
-#endif
+precision highp float;
 
 INPUT vec3 aPosition;
 INPUT vec2 aTexCoord;
@@ -36,20 +32,20 @@ uniform int uBlendShapeGeometryHeight;
 #endif
 
 OUTPUT mediump vec2 vUV;
-OUTPUT lowp mat3 vTBN;
+OUTPUT highp mat3 vTBN;
 OUTPUT lowp vec4 vColor;
 OUTPUT highp vec3 vPositionToCamera;
 
 uniform highp mat4 uViewMatrix;
-uniform mat3 uNormalMatrix;
-uniform mat4 uModelMatrix;
-uniform mat4 uProjection;
+uniform highp mat3 uNormalMatrix;
+uniform highp mat4 uModelMatrix;
+uniform highp mat4 uProjection;
 
 #ifdef SKINNING
 INPUT vec4 aJoints;
 INPUT vec4 aWeights;
 #define MAX_BONES 80
-uniform mat4 uBone[MAX_BONES];
+uniform highp mat4 uBone[MAX_BONES];
 uniform mediump vec3 uYDirection;
 #endif
 
