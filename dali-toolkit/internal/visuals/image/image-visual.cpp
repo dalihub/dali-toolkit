@@ -62,6 +62,7 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, SCALE_TO_FILL)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, FIT_WIDTH)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, FIT_HEIGHT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, VISUAL_FITTING)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, DEFAULT)
 DALI_ENUM_TO_STRING_TABLE_END(FITTING_MODE)
 
@@ -180,7 +181,7 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
                          ImageDimensions           size,
                          FittingMode::Type         fittingMode,
                          Dali::SamplingMode::Type  samplingMode)
-: Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::IMAGE),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::IMAGE),
   mPixelArea(FULL_TEXTURE_RECT),
   mPixelAreaIndex(Property::INVALID_INDEX),
   mPlacementActor(),
@@ -475,6 +476,23 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
 {
   if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
   {
+    if(mImpl->mRenderer)
+    {
+      auto textureSet = mImpl->mRenderer.GetTextures();
+      if(textureSet && textureSet.GetTextureCount())
+      {
+        auto texture = textureSet.GetTexture(0);
+        if(texture)
+        {
+          if(mTextureSize != Vector2::ZERO)
+          {
+            naturalSize = mTextureSize;
+            return;
+          }
+        }
+      }
+    }
+
     naturalSize.x = mDesiredSize.GetWidth();
     naturalSize.y = mDesiredSize.GetHeight();
     return;

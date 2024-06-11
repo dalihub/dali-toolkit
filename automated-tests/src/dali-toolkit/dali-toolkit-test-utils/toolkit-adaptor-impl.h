@@ -85,6 +85,8 @@ public:
 
   void RegisterProcessor(Integration::Processor& processor, bool postProcessor = false);
   void UnregisterProcessor(Integration::Processor& processor, bool postProcessor = false);
+  void RegisterProcessorOnce(Integration::Processor& processor, bool postProcessor = false);
+  void UnregisterProcessorOnce(Integration::Processor& processor, bool postProcessor = false);
 
   void SetApplication(Dali::TestApplication& testApplication);
 

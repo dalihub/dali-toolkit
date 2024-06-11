@@ -56,6 +56,9 @@ namespace Toolkit
 {
 namespace Internal
 {
+
+const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
+
 namespace
 {
 DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_FITTING_MODE)
@@ -65,6 +68,7 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_FITTING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, CENTER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, FIT_HEIGHT)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, FIT_WIDTH)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, DONT_CARE)
 DALI_ENUM_TO_STRING_TABLE_END(VISUAL_FITTING_MODE)
 
 /**
@@ -494,7 +498,7 @@ void Visual::Base::GetNaturalSize(Vector2& naturalSize)
   naturalSize = Vector2::ZERO;
 }
 
-void Visual::Base::DoAction(const Property::Index actionId, const Property::Value attributes)
+void Visual::Base::DoAction(const Property::Index actionId, const Property::Value& attributes)
 {
   OnDoAction(actionId, attributes);
 
@@ -513,7 +517,7 @@ void Visual::Base::DoAction(const Property::Index actionId, const Property::Valu
   }
 }
 
-void Visual::Base::DoActionExtension(const Dali::Property::Index actionId, const Dali::Any attributes)
+void Visual::Base::DoActionExtension(const Dali::Property::Index actionId, const Dali::Any& attributes)
 {
   OnDoActionExtension(actionId, attributes);
 }
@@ -728,7 +732,7 @@ void Visual::Base::OnDoAction(const Property::Index actionId, const Property::Va
   // May be overriden by derived class
 }
 
-void Visual::Base::OnDoActionExtension(const Property::Index actionId, const Dali::Any attributes)
+void Visual::Base::OnDoActionExtension(const Property::Index actionId, const Dali::Any& attributes)
 {
   // May be overriden by derived class
 }
@@ -847,6 +851,41 @@ Toolkit::Visual::ResourceStatus Visual::Base::GetResourceStatus() const
 Visual::FittingMode Visual::Base::GetFittingMode() const
 {
   return mImpl->mFittingMode;
+}
+
+void Visual::Base::SetFittingMode(Visual::FittingMode fittingMode)
+{
+  mImpl->mFittingMode = fittingMode;
+}
+
+bool Visual::Base::IsIgnoreFittingMode() const
+{
+  return mImpl->mIgnoreFittingMode;
+}
+
+bool Visual::Base::IsPixelAreaSetForFittingMode() const
+{
+  return mImpl->mPixelAreaSetByFittingMode;
+}
+
+void Visual::Base::SetPixelAreaForFittingMode(const Vector4& pixelArea)
+{
+  if(mImpl->mRenderer)
+  {
+    mImpl->mRenderer.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, pixelArea);
+  }
+
+  mImpl->mPixelAreaSetByFittingMode = (pixelArea != FULL_TEXTURE_RECT) ? true : false;
+}
+
+bool Visual::Base::IsTransformMapSetForFittingMode() const
+{
+  return mImpl->mTransformMapSetForFittingMode;
+}
+
+void Visual::Base::SetTransformMapUsageForFittingMode(bool used)
+{
+  mImpl->mTransformMapSetForFittingMode = used;
 }
 
 Visual::Base& Visual::Base::GetVisualObject()
@@ -1148,6 +1187,8 @@ void Visual::Base::AnimateRendererProperty(
         map.Add(animator.propertyKey.stringKey, animator.targetValue);
       }
 
+      // Set flag to ignore fitting mode when we set the transform property map
+      mImpl->mIgnoreFittingMode = true;
       mImpl->mTransform.UpdatePropertyMap(map);
     }
     SetupTransition(transition, animator, index, animator.initialValue, animator.targetValue);

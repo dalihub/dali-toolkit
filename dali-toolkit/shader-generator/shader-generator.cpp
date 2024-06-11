@@ -304,19 +304,13 @@ int GenerateShaderSources(fs::path inDir, fs::path outDir, const bool generateBu
           if(shaderFile.is_open())
           {
             fs::path outFilePath(GetShaderOutputFilePath(outDir, filename));
-            generator.Add(std::move(shaderVariableName), outFilePath.filename().string());
-            if(fs::exists(outFilePath))
+            // If output file already exists, then only overwrite if input file is newer than output file
+            if(!fs::exists(outFilePath) || (fs::last_write_time(path) > fs::last_write_time(outFilePath)))
             {
-              // Only overwrite if input file is newer than output file
-              fs::file_time_type inFileTime = fs::last_write_time(path);
-              fs::file_time_type outFileTime = fs::last_write_time(outFilePath);
-              if(outFileTime > inFileTime)
-              {
-                continue;
-              }
+              GenerateHeaderFile(shaderFile, shaderVariableName, outFilePath);
+              shaderGenerated = true;
             }
-            GenerateHeaderFile(shaderFile, shaderVariableName, outFilePath);
-            shaderGenerated = true;
+            generator.Add(std::move(shaderVariableName), outFilePath.filename().string());
           }
           break;
         }

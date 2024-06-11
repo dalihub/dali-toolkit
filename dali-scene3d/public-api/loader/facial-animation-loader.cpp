@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/animation/key-frames-devel.h>
+#include <dali/integration-api/debug.h>
 #include <sstream>
 
 // INTERNAL INCLUDES
@@ -37,22 +38,22 @@ const float MILLISECONDS_TO_SECONDS = 0.001f;
 
 struct BlendShape
 {
-  std::vector<std::vector<float>> mKeys;
-  std::string_view                mNodeName;
-  uint32_t                        mNumberOfMorphTarget;
-  std::string_view                mVersion;
-  std::string_view                mFullName;
-  std::vector<std::string_view>   mMorphNames;
+  std::vector<std::vector<float>> mKeys{{}};
+  std::string_view                mNodeName{};
+  uint32_t                        mNumberOfMorphTarget{0u};
+  std::string_view                mVersion{};
+  std::string_view                mFullName{};
+  std::vector<std::string_view>   mMorphNames{};
 };
 
 struct FacialAnimation
 {
-  std::string_view        mName;
-  std::vector<BlendShape> mBlendShapes;
-  std::string_view        mVersion;
-  uint32_t                mNumberOfShapes;
-  std::vector<uint32_t>   mTime;
-  uint32_t                mNumberOfFrames;
+  std::string_view        mName{};
+  std::vector<BlendShape> mBlendShapes{{}};
+  std::string_view        mVersion{};
+  uint32_t                mNumberOfShapes{0u};
+  std::vector<uint32_t>   mTime{};
+  uint32_t                mNumberOfFrames{0u};
 };
 
 std::vector<std::vector<float>> ReadBlendShapeKeys(const json_value_s& j)
@@ -112,15 +113,43 @@ Dali::Scene3D::Loader::AnimationDefinition LoadFacialAnimationInternal(json::uni
   GetFacialAnimationReader().Read(rootObj, facialAnimation);
 
   Dali::Scene3D::Loader::AnimationDefinition animationDefinition;
-  animationDefinition.SetName(facialAnimation.mName.data());
-  animationDefinition.SetDuration(MILLISECONDS_TO_SECONDS * static_cast<float>(facialAnimation.mTime[facialAnimation.mNumberOfFrames - 1u]));
+
+  // Check validation of the facial animation data.
+  if(facialAnimation.mNumberOfFrames == 0u)
+  {
+    DALI_LOG_ERROR("The number of frames is zero! return empty animation.\n");
+    return animationDefinition;
+  }
+  if(facialAnimation.mTime.size() != static_cast<size_t>(facialAnimation.mNumberOfFrames))
+  {
+    DALI_LOG_ERROR("The number of frames does not match the number of time values.\n");
+    return animationDefinition;
+  }
 
   // Calculate the number of animated properties.
   uint32_t numberOfAnimatedProperties = 0u;
   for(const auto& blendShape : facialAnimation.mBlendShapes)
   {
     numberOfAnimatedProperties += blendShape.mNumberOfMorphTarget;
+
+    if(blendShape.mKeys.size() != static_cast<uint32_t>(facialAnimation.mNumberOfFrames))
+    {
+      DALI_LOG_ERROR("The number of frames does not match the number of node[%s]'s keys.\n", std::string(blendShape.mNodeName).c_str());
+      return animationDefinition;
+    }
+
+    for(const auto& keyframes : blendShape.mKeys)
+    {
+      if(keyframes.size() != static_cast<size_t>(blendShape.mNumberOfMorphTarget))
+      {
+        DALI_LOG_ERROR("The number of keys does not match the number of node[%s]'s values.\n", std::string(blendShape.mNodeName).c_str());
+        return animationDefinition;
+      }
+    }
   }
+
+  animationDefinition.SetName(facialAnimation.mName.data());
+  animationDefinition.SetDuration(MILLISECONDS_TO_SECONDS * static_cast<float>(facialAnimation.mTime[facialAnimation.mNumberOfFrames - 1u]));
   animationDefinition.ReserveSize(numberOfAnimatedProperties);
 
   uint32_t targets = 0u;
@@ -138,7 +167,7 @@ Dali::Scene3D::Loader::AnimationDefinition LoadFacialAnimationInternal(json::uni
       animatedProperty.mKeyFrames = Dali::KeyFrames::New();
       for(uint32_t timeIndex = 0u; timeIndex < facialAnimation.mNumberOfFrames; ++timeIndex)
       {
-        const float progress = MILLISECONDS_TO_SECONDS * static_cast<float>(facialAnimation.mTime[timeIndex]) / animationDefinition.GetDuration();
+        const float progress = Dali::EqualsZero(animationDefinition.GetDuration()) ? 0.0f : MILLISECONDS_TO_SECONDS * static_cast<float>(facialAnimation.mTime[timeIndex]) / animationDefinition.GetDuration();
         animatedProperty.mKeyFrames.Add(progress, blendShape.mKeys[timeIndex][morphTargetIndex]);
       }
       // Optimize keyframes, for heuristic!
@@ -163,13 +192,17 @@ AnimationDefinition LoadFacialAnimation(const std::string& url)
   auto jsonData = LoadTextFile(url.c_str(), &failed);
   if(failed)
   {
-    ExceptionFlinger(ASSERT_LOCATION) << "Failed to load " << url << ".";
+    DALI_LOG_ERROR("Failed to load file. url : %s\n", url.c_str());
+    AnimationDefinition animationDefinition;
+    return animationDefinition;
   }
 
   json::unique_ptr root(json_parse(jsonData.c_str(), jsonData.size()));
   if(!root)
   {
-    ExceptionFlinger(ASSERT_LOCATION) << "Failed to parse json " << url << ".";
+    DALI_LOG_ERROR("Failed to parse json. url : %s\n", url.c_str());
+    AnimationDefinition animationDefinition;
+    return animationDefinition;
   }
 
   return LoadFacialAnimationInternal(root);
@@ -180,7 +213,9 @@ AnimationDefinition LoadFacialAnimationFromBuffer(const uint8_t* rawBuffer, int 
   json::unique_ptr root(json_parse(rawBuffer, static_cast<size_t>(static_cast<uint32_t>(rawBufferLength))));
   if(!root)
   {
-    ExceptionFlinger(ASSERT_LOCATION) << "Failed to parse json from buffer.";
+    DALI_LOG_ERROR("Failed to parse json from buffer.\n");
+    AnimationDefinition animationDefinition;
+    return animationDefinition;
   }
 
   return LoadFacialAnimationInternal(root);

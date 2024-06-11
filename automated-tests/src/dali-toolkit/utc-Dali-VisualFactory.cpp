@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/integration-api/debug.h>
 #include <dali/integration-api/adaptor-framework/shader-precompiler.h>
+#include <dali/integration-api/debug.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -1625,6 +1625,8 @@ int UtcDaliVisualFactoryGetSvgVisualAtlas(void)
   END_TEST;
 }
 
+namespace
+{
 //Creates a mesh visual from the given propertyMap and tries to load it on stage in the given application.
 //This is expected to succeed, which will then pass the test.
 void MeshVisualLoadsCorrectlyTest(Property::Map& propertyMap, ToolkitTestApplication& application)
@@ -1706,6 +1708,7 @@ void MeshVisualDoesNotLoadCorrectlyTest(Property::Map& propertyMap, ToolkitTestA
   actor.Unparent();
   DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
 }
+} // namespace
 
 //Test if mesh loads correctly when supplied with only the bare minimum requirements, an object file.
 int UtcDaliVisualFactoryGetMeshVisual1(void)
@@ -2790,12 +2793,107 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual2(void)
   END_TEST;
 }
 
+int UtcDaliVisualFactoryGetAnimatedImageVisualWithOption(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualFactoryGetAnimatedImageVisualWithOption: Request animated image with option that we will use regular image visual even if gif url");
+
+  DummyControl actor = DummyControl::New(true);
+
+  Property::Map    map;
+  Property::Value* valuePtr = nullptr;
+
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base  visual;
+
+  tet_printf("Test CreateVisual(url, size) with options\n");
+  visual = factory.CreateVisual(TEST_GIF_FILE_NAME, ImageDimensions(), VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY);
+  DALI_TEST_CHECK(visual);
+
+  TestVisualAsynchronousRender(application, actor, visual);
+
+  visual.CreatePropertyMap(map);
+  valuePtr = map.Find(Dali::Toolkit::Visual::Property::TYPE);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get<int>() == Dali::Toolkit::Visual::Type::IMAGE);
+
+  tet_printf("Test CreateVisual(propertyMap) with options\n");
+  map.Clear();
+  map.Add(Toolkit::Visual::Property::TYPE, Visual::IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+
+  // Change actor and visual as new reference.
+  actor  = DummyControl::New(true);
+  visual = factory.CreateVisual(map, VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY);
+
+  // We will use cached image.
+  TestVisualRender(application, actor, visual);
+
+  visual.CreatePropertyMap(map);
+  valuePtr = map.Find(Dali::Toolkit::Visual::Property::TYPE);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get<int>() == Dali::Toolkit::Visual::Type::IMAGE);
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactorySetGetDefaultCreationOptions(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualFactorySetGetDefaultCreationOptions");
+
+  VisualFactory factory = VisualFactory::Get();
+
+  tet_printf("Check default creation options is NONE\n");
+  DALI_TEST_EQUALS(factory.GetDefaultCreationOptions(), VisualFactory::CreationOptions::NONE, TEST_LOCATION);
+  factory.SetDefaultCreationOptions(VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY);
+
+  tet_printf("Check default creation options changed\n");
+  DALI_TEST_EQUALS(factory.GetDefaultCreationOptions(), VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY, TEST_LOCATION);
+
+  tet_printf("Check default creation options applied\n");
+  DummyControl actor = DummyControl::New(true);
+
+  Property::Map    map;
+  Property::Value* valuePtr = nullptr;
+
+  Visual::Base visual;
+
+  tet_printf("Test CreateVisual(url, size) with options\n");
+  visual = factory.CreateVisual(TEST_GIF_FILE_NAME, ImageDimensions());
+  DALI_TEST_CHECK(visual);
+
+  TestVisualAsynchronousRender(application, actor, visual);
+
+  visual.CreatePropertyMap(map);
+  valuePtr = map.Find(Dali::Toolkit::Visual::Property::TYPE);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get<int>() == Dali::Toolkit::Visual::Type::IMAGE);
+
+  tet_printf("Test CreateVisual(propertyMap) with options\n");
+  map.Clear();
+  map.Add(Toolkit::Visual::Property::TYPE, Visual::IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+
+  // Change actor and visual as new reference.
+  actor  = DummyControl::New(true);
+  visual = factory.CreateVisual(map);
+
+  // We will use cached image.
+  TestVisualRender(application, actor, visual);
+
+  visual.CreatePropertyMap(map);
+  valuePtr = map.Find(Dali::Toolkit::Visual::Property::TYPE);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get<int>() == Dali::Toolkit::Visual::Type::IMAGE);
+
+  END_TEST;
+}
 
 int UtcDaliVisualFactoryGetPreCompiler(void)
 {
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactoryGetAnimatedImageVisual2: Request animated image visual with a Property::Map, test custom wrap mode and pixel area");
-
 
   std::vector<RawShaderData> precompiledShaderList;
   DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // before Get Shader

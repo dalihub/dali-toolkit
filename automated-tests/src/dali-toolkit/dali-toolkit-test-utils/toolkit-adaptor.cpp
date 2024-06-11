@@ -237,6 +237,20 @@ void Adaptor::UnregisterProcessor(Integration::Processor& processor, bool postPr
   core.UnregisterProcessor(processor, postProcessor);
 }
 
+void Adaptor::RegisterProcessorOnce(Integration::Processor& processor, bool postProcessor)
+{
+  Integration::Core& core = mTestApplication->GetCore();
+  tet_printf("Adaptor::RegisterProcessorOnce : %s\n", processor.GetProcessorName().data());
+  core.RegisterProcessorOnce(processor, postProcessor);
+}
+
+void Adaptor::UnregisterProcessorOnce(Integration::Processor& processor, bool postProcessor)
+{
+  Integration::Core& core = mTestApplication->GetCore();
+  tet_printf("Adaptor::UnregisterProcessorOnce : %s\n", processor.GetProcessorName().data());
+  core.UnregisterProcessorOnce(processor, postProcessor);
+}
+
 void Adaptor::SetApplication(Dali::TestApplication& testApplication)
 {
   mTestApplication = &testApplication;
@@ -457,6 +471,16 @@ void Adaptor::RegisterProcessor(Integration::Processor& processor, bool postProc
 void Adaptor::UnregisterProcessor(Integration::Processor& processor, bool postProcessor)
 {
   mImpl->UnregisterProcessor(processor, postProcessor);
+}
+
+void Adaptor::RegisterProcessorOnce(Integration::Processor& processor, bool postProcessor)
+{
+  mImpl->RegisterProcessorOnce(processor, postProcessor);
+}
+
+void Adaptor::UnregisterProcessorOnce(Integration::Processor& processor, bool postProcessor)
+{
+  mImpl->UnregisterProcessorOnce(processor, postProcessor);
 }
 
 } // namespace Dali

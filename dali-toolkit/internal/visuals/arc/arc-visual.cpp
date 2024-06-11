@@ -56,7 +56,7 @@ ArcVisualPtr ArcVisual::New(VisualFactoryCache& factoryCache, const Property::Ma
 }
 
 ArcVisual::ArcVisual(VisualFactoryCache& factoryCache)
-: Visual::Base(factoryCache, Visual::FittingMode::FILL, static_cast<Toolkit::Visual::Type>(Toolkit::DevelVisual::ARC)),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, static_cast<Toolkit::Visual::Type>(Toolkit::DevelVisual::ARC)),
   mThickness(0.0f),
   mRadius(0.0f),
   mStartAngle(0.0f),

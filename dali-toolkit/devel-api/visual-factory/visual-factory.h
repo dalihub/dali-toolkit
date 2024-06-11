@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,13 @@ class VisualFactory;
 class DALI_TOOLKIT_API VisualFactory : public BaseHandle
 {
 public:
+  enum CreationOptions
+  {
+    NONE = 0,
+
+    IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY = 1 << 0, ///< Load static images only when we use the image visual.
+  };
+
   /**
    * @brief Create or retrieve VisualFactory singleton.
    *
@@ -99,6 +106,16 @@ public:
   Visual::Base CreateVisual(const Property::Map& propertyMap);
 
   /**
+   * @brief Request the visual with some options
+   *
+   * @param[in] propertyMap The map contains the properties required by the visual.
+   *            The content of the map determines the type of visual that will be returned.
+   * @param[in] creationOptions The creation option.
+   * @return The handle to the created visual
+   */
+  Visual::Base CreateVisual(const Property::Map& propertyMap, CreationOptions creationOptions);
+
+  /**
    * @brief Request the visual to render the given resource at the url.
    *
    * @param[in] url The URL to the resource to be rendered.
@@ -106,6 +123,16 @@ public:
    * @return The pointer pointing to the visual
    */
   Visual::Base CreateVisual(const std::string& url, ImageDimensions size);
+
+  /**
+   * @brief Request the visual to render the given resource at the url with some options.
+   *
+   * @param[in] url The URL to the resource to be rendered.
+   * @param[in] size The width and height to fit the loaded image to.
+   * @param[in] creationOptions The creation option.
+   * @return The pointer pointing to the visual
+   */
+  Visual::Base CreateVisual(const std::string& url, ImageDimensions size, CreationOptions creationOptions);
 
   /**
    * @brief Enable or disable premultiplying alpha in images and image visuals.
@@ -125,6 +152,20 @@ public:
    * @return True if loaded images have pre-multiplied alpha applied on load, false otherwise.
    */
   bool GetPreMultiplyOnLoad() const;
+
+  /**
+   * @brief Set the default creation options when we skip the creation options parameter.
+   *
+   * @param[in] creationOptions The default creation options for the visual factory.
+   */
+  void SetDefaultCreationOptions(CreationOptions creationOptions);
+
+  /**
+   * @brief Set the default creation options when we skip the creation options parameter.
+   *
+   * @return The default creation options for the visual factory.
+   */
+  CreationOptions GetDefaultCreationOptions() const;
 
   /**
    * @brief Discard visual base. It will keep reference of visual until idle callback called.

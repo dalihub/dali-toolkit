@@ -44,10 +44,8 @@ namespace Internal
 {
 namespace
 {
-const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
-
-constexpr float FULL_OPACITY            = 1.0f;
-constexpr float LOW_OPACITY             = 0.2f;
+constexpr float FULL_OPACITY = 1.0f;
+constexpr float LOW_OPACITY  = 0.2f;
 constexpr float TRANSITION_EFFECT_SPEED = 0.3f;
 
 constexpr int PLACEHOLDER_DEPTH_INDEX     = -2;
@@ -77,10 +75,7 @@ ImageView::ImageView(ControlBehaviour additionalBehaviour)
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mImageSize(),
   mTransitionTargetAlpha(FULL_OPACITY),
-  mImageVisualPaddingSetByTransform(false),
-  mImageViewPixelAreaSetByFittingMode(false),
   mTransitionEffect(false),
-  mNeedLazyFittingMode(false),
   mImageReplaced(false)
 {
 }
@@ -163,6 +158,12 @@ void ImageView::SetImage(const Property::Map& map)
   Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(mPropertyMap);
   if(visual)
   {
+    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
+    if(visualImpl.GetFittingMode() == Visual::FittingMode::DONT_CARE)
+    {
+      visualImpl.SetFittingMode(Visual::FittingMode::FILL);
+    }
+
     // Don't set mVisual until it is ready and shown. Getters will still use current visual.
     if(!mVisual)
     {
@@ -171,7 +172,6 @@ void ImageView::SetImage(const Property::Map& map)
 
     if(!mShaderMap.Empty())
     {
-      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
       visualImpl.SetCustomShader(mShaderMap);
     }
 
@@ -228,6 +228,12 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
   Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(url, size);
   if(visual)
   {
+    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
+    if(visualImpl.GetFittingMode() == Visual::FittingMode::DONT_CARE)
+    {
+      visualImpl.SetFittingMode(Visual::FittingMode::FILL);
+    }
+
     if(!mVisual)
     {
       mVisual = visual;
@@ -235,7 +241,6 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
 
     if(!mShaderMap.Empty())
     {
-      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
       visualImpl.SetCustomShader(mShaderMap);
     }
 
@@ -387,16 +392,6 @@ void ImageView::OnRelayout(const Vector2& size, RelayoutContainer& container)
   Control::OnRelayout(size, container);
   if(mVisual)
   {
-    // If Resource is not ready, fittingMode is not working well.
-    // in this case, imageview set the flag for working applyFittingMode again when the resource is ready
-    if(!IsResourceReady())
-    {
-      mNeedLazyFittingMode = true;
-    }
-
-    // Apply FittingMode using actor's size
-    ApplyFittingMode(size);
-
     // mVisual is not updated util the resource is ready in the case of visual replacement.
     // in this case, the Property Map must be initialized so that the previous value is not reused.
     // after mVisual is updated, the correct value will be reset.
@@ -471,168 +466,7 @@ void ImageView::OnResourceReady(Toolkit::Control control)
   // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.
   mVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
 
-  // Applying FittingMode again if it is not working well on OnRelayout().
-  if(mNeedLazyFittingMode)
-  {
-    const Vector2& size = Self().GetProperty(Dali::Actor::Property::SIZE).Get<Vector2>();
-    ApplyFittingMode(size);
-    mNeedLazyFittingMode = false;
-  }
-
   // Signal that a Relayout may be needed
-}
-
-void ImageView::SetTransformMapForFittingMode(Vector2 finalSize, Vector2 naturalSize, Vector2 finalOffset, Visual::FittingMode fittingMode, Property::Map& transformMap)
-{
-  switch(fittingMode)
-  {
-    case Visual::FittingMode::FIT_KEEP_ASPECT_RATIO:
-    {
-      auto availableVisualSize = finalSize;
-
-      // scale to fit the padded area
-      finalSize = naturalSize * std::min((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0),
-                                         (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0));
-
-      // calculate final offset within the padded area
-      finalOffset += (availableVisualSize - finalSize) * .5f;
-
-      // populate the transform map
-      transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET, finalOffset)
-        .Add(Toolkit::Visual::Transform::Property::SIZE, finalSize);
-      break;
-    }
-    case Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO:
-    {
-      mImageViewPixelAreaSetByFittingMode = true;
-      auto availableVisualSize            = finalSize;
-      finalSize                           = naturalSize * std::max((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
-                                         (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
-
-      auto originalOffset = finalOffset;
-      finalOffset += (availableVisualSize - finalSize) * .5f;
-
-      float   x           = abs((availableVisualSize.width - finalSize.width) / finalSize.width) * .5f;
-      float   y           = abs((availableVisualSize.height - finalSize.height) / finalSize.height) * .5f;
-      float   widthRatio  = 1.f - abs((availableVisualSize.width - finalSize.width) / finalSize.width);
-      float   heightRatio = 1.f - abs((availableVisualSize.height - finalSize.height) / finalSize.height);
-      Vector4 pixelArea   = Vector4(x, y, widthRatio, heightRatio);
-      Self().SetProperty(Toolkit::ImageView::Property::PIXEL_AREA, pixelArea);
-
-      // populate the transform map
-      transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET, originalOffset)
-        .Add(Toolkit::Visual::Transform::Property::SIZE, availableVisualSize);
-      break;
-    }
-    case Visual::FittingMode::CENTER:
-    {
-      auto availableVisualSize = finalSize;
-      if(availableVisualSize.width > naturalSize.width && availableVisualSize.height > naturalSize.height)
-      {
-        finalSize = naturalSize;
-      }
-      else
-      {
-        finalSize = naturalSize * std::min((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
-                                           (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
-      }
-
-      finalOffset += (availableVisualSize - finalSize) * .5f;
-
-      // populate the transform map
-      transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET, finalOffset)
-        .Add(Toolkit::Visual::Transform::Property::SIZE, finalSize);
-      break;
-    }
-    case Visual::FittingMode::FILL:
-    {
-      transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET, finalOffset)
-        .Add(Toolkit::Visual::Transform::Property::SIZE, finalSize);
-      break;
-    }
-    case Visual::FittingMode::FIT_WIDTH:
-    case Visual::FittingMode::FIT_HEIGHT:
-    {
-      // This FittingMode already converted
-      break;
-    }
-  }
-}
-
-void ImageView::ApplyFittingMode(const Vector2& size)
-{
-  Property::Map transformMap = Property::Map();
-
-  Extents padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-
-  bool zeroPadding = (padding == Extents());
-
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(
-    Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
-  {
-    std::swap(padding.start, padding.end);
-  }
-
-  // remove padding from the size to know how much is left for the visual
-  Vector2 finalSize   = size - Vector2(padding.start + padding.end, padding.top + padding.bottom);
-  Vector2 finalOffset = Vector2(padding.start, padding.top);
-
-  Visual::FittingMode fittingMode = Toolkit::GetImplementation(mVisual).GetFittingMode();
-
-  // Reset PIXEL_AREA after using OVER_FIT_KEEP_ASPECT_RATIO
-  if(mImageViewPixelAreaSetByFittingMode)
-  {
-    Self().SetProperty(Toolkit::ImageView::Property::PIXEL_AREA, FULL_TEXTURE_RECT);
-    mImageViewPixelAreaSetByFittingMode = false;
-  }
-
-  if((!zeroPadding) || // If padding is not zero
-     (fittingMode != Visual::FittingMode::FILL))
-  {
-    mImageVisualPaddingSetByTransform = true;
-
-    Vector2 naturalSize;
-    // NaturalSize will not be used for FILL fitting mode, which is default.
-    // Skip GetNaturalSize
-    if(fittingMode != Visual::FittingMode::FILL)
-    {
-      mVisual.GetNaturalSize(naturalSize);
-    }
-
-    // If FittingMode use FIT_WIDTH or FIT_HEIGTH, it need to change proper fittingMode
-    if(fittingMode == Visual::FittingMode::FIT_WIDTH)
-    {
-      fittingMode = (finalSize.height / naturalSize.height) < (finalSize.width / naturalSize.width) ? Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO : Visual::FittingMode::FIT_KEEP_ASPECT_RATIO;
-    }
-    else if(fittingMode == Visual::FittingMode::FIT_HEIGHT)
-    {
-      fittingMode = (finalSize.height / naturalSize.height) < (finalSize.width / naturalSize.width) ? Visual::FittingMode::FIT_KEEP_ASPECT_RATIO : Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO;
-    }
-
-    SetTransformMapForFittingMode(finalSize, naturalSize, finalOffset, fittingMode, transformMap);
-
-    // Set extra value for applying transformMap
-    transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY,
-                     Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
-      .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN)
-      .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN)
-      .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY,
-           Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE));
-  }
-  else if(mImageVisualPaddingSetByTransform && zeroPadding) // Reset offset to zero only if padding applied previously
-  {
-    mImageVisualPaddingSetByTransform = false;
-    // Reset the transform map
-    transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET, Vector2::ZERO)
-      .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY,
-           Vector2(Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE))
-      .Add(Toolkit::Visual::Transform::Property::SIZE, Vector2::ONE)
-      .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY,
-           Vector2(Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE));
-  }
-
-  mVisual.SetTransformAndSize(transformMap, size);
 }
 
 void ImageView::CreatePlaceholderImage()

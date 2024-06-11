@@ -128,7 +128,10 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Typ
   mResourceStatus(Toolkit::Visual::ResourceStatus::PREPARING),
   mType(type),
   mAlwaysUsingBorderline(false),
-  mAlwaysUsingCornerRadius(false)
+  mAlwaysUsingCornerRadius(false),
+  mIgnoreFittingMode(false),
+  mPixelAreaSetByFittingMode(false),
+  mTransformMapSetForFittingMode(false)
 {
 }
 

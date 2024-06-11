@@ -21,12 +21,15 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/ordered-set.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/capture/capture.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/frame-buffer.h>
@@ -242,6 +245,16 @@ public:
   Quaternion GetSkyboxOrientation() const;
 
   /**
+   * @copydoc SceneView::Capture()
+   */
+  int32_t Capture(Dali::CameraActor camera, const Vector2& size);
+
+  /**
+   * @copydoc SceneView::FinishedSignal
+   */
+  Dali::Scene3D::SceneView::CaptureFinishedSignalType& CaptureFinishedSignal();
+
+  /**
    * @brief Retrieves ShaderManager of this SceneView.
    * @return ShaderManager of this SceneView.
    */
@@ -430,25 +443,61 @@ private:
    */
   void UpdateShadowMapBuffer(uint32_t shadowMapSize);
 
+  /**
+   * @brief CaptureFinished Callback that is called the capture rendering is finished.
+   * @param[in] task RenderTask that draws requested capture scene.
+   */
+  void OnCaptureFinished(Dali::RenderTask& task);
+
+  /**
+   * @brief Time out Callback to handle the case each capture request is not finished for long time.
+   * @return True if the timer needs to go on.
+   */
+  bool OnTimeOut();
+
 private:
+  /**
+   * Data to store Capture related objects.
+   */
+  struct CaptureData
+  {
+    int32_t                  mStartTick;
+    int32_t                  mCaptureId;                // Unique Key to distinguish requested Captures.
+    Dali::Toolkit::ImageUrl  mCaptureUrl;               // URL for first captured buffer, but it is Y-inverted.
+    Dali::Toolkit::ImageView mCaptureImageView;         // ImageView to draw first capture buffer to be transfered as input for invert.
+    Dali::RenderTask         mCaptureTask;              // RenderTask that is used to capture first buffer.
+    Dali::Texture            mCaptureTexture;           // First Captured texture, but it is Y-inverted.
+    Dali::FrameBuffer        mCaptureFrameBuffer;       // First Captured FBO, but it is Y-inverted.
+    Dali::CameraActor        mCaptureInvertCamera;      // CameraActor to invert first captured buffer by second pass.
+    Dali::RenderTask         mCaptureInvertTask;        // RenderTask to invert first captured buffer.
+    Dali::Texture            mCaptureInvertTexture;     // Result texture of second pass. This is final Texture result.
+    Dali::FrameBuffer        mCaptureInvertFrameBuffer; // FBO for firnal Texture result
+  };
+
   Toolkit::Visual::Base mVisual;
 
   /////////////////////////////////////////////////////////////
   // FrameBuffer and Rendertask to render child objects as a 3D Scene
-  Dali::WeakHandle<Dali::Window> mWindow;
-  Integration::SceneHolder       mSceneHolder;
-  CameraActor                    mDefaultCamera;
-  CameraActor                    mSelectedCamera;
-  std::vector<CameraActor>       mCameras;
-  Dali::FrameBuffer              mFrameBuffer;
-  Dali::Texture                  mTexture;
-  Dali::RenderTask               mRenderTask;
-  Layer                          mRootLayer;
-  int32_t                        mWindowOrientation;
-  Dali::Actor                    mSkybox;
-  Quaternion                     mSkyboxOrientation;
-  float                          mSkyboxIntensity{1.0f};
-  uint8_t                        mFrameBufferMultiSamplingLevel{0u};
+  Dali::WeakHandle<Dali::Window>                      mWindow;
+  Integration::SceneHolder                            mSceneHolder;
+  CameraActor                                         mDefaultCamera;
+  CameraActor                                         mSelectedCamera;
+  std::vector<CameraActor>                            mCameras;
+  Dali::FrameBuffer                                   mFrameBuffer;
+  Dali::Texture                                       mTexture;
+  Dali::RenderTask                                    mRenderTask;
+  Layer                                               mRootLayer;
+  int32_t                                             mWindowOrientation;
+  Dali::Actor                                         mSkybox;
+  Quaternion                                          mSkyboxOrientation;
+  float                                               mSkyboxIntensity{1.0f};
+  uint8_t                                             mFrameBufferMultiSamplingLevel{0u};
+  Dali::Scene3D::SceneView::CaptureFinishedSignalType mCaptureFinishedSignal;
+
+  int32_t                                                                mCaptureId{0};     // Capture ID for requested capture, this is incrementally increasing.
+  std::vector<std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>>> mCaptureContainer; // Container that stores CaptureData until the Capture is finished.
+  Dali::Timer                                                            mCaptureTimer;     // Timer to check the capture is time out or not.
+  int32_t                                                                mTimerTickCount{0};
 
   Dali::Integration::OrderedSet<Scene3D::Internal::LightObserver, false> mLightObservers; ///< The set of items to be notified when light properties change. (not owned)
 

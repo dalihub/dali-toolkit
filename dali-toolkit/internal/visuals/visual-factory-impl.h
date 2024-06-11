@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/adaptor-framework/shader-precompiler.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/integration-api/adaptor-framework/shader-precompiler.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
@@ -72,9 +72,19 @@ public:
   Toolkit::Visual::Base CreateVisual(const Property::Map& propertyMap);
 
   /**
+   * @copydoc Toolkit::VisualFactory::CreateVisual( const Property::Map&, Toolkit::VisualFactory::CreationOptions )
+   */
+  Toolkit::Visual::Base CreateVisual(const Property::Map& propertyMap, Toolkit::VisualFactory::CreationOptions creationOptions);
+
+  /**
    * @copydoc Toolkit::VisualFactory::CreateVisual( const std::string&, ImageDimensions )
    */
   Toolkit::Visual::Base CreateVisual(const std::string& image, ImageDimensions size);
+
+  /**
+   * @copydoc Toolkit::VisualFactory::CreateVisual( const std::string&, ImageDimensions, Toolkit::VisualFactory::CreationOptions )
+   */
+  Toolkit::Visual::Base CreateVisual(const std::string& image, ImageDimensions size, Toolkit::VisualFactory::CreationOptions creationOptions);
 
   /**
    * @copydoc Toolkit::VisualFactory::SetPreMultiplyOnLoad()
@@ -85,6 +95,16 @@ public:
    * @copydoc Toolkit::VisualFactory::GetPreMultiplyOnLoad()
    */
   bool GetPreMultiplyOnLoad() const;
+
+  /**
+   * @copydoc Toolkit::VisualFactory::SetDefaultCreationOptions( Toolkit::VisualFactory::CreationOptions )
+   */
+  void SetDefaultCreationOptions(Toolkit::VisualFactory::CreationOptions creationOptions);
+
+  /**
+   * @copydoc Toolkit::VisualFactory::GetDefaultCreationOptions()
+   */
+  Toolkit::VisualFactory::CreationOptions GetDefaultCreationOptions() const;
 
   /**
    * @copydoc Toolkit::VisualFactory::DiscardVisual()
@@ -157,9 +177,12 @@ private:
   CallbackBase*                             mIdleCallback;
   using DiscardedVisualContainer = std::vector<Toolkit::Visual::Base>;
   DiscardedVisualContainer mDiscardedVisuals{};
-  bool                                      mDebugEnabled : 1;
-  bool                                      mPreMultiplyOnLoad : 1; ///< Local store for this flag
-  bool                                      mPrecompiledShaderRequested : 1;
+
+  Toolkit::VisualFactory::CreationOptions mDefaultCreationOptions : 2;
+
+  bool mDebugEnabled : 1;
+  bool mPreMultiplyOnLoad : 1; ///< Local store for this flag
+  bool mPrecompiledShaderRequested : 1;
 };
 
 /**

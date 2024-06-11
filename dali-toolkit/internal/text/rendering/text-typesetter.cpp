@@ -62,6 +62,23 @@ inline uint8_t MultiplyAndNormalizeColor(const uint8_t x, const uint8_t y) noexc
   return ((xy << 15) + (xy << 7) + xy) >> 23;
 }
 
+/**
+ * @brief Fast multiply & Summation & divide by 255.
+ *
+ * @param x1 The value between [0..255]
+ * @param y1 The value between [0..255]
+ * @param x2 The value between [0..255]
+ * @param y2 The value between [0..255]
+ * @return min(255, (x1*y1)/255 + (x2*y2)/255)
+ */
+inline uint8_t MultiplyAndSummationAndNormalizeColor(const uint8_t x1, const uint8_t y1, const uint8_t x2, const uint8_t y2) noexcept
+{
+  const uint32_t xy1 = static_cast<const uint32_t>(x1) * y1;
+  const uint32_t xy2 = static_cast<const uint32_t>(x2) * y2;
+  const uint32_t res = std::min(65025u, xy1 + xy2); // 65025 is 255 * 255.
+  return ((res + ((res + 257) >> 8)) >> 8); // fast divide by 255.
+}
+
 /// Helper macro define for glyph typesetter. It will reduce some duplicated code line.
 // clang-format off
 /**
@@ -1655,27 +1672,17 @@ void Typesetter::SetMaskForImageBuffer(Devel::PixelBuffer& __restrict__ topPixel
     uint8_t* __restrict__ topBufferColorBuffer = reinterpret_cast<uint8_t*>(&topBufferColor);
     uint8_t* __restrict__ bottomBufferColorBuffer = reinterpret_cast<uint8_t*>(&bottomBufferColor);
 
+    // Return the transparency of the text to original.
+    uint8_t originAlphaInt = originAlpha * 255;
+
     uint8_t topAlpha = topBufferColorBuffer[3];
     uint8_t bottomAlpha = 255 - topAlpha;
 
-    float tempTop[4], tempBottom[4];
-
-    // Return the transparency of the text to original.
-    tempTop[0] = static_cast<float>(topBufferColorBuffer[0]) * originAlpha;
-    tempTop[1] = static_cast<float>(topBufferColorBuffer[1]) * originAlpha;
-    tempTop[2] = static_cast<float>(topBufferColorBuffer[2]) * originAlpha;
-    tempTop[3] = static_cast<float>(topBufferColorBuffer[3]) * originAlpha;
-
     // Manual blending.
-    tempBottom[0] = static_cast<float>(bottomBufferColorBuffer[0]) * static_cast<float>(bottomAlpha) / 255.f;
-    tempBottom[1] = static_cast<float>(bottomBufferColorBuffer[1]) * static_cast<float>(bottomAlpha) / 255.f;
-    tempBottom[2] = static_cast<float>(bottomBufferColorBuffer[2]) * static_cast<float>(bottomAlpha) / 255.f;
-    tempBottom[3] = static_cast<float>(bottomBufferColorBuffer[3]) * static_cast<float>(bottomAlpha) / 255.f;
-
-    bottomBufferColorBuffer[0] = static_cast<uint8_t>(std::min(255u, static_cast<uint32_t>(tempBottom[0] + tempTop[0])));
-    bottomBufferColorBuffer[1] = static_cast<uint8_t>(std::min(255u, static_cast<uint32_t>(tempBottom[1] + tempTop[1])));
-    bottomBufferColorBuffer[2] = static_cast<uint8_t>(std::min(255u, static_cast<uint32_t>(tempBottom[2] + tempTop[2])));
-    bottomBufferColorBuffer[3] = static_cast<uint8_t>(std::min(255u, static_cast<uint32_t>(tempBottom[3] + tempTop[3])));
+    bottomBufferColorBuffer[0] = MultiplyAndSummationAndNormalizeColor(topBufferColorBuffer[0], originAlphaInt, bottomBufferColorBuffer[0], bottomAlpha);
+    bottomBufferColorBuffer[1] = MultiplyAndSummationAndNormalizeColor(topBufferColorBuffer[1], originAlphaInt, bottomBufferColorBuffer[1], bottomAlpha);
+    bottomBufferColorBuffer[2] = MultiplyAndSummationAndNormalizeColor(topBufferColorBuffer[2], originAlphaInt, bottomBufferColorBuffer[2], bottomAlpha);
+    bottomBufferColorBuffer[3] = MultiplyAndSummationAndNormalizeColor(topBufferColorBuffer[3], originAlphaInt, bottomBufferColorBuffer[3], bottomAlpha);
 
     *(bottomBuffer) = bottomBufferColor;
 

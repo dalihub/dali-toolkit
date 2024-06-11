@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,5 +135,40 @@ int UtcDaliLoadFacialAnimation(void)
     DALI_TEST_EQUAL(anim.GetLoopCount(), animDef.GetLoopCount());
   }
 
+  END_TEST;
+}
+
+int UtcDaliLoadFacialAnimationFailed01(void)
+{
+  TestApplication application;
+
+  AnimationDefinition animDef = LoadFacialAnimation("/nothing.json");
+  DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliLoadFacialAnimationFailed02(void)
+{
+  TestApplication application;
+
+  AnimationDefinition animDef = LoadFacialAnimationFromBuffer(nullptr, 0);
+  DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliLoadFacialAnimationFailed03(void)
+{
+  TestApplication application;
+
+  tet_infoline("Parse error for invalid json");
+  uint32_t caseCount = 6;
+  for(uint32_t tc = 0; tc < caseCount; ++tc)
+  {
+    tet_printf("Parse error for json %u\n", tc);
+    std::ostringstream oss;
+    oss << TEST_RESOURCE_DIR << "/test-invalid-facial-animation" << tc << ".json";
+    AnimationDefinition animDef = LoadFacialAnimation(oss.str());
+    DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
+  }
   END_TEST;
 }

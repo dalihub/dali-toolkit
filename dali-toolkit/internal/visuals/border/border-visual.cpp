@@ -55,7 +55,7 @@ BorderVisualPtr BorderVisual::New(VisualFactoryCache& factoryCache, const Proper
 }
 
 BorderVisual::BorderVisual(VisualFactoryCache& factoryCache)
-: Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::BORDER),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::BORDER),
   mBorderColor(Color::TRANSPARENT),
   mBorderSize(0.f),
   mBorderColorIndex(Property::INVALID_INDEX),

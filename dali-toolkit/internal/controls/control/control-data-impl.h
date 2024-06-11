@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/integration-api/processor-interface.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -72,7 +73,7 @@ typedef Dali::OwnerContainer<RegisteredVisual*> RegisteredVisualContainer;
 /**
  * @brief Holds the Implementation for the internal control class
  */
-class Control::Impl : public ConnectionTracker, public Visual::EventObserver
+class Control::Impl : public ConnectionTracker, public Visual::EventObserver, public Integration::Processor
 {
   friend class Toolkit::DevelControl::ControlAccessible;
 
@@ -471,6 +472,32 @@ public:
    */
   bool IsCreateAccessibleEnabled() const;
 
+  /**
+   * @brief Apply fittingMode
+   *
+   * @param[in] size The size of the control
+   */
+  void ApplyFittingMode(const Vector2& size);
+
+  /**
+   * @brief Register processor
+  */
+  void RegisterProcessorOnce();
+
+protected: // From processor-interface
+  /**
+   * @copydoc Dali::Integration::Processor::Process()
+   */
+  void Process(bool postProcessor) override;
+
+  /**
+   * @copydoc Dali::Integration::Processor::GetProcessorName()
+   */
+  std::string_view GetProcessorName() const override
+  {
+    return "ControlDataImpl";
+  }
+
 private:
   /**
    * Used as an alternative to boolean so that it is obvious whether a visual is enabled/disabled.
@@ -576,6 +603,7 @@ public:
   Vector3*                                  mStartingPinchScale; ///< The scale when a pinch gesture starts, TODO: consider removing this
   Extents                                   mMargin;             ///< The margin values
   Extents                                   mPadding;            ///< The padding values
+  Vector2                                   mSize;               ///< The size of the control
   Toolkit::Control::KeyEventSignalType      mKeyEventSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
@@ -626,6 +654,7 @@ public:
   bool             mIsEmittingResourceReadySignal : 1;    ///< True during ResourceReady().
   bool             mIdleCallbackRegistered : 1;           ///< True if need to emit the resource ready signal again.
   bool             mDispatchKeyEvents : 1;                ///< Whether the actor emits key event signals
+  bool             mProcessorRegistered : 1;              ///< Whether the processor is registered.
 
   RegisteredVisualContainer mRemoveVisuals; ///< List of visuals that are being replaced by another visual once ready
 

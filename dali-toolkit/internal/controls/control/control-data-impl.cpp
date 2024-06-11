@@ -45,6 +45,7 @@
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
@@ -76,6 +77,7 @@ const Scripting::StringEnum ControlStateTable[] = {
   {"DISABLED", Toolkit::DevelControl::DISABLED},
 };
 const unsigned int ControlStateTableCount = sizeof(ControlStateTable) / sizeof(ControlStateTable[0]);
+const Vector4      FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 namespace
 {
@@ -554,6 +556,7 @@ Control::Impl::Impl(Control& controlImpl)
   mStartingPinchScale(nullptr),
   mMargin(0, 0, 0, 0),
   mPadding(0, 0, 0, 0),
+  mSize(0, 0),
   mKeyEventSignal(),
   mKeyInputFocusGainedSignal(),
   mKeyInputFocusLostSignal(),
@@ -574,7 +577,8 @@ Control::Impl::Impl(Control& controlImpl)
   mIsKeyboardFocusGroup(false),
   mIsEmittingResourceReadySignal(false),
   mIdleCallbackRegistered(false),
-  mDispatchKeyEvents(true)
+  mDispatchKeyEvents(true),
+  mProcessorRegistered(false)
 {
   Dali::Accessibility::Accessible::RegisterExternalAccessibleGetter(&ExternalAccessibleGetter);
 }
@@ -593,6 +597,12 @@ Control::Impl::~Impl()
 
   // All gesture detectors will be destroyed so no need to disconnect.
   delete mStartingPinchScale;
+
+  if(mProcessorRegistered && Adaptor::IsAvailable())
+  {
+    // Unregister the processor from the adaptor
+    Adaptor::Get().UnregisterProcessorOnce(*this, true);
+  }
 
   if(mIdleCallback && Adaptor::IsAvailable())
   {
@@ -1206,10 +1216,10 @@ void Control::Impl::AddTransitions(Dali::Animation&               animation,
             }
 
             animation.AnimateTo(Property(child, propertyIndex),
-                  animator->targetValue,
-                  animator->alphaFunction,
-                  TimePeriod(animator->timePeriodDelay,
-                            animator->timePeriodDuration));
+                                animator->targetValue,
+                                animator->alphaFunction,
+                                TimePeriod(animator->timePeriodDelay,
+                                           animator->timePeriodDuration));
           }
         }
       }
@@ -2306,6 +2316,205 @@ void Control::Impl::EnableCreateAccessible(bool enable)
 bool Control::Impl::IsCreateAccessibleEnabled() const
 {
   return mAccessibleCreatable;
+}
+
+void Control::Impl::ApplyFittingMode(const Vector2& size)
+{
+  Actor self = mControlImpl.Self();
+  for(RegisteredVisualContainer::Iterator iter = mVisuals.Begin(); iter != mVisuals.End(); iter++)
+  {
+    // Check whether the visual is empty and enabled
+    if((*iter)->visual && (*iter)->enabled)
+    {
+      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation((*iter)->visual);
+
+      // If the current visual is using the transform property map, fittingMode will not be applied.
+      if(visualImpl.IsIgnoreFittingMode())
+      {
+        continue;
+      }
+
+      Visual::FittingMode fittingMode  = visualImpl.GetFittingMode();
+      Property::Map       transformMap = Property::Map();
+
+      // If the fittingMode is DONT_CARE, we don't need to apply fittingMode, just Set empty transformMap
+      if(fittingMode == Visual::FittingMode::DONT_CARE)
+      {
+        if(visualImpl.GetType() != Toolkit::Visual::Type::TEXT)
+        {
+          ((*iter)->visual).SetTransformAndSize(transformMap, size);
+        }
+        continue;
+      }
+
+      Extents padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+
+      bool zeroPadding = (padding == Extents());
+
+      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(
+        self.GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+      if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
+      {
+        std::swap(padding.start, padding.end);
+      }
+
+      // remove padding from the size to know how much is left for the visual
+      Vector2 finalSize   = size - Vector2(padding.start + padding.end, padding.top + padding.bottom);
+      Vector2 finalOffset = Vector2(padding.start, padding.top);
+
+      // Reset PIXEL_AREA after using OVER_FIT_KEEP_ASPECT_RATIO
+      if(visualImpl.IsPixelAreaSetForFittingMode())
+      {
+        visualImpl.SetPixelAreaForFittingMode(FULL_TEXTURE_RECT);
+      }
+
+      if((!zeroPadding) || // If padding is not zero
+         (fittingMode != Visual::FittingMode::FILL))
+      {
+        visualImpl.SetTransformMapUsageForFittingMode(true);
+
+        Vector2 naturalSize;
+        // NaturalSize will not be used for FILL fitting mode, which is default.
+        // Skip GetNaturalSize
+        if(fittingMode != Visual::FittingMode::FILL)
+        {
+          ((*iter)->visual).GetNaturalSize(naturalSize);
+        }
+
+        // If FittingMode use FIT_WIDTH or FIT_HEIGTH, it need to change proper fittingMode
+        if(fittingMode == Visual::FittingMode::FIT_WIDTH || fittingMode == Visual::FittingMode::FIT_HEIGHT)
+        {
+          const float widthRatio  = !Dali::EqualsZero(naturalSize.width) ? (finalSize.width / naturalSize.width) : 0.0f;
+          const float heightRatio = !Dali::EqualsZero(naturalSize.height) ? (finalSize.height / naturalSize.height) : 0.0f;
+          if(widthRatio < heightRatio)
+          {
+            // Final size has taller form than natural size.
+            fittingMode = (fittingMode == Visual::FittingMode::FIT_WIDTH) ? Visual::FittingMode::FIT_KEEP_ASPECT_RATIO : Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO;
+          }
+          else
+          {
+            // Final size has wider form than natural size.
+            fittingMode = (fittingMode == Visual::FittingMode::FIT_WIDTH) ? Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO : Visual::FittingMode::FIT_KEEP_ASPECT_RATIO;
+          }
+        }
+
+        // Calculate size for fittingMode
+        switch(fittingMode)
+        {
+          case Visual::FittingMode::FIT_KEEP_ASPECT_RATIO:
+          {
+            auto availableVisualSize = finalSize;
+
+            // scale to fit the padded area
+            finalSize = naturalSize * std::min((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0),
+                                               (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0));
+
+            // calculate final offset within the padded area
+            finalOffset += (availableVisualSize - finalSize) * .5f;
+
+            // populate the transform map
+            transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET, finalOffset)
+              .Add(Toolkit::Visual::Transform::Property::SIZE, finalSize);
+            break;
+          }
+          case Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO:
+          {
+            auto availableVisualSize = finalSize;
+            finalSize                = naturalSize * std::max((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
+                                               (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
+
+            auto originalOffset = finalOffset;
+
+            if(!visualImpl.IsPixelAreaSetForFittingMode() && !Dali::EqualsZero(finalSize.width) && !Dali::EqualsZero(finalSize.height))
+            {
+              float   x           = abs((availableVisualSize.width - finalSize.width) / finalSize.width) * .5f;
+              float   y           = abs((availableVisualSize.height - finalSize.height) / finalSize.height) * .5f;
+              float   widthRatio  = 1.f - abs((availableVisualSize.width - finalSize.width) / finalSize.width);
+              float   heightRatio = 1.f - abs((availableVisualSize.height - finalSize.height) / finalSize.height);
+              Vector4 pixelArea   = Vector4(x, y, widthRatio, heightRatio);
+              visualImpl.SetPixelAreaForFittingMode(pixelArea);
+            }
+
+            // populate the transform map
+            transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET, originalOffset)
+              .Add(Toolkit::Visual::Transform::Property::SIZE, availableVisualSize);
+            break;
+          }
+          case Visual::FittingMode::CENTER:
+          {
+            auto availableVisualSize = finalSize;
+            if(availableVisualSize.width > naturalSize.width && availableVisualSize.height > naturalSize.height)
+            {
+              finalSize = naturalSize;
+            }
+            else
+            {
+              finalSize = naturalSize * std::min((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
+                                                 (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
+            }
+
+            finalOffset += (availableVisualSize - finalSize) * .5f;
+
+            // populate the transform map
+            transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET, finalOffset)
+              .Add(Toolkit::Visual::Transform::Property::SIZE, finalSize);
+            break;
+          }
+          case Visual::FittingMode::FILL:
+          {
+            transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET, finalOffset)
+              .Add(Toolkit::Visual::Transform::Property::SIZE, finalSize);
+            break;
+          }
+          case Visual::FittingMode::FIT_WIDTH:
+          case Visual::FittingMode::FIT_HEIGHT:
+          case Visual::FittingMode::DONT_CARE:
+          {
+            // This FittingMode already converted
+            break;
+          }
+        }
+
+        // Set extra value for applying transformMap
+        transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY,
+                         Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
+          .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN)
+          .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN)
+          .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY,
+               Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE));
+      }
+      else if(visualImpl.IsTransformMapSetForFittingMode() && zeroPadding) // Reset offset to zero only if padding applied previously
+      {
+        visualImpl.SetTransformMapUsageForFittingMode(false);
+
+        // Reset the transform map
+        transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET, Vector2::ZERO)
+          .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY,
+               Vector2(Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE))
+          .Add(Toolkit::Visual::Transform::Property::SIZE, Vector2::ONE)
+          .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY,
+               Vector2(Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE));
+      }
+
+      ((*iter)->visual).SetTransformAndSize(transformMap, size);
+    }
+  }
+}
+
+void Control::Impl::RegisterProcessorOnce()
+{
+  if(!mProcessorRegistered)
+  {
+    Adaptor::Get().RegisterProcessorOnce(*this, true);
+    mProcessorRegistered = true;
+  }
+}
+
+void Control::Impl::Process(bool postProcessor)
+{
+  // Call ApplyFittingMode
+  ApplyFittingMode(mSize);
+  mProcessorRegistered = false;
 }
 
 } // namespace Internal

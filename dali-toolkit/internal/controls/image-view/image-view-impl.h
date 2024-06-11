@@ -194,21 +194,6 @@ private:
    */
   void OnResourceReady(Toolkit::Control control);
 
-  /**
-   * @brief Set TransformMap for fittingMode
-   * param[in] finalSize The size for fittingMode
-   * param[in] textureSize The size of texture
-   * param[in] offset The offset for fittingMode
-   * param[in] fittingMode The mode for fitting image
-   * param[in] transformMap  The map for fitting image
-   */
-  void SetTransformMapForFittingMode(Vector2 finalSize, Vector2 textureSize, Vector2 offset, Visual::FittingMode fittingMode, Property::Map& transformMap);
-
-  /**
-   * @brief Apply fittingMode
-   */
-  void ApplyFittingMode(const Vector2& size);
-
    /**
    * @brief Create placeholder image if it set. placeholder image is shown when image view is waiting for the image to load.
    */
@@ -253,10 +238,7 @@ private:
 
   Animation       mTransitionAnimation;                    ///< the animation for transition effect
   float           mTransitionTargetAlpha;                  ///< Keep image's alpha value
-  bool            mImageVisualPaddingSetByTransform : 1;   ///< Flag to indicate Padding was set using a transform.
-  bool            mImageViewPixelAreaSetByFittingMode : 1; ///< Flag to indicate pixel area was set by fitting Mode
   bool            mTransitionEffect :1;                    ///< Flag to indicate TransitionEffect is enabled
-  bool            mNeedLazyFittingMode:1;                  ///< Flag to indicate FittingMode will be applying lazy
   bool            mImageReplaced:1;                        ///< Flag to indicate image is replaced
 };
 
