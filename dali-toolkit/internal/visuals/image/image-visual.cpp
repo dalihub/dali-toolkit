@@ -188,6 +188,7 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
   mImageUrl(imageUrl),
   mMaskingData(),
   mDesiredSize(size),
+  mLastRequiredSize(size),
   mTextureId(TextureManager::INVALID_TEXTURE_ID),
   mTextures(),
   mImageVisualShaderFactory(shaderFactory),
@@ -263,8 +264,9 @@ void ImageVisual::DoSetProperties(const Property::Map& propertyMap)
   // Load image immediately if LOAD_POLICY requires it
   if(mLoadPolicy == Toolkit::ImageVisual::LoadPolicy::IMMEDIATE)
   {
-    auto attemptAtlasing = AttemptAtlasing();
-    LoadTexture(attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection, TextureManager::ReloadPolicy::CACHED);
+    Dali::ImageDimensions size            = mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize;
+    auto                  attemptAtlasing = AttemptAtlasing();
+    LoadTexture(attemptAtlasing, mAtlasRect, mTextures, size, TextureManager::ReloadPolicy::CACHED);
   }
 }
 
@@ -457,6 +459,12 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
       value.Get(mUseFastTrackUploading);
       break;
     }
+
+    case Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING:
+    {
+      value.Get(mUseSynchronousSizing);
+      break;
+    }
   }
 }
 
@@ -474,7 +482,30 @@ void ImageVisual::AllocateMaskData()
 
 void ImageVisual::GetNaturalSize(Vector2& naturalSize)
 {
-  if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
+  if(mUseSynchronousSizing && (mLastRequiredSize.GetWidth() > 0 && mLastRequiredSize.GetHeight() > 0))
+  {
+    if(mImpl->mRenderer)
+    {
+      auto textureSet = mImpl->mRenderer.GetTextures();
+      if(textureSet && textureSet.GetTextureCount())
+      {
+        auto texture = textureSet.GetTexture(0);
+        if(texture)
+        {
+          if(mTextureSize != Vector2::ZERO)
+          {
+            naturalSize = mTextureSize;
+            return;
+          }
+        }
+      }
+    }
+
+    naturalSize.x = mLastRequiredSize.GetWidth();
+    naturalSize.y = mLastRequiredSize.GetHeight();
+    return;
+  }
+  else if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
   {
     if(mImpl->mRenderer)
     {
@@ -596,9 +627,11 @@ void ImageVisual::OnInitialize()
   }
 }
 
-void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection, TextureManager::ReloadPolicy forceReload)
+void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& textures, const Dali::ImageDimensions& size, TextureManager::ReloadPolicy forceReload)
 {
   TextureManager& textureManager = mFactoryCache.GetTextureManager();
+
+  mLastRequiredSize = size;
 
   ImageAtlasManagerPtr atlasManager        = nullptr;
   AtlasUploadObserver* atlasUploadObserver = nullptr;
@@ -643,6 +676,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
        forceReload == TextureManager::ReloadPolicy::CACHED &&
        (mImageUrl.GetProtocolType() == VisualUrl::LOCAL || mImageUrl.GetProtocolType() == VisualUrl::REMOTE) &&
        !synchronousLoading &&
+       !mUseSynchronousSizing &&
        !atlasing &&
        !mImpl->mCustomShader &&
        !(mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()))
@@ -651,13 +685,14 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
     }
     else if(mUseFastTrackUploading)
     {
-      DALI_LOG_DEBUG_INFO("FastTrack : Fail to load fast track. mUrl : [%s]%s%s%s%s%s%s%s%s\n",
+      DALI_LOG_DEBUG_INFO("FastTrack : Fail to load fast track. mUrl : [%s]%s%s%s%s%s%s%s%s%s\n",
                           mImageUrl.GetEllipsedUrl().c_str(),
                           (mLoadPolicy != Toolkit::ImageVisual::LoadPolicy::ATTACHED) ? "/ mLoadPolicy != ATTACHED" : "",
                           (mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::DETACHED) ? "/ mReleasePolicy != DETACHED" : "",
                           (forceReload != TextureManager::ReloadPolicy::CACHED) ? "/ forceReload != CACHED" : "",
                           (!(mImageUrl.GetProtocolType() == VisualUrl::LOCAL || mImageUrl.GetProtocolType() == VisualUrl::REMOTE)) ? "/ url is not image" : "",
                           (synchronousLoading) ? "/ synchronousLoading" : "",
+                          (mUseSynchronousSizing) ? "/ useSynchronousSizing " : "",
                           (atlasing) ? "/ atlasing" : "",
                           (mImpl->mCustomShader) ? "/ use customs shader" : "",
                           (mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()) ? "/ use masking url" : "");
@@ -671,7 +706,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
     EnablePreMultipliedAlpha(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
 
     // Set new TextureSet with fast track loading task
-    mFastTrackLoadingTask = new FastTrackLoadingTask(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode, mOrientationCorrection, preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, mFactoryCache.GetLoadYuvPlanes(), MakeCallback(this, &ImageVisual::FastLoadComplete));
+    mFastTrackLoadingTask = new FastTrackLoadingTask(mImageUrl, size, mFittingMode, mSamplingMode, mOrientationCorrection, preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, mFactoryCache.GetLoadYuvPlanes(), MakeCallback(this, &ImageVisual::FastLoadComplete));
 
     TextureSet textureSet = TextureSet::New();
     if(!mFastTrackLoadingTask->mLoadPlanesAvaliable)
@@ -699,7 +734,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
   }
   else
   {
-    textures = textureManager.LoadTexture(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mTextureId, atlasRect, mAtlasRectSize, atlasing, loadingStatus, textureObserver, atlasUploadObserver, atlasManager, mOrientationCorrection, forceReload, preMultiplyOnLoad);
+    textures = textureManager.LoadTexture(mImageUrl, size, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mTextureId, atlasRect, mAtlasRectSize, atlasing, loadingStatus, textureObserver, atlasUploadObserver, atlasManager, mOrientationCorrection, forceReload, preMultiplyOnLoad);
   }
 
   if(textures)
@@ -759,7 +794,7 @@ void ImageVisual::InitializeRenderer()
   {
     if(mTextureId == TextureManager::INVALID_TEXTURE_ID)
     {
-      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection, TextureManager::ReloadPolicy::CACHED);
+      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, mDesiredSize, TextureManager::ReloadPolicy::CACHED);
     }
     else
     {
@@ -897,9 +932,11 @@ void ImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, sync);
   if(mImageUrl.IsValid())
   {
+    Dali::ImageDimensions size = mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize;
+
     map.Insert(Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl());
-    map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
-    map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
+    map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, size.GetWidth());
+    map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, size.GetHeight());
   }
 
   map.Insert(Toolkit::ImageVisual::Property::FITTING_MODE, mFittingMode);
@@ -934,6 +971,7 @@ void ImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION, mOrientationCorrection);
 
   map.Insert(Toolkit::DevelImageVisual::Property::FAST_TRACK_UPLOADING, mUseFastTrackUploading);
+  map.Insert(Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING, mUseSynchronousSizing);
 }
 
 void ImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -942,8 +980,9 @@ void ImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
   if(mImageUrl.IsValid())
   {
-    map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
-    map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
+    Dali::ImageDimensions size = mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize;
+    map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, size.GetWidth());
+    map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, size.GetHeight());
   }
 }
 
@@ -961,7 +1000,8 @@ void ImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::P
       ResourceReady(Toolkit::Visual::ResourceStatus::PREPARING);
       mLoadState = TextureManager::LoadState::NOT_STARTED;
 
-      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection, TextureManager::ReloadPolicy::FORCED);
+      Dali::ImageDimensions size = mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize;
+      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, size, TextureManager::ReloadPolicy::FORCED);
       break;
     }
   }
@@ -972,6 +1012,28 @@ void ImageVisual::OnSetTransform()
   if(mImpl->mRenderer)
   {
     mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  }
+
+  if(mUseSynchronousSizing)
+  {
+    // Get current visual size
+    Vector2  size                    = mImpl->mTransform.GetVisualSize(mImpl->mControlSize);
+    uint32_t maximumNumber           = std::numeric_limits<uint16_t>::max();
+    uint32_t sizeWidth               = static_cast<uint32_t>(roundf(size.width));
+    sizeWidth                        = std::min(sizeWidth, maximumNumber);
+    uint32_t sizeHeight              = static_cast<uint32_t>(roundf(size.height));
+    sizeHeight                       = std::min(sizeHeight, maximumNumber);
+    Dali::ImageDimensions visualSize = Dali::ImageDimensions(sizeWidth, sizeHeight);
+
+    // Reload if visual size is updated
+    if(mLastRequiredSize != visualSize)
+    {
+      RemoveTexture();
+
+      mLoadState           = TextureManager::LoadState::NOT_STARTED;
+      bool attemptAtlasing = AttemptAtlasing();
+      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, visualSize, TextureManager::ReloadPolicy::FORCED);
+    }
   }
 }
 

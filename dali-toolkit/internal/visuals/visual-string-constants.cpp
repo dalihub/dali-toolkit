@@ -213,6 +213,7 @@ const char* const FAST_TRACK_UPLOADING_NAME("fastTrackUploading");
 const char* const ENABLE_BROKEN_IMAGE("enableBrokenImage");
 const char* const ENABLE_FRAME_CACHE("enableFrameCache");
 const char* const NOTIFY_AFTER_RASTERIZATION("notifyAfterRasterization");
+const char* const SYNCHRONOUS_SIZING("synchronousSizing");
 
 // Text visual
 const char* const TEXT_PROPERTY("text");
