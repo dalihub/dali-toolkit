@@ -1011,6 +1011,14 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
     }
   }
 
+  const bool isCutoutEnabled = mModel->IsCutoutEnabled();
+  if(isCutoutEnabled)
+  {
+    Vector2 padding = mModel->GetPaddingWithCutout();
+    penX += padding.x;
+    penY += padding.y;
+  }
+
   // Generate the image buffers of the text for each different style first,
   // then combine all of them together as one final image buffer. We try to
   // do all of these in CPU only, so that once the final texture is generated,

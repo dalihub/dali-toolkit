@@ -510,6 +510,14 @@ void TextVisual::UpdateRenderer()
   const float controlWidth = mImpl->mControlSize.width;
   const float controlHeight = mImpl->mControlSize.height;
 
+  const bool cutoutEnabled = mController->IsTextCutout();
+  Extents padding = control.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  if(cutoutEnabled)
+  {
+    relayoutSize.width -= padding.start + padding.end;
+    relayoutSize.height -= padding.top + padding.bottom;
+  }
+
   // Round the size and offset to avoid pixel alignement issues.
   relayoutSize.width  = floorf(0.5f + (isWidthRelative ? controlWidth * mImpl->mTransform.mSize.x : mImpl->mTransform.mSize.width));
   relayoutSize.height = floorf(0.5f + (isHeightRelative ? controlHeight * mImpl->mTransform.mSize.y : mImpl->mTransform.mSize.height));
@@ -593,6 +601,8 @@ void TextVisual::UpdateRenderer()
         relayoutSize = Vector2(controlWidth, controlHeight);
         mImpl->mTransform.mSize.width = controlWidth;
         mImpl->mTransform.mSize.height = controlHeight;
+
+        mController->SetPaddingWithCutout(Vector2(mImpl->mTransform.mOffset.x, mImpl->mTransform.mOffset.y));
         mImpl->mTransform.mOffset.x = 0;
         mImpl->mTransform.mOffset.y = 0;
       }
