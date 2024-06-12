@@ -794,6 +794,11 @@ const Vector4& ViewModel::GetBackgroundColorWithCutout() const
   return mModel->GetBackgroundColorWithCutout();
 }
 
+const Vector2& ViewModel::GetOffsetWithCutout() const
+{
+  return mModel->GetOffsetWithCutout();
+}
+
 } // namespace Text
 
 } // namespace Toolkit

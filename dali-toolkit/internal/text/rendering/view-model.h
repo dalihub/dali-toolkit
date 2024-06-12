@@ -413,6 +413,11 @@ public:
    */
   const Vector4& GetBackgroundColorWithCutout() const override;
 
+  /**
+   * @copydoc ModelInterface::GetOffsetWithCutout()
+   */
+  const Vector2& GetOffsetWithCutout() const override;
+
 private:
   const ModelInterface* const mModel;                           ///< Pointer to the text's model.
   Vector<GlyphInfo>           mElidedGlyphs;                    ///< Stores the glyphs of the elided text.

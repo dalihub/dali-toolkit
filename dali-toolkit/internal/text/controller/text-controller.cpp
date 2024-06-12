@@ -1568,6 +1568,11 @@ const Vector4 Controller::GetBackgroundColorWithCutout() const
   return mImpl->mModel->mVisualModel->GetBackgroundColorWithCutout();
 }
 
+void Controller::SetOffsetWithCutout(const Vector2& offset)
+{
+  mImpl->mModel->mVisualModel->SetOffsetWithCutout(offset);
+}
+
 Controller::UpdateTextType Controller::Relayout(const Size& size, Dali::LayoutDirection::Type layoutDirection)
 {
   return Relayouter::Relayout(*this, size, layoutDirection);

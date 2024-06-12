@@ -590,11 +590,21 @@ void TextVisual::UpdateRenderer()
 
       if(cutoutEnabled)
       {
-        relayoutSize                   = Vector2(controlWidth, controlHeight);
-        mImpl->mTransform.mSize.width  = controlWidth;
+        // mTransform stores the size and offset of the current visual.
+        // padding and alignment information is stored in mOffset.
+        // When Cutout Enabled, the current visual must draw the entire control.
+        // so set the size to controlSize and offset to 0.
+
+        relayoutSize = Vector2(controlWidth, controlHeight);
+        mImpl->mTransform.mSize.width = controlWidth;
         mImpl->mTransform.mSize.height = controlHeight;
-        mImpl->mTransform.mOffset.x    = 0;
-        mImpl->mTransform.mOffset.y    = 0;
+
+        // Relayout to the original size has been completed, so save only the offset information and use it in typesetter.
+
+        Vector2 originOffset = Vector2(mImpl->mTransform.mOffset.x, mImpl->mTransform.mOffset.y);
+        mController->SetOffsetWithCutout(originOffset);
+        mImpl->mTransform.mOffset.x = 0;
+        mImpl->mTransform.mOffset.y = 0;
       }
 
       AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);

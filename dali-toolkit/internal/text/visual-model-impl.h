@@ -704,6 +704,20 @@ public:
    */
   const Vector4& GetBackgroundColorWithCutout() const;
 
+  /**
+   * @brief Sets the left and top offset with cutout.
+   *
+   * @param[in] offset The offset to set.
+   */
+  void SetOffsetWithCutout(const Vector2& offset);
+
+  /**
+   * @brief Retrieves the left and top offset with cutout.
+   *
+   * @return The offset.
+   */
+  const Vector2& GetOffsetWithCutout() const;
+
 protected:
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -750,11 +764,12 @@ public:
   float                            mDashedUnderlineWidth;       ///< The width of the dashes of the dashed underline.
   float                            mDashedUnderlineGap;         ///< The gap between the dashes of the dashed underline.
   float                            mShadowBlurRadius;           ///< Blur radius of shadow, 0 indicates no blur.
-  float                            mOutlineBlurRadius;      ///< Blur radius of outline, 0 indicates no blur.
+  float                            mOutlineBlurRadius;          ///< Blur radius of outline, 0 indicates no blur.
   uint16_t                         mOutlineWidth;               ///< Width of outline.
   Vector<StrikethroughGlyphRun>    mStrikethroughRuns;          ///< Runs of glyphs that have strikethrough.
   Vector<CharacterSpacingGlyphRun> mCharacterSpacingRuns;       ///< Runs of glyphs that have character-spacing.
   Vector4                          mBackgroundColorWithCutout;  ///< Background color with cutout.
+  Vector2                          mOffsetWithCutout;           ///< Left and top offset when cutout.
 
 private:
   Size mNaturalSize;    ///< Size of the text with no line wrapping.
