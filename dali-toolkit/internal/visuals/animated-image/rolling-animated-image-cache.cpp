@@ -19,7 +19,7 @@
 
 // INTERNAL HEADERS
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
-#include <dali-toolkit/internal/visuals/image-atlas-manager.h> // For ImageAtlasManagerPtr
+#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h> // For ImageAtlasManagerPtr
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 

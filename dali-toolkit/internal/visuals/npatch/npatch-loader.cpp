@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/visuals/npatch-loader.h>
+#include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
 
 // INTERNAL HEADERS
 #include <dali-toolkit/internal/visuals/rendering-addon.h>

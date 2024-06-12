@@ -15,7 +15,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/visuals/image-visual-shader-debug.h>
+#include <dali-toolkit/internal/visuals/image/image-visual-shader-debug.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/environment-variable.h>

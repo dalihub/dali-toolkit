@@ -29,7 +29,7 @@
 // INTERNAL HEADERS
 #include <dali-toolkit/internal/texture-manager/texture-async-loading-helper.h>
 #include <dali-toolkit/internal/texture-manager/texture-cache-manager.h>
-#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
+#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
 
 namespace

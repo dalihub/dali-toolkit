@@ -19,9 +19,9 @@
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
-#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
-#include <dali-toolkit/internal/visuals/image-visual-shader-feature-builder.h>
+#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
+#include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/image/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/svg/svg-task.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
