@@ -543,13 +543,6 @@ public:
    * @return The color of the background with cutout.
    */
   virtual const Vector4& GetBackgroundColorWithCutout() const = 0;
-
-  /**
-   * @brief Retrieves the left and top padding with cutout.
-   *
-   * @return The padding with cutout.
-   */
-  virtual const Vector2& GetPaddingWithCutout() const = 0;
 };
 
 } // namespace Text

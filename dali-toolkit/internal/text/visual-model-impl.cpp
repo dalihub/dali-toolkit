@@ -695,16 +695,6 @@ const Vector4& VisualModel::GetBackgroundColorWithCutout() const
   return mBackgroundColorWithCutout;
 }
 
-void VisualModel::SetPaddingWithCutout(const Vector2& padding)
-{
-  mPaddingWithCutout = padding;
-}
-
-const Vector2& VisualModel::GetPaddingWithCutout() const
-{
-  return mPaddingWithCutout;
-}
-
 VisualModel::~VisualModel()
 {
 }
@@ -751,8 +741,7 @@ VisualModel::VisualModel()
   mStrikethroughEnabled(false),
   mCharacterSpacing(0.0f),
   mCutoutEnabled(false),
-  mBackgroundWithCutoutEnabled(false),
-  mPaddingWithCutout()
+  mBackgroundWithCutoutEnabled(false)
 {
 }
 

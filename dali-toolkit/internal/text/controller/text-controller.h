@@ -1704,13 +1704,6 @@ public: // Default style & Input style
    */
   const Vector4 GetBackgroundColorWithCutout() const;
 
-  /**
-   * @brief Sets padding with cutout.
-   *
-   * @param[in] padding The padding.
-   */
-  void SetPaddingWithCutout(const Vector2& padding);
-
 public: // Queries & retrieves.
   /**
    * @brief Return the layout engine.

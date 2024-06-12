@@ -381,11 +381,6 @@ const Vector4& Model::GetBackgroundColorWithCutout() const
   return mVisualModel->GetBackgroundColorWithCutout();
 }
 
-const Vector2& Model::GetPaddingWithCutout() const
-{
-  return mVisualModel->GetPaddingWithCutout();
-}
-
 Model::Model()
 : mLogicalModel(),
   mVisualModel(),

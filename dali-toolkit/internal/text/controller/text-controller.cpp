@@ -1568,11 +1568,6 @@ const Vector4 Controller::GetBackgroundColorWithCutout() const
   return mImpl->mModel->mVisualModel->GetBackgroundColorWithCutout();
 }
 
-void Controller::SetPaddingWithCutout(const Vector2& padding)
-{
-  mImpl->mModel->mVisualModel->SetPaddingWithCutout(padding);
-}
-
 Controller::UpdateTextType Controller::Relayout(const Size& size, Dali::LayoutDirection::Type layoutDirection)
 {
   return Relayouter::Relayout(*this, size, layoutDirection);
