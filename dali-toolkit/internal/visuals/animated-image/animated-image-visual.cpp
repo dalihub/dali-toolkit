@@ -32,8 +32,8 @@
 #include <dali-toolkit/internal/visuals/animated-image/fixed-image-cache.h>
 #include <dali-toolkit/internal/visuals/animated-image/rolling-animated-image-cache.h>
 #include <dali-toolkit/internal/visuals/animated-image/rolling-image-cache.h>
-#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
-#include <dali-toolkit/internal/visuals/image-visual-shader-feature-builder.h>
+#include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/image/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>

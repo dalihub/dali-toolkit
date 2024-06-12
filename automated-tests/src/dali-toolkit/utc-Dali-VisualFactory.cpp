@@ -26,7 +26,7 @@
 #include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
-#include <dali-toolkit/internal/visuals/npatch-loader.h>
+#include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/adaptor-framework/shader-precompiler.h>
 #include <dali/integration-api/debug.h>

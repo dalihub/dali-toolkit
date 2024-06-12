@@ -28,7 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-thread.h>
-#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 
 #ifdef TRACE_ENABLED
 #include <chrono>

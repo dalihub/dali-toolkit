@@ -15,14 +15,14 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/rendering/texture-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
-#include <dali-toolkit/internal/visuals/image-visual-shader-debug.h>
+#include <dali-toolkit/internal/visuals/image/image-visual-shader-debug.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali/integration-api/debug.h>
 

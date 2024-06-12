@@ -18,8 +18,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/common/owner-container.h>
-#include <dali/integration-api/adaptor-framework/shader-precompiler.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/geometry.h>
@@ -27,7 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
-#include <dali-toolkit/internal/visuals/npatch-loader.h>
+#include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 
 namespace Dali

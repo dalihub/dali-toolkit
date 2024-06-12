@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/visuals/npatch-loader.h>
+#include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
 
 // INTERNAL HEADERS
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
@@ -51,7 +51,7 @@ NPatchLoader::~NPatchLoader()
 {
   if(mRemoveProcessorRegistered && Adaptor::IsAvailable())
   {
-    Adaptor::Get().UnregisterProcessor(*this, true);
+    Adaptor::Get().UnregisterProcessorOnce(*this, true);
     mRemoveProcessorRegistered = false;
   }
 }
@@ -160,7 +160,7 @@ void NPatchLoader::RequestRemove(NPatchData::NPatchDataId id, TextureUploadObser
   if(!mRemoveProcessorRegistered && Adaptor::IsAvailable())
   {
     mRemoveProcessorRegistered = true;
-    Adaptor::Get().RegisterProcessor(*this, true);
+    Adaptor::Get().RegisterProcessorOnce(*this, true);
   }
 }
 
@@ -188,18 +188,14 @@ void NPatchLoader::Process(bool postProcessor)
     oss << "[" << mRemoveQueue.size() << "]";
   });
 
+  mRemoveProcessorRegistered = false;
+
   for(auto& iter : mRemoveQueue)
   {
     Remove(iter.first, iter.second);
   }
 
   mRemoveQueue.clear();
-
-  if(Adaptor::IsAvailable())
-  {
-    Adaptor::Get().UnregisterProcessor(*this, true);
-    mRemoveProcessorRegistered = false;
-  }
 
   DALI_TRACE_END(gTraceFilter, "DALI_NPATCH_LOADER_PROCESS_REMOVE_QUEUE");
 }

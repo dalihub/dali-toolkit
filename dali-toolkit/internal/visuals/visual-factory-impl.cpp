@@ -37,13 +37,13 @@
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
-#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/internal/visuals/mesh/mesh-visual.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
-#include <dali-toolkit/internal/visuals/text-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/text/text-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>

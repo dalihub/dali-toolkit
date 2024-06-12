@@ -1660,7 +1660,7 @@ void Controller::RequestProcessInputStyleChangedSignals()
   if(Dali::Adaptor::IsAvailable() && !mImpl->mProcessorRegistered)
   {
     mImpl->mProcessorRegistered = true;
-    Dali::Adaptor::Get().RegisterProcessor(*this, true);
+    Dali::Adaptor::Get().RegisterProcessorOnce(*this, true);
   }
 }
 
@@ -1807,7 +1807,7 @@ void Controller::PasteClipboardItemEvent(uint32_t id, const char* mimeType, cons
     // This is temporary code, as text controls do not support html type data.
     // Simply remove the tags inside the angle brackets.
     // Once multiple types and data can be stored in the clipboard, this code should be removed.
-    std::regex reg("<[^>]*>");
+    std::regex  reg("<[^>]*>");
     std::string result = regex_replace(data, reg, "");
 
     EventHandler::PasteClipboardItemEvent(*this, result.c_str());
@@ -1957,7 +1957,6 @@ void Controller::Process(bool postProcess)
   {
     Dali::Adaptor& adaptor = Dali::Adaptor::Get();
 
-    adaptor.UnregisterProcessor(*this, true);
     mImpl->mProcessorRegistered = false;
 
     if(NULL == mImpl->mIdleCallback)
@@ -1995,7 +1994,7 @@ Controller::~Controller()
   {
     if(mImpl->mProcessorRegistered)
     {
-      Dali::Adaptor::Get().UnregisterProcessor(*this, true);
+      Dali::Adaptor::Get().UnregisterProcessorOnce(*this, true);
     }
     if(mImpl->mIdleCallback)
     {

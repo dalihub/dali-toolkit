@@ -55,7 +55,7 @@ VectorAnimationManager::~VectorAnimationManager()
 
   if(mProcessorRegistered && Adaptor::IsAvailable())
   {
-    Adaptor::Get().UnregisterProcessor(*this, true);
+    Adaptor::Get().UnregisterProcessorOnce(*this, true);
   }
 }
 
@@ -75,7 +75,7 @@ void VectorAnimationManager::RegisterEventCallback(CallbackBase* callback)
 
   if(!mProcessorRegistered)
   {
-    Adaptor::Get().RegisterProcessor(*this, true); // Use post processor to trigger after layoutting
+    Adaptor::Get().RegisterProcessorOnce(*this, true); // Use post processor to trigger after layoutting
     mProcessorRegistered = true;
   }
 }
@@ -86,15 +86,6 @@ void VectorAnimationManager::UnregisterEventCallback(CallbackBase* callback)
   if(iter != mEventCallbacks.End())
   {
     mEventCallbacks.Erase(iter);
-
-    if(mEventCallbacks.Count() == 0u)
-    {
-      if(Adaptor::IsAvailable())
-      {
-        Adaptor::Get().UnregisterProcessor(*this, true);
-        mProcessorRegistered = false;
-      }
-    }
   }
 }
 
@@ -111,6 +102,8 @@ void VectorAnimationManager::Process(bool postProcessor)
     }
   }
 #endif
+
+  mProcessorRegistered = false;
 
   for(auto&& iter : mEventCallbacks)
   {
@@ -129,9 +122,6 @@ void VectorAnimationManager::Process(bool postProcessor)
   }
 #endif
   mEventCallbacks.Clear();
-
-  Adaptor::Get().UnregisterProcessor(*this, true);
-  mProcessorRegistered = false;
 }
 
 } // namespace Internal

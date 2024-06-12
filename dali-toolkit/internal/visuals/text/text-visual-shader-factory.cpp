@@ -15,7 +15,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/visuals/text-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/text/text-visual-shader-factory.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>

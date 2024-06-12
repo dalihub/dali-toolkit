@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "image-atlas-manager.h"
+#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 
 // EXTERNAL HEADER
 #include <dali/devel-api/adaptor-framework/image-loading.h>

@@ -31,7 +31,7 @@
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
-#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
+#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 

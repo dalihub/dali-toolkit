@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_NPATCH_LOADER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
-#include <dali-toolkit/internal/visuals/npatch-data.h>
+#include <dali-toolkit/internal/visuals/npatch/npatch-data.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
