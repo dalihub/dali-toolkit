@@ -1376,6 +1376,12 @@ void WebView::WebViewAccessible::UpdateAttributes(Dali::Accessibility::Attribute
 
 void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::Accessible*>& children)
 {
+  if(!mRemoteChild.GetAddress())
+  {
+    DALI_LOG_DEBUG_INFO("Try setting address as it is not set on initialize");
+    SetRemoteChildAddress(mWebEngine.GetAccessibilityAddress());
+  }
+
   if(mRemoteChild.GetAddress())
   {
     // DoGetChildren is called at most once per every OnChildrenChanged.
