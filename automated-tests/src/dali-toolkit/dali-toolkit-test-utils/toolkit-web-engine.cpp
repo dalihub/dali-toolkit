@@ -1604,6 +1604,7 @@ public:
   void LoadUrl(const std::string& url)
   {
     mUrl = url;
+    SetAccessibilityAddress();
     ConnectToGlobalSignal(&OnLoadUrl);
   }
 
@@ -1806,7 +1807,12 @@ public:
 
   Dali::Accessibility::Address GetAccessibilityAddress()
   {
-    return {":9.99", "root"};
+    return mAccessibilityAddress;
+  }
+
+  void SetAccessibilityAddress()
+  {
+    mAccessibilityAddress = {":9.99", "root"};
   }
 
   Dali::PixelData GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
@@ -1956,6 +1962,7 @@ public:
   Dali::Vector2             mContentSize;
   WebEngineBackForwardList* mockWebEngineBackForwardList;
   WebEngineSettings*        mockWebEngineSettings;
+  Dali::Accessibility::Address mAccessibilityAddress{};
 
   std::vector<Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback> mResultCallbacks;
 

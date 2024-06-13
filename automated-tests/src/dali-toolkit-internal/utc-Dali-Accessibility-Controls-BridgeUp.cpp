@@ -17,8 +17,6 @@
 #include <dali/devel-api/common/stage.h>
 #include <cstdlib>
 
-#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
-
 using namespace Dali::Toolkit;
 
 void utc_dali_accessibility_controls_bridge_up_startup(void)
@@ -1354,10 +1352,17 @@ int UtcDaliWebViewAccessible(void)
 
   DALI_TEST_CHECK(children.empty());
 
+  // Enables accessibility
   Dali::Accessibility::TestEnableSC(true);
 
+  // Assuming the webengine lazy sets accessibility address on LoadUrl
   children = webViewAccessible->GetChildren();
+  DALI_TEST_CHECK(children.empty());
 
+  // our test webengine sets accessibility address here
+  webView.LoadUrl("http://www.somewhere.valid1.com");
+
+  children = webViewAccessible->GetChildren();
   DALI_TEST_EQUALS(children.size(), 1u, TEST_LOCATION);
 
   auto* child = children[0];
