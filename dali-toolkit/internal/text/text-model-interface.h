@@ -543,6 +543,13 @@ public:
    * @return The color of the background with cutout.
    */
   virtual const Vector4& GetBackgroundColorWithCutout() const = 0;
+
+  /**
+   * @brief Retrieves the left and top offset with cutout.
+   *
+   * @return The offset with cutout.
+   */
+  virtual const Vector2& GetOffsetWithCutout() const = 0;
 };
 
 } // namespace Text

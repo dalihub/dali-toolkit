@@ -399,6 +399,11 @@ public:
    */
   const Vector4& GetBackgroundColorWithCutout() const override;
 
+  /**
+   * @copydoc ModelInterface::GetOffsetWithCutout()
+   */
+  const Vector2& GetOffsetWithCutout() const override;
+
 private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.

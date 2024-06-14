@@ -1704,6 +1704,13 @@ public: // Default style & Input style
    */
   const Vector4 GetBackgroundColorWithCutout() const;
 
+  /**
+   * @brief Sets offset with cutout.
+   *
+   * @param[in] offset The offset.
+   */
+  void SetOffsetWithCutout(const Vector2& offset);
+
 public: // Queries & retrieves.
   /**
    * @brief Return the layout engine.
