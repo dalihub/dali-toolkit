@@ -1926,5 +1926,43 @@ int UtcDaliEmitAccessibilityStateChanged(void)
   DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("showing", 1));
   DALI_TEST_CHECK(Accessibility::Bridge::GetCurrentBridge()->GetDefaultLabel(rootAccessible) != buttonAccessible);
 
+  Dali::Accessibility::TestEnableSC(false);
+
+  END_TEST;
+}
+
+int UtcDaliGetAcessibleTestWithSceneConnection(void)
+{
+  ToolkitTestApplication application;
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  auto layer = Layer::New();
+
+  auto control = Control::New();
+
+  std::weak_ptr<Accessibility::Accessible> layerAccessible   = Accessibility::Accessible::GetOwningPtr(layer);   // AdaptorAccessible
+  std::weak_ptr<Accessibility::Accessible> controlAccessible = Accessibility::Accessible::GetOwningPtr(control); // ControlAccessible
+  DALI_TEST_CHECK(layerAccessible.lock());
+  DALI_TEST_CHECK(controlAccessible.lock());
+
+  // Test Getting already added accessible from the map
+  DALI_TEST_CHECK(!layerAccessible.expired());
+  DALI_TEST_CHECK(!controlAccessible.expired());
+  DALI_TEST_CHECK(Accessibility::Accessible::Get(layer) == layerAccessible.lock().get());
+  DALI_TEST_CHECK(Accessibility::Accessible::Get(control) == controlAccessible.lock().get());
+
+  // Test ControlAccessible Removal
+  control.Reset();
+  DALI_TEST_CHECK(controlAccessible.expired());
+  DALI_TEST_CHECK(Accessibility::Accessible::Get(control) == nullptr);
+
+  // Test AdaptorAccessible Removal
+  layer.Reset();
+  DALI_TEST_CHECK(layerAccessible.expired());
+  DALI_TEST_CHECK(Accessibility::Accessible::Get(layer) == nullptr);
+
+  Dali::Accessibility::TestEnableSC(false);
+
   END_TEST;
 }
