@@ -115,6 +115,16 @@ public:
   void ClearBackground();
 
   /**
+   * @copydoc Dali::Toolkit::Control::SetRenderEffect
+   */
+  void SetRenderEffect(Toolkit::RenderEffect effect);
+
+  /**
+   * @copydoc Dali::Toolkit::Control::ClearRenderEffect
+   */
+  void ClearRenderEffect();
+
+  /**
    * @brief Called when resources of control are ready. this api does not request relayout.
    */
   void SetResourceReady();

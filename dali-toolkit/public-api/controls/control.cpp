@@ -115,6 +115,16 @@ void Control::ClearBackground()
   Internal::GetImplementation(*this).ClearBackground();
 }
 
+void Control::SetRenderEffect(Toolkit::RenderEffect effect)
+{
+  Internal::GetImplementation(*this).SetRenderEffect(effect);
+}
+
+void Control::ClearRenderEffect()
+{
+  Internal::GetImplementation(*this).ClearRenderEffect();
+}
+
 bool Control::IsResourceReady() const
 {
   return Internal::GetImplementation(*this).IsResourceReady();
