@@ -36,6 +36,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -1458,6 +1459,12 @@ Dali::Accessibility::Attributes WebView::WebViewAccessible::GetAttributes() cons
 
 void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::Accessible*>& children)
 {
+  if(Dali::Accessibility::IsUp() && !mRemoteChild.GetAddress())
+  {
+    DALI_LOG_DEBUG_INFO("Try setting address as it has not not been set on initialize.\n");
+    SetRemoteChildAddress(mWebEngine.GetAccessibilityAddress());
+  }
+
   if(mRemoteChild.GetAddress())
   {
     // DoGetChildren is called at most once per every OnChildrenChanged.
