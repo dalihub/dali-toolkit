@@ -729,7 +729,7 @@ void Popup::SetDisplayState(Toolkit::Popup::DisplayState displayState)
 
   // Convert the bool state to the actual display state to use.
   mDisplayState    = display ? Toolkit::Popup::SHOWING : Toolkit::Popup::HIDING;
-  auto* accessible = Dali::Accessibility::Accessible::Get(Self());
+  auto accessible = Dali::Accessibility::Accessible::GetOwningPtr(Self());
 
   if(display)
   {

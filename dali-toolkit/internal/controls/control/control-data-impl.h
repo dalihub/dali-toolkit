@@ -456,7 +456,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Internal::Control::GetAccessibleObject()
    */
-  Toolkit::DevelControl::ControlAccessible* GetAccessibleObject();
+  std::shared_ptr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::IsAccessibleCreated()
@@ -636,7 +636,7 @@ public:
   Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
 
   std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> mAccessibilityRelations;
-  std::unique_ptr<Toolkit::DevelControl::ControlAccessible>                         mAccessibleObject;
+  std::shared_ptr<Toolkit::DevelControl::ControlAccessible>                         mAccessibleObject;
 
   // Gesture Detection
   PinchGestureDetector     mPinchGestureDetector;

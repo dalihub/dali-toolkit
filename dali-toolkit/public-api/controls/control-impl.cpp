@@ -199,7 +199,7 @@ void Control::SetResourceReady()
   controlDataImpl.ResourceReady();
 }
 
-Toolkit::DevelControl::ControlAccessible* Control::GetAccessibleObject()
+std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::GetAccessibleObject()
 {
   return mImpl->GetAccessibleObject();
 }
@@ -525,7 +525,7 @@ void Control::EmitKeyInputFocusSignal(bool focusGained)
       auto parent = accessible->GetParent();
       if(parent && !accessible->GetStates()[Dali::Accessibility::State::MANAGES_DESCENDANTS])
       {
-        parent->EmitActiveDescendantChanged(accessible);
+        parent->EmitActiveDescendantChanged(accessible.get());
       }
     }
   }
@@ -608,7 +608,7 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
     }
     case Actor::Property::VISIBLE:
     {
-      auto* accessible = GetAccessibleObject();
+      auto accessible = GetAccessibleObject();
       if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
       {
         accessible->EmitVisible(Self().GetProperty<bool>(Actor::Property::VISIBLE));
