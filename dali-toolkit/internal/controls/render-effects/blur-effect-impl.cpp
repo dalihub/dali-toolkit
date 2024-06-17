@@ -56,6 +56,7 @@ namespace Internal
 BlurEffectImpl::BlurEffectImpl(bool isBackground)
 : RenderEffectImpl(),
   mInternalRoot(Actor::New()),
+  mPixelFormat(Pixel::Format::INVALID),
   mDownscaleFactor(BLUR_EFFECT_DOWNSCALE_FACTOR),
   mPixelRadius(BLUR_EFFECT_PIXEL_RADIUS),
   mBellCurveWidth(BLUR_EFFECT_BELL_CURVE_WIDTH),
@@ -69,6 +70,7 @@ BlurEffectImpl::BlurEffectImpl(bool isBackground)
 BlurEffectImpl::BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, float bellCurveWidth, bool isBackground)
 : RenderEffectImpl(),
   mInternalRoot(Actor::New()),
+  mPixelFormat(Pixel::Format::INVALID),
   mDownscaleFactor(downscaleFactor),
   mPixelRadius((blurRadius >> 2) + 1),
   mBellCurveWidth(std::max(bellCurveWidth, BLUR_EFFECT_DIVIDE_ZERO_EPSILON)),
