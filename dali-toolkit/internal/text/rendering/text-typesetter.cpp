@@ -1015,8 +1015,8 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
   if(isCutoutEnabled)
   {
     Vector2 offset = mModel->GetOffsetWithCutout();
-    penX += offset.x;
-    penY += offset.y;
+    penX = offset.x;
+    penY = offset.y;
   }
 
   // Generate the image buffers of the text for each different style first,
