@@ -47,6 +47,7 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN(Toolkit::CanvasView, Toolkit::Control, Create);
 DALI_PROPERTY_REGISTRATION(Toolkit, CanvasView, "viewBox", VECTOR2, VIEW_BOX)
 DALI_PROPERTY_REGISTRATION(Toolkit, CanvasView, "synchronousLoading", BOOLEAN, SYNCHRONOUS_LOADING)
+DALI_PROPERTY_REGISTRATION(Toolkit, CanvasView, "rasterizationRequestManually", BOOLEAN, RASTERIZATION_REQUEST_MANUALLY)
 DALI_TYPE_REGISTRATION_END()
 } // anonymous namespace
 
@@ -58,17 +59,22 @@ CanvasView::CanvasView(const Vector2& viewBox)
   mTexture(),
   mTextureSet(),
   mSize(viewBox),
-  mIsSynchronous(true)
+  mIsSynchronous(true),
+  mManualRasterization(false),
+  mProcessorRegistered(false)
 {
 }
 
 CanvasView::~CanvasView()
 {
-  if(Adaptor::IsAvailable())
+  if(Adaptor::IsAvailable() && mProcessorRegistered)
   {
-    Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
-    mRasterizingTask.Reset();
-    Adaptor::Get().UnregisterProcessor(*this, true);
+    if(mRasterizingTask)
+    {
+      Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
+      mRasterizingTask.Reset();
+    }
+    Adaptor::Get().UnregisterProcessorOnce(*this, true);
   }
 }
 
@@ -94,7 +100,8 @@ void CanvasView::OnInitialize()
 
   Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::IMAGE);
 
-  Adaptor::Get().RegisterProcessor(*this, true);
+  // Request rasterization once at very first time.
+  RequestRasterization();
 }
 
 void CanvasView::OnRelayout(const Vector2& size, RelayoutContainer& container)
@@ -147,6 +154,15 @@ void CanvasView::SetProperty(BaseObject* object, Property::Index propertyIndex, 
         }
         break;
       }
+      case Toolkit::CanvasView::Property::RASTERIZATION_REQUEST_MANUALLY:
+      {
+        bool isRasterizationManually;
+        if(value.Get(isRasterizationManually))
+        {
+          canvasViewImpl.SetRasterizationRequestManually(isRasterizationManually);
+        }
+        break;
+      }
     }
   }
 }
@@ -173,6 +189,11 @@ Property::Value CanvasView::GetProperty(BaseObject* object, Property::Index prop
         value = canvasViewImpl.IsSynchronous();
         break;
       }
+      case Toolkit::CanvasView::Property::RASTERIZATION_REQUEST_MANUALLY:
+      {
+        value = canvasViewImpl.IsRasterizationRequestManually();
+        break;
+      }
     }
   }
   return value;
@@ -180,27 +201,39 @@ Property::Value CanvasView::GetProperty(BaseObject* object, Property::Index prop
 
 void CanvasView::Process(bool postProcessor)
 {
+  mProcessorRegistered = false;
+
   if(mCanvasRenderer && mCanvasRenderer.IsCanvasChanged() && mSize.width > 0 && mSize.height > 0)
   {
     AddRasterizationTask();
+  }
+
+  // If we are not doing manual rasterization, register processor once again.
+  // TODO : Could we reqest it only if IsCanvasChagned() is true?
+  if(!mManualRasterization)
+  {
+    RequestRasterization();
   }
 }
 
 void CanvasView::AddRasterizationTask()
 {
-  mRasterizingTask = new CanvasRendererRasterizingTask(mCanvasRenderer, MakeCallback(this, &CanvasView::ApplyRasterizedImage));
-
-  if(mCanvasRenderer.Commit())
+  if(mCanvasRenderer && mCanvasRenderer.Commit())
   {
     if(mIsSynchronous)
     {
-      mRasterizingTask->Process();
-      ApplyRasterizedImage(mRasterizingTask);
-      mRasterizingTask.Reset(); // We don't need it anymore.
+      CanvasRendererRasterizingTaskPtr rasterizingTask = new CanvasRendererRasterizingTask(mCanvasRenderer, MakeCallback(this, &CanvasView::ApplyRasterizedImage));
+      rasterizingTask->Process();
+      ApplyRasterizedImage(rasterizingTask);
+      rasterizingTask.Reset(); // We don't need it anymore.
     }
     else
     {
-      AsyncTaskManager::Get().AddTask(mRasterizingTask);
+      if(!mRasterizingTask)
+      {
+        mRasterizingTask = new CanvasRendererRasterizingTask(mCanvasRenderer, MakeCallback(this, &CanvasView::ApplyRasterizedImage));
+        AsyncTaskManager::Get().AddTask(mRasterizingTask);
+      }
     }
   }
 }
@@ -230,10 +263,13 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
     }
   }
 
-  mRasterizingTask.Reset(); // We don't need it anymore
+  if(task == mRasterizingTask)
+  {
+    mRasterizingTask.Reset(); // We don't need it anymore
+  }
 
   //If there are accumulated changes to CanvasRenderer during Rasterize, Rasterize once again.
-  if(!mIsSynchronous && mCanvasRenderer && mCanvasRenderer.IsCanvasChanged())
+  if(!mIsSynchronous && !mManualRasterization && mCanvasRenderer && mCanvasRenderer.IsCanvasChanged())
   {
     AddRasterizationTask();
   }
@@ -266,6 +302,15 @@ bool CanvasView::RemoveAllDrawables()
   return false;
 }
 
+void CanvasView::RequestRasterization()
+{
+  if(!mProcessorRegistered && Adaptor::IsAvailable())
+  {
+    mProcessorRegistered = true;
+    Adaptor::Get().RegisterProcessorOnce(*this, true);
+  }
+}
+
 bool CanvasView::SetViewBox(const Vector2& viewBox)
 {
   if(mCanvasRenderer && mCanvasRenderer.SetViewBox(viewBox))
@@ -289,9 +334,26 @@ void CanvasView::SetSynchronous(const bool isSynchronous)
   mIsSynchronous = isSynchronous;
 }
 
-const bool CanvasView::IsSynchronous()
+const bool CanvasView::IsSynchronous() const
 {
   return mIsSynchronous;
+}
+
+void CanvasView::SetRasterizationRequestManually(const bool isRasterizationManually)
+{
+  if(mManualRasterization != isRasterizationManually)
+  {
+    mManualRasterization = isRasterizationManually;
+    if(!mManualRasterization)
+    {
+      RequestRasterization();
+    }
+  }
+}
+
+const bool CanvasView::IsRasterizationRequestManually() const
+{
+  return mManualRasterization;
 }
 
 } // namespace Internal
