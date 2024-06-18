@@ -695,6 +695,16 @@ const Vector4& VisualModel::GetBackgroundColorWithCutout() const
   return mBackgroundColorWithCutout;
 }
 
+void VisualModel::SetOffsetWithCutout(const Vector2& offset)
+{
+  mOffsetWithCutout = offset;
+}
+
+const Vector2& VisualModel::GetOffsetWithCutout() const
+{
+  return mOffsetWithCutout;
+}
+
 VisualModel::~VisualModel()
 {
 }

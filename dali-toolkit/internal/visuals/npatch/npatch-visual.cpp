@@ -28,10 +28,10 @@
 #include <dali-toolkit/devel-api/utility/npatch-helper.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
-#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
-#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
-#include <dali-toolkit/internal/visuals/image-visual-shader-feature-builder.h>
-#include <dali-toolkit/internal/visuals/npatch-loader.h>
+#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
+#include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/image/image-visual-shader-feature-builder.h>
+#include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>

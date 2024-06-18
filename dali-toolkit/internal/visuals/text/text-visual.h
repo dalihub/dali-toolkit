@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
-#include <dali-toolkit/internal/visuals/text-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/text/text-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali

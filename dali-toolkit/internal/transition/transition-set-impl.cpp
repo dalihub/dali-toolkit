@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,8 +98,8 @@ uint32_t TransitionSet::GetTransitionCount() const
 
 void TransitionSet::Play()
 {
-  Adaptor::Get().RegisterProcessor(*this, true);
-  Adaptor::Get().RegisterProcessor(*this, false);
+  Adaptor::Get().RegisterProcessorOnce(*this, true);
+  Adaptor::Get().RegisterProcessorOnce(*this, false);
   TransitionLifecycleController::GetInstance().AddTransitions(Dali::Toolkit::TransitionSet(this));
 }
 
@@ -140,7 +140,7 @@ void TransitionSet::TransitionStart()
         if(minimumDelays[index].first == transition->GetTarget())
         {
           minimumDelays[index].second = std::min(minimumDelays[index].second, transition->GetTimePeriod().delaySeconds);
-          found = true;
+          found                       = true;
           break;
         }
       }
@@ -221,7 +221,6 @@ void TransitionSet::Process(bool postProcessor)
   {
     TransitionStart();
   }
-  Adaptor::Get().UnregisterProcessor(*this, postProcessor);
 }
 
 } // namespace Internal

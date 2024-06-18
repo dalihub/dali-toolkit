@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-
 // EXTERNAL HEADERS
-#include <dali/devel-api/addons/addon-base.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/devel-api/addons/addon-base.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL HEADERS
 // Needed to access the private class members
 #define private public
+#include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
-#include <dali-toolkit/internal/visuals/npatch-loader.h>
 #undef private
-
 
 using Dali::Toolkit::Internal::TextureManager;
 
@@ -35,12 +33,11 @@ namespace Dali
 {
 namespace AddOns
 {
-
 struct DummyTiler
 {
 };
 
-void* CreateInstance( TextureManager* textureManager )
+void* CreateInstance(TextureManager* textureManager)
 {
   fprintf(stderr, "AddOn::CreateInstance( %p )\n", textureManager);
   return new DummyTiler;
@@ -50,53 +47,53 @@ namespace GeometryTiler
 {
 std::vector<std::string> gCallStack;
 
-static Geometry GetGeometryInternal(TextureManager::TextureId textureId, uint32_t& o0, uint32_t& o1 )
+static Geometry GetGeometryInternal(TextureManager::TextureId textureId, uint32_t& o0, uint32_t& o1)
 {
-  gCallStack.emplace_back( "GetGeometry" );
+  gCallStack.emplace_back("GetGeometry");
   o0 = 10;
   o1 = 5;
   fprintf(stderr, "AddOn::GetGeometryInternal()\n");
   return Dali::Geometry::New();
 }
 
-static Geometry CreateGeometryInternal(TextureManager::TextureId textureId, const Devel::PixelBuffer& pixelBuffer )
+static Geometry CreateGeometryInternal(TextureManager::TextureId textureId, const Devel::PixelBuffer& pixelBuffer)
 {
-  gCallStack.emplace_back( "CreateGeometry" );
+  gCallStack.emplace_back("CreateGeometry");
   fprintf(stderr, "AddOn::CreateGeometryInternal()\n");
   return Dali::Geometry::New();
 }
 
-static Geometry CreateGeometryMapInternal(const void* opacityMap,
+static Geometry CreateGeometryMapInternal(const void*       opacityMap,
                                           const Uint16Pair& gridSize,
-                                          uint32_t *outElements)
+                                          uint32_t*         outElements)
 {
-  gCallStack.emplace_back( "CreateGeometryGrid" );
+  gCallStack.emplace_back("CreateGeometryGrid");
   outElements[0] = 2;
   outElements[1] = 3;
   return Dali::Geometry::New();
 }
 
-static void* NPatchBuildInternal(const Devel::PixelBuffer& pixelBuffer, Toolkit::Internal::NPatchData* data )
+static void* NPatchBuildInternal(const Devel::PixelBuffer& pixelBuffer, Toolkit::Internal::NPatchData* data)
 {
-  gCallStack.emplace_back( "BuildNPatch" );
+  gCallStack.emplace_back("BuildNPatch");
   fprintf(stderr, "AddOn::NPatchBuild()\n");
   static char dummyData;
   return &dummyData;
 }
 
-static void NPatchDestroyInternal(void* object )
+static void NPatchDestroyInternal(void* object)
 {
-  gCallStack.emplace_back( "DestroyNPatch" );
+  gCallStack.emplace_back("DestroyNPatch");
   fprintf(stderr, "AddOn::NPatchDestroy()\n");
 }
 
-static void SubmitInternal(Renderer& renderer, const void* object  )
+static void SubmitInternal(Renderer& renderer, const void* object)
 {
-  gCallStack.emplace_back( "SubmitRenderTask" );
+  gCallStack.emplace_back("SubmitRenderTask");
   fprintf(stderr, "AddOn::SubmitInternal()\n");
 }
 
-static std::vector<std::string> GetCallStack( bool clear )
+static std::vector<std::string> GetCallStack(bool clear)
 {
   auto retval = gCallStack;
   if(clear)
@@ -106,10 +103,9 @@ static std::vector<std::string> GetCallStack( bool clear )
   return retval;
 }
 
-
-}
-}
-}
+} // namespace GeometryTiler
+} // namespace AddOns
+} // namespace Dali
 
 /**
  * OverdrawingAddOn implementation
@@ -117,13 +113,12 @@ static std::vector<std::string> GetCallStack( bool clear )
 class TestRenderingAddOn : public Dali::AddOns::AddOnBase
 {
 public:
-
-  void GetAddOnInfo( Dali::AddOnInfo& info ) override
+  void GetAddOnInfo(Dali::AddOnInfo& info) override
   {
-    info.type = Dali::AddOnType::GENERIC;
-    info.name = "oo-rendering";
-    info.version = Dali::DALI_ADDON_VERSION( 1, 0, 0 );
-    info.next = nullptr;
+    info.type    = Dali::AddOnType::GENERIC;
+    info.name    = "oo-rendering";
+    info.version = Dali::DALI_ADDON_VERSION(1, 0, 0);
+    info.next    = nullptr;
   }
 
   /**
@@ -133,7 +128,7 @@ public:
   Dali::AddOns::DispatchTable* GetGlobalDispatchTable() override
   {
     static Dali::AddOns::DispatchTable dispatchTable{};
-    if( dispatchTable.Empty() )
+    if(dispatchTable.Empty())
     {
       dispatchTable["Initialize"]         = Dali::AddOns::CreateInstance;
       dispatchTable["CreateGeometry"]     = Dali::AddOns::GeometryTiler::CreateGeometryInternal;
@@ -177,4 +172,4 @@ public:
   }
 };
 
-REGISTER_ADDON_CLASS( TestRenderingAddOn );
+REGISTER_ADDON_CLASS(TestRenderingAddOn);

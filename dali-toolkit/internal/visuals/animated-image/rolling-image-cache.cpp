@@ -18,7 +18,7 @@
 #include <dali-toolkit/internal/visuals/animated-image/rolling-image-cache.h>
 
 // INTERNAL HEADERS
-#include <dali-toolkit/internal/visuals/image-atlas-manager.h> // For ImageAtlasManagerPtr
+#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h> // For ImageAtlasManagerPtr
 
 // EXTERNAL HEADERS
 #include <dali/integration-api/adaptor-framework/adaptor.h>

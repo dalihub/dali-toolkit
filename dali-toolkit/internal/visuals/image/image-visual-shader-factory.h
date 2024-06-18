@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_SHADER_FACTORY_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/adaptor-framework/shader-precompiler.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/image/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-#include <dali-toolkit/internal/visuals/image-visual-shader-feature-builder.h>
 #include <string_view>
 
 namespace Dali
@@ -30,7 +31,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 /**
  * ImageVisualShaderFactory is an object that provides and shares shaders between image visuals
  */

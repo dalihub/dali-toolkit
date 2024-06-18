@@ -694,7 +694,7 @@ Devel::PixelBuffer DrawGlyphsBackground(const ViewModel* model, Devel::PixelBuff
       {
         if(position->x + glyphInfo->width > right)
         {
-          right = position->x - position->x + glyphInfo->width;
+          right = position->x + glyphInfo->width;
         }
       }
       else
@@ -1009,6 +1009,14 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
       penY = static_cast<int32_t>(size.height - layoutSize.height);
       break;
     }
+  }
+
+  const bool isCutoutEnabled = mModel->IsCutoutEnabled();
+  if(isCutoutEnabled)
+  {
+    Vector2 offset = mModel->GetOffsetWithCutout();
+    penX = offset.x;
+    penY = offset.y;
   }
 
   // Generate the image buffers of the text for each different style first,

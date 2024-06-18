@@ -29,7 +29,7 @@
 // INTERNAL HEADERS
 #include <dali-toolkit/internal/texture-manager/texture-async-loading-helper.h>
 #include <dali-toolkit/internal/texture-manager/texture-cache-manager.h>
-#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
+#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
 
 namespace
@@ -116,7 +116,7 @@ TextureManager::~TextureManager()
 {
   if(mRemoveProcessorRegistered && Adaptor::IsAvailable())
   {
-    Adaptor::Get().UnregisterProcessor(*this, true);
+    Adaptor::Get().UnregisterProcessorOnce(*this, true);
     mRemoveProcessorRegistered = false;
   }
 }
@@ -751,7 +751,7 @@ void TextureManager::RequestRemove(const TextureManager::TextureId textureId, Te
       if(!mRemoveProcessorRegistered && Adaptor::IsAvailable())
       {
         mRemoveProcessorRegistered = true;
-        Adaptor::Get().RegisterProcessor(*this, true);
+        Adaptor::Get().RegisterProcessorOnce(*this, true);
       }
     }
   }
@@ -821,13 +821,8 @@ void TextureManager::Process(bool postProcessor)
 {
   DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::Process()\n");
 
+  mRemoveProcessorRegistered = false;
   ProcessRemoveQueue();
-
-  if(Adaptor::IsAvailable())
-  {
-    Adaptor::Get().UnregisterProcessor(*this, true);
-    mRemoveProcessorRegistered = false;
-  }
 }
 
 void TextureManager::LoadImageSynchronously(

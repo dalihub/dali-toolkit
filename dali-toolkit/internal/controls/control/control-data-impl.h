@@ -20,9 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/integration-api/processor-interface.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -34,6 +34,7 @@
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 #include <dali-toolkit/internal/visuals/visual-event-observer.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/render-effects/render-effect.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/integration-api/debug.h>
@@ -600,6 +601,7 @@ public:
   RegisteredVisualContainer                 mVisuals; ///< Stores visuals needed by the control, non trivial type so std::vector used.
   std::string                               mStyleName;
   Vector4                                   mBackgroundColor;    ///< The color of the background visual
+  RenderEffect                              mRenderEffect;       ///< The render effect on this control
   Vector3*                                  mStartingPinchScale; ///< The scale when a pinch gesture starts, TODO: consider removing this
   Extents                                   mMargin;             ///< The margin values
   Extents                                   mPadding;            ///< The padding values
