@@ -611,12 +611,6 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         const bool cutout = value.Get<bool>();
 
         impl.mController->SetTextCutout(cutout);
-
-        // Property doesn't affect the layout, only Visual must be updated
-        TextVisual::EnableRendererUpdate(impl.mVisual);
-
-        // No need to trigger full re-layout. Instead call UpdateRenderer() directly
-        TextVisual::UpdateRenderer(impl.mVisual);
         break;
       }
     }
