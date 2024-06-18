@@ -694,7 +694,7 @@ Devel::PixelBuffer DrawGlyphsBackground(const ViewModel* model, Devel::PixelBuff
       {
         if(position->x + glyphInfo->width > right)
         {
-          right = position->x - position->x + glyphInfo->width;
+          right = position->x + glyphInfo->width;
         }
       }
       else
