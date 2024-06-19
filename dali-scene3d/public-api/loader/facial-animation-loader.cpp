@@ -38,7 +38,7 @@ const float MILLISECONDS_TO_SECONDS = 0.001f;
 
 struct BlendShape
 {
-  std::vector<std::vector<float>> mKeys{{}};
+  std::vector<std::vector<float>> mKeys{};
   std::string_view                mNodeName{};
   uint32_t                        mNumberOfMorphTarget{0u};
   std::string_view                mVersion{};
@@ -49,7 +49,7 @@ struct BlendShape
 struct FacialAnimation
 {
   std::string_view        mName{};
-  std::vector<BlendShape> mBlendShapes{{}};
+  std::vector<BlendShape> mBlendShapes{};
   std::string_view        mVersion{};
   uint32_t                mNumberOfShapes{0u};
   std::vector<uint32_t>   mTime{};
