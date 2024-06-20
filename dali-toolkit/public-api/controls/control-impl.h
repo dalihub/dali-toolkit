@@ -140,7 +140,7 @@ public:
    *
    * @see CreateAccessibleObject()
    */
-  Toolkit::DevelControl::ControlAccessible* GetAccessibleObject();
+  std::shared_ptr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
 
   // Gesture Detection
 

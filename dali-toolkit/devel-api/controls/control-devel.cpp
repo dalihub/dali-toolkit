@@ -256,7 +256,7 @@ Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType(Toolkit::C
 
 bool ClearAccessibilityHighlight(Toolkit::Control control)
 {
-  auto* controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  auto controlAccessible = GetControlImplementation(control).GetAccessibleObject();
   if(DALI_LIKELY(controlAccessible))
   {
     return controlAccessible->ClearHighlight();
@@ -266,7 +266,7 @@ bool ClearAccessibilityHighlight(Toolkit::Control control)
 
 bool GrabAccessibilityHighlight(Toolkit::Control control)
 {
-  auto* controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  auto controlAccessible = GetControlImplementation(control).GetAccessibleObject();
   if(DALI_LIKELY(controlAccessible))
   {
     return controlAccessible->GrabHighlight();
@@ -276,7 +276,7 @@ bool GrabAccessibilityHighlight(Toolkit::Control control)
 
 Dali::Accessibility::States GetAccessibilityStates(Toolkit::Control control)
 {
-  auto* controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  auto controlAccessible = GetControlImplementation(control).GetAccessibleObject();
   if(DALI_LIKELY(controlAccessible))
   {
     return controlAccessible->GetStates();
@@ -286,7 +286,7 @@ Dali::Accessibility::States GetAccessibilityStates(Toolkit::Control control)
 
 void NotifyAccessibilityStateChange(Toolkit::Control control, Dali::Accessibility::States states, bool recurse)
 {
-  auto* controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  auto controlAccessible = GetControlImplementation(control).GetAccessibleObject();
   if(DALI_LIKELY(controlAccessible))
   {
     controlAccessible->NotifyAccessibilityStateChange(std::move(states), recurse);
