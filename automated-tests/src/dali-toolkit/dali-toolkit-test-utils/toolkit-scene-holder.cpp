@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <toolkit-adaptor-impl.h>
+#include "test-render-surface.h"
 
 using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
 
@@ -43,7 +44,7 @@ namespace Internal
 namespace Adaptor
 {
 SceneHolder::SceneHolder(const Dali::Rect<int>& positionSize)
-: mRenderSurface(positionSize),
+: mRenderSurface(new TestRenderSurface(positionSize)),
   mScene(Dali::Integration::Scene::New(Dali::Size(static_cast<float>(positionSize.width), static_cast<float>(positionSize.height))))
 {
 }
@@ -123,9 +124,9 @@ Integration::Scene SceneHolder::GetScene()
   return mScene;
 }
 
-Dali::RenderSurfaceInterface& SceneHolder::GetRenderSurface()
+Dali::Integration::RenderSurfaceInterface& SceneHolder::GetRenderSurface()
 {
-  return mRenderSurface;
+  return *mRenderSurface;
 }
 
 Dali::RenderTaskList SceneHolder::GetRenderTaskList()

@@ -105,6 +105,7 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-shader.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-platform-abstraction.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-render-controller.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/test-render-surface.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-trace-call-stack.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-native-image.cpp
    dali-toolkit-test-utils/toolkit-text-utils.cpp

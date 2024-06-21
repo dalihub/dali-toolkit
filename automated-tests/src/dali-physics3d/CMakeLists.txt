@@ -54,6 +54,7 @@ SET(TEST_HARNESS_SOURCES
   ${TEST_HARNESS_DIR}/test-graphics-reflection.cpp
   ${TEST_HARNESS_DIR}/test-platform-abstraction.cpp
   ${TEST_HARNESS_DIR}/test-render-controller.cpp
+  ${TEST_HARNESS_DIR}/test-render-surface.cpp
   ${TEST_HARNESS_DIR}/test-trace-call-stack.cpp
 )
 
