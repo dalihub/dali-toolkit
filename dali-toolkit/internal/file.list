@@ -51,6 +51,8 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/npatch/npatch-loader.cpp
    ${toolkit_src_dir}/visuals/npatch/npatch-visual.cpp
    ${toolkit_src_dir}/visuals/primitive/primitive-visual.cpp
+   ${toolkit_src_dir}/visuals/svg/svg-loader-observer.cpp
+   ${toolkit_src_dir}/visuals/svg/svg-loader.cpp
    ${toolkit_src_dir}/visuals/svg/svg-task.cpp
    ${toolkit_src_dir}/visuals/svg/svg-visual.cpp
    ${toolkit_src_dir}/visuals/text/text-visual-shader-factory.cpp

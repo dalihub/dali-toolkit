@@ -121,6 +121,11 @@ public:
    */
   Internal::TextureManager& GetTextureManager();
 
+  /**
+   * @return the reference to svg loader
+   */
+  Internal::SvgLoader& GetSvgLoader();
+
 protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()

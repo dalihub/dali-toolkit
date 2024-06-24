@@ -65,6 +65,7 @@ VisualFactoryCache::VisualFactoryCache(bool preMultiplyOnLoad)
   mDefaultBrokenImageUrl(""),
   mUseDefaultBrokenImageOnly(true)
 {
+  mSvgLoader.SetVisualFactoryCache(*this);
 }
 
 VisualFactoryCache::~VisualFactoryCache()
@@ -145,6 +146,11 @@ TextureManager& VisualFactoryCache::GetTextureManager()
 NPatchLoader& VisualFactoryCache::GetNPatchLoader()
 {
   return mNPatchLoader;
+}
+
+SvgLoader& VisualFactoryCache::GetSvgLoader()
+{
+  return mSvgLoader;
 }
 
 VectorAnimationManager& VisualFactoryCache::GetVectorAnimationManager()

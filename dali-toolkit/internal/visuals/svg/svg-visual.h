@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SVG_VISUAL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/svg/svg-loader-observer.h>
+#include <dali-toolkit/internal/visuals/svg/svg-loader.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
-#include <dali-toolkit/internal/visuals/svg/svg-task.h>
 
 namespace Dali
 {
@@ -47,7 +48,8 @@ typedef IntrusivePtr<SvgVisual> SvgVisualPtr;
  * | url                      | STRING           |
  *
  */
-class SvgVisual : public Visual::Base
+class SvgVisual : public Visual::Base,
+                  public SvgLoaderObserver
 {
 public:
   /**
@@ -150,13 +152,16 @@ protected:
    */
   Shader GenerateShader() const override;
 
-public:
+protected: // Implementation of  SvgLoaderObserver
   /**
-   * @bried Apply the rasterized image to the visual.
-   *
-   * @param[in] task SvgTaskPtr
+   * @copydoc Dali::Toolkit::Internal::SvgLoaderObserver::LoadComplete
    */
-  void ApplyRasterizedImage(SvgTaskPtr task);
+  void LoadComplete(int32_t loadId, Dali::VectorImageRenderer vectorImageRenderer) override;
+
+  /**
+   * @copydoc Dali::Toolkit::Internal::SvgLoaderObserver::RasterizeComplete
+   */
+  void RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet, Vector4 atlasRect) override;
 
 private:
   /**
@@ -173,6 +178,12 @@ private:
    */
   void DoSetProperty(Property::Index index, const Property::Value& value);
 
+  /**
+   * @brief Checks if atlasing should be attempted
+   * @return bool returns true if atlasing can be attempted.
+   */
+  bool AttemptAtlasing() const;
+
   // Undefined
   SvgVisual(const SvgVisual& svgRenderer);
 
@@ -181,18 +192,21 @@ private:
 
 private:
   ImageVisualShaderFactory& mImageVisualShaderFactory;
-  Vector4                   mAtlasRect;
-  VisualUrl                 mImageUrl;
-  VectorImageRenderer       mVectorRenderer;
-  uint32_t                  mDefaultWidth;
-  uint32_t                  mDefaultHeight;
-  WeakHandle<Actor>         mPlacementActor;
-  Vector2                   mRasterizedSize;
-  Dali::ImageDimensions     mDesiredSize{};
-  SvgTaskPtr                mLoadingTask;
-  SvgTaskPtr                mRasterizingTask;
-  bool                      mLoadFailed;
-  bool                      mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
+  SvgLoader&                mSvgLoader; ///< reference to Svg loader for fast access
+
+  SvgLoader::SvgLoadId      mSvgLoadId;
+  SvgLoader::SvgRasterizeId mSvgRasterizeId;
+
+  Vector4               mAtlasRect;
+  Property::Index       mAtlasRectIndex;
+  VisualUrl             mImageUrl;
+  uint32_t              mDefaultWidth;
+  uint32_t              mDefaultHeight;
+  WeakHandle<Actor>     mPlacementActor;
+  Vector2               mRasterizedSize;
+  Dali::ImageDimensions mDesiredSize{};
+  bool                  mLoadFailed : 1;
+  bool                  mAttemptAtlasing : 1; ///< If true will attempt atlasing, otherwise create unique texture
 };
 
 } // namespace Internal

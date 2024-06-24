@@ -450,6 +450,11 @@ Internal::TextureManager& VisualFactory::GetTextureManager()
   return GetFactoryCache().GetTextureManager();
 }
 
+Internal::SvgLoader& VisualFactory::GetSvgLoader()
+{
+  return GetFactoryCache().GetSvgLoader();
+}
+
 void VisualFactory::SetBrokenImageUrl(Toolkit::StyleManager& styleManager)
 {
   const std::string        imageDirPath   = AssetManager::GetDaliImagePath();
