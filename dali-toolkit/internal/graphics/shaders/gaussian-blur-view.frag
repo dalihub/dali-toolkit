@@ -1,15 +1,15 @@
-varying highp vec2 vTexCoord;
+varying mediump vec2 vTexCoord;
 uniform sampler2D sTexture;
 uniform lowp vec4 uColor;
-uniform highp vec2 uSampleOffsets[NUM_SAMPLES];
-uniform highp float uSampleWeights[NUM_SAMPLES];
+uniform mediump vec2 uSampleOffsets[NUM_SAMPLES];
+uniform mediump float uSampleWeights[NUM_SAMPLES];
 
 void main()
 {
-  highp vec4 col = vec4(0.0);
-  for (int i=0; i<NUM_SAMPLES; ++i)
+  mediump vec4 col = texture2D(sTexture, vTexCoord + uSampleOffsets[0]) * uSampleWeights[0];
+  for (int i=1; i<NUM_SAMPLES; ++i)
   {
-    col += (texture2D(sTexture, vTexCoord + uSampleOffsets[i]) + texture2D(sTexture, vTexCoord - uSampleOffsets[i])) * uSampleWeights[i];
+    col += texture2D(sTexture, vTexCoord + uSampleOffsets[i]) * uSampleWeights[i];
   }
   gl_FragColor = col;
 }
