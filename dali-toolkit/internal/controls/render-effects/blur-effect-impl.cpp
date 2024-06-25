@@ -122,7 +122,7 @@ void BlurEffectImpl::Initialize()
 
   std::ostringstream fragmentStringStream;
   fragmentStringStream << "#define NUM_SAMPLES " << mPixelRadius << "\n";
-  fragmentStringStream << SHADER_GAUSSIAN_BLUR_VIEW_FRAG;
+  fragmentStringStream << SHADER_BLUR_EFFECT_FRAG;
   std::string fragmentSource(fragmentStringStream.str());
 
   //////////////////////////////////////////////////////
