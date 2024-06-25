@@ -171,6 +171,7 @@ void Control::SetRenderEffect(Toolkit::RenderEffect effect)
 {
   if(mImpl->mRenderEffect != effect)
   {
+    ClearRenderEffect();
     mImpl->mRenderEffect = effect;
 
     BaseObject&                          handle = effect.GetBaseObject();
@@ -178,8 +179,7 @@ void Control::SetRenderEffect(Toolkit::RenderEffect effect)
     DALI_ASSERT_ALWAYS(object && "Not a valid RenderEffect set.");
 
     Dali::Toolkit::Control ownerControl(GetOwner());
-    object->SetOwnerControl(ownerControl);
-    object->Activate();
+    object->Activate(ownerControl);
   }
 }
 
@@ -187,10 +187,12 @@ void Control::ClearRenderEffect()
 {
   BaseObject&                          handle = mImpl->mRenderEffect.GetBaseObject();
   Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(&handle);
-  DALI_ASSERT_ALWAYS(object && "Set any render effect before you clear.");
 
-  object->Deactivate();
-  object->SetOwnerControl(Toolkit::Control());
+  if(object)
+  {
+    object->Deactivate();
+  }
+  mImpl->mRenderEffect.Reset();
 }
 
 void Control::SetResourceReady()
