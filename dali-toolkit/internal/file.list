@@ -129,10 +129,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/video-view/video-view-impl.cpp
    ${toolkit_src_dir}/controls/web-view/web-view-impl.cpp
    ${toolkit_src_dir}/controls/camera-view/camera-view-impl.cpp
-   ${toolkit_src_dir}/controls/gl-view/drawable-view-impl.cpp
-   ${toolkit_src_dir}/controls/gl-view/drawable-view-native-renderer.cpp
-   ${toolkit_src_dir}/controls/gl-view/gl-view-impl.cpp
-   ${toolkit_src_dir}/controls/gl-view/gl-view-render-thread.cpp
    ${toolkit_src_dir}/accessibility-manager/accessibility-manager-impl.cpp
    ${toolkit_src_dir}/feedback/feedback-style.cpp
    ${toolkit_src_dir}/focus-manager/keyboard-focus-manager-impl.cpp
@@ -253,6 +249,13 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/drag-drop-detector/drag-and-drop-detector-impl.cpp
    ${toolkit_src_dir}/text/emoji-helper.cpp
    ${toolkit_src_dir}/text/text-geometry.cpp
+)
+
+SET(toolkit_internal_egl_src_files
+   ${toolkit_src_dir}/controls/gl-view/drawable-view-impl.cpp
+   ${toolkit_src_dir}/controls/gl-view/drawable-view-native-renderer.cpp
+   ${toolkit_src_dir}/controls/gl-view/gl-view-impl.cpp
+   ${toolkit_src_dir}/controls/gl-view/gl-view-render-thread.cpp
 )
 
 SET( SOURCES ${SOURCES}
