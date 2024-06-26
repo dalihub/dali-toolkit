@@ -25,7 +25,6 @@ namespace Dali
 {
 namespace Toolkit
 {
-
 RenderEffect::RenderEffect(const RenderEffect& handle)
 : BaseHandle(handle)
 {
@@ -37,6 +36,5 @@ RenderEffect::RenderEffect(Internal::RenderEffectImpl* renderEffectImpl)
 }
 
 RenderEffect::~RenderEffect() = default;
-
 } // namespace Toolkit
 } // namespace Dali

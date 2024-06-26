@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CANVAS_VIEW_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,11 @@ public:
    */
   bool RemoveAllDrawables();
 
+  /**
+   * @copydoc Toolkit::Control::CanvasView::RequestRasterization
+   */
+  void RequestRasterization();
+
 private: // From Control
   /**
    * @copydoc Control::OnRelayout
@@ -131,7 +136,21 @@ private: // From Control
    *
    * @return Returns true if synchronously.
    */
-  const bool IsSynchronous();
+  const bool IsSynchronous() const;
+
+  /**
+   * @brief Set to request rasterize canvas manually or automatically
+   *
+   * @param isRasterizationManually True if rasterize canvas manually.
+   */
+  void SetRasterizationRequestManually(const bool isRasterizationManually);
+
+  /**
+   * @brief Whether to request rasterize canvas manually or automatically
+   *
+   * @return Returns true if rasterize canvas manually.
+   */
+  const bool IsRasterizationRequestManually() const;
 
   /**
    * @bried Rasterize the canvas, and add it to the view.
@@ -172,7 +191,9 @@ private:
   TextureSet                       mTextureSet;
   Vector2                          mSize;
   CanvasRendererRasterizingTaskPtr mRasterizingTask;
-  bool                             mIsSynchronous;
+  bool                             mIsSynchronous : 1;
+  bool                             mManualRasterization : 1;
+  bool                             mProcessorRegistered : 1;
 };
 
 } // namespace Internal

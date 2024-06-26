@@ -1384,7 +1384,6 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   END_TEST;
 }
 
-
 int UtcDaliImageVisualCustomWrapModePixelArea02(void)
 {
   ToolkitTestApplication application;
@@ -3404,15 +3403,31 @@ int UtcDaliImageVisualOrientationCorrection(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   application.GetScene().Add(actor);
 
+  Property::Map resultMap;
+  imageVisual.CreatePropertyMap(resultMap);
+
+  // check the Property::ORIENTATION_CORRECTION value from the returned map
+  Property::Value* typeValue = resultMap.Find(ImageVisual::Property::ORIENTATION_CORRECTION, Property::BOOLEAN);
+  DALI_TEST_CHECK(typeValue);
+  DALI_TEST_EQUALS(typeValue->Get<bool>(), false, TEST_LOCATION);
+
+  Vector2 originalImageSize;
+  tet_infoline("Get size of original visual before load image");
+  imageVisual.GetNaturalSize(originalImageSize);
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual);
+  DALI_TEST_GREATER(originalImageSize.width, originalImageSize.height, TEST_LOCATION); // Width and Height must be different for this test.
+
   // Wait for image to load
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
-  Vector2 originalImageSize;
+  Vector2 nonRotatedImageSize;
   tet_infoline("Get size of original visual to compare later with rotated image");
-  imageVisual.GetNaturalSize(originalImageSize);
-  DALI_TEST_GREATER(originalImageSize.width, originalImageSize.height, TEST_LOCATION); // Width and Height must be different for this test.
-  imageVisual.Reset();                                                                 // remove handle so can unregister it and remove from cache
+  imageVisual.GetNaturalSize(nonRotatedImageSize);
+  DALI_TEST_GREATER(nonRotatedImageSize.width, nonRotatedImageSize.height, TEST_LOCATION); // Width and Height must be different for this test.
+
+  // Note : The size of original image is bigger than MAX_TEXTURE_SIZE. origianImageSize might not be same as nonRotatedImageSize.
+  // TODO : Shouldn't we need to fix it?
+
   dummyImpl.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
   application.SendNotification();
   application.Render();
@@ -3424,21 +3439,26 @@ int UtcDaliImageVisualOrientationCorrection(void)
   propertyMap.Insert(ImageVisual::Property::ORIENTATION_CORRECTION, true);
   imageVisual = factory.CreateVisual(propertyMap);
 
+  Vector2 rotatedImageSize;
+  imageVisual.GetNaturalSize(rotatedImageSize);
+  tet_infoline("Confirm that visual has rotated, even if ");
+  DALI_TEST_EQUALS(originalImageSize.width, rotatedImageSize.height, TEST_LOCATION);
+  DALI_TEST_EQUALS(originalImageSize.height, rotatedImageSize.width, TEST_LOCATION);
+
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual);
   // Wait for image to load
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
-  Vector2 rotatedImageSize;
   imageVisual.GetNaturalSize(rotatedImageSize);
   tet_infoline("Confirm that visual has rotated");
-  DALI_TEST_EQUALS(originalImageSize.width, rotatedImageSize.height, TEST_LOCATION);
-  DALI_TEST_EQUALS(originalImageSize.height, rotatedImageSize.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(nonRotatedImageSize.width, rotatedImageSize.height, TEST_LOCATION);
+  DALI_TEST_EQUALS(nonRotatedImageSize.height, rotatedImageSize.width, TEST_LOCATION);
 
-  Property::Map resultMap;
   imageVisual.CreatePropertyMap(resultMap);
 
   // check the Property::ORIENTATION_CORRECTION value from the returned map
-  Property::Value* typeValue = resultMap.Find(ImageVisual::Property::ORIENTATION_CORRECTION, Property::BOOLEAN);
+  typeValue = resultMap.Find(ImageVisual::Property::ORIENTATION_CORRECTION, Property::BOOLEAN);
+  DALI_TEST_CHECK(typeValue);
   DALI_TEST_EQUALS(typeValue->Get<bool>(), true, TEST_LOCATION);
 
   END_TEST;

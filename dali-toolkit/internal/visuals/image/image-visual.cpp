@@ -532,7 +532,9 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
   {
     if(mImageUrl.GetProtocolType() == VisualUrl::LOCAL)
     {
-      ImageDimensions dimensions = Dali::GetClosestImageSize(mImageUrl.GetUrl());
+      // Note that We don't consider desired image size for this case.
+      // Just use (0, 0) value for desired size of image.
+      ImageDimensions dimensions = Dali::GetClosestImageSize(mImageUrl.GetUrl(), ImageDimensions(0, 0), mFittingMode, mSamplingMode, mOrientationCorrection);
 
       if(dimensions != ImageDimensions(0, 0))
       {

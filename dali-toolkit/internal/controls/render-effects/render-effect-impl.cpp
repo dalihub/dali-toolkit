@@ -22,9 +22,6 @@
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-
 namespace
 {
 static constexpr float SIZE_STEP_CONDITION = 3.0f;
@@ -51,11 +48,16 @@ void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
   if(mOwnerControl)
   {
     mTargetSize = mOwnerControl.GetProperty<Vector2>(Actor::Property::SIZE);
-    mRenderer   = CreateRenderer(BASIC_VERTEX_SOURCE, BASIC_FRAGMENT_SOURCE);
+    mRenderer   = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
 
     mSizeNotification = control.AddPropertyNotification(Actor::Property::SIZE, StepCondition(SIZE_STEP_CONDITION));
     mSizeNotification.NotifySignal().Connect(this, &RenderEffectImpl::OnSizeSet);
   }
+}
+
+Toolkit::Control RenderEffectImpl::GetOwnerControl() const
+{
+  return mOwnerControl;
 }
 
 void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
@@ -68,11 +70,6 @@ void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
 Renderer RenderEffectImpl::GetTargetRenderer() const
 {
   return mRenderer;
-}
-
-Toolkit::Control RenderEffectImpl::GetOwnerControl() const
-{
-  return mOwnerControl;
 }
 
 Vector2 RenderEffectImpl::GetTargetSize() const

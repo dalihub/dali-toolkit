@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@
 #include <dali-toolkit/internal/controls/canvas-view/canvas-view-rasterize-task.h>
 #include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer-shape.h>
 #include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer.h>
-#include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/adaptor-framework/async-task-manager.h>
+#include <dali/public-api/images/pixel-data.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -357,7 +357,7 @@ int UtcDaliCanvasViewRasterizeThreadRasterizationCompletedSignalP(void)
 
   gRasterizationCompletedSignal = false;
 
-  Dali::Toolkit::CanvasView            canvasView              = Dali::Toolkit::CanvasView::New(Vector2(100, 100));
+  Dali::Toolkit::CanvasView canvasView = Dali::Toolkit::CanvasView::New(Vector2(100, 100));
 
   Dali::CanvasRenderer dummyCanvasRenderer = Dali::CanvasRenderer::New(Vector2(100, 100));
   DALI_TEST_CHECK(dummyCanvasRenderer);
@@ -500,6 +500,88 @@ int UtcDaliCanvasViewSychronousLoading(void)
 
   isSynchronous = canvasView.GetProperty(Toolkit::CanvasView::Property::SYNCHRONOUS_LOADING).Get<bool>();
   DALI_TEST_EQUALS(isSynchronous, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCanvasViewRasterizationRequestManually(void)
+{
+  ToolkitTestApplication application;
+
+  CanvasView canvasView = CanvasView::New(Vector2(300, 300));
+  DALI_TEST_CHECK(canvasView);
+
+  application.GetScene().Add(canvasView);
+
+  canvasView.SetProperty(Actor::Property::SIZE, Vector2(300, 300));
+  canvasView.SetProperty(Toolkit::CanvasView::Property::SYNCHRONOUS_LOADING, false);
+
+  Dali::CanvasRenderer::Shape shape = Dali::CanvasRenderer::Shape::New();
+
+  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+
+  canvasView.AddDrawable(shape);
+
+  application.SendNotification();
+  application.Render();
+
+  // Rasterization occured
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  bool isRasterizationManually = canvasView.GetProperty(Toolkit::CanvasView::Property::RASTERIZATION_REQUEST_MANUALLY).Get<bool>();
+  DALI_TEST_EQUALS(isRasterizationManually, false, TEST_LOCATION);
+
+  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  application.SendNotification();
+  application.Render();
+
+  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  application.SendNotification();
+  application.Render();
+
+  // Check if the canvasView is rasterized.
+  // Rasterization occured
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  canvasView.SetProperty(Toolkit::CanvasView::Property::RASTERIZATION_REQUEST_MANUALLY, true);
+
+  application.SendNotification();
+  application.Render();
+
+  // Rasterization occured
+  // (Note that we cannot 'cancel' the latest rasterization request even if we set RASTERIZATION_REQUEST_MANUALLY to true)
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  isRasterizationManually = canvasView.GetProperty(Toolkit::CanvasView::Property::RASTERIZATION_REQUEST_MANUALLY).Get<bool>();
+  DALI_TEST_EQUALS(isRasterizationManually, true, TEST_LOCATION);
+
+  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  application.SendNotification();
+  application.Render();
+
+  // Check if the canvasView is not rasterized.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+  Dali::CanvasRenderer::Shape shape2 = Dali::CanvasRenderer::Shape::New();
+
+  shape2.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+
+  canvasView.AddDrawable(shape2);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check whether the canvasView is not rasterized even if we add drawables.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+  // Request rasterize manually
+  canvasView.RequestRasterization();
+
+  application.SendNotification();
+  application.Render();
+
+  // Check if the canvasView is rasterized.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   END_TEST;
 }

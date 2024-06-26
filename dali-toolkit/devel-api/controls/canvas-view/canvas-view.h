@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CANVAS_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,10 +87,19 @@ public:
       /**
        * @brief Whether to load the canvas synchronously.
        * @details Name "synchronousLoading", type Property::BOOLEAN.
+       * @note Default is true.
        */
       SYNCHRONOUS_LOADING,
+
+      /**
+       * @brief Whether to request rasterize canvas manually or automatically
+       * @details Name "rasterizationRequestManually", type Property::BOOLEAN.
+       * @note Default is false.
+       */
+      RASTERIZATION_REQUEST_MANUALLY,
     };
   };
+
 public:
   /**
    * @brief Creates an uninitialized CanvasView.
@@ -179,6 +188,11 @@ public:
    * @brief Remove all drawable objects added to the CanvasView.
    */
   void RemoveAllDrawables();
+
+  /**
+   * @brief Request to rasterize the CanvasView.
+   */
+  void RequestRasterization();
 
 public: // Not intended for application developers
   /// @cond internal
