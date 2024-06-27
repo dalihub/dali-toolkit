@@ -43,9 +43,41 @@ namespace Internal
 {
 namespace Adaptor
 {
+class SceneHolder::SceneHolderLifeCycleObserver
+{
+public:
+  SceneHolderLifeCycleObserver(Adaptor*& adaptor, bool& adaptorStarted)
+  : mAdaptor(adaptor),
+    mAdaptorStarted(adaptorStarted)
+  {
+  }
+
+private: // Adaptor::LifeCycleObserver interface
+  virtual void OnStart()
+  {
+    mAdaptorStarted = true;
+  };
+  virtual void OnPause(){};
+  virtual void OnResume(){};
+  virtual void OnStop()
+  {
+    // Mark adaptor as stopped;
+    mAdaptorStarted = false;
+  };
+  virtual void OnDestroy()
+  {
+    mAdaptor = nullptr;
+  };
+
+private:
+  Adaptor*& mAdaptor;
+  bool&     mAdaptorStarted;
+};
+
 SceneHolder::SceneHolder(const Dali::Rect<int>& positionSize)
-: mRenderSurface(new TestRenderSurface(positionSize)),
-  mScene(Dali::Integration::Scene::New(Dali::Size(static_cast<float>(positionSize.width), static_cast<float>(positionSize.height))))
+: mId(0),
+  mScene(Dali::Integration::Scene::New(Dali::Size(static_cast<float>(positionSize.width), static_cast<float>(positionSize.height)))),
+  mRenderSurface(new TestRenderSurface(positionSize))
 {
 }
 

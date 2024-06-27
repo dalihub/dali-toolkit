@@ -173,9 +173,9 @@ FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
 ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
 
 INCLUDE_DIRECTORIES(
-    ../../../
-    ${${CAPI_LIB}_INCLUDE_DIRS}
-    dali-toolkit-test-utils
+  ../../../
+  ${${CAPI_LIB}_INCLUDE_DIRS}
+  dali-toolkit-test-utils
 )
 
 ADD_CUSTOM_COMMAND(

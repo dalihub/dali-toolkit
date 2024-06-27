@@ -23,15 +23,15 @@
 #include <dali/public-api/object/base-object.h>
 #include "test-render-surface.h"
 
+#include <dali/public-api/events/hover-event.h>
+#include <dali/public-api/events/touch-event.h>
+
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace Adaptor
 {
-
 class SceneHolder : public Dali::BaseObject
 {
 public:
@@ -71,9 +71,16 @@ public:
 
   Dali::RenderTaskList GetRenderTaskList();
 
-protected:
+  class SceneHolderLifeCycleObserver;
+  std::unique_ptr<SceneHolderLifeCycleObserver> mLifeCycleObserver; ///< The adaptor life cycle observer
+  Dali::TouchEvent                              mLastTouchEvent;
+  Dali::HoverEvent                              mLastHoverEvent;
+
+  uint32_t                 mId;             ///< A unique ID to identify the SceneHolder starting from 0
+  Dali::Integration::Scene mScene{nullptr}; ///< The Scene
+  std::string              mName;           ///< The name of the SceneHolder
+
   TestRenderSurface* mRenderSurface;
-  Integration::Scene mScene;
 };
 
 } // namespace Adaptor
