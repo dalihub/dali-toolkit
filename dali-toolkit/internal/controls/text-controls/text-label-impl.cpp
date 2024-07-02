@@ -1188,7 +1188,6 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
   Extents padding;
   padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-  bool isCutoutEnabled = mController->IsTextCutout();
 
   Vector2 contentSize(size.x - (padding.start + padding.end), size.y - (padding.top + padding.bottom));
 
@@ -1255,19 +1254,14 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
     mController->SetVisualTransformOffset(visualTransformOffset);
 
-    if(isCutoutEnabled && mController->IsAutoScrollEnabled())
-    {
-      layoutSize = size;
-    }
-
     Property::Map visualTransform;
-      visualTransform.Add(Toolkit::Visual::Transform::Property::SIZE, layoutSize)
-        .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
-        .Add(Toolkit::Visual::Transform::Property::OFFSET, visualTransformOffset)
-        .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
-        .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN)
-        .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN);
-      mVisual.SetTransformAndSize(visualTransform, size);
+    visualTransform.Add(Toolkit::Visual::Transform::Property::SIZE, layoutSize)
+      .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
+      .Add(Toolkit::Visual::Transform::Property::OFFSET, visualTransformOffset)
+      .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
+      .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN)
+      .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN);
+    mVisual.SetTransformAndSize(visualTransform, size);
 
     if(mController->IsAutoScrollEnabled())
     {
@@ -1295,7 +1289,6 @@ void TextLabel::SetUpAutoScrolling()
   const Size&                    controlSize     = mController->GetView().GetControlSize();
   const Size                     textNaturalSize = GetNaturalSize().GetVectorXY(); // As relayout of text may not be done at this point natural size is used to get size. Single line scrolling only.
   const Text::CharacterDirection direction       = mController->GetAutoScrollDirection();
-  const bool cutoutEnabled = mController->IsTextCutout();
 
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling textNaturalSize[%f,%f] controlSize[%f,%f]\n", textNaturalSize.x, textNaturalSize.y, controlSize.x, controlSize.y);
 
@@ -1316,14 +1309,8 @@ void TextLabel::SetUpAutoScrolling()
   Size      verifiedSize   = textureSize;
   const int maxTextureSize = Dali::GetMaxTextureSize();
 
-  if(cutoutEnabled)
-  {
-    verifiedSize = controlSize;
-  }
-
   //if the texture size width exceed maxTextureSize, modify the visual model size and enabled the ellipsis
   bool actualellipsis = mController->IsTextElideEnabled();
-
   if(verifiedSize.width > maxTextureSize)
   {
     verifiedSize.width = maxTextureSize;
@@ -1338,24 +1325,11 @@ void TextLabel::SetUpAutoScrolling()
 
   Text::TypesetterPtr typesetter = Text::Typesetter::New(mController->GetTextModel());
 
-  PixelData data;
-
-  if(cutoutEnabled)
-  {
-    float cutoutAlpha = mController->GetTextModel()->GetDefaultColor().a;
-
-    Devel::PixelBuffer cutoutData = typesetter->RenderWithPixelBuffer(controlSize, mController->GetTextDirection(), Text::Typesetter::RENDER_NO_STYLES, true, Pixel::RGBA8888);
-    data = typesetter->RenderWithCutout(controlSize, mController->GetTextDirection(), cutoutData, Text::Typesetter::RENDER_NO_TEXT, true, Pixel::RGBA8888, cutoutAlpha); // ignore the horizontal alignment
-  }
-  else
-  {
-    data = typesetter->Render(verifiedSize, mController->GetTextDirection(), Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888); // ignore the horizontal alignment
-  }
-
-  Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D,
-                            data.GetPixelFormat(),
-                            data.GetWidth(),
-                            data.GetHeight());
+  PixelData data    = typesetter->Render(verifiedSize, mController->GetTextDirection(), Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888); // ignore the horizontal alignment
+  Texture   texture = Texture::New(Dali::TextureType::TEXTURE_2D,
+                                 data.GetPixelFormat(),
+                                 data.GetWidth(),
+                                 data.GetHeight());
   texture.Upload(data);
 
   TextureSet textureSet = TextureSet::New();
