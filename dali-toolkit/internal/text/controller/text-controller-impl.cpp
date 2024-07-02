@@ -1677,12 +1677,11 @@ bool Controller::Impl::IsScrollable(const Vector2& displacement)
     {
       const Vector2& targetSize     = mModel->mVisualModel->mControlSize;
       const Vector2& layoutSize     = mModel->mVisualModel->GetLayoutSize();
-      const Vector2& scrollPosition = mModel->mScrollPosition;
 
       if(isHorizontalScrollEnabled)
       {
-        const float displacementX = displacement.x;
-        const float positionX     = scrollPosition.x + displacementX;
+        const float scrollPositionX = std::max(mModel->mScrollPosition.x, -(layoutSize.width - targetSize.width));
+        const float positionX       = scrollPositionX + displacement.x;
         if(layoutSize.width > targetSize.width && -positionX > 0.f && -positionX < layoutSize.width - targetSize.width)
         {
           isScrollable = true;
@@ -1691,9 +1690,9 @@ bool Controller::Impl::IsScrollable(const Vector2& displacement)
 
       if(isVerticalScrollEnabled)
       {
-        const float displacementY = displacement.y;
-        const float positionY     = scrollPosition.y + displacementY;
-        if(layoutSize.height > targetSize.height && -positionY > 0 && -positionY < layoutSize.height - targetSize.height)
+        const float scrollPositionY = std::max(mModel->mScrollPosition.y, -(layoutSize.height - targetSize.height));
+        const float positionY       = scrollPositionY + displacement.y;
+        if(layoutSize.height > targetSize.height && -positionY > 0.f && -positionY < layoutSize.height - targetSize.height)
         {
           isScrollable = true;
         }

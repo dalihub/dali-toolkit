@@ -1415,7 +1415,7 @@ struct Engine::Impl
         }
       }
 
-      const BidirectionalLineInfoRun* const bidirectionalLineInfo = (layoutBidiParameters.isBidirectional && !bidirectionalLinesInfo.Empty()) ? &bidirectionalLinesInfo[layoutBidiParameters.bidiLineIndex] : nullptr;
+      const BidirectionalLineInfoRun* const bidirectionalLineInfo = (layoutBidiParameters.isBidirectional && (layoutBidiParameters.bidiLineIndex < bidirectionalLinesInfo.Count())) ? &bidirectionalLinesInfo[layoutBidiParameters.bidiLineIndex] : nullptr;
 
       if((nullptr != bidirectionalLineInfo) &&
          !bidirectionalLineInfo->isIdentity &&
