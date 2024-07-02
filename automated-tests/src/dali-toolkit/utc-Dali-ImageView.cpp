@@ -3993,6 +3993,22 @@ void OnResourceReadySignal11(Control control)
   }
 }
 
+void OnResourceReadySignal12(Control control)
+{
+  gResourceReadySignalCounter++;
+
+  if(gImageView1)
+  {
+    gImageView1.Unparent();
+    gImageView1.Reset(); // Destroy visual
+  }
+  if(gImageView2)
+  {
+    gImageView2.Unparent();
+    gImageView2.Reset(); // Destroy visual
+  }
+}
+
 } // namespace
 
 int UtcDaliImageViewSetImageOnResourceReadySignal01(void)
@@ -4999,6 +5015,87 @@ int UtcDaliImageViewSetImageOnResourceReadySignal11(void)
   END_TEST;
 }
 
+int UtcDaliImageViewSetImageOnResourceReadySignal12(void)
+{
+  tet_infoline("Test ResourceReady Add AnimatedImageVisual with invalid url, and then Remove immediately.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+  if(gImageView2)
+  {
+    gImageView2.Reset();
+  }
+  if(gImageView3)
+  {
+    gImageView3.Reset();
+  }
+
+  try
+  {
+    gImageView1 = ImageView::New();
+    gImageView1.SetProperty(Toolkit::ImageView::Property::IMAGE, "invalid.gif");
+    gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal12);
+    application.GetScene().Add(gImageView1); // It will call resourceReady signal 1 time.
+
+    gImageView2 = ImageView::New();
+    gImageView2.SetProperty(Toolkit::ImageView::Property::IMAGE, "invalid.gif");
+    gImageView2.ResourceReadySignal().Connect(&OnResourceReadySignal12);
+    application.GetScene().Add(gImageView2); // It will call resourceReady signal 1 time.
+
+    tet_printf("ResourceReady called %d times\n", gResourceReadySignalCounter);
+
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 0, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    // Load gImageView1
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    tet_printf("ResourceReady called %d times\n", gResourceReadySignalCounter);
+
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, TEST_LOCATION);
+
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    // Exception should not happened
+    DALI_TEST_CHECK(false);
+  }
+
+  // Clear cache.
+  application.SendNotification();
+  application.Render();
+
+  gResourceReadySignalCounter = 0;
+
+  // Clear image view for clear test
+
+  if(gImageView1)
+  {
+    gImageView1.Reset();
+  }
+  if(gImageView2)
+  {
+    gImageView2.Reset();
+  }
+  if(gImageView3)
+  {
+    gImageView3.Reset();
+  }
+
+  END_TEST;
+}
+
 int UtcDaliImageViewUseSameUrlWithAnimatedImageVisual(void)
 {
   tet_infoline("Test multiple views with same image in animated image visual");
@@ -5042,6 +5139,9 @@ int UtcDaliImageViewNpatchImageCacheTest01(void)
     // Ensure remove npatch cache if required.
     application.SendNotification();
     application.Render();
+    application.RunIdles();
+    application.SendNotification();
+    application.Render();
 
     imageView[index] = ImageView::New(nPatchImageUrl);
     imageView[index].SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
@@ -5080,6 +5180,9 @@ int UtcDaliImageViewNpatchImageCacheTest01(void)
 
   application.SendNotification();
   application.Render();
+  application.RunIdles();
+  application.SendNotification();
+  application.Render();
 
   textureCallStack.Reset();
   // Let we use deference textures
@@ -5104,6 +5207,9 @@ int UtcDaliImageViewNpatchImageCacheTest01(void)
   imageView[1].Unparent();
   imageView[1].Reset();
 
+  application.SendNotification();
+  application.Render();
+  application.RunIdles();
   application.SendNotification();
   application.Render();
 
@@ -5586,11 +5692,11 @@ int UtcDaliImageViewTransitionEffect05(void)
   ToolkitTestApplication application;
 
   Property::Map map;
-  map["target"]      = "image";
-  map["property"]    = "opacity";
+  map["target"]       = "image";
+  map["property"]     = "opacity";
   map["initialValue"] = 0.2f;
-  map["targetValue"] = 1.0f;
-  map["animator"]    = Property::Map()
+  map["targetValue"]  = 1.0f;
+  map["animator"]     = Property::Map()
                       .Add("alphaFunction", "EASE_IN_OUT")
                       .Add("timePeriod", Property::Map().Add("delay", 0.0f).Add("duration", 2.0f))
                       .Add("animationType", "BETWEEN");
@@ -5625,11 +5731,11 @@ int UtcDaliImageViewTransitionEffect06(void)
   ToolkitTestApplication application;
 
   Property::Map map;
-  map["target"]      = "image";
-  map["property"]    = "opacity";
+  map["target"]       = "image";
+  map["property"]     = "opacity";
   map["initialValue"] = 0.2f;
-  map["targetValue"] = 1.0f;
-  map["animator"]    = Property::Map()
+  map["targetValue"]  = 1.0f;
+  map["animator"]     = Property::Map()
                       .Add("alphaFunction", "EASE_IN_OUT")
                       .Add("timePeriod", Property::Map().Add("delay", 0.0f).Add("duration", 2.0f))
                       .Add("animationType", "TO");
@@ -5657,8 +5763,6 @@ int UtcDaliImageViewTransitionEffect06(void)
 
   END_TEST;
 }
-
-
 
 int UtcDaliImageViewImageLoadFailureAndReload01(void)
 {
