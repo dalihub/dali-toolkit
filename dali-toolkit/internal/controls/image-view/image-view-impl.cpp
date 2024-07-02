@@ -19,6 +19,7 @@
 #include "image-view-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -45,8 +46,8 @@ namespace
 {
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
-constexpr float FULL_OPACITY = 1.0f;
-constexpr float LOW_OPACITY  = 0.2f;
+constexpr float FULL_OPACITY            = 1.0f;
+constexpr float LOW_OPACITY             = 0.2f;
 constexpr float TRANSITION_EFFECT_SPEED = 0.3f;
 
 constexpr int PLACEHOLDER_DEPTH_INDEX = -2;
@@ -67,6 +68,20 @@ DALI_PROPERTY_REGISTRATION(Toolkit, ImageView, "enableTransitionEffect", BOOLEAN
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, ImageView, "pixelArea", Vector4(0.f, 0.f, 1.f, 1.f), PIXEL_AREA)
 DALI_TYPE_REGISTRATION_END()
 
+/**
+ * @brief Discard the given visual into VisualFactory. The visual will be destroyed at next idle time.
+ *
+ * @param[in,out] visual Visual to be discarded. It will be reset to an empty handle.
+ */
+void DiscardImageViewVisual(Dali::Toolkit::Visual::Base& visual)
+{
+  if(DALI_LIKELY(Dali::Stage::IsInstalled() && visual))
+  {
+    Dali::Toolkit::VisualFactory::Get().DiscardVisual(visual);
+  }
+  visual.Reset();
+}
+
 } // anonymous namespace
 
 using namespace Dali;
@@ -85,6 +100,9 @@ ImageView::ImageView(ControlBehaviour additionalBehaviour)
 
 ImageView::~ImageView()
 {
+  DiscardImageViewVisual(mVisual);
+  DiscardImageViewVisual(mPreviousVisual);
+  DiscardImageViewVisual(mPlaceholderVisual);
 }
 
 Toolkit::ImageView ImageView::New(ControlBehaviour additionalBehaviour)
@@ -133,6 +151,8 @@ void ImageView::SetImage(const Property::Map& map)
     // This previous visual will be deleted when transition effect is done.
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
     controlDataImpl.EnableReadyTransitionOverriden(mVisual, true);
+
+    DiscardImageViewVisual(mPreviousVisual);
     mPreviousVisual = mVisual;
   }
 
@@ -207,6 +227,8 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
     // This previous visual will be deleted when transition effect is done.
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
     controlDataImpl.EnableReadyTransitionOverriden(mVisual, true);
+
+    DiscardImageViewVisual(mPreviousVisual);
     mPreviousVisual = mVisual;
   }
 
@@ -257,7 +279,8 @@ void ImageView::ClearImageVisual()
   // Clear cached properties
   mPropertyMap.Clear();
   mUrl.clear();
-  mVisual.Reset();
+
+  DiscardImageViewVisual(mVisual);
 
   // Unregister the exsiting visual
   DevelControl::UnregisterVisual(*this, Toolkit::ImageView::Property::IMAGE);
@@ -296,7 +319,7 @@ void ImageView::SetPlaceholderUrl(const std::string& url)
   mPlaceholderUrl = url;
   if(!url.empty())
   {
-    mPlaceholderVisual.Reset();
+    DiscardImageViewVisual(mPlaceholderVisual);
     CreatePlaceholderImage();
   }
   else
@@ -308,7 +331,7 @@ void ImageView::SetPlaceholderUrl(const std::string& url)
       DevelControl::UnregisterVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE);
     }
 
-    mPlaceholderVisual.Reset();
+    DiscardImageViewVisual(mPlaceholderVisual);
     mPlaceholderUrl = url;
   }
 }
@@ -464,7 +487,13 @@ void ImageView::OnResourceReady(Toolkit::Control control)
   }
 
   // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.
-  mVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
+  auto currentVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
+  if(mVisual != currentVisual)
+  {
+    // If the current visual is not the same as the previous holded visual, then we need to discard old one.
+    DiscardImageViewVisual(mVisual);
+  }
+  mVisual = currentVisual;
 
   // Applying FittingMode again if it is not working well on OnRelayout().
   if(mNeedLazyFittingMode)
@@ -647,7 +676,7 @@ void ImageView::CreatePlaceholderImage()
   else
   {
     DevelControl::UnregisterVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE);
-    mPlaceholderVisual.Reset();
+    DiscardImageViewVisual(mPlaceholderVisual);
   }
 }
 
@@ -726,7 +755,7 @@ void ImageView::ClearTransitionAnimation()
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
     controlDataImpl.EnableReadyTransitionOverriden(mVisual, false);
     Toolkit::GetImplementation(mPreviousVisual).SetOffScene(self);
-    mPreviousVisual.Reset();
+    DiscardImageViewVisual(mPreviousVisual);
   }
 
   if(mTransitionAnimation)

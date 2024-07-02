@@ -232,6 +232,20 @@ void ParseTextFitProperty(Text::ControllerPtr& controller, const Property::Map* 
   }
 }
 
+/**
+ * @brief Discard the given visual into VisualFactory. The visual will be destroyed at next idle time.
+ *
+ * @param[in,out] visual Visual to be discarded. It will be reset to an empty handle.
+ */
+void DiscardTextLabelVisual(Dali::Toolkit::Visual::Base& visual)
+{
+  if(DALI_LIKELY(Dali::Stage::IsInstalled() && visual))
+  {
+    Dali::Toolkit::VisualFactory::Get().DiscardVisual(visual);
+  }
+  visual.Reset();
+}
+
 } // namespace
 
 Toolkit::TextLabel TextLabel::New(ControlBehaviour additionalBehaviour)
@@ -1403,6 +1417,7 @@ TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
 
 TextLabel::~TextLabel()
 {
+  DiscardTextLabelVisual(mVisual);
 }
 
 Vector<Vector2> TextLabel::GetTextSize(const uint32_t startIndex, const uint32_t endIndex) const

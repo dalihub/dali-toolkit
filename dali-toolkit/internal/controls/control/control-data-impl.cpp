@@ -581,14 +581,22 @@ Control::Impl::Impl(Control& controlImpl)
 
 Control::Impl::~Impl()
 {
-  for(auto&& iter : mVisuals)
+  while(!mVisuals.Empty())
   {
-    StopObservingVisual(iter->visual);
+    auto iter = mVisuals.End() - 1u;
+    StopObservingVisual((*iter)->visual);
+
+    // Discard removed visual. It will be destroyed at next Idle time.
+    DiscardVisual(iter, mVisuals);
   }
 
-  for(auto&& iter : mRemoveVisuals)
+  while(!mRemoveVisuals.Empty())
   {
-    StopObservingVisual(iter->visual);
+    auto removalIter = mRemoveVisuals.End() - 1u;
+    StopObservingVisual((*removalIter)->visual);
+
+    // Discard removed visual. It will be destroyed at next Idle time.
+    DiscardVisual(removalIter, mRemoveVisuals);
   }
 
   // All gesture detectors will be destroyed so no need to disconnect.
@@ -2217,35 +2225,38 @@ void Control::Impl::UpdateVisualProperties(const std::vector<std::pair<Dali::Pro
 
 void Control::Impl::EmitResourceReadySignal()
 {
-  if(!mIsEmittingResourceReadySignal)
+  if(DALI_LIKELY(Stage::IsInstalled())) ///< Avoid resource ready callback during shutting down
   {
-    // Guard against calls to emit the signal during the callback
-    mIsEmittingResourceReadySignal = true;
-
-    // If the signal handler changes visual, it may become ready during this call & therefore this method will
-    // get called again recursively. If so, mIdleCallbackRegistered is set below, and we act on it after that secondary
-    // invocation has completed by notifying in an Idle callback to prevent further recursion.
-    Dali::Toolkit::Control handle(mControlImpl.GetOwner());
-    mResourceReadySignal.Emit(handle);
-
-    mIsEmittingResourceReadySignal = false;
-  }
-  else
-  {
-    if(!mIdleCallbackRegistered)
+    if(!mIsEmittingResourceReadySignal)
     {
-      mIdleCallbackRegistered = true;
+      // Guard against calls to emit the signal during the callback
+      mIsEmittingResourceReadySignal = true;
 
-      // Add idler to emit the signal again
-      if(!mIdleCallback)
+      // If the signal handler changes visual, it may become ready during this call & therefore this method will
+      // get called again recursively. If so, mIdleCallbackRegistered is set below, and we act on it after that secondary
+      // invocation has completed by notifying in an Idle callback to prevent further recursion.
+      Dali::Toolkit::Control handle(mControlImpl.GetOwner());
+      mResourceReadySignal.Emit(handle);
+
+      mIsEmittingResourceReadySignal = false;
+    }
+    else
+    {
+      if(!mIdleCallbackRegistered)
       {
-        // The callback manager takes the ownership of the callback object.
-        mIdleCallback = MakeCallback(this, &Control::Impl::OnIdleCallback);
-        if(DALI_UNLIKELY(!Adaptor::Get().AddIdle(mIdleCallback, true)))
+        mIdleCallbackRegistered = true;
+
+        // Add idler to emit the signal again
+        if(!mIdleCallback)
         {
-          DALI_LOG_ERROR("Fail to add idle callback for control resource ready. Skip this callback.\n");
-          mIdleCallback           = nullptr;
-          mIdleCallbackRegistered = false;
+          // The callback manager takes the ownership of the callback object.
+          mIdleCallback = MakeCallback(this, &Control::Impl::OnIdleCallback);
+          if(DALI_UNLIKELY(!Adaptor::Get().AddIdle(mIdleCallback, true)))
+          {
+            DALI_LOG_ERROR("Fail to add idle callback for control resource ready. Skip this callback.\n");
+            mIdleCallback           = nullptr;
+            mIdleCallbackRegistered = false;
+          }
         }
       }
     }
