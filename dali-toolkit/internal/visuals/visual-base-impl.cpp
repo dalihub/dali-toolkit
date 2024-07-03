@@ -20,6 +20,7 @@
 
 // EXTERNAL HEADER
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/debug.h>
@@ -56,7 +57,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 namespace
@@ -164,10 +164,18 @@ Visual::Base::Base(VisualFactoryCache& factoryCache, FittingMode fittingMode, To
 : mImpl(new Impl(fittingMode, type)),
   mFactoryCache(factoryCache)
 {
+  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("Visual::Base[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
+  }
 }
 
 Visual::Base::~Base()
 {
+  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("Visual::~Base[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
+  }
   delete mImpl;
 }
 
@@ -1098,7 +1106,7 @@ void Visual::Base::SetupTransition(
           Dali::KeyFrames keyFrames = Dali::KeyFrames::New();
           keyFrames.Add(0.0f, animator.initialValue);
           keyFrames.Add(1.0f, animator.targetValue);
-          transition.AnimateBetween(Property(mImpl->mRenderer, index),keyFrames, TimePeriod(animator.timePeriodDelay, animator.timePeriodDuration));
+          transition.AnimateBetween(Property(mImpl->mRenderer, index), keyFrames, TimePeriod(animator.timePeriodDelay, animator.timePeriodDuration));
         }
         else if(animator.animationType == TransitionData::AnimationType::BY)
         {
@@ -1108,10 +1116,10 @@ void Visual::Base::SetupTransition(
         else
         {
           transition.AnimateTo(Property(mImpl->mRenderer, index),
-                      targetValue,
-                      animator.alphaFunction,
-                      TimePeriod(animator.timePeriodDelay,
-                                animator.timePeriodDuration));
+                               targetValue,
+                               animator.alphaFunction,
+                               TimePeriod(animator.timePeriodDelay,
+                                          animator.timePeriodDuration));
         }
       }
     }

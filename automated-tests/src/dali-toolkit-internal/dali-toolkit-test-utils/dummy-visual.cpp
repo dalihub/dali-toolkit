@@ -35,7 +35,7 @@ DummyVisualPtr DummyVisual::New(const Property::Map& properties)
 }
 
 DummyVisual::DummyVisual(VisualFactoryCache& factoryCache)
-: Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::Type::COLOR),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::Type::COLOR),
   mActionCounter(0)
 {
 }
