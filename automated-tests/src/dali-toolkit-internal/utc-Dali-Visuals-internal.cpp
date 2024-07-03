@@ -297,6 +297,7 @@ int UtcDaliArcVisualCreateInstancePropertyMap(void)
 
   END_TEST;
 }
+
 int UtcDaliVisualUpdateBrokenImageRenderer(void)
 {
   ToolkitTestApplication application;
@@ -337,6 +338,24 @@ int UtcDaliVisualUpdateBrokenImageRenderer(void)
   DALI_TEST_CHECK(testShader3 == factoryCache->GetShader(Toolkit::Internal::VisualFactoryCache::NINE_PATCH_SHADER));
 
   delete factoryCache;
+
+  END_TEST;
+}
+
+int UtcDaliVisualCreateWithoutCoreN(void)
+{
+  // DO NOT USE Application for this UTC.
+  tet_infoline("UtcDaliVisualCreateWithoutCore Test, for line coverage");
+
+  //Created DummyVisual
+  Property::Map                     settings;
+  Toolkit::Internal::DummyVisualPtr dummyVisualPtr   = Toolkit::Internal::DummyVisual::New(settings);
+  Toolkit::Visual::Base             visualBaseHandle = Toolkit::Visual::Base(dummyVisualPtr.Get());
+
+  visualBaseHandle.Reset();
+
+  // Always success
+  DALI_TEST_CHECK(true);
 
   END_TEST;
 }
