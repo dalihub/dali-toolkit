@@ -144,19 +144,29 @@ void BlurEffectImpl::Initialize()
   mInternalRoot.Add(mVerticalBlurActor);
 }
 
-void BlurEffectImpl::Activate()
+void BlurEffectImpl::Activate(Toolkit::Control ownerControl)
 {
-  DALI_ASSERT_ALWAYS(!mIsActivated &&
-                     "This effect is already taken. Call Toolkit::Control::ClearRenderEffect(); to free the effect.");
+  DALI_ASSERT_ALWAYS(ownerControl && "Given empty owner control");
 
-  Toolkit::Control handle = GetOwnerControl();
-  DALI_ASSERT_ALWAYS(handle); // RenderEffect::SetOwnerControl(mOwnerControl); was done.
+  if(mIsActivated)
+  {
+    if(ownerControl == GetOwnerControl())
+    {
+      return;
+    }
+    else
+    {
+      Deactivate();
+    }
+  }
+  SetOwnerControl(ownerControl);
+  mIsActivated = true;
 
   // Get input texture size
   Vector2 size = GetTargetSize();
   if(size == Vector2::ZERO)
   {
-    size = handle.GetNaturalSize();
+    size = ownerControl.GetNaturalSize();
     if(size == Vector2::ZERO)
     {
       return;
@@ -205,11 +215,11 @@ void BlurEffectImpl::Activate()
   if(mIsBackground)
   {
     mSourceRenderTask.SetSourceActor(Stage::GetCurrent().GetRootLayer());
-    mSourceRenderTask.RenderUntil(handle);
+    mSourceRenderTask.RenderUntil(ownerControl);
   }
   else
   {
-    mSourceRenderTask.SetSourceActor(handle);
+    mSourceRenderTask.SetSourceActor(ownerControl);
   }
   mSourceRenderTask.SetOrderIndex(BLUR_EFFECT_ORDER_INDEX);
   mSourceRenderTask.SetCameraActor(mRenderFullSizeCamera);
@@ -246,11 +256,10 @@ void BlurEffectImpl::Activate()
   {
     renderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Dali::Toolkit::DepthIndex::CONTENT);
   }
-  handle.AddRenderer(renderer);
+  ownerControl.AddRenderer(renderer);
   SetRendererTexture(renderer, mSourceFrameBuffer);
 
-  handle.Add(mInternalRoot);
-  mIsActivated = true;
+  ownerControl.Add(mInternalRoot);
 }
 
 void BlurEffectImpl::Deactivate()
@@ -268,12 +277,7 @@ void BlurEffectImpl::Deactivate()
   taskList.RemoveTask(mVerticalBlurTask);
   taskList.RemoveTask(mSourceRenderTask);
 
-  auto ownerControl = GetOwnerControl();
-  if(ownerControl)
-  {
-    Renderer renderer = GetTargetRenderer();
-    ownerControl.RemoveRenderer(renderer);
-  }
+  ClearOwnerControl();
 }
 
 void BlurEffectImpl::SetShaderConstants(float downsampledWidth, float downsampledHeight)

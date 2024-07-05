@@ -38,24 +38,13 @@ class RenderEffectImpl : public BaseObject, public ConnectionTracker
 {
 public:
   /**
-   * @brief Sets owner Control. Applies effect on the owner.
+   * @brief Activates effect on ownerControl
    * @param[in] control The owner control to apply RenderEffect.
    */
-  void SetOwnerControl(Dali::Toolkit::Control control);
+  virtual void Activate(Toolkit::Control ownerControl) = 0;
 
   /**
-   * @brief Get Owner control.
-   * @return mOwnerControl
-   */
-  Toolkit::Control GetOwnerControl() const;
-
-  /**
-   * @brief Activate effect.
-   */
-  virtual void Activate() = 0;
-
-  /**
-   * @brief Deactivate effect.
+   * @brief Deactivates effect
    */
   virtual void Deactivate() = 0;
 
@@ -95,12 +84,29 @@ protected:
    */
   Vector2 GetTargetSize() const;
 
+  /**
+   * @brief Sets owner Control. Applies effect on the owner.
+   * @param[in] control The owner control to apply RenderEffect.
+   */
+  void SetOwnerControl(Toolkit::Control control);
+
+  /**
+   * @brief Clears owner Control.
+   */
+  void ClearOwnerControl();
+
+  /**
+   * @brief Get Owner control.
+   * @return mOwnerControl
+   */
+  Toolkit::Control GetOwnerControl() const;
+
 private:
   Dali::Renderer         mRenderer; // An additional renderer for mOwnerControl
   Dali::Toolkit::Control mOwnerControl;
 
-  Vector2              mTargetSize;       // The final size of mOwnerControl
   PropertyNotification mSizeNotification; // Resize/Relayout signal
+  Vector2              mTargetSize;       // The final size of mOwnerControl
 };
 } // namespace Internal
 

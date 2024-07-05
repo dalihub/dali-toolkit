@@ -64,8 +64,9 @@ public:
 
   /**
    * @brief Activates blur effect
+   * @param[in] ownerControl The control to apply effect
    */
-  void Activate() override;
+  void Activate(Toolkit::Control ownerControl) override;
 
   /**
    * @brief Dectivates blur effect

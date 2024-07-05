@@ -78,7 +78,6 @@ int UtcDaliRenderEffectActivateP01(void)
   childControl.SetRenderEffect(BackgroundBlurEffect::New());
 
   taskList = scene.GetRenderTaskList();
-  DALI_LOG_ERROR("%d\n", taskList.GetTaskCount());
   DALI_TEST_CHECK(4u == taskList.GetTaskCount());
 
   END_TEST;
@@ -107,7 +106,7 @@ int UtcDaliRenderEffectActivateP02(void)
   control2.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
   scene.Add(control2);
 
-  control2.SetRenderEffect(blurEffect); // Ownership changed.
+  control2.SetRenderEffect(blurEffect);
   taskList = scene.GetRenderTaskList();
   DALI_TEST_CHECK(4u == taskList.GetTaskCount());
 
@@ -153,24 +152,18 @@ int UtcDaliRenderEffectDeactivateN(void)
   control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
   scene.Add(control);
 
-  try
-  {
-    control.ClearRenderEffect();
-    DALI_TEST_CHECK(false);
-  }
-  catch(Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT(e);
-    DALI_TEST_CHECK(true);
-  }
+  RenderTaskList taskList = scene.GetRenderTaskList();
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
+  control.ClearRenderEffect(); // Nothing happens
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
 
   END_TEST;
 }
 
-int UtcDaliRenderEffectRepeatActivateDeactivate(void)
+int UtcDaliRenderEffectActivateDeactivateInplace(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliRenderEffectRepeatActivateDeactivate");
+  tet_infoline("UtcDaliRenderEffectActivateDeactivateInplace");
 
   Integration::Scene scene = application.GetScene();
 
@@ -180,13 +173,63 @@ int UtcDaliRenderEffectRepeatActivateDeactivate(void)
   scene.Add(control);
 
   BackgroundBlurEffect blurEffect = BackgroundBlurEffect::New();
-  for(int i = 0; i < 3; i++)
-  {
-    control.SetRenderEffect(blurEffect); // Activate
-    RenderTaskList taskList = scene.GetRenderTaskList();
-    DALI_TEST_CHECK(4u == taskList.GetTaskCount());
-    //control.ClearRenderEffect(); // Deactivate, Done automatically on duplicated jobs.
-  }
+  control.SetRenderEffect(blurEffect);
+
+  RenderTaskList taskList = scene.GetRenderTaskList();
+  DALI_TEST_CHECK(4u == taskList.GetTaskCount());
+
+  control.ClearRenderEffect();
+  control.SetRenderEffect(blurEffect);
+  control.ClearRenderEffect();
+  control.SetRenderEffect(blurEffect);
+  DALI_TEST_CHECK(4u == taskList.GetTaskCount());
+
+  END_TEST;
+}
+
+int UtcDaliRenderEffectReassign(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRenderEffectReassign");
+
+  Integration::Scene scene = application.GetScene();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  scene.Add(control);
+
+  BackgroundBlurEffect blurEffect = BackgroundBlurEffect::New();
+  control.SetRenderEffect(blurEffect); // Duplicate actions will be ignored
+  control.SetRenderEffect(blurEffect); // Duplicate actions will be ignored
+  control.SetRenderEffect(blurEffect); // Duplicate actions will be ignored
+  RenderTaskList taskList = scene.GetRenderTaskList();
+  DALI_TEST_CHECK(4u == taskList.GetTaskCount());
+
+  END_TEST;
+}
+
+int UtcDaliRenderEffectResize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRenderEffectResize");
+
+  Integration::Scene scene   = application.GetScene();
+  Control            control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  scene.Add(control);
+  control.SetRenderEffect(BackgroundBlurEffect::New());
+
+  application.SendNotification();
+  application.Render();
+
+  control.SetProperty(Actor::Property::SIZE, Vector2(30.0f, 30.0f));
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 30.0f, TEST_LOCATION);
 
   END_TEST;
 }
