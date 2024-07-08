@@ -179,7 +179,8 @@ void Control::SetRenderEffect(Toolkit::RenderEffect effect)
     DALI_ASSERT_ALWAYS(object && "Not a valid RenderEffect set.");
 
     Dali::Toolkit::Control ownerControl(GetOwner());
-    object->Activate(ownerControl);
+    object->SetOwnerControl(ownerControl);
+    object->Activate();
   }
 }
 
@@ -191,6 +192,7 @@ void Control::ClearRenderEffect()
   if(object)
   {
     object->Deactivate();
+    object->ClearOwnerControl();
   }
   mImpl->mRenderEffect.Reset();
 }

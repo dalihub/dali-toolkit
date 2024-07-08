@@ -43,7 +43,7 @@ RenderEffectImpl::~RenderEffectImpl()
 
 void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
 {
-  if(control)
+  if(control && (control != mOwnerControl))
   {
     mOwnerControl = control;
 
@@ -73,9 +73,12 @@ Toolkit::Control RenderEffectImpl::GetOwnerControl() const
 
 void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
 {
-  mTargetSize = mOwnerControl.GetProperty<Vector2>(Actor::Property::SIZE);
-  Deactivate();
-  Activate(mOwnerControl);
+  if(mOwnerControl)
+  {
+    mTargetSize = mOwnerControl.GetProperty<Vector2>(Actor::Property::SIZE);
+    Deactivate();
+    Activate();
+  }
 }
 
 Renderer RenderEffectImpl::GetTargetRenderer() const

@@ -45,11 +45,11 @@ BackgroundBlurEffect BackgroundBlurEffect::New()
   return BackgroundBlurEffect(internal.Get());
 }
 
-BackgroundBlurEffect BackgroundBlurEffect::New(float downscaleFactor, uint32_t blurRadius, float bellCurveWidth)
+BackgroundBlurEffect BackgroundBlurEffect::New(float downscaleFactor, uint32_t blurRadius)
 {
-  Internal::BlurEffectImplPtr internal = Internal::BlurEffectImpl::New(downscaleFactor, blurRadius, bellCurveWidth, true);
+  Internal::BlurEffectImplPtr internal = Internal::BlurEffectImpl::New(downscaleFactor, blurRadius, true);
   return BackgroundBlurEffect(internal.Get());
 }
 
-}// namespace Toolkit
-}// namespace Dali
+} // namespace Toolkit
+} // namespace Dali

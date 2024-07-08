@@ -24,7 +24,7 @@ float roundedBoxSDF(vec2 PixelPositionFromCenter, vec2 RectangleEdgePositionFrom
     return length(max(abs(PixelPositionFromCenter)
                       - RectangleEdgePositionFromCenter
                       + Radius
-                      ,0.0))
+                      , 0.0))
            - Radius;
 }
 
@@ -52,10 +52,11 @@ void main()
 {
   gl_FragColor = texture2D(sTexture, vTexCoord);
 
-  float edgeSoftness = 1.0;
-  float distance = roundedBoxSDF(vFragCoord.xy - (uSize.xy/2.0), uSize.xy/2.0, getCurrentRadius());
+  float radius = getCurrentRadius();
+  float edgeSoftness = min(1.0, radius);
+  float distance = roundedBoxSDF(vFragCoord.xy - (uSize.xy/2.0), uSize.xy/2.0, radius);
 
-  float smoothedAlpha = 1.0 - smoothstep(0.0, edgeSoftness * 2.0, distance);
+  float smoothedAlpha = 1.0 - smoothstep(-edgeSoftness, edgeSoftness, distance);
   gl_FragColor.a *= smoothedAlpha;
 
   gl_FragColor.rgb = applyDithering(gl_FragColor.rgb);
