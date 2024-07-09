@@ -8,6 +8,12 @@ OUTPUT highp float vAliasMargin;
 OUTPUT highp vec4 vCornerRadius;
 #endif
 #endif
+#if defined(IS_REQUIRED_CUTOUT)
+OUTPUT highp vec2 vPositionFromCenter;
+#if defined(IS_REQUIRED_ROUNDED_CORNER)
+OUTPUT highp vec4 vCutoutCornerRadius;
+#endif
+#endif
 
 uniform highp mat4 uMvpMatrix;
 uniform highp vec3 uSize;
@@ -92,7 +98,17 @@ vec4 ComputeVertexPosition()
 #else
   highp vec2 vPosition = aPosition * visualSize;
 #endif
+
+#if defined(IS_REQUIRED_CUTOUT)
+  vPositionFromCenter = vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy;
+#if defined(IS_REQUIRED_ROUNDED_CORNER)
+  vCutoutCornerRadius = mix(cornerRadius * min(uSize.x, uSize.y), cornerRadius, cornerRadiusPolicy);
+  vCutoutCornerRadius = min(vCutoutCornerRadius, min(uSize.x, uSize.y) * 0.5);
+#endif
+  return vec4(vPositionFromCenter, 0.0, 1.0);
+#else
   return vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
+#endif
 }
 
 void main()

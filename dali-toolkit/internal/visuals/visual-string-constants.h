@@ -74,6 +74,7 @@ extern const char* const CORNER_RADIUS_POLICY;
 
 // Color visual
 extern const char* const BLUR_RADIUS_NAME;
+extern const char* const CUTOUT_POLICY_NAME;
 
 // Image visual
 extern const char* const IMAGE_URL_NAME;
