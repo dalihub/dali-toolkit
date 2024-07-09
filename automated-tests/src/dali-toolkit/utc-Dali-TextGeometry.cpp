@@ -63,6 +63,8 @@ int UtcDaliTextGeometryGetLineBoundingRectangleLabel(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
   label.SetProperty(DevelTextLabel::Property::LINE_SPACING, lineSpacing);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -89,6 +91,8 @@ int UtcDaliTextGeometryGetLineBoundingRectangleEditor(void)
 
   editor.SetProperty(Actor::Property::SIZE, Vector2(160.0f, 250.f));
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
   editor.SetProperty(TextEditor::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -116,6 +120,8 @@ int UtcDaliTextGeometryGetLineBoundingRectangleField(void)
   field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
   field.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 350.f));
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
+  field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, true);
+  field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, true);
   field.SetProperty(TextField::Property::TEXT, "مرحبا بالعالم");
 
   application.SendNotification();
@@ -172,6 +178,8 @@ int UtcDaliTextGeometryLineSpacingPositiveGetLineBoundingRectangleLabel(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
   label.SetProperty(DevelTextLabel::Property::LINE_SPACING, lineSpacing);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -200,6 +208,8 @@ int UtcDaliTextGeometryWithVerticalLineAlignmentTopGetLineBoundingRectangleLabel
   label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   label.SetProperty(Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "TOP");
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -228,6 +238,8 @@ int UtcDaliTextGeometryWithVerticalLineAlignmentBottomGetLineBoundingRectangleLa
   label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   label.SetProperty(Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "BOTTOM");
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -256,6 +268,8 @@ int UtcDaliTextGeometryWithEllipsisMiddleGetLineBoundingRectangleLabel(void)
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   label.SetProperty(TextLabel::Property::ELLIPSIS, true);
   label.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::MIDDLE);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -285,6 +299,8 @@ int UtcDaliTextGeometryWithEllipsisStartGetLineBoundingRectangleLabel(void)
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   label.SetProperty(TextLabel::Property::ELLIPSIS, true);
   label.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::START);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -314,6 +330,8 @@ int UtcDaliTextGeometryWithEllipsisEndGetLineBoundingRectangleLabel(void)
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   label.SetProperty(TextLabel::Property::ELLIPSIS, true);
   label.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::END);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -344,6 +362,8 @@ int UtcDaliTextGeometryGetCharacterBoundingRectangleLabel(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
   label.SetProperty(DevelTextLabel::Property::LINE_SPACING, lineSpacing);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -374,6 +394,8 @@ int UtcDaliTextGeometryGetCharacterBoundingRectangleEditor(void)
 
   editor.SetProperty(Actor::Property::SIZE, Vector2(160.0f, 250.f));
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
   editor.SetProperty(TextEditor::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -458,6 +480,8 @@ int UtcDaliTextGeometryLineSpacingPositiveGetCharacterBoundingRectangleLabel(voi
   label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
   label.SetProperty(DevelTextLabel::Property::LINE_SPACING, lineSpacing);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -486,6 +510,8 @@ int UtcDaliTextGeometryWithVerticalLineAlignmentTopGetCharacterBoundingRectangle
   label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   label.SetProperty(Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "TOP");
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -514,6 +540,8 @@ int UtcDaliTextGeometryWithVerticalLineAlignmentBottomGetCharacterBoundingRectan
   label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   label.SetProperty(Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "BOTTOM");
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
   application.SendNotification();
@@ -566,6 +594,8 @@ int UtcDaliTextGeometryGetCharacterIndexAtPositionTextEditor(void)
 
   editor.SetProperty(Actor::Property::SIZE, Vector2(160.0f, 250.f));
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
   editor.SetProperty(TextEditor::Property::TEXT, "Hello everyone.");
 
   application.SendNotification();
@@ -645,6 +675,8 @@ int UtcDaliTextGeometryGetCharacterIndexAtPositionLastCharacter(void)
 
   label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
   label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Hello");
 
   application.SendNotification();

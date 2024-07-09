@@ -90,6 +90,8 @@ namespace
     controller->SetMultiLineEnabled( data.isMultiLines );
     controller->SetLineWrapMode( (Text::LineWrap::Mode)(data.lineWrapMode) );
     controller->SetEllipsisPosition( data.ellipsisPosition );
+    controller->SetRemoveFrontInset(true);
+    controller->SetRemoveBackInset(true);
 
     controller->SetText(data.text);
     controller->Relayout( data.size );
@@ -258,6 +260,9 @@ namespace
 
     controller->SetTextElideEnabled( true );
     controller->SetEllipsisPosition( data.ellipsisPosition );
+
+    controller->SetRemoveFrontInset(true);
+    controller->SetRemoveBackInset(true);
 
     controller->SetText( data.text );
     controller->Relayout( data.size );

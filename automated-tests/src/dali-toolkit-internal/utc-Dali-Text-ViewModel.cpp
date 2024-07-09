@@ -250,6 +250,8 @@ int UtcDaliTextViewModelGetLayoutSize(void)
 
   // Sets a text and relais-out.
   controller->SetMarkupProcessorEnabled(true);
+  controller->SetRemoveFrontInset(true);
+  controller->SetRemoveBackInset(true);
   controller->SetText("<font family='TizenSansRegular' size='10'>Lorem ipsum dolor sit amet, aeque definiebas ea mei, posse iracundia ne cum.</font>");
   controller->Relayout(CONTROL_SIZE);
 
