@@ -54,7 +54,6 @@ public:
    *
    * downscaleFactor = 0.4f
    * pixelRadius = 5u
-   * bellCurveWidth = 1.5f
    *
    * @SINCE_2_3.28
    * @return A handle to a newly allocated Dali resource
@@ -65,11 +64,10 @@ public:
    * @brief Creates an initialized BackgroundBlurEffect.
    * @param[in] downscaleFactor This value should reside in the range [0.0, 1.0].
    * @param[in] blurRadius The radius of Gaussian kernel.
-   * @param[in] bellCurveWidth Blur intensity.
    * @SINCE_2_3.28
    * @return A handle to a newly allocated Dali resource
    */
-  static BackgroundBlurEffect New(float downscaleFactor, uint32_t blurRadius, float bellCurveWidth);
+  static BackgroundBlurEffect New(float downscaleFactor, uint32_t blurRadius);
 
   /**
    * @brief Creates an uninitialized blur effect.

@@ -33,25 +33,36 @@ namespace Toolkit
 {
 namespace Internal
 {
-RenderEffectImpl::~RenderEffectImpl() = default;
-
-void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
+RenderEffectImpl::~RenderEffectImpl()
 {
   if(mOwnerControl)
   {
-    Deactivate();
-    mOwnerControl.RemovePropertyNotification(mSizeNotification);
+    mOwnerControl.ClearRenderEffect();
   }
+}
 
-  mOwnerControl = control;
-
-  if(mOwnerControl)
+void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
+{
+  if(control && (control != mOwnerControl))
   {
+    mOwnerControl = control;
+
     mTargetSize = mOwnerControl.GetProperty<Vector2>(Actor::Property::SIZE);
     mRenderer   = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
 
     mSizeNotification = control.AddPropertyNotification(Actor::Property::SIZE, StepCondition(SIZE_STEP_CONDITION));
     mSizeNotification.NotifySignal().Connect(this, &RenderEffectImpl::OnSizeSet);
+  }
+}
+
+void RenderEffectImpl::ClearOwnerControl()
+{
+  if(mOwnerControl)
+  {
+    Renderer renderer = GetTargetRenderer();
+    mOwnerControl.RemoveRenderer(renderer);
+    mOwnerControl.RemovePropertyNotification(mSizeNotification);
+    mOwnerControl.Reset();
   }
 }
 
@@ -62,9 +73,12 @@ Toolkit::Control RenderEffectImpl::GetOwnerControl() const
 
 void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
 {
-  mTargetSize = mOwnerControl.GetProperty<Vector2>(Actor::Property::SIZE);
-  Deactivate();
-  Activate();
+  if(mOwnerControl)
+  {
+    mTargetSize = mOwnerControl.GetProperty<Vector2>(Actor::Property::SIZE);
+    Deactivate();
+    Activate();
+  }
 }
 
 Renderer RenderEffectImpl::GetTargetRenderer() const

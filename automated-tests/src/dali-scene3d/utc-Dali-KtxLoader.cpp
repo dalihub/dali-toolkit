@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,20 @@ int UtcDaliKtxLoaderFailTruncated(void)
 {
   EnvironmentMapData environmentMapData;
   DALI_TEST_CHECK(!LoadKtxData(TEST_RESOURCE_DIR "/truncated.ktx", environmentMapData));
+  END_TEST;
+}
+
+int UtcDaliKtxLoaderFailValidHeaderInvalidArray(void)
+{
+  EnvironmentMapData environmentMapData;
+  DALI_TEST_CHECK(!LoadKtxData(TEST_RESOURCE_DIR "/headerOK-invalidArray.ktx", environmentMapData));
+  END_TEST;
+}
+
+int UtcDaliKtxLoaderFailValidHeaderOnly(void)
+{
+  EnvironmentMapData environmentMapData;
+  DALI_TEST_CHECK(!LoadKtxData(TEST_RESOURCE_DIR "/headerOnly.ktx", environmentMapData));
   END_TEST;
 }
 

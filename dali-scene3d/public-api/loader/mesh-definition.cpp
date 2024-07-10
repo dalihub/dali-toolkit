@@ -44,7 +44,7 @@ struct LoadAccessorInputs
   MeshDefinition::RawData&  rawData;
   MeshDefinition::Accessor& accessor;
   uint32_t                  flags;
-  std::fstream&             fileStream;
+  std::iostream*            fileStream;
   std::string&              meshPath;
   BufferDefinition::Vector& buffers;
 };
@@ -54,7 +54,7 @@ struct LoadAccessorListInputs
   MeshDefinition::RawData&               rawData;
   std::vector<MeshDefinition::Accessor>& accessors;
   uint32_t                               flags;
-  std::fstream&                          fileStream;
+  std::iostream*                         fileStream;
   std::string&                           meshPath;
   BufferDefinition::Vector&              buffers;
 };
@@ -816,10 +816,10 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::vector<MeshDefiniti
   }
 }
 
-std::iostream& GetAvailableData(std::fstream& meshStream, const std::string& meshPath, BufferDefinition& buffer, std::string& availablePath)
+std::iostream& GetAvailableData(std::iostream* meshStream, const std::string& meshPath, BufferDefinition& buffer, std::string& availablePath)
 {
-  auto& stream  = (meshStream.is_open()) ? meshStream : buffer.GetBufferStream();
-  availablePath = (meshStream.is_open()) ? meshPath : buffer.GetUri();
+  auto& stream  = meshStream ? *meshStream : buffer.GetBufferStream();
+  availablePath = meshStream ? meshPath : buffer.GetUri();
   return stream;
 }
 
@@ -855,6 +855,7 @@ void LoadIndices(LoadAccessorInputs indicesInput)
       auto&       stream = GetAvailableData(indicesInput.fileStream, indicesInput.meshPath, indicesInput.buffers[indicesInput.accessor.mBufferIdx], path);
       if(!ReadAccessor(indicesInput.accessor, stream, reinterpret_cast<uint8_t*>(indicesInput.rawData.mIndices.data())))
       {
+        DALI_LOG_ERROR("Failed to read indices from %s\n", path.c_str());
         ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << path << "'.";
       }
     }
@@ -871,6 +872,7 @@ void LoadIndices(LoadAccessorInputs indicesInput)
       auto&       stream = GetAvailableData(indicesInput.fileStream, indicesInput.meshPath, indicesInput.buffers[indicesInput.accessor.mBufferIdx], path);
       if(!ReadAccessor(indicesInput.accessor, stream, u8s))
       {
+        DALI_LOG_ERROR("Failed to read indices from %s\n", path.c_str());
         ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indices from '" << path << "'.";
       }
 
@@ -894,6 +896,7 @@ void LoadIndices(LoadAccessorInputs indicesInput)
       auto&       stream = GetAvailableData(indicesInput.fileStream, indicesInput.meshPath, indicesInput.buffers[indicesInput.accessor.mBufferIdx], path);
       if(!ReadAccessor(indicesInput.accessor, stream, reinterpret_cast<uint8_t*>(indicesInput.rawData.mIndices.data())))
       {
+        DALI_LOG_ERROR("Failed to read indices from %s\n", path.c_str());
         ExceptionFlinger(ASSERT_LOCATION) << "Failed to read indicesInput.accessor from '" << path << "'.";
       }
     }
@@ -1211,7 +1214,7 @@ void LoadColors(LoadAccessorListInputs colorsInput)
       colorsInput.rawData.mAttribs.push_back({"aVertexColor", propertyType, static_cast<uint32_t>(bufferSize / propertySize), std::move(buffer)});
     }
   }
-  else
+  else if(!colorsInput.rawData.mAttribs.empty())
   {
     std::vector<uint8_t> buffer(colorsInput.rawData.mAttribs[0].mNumElements * sizeof(Vector4));
     auto                 colors = reinterpret_cast<Vector4*>(buffer.data());
@@ -1225,7 +1228,7 @@ void LoadColors(LoadAccessorListInputs colorsInput)
   }
 }
 
-void LoadBlendShapes(MeshDefinition::RawData& rawData, std::vector<MeshDefinition::BlendShape>& blendShapes, MeshDefinition::Blob& blendShapeHeader, BlendShapes::Version blendShapeVersion, uint32_t numberOfVertices, std::fstream& fileStream, BufferDefinition::Vector& buffers)
+void LoadBlendShapes(MeshDefinition::RawData& rawData, std::vector<MeshDefinition::BlendShape>& blendShapes, MeshDefinition::Blob& blendShapeHeader, BlendShapes::Version blendShapeVersion, uint32_t numberOfVertices, std::istream* fileStream, BufferDefinition::Vector& buffers)
 {
   // Calculate the Blob for the blend shapes.
   MeshDefinition::Blob blendShapesBlob;
@@ -1269,10 +1272,10 @@ void LoadBlendShapes(MeshDefinition::RawData& rawData, std::vector<MeshDefinitio
       CalculateTextureSize(totalTextureSize, textureWidth, textureHeight);
       calculateGltf2BlendShapes = true;
     }
-    else
+    else if(fileStream)
     {
       uint16_t header[2u];
-      ReadBlob(blendShapeHeader, fileStream, reinterpret_cast<uint8_t*>(header));
+      ReadBlob(blendShapeHeader, *fileStream, reinterpret_cast<uint8_t*>(header));
       textureWidth  = header[0u];
       textureHeight = header[1u];
     }
@@ -1294,16 +1297,16 @@ void LoadBlendShapes(MeshDefinition::RawData& rawData, std::vector<MeshDefinitio
 
       if(blendShapesBlob.IsDefined())
       {
-        if(ReadBlob(blendShapesBlob, fileStream, geometryBuffer))
+        if(fileStream && ReadBlob(blendShapesBlob, *fileStream, geometryBuffer))
         {
           unnormalizeFactorBlob.mOffset = blendShapesBlob.mOffset + blendShapesBlob.mLength;
         }
       }
 
       // Read the unnormalize factors.
-      if(unnormalizeFactorBlob.IsDefined())
+      if(unnormalizeFactorBlob.IsDefined() && fileStream)
       {
-        ReadBlob(unnormalizeFactorBlob, fileStream, reinterpret_cast<uint8_t*>(&rawData.mBlendShapeUnnormalizeFactor[0u]));
+        ReadBlob(unnormalizeFactorBlob, *fileStream, reinterpret_cast<uint8_t*>(&rawData.mBlendShapeUnnormalizeFactor[0u]));
       }
     }
     rawData.mBlendShapeData = Devel::PixelBuffer::Convert(geometryPixelBuffer);
@@ -1473,20 +1476,24 @@ MeshDefinition::RawData
 MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector& buffers)
 {
   RawData raw;
-  if(IsQuad())
+  if (IsQuad())
   {
     return raw;
   }
 
   std::string meshPath;
   meshPath = modelsPath + mUri;
-  std::fstream fileStream;
-  if(!mUri.empty())
+
+  std::unique_ptr<Dali::FileStream> daliFileStream(nullptr);
+  std::iostream* fileStream = nullptr;
+  if (!mUri.empty())
   {
-    fileStream.open(meshPath, std::ios::in | std::ios::binary);
-    if(!fileStream.is_open())
+    daliFileStream.reset(new Dali::FileStream(meshPath, FileStream::READ | FileStream::BINARY));
+    fileStream = &daliFileStream->GetStream();
+    if(!fileStream->good() || !fileStream->rdbuf()->in_avail())
     {
       DALI_LOG_ERROR("Fail to open buffer from %s.\n", meshPath.c_str());
+      fileStream = nullptr;
     }
   }
 

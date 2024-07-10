@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <stdarg.h>
 #include <cstring>
 #include <fstream>
@@ -85,12 +86,12 @@ std::string FormatString(const char* format, ...)
 
 std::string LoadTextFile(const char* path, bool* fail)
 {
-  std::ifstream inFile(path);
-  if(inFile)
+  std::streampos     fileSize;
+  Dali::Vector<char> fileContent;
+
+  if(FileLoader::ReadFile(path, fileSize, fileContent, FileLoader::TEXT))
   {
-    std::istreambuf_iterator<char> eos;
-    std::istreambuf_iterator<char> i(inFile.rdbuf());
-    return std::string(i, eos);
+    return std::string(fileContent.Begin(), fileSize);
   }
   else if(fail)
   {

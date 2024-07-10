@@ -19,8 +19,10 @@
 #include <dali-scene3d/public-api/loader/ktx-loader.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/public-api/rendering/texture.h>
+#include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <fstream>
 #include <memory>
 
@@ -188,26 +190,33 @@ bool ConvertPixelFormat(const uint32_t ktxPixelFormat, Pixel::Format& format)
 
 bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData)
 {
-  std::fstream fp(path, std::ios::in | std::ios::binary);
-  if(fp.is_open() == false)
+  Dali::FileStream fileStream(path, FileStream::READ | FileStream::BINARY);
+  auto&            stream = fileStream.GetStream();
+  if(!stream.good() || !stream.rdbuf()->in_avail())
   {
+    DALI_LOG_ERROR("Load ktx data failed, path : %s\n", path.c_str());
     return false;
   }
 
   KtxFileHeader header;
-  if(fp.read(reinterpret_cast<char*>(&header), sizeof(KtxFileHeader)).good() == false)
+  stream.clear();
+  stream.seekg(0u, stream.beg);
+  if(stream.read(reinterpret_cast<char*>(&header), sizeof(KtxFileHeader)).good() == false)
   {
+    DALI_LOG_ERROR("Unable to read ktx header in file, %s\n", path.c_str());
     return false;
   }
 
   if(!header.IsIdentifierValid())
   {
+    DALI_LOG_ERROR("KTX Header Identifier is not valid, %s\n", path.c_str());
     return false;
   }
 
   // Skip the key-values:
-  if(fp.seekg(static_cast<std::streamoff>(static_cast<std::size_t>(header.bytesOfKeyValueData)), fp.cur).good() == false)
+  if(stream.seekg(static_cast<std::streamoff>(static_cast<std::size_t>(header.bytesOfKeyValueData)), stream.cur).good() == false)
   {
+    DALI_LOG_ERROR("Unable to skip key-values in KTX file, %s\n", path.c_str());
     return false;
   }
 
@@ -230,8 +239,9 @@ bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData
   for(uint32_t mipmapLevel = 0u; mipmapLevel < header.numberOfMipmapLevels; ++mipmapLevel)
   {
     uint32_t byteSize = 0u;
-    if(fp.read(reinterpret_cast<char*>(&byteSize), sizeof(byteSize)).good() == false)
+    if(stream.read(reinterpret_cast<char*>(&byteSize), sizeof(byteSize)).good() == false)
     {
+      DALI_LOG_ERROR("Unable to read byteSize from KTX stream, %s\n", path.c_str());
       return false;
     }
 
@@ -245,8 +255,9 @@ bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData
       for(uint32_t face = 0u; face < header.numberOfFaces; ++face)
       {
         std::unique_ptr<uint8_t, void (*)(uint8_t*)> img(new uint8_t[byteSize], FreeBuffer);
-        if(fp.read(reinterpret_cast<char*>(img.get()), static_cast<std::streamsize>(static_cast<size_t>(byteSize))).good() == false)
+        if(stream.read(reinterpret_cast<char*>(img.get()), static_cast<std::streamsize>(static_cast<size_t>(byteSize))).good() == false)
         {
+          DALI_LOG_ERROR("Unable to read data from KTX stream, %s\n", path.c_str());
           return false;
         }
         environmentMapData.mPixelData[face][mipmapLevel] = Dali::Integration::NewPixelDataWithReleaseAfterUpload(img.release(), byteSize, header.pixelWidth, header.pixelHeight, 0u, daliformat, PixelData::DELETE_ARRAY);
