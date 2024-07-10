@@ -18,6 +18,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/public-api/controls/render-effects/background-blur-effect.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -217,7 +218,6 @@ int UtcDaliRenderEffectResize(void)
   Integration::Scene scene   = application.GetScene();
   Control            control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control.SetProperty(Actor::Property::SIZE, Vector2(3.0f, 3.0f));
   scene.Add(control);
   control.SetRenderEffect(BackgroundBlurEffect::New());
 
@@ -263,12 +263,45 @@ int UtcDaliRenderEffectSynchronizeBackgroundCornerRadius(void)
 
   Renderer renderer = control.GetRendererAt(1u);
   Vector4  radius   = Vector4::ZERO;
-  renderer.GetProperty(renderer.GetPropertyIndex(std::string("uRadius"))).Get(radius);
+  renderer.GetProperty(renderer.GetPropertyIndex(std::string("uCornerRadius"))).Get(radius);
+
+  Toolkit::Visual::Transform::Policy::Type policy;
+  renderer.GetProperty(renderer.GetPropertyIndex(std::string("uCornerRadiusPolicy"))).Get(policy);
+  DALI_TEST_CHECK(policy == 1);
 
   DALI_TEST_CHECK(radius.x == 30.0f);
   DALI_TEST_CHECK(radius.y == 30.0f);
   DALI_TEST_CHECK(radius.z == 30.0f);
   DALI_TEST_CHECK(radius.w == 30.0f);
+
+  END_TEST;
+}
+
+int UtcDaliRenderEffectInvalidTargetSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRenderEffectInvalidTargetSize");
+
+  Integration::Scene scene          = application.GetScene();
+  const uint32_t     maxTextureSize = Dali::GetMaxTextureSize();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE_WIDTH, maxTextureSize + 1000.0f);
+  control.SetProperty(Actor::Property::SIZE_HEIGHT, maxTextureSize + 1000.0f);
+  scene.Add(control);
+  control.SetRenderEffect(BackgroundBlurEffect::New(0.4f, 40));
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(true); // no error
+
+  control.SetProperty(Actor::Property::SIZE_WIDTH, -10.0f);
+  control.SetProperty(Actor::Property::SIZE_HEIGHT, -10.0f);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(true); // no error
 
   END_TEST;
 }
