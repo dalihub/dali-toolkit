@@ -39,14 +39,24 @@ class RenderEffectImpl : public BaseObject, public ConnectionTracker
 public:
   /**
    * @brief Activates effect on ownerControl
-   * @param[in] control The owner control to apply RenderEffect.
    */
-  virtual void Activate(Toolkit::Control ownerControl) = 0;
+  virtual void Activate() = 0;
 
   /**
    * @brief Deactivates effect
    */
   virtual void Deactivate() = 0;
+
+  /**
+   * @brief Sets owner Control. Applies effect on the owner.
+   * @param[in] control The owner control to apply RenderEffect.
+   */
+  void SetOwnerControl(Toolkit::Control control);
+
+  /**
+   * @brief Clears owner Control.
+   */
+  void ClearOwnerControl();
 
 protected:
   /**
@@ -83,17 +93,6 @@ protected:
    * @return mTargetSize
    */
   Vector2 GetTargetSize() const;
-
-  /**
-   * @brief Sets owner Control. Applies effect on the owner.
-   * @param[in] control The owner control to apply RenderEffect.
-   */
-  void SetOwnerControl(Toolkit::Control control);
-
-  /**
-   * @brief Clears owner Control.
-   */
-  void ClearOwnerControl();
 
   /**
    * @brief Get Owner control.

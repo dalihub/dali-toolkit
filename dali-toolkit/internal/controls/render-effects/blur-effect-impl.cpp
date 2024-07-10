@@ -35,11 +35,9 @@
 namespace
 {
 // Default values
-static constexpr float    BLUR_EFFECT_DOWNSCALE_FACTOR    = 0.4f;
-static constexpr uint32_t BLUR_EFFECT_PIXEL_RADIUS        = 5u;
-static constexpr float    BLUR_EFFECT_BELL_CURVE_WIDTH    = 1.5f;
-static constexpr int32_t  BLUR_EFFECT_ORDER_INDEX         = 101;
-static constexpr float    BLUR_EFFECT_DIVIDE_ZERO_EPSILON = 0.001f;
+static constexpr float    BLUR_EFFECT_DOWNSCALE_FACTOR = 0.4f;
+static constexpr uint32_t BLUR_EFFECT_PIXEL_RADIUS     = 5u;
+static constexpr int32_t  BLUR_EFFECT_ORDER_INDEX      = 101;
 } // namespace
 
 namespace Dali
@@ -48,33 +46,23 @@ namespace Toolkit
 {
 namespace Internal
 {
-// mMultiplierForFraction and mDenominator are for CalculateGaussianWeight().
-// The original equation,
-//   (1.0f / sqrt(2.0f * Math::PI * mBellCurveWidth)) * exp(-(localOffset * localOffset) * (1.0f / (2.0f * mBellCurveWidth * mBellCurveWidth)));
-// is simplified as below:
-//   mDenominator * exp(-(localOffset * localOffset) * mMultiplierForFraction);
-
 BlurEffectImpl::BlurEffectImpl(bool isBackground)
 : RenderEffectImpl(),
   mInternalRoot(Actor::New()),
   mDownscaleFactor(BLUR_EFFECT_DOWNSCALE_FACTOR),
   mPixelRadius(BLUR_EFFECT_PIXEL_RADIUS),
-  mBellCurveWidth(BLUR_EFFECT_BELL_CURVE_WIDTH),
-  mMultiplierForFraction(1.0f / (2.0f * mBellCurveWidth * mBellCurveWidth)),
-  mDenominator(1.0f / sqrt(2.0f * Math::PI * mBellCurveWidth)),
+  mBellCurveWidth(0.001f),
   mIsActivated(false),
   mIsBackground(isBackground)
 {
 }
 
-BlurEffectImpl::BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, float bellCurveWidth, bool isBackground)
+BlurEffectImpl::BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool isBackground)
 : RenderEffectImpl(),
   mInternalRoot(Actor::New()),
   mDownscaleFactor(downscaleFactor),
   mPixelRadius((blurRadius >> 2) + 1),
-  mBellCurveWidth(std::max(bellCurveWidth, BLUR_EFFECT_DIVIDE_ZERO_EPSILON)),
-  mMultiplierForFraction(1.0f / (2.0f * mBellCurveWidth * mBellCurveWidth)),
-  mDenominator(1.0f / sqrt(2.0f * Math::PI * mBellCurveWidth)),
+  mBellCurveWidth(0.001f),
   mIsActivated(false),
   mIsBackground(isBackground)
 {
@@ -92,9 +80,9 @@ BlurEffectImplPtr BlurEffectImpl::New(bool isBackground)
   return handle;
 }
 
-BlurEffectImplPtr BlurEffectImpl::New(float downscaleFactor, uint32_t blurRadius, float bellCurveWidth, bool isBackground)
+BlurEffectImplPtr BlurEffectImpl::New(float downscaleFactor, uint32_t blurRadius, bool isBackground)
 {
-  BlurEffectImplPtr handle = new BlurEffectImpl(downscaleFactor, blurRadius, bellCurveWidth, isBackground);
+  BlurEffectImplPtr handle = new BlurEffectImpl(downscaleFactor, blurRadius, isBackground);
   handle->Initialize();
   return handle;
 }
@@ -125,6 +113,16 @@ void BlurEffectImpl::Initialize()
   fragmentStringStream << SHADER_BLUR_EFFECT_FRAG;
   std::string fragmentSource(fragmentStringStream.str());
 
+  float sigma = 0.5f;
+  {
+    float epsilon = 1e-2f / (mPixelRadius * 2);
+    while((CalculateGaussianWeight((mPixelRadius * 2) - 1, sigma) < epsilon) && (sigma < 50.0f))
+    {
+      sigma += 1.0f;
+    }
+  }
+  mBellCurveWidth = sigma;
+
   //////////////////////////////////////////////////////
   // Create actors
   mInternalRoot.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -144,23 +142,15 @@ void BlurEffectImpl::Initialize()
   mInternalRoot.Add(mVerticalBlurActor);
 }
 
-void BlurEffectImpl::Activate(Toolkit::Control ownerControl)
+void BlurEffectImpl::Activate()
 {
-  DALI_ASSERT_ALWAYS(ownerControl && "Given empty owner control");
-
   if(mIsActivated)
   {
-    if(ownerControl == GetOwnerControl())
-    {
-      return;
-    }
-    else
-    {
-      Deactivate();
-    }
+    return;
   }
-  SetOwnerControl(ownerControl);
-  mIsActivated = true;
+  mIsActivated                  = true;
+  Toolkit::Control ownerControl = GetOwnerControl();
+  DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
 
   // Get input texture size
   Vector2 size = GetTargetSize();
@@ -276,8 +266,6 @@ void BlurEffectImpl::Deactivate()
   taskList.RemoveTask(mHorizontalBlurTask);
   taskList.RemoveTask(mVerticalBlurTask);
   taskList.RemoveTask(mSourceRenderTask);
-
-  ClearOwnerControl();
 }
 
 void BlurEffectImpl::SetShaderConstants(float downsampledWidth, float downsampledHeight)
@@ -289,11 +277,11 @@ void BlurEffectImpl::SetShaderConstants(float downsampledWidth, float downsample
   unsigned int       halfSize = mPixelRadius * 2;
   std::vector<float> halfSideKernel(halfSize);
 
-  halfSideKernel[0]  = CalculateGaussianWeight(0.0f);
+  halfSideKernel[0]  = CalculateGaussianWeight(0.0f, mBellCurveWidth);
   float totalWeights = halfSideKernel[0];
   for(unsigned int i = 1; i < halfSize; i++)
   {
-    float w           = CalculateGaussianWeight(i);
+    float w           = CalculateGaussianWeight(i, mBellCurveWidth);
     halfSideKernel[i] = w;
     totalWeights += w * 2.0f;
   }

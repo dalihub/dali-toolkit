@@ -40,7 +40,6 @@ public:
    *
    * downscaleFactor = 0.4f
    * pixelRadius = 5u
-   * bellCurveWidth = 1.5f
    *
    * This blur algorithm is used for both foreground and background blurs.
    *
@@ -56,17 +55,15 @@ public:
    *
    * @param[in] downscaleFactor This value should reside in the range [0.0, 1.0].
    * @param[in] blurRadius The radius of Gaussian kernel.
-   * @param[in] bellCurveWidth Blur intensity.
    * @param[in] isBackground True when blurring background, False otherwise
    * @return A handle to a newly allocated Dali resource
    */
-  static BlurEffectImplPtr New(float downscaleFactor, uint32_t blurRadius, float bellCurveWidth, bool isBackground);
+  static BlurEffectImplPtr New(float downscaleFactor, uint32_t blurRadius, bool isBackground);
 
   /**
    * @brief Activates blur effect
-   * @param[in] ownerControl The control to apply effect
    */
-  void Activate(Toolkit::Control ownerControl) override;
+  void Activate() override;
 
   /**
    * @brief Dectivates blur effect
@@ -84,10 +81,9 @@ protected:
    * @brief Creates an uninitialized blur effect implementation
    * @param[in] downscaleFactor This value should reside in the range [0.0, 1.0].
    * @param[in] blurRadius The radius of Gaussian kernel.
-   * @param[in] bellCurveWidth Blur intensity.
    * @param[in] isBackground True when blurring background, False otherwise
    */
-  BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, float bellCurveWidth, bool isBackground);
+  BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool isBackground);
 
   /**
    * @brief Destructor
@@ -106,9 +102,9 @@ private:
    * @brief Calculates gaussian weight
    * @param[in] localOffset Input to the function
    */
-  inline float CalculateGaussianWeight(float localOffset) const
+  inline float CalculateGaussianWeight(float localOffset, float sigma) const
   {
-    return mDenominator * exp(-(localOffset * localOffset) * mMultiplierForFraction);
+    return (1.0f / sqrt(2.0f * Math::PI * sigma)) * exp(-(localOffset * localOffset) * (1.0f / (2.0f * sigma * sigma)));
   }
 
   /**
@@ -164,8 +160,6 @@ private:
   float    mDownscaleFactor;
   uint32_t mPixelRadius;
   float    mBellCurveWidth;
-  float    mMultiplierForFraction;
-  float    mDenominator;
 
   bool mIsActivated : 1;
   bool mIsBackground : 1;

@@ -30,7 +30,7 @@ int UtcDaliRenderEffectNewP(void)
   BackgroundBlurEffect blurEffect = BackgroundBlurEffect::New();
   DALI_TEST_CHECK(blurEffect);
 
-  BackgroundBlurEffect blurEffect2 = BackgroundBlurEffect::New(0.5f, 10.0f, 10.0f);
+  BackgroundBlurEffect blurEffect2 = BackgroundBlurEffect::New(0.5f, 10.0f);
   DALI_TEST_CHECK(blurEffect2);
 
   END_TEST;
@@ -43,8 +43,8 @@ int UtcDaliRenderEffectNewN(void)
 
   try
   {
-    BackgroundBlurEffect blurEffect  = BackgroundBlurEffect::New(-0.5f, 10.0f, 10.0f);
-    BackgroundBlurEffect blurEffect2 = BackgroundBlurEffect::New(10.0f, 10.0f, 10.0f);
+    BackgroundBlurEffect blurEffect  = BackgroundBlurEffect::New(-0.5f, 10.0f);
+    BackgroundBlurEffect blurEffect2 = BackgroundBlurEffect::New(10.0f, 10.0f);
     DALI_TEST_CHECK(!blurEffect && !blurEffect2);
   }
   catch(Dali::DaliException& e)
@@ -217,6 +217,7 @@ int UtcDaliRenderEffectResize(void)
   Integration::Scene scene   = application.GetScene();
   Control            control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(3.0f, 3.0f));
   scene.Add(control);
   control.SetRenderEffect(BackgroundBlurEffect::New());
 
@@ -247,7 +248,7 @@ int UtcDaliRenderEffectSynchronizeBackgroundCornerRadius(void)
   blackDimmerMap.Insert(Toolkit::Visual::Property::OPACITY, 0.2f);
   blackDimmerMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, 30.0f);
 
-  RenderEffect effect = BackgroundBlurEffect::New(0.4f, 40, 10.0f);
+  RenderEffect effect = BackgroundBlurEffect::New(0.4f, 40);
 
   Control control = Control::New();
   DALI_TEST_CHECK(control.GetRendererCount() == 0u);
