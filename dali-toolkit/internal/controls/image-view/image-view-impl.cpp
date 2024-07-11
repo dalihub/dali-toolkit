@@ -424,12 +424,6 @@ void ImageView::OnRelayout(const Vector2& size, RelayoutContainer& container)
     {
       visual.SetTransformAndSize(Property::Map(), size);
     }
-
-    if(!mTransitionEffect)
-    {
-      // we don't need placeholder anymore because visual is replaced. so hide placeholder.
-      HidePlaceholderImage();
-    }
   }
 }
 
@@ -493,6 +487,12 @@ void ImageView::OnResourceReady(Toolkit::Control control)
   {
     // If the current visual is not the same as the previous holded visual, then we need to discard old one.
     DiscardImageViewVisual(mVisual);
+  }
+
+  if(!mTransitionEffect)
+  {
+    // we don't need placeholder anymore because visual is replaced. so hide placeholder.
+    HidePlaceholderImage();
   }
   mVisual = currentVisual;
 
