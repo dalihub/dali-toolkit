@@ -528,10 +528,10 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 
   if(storageType != TextureManager::StorageType::RETURN_PIXEL_BUFFER)
   {
-    textureHash = mTextureCacheManager.GenerateHash(url, desiredSize, fittingMode, samplingMode, maskTextureId, cropToMask, frameIndex);
+    textureHash = mTextureCacheManager.GenerateHash(url, desiredSize, fittingMode, samplingMode, maskTextureId, cropToMask, orientationCorrection, frameIndex);
 
     // Look up the texture by hash. Note: The extra parameters are used in case of a hash collision.
-    cacheIndex = mTextureCacheManager.FindCachedTexture(textureHash, url, desiredSize, fittingMode, samplingMode, storageType, maskTextureId, cropToMask, preMultiplyOnLoad, (animatedImageLoading) ? true : false, frameIndex);
+    cacheIndex = mTextureCacheManager.FindCachedTexture(textureHash, url, desiredSize, fittingMode, samplingMode, storageType, maskTextureId, cropToMask, orientationCorrection, preMultiplyOnLoad, (animatedImageLoading) ? true : false, frameIndex);
   }
 
   TextureManager::TextureId textureId = INVALID_TEXTURE_ID;
