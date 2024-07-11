@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -504,6 +504,7 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
   const Dali::SamplingMode::Type       samplingMode,
   const TextureCacheManager::TextureId maskTextureId,
   const bool                           cropToMask,
+  const bool                           orientationCorrection,
   const uint32_t                       frameIndex)
 {
   std::vector<std::uint8_t> hashTarget;
@@ -526,6 +527,15 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
     // Bit-pack the FittingMode, SamplingMode.
     // FittingMode=2bits, SamplingMode=3bits
     *hashTargetPtr = (fittingMode << 3u) | (samplingMode);
+  }
+
+  // Append whether we will not correction orientation. We don't do additional job when it is true, the general cases.
+  if(!orientationCorrection)
+  {
+    auto textureIdIndex = hashTarget.size();
+    hashTarget.resize(hashTarget.size() + 1u);
+    std::uint8_t* hashTargetPtr = reinterpret_cast<std::uint8_t*>(&(hashTarget[textureIdIndex]));
+    *hashTargetPtr++            = 'F';
   }
 
   if(maskTextureId != INVALID_TEXTURE_ID)
@@ -574,6 +584,7 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
   const TextureCacheManager::StorageType    storageType,
   const TextureCacheManager::TextureId      maskTextureId,
   const bool                                cropToMask,
+  const bool                                orientationCorrection,
   const TextureCacheManager::MultiplyOnLoad preMultiplyOnLoad,
   const bool                                isAnimatedImage,
   const uint32_t                            frameIndex)
@@ -597,6 +608,7 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
            (isAnimatedImage == textureInfo.isAnimatedImageFormat) &&
            (storageType == textureInfo.storageType) &&
            (frameIndex == textureInfo.frameIndex) &&
+           (orientationCorrection == textureInfo.orientationCorrection) &&
            ((size.GetWidth() == 0 && size.GetHeight() == 0) ||
             (fittingMode == textureInfo.fittingMode &&
              samplingMode == textureInfo.samplingMode)))

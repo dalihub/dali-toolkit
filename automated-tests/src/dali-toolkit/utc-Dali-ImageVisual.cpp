@@ -3357,6 +3357,58 @@ int UtcDaliImageVisualOrientationCorrection(void)
   END_TEST;
 }
 
+int UtcDaliImageVisualOrientationCorrectionCache(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliImageVisualOrientationCorrectionCache Check orientation correction value give effort to cache hit");
+
+  VisualFactory factory = VisualFactory::Get();
+  tet_infoline("Create visual with Orientation correction set OFF");
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_ROTATED_IMAGE);
+  propertyMap.Insert("orientationCorrection", false);
+  Visual::Base imageVisual1 = factory.CreateVisual(propertyMap);
+
+  tet_infoline("Create control for visual, need to loaded it");
+  DummyControl        actor1     = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl1 = static_cast<Impl::DummyControl&>(actor1.GetImplementation());
+  dummyImpl1.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual1);
+  application.GetScene().Add(actor1);
+
+  // Wait for image to load
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  tet_infoline("Create visual with Orientation correction set ON ");
+  propertyMap.Clear();
+  propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_ROTATED_IMAGE);
+  propertyMap.Insert(ImageVisual::Property::ORIENTATION_CORRECTION, true);
+  Visual::Base imageVisual2 = factory.CreateVisual(propertyMap);
+
+  tet_infoline("Create control for visual2, need to loaded it");
+  DummyControl        actor2     = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl2 = static_cast<Impl::DummyControl&>(actor2.GetImplementation());
+  dummyImpl2.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual2);
+  application.GetScene().Add(actor2);
+
+  // Wait for image to load. Check whether each correction and non-correction image have difference size.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  Vector2 visual1NaturalSize;
+  imageVisual1.GetNaturalSize(visual1NaturalSize);
+  Vector2 visual2NaturalSize;
+  imageVisual2.GetNaturalSize(visual2NaturalSize);
+
+  DALI_TEST_NOT_EQUALS(visual1NaturalSize.width, visual1NaturalSize.height, 0.01f, TEST_LOCATION); // Width and Height must be different for this test.
+
+  tet_infoline("Confirm that visual has rotated");
+  DALI_TEST_EQUALS(visual1NaturalSize.width, visual2NaturalSize.height, TEST_LOCATION);
+  DALI_TEST_EQUALS(visual1NaturalSize.height, visual2NaturalSize.width, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliImageVisualCustomShader(void)
 {
   ToolkitTestApplication application;
