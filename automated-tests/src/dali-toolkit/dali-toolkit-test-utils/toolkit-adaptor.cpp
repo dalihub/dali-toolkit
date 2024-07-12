@@ -114,8 +114,12 @@ bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
 
 void Adaptor::RemoveIdle(CallbackBase* callback)
 {
-  mCallbacks.Erase(std::remove_if(mCallbacks.Begin(), mCallbacks.End(), [&callback](CallbackBase* current) { return callback == current; }), mCallbacks.End());
-  mReturnCallbacks.Erase(std::remove_if(mReturnCallbacks.Begin(), mReturnCallbacks.End(), [&callback](CallbackBase* current) { return callback == current; }), mReturnCallbacks.End());
+  mCallbacks.Erase(std::remove_if(mCallbacks.Begin(), mCallbacks.End(), [&callback](CallbackBase* current)
+                                  { return callback == current; }),
+                   mCallbacks.End());
+  mReturnCallbacks.Erase(std::remove_if(mReturnCallbacks.Begin(), mReturnCallbacks.End(), [&callback](CallbackBase* current)
+                                        { return callback == current; }),
+                         mReturnCallbacks.End());
 }
 
 void Adaptor::RunIdles()
@@ -152,11 +156,11 @@ void Adaptor::RequestUpdateOnce()
   }
 }
 
-Dali::RenderSurfaceInterface& Adaptor::GetSurface()
+Dali::Integration::RenderSurfaceInterface& Adaptor::GetSurface()
 {
   DALI_ASSERT_ALWAYS(!mWindows.empty());
 
-  return reinterpret_cast<Dali::RenderSurfaceInterface&>(mWindows.front()->GetRenderSurface());
+  return reinterpret_cast<Dali::Integration::RenderSurfaceInterface&>(mWindows.front()->GetRenderSurface());
 }
 
 Dali::WindowContainer Adaptor::GetWindows()
@@ -318,11 +322,11 @@ void Adaptor::RemoveIdle(CallbackBase* callback)
   mImpl->RemoveIdle(callback);
 }
 
-void Adaptor::ReplaceSurface(Window window, Dali::RenderSurfaceInterface& surface)
+void Adaptor::ReplaceSurface(Window window, Dali::Integration::RenderSurfaceInterface& surface)
 {
 }
 
-void Adaptor::ReplaceSurface(Dali::Integration::SceneHolder window, Dali::RenderSurfaceInterface& surface)
+void Adaptor::ReplaceSurface(Dali::Integration::SceneHolder window, Dali::Integration::RenderSurfaceInterface& surface)
 {
 }
 
@@ -341,7 +345,7 @@ Adaptor::WindowCreatedSignalType& Adaptor::WindowCreatedSignal()
   return mImpl->WindowCreatedSignal();
 }
 
-Dali::RenderSurfaceInterface& Adaptor::GetSurface()
+Dali::Integration::RenderSurfaceInterface& Adaptor::GetSurface()
 {
   return mImpl->GetSurface();
 }

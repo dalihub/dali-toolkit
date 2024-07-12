@@ -59,26 +59,26 @@ Window* Window::New(const PositionSize& positionSize, const std::string& name, c
 
 Dali::Window::WindowPosition Window::GetPosition() const
 {
-  PositionSize positionSize = mRenderSurface.GetPositionSize();
+  PositionSize positionSize = mRenderSurface->GetPositionSize();
 
   return Dali::Window::WindowPosition(positionSize.x, positionSize.y);
 }
 
 PositionSize Window::GetPositionSize() const
 {
-  return mRenderSurface.GetPositionSize();
+  return mRenderSurface->GetPositionSize();
 }
 
 Dali::Window::WindowSize Window::GetSize() const
 {
-  PositionSize positionSize = mRenderSurface.GetPositionSize();
+  PositionSize positionSize = mRenderSurface->GetPositionSize();
 
   return Dali::Window::WindowSize(positionSize.width, positionSize.height);
 }
 
 void Window::SetPositionSize(PositionSize positionSize)
 {
-  mRenderSurface.MoveResize(positionSize);
+  mRenderSurface->MoveResize(positionSize);
 
   Uint16Pair   newSize(positionSize.width, positionSize.height);
   Dali::Window handle(this);
@@ -155,7 +155,7 @@ Integration::Scene Window::GetScene()
   return GetImplementation(*this).GetScene();
 }
 
-Dali::RenderSurfaceInterface& Window::GetRenderSurface()
+Dali::Integration::RenderSurfaceInterface& Window::GetRenderSurface()
 {
   return GetImplementation(*this).GetRenderSurface();
 }

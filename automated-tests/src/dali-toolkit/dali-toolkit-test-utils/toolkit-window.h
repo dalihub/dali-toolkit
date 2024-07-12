@@ -18,7 +18,7 @@
  *
  */
 
-//EXTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/integration-api/scene.h>
 #include <dali/public-api/math/int-pair.h>
 #include <dali/public-api/math/rect.h>
@@ -71,22 +71,22 @@ public:
   Window&       operator=(Window&& rhs);
   static Window DownCast(BaseHandle handle);
 
-  Integration::Scene            GetScene();
-  Dali::RenderSurfaceInterface& GetRenderSurface();
-  void                          Add(Dali::Actor actor);
-  void                          Remove(Dali::Actor actor);
-  Dali::Layer                   GetRootLayer() const;
-  void                          SetBackgroundColor(const Vector4& color);
-  Vector4                       GetBackgroundColor() const;
-  void                          Raise();
-  void                          Show();
-  void                          Hide();
-  bool                          IsVisible() const;
-  FocusChangeSignalType&        FocusChangeSignal();
-  KeyEventSignalType&           KeyEventSignal();
-  TouchEventSignalType&         TouchedSignal();
-  ResizeSignalType&             ResizeSignal();
-  Dali::RenderTaskList          GetRenderTaskList();
+  Integration::Scene                         GetScene();
+  Dali::Integration::RenderSurfaceInterface& GetRenderSurface();
+  void                                       Add(Dali::Actor actor);
+  void                                       Remove(Dali::Actor actor);
+  Dali::Layer                                GetRootLayer() const;
+  void                                       SetBackgroundColor(const Vector4& color);
+  Vector4                                    GetBackgroundColor() const;
+  void                                       Raise();
+  void                                       Show();
+  void                                       Hide();
+  bool                                       IsVisible() const;
+  FocusChangeSignalType&                     FocusChangeSignal();
+  KeyEventSignalType&                        KeyEventSignal();
+  TouchEventSignalType&                      TouchedSignal();
+  ResizeSignalType&                          ResizeSignal();
+  Dali::RenderTaskList                       GetRenderTaskList();
 
 public:
   explicit Window(Internal::Adaptor::Window* window);

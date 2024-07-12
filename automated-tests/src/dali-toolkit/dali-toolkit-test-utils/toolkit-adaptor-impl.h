@@ -75,9 +75,9 @@ public:
 
   static Integration::Scene GetScene(Dali::Window window);
 
-  Dali::RenderSurfaceInterface& GetSurface();
-  Dali::WindowContainer         GetWindows();
-  Dali::SceneHolderList         GetSceneHolders();
+  Dali::Integration::RenderSurfaceInterface& GetSurface();
+  Dali::WindowContainer                      GetWindows();
+  Dali::SceneHolderList                      GetSceneHolders();
 
   Dali::Internal::Adaptor::SceneHolder* GetWindow(Dali::Actor& actor);
   void                                  AddWindow(Internal::Adaptor::SceneHolder* window);

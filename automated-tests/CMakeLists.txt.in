@@ -6,6 +6,7 @@ INCLUDE(FindPkgConfig)
 SET(BIN_DIR "/opt/usr/bin")
 SET(SCRIPT_DIR ${CMAKE_SOURCE_DIR}/scripts)
 
+
 ADD_DEFINITIONS(-DDALI_STYLE_DIR="@dataReadOnlyDir@/toolkit/styles/")
 
 # Macro checks if the module is available and sets user variable
@@ -24,6 +25,7 @@ CHECK_MODULE_AND_SET(ELDBUS eldbus>=${ELDBUS_REQUIRED} ELDBUS_AVAILABLE)
 
 INCLUDE_DIRECTORIES(
   src/common
+  @PREFIX@/include/dali/integration-api/adaptor-framework
 )
 
 ADD_SUBDIRECTORY(src)
