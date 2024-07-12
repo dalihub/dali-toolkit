@@ -1385,8 +1385,8 @@ void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::
   if(mRemoteChild.GetAddress())
   {
     // DoGetChildren is called at most once per every OnChildrenChanged.
-    // We have only one OnChildrenChanged in this case, so EmbedAtkSocket will be called only once.
-    Accessibility::Bridge::GetCurrentBridge()->EmbedAtkSocket(GetAddress(), mRemoteChild.GetAddress());
+    // We have only one OnChildrenChanged in this case, so EmbedSocket will be called only once.
+    Accessibility::Bridge::GetCurrentBridge()->EmbedSocket(GetAddress(), mRemoteChild.GetAddress());
     children.push_back(&mRemoteChild);
   }
 }
