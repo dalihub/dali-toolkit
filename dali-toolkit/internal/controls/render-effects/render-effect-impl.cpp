@@ -75,7 +75,7 @@ void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
 {
   if(mOwnerControl)
   {
-    mTargetSize = mOwnerControl.GetProperty<Vector2>(Actor::Property::SIZE);
+    mTargetSize = mOwnerControl.GetCurrentProperty<Vector2>(Actor::Property::SIZE);
     Deactivate();
     Activate();
   }

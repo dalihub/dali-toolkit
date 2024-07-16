@@ -142,6 +142,29 @@ void BlurEffectImpl::Initialize()
   mInternalRoot.Add(mVerticalBlurActor);
 }
 
+Vector2 BlurEffectImpl::GetTargetSizeForValidTexture()
+{
+  Vector2 size = GetTargetSize();
+  if(size == Vector2::ZERO)
+  {
+    size = GetOwnerControl().GetNaturalSize();
+  }
+
+  if(size == Vector2::ZERO || size.x < 0.0f || size.y < 0.0f)
+  {
+    return Vector2::ZERO;
+  }
+
+  const uint32_t maxTextureSize = Dali::GetMaxTextureSize();
+  if(uint32_t(size.x) > maxTextureSize || uint32_t(size.y) > maxTextureSize)
+  {
+    uint32_t denominator = std::max(size.x, size.y);
+    size.x               = (size.x * maxTextureSize / denominator);
+    size.y               = (size.y * maxTextureSize / denominator);
+  }
+  return size;
+}
+
 void BlurEffectImpl::Activate()
 {
   if(mIsActivated)
@@ -152,20 +175,22 @@ void BlurEffectImpl::Activate()
   Toolkit::Control ownerControl = GetOwnerControl();
   DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
 
-  // Get input texture size
-  Vector2 size = GetTargetSize();
+  // Get/Set sizes
+  Vector2 size = GetTargetSizeForValidTexture();
   if(size == Vector2::ZERO)
   {
-    size = ownerControl.GetNaturalSize();
-    if(size == Vector2::ZERO)
-    {
-      return;
-    }
+    return;
   }
-  DALI_ASSERT_ALWAYS(!(size.x < 0.0f || size.y < 0.0f || uint32_t(size.x) > Dali::GetMaxTextureSize() || uint32_t(size.y) > Dali::GetMaxTextureSize()) && "You need to pass a valid texture size.");
-
   uint32_t downsampledWidth  = static_cast<uint32_t>(size.width * mDownscaleFactor);
   uint32_t downsampledHeight = static_cast<uint32_t>(size.height * mDownscaleFactor);
+  if(downsampledWidth == 0u)
+  {
+    downsampledWidth = 1u;
+  }
+  if(downsampledHeight == 0u)
+  {
+    downsampledHeight = 1u;
+  }
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 
@@ -336,8 +361,12 @@ void BlurEffectImpl::SynchronizeBackgroundCornerRadius()
   Vector4       radius = Vector4::ZERO;
   map[Toolkit::DevelVisual::Property::CORNER_RADIUS].Get(radius);
 
+  Visual::Transform::Policy::Type policy;
+  map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY].Get(policy);
+
   Renderer renderer = GetTargetRenderer();
-  renderer.RegisterProperty("uRadius", radius);
+  renderer.RegisterProperty("uCornerRadius", radius);
+  renderer.RegisterProperty("uCornerRadiusPolicy", static_cast<float>(policy));
 }
 
 } // namespace Internal

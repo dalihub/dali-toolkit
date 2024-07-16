@@ -1,9 +1,9 @@
 precision highp float;
 varying highp vec2 vFragCoord;
 varying highp vec2 vTexCoord;
+varying highp vec4 vCornerRadius;
 uniform highp vec3 uSize;
 uniform sampler2D sTexture;
-uniform highp vec4 uRadius;
 
 highp float nrand(const in vec2 uv)
 {
@@ -28,31 +28,18 @@ float roundedBoxSDF(vec2 PixelPositionFromCenter, vec2 RectangleEdgePositionFrom
            - Radius;
 }
 
-float getCurrentRadius()
-{
-  if(vTexCoord.x < 0.5 && vTexCoord.y < 0.5)
-  {
-    return uRadius.x;
-  }
-  else if(vTexCoord.x < 0.5 && vTexCoord.y > 0.5)
-  {
-    return uRadius.y;
-  }
-  else if(vTexCoord.x > 0.5 && vTexCoord.y > 0.5)
-  {
-    return uRadius.z;
-  }
-  else
-  {
-    return uRadius.w;
-  }
-}
-
 void main()
 {
   gl_FragColor = texture2D(sTexture, vTexCoord);
 
-  float radius = getCurrentRadius();
+  highp vec2 location = vTexCoord.xy - vec2(0.5);
+  float radius =
+    mix(
+      mix(vCornerRadius.x, vCornerRadius.y, sign(location.x)*0.5 + 0.5),
+      mix(vCornerRadius.w, vCornerRadius.z, sign(location.x)*0.5 + 0.5),
+      sign(location.y) * 0.5 + 0.5
+     );
+
   float edgeSoftness = min(1.0, radius);
   float distance = roundedBoxSDF(vFragCoord.xy - (uSize.xy/2.0), uSize.xy/2.0, radius);
 

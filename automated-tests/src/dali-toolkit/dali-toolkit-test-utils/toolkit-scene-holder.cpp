@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <toolkit-adaptor-impl.h>
+#include "test-render-surface.h"
 
 using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
 
@@ -42,9 +43,41 @@ namespace Internal
 {
 namespace Adaptor
 {
+class SceneHolder::SceneHolderLifeCycleObserver
+{
+public:
+  SceneHolderLifeCycleObserver(Adaptor*& adaptor, bool& adaptorStarted)
+  : mAdaptor(adaptor),
+    mAdaptorStarted(adaptorStarted)
+  {
+  }
+
+private: // Adaptor::LifeCycleObserver interface
+  virtual void OnStart()
+  {
+    mAdaptorStarted = true;
+  };
+  virtual void OnPause(){};
+  virtual void OnResume(){};
+  virtual void OnStop()
+  {
+    // Mark adaptor as stopped;
+    mAdaptorStarted = false;
+  };
+  virtual void OnDestroy()
+  {
+    mAdaptor = nullptr;
+  };
+
+private:
+  Adaptor*& mAdaptor;
+  bool&     mAdaptorStarted;
+};
+
 SceneHolder::SceneHolder(const Dali::Rect<int>& positionSize)
-: mRenderSurface(positionSize),
-  mScene(Dali::Integration::Scene::New(Dali::Size(static_cast<float>(positionSize.width), static_cast<float>(positionSize.height))))
+: mId(0),
+  mScene(Dali::Integration::Scene::New(Dali::Size(static_cast<float>(positionSize.width), static_cast<float>(positionSize.height)))),
+  mRenderSurface(new TestRenderSurface(positionSize))
 {
 }
 
@@ -123,9 +156,9 @@ Integration::Scene SceneHolder::GetScene()
   return mScene;
 }
 
-Dali::RenderSurfaceInterface& SceneHolder::GetRenderSurface()
+Dali::Integration::RenderSurfaceInterface& SceneHolder::GetRenderSurface()
 {
-  return mRenderSurface;
+  return *mRenderSurface;
 }
 
 Dali::RenderTaskList SceneHolder::GetRenderTaskList()

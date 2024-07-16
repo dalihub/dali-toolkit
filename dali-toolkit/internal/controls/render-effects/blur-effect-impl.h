@@ -97,6 +97,13 @@ protected:
 
 private:
   // Inner functions
+  /**
+   * @brief Gets or Calculates a valid target size for texture.
+   * Invalid cases include: zero vector, minus numbers or large numbers(larger than the maximum).
+   * @return A valid version of mTargetSize, Vector2::ZERO otherwise.
+   * @note The return value is a copy, not mTargetSize itself.
+   */
+  Vector2 GetTargetSizeForValidTexture();
 
   /**
    * @brief Calculates gaussian weight

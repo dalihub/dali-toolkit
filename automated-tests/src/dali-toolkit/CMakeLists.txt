@@ -151,6 +151,7 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/test-graphics-shader.cpp
   dali-toolkit-test-utils/test-platform-abstraction.cpp
   dali-toolkit-test-utils/test-render-controller.cpp
+  dali-toolkit-test-utils/test-render-surface.cpp
   dali-toolkit-test-utils/test-trace-call-stack.cpp
   dali-toolkit-test-utils/test-native-image.cpp
   test-text-geometry-utils.cpp
@@ -172,9 +173,9 @@ FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
 ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
 
 INCLUDE_DIRECTORIES(
-    ../../../
-    ${${CAPI_LIB}_INCLUDE_DIRS}
-    dali-toolkit-test-utils
+  ../../../
+  ${${CAPI_LIB}_INCLUDE_DIRS}
+  dali-toolkit-test-utils
 )
 
 ADD_CUSTOM_COMMAND(

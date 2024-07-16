@@ -31,6 +31,7 @@ OPTION(ENABLE_I18N               "Turns on internationalisation" OFF)
 OPTION(ENABLE_COVERAGE           "Coverage" OFF)
 OPTION(ENABLE_PKG_CONFIGURE      "Use pkgconfig" ON)
 OPTION(ENABLE_LINK_TEST          "Enable the link test" ON)
+OPTION(ENABLE_VULKAN             "Enable Vulkan instead of GLES" OFF)
 OPTION(INSTALL_DOXYGEN_DOC       "Install doxygen doc" ON)
 OPTION(CONFIGURE_AUTOMATED_TESTS "Configure automated tests" ON)
 OPTION(USE_DEFAULT_RESOURCE_DIR  "Whether to use the default resource folders. Otherwise set environment variables for DALI_IMAGE_DIR, DALI_SOUND_DIR, DALI_STYLE_DIR, DALI_STYLE_IMAGE_DIR and DALI_DATA_READ_ONLY_DIR" ON)
@@ -359,6 +360,13 @@ IF ( WIN32 )
   FIND_PACKAGE( pthreads REQUIRED )
 ENDIF()
 
+IF( NOT ENABLE_VULKAN)
+  SET(SOURCES ${SOURCES}
+    ${toolkit_internal_egl_src_files}
+    ${public_api_egl_src_files}
+  )
+ENDIF()
+
 ADD_LIBRARY( ${name} ${LIBTYPE} ${SOURCES} )
 
 SET(CUSTOM_COMPILE_OPTIONS "")
@@ -640,6 +648,7 @@ MESSAGE( STATUS "Debug build:                   " ${ENABLE_DEBUG} )
 MESSAGE( STATUS "Export all symbols:            " ${ENABLE_EXPORTALL} )
 MESSAGE( STATUS "Coverage:                      " ${ENABLE_COVERAGE} )
 MESSAGE( STATUS "Trace:                         " ${ENABLE_TRACE} )
+MESSAGE( STATUS "Vulkan:                        " ${ENABLE_VULKAN} )
 MESSAGE( STATUS "Doxygen:                       " ${doxygenEnabled} )
 MESSAGE( STATUS "Data Dir (Read/Write):         " ${dataReadWriteDir} )
 MESSAGE( STATUS "Data Dir (Read Only):          " ${dataReadOnlyDir} )
