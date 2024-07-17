@@ -247,6 +247,8 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
       actor.Add(GetFocusIndicatorActor());
     }
 
+    actor.OffSceneSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnSceneDisconnection);
+
     // Save the current focused actor
     mCurrentFocusActor = actor;
 
@@ -676,13 +678,12 @@ void KeyboardFocusManager::DoKeyboardEnter(Actor actor)
   }
 }
 
-void KeyboardFocusManager::ClearFocus()
+void KeyboardFocusManager::ClearFocus(Actor actor)
 {
-  ClearFocusIndicator();
-  Actor actor = GetCurrentFocusActor();
   if(actor)
   {
     DALI_LOG_RELEASE_INFO("ClearFocus id:(%d)\n",  actor.GetProperty<int32_t>(Dali::Actor::Property::ID));
+    actor.OffSceneSignal().Disconnect(mSlotDelegate, &KeyboardFocusManager::OnSceneDisconnection);
     // Send notification for the change of focus actor
     if(!mFocusChangedSignal.Empty())
     {
@@ -699,9 +700,8 @@ void KeyboardFocusManager::ClearFocus()
   mCurrentFocusActor.Reset();
 }
 
-void KeyboardFocusManager::ClearFocusIndicator()
+void KeyboardFocusManager::ClearFocusIndicator(Actor actor)
 {
-  Actor actor = GetCurrentFocusActor();
   if(actor)
   {
     if(mFocusIndicatorActor)
@@ -710,6 +710,13 @@ void KeyboardFocusManager::ClearFocusIndicator()
     }
   }
   mIsFocusIndicatorShown = (mAlwaysShowIndicator == ALWAYS_SHOW) ? SHOW : HIDE;
+}
+
+void KeyboardFocusManager::ClearFocus()
+{
+  Actor actor = GetCurrentFocusActor();
+  ClearFocusIndicator(actor);
+  ClearFocus(actor);
 }
 
 void KeyboardFocusManager::SetFocusGroupLoop(bool enabled)
@@ -1035,7 +1042,7 @@ void KeyboardFocusManager::OnTouch(const TouchEvent& touch)
     // If mClearFocusOnTouch is false, do not clear the focus indicator even if user touch the screen.
     if(mClearFocusOnTouch)
     {
-      ClearFocusIndicator();
+      ClearFocusIndicator(GetCurrentFocusActor());
     }
 
     // If KEYBOARD_FOCUSABLE and TOUCH_FOCUSABLE is true, set focus actor
@@ -1214,6 +1221,16 @@ void KeyboardFocusManager::SetFocusFinderRootActor(Actor actor)
 void KeyboardFocusManager::ResetFocusFinderRootActor()
 {
   mFocusFinderRootActor.Reset();
+}
+
+void KeyboardFocusManager::OnSceneDisconnection(Dali::Actor actor)
+{
+  if(actor && actor == mCurrentFocusActor.GetHandle())
+  {
+    DALI_LOG_RELEASE_INFO("ClearFocus due to actor id:(%d) removed from scene\n", actor.GetProperty<int32_t>(Dali::Actor::Property::ID));
+    ClearFocusIndicator(actor);
+    ClearFocus(actor);
+  }
 }
 
 } // namespace Internal

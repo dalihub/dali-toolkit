@@ -333,15 +333,28 @@ private:
    */
   bool EmitCustomWheelSignals(Actor actor, const WheelEvent& event);
 
+   /**
+   * Clear the focus actor
+   * @param[in] actor Actor to be cleared of focus
+   */
+  void ClearFocus(Actor actor);
+
   /**
    * Clear the focus indicator actor.
+   * @param[in] actor Actor to be cleared of focus indicator.
    */
-  void ClearFocusIndicator();
+  void ClearFocusIndicator(Actor actor);
 
   /**
    * Gets the current native window id
    */
   uint32_t GetCurrentWindowId() const;
+
+  /**
+   * Signal handler called when a focused actor is removed from Scene.
+   * @param[in] actor The actor removed from the scene.
+   */
+  void OnSceneDisconnection(Dali::Actor actor);
 
 private:
   // Undefined
