@@ -146,6 +146,10 @@ void CreateTextModel(const std::string&                text,
   textModel->mEllipsisPosition = ellipsisPosition;
   textModel->mVisualModel->SetEllipsisPosition(ellipsisPosition);
 
+  //Inset
+  textModel->mRemoveFrontInset = true;
+  textModel->mRemoveBackInset = true;
+
   // 1) Convert to utf32
   Vector<Character>& utf32Characters = logicalModel->mText;
   utf32Characters.Resize(textSize);

@@ -725,6 +725,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   ControllerPtr controller = Controller::New();
 
   ConfigureTextLabel(controller);
+  controller->SetRemoveFrontInset(true);
+  controller->SetRemoveBackInset(true);
 
   // single line, line spacing = 0px
   {

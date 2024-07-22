@@ -1032,13 +1032,13 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   application.Render();
 
   // Check Remove Front/Back Inset Property
-  DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::REMOVE_FRONT_INSET));
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, false);
   DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::REMOVE_FRONT_INSET));
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::REMOVE_FRONT_INSET));
 
-  DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::REMOVE_BACK_INSET));
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, false);
   DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::REMOVE_BACK_INSET));
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
+  DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::REMOVE_BACK_INSET));
 
   application.SendNotification();
   application.Render();
@@ -1708,6 +1708,8 @@ int UtcDaliToolkitTextlabelTextWrapMode(void)
 
   TextLabel label = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.f));
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world");
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
@@ -2043,6 +2045,8 @@ int UtcDaliToolkitTextlabelTextFit(void)
   TextLabel label = TextLabel::New();
   Vector2   size(460.0f, 100.0f);
   label.SetProperty(Actor::Property::SIZE, size);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Hello world");
 
   // connect to the text git changed signal.
@@ -2099,6 +2103,8 @@ int UtcDaliToolkitTextlabelTextFitStressTest(void)
   TextLabel label = TextLabel::New();
   Vector2   size(460.0f, 100.0f);
   label.SetProperty(Actor::Property::SIZE, size);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "Hello world");
 
   // connect to the text git changed signal.
@@ -2224,6 +2230,8 @@ int UtcDaliToolkitTextlabelTextFitArray(void)
   TextLabel label = TextLabel::New();
   Vector2   size(300.0f, 80.0f);
   label.SetProperty(Actor::Property::SIZE, size);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "A Quick Brown Fox Jumps Over The Lazy Dog");
   label.SetProperty(DevelTextLabel::Property::MIN_LINE_SIZE, 80.f);
   label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
@@ -2746,6 +2754,8 @@ int UtcDaliTextLabelHyphenWrapMode(void)
   label.SetProperty(Actor::Property::SIZE, Vector2(150.0f, 300.f));
   label.SetProperty(TextLabel::Property::POINT_SIZE, 12.f);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   application.GetScene().Add(label);
   application.SendNotification();
   application.Render();
@@ -2841,6 +2851,8 @@ int utcDaliTextLabelGeometryRTL(void)
   label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "line1 \nline2\nline 3\nالاخيرالسطر");
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -2939,6 +2951,8 @@ int utcDaliTextLabelGeometryOneGlyph(void)
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::TEXT, "H");
 
   // Avoid a crash when core load gl resources.
@@ -3381,8 +3395,9 @@ int utcDaliTextLabelRemoveFrontInset(void)
   application.SendNotification();
   application.Render();
 
-  DevelTextLabel::SetRemoveFrontInset(label, false);
-  DALI_TEST_CHECK(!DevelTextLabel::IsRemoveFrontInset(label));
+  DALI_TEST_CHECK(!DevelTextLabel::IsRemoveFrontInset(label)); // default value is false.
+  DevelTextLabel::SetRemoveFrontInset(label, true);
+  DALI_TEST_CHECK(DevelTextLabel::IsRemoveFrontInset(label));
 
   END_TEST;
 }
@@ -3399,8 +3414,9 @@ int utcDaliTextLabelRemoveBackInset(void)
   application.SendNotification();
   application.Render();
 
-  DevelTextLabel::SetRemoveBackInset(label, false);
-  DALI_TEST_CHECK(!DevelTextLabel::IsRemoveBackInset(label));
+  DALI_TEST_CHECK(!DevelTextLabel::IsRemoveBackInset(label)); // default value is false.
+  DevelTextLabel::SetRemoveBackInset(label, true);
+  DALI_TEST_CHECK(DevelTextLabel::IsRemoveBackInset(label));
 
   END_TEST;
 }

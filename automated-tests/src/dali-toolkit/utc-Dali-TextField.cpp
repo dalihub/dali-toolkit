@@ -1275,13 +1275,13 @@ int UtcDaliTextFieldSetPropertyP(void)
   application.Render();
 
   // Check Remove Front/Back Inset Property
-  DALI_TEST_CHECK(field.GetProperty<bool>(DevelTextField::Property::REMOVE_FRONT_INSET));
-  field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, false);
   DALI_TEST_CHECK(!field.GetProperty<bool>(DevelTextField::Property::REMOVE_FRONT_INSET));
+  field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, true);
+  DALI_TEST_CHECK(field.GetProperty<bool>(DevelTextField::Property::REMOVE_FRONT_INSET));
 
-  DALI_TEST_CHECK(field.GetProperty<bool>(DevelTextField::Property::REMOVE_BACK_INSET));
-  field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, false);
   DALI_TEST_CHECK(!field.GetProperty<bool>(DevelTextField::Property::REMOVE_BACK_INSET));
+  field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, true);
+  DALI_TEST_CHECK(field.GetProperty<bool>(DevelTextField::Property::REMOVE_BACK_INSET));
 
   application.SendNotification();
   application.Render();
@@ -5035,6 +5035,8 @@ int utcDaliTextFieldGeometryEllipsisStart(void)
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   field.SetProperty(DevelTextField::Property::ELLIPSIS, true);
   field.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::START);
+  field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, true);
+  field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, true);
   field.SetProperty(TextField::Property::TEXT, "Hello World");
 
   // Avoid a crash when core load gl resources.
@@ -5082,6 +5084,8 @@ int utcDaliTextFieldGeometryEllipsisEnd(void)
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   field.SetProperty(DevelTextField::Property::ELLIPSIS, true);
   field.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::END);
+  field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, true);
+  field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, true);
   field.SetProperty(TextField::Property::TEXT, "Hello World");
 
   // Avoid a crash when core load gl resources.
@@ -6166,8 +6170,9 @@ int utcDaliTextFieldRemoveFrontInset(void)
   application.SendNotification();
   application.Render();
 
-  DevelTextField::SetRemoveFrontInset(field, false);
-  DALI_TEST_CHECK(!DevelTextField::IsRemoveFrontInset(field));
+  DALI_TEST_CHECK(!DevelTextField::IsRemoveFrontInset(field)); // default value is false.
+  DevelTextField::SetRemoveFrontInset(field, true);
+  DALI_TEST_CHECK(DevelTextField::IsRemoveFrontInset(field));
 
   END_TEST;
 }
@@ -6184,8 +6189,9 @@ int utcDaliTextFieldRemoveBackInset(void)
   application.SendNotification();
   application.Render();
 
-  DevelTextField::SetRemoveBackInset(field, false);
-  DALI_TEST_CHECK(!DevelTextField::IsRemoveBackInset(field));
+  DALI_TEST_CHECK(!DevelTextField::IsRemoveBackInset(field)); // default value is false.
+  DevelTextField::SetRemoveBackInset(field, true);
+  DALI_TEST_CHECK(DevelTextField::IsRemoveBackInset(field));
 
   END_TEST;
 }
