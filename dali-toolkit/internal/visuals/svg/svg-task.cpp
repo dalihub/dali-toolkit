@@ -55,9 +55,10 @@ uint64_t GetNanoseconds()
 #endif
 } // namespace
 
-SvgTask::SvgTask(VectorImageRenderer vectorRenderer, CallbackBase* callback, AsyncTask::PriorityType priorityType)
+SvgTask::SvgTask(VectorImageRenderer vectorRenderer, int32_t id, CallbackBase* callback, AsyncTask::PriorityType priorityType)
 : AsyncTask(callback, priorityType),
   mVectorRenderer(vectorRenderer),
+  mId(id),
   mHasSucceeded(false)
 {
 }
@@ -77,8 +78,8 @@ VectorImageRenderer SvgTask::GetRenderer()
   return mVectorRenderer;
 }
 
-SvgLoadingTask::SvgLoadingTask(VectorImageRenderer vectorRenderer, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, CallbackBase* callback)
-: SvgTask(vectorRenderer, callback, url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
+SvgLoadingTask::SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, CallbackBase* callback)
+: SvgTask(vectorRenderer, id, callback, url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
   mImageUrl(url),
   mEncodedImageBuffer(encodedImageBuffer),
   mDpi(dpi)
@@ -175,8 +176,8 @@ bool SvgLoadingTask::IsReady()
   return true;
 }
 
-SvgRasterizingTask::SvgRasterizingTask(VectorImageRenderer vectorRenderer, uint32_t width, uint32_t height, CallbackBase* callback)
-: SvgTask(vectorRenderer, callback),
+SvgRasterizingTask::SvgRasterizingTask(VectorImageRenderer vectorRenderer, int32_t id, uint32_t width, uint32_t height, CallbackBase* callback)
+: SvgTask(vectorRenderer, id, callback),
   mWidth(width),
   mHeight(height)
 {

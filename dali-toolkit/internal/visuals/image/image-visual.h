@@ -284,7 +284,7 @@ private:
    * @brief Checks if atlasing should be attempted
    * @return bool returns true if atlasing can be attempted.
    */
-  bool AttemptAtlasing();
+  bool AttemptAtlasing() const;
 
   /**
    * @brief Initializes the Dali::Renderer from the image url

@@ -737,7 +737,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
   }
 }
 
-bool ImageVisual::AttemptAtlasing()
+bool ImageVisual::AttemptAtlasing() const
 {
   return (!mImpl->mCustomShader && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource()) && mAttemptAtlasing);
 }

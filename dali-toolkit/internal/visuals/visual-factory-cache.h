@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
+#include <dali-toolkit/internal/visuals/svg/svg-loader.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 
 namespace Dali
@@ -38,6 +39,7 @@ namespace Internal
 {
 class ImageAtlasManager;
 class NPatchLoader;
+class SvgLoader;
 class TextureManager;
 class VectorAnimationManager;
 
@@ -258,6 +260,12 @@ public:
   NPatchLoader& GetNPatchLoader();
 
   /**
+   * Get the Svg texture cache.
+   * @return A reference to the Svg loader
+   */
+  SvgLoader& GetSvgLoader();
+
+  /**
    * Get the vector animation manager.
    * @return A reference to the vector animation manager.
    */
@@ -356,6 +364,7 @@ private:
   ImageAtlasManagerPtr mAtlasManager;
   TextureManager       mTextureManager;
   NPatchLoader         mNPatchLoader;
+  SvgLoader            mSvgLoader;
 
   std::unique_ptr<VectorAnimationManager> mVectorAnimationManager;
   bool                                    mPreMultiplyOnLoad;

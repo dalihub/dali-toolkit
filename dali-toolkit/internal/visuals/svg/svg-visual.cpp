@@ -22,7 +22,7 @@
 #include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-feature-builder.h>
-#include <dali-toolkit/internal/visuals/svg/svg-task.h>
+#include <dali-toolkit/internal/visuals/svg/svg-loader.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
@@ -42,8 +42,7 @@ namespace
 {
 const int CUSTOM_PROPERTY_COUNT(1); // atlas
 
-// property name
-const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
+constexpr Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 } // namespace
 
@@ -65,9 +64,12 @@ SvgVisualPtr SvgVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderF
 SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, ImageDimensions size)
 : Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::SVG),
   mImageVisualShaderFactory(shaderFactory),
+  mSvgLoader(factoryCache.GetSvgLoader()),
+  mSvgLoadId(SvgLoader::INVALID_SVG_LOAD_ID),
+  mSvgRasterizeId(SvgLoader::INVALID_SVG_RASTERIZE_ID),
   mAtlasRect(FULL_TEXTURE_RECT),
+  mAtlasRectIndex(Property::INVALID_INDEX),
   mImageUrl(imageUrl),
-  mVectorRenderer(VectorImageRenderer::New()),
   mDefaultWidth(0),
   mDefaultHeight(0),
   mPlacementActor(),
@@ -84,13 +86,16 @@ SvgVisual::~SvgVisual()
 {
   if(Stage::IsInstalled())
   {
-    if(mLoadingTask)
+    if(mSvgLoadId != SvgLoader::INVALID_SVG_LOAD_ID)
     {
-      Dali::AsyncTaskManager::Get().RemoveTask(mLoadingTask);
+      mSvgLoader.RequestLoadRemove(mSvgLoadId, this);
+      mSvgLoadId = SvgLoader::INVALID_SVG_LOAD_ID;
     }
-    if(mRasterizingTask)
+    if(mSvgRasterizeId != SvgLoader::INVALID_SVG_LOAD_ID)
     {
-      Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
+      // We don't need to remove task synchronously.
+      mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, false);
+      mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
     }
 
     if(mImageUrl.IsBufferResource())
@@ -111,34 +116,10 @@ void SvgVisual::OnInitialize()
   Vector2 dpi     = Stage::GetCurrent().GetDpi();
   float   meanDpi = (dpi.height + dpi.width) * 0.5f;
 
-  EncodedImageBuffer encodedImageBuffer;
+  const bool synchronousLoading = IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
 
-  if(mImageUrl.IsBufferResource())
-  {
-    // Increase reference count of External Resources :
-    // EncodedImageBuffer.
-    // Reference count will be decreased at destructor of the visual.
-    TextureManager& textureManager = mFactoryCache.GetTextureManager();
-    textureManager.UseExternalResource(mImageUrl.GetUrl());
-
-    encodedImageBuffer = textureManager.GetEncodedImageBuffer(mImageUrl.GetUrl());
-  }
-
-  mLoadingTask = new SvgLoadingTask(mVectorRenderer, mImageUrl, encodedImageBuffer, meanDpi, MakeCallback(this, &SvgVisual::ApplyRasterizedImage));
-
-  if(IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource()))
-  {
-    mLoadingTask->Process();
-    if(!mLoadingTask->HasSucceeded())
-    {
-      mLoadFailed = true;
-    }
-    mLoadingTask.Reset(); // We don't need it anymore.
-  }
-  else
-  {
-    Dali::AsyncTaskManager::Get().AddTask(mLoadingTask);
-  }
+  // It will call SvgVisual::LoadComplete() synchronously if it required, or we already loaded same svg before.
+  mSvgLoadId = mSvgLoader.Load(mImageUrl, meanDpi, this, synchronousLoading);
 }
 
 void SvgVisual::DoSetProperties(const Property::Map& propertyMap)
@@ -176,7 +157,11 @@ void SvgVisual::DoSetProperty(Property::Index index, const Property::Value& valu
   {
     case Toolkit::ImageVisual::Property::ATLASING:
     {
-      value.Get(mAttemptAtlasing);
+      bool atlasing = false;
+      if(value.Get(atlasing))
+      {
+        mAttemptAtlasing = atlasing;
+      }
       break;
     }
     case Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING:
@@ -255,17 +240,18 @@ void SvgVisual::DoSetOnScene(Actor& actor)
 void SvgVisual::DoSetOffScene(Actor& actor)
 {
   // Remove rasterizing task
-  if(mRasterizingTask)
+  if(mSvgRasterizeId != SvgLoader::INVALID_SVG_LOAD_ID)
   {
-    Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
-    mRasterizingTask.Reset();
+    // We don't need to remove task synchronously.
+    mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, false);
+    mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
   }
 
   actor.RemoveRenderer(mImpl->mRenderer);
   mPlacementActor.Reset();
 
-  // Reset the visual size to zero so that when adding the actor back to stage the SVG rasterization is forced
-  mRasterizedSize = Vector2::ZERO;
+  // Reset the visual size so that when adding the actor back to stage the SVG rasterization is forced
+  mRasterizedSize = -Vector2::ONE; ///< Let we don't use zero since visual size could be zero after trasnform
 }
 
 void SvgVisual::GetNaturalSize(Vector2& naturalSize)
@@ -325,115 +311,134 @@ void SvgVisual::EnablePreMultipliedAlpha(bool preMultiplied)
   }
 }
 
+bool SvgVisual::AttemptAtlasing() const
+{
+  return (!mImpl->mCustomShader && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource()) && mAttemptAtlasing);
+}
+
 void SvgVisual::AddRasterizationTask(const Vector2& size)
 {
   if(mImpl->mRenderer)
   {
     // Remove previous task
-    if(mRasterizingTask)
+    if(mSvgRasterizeId != SvgLoader::INVALID_SVG_LOAD_ID)
     {
-      Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
-      mRasterizingTask.Reset();
+      mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, true);
+      mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
     }
 
     uint32_t width  = static_cast<uint32_t>(roundf(size.width));
     uint32_t height = static_cast<uint32_t>(roundf(size.height));
 
-    mRasterizingTask = new SvgRasterizingTask(mVectorRenderer, width, height, MakeCallback(this, &SvgVisual::ApplyRasterizedImage));
+    const bool synchronousRasterize = IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
+    const bool attemtAtlasing       = AttemptAtlasing();
 
-#ifdef TRACE_ENABLED
-    reinterpret_cast<SvgRasterizingTask*>(mRasterizingTask.Get())->SetUrl(mImageUrl);
-#endif
+    mSvgRasterizeId = mSvgLoader.Rasterize(mSvgLoadId, width, height, attemtAtlasing, this, synchronousRasterize);
+  }
+}
 
-    if(IsSynchronousLoadingRequired() && mImageUrl.IsLocalResource())
+/// Called when SvgLoader::Load is completed.
+void SvgVisual::LoadComplete(int32_t loadId, Dali::VectorImageRenderer vectorImageRenderer)
+{
+  // mSvgLoadId might not be updated if svg file is cached. Update now.
+  mSvgLoadId = loadId;
+
+  if(DALI_LIKELY(vectorImageRenderer))
+  {
+    vectorImageRenderer.GetDefaultSize(mDefaultWidth, mDefaultHeight);
+  }
+  else if(!mLoadFailed)
+  {
+    SvgVisualPtr self = this; // Keep reference until this API finished
+
+    mLoadFailed = true;
+
+    // Remove rasterizing task if we requested before.
+    if(mSvgRasterizeId != SvgLoader::INVALID_SVG_LOAD_ID)
     {
-      mRasterizingTask->Process();
-      ApplyRasterizedImage(mRasterizingTask);
-      mRasterizingTask.Reset(); // We don't need it anymore.
+      mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, true);
+      mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
     }
-    else
+
+    if(IsOnScene())
     {
-      Dali::AsyncTaskManager::Get().AddTask(mRasterizingTask);
+      Actor actor = mPlacementActor.GetHandle();
+      if(actor && mImpl->mRenderer)
+      {
+        Vector2 imageSize = Vector2::ZERO;
+        imageSize         = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+        mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+        actor.AddRenderer(mImpl->mRenderer);
+        // reset the weak handle so that the renderer only get added to actor once
+        mPlacementActor.Reset();
+      }
+
+      // Emit failed signal only if this visual is scene-on
+      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
     }
   }
 }
 
-void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
+/// Called when SvgLoader::Rasterize is completed.
+void SvgVisual::RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet, Vector4 atlasRect)
 {
-  SvgVisualPtr self = this; // Keep reference until this API finished
+  // rasterize id might not be updated if rasterize is cached.
+  mSvgRasterizeId = rasterizeId;
 
-  if(task->HasSucceeded())
+  if(DALI_LIKELY(textureSet))
   {
-    PixelData rasterizedPixelData = task->GetPixelData();
-    if(mDefaultWidth == 0 || mDefaultHeight == 0)
+    bool updateShader = false;
+
+    if(AttemptAtlasing() && atlasRect != FULL_TEXTURE_RECT)
     {
-      task->GetRenderer().GetDefaultSize(mDefaultWidth, mDefaultHeight);
+      mAtlasRect = atlasRect;
+      if(DALI_UNLIKELY(!(mImpl->mFlags & Impl::IS_ATLASING_APPLIED)))
+      {
+        updateShader = true;
+      }
+      mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
+    }
+    else
+    {
+      mAtlasRect = FULL_TEXTURE_RECT;
+      if(DALI_UNLIKELY(mImpl->mFlags & Impl::IS_ATLASING_APPLIED))
+      {
+        updateShader = true;
+      }
+      mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
     }
 
-    // We don't need to keep tasks anymore. reset now.
-    if(task == mLoadingTask)
+    if(DALI_LIKELY(mImpl->mRenderer))
     {
-      mLoadingTask.Reset();
-    }
-    if(task == mRasterizingTask)
-    {
-      mRasterizingTask.Reset();
-    }
-
-    // Rasterization success
-    if(rasterizedPixelData && IsOnScene())
-    {
-      mRasterizedSize.x = static_cast<float>(rasterizedPixelData.GetWidth());
-      mRasterizedSize.y = static_cast<float>(rasterizedPixelData.GetHeight());
-
       TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
-      if(mImpl->mFlags & Impl::IS_ATLASING_APPLIED)
-      {
-        mFactoryCache.GetAtlasManager()->Remove(currentTextureSet, mAtlasRect);
-      }
 
-      TextureSet textureSet;
-
-      if(mAttemptAtlasing && !mImpl->mCustomShader)
+      if(mAtlasRectIndex == Property::INVALID_INDEX)
       {
-        Vector4 atlasRect;
-        textureSet = mFactoryCache.GetAtlasManager()->Add(atlasRect, rasterizedPixelData);
-        if(textureSet) // atlasing
+        if(DALI_UNLIKELY(mAtlasRect != FULL_TEXTURE_RECT))
         {
-          if(textureSet != currentTextureSet)
-          {
-            mImpl->mRenderer.SetTextures(textureSet);
-          }
-          mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, atlasRect);
-          mAtlasRect = atlasRect;
-          mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
+          // Register atlas rect property only if it's not full texture rect.
+          mAtlasRectIndex = mImpl->mRenderer.RegisterUniqueProperty(mAtlasRectIndex, ATLAS_RECT_UNIFORM_NAME, mAtlasRect);
         }
       }
-
-      if(!textureSet) // no atlasing - mAttemptAtlasing is false or adding to atlas is failed
+      else
       {
-        Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight());
-        texture.Upload(rasterizedPixelData);
-        mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
-
-        if(mAtlasRect == FULL_TEXTURE_RECT)
-        {
-          textureSet = currentTextureSet;
-        }
-        else
-        {
-          textureSet = TextureSet::New();
-          mImpl->mRenderer.SetTextures(textureSet);
-
-          mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT);
-          mAtlasRect = FULL_TEXTURE_RECT;
-        }
-
-        if(textureSet)
-        {
-          textureSet.SetTexture(0, texture);
-        }
+        mImpl->mRenderer.SetProperty(mAtlasRectIndex, mAtlasRect);
       }
+
+      if(textureSet != currentTextureSet)
+      {
+        mImpl->mRenderer.SetTextures(textureSet);
+      }
+
+      if(DALI_UNLIKELY(updateShader))
+      {
+        UpdateShader();
+      }
+    }
+
+    if(IsOnScene())
+    {
+      SvgVisualPtr self = this; // Keep reference until this API finished
 
       // Rasterized pixels are uploaded to texture. If weak handle is holding a placement actor, it is the time to add the renderer to actor.
       Actor actor = mPlacementActor.GetHandle();
@@ -450,36 +455,37 @@ void SvgVisual::ApplyRasterizedImage(SvgTaskPtr task)
   }
   else if(!mLoadFailed)
   {
+    SvgVisualPtr self = this; // Keep reference until this API finished
+
     mLoadFailed = true;
 
-    // Remove rasterizing task if we requested before.
-    if(mRasterizingTask)
+    if(IsOnScene())
     {
-      Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
-      mRasterizingTask.Reset();
-    }
+      Actor actor = mPlacementActor.GetHandle();
+      if(actor && mImpl->mRenderer)
+      {
+        Vector2 imageSize = Vector2::ZERO;
+        imageSize         = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+        mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+        actor.AddRenderer(mImpl->mRenderer);
 
-    // We don't need to keep tasks anymore. reset now.
-    if(task == mLoadingTask)
-    {
-      mLoadingTask.Reset();
-    }
+        // reset the weak handle so that the renderer only get added to actor once
+        mPlacementActor.Reset();
+      }
 
-    Actor actor = mPlacementActor.GetHandle();
-    if(actor)
-    {
-      Vector2 imageSize = Vector2::ZERO;
-      imageSize         = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-      mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
-      actor.AddRenderer(mImpl->mRenderer);
+      // Emit failed signal only if this visual is scene-on
+      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
     }
-
-    ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
   }
 }
 
 void SvgVisual::OnSetTransform()
 {
+  if(mImpl->mRenderer)
+  {
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  }
+
   if(IsOnScene() && !mLoadFailed)
   {
     Vector2 size;
@@ -498,16 +504,11 @@ void SvgVisual::OnSetTransform()
     size.width  = static_cast<uint32_t>(roundf(size.width));
     size.height = static_cast<uint32_t>(roundf(size.height));
 
-    if(size != mRasterizedSize || mDefaultWidth == 0 || mDefaultHeight == 0)
+    if(size != mRasterizedSize)
     {
       mRasterizedSize = size;
       AddRasterizationTask(size);
     }
-  }
-
-  if(mImpl->mRenderer)
-  {
-    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 
@@ -528,7 +529,7 @@ Shader SvgVisual::GenerateShader() const
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
       ImageVisualShaderFeatureBuilder()
-        .EnableTextureAtlas(mAttemptAtlasing)
+        .EnableTextureAtlas(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED)
         .EnableRoundedCorner(IsRoundedCornerRequired())
         .EnableBorderline(IsBorderlineRequired()));
   }
