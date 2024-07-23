@@ -473,11 +473,13 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
   tableView.AddChild(third, TableView::CellPosition(1, 0));
   tableView.AddChild(fourth, TableView::CellPosition(1, 1));
 
+  focusChangedCallback.Reset();
+
   // Set the focus to the first actor
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
-  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == second);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == Actor());
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == first);
   focusChangedCallback.Reset();
 
@@ -1435,11 +1437,13 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
   tableView.AddChild(third, TableView::CellPosition(1, 0));
   tableView.AddChild(fourth, TableView::CellPosition(1, 1));
 
+  focusChangedCallback.Reset();
+
   // Set the focus to the first actor
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
-  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == second);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == Actor());
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == first);
 
   DALI_TEST_EQUALS(first.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
@@ -2453,6 +2457,59 @@ int UtcDaliKeyboardFocusManagerKeyEventOtherWindow(void)
   application.Render();
 
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == button1);
+
+  END_TEST;
+}
+
+int UtcDaliKeyboardFocusManagerRemoveScene(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerRemoveScene");
+
+  // Register Type
+  TypeInfo type;
+  type = TypeRegistry::Get().GetTypeInfo("KeyboardFocusManager");
+  DALI_TEST_CHECK(type);
+  BaseHandle handle = type.CreateInstance();
+  DALI_TEST_CHECK(handle);
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  bool                 focusChangedSignalVerified = false;
+  FocusChangedCallback focusChangedCallback(focusChangedSignalVerified);
+  manager.FocusChangedSignal().Connect(&focusChangedCallback, &FocusChangedCallback::Callback);
+
+  // Create the first actor and add it to the stage
+  Actor first = Actor::New();
+  first.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(first);
+
+  // Check that the focus is set on the first actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == Actor());
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == first);
+  focusChangedCallback.Reset();
+
+  // Remove actor from scene
+  application.GetScene().Remove(first);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == first);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == Actor());
+  focusChangedCallback.Reset();
+
+  // Add actor to scene
+  application.GetScene().Add(first);
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == Actor());
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == first);
+  focusChangedCallback.Reset();
 
   END_TEST;
 }

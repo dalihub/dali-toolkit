@@ -1273,13 +1273,13 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS(editor.GetProperty<float>(DevelTextEditor::Property::MIN_LINE_SIZE), 50.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
   // Check Remove Front/Back Inset Property
-  DALI_TEST_CHECK(editor.GetProperty<bool>(DevelTextEditor::Property::REMOVE_FRONT_INSET));
-  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, false);
   DALI_TEST_CHECK(!editor.GetProperty<bool>(DevelTextEditor::Property::REMOVE_FRONT_INSET));
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
+  DALI_TEST_CHECK(editor.GetProperty<bool>(DevelTextEditor::Property::REMOVE_FRONT_INSET));
 
-  DALI_TEST_CHECK(editor.GetProperty<bool>(DevelTextEditor::Property::REMOVE_BACK_INSET));
-  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, false);
   DALI_TEST_CHECK(!editor.GetProperty<bool>(DevelTextEditor::Property::REMOVE_BACK_INSET));
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
+  DALI_TEST_CHECK(editor.GetProperty<bool>(DevelTextEditor::Property::REMOVE_BACK_INSET));
 
   application.SendNotification();
   application.Render();
@@ -4464,6 +4464,8 @@ int UtcDaliTextEditorHyphenWrapMode(void)
   TextEditor textEditor = TextEditor::New();
 
   textEditor.SetProperty(Actor::Property::SIZE, Vector2(150.0f, 300.f));
+  textEditor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
+  textEditor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
 
   application.GetScene().Add(textEditor);
   application.SendNotification();
@@ -5063,6 +5065,8 @@ int utcDaliTextEditorGeometryEllipsisStart(void)
   editor.SetProperty(DevelTextEditor::Property::ENABLE_SCROLL_BAR, false);
   editor.SetProperty(DevelTextEditor::Property::ELLIPSIS, true);
   editor.SetProperty(DevelTextEditor::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::START);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
   editor.SetProperty(TextEditor::Property::TEXT, "line1 \nline2\nline 3\nline4");
 
   // Avoid a crash when core load gl resources.
@@ -5114,6 +5118,8 @@ int utcDaliTextEditorGeometryEllipsisMiddle(void)
   editor.SetProperty(DevelTextEditor::Property::ENABLE_SCROLL_BAR, false);
   editor.SetProperty(DevelTextEditor::Property::ELLIPSIS, true);
   editor.SetProperty(DevelTextEditor::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::MIDDLE);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
   editor.SetProperty(TextEditor::Property::TEXT, "line1 \nline2\nline 3\nline4");
 
   // Avoid a crash when core load gl resources.
@@ -5165,6 +5171,8 @@ int utcDaliTextEditorGeometryEllipsisEnd(void)
   editor.SetProperty(DevelTextEditor::Property::ENABLE_SCROLL_BAR, false);
   editor.SetProperty(DevelTextEditor::Property::ELLIPSIS, true);
   editor.SetProperty(DevelTextEditor::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::END);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
   editor.SetProperty(TextEditor::Property::TEXT, "line1 \nline2\nline 3\nline4");
 
   // Avoid a crash when core load gl resources.
@@ -5213,6 +5221,8 @@ int utcDaliTextEditorGeometryRTL(void)
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
+  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
   editor.SetProperty(TextEditor::Property::TEXT, "line1 \nline2\nline 3\nالاخيرالسطر");
 
   // Avoid a crash when core load gl resources.
@@ -5312,6 +5322,8 @@ int utcDaliTextEditorGeometryOneGlyph(void)
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   label.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+  label.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextEditor::Property::TEXT, "H");
 
   // Avoid a crash when core load gl resources.
@@ -6653,11 +6665,15 @@ int utcDaliTextEditorRemoveFrontInset(void)
   tet_infoline(" utcDaliTextEditorRemoveFrontInset");
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK(editor);
+
   application.GetScene().Add(editor);
   application.SendNotification();
   application.Render();
-  DevelTextEditor::SetRemoveFrontInset(editor, false);
-  DALI_TEST_CHECK(!DevelTextEditor::IsRemoveFrontInset(editor));
+
+  DALI_TEST_CHECK(!DevelTextEditor::IsRemoveFrontInset(editor)); // default value is false.
+  DevelTextEditor::SetRemoveFrontInset(editor, true);
+  DALI_TEST_CHECK(DevelTextEditor::IsRemoveFrontInset(editor));
+
   END_TEST;
 }
 int utcDaliTextEditorRemoveBackInset(void)
@@ -6666,10 +6682,14 @@ int utcDaliTextEditorRemoveBackInset(void)
   tet_infoline(" utcDaliTextEditorRemoveBackInset");
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK(editor);
+
   application.GetScene().Add(editor);
   application.SendNotification();
   application.Render();
-  DevelTextEditor::SetRemoveBackInset(editor, false);
-  DALI_TEST_CHECK(!DevelTextEditor::IsRemoveBackInset(editor));
+
+  DALI_TEST_CHECK(!DevelTextEditor::IsRemoveBackInset(editor)); // default value is false.
+  DevelTextEditor::SetRemoveBackInset(editor, true);
+  DALI_TEST_CHECK(DevelTextEditor::IsRemoveBackInset(editor));
+
   END_TEST;
 }
