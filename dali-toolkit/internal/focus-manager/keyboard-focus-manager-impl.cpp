@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -206,13 +206,16 @@ bool KeyboardFocusManager::SetCurrentFocusActor(Actor actor)
 
 bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
 {
-  bool success = false;
+  bool                     success = false;
+  Integration::SceneHolder currentWindow;
 
   // Check whether the actor is in the stage and is keyboard focusable.
   if(actor &&
      actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) &&
      actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED) &&
-     actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+     actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE) &&
+     (currentWindow = Integration::SceneHolder::Get(actor))) ///< Note : SceneHolder might not be valid even if actor is connected to scene.
+                                                             ///         (e.g. Adaptor Stopped, SceneHolder removed but Scene is still alive)
   {
     // If the parent's KEYBOARD_FOCUSABLE_CHILDREN is false, it cannot have focus.
     Actor parent = actor.GetParent();
@@ -234,12 +237,11 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
       return true;
     }
 
-    Integration::SceneHolder currentWindow = Integration::SceneHolder::Get(actor);
     if(currentWindow.GetRootLayer() != mCurrentFocusedWindow.GetHandle())
     {
       Layer rootLayer       = currentWindow.GetRootLayer();
       mCurrentFocusedWindow = rootLayer;
-      mCurrentWindowId = static_cast<uint32_t>(currentWindow.GetNativeId());
+      mCurrentWindowId      = static_cast<uint32_t>(currentWindow.GetNativeId());
     }
 
     if((mIsFocusIndicatorShown == SHOW) && (mEnableFocusIndicator == ENABLE))
@@ -682,7 +684,7 @@ void KeyboardFocusManager::ClearFocus(Actor actor)
 {
   if(actor)
   {
-    DALI_LOG_RELEASE_INFO("ClearFocus id:(%d)\n",  actor.GetProperty<int32_t>(Dali::Actor::Property::ID));
+    DALI_LOG_RELEASE_INFO("ClearFocus id:(%d)\n", actor.GetProperty<int32_t>(Dali::Actor::Property::ID));
     actor.OffSceneSignal().Disconnect(mSlotDelegate, &KeyboardFocusManager::OnSceneDisconnection);
     // Send notification for the change of focus actor
     if(!mFocusChangedSignal.Empty())
@@ -1113,7 +1115,7 @@ void KeyboardFocusManager::OnWindowFocusChanged(Window window, bool focusIn)
     // Change Current Focused Window
     Layer rootLayer       = window.GetRootLayer();
     mCurrentFocusedWindow = rootLayer;
-    mCurrentWindowId = static_cast<uint32_t>(Integration::SceneHolder::Get(rootLayer).GetNativeId());
+    mCurrentWindowId      = static_cast<uint32_t>(Integration::SceneHolder::Get(rootLayer).GetNativeId());
 
     // Get Current Focused Actor from window
     Actor currentFocusedActor = GetFocusActorFromCurrentWindow();
