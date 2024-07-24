@@ -210,7 +210,15 @@ enum Type
    * This flag is useful if given resource has low fps, so we don't need to render every frame.
    * @note It is used in the AnimatedVectorImageVisual. The default is false.
    */
-  NOTIFY_AFTER_RASTERIZATION = ORIENTATION_CORRECTION + 17
+  NOTIFY_AFTER_RASTERIZATION = ORIENTATION_CORRECTION + 17,
+
+  /**
+   * @brief Whether to synchronize image texture size to visual size.
+   * @details Name "synchronousSizing", type Property::BOOLEAN.
+   * If this property is true, ImageVisual ignores mDesiredSize.
+   * @note Used by the ImageVisual. The default is false.
+   */
+  SYNCHRONOUS_SIZING = ORIENTATION_CORRECTION + 18
 };
 
 } //namespace Property

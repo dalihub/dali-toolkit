@@ -275,10 +275,10 @@ private:
    * @param[in, out] atlasing flag if the image has been put in a atlas (true), passing false will not atlas even if possible.
    * @param[out] atlasRect if atlasing is used this the texture area of the image in the atlas.
    * @param[out] textures resulting texture set from the image loading.
-   * @param[in] orientationCorrection flag determines if orientation correction should be performed
+   * @param[in] size if mUseSynchronousSizing is true this is the size of visual, else it is mDesiredSize
    * @param[in] forceReload flag determines if the texture should be reloaded from its source or use the cached texture.
    */
-  void LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection, TextureManager::ReloadPolicy forceReload);
+  void LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& textures, const Dali::ImageDimensions& size, TextureManager::ReloadPolicy forceReload);
 
   /**
    * @brief Checks if atlasing should be attempted
@@ -369,6 +369,7 @@ private:
   TextureManager::MaskingDataPointer mMaskingData;
 
   Dali::ImageDimensions     mDesiredSize;
+  Dali::ImageDimensions     mLastRequiredSize;
   TextureManager::TextureId mTextureId;
   TextureSet                mTextures;
   Vector2                   mTextureSize;
@@ -395,6 +396,7 @@ private:
   bool                                            mUseFastTrackUploading{false};  ///< True if we use fast tack feature.
   bool                                            mRendererAdded{false};          ///< True if renderer added into actor.
   bool                                            mUseBrokenImageRenderer{false}; ///< True if renderer changed as broken image.
+  bool                                            mUseSynchronousSizing{false};   ///< True if we need to synchronize image texture size to visual size, otherwise use mDesiredSize.
 };
 
 } // namespace Internal

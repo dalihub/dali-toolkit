@@ -4300,3 +4300,108 @@ int UtcDaliImageVisualDebugImageVisualShaderN2(void)
 
   END_TEST;
 }
+
+int UtcDaliImageVisualSynchronousSizing01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliImageVisualSynchronousSizing01");
+
+  Vector2  size   = Vector2(64.0f, 64.0f);
+  uint32_t width  = 64;
+  uint32_t height = 64;
+
+  Property::Map imagePropertyMap;
+  imagePropertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
+  imagePropertyMap.Insert(Toolkit::ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  imagePropertyMap.Insert(Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING, true);
+
+  Toolkit::ImageView imageView = Toolkit::ImageView::New();
+  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imagePropertyMap);
+  imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  imageView.SetProperty(Actor::Property::SIZE, size);
+
+  DALI_TEST_EQUALS(imageView.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(imageView);
+
+  // Wait for image loading(1)
+  // (Texture size is its original size, not the actor size.)
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(imageView.GetRendererCount(), 1u, TEST_LOCATION);
+
+  // Set size again
+  imageView.SetProperty(Actor::Property::SIZE, size);
+
+  // Wait for image loading(2)
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Check (reloaded image texture size == actor size)
+  Renderer   renderer = imageView.GetRendererAt(0);
+  TextureSet textures = renderer.GetTextures();
+  DALI_TEST_EQUALS(textures.GetTextureCount(), 1u, TEST_LOCATION);
+
+  Texture texture = textures.GetTexture(0);
+  DALI_TEST_EQUALS(texture.GetWidth(), width, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetHeight(), height, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualSynchronousSizing02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliImageVisualSynchronousSizing02");
+
+  Property::Map imagePropertyMap;
+  imagePropertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
+  imagePropertyMap.Insert(Toolkit::ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  imagePropertyMap.Insert(Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING, true);
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Visual::Base visual = factory.CreateVisual(imagePropertyMap);
+
+  Vector2 size;
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f)); // set size(1), no renderer yet
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), false, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render(); // require to load size(1)
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f)); // set size(2), no renderer yet
+  visual.GetNaturalSize(size);                                     // get size(1)
+  DALI_TEST_EQUALS(size, Vector2(200.0f, 200.0f), 0.001f, TEST_LOCATION);
+
+  // load image
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(); // require to load size(2)
+
+  // reload image
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  visual.GetNaturalSize(size); // get size(2)
+  DALI_TEST_EQUALS(size, Vector2(100.0f, 100.0f), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+
+  END_TEST;
+}
