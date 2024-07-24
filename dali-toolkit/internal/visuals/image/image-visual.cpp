@@ -220,12 +220,12 @@ ImageVisual::~ImageVisual()
       if(mImageUrl.GetProtocolType() == VisualUrl::TEXTURE)
       {
         TextureManager& textureManager = mFactoryCache.GetTextureManager();
-        textureManager.RemoveExternalTexture(mImageUrl.GetUrl());
+        textureManager.RemoveExternalTexture(mImageUrl);
       }
       else if(mImageUrl.IsBufferResource())
       {
         TextureManager& textureManager = mFactoryCache.GetTextureManager();
-        textureManager.RemoveEncodedImageBuffer(mImageUrl.GetUrl());
+        textureManager.RemoveEncodedImageBuffer(mImageUrl);
       }
     }
 
@@ -605,7 +605,7 @@ void ImageVisual::OnInitialize()
   if(mImageUrl.IsValid() && (mImageUrl.IsBufferResource() || mImageUrl.GetProtocolType() == VisualUrl::TEXTURE))
   {
     TextureManager& textureManager = mFactoryCache.GetTextureManager();
-    textureManager.UseExternalResource(mImageUrl.GetUrl());
+    textureManager.UseExternalResource(mImageUrl);
   }
 
   // Generate geometry and shader. Note that we should check AddOn when generate geometry, due to LoadPolicy::IMMEDIATE case

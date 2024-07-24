@@ -564,7 +564,7 @@ void SvgLoader::RemoveLoad(SvgLoader::SvgLoadId loadId)
           if(DALI_LIKELY(Dali::Adaptor::IsAvailable() && mFactoryCache))
           {
             auto& textureManager = mFactoryCache->GetTextureManager();
-            textureManager.RemoveEncodedImageBuffer(loadInfo.mImageUrl.GetUrl());
+            textureManager.RemoveEncodedImageBuffer(loadInfo.mImageUrl);
           }
         }
 
@@ -666,7 +666,7 @@ void SvgLoader::LoadRequest(SvgLoader::SvgLoadInfo& loadInfo, SvgLoaderObserver*
     if(DALI_LIKELY(Dali::Adaptor::IsAvailable() && mFactoryCache))
     {
       auto& textureManager = mFactoryCache->GetTextureManager();
-      encodedImageBuffer   = textureManager.GetEncodedImageBuffer(loadInfo.mImageUrl.GetUrl());
+      encodedImageBuffer   = textureManager.GetEncodedImageBuffer(loadInfo.mImageUrl);
     }
   }
 
@@ -686,7 +686,7 @@ void SvgLoader::LoadSynchronously(SvgLoader::SvgLoadInfo& loadInfo, SvgLoaderObs
     if(DALI_LIKELY(Dali::Adaptor::IsAvailable() && mFactoryCache))
     {
       auto& textureManager = mFactoryCache->GetTextureManager();
-      encodedImageBuffer   = textureManager.GetEncodedImageBuffer(loadInfo.mImageUrl.GetUrl());
+      encodedImageBuffer   = textureManager.GetEncodedImageBuffer(loadInfo.mImageUrl);
     }
   }
 

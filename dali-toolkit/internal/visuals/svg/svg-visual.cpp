@@ -101,7 +101,7 @@ SvgVisual::~SvgVisual()
     if(mImageUrl.IsBufferResource())
     {
       TextureManager& textureManager = mFactoryCache.GetTextureManager();
-      textureManager.RemoveEncodedImageBuffer(mImageUrl.GetUrl());
+      textureManager.RemoveEncodedImageBuffer(mImageUrl);
     }
   }
 }

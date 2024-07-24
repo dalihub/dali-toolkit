@@ -120,7 +120,7 @@ AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
     if(mImageUrl.IsBufferResource())
     {
       TextureManager& textureManager = mFactoryCache.GetTextureManager();
-      textureManager.RemoveEncodedImageBuffer(mImageUrl.GetUrl());
+      textureManager.RemoveEncodedImageBuffer(mImageUrl);
     }
 
     if(mEventCallback)
@@ -433,9 +433,9 @@ void AnimatedVectorImageVisual::OnInitialize(void)
     // EncodedImageBuffer.
     // Reference count will be decreased at destructor of the visual.
     TextureManager& textureManager = mFactoryCache.GetTextureManager();
-    textureManager.UseExternalResource(mImageUrl.GetUrl());
+    textureManager.UseExternalResource(mImageUrl);
 
-    encodedImageBuffer = textureManager.GetEncodedImageBuffer(mImageUrl.GetUrl());
+    encodedImageBuffer = textureManager.GetEncodedImageBuffer(mImageUrl);
   }
 
   mVectorAnimationTask->KeepRasterizedBuffer(mEnableFrameCache);
