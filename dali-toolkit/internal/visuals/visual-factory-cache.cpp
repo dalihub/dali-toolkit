@@ -367,7 +367,7 @@ void VisualFactoryCache::ApplyTextureAndUniforms(Renderer& renderer, int index)
   }
 }
 
-void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size, const bool& rendererIsImage)
+void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size, const bool rendererIsImage)
 {
   bool useDefaultBrokenImage = false;
   if(mBrokenImageInfoContainer.size() == 0)
