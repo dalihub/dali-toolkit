@@ -231,7 +231,7 @@ public:
    *                            If true, we don't need to create new renderer when broken image is single image.
    *                            Most of user experience use normal images. So It can reduce runtime.
    */
-  void UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size, const bool& rendererIsImage = true);
+  void UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size, const bool rendererIsImage = true);
 
   /**
    * @brief Get whether we support YUV Planes load or not.
