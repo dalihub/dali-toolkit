@@ -209,6 +209,7 @@ public:
   {
     SvgLoadInfo(SvgLoadId loadId, const VisualUrl& url, float dpi)
     : mId(loadId),
+      mTask(),
       mImageUrl(url),
       mDpi(dpi),
       mLoadState(LoadState::NOT_STARTED),
@@ -222,9 +223,18 @@ public:
     }
 
     SvgLoadInfo(SvgLoadInfo&& info) noexcept // move constructor
+    : mId(info.mId),
+      mTask(std::move(info.mTask)),
+      mImageUrl(std::move(info.mImageUrl)),
+      mDpi(info.mDpi),
+      mLoadState(info.mLoadState),
+      mVectorImageRenderer(std::move(info.mVectorImageRenderer)),
+      mObservers(std::move(info.mObservers)),
+      mReferenceCount(1u)
     {
-      // Reuse move operator.
-      *this = std::move(info);
+      info.mTask.Reset();
+      info.mVectorImageRenderer.Reset();
+      info.mReferenceCount = 0;
     }
     SvgLoadInfo& operator=(SvgLoadInfo&& info) noexcept // move operator
     {
@@ -246,7 +256,6 @@ public:
 
         info.mTask.Reset();
         info.mVectorImageRenderer.Reset();
-        info.mObservers.Clear();
         info.mReferenceCount = 0;
       }
       return *this;
@@ -279,6 +288,7 @@ public:
   {
     SvgRasterizeInfo(SvgRasterizeId rasterizeId, SvgLoadId loadId, uint32_t width, uint32_t height, bool attemptAtlasing)
     : mId(rasterizeId),
+      mTask(),
       mLoadId(loadId),
       mWidth(width),
       mHeight(height),
@@ -295,9 +305,22 @@ public:
     {
     }
     SvgRasterizeInfo(SvgRasterizeInfo&& info) noexcept // move constructor
+    : mId(info.mId),
+      mTask(std::move(info.mTask)),
+      mLoadId(info.mLoadId),
+      mWidth(info.mWidth),
+      mHeight(info.mHeight),
+      mAttemptAtlasing(info.mAttemptAtlasing),
+      mRasterizeState(info.mRasterizeState),
+      mTextureSet(std::move(info.mTextureSet)),
+      mAtlasRect(std::move(info.mAtlasRect)),
+      mAtlasAttempted(info.mAtlasAttempted),
+      mObservers(std::move(info.mObservers)),
+      mReferenceCount(info.mReferenceCount)
     {
-      // Reuse move operator
-      *this = std::move(info);
+      info.mTask.Reset();
+      info.mTextureSet.Reset();
+      info.mReferenceCount = 0;
     }
     SvgRasterizeInfo& operator=(SvgRasterizeInfo&& info) noexcept // move operator
     {
@@ -322,7 +345,6 @@ public:
 
         info.mTask.Reset();
         info.mTextureSet.Reset();
-        info.mObservers.Clear();
         info.mReferenceCount = 0;
       }
       return *this;
