@@ -1203,7 +1203,9 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
   Extents padding;
   padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
 
-  Vector2 contentSize(size.x - (padding.start + padding.end), size.y - (padding.top + padding.bottom));
+  float width  = std::max(size.x - (padding.start + padding.end), 0.0f);
+  float height = std::max(size.y - (padding.top + padding.bottom), 0.0f);
+  Vector2 contentSize(width, height);
 
   if(mController->IsTextFitArrayEnabled())
   {
