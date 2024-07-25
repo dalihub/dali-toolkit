@@ -23,6 +23,7 @@ namespace Accessibility
       auto bridge = Accessibility::Bridge::GetCurrentBridge();
       Dali::Stage stage = Dali::Stage::GetCurrent();
       auto accessible = Accessibility::Accessible::Get( stage.GetRootLayer() );
+      bridge->ApplicationResumed();
       bridge->AddTopLevelWindow( accessible );
       bridge->SetApplicationName( "TestApp" );
       bridge->Initialize();
