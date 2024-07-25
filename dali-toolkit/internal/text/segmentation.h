@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/text-abstraction/segmentation.h>
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
@@ -41,15 +42,17 @@ class LogicalModel;
  *  - 1 is a LINE_ALLOW_BREAK. Is possible to break the text into a new line.
  *  - 2 is a LINE_NO_BREAK.    Text can't be broken into a new line.
  *
+ * @param[in] segmentation Segmentation to use in this function.
  * @param[in] text Vector of UTF-32 characters.
  * @param[in] startIndex The character from where the break info is set.
  * @param[in] numberOfCharacters The number of characters.
  * @param[out] lineBreakInfo The line break info
  */
-void SetLineBreakInfo(const Vector<Character>& text,
-                      CharacterIndex           startIndex,
-                      Length                   numberOfCharacters,
-                      Vector<LineBreakInfo>&   lineBreakInfo);
+void SetLineBreakInfo(TextAbstraction::Segmentation& segmentation,
+                      const Vector<Character>&       text,
+                      CharacterIndex                 startIndex,
+                      Length                         numberOfCharacters,
+                      Vector<LineBreakInfo>&         lineBreakInfo);
 
 /**
  * Sets word break info.
@@ -57,15 +60,17 @@ void SetLineBreakInfo(const Vector<Character>& text,
  * - 0 is a WORD_BREAK.    Text can be broken into a new word.
  * - 1 is a WORD_NO_BREAK. Text can't be broken into a new word.
  *
+ * @param[in] segmentation Segmentation to use in this function.
  * @param[in] text Vector of UTF-32 characters.
  * @param[in] startIndex The character from where the break info is set.
  * @param[in] numberOfCharacters The number of characters.
  * @param[out] wordBreakInfo The word break info.
  */
-void SetWordBreakInfo(const Vector<Character>& text,
-                      CharacterIndex           startIndex,
-                      Length                   numberOfCharacters,
-                      Vector<WordBreakInfo>&   wordBreakInfo);
+void SetWordBreakInfo(TextAbstraction::Segmentation& segmentation,
+                      const Vector<Character>&       text,
+                      CharacterIndex                 startIndex,
+                      Length                         numberOfCharacters,
+                      Vector<WordBreakInfo>&         wordBreakInfo);
 
 } // namespace Text
 

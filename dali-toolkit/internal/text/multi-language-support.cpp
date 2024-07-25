@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,13 @@ MultilanguageSupport MultilanguageSupport::Get()
   return Internal::MultilanguageSupport::Get();
 }
 
+MultilanguageSupport MultilanguageSupport::New(bool connectLocaleChangedSignal)
+{
+  auto multilanguageSupportImpl = new Internal::MultilanguageSupport(connectLocaleChangedSignal);
+
+  return MultilanguageSupport(multilanguageSupportImpl);
+}
+
 void MultilanguageSupport::SetScripts(const Vector<Character>& text,
                                       CharacterIndex           startIndex,
                                       Length                   numberOfCharacters,
@@ -56,7 +63,8 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
                                       scripts);
 }
 
-void MultilanguageSupport::ValidateFonts(const Vector<Character>&                text,
+void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&            fontClient,
+                                         const Vector<Character>&                text,
                                          const Vector<ScriptRun>&                scripts,
                                          const Vector<FontDescriptionRun>&       fontDescriptions,
                                          const TextAbstraction::FontDescription& defaultFontDescription,
@@ -66,7 +74,8 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
                                          Length                                  numberOfCharacters,
                                          Vector<FontRun>&                        fonts)
 {
-  GetImplementation(*this).ValidateFonts(text,
+  GetImplementation(*this).ValidateFonts(fontClient,
+                                         text,
                                          scripts,
                                          fontDescriptions,
                                          defaultFontDescription,
@@ -75,6 +84,11 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
                                          startIndex,
                                          numberOfCharacters,
                                          fonts);
+}
+
+void MultilanguageSupport::ClearCache()
+{
+  GetImplementation(*this).ClearCache();
 }
 
 } // namespace Text

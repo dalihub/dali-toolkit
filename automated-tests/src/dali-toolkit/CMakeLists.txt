@@ -56,6 +56,7 @@ SET(TC_SOURCES
   utc-Dali-TextField.cpp
   utc-Dali-TextGeometry.cpp
   utc-Dali-TextLabel.cpp
+  utc-Dali-TextLabel-Async.cpp
   utc-Dali-TextSelectionPopup.cpp
   utc-Dali-TextSelectionPopupMirroringLTR.cpp
   utc-Dali-TextSelectionPopupMirroringRTL.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,10 @@ const char* const PROPERTY_NAME_ANCHOR_CLICKED_COLOR = "anchorClickedColor";
 const char* const PROPERTY_NAME_REMOVE_FRONT_INSET    = "removeFrontInset";
 const char* const PROPERTY_NAME_REMOVE_BACK_INSET     = "removeBackInset";
 const char* const PROPERTY_NAME_REMOVE_CUTOUT         = "cutout";
+
+const char* const PROPERTY_NAME_RENDER_MODE           = "renderMode";
+const char* const PROPERTY_NAME_MANUAL_RENDERED       = "manualRendered";
+const char* const PROPERTY_NAME_ASYNC_LINE_COUNT      = "asyncLineCount";
 
 const std::string  DEFAULT_FONT_DIR("/resources/fonts");
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
@@ -367,6 +371,9 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_REMOVE_FRONT_INSET) == DevelTextLabel::Property::REMOVE_FRONT_INSET);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_REMOVE_BACK_INSET) == DevelTextLabel::Property::REMOVE_BACK_INSET);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_REMOVE_CUTOUT) == DevelTextLabel::Property::CUTOUT);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_RENDER_MODE) == DevelTextLabel::Property::RENDER_MODE);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_MANUAL_RENDERED) == DevelTextLabel::Property::MANUAL_RENDERED);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ASYNC_LINE_COUNT) == DevelTextLabel::Property::ASYNC_LINE_COUNT);
 
   END_TEST;
 }
@@ -1047,6 +1054,23 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::CUTOUT));
   label.SetProperty(DevelTextLabel::Property::CUTOUT, true);
   DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::CUTOUT));
+
+  application.SendNotification();
+  application.Render();
+
+  // Check render mode property
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::SYNC);
+  DALI_TEST_EQUALS(label.GetProperty<int>(DevelTextLabel::Property::RENDER_MODE), static_cast<int>(DevelTextLabel::Render::SYNC), TEST_LOCATION);
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
+  DALI_TEST_EQUALS(label.GetProperty<int>(DevelTextLabel::Property::RENDER_MODE), static_cast<int>(DevelTextLabel::Render::ASYNC_AUTO), TEST_LOCATION);
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_MANUAL);
+  DALI_TEST_EQUALS(label.GetProperty<int>(DevelTextLabel::Property::RENDER_MODE), static_cast<int>(DevelTextLabel::Render::ASYNC_MANUAL), TEST_LOCATION);
+
+  // Invalid index
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, 3);
+  DALI_TEST_EQUALS(label.GetProperty<int>(DevelTextLabel::Property::RENDER_MODE), static_cast<int>(DevelTextLabel::Render::SYNC), TEST_LOCATION);
 
   application.SendNotification();
   application.Render();

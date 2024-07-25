@@ -937,6 +937,11 @@ ViewModel* Typesetter::GetViewModel()
   return mModel;
 }
 
+void Typesetter::SetFontClient(TextAbstraction::FontClient& fontClient)
+{
+  mFontClient = fontClient;
+}
+
 PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat)
 {
   Devel::PixelBuffer result = RenderWithPixelBuffer(size, textDirection, behaviour, ignoreHorizontalAlignment, pixelFormat);
@@ -961,7 +966,7 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
   // @todo. This initial implementation for a TextLabel has only one visible page.
 
   // Elides the text if needed.
-  mModel->ElideGlyphs();
+  mModel->ElideGlyphs(mFontClient);
 
   // Retrieves the layout size.
   const Size& layoutSize = mModel->GetLayoutSize();
@@ -1231,7 +1236,6 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t bufferWidth, con
   glyphData.horizontalOffset = 0;
 
   // Get a handle of the font client. Used to retrieve the bitmaps of the glyphs.
-  TextAbstraction::FontClient fontClient  = TextAbstraction::FontClient::Get();
   Length                      hyphenIndex = 0;
 
   const Character* __restrict__ textBuffer                       = mModel->GetTextBuffer();
@@ -1401,7 +1405,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t bufferWidth, con
       {
         // We need to fetch fresh font underline metrics
         FontMetrics fontMetrics;
-        fontClient.GetFontMetrics(glyphInfo->fontId, fontMetrics);
+        mFontClient.GetFontMetrics(glyphInfo->fontId, fontMetrics);
 
         //The currentUnderlinePosition will be used for both Underline and/or Strikethrough
         currentUnderlinePosition = FetchUnderlinePositionFromFontMetrics(fontMetrics);
@@ -1511,12 +1515,12 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const uint32_t bufferWidth, con
 
       if(style != Typesetter::STYLE_UNDERLINE && style != Typesetter::STYLE_STRIKETHROUGH)
       {
-        fontClient.CreateBitmap(glyphInfo->fontId,
-                                glyphInfo->index,
-                                glyphInfo->isItalicRequired,
-                                glyphInfo->isBoldRequired,
-                                glyphData.glyphBitmap,
-                                static_cast<int32_t>(outlineWidth));
+        mFontClient.CreateBitmap(glyphInfo->fontId,
+                                 glyphInfo->index,
+                                 glyphInfo->isItalicRequired,
+                                 glyphInfo->isBoldRequired,
+                                 glyphData.glyphBitmap,
+                                 static_cast<int32_t>(outlineWidth));
       }
 
       // Sets the glyph's bitmap into the bitmap of the whole text.
@@ -1701,8 +1705,11 @@ void Typesetter::SetMaskForImageBuffer(Devel::PixelBuffer& __restrict__ topPixel
 }
 
 Typesetter::Typesetter(const ModelInterface* const model)
-: mModel(new ViewModel(model))
+: mModel(new ViewModel(model)),
+  mFontClient()
 {
+  // Default font client set.
+  mFontClient = TextAbstraction::FontClient::Get();
 }
 
 Typesetter::~Typesetter()

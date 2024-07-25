@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
@@ -325,8 +326,10 @@ public:
    * between the first and last visible lines to add the ellipsis glyph.
    *
    * It stores as well a copy of the positions for each visible glyph.
+   *
+   * @param[in] fontClient FontClient to use in this function to obtain information about the ellipsis glyph.
    */
-  void ElideGlyphs();
+  void ElideGlyphs(TextAbstraction::FontClient& fontClient);
 
   /**
    * @copydoc ModelInterface::GetStrikethroughHeight()

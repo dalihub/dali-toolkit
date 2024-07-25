@@ -22,6 +22,7 @@
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/images/pixel.h>
@@ -90,6 +91,15 @@ public:
    * @return A pointer to the view model.
    */
   ViewModel* GetViewModel();
+
+  /**
+   * @brief Set the font client.
+   *
+   * Set the font client used in the update/render process of the text model.
+   *
+   * @param[in] fontClient The font client used by the Typesetter.
+   */
+  void SetFontClient(TextAbstraction::FontClient& fontClient);
 
   /**
    * @brief Renders the text.
@@ -252,7 +262,8 @@ protected:
   virtual ~Typesetter();
 
 private:
-  ViewModel* mModel;
+  ViewModel*                  mModel;
+  TextAbstraction::FontClient mFontClient;
 };
 
 } // namespace Text

@@ -82,6 +82,10 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
     }
   }
 
+  // Stores raw text including markup tags.
+  // Currently, this raw text cannot be updated when it is editable.
+  impl.mRawText = text;
+
   if(!text.empty())
   {
     ModelPtr&        model        = impl.mModel;

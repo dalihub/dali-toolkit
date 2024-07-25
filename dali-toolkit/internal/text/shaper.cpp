@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <chrono>
 #include <dali/devel-api/text-abstraction/font-client.h>
-#include <dali/devel-api/text-abstraction/shaping.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 
@@ -51,7 +50,9 @@ uint32_t GetMilliSeconds()
 }
 #endif
 
-void ShapeText(const Vector<Character>&     text,
+void ShapeText(TextAbstraction::Shaping&    shaping,
+               TextAbstraction::FontClient& fontClient,
+               const Vector<Character>&     text,
                const Vector<LineBreakInfo>& lineBreakInfo,
                const Vector<ScriptRun>&     scripts,
                const Vector<FontRun>&       fonts,
@@ -95,8 +96,6 @@ void ShapeText(const Vector<Character>&     text,
   // The text needs to be split in chunks of consecutive characters.
   // Each chunk must contain characters with the same font id and script set.
   // A chunk of consecutive characters must not contain a LINE_MUST_BREAK, if there is one a new chunk has to be created.
-
-  TextAbstraction::Shaping shaping = TextAbstraction::Shaping::Get();
 
   // To shape the text a font and an script is needed.
 
@@ -209,7 +208,8 @@ void ShapeText(const Vector<Character>&     text,
 #endif
 
     // Shape the text for the current chunk.
-    const Length numberOfGlyphs = shaping.Shape(textBuffer + previousIndex,
+    const Length numberOfGlyphs = shaping.Shape(fontClient,
+                                                textBuffer + previousIndex,
                                                 (currentIndex - previousIndex), // The number of characters to shape.
                                                 currentFontId,
                                                 currentScript);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -163,7 +163,9 @@ void CreateTextModel(const std::string&                text,
   Vector<LineBreakInfo>& lineBreakInfo = logicalModel->mLineBreakInfo;
   lineBreakInfo.Resize(characterCount);
 
-  SetLineBreakInfo(utf32Characters,
+  TextAbstraction::Segmentation segmentation = TextAbstraction::Segmentation::Get();
+  SetLineBreakInfo(segmentation,
+                   utf32Characters,
                    0u,
                    characterCount,
                    lineBreakInfo);
@@ -182,6 +184,8 @@ void CreateTextModel(const std::string&                text,
     CharacterIndex end                 = characterCount;
     LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
 
+    TextAbstraction::Hyphenation hyphenation = TextAbstraction::Hyphenation::Get();
+
     for(CharacterIndex index = 0; index < end; index++)
     {
       CharacterIndex wordEnd = index;
@@ -195,7 +199,7 @@ void CreateTextModel(const std::string&                text,
         wordEnd++;
       }
 
-      Vector<bool> hyphens = GetWordHyphens(utf32Characters.Begin() + index, wordEnd - index, nullptr);
+      Vector<bool> hyphens = GetWordHyphens(hyphenation, utf32Characters.Begin() + index, wordEnd - index, nullptr);
 
       for(CharacterIndex i = 0; i < (wordEnd - index); i++)
       {
@@ -231,7 +235,8 @@ void CreateTextModel(const std::string&                text,
 
   // Validates the fonts. If there is a character with no assigned font it sets a default one.
   // After this call, fonts are validated.
-  multilanguageSupport.ValidateFonts(utf32Characters,
+  multilanguageSupport.ValidateFonts(fontClient,
+                                     utf32Characters,
                                      scripts,
                                      fontDescriptionRuns,
                                      fontDescription,
@@ -249,7 +254,11 @@ void CreateTextModel(const std::string&                text,
   Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = logicalModel->mBidirectionalParagraphInfo;
 
   // Calculates the bidirectional info for the whole paragraph if it contains right to left scripts.
-  SetBidirectionalInfo(utf32Characters,
+
+  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+
+  SetBidirectionalInfo(bidirectionalSupport,
+                       utf32Characters,
                        scripts,
                        lineBreakInfo,
                        0u,
@@ -265,14 +274,16 @@ void CreateTextModel(const std::string&                text,
   if(0u != bidirectionalInfo.Count())
   {
     // Only set the character directions if there is right to left characters.
-    GetCharactersDirection(bidirectionalInfo,
+    GetCharactersDirection(bidirectionalSupport,
+                           bidirectionalInfo,
                            characterCount,
                            0u,
                            characterCount,
                            characterDirections);
 
     // This paragraph has right to left text. Some characters may need to be mirrored.
-    textMirrored = GetMirroredText(utf32Characters,
+    textMirrored = GetMirroredText(bidirectionalSupport,
+                                   utf32Characters,
                                    characterDirections,
                                    bidirectionalInfo,
                                    0u,
@@ -294,7 +305,11 @@ void CreateTextModel(const std::string&                text,
 
   const Vector<Character>& textToShape = textMirrored ? mirroredUtf32Characters : utf32Characters;
 
-  ShapeText(textToShape,
+  TextAbstraction::Shaping shaping = TextAbstraction::Shaping::Get();
+
+  ShapeText(shaping,
+            fontClient,
+            textToShape,
             lineBreakInfo,
             scripts,
             validFonts,
@@ -344,7 +359,9 @@ void CreateTextModel(const std::string&                text,
   textModel->mHorizontalAlignment   = Text::HorizontalAlignment::BEGIN;
   textModel->mIgnoreSpacesAfterText = true;
   Layout::Parameters layoutParameters(textArea,
-                                      textModel);
+                                      textModel,
+                                      fontClient,
+                                      bidirectionalSupport);
 
   Vector<LineRun>& lines = visualModel->mLines;
 

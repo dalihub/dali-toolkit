@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/singleton-service.h>
-#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
@@ -240,7 +239,7 @@ void DefaultFonts::Cache(const TextAbstraction::FontDescription& description, Fo
   return;
 }
 
-MultilanguageSupport::MultilanguageSupport()
+MultilanguageSupport::MultilanguageSupport(bool connectLocaleChangedSignal)
 : mDefaultFontPerScriptCache(),
   mValidFontsPerScriptCache(),
   mLocale(std::string())
@@ -253,7 +252,7 @@ MultilanguageSupport::MultilanguageSupport()
   // Reserves space to cache the valid fonts and access them with the script as an index.
   mValidFontsPerScriptCache.Resize(TextAbstraction::GetNumberOfScripts(), NULL);
 
-  if(Dali::Adaptor::IsAvailable())
+  if(connectLocaleChangedSignal && Dali::Adaptor::IsAvailable())
   {
     Dali::Adaptor::Get().LocaleChangedSignal().Connect(this, &MultilanguageSupport::OnLocaleChanged);
   }
@@ -582,7 +581,8 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
   }
 }
 
-void MultilanguageSupport::ValidateFonts(const Vector<Character>&                text,
+void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&            fontClient,
+                                         const Vector<Character>&                text,
                                          const Vector<ScriptRun>&                scripts,
                                          const Vector<FontDescriptionRun>&       fontDescriptions,
                                          const TextAbstraction::FontDescription& defaultFontDescription,
@@ -637,9 +637,6 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
   currentFontRun.fontId                          = 0u;
   currentFontRun.isBoldRequired                  = false;
   currentFontRun.isItalicRequired                = false;
-
-  // Get the font client.
-  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
   const Character* const textBuffer = text.Begin();
 

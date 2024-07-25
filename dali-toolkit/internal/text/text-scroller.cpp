@@ -150,8 +150,9 @@ void TextScroller::StopScrolling()
     {
       case TextLabel::AutoScrollStopMode::IMMEDIATE:
       {
-        mIsStop = true;
+        mIsStop = false;
         mScrollAnimation.Stop();
+        mScrollerInterface.ScrollingFinished();
         break;
       }
       case TextLabel::AutoScrollStopMode::FINISH_LOOP:
@@ -281,13 +282,9 @@ void TextScroller::AutoScrollAnimationFinished(Dali::Animation& animation)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextScroller::AutoScrollAnimationFinished\n");
   mIsStop = false;
-  mScrollerInterface.ScrollingFinished();
-
-  // Revert to the original shader and texture after scrolling
-  mRenderer.SetShader(mShader);
-  if(mTextureSet)
+  if(mStopMode == TextLabel::AutoScrollStopMode::FINISH_LOOP)
   {
-    mRenderer.SetTextures(mTextureSet);
+    mScrollerInterface.ScrollingFinished();
   }
 }
 

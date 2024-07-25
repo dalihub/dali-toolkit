@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/text/segmentation.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/text-abstraction/segmentation.h>
 #ifdef DEBUG_ENABLED
 #include <dali/integration-api/debug.h>
 #include <string>
@@ -44,10 +43,11 @@ namespace Toolkit
 {
 namespace Text
 {
-void SetLineBreakInfo(const Vector<Character>& text,
-                      CharacterIndex           startIndex,
-                      Length                   numberOfCharacters,
-                      Vector<LineBreakInfo>&   lineBreakInfo)
+void SetLineBreakInfo(TextAbstraction::Segmentation& segmentation,
+                      const Vector<Character>&       text,
+                      CharacterIndex                 startIndex,
+                      Length                         numberOfCharacters,
+                      Vector<LineBreakInfo>&         lineBreakInfo)
 {
   const Length totalNumberOfCharacters = text.Count();
 
@@ -77,9 +77,9 @@ void SetLineBreakInfo(const Vector<Character>& text,
   }
 
   // Retrieve the line break info.
-  TextAbstraction::Segmentation::Get().GetLineBreakPositions(text.Begin() + startIndex,
-                                                             numberOfCharacters,
-                                                             lineBreakInfoBuffer);
+  segmentation.GetLineBreakPositions(text.Begin() + startIndex,
+                                     numberOfCharacters,
+                                     lineBreakInfoBuffer);
 
   // If the line break info is updated, it needs to be inserted in the model.
   if(updateCurrentBuffer)
@@ -109,10 +109,11 @@ void SetLineBreakInfo(const Vector<Character>& text,
 #endif
 }
 
-void SetWordBreakInfo(const Vector<Character>& text,
-                      CharacterIndex           startIndex,
-                      Length                   numberOfCharacters,
-                      Vector<WordBreakInfo>&   wordBreakInfo)
+void SetWordBreakInfo(TextAbstraction::Segmentation& segmentation,
+                      const Vector<Character>&       text,
+                      CharacterIndex                 startIndex,
+                      Length                         numberOfCharacters,
+                      Vector<WordBreakInfo>&         wordBreakInfo)
 {
   const Length totalNumberOfCharacters = text.Count();
 
@@ -142,9 +143,9 @@ void SetWordBreakInfo(const Vector<Character>& text,
   }
 
   // Retrieve the word break info.
-  TextAbstraction::Segmentation::Get().GetWordBreakPositions(text.Begin() + startIndex,
-                                                             numberOfCharacters,
-                                                             wordBreakInfoBuffer);
+  segmentation.GetWordBreakPositions(text.Begin() + startIndex,
+                                     numberOfCharacters,
+                                     wordBreakInfoBuffer);
 
   // If the word break info is updated, it needs to be inserted in the model.
   if(updateCurrentBuffer)

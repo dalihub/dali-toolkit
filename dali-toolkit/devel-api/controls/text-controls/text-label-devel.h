@@ -30,6 +30,20 @@ namespace Toolkit
 {
 namespace DevelTextLabel
 {
+namespace Render
+{
+/**
+ * @brief Enumerations specifying the render mode of text.
+ */
+enum Mode
+{
+  SYNC = 0,     ///< default, synchronous text loading.
+  ASYNC_AUTO,   ///< automatically requests an asynchronous text load in OnRelayout.
+  ASYNC_MANUAL  ///< users should manually request rendering using the async text method.
+};
+
+} // namespace Render
+
 namespace Property
 {
 enum Type
@@ -236,6 +250,31 @@ enum Type
    * @details Name "cutout", type Property::BOOLEAN.
    */
   CUTOUT,
+
+  /**
+   * @brief The enumerations used to specify whether to render mode of the text.
+   * @details Name "renderMode", type Property::INTEGER.
+   * @note
+   * Render::Mode
+   * SYNC         : default, synchronous text loading.
+   * ASYNC_AUTO   : automatically requests an asynchronous text load in OnRelayout.
+   * ASYNC_MANUAL : users should manually request rendering using the async text method.
+   */
+  RENDER_MODE,
+
+  /**
+   * @brief Whether the last rendering result is a manual render.
+   * @details Name "manualRender", type Property::BOOLEAN.
+   * @note If it's false, the render result was automatically requested by OnRelayout.
+   */
+  MANUAL_RENDERED,
+
+  /**
+   * @brief Number of lines after latest asynchronous computing or rendering of text.
+   * @details Name "asyncLineCount", type Property::INTERGER.
+   * @note This property is read-only.
+   */
+  ASYNC_LINE_COUNT,
 };
 
 } // namespace Property
@@ -358,6 +397,57 @@ DALI_TOOLKIT_API void SetRemoveBackInset(TextLabel textLabel, const bool remove)
 DALI_TOOLKIT_API bool IsRemoveBackInset(TextLabel textLabel);
 
 /**
+ * @brief A method that requests asynchronous rendering of text with a fixed size.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] width The width of text to render.
+ * @param[in] height The height of text to render.
+ */
+DALI_TOOLKIT_API void RequestAsyncRenderWithFixedSize(TextLabel textLabel, float width, float height);
+
+/**
+ * @brief Requests asynchronous text rendering with a fixed width.
+ * The height is determined by the content of the text when rendered with the given width.
+ * The result will be the same as the height returned by GetHeightForWidth.
+ * If the heightConstraint is given, the maximum height will be the heightConstraint.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] width The width of text to render.
+ * @param[in] heightConstraint The maximum available height of text to render.
+ */
+DALI_TOOLKIT_API void RequestAsyncRenderWithFixedWidth(TextLabel textLabel, float width, float heightConstraint);
+
+/**
+ * @brief Requests asynchronous rendering with the maximum available width using the given widthConstraint.
+ *
+ * If the width of the text content is smaller than the widthConstraint, the width will be determined by the width of the text.
+ * If the width of the text content is larger than the widthConstraint, the width will be determined by the widthConstraint.
+ * The height is determined by the content of the text when rendered with the given width.
+ * In this case, the result will be the same as the height returned by GetHeightForWidth.
+ * If the heightConstraint is given, the maximum height will be the heightConstraint.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] widthConstraint The maximum available width of text to render.
+ * @param[in] heightConstraint The maximum available height of text to render.
+ */
+DALI_TOOLKIT_API void RequestAsyncRenderWithConstraint(TextLabel textLabel, float widthConstraint, float heightConstraint);
+
+/**
+ * @brief Requests asynchronous text natural size computation.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ */
+DALI_TOOLKIT_API void RequestAsyncNaturalSize(TextLabel textLabel);
+
+/**
+ * @brief Requests asynchronous computation of the height of the text based on the given width.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] width The width of text to compute.
+ */
+DALI_TOOLKIT_API void RequestAsyncHeightForWidth(TextLabel textLabel, float width);
+
+/**
  * @brief Anchor clicked signal type.
  *
  * @note Signal
@@ -370,6 +460,33 @@ using AnchorClickedSignalType = Signal<void(TextLabel, const char*, uint32_t)>;
  * @brief TextFit property changed signal type.
  */
 using TextFitChangedSignalType = Signal<void(TextLabel)>;
+
+/**
+ * @brief Async text rendered signal type.
+ *
+ * @note Signal
+ *  - float : rendered width.
+ *  - float : rendered height.
+ */
+using AsyncTextRenderedSignalType = Signal<void(TextLabel, float, float)>;
+
+/**
+ * @brief Async natural size computed signal type.
+ *
+ * @note Signal
+ *  - float : computed width.
+ *  - float : computed height.
+ */
+using AsyncNaturalSizeComputedSignalType = Signal<void(TextLabel, float, float)>;
+
+/**
+ * @brief Async height for width computed signal type.
+ *
+ * @note Signal
+ *  - float : computed width.
+ *  - float : computed height.
+ */
+using AsyncHeightForWidthComputedSignalType = Signal<void(TextLabel, float, float)>;
 
 /**
  * @brief This signal is emitted when the anchor is clicked.
@@ -394,6 +511,42 @@ DALI_TOOLKIT_API AnchorClickedSignalType& AnchorClickedSignal(TextLabel textLabe
  * @return The signal to connect to.
  */
 DALI_TOOLKIT_API TextFitChangedSignalType& TextFitChangedSignal(TextLabel textLabel);
+
+/**
+ * @brief This signal is emitted when the async text rendered.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName(TextLabel textLabel);
+ * @endcode
+ * @param[in] textLabel The instance of TextLabel.
+ * @return The signal to connect to.
+ */
+DALI_TOOLKIT_API AsyncTextRenderedSignalType& AsyncTextRenderedSignal(TextLabel textLabel);
+
+/**
+ * @brief This signal is emitted when the async natural size computed.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName(TextLabel textLabel);
+ * @endcode
+ * @param[in] textLabel The instance of TextLabel.
+ * @return The signal to connect to.
+ */
+DALI_TOOLKIT_API AsyncNaturalSizeComputedSignalType& AsyncNaturalSizeComputedSignal(TextLabel textLabel);
+
+/**
+ * @brief This signal is emitted when the async height for width computed.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName(TextLabel textLabel);
+ * @endcode
+ * @param[in] textLabel The instance of TextLabel.
+ * @return The signal to connect to.
+ */
+DALI_TOOLKIT_API AsyncHeightForWidthComputedSignalType& AsyncHeightForWidthComputedSignal(TextLabel textLabel);
 
 } // namespace DevelTextLabel
 

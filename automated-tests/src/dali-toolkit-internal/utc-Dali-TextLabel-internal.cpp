@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <iostream>
 
+#include <toolkit-event-thread-callback.h>
+
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 
@@ -30,6 +32,38 @@
 using namespace Dali;
 using namespace Toolkit;
 using namespace Text;
+
+namespace
+{
+static int   ASYNC_TEXT_THREAD_TIMEOUT = 5;
+
+static bool  gAsyncTextRenderedCalled;
+static float gAsyncTextRenderedWidth;
+static float gAsyncTextRenderedHeight;
+
+struct CallbackFunctor
+{
+  CallbackFunctor(bool* callbackFlag)
+  : mCallbackFlag(callbackFlag)
+  {
+  }
+
+  void operator()()
+  {
+    *mCallbackFlag = true;
+  }
+  bool* mCallbackFlag;
+};
+
+static void TestAsyncTextRendered(TextLabel control, float width, float height)
+{
+  tet_infoline(" TestAsyncTextRendered");
+  gAsyncTextRenderedCalled = true;
+  gAsyncTextRenderedWidth  = width;
+  gAsyncTextRenderedHeight = height;
+}
+
+} // namespace
 
 int UtcDaliTextLabelMarkupUnderline(void)
 {
@@ -1339,10 +1373,10 @@ int UtcDaliTextLabelMarkupSpanCharacterSpacing(void)
   END_TEST;
 }
 
-int UtcDaliTextLabelLocaleChange(void)
+int UtcDaliTextLabelLocaleChange01(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextLabelLocaleChange ");
+  tet_infoline(" UtcDaliTextLabelLocaleChange01");
 
   Adaptor &adaptor = application.GetAdaptor();
   TextLabel textLabel = TextLabel::New();
@@ -1358,6 +1392,125 @@ int UtcDaliTextLabelLocaleChange(void)
   application.Render();
 
   DALI_TEST_EQUALS(newLocale.data(), GetImpl(textLabel).GetLocale(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextLabelLocaleChange02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLabelLocaleChange02");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  float expectedWidth  = 300.0f;
+  float expectedHeight = 300.0f;
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world");
+  label.SetProperty(Actor::Property::SIZE, Vector2(expectedWidth, expectedHeight));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 12);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  application.GetScene().Add(label);
+
+  // Connect to the async text rendered signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
+
+  bool asyncTextRendered = false;
+  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+
+  gAsyncTextRenderedCalled = false;
+  gAsyncTextRenderedWidth  = 0.0f;
+  gAsyncTextRenderedHeight = 0.0f;
+
+  // Request render automatically.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+
+  DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+
+  Adaptor &adaptor = application.GetAdaptor();
+
+  application.SendNotification();
+  application.Render();
+
+  std::string newLocale = "label_TEST";
+  adaptor.LocaleChangedSignal().Emit(newLocale);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(newLocale.data(), GetImpl(label).GetLocale(), TEST_LOCATION);
+
+  // dummy text for test.
+  TextLabel dummy1 = TextLabel::New();
+  DALI_TEST_CHECK(dummy1);
+  dummy1.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_MANUAL);
+  dummy1.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
+  dummy1.SetProperty(TextLabel::Property::POINT_SIZE, 20);
+  dummy1.SetProperty(TextLabel::Property::MULTI_LINE, true);
+
+  TextLabel dummy2 = TextLabel::New();
+  DALI_TEST_CHECK(dummy2);
+  dummy2.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_MANUAL);
+  dummy2.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
+  dummy2.SetProperty(TextLabel::Property::POINT_SIZE, 20);
+  dummy2.SetProperty(TextLabel::Property::MULTI_LINE, true);
+
+  asyncTextRendered        = false;
+  gAsyncTextRenderedCalled = false;
+  gAsyncTextRenderedWidth  = 0.0f;
+  gAsyncTextRenderedHeight = 0.0f;
+
+  expectedWidth   = 200.0f;
+  expectedHeight  = 200.0f;
+  float dummySize = 100.0f;
+
+  std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+  dummy1.SetProperty(TextLabel::Property::TEXT, text);
+  dummy2.SetProperty(TextLabel::Property::TEXT, text);
+  label.SetProperty(TextLabel::Property::TEXT, text);
+
+  // Request size computation, due to dummy's requests, text manager's loader queue is full.
+  DevelTextLabel::RequestAsyncNaturalSize(dummy1);
+  DevelTextLabel::RequestAsyncHeightForWidth(dummy1, dummySize);
+  DevelTextLabel::RequestAsyncNaturalSize(dummy2);
+  DevelTextLabel::RequestAsyncHeightForWidth(dummy2, dummySize);
+
+  // Request render.
+  DevelTextLabel::RequestAsyncRenderWithFixedSize(label, expectedWidth, expectedHeight);
+
+  newLocale = "label_TEST_2";
+  adaptor.LocaleChangedSignal().Emit(newLocale);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(5, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+
+  DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(newLocale.data(), GetImpl(label).GetLocale(), TEST_LOCATION);
 
   END_TEST;
 }
