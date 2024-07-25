@@ -230,7 +230,7 @@ public:
       mLoadState(info.mLoadState),
       mVectorImageRenderer(std::move(info.mVectorImageRenderer)),
       mObservers(std::move(info.mObservers)),
-      mReferenceCount(1u)
+      mReferenceCount(info.mReferenceCount)
     {
       info.mTask.Reset();
       info.mVectorImageRenderer.Reset();
