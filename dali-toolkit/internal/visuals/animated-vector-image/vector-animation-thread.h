@@ -103,6 +103,18 @@ protected:
 
 private:
   /**
+   * @brief Move given tasks to mAnimationTasks if required.
+   * @return True if task added. False if not.
+   */
+  bool MoveTasksToAnimation(VectorAnimationTaskPtr task, bool useCurrentTime);
+
+  /**
+   * @brief Move given tasks to mCompletedTasks if required.
+   */
+  void MoveTasksToCompleted(VectorAnimationTaskPtr task, bool keepAnimation);
+
+private:
+  /**
    * @brief Rasterizes the tasks.
    */
   void Rasterize();
@@ -204,14 +216,20 @@ private:
   VectorAnimationThread& operator=(const VectorAnimationThread& thread) = delete;
 
 private:
-  std::vector<VectorAnimationTaskPtr>             mAnimationTasks;
-  std::vector<VectorAnimationTaskPtr>             mCompletedTasks;
-  std::vector<VectorAnimationTaskPtr>             mWorkingTasks;
+  std::vector<VectorAnimationTaskPtr> mAnimationTasks; ///< Animation processing tasks, ordered by next frame time.
+  std::vector<VectorAnimationTaskPtr> mCompletedTasks; ///< Temperal storage for completed tasks.
+  std::vector<VectorAnimationTaskPtr> mWorkingTasks;
+
+  std::vector<std::pair<VectorAnimationTaskPtr, bool>> mCompletedTasksQueue; ///< Queue of completed tasks from worker thread. pair of task, and rasterize required.
+                                                                             ///< It will be moved at begin of Rasterize().
+
   RoundRobinContainerView<RasterizeHelper>        mRasterizers;
   std::vector<std::pair<CallbackBase*, uint32_t>> mTriggerEventCallbacks{}; // Callbacks are not owned
   SleepThread                                     mSleepThread;
   ConditionalWait                                 mConditionalWait;
   Mutex                                           mEventTriggerMutex;
+  Mutex                                           mAnimationTasksMutex; ///< Mutex to change + get mAnimationTasks from event thread
+  Mutex                                           mTaskCompletedMutex;  ///< Mutex to collect completed tasks to mCompletedTasksQueue from worker threads
   std::unique_ptr<EventThreadCallback>            mEventTrigger{};
   const Dali::LogFactoryInterface&                mLogFactory;
 
