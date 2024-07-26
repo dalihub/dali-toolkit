@@ -90,11 +90,28 @@ public:
    */
   void RemoveEventTriggerCallbacks(CallbackBase* callback);
 
+  /**
+   * @brief Request to event callback from rasterize thread. This is called when we want to ensure rendering next frame.
+   */
+  void RequestForceRenderOnce();
+
 protected:
   /**
    * @brief The entry function of the animation thread.
    */
   void Run() override;
+
+private:
+  /**
+   * @brief Move given tasks to mAnimationTasks if required.
+   * @return True if task added. False if not.
+   */
+  bool MoveTasksToAnimation(VectorAnimationTaskPtr task, bool useCurrentTime);
+
+  /**
+   * @brief Move given tasks to mCompletedTasks if required.
+   */
+  void MoveTasksToCompleted(VectorAnimationTaskPtr task, bool keepAnimation);
 
 private:
   /**
@@ -149,8 +166,9 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> mSleepTimePoint;
     const Dali::LogFactoryInterface&                   mLogFactory;
     const Dali::TraceFactoryInterface&                 mTraceFactory;
-    bool                                               mNeedToSleep;
-    bool                                               mDestroyThread;
+
+    bool mNeedToSleep : 1;
+    bool mDestroyThread : 1;
   };
 
 private:
@@ -161,20 +179,28 @@ private:
   VectorAnimationThread& operator=(const VectorAnimationThread& thread) = delete;
 
 private:
-  std::vector<VectorAnimationTaskPtr>             mAnimationTasks;
-  std::vector<VectorAnimationTaskPtr>             mCompletedTasks;
-  std::vector<VectorAnimationTaskPtr>             mWorkingTasks;
+  std::vector<VectorAnimationTaskPtr> mAnimationTasks; ///< Animation processing tasks, ordered by next frame time.
+  std::vector<VectorAnimationTaskPtr> mCompletedTasks; ///< Temperal storage for completed tasks.
+  std::vector<VectorAnimationTaskPtr> mWorkingTasks;
+
+  std::vector<std::pair<VectorAnimationTaskPtr, bool>> mCompletedTasksQueue; ///< Queue of completed tasks from worker thread. pair of task, and rasterize required.
+                                                                             ///< It will be moved at begin of Rasterize().
+
   std::vector<std::pair<CallbackBase*, uint32_t>> mTriggerEventCallbacks{}; // Callbacks are not owned
   SleepThread                                     mSleepThread;
   ConditionalWait                                 mConditionalWait;
   Mutex                                           mEventTriggerMutex;
+  Mutex                                           mAnimationTasksMutex; ///< Mutex to change + get mAnimationTasks from event thread
+  Mutex                                           mTaskCompletedMutex;  ///< Mutex to collect completed tasks to mCompletedTasksQueue from worker threads
   std::unique_ptr<EventThreadCallback>            mEventTrigger{};
-  bool                                            mNeedToSleep;
-  bool                                            mDestroyThread;
-  bool                                            mEventTriggered{false};
   const Dali::LogFactoryInterface&                mLogFactory;
   const Dali::TraceFactoryInterface&              mTraceFactory;
   Dali::AsyncTaskManager                          mAsyncTaskManager;
+
+  bool mNeedToSleep : 1;
+  bool mDestroyThread : 1;
+  bool mEventTriggered : 1;
+  bool mForceRenderOnce : 1;
 };
 
 } // namespace Internal

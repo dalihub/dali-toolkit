@@ -108,6 +108,7 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mLayerInfoCached(false),
   mMarkerInfoCached(false),
   mEnableFrameCache(false),
+  mNotifyAfterRasterization(false),
   mSizeUpdated(false)
 {
   mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
@@ -138,11 +139,6 @@ void VectorAnimationTask::Finalize()
     {
       mVectorAnimationThread.RemoveEventTriggerCallbacks(mAnimationFinishedCallback.get());
       mAnimationFinishedCallback.reset();
-    }
-    if(mForceRenderOnceCallback)
-    {
-      mVectorAnimationThread.RemoveEventTriggerCallbacks(mForceRenderOnceCallback.get());
-      mForceRenderOnceCallback.reset();
     }
     if(mLoadCompletedCallback)
     {
@@ -393,12 +389,6 @@ void VectorAnimationTask::SetAnimationFinishedCallback(CallbackBase* callback)
 {
   Mutex::ScopedLock lock(mMutex);
   mAnimationFinishedCallback = std::unique_ptr<CallbackBase>(callback);
-}
-
-void VectorAnimationTask::SetForceRenderOnceCallback(CallbackBase* callback)
-{
-  Mutex::ScopedLock lock(mMutex);
-  mForceRenderOnceCallback = std::unique_ptr<CallbackBase>(callback);
 }
 
 void VectorAnimationTask::SetLoopCount(int32_t count)
@@ -747,13 +737,10 @@ bool VectorAnimationTask::Rasterize()
   }
 
   // Forcely trigger render once if need.
-  if(mNeedForceRenderOnceTrigger)
+  if(mNotifyAfterRasterization || mNeedForceRenderOnceTrigger)
   {
     Mutex::ScopedLock lock(mMutex);
-    if(mForceRenderOnceCallback)
-    {
-      mVectorAnimationThread.AddEventTriggerCallback(mForceRenderOnceCallback.get(), mAppliedPlayStateId);
-    }
+    mVectorAnimationThread.RequestForceRenderOnce();
     mNeedForceRenderOnceTrigger = false;
   }
 
@@ -889,6 +876,11 @@ void VectorAnimationTask::ApplyAnimationData()
     if(animationData.resendFlag & VectorAnimationTask::RESEND_CURRENT_FRAME)
     {
       SetCurrentFrameNumber(animationData.currentFrame);
+    }
+
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_NOTIFY_AFTER_RASTERIZATION)
+    {
+      mNotifyAfterRasterization = animationData.notifyAfterRasterization;
     }
 
     if(animationData.resendFlag & VectorAnimationTask::RESEND_NEED_RESOURCE_READY)
