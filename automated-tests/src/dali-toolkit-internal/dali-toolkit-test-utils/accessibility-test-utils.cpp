@@ -23,6 +23,7 @@ namespace Accessibility
       auto bridge = Accessibility::Bridge::GetCurrentBridge();
       Dali::Stage stage = Dali::Stage::GetCurrent();
       auto accessible = Accessibility::Accessible::Get( stage.GetRootLayer() );
+      bridge->ApplicationResumed();
       bridge->AddTopLevelWindow( accessible );
       bridge->SetApplicationName( "TestApp" );
       bridge->Initialize();
@@ -53,9 +54,6 @@ namespace Accessibility
           return reply;
       };
       wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible/root", "org.a11y.atspi.Socket", "Unembed", MethodType::Method}] = [wr](const MessagePtr &m) -> MessagePtr {
-          return wr->newReplyMessage(m);
-      };
-      wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible/root", "org.a11y.atspi.Socket", "Embedded", MethodType::Method}] = [wr](const MessagePtr &m) -> MessagePtr {
           return wr->newReplyMessage(m);
       };
       wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "PropertyChange", MethodType::Method}] =
