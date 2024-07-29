@@ -455,6 +455,12 @@ private:
    */
   bool OnTimeOut();
 
+  /**
+   * @brief OffScene Callback of camera actor to check whether the SceneView has valid camera or not.
+   * @param[in] actor Disconnected Camera.
+   */
+  void OnCameraDisconnected(Dali::Actor actor);
+
 private:
   /**
    * Data to store Capture related objects.

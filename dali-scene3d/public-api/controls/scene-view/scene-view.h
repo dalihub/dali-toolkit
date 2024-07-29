@@ -321,6 +321,7 @@ public:
    *
    * @SINCE_2_1.38
    * @param[in] index Index of CameraActor to be used as a selected camera.
+   * @note If the Camera is not added in this Scene, this method adds it on SceneView root.
    */
   void SelectCamera(uint32_t index);
 
@@ -329,6 +330,7 @@ public:
    *
    * @SINCE_2_1.38
    * @param[in] name string keyword of CameraActor to be used as a selected camera.
+   * @note If the Camera is not added in this Scene, this method adds it on SceneView root.
    */
   void SelectCamera(const std::string& name);
 

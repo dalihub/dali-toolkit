@@ -1491,3 +1491,57 @@ int UtcDaliSceneViewCapture02(void)
 
   END_TEST;
 }
+
+int UtcDaliSceneViewSelectCamera(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  application.GetScene().Add(view);
+
+  CameraActor camera1 = CameraActor::New3DCamera();
+  camera1.SetProperty(Dali::Actor::Property::NAME, "camera1");
+  view.AddCamera(camera1);
+  DALI_TEST_CHECK(!camera1.GetParent());
+  view.SelectCamera("camera1");
+  DALI_TEST_CHECK(camera1.GetParent());
+  DALI_TEST_EQUALS(camera1, view.GetSelectedCamera(), TEST_LOCATION);
+
+  CameraActor camera2 = CameraActor::New3DCamera();
+  camera2.SetProperty(Dali::Actor::Property::NAME, "camera2");
+  view.AddCamera(camera2);
+  DALI_TEST_CHECK(!camera2.GetParent());
+  view.SelectCamera("camera2");
+  DALI_TEST_EQUALS(camera2, view.GetSelectedCamera(), TEST_LOCATION);
+  DALI_TEST_CHECK(camera2.GetParent());
+  DALI_TEST_CHECK(camera1.GetParent());
+  DALI_TEST_EQUALS(camera1.GetParent(), camera2.GetParent(), TEST_LOCATION);
+
+  Scene3D::Model model = Scene3D::Model::New();
+  view.Add(model);
+  model.Add(camera1);
+  DALI_TEST_EQUALS(camera1.GetParent(), model, TEST_LOCATION);
+  view.SelectCamera("camera1");
+  DALI_TEST_EQUALS(camera1, view.GetSelectedCamera(), TEST_LOCATION);
+  DALI_TEST_CHECK(camera1.GetParent());
+  DALI_TEST_CHECK(camera2.GetParent());
+  DALI_TEST_EQUALS(camera1.GetParent(), model, TEST_LOCATION);
+
+  model.Unparent();
+  view.SelectCamera("camera1");
+  DALI_TEST_EQUALS(camera1, view.GetSelectedCamera(), TEST_LOCATION);
+  DALI_TEST_CHECK(camera1.GetParent());
+  DALI_TEST_CHECK(camera2.GetParent());
+  DALI_TEST_EQUALS(camera1.GetParent(), camera2.GetParent(), TEST_LOCATION);
+
+  camera1.Unparent();
+
+  application.SendNotification();
+  application.Render(0);
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_NOT_EQUALS(camera1, view.GetSelectedCamera(), 0.01f, TEST_LOCATION);
+
+  END_TEST;
+}
