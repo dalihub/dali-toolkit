@@ -4325,26 +4325,36 @@ int UtcDaliImageVisualSynchronousSizing01(void)
 
   application.GetScene().Add(imageView);
 
-  // Wait for image loading(1)
+  // load image as size 0x0 (Since we cannot ensure the size of actor yet)
   // (Texture size is its original size, not the actor size.)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-  application.SendNotification();
-  application.Render();
 
-  DALI_TEST_EQUALS(imageView.GetRendererCount(), 1u, TEST_LOCATION);
-
-  // Set size again
-  imageView.SetProperty(Actor::Property::SIZE, size);
-
-  // Wait for image loading(2)
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  // Check (reloaded image texture size == actor size)
+  // Check (current image texture size != actor size)
   Renderer   renderer = imageView.GetRendererAt(0);
   TextureSet textures = renderer.GetTextures();
   DALI_TEST_EQUALS(textures.GetTextureCount(), 1u, TEST_LOCATION);
 
   Texture texture = textures.GetTexture(0);
+  DALI_TEST_EQUALS(texture.GetWidth(), 128u, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetHeight(), 128u, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(imageView.GetRendererCount(), 1u, TEST_LOCATION);
+
+  // load image as size 200x200 (Now we can ensure the size of actor is 200x200)
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Set size again
+  imageView.SetProperty(Actor::Property::SIZE, size);
+
+  // Check (reloaded image texture size == actor size)
+  renderer = imageView.GetRendererAt(0);
+  textures = renderer.GetTextures();
+  DALI_TEST_EQUALS(textures.GetTextureCount(), 1u, TEST_LOCATION);
+
+  texture = textures.GetTexture(0);
   DALI_TEST_EQUALS(texture.GetWidth(), width, TEST_LOCATION);
   DALI_TEST_EQUALS(texture.GetHeight(), height, TEST_LOCATION);
 
@@ -4381,18 +4391,24 @@ int UtcDaliImageVisualSynchronousSizing02(void)
   DALI_TEST_EQUALS(actor.IsResourceReady(), false, TEST_LOCATION);
 
   application.GetScene().Add(actor);
+
+  // load image as size 0x0 (Since we cannot ensure the size of actor yet)
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification(); // require to load size(1)
+
+  // load image as size 200x200 (Now we can ensure the size of actor is 200x200)
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
   application.SendNotification();
-  application.Render(); // require to load size(1)
+  application.Render();
 
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f)); // set size(2), no renderer yet
   visual.GetNaturalSize(size);                                     // get size(1)
   DALI_TEST_EQUALS(size, Vector2(200.0f, 200.0f), 0.001f, TEST_LOCATION);
 
-  // load image
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render(); // require to load size(2)
+  application.SendNotification(); // require to load size(2)
+  application.Render();
 
   // reload image
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
@@ -4402,6 +4418,94 @@ int UtcDaliImageVisualSynchronousSizing02(void)
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualSynchronousSizing03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliImageVisualSynchronousSizing03");
+
+  Property::Map imagePropertyMap;
+  imagePropertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
+  imagePropertyMap.Insert(Toolkit::ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  imagePropertyMap.Insert("synchronousSizing", true);
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Visual::Base visual1 = factory.CreateVisual(imagePropertyMap); // Create duplicated visuals, to check whether cache system works well.
+  Visual::Base visual2 = factory.CreateVisual(imagePropertyMap);
+  Visual::Base visual3 = factory.CreateVisual(imagePropertyMap);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual1);
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 2, visual2);
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 3, visual3);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f)); // set size(1), no renderer yet
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), false, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  // load image as size 0x0 (Since we cannot ensure the size of actor yet)
+  // NOTE : This behavior might be changed in future.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+
+  application.SendNotification(); // require to load size(1)
+
+  // load image as size 200x200 (Now we can ensure the size of actor is 200x200)
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 2, TEST_LOCATION);
+
+  textureTrace.Reset();
+
+  // Unparent and Add again. Check whether the texture is cached.
+  actor.Unparent();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 0, TEST_LOCATION);
+
+  textureTrace.Reset();
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f)); // set size(2)
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 0, TEST_LOCATION);
+
+  application.SendNotification(); // require to load size(2)
+
+  // load image as size 100x100 (Now we can ensure the size of actor is 100x100)
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 1, TEST_LOCATION);
 
   END_TEST;
 }

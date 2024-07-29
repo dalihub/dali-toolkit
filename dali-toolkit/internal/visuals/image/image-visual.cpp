@@ -128,6 +128,7 @@ const NameIndexMatch NAME_INDEX_MATCH_TABLE[] =
     {RELEASE_POLICY_NAME, Toolkit::ImageVisual::Property::RELEASE_POLICY},
     {ORIENTATION_CORRECTION_NAME, Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION},
     {FAST_TRACK_UPLOADING_NAME, Toolkit::DevelImageVisual::Property::FAST_TRACK_UPLOADING},
+    {SYNCHRONOUS_SIZING, Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING},
 };
 const int NAME_INDEX_MATCH_TABLE_SIZE = sizeof(NAME_INDEX_MATCH_TABLE) / sizeof(NAME_INDEX_MATCH_TABLE[0]);
 
@@ -264,9 +265,8 @@ void ImageVisual::DoSetProperties(const Property::Map& propertyMap)
   // Load image immediately if LOAD_POLICY requires it
   if(mLoadPolicy == Toolkit::ImageVisual::LoadPolicy::IMMEDIATE)
   {
-    Dali::ImageDimensions size            = mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize;
-    auto                  attemptAtlasing = AttemptAtlasing();
-    LoadTexture(attemptAtlasing, mAtlasRect, mTextures, size, TextureManager::ReloadPolicy::CACHED);
+    auto attemptAtlasing = AttemptAtlasing();
+    LoadTexture(attemptAtlasing, mAtlasRect, mTextures, mDesiredSize, TextureManager::ReloadPolicy::CACHED);
   }
 }
 
@@ -794,7 +794,7 @@ void ImageVisual::InitializeRenderer()
   {
     if(mTextureId == TextureManager::INVALID_TEXTURE_ID)
     {
-      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, mDesiredSize, TextureManager::ReloadPolicy::CACHED);
+      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize, TextureManager::ReloadPolicy::CACHED);
     }
     else
     {
@@ -1000,6 +1000,9 @@ void ImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::P
       ResourceReady(Toolkit::Visual::ResourceStatus::PREPARING);
       mLoadState = TextureManager::LoadState::NOT_STARTED;
 
+      // Need to reset textureset after change load state.
+      mTextures.Reset();
+
       Dali::ImageDimensions size = mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize;
       LoadTexture(attemptAtlasing, mAtlasRect, mTextures, size, TextureManager::ReloadPolicy::FORCED);
       break;
@@ -1029,10 +1032,13 @@ void ImageVisual::OnSetTransform()
     if(mLastRequiredSize != visualSize)
     {
       RemoveTexture();
+      mLoadState = TextureManager::LoadState::NOT_STARTED;
 
-      mLoadState           = TextureManager::LoadState::NOT_STARTED;
+      // Need to reset textureset after change load state.
+      mTextures.Reset();
+
       bool attemptAtlasing = AttemptAtlasing();
-      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, visualSize, TextureManager::ReloadPolicy::FORCED);
+      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, visualSize, TextureManager::ReloadPolicy::CACHED);
     }
   }
 }
@@ -1428,6 +1434,9 @@ void ImageVisual::ResetRenderer()
   ComputeTextureSize();
 
   mLoadState = TextureManager::LoadState::NOT_STARTED;
+
+  // Need to reset textureset after change load state.
+  mTextures.Reset();
 }
 
 void ImageVisual::ShowBrokenImage()
