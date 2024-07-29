@@ -302,7 +302,7 @@ void TextVisual::OnInitialize()
 {
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
   auto featureBuilder = TextVisualShaderFeature::FeatureBuilder();
-  Shader   shader   = GetTextShader(mFactoryCache, featureBuilder);
+  Shader shader = GetTextShader(mFactoryCache, featureBuilder);
 
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);

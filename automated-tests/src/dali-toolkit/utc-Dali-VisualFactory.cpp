@@ -54,6 +54,15 @@ const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 // resolution: 34*34, pixel format: RGBA8888
 static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
 
+// custom shader
+static const char* VertexSource =
+  "This is a custom vertex shader\n"
+  "made on purpose to look nothing like a normal vertex shader inside dali\n";
+
+static const char* FragmentSource =
+  "This is a custom fragment shader\n"
+  "made on purpose to look nothing like a normal fragment shader inside dali\n";
+
 Property::Map DefaultTransform()
 {
   Property::Map transformMap;
@@ -2890,10 +2899,10 @@ int UtcDaliVisualFactorySetGetDefaultCreationOptions(void)
   END_TEST;
 }
 
-int UtcDaliVisualFactoryGetPreCompiler(void)
+int UtcDaliVisualFactoryUsePreCompiledShader(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliVisualFactoryGetAnimatedImageVisual2: Request animated image visual with a Property::Map, test custom wrap mode and pixel area");
+  tet_infoline("UtcDaliVisualFactoryUsePreCompiledShader: Test a UsePreCompiledShader fucntion");
 
   std::vector<RawShaderData> precompiledShaderList;
   DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // before Get Shader
@@ -2902,6 +2911,73 @@ int UtcDaliVisualFactoryGetPreCompiler(void)
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
+
+  Property::Map imageShader;
+  imageShader["shaderType"]   = "image";
+  imageShader["shaderOption"] = Property::Map().Add("YUV_AND_RGB", true);
+  imageShader["shaderName"]   = "IMAGE_SHADER_YUV_AND_RGB";
+
+  Property::Map imageShader2;
+  imageShader2["shaderType"]   = "image";
+  imageShader2["shaderOption"] = Property::Map()
+                                    .Add("ROUNDED_CORNER", true)
+                                    .Add("BORDERLINE", true)
+                                    .Add("MASKING", true);
+
+  Property::Map imageShader3;
+  imageShader3["shaderType"]   = "image";
+  imageShader3["shaderOption"] = Property::Map().Add("YUV_TO_RGB", true);
+
+  Property::Map imageShader4;
+  imageShader4["shaderType"]   = "image";
+  imageShader4["shaderOption"] = Property::Map().Add("ATLAS_DEFAULT", true);
+
+  Property::Map imageShader5;
+  imageShader5["shaderType"]   = "image";
+  imageShader5["shaderOption"] = Property::Map().Add("ATLAS_CUSTOM", true);
+
+  Property::Map textShader;
+  textShader["shaderType"]   = "text";
+  textShader["shaderOption"] = Property::Map()
+                                    .Add("MULTI_COLOR", true)
+                                    .Add("OVERLAY", true)
+                                    .Add("STYLES", true);
+
+  Property::Map textShader2;
+  textShader2["shaderType"]   = "text";
+  textShader2["shaderOption"] = Property::Map()
+                                    .Add("EMOJI", true);
+
+  Property::Map colorShader;
+  colorShader["shaderType"]   = "color";
+  colorShader["shaderOption"] = Property::Map()
+                                    .Add("CUTOUT", true)
+                                    .Add("BORDERLINE", true);
+
+  Property::Map colorShader2;
+  colorShader2["shaderType"]   = "color";
+  colorShader2["shaderOption"] = Property::Map()
+                                    .Add("ROUNDED_CORNER,", true)
+                                    .Add("BLUR_EDGE", true);
+
+
+  Property::Map customSHader;
+  customSHader["shaderType"]   = "custom";
+  customSHader["shaderName"]   = "myShader";
+  customSHader["vertexShader"] = VertexSource;
+  customSHader["fragmentShader"] = FragmentSource;
+
+  factory.AddPrecompileShader(imageShader);
+  factory.AddPrecompileShader(imageShader); // use same shader, because check line coverage
+  factory.AddPrecompileShader(imageShader2);
+  factory.AddPrecompileShader(imageShader3);
+  factory.AddPrecompileShader(imageShader4);
+  factory.AddPrecompileShader(imageShader5);
+  factory.AddPrecompileShader(textShader);
+  factory.AddPrecompileShader(textShader2);
+  factory.AddPrecompileShader(colorShader);
+  factory.AddPrecompileShader(colorShader2);
+  factory.AddPrecompileShader(customSHader);
 
   factory.UsePreCompiledShader();
 

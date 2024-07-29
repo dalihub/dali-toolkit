@@ -175,6 +175,61 @@ public:
   void DiscardVisual(Visual::Base visual);
 
   /**
+   * @brief Adds a list of pre-compiled shaders to the visual factory.
+   *
+   * This function allows you to add the desired precompile shader to the list.
+   * you can set it through PropertyMap.
+   * you need to know the values for setting well to use them, so please refer to the explanation below.
+   *
+   * shaderType: Set the desired shader type. dali provides these type: "image","text","color","3d" and "custom"
+   * shaderOption: Set the desired shader option. dali provides these flag: dali provides a lot of shader options, so user need to check proper shader option.
+   * vertexShader: Set the vertext shader that user want. this is for custom shader.
+   * fragmentShader: Set the fragment shader that user want. this is for custom shader.
+   * shaderName: if user want to set shader name, use this. this is for custom shader.(optional)
+   *
+   *(example)
+   * // Precompile image and Custom shader
+   * // Image Case
+   *   Property::Map imageShader;
+   *   imageShader["shaderType"]   = "image";
+   *   imageShader["shaderOption"] = Property::Map().Add("YUV_AND_RGB", true);
+   *   imageShader["shaderName"]   = "IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB";
+   *
+   * // Text Case
+   *   Property::Map textShader;
+   *   textShader["shaderType"]   = "text";
+   *   textShader["shaderOption"] = Property::Map()
+   *                                       .Add("MULTI_COLOR", true)
+   *                                       .Add("OVERLAY", true);
+   * // Color Case
+   *   Property::Map colorShader;
+   *   colorShader["shaderType"]   = "color";
+   *   colorShader["shaderOption"] = Property::Map()
+   *                                   .Add("CUTOUT", true)
+   *                                   .Add("BORDERLINE", true);
+   * // Custom Case
+   *   Property::Map customShader;
+   *   customShader["shaderType"]      = "custom";
+   *   customShader["vertexShader"]    = "..."; // input vertexShader code
+   *   customShader["fragementShader"] = "..."; // input fragementShader code
+   *   customShader["shaderName"]      = "MyCustomShader";
+   *
+   *   // Add to Precompile Shader
+   *   VisualFactory factory = VisualFactory::Get();
+   *   factory.AddPrecompileShader(imageShader);
+   *   factory.AddPrecompileShader(textShader);
+   *   factory.AddPrecompileShader(colorShader);
+   *   factory.AddPrecompileShader(customShader);
+   *   factory.UsePreCompiledShader();
+   *
+   *  If you want to detail information about shader option. please refer to precompil-shader-option.h.
+   *
+   *  @param[in] map The shader information for precompile
+   *  @return True if shader is successfully added to the precompiled list, false otherwise.
+   */
+  bool AddPrecompileShader(const Property::Map& map);
+
+  /**
    * @brief Compile the visual shader in advance. Afterwards,
    * when a visual using a new shader is requested, the pre-compiled shader is used.
    *

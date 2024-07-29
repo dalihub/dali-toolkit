@@ -38,6 +38,7 @@
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
+#include <dali-toolkit/internal/visuals/custom-shader-factory.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
@@ -417,6 +418,19 @@ void VisualFactory::DiscardVisual(Toolkit::Visual::Base visual)
   RegisterDiscardCallback();
 }
 
+bool VisualFactory::AddPrecompileShader(const Property::Map& map)
+{
+  PrecompileShaderOption shaderOption(map);
+  auto type = shaderOption.GetShaderType();
+  if(type == PrecompileShaderOption::ShaderType::UNKNOWN)
+  {
+    DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader type");
+    return false;
+  }
+
+  return AddPrecompileShader(shaderOption);
+}
+
 void VisualFactory::UsePreCompiledShader()
 {
   if(mPrecompiledShaderRequested)
@@ -426,8 +440,6 @@ void VisualFactory::UsePreCompiledShader()
   mPrecompiledShaderRequested = true;
 
   ShaderPreCompiler::Get().Enable();
-
-  // To DO : Create all visual shader factory here.
 
   // Get image shader
   std::vector<RawShaderData> rawShaderList;
@@ -444,6 +456,12 @@ void VisualFactory::UsePreCompiledShader()
   RawShaderData colorShaderData;
   GetColorVisualShaderFactory().GetPreCompiledShader(colorShaderData);
   rawShaderList.push_back(colorShaderData);
+
+  // Get 3D shader
+  // Get Custom shader
+  RawShaderData customShaderData;
+  GetCustomShaderFactory().GetPreCompiledShader(customShaderData);
+  rawShaderList.push_back(customShaderData);
 
   // Save all shader
   ShaderPreCompiler::Get().SavePreCompileShaderList(rawShaderList);
@@ -521,6 +539,56 @@ ColorVisualShaderFactory& VisualFactory::GetColorVisualShaderFactory()
     mColorVisualShaderFactory = std::unique_ptr<ColorVisualShaderFactory>(new ColorVisualShaderFactory());
   }
   return *mColorVisualShaderFactory;
+}
+
+CustomShaderFactory& VisualFactory::GetCustomShaderFactory()
+{
+  if(!mCustomShaderFactory)
+  {
+    mCustomShaderFactory = std::unique_ptr<CustomShaderFactory>(new CustomShaderFactory());
+  }
+  return *mCustomShaderFactory;
+}
+
+bool VisualFactory::AddPrecompileShader(PrecompileShaderOption& option)
+{
+  auto type = option.GetShaderType();
+  bool ret = false;
+  switch(type)
+  {
+    case PrecompileShaderOption::ShaderType::COLOR:
+    {
+      ret = GetColorVisualShaderFactory().AddPrecompiledShader(option);
+      break;
+    }
+    case PrecompileShaderOption::ShaderType::IMAGE:
+    {
+      ret = GetImageVisualShaderFactory().AddPrecompiledShader(option);
+      break;
+    }
+    case PrecompileShaderOption::ShaderType::TEXT:
+    {
+      ret = GetTextVisualShaderFactory().AddPrecompiledShader(option);
+      break;
+    }
+    case PrecompileShaderOption::ShaderType::MODEL_3D:
+    {
+      // TODO
+      break;
+    }
+    case PrecompileShaderOption::ShaderType::CUSTOM:
+    {
+      ret = GetCustomShaderFactory().AddPrecompiledShader(option);
+      break;
+    }
+    default:
+    {
+      DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader factory type:%d",type);
+      break;
+    }
+  }
+
+  return ret;
 }
 
 void VisualFactory::OnDiscardCallback()

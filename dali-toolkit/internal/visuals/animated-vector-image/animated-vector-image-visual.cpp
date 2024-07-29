@@ -876,7 +876,7 @@ Shader AnimatedVectorImageVisual::GenerateShader() const
   {
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
-      ImageVisualShaderFeatureBuilder()
+      ImageVisualShaderFeature::FeatureBuilder()
         .EnableRoundedCorner(IsRoundedCornerRequired())
         .EnableBorderline(IsBorderlineRequired())
         .SetTextureForFragmentShaderCheck(mUseNativeImage ? mImpl->mRenderer.GetTextures().GetTexture(0) : Dali::Texture()));

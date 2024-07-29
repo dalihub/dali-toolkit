@@ -35,7 +35,7 @@ int UtcImageVisualShaderFeatureBuilderSetGetProperty01(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Register an ImageVisual and and perform an Action on Visual directly");
-  auto featureBuilder = Dali::Toolkit::Internal::ImageVisualShaderFeatureBuilder()
+  auto featureBuilder = Dali::Toolkit::Internal::ImageVisualShaderFeature::FeatureBuilder()
                           .EnableTextureAtlas(Dali::Toolkit::Internal::ImageVisualShaderFeature::TextureAtlas::ENABLED)
                           .ApplyDefaultTextureWrapMode(true);
 
@@ -63,7 +63,7 @@ int UtcImageVisualShaderFeatureBuilderSetGetProperty02(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Register an ImageVisual and and perform an Action on Visual directly");
-  auto featureBuilder = Dali::Toolkit::Internal::ImageVisualShaderFeatureBuilder()
+  auto featureBuilder = Dali::Toolkit::Internal::ImageVisualShaderFeature::FeatureBuilder()
                           .EnableRoundedCorner(true)
                           .EnableBorderline(true)
                           .EnableAlphaMaskingOnRendering(true)

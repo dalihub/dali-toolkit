@@ -184,13 +184,39 @@ Shader TextVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, cons
   return shader;
 }
 
+bool TextVisualShaderFactory::AddPrecompiledShader(PrecompileShaderOption& option)
+{
+  ShaderFlagList shaderOption = option.GetShaderOptions();
+
+  auto featureBuilder = TextVisualShaderFeature::FeatureBuilder();
+  std::string vertexPrefixList;
+  std::string fragmentPrefixList;
+  CreatePrecompileShader(featureBuilder, shaderOption);
+
+  VisualFactoryCache::ShaderType type = featureBuilder.GetShaderType();
+  featureBuilder.GetVertexShaderPrefixList(vertexPrefixList);
+  featureBuilder.GetFragmentShaderPrefixList(fragmentPrefixList);
+  return SavePrecompileShader(type, vertexPrefixList, fragmentPrefixList );
+}
+
+
 void TextVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
 {
   std::vector<std::string_view> vertexPrefix;
   std::vector<std::string_view> fragmentPrefix;
   std::vector<std::string_view> shaderName;
   int                           shaderCount = 0;
-  for(uint32_t i = 0; i < PREDEFINED_SHADER_TYPE_COUNT; ++i)
+
+  // precompile requested shader first
+  for(uint32_t i = 0u; i < mRequestedPrecompileShader.size(); i++ )
+  {
+    vertexPrefix.push_back(mRequestedPrecompileShader[i].vertexPrefix);
+    fragmentPrefix.push_back(mRequestedPrecompileShader[i].fragmentPrefix);
+    shaderName.push_back(Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+    shaderCount++;
+  }
+
+  for(uint32_t i = 0u; i < PREDEFINED_SHADER_TYPE_COUNT; ++i)
   {
     vertexPrefix.push_back(VertexPredefines[i]);
     fragmentPrefix.push_back(FragmentPredefines[i]);
@@ -204,8 +230,64 @@ void TextVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
   shaders.vertexShader   = SHADER_TEXT_VISUAL_SHADER_VERT;
   shaders.fragmentShader = SHADER_TEXT_VISUAL_SHADER_FRAG;
   shaders.shaderCount    = shaderCount;
+  shaders.custom = false;
 }
 
+void TextVisualShaderFactory::CreatePrecompileShader(TextVisualShaderFeature::FeatureBuilder& builder, const ShaderFlagList& option)
+{
+  for(uint32_t i = 0; i < option.size(); ++i)
+  {
+    if(option[i] == PrecompileShaderOption::Flag::STYLES)
+    {
+      builder.EnableStyle(true);
+    }
+    else if(option[i] == PrecompileShaderOption::Flag::OVERLAY)
+    {
+      builder.EnableOverlay(true);
+    }
+    else if(option[i] == PrecompileShaderOption::Flag::EMOJI)
+    {
+      builder.EnableEmoji(true);
+    }
+    else if(option[i] == PrecompileShaderOption::Flag::MULTI_COLOR)
+    {
+      builder.EnableMultiColor(true);
+    }
+    else
+    {
+      DALI_LOG_WARNING("Unknown option[%d]. maybe this type can't use this flag \n", option[i]);
+    }
+  }
+}
+
+bool TextVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix)
+{
+  for(uint32_t i = 0u; i< PREDEFINED_SHADER_TYPE_COUNT; i++)
+  {
+    if(ShaderTypePredefines[i] == shader)
+    {
+      DALI_LOG_WARNING("This shader already added list(%s).", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      return false;
+    }
+  }
+
+  for(uint32_t i = 0u; i< mRequestedPrecompileShader.size(); i++)
+  {
+    if(mRequestedPrecompileShader[i].type == shader)
+    {
+      DALI_LOG_WARNING("This shader already requsted(%s).", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      return false;
+    }
+  }
+
+  RequestShaderInfo info;
+  info.type = shader;
+  info.vertexPrefix = vertexPrefix;
+  info.fragmentPrefix = fragmentPrefix;
+  mRequestedPrecompileShader.push_back(info);
+  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)",Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(shader, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+  return true;
+}
 } // namespace Internal
 
 } // namespace Toolkit

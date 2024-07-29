@@ -877,7 +877,7 @@ Shader AnimatedImageVisual::GenerateShader() const
   Shader shader;
   shader = mImageVisualShaderFactory.GetShader(
     mFactoryCache,
-    ImageVisualShaderFeatureBuilder()
+    ImageVisualShaderFeature::FeatureBuilder()
       .ApplyDefaultTextureWrapMode(defaultWrapMode)
       .EnableRoundedCorner(IsRoundedCornerRequired())
       .EnableBorderline(IsBorderlineRequired())

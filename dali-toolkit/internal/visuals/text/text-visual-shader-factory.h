@@ -22,7 +22,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-#include <dali-toolkit/devel-api/visual-factory/visual-shader-factory-interface.h>
+#include <dali-toolkit/internal/visuals/visual-shader-factory-interface.h>
 #include <string_view>
 
 namespace Dali
@@ -152,9 +152,25 @@ public:
 
 public: // Implementation of VisualShaderFactoryInterface
   /**
+   * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::AddPrecompiledShader
+   */
+  bool AddPrecompiledShader(PrecompileShaderOption& option) override;
+
+  /**
    * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::GetPreCompiledShader
    */
   void GetPreCompiledShader(RawShaderData& shaders) override;
+
+private:
+  /**
+   * @brief Create pre-compiled shader for image with builder and option.
+   */
+  void CreatePrecompileShader(TextVisualShaderFeature::FeatureBuilder& builder, const ShaderFlagList& option);
+
+  /**
+   * @brief Check if cached hash value is valid or not.
+   */
+  bool SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix);
 
 protected:
   /**
@@ -166,8 +182,6 @@ protected:
    * Undefined assignment operator.
    */
   TextVisualShaderFactory& operator=(const TextVisualShaderFactory& rhs);
-
-private:
 };
 
 } // namespace Internal

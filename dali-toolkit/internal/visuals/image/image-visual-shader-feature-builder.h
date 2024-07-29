@@ -121,33 +121,31 @@ enum Type
 };
 } // namespace ColorConversion
 
-} // namespace ImageVisualShaderFeature
-
 /**
  * @brief Collection of current image visual feature. Only use for ImageVisualShaderFactory::GetShader()
  */
-class ImageVisualShaderFeatureBuilder
+class FeatureBuilder
 {
 public:
-  ImageVisualShaderFeatureBuilder();
+  FeatureBuilder();
 
-  ImageVisualShaderFeatureBuilder& EnableTextureAtlas(bool enableTextureAtlas);
+  FeatureBuilder& EnableTextureAtlas(bool enableTextureAtlas);
 
-  ImageVisualShaderFeatureBuilder& ApplyDefaultTextureWrapMode(bool applyDefaultTextureWrapMode);
+  FeatureBuilder& ApplyDefaultTextureWrapMode(bool applyDefaultTextureWrapMode);
 
-  ImageVisualShaderFeatureBuilder& EnableRoundedCorner(bool enableRoundedCorner);
+  FeatureBuilder& EnableRoundedCorner(bool enableRoundedCorner);
 
-  ImageVisualShaderFeatureBuilder& EnableBorderline(bool enableBorderline);
+  FeatureBuilder& EnableBorderline(bool enableBorderline);
 
-  ImageVisualShaderFeatureBuilder& SetTextureForFragmentShaderCheck(const Dali::Texture& texture);
+  FeatureBuilder& SetTextureForFragmentShaderCheck(const Dali::Texture& texture);
 
-  ImageVisualShaderFeatureBuilder& EnableAlphaMaskingOnRendering(bool enableAlphaMaskingOnRendering);
+  FeatureBuilder& EnableAlphaMaskingOnRendering(bool enableAlphaMaskingOnRendering);
 
-  ImageVisualShaderFeatureBuilder& EnableYuvToRgb(bool enableYuvToRgb, bool enableUnifiedYuvAndRgb = false);
+  FeatureBuilder& EnableYuvToRgb(bool enableYuvToRgb, bool enableUnifiedYuvAndRgb = false);
 
   VisualFactoryCache::ShaderType GetShaderType() const;
 
-  ImageVisualShaderFeature::ChangeFragmentShader::Type NeedToChangeFragmentShader() const;
+  ChangeFragmentShader::Type NeedToChangeFragmentShader() const;
 
   void GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const;
   void GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const;
@@ -157,14 +155,16 @@ public:
   bool IsEnabledAlphaMaskingOnRendering() const;
 
 private:
-  ImageVisualShaderFeature::TextureAtlas::Type            mTextureAtlas : 2;            ///< Whether use texture with atlas, or not. default as TextureAtlas::DISABLED
-  ImageVisualShaderFeature::DefaultTextureWrapMode::Type  mDefaultTextureWrapMode : 2;  ///< Whether apply to texture wraping in default, or not. default as DefaultTextureWrapMode::APPLY
-  ImageVisualShaderFeature::RoundedCorner::Type           mRoundedCorner : 2;           ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED
-  ImageVisualShaderFeature::Borderline::Type              mBorderline : 2;              ///< Whether use borderline, or not. default as Borderline::DISABLED
-  ImageVisualShaderFeature::AlphaMaskingOnRendering::Type mAlphaMaskingOnRendering : 2; ///< Whether use runtime alpha masking, or not. default as AlphaMaskingOnRendering::DISABLED
-  ImageVisualShaderFeature::ColorConversion::Type         mColorConversion : 2;         ///< Whether the color format conversion is needed or not
-  Dali::Texture                                           mTexture;                     ///< Texture to check whether we need to change fragment shader or not
+  TextureAtlas::Type            mTextureAtlas : 2;            ///< Whether use texture with atlas, or not. default as TextureAtlas::DISABLED
+  DefaultTextureWrapMode::Type  mDefaultTextureWrapMode : 2;  ///< Whether apply to texture wraping in default, or not. default as DefaultTextureWrapMode::APPLY
+  RoundedCorner::Type           mRoundedCorner : 2;           ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED
+  Borderline::Type              mBorderline : 2;              ///< Whether use borderline, or not. default as Borderline::DISABLED
+  AlphaMaskingOnRendering::Type mAlphaMaskingOnRendering : 2; ///< Whether use runtime alpha masking, or not. default as AlphaMaskingOnRendering::DISABLED
+  ColorConversion::Type         mColorConversion : 2;         ///< Whether the color format conversion is needed or not
+  Dali::Texture                 mTexture;                     ///< Texture to check whether we need to change fragment shader or not
 };
+
+} // namespace ImageVisualShaderFeature
 
 } // namespace Internal
 

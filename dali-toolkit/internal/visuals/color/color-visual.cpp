@@ -244,7 +244,7 @@ Shader ColorVisual::GenerateShader() const
 {
   Shader shader = mColorVisualShaderFactory.GetShader(
     mFactoryCache,
-    ColorVisualShaderFeatureBuilder()
+    ColorVisualShaderFeature::FeatureBuilder()
     .EnableBlur(IsBlurRequired())
     .EnableBorderLine(IsBorderlineRequired())
     .EnableRoundCorner(IsRoundedCornerRequired())
