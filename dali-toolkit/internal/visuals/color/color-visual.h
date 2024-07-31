@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/color/color-visual-shader-factory.h>
 
 namespace Dali
 {
@@ -50,10 +51,11 @@ public:
    * @brief Create a new color visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory A reference to the ColorVisualShaderFactory object
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static ColorVisualPtr New(VisualFactoryCache& factoryCache, const Property::Map& properties);
+  static ColorVisualPtr New(VisualFactoryCache& factoryCache, ColorVisualShaderFactory& shaderFactory, const Property::Map& properties);
 
 public: // from Visual
   /**
@@ -76,8 +78,9 @@ protected:
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory A reference to the ColorVisualShaderFactory object
    */
-  ColorVisual(VisualFactoryCache& factoryCache);
+  ColorVisual(VisualFactoryCache& factoryCache, ColorVisualShaderFactory& shaderFactory);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -151,6 +154,7 @@ private:
 
   DevelColorVisual::CutoutPolicy::Type mCutoutPolicy : 3;          ///< The policy of cutout
   bool                                 mAlwaysUsingBlurRadius : 1; ///< Whether we need the blur radius in shader always.
+  ColorVisualShaderFactory&            mColorVisualShaderFactory;  ///< The shader factory for color visual.
 };
 
 } // namespace Internal

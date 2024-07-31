@@ -301,7 +301,8 @@ TextVisual::~TextVisual()
 void TextVisual::OnInitialize()
 {
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
-  Shader   shader   = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder());
+  auto featureBuilder = TextVisualShaderFeature::FeatureBuilder();
+  Shader   shader   = GetTextShader(mFactoryCache, featureBuilder);
 
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
@@ -1364,7 +1365,7 @@ TextureSet TextVisual::GetTextTexture(const Vector2& size)
   return textureSet;
 }
 
-Shader TextVisual::GetTextShader(VisualFactoryCache& factoryCache, const TextVisualShaderFeature::FeatureBuilder& featureBuilder)
+Shader TextVisual::GetTextShader(VisualFactoryCache& factoryCache, TextVisualShaderFeature::FeatureBuilder& featureBuilder)
 {
   // Cache feature builder informations.
   mTextShaderFeatureCache = featureBuilder;

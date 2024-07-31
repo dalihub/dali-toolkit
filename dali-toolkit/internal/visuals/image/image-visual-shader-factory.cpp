@@ -40,9 +40,9 @@ constexpr int              NATIVE_SHADER_TYPE_OFFSET = VisualFactoryCache::Shade
 constexpr std::string_view Y_FLIP_MASK_TEXTURE       = "uYFlipMaskTexture";
 constexpr float            NOT_FLIP_MASK_TEXTURE     = 0.0f;
 
-constexpr auto SHADER_TYPE_COUNT = 6u;
+constexpr auto PREDEFINED_SHADER_TYPE_COUNT = 6u;
 
-constexpr std::string_view VertexPredefines[SHADER_TYPE_COUNT]{
+constexpr std::string_view VertexPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
   "",                                     // VisualFactoryCache::IMAGE_SHADER,
   "#define IS_REQUIRED_ROUNDED_CORNER\n", // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
   "",                                     // VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
@@ -50,7 +50,7 @@ constexpr std::string_view VertexPredefines[SHADER_TYPE_COUNT]{
   "",                                     // VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
   "#define IS_REQUIRED_ROUNDED_CORNER\n", // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
 };
-constexpr std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
+constexpr std::string_view FragmentPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
   "",                                                                              // VisualFactoryCache::IMAGE_SHADER,
   "#define IS_REQUIRED_ROUNDED_CORNER\n",                                          // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
   "#define IS_REQUIRED_YUV_TO_RGB\n",                                              // VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
@@ -58,7 +58,7 @@ constexpr std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
   "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n",                                     // VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
   "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n", // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
 };
-constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[SHADER_TYPE_COUNT]{
+constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[PREDEFINED_SHADER_TYPE_COUNT]{
   VisualFactoryCache::ShaderType::IMAGE_SHADER,
   VisualFactoryCache::ShaderType::IMAGE_SHADER_ROUNDED_CORNER,
   VisualFactoryCache::ShaderType::IMAGE_SHADER_YUV_TO_RGB,
@@ -77,7 +77,7 @@ ImageVisualShaderFactory::~ImageVisualShaderFactory()
 {
 }
 
-Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, ImageVisualShaderFeatureBuilder& featureBuilder)
+Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, const ImageVisualShaderFeatureBuilder& featureBuilder)
 {
   Shader                         shader;
   VisualFactoryCache::ShaderType shaderType = featureBuilder.GetShaderType();
@@ -181,7 +181,7 @@ void ImageVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
   std::vector<std::string_view> shaderName;
   shaders.shaderCount = 0;
   int shaderCount     = 0;
-  for(uint32_t i = 0; i < SHADER_TYPE_COUNT; ++i)
+  for(uint32_t i = 0; i < PREDEFINED_SHADER_TYPE_COUNT; ++i)
   {
     vertexPrefix.push_back(VertexPredefines[i]);
     fragmentPrefix.push_back(FragmentPredefines[i]);
@@ -189,9 +189,9 @@ void ImageVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
     shaderCount++;
   }
 
-  shaders.vertexPrefix   = vertexPrefix;
-  shaders.fragmentPrefix = fragmentPrefix;
-  shaders.shaderName     = shaderName;
+  shaders.vertexPrefix   = std::move(vertexPrefix);
+  shaders.fragmentPrefix = std::move(fragmentPrefix);
+  shaders.shaderName     = std::move(shaderName);
   shaders.vertexShader   = SHADER_IMAGE_VISUAL_SHADER_VERT;
   shaders.fragmentShader = SHADER_IMAGE_VISUAL_SHADER_FRAG;
   shaders.shaderCount    = shaderCount;

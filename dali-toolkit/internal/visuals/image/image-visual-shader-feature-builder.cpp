@@ -111,7 +111,7 @@ ImageVisualShaderFeatureBuilder& ImageVisualShaderFeatureBuilder::EnableYuvToRgb
   return *this;
 }
 
-VisualFactoryCache::ShaderType ImageVisualShaderFeatureBuilder::GetShaderType()
+VisualFactoryCache::ShaderType ImageVisualShaderFeatureBuilder::GetShaderType() const
 {
   VisualFactoryCache::ShaderType shaderType = VisualFactoryCache::IMAGE_SHADER;
   if(mTextureAtlas == ImageVisualShaderFeature::TextureAtlas::ENABLED)
@@ -155,14 +155,14 @@ VisualFactoryCache::ShaderType ImageVisualShaderFeatureBuilder::GetShaderType()
   return shaderType;
 }
 
-ImageVisualShaderFeature::ChangeFragmentShader::Type ImageVisualShaderFeatureBuilder::NeedToChangeFragmentShader()
+ImageVisualShaderFeature::ChangeFragmentShader::Type ImageVisualShaderFeatureBuilder::NeedToChangeFragmentShader() const
 {
   return (mTexture && DevelTexture::IsNative(mTexture))
            ? ImageVisualShaderFeature::ChangeFragmentShader::NEED_CHANGE
            : ImageVisualShaderFeature::ChangeFragmentShader::DONT_CHANGE;
 }
 
-void ImageVisualShaderFeatureBuilder::GetVertexShaderPrefixList(std::string& vertexShaderPrefixList)
+void ImageVisualShaderFeatureBuilder::GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const
 {
   if(mTextureAtlas != ImageVisualShaderFeature::TextureAtlas::ENABLED)
   {
@@ -181,7 +181,7 @@ void ImageVisualShaderFeatureBuilder::GetVertexShaderPrefixList(std::string& ver
   }
 }
 
-void ImageVisualShaderFeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList)
+void ImageVisualShaderFeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const
 {
   if(mTextureAtlas == ImageVisualShaderFeature::TextureAtlas::ENABLED)
   {
@@ -219,7 +219,7 @@ void ImageVisualShaderFeatureBuilder::GetFragmentShaderPrefixList(std::string& f
   }
 }
 
-Dali::Texture ImageVisualShaderFeatureBuilder::GetTexture()
+Dali::Texture ImageVisualShaderFeatureBuilder::GetTexture() const
 {
   return mTexture;
 }

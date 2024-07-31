@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-shader-factory-interface.h>
 #include <string_view>
 
 namespace Dali
@@ -34,7 +35,7 @@ namespace Internal
 /**
  * ImageVisualShaderFactory is an object that provides and shares shaders between image visuals
  */
-class ImageVisualShaderFactory
+class ImageVisualShaderFactory : public VisualShaderFactoryInterface
 {
 public:
   /**
@@ -53,7 +54,7 @@ public:
    * @param[in] featureBuilder Collection of current image shader's features
    * @return The standard image rendering shader with features.
    */
-  Shader GetShader(VisualFactoryCache& factoryCache, ImageVisualShaderFeatureBuilder& featureBuilder);
+  Shader GetShader(VisualFactoryCache& factoryCache, const ImageVisualShaderFeatureBuilder& featureBuilder);
 
   /**
    * @brief Request the default vertex shader source.
@@ -67,11 +68,11 @@ public:
    */
   std::string_view GetFragmentShaderSource();
 
+public: // Implementation of VisualShaderFactoryInterface
   /**
-   * @brief Get the default shader source.
-   * @param[in] shaders shaderList for precompile
+   * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::GetPreCompiledShader
    */
-  void GetPreCompiledShader(RawShaderData& shaders);
+  void GetPreCompiledShader(RawShaderData& shaders) override;
 
 protected:
   /**
