@@ -52,7 +52,6 @@
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali/integration-api/debug.h>
 
 #include <functional>
 #include <memory>
@@ -166,9 +165,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mKeyEventsEnabled(true),
   mVisualChangeRequired(false),
   mScreenshotCapturedCallback{nullptr},
-  mFrameRenderedCallback{nullptr},
-  mCornerRadius(Vector4::ZERO),
-  mCornerRadiusPolicy(1.0f)
+  mFrameRenderedCallback{nullptr}
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -192,9 +189,7 @@ WebView::WebView(uint32_t argc, char** argv)
   mKeyEventsEnabled(true),
   mVisualChangeRequired(false),
   mScreenshotCapturedCallback{nullptr},
-  mFrameRenderedCallback{nullptr},
-  mCornerRadius(Vector4::ZERO),
-  mCornerRadiusPolicy(1.0f)
+  mFrameRenderedCallback{nullptr}
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -297,21 +292,6 @@ void WebView::OnInitialize()
   mPositionUpdateNotification.NotifySignal().Connect(this, &WebView::OnDisplayAreaUpdated);
   mSizeUpdateNotification.NotifySignal().Connect(this, &WebView::OnDisplayAreaUpdated);
   mScaleUpdateNotification.NotifySignal().Connect(this, &WebView::OnDisplayAreaUpdated);
-
-  // Create WebVisual for WebView
-  Property::Map propertyMap;
-  propertyMap.Insert(Dali::Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::COLOR);
-  propertyMap.Insert(Dali::Toolkit::Visual::Property::MIX_COLOR, Color::TRANSPARENT);
-  Toolkit::Visual::Base webVisual = Toolkit::VisualFactory::Get().CreateVisual(propertyMap);
-  if(webVisual)
-  {
-    Dali::Toolkit::DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, webVisual);
-  }
-  else
-  {
-    DALI_LOG_ERROR("fail to create webVisual for CornerRadius");
-    Dali::Toolkit::DevelControl::UnregisterVisual(*this, Toolkit::WebView::Property::URL);
-  }
 
   if(mWebEngine)
   {
@@ -906,33 +886,8 @@ void WebView::OnFrameRendered()
     mFrameRenderedCallback();
   }
 
-  // Make sure that mVisual is created only once.
-  if (mVisual)
-    return;
-
-  // Get webVisual for checking corner radius
-  Toolkit::Visual::Base webVisual = Dali::Toolkit::DevelControl::GetVisual(*this, Toolkit::WebView::Property::URL);
-  Property::Map webMap;
-  webVisual.CreatePropertyMap(webMap);
-  Property::Value* cornerRadiusValue =  webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
-  if(cornerRadiusValue)
-  {
-    mCornerRadius = cornerRadiusValue->Get<Vector4>();
-  }
-  Property::Value* cornerRadiusValuePolicy =  webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY);
-  if(cornerRadiusValuePolicy)
-  {
-    mCornerRadiusPolicy = cornerRadiusValuePolicy->Get<int>();
-  }
-
-  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(mWebEngine.GetNativeImageSource());
-  Property::Map propertyMap;
-  propertyMap.Insert(Dali::Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::IMAGE);
-  propertyMap.Insert(Dali::Toolkit::ImageVisual::Property::URL, nativeImageUrl.GetUrl());
-  propertyMap.Insert(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS, mCornerRadius);
-  propertyMap.Insert(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, mCornerRadiusPolicy);
-  mVisual = Toolkit::VisualFactory::Get().CreateVisual(propertyMap);
-  if(mVisual)
+  // Make sure that mVisual is created only if required.
+  if(mVisualChangeRequired || !mVisual)
   {
     // Reset flag
     mVisualChangeRequired = false;
