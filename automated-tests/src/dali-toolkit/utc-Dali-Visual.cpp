@@ -555,6 +555,7 @@ int UtcDaliVisualGetPropertyMap1(void)
   propertyMap.Insert(DevelVisual::Property::BORDERLINE_COLOR, Color::RED);
   propertyMap.Insert(DevelVisual::Property::BORDERLINE_OFFSET, -1.0f);
   propertyMap.Insert(DevelColorVisual::Property::BLUR_RADIUS, 20.0f);
+  propertyMap.Insert(DevelColorVisual::Property::CUTOUT_POLICY, DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS);
   Visual::Base colorVisual = factory.CreateVisual(propertyMap);
 
   Property::Map resultMap;
@@ -592,6 +593,10 @@ int UtcDaliVisualGetPropertyMap1(void)
   DALI_TEST_CHECK(blurRadiusValue);
   DALI_TEST_CHECK(blurRadiusValue->Get<float>() == 20.0f);
 
+  Property::Value* cutoutPolicyValue = resultMap.Find(DevelColorVisual::Property::CUTOUT_POLICY, Property::INTEGER);
+  DALI_TEST_CHECK(cutoutPolicyValue);
+  DALI_TEST_CHECK(cutoutPolicyValue->Get<int>() == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS);
+
   // change the blend color
   propertyMap[ColorVisual::Property::MIX_COLOR] = Color::CYAN;
   colorVisual                                   = factory.CreateVisual(propertyMap);
@@ -610,6 +615,35 @@ int UtcDaliVisualGetPropertyMap1(void)
   blurRadiusValue = resultMap.Find(DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT);
   DALI_TEST_CHECK(blurRadiusValue);
   DALI_TEST_CHECK(blurRadiusValue->Get<float>() == 0.0f);
+
+  // Test wrong values 2
+  propertyMap[DevelColorVisual::Property::CUTOUT_POLICY] = Vector2(2.0f, 3.0f);
+
+  colorVisual = factory.CreateVisual(propertyMap);
+  colorVisual.CreatePropertyMap(resultMap);
+
+  cutoutPolicyValue = resultMap.Find(DevelColorVisual::Property::CUTOUT_POLICY, Property::INTEGER);
+  DALI_TEST_CHECK(cutoutPolicyValue);
+  DALI_TEST_CHECK(cutoutPolicyValue->Get<int>() == DevelColorVisual::CutoutPolicy::NONE);
+
+  // Test property set by string
+  propertyMap[DevelColorVisual::Property::CUTOUT_POLICY] = "CUTOUT_VIEW";
+
+  colorVisual = factory.CreateVisual(propertyMap);
+  colorVisual.CreatePropertyMap(resultMap);
+
+  cutoutPolicyValue = resultMap.Find(DevelColorVisual::Property::CUTOUT_POLICY, Property::INTEGER);
+  DALI_TEST_CHECK(cutoutPolicyValue);
+  DALI_TEST_CHECK(cutoutPolicyValue->Get<int>() == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW);
+
+  propertyMap[DevelColorVisual::Property::CUTOUT_POLICY] = "CUTOUT_VIEW_WITH_CORNER_RADIUS";
+
+  colorVisual = factory.CreateVisual(propertyMap);
+  colorVisual.CreatePropertyMap(resultMap);
+
+  cutoutPolicyValue = resultMap.Find(DevelColorVisual::Property::CUTOUT_POLICY, Property::INTEGER);
+  DALI_TEST_CHECK(cutoutPolicyValue);
+  DALI_TEST_CHECK(cutoutPolicyValue->Get<int>() == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS);
 
   END_TEST;
 }
@@ -6650,6 +6684,89 @@ int UtcDaliVisualUpdatePropertyChangeShader05(void)
 
   // Revert shader version. We should revert it even if UTC failed.
   application.GetGlAbstraction().mShaderLanguageVersion = originalShaderVersion;
+
+  END_TEST;
+}
+
+int UtcDaliVisualCutoutPolicyChangeShader01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualCutoutPolicyChangeShader01: ColorVisual with cutout policy");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("uCutoutWithCornerRadius", Property::Type::INTEGER),
+    };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  VisualFactory factory = VisualFactory::Get();
+
+  // Test (Enable/Disable) CornerRadius, (Enable/Disable) Borderline, (Enable/Disable) Blur, and 3 kind of CutoutPolicy
+  for(int testCase = 0; testCase < 2 * 2 * 2 * 3; ++testCase)
+  {
+    const bool enableCornerRadius = (testCase & 1);
+    const bool enableBorderline   = (testCase & 2);
+    const bool enableBlur         = (testCase & 4);
+
+    // clang-format off
+    const DevelColorVisual::CutoutPolicy::Type cutoutPolicy = (testCase / 8) == 0 ? DevelColorVisual::CutoutPolicy::NONE :
+                                                              (testCase / 8) == 1 ? DevelColorVisual::CutoutPolicy::CUTOUT_VIEW :
+                                                                                    DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS;
+    // clang-format on
+
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
+    propertyMap.Insert(Visual::Property::MIX_COLOR, Color::BLUE);
+    if(enableCornerRadius)
+    {
+      propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS, 10.0f);
+      propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::RELATIVE);
+    }
+    if(enableBorderline)
+    {
+      propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, 20.0f);
+      propertyMap.Insert(DevelVisual::Property::BORDERLINE_COLOR, Color::RED);
+      propertyMap.Insert(DevelVisual::Property::BORDERLINE_OFFSET, -1.0f);
+    }
+    if(enableBlur)
+    {
+      propertyMap.Insert(DevelColorVisual::Property::BLUR_RADIUS, 20.0f);
+    }
+    propertyMap.Insert(DevelColorVisual::Property::CUTOUT_POLICY, cutoutPolicy);
+
+    Visual::Base colorVisual = factory.CreateVisual(propertyMap);
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, colorVisual);
+    dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+    application.GetScene().Add(dummyControl);
+
+    application.SendNotification();
+    application.Render();
+
+    TestShaderCodeContainSubstrings(
+      dummyControl,
+      {
+        {"#define IS_REQUIRED_BLUR", enableBlur},
+        {"#define IS_REQUIRED_BORDERLINE", !enableBlur && enableBorderline}, ///< Since borderline is ignored, due to blur enabled.
+        {"#define IS_REQUIRED_ROUNDED_CORNER", enableCornerRadius},
+        {"#define IS_REQUIRED_CUTOUT", cutoutPolicy != DevelColorVisual::CutoutPolicy::NONE},
+      },
+      TEST_LOCATION);
+
+    if(cutoutPolicy != DevelColorVisual::CutoutPolicy::NONE)
+    {
+      auto& gl = application.GetGlAbstraction();
+      DALI_TEST_EQUALS(gl.CheckUniformValue<int>("uCutoutWithCornerRadius", cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS ? 1 : 0), true, TEST_LOCATION);
+    }
+    dummyControl.Unparent();
+
+    application.SendNotification();
+    application.Render();
+  }
 
   END_TEST;
 }

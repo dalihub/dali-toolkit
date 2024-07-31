@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SVG_TASK_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,10 +55,11 @@ public:
   /**
    * Constructor
    * @param[in] vectorRenderer The vector rasterizer.
+   * @param[in] id The id of this task.
    * @param[in] callback The callback that is called when the operation is completed.
    * @param[in] priorityType The priority of this task.
    */
-  SvgTask(VectorImageRenderer vectorRenderer, CallbackBase* callback, AsyncTask::PriorityType priorityType = AsyncTask::PriorityType::DEFAULT);
+  SvgTask(VectorImageRenderer vectorRenderer, int32_t id, CallbackBase* callback, AsyncTask::PriorityType priorityType = AsyncTask::PriorityType::DEFAULT);
 
   /**
    * Destructor.
@@ -70,6 +71,15 @@ public:
    * @return True if the task has succeeded.
    */
   bool HasSucceeded() const;
+
+  /**
+   * Get the id of task.
+   * @return The Id of task what we added from constructor.
+   */
+  int32_t GetId() const
+  {
+    return mId;
+  }
 
   /**
    * @brief Get the task's imageRenderer
@@ -92,6 +102,7 @@ private:
 
 protected:
   VectorImageRenderer mVectorRenderer;
+  const int32_t       mId;
   bool                mHasSucceeded;
 };
 
@@ -101,12 +112,13 @@ public:
   /**
    * Constructor
    * @param[in] vectorRenderer The vector rasterizer.
+   * @param[in] id The id of this task.
    * @param[in] url The URL to svg resource to use.
    * @param[in] encodedImageBuffer The resource buffer if required.
    * @param[in] dpi The DPI of the screen.
    * @param[in] callback The callback that is called when the operation is completed.
    */
-  SvgLoadingTask(VectorImageRenderer vectorRenderer, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, CallbackBase* callback);
+  SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, CallbackBase* callback);
 
   /**
    * Destructor.
@@ -151,11 +163,12 @@ public:
   /**
    * Constructor
    * @param[in] vectorRenderer The vector rasterizer.
+   * @param[in] id The id of this task.
    * @param[in] width The rasterization width.
    * @param[in] height The rasterization height.
    * @param[in] callback The callback that is called when the operation is completed.
    */
-  SvgRasterizingTask(VectorImageRenderer vectorRenderer, uint32_t width, uint32_t height, CallbackBase* callback);
+  SvgRasterizingTask(VectorImageRenderer vectorRenderer, int32_t id, uint32_t width, uint32_t height, CallbackBase* callback);
 
   /**
    * Destructor.

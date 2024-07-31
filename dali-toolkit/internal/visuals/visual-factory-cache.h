@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
+#include <dali-toolkit/internal/visuals/svg/svg-loader.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 
 namespace Dali
@@ -38,6 +39,7 @@ namespace Internal
 {
 class ImageAtlasManager;
 class NPatchLoader;
+class SvgLoader;
 class TextureManager;
 class VectorAnimationManager;
 
@@ -60,6 +62,12 @@ public:
     COLOR_SHADER_ROUNDED_BORDERLINE,
     COLOR_SHADER_BLUR_EDGE,
     COLOR_SHADER_ROUNDED_CORNER_BLUR_EDGE,
+    COLOR_SHADER_CUTOUT,
+    COLOR_SHADER_CUTOUT_ROUNDED_CORNER,
+    COLOR_SHADER_CUTOUT_BORDERLINE,
+    COLOR_SHADER_CUTOUT_ROUNDED_BORDERLINE,
+    COLOR_SHADER_CUTOUT_BLUR_EDGE,
+    COLOR_SHADER_CUTOUT_ROUNDED_CORNER_BLUR_EDGE,
     BORDER_SHADER,
     BORDER_SHADER_ANTI_ALIASING,
     GRADIENT_SHADER_LINEAR_BOUNDING_BOX,
@@ -229,7 +237,7 @@ public:
    *                            If true, we don't need to create new renderer when broken image is single image.
    *                            Most of user experience use normal images. So It can reduce runtime.
    */
-  void UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size, const bool& rendererIsImage = true);
+  void UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size, const bool rendererIsImage = true);
 
   /**
    * @brief Get whether we support YUV Planes load or not.
@@ -256,6 +264,12 @@ public:
    * @return A reference to the N patch loader
    */
   NPatchLoader& GetNPatchLoader();
+
+  /**
+   * Get the Svg texture cache.
+   * @return A reference to the Svg loader
+   */
+  SvgLoader& GetSvgLoader();
 
   /**
    * Get the vector animation manager.
@@ -356,6 +370,7 @@ private:
   ImageAtlasManagerPtr mAtlasManager;
   TextureManager       mTextureManager;
   NPatchLoader         mNPatchLoader;
+  SvgLoader            mSvgLoader;
 
   std::unique_ptr<VectorAnimationManager> mVectorAnimationManager;
   bool                                    mPreMultiplyOnLoad;

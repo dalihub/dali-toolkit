@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_COLOR_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,11 +46,33 @@ enum
    * @note Optional.
    * @note The default is 0.
    * @note The visual size increases by the blur radius.
+   * @note We cannot use blur radius and borderline properties at the same time.
    */
   BLUR_RADIUS = MIX_COLOR + 2,
+
+  /**
+   * @brief Policy of cutout the color render result.
+   * @details Name "cutoutPolicy", type Property::INTEGER.
+   * @note Optional.
+   * @note The default is CutoutPolicy::NONE.
+   */
+  CUTOUT_POLICY = MIX_COLOR + 3,
 };
 
 } // namespace Property
+
+/**
+ * @brief Enumeration for cutout policy.
+ */
+namespace CutoutPolicy
+{
+enum Type
+{
+  NONE,                           ///< Fully render the visual area (Default)
+  CUTOUT_VIEW,                    ///< Cutout the area of the view. It will use size of view.
+  CUTOUT_VIEW_WITH_CORNER_RADIUS, ///< Cutout the area of the view include visual's corner radius. It will use size of view.
+};
+} // namespace CutoutPolicy
 
 } // namespace DevelColorVisual
 

@@ -20,6 +20,7 @@ SET(TC_SOURCES
  utc-Dali-LineHelperFunctions.cpp
  utc-Dali-LogicalModel.cpp
  utc-Dali-PropertyHelper.cpp
+ utc-Dali-SvgLoader.cpp
  utc-Dali-Text-AbstractStyleCharacterRun.cpp
  utc-Dali-Text-Characters.cpp
  utc-Dali-Text-CharacterSetConversion.cpp

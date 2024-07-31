@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_CACHE_MANAGER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -218,6 +218,7 @@ public:
     const Dali::SamplingMode::Type       samplingMode,
     const TextureCacheManager::TextureId maskTextureId,
     const bool                           cropToMask,
+    const bool                           orientationCorrection,
     const uint32_t                       frameIndex);
 
   /**
@@ -245,6 +246,7 @@ public:
     const TextureCacheManager::StorageType    storageType,
     const TextureCacheManager::TextureId      maskTextureId,
     const bool                                cropToMask,
+    const bool                                orientationCorrection,
     const TextureCacheManager::MultiplyOnLoad preMultiplyOnLoad,
     const bool                                isAnimatedImage,
     const uint32_t                            frameIndex);

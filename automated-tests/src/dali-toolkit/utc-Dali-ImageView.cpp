@@ -1184,15 +1184,16 @@ int UtcDaliImageViewSetImageUrl(void)
   END_TEST;
 }
 
-bool    gResourceReadySignalFired = false;
-Vector3 gNaturalSize;
+namespace
+{
+bool gResourceReadySignalFired = false;
 
 void ResourceReadySignal(Control control)
 {
   gResourceReadySignalFired = true;
 }
 
-void OnResourceReadySignalSVG(Control control)
+void OnResourceReadySyncSVGLoading02(Control control)
 {
   // Check whether Image Visual transforms on ImageView::OnRelayout()
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
@@ -1205,9 +1206,13 @@ void OnResourceReadySignalSVG(Control control)
   Property::Map* retMap = transformValue->GetMap();
   DALI_TEST_CHECK(retMap);
 
+  auto size = retMap->Find(Visual::Transform::Property::SIZE)->Get<Vector2>();
+
   // Fitting mode is applied at this point. because we do FittingMode in control
-  DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::SIZE)->Get<Vector2>(), Vector2::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(size, Vector2(100.0f, 100.0f), TEST_LOCATION);
 }
+
+} // namespace
 
 int UtcDaliImageViewCheckResourceReady(void)
 {
@@ -1499,10 +1504,15 @@ int UtcDaliImageViewReloadAlphaMaskImage(void)
   END_TEST;
 }
 
+namespace
+{
+Vector3 gNaturalSize;
+
 void OnRelayoutOverride(Size size)
 {
   gNaturalSize = size; // Size Relayout is using
 }
+} // namespace
 
 int UtcDaliImageViewReplaceImageAndGetNaturalSize(void)
 {
@@ -2922,7 +2932,16 @@ int UtcDaliImageViewLoadRemoteSVG(void)
     application.Render();
 
     DALI_TEST_EQUALS(imageView.GetRendererCount(), 1u, TEST_LOCATION);
+
+    imageView.Unparent();
   }
+
+  // Insure to Remove svg cache.
+  application.SendNotification();
+  application.Render();
+  application.RunIdles();
+  application.SendNotification();
+  application.Render();
 
   // Without size set
   {
@@ -2948,6 +2967,8 @@ int UtcDaliImageViewLoadRemoteSVG(void)
     application.Render();
 
     DALI_TEST_EQUALS(imageView.GetRendererCount(), 1u, TEST_LOCATION);
+
+    imageView.Unparent();
   }
 
   END_TEST;
@@ -3015,6 +3036,7 @@ int UtcDaliImageViewSyncSVGLoading02(void)
 
   tet_infoline("ImageView Testing SVG image sync loading");
 
+  for(int testCase = 0; testCase < 3; ++testCase)
   {
     ImageView imageView = ImageView::New();
 
@@ -3025,7 +3047,28 @@ int UtcDaliImageViewSyncSVGLoading02(void)
     syncLoadingMap.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, true);
     syncLoadingMap.Insert(DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO);
     imageView.SetProperty(ImageView::Property::IMAGE, syncLoadingMap);
-    imageView.ResourceReadySignal().Connect(&OnResourceReadySignalSVG);
+    switch(testCase)
+    {
+      case 0:
+      default:
+      {
+        tet_printf("Case 0 : Do not set size (size is 0, 0)\n");
+        break;
+      }
+      case 1:
+      {
+        tet_printf("Case 1 : Width is bigger than height (size is 200, 100)\n");
+        imageView.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 100.0f));
+        break;
+      }
+      case 2:
+      {
+        tet_printf("Case 2 : Height is bigger than width (size is 100, 200)\n");
+        imageView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+        break;
+      }
+    }
+    imageView.ResourceReadySignal().Connect(&OnResourceReadySyncSVGLoading02);
 
     application.GetScene().Add(imageView);
     DALI_TEST_CHECK(imageView);
@@ -3050,6 +3093,14 @@ int UtcDaliImageViewSyncSVGLoading02(void)
     Vector3 naturalSize = imageView.GetNaturalSize();
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
+
+    imageView.Unparent();
+
+    // Ensure remove cache.
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
   }
   END_TEST;
 }
@@ -3081,6 +3132,57 @@ int UtcDaliImageViewAsyncSVGLoading(void)
     application.Render(16);
 
     Vector3 naturalSize = imageView.GetNaturalSize();
+    DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliImageViewAsyncSVGLoading02(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("ImageView Testing SVG image async loading and the loaded result check cached");
+
+  {
+    ImageView imageView = ImageView::New();
+    DALI_TEST_CHECK(imageView);
+
+    // Async loading is used - default value of SYNCHRONOUS_LOADING is false.
+    Property::Map propertyMap;
+    propertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
+    propertyMap.Insert(Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/svg1.svg");
+    imageView.SetProperty(ImageView::Property::IMAGE, propertyMap);
+
+    application.GetScene().Add(imageView);
+
+    // Check that natural size return invalid values now
+    // Note : This logic might be changed if we decide to decode the svg synchronously.
+    Vector3 naturalSize = imageView.GetNaturalSize();
+    DALI_TEST_NOT_EQUALS(naturalSize.width, 100.0f, 0.01f, TEST_LOCATION);
+    DALI_TEST_NOT_EQUALS(naturalSize.height, 100.0f, 0.01f, TEST_LOCATION);
+
+    application.SendNotification();
+
+    // Wait for loading
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(16);
+
+    naturalSize = imageView.GetNaturalSize();
+    DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
+
+    // Test that imageView2 use cached natrual size.
+    ImageView imageView2 = ImageView::New();
+    DALI_TEST_CHECK(imageView2);
+
+    // Use same property map with imageView
+    imageView2.SetProperty(ImageView::Property::IMAGE, propertyMap);
+
+    // Check whether natural size is same as cached image size.
+    naturalSize = imageView2.GetNaturalSize();
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
   }
@@ -3412,15 +3514,20 @@ int UtcDaliImageViewSvgAtlasing(void)
   propertyMap["url"]      = TEST_SVG_FILE_NAME;
   propertyMap["atlasing"] = true;
 
+  gResourceReadySignalFired = false;
+
   ImageView imageView = ImageView::New();
   imageView.SetProperty(ImageView::Property::IMAGE, propertyMap);
   imageView.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
+  imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
   application.GetScene().Add(imageView);
 
   application.SendNotification();
 
   // Wait for loading & rasterization
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gResourceReadySignalFired);
 
   application.SendNotification();
   application.Render(16);
@@ -3431,14 +3538,69 @@ int UtcDaliImageViewSvgAtlasing(void)
   params1["height"] << 100;
   DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params1), true, TEST_LOCATION);
 
+  callStack.Reset();
+
+  gResourceReadySignalFired = false;
+
+  // Also use new image view with atlas.
+  ImageView imageView2 = ImageView::New();
+  imageView2.SetProperty(ImageView::Property::IMAGE, propertyMap);
+  imageView2.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
+  imageView2.ResourceReadySignal().Connect(&ResourceReadySignal);
+  application.GetScene().Add(imageView2);
+
+  application.SendNotification();
+
+  // Let we check that we use cached image, and cached texture.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gResourceReadySignalFired);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Check there is no newly generated texture
+  DALI_TEST_EQUALS(callStack.CountMethod("GenTextures"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params1), false, TEST_LOCATION);
+
+  callStack.Reset();
+
+  gResourceReadySignalFired = false;
+
+  // Also use new image view 'without'' atlas.
+  propertyMap["atlasing"] = false;
+  ImageView imageView3    = ImageView::New();
+  imageView3.SetProperty(ImageView::Property::IMAGE, propertyMap);
+  imageView3.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
+  imageView3.ResourceReadySignal().Connect(&ResourceReadySignal);
+  application.GetScene().Add(imageView3);
+
+  application.SendNotification();
+
+  // Let we check that we use cached image, but not cached texture.
+  // Wait rasterize.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gResourceReadySignalFired);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Check that we generate new texture
+  DALI_TEST_EQUALS(callStack.CountMethod("GenTextures"), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexImage2D", params1), true, TEST_LOCATION);
+
+  callStack.Reset();
+
+  gResourceReadySignalFired = false;
+
+  // Try to atlas over the size.
   imageView.SetProperty(Actor::Property::SIZE, Vector2(600.f, 600.f));
 
   application.SendNotification();
 
   // Wait for rasterization
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  callStack.Reset();
 
   application.SendNotification();
   application.Render(16);
@@ -3448,6 +3610,24 @@ int UtcDaliImageViewSvgAtlasing(void)
   params2["width"] << 600;
   params2["height"] << 600;
   DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexImage2D", params2), true, TEST_LOCATION);
+
+  callStack.Reset();
+
+  // Try to load over the size.
+  // Note that imageView3's atlas attempt is false.
+  imageView3.SetProperty(Actor::Property::SIZE, Vector2(600.f, 600.f));
+
+  // Let we check atlas cached.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Check there is no newly generated texture
+  DALI_TEST_EQUALS(callStack.CountMethod("GenTextures"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params2), false, TEST_LOCATION);
+
+  gResourceReadySignalFired = false;
 
   END_TEST;
 }
@@ -5925,6 +6105,224 @@ int UtcDaliImageViewImageLoadSuccessAndReload01(void)
   DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::READY, TEST_LOCATION);
 
   gResourceReadySignalFired = false;
+
+  END_TEST;
+}
+
+namespace
+{
+int  gSvgReRasterizeDuringResourceReadyOrderType = 0;
+void OnResourceReadyReRasterize01(Control control)
+{
+  if(gResourceReadySignalCounter == 0u)
+  {
+    auto parent = gImageView1.GetParent();
+    DALI_TEST_CHECK(parent);
+
+    tet_printf("Request gImageView2 and gImageView3 as 300x300. gImageView4 as 400x400\n");
+
+    gImageView2 = ImageView::New(TEST_SVG_FILE_NAME);
+    gImageView2.ResourceReadySignal().Connect(&OnSimpleResourceReadySignal);
+    gImageView2.SetProperty(Actor::Property::SIZE, Vector2(300.f, 300.f));
+    parent.Add(gImageView2);
+    gImageView3 = ImageView::New(TEST_SVG_FILE_NAME);
+    gImageView3.ResourceReadySignal().Connect(&OnSimpleResourceReadySignal);
+    gImageView3.SetProperty(Actor::Property::SIZE, Vector2(300.f, 300.f));
+    parent.Add(gImageView3);
+    gImageView4 = ImageView::New(TEST_SVG_FILE_NAME);
+    gImageView4.ResourceReadySignal().Connect(&OnSimpleResourceReadySignal);
+    gImageView4.SetProperty(Actor::Property::SIZE, Vector2(400.f, 400.f));
+
+    Property::Map map;
+    map.Add(Visual::Property::TYPE, Visual::IMAGE);
+    map.Add(ImageVisual::Property::URL, TEST_SVG_FILE_NAME);
+    map.Add(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+
+    gImageView1.Unparent();
+
+    gImageView1.SetProperty(Actor::Property::SIZE, Vector2(400.f, 400.f));
+    gImageView1.SetProperty(ImageView::Property::IMAGE, map);
+
+    if((gSvgReRasterizeDuringResourceReadyOrderType & 2) == 0)
+    {
+      tet_printf("Make 400x400 image raterized as synchronously\n");
+      // Add gImageView1 now.
+      parent.Add(gImageView1);
+    }
+    else
+    {
+      tet_printf("Make 400x400 image raterized as synchronously, but after some async rasterization request first.\n");
+    }
+
+    if((gSvgReRasterizeDuringResourceReadyOrderType & 1) == 0)
+    {
+      // Add gImageView4 now
+      parent.Add(gImageView4);
+    }
+  }
+  else if(gResourceReadySignalCounter > 0 && ((gSvgReRasterizeDuringResourceReadyOrderType & 1) == 1))
+  {
+    auto parent = gImageView2.GetParent();
+    DALI_TEST_CHECK(parent);
+
+    // Add gImageView4 after second phase of gImageView1 load done.
+    parent.Add(gImageView4);
+  }
+  ++gResourceReadySignalCounter;
+}
+
+} // namespace
+
+int UtcDaliImageViewSvgReRasterizeDuringResourceReady01(void)
+{
+  for(int useInvalidSvg = 0; useInvalidSvg < 2; ++useInvalidSvg)
+  {
+    for(gSvgReRasterizeDuringResourceReadyOrderType = 0; gSvgReRasterizeDuringResourceReadyOrderType < 4; ++gSvgReRasterizeDuringResourceReadyOrderType)
+    {
+      ToolkitTestApplication application;
+
+      tet_infoline("Test SVG image rasterize and re-rasterize at ResourceReady callback.\n");
+      if(useInvalidSvg == 1)
+      {
+        tet_infoline("But in this case, we will use invalid svg file. So broken image used.\n");
+      }
+      tet_printf("order type : %d\n", gSvgReRasterizeDuringResourceReadyOrderType);
+
+      TestGlAbstraction& gl           = application.GetGlAbstraction();
+      TraceCallStack&    textureTrace = gl.GetTextureTrace();
+      textureTrace.Enable(true);
+
+      // Clear image view for clear test
+      if(gImageView1)
+      {
+        gImageView1.Reset();
+      }
+      if(gImageView2)
+      {
+        gImageView2.Reset();
+      }
+      if(gImageView3)
+      {
+        gImageView3.Reset();
+      }
+      if(gImageView4)
+      {
+        gImageView4.Reset();
+      }
+      gResourceReadySignalCounter = 0u;
+
+      gImageView1 = ImageView::New(useInvalidSvg == 1 ? TEST_RESOURCE_DIR "/invalid.svg" : TEST_SVG_FILE_NAME);
+      gImageView1.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+      gImageView1.ResourceReadySignal().Connect(&OnResourceReadyReRasterize01);
+      application.GetScene().Add(gImageView1);
+
+      DALI_TEST_EQUALS(gResourceReadySignalCounter, 0u, TEST_LOCATION);
+
+      application.SendNotification();
+      application.Render(16);
+
+      if(useInvalidSvg == 1)
+      {
+        // load invalid svg file. It will emit ResourceReady for gImageView1
+        DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+        DALI_TEST_EQUALS(gResourceReadySignalCounter, 1u, TEST_LOCATION);
+      }
+      else
+      {
+        // load svg file. It will not emit ResourceReady yet
+        DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+        DALI_TEST_EQUALS(gResourceReadySignalCounter, 0u, TEST_LOCATION);
+
+        application.SendNotification();
+        application.Render(16);
+        DALI_TEST_EQUALS(gResourceReadySignalCounter, 0u, TEST_LOCATION);
+
+        // rasterize svg 200x200. Now, ResourceReady signal will be emitted for gImageView1
+        DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+        DALI_TEST_EQUALS(gResourceReadySignalCounter, 1u, TEST_LOCATION);
+      }
+
+      application.SendNotification();
+      application.Render(16);
+      if((gSvgReRasterizeDuringResourceReadyOrderType & 2) == 2)
+      {
+        // Add gImageView1 now, to avoid sync load & rasterize request always before async.
+        application.GetScene().Add(gImageView1);
+
+        application.SendNotification();
+        application.Render(16);
+      }
+      // ResourceReady signal will be emitted for gImageView1 (sync load case), or gImageView4 (if gImageView1 rasterize first.)
+      // Note : We cannot assume that gImageView1 rasterize requested before gImageView4.
+      //        So, we cannot ensure that gResourceReadySignalCounter is which 2 or 3.
+      DALI_TEST_GREATER(gResourceReadySignalCounter, 1, TEST_LOCATION);
+      DALI_TEST_GREATER(4, gResourceReadySignalCounter, TEST_LOCATION);
+
+      application.SendNotification();
+      application.Render(16);
+
+      {
+        TraceCallStack::NamedParams params;
+        params["width"] << 200;
+        params["height"] << 200;
+        DALI_TEST_EQUALS(textureTrace.FindMethodAndParams("TexImage2D", params), useInvalidSvg == 0, TEST_LOCATION);
+        params.mParams.clear();
+        params["width"] << 300;
+        params["height"] << 300;
+        DALI_TEST_EQUALS(textureTrace.FindMethodAndParams("TexImage2D", params), false, TEST_LOCATION);
+        params.mParams.clear();
+        params["width"] << 400;
+        params["height"] << 400;
+        DALI_TEST_EQUALS(textureTrace.FindMethodAndParams("TexImage2D", params), true, TEST_LOCATION);
+      }
+      textureTrace.Reset();
+
+      // Total event trigger count is 2 or 1 : rasterize svg 300x300 + (rasterize svg 400x400 if required) + (load valid svg file if required)
+      // Now, ResourceReady signal will be emitted for gImageView2 and gImageView3 (and gImageView4 if required).
+      // Note : We cannot assume that which signal will be come first / rasterization 300x300 vs 400x400.
+      uint32_t eventTriggerRequiredCount = gResourceReadySignalCounter == 2 ? (gSvgReRasterizeDuringResourceReadyOrderType == 3 ? 3 : 2) : 1; // Check whether we need to wait 400x400 + 300x300, or only 300x300.
+
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(eventTriggerRequiredCount), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(gResourceReadySignalCounter, 5u, TEST_LOCATION);
+
+      application.SendNotification();
+      application.Render(16);
+
+      {
+        TraceCallStack::NamedParams params;
+        params["width"] << 200;
+        params["height"] << 200;
+        DALI_TEST_EQUALS(textureTrace.FindMethodAndParams("TexImage2D", params), false, TEST_LOCATION);
+        params.mParams.clear();
+        params["width"] << 300;
+        params["height"] << 300;
+        DALI_TEST_EQUALS(textureTrace.FindMethodAndParams("TexImage2D", params), true, TEST_LOCATION);
+        params.mParams.clear();
+        params["width"] << 400;
+        params["height"] << 400;
+        DALI_TEST_EQUALS(textureTrace.FindMethodAndParams("TexImage2D", params), false, TEST_LOCATION);
+      }
+
+      // Clear image view for clear test
+      if(gImageView1)
+      {
+        gImageView1.Reset();
+      }
+      if(gImageView2)
+      {
+        gImageView2.Reset();
+      }
+      if(gImageView3)
+      {
+        gImageView3.Reset();
+      }
+      if(gImageView4)
+      {
+        gImageView4.Reset();
+      }
+      gResourceReadySignalCounter = 0u;
+    }
+  }
 
   END_TEST;
 }

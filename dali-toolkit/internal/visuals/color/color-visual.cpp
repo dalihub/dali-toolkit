@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "color-visual.h"
+#include <dali-toolkit/internal/visuals/color/color-visual.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/rendering/renderer-devel.h>
@@ -24,7 +24,6 @@
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -42,16 +41,32 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(0);
+const int CUSTOM_PROPERTY_COUNT(0); ///< Note : cutout policy property will be registered only of the cutout view is used.
+                                    ///<        We don't need to reserve that property memory always.
 
-VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[6] =
-  {
-    VisualFactoryCache::COLOR_SHADER,
-    VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER,
-    VisualFactoryCache::COLOR_SHADER_BORDERLINE,
-    VisualFactoryCache::COLOR_SHADER_ROUNDED_BORDERLINE,
-    VisualFactoryCache::COLOR_SHADER_BLUR_EDGE,
-    VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER_BLUR_EDGE,
+// cutout policies
+DALI_ENUM_TO_STRING_TABLE_BEGIN(CUTOUT_POLICY)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, NONE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, CUTOUT_VIEW)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, CUTOUT_VIEW_WITH_CORNER_RADIUS)
+DALI_ENUM_TO_STRING_TABLE_END(CUTOUT_POLICY)
+
+constexpr VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
+  VisualFactoryCache::COLOR_SHADER,
+  VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER,
+  VisualFactoryCache::COLOR_SHADER_BORDERLINE,
+  VisualFactoryCache::COLOR_SHADER_ROUNDED_BORDERLINE,
+  VisualFactoryCache::COLOR_SHADER_BLUR_EDGE,
+  VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER_BLUR_EDGE,
+};
+
+constexpr VisualFactoryCache::ShaderType SHADER_TYPE_WITH_CUTOUT_TABLE[] = {
+  VisualFactoryCache::COLOR_SHADER_CUTOUT,
+  VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_CORNER,
+  VisualFactoryCache::COLOR_SHADER_CUTOUT_BORDERLINE,
+  VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_BORDERLINE,
+  VisualFactoryCache::COLOR_SHADER_CUTOUT_BLUR_EDGE,
+  VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_CORNER_BLUR_EDGE,
 };
 
 // enum of required list when we select shader
@@ -65,6 +80,7 @@ enum ColorVisualRequireFlag
 
 constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_ROUNDED_BLUR = 300;
 } // unnamed namespace
+
 ColorVisualPtr ColorVisual::New(VisualFactoryCache& factoryCache, const Property::Map& properties)
 {
   ColorVisualPtr colorVisualPtr(new ColorVisual(factoryCache));
@@ -76,6 +92,7 @@ ColorVisualPtr ColorVisual::New(VisualFactoryCache& factoryCache, const Property
 ColorVisual::ColorVisual(VisualFactoryCache& factoryCache)
 : Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::COLOR),
   mBlurRadius(0.0f),
+  mCutoutPolicy(DevelColorVisual::CutoutPolicy::NONE),
   mAlwaysUsingBlurRadius(false)
 {
 }
@@ -141,6 +158,22 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
       }
     }
   }
+
+  Property::Value* cutoutPolicyValue = propertyMap.Find(Toolkit::DevelColorVisual::Property::CUTOUT_POLICY, CUTOUT_POLICY_NAME);
+  if(cutoutPolicyValue)
+  {
+    int cutoutPolicy = static_cast<int>(DevelColorVisual::CutoutPolicy::NONE) - 1; ///< Make always invalid
+    if(DALI_UNLIKELY(!Scripting::GetEnumerationProperty(*cutoutPolicyValue, CUTOUT_POLICY_TABLE, CUTOUT_POLICY_TABLE_COUNT, cutoutPolicy)))
+    {
+      std::ostringstream oss;
+      oss << *cutoutPolicyValue;
+      DALI_LOG_ERROR("ColorVisual:DoSetProperties:: CUTOUT_POLICY property has incorrect type : %d, value : %s\n", cutoutPolicyValue->GetType(), oss.str().c_str());
+    }
+    else
+    {
+      mCutoutPolicy = static_cast<DevelColorVisual::CutoutPolicy::Type>(cutoutPolicy);
+    }
+  }
 }
 
 void ColorVisual::DoSetOnScene(Actor& actor)
@@ -161,6 +194,7 @@ void ColorVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Clear();
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
   map.Insert(Toolkit::ColorVisual::Property::MIX_COLOR, mImpl->mMixColor);
+  map.Insert(Toolkit::DevelColorVisual::Property::CUTOUT_POLICY, mCutoutPolicy);
 
   if(mImpl->mRenderer)
   {
@@ -223,6 +257,12 @@ void ColorVisual::OnInitialize()
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
   }
 
+  if(IsCutoutRequired())
+  {
+    int cutoutWithCornerRadius = (mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS) ? 1 : 0;
+    mImpl->mRenderer.RegisterUniqueProperty("uCutoutWithCornerRadius", cutoutWithCornerRadius);
+  }
+
   // Register transform properties
   mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
@@ -235,6 +275,7 @@ Shader ColorVisual::GenerateShader() const
   bool roundedCorner  = IsRoundedCornerRequired();
   bool borderline     = IsBorderlineRequired();
   bool blur           = IsBlurRequired();
+  bool cutout         = IsCutoutRequired();
   int  shaderTypeFlag = ColorVisualRequireFlag::DEFAULT;
 
   if(blur)
@@ -252,7 +293,7 @@ Shader ColorVisual::GenerateShader() const
     shaderTypeFlag |= ColorVisualRequireFlag::BORDERLINE;
   }
 
-  shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
+  shaderType = cutout ? SHADER_TYPE_WITH_CUTOUT_TABLE[shaderTypeFlag] : SHADER_TYPE_TABLE[shaderTypeFlag];
   shader     = mFactoryCache.GetShader(shaderType);
   if(!shader)
   {
@@ -278,6 +319,11 @@ Shader ColorVisual::GenerateShader() const
     {
       vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
       fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
+    }
+    if(cutout)
+    {
+      vertexShaderPrefixList += "#define IS_REQUIRED_CUTOUT\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_CUTOUT\n";
     }
 
     shader = mFactoryCache.GenerateAndSaveShader(shaderType,
@@ -329,6 +375,11 @@ bool ColorVisual::IsBlurRequired() const
     blurRadius = mImpl->mRenderer.GetProperty<float>(DecoratedVisualRenderer::Property::BLUR_RADIUS);
   }
   return mAlwaysUsingBlurRadius || !EqualsZero(blurRadius);
+}
+
+bool ColorVisual::IsCutoutRequired() const
+{
+  return (mCutoutPolicy != DevelColorVisual::CutoutPolicy::NONE);
 }
 
 } // namespace Internal

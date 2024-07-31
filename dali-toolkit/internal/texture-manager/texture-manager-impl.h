@@ -261,17 +261,33 @@ public:
   /**
    * @copydoc TextureCacheManager::RemoveExternalTexture
    */
-  inline TextureSet RemoveExternalTexture(const std::string& url)
+  inline TextureSet RemoveExternalTexture(const VisualUrl& url)
   {
     return mTextureCacheManager.RemoveExternalTexture(url);
   }
 
   /**
+   * @copydoc TextureCacheManager::RemoveExternalTexture
+   */
+  inline TextureSet RemoveExternalTextureByUrl(const std::string& url)
+  {
+    return RemoveExternalTexture(url);
+  }
+
+  /**
    * @copydoc TextureCacheManager::RemoveEncodedImageBuffer
    */
-  inline EncodedImageBuffer RemoveEncodedImageBuffer(const std::string& url)
+  inline EncodedImageBuffer RemoveEncodedImageBuffer(const VisualUrl& url)
   {
     return mTextureCacheManager.RemoveEncodedImageBuffer(url);
+  }
+
+  /**
+   * @copydoc TextureCacheManager::RemoveEncodedImageBuffer
+   */
+  inline EncodedImageBuffer RemoveEncodedImageBufferByUrl(const std::string& url)
+  {
+    return RemoveEncodedImageBuffer(url);
   }
 
   /**
@@ -285,7 +301,7 @@ public:
   /**
    * @copydoc TextureCacheManager::GetEncodedImageBuffer
    */
-  inline EncodedImageBuffer GetEncodedImageBuffer(const std::string& url)
+  inline EncodedImageBuffer GetEncodedImageBuffer(const VisualUrl& url)
   {
     return mTextureCacheManager.GetEncodedImageBuffer(url);
   }

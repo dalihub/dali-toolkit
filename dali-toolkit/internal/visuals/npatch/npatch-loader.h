@@ -153,7 +153,7 @@ private:
     NPatchInfo& operator=(const NPatchInfo& info) = delete; // Do not use copy assign
 
     NPatchDataPtr mData;
-    std::int16_t  mReferenceCount; ///< The number of N-patch visuals that use this data.
+    int32_t       mReferenceCount; ///< The number of N-patch visuals that use this data.
   };
 
   /**

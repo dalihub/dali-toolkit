@@ -53,6 +53,12 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_SHADER_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_ROUNDED_BORDERLINE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_BLUR_EDGE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_ROUNDED_CORNER_BLUR_EDGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_ROUNDED_CORNER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_ROUNDED_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_BLUR_EDGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_ROUNDED_CORNER_BLUR_EDGE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, BORDER_SHADER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, BORDER_SHADER_ANTI_ALIASING)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_LINEAR_BOUNDING_BOX)
@@ -172,6 +178,7 @@ const char* const CORNER_RADIUS_POLICY("cornerRadiusPolicy");
 
 // Color visual
 const char* const BLUR_RADIUS_NAME("blurRadius");
+const char* const CUTOUT_POLICY_NAME("cutoutPolicy");
 
 // Image visual
 const char* const IMAGE_URL_NAME("url");
@@ -213,6 +220,7 @@ const char* const FAST_TRACK_UPLOADING_NAME("fastTrackUploading");
 const char* const ENABLE_BROKEN_IMAGE("enableBrokenImage");
 const char* const ENABLE_FRAME_CACHE("enableFrameCache");
 const char* const NOTIFY_AFTER_RASTERIZATION("notifyAfterRasterization");
+const char* const SYNCHRONOUS_SIZING("synchronousSizing");
 
 // Text visual
 const char* const TEXT_PROPERTY("text");

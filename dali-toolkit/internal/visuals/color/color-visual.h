@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_COLOR_VISUAL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
@@ -131,6 +132,13 @@ protected:
    */
   bool IsBlurRequired() const;
 
+  /**
+   * @brief Query whether the visual requires to cutout feature.
+   *
+   * @return Returns true if the cutout is required, false otherwise.
+   */
+  bool IsCutoutRequired() const;
+
 private:
   // Undefined
   ColorVisual(const ColorVisual& colorRenderer);
@@ -139,8 +147,10 @@ private:
   ColorVisual& operator=(const ColorVisual& colorRenderer);
 
 private:
-  float mBlurRadius;                ///< The blur radius
-  bool  mAlwaysUsingBlurRadius : 1; ///< Whether we need the blur radius in shader always.
+  float mBlurRadius; ///< The blur radius
+
+  DevelColorVisual::CutoutPolicy::Type mCutoutPolicy : 3;          ///< The policy of cutout
+  bool                                 mAlwaysUsingBlurRadius : 1; ///< Whether we need the blur radius in shader always.
 };
 
 } // namespace Internal
