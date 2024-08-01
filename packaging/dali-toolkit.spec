@@ -1,4 +1,4 @@
-Name:       dali-toolkit-vk
+Name:       dali-toolkit
 Summary:    Dali 3D engine Toolkit
 Version:    1.4.16
 Release:    1
@@ -9,35 +9,18 @@ Source0:    %{name}-%{version}.tar.gz
 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-
-%if 0%{?tizen_version_major} < 4
-%define disable_cxx03_build 1
-%endif
-
+BuildRequires:  cmake
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
-BuildRequires:  pkgconfig(dali-core-vk)
-BuildRequires:  pkgconfig(dali-adaptor-vk)
-%if !0%{?disable_cxx03_build}
-BuildRequires:  pkgconfig(dali-core-vk-cxx03)
-BuildRequires:  pkgconfig(dali-adaptor-vk-cxx03)
-%endif
-BuildRequires: gettext
+BuildRequires:  pkgconfig(dali-core)
+BuildRequires:  pkgconfig(dali-adaptor)
 
-
-#need libtzplatform-config for directory if tizen version is 3.x
-
-%if 0%{?tizen_version_major} >= 3
+BuildRequires:  gettext
 BuildRequires:  pkgconfig(libtzplatform-config)
-%endif
 
 #############################
 # profile setup
 #############################
-
-%if "%{tizen_version_major}" == "2" && 0%{?tizen_profile_name:1}
-%define profile %{tizen_profile_name}
-%endif
 
 %description
 Dali 3D engine Toolkit - a set of controls that provide
@@ -86,14 +69,6 @@ Conflicts:  %{name}-resources_720x1280
 dali-toolkit default resource files for 1920x1080
 Contain po / sounds / common images / style / style images
 
-%if !0%{?disable_cxx03_build}
-%package cxx03
-Summary:	Dali 3D engine Toolkit with cxx03
-Provides:	%{name}-cxx03 = %{version}-%{release}
-
-%description cxx03
-Dali 3D engine Toolkit with cxx03
-%endif
 
 ##############################
 # devel
@@ -107,29 +82,28 @@ Requires:   %{name} = %{version}-%{release}
 Application development package for Dali 3D engine toolkit - headers and package config
 
 ##############################
-# Preparation
-##############################
-%prep
-%setup -q
 
-#Use TZ_PATH when tizen version is 3.x
-
-%if "%{tizen_version_major}" == "2"
-%define dali_data_rw_dir            /opt/usr/share/dali/
-%define dali_data_ro_dir            /usr/share/dali/
-%else
 %define dali_data_rw_dir            %TZ_SYS_SHARE/dali/
 %define dali_data_ro_dir            %TZ_SYS_RO_SHARE/dali/
-%endif
 
 %define dali_toolkit_image_files    %{dali_data_ro_dir}/toolkit/images/
 %define dali_toolkit_sound_files    %{dali_data_ro_dir}/toolkit/sounds/
 %define dali_toolkit_style_files    %{dali_data_ro_dir}/toolkit/styles/
 %define dev_include_path %{_includedir}
 
+##############################
+# Preparation
+##############################
+%prep
+%setup -q
+
+##############################
+# Build
+##############################
+%build
 # PO
 {
-cd %{_builddir}/dali-toolkit-vk-%{version}/dali-toolkit/po
+cd %{_builddir}/dali-toolkit-%{version}/dali-toolkit/po
 for language in *.po
 do
   language=${language%.po}
@@ -137,10 +111,6 @@ do
 done
 } &> /dev/null
 
-##############################
-# Build
-##############################
-%build
 PREFIX="/usr"
 CXXFLAGS+=" -Wall -g -Os -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
 LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -Wl,-Bsymbolic-functions "
@@ -150,71 +120,51 @@ CXXFLAGS+=" --coverage "
 LDFLAGS+=" --coverage "
 %endif
 
-libtoolize --force
-cd %{_builddir}/dali-toolkit-vk-%{version}/build/tizen
-autoreconf --install
-DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
-DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
-
-%configure --enable-profile=TIZEN \
-%if 0%{?enable_debug}
-           --enable-debug \
+%ifarch %{arm}
+CXXFLAGS+=" -D_ARCH_ARM_"
 %endif
-%if 0%{?enable_trace}
-      --enable-trace \
-%endif
-           --enable-i18n=yes \
-           --enable-rename-so=no
-
-make %{?jobs:-j%jobs}
-
-pushd %{_builddir}/%{name}-%{version}/build/tizen
-%make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
-popd
-
-pushd %{buildroot}%{_libdir}
-for FILE in libdali-toolkit-vk-cxx11.so*; do mv "$FILE" "%{_builddir}/%{name}-%{version}/build/tizen/$FILE"; done
-mv pkgconfig/dali-toolkit-vk.pc %{_builddir}/%{name}-%{version}/build/tizen/dali-toolkit-vk.pc
-popd
-
-%if !0%{?disable_cxx03_build}
-make clean
 
 libtoolize --force
-cd %{_builddir}/dali-toolkit-vk-%{version}/build/tizen
-autoreconf --install
+cd %{_builddir}/dali-toolkit-%{version}/build/tizen
 
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
 
-%configure --enable-profile=TIZEN \
-           --enable-cxx03-abi=yes \
+cmake \
 %if 0%{?enable_debug}
-           --enable-debug \
+      -DCMAKE_BUILD_TYPE=Debug \
 %endif
-%if 0%{?enable_trace}
-      --enable-trace \
-%endif
-           --enable-i18n=yes \
-           --enable-rename-so=no
+      -DENABLE_TRACE=ON \
+      -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+      -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
+      -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir} \
+      -DENABLE_I18N=ON
 
 make %{?jobs:-j%jobs}
-%endif
+
+#pushd %{_builddir}/%{name}-%{version}/build/tizen
+#%make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
+#popd
+
+#pushd %{buildroot}%{_libdir}
+#mv pkgconfig/dali-toolkit-vk.pc %{_builddir}/%{name}-%{version}/build/tizen/dali-toolkit-vk.pc
+#popd
 
 ##############################
 # Installation
 ##############################
 %install
 rm -rf %{buildroot}
-pushd %{_builddir}/%{name}-%{version}/build/tizen
-%make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
+cd build/tizen
 
-for FILE in libdali-toolkit-vk-cxx11.so*; do mv "$FILE" "%{buildroot}%{_libdir}/$FILE"; done
-mv dali-toolkit-vk.pc %{buildroot}%{_libdir}/pkgconfig/dali-toolkit-vk.pc
+pushd %{_builddir}/%{name}-%{version}/build/tizen
+%make_install
+#%make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
+#mv dali-toolkit-vk.pc %{buildroot}%{_libdir}/pkgconfig/dali-toolkit-vk.pc
 
 # PO
 {
-cd %{_builddir}/dali-toolkit-vk-%{version}/dali-toolkit/po
+cd %{_builddir}/dali-toolkit-%{version}/dali-toolkit/po
 for language in *.mo
 do
   language=${language%.mo}
@@ -224,23 +174,12 @@ done
 } &> /dev/null
 popd
 
-#############################
-#rename
-#############################
-pushd  %{buildroot}%{_libdir}
-rm -rf libdali-toolkit-vk.so
-rm -rf libdali-toolkit-vk-cxx11.so
-%if !0%{?disable_cxx03_build}
-ln -s libdali-toolkit-vk.so.0.0.* libdali-toolkit-vk-cxx03.so
-%endif
-ln -s libdali-toolkit-vk-cxx11.so.0.0.* libdali-toolkit-vk.so
-popd
-
 # Remove default style and style images which are for Linux build
 rm -rf %{buildroot}%{dali_toolkit_style_files}/*
 
 # Make folder to contain style and style images
 # After making folder, copy local style and style images to new folder
+pushd %{_builddir}/%{name}-%{version}
 mkdir -p %{buildroot}%{dali_toolkit_style_files}/360x360
 cp -r dali-toolkit/styles/360x360/* %{buildroot}%{dali_toolkit_style_files}/360x360
 mkdir -p %{buildroot}%{dali_toolkit_style_files}/480x800
@@ -252,6 +191,10 @@ cp -r dali-toolkit/styles/1920x1080/* %{buildroot}%{dali_toolkit_style_files}/19
 
 # Copy default feedback theme
 cp dali-toolkit/styles/default-feedback-theme.json %{buildroot}%{dali_toolkit_style_files}
+
+## Copy default debug image visual shader script
+#cp dali-toolkit/styles/debug-image-visual-shader-script.json %{buildroot}%{dali_toolkit_style_files}
+#popd
 
 ##############################
 # Pre Install
@@ -421,27 +364,13 @@ esac
 %manifest dali-toolkit.manifest
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/libdali-toolkit-vk-cxx11.so.*
-%{_libdir}/libdali-toolkit-vk.so
+%{_libdir}/libdali-toolkit.so*
 %license LICENSE
-
-%if !0%{?disable_cxx03_build}
-%files cxx03
-%if 0%{?enable_dali_smack_rules}
-%manifest dali-toolkit.manifest-smack
-%else
-%manifest dali-toolkit.manifest
-%endif
-%defattr(-,root,root,-)
-%{_libdir}/libdali-toolkit-vk.so.*
-%{_libdir}/libdali-toolkit-vk-cxx03.so
-%license LICENSE
-%endif
 
 %files devel
 %defattr(-,root,root,-)
 %{dev_include_path}/dali-toolkit/*
-%{_libdir}/pkgconfig/dali-toolkit-vk.pc
+%{_libdir}/pkgconfig/dali-toolkit.pc
 
 %files resources_360x360
 %manifest dali-toolkit-resources.manifest
