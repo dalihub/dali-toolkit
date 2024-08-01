@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/set-wrapper.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
@@ -180,8 +181,10 @@ private:
 
 private:
   std::vector<VectorAnimationTaskPtr> mAnimationTasks; ///< Animation processing tasks, ordered by next frame time.
-  std::vector<VectorAnimationTaskPtr> mCompletedTasks; ///< Temperal storage for completed tasks.
-  std::vector<VectorAnimationTaskPtr> mWorkingTasks;
+
+  using VectorAnimationTaskSet = std::set<VectorAnimationTaskPtr>;
+  VectorAnimationTaskSet mCompletedTasks; ///< Temperal storage for completed tasks.
+  VectorAnimationTaskSet mWorkingTasks;   ///< Tasks which are currently being processed. Key is the task, value is the number of tasks running.
 
   std::vector<std::pair<VectorAnimationTaskPtr, bool>> mCompletedTasksQueue; ///< Queue of completed tasks from worker thread. pair of task, and rasterize required.
                                                                              ///< It will be moved at begin of Rasterize().
