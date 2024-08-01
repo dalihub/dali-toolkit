@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/common/stage.h>
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
@@ -46,13 +46,16 @@ namespace Toolkit
 {
 namespace Internal
 {
+#ifdef DEBUG_ENABLED
+extern Debug::Filter* gRenderEffectLogFilter; ///< Define at render-effect-impl.cpp
+#endif
+
 BlurEffectImpl::BlurEffectImpl(bool isBackground)
 : RenderEffectImpl(),
   mInternalRoot(Actor::New()),
   mDownscaleFactor(BLUR_EFFECT_DOWNSCALE_FACTOR),
   mPixelRadius(BLUR_EFFECT_PIXEL_RADIUS),
   mBellCurveWidth(0.001f),
-  mIsActivated(false),
   mIsBackground(isBackground)
 {
 }
@@ -63,7 +66,6 @@ BlurEffectImpl::BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool 
   mDownscaleFactor(downscaleFactor),
   mPixelRadius((blurRadius >> 2) + 1),
   mBellCurveWidth(0.001f),
-  mIsActivated(false),
   mIsBackground(isBackground)
 {
   DALI_ASSERT_ALWAYS(downscaleFactor <= 1.0 && 0.0 < downscaleFactor);
@@ -87,7 +89,7 @@ BlurEffectImplPtr BlurEffectImpl::New(float downscaleFactor, uint32_t blurRadius
   return handle;
 }
 
-void BlurEffectImpl::Initialize()
+void BlurEffectImpl::OnInitialize()
 {
   mRenderFullSizeCamera = CameraActor::New();
   mRenderFullSizeCamera.SetInvertYAxis(true);
@@ -123,6 +125,8 @@ void BlurEffectImpl::Initialize()
   }
   mBellCurveWidth = sigma;
 
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[BlurEffect:%p] mBellCurveWidth calculated! [radius:%u][sigma:%f]\n", this, mPixelRadius, mBellCurveWidth);
+
   //////////////////////////////////////////////////////
   // Create actors
   mInternalRoot.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -142,41 +146,15 @@ void BlurEffectImpl::Initialize()
   mInternalRoot.Add(mVerticalBlurActor);
 }
 
-Vector2 BlurEffectImpl::GetTargetSizeForValidTexture()
+void BlurEffectImpl::OnActivate()
 {
-  Vector2 size = GetTargetSize();
-  if(size == Vector2::ZERO)
-  {
-    size = GetOwnerControl().GetNaturalSize();
-  }
-
-  if(size == Vector2::ZERO || size.x < 0.0f || size.y < 0.0f)
-  {
-    return Vector2::ZERO;
-  }
-
-  const uint32_t maxTextureSize = Dali::GetMaxTextureSize();
-  if(uint32_t(size.x) > maxTextureSize || uint32_t(size.y) > maxTextureSize)
-  {
-    uint32_t denominator = std::max(size.x, size.y);
-    size.x               = (size.x * maxTextureSize / denominator);
-    size.y               = (size.y * maxTextureSize / denominator);
-  }
-  return size;
-}
-
-void BlurEffectImpl::Activate()
-{
-  if(mIsActivated)
-  {
-    return;
-  }
-  mIsActivated                  = true;
   Toolkit::Control ownerControl = GetOwnerControl();
   DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
 
   // Get/Set sizes
   Vector2 size = GetTargetSizeForValidTexture();
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[BlurEffect:%p] OnActivated! [ID:%d][size:%fx%f]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, size.x, size.y);
+
   if(size == Vector2::ZERO)
   {
     return;
@@ -192,7 +170,17 @@ void BlurEffectImpl::Activate()
     downsampledHeight = 1u;
   }
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  Integration::SceneHolder sceneHolder = Integration::SceneHolder::Get(ownerControl);
+  if(DALI_UNLIKELY(!sceneHolder))
+  {
+    DALI_LOG_ERROR("BlurEffect Could not be activated due to ownerControl's SceneHolder is not exist\n");
+    return;
+  }
+
+  // Keep sceneHolder as week handle.
+  mPlacementSceneHolder = sceneHolder;
+
+  RenderTaskList taskList = sceneHolder.GetRenderTaskList();
 
   // Prepare resource
   // original texture output
@@ -229,7 +217,7 @@ void BlurEffectImpl::Activate()
   mSourceRenderTask = taskList.CreateTask();
   if(mIsBackground)
   {
-    mSourceRenderTask.SetSourceActor(Stage::GetCurrent().GetRootLayer());
+    mSourceRenderTask.SetSourceActor(sceneHolder.GetRootLayer());
     mSourceRenderTask.RenderUntil(ownerControl);
   }
   else
@@ -277,9 +265,15 @@ void BlurEffectImpl::Activate()
   ownerControl.Add(mInternalRoot);
 }
 
-void BlurEffectImpl::Deactivate()
+void BlurEffectImpl::OnDeactivate()
 {
-  mIsActivated = false;
+  auto ownerControl = GetOwnerControl();
+  if(DALI_LIKELY(ownerControl))
+  {
+    Renderer renderer = GetTargetRenderer();
+    ownerControl.RemoveRenderer(renderer);
+  }
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[BlurEffect:%p] OnDeactivated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
 
   mInternalRoot.Unparent();
 
@@ -287,10 +281,42 @@ void BlurEffectImpl::Deactivate()
   mTemporaryFrameBuffer.Reset();
   mSourceFrameBuffer.Reset();
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
-  taskList.RemoveTask(mHorizontalBlurTask);
-  taskList.RemoveTask(mVerticalBlurTask);
-  taskList.RemoveTask(mSourceRenderTask);
+  auto sceneHolder = mPlacementSceneHolder.GetHandle();
+  if(DALI_LIKELY(sceneHolder))
+  {
+    RenderTaskList taskList = sceneHolder.GetRenderTaskList();
+    taskList.RemoveTask(mHorizontalBlurTask);
+    taskList.RemoveTask(mVerticalBlurTask);
+    taskList.RemoveTask(mSourceRenderTask);
+    mPlacementSceneHolder.Reset();
+  }
+
+  mHorizontalBlurTask.Reset();
+  mVerticalBlurTask.Reset();
+  mSourceRenderTask.Reset();
+}
+
+Vector2 BlurEffectImpl::GetTargetSizeForValidTexture() const
+{
+  Vector2 size = GetTargetSize();
+  if(size == Vector2::ZERO)
+  {
+    size = GetOwnerControl().GetNaturalSize();
+  }
+
+  if(size == Vector2::ZERO || size.x < 0.0f || size.y < 0.0f)
+  {
+    return Vector2::ZERO;
+  }
+
+  const uint32_t maxTextureSize = Dali::GetMaxTextureSize();
+  if(uint32_t(size.x) > maxTextureSize || uint32_t(size.y) > maxTextureSize)
+  {
+    uint32_t denominator = std::max(size.x, size.y);
+    size.x               = (size.x * maxTextureSize / denominator);
+    size.y               = (size.y * maxTextureSize / denominator);
+  }
+  return size;
 }
 
 void BlurEffectImpl::SetShaderConstants(float downsampledWidth, float downsampledHeight)
@@ -355,13 +381,15 @@ std::string BlurEffectImpl::GetSampleWeightsPropertyName(unsigned int index) con
 
 void BlurEffectImpl::SynchronizeBackgroundCornerRadius()
 {
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[BlurEffect:%p] Synchronize background corner radius\n", this);
+
   DALI_ASSERT_ALWAYS(GetOwnerControl() && "You should first SetRenderEffect(), then set its background property map");
 
   Property::Map map    = GetOwnerControl().GetProperty<Property::Map>(Toolkit::Control::Property::BACKGROUND);
   Vector4       radius = Vector4::ZERO;
   map[Toolkit::DevelVisual::Property::CORNER_RADIUS].Get(radius);
 
-  Visual::Transform::Policy::Type policy;
+  Visual::Transform::Policy::Type policy{Visual::Transform::Policy::ABSOLUTE};
   map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY].Get(policy);
 
   Renderer renderer = GetTargetRenderer();

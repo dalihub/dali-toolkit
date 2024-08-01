@@ -174,27 +174,29 @@ void Control::SetRenderEffect(Toolkit::RenderEffect effect)
     ClearRenderEffect();
     mImpl->mRenderEffect = effect;
 
-    BaseObject&                          handle = effect.GetBaseObject();
-    Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(&handle);
-    DALI_ASSERT_ALWAYS(object && "Not a valid RenderEffect set.");
+    if(effect)
+    {
+      Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(mImpl->mRenderEffect.GetObjectPtr());
+      DALI_ASSERT_ALWAYS(object && "Not a valid RenderEffect set.");
 
-    Dali::Toolkit::Control ownerControl(GetOwner());
-    object->SetOwnerControl(ownerControl);
-    object->Activate();
+      Dali::Toolkit::Control ownerControl(GetOwner());
+      object->SetOwnerControl(ownerControl);
+    }
   }
 }
 
 void Control::ClearRenderEffect()
 {
-  BaseObject&                          handle = mImpl->mRenderEffect.GetBaseObject();
-  Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(&handle);
-
-  if(object)
+  if(mImpl->mRenderEffect)
   {
-    object->Deactivate();
-    object->ClearOwnerControl();
+    Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(mImpl->mRenderEffect.GetObjectPtr());
+
+    if(object)
+    {
+      object->ClearOwnerControl();
+    }
+    mImpl->mRenderEffect.Reset();
   }
-  mImpl->mRenderEffect.Reset();
 }
 
 void Control::SetResourceReady()
@@ -437,6 +439,9 @@ Control::Control(ControlBehaviour behaviourFlags)
 
 Control::~Control()
 {
+  // Deactivate render effect before destroying the control impl
+  ClearRenderEffect();
+
   delete mImpl;
 }
 
