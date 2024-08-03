@@ -15,6 +15,7 @@
  *
  */
 
+#include <dali/devel-api/animation/key-frames-devel.h>
 #include <dali-scene3d/public-api/loader/animation-definition.h>
 #include <dali-scene3d/public-api/loader/facial-animation-loader.h>
 #include <dali-test-suite-utils.h>
@@ -170,5 +171,61 @@ int UtcDaliLoadFacialAnimationFailed03(void)
     AnimationDefinition animDef = LoadFacialAnimation(oss.str());
     DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
   }
+  END_TEST;
+}
+
+int UtcDaliLoadFacialAnimationLoadFirstFrameData(void)
+{
+  TestApplication application;
+
+  tet_infoline("parse json which don't define times zero");
+  std::string rawData = R"(
+  {
+    "name": "Facial_Blendshape_Animation",
+    "version": "1.2.3",
+    "blendShapes": [
+      {
+        "name": "GEO_1",
+        "fullName": "Facial_Blendshape_Animation:GEO_1",
+        "blendShapeVersion": "3.0",
+        "morphtarget": 1,
+        "morphname": [
+          "EyeBlink_Left"
+        ],
+        "key": [
+          [
+            0.5
+          ],
+          [
+            1.0
+          ]
+        ]
+      }
+    ],
+    "shapesAmount": 1,
+    "time": [
+      50,
+      100
+    ],
+    "frames": 2
+  }
+  )";
+  AnimationDefinition animDef = LoadFacialAnimationFromBuffer(reinterpret_cast<uint8_t*>(rawData.data()), static_cast<int>(rawData.length()));
+
+  DALI_TEST_EQUALS(1u, animDef.GetPropertyCount(), TEST_LOCATION);
+
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(0).mNodeName, "GEO_1");
+  DALI_TEST_EQUAL(animDef.GetPropertyAt(0).mPropertyName, "uBlendShapeWeight[0]");
+
+  // Let we ensure 0'th keyframe progress is 0.0f.
+  auto keyFrames = animDef.GetPropertyAt(0).mKeyFrames;
+  DALI_TEST_EQUAL(keyFrames.GetType(), Property::Type::FLOAT);
+  DALI_TEST_EQUALS(Dali::DevelKeyFrames::GetKeyFrameCount(keyFrames), 3, TEST_LOCATION);
+
+  float progress = -1.0f;
+  Property::Value value = Property::Value(10.0f);
+  Dali::DevelKeyFrames::GetKeyFrame(keyFrames, 0u, progress, value);
+  DALI_TEST_EQUALS(progress, 0.0f, TEST_LOCATION);
+
   END_TEST;
 }
