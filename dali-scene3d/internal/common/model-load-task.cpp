@@ -20,7 +20,15 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <filesystem>
+
+#ifdef TRACE_ENABLED
+#include <chrono>
+#include <iomanip>
+#include <sstream>
+#include <thread>
+#endif
 
 namespace Dali
 {
@@ -31,6 +39,18 @@ namespace Internal
 namespace
 {
 static constexpr Vector3 Y_DIRECTION(1.0f, -1.0f, 1.0f);
+
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_MODEL_PERFORMANCE_MARKER, false);
+
+#ifdef TRACE_ENABLED
+uint64_t GetNanoseconds()
+{
+  // Get the time of a monotonic clock since its epoch.
+  auto epoch    = std::chrono::steady_clock::now().time_since_epoch();
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch);
+  return static_cast<uint64_t>(duration.count());
+}
+#endif
 } // namespace
 
 ModelLoadTask::ModelLoadTask(const std::string& modelUrl, const std::string& resourceDirectoryUrl, CallbackBase* callback)
@@ -51,6 +71,18 @@ ModelLoadTask::~ModelLoadTask()
 
 void ModelLoadTask::Process()
 {
+#ifdef TRACE_ENABLED
+  uint64_t mStartTimeNanoSceonds = 0;
+  uint64_t mEndTimeNanoSceonds   = 0;
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    mStartTimeNanoSceonds = GetNanoseconds();
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss) {
+      oss << "[u:" << mModelUrl << ",dir:" << mResourceDirectoryUrl << "]";
+    });
+  }
+#endif
+
   if(mResourceDirectoryUrl.empty())
   {
     std::filesystem::path modelUrl(mModelUrl);
@@ -63,13 +95,15 @@ void ModelLoadTask::Process()
 
   mModelLoader = std::make_shared<Dali::Scene3D::Loader::ModelLoader>(mModelUrl, mResourceDirectoryUrl, mLoadResult);
 
-  bool loadSucceeded = false;
+  bool loadSucceeded  = false;
+  bool useCachedModel = false;
   {
     // Lock model url during process, so let we do not try to load same model multiple times.
     mModelCacheManager.LockModelLoadScene(mModelUrl);
     if(mModelCacheManager.IsSceneLoaded(mModelUrl))
     {
-      loadSucceeded = true;
+      useCachedModel = true;
+      loadSucceeded  = true;
     }
     else
     {
@@ -90,6 +124,21 @@ void ModelLoadTask::Process()
     mModelCacheManager.UnlockModelLoadScene(mModelUrl);
   }
 
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    mEndTimeNanoSceonds = GetNanoseconds();
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss) {
+      oss << std::fixed << std::setprecision(3);
+      oss << "[";
+      oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
+      oss << "c?" << useCachedModel << " ";
+      oss << "s?" << loadSucceeded << " ";
+      oss << "dir:" << mResourceDirectoryUrl << " ";
+      oss << "u:" << mModelUrl << "]";
+    });
+  }
+#endif
   if(!loadSucceeded)
   {
     DALI_LOG_ERROR("Failed to load scene from '%s'\n", mModelUrl.c_str());

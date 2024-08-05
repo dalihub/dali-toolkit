@@ -236,6 +236,7 @@ Dali::Shader ShaderManager::ProduceShader(const ShaderOption& shaderOption)
     DALI_LOG_INFO(gLogFilter, Debug::Concise, "Creating new shader: hash: %lx\n", hash);
     ShaderDefinition shaderDef;
     shaderDef.mUseBuiltInShader = true;
+    shaderDef.mShadowOptionHash = hash;
 
     shaderOption.GetDefines(shaderDef.mDefines);
     shaderDef.mMacros                  = shaderOption.GetMacroDefinitions();
