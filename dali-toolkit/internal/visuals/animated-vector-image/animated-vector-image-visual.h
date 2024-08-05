@@ -217,11 +217,6 @@ private:
   void OnControlInheritedVisibilityChanged(Actor actor, bool visible);
 
   /**
-   * @brief Callback when the visibility of the window is changed.
-   */
-  void OnWindowVisibilityChanged(Window window, bool visible);
-
-  /**
    * @brief Callback when the event is processed.
    */
   void OnProcessEvents();
@@ -233,7 +228,6 @@ private:
   AnimatedVectorImageVisual& operator=(const AnimatedVectorImageVisual& visual) = delete;
 
 private:
-  WeakHandle<Window>                 mPlacementWindow;
   VisualUrl                          mImageUrl;
   VectorAnimationTask::AnimationData mAnimationData;
   VectorAnimationTaskPtr             mVectorAnimationTask;

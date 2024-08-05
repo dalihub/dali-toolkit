@@ -193,12 +193,14 @@ void Window::Raise()
 void Window::Show()
 {
   GetImplementation(*this).mVisible = true;
+  GetImplementation(*this).GetScene().Show();
   GetImplementation(*this).mVisibilityChangedSignal.Emit(*this, true);
 }
 
 void Window::Hide()
 {
   GetImplementation(*this).mVisible = false;
+  GetImplementation(*this).GetScene().Hide();
   GetImplementation(*this).mVisibilityChangedSignal.Emit(*this, false);
 }
 

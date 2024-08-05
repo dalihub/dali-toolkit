@@ -820,13 +820,6 @@ void AnimatedImageVisual::DoSetOnScene(Actor& actor)
   PrepareTextureSet();
 
   actor.InheritedVisibilityChangedSignal().Connect(this, &AnimatedImageVisual::OnControlInheritedVisibilityChanged);
-
-  Window window = DevelWindow::Get(actor);
-  if(window)
-  {
-    mPlacementWindow = window;
-    DevelWindow::VisibilityChangedSignal(window).Connect(this, &AnimatedImageVisual::OnWindowVisibilityChanged);
-  }
 }
 
 void AnimatedImageVisual::DoSetOffScene(Actor& actor)
@@ -858,13 +851,6 @@ void AnimatedImageVisual::DoSetOffScene(Actor& actor)
   mCurrentLoopIndex  = FIRST_LOOP;
 
   actor.InheritedVisibilityChangedSignal().Disconnect(this, &AnimatedImageVisual::OnControlInheritedVisibilityChanged);
-
-  Window window = mPlacementWindow.GetHandle();
-  if(window)
-  {
-    DevelWindow::VisibilityChangedSignal(window).Disconnect(this, &AnimatedImageVisual::OnWindowVisibilityChanged);
-    mPlacementWindow.Reset();
-  }
 }
 
 void AnimatedImageVisual::OnSetTransform()
@@ -1193,16 +1179,6 @@ void AnimatedImageVisual::OnControlInheritedVisibilityChanged(Actor actor, bool 
     mActionStatus = DevelAnimatedImageVisual::Action::STOP;
     DisplayNextFrame();
     DALI_LOG_INFO(gAnimImgLogFilter, Debug::Verbose, "AnimatedImageVisual::OnControlInheritedVisibilityChanged: invisibile. Pause animation [%p]\n", this);
-  }
-}
-
-void AnimatedImageVisual::OnWindowVisibilityChanged(Window window, bool visible)
-{
-  if(!visible && mActionStatus != DevelAnimatedImageVisual::Action::STOP)
-  {
-    mActionStatus = DevelAnimatedImageVisual::Action::STOP;
-    DisplayNextFrame();
-    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Verbose, "AnimatedImageVisual::OnWindowVisibilityChanged: invisibile. Pause animation [%p]\n", this);
   }
 }
 
