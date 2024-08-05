@@ -28,6 +28,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
+#include <dali/integration-api/trace.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
@@ -50,6 +51,7 @@ constexpr uint32_t GC_PERIOD_MILLISECONDS                     = 1000u;
 #ifdef DEBUG_ENABLED
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_IMAGE_RESOURCE_LOADER");
 #endif
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_MODEL_PERFORMANCE_MARKER, false);
 
 bool IsDefaultPixelData(const Dali::PixelData& pixelData)
 {
@@ -153,12 +155,29 @@ Dali::PixelData CreatePixelDataFromImageInfo(const ImageInformation& info, bool 
 {
   Dali::PixelData pixelData;
 
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_FILE", [&](std::ostringstream& oss) {
+    oss << "[";
+    if(info.mDimensions.GetWidth() > 0 || info.mDimensions.GetHeight() > 0)
+    {
+      oss << "d:" << info.mDimensions.GetWidth() << "x" << info.mDimensions.GetHeight() << " ";
+    }
+    oss << "f:" << info.mFittingMode << " s:" << info.mSamplingMode << " c:" << info.mOrientationCorrection << " ";
+    oss << "u:" << info.mUrl << "]";
+  });
   // Load the image synchronously (block the thread here).
   Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(info.mUrl, info.mDimensions, info.mFittingMode, info.mSamplingMode, info.mOrientationCorrection);
   if(pixelBuffer)
   {
     pixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffer, releasePixelData);
   }
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_FILE", [&](std::ostringstream& oss) {
+    oss << "[";
+    if(pixelData)
+    {
+      oss << "d:" << pixelData.GetWidth() << "x" << pixelData.GetHeight() << " f:" << pixelData.GetPixelFormat() << " ";
+    }
+    oss << "u:" << info.mUrl << "]";
+  });
   return pixelData;
 }
 

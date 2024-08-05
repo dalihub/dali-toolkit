@@ -50,6 +50,7 @@ ShaderDefinition::ShaderDefinition(const ShaderDefinition& other)
   mDefines(other.mDefines),
   mHints(other.mHints),
   mUniforms(other.mUniforms),
+  mShadowOptionHash(other.mShadowOptionHash),
   mUseBuiltInShader(other.mUseBuiltInShader)
 {
 }
@@ -193,12 +194,23 @@ Shader ShaderDefinition::Load(RawData&& raw) const
   map[0]["fragment"]      = raw.mFragmentShaderSource;
   map[0]["renderPassTag"] = 0;
   map[0]["hints"]         = static_cast<Shader::Hint::Value>(hints);
-  map[0]["name"]          = "SCENE3D_PBR";
 
   map[1]["vertex"]        = raw.mShadowVertexShaderSource;
   map[1]["fragment"]      = raw.mShadowFragmentShaderSource;
   map[1]["renderPassTag"] = 10;
-  map[1]["name"]          = "SCENE3D_SHADOW_MAP";
+
+  if(mUseBuiltInShader)
+  {
+    std::ostringstream oss;
+    oss << "_0x" << std::hex << mShadowOptionHash;
+    map[0]["name"] = std::string("SCENE3D_PBR") + oss.str();
+    map[1]["name"] = std::string("SCENE3D_SHADOW_MAP") + oss.str();
+  }
+  else
+  {
+    map[0]["name"] = "SCENE3D_CUSTOM";
+    map[1]["name"] = "SCENE3D_CUSTOM_SHADOW";
+  }
 
   Property::Array array;
   array.PushBack(map[0]);
