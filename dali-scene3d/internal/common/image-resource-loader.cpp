@@ -19,6 +19,8 @@
 #include <dali-scene3d/internal/common/image-resource-loader.h>
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
+#include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
@@ -47,6 +49,8 @@ namespace
 {
 constexpr uint32_t MAXIMUM_COLLECTING_ITEM_COUNTS_PER_GC_CALL = 5u;
 constexpr uint32_t GC_PERIOD_MILLISECONDS                     = 1000u;
+
+constexpr std::string_view PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME = "brdfLUT.png";
 
 #ifdef DEBUG_ENABLED
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_IMAGE_RESOURCE_LOADER");
@@ -516,8 +520,11 @@ private:
 };
 
 static std::shared_ptr<CacheImpl> gCacheImpl{nullptr};
-static Dali::Texture              gEmptyTextureWhiteRGB{};
-static Dali::Texture              gEmptyCubeTextureWhiteRGB{};
+
+// Static singletone instance what we usually used.
+static Dali::Texture gEmptyTextureWhiteRGB{};
+static Dali::Texture gEmptyCubeTextureWhiteRGB{};
+static Dali::Texture gDefaultBrdfTexture{};
 
 std::shared_ptr<CacheImpl> GetCacheImpl()
 {
@@ -535,6 +542,7 @@ void DestroyCacheImpl()
   // Remove texture object when application stopped.
   gEmptyTextureWhiteRGB.Reset();
   gEmptyCubeTextureWhiteRGB.Reset();
+  gDefaultBrdfTexture.Reset();
 }
 
 } // namespace
@@ -546,7 +554,7 @@ namespace ImageResourceLoader
 // Called by main thread..
 Dali::Texture GetEmptyTextureWhiteRGB()
 {
-  if(!gEmptyTextureWhiteRGB)
+  if(DALI_UNLIKELY(!gEmptyTextureWhiteRGB))
   {
     Dali::PixelData emptyPixelData = GetEmptyPixelDataWhiteRGB();
     gEmptyTextureWhiteRGB          = Texture::New(TextureType::TEXTURE_2D, emptyPixelData.GetPixelFormat(), emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
@@ -557,7 +565,7 @@ Dali::Texture GetEmptyTextureWhiteRGB()
 
 Dali::Texture GetEmptyCubeTextureWhiteRGB()
 {
-  if(!gEmptyCubeTextureWhiteRGB)
+  if(DALI_UNLIKELY(!gEmptyCubeTextureWhiteRGB))
   {
     Dali::PixelData emptyPixelData = GetEmptyPixelDataWhiteRGB();
     gEmptyCubeTextureWhiteRGB      = Texture::New(TextureType::TEXTURE_CUBE, emptyPixelData.GetPixelFormat(), emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
@@ -567,6 +575,17 @@ Dali::Texture GetEmptyCubeTextureWhiteRGB()
     }
   }
   return gEmptyCubeTextureWhiteRGB;
+}
+
+Dali::Texture GetDefaultBrdfTexture()
+{
+  if(DALI_UNLIKELY(!gDefaultBrdfTexture))
+  {
+    Dali::PixelData brdfPixelData = GetDefaultBrdfPixelData();
+    gDefaultBrdfTexture           = Texture::New(TextureType::TEXTURE_2D, brdfPixelData.GetPixelFormat(), brdfPixelData.GetWidth(), brdfPixelData.GetHeight());
+    gDefaultBrdfTexture.Upload(brdfPixelData, 0, 0, 0, 0, brdfPixelData.GetWidth(), brdfPixelData.GetHeight());
+  }
+  return gDefaultBrdfTexture;
 }
 
 Dali::Texture GetCachedTexture(Dali::PixelData pixelData, bool mipmapRequired)
@@ -620,6 +639,26 @@ Dali::PixelData GetEmptyPixelDataZAxisAndAlphaRGBA()
 {
   static Dali::PixelData emptyPixelData = PixelData::New(new uint8_t[4]{0x7f, 0x7f, 0xff, 0xff}, 4, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
   return emptyPixelData;
+}
+
+Dali::PixelData GetDefaultBrdfPixelData()
+{
+  static Dali::Mutex sPixelDataMutex;
+  {
+    Dali::Mutex::ScopedLock lock(sPixelDataMutex);
+
+    static Dali::PixelData defaultBrdfPixelData;
+
+    if(DALI_UNLIKELY(!defaultBrdfPixelData))
+    {
+      Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(Dali::Toolkit::AssetManager::GetDaliImagePath() + std::string(PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME));
+      if(pixelBuffer)
+      {
+        defaultBrdfPixelData = Devel::PixelBuffer::Convert(pixelBuffer);
+      }
+    }
+    return defaultBrdfPixelData;
+  }
 }
 
 Dali::PixelData GetCachedPixelData(const std::string& url)
