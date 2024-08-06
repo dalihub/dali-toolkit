@@ -94,7 +94,7 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
   if(!textureDefinition.mTextureBuffer.empty())
   {
     DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) {
-      oss << "[b:" << textureDefinition.mTextureBuffer.data() << ",s:" << textureDefinition.mTextureBuffer.size() << "]";
+      oss << "[s:" << textureDefinition.mTextureBuffer.size() << "]";
     });
     Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(textureDefinition.mTextureBuffer.data(), textureDefinition.mTextureBuffer.size(), textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
     if(pixelBuffer)
@@ -107,7 +107,7 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
       {
         oss << "d:" << pixelData.GetWidth() << "x" << pixelData.GetHeight() << " f:" << pixelData.GetPixelFormat() << " ";
       }
-      oss << "b:" << textureDefinition.mTextureBuffer.data() << ",s:" << textureDefinition.mTextureBuffer.size() << "]";
+      oss << "s:" << textureDefinition.mTextureBuffer.size() << "]";
     });
   }
   else if(textureDefinition.mImageUri.find(EMBEDDED_DATA_PREFIX.data()) == 0 && textureDefinition.mImageUri.find(EMBEDDED_DATA_IMAGE_MEDIA_TYPE.data(), EMBEDDED_DATA_PREFIX.length()) == EMBEDDED_DATA_PREFIX.length())
@@ -122,7 +122,7 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
       uint32_t bufferSize = buffer.size();
 
       DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) {
-        oss << "[s:" << bufferSize << "]";
+        oss << "[embedded s:" << bufferSize << "]";
       });
       Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(reinterpret_cast<uint8_t*>(buffer.data()), bufferSize, textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
       if(pixelBuffer)
@@ -135,7 +135,7 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
         {
           oss << "d:" << pixelData.GetWidth() << "x" << pixelData.GetHeight() << " f:" << pixelData.GetPixelFormat() << " ";
         }
-        oss << "s:" << bufferSize << "]";
+        oss << "embedded s:" << bufferSize << "]";
       });
     }
   }
