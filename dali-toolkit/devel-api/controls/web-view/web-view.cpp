@@ -264,11 +264,6 @@ bool WebView::CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineH
   return Dali::Toolkit::GetImpl(*this).CreateHitTestAsynchronously(x, y, mode, callback);
 }
 
-void WebView::ExitFullscreen()
-{
-  Dali::Toolkit::GetImpl(*this).ExitFullscreen();
-}
-
 void WebView::ClearHistory()
 {
   Dali::Toolkit::GetImpl(*this).ClearHistory();
@@ -384,11 +379,6 @@ void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::Web
   Dali::Toolkit::GetImpl(*this).RegisterNavigationPolicyDecidedCallback(callback);
 }
 
-void WebView::RegisterNewWindowPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback callback)
-{
-  Dali::Toolkit::GetImpl(*this).RegisterNewWindowPolicyDecidedCallback(callback);
-}
-
 void WebView::RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback)
 {
   Dali::Toolkit::GetImpl(*this).RegisterNewWindowCreatedCallback(callback);
@@ -417,21 +407,6 @@ void WebView::RegisterContextMenuShownCallback(Dali::WebEnginePlugin::WebEngineC
 void WebView::RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback)
 {
   Dali::Toolkit::GetImpl(*this).RegisterContextMenuHiddenCallback(callback);
-}
-
-void WebView::RegisterFullscreenEnteredCallback(Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback callback)
-{
-  Dali::Toolkit::GetImpl(*this).RegisterFullscreenEnteredCallback(callback);
-}
-
-void WebView::RegisterFullscreenExitedCallback(Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback callback)
-{
-  Dali::Toolkit::GetImpl(*this).RegisterFullscreenExitedCallback(callback);
-}
-
-void WebView::RegisterTextFoundCallback(Dali::WebEnginePlugin::WebEngineTextFoundCallback callback)
-{
-  Dali::Toolkit::GetImpl(*this).RegisterTextFoundCallback(callback);
 }
 
 void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
