@@ -36,7 +36,7 @@ rootLayer.add( myActor );  // adds an actor to the root layer
 Example To create two new layers on top of the root layer.
   
 
-### Layer clipping
+## Layer clipping
 
 Clips the contents of the layer to a rectangle.
 
@@ -50,7 +50,7 @@ layer1.SetClippingBox( 20, 20, 100, 100 ); // X, Y, Width, Height
 
 ~~~
 
-### Re-ordering layers
+## Re-ordering layers
 
 The following functions can be used to change the draw order of the layers.
 
@@ -67,21 +67,21 @@ The following functions can be used to change the draw order of the layers.
 Note:
  - The root layer can be moved above and below other layers. However, stage.add( actor ), will always use the root layer object.
 
-### Rendering order of actors inside of a layer
+## Rendering order of actors inside of a layer
 
 Layers have two behaviour modes:
 
  - LAYER_2D ( Default )
  - LAYER_3D
 
-### Layer_2D
+## Layer_2D
 
 ~~~{.cpp}
 // C++
 layer.SetBehavior( Layer::LAYER_2D );
 ~~~
 
-#### Background
+### Background
 
  - Graphics are drawn in DALi using renderers
  - Actors can have zero or many renderers
@@ -144,7 +144,7 @@ For example if we want the render draw order to be 8, 7, 6, with 6 being drawn l
 
 ~~~
 
-### Layer_3D
+## Layer_3D
 
 ~~~{.cpp}
 // C++
@@ -172,7 +172,7 @@ Note:
  - When 2 transparent renderers are the same distance from the camera, you can use depth index to adjust which renderer is drawn first.
 
   
-### Actor drawMode OVERLAY_2D
+## Actor drawMode OVERLAY_2D
 
 Inside a layer it is possible to force a tree actors to be drawn on top everything else in the layer.
   
@@ -180,7 +180,7 @@ The draw order of the actors inside the tree marked OVERLAY_2D, the draw order i
 Depth testing is not used.
   
 
-### Layer Actor Specific Properties
+## Layer Actor Specific Properties
 
 | Name                   |    Type    | Writable     | Animatable|
 |------------------------|------------|--------------|-----------|

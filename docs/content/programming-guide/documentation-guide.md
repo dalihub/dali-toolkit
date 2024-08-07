@@ -12,7 +12,7 @@ For documentation, please follow these guidelines:
  - For DOXYGEN to link to the mark down it currently needs a reference {hash myfile}
   
 
-#### Images
+## Images
  Doxygen copies all images in to the same folder as the HTML generated pages so you can just reference it as follows:
 
  ~~~

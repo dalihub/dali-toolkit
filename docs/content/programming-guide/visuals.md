@@ -361,7 +361,7 @@ control.SetProperty( Control::Property::BACKGROUND, map );
 ~~~
 ___________________________________________________________________________________________________
 
-## Animated Image Visual {#animated-image-visual}
+### Animated Image Visual {#animated-image-visual}
 
 Renders an animated image into the visual's quad geometry. Currently, only the GIF format is supported.
 
