@@ -201,7 +201,8 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
 
   // Load textures
   auto iTexture   = mTextureStages.begin();
-  auto checkStage = [&](uint32_t flags) {
+  auto checkStage = [&](uint32_t flags)
+  {
     return iTexture != mTextureStages.end() && MaskMatch(iTexture->mSemantic, flags);
   };
 
@@ -252,7 +253,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
       buffer[0] = static_cast<uint8_t>(mColor.r * 255.f);
       buffer[1] = static_cast<uint8_t>(mColor.g * 255.f);
       buffer[2] = static_cast<uint8_t>(mColor.b * 255.f);
-      raw.mTextures.push_back({Dali::Integration::NewPixelDataWithReleaseAfterUpload(buffer, bufferSize, 1, 1, 0, format, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
+      raw.mTextures.push_back({Dali::PixelData::New(buffer, bufferSize, 1, 1, format, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
     }
 
     // If we have transparency, or an image based albedo map, we will have to continue with separate metallicRoughness + normal.
@@ -384,7 +385,8 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
 
 bool MaterialDefinition::CheckTextures(uint32_t flags) const
 {
-  return std::find_if(mTextureStages.begin(), mTextureStages.end(), [flags](const TextureStage& ts) { return MaskMatch(ts.mSemantic, flags); }) != mTextureStages.end();
+  return std::find_if(mTextureStages.begin(), mTextureStages.end(), [flags](const TextureStage& ts)
+                      { return MaskMatch(ts.mSemantic, flags); }) != mTextureStages.end();
 }
 
 } // namespace Loader
