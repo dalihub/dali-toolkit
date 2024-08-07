@@ -297,6 +297,21 @@ void SetShadowLightConstraint(Dali::CameraActor selectedCamera, Dali::CameraActo
   projectionMatrixConstraint.ApplyPost();
 }
 
+bool CheckInside(Actor root, Actor actor)
+{
+  Actor currentActor = actor;
+  while(currentActor)
+  {
+    if(currentActor == root)
+    {
+      return true;
+      break;
+    }
+    currentActor = currentActor.GetParent();
+  }
+  return false;
+}
+
 } // anonymous namespace
 
 SceneView::SceneView()
@@ -329,6 +344,7 @@ SceneView::~SceneView()
       Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
       mSkyboxLoadTask.Reset();
     }
+    mSelectedCamera.OffSceneSignal().Disconnect(this, &SceneView::OnCameraDisconnected);
 
     // Request image resource GC
     Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
@@ -1107,6 +1123,13 @@ void SceneView::OnSceneConnection(int depth)
     UpdateRenderTask();
   }
 
+  CameraActor selectedCamera = GetSelectedCamera();
+  selectedCamera = selectedCamera ? selectedCamera : mDefaultCamera;
+  if(selectedCamera)
+  {
+    UpdateCamera(selectedCamera);
+  }
+
   Control::OnSceneConnection(depth);
 }
 
@@ -1240,14 +1263,24 @@ void SceneView::UpdateCamera(CameraActor camera)
 {
   if(camera)
   {
-    if(mSelectedCamera && mSelectedCamera.GetParent())
+    if(mSelectedCamera != camera)
     {
-      mSelectedCamera.Unparent();
+      if(mSelectedCamera)
+      {
+        mSelectedCamera.OffSceneSignal().Disconnect(this, &SceneView::OnCameraDisconnected);
+      }
+
+      mSelectedCamera = camera;
+      camera.OffSceneSignal().Connect(this, &SceneView::OnCameraDisconnected);
     }
-    mRootLayer.Add(camera);
+
+    bool isCameraIncluded = CheckInside(mRootLayer, camera);
+    if(!isCameraIncluded)
+    {
+      mRootLayer.Add(camera);
+    }
   }
 
-  mSelectedCamera = camera;
   if(mShadowLight)
   {
     SetShadowLightConstraint(mSelectedCamera, GetImplementation(mShadowLight).GetCamera());
@@ -1623,6 +1656,18 @@ bool SceneView::OnTimeOut()
   }
 
   return !mCaptureContainer.empty();
+}
+
+void SceneView::OnCameraDisconnected(Dali::Actor actor)
+{
+  CameraActor selectedCamera = GetSelectedCamera();
+  if(selectedCamera == actor)
+  {
+    if(!selectedCamera || !CheckInside(mRootLayer, selectedCamera))
+    {
+      UpdateCamera(mDefaultCamera);
+    }
+  }
 }
 
 } // namespace Internal
