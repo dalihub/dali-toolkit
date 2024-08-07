@@ -74,12 +74,12 @@ int UtcDaliRenderEffectActivateP01(void)
   control.Add(childControl);
 
   RenderTaskList taskList = scene.GetRenderTaskList();
-  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
 
   childControl.SetRenderEffect(BackgroundBlurEffect::New());
 
   taskList = scene.GetRenderTaskList();
-  DALI_TEST_CHECK(4u == taskList.GetTaskCount());
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -100,7 +100,7 @@ int UtcDaliRenderEffectActivateP02(void)
   control.SetRenderEffect(blurEffect);
 
   RenderTaskList taskList = scene.GetRenderTaskList();
-  DALI_TEST_CHECK(4u == taskList.GetTaskCount());
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
 
   Control control2 = Control::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -109,7 +109,7 @@ int UtcDaliRenderEffectActivateP02(void)
 
   control2.SetRenderEffect(blurEffect);
   taskList = scene.GetRenderTaskList();
-  DALI_TEST_CHECK(4u == taskList.GetTaskCount());
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -130,13 +130,13 @@ int UtcDaliRenderEffectDeactivateP(void)
   control.SetRenderEffect(BackgroundBlurEffect::New());
 
   RenderTaskList taskList = scene.GetRenderTaskList();
-  DALI_TEST_CHECK(4u == taskList.GetTaskCount());
-  DALI_TEST_CHECK(count + 1 == control.GetRendererCount());
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
 
   control.ClearRenderEffect();
   taskList = scene.GetRenderTaskList();
-  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
-  DALI_TEST_CHECK(count == control.GetRendererCount());
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -154,9 +154,9 @@ int UtcDaliRenderEffectDeactivateN(void)
   scene.Add(control);
 
   RenderTaskList taskList = scene.GetRenderTaskList();
-  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
   control.ClearRenderEffect(); // Nothing happens
-  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -177,13 +177,13 @@ int UtcDaliRenderEffectActivateDeactivateInplace(void)
   control.SetRenderEffect(blurEffect);
 
   RenderTaskList taskList = scene.GetRenderTaskList();
-  DALI_TEST_CHECK(4u == taskList.GetTaskCount());
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
 
   control.ClearRenderEffect();
   control.SetRenderEffect(blurEffect);
   control.ClearRenderEffect();
   control.SetRenderEffect(blurEffect);
-  DALI_TEST_CHECK(4u == taskList.GetTaskCount());
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -205,7 +205,7 @@ int UtcDaliRenderEffectReassign(void)
   control.SetRenderEffect(blurEffect); // Duplicate actions will be ignored
   control.SetRenderEffect(blurEffect); // Duplicate actions will be ignored
   RenderTaskList taskList = scene.GetRenderTaskList();
-  DALI_TEST_CHECK(4u == taskList.GetTaskCount());
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -302,6 +302,226 @@ int UtcDaliRenderEffectInvalidTargetSize(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(true); // no error
+
+  END_TEST;
+}
+
+int UtcDaliRenderEffectControlSceneOnAndSceneOff01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRenderEffectControlSceneOnAndSceneOff01");
+
+  Integration::Scene scene = application.GetScene();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  uint32_t count = control.GetRendererCount();
+
+  // Add render effect during scene off.
+  control.SetRenderEffect(BackgroundBlurEffect::New());
+
+  RenderTaskList taskList = scene.GetRenderTaskList();
+
+  // Still render effect is not activated.
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  scene.Add(control);
+  // Render effect activated.
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+
+  // Render effect deactivated.
+  control.Unparent();
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  scene.Add(control);
+  // Render effect activated.
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+
+  // Render effect deactivated.
+  control.Unparent();
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  control.ClearRenderEffect();
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  scene.Add(control);
+  // Render effect not activated.
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderEffectControlSceneOnAndSceneOff02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRenderEffectControlSceneOnAndSceneOff02");
+
+  Integration::Scene scene = application.GetScene();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  uint32_t count = control.GetRendererCount();
+  scene.Add(control);
+
+  // Add render effect during scene on.
+  control.SetRenderEffect(BackgroundBlurEffect::New());
+
+  RenderTaskList taskList = scene.GetRenderTaskList();
+
+  // Render effect activated.
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+
+  // Render effect deactivated.
+  control.Unparent();
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  scene.Add(control);
+  // Render effect activated.
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+
+  // Render effect deactivated.
+  control.Unparent();
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  control.ClearRenderEffect();
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  scene.Add(control);
+  // Render effect not activated.
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderEffectControlVisiblityChanged01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRenderEffectControlVisiblityChanged01");
+
+  Integration::Scene scene = application.GetScene();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  uint32_t count = control.GetRendererCount();
+  scene.Add(control);
+
+  // Add render effect during invisible.
+  control.SetProperty(Actor::Property::VISIBLE, false);
+  control.SetRenderEffect(BackgroundBlurEffect::New());
+
+  RenderTaskList taskList = scene.GetRenderTaskList();
+
+  // Still render effect is not activated.
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  // Render effect activated.
+  control.SetProperty(Actor::Property::VISIBLE, true);
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+
+  // Render effect deactivated.
+  control.SetProperty(Actor::Property::VISIBLE, false);
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  // Render effect deactivated.
+  control.Unparent();
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  // Render effect still deactivated.
+  control.SetProperty(Actor::Property::VISIBLE, true);
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  // Render effect activated.
+  scene.Add(control);
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+
+  // Render effect deactivated.
+  control.SetProperty(Actor::Property::VISIBLE, false);
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  control.ClearRenderEffect();
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  control.SetProperty(Actor::Property::VISIBLE, true);
+  // Render effect not activated.
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderEffectControlVisiblityChanged02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRenderEffectControlVisiblityChanged02");
+
+  Integration::Scene scene = application.GetScene();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  uint32_t count = control.GetRendererCount();
+  scene.Add(control);
+
+  // Add render effect during scene on.
+  control.SetRenderEffect(BackgroundBlurEffect::New());
+
+  RenderTaskList taskList = scene.GetRenderTaskList();
+
+  // Render effect activated.
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+
+  // Render effect deactivated.
+  control.SetProperty(Actor::Property::VISIBLE, false);
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  control.SetProperty(Actor::Property::VISIBLE, true);
+  // Render effect activated.
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+
+  // Render effect deactivated.
+  control.SetProperty(Actor::Property::VISIBLE, false);
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  control.ClearRenderEffect();
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  control.SetProperty(Actor::Property::VISIBLE, true);
+  // Render effect not activated.
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
 
   END_TEST;
 }

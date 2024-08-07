@@ -165,6 +165,12 @@ Dali::Scene3D::Loader::AnimationDefinition LoadFacialAnimationInternal(json::uni
       animatedProperty.mPropertyName = weightPropertyStream.str();
 
       animatedProperty.mKeyFrames = Dali::KeyFrames::New();
+      // Make initial progress value follow the first parameter, if their is nothing defined at 0'th duration.
+      if(DALI_UNLIKELY(facialAnimation.mNumberOfFrames > 0 && facialAnimation.mTime[0] != 0))
+      {
+        animatedProperty.mKeyFrames.Add(0.0f, blendShape.mKeys[0][0]);
+      }
+
       for(uint32_t timeIndex = 0u; timeIndex < facialAnimation.mNumberOfFrames; ++timeIndex)
       {
         const float progress = Dali::EqualsZero(animationDefinition.GetDuration()) ? 0.0f : MILLISECONDS_TO_SECONDS * static_cast<float>(facialAnimation.mTime[timeIndex]) / animationDefinition.GetDuration();

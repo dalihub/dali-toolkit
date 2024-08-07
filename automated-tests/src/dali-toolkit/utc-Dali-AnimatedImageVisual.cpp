@@ -2190,10 +2190,10 @@ int UtcDaliAnimatedImageVisualControlVisibilityChanged(void)
   END_TEST;
 }
 
-int UtcDaliAnimatedImageVisualWindowVisibilityChanged(void)
+int UtcDaliAnimatedImageVisualInheritedVisibilityChanged(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliAnimatedImageVisualWindowVisibilityChanged");
+  tet_infoline("UtcDaliAnimatedImageVisualInheritedVisibilityChanged");
 
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_IMAGE)

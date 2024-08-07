@@ -18,11 +18,17 @@
  *
  */
 
+// EXTERNAL INCLUDE
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/property-notification.h>
+#include <dali/public-api/object/weak-handle.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/signals/connection-tracker.h>
+
 //INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/render-effects/render-effect.h>
-
-// EXTERNAL INCLUDE
-#include <dali/public-api/dali-core.h>
 
 namespace Dali
 {
@@ -38,16 +44,6 @@ class RenderEffectImpl : public BaseObject, public ConnectionTracker
 {
 public:
   /**
-   * @brief Activates effect on ownerControl
-   */
-  virtual void Activate() = 0;
-
-  /**
-   * @brief Deactivates effect
-   */
-  virtual void Deactivate() = 0;
-
-  /**
    * @brief Sets owner Control. Applies effect on the owner.
    * @param[in] control The owner control to apply RenderEffect.
    */
@@ -58,11 +54,17 @@ public:
    */
   void ClearOwnerControl();
 
+  /**
+   * @brief Get whether this effect activated or not.
+   * @return True if effect is activated. False otherwise.
+   */
+  bool IsActivated() const;
+
 protected:
   /**
    * @copydoc Dali::Toolkit::RenderEffect::RenderEffect
    */
-  RenderEffectImpl() = default;
+  RenderEffectImpl();
 
   /**
    * @copydoc Dali::Toolkit::RenderEffect::~RenderEffect
@@ -74,7 +76,10 @@ protected:
   RenderEffectImpl& operator=(RenderEffectImpl&&) = delete;      // no move()
   RenderEffectImpl& operator=(const RenderEffectImpl&) = delete; // no copy()
 
-  virtual void Initialize() = 0;
+  /**
+   * @brief Second-phase Initialization
+   */
+  void Initialize();
 
   /**
    * @brief Get target renderer
@@ -82,11 +87,6 @@ protected:
    * @return mRenderer
    */
   Renderer GetTargetRenderer() const;
-
-  /**
-   * @brief Callback when the size changes.
-   */
-  void OnSizeSet(PropertyNotification& source);
 
   /**
    * @brief The final size of the owner after resizing or relayouts.
@@ -100,12 +100,62 @@ protected:
    */
   Toolkit::Control GetOwnerControl() const;
 
-private:
-  Dali::Renderer         mRenderer; // An additional renderer for mOwnerControl
-  Dali::Toolkit::Control mOwnerControl;
+  /// For sub classes
+protected:
+  /**
+   * @brief Initialize sub classes effect
+   */
+  virtual void OnInitialize() = 0;
 
-  PropertyNotification mSizeNotification; // Resize/Relayout signal
+  /**
+   * @brief Activates sub classes effect on ownerControl
+   */
+  virtual void OnActivate() = 0;
+
+  /**
+   * @brief Deactivates sub classes effect
+   */
+  virtual void OnDeactivate() = 0;
+
+private:
+  /**
+   * @brief Activates effect on ownerControl
+   */
+  void Activate();
+
+  /**
+   * @brief Deactivates effect
+   */
+  void Deactivate();
+
+  /**
+   * @brief Check whether it is possible to activate effect or not.
+   *        It will check various status, e.g. the control's visibility.
+   * @note This API don't consider mIsActivated
+   */
+  bool IsActivateValid() const;
+
+private:
+  /**
+   * @brief Callback when the size changes.
+   */
+  void OnSizeSet(PropertyNotification& source);
+
+  /**
+   * @brief Callback when the visibility of the actor is changed.
+   * @param[in] actor The actor
+   * @param[in] visible Whether this actor is visible or not.
+   */
+  void OnControlInheritedVisibilityChanged(Actor actor, bool visible);
+
+private:
+  Dali::Renderer         mRenderer;     // An additional renderer for mOwnerControl
+  Dali::Toolkit::Control mOwnerControl; ///< TODO : Make it as WeakHandle if mSizeNotification reference issue is fixed.
+
+  PropertyNotification mSizeNotification; // Resize/Relayout signal.
   Vector2              mTargetSize;       // The final size of mOwnerControl
+
+  bool mIsActivated : 1;
 };
 } // namespace Internal
 

@@ -148,7 +148,6 @@ private:
   Dali::NativeImageSourceQueue::ColorFormat GetColorFormat(Dali::Toolkit::GlView::ColorFormat format);
 
 private:
-  WeakHandle<Window>                   mPlacementWindow;
   std::unique_ptr<GlViewRenderThread>  mRenderThread;
   Dali::NativeImageSourceQueuePtr      mNativeImageQueue;
   Dali::Toolkit::GlView::RenderingMode mRenderingMode;

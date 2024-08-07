@@ -253,10 +253,10 @@ void VectorAnimationThread::MoveTasksToCompleted(VectorAnimationTaskPtr task, bo
     });
     bool needRasterize = false;
 
-    auto workingTask = std::find(mWorkingTasks.begin(), mWorkingTasks.end(), task);
-    if(workingTask != mWorkingTasks.end())
+    VectorAnimationTaskSet::const_iterator workingIter = mWorkingTasks.find(task);
+    if(workingIter != mWorkingTasks.cend())
     {
-      mWorkingTasks.erase(workingTask);
+      mWorkingTasks.erase(workingIter);
     }
 
     // Check pending task
@@ -270,9 +270,10 @@ void VectorAnimationThread::MoveTasksToCompleted(VectorAnimationTaskPtr task, bo
 
     if(keepAnimation)
     {
-      if(mCompletedTasks.end() == std::find(mCompletedTasks.begin(), mCompletedTasks.end(), task))
+      VectorAnimationTaskSet::const_iterator completedIter = mCompletedTasks.lower_bound(task);
+      if(completedIter == mCompletedTasks.cend() || task < *completedIter)
       {
-        mCompletedTasks.push_back(task);
+        mCompletedTasks.insert(completedIter, task);
         needRasterize = true;
       }
     }
@@ -353,12 +354,13 @@ void VectorAnimationThread::Rasterize()
           if(nextFrameTime <= currentTime)
           {
             // If the task is not in the working list
-            if(std::find(mWorkingTasks.begin(), mWorkingTasks.end(), nextTask) == mWorkingTasks.end())
+            VectorAnimationTaskSet::const_iterator workingIter = mWorkingTasks.lower_bound(nextTask);
+            if(workingIter == mWorkingTasks.cend() || nextTask < *workingIter)
             {
               it = mAnimationTasks.erase(it);
 
               // Add it to the working list
-              mWorkingTasks.push_back(nextTask);
+              mWorkingTasks.insert(workingIter, nextTask);
               mAsyncTaskManager.AddTask(nextTask);
             }
             else

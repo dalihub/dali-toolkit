@@ -18,6 +18,15 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/object/weak-handle.h>
+#include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/rendering/frame-buffer.h>
+#include <string>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
 #include <dali-toolkit/public-api/controls/render-effects/background-blur-effect.h>
@@ -60,16 +69,6 @@ public:
    */
   static BlurEffectImplPtr New(float downscaleFactor, uint32_t blurRadius, bool isBackground);
 
-  /**
-   * @brief Activates blur effect
-   */
-  void Activate() override;
-
-  /**
-   * @brief Dectivates blur effect
-   */
-  void Deactivate() override;
-
 protected:
   /**
    * @brief Creates an uninitialized blur effect implementation
@@ -91,9 +90,19 @@ protected:
   virtual ~BlurEffectImpl();
 
   /**
-   * @brief Initializes effect
+   * @brief Initializes blur effect
    */
-  void Initialize() override;
+  void OnInitialize() override;
+
+  /**
+   * @brief Activates blur effect
+   */
+  void OnActivate() override;
+
+  /**
+   * @brief Dectivates blur effect
+   */
+  void OnDeactivate() override;
 
 private:
   // Inner functions
@@ -103,7 +112,7 @@ private:
    * @return A valid version of mTargetSize, Vector2::ZERO otherwise.
    * @note The return value is a copy, not mTargetSize itself.
    */
-  Vector2 GetTargetSizeForValidTexture();
+  Vector2 GetTargetSizeForValidTexture() const;
 
   /**
    * @brief Calculates gaussian weight
@@ -153,6 +162,8 @@ private:
   // Resource
   FrameBuffer mInputBackgroundFrameBuffer; // Input. Background. What to blur.
 
+  WeakHandle<Integration::SceneHolder> mPlacementSceneHolder;
+
   Actor       mInternalRoot;
   Actor       mHorizontalBlurActor;
   RenderTask  mHorizontalBlurTask;
@@ -168,7 +179,6 @@ private:
   uint32_t mPixelRadius;
   float    mBellCurveWidth;
 
-  bool mIsActivated : 1;
   bool mIsBackground : 1;
 };
 } // namespace Internal

@@ -178,7 +178,12 @@ void LoadingTask::Process()
   {
     mStartTimeNanoSceonds = GetNanoseconds();
     std::ostringstream oss;
-    oss << "[u:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]";
+    oss << "[";
+    if(dimensions.GetWidth() > 0 || dimensions.GetHeight() > 0)
+    {
+      oss << "d:" << dimensions.GetWidth() << "x" << dimensions.GetHeight() << " ";
+    }
+    oss << "u:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]";
     // DALI_TRACE_BEGIN(gTraceFilter, "DALI_IMAGE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
     DALI_LOG_RELEASE_INFO("BEGIN: DALI_IMAGE_LOADING_TASK %s", oss.str().c_str());
   }
@@ -211,6 +216,10 @@ void LoadingTask::Process()
     {
       oss << "s:" << pixelBuffers[0].GetWidth() << "x" << pixelBuffers[0].GetHeight() << " ";
       oss << "p:" << pixelBuffers[0].IsAlphaPreMultiplied() << " ";
+    }
+    if(dimensions.GetWidth() > 0 || dimensions.GetHeight() > 0)
+    {
+      oss << "d:" << dimensions.GetWidth() << "x" << dimensions.GetHeight() << " ";
     }
     oss << "u:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]";
     // DALI_TRACE_END(gTraceFilter, "DALI_IMAGE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level

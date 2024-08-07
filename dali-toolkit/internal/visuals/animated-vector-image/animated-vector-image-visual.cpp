@@ -483,13 +483,6 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
 
     actor.InheritedVisibilityChangedSignal().Connect(this, &AnimatedVectorImageVisual::OnControlInheritedVisibilityChanged);
 
-    Window window = DevelWindow::Get(actor);
-    if(window)
-    {
-      mPlacementWindow = window;
-      DevelWindow::VisibilityChangedSignal(window).Connect(this, &AnimatedVectorImageVisual::OnWindowVisibilityChanged);
-    }
-
     if(mImpl->mEventObserver)
     {
       // The visual needs it's size set before it can be rasterized hence request relayout once on stage
@@ -519,13 +512,6 @@ void AnimatedVectorImageVisual::DoSetOffScene(Actor& actor)
   actor.RemovePropertyNotification(mSizeNotification);
 
   actor.InheritedVisibilityChangedSignal().Disconnect(this, &AnimatedVectorImageVisual::OnControlInheritedVisibilityChanged);
-
-  Window window = mPlacementWindow.GetHandle();
-  if(window)
-  {
-    DevelWindow::VisibilityChangedSignal(window).Disconnect(this, &AnimatedVectorImageVisual::OnWindowVisibilityChanged);
-    mPlacementWindow.Reset();
-  }
 
   mPlacementActor.Reset();
 
@@ -865,17 +851,6 @@ void AnimatedVectorImageVisual::OnControlInheritedVisibilityChanged(Actor actor,
     TriggerVectorRasterization();
 
     DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnControlInheritedVisibilityChanged: invisibile. Pause animation [%p]\n", this);
-  }
-}
-
-void AnimatedVectorImageVisual::OnWindowVisibilityChanged(Window window, bool visible)
-{
-  if(!visible)
-  {
-    StopAnimation();
-    TriggerVectorRasterization();
-
-    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnWindowVisibilityChanged: invisibile. Pause animation [%p]\n", this);
   }
 }
 

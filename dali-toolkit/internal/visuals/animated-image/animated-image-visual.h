@@ -263,11 +263,6 @@ private:
    */
   void OnControlInheritedVisibilityChanged(Actor actor, bool visible);
 
-  /**
-   * @brief Callback when the visibility of the window is changed.
-   */
-  void OnWindowVisibilityChanged(Window window, bool visible);
-
   // Undefined
   AnimatedImageVisual(const AnimatedImageVisual& animatedImageVisual);
 
@@ -276,7 +271,6 @@ private:
 
 private:
   Timer                     mFrameDelayTimer;
-  WeakHandle<Window>        mPlacementWindow;
   WeakHandle<Actor>         mPlacementActor;
   ImageVisualShaderFactory& mImageVisualShaderFactory;
 

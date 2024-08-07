@@ -223,44 +223,14 @@ void GlView::OnControlInheritedVisibilityChanged(Dali::Actor actor, bool visible
   }
 }
 
-void GlView::OnWindowVisibilityChanged(Window window, bool visible)
-{
-  if(mRenderThread)
-  {
-    if(visible && Self().GetProperty<bool>(Actor::Property::VISIBLE))
-    {
-      mRenderThread->Resume();
-    }
-    else
-    {
-      mRenderThread->Pause();
-    }
-  }
-}
-
 void GlView::OnSceneConnection(int depth)
 {
   Control::OnSceneConnection(depth);
-
-  Actor  self   = Self();
-  Window window = DevelWindow::Get(self);
-
-  if(window)
-  {
-    mPlacementWindow = window;
-    DevelWindow::VisibilityChangedSignal(window).Connect(this, &GlView::OnWindowVisibilityChanged);
-  }
 }
 
 void GlView::OnSceneDisconnection()
 {
   Control::OnSceneDisconnection();
-  Window window = mPlacementWindow.GetHandle();
-  if(window)
-  {
-    DevelWindow::VisibilityChangedSignal(window).Disconnect(this, &GlView::OnWindowVisibilityChanged);
-    mPlacementWindow.Reset();
-  }
 }
 
 Dali::Geometry GlView::CreateTexturedQuad()

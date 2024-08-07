@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_SHADER_DEFINITION_H
 #define DALI_SCENE3D_LOADER_SHADER_DEFINITION_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,9 @@ public: // DATA
   std::vector<ShaderOption::MacroDefinition> mMacros;
   std::vector<std::string>                   mHints;
   Property::Map                              mUniforms;
-  bool                                       mUseBuiltInShader{false};
+
+  uint64_t mShadowOptionHash{0u};
+  bool     mUseBuiltInShader{false};
 };
 
 } // namespace Dali::Scene3D::Loader

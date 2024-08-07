@@ -22,7 +22,9 @@
 #include <dali-toolkit/devel-api/builder/base64-encoding.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
+#include <dali/integration-api/trace.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/image-resource-loader.h>
@@ -39,6 +41,8 @@ const Matrix3 TextureDefinition::DEFAULT_TRANSFORM = Matrix3::IDENTITY;
 
 namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_MODEL_PERFORMANCE_MARKER, false);
+
 constexpr SamplerFlags::Type FILTER_MODES_FROM_DALI[]{
   SamplerFlags::FILTER_LINEAR | SamplerFlags::FILTER_MIPMAP_NEAREST,
   SamplerFlags::FILTER_LINEAR,
@@ -89,11 +93,22 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
   Dali::PixelData pixelData;
   if(!textureDefinition.mTextureBuffer.empty())
   {
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) {
+      oss << "[s:" << textureDefinition.mTextureBuffer.size() << "]";
+    });
     Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(textureDefinition.mTextureBuffer.data(), textureDefinition.mTextureBuffer.size(), textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
     if(pixelBuffer)
     {
       pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
     }
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) {
+      oss << "[";
+      if(pixelData)
+      {
+        oss << "d:" << pixelData.GetWidth() << "x" << pixelData.GetHeight() << " f:" << pixelData.GetPixelFormat() << " ";
+      }
+      oss << "s:" << textureDefinition.mTextureBuffer.size() << "]";
+    });
   }
   else if(textureDefinition.mImageUri.find(EMBEDDED_DATA_PREFIX.data()) == 0 && textureDefinition.mImageUri.find(EMBEDDED_DATA_IMAGE_MEDIA_TYPE.data(), EMBEDDED_DATA_PREFIX.length()) == EMBEDDED_DATA_PREFIX.length())
   {
@@ -106,11 +121,22 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
       Dali::Toolkit::DecodeBase64FromString(data, buffer);
       uint32_t bufferSize = buffer.size();
 
+      DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) {
+        oss << "[embedded s:" << bufferSize << "]";
+      });
       Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(reinterpret_cast<uint8_t*>(buffer.data()), bufferSize, textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
       if(pixelBuffer)
       {
         pixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffer, true);
       }
+      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) {
+        oss << "[";
+        if(pixelData)
+        {
+          oss << "d:" << pixelData.GetWidth() << "x" << pixelData.GetHeight() << " f:" << pixelData.GetPixelFormat() << " ";
+        }
+        oss << "embedded s:" << bufferSize << "]";
+      });
     }
   }
   else
