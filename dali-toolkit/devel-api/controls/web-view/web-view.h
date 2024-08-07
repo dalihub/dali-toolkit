@@ -543,6 +543,11 @@ public:
   bool CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback callback);
 
   /**
+   * @brief Exit fullscreen.
+   */
+  void ExitFullscreen();
+
+  /**
    * @brief Clear the history of Web.
    */
   void ClearHistory();
@@ -710,6 +715,13 @@ public:
   void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
 
   /**
+   * @brief Callback to be called when new window policy would be decided.
+   *
+   * @param[in] callback
+   */
+  void RegisterNewWindowPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback callback);
+
+  /**
    * @brief Callback to be called when a new window would be created.
    *
    * @param[in] callback
@@ -750,6 +762,27 @@ public:
    * @param[in] callback
    */
   void RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback);
+
+  /**
+   * @brief Callback to be called when fullscreen would be entered.
+   *
+   * @param[in] callback
+   */
+  void RegisterFullscreenEnteredCallback(Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback callback);
+
+  /**
+   * @brief Callback to be called when fullscreen would be exited.
+   *
+   * @param[in] callback
+   */
+  void RegisterFullscreenExitedCallback(Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback callback);
+
+  /**
+   * @brief Callback to be called when text would be found.
+   *
+   * @param[in] callback
+   */
+  void RegisterTextFoundCallback(Dali::WebEnginePlugin::WebEngineTextFoundCallback callback);
 
   /**
    * @brief Get a plain text of current web page asynchronously.
