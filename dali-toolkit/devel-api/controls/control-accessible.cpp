@@ -127,9 +127,9 @@ std::string ControlAccessible::GetName() const
   {
     controlImpl.mAccessibilityGetNameSignal.Emit(name);
   }
-  else if(!controlImpl.mAccessibilityName.empty())
+  else if(!controlImpl.mAccessibilityProps.name.empty())
   {
-    name = controlImpl.mAccessibilityName;
+    name = controlImpl.mAccessibilityProps.name;
   }
   else if(auto raw = GetNameRaw(); !raw.empty())
   {
@@ -138,11 +138,6 @@ std::string ControlAccessible::GetName() const
   else
   {
     name = Self().GetProperty<std::string>(Actor::Property::NAME);
-  }
-
-  if(!controlImpl.mAccessibilityTranslationDomain.empty())
-  {
-    return GetLocaleText(name, controlImpl.mAccessibilityTranslationDomain.c_str());
   }
 
   return GetLocaleText(name);
@@ -165,18 +160,13 @@ std::string ControlAccessible::GetDescription() const
   {
     controlImpl.mAccessibilityGetDescriptionSignal.Emit(description);
   }
-  else if(!controlImpl.mAccessibilityDescription.empty())
+  else if(!controlImpl.mAccessibilityProps.description.empty())
   {
-    description = controlImpl.mAccessibilityDescription;
+    description = controlImpl.mAccessibilityProps.description;
   }
   else
   {
     description = GetDescriptionRaw();
-  }
-
-  if(!controlImpl.mAccessibilityTranslationDomain.empty())
-  {
-    return GetLocaleText(description, controlImpl.mAccessibilityTranslationDomain.c_str());
   }
 
   return GetLocaleText(description);
@@ -185,6 +175,11 @@ std::string ControlAccessible::GetDescription() const
 std::string ControlAccessible::GetDescriptionRaw() const
 {
   return {};
+}
+
+std::string ControlAccessible::GetValue() const
+{
+  return Self().GetProperty<std::string>(Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE);
 }
 
 Dali::Accessibility::Role ControlAccessible::GetRole() const
@@ -313,7 +308,7 @@ bool ControlAccessible::IsHidden() const
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
 
-  return controlImpl.mAccessibilityHidden;
+  return controlImpl.mAccessibilityProps.isHidden;
 }
 
 bool ControlAccessible::GrabFocus()

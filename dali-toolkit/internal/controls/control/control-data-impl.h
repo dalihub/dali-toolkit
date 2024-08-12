@@ -589,7 +589,6 @@ public:
   Control&            mControlImpl;
   DevelControl::State mState;
   std::string         mSubStateName;
-  Property::Map       mAccessibilityAttributes;
 
   int mLeftFocusableActorId;             ///< Actor ID of Left focusable control.
   int mRightFocusableActorId;            ///< Actor ID of Right focusable control.
@@ -624,19 +623,20 @@ public:
   Toolkit::DevelControl::AccessibilityGetDescriptionSignalType mAccessibilityGetDescriptionSignal;
   Toolkit::DevelControl::AccessibilityDoGestureSignalType      mAccessibilityDoGestureSignal;
 
-  std::string mAccessibilityName;
-  std::string mAccessibilityDescription;
-  std::string mAccessibilityTranslationDomain;
-  std::string mAutomationId;
+  struct AccessibilityProps
+  {
+    std::string name{};
+    std::string description{};
+    std::string value{};
+    std::string automationId{};
+    Dali::Accessibility::Role role = Dali::Accessibility::Role::UNKNOWN;
+    std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> relations;
+    Property::Map       extraAttributes{};
+    bool isHighlightable = false;
+    bool isHidden        = false;
+  } mAccessibilityProps;
 
-  bool mAccessibilityHighlightable = false;
-  bool mAccessibilityHidden        = false;
-  bool mAccessibleCreatable        = true;
-
-  Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
-
-  std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> mAccessibilityRelations;
-  std::shared_ptr<Toolkit::DevelControl::ControlAccessible>                         mAccessibleObject;
+  bool mAccessibleCreatable     = true;
 
   // Gesture Detection
   PinchGestureDetector     mPinchGestureDetector;
@@ -687,6 +687,7 @@ public:
   static const PropertyRegistration PROPERTY_24;
   static const PropertyRegistration PROPERTY_25;
   static const PropertyRegistration PROPERTY_26;
+  static const PropertyRegistration PROPERTY_27;
 
 private:
   // Accessibility - notification for highlighted object to check if it is showing.
@@ -694,6 +695,9 @@ private:
   bool                                        mIsAccessibilityPropertySetSignalRegistered{false};
   Dali::PropertyNotification                  mAccessibilityPositionNotification;
   Dali::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType{Accessibility::ScreenRelativeMoveType::OUTSIDE};
+
+  std::shared_ptr<Toolkit::DevelControl::ControlAccessible>                         mAccessibleObject;
+
 };
 
 } // namespace Internal

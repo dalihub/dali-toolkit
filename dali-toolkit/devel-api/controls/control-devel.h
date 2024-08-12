@@ -161,7 +161,7 @@ enum
   ACCESSIBILITY_DESCRIPTION,
 
   /**
-   * @brief Current translation domain for accessibility clients.
+   * @brief Deprecated. Current translation domain for accessibility clients.
    * @details Name "accessibilityTranslationDomain", type Property::STRING.
    */
   ACCESSIBILITY_TRANSLATION_DOMAIN,
@@ -223,6 +223,12 @@ enum
    * It will also appear in the AT-SPI tree under the key "automationId".
    */
   AUTOMATION_ID,
+
+  /**
+   * @brief The accessibility value represented by the control. For example, "60%" for a slider object.
+   * @details Name "accessibilityValue", type Property::STRING.
+   */
+  ACCESSIBILITY_VALUE,
 };
 
 } // namespace Property
