@@ -518,11 +518,15 @@ void VideoView::OnSceneConnection(int depth)
     SetWindowSurfaceTarget();
   }
 
+  DALI_LOG_RELEASE_INFO("Calls mVideoPlayer.SceneConnection()\n");
+  mVideoPlayer.SceneConnection();
   Control::OnSceneConnection(depth);
 }
 
 void VideoView::OnSceneDisconnection()
 {
+  DALI_LOG_RELEASE_INFO("Calls mVideoPlayer.SceneDisconnection()\n");
+  mVideoPlayer.SceneDisconnection();
   Control::OnSceneDisconnection();
 }
 
@@ -530,7 +534,11 @@ void VideoView::OnSizeSet(const Vector3& targetSize)
 {
   if(mIsUnderlay && mSyncMode == Dali::VideoSyncMode::ENABLED)
   {
-    SetFrameRenderCallback();
+    // TODO: SR Video shell's designed is completed,
+    // it will be re-designed and implemented.
+    // Until it is completed, the below code will be commented.
+
+    //SetFrameRenderCallback();
     mVideoPlayer.StartSynchronization();
   }
   Control::OnSizeSet(targetSize);
@@ -732,7 +740,11 @@ void VideoView::UpdateDisplayArea(Dali::PropertyNotification& source)
 {
   // If mSyncMode is enabled, Video player's size and poistion is updated in Video player's constraint.
   // Because video view and player should be work syncronization.
-  if(!mIsUnderlay || mSyncMode == Dali::VideoSyncMode::ENABLED)
+
+  // TODO: SR Video shell's designed is completed,
+  // it will be re-designed and implemented.
+  // Until it is completed, the below code will be commented.
+  if(!mIsUnderlay /* || mSyncMode == Dali::VideoSyncMode::ENABLED */)
   {
     return;
   }
@@ -819,7 +831,11 @@ Any VideoView::GetMediaPlayer()
 void VideoView::OnAnimationFinished(Animation& animation)
 {
   // send desync
-  SetFrameRenderCallback();
+  // TODO: SR Video shell's designed is completed,
+  // it will be re-designed and implemented.
+  // Until it is completed, the below code will be commented.
+
+  //SetFrameRenderCallback();
 }
 
 void VideoView::OnWindowResized(Dali::Window winHandle, Dali::Window::WindowSize size)
