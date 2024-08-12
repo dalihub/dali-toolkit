@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_ACCESSIBLE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
+#include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/actor-accessible.h>
 #include <dali/devel-api/atspi-interfaces/action.h>
 #include <dali/public-api/object/weak-handle.h>
@@ -28,7 +28,58 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali::Toolkit::DevelControl {
+namespace Dali::Toolkit::DevelControl
+{
+/**
+ * @brief Represents current state of a control.
+ */
+enum class AccessibilityState : uint32_t
+{
+  ENABLED = 0,
+  SELECTED,
+  CHECKED,
+  BUSY,
+  EXPANDED,
+  MAX_COUNT
+};
+using AccessibilityStates = Accessibility::EnumBitSet<AccessibilityState, AccessibilityState::MAX_COUNT>;
+
+constexpr const uint32_t ROLE_START_INDEX = 200;
+/**
+ * @brief AccessibilityRole represents the purpose of a control.
+ */
+enum class AccessibilityRole : uint32_t
+{
+  ADJUSTABLE = ROLE_START_INDEX,
+  ALERT,
+  BUTTON,
+  CHECK_BOX,
+  COMBO_BOX,
+  CONTAINER,
+  DIALOG,
+  ENTRY,
+  HEADER,
+  IMAGE,
+  LINK,
+  LIST,
+  LIST_ITEM,
+  MENU,
+  MENU_BAR,
+  MENU_ITEM,
+  NONE,
+  PASSWORD_TEXT,
+  POPUP_MENU,
+  PROGRESS_BAR,
+  RADIO_BUTTON,
+  SCROLL_BAR,
+  SPIN_BUTTON,
+  TAB,
+  TAB_LIST,
+  TEXT,
+  TOGGLE_BUTTON,
+  TOOL_BAR,
+  MAX_COUNT
+};
 
 /**
  * @brief Represents the Accessible object for Dali::Toolkit::Control and derived classes
@@ -64,6 +115,18 @@ protected:
   void UnregisterPositionPropertyNotification();
 
   /**
+   * @brief Registers PropertySet signal to notify when ACCESSIBILITY_NAME or ACCESSIBILITY_DESCRIPTION is changed.
+   * Note that those two signals only need for highlighted control. So, let us ensure to connect PropertySet signal
+   * only if control has been grabbed.
+   */
+  void RegisterPropertySetSignal();
+
+  /**
+   * @brief Unregisters PropertySet signal to notify when ACCESSIBILITY_NAME or ACCESSIBILITY_DESCRIPTION is changed.
+   */
+  void UnregisterPropertySetSignal();
+
+  /**
    * @brief Check if the actor is showing
    * @return True if the actor is showing
    */
@@ -96,6 +159,11 @@ public:
    * @brief Returns the actor's description in the absence of ACCESSIBILITY_DESCRIPTION property
    */
   virtual std::string GetDescriptionRaw() const;
+
+  /**
+   * @copydoc Dali::Accessibility::Accessible::GetValue()
+   */
+  std::string GetValue() const override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetRole()
@@ -178,6 +246,11 @@ public:
   std::vector<Dali::Accessibility::Relation> GetRelationSet() override;
 
   /**
+   * @copydoc Dali::Accessibility::Component::IsScrollable()
+   */
+  bool IsScrollable() const override;
+
+  /**
    * @copydoc Dali::Accessibility::Accessible::GetStates()
    */
   virtual Dali::Accessibility::States CalculateStates();
@@ -209,6 +282,22 @@ public:
    * @return The Last object position
    */
   Vector2 GetLastPosition() const;
+
+  /**
+   * @brief Handles AcessibilityState property change; Only called when the control is highlighted.
+   */
+  void OnStatePropertySet(AccessibilityStates newStates);
+
+private:
+  /**
+   * @brief Appliys relavant accessibility properties to AT-SPI states.
+   */
+  void ApplyAccessibilityProps(Dali::Accessibility::States& states);
+
+  /**
+   * @brief Grabs snapshot of previous state when the control is highlighted.
+   */
+  AccessibilityStates mStatesSnapshot;
 };
 
 } // namespace Dali::Toolkit::DevelControl

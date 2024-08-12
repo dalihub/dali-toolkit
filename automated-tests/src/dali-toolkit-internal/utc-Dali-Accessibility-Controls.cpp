@@ -131,24 +131,6 @@ int UtcDaliControlAccessibileBlockAccessibleCreation(void)
   END_TEST;
 }
 
-int UtcDaliControlPropertyAccessibilityTranslationDomain(void)
-{
-  ToolkitTestApplication application;
-
-  auto control = Control::New();
-
-  auto accessibility_translation_domain = DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN;
-  DALI_TEST_EQUALS("", control.GetProperty<std::string>(accessibility_translation_domain), TEST_LOCATION);
-
-  control.SetProperty(accessibility_translation_domain, "translation_domain_test_1");
-  DALI_TEST_EQUALS("translation_domain_test_1", control.GetProperty(accessibility_translation_domain).Get<std::string>(), TEST_LOCATION);
-
-  control.SetProperty(accessibility_translation_domain, "translation_domain_test_2");
-  DALI_TEST_EQUALS("translation_domain_test_2", control.GetProperty(accessibility_translation_domain).Get<std::string>(), TEST_LOCATION);
-
-  END_TEST;
-}
-
 // This test shows that when the accessibility bridge is
 // not up, there is no possibility to grab or clear highlight
 int UtcDaliControlAccessibilityHighlight(void)
@@ -727,11 +709,11 @@ int UtcDaliAccessibilityTextAnchor(void)
   DALI_TEST_EQUALS(hyperlink->IsValid(), true, TEST_LOCATION);
   auto action = dynamic_cast<Dali::Accessibility::Action*>(accessible);
   // activation of valid hyperlink
-  DALI_TEST_CHECK(action->DoAction("accessibilityActivated"));
+  DALI_TEST_CHECK(action->DoAction("activate"));
   // making hyperlink invalid
   textanchor.SetProperty(Toolkit::TextAnchor::Property::URI, "");
   DALI_TEST_EQUALS(hyperlink->IsValid(), false, TEST_LOCATION);
-  DALI_TEST_CHECK(!action->DoAction("accessibilityActivated"));
+  DALI_TEST_CHECK(!action->DoAction("activate"));
 
   Dali::Accessibility::TestEnableSC(false);
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DEVEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,9 @@ typedef Signal<void(std::string&)> AccessibilityGetDescriptionSignalType;
 
 /// @brief AccessibilityDoGesture signal type.
 typedef Signal<void(std::pair<Dali::Accessibility::GestureInfo, bool>&)> AccessibilityDoGestureSignalType;
+
+/// @brief AccessibilityAction signal type.
+typedef Signal<bool(const Dali::Accessibility::ActionInfo&)> AccessibilityActionSignalType;
 
 enum State
 {
@@ -161,7 +164,7 @@ enum
   ACCESSIBILITY_DESCRIPTION,
 
   /**
-   * @brief Current translation domain for accessibility clients.
+   * @brief Deprecated. Current translation domain for accessibility clients.
    * @details Name "accessibilityTranslationDomain", type Property::STRING.
    */
   ACCESSIBILITY_TRANSLATION_DOMAIN,
@@ -169,9 +172,8 @@ enum
   /**
    * @brief Role being performed in accessibility hierarchy.
    * @details Name "accessibilityRole", type Property::INTEGER.
-   * @note Property is stored as INTEGER, however its interpretaton
-   * depend on enumeration Dali::Accessibility::Role and should be read and written
-   * with usage of enumerated values.
+   * @note It gets integer value of AccessibilityRole enum then interprets to Dali::Accessibility::Role when requested by AT-SPI.
+   *  Note that setting Dali::Accessibility::Role value is still accepted for backward compatibility but not preferred.
    * @see Dali::Accessibility::Role
    */
   ACCESSIBILITY_ROLE,
@@ -217,6 +219,30 @@ enum
    * It will also appear in the AT-SPI tree under the key "automationId".
    */
   AUTOMATION_ID,
+
+  /**
+   * @brief The accessibility value represented by the control. For example, "60%" for a slider object.
+   * @details Name "accessibilityValue", type Property::STRING.
+   */
+  ACCESSIBILITY_VALUE,
+
+  /**
+   * @brief Indicates the accessibility services treat the control as scrollable.
+   * @details Name "accessibilityScrollable", type Property::BOOLEAN.
+   */
+  ACCESSIBILITY_SCROLLABLE,
+
+  /**
+   * @brief Bitset integer of AccessibilityState which describes the current state of a control.
+   * @details Name "accessibilityStates", type Property::INTEGER.
+   */
+  ACCESSIBILITY_STATES,
+
+  /**
+   * @brief Indicates the accessibility services treat the controla as modal.
+   * @details Name "accessibilityIsModal", type Property::BOOLEAN.
+   */
+  ACCESSIBILITY_IS_MODAL,
 };
 
 } // namespace Property
@@ -482,6 +508,12 @@ DALI_TOOLKIT_API AccessibilityGetDescriptionSignalType& AccessibilityGetDescript
  * @return signal handler
  */
 DALI_TOOLKIT_API AccessibilityDoGestureSignalType& AccessibilityDoGestureSignal(Toolkit::Control control);
+
+/**
+ * @brief The signal is emitted when accessibility client call "DoAction" or "DoActionName" method via IPC mechanism.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API AccessibilityActionSignalType& AccessibilityActionSignal(Toolkit::Control control);
 
 /**
  * @brief The method allows connection with other actor with usage of concrete accessibility relation type.

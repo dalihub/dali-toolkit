@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -197,11 +197,16 @@ Toolkit::DevelControl::AccessibilityDoGestureSignalType& AccessibilityDoGestureS
   return GetControlImplementation(control).mAccessibilityDoGestureSignal;
 }
 
+Toolkit::DevelControl::AccessibilityActionSignalType& AccessibilityActionSignal(Toolkit::Control control)
+{
+  return GetControlImplementation(control).mAccessibilityActionSignal;
+}
+
 void AppendAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation)
 {
   if(auto destinationAccessible = Accessibility::Accessible::Get(destination))
   {
-    GetControlImplementation(control).mAccessibilityRelations[relation].insert(destinationAccessible);
+    GetControlImplementation(control).mAccessibilityProps.relations[relation].insert(destinationAccessible);
   }
 }
 
@@ -209,7 +214,7 @@ void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destinati
 {
   if(auto destinationAccessible = Accessibility::Accessible::Get(destination))
   {
-    auto& relations = GetControlImplementation(control).mAccessibilityRelations;
+    auto& relations = GetControlImplementation(control).mAccessibilityProps.relations;
 
     relations[relation].erase(destinationAccessible);
 
@@ -222,7 +227,7 @@ void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destinati
 
 std::vector<Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control control)
 {
-  const auto&                          relations = GetControlImplementation(control).mAccessibilityRelations;
+  const auto&                          relations = GetControlImplementation(control).mAccessibilityProps.relations;
   std::vector<Accessibility::Relation> result;
 
   for(auto& relation : relations)
@@ -238,7 +243,7 @@ std::vector<Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control 
 
 void ClearAccessibilityRelations(Toolkit::Control control)
 {
-  GetControlImplementation(control).mAccessibilityRelations.clear();
+  GetControlImplementation(control).mAccessibilityProps.relations.clear();
 }
 
 void AppendAccessibilityAttribute(Toolkit::Control control, const std::string& key, const std::string& value)

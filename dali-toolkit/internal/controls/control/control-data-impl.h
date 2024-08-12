@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DATA_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -482,9 +482,28 @@ private:
   void RegisterAccessibilityPositionPropertyNotification();
 
   /**
-   * @brief Remove property notification added by RegisterPropertyNotification
+   * @brief Remove property notification added by RegisterAccessibilityPositionPropertyNotification
    */
   void UnregisterAccessibilityPositionPropertyNotification();
+
+  /**
+   * @brief Register PropertySet signal to check highlighted object name and description
+   */
+  void RegisterAccessibilityPropertySetSignal();
+
+  /**
+   * @brief Remove PropertySet signal added by RegisterAccessibilityPropertySetSignal
+   */
+  void UnregisterAccessibilityPropertySetSignal();
+
+  /**
+   * @brief Signal callback of PropertySet when this object is become highlighted, so RegisterAccessibilityPropertySetSignal called.
+   *
+   * @param[in] handle Handle of the control.
+   * @param[in] index The index of property.
+   * @param[in] value The value of property.
+   */
+  void OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value);
 
 public:
   Control&            mControlImpl;
@@ -522,19 +541,26 @@ public:
   Toolkit::DevelControl::AccessibilityGetDescriptionSignalType mAccessibilityGetDescriptionSignal;
   Toolkit::DevelControl::AccessibilityDoGestureSignalType      mAccessibilityDoGestureSignal;
 
-  std::string mAccessibilityName;
-  std::string mAccessibilityDescription;
-  std::string mAccessibilityTranslationDomain;
-  std::string mAutomationId;
+  Toolkit::DevelControl::AccessibilityActionSignalType mAccessibilityActionSignal;
 
-  bool mAccessibilityHighlightable = false;
-  bool mAccessibilityHidden        = false;
-  bool mAccessibleCreatable        = true;
+  struct AccessibilityProps
+  {
+    std::string                                                                       name{};
+    std::string                                                                       description{};
+    std::string                                                                       value{};
+    std::string                                                                       automationId{};
+    int32_t                                                                           role{static_cast<int32_t>(Dali::Accessibility::Role::UNKNOWN)};
+    DevelControl::AccessibilityStates                                                 states{};
+    std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> relations;
+    Property::Map                                                                     extraAttributes{};
+    bool                                                                              isHighlightable{false};
+    bool                                                                              isHidden{false};
+    bool                                                                              isScrollable{false};
+    bool                                                                              isModal{false};
+  } mAccessibilityProps;
 
-  Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
-
-  std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> mAccessibilityRelations;
-  std::unique_ptr<Toolkit::DevelControl::ControlAccessible>                         mAccessibleObject;
+  bool                                                      mAccessibleCreatable = true;
+  std::unique_ptr<Toolkit::DevelControl::ControlAccessible> mAccessibleObject;
 
   // Gesture Detection
   PinchGestureDetector     mPinchGestureDetector;
@@ -584,10 +610,15 @@ public:
   static const PropertyRegistration PROPERTY_24;
   static const PropertyRegistration PROPERTY_25;
   static const PropertyRegistration PROPERTY_26;
+  static const PropertyRegistration PROPERTY_27;
+  static const PropertyRegistration PROPERTY_28;
+  static const PropertyRegistration PROPERTY_29;
+  static const PropertyRegistration PROPERTY_30;
 
 private:
   // Accessibility - notification for highlighted object to check if it is showing.
   bool                                        mIsAccessibilityPositionPropertyNotificationSet{false};
+  bool                                        mIsAccessibilityPropertySetSignalRegistered{false};
   Dali::PropertyNotification                  mAccessibilityPositionNotification;
   Dali::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType{Accessibility::ScreenRelativeMoveType::OUTSIDE};
 };
