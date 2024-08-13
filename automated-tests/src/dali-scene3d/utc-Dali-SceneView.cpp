@@ -1202,30 +1202,26 @@ int UtcDaliSceneViewMasking(void)
 
 namespace
 {
-static bool                                   gCaptureFinishedCalled{false};
-static int32_t                                gCaptureId{-1};
-static Toolkit::ImageUrl                      gCapturedImageUrl;
-static Scene3D::SceneView::CaptureFinishState gCaptureFinishState{Scene3D::SceneView::CaptureFinishState::FAILED};
+static bool              gCaptureFinishedCalled{false};
+static int32_t           gCaptureId{-1};
+static Toolkit::ImageUrl gCapturedImageUrl;
 
-void OnCaptureFinished(Scene3D::SceneView sceneView, Scene3D::SceneView::CaptureResult& captureResult)
+void OnCaptureFinished(Scene3D::SceneView sceneView, int32_t captureId, const Toolkit::ImageUrl& capturedImageUrl)
 {
   gCaptureFinishedCalled = true;
-  gCaptureId             = captureResult.captureId;
-  gCapturedImageUrl      = captureResult.imageUrl;
-  gCaptureFinishState    = captureResult.state;
+  gCaptureId             = captureId;
+  gCapturedImageUrl      = capturedImageUrl;
 }
 
 static int32_t                                             gCapturedCount{0};
 static std::vector<int32_t>                                gCaptureIds;
 static std::vector<Toolkit::ImageUrl>                      gCapturedImageUrls;
-static std::vector<Scene3D::SceneView::CaptureFinishState> gCaptureFinishStates;
 
-void OnCaptureMultipleFinished(Scene3D::SceneView sceneView, Scene3D::SceneView::CaptureResult& captureResult)
+void OnCaptureMultipleFinished(Scene3D::SceneView sceneView, int32_t captureId, const Toolkit::ImageUrl& capturedImageUrl)
 {
   gCapturedCount++;
-  gCaptureIds.push_back(captureResult.captureId);
-  gCapturedImageUrls.push_back(captureResult.imageUrl);
-  gCaptureFinishStates.push_back(captureResult.state);
+  gCaptureIds.push_back(captureId);
+  gCapturedImageUrls.push_back(capturedImageUrl);
 }
 } // namespace
 
@@ -1265,7 +1261,6 @@ int UtcDaliSceneViewCapture01(void)
   gCaptureFinishedCalled = false;
   gCaptureId = -1;
   gCapturedImageUrl.Reset();
-  gCaptureFinishState = Scene3D::SceneView::CaptureFinishState::FAILED;
   int32_t captureId = view.Capture(camera, Vector2(300, 300));
 
   application.SendNotification();
@@ -1276,15 +1271,14 @@ int UtcDaliSceneViewCapture01(void)
 
   DALI_TEST_EQUALS(gCaptureFinishedCalled, true, TEST_LOCATION);
   DALI_TEST_EQUALS(gCaptureId, captureId, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!gCapturedImageUrl, true, TEST_LOCATION);
   DALI_TEST_EQUALS(gCapturedImageUrl.GetUrl().empty(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(gCaptureFinishState, Scene3D::SceneView::CaptureFinishState::SUCCEEDED, TEST_LOCATION);
 
   Toolkit::ImageUrl tempImageUrl = gCapturedImageUrl;
 
   gCaptureFinishedCalled = false;
   gCaptureId = -1;
   gCapturedImageUrl.Reset();
-  gCaptureFinishState = Scene3D::SceneView::CaptureFinishState::FAILED;
   int32_t captureId2 = view.Capture(camera, Vector2(400, 400));
 
   application.SendNotification();
@@ -1296,9 +1290,9 @@ int UtcDaliSceneViewCapture01(void)
   DALI_TEST_EQUALS(gCaptureFinishedCalled, true, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(captureId, captureId2, 0.1f, TEST_LOCATION);
   DALI_TEST_EQUALS(gCaptureId, captureId2, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!gCapturedImageUrl, true, TEST_LOCATION);
   DALI_TEST_EQUALS(gCapturedImageUrl.GetUrl().empty(), false, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(gCapturedImageUrl, tempImageUrl, 0.1f, TEST_LOCATION);
-  DALI_TEST_EQUALS(gCaptureFinishState, Scene3D::SceneView::CaptureFinishState::SUCCEEDED, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1339,7 +1333,6 @@ int UtcDaliSceneViewCaptureCancel(void)
   gCaptureFinishedCalled = false;
   gCaptureId = -1;
   gCapturedImageUrl.Reset();
-  gCaptureFinishState = Scene3D::SceneView::CaptureFinishState::FAILED;
   int32_t captureId = view.Capture(camera, Vector2(300, 300));
 
   view.Unparent();
@@ -1347,13 +1340,11 @@ int UtcDaliSceneViewCaptureCancel(void)
   DALI_TEST_EQUALS(gCaptureFinishedCalled, true, TEST_LOCATION);
   DALI_TEST_EQUALS(gCaptureId, captureId, TEST_LOCATION);
   DALI_TEST_EQUALS(!!gCapturedImageUrl, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(gCaptureFinishState, Scene3D::SceneView::CaptureFinishState::FAILED, TEST_LOCATION);
 
 
   gCaptureFinishedCalled = false;
   gCaptureId = -1;
   gCapturedImageUrl.Reset();
-  gCaptureFinishState = Scene3D::SceneView::CaptureFinishState::FAILED;
 
   application.SendNotification();
   application.Render();
@@ -1402,7 +1393,6 @@ int UtcDaliSceneViewCaptureFailed(void)
   gCaptureFinishedCalled = false;
   gCaptureId = -1;
   gCapturedImageUrl.Reset();
-  gCaptureFinishState = Scene3D::SceneView::CaptureFinishState::FAILED;
   int32_t captureId = view.Capture(camera, Vector2(300, 300));
 
   Test::EmitGlobalTimerSignal();
@@ -1412,12 +1402,10 @@ int UtcDaliSceneViewCaptureFailed(void)
   DALI_TEST_EQUALS(gCaptureFinishedCalled, true, TEST_LOCATION);
   DALI_TEST_EQUALS(gCaptureId, captureId, TEST_LOCATION);
   DALI_TEST_EQUALS(!!gCapturedImageUrl, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(gCaptureFinishState, Scene3D::SceneView::CaptureFinishState::FAILED, TEST_LOCATION);
 
   gCaptureFinishedCalled = false;
   gCaptureId = -1;
   gCapturedImageUrl.Reset();
-  gCaptureFinishState = Scene3D::SceneView::CaptureFinishState::FAILED;
 
   application.SendNotification();
   application.Render();
@@ -1466,7 +1454,6 @@ int UtcDaliSceneViewCapture02(void)
   gCapturedCount = 0;
   gCaptureIds.clear();
   gCapturedImageUrls.clear();
-  gCaptureFinishStates.clear();
   int32_t captureId = view.Capture(camera, Vector2(300, 300));
   int32_t captureId2 = view.Capture(camera, Vector2(300, 300));
 
@@ -1486,9 +1473,9 @@ int UtcDaliSceneViewCapture02(void)
   DALI_TEST_EQUALS(isIter2, true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(gCapturedImageUrls.size(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!gCapturedImageUrls[0], true, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!gCapturedImageUrls[1], true, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(gCapturedImageUrls[0], gCapturedImageUrls[1], 0.1f, TEST_LOCATION);
-  DALI_TEST_EQUALS(gCaptureFinishStates[0], Scene3D::SceneView::CaptureFinishState::SUCCEEDED, TEST_LOCATION);
-  DALI_TEST_EQUALS(gCaptureFinishStates[1], Scene3D::SceneView::CaptureFinishState::SUCCEEDED, TEST_LOCATION);
 
   END_TEST;
 }

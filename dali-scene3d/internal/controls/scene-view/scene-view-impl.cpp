@@ -363,6 +363,13 @@ SceneView::~SceneView()
       ResetTransition();
     }
 
+    for(auto&& capture : mCaptureContainer)
+    {
+      ResetCaptureData(capture.second);
+    }
+    mCaptureContainer.clear();
+    ResetCaptureTimer();
+
     // Request image resource GC
     Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
   }
@@ -902,14 +909,14 @@ Quaternion SceneView::GetSkyboxOrientation() const
 
 int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
 {
-  if(size.x <= 0.0f || size.y <= 0.0f)
+  if(size.x < 0.0f || size.y < 0.0f)
   {
     DALI_LOG_ERROR("The width and height should be positive.\n");
     return INVALID_CAPTURE_ID;
   }
 
-  uint32_t width = unsigned(size.width);
-  uint32_t height = unsigned(size.height);
+  uint32_t width = std::max(1u, unsigned(size.width));
+  uint32_t height = std::max(1u, unsigned(size.height));
   if(width > Dali::GetMaxTextureSize() || height > Dali::GetMaxTextureSize())
   {
     DALI_LOG_ERROR("The input size is too large.\n");
@@ -934,13 +941,17 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
   DevelFrameBuffer::SetMultiSamplingLevel(captureData->mCaptureFrameBuffer, mFrameBufferMultiSamplingLevel);
   captureData->mCaptureFrameBuffer.AttachColorTexture(captureData->mCaptureTexture);
 
+  captureData->mCaptureCamera = camera;
+  captureData->mCaptureCameraOriginalAspectRatio = captureData->mCaptureCamera.GetAspectRatio();
+  captureData->mCaptureCamera.SetAspectRatio((float)width/(float)height);
+
   RenderTaskList taskList   = mSceneHolder.GetRenderTaskList();
   captureData->mCaptureTask = taskList.CreateTask();
   captureData->mCaptureTask.SetSourceActor(mRootLayer);
   captureData->mCaptureTask.SetExclusive(true);
   captureData->mCaptureTask.SetCullMode(false);
   captureData->mCaptureTask.SetOrderIndex(SCENE_ORDER_INDEX + 1);
-  captureData->mCaptureTask.SetCameraActor(camera);
+  captureData->mCaptureTask.SetCameraActor(captureData->mCaptureCamera);
   captureData->mCaptureTask.SetFrameBuffer(captureData->mCaptureFrameBuffer);
   captureData->mCaptureTask.SetClearEnabled(true);
   captureData->mCaptureTask.SetClearColor(Color::TRANSPARENT);
@@ -1191,33 +1202,17 @@ void SceneView::OnSceneDisconnection()
   std::vector<std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>>> tempContainer(mCaptureContainer);
   for(auto&& capture : tempContainer)
   {
-    Dali::Scene3D::SceneView::CaptureResult result{capture.second->mCaptureId, Dali::Toolkit::ImageUrl(), Dali::Scene3D::SceneView::CaptureFinishState::FAILED};
-    mCaptureFinishedSignal.Emit(handle, result);
+    mCaptureFinishedSignal.Emit(handle, capture.second->mCaptureId, Dali::Toolkit::ImageUrl());
   }
   tempContainer.clear();
 
   for(auto && capture : mCaptureContainer)
   {
-    if(mSceneHolder)
-    {
-      RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
-      taskList.RemoveTask(capture.second->mCaptureTask);
-      taskList.RemoveTask(capture.second->mCaptureInvertTask);
-    }
-    capture.second->mCaptureTask.Reset();
-    capture.second->mCaptureInvertTask.Reset();
-    capture.second->mCaptureTexture.Reset();
-    capture.second->mCaptureInvertTexture.Reset();
-    capture.second->mCaptureFrameBuffer.Reset();
-    capture.second->mCaptureInvertFrameBuffer.Reset();
-    capture.second->mCaptureUrl.Reset();
-    capture.second->mCaptureImageView.Unparent();
-    capture.second->mCaptureImageView.Reset();
-    capture.second->mCaptureInvertCamera.Unparent();
-    capture.second->mCaptureInvertCamera.Reset();
+    ResetCaptureData(capture.second);
   }
   mCaptureContainer.clear();
 
+  ResetCaptureTimer();
 
   if(mSceneHolder)
   {
@@ -1637,36 +1632,18 @@ void SceneView::OnCaptureFinished(Dali::RenderTask& task)
 
   if(iter != mCaptureContainer.end())
   {
-    captureId               = iter->second->mCaptureId;
-    imageUrl                = Dali::Toolkit::ImageUrl::New(iter->second->mCaptureInvertTexture);
-    if(mSceneHolder)
-    {
-      RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
-      taskList.RemoveTask(iter->second->mCaptureTask);
-      taskList.RemoveTask(iter->second->mCaptureInvertTask);
-    }
-    iter->second->mCaptureTexture.Reset();
-    iter->second->mCaptureInvertTexture.Reset();
-    iter->second->mCaptureFrameBuffer.Reset();
-    iter->second->mCaptureInvertFrameBuffer.Reset();
-    iter->second->mCaptureUrl.Reset();
-    iter->second->mCaptureImageView.Unparent();
-    iter->second->mCaptureImageView.Reset();
+    captureId = iter->second->mCaptureId;
+    imageUrl  = Dali::Toolkit::ImageUrl::New(iter->second->mCaptureInvertTexture);
+
+    ResetCaptureData(iter->second);
     mCaptureContainer.erase(iter);
 
     auto                     self = Self();
     Dali::Scene3D::SceneView handle(Dali::Scene3D::SceneView::DownCast(self));
-
-    Dali::Scene3D::SceneView::CaptureResult result{captureId, imageUrl, Dali::Scene3D::SceneView::CaptureFinishState::SUCCEEDED};
-    mCaptureFinishedSignal.Emit(handle, result);
+    mCaptureFinishedSignal.Emit(handle, captureId, imageUrl);
   }
 
-  if(mCaptureContainer.empty() && mCaptureTimer)
-  {
-    mCaptureTimer.Stop();
-    mCaptureTimer.Reset();
-    mTimerTickCount = 0;
-  }
+  ResetCaptureTimer();
 }
 
 bool SceneView::OnTimeOut()
@@ -1685,9 +1662,14 @@ bool SceneView::OnTimeOut()
 
   for(auto&& capture : tempContainer)
   {
-    Dali::Scene3D::SceneView::CaptureResult result{capture.second->mCaptureId, Dali::Toolkit::ImageUrl(), Dali::Scene3D::SceneView::CaptureFinishState::FAILED};
-    mCaptureFinishedSignal.Emit(handle, result);
+    mCaptureFinishedSignal.Emit(handle, capture.second->mCaptureId, Dali::Toolkit::ImageUrl());
   }
+
+  for(auto && capture : tempContainer)
+  {
+    ResetCaptureData(capture.second);
+  }
+  tempContainer.clear();
 
   int32_t tickCount = mTimerTickCount;
   auto it = std::remove_if(mCaptureContainer.begin(), mCaptureContainer.end(), [tickCount](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item) {
@@ -1696,12 +1678,7 @@ bool SceneView::OnTimeOut()
   mCaptureContainer.erase(it, mCaptureContainer.end());
   mCaptureContainer.shrink_to_fit();
 
-  if(mCaptureContainer.empty() && mCaptureTimer)
-  {
-    mCaptureTimer.Stop();
-    mCaptureTimer.Reset();
-    mTimerTickCount = 0;
-  }
+  ResetCaptureTimer();
 
   return !mCaptureContainer.empty();
 }
@@ -1867,6 +1844,38 @@ void SceneView::OnTransitionFinished(Animation& animation)
   auto                     self = Self();
   Dali::Scene3D::SceneView handle(Dali::Scene3D::SceneView::DownCast(self));
   mCameraTransitionFinishedSignal.Emit(handle);
+}
+
+void SceneView::ResetCaptureData(std::shared_ptr<CaptureData> captureData)
+{
+  captureData->mCaptureCamera.SetAspectRatio(captureData->mCaptureCameraOriginalAspectRatio);
+  if(mSceneHolder)
+  {
+    RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
+    taskList.RemoveTask(captureData->mCaptureTask);
+    taskList.RemoveTask(captureData->mCaptureInvertTask);
+  }
+  captureData->mCaptureTask.Reset();
+  captureData->mCaptureInvertTask.Reset();
+  captureData->mCaptureTexture.Reset();
+  captureData->mCaptureInvertTexture.Reset();
+  captureData->mCaptureFrameBuffer.Reset();
+  captureData->mCaptureInvertFrameBuffer.Reset();
+  captureData->mCaptureUrl.Reset();
+  captureData->mCaptureImageView.Unparent();
+  captureData->mCaptureImageView.Reset();
+  captureData->mCaptureInvertCamera.Unparent();
+  captureData->mCaptureInvertCamera.Reset();
+}
+
+void SceneView::ResetCaptureTimer()
+{
+  if(mCaptureContainer.empty() && mCaptureTimer)
+  {
+    mCaptureTimer.Stop();
+    mCaptureTimer.Reset();
+    mTimerTickCount = 0;
+  }
 }
 
 void SceneView::Process(bool postProcessor)
