@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_ENVIRONMENT_DEFINITION_H
 #define DALI_SCENE3D_LOADER_ENVIRONMENT_DEFINITION_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,8 +65,6 @@ struct DALI_SCENE3D_API EnvironmentDefinition
   EnvironmentDefinition(EnvironmentDefinition&&) = default;
   EnvironmentDefinition& operator=(EnvironmentDefinition&&) = default;
 
-  static Dali::Texture GetBrdfTexture();
-
   /**
    * @brief Loads raw pixel data for the given diffuse and specular maps.
    * @SINCE_2_0.7
@@ -90,11 +88,6 @@ struct DALI_SCENE3D_API EnvironmentDefinition
    */
   static float GetDefaultIntensity();
 
-private:
-  /// @cond internal
-  static void LoadBrdfTexture();
-  /// @endcond internal
-
 public: // DATA
   std::string              mDiffuseMapPath;
   std::string              mSpecularMapPath;
@@ -103,11 +96,6 @@ public: // DATA
   Vector3                  mYDirection      = Vector3::ONE;
   float                    mIblIntensity    = 1.0f;
   bool                     mUseBrdfTexture  = false;
-
-private:
-  static PixelData mBrdfPixelData;
-  static Texture   mBrdfTexture;
-  static bool      mIsBrdfLoaded;
 };
 
 } // namespace Dali::Scene3D::Loader

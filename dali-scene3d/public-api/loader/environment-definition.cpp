@@ -30,40 +30,21 @@
 
 namespace
 {
-#define TOKEN_STRING(x) #x
-std::string GetDaliImagePath()
-{
-  return (nullptr == DALI_IMAGE_DIR) ? Dali::EnvironmentVariable::GetEnvironmentVariable(TOKEN_STRING(DALI_IMAGE_DIR)) : DALI_IMAGE_DIR;
-}
-
 static constexpr float DEFAULT_INTENSITY = 1.0f;
+
+/**
+ * @brief Request to load default brdf pixel data at worker thread.
+ */
+static void RequestLoadBrdfPixelData()
+{
+  /// GetDefaultBrdfPixelData() will load the brdf pixel data if we don't load it before.
+  [[maybe_unused]] auto ret = Dali::Scene3D::Internal::ImageResourceLoader::GetDefaultBrdfPixelData();
+}
 
 } // unnamed namespace
 
 namespace Dali::Scene3D::Loader
 {
-namespace
-{
-const char* PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME = "brdfLUT.png";
-}
-PixelData EnvironmentDefinition::mBrdfPixelData;
-Texture   EnvironmentDefinition::mBrdfTexture;
-bool      EnvironmentDefinition::mIsBrdfLoaded = false;
-
-Dali::Texture EnvironmentDefinition::GetBrdfTexture()
-{
-  if(!mBrdfTexture)
-  {
-    if(!mIsBrdfLoaded)
-    {
-      LoadBrdfTexture();
-    }
-    mBrdfTexture = Texture::New(TextureType::TEXTURE_2D, mBrdfPixelData.GetPixelFormat(), mBrdfPixelData.GetWidth(), mBrdfPixelData.GetHeight());
-    mBrdfTexture.Upload(mBrdfPixelData);
-  }
-  return mBrdfTexture;
-}
-
 EnvironmentDefinition::RawData
 EnvironmentDefinition::LoadRaw(const std::string& environmentsPath)
 {
@@ -89,7 +70,7 @@ EnvironmentDefinition::LoadRaw(const std::string& environmentsPath)
 
   if(mUseBrdfTexture)
   {
-    LoadBrdfTexture();
+    RequestLoadBrdfPixelData();
   }
   return raw;
 }
@@ -113,7 +94,7 @@ EnvironmentDefinition::Textures EnvironmentDefinition::Load(RawData&& raw)
 
   if(mUseBrdfTexture)
   {
-    textures.mBrdf = GetBrdfTexture();
+    textures.mBrdf = Dali::Scene3D::Internal::ImageResourceLoader::GetDefaultBrdfTexture();
   }
   return textures;
 }
@@ -121,23 +102,6 @@ EnvironmentDefinition::Textures EnvironmentDefinition::Load(RawData&& raw)
 float EnvironmentDefinition::GetDefaultIntensity()
 {
   return DEFAULT_INTENSITY;
-}
-
-void EnvironmentDefinition::LoadBrdfTexture()
-{
-  static Dali::Mutex mutex;
-  {
-    Mutex::ScopedLock lock(mutex);
-    if(!mIsBrdfLoaded)
-    {
-      Devel::PixelBuffer pixelBuffer = LoadImageFromFile(GetDaliImagePath() + PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME);
-      if(pixelBuffer)
-      {
-        mBrdfPixelData = Devel::PixelBuffer::Convert(pixelBuffer);
-        mIsBrdfLoaded  = true;
-      }
-    }
-  }
 }
 
 } // namespace Dali::Scene3D::Loader
