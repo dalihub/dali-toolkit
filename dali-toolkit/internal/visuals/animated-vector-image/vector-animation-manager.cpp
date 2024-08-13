@@ -46,18 +46,14 @@ VectorAnimationManager::VectorAnimationManager()
 : mEventCallbacks(),
   mLifecycleObservers(),
   mVectorAnimationThread(nullptr),
-  mProcessorRegistered(false)
+  mProcessorRegistered(false),
+  mDestroyed(false)
 {
 }
 
 VectorAnimationManager::~VectorAnimationManager()
 {
-  mEventCallbacks.clear();
-
-  if(mProcessorRegistered && Adaptor::IsAvailable())
-  {
-    Adaptor::Get().UnregisterProcessor(*this, true);
-  }
+  Finalize();
 
   for(auto observer : mLifecycleObservers)
   {
@@ -92,12 +88,19 @@ VectorAnimationThread& VectorAnimationManager::GetVectorAnimationThread()
 
 void VectorAnimationManager::RegisterEventCallback(CallbackBase* callback)
 {
-  mEventCallbacks.emplace_back(std::unique_ptr<Dali::CallbackBase>(callback));
-
-  if(!mProcessorRegistered)
+  if(DALI_LIKELY(!mDestroyed))
   {
-    Adaptor::Get().RegisterProcessor(*this, true); // Use post processor to trigger after layoutting
-    mProcessorRegistered = true;
+    mEventCallbacks.emplace_back(std::unique_ptr<Dali::CallbackBase>(callback));
+
+    if(!mProcessorRegistered && DALI_LIKELY(Adaptor::IsAvailable()))
+    {
+      Adaptor::Get().RegisterProcessor(*this, true); // Use post processor to trigger after layoutting
+      mProcessorRegistered = true;
+    }
+  }
+  else
+  {
+    delete callback; // No longer needed.
   }
 }
 
@@ -123,37 +126,62 @@ void VectorAnimationManager::UnregisterEventCallback(CallbackBase* callback)
   }
 }
 
+void VectorAnimationManager::Finalize()
+{
+  if(DALI_LIKELY(!mDestroyed))
+  {
+    DALI_LOG_DEBUG_INFO("Finalizing Vector Animation Manager.\n");
+    mDestroyed = true;
+
+    mEventCallbacks.clear();
+
+    if(mProcessorRegistered && Adaptor::IsAvailable())
+    {
+      Adaptor::Get().UnregisterProcessor(*this, true);
+      mProcessorRegistered = false;
+    }
+
+    if(mVectorAnimationThread)
+    {
+      mVectorAnimationThread->Finalize();
+    }
+  }
+}
+
 void VectorAnimationManager::Process(bool postProcessor)
 {
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  if(DALI_LIKELY(!mDestroyed))
   {
-    if(mEventCallbacks.size() > 0u)
+#ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
     {
-      std::ostringstream oss;
-      oss << "[" << mEventCallbacks.size() << "]";
-      DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_VECTOR_ANIMATION_MANAGER_PROCESS", oss.str().c_str());
+      if(mEventCallbacks.size() > 0u)
+      {
+        std::ostringstream oss;
+        oss << "[" << mEventCallbacks.size() << "]";
+        DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_VECTOR_ANIMATION_MANAGER_PROCESS", oss.str().c_str());
+      }
     }
-  }
 #endif
 
-  for(auto&& iter : mEventCallbacks)
-  {
-    CallbackBase::Execute(*iter);
-  }
+    for(auto&& iter : mEventCallbacks)
+    {
+      CallbackBase::Execute(*iter);
+    }
 
 #ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    if(mEventCallbacks.size() > 0u)
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
     {
-      std::ostringstream oss;
-      oss << "[" << mEventCallbacks.size() << "]";
-      DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_VECTOR_ANIMATION_MANAGER_PROCESS", oss.str().c_str());
+      if(mEventCallbacks.size() > 0u)
+      {
+        std::ostringstream oss;
+        oss << "[" << mEventCallbacks.size() << "]";
+        DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_VECTOR_ANIMATION_MANAGER_PROCESS", oss.str().c_str());
+      }
     }
-  }
 #endif
-  mEventCallbacks.clear();
+    mEventCallbacks.clear();
+  }
 
   Adaptor::Get().UnregisterProcessor(*this, true);
   mProcessorRegistered = false;

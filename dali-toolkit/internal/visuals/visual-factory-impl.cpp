@@ -18,6 +18,7 @@
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -103,15 +104,29 @@ VisualFactory::VisualFactory(bool debugEnabled)
   mPreMultiplyOnLoad(true),
   mPrecompiledShaderRequested(false)
 {
+  Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
+  if(DALI_LIKELY(lifecycleController))
+  {
+    lifecycleController.TerminateSignal().Connect(this, &VisualFactory::OnApplicationTerminated);
+  }
 }
 
 VisualFactory::~VisualFactory()
 {
-  if(mIdleCallback && Adaptor::IsAvailable())
+  if(Adaptor::IsAvailable())
   {
-    // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
-    Adaptor::Get().RemoveIdle(mIdleCallback);
-    mIdleCallback = nullptr;
+    Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
+    if(DALI_LIKELY(lifecycleController))
+    {
+      lifecycleController.TerminateSignal().Disconnect(this, &VisualFactory::OnApplicationTerminated);
+    }
+
+    if(mIdleCallback)
+    {
+      // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
+      Adaptor::Get().RemoveIdle(mIdleCallback);
+      mIdleCallback = nullptr;
+    }
   }
 }
 
@@ -529,6 +544,19 @@ void VisualFactory::OnDiscardCallback()
 
   // Discard visual now.
   mDiscardedVisuals.clear();
+}
+
+void VisualFactory::OnApplicationTerminated()
+{
+  if(DALI_UNLIKELY(mIdleCallback))
+  {
+    OnDiscardCallback();
+  }
+
+  if(mFactoryCache)
+  {
+    mFactoryCache->FinalizeVectorAnimationManager();
+  }
 }
 
 void VisualFactory::RegisterDiscardCallback()

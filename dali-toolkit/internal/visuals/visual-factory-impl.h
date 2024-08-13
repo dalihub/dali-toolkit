@@ -41,7 +41,7 @@ class TextVisualShaderFactory;
 /**
  * @copydoc Toolkit::VisualFactory
  */
-class VisualFactory : public BaseObject
+class VisualFactory : public BaseObject, public ConnectionTracker
 {
 public:
   /**
@@ -144,6 +144,11 @@ private:
    * @brief Register idle callback for discard visuals if need.
    */
   void RegisterDiscardCallback();
+
+  /**
+   * @brief Callbacks called when application is terminated.
+   */
+  void OnApplicationTerminated();
 
   VisualFactory(const VisualFactory&) = delete;
 

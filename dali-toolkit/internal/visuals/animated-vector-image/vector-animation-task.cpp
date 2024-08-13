@@ -739,7 +739,6 @@ bool VectorAnimationTask::Rasterize()
   // Forcely trigger render once if need.
   if(mNotifyAfterRasterization || mNeedForceRenderOnceTrigger)
   {
-    Mutex::ScopedLock lock(mMutex);
     mVectorAnimationThread.RequestForceRenderOnce();
     mNeedForceRenderOnceTrigger = false;
   }
