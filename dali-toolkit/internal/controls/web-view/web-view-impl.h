@@ -88,6 +88,11 @@ public:
   static Dali::WebEngineCookieManager* GetCookieManager();
 
   /**
+   * @copydoc Dali::Toolkit::WebView::ChangeOrientation()
+   */
+  void ChangeOrientation(int orientation);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::GetSettings()
    */
   Dali::Toolkit::WebSettings* GetSettings() const;
