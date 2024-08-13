@@ -95,6 +95,11 @@ public:
    */
   void RequestForceRenderOnce();
 
+  /**
+   * @brief Finalize the thread.
+   */
+  void Finalize();
+
 protected:
   /**
    * @brief The entry function of the animation thread.

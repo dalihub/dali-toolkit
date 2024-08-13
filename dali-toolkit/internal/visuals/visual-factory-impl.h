@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
+#include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/styling/style-manager-devel.h>
@@ -40,7 +41,7 @@ class TextVisualShaderFactory;
 /**
  * @copydoc Toolkit::VisualFactory
  */
-class VisualFactory : public BaseObject
+class VisualFactory : public BaseObject, public ConnectionTracker
 {
 public:
   /**
@@ -118,6 +119,11 @@ private:
    */
   TextVisualShaderFactory& GetTextVisualShaderFactory();
 
+  /**
+   * @brief Callbacks called when application is terminated.
+   */
+  void OnApplicationTerminated();
+
   VisualFactory(const VisualFactory&) = delete;
 
   VisualFactory& operator=(const VisualFactory& rhs) = delete;
@@ -127,6 +133,7 @@ private:
   std::unique_ptr<ImageVisualShaderFactory> mImageVisualShaderFactory;
   std::unique_ptr<TextVisualShaderFactory>  mTextVisualShaderFactory;
   SlotDelegate<VisualFactory>               mSlotDelegate;
+  Dali::LifecycleController                 mLifecycleController;
   bool                                      mDebugEnabled : 1;
   bool                                      mPreMultiplyOnLoad : 1; ///< Local store for this flag
 };

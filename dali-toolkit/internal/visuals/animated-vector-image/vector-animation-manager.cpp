@@ -43,22 +43,14 @@ VectorAnimationManager::VectorAnimationManager()
 : mEventCallbacks(),
   mLifecycleObservers(),
   mVectorAnimationThread(nullptr),
-  mProcessorRegistered(false)
+  mProcessorRegistered(false),
+  mDestroyed(false)
 {
 }
 
 VectorAnimationManager::~VectorAnimationManager()
 {
-  for(auto&& iter : mEventCallbacks)
-  {
-    delete iter;
-  }
-  mEventCallbacks.clear();
-
-  if(mProcessorRegistered && Adaptor::IsAvailable())
-  {
-    Adaptor::Get().UnregisterProcessor(*this, true);
-  }
+  Finalize();
 
   for(auto observer : mLifecycleObservers)
   {
@@ -93,12 +85,19 @@ VectorAnimationThread& VectorAnimationManager::GetVectorAnimationThread()
 
 void VectorAnimationManager::RegisterEventCallback(CallbackBase* callback)
 {
-  mEventCallbacks.push_back(callback);
-
-  if(!mProcessorRegistered)
+  if(DALI_LIKELY(!mDestroyed))
   {
-    Adaptor::Get().RegisterProcessor(*this, true); // Use post processor to trigger after layoutting
-    mProcessorRegistered = true;
+    mEventCallbacks.push_back(callback);
+
+    if(!mProcessorRegistered && DALI_LIKELY(Adaptor::IsAvailable()))
+    {
+      Adaptor::Get().RegisterProcessor(*this, true); // Use post processor to trigger after layoutting
+      mProcessorRegistered = true;
+    }
+  }
+  else
+  {
+    delete callback; // No longer needed.
   }
 }
 
@@ -123,14 +122,45 @@ void VectorAnimationManager::UnregisterEventCallback(CallbackBase* callback)
   }
 }
 
+void VectorAnimationManager::Finalize()
+{
+  if(DALI_LIKELY(!mDestroyed))
+  {
+    DALI_LOG_DEBUG_INFO("Finalizing Vector Animation Manager.\n");
+    mDestroyed = true;
+
+    for(auto&& iter : mEventCallbacks)
+    {
+      delete iter;
+    }
+
+    mEventCallbacks.clear();
+
+    if(mProcessorRegistered && Adaptor::IsAvailable())
+    {
+      Adaptor::Get().UnregisterProcessor(*this, true);
+      mProcessorRegistered = false;
+    }
+
+    if(mVectorAnimationThread)
+    {
+      mVectorAnimationThread->Finalize();
+    }
+  }
+}
+
 void VectorAnimationManager::Process(bool postProcessor)
 {
-  for(auto&& iter : mEventCallbacks)
+  if(DALI_LIKELY(!mDestroyed))
   {
-    CallbackBase::Execute(*iter);
-    delete iter;
+    for(auto&& iter : mEventCallbacks)
+    {
+      CallbackBase::Execute(*iter);
+      delete iter;
+    }
+
+    mEventCallbacks.clear();
   }
-  mEventCallbacks.clear();
 
   Adaptor::Get().UnregisterProcessor(*this, true);
   mProcessorRegistered = false;

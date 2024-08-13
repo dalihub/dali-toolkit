@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <thread>
 
 namespace Dali
@@ -79,15 +80,7 @@ VectorAnimationThread::~VectorAnimationThread()
   // Stop the thread
   {
     ConditionalWait::ScopedLock lock(mConditionalWait);
-    // Wait until some event thread trigger relative job finished.
-    {
-      Mutex::ScopedLock eventTriggerLock(mEventTriggerMutex);
-      Mutex::ScopedLock taskCompletedLock(mTaskCompletedMutex);
-      Mutex::ScopedLock animationTasksLock(mAnimationTasksMutex);
-      DALI_LOG_DEBUG_INFO("Mark VectorAnimationThread destroyed\n");
-      mDestroyThread = true;
-    }
-    mNeedToSleep = false;
+    Finalize();
     mConditionalWait.Notify(lock);
   }
 
@@ -102,6 +95,41 @@ VectorAnimationThread::~VectorAnimationThread()
   DALI_LOG_DEBUG_INFO("VectorAnimationThread Join request\n");
 
   Join();
+
+  // We need to wait all working tasks are completed before destructing this thread.
+  while(mWorkingTasks.size() > 0)
+  {
+    DALI_LOG_DEBUG_INFO("Still waiting WorkingTasks [%zu]\n", mWorkingTasks.size());
+    ConditionalWait::ScopedLock lock(mConditionalWait);
+
+    // ConditionalWait notifyed when task complete.
+    // If task complete, then remove working tasks list and then wait again, until all working tasks are completed.
+    decltype(mCompletedTasksQueue) completedTasksQueue;
+    {
+      Mutex::ScopedLock taskCompletedLock(mTaskCompletedMutex);
+      completedTasksQueue.swap(mCompletedTasksQueue);
+    }
+    if(completedTasksQueue.empty())
+    {
+      mConditionalWait.Wait(lock);
+      // Task completed may have been added to the queue while we were waiting.
+      {
+        Mutex::ScopedLock taskCompletedLock(mTaskCompletedMutex);
+        completedTasksQueue.swap(mCompletedTasksQueue);
+      }
+    }
+
+    DALI_LOG_DEBUG_INFO("Completed task queue [%zu]\n", completedTasksQueue.size());
+
+    for(auto& taskPair : completedTasksQueue)
+    {
+      auto workingIter = std::find(mWorkingTasks.begin(), mWorkingTasks.end(), taskPair.first);
+      if(workingIter != mWorkingTasks.end())
+      {
+        mWorkingTasks.erase(workingIter);
+      }
+    }
+  }
 }
 
 /// Event thread called
@@ -125,14 +153,13 @@ void VectorAnimationThread::OnTaskCompleted(VectorAnimationTaskPtr task, bool su
 
   Mutex::ScopedLock taskCompletedLock(mTaskCompletedMutex);
 
-  if(DALI_LIKELY(!mDestroyThread))
-  {
-    mCompletedTasksQueue.emplace_back(task, success && keepAnimation);
+  // DevNote : We need to add task queue, and notify even if mDestroyThread is true.
+  // Since we should make ensure that all working tasks are completed before destroying the thread.
+  mCompletedTasksQueue.emplace_back(task, success && keepAnimation);
 
-    // wake up the animation thread.
-    // Note that we should not make mNeedToSleep as false now.
-    mConditionalWait.Notify(lock);
-  }
+  // wake up the animation thread.
+  // Note that we should not make mNeedToSleep as false now.
+  mConditionalWait.Notify(lock);
 }
 
 /// VectorAnimationThread::SleepThread called, Mutex SleepThread::mAwakeCallbackMutex is locked
@@ -191,13 +218,28 @@ void VectorAnimationThread::RequestForceRenderOnce()
   }
 }
 
+/// Event thread called
+void VectorAnimationThread::Finalize()
+{
+  Mutex::ScopedLock eventTriggerLock(mEventTriggerMutex);
+  Mutex::ScopedLock taskCompletedLock(mTaskCompletedMutex);
+  Mutex::ScopedLock animationTasksLock(mAnimationTasksMutex);
+  // Wait until some event thread trigger, and tasks relative job finished.
+  if(DALI_LIKELY(!mDestroyThread))
+  {
+    DALI_LOG_DEBUG_INFO("Mark VectorAnimationThread destroyed\n");
+    mDestroyThread = true;
+  }
+  mNeedToSleep = false;
+}
+
 /// VectorAnimationThread called
 void VectorAnimationThread::Run()
 {
   SetThreadName("VectorAnimationThread");
   mLogFactory.InstallLogFunction();
 
-  while(!mDestroyThread)
+  while(DALI_LIKELY(!mDestroyThread))
   {
     Rasterize();
   }
@@ -248,16 +290,18 @@ bool VectorAnimationThread::MoveTasksToAnimation(VectorAnimationTaskPtr task, bo
 /// VectorAnimationThread called
 void VectorAnimationThread::MoveTasksToCompleted(VectorAnimationTaskPtr task, bool keepAnimation)
 {
+  // DevNote : We need to consume task queue, and notify even if mDestroyThread is true.
+  // Since we should make ensure that all working tasks are completed before destroying the thread.
+  bool needRasterize = false;
+
+  auto workingIter = std::find(mWorkingTasks.begin(), mWorkingTasks.end(), task);
+  if(workingIter != mWorkingTasks.end())
+  {
+    mWorkingTasks.erase(workingIter);
+  }
+
   if(DALI_LIKELY(!mDestroyThread))
   {
-    bool needRasterize = false;
-
-    auto workingTask = std::find(mWorkingTasks.begin(), mWorkingTasks.end(), task);
-    if(workingTask != mWorkingTasks.end())
-    {
-      mWorkingTasks.erase(workingTask);
-    }
-
     // Check pending task
     {
       Mutex::ScopedLock animationTasksLock(mAnimationTasksMutex);

@@ -148,6 +148,14 @@ VectorAnimationManager& VisualFactoryCache::GetVectorAnimationManager()
   return *mVectorAnimationManager;
 }
 
+void VisualFactoryCache::FinalizeVectorAnimationManager()
+{
+  if(mVectorAnimationManager)
+  {
+    mVectorAnimationManager->Finalize();
+  }
+}
+
 Geometry VisualFactoryCache::CreateGridGeometry(Uint16Pair gridSize)
 {
   uint16_t gridWidth  = gridSize.GetWidth();

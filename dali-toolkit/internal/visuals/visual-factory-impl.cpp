@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -80,13 +81,22 @@ VisualFactory::VisualFactory(bool debugEnabled)
   mImageVisualShaderFactory(),
   mTextVisualShaderFactory(),
   mSlotDelegate(this),
+  mLifecycleController(Dali::LifecycleController::Get()),
   mDebugEnabled(debugEnabled),
   mPreMultiplyOnLoad(true)
 {
+  if(DALI_LIKELY(mLifecycleController))
+  {
+    mLifecycleController.TerminateSignal().Connect(this, &VisualFactory::OnApplicationTerminated);
+  }
 }
 
 VisualFactory::~VisualFactory()
 {
+  if(DALI_LIKELY(mLifecycleController))
+  {
+    mLifecycleController.TerminateSignal().Disconnect(this, &VisualFactory::OnApplicationTerminated);
+  }
 }
 
 void VisualFactory::OnStyleChangedSignal(Toolkit::StyleManager styleManager, StyleChange::Type type)
@@ -435,6 +445,16 @@ TextVisualShaderFactory& VisualFactory::GetTextVisualShaderFactory()
     mTextVisualShaderFactory = std::unique_ptr<TextVisualShaderFactory>(new TextVisualShaderFactory());
   }
   return *mTextVisualShaderFactory;
+}
+
+void VisualFactory::OnApplicationTerminated()
+{
+  if(mFactoryCache)
+  {
+    mFactoryCache->FinalizeVectorAnimationManager();
+  }
+  // We don't need to keep it anymore
+  mLifecycleController.Reset();
 }
 
 } // namespace Internal

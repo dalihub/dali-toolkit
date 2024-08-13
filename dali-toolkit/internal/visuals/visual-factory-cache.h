@@ -256,6 +256,12 @@ public:
    */
   VectorAnimationManager& GetVectorAnimationManager();
 
+  /**
+   * @brief Finalize vector animation manager.
+   * It will be called when application is terminated.
+   */
+  void FinalizeVectorAnimationManager();
+
 protected:
   /**
    * Undefined copy constructor.
