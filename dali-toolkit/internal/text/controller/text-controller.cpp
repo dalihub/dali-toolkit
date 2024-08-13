@@ -1802,11 +1802,11 @@ void Controller::PasteClipboardItemEvent(uint32_t id, const char* mimeType, cons
   }
 
   // text-controller allows only plain text type.
-  if(!strncmp(mimeType, MIME_TYPE_TEXT_PLAIN, strlen(MIME_TYPE_TEXT_PLAIN)))
+  if(!strncmp(mimeType, MIME_TYPE_TEXT_PLAIN, strlen(MIME_TYPE_TEXT_PLAIN) + 1 /* Compare include null-terminated char */))
   {
     EventHandler::PasteClipboardItemEvent(*this, data);
   }
-  else if(!strncmp(mimeType, MIME_TYPE_HTML, strlen(MIME_TYPE_HTML)))
+  else if(!strncmp(mimeType, MIME_TYPE_HTML, strlen(MIME_TYPE_HTML) + 1 /* Compare include null-terminated char */))
   {
     // This does not mean that text controls can parse html.
     // This is temporary code, as text controls do not support html type data.
