@@ -105,6 +105,11 @@ public:
   virtual std::string GetDescriptionRaw() const;
 
   /**
+   * @copydoc Dali::Accessibility::Accessible::GetValue()
+   */
+  std::string GetValue() const override;
+
+  /**
    * @copydoc Dali::Accessibility::Accessible::GetRole()
    */
   Dali::Accessibility::Role GetRole() const override;

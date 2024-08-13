@@ -129,6 +129,16 @@ public:
 
   }
 
+  void SceneConnection()
+  {
+
+  }
+
+  void SceneDisconnection()
+  {
+
+  }
+
 public:
 
   std::string mUrl;
@@ -363,6 +373,16 @@ void VideoPlayer::RaiseToTop()
 void VideoPlayer::LowerToBottom()
 {
   Internal::Adaptor::GetImplementation( *this ).LowerToBottom();
+}
+
+void VideoPlayer::SceneConnection()
+{
+  Internal::Adaptor::GetImplementation( *this ).SceneConnection();
+}
+
+void VideoPlayer::SceneDisconnection()
+{
+  Internal::Adaptor::GetImplementation( *this ).SceneDisconnection();
 }
 
 } // namespace Dali;

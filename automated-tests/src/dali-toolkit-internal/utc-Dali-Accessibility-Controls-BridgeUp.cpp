@@ -158,6 +158,40 @@ int UtcDaliControlAccessibilityDescription(void)
   END_TEST;
 }
 
+int UtcDaliControlAccessibilityValue(void)
+{
+  ToolkitTestApplication application;
+
+  auto control = Control::New();
+
+  auto q = Dali::Accessibility::Accessible::Get(control);
+  DALI_TEST_CHECK(q);
+
+  DALI_TEST_EQUALS("", q->GetValue(), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_VALUE, "Accessibility_Value");
+  DALI_TEST_EQUALS("Accessibility_Value", q->GetValue(), TEST_LOCATION);
+
+  auto property = control.GetProperty(DevelControl::Property::ACCESSIBILITY_VALUE).Get<std::string>();
+  DALI_TEST_EQUALS("Accessibility_Value", property, TEST_LOCATION);
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  auto i = dynamic_cast<Dali::Accessibility::Component*>(q);
+
+  DALI_TEST_CHECK(i);
+  i->GrabHighlight();
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_VALUE, "Changed_Accessiblity_Value");
+  DALI_TEST_EQUALS("Changed_Accessiblity_Value", q->GetValue(), TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_VALUE).Get<std::string>(), "Changed_Accessiblity_Value", TEST_LOCATION);
+
+  //TODO test emission of description change signal
+  Dali::Accessibility::TestEnableSC(false);
+
+  END_TEST;
+}
+
 int UtcDaliControlAccessibilityRole(void)
 {
   ToolkitTestApplication application;
