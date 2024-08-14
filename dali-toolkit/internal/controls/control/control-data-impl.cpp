@@ -814,6 +814,7 @@ void Control::Impl::OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Prope
       if(index == DevelControl::Property::ACCESSIBILITY_NAME || (mAccessibilityProps.name.empty() && index == accessible->GetNamePropertyIndex()))
       {
         accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::NAME);
+        return;
       }
     }
 
@@ -822,7 +823,13 @@ void Control::Impl::OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Prope
       if(index == DevelControl::Property::ACCESSIBILITY_DESCRIPTION || (mAccessibilityProps.description.empty() && index == accessible->GetDescriptionPropertyIndex()))
       {
         accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
+        return;
       }
+    }
+
+    if(index == DevelControl::Property::ACCESSIBILITY_VALUE)
+    {
+      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
     }
   }
 }
