@@ -623,6 +623,8 @@ public:
   Toolkit::DevelControl::AccessibilityGetDescriptionSignalType mAccessibilityGetDescriptionSignal;
   Toolkit::DevelControl::AccessibilityDoGestureSignalType      mAccessibilityDoGestureSignal;
 
+  Toolkit::DevelControl::AccessibilityActionSignalType mAccessibilityActionSignal;
+
   struct AccessibilityProps
   {
     std::string name{};

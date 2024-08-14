@@ -185,6 +185,11 @@ Toolkit::DevelControl::AccessibilityDoGestureSignalType& AccessibilityDoGestureS
   return GetControlImplementation(control).mAccessibilityDoGestureSignal;
 }
 
+Toolkit::DevelControl::AccessibilityActionSignalType& AccessibilityActionSignal(Toolkit::Control control)
+{
+  return GetControlImplementation(control).mAccessibilityActionSignal;
+}
+
 void AppendAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation)
 {
   if(auto destinationAccessible = Accessibility::Accessible::Get(destination))
