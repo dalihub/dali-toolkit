@@ -346,6 +346,7 @@ struct Controller::Impl
     mHiddenInput(NULL),
     mInputFilter(nullptr),
     mTextFitContentSize(),
+    mRawText(),
     mTextFitArray(),
     mRecalculateNaturalSize(true),
     mMarkupProcessorEnabled(false),
@@ -375,7 +376,8 @@ struct Controller::Impl
     mIsLayoutDirectionChanged(false),
     mIsUserInteractionEnabled(true),
     mProcessorRegistered(false),
-    mTextCutout(false)
+    mTextCutout(false),
+    mRenderMode(DevelTextLabel::Render::SYNC)
   {
     mModel = Model::New();
 
@@ -384,7 +386,7 @@ struct Controller::Impl
     {
       mClipboard = Clipboard::Get();
     }
-
+    mView.SetFontClient(mFontClient);
     mView.SetVisualModel(mModel->mVisualModel);
     mView.SetLogicalModel(mModel->mLogicalModel);
 
@@ -1074,6 +1076,7 @@ public:
   HiddenText*                  mHiddenInput;                ///< Avoid allocating this when the user does not specify hidden input mode.
   std::unique_ptr<InputFilter> mInputFilter;                ///< Avoid allocating this when the user does not specify input filter mode.
   Vector2                      mTextFitContentSize;         ///< Size of Text fit content
+  std::string                  mRawText;                    ///< Raw text including markup tag.
 
   std::vector<Toolkit::DevelTextLabel::FitOption> mTextFitArray; ///< List of FitOption for TextFitArray operation.
 
@@ -1110,6 +1113,8 @@ public:
   bool  mIsUserInteractionEnabled : 1; ///< Whether the user interaction is enabled.
   bool  mProcessorRegistered : 1;      ///< Whether the text controller registered into processor or not.
   bool  mTextCutout : 1;               ///< Whether the text cutout enabled.
+
+  DevelTextLabel::Render::Mode mRenderMode; ///< Render mode of the text. (SYNC, ASYNC_AUTO, ASYNC_MANUAL)
 
 private:
   friend ControllerImplEventHandler;

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MULTI_LANGUAGE_SUPPORT_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/base-handle.h>
 
@@ -72,6 +73,14 @@ public:
   static MultilanguageSupport Get();
 
   /**
+   * @brief Create a handle to the new MultilanguageSupport instance.
+   *
+   * @param[in] connectLocaleChangedSignal Whether to connect Locale changed signal, default is true.
+   * @return A handle to the MultilanguageSupport.
+   */
+  static MultilanguageSupport New(bool connectLocaleChangedSignal);
+
+  /**
    * @brief Sets the scripts of the whole text.
    *
    * Scripts are used to validate and set default fonts and to shape the text in further steps.
@@ -105,6 +114,7 @@ public:
    * If a font has been set by the application developer, this method checks if the font supports the character.
    * If it doesn't, this method replaces it by a default one.
    *
+   * @param[in] fontClient FontClient to use in this function.
    * @param[in] text Vector of UTF-32 characters.
    * @param[in] scripts Vector containing the script runs for the whole text.
    * @param[in] fontDescriptions The fonts set through the mark-up string or the input style set through the property system.
@@ -115,7 +125,8 @@ public:
    * @param[in] numberOfCharacters The number of characters to set the font.
    * @param[out] fonts The validated fonts.
    */
-  void ValidateFonts(const Vector<Character>&                text,
+  void ValidateFonts(TextAbstraction::FontClient&            fontClient,
+                     const Vector<Character>&                text,
                      const Vector<ScriptRun>&                scripts,
                      const Vector<FontDescriptionRun>&       fontDescriptions,
                      const TextAbstraction::FontDescription& defaultFontDescription,
@@ -124,6 +135,11 @@ public:
                      CharacterIndex                          startIndex,
                      Length                                  numberOfCharacters,
                      Vector<FontRun>&                        fonts);
+
+  /**
+   * @brief Clear font caches when locale changed.
+   */
+  void ClearCache();
 
 public:
   // Default copy and move operator

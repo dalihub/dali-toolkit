@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/text/hyphenator.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/text-abstraction/hyphenation.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
@@ -34,9 +33,10 @@ namespace Text
 {
 const char* UTF8 = "UTF-8";
 
-Vector<bool> GetWordHyphens(const Character* word,
-                            Length           wordSize,
-                            const char*      lang)
+Vector<bool> GetWordHyphens(TextAbstraction::Hyphenation& hyphenation,
+                            const Character*              word,
+                            Length                        wordSize,
+                            const char*                   lang)
 {
   Vector<bool> hyphens;
 
@@ -45,8 +45,6 @@ Vector<bool> GetWordHyphens(const Character* word,
     // Nothing to do if there are no characters.
     return hyphens;
   }
-
-  TextAbstraction::Hyphenation hyphenation = TextAbstraction::Hyphenation::Get();
 
   // first get the needed encoding
   std::string text;

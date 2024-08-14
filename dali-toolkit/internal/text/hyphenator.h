@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_HYPHENATOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/text-abstraction/hyphenation.h>
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
@@ -34,15 +35,17 @@ namespace Text
 /**
  * Gets a vector booleans that indicates possible hyphen locations.
  *
+ * @param[in] hyphenation Hyphenation to use in this function.
  * @param[in] word the word to get possible hyphens for.
  * @param[in] wordSize the word size in bytes.
  * @param[in] lang the language for the word
  *
  * @return vector of boolean, true if possible to hyphenate at this character position.
  */
-Vector<bool> GetWordHyphens(const Character* word,
-                            Length           wordSize,
-                            const char*      lang);
+Vector<bool> GetWordHyphens(TextAbstraction::Hyphenation& hyphenation,
+                            const Character*              word,
+                            Length                        wordSize,
+                            const char*                   lang);
 
 } // namespace Text
 

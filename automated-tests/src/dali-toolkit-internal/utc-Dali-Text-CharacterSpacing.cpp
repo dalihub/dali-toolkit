@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,7 @@ bool LayoutTextTest(const LayoutTextData& data)
   // Load some fonts.
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
   fontClient.SetDpi(96u, 96u);
+  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
 
   char*             pathNamePtr = get_current_dir_name();
   const std::string pathName(pathNamePtr);
@@ -167,8 +168,11 @@ bool LayoutTextTest(const LayoutTextData& data)
   textModel->mLineWrapMode          = LineWrap::WORD;
   textModel->mIgnoreSpacesAfterText = true;
   //textModel->mMatchSystemLanguageDirection = false;
+
   Layout::Parameters layoutParameters(data.textArea,
-                                      textModel);
+                                      textModel,
+                                      fontClient,
+                                      bidirectionalSupport);
 
   layoutParameters.isLastNewParagraph = isLastNewParagraph;
 

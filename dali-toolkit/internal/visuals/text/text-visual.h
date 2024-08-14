@@ -25,6 +25,8 @@
 #include <dali/public-api/rendering/visual-renderer.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/async-text/async-text-interface.h>
+#include <dali-toolkit/internal/text/async-text/async-text-manager.h>
 #include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 #include <dali-toolkit/internal/visuals/text/text-visual-shader-factory.h>
@@ -66,7 +68,7 @@ typedef IntrusivePtr<TextVisual> TextVisualPtr;
  * | outline             | STRING  |
  *
  */
-class TextVisual : public Visual::Base
+class TextVisual : public Visual::Base, public TextLoadObserver
 {
 public:
   /**
@@ -132,6 +134,37 @@ public:
   static void UpdateRenderer(Toolkit::Visual::Base visual)
   {
     GetVisualObject(visual).UpdateRenderer();
+  };
+
+  /**
+   * @brief Instantly updates the async renderer
+   * @param[in] visual The text visual.
+   * @param[in] parameters The async text parameters.
+   * @return true if the async text render request was successful, false otherwise.
+   */
+  static bool UpdateAsyncRenderer(Toolkit::Visual::Base visual, Text::AsyncTextParameters& parameters)
+  {
+    return GetVisualObject(visual).UpdateAsyncRenderer(parameters);
+  };
+
+  /**
+   * @brief Instantly requests the async size computation.
+   * @param[in] visual The text visual.
+   * @param[in] parameters The async text parameters.
+   */
+  static void RequestAsyncSizeComputation(Toolkit::Visual::Base visual, Text::AsyncTextParameters& parameters)
+  {
+    GetVisualObject(visual).RequestAsyncSizeComputation(parameters);
+  };
+
+  /**
+   * @brief Set the control's async text interface.
+   * @param[in] visual The text visual.
+   * @param[in] asyncTextInterface The async text interface.
+   */
+  static void SetAsyncTextInterface(Toolkit::Visual::Base visual, Text::AsyncTextInterface* asyncTextInterface)
+  {
+    GetVisualObject(visual).SetAsyncTextInterface(asyncTextInterface);
   };
 
 public: // from Visual::Base
@@ -210,18 +243,16 @@ private:
     PixelData     maskPixelData;
     int32_t       width;
     int32_t       height;
-    Pixel::Format textPixelFormat;
     uint32_t      offsetHeight;
     Vector2       transformOffset;
 
-    TilingInfo(int32_t width, int32_t height, Pixel::Format textPixelFormat)
+    TilingInfo(int32_t width, int32_t height)
     : textPixelData(),
       stylePixelData(),
       overlayStylePixelData(),
       maskPixelData(),
       width(width),
       height(height),
-      textPixelFormat(textPixelFormat),
       offsetHeight(0u),
       transformOffset(0.f, 0.f)
     {
@@ -245,6 +276,25 @@ private:
    * @brief Updates the text's renderer.
    */
   void UpdateRenderer();
+
+  /**
+   * @brief Updates the text's async renderer.
+   * @param[in] parameters The async text parameters.
+   * @return true if the async text render request was successful, false otherwise.
+   */
+  bool UpdateAsyncRenderer(Text::AsyncTextParameters& parameters);
+
+  /**
+   * @brief Requests the async size computation.
+   * @param[in] parameters The async text parameters.
+   */
+  void RequestAsyncSizeComputation(Text::AsyncTextParameters& parameters);
+
+  /**
+   * @brief Set the control's async text interface.
+   * @param[in] asyncTextInterface The async text interface.
+   */
+  void SetAsyncTextInterface(Text::AsyncTextInterface* asyncTextInterface);
 
   /**
    * @brief Removes the text's renderer.
@@ -318,12 +368,23 @@ private:
     return static_cast<TextVisual&>(Toolkit::GetImplementation(visual).GetVisualObject());
   };
 
+  /**
+   * @copydoc TextLoadObserver::LoadComplete
+   *
+   * Called when the TextLoadingTask's work is complete.
+   *
+   * @param[in] success True if the load was successful, false otherwise.
+   * @param[in] textInformation The text information including render info and parameters.
+   */
+  void LoadComplete(bool success, TextInformation textInformation) override;
+
 private:
   typedef std::vector<Renderer> RendererContainer;
 
 private:
-  Text::ControllerPtr mController; ///< The text's controller.
-  Text::TypesetterPtr mTypesetter; ///< The text's typesetter.
+  Text::ControllerPtr       mController;         ///< The text's controller.
+  Text::TypesetterPtr       mTypesetter;         ///< The text's typesetter.
+  Text::AsyncTextInterface* mAsyncTextInterface; ///< The text's async interface.
 
   TextVisualShaderFactory&                mTextVisualShaderFactory; ///< The shader factory for text visual.
   TextVisualShaderFeature::FeatureBuilder mTextShaderFeatureCache;  ///< The cached shader feature for text visual.
@@ -338,6 +399,13 @@ private:
   bool              mRendererUpdateNeeded : 1;         ///< The flag to indicate whether the renderer needs to be updated.
   bool              mTextRequireRender : 1;            ///< The flag to indicate whether the text needs to be rendered.
   RendererContainer mRendererList;
+
+  uint32_t          mTextLoadingTaskId;               ///< The currently requested text loading(render) task Id.
+  uint32_t          mNaturalSizeTaskId;               ///< The currently requested natural size task Id.
+  uint32_t          mHeightForWidthTaskId;            ///< The currently requested height for width task Id.
+  bool              mIsTextLoadingTaskRunning    : 1; ///< Whether the requested text loading task is running or not.
+  bool              mIsNaturalSizeTaskRunning    : 1; ///< Whether the requested natural size task is running or not.
+  bool              mIsHeightForWidthTaskRunning : 1; ///< Whether the requested height for width task is running or not.
 };
 
 } // namespace Internal

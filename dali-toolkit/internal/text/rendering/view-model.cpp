@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/text/rendering/view-model.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/text-abstraction/font-client.h>
 #include <memory.h>
 
 // INTERNAL INCLUDES
@@ -355,7 +354,7 @@ const Vector<CharacterIndex>& ViewModel::GetGlyphsToCharacters() const
   return mModel->GetGlyphsToCharacters();
 }
 
-void ViewModel::ElideGlyphs()
+void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
 {
   mIsTextElided             = false;
   mStartIndexOfElidedGlyphs = mFirstMiddleIndexOfElidedGlyphs = mSecondMiddleIndexOfElidedGlyphs = 0;
@@ -414,8 +413,7 @@ void ViewModel::ElideGlyphs()
         if(0u != numberOfActualLaidOutGlyphs)
         {
           // There are elided glyphs.
-          mIsTextElided                          = true;
-          TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+          mIsTextElided = true;
 
           // Retrieve the whole glyphs and their positions.
           const GlyphInfo* const glyphs    = mModel->GetGlyphs();

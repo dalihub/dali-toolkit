@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,6 +151,7 @@ void ShapeTextPreprocess(const RendererParameters& textParameters, TextAbstracti
   const uint8_t*       utf8                 = NULL; // pointer to the first character of the text (encoded in utf8)
   Length               textSize             = 0u;   // The length of the utf8 string.
 
+  FontClient&        fontClient              = internalDataModel.fontClient;
   Length&            numberOfCharacters      = internalDataModel.numberOfCharacters;
   Vector<Character>& mirroredUtf32Characters = internalDataModel.mirroredUtf32Characters;
   Text::ModelPtr&    textModel               = internalDataModel.textModel;
@@ -217,10 +218,8 @@ void ShapeTextPreprocess(const RendererParameters& textParameters, TextAbstracti
 
   lineBreakInfo.Resize(numberOfCharacters, LINE_NO_BREAK);
 
-  SetLineBreakInfo(utf32Characters,
-                   0u,
-                   numberOfCharacters,
-                   lineBreakInfo);
+  TextAbstraction::Segmentation segmentation = TextAbstraction::Segmentation::Get();
+  SetLineBreakInfo(segmentation, utf32Characters, 0u, numberOfCharacters, lineBreakInfo);
 
   ////////////////////////////////////////////////////////////////////////////////
   // Retrieve the script runs.
@@ -290,7 +289,8 @@ void ShapeTextPreprocess(const RendererParameters& textParameters, TextAbstracti
 
   // Validates the fonts. If there is a character with no assigned font it sets a default one.
   // After this call, fonts are validated.
-  multilanguageSupport.ValidateFonts(utf32Characters,
+  multilanguageSupport.ValidateFonts(fontClient,
+                                     utf32Characters,
                                      scripts,
                                      fontDescriptionRuns,
                                      defaultFontDescription,
@@ -306,7 +306,10 @@ void ShapeTextPreprocess(const RendererParameters& textParameters, TextAbstracti
 
   bidirectionalInfo.Reserve(1u);
 
-  SetBidirectionalInfo(utf32Characters,
+  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+
+  SetBidirectionalInfo(bidirectionalSupport,
+                       utf32Characters,
                        scripts,
                        lineBreakInfo,
                        0u,
@@ -317,7 +320,8 @@ void ShapeTextPreprocess(const RendererParameters& textParameters, TextAbstracti
   if(hasBidirectionalText)
   {
     // Only set the character directions if there is right to left characters.
-    GetCharactersDirection(bidirectionalInfo,
+    GetCharactersDirection(bidirectionalSupport,
+                           bidirectionalInfo,
                            numberOfCharacters,
                            0u,
                            numberOfCharacters,
@@ -326,7 +330,8 @@ void ShapeTextPreprocess(const RendererParameters& textParameters, TextAbstracti
     // This paragraph has right to left text. Some characters may need to be mirrored.
     // TODO: consider if the mirrored string can be stored as well.
 
-    internalDataModel.isTextMirrored = GetMirroredText(utf32Characters,
+    internalDataModel.isTextMirrored = GetMirroredText(bidirectionalSupport,
+                                                       utf32Characters,
                                                        directions,
                                                        bidirectionalInfo,
                                                        0u,
@@ -359,8 +364,12 @@ void ShapeText(TextAbstraction::TextRenderer::Parameters& rendererParameters, Ve
 
   newParagraphGlyphs.Reserve(1u);
 
+  TextAbstraction::Shaping shaping = TextAbstraction::Shaping::Get();
+
   // Shapes the text.
-  ShapeText(textToShape,
+  ShapeText(shaping,
+            fontClient,
+            textToShape,
             lineBreakInfo,
             scripts,
             validFonts,
@@ -1052,8 +1061,12 @@ Size LayoutText(const RendererParameters& textParameters, TextAbstraction::TextR
 
   textModel->mLineWrapMode          = Text::LineWrap::WORD;
   textModel->mIgnoreSpacesAfterText = false;
+
+  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
   Text::Layout::Parameters layoutParameters(internalDataModel.textLayoutArea,
-                                            textModel);
+                                            textModel,
+                                            fontClient,
+                                            bidirectionalSupport);
 
   // Whether the last character is a new paragraph character.
   const Vector<Character>& textToShape = isTextMirrored ? mirroredUtf32Characters : textModel->mLogicalModel->mText;

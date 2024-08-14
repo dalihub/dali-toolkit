@@ -555,8 +555,11 @@ struct Engine::Impl
     {
       Vector<BidirectionalLineInfoRun>& bidirectionalLinesInfo = parameters.textModel->mLogicalModel->mBidirectionalLineInfo;
 
+      TextAbstraction::BidirectionalSupport bidirectionalSupport = parameters.bidirectionalSupport;
+
       // Sets the visual to logical map tables needed to reorder the text.
-      ReorderLine(bidirectionalParagraphInfo,
+      ReorderLine(bidirectionalSupport,
+                  bidirectionalParagraphInfo,
                   bidirectionalLinesInfo,
                   bidiParameters.bidiLineIndex,
                   lineLayout.characterIndex,
@@ -648,8 +651,11 @@ struct Engine::Impl
     // Remove current reordered line.
     bidirectionalLinesInfo.Erase(bidirectionalLinesInfo.Begin() + bidiParameters.bidiLineIndex);
 
+    TextAbstraction::BidirectionalSupport bidirectionalSupport = parameters.bidirectionalSupport;
+
     // Re-build the conversion table without the removed glyphs.
-    ReorderLine(bidirectionalParagraphInfo,
+    ReorderLine(bidirectionalSupport,
+                bidirectionalParagraphInfo,
                 bidirectionalLinesInfo,
                 bidiParameters.bidiLineIndex,
                 lineLayout.characterIndex,
@@ -1090,7 +1096,7 @@ struct Engine::Impl
         hyphenGlyph        = GlyphInfo();
         hyphenGlyph.fontId = glyphsBuffer[glyphIndex].fontId;
 
-        TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+        TextAbstraction::FontClient fontClient = parameters.fontClient;
         hyphenGlyph.index                      = fontClient.GetGlyphIndex(hyphenGlyph.fontId, HYPHEN_UNICODE);
 
         mMetrics->GetGlyphMetrics(&hyphenGlyph, 1);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -277,7 +277,7 @@ public:
     }
   }
 
-  Length Shape(unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script)
+  Length Shape(TextAbstraction::FontClient& fontClient, unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script)
   {
     mText     = new unsigned char[numChars];
     mNumChars = numChars;
@@ -640,9 +640,9 @@ void Shaping::GetGlyphs(GlyphInfo* glyphStore, unsigned int* mappingTable)
   GetImplementation(*this).GetGlyphs(glyphStore, mappingTable);
 }
 
-Length Shaping::Shape(unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script)
+Length Shaping::Shape(TextAbstraction::FontClient& fontClient, unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script)
 {
-  return GetImplementation(*this).Shape(text, numChars, fontId, script);
+  return GetImplementation(*this).Shape(fontClient, text, numChars, fontId, script);
 }
 
 } // namespace TextAbstraction

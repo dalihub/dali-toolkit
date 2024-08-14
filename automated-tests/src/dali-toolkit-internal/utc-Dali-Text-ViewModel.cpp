@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ bool ElideTest(const ElideData& data)
   controller->Relayout(data.size);
 
   // Elide the glyphs.
-  model->ElideGlyphs();
+  model->ElideGlyphs(fontClient);
 
   if(data.numberOfLines != model->GetNumberOfLines())
   {
@@ -481,7 +481,9 @@ int UtcDaliTextViewModelGetGlyphsLayout(void)
   controller->Relayout(CONTROL_SIZE);
 
   // Elide the glyphs.
-  model->ElideGlyphs();
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi(93u, 93u);
+  model->ElideGlyphs(fontClient);
 
   DALI_TEST_EQUALS(LOREM_NUMBER_OF_GLYPHS_ELIDED, model->GetNumberOfGlyphs(), TEST_LOCATION);
   DALI_TEST_CHECK(NULL != model->GetGlyphs());
@@ -570,7 +572,9 @@ int UtcDaliTextViewModelElideText01(void)
   const Vector2*         layoutsModel = model->GetLayout();
 
   // Elide the glyphs. Text shouldn't be elided with this configuration.
-  model->ElideGlyphs();
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi(93u, 93u);
+  model->ElideGlyphs(fontClient);
 
   DALI_TEST_CHECK(glyphsModel == model->GetGlyphs());
   DALI_TEST_CHECK(layoutsModel == model->GetLayout());
@@ -589,7 +593,7 @@ int UtcDaliTextViewModelElideText01(void)
   DALI_TEST_EQUALS(0u, model->GetNumberOfLines(), TEST_LOCATION);
 
   // Elide the glyphs. Should not add the ellipsis glyph.
-  model->ElideGlyphs();
+  model->ElideGlyphs(fontClient);
 
   DALI_TEST_EQUALS(0u, model->GetNumberOfGlyphs(), TEST_LOCATION);
 
@@ -598,7 +602,7 @@ int UtcDaliTextViewModelElideText01(void)
   controller->Relayout(CONTROL_SIZE);
 
   // Elide the glyphs.
-  model->ElideGlyphs();
+  model->ElideGlyphs(fontClient);
 
   DALI_TEST_EQUALS(6u, model->GetNumberOfGlyphs(), TEST_LOCATION);
   DALI_TEST_EQUALS(2u, model->GetNumberOfLines(), TEST_LOCATION);
@@ -608,7 +612,7 @@ int UtcDaliTextViewModelElideText01(void)
   controller->Relayout(CONTROL_SIZE);
 
   // Elide the glyphs.
-  model->ElideGlyphs();
+  model->ElideGlyphs(fontClient);
 
   DALI_TEST_EQUALS(LOREM_NUMBER_OF_GLYPHS_ELIDED, model->GetNumberOfGlyphs(), TEST_LOCATION);
   DALI_TEST_EQUALS(LOREM_NUMBER_OF_LINES_ELIDED, model->GetNumberOfLines(), TEST_LOCATION);
@@ -631,7 +635,7 @@ int UtcDaliTextViewModelElideText01(void)
   controller->Relayout(Size(testWidth, sizeAB.height));
 
   // Elide the glyphs.
-  model->ElideGlyphs();
+  model->ElideGlyphs(fontClient);
   DALI_TEST_EQUALS(1u, model->GetNumberOfGlyphs(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, model->GetNumberOfLines(), TEST_LOCATION);
 
