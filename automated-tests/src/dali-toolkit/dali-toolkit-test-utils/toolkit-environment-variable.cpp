@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,11 @@ const char* GetEnvironmentVariable(const char* variable)
   if(value != gEnvironmentVariables.end())
   {
     return value->second.c_str();
+  }
+  // Get http_proxy from real environment variables
+  if(std::string(variable) == std::string("http_proxy"))
+  {
+    return (gEnvironmentVariables[variable] = std::getenv("http_proxy")).c_str();
   }
   return nullptr;
 }
