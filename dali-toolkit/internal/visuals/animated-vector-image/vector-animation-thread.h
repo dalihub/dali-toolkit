@@ -151,6 +151,11 @@ private:
      */
     void SleepUntil(std::chrono::time_point<std::chrono::steady_clock> timeToSleepUntil);
 
+    /**
+     * @brief Finalizes the sleep thread. This will make ensure that we don't touch VectorAnimationThread.
+     */
+    void Finalize();
+
   protected:
     /**
      * @brief The entry function of the animation thread.
@@ -162,7 +167,10 @@ private:
     SleepThread& operator=(const SleepThread& thread) = delete;
 
   private:
-    ConditionalWait                                    mConditionalWait;
+    ConditionalWait mConditionalWait;
+    Mutex           mAwakeCallbackMutex; ///< Mutex to check validatoin of mAwakeCallback
+    Mutex           mSleepRequestMutex;  ///< Mutex to change sleep time point.
+
     std::unique_ptr<CallbackBase>                      mAwakeCallback;
     std::chrono::time_point<std::chrono::steady_clock> mSleepTimePoint;
     const Dali::LogFactoryInterface&                   mLogFactory;
