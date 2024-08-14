@@ -84,6 +84,9 @@ VectorAnimationThread::~VectorAnimationThread()
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::~VectorAnimationThread: Join [%p]\n", this);
 
+  // Mark as sleep thread destroyed now.
+  mSleepThread.Finalize();
+
   DALI_LOG_DEBUG_INFO("VectorAnimationThread Join request\n");
 
   Join();
@@ -120,14 +123,16 @@ void VectorAnimationThread::OnTaskCompleted(VectorAnimationTaskPtr task, bool su
   }
 }
 
-/// VectorAnimationThread::SleepThread called
+/// VectorAnimationThread::SleepThread called, Mutex SleepThread::mAwakeCallbackMutex is locked
 void VectorAnimationThread::OnAwakeFromSleep()
 {
   if(DALI_LIKELY(!mDestroyThread))
   {
+    ConditionalWait::ScopedLock lock(mConditionalWait);
+
     mNeedToSleep = false;
     // wake up the animation thread
-    mConditionalWait.Notify();
+    mConditionalWait.Notify(lock);
   }
 }
 
@@ -412,10 +417,12 @@ VectorAnimationThread::SleepThread::~SleepThread()
   // Stop the thread
   {
     ConditionalWait::ScopedLock lock(mConditionalWait);
-    mDestroyThread = true;
-    mAwakeCallback.reset();
+    Finalize();
+
     mConditionalWait.Notify(lock);
   }
+
+  DALI_LOG_DEBUG_INFO("VectorAnimationThread::SleepThread Join request\n");
 
   Join();
 }
@@ -424,9 +431,27 @@ VectorAnimationThread::SleepThread::~SleepThread()
 void VectorAnimationThread::SleepThread::SleepUntil(std::chrono::time_point<std::chrono::steady_clock> timeToSleepUntil)
 {
   ConditionalWait::ScopedLock lock(mConditionalWait);
-  mSleepTimePoint = timeToSleepUntil;
-  mNeedToSleep    = true;
-  mConditionalWait.Notify(lock);
+
+  Mutex::ScopedLock sleepLock(mSleepRequestMutex);
+
+  if(DALI_LIKELY(!mDestroyThread))
+  {
+    mSleepTimePoint = timeToSleepUntil;
+    mNeedToSleep    = true;
+    mConditionalWait.Notify(lock);
+  }
+}
+
+void VectorAnimationThread::SleepThread::Finalize()
+{
+  Mutex::ScopedLock awakeLock(mAwakeCallbackMutex);
+  Mutex::ScopedLock sleepLock(mSleepRequestMutex);
+  if(DALI_LIKELY(!mDestroyThread))
+  {
+    DALI_LOG_DEBUG_INFO("Mark VectorAnimationThread::SleepThread destroyed\n");
+    mDestroyThread = true;
+  }
+  mAwakeCallback.reset();
 }
 
 void VectorAnimationThread::SleepThread::Run()
@@ -437,31 +462,39 @@ void VectorAnimationThread::SleepThread::Run()
 
   while(!mDestroyThread)
   {
-    bool                                               needToSleep;
+    bool needToSleep = false;
+
     std::chrono::time_point<std::chrono::steady_clock> sleepTimePoint;
 
     {
       ConditionalWait::ScopedLock lock(mConditionalWait);
+      Mutex::ScopedLock           sleepLock(mSleepRequestMutex);
 
-      needToSleep    = mNeedToSleep;
-      sleepTimePoint = mSleepTimePoint;
+      if(DALI_LIKELY(!mDestroyThread))
+      {
+        needToSleep    = mNeedToSleep;
+        sleepTimePoint = mSleepTimePoint;
 
-      mNeedToSleep = false;
+        mNeedToSleep = false;
+      }
     }
 
     if(needToSleep)
     {
       std::this_thread::sleep_until(sleepTimePoint);
 
-      if(mAwakeCallback)
       {
-        CallbackBase::Execute(*mAwakeCallback);
+        Mutex::ScopedLock awakeLock(mAwakeCallbackMutex);
+        if(DALI_LIKELY(mAwakeCallback))
+        {
+          CallbackBase::Execute(*mAwakeCallback);
+        }
       }
     }
 
     {
       ConditionalWait::ScopedLock lock(mConditionalWait);
-      if(!mDestroyThread && !mNeedToSleep)
+      if(DALI_LIKELY(!mDestroyThread) && !mNeedToSleep)
       {
         mConditionalWait.Wait(lock);
       }
