@@ -25,7 +25,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/async-text/async-text-loader.h>
 
-
 namespace Dali
 {
 namespace Toolkit
@@ -47,9 +46,9 @@ public:
    * @param [in] paramaters The async text parameters.
    * @param [in] callback The callback that is called when the operation is completed.
    */
-  TextLoadingTask(const uint32_t            id,
-                  Text::AsyncTextParameters paramaters,
-                  CallbackBase*             callback);
+  TextLoadingTask(const uint32_t                   id,
+                  const Text::AsyncTextParameters& paramaters,
+                  CallbackBase*                    callback);
 
   /**
    * Constructor, empty task for wake up the async task manger.
@@ -116,8 +115,8 @@ public:
   Text::AsyncTextRenderInfo mRenderInfo;
 
 private:
-  bool            mIsReady : 1; ///< Whether this task ready to run
-  Mutex           mMutex;
+  bool  mIsReady : 1; ///< Whether this task ready to run
+  Mutex mMutex;
 };
 
 } // namespace Internal

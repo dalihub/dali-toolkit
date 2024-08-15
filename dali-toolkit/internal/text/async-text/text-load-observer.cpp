@@ -24,7 +24,7 @@ namespace Dali
 {
 namespace Toolkit
 {
-TextLoadObserver::TextInformation::TextInformation(Text::AsyncTextRenderInfo renderInfo, Text::AsyncTextParameters parameters)
+TextLoadObserver::TextInformation::TextInformation(const Text::AsyncTextRenderInfo& renderInfo, const Text::AsyncTextParameters& parameters)
 : renderInfo(renderInfo),
   parameters(parameters)
 {

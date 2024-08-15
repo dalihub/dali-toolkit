@@ -27,7 +27,6 @@
 
 // INTERNAL INCLUDES
 
-
 namespace Dali
 {
 namespace Toolkit
@@ -37,7 +36,8 @@ namespace
 const char*    DALI_TEXT_NUMBER_OF_ASYNC_TEXT_LOADER("DALI_TEXT_NUMBER_OF_ASYNC_TEXT_LOADER");
 const int      DEFAULT_NUMBER_OF_LOADER = 4;
 const int      MINIMUM_NUMBER_OF_LOADER = 1;
-const uint32_t EMPTY_TASK_ID = 0u;
+const int      MAXIMUM_NUMBER_OF_LOADER = 16;
+const uint32_t EMPTY_TASK_ID            = 0u;
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_ASYNC, false);
 } // namespace
@@ -59,10 +59,10 @@ AsyncTextManager::AsyncTextManager()
   auto numberOfLoaderString = Dali::EnvironmentVariable::GetEnvironmentVariable(DALI_TEXT_NUMBER_OF_ASYNC_TEXT_LOADER);
   int  numberOfLoader       = numberOfLoaderString ? std::atoi(numberOfLoaderString) : DEFAULT_NUMBER_OF_LOADER;
 
-  numberOfLoader = std::max(numberOfLoader, MINIMUM_NUMBER_OF_LOADER);
+  numberOfLoader = std::clamp(numberOfLoader, MINIMUM_NUMBER_OF_LOADER, MAXIMUM_NUMBER_OF_LOADER);
   DALI_LOG_RELEASE_INFO("Number of async text loaders:%d\n", numberOfLoader);
 
-  for(int i = 0; i < numberOfLoader; i ++)
+  for(int i = 0; i < numberOfLoader; i++)
   {
     Text::AsyncTextLoader loader = Text::AsyncTextLoader::New();
     mAvailableLoaders.push_back(loader);
@@ -356,7 +356,7 @@ void AsyncTextManager::ObserverDestroyed(TextLoadObserver* observer)
     if(it->second.mObserver == observer)
     {
       it->second.mObserver = nullptr;
-      it = mRunningTasks.erase(it);
+      it                   = mRunningTasks.erase(it);
     }
     else
     {
@@ -370,7 +370,7 @@ void AsyncTextManager::ObserverDestroyed(TextLoadObserver* observer)
     {
       Dali::AsyncTaskManager::Get().RemoveTask(it->second.mTask);
       it->second.mObserver = nullptr;
-      it = mWaitingTasks.erase(it);
+      it                   = mWaitingTasks.erase(it);
     }
     else
     {

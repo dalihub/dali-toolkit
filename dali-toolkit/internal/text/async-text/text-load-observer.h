@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/async-text/async-text-loader.h>
 
-
 namespace Dali
 {
 namespace Toolkit
@@ -42,7 +41,7 @@ public:
 
   struct TextInformation
   {
-    TextInformation(Text::AsyncTextRenderInfo renderInfo, Text::AsyncTextParameters parameters);
+    TextInformation(const Text::AsyncTextRenderInfo& renderInfo, const Text::AsyncTextParameters& parameters);
     TextInformation();
 
     Text::AsyncTextRenderInfo renderInfo;
@@ -68,7 +67,7 @@ public:
    * @param[in] loadSuccess True if the text load was successful.
    * @param[in] textureInformation Structure that contains loaded text information.
    */
-  virtual void LoadComplete(bool loadSuccess, TextInformation textInformation) = 0;
+  virtual void LoadComplete(bool loadSuccess, const TextInformation& textInformation) = 0;
 
   /**
    * @brief Returns the destruction signal.
@@ -89,7 +88,6 @@ public:
   bool DisconnectDestructionSignal();
 
 public:
-
 private:
   DestructionSignalType mDestructionSignal;        ///< The destruction signal emitted when the observer is destroyed.
   int                   mDestructionSignalConnect; ///< The number of times DestructionSignal is connected.

@@ -237,14 +237,14 @@ protected:
 private:
   struct TilingInfo
   {
-    PixelData     textPixelData;
-    PixelData     stylePixelData;
-    PixelData     overlayStylePixelData;
-    PixelData     maskPixelData;
-    int32_t       width;
-    int32_t       height;
-    uint32_t      offsetHeight;
-    Vector2       transformOffset;
+    PixelData textPixelData;
+    PixelData stylePixelData;
+    PixelData overlayStylePixelData;
+    PixelData maskPixelData;
+    int32_t   width;
+    int32_t   height;
+    uint32_t  offsetHeight;
+    Vector2   transformOffset;
 
     TilingInfo(int32_t width, int32_t height)
     : textPixelData(),
@@ -376,7 +376,7 @@ private:
    * @param[in] success True if the load was successful, false otherwise.
    * @param[in] textInformation The text information including render info and parameters.
    */
-  void LoadComplete(bool success, TextInformation textInformation) override;
+  void LoadComplete(bool success, const TextInformation& textInformation) override;
 
 private:
   typedef std::vector<Renderer> RendererContainer;
@@ -400,12 +400,12 @@ private:
   bool              mTextRequireRender : 1;            ///< The flag to indicate whether the text needs to be rendered.
   RendererContainer mRendererList;
 
-  uint32_t          mTextLoadingTaskId;               ///< The currently requested text loading(render) task Id.
-  uint32_t          mNaturalSizeTaskId;               ///< The currently requested natural size task Id.
-  uint32_t          mHeightForWidthTaskId;            ///< The currently requested height for width task Id.
-  bool              mIsTextLoadingTaskRunning    : 1; ///< Whether the requested text loading task is running or not.
-  bool              mIsNaturalSizeTaskRunning    : 1; ///< Whether the requested natural size task is running or not.
-  bool              mIsHeightForWidthTaskRunning : 1; ///< Whether the requested height for width task is running or not.
+  uint32_t mTextLoadingTaskId;               ///< The currently requested text loading(render) task Id.
+  uint32_t mNaturalSizeTaskId;               ///< The currently requested natural size task Id.
+  uint32_t mHeightForWidthTaskId;            ///< The currently requested height for width task Id.
+  bool     mIsTextLoadingTaskRunning : 1;    ///< Whether the requested text loading task is running or not.
+  bool     mIsNaturalSizeTaskRunning : 1;    ///< Whether the requested natural size task is running or not.
+  bool     mIsHeightForWidthTaskRunning : 1; ///< Whether the requested height for width task is running or not.
 };
 
 } // namespace Internal

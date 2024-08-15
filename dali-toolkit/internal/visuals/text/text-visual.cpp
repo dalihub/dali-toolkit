@@ -58,7 +58,7 @@ DALI_INIT_TRACE_FILTER(gTraceFilter2, DALI_TRACE_TEXT_ASYNC, false);
 const int CUSTOM_PROPERTY_COUNT(3); // uTextColorAnimatable, uHasMultipleTextColors, requireRender
 
 const float VERTICAL_ALIGNMENT_TABLE[Text::VerticalAlignment::BOTTOM + 1] =
-{
+  {
     0.0f, // VerticalAlignment::TOP
     0.5f, // VerticalAlignment::CENTER
     1.0f  // VerticalAlignment::BOTTOM
@@ -631,8 +631,8 @@ void TextVisual::UpdateRenderer()
         // When Cutout Enabled, the current visual must draw the entire control.
         // so set the size to controlSize and offset to 0.
 
-        relayoutSize = Vector2(controlWidth, controlHeight);
-        mImpl->mTransform.mSize.width = controlWidth;
+        relayoutSize                   = Vector2(controlWidth, controlHeight);
+        mImpl->mTransform.mSize.width  = controlWidth;
         mImpl->mTransform.mSize.height = controlHeight;
 
         // Relayout to the original size has been completed, so save only the offset information and use it in typesetter.
@@ -708,7 +708,7 @@ void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sa
 
   renderer.SetTextures(textureSet);
 
-  //Register transform properties
+  // Register transform properties
   mImpl->mTransform.SetUniforms(renderer, Direction::LEFT_TO_RIGHT);
 
   // Enable the pre-multiplied alpha to improve the text quality
@@ -725,7 +725,7 @@ void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sa
 }
 
 // From async text manager
-void TextVisual::LoadComplete(bool loadingSuccess, TextInformation textInformation)
+void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textInformation)
 {
   Text::AsyncTextParameters parameters = textInformation.parameters;
 
@@ -736,7 +736,7 @@ void TextVisual::LoadComplete(bool loadingSuccess, TextInformation textInformati
   }
 #endif
 
-  switch (parameters.requestType)
+  switch(parameters.requestType)
   {
     case Text::Async::RENDER_FIXED_SIZE:
     case Text::Async::RENDER_FIXED_WIDTH:
@@ -880,7 +880,7 @@ void TextVisual::LoadComplete(bool loadingSuccess, TextInformation textInformati
       }
 
       mImpl->mRenderer.SetTextures(textureSet);
-      //Register transform properties
+      // Register transform properties
       mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
       mImpl->mRenderer.SetProperty(mHasMultipleTextColorsIndex, static_cast<float>(mTextShaderFeatureCache.IsEnabledMultiColor()));
       mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
@@ -1047,7 +1047,7 @@ void TextVisual::RequestAsyncSizeComputation(Text::AsyncTextParameters& paramete
       mIsNaturalSizeTaskRunning = true;
 
       TextLoadObserver* textLoadObserver = this;
-      mNaturalSizeTaskId = Text::AsyncTextManager::Get().RequestLoad(parameters, textLoadObserver);
+      mNaturalSizeTaskId                 = Text::AsyncTextManager::Get().RequestLoad(parameters, textLoadObserver);
       break;
     }
     case Text::Async::COMPUTE_HEIGHT_FOR_WIDTH:
@@ -1059,7 +1059,7 @@ void TextVisual::RequestAsyncSizeComputation(Text::AsyncTextParameters& paramete
       mIsHeightForWidthTaskRunning = true;
 
       TextLoadObserver* textLoadObserver = this;
-      mHeightForWidthTaskId = Text::AsyncTextManager::Get().RequestLoad(parameters, textLoadObserver);
+      mHeightForWidthTaskId              = Text::AsyncTextManager::Get().RequestLoad(parameters, textLoadObserver);
       break;
     }
     default:
@@ -1141,9 +1141,9 @@ bool TextVisual::UpdateAsyncRenderer(Text::AsyncTextParameters& parameters)
   }
 #endif
 
-  mIsTextLoadingTaskRunning = true;
+  mIsTextLoadingTaskRunning          = true;
   TextLoadObserver* textLoadObserver = this;
-  mTextLoadingTaskId = Text::AsyncTextManager::Get().RequestLoad(parameters, textLoadObserver);
+  mTextLoadingTaskId                 = Text::AsyncTextManager::Get().RequestLoad(parameters, textLoadObserver);
 
   return true;
 }
@@ -1164,7 +1164,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     TextureSet textureSet = GetTextTexture(size);
 
     mImpl->mRenderer.SetTextures(textureSet);
-    //Register transform properties
+    // Register transform properties
     mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
     mImpl->mRenderer.SetProperty(mHasMultipleTextColorsIndex, static_cast<float>(hasMultipleTextColors));
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);

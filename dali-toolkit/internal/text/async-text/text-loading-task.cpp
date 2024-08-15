@@ -24,7 +24,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 
-
 namespace Dali
 {
 namespace Toolkit
@@ -36,7 +35,7 @@ namespace
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_ASYNC, false);
 } // namespace
 
-TextLoadingTask::TextLoadingTask(const uint32_t id, Text::AsyncTextParameters parameters, CallbackBase* callback)
+TextLoadingTask::TextLoadingTask(const uint32_t id, const Text::AsyncTextParameters& parameters, CallbackBase* callback)
 : AsyncTask(callback),
   mId(id),
   mParameters(parameters),
@@ -67,7 +66,7 @@ uint32_t TextLoadingTask::GetId()
 void TextLoadingTask::SetLoader(Text::AsyncTextLoader& loader)
 {
   Dali::Mutex::ScopedLock lock(mMutex);
-  mLoader = loader;
+  mLoader  = loader;
   mIsReady = true;
 }
 

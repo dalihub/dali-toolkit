@@ -92,7 +92,7 @@ private:
     {
     }
 
-    LoadElement(Toolkit::Internal::TextLoadingTaskPtr task, TextLoadObserver* observer, AsyncTextParameters parameters)
+    LoadElement(Toolkit::Internal::TextLoadingTaskPtr task, TextLoadObserver* observer, const AsyncTextParameters& parameters)
     : mTask(task),
       mObserver(observer),
       mParameters(parameters)
@@ -134,8 +134,8 @@ private:
 
   std::vector<Text::AsyncTextLoader> mAvailableLoaders; ///< List of available async text loader.
   std::vector<Text::AsyncTextLoader> mRunningLoaders;   ///< List of running async text loader.
-  std::map<uint32_t, LoadElement>    mWaitingTasks; ///< Waiting tasks, key is task id.
-  std::map<uint32_t, LoadElement>    mRunningTasks; ///< Running tasks, key is task id.
+  std::map<uint32_t, LoadElement>    mWaitingTasks;     ///< Waiting tasks, key is task id.
+  std::map<uint32_t, LoadElement>    mRunningTasks;     ///< Running tasks, key is task id.
 };
 
 } // namespace Internal
