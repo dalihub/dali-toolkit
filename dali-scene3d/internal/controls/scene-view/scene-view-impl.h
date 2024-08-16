@@ -54,6 +54,28 @@ namespace Internal
  */
 class SceneView : public Dali::Toolkit::Internal::Control, public Integration::Processor
 {
+
+private:
+  /**
+   * Data to store Capture related objects.
+   */
+  struct CaptureData
+  {
+    int32_t                  mStartTick;
+    int32_t                  mCaptureId;                        // Unique Key to distinguish requested Captures.
+    float                    mCaptureCameraOriginalAspectRatio; // Original AspectRatio of the input cameras
+    Dali::Toolkit::ImageUrl  mCaptureUrl;                       // URL for first captured buffer, but it is Y-inverted.
+    Dali::Toolkit::ImageView mCaptureImageView;                 // ImageView to draw first capture buffer to be transfered as input for invert.
+    Dali::CameraActor        mCaptureCamera;                    // CameraActor to draw first capture buffer
+    Dali::RenderTask         mCaptureTask;                      // RenderTask that is used to capture first buffer.
+    Dali::Texture            mCaptureTexture;                   // First Captured texture, but it is Y-inverted.
+    Dali::FrameBuffer        mCaptureFrameBuffer;               // First Captured FBO, but it is Y-inverted.
+    Dali::CameraActor        mCaptureInvertCamera;              // CameraActor to invert first captured buffer by second pass.
+    Dali::RenderTask         mCaptureInvertTask;                // RenderTask to invert first captured buffer.
+    Dali::Texture            mCaptureInvertTexture;             // Result texture of second pass. This is final Texture result.
+    Dali::FrameBuffer        mCaptureInvertFrameBuffer;         // FBO for firnal Texture result
+  };
+
 public:
   /**
    * @brief Creates a new SceneView.
@@ -499,6 +521,17 @@ private:
    */
   void OnTransitionFinished(Animation& animation);
 
+  /**
+   * @brief Reset CaptureData when the capture is finished or failed.
+   * @param[in] captureData CaptureData to be reset.
+   */
+  void ResetCaptureData(std::shared_ptr<CaptureData> captureData);
+
+  /**
+   * @brief Reset Capture timer when there isn't any capture in progress.
+   */
+  void ResetCaptureTimer();
+
 private: // Implementation of Processor
 
   /**
@@ -516,25 +549,6 @@ private: // Implementation of Processor
   {
     return "SceneViewImpl";
   }
-
-private:
-  /**
-   * Data to store Capture related objects.
-   */
-  struct CaptureData
-  {
-    int32_t                  mStartTick;
-    int32_t                  mCaptureId;                // Unique Key to distinguish requested Captures.
-    Dali::Toolkit::ImageUrl  mCaptureUrl;               // URL for first captured buffer, but it is Y-inverted.
-    Dali::Toolkit::ImageView mCaptureImageView;         // ImageView to draw first capture buffer to be transfered as input for invert.
-    Dali::RenderTask         mCaptureTask;              // RenderTask that is used to capture first buffer.
-    Dali::Texture            mCaptureTexture;           // First Captured texture, but it is Y-inverted.
-    Dali::FrameBuffer        mCaptureFrameBuffer;       // First Captured FBO, but it is Y-inverted.
-    Dali::CameraActor        mCaptureInvertCamera;      // CameraActor to invert first captured buffer by second pass.
-    Dali::RenderTask         mCaptureInvertTask;        // RenderTask to invert first captured buffer.
-    Dali::Texture            mCaptureInvertTexture;     // Result texture of second pass. This is final Texture result.
-    Dali::FrameBuffer        mCaptureInvertFrameBuffer; // FBO for firnal Texture result
-  };
 
   Toolkit::Visual::Base mVisual;
 
