@@ -52,7 +52,7 @@ namespace Internal
 /**
  * @brief Impl class for SceneView.
  */
-class SceneView : public Dali::Toolkit::Internal::Control
+class SceneView : public Dali::Toolkit::Internal::Control, public Integration::Processor
 {
 public:
   /**
@@ -101,6 +101,16 @@ public:
    * @copydoc SceneView::SelectCamera()
    */
   void SelectCamera(const std::string& name);
+
+  /**
+   * @copydoc SceneView::StartCameraTransition()
+   */
+  void StartCameraTransition(uint32_t index, float durationSeconds, Dali::AlphaFunction alphaFunction);
+
+  /**
+   * @copydoc SceneView::StartCameraTransition()
+   */
+  void StartCameraTransition(std::string name, float durationSeconds, Dali::AlphaFunction alphaFunction);
 
   /**
    * @brief Register an item.
@@ -250,9 +260,14 @@ public:
   int32_t Capture(Dali::CameraActor camera, const Vector2& size);
 
   /**
-   * @copydoc SceneView::FinishedSignal
+   * @copydoc SceneView::CaptureFinishedSignal
    */
   Dali::Scene3D::SceneView::CaptureFinishedSignalType& CaptureFinishedSignal();
+
+  /**
+   * @copydoc SceneView::CameraTransitionFinishedSignal
+   */
+  Dali::Scene3D::SceneView::CameraTransitionFinishedSignalType& CameraTransitionFinishedSignal();
 
   /**
    * @brief Retrieves ShaderManager of this SceneView.
@@ -461,6 +476,47 @@ private:
    */
   void OnCameraDisconnected(Dali::Actor actor);
 
+  /**
+   * @brief Registers Camera Transition to processor
+   */
+  void RegisterCameraTransition(CameraActor destinationCamera, float durationSeconds, Dali::AlphaFunction alphaFunction);
+
+  /**
+   * @brief Requests Camera Transition
+   * @note This method is called in Process.
+   */
+  void RequestCameraTransition();
+
+  /**
+   * @brief Resets Transition information.
+   * This method is called when the transition is finished or invalid transition is requested.
+   */
+  void ResetTransition();
+
+  /**
+   * @brief Camera Transition finished callback.
+   * @param[in] animation animation for this Transition
+   */
+  void OnTransitionFinished(Animation& animation);
+
+private: // Implementation of Processor
+
+  /**
+   * @copydoc Dali::Integration::Processor::Process()
+   * @note This process check the SceneView has activated Camera or not.
+   * If not, select default camera.
+   * And, this process generates Camera transition animation that is triggered by StartCameraTransition method.
+   */
+  void Process(bool postProcessor) override;
+
+  /**
+   * @copydoc Dali::Integration::Processor::GetProcessorName()
+   */
+  std::string_view GetProcessorName() const override
+  {
+    return "SceneViewImpl";
+  }
+
 private:
   /**
    * Data to store Capture related objects.
@@ -499,6 +555,16 @@ private:
   float                                               mSkyboxIntensity{1.0f};
   uint8_t                                             mFrameBufferMultiSamplingLevel{0u};
   Dali::Scene3D::SceneView::CaptureFinishedSignalType mCaptureFinishedSignal;
+
+  // camera Transition
+  CameraActor                                                  mTransitionCamera;
+  CameraActor                                                  mTransitionSourceCamera;
+  CameraActor                                                  mTransitionDestinationCamera;
+  float                                                        mTransitionDurationSeconds;
+  AlphaFunction                                                mTransitionAlphaFunction;
+  bool                                                         mInCameraTransition{false};
+  Animation                                                    mTransitionAnimation;
+  Dali::Scene3D::SceneView::CameraTransitionFinishedSignalType mCameraTransitionFinishedSignal;
 
   int32_t                                                                mCaptureId{0};     // Capture ID for requested capture, this is incrementally increasing.
   std::vector<std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>>> mCaptureContainer; // Container that stores CaptureData until the Capture is finished.
@@ -548,6 +614,7 @@ private:
   bool                        mSkyboxDirty{false};
   bool                        mIblDiffuseDirty{false};
   bool                        mIblSpecularDirty{false};
+  bool                        mIsProcessorRegistered{false};
 };
 
 } // namespace Internal

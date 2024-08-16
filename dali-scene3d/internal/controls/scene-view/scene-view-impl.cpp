@@ -25,6 +25,7 @@
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
@@ -312,6 +313,16 @@ bool CheckInside(Actor root, Actor actor)
   return false;
 }
 
+void ConvertFovFromVerticalToHorizontal(float aspect, float& fov)
+{
+  fov = 2.0f * (float)std::atan(std::tan(fov * 0.5f) * aspect);
+}
+
+void ConvertFovFromHorizontalToVertical(float aspect, float& fov)
+{
+  fov = 2.0f * (float)std::atan(std::tan(fov * 0.5f) / aspect);
+}
+
 } // anonymous namespace
 
 SceneView::SceneView()
@@ -345,6 +356,12 @@ SceneView::~SceneView()
       mSkyboxLoadTask.Reset();
     }
     mSelectedCamera.OffSceneSignal().Disconnect(this, &SceneView::OnCameraDisconnected);
+
+    if(mInCameraTransition)
+    {
+      mTransitionAnimation.Stop();
+      ResetTransition();
+    }
 
     // Request image resource GC
     Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
@@ -439,12 +456,32 @@ CameraActor SceneView::GetCamera(const std::string& name) const
 
 void SceneView::SelectCamera(uint32_t index)
 {
+  if(mInCameraTransition)
+  {
+    DALI_LOG_ERROR("Cannot change camera during Camera Transition.\n");
+    return;
+  }
   UpdateCamera(GetCamera(index));
 }
 
 void SceneView::SelectCamera(const std::string& name)
 {
+  if(mInCameraTransition)
+  {
+    DALI_LOG_ERROR("Cannot change camera during Camera Transition.\n");
+    return;
+  }
   UpdateCamera(GetCamera(name));
+}
+
+void SceneView::StartCameraTransition(uint32_t index, float durationSeconds, Dali::AlphaFunction alphaFunction)
+{
+  RegisterCameraTransition(GetCamera(index), durationSeconds, alphaFunction);
+}
+
+void SceneView::StartCameraTransition(std::string name, float durationSeconds, Dali::AlphaFunction alphaFunction)
+{
+  RegisterCameraTransition(GetCamera(name), durationSeconds, alphaFunction);
 }
 
 void SceneView::RegisterSceneItem(Scene3D::Internal::LightObserver* item)
@@ -957,6 +994,11 @@ Dali::Scene3D::SceneView::CaptureFinishedSignalType& SceneView::CaptureFinishedS
   return mCaptureFinishedSignal;
 }
 
+Dali::Scene3D::SceneView::CameraTransitionFinishedSignalType& SceneView::CameraTransitionFinishedSignal()
+{
+  return mCameraTransitionFinishedSignal;
+}
+
 Dali::Scene3D::Loader::ShaderManagerPtr SceneView::GetShaderManager() const
 {
   return mShaderManager;
@@ -1195,6 +1237,12 @@ void SceneView::OnSceneDisconnection()
   }
   mFrameBuffer.Reset();
   mShadowFrameBuffer.Reset();
+
+  if(mInCameraTransition)
+  {
+    mTransitionAnimation.Stop();
+    ResetTransition();
+  }
 
   Control::OnSceneDisconnection();
 }
@@ -1660,14 +1708,181 @@ bool SceneView::OnTimeOut()
 
 void SceneView::OnCameraDisconnected(Dali::Actor actor)
 {
-  CameraActor selectedCamera = GetSelectedCamera();
-  if(selectedCamera == actor)
+  if(!mIsProcessorRegistered)
   {
-    if(!selectedCamera || !CheckInside(mRootLayer, selectedCamera))
-    {
-      UpdateCamera(mDefaultCamera);
-    }
+    mIsProcessorRegistered = true;
+    Adaptor::Get().RegisterProcessorOnce(*this);
   }
+}
+
+void SceneView::RegisterCameraTransition(CameraActor destinationCamera, float durationSeconds, Dali::AlphaFunction alphaFunction)
+{
+  if(mInCameraTransition)
+  {
+    DALI_LOG_ERROR("Cannot start Camera transition before previous Camera transition is finished.\n");
+    return;
+  }
+
+  mTransitionSourceCamera      = GetSelectedCamera();
+  mTransitionDestinationCamera = destinationCamera;
+  mTransitionDurationSeconds   = durationSeconds;
+  mTransitionAlphaFunction     = alphaFunction;
+  mInCameraTransition          = true;
+
+  if(!mIsProcessorRegistered)
+  {
+    mIsProcessorRegistered = true;
+    Adaptor::Get().RegisterProcessorOnce(*this);
+  }
+}
+
+void SceneView::RequestCameraTransition()
+{
+  if(mTransitionSourceCamera && mTransitionDestinationCamera && !(mTransitionSourceCamera == mTransitionDestinationCamera))
+  {
+    Vector3 sourceWorldPosition = mTransitionSourceCamera.GetProperty<Vector3>(Dali::Actor::Property::WORLD_POSITION);
+    Quaternion sourceWorldOrientation = mTransitionSourceCamera.GetProperty<Quaternion>(Dali::Actor::Property::WORLD_ORIENTATION);
+
+    if(!CheckInside(mRootLayer, mTransitionDestinationCamera))
+    {
+      mRootLayer.Add(mTransitionDestinationCamera);
+    }
+
+    Vector3 destinationWorldPosition;
+    Quaternion destinationWorldOrientation;
+    Vector3 destinationWorldScale;
+    Dali::Matrix destinationWorldTransform = Dali::DevelActor::GetWorldTransform(mTransitionDestinationCamera);
+    destinationWorldTransform.GetTransformComponents(destinationWorldPosition, destinationWorldOrientation, destinationWorldScale);
+
+    if(!mTransitionAnimation)
+    {
+      mTransitionAnimation = Dali::Animation::New(mTransitionDurationSeconds);
+    }
+
+    if(mTransitionAnimation.GetState() != Animation::State::STOPPED)
+    {
+      mTransitionAnimation.Stop();
+    }
+    mTransitionAnimation.Clear();
+
+    Dali::KeyFrames positionKeyFrames = Dali::KeyFrames::New();
+    positionKeyFrames.Add(0.0f, sourceWorldPosition);
+    positionKeyFrames.Add(1.0f, destinationWorldPosition);
+
+    Dali::KeyFrames orientationKeyFrames = Dali::KeyFrames::New();
+    orientationKeyFrames.Add(0.0f, sourceWorldOrientation);
+    orientationKeyFrames.Add(1.0f, destinationWorldOrientation);
+
+    mTransitionCamera = Dali::CameraActor::New3DCamera();
+    mTransitionCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    mTransitionCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    mRootLayer.Add(mTransitionCamera);
+
+    mTransitionAnimation.AnimateBetween(Dali::Property(mTransitionCamera, Dali::Actor::Property::POSITION), positionKeyFrames, mTransitionAlphaFunction, Dali::Animation::Interpolation::LINEAR);
+    mTransitionAnimation.AnimateBetween(Dali::Property(mTransitionCamera, Dali::Actor::Property::ORIENTATION), orientationKeyFrames, mTransitionAlphaFunction, Dali::Animation::Interpolation::LINEAR);
+
+    Dali::DevelCameraActor::ProjectionDirection sourceProjectionDirection      = mTransitionSourceCamera.GetProperty<Dali::DevelCameraActor::ProjectionDirection>(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION);
+    Dali::DevelCameraActor::ProjectionDirection destinationProjectionDirection = mTransitionDestinationCamera.GetProperty<Dali::DevelCameraActor::ProjectionDirection>(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION);
+    if(mTransitionDestinationCamera.GetProjectionMode() == Dali::Camera::ProjectionMode::PERSPECTIVE_PROJECTION)
+    {
+      float sourceFieldOfView = mTransitionSourceCamera.GetFieldOfView();
+      float destinationFieldOfView = mTransitionDestinationCamera.GetFieldOfView();
+
+      if(sourceProjectionDirection != destinationProjectionDirection)
+      {
+        float aspect = mTransitionDestinationCamera.GetAspectRatio();
+        if(destinationProjectionDirection == Dali::DevelCameraActor::ProjectionDirection::VERTICAL)
+        {
+          ConvertFovFromHorizontalToVertical(aspect, sourceFieldOfView);
+        }
+        else
+        {
+          ConvertFovFromVerticalToHorizontal(aspect, sourceFieldOfView);
+        }
+      }
+
+      KeyFrames fieldOfViewKeyFrames = KeyFrames::New();
+      fieldOfViewKeyFrames.Add(0.0f, sourceFieldOfView);
+      fieldOfViewKeyFrames.Add(1.0f, destinationFieldOfView);
+      mTransitionAnimation.AnimateBetween(Dali::Property(mTransitionCamera, Dali::CameraActor::Property::FIELD_OF_VIEW), fieldOfViewKeyFrames, mTransitionAlphaFunction, Dali::Animation::Interpolation::LINEAR);
+    }
+    else
+    {
+      float sourceOrthographicSize = mTransitionSourceCamera.GetProperty<float>(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE);
+      float destinationOrthographicSize = mTransitionDestinationCamera.GetProperty<float>(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE);
+
+      if(sourceProjectionDirection != destinationProjectionDirection)
+      {
+        float aspect = mTransitionDestinationCamera.GetAspectRatio();
+        if(destinationProjectionDirection == Dali::DevelCameraActor::ProjectionDirection::VERTICAL)
+        {
+          sourceOrthographicSize = sourceOrthographicSize / aspect;
+        }
+        else
+        {
+          sourceOrthographicSize = sourceOrthographicSize * aspect;
+        }
+      }
+
+      KeyFrames orthographicSizeKeyFrames = KeyFrames::New();
+      orthographicSizeKeyFrames.Add(0.0f, sourceOrthographicSize);
+      orthographicSizeKeyFrames.Add(1.0f, destinationOrthographicSize);
+      mTransitionAnimation.AnimateBetween(Dali::Property(mTransitionCamera, Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE), orthographicSizeKeyFrames, mTransitionAlphaFunction, Dali::Animation::Interpolation::LINEAR);
+    }
+
+    float destinationNearPlaneDistance = mTransitionDestinationCamera.GetNearClippingPlane();
+    float destinationFarPlaneDistance = mTransitionDestinationCamera.GetFarClippingPlane();
+    mTransitionCamera.SetNearClippingPlane(std::min(mTransitionSourceCamera.GetNearClippingPlane(), destinationNearPlaneDistance));
+    mTransitionCamera.SetFarClippingPlane(std::max(mTransitionSourceCamera.GetFarClippingPlane(), destinationFarPlaneDistance));
+
+    mTransitionCamera.SetProperty(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION, destinationProjectionDirection);
+    mTransitionCamera.SetProjectionMode(mTransitionDestinationCamera.GetProjectionMode());
+
+    UpdateCamera(mTransitionCamera);
+
+    mTransitionAnimation.FinishedSignal().Connect(this, &SceneView::OnTransitionFinished);
+
+    mTransitionAnimation.Play();
+  }
+  else
+  {
+    ResetTransition();
+  }
+}
+
+void SceneView::ResetTransition()
+{
+  mTransitionCamera.Reset();
+  mTransitionSourceCamera.Reset();
+  mTransitionDestinationCamera.Reset();
+  mTransitionAnimation.Reset();
+  mInCameraTransition = false;
+}
+
+void SceneView::OnTransitionFinished(Animation& animation)
+{
+  UpdateCamera(mTransitionDestinationCamera);
+  ResetTransition();
+
+  auto                     self = Self();
+  Dali::Scene3D::SceneView handle(Dali::Scene3D::SceneView::DownCast(self));
+  mCameraTransitionFinishedSignal.Emit(handle);
+}
+
+void SceneView::Process(bool postProcessor)
+{
+  CameraActor selectedCamera = GetSelectedCamera();
+  if(!selectedCamera || !CheckInside(mRootLayer, selectedCamera))
+  {
+    UpdateCamera(mDefaultCamera);
+  }
+
+  if(mInCameraTransition && !mTransitionCamera)
+  {
+    RequestCameraTransition();
+  }
+
+  mIsProcessorRegistered = false;
 }
 
 } // namespace Internal

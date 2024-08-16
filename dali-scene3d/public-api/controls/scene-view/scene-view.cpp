@@ -102,6 +102,16 @@ void SceneView::SelectCamera(const std::string& name)
   GetImpl(*this).SelectCamera(name);
 }
 
+void SceneView::StartCameraTransition(uint32_t index, float durationSeconds, Dali::AlphaFunction alphaFunction)
+{
+  GetImpl(*this).StartCameraTransition(index, durationSeconds, alphaFunction);
+}
+
+void SceneView::StartCameraTransition(std::string name, float durationSeconds, Dali::AlphaFunction alphaFunction)
+{
+  GetImpl(*this).StartCameraTransition(name, durationSeconds, alphaFunction);
+}
+
 void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
 {
   GetImpl(*this).SetImageBasedLightSource(diffuseUrl, specularUrl, scaleFactor);
@@ -200,6 +210,11 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
 SceneView::CaptureFinishedSignalType& SceneView::CaptureFinishedSignal()
 {
   return GetImpl(*this).CaptureFinishedSignal();
+}
+
+SceneView::CameraTransitionFinishedSignalType& SceneView::CameraTransitionFinishedSignal()
+{
+  return GetImpl(*this).CameraTransitionFinishedSignal();
 }
 
 } // namespace Scene3D
