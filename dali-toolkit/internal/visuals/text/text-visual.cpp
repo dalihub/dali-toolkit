@@ -274,6 +274,7 @@ TextVisual::TextVisual(VisualFactoryCache& factoryCache, TextVisualShaderFactory
 : Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::TEXT),
   mController(Text::Controller::New()),
   mTypesetter(Text::Typesetter::New(mController->GetTextModel())),
+  mAsyncTextInterface(nullptr),
   mTextVisualShaderFactory(shaderFactory),
   mTextShaderFeatureCache(),
   mHasMultipleTextColorsIndex(Property::INVALID_INDEX),
