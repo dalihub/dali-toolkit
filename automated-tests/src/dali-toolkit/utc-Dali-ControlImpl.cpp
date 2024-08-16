@@ -655,7 +655,7 @@ int UtcDaliControlImplOnAccessibilityActivatedP(void)
   DALI_TEST_CHECK(handle);
 
   Property::Map attributes;
-  DALI_TEST_EQUALS(false, handle.DoAction("accessibilityActivated", attributes), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, handle.DoAction("activate", attributes), TEST_LOCATION);
 
   END_TEST;
 }

@@ -977,10 +977,10 @@ int UtcDaliAccessibilityAction(void)
   auto a       = Dali::Accessibility::Accessible::Get(control);
   auto b       = dynamic_cast<Dali::Accessibility::Action*>(a);
 
-  std::vector<std::string> actions{"activate", "accessibilityActivated", "ReadingSkipped", "ReadingCancelled", "ReadingStopped", "ReadingPaused", "ReadingResumed", "show", "hide"};
+  std::vector<std::string> actions{"activate", "escape", "increment", "decrement", "ReadingSkipped", "ReadingCancelled", "ReadingStopped", "ReadingPaused", "ReadingResumed", "show", "hide"};
   auto                     count = b->GetActionCount();
 
-  DALI_TEST_EQUALS(count, 9, TEST_LOCATION);
+  DALI_TEST_EQUALS(count, 11, TEST_LOCATION);
 
   for(auto i = 0u; i < count; ++i)
   {
@@ -998,7 +998,7 @@ int UtcDaliAccessibilityAction(void)
 
   count = TestGetActionCount(b->GetAddress());
 
-  DALI_TEST_EQUALS(count, 9, TEST_LOCATION);
+  DALI_TEST_EQUALS(count, 11, TEST_LOCATION);
 
   for(auto i = 0u; i < count; ++i)
   {
@@ -1020,79 +1020,126 @@ int UtcDaliAccessibilityAction(void)
 
 int UtcDaliAccessibilityDoAction(void)
 {
+  using Dali::Accessibility::ActionType;
+
   ToolkitTestApplication application;
 
   Dali::Accessibility::TestEnableSC(true);
-  thread_local std::vector<bool> actions_done{false, false, false, false, false, false};
+  thread_local std::vector<ActionType> actions_done;
+  thread_local std::vector<bool>       legacy_actions_done(5, false);
+
+  const auto reset_results = [&]() {
+    actions_done.clear();
+    std::fill(legacy_actions_done.begin(), legacy_actions_done.end(), false);
+  };
+
+  const auto check_actions_done = [&](std::vector<ActionType> actions_sent) {
+    for(ActionType action : actions_sent)
+    {
+      auto it = std::find(actions_done.begin(), actions_done.end(), action);
+      DALI_TEST_CHECK(it != actions_done.end());
+    }
+  };
+
+  const auto check_all_actions_done_and_reset = [&]() {
+    check_actions_done({ActionType::ACTIVATE, ActionType::ESCAPE, ActionType::INCREMENT, ActionType::DECREMENT});
+    DALI_TEST_CHECK(std::all_of(legacy_actions_done.begin(), legacy_actions_done.end(), [](bool x) { return x == true; }));
+    reset_results();
+  };
 
   auto                     control = Control::New();
   auto                     a       = Dali::Accessibility::Accessible::Get(control);
   auto                     b       = dynamic_cast<Dali::Accessibility::Action*>(a);
-  std::vector<std::string> actions{"activate", "accessibilityActivated", "ReadingSkipped", "ReadingCancelled", "ReadingStopped", "ReadingPaused", "ReadingResumed", "show", "hide"};
-
-  // Test calling action by name
-  DALI_TEST_CHECK(b->DoAction(actions[2])); // ReadingSkipped
-  DALI_TEST_CHECK(b->DoAction(actions[4])); // ReadingStopped
-  DALI_TEST_CHECK(b->DoAction(actions[4])); // ReadingStopped
+  std::vector<std::string> actions{"activate", "escape", "increment", "decrement", "ReadingSkipped", "ReadingCancelled", "ReadingStopped", "ReadingPaused", "ReadingResumed"};
 
   // Negative test of calling action with not defined name
   DALI_TEST_CHECK(!b->DoAction("undefined"));
 
+  // Returns fail if no signal is connected
+  DALI_TEST_CHECK(!b->DoAction(actions[0])); // activate
+  DALI_TEST_CHECK(!b->DoAction(actions[1])); // escape
+  DALI_TEST_CHECK(!b->DoAction(actions[2])); // increment
+  DALI_TEST_CHECK(!b->DoAction(actions[3])); // decrement
+
+  DevelControl::AccessibilityActionSignal(control).Connect([](Dali::Accessibility::ActionType action) {
+    actions_done.push_back(action);
+    return true;
+  });
   DevelControl::AccessibilityReadingSkippedSignal(control).Connect([]() {
-    actions_done[1] = true;
+    legacy_actions_done[0] = true;
   });
   DevelControl::AccessibilityReadingCancelledSignal(control).Connect([]() {
-    actions_done[2] = true;
+    legacy_actions_done[1] = true;
   });
   DevelControl::AccessibilityReadingStoppedSignal(control).Connect([]() {
-    actions_done[3] = true;
+    legacy_actions_done[2] = true;
   });
   DevelControl::AccessibilityReadingPausedSignal(control).Connect([]() {
-    actions_done[4] = true;
+    legacy_actions_done[3] = true;
   });
   DevelControl::AccessibilityReadingResumedSignal(control).Connect([]() {
-    actions_done[5] = true;
-  });
-  DevelControl::AccessibilityActivateSignal(control).Connect([]() {
-    actions_done[0] = true;
+    legacy_actions_done[4] = true;
   });
 
   // Test calling action by index
-  DALI_TEST_CHECK(b->DoAction(1));
-  DALI_TEST_CHECK(b->DoAction(2));
-  DALI_TEST_CHECK(b->DoAction(3));
-  DALI_TEST_CHECK(b->DoAction(4));
-  DALI_TEST_CHECK(b->DoAction(5));
-  DALI_TEST_CHECK(b->DoAction(6));
-
-  for(auto i = 0u; i < actions_done.size(); ++i)
+  for(size_t i = 0; i < actions.size(); ++i)
   {
-    DALI_TEST_CHECK(actions_done[i]);
-    actions_done[i] = false;
+    DALI_TEST_CHECK(b->DoAction(i));
   }
 
-  DALI_TEST_CHECK(TestDoAction(b->GetAddress(), 1));
-  DALI_TEST_CHECK(TestDoAction(b->GetAddress(), 2));
-  DALI_TEST_CHECK(TestDoAction(b->GetAddress(), 3));
-  DALI_TEST_CHECK(TestDoAction(b->GetAddress(), 4));
-  DALI_TEST_CHECK(TestDoAction(b->GetAddress(), 5));
-  DALI_TEST_CHECK(TestDoAction(b->GetAddress(), 6));
+  check_all_actions_done_and_reset();
 
-  for(auto i = 0u; i < actions_done.size(); ++i)
+  // Test calling action by name
+  for(size_t i = 0; i < actions.size(); ++i)
   {
-    DALI_TEST_CHECK(actions_done[i]);
-    actions_done[i] = false;
+    DALI_TEST_CHECK(b->DoAction(actions[i]));
   }
 
-  DALI_TEST_CHECK(TestDoAction(b->GetAddress(), actions[1]));
-  DALI_TEST_CHECK(TestDoAction(b->GetAddress(), actions[2]));
-  DALI_TEST_CHECK(TestDoAction(b->GetAddress(), actions[3]));
-  DALI_TEST_CHECK(TestDoAction(b->GetAddress(), actions[4]));
-  DALI_TEST_CHECK(TestDoAction(b->GetAddress(), actions[5]));
-  DALI_TEST_CHECK(TestDoAction(b->GetAddress(), actions[6]));
+  check_all_actions_done_and_reset();
 
-  for(auto i = 0u; i < actions_done.size(); ++i)
-    DALI_TEST_CHECK(actions_done[i]);
+  // Test "DoAction" through d-bus call
+  for(size_t i = 0; i < actions.size(); ++i)
+  {
+    DALI_TEST_CHECK(TestDoAction(b->GetAddress(), i));
+  }
+
+  check_all_actions_done_and_reset();
+
+  // Test "DoActionName" through d-bus call
+  for(size_t i = 0; i < actions.size(); ++i)
+  {
+    DALI_TEST_CHECK(TestDoAction(b->GetAddress(), actions[i]));
+  }
+
+  check_all_actions_done_and_reset();
+
+  Dali::Accessibility::TestEnableSC(false);
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityActivateFallbackToLegacy(void)
+{
+  using Dali::Accessibility::ActionType;
+
+  ToolkitTestApplication application;
+
+  Dali::Accessibility::TestEnableSC(true);
+  thread_local std::vector<ActionType> actions_done;
+  thread_local bool                    legacy_activate_done = false;
+
+  auto control = Control::New();
+  auto a       = Dali::Accessibility::Accessible::Get(control);
+  auto b       = dynamic_cast<Dali::Accessibility::Action*>(a);
+
+  DevelControl::AccessibilityActivateSignal(control).Connect([]() {
+    legacy_activate_done = true;
+  });
+
+  DALI_TEST_CHECK(b->DoAction("activate"));   // fallback to legacy "activate" when ActionSignal is not connected
+  DALI_TEST_CHECK(!b->DoAction("increment")); // "increment" does not exist in legacy actions
+
+  DALI_TEST_CHECK(legacy_activate_done);
 
   Dali::Accessibility::TestEnableSC(false);
 

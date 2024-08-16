@@ -68,6 +68,9 @@ typedef Signal<void(std::string&)> AccessibilityGetDescriptionSignalType;
 /// @brief AccessibilityDoGesture signal type.
 typedef Signal<void(std::pair<Dali::Accessibility::GestureInfo, bool>&)> AccessibilityDoGestureSignalType;
 
+/// @brief AccessibilityAction signal type.
+typedef Signal<bool(Dali::Accessibility::ActionType)> AccessibilityActionSignalType;
+
 enum State
 {
   NORMAL,
@@ -496,6 +499,12 @@ DALI_TOOLKIT_API AccessibilityGetDescriptionSignalType& AccessibilityGetDescript
  * @return signal handler
  */
 DALI_TOOLKIT_API AccessibilityDoGestureSignalType& AccessibilityDoGestureSignal(Toolkit::Control control);
+
+/**
+ * @brief The signal is emitted when accessibility client call "DoAction" or "DoActionName" method via IPC mechanism.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API AccessibilityActionSignalType& AccessibilityActionSignal(Toolkit::Control control);
 
 /**
  * @brief The method allows connection with other actor with usage of concrete accessibility relation type.
