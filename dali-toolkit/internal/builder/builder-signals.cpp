@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -429,7 +429,7 @@ struct SignalConnector<Actor>
   ConnectionTracker* mTracker;
   const std::string& mName;
 
-  SignalConnector<Actor>(ConnectionTracker* tracker, Actor& actor, const std::string& name)
+  SignalConnector(ConnectionTracker* tracker, Actor& actor, const std::string& name)
   : mActor(actor),
     mTracker(tracker),
     mName(name)
@@ -450,7 +450,7 @@ struct SignalConnector<PropertyNotification>
   PropertyNotification& mNotification;
   ConnectionTracker*    mTracker;
 
-  SignalConnector<PropertyNotification>(ConnectionTracker* tracker, PropertyNotification& notification)
+  SignalConnector(ConnectionTracker* tracker, PropertyNotification& notification)
   : mNotification(notification),
     mTracker(tracker)
   {

@@ -74,7 +74,7 @@ The application may request dimensions through `ResourceImage::New()`:
   - `Not specifying either dimension`: IE. Width and Height set to 0 - The target dimensions become the same as the source.
 
   - `Just one dimension specified, Width OR Height (the other dimension set to 0)`:
-    The unspecified dimension will be derived from the specified one whilst maintaining the aspect of the source image. The specified and calculated dimensions become the target dimensions. See more on this case [below](#resourceimagescalingzerodimensions).
+    The unspecified dimension will be derived from the specified one whilst maintaining the aspect of the source image. The specified and calculated dimensions become the target dimensions. See more on this case [below](#resourceimagescaling-zerodimensions).
      
   - `Width AND Height both specified` The requested dimensions pass straight through to become the target for fitting.
   
@@ -109,7 +109,7 @@ The operation of each of these modes is as follows:
 <sub> **Fitting modes**: *The top row shows the effect of each mode when a tall target rectangle is applied to a square image. The middle row applies a wide target to a square raw image. The bottom row uses a target with the same aspect ratio as the raw image. This example shows that `SCALE_TO_FILL` is the only option for which the dimensions of the fitted image result fill all the area of the target. Others would be letterboxed with borders. `SHRINK_TO_FIT` is always equal to one of `FIT_WIDTH` or `FIT_HEIGHT`: in each case it is the minimum of them. As a special case, where the aspect ratio of raw image and target match, all fitting modes generate an exact match final image and are equivalent to each other.* </sub>
   
 
-Note: The image is scaled to the same aspect and shrunk to fit depending on fitting mode. It is not upscaled. See: [Upscaling](#resourceimagescalingupscaling).
+Note: The image is scaled to the same aspect and shrunk to fit depending on fitting mode. It is not upscaled. See: [Upscaling](#resourceimagescaling-upscaling).
   
   
 
@@ -209,7 +209,7 @@ ResourceImage image = ResourceImage::New( "flower.png", ImageDimensions( 32, 24 
 ~~~
   
 
-### Passing a Zero Dimension {#resourceimagescalingzerodimensions}
+### Passing a Zero Dimension {#resourceimagescaling-zerodimensions}
   
 Passing in a single zero dimension is equivalent to specifying `FIT_WIDTH` or `FIT_HEIGHT` `FittingMode`s. When a non-zero width and zero height are specified, the fitting done will be identical to the result using `FittingMode` `FIT_WIDTH`. When passing a zero width and non-zero height, the effect of applying the chosen `FittingMode` to the calculated target dimensions is always identical to applying the `FIT_HEIGHT` mode.
   
@@ -233,7 +233,7 @@ ResourceImage image = ResourceImage::New("flower.png", ImageDimensions(0, y));
   
 Note:
 - If both values are specified as 0, both dimensions are taken from the source image.
-- If both dimensions are not 0, this value becomes the 'natural size' even if it differs from the actual pixel dimensions loaded. [This requires some care in rendering to avoid distortion](#resourceimagescaling-samplingmodesrendernaturalsize).
+- If both dimensions are not 0, this value becomes the 'natural size' even if it differs from the actual pixel dimensions loaded. [This requires some care in rendering to avoid distortion](#resourceimagescaling-naturalsizecompensation).
   
 
 ### Code Examples for Sampling Modes  {#resourceimagescaling-codeexamplessamplingmodes}
@@ -316,7 +316,7 @@ Compressed textures cannot be scaled at load time as their formats are designed 
 ### Compensation for Natural Size != Pixel Width / Height {#resourceimagescaling-naturalsizecompensation}
   
 Because the *natural size* of an image is
-[taken from the requested dimensions](#resourceimagescaling-samplingmodesdimensionflow)
+[taken from the requested dimensions](#resourceimagescaling-workflow)
 passed to `ResourceImage::New()` rather than passing through the same calculations that result in the eventual pixel width and height loaded,
 the *natural size* and pixel dimensions of an image will differ when loaded with scaling.
 It is inherent in the definition of fitting modes other than `SCALE_TO_FILL` not to match the requested dimensions, so in general, images loaded with them must have this mismatch between *natural size* and actual pixel width.
@@ -334,7 +334,7 @@ There are circumstance, however, in which the the natural size of a resource ima
 In these cases the image may be used freely in layouts controlled by size negotiation.
 Additionally, if the requested size has the same aspect ratio as the eventual pixel array loaded, and the fitting mode is `SCALE_TO_FILL` or `BOX` and `NO_FILTER` sampling modes are avoided, even if they don't match in dimensions exactly, the eventual image will be drawn without aspect ratio distortion although it will be scaled at render time.
   
-The fitting and scaling modes [demo](#resourceimagescalingsamplingmodesdemoexamples) allows this behavior to be be explored dynamically when the fitting mode is changed from `SCALE_TO_FILL`.
+The fitting and scaling modes [demo](#resourceimagescaling-samplingmodesdemoexamples) allows this behavior to be be explored dynamically when the fitting mode is changed from `SCALE_TO_FILL`.
   
 The application can of course only pass dimensions which are just right if it happens to know the raw dimensions or if it accesses the the image resource and reads the raw dimensions from its header.
   

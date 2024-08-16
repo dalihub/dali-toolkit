@@ -1,6 +1,6 @@
 # DALi Introduction
 
-### Introduction
+## Introduction
  + [What is DALi?](@ref dali-introduction)
  + [Features](@ref dali-features)
  + [High Level Design](@ref dali-hld)
@@ -17,10 +17,10 @@
   + [Actions](@ref actions)
  + [Tutorial: Hello World](@ref hello-world)
 
-### Getting Started
+## Getting Started
  + [How to build DALi on Ubuntu Desktop](@ref build-ubuntu)
 
-### Programming Guide
+## Programming Guide
  + [Programming Languages:](@ref programming-languages)
   + [C++](@ref c-plus-plus)
   + [JSON](@ref json-support)
@@ -39,18 +39,18 @@
   + [Multi-threading Notes](@ref animation-multi-threading-notes)
  + [Styling](@ref styling)
 
-### Resources
+## Resources
  + [Resource Image](@ref resource-image)
  + [9 Patch Image](@ref resource-9-patch)
  + [Buffer Image](@ref resource-buffer)
 
-### Control Base Class & Visuals
+## Control Base Class & Visuals
  + [Background Feature](@ref background)
  + Keyboard Focus
  + [Accessibility](@ref accessibility)
  + [Visuals](@ref visuals)
 
-### UI Components
+## UI Components
  + Buttons
  + [FlexContainer](@ref flex-container)
  + [ItemView](@ref item-view)
@@ -61,31 +61,31 @@
  + [Text Field](@ref text-field)
  + [Text Label](@ref text-label)
 
-### RenderTasks
+## RenderTasks
 
-### Shader Effects
+## Shader Effects
  + [Overview](@ref shader-intro)
 
-### Scripting
+## Scripting
  + [JSON Overview](@ref scriptoverview)
  + [JSON Syntax](@ref script-json-specification)
  + [Scripting Hello World](@ref script-hello)
 
-### Tools
+## Tools
  + Environment Variables
  + [Resource Tracking](@ref resourcetracking)
  + Logging
  + [Visual Debug Rendering](@ref debugrendering)
  + [Stagehand - DALi Visual Debugger](@ref stagehand)
 
-### Extending DALi
+## Extending DALi
  + [How to write Custom UI Components](@ref creating-custom-controls)
   + [Size Negotiation for Controls](@ref size-negotiation-controls)
   + [Type Registration](@ref type-registration)
  + [Automated Tests](@ref auto_testing)
  + [Programming Guide](@ref documentationguide)
 
-### Application Optimization Guide
+## Application Optimization Guide
  + [Rescaling Images](@ref resourceimagescaling)
  + Performance & Debugging
  + [Performance Tips](@ref performancetips)

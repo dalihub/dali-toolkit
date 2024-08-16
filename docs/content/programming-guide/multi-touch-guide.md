@@ -8,7 +8,7 @@ Touch events are received via signals.
 
 For C++ API see Dali::Actor::TouchedSignal() and Dali::Actor::HoveredSignal() for more details.
 
-### Hit Testing Rules Summary:
+# Hit Testing Rules Summary:
 
  - An actor is only hittable if the actor's touch signal has a connection.
  - An actor is only hittable when it is between the camera's near and far planes.
@@ -17,7 +17,7 @@ For C++ API see Dali::Actor::TouchedSignal() and Dali::Actor::HoveredSignal() fo
  - To be hittable, an actor must have a non-zero size.
  - If an actor's world color is fully transparent, then it is not hittable; see Dali::Actor::Property::WORLD_COLOR
 
-### Hit Test Algorithm:
+# Hit Test Algorithm:
 
  - RenderTasks
    - Hit testing is dependent on the camera used, which is specific to each RenderTask.
