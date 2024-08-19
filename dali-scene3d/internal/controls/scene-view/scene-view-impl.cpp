@@ -370,6 +370,8 @@ SceneView::~SceneView()
     mCaptureContainer.clear();
     ResetCaptureTimer();
 
+    Adaptor::Get().UnregisterProcessorOnce(*this);
+
     // Request image resource GC
     Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
   }
