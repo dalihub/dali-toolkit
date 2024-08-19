@@ -96,6 +96,11 @@ public:
    */
   void RequestForceRenderOnce();
 
+  /**
+   * @brief Finalize the thread.
+   */
+  void Finalize();
+
 protected:
   /**
    * @brief The entry function of the animation thread.
@@ -191,8 +196,8 @@ private:
   std::vector<VectorAnimationTaskPtr> mAnimationTasks; ///< Animation processing tasks, ordered by next frame time.
 
   using VectorAnimationTaskSet = std::set<VectorAnimationTaskPtr>;
-  VectorAnimationTaskSet mCompletedTasks; ///< Temperal storage for completed tasks.
-  VectorAnimationTaskSet mWorkingTasks;   ///< Tasks which are currently being processed. Key is the task, value is the number of tasks running.
+  VectorAnimationTaskSet mCompletedTasks; ///< Temperal storage for completed tasks. Thread warning : This should be touched only at VectorAnimationThread.
+  VectorAnimationTaskSet mWorkingTasks;   ///< Tasks which are currently being processed. Thread warning : This should be touched only at VectorAnimationThread.
 
   std::vector<std::pair<VectorAnimationTaskPtr, bool>> mCompletedTasksQueue; ///< Queue of completed tasks from worker thread. pair of task, and rasterize required.
                                                                              ///< It will be moved at begin of Rasterize().

@@ -72,15 +72,7 @@ VectorAnimationThread::~VectorAnimationThread()
   // Stop the thread
   {
     ConditionalWait::ScopedLock lock(mConditionalWait);
-    // Wait until some event thread trigger relative job finished.
-    {
-      Mutex::ScopedLock eventTriggerLock(mEventTriggerMutex);
-      Mutex::ScopedLock taskCompletedLock(mTaskCompletedMutex);
-      Mutex::ScopedLock animationTasksLock(mAnimationTasksMutex);
-      DALI_LOG_DEBUG_INFO("Mark VectorAnimationThread destroyed\n");
-      mDestroyThread = true;
-    }
-    mNeedToSleep = false;
+    Finalize();
     mConditionalWait.Notify(lock);
   }
 
@@ -95,6 +87,37 @@ VectorAnimationThread::~VectorAnimationThread()
   DALI_LOG_DEBUG_INFO("VectorAnimationThread Join request\n");
 
   Join();
+
+  // We need to wait all working tasks are completed before destructing this thread.
+  while(mWorkingTasks.size() > 0)
+  {
+    DALI_LOG_DEBUG_INFO("Still waiting WorkingTasks [%zu]\n", mWorkingTasks.size());
+    ConditionalWait::ScopedLock lock(mConditionalWait);
+
+    // ConditionalWait notifyed when task complete.
+    // If task complete, then remove working tasks list and then wait again, until all working tasks are completed.
+    decltype(mCompletedTasksQueue) completedTasksQueue;
+    {
+      Mutex::ScopedLock taskCompletedLock(mTaskCompletedMutex);
+      completedTasksQueue.swap(mCompletedTasksQueue);
+    }
+    if(completedTasksQueue.empty())
+    {
+      mConditionalWait.Wait(lock);
+      // Task completed may have been added to the queue while we were waiting.
+      {
+        Mutex::ScopedLock taskCompletedLock(mTaskCompletedMutex);
+        completedTasksQueue.swap(mCompletedTasksQueue);
+      }
+    }
+
+    DALI_LOG_DEBUG_INFO("Completed task queue [%zu]\n", completedTasksQueue.size());
+
+    for(auto& taskPair : completedTasksQueue)
+    {
+      mWorkingTasks.erase(taskPair.first);
+    }
+  }
 }
 
 /// Event thread called
@@ -118,14 +141,13 @@ void VectorAnimationThread::OnTaskCompleted(VectorAnimationTaskPtr task, bool su
 
   Mutex::ScopedLock taskCompletedLock(mTaskCompletedMutex);
 
-  if(DALI_LIKELY(!mDestroyThread))
-  {
-    mCompletedTasksQueue.emplace_back(task, success && keepAnimation);
+  // DevNote : We need to add task queue, and notify even if mDestroyThread is true.
+  // Since we should make ensure that all working tasks are completed before destroying the thread.
+  mCompletedTasksQueue.emplace_back(task, success && keepAnimation);
 
-    // wake up the animation thread.
-    // Note that we should not make mNeedToSleep as false now.
-    mConditionalWait.Notify(lock);
-  }
+  // wake up the animation thread.
+  // Note that we should not make mNeedToSleep as false now.
+  mConditionalWait.Notify(lock);
 }
 
 /// VectorAnimationThread::SleepThread called, Mutex SleepThread::mAwakeCallbackMutex is locked
@@ -184,6 +206,21 @@ void VectorAnimationThread::RequestForceRenderOnce()
   }
 }
 
+/// Event thread called
+void VectorAnimationThread::Finalize()
+{
+  Mutex::ScopedLock eventTriggerLock(mEventTriggerMutex);
+  Mutex::ScopedLock taskCompletedLock(mTaskCompletedMutex);
+  Mutex::ScopedLock animationTasksLock(mAnimationTasksMutex);
+  // Wait until some event thread trigger, and tasks relative job finished.
+  if(DALI_LIKELY(!mDestroyThread))
+  {
+    DALI_LOG_DEBUG_INFO("Mark VectorAnimationThread destroyed\n");
+    mDestroyThread = true;
+  }
+  mNeedToSleep = false;
+}
+
 /// VectorAnimationThread called
 void VectorAnimationThread::Run()
 {
@@ -191,7 +228,7 @@ void VectorAnimationThread::Run()
   mLogFactory.InstallLogFunction();
   mTraceFactory.InstallTraceFunction();
 
-  while(!mDestroyThread)
+  while(DALI_LIKELY(!mDestroyThread))
   {
     Rasterize();
   }
@@ -251,19 +288,21 @@ bool VectorAnimationThread::MoveTasksToAnimation(VectorAnimationTaskPtr task, bo
 /// VectorAnimationThread called
 void VectorAnimationThread::MoveTasksToCompleted(VectorAnimationTaskPtr task, bool keepAnimation)
 {
+  // DevNote : We need to consume task queue, and notify even if mDestroyThread is true.
+  // Since we should make ensure that all working tasks are completed before destroying the thread.
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss) {
+    oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << "]";
+  });
+  bool needRasterize = false;
+
+  VectorAnimationTaskSet::const_iterator workingIter = mWorkingTasks.find(task);
+  if(workingIter != mWorkingTasks.cend())
+  {
+    mWorkingTasks.erase(workingIter);
+  }
+
   if(DALI_LIKELY(!mDestroyThread))
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss) {
-      oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << "]";
-    });
-    bool needRasterize = false;
-
-    VectorAnimationTaskSet::const_iterator workingIter = mWorkingTasks.find(task);
-    if(workingIter != mWorkingTasks.cend())
-    {
-      mWorkingTasks.erase(workingIter);
-    }
-
     // Check pending task
     {
       Mutex::ScopedLock animationTasksLock(mAnimationTasksMutex);
@@ -287,11 +326,11 @@ void VectorAnimationThread::MoveTasksToCompleted(VectorAnimationTaskPtr task, bo
     {
       mNeedToSleep = false;
     }
-
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss) {
-      oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",r?" << needRasterize << ",s?" << mNeedToSleep << "]";
-    });
   }
+
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss) {
+    oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",r?" << needRasterize << ",s?" << mNeedToSleep << "]";
+  });
 }
 
 /// VectorAnimationThread called
@@ -380,7 +419,7 @@ void VectorAnimationThread::Rasterize()
           }
         }
         DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK2", [&](std::ostringstream& oss) {
-          oss << "[" << mAnimationTasks.size() << "]";
+          oss << "[a:" << mAnimationTasks.size() << ",w:" << mWorkingTasks.size() << "]";
         });
       }
     }

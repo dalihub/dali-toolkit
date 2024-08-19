@@ -72,6 +72,11 @@ public:
    */
   void UnregisterEventCallback(CallbackBase* callback);
 
+  /**
+   * @brief Finalize the manager. This will stop the animation thread and clear all resources.
+   */
+  void Finalize();
+
 protected: // Implementation of Processor
   /**
    * @copydoc Dali::Integration::Processor::Process()
@@ -98,6 +103,7 @@ private:
 
   std::unique_ptr<VectorAnimationThread> mVectorAnimationThread;
   bool                                   mProcessorRegistered : 1;
+  bool                                   mDestroyed : 1;
 };
 
 } // namespace Internal
