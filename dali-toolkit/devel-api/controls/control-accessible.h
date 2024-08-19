@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_ACCESSIBLE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,6 +193,11 @@ public:
    * @copydoc Dali::Accessibility::Accessible::GetRelationSet()
    */
   std::vector<Dali::Accessibility::Relation> GetRelationSet() override;
+
+  /**
+   * @copydoc Dali::Accessibility::Component::IsScrollable()
+   */
+  bool IsScrollable() const override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetStates()

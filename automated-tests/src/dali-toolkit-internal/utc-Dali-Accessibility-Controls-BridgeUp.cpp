@@ -378,6 +378,42 @@ int UtcDaliControlAccessibilityHighlightable(void)
   END_TEST;
 }
 
+int UtcDaliControlAccessibilityScrollable(void)
+{
+  ToolkitTestApplication application;
+  auto                   control = Control::New();
+
+  auto scrollable = control.GetProperty<bool>(DevelControl::Property::ACCESSIBILITY_SCROLLABLE);
+  DALI_TEST_EQUALS(scrollable, false, TEST_LOCATION);
+
+  // negative testcase - trying to set unconvertible value
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_SCROLLABLE, "deadbeef");
+  scrollable = control.GetProperty<bool>(DevelControl::Property::ACCESSIBILITY_SCROLLABLE);
+  DALI_TEST_EQUALS(scrollable, false, TEST_LOCATION);
+
+  auto accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(control));
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  DALI_TEST_CHECK(!accessible->IsScrollable());
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_SCROLLABLE, true);
+  DALI_TEST_EQUALS(Property::BOOLEAN, control.GetProperty(DevelControl::Property::ACCESSIBILITY_SCROLLABLE).GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, control.GetProperty(DevelControl::Property::ACCESSIBILITY_SCROLLABLE).Get<bool>(), TEST_LOCATION);
+
+  DALI_TEST_CHECK(accessible->IsScrollable());
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_SCROLLABLE, false);
+  DALI_TEST_EQUALS(Property::BOOLEAN, control.GetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, control.GetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).Get<bool>(), TEST_LOCATION);
+
+  DALI_TEST_CHECK(!accessible->IsScrollable());
+
+  Dali::Accessibility::TestEnableSC(false);
+
+  END_TEST;
+}
+
 int UtcDaliControlAccessibilityHighlightBridgeUp(void)
 {
   ToolkitTestApplication application;
@@ -1077,8 +1113,8 @@ int UtcDaliAccessibilityDoAction(void)
   DALI_TEST_CHECK(!b->DoAction(actions[2])); // increment
   DALI_TEST_CHECK(!b->DoAction(actions[3])); // decrement
 
-  DevelControl::AccessibilityActionSignal(control).Connect([](Dali::Accessibility::ActionType action) {
-    actions_done.push_back(action);
+  DevelControl::AccessibilityActionSignal(control).Connect([](const Dali::Accessibility::ActionInfo& action_info) {
+    actions_done.push_back(action_info.type);
     return true;
   });
   DevelControl::AccessibilityReadingSkippedSignal(control).Connect([]() {
@@ -1245,6 +1281,115 @@ int UtcDaliAccessibilityScrollToChildScrollView(void)
 
   // negative testcase calling ScrollToChild using non-child actor
   accessibleParent->ScrollToChild(actorD);
+
+  Dali::Accessibility::TestEnableSC(false);
+  END_TEST;
+}
+
+int UtcDaliAccessibilityScrollToChildCustomScrollable(void)
+{
+  ToolkitTestApplication application;
+
+  thread_local Dali::Accessibility::ActionInfo action_done;
+  const auto                                   check_scroll_to_child_action_done_and_reset = [&](Actor child) {
+    DALI_TEST_CHECK(action_done.type == Dali::Accessibility::ActionType::SCROLL_TO_CHILD);
+    DALI_TEST_CHECK(action_done.target == child);
+    action_done = Dali::Accessibility::ActionInfo{};
+  };
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  auto scrollable = Control::New();
+  // set control as scrollable
+  scrollable.SetProperty(DevelControl::Property::ACCESSIBILITY_SCROLLABLE, true);
+
+  DevelControl::AccessibilityActionSignal(scrollable).Connect([](const Dali::Accessibility::ActionInfo& action_info) {
+    action_done = action_info;
+    return true;
+  });
+
+  application.GetScene().Add(scrollable);
+
+  PushButton          actorA    = PushButton::New();
+  const Dali::Vector3 positionA = Vector3(100.0f, 400.0f, 0.0f);
+  actorA.SetProperty(Dali::Actor::Property::POSITION, positionA);
+  scrollable.Add(actorA);
+
+  PushButton          actorB    = PushButton::New();
+  const Dali::Vector3 positionB = Vector3(500.0f, 200.0f, 0.0f);
+  actorB.SetProperty(Dali::Actor::Property::POSITION, positionB);
+  scrollable.Add(actorB);
+
+  TableView tableView = TableView::New(2, 2); // 2 by 2 grid.
+  tableView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  scrollable.Add(tableView);
+
+  PushButton actorC = PushButton::New();
+  actorC.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
+  tableView.AddChild(actorC, TableView::CellPosition(0, 0));
+
+  PushButton actorD = PushButton::New();
+  application.GetScene().Add(actorD);
+
+  Wait(application);
+
+  auto* accessibleParent = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(scrollable));
+  DALI_TEST_CHECK(accessibleParent);
+  auto* accessibleA = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(actorA));
+  DALI_TEST_CHECK(accessibleA);
+  auto* accessibleB = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(actorB));
+  DALI_TEST_CHECK(accessibleB);
+  auto* accessibleC = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(actorC));
+  DALI_TEST_CHECK(accessibleC);
+  auto* accessibleD = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(actorD));
+  DALI_TEST_CHECK(accessibleD);
+
+  accessibleA->GrabHighlight();
+  Wait(application);
+  check_scroll_to_child_action_done_and_reset(actorA);
+
+  accessibleB->GrabHighlight();
+  Wait(application);
+  check_scroll_to_child_action_done_and_reset(actorB);
+
+  // scrollable is ancestor of actorC
+  // This should work without a crash
+  accessibleC->GrabHighlight();
+  check_scroll_to_child_action_done_and_reset(actorC);
+
+  // Grabbing highlight on a non-child actor to scrollable does not emit SCROLL_TO_CHILD
+  accessibleD->GrabHighlight();
+  DALI_TEST_CHECK(action_done.type == Dali::Accessibility::ActionType::MAX_COUNT);
+  DALI_TEST_CHECK(action_done.target != actorD);
+
+  Dali::Accessibility::TestEnableSC(false);
+  END_TEST;
+}
+
+int UtcDaliAccessibilityScrollToChild(void)
+{
+  ToolkitTestApplication application;
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  auto parent = Control::New();
+
+  auto                child    = Control::New();
+  const Dali::Vector3 position = Vector3(100.0f, 400.0f, 0.0f);
+  child.SetProperty(Dali::Actor::Property::POSITION, position);
+
+  auto* accessibleParent = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(parent));
+  DALI_TEST_CHECK(accessibleParent);
+
+  // ScrollToChild fails if no ActionSignal is connected
+  DALI_TEST_CHECK(!accessibleParent->ScrollToChild(child));
+
+  DevelControl::AccessibilityActionSignal(parent).Connect([](const Dali::Accessibility::ActionInfo& action_info) {
+    return true;
+  });
+
+  // ScrollToChild succeeds is an ActionSinal is connected
+  DALI_TEST_CHECK(accessibleParent->ScrollToChild(child));
 
   Dali::Accessibility::TestEnableSC(false);
   END_TEST;
