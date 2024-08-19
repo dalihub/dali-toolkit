@@ -114,10 +114,12 @@ private:
    */
   bool MoveTasksToAnimation(VectorAnimationTaskPtr task, bool useCurrentTime);
 
+  using CompletedTasksContainer = std::vector<std::pair<VectorAnimationTaskPtr, bool>>; ///< Pair of completed task, and rasterize required.
+
   /**
    * @brief Move given tasks to mCompletedTasks if required.
    */
-  void MoveTasksToCompleted(VectorAnimationTaskPtr task, bool keepAnimation);
+  void MoveTasksToCompleted(CompletedTasksContainer&& completedTasksQueue);
 
 private:
   /**

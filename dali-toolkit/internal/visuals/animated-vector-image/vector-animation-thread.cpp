@@ -286,46 +286,53 @@ bool VectorAnimationThread::MoveTasksToAnimation(VectorAnimationTaskPtr task, bo
 }
 
 /// VectorAnimationThread called
-void VectorAnimationThread::MoveTasksToCompleted(VectorAnimationTaskPtr task, bool keepAnimation)
+void VectorAnimationThread::MoveTasksToCompleted(CompletedTasksContainer&& completedTasksQueue)
 {
   // DevNote : We need to consume task queue, and notify even if mDestroyThread is true.
   // Since we should make ensure that all working tasks are completed before destroying the thread.
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss) {
-    oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << "]";
+    oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",i:" << completedTasksQueue.size() << "]";
   });
   bool needRasterize = false;
 
-  VectorAnimationTaskSet::const_iterator workingIter = mWorkingTasks.find(task);
-  if(workingIter != mWorkingTasks.cend())
+  for(auto&& taskPair : completedTasksQueue)
   {
-    mWorkingTasks.erase(workingIter);
+    auto& task          = taskPair.first;
+    bool  keepAnimation = taskPair.second;
+
+    VectorAnimationTaskSet::const_iterator workingIter = mWorkingTasks.find(task);
+    if(workingIter != mWorkingTasks.cend())
+    {
+      mWorkingTasks.erase(workingIter);
+    }
+
+    if(DALI_LIKELY(!mDestroyThread))
+    {
+      // Check pending task
+      if(!needRasterize)
+      {
+        Mutex::ScopedLock animationTasksLock(mAnimationTasksMutex);
+        if(mAnimationTasks.end() != std::find(mAnimationTasks.begin(), mAnimationTasks.end(), task))
+        {
+          needRasterize = true;
+        }
+      }
+
+      if(keepAnimation)
+      {
+        VectorAnimationTaskSet::const_iterator completedIter = mCompletedTasks.lower_bound(task);
+        if(completedIter == mCompletedTasks.cend() || task < *completedIter)
+        {
+          mCompletedTasks.insert(completedIter, task);
+          needRasterize = true;
+        }
+      }
+    }
   }
 
-  if(DALI_LIKELY(!mDestroyThread))
+  if(needRasterize)
   {
-    // Check pending task
-    {
-      Mutex::ScopedLock animationTasksLock(mAnimationTasksMutex);
-      if(mAnimationTasks.end() != std::find(mAnimationTasks.begin(), mAnimationTasks.end(), task))
-      {
-        needRasterize = true;
-      }
-    }
-
-    if(keepAnimation)
-    {
-      VectorAnimationTaskSet::const_iterator completedIter = mCompletedTasks.lower_bound(task);
-      if(completedIter == mCompletedTasks.cend() || task < *completedIter)
-      {
-        mCompletedTasks.insert(completedIter, task);
-        needRasterize = true;
-      }
-    }
-
-    if(needRasterize)
-    {
-      mNeedToSleep = false;
-    }
+    mNeedToSleep = false;
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss) {
@@ -359,12 +366,7 @@ void VectorAnimationThread::Rasterize()
       }
     }
 
-    for(auto&& taskPair : completedTasksQueue)
-    {
-      auto& task          = taskPair.first;
-      bool  keepAnimation = taskPair.second;
-      MoveTasksToCompleted(task, keepAnimation);
-    }
+    MoveTasksToCompleted(std::move(completedTasksQueue));
   }
 
   mNeedToSleep = true;
