@@ -2725,3 +2725,57 @@ int UtcDaliAnimatedVectorImageNativeTextureChangeShader(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimatedVectorImageVisualDestroyApplicationWhenFrameDropped(void)
+{
+  try
+  {
+    {
+      ToolkitTestApplication application;
+      tet_infoline("UtcDaliAnimatedVectorImageVisualDestroyApplicationWhenFrameDropped");
+
+      Property::Map propertyMap;
+      propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+        .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME_FRAME_DROP)
+        .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
+
+      Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+      DALI_TEST_CHECK(visual);
+
+      DummyControl      actor     = DummyControl::New(true);
+      DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+      dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+      Vector2 controlSize(20.f, 30.f);
+      actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+      application.GetScene().Add(actor);
+
+      application.SendNotification();
+      application.Render();
+
+      // Trigger count is 2 - load, render the first frame
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+      Property::Map attributes;
+      DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
+
+      // Make delay to drop frames
+      Test::VectorAnimationRenderer::DelayRendering(500); // block Rasterize thread near 500 ms
+
+      // Request 1 frame rendering.
+      application.SendNotification();
+      application.Render();
+
+      // Destroy applicatoin immediately.
+    }
+
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
