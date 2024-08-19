@@ -94,6 +94,7 @@ int UtcDaliControlAccessibilityName(void)
   DALI_TEST_EQUALS("Accessibility_Name_With_Callback", q->GetName(), TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC(true);
+  DALI_TEST_CHECK(!Dali::Accessibility::TestPropertyChangeCalled());
 
   DALI_TEST_EQUALS("Accessibility_Name_With_Callback", TestGetName(q->GetAddress()), TEST_LOCATION);
 
@@ -108,7 +109,9 @@ int UtcDaliControlAccessibilityName(void)
   DALI_TEST_EQUALS("Changed_Accessiblity_Name", q->GetName(), TEST_LOCATION);
   DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_NAME).Get<std::string>(), "Changed_Accessiblity_Name", TEST_LOCATION);
 
-  //TODO test emission of name change signal
+  // test emission of property change signal
+  DALI_TEST_CHECK(Dali::Accessibility::TestPropertyChangeCalled());
+
   Dali::Accessibility::TestEnableSC(false);
 
   END_TEST;
@@ -138,6 +141,7 @@ int UtcDaliControlAccessibilityDescription(void)
   DALI_TEST_EQUALS("Accessibility_Description_With_Callback", q->GetDescription(), TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC(true);
+  DALI_TEST_CHECK(!Dali::Accessibility::TestPropertyChangeCalled());
 
   DALI_TEST_EQUALS("Accessibility_Description_With_Callback", TestGetDescription(q->GetAddress()), TEST_LOCATION);
 
@@ -152,7 +156,9 @@ int UtcDaliControlAccessibilityDescription(void)
   DALI_TEST_EQUALS("Changed_Accessiblity_Description", q->GetDescription(), TEST_LOCATION);
   DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_DESCRIPTION).Get<std::string>(), "Changed_Accessiblity_Description", TEST_LOCATION);
 
-  //TODO test emission of description change signal
+  // test emission of property change signal
+  DALI_TEST_CHECK(Dali::Accessibility::TestPropertyChangeCalled());
+
   Dali::Accessibility::TestEnableSC(false);
 
   END_TEST;
@@ -176,17 +182,27 @@ int UtcDaliControlAccessibilityValue(void)
   DALI_TEST_EQUALS("Accessibility_Value", property, TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC(true);
-
-  auto i = dynamic_cast<Dali::Accessibility::Component*>(q);
-
-  DALI_TEST_CHECK(i);
-  i->GrabHighlight();
+  DALI_TEST_CHECK(!Dali::Accessibility::TestPropertyChangeCalled());
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_VALUE, "Changed_Accessiblity_Value");
   DALI_TEST_EQUALS("Changed_Accessiblity_Value", q->GetValue(), TEST_LOCATION);
   DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_VALUE).Get<std::string>(), "Changed_Accessiblity_Value", TEST_LOCATION);
 
-  //TODO test emission of description change signal
+  // value property change signal is not emitted if not highlighted
+  DALI_TEST_CHECK(!Dali::Accessibility::TestPropertyChangeCalled());
+
+  auto component = dynamic_cast<Dali::Accessibility::Component*>(q);
+
+  DALI_TEST_CHECK(component);
+  component->GrabHighlight();
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_VALUE, "Changed_Accessiblity_Value_2");
+  DALI_TEST_EQUALS("Changed_Accessiblity_Value_2", q->GetValue(), TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_VALUE).Get<std::string>(), "Changed_Accessiblity_Value_2", TEST_LOCATION);
+
+  // value property change signal is emitted if highlighted
+  DALI_TEST_CHECK(Dali::Accessibility::TestPropertyChangeCalled());
+
   Dali::Accessibility::TestEnableSC(false);
 
   END_TEST;
