@@ -40,12 +40,12 @@ public:
 
   ~ColliderMeshProcessor();
 
-  void ColliderMeshChanged(Scene3D::Model model);
+  void ColliderMeshChanged(Collidable* collidable);
 
 private:
   void ModelOnScene(Actor actor);
 
-  void AddSceneViewParentToProcessingQueue(Scene3D::Model model);
+  void AddSceneViewParentToProcessingQueue(Actor actor);
 
 protected: // Implementation of Processor
   /**

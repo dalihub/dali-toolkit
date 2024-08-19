@@ -5,6 +5,7 @@ set(scene3d_src_files ${scene3d_src_files}
 	${scene3d_public_api_dir}/algorithm/path-finder.cpp
 	${scene3d_public_api_dir}/algorithm/path-finder-waypoint.cpp
 	${scene3d_public_api_dir}/controls/model/model.cpp
+	${scene3d_public_api_dir}/controls/panel/panel.cpp
 	${scene3d_public_api_dir}/controls/scene-view/scene-view.cpp
 	${scene3d_public_api_dir}/light/light.cpp
 	${scene3d_public_api_dir}/loader/alpha-function-helper.cpp

@@ -1230,7 +1230,9 @@ void SceneView::OnSceneDisconnection()
     }
     mSceneHolder.Reset();
   }
+  mTexture.Reset();
   mFrameBuffer.Reset();
+  mShadowTexture.Reset();
   mShadowFrameBuffer.Reset();
 
   if(mInCameraTransition)

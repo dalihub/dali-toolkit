@@ -18,7 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/object/weak-handle.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/controls/model/model.h>
@@ -30,6 +33,26 @@ namespace Internal
 class ColliderMeshProcessor;
 }
 
+class Collidable
+{
+public:
+  Collidable() = default;
+
+  Dali::Actor GetCollidableActor() const
+  {
+    return mCollidableActor.GetHandle();
+  }
+
+protected:
+  void SetCollidableActor(Dali::Actor collidableActor)
+  {
+    mCollidableActor = collidableActor;
+  }
+
+private:
+  Dali::WeakHandle<Dali::Actor> mCollidableActor;
+};
+
 class ColliderMeshProcessor : public BaseHandle
 {
 public:
@@ -38,7 +61,7 @@ public:
 
   static ColliderMeshProcessor Get();
 
-  void ColliderMeshChanged(Scene3D::Model model);
+  void ColliderMeshChanged(Collidable* collidable);
 
 private:
   explicit ColliderMeshProcessor(Internal::ColliderMeshProcessor* impl);

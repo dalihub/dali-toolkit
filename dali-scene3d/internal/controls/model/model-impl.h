@@ -33,6 +33,7 @@
 #include <dali-scene3d/internal/common/environment-map-load-task.h>
 #include <dali-scene3d/internal/common/light-observer.h>
 #include <dali-scene3d/internal/common/model-load-task.h>
+#include <dali-scene3d/internal/event/collider-mesh-processor.h>
 #include <dali-scene3d/internal/model-components/model-node-impl.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
@@ -51,7 +52,7 @@ namespace Internal
 /**
  * @brief Impl class for Model.
  */
-class Model : public Dali::Toolkit::Internal::Control, public LightObserver
+class Model : public Dali::Toolkit::Internal::Control, public LightObserver, public Dali::Scene3D::Collidable
 {
 public:
   using AnimationData          = std::pair<std::string, Dali::Animation>;
@@ -313,26 +314,6 @@ private:
    * @brief Changes model anchor point to set the model at center or returns to the original model pivot.
    */
   void FitModelPosition();
-
-  /**
-   * @brief Makes the input node cast shadow or not.
-   */
-  void UpdateCastShadowRecursively(Scene3D::ModelNode node, bool castShadow);
-
-  /**
-   * @brief Makes the input node receive shadow or not.
-   */
-  void UpdateReceiveShadowRecursively(Scene3D::ModelNode node, bool receiveShadow);
-
-  /**
-   * @brief Changes IBL information of the input node.
-   */
-  void UpdateImageBasedLightTextureRecursively(Scene3D::ModelNode node, Dali::Texture diffuseTexture, Dali::Texture specularTexture, float iblScaleFactor, uint32_t specularMipmapLevels);
-
-  /**
-   * @brief Changes IBL factor of the input node.
-   */
-  void UpdateImageBasedLightScaleFactorRecursively(Scene3D::ModelNode node, float iblScaleFactor);
 
   /**
    * @brief Changes IBL textures of the input node.
