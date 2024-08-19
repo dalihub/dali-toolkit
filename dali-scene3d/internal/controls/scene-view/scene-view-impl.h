@@ -54,7 +54,6 @@ namespace Internal
  */
 class SceneView : public Dali::Toolkit::Internal::Control, public Integration::Processor
 {
-
 private:
   /**
    * Data to store Capture related objects.
@@ -533,7 +532,6 @@ private:
   void ResetCaptureTimer();
 
 private: // Implementation of Processor
-
   /**
    * @copydoc Dali::Integration::Processor::Process()
    * @note This process check the SceneView has activated Camera or not.
@@ -574,7 +572,7 @@ private: // Implementation of Processor
   CameraActor                                                  mTransitionCamera;
   CameraActor                                                  mTransitionSourceCamera;
   CameraActor                                                  mTransitionDestinationCamera;
-  float                                                        mTransitionDurationSeconds;
+  float                                                        mTransitionDurationSeconds{0.0f};
   AlphaFunction                                                mTransitionAlphaFunction;
   bool                                                         mInCameraTransition{false};
   Animation                                                    mTransitionAnimation;
