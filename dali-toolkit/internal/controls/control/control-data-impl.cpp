@@ -296,7 +296,7 @@ bool PerformAccessibilityAction(Toolkit::Control control, const std::string& act
 
   if(action != ActionType::MAX_COUNT)
   {
-    bool success = DevelControl::AccessibilityActionSignal(control).Emit(action);
+    bool success = DevelControl::AccessibilityActionSignal(control).Emit({action, Dali::Actor{}});
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Performed AccessibilityAction: %s, success : %d\n", actionName.c_str(), success);
     return success;
   }
@@ -597,7 +597,8 @@ const PropertyRegistration Control::Impl::PROPERTY_23(typeRegistration, "accessi
 const PropertyRegistration Control::Impl::PROPERTY_24(typeRegistration, "clockwiseFocusableActorId",      Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID,     Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_25(typeRegistration, "counterClockwiseFocusableActorId", Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_26(typeRegistration, "automationId",                   Toolkit::DevelControl::Property::AUTOMATION_ID,                    Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_27(typeRegistration, "accessibilityValue",             Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE,                    Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_27(typeRegistration, "accessibilityValue",             Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE,              Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_28(typeRegistration, "accessibilityScrollable",        Toolkit::DevelControl::Property::ACCESSIBILITY_SCROLLABLE,         Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 // clang-format on
 
@@ -1655,6 +1656,16 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         }
         break;
       }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_SCROLLABLE:
+      {
+        bool isScrollable;
+        if(value.Get(isScrollable))
+        {
+          controlImpl.mImpl->mAccessibilityProps.isScrollable = isScrollable;
+        }
+        break;
+      }
     }
   }
 }
@@ -1833,6 +1844,12 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE:
       {
         value = controlImpl.mImpl->mAccessibilityProps.value;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_SCROLLABLE:
+      {
+        value = controlImpl.mImpl->mAccessibilityProps.isScrollable;
         break;
       }
     }

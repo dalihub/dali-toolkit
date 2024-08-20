@@ -69,7 +69,7 @@ typedef Signal<void(std::string&)> AccessibilityGetDescriptionSignalType;
 typedef Signal<void(std::pair<Dali::Accessibility::GestureInfo, bool>&)> AccessibilityDoGestureSignalType;
 
 /// @brief AccessibilityAction signal type.
-typedef Signal<bool(Dali::Accessibility::ActionType)> AccessibilityActionSignalType;
+typedef Signal<bool(const Dali::Accessibility::ActionInfo&)> AccessibilityActionSignalType;
 
 enum State
 {
@@ -232,6 +232,12 @@ enum
    * @details Name "accessibilityValue", type Property::STRING.
    */
   ACCESSIBILITY_VALUE,
+
+  /**
+   * @brief Indicates the accessibility services treat the controla as scrollable.
+   * @details Name "accessibilityScrollable", type Property::BOOLEAN.
+   */
+  ACCESSIBILITY_SCROLLABLE,
 };
 
 } // namespace Property

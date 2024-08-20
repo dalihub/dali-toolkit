@@ -627,18 +627,19 @@ public:
 
   struct AccessibilityProps
   {
-    std::string name{};
-    std::string description{};
-    std::string value{};
-    std::string automationId{};
-    Dali::Accessibility::Role role = Dali::Accessibility::Role::UNKNOWN;
+    std::string                                                                       name{};
+    std::string                                                                       description{};
+    std::string                                                                       value{};
+    std::string                                                                       automationId{};
+    Dali::Accessibility::Role                                                         role = Dali::Accessibility::Role::UNKNOWN;
     std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> relations;
-    Property::Map       extraAttributes{};
-    bool isHighlightable = false;
-    bool isHidden        = false;
+    Property::Map                                                                     extraAttributes{};
+    bool                                                                              isHighlightable = false;
+    bool                                                                              isHidden        = false;
+    bool                                                                              isScrollable    = false;
   } mAccessibilityProps;
 
-  bool mAccessibleCreatable     = true;
+  bool mAccessibleCreatable = true;
 
   // Gesture Detection
   PinchGestureDetector     mPinchGestureDetector;
@@ -690,6 +691,7 @@ public:
   static const PropertyRegistration PROPERTY_25;
   static const PropertyRegistration PROPERTY_26;
   static const PropertyRegistration PROPERTY_27;
+  static const PropertyRegistration PROPERTY_28;
 
 private:
   // Accessibility - notification for highlighted object to check if it is showing.
@@ -698,8 +700,7 @@ private:
   Dali::PropertyNotification                  mAccessibilityPositionNotification;
   Dali::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType{Accessibility::ScreenRelativeMoveType::OUTSIDE};
 
-  std::shared_ptr<Toolkit::DevelControl::ControlAccessible>                         mAccessibleObject;
-
+  std::shared_ptr<Toolkit::DevelControl::ControlAccessible> mAccessibleObject;
 };
 
 } // namespace Internal
