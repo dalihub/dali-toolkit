@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_WEB_VIEW_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -270,6 +270,11 @@ public:
   static WebView DownCast(BaseHandle handle);
 
   /**
+   * @brief Change orientation.
+   */
+  void ChangeOrientation(int orientation);
+
+  /**
    * @brief Get WebSettings of WebEngine.
    */
   Dali::Toolkit::WebSettings* GetSettings() const;
@@ -482,6 +487,14 @@ public:
   void AddJavaScriptMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler);
 
   /**
+   * @brief Inject a JavaScript object with a message handler into the WebView.
+   *
+   * @param[in] exposedObjectName The name of exposed object
+   * @param[in] handler The callback function
+   */
+  void AddJavaScriptEntireMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptEntireMessageHandlerCallback handler);
+
+  /**
    * @brief Register alert callback for javascript.
    *
    * @param[in] callback The callback function to be called by the JavaScript runtime.
@@ -541,6 +554,11 @@ public:
    * @return true if succeeded, false otherwise.
    */
   bool CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback callback);
+
+  /**
+   * @brief Exit fullscreen.
+   */
+  void ExitFullscreen();
 
   /**
    * @brief Clear the history of Web.
@@ -710,6 +728,13 @@ public:
   void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
 
   /**
+   * @brief Callback to be called when new window policy would be decided.
+   *
+   * @param[in] callback
+   */
+  void RegisterNewWindowPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback callback);
+
+  /**
    * @brief Callback to be called when a new window would be created.
    *
    * @param[in] callback
@@ -750,6 +775,27 @@ public:
    * @param[in] callback
    */
   void RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback);
+
+  /**
+   * @brief Callback to be called when fullscreen would be entered.
+   *
+   * @param[in] callback
+   */
+  void RegisterFullscreenEnteredCallback(Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback callback);
+
+  /**
+   * @brief Callback to be called when fullscreen would be exited.
+   *
+   * @param[in] callback
+   */
+  void RegisterFullscreenExitedCallback(Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback callback);
+
+  /**
+   * @brief Callback to be called when text would be found.
+   *
+   * @param[in] callback
+   */
+  void RegisterTextFoundCallback(Dali::WebEnginePlugin::WebEngineTextFoundCallback callback);
 
   /**
    * @brief Get a plain text of current web page asynchronously.
