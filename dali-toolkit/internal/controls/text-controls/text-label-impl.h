@@ -28,6 +28,7 @@
 #include <dali-toolkit/devel-api/text/spanned.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
+#include <dali-toolkit/internal/text/async-text/async-text-loader.h>
 #include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-anchor-control-interface.h>
@@ -46,7 +47,7 @@ namespace Internal
 /**
  * @brief A control which renders a short text string.
  */
-class TextLabel : public Control, public Text::ControlInterface, public Text::ScrollerInterface, public Text::AnchorControlInterface
+class TextLabel : public Control, public Text::ControlInterface, public Text::ScrollerInterface, public Text::AnchorControlInterface, public Text::AsyncTextInterface
 {
 public:
   /**
@@ -84,6 +85,21 @@ public:
    * @copydoc Dali::Toollkit::TextLabel::TextFitChangedSignal()
    */
   DevelTextLabel::TextFitChangedSignalType& TextFitChangedSignal();
+
+  /**
+   * @copydoc Dali::Toollkit::TextLabel::AsyncTextRenderedSignal()
+   */
+  DevelTextLabel::AsyncTextRenderedSignalType& AsyncTextRenderedSignal();
+
+  /**
+   * @copydoc Dali::Toollkit::TextLabel::AsyncNaturalSizeComputedSignal()
+   */
+  DevelTextLabel::AsyncNaturalSizeComputedSignalType& AsyncNaturalSizeComputedSignal();
+
+  /**
+   * @copydoc Dali::Toollkit::TextLabel::AsyncHeightForWidthComputedSignal()
+   */
+  DevelTextLabel::AsyncHeightForWidthComputedSignalType& AsyncHeightForWidthComputedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -226,6 +242,57 @@ public:
    */
   bool IsRemoveBackInset() const;
 
+  /**
+   * @brief Enable control's background
+   *
+   * @param[in] enable Whether to enable the background of control.
+   */
+  void EnableControlBackground(const bool enable);
+
+  /**
+   * @brief A method that requests asynchronous rendering of text with a fixed size.
+   *
+   * @param[in] width The width of text to render.
+   * @param[in] height The height of text to render.
+   */
+  void RequestAsyncRenderWithFixedSize(float width, float height);
+
+  /**
+   * @brief Requests asynchronous text rendering with a fixed width.
+   * The height is determined by the content of the text when rendered with the given width.
+   * The result will be the same as the height returned by GetHeightForWidth.
+   * If the heightConstraint is given, the maximum height will be the heightConstraint.
+   *
+   * @param[in] width The width of text to render.
+   * @param[in] heightConstraint The maximum available height of text to render.
+   */
+  void RequestAsyncRenderWithFixedWidth(float width, float heightConstraint);
+
+  /**
+   * @brief Requests asynchronous rendering with the maximum available width using the given widthConstraint.
+   *
+   * If the width of the text content is smaller than the widthConstraint, the width will be determined by the width of the text.
+   * If the width of the text content is larger than the widthConstraint, the width will be determined by the widthConstraint.
+   * The height is determined by the content of the text when rendered with the given width.
+   * In this case, the result will be the same as the height returned by GetHeightForWidth.
+   * If the heightConstraint is given, the maximum height will be the heightConstraint.
+   *
+   * @param[in] widthConstraint The maximum available width of text to render.
+   */
+  void RequestAsyncRenderWithConstraint(float widthConstraint, float heightConstraint);
+
+  /**
+   * @brief Requests asynchronous text natural size computation.
+   */
+  void RequestAsyncNaturalSize();
+
+  /**
+   * @brief Requests asynchronous computation of the height of the text based on the given width.
+   * @param[in] width The width of text to compute.
+   */
+  void RequestAsyncHeightForWidth(float width);
+
+
 private: // From Control
   /**
    * @copydoc Control::OnInitialize()
@@ -296,6 +363,29 @@ public: // From AnchorControlInterface
    */
   void AnchorClicked(const std::string& href) override;
 
+private: // from AsyncTextInterface
+
+  /**
+   * @copydoc Text::AsyncTextInterface::AsyncSetupAutoScroll()
+   */
+  void AsyncSetupAutoScroll(Text::AsyncTextRenderInfo renderInfo) override;
+
+  /**
+   * @copydoc Text::AsyncTextInterface::AsyncTextFitChanged()
+   */
+  void AsyncTextFitChanged(float pointSize) override;
+
+  /**
+   * @copydoc Text::AsyncTextInterface::AsyncLoadComplete()
+   */
+  void AsyncLoadComplete(Text::AsyncTextRenderInfo renderInfo);
+
+  /**
+   * @copydoc Text::AsyncTextInterface::AsyncSizeComputed()
+   */
+  void AsyncSizeComputed(Text::AsyncTextRenderInfo renderInfo);
+
+
 private: // Implementation
   /**
    * Construct a new TextLabel.
@@ -313,6 +403,18 @@ private:
   // Undefined copy constructor and assignment operators
   TextLabel(const TextLabel&);
   TextLabel& operator=(const TextLabel& rhs);
+
+  /**
+   * @brief Get the AsyncTextParameters
+   * All properties of the text label needed to render the text are stored and returned in the parameter.
+   *
+   * @param[in] requestType Type to request asynchronous computation.
+   * @param[in] contentSize The size of the text content requested by relayout excluding padding.
+   * @param[in] padding The size of the label's padding.
+   * @param[in] layoutDirection The layout direction.
+   * @return The parameters for async text render.
+   */
+  Text::AsyncTextParameters GetAsyncTextParameters(const Text::Async::RequestType requestType, const Vector2& contentSize, const Extents& padding, const Dali::LayoutDirection::Type layoutDirection);
 
   /**
    * @brief Set up Autoscrolling
@@ -349,6 +451,22 @@ private:
    * @brief Emits TextFitChanged signal.
    */
   void EmitTextFitChangedSignal();
+
+  /**
+   * @brief Emits AsyncTextRendered signal.
+   */
+  void EmitAsyncTextRenderedSignal(float width, float height);
+
+  /**
+   * @brief Emits AsyncNaturalSizeComputed signal.
+   */
+  void EmitAsyncNaturalSizeComputedSignal(float width, float height);
+
+  /**
+   * @brief Emits AsyncHeightForWidthComputed signal.
+   */
+  void EmitAsyncHeightForWidthComputedSignal(float width, float height);
+
   void OnAccessibilityStatusChanged();
 
 private: // Data
@@ -362,12 +480,25 @@ private: // Data
   // Signals
   Toolkit::DevelTextLabel::AnchorClickedSignalType  mAnchorClickedSignal;
   Toolkit::DevelTextLabel::TextFitChangedSignalType mTextFitChangedSignal;
+  Toolkit::DevelTextLabel::AsyncTextRenderedSignalType mAsyncTextRenderedSignal;
+  Toolkit::DevelTextLabel::AsyncNaturalSizeComputedSignalType mAsyncNaturalSizeComputedSignal;
+  Toolkit::DevelTextLabel::AsyncHeightForWidthComputedSignalType mAsyncHeightForWidthComputedSignal;
+
 
   std::string mLocale;
+  Vector2     mSize;
 
   int  mRenderingBackend;
-  bool mTextUpdateNeeded : 1;
-  bool mLastAutoScrollEnabled : 1;
+  int  mAsyncLineCount;
+  bool mTextUpdateNeeded         : 1;
+  bool mLastAutoScrollEnabled    : 1;
+  bool mControlBackgroundEnabeld : 1;
+
+  bool mIsAsyncRenderNeeded : 1; // true if a render request is required in ASYNC_AUTO mode, otherwise false.
+  bool mIsSizeChanged       : 1; // whether the size has been changed or not.
+  bool mIsManualRender      : 1; // whether an async manual render has been requested, returns false when completed.
+  bool mIsManualRendered    : 1; // whether an async manual render has been completed, returns false on the next relayout.
+  bool mManualRendered      : 1;
 
 protected:
   /**

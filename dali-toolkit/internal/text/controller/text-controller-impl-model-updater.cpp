@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,16 +171,16 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
     // is not shaped together).
     lineBreakInfo.Resize(numberOfCharacters, TextAbstraction::LINE_NO_BREAK);
 
-    SetLineBreakInfo(utf32Characters,
-                     startIndex,
-                     requestedNumberOfCharacters,
-                     lineBreakInfo);
+    TextAbstraction::Segmentation segmentation = TextAbstraction::Segmentation::Get();
+    SetLineBreakInfo(segmentation, utf32Characters, startIndex, requestedNumberOfCharacters, lineBreakInfo);
 
     if(impl.mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
        impl.mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::MIXED))
     {
       CharacterIndex end                 = startIndex + requestedNumberOfCharacters;
       LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
+
+      TextAbstraction::Hyphenation hyphenation = TextAbstraction::Hyphenation::Get();
 
       for(CharacterIndex index = startIndex; index < end; index++)
       {
@@ -195,7 +195,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           wordEnd++;
         }
 
-        Vector<bool> hyphens = GetWordHyphens(utf32Characters.Begin() + index, wordEnd - index, nullptr);
+        Vector<bool> hyphens = GetWordHyphens(hyphenation, utf32Characters.Begin() + index, wordEnd - index, nullptr);
 
         for(CharacterIndex i = 0; i < (wordEnd - index); i++)
         {
@@ -274,7 +274,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
 
       // Validates the fonts. If there is a character with no assigned font it sets a default one.
       // After this call, fonts are validated.
-      multilanguageSupport.ValidateFonts(utf32Characters,
+      multilanguageSupport.ValidateFonts(impl.mFontClient,
+                                         utf32Characters,
                                          scripts,
                                          fontDescriptionRuns,
                                          defaultFontDescription,
@@ -295,8 +296,11 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
     Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = impl.mModel->mLogicalModel->mBidirectionalParagraphInfo;
     bidirectionalInfo.Reserve(numberOfParagraphs);
 
+    TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+
     // Calculates the bidirectional info for the whole paragraph if it contains right to left scripts.
-    SetBidirectionalInfo(utf32Characters,
+    SetBidirectionalInfo(bidirectionalSupport,
+                         utf32Characters,
                          scripts,
                          lineBreakInfo,
                          startIndex,
@@ -309,7 +313,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
     {
       // Only set the character directions if there is right to left characters.
       Vector<CharacterDirection>& directions = impl.mModel->mLogicalModel->mCharacterDirections;
-      GetCharactersDirection(bidirectionalInfo,
+      GetCharactersDirection(bidirectionalSupport,
+                             bidirectionalInfo,
                              numberOfCharacters,
                              startIndex,
                              requestedNumberOfCharacters,
@@ -318,7 +323,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
       // This paragraph has right to left text. Some characters may need to be mirrored.
       // TODO: consider if the mirrored string can be stored as well.
 
-      textMirrored = GetMirroredText(utf32Characters,
+      textMirrored = GetMirroredText(bidirectionalSupport,
+                                     utf32Characters,
                                      directions,
                                      bidirectionalInfo,
                                      startIndex,
@@ -357,8 +363,13 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
   if(Controller::NO_OPERATION != (Controller::SHAPE_TEXT & operations))
   {
     const Vector<Character>& textToShape = textMirrored ? mirroredUtf32Characters : utf32Characters;
+
+    TextAbstraction::Shaping shaping = TextAbstraction::Shaping::Get();
+
     // Shapes the text.
-    ShapeText(textToShape,
+    ShapeText(shaping,
+              impl.mFontClient,
+              textToShape,
               lineBreakInfo,
               scripts,
               validFonts,

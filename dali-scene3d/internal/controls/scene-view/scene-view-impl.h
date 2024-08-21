@@ -52,8 +52,29 @@ namespace Internal
 /**
  * @brief Impl class for SceneView.
  */
-class SceneView : public Dali::Toolkit::Internal::Control
+class SceneView : public Dali::Toolkit::Internal::Control, public Integration::Processor
 {
+private:
+  /**
+   * Data to store Capture related objects.
+   */
+  struct CaptureData
+  {
+    int32_t                  mStartTick;
+    int32_t                  mCaptureId;                        // Unique Key to distinguish requested Captures.
+    float                    mCaptureCameraOriginalAspectRatio; // Original AspectRatio of the input cameras
+    Dali::Toolkit::ImageUrl  mCaptureUrl;                       // URL for first captured buffer, but it is Y-inverted.
+    Dali::Toolkit::ImageView mCaptureImageView;                 // ImageView to draw first capture buffer to be transfered as input for invert.
+    Dali::CameraActor        mCaptureCamera;                    // CameraActor to draw first capture buffer
+    Dali::RenderTask         mCaptureTask;                      // RenderTask that is used to capture first buffer.
+    Dali::Texture            mCaptureTexture;                   // First Captured texture, but it is Y-inverted.
+    Dali::FrameBuffer        mCaptureFrameBuffer;               // First Captured FBO, but it is Y-inverted.
+    Dali::CameraActor        mCaptureInvertCamera;              // CameraActor to invert first captured buffer by second pass.
+    Dali::RenderTask         mCaptureInvertTask;                // RenderTask to invert first captured buffer.
+    Dali::Texture            mCaptureInvertTexture;             // Result texture of second pass. This is final Texture result.
+    Dali::FrameBuffer        mCaptureInvertFrameBuffer;         // FBO for firnal Texture result
+  };
+
 public:
   /**
    * @brief Creates a new SceneView.
@@ -101,6 +122,16 @@ public:
    * @copydoc SceneView::SelectCamera()
    */
   void SelectCamera(const std::string& name);
+
+  /**
+   * @copydoc SceneView::StartCameraTransition()
+   */
+  void StartCameraTransition(uint32_t index, float durationSeconds, Dali::AlphaFunction alphaFunction);
+
+  /**
+   * @copydoc SceneView::StartCameraTransition()
+   */
+  void StartCameraTransition(std::string name, float durationSeconds, Dali::AlphaFunction alphaFunction);
 
   /**
    * @brief Register an item.
@@ -250,9 +281,14 @@ public:
   int32_t Capture(Dali::CameraActor camera, const Vector2& size);
 
   /**
-   * @copydoc SceneView::FinishedSignal
+   * @copydoc SceneView::CaptureFinishedSignal
    */
   Dali::Scene3D::SceneView::CaptureFinishedSignalType& CaptureFinishedSignal();
+
+  /**
+   * @copydoc SceneView::CameraTransitionFinishedSignal
+   */
+  Dali::Scene3D::SceneView::CameraTransitionFinishedSignalType& CameraTransitionFinishedSignal();
 
   /**
    * @brief Retrieves ShaderManager of this SceneView.
@@ -461,24 +497,56 @@ private:
    */
   void OnCameraDisconnected(Dali::Actor actor);
 
-private:
   /**
-   * Data to store Capture related objects.
+   * @brief Registers Camera Transition to processor
    */
-  struct CaptureData
+  void RegisterCameraTransition(CameraActor destinationCamera, float durationSeconds, Dali::AlphaFunction alphaFunction);
+
+  /**
+   * @brief Requests Camera Transition
+   * @note This method is called in Process.
+   */
+  void RequestCameraTransition();
+
+  /**
+   * @brief Resets Transition information.
+   * This method is called when the transition is finished or invalid transition is requested.
+   */
+  void ResetTransition();
+
+  /**
+   * @brief Camera Transition finished callback.
+   * @param[in] animation animation for this Transition
+   */
+  void OnTransitionFinished(Animation& animation);
+
+  /**
+   * @brief Reset CaptureData when the capture is finished or failed.
+   * @param[in] captureData CaptureData to be reset.
+   */
+  void ResetCaptureData(std::shared_ptr<CaptureData> captureData);
+
+  /**
+   * @brief Reset Capture timer when there isn't any capture in progress.
+   */
+  void ResetCaptureTimer();
+
+private: // Implementation of Processor
+  /**
+   * @copydoc Dali::Integration::Processor::Process()
+   * @note This process check the SceneView has activated Camera or not.
+   * If not, select default camera.
+   * And, this process generates Camera transition animation that is triggered by StartCameraTransition method.
+   */
+  void Process(bool postProcessor) override;
+
+  /**
+   * @copydoc Dali::Integration::Processor::GetProcessorName()
+   */
+  std::string_view GetProcessorName() const override
   {
-    int32_t                  mStartTick;
-    int32_t                  mCaptureId;                // Unique Key to distinguish requested Captures.
-    Dali::Toolkit::ImageUrl  mCaptureUrl;               // URL for first captured buffer, but it is Y-inverted.
-    Dali::Toolkit::ImageView mCaptureImageView;         // ImageView to draw first capture buffer to be transfered as input for invert.
-    Dali::RenderTask         mCaptureTask;              // RenderTask that is used to capture first buffer.
-    Dali::Texture            mCaptureTexture;           // First Captured texture, but it is Y-inverted.
-    Dali::FrameBuffer        mCaptureFrameBuffer;       // First Captured FBO, but it is Y-inverted.
-    Dali::CameraActor        mCaptureInvertCamera;      // CameraActor to invert first captured buffer by second pass.
-    Dali::RenderTask         mCaptureInvertTask;        // RenderTask to invert first captured buffer.
-    Dali::Texture            mCaptureInvertTexture;     // Result texture of second pass. This is final Texture result.
-    Dali::FrameBuffer        mCaptureInvertFrameBuffer; // FBO for firnal Texture result
-  };
+    return "SceneViewImpl";
+  }
 
   Toolkit::Visual::Base mVisual;
 
@@ -499,6 +567,16 @@ private:
   float                                               mSkyboxIntensity{1.0f};
   uint8_t                                             mFrameBufferMultiSamplingLevel{0u};
   Dali::Scene3D::SceneView::CaptureFinishedSignalType mCaptureFinishedSignal;
+
+  // camera Transition
+  CameraActor                                                  mTransitionCamera;
+  CameraActor                                                  mTransitionSourceCamera;
+  CameraActor                                                  mTransitionDestinationCamera;
+  float                                                        mTransitionDurationSeconds{0.0f};
+  AlphaFunction                                                mTransitionAlphaFunction;
+  bool                                                         mInCameraTransition{false};
+  Animation                                                    mTransitionAnimation;
+  Dali::Scene3D::SceneView::CameraTransitionFinishedSignalType mCameraTransitionFinishedSignal;
 
   int32_t                                                                mCaptureId{0};     // Capture ID for requested capture, this is incrementally increasing.
   std::vector<std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>>> mCaptureContainer; // Container that stores CaptureData until the Capture is finished.
@@ -548,6 +626,7 @@ private:
   bool                        mSkyboxDirty{false};
   bool                        mIblDiffuseDirty{false};
   bool                        mIblSpecularDirty{false};
+  bool                        mIsProcessorRegistered{false};
 };
 
 } // namespace Internal

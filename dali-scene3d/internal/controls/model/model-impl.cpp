@@ -37,6 +37,7 @@
 #include <dali-scene3d/internal/event/collider-mesh-processor.h>
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/model-node-impl.h>
+#include <dali-scene3d/internal/model-components/model-node-tree-utility.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/loader/animation-definition.h>
 #include <dali-scene3d/public-api/loader/camera-parameters.h>
@@ -47,6 +48,7 @@
 #include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+
 using namespace Dali;
 
 namespace Dali
@@ -195,46 +197,6 @@ void UpdateBlendShapeNodeMapRecursively(Model::BlendShapeModelNodeMap& resultMap
   }
 }
 
-void UpdateShaderRecursively(Scene3D::ModelNode node, Scene3D::Loader::ShaderManagerPtr shaderManager)
-{
-  if(!node)
-  {
-    return;
-  }
-
-  GetImplementation(node).UpdateShader(shaderManager);
-
-  uint32_t childrenCount = node.GetChildCount();
-  for(uint32_t i = 0; i < childrenCount; ++i)
-  {
-    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
-    if(childNode)
-    {
-      UpdateShaderRecursively(childNode, shaderManager);
-    }
-  }
-}
-
-void UpdateShadowMapTextureRecursively(Scene3D::ModelNode node, Dali::Texture shadowMapTexture)
-{
-  if(!node)
-  {
-    return;
-  }
-
-  GetImplementation(node).SetShadowMapTexture(shadowMapTexture);
-
-  uint32_t childrenCount = node.GetChildCount();
-  for(uint32_t i = 0; i < childrenCount; ++i)
-  {
-    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
-    if(childNode)
-    {
-      UpdateShadowMapTextureRecursively(childNode, shadowMapTexture);
-    }
-  }
-}
-
 void ResetResourceTask(IntrusivePtr<AsyncTask>&& asyncTask)
 {
   if(!asyncTask)
@@ -312,11 +274,11 @@ void Model::AddModelNode(Scene3D::ModelNode modelNode)
     mModelResourceReady = true;
   }
 
-  UpdateShaderRecursively(modelNode, mShaderManager);
+  ModelNodeTreeUtility::UpdateShaderRecursively(modelNode, mShaderManager);
 
   if(mShadowMapTexture)
   {
-    UpdateShadowMapTextureRecursively(modelNode, mShadowMapTexture);
+    ModelNodeTreeUtility::UpdateShadowMapTextureRecursively(modelNode, mShadowMapTexture);
   }
 
   if(mIblDiffuseResourceReady && mIblSpecularResourceReady)
@@ -331,7 +293,7 @@ void Model::AddModelNode(Scene3D::ModelNode modelNode)
   if(modelNode.HasColliderMesh())
   {
     RegisterColliderMesh(modelNode);
-    Scene3D::ColliderMeshProcessor::Get().ColliderMeshChanged(Scene3D::Model::DownCast(Self()));
+    Scene3D::ColliderMeshProcessor::Get().ColliderMeshChanged(this);
   }
 
   if(Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE))
@@ -345,7 +307,7 @@ void Model::RegisterColliderMesh(Scene3D::ModelNode& modelNode)
   mColliderMeshes[modelNode.GetProperty<int>(Actor::Property::ID)] = modelNode;
 
   // Add processor
-  Scene3D::ColliderMeshProcessor::Get().ColliderMeshChanged(Scene3D::Model::DownCast(Self()));
+  Scene3D::ColliderMeshProcessor::Get().ColliderMeshChanged(this);
 }
 
 void Model::RemoveColliderMesh(Scene3D::ModelNode& node)
@@ -371,7 +333,7 @@ void Model::RemoveModelNode(Scene3D::ModelNode modelNode)
 
   if(mModelRoot)
   {
-    UpdateShaderRecursively(modelNode, nullptr);
+    ModelNodeTreeUtility::UpdateShaderRecursively(modelNode, nullptr);
     mModelRoot.Remove(modelNode);
   }
 }
@@ -815,7 +777,7 @@ void Model::SetMotionData(Scene3D::MotionData motionData)
 void Model::CastShadow(bool castShadow)
 {
   mIsShadowCasting = castShadow;
-  UpdateCastShadowRecursively(mModelRoot, mIsShadowCasting);
+  ModelNodeTreeUtility::UpdateCastShadowRecursively(mModelRoot, mIsShadowCasting);
 }
 
 bool Model::IsShadowCasting() const
@@ -826,7 +788,7 @@ bool Model::IsShadowCasting() const
 void Model::ReceiveShadow(bool receiveShadow)
 {
   mIsShadowReceiving = receiveShadow;
-  UpdateReceiveShadowRecursively(mModelRoot, mIsShadowReceiving);
+  ModelNodeTreeUtility::UpdateReceiveShadowRecursively(mModelRoot, mIsShadowReceiving);
 }
 
 bool Model::IsShadowReceiving() const
@@ -842,6 +804,8 @@ bool Model::IsShadowReceiving() const
 
 void Model::OnInitialize()
 {
+  Collidable::SetCollidableActor(Scene3D::Model::DownCast(Self()));
+
   // Make ParentOrigin as Center.
   Self().SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
@@ -865,7 +829,7 @@ void Model::OnSceneConnection(int depth)
       if(mShaderManager != shaderManager)
       {
         mShaderManager = shaderManager;
-        UpdateShaderRecursively(mModelRoot, mShaderManager);
+        ModelNodeTreeUtility::UpdateShaderRecursively(mModelRoot, mShaderManager);
       }
       break;
     }
@@ -878,7 +842,7 @@ void Model::OnSceneConnection(int depth)
   if(!parentSceneView)
   {
     mShaderManager = new Dali::Scene3D::Loader::ShaderManager();
-    UpdateShaderRecursively(mModelRoot, mShaderManager);
+    ModelNodeTreeUtility::UpdateShaderRecursively(mModelRoot, mShaderManager);
   }
 
   if(!mModelLoadTask && !mModelResourceReady && !mModelUrl.empty())
@@ -1007,87 +971,6 @@ void Model::FitModelPosition()
   mModelRoot.SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3::ONE - mModelPivot);
 }
 
-void Model::UpdateCastShadowRecursively(Scene3D::ModelNode node, bool castShadow)
-{
-  if(!node)
-  {
-    return;
-  }
-
-  GetImplementation(node).CastShadow(castShadow);
-  uint32_t childrenCount = node.GetChildCount();
-  for(uint32_t i = 0; i < childrenCount; ++i)
-  {
-    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
-    if(!childNode)
-    {
-      continue;
-    }
-    UpdateCastShadowRecursively(childNode, castShadow);
-  }
-}
-
-void Model::UpdateReceiveShadowRecursively(Scene3D::ModelNode node, bool receiveShadow)
-{
-  if(!node)
-  {
-    return;
-  }
-
-  GetImplementation(node).ReceiveShadow(receiveShadow);
-  uint32_t childrenCount = node.GetChildCount();
-  for(uint32_t i = 0; i < childrenCount; ++i)
-  {
-    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
-    if(!childNode)
-    {
-      continue;
-    }
-    UpdateReceiveShadowRecursively(childNode, receiveShadow);
-  }
-}
-
-void Model::UpdateImageBasedLightTextureRecursively(Scene3D::ModelNode node, Dali::Texture diffuseTexture, Dali::Texture specularTexture, float iblScaleFactor, uint32_t specularMipmapLevels)
-{
-  if(!node)
-  {
-    return;
-  }
-
-  GetImplementation(node).SetImageBasedLightTexture(diffuseTexture, specularTexture, iblScaleFactor, specularMipmapLevels);
-  uint32_t childrenCount = node.GetChildCount();
-  for(uint32_t i = 0; i < childrenCount; ++i)
-  {
-    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
-    if(!childNode)
-    {
-      continue;
-    }
-    UpdateImageBasedLightTextureRecursively(childNode, diffuseTexture, specularTexture, iblScaleFactor, specularMipmapLevels);
-  }
-}
-
-void Model::UpdateImageBasedLightScaleFactorRecursively(Scene3D::ModelNode node, float iblScaleFactor)
-{
-  if(!node)
-  {
-    return;
-  }
-
-  GetImplementation(node).SetImageBasedLightScaleFactor(iblScaleFactor);
-
-  uint32_t childrenCount = node.GetChildCount();
-  for(uint32_t i = 0; i < childrenCount; ++i)
-  {
-    Scene3D::ModelNode childNode = Scene3D::ModelNode::DownCast(node.GetChildAt(i));
-    if(!childNode)
-    {
-      continue;
-    }
-    UpdateImageBasedLightScaleFactorRecursively(childNode, iblScaleFactor);
-  }
-}
-
 void Model::UpdateImageBasedLightTexture()
 {
   Dali::Texture currentDiffuseTexture          = (mDiffuseTexture && mSpecularTexture) ? mDiffuseTexture : mSceneDiffuseTexture;
@@ -1103,7 +986,7 @@ void Model::UpdateImageBasedLightTexture()
     currentIblSpecularMipmapLevels = 1u;
   }
 
-  UpdateImageBasedLightTextureRecursively(mModelRoot, currentDiffuseTexture, currentSpecularTexture, currentIblScaleFactor, currentIblSpecularMipmapLevels);
+  ModelNodeTreeUtility::UpdateImageBasedLightTextureRecursively(mModelRoot, currentDiffuseTexture, currentSpecularTexture, currentIblScaleFactor, currentIblSpecularMipmapLevels);
 }
 
 void Model::UpdateImageBasedLightScaleFactor()
@@ -1115,7 +998,7 @@ void Model::UpdateImageBasedLightScaleFactor()
   }
 
   float currentIblScaleFactor = (mDiffuseTexture && mSpecularTexture) ? mIblScaleFactor : mSceneIblScaleFactor;
-  UpdateImageBasedLightScaleFactorRecursively(mModelRoot, currentIblScaleFactor);
+  ModelNodeTreeUtility::UpdateImageBasedLightScaleFactorRecursively(mModelRoot, currentIblScaleFactor);
 }
 
 void Model::ApplyCameraTransform(Dali::CameraActor camera) const
@@ -1162,7 +1045,7 @@ void Model::NotifyShadowMapTexture(Dali::Texture shadowMapTexture)
   if(mShadowMapTexture != shadowMapTexture)
   {
     mShadowMapTexture = shadowMapTexture;
-    UpdateShadowMapTextureRecursively(mModelRoot, mShadowMapTexture);
+    ModelNodeTreeUtility::UpdateShadowMapTextureRecursively(mModelRoot, mShadowMapTexture);
   }
 }
 
@@ -1231,7 +1114,7 @@ void Model::OnModelLoadComplete()
 
   if(mShadowMapTexture)
   {
-    UpdateShadowMapTextureRecursively(mModelRoot, mShadowMapTexture);
+    ModelNodeTreeUtility::UpdateShadowMapTextureRecursively(mModelRoot, mShadowMapTexture);
   }
   UpdateImageBasedLightTexture();
   UpdateImageBasedLightScaleFactor();

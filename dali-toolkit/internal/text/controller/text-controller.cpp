@@ -375,6 +375,16 @@ bool Controller::IsShowingRealText() const
   return mImpl->IsShowingRealText();
 }
 
+void Controller::SetRenderMode(DevelTextLabel::Render::Mode renderMode)
+{
+  mImpl->mRenderMode = renderMode;
+}
+
+DevelTextLabel::Render::Mode Controller::GetRenderMode()
+{
+  return mImpl->mRenderMode;
+}
+
 void Controller::SetLineWrapMode(Text::LineWrap::Mode lineWrapMode)
 {
   mImpl->SetLineWrapMode(lineWrapMode);
@@ -471,6 +481,14 @@ float Controller::GetTextFitPointSize() const
   return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFitPointSize : 0.0f;
 }
 
+void Controller::SetTextFitPointSize(float pointSize)
+{
+  EnsureCreated(mImpl->mFontDefaults);
+  mImpl->mFontDefaults->mFitPointSize = pointSize;
+  mImpl->mFontDefaults->sizeDefined   = true;
+  mImpl->ClearFontData();
+}
+
 void Controller::SetTextFitLineSize(float lineSize)
 {
   mImpl->mTextFitLineSize = lineSize;
@@ -556,6 +574,11 @@ void Controller::SetText(const std::string& text)
 void Controller::GetText(std::string& text) const
 {
   mImpl->GetText(text);
+}
+
+void Controller::GetRawText(std::string& text) const
+{
+  text = mImpl->mRawText;
 }
 
 Length Controller::GetNumberOfCharacters() const
@@ -1802,11 +1825,11 @@ void Controller::PasteClipboardItemEvent(uint32_t id, const char* mimeType, cons
   }
 
   // text-controller allows only plain text type.
-  if(!strncmp(mimeType, MIME_TYPE_TEXT_PLAIN, strlen(MIME_TYPE_TEXT_PLAIN)))
+  if(!strncmp(mimeType, MIME_TYPE_TEXT_PLAIN, strlen(MIME_TYPE_TEXT_PLAIN) + 1 /* Compare include null-terminated char */))
   {
     EventHandler::PasteClipboardItemEvent(*this, data);
   }
-  else if(!strncmp(mimeType, MIME_TYPE_HTML, strlen(MIME_TYPE_HTML)))
+  else if(!strncmp(mimeType, MIME_TYPE_HTML, strlen(MIME_TYPE_HTML) + 1 /* Compare include null-terminated char */))
   {
     // This does not mean that text controls can parse html.
     // This is temporary code, as text controls do not support html type data.

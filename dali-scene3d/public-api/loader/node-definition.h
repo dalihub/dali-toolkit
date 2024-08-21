@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_NODE_DEFINITION_H_
 #define DALI_SCENE3D_LOADER_NODE_DEFINITION_H_
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,6 +180,9 @@ public: // TYPES
     virtual void RegisterResources(IResourceReceiver& receiver) const;
     virtual void ReflectResources(IResourceReflector& reflector);
     virtual void OnCreate(const NodeDefinition& nodeDefinition, CreateParams& params, ModelNode& node) const;
+
+  protected:
+    void CreateRenderer(const NodeDefinition& nodeDefinition, CreateParams& params, Geometry& geometry, ModelNode& node) const;
   };
 
   struct CustomizationDefinition

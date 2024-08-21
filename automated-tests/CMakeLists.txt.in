@@ -28,6 +28,19 @@ INCLUDE_DIRECTORIES(
   @PREFIX@/include/dali/integration-api/adaptor-framework
 )
 
+# Ignore some warning options
+INCLUDE(CheckCXXCompilerFlag)
+
+CHECK_CXX_COMPILER_FLAG(-Wno-unused-result HAVE_NO_UNUSED_RESULT)
+IF (HAVE_NO_UNUSED_RESULT)
+  ADD_COMPILE_OPTIONS( -Wno-unused-result )
+ENDIF()
+
+CHECK_CXX_COMPILER_FLAG(-Wno-ignored-attributes HAVE_NO_IGNORED_ATTRIBUTES)
+IF (HAVE_NO_IGNORED_ATTRIBUTES)
+  ADD_COMPILE_OPTIONS( -Wno-ignored-attributes )
+ENDIF()
+
 ADD_SUBDIRECTORY(src)
 
 #Internationalization

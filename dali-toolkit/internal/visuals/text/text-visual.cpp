@@ -24,6 +24,7 @@
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/trace.h>
 #include <string.h>
 
@@ -52,8 +53,27 @@ namespace Internal
 namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
+DALI_INIT_TRACE_FILTER(gTraceFilter2, DALI_TRACE_TEXT_ASYNC, false);
 
 const int CUSTOM_PROPERTY_COUNT(3); // uTextColorAnimatable, uHasMultipleTextColors, requireRender
+
+const float VERTICAL_ALIGNMENT_TABLE[Text::VerticalAlignment::BOTTOM + 1] =
+  {
+    0.0f, // VerticalAlignment::TOP
+    0.5f, // VerticalAlignment::CENTER
+    1.0f  // VerticalAlignment::BOTTOM
+};
+
+#ifdef TRACE_ENABLED
+const char* GetRequestTypeName(Text::Async::RequestType type)
+{
+  if(type < Text::Async::RENDER_FIXED_SIZE || type > Text::Async::COMPUTE_HEIGHT_FOR_WIDTH)
+  {
+    return "INVALID_REQUEST_TYPE";
+  }
+  return Text::Async::RequestTypeName[type];
+}
+#endif
 
 /**
  * Return Property index for the given string key
@@ -254,6 +274,7 @@ TextVisual::TextVisual(VisualFactoryCache& factoryCache, TextVisualShaderFactory
 : Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::TEXT),
   mController(Text::Controller::New()),
   mTypesetter(Text::Typesetter::New(mController->GetTextModel())),
+  mAsyncTextInterface(nullptr),
   mTextVisualShaderFactory(shaderFactory),
   mTextShaderFeatureCache(),
   mHasMultipleTextColorsIndex(Property::INVALID_INDEX),
@@ -261,7 +282,13 @@ TextVisual::TextVisual(VisualFactoryCache& factoryCache, TextVisualShaderFactory
   mTextColorAnimatableIndex(Property::INVALID_INDEX),
   mTextRequireRenderPropertyIndex(Property::INVALID_INDEX),
   mRendererUpdateNeeded(false),
-  mTextRequireRender(false)
+  mTextRequireRender(false),
+  mTextLoadingTaskId(0u),
+  mNaturalSizeTaskId(0u),
+  mHeightForWidthTaskId(0u),
+  mIsTextLoadingTaskRunning(false),
+  mIsNaturalSizeTaskRunning(false),
+  mIsHeightForWidthTaskRunning(false)
 {
   // Enable the pre-multiplied alpha to improve the text quality
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -372,6 +399,11 @@ void TextVisual::RemoveRenderer(Actor& actor, bool removeDefaultRenderer)
 
 void TextVisual::DoSetOffScene(Actor& actor)
 {
+  if(mController->GetRenderMode() != DevelTextLabel::Render::SYNC && mIsTextLoadingTaskRunning)
+  {
+    Text::AsyncTextManager::Get().RequestCancel(mTextLoadingTaskId);
+    mIsTextLoadingTaskRunning = false;
+  }
   if(mColorConstraint)
   {
     mColorConstraint.Remove();
@@ -494,6 +526,11 @@ void TextVisual::DoSetProperty(Dali::Property::Index index, const Dali::Property
 
 void TextVisual::UpdateRenderer()
 {
+  if(mController->GetRenderMode() != DevelTextLabel::Render::SYNC)
+  {
+    return;
+  }
+
   Actor control = mControl.GetHandle();
   if(!control)
   {
@@ -595,8 +632,8 @@ void TextVisual::UpdateRenderer()
         // When Cutout Enabled, the current visual must draw the entire control.
         // so set the size to controlSize and offset to 0.
 
-        relayoutSize = Vector2(controlWidth, controlHeight);
-        mImpl->mTransform.mSize.width = controlWidth;
+        relayoutSize                   = Vector2(controlWidth, controlHeight);
+        mImpl->mTransform.mSize.width  = controlWidth;
         mImpl->mTransform.mSize.height = controlHeight;
 
         // Relayout to the original size has been completed, so save only the offset information and use it in typesetter.
@@ -630,7 +667,7 @@ void TextVisual::AddTexture(TextureSet& textureSet, PixelData& data, Sampler& sa
 void TextVisual::AddTilingTexture(TextureSet& textureSet, TilingInfo& tilingInfo, PixelData& data, Sampler& sampler, unsigned int textureSetIndex)
 {
   Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D,
-                                 tilingInfo.textPixelFormat,
+                                 data.GetPixelFormat(),
                                  tilingInfo.width,
                                  tilingInfo.height);
   DevelTexture::UploadSubPixelData(texture, data, 0u, tilingInfo.offsetHeight, tilingInfo.width, tilingInfo.height);
@@ -672,7 +709,7 @@ void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sa
 
   renderer.SetTextures(textureSet);
 
-  //Register transform properties
+  // Register transform properties
   mImpl->mTransform.SetUniforms(renderer, Direction::LEFT_TO_RIGHT);
 
   // Enable the pre-multiplied alpha to improve the text quality
@@ -680,12 +717,436 @@ void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sa
   renderer.SetProperty(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, true);
 
   // Set size and offset for the tiling.
-  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, Vector2(info.width, info.height));
+  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, Vector2(static_cast<float>(info.width), static_cast<float>(info.height)));
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET, info.transformOffset);
   renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
   renderer.RegisterProperty("uHasMultipleTextColors", static_cast<float>(mTextShaderFeatureCache.IsEnabledMultiColor()));
 
   mRendererList.push_back(renderer);
+}
+
+// From async text manager
+void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textInformation)
+{
+  Text::AsyncTextParameters parameters = textInformation.parameters;
+
+#ifdef TRACE_ENABLED
+  if(gTraceFilter2 && gTraceFilter2->IsTraceEnabled())
+  {
+    DALI_LOG_RELEASE_INFO("LoadComplete, success:%d, type:%s\n", loadingSuccess, GetRequestTypeName(parameters.requestType));
+  }
+#endif
+
+  switch(parameters.requestType)
+  {
+    case Text::Async::RENDER_FIXED_SIZE:
+    case Text::Async::RENDER_FIXED_WIDTH:
+    case Text::Async::RENDER_CONSTRAINT:
+    {
+      mIsTextLoadingTaskRunning = false;
+      break;
+    }
+    case Text::Async::COMPUTE_NATURAL_SIZE:
+    {
+      mIsNaturalSizeTaskRunning = false;
+      break;
+    }
+    case Text::Async::COMPUTE_HEIGHT_FOR_WIDTH:
+    {
+      mIsHeightForWidthTaskRunning = false;
+      break;
+    }
+    default:
+    {
+      DALI_LOG_ERROR("Unexpected request type : %d\n", parameters.requestType);
+      break;
+    }
+  }
+
+  Toolkit::Visual::ResourceStatus resourceStatus;
+
+  if(loadingSuccess)
+  {
+    resourceStatus = Toolkit::Visual::ResourceStatus::READY;
+
+    Text::AsyncTextRenderInfo renderInfo = textInformation.renderInfo;
+
+    if(parameters.requestType == Text::Async::COMPUTE_NATURAL_SIZE || parameters.requestType == Text::Async::COMPUTE_HEIGHT_FOR_WIDTH)
+    {
+      if(mAsyncTextInterface)
+      {
+        mAsyncTextInterface->AsyncSizeComputed(renderInfo);
+        return;
+      }
+    }
+
+    Actor control = mControl.GetHandle();
+    if(!control)
+    {
+      // Nothing to do.
+      ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+      return;
+    }
+
+    // Calculate the size of the visual that can fit the text.
+    // The size of the text after it has been laid-out, size of pixel data buffer.
+    Size layoutSize(static_cast<float>(renderInfo.width), static_cast<float>(renderInfo.height));
+
+    // Calculate the offset for vertical alignment only, as the layout engine will do the horizontal alignment.
+    Vector2 alignmentOffset;
+    alignmentOffset.x = 0.0f;
+    alignmentOffset.y = (parameters.textHeight - layoutSize.y) * VERTICAL_ALIGNMENT_TABLE[parameters.verticalAlignment];
+
+    // Size of the text control including padding.
+    Vector2 textControlSize(parameters.textWidth + (parameters.padding.start + parameters.padding.end), parameters.textHeight + (parameters.padding.top + parameters.padding.bottom));
+
+    if(parameters.isAutoScrollEnabled)
+    {
+      // In case of auto scroll, the layout width (renderInfo's width) is the natural size of the text.
+      // Since the layout size is the size of the visual transform, it should be reset to the text area excluding padding.
+      layoutSize.width = parameters.textWidth;
+    }
+
+    Vector2 visualTransformOffset;
+    if(renderInfo.isCutout)
+    {
+      // When Cutout Enabled, the current visual must draw the entire control.
+      // so set the size to controlSize and offset to 0.
+      visualTransformOffset.x = 0.0f;
+      visualTransformOffset.y = 0.0f;
+
+      // The layout size is set to the text control size including padding.
+      layoutSize = textControlSize;
+    }
+    else
+    {
+      // This affects font rendering quality.
+      // It need to be integerized.
+      visualTransformOffset.x = roundf(parameters.padding.start + alignmentOffset.x);
+      visualTransformOffset.y = roundf(parameters.padding.top + alignmentOffset.y);
+    }
+
+    SetRequireRender(renderInfo.isCutout);
+
+    // Transform offset is used for subpixel data upload in text tiling.
+    // We should set the transform before creating a tiling texture.
+    Property::Map visualTransform;
+    visualTransform.Add(Toolkit::Visual::Transform::Property::SIZE, layoutSize)
+      .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
+      .Add(Toolkit::Visual::Transform::Property::OFFSET, visualTransformOffset)
+      .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
+      .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN)
+      .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN);
+    SetTransformAndSize(visualTransform, textControlSize);
+
+    Shader shader = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder().EnableMultiColor(renderInfo.hasMultipleTextColors).EnableEmoji(renderInfo.containsColorGlyph).EnableStyle(renderInfo.styleEnabled).EnableOverlay(renderInfo.isOverlayStyle));
+    mImpl->mRenderer.SetShader(shader);
+
+    // Remove the texture set and any renderer previously set.
+    RemoveRenderer(control, false);
+
+    // Get the maximum texture size.
+    const int maxTextureSize = Dali::GetMaxTextureSize();
+
+    // No tiling required. Use the default renderer.
+    if(renderInfo.height < static_cast<uint32_t>(maxTextureSize))
+    {
+      // Filter mode needs to be set to linear to produce better quality while scaling.
+      Sampler sampler = Sampler::New();
+      sampler.SetFilterMode(FilterMode::LINEAR, FilterMode::LINEAR);
+
+      TextureSet textureSet = TextureSet::New();
+
+      uint32_t textureSetIndex = 0u;
+      AddTexture(textureSet, renderInfo.textPixelData, sampler, textureSetIndex);
+      ++textureSetIndex;
+
+      if(mTextShaderFeatureCache.IsEnabledStyle())
+      {
+        // Create RGBA texture for all the text styles that render in the background (without the text itself)
+        AddTexture(textureSet, renderInfo.stylePixelData, sampler, textureSetIndex);
+        ++textureSetIndex;
+      }
+      if(mTextShaderFeatureCache.IsEnabledOverlay())
+      {
+        // Create RGBA texture for overlay styles such as underline and strikethrough (without the text itself)
+        AddTexture(textureSet, renderInfo.overlayStylePixelData, sampler, textureSetIndex);
+        ++textureSetIndex;
+      }
+
+      if(mTextShaderFeatureCache.IsEnabledEmoji() && !mTextShaderFeatureCache.IsEnabledMultiColor())
+      {
+        // Create a L8 texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
+        AddTexture(textureSet, renderInfo.maskPixelData, sampler, textureSetIndex);
+      }
+
+      mImpl->mRenderer.SetTextures(textureSet);
+      // Register transform properties
+      mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+      mImpl->mRenderer.SetProperty(mHasMultipleTextColorsIndex, static_cast<float>(mTextShaderFeatureCache.IsEnabledMultiColor()));
+      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+
+      mRendererList.push_back(mImpl->mRenderer);
+    }
+    else
+    {
+      // Filter mode needs to be set to linear to produce better quality while scaling.
+      Sampler sampler = Sampler::New();
+      sampler.SetFilterMode(FilterMode::LINEAR, FilterMode::LINEAR);
+
+      int verifiedWidth  = static_cast<int>(renderInfo.width);
+      int verifiedHeight = static_cast<int>(renderInfo.height);
+
+      // Set information for creating textures.
+      TilingInfo info(verifiedWidth, maxTextureSize);
+
+      // Get the pixel data of text.
+      info.textPixelData = renderInfo.textPixelData;
+
+      if(mTextShaderFeatureCache.IsEnabledStyle())
+      {
+        info.stylePixelData = renderInfo.stylePixelData;
+      }
+
+      if(mTextShaderFeatureCache.IsEnabledOverlay())
+      {
+        info.overlayStylePixelData = renderInfo.overlayStylePixelData;
+      }
+
+      if(mTextShaderFeatureCache.IsEnabledEmoji() && !mTextShaderFeatureCache.IsEnabledMultiColor())
+      {
+        info.maskPixelData = renderInfo.maskPixelData;
+      }
+
+      // Get the current offset for recalculate the offset when tiling.
+      Property::Map retMap;
+      mImpl->mTransform.GetPropertyMap(retMap);
+      Property::Value* offsetValue = retMap.Find(Dali::Toolkit::Visual::Transform::Property::OFFSET);
+      if(offsetValue)
+      {
+        offsetValue->Get(info.transformOffset);
+      }
+
+      // Create a textureset in the default renderer.
+      CreateTextureSet(info, mImpl->mRenderer, sampler);
+
+      verifiedHeight -= maxTextureSize;
+
+      Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
+
+      // Create a renderer by cutting maxTextureSize.
+      while(verifiedHeight > 0)
+      {
+        VisualRenderer tilingRenderer = VisualRenderer::New(geometry, shader);
+        tilingRenderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT);
+        // New offset position of buffer for tiling.
+        info.offsetHeight += static_cast<uint32_t>(maxTextureSize);
+        // New height for tiling.
+        info.height = (verifiedHeight - maxTextureSize) > 0 ? maxTextureSize : verifiedHeight;
+        // New offset for tiling.
+        info.transformOffset.y += static_cast<float>(maxTextureSize);
+
+        // Create a textureset int the new tiling renderer.
+        CreateTextureSet(info, tilingRenderer, sampler);
+
+        verifiedHeight -= maxTextureSize;
+      }
+    }
+
+    mImpl->mFlags &= ~Visual::Base::Impl::IS_ATLASING_APPLIED;
+
+    const Vector4& defaultColor = parameters.textColor;
+
+    for(RendererContainer::iterator iter = mRendererList.begin(); iter != mRendererList.end(); ++iter)
+    {
+      Renderer renderer = (*iter);
+      if(renderer)
+      {
+        control.AddRenderer(renderer);
+
+        if(renderer != mImpl->mRenderer)
+        {
+          // Set constraint for text label's color for non-default renderers.
+          if(mAnimatableTextColorPropertyIndex != Property::INVALID_INDEX)
+          {
+            // Register unique property, or get property for default renderer.
+            Property::Index index = renderer.RegisterUniqueProperty("uTextColorAnimatable", defaultColor);
+
+            // Create constraint for the animatable text's color Property with uTextColorAnimatable in the renderer.
+            if(index != Property::INVALID_INDEX)
+            {
+              Constraint colorConstraint = Constraint::New<Vector4>(renderer, index, TextColorConstraint);
+              colorConstraint.AddSource(Source(control, mAnimatableTextColorPropertyIndex));
+              colorConstraint.Apply();
+            }
+
+            // Make zero if the alpha value of text color is zero to skip rendering text
+            // VisualRenderer::Property::OPACITY uses same animatable property internally.
+            Constraint opacityConstraint = Constraint::New<float>(renderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint);
+            opacityConstraint.AddSource(Source(control, mAnimatableTextColorPropertyIndex));
+            opacityConstraint.AddSource(Source(mImpl->mRenderer, mTextRequireRenderPropertyIndex));
+            opacityConstraint.Apply();
+          }
+        }
+      }
+    }
+
+    if(mAsyncTextInterface && parameters.isAutoScrollEnabled)
+    {
+      mAsyncTextInterface->AsyncSetupAutoScroll(renderInfo);
+    }
+
+    if(mAsyncTextInterface && parameters.isTextFitEnabled)
+    {
+      mAsyncTextInterface->AsyncTextFitChanged(parameters.fontSize);
+    }
+
+    if(mAsyncTextInterface)
+    {
+      mAsyncTextInterface->AsyncLoadComplete(renderInfo);
+    }
+
+    // Ignore current result when user re-request async load during load complete callback.
+    if(mIsTextLoadingTaskRunning)
+    {
+      // Remove the texture set and any renderer previously set.
+      RemoveRenderer(control, true);
+      return;
+    }
+  }
+  else
+  {
+    resourceStatus = Toolkit::Visual::ResourceStatus::FAILED;
+  }
+
+  // Signal to observers ( control ) that resources are ready. Must be all resources.
+  ResourceReady(resourceStatus);
+}
+
+void TextVisual::SetAsyncTextInterface(Text::AsyncTextInterface* asyncTextInterface)
+{
+  mAsyncTextInterface = asyncTextInterface;
+}
+
+void TextVisual::RequestAsyncSizeComputation(Text::AsyncTextParameters& parameters)
+{
+#ifdef TRACE_ENABLED
+  if(gTraceFilter2 && gTraceFilter2->IsTraceEnabled())
+  {
+    DALI_LOG_RELEASE_INFO("Request size computation, type:%s\n", GetRequestTypeName(parameters.requestType));
+  }
+#endif
+
+  switch(parameters.requestType)
+  {
+    case Text::Async::COMPUTE_NATURAL_SIZE:
+    {
+      if(mIsNaturalSizeTaskRunning)
+      {
+        Text::AsyncTextManager::Get().RequestCancel(mNaturalSizeTaskId);
+      }
+      mIsNaturalSizeTaskRunning = true;
+
+      TextLoadObserver* textLoadObserver = this;
+      mNaturalSizeTaskId                 = Text::AsyncTextManager::Get().RequestLoad(parameters, textLoadObserver);
+      break;
+    }
+    case Text::Async::COMPUTE_HEIGHT_FOR_WIDTH:
+    {
+      if(mIsHeightForWidthTaskRunning)
+      {
+        Text::AsyncTextManager::Get().RequestCancel(mHeightForWidthTaskId);
+      }
+      mIsHeightForWidthTaskRunning = true;
+
+      TextLoadObserver* textLoadObserver = this;
+      mHeightForWidthTaskId              = Text::AsyncTextManager::Get().RequestLoad(parameters, textLoadObserver);
+      break;
+    }
+    default:
+    {
+      DALI_LOG_ERROR("Unexpected request type : %d\n", parameters.requestType);
+      break;
+    }
+  }
+}
+
+bool TextVisual::UpdateAsyncRenderer(Text::AsyncTextParameters& parameters)
+{
+  Actor control = mControl.GetHandle();
+  if(!control)
+  {
+    // Nothing to do.
+    ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+    return false;
+  }
+
+  if((fabsf(parameters.textWidth) < Math::MACHINE_EPSILON_1000) || (fabsf(parameters.textHeight) < Math::MACHINE_EPSILON_1000) ||
+     parameters.text.empty())
+  {
+    if(mIsTextLoadingTaskRunning)
+    {
+      Text::AsyncTextManager::Get().RequestCancel(mTextLoadingTaskId);
+      mIsTextLoadingTaskRunning = false;
+    }
+
+    // Remove the texture set and any renderer previously set.
+    RemoveRenderer(control, true);
+
+    // Nothing else to do if the relayout size is zero.
+    ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+
+    if(mAsyncTextInterface)
+    {
+      Text::AsyncTextRenderInfo renderInfo;
+      if(parameters.requestType == Text::Async::RENDER_FIXED_SIZE)
+      {
+        renderInfo.renderedSize = Size(parameters.textWidth, parameters.textHeight);
+      }
+      else if(parameters.requestType == Text::Async::RENDER_FIXED_WIDTH)
+      {
+        renderInfo.renderedSize = Size(parameters.textWidth, 0.0f);
+      }
+      else
+      {
+        renderInfo.renderedSize = Size::ZERO;
+      }
+
+      renderInfo.manualRendered = parameters.manualRender;
+      mAsyncTextInterface->AsyncLoadComplete(renderInfo);
+    }
+
+    return true;
+  }
+
+  // Get the maximum texture size.
+  const int maxTextureSize = Dali::GetMaxTextureSize();
+
+  if(parameters.textWidth > maxTextureSize)
+  {
+    DALI_LOG_WARNING("layoutSize(%f) > maxTextureSize(%d): To guarantee the behavior of Texture::New, layoutSize must not be bigger than maxTextureSize\n", parameters.textWidth, maxTextureSize);
+    parameters.textWidth = maxTextureSize;
+  }
+
+  // This does not mean whether task is actually running or waiting.
+  // It is whether text visual received a completion callback after requesting a task.
+  if(mIsTextLoadingTaskRunning)
+  {
+    Text::AsyncTextManager::Get().RequestCancel(mTextLoadingTaskId);
+  }
+
+#ifdef TRACE_ENABLED
+  if(gTraceFilter2 && gTraceFilter2->IsTraceEnabled())
+  {
+    DALI_LOG_RELEASE_INFO("Request render, type:%s\n", GetRequestTypeName(parameters.requestType));
+  }
+#endif
+
+  mIsTextLoadingTaskRunning          = true;
+  TextLoadObserver* textLoadObserver = this;
+  mTextLoadingTaskId                 = Text::AsyncTextManager::Get().RequestLoad(parameters, textLoadObserver);
+
+  return true;
 }
 
 void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle)
@@ -704,7 +1165,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     TextureSet textureSet = GetTextTexture(size);
 
     mImpl->mRenderer.SetTextures(textureSet);
-    //Register transform properties
+    // Register transform properties
     mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
     mImpl->mRenderer.SetProperty(mHasMultipleTextColorsIndex, static_cast<float>(hasMultipleTextColors));
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
@@ -731,7 +1192,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     int verifiedHeight = data.GetHeight();
 
     // Set information for creating textures.
-    TilingInfo info(verifiedWidth, maxTextureSize, textPixelFormat);
+    TilingInfo info(verifiedWidth, maxTextureSize);
 
     // Get the pixel data of text.
     info.textPixelData = data;
@@ -914,10 +1375,14 @@ Shader TextVisual::GetTextShader(VisualFactoryCache& factoryCache, const TextVis
 
 void TextVisual::SetRequireRender(bool requireRender)
 {
-  mTextRequireRender = requireRender;
-  if(mImpl->mRenderer)
+  // Avoid function calls if there is no change.
+  if(mTextRequireRender != requireRender)
   {
-    mImpl->mRenderer.SetProperty(mTextRequireRenderPropertyIndex, mTextRequireRender);
+    mTextRequireRender = requireRender;
+    if(mImpl->mRenderer)
+    {
+      mImpl->mRenderer.SetProperty(mTextRequireRenderPropertyIndex, mTextRequireRender);
+    }
   }
 }
 

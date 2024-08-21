@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,8 @@ struct BreakInfoData
 
 bool LineBreakInfoTest( const BreakInfoData& data )
 {
+  TextAbstraction::Segmentation segmentation = TextAbstraction::Segmentation::Get();
+
   // 1) Convert to utf32
   Vector<Character> utf32;
   utf32.Resize( data.text.size() );
@@ -67,7 +69,8 @@ bool LineBreakInfoTest( const BreakInfoData& data )
   Vector<LineBreakInfo> lineBreakInfo;
   lineBreakInfo.Resize( numberOfCharacters );
 
-  SetLineBreakInfo( utf32,
+  SetLineBreakInfo( segmentation,
+                    utf32,
                     0u,
                     numberOfCharacters,
                     lineBreakInfo );
@@ -81,7 +84,8 @@ bool LineBreakInfoTest( const BreakInfoData& data )
                          lineBreakInfo.Begin() + data.index + data.numberOfCharacters );
 
     // Update the word line info.
-    SetLineBreakInfo( utf32,
+    SetLineBreakInfo( segmentation,
+                      utf32,
                       data.index,
                       data.numberOfCharacters,
                       lineBreakInfo );
@@ -110,6 +114,8 @@ bool LineBreakInfoTest( const BreakInfoData& data )
 
 bool WordBreakInfoTest( const BreakInfoData& data )
 {
+  TextAbstraction::Segmentation segmentation = TextAbstraction::Segmentation::Get();
+
   // 1) Convert to utf32
   Vector<Character> utf32;
   utf32.Resize( data.text.size() );
@@ -125,7 +131,8 @@ bool WordBreakInfoTest( const BreakInfoData& data )
   Vector<WordBreakInfo> wordBreakInfo;
   wordBreakInfo.Resize( numberOfCharacters );
 
-  SetWordBreakInfo( utf32,
+  SetWordBreakInfo( segmentation,
+                    utf32,
                     0u,
                     numberOfCharacters,
                     wordBreakInfo );
@@ -139,7 +146,8 @@ bool WordBreakInfoTest( const BreakInfoData& data )
                          wordBreakInfo.Begin() + data.index + data.numberOfCharacters );
 
     // Update the word break info.
-    SetWordBreakInfo( utf32,
+    SetWordBreakInfo( segmentation,
+                      utf32,
                       data.index,
                       data.numberOfCharacters,
                       wordBreakInfo );

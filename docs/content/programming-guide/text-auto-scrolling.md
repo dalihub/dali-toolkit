@@ -26,18 +26,18 @@ text complete it's current scrolling loop then stop.
 
 ## The additional properties below can be set to customize the scrolling behaviour
 
-#### AUTO_SCROLL_SPEED
+### AUTO_SCROLL_SPEED
 
 This controls the speed of the scrolling, the speed should be provided as pixels/second.
 
-#### AUTO_SCROLL_LOOP_COUNT
+### AUTO_SCROLL_LOOP_COUNT
 
 This specifies how many times the text will complete a full scroll cycle.
 If not set then it will keep scrolling until ENABLE_AUTO_SCROLL is set to false.
 
 Setting ENABLE_AUTO_SCROLL to false will stop scrolling whilst still maintaining the original loop count value for when it is next started.
 
-#### AUTO_SCROLL_GAP
+### AUTO_SCROLL_GAP
 
 This specifies the amount of whitespace to display before the scrolling text is shown again.
 

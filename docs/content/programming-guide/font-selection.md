@@ -62,7 +62,7 @@ label.SetProperty( TextLabel::Property::POINT_SIZE,  12.0f );
 
 However the text control will fall-back to using the default font, if the requested font does not support the required scripts.
 
-### Font Styles
+## Font Styles
 
 Setting a font size programmatically is not ideal for applications which support multiple
 screen resolutions and platforms which support multiple logical font sizes.  Also, any

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/text/text-view.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/public-api/math/vector2.h>
 #include <memory.h>
 
@@ -383,13 +382,16 @@ View::View()
     : mImpl(NULL)
 {
   mImpl = new View::Impl();
-
-  mImpl->mFontClient = TextAbstraction::FontClient::Get();
 }
 
 View::~View()
 {
   delete mImpl;
+}
+
+void View::SetFontClient(TextAbstraction::FontClient& fontClient)
+{
+  mImpl->mFontClient = fontClient;
 }
 
 void View::SetVisualModel(VisualModelPtr visualModel)

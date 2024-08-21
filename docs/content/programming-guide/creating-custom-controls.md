@@ -19,7 +19,7 @@ Namespaces are important
   + MyUIControl
   + Internal::MyUIControl
  
-### General Guidelines:
+## General Guidelines:
 + Try to avoid adding C++ APIs as they become difficult to maintain.
   + Use **properties** as much as possible as Controls should be data driven.
   + These controls will be used through JSON files so need to be compatible.

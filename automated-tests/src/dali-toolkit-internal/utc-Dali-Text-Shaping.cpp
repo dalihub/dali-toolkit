@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,10 +207,14 @@ bool ShapeInfoTest(const ShapeInfoData& data)
   }
 
   // 3) Call the ShapeText() function.
+  TextAbstraction::Shaping    shaping    = TextAbstraction::Shaping::Get();
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
   Vector<GlyphIndex> newParagraphGlyphs;
 
-  ShapeText(logicalModel->mText,
+  ShapeText(shaping,
+            fontClient,
+            logicalModel->mText,
             logicalModel->mLineBreakInfo,
             logicalModel->mScriptRuns,
             logicalModel->mFontRuns,

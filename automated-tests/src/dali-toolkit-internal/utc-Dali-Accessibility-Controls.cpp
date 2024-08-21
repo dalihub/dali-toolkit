@@ -709,11 +709,11 @@ int UtcDaliAccessibilityTextAnchor(void)
   DALI_TEST_EQUALS(hyperlink->IsValid(), true, TEST_LOCATION);
   auto action = dynamic_cast<Dali::Accessibility::Action*>(accessible);
   // activation of valid hyperlink
-  DALI_TEST_CHECK(action->DoAction("accessibilityActivated"));
+  DALI_TEST_CHECK(action->DoAction("activate"));
   // making hyperlink invalid
   textanchor.SetProperty(Toolkit::TextAnchor::Property::URI, "");
   DALI_TEST_EQUALS(hyperlink->IsValid(), false, TEST_LOCATION);
-  DALI_TEST_CHECK(!action->DoAction("accessibilityActivated"));
+  DALI_TEST_CHECK(!action->DoAction("activate"));
 
   Dali::Accessibility::TestEnableSC(false);
 

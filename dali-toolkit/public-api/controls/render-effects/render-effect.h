@@ -34,19 +34,18 @@ namespace Internal DALI_INTERNAL
 {
 class Control;
 class RenderEffectImpl;
-} // namespace DALI_INTERNAL
+} // namespace Internal DALI_INTERNAL
 
 /**
  * @brief
  * RenderEffect is an interface for visual effects.
- * You do not ::New() an interface.
  *
  * Each effect has a single owner Control.
  *
  * Used internal at:
  * Toolkit::Control::SetRenderEffect(Toolkit::RenderEffect effect);
  * Toolkit::Control::ClearRenderEffect();
- *
+ * @note RenderEffect is interface class without constructor. Create resource by subclass.
  * @SINCE_2_3.28
  */
 class DALI_TOOLKIT_API RenderEffect : public BaseHandle
@@ -85,4 +84,4 @@ public: // Not intended for Application developers
 } // namespace Toolkit
 } // namespace Dali
 
-#endif //DALI_TOOLKIT_RENDER_EFFECT_H
+#endif // DALI_TOOLKIT_RENDER_EFFECT_H

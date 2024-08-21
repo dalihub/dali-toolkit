@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_BIDIRECTIONAL_SUPPORT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/text-abstraction/bidirectional-support.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/common/dali-vector.h>
 
@@ -37,6 +38,7 @@ namespace Text
 /**
  * Sets the bidirectional info into the logical model.
  *
+ * @param[in] bidirectionalSupport BidirectionalSupport to use in this function.
  * @param[in] text Vector of UTF-32 characters.
  * @param[in] scripts Vector containing the script runs for the whole text.
  * @param[in] lineBreakInfo The line break info.
@@ -46,7 +48,8 @@ namespace Text
  * @param[in] matchLayoutDirection Whether match for layout direction or not.
  * @param[in] layoutDirection The direction of the layout.
  */
-void SetBidirectionalInfo(const Vector<Character>&               text,
+void SetBidirectionalInfo(TextAbstraction::BidirectionalSupport& bidirectionalSupport,
+                          const Vector<Character>&               text,
                           const Vector<ScriptRun>&               scripts,
                           const Vector<LineBreakInfo>&           lineBreakInfo,
                           CharacterIndex                         startIndex,
@@ -58,6 +61,7 @@ void SetBidirectionalInfo(const Vector<Character>&               text,
 /**
  * @brief Sets the visual to logical map table for a given line.
  *
+ * @param[in] bidirectionalSupport BidirectionalSupport to use in this function.
  * @param[in] bidirectionalParagraphInfo The paragraph's bidirectional info.
  * @param[out] lineInfoRuns Line runs with the visual to logical conversion maps.
  * @param[in] bidiLineIndex Index to the line's bidirectional info.
@@ -67,18 +71,20 @@ void SetBidirectionalInfo(const Vector<Character>&               text,
  * @param[in] numberOfCharactersInSecondHalfLine The number of characters for the second half of line..
  * @param[in] direction The direction of the line.
  */
-void ReorderLine(const BidirectionalParagraphInfoRun& bidirectionalParagraphInfo,
-                 Vector<BidirectionalLineInfoRun>&    lineInfoRuns,
-                 BidirectionalLineRunIndex            bidiLineIndex,
-                 CharacterIndex                       startIndex,
-                 Length                               numberOfCharacters,
-                 CharacterIndex                       startIndexInSecondHalfLine,
-                 Length                               numberOfCharactersInSecondHalfLine,
-                 CharacterDirection                   direction);
+void ReorderLine(TextAbstraction::BidirectionalSupport& bidirectionalSupport,
+                 const BidirectionalParagraphInfoRun&   bidirectionalParagraphInfo,
+                 Vector<BidirectionalLineInfoRun>&      lineInfoRuns,
+                 BidirectionalLineRunIndex              bidiLineIndex,
+                 CharacterIndex                         startIndex,
+                 Length                                 numberOfCharacters,
+                 CharacterIndex                         startIndexInSecondHalfLine,
+                 Length                                 numberOfCharactersInSecondHalfLine,
+                 CharacterDirection                     direction);
 
 /**
  * @brief Replaces any character in the right to left paragraphs which could be mirrored.
  *
+ * @param[in] bidirectionalSupport BidirectionalSupport to use in this function.
  * @param[in] text The text.
  * @param[in] directions Vector with the direction of each paragraph.
  * @param[in] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
@@ -88,7 +94,8 @@ void ReorderLine(const BidirectionalParagraphInfoRun& bidirectionalParagraphInfo
  *
  * @return @e true if a character has been replaced.
  */
-bool GetMirroredText(const Vector<Character>&                     text,
+bool GetMirroredText(TextAbstraction::BidirectionalSupport&       bidirectionalSupport,
+                     const Vector<Character>&                     text,
                      const Vector<CharacterDirection>&            directions,
                      const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
                      CharacterIndex                               startIndex,
@@ -101,13 +108,15 @@ bool GetMirroredText(const Vector<Character>&                     text,
  * @pre The @p logicalModel needs to have a text set.
  * @pre The @p logicalModel needs to have the bidirectional info indices for each paragraph set.
  *
+ * @param[in] bidirectionalSupport BidirectionalSupport to use in this function.
  * @param[in] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
  * @param[in] totalNumberOfCharacters The number of characters of the whole text.
  * @param[in] startIndex The character from where the direction info is set.
  * @param[in] numberOfCharacters The number of characters.
  * @param[out] directions The direction, @e false is left to right and @e true is right to left, of each character of the paragraph.
  */
-void GetCharactersDirection(const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+void GetCharactersDirection(TextAbstraction::BidirectionalSupport&       bidirectionalSupport,
+                            const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
                             Length                                       totalNumberOfCharacters,
                             CharacterIndex                               startIndex,
                             Length                                       numberOfCharacters,

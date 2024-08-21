@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SHAPER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/text-abstraction/shaping.h>
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
@@ -37,6 +39,8 @@ class VisualModel;
 /**
  * Shapes the whole text.
  *
+ * @param[in] shaping Shaping to use in this function.
+ * @param[in] fontClient FontClient to use in this function.
  * @param[in] text Vector of UTF-32 characters.
  * @param[in] lineBreakInfo The line break info.
  * @param[in] scripts Vector containing the script runs for the whole text.
@@ -49,7 +53,9 @@ class VisualModel;
  * @param[out] charactersPerGlyph Vector containing the number of characters per glyph.
  * @param[out] newParagraphGlyphs Vector containing the indices to the new paragraph glyphs.
  */
-void ShapeText(const Vector<Character>&     text,
+void ShapeText(TextAbstraction::Shaping&    shaping,
+               TextAbstraction::FontClient& fontClient,
+               const Vector<Character>&     text,
                const Vector<LineBreakInfo>& lineBreakInfo,
                const Vector<ScriptRun>&     scripts,
                const Vector<FontRun>&       fonts,

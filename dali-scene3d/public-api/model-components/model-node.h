@@ -243,7 +243,7 @@ public: // Public Method
    * @brief Sets whether this ModelNode casts shadow or not.
    * If it is true, this ModelNode is drawn on Shadow Map.
    *
-   * @SINCE_2_3.99
+   * @SINCE_2_3.37
    * @param[in] castShadow Whether this ModelNode casts shadow or not.
    * @note This method affects only for this ModelNode.
    */
@@ -252,7 +252,7 @@ public: // Public Method
   /**
    * @brief Retrieves whether the ModelNode cast shadow or not for Light.
    *
-   * @SINCE_2_3.99
+   * @SINCE_2_3.37
    * @return True if this ModelNode cast shadow.
    * @note IBL does not cast any shadow.
    */
@@ -262,7 +262,7 @@ public: // Public Method
    * @brief Sets whether this ModelNode receives shadow or not.
    * If it is true, shadows are drawn on this ModelNode.
    *
-   * @SINCE_2_3.99
+   * @SINCE_2_3.37
    * @param[in] receiveShadow Whether this ModelNode receives shadow or not.
    * @note This method affects only for this ModelNode.
    */
@@ -271,7 +271,7 @@ public: // Public Method
   /**
    * @brief Retrieves whether the ModelNode receives shadow or not for Light.
    *
-   * @SINCE_2_3.99
+   * @SINCE_2_3.37
    * @return True if this ModelNode receives shadow.
    */
   bool IsShadowReceiving() const;

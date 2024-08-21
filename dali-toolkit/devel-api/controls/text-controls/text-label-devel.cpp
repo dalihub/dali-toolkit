@@ -35,6 +35,21 @@ TextFitChangedSignalType& TextFitChangedSignal(TextLabel textLabel)
   return GetImpl(textLabel).TextFitChangedSignal();
 }
 
+AsyncTextRenderedSignalType& AsyncTextRenderedSignal(TextLabel textLabel)
+{
+  return GetImpl(textLabel).AsyncTextRenderedSignal();
+}
+
+AsyncNaturalSizeComputedSignalType& AsyncNaturalSizeComputedSignal(TextLabel textLabel)
+{
+  return GetImpl(textLabel).AsyncNaturalSizeComputedSignal();
+}
+
+AsyncHeightForWidthComputedSignalType& AsyncHeightForWidthComputedSignal(TextLabel textLabel)
+{
+  return GetImpl(textLabel).AsyncHeightForWidthComputedSignal();
+}
+
 Vector<Vector2> GetTextSize(TextLabel textLabel, const uint32_t startIndex, const uint32_t endIndex)
 {
   return GetImpl(textLabel).GetTextSize(startIndex, endIndex);
@@ -83,6 +98,31 @@ void SetRemoveBackInset(TextLabel textLabel, const bool remove)
 bool IsRemoveBackInset(TextLabel textLabel)
 {
   return GetImpl(textLabel).IsRemoveBackInset();
+}
+
+void RequestAsyncRenderWithFixedSize(TextLabel textLabel, float width, float height)
+{
+  GetImpl(textLabel).RequestAsyncRenderWithFixedSize(width, height);
+}
+
+void RequestAsyncRenderWithFixedWidth(TextLabel textLabel, float width, float heightConstraint)
+{
+  GetImpl(textLabel).RequestAsyncRenderWithFixedWidth(width, heightConstraint);
+}
+
+void RequestAsyncRenderWithConstraint(TextLabel textLabel, float widthConstraint, float heightConstraint)
+{
+  GetImpl(textLabel).RequestAsyncRenderWithConstraint(widthConstraint, heightConstraint);
+}
+
+void RequestAsyncNaturalSize(TextLabel textLabel)
+{
+  GetImpl(textLabel).RequestAsyncNaturalSize();
+}
+
+void RequestAsyncHeightForWidth(TextLabel textLabel, float width)
+{
+  GetImpl(textLabel).RequestAsyncHeightForWidth(width);
 }
 
 } // namespace DevelTextLabel

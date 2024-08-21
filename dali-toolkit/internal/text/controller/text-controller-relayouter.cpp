@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -826,8 +826,10 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
       return true;
     }
 
+    TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+
     // Set the layout parameters.
-    Layout::Parameters layoutParameters(size, impl.mModel);
+    Layout::Parameters layoutParameters(size, impl.mModel, impl.mFontClient, bidirectionalSupport);
 
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = visualModel->mGlyphPositions;
@@ -877,13 +879,14 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
     }
 
     Size newLayoutSize;
-    viewUpdated               = impl.mLayoutEngine.LayoutText(layoutParameters,
+    viewUpdated = impl.mLayoutEngine.LayoutText(layoutParameters,
                                                 newLayoutSize,
                                                 elideTextEnabled,
                                                 isAutoScrollEnabled,
                                                 isAutoScrollMaxTextureExceeded,
                                                 isHiddenInputEnabled,
                                                 ellipsisPosition);
+
     impl.mIsAutoScrollEnabled = isAutoScrollEnabled;
     layoutTooSmall = !viewUpdated;
 

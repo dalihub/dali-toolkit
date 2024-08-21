@@ -417,7 +417,7 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
     }
     mTextureSet.SetTexture(textureCount++, mShadowMapTexture);
 
-    Texture brdfTexture = Scene3D::Loader::EnvironmentDefinition::GetBrdfTexture();
+    Texture brdfTexture = Dali::Scene3D::Internal::ImageResourceLoader::GetDefaultBrdfTexture();
     if(!mSpecularTexture || !mDiffuseTexture)
     {
       Texture iblTexture = Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyCubeTextureWhiteRGB();

@@ -521,6 +521,13 @@ public: // Configure the text controller.
   float GetTextFitPointSize() const;
 
   /**
+   * @brief Sets the text fit point size.
+   *
+   * @param[in] pointSize The fited point size.
+   */
+  void SetTextFitPointSize(float pointSize);
+
+  /**
    * @brief Sets whether the text fit properties have changed.
    *
    * @param[in] changed Whether to changed the text fit.
@@ -808,6 +815,14 @@ public: // Update.
    * @param[out] text A string of UTF-8 characters.
    */
   void GetText(std::string& text) const;
+
+  /**
+   * @brief Retrieve raw text previously set.
+   *
+   * @note Raw text including markup tag.
+   * @param[out] text A string of UTF-8 characters.
+   */
+  void GetRawText(std::string& text) const;
 
   /**
    * @brief Retrieves number of characters previously set.
@@ -1997,6 +2012,22 @@ public: // Queries & retrieves.
    * @return The value of showing real text.
    */
   bool IsShowingRealText() const;
+
+  /**
+   * @brief Sets the render mode of the text.
+   *
+   * By default is DevelTextLabel::Render::Sync.
+   *
+   * @param[in] renderMode Render mode of the text.
+   */
+  void SetRenderMode(DevelTextLabel::Render::Mode renderMode);
+
+  /**
+   * @brief Gets the render mode of the text.
+   * @return The value of render mode of the text.
+   */
+  DevelTextLabel::Render::Mode GetRenderMode();
+
 
 public: // Relayout.
   /**

@@ -291,13 +291,15 @@ Dali::NativeImageSourceQueue::ColorFormat GlView::GetColorFormat(Dali::Toolkit::
   {
     case Toolkit::GlView::ColorFormat::RGBA8888:
     {
-      return Dali::NativeImageSourceQueue::ColorFormat::RGBA8888;
+      // TODO : Shouldn't it be RGBA8888?
+      return Dali::NativeImageSourceQueue::ColorFormat::BGRA8888;
     }
 
     case Toolkit::GlView::ColorFormat::RGB888:
     default:
     {
-      return Dali::NativeImageSourceQueue::ColorFormat::RGBX8888;
+      // TODO : Shouldn't it be RGBX8888?
+      return Dali::NativeImageSourceQueue::ColorFormat::BGRX8888;
     }
   }
 }

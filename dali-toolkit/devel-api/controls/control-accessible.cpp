@@ -41,6 +41,10 @@ namespace Dali::Toolkit::DevelControl
 {
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_CONTROL_ACCESSIBLE");
+#endif
+
 constexpr const char* ATTR_IMG_SRC_KEY = "imgSrc";
 
 std::string GetLocaleText(std::string string, const char* domain = "dali-toolkit")
@@ -509,9 +513,23 @@ std::vector<Dali::Accessibility::Relation> ControlAccessible::GetRelationSet()
   return DevelControl::GetAccessibilityRelations(control);
 }
 
+bool ControlAccessible::IsScrollable() const
+{
+  return Self().GetProperty<bool>(Toolkit::DevelControl::Property::ACCESSIBILITY_SCROLLABLE);
+}
+
 bool ControlAccessible::ScrollToChild(Actor child)
 {
-  return false;
+  auto control = Dali::Toolkit::Control::DownCast(Self());
+  bool success = false;
+
+  if(!DevelControl::AccessibilityActionSignal(control).Empty())
+  {
+    success = DevelControl::AccessibilityActionSignal(control).Emit({Accessibility::ActionType::SCROLL_TO_CHILD, child});
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Performed AccessibilityAction: scrollToChild, success : %d\n", success);
+  }
+
+  return success;
 }
 
 Dali::Property::Index ControlAccessible::GetNamePropertyIndex()

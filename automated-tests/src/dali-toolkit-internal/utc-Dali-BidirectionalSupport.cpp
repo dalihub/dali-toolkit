@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,10 @@ bool SetBidirectionalInfoTest(const SetBidirectionalInfoData& data)
   }
 
   // 3) Call the SetBidirectionalInfo() function.
-  SetBidirectionalInfo(logicalModel->mText,
+  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+
+  SetBidirectionalInfo(bidirectionalSupport,
+                       logicalModel->mText,
                        logicalModel->mScriptRuns,
                        logicalModel->mLineBreakInfo,
                        data.startIndex,
@@ -139,8 +142,6 @@ bool SetBidirectionalInfoTest(const SetBidirectionalInfoData& data)
                        bidirectionalInfo);
 
   // 4) Compare with the expected results.
-  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
-
   if(data.numberOfParagraphs != bidirectionalInfo.Count())
   {
     // Different number of expected bidirectional paragraphs.
@@ -213,17 +214,21 @@ bool GetMirroredTextTest(const GetMirroredTextData& data)
   VisualModelPtr  visualModel  = textModel->mVisualModel;
 
   // 2) Call the GetMirroredText() function for the whole text
+  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+
   Vector<Character> mirroredText;
   bool              mirrored = false;
-  mirrored                   = GetMirroredText(logicalModel->mText,
-                             logicalModel->mCharacterDirections,
-                             logicalModel->mBidirectionalParagraphInfo,
-                             0u,
-                             logicalModel->mText.Count(),
-                             mirroredText);
+  mirrored                   = GetMirroredText(bidirectionalSupport,
+                                               logicalModel->mText,
+                                               logicalModel->mCharacterDirections,
+                                               logicalModel->mBidirectionalParagraphInfo,
+                                               0u,
+                                               logicalModel->mText.Count(),
+                                               mirroredText);
 
   // 3) Call the GetMirroredText() function for the given index + number of characters
-  mirrored = GetMirroredText(logicalModel->mText,
+  mirrored = GetMirroredText(bidirectionalSupport,
+                             logicalModel->mText,
                              logicalModel->mCharacterDirections,
                              logicalModel->mBidirectionalParagraphInfo,
                              data.startIndex,
@@ -306,8 +311,10 @@ bool GetCharactersDirectionTest(const GetCharactersDirectionData& data)
   }
 
   // 3) Call GetCharactersDirection() function.
+  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
 
-  GetCharactersDirection(bidirectionalInfo,
+  GetCharactersDirection(bidirectionalSupport,
+                         bidirectionalInfo,
                          logicalModel->mText.Count(),
                          data.startIndex,
                          data.numberOfCharacters,

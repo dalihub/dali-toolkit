@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/text-abstraction/bidirectional-support.h>
 #include <memory.h>
 
 namespace Dali
@@ -28,7 +27,9 @@ namespace Toolkit
 {
 namespace Text
 {
-void SetBidirectionalInfo(const Vector<Character>&               text,
+
+void SetBidirectionalInfo(TextAbstraction::BidirectionalSupport& bidirectionalSupport,
+                          const Vector<Character>&               text,
                           const Vector<ScriptRun>&               scripts,
                           const Vector<LineBreakInfo>&           lineBreakInfo,
                           CharacterIndex                         startIndex,
@@ -65,9 +66,6 @@ void SetBidirectionalInfo(const Vector<Character>&               text,
 
   // Pointer to the line break info buffer.
   const LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
-
-  // Handle to the bidirectional info module in text-abstraction.
-  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
 
   const CharacterIndex lastCharacter = startIndex + numberOfCharacters;
 
@@ -142,18 +140,16 @@ void SetBidirectionalInfo(const Vector<Character>&               text,
   }
 }
 
-void ReorderLine(const BidirectionalParagraphInfoRun& bidirectionalParagraphInfo,
-                 Vector<BidirectionalLineInfoRun>&    lineInfoRuns,
-                 BidirectionalLineRunIndex            bidiLineIndex,
-                 CharacterIndex                       startIndex,
-                 Length                               numberOfCharacters,
-                 CharacterIndex                       startIndexInSecondHalfLine,
-                 Length                               numberOfCharactersInSecondHalfLine,
-                 CharacterDirection                   direction)
+void ReorderLine(TextAbstraction::BidirectionalSupport& bidirectionalSupport,
+                 const BidirectionalParagraphInfoRun&   bidirectionalParagraphInfo,
+                 Vector<BidirectionalLineInfoRun>&      lineInfoRuns,
+                 BidirectionalLineRunIndex              bidiLineIndex,
+                 CharacterIndex                         startIndex,
+                 Length                                 numberOfCharacters,
+                 CharacterIndex                         startIndexInSecondHalfLine,
+                 Length                                 numberOfCharactersInSecondHalfLine,
+                 CharacterDirection                     direction)
 {
-  // Handle to the bidirectional info module in text-abstraction.
-  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
-
   // Creates a bidirectional info for the line run.
   BidirectionalLineInfoRun lineInfoRun;
   lineInfoRun.characterRun.characterIndex     = startIndex;
@@ -208,7 +204,8 @@ void ReorderLine(const BidirectionalParagraphInfoRun& bidirectionalParagraphInfo
   lineInfoRuns.Insert(lineInfoRuns.Begin() + bidiLineIndex, lineInfoRun);
 }
 
-bool GetMirroredText(const Vector<Character>&                     text,
+bool GetMirroredText(TextAbstraction::BidirectionalSupport&       bidirectionalSupport,
+                     const Vector<Character>&                     text,
                      const Vector<CharacterDirection>&            directions,
                      const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
                      CharacterIndex                               startIndex,
@@ -216,9 +213,6 @@ bool GetMirroredText(const Vector<Character>&                     text,
                      Vector<Character>&                           mirroredText)
 {
   bool hasTextMirrored = false;
-
-  // Handle to the bidirectional info module in text-abstraction.
-  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
 
   mirroredText = text;
 
@@ -259,15 +253,13 @@ bool GetMirroredText(const Vector<Character>&                     text,
   return hasTextMirrored;
 }
 
-void GetCharactersDirection(const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+void GetCharactersDirection(TextAbstraction::BidirectionalSupport&       bidirectionalSupport,
+                            const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
                             Length                                       totalNumberOfCharacters,
                             CharacterIndex                               startIndex,
                             Length                                       numberOfCharacters,
                             Vector<CharacterDirection>&                  directions)
 {
-  // Handle to the bidirectional info module in text-abstraction.
-  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
-
   // Resize the vector.
   directions.Resize(totalNumberOfCharacters);
 

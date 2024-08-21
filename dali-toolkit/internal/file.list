@@ -191,6 +191,14 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/text-view.cpp
    ${toolkit_src_dir}/text/text-view-interface.cpp
    ${toolkit_src_dir}/text/visual-model-impl.cpp
+   ${toolkit_src_dir}/text/async-text/async-text-loader.cpp
+   ${toolkit_src_dir}/text/async-text/async-text-loader-impl.cpp
+   ${toolkit_src_dir}/text/async-text/async-text-manager.cpp
+   ${toolkit_src_dir}/text/async-text/async-text-manager-impl.cpp
+   ${toolkit_src_dir}/text/async-text/async-text-module.cpp
+   ${toolkit_src_dir}/text/async-text/async-text-module-impl.cpp
+   ${toolkit_src_dir}/text/async-text/text-load-observer.cpp
+   ${toolkit_src_dir}/text/async-text/text-loading-task.cpp
    ${toolkit_src_dir}/text/decorator/text-decorator.cpp
    ${toolkit_src_dir}/text/controller/text-controller.cpp
    ${toolkit_src_dir}/text/controller/text-controller-background-actor.cpp

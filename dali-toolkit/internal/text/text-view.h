@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bounded-paragraph-run.h>
@@ -45,6 +48,13 @@ public:
    * @brief Virtual destructor.
    */
   virtual ~View();
+
+  /**
+   * @brief Set the font client.
+   *
+   * @param[in] fontClient The font client used by the View.
+   */
+  void SetFontClient(TextAbstraction::FontClient& fontClient);
 
   /**
    * @brief Set the visual model.

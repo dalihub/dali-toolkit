@@ -22,6 +22,7 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/dali-common.h>
 
 // INTERNAL INCLUDES
@@ -151,30 +152,21 @@ public:
     };
   };
 
-  /**
-   * @brief The enumerations used for checking capture success
-   * @SINCE_2_3.25
-   */
-  enum class CaptureFinishState
-  {
-    SUCCEEDED, ///< Succeeded to capture
-    FAILED     ///< Failed to capture by time out
-  };
-
 public:
-  struct CaptureResult
-  {
-    int32_t                 captureId;
-    Dali::Toolkit::ImageUrl imageUrl;
-    CaptureFinishState      state;
-  };
 
   /**
    * @brief Typedef for capture finished signals sent by this class.
    *
-   * @SINCE_2_3.25
+   * @SINCE_2_3.37
    */
-  typedef Signal<void(SceneView, CaptureResult&)> CaptureFinishedSignalType;
+  typedef Signal<void(SceneView, int32_t, const Dali::Toolkit::ImageUrl&)> CaptureFinishedSignalType;
+
+  /**
+   * @brief Typedef for camera transition finished signals sent by this class.
+   *
+   * @SINCE_2_3.37
+   */
+  typedef Signal<void(SceneView)> CameraTransitionFinishedSignalType;
 
   /**
    * @brief Create an initialized SceneView.
@@ -333,6 +325,34 @@ public:
    * @note If the Camera is not added in this Scene, this method adds it on SceneView root.
    */
   void SelectCamera(const std::string& name);
+
+  /**
+   * @brief Starts camera transition from currently selected camera to a camera of index.
+   * Camera Position, Orientation and FieldOfView(Orthogrpahic Size) are smoothly animated.
+   *
+   * @SINCE_2_3.37
+   * @param[in] index Index of destination Camera of Camera transition.
+   * @param[in] durationSeconds The duration in seconds.
+   * @param[in] alphaFunction The alpha function to apply.
+   * @note The selected camera is switched to the Camera of the index when the transition is finished.
+   * During camera transition, Selected Camera should not be changed by using SelectCamera() or StartCameraTransition() method.
+   * During camera transition, Camera properties of Selected Camera should not be changed.
+   */
+  void StartCameraTransition(uint32_t index, float durationSeconds, Dali::AlphaFunction alphaFunction = AlphaFunction::DEFAULT);
+
+  /**
+   * @brief Starts camera transition from currently selected camera to a camera of index.
+   * Camera Position, Orientation and FieldOfView(Orthogrpahic Size) are smoothly animated.
+   *
+   * @SINCE_2_3.37
+   * @param[in] name string keyword of destination Camera of Camera transition.
+   * @param[in] durationSeconds The duration in seconds.
+   * @param[in] alphaFunction The alpha function to apply.
+   * @note The selected camera is switched to the Camera of the input name when the transition is finished.
+   * During camera transition, Selected Camera should not be changed by using SelectCamera() or StartCameraTransition() method.
+   * During camera transition, Camera properties of Selected Camera should not be changed.
+   */
+  void StartCameraTransition(std::string name, float durationSeconds, Dali::AlphaFunction alphaFunction = AlphaFunction::DEFAULT);
 
   /**
    * @brief Sets Image Based Light Source to apply it on the all Models those added on this SceneView.
@@ -519,7 +539,9 @@ public:
    * @SINCE_2_3.25
    * @param[in] camera CameraActor to be used for capture.
    * @param[in] size captured size.
-   * @note The camera is required to be added in this SceneView. (Not need to be a selected camera)
+   * @note The input camera should not be used for any other purpose during Capture.
+   * (Simultaneous usage elsewhere may result in incorrect rendering.)
+   * @note The camera is required to be added in this SceneView. (But should not be a selected camera.)
    * @note If the SceneView is disconnected from Scene, the left capture requests are canceled.
    * @return capture id that id unique value to distinguish each requiest.
    */
@@ -532,6 +554,14 @@ public:
    * @return finished signal instance.
    */
   CaptureFinishedSignalType& CaptureFinishedSignal();
+
+  /**
+   * @brief Get camera transition finished signal.
+   *
+   * @SINCE_2_3.37
+   * @return camera transition finished signal instance.
+   */
+  CameraTransitionFinishedSignalType& CameraTransitionFinishedSignal();
 
 public: // Not intended for application developers
   /// @cond internal

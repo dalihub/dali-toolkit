@@ -96,6 +96,11 @@ public:
    */
   void RequestForceRenderOnce();
 
+  /**
+   * @brief Finalize the thread.
+   */
+  void Finalize();
+
 protected:
   /**
    * @brief The entry function of the animation thread.
@@ -109,10 +114,12 @@ private:
    */
   bool MoveTasksToAnimation(VectorAnimationTaskPtr task, bool useCurrentTime);
 
+  using CompletedTasksContainer = std::vector<std::pair<VectorAnimationTaskPtr, bool>>; ///< Pair of completed task, and rasterize required.
+
   /**
    * @brief Move given tasks to mCompletedTasks if required.
    */
-  void MoveTasksToCompleted(VectorAnimationTaskPtr task, bool keepAnimation);
+  void MoveTasksToCompleted(CompletedTasksContainer&& completedTasksQueue);
 
 private:
   /**
@@ -151,6 +158,11 @@ private:
      */
     void SleepUntil(std::chrono::time_point<std::chrono::steady_clock> timeToSleepUntil);
 
+    /**
+     * @brief Finalizes the sleep thread. This will make ensure that we don't touch VectorAnimationThread.
+     */
+    void Finalize();
+
   protected:
     /**
      * @brief The entry function of the animation thread.
@@ -162,7 +174,10 @@ private:
     SleepThread& operator=(const SleepThread& thread) = delete;
 
   private:
-    ConditionalWait                                    mConditionalWait;
+    ConditionalWait mConditionalWait;
+    Mutex           mAwakeCallbackMutex; ///< Mutex to check validatoin of mAwakeCallback
+    Mutex           mSleepRequestMutex;  ///< Mutex to change sleep time point.
+
     std::unique_ptr<CallbackBase>                      mAwakeCallback;
     std::chrono::time_point<std::chrono::steady_clock> mSleepTimePoint;
     const Dali::LogFactoryInterface&                   mLogFactory;
@@ -183,8 +198,8 @@ private:
   std::vector<VectorAnimationTaskPtr> mAnimationTasks; ///< Animation processing tasks, ordered by next frame time.
 
   using VectorAnimationTaskSet = std::set<VectorAnimationTaskPtr>;
-  VectorAnimationTaskSet mCompletedTasks; ///< Temperal storage for completed tasks.
-  VectorAnimationTaskSet mWorkingTasks;   ///< Tasks which are currently being processed. Key is the task, value is the number of tasks running.
+  VectorAnimationTaskSet mCompletedTasks; ///< Temperal storage for completed tasks. Thread warning : This should be touched only at VectorAnimationThread.
+  VectorAnimationTaskSet mWorkingTasks;   ///< Tasks which are currently being processed. Thread warning : This should be touched only at VectorAnimationThread.
 
   std::vector<std::pair<VectorAnimationTaskPtr, bool>> mCompletedTasksQueue; ///< Queue of completed tasks from worker thread. pair of task, and rasterize required.
                                                                              ///< It will be moved at begin of Rasterize().

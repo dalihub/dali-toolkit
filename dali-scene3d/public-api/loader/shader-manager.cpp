@@ -414,6 +414,17 @@ void ShaderManager::RemoveLightConstraint(uint32_t lightIndex)
 
 void ShaderManager::SetShadowUniformToShader(Dali::Shader shader)
 {
+  uint32_t index = mImpl->mLights.size();
+  for(uint32_t i = 0; i < mImpl->mLights.size(); ++i)
+  {
+    if(mImpl->mLights[i] == mImpl->mShadowLight)
+    {
+      index = i;
+      break;
+    }
+  }
+
+  shader.RegisterProperty("uShadowLightIndex", index < mImpl->mLights.size() ? static_cast<int32_t>(index) : -1);
   shader.RegisterProperty("uShadowIntensity", mImpl->mShadowLight.GetShadowIntensity());
   shader.RegisterProperty("uShadowBias", mImpl->mShadowLight.GetShadowBias());
   shader.RegisterProperty("uEnableShadowSoftFiltering", static_cast<int>(mImpl->mShadowLight.IsShadowSoftFilteringEnabled()));
