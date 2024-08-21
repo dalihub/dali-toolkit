@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,11 +150,6 @@ private: // From Control
    */
   void OnInitialize() override;
 
-  /**
-   * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
-   */
-  DevelControl::ControlAccessible* CreateAccessibleObject() override;
-
 private: // Implementation
   void HideAnimationFinished(Animation& animation);
 
@@ -291,7 +286,6 @@ private: // Implementation
    */
   void CreateBackground(Property::Map& propertyMap);
 
-
   /**
    * Construct a new TextField.
    */
@@ -304,17 +298,6 @@ private: // Implementation
 
 protected:
   struct PropertyHandler;
-
-  class TextSelectionPopupAccessible : public DevelControl::ControlAccessible
-  {
-  public:
-    using DevelControl::ControlAccessible::ControlAccessible;
-
-    /**
-     * @copydoc DevelControl::ControlAccessible::CalculateStates()
-     */
-    Dali::Accessibility::States CalculateStates() override;
-  };
 
 private:
   // Undefined copy constructor and assignment operators

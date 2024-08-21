@@ -231,6 +231,9 @@ public:
    * @return The Last object position
    */
   Vector2 GetLastPosition() const;
+
+private:
+  void ApplyAccessibilityProps(Dali::Accessibility::States& states);
 };
 
 } // namespace Dali::Toolkit::DevelControl

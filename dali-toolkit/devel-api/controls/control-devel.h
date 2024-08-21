@@ -78,6 +78,57 @@ enum State
   DISABLED
 };
 
+/**
+ * @brief Represents current state of a control.
+ */
+enum class AccessibilityState : uint32_t
+{
+  ENABLED = 0,
+  SELECTED,
+  CHECKED,
+  BUSY,
+  EXPANDED,
+  MAX_COUNT
+};
+using AccessibilityStates = Accessibility::EnumBitSet<AccessibilityState, AccessibilityState::MAX_COUNT>;
+
+constexpr const uint32_t ROLE_START_INDEX = 200;
+/**
+ * @brief AccessibilityRole represents the purpose of a control.
+ */
+enum class AccessibilityRole : uint32_t
+{
+  ADJUSTABLE = ROLE_START_INDEX,
+  ALERT,
+  BUTTON,
+  CHECK_BOX,
+  COMBO_BOX,
+  CONTAINER,
+  DIALOG,
+  ENTRY,
+  HEADER,
+  IMAGE,
+  LINK,
+  LIST,
+  LIST_ITEM,
+  MENU,
+  MENU_BAR,
+  MENU_ITEM,
+  NONE,
+  PASSWORD_TEXT,
+  POPUP_MENU,
+  PROGRESS_BAR,
+  RADIO_BUTTON,
+  SCROLL_BAR,
+  SPIN_BUTTON,
+  TAB,
+  TAB_LIST,
+  TEXT,
+  TOGGLE_BUTTON,
+  TOOL_BAR,
+  MAX_COUNT
+};
+
 namespace Property
 {
 enum
@@ -172,9 +223,8 @@ enum
   /**
    * @brief Role being performed in accessibility hierarchy.
    * @details Name "accessibilityRole", type Property::INTEGER.
-   * @note Property is stored as INTEGER, however its interpretaton
-   * depend on enumeration Dali::Accessibility::Role and should be read and written
-   * with usage of enumerated values.
+   * @note It gets integer value of AccessibilityRole enum then interprets to Dali::Accessibility::Role when requested by AT-SPI.
+   *  Note that setting Dali::Accessibility::Role value is still accepted for backward compatibility but not preferred.
    * @see Dali::Accessibility::Role
    */
   ACCESSIBILITY_ROLE,
@@ -234,10 +284,22 @@ enum
   ACCESSIBILITY_VALUE,
 
   /**
-   * @brief Indicates the accessibility services treat the controla as scrollable.
+   * @brief Indicates the accessibility services treat the control as scrollable.
    * @details Name "accessibilityScrollable", type Property::BOOLEAN.
    */
   ACCESSIBILITY_SCROLLABLE,
+
+  /**
+   * @brief Bitset integer of AccessibilityState which describes the current state of a control.
+   * @details Name "accessibilityStates", type Property::INTEGER.
+   */
+  ACCESSIBILITY_STATES,
+
+  /**
+   * @brief Indicates the accessibility services treat the controla as modal.
+   * @details Name "accessibilityIsModal", type Property::BOOLEAN.
+   */
+  ACCESSIBILITY_IS_MODAL,
 };
 
 } // namespace Property

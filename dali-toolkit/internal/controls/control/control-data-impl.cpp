@@ -599,6 +599,8 @@ const PropertyRegistration Control::Impl::PROPERTY_25(typeRegistration, "counter
 const PropertyRegistration Control::Impl::PROPERTY_26(typeRegistration, "automationId",                   Toolkit::DevelControl::Property::AUTOMATION_ID,                    Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_27(typeRegistration, "accessibilityValue",             Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE,              Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_28(typeRegistration, "accessibilityScrollable",        Toolkit::DevelControl::Property::ACCESSIBILITY_SCROLLABLE,         Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_29(typeRegistration, "accessibilityStates",            Toolkit::DevelControl::Property::ACCESSIBILITY_STATES,             Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_30(typeRegistration, "accessibilityIsModal",           Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL,           Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 // clang-format on
 
@@ -652,6 +654,7 @@ Control::Impl::Impl(Control& controlImpl)
 
     return controlImpl.GetAccessibleObject();
   });
+  mAccessibilityProps.states[DevelControl::AccessibilityState::ENABLED] = true;
 }
 
 Control::Impl::~Impl()
@@ -1561,7 +1564,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
       {
-        Dali::Accessibility::Role role;
+        int32_t role;
         if(value.Get(role))
         {
           controlImpl.mImpl->mAccessibilityProps.role = role;
@@ -1663,6 +1666,26 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         if(value.Get(isScrollable))
         {
           controlImpl.mImpl->mAccessibilityProps.isScrollable = isScrollable;
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_STATES:
+      {
+        int32_t states;
+        if(value.Get(states))
+        {
+          controlImpl.mImpl->mAccessibilityProps.states = Toolkit::DevelControl::AccessibilityStates{static_cast<uint32_t>(states)};
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL:
+      {
+        bool isModal;
+        if(value.Get(isModal))
+        {
+          controlImpl.mImpl->mAccessibilityProps.isModal = isModal;
         }
         break;
       }
@@ -1795,7 +1818,7 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
       {
-        value = Property::Value(controlImpl.mImpl->mAccessibilityProps.role);
+        value = controlImpl.mImpl->mAccessibilityProps.role;
         break;
       }
 
@@ -1850,6 +1873,18 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::ACCESSIBILITY_SCROLLABLE:
       {
         value = controlImpl.mImpl->mAccessibilityProps.isScrollable;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_STATES:
+      {
+        value = static_cast<int32_t>(controlImpl.mImpl->mAccessibilityProps.states.GetRawData32());
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL:
+      {
+        value = controlImpl.mImpl->mAccessibilityProps.isModal;
         break;
       }
     }

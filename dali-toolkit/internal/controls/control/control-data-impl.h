@@ -631,12 +631,14 @@ public:
     std::string                                                                       description{};
     std::string                                                                       value{};
     std::string                                                                       automationId{};
-    Dali::Accessibility::Role                                                         role = Dali::Accessibility::Role::UNKNOWN;
+    int32_t                                                                           role{static_cast<int32_t>(Dali::Accessibility::Role::UNKNOWN)};
+    DevelControl::AccessibilityStates                                                 states{};
     std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> relations;
     Property::Map                                                                     extraAttributes{};
-    bool                                                                              isHighlightable = false;
-    bool                                                                              isHidden        = false;
-    bool                                                                              isScrollable    = false;
+    bool                                                                              isHighlightable{false};
+    bool                                                                              isHidden{false};
+    bool                                                                              isScrollable{false};
+    bool                                                                              isModal{false};
   } mAccessibilityProps;
 
   bool mAccessibleCreatable = true;
@@ -692,6 +694,8 @@ public:
   static const PropertyRegistration PROPERTY_26;
   static const PropertyRegistration PROPERTY_27;
   static const PropertyRegistration PROPERTY_28;
+  static const PropertyRegistration PROPERTY_29;
+  static const PropertyRegistration PROPERTY_30;
 
 private:
   // Accessibility - notification for highlighted object to check if it is showing.
