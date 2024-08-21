@@ -114,15 +114,6 @@ private:
   Vector2 GetTargetSizeForValidTexture() const;
 
   /**
-   * @brief Calculates gaussian weight
-   * @param[in] localOffset Input to the function
-   */
-  inline float CalculateGaussianWeight(float localOffset, float sigma) const
-  {
-    return (1.0f / sqrt(2.0f * Math::PI * sigma)) * exp(-(localOffset * localOffset) * (1.0f / (2.0f * sigma * sigma)));
-  }
-
-  /**
    * @brief Sets shader constants, gaussian kernel weights and pixel offsets.
    * @param[in] downsampledWidth Downsized width of input texture.
    * @param[in] downsampledHeight Downsized height of input texture.

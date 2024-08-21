@@ -208,9 +208,10 @@ void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
   Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
   if(ownerControl)
   {
-    mTargetSize = ownerControl.GetCurrentProperty<Vector2>(Actor::Property::SIZE);
-    if(IsActivated())
+    const auto targetSize = ownerControl.GetCurrentProperty<Vector2>(Actor::Property::SIZE);
+    if(mTargetSize != targetSize && IsActivated())
     {
+      mTargetSize = targetSize;
       Deactivate();
       Activate();
     }
