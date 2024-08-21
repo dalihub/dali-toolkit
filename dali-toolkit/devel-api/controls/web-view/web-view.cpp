@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,11 @@ Dali::WebEngineCookieManager* WebView::GetCookieManager()
 WebView WebView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<WebView, Internal::WebView>(handle);
+}
+
+void WebView::ChangeOrientation(int orientation)
+{
+  return Dali::Toolkit::GetImpl(*this).ChangeOrientation(orientation);
 }
 
 Dali::Toolkit::WebSettings* WebView::GetSettings() const
@@ -224,6 +229,11 @@ void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, 
   Dali::Toolkit::GetImpl(*this).AddJavaScriptMessageHandler(exposedObjectName, handler);
 }
 
+void WebView::AddJavaScriptEntireMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptEntireMessageHandlerCallback handler)
+{
+  Dali::Toolkit::GetImpl(*this).AddJavaScriptEntireMessageHandler(exposedObjectName, handler);
+}
+
 void WebView::RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptAlertCallback callback)
 {
   Dali::Toolkit::GetImpl(*this).RegisterJavaScriptAlertCallback(callback);
@@ -262,6 +272,11 @@ std::unique_ptr<Dali::WebEngineHitTest> WebView::CreateHitTest(int32_t x, int32_
 bool WebView::CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback callback)
 {
   return Dali::Toolkit::GetImpl(*this).CreateHitTestAsynchronously(x, y, mode, callback);
+}
+
+void WebView::ExitFullscreen()
+{
+  Dali::Toolkit::GetImpl(*this).ExitFullscreen();
 }
 
 void WebView::ClearHistory()
@@ -379,6 +394,11 @@ void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::Web
   Dali::Toolkit::GetImpl(*this).RegisterNavigationPolicyDecidedCallback(callback);
 }
 
+void WebView::RegisterNewWindowPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterNewWindowPolicyDecidedCallback(callback);
+}
+
 void WebView::RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback)
 {
   Dali::Toolkit::GetImpl(*this).RegisterNewWindowCreatedCallback(callback);
@@ -407,6 +427,21 @@ void WebView::RegisterContextMenuShownCallback(Dali::WebEnginePlugin::WebEngineC
 void WebView::RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback)
 {
   Dali::Toolkit::GetImpl(*this).RegisterContextMenuHiddenCallback(callback);
+}
+
+void WebView::RegisterFullscreenEnteredCallback(Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterFullscreenEnteredCallback(callback);
+}
+
+void WebView::RegisterFullscreenExitedCallback(Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterFullscreenExitedCallback(callback);
+}
+
+void WebView::RegisterTextFoundCallback(Dali::WebEnginePlugin::WebEngineTextFoundCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterTextFoundCallback(callback);
 }
 
 void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
