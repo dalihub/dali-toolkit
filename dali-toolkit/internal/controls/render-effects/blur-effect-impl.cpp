@@ -230,6 +230,10 @@ void BlurEffectImpl::OnActivate()
   mSourceRenderTask.SetInputEnabled(false);
   mSourceRenderTask.SetExclusive(false);
 
+  // Clear inputBackgroundTexture as scene holder background.
+  mSourceRenderTask.SetClearEnabled(true);
+  mSourceRenderTask.SetClearColor(sceneHolder.GetBackgroundColor());
+
   // Blur tasks
   SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0), mInputBackgroundFrameBuffer);
   mHorizontalBlurTask = taskList.CreateTask();
@@ -240,6 +244,10 @@ void BlurEffectImpl::OnActivate()
   mHorizontalBlurTask.SetCameraActor(mRenderDownsampledCamera);
   mHorizontalBlurTask.SetFrameBuffer(mTemporaryFrameBuffer);
 
+  // Clear temporaryTexture as Transparent.
+  mHorizontalBlurTask.SetClearEnabled(true);
+  mHorizontalBlurTask.SetClearColor(Color::TRANSPARENT);
+
   SetRendererTexture(mVerticalBlurActor.GetRendererAt(0), mTemporaryFrameBuffer);
   mVerticalBlurTask = taskList.CreateTask();
   mVerticalBlurTask.SetSourceActor(mVerticalBlurActor);
@@ -248,6 +256,10 @@ void BlurEffectImpl::OnActivate()
   mVerticalBlurTask.SetInputEnabled(false);
   mVerticalBlurTask.SetCameraActor(mRenderDownsampledCamera);
   mVerticalBlurTask.SetFrameBuffer(mSourceFrameBuffer);
+
+  // Clear sourceTexture as Transparent.
+  mVerticalBlurTask.SetClearEnabled(true);
+  mVerticalBlurTask.SetClearColor(Color::TRANSPARENT);
 
   // Inject output to control
   Renderer renderer = GetTargetRenderer();
