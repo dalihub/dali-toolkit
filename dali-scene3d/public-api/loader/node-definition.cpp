@@ -115,18 +115,12 @@ void NodeDefinition::Renderable::ReflectResources(IResourceReflector& reflector)
 
 void NodeDefinition::Renderable::OnCreate(const NodeDefinition& nodeDefinition, CreateParams& params, ModelNode& node) const
 {
-  // TODO : Need to keep this default geometry only 1 times per each adaptor.
-  Geometry defaultGeometry = Geometry::New();
-  CreateRenderer(nodeDefinition, params, defaultGeometry, node);
-}
-
-void NodeDefinition::Renderable::CreateRenderer(const NodeDefinition& nodeDefinition, CreateParams& params, Geometry& geometry, ModelNode& node) const
-{
   DALI_ASSERT_DEBUG(mShaderIdx != INVALID_INDEX);
   auto&  resources = params.mResources;
   Shader shader    = resources.mShaders[mShaderIdx].second;
 
-  Renderer renderer = Renderer::New(geometry, shader);
+  static Geometry defaultGeometry = Geometry::New();
+  Renderer        renderer        = Renderer::New(defaultGeometry, shader);
 
   RendererState::Apply(resources.mShaders[mShaderIdx].first.mRendererState, renderer);
 
@@ -263,12 +257,7 @@ void ModelRenderable::ReflectResources(IResourceReflector& reflector)
 void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinition::CreateParams& params, ModelNode& node) const
 {
   DALI_ASSERT_DEBUG(mMeshIdx != INVALID_INDEX);
-
-  auto& resources = params.mResources;
-  auto& mesh      = resources.mMeshes[mMeshIdx];
-
   ShaderOption::HashType shaderOptionHash{0u};
-  Renderer               renderer;
   if(mShaderIdx == INVALID_INDEX)
   {
     ShaderOption option = params.mShaderManager->ProduceShaderOption(params.mResources.mMaterials[mMaterialIdx].first,
@@ -276,7 +265,8 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
     shaderOptionHash    = option.GetOptionHash();
     Shader shader       = params.mShaderManager->ProduceShader(option);
 
-    renderer = Renderer::New(mesh.second.geometry, shader);
+    static Geometry defaultGeometry = Geometry::New();
+    Renderer        renderer        = Renderer::New(defaultGeometry, shader);
 
     RendererState::Apply(params.mShaderManager->GetRendererState(params.mResources.mMaterials[mMaterialIdx].first), renderer);
     Internal::GetImplementation(node).UpdateShader(params.mShaderManager);
@@ -284,10 +274,15 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
   }
   else
   {
-    Renderable::CreateRenderer(nodeDefinition, params, mesh.second.geometry, node);
-    DALI_ASSERT_ALWAYS(node.GetRendererCount() > 0u && "CreateRenderer failed!");
-    renderer = node.GetRendererAt(node.GetRendererCount() - 1u);
+    Renderable::OnCreate(nodeDefinition, params, node);
   }
+
+  auto& resources = params.mResources;
+  auto& mesh      = resources.mMeshes[mMeshIdx];
+
+  auto     renderer = node.GetRendererAt(node.GetRendererCount() - 1u);
+  Geometry geometry = mesh.second.geometry;
+  renderer.SetGeometry(geometry);
 
   TextureSet textures = resources.mMaterials[mMaterialIdx].second;
   // Set the blend shape texture.

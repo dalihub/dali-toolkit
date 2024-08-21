@@ -54,12 +54,6 @@ Dali::Texture GetEmptyTextureWhiteRGB();
 Dali::Texture GetEmptyCubeTextureWhiteRGB();
 
 /**
- * @brief Get default BRDF texture.
- * @return A Texture object containing the default BRDF texture.
- */
-Dali::Texture GetDefaultBrdfTexture();
-
-/**
  * @brief Get cached texture handle, or create new texture and upload.
  * @param[in] pixelData The PixelData of image to upload
  * @param[in] mipmapRequired True if this texture need to generate mipmap
@@ -103,12 +97,6 @@ Dali::PixelData GetEmptyPixelDataZAxisRGB();
  * @return A PixelData object containing the Z-Axis and 1.0 alpha RGBA8888 color.
  */
 Dali::PixelData GetEmptyPixelDataZAxisAndAlphaRGBA();
-
-/**
- * @brief Get cached pixelData handle with brdf pixel data has.
- * @return A PixelData object containing brdf data.
- */
-Dali::PixelData GetDefaultBrdfPixelData();
 
 /**
  * @brief Get cached image, or loads an image synchronously.

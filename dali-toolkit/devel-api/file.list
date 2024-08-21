@@ -100,11 +100,6 @@ SET( devel_api_accessibility-manager_header_files
   ${devel_api_src_dir}/accessibility-manager/accessibility-manager.h
 )
 
-SET( devel_api_asset-manager_header_files
-  ${devel_api_src_dir}/asset-manager/asset-manager.h
-)
-
-
 SET( devel_api_controls_header_files
   ${devel_api_src_dir}/controls/canvas-view/canvas-view.h
   ${devel_api_src_dir}/controls/control-accessible.h
@@ -316,7 +311,6 @@ SET( SOURCES ${SOURCES}
 SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
   ${devel_api_header_files}
   ${devel_api_accessibility-manager_header_files}
-  ${devel_api_asset-manager_header_files}
   ${devel_api_alignment_header_files}
   ${devel_api_controls_header_files}
   ${devel_api_bloom_view_header_files}
