@@ -328,10 +328,10 @@ void ConvertFovFromHorizontalToVertical(float aspect, float& fov)
 SceneView::SceneView()
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mWindowOrientation(DEFAULT_ORIENTATION),
-  mFailedCaptureCallbacks(nullptr),
   mSkybox(),
   mSkyboxOrientation(Quaternion()),
   mSkyboxIntensity(1.0f),
+  mFailedCaptureCallbacks(nullptr),
   mLightObservers(),
   mShaderManager(new Scene3D::Loader::ShaderManager())
 {
