@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -850,6 +850,26 @@ int UtcDaliColliderMeshModelNodeRemoveModelNode(void)
 
   model.AddModelNode(node);
   DALI_TEST_EQUALS(node.HasColliderMesh(), true, TEST_LOCATION);
+
+  // Scene off model, and add,remove model node.
+  model.Unparent();
+  DALI_TEST_EQUALS(node.HasColliderMesh(), true, TEST_LOCATION);
+
+  model.RemoveModelNode(node);
+  DALI_TEST_EQUALS(node.HasColliderMesh(), true, TEST_LOCATION);
+
+  model.AddModelNode(node);
+  DALI_TEST_EQUALS(node.HasColliderMesh(), true, TEST_LOCATION);
+
+  // Reset collider mesh
+  node.SetColliderMesh(nullptr);
+  DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
+
+  model.RemoveModelNode(node);
+  DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
+
+  model.AddModelNode(node);
+  DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
 
   END_TEST;
 }
