@@ -1297,6 +1297,68 @@ int UtcDaliSceneViewCapture01(void)
   END_TEST;
 }
 
+int UtcDaliSceneViewCapture02(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  view.CaptureFinishedSignal().Connect(OnCaptureMultipleFinished);
+  view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+
+  application.GetScene().Add(view);
+
+  application.SendNotification();
+  application.Render();
+
+  Scene3D::Model modelView1 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+  view.Add(modelView1);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  CameraActor camera = Dali::CameraActor::New();
+  camera.SetProperty(Dali::Actor::Property::NAME, "camera");
+  camera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  camera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  camera.SetFieldOfView(0.5f);
+  camera.SetNearClippingPlane(1.0f);
+  camera.SetFarClippingPlane(5000.0f);
+  camera.SetProperty(Dali::Actor::Property::POSITION, Vector3(20, 30, 40));
+
+  view.Add(camera);
+
+  gCapturedCount = 0;
+  gCaptureIds.clear();
+  gCapturedImageUrls.clear();
+  int32_t captureId = view.Capture(camera, Vector2(300, 300));
+  int32_t captureId2 = view.Capture(camera, Vector2(300, 300));
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(gCapturedCount, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureIds.size(), 2, TEST_LOCATION);
+  auto idIter1 = std::find(gCaptureIds.begin(), gCaptureIds.end(), captureId);
+  bool isIter1 = idIter1 != gCaptureIds.end();
+  DALI_TEST_EQUALS(isIter1, true, TEST_LOCATION);
+  auto idIter2 = std::find(gCaptureIds.begin(), gCaptureIds.end(), captureId2);
+  bool isIter2 = idIter2 != gCaptureIds.end();
+  DALI_TEST_EQUALS(isIter2, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gCapturedImageUrls.size(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!gCapturedImageUrls[0], true, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!gCapturedImageUrls[1], true, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(gCapturedImageUrls[0], gCapturedImageUrls[1], 0.1f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliSceneViewCaptureCancel(void)
 {
   ToolkitTestApplication application;
@@ -1418,25 +1480,16 @@ int UtcDaliSceneViewCaptureFailed(void)
   END_TEST;
 }
 
-int UtcDaliSceneViewCapture02(void)
+int UtcDaliSceneViewCaptureFailed2(void)
 {
   ToolkitTestApplication application;
 
   Scene3D::SceneView view = Scene3D::SceneView::New();
-  view.CaptureFinishedSignal().Connect(OnCaptureMultipleFinished);
+  view.CaptureFinishedSignal().Connect(OnCaptureFinished);
   view.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
 
-  application.GetScene().Add(view);
+  // not add on Scene.
 
-  application.SendNotification();
-  application.Render();
-
-  Scene3D::Model modelView1 = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
-  view.Add(modelView1);
-
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
   application.SendNotification();
   application.Render();
 
@@ -1451,31 +1504,16 @@ int UtcDaliSceneViewCapture02(void)
 
   view.Add(camera);
 
-  gCapturedCount = 0;
-  gCaptureIds.clear();
-  gCapturedImageUrls.clear();
+  gCaptureFinishedCalled = false;
+  gCaptureId = -1;
+  gCapturedImageUrl.Reset();
   int32_t captureId = view.Capture(camera, Vector2(300, 300));
-  int32_t captureId2 = view.Capture(camera, Vector2(300, 300));
 
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
+  application.RunIdles();
 
-  DALI_TEST_EQUALS(gCapturedCount, 2, TEST_LOCATION);
-  DALI_TEST_EQUALS(gCaptureIds.size(), 2, TEST_LOCATION);
-  auto idIter1 = std::find(gCaptureIds.begin(), gCaptureIds.end(), captureId);
-  bool isIter1 = idIter1 != gCaptureIds.end();
-  DALI_TEST_EQUALS(isIter1, true, TEST_LOCATION);
-  auto idIter2 = std::find(gCaptureIds.begin(), gCaptureIds.end(), captureId2);
-  bool isIter2 = idIter2 != gCaptureIds.end();
-  DALI_TEST_EQUALS(isIter2, true, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(gCapturedImageUrls.size(), 2, TEST_LOCATION);
-  DALI_TEST_EQUALS(!!gCapturedImageUrls[0], true, TEST_LOCATION);
-  DALI_TEST_EQUALS(!!gCapturedImageUrls[1], true, TEST_LOCATION);
-  DALI_TEST_NOT_EQUALS(gCapturedImageUrls[0], gCapturedImageUrls[1], 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureFinishedCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCaptureId, captureId, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!gCapturedImageUrl, false, TEST_LOCATION);
 
   END_TEST;
 }
