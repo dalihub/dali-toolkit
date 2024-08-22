@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,24 +132,19 @@ ColliderMeshProcessor::~ColliderMeshProcessor()
   }
 }
 
-void ColliderMeshProcessor::ColliderMeshChanged(Collidable* collidable)
+void ColliderMeshProcessor::ColliderMeshChanged(Collidable& collidable)
 {
-  if(!collidable)
-  {
-    DALI_LOG_ERROR("The collider should not be null.\n");
-  }
-
-  Actor actor = collidable->GetCollidableActor();
+  Actor actor = collidable.GetCollidableActor();
   if(actor)
   {
     if(actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
     {
-      AddSceneViewParentToProcessingQueue(collidable->GetCollidableActor());
+      AddSceneViewParentToProcessingQueue(collidable.GetCollidableActor());
     }
     else
     {
       // TODO: Check if signal already connected
-      collidable->GetCollidableActor().OnSceneSignal().Connect(this, &ColliderMeshProcessor::ModelOnScene);
+      collidable.GetCollidableActor().OnSceneSignal().Connect(this, &ColliderMeshProcessor::ModelOnScene);
     }
   }
 }
