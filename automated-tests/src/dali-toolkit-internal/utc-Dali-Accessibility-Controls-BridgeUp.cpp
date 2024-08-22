@@ -1,5 +1,6 @@
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+#include <automated-tests/src/dali-toolkit/dali-toolkit-test-utils/toolkit-timer.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
@@ -397,19 +398,36 @@ int UtcDaliControlAccessibilityState(void)
 {
   ToolkitTestApplication application;
 
-  auto control    = Control::New();
+  auto control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  control.SetProperty(Actor::Property::POSITION, Vector3(10, 10, 100));
+
+  application.GetScene().Add(control);
   auto accessible = Dali::Accessibility::Accessible::Get(control);
 
-  Dali::Accessibility::TestEnableSC(true);
+  const auto flushCoalescableMessage = [&]() {
+    Dali::Timer timer = Timer::New(0);
+    for(int i = 0; i < 11; ++i)
+    {
+      application.SendNotification();
+      application.Render();
+      timer.MockEmitSignal();
+    }
+  };
 
-  // Test AccessibilityState property
+  Dali::Accessibility::TestEnableSC(true);
+  DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
+
+  // Test setting AccessibilityState property updates at-spi states
+  DevelControl::AccessibilityStates inputStates;
   {
-    DevelControl::AccessibilityStates inputStates;
     inputStates[DevelControl::AccessibilityState::ENABLED] = false;
     inputStates[DevelControl::AccessibilityState::CHECKED] = true;
     inputStates[DevelControl::AccessibilityState::BUSY]    = true;
 
     control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
 
     auto states = DevelControl::GetAccessibilityStates(control);
     DALI_TEST_CHECK(!states[Dali::Accessibility::State::ENABLED]);
@@ -417,6 +435,122 @@ int UtcDaliControlAccessibilityState(void)
     DALI_TEST_CHECK(states[Dali::Accessibility::State::CHECKED]);
     DALI_TEST_CHECK(states[Dali::Accessibility::State::BUSY]);
     DALI_TEST_CHECK(!states[Dali::Accessibility::State::EXPANDED]);
+  }
+
+  // state-changed:checked event is NOT emitted if the object is not highlighted
+  {
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::CHECK_BOX);
+
+    inputStates[DevelControl::AccessibilityState::CHECKED] = false; // CHECKED: true -> false
+
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
+
+    auto states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::ENABLED]);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::SELECTED]);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::CHECKED]);
+    DALI_TEST_CHECK(states[Dali::Accessibility::State::BUSY]);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::EXPANDED]);
+  }
+
+  auto component = dynamic_cast<Dali::Accessibility::Component*>(accessible);
+  component->GrabHighlight();
+
+  // state-changed:checked event is emitted if the object is highlighted and checkable
+  const std::array<DevelControl::AccessibilityRole, 3> checkableRoles{DevelControl::AccessibilityRole::CHECK_BOX, DevelControl::AccessibilityRole::RADIO_BUTTON, DevelControl::AccessibilityRole::TOGGLE_BUTTON};
+  for(auto role : checkableRoles)
+  {
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, role);
+
+    // CHECKED: false -> true
+    inputStates[DevelControl::AccessibilityState::CHECKED] = true;
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("checked", 1));
+
+    auto states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(states[Dali::Accessibility::State::CHECKED]);
+
+    Dali::Accessibility::TestResetStateChangedResult();
+    flushCoalescableMessage();
+
+    // CHECKED: true -> false
+    inputStates[DevelControl::AccessibilityState::CHECKED] = false;
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("checked", 0));
+
+    states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::CHECKED]);
+
+    Dali::Accessibility::TestResetStateChangedResult();
+    flushCoalescableMessage();
+  }
+
+  // state-changed:selected event is emitted if the object is highlighted and selectable
+  const std::array<DevelControl::AccessibilityRole, 3> selectableRoles{DevelControl::AccessibilityRole::BUTTON, DevelControl::AccessibilityRole::LIST_ITEM, DevelControl::AccessibilityRole::MENU_ITEM};
+  for(auto role : selectableRoles)
+  {
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, role);
+
+    // SELECTED: false -> true
+    inputStates[DevelControl::AccessibilityState::SELECTED] = true;
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("selected", 1));
+
+    auto states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(states[Dali::Accessibility::State::SELECTED]);
+
+    Dali::Accessibility::TestResetStateChangedResult();
+    flushCoalescableMessage();
+
+    // SELECTED: true -> false
+    inputStates[DevelControl::AccessibilityState::SELECTED] = false;
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("selected", 0));
+
+    states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::SELECTED]);
+    Dali::Accessibility::TestResetStateChangedResult();
+    flushCoalescableMessage();
+  }
+
+  // state-changed event is NOT emitted if object is not checkable or selectable
+  {
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::CONTAINER);
+
+    inputStates[DevelControl::AccessibilityState::CHECKED]  = true; // CHECKED: false -> true
+    inputStates[DevelControl::AccessibilityState::SELECTED] = true; // SELECTED: false -> true
+
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
+
+    auto states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(states[Dali::Accessibility::State::SELECTED]);
+    DALI_TEST_CHECK(states[Dali::Accessibility::State::CHECKED]);
+  }
+
+  // state-changed event is NOT emitted if object is v1 role
+  {
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::CHECK_BOX);
+
+    inputStates[DevelControl::AccessibilityState::CHECKED] = false; // CHECKED: true -> false
+
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
+
+    auto states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::CHECKED]);
   }
 
   // Test bridge behavior

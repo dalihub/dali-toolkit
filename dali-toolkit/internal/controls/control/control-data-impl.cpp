@@ -834,6 +834,13 @@ void Control::Impl::OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Prope
     if(index == DevelControl::Property::ACCESSIBILITY_VALUE)
     {
       accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
+      return;
+    }
+
+    if(index == DevelControl::Property::ACCESSIBILITY_STATES)
+    {
+      accessible->OnStatePropertySet(mAccessibilityProps.states);
+      return;
     }
   }
 }
