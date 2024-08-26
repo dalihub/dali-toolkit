@@ -469,6 +469,8 @@ void ControlAccessible::RegisterPropertySetSignal()
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
   controlImpl.RegisterAccessibilityPropertySetSignal();
+
+  mStatesSnapshot = controlImpl.mAccessibilityProps.states;
 }
 
 void ControlAccessible::UnregisterPropertySetSignal()
@@ -477,6 +479,8 @@ void ControlAccessible::UnregisterPropertySetSignal()
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
   controlImpl.UnregisterAccessibilityPropertySetSignal();
+
+  mStatesSnapshot = {};
 }
 
 bool ControlAccessible::GrabHighlight()
@@ -661,6 +665,33 @@ void ControlAccessible::SetLastPosition(Vector2 position)
 Vector2 ControlAccessible::GetLastPosition() const
 {
   return mLastPosition;
+}
+
+void ControlAccessible::OnStatePropertySet(AccessibilityStates newStates)
+{
+  int32_t rawRole = Self().GetProperty<int32_t>(Property::ACCESSIBILITY_ROLE);
+  if(IsRoleV2(rawRole))
+  {
+    AccessibilityRole role = static_cast<AccessibilityRole>(rawRole);
+
+    if(newStates[AccessibilityState::CHECKED] != mStatesSnapshot[AccessibilityState::CHECKED] &&
+       (role == AccessibilityRole::CHECK_BOX || role == AccessibilityRole::RADIO_BUTTON || role == AccessibilityRole::TOGGLE_BUTTON))
+    {
+      EmitStateChanged(Accessibility::State::CHECKED, newStates[AccessibilityState::CHECKED]);
+    }
+
+    if(newStates[AccessibilityState::SELECTED] != mStatesSnapshot[AccessibilityState::SELECTED] &&
+       (role == AccessibilityRole::BUTTON || role == AccessibilityRole::LIST_ITEM || role == AccessibilityRole::MENU_ITEM))
+    {
+      EmitStateChanged(Accessibility::State::SELECTED, newStates[AccessibilityState::SELECTED]);
+    }
+  }
+  else
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "With V1 role, state change events are emitted manually by the app component.");
+  }
+
+  mStatesSnapshot = newStates;
 }
 
 } // namespace Dali::Toolkit::DevelControl
