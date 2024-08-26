@@ -1304,10 +1304,21 @@ void TextEditor::KeyboardStatusChanged(bool keyboardShown)
 {
   DALI_LOG_INFO(gTextEditorLogFilter, Debug::Verbose, "TextEditor::KeyboardStatusChanged %p keyboardShown %d\n", mController.Get(), keyboardShown);
 
+  bool isFocused = false;
+
+  Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
+  if(keyboardFocusManager)
+  {
+    isFocused = keyboardFocusManager.GetCurrentFocusActor() == Self();
+  }
+
   // Just hide the grab handle when keyboard is hidden.
   if(!keyboardShown)
   {
-    mController->KeyboardFocusLostEvent();
+    if(!isFocused)
+    {
+      mController->KeyboardFocusLostEvent();
+    }
   }
   else
   {
