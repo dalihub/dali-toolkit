@@ -1459,6 +1459,53 @@ int utcDaliTextEditorTextChangedWithInputMethodContext(void)
   END_TEST;
 }
 
+int utcDaliTextEditorFocusWithInputMethodContext(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorFocusWithInputMethodContext");
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  application.GetScene().Add(editor);
+  editor.SetProperty(DevelTextEditor::Property::ENABLE_EDITING, true);
+  application.SendNotification();
+  application.Render();
+
+  // get InputMethodContext
+  InputMethodContext inputMethodContext = DevelTextEditor::GetInputMethodContext(editor);
+  DALI_TEST_CHECK(inputMethodContext);
+
+  // connect StatusChangedSignal
+  editor.SetKeyInputFocus();
+
+  // keyboard shown
+  inputMethodContext.StatusChangedSignal().Emit(true);
+  application.SendNotification();
+  application.Render();
+
+  // keyboard hidden
+  inputMethodContext.StatusChangedSignal().Emit(false);
+  application.SendNotification();
+  application.Render();
+
+  // set focus and keyboard shown
+  editor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  KeyboardFocusManager::Get().SetCurrentFocusActor(editor);
+
+  inputMethodContext.StatusChangedSignal().Emit(true);
+  application.SendNotification();
+  application.Render();
+
+  // keyboard hidden, focus should remain
+  inputMethodContext.StatusChangedSignal().Emit(false);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(editor, KeyboardFocusManager::Get().GetCurrentFocusActor(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int utcDaliTextEditorInputStyleChanged01(void)
 {
   // The text-editor emits signals when the input style changes. These changes of style are
