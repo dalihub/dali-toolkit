@@ -1,5 +1,6 @@
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+#include <automated-tests/src/dali-toolkit/dali-toolkit-test-utils/toolkit-timer.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
@@ -218,26 +219,115 @@ int UtcDaliControlAccessibilityRole(void)
 
   DALI_TEST_EQUALS(role_unknown, control.GetProperty(DevelControl::Property::ACCESSIBILITY_ROLE).Get<Dali::Accessibility::Role>(), TEST_LOCATION);
 
-  auto q = Dali::Accessibility::Accessible::Get(control);
-  DALI_TEST_EQUALS(role_unknown, q->GetRole(), TEST_LOCATION);
-  DALI_TEST_EQUALS("unknown", q->GetRoleName(), TEST_LOCATION);
+  auto accessible = Dali::Accessibility::Accessible::Get(control);
+  DALI_TEST_EQUALS(role_unknown, accessible->GetRole(), TEST_LOCATION);
+  DALI_TEST_EQUALS("unknown", accessible->GetRoleName(), TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC(true);
-  DALI_TEST_CHECK(q);
-  DALI_TEST_EQUALS(static_cast<uint32_t>(role_unknown), TestGetRole(q->GetAddress()), TEST_LOCATION);
-  DALI_TEST_EQUALS("unknown", TestGetRoleName(q->GetAddress()), TEST_LOCATION);
-  DALI_TEST_EQUALS("unknown", TestGetLocalizedRoleName(q->GetAddress()), TEST_LOCATION);
+  DALI_TEST_CHECK(accessible);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(role_unknown), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+  DALI_TEST_EQUALS("unknown", TestGetRoleName(accessible->GetAddress()), TEST_LOCATION);
+  DALI_TEST_EQUALS("unknown", TestGetLocalizedRoleName(accessible->GetAddress()), TEST_LOCATION);
 
-  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, role_pushbutton);
+  // Invalid role
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, 9999);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::UNKNOWN), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
 
-  DALI_TEST_EQUALS(static_cast<uint32_t>(role_pushbutton), TestGetRole(q->GetAddress()), TEST_LOCATION);
-  DALI_TEST_EQUALS("push button", TestGetRoleName(q->GetAddress()), TEST_LOCATION);
-  DALI_TEST_EQUALS("push button", TestGetLocalizedRoleName(q->GetAddress()), TEST_LOCATION);
+  // V2 Roles
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::ADJUSTABLE);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::SLIDER), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::ALERT);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::ALERT), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::BUTTON);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::PUSH_BUTTON), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::CHECK_BOX);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::CHECK_BOX), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::COMBO_BOX);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::COMBO_BOX), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::CONTAINER);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::FILLER), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::DIALOG);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::DIALOG), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::ENTRY);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::ENTRY), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::HEADER);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::HEADER), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::IMAGE);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::IMAGE), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::LINK);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::LINK), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::LIST);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::LIST), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::LIST_ITEM);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::LIST_ITEM), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::MENU);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::MENU), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::MENU_BAR);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::MENU_BAR), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::MENU_ITEM);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::MENU_ITEM), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::NONE);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::UNKNOWN), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::PASSWORD_TEXT);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::PASSWORD_TEXT), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::POPUP_MENU);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::POPUP_MENU), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::PROGRESS_BAR);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::PROGRESS_BAR), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::RADIO_BUTTON);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::RADIO_BUTTON), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::SCROLL_BAR);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::SCROLL_BAR), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::SPIN_BUTTON);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::SPIN_BUTTON), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::TAB);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::PAGE_TAB), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::TAB_LIST);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::PAGE_TAB_LIST), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::TEXT);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::TEXT), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::TOGGLE_BUTTON);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::TOGGLE_BUTTON), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::TOOL_BAR);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::TOOL_BAR), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
+  // Directly sets ATSPI role  (V1)
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::PUSH_BUTTON);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(role_pushbutton), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+  DALI_TEST_EQUALS("push button", TestGetRoleName(accessible->GetAddress()), TEST_LOCATION);
+  DALI_TEST_EQUALS("push button", TestGetLocalizedRoleName(accessible->GetAddress()), TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC(false);
 
-  DALI_TEST_EQUALS(role_pushbutton, q->GetRole(), TEST_LOCATION);
-  DALI_TEST_EQUALS("push button", q->GetRoleName(), TEST_LOCATION);
+  DALI_TEST_EQUALS(role_pushbutton, accessible->GetRole(), TEST_LOCATION);
+  DALI_TEST_EQUALS("push button", accessible->GetRoleName(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -309,13 +399,166 @@ int UtcDaliControlAccessibilityState(void)
   ToolkitTestApplication application;
 
   auto control = Control::New();
-  auto q       = Dali::Accessibility::Accessible::Get(control);
+  control.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  control.SetProperty(Actor::Property::POSITION, Vector3(10, 10, 100));
+
+  application.GetScene().Add(control);
+  auto accessible = Dali::Accessibility::Accessible::Get(control);
+
+  const auto flushCoalescableMessage = [&]() {
+    Dali::Timer timer = Timer::New(0);
+    for(int i = 0; i < 11; ++i)
+    {
+      application.SendNotification();
+      application.Render();
+      timer.MockEmitSignal();
+    }
+  };
 
   Dali::Accessibility::TestEnableSC(true);
+  DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
 
-  auto states_by_bridge = Dali::Accessibility::States{TestGetStates(q->GetAddress())};
-  auto states           = DevelControl::GetAccessibilityStates(control);
-  DALI_TEST_CHECK(states_by_bridge == states);
+  // Test setting AccessibilityState property updates at-spi states
+  DevelControl::AccessibilityStates inputStates;
+  {
+    inputStates[DevelControl::AccessibilityState::ENABLED] = false;
+    inputStates[DevelControl::AccessibilityState::CHECKED] = true;
+    inputStates[DevelControl::AccessibilityState::BUSY]    = true;
+
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
+
+    auto states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::ENABLED]);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::SELECTED]);
+    DALI_TEST_CHECK(states[Dali::Accessibility::State::CHECKED]);
+    DALI_TEST_CHECK(states[Dali::Accessibility::State::BUSY]);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::EXPANDED]);
+  }
+
+  // state-changed:checked event is NOT emitted if the object is not highlighted
+  {
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::CHECK_BOX);
+
+    inputStates[DevelControl::AccessibilityState::CHECKED] = false; // CHECKED: true -> false
+
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
+
+    auto states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::ENABLED]);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::SELECTED]);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::CHECKED]);
+    DALI_TEST_CHECK(states[Dali::Accessibility::State::BUSY]);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::EXPANDED]);
+  }
+
+  auto component = dynamic_cast<Dali::Accessibility::Component*>(accessible);
+  component->GrabHighlight();
+
+  // state-changed:checked event is emitted if the object is highlighted and checkable
+  const std::array<DevelControl::AccessibilityRole, 3> checkableRoles{DevelControl::AccessibilityRole::CHECK_BOX, DevelControl::AccessibilityRole::RADIO_BUTTON, DevelControl::AccessibilityRole::TOGGLE_BUTTON};
+  for(auto role : checkableRoles)
+  {
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, role);
+
+    // CHECKED: false -> true
+    inputStates[DevelControl::AccessibilityState::CHECKED] = true;
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("checked", 1));
+
+    auto states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(states[Dali::Accessibility::State::CHECKED]);
+
+    Dali::Accessibility::TestResetStateChangedResult();
+    flushCoalescableMessage();
+
+    // CHECKED: true -> false
+    inputStates[DevelControl::AccessibilityState::CHECKED] = false;
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("checked", 0));
+
+    states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::CHECKED]);
+
+    Dali::Accessibility::TestResetStateChangedResult();
+    flushCoalescableMessage();
+  }
+
+  // state-changed:selected event is emitted if the object is highlighted and selectable
+  const std::array<DevelControl::AccessibilityRole, 3> selectableRoles{DevelControl::AccessibilityRole::BUTTON, DevelControl::AccessibilityRole::LIST_ITEM, DevelControl::AccessibilityRole::MENU_ITEM};
+  for(auto role : selectableRoles)
+  {
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, role);
+
+    // SELECTED: false -> true
+    inputStates[DevelControl::AccessibilityState::SELECTED] = true;
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("selected", 1));
+
+    auto states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(states[Dali::Accessibility::State::SELECTED]);
+
+    Dali::Accessibility::TestResetStateChangedResult();
+    flushCoalescableMessage();
+
+    // SELECTED: true -> false
+    inputStates[DevelControl::AccessibilityState::SELECTED] = false;
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
+    DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("selected", 0));
+
+    states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::SELECTED]);
+    Dali::Accessibility::TestResetStateChangedResult();
+    flushCoalescableMessage();
+  }
+
+  // state-changed event is NOT emitted if object is not checkable or selectable
+  {
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::CONTAINER);
+
+    inputStates[DevelControl::AccessibilityState::CHECKED]  = true; // CHECKED: false -> true
+    inputStates[DevelControl::AccessibilityState::SELECTED] = true; // SELECTED: false -> true
+
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
+
+    auto states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(states[Dali::Accessibility::State::SELECTED]);
+    DALI_TEST_CHECK(states[Dali::Accessibility::State::CHECKED]);
+  }
+
+  // state-changed event is NOT emitted if object is v1 role
+  {
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::CHECK_BOX);
+
+    inputStates[DevelControl::AccessibilityState::CHECKED] = false; // CHECKED: true -> false
+
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_STATES, static_cast<int32_t>(inputStates.GetRawData32()));
+
+    DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
+
+    auto states = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(!states[Dali::Accessibility::State::CHECKED]);
+  }
+
+  // Test bridge behavior
+  {
+    auto states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
+    auto states           = DevelControl::GetAccessibilityStates(control);
+    DALI_TEST_CHECK(states_by_bridge == states);
+  }
 
   Dali::Accessibility::TestEnableSC(false);
 
@@ -326,13 +569,27 @@ int UtcDaliControlAccessibilityModal(void)
 {
   ToolkitTestApplication application;
 
-  auto control = Dali::Toolkit::Popup::New();
-  auto q       = Dali::Accessibility::Accessible::Get(control);
-
   Dali::Accessibility::TestEnableSC(true);
 
-  auto states_by_bridge = Dali::Accessibility::States{TestGetStates(q->GetAddress())};
-  DALI_TEST_CHECK(states_by_bridge[Dali::Accessibility::State::MODAL]);
+  // Modal state is set by Dialog role
+  {
+    auto control    = Dali::Toolkit::Popup::New();
+    auto accessible = Dali::Accessibility::Accessible::Get(control);
+
+    auto states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
+    DALI_TEST_CHECK(states_by_bridge[Dali::Accessibility::State::MODAL]);
+  }
+
+  // Modal state is set by isModal property
+  {
+    auto control = Control::New();
+    control.SetProperty(DevelControl::Property::ACCESSIBILITY_IS_MODAL, true);
+
+    auto accessible = Dali::Accessibility::Accessible::Get(control);
+
+    auto states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
+    DALI_TEST_CHECK(states_by_bridge[Dali::Accessibility::State::MODAL]);
+  }
 
   Dali::Accessibility::TestEnableSC(false);
 
@@ -373,6 +630,11 @@ int UtcDaliControlAccessibilityHighlightable(void)
   states_by_bridge = Dali::Accessibility::States{TestGetStates(q->GetAddress())};
   DALI_TEST_CHECK(!states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
 
+  // Highlightable state is set if V2 role is set and is not Role::None
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::CONTAINER);
+  states_by_bridge = Dali::Accessibility::States{TestGetStates(q->GetAddress())};
+  DALI_TEST_CHECK(states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
+
   Dali::Accessibility::TestEnableSC(false);
 
   END_TEST;
@@ -404,8 +666,8 @@ int UtcDaliControlAccessibilityScrollable(void)
   DALI_TEST_CHECK(accessible->IsScrollable());
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_SCROLLABLE, false);
-  DALI_TEST_EQUALS(Property::BOOLEAN, control.GetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).GetType(), TEST_LOCATION);
-  DALI_TEST_EQUALS(false, control.GetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).Get<bool>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Property::BOOLEAN, control.GetProperty(DevelControl::Property::ACCESSIBILITY_SCROLLABLE).GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, control.GetProperty(DevelControl::Property::ACCESSIBILITY_SCROLLABLE).Get<bool>(), TEST_LOCATION);
 
   DALI_TEST_CHECK(!accessible->IsScrollable());
 

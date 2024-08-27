@@ -676,18 +676,10 @@ private:
 
   /**
    * @brief Callback function to be called when visibility is changed.
-   * @param[in] actor The actor, or child of actor, whose visibility has changed
+   * @param[in] actor The actor, whose inherit visibility has changed
    * @param[in] isVisible Whether the actor is now visible or not
-   * @param[in] type, Whether the actor's visible property has changed or a parent's
    */
-  void OnVisibilityChanged(Actor actor, bool isVisible, Dali::DevelActor::VisibilityChange::Type type);
-
-  /**
-   * @brief Callback when the visibility of the window is changed.
-   * @param[in] window The window whose visibility has changed
-   * @param[in] visible Whether the window is now visible or not
-   */
-  void OnWindowVisibilityChanged(Window window, bool visible);
+  void OnInheritedVisibilityChanged(Actor actor, bool isVisible);
 
   /**
    * @brief callback for screen shot captured.
@@ -702,11 +694,6 @@ private:
    * @param[in] displayArea The display area for current webview want to show.
    */
   void SetDisplayArea(const Dali::Rect<int32_t>& displayArea);
-
-  /**
-   * @brief Apply self visibility state and send visibility chagend to web engine.
-   */
-  void ApplyVisibilityCheck();
 
 protected:
   class WebViewAccessible : public DevelControl::ControlAccessible
@@ -743,19 +730,6 @@ private:
 
   uint32_t mLastRenderedNativeImageWidth;
   uint32_t mLastRenderedNativeImageHeight;
-
-  enum WebViewVisibleStateFlag
-  {
-    NONE        = 0,
-    SCENE_ON    = 1 << 0,
-    WINDOW_SHOW = 1 << 1,
-    SELF_SHOW   = 1 << 2,
-    PARENT_SHOW = 1 << 3,
-
-    VISIBLE = SCENE_ON | WINDOW_SHOW | SELF_SHOW | PARENT_SHOW,
-  };
-  uint32_t           mWebViewVisibleState{WebViewVisibleStateFlag::NONE}; /// Flag of web view visible.
-  WeakHandle<Window> mPlacementWindow;
 
   std::unique_ptr<Dali::Toolkit::WebSettings>        mWebSettings;
   std::unique_ptr<Dali::Toolkit::WebBackForwardList> mWebBackForwardList;

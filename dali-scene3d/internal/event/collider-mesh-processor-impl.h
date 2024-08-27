@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public:
 
   ~ColliderMeshProcessor();
 
-  void ColliderMeshChanged(Collidable* collidable);
+  void ColliderMeshChanged(Collidable& collidable);
 
 private:
   void ModelOnScene(Actor actor);

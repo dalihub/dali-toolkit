@@ -34,13 +34,6 @@
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
 
-#if defined(DEBUG_ENABLED)
-#include <sys/types.h>
-#include <unistd.h>
-#include <filesystem>
-namespace fs = std::filesystem;
-#endif
-
 namespace Dali
 {
 namespace Scene3D
@@ -51,24 +44,6 @@ namespace
 {
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_SCENE3D_MODEL_PRIMITIVE");
-
-std::string tmpFilename(std::string prefix, std::string suffix)
-{
-  static int id = 0;
-  id++;
-  std::ostringstream oss;
-  oss << prefix << getpid() << "_" << std::setfill('0') << std::setw(4) << id << suffix;
-  return oss.str();
-}
-
-#define DALI_LOG_WRITE_FILE(filename, stream) \
-  {                                           \
-    fs::path tmp = fs::temp_directory_path(); \
-    tmp /= filename;                          \
-    std::ofstream ostrm(tmp, std::ios::out);  \
-    ostrm << stream;                          \
-    ostrm.flush();                            \
-  }
 
 inline Property::Map GetMap(Shader shader)
 {
@@ -356,21 +331,6 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
     if(mShader != newShader)
     {
       DALI_LOG_INFO(gLogFilter, Debug::General, "Warning!  Model primitive shader changed: OldHash:%x NewHash:%x\n", oldHash, shaderOption.GetOptionHash());
-
-#if defined(DEBUG_ENABLED)
-      if(mShader)
-      {
-        Property::Map oldMap = GetMap(mShader);
-        DALI_LOG_WRITE_FILE(tmpFilename("oldShader", ".txt"), "Vertex Shader:\n"
-                                                                << oldMap["vertex"] << "\n\nFragmentShader: " << oldMap["fragment"] << "\n");
-      }
-      if(newShader)
-      {
-        Property::Map newMap = GetMap(newShader);
-        DALI_LOG_WRITE_FILE(tmpFilename("newShader", ".txt"), "Vertex Shader:\n"
-                                                                << newMap["vertex"] << "\n\nFragmentShader: " << newMap["fragment"] << "\n");
-      }
-#endif
     }
     mShader = newShader;
 

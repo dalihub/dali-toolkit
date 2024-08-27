@@ -1857,6 +1857,53 @@ int utcDaliTextFieldInputFilterWithInputMethodContext(void)
   END_TEST;
 }
 
+int utcDaliTextFieldFocusWithInputMethodContext(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldFocusWithInputMethodContext");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+  field.SetProperty(DevelTextField::Property::ENABLE_EDITING, true);
+  application.SendNotification();
+  application.Render();
+
+  // get InputMethodContext
+  InputMethodContext inputMethodContext = DevelTextField::GetInputMethodContext(field);
+  DALI_TEST_CHECK(inputMethodContext);
+
+  // connect StatusChangedSignal
+  field.SetKeyInputFocus();
+
+  // keyboard shown
+  inputMethodContext.StatusChangedSignal().Emit(true);
+  application.SendNotification();
+  application.Render();
+
+  // keyboard hidden
+  inputMethodContext.StatusChangedSignal().Emit(false);
+  application.SendNotification();
+  application.Render();
+
+  // set focus and keyboard shown
+  field.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  KeyboardFocusManager::Get().SetCurrentFocusActor(field);
+
+  inputMethodContext.StatusChangedSignal().Emit(true);
+  application.SendNotification();
+  application.Render();
+
+  // keyboard hidden, focus should remain
+  inputMethodContext.StatusChangedSignal().Emit(false);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(field, KeyboardFocusManager::Get().GetCurrentFocusActor(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 // Negative test for the textChanged signal.
 int utcDaliTextFieldTextChangedN(void)
 {

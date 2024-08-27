@@ -112,6 +112,95 @@ std::string FetchImageSrc(const Toolkit::ImageView& imageView)
   return {};
 }
 
+bool IsAtspiRole(int32_t rawRole)
+{
+  return rawRole >= static_cast<int32_t>(Dali::Accessibility::Role::INVALID) && rawRole < static_cast<int32_t>(Dali::Accessibility::Role::MAX_COUNT);
+}
+
+bool IsRoleV2(int32_t rawRole)
+{
+  return rawRole >= static_cast<int32_t>(ROLE_START_INDEX) && rawRole < static_cast<int32_t>(AccessibilityRole::MAX_COUNT);
+}
+
+#define TO_V1_ROLE_TYPE(v2RoleType, v1RoleType) \
+  case AccessibilityRole::v2RoleType:           \
+  {                                             \
+    return Role::v1RoleType;                    \
+  }
+#define TO_SAME_ROLE_TYPE(roleType) \
+  case AccessibilityRole::roleType: \
+  {                                 \
+    return Role::roleType;          \
+  }
+
+Dali::Accessibility::Role ConvertV2RoleToAtspiRole(AccessibilityRole role)
+{
+  using Dali::Accessibility::Role;
+  switch(role)
+  {
+    TO_V1_ROLE_TYPE(ADJUSTABLE, SLIDER)
+    TO_SAME_ROLE_TYPE(ALERT)
+    TO_V1_ROLE_TYPE(BUTTON, PUSH_BUTTON)
+    TO_SAME_ROLE_TYPE(CHECK_BOX)
+    TO_SAME_ROLE_TYPE(COMBO_BOX)
+    TO_V1_ROLE_TYPE(CONTAINER, FILLER)
+    TO_SAME_ROLE_TYPE(DIALOG)
+    TO_SAME_ROLE_TYPE(ENTRY)
+    TO_SAME_ROLE_TYPE(HEADER)
+    TO_SAME_ROLE_TYPE(IMAGE)
+    TO_SAME_ROLE_TYPE(LINK)
+    TO_SAME_ROLE_TYPE(LIST)
+    TO_SAME_ROLE_TYPE(LIST_ITEM)
+    TO_SAME_ROLE_TYPE(MENU)
+    TO_SAME_ROLE_TYPE(MENU_BAR)
+    TO_SAME_ROLE_TYPE(MENU_ITEM)
+    TO_V1_ROLE_TYPE(NONE, UNKNOWN)
+    TO_SAME_ROLE_TYPE(PASSWORD_TEXT)
+    TO_SAME_ROLE_TYPE(POPUP_MENU)
+    TO_SAME_ROLE_TYPE(PROGRESS_BAR)
+    TO_SAME_ROLE_TYPE(RADIO_BUTTON)
+    TO_SAME_ROLE_TYPE(SCROLL_BAR)
+    TO_SAME_ROLE_TYPE(SPIN_BUTTON)
+    TO_V1_ROLE_TYPE(TAB, PAGE_TAB)
+    TO_V1_ROLE_TYPE(TAB_LIST, PAGE_TAB_LIST)
+    TO_SAME_ROLE_TYPE(TEXT)
+    TO_SAME_ROLE_TYPE(TOGGLE_BUTTON)
+    TO_SAME_ROLE_TYPE(TOOL_BAR)
+    default:
+    {
+      return Role::UNKNOWN;
+    }
+  }
+}
+
+Dali::Accessibility::Role ConvertRawRoleToAtspiRole(int32_t rawRole)
+{
+  if(IsAtspiRole(rawRole))
+  {
+    return static_cast<Dali::Accessibility::Role>(rawRole);
+  }
+  else if(IsRoleV2(rawRole))
+  {
+    return ConvertV2RoleToAtspiRole(static_cast<AccessibilityRole>(rawRole));
+  }
+  else
+  {
+    return Dali::Accessibility::Role::UNKNOWN;
+  }
+}
+
+bool IsModalRole(int32_t rawRole)
+{
+  using Dali::Accessibility::Role;
+  Role role = ConvertRawRoleToAtspiRole(rawRole);
+  return role == Role::ALERT || role == Role::DIALOG || role == Role::POPUP_MENU;
+}
+
+bool IsHighlightableRole(int32_t rawRole)
+{
+  return IsRoleV2(rawRole) && static_cast<AccessibilityRole>(rawRole) != AccessibilityRole::NONE;
+}
+
 } // unnamed namespace
 
 ControlAccessible::ControlAccessible(Dali::Actor self)
@@ -188,7 +277,8 @@ std::string ControlAccessible::GetValue() const
 
 Dali::Accessibility::Role ControlAccessible::GetRole() const
 {
-  return Self().GetProperty<Dali::Accessibility::Role>(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE);
+  int32_t rawRole = Self().GetProperty<int32_t>(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE);
+  return ConvertRawRoleToAtspiRole(rawRole);
 }
 
 std::string ControlAccessible::GetLocalizedRoleName() const
@@ -224,6 +314,27 @@ bool ControlAccessible::IsShowing()
   return true;
 }
 
+void ControlAccessible::ApplyAccessibilityProps(Dali::Accessibility::States& states)
+{
+  using Dali::Accessibility::State;
+  auto control = Dali::Toolkit::Control::DownCast(Self());
+
+  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
+  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+
+  // Apply states
+  const auto& props       = controlImpl.mAccessibilityProps;
+  states[State::ENABLED]  = props.states[AccessibilityState::ENABLED];
+  states[State::SELECTED] = props.states[AccessibilityState::SELECTED];
+  states[State::CHECKED]  = props.states[AccessibilityState::CHECKED];
+  states[State::BUSY]     = props.states[AccessibilityState::BUSY];
+  states[State::EXPANDED] = props.states[AccessibilityState::EXPANDED];
+
+  // Apply traits
+  states[State::MODAL]         = props.isModal || IsModalRole(props.role);
+  states[State::HIGHLIGHTABLE] = props.isHighlightable || IsHighlightableRole(props.role);
+}
+
 Dali::Accessibility::States ControlAccessible::CalculateStates()
 {
   using Dali::Accessibility::State;
@@ -231,15 +342,15 @@ Dali::Accessibility::States ControlAccessible::CalculateStates()
   Dali::Actor                 self = Self();
   Dali::Accessibility::States states;
 
-  states[State::FOCUSABLE]     = self.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE);
-  states[State::FOCUSED]       = Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor() == self;
-  states[State::HIGHLIGHTABLE] = self.GetProperty<bool>(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE);
-  states[State::HIGHLIGHTED]   = IsHighlighted();
-  states[State::ENABLED]       = true;
-  states[State::SENSITIVE]     = (Dali::DevelActor::IsHittable(self) && Dali::DevelActor::GetTouchRequired(self));
-  states[State::VISIBLE]       = self.GetProperty<bool>(Actor::Property::VISIBLE);
-  states[State::SHOWING]       = IsShowing();
-  states[State::DEFUNCT]       = !self.GetProperty(Dali::DevelActor::Property::CONNECTED_TO_SCENE).Get<bool>();
+  states[State::FOCUSABLE]   = self.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE);
+  states[State::FOCUSED]     = Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor() == self;
+  states[State::HIGHLIGHTED] = IsHighlighted();
+  states[State::SENSITIVE]   = (Dali::DevelActor::IsHittable(self) && Dali::DevelActor::GetTouchRequired(self));
+  states[State::VISIBLE]     = self.GetProperty<bool>(Actor::Property::VISIBLE);
+  states[State::SHOWING]     = IsShowing();
+  states[State::DEFUNCT]     = !self.GetProperty(Dali::DevelActor::Property::CONNECTED_TO_SCENE).Get<bool>();
+
+  ApplyAccessibilityProps(states);
 
   return states;
 }
@@ -358,6 +469,8 @@ void ControlAccessible::RegisterPropertySetSignal()
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
   controlImpl.RegisterAccessibilityPropertySetSignal();
+
+  mStatesSnapshot = controlImpl.mAccessibilityProps.states;
 }
 
 void ControlAccessible::UnregisterPropertySetSignal()
@@ -366,6 +479,8 @@ void ControlAccessible::UnregisterPropertySetSignal()
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
   controlImpl.UnregisterAccessibilityPropertySetSignal();
+
+  mStatesSnapshot = {};
 }
 
 bool ControlAccessible::GrabHighlight()
@@ -550,6 +665,33 @@ void ControlAccessible::SetLastPosition(Vector2 position)
 Vector2 ControlAccessible::GetLastPosition() const
 {
   return mLastPosition;
+}
+
+void ControlAccessible::OnStatePropertySet(AccessibilityStates newStates)
+{
+  int32_t rawRole = Self().GetProperty<int32_t>(Property::ACCESSIBILITY_ROLE);
+  if(IsRoleV2(rawRole))
+  {
+    AccessibilityRole role = static_cast<AccessibilityRole>(rawRole);
+
+    if(newStates[AccessibilityState::CHECKED] != mStatesSnapshot[AccessibilityState::CHECKED] &&
+       (role == AccessibilityRole::CHECK_BOX || role == AccessibilityRole::RADIO_BUTTON || role == AccessibilityRole::TOGGLE_BUTTON))
+    {
+      EmitStateChanged(Accessibility::State::CHECKED, newStates[AccessibilityState::CHECKED]);
+    }
+
+    if(newStates[AccessibilityState::SELECTED] != mStatesSnapshot[AccessibilityState::SELECTED] &&
+       (role == AccessibilityRole::BUTTON || role == AccessibilityRole::LIST_ITEM || role == AccessibilityRole::MENU_ITEM))
+    {
+      EmitStateChanged(Accessibility::State::SELECTED, newStates[AccessibilityState::SELECTED]);
+    }
+  }
+  else
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "With V1 role, state change events are emitted manually by the app component.");
+  }
+
+  mStatesSnapshot = newStates;
 }
 
 } // namespace Dali::Toolkit::DevelControl

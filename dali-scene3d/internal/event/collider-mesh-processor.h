@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/weak-handle.h>
-#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/controls/model/model.h>
@@ -61,7 +61,7 @@ public:
 
   static ColliderMeshProcessor Get();
 
-  void ColliderMeshChanged(Collidable* collidable);
+  void ColliderMeshChanged(Collidable& collidable);
 
 private:
   explicit ColliderMeshProcessor(Internal::ColliderMeshProcessor* impl);

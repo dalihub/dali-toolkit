@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -728,7 +728,7 @@ void Popup::SetDisplayState(Toolkit::Popup::DisplayState displayState)
   }
 
   // Convert the bool state to the actual display state to use.
-  mDisplayState    = display ? Toolkit::Popup::SHOWING : Toolkit::Popup::HIDING;
+  mDisplayState   = display ? Toolkit::Popup::SHOWING : Toolkit::Popup::HIDING;
   auto accessible = Dali::Accessibility::Accessible::GetOwningPtr(Self());
 
   if(display)
@@ -2024,7 +2024,6 @@ Dali::Accessibility::States Popup::PopupAccessible::CalculateStates()
   auto displayState = popup.GetProperty<std::string>(Toolkit::Popup::Property::DISPLAY_STATE);
 
   states[Dali::Accessibility::State::SHOWING] = (displayState == "SHOWN" || displayState == "SHOWING");
-  states[Dali::Accessibility::State::MODAL]   = true;
 
   return states;
 }

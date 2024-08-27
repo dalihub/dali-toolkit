@@ -15,12 +15,20 @@ using MessagePtr = DBusWrapper::MessagePtr;
 static bool gMoveOutedCalled      = false;
 static bool gPropertyChangeCalled = false;
 
+struct StateChangedResult
+{
+  std::string state{};
+  int         value{-1};
+};
+static StateChangedResult gStateChangedResult{};
+
 void TestEnableSC(bool b)
 {
   static bool firstTime = true;
   if(b && firstTime)
   {
     gPropertyChangeCalled  = false;
+    gStateChangedResult    = {};
     firstTime              = false;
     auto        bridge     = Accessibility::Bridge::GetCurrentBridge();
     Dali::Stage stage      = Dali::Stage::GetCurrent();
@@ -65,6 +73,11 @@ void TestEnableSC(bool b)
     };
     wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "StateChanged", MethodType::Method}] =
       [wr](const MessagePtr& m) -> MessagePtr {
+      std::tuple<std::string, int> decoded;
+      wr->Decode(m, decoded);
+      gStateChangedResult.state = std::get<0>(decoded);
+      gStateChangedResult.value = std::get<1>(decoded);
+
       return wr->newReplyMessage(m);
     };
     wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "BoundsChanged", MethodType::Method}] =
@@ -305,6 +318,21 @@ bool TestGetMoveOutedCalled()
 bool TestPropertyChangeCalled()
 {
   return gPropertyChangeCalled;
+}
+
+bool TestStateChangedCalled()
+{
+  return !gStateChangedResult.state.empty();
+}
+
+bool TestStateChangedResult(const std::string_view& expectedState, int expectedValue)
+{
+  return expectedState == gStateChangedResult.state && expectedValue == gStateChangedResult.value;
+}
+
+void TestResetStateChangedResult()
+{
+  gStateChangedResult = {};
 }
 
 void PrintTree(const Address& root, size_t depth)

@@ -283,9 +283,7 @@ void WebView::OnInitialize()
   self.TouchedSignal().Connect(this, &WebView::OnTouchEvent);
   self.HoveredSignal().Connect(this, &WebView::OnHoverEvent);
   self.WheelEventSignal().Connect(this, &WebView::OnWheelEvent);
-  Dali::DevelActor::VisibilityChangedSignal(self).Connect(this, &WebView::OnVisibilityChanged);
-
-  mWebViewVisibleState |= WebViewVisibleStateFlag::SELF_SHOW;
+  self.InheritedVisibilityChangedSignal().Connect(this, &WebView::OnInheritedVisibilityChanged);
 
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
   mSizeUpdateNotification     = self.AddPropertyNotification(Actor::Property::SIZE, StepCondition(1.0f, 1.0f));
@@ -887,45 +885,9 @@ void WebView::OnDisplayAreaUpdated(Dali::PropertyNotification& /*source*/)
   SetDisplayArea(displayArea);
 }
 
-void WebView::OnVisibilityChanged(Actor actor, bool isVisible, Dali::DevelActor::VisibilityChange::Type type)
+void WebView::OnInheritedVisibilityChanged(Actor actor, bool isVisible)
 {
-  if(type == Dali::DevelActor::VisibilityChange::Type::SELF)
-  {
-    if(isVisible)
-    {
-      mWebViewVisibleState |= WebViewVisibleStateFlag::SELF_SHOW;
-    }
-    else
-    {
-      mWebViewVisibleState &= ~WebViewVisibleStateFlag::SELF_SHOW;
-    }
-  }
-  else if(type == Dali::DevelActor::VisibilityChange::Type::PARENT)
-  {
-    if(isVisible)
-    {
-      mWebViewVisibleState |= WebViewVisibleStateFlag::PARENT_SHOW;
-      // TODO : We should consider double-hide called from parent
-    }
-    else
-    {
-      mWebViewVisibleState &= ~WebViewVisibleStateFlag::PARENT_SHOW;
-    }
-  }
-  ApplyVisibilityCheck();
-}
-
-void WebView::OnWindowVisibilityChanged(Window window, bool visible)
-{
-  if(visible)
-  {
-    mWebViewVisibleState |= WebViewVisibleStateFlag::WINDOW_SHOW;
-  }
-  else
-  {
-    mWebViewVisibleState &= ~WebViewVisibleStateFlag::WINDOW_SHOW;
-  }
-  ApplyVisibilityCheck();
+  SetVisibility(isVisible);
 }
 
 void WebView::OnScreenshotCaptured(Dali::PixelData pixel)
@@ -964,41 +926,12 @@ void WebView::SetDisplayArea(const Dali::Rect<int32_t>& displayArea)
 
 void WebView::OnSceneConnection(int depth)
 {
-  mWebViewVisibleState |= WebViewVisibleStateFlag::SCENE_ON;
-  mWebViewVisibleState |= WebViewVisibleStateFlag::PARENT_SHOW;
-  // TODO : We should consider already hided parent
-  Window window = DevelWindow::Get(Self());
-  if(window)
-  {
-    // Hold the weak handle of the placement window.
-    mPlacementWindow = window;
-    if(window.IsVisible())
-    {
-      mWebViewVisibleState |= WebViewVisibleStateFlag::WINDOW_SHOW;
-    }
-    else
-    {
-      mWebViewVisibleState &= ~WebViewVisibleStateFlag::WINDOW_SHOW;
-    }
-    DevelWindow::VisibilityChangedSignal(window).Connect(this, &WebView::OnWindowVisibilityChanged);
-  }
-  ApplyVisibilityCheck();
   Control::OnSceneConnection(depth);
   EnableBlendMode(!mVideoHoleEnabled);
 }
 
 void WebView::OnSceneDisconnection()
 {
-  mWebViewVisibleState &= ~WebViewVisibleStateFlag::SCENE_ON;
-  mWebViewVisibleState &= ~WebViewVisibleStateFlag::WINDOW_SHOW;
-  mWebViewVisibleState &= ~WebViewVisibleStateFlag::PARENT_SHOW;
-  Window window = mPlacementWindow.GetHandle();
-  if(window)
-  {
-    DevelWindow::VisibilityChangedSignal(window).Disconnect(this, &WebView::OnWindowVisibilityChanged);
-    mPlacementWindow.Reset();
-  }
-  ApplyVisibilityCheck();
   Control::OnSceneDisconnection();
 }
 
@@ -1418,11 +1351,6 @@ float WebView::GetLoadProgressPercentage() const
 bool WebView::SetVisibility(bool visible)
 {
   return mWebEngine ? mWebEngine.SetVisibility(visible) : false;
-}
-
-void WebView::ApplyVisibilityCheck()
-{
-  SetVisibility(mWebViewVisibleState == WebViewVisibleStateFlag::VISIBLE);
 }
 
 WebView::WebViewAccessible::WebViewAccessible(Dali::Actor self, Dali::WebEngine& webEngine)

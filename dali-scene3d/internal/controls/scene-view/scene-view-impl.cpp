@@ -67,13 +67,13 @@ DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CropToMask", BOOLEAN, CROP_TO_MA
 DALI_TYPE_REGISTRATION_END()
 
 Property::Index    RENDERING_BUFFER        = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
-constexpr int32_t  DEFAULT_ORIENTATION     = 0;
-constexpr int32_t  INVALID_INDEX           = -1;
-constexpr int32_t  INVALID_CAPTURE_ID      = -1;
-constexpr uint32_t MAXIMUM_SIZE_SHADOW_MAP = 2048;
+static constexpr float    MIM_CAPTURE_SIZE        = 1.0f;
+static constexpr int32_t  DEFAULT_ORIENTATION     = 0;
+static constexpr int32_t  INVALID_INDEX           = -1;
+static constexpr uint32_t MAXIMUM_SIZE_SHADOW_MAP = 2048;
 
-constexpr int32_t SCENE_ORDER_INDEX  = 100;
-constexpr int32_t SHADOW_ORDER_INDEX = 99;
+static constexpr int32_t SCENE_ORDER_INDEX  = 100;
+static constexpr int32_t SHADOW_ORDER_INDEX = 99;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
 static constexpr std::string_view Y_FLIP_MASK_TEXTURE     = "uYFlipMaskTexture";
@@ -331,6 +331,7 @@ SceneView::SceneView()
   mSkybox(),
   mSkyboxOrientation(Quaternion()),
   mSkyboxIntensity(1.0f),
+  mFailedCaptureCallbacks(nullptr),
   mLightObservers(),
   mShaderManager(new Scene3D::Loader::ShaderManager())
 {
@@ -369,6 +370,12 @@ SceneView::~SceneView()
     }
     mCaptureContainer.clear();
     ResetCaptureTimer();
+
+    if(mFailedCaptureCallbacks && Adaptor::IsAvailable())
+    {
+      // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
+      Adaptor::Get().RemoveIdle(mFailedCaptureCallbacks);
+    }
 
     Adaptor::Get().UnregisterProcessorOnce(*this);
 
@@ -911,10 +918,11 @@ Quaternion SceneView::GetSkyboxOrientation() const
 
 int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
 {
-  if(size.x < 0.0f || size.y < 0.0f)
+  bool capturePossible = true;
+  if(size.x < MIM_CAPTURE_SIZE || size.y < MIM_CAPTURE_SIZE)
   {
     DALI_LOG_ERROR("The width and height should be positive.\n");
-    return INVALID_CAPTURE_ID;
+    capturePossible = false;
   }
 
   uint32_t width = std::max(1u, unsigned(size.width));
@@ -922,82 +930,97 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
   if(width > Dali::GetMaxTextureSize() || height > Dali::GetMaxTextureSize())
   {
     DALI_LOG_ERROR("The input size is too large.\n");
-    return INVALID_CAPTURE_ID;
+    capturePossible = false;
   }
 
   if(!mRootLayer.GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE))
   {
     DALI_LOG_ERROR("Current SceneView is not connected on scene tree\n");
-    return INVALID_CAPTURE_ID;
+    capturePossible = false;
   }
 
-  if(!camera.GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE))
+  if(!capturePossible)
   {
-    mRootLayer.Add(camera);
+    mFailedCaptureRequests.push_back(mCaptureId);
+    if(!mFailedCaptureCallbacks && DALI_LIKELY(Adaptor::IsAvailable()))
+    {
+      mFailedCaptureCallbacks = MakeCallback(this, &SceneView::OnCaptureFailedIdle);
+      if(!Adaptor::Get().AddIdle(mFailedCaptureCallbacks, false))
+      {
+        mFailedCaptureCallbacks = nullptr;
+      }
+    }
   }
-
-  std::shared_ptr<CaptureData> captureData = std::make_shared<CaptureData>();
-  captureData->mCaptureId                  = mCaptureId;
-  captureData->mCaptureTexture             = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
-  captureData->mCaptureFrameBuffer         = Dali::FrameBuffer::New(captureData->mCaptureTexture.GetWidth(), captureData->mCaptureTexture.GetHeight(), Dali::FrameBuffer::Attachment::DEPTH_STENCIL);
-  DevelFrameBuffer::SetMultiSamplingLevel(captureData->mCaptureFrameBuffer, mFrameBufferMultiSamplingLevel);
-  captureData->mCaptureFrameBuffer.AttachColorTexture(captureData->mCaptureTexture);
-
-  captureData->mCaptureCamera = camera;
-  captureData->mCaptureCameraOriginalAspectRatio = captureData->mCaptureCamera.GetAspectRatio();
-  captureData->mCaptureCamera.SetAspectRatio((float)width/(float)height);
-
-  RenderTaskList taskList   = mSceneHolder.GetRenderTaskList();
-  captureData->mCaptureTask = taskList.CreateTask();
-  captureData->mCaptureTask.SetSourceActor(mRootLayer);
-  captureData->mCaptureTask.SetExclusive(true);
-  captureData->mCaptureTask.SetCullMode(false);
-  captureData->mCaptureTask.SetOrderIndex(SCENE_ORDER_INDEX + 1);
-  captureData->mCaptureTask.SetCameraActor(captureData->mCaptureCamera);
-  captureData->mCaptureTask.SetFrameBuffer(captureData->mCaptureFrameBuffer);
-  captureData->mCaptureTask.SetClearEnabled(true);
-  captureData->mCaptureTask.SetClearColor(Color::TRANSPARENT);
-  captureData->mCaptureTask.SetRefreshRate(Dali::RenderTask::REFRESH_ONCE);
-
-  captureData->mCaptureInvertCamera = Dali::CameraActor::New(size);
-  captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::POSITION_X, size.x / 2.0f);
-  captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::POSITION_Y, size.y / 2.0f);
-
-  captureData->mCaptureUrl       = Dali::Toolkit::Image::GenerateUrl(captureData->mCaptureFrameBuffer, 0u);
-  captureData->mCaptureImageView = Dali::Toolkit::ImageView::New(captureData->mCaptureUrl.GetUrl());
-  captureData->mCaptureImageView.SetProperty(Dali::Actor::Property::SIZE, size);
-  captureData->mCaptureImageView.Add(captureData->mCaptureInvertCamera);
-
-  Window window = DevelWindow::Get(Self());
-  window.Add(captureData->mCaptureImageView);
-
-  captureData->mCaptureInvertTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
-  captureData->mCaptureInvertFrameBuffer = Dali::FrameBuffer::New(captureData->mCaptureInvertTexture.GetWidth(), captureData->mCaptureInvertTexture.GetHeight(), Dali::FrameBuffer::Attachment::DEPTH_STENCIL);
-  captureData->mCaptureInvertFrameBuffer.AttachColorTexture(captureData->mCaptureInvertTexture);
-
-  captureData->mCaptureInvertTask = taskList.CreateTask();
-  captureData->mCaptureInvertTask.SetSourceActor(captureData->mCaptureImageView);
-  captureData->mCaptureInvertTask.SetExclusive(true);
-  captureData->mCaptureInvertTask.SetCullMode(false);
-  captureData->mCaptureInvertTask.SetOrderIndex(SCENE_ORDER_INDEX + 2);
-  captureData->mCaptureInvertTask.SetCameraActor(captureData->mCaptureInvertCamera);
-  captureData->mCaptureInvertTask.SetFrameBuffer(captureData->mCaptureInvertFrameBuffer);
-  captureData->mCaptureInvertTask.SetClearEnabled(true);
-  captureData->mCaptureInvertTask.SetClearColor(Color::TRANSPARENT);
-  captureData->mCaptureInvertTask.SetRefreshRate(Dali::RenderTask::REFRESH_ONCE);
-  captureData->mCaptureInvertTask.FinishedSignal().Connect(this, &SceneView::OnCaptureFinished);
-
-  captureData->mStartTick = mTimerTickCount;
-
-  mCaptureContainer.push_back(std::make_pair(captureData->mCaptureInvertTask, captureData));
-
-  if(!mCaptureTimer)
+  else
   {
-    mCaptureTimer = Dali::Timer::New(1000);
-    mCaptureTimer.TickSignal().Connect(this, &SceneView::OnTimeOut);
-    mCaptureTimer.Start();
+    if(!camera.GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE))
+    {
+      mRootLayer.Add(camera);
+    }
+
+    std::shared_ptr<CaptureData> captureData = std::make_shared<CaptureData>();
+    captureData->mCaptureId                  = mCaptureId;
+    captureData->mCaptureTexture             = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+    captureData->mCaptureFrameBuffer         = Dali::FrameBuffer::New(captureData->mCaptureTexture.GetWidth(), captureData->mCaptureTexture.GetHeight(), Dali::FrameBuffer::Attachment::DEPTH_STENCIL);
+    DevelFrameBuffer::SetMultiSamplingLevel(captureData->mCaptureFrameBuffer, mFrameBufferMultiSamplingLevel);
+    captureData->mCaptureFrameBuffer.AttachColorTexture(captureData->mCaptureTexture);
+
+    captureData->mCaptureCamera                    = camera;
+    captureData->mCaptureCameraOriginalAspectRatio = captureData->mCaptureCamera.GetAspectRatio();
+    captureData->mCaptureCamera.SetAspectRatio((float)width / (float)height);
+
+    RenderTaskList taskList   = mSceneHolder.GetRenderTaskList();
+    captureData->mCaptureTask = taskList.CreateTask();
+    captureData->mCaptureTask.SetSourceActor(mRootLayer);
+    captureData->mCaptureTask.SetExclusive(true);
+    captureData->mCaptureTask.SetCullMode(false);
+    captureData->mCaptureTask.SetOrderIndex(SCENE_ORDER_INDEX + 1);
+    captureData->mCaptureTask.SetCameraActor(captureData->mCaptureCamera);
+    captureData->mCaptureTask.SetFrameBuffer(captureData->mCaptureFrameBuffer);
+    captureData->mCaptureTask.SetClearEnabled(true);
+    captureData->mCaptureTask.SetClearColor(Color::TRANSPARENT);
+    captureData->mCaptureTask.SetRefreshRate(Dali::RenderTask::REFRESH_ONCE);
+
+    captureData->mCaptureInvertCamera = Dali::CameraActor::New(size);
+    captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+    captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::POSITION_X, size.x / 2.0f);
+    captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::POSITION_Y, size.y / 2.0f);
+
+    captureData->mCaptureUrl       = Dali::Toolkit::Image::GenerateUrl(captureData->mCaptureFrameBuffer, 0u);
+    captureData->mCaptureImageView = Dali::Toolkit::ImageView::New(captureData->mCaptureUrl.GetUrl());
+    captureData->mCaptureImageView.SetProperty(Dali::Actor::Property::SIZE, size);
+    captureData->mCaptureImageView.Add(captureData->mCaptureInvertCamera);
+
+    Window window = DevelWindow::Get(Self());
+    window.Add(captureData->mCaptureImageView);
+
+    captureData->mCaptureInvertTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+    captureData->mCaptureInvertFrameBuffer = Dali::FrameBuffer::New(captureData->mCaptureInvertTexture.GetWidth(), captureData->mCaptureInvertTexture.GetHeight(), Dali::FrameBuffer::Attachment::DEPTH_STENCIL);
+    captureData->mCaptureInvertFrameBuffer.AttachColorTexture(captureData->mCaptureInvertTexture);
+
+    captureData->mCaptureInvertTask = taskList.CreateTask();
+    captureData->mCaptureInvertTask.SetSourceActor(captureData->mCaptureImageView);
+    captureData->mCaptureInvertTask.SetExclusive(true);
+    captureData->mCaptureInvertTask.SetCullMode(false);
+    captureData->mCaptureInvertTask.SetOrderIndex(SCENE_ORDER_INDEX + 2);
+    captureData->mCaptureInvertTask.SetCameraActor(captureData->mCaptureInvertCamera);
+    captureData->mCaptureInvertTask.SetFrameBuffer(captureData->mCaptureInvertFrameBuffer);
+    captureData->mCaptureInvertTask.SetClearEnabled(true);
+    captureData->mCaptureInvertTask.SetClearColor(Color::TRANSPARENT);
+    captureData->mCaptureInvertTask.SetRefreshRate(Dali::RenderTask::REFRESH_ONCE);
+    captureData->mCaptureInvertTask.FinishedSignal().Connect(this, &SceneView::OnCaptureFinished);
+
+    captureData->mStartTick = mTimerTickCount;
+
+    mCaptureContainer.push_back(std::make_pair(captureData->mCaptureInvertTask, captureData));
+
+    if(!mCaptureTimer)
+    {
+      mCaptureTimer = Dali::Timer::New(1000);
+      mCaptureTimer.TickSignal().Connect(this, &SceneView::OnTimeOut);
+      mCaptureTimer.Start();
+    }
   }
   return mCaptureId++;
 }
@@ -1628,16 +1651,13 @@ void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
 
 void SceneView::OnCaptureFinished(Dali::RenderTask& task)
 {
-  int32_t                 captureId = INVALID_CAPTURE_ID;
-  Dali::Toolkit::ImageUrl imageUrl;
-
   auto iter = std::find_if(mCaptureContainer.begin(), mCaptureContainer.end(), [task](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item)
                            { return item.first == task; });
 
   if(iter != mCaptureContainer.end())
   {
-    captureId = iter->second->mCaptureId;
-    imageUrl  = Dali::Toolkit::ImageUrl::New(iter->second->mCaptureInvertTexture);
+    int32_t                 captureId = iter->second->mCaptureId;
+    Dali::Toolkit::ImageUrl imageUrl  = Dali::Toolkit::ImageUrl::New(iter->second->mCaptureInvertTexture);
 
     ResetCaptureData(iter->second);
     mCaptureContainer.erase(iter);
@@ -1896,6 +1916,17 @@ void SceneView::Process(bool postProcessor)
   }
 
   mIsProcessorRegistered = false;
+}
+
+void SceneView::OnCaptureFailedIdle()
+{
+  for(auto&& captureId : mFailedCaptureRequests)
+  {
+    auto                     self = Self();
+    Dali::Scene3D::SceneView handle(Dali::Scene3D::SceneView::DownCast(self));
+    mCaptureFinishedSignal.Emit(handle, captureId, Dali::Toolkit::ImageUrl());
+  }
+  mFailedCaptureCallbacks = nullptr;
 }
 
 } // namespace Internal

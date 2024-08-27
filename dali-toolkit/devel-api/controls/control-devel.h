@@ -172,9 +172,8 @@ enum
   /**
    * @brief Role being performed in accessibility hierarchy.
    * @details Name "accessibilityRole", type Property::INTEGER.
-   * @note Property is stored as INTEGER, however its interpretaton
-   * depend on enumeration Dali::Accessibility::Role and should be read and written
-   * with usage of enumerated values.
+   * @note It gets integer value of AccessibilityRole enum then interprets to Dali::Accessibility::Role when requested by AT-SPI.
+   *  Note that setting Dali::Accessibility::Role value is still accepted for backward compatibility but not preferred.
    * @see Dali::Accessibility::Role
    */
   ACCESSIBILITY_ROLE,
@@ -234,10 +233,22 @@ enum
   ACCESSIBILITY_VALUE,
 
   /**
-   * @brief Indicates the accessibility services treat the controla as scrollable.
+   * @brief Indicates the accessibility services treat the control as scrollable.
    * @details Name "accessibilityScrollable", type Property::BOOLEAN.
    */
   ACCESSIBILITY_SCROLLABLE,
+
+  /**
+   * @brief Bitset integer of AccessibilityState which describes the current state of a control.
+   * @details Name "accessibilityStates", type Property::INTEGER.
+   */
+  ACCESSIBILITY_STATES,
+
+  /**
+   * @brief Indicates the accessibility services treat the controla as modal.
+   * @details Name "accessibilityIsModal", type Property::BOOLEAN.
+   */
+  ACCESSIBILITY_IS_MODAL,
 };
 
 } // namespace Property

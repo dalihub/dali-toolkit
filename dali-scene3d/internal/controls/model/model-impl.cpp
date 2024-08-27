@@ -293,7 +293,7 @@ void Model::AddModelNode(Scene3D::ModelNode modelNode)
   if(modelNode.HasColliderMesh())
   {
     RegisterColliderMesh(modelNode);
-    Scene3D::ColliderMeshProcessor::Get().ColliderMeshChanged(this);
+    Scene3D::ColliderMeshProcessor::Get().ColliderMeshChanged(*this);
   }
 
   if(Self().GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE))
@@ -307,7 +307,7 @@ void Model::RegisterColliderMesh(Scene3D::ModelNode& modelNode)
   mColliderMeshes[modelNode.GetProperty<int>(Actor::Property::ID)] = modelNode;
 
   // Add processor
-  Scene3D::ColliderMeshProcessor::Get().ColliderMeshChanged(this);
+  Scene3D::ColliderMeshProcessor::Get().ColliderMeshChanged(*this);
 }
 
 void Model::RemoveColliderMesh(Scene3D::ModelNode& node)
@@ -795,7 +795,6 @@ bool Model::IsShadowReceiving() const
 {
   return mIsShadowReceiving;
 }
-
 
 ///////////////////////////////////////////////////////////
 //

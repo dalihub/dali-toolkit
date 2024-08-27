@@ -40,6 +40,9 @@ std::string                                                                    T
 void                                                                           TestResetMoveOutedCalled();
 bool                                                                           TestGetMoveOutedCalled();
 bool                                                                           TestPropertyChangeCalled();
+bool                                                                           TestStateChangedCalled();
+bool                                                                           TestStateChangedResult(const std::string_view& expectedState, int expectedValue);
+void                                                                           TestResetStateChangedResult();
 } // namespace Accessibility
 } // namespace Dali
 

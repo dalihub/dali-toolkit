@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ namespace
 #define GET_LOCALE_TEXT(string) dgettext("dali-toolkit", string)
 #endif
 
-const char*   TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME("TextSelectionPopupButton");
+const char*         TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME("TextSelectionPopupButton");
 const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR(Dali::Vector4(0.24f, 0.72f, 0.8f, 1.0f));
 const float         DEFAULT_OPTION_PRESSED_CORNER_RADIUS = 0.0f;
 const Dali::Vector4 DEFAULT_LABEL_PADDING(Dali::Vector4(24.0f, 24.0f, 14.0f, 14.0f));
@@ -105,31 +105,31 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN(Toolkit::TextSelectionPopup, Toolkit::Control, Create);
 
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupMaxSize",              VECTOR2, POPUP_MAX_SIZE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupMinSize",              VECTOR2, POPUP_MIN_SIZE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionMaxSize",             VECTOR2, OPTION_MAX_SIZE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionMinSize",             VECTOR2, OPTION_MIN_SIZE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionDividerSize",         VECTOR2, OPTION_DIVIDER_SIZE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionDividerPadding",      VECTOR4, OPTION_DIVIDER_PADDING)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupClipboardButtonImage", STRING,  POPUP_CLIPBOARD_BUTTON_ICON_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupCutButtonImage",       STRING,  POPUP_CUT_BUTTON_ICON_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupCopyButtonImage",      STRING,  POPUP_COPY_BUTTON_ICON_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPasteButtonImage",     STRING,  POPUP_PASTE_BUTTON_ICON_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupSelectButtonImage",    STRING,  POPUP_SELECT_BUTTON_ICON_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupSelectAllButtonImage", STRING,  POPUP_SELECT_ALL_BUTTON_ICON_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupDividerColor",         VECTOR4, POPUP_DIVIDER_COLOR)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupIconColor",            VECTOR4, POPUP_ICON_COLOR)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPressedColor",         VECTOR4, POPUP_PRESSED_COLOR)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPressedCornerRadius",  FLOAT,   POPUP_PRESSED_CORNER_RADIUS)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPressedImage",         STRING,  POPUP_PRESSED_IMAGE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupFadeInDuration",       FLOAT,   POPUP_FADE_IN_DURATION)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupFadeOutDuration",      FLOAT,   POPUP_FADE_OUT_DURATION)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "backgroundBorder",          MAP,     BACKGROUND_BORDER)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "background",                MAP,     BACKGROUND)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "labelMinimumSize",          VECTOR2, LABEL_MINIMUM_SIZE)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "labelPadding",              VECTOR4, LABEL_PADDING)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "labelTextVisual",           MAP,     LABEL_TEXT_VISUAL)
-DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "enableScrollBar",           BOOLEAN, ENABLE_SCROLL_BAR)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupMaxSize", VECTOR2, POPUP_MAX_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupMinSize", VECTOR2, POPUP_MIN_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionMaxSize", VECTOR2, OPTION_MAX_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionMinSize", VECTOR2, OPTION_MIN_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionDividerSize", VECTOR2, OPTION_DIVIDER_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionDividerPadding", VECTOR4, OPTION_DIVIDER_PADDING)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupClipboardButtonImage", STRING, POPUP_CLIPBOARD_BUTTON_ICON_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupCutButtonImage", STRING, POPUP_CUT_BUTTON_ICON_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupCopyButtonImage", STRING, POPUP_COPY_BUTTON_ICON_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPasteButtonImage", STRING, POPUP_PASTE_BUTTON_ICON_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupSelectButtonImage", STRING, POPUP_SELECT_BUTTON_ICON_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupSelectAllButtonImage", STRING, POPUP_SELECT_ALL_BUTTON_ICON_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupDividerColor", VECTOR4, POPUP_DIVIDER_COLOR)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupIconColor", VECTOR4, POPUP_ICON_COLOR)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPressedColor", VECTOR4, POPUP_PRESSED_COLOR)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPressedCornerRadius", FLOAT, POPUP_PRESSED_CORNER_RADIUS)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupPressedImage", STRING, POPUP_PRESSED_IMAGE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupFadeInDuration", FLOAT, POPUP_FADE_IN_DURATION)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupFadeOutDuration", FLOAT, POPUP_FADE_OUT_DURATION)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "backgroundBorder", MAP, BACKGROUND_BORDER)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "background", MAP, BACKGROUND)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "labelMinimumSize", VECTOR2, LABEL_MINIMUM_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "labelPadding", VECTOR4, LABEL_PADDING)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "labelTextVisual", MAP, LABEL_TEXT_VISUAL)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "enableScrollBar", BOOLEAN, ENABLE_SCROLL_BAR)
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -164,7 +164,7 @@ void TextSelectionPopup::SetProperty(BaseObject* object, Property::Index index, 
 
 Property::Value TextSelectionPopup::GetProperty(BaseObject* object, Property::Index index)
 {
-  Property::Value value;
+  Property::Value             value;
   Toolkit::TextSelectionPopup selectionPopup = Toolkit::TextSelectionPopup::DownCast(Dali::BaseHandle(object));
 
   if(selectionPopup)
@@ -208,7 +208,7 @@ void TextSelectionPopup::GetProperties(Property::Map& properties)
   map.Insert(Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_COLOR, mPressedColor);
   map.Insert(Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_CORNER_RADIUS, mPressedCornerRadius);
 
-  Property::Map backgroundMap;
+  Property::Map         backgroundMap;
   Toolkit::Visual::Base backgroundVisual = DevelControl::GetVisual(*this, Toolkit::Control::Property::BACKGROUND);
   if(backgroundVisual)
   {
@@ -216,7 +216,7 @@ void TextSelectionPopup::GetProperties(Property::Map& properties)
   }
   map.Insert(Toolkit::TextSelectionPopup::Property::BACKGROUND, backgroundMap);
 
-  Property::Map borderMap;
+  Property::Map         borderMap;
   Toolkit::Visual::Base borderVisual = DevelControl::GetVisual(*this, Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER);
   if(borderVisual)
   {
@@ -279,20 +279,6 @@ void TextSelectionPopup::OnInitialize()
   // Accessibility
   self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
   self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::DIALOG);
-}
-
-DevelControl::ControlAccessible* TextSelectionPopup::CreateAccessibleObject()
-{
-  return new TextSelectionPopupAccessible(Self());
-}
-
-Dali::Accessibility::States TextSelectionPopup::TextSelectionPopupAccessible::CalculateStates()
-{
-  auto states = ControlAccessible::CalculateStates();
-
-  states[Dali::Accessibility::State::MODAL] = true;
-
-  return states;
 }
 
 void TextSelectionPopup::HideAnimationFinished(Animation& animation)

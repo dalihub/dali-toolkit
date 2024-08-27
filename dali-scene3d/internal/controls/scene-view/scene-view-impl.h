@@ -531,6 +531,11 @@ private:
    */
   void ResetCaptureTimer();
 
+  /**
+   * @brief Emit capture failed event on idle.
+   */
+  void OnCaptureFailedIdle();
+
 private: // Implementation of Processor
   /**
    * @copydoc Dali::Integration::Processor::Process()
@@ -567,6 +572,8 @@ private: // Implementation of Processor
   float                                               mSkyboxIntensity{1.0f};
   uint8_t                                             mFrameBufferMultiSamplingLevel{0u};
   Dali::Scene3D::SceneView::CaptureFinishedSignalType mCaptureFinishedSignal;
+  std::vector<int32_t>                                mFailedCaptureRequests;
+  CallbackBase*                                       mFailedCaptureCallbacks;
 
   // camera Transition
   CameraActor                                                  mTransitionCamera;
