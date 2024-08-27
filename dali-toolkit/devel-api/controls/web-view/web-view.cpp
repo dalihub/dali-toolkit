@@ -229,11 +229,6 @@ void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, 
   Dali::Toolkit::GetImpl(*this).AddJavaScriptMessageHandler(exposedObjectName, handler);
 }
 
-void WebView::AddJavaScriptEntireMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptEntireMessageHandlerCallback handler)
-{
-  Dali::Toolkit::GetImpl(*this).AddJavaScriptEntireMessageHandler(exposedObjectName, handler);
-}
-
 void WebView::RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptAlertCallback callback)
 {
   Dali::Toolkit::GetImpl(*this).RegisterJavaScriptAlertCallback(callback);

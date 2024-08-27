@@ -228,11 +228,6 @@ public:
   void AddJavaScriptMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::AddJavaScriptEntireMessageHandler()
-   */
-  void AddJavaScriptEntireMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptEntireMessageHandlerCallback handler);
-
-  /**
    * @copydoc Dali::Toolkit::WebView::RegisterJavaScriptAlertCallback()
    */
   void RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptAlertCallback callback);

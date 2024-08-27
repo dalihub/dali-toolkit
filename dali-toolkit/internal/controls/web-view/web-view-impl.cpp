@@ -534,14 +534,6 @@ void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, 
   }
 }
 
-void WebView::AddJavaScriptEntireMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptEntireMessageHandlerCallback handler)
-{
-  if(mWebEngine)
-  {
-    mWebEngine.AddJavaScriptEntireMessageHandler(exposedObjectName, std::move(handler));
-  }
-}
-
 void WebView::RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptAlertCallback callback)
 {
   if(mWebEngine)

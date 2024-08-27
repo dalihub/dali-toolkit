@@ -487,14 +487,6 @@ public:
   void AddJavaScriptMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler);
 
   /**
-   * @brief Inject a JavaScript object with a message handler into the WebView.
-   *
-   * @param[in] exposedObjectName The name of exposed object
-   * @param[in] handler The callback function
-   */
-  void AddJavaScriptEntireMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptEntireMessageHandlerCallback handler);
-
-  /**
    * @brief Register alert callback for javascript.
    *
    * @param[in] callback The callback function to be called by the JavaScript runtime.
