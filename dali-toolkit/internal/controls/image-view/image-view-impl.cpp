@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -75,7 +76,7 @@ DALI_TYPE_REGISTRATION_END()
  */
 void DiscardImageViewVisual(Dali::Toolkit::Visual::Base& visual)
 {
-  if(DALI_LIKELY(Dali::Stage::IsInstalled() && visual))
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable() && visual))
   {
     Dali::Toolkit::VisualFactory::Get().DiscardVisual(visual);
   }

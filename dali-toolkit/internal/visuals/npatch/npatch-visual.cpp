@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -314,7 +315,7 @@ NPatchVisual::NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFa
 
 NPatchVisual::~NPatchVisual()
 {
-  if(Stage::IsInstalled())
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
     if(mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER)
     {

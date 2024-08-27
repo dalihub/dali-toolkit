@@ -240,7 +240,7 @@ void DiscardVisual(RegisteredVisualContainer::Iterator sourceIter, RegisteredVis
   Toolkit::Visual::Base visual = (*sourceIter)->visual;
   if(visual)
   {
-    if(Stage::IsInstalled())
+    if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
     {
       Toolkit::VisualFactory::Get().DiscardVisual(visual);
     }
@@ -2225,7 +2225,7 @@ void Control::Impl::UpdateVisualProperties(const std::vector<std::pair<Dali::Pro
 
 void Control::Impl::EmitResourceReadySignal()
 {
-  if(DALI_LIKELY(Stage::IsInstalled())) ///< Avoid resource ready callback during shutting down
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable())) ///< Avoid resource ready callback during shutting down
   {
     if(!mIsEmittingResourceReadySignal)
     {

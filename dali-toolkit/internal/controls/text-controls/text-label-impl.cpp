@@ -239,7 +239,7 @@ void ParseTextFitProperty(Text::ControllerPtr& controller, const Property::Map* 
  */
 void DiscardTextLabelVisual(Dali::Toolkit::Visual::Base& visual)
 {
-  if(DALI_LIKELY(Dali::Stage::IsInstalled() && visual))
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable() && visual))
   {
     Dali::Toolkit::VisualFactory::Get().DiscardVisual(visual);
   }
