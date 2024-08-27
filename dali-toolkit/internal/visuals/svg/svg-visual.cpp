@@ -29,6 +29,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/stage.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 
@@ -84,7 +85,7 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
 
 SvgVisual::~SvgVisual()
 {
-  if(Stage::IsInstalled())
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
     if(mSvgLoadId != SvgLoader::INVALID_SVG_LOAD_ID)
     {
