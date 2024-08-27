@@ -35,10 +35,9 @@ namespace Dali
 {
 namespace Toolkit
 {
-class BlurEffectImpl;
-
 namespace Internal
 {
+class BlurEffectImpl;
 using BlurEffectImplPtr = IntrusivePtr<BlurEffectImpl>;
 
 class BlurEffectImpl : public RenderEffectImpl

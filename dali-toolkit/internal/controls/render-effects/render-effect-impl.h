@@ -95,7 +95,7 @@ protected:
   Vector2 GetTargetSize() const;
 
   /**
-   * @brief Get Owner control.
+   * @brief Get Owner control. It could be return empty handle if owner control is not set, or destroyed.
    * @return mOwnerControl
    */
   Toolkit::Control GetOwnerControl() const;
@@ -149,8 +149,9 @@ private:
   void OnControlInheritedVisibilityChanged(Actor actor, bool visible);
 
 private:
-  Dali::Renderer         mRenderer;     // An additional renderer for mOwnerControl
-  Dali::Toolkit::Control mOwnerControl; ///< TODO : Make it as WeakHandle if mSizeNotification reference issue is fixed.
+  Dali::Renderer mRenderer; // An additional renderer for mOwnerControl
+
+  Dali::WeakHandle<Dali::Toolkit::Control> mOwnerControl; ///< Weakhandle of owner control.
 
   PropertyNotification mSizeNotification; // Resize/Relayout signal.
   Vector2              mTargetSize;       // The final size of mOwnerControl
