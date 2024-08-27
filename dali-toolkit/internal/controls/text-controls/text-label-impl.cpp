@@ -247,7 +247,7 @@ void ParseTextFitProperty(Text::ControllerPtr& controller, const Property::Map* 
  */
 void DiscardTextLabelVisual(Dali::Toolkit::Visual::Base& visual)
 {
-  if(DALI_LIKELY(Dali::Stage::IsInstalled() && visual))
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable() && visual))
   {
     Dali::Toolkit::VisualFactory::Get().DiscardVisual(visual);
   }
@@ -1202,7 +1202,7 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       const Vector2& size = propertyValue.Get<Vector2>();
       if(mSize != size)
       {
-        mSize = size;
+        mSize          = size;
         mIsSizeChanged = true;
       }
       break;
@@ -1212,7 +1212,7 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       const float width = propertyValue.Get<float>();
       if(mSize.width != width)
       {
-        mSize.width = width;
+        mSize.width    = width;
         mIsSizeChanged = true;
       }
       break;
@@ -1222,7 +1222,7 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       const float height = propertyValue.Get<float>();
       if(mSize.height != height)
       {
-        mSize.height = height;
+        mSize.height   = height;
         mIsSizeChanged = true;
       }
       break;
@@ -1233,7 +1233,7 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       if(mController->GetDefaultColor() != textColor)
       {
         mController->SetDefaultColor(textColor);
-        mTextUpdateNeeded = true;
+        mTextUpdateNeeded    = true;
         mIsAsyncRenderNeeded = true;
       }
       break;
@@ -1271,7 +1271,7 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
         if(backgroundValue)
         {
           Vector4 backgroundColor = Vector4::ZERO;
-          backgroundColor = backgroundValue->Get<Vector4>();
+          backgroundColor         = backgroundValue->Get<Vector4>();
           mController->SetBackgroundColorWithCutout(backgroundColor);
         }
       }
@@ -1304,8 +1304,8 @@ void TextLabel::OnSceneConnection(int depth)
 
 void TextLabel::OnSceneDisconnection()
 {
-  mIsSizeChanged = false;
-  mIsManualRender = false;
+  mIsSizeChanged    = false;
+  mIsManualRender   = false;
   mIsManualRendered = false;
 
   if(mTextScroller)
@@ -1350,8 +1350,8 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
   Extents padding;
   padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
 
-  float width  = std::max(size.x - (padding.start + padding.end), 0.0f);
-  float height = std::max(size.y - (padding.top + padding.bottom), 0.0f);
+  float   width  = std::max(size.x - (padding.start + padding.end), 0.0f);
+  float   height = std::max(size.y - (padding.top + padding.bottom), 0.0f);
   Vector2 contentSize(width, height);
 
   // Support Right-To-Left
@@ -1390,7 +1390,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
     DALI_LOG_RELEASE_INFO("Request render, size : %f, %f\n", contentSize.width, contentSize.height);
     AsyncTextParameters parameters = GetAsyncTextParameters(Async::RENDER_FIXED_SIZE, contentSize, padding, layoutDirection);
     TextVisual::UpdateAsyncRenderer(mVisual, parameters);
-    mTextUpdateNeeded = false;
+    mTextUpdateNeeded    = false;
     mIsAsyncRenderNeeded = false;
     return;
   }
@@ -1487,12 +1487,12 @@ AsyncTextParameters TextLabel::GetAsyncTextParameters(const Async::RequestType r
   mController->GetRawText(text);
 
   AsyncTextParameters parameters;
-  parameters.requestType            = requestType;
-  parameters.textWidth              = contentSize.width;
-  parameters.textHeight             = contentSize.height;
-  parameters.padding                = padding;
-  parameters.layoutDirection        = layoutDirection;
-  parameters.text                   = text;
+  parameters.requestType     = requestType;
+  parameters.textWidth       = contentSize.width;
+  parameters.textHeight      = contentSize.height;
+  parameters.padding         = padding;
+  parameters.layoutDirection = layoutDirection;
+  parameters.text            = text;
 
   parameters.maxTextureSize         = Dali::GetMaxTextureSize();
   parameters.fontSize               = mController->GetDefaultFontSize(Text::Controller::POINT_SIZE);
@@ -1597,9 +1597,9 @@ void TextLabel::SetUpAutoScrolling()
 
   PixelData data    = typesetter->Render(verifiedSize, mController->GetTextDirection(), Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888); // ignore the horizontal alignment
   Texture   texture = Texture::New(Dali::TextureType::TEXTURE_2D,
-                                   data.GetPixelFormat(),
-                                   data.GetWidth(),
-                                   data.GetHeight());
+                                 data.GetPixelFormat(),
+                                 data.GetWidth(),
+                                 data.GetHeight());
   texture.Upload(data);
 
   TextureSet textureSet = TextureSet::New();
@@ -1626,8 +1626,8 @@ void TextLabel::AsyncSetupAutoScroll(Text::AsyncTextRenderInfo renderInfo)
   Size  controlSize = renderInfo.controlSize;
   float wrapGap     = renderInfo.autoScrollWrapGap;
 
-  PixelData data  = renderInfo.autoScrollPixelData;
-  Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D,
+  PixelData data    = renderInfo.autoScrollPixelData;
+  Texture   texture = Texture::New(Dali::TextureType::TEXTURE_2D,
                                  data.GetPixelFormat(),
                                  data.GetWidth(),
                                  data.GetHeight());
@@ -1707,7 +1707,7 @@ void TextLabel::AsyncLoadComplete(Text::AsyncTextRenderInfo renderInfo)
 
   if(mIsManualRender)
   {
-    mIsManualRender = false;
+    mIsManualRender   = false;
     mIsManualRendered = true;
   }
 
@@ -1758,7 +1758,7 @@ void TextLabel::EmitAsyncTextRenderedSignal(float width, float height)
 void TextLabel::EmitAsyncNaturalSizeComputedSignal(float width, float height)
 {
   Dali::Toolkit::TextLabel handle(GetOwner());
-  Extents padding;
+  Extents                  padding;
   padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
   mAsyncNaturalSizeComputedSignal.Emit(handle, width + (padding.start + padding.end), height + (padding.top + padding.bottom));
 }
@@ -1766,7 +1766,7 @@ void TextLabel::EmitAsyncNaturalSizeComputedSignal(float width, float height)
 void TextLabel::EmitAsyncHeightForWidthComputedSignal(float width, float height)
 {
   Dali::Toolkit::TextLabel handle(GetOwner());
-  Extents padding;
+  Extents                  padding;
   padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
   mAsyncHeightForWidthComputedSignal.Emit(handle, width, height + (padding.top + padding.bottom));
 }
@@ -1891,9 +1891,9 @@ void TextLabel::EnableControlBackground(const bool enable)
 
 void TextLabel::RequestAsyncNaturalSize()
 {
-  Actor   self = Self();
-  Extents padding;
-  Size    contentSize = Size::ZERO;
+  Actor                       self = Self();
+  Extents                     padding;
+  Size                        contentSize     = Size::ZERO;
   Dali::LayoutDirection::Type layoutDirection = mController->GetLayoutDirection(self);
 
   AsyncTextParameters parameters = GetAsyncTextParameters(Async::COMPUTE_NATURAL_SIZE, contentSize, padding, layoutDirection);
@@ -1902,9 +1902,9 @@ void TextLabel::RequestAsyncNaturalSize()
 
 void TextLabel::RequestAsyncHeightForWidth(float width)
 {
-  Actor   self = Self();
-  Extents padding;
-  Size    contentSize(width, 0.0f);
+  Actor                       self = Self();
+  Extents                     padding;
+  Size                        contentSize(width, 0.0f);
   Dali::LayoutDirection::Type layoutDirection = mController->GetLayoutDirection(self);
 
   AsyncTextParameters parameters = GetAsyncTextParameters(Async::COMPUTE_HEIGHT_FOR_WIDTH, contentSize, padding, layoutDirection);
@@ -1936,10 +1936,10 @@ void TextLabel::RequestAsyncRenderWithFixedSize(float width, float height)
   }
 
   AsyncTextParameters parameters = GetAsyncTextParameters(Async::RENDER_FIXED_SIZE, contentSize, padding, layoutDirection);
-  parameters.manualRender = true;
+  parameters.manualRender        = true;
 
-  mIsManualRender = TextVisual::UpdateAsyncRenderer(mVisual, parameters);
-  mTextUpdateNeeded = false;
+  mIsManualRender      = TextVisual::UpdateAsyncRenderer(mVisual, parameters);
+  mTextUpdateNeeded    = false;
   mIsAsyncRenderNeeded = false;
 }
 
@@ -1968,10 +1968,10 @@ void TextLabel::RequestAsyncRenderWithFixedWidth(float width, float heightConstr
   }
 
   AsyncTextParameters parameters = GetAsyncTextParameters(Async::RENDER_FIXED_WIDTH, contentSize, padding, layoutDirection);
-  parameters.manualRender = true;
+  parameters.manualRender        = true;
 
-  mIsManualRender = TextVisual::UpdateAsyncRenderer(mVisual, parameters);
-  mTextUpdateNeeded = false;
+  mIsManualRender      = TextVisual::UpdateAsyncRenderer(mVisual, parameters);
+  mTextUpdateNeeded    = false;
   mIsAsyncRenderNeeded = false;
 }
 
@@ -2000,10 +2000,10 @@ void TextLabel::RequestAsyncRenderWithConstraint(float widthConstraint, float he
   }
 
   AsyncTextParameters parameters = GetAsyncTextParameters(Async::RENDER_CONSTRAINT, contentSize, padding, layoutDirection);
-  parameters.manualRender = true;
+  parameters.manualRender        = true;
 
-  mIsManualRender = TextVisual::UpdateAsyncRenderer(mVisual, parameters);
-  mTextUpdateNeeded = false;
+  mIsManualRender      = TextVisual::UpdateAsyncRenderer(mVisual, parameters);
+  mTextUpdateNeeded    = false;
   mIsAsyncRenderNeeded = false;
 }
 
