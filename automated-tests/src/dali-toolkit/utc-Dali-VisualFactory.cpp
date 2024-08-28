@@ -2960,6 +2960,14 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
                                     .Add("ROUNDED_CORNER,", true)
                                     .Add("BLUR_EDGE", true);
 
+  Property::Map npatchShader;
+  npatchShader["shaderType"]   = "npatch";
+
+  Property::Map npatchShader2;
+  npatchShader2["shaderType"]   = "npatch";
+  npatchShader2["shaderOption"] = Property::Map() .Add("MASKING", true);
+  npatchShader2["xStretchCount"] = 4;
+  npatchShader2["yStretchCount"] = 3;
 
   Property::Map customSHader;
   customSHader["shaderType"]   = "custom";
@@ -2977,6 +2985,8 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   factory.AddPrecompileShader(textShader2);
   factory.AddPrecompileShader(colorShader);
   factory.AddPrecompileShader(colorShader2);
+  factory.AddPrecompileShader(npatchShader);
+  factory.AddPrecompileShader(npatchShader2);
   factory.AddPrecompileShader(customSHader);
 
   factory.UsePreCompiledShader();

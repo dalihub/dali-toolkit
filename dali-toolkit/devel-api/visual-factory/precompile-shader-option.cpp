@@ -29,6 +29,7 @@ namespace
   const char* TOKEN_TYPE_TEXT("text");
   const char* TOKEN_TYPE_COLOR("color");
   const char* TOKEN_TYPE_MODEL_3D("3d");
+  const char* TOKEN_TYPE_NPATCH("npatch");
   const char* TOKEN_TYPE_CUSTOM("custom");
 
   // OPTION
@@ -46,6 +47,9 @@ namespace
   const char* TOKEN_OPTION_STYLES("STYLES");
   const char* TOKEN_OPTION_OVERLAY("OVERLAY");
   const char* TOKEN_OPTION_EMOJI("EMOJI");
+  const char* TOKEN_OPTION_STRETCH_X("xStretchCount");
+  const char* TOKEN_OPTION_STRETCH_Y("yStretchCount");
+
 
   // CUSTOM
   const char* TOKEN_CUSTOM_VERTEX("vertexShader");
@@ -64,7 +68,9 @@ PrecompileShaderOption::PrecompileShaderOption(const Property::Map& shaderOption
   mShaderOptions(),
   mShaderName(""),
   mVertexShader(""),
-  mFragmentShader("")
+  mFragmentShader(""),
+  mNpatchXStretchCount(0),
+  mNpatchYStretchCount(0)
 {
   ConvertShaderMap(shaderOption);
 }
@@ -102,6 +108,10 @@ void PrecompileShaderOption::ConvertShaderMap(const Property::Map& shaderOption)
         else if(shaderType == TOKEN_TYPE_MODEL_3D)
         {
           mShaderType = ShaderType::MODEL_3D;
+        }
+        else if(shaderType == TOKEN_TYPE_NPATCH)
+        {
+          mShaderType = ShaderType::NPATCH;
         }
         else if(shaderType == TOKEN_TYPE_CUSTOM)
         {
@@ -251,6 +261,20 @@ void PrecompileShaderOption::ConvertShaderMap(const Property::Map& shaderOption)
         mShaderName = value.Get<std::string>();
       }
     }
+    else if(key == TOKEN_OPTION_STRETCH_X)
+    {
+      if(value.GetType() == Property::INTEGER)
+      {
+        mNpatchXStretchCount = value.Get<int>();
+      }
+    }
+    else if(key == TOKEN_OPTION_STRETCH_Y)
+    {
+      if(value.GetType() == Property::INTEGER)
+      {
+        mNpatchYStretchCount = value.Get<int>();
+      }
+    }
   }
 }
 
@@ -277,6 +301,16 @@ std::string PrecompileShaderOption::GetVertexShader() const
 std::string PrecompileShaderOption::GetFragmentShader() const
 {
   return mFragmentShader;
+}
+
+uint32_t PrecompileShaderOption::GetNpatchXStretchCount() const
+{
+  return mNpatchXStretchCount;
+}
+
+uint32_t PrecompileShaderOption::GetNpatchYStretchCount()  const
+{
+  return mNpatchYStretchCount;
 }
 
 } // namespace Toolkit
