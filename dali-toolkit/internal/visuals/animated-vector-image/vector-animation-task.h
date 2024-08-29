@@ -77,6 +77,7 @@ public:
     RESEND_NEED_RESOURCE_READY        = 1 << 7,
     RESEND_DYNAMIC_PROPERTY           = 1 << 8,
     RESEND_NOTIFY_AFTER_RASTERIZATION = 1 << 9,
+    RESEND_FRAME_SPEED_FACTOR         = 1 << 10,
   };
 
   /**
@@ -96,6 +97,7 @@ public:
       height(0),
       loopCount(-1),
       playStateId(0),
+      frameSpeedFactor(1.0f),
       notifyAfterRasterization(false)
     {
     }
@@ -112,7 +114,9 @@ public:
       height                   = rhs.height;
       loopCount                = rhs.loopCount;
       playStateId              = rhs.playStateId;
+      frameSpeedFactor         = rhs.frameSpeedFactor;
       notifyAfterRasterization = rhs.notifyAfterRasterization;
+
       dynamicProperties.insert(dynamicProperties.end(), rhs.dynamicProperties.begin(), rhs.dynamicProperties.end());
       return *this;
     }
@@ -128,6 +132,7 @@ public:
     uint32_t                             height;
     int32_t                              loopCount;
     uint32_t                             playStateId;
+    float                                frameSpeedFactor;
     bool                                 notifyAfterRasterization;
   };
 
@@ -406,6 +411,7 @@ private:
   TimePoint                            mNextFrameStartTime;
   int64_t                              mFrameDurationMicroSeconds;
   float                                mFrameRate;
+  float                                mFrameSpeedFactor;
   uint32_t                             mCurrentFrame;
   uint32_t                             mTotalFrame;
   uint32_t                             mStartFrame;

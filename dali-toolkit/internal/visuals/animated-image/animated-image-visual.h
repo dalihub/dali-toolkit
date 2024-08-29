@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/devel-api/adaptor-framework/animated-image-loading.h>
 #include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/math/vector4.h>
@@ -295,6 +295,7 @@ private:
   Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
   TextureManager::MaskingDataPointer              mMaskingData;
   Dali::ImageDimensions                           mDesiredSize;
+  float                                           mFrameSpeedFactor;
 
   // Shared variables
   uint32_t        mFrameCount; // Number of frames
