@@ -346,6 +346,35 @@ bool IsCreateAccessibleEnabled(Toolkit::Control control)
   return GetControlImplementation(control).IsCreateAccessibleEnabled();
 }
 
+void EmitAccessibilityStateChanged(Dali::Actor actor, Accessibility::State state, int newValue)
+{
+  auto accessible = Accessibility::Accessible::Get(actor);
+  if(DALI_LIKELY(accessible))
+  {
+    auto control = Toolkit::Control::DownCast(actor);
+    if(DALI_LIKELY(control))
+    {
+      if(state == Accessibility::State::SHOWING)
+      {
+        bool isModal = ControlAccessible::IsModal(control);
+        if(isModal)
+        {
+          if(newValue == 1)
+          {
+            Accessibility::Bridge::GetCurrentBridge()->RegisterDefaultLabel(accessible);
+          }
+          else
+          {
+            Accessibility::Bridge::GetCurrentBridge()->UnregisterDefaultLabel(accessible);
+          }
+        }
+      }
+    }
+
+    accessible->EmitStateChanged(state, newValue, 0);
+  }
+}
+
 } // namespace DevelControl
 
 } // namespace Toolkit
