@@ -656,6 +656,15 @@ DALI_TOOLKIT_API void EnableCreateAccessible(Toolkit::Control control, bool enab
  */
 DALI_TOOLKIT_API bool IsCreateAccessibleEnabled(Toolkit::Control control);
 
+/**
+ * @brief The method to emit accessibility state-changed event to accessibility clients
+ *
+ * @param actor The actor that has accessibility state change.
+ * @param state  The accessibility state.
+ * @param newValue new value to set.
+ */
+DALI_TOOLKIT_API void EmitAccessibilityStateChanged(Dali::Actor actor, Dali::Accessibility::State state, int newValue);
+
 } // namespace DevelControl
 
 } // namespace Toolkit
