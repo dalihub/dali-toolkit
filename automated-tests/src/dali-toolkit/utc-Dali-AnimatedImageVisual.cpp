@@ -98,7 +98,8 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
       .Add(DevelVisual::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::ABSOLUTE)
       .Add(DevelVisual::Property::BORDERLINE_WIDTH, 33.3f)
       .Add(DevelVisual::Property::BORDERLINE_COLOR, Color::RED)
-      .Add(DevelVisual::Property::BORDERLINE_OFFSET, 0.3f));
+      .Add(DevelVisual::Property::BORDERLINE_OFFSET, 0.3f)
+      .Add(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 2.0f));
 
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap(resultMap);
@@ -172,6 +173,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<int>() == DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
 
+  value = resultMap.Find(DevelImageVisual::Property::FRAME_SPEED_FACTOR, Property::FLOAT);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<float>(), 2.0f, TEST_LOCATION);
+
   // Natural size getted as desired size
   Vector2 naturalSize;
   animatedImageVisual.GetNaturalSize(naturalSize);
@@ -230,7 +235,8 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
       .Add("cornerRadiusPolicy", Visual::Transform::Policy::RELATIVE)
       .Add("borderlineWidth", 20.0f)
       .Add("borderlineColor", Vector4())
-      .Add("borderlineOffset", -1.0f));
+      .Add("borderlineOffset", -1.0f)
+      .Add("frameSpeedFactor", 0.5f));
 
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap(resultMap);
@@ -325,6 +331,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   value = resultMap.Find(DevelImageVisual::Property::MASKING_TYPE, Property::INTEGER);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<int>() == DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+
+  value = resultMap.Find(DevelImageVisual::Property::FRAME_SPEED_FACTOR, Property::FLOAT);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<float>(), 0.5f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1049,6 +1059,7 @@ int UtcDaliAnimatedImageVisualAnimatedImage01(void)
     propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
     propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 4);
     propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+    propertyMap.Insert(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 1.5f);
 
     VisualFactory factory = VisualFactory::Get();
     Visual::Base  visual  = factory.CreateVisual(propertyMap);
@@ -1301,6 +1312,7 @@ int UtcDaliAnimatedImageVisualMultiImage01(void)
     propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 4);
     propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 8);
     propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 100);
+    propertyMap.Insert(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 1.5f);
 
     VisualFactory factory = VisualFactory::Get();
     Visual::Base  visual  = factory.CreateVisual(propertyMap);
@@ -2052,7 +2064,7 @@ int UtcDaliAnimatedImageVisualDesiredSize(void)
   int desiredHeight = 20;
 
   // texture size have to keep it's ratio. So, the size of texture should be 20x20.
-  const int resultWidth = 20;
+  const int resultWidth  = 20;
   const int resultHeight = 20;
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(TEST_GIF_FILE_NAME, ImageDimensions(desiredWidth, desiredHeight));
