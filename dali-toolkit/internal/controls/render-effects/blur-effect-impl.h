@@ -35,10 +35,9 @@ namespace Dali
 {
 namespace Toolkit
 {
-class BlurEffectImpl;
-
 namespace Internal
 {
+class BlurEffectImpl;
 using BlurEffectImplPtr = IntrusivePtr<BlurEffectImpl>;
 
 class BlurEffectImpl : public RenderEffectImpl
@@ -113,15 +112,6 @@ private:
    * @note The return value is a copy, not mTargetSize itself.
    */
   Vector2 GetTargetSizeForValidTexture() const;
-
-  /**
-   * @brief Calculates gaussian weight
-   * @param[in] localOffset Input to the function
-   */
-  inline float CalculateGaussianWeight(float localOffset, float sigma) const
-  {
-    return (1.0f / sqrt(2.0f * Math::PI * sigma)) * exp(-(localOffset * localOffset) * (1.0f / (2.0f * sigma * sigma)));
-  }
 
   /**
    * @brief Sets shader constants, gaussian kernel weights and pixel offsets.

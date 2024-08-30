@@ -1,6 +1,5 @@
 varying highp vec2 vTexCoord;
 uniform sampler2D sTexture;
-uniform lowp vec4 uColor;
 uniform highp vec2 uSampleOffsets[NUM_SAMPLES];
 uniform highp float uSampleWeights[NUM_SAMPLES];
 
