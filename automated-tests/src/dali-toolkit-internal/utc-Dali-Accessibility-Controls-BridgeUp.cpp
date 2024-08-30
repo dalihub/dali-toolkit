@@ -33,6 +33,18 @@ const auto flushCoalescableMessage = [](Dali::ToolkitTestApplication& applicatio
 };
 }
 
+void utc_dali_toolkit_accessibility_control_bridgeup_startup(void)
+{
+  test_return_value = TET_UNDEF;
+  DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
+}
+
+void utc_dali_toolkit_accessibility_control_bridgeup_cleanup(void)
+{
+  test_return_value = TET_PASS;
+  DBusWrapper::Install({}); // Clean up TestDBusWrapper
+}
+
 namespace Dali
 {
 namespace Accessibility

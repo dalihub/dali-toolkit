@@ -45,6 +45,7 @@ void utc_dali_toolkit_accessibility_value_startup(void)
 void utc_dali_toolkit_accessibility_value_cleanup(void)
 {
   test_return_value = TET_PASS;
+  DBusWrapper::Install({}); // Clean up TestDBusWrapper
 }
 
 int utcDaliAccessibilityProgressBarGetMinimum(void)

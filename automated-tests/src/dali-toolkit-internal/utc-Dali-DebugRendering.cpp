@@ -93,6 +93,9 @@ void dali_debug_rendering_startup(void)
 void dali_debug_rendering_cleanup(void)
 {
   test_return_value = TET_PASS;
+#if defined(ELDBUS_ENABLED)
+  DBusWrapper::Install({}); // Clean up TestDBusWrapper
+#endif
 }
 
 int UtcDaliDebugRenderingGetVisual1(void)
