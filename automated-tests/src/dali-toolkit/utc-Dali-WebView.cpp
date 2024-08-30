@@ -103,6 +103,10 @@ static std::unique_ptr<Dali::WebEngineContextMenu>                        gConte
 static int                                                                gHitTestCreatedCallbackCalled           = 0;
 static int                                                                gCookieManagerChangsWatchCallbackCalled = 0;
 static int                                                                gPlainTextReceivedCallbackCalled        = 0;
+static int                                                                gNewWindowPolicyDecidedCallbackCalled   = 0;
+static int                                                                gFullscreenEnteredCallbackCalled        = 0;
+static int                                                                gFullscreenExitedCallbackCalled         = 0;
+static int                                                                gTextFoundCallbackCalled                = 0;
 
 struct CallbackFunctor
 {
@@ -323,6 +327,26 @@ static void OnContextMenuHidden(std::unique_ptr<Dali::WebEngineContextMenu> menu
 {
   gContextMenuHiddenCallbackCalled++;
   gContextMenuHiddenInstance = std::move(menu);
+}
+
+static void OnNewWindowPolicyDecided(std::unique_ptr<Dali::WebEnginePolicyDecision> decision)
+{
+  gNewWindowPolicyDecidedCallbackCalled++;
+}
+
+static void OnFullscreenEntered()
+{
+  gFullscreenEnteredCallbackCalled++;
+}
+
+static void OnFullscreenExited()
+{
+  gFullscreenExitedCallbackCalled++;
+}
+
+static void OnTextFound(uint32_t arg)
+{
+  gTextFoundCallbackCalled++;
 }
 
 } // namespace
@@ -864,6 +888,8 @@ int UtcDaliWebViewSslCertificateHttpAuthentication(void)
   DALI_TEST_CHECK(gSslCertificateInstance);
   DALI_TEST_EQUALS(gSslCertificateInstance->GetPem(), "abc", TEST_LOCATION);
   DALI_TEST_CHECK(gSslCertificateInstance->IsContextSecure());
+  DALI_TEST_EQUALS(gSslCertificateInstance->GetPolicyDecisionError(), 1, TEST_LOCATION);
+  DALI_TEST_CHECK(gSslCertificateInstance->SuspendPolicyDecision());
 
   // http authentication.
   DALI_TEST_CHECK(gHttpAuthInstance);
@@ -1481,9 +1507,18 @@ int UtcDaliWebViewMethodsForCoverage(void)
   view.AddJavaScriptMessageHandler("jsObject",
                                    [](const std::string& arg) {
                                    });
+
+  view.AddJavaScriptEntireMessageHandler("jsObject2",
+                                   [](const std::string& arg, const std::string& arg2) {
+                                   });
+
   view.SetTtsFocus(true);
 
+  //view.ChangeOrientation(90);
+
   DALI_TEST_CHECK(view);
+
+  //view.ExitFullscreen();
 
   END_TEST;
 }
@@ -2412,5 +2447,100 @@ int UtcDaliWebViewVisibilityChange(void)
     tet_result(TET_FAIL);
   }
 
+  END_TEST;
+}
+
+int UtcDaliWebViewMethodsForCoverage2(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
+  view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
+
+  application.GetScene().Add(view);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(view);
+
+  try
+  {
+    // Just call API and exception check.
+    view.ChangeOrientation(90);
+    view.ExitFullscreen();
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+    // Should not throw exception
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterNewWindowPolicyDecidedCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterNewWindowPolicyDecidedCallback(&OnNewWindowPolicyDecided);
+  DALI_TEST_EQUALS(gNewWindowPolicyDecidedCallbackCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gNewWindowPolicyDecidedCallbackCalled, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterFullscreenEnteredCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterFullscreenEnteredCallback(&OnFullscreenEntered);
+  DALI_TEST_EQUALS(gFullscreenEnteredCallbackCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gFullscreenEnteredCallbackCalled, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterFullscreenExitedCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterFullscreenExitedCallback(&OnFullscreenExited);
+  DALI_TEST_EQUALS(gFullscreenExitedCallbackCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gFullscreenExitedCallbackCalled, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterTextFoundCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterTextFoundCallback(&OnTextFound);
+  DALI_TEST_EQUALS(gTextFoundCallbackCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gTextFoundCallbackCalled, 1, TEST_LOCATION);
   END_TEST;
 }

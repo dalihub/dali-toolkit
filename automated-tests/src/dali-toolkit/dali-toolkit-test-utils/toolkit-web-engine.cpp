@@ -509,6 +509,16 @@ public:
   {
     return true;
   }
+
+  int GetPolicyDecisionError() const override
+  {
+    return 1;
+  }
+
+  bool SuspendPolicyDecision() const override
+  {
+    return true;
+  }
 };
 
 class MockWebEngineHttpAuthHandler : public Dali::WebEngineHttpAuthHandler
@@ -1181,6 +1191,9 @@ public:
   {
     return nullptr;
   }
+  void ChangeOrientation(int orientation) override
+  {
+  }
   std::string GetUrl() const override
   {
     return std::string();
@@ -1274,6 +1287,9 @@ public:
   {
   }
   void AddJavaScriptMessageHandler(const std::string& exposedObjectName, JavaScriptMessageHandlerCallback handler) override
+  {
+  }
+  void AddJavaScriptEntireMessageHandler(const std::string& exposedObjectName, JavaScriptEntireMessageHandlerCallback handler) override
   {
   }
   void RegisterJavaScriptAlertCallback(JavaScriptAlertCallback callback) override
@@ -1423,6 +1439,9 @@ public:
   {
     return false;
   }
+  void ExitFullscreen() override
+  {
+  }
   void RegisterFrameRenderedCallback(WebEngineFrameRenderedCallback callback) override
   {
   }
@@ -1456,6 +1475,9 @@ public:
   void RegisterNavigationPolicyDecidedCallback(WebEngineNavigationPolicyDecidedCallback callback) override
   {
   }
+  void RegisterNewWindowPolicyDecidedCallback(WebEngineNewWindowPolicyDecidedCallback callback) override
+  {
+  }
   void RegisterNewWindowCreatedCallback(WebEngineNewWindowCreatedCallback callback) override
   {
   }
@@ -1472,6 +1494,15 @@ public:
   {
   }
   void RegisterContextMenuHiddenCallback(WebEngineContextMenuHiddenCallback callback) override
+  {
+  }
+  void RegisterFullscreenEnteredCallback(WebEngineFullscreenEnteredCallback callback) override
+  {
+  }
+  void RegisterFullscreenExitedCallback(WebEngineFullscreenExitedCallback callback) override
+  {
+  }
+  void RegisterTextFoundCallback(WebEngineTextFoundCallback callback) override
   {
   }
   void GetPlainTextAsynchronously(PlainTextReceivedCallback callback) override
@@ -1946,6 +1977,26 @@ public:
     }
   }
 
+  void RegisterNewWindowPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback callback)
+  {
+    mNewWindowPolicyDecidedCallback = callback;
+  }
+
+  void RegisterFullscreenEnteredCallback(Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback callback)
+  {
+    mFullscreenEnteredCallback = callback;
+  }
+
+  void RegisterFullscreenExitedCallback(Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback callback)
+  {
+    mFullscreenExitedCallback = callback;
+  }
+
+  void RegisterTextFoundCallback(Dali::WebEnginePlugin::WebEngineTextFoundCallback callback)
+  {
+    mTextFoundCallback = callback;
+  }
+
   std::string              mUrl;
   std::vector<std::string> mHistory;
   size_t                   mCurrentPlusOnePos;
@@ -1991,6 +2042,10 @@ public:
   Dali::WebEnginePlugin::GeolocationPermissionCallback            mGeolocationPermissionCallback;
   Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback          mHitTestCreatedCallback;
   Dali::WebEnginePlugin::PlainTextReceivedCallback                mPlainTextReceivedCallback;
+  Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback  mNewWindowPolicyDecidedCallback;
+  Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback       mFullscreenEnteredCallback;
+  Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback        mFullscreenExitedCallback;
+  Dali::WebEnginePlugin::WebEngineTextFoundCallback               mTextFoundCallback;
 };
 
 namespace
@@ -2103,6 +2158,23 @@ bool OnLoadUrl()
     {
       std::unique_ptr<Dali::WebEngineContextMenu> hiddenMenu(new MockWebEngineContextMenu());
       gInstance->mContextMenuHiddenCallback(std::move(hiddenMenu));
+    }
+    if(gInstance->mNewWindowPolicyDecidedCallback)
+    {
+      std::unique_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
+      gInstance->mNewWindowPolicyDecidedCallback(std::move(policyDecision));
+    }
+    if(gInstance->mFullscreenEnteredCallback)
+    {
+      gInstance->mFullscreenEnteredCallback();
+    }
+    if(gInstance->mFullscreenExitedCallback)
+    {
+      gInstance->mFullscreenExitedCallback();
+    }
+    if(gInstance->mTextFoundCallback)
+    {
+      gInstance->mTextFoundCallback(1);
     }
   }
   return false;
@@ -2435,6 +2507,10 @@ NativeImageSourcePtr WebEngine::GetNativeImageSource()
   return sourcePtr;
 }
 
+void WebEngine::ChangeOrientation(int orientation)
+{
+}
+
 void WebEngine::LoadHtmlString(const std::string& htmlString)
 {
 }
@@ -2524,6 +2600,10 @@ void WebEngine::EvaluateJavaScript(const std::string& script, std::function<void
 }
 
 void WebEngine::AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler)
+{
+}
+
+void WebEngine::AddJavaScriptEntireMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&, const std::string&)> handler)
 {
 }
 
@@ -2711,6 +2791,10 @@ bool WebEngine::SendWheelEvent(const WheelEvent& event)
   return true;
 }
 
+void WebEngine::ExitFullscreen()
+{
+}
+
 void WebEngine::SetFocus(bool focused)
 {
 }
@@ -2845,5 +2929,26 @@ void WebEngine::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextRecei
 {
   Internal::Adaptor::GetImplementation(*this).GetPlainTextAsynchronously(callback);
 }
+
+void WebEngine::RegisterNewWindowPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterNewWindowPolicyDecidedCallback(callback);
+}
+
+void WebEngine::RegisterFullscreenEnteredCallback(Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterFullscreenEnteredCallback(callback);
+}
+
+void WebEngine::RegisterFullscreenExitedCallback(Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterFullscreenExitedCallback(callback);
+}
+
+void WebEngine::RegisterTextFoundCallback(Dali::WebEnginePlugin::WebEngineTextFoundCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterTextFoundCallback(callback);
+}
+
 
 } // namespace Dali
