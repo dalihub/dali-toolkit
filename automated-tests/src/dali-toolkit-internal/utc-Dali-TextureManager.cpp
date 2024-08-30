@@ -53,6 +53,9 @@ void utc_dali_toolkit_texture_manager_startup(void)
 void utc_dali_toolkit_texture_manager_cleanup(void)
 {
   test_return_value = TET_PASS;
+#if defined(ELDBUS_ENABLED)
+  DBusWrapper::Install({}); // Clean up TestDBusWrapper
+#endif
 }
 
 namespace

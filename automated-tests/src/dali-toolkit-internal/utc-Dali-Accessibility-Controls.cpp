@@ -26,8 +26,7 @@ void utc_dali_accessibility_controls_startup(void)
 void utc_dali_accessibility_controls_cleanup(void)
 {
   test_return_value = TET_PASS;
-  //DBusWrapper::Install({}) is a de-install
-  DBusWrapper::Install({});
+  DBusWrapper::Install({}); // Clean up TestDBusWrapper
 }
 
 int UtcDaliControlAccessibileGet01(void)
