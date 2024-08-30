@@ -65,6 +65,9 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(LOOPING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelImageVisual::LoopingMode, AUTO_REVERSE)
 DALI_ENUM_TO_STRING_TABLE_END(LOOPING_MODE)
 
+constexpr float MINIMUM_FRAME_SPEED_FACTOR(0.01f);
+constexpr float MAXIMUM_FRAME_SPEED_FACTOR(100.0f);
+
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VECTOR_ANIMATION");
 #endif
@@ -98,6 +101,7 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   mPlacementActor(),
   mPlayState(DevelImageVisual::PlayState::STOPPED),
   mEventCallback(nullptr),
+  mFrameSpeedFactor(1.0f),
   mLastSentPlayStateId(0u),
   mLoadFailed(false),
   mRendererAdded(false),
@@ -214,6 +218,7 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
   map.Insert(Toolkit::DevelImageVisual::Property::ENABLE_FRAME_CACHE, mEnableFrameCache);
   map.Insert(Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, mNotifyAfterRasterization);
+  map.Insert(Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR, mFrameSpeedFactor);
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -281,6 +286,10 @@ void AnimatedVectorImageVisual::DoSetProperties(const Property::Map& propertyMap
       else if(keyValue.first == NOTIFY_AFTER_RASTERIZATION)
       {
         DoSetProperty(Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, keyValue.second);
+      }
+      else if(keyValue.first == FRAME_SPEED_FACTOR)
+      {
+        DoSetProperty(Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR, keyValue.second);
       }
     }
   }
@@ -413,6 +422,25 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
 
           mAnimationData.notifyAfterRasterization = mNotifyAfterRasterization;
           mAnimationData.resendFlag |= VectorAnimationTask::RESEND_NOTIFY_AFTER_RASTERIZATION;
+        }
+      }
+      break;
+    }
+
+    case Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR:
+    {
+      float frameSpeedFactor = 1.0f;
+      if(value.Get(frameSpeedFactor))
+      {
+        // TODO : Could we remove this limitation?
+        Dali::ClampInPlace(frameSpeedFactor, MINIMUM_FRAME_SPEED_FACTOR, MAXIMUM_FRAME_SPEED_FACTOR);
+
+        if(!Dali::Equals(mFrameSpeedFactor, frameSpeedFactor))
+        {
+          mFrameSpeedFactor = frameSpeedFactor;
+
+          mAnimationData.frameSpeedFactor = mFrameSpeedFactor;
+          mAnimationData.resendFlag |= VectorAnimationTask::RESEND_FRAME_SPEED_FACTOR;
         }
       }
       break;

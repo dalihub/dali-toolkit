@@ -221,6 +221,7 @@ const char* const ENABLE_BROKEN_IMAGE("enableBrokenImage");
 const char* const ENABLE_FRAME_CACHE("enableFrameCache");
 const char* const NOTIFY_AFTER_RASTERIZATION("notifyAfterRasterization");
 const char* const SYNCHRONOUS_SIZING("synchronousSizing");
+const char* const FRAME_SPEED_FACTOR("frameSpeedFactor");
 
 // Text visual
 const char* const TEXT_PROPERTY("text");

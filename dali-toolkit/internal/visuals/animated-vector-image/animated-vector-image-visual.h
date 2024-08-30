@@ -240,6 +240,7 @@ private:
   WeakHandle<Actor>                  mPlacementActor;
   DevelImageVisual::PlayState::Type  mPlayState;
   CallbackBase*                      mEventCallback; // Not owned
+  float                              mFrameSpeedFactor;
 
   uint32_t mLastSentPlayStateId;
 
