@@ -191,9 +191,9 @@ Dali::Accessibility::Role ConvertRawRoleToAtspiRole(int32_t rawRole)
 
 bool IsModalRole(int32_t rawRole)
 {
-  using Dali::Accessibility::Role;
-  Role role = ConvertRawRoleToAtspiRole(rawRole);
-  return role == Role::ALERT || role == Role::DIALOG || role == Role::POPUP_MENU;
+  return IsRoleV2(rawRole) && (static_cast<AccessibilityRole>(rawRole) == AccessibilityRole::ALERT ||
+                               static_cast<AccessibilityRole>(rawRole) == AccessibilityRole::DIALOG ||
+                               static_cast<AccessibilityRole>(rawRole) == AccessibilityRole::POPUP_MENU);
 }
 
 bool IsHighlightableRole(int32_t rawRole)
@@ -692,6 +692,18 @@ void ControlAccessible::OnStatePropertySet(AccessibilityStates newStates)
   }
 
   mStatesSnapshot = newStates;
+}
+
+bool ControlAccessible::IsModal(Actor actor)
+{
+  bool isModalPropertySet = actor.GetProperty<bool>(Property::ACCESSIBILITY_IS_MODAL);
+  if(isModalPropertySet)
+  {
+    return true;
+  }
+
+  int32_t rawRole = actor.GetProperty<int32_t>(Property::ACCESSIBILITY_ROLE);
+  return IsModalRole(rawRole);
 }
 
 } // namespace Dali::Toolkit::DevelControl
