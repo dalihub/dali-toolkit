@@ -643,20 +643,16 @@ Control::Impl::Impl(Control& controlImpl)
   mDispatchKeyEvents(true),
   mProcessorRegistered(false)
 {
-  Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::pair<std::shared_ptr<Accessibility::Accessible>, bool> {
+  Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::shared_ptr<Accessibility::Accessible> {
     auto control = Toolkit::Control::DownCast(actor);
     if(!control)
     {
-      return {nullptr, true};
+      return nullptr;
     }
 
     auto& controlImpl = Toolkit::Internal::GetImplementation(control);
-    if(controlImpl.mImpl->IsCreateAccessibleEnabled())
-    {
-      return {std::shared_ptr<DevelControl::ControlAccessible>(controlImpl.CreateAccessibleObject()), true};
-    }
 
-    return {nullptr, false};
+    return controlImpl.GetAccessibleObject();
   });
   mAccessibilityProps.states[DevelControl::AccessibilityState::ENABLED] = true;
 }
@@ -2255,9 +2251,6 @@ void Control::Impl::OnSceneDisconnection()
   {
     (*replacedIter)->pending = false;
   }
-
-  uint32_t actorId = self.GetProperty<int>(Actor::Property::ID);
-  Accessibility::Bridge::GetCurrentBridge()->RemoveAccessible(actorId);
 }
 
 void Control::Impl::SetMargin(Extents margin)
@@ -2449,13 +2442,17 @@ bool Control::Impl::OnIdleCallback()
 
 std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::Impl::GetAccessibleObject()
 {
-  return std::dynamic_pointer_cast<DevelControl::ControlAccessible>(Accessibility::Accessible::GetOwningPtr(mControlImpl.Self()));
+  if(mAccessibleCreatable && !mAccessibleObject)
+  {
+    mAccessibleObject.reset(mControlImpl.CreateAccessibleObject());
+  }
+
+  return mAccessibleObject;
 }
 
 bool Control::Impl::IsAccessibleCreated() const
 {
-  uint32_t actorId = mControlImpl.Self().GetProperty<int>(Actor::Property::ID);
-  return !!Accessibility::Bridge::GetCurrentBridge()->GetAccessible(actorId);
+  return !!mAccessibleObject;
 }
 
 void Control::Impl::EnableCreateAccessible(bool enable)

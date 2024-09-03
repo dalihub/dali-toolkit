@@ -703,6 +703,8 @@ private:
   bool                                        mIsAccessibilityPropertySetSignalRegistered{false};
   Dali::PropertyNotification                  mAccessibilityPositionNotification;
   Dali::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType{Accessibility::ScreenRelativeMoveType::OUTSIDE};
+
+  std::shared_ptr<Toolkit::DevelControl::ControlAccessible> mAccessibleObject;
 };
 
 } // namespace Internal
