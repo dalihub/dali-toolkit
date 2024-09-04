@@ -443,7 +443,7 @@ uint32_t SceneView::GetCameraCount() const
 
 CameraActor SceneView::GetSelectedCamera() const
 {
-  return mSelectedCamera;
+  return (mInCameraTransition && mTransitionDestinationCamera) ? mTransitionDestinationCamera : mSelectedCamera;
 }
 
 CameraActor SceneView::GetCamera(uint32_t index) const
