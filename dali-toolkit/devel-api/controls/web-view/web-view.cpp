@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,11 +82,6 @@ Dali::WebEngineCookieManager* WebView::GetCookieManager()
 WebView WebView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<WebView, Internal::WebView>(handle);
-}
-
-void WebView::ChangeOrientation(int orientation)
-{
-  return Dali::Toolkit::GetImpl(*this).ChangeOrientation(orientation);
 }
 
 Dali::Toolkit::WebSettings* WebView::GetSettings() const

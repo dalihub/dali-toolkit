@@ -338,14 +338,6 @@ void WebView::OnRelayout(const Vector2& size, RelayoutContainer& container)
   SetDisplayArea(displayArea);
 }
 
-void WebView::ChangeOrientation(int orientation)
-{
-  if(mWebEngine)
-  {
-    mWebEngine.ChangeOrientation(orientation);
-  }
-}
-
 Dali::Toolkit::WebSettings* WebView::GetSettings() const
 {
   return mWebSettings.get();
