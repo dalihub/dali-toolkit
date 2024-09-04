@@ -646,14 +646,6 @@ bool WebView::CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayin
   return mWebEngine ? mWebEngine.CheckVideoPlayingAsynchronously(std::move(callback)) : false;
 }
 
-void WebView::ExitFullscreen()
-{
-  if(mWebEngine)
-  {
-    mWebEngine.ExitFullscreen();
-  }
-}
-
 void WebView::RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback)
 {
   if(mWebEngine)
@@ -790,14 +782,6 @@ void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::Web
   }
 }
 
-void WebView::RegisterNewWindowPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback callback)
-{
-  if(mWebEngine)
-  {
-    mWebEngine.RegisterNewWindowPolicyDecidedCallback(callback);
-  }
-}
-
 void WebView::RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback)
 {
   if(mWebEngine)
@@ -843,30 +827,6 @@ void WebView::RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngine
   if(mWebEngine)
   {
     mWebEngine.RegisterContextMenuHiddenCallback(std::move(callback));
-  }
-}
-
-void WebView::RegisterFullscreenEnteredCallback(Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback callback)
-{
-  if(mWebEngine)
-  {
-    mWebEngine.RegisterFullscreenEnteredCallback(callback);
-  }
-}
-
-void WebView::RegisterFullscreenExitedCallback(Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback callback)
-{
-  if(mWebEngine)
-  {
-    mWebEngine.RegisterFullscreenExitedCallback(callback);
-  }
-}
-
-void WebView::RegisterTextFoundCallback(Dali::WebEnginePlugin::WebEngineTextFoundCallback callback)
-{
-  if(mWebEngine)
-  {
-    mWebEngine.RegisterTextFoundCallback(callback);
   }
 }
 
