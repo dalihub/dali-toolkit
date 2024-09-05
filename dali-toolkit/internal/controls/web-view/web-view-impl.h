@@ -447,6 +447,26 @@ public:
    */
   void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback);
 
+  /**
+   * @copydoc Dali::Toolkit::WebView::WebAuthenticationCancel()
+   */
+  void WebAuthenticationCancel();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterWebAuthDisplayQRCallback()
+   */
+  void RegisterWebAuthDisplayQRCallback(Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterWebAuthResponseCallback()
+   */
+  void RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterUserMediaPermissionRequestCallback()
+   */
+  void RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback);
+
 public: // Properties
   /**
    * @brief Called when a property of an object of this type is set.
