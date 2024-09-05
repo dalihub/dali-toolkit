@@ -81,6 +81,7 @@ void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
       if(!mRenderer)
       {
         mRenderer = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
+        mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
       }
 
       ownerControl.InheritedVisibilityChangedSignal().Connect(this, &RenderEffectImpl::OnControlInheritedVisibilityChanged);

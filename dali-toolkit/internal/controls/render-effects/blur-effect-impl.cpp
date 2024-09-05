@@ -181,6 +181,7 @@ void BlurEffectImpl::OnInitialize()
   mHorizontalBlurActor = Actor::New();
   mHorizontalBlurActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   Renderer horizontalBlurRenderer = CreateRenderer(BASIC_VERTEX_SOURCE, fragmentSource.c_str());
+  horizontalBlurRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
   mHorizontalBlurActor.AddRenderer(horizontalBlurRenderer);
   mInternalRoot.Add(mHorizontalBlurActor);
 
@@ -188,6 +189,7 @@ void BlurEffectImpl::OnInitialize()
   mVerticalBlurActor = Actor::New();
   mVerticalBlurActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   Renderer verticalBlurRenderer = CreateRenderer(BASIC_VERTEX_SOURCE, fragmentSource.c_str());
+  verticalBlurRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
   mVerticalBlurActor.AddRenderer(verticalBlurRenderer);
   mInternalRoot.Add(mVerticalBlurActor);
 }

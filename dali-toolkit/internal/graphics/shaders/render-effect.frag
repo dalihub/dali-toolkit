@@ -3,6 +3,7 @@ varying highp vec2 vTexCoord;
 varying highp vec2 vOptRectSize;
 varying highp vec4 vCornerRadius;
 
+uniform lowp vec4 uColor;
 uniform highp vec3 uSize;
 uniform sampler2D sTexture;
 
@@ -31,7 +32,7 @@ float roundedBoxSDF(vec2 PixelPositionFromCenter, vec2 RectangleEdgePositionFrom
 
 void main()
 {
-  gl_FragColor = texture2D(sTexture, vTexCoord);
+  gl_FragColor = texture2D(sTexture, vTexCoord) * uColor;
   gl_FragColor.rgb = applyDithering(gl_FragColor.rgb);
 
   highp vec2 location = (vTexCoord.xy - vec2(0.5)) * uSize.xy;
@@ -53,6 +54,8 @@ void main()
     float distance = roundedBoxSDF(location, uSize.xy * 0.5, radius);
 
     float smoothedAlpha = 1.0 - smoothstep(-edgeSoftness, edgeSoftness, distance);
-    gl_FragColor.a *= smoothedAlpha;
+
+    // Premultiply alpha feature used.
+    gl_FragColor *= smoothedAlpha;
   }
 }
