@@ -3,7 +3,7 @@ precision mediump float;
 uniform mat4 uMvpMatrix;
 INPUT vec3 aPosition;
 INPUT float aColor;
-flat OUTPUT float vColor;
+FLAT OUTPUT float vColor;
 
 void main()
 {

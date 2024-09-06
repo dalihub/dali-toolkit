@@ -1,20 +1,19 @@
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
 INPUT highp vec2 vPosition;
-INPUT highp vec2 vRectSize;
-INPUT highp vec2 vOptRectSize;
-INPUT highp float vAliasMargin;
+FLAT INPUT highp vec2 vRectSize;
+FLAT INPUT highp vec2 vOptRectSize;
+FLAT INPUT highp float vAliasMargin;
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-INPUT highp vec4 vCornerRadius;
+FLAT INPUT highp vec4 vCornerRadius;
 #endif
 #endif
 #if defined(IS_REQUIRED_CUTOUT)
 INPUT highp vec2 vPositionFromCenter;
 #if defined(IS_REQUIRED_ROUNDED_CORNER)
-INPUT highp vec4 vCutoutCornerRadius;
+FLAT INPUT highp vec4 vCutoutCornerRadius;
 #endif
 #endif
 
-uniform highp vec3 uSize;
 uniform lowp vec4 uColor;
 uniform lowp vec3 mixColor;
 #ifdef IS_REQUIRED_BLUR
@@ -27,6 +26,7 @@ uniform lowp vec4 uActorColor;
 #endif
 
 #if defined(IS_REQUIRED_CUTOUT)
+uniform highp vec3 uSize;
 uniform lowp int uCutoutWithCornerRadius;
 #endif
 
