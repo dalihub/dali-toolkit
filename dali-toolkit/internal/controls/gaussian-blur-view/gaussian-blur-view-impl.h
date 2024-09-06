@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_GAUSSIAN_BLUR_EFFECT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,8 +100,6 @@ private:
    */
   void OnChildRemove(Actor& child) override;
 
-  void        SetBlurBellCurveWidth(float blurBellCurveWidth);
-  float       CalcGaussianWeight(float x);
   void        SetShaderConstants();
   std::string GetSampleOffsetsPropertyName(unsigned int index) const;
   std::string GetSampleWeightsPropertyName(unsigned int index) const;
@@ -109,9 +107,9 @@ private:
   void OnRenderTaskFinished(Dali::RenderTask& renderTask);
 
   /////////////////////////////////////////////////////////////
-  unsigned int  mNumSamples;         // number of blur samples in each of horiz/vert directions
-  float         mBlurBellCurveWidth; // constant used when calculating the gaussian weights
-  Pixel::Format mPixelFormat;        // pixel format used by render targets
+  unsigned int  mPixelRadius;    // number of blur samples in each of horiz/vert directions
+  float         mBellCurveWidth; // constant used when calculating the gaussian weights
+  Pixel::Format mPixelFormat;    // pixel format used by render targets
 
   /////////////////////////////////////////////////////////////
   // downsampling is used for the separated blur passes to get increased blur with the same number of samples and also to make rendering quicker
@@ -152,17 +150,18 @@ private:
   // for rendering all user added children to offscreen target
   FrameBuffer mRenderTargetForRenderingChildren;
   RenderTask  mRenderChildrenTask;
+  FrameBuffer mBlurResultFrameBuffer;
 
   /////////////////////////////////////////////////////////////
   // for rendering separated blur passes to offscreen targets
   FrameBuffer mRenderTarget1;
   FrameBuffer mRenderTarget2;
 
-  Actor mHorizBlurActor;
-  Actor mVertBlurActor;
+  Actor mHorizontalBlurActor;
+  Actor mVerticalBlurActor;
 
-  RenderTask mHorizBlurTask;
-  RenderTask mVertBlurTask;
+  RenderTask mHorizontalBlurTask;
+  RenderTask mVerticalBlurTask;
 
   /////////////////////////////////////////////////////////////
   // for compositing blur and children renders to offscreen target
