@@ -372,6 +372,10 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
   // Whether the first valid script is a right to left script.
   bool isParagraphRTL = false;
 
+  // Whether there is an RTL marker in the invalid script.
+  // This variable was added to solve the problem that autoscroll does not work properly when there are only RTL Marker and LTR Text.
+  bool hasRTLMarker = false;
+
   // Count the number of characters which are valid for all scripts. i.e. white spaces or '\n'.
   Length numberOfAllScriptCharacters = 0u;
 
@@ -434,6 +438,7 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
     {
       // Check if whether is right to left markup and Keeps true if the previous value was true.
       currentScriptRun.isRightToLeft = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftMark(character);
+      hasRTLMarker = hasRTLMarker || TextAbstraction::IsRightToLeftMark(character);
 
       // Count all these characters to be added into a script.
       ++numberOfAllScriptCharacters;
@@ -533,12 +538,14 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
       // Adds the white spaces which are at the begining of the script.
       numberOfAllScriptCharacters++;
       AddCurrentScriptAndCreatNewScript(script,
-                                        TextAbstraction::IsRightToLeftScript(script),
+                                        hasRTLMarker ? true : TextAbstraction::IsRightToLeftScript(script),
                                         true,
                                         currentScriptRun,
                                         numberOfAllScriptCharacters,
                                         scripts,
                                         scriptIndex);
+
+      hasRTLMarker = false;
     }
     else
     {
