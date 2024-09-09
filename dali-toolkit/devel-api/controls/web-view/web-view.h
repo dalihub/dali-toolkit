@@ -796,25 +796,6 @@ public:
    */
   void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback);
 
-  /**
-   * @brief Cancel WebAuthentication(cancel in progress passkey operation).
-   */
-  void WebAuthenticationCancel();
-
-  /**
-   * @brief Register WebAuthDisplayQR callback.
-   *
-   * @param[in] callback The callback informs browser app to display QR code popup for passkey scenario.
-   */
-  void RegisterWebAuthDisplayQRCallback(Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback callback);
-
-  /**
-   * @brief Register WebAuthResponse callback.
-   *
-   * @param[in] callback The callback informs browser app that the passkey registration and authentication has been successful and app can close QR popup.
-   */
-  void RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback);
-
 public: // Not intended for application developers
   /// @cond internal
   /**

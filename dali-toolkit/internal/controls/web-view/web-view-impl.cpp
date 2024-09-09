@@ -828,30 +828,6 @@ void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceive
   }
 }
 
-void WebView::WebAuthenticationCancel()
-{
-  if(mWebEngine)
-  {
-    mWebEngine.WebAuthenticationCancel();
-  }
-}
-
-void WebView::RegisterWebAuthDisplayQRCallback(Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback callback)
-{
-  if(mWebEngine)
-  {
-    mWebEngine.RegisterWebAuthDisplayQRCallback(std::move(callback));
-  }
-}
-
-void WebView::RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback)
-{
-  if(mWebEngine)
-  {
-    mWebEngine.RegisterWebAuthResponseCallback(std::move(callback));
-  }
-}
-
 void WebView::OnFrameRendered()
 {
   if(mFrameRenderedCallback)
