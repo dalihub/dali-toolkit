@@ -97,6 +97,7 @@ function output_end
 EOF
 }
 
+modules=`ls -1 build/src | grep -v CMakeFiles | grep -v cmake_install.cmake | grep -v Makefile`
 
 if [ $opt_modules == 1 ] ; then
     modules= get_modules
@@ -116,7 +117,6 @@ find build \( -name "*.gcda" \) -exec rm '{}' \;
 ASCII_BOLD="\e[1m"
 ASCII_RESET="\e[0m"
 
-modules=`ls -1 src/ | grep -v CMakeList | grep -v common | grep -v manual`
 if [ -f summary.xml ] ; then unlink summary.xml ; fi
 
 if [ $opt_tct == 1 ] ; then
