@@ -54,7 +54,6 @@ ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfa
 
   // Core needs to be initialized next before we start the adaptor
   InitializeCore();
-  Accessibility::Accessible::SetObjectRegistry(mCore->GetObjectRegistry());
 
   // This will also emit the window created signals
   AdaptorImpl::GetImpl(*mAdaptor).Start(mMainWindow);
