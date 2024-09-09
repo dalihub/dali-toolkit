@@ -1,7 +1,7 @@
 
 precision mediump float;
 uniform lowp vec4 uColor;
-flat INPUT float vColor;
+FLAT INPUT float vColor;
 
 void main()
 {

@@ -1,11 +1,11 @@
 INPUT mediump vec2 vTexCoord;
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 INPUT highp vec2 vPosition;
-INPUT highp vec2 vRectSize;
-INPUT highp vec2 vOptRectSize;
-INPUT highp float vAliasMargin;
+FLAT INPUT highp vec2 vRectSize;
+FLAT INPUT highp vec2 vOptRectSize;
+FLAT INPUT highp float vAliasMargin;
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-INPUT highp vec4 vCornerRadius;
+FLAT INPUT highp vec4 vCornerRadius;
 #endif
 #endif
 #ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
