@@ -14,7 +14,6 @@ uniform lowp float uHasMultipleTextColors;
 #endif
 uniform lowp vec4 uTextColorAnimatable;
 uniform lowp vec4 uColor;
-uniform lowp vec3 mixColor;
 
 void main()
 {
@@ -48,7 +47,7 @@ void main()
 #endif
 
   // Draw the text as overlay above the style
-  OUT_COLOR = uColor * vec4(mixColor, 1.0) * (
+  OUT_COLOR = uColor * (
 #ifdef IS_REQUIRED_OVERLAY
                    (
 #endif

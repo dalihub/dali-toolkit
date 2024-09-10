@@ -1174,14 +1174,6 @@ int UtcDaliVisualGetPropertyMap9(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualGetPropertyMap9: PrimitiveVisual");
 
-  static std::vector<UniformData> customUniforms =
-    {
-      UniformData("mixColor", Property::Type::VECTOR3),
-    };
-
-  TestGraphicsController& graphics = application.GetGraphicsController();
-  graphics.AddCustomUniforms(customUniforms);
-
   Vector4 color      = Vector4(1.0, 0.8, 0.6, 1.0);
   Vector3 dimensions = Vector3(1.0, 2.0, 3.0);
 
@@ -1268,7 +1260,7 @@ int UtcDaliVisualGetPropertyMap9(void)
   application.GetScene().Add(actor);
 
   Animation animation = Animation::New(1.0f);
-  animation.AnimateTo(DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, PrimitiveVisual::Property::MIX_COLOR), Vector3(Color::MAGENTA));
+  animation.AnimateTo(DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, PrimitiveVisual::Property::MIX_COLOR), Color::MAGENTA);
   animation.Play();
   application.SendNotification();
   application.Render(0);
@@ -1276,7 +1268,7 @@ int UtcDaliVisualGetPropertyMap9(void)
   application.SendNotification();
 
   auto& gl = application.GetGlAbstraction();
-  DALI_TEST_EQUALS(gl.CheckUniformValue<Vector3>("mixColor", Vector3(Color::MAGENTA)), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.CheckUniformValue<Vector4>("uColor", Color::MAGENTA), true, TEST_LOCATION);
 
   tet_infoline("Check property map after animation");
 
@@ -1285,7 +1277,7 @@ int UtcDaliVisualGetPropertyMap9(void)
   DALI_TEST_CHECK(value);
   color = value->Get<Vector4>();
   // Ignore alpha part
-  DALI_TEST_EQUALS(Vector3(color), Vector3(Color::MAGENTA), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(color, Color::MAGENTA, 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1959,7 +1951,6 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   static std::vector<UniformData> customUniforms =
     {
       UniformData("borderColor", Property::Type::VECTOR4),
-      UniformData("mixColor", Property::Type::VECTOR3),
     };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -1994,7 +1985,7 @@ int UtcDaliVisualAnimateBorderVisual01(void)
 
   Renderer        renderer         = actor.GetRendererAt(0);
   Property::Index borderColorIndex = renderer.GetPropertyIndex(BorderVisual::Property::COLOR);
-  Property::Index mixColorIndex    = VisualRenderer::Property::VISUAL_MIX_COLOR; //renderer.GetPropertyIndex( Visual::Property::MIX_COLOR );
+  Property::Index mixColorIndex    = Renderer::Property::MIX_COLOR;
 
   Animation animation = dummyImpl.CreateTransition(transition);
 
@@ -2012,14 +2003,10 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   DALI_TEST_EQUALS(color, testColor, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderColor", testColor), true, TEST_LOCATION);
 
-  color     = renderer.GetCurrentProperty<Vector3>(mixColorIndex);
+  color     = renderer.GetCurrentProperty<Vector4>(mixColorIndex);
   testColor = Vector4(1, 1, 1, 0.45f);
-  DALI_TEST_EQUALS(Vector3(color), Vector3(testColor), 0.0001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(testColor)), true, TEST_LOCATION);
-
-  Vector4 uColor;
-  DALI_TEST_CHECK(application.GetGlAbstraction().GetUniformValue<Vector4>("uColor", uColor));
-  DALI_TEST_EQUALS(uColor.a, testColor.a, TEST_LOCATION);
+  DALI_TEST_EQUALS(color, testColor, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", testColor), true, TEST_LOCATION);
 
   application.Render(2000u);
 
@@ -2027,13 +2014,10 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   DALI_TEST_EQUALS(color, Color::WHITE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderColor", Color::WHITE), true, TEST_LOCATION);
 
-  color     = renderer.GetCurrentProperty<Vector3>(mixColorIndex);
+  color     = renderer.GetCurrentProperty<Vector4>(mixColorIndex);
   testColor = Vector4(1, 1, 1, 0.1);
-  DALI_TEST_EQUALS(Vector3(color), Vector3(testColor), TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(testColor)), true, TEST_LOCATION);
-
-  DALI_TEST_CHECK(application.GetGlAbstraction().GetUniformValue<Vector4>("uColor", uColor));
-  DALI_TEST_EQUALS(uColor.a, testColor.a, TEST_LOCATION);
+  DALI_TEST_EQUALS(color, testColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", testColor), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2096,14 +2080,6 @@ int UtcDaliVisualAnimateColorVisual(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliAnimateColorVisual mixColor");
 
-  static std::vector<UniformData> customUniforms =
-    {
-      UniformData("mixColor", Property::Type::VECTOR3),
-    };
-
-  TestGraphicsController& graphics = application.GetGraphicsController();
-  graphics.AddCustomUniforms(customUniforms);
-
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
@@ -2120,31 +2096,31 @@ int UtcDaliVisualAnimateColorVisual(void)
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer        renderer      = actor.GetRendererAt(0);
-  Property::Index mixColorIndex = VisualRenderer::Property::VISUAL_MIX_COLOR; //renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
+  Property::Index mixColorIndex = Renderer::Property::MIX_COLOR;
 
   Property::Value blendModeValue = renderer.GetProperty(Renderer::Property::BLEND_MODE);
   DALI_TEST_EQUALS(blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION);
 
   Animation animation = Animation::New(4.0f);
-  animation.AnimateTo(Property(renderer, mixColorIndex), Vector3(Color::WHITE));
+  animation.AnimateTo(Property(renderer, mixColorIndex), Color::WHITE);
   animation.Play();
 
   application.SendNotification();
   application.Render(0);
   application.Render(2000u); // halfway point
 
-  Vector3 color     = renderer.GetCurrentProperty<Vector3>(mixColorIndex);
-  Vector3 testColor = Vector3(Color::BLUE + Color::WHITE) * 0.5f;
+  Vector4 color     = renderer.GetCurrentProperty<Vector4>(mixColorIndex);
+  Vector4 testColor = (Color::BLUE + Color::WHITE) * 0.5f;
   DALI_TEST_EQUALS(color, testColor, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", testColor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", testColor), true, TEST_LOCATION);
 
   application.Render(2000u); // halfway point between blue and white
 
-  color = renderer.GetCurrentProperty<Vector3>(mixColorIndex);
-  DALI_TEST_EQUALS(color, Vector3(Color::WHITE), TEST_LOCATION);
+  color = renderer.GetCurrentProperty<Vector4>(mixColorIndex);
+  DALI_TEST_EQUALS(color, Color::WHITE, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(Color::WHITE)), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Color::WHITE), true, TEST_LOCATION);
 
   blendModeValue = renderer.GetCurrentProperty(Renderer::Property::BLEND_MODE);
   DALI_TEST_EQUALS(blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION);
@@ -2156,14 +2132,6 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
 {
   ToolkitTestApplication application;
   tet_infoline("UtcDaliAnimatePrimitiveVisual color");
-
-  static std::vector<UniformData> customUniforms =
-    {
-      UniformData("mixColor", Property::Type::VECTOR3),
-    };
-
-  TestGraphicsController& graphics = application.GetGraphicsController();
-  graphics.AddCustomUniforms(customUniforms);
 
   {
     VisualFactory factory = VisualFactory::Get();
@@ -2215,8 +2183,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     application.SendNotification();
 
     Vector4 halfwayColor = (INITIAL_MIX_COLOR + TARGET_MIX_COLOR) * 0.5;
-    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(0.5f, 0.5f, 0.5f, halfwayColor.a)), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(halfwayColor)), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(0.5f, 0.5f, 0.5f, 1.0f) * halfwayColor), true, TEST_LOCATION);
 
     DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", blendStr.str()));
 
@@ -2226,8 +2193,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     application.SendNotification(); // Trigger signals
 
     DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Color::WHITE, TEST_LOCATION);
-    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, TARGET_MIX_COLOR.a)), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(TARGET_MIX_COLOR)), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, 1.0f) * TARGET_MIX_COLOR), true, TEST_LOCATION);
 
     DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Disable", blendStr.str()));
 
@@ -4824,7 +4790,6 @@ int UtcDaliVisualBorderlineColorAnimateTest(void)
   TestGraphicsController&         graphics = application.GetGraphicsController();
   static std::vector<UniformData> customUniforms =
     {
-      UniformData("mixColor", Property::Type::VECTOR3),
       UniformData("cornerRadius", Property::Type::VECTOR4),
       UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
       UniformData("borderlineWidth", Property::Type::FLOAT),
@@ -4834,12 +4799,10 @@ int UtcDaliVisualBorderlineColorAnimateTest(void)
   graphics.AddCustomUniforms(customUniforms);
 
   {
-    const Vector3 INITIAL_MIX_COLOR(1.0f, 0.0f, 1.0f);
-    const float   INITIAL_MIX_OPACITY(0.5f);
+    const Vector4 INITIAL_MIX_COLOR(1.0f, 0.0f, 1.0f, 0.5f);
     const Vector4 INITIAL_BORDERLINE_COLOR(0.0f, 1.0f, 0.0f, 1.0f);
     const float   INITIAL_ACTOR_OPACITY(1.0f);
-    const Vector3 TARGET_MIX_COLOR(1.0f, 0.0f, 0.0f);
-    const float   TARGET_MIX_OPACITY(0.8f);
+    const Vector4 TARGET_MIX_COLOR(1.0f, 0.0f, 0.0f, 0.8f);
     const Vector4 TARGET_BORDERLINE_COLOR(1.0f, 0.0f, 1.0f, 0.2f);
     const float   TARGET_ACTOR_OPACITY(0.5f);
 
@@ -4847,7 +4810,6 @@ int UtcDaliVisualBorderlineColorAnimateTest(void)
     Property::Map propertyMap;
     propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
     propertyMap.Insert(Visual::Property::MIX_COLOR, INITIAL_MIX_COLOR);
-    propertyMap.Insert(Visual::Property::OPACITY, INITIAL_MIX_OPACITY);
     propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, 1.0f);
     propertyMap.Insert(DevelVisual::Property::BORDERLINE_COLOR, INITIAL_BORDERLINE_COLOR);
     Visual::Base visual = factory.CreateVisual(propertyMap);
@@ -4864,7 +4826,6 @@ int UtcDaliVisualBorderlineColorAnimateTest(void)
 
     Animation animation = Animation::New(4.0f);
     animation.AnimateTo(DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, Visual::Property::MIX_COLOR), TARGET_MIX_COLOR);
-    animation.AnimateTo(DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), TARGET_MIX_OPACITY);
     animation.AnimateTo(DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), TARGET_BORDERLINE_COLOR);
     animation.AnimateTo(Property(actor, Actor::Property::OPACITY), TARGET_ACTOR_OPACITY);
     animation.Play();
@@ -4876,13 +4837,10 @@ int UtcDaliVisualBorderlineColorAnimateTest(void)
     application.Render(2000u); // halfway point
     application.SendNotification();
 
-    Vector3 halfwayMixColor        = (INITIAL_MIX_COLOR + TARGET_MIX_COLOR) * 0.5f;
-    float   halfwayMixOpacity      = (INITIAL_MIX_OPACITY + TARGET_MIX_OPACITY) * 0.5f;
+    Vector4 halfwayMixColor        = (INITIAL_MIX_COLOR + TARGET_MIX_COLOR) * 0.5f;
     Vector4 halfwayBorderlineColor = (INITIAL_BORDERLINE_COLOR + TARGET_BORDERLINE_COLOR) * 0.5f;
     float   halfwayActorOpacity    = (INITIAL_ACTOR_OPACITY + TARGET_ACTOR_OPACITY) * 0.5f;
-    halfwayMixOpacity *= halfwayActorOpacity;
-    DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector3>("mixColor", halfwayMixColor), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, halfwayMixOpacity)), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, halfwayActorOpacity) * halfwayMixColor), true, TEST_LOCATION);
     DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uActorColor", Vector4(1.0f, 1.0f, 1.0f, halfwayActorOpacity)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("borderlineColor", halfwayBorderlineColor), true, TEST_LOCATION);
 
@@ -4890,8 +4848,7 @@ int UtcDaliVisualBorderlineColorAnimateTest(void)
     application.SendNotification(); // Trigger signals
 
     DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY), TEST_LOCATION);
-    DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector3>("mixColor", TARGET_MIX_COLOR), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, TARGET_MIX_OPACITY * TARGET_ACTOR_OPACITY)), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY) * TARGET_MIX_COLOR), true, TEST_LOCATION);
     DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uActorColor", Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("borderlineColor", TARGET_BORDERLINE_COLOR), true, TEST_LOCATION);
 
@@ -5087,7 +5044,6 @@ int UtcDaliVisualGetVisualProperty01(void)
 
   static std::vector<UniformData> customUniforms =
     {
-      UniformData("mixColor", Property::Type::VECTOR3),
       UniformData("offset", Property::Type::VECTOR2),
       UniformData("size", Property::Type::VECTOR2),
       UniformData("cornerRadius", Property::Type::VECTOR4),
@@ -5120,10 +5076,9 @@ int UtcDaliVisualGetVisualProperty01(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 targetColor(1.0f, 1.0f, 1.0f);
+  Vector4 targetColor(1.0f, 1.0f, 1.0f, 0.5f);
   Vector2 targetOffset(0.05f, 0.05f);
   Vector2 targetSize(1.1f, 1.1f);
-  float   targetOpacity = 0.5f;
   Vector4 targetCornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
   float   targetBlurRadius      = 10.0f;
   float   targetBorderlineWidth = 25.0f;
@@ -5132,7 +5087,6 @@ int UtcDaliVisualGetVisualProperty01(void)
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::MIX_COLOR), targetColor);
-  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Transform::Property::OFFSET), targetOffset);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Transform::Property::SIZE), targetSize);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
@@ -5152,7 +5106,7 @@ int UtcDaliVisualGetVisualProperty01(void)
   // Test property values: they should be updated
   Property::Value* colorValue = resultMap.Find(ColorVisual::Property::MIX_COLOR, Property::VECTOR4);
   DALI_TEST_CHECK(colorValue);
-  DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(targetColor.r, targetColor.g, targetColor.b, targetOpacity), TEST_LOCATION);
+  DALI_TEST_EQUALS(colorValue->Get<Vector4>(), targetColor, TEST_LOCATION);
 
   Property::Value*     transformValue = resultMap.Find(Dali::Toolkit::Visual::Property::TRANSFORM);
   Dali::Property::Map* transformMap   = transformValue->GetMap();
@@ -5187,7 +5141,6 @@ int UtcDaliVisualGetVisualProperty01(void)
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
   // Test uniform values
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", targetColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("offset", targetOffset), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("size", targetSize), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
@@ -5211,7 +5164,6 @@ int UtcDaliVisualGetVisualProperty02(void)
 
   static std::vector<UniformData> customUniforms =
     {
-      UniformData("mixColor", Property::Type::VECTOR3),
       UniformData("offset", Property::Type::VECTOR2),
       UniformData("size", Property::Type::VECTOR2),
       UniformData("cornerRadius", Property::Type::VECTOR4),
@@ -5238,10 +5190,9 @@ int UtcDaliVisualGetVisualProperty02(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 targetColor(1.0f, 1.0f, 1.0f);
+  Vector4 targetColor(1.0f, 1.0f, 1.0f, 0.5f);
   Vector2 targetOffset(0.05f, 0.05f);
   Vector2 targetSize(1.1f, 1.1f);
-  float   targetOpacity = 0.5f;
   Vector4 targetCornerRadius(20.0f, 0.0f, 20.0f, 0.0f);
   float   targetBorderlineWidth = 77.7f;
   Vector4 targetBorderlineColor(0.4f, 0.2f, 0.3f, 0.9f);
@@ -5251,7 +5202,6 @@ int UtcDaliVisualGetVisualProperty02(void)
   // Should work when the properties are not set before
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "mixColor"), targetColor);
-  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "opacity"), targetOpacity);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "offset"), targetOffset);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "size"), targetSize);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "cornerRadius"), targetCornerRadius);
@@ -5271,7 +5221,7 @@ int UtcDaliVisualGetVisualProperty02(void)
   // Test property values: they should be updated
   Property::Value* colorValue = resultMap.Find(ColorVisual::Property::MIX_COLOR, Property::VECTOR4);
   DALI_TEST_CHECK(colorValue);
-  DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(targetColor.r, targetColor.g, targetColor.b, targetOpacity), TEST_LOCATION);
+  DALI_TEST_EQUALS(colorValue->Get<Vector4>(), targetColor, TEST_LOCATION);
 
   Property::Value*     transformValue = resultMap.Find(Dali::Toolkit::Visual::Property::TRANSFORM);
   Dali::Property::Map* transformMap   = transformValue->GetMap();
@@ -5306,7 +5256,6 @@ int UtcDaliVisualGetVisualProperty02(void)
   DALI_TEST_EQUALS(blurRadiusValue->Get<float>(), targetBlurRadius, TEST_LOCATION);
 
   // Test uniform values
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", targetColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("offset", targetOffset), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("size", targetSize), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);

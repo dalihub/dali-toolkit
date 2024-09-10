@@ -171,6 +171,11 @@ public: // from Visual
   void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
   /**
+   * @copydoc Visual::Base::EnablePreMultipliedAlpha
+   */
+  void EnablePreMultipliedAlpha(bool preMultiplied) override;
+
+  /**
    * @copydoc Visual::Base::OnDoAction
    */
   void OnDoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes) override;
@@ -362,8 +367,10 @@ private:
   Geometry GenerateGeometry(TextureManager::TextureId textureId, bool createForce);
 
 private:
-  Vector4                            mPixelArea;
-  Property::Index                    mPixelAreaIndex;
+  Vector4         mPixelArea;
+  Property::Index mPixelAreaIndex;
+  Property::Index mPreMultipliedAlphaIndex; ///< Index of premultipliedAlpha uniform.
+
   WeakHandle<Actor>                  mPlacementActor;
   VisualUrl                          mImageUrl;
   TextureManager::MaskingDataPointer mMaskingData;

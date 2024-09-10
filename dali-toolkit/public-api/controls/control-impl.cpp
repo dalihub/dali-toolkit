@@ -812,16 +812,10 @@ void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali:
   float   destinationBorderlineOffset = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, defaultBorderlineOffset);
 
   // If the value of the source Control and that of destination Control is different, the property should be transitioned.
-  if(Vector3(sourceMixColor) != Vector3(destinationMixColor))
+  if(sourceMixColor != destinationMixColor)
   {
-    sourcePropertyMap.Add(Dali::Toolkit::Visual::Property::MIX_COLOR, Vector3(sourceMixColor));
-    destinationPropertyMap.Add(Dali::Toolkit::Visual::Property::MIX_COLOR, Vector3(destinationMixColor));
-  }
-
-  if(std::abs(sourceMixColor.a - destinationMixColor.a) > Math::MACHINE_EPSILON_1)
-  {
-    sourcePropertyMap.Add(Dali::Toolkit::Visual::Property::OPACITY, sourceMixColor.a);
-    destinationPropertyMap.Add(Dali::Toolkit::Visual::Property::OPACITY, destinationMixColor.a);
+    sourcePropertyMap.Add(Dali::Toolkit::Visual::Property::MIX_COLOR, sourceMixColor);
+    destinationPropertyMap.Add(Dali::Toolkit::Visual::Property::MIX_COLOR, destinationMixColor);
   }
 
   if(sourceCornerRadius != destinationCornerRadius)

@@ -232,10 +232,13 @@ int UtcDaliImageVisualPropertyMap(void)
   application.Render();
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  auto renderer           = actor.GetRendererAt(0);
-  auto preMultipliedIndex = renderer.GetPropertyIndex("preMultipliedAlpha");
+  auto renderer = actor.GetRendererAt(0);
+
+  // Note : renderer don't have "premultipliedAlpha" at pre multiplied alpha enabled. (Since shader hold it.)
+  auto shader             = renderer.GetShader();
+  auto preMultipliedIndex = shader.GetPropertyIndex("premultipliedAlpha");
   DALI_TEST_CHECK(preMultipliedIndex != Property::INVALID_INDEX);
-  auto preMultipliedAlpha  = renderer.GetProperty<float>(preMultipliedIndex);
+  auto preMultipliedAlpha  = shader.GetProperty<float>(preMultipliedIndex);
   auto preMultipliedAlpha2 = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
   DALI_TEST_EQUALS(preMultipliedAlpha, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(preMultipliedAlpha2, true, TEST_LOCATION);
@@ -287,13 +290,15 @@ int UtcDaliImageVisualNoPremultipliedAlpha01(void)
   application.Render();
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  auto renderer           = actor.GetRendererAt(0);
-  auto preMultipliedIndex = renderer.GetPropertyIndex("preMultipliedAlpha");
+  auto renderer = actor.GetRendererAt(0);
+
+  // Note : renderer now have "premultipliedAlpha" since pre multiplied alpha disabled.
+  auto preMultipliedIndex = renderer.GetPropertyIndex("premultipliedAlpha");
   DALI_TEST_CHECK(preMultipliedIndex != Property::INVALID_INDEX);
-  auto preMultipliedAlpha  = renderer.GetProperty<bool>(preMultipliedIndex);
+  auto preMultipliedAlpha  = renderer.GetProperty<float>(preMultipliedIndex);
   auto preMultipliedAlpha2 = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
 
-  DALI_TEST_EQUALS(preMultipliedAlpha, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(preMultipliedAlpha, 0.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(preMultipliedAlpha2, false, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
@@ -343,13 +348,15 @@ int UtcDaliImageVisualNoPremultipliedAlpha02(void)
   application.Render();
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  auto renderer           = actor.GetRendererAt(0);
-  auto preMultipliedIndex = renderer.GetPropertyIndex("preMultipliedAlpha");
+  auto renderer = actor.GetRendererAt(0);
+
+  // Note : renderer now have "premultipliedAlpha" since pre multiplied alpha disabled.
+  auto preMultipliedIndex = renderer.GetPropertyIndex("premultipliedAlpha");
   DALI_TEST_CHECK(preMultipliedIndex != Property::INVALID_INDEX);
-  auto preMultipliedAlpha  = renderer.GetProperty<bool>(preMultipliedIndex);
+  auto preMultipliedAlpha  = renderer.GetProperty<float>(preMultipliedIndex);
   auto preMultipliedAlpha2 = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
 
-  DALI_TEST_EQUALS(preMultipliedAlpha, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(preMultipliedAlpha, 0.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(preMultipliedAlpha2, false, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
@@ -386,12 +393,12 @@ int UtcDaliImageVisualNoPremultipliedAlpha02(void)
 
   DALI_TEST_EQUALS(newActor.GetRendererCount(), 1u, TEST_LOCATION);
   auto newRenderer   = newActor.GetRendererAt(0);
-  preMultipliedIndex = newRenderer.GetPropertyIndex("preMultipliedAlpha");
+  preMultipliedIndex = newRenderer.GetPropertyIndex("premultipliedAlpha");
   DALI_TEST_CHECK(preMultipliedIndex != Property::INVALID_INDEX);
-  preMultipliedAlpha  = newRenderer.GetProperty<bool>(preMultipliedIndex);
+  preMultipliedAlpha  = newRenderer.GetProperty<float>(preMultipliedIndex);
   preMultipliedAlpha2 = newRenderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
 
-  DALI_TEST_EQUALS(preMultipliedAlpha, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(preMultipliedAlpha, 0.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(preMultipliedAlpha2, false, TEST_LOCATION);
 
   srcFactorRgb    = newRenderer.GetProperty<int>(Renderer::Property::BLEND_FACTOR_SRC_RGB);
@@ -1560,14 +1567,6 @@ int UtcDaliImageVisualAnimateMixColor(void)
   ToolkitTestApplication application;
   tet_infoline("Animate mix color");
 
-  static std::vector<UniformData> customUniforms =
-    {
-      UniformData("mixColor", Property::Type::VECTOR3),
-    };
-
-  TestGraphicsController& graphics = application.GetGraphicsController();
-  graphics.AddCustomUniforms(customUniforms);
-
   application.GetPlatform().SetClosestImageSize(Vector2(100, 100));
 
   VisualFactory factory = VisualFactory::Get();
@@ -1624,11 +1623,10 @@ int UtcDaliImageVisualAnimateMixColor(void)
   application.SendNotification();
   application.Render(0);     // Ensure animation starts
   application.Render(2000u); // Halfway point
-  Vector3 testColor(1.0f, 0.0f, 0.5f);
+  Vector4 testColor(1.0f, 0.0f, 0.5f, 0.75f);
 
-  // uColor.a should be actor's alpha * mixColor.a.
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(0.5f, 0.5f, 0.5f, 0.75f)), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", testColor), true, TEST_LOCATION);
+  // uColor should be actor's color * mixColor.
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(0.5f, 0.5f, 0.5f, 1.0f) * testColor), true, TEST_LOCATION);
 
   DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Enable", blendStr.str()));
 
@@ -1642,8 +1640,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   application.SendNotification();
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Color::WHITE, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, 0.5f)), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(TARGET_MIX_COLOR)), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Color::WHITE * TARGET_MIX_COLOR), true, TEST_LOCATION);
 
   // (Don't test for caching of capabilities, toolkit uses Test graphics backend, not actual backend)
 

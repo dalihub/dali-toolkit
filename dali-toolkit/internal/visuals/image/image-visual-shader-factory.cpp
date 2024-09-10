@@ -36,6 +36,10 @@ namespace
 {
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
+constexpr float ALPHA_PRE_MULTIPLIED(1.0f);
+
+constexpr int CUSTOM_PROPERTY_COUNT(2); // PixelArea, pre-multiplied alpha
+
 constexpr int              NATIVE_SHADER_TYPE_OFFSET = VisualFactoryCache::ShaderType::NATIVE_IMAGE_SHADER - VisualFactoryCache::ShaderType::IMAGE_SHADER;
 constexpr std::string_view Y_FLIP_MASK_TEXTURE       = "uYFlipMaskTexture";
 constexpr float            NOT_FLIP_MASK_TEXTURE     = 0.0f;
@@ -142,7 +146,16 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
   }
 
   shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
+
+  shader.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT +
+                                 (featureBuilder.IsEnabledAlphaMaskingOnRendering() ? 1 : 0));
+
   shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+
+  // Most of image visual shader user (like svg, animated vector image visual) use pre-multiplied alpha.
+  // If the visual dont want to using pre-multiplied alpha, it should be set as 0.0f as renderer side.
+  shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_PRE_MULTIPLIED);
+
   if(featureBuilder.IsEnabledAlphaMaskingOnRendering())
   {
     shader.RegisterProperty(Y_FLIP_MASK_TEXTURE, NOT_FLIP_MASK_TEXTURE);
@@ -178,7 +191,7 @@ bool ImageVisualShaderFactory::AddPrecompiledShader(PrecompileShaderOption& opti
 {
   ShaderFlagList shaderOption = option.GetShaderOptions();
 
-  auto featureBuilder = ImageVisualShaderFeature::FeatureBuilder();
+  auto        featureBuilder = ImageVisualShaderFeature::FeatureBuilder();
   std::string vertexPrefixList;
   std::string fragmentPrefixList;
   CreatePrecompileShader(featureBuilder, shaderOption);
@@ -186,7 +199,7 @@ bool ImageVisualShaderFactory::AddPrecompiledShader(PrecompileShaderOption& opti
   VisualFactoryCache::ShaderType type = featureBuilder.GetShaderType();
   featureBuilder.GetVertexShaderPrefixList(vertexPrefixList);
   featureBuilder.GetFragmentShaderPrefixList(fragmentPrefixList);
-  return SavePrecompileShader(type, vertexPrefixList, fragmentPrefixList );
+  return SavePrecompileShader(type, vertexPrefixList, fragmentPrefixList);
 }
 
 void ImageVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
@@ -197,7 +210,7 @@ void ImageVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
   shaders.shaderCount = 0;
   int shaderCount     = 0;
 
-  for(uint32_t i = 0u; i < mRequestedPrecompileShader.size(); i++ )
+  for(uint32_t i = 0u; i < mRequestedPrecompileShader.size(); i++)
   {
     vertexPrefix.push_back(mRequestedPrecompileShader[i].vertexPrefix);
     fragmentPrefix.push_back(mRequestedPrecompileShader[i].fragmentPrefix);
@@ -219,7 +232,7 @@ void ImageVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
   shaders.vertexShader   = SHADER_IMAGE_VISUAL_SHADER_VERT;
   shaders.fragmentShader = SHADER_IMAGE_VISUAL_SHADER_FRAG;
   shaders.shaderCount    = shaderCount;
-  shaders.custom = false;
+  shaders.custom         = false;
 }
 
 void ImageVisualShaderFactory::CreatePrecompileShader(ImageVisualShaderFeature::FeatureBuilder& builder, const ShaderFlagList& option)
@@ -261,7 +274,7 @@ void ImageVisualShaderFactory::CreatePrecompileShader(ImageVisualShaderFeature::
 
 bool ImageVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix)
 {
-  for(uint32_t i = 0u; i< PREDEFINED_SHADER_TYPE_COUNT; i++)
+  for(uint32_t i = 0u; i < PREDEFINED_SHADER_TYPE_COUNT; i++)
   {
     if(ShaderTypePredefines[i] == shader)
     {
@@ -270,7 +283,7 @@ bool ImageVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTy
     }
   }
 
-  for(uint32_t i = 0u; i< mRequestedPrecompileShader.size(); i++)
+  for(uint32_t i = 0u; i < mRequestedPrecompileShader.size(); i++)
   {
     if(mRequestedPrecompileShader[i].type == shader)
     {
@@ -280,11 +293,11 @@ bool ImageVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTy
   }
 
   RequestShaderInfo info;
-  info.type = shader;
-  info.vertexPrefix = vertexPrefix;
+  info.type           = shader;
+  info.vertexPrefix   = vertexPrefix;
   info.fragmentPrefix = fragmentPrefix;
   mRequestedPrecompileShader.push_back(info);
-  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)",Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(shader, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(shader, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
   return true;
 }
 

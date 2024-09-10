@@ -55,7 +55,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(7); // ltr, wrap, pixel area, atlas, pixalign, crop to mask, mask texture ratio
+const int CUSTOM_PROPERTY_COUNT(8); // ltr, wrap, pixel area, atlas, pixalign, crop to mask, mask texture ratio, pre-multiplied alpha
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
@@ -186,6 +186,7 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
 : Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::IMAGE),
   mPixelArea(FULL_TEXTURE_RECT),
   mPixelAreaIndex(Property::INVALID_INDEX),
+  mPreMultipliedAlphaIndex(Property::INVALID_INDEX),
   mPlacementActor(),
   mImageUrl(imageUrl),
   mMaskingData(),
@@ -985,6 +986,22 @@ void ImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
     map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, size.GetWidth());
     map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, size.GetHeight());
   }
+}
+
+void ImageVisual::EnablePreMultipliedAlpha(bool preMultiplied)
+{
+  if(mImpl->mRenderer)
+  {
+    if(mPreMultipliedAlphaIndex != Property::INVALID_INDEX || !preMultiplied)
+    {
+      // RegisterUniqueProperty call SetProperty internally.
+      // Register PREMULTIPLIED_ALPHA only if it become false.
+      // Default PREMULTIPLIED_ALPHA value is 1.0f, at image-visual-shader-factory.cpp
+      mPreMultipliedAlphaIndex = mImpl->mRenderer.RegisterUniqueProperty(mPreMultipliedAlphaIndex, PREMULTIPLIED_ALPHA, preMultiplied ? 1.0f : 0.0f);
+    }
+  }
+
+  Visual::Base::EnablePreMultipliedAlpha(preMultiplied);
 }
 
 void ImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes)
