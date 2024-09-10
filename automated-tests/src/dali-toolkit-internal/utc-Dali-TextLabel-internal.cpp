@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ using namespace Text;
 
 namespace
 {
-static int   ASYNC_TEXT_THREAD_TIMEOUT = 5;
+static int ASYNC_TEXT_THREAD_TIMEOUT = 5;
 
 static bool  gAsyncTextRenderedCalled;
 static float gAsyncTextRenderedWidth;
@@ -1378,7 +1378,7 @@ int UtcDaliTextLabelLocaleChange01(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextLabelLocaleChange01");
 
-  Adaptor &adaptor = application.GetAdaptor();
+  Adaptor&  adaptor   = application.GetAdaptor();
   TextLabel textLabel = TextLabel::New();
   application.GetScene().Add(textLabel);
 
@@ -1407,8 +1407,8 @@ int UtcDaliTextLabelLocaleChange02(void)
   TextLabel label = TextLabel::New();
   DALI_TEST_CHECK(label);
 
-  float expectedWidth  = 300.0f;
-  float expectedHeight = 300.0f;
+  float expectedWidth  = 100.0f;
+  float expectedHeight = 100.0f;
 
   label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
   label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world");
@@ -1441,7 +1441,7 @@ int UtcDaliTextLabelLocaleChange02(void)
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(false, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
 
-  Adaptor &adaptor = application.GetAdaptor();
+  Adaptor& adaptor = application.GetAdaptor();
 
   application.SendNotification();
   application.Render();
@@ -1458,14 +1458,14 @@ int UtcDaliTextLabelLocaleChange02(void)
   TextLabel dummy1 = TextLabel::New();
   DALI_TEST_CHECK(dummy1);
   dummy1.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_MANUAL);
-  dummy1.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
+  dummy1.SetProperty(Actor::Property::SIZE, Vector2(expectedWidth, expectedHeight));
   dummy1.SetProperty(TextLabel::Property::POINT_SIZE, 20);
   dummy1.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
   TextLabel dummy2 = TextLabel::New();
   DALI_TEST_CHECK(dummy2);
   dummy2.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_MANUAL);
-  dummy2.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
+  dummy2.SetProperty(Actor::Property::SIZE, Vector2(expectedWidth, expectedHeight));
   dummy2.SetProperty(TextLabel::Property::POINT_SIZE, 20);
   dummy2.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
@@ -1474,8 +1474,8 @@ int UtcDaliTextLabelLocaleChange02(void)
   gAsyncTextRenderedWidth  = 0.0f;
   gAsyncTextRenderedHeight = 0.0f;
 
-  expectedWidth   = 200.0f;
-  expectedHeight  = 200.0f;
+  expectedWidth   = 50.0f;
+  expectedHeight  = 50.0f;
   float dummySize = 100.0f;
 
   std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
