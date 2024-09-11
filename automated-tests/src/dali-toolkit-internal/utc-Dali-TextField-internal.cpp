@@ -51,6 +51,9 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
   ControllerPtr                 controller     = textFieldImpl.GetTextController();
   Controller::Impl&             controllerImpl = Controller::Impl::GetImplementation(*controller.Get());
 
+  // Check the case where there is only one character in the text
+  controller->SetText("S");
+
   // Add multiple background colors for the text.
   ColorRun backgroundColorRun1;
   backgroundColorRun1.characterRun.characterIndex     = 0u;
@@ -70,19 +73,16 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
   backgroundColorRun3.color                           = Color::GREEN;
   controllerImpl.mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun3);
 
-  // Check the case where there is only one character in the text
-  controller->SetText("S");
-
   application.SendNotification();
   application.Render();
 
   // The offscreen root actor should have one child: the renderable.
   Actor stencil = textField.GetChildAt(0u);
-  DALI_TEST_CHECK(stencil.GetChildCount() == 1u);
+  DALI_TEST_EQUALS(stencil.GetChildCount(), 1u, TEST_LOCATION);
 
   // The renderable actor should have two children: the text and the background.
   Actor renderableActor = stencil.GetChildAt(0u);
-  DALI_TEST_CHECK(renderableActor.GetChildCount() == 2u);
+  DALI_TEST_EQUALS(renderableActor.GetChildCount(), 2u, TEST_LOCATION);
 
   // Check that the background is created
   Actor backgroundActor = renderableActor.GetChildAt(0u);
@@ -91,6 +91,14 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
 
   // Change the text to contain more characters
   controller->SetText("Text Multiple Background Test");
+
+  // After SetText, BackgroundColorRun should be empty.
+  DALI_TEST_CHECK(controllerImpl.mModel->mLogicalModel->mBackgroundColorRuns.Empty());
+
+  // Add multiple background colors for the text.
+  controllerImpl.mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun1);
+  controllerImpl.mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun2);
+  controllerImpl.mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun3);
 
   application.SendNotification();
   application.Render();
@@ -102,9 +110,9 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
   application.Render();
 
   // Now the offscreen root actor should have four children: the renderable, the clipped cursor, the highlight, and the background.
-  DALI_TEST_CHECK(stencil.GetChildCount() == 4u);
+  DALI_TEST_EQUALS(stencil.GetChildCount(), 4u, TEST_LOCATION);
   // The renderable actor should have one child only: the text
-  DALI_TEST_CHECK(renderableActor.GetChildCount() == 1u);
+  DALI_TEST_EQUALS(renderableActor.GetChildCount(), 1u, TEST_LOCATION);
 
   // The background should now be lowered below the highlight
   backgroundActor = stencil.GetChildAt(0u);

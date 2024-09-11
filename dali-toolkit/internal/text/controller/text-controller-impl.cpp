@@ -2056,6 +2056,7 @@ void Controller::Impl::ClearFontData()
 void Controller::Impl::ClearStyleData()
 {
   mModel->mLogicalModel->mColorRuns.Clear();
+  mModel->mLogicalModel->mBackgroundColorRuns.Clear();
   mModel->mLogicalModel->ClearFontDescriptionRuns();
   mModel->mLogicalModel->ClearStrikethroughRuns();
   mModel->mLogicalModel->ClearUnderlineRuns();
