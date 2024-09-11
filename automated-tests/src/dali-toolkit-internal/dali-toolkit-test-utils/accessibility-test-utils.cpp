@@ -311,6 +311,19 @@ std::string TestGetActionDescription(const Address& adr, size_t index)
   return std::move(std::get<0>(chs));
 }
 
+bool TestGetIncludeHidden(const Address& adr)
+{
+  auto dbus   = static_cast<TestDBusWrapper*>(DBusWrapper::Installed());
+  auto result = dbus->fromTestCall<bool>(adr.GetPath(), "org.a11y.atspi.Application", "GetIncludeHidden", std::tuple<>());
+  return std::move(std::get<0>(result));
+}
+
+void TestSetIncludeHidden(const Address& adr, bool includeHidden)
+{
+  auto dbus = static_cast<TestDBusWrapper*>(DBusWrapper::Installed());
+  dbus->voidTestCall(adr.GetPath(), "org.a11y.atspi.Application", "SetIncludeHidden", std::tuple<bool>(includeHidden));
+}
+
 void TestResetMoveOutedCalled()
 {
   gMoveOutedCalled = false;

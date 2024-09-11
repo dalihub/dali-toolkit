@@ -1950,7 +1950,7 @@ int UtcDaliEmitAccessibilityStateChanged(void)
   END_TEST;
 }
 
-int UtcDaliGetAcessibleTestWithSceneConnection(void)
+int UtcDaliAccessibleRemovalOnActorDestoyed(void)
 {
   ToolkitTestApplication application;
 
@@ -1980,6 +1980,45 @@ int UtcDaliGetAcessibleTestWithSceneConnection(void)
   layer.Reset();
   DALI_TEST_CHECK(layerAccessible.expired());
   DALI_TEST_CHECK(Accessibility::Accessible::Get(layer) == nullptr);
+
+  Dali::Accessibility::TestEnableSC(false);
+
+  END_TEST;
+}
+
+int UtcDaliIncludeHidden(void)
+{
+  ToolkitTestApplication application;
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  auto root          = Layer::New();
+  auto control       = Control::New();
+  auto hiddenControl = Control::New();
+  hiddenControl.SetProperty(DevelControl::Property::ACCESSIBILITY_HIDDEN, true);
+
+  application.GetScene().Add(root);
+  root.Add(control);
+  root.Add(hiddenControl);
+
+  auto appAccessible = Accessibility::Bridge::GetCurrentBridge()->GetApplication();
+  DALI_TEST_CHECK(appAccessible);
+
+  auto rootAccessible = Accessibility::Accessible::Get(root);
+  DALI_TEST_CHECK(rootAccessible);
+
+  auto appAddress = appAccessible->GetAddress();
+
+  DALI_TEST_CHECK(!TestGetIncludeHidden(appAddress));
+  DALI_TEST_CHECK(rootAccessible->GetChildCount() == 1); // hidden control is excluded by default
+
+  TestSetIncludeHidden(appAddress, true);
+  DALI_TEST_CHECK(TestGetIncludeHidden(appAddress));
+  DALI_TEST_CHECK(rootAccessible->GetChildCount() == 2); // hidden control is included after setting includeHidden to true
+
+  TestSetIncludeHidden(appAddress, false);
+  DALI_TEST_CHECK(!TestGetIncludeHidden(appAddress));
+  DALI_TEST_CHECK(rootAccessible->GetChildCount() == 1); // hidden control is excluded after setting includeHidden to false
 
   Dali::Accessibility::TestEnableSC(false);
 
