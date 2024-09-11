@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -311,6 +311,35 @@ void EnableCreateAccessible(Toolkit::Control control, bool enable)
 bool IsCreateAccessibleEnabled(Toolkit::Control control)
 {
   return GetControlImplementation(control).IsCreateAccessibleEnabled();
+}
+
+void EmitAccessibilityStateChanged(Dali::Actor actor, Accessibility::State state, int newValue)
+{
+  auto accessible = Accessibility::Accessible::GetOwningPtr(actor);
+  if(DALI_LIKELY(accessible))
+  {
+    auto control = Toolkit::Control::DownCast(actor);
+    if(DALI_LIKELY(control))
+    {
+      if(state == Accessibility::State::SHOWING)
+      {
+        bool isModal = ControlAccessible::IsModal(control);
+        if(isModal)
+        {
+          if(newValue == 1)
+          {
+            Accessibility::Bridge::GetCurrentBridge()->RegisterDefaultLabel(accessible);
+          }
+          else
+          {
+            Accessibility::Bridge::GetCurrentBridge()->UnregisterDefaultLabel(accessible);
+          }
+        }
+      }
+    }
+
+    accessible->EmitStateChanged(state, newValue, 0);
+  }
 }
 
 } // namespace DevelControl

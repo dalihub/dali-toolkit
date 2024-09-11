@@ -41,7 +41,13 @@ void TestEnableSC(bool b)
     static bool ScreenReaderEnabled = false;
     static bool IsEnabled           = false;
 
-    auto wr = static_cast<TestDBusWrapper*>(DBusWrapper::Installed());
+    auto* dbusWrapper = DBusWrapper::Installed();
+    auto* wr          = dynamic_cast<TestDBusWrapper*>(dbusWrapper);
+    if(wr == nullptr)
+    {
+      fprintf(stderr, "Wrong case! TestDBusWrapper was not installed! have you forget to call DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper)); at startup?\n");
+      std::abort();
+    }
 
     wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/bus", "org.a11y.Status", "ScreenReaderEnabled", MethodType::Getter}] = [wr](const MessagePtr& m) -> MessagePtr {
       auto reply = wr->newReplyMessage(m);

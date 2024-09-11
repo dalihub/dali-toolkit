@@ -88,6 +88,11 @@ public:
   static Dali::WebEngineCookieManager* GetCookieManager();
 
   /**
+   * @copydoc Dali::Toolkit::WebView::ChangeOrientation()
+   */
+  void ChangeOrientation(int orientation);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::GetSettings()
    */
   Dali::Toolkit::WebSettings* GetSettings() const;
@@ -223,6 +228,11 @@ public:
   void AddJavaScriptMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::AddJavaScriptEntireMessageHandler()
+   */
+  void AddJavaScriptEntireMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptEntireMessageHandlerCallback handler);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::RegisterJavaScriptAlertCallback()
    */
   void RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptAlertCallback callback);
@@ -313,6 +323,11 @@ public:
   bool CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayingCallback callback);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::ExitFullscreen()
+   */
+  void ExitFullscreen();
+
+  /**
    * @copydoc Dali::Toolkit::WebView::RegisterGeolocationPermissionCallback()
    */
   void RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback);
@@ -378,6 +393,11 @@ public:
   void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::RegisterNewWindowPolicyDecidedCallback()
+   */
+  void RegisterNewWindowPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback callback);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::RegisterNewWindowCreatedCallback()
    */
   void RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback);
@@ -406,6 +426,21 @@ public:
    * @copydoc Dali::Toolkit::WebView::RegisterContextMenuHiddenCallback()
    */
   void RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterFullscreenEnteredCallback()
+   */
+  void RegisterFullscreenEnteredCallback(Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterFullscreenExitedCallback()
+   */
+  void RegisterFullscreenExitedCallback(Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterTextFoundCallback()
+   */
+  void RegisterTextFoundCallback(Dali::WebEnginePlugin::WebEngineTextFoundCallback callback);
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetPlainTextAsynchronously()
@@ -746,6 +781,10 @@ private:
 
   Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback mScreenshotCapturedCallback;
   Dali::WebEnginePlugin::WebEngineFrameRenderedCallback     mFrameRenderedCallback;
+
+  Vector4 mCornerRadius;                     /// < Corner radius
+  float   mCornerRadiusPolicy;               /// < Corner radius policy
+  static std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>> mPluginWebViewMap;
 };
 
 } // namespace Internal

@@ -106,11 +106,23 @@ static constexpr Vector4  FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 static constexpr auto     LOOP_FOREVER = -1;
 static constexpr auto     FIRST_LOOP   = 0u;
 
+constexpr float MINIMUM_FRAME_SPEED_FACTOR(0.01f);
+constexpr float MAXIMUM_FRAME_SPEED_FACTOR(100.0f);
+
 constexpr uint32_t TEXTURE_COUNT_FOR_GPU_ALPHA_MASK = 2u;
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
 #endif
+
+/**
+ * @brief Safety method to calculate interval with speed factor.
+ */
+template<typename T>
+inline uint32_t CalculateInterval(const T interval, const float frameSpeedFactor)
+{
+  return DALI_LIKELY(Dali::Equals(frameSpeedFactor, 1.0f)) ? static_cast<uint32_t>(interval) : static_cast<uint32_t>(static_cast<float>(interval) / (frameSpeedFactor));
+}
 } // namespace
 
 /**
@@ -262,6 +274,7 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mReleasePolicy(Toolkit::ImageVisual::ReleasePolicy::DETACHED),
   mMaskingData(),
   mDesiredSize(desiredSize),
+  mFrameSpeedFactor(1.0f),
   mFrameCount(0),
   mImageSize(),
   mActionStatus(DevelAnimatedImageVisual::Action::PLAY),
@@ -418,6 +431,7 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::SAMPLING_MODE, mSamplingMode);
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
+  map.Insert(Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR, mFrameSpeedFactor);
 }
 
 void AnimatedImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -578,6 +592,10 @@ void AnimatedImageVisual::DoSetProperties(const Property::Map& propertyMap)
       {
         DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second);
       }
+      else if(keyValue.first == FRAME_SPEED_FACTOR)
+      {
+        DoSetProperty(Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR, keyValue.second);
+      }
     }
   }
   // Load image immediately if LOAD_POLICY requires it
@@ -666,7 +684,7 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
         mFrameDelay = frameDelay;
         if(DALI_LIKELY(mImageCache))
         {
-          mImageCache->SetInterval(static_cast<uint32_t>(mFrameDelay));
+          mImageCache->SetInterval(CalculateInterval(mFrameDelay, mFrameSpeedFactor));
         }
       }
       break;
@@ -810,6 +828,22 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
       }
       break;
     }
+
+    case Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR:
+    {
+      float frameSpeedFactor = 1.0f;
+      if(value.Get(frameSpeedFactor))
+      {
+        // TODO : Could we remove this limitation?
+        Dali::ClampInPlace(frameSpeedFactor, MINIMUM_FRAME_SPEED_FACTOR, MAXIMUM_FRAME_SPEED_FACTOR);
+
+        if(!Dali::Equals(mFrameSpeedFactor, frameSpeedFactor))
+        {
+          mFrameSpeedFactor = frameSpeedFactor;
+        }
+      }
+      break;
+    }
   }
 }
 
@@ -946,7 +980,7 @@ void AnimatedImageVisual::StartFirstFrame(TextureSet& textureSet, uint32_t first
   {
     if(mFrameCount > SINGLE_IMAGE_COUNT)
     {
-      mFrameDelayTimer = Timer::New(firstInterval);
+      mFrameDelayTimer = Timer::New(CalculateInterval(firstInterval, mFrameSpeedFactor));
       mFrameDelayTimer.TickSignal().Connect(this, &AnimatedImageVisual::DisplayNextFrame);
       mFrameDelayTimer.Start();
     }
@@ -1032,7 +1066,7 @@ void AnimatedImageVisual::FrameReady(TextureSet textureSet, uint32_t interval, b
     {
       if(mFrameDelayTimer && interval > 0u)
       {
-        mFrameDelayTimer.SetInterval(interval);
+        mFrameDelayTimer.SetInterval(CalculateInterval(interval, mFrameSpeedFactor));
       }
       mImpl->mRenderer.SetTextures(textureSet);
       CheckMaskTexture();
@@ -1106,7 +1140,7 @@ bool AnimatedImageVisual::DisplayNextFrame()
         mImpl->mRenderer.SetTextures(textureSet);
         CheckMaskTexture();
       }
-      mFrameDelayTimer.SetInterval(mImageCache->GetFrameInterval(frameIndex));
+      mFrameDelayTimer.SetInterval(CalculateInterval(mImageCache->GetFrameInterval(frameIndex), mFrameSpeedFactor));
     }
 
     mCurrentFrameIndex = frameIndex;

@@ -1,0 +1,4 @@
+automated-tests
+dali-toolkit/third-party
+dali-scene3d/third-party
+dali-physics/third-party

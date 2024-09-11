@@ -31,7 +31,7 @@ int UtcDaliRenderEffectNewP(void)
   BackgroundBlurEffect blurEffect = BackgroundBlurEffect::New();
   DALI_TEST_CHECK(blurEffect);
 
-  BackgroundBlurEffect blurEffect2 = BackgroundBlurEffect::New(0.5f, 10.0f);
+  BackgroundBlurEffect blurEffect2 = BackgroundBlurEffect::New(0.5f, 10);
   DALI_TEST_CHECK(blurEffect2);
 
   END_TEST;
@@ -42,17 +42,17 @@ int UtcDaliRenderEffectNewN(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectNewN");
 
-  try
-  {
-    BackgroundBlurEffect blurEffect  = BackgroundBlurEffect::New(-0.5f, 10.0f);
-    BackgroundBlurEffect blurEffect2 = BackgroundBlurEffect::New(10.0f, 10.0f);
-    DALI_TEST_CHECK(!blurEffect && !blurEffect2);
-  }
-  catch(Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT(e);
-    DALI_TEST_CHECK(true);
-  }
+  tet_printf("Check some invalid parameters clamp internally\n");
+
+  BackgroundBlurEffect blurEffect  = BackgroundBlurEffect::New(-0.5f, 10);
+  BackgroundBlurEffect blurEffect2 = BackgroundBlurEffect::New(10.0f, 10);
+  BackgroundBlurEffect blurEffect3 = BackgroundBlurEffect::New(0.5f, 0);
+  BackgroundBlurEffect blurEffect4 = BackgroundBlurEffect::New(0.5f, 2147483647);
+  DALI_TEST_CHECK(blurEffect);
+  DALI_TEST_CHECK(blurEffect2);
+  DALI_TEST_CHECK(blurEffect3);
+  DALI_TEST_CHECK(blurEffect4);
+
   END_TEST;
 }
 

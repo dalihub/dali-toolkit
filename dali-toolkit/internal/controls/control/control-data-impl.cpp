@@ -242,7 +242,7 @@ void DiscardVisual(RegisteredVisualContainer::Iterator sourceIter, RegisteredVis
   Toolkit::Visual::Base visual = (*sourceIter)->visual;
   if(visual)
   {
-    if(Stage::IsInstalled())
+    if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
     {
       Toolkit::VisualFactory::Get().DiscardVisual(visual);
     }
@@ -643,16 +643,20 @@ Control::Impl::Impl(Control& controlImpl)
   mDispatchKeyEvents(true),
   mProcessorRegistered(false)
 {
-  Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::shared_ptr<Accessibility::Accessible> {
+  Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::pair<std::shared_ptr<Accessibility::Accessible>, bool> {
     auto control = Toolkit::Control::DownCast(actor);
     if(!control)
     {
-      return nullptr;
+      return {nullptr, true};
     }
 
     auto& controlImpl = Toolkit::Internal::GetImplementation(control);
+    if(controlImpl.mImpl->IsCreateAccessibleEnabled())
+    {
+      return {std::shared_ptr<DevelControl::ControlAccessible>(controlImpl.CreateAccessibleObject()), true};
+    }
 
-    return controlImpl.GetAccessibleObject();
+    return {nullptr, false};
   });
   mAccessibilityProps.states[DevelControl::AccessibilityState::ENABLED] = true;
 }
@@ -2379,7 +2383,7 @@ void Control::Impl::UpdateVisualProperties(const std::vector<std::pair<Dali::Pro
 
 void Control::Impl::EmitResourceReadySignal()
 {
-  if(DALI_LIKELY(Stage::IsInstalled())) ///< Avoid resource ready callback during shutting down
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable())) ///< Avoid resource ready callback during shutting down
   {
     if(!mIsEmittingResourceReadySignal)
     {
@@ -2442,17 +2446,12 @@ bool Control::Impl::OnIdleCallback()
 
 std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::Impl::GetAccessibleObject()
 {
-  if(mAccessibleCreatable && !mAccessibleObject)
-  {
-    mAccessibleObject.reset(mControlImpl.CreateAccessibleObject());
-  }
-
-  return mAccessibleObject;
+  return std::dynamic_pointer_cast<DevelControl::ControlAccessible>(Accessibility::Accessible::GetOwningPtr(mControlImpl.Self()));
 }
 
 bool Control::Impl::IsAccessibleCreated() const
 {
-  return !!mAccessibleObject;
+  return !!Accessibility::Bridge::GetCurrentBridge()->GetAccessible(mControlImpl.Self());
 }
 
 void Control::Impl::EnableCreateAccessible(bool enable)

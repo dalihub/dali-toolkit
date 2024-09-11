@@ -25,6 +25,7 @@
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/async-task-manager.h>
@@ -211,7 +212,7 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
 
 ImageVisual::~ImageVisual()
 {
-  if(Stage::IsInstalled())
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
     if(mImageUrl.IsValid())
     {
@@ -1494,7 +1495,7 @@ void ImageVisual::ResetFastTrackLoadingTask()
 Geometry ImageVisual::GenerateGeometry(TextureManager::TextureId textureId, bool createForce)
 {
   Geometry geometry;
-  if(Stage::IsInstalled())
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
     if(mImpl->mCustomShader)
     {

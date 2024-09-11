@@ -38,6 +38,21 @@ namespace
 static constexpr float    BLUR_EFFECT_DOWNSCALE_FACTOR = 0.4f;
 static constexpr uint32_t BLUR_EFFECT_PIXEL_RADIUS     = 5u;
 static constexpr int32_t  BLUR_EFFECT_ORDER_INDEX      = 101;
+
+static constexpr float MINIMUM_DOWNSCALE_FACTOR = Dali::Math::MACHINE_EPSILON_100;
+static constexpr float MAXIMUM_DOWNSCALE_FACTOR = 1.0f;
+
+static constexpr uint32_t MAXIMUM_BLUR_RADIUS = 1339u; ///< Maximum pixel radius for blur effect. (GL_MAX_FRAGMENT_UNIFORM_COMPONENTS(Usually 1024) - 19 (vertex shader used)) / 3 float = 335
+static_assert(BLUR_EFFECT_PIXEL_RADIUS < ((MAXIMUM_BLUR_RADIUS >> 2) + 1));
+
+/**
+  * @brief Calculates gaussian weight
+  * @param[in] localOffset Input to the function
+  */
+inline float CalculateGaussianWeight(float localOffset, float sigma)
+{
+  return (1.0f / sqrt(2.0f * Dali::Math::PI * sigma)) * exp(-(localOffset / sigma * localOffset / sigma) * 0.5f);
+}
 } // namespace
 
 namespace Dali
@@ -68,7 +83,22 @@ BlurEffectImpl::BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool 
   mBellCurveWidth(0.001f),
   mIsBackground(isBackground)
 {
-  DALI_ASSERT_ALWAYS(downscaleFactor <= 1.0 && 0.0 < downscaleFactor);
+  if(DALI_UNLIKELY(mDownscaleFactor < MINIMUM_DOWNSCALE_FACTOR || mDownscaleFactor > MAXIMUM_DOWNSCALE_FACTOR))
+  {
+    const float fixedDownScaleFactor = Dali::Clamp(mDownscaleFactor, MINIMUM_DOWNSCALE_FACTOR, MAXIMUM_DOWNSCALE_FACTOR);
+    DALI_LOG_ERROR("Downscale factor is out of bound: %f. Use %f instead.\n", mDownscaleFactor, fixedDownScaleFactor);
+    mDownscaleFactor = fixedDownScaleFactor;
+  }
+  if(DALI_UNLIKELY(blurRadius > MAXIMUM_BLUR_RADIUS))
+  {
+    const uint32_t fixedBlurRadius      = MAXIMUM_BLUR_RADIUS;
+    const float    fixedDownScaleFactor = Dali::Clamp(mDownscaleFactor * static_cast<float>(fixedBlurRadius) / static_cast<float>(blurRadius), MINIMUM_DOWNSCALE_FACTOR, MAXIMUM_DOWNSCALE_FACTOR);
+    DALI_LOG_ERROR("Blur radius is out of bound: %u. Use %u and make downscale factor %f to %f.\n", blurRadius, fixedBlurRadius, mDownscaleFactor, fixedDownScaleFactor);
+    mDownscaleFactor = fixedDownScaleFactor;
+    mPixelRadius     = (fixedBlurRadius >> 2) + 1;
+  }
+
+  DALI_ASSERT_DEBUG((mPixelRadius != 0u) && "mPixelRadius chould not be zero! their was some logical error occured.");
 }
 
 BlurEffectImpl::~BlurEffectImpl()
@@ -111,19 +141,35 @@ void BlurEffectImpl::OnInitialize()
   // Create shaders
 
   std::ostringstream fragmentStringStream;
-  fragmentStringStream << "#define NUM_SAMPLES " << mPixelRadius << "\n";
+  fragmentStringStream << "#define NUM_SAMPLES " << (DALI_LIKELY(mPixelRadius > 1u) ? mPixelRadius : 2u) << "\n";
   fragmentStringStream << SHADER_BLUR_EFFECT_FRAG;
   std::string fragmentSource(fragmentStringStream.str());
 
-  float sigma = 0.5f;
+  // Calculate bell curve width
   {
-    float epsilon = 1e-2f / (mPixelRadius * 2);
-    while((CalculateGaussianWeight((mPixelRadius * 2) - 1, sigma) < epsilon) && (sigma < 50.0f))
+    const float epsilon     = 1e-2f / (mPixelRadius * 2);
+    const float localOffset = (mPixelRadius * 2) - 1;
+
+    float lowerBoundSigma = 0.001f;
+    float upperBoundSigma = 171.352f; ///< bell curve width for MAXIMUM_BLUR_RADIUS case
+
+    int       trialCount        = 0;
+    const int maximumTrialCount = 50;
+    while(trialCount++ < maximumTrialCount && upperBoundSigma - lowerBoundSigma > Math::MACHINE_EPSILON_10000)
     {
-      sigma += 1.0f;
+      const float sigma = (lowerBoundSigma + upperBoundSigma) * 0.5f;
+      if(CalculateGaussianWeight(localOffset, sigma) < epsilon)
+      {
+        lowerBoundSigma = sigma;
+      }
+      else
+      {
+        upperBoundSigma = sigma;
+      }
     }
+
+    mBellCurveWidth = (lowerBoundSigma + upperBoundSigma) * 0.5f;
   }
-  mBellCurveWidth = sigma;
 
   DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[BlurEffect:%p] mBellCurveWidth calculated! [radius:%u][sigma:%f]\n", this, mPixelRadius, mBellCurveWidth);
 
@@ -135,6 +181,7 @@ void BlurEffectImpl::OnInitialize()
   mHorizontalBlurActor = Actor::New();
   mHorizontalBlurActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   Renderer horizontalBlurRenderer = CreateRenderer(BASIC_VERTEX_SOURCE, fragmentSource.c_str());
+  horizontalBlurRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
   mHorizontalBlurActor.AddRenderer(horizontalBlurRenderer);
   mInternalRoot.Add(mHorizontalBlurActor);
 
@@ -142,6 +189,7 @@ void BlurEffectImpl::OnInitialize()
   mVerticalBlurActor = Actor::New();
   mVerticalBlurActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   Renderer verticalBlurRenderer = CreateRenderer(BASIC_VERTEX_SOURCE, fragmentSource.c_str());
+  verticalBlurRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
   mVerticalBlurActor.AddRenderer(verticalBlurRenderer);
   mInternalRoot.Add(mVerticalBlurActor);
 }
@@ -184,17 +232,17 @@ void BlurEffectImpl::OnActivate()
 
   // Prepare resource
   // original texture output
-  mInputBackgroundFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::NONE);
+  mInputBackgroundFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::DEPTH_STENCIL);
   Texture inputBackgroundTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
   mInputBackgroundFrameBuffer.AttachColorTexture(inputBackgroundTexture);
 
   // half-blurred output
-  mTemporaryFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::NONE);
+  mTemporaryFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::DEPTH_STENCIL);
   Texture temporaryTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
   mTemporaryFrameBuffer.AttachColorTexture(temporaryTexture);
 
   // blurred output
-  mSourceFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::NONE);
+  mSourceFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::DEPTH_STENCIL);
   Texture sourceTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
   mSourceFrameBuffer.AttachColorTexture(sourceTexture);
 
@@ -230,6 +278,10 @@ void BlurEffectImpl::OnActivate()
   mSourceRenderTask.SetInputEnabled(false);
   mSourceRenderTask.SetExclusive(false);
 
+  // Clear inputBackgroundTexture as scene holder background.
+  mSourceRenderTask.SetClearEnabled(true);
+  mSourceRenderTask.SetClearColor(sceneHolder.GetBackgroundColor());
+
   // Blur tasks
   SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0), mInputBackgroundFrameBuffer);
   mHorizontalBlurTask = taskList.CreateTask();
@@ -240,6 +292,10 @@ void BlurEffectImpl::OnActivate()
   mHorizontalBlurTask.SetCameraActor(mRenderDownsampledCamera);
   mHorizontalBlurTask.SetFrameBuffer(mTemporaryFrameBuffer);
 
+  // Clear temporaryTexture as Transparent.
+  mHorizontalBlurTask.SetClearEnabled(true);
+  mHorizontalBlurTask.SetClearColor(Color::TRANSPARENT);
+
   SetRendererTexture(mVerticalBlurActor.GetRendererAt(0), mTemporaryFrameBuffer);
   mVerticalBlurTask = taskList.CreateTask();
   mVerticalBlurTask.SetSourceActor(mVerticalBlurActor);
@@ -248,6 +304,10 @@ void BlurEffectImpl::OnActivate()
   mVerticalBlurTask.SetInputEnabled(false);
   mVerticalBlurTask.SetCameraActor(mRenderDownsampledCamera);
   mVerticalBlurTask.SetFrameBuffer(mSourceFrameBuffer);
+
+  // Clear sourceTexture as Transparent.
+  mVerticalBlurTask.SetClearEnabled(true);
+  mVerticalBlurTask.SetClearColor(Color::TRANSPARENT);
 
   // Inject output to control
   Renderer renderer = GetTargetRenderer();
@@ -321,11 +381,13 @@ Vector2 BlurEffectImpl::GetTargetSizeForValidTexture() const
 
 void BlurEffectImpl::SetShaderConstants(float downsampledWidth, float downsampledHeight)
 {
-  std::vector<float> uvOffsets(mPixelRadius);
-  std::vector<float> weights(mPixelRadius);
+  const uint32_t numSamples = DALI_LIKELY(mPixelRadius > 1u) ? mPixelRadius : 2u;
+
+  std::vector<float> uvOffsets(numSamples);
+  std::vector<float> weights(numSamples);
 
   // generate bell curve kernel
-  unsigned int       halfSize = mPixelRadius * 2;
+  unsigned int       halfSize = numSamples * 2;
   std::vector<float> halfSideKernel(halfSize);
 
   halfSideKernel[0]  = CalculateGaussianWeight(0.0f, mBellCurveWidth);
@@ -343,14 +405,14 @@ void BlurEffectImpl::SetShaderConstants(float downsampledWidth, float downsample
   halfSideKernel[0] *= 0.5f;
 
   // compress kernel
-  for(unsigned int i = 0; i < mPixelRadius; i++)
+  for(unsigned int i = 0; i < numSamples; i++)
   {
     weights[i]   = halfSideKernel[2 * i] + halfSideKernel[2 * i + 1];
     uvOffsets[i] = 2.0f * i + halfSideKernel[2 * i + 1] / weights[i];
   }
 
   // set shader constants
-  for(unsigned int i = 0; i < mPixelRadius; ++i)
+  for(unsigned int i = 0; i < numSamples; ++i)
   {
     mHorizontalBlurActor.RegisterProperty(GetSampleOffsetsPropertyName(i), Vector2(uvOffsets[i] / downsampledWidth, 0.0f));
     mHorizontalBlurActor.RegisterProperty(GetSampleWeightsPropertyName(i), weights[i]);

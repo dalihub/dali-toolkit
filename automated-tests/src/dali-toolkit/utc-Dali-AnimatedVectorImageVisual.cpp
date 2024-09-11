@@ -249,6 +249,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual03(void)
     .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
     .Add(DevelImageVisual::Property::LOOP_COUNT, 3)
     .Add(DevelImageVisual::Property::PLAY_RANGE, playRange)
+    .Add(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 2.0f)
     .Add(DevelVisual::Property::CORNER_RADIUS, 50.0f)
     .Add(DevelVisual::Property::BORDERLINE_WIDTH, 20.0f)
     .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
@@ -313,6 +314,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
     .Add("redrawInScalingDown", false)
     .Add("enableFrameCache", false)
     .Add("notifyAfterRasterization", false)
+    .Add("frameSpeedFactor", 0.5f)
     .Add("cornerRadius", cornerRadius)
     .Add("borderlineWidth", borderlineWidth)
     .Add("borderlineColor", borderlineColor)
@@ -390,6 +392,10 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   value = resultMap.Find(DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, Property::BOOLEAN);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>() == false);
+
+  value = resultMap.Find(DevelImageVisual::Property::FRAME_SPEED_FACTOR, Property::FLOAT);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<float>() == 0.5f);
 
   value = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
   DALI_TEST_CHECK(value);
@@ -1916,6 +1922,119 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
   DALI_TEST_EQUALS(value->Get<int>(), totalFrameNumber - 1, TEST_LOCATION); // Should be the last frame
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualFrameSpeedFactor(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualFrameSpeedFactor");
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  Property::Value* value = map.Find(DevelImageVisual::Property::FRAME_SPEED_FACTOR);
+  DALI_TEST_EQUALS(value->Get<float>(), 1.0f, TEST_LOCATION); // Check default value is 1.0f
+
+  Property::Map attributes;
+  attributes.Add(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 0.5f);
+
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  value = map.Find(DevelImageVisual::Property::FRAME_SPEED_FACTOR);
+  DALI_TEST_EQUALS(value->Get<float>(), 0.5f, TEST_LOCATION);
+
+  attributes.Clear();
+  attributes.Add(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 8.0f);
+
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  value = map.Find(DevelImageVisual::Property::FRAME_SPEED_FACTOR);
+  DALI_TEST_EQUALS(value->Get<float>(), 8.0f, TEST_LOCATION);
+
+  // TODO : Below logic might be changed in future.
+
+  // Clampled by maximum frame speed factor.
+  attributes.Clear();
+  attributes.Add(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 100.0f + 1.0f);
+
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  value = map.Find(DevelImageVisual::Property::FRAME_SPEED_FACTOR);
+  DALI_TEST_EQUALS(value->Get<float>(), 100.0f, TEST_LOCATION);
+
+  // Clampled by minimum frame speed factor.
+  attributes.Clear();
+  attributes.Add(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 0.0f);
+
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  value = map.Find(DevelImageVisual::Property::FRAME_SPEED_FACTOR);
+  DALI_TEST_EQUALS(value->Get<float>(), 0.01f, TEST_LOCATION);
+
+  // Clampled by minimum frame speed factor 2.
+  attributes.Clear();
+  attributes.Add(DevelImageVisual::Property::FRAME_SPEED_FACTOR, -1.0f);
+
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  value = map.Find(DevelImageVisual::Property::FRAME_SPEED_FACTOR);
+  DALI_TEST_EQUALS(value->Get<float>(), 0.01f, TEST_LOCATION);
+
+  // Clampled by minimum frame speed factor 3.
+  attributes.Clear();
+  attributes.Add(DevelImageVisual::Property::FRAME_SPEED_FACTOR, -100.0f - 1.0f);
+
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  value = map.Find(DevelImageVisual::Property::FRAME_SPEED_FACTOR);
+  DALI_TEST_EQUALS(value->Get<float>(), 0.01f, TEST_LOCATION);
 
   END_TEST;
 }

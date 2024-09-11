@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,6 +99,10 @@ int UtcDaliGaussianBlurViewNew(void)
 
   Toolkit::GaussianBlurView view2 = Toolkit::GaussianBlurView::New(5, 1.5f, Pixel::RGB888, 0.5f, 0.5f, false);
   DALI_TEST_CHECK(view2);
+
+  // Don't assert even if we give big number.
+  Toolkit::GaussianBlurView view3 = Toolkit::GaussianBlurView::New(2147483647, 1.5f, Pixel::RGB888, 0.5f, 0.5f, false);
+  DALI_TEST_CHECK(view3);
   END_TEST;
 }
 
@@ -210,21 +214,21 @@ int UtcDaliGaussianBlurActivateDeactivateRepeat(void)
   application.SendNotification();
   application.Render(20);
 
-  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 4, TEST_LOCATION);
 
   view.Deactivate();
 
   application.SendNotification();
   application.Render(20);
 
-  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 4, TEST_LOCATION);
 
   view.Activate();
 
   application.SendNotification();
   application.Render(20);
 
-  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 6, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 8, TEST_LOCATION);
   END_TEST;
 }
 
@@ -313,14 +317,14 @@ int UtcDaliGaussianBlurActivateOnce2(void)
   application.SendNotification();
   application.Render(20);
 
-  DALI_TEST_CHECK(gl.GetLastGenTextureId() == 3);
+  DALI_TEST_CHECK(gl.GetLastGenTextureId() == 4);
 
   view.ActivateOnce();
 
   application.SendNotification();
   application.Render(20);
 
-  DALI_TEST_CHECK(gl.GetLastGenTextureId() == 6);
+  DALI_TEST_CHECK(gl.GetLastGenTextureId() == 8);
 
   END_TEST;
 }

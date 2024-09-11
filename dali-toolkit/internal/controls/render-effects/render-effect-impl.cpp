@@ -54,35 +54,39 @@ RenderEffectImpl::RenderEffectImpl()
 
 RenderEffectImpl::~RenderEffectImpl()
 {
-  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[RenderEffect:%p] Destructor. [ID:%d]\n", this, mOwnerControl ? mOwnerControl.GetProperty<int>(Actor::Property::ID) : -1);
-  if(mOwnerControl)
-  {
-    mOwnerControl.ClearRenderEffect();
-  }
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[RenderEffect:%p] Destructor.\n", this);
+
+  // Reset weak handle first. (Since it might not valid during destruction.)
+  mOwnerControl.Reset();
+
+  // Don't call Deactivate here, since we cannot call virtual function during destruction.
+  // Deactivate already be called at Control's destructor, and InheritVisibilityChanged signal.
 }
 
 void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
 {
-  if(mOwnerControl != control)
+  Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
+  if(ownerControl != control)
   {
     // Clear previous owner control
     ClearOwnerControl();
 
-    mOwnerControl = control;
+    mOwnerControl = (ownerControl = control);
 
-    DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] SetOwnerControl [ID:%d]\n", this, mOwnerControl ? mOwnerControl.GetProperty<int>(Actor::Property::ID) : -1);
+    DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] SetOwnerControl [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
 
-    if(mOwnerControl)
+    if(ownerControl)
     {
-      mTargetSize = mOwnerControl.GetProperty<Vector2>(Actor::Property::SIZE);
+      mTargetSize = ownerControl.GetProperty<Vector2>(Actor::Property::SIZE);
       if(!mRenderer)
       {
         mRenderer = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
+        mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
       }
 
-      mOwnerControl.InheritedVisibilityChangedSignal().Connect(this, &RenderEffectImpl::OnControlInheritedVisibilityChanged);
+      ownerControl.InheritedVisibilityChangedSignal().Connect(this, &RenderEffectImpl::OnControlInheritedVisibilityChanged);
 
-      mSizeNotification = mOwnerControl.AddPropertyNotification(Actor::Property::SIZE, StepCondition(SIZE_STEP_CONDITION));
+      mSizeNotification = ownerControl.AddPropertyNotification(Actor::Property::SIZE, StepCondition(SIZE_STEP_CONDITION));
       mSizeNotification.NotifySignal().Connect(this, &RenderEffectImpl::OnSizeSet);
 
       Activate(); // Dev note : Activate after set the owner control.
@@ -92,17 +96,18 @@ void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
 
 void RenderEffectImpl::ClearOwnerControl()
 {
-  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] ClearOwnerControl [ID:%d]\n", this, mOwnerControl ? mOwnerControl.GetProperty<int>(Actor::Property::ID) : -1);
-  if(mOwnerControl)
+  Deactivate(); // Dev note : Deactivate before clearing the owner control.
+
+  Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] ClearOwnerControl [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
+  if(ownerControl)
   {
-    Deactivate(); // Dev note : Deactivate before clearing the owner control.
+    ownerControl.InheritedVisibilityChangedSignal().Disconnect(this, &RenderEffectImpl::OnControlInheritedVisibilityChanged);
 
-    mOwnerControl.InheritedVisibilityChangedSignal().Disconnect(this, &RenderEffectImpl::OnControlInheritedVisibilityChanged);
-
-    mOwnerControl.RemovePropertyNotification(mSizeNotification);
+    ownerControl.RemovePropertyNotification(mSizeNotification);
     mSizeNotification.Reset();
 
-    auto previousOwnerControl = mOwnerControl;
+    auto previousOwnerControl = ownerControl;
     mOwnerControl.Reset();
 
     // Make previous owner don't have render effect, after make we don't have owner control now.
@@ -122,7 +127,7 @@ void RenderEffectImpl::Initialize()
 
 Toolkit::Control RenderEffectImpl::GetOwnerControl() const
 {
-  return mOwnerControl;
+  return mOwnerControl.GetHandle();
 }
 
 Renderer RenderEffectImpl::GetTargetRenderer() const
@@ -139,7 +144,8 @@ void RenderEffectImpl::Activate()
 {
   if(!IsActivated() && IsActivateValid())
   {
-    DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] Activated! [ID:%d]\n", this, mOwnerControl ? mOwnerControl.GetProperty<int>(Actor::Property::ID) : -1);
+    Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
+    DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] Activated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
     mIsActivated = true;
 
     // Activate logic for subclass.
@@ -151,7 +157,8 @@ void RenderEffectImpl::Deactivate()
 {
   if(IsActivated() || !IsActivateValid())
   {
-    DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] Deactivated! [ID:%d]\n", this, mOwnerControl ? mOwnerControl.GetProperty<int>(Actor::Property::ID) : -1);
+    Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
+    DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] Deactivated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
     mIsActivated = false;
 
     // Deactivate logic for subclass.
@@ -168,9 +175,10 @@ bool RenderEffectImpl::IsActivateValid() const
   // TODO : Currently we don't check SceneHolder's visibility.
   bool ret = false;
 
-  if(mOwnerControl && mOwnerControl.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
+  if(ownerControl && ownerControl.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
-    Integration::SceneHolder sceneHolder = Integration::SceneHolder::Get(mOwnerControl);
+    Integration::SceneHolder sceneHolder = Integration::SceneHolder::Get(ownerControl);
     if(sceneHolder)
     {
       ret = true;
@@ -178,7 +186,7 @@ bool RenderEffectImpl::IsActivateValid() const
       // Check visibility of owner control's parents.
       // TODO : We'd better check the control visibility at core side.
       // TODO : Window visibility will be consider at dali-core actor side in future.
-      Dali::Actor self = mOwnerControl;
+      Dali::Actor self = ownerControl;
       while(self)
       {
         if(!self.GetProperty<bool>(Dali::Actor::Property::VISIBLE))
@@ -191,18 +199,20 @@ bool RenderEffectImpl::IsActivateValid() const
     }
   }
 
-  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Concise, "[RenderEffect:%p] IsActivateValid? [ID:%d][ret:%d]\n", this, mOwnerControl ? mOwnerControl.GetProperty<int>(Actor::Property::ID) : -1, ret);
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Concise, "[RenderEffect:%p] IsActivateValid? [ID:%d][ret:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, ret);
 
   return ret;
 }
 
 void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
 {
-  if(mOwnerControl)
+  Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
+  if(ownerControl)
   {
-    mTargetSize = mOwnerControl.GetCurrentProperty<Vector2>(Actor::Property::SIZE);
-    if(IsActivated())
+    const auto targetSize = ownerControl.GetCurrentProperty<Vector2>(Actor::Property::SIZE);
+    if(mTargetSize != targetSize && IsActivated())
     {
+      mTargetSize = targetSize;
       Deactivate();
       Activate();
     }
@@ -211,7 +221,8 @@ void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
 
 void RenderEffectImpl::OnControlInheritedVisibilityChanged(Actor actor, bool visible)
 {
-  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Concise, "[RenderEffect:%p] visibility changed [ID:%d][visible:%d]\n", this, mOwnerControl ? mOwnerControl.GetProperty<int>(Actor::Property::ID) : -1, visible);
+  Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Concise, "[RenderEffect:%p] visibility changed [ID:%d][visible:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, visible);
   if(visible)
   {
     Activate();

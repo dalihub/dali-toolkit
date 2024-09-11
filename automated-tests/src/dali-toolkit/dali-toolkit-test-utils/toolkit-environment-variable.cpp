@@ -40,14 +40,15 @@ const char* GetEnvironmentVariable(const char* variable)
   // Get http_proxy from real environment variables
   if(std::string(variable) == std::string("http_proxy"))
   {
-    return (gEnvironmentVariables[variable] = std::getenv("http_proxy")).c_str();
+    auto* httpProxyResult = std::getenv("http_proxy");
+    return (gEnvironmentVariables[variable] = (httpProxyResult ? httpProxyResult : "")).c_str();
   }
   return nullptr;
 }
 
 void SetTestEnvironmentVariable(const char* variable, const char* value)
 {
-  gEnvironmentVariables[variable] = value;
+  gEnvironmentVariables[variable] = value ? value : "";
 }
 
 } // namespace EnvironmentVariable

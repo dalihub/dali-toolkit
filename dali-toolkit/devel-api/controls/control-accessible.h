@@ -288,6 +288,11 @@ public:
    */
   void OnStatePropertySet(AccessibilityStates newStates);
 
+  /**
+   * @brief Returns true if given actor is considered as modal by propeties set.
+   */
+  static bool IsModal(Actor actor);
+
 private:
   /**
    * @brief Appliys relavant accessibility properties to AT-SPI states.

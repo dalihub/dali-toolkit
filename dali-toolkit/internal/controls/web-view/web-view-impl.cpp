@@ -52,6 +52,7 @@
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali/integration-api/debug.h>
 
 #include <functional>
 #include <memory>
@@ -165,7 +166,9 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mKeyEventsEnabled(true),
   mVisualChangeRequired(false),
   mScreenshotCapturedCallback{nullptr},
-  mFrameRenderedCallback{nullptr}
+  mFrameRenderedCallback{nullptr},
+  mCornerRadius(Vector4::ZERO),
+  mCornerRadiusPolicy(1.0f)
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -189,7 +192,9 @@ WebView::WebView(uint32_t argc, char** argv)
   mKeyEventsEnabled(true),
   mVisualChangeRequired(false),
   mScreenshotCapturedCallback{nullptr},
-  mFrameRenderedCallback{nullptr}
+  mFrameRenderedCallback{nullptr},
+  mCornerRadius(Vector4::ZERO),
+  mCornerRadiusPolicy(1.0f)
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -279,7 +284,6 @@ void WebView::OnInitialize()
   Actor self = Self();
 
   self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
-  self.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);
   self.TouchedSignal().Connect(this, &WebView::OnTouchEvent);
   self.HoveredSignal().Connect(this, &WebView::OnHoverEvent);
   self.WheelEventSignal().Connect(this, &WebView::OnWheelEvent);
@@ -291,6 +295,21 @@ void WebView::OnInitialize()
   mPositionUpdateNotification.NotifySignal().Connect(this, &WebView::OnDisplayAreaUpdated);
   mSizeUpdateNotification.NotifySignal().Connect(this, &WebView::OnDisplayAreaUpdated);
   mScaleUpdateNotification.NotifySignal().Connect(this, &WebView::OnDisplayAreaUpdated);
+
+  // Create WebVisual for WebView
+  Property::Map propertyMap;
+  propertyMap.Insert(Dali::Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::COLOR);
+  propertyMap.Insert(Dali::Toolkit::Visual::Property::MIX_COLOR, Color::TRANSPARENT);
+  Toolkit::Visual::Base webVisual = Toolkit::VisualFactory::Get().CreateVisual(propertyMap);
+  if(webVisual)
+  {
+    Dali::Toolkit::DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, webVisual);
+  }
+  else
+  {
+    DALI_LOG_ERROR("fail to create webVisual for CornerRadius");
+    Dali::Toolkit::DevelControl::UnregisterVisual(*this, Toolkit::WebView::Property::URL);
+  }
 
   if(mWebEngine)
   {
@@ -317,6 +336,14 @@ void WebView::OnRelayout(const Vector2& size, RelayoutContainer& container)
   auto displayArea = CalculateDisplayArea(Self(), DisplayAreaCalculateOption::PROPERTY);
 
   SetDisplayArea(displayArea);
+}
+
+void WebView::ChangeOrientation(int orientation)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.ChangeOrientation(orientation);
+  }
 }
 
 Dali::Toolkit::WebSettings* WebView::GetSettings() const
@@ -505,6 +532,14 @@ void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, 
   }
 }
 
+void WebView::AddJavaScriptEntireMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptEntireMessageHandlerCallback handler)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.AddJavaScriptEntireMessageHandler(exposedObjectName, std::move(handler));
+  }
+}
+
 void WebView::RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptAlertCallback callback)
 {
   if(mWebEngine)
@@ -646,6 +681,14 @@ bool WebView::CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayin
   return mWebEngine ? mWebEngine.CheckVideoPlayingAsynchronously(std::move(callback)) : false;
 }
 
+void WebView::ExitFullscreen()
+{
+  if(mWebEngine)
+  {
+    mWebEngine.ExitFullscreen();
+  }
+}
+
 void WebView::RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback)
 {
   if(mWebEngine)
@@ -782,6 +825,14 @@ void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::Web
   }
 }
 
+void WebView::RegisterNewWindowPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterNewWindowPolicyDecidedCallback(callback);
+  }
+}
+
 void WebView::RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback)
 {
   if(mWebEngine)
@@ -830,6 +881,30 @@ void WebView::RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngine
   }
 }
 
+void WebView::RegisterFullscreenEnteredCallback(Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterFullscreenEnteredCallback(callback);
+  }
+}
+
+void WebView::RegisterFullscreenExitedCallback(Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterFullscreenExitedCallback(callback);
+  }
+}
+
+void WebView::RegisterTextFoundCallback(Dali::WebEnginePlugin::WebEngineTextFoundCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterTextFoundCallback(callback);
+  }
+}
+
 void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
 {
   if(mWebEngine)
@@ -845,8 +920,33 @@ void WebView::OnFrameRendered()
     mFrameRenderedCallback();
   }
 
-  // Make sure that mVisual is created only if required.
-  if(mVisualChangeRequired || !mVisual)
+  // Make sure that mVisual is created only once.
+  if (mVisual)
+    return;
+
+  // Get webVisual for checking corner radius
+  Toolkit::Visual::Base webVisual = Dali::Toolkit::DevelControl::GetVisual(*this, Toolkit::WebView::Property::URL);
+  Property::Map webMap;
+  webVisual.CreatePropertyMap(webMap);
+  Property::Value* cornerRadiusValue =  webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
+  if(cornerRadiusValue)
+  {
+    mCornerRadius = cornerRadiusValue->Get<Vector4>();
+  }
+  Property::Value* cornerRadiusValuePolicy =  webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY);
+  if(cornerRadiusValuePolicy)
+  {
+    mCornerRadiusPolicy = cornerRadiusValuePolicy->Get<int>();
+  }
+
+  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(mWebEngine.GetNativeImageSource());
+  Property::Map propertyMap;
+  propertyMap.Insert(Dali::Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::IMAGE);
+  propertyMap.Insert(Dali::Toolkit::ImageVisual::Property::URL, nativeImageUrl.GetUrl());
+  propertyMap.Insert(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS, mCornerRadius);
+  propertyMap.Insert(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, mCornerRadiusPolicy);
+  mVisual = Toolkit::VisualFactory::Get().CreateVisual(propertyMap);
+  if(mVisual)
   {
     // Reset flag
     mVisualChangeRequired = false;

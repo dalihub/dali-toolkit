@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,6 @@ ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfa
 
   // Core needs to be initialized next before we start the adaptor
   InitializeCore();
-  Accessibility::Accessible::SetObjectRegistry(mCore->GetObjectRegistry());
 
   // This will also emit the window created signals
   AdaptorImpl::GetImpl(*mAdaptor).Start(mMainWindow);
@@ -75,6 +74,12 @@ ToolkitTestApplication::~ToolkitTestApplication()
 {
   Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
   lifecycleController.TerminateSignal().Emit();
+
+  // Stop adaptor after terminate signal emit
+  if(Dali::Adaptor::IsAvailable() && mAdaptor)
+  {
+    mAdaptor->Stop();
+  }
 
   // Need to delete core before we delete the adaptor.
   delete mCore;

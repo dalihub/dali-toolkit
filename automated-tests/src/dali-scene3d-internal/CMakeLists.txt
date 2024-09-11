@@ -18,6 +18,7 @@ SET(TC_SOURCES
   utc-Dali-MaterialImpl.cpp
   utc-Dali-ModelCacheManager.cpp
   utc-Dali-ModelPrimitiveImpl.cpp
+  utc-Dali-SceneViewImpl.cpp
 )
 
 # List of test harness files (Won't get parsed for test cases)

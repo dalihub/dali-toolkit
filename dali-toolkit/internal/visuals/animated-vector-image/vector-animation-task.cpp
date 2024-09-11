@@ -64,6 +64,11 @@ uint64_t GetNanoseconds()
 }
 #endif
 
+int64_t CalculateFrameDurationMicroSeconds(const float frameRate, const float frameSpeedFactor)
+{
+  return static_cast<int64_t>(MICROSECONDS_PER_SECOND / static_cast<double>(frameRate * frameSpeedFactor));
+}
+
 } // unnamed namespace
 
 VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
@@ -84,6 +89,7 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mNextFrameStartTime(),
   mFrameDurationMicroSeconds(MICROSECONDS_PER_SECOND / 60.0f),
   mFrameRate(60.0f),
+  mFrameSpeedFactor(1.0f),
   mCurrentFrame(0),
   mTotalFrame(0),
   mStartFrame(0),
@@ -240,8 +246,9 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
 
   mEndFrame = mTotalFrame - 1;
 
-  mFrameRate                 = mVectorRenderer.GetFrameRate();
-  mFrameDurationMicroSeconds = MICROSECONDS_PER_SECOND / mFrameRate;
+  mFrameRate = mVectorRenderer.GetFrameRate();
+
+  mFrameDurationMicroSeconds = CalculateFrameDurationMicroSeconds(mFrameRate, mFrameSpeedFactor);
 
   mLoadRequest = false;
   {
@@ -796,31 +803,37 @@ uint32_t VectorAnimationTask::GetStoppedFrame(uint32_t startFrame, uint32_t endF
   return frame;
 }
 
+/// Event & VectorAnimationThread called after Rasterize() finished.
 VectorAnimationTask::TimePoint VectorAnimationTask::CalculateNextFrameTime(bool renderNow)
 {
   // std::chrono::time_point template has second parameter duration which defaults to the std::chrono::steady_clock supported
   // duration. In some C++11 implementations it is a milliseconds duration, so it fails to compile unless mNextFrameStartTime
   // is casted to use the default duration.
-  mNextFrameStartTime = std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + std::chrono::microseconds(mFrameDurationMicroSeconds));
-  auto current        = std::chrono::steady_clock::now();
-  mDroppedFrames      = 0;
+  auto current = std::chrono::steady_clock::now();
 
   if(renderNow)
   {
     mNextFrameStartTime = current;
+    mDroppedFrames      = 0;
   }
-  else if(mNextFrameStartTime < current)
+  else
   {
-    uint32_t droppedFrames = 0;
+    const auto durationMicroSeconds = std::chrono::microseconds(mFrameDurationMicroSeconds);
 
-    while(current > std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + std::chrono::microseconds(mFrameDurationMicroSeconds)) && droppedFrames < mTotalFrame)
+    mNextFrameStartTime = std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + durationMicroSeconds);
+    if(mNextFrameStartTime < current)
     {
-      droppedFrames++;
-      mNextFrameStartTime = std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + std::chrono::microseconds(mFrameDurationMicroSeconds));
-    }
+      uint32_t droppedFrames = 0;
 
-    mNextFrameStartTime = current;
-    mDroppedFrames      = droppedFrames;
+      while(current > std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + durationMicroSeconds) && droppedFrames < mTotalFrame)
+      {
+        droppedFrames++;
+        mNextFrameStartTime = std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + durationMicroSeconds);
+      }
+
+      mNextFrameStartTime = current;
+      mDroppedFrames      = droppedFrames;
+    }
   }
 
   return mNextFrameStartTime;
@@ -880,6 +893,14 @@ void VectorAnimationTask::ApplyAnimationData()
     if(animationData.resendFlag & VectorAnimationTask::RESEND_NOTIFY_AFTER_RASTERIZATION)
     {
       mNotifyAfterRasterization = animationData.notifyAfterRasterization;
+    }
+
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_FRAME_SPEED_FACTOR)
+    {
+      mFrameSpeedFactor = animationData.frameSpeedFactor;
+
+      // Recalculate frame duration with new frame speed factor.
+      mFrameDurationMicroSeconds = CalculateFrameDurationMicroSeconds(mFrameRate, mFrameSpeedFactor);
     }
 
     if(animationData.resendFlag & VectorAnimationTask::RESEND_NEED_RESOURCE_READY)

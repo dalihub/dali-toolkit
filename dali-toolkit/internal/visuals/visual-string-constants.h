@@ -117,6 +117,7 @@ extern const char* const ENABLE_BROKEN_IMAGE;
 extern const char* const ENABLE_FRAME_CACHE;
 extern const char* const NOTIFY_AFTER_RASTERIZATION;
 extern const char* const SYNCHRONOUS_SIZING;
+extern const char* const FRAME_SPEED_FACTOR;
 
 // Text visual
 extern const char* const TEXT_PROPERTY;

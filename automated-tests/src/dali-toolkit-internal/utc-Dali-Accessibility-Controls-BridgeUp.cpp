@@ -20,17 +20,29 @@
 
 using namespace Dali::Toolkit;
 
-void utc_dali_accessibility_controls_bridge_up_startup(void)
+namespace
+{
+const auto flushCoalescableMessage = [](Dali::ToolkitTestApplication& application) {
+  Dali::Timer timer = Timer::New(0);
+  for(int i = 0; i < 11; ++i)
+  {
+    application.SendNotification();
+    application.Render();
+    timer.MockEmitSignal();
+  }
+};
+}
+
+void utc_dali_toolkit_accessibility_control_bridgeup_startup(void)
 {
   test_return_value = TET_UNDEF;
   DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
 }
 
-void utc_dali_accessibility_controls_bridge_up_cleanup(void)
+void utc_dali_toolkit_accessibility_control_bridgeup_cleanup(void)
 {
   test_return_value = TET_PASS;
-  //DBusWrapper::Install({}) is a de-install
-  DBusWrapper::Install({});
+  DBusWrapper::Install({}); // Clean up TestDBusWrapper
 }
 
 namespace Dali
@@ -405,16 +417,6 @@ int UtcDaliControlAccessibilityState(void)
   application.GetScene().Add(control);
   auto accessible = Dali::Accessibility::Accessible::Get(control);
 
-  const auto flushCoalescableMessage = [&]() {
-    Dali::Timer timer = Timer::New(0);
-    for(int i = 0; i < 11; ++i)
-    {
-      application.SendNotification();
-      application.Render();
-      timer.MockEmitSignal();
-    }
-  };
-
   Dali::Accessibility::TestEnableSC(true);
   DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
 
@@ -475,7 +477,7 @@ int UtcDaliControlAccessibilityState(void)
     DALI_TEST_CHECK(states[Dali::Accessibility::State::CHECKED]);
 
     Dali::Accessibility::TestResetStateChangedResult();
-    flushCoalescableMessage();
+    flushCoalescableMessage(application);
 
     // CHECKED: true -> false
     inputStates[DevelControl::AccessibilityState::CHECKED] = false;
@@ -488,7 +490,7 @@ int UtcDaliControlAccessibilityState(void)
     DALI_TEST_CHECK(!states[Dali::Accessibility::State::CHECKED]);
 
     Dali::Accessibility::TestResetStateChangedResult();
-    flushCoalescableMessage();
+    flushCoalescableMessage(application);
   }
 
   // state-changed:selected event is emitted if the object is highlighted and selectable
@@ -508,7 +510,7 @@ int UtcDaliControlAccessibilityState(void)
     DALI_TEST_CHECK(states[Dali::Accessibility::State::SELECTED]);
 
     Dali::Accessibility::TestResetStateChangedResult();
-    flushCoalescableMessage();
+    flushCoalescableMessage(application);
 
     // SELECTED: true -> false
     inputStates[DevelControl::AccessibilityState::SELECTED] = false;
@@ -520,7 +522,7 @@ int UtcDaliControlAccessibilityState(void)
     states = DevelControl::GetAccessibilityStates(control);
     DALI_TEST_CHECK(!states[Dali::Accessibility::State::SELECTED]);
     Dali::Accessibility::TestResetStateChangedResult();
-    flushCoalescableMessage();
+    flushCoalescableMessage(application);
   }
 
   // state-changed event is NOT emitted if object is not checkable or selectable
@@ -1885,6 +1887,101 @@ int UtcDaliWebViewAccessible(void)
   children = webViewAccessible->GetChildren();
 
   DALI_TEST_CHECK(children.empty());
+
+  END_TEST;
+}
+
+int UtcDaliEmitAccessibilityStateChanged(void)
+{
+  ToolkitTestApplication application;
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  auto root = Control::New();
+  root.SetProperty(Actor::Property::SIZE, Vector2(300, 300));
+  root.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::CONTAINER);
+
+  auto dialog = Control::New();
+  dialog.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  dialog.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::DIALOG);
+  root.Add(dialog);
+
+  auto button = Control::New();
+  button.SetProperty(Actor::Property::SIZE, Vector2(20, 20));
+  button.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::BUTTON);
+  root.Add(button);
+
+  auto rootAccessible   = dynamic_cast<DevelControl::ControlAccessible*>(Accessibility::Accessible::Get(root));
+  auto dialogAccessible = dynamic_cast<DevelControl::ControlAccessible*>(Accessibility::Accessible::Get(dialog));
+  auto buttonAccessible = dynamic_cast<DevelControl::ControlAccessible*>(Accessibility::Accessible::Get(button));
+
+  application.GetScene().Add(root);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(Accessibility::Bridge::GetCurrentBridge()->GetDefaultLabel(rootAccessible) != dialogAccessible);
+
+  // modal role: State is emitted and Default label is registered
+  DevelControl::EmitAccessibilityStateChanged(dialog, Accessibility::State::SHOWING, 1);
+
+  DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
+  DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("showing", 1));
+  DALI_TEST_CHECK(Accessibility::Bridge::GetCurrentBridge()->GetDefaultLabel(rootAccessible) == dialogAccessible);
+
+  Dali::Accessibility::TestResetStateChangedResult();
+  flushCoalescableMessage(application);
+
+  // modal role: State is emitted and Default label is unregistered
+  DevelControl::EmitAccessibilityStateChanged(dialog, Accessibility::State::SHOWING, 0);
+
+  DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
+  DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("showing", 0));
+  DALI_TEST_CHECK(Accessibility::Bridge::GetCurrentBridge()->GetDefaultLabel(rootAccessible) != dialogAccessible);
+
+  // non-modal role: State is emitted but Default label is not registered
+  DevelControl::EmitAccessibilityStateChanged(button, Accessibility::State::SHOWING, 1);
+
+  DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
+  DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("showing", 1));
+  DALI_TEST_CHECK(Accessibility::Bridge::GetCurrentBridge()->GetDefaultLabel(rootAccessible) != buttonAccessible);
+
+  Dali::Accessibility::TestEnableSC(false);
+
+  END_TEST;
+}
+
+int UtcDaliGetAcessibleTestWithSceneConnection(void)
+{
+  ToolkitTestApplication application;
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  auto layer = Layer::New();
+
+  auto control = Control::New();
+
+  std::weak_ptr<Accessibility::Accessible> layerAccessible   = Accessibility::Accessible::GetOwningPtr(layer);   // AdaptorAccessible
+  std::weak_ptr<Accessibility::Accessible> controlAccessible = Accessibility::Accessible::GetOwningPtr(control); // ControlAccessible
+  DALI_TEST_CHECK(layerAccessible.lock());
+  DALI_TEST_CHECK(controlAccessible.lock());
+
+  // Test Getting already added accessible from the map
+  DALI_TEST_CHECK(!layerAccessible.expired());
+  DALI_TEST_CHECK(!controlAccessible.expired());
+  DALI_TEST_CHECK(Accessibility::Accessible::Get(layer) == layerAccessible.lock().get());
+  DALI_TEST_CHECK(Accessibility::Accessible::Get(control) == controlAccessible.lock().get());
+
+  // Test ControlAccessible Removal
+  control.Reset();
+  DALI_TEST_CHECK(controlAccessible.expired());
+  DALI_TEST_CHECK(Accessibility::Accessible::Get(control) == nullptr);
+
+  // Test AdaptorAccessible Removal
+  layer.Reset();
+  DALI_TEST_CHECK(layerAccessible.expired());
+  DALI_TEST_CHECK(Accessibility::Accessible::Get(layer) == nullptr);
+
+  Dali::Accessibility::TestEnableSC(false);
 
   END_TEST;
 }
