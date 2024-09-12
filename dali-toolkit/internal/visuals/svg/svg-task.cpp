@@ -102,15 +102,12 @@ void SvgLoadingTask::Process()
 #ifdef TRACE_ENABLED
   uint64_t mStartTimeNanoSceonds = 0;
   uint64_t mEndTimeNanoSceonds   = 0;
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    mStartTimeNanoSceonds = GetNanoseconds();
-    std::ostringstream oss;
-    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
-    // DALI_TRACE_BEGIN(gTraceFilter, "DALI_SVG_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
-    DALI_LOG_RELEASE_INFO("BEGIN: DALI_SVG_LOADING_TASK %s", oss.str().c_str());
-  }
 #endif
+
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_LOADING_TASK", [&](std::ostringstream& oss) {
+    mStartTimeNanoSceonds = GetNanoseconds();
+    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
+  });
 
   bool loadFailed = false;
 
@@ -155,20 +152,15 @@ void SvgLoadingTask::Process()
   }
 
   mHasSucceeded = !loadFailed;
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
+
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_LOADING_TASK", [&](std::ostringstream& oss) {
     mEndTimeNanoSceonds = GetNanoseconds();
-    std::ostringstream oss;
     oss << std::fixed << std::setprecision(3);
     oss << "[";
     oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
     oss << "s:" << mHasSucceeded << " ";
     oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
-    // DALI_TRACE_END(gTraceFilter, "DALI_SVG_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
-    DALI_LOG_RELEASE_INFO("END: DALI_SVG_LOADING_TASK %s", oss.str().c_str());
-  }
-#endif
+  });
 }
 
 bool SvgLoadingTask::IsReady()
@@ -210,7 +202,10 @@ void SvgRasterizingTask::Process()
   {
     DALI_LOG_ERROR("Rasterize is failed!\n");
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
-      oss << "[s:" << mWidth << "x" << mHeight << " ";
+      mEndTimeNanoSceonds = GetNanoseconds();
+      oss << "[";
+      oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
+      oss << "s:" << mWidth << "x" << mHeight << " ";
       oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
     });
     return;

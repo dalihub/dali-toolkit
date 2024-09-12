@@ -161,15 +161,12 @@ void FastTrackLoadingTask::Load()
 #ifdef TRACE_ENABLED
   uint64_t mStartTimeNanoSceonds = 0;
   uint64_t mEndTimeNanoSceonds   = 0;
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    mStartTimeNanoSceonds = GetNanoseconds();
-    std::ostringstream oss;
-    oss << "[u:" << mUrl.GetEllipsedUrl() << "]";
-    // DALI_TRACE_BEGIN(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK"); ///< TODO : Open it if we can control trace log level
-    DALI_LOG_RELEASE_INFO("BEGIN: DALI_IMAGE_FAST_TRACK_UPLOADING_TASK %s", oss.str().c_str());
-  }
 #endif
+
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK", [&](std::ostringstream& oss) {
+    mStartTimeNanoSceonds = GetNanoseconds();
+    oss << "[u:" << mUrl.GetEllipsedUrl() << "]";
+  });
 
   Devel::PixelBuffer              pixelBuffer;
   std::vector<Devel::PixelBuffer> pixelBuffers;
@@ -232,11 +229,8 @@ void FastTrackLoadingTask::Load()
     }
   }
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK", [&](std::ostringstream& oss) {
     mEndTimeNanoSceonds = GetNanoseconds();
-    std::ostringstream oss;
     oss << std::fixed << std::setprecision(3);
     oss << "[";
     oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
@@ -247,10 +241,7 @@ void FastTrackLoadingTask::Load()
       oss << "p:" << mPremultiplied << " ";
     }
     oss << "u:" << mUrl.GetEllipsedUrl() << "]";
-    // DALI_TRACE_END(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK"); ///< TODO : Open it if we can control trace log level
-    DALI_LOG_RELEASE_INFO("END: DALI_IMAGE_FAST_TRACK_UPLOADING_TASK %s", oss.str().c_str());
-  }
-#endif
+  });
 }
 
 void FastTrackLoadingTask::MultiplyAlpha(Dali::Devel::PixelBuffer pixelBuffer)
