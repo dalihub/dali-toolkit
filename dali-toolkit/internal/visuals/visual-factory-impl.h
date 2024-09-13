@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visual-factory/precompile-shader-option.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
@@ -38,6 +39,7 @@ class VisualFactoryCache;
 class ImageVisualShaderFactory;
 class TextVisualShaderFactory;
 class ColorVisualShaderFactory;
+class CustomShaderFactory;
 
 /**
  * @copydoc Toolkit::VisualFactory
@@ -113,6 +115,11 @@ public:
   void DiscardVisual(Toolkit::Visual::Base visual);
 
   /**
+   * @copydoc Toolkit::VisualFactory::AddPrecompileShader()
+   */
+  bool AddPrecompileShader(const Property::Map& map);
+
+  /**
    * @copydoc Toolkit::VisualFactory::UsePreCompiledShader()
    */
   void UsePreCompiledShader();
@@ -161,6 +168,19 @@ private:
   ColorVisualShaderFactory& GetColorVisualShaderFactory();
 
   /**
+   * Get the custom shader factory, creating it if necessary.
+   */
+   CustomShaderFactory& GetCustomShaderFactory();
+
+  /**
+   * @brief Add precompiled shader
+   * @param[in] shaderOption The option of precompiled shader
+   *
+   * @return True if add success, false otherwise.
+   */
+  bool AddPrecompileShader(PrecompileShaderOption& shaderOption);
+
+  /**
    * @brief Callbacks called for clear discarded visuals.
    */
   void OnDiscardCallback();
@@ -184,6 +204,7 @@ private:
   std::unique_ptr<ImageVisualShaderFactory> mImageVisualShaderFactory;
   std::unique_ptr<TextVisualShaderFactory>  mTextVisualShaderFactory;
   std::unique_ptr<ColorVisualShaderFactory> mColorVisualShaderFactory;
+  std::unique_ptr<CustomShaderFactory>      mCustomShaderFactory;
   SlotDelegate<VisualFactory>               mSlotDelegate;
   CallbackBase*                             mIdleCallback;
   using DiscardedVisualContainer = std::vector<Toolkit::Visual::Base>;

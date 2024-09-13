@@ -333,7 +333,7 @@ void NPatchVisual::OnInitialize()
 {
   // Get basic geometry and shader
   Geometry geometry                        = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
-  auto     imageVisualShaderFeatureBuilder = ImageVisualShaderFeatureBuilder();
+  auto     imageVisualShaderFeatureBuilder = ImageVisualShaderFeature::FeatureBuilder();
   Shader   shader                          = mImageVisualShaderFactory.GetShader(
     mFactoryCache,
     imageVisualShaderFeatureBuilder);

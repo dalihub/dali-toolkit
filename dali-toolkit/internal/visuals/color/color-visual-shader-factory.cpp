@@ -77,39 +77,42 @@ constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[PREDEFINED_SHADER_
 };
 }
 
-ColorVisualShaderFeatureBuilder::ColorVisualShaderFeatureBuilder()
-: mColorRoundCorner(ColorVisualShaderFeature::RoundedCorner::DISABLED),
-  mColorBorderline(ColorVisualShaderFeature::Borderline::DISABLED),
-  mColorBlur(ColorVisualShaderFeature::Blur::DISABLED),
-  mColorCutout(ColorVisualShaderFeature::Cutout::DISABLED)
+namespace ColorVisualShaderFeature
+{
+
+FeatureBuilder::FeatureBuilder()
+: mColorRoundCorner(RoundedCorner::DISABLED),
+  mColorBorderline(Borderline::DISABLED),
+  mColorBlur(Blur::DISABLED),
+  mColorCutout(Cutout::DISABLED)
 {
 }
 
-ColorVisualShaderFeatureBuilder& ColorVisualShaderFeatureBuilder::EnableRoundCorner(bool enableRoundedCorner)
+FeatureBuilder& FeatureBuilder::EnableRoundCorner(bool enableRoundedCorner)
 {
-  mColorRoundCorner = (enableRoundedCorner ? ColorVisualShaderFeature::RoundedCorner::ENABLED : ColorVisualShaderFeature::RoundedCorner::DISABLED);
+  mColorRoundCorner = (enableRoundedCorner ? RoundedCorner::ENABLED : RoundedCorner::DISABLED);
   return *this;
 }
 
-ColorVisualShaderFeatureBuilder& ColorVisualShaderFeatureBuilder::EnableBorderLine(bool enableBorderLine)
+FeatureBuilder& FeatureBuilder::EnableBorderLine(bool enableBorderLine)
 {
-  mColorBorderline = (enableBorderLine ? ColorVisualShaderFeature::Borderline::ENABLED : ColorVisualShaderFeature::Borderline::DISABLED);
+  mColorBorderline = (enableBorderLine ? Borderline::ENABLED : Borderline::DISABLED);
   return *this;
 }
 
-ColorVisualShaderFeatureBuilder& ColorVisualShaderFeatureBuilder::EnableBlur(bool enableBlur)
+FeatureBuilder& FeatureBuilder::EnableBlur(bool enableBlur)
 {
-  mColorBlur = (enableBlur ? ColorVisualShaderFeature::Blur::ENABLED : ColorVisualShaderFeature::Blur::DISABLED);
+  mColorBlur = (enableBlur ? Blur::ENABLED : Blur::DISABLED);
   return *this;
 }
 
-ColorVisualShaderFeatureBuilder& ColorVisualShaderFeatureBuilder::EnableCutout(bool enableCutout)
+FeatureBuilder& FeatureBuilder::EnableCutout(bool enableCutout)
 {
-  mColorCutout = (enableCutout ? ColorVisualShaderFeature::Cutout::ENABLED : ColorVisualShaderFeature::Cutout::DISABLED);
+  mColorCutout = (enableCutout ? Cutout::ENABLED : Cutout::DISABLED);
   return *this;
 }
 
-VisualFactoryCache::ShaderType ColorVisualShaderFeatureBuilder::GetShaderType() const
+VisualFactoryCache::ShaderType FeatureBuilder::GetShaderType() const
 {
   VisualFactoryCache::ShaderType shaderType = VisualFactoryCache::COLOR_SHADER;
   uint32_t  shaderTypeFlag = ColorVisualRequireFlag::DEFAULT;
@@ -131,33 +134,33 @@ VisualFactoryCache::ShaderType ColorVisualShaderFeatureBuilder::GetShaderType() 
   return shaderType;
 }
 
-void ColorVisualShaderFeatureBuilder::GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const
+void FeatureBuilder::GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const
 {
-  if(mColorRoundCorner == ColorVisualShaderFeature::RoundedCorner::ENABLED)
+  if(mColorRoundCorner == RoundedCorner::ENABLED)
   {
     vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
   }
-  if(mColorBlur == ColorVisualShaderFeature::Blur::ENABLED)
+  if(mColorBlur == Blur::ENABLED)
   {
     vertexShaderPrefixList += "#define IS_REQUIRED_BLUR\n";
   }
-  if(mColorBorderline == ColorVisualShaderFeature::Borderline::ENABLED && mColorBlur == ColorVisualShaderFeature::RoundedCorner::DISABLED)
+  if(mColorBorderline == Borderline::ENABLED && mColorBlur == RoundedCorner::DISABLED)
   {
     vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
   }
-  if(mColorCutout == ColorVisualShaderFeature::Cutout::ENABLED)
+  if(mColorCutout == Cutout::ENABLED)
   {
     vertexShaderPrefixList += "#define IS_REQUIRED_CUTOUT\n";
   }
 }
 
-void ColorVisualShaderFeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const
+void FeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const
 {
-  if(mColorRoundCorner == ColorVisualShaderFeature::RoundedCorner::ENABLED)
+  if(mColorRoundCorner == RoundedCorner::ENABLED)
   {
     fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
   }
-  if(mColorBlur == ColorVisualShaderFeature::Blur::ENABLED)
+  if(mColorBlur == Blur::ENABLED)
   {
     fragmentShaderPrefixList += "#define IS_REQUIRED_BLUR\n";
     // If shader version doesn't support latest blur with corner radius, Let we use legacy code.
@@ -166,15 +169,17 @@ void ColorVisualShaderFeatureBuilder::GetFragmentShaderPrefixList(std::string& f
       fragmentShaderPrefixList += "#define SL_VERSION_LOW\n";
     }
   }
-  if(mColorBorderline == ColorVisualShaderFeature::Borderline::ENABLED && mColorBlur == ColorVisualShaderFeature::RoundedCorner::DISABLED)
+  if(mColorBorderline == Borderline::ENABLED && mColorBlur == RoundedCorner::DISABLED)
   {
     fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
   }
-  if(mColorCutout == ColorVisualShaderFeature::Cutout::ENABLED)
+  if(mColorCutout == Cutout::ENABLED)
   {
     fragmentShaderPrefixList += "#define IS_REQUIRED_CUTOUT\n";
   }
 }
+
+} // namespace ColorVisualShaderFeature
 
 ColorVisualShaderFactory::ColorVisualShaderFactory()
 {
@@ -184,7 +189,7 @@ ColorVisualShaderFactory::~ColorVisualShaderFactory()
 {
 }
 
-Shader ColorVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, const ColorVisualShaderFeatureBuilder& featureBuilder)
+Shader ColorVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, const ColorVisualShaderFeature::FeatureBuilder& featureBuilder)
 {
   Shader                         shader;
   VisualFactoryCache::ShaderType  shaderType = featureBuilder.GetShaderType();
@@ -206,6 +211,21 @@ Shader ColorVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
 
 }
 
+bool ColorVisualShaderFactory::AddPrecompiledShader(PrecompileShaderOption& option)
+{
+  ShaderFlagList shaderOption = option.GetShaderOptions();
+
+  auto featureBuilder = ColorVisualShaderFeature::FeatureBuilder();
+  std::string vertexPrefixList;
+  std::string fragmentPrefixList;
+  CreatePrecompileShader(featureBuilder, shaderOption);
+
+  VisualFactoryCache::ShaderType type = featureBuilder.GetShaderType();
+  featureBuilder.GetVertexShaderPrefixList(vertexPrefixList);
+  featureBuilder.GetFragmentShaderPrefixList(fragmentPrefixList);
+  return SavePrecompileShader(type, vertexPrefixList, fragmentPrefixList );
+}
+
 void ColorVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
 {
   std::vector<std::string_view> vertexPrefix;
@@ -213,6 +233,16 @@ void ColorVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
   std::vector<std::string_view> shaderName;
   int                           shaderCount = 0;
   shaders.shaderCount                       = 0;
+
+  // precompile requested shader first
+  for(uint32_t i = 0u; i < mRequestedPrecompileShader.size(); i++ )
+  {
+    vertexPrefix.push_back(mRequestedPrecompileShader[i].vertexPrefix);
+    fragmentPrefix.push_back(mRequestedPrecompileShader[i].fragmentPrefix);
+    shaderName.push_back(Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+    shaderCount++;
+  }
+
   for(uint32_t i = 0u; i < PREDEFINED_SHADER_TYPE_COUNT; ++i)
   {
     vertexPrefix.push_back(VertexPredefines[i]);
@@ -227,6 +257,59 @@ void ColorVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
   shaders.vertexShader   = SHADER_COLOR_VISUAL_SHADER_VERT;
   shaders.fragmentShader = SHADER_COLOR_VISUAL_SHADER_FRAG;
   shaders.shaderCount    = shaderCount;
+  shaders.custom = false;
+}
+
+void ColorVisualShaderFactory::CreatePrecompileShader(ColorVisualShaderFeature::FeatureBuilder& builder, const ShaderFlagList& option)
+{
+  for(uint32_t i = 0; i < option.size(); ++i)
+  {
+    if(option[i] == PrecompileShaderOption::Flag::ROUNDED_CORNER)
+    {
+      builder.EnableRoundCorner(true);
+    }
+    else if(option[i] == PrecompileShaderOption::Flag::BORDERLINE)
+    {
+      builder.EnableBorderLine(true);
+    }
+    else if(option[i] == PrecompileShaderOption::Flag::BLUR_EDGE)
+    {
+      builder.EnableBlur(true);
+    }
+    else if(option[i] == PrecompileShaderOption::Flag::CUTOUT)
+    {
+      builder.EnableCutout(true);
+    }
+  }
+}
+
+bool ColorVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix)
+{
+  for(uint32_t i = 0u; i< PREDEFINED_SHADER_TYPE_COUNT; i++)
+  {
+    if(ShaderTypePredefines[i] == shader)
+    {
+      DALI_LOG_WARNING("This shader already added list(%s).", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      return false;
+    }
+  }
+
+  for(uint32_t i = 0u; i< mRequestedPrecompileShader.size(); i++)
+  {
+    if(mRequestedPrecompileShader[i].type == shader)
+    {
+      DALI_LOG_WARNING("This shader already requsted(%s).", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      return false;
+    }
+  }
+
+  RequestShaderInfo info;
+  info.type = shader;
+  info.vertexPrefix = vertexPrefix;
+  info.fragmentPrefix = fragmentPrefix;
+  mRequestedPrecompileShader.push_back(info);
+  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)",Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(shader, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+  return true;
 }
 
 } // namespace Internal
