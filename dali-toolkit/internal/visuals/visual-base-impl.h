@@ -494,8 +494,8 @@ private:
   void SetupTransition(Dali::Animation&                    transition,
                        Internal::TransitionData::Animator& animator,
                        Property::Index                     index,
-                       Property::Value&                    initialValue,
-                       Property::Value&                    targetValue);
+                       const Property::Value&              initialValue,
+                       const Property::Value&              targetValue);
 
   /**
    * Animate the opacity property - Special handling to

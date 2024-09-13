@@ -38,8 +38,7 @@ uniform highp vec3 uScale;
 #endif
 
 uniform lowp vec4 uColor;
-uniform lowp vec3 mixColor;
-uniform lowp float preMultipliedAlpha;
+uniform lowp float premultipliedAlpha;
 #ifdef IS_REQUIRED_BORDERLINE
 uniform highp float borderlineWidth;
 uniform highp float borderlineOffset;
@@ -162,7 +161,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 
   lowp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
   lowp float borderlineColorAlpha = borderlineColor.a * uActorColor.a;
-  borderlineColorRGB *= mix(1.0, borderlineColorAlpha, preMultipliedAlpha);
+  borderlineColorRGB *= mix(1.0, borderlineColorAlpha, premultipliedAlpha);
 
   // Calculate inside of borderline when alpha is between (0.0  1.0). So we need to apply texture color.
   // If borderlineOpacity is exactly 0.0, we always use whole texture color. In this case, we don't need to run below code.
@@ -182,24 +181,24 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
       // potential is in texture range.
       lowp float textureAlphaScale = mix(1.0, 0.0, smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
       textureColor.a *= textureAlphaScale;
-      textureColor.rgb *= mix(textureColor.a, textureAlphaScale, preMultipliedAlpha);
+      textureColor.rgb *= mix(textureColor.a, textureAlphaScale, premultipliedAlpha);
     }
 
     borderlineColorAlpha *= borderlineOpacity;
-    borderlineColorRGB *= mix(borderlineColorAlpha, borderlineOpacity, preMultipliedAlpha);
+    borderlineColorRGB *= mix(borderlineColorAlpha, borderlineOpacity, premultipliedAlpha);
     // We use pre-multiplied color to reduce operations.
     // In here, textureColor and borderlineColorRGB is pre-multiplied color now.
 
     // Manual blend operation with premultiplied colors.
     // Final alpha = borderlineColorAlpha + (1.0 - borderlineColorAlpha) * textureColor.a.
     // (Final rgb * alpha) =  borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb
-    // If preMultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
+    // If premultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
     // Else, return vec4((rgb*alpha) / alpha, alpha)
 
     lowp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
     lowp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
     // TODO : Need to find some way without division
-    return vec4(finalMultipliedRGB * mix(1.0 / finalAlpha, 1.0, preMultipliedAlpha), finalAlpha);
+    return vec4(finalMultipliedRGB * mix(1.0 / finalAlpha, 1.0, premultipliedAlpha), finalAlpha);
   }
   return mix(textureColor, vec4(borderlineColorRGB, borderlineColorAlpha), borderlineOpacity);
 }
@@ -364,7 +363,7 @@ mediump vec3 ApplyDebugMixColor(mediump vec4 originColor)
   mediump float colorRate = max(debugColorRateRed, max(debugColorRateGreen, debugColorRateBlue));
   mediump vec3 debugColor = vec3(debugColorRateRed, debugColorRateGreen, debugColorRateBlue);
 
-  debugColor *= mix(1.0, originColor.a, preMultipliedAlpha);
+  debugColor *= mix(1.0, originColor.a, premultipliedAlpha);
 
   return originColor.rgb * (1.0 - colorRate) + debugColor;
 }
@@ -382,9 +381,9 @@ void main()
 #endif
 
 #if defined(IS_REQUIRED_YUV_TO_RGB) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
-  lowp vec4 textureColor = ConvertYuvToRgba(texCoord) * vec4( mixColor, 1.0 ) * uColor;
+  lowp vec4 textureColor = ConvertYuvToRgba(texCoord) * uColor;
 #else
-  lowp vec4 textureColor = TEXTURE( sTexture, texCoord ) * vec4( mixColor, 1.0 ) * uColor;
+  lowp vec4 textureColor = TEXTURE( sTexture, texCoord ) * uColor;
 #endif
 
 #ifdef IS_REQUIRED_ALPHA_MASKING
@@ -392,7 +391,7 @@ void main()
   maskTexCoord.y = mix(maskTexCoord.y, 1.0-maskTexCoord.y, uYFlipMaskTexture);
   mediump float maskAlpha = TEXTURE(sMaskTexture, maskTexCoord).a;
   textureColor.a *= maskAlpha;
-  textureColor.rgb *= mix(1.0, maskAlpha, preMultipliedAlpha);
+  textureColor.rgb *= mix(1.0, maskAlpha, premultipliedAlpha);
 #endif
 
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
@@ -433,7 +432,7 @@ void main()
 #ifdef IS_REQUIRED_ROUNDED_CORNER
       mediump float opacity = calculateCornerOpacity();
       OUT_COLOR.a *= opacity;
-      OUT_COLOR.rgb *= mix(1.0, opacity, preMultipliedAlpha);
+      OUT_COLOR.rgb *= mix(1.0, opacity, premultipliedAlpha);
 #endif
     }
 

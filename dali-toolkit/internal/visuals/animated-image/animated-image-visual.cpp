@@ -49,7 +49,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(5); // ltr, wrap, pixel area, crop to mask, mask texture ratio
+const int CUSTOM_PROPERTY_COUNT(6); // ltr, wrap, pixel area, crop to mask, mask texture ratio, pre-multiplied alph
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
@@ -259,6 +259,8 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mPlacementActor(),
   mImageVisualShaderFactory(shaderFactory),
   mPixelArea(FULL_TEXTURE_RECT),
+  mPixelAreaIndex(Property::INVALID_INDEX),
+  mPreMultipliedAlphaIndex(Property::INVALID_INDEX),
   mImageUrl(),
   mAnimatedImageLoading(),
   mFrameIndexForJumpTo(0),
@@ -387,7 +389,17 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
     map.Insert(Toolkit::ImageVisual::Property::URL, value);
   }
 
-  map.Insert(Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea);
+  if(mImpl->mRenderer && mPixelAreaIndex != Property::INVALID_INDEX)
+  {
+    // Update values from Renderer
+    Vector4 pixelArea = mImpl->mRenderer.GetProperty<Vector4>(mPixelAreaIndex);
+    map.Insert(Toolkit::ImageVisual::Property::PIXEL_AREA, pixelArea);
+  }
+  else
+  {
+    map.Insert(Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea);
+  }
+
   map.Insert(Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU);
   map.Insert(Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV);
 
@@ -440,6 +452,22 @@ void AnimatedImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::ANIMATED_IMAGE);
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
+}
+
+void AnimatedImageVisual::EnablePreMultipliedAlpha(bool preMultiplied)
+{
+  if(mImpl->mRenderer)
+  {
+    if(mPreMultipliedAlphaIndex != Property::INVALID_INDEX || !preMultiplied)
+    {
+      // RegisterUniqueProperty call SetProperty internally.
+      // Register PREMULTIPLIED_ALPHA only if it become false.
+      // Default PREMULTIPLIED_ALPHA value is 1.0f, at image-visual-shader-factory.cpp
+      mPreMultipliedAlphaIndex = mImpl->mRenderer.RegisterUniqueProperty(mPreMultipliedAlphaIndex, PREMULTIPLIED_ALPHA, preMultiplied ? 1.0f : 0.0f);
+    }
+  }
+
+  Visual::Base::EnablePreMultipliedAlpha(preMultiplied);
 }
 
 void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes)
@@ -943,7 +971,7 @@ void AnimatedImageVisual::OnInitialize()
 
   if(mPixelArea != FULL_TEXTURE_RECT)
   {
-    mImpl->mRenderer.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, mPixelArea);
+    mPixelAreaIndex = mImpl->mRenderer.RegisterProperty(mPixelAreaIndex, PIXEL_AREA_UNIFORM_NAME, mPixelArea);
   }
 
   if(mMaskingData)
@@ -951,7 +979,7 @@ void AnimatedImageVisual::OnInitialize()
     mImpl->mRenderer.RegisterProperty(CROP_TO_MASK_NAME, static_cast<float>(mMaskingData->mCropToMask));
   }
 
-  // Enable PreMultipliedAlpha if it need premultiplied
+  // Enable PreMultipliedAlpha if it need.
   auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader
                              ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                              : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;

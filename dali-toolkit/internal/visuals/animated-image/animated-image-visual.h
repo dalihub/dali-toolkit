@@ -134,6 +134,11 @@ public: // from Visual
   void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
   /**
+   * @copydoc Visual::Base::EnablePreMultipliedAlpha
+   */
+  void EnablePreMultipliedAlpha(bool preMultiplied) override;
+
+  /**
    * @copydoc Visual::Base::OnDoAction
    */
   void OnDoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes) override;
@@ -274,8 +279,12 @@ private:
   WeakHandle<Actor>         mPlacementActor;
   ImageVisualShaderFactory& mImageVisualShaderFactory;
 
+  // Variables for Image renderer
+  Vector4         mPixelArea;
+  Property::Index mPixelAreaIndex;
+  Property::Index mPreMultipliedAlphaIndex; ///< Index of premultipliedAlpha uniform.
+
   // Variables for Animated Image player
-  Vector4                    mPixelArea;
   VisualUrl                  mImageUrl;
   Dali::AnimatedImageLoading mAnimatedImageLoading; // Only needed for animated image
   uint32_t                   mFrameIndexForJumpTo;  // Frame index into textureRects

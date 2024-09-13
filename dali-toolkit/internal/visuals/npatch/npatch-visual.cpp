@@ -49,7 +49,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(5); // fixed(3),stretch,aux
+const int CUSTOM_PROPERTY_COUNT(6); // fixed(3),stretch,aux,pre-muliplied alpha
 }
 
 /////////////////NPatchVisual////////////////
@@ -93,6 +93,9 @@ void NPatchVisual::LoadImages()
     auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader
                                ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                                : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
+    // Register PREMULTIPLIED_ALPHA property here.
+    mPreMultipliedAlphaIndex = mImpl->mRenderer.RegisterUniqueProperty(mPreMultipliedAlphaIndex, PREMULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled() ? 1.0f : 0.0f);
 
     TextureManager::MaskingDataPointer maskingDataPtr       = nullptr;
     ImageAtlasManagerPtr               imageAtlasManagerPtr = nullptr;
@@ -287,6 +290,16 @@ void NPatchVisual::DoCreateInstancePropertyMap(Property::Map& map) const
   }
 }
 
+void NPatchVisual::EnablePreMultipliedAlpha(bool preMultiplied)
+{
+  if(mImpl->mRenderer && mPreMultipliedAlphaIndex != Property::INVALID_INDEX)
+  {
+    mImpl->mRenderer.SetProperty(mPreMultipliedAlphaIndex, preMultiplied ? 1.0f : 0.0f);
+  }
+
+  Visual::Base::EnablePreMultipliedAlpha(preMultiplied);
+}
+
 NPatchVisual::NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory)
 : Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::N_PATCH),
   mPlacementActor(),
@@ -298,6 +311,7 @@ NPatchVisual::NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFa
   mAuxiliaryTextureSet(),
   mAuxiliaryTextureId(TextureManager::INVALID_TEXTURE_ID),
   mAuxiliaryResourceStatus(Toolkit::Visual::ResourceStatus::PREPARING),
+  mPreMultipliedAlphaIndex(Property::INVALID_INDEX),
   mBorderOnly(false),
   mBorder(),
   mAuxiliaryImageAlpha(0.0f),

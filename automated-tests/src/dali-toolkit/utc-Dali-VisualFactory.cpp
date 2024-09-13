@@ -197,14 +197,6 @@ int UtcDaliVisualFactoryGetColorVisual1(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactoryGetColorVisual1:  Request color visual with a Property::Map");
 
-  static std::vector<UniformData> customUniforms =
-    {
-      UniformData("mixColor", Property::Type::VECTOR3),
-    };
-
-  TestGraphicsController& graphics = application.GetGraphicsController();
-  graphics.AddCustomUniforms(customUniforms);
-
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
@@ -219,13 +211,10 @@ int UtcDaliVisualFactoryGetColorVisual1(void)
   DummyControl actor = DummyControl::New(true);
   TestVisualRender(application, actor, visual);
 
-  Vector3            actualValue(Vector4::ZERO);
   Vector4            actualColor(Vector4::ZERO);
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector3>("mixColor", actualValue));
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualColor));
-  DALI_TEST_EQUALS(actualValue, Vector3(testColor), TEST_LOCATION);
-  DALI_TEST_EQUALS(actualColor.a, testColor.a, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualColor, testColor, TEST_LOCATION);
 
   END_TEST;
 }
@@ -234,14 +223,6 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
 {
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactoryGetColorVisual2: Request color visual with a Vector4");
-
-  static std::vector<UniformData> customUniforms =
-    {
-      UniformData("mixColor", Property::Type::VECTOR3),
-    };
-
-  TestGraphicsController& graphics = application.GetGraphicsController();
-  graphics.AddCustomUniforms(customUniforms);
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -256,13 +237,10 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
   DummyControl actor = DummyControl::New(true);
   TestVisualRender(application, actor, visual);
 
-  Vector3            actualValue;
   Vector4            actualColor;
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector3>("mixColor", actualValue));
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualColor));
-  DALI_TEST_EQUALS(actualValue, Vector3(testColor), TEST_LOCATION);
-  DALI_TEST_EQUALS(actualColor.a, testColor.a, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualColor, testColor, TEST_LOCATION);
 
   application.GetScene().Remove(actor);
   DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
@@ -2920,9 +2898,9 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   Property::Map imageShader2;
   imageShader2["shaderType"]   = "image";
   imageShader2["shaderOption"] = Property::Map()
-                                    .Add("ROUNDED_CORNER", true)
-                                    .Add("BORDERLINE", true)
-                                    .Add("MASKING", true);
+                                   .Add("ROUNDED_CORNER", true)
+                                   .Add("BORDERLINE", true)
+                                   .Add("MASKING", true);
 
   Property::Map imageShader3;
   imageShader3["shaderType"]   = "image";
@@ -2939,40 +2917,40 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   Property::Map textShader;
   textShader["shaderType"]   = "text";
   textShader["shaderOption"] = Property::Map()
-                                    .Add("MULTI_COLOR", true)
-                                    .Add("OVERLAY", true)
-                                    .Add("STYLES", true);
+                                 .Add("MULTI_COLOR", true)
+                                 .Add("OVERLAY", true)
+                                 .Add("STYLES", true);
 
   Property::Map textShader2;
   textShader2["shaderType"]   = "text";
   textShader2["shaderOption"] = Property::Map()
-                                    .Add("EMOJI", true);
+                                  .Add("EMOJI", true);
 
   Property::Map colorShader;
   colorShader["shaderType"]   = "color";
   colorShader["shaderOption"] = Property::Map()
-                                    .Add("CUTOUT", true)
-                                    .Add("BORDERLINE", true);
+                                  .Add("CUTOUT", true)
+                                  .Add("BORDERLINE", true);
 
   Property::Map colorShader2;
   colorShader2["shaderType"]   = "color";
   colorShader2["shaderOption"] = Property::Map()
-                                    .Add("ROUNDED_CORNER,", true)
-                                    .Add("BLUR_EDGE", true);
+                                   .Add("ROUNDED_CORNER,", true)
+                                   .Add("BLUR_EDGE", true);
 
   Property::Map npatchShader;
-  npatchShader["shaderType"]   = "npatch";
+  npatchShader["shaderType"] = "npatch";
 
   Property::Map npatchShader2;
-  npatchShader2["shaderType"]   = "npatch";
-  npatchShader2["shaderOption"] = Property::Map() .Add("MASKING", true);
+  npatchShader2["shaderType"]    = "npatch";
+  npatchShader2["shaderOption"]  = Property::Map().Add("MASKING", true);
   npatchShader2["xStretchCount"] = 4;
   npatchShader2["yStretchCount"] = 3;
 
   Property::Map customSHader;
-  customSHader["shaderType"]   = "custom";
-  customSHader["shaderName"]   = "myShader";
-  customSHader["vertexShader"] = VertexSource;
+  customSHader["shaderType"]     = "custom";
+  customSHader["shaderName"]     = "myShader";
+  customSHader["vertexShader"]   = VertexSource;
   customSHader["fragmentShader"] = FragmentSource;
 
   factory.AddPrecompileShader(imageShader);

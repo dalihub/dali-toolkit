@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ enum
    * @details Name "mixColor", type Property::VECTOR3 or Property::VECTOR4, animatable
    * @SINCE_1_2.60
    * @note Optional
-   * @note To animate an opacity, OPACITY property should be used.
+   * @note Animate support for Property::VECTOR4, which OPACITY property included.
    */
   MIX_COLOR,
 

@@ -15,7 +15,6 @@ FLAT INPUT highp vec4 vCutoutCornerRadius;
 #endif
 
 uniform lowp vec4 uColor;
-uniform lowp vec3 mixColor;
 #ifdef IS_REQUIRED_BLUR
 uniform highp float blurRadius;
 #elif defined(IS_REQUIRED_BORDERLINE)
@@ -169,7 +168,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     // Manual blend operation with premultiplied colors.
     // Final alpha = borderlineColorAlpha + (1.0 - borderlineColorAlpha) * textureColor.a.
     // (Final rgb * alpha) =  borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb
-    // If preMultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
+    // If premultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
     // Else, return vec4((rgb*alpha) / alpha, alpha)
 
     lowp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
@@ -289,7 +288,7 @@ mediump float calculateBlurOpacity()
 
 void main()
 {
-  lowp vec4 targetColor = vec4(mixColor, 1.0) * uColor;
+  lowp vec4 targetColor = uColor;
 
 #ifdef IS_REQUIRED_CUTOUT
   mediump float discardOpacity = 1.0;

@@ -14,7 +14,6 @@ uniform mediump float uTextureCoordinateScaleFactor;
 
 uniform sampler2D sTexture; // sampler1D?
 uniform lowp vec4 uColor;
-uniform lowp vec3 mixColor;
 #ifdef IS_REQUIRED_BORDERLINE
 uniform highp float borderlineWidth;
 uniform highp float borderlineOffset;
@@ -159,7 +158,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     // Manual blend operation with premultiplied colors.
     // Final alpha = borderlineColorAlpha + (1.0 - borderlineColorAlpha) * textureColor.a.
     // (Final rgb * alpha) =  borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb
-    // If preMultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
+    // If premultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
     // Else, return vec4((rgb*alpha) / alpha, alpha)
 
     lowp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
@@ -196,9 +195,9 @@ void main()
 {
 #ifdef RADIAL
   mediump float radialTexCoord = ((length(vTexCoord) - 0.5) * uTextureCoordinateScaleFactor) + 0.5;
-  lowp vec4 textureColor = TEXTURE(sTexture, vec2(radialTexCoord, 0.5)) * vec4(mixColor, 1.0) * uColor;
+  lowp vec4 textureColor = TEXTURE(sTexture, vec2(radialTexCoord, 0.5)) * uColor;
 #else
-  lowp vec4 textureColor = TEXTURE(sTexture, vec2(vTexCoord.y, 0.5)) * vec4(mixColor, 1.0) * uColor;
+  lowp vec4 textureColor = TEXTURE(sTexture, vec2(vTexCoord.y, 0.5)) * uColor;
 #endif
 
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
