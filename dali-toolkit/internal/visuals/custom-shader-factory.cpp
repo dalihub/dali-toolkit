@@ -28,7 +28,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 CustomShaderFactory::CustomShaderFactory()
 {
 }
@@ -39,8 +38,8 @@ CustomShaderFactory::~CustomShaderFactory()
 
 bool CustomShaderFactory::AddPrecompiledShader(PrecompileShaderOption& option)
 {
-  auto shaderName = option.GetShaderName();
-  auto vertexShader = option.GetVertexShader();
+  auto shaderName     = option.GetShaderName();
+  auto vertexShader   = option.GetVertexShader();
   auto fragmentShader = option.GetFragmentShader();
   return SavePrecompileShader(shaderName, vertexShader, fragmentShader);
 }
@@ -54,7 +53,7 @@ void CustomShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
   shaders.shaderCount                       = 0;
 
   // precompile requested shader first
-  for(uint32_t i = 0; i < mRequestedPrecompileShader.size(); i++ )
+  for(uint32_t i = 0; i < mRequestedPrecompileShader.size(); i++)
   {
     vertexPrefix.push_back(mRequestedPrecompileShader[i].vertexPrefix);
     fragmentPrefix.push_back(mRequestedPrecompileShader[i].fragmentPrefix);
@@ -68,17 +67,18 @@ void CustomShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
   shaders.vertexShader   = ""; // Custom shader use prefix shader only. No need to set vertexShader and fragmentShader.
   shaders.fragmentShader = ""; // Custom shader use prefix shader only. No need to set vertexShader and fragmentShader.
   shaders.shaderCount    = std::move(shaderCount);
-  shaders.custom = true;
+  shaders.custom         = true;
 }
 
 bool CustomShaderFactory::SavePrecompileShader(std::string& shaderName, std::string& vertexShader, std::string& fragmentShader)
 {
   RequestShaderInfo info;
-  info.name = shaderName;
-  info.vertexPrefix = vertexShader;
+  info.type           = VisualFactoryCache::SHADER_TYPE_MAX; ///< Not be used
+  info.name           = shaderName;
+  info.vertexPrefix   = vertexShader;
   info.fragmentPrefix = fragmentShader;
   mRequestedPrecompileShader.push_back(info);
-  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)",shaderName.c_str());
+  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)", shaderName.c_str());
   return true;
 }
 
