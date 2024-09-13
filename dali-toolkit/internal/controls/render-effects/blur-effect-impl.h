@@ -106,6 +106,21 @@ protected:
 private:
   // Inner functions
   /**
+   * @brief Sets frame buffers to draw blurred output.
+   * @param[in] size Full size of input.
+   * @param[in] downsampledSize Downsampled size for performance.
+   */
+  void CreateFrameBuffers(const Size size, const Size downsampledSize);
+
+  /**
+   * @brief Sets blur render tasks.
+   * Requires initialized buffers, source actors, and source cameras.
+   * @param[in] sceneHolder SceneHolder of source control
+   * @param[in] sourceControl Input source control
+   */
+  void CreateRenderTasks(Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl);
+
+  /**
    * @brief Gets or Calculates a valid target size for texture.
    * Invalid cases include: zero vector, minus numbers or large numbers(larger than the maximum).
    * @return A valid version of mTargetSize, Vector2::ZERO otherwise.
