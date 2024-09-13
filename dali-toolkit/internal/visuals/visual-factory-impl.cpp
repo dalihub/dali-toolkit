@@ -39,6 +39,7 @@
 #include <dali-toolkit/internal/visuals/color/color-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/custom-shader-factory.h>
+#include <dali-toolkit/internal/visuals/npatch-shader-factory.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
@@ -457,6 +458,10 @@ void VisualFactory::UsePreCompiledShader()
   GetColorVisualShaderFactory().GetPreCompiledShader(colorShaderData);
   rawShaderList.push_back(colorShaderData);
 
+  RawShaderData npatchShaderData;
+  GetNpatchShaderFactory().GetPreCompiledShader(npatchShaderData);
+  rawShaderList.push_back(npatchShaderData);
+
   // Get 3D shader
   // Get Custom shader
   RawShaderData customShaderData;
@@ -541,6 +546,15 @@ ColorVisualShaderFactory& VisualFactory::GetColorVisualShaderFactory()
   return *mColorVisualShaderFactory;
 }
 
+NpatchShaderFactory& VisualFactory::GetNpatchShaderFactory()
+{
+  if(!mNpatchShaderFactory)
+  {
+    mNpatchShaderFactory = std::unique_ptr<NpatchShaderFactory>(new NpatchShaderFactory());
+  }
+  return *mNpatchShaderFactory;
+}
+
 CustomShaderFactory& VisualFactory::GetCustomShaderFactory()
 {
   if(!mCustomShaderFactory)
@@ -570,6 +584,10 @@ bool VisualFactory::AddPrecompileShader(PrecompileShaderOption& option)
     {
       ret = GetTextVisualShaderFactory().AddPrecompiledShader(option);
       break;
+    }
+    case PrecompileShaderOption::ShaderType::NPATCH:
+    {
+      ret = GetNpatchShaderFactory().AddPrecompiledShader(option);
     }
     case PrecompileShaderOption::ShaderType::MODEL_3D:
     {

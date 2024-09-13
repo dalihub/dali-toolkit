@@ -41,15 +41,8 @@ bool CustomShaderFactory::AddPrecompiledShader(PrecompileShaderOption& option)
 {
   auto shaderName = option.GetShaderName();
   auto vertexShader = option.GetVertexShader();
-  auto framentShader = option.GetFragmentShader();
-
-  RequestShaderInfo info;
-  info.name = shaderName;
-  info.vertexPrefix = vertexShader;
-  info.fragmentPrefix = framentShader;
-  mRequestedPrecompileShader.push_back(info);
-  DALI_LOG_RELEASE_INFO("Add custom precompile shader success!!(%s)", shaderName.c_str());
-  return true;
+  auto fragmentShader = option.GetFragmentShader();
+  return SavePrecompileShader(shaderName, vertexShader, fragmentShader);
 }
 
 void CustomShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
@@ -76,6 +69,17 @@ void CustomShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
   shaders.fragmentShader = ""; // Custom shader use prefix shader only. No need to set vertexShader and fragmentShader.
   shaders.shaderCount    = std::move(shaderCount);
   shaders.custom = true;
+}
+
+bool CustomShaderFactory::SavePrecompileShader(std::string& shaderName, std::string& vertexShader, std::string& fragmentShader)
+{
+  RequestShaderInfo info;
+  info.name = shaderName;
+  info.vertexPrefix = vertexShader;
+  info.fragmentPrefix = fragmentShader;
+  mRequestedPrecompileShader.push_back(info);
+  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)",shaderName.c_str());
+  return true;
 }
 
 } // namespace Internal

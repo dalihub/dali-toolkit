@@ -69,6 +69,18 @@ namespace Toolkit
  * IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
  * IMAGE_SHADER_BORDERLINE_YUV_AND_RGB,
  * IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_AND_RGB,
+ * NATIVE_IMAGE_SHADER,
+ * NATIVE_IMAGE_SHADER_ROUNDED_CORNER,
+ * NATIVE_IMAGE_SHADER_BORDERLINE,
+ * NATIVE_IMAGE_SHADER_ROUNDED_BORDERLINE,
+ * NATIVE_IMAGE_SHADER_MASKING,
+ * NATIVE_IMAGE_SHADER_ROUNDED_CORNER_MASKING,
+ * NATIVE_IMAGE_SHADER_BORDERLINE_MASKING,
+ * NATIVE_IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING,
+ * NATIVE_IMAGE_SHADER_ATLAS_DEFAULT_WRAP,
+ * NATIVE_IMAGE_SHADER_ATLAS_CUSTOM_WRAP,
+ * NINE_PATCH_SHADER,
+ * NINE_PATCH_MASK_SHADER,
  * TEXT_SHADER_SINGLE_COLOR_TEXT,
  * TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE,
  * TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_OVERLAY,
@@ -94,6 +106,7 @@ public:
     COLOR,
     IMAGE,
     TEXT,
+    NPATCH,
     MODEL_3D, // ToDO: Need to add more options
     CUSTOM,
   };
@@ -114,6 +127,9 @@ public:
     STYLES,
     OVERLAY,
     EMOJI,
+    NATIVE,
+    STRETCH_X,
+    STRETCH_Y,
   };
 
   PrecompileShaderOption(const Property::Map& shaderOption);
@@ -163,12 +179,28 @@ public:
    */
   std::string GetFragmentShader() const;
 
+  /**
+   * @brief Get the XStretchCount for npatch
+   *
+   * @return The NpatchXStretchCount
+   */
+  uint32_t GetNpatchXStretchCount() const;
+
+    /**
+   * @brief Get the YStretchCount for npatch
+   *
+   * @return The NpatchYStretchCount
+   */
+  uint32_t GetNpatchYStretchCount() const;
+
 private:
   ShaderType mShaderType;
   std::vector<Flag> mShaderOptions;
   std::string mShaderName;
   std::string mVertexShader;
   std::string mFragmentShader;
+  uint32_t mNpatchXStretchCount;
+  uint32_t mNpatchYStretchCount;
 };
 
 } // namespace Toolkit

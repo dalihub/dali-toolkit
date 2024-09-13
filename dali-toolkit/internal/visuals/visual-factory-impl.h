@@ -39,6 +39,7 @@ class VisualFactoryCache;
 class ImageVisualShaderFactory;
 class TextVisualShaderFactory;
 class ColorVisualShaderFactory;
+class NpatchShaderFactory;
 class CustomShaderFactory;
 
 /**
@@ -168,9 +169,14 @@ private:
   ColorVisualShaderFactory& GetColorVisualShaderFactory();
 
   /**
+   * Get the npatch shader factory, creating it if necessary.
+   */
+  NpatchShaderFactory& GetNpatchShaderFactory();
+
+  /**
    * Get the custom shader factory, creating it if necessary.
    */
-   CustomShaderFactory& GetCustomShaderFactory();
+  CustomShaderFactory& GetCustomShaderFactory();
 
   /**
    * @brief Add precompiled shader
@@ -204,6 +210,7 @@ private:
   std::unique_ptr<ImageVisualShaderFactory> mImageVisualShaderFactory;
   std::unique_ptr<TextVisualShaderFactory>  mTextVisualShaderFactory;
   std::unique_ptr<ColorVisualShaderFactory> mColorVisualShaderFactory;
+  std::unique_ptr<NpatchShaderFactory>      mNpatchShaderFactory;
   std::unique_ptr<CustomShaderFactory>      mCustomShaderFactory;
   SlotDelegate<VisualFactory>               mSlotDelegate;
   CallbackBase*                             mIdleCallback;

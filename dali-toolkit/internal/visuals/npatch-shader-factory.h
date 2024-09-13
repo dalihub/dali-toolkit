@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_CUSTOM_SHADER_FACTORY_H
-#define DALI_TOOLKIT_CUSTOM_SHADER_FACTORY_H
+#ifndef DALI_TOOLKIT_NPATCH_SHADER_FACTORY_H
+#define DALI_TOOLKIT_NPATCH_SHADER_FACTORY_H
 
 /*
  * Copyright (c) 2024 Samsung Electronics Co., Ltd.
@@ -33,20 +33,20 @@ namespace Internal
 {
 
 /**
- * CustomShaderFactory is an object that provides custom shader
+ * NpatchShaderFactory is an object that provides custom shader
  */
-class CustomShaderFactory : public VisualShaderFactoryInterface
+class NpatchShaderFactory : public VisualShaderFactoryInterface
 {
 public:
   /**
    * @brief Constructor
    */
-  CustomShaderFactory();
+  NpatchShaderFactory();
 
   /**
    * @brief Destructor
    */
-  ~CustomShaderFactory() override;
+  ~NpatchShaderFactory() override;
 
 public: // Implementation of VisualShaderFactoryInterface
   /**
@@ -61,20 +61,36 @@ public: // Implementation of VisualShaderFactoryInterface
 
 private:
   /**
-   * @brief Save the custom shader
+   * @brief Get the NPatch vertex shader. this is used for generating pre-compiled shader.
    */
-  bool SavePrecompileShader(std::string& shaderName, std::string& vertexPrefix, std::string& fragmentPrefix);
+  void GetVertexShader(std::string& vertexShader) const;
+
+  /**
+   * @brief Get the NPatch fragment shader. this is used for generating pre-compiled shader
+   */
+  void GetFragmentShader(std::string& fragmentShader) const;
+
+  /**
+   * @brief Save the npatch shader
+   */
+  bool SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix);
 
 protected:
   /**
    * Undefined copy constructor.
    */
-  CustomShaderFactory(const CustomShaderFactory&) = delete;
+  NpatchShaderFactory(const NpatchShaderFactory&) = delete;
 
   /**
    * Undefined assignment operator.
    */
-  CustomShaderFactory& operator=(const CustomShaderFactory& rhs) = delete;
+  NpatchShaderFactory& operator=(const NpatchShaderFactory& rhs) = delete;
+
+private:
+  // For Npatch
+  uint32_t mNpatchXStretchCount;
+  uint32_t mNpatchYStretchCount;
+  bool     mNpatchMaskingEnable;
 };
 
 } // namespace Internal
@@ -83,4 +99,4 @@ protected:
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_CUSTOM_SHADER_FACTORY_H
+#endif // DALI_TOOLKIT_NPATCH_SHADER_FACTORY_H
