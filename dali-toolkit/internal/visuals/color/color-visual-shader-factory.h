@@ -1,0 +1,172 @@
+#ifndef DALI_TOOLKIT_COLOR_VISUAL_SHADER_FACTORY_H
+#define DALI_TOOLKIT_COLOR_VISUAL_SHADER_FACTORY_H
+
+/*
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// EXTERNAL INCLUDES
+#include <dali/integration-api/adaptor-framework/shader-precompiler.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-shader-factory-interface.h>
+#include <string_view>
+
+namespace Dali
+{
+namespace Toolkit
+{
+namespace Internal
+{
+
+namespace ColorVisualShaderFeature
+{
+namespace RoundedCorner
+{
+/**
+ * @brief Whether use RoundedCorner, or not
+ */
+enum Type
+{
+  DISABLED = 0, ///< Color visual doesn't use rounded corner
+  ENABLED       ///< Color visual uses rounded corner
+};
+} // namespace RoundedCorner
+
+namespace Blur
+{
+/**
+ * @brief Whether use Blur, or not
+ */
+enum Type
+{
+  DISABLED = 0, ///< Color visual doesn't use blur
+  ENABLED       ///< Color visual uses blur
+};
+} // namespace Blur
+
+namespace Borderline
+{
+/**
+ * @brief Whether use Borderline
+ */
+enum Type
+{
+  DISABLED = 0, /// Color visual doesn't use Borderline
+  ENABLED       /// Color visual uses Borderline
+};
+} // namespace Borderline
+
+namespace Cutout
+{
+/**
+ * @brief Whether use Cutout, or not
+ */
+enum Type
+{
+  DISABLED = 0, ///< Color visual doesn't use Cutout
+  ENABLED       ///< Color visual uses Cutout
+};
+} // namespace Cutout
+} // namespace ColorVisualShaderFeature
+
+class ColorVisualShaderFeatureBuilder
+{
+public:
+  ColorVisualShaderFeatureBuilder();
+  ColorVisualShaderFeatureBuilder& EnableRoundCorner(bool enableRoundCorner);
+  ColorVisualShaderFeatureBuilder& EnableBorderLine(bool enableBorderLine);
+  ColorVisualShaderFeatureBuilder& EnableBlur(bool enableBlur);
+  ColorVisualShaderFeatureBuilder& EnableCutout(bool enableCutout);
+
+  VisualFactoryCache::ShaderType GetShaderType() const;
+  void GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const;
+  void GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const;
+
+  bool IsEnabledRoundCorner() const
+  {
+    return mColorRoundCorner == ColorVisualShaderFeature::RoundedCorner::ENABLED;
+  }
+  bool IsEnabledBorderLine() const
+  {
+    return mColorBorderline == ColorVisualShaderFeature::Borderline::ENABLED;
+  }
+  bool IsEnabledBlur() const
+  {
+    return mColorBlur == ColorVisualShaderFeature::Blur::ENABLED;
+  }
+  bool IsEnabledCutout() const
+  {
+    return mColorCutout == ColorVisualShaderFeature::Cutout::ENABLED;
+  }
+
+private:
+  ColorVisualShaderFeature::RoundedCorner::Type mColorRoundCorner : 2; ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED
+  ColorVisualShaderFeature::Borderline::Type    mColorBorderline : 2;  ///< Whether use border line, or not. default as Borderline::DISABLED
+  ColorVisualShaderFeature::Blur::Type          mColorBlur : 2;        ///< Whether use blur, or not. default as Blur::DISABLED
+  ColorVisualShaderFeature::Cutout::Type        mColorCutout : 2;      ///< Whether use cutout, or not. default as Cutout::DISABLED
+};
+
+/**
+ * ColorVisualShaderFactory is an object that provides and shares shaders between color visuals
+ */
+class ColorVisualShaderFactory : public VisualShaderFactoryInterface
+{
+public:
+  /**
+   * @brief Constructor
+   */
+  ColorVisualShaderFactory();
+
+  /**
+   * @brief Destructor
+   */
+  ~ColorVisualShaderFactory() override;
+
+public:
+  /**
+   * @brief Get the standard color rendering shader.
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] featureBuilder Collection of current text shader's features
+   * @return The standard text rendering shader with features.
+  */
+  Shader GetShader(VisualFactoryCache& factoryCache, const ColorVisualShaderFeatureBuilder& featureBuilder);
+
+public: // Implementation of VisualShaderFactoryInterface
+  /**
+   * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::GetPreCompiledShader
+   */
+  void GetPreCompiledShader(RawShaderData& shaders) override;
+
+protected:
+  /**
+   * Undefined copy constructor.
+   */
+  ColorVisualShaderFactory(const ColorVisualShaderFactory&) = delete;
+
+  /**
+   * Undefined assignment operator.
+   */
+  ColorVisualShaderFactory& operator=(const ColorVisualShaderFactory& rhs) = delete;
+};
+
+} // namespace Internal
+
+} // namespace Toolkit
+
+} // namespace Dali
+
+#endif // DALI_TOOLKIT_COLOR_VISUAL_SHADER_FACTORY_H

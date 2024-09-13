@@ -183,6 +183,7 @@ SET( devel_api_visual_factory_header_files
   ${devel_api_src_dir}/visual-factory/transition-data.h
   ${devel_api_src_dir}/visual-factory/visual-factory.h
   ${devel_api_src_dir}/visual-factory/visual-base.h
+  ${devel_api_src_dir}/visual-factory/visual-shader-factory-interface.h
 )
 
 SET( devel_api_visuals_header_files

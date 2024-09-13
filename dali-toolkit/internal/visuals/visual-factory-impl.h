@@ -37,6 +37,7 @@ namespace Internal
 class VisualFactoryCache;
 class ImageVisualShaderFactory;
 class TextVisualShaderFactory;
+class ColorVisualShaderFactory;
 
 /**
  * @copydoc Toolkit::VisualFactory
@@ -140,12 +141,6 @@ private:
   void SetBrokenImageUrl(Toolkit::StyleManager& styleManager);
 
   /**
-   * @brief Get the default shader source.
-   * @param[in] shaders shaderList for precompile
-   */
-  void GetPreCompiledShader(RawShaderData& shaders);
-
-  /**
    * Get the factory cache, creating it if necessary.
    */
   Internal::VisualFactoryCache& GetFactoryCache();
@@ -159,6 +154,11 @@ private:
    * Get the text visual shader factory, creating it if necessary.
    */
   TextVisualShaderFactory& GetTextVisualShaderFactory();
+
+  /**
+   * Get the color visual shader factory, creating it if necessary.
+   */
+  ColorVisualShaderFactory& GetColorVisualShaderFactory();
 
   /**
    * @brief Callbacks called for clear discarded visuals.
@@ -183,6 +183,7 @@ private:
   std::unique_ptr<VisualFactoryCache>       mFactoryCache;
   std::unique_ptr<ImageVisualShaderFactory> mImageVisualShaderFactory;
   std::unique_ptr<TextVisualShaderFactory>  mTextVisualShaderFactory;
+  std::unique_ptr<ColorVisualShaderFactory> mColorVisualShaderFactory;
   SlotDelegate<VisualFactory>               mSlotDelegate;
   CallbackBase*                             mIdleCallback;
   using DiscardedVisualContainer = std::vector<Toolkit::Visual::Base>;

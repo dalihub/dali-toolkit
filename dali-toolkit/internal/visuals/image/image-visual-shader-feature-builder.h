@@ -145,14 +145,14 @@ public:
 
   ImageVisualShaderFeatureBuilder& EnableYuvToRgb(bool enableYuvToRgb, bool enableUnifiedYuvAndRgb = false);
 
-  VisualFactoryCache::ShaderType GetShaderType();
+  VisualFactoryCache::ShaderType GetShaderType() const;
 
-  ImageVisualShaderFeature::ChangeFragmentShader::Type NeedToChangeFragmentShader();
+  ImageVisualShaderFeature::ChangeFragmentShader::Type NeedToChangeFragmentShader() const;
 
-  void GetVertexShaderPrefixList(std::string& vertexShaderPrefixList);
-  void GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList);
+  void GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const;
+  void GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const;
 
-  Dali::Texture GetTexture();
+  Dali::Texture GetTexture() const;
 
   bool IsEnabledAlphaMaskingOnRendering() const;
 
