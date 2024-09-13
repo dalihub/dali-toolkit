@@ -22,6 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
@@ -42,8 +43,11 @@ static constexpr int32_t  BLUR_EFFECT_ORDER_INDEX      = 101;
 static constexpr float MINIMUM_DOWNSCALE_FACTOR = 0.1f;
 static constexpr float MAXIMUM_DOWNSCALE_FACTOR = 1.0f;
 
-static constexpr uint32_t MINIMUM_BLUR_RADIUS = 3u;   ///< 1-pixel blur(No blur). Blur radius will be compressed to half size(mPixelRadius / 2 >= 1).
-static constexpr uint32_t MAXIMUM_BLUR_RADIUS = 500u; ///< Maximum pixel radius for blur effect. (GL_MAX_FRAGMENT_UNIFORM_COMPONENTS(Usually 1024) - 19 (vertex shader used)) / 3 float
+static constexpr uint32_t MINIMUM_GPU_ARRAY_SIZE = 2u;   // GPU cannot handle array size smaller than 2.
+static constexpr uint32_t MAXIMUM_BLUR_RADIUS    = 500u; ///< Maximum pixel radius for blur effect. (GL_MAX_FRAGMENT_UNIFORM_COMPONENTS(Usually 1024) - 19 (vertex shader used)) / 3 float
+
+static constexpr float   MAXIMUM_BELL_CURVE_WIDTH            = 171.352f; ///< bell curve width for MAXIMUM_BLUR_RADIUS case
+static constexpr int32_t MAXIMUM_BELL_CURVE_LOOP_TRIAL_COUNT = 50;
 
 /**
   * @brief Calculates gaussian weight
@@ -73,6 +77,7 @@ BlurEffectImpl::BlurEffectImpl(bool isBackground)
   mDownscaleFactor(BLUR_EFFECT_DOWNSCALE_FACTOR),
   mPixelRadius(BLUR_EFFECT_PIXEL_RADIUS),
   mBellCurveWidth(Math::MACHINE_EPSILON_1),
+  mSkipBlur(false),
   mIsBackground(isBackground)
 {
 }
@@ -83,17 +88,38 @@ BlurEffectImpl::BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool 
   mDownscaleFactor(downscaleFactor),
   mPixelRadius(blurRadius),
   mBellCurveWidth(Math::MACHINE_EPSILON_1),
+  mSkipBlur(false),
   mIsBackground(isBackground)
 {
-  mDownscaleFactor = Dali::Clamp(mDownscaleFactor, MINIMUM_DOWNSCALE_FACTOR, MAXIMUM_DOWNSCALE_FACTOR);
-  mPixelRadius     = Dali::Clamp(mPixelRadius, MINIMUM_BLUR_RADIUS, MAXIMUM_BLUR_RADIUS);
+  if(DALI_UNLIKELY(mDownscaleFactor < MINIMUM_DOWNSCALE_FACTOR || mDownscaleFactor > MAXIMUM_DOWNSCALE_FACTOR))
+  {
+    mDownscaleFactor = Dali::Clamp(mDownscaleFactor, MINIMUM_DOWNSCALE_FACTOR, MAXIMUM_DOWNSCALE_FACTOR);
+  }
+
+  if(DALI_UNLIKELY(blurRadius > MAXIMUM_BLUR_RADIUS))
+  {
+    const uint32_t fixedBlurRadius      = MAXIMUM_BLUR_RADIUS;
+    const float    fixedDownScaleFactor = Dali::Clamp(
+      mDownscaleFactor * static_cast<float>(fixedBlurRadius) / static_cast<float>(blurRadius),
+      MINIMUM_DOWNSCALE_FACTOR,
+      MAXIMUM_DOWNSCALE_FACTOR);
+
+    DALI_LOG_ERROR("Blur radius is out of bound: %u. Use %u and make downscale factor %f to %f.\n",
+                   blurRadius,
+                   fixedBlurRadius,
+                   mDownscaleFactor,
+                   fixedDownScaleFactor);
+
+    mDownscaleFactor = fixedDownScaleFactor;
+    mPixelRadius     = fixedBlurRadius;
+  }
 
   mPixelRadius = static_cast<uint32_t>(mPixelRadius * mDownscaleFactor);
-  if(mPixelRadius <= MINIMUM_BLUR_RADIUS)
+
+  if(DALI_UNLIKELY((mPixelRadius >> 1) < MINIMUM_GPU_ARRAY_SIZE))
   {
-    DALI_LOG_ERROR("Downscaled pixel radius %u is too small. Ignore blur.", mPixelRadius);
-    mDownscaleFactor = MAXIMUM_DOWNSCALE_FACTOR;
-    mPixelRadius     = MINIMUM_BLUR_RADIUS;
+    mSkipBlur = true;
+    DALI_LOG_ERROR("Blur radius is too small. This blur will be ignored.\n");
   }
 }
 
@@ -117,6 +143,11 @@ BlurEffectImplPtr BlurEffectImpl::New(float downscaleFactor, uint32_t blurRadius
 
 void BlurEffectImpl::OnInitialize()
 {
+  if(DALI_UNLIKELY(mSkipBlur))
+  {
+    return;
+  }
+
   // Create CameraActors
   {
     mRenderFullSizeCamera = CameraActor::New();
@@ -139,28 +170,25 @@ void BlurEffectImpl::OnInitialize()
     const float epsilon     = 1e-2f / (mPixelRadius * 2);
     const float localOffset = (mPixelRadius * 2) - 1;
 
-    float lowerBoundBellCurveWidth = 0.001f;
-    float upperBoundBellCurveWidth = 171.352f; ///< bell curve width for MAXIMUM_BLUR_RADIUS case
+    float lowerBoundBellCurveWidth = Math::MACHINE_EPSILON_10000;
+    float upperBoundBellCurveWidth = MAXIMUM_BELL_CURVE_WIDTH;
 
-    int       trialCount        = 0;
-    const int maximumTrialCount = 50;
-    while(trialCount++ < maximumTrialCount && upperBoundBellCurveWidth - lowerBoundBellCurveWidth > Math::MACHINE_EPSILON_10000)
+    int trialCount = 0;
+    while(trialCount++ < MAXIMUM_BELL_CURVE_LOOP_TRIAL_COUNT && upperBoundBellCurveWidth - lowerBoundBellCurveWidth > Math::MACHINE_EPSILON_10000)
     {
-      const float bellCurveWidth = (lowerBoundBellCurveWidth + upperBoundBellCurveWidth) * 0.5f;
-      if(CalculateGaussianWeight(localOffset, bellCurveWidth) < epsilon)
+      mBellCurveWidth = (lowerBoundBellCurveWidth + upperBoundBellCurveWidth) * 0.5f;
+      if(CalculateGaussianWeight(localOffset, mBellCurveWidth) < epsilon)
       {
-        lowerBoundBellCurveWidth = bellCurveWidth;
+        lowerBoundBellCurveWidth = mBellCurveWidth;
       }
       else
       {
-        upperBoundBellCurveWidth = bellCurveWidth;
+        upperBoundBellCurveWidth = mBellCurveWidth;
       }
     }
-
-    mBellCurveWidth = (lowerBoundBellCurveWidth + upperBoundBellCurveWidth) * 0.5f;
   }
 
-  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[BlurEffect:%p] mBellCurveWidth calculated! [radius:%u][bellCurveWidth:%f]\n", this, mPixelRadius, mBellCurveWidth);
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[BlurEffect:%p] mBellCurveWidth calculated! [mPixelRadius:%u][mBellCurveWidth:%f]\n", this, mPixelRadius, mBellCurveWidth);
 
   // Create blur actors
   {
@@ -192,6 +220,11 @@ void BlurEffectImpl::OnInitialize()
 
 void BlurEffectImpl::OnActivate()
 {
+  if(DALI_UNLIKELY(mSkipBlur))
+  {
+    return;
+  }
+
   Toolkit::Control ownerControl = GetOwnerControl();
   DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
 
@@ -223,7 +256,7 @@ void BlurEffectImpl::OnActivate()
   mPlacementSceneHolder = sceneHolder;
 
   // Set blur
-  CreateFrameBuffers(size, Size(downsampledWidth, downsampledHeight));
+  CreateFrameBuffers(size, ImageDimensions(downsampledWidth, downsampledHeight));
   CreateRenderTasks(sceneHolder, ownerControl);
   SetShaderConstants(downsampledWidth, downsampledHeight);
 
@@ -245,6 +278,11 @@ void BlurEffectImpl::OnActivate()
 
 void BlurEffectImpl::OnDeactivate()
 {
+  if(DALI_UNLIKELY(mSkipBlur))
+  {
+    return;
+  }
+
   auto ownerControl = GetOwnerControl();
   if(DALI_LIKELY(ownerControl))
   {
@@ -274,10 +312,10 @@ void BlurEffectImpl::OnDeactivate()
   mSourceRenderTask.Reset();
 }
 
-void BlurEffectImpl::CreateFrameBuffers(const Size size, const Size downsampledSize)
+void BlurEffectImpl::CreateFrameBuffers(const Vector2 size, const ImageDimensions downsampledSize)
 {
-  uint32_t downsampledWidth  = downsampledSize.width;
-  uint32_t downsampledHeight = downsampledSize.height;
+  uint32_t downsampledWidth  = downsampledSize.GetWidth();
+  uint32_t downsampledHeight = downsampledSize.GetHeight();
 
   // buffer to draw input texture
   mInputBackgroundFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::DEPTH_STENCIL);
@@ -372,11 +410,11 @@ Vector2 BlurEffectImpl::GetTargetSizeForValidTexture() const
   return size;
 }
 
-void BlurEffectImpl::SetShaderConstants(float downsampledWidth, float downsampledHeight)
+void BlurEffectImpl::SetShaderConstants(uint32_t downsampledWidth, uint32_t downsampledHeight)
 {
   const uint32_t sampleCount    = mPixelRadius >> 1; // compression
   const uint32_t kernelSize     = sampleCount * 4 - 1;
-  const uint32_t halfKernelSize = kernelSize / 2; // Gaussian curve is symmetric
+  const uint32_t halfKernelSize = kernelSize / 2 + 1; // Gaussian curve is symmetric
 
   // Output: Gaussian kernel compressed to half size
   std::vector<float> uvOffsets(sampleCount);
