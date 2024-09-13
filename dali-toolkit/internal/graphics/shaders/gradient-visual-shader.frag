@@ -41,8 +41,10 @@ highp float gPotential = 0.0;
 highp float gPotentialRange = 0.0;
 highp float gMaxOutlinePotential = 0.0;
 highp float gMinOutlinePotential = 0.0;
+#ifdef IS_REQUIRED_BORDERLINE
 highp float gMaxInlinePotential = 0.0;
 highp float gMinInlinePotential = 0.0;
+#endif
 
 void calculateCornerRadius()
 {
@@ -56,9 +58,13 @@ void calculateCornerRadius()
 #endif
 }
 
-void calculatePosition()
+void calculateFragmentPosition()
 {
   gFragmentPosition = abs(vPosition) - vRectSize;
+}
+
+void calculatePosition()
+{
   gCenterPosition = -gRadius;
 #ifdef IS_REQUIRED_BORDERLINE
   gCenterPosition += borderlineWidth * (clamp(borderlineOffset, -1.0, 1.0) + 1.0) * 0.5;
@@ -81,24 +87,22 @@ void setupMinMaxPotential()
 #ifdef IS_REQUIRED_BORDERLINE
   gMaxInlinePotential = gMaxOutlinePotential - borderlineWidth;
   gMinInlinePotential = gMinOutlinePotential - borderlineWidth;
-#else
-  gMaxInlinePotential = gMaxOutlinePotential;
-  gMinInlinePotential = gMinOutlinePotential;
 #endif
 
   // reduce defect near edge of rounded corner.
-  gMaxOutlinePotential += clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, 1.0);
-  gMinOutlinePotential += clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, 1.0);
+  highp float heuristicEdgeCasePotential = clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, gPotentialRange);
+  gMaxOutlinePotential += heuristicEdgeCasePotential;
+  gMinOutlinePotential += heuristicEdgeCasePotential;
 }
 
-void PreprocessPotential()
-{
-  calculateCornerRadius();
-  calculatePosition();
-  calculatePotential();
-
-  setupMinMaxPotential();
-}
+//void PreprocessPotential()
+//{
+//  calculateCornerRadius();
+//  calculateFragmentPosition();
+//  calculatePosition();
+//  calculatePotential();
+//  setupMinMaxPotential();
+//}
 #endif
 
 
@@ -205,18 +209,36 @@ void main()
   }
   else
   {
-    PreprocessPotential();
+    calculateCornerRadius();
+    calculateFragmentPosition();
+#endif
+
+#if defined(IS_REQUIRED_ROUNDED_CORNER) && !defined(IS_REQUIRED_BORDERLINE)
+    // skip length and etc potential calculation for performance
+    if(gFragmentPosition.x + gFragmentPosition.y < -(gRadius + vAliasMargin) * 2.0)
+    {
+      // Do nothing.
+      OUT_COLOR = textureColor;
+    }
+    else
+#endif
+    {
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+      calculatePosition();
+      calculatePotential();
+      setupMinMaxPotential();
 #endif
 
 #ifdef IS_REQUIRED_BORDERLINE
-    textureColor = convertBorderlineColor(textureColor);
+      textureColor = convertBorderlineColor(textureColor);
 #endif
-    OUT_COLOR = textureColor;
+      OUT_COLOR = textureColor;
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-    mediump float opacity = calculateCornerOpacity();
-    OUT_COLOR *= opacity;
+      mediump float opacity = calculateCornerOpacity();
+      OUT_COLOR *= opacity;
 #endif
+    }
 
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
   }
