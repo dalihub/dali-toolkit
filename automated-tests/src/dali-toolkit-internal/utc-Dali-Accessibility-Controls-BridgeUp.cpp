@@ -1921,7 +1921,7 @@ int UtcDaliEmitAccessibilityStateChanged(void)
 
   DALI_TEST_CHECK(Accessibility::Bridge::GetCurrentBridge()->GetDefaultLabel(rootAccessible) != dialogAccessible);
 
-  // modal role: State is emitted and Default label is registered
+  // modal role: Showing State is emitted and Default label is registered
   DevelControl::EmitAccessibilityStateChanged(dialog, Accessibility::State::SHOWING, 1);
 
   DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
@@ -1931,19 +1931,55 @@ int UtcDaliEmitAccessibilityStateChanged(void)
   Dali::Accessibility::TestResetStateChangedResult();
   flushCoalescableMessage(application);
 
-  // modal role: State is emitted and Default label is unregistered
+  // modal role: Showing State is emitted and Default label is unregistered
   DevelControl::EmitAccessibilityStateChanged(dialog, Accessibility::State::SHOWING, 0);
 
   DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
   DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("showing", 0));
   DALI_TEST_CHECK(Accessibility::Bridge::GetCurrentBridge()->GetDefaultLabel(rootAccessible) != dialogAccessible);
 
-  // non-modal role: State is emitted but Default label is not registered
+  Dali::Accessibility::TestResetStateChangedResult();
+  flushCoalescableMessage(application);
+
+  // modal role: Visible State is not emitted
+  DevelControl::EmitAccessibilityStateChanged(dialog, Accessibility::State::VISIBLE, 1);
+
+  DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
+  DALI_TEST_CHECK(Accessibility::Bridge::GetCurrentBridge()->GetDefaultLabel(rootAccessible) != dialogAccessible);
+
+  Dali::Accessibility::TestResetStateChangedResult();
+  flushCoalescableMessage(application);
+
+  // non-modal role: Showing State is not emitted and Default label is not registered
   DevelControl::EmitAccessibilityStateChanged(button, Accessibility::State::SHOWING, 1);
 
-  DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
-  DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("showing", 1));
+  DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
   DALI_TEST_CHECK(Accessibility::Bridge::GetCurrentBridge()->GetDefaultLabel(rootAccessible) != buttonAccessible);
+
+  Dali::Accessibility::TestResetStateChangedResult();
+  flushCoalescableMessage(application);
+
+  // non-modal role: Visible State is not emitted
+  DevelControl::EmitAccessibilityStateChanged(button, Accessibility::State::VISIBLE, 1);
+
+  DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
+  DALI_TEST_CHECK(Accessibility::Bridge::GetCurrentBridge()->GetDefaultLabel(rootAccessible) != buttonAccessible);
+
+  Dali::Accessibility::TestResetStateChangedResult();
+  flushCoalescableMessage(application);
+
+  // non-modal role: Showing State is emitted if highlighted and not showing
+  buttonAccessible->GrabHighlight();
+  DevelControl::EmitAccessibilityStateChanged(button, Accessibility::State::SHOWING, 0);
+  DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedCalled());
+  DALI_TEST_CHECK(Dali::Accessibility::TestStateChangedResult("showing", 0));
+
+  Dali::Accessibility::TestResetStateChangedResult();
+  flushCoalescableMessage(application);
+
+  // non-modal role: Showing State is not emitted if highlighted and showing
+  DevelControl::EmitAccessibilityStateChanged(button, Accessibility::State::SHOWING, 1);
+  DALI_TEST_CHECK(!Dali::Accessibility::TestStateChangedCalled());
 
   Dali::Accessibility::TestEnableSC(false);
 
