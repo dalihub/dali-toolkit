@@ -174,20 +174,17 @@ void LoadingTask::Process()
 #ifdef TRACE_ENABLED
   uint64_t mStartTimeNanoSceonds = 0;
   uint64_t mEndTimeNanoSceonds   = 0;
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
+#endif
+
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_LOADING_TASK", [&](std::ostringstream& oss) {
     mStartTimeNanoSceonds = GetNanoseconds();
-    std::ostringstream oss;
     oss << "[";
     if(dimensions.GetWidth() > 0 || dimensions.GetHeight() > 0)
     {
       oss << "d:" << dimensions.GetWidth() << "x" << dimensions.GetHeight() << " ";
     }
     oss << "u:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]";
-    // DALI_TRACE_BEGIN(gTraceFilter, "DALI_IMAGE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
-    DALI_LOG_RELEASE_INFO("BEGIN: DALI_IMAGE_LOADING_TASK %s", oss.str().c_str());
-  }
-#endif
+  });
 
   isReady = false;
   if(!isMaskTask)
@@ -201,11 +198,8 @@ void LoadingTask::Process()
   MultiplyAlpha();
   isReady = true;
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_LOADING_TASK", [&](std::ostringstream& oss) {
     mEndTimeNanoSceonds = GetNanoseconds();
-    std::ostringstream oss;
     oss << std::fixed << std::setprecision(3);
     oss << "[";
     oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
@@ -222,10 +216,7 @@ void LoadingTask::Process()
       oss << "d:" << dimensions.GetWidth() << "x" << dimensions.GetHeight() << " ";
     }
     oss << "u:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]";
-    // DALI_TRACE_END(gTraceFilter, "DALI_IMAGE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
-    DALI_LOG_RELEASE_INFO("END: DALI_IMAGE_LOADING_TASK %s", oss.str().c_str());
-  }
-#endif
+  });
 }
 
 bool LoadingTask::IsReady()
