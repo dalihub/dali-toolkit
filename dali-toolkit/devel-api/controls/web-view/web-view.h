@@ -217,6 +217,15 @@ public:
   static WebView New(uint32_t argc, char** argv);
 
   /**
+   * @brief Create an initialized WebView with web engine type.
+   *
+   * @param [in] argc The count of arguments of Applications
+   * @param [in] argv The string array of arguments of Applications
+   * @param [in] type The web engine type (0: Chromium, 1: LWE, otherwise: depend on system environment)
+   */
+  static WebView New(uint32_t argc, char** argv, int32_t type);
+
+  /**
    * @brief Find web view by web engine plugin.
    */
   static Toolkit::WebView FindWebView(Dali::WebEnginePlugin* plugin);

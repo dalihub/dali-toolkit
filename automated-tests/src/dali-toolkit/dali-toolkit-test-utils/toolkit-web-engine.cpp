@@ -2427,6 +2427,14 @@ WebEngine WebEngine::New()
   return WebEngine(baseObject);
 }
 
+WebEngine WebEngine::New(int32_t type)
+{
+  //type is used for actual target
+  Internal::Adaptor::WebEngine* baseObject = new Internal::Adaptor::WebEngine();
+
+  return WebEngine(baseObject);
+}
+
 Dali::WebEngineContext* WebEngine::GetContext()
 {
   return Internal::Adaptor::GetContext();

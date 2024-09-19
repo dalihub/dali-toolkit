@@ -1211,7 +1211,7 @@ int UtcDaliWebViewGetScreenshotSyncAndAsync(void)
   ToolkitTestApplication application;
 
   char    argv[] = "--test";
-  WebView view   = WebView::New(1, (char**)&argv);
+  WebView view   = WebView::New(1, (char**)&argv, 0);
   DALI_TEST_CHECK(view);
 
   // Check GetScreenshot

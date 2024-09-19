@@ -179,7 +179,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   }
 }
 
-WebView::WebView(uint32_t argc, char** argv)
+WebView::WebView(uint32_t argc, char** argv, int32_t type)
 : Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
@@ -196,7 +196,7 @@ WebView::WebView(uint32_t argc, char** argv)
   mCornerRadius(Vector4::ZERO),
   mCornerRadiusPolicy(1.0f)
 {
-  mWebEngine = Dali::WebEngine::New();
+  mWebEngine = Dali::WebEngine::New(type);
 
   // WebEngine is empty when it is not properly initialized.
   if(mWebEngine)
@@ -247,9 +247,9 @@ Toolkit::WebView WebView::New(const std::string& locale, const std::string& time
   return handle;
 }
 
-Toolkit::WebView WebView::New(uint32_t argc, char** argv)
+Toolkit::WebView WebView::New(uint32_t argc, char** argv, int32_t type)
 {
-  WebView*         impl   = new WebView(argc, argv);
+  WebView*         impl   = new WebView(argc, argv, type);
   Toolkit::WebView handle = Toolkit::WebView(*impl);
   if(impl->GetPlugin())
   {
