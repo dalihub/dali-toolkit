@@ -86,22 +86,18 @@ static constexpr std::string_view EMBEDDED_DATA_IMAGE_MEDIA_TYPE     = "image/";
 static constexpr std::string_view EMBEDDED_DATA_BASE64_ENCODING_TYPE = "base64,";
 
 Dali::PixelData LoadImageResource(const std::string& resourcePath,
-                                  TextureDefinition& textureDefinition,
-                                  FittingMode::Type  fittingMode,
-                                  bool               orientationCorrection)
+                                  TextureDefinition& textureDefinition)
 {
   Dali::PixelData pixelData;
   if(!textureDefinition.mTextureBuffer.empty())
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
-                                            { oss << "[s:" << textureDefinition.mTextureBuffer.size() << "]"; });
-    Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(textureDefinition.mTextureBuffer.data(), textureDefinition.mTextureBuffer.size(), textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) { oss << "[s:" << textureDefinition.mTextureBuffer.size() << "]"; });
+    Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(textureDefinition.mTextureBuffer.data(), textureDefinition.mTextureBuffer.size(), textureDefinition.mMinImageDimensions, FittingMode::DEFAULT, textureDefinition.mSamplingMode, true);
     if(pixelBuffer)
     {
       pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
     }
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
-                                          {
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) {
       oss << "[";
       if(pixelData)
       {
@@ -120,15 +116,13 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
       Dali::Toolkit::DecodeBase64FromString(data, buffer);
       uint32_t bufferSize = buffer.size();
 
-      DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
-                                              { oss << "[embedded s:" << bufferSize << "]"; });
-      Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(reinterpret_cast<uint8_t*>(buffer.data()), bufferSize, textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
+      DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) { oss << "[embedded s:" << bufferSize << "]"; });
+      Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(reinterpret_cast<uint8_t*>(buffer.data()), bufferSize, textureDefinition.mMinImageDimensions, FittingMode::DEFAULT, textureDefinition.mSamplingMode, true);
       if(pixelBuffer)
       {
         pixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffer, true);
       }
-      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
-                                            {
+      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) {
         oss << "[";
         if(pixelData)
         {
@@ -140,7 +134,7 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
   else
   {
     textureDefinition.mDirectoryPath = resourcePath;
-    pixelData                        = Internal::ImageResourceLoader::GetCachedPixelData(resourcePath + textureDefinition.mImageUri, textureDefinition.mMinImageDimensions, fittingMode, textureDefinition.mSamplingMode, orientationCorrection);
+    pixelData                        = Internal::ImageResourceLoader::GetCachedPixelData(resourcePath + textureDefinition.mImageUri, textureDefinition.mMinImageDimensions, textureDefinition.mSamplingMode);
   }
   return pixelData;
 }
@@ -225,20 +219,19 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
 
   // Load textures
   auto iTexture   = mTextureStages.begin();
-  auto checkStage = [&](uint32_t flags)
-  {
+  auto checkStage = [&](uint32_t flags) {
     return iTexture != mTextureStages.end() && MaskMatch(iTexture->mSemantic, flags);
   };
 
   // Check for compulsory textures: Albedo, Metallic, Roughness, Normal
   if(checkStage(ALBEDO | METALLIC))
   {
-    raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture, FittingMode::DEFAULT, true), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
 
     if(checkStage(NORMAL | ROUGHNESS))
     {
-      raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture, FittingMode::DEFAULT, true), iTexture->mTexture.mSamplerFlags});
+      raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
     else // single value normal-roughness
@@ -250,7 +243,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
   {
     if(checkStage(ALBEDO))
     {
-      raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture, FittingMode::DEFAULT, true), iTexture->mTexture.mSamplerFlags});
+      raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
     else if(mNeedAlbedoTexture) // single value albedo, albedo-alpha or albedo-metallic
@@ -284,7 +277,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
     const bool createMetallicRoughnessAndNormal = hasTransparency || std::distance(mTextureStages.begin(), iTexture) > 0;
     if(checkStage(METALLIC | ROUGHNESS))
     {
-      raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture, FittingMode::DEFAULT, true), iTexture->mTexture.mSamplerFlags});
+      raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
     else if(createMetallicRoughnessAndNormal && mNeedMetallicRoughnessTexture)
@@ -296,7 +289,7 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
 
     if(checkStage(NORMAL))
     {
-      raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture, FittingMode::DEFAULT, true), iTexture->mTexture.mSamplerFlags});
+      raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
     else if(mNeedNormalTexture)
@@ -315,31 +308,31 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
   // Extra textures.
   if(checkStage(SUBSURFACE))
   {
-    raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture, FittingMode::DEFAULT, true), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
   if(checkStage(OCCLUSION))
   {
-    raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture, FittingMode::DEFAULT, true), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
   if(checkStage(EMISSIVE))
   {
-    raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture, FittingMode::DEFAULT, true), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
   if(checkStage(SPECULAR))
   {
-    raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture, FittingMode::DEFAULT, true), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
   if(checkStage(SPECULAR_COLOR))
   {
-    raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture, FittingMode::DEFAULT, true), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.push_back({LoadImageResource(imagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
@@ -409,8 +402,7 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
 
 bool MaterialDefinition::CheckTextures(uint32_t flags) const
 {
-  return std::find_if(mTextureStages.begin(), mTextureStages.end(), [flags](const TextureStage& ts)
-                      { return MaskMatch(ts.mSemantic, flags); }) != mTextureStages.end();
+  return std::find_if(mTextureStages.begin(), mTextureStages.end(), [flags](const TextureStage& ts) { return MaskMatch(ts.mSemantic, flags); }) != mTextureStages.end();
 }
 
 } // namespace Loader
