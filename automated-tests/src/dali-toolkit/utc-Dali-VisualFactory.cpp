@@ -122,6 +122,11 @@ void TestVisualAsynchronousRender(ToolkitTestApplication& application,
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 }
 
+Vector4 GetAlphaPreMultipliedColor(const Vector4& color)
+{
+  return Vector4(color.r * color.a, color.g * color.a, color.b * color.a, color.a);
+}
+
 int gResourceReadySignalCounter;
 
 void OnResourceReadySignal(Control control)
@@ -216,7 +221,9 @@ int UtcDaliVisualFactoryGetColorVisual1(void)
   Vector4            actualColor(Vector4::ZERO);
   TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualColor));
-  DALI_TEST_EQUALS(actualColor, testColor, TEST_LOCATION);
+
+  // Note : uColor is alpha premultiplied when we use ColorVisual.
+  DALI_TEST_EQUALS(actualColor, GetAlphaPreMultipliedColor(testColor), TEST_LOCATION);
 
   END_TEST;
 }
@@ -242,7 +249,9 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
   Vector4            actualColor;
   TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualColor));
-  DALI_TEST_EQUALS(actualColor, testColor, TEST_LOCATION);
+
+  // Note : uColor is alpha premultiplied when we use ColorVisual.
+  DALI_TEST_EQUALS(actualColor, GetAlphaPreMultipliedColor(testColor), TEST_LOCATION);
 
   application.GetScene().Remove(actor);
   DALI_TEST_CHECK(actor.GetRendererCount() == 0u);

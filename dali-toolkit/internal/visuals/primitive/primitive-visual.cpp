@@ -381,7 +381,6 @@ void PrimitiveVisual::OnInitialize()
 
   mImpl->mRenderer = VisualRenderer::New(mGeometry, mShader);
   mImpl->mRenderer.SetProperty(Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::BACK);
-  mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, Vector3(mImpl->mMixColor));
   mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
