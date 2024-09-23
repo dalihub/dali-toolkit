@@ -243,6 +243,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/rendering/atlas/atlas-mesh-factory.cpp
    ${toolkit_src_dir}/text/rendering/text-backend-impl.cpp
    ${toolkit_src_dir}/text/rendering/text-typesetter.cpp
+   ${toolkit_src_dir}/text/rendering/text-typesetter-impl.cpp
    ${toolkit_src_dir}/text/rendering/view-model.cpp
    ${toolkit_src_dir}/text/rendering/styles/underline-helper-functions.cpp
    ${toolkit_src_dir}/text/rendering/styles/strikethrough-helper-functions.cpp
