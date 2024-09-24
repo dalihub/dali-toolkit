@@ -38,6 +38,8 @@ namespace
 {
 typedef Toolkit::NPatchUtility::StretchRanges StretchRanges;
 
+constexpr uint32_t PLATFORM_DEFAULT_PRECOMPILED_SHADER_COUNT = 5u;
+
 const char* TEST_9_PATCH_FILE_NAME    = TEST_RESOURCE_DIR "/demo-tile-texture-focused.9.png";
 const char* TEST_NPATCH_FILE_NAME     = TEST_RESOURCE_DIR "/heartsframe.9.png";
 const char* TEST_SVG_FILE_NAME        = TEST_RESOURCE_DIR "/svg1.svg";
@@ -2947,30 +2949,34 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   npatchShader2["xStretchCount"] = 4;
   npatchShader2["yStretchCount"] = 3;
 
-  Property::Map customSHader;
-  customSHader["shaderType"]     = "custom";
-  customSHader["shaderName"]     = "myShader";
-  customSHader["vertexShader"]   = VertexSource;
-  customSHader["fragmentShader"] = FragmentSource;
+  Property::Map customShader;
+  customShader["shaderType"]     = "custom";
+  customShader["shaderName"]     = "myShader";
+  customShader["vertexShader"]   = VertexSource;
+  customShader["fragmentShader"] = FragmentSource;
 
   factory.AddPrecompileShader(imageShader);
   factory.AddPrecompileShader(imageShader); // use same shader, because check line coverage
   factory.AddPrecompileShader(imageShader2);
   factory.AddPrecompileShader(imageShader3);
   factory.AddPrecompileShader(imageShader4);
+  factory.AddPrecompileShader(imageShader4); // use same shader, because check line coverage
   factory.AddPrecompileShader(imageShader5);
   factory.AddPrecompileShader(textShader);
+  factory.AddPrecompileShader(textShader); // use same shader, because check line coverage
   factory.AddPrecompileShader(textShader2);
   factory.AddPrecompileShader(colorShader);
+  factory.AddPrecompileShader(colorShader); // use same shader, because check line coverage
   factory.AddPrecompileShader(colorShader2);
   factory.AddPrecompileShader(npatchShader);
   factory.AddPrecompileShader(npatchShader2);
-  factory.AddPrecompileShader(customSHader);
+  factory.AddPrecompileShader(customShader);
 
   factory.UsePreCompiledShader();
 
   ShaderPreCompiler::Get().GetPreCompileShaderList(precompiledShaderList);
-  DALI_TEST_CHECK(precompiledShaderList.size() != 0u); // after Get Shader
+
+  DALI_TEST_EQUALS(precompiledShaderList.size(), PLATFORM_DEFAULT_PRECOMPILED_SHADER_COUNT, TEST_LOCATION);
 
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
@@ -2986,6 +2992,58 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
 
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryUsePreCompiledShaderN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualFactoryUsePreCompiledShader: Test a UsePreCompiledShader fucntion with invalid options");
+
+  std::vector<RawShaderData> precompiledShaderList;
+  DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // before Get Shader
+  ShaderPreCompiler::Get().GetPreCompileShaderList(precompiledShaderList);
+  DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // after Get Shader
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map invalidShaderType;
+  invalidShaderType["shaderType"] = "invalid";
+
+  Property::Map invalidShaderFlag;
+  invalidShaderFlag["shaderType"]   = "image";
+  invalidShaderFlag["shaderOption"] = Property::Map().Add("INVALID", true);
+
+  Property::Map invalidShaderFlag2;
+  invalidShaderFlag2["shaderType"]   = "image";
+  invalidShaderFlag2["shaderOption"] = Property::Map().Add("ROUNDED_CORNER", false).Add("INVALID", false);
+
+  Property::Map unmatchedShaderOption;
+  unmatchedShaderOption["shaderType"]   = "image";
+  unmatchedShaderOption["shaderOption"] = Property::Map().Add("CUTOUT", true);
+
+  Property::Map unmatchedShaderOption2;
+  unmatchedShaderOption2["shaderType"]   = "text";
+  unmatchedShaderOption2["shaderOption"] = Property::Map().Add("ROUNDED_CORNER", true);
+
+  Property::Map unmatchedShaderOption3;
+  unmatchedShaderOption3["shaderType"]   = "color";
+  unmatchedShaderOption3["shaderOption"] = Property::Map().Add("EMOJI", true);
+
+  factory.AddPrecompileShader(invalidShaderType);
+  factory.AddPrecompileShader(invalidShaderFlag);
+  factory.AddPrecompileShader(invalidShaderFlag2);
+  factory.AddPrecompileShader(unmatchedShaderOption);
+  factory.AddPrecompileShader(unmatchedShaderOption2);
+  factory.AddPrecompileShader(unmatchedShaderOption3);
+
+  factory.UsePreCompiledShader();
+
+  ShaderPreCompiler::Get().GetPreCompileShaderList(precompiledShaderList);
+
+  DALI_TEST_EQUALS(precompiledShaderList.size(), PLATFORM_DEFAULT_PRECOMPILED_SHADER_COUNT, TEST_LOCATION);
 
   END_TEST;
 }

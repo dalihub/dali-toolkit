@@ -425,7 +425,7 @@ bool VisualFactory::AddPrecompileShader(const Property::Map& map)
   auto                   type = shaderOption.GetShaderType();
   if(type == PrecompileShaderOption::ShaderType::UNKNOWN)
   {
-    DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader type");
+    DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader type\n");
     return false;
   }
 
@@ -602,7 +602,7 @@ bool VisualFactory::AddPrecompileShader(PrecompileShaderOption& option)
     }
     default:
     {
-      DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader factory type:%d", type);
+      DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader factory type:%d\n", type);
       break;
     }
   }

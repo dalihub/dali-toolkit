@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/property-map.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -33,7 +33,6 @@ namespace Dali
 {
 namespace Toolkit
 {
-
 /**
  * @brief PrecompiledShaderOption is a class for precompiled shader option.
  *
@@ -113,7 +112,8 @@ public:
 
   enum class Flag
   {
-    ROUNDED_CORNER = 0,
+    UNKNOWN = 0,
+    ROUNDED_CORNER,
     BORDERLINE,
     BLUR_EDGE,
     CUTOUT,
@@ -136,7 +136,7 @@ public:
   PrecompileShaderOption(const PrecompileShaderOption& rhs);
   PrecompileShaderOption& operator=(const PrecompileShaderOption& rhs);
 
-  using ShaderOptions= std::vector<Flag>;
+  using ShaderOptions = std::vector<Flag>;
 
 public:
   /**
@@ -186,7 +186,7 @@ public:
    */
   uint32_t GetNpatchXStretchCount() const;
 
-    /**
+  /**
    * @brief Get the YStretchCount for npatch
    *
    * @return The NpatchYStretchCount
@@ -194,13 +194,13 @@ public:
   uint32_t GetNpatchYStretchCount() const;
 
 private:
-  ShaderType mShaderType;
-  std::vector<Flag> mShaderOptions;
-  std::string mShaderName;
-  std::string mVertexShader;
-  std::string mFragmentShader;
-  uint32_t mNpatchXStretchCount;
-  uint32_t mNpatchYStretchCount;
+  ShaderType    mShaderType;
+  ShaderOptions mShaderOptions;
+  std::string   mShaderName;
+  std::string   mVertexShader;
+  std::string   mFragmentShader;
+  uint32_t      mNpatchXStretchCount;
+  uint32_t      mNpatchYStretchCount;
 };
 
 } // namespace Toolkit
