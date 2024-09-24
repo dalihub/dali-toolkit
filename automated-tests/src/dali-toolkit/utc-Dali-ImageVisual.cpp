@@ -72,6 +72,8 @@ const char* TEST_ROTATED_IMAGE            = TEST_RESOURCE_DIR "/keyboard-Landsca
 const char* TEST_YUV420_IMAGE_FILE_NAME   = TEST_RESOURCE_DIR "/gallery-small-1-yuv420.jpg";
 const char* TEST_N_PATCH_IMAGE_FILE_NAME  = TEST_RESOURCE_DIR "/heartsframe.9.png";
 
+const char* TEST_COMPRESSED_ALPHA_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/RGBA_ASTC_4x4.ktx";
+
 constexpr auto LOAD_IMAGE_YUV_PLANES_ENV         = "DALI_LOAD_IMAGE_YUV_PLANES";
 constexpr auto ENABLE_DECODE_JPEG_TO_YUV_420_ENV = "DALI_ENABLE_DECODE_JPEG_TO_YUV_420";
 
@@ -312,14 +314,14 @@ int UtcDaliImageVisualNoPremultipliedAlpha01(void)
 int UtcDaliImageVisualNoPremultipliedAlpha02(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("Request image visual with no alpha channel");
+  tet_infoline("Request image visual with alpha channel and compressed format");
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
-  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_COMPRESSED_ALPHA_IMAGE_FILE_NAME);
 
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -1572,7 +1574,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE);
-  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_COMPRESSED_ALPHA_IMAGE_FILE_NAME);
   propertyMap.Insert("mixColor", Color::BLUE);
   propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
   Visual::Base visual = factory.CreateVisual(propertyMap);
@@ -3719,7 +3721,9 @@ int UtcDaliImageVisualLoadImagePlanes01(void)
 
   Renderer renderer           = actor.GetRendererAt(0);
   auto     preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
-  DALI_TEST_EQUALS(preMultipliedAlpha, false, TEST_LOCATION);
+
+  // Let we allow to premultiply alpha for YUV case, since it doesn't have alpha channel.
+  DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
 
   END_TEST;
 }
