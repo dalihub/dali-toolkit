@@ -22,6 +22,7 @@
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/frame-buffer.h>
@@ -68,6 +69,16 @@ public:
    */
   static BlurEffectImplPtr New(float downscaleFactor, uint32_t blurRadius, bool isBackground);
 
+  /**
+   * @copydoc Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderableType
+   */
+  OffScreenRenderable::Type GetOffScreenRenderableType() override;
+
+  /**
+   * @copydoc Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderTasks
+   */
+  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
+
 protected:
   /**
    * @brief Creates an uninitialized blur effect implementation
@@ -106,6 +117,21 @@ protected:
 private:
   // Inner functions
   /**
+   * @brief Sets frame buffers to draw blurred output.
+   * @param[in] size Full size of input.
+   * @param[in] downsampledSize Downsampled size for performance.
+   */
+  void CreateFrameBuffers(const Vector2 size, const ImageDimensions downsampledSize);
+
+  /**
+   * @brief Sets blur render tasks.
+   * Requires initialized buffers, source actors, and source cameras.
+   * @param[in] sceneHolder SceneHolder of source control
+   * @param[in] sourceControl Input source control
+   */
+  void CreateRenderTasks(Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl);
+
+  /**
    * @brief Gets or Calculates a valid target size for texture.
    * Invalid cases include: zero vector, minus numbers or large numbers(larger than the maximum).
    * @return A valid version of mTargetSize, Vector2::ZERO otherwise.
@@ -118,7 +144,7 @@ private:
    * @param[in] downsampledWidth Downsized width of input texture.
    * @param[in] downsampledHeight Downsized height of input texture.
    */
-  void SetShaderConstants(float downsampledWidth, float downsampledHeight);
+  void SetShaderConstants(uint32_t downsampledWidth, uint32_t downsampledHeight);
 
   /**
    * @brief Get an offset property in std::string format
@@ -169,6 +195,7 @@ private:
   uint32_t mPixelRadius;
   float    mBellCurveWidth;
 
+  bool mSkipBlur : 1;
   bool mIsBackground : 1;
 };
 } // namespace Internal

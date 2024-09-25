@@ -350,7 +350,7 @@ private:
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] featureBuilder Collection of current text shader's features. It will be cached as text visual.
    */
-  Shader GetTextShader(VisualFactoryCache& factoryCache, const TextVisualShaderFeature::FeatureBuilder& featureBuilder);
+  Shader GetTextShader(VisualFactoryCache& factoryCache, TextVisualShaderFeature::FeatureBuilder& featureBuilder);
 
   /**
    * @brief Set the text to be always rendered

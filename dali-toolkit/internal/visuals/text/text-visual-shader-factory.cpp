@@ -56,14 +56,14 @@ const VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] =
     VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE_AND_OVERLAY,
 };
 
-static constexpr auto      SHADER_TYPE_COUNT = 1u;
-constexpr std::string_view VertexPredefines[SHADER_TYPE_COUNT]{
+static constexpr auto      PREDEFINED_SHADER_TYPE_COUNT = 1u;
+constexpr std::string_view VertexPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
   "", // VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT
 };
-constexpr std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
+constexpr std::string_view FragmentPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
   "", // VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT
 };
-constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[SHADER_TYPE_COUNT]{
+constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[PREDEFINED_SHADER_TYPE_COUNT]{
   VisualFactoryCache::ShaderType::TEXT_SHADER_SINGLE_COLOR_TEXT,
 };
 
@@ -71,6 +71,14 @@ constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[SHADER_TYPE_COUNT]
 
 namespace TextVisualShaderFeature
 {
+FeatureBuilder::FeatureBuilder()
+: mTextMultiColor(TextMultiColor::SINGLE_COLOR_TEXT),
+  mTextEmoji(TextEmoji::NO_EMOJI),
+  mTextStyle(TextStyle::NO_STYLES),
+  mTextOverlay(TextOverlay::NO_OVERLAY)
+{
+}
+
 FeatureBuilder& FeatureBuilder::EnableMultiColor(bool enableMultiColor)
 {
   mTextMultiColor = enableMultiColor ? TextMultiColor::MULTI_COLOR_TEXT : TextMultiColor::SINGLE_COLOR_TEXT;
@@ -91,6 +99,60 @@ FeatureBuilder& FeatureBuilder::EnableOverlay(bool enableOverlay)
   mTextOverlay = enableOverlay ? TextOverlay::HAS_OVERLAY : TextOverlay::NO_OVERLAY;
   return *this;
 }
+
+VisualFactoryCache::ShaderType FeatureBuilder::GetShaderType() const
+{
+  uint32_t                       shaderTypeFlag = static_cast<uint32_t>(TextVisualRequireFlag::DEFAULT);
+  VisualFactoryCache::ShaderType shaderType     = VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT;
+
+  if(mTextStyle == TextVisualShaderFeature::TextStyle::HAS_STYLES)
+  {
+    shaderTypeFlag |= static_cast<uint32_t>(TextVisualRequireFlag::STYLES);
+  }
+  if(mTextOverlay == TextVisualShaderFeature::TextOverlay::HAS_OVERLAY)
+  {
+    shaderTypeFlag |= static_cast<uint32_t>(TextVisualRequireFlag::OVERLAY);
+  }
+  // multi color can also render emoji. If multi color text, dont consider emoji
+  if(mTextMultiColor != TextVisualShaderFeature::TextMultiColor::MULTI_COLOR_TEXT && mTextEmoji == TextVisualShaderFeature::TextEmoji::HAS_EMOJI)
+  {
+    shaderTypeFlag |= static_cast<uint32_t>(TextVisualRequireFlag::EMOJI);
+  }
+  if(mTextMultiColor == TextVisualShaderFeature::TextMultiColor::MULTI_COLOR_TEXT)
+  {
+    shaderTypeFlag |= static_cast<uint32_t>(TextVisualRequireFlag::MULTI_COLOR);
+  }
+
+  shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
+  return shaderType;
+}
+
+void FeatureBuilder::GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const
+{
+  // Do nothing
+}
+
+void FeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const
+{
+  if(mTextStyle == TextVisualShaderFeature::TextStyle::HAS_STYLES)
+  {
+    fragmentShaderPrefixList += "#define IS_REQUIRED_STYLE\n";
+  }
+  if(mTextOverlay == TextVisualShaderFeature::TextOverlay::HAS_OVERLAY)
+  {
+    fragmentShaderPrefixList += "#define IS_REQUIRED_OVERLAY\n";
+  }
+  // multi color can also render emoji. If multi color text, dont consider emoji
+  if(mTextMultiColor != TextVisualShaderFeature::TextMultiColor::MULTI_COLOR_TEXT && mTextEmoji == TextVisualShaderFeature::TextEmoji::HAS_EMOJI)
+  {
+    fragmentShaderPrefixList += "#define IS_REQUIRED_EMOJI\n";
+  }
+  if(mTextMultiColor == TextVisualShaderFeature::TextMultiColor::MULTI_COLOR_TEXT)
+  {
+    fragmentShaderPrefixList += "#define IS_REQUIRED_MULTI_COLOR\n";
+  }
+}
+
 } // namespace TextVisualShaderFeature
 
 TextVisualShaderFactory::TextVisualShaderFactory()
@@ -104,57 +166,15 @@ TextVisualShaderFactory::~TextVisualShaderFactory()
 Shader TextVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, const TextVisualShaderFeature::FeatureBuilder& featureBuilder)
 {
   Shader                         shader;
-  uint32_t                       shaderTypeFlag = static_cast<uint32_t>(TextVisualRequireFlag::DEFAULT);
-  VisualFactoryCache::ShaderType shaderType     = VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT;
-
-  const auto& multiColor = featureBuilder.mTextMultiColor;
-  const auto& emoji      = featureBuilder.mTextEmoji;
-  const auto& style      = featureBuilder.mTextStyle;
-  const auto& overlay    = featureBuilder.mTextOverlay;
-
-  if(style == TextVisualShaderFeature::TextStyle::HAS_STYLES)
-  {
-    shaderTypeFlag |= static_cast<uint32_t>(TextVisualRequireFlag::STYLES);
-  }
-  if(overlay == TextVisualShaderFeature::TextOverlay::HAS_OVERLAY)
-  {
-    shaderTypeFlag |= static_cast<uint32_t>(TextVisualRequireFlag::OVERLAY);
-  }
-  // multi color can also render emoji. If multi color text, dont consider emoji
-  if(multiColor != TextVisualShaderFeature::TextMultiColor::MULTI_COLOR_TEXT && emoji == TextVisualShaderFeature::TextEmoji::HAS_EMOJI)
-  {
-    shaderTypeFlag |= static_cast<uint32_t>(TextVisualRequireFlag::EMOJI);
-  }
-  if(multiColor == TextVisualShaderFeature::TextMultiColor::MULTI_COLOR_TEXT)
-  {
-    shaderTypeFlag |= static_cast<uint32_t>(TextVisualRequireFlag::MULTI_COLOR);
-  }
-
-  shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
-  shader     = factoryCache.GetShader(shaderType);
+  VisualFactoryCache::ShaderType shaderType = featureBuilder.GetShaderType();
+  shader                                    = factoryCache.GetShader(shaderType);
 
   if(!shader)
   {
     std::string vertexShaderPrefixList;
     std::string fragmentShaderPrefixList;
-
-    if(style == TextVisualShaderFeature::TextStyle::HAS_STYLES)
-    {
-      fragmentShaderPrefixList += "#define IS_REQUIRED_STYLE\n";
-    }
-    if(overlay == TextVisualShaderFeature::TextOverlay::HAS_OVERLAY)
-    {
-      fragmentShaderPrefixList += "#define IS_REQUIRED_OVERLAY\n";
-    }
-    // multi color can also render emoji. If multi color text, dont consider emoji
-    if(multiColor != TextVisualShaderFeature::TextMultiColor::MULTI_COLOR_TEXT && emoji == TextVisualShaderFeature::TextEmoji::HAS_EMOJI)
-    {
-      fragmentShaderPrefixList += "#define IS_REQUIRED_EMOJI\n";
-    }
-    if(multiColor == TextVisualShaderFeature::TextMultiColor::MULTI_COLOR_TEXT)
-    {
-      fragmentShaderPrefixList += "#define IS_REQUIRED_MULTI_COLOR\n";
-    }
+    featureBuilder.GetVertexShaderPrefixList(vertexShaderPrefixList);
+    featureBuilder.GetFragmentShaderPrefixList(fragmentShaderPrefixList);
 
     std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_VERT.data());
     std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_FRAG.data());
@@ -164,13 +184,38 @@ Shader TextVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, cons
   return shader;
 }
 
+bool TextVisualShaderFactory::AddPrecompiledShader(PrecompileShaderOption& option)
+{
+  ShaderFlagList shaderOption = option.GetShaderOptions();
+
+  auto        featureBuilder = TextVisualShaderFeature::FeatureBuilder();
+  std::string vertexPrefixList;
+  std::string fragmentPrefixList;
+  CreatePrecompileShader(featureBuilder, shaderOption);
+
+  VisualFactoryCache::ShaderType type = featureBuilder.GetShaderType();
+  featureBuilder.GetVertexShaderPrefixList(vertexPrefixList);
+  featureBuilder.GetFragmentShaderPrefixList(fragmentPrefixList);
+  return SavePrecompileShader(type, vertexPrefixList, fragmentPrefixList);
+}
+
 void TextVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
 {
   std::vector<std::string_view> vertexPrefix;
   std::vector<std::string_view> fragmentPrefix;
   std::vector<std::string_view> shaderName;
   int                           shaderCount = 0;
-  for(uint32_t i = 0; i < SHADER_TYPE_COUNT; ++i)
+
+  // precompile requested shader first
+  for(uint32_t i = 0u; i < mRequestedPrecompileShader.size(); i++)
+  {
+    vertexPrefix.push_back(mRequestedPrecompileShader[i].vertexPrefix);
+    fragmentPrefix.push_back(mRequestedPrecompileShader[i].fragmentPrefix);
+    shaderName.push_back(Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+    shaderCount++;
+  }
+
+  for(uint32_t i = 0u; i < PREDEFINED_SHADER_TYPE_COUNT; ++i)
   {
     vertexPrefix.push_back(VertexPredefines[i]);
     fragmentPrefix.push_back(FragmentPredefines[i]);
@@ -178,14 +223,78 @@ void TextVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
     shaderCount++;
   }
 
-  shaders.vertexPrefix   = vertexPrefix;
-  shaders.fragmentPrefix = fragmentPrefix;
-  shaders.shaderName     = shaderName;
+  shaders.vertexPrefix   = std::move(vertexPrefix);
+  shaders.fragmentPrefix = std::move(fragmentPrefix);
+  shaders.shaderName     = std::move(shaderName);
   shaders.vertexShader   = SHADER_TEXT_VISUAL_SHADER_VERT;
   shaders.fragmentShader = SHADER_TEXT_VISUAL_SHADER_FRAG;
   shaders.shaderCount    = shaderCount;
+  shaders.custom         = false;
 }
 
+void TextVisualShaderFactory::CreatePrecompileShader(TextVisualShaderFeature::FeatureBuilder& builder, const ShaderFlagList& option)
+{
+  for(uint32_t i = 0; i < option.size(); ++i)
+  {
+    switch(option[i])
+    {
+      case PrecompileShaderOption::Flag::STYLES:
+      {
+        builder.EnableStyle(true);
+        break;
+      }
+      case PrecompileShaderOption::Flag::OVERLAY:
+      {
+        builder.EnableOverlay(true);
+        break;
+      }
+      case PrecompileShaderOption::Flag::EMOJI:
+      {
+        builder.EnableEmoji(true);
+        break;
+      }
+      case PrecompileShaderOption::Flag::MULTI_COLOR:
+      {
+        builder.EnableMultiColor(true);
+        break;
+      }
+      default:
+      {
+        DALI_LOG_WARNING("Unknown option[%d]. maybe this type can't use this flag\n", static_cast<int>(option[i]));
+        break;
+      }
+    }
+  }
+}
+
+bool TextVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix)
+{
+  for(uint32_t i = 0u; i < PREDEFINED_SHADER_TYPE_COUNT; i++)
+  {
+    if(ShaderTypePredefines[i] == shader)
+    {
+      DALI_LOG_WARNING("This shader already added list(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      return false;
+    }
+  }
+
+  for(uint32_t i = 0u; i < mRequestedPrecompileShader.size(); i++)
+  {
+    if(mRequestedPrecompileShader[i].type == shader)
+    {
+      DALI_LOG_WARNING("This shader already requsted(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      return false;
+    }
+  }
+
+  RequestShaderInfo info;
+  info.type           = shader;
+  info.vertexPrefix   = vertexPrefix;
+  info.fragmentPrefix = fragmentPrefix;
+  mRequestedPrecompileShader.push_back(info);
+  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(shader, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+  return true;
+}
 } // namespace Internal
 
 } // namespace Toolkit

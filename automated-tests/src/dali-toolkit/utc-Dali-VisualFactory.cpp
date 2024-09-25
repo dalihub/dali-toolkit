@@ -38,6 +38,8 @@ namespace
 {
 typedef Toolkit::NPatchUtility::StretchRanges StretchRanges;
 
+constexpr uint32_t PLATFORM_DEFAULT_PRECOMPILED_SHADER_COUNT = 5u;
+
 const char* TEST_9_PATCH_FILE_NAME    = TEST_RESOURCE_DIR "/demo-tile-texture-focused.9.png";
 const char* TEST_NPATCH_FILE_NAME     = TEST_RESOURCE_DIR "/heartsframe.9.png";
 const char* TEST_SVG_FILE_NAME        = TEST_RESOURCE_DIR "/svg1.svg";
@@ -53,6 +55,15 @@ const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 
 // resolution: 34*34, pixel format: RGBA8888
 static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
+
+// custom shader
+static const char* VertexSource =
+  "This is a custom vertex shader\n"
+  "made on purpose to look nothing like a normal vertex shader inside dali\n";
+
+static const char* FragmentSource =
+  "This is a custom fragment shader\n"
+  "made on purpose to look nothing like a normal fragment shader inside dali\n";
 
 Property::Map DefaultTransform()
 {
@@ -188,14 +199,6 @@ int UtcDaliVisualFactoryGetColorVisual1(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactoryGetColorVisual1:  Request color visual with a Property::Map");
 
-  static std::vector<UniformData> customUniforms =
-    {
-      UniformData("mixColor", Property::Type::VECTOR3),
-    };
-
-  TestGraphicsController& graphics = application.GetGraphicsController();
-  graphics.AddCustomUniforms(customUniforms);
-
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
@@ -210,13 +213,10 @@ int UtcDaliVisualFactoryGetColorVisual1(void)
   DummyControl actor = DummyControl::New(true);
   TestVisualRender(application, actor, visual);
 
-  Vector3            actualValue(Vector4::ZERO);
   Vector4            actualColor(Vector4::ZERO);
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector3>("mixColor", actualValue));
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualColor));
-  DALI_TEST_EQUALS(actualValue, Vector3(testColor), TEST_LOCATION);
-  DALI_TEST_EQUALS(actualColor.a, testColor.a, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualColor, testColor, TEST_LOCATION);
 
   END_TEST;
 }
@@ -225,14 +225,6 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
 {
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactoryGetColorVisual2: Request color visual with a Vector4");
-
-  static std::vector<UniformData> customUniforms =
-    {
-      UniformData("mixColor", Property::Type::VECTOR3),
-    };
-
-  TestGraphicsController& graphics = application.GetGraphicsController();
-  graphics.AddCustomUniforms(customUniforms);
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -247,13 +239,10 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
   DummyControl actor = DummyControl::New(true);
   TestVisualRender(application, actor, visual);
 
-  Vector3            actualValue;
   Vector4            actualColor;
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector3>("mixColor", actualValue));
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualColor));
-  DALI_TEST_EQUALS(actualValue, Vector3(testColor), TEST_LOCATION);
-  DALI_TEST_EQUALS(actualColor.a, testColor.a, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualColor, testColor, TEST_LOCATION);
 
   application.GetScene().Remove(actor);
   DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
@@ -2890,10 +2879,10 @@ int UtcDaliVisualFactorySetGetDefaultCreationOptions(void)
   END_TEST;
 }
 
-int UtcDaliVisualFactoryGetPreCompiler(void)
+int UtcDaliVisualFactoryUsePreCompiledShader(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliVisualFactoryGetAnimatedImageVisual2: Request animated image visual with a Property::Map, test custom wrap mode and pixel area");
+  tet_infoline("UtcDaliVisualFactoryUsePreCompiledShader: Test a UsePreCompiledShader fucntion");
 
   std::vector<RawShaderData> precompiledShaderList;
   DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // before Get Shader
@@ -2903,10 +2892,91 @@ int UtcDaliVisualFactoryGetPreCompiler(void)
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
+  Property::Map imageShader;
+  imageShader["shaderType"]   = "image";
+  imageShader["shaderOption"] = Property::Map().Add("YUV_AND_RGB", true);
+  imageShader["shaderName"]   = "IMAGE_SHADER_YUV_AND_RGB";
+
+  Property::Map imageShader2;
+  imageShader2["shaderType"]   = "image";
+  imageShader2["shaderOption"] = Property::Map()
+                                   .Add("ROUNDED_CORNER", true)
+                                   .Add("BORDERLINE", true)
+                                   .Add("MASKING", true);
+
+  Property::Map imageShader3;
+  imageShader3["shaderType"]   = "image";
+  imageShader3["shaderOption"] = Property::Map().Add("YUV_TO_RGB", true);
+
+  Property::Map imageShader4;
+  imageShader4["shaderType"]   = "image";
+  imageShader4["shaderOption"] = Property::Map().Add("ATLAS_DEFAULT", true);
+
+  Property::Map imageShader5;
+  imageShader5["shaderType"]   = "image";
+  imageShader5["shaderOption"] = Property::Map().Add("ATLAS_CUSTOM", true);
+
+  Property::Map textShader;
+  textShader["shaderType"]   = "text";
+  textShader["shaderOption"] = Property::Map()
+                                 .Add("MULTI_COLOR", true)
+                                 .Add("OVERLAY", true)
+                                 .Add("STYLES", true);
+
+  Property::Map textShader2;
+  textShader2["shaderType"]   = "text";
+  textShader2["shaderOption"] = Property::Map()
+                                  .Add("EMOJI", true);
+
+  Property::Map colorShader;
+  colorShader["shaderType"]   = "color";
+  colorShader["shaderOption"] = Property::Map()
+                                  .Add("CUTOUT", true)
+                                  .Add("BORDERLINE", true);
+
+  Property::Map colorShader2;
+  colorShader2["shaderType"]   = "color";
+  colorShader2["shaderOption"] = Property::Map()
+                                   .Add("ROUNDED_CORNER,", true)
+                                   .Add("BLUR_EDGE", true);
+
+  Property::Map npatchShader;
+  npatchShader["shaderType"] = "npatch";
+
+  Property::Map npatchShader2;
+  npatchShader2["shaderType"]    = "npatch";
+  npatchShader2["shaderOption"]  = Property::Map().Add("MASKING", true);
+  npatchShader2["xStretchCount"] = 4;
+  npatchShader2["yStretchCount"] = 3;
+
+  Property::Map customShader;
+  customShader["shaderType"]     = "custom";
+  customShader["shaderName"]     = "myShader";
+  customShader["vertexShader"]   = VertexSource;
+  customShader["fragmentShader"] = FragmentSource;
+
+  factory.AddPrecompileShader(imageShader);
+  factory.AddPrecompileShader(imageShader); // use same shader, because check line coverage
+  factory.AddPrecompileShader(imageShader2);
+  factory.AddPrecompileShader(imageShader3);
+  factory.AddPrecompileShader(imageShader4);
+  factory.AddPrecompileShader(imageShader4); // use same shader, because check line coverage
+  factory.AddPrecompileShader(imageShader5);
+  factory.AddPrecompileShader(textShader);
+  factory.AddPrecompileShader(textShader); // use same shader, because check line coverage
+  factory.AddPrecompileShader(textShader2);
+  factory.AddPrecompileShader(colorShader);
+  factory.AddPrecompileShader(colorShader); // use same shader, because check line coverage
+  factory.AddPrecompileShader(colorShader2);
+  factory.AddPrecompileShader(npatchShader);
+  factory.AddPrecompileShader(npatchShader2);
+  factory.AddPrecompileShader(customShader);
+
   factory.UsePreCompiledShader();
 
   ShaderPreCompiler::Get().GetPreCompileShaderList(precompiledShaderList);
-  DALI_TEST_CHECK(precompiledShaderList.size() != 0u); // after Get Shader
+
+  DALI_TEST_EQUALS(precompiledShaderList.size(), PLATFORM_DEFAULT_PRECOMPILED_SHADER_COUNT, TEST_LOCATION);
 
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
@@ -2922,6 +2992,58 @@ int UtcDaliVisualFactoryGetPreCompiler(void)
 
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryUsePreCompiledShaderN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualFactoryUsePreCompiledShader: Test a UsePreCompiledShader fucntion with invalid options");
+
+  std::vector<RawShaderData> precompiledShaderList;
+  DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // before Get Shader
+  ShaderPreCompiler::Get().GetPreCompileShaderList(precompiledShaderList);
+  DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // after Get Shader
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map invalidShaderType;
+  invalidShaderType["shaderType"] = "invalid";
+
+  Property::Map invalidShaderFlag;
+  invalidShaderFlag["shaderType"]   = "image";
+  invalidShaderFlag["shaderOption"] = Property::Map().Add("INVALID", true);
+
+  Property::Map invalidShaderFlag2;
+  invalidShaderFlag2["shaderType"]   = "image";
+  invalidShaderFlag2["shaderOption"] = Property::Map().Add("ROUNDED_CORNER", false).Add("INVALID", false);
+
+  Property::Map unmatchedShaderOption;
+  unmatchedShaderOption["shaderType"]   = "image";
+  unmatchedShaderOption["shaderOption"] = Property::Map().Add("CUTOUT", true);
+
+  Property::Map unmatchedShaderOption2;
+  unmatchedShaderOption2["shaderType"]   = "text";
+  unmatchedShaderOption2["shaderOption"] = Property::Map().Add("ROUNDED_CORNER", true);
+
+  Property::Map unmatchedShaderOption3;
+  unmatchedShaderOption3["shaderType"]   = "color";
+  unmatchedShaderOption3["shaderOption"] = Property::Map().Add("EMOJI", true);
+
+  factory.AddPrecompileShader(invalidShaderType);
+  factory.AddPrecompileShader(invalidShaderFlag);
+  factory.AddPrecompileShader(invalidShaderFlag2);
+  factory.AddPrecompileShader(unmatchedShaderOption);
+  factory.AddPrecompileShader(unmatchedShaderOption2);
+  factory.AddPrecompileShader(unmatchedShaderOption3);
+
+  factory.UsePreCompiledShader();
+
+  ShaderPreCompiler::Get().GetPreCompileShaderList(precompiledShaderList);
+
+  DALI_TEST_EQUALS(precompiledShaderList.size(), PLATFORM_DEFAULT_PRECOMPILED_SHADER_COUNT, TEST_LOCATION);
 
   END_TEST;
 }

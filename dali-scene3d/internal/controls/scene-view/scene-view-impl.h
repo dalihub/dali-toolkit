@@ -361,6 +361,16 @@ public:
    */
   static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
+  /**
+   * @copydoc Toolkit::Internal::Control::GetOffScreenRenderableSourceActor
+   */
+  Dali::Actor GetOffScreenRenderableSourceActor() override;
+
+  /**
+   * @copydoc Toolkit::Internal::Control::IsOffScreenRenderTaskExclusive
+   */
+  bool IsOffScreenRenderTaskExclusive() override;
+
 protected:
   /**
    * @brief Constructs a new SceneView.
@@ -382,6 +392,11 @@ private:
    * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
   void OnSceneDisconnection() override;
+
+  /**
+   * @copydoc CustomActorImpl::GetOffScreenRenderTasks()
+   */
+  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()

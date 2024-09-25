@@ -129,6 +129,24 @@ public:
    */
   void SetResourceReady();
 
+  /**
+   * @brief Retrieves SourceActor of the OffScreenRenderable.
+   *
+   * @SINCE_2_3.43
+   * @return SourceActor of the OffScreenRenderable.
+   */
+  virtual Dali::Actor GetOffScreenRenderableSourceActor();
+
+  /**
+   * @brief Retrieves whether the OffScreen RenderTasks is exclusive or not.
+   * The SourceActor of an OffScreen RenderTask can also become the SourceActor of another Actor's OffScreen RenderTask.
+   * To draw the SourceActor multitimes, the exclusive information is required.
+   *
+   * @SINCE_2_3.43
+   * @return True if the RenderTask is exclusive.
+   */
+  virtual bool IsOffScreenRenderTaskExclusive();
+
   // Accessibility
 
   /**
@@ -361,6 +379,11 @@ protected: // From CustomActorImpl
    * @note If overridden, then an up-call to Control::OnSizeAnimation MUST be made at the end.
    */
   void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override;
+
+  /**
+   * @copydoc CustomActorImpl::GetOffScreenRenderTasks()
+   */
+  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
 
   /**
    * @copydoc CustomActorImpl::OnRelayout()

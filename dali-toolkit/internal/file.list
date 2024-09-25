@@ -35,7 +35,10 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/animated-vector-image/vector-animation-thread.cpp
    ${toolkit_src_dir}/visuals/arc/arc-visual.cpp
    ${toolkit_src_dir}/visuals/border/border-visual.cpp
+   ${toolkit_src_dir}/visuals/color/color-visual-shader-factory.cpp
    ${toolkit_src_dir}/visuals/color/color-visual.cpp
+   ${toolkit_src_dir}/visuals/custom-shader-factory.cpp
+   ${toolkit_src_dir}/visuals/npatch-shader-factory.cpp
    ${toolkit_src_dir}/visuals/gradient/gradient-visual.cpp
    ${toolkit_src_dir}/visuals/gradient/gradient.cpp
    ${toolkit_src_dir}/visuals/gradient/linear-gradient.cpp
@@ -240,6 +243,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/rendering/atlas/atlas-mesh-factory.cpp
    ${toolkit_src_dir}/text/rendering/text-backend-impl.cpp
    ${toolkit_src_dir}/text/rendering/text-typesetter.cpp
+   ${toolkit_src_dir}/text/rendering/text-typesetter-impl.cpp
    ${toolkit_src_dir}/text/rendering/view-model.cpp
    ${toolkit_src_dir}/text/rendering/styles/underline-helper-functions.cpp
    ${toolkit_src_dir}/text/rendering/styles/strikethrough-helper-functions.cpp

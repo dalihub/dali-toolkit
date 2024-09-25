@@ -178,15 +178,12 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
 #ifdef TRACE_ENABLED
   uint64_t mStartTimeNanoSceonds = 0;
   uint64_t mEndTimeNanoSceonds   = 0;
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    mStartTimeNanoSceonds = GetNanoseconds();
-    std::ostringstream oss;
-    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
-    // DALI_TRACE_BEGIN(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
-    DALI_LOG_RELEASE_INFO("BEGIN: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
-  }
 #endif
+
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss) {
+    mStartTimeNanoSceonds = GetNanoseconds();
+    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
+  });
 
   if(mEncodedImageBuffer)
   {
@@ -226,19 +223,14 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
         mVectorAnimationThread.AddEventTriggerCallback(mLoadCompletedCallback.get(), 0u);
       }
     }
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
+
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss) {
       mEndTimeNanoSceonds = GetNanoseconds();
-      std::ostringstream oss;
       oss << std::fixed << std::setprecision(3);
       oss << "[";
       oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
       oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
-      // DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
-      DALI_LOG_RELEASE_INFO("END: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
-    }
-#endif
+    });
     return false;
   }
 
@@ -261,19 +253,13 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Load: file = %s [%d frames, %f fps] [%p]\n", mImageUrl.GetUrl().c_str(), mTotalFrame, mFrameRate, this);
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss) {
     mEndTimeNanoSceonds = GetNanoseconds();
-    std::ostringstream oss;
     oss << std::fixed << std::setprecision(3);
     oss << "[";
     oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
     oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
-    // DALI_TRACE_END(gTraceFilter, "DALI_LOTTIE_LOADING_TASK"); ///< TODO : Open it if we can control trace log level
-    DALI_LOG_RELEASE_INFO("END: DALI_LOTTIE_LOADING_TASK %s", oss.str().c_str());
-  }
-#endif
+  });
 
   return true;
 }
@@ -761,7 +747,12 @@ bool VectorAnimationTask::Rasterize()
     oss << "[";
     oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
     oss << "s:" << mWidth << "x" << mHeight << " ";
-    oss << "f:" << mCurrentFrame << " ";
+    oss << "f:" << mCurrentFrame;
+    if(mDroppedFrames > 0)
+    {
+      oss << "(+" << mDroppedFrames << ")";
+    }
+    oss << " ";
     oss << "l:" << mCurrentLoop << " ";
     oss << "p:" << mPlayState << " ";
     oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
@@ -818,13 +809,12 @@ VectorAnimationTask::TimePoint VectorAnimationTask::CalculateNextFrameTime(bool 
   }
   else
   {
+    uint32_t   droppedFrames        = 0;
     const auto durationMicroSeconds = std::chrono::microseconds(mFrameDurationMicroSeconds);
 
     mNextFrameStartTime = std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + durationMicroSeconds);
     if(mNextFrameStartTime < current)
     {
-      uint32_t droppedFrames = 0;
-
       while(current > std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + durationMicroSeconds) && droppedFrames < mTotalFrame)
       {
         droppedFrames++;
@@ -832,8 +822,8 @@ VectorAnimationTask::TimePoint VectorAnimationTask::CalculateNextFrameTime(bool 
       }
 
       mNextFrameStartTime = current;
-      mDroppedFrames      = droppedFrames;
     }
+    mDroppedFrames = droppedFrames;
   }
 
   return mNextFrameStartTime;

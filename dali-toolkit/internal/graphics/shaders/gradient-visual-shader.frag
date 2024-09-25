@@ -14,7 +14,6 @@ uniform mediump float uTextureCoordinateScaleFactor;
 
 uniform sampler2D sTexture; // sampler1D?
 uniform lowp vec4 uColor;
-uniform lowp vec3 mixColor;
 #ifdef IS_REQUIRED_BORDERLINE
 uniform highp float borderlineWidth;
 uniform highp float borderlineOffset;
@@ -41,8 +40,10 @@ highp float gPotential = 0.0;
 highp float gPotentialRange = 0.0;
 highp float gMaxOutlinePotential = 0.0;
 highp float gMinOutlinePotential = 0.0;
+#ifdef IS_REQUIRED_BORDERLINE
 highp float gMaxInlinePotential = 0.0;
 highp float gMinInlinePotential = 0.0;
+#endif
 
 void calculateCornerRadius()
 {
@@ -56,9 +57,13 @@ void calculateCornerRadius()
 #endif
 }
 
-void calculatePosition()
+void calculateFragmentPosition()
 {
   gFragmentPosition = abs(vPosition) - vRectSize;
+}
+
+void calculatePosition()
+{
   gCenterPosition = -gRadius;
 #ifdef IS_REQUIRED_BORDERLINE
   gCenterPosition += borderlineWidth * (clamp(borderlineOffset, -1.0, 1.0) + 1.0) * 0.5;
@@ -81,24 +86,22 @@ void setupMinMaxPotential()
 #ifdef IS_REQUIRED_BORDERLINE
   gMaxInlinePotential = gMaxOutlinePotential - borderlineWidth;
   gMinInlinePotential = gMinOutlinePotential - borderlineWidth;
-#else
-  gMaxInlinePotential = gMaxOutlinePotential;
-  gMinInlinePotential = gMinOutlinePotential;
 #endif
 
   // reduce defect near edge of rounded corner.
-  gMaxOutlinePotential += clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, 1.0);
-  gMinOutlinePotential += clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, 1.0);
+  highp float heuristicEdgeCasePotential = clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, gPotentialRange);
+  gMaxOutlinePotential += heuristicEdgeCasePotential;
+  gMinOutlinePotential += heuristicEdgeCasePotential;
 }
 
-void PreprocessPotential()
-{
-  calculateCornerRadius();
-  calculatePosition();
-  calculatePotential();
-
-  setupMinMaxPotential();
-}
+//void PreprocessPotential()
+//{
+//  calculateCornerRadius();
+//  calculateFragmentPosition();
+//  calculatePosition();
+//  calculatePotential();
+//  setupMinMaxPotential();
+//}
 #endif
 
 
@@ -155,7 +158,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     // Manual blend operation with premultiplied colors.
     // Final alpha = borderlineColorAlpha + (1.0 - borderlineColorAlpha) * textureColor.a.
     // (Final rgb * alpha) =  borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb
-    // If preMultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
+    // If premultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
     // Else, return vec4((rgb*alpha) / alpha, alpha)
 
     lowp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
@@ -192,9 +195,9 @@ void main()
 {
 #ifdef RADIAL
   mediump float radialTexCoord = ((length(vTexCoord) - 0.5) * uTextureCoordinateScaleFactor) + 0.5;
-  lowp vec4 textureColor = TEXTURE(sTexture, vec2(radialTexCoord, 0.5)) * vec4(mixColor, 1.0) * uColor;
+  lowp vec4 textureColor = TEXTURE(sTexture, vec2(radialTexCoord, 0.5)) * uColor;
 #else
-  lowp vec4 textureColor = TEXTURE(sTexture, vec2(vTexCoord.y, 0.5)) * vec4(mixColor, 1.0) * uColor;
+  lowp vec4 textureColor = TEXTURE(sTexture, vec2(vTexCoord.y, 0.5)) * uColor;
 #endif
 
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
@@ -205,18 +208,36 @@ void main()
   }
   else
   {
-    PreprocessPotential();
+    calculateCornerRadius();
+    calculateFragmentPosition();
+#endif
+
+#if defined(IS_REQUIRED_ROUNDED_CORNER) && !defined(IS_REQUIRED_BORDERLINE)
+    // skip length and etc potential calculation for performance
+    if(gFragmentPosition.x + gFragmentPosition.y < -(gRadius + vAliasMargin) * 2.0)
+    {
+      // Do nothing.
+      OUT_COLOR = textureColor;
+    }
+    else
+#endif
+    {
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+      calculatePosition();
+      calculatePotential();
+      setupMinMaxPotential();
 #endif
 
 #ifdef IS_REQUIRED_BORDERLINE
-    textureColor = convertBorderlineColor(textureColor);
+      textureColor = convertBorderlineColor(textureColor);
 #endif
-    OUT_COLOR = textureColor;
+      OUT_COLOR = textureColor;
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-    mediump float opacity = calculateCornerOpacity();
-    OUT_COLOR *= opacity;
+      mediump float opacity = calculateCornerOpacity();
+      OUT_COLOR *= opacity;
 #endif
+    }
 
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
   }

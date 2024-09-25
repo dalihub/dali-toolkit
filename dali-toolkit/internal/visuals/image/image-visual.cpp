@@ -55,7 +55,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(7); // ltr, wrap, pixel area, atlas, pixalign, crop to mask, mask texture ratio
+const int CUSTOM_PROPERTY_COUNT(8); // ltr, wrap, pixel area, atlas, pixalign, crop to mask, mask texture ratio, pre-multiplied alpha
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
@@ -76,6 +76,9 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(SAMPLING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX_THEN_LINEAR)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, NO_FILTER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, DONT_CARE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, LANCZOS)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX_THEN_LANCZOS)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, DEFAULT)
 DALI_ENUM_TO_STRING_TABLE_END(SAMPLING_MODE)
 
 // wrap modes
@@ -186,6 +189,7 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
 : Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::IMAGE),
   mPixelArea(FULL_TEXTURE_RECT),
   mPixelAreaIndex(Property::INVALID_INDEX),
+  mPreMultipliedAlphaIndex(Property::INVALID_INDEX),
   mPlacementActor(),
   mImageUrl(imageUrl),
   mMaskingData(),
@@ -987,6 +991,22 @@ void ImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
   }
 }
 
+void ImageVisual::EnablePreMultipliedAlpha(bool preMultiplied)
+{
+  if(mImpl->mRenderer)
+  {
+    if(mPreMultipliedAlphaIndex != Property::INVALID_INDEX || !preMultiplied)
+    {
+      // RegisterUniqueProperty call SetProperty internally.
+      // Register PREMULTIPLIED_ALPHA only if it become false.
+      // Default PREMULTIPLIED_ALPHA value is 1.0f, at image-visual-shader-factory.cpp
+      mPreMultipliedAlphaIndex = mImpl->mRenderer.RegisterUniqueProperty(mPreMultipliedAlphaIndex, PREMULTIPLIED_ALPHA, preMultiplied ? 1.0f : 0.0f);
+    }
+  }
+
+  Visual::Base::EnablePreMultipliedAlpha(preMultiplied);
+}
+
 void ImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes)
 {
   // Check if action is valid for this visual type and perform action if possible
@@ -1315,7 +1335,7 @@ Shader ImageVisual::GenerateShader() const
     // Create and cache the standard shader
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
-      ImageVisualShaderFeatureBuilder()
+      ImageVisualShaderFeature::FeatureBuilder()
         .EnableTextureAtlas(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED && !useNativeImage)
         .ApplyDefaultTextureWrapMode(mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE)
         .EnableRoundedCorner(IsRoundedCornerRequired())

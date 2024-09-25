@@ -136,6 +136,11 @@ void VisualFactory::DiscardVisual(Visual::Base visual)
   GetImplementation(*this).DiscardVisual(visual);
 }
 
+bool VisualFactory::AddPrecompileShader(const Property::Map& map)
+{
+  return GetImplementation(*this).AddPrecompileShader(map);
+}
+
 void VisualFactory::UsePreCompiledShader()
 {
   GetImplementation(*this).UsePreCompiledShader();

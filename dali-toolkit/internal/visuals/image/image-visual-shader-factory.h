@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/internal/visuals/visual-shader-factory-interface.h>
 #include <string_view>
 
 namespace Dali
@@ -31,10 +32,11 @@ namespace Toolkit
 {
 namespace Internal
 {
+
 /**
  * ImageVisualShaderFactory is an object that provides and shares shaders between image visuals
  */
-class ImageVisualShaderFactory
+class ImageVisualShaderFactory : public VisualShaderFactoryInterface
 {
 public:
   /**
@@ -53,7 +55,7 @@ public:
    * @param[in] featureBuilder Collection of current image shader's features
    * @return The standard image rendering shader with features.
    */
-  Shader GetShader(VisualFactoryCache& factoryCache, ImageVisualShaderFeatureBuilder& featureBuilder);
+  Shader GetShader(VisualFactoryCache& factoryCache, const ImageVisualShaderFeature::FeatureBuilder& featureBuilder);
 
   /**
    * @brief Request the default vertex shader source.
@@ -67,11 +69,25 @@ public:
    */
   std::string_view GetFragmentShaderSource();
 
+public: // Implementation of VisualShaderFactoryInterface
   /**
-   * @brief Get the default shader source.
-   * @param[in] shaders shaderList for precompile
+   * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::AddPrecompiledShader
    */
-  void GetPreCompiledShader(RawShaderData& shaders);
+  bool AddPrecompiledShader(PrecompileShaderOption& option) override;
+  /**
+   * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::GetPreCompiledShader
+   */
+  void GetPreCompiledShader(RawShaderData& shaders) override;
+
+private:
+  /**
+   * @brief Create pre-compiled shader for image with builder and option.
+   */
+  void CreatePrecompileShader(ImageVisualShaderFeature::FeatureBuilder& builder, const ShaderFlagList& option);
+  /**
+   * @brief Check if cached hash value is valid or not.
+   */
+  bool SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix);
 
 protected:
   /**

@@ -43,6 +43,8 @@ bool                                                                           T
 bool                                                                           TestStateChangedCalled();
 bool                                                                           TestStateChangedResult(const std::string_view& expectedState, int expectedValue);
 void                                                                           TestResetStateChangedResult();
+bool                                                                           TestGetIncludeHidden(const Address& adr);
+void                                                                           TestSetIncludeHidden(const Address& adr, bool includeHidden);
 } // namespace Accessibility
 } // namespace Dali
 

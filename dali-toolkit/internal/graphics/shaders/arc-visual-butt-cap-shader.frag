@@ -1,7 +1,6 @@
 INPUT mediump vec2 vPosition;
 
 uniform lowp vec4 uColor;
-uniform lowp vec3 mixColor;
 uniform mediump float thickness;
 uniform mediump float radius;
 uniform mediump float startAngle;
@@ -30,6 +29,6 @@ mediump float GetOpacity()
 
 void main()
 {
-  OUT_COLOR = vec4( mixColor, 1.0 ) * uColor;
+  OUT_COLOR = uColor;
   OUT_COLOR.a *= GetOpacity();
 }

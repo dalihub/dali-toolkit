@@ -144,11 +144,11 @@ protected:
   FrameReadyObserver&                 mObserver;
   TextureManager::MaskingDataPointer& mMaskingData;
   Dali::ImageDimensions               mDesiredSize;
-  Dali::FittingMode::Type             mFittingMode : 3;
-  Dali::SamplingMode::Type            mSamplingMode : 4;
   uint32_t                            mBatchSize;
   uint32_t                            mInterval;
   TextureManager::LoadState           mLoadState;
+  Dali::FittingMode::Type             mFittingMode : 4;
+  Dali::SamplingMode::Type            mSamplingMode : 5;
   bool                                mRequestingLoad : 1;
   bool                                mPreMultiplyOnLoad : 1;
 };

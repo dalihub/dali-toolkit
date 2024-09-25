@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_N_PATCH_VISUAL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,6 +98,11 @@ public: // from Visual
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
   void DoCreateInstancePropertyMap(Property::Map& map) const override;
+
+  /**
+   * @copydoc Visual::Base::EnablePreMultipliedAlpha
+   */
+  void EnablePreMultipliedAlpha(bool preMultiplied) override;
 
 protected:
   /**
@@ -224,6 +229,7 @@ private:
   TextureSet                                mAuxiliaryTextureSet;     ///< TextureSet of the auxiliary mask image
   TextureManager::TextureId                 mAuxiliaryTextureId;      ///< id of the auxiliary mask image (from TextureManager)
   Toolkit::Visual::ResourceStatus           mAuxiliaryResourceStatus; ///< resource status for auxiliary mask image
+  Property::Index                           mPreMultipliedAlphaIndex; ///< Index of premultipliedAlpha uniform. Only be used for auxiliary image.
   bool                                      mBorderOnly;              ///< if only border is desired
   Rect<int>                                 mBorder;                  ///< The size of the border
   float                                     mAuxiliaryImageAlpha;     ///< The alpha value for the auxiliary image only

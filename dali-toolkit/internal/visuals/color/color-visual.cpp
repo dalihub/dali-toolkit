@@ -51,49 +51,22 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(CUTOUT_POLICY)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, CUTOUT_VIEW_WITH_CORNER_RADIUS)
 DALI_ENUM_TO_STRING_TABLE_END(CUTOUT_POLICY)
 
-constexpr VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
-  VisualFactoryCache::COLOR_SHADER,
-  VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER,
-  VisualFactoryCache::COLOR_SHADER_BORDERLINE,
-  VisualFactoryCache::COLOR_SHADER_ROUNDED_BORDERLINE,
-  VisualFactoryCache::COLOR_SHADER_BLUR_EDGE,
-  VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER_BLUR_EDGE,
-};
-
-constexpr VisualFactoryCache::ShaderType SHADER_TYPE_WITH_CUTOUT_TABLE[] = {
-  VisualFactoryCache::COLOR_SHADER_CUTOUT,
-  VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_CORNER,
-  VisualFactoryCache::COLOR_SHADER_CUTOUT_BORDERLINE,
-  VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_BORDERLINE,
-  VisualFactoryCache::COLOR_SHADER_CUTOUT_BLUR_EDGE,
-  VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_CORNER_BLUR_EDGE,
-};
-
-// enum of required list when we select shader
-enum ColorVisualRequireFlag
-{
-  DEFAULT        = 0,
-  ROUNDED_CORNER = 1 << 0,
-  BORDERLINE     = 1 << 1,
-  BLUR           = 1 << 2,
-};
-
-constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_ROUNDED_BLUR = 300;
 } // unnamed namespace
 
-ColorVisualPtr ColorVisual::New(VisualFactoryCache& factoryCache, const Property::Map& properties)
+ColorVisualPtr ColorVisual::New(VisualFactoryCache& factoryCache, ColorVisualShaderFactory& shaderFactory, const Property::Map& properties)
 {
-  ColorVisualPtr colorVisualPtr(new ColorVisual(factoryCache));
+  ColorVisualPtr colorVisualPtr(new ColorVisual(factoryCache, shaderFactory));
   colorVisualPtr->SetProperties(properties);
   colorVisualPtr->Initialize();
   return colorVisualPtr;
 }
 
-ColorVisual::ColorVisual(VisualFactoryCache& factoryCache)
+ColorVisual::ColorVisual(VisualFactoryCache& factoryCache, ColorVisualShaderFactory& shaderFactory)
 : Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::COLOR),
   mBlurRadius(0.0f),
   mCutoutPolicy(DevelColorVisual::CutoutPolicy::NONE),
-  mAlwaysUsingBlurRadius(false)
+  mAlwaysUsingBlurRadius(false),
+  mColorVisualShaderFactory(shaderFactory)
 {
 }
 
@@ -269,67 +242,13 @@ void ColorVisual::OnInitialize()
 
 Shader ColorVisual::GenerateShader() const
 {
-  Shader                         shader;
-  VisualFactoryCache::ShaderType shaderType;
-
-  bool roundedCorner  = IsRoundedCornerRequired();
-  bool borderline     = IsBorderlineRequired();
-  bool blur           = IsBlurRequired();
-  bool cutout         = IsCutoutRequired();
-  int  shaderTypeFlag = ColorVisualRequireFlag::DEFAULT;
-
-  if(blur)
-  {
-    // If we use blur, just ignore borderline
-    borderline = false;
-    shaderTypeFlag |= ColorVisualRequireFlag::BLUR;
-  }
-  if(roundedCorner)
-  {
-    shaderTypeFlag |= ColorVisualRequireFlag::ROUNDED_CORNER;
-  }
-  if(borderline)
-  {
-    shaderTypeFlag |= ColorVisualRequireFlag::BORDERLINE;
-  }
-
-  shaderType = cutout ? SHADER_TYPE_WITH_CUTOUT_TABLE[shaderTypeFlag] : SHADER_TYPE_TABLE[shaderTypeFlag];
-  shader     = mFactoryCache.GetShader(shaderType);
-  if(!shader)
-  {
-    std::string vertexShaderPrefixList;
-    std::string fragmentShaderPrefixList;
-    if(roundedCorner)
-    {
-      vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
-    }
-    if(blur)
-    {
-      vertexShaderPrefixList += "#define IS_REQUIRED_BLUR\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_BLUR\n";
-
-      // If shader version doesn't support latest blur with corner radius, Let we use legacy code.
-      if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_ROUNDED_BLUR))
-      {
-        fragmentShaderPrefixList += "#define SL_VERSION_LOW\n";
-      }
-    }
-    if(borderline)
-    {
-      vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
-    }
-    if(cutout)
-    {
-      vertexShaderPrefixList += "#define IS_REQUIRED_CUTOUT\n";
-      fragmentShaderPrefixList += "#define IS_REQUIRED_CUTOUT\n";
-    }
-
-    shader = mFactoryCache.GenerateAndSaveShader(shaderType,
-                                                 Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_VERT.data(),
-                                                 Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
-  }
+  Shader shader = mColorVisualShaderFactory.GetShader(
+    mFactoryCache,
+    ColorVisualShaderFeature::FeatureBuilder()
+    .EnableBlur(IsBlurRequired())
+    .EnableBorderLine(IsBorderlineRequired())
+    .EnableRoundCorner(IsRoundedCornerRequired())
+    .EnableCutout(IsCutoutRequired()));
 
   return shader;
 }

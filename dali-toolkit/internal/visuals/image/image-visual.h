@@ -95,6 +95,8 @@ typedef IntrusivePtr<ImageVisual> ImageVisualPtr;
  *   "BOX_THEN_LINEAR"
  *   "NO_FILTER"
  *   "DONT_CARE"
+ *   "LANCZOS"
+ *   "BOX_THEN_LANCZOS"
  *   "DEFAULT"
  *
  * where loadPolicy should be one of the following image loading modes
@@ -169,6 +171,11 @@ public: // from Visual
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
   void DoCreateInstancePropertyMap(Property::Map& map) const override;
+
+  /**
+   * @copydoc Visual::Base::EnablePreMultipliedAlpha
+   */
+  void EnablePreMultipliedAlpha(bool preMultiplied) override;
 
   /**
    * @copydoc Visual::Base::OnDoAction
@@ -362,8 +369,10 @@ private:
   Geometry GenerateGeometry(TextureManager::TextureId textureId, bool createForce);
 
 private:
-  Vector4                            mPixelArea;
-  Property::Index                    mPixelAreaIndex;
+  Vector4         mPixelArea;
+  Property::Index mPixelAreaIndex;
+  Property::Index mPreMultipliedAlphaIndex; ///< Index of premultipliedAlpha uniform.
+
   WeakHandle<Actor>                  mPlacementActor;
   VisualUrl                          mImageUrl;
   TextureManager::MaskingDataPointer mMaskingData;
@@ -379,8 +388,8 @@ private:
 
   ImageVisualShaderFactory& mImageVisualShaderFactory;
 
-  Dali::FittingMode::Type                         mFittingMode : 3;
-  Dali::SamplingMode::Type                        mSamplingMode : 4;
+  Dali::FittingMode::Type                         mFittingMode : 4;
+  Dali::SamplingMode::Type                        mSamplingMode : 5;
   Dali::WrapMode::Type                            mWrapModeU : 3;
   Dali::WrapMode::Type                            mWrapModeV : 3;
   Dali::Toolkit::ImageVisual::LoadPolicy::Type    mLoadPolicy;

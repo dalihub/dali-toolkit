@@ -205,7 +205,7 @@ int UtcDaliVisualSetProperties(void)
   Property::Map propertyMap1;
   propertyMap1.Insert(Visual::Property::TYPE, Visual::COLOR);
   propertyMap1.Insert(ColorVisual::Property::MIX_COLOR, Color::RED);
-  Toolkit::Internal::ColorVisualPtr colorVisualPtr = Toolkit::Internal::ColorVisual::New(*factoryCache, propertyMap1);
+  Toolkit::Internal::DummyVisualPtr colorVisualPtr = Toolkit::Internal::DummyVisual::New(propertyMap1);
 
   DummyControl        dummyControl = DummyControl::New(true);
   Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());

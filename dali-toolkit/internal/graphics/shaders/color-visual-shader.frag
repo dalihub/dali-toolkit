@@ -15,7 +15,6 @@ FLAT INPUT highp vec4 vCutoutCornerRadius;
 #endif
 
 uniform lowp vec4 uColor;
-uniform lowp vec3 mixColor;
 #ifdef IS_REQUIRED_BLUR
 uniform highp float blurRadius;
 #elif defined(IS_REQUIRED_BORDERLINE)
@@ -49,8 +48,11 @@ highp float gPotential = 0.0;
 highp float gPotentialRange = 0.0;
 highp float gMaxOutlinePotential = 0.0;
 highp float gMinOutlinePotential = 0.0;
+#ifdef IS_REQUIRED_BLUR
+#elif defined(IS_REQUIRED_BORDERLINE)
 highp float gMaxInlinePotential = 0.0;
 highp float gMinInlinePotential = 0.0;
+#endif
 
 void calculateCornerRadius(highp vec4 cornerRadius, highp vec2 position)
 {
@@ -63,10 +65,13 @@ void calculateCornerRadius(highp vec4 cornerRadius, highp vec2 position)
   );
 #endif
 }
-
-void calculatePosition(highp vec2 position, highp vec2 halfSizeOfRect, highp float currentBorderlineWidth)
+void calculateFragmentPosition(highp vec2 position, highp vec2 halfSizeOfRect)
 {
   gFragmentPosition = abs(position) - halfSizeOfRect;
+}
+
+void calculatePosition(highp float currentBorderlineWidth)
+{
   gCenterPosition = -gRadius;
 #ifdef IS_REQUIRED_BLUR
 #elif defined(IS_REQUIRED_BORDERLINE)
@@ -88,27 +93,24 @@ void setupMinMaxPotential(highp float currentBorderlineWidth)
   gMinOutlinePotential = gRadius - gPotentialRange;
 
 #ifdef IS_REQUIRED_BLUR
-  gMaxInlinePotential = gMaxOutlinePotential;
-  gMinInlinePotential = gMinOutlinePotential;
 #elif defined(IS_REQUIRED_BORDERLINE)
   gMaxInlinePotential = gMaxOutlinePotential - currentBorderlineWidth;
   gMinInlinePotential = gMinOutlinePotential - currentBorderlineWidth;
 #else
-  gMaxInlinePotential = gMaxOutlinePotential;
-  gMinInlinePotential = gMinOutlinePotential;
 #endif
 
   // reduce defect near edge of rounded corner.
-  gMaxOutlinePotential += clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, 1.0);
-  gMinOutlinePotential += clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, 1.0);
+  highp float heuristicEdgeCasePotential = clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, gPotentialRange);
+  gMaxOutlinePotential += heuristicEdgeCasePotential;
+  gMinOutlinePotential += heuristicEdgeCasePotential;
 }
 
 void PreprocessPotential(highp vec4 cornerRadius, highp vec2 position, highp vec2 halfSizeOfRect, highp float currentBorderlineWidth)
 {
   calculateCornerRadius(cornerRadius, position);
-  calculatePosition(position, halfSizeOfRect, currentBorderlineWidth);
+  calculateFragmentPosition(position, halfSizeOfRect);
+  calculatePosition(currentBorderlineWidth);
   calculatePotential();
-
   setupMinMaxPotential(currentBorderlineWidth);
 }
 #endif
@@ -166,7 +168,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     // Manual blend operation with premultiplied colors.
     // Final alpha = borderlineColorAlpha + (1.0 - borderlineColorAlpha) * textureColor.a.
     // (Final rgb * alpha) =  borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb
-    // If preMultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
+    // If premultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
     // Else, return vec4((rgb*alpha) / alpha, alpha)
 
     lowp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
@@ -286,7 +288,7 @@ mediump float calculateBlurOpacity()
 
 void main()
 {
-  lowp vec4 targetColor = vec4(mixColor, 1.0) * uColor;
+  lowp vec4 targetColor = uColor;
 
 #ifdef IS_REQUIRED_CUTOUT
   mediump float discardOpacity = 1.0;
@@ -333,25 +335,50 @@ void main()
 #ifdef IS_REQUIRED_ROUNDED_CORNER
     tempCornerRadius = vCornerRadius;
 #endif
-#ifdef IS_REQUIRED_BLUR
-#elif defined(IS_REQUIRED_BORDERLINE)
-    tempBorderlineWidth = borderlineWidth;
-#endif
-    PreprocessPotential(tempCornerRadius, vPosition, vRectSize, tempBorderlineWidth);
+    calculateCornerRadius(tempCornerRadius, vPosition);
+    calculateFragmentPosition(vPosition, vRectSize);
 #endif
 
 #ifdef IS_REQUIRED_BLUR
-#elif defined(IS_REQUIRED_BORDERLINE)
-    targetColor = convertBorderlineColor(targetColor);
-#endif
+    calculatePosition(tempBorderlineWidth);
+    calculatePotential();
+    setupMinMaxPotential(tempBorderlineWidth);
+
     OUT_COLOR = targetColor;
 
-#ifdef IS_REQUIRED_BLUR
     mediump float opacity = calculateBlurOpacity();
     OUT_COLOR.a *= opacity;
-#elif defined(IS_REQUIRED_ROUNDED_CORNER)
-    mediump float opacity = calculateCornerOpacity();
-    OUT_COLOR.a *= opacity;
+#else
+#if defined(IS_REQUIRED_ROUNDED_CORNER) && !defined(IS_REQUIRED_BORDERLINE)
+    // skip rounded corner calculate for performance
+    if(gFragmentPosition.x + gFragmentPosition.y < -(gRadius + vAliasMargin) * 2.0)
+    {
+      // Do nothing.
+      OUT_COLOR = targetColor;
+    }
+    else
+#endif
+    {
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+#ifdef IS_REQUIRED_BORDERLINE
+      tempBorderlineWidth = borderlineWidth;
+#endif
+      calculatePosition(tempBorderlineWidth);
+      calculatePotential();
+      setupMinMaxPotential(tempBorderlineWidth);
+
+#ifdef IS_REQUIRED_BORDERLINE
+      targetColor = convertBorderlineColor(targetColor);
+#endif
+#endif
+
+      OUT_COLOR = targetColor;
+
+#ifdef IS_REQUIRED_ROUNDED_CORNER
+      mediump float opacity = calculateCornerOpacity();
+      OUT_COLOR.a *= opacity;
+#endif
+    }
 #endif
 
 #if defined(IS_REQUIRED_BLUR) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)

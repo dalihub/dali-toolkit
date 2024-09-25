@@ -23,7 +23,7 @@ vec3 applyDithering( vec3 inColor )
 
 // from https://iquilezles.org/articles/distfunctions
 float roundedBoxSDF(vec2 PixelPositionFromCenter, vec2 RectangleEdgePositionFromCenter, float Radius) {
-    return length(max(abs(PixelPositionFromCenter)
+    return length(max(PixelPositionFromCenter
                       - RectangleEdgePositionFromCenter
                       + Radius
                       , 0.0))
@@ -51,11 +51,23 @@ void main()
       );
 
     float edgeSoftness = min(1.0, radius);
-    float distance = roundedBoxSDF(location, uSize.xy * 0.5, radius);
 
-    float smoothedAlpha = 1.0 - smoothstep(-edgeSoftness, edgeSoftness, distance);
+    highp vec2 halfSize = uSize.xy * 0.5;
+    location = abs(location);
 
-    // Premultiply alpha feature used.
-    gl_FragColor *= smoothedAlpha;
+    // For test, let we just linear function.
+    if(location.x + location.y < halfSize.x + halfSize.y - radius - 2.0 * edgeSoftness)
+    {
+      // Do nothing
+    }
+    else
+    {
+      float distance = roundedBoxSDF(location, halfSize, radius);
+
+      float smoothedAlpha = 1.0 - smoothstep(-edgeSoftness, edgeSoftness, distance);
+
+      // Premultiply alpha feature used.
+      gl_FragColor *= smoothedAlpha;
+    }
   }
 }

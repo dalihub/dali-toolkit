@@ -36,11 +36,14 @@
 #include <dali-toolkit/internal/visuals/animated-vector-image/animated-vector-image-visual.h>
 #include <dali-toolkit/internal/visuals/arc/arc-visual.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
+#include <dali-toolkit/internal/visuals/color/color-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
+#include <dali-toolkit/internal/visuals/custom-shader-factory.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/internal/visuals/mesh/mesh-visual.h>
+#include <dali-toolkit/internal/visuals/npatch-shader-factory.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
@@ -77,27 +80,13 @@ DALI_TYPE_REGISTRATION_BEGIN_CREATE(Toolkit::VisualFactory, Dali::BaseHandle, Cr
 DALI_TYPE_REGISTRATION_END()
 const char* const BROKEN_IMAGE_FILE_NAME = "broken.png"; ///< The file name of the broken image.
 
-static constexpr auto SHADER_TYPE_COUNT = 2u;
-
-constexpr std::string_view VertexPredefines[SHADER_TYPE_COUNT]{
-  "",                                     //VisualFactoryCache::COLOR_SHADER
-  "#define IS_REQUIRED_ROUNDED_CORNER\n", //VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
-};
-constexpr std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
-  "",                                     //VisualFactoryCache::COLOR_SHADER
-  "#define IS_REQUIRED_ROUNDED_CORNER\n", //VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
-};
-constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[SHADER_TYPE_COUNT]{
-  VisualFactoryCache::ShaderType::COLOR_SHADER,
-  VisualFactoryCache::ShaderType::COLOR_SHADER_ROUNDED_CORNER,
-};
-
 } // namespace
 
 VisualFactory::VisualFactory(bool debugEnabled)
 : mFactoryCache(),
   mImageVisualShaderFactory(),
   mTextVisualShaderFactory(),
+  mColorVisualShaderFactory(),
   mSlotDelegate(this),
   mIdleCallback(nullptr),
   mDefaultCreationOptions(Toolkit::VisualFactory::CreationOptions::NONE),
@@ -170,7 +159,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
 
     case Toolkit::Visual::COLOR:
     {
-      visualPtr = ColorVisual::New(GetFactoryCache(), propertyMap);
+      visualPtr = ColorVisual::New(GetFactoryCache(), GetColorVisualShaderFactory(), propertyMap);
       break;
     }
 
@@ -430,6 +419,19 @@ void VisualFactory::DiscardVisual(Toolkit::Visual::Base visual)
   RegisterDiscardCallback();
 }
 
+bool VisualFactory::AddPrecompileShader(const Property::Map& map)
+{
+  PrecompileShaderOption shaderOption(map);
+  auto                   type = shaderOption.GetShaderType();
+  if(type == PrecompileShaderOption::ShaderType::UNKNOWN)
+  {
+    DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader type\n");
+    return false;
+  }
+
+  return AddPrecompileShader(shaderOption);
+}
+
 void VisualFactory::UsePreCompiledShader()
 {
   if(mPrecompiledShaderRequested)
@@ -453,8 +455,18 @@ void VisualFactory::UsePreCompiledShader()
 
   // Get color shader
   RawShaderData colorShaderData;
-  GetPreCompiledShader(colorShaderData);
+  GetColorVisualShaderFactory().GetPreCompiledShader(colorShaderData);
   rawShaderList.push_back(colorShaderData);
+
+  RawShaderData npatchShaderData;
+  GetNpatchShaderFactory().GetPreCompiledShader(npatchShaderData);
+  rawShaderList.push_back(npatchShaderData);
+
+  // Get 3D shader
+  // Get Custom shader
+  RawShaderData customShaderData;
+  GetCustomShaderFactory().GetPreCompiledShader(customShaderData);
+  rawShaderList.push_back(customShaderData);
 
   // Save all shader
   ShaderPreCompiler::Get().SavePreCompileShaderList(rawShaderList);
@@ -490,29 +502,6 @@ void VisualFactory::SetBrokenImageUrl(Toolkit::StyleManager& styleManager)
   mFactoryCache->SetBrokenImageUrl(brokenImageUrl, customBrokenImageUrlList);
 }
 
-void VisualFactory::GetPreCompiledShader(RawShaderData& shaders)
-{
-  std::vector<std::string_view> vertexPrefix;
-  std::vector<std::string_view> fragmentPrefix;
-  std::vector<std::string_view> shaderName;
-  int                           shaderCount = 0;
-  shaders.shaderCount                       = 0;
-  for(uint32_t i = 0u; i < SHADER_TYPE_COUNT; ++i)
-  {
-    vertexPrefix.push_back(VertexPredefines[i]);
-    fragmentPrefix.push_back(FragmentPredefines[i]);
-    shaderName.push_back(Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
-    shaderCount++;
-  }
-
-  shaders.vertexPrefix   = vertexPrefix;
-  shaders.fragmentPrefix = fragmentPrefix;
-  shaders.shaderName     = shaderName;
-  shaders.vertexShader   = SHADER_COLOR_VISUAL_SHADER_VERT;
-  shaders.fragmentShader = SHADER_COLOR_VISUAL_SHADER_FRAG;
-  shaders.shaderCount    = shaderCount;
-}
-
 Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
 {
   if(!mFactoryCache)
@@ -546,6 +535,79 @@ TextVisualShaderFactory& VisualFactory::GetTextVisualShaderFactory()
     mTextVisualShaderFactory = std::unique_ptr<TextVisualShaderFactory>(new TextVisualShaderFactory());
   }
   return *mTextVisualShaderFactory;
+}
+
+ColorVisualShaderFactory& VisualFactory::GetColorVisualShaderFactory()
+{
+  if(!mColorVisualShaderFactory)
+  {
+    mColorVisualShaderFactory = std::unique_ptr<ColorVisualShaderFactory>(new ColorVisualShaderFactory());
+  }
+  return *mColorVisualShaderFactory;
+}
+
+NpatchShaderFactory& VisualFactory::GetNpatchShaderFactory()
+{
+  if(!mNpatchShaderFactory)
+  {
+    mNpatchShaderFactory = std::unique_ptr<NpatchShaderFactory>(new NpatchShaderFactory());
+  }
+  return *mNpatchShaderFactory;
+}
+
+CustomShaderFactory& VisualFactory::GetCustomShaderFactory()
+{
+  if(!mCustomShaderFactory)
+  {
+    mCustomShaderFactory = std::unique_ptr<CustomShaderFactory>(new CustomShaderFactory());
+  }
+  return *mCustomShaderFactory;
+}
+
+bool VisualFactory::AddPrecompileShader(PrecompileShaderOption& option)
+{
+  auto type = option.GetShaderType();
+  bool ret  = false;
+  switch(type)
+  {
+    case PrecompileShaderOption::ShaderType::COLOR:
+    {
+      ret = GetColorVisualShaderFactory().AddPrecompiledShader(option);
+      break;
+    }
+    case PrecompileShaderOption::ShaderType::IMAGE:
+    {
+      ret = GetImageVisualShaderFactory().AddPrecompiledShader(option);
+      break;
+    }
+    case PrecompileShaderOption::ShaderType::TEXT:
+    {
+      ret = GetTextVisualShaderFactory().AddPrecompiledShader(option);
+      break;
+    }
+    case PrecompileShaderOption::ShaderType::NPATCH:
+    {
+      ret = GetNpatchShaderFactory().AddPrecompiledShader(option);
+      break;
+    }
+    case PrecompileShaderOption::ShaderType::MODEL_3D:
+    {
+      // TODO
+      break;
+    }
+    case PrecompileShaderOption::ShaderType::CUSTOM:
+    {
+      ret = GetCustomShaderFactory().AddPrecompiledShader(option);
+      break;
+    }
+    default:
+    {
+      DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader factory type:%d\n", type);
+      break;
+    }
+  }
+
+  return ret;
 }
 
 void VisualFactory::OnDiscardCallback()

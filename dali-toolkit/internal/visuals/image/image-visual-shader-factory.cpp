@@ -36,13 +36,17 @@ namespace
 {
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
+constexpr float ALPHA_PRE_MULTIPLIED(1.0f);
+
+constexpr int CUSTOM_PROPERTY_COUNT(2); // PixelArea, pre-multiplied alpha
+
 constexpr int              NATIVE_SHADER_TYPE_OFFSET = VisualFactoryCache::ShaderType::NATIVE_IMAGE_SHADER - VisualFactoryCache::ShaderType::IMAGE_SHADER;
 constexpr std::string_view Y_FLIP_MASK_TEXTURE       = "uYFlipMaskTexture";
 constexpr float            NOT_FLIP_MASK_TEXTURE     = 0.0f;
 
-constexpr auto SHADER_TYPE_COUNT = 6u;
+constexpr auto PREDEFINED_SHADER_TYPE_COUNT = 6u;
 
-constexpr std::string_view VertexPredefines[SHADER_TYPE_COUNT]{
+constexpr std::string_view VertexPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
   "",                                     // VisualFactoryCache::IMAGE_SHADER,
   "#define IS_REQUIRED_ROUNDED_CORNER\n", // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
   "",                                     // VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
@@ -50,7 +54,7 @@ constexpr std::string_view VertexPredefines[SHADER_TYPE_COUNT]{
   "",                                     // VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
   "#define IS_REQUIRED_ROUNDED_CORNER\n", // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
 };
-constexpr std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
+constexpr std::string_view FragmentPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
   "",                                                                              // VisualFactoryCache::IMAGE_SHADER,
   "#define IS_REQUIRED_ROUNDED_CORNER\n",                                          // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
   "#define IS_REQUIRED_YUV_TO_RGB\n",                                              // VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
@@ -58,7 +62,7 @@ constexpr std::string_view FragmentPredefines[SHADER_TYPE_COUNT]{
   "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n",                                     // VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
   "#define IS_REQUIRED_ROUNDED_CORNER\n#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n", // VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
 };
-constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[SHADER_TYPE_COUNT]{
+constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[PREDEFINED_SHADER_TYPE_COUNT]{
   VisualFactoryCache::ShaderType::IMAGE_SHADER,
   VisualFactoryCache::ShaderType::IMAGE_SHADER_ROUNDED_CORNER,
   VisualFactoryCache::ShaderType::IMAGE_SHADER_YUV_TO_RGB,
@@ -77,7 +81,7 @@ ImageVisualShaderFactory::~ImageVisualShaderFactory()
 {
 }
 
-Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, ImageVisualShaderFeatureBuilder& featureBuilder)
+Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, const ImageVisualShaderFeature::FeatureBuilder& featureBuilder)
 {
   Shader                         shader;
   VisualFactoryCache::ShaderType shaderType = featureBuilder.GetShaderType();
@@ -142,7 +146,16 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, Ima
   }
 
   shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
+
+  shader.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT +
+                                 (featureBuilder.IsEnabledAlphaMaskingOnRendering() ? 1 : 0));
+
   shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+
+  // Most of image visual shader user (like svg, animated vector image visual) use pre-multiplied alpha.
+  // If the visual dont want to using pre-multiplied alpha, it should be set as 0.0f as renderer side.
+  shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_PRE_MULTIPLIED);
+
   if(featureBuilder.IsEnabledAlphaMaskingOnRendering())
   {
     shader.RegisterProperty(Y_FLIP_MASK_TEXTURE, NOT_FLIP_MASK_TEXTURE);
@@ -174,6 +187,21 @@ std::string_view ImageVisualShaderFactory::GetFragmentShaderSource()
   return gFragmentShaderNoAtlas;
 }
 
+bool ImageVisualShaderFactory::AddPrecompiledShader(PrecompileShaderOption& option)
+{
+  ShaderFlagList shaderOption = option.GetShaderOptions();
+
+  auto        featureBuilder = ImageVisualShaderFeature::FeatureBuilder();
+  std::string vertexPrefixList;
+  std::string fragmentPrefixList;
+  CreatePrecompileShader(featureBuilder, shaderOption);
+
+  VisualFactoryCache::ShaderType type = featureBuilder.GetShaderType();
+  featureBuilder.GetVertexShaderPrefixList(vertexPrefixList);
+  featureBuilder.GetFragmentShaderPrefixList(fragmentPrefixList);
+  return SavePrecompileShader(type, vertexPrefixList, fragmentPrefixList);
+}
+
 void ImageVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
 {
   std::vector<std::string_view> vertexPrefix;
@@ -181,7 +209,16 @@ void ImageVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
   std::vector<std::string_view> shaderName;
   shaders.shaderCount = 0;
   int shaderCount     = 0;
-  for(uint32_t i = 0; i < SHADER_TYPE_COUNT; ++i)
+
+  for(uint32_t i = 0u; i < mRequestedPrecompileShader.size(); i++)
+  {
+    vertexPrefix.push_back(mRequestedPrecompileShader[i].vertexPrefix);
+    fragmentPrefix.push_back(mRequestedPrecompileShader[i].fragmentPrefix);
+    shaderName.push_back(Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+    shaderCount++;
+  }
+
+  for(uint32_t i = 0u; i < PREDEFINED_SHADER_TYPE_COUNT; ++i)
   {
     vertexPrefix.push_back(VertexPredefines[i]);
     fragmentPrefix.push_back(FragmentPredefines[i]);
@@ -189,12 +226,94 @@ void ImageVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
     shaderCount++;
   }
 
-  shaders.vertexPrefix   = vertexPrefix;
-  shaders.fragmentPrefix = fragmentPrefix;
-  shaders.shaderName     = shaderName;
+  shaders.vertexPrefix   = std::move(vertexPrefix);
+  shaders.fragmentPrefix = std::move(fragmentPrefix);
+  shaders.shaderName     = std::move(shaderName);
   shaders.vertexShader   = SHADER_IMAGE_VISUAL_SHADER_VERT;
   shaders.fragmentShader = SHADER_IMAGE_VISUAL_SHADER_FRAG;
   shaders.shaderCount    = shaderCount;
+  shaders.custom         = false;
+}
+
+void ImageVisualShaderFactory::CreatePrecompileShader(ImageVisualShaderFeature::FeatureBuilder& builder, const ShaderFlagList& option)
+{
+  for(uint32_t i = 0; i < option.size(); ++i)
+  {
+    switch(option[i])
+    {
+      case PrecompileShaderOption::Flag::ATLAS_DEFAULT:
+      {
+        builder.EnableTextureAtlas(true);
+        builder.ApplyDefaultTextureWrapMode(true);
+        break;
+      }
+      case PrecompileShaderOption::Flag::ATLAS_CUSTOM:
+      {
+        builder.EnableTextureAtlas(true);
+        builder.ApplyDefaultTextureWrapMode(false);
+        break;
+      }
+      case PrecompileShaderOption::Flag::ROUNDED_CORNER:
+      {
+        builder.EnableRoundedCorner(true);
+        break;
+      }
+      case PrecompileShaderOption::Flag::BORDERLINE:
+      {
+        builder.EnableBorderline(true);
+        break;
+      }
+      case PrecompileShaderOption::Flag::MASKING:
+      {
+        builder.EnableAlphaMaskingOnRendering(true);
+        break;
+      }
+      case PrecompileShaderOption::Flag::YUV_TO_RGB:
+      {
+        builder.EnableYuvToRgb(true, false);
+        break;
+      }
+      case PrecompileShaderOption::Flag::YUV_AND_RGB:
+      {
+        builder.EnableYuvToRgb(false, true);
+        break;
+      }
+      default:
+      {
+        DALI_LOG_WARNING("Unknown option[%d]. maybe this type can't use this flag\n", static_cast<int>(option[i]));
+        break;
+      }
+    }
+  }
+}
+
+bool ImageVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix)
+{
+  for(uint32_t i = 0u; i < PREDEFINED_SHADER_TYPE_COUNT; i++)
+  {
+    if(ShaderTypePredefines[i] == shader)
+    {
+      DALI_LOG_WARNING("This shader already added list(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      return false;
+    }
+  }
+
+  for(uint32_t i = 0u; i < mRequestedPrecompileShader.size(); i++)
+  {
+    if(mRequestedPrecompileShader[i].type == shader)
+    {
+      DALI_LOG_WARNING("This shader already requsted(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      return false;
+    }
+  }
+
+  RequestShaderInfo info;
+  info.type           = shader;
+  info.vertexPrefix   = vertexPrefix;
+  info.fragmentPrefix = fragmentPrefix;
+  mRequestedPrecompileShader.push_back(info);
+  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(shader, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+  return true;
 }
 
 } // namespace Internal

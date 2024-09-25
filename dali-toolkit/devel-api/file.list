@@ -84,6 +84,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/visual-factory/transition-data.cpp
   ${devel_api_src_dir}/visual-factory/visual-factory.cpp
   ${devel_api_src_dir}/visual-factory/visual-base.cpp
+  ${devel_api_src_dir}/visual-factory/precompile-shader-option.cpp
   ${devel_api_src_dir}/controls/gaussian-blur-view/gaussian-blur-view.cpp
   ${devel_api_src_dir}/drag-drop-detector/drag-and-drop-detector.cpp
   ${devel_api_src_dir}/text/text-geometry-devel.cpp
@@ -183,6 +184,7 @@ SET( devel_api_visual_factory_header_files
   ${devel_api_src_dir}/visual-factory/transition-data.h
   ${devel_api_src_dir}/visual-factory/visual-factory.h
   ${devel_api_src_dir}/visual-factory/visual-base.h
+  ${devel_api_src_dir}/visual-factory/precompile-shader-option.h
 )
 
 SET( devel_api_visuals_header_files

@@ -181,6 +181,8 @@ void Control::SetRenderEffect(Toolkit::RenderEffect effect)
 
       Dali::Toolkit::Control ownerControl(GetOwner());
       object->SetOwnerControl(ownerControl);
+
+      SetOffScreenRenderableType(object->GetOffScreenRenderableType());
     }
   }
 }
@@ -197,12 +199,24 @@ void Control::ClearRenderEffect()
     }
     mImpl->mRenderEffect.Reset();
   }
+  SetOffScreenRenderableType(OffScreenRenderable::NONE);
 }
 
 void Control::SetResourceReady()
 {
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
   controlDataImpl.ResourceReady();
+}
+
+Dali::Actor Control::GetOffScreenRenderableSourceActor()
+{
+  // Need to override this in FORWARD OffScreenRenderable
+  return Dali::Actor();
+}
+
+bool Control::IsOffScreenRenderTaskExclusive()
+{
+  return false;
 }
 
 std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::GetAccessibleObject()
@@ -615,15 +629,6 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
       }
       break;
     }
-    case Actor::Property::VISIBLE:
-    {
-      auto accessible = GetAccessibleObject();
-      if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
-      {
-        accessible->EmitVisible(Self().GetProperty<bool>(Actor::Property::VISIBLE));
-      }
-      break;
-    }
     case DevelActor::Property::USER_INTERACTION_ENABLED:
     {
       const bool enabled = propertyValue.Get<bool>();
@@ -653,6 +658,15 @@ void Control::OnSizeSet(const Vector3& targetSize)
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 {
   // @todo size negotiate background to new size, animate as well?
+}
+
+void Control::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+{
+  if(mImpl->mRenderEffect)
+  {
+    Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(mImpl->mRenderEffect.GetObjectPtr());
+    object->GetOffScreenRenderTasks(tasks, isForward);
+  }
 }
 
 bool Control::OnKeyEvent(const KeyEvent& event)
@@ -812,16 +826,10 @@ void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali:
   float   destinationBorderlineOffset = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, defaultBorderlineOffset);
 
   // If the value of the source Control and that of destination Control is different, the property should be transitioned.
-  if(Vector3(sourceMixColor) != Vector3(destinationMixColor))
+  if(sourceMixColor != destinationMixColor)
   {
-    sourcePropertyMap.Add(Dali::Toolkit::Visual::Property::MIX_COLOR, Vector3(sourceMixColor));
-    destinationPropertyMap.Add(Dali::Toolkit::Visual::Property::MIX_COLOR, Vector3(destinationMixColor));
-  }
-
-  if(std::abs(sourceMixColor.a - destinationMixColor.a) > Math::MACHINE_EPSILON_1)
-  {
-    sourcePropertyMap.Add(Dali::Toolkit::Visual::Property::OPACITY, sourceMixColor.a);
-    destinationPropertyMap.Add(Dali::Toolkit::Visual::Property::OPACITY, destinationMixColor.a);
+    sourcePropertyMap.Add(Dali::Toolkit::Visual::Property::MIX_COLOR, sourceMixColor);
+    destinationPropertyMap.Add(Dali::Toolkit::Visual::Property::MIX_COLOR, destinationMixColor);
   }
 
   if(sourceCornerRadius != destinationCornerRadius)

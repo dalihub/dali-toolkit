@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visual-factory/precompile-shader-option.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
@@ -37,6 +38,9 @@ namespace Internal
 class VisualFactoryCache;
 class ImageVisualShaderFactory;
 class TextVisualShaderFactory;
+class ColorVisualShaderFactory;
+class NpatchShaderFactory;
+class CustomShaderFactory;
 
 /**
  * @copydoc Toolkit::VisualFactory
@@ -112,6 +116,11 @@ public:
   void DiscardVisual(Toolkit::Visual::Base visual);
 
   /**
+   * @copydoc Toolkit::VisualFactory::AddPrecompileShader()
+   */
+  bool AddPrecompileShader(const Property::Map& map);
+
+  /**
    * @copydoc Toolkit::VisualFactory::UsePreCompiledShader()
    */
   void UsePreCompiledShader();
@@ -140,12 +149,6 @@ private:
   void SetBrokenImageUrl(Toolkit::StyleManager& styleManager);
 
   /**
-   * @brief Get the default shader source.
-   * @param[in] shaders shaderList for precompile
-   */
-  void GetPreCompiledShader(RawShaderData& shaders);
-
-  /**
    * Get the factory cache, creating it if necessary.
    */
   Internal::VisualFactoryCache& GetFactoryCache();
@@ -159,6 +162,29 @@ private:
    * Get the text visual shader factory, creating it if necessary.
    */
   TextVisualShaderFactory& GetTextVisualShaderFactory();
+
+  /**
+   * Get the color visual shader factory, creating it if necessary.
+   */
+  ColorVisualShaderFactory& GetColorVisualShaderFactory();
+
+  /**
+   * Get the npatch shader factory, creating it if necessary.
+   */
+  NpatchShaderFactory& GetNpatchShaderFactory();
+
+  /**
+   * Get the custom shader factory, creating it if necessary.
+   */
+  CustomShaderFactory& GetCustomShaderFactory();
+
+  /**
+   * @brief Add precompiled shader
+   * @param[in] shaderOption The option of precompiled shader
+   *
+   * @return True if add success, false otherwise.
+   */
+  bool AddPrecompileShader(PrecompileShaderOption& shaderOption);
 
   /**
    * @brief Callbacks called for clear discarded visuals.
@@ -183,6 +209,9 @@ private:
   std::unique_ptr<VisualFactoryCache>       mFactoryCache;
   std::unique_ptr<ImageVisualShaderFactory> mImageVisualShaderFactory;
   std::unique_ptr<TextVisualShaderFactory>  mTextVisualShaderFactory;
+  std::unique_ptr<ColorVisualShaderFactory> mColorVisualShaderFactory;
+  std::unique_ptr<NpatchShaderFactory>      mNpatchShaderFactory;
+  std::unique_ptr<CustomShaderFactory>      mCustomShaderFactory;
   SlotDelegate<VisualFactory>               mSlotDelegate;
   CallbackBase*                             mIdleCallback;
   using DiscardedVisualContainer = std::vector<Toolkit::Visual::Base>;

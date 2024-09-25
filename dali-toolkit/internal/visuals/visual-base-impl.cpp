@@ -589,8 +589,7 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
   if(mImpl->mRenderer)
   {
     // Update values from Renderer
-    mImpl->mMixColor   = mImpl->mRenderer.GetProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR);
-    mImpl->mMixColor.a = mImpl->mRenderer.GetProperty<float>(DevelRenderer::Property::OPACITY);
+    mImpl->mMixColor = mImpl->mRenderer.GetProperty<Vector4>(Renderer::Property::MIX_COLOR);
 
     mImpl->mTransform.mOffset = mImpl->mRenderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET);
     mImpl->mTransform.mSize   = mImpl->mRenderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE);
@@ -668,7 +667,6 @@ void Visual::Base::EnablePreMultipliedAlpha(bool preMultiplied)
   if(mImpl->mRenderer)
   {
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, preMultiplied);
-    mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, preMultiplied);
   }
 }
 
@@ -750,15 +748,9 @@ void Visual::Base::RegisterMixColor()
   if(mImpl->mRenderer)
   {
     // All visual renderers now use same mix color / opacity properties.
-    mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, Vector3(mImpl->mMixColor));
-    mImpl->mRenderer.SetProperty(DevelRenderer::Property::OPACITY, mImpl->mMixColor.a);
+    mImpl->mRenderer.SetProperty(Renderer::Property::MIX_COLOR, mImpl->mMixColor);
 
-    float preMultipliedAlpha = 0.0f;
-    if(IsPreMultipliedAlphaEnabled())
-    {
-      preMultipliedAlpha = 1.0f;
-    }
-    mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, preMultipliedAlpha);
+    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
   }
 }
 
@@ -794,8 +786,7 @@ void Visual::Base::SetMixColor(const Vector4& color)
 
   if(mImpl->mRenderer)
   {
-    mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, Vector3(color));
-    mImpl->mRenderer.SetProperty(DevelRenderer::Property::OPACITY, color.a);
+    mImpl->mRenderer.SetProperty(Renderer::Property::MIX_COLOR, color);
   }
 }
 
@@ -807,7 +798,9 @@ void Visual::Base::SetMixColor(const Vector3& color)
 
   if(mImpl->mRenderer)
   {
-    mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, color);
+    mImpl->mRenderer.SetProperty(Renderer::Property::MIX_COLOR_RED, color.r);
+    mImpl->mRenderer.SetProperty(Renderer::Property::MIX_COLOR_GREEN, color.g);
+    mImpl->mRenderer.SetProperty(Renderer::Property::MIX_COLOR_BLUE, color.b);
   }
 }
 
@@ -1011,15 +1004,15 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key)
     }
     case Dali::Toolkit::Visual::Property::MIX_COLOR:
     {
-      return VisualRenderer::Property::VISUAL_MIX_COLOR;
+      return Renderer::Property::MIX_COLOR;
     }
     case Dali::Toolkit::Visual::Property::OPACITY:
     {
-      return DevelRenderer::Property::OPACITY;
+      return Renderer::Property::OPACITY;
     }
     case Dali::Toolkit::Visual::Property::PREMULTIPLIED_ALPHA:
     {
-      return VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA;
+      return Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA;
     }
     case Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS:
     {
@@ -1075,8 +1068,8 @@ void Visual::Base::SetupTransition(
   Dali::Animation&                    transition,
   Internal::TransitionData::Animator& animator,
   Property::Index                     index,
-  Property::Value&                    initialValue,
-  Property::Value&                    targetValue)
+  const Property::Value&              initialValue,
+  const Property::Value&              targetValue)
 {
   if(index != Property::INVALID_INDEX)
   {
@@ -1169,7 +1162,7 @@ void Visual::Base::AnimateOpacityProperty(
     mImpl->mMixColor.a = targetOpacity;
   }
 
-  SetupTransition(transition, animator, DevelRenderer::Property::OPACITY, animator.initialValue, animator.targetValue);
+  SetupTransition(transition, animator, Renderer::Property::OPACITY, animator.initialValue, animator.targetValue);
 }
 
 void Visual::Base::AnimateRendererProperty(
@@ -1209,45 +1202,41 @@ void Visual::Base::AnimateMixColorProperty(
 {
   bool animateOpacity = false;
 
-  Property::Value initialOpacity;
-  Property::Value targetOpacity;
-  Property::Value initialMixColor;
-  Property::Value targetMixColor;
-
-  Vector4 initialColor;
-  if(animator.initialValue.Get(initialColor))
+  Vector4 initialMixColor;
+  Vector4 targetMixColor;
+  if(animator.initialValue.Get(initialMixColor))
   {
-    if(animator.initialValue.GetType() == Property::VECTOR4)
+    if(animator.initialValue.GetType() != Property::VECTOR4)
     {
-      // if there is an initial color specifying alpha, test it
-      initialOpacity = initialColor.a;
+      // if there is non initial color specifying alpha, get from cached mix color
+      initialMixColor.a = mImpl->mMixColor.a;
     }
-    initialMixColor = Vector3(initialColor);
   }
 
   // Set target value into data store
   if(animator.targetValue.GetType() != Property::NONE)
   {
-    Vector4 mixColor;
-    animator.targetValue.Get(mixColor);
+    animator.targetValue.Get(targetMixColor);
     if(animator.targetValue.GetType() == Property::VECTOR4)
     {
-      mImpl->mMixColor.a = mixColor.a;
-      targetOpacity      = mixColor.a;
+      mImpl->mMixColor.a = targetMixColor.a;
       animateOpacity     = true;
     }
 
-    mImpl->mMixColor.r = mixColor.r;
-    mImpl->mMixColor.g = mixColor.g;
-    mImpl->mMixColor.b = mixColor.b;
-    targetMixColor     = Vector3(mixColor);
+    mImpl->mMixColor.r = targetMixColor.r;
+    mImpl->mMixColor.g = targetMixColor.g;
+    mImpl->mMixColor.b = targetMixColor.b;
   }
-
-  SetupTransition(transition, animator, VisualRenderer::Property::VISUAL_MIX_COLOR, initialMixColor, targetMixColor);
 
   if(animateOpacity)
   {
-    SetupTransition(transition, animator, DevelRenderer::Property::OPACITY, initialOpacity, targetOpacity);
+    SetupTransition(transition, animator, Renderer::Property::MIX_COLOR, initialMixColor, targetMixColor);
+  }
+  else
+  {
+    SetupTransition(transition, animator, Renderer::Property::MIX_COLOR_RED, initialMixColor.r, targetMixColor.r);
+    SetupTransition(transition, animator, Renderer::Property::MIX_COLOR_GREEN, initialMixColor.g, targetMixColor.g);
+    SetupTransition(transition, animator, Renderer::Property::MIX_COLOR_BLUE, initialMixColor.b, targetMixColor.b);
   }
 }
 
@@ -1264,11 +1253,11 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     // Default animatable properties from VisualRenderer
     case Toolkit::Visual::Property::MIX_COLOR:
     {
-      return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::VISUAL_MIX_COLOR);
+      return Dali::Property(mImpl->mRenderer, Renderer::Property::MIX_COLOR);
     }
     case Toolkit::Visual::Property::OPACITY:
     {
-      return Dali::Property(mImpl->mRenderer, DevelRenderer::Property::OPACITY);
+      return Dali::Property(mImpl->mRenderer, Renderer::Property::OPACITY);
     }
     case Toolkit::Visual::Transform::Property::OFFSET:
     {
@@ -1343,7 +1332,7 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
          ((mImpl->mType == Toolkit::Visual::COLOR && key.indexKey == ColorVisual::Property::MIX_COLOR) ||
           (mImpl->mType == Toolkit::Visual::PRIMITIVE && key.indexKey == PrimitiveVisual::Property::MIX_COLOR)))
       {
-        return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::VISUAL_MIX_COLOR);
+        return Dali::Property(mImpl->mRenderer, Renderer::Property::MIX_COLOR);
       }
 
       // Special case for BLUR_RADIUS

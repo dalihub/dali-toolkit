@@ -123,16 +123,12 @@ Dali::PixelData GetCachedPixelData(const std::string& url);
  * @note If cache handler is not created yet, or destroyed due to app terminated, it will load image synchronously without cache.
  * @param[in] url The URL of the image file to load
  * @param[in] dimensions The width and height to fit the loaded image to
- * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
  * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
- * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
  * @return A PixelData object containing the image, or an invalid object on failure
  */
 Dali::PixelData GetCachedPixelData(const std::string& url,
                                    ImageDimensions    dimensions,
-                                   FittingMode::Type  fittingMode,
-                                   SamplingMode::Type samplingMode,
-                                   bool               orientationCorrection);
+                                   SamplingMode::Type samplingMode);
 } // namespace ImageResourceLoader
 
 } // namespace Internal

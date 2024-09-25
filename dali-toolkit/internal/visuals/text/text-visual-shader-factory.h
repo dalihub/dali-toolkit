@@ -22,6 +22,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/internal/visuals/visual-shader-factory-interface.h>
 #include <string_view>
 
 namespace Dali
@@ -86,20 +87,18 @@ enum Type
 /**
  * @brief Collection of current text visual feature.
  */
-struct FeatureBuilder
+class FeatureBuilder
 {
-  FeatureBuilder()
-  : mTextMultiColor(TextMultiColor::SINGLE_COLOR_TEXT),
-    mTextEmoji(TextEmoji::NO_EMOJI),
-    mTextStyle(TextStyle::NO_STYLES),
-    mTextOverlay(TextOverlay::NO_OVERLAY)
-  {
-  }
-
+public:
+  FeatureBuilder();
   FeatureBuilder& EnableMultiColor(bool enableMultiColor);
   FeatureBuilder& EnableEmoji(bool enableEmoji);
   FeatureBuilder& EnableStyle(bool enableStyle);
   FeatureBuilder& EnableOverlay(bool enableOverlay);
+
+  VisualFactoryCache::ShaderType GetShaderType() const;
+  void GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const;
+  void GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const;
 
   bool IsEnabledMultiColor() const
   {
@@ -118,6 +117,7 @@ struct FeatureBuilder
     return mTextOverlay == TextOverlay::HAS_OVERLAY;
   }
 
+private:
   TextMultiColor::Type mTextMultiColor : 2; ///< Whether text has multiple color, or not. default as TextMultiColor::SINGLE_COLOR_TEXT
   TextEmoji::Type      mTextEmoji : 2;      ///< Whether text has emoji, or not. default as TextEmoji::NO_EMOJI
   TextStyle::Type      mTextStyle : 2;      ///< Whether text has style, or not. default as TextStyle::NO_STYLES
@@ -129,7 +129,7 @@ struct FeatureBuilder
 /**
  * TextVisualShaderFactory is an object that provides and shares shaders for text visuals
  */
-class TextVisualShaderFactory
+class TextVisualShaderFactory : public VisualShaderFactoryInterface
 {
 public:
   /**
@@ -150,11 +150,27 @@ public:
    */
   Shader GetShader(VisualFactoryCache& factoryCache, const TextVisualShaderFeature::FeatureBuilder& featureBuilder);
 
+public: // Implementation of VisualShaderFactoryInterface
   /**
-   * @brief Get the default shader source.
-   * @param[in] shaders shaderList for precompile
+   * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::AddPrecompiledShader
    */
-  void GetPreCompiledShader(RawShaderData& shaders);
+  bool AddPrecompiledShader(PrecompileShaderOption& option) override;
+
+  /**
+   * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::GetPreCompiledShader
+   */
+  void GetPreCompiledShader(RawShaderData& shaders) override;
+
+private:
+  /**
+   * @brief Create pre-compiled shader for image with builder and option.
+   */
+  void CreatePrecompileShader(TextVisualShaderFeature::FeatureBuilder& builder, const ShaderFlagList& option);
+
+  /**
+   * @brief Check if cached hash value is valid or not.
+   */
+  bool SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix);
 
 protected:
   /**
@@ -166,8 +182,6 @@ protected:
    * Undefined assignment operator.
    */
   TextVisualShaderFactory& operator=(const TextVisualShaderFactory& rhs);
-
-private:
 };
 
 } // namespace Internal

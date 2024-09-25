@@ -300,8 +300,9 @@ TextVisual::~TextVisual()
 
 void TextVisual::OnInitialize()
 {
-  Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
-  Shader   shader   = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder());
+  Geometry geometry       = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
+  auto     featureBuilder = TextVisualShaderFeature::FeatureBuilder();
+  Shader   shader         = GetTextShader(mFactoryCache, featureBuilder);
 
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
@@ -714,7 +715,6 @@ void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sa
 
   // Enable the pre-multiplied alpha to improve the text quality
   renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
-  renderer.SetProperty(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, true);
 
   // Set size and offset for the tiling.
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, Vector2(static_cast<float>(info.width), static_cast<float>(info.height)));
@@ -1364,7 +1364,7 @@ TextureSet TextVisual::GetTextTexture(const Vector2& size)
   return textureSet;
 }
 
-Shader TextVisual::GetTextShader(VisualFactoryCache& factoryCache, const TextVisualShaderFeature::FeatureBuilder& featureBuilder)
+Shader TextVisual::GetTextShader(VisualFactoryCache& factoryCache, TextVisualShaderFeature::FeatureBuilder& featureBuilder)
 {
   // Cache feature builder informations.
   mTextShaderFeatureCache = featureBuilder;
