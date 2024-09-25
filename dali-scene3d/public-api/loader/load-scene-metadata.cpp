@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,9 @@ struct ImageData
       BOX_THEN_NEAREST = Dali::SamplingMode::BOX_THEN_NEAREST,
       BOX_THEN_LINEAR  = Dali::SamplingMode::BOX_THEN_LINEAR,
       NO_FILTER        = Dali::SamplingMode::NO_FILTER,
-      DONT_CARE        = Dali::SamplingMode::DONT_CARE
+      DONT_CARE        = Dali::SamplingMode::DONT_CARE,
+      LANCZOS          = Dali::SamplingMode::LANCZOS,
+      BOX_THEN_LANCZOS = Dali::SamplingMode::BOX_THEN_LANCZOS,
     };
 
     static Type FromString(const char* s, size_t len);
@@ -64,6 +66,8 @@ const std::map<std::string_view, ImageData::SamplingMode::Type>& GetStringSampli
     ENUM_STRING_MAPPING(ImageData::SamplingMode, BOX_THEN_LINEAR),
     ENUM_STRING_MAPPING(ImageData::SamplingMode, NO_FILTER),
     ENUM_STRING_MAPPING(ImageData::SamplingMode, DONT_CARE),
+    ENUM_STRING_MAPPING(ImageData::SamplingMode, LANCZOS),
+    ENUM_STRING_MAPPING(ImageData::SamplingMode, BOX_THEN_LANCZOS),
   };
   return SAMPLING_MODE_TYPES;
 }
@@ -78,17 +82,17 @@ struct MetaData
 const js::Reader<ImageData>& GetImageMetaDataReader()
 {
   static const auto IMAGE_METADATA_READER = std::move(js::Reader<ImageData>()
-                                                         .Register(*js::MakeProperty("uri", js::Read::String, &ImageData::mImageUri))
-                                                         .Register(*js::MakeProperty("minWidth", js::Read::Number, &ImageData::mMinWidth))
-                                                         .Register(*js::MakeProperty("minHeight", js::Read::Number, &ImageData::mMinHeight))
-                                                         .Register(*js::MakeProperty("samplingMode", gt::ReadStringEnum<ImageData::SamplingMode>, &ImageData::mSamplingMode)));
+                                                        .Register(*js::MakeProperty("uri", js::Read::String, &ImageData::mImageUri))
+                                                        .Register(*js::MakeProperty("minWidth", js::Read::Number, &ImageData::mMinWidth))
+                                                        .Register(*js::MakeProperty("minHeight", js::Read::Number, &ImageData::mMinHeight))
+                                                        .Register(*js::MakeProperty("samplingMode", gt::ReadStringEnum<ImageData::SamplingMode>, &ImageData::mSamplingMode)));
   return IMAGE_METADATA_READER;
 }
 
 const js::Reader<MetaData>& GetMetaDataReader()
 {
   static const auto METADATA_READER = std::move(js::Reader<MetaData>()
-                                                   .Register(*js::MakeProperty("images", js::Read::Array<ImageData, js::ObjectReader<ImageData>::Read>, &MetaData::mImageData)));
+                                                  .Register(*js::MakeProperty("images", js::Read::Array<ImageData, js::ObjectReader<ImageData>::Read>, &MetaData::mImageData)));
   return METADATA_READER;
 }
 } // namespace
