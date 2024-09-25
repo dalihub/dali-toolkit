@@ -239,35 +239,50 @@ void ImageVisualShaderFactory::CreatePrecompileShader(ImageVisualShaderFeature::
 {
   for(uint32_t i = 0; i < option.size(); ++i)
   {
-    if(option[i] == PrecompileShaderOption::Flag::ATLAS_DEFAULT)
+    switch(option[i])
     {
-      builder.EnableTextureAtlas(true);
-      builder.ApplyDefaultTextureWrapMode(true);
-    }
-    else if(option[i] == PrecompileShaderOption::Flag::ATLAS_CUSTOM)
-    {
-      builder.EnableTextureAtlas(true);
-      builder.ApplyDefaultTextureWrapMode(false);
-    }
-    else if(option[i] == PrecompileShaderOption::Flag::ROUNDED_CORNER)
-    {
-      builder.EnableRoundedCorner(true);
-    }
-    else if(option[i] == PrecompileShaderOption::Flag::BORDERLINE)
-    {
-      builder.EnableBorderline(true);
-    }
-    else if(option[i] == PrecompileShaderOption::Flag::MASKING)
-    {
-      builder.EnableAlphaMaskingOnRendering(true);
-    }
-    else if(option[i] == PrecompileShaderOption::Flag::YUV_TO_RGB)
-    {
-      builder.EnableYuvToRgb(true, false);
-    }
-    else if(option[i] == PrecompileShaderOption::Flag::YUV_AND_RGB)
-    {
-      builder.EnableYuvToRgb(false, true);
+      case PrecompileShaderOption::Flag::ATLAS_DEFAULT:
+      {
+        builder.EnableTextureAtlas(true);
+        builder.ApplyDefaultTextureWrapMode(true);
+        break;
+      }
+      case PrecompileShaderOption::Flag::ATLAS_CUSTOM:
+      {
+        builder.EnableTextureAtlas(true);
+        builder.ApplyDefaultTextureWrapMode(false);
+        break;
+      }
+      case PrecompileShaderOption::Flag::ROUNDED_CORNER:
+      {
+        builder.EnableRoundedCorner(true);
+        break;
+      }
+      case PrecompileShaderOption::Flag::BORDERLINE:
+      {
+        builder.EnableBorderline(true);
+        break;
+      }
+      case PrecompileShaderOption::Flag::MASKING:
+      {
+        builder.EnableAlphaMaskingOnRendering(true);
+        break;
+      }
+      case PrecompileShaderOption::Flag::YUV_TO_RGB:
+      {
+        builder.EnableYuvToRgb(true, false);
+        break;
+      }
+      case PrecompileShaderOption::Flag::YUV_AND_RGB:
+      {
+        builder.EnableYuvToRgb(false, true);
+        break;
+      }
+      default:
+      {
+        DALI_LOG_WARNING("Unknown option[%d]. maybe this type can't use this flag\n", static_cast<int>(option[i]));
+        break;
+      }
     }
   }
 }
@@ -278,7 +293,7 @@ bool ImageVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTy
   {
     if(ShaderTypePredefines[i] == shader)
     {
-      DALI_LOG_WARNING("This shader already added list(%s).", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      DALI_LOG_WARNING("This shader already added list(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
       return false;
     }
   }
@@ -287,7 +302,7 @@ bool ImageVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTy
   {
     if(mRequestedPrecompileShader[i].type == shader)
     {
-      DALI_LOG_WARNING("This shader already requsted(%s).", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      DALI_LOG_WARNING("This shader already requsted(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
       return false;
     }
   }
@@ -297,7 +312,7 @@ bool ImageVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTy
   info.vertexPrefix   = vertexPrefix;
   info.fragmentPrefix = fragmentPrefix;
   mRequestedPrecompileShader.push_back(info);
-  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(shader, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(shader, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
   return true;
 }
 
