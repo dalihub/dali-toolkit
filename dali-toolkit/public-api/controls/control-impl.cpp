@@ -615,15 +615,6 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
       }
       break;
     }
-    case Actor::Property::VISIBLE:
-    {
-      auto accessible = GetAccessibleObject();
-      if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
-      {
-        accessible->EmitVisible(Self().GetProperty<bool>(Actor::Property::VISIBLE));
-      }
-      break;
-    }
     case DevelActor::Property::USER_INTERACTION_ENABLED:
     {
       const bool enabled = propertyValue.Get<bool>();
