@@ -1571,3 +1571,67 @@ int UtcDaliSceneViewSelectCamera(void)
 
   END_TEST;
 }
+
+int UtcDaliSceneViewRenderTaskOrdering(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliPanelRenderTaskOrdering");
+
+  Integration::Scene scene = application.GetScene();
+  RenderTaskList taskList = scene.GetRenderTaskList();
+
+  uint32_t defaultTaskCount = taskList.GetTaskCount();
+  RenderTask defaultRenderTask = taskList.GetTask(defaultTaskCount - 1);
+  tet_printf("default Task Cnt : %d\n", defaultTaskCount);
+
+  Scene3D::SceneView sceneView = Scene3D::SceneView::New();
+  sceneView.UseFramebuffer(true);
+  scene.Add(sceneView);
+
+  uint32_t afterSceneViewTaskCount = taskList.GetTaskCount();
+  RenderTask sceneViewRenderTask = taskList.GetTask(afterSceneViewTaskCount - 1);
+  tet_printf("after SceneView Task cnt : %d\n", afterSceneViewTaskCount);
+  DALI_TEST_CHECK(afterSceneViewTaskCount == defaultTaskCount + 1);
+
+  Control control1 = Control::New();
+  control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control1.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  control1.SetRenderEffect(BackgroundBlurEffect::New());
+
+  sceneView.Add(control1);
+
+  uint32_t afterBlurEffectTaskCount = taskList.GetTaskCount();
+  RenderTask blurSourceRenderTask = taskList.GetTask(afterBlurEffectTaskCount - 3);
+  RenderTask blurHorizontalRenderTask = taskList.GetTask(afterBlurEffectTaskCount - 2);
+  RenderTask blurVerticalRenderTask = taskList.GetTask(afterBlurEffectTaskCount - 1);
+  tet_printf("after blurEffect Task cnt : %d\n", afterBlurEffectTaskCount);
+  DALI_TEST_CHECK(afterBlurEffectTaskCount == afterSceneViewTaskCount + 3);
+
+  tet_printf("defaultRenderTask order : %d\n", defaultRenderTask.GetOrderIndex());
+  tet_printf("sceneViewRenderTask order : %d\n", sceneViewRenderTask.GetOrderIndex());
+  tet_printf("blurSourceRenderTask order : %d\n", blurSourceRenderTask.GetOrderIndex());
+  tet_printf("blurHorizontalRenderTask order : %d\n", blurHorizontalRenderTask.GetOrderIndex());
+  tet_printf("blurVerticalRenderTask order : %d\n", blurVerticalRenderTask.GetOrderIndex());
+
+  DALI_TEST_EQUALS(INT32_MIN, defaultRenderTask.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, sceneViewRenderTask.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, blurSourceRenderTask.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, blurHorizontalRenderTask.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, blurVerticalRenderTask.GetOrderIndex(), TEST_LOCATION);
+
+  application.SendNotification();
+
+  tet_printf("defaultRenderTask order : %d\n", defaultRenderTask.GetOrderIndex());
+  tet_printf("sceneViewRenderTask order : %d\n", sceneViewRenderTask.GetOrderIndex());
+  tet_printf("blurSourceRenderTask order : %d\n", blurSourceRenderTask.GetOrderIndex());
+  tet_printf("blurHorizontalRenderTask order : %d\n", blurHorizontalRenderTask.GetOrderIndex());
+  tet_printf("blurVerticalRenderTask order : %d\n", blurVerticalRenderTask.GetOrderIndex());
+
+  DALI_TEST_EQUALS(INT32_MIN, defaultRenderTask.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(INT32_MIN + 3, sceneViewRenderTask.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(INT32_MIN, blurSourceRenderTask.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(INT32_MIN + 1, blurHorizontalRenderTask.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(INT32_MIN + 2, blurVerticalRenderTask.GetOrderIndex(), TEST_LOCATION);
+
+  END_TEST;
+}

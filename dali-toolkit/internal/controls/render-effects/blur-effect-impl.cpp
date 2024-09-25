@@ -26,19 +26,20 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/actors/custom-actor-impl.h>
 
-//INTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace
 {
 // Default values
 static constexpr float    BLUR_EFFECT_DOWNSCALE_FACTOR = 0.4f;
 static constexpr uint32_t BLUR_EFFECT_PIXEL_RADIUS     = 10u;
-static constexpr int32_t  BLUR_EFFECT_ORDER_INDEX      = 101;
 
 static constexpr float MINIMUM_DOWNSCALE_FACTOR = 0.1f;
 static constexpr float MAXIMUM_DOWNSCALE_FACTOR = 1.0f;
@@ -139,6 +140,47 @@ BlurEffectImplPtr BlurEffectImpl::New(float downscaleFactor, uint32_t blurRadius
   BlurEffectImplPtr handle = new BlurEffectImpl(downscaleFactor, blurRadius, isBackground);
   handle->Initialize();
   return handle;
+}
+
+OffScreenRenderable::Type BlurEffectImpl::GetOffScreenRenderableType()
+{
+  return mSkipBlur ? OffScreenRenderable::NONE : OffScreenRenderable::BACKWARD;
+}
+
+void BlurEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+{
+  tasks.clear();
+  if(!isForward && mIsBackground)
+  {
+    bool isExclusiveRequired = false;
+    Dali::Actor sourceActor = GetOwnerControl();
+    while(sourceActor.GetParent())
+    {
+      sourceActor = sourceActor.GetParent();
+      Toolkit::Control control = Toolkit::Control::DownCast(sourceActor);
+      if(control && GetImplementation(control).GetOffScreenRenderableType() == OffScreenRenderable::Type::FORWARD)
+      {
+        sourceActor = GetImplementation(control).GetOffScreenRenderableSourceActor();
+        isExclusiveRequired = GetImplementation(control).IsOffScreenRenderTaskExclusive();
+        break;
+      }
+    }
+    mSourceRenderTask.SetSourceActor(sourceActor);
+    mSourceRenderTask.SetExclusive(isExclusiveRequired);
+
+    if(mSourceRenderTask)
+    {
+      tasks.push_back(mSourceRenderTask);
+    }
+    if(mHorizontalBlurTask)
+    {
+      tasks.push_back(mHorizontalBlurTask);
+    }
+    if(mVerticalBlurTask)
+    {
+      tasks.push_back(mVerticalBlurTask);
+    }
+  }
 }
 
 void BlurEffectImpl::OnInitialize()
@@ -348,7 +390,6 @@ void BlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHolder, con
   {
     mSourceRenderTask.SetSourceActor(sourceControl);
   }
-  mSourceRenderTask.SetOrderIndex(BLUR_EFFECT_ORDER_INDEX);
   mSourceRenderTask.SetCameraActor(mRenderFullSizeCamera);
   mSourceRenderTask.SetFrameBuffer(mInputBackgroundFrameBuffer);
   mSourceRenderTask.SetInputEnabled(false);
@@ -362,7 +403,6 @@ void BlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHolder, con
   SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0), mInputBackgroundFrameBuffer);
   mHorizontalBlurTask = taskList.CreateTask();
   mHorizontalBlurTask.SetSourceActor(mHorizontalBlurActor);
-  mHorizontalBlurTask.SetOrderIndex(BLUR_EFFECT_ORDER_INDEX + 1);
   mHorizontalBlurTask.SetExclusive(true);
   mHorizontalBlurTask.SetInputEnabled(false);
   mHorizontalBlurTask.SetCameraActor(mRenderDownsampledCamera);
@@ -376,7 +416,6 @@ void BlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHolder, con
   SetRendererTexture(mVerticalBlurActor.GetRendererAt(0), mTemporaryFrameBuffer);
   mVerticalBlurTask = taskList.CreateTask();
   mVerticalBlurTask.SetSourceActor(mVerticalBlurActor);
-  mVerticalBlurTask.SetOrderIndex(BLUR_EFFECT_ORDER_INDEX + 2);
   mVerticalBlurTask.SetExclusive(true);
   mVerticalBlurTask.SetInputEnabled(false);
   mVerticalBlurTask.SetCameraActor(mRenderDownsampledCamera);

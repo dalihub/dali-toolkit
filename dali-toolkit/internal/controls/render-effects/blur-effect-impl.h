@@ -69,6 +69,16 @@ public:
    */
   static BlurEffectImplPtr New(float downscaleFactor, uint32_t blurRadius, bool isBackground);
 
+  /**
+   * @copydoc Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderableType
+   */
+  OffScreenRenderable::Type GetOffScreenRenderableType() override;
+
+  /**
+   * @copydoc Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderTasks
+   */
+  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
+
 protected:
   /**
    * @brief Creates an uninitialized blur effect implementation

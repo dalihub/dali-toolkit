@@ -121,6 +121,16 @@ public:
    */
   static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
+  /**
+   * @copydoc Toolkit::Internal::Control::GetOffScreenRenderableSourceActor
+   */
+  Dali::Actor GetOffScreenRenderableSourceActor() override;
+
+  /**
+   * @copydoc Toolkit::Internal::Control::IsOffScreenRenderTaskExclusive
+   */
+  bool IsOffScreenRenderTaskExclusive() override;
+
 protected:
   /**
    * @brief Constructs a new Panel.
@@ -147,6 +157,11 @@ private:
    * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
   void OnSceneDisconnection() override;
+
+  /**
+   * @copydoc CustomActorImpl::SetFirstOrderIndex()
+   */
+  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
 
 private:
   /**

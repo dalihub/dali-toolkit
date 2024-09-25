@@ -796,7 +796,9 @@ void SceneView::UseFramebuffer(bool useFramebuffer)
   if(mUseFrameBuffer != useFramebuffer)
   {
     mUseFrameBuffer = useFramebuffer;
+    SetOffScreenRenderableType((mUseFrameBuffer) ? OffScreenRenderable::Type::FORWARD : OffScreenRenderable::Type::NONE);
     UpdateRenderTask();
+    RequestRenderTaskReorder();
   }
 }
 
@@ -1157,6 +1159,16 @@ Property::Value SceneView::GetProperty(BaseObject* object, Property::Index index
   return value;
 }
 
+Dali::Actor SceneView::GetOffScreenRenderableSourceActor()
+{
+  return (mRootLayer) ? mRootLayer : Dali::Actor();
+}
+
+bool SceneView::IsOffScreenRenderTaskExclusive()
+{
+  return (mRenderTask) ? mRenderTask.IsExclusive() : false;
+}
+
 ///////////////////////////////////////////////////////////
 //
 // Private methods
@@ -1195,7 +1207,6 @@ void SceneView::OnSceneConnection(int depth)
     mRenderTask.SetExclusive(true);
     mRenderTask.SetInputEnabled(true);
     mRenderTask.SetCullMode(false);
-    mRenderTask.SetOrderIndex(SCENE_ORDER_INDEX);
     mRenderTask.SetScreenToFrameBufferMappingActor(Self());
 
     UpdateRenderTask();
@@ -1269,6 +1280,22 @@ void SceneView::OnSceneDisconnection()
   Control::OnSceneDisconnection();
 }
 
+void SceneView::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+{
+  tasks.clear();
+  if(isForward)
+  {
+    if(mShadowMapRenderTask)
+    {
+      tasks.push_back(mShadowMapRenderTask);
+    }
+    if(mRenderTask)
+    {
+      tasks.push_back(mRenderTask);
+    }
+  }
+}
+
 void SceneView::OnInitialize()
 {
   Actor self = Self();
@@ -1286,6 +1313,11 @@ void SceneView::OnInitialize()
   mDefaultCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
   AddCamera(mDefaultCamera);
   UpdateCamera(mDefaultCamera);
+
+  if(mUseFrameBuffer)
+  {
+    SetOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  }
 }
 
 void SceneView::OnChildAdd(Actor& child)
@@ -1420,6 +1452,8 @@ void SceneView::UpdateRenderTask()
     }
     else
     {
+      mRenderTask.SetOrderIndex(SCENE_ORDER_INDEX);
+
       mRenderTask.SetViewportGuideActor(Self());
       if(mRenderTask.GetFrameBuffer())
       {
@@ -1625,6 +1659,10 @@ void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
     mShadowMapRenderTask.SetClearColor(Color::WHITE);
     mShadowMapRenderTask.SetRenderPassTag(10);
     mShadowMapRenderTask.SetCameraActor(GetImplementation(mShadowLight).GetCamera());
+  }
+
+  if(!mUseFrameBuffer)
+  {
     mShadowMapRenderTask.SetOrderIndex(SHADOW_ORDER_INDEX);
   }
 
