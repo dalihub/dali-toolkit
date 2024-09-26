@@ -665,7 +665,11 @@ void Control::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool
   if(mImpl->mRenderEffect)
   {
     Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(mImpl->mRenderEffect.GetObjectPtr());
-    object->GetOffScreenRenderTasks(tasks, isForward);
+
+    if(object)
+    {
+      object->GetOffScreenRenderTasks(tasks, isForward);
+    }
   }
 }
 
