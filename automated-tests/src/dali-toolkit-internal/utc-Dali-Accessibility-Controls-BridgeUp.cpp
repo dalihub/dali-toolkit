@@ -613,30 +613,57 @@ int UtcDaliControlAccessibilityHighlightable(void)
   highlightable = control.GetProperty<bool>(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE);
   DALI_TEST_EQUALS(highlightable, false, TEST_LOCATION);
 
-  auto q = Dali::Accessibility::Accessible::Get(control);
+  auto accessible = Dali::Accessibility::Accessible::Get(control);
 
   Dali::Accessibility::TestEnableSC(true);
 
-  auto states_by_bridge = Dali::Accessibility::States{TestGetStates(q->GetAddress())};
+  auto states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
   DALI_TEST_CHECK(!states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
   DALI_TEST_EQUALS(Property::BOOLEAN, control.GetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(true, control.GetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).Get<bool>(), TEST_LOCATION);
 
-  states_by_bridge = Dali::Accessibility::States{TestGetStates(q->GetAddress())};
+  states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
   DALI_TEST_CHECK(states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false);
   DALI_TEST_EQUALS(Property::BOOLEAN, control.GetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(false, control.GetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).Get<bool>(), TEST_LOCATION);
 
-  states_by_bridge = Dali::Accessibility::States{TestGetStates(q->GetAddress())};
+  states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
   DALI_TEST_CHECK(!states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
 
-  // Highlightable state is set if V2 role is set and is not Role::None
+  Dali::Accessibility::TestEnableSC(false);
+
+  END_TEST;
+}
+
+int UtcDaliControlAccessibilityHighlightableV2(void)
+{
+  ToolkitTestApplication application;
+  auto                   control    = Control::New();
+  auto                   accessible = Dali::Accessibility::Accessible::Get(control);
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  auto states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
+  // Is not highlightable if no role is set
+  DALI_TEST_CHECK(!states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
+
+  // Is highlightable by default if V2 role is set and is not Role::None
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::CONTAINER);
-  states_by_bridge = Dali::Accessibility::States{TestGetStates(q->GetAddress())};
+  states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
+  DALI_TEST_CHECK(states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
+
+  // Returns explicitly set highlightable property: false
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false);
+  states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
+  DALI_TEST_CHECK(!states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
+
+  // Returns explicitly set highlightable property: true
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
+  states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
   DALI_TEST_CHECK(states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
 
   Dali::Accessibility::TestEnableSC(false);
