@@ -201,6 +201,26 @@ bool IsHighlightableRole(int32_t rawRole)
   return IsRoleV2(rawRole) && static_cast<AccessibilityRole>(rawRole) != AccessibilityRole::NONE;
 }
 
+using Dali::Toolkit::Internal::TriStateProperty;
+bool IsHighlightable(TriStateProperty highlightable, int32_t rawRole)
+{
+  switch(highlightable)
+  {
+    case TriStateProperty::AUTO:
+    {
+      return IsHighlightableRole(rawRole);
+    }
+    case TriStateProperty::TRUE:
+    {
+      return true;
+    }
+    default:
+    {
+      return false;
+    }
+  }
+}
+
 } // unnamed namespace
 
 ControlAccessible::ControlAccessible(Dali::Actor self)
@@ -332,7 +352,7 @@ void ControlAccessible::ApplyAccessibilityProps(Dali::Accessibility::States& sta
 
   // Apply traits
   states[State::MODAL]         = props.isModal || IsModalRole(props.role);
-  states[State::HIGHLIGHTABLE] = props.isHighlightable || IsHighlightableRole(props.role);
+  states[State::HIGHLIGHTABLE] = IsHighlightable(props.isHighlightable, props.role);
 }
 
 Dali::Accessibility::States ControlAccessible::CalculateStates()
