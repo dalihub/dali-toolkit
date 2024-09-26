@@ -77,8 +77,7 @@ void ModelLoadTask::Process()
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     mStartTimeNanoSceonds = GetNanoseconds();
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss)
-                                            { oss << "[u:" << mModelUrl << ",dir:" << mResourceDirectoryUrl << "]"; });
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss) { oss << "[u:" << mModelUrl << ",dir:" << mResourceDirectoryUrl << "]"; });
   }
 #endif
 
@@ -88,12 +87,11 @@ void ModelLoadTask::Process()
     mResourceDirectoryUrl = std::string(modelUrl.parent_path()) + "/";
   }
 
-  Dali::Scene3D::Loader::ResourceBundle::PathProvider pathProvider = [&](Dali::Scene3D::Loader::ResourceType::Value type)
-  {
+  Dali::Scene3D::Loader::ResourceBundle::PathProvider pathProvider = [&](Dali::Scene3D::Loader::ResourceType::Value type) {
     return mResourceDirectoryUrl;
   };
 
-  mModelLoader = std::make_shared<Dali::Scene3D::Loader::ModelLoader>(mModelUrl, mResourceDirectoryUrl, mLoadResult);
+  mModelLoader = std::make_unique<Dali::Scene3D::Loader::ModelLoader>(mModelUrl, mResourceDirectoryUrl, mLoadResult);
 
   bool loadSucceeded = false;
 
@@ -135,8 +133,7 @@ void ModelLoadTask::Process()
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     mEndTimeNanoSceonds = GetNanoseconds();
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss)
-                                          {
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss) {
       oss << std::fixed << std::setprecision(3);
       oss << "[";
       oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
