@@ -225,11 +225,13 @@ int UtcDaliControlAccessibilityRole(void)
 {
   ToolkitTestApplication application;
 
-  auto control         = Control::New();
+  auto control = Control::New();
+
+  auto role_none       = DevelControl::AccessibilityRole::NONE;
   auto role_unknown    = Dali::Accessibility::Role::UNKNOWN;
   auto role_pushbutton = Dali::Accessibility::Role::PUSH_BUTTON;
 
-  DALI_TEST_EQUALS(role_unknown, control.GetProperty(DevelControl::Property::ACCESSIBILITY_ROLE).Get<Dali::Accessibility::Role>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(role_none, control.GetProperty(DevelControl::Property::ACCESSIBILITY_ROLE).Get<DevelControl::AccessibilityRole>(), TEST_LOCATION);
 
   auto accessible = Dali::Accessibility::Accessible::Get(control);
   DALI_TEST_EQUALS(role_unknown, accessible->GetRole(), TEST_LOCATION);
@@ -322,7 +324,7 @@ int UtcDaliControlAccessibilityRole(void)
   DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::PAGE_TAB_LIST), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::TEXT);
-  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::TEXT), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::LABEL), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::TOGGLE_BUTTON);
   DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::TOGGLE_BUTTON), TestGetRole(accessible->GetAddress()), TEST_LOCATION);

@@ -631,7 +631,7 @@ public:
     std::string                                                                       description{};
     std::string                                                                       value{};
     std::string                                                                       automationId{};
-    int32_t                                                                           role{static_cast<int32_t>(Dali::Accessibility::Role::UNKNOWN)};
+    int32_t                                                                           role{static_cast<int32_t>(DevelControl::AccessibilityRole::NONE)};
     DevelControl::AccessibilityStates                                                 states{};
     std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> relations;
     Property::Map                                                                     extraAttributes{};
