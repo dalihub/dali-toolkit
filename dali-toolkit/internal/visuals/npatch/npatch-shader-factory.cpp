@@ -15,7 +15,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/visuals/npatch-shader-factory.h>
+#include <dali-toolkit/internal/visuals/npatch/npatch-shader-factory.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
@@ -28,7 +28,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 NpatchShaderFactory::NpatchShaderFactory()
 : mNpatchXStretchCount(0),
   mNpatchYStretchCount(0),
@@ -61,40 +60,45 @@ bool NpatchShaderFactory::AddPrecompiledShader(PrecompileShaderOption& option)
   GetVertexShader(vertexShader);
   GetFragmentShader(fragmentShader);
 
-  VisualFactoryCache::ShaderType shaderType =  mNpatchMaskingEnable? VisualFactoryCache::ShaderType::NINE_PATCH_MASK_SHADER : VisualFactoryCache::ShaderType::NINE_PATCH_SHADER;
-  return SavePrecompileShader(shaderType, vertexShader, fragmentShader);
+  VisualFactoryCache::ShaderType shaderType = mNpatchMaskingEnable ? VisualFactoryCache::ShaderType::NINE_PATCH_MASK_SHADER : VisualFactoryCache::ShaderType::NINE_PATCH_SHADER;
+  return SavePrecompileShader(shaderType, std::move(vertexShader), std::move(fragmentShader));
 }
 
-void NpatchShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
+void NpatchShaderFactory::GetPreCompiledShader(ShaderPreCompiler::RawShaderData& shaders)
 {
-  std::vector<std::string_view> vertexPrefix;
-  std::vector<std::string_view> fragmentPrefix;
-  std::vector<std::string_view> shaderName;
-  int                           shaderCount = 0;
-  shaders.shaderCount                       = 0;
+  std::vector<std::string> vertexPrefix;
+  std::vector<std::string> fragmentPrefix;
+  std::vector<std::string> shaderName;
+
+  uint32_t shaderCount = 0;
+
+  shaders.shaderCount = 0;
 
   // precompile requested shader first
-  for(uint32_t i = 0; i < mRequestedPrecompileShader.size(); i++ )
+  for(uint32_t i = 0; i < mRequestedPrecompileShader.size(); i++)
   {
-    vertexPrefix.push_back(mRequestedPrecompileShader[i].vertexPrefix);
-    fragmentPrefix.push_back(mRequestedPrecompileShader[i].fragmentPrefix);
-    shaderName.push_back(mRequestedPrecompileShader[i].name);
+    vertexPrefix.push_back(std::move(mRequestedPrecompileShader[i].vertexPrefix));
+    fragmentPrefix.push_back(std::move(mRequestedPrecompileShader[i].fragmentPrefix));
+    shaderName.push_back(std::move(mRequestedPrecompileShader[i].name));
     shaderCount++;
   }
+
+  // Clean up requested precompile shader list
+  mRequestedPrecompileShader.clear();
 
   shaders.vertexPrefix   = std::move(vertexPrefix);
   shaders.fragmentPrefix = std::move(fragmentPrefix);
   shaders.shaderName     = std::move(shaderName);
   shaders.vertexShader   = ""; // Custom shader use prefix shader only. No need to set vertexShader and fragmentShader.
   shaders.fragmentShader = ""; // Custom shader use prefix shader only. No need to set vertexShader and fragmentShader.
-  shaders.shaderCount    = std::move(shaderCount);
-  shaders.custom = true;
+  shaders.shaderCount    = shaderCount;
+  shaders.custom         = true; ///< Note that npatch shader is kind of custom shader.
 }
 
 void NpatchShaderFactory::GetVertexShader(std::string& vertexShader) const
 {
   if(DALI_LIKELY((mNpatchXStretchCount == 1 && mNpatchYStretchCount == 1) ||
-                  (mNpatchXStretchCount == 0 && mNpatchYStretchCount == 0)))
+                 (mNpatchXStretchCount == 0 && mNpatchYStretchCount == 0)))
   {
     vertexShader += SHADER_NPATCH_VISUAL_3X3_SHADER_VERT;
   }
@@ -113,9 +117,9 @@ void NpatchShaderFactory::GetFragmentShader(std::string& fragmentShader) const
   fragmentShader += (mNpatchMaskingEnable ? SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG : SHADER_NPATCH_VISUAL_SHADER_FRAG);
 }
 
-bool NpatchShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexShader, std::string& fragmentShader)
+bool NpatchShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string&& vertexShader, std::string&& fragmentShader)
 {
-  for(uint32_t i = 0u; i< mRequestedPrecompileShader.size(); i++)
+  for(uint32_t i = 0u; i < mRequestedPrecompileShader.size(); i++)
   {
     if(mRequestedPrecompileShader[i].type == shader)
     {
@@ -135,16 +139,16 @@ bool NpatchShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderType sh
     }
   }
 
+  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)", shaderName.c_str());
+
   RequestShaderInfo info;
-  info.type = shader;
-  info.name = shaderName;
-  info.vertexPrefix = vertexShader;
-  info.fragmentPrefix = fragmentShader;
-  mRequestedPrecompileShader.push_back(info);
-  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)",Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(shader, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+  info.type           = shader;
+  info.name           = std::move(shaderName);
+  info.vertexPrefix   = std::move(vertexShader);
+  info.fragmentPrefix = std::move(fragmentShader);
+  mRequestedPrecompileShader.emplace_back(std::move(info));
   return true;
 }
-
 
 } // namespace Internal
 

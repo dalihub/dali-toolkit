@@ -196,30 +196,34 @@ bool TextVisualShaderFactory::AddPrecompiledShader(PrecompileShaderOption& optio
   VisualFactoryCache::ShaderType type = featureBuilder.GetShaderType();
   featureBuilder.GetVertexShaderPrefixList(vertexPrefixList);
   featureBuilder.GetFragmentShaderPrefixList(fragmentPrefixList);
-  return SavePrecompileShader(type, vertexPrefixList, fragmentPrefixList);
+  return SavePrecompileShader(type, std::move(vertexPrefixList), std::move(fragmentPrefixList));
 }
 
-void TextVisualShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
+void TextVisualShaderFactory::GetPreCompiledShader(ShaderPreCompiler::RawShaderData& shaders)
 {
-  std::vector<std::string_view> vertexPrefix;
-  std::vector<std::string_view> fragmentPrefix;
-  std::vector<std::string_view> shaderName;
-  int                           shaderCount = 0;
+  std::vector<std::string> vertexPrefix;
+  std::vector<std::string> fragmentPrefix;
+  std::vector<std::string> shaderName;
+
+  uint32_t shaderCount = 0;
 
   // precompile requested shader first
   for(uint32_t i = 0u; i < mRequestedPrecompileShader.size(); i++)
   {
-    vertexPrefix.push_back(mRequestedPrecompileShader[i].vertexPrefix);
-    fragmentPrefix.push_back(mRequestedPrecompileShader[i].fragmentPrefix);
-    shaderName.push_back(Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+    vertexPrefix.push_back(std::move(mRequestedPrecompileShader[i].vertexPrefix));
+    fragmentPrefix.push_back(std::move(mRequestedPrecompileShader[i].fragmentPrefix));
+    shaderName.push_back(std::string(Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT)));
     shaderCount++;
   }
 
+  // Clean up requested precompile shader list
+  mRequestedPrecompileShader.clear();
+
   for(uint32_t i = 0u; i < PREDEFINED_SHADER_TYPE_COUNT; ++i)
   {
-    vertexPrefix.push_back(VertexPredefines[i]);
-    fragmentPrefix.push_back(FragmentPredefines[i]);
-    shaderName.push_back(Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+    vertexPrefix.push_back(std::string(VertexPredefines[i]));
+    fragmentPrefix.push_back(std::string(FragmentPredefines[i]));
+    shaderName.push_back(std::string(Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT)));
     shaderCount++;
   }
 
@@ -267,7 +271,7 @@ void TextVisualShaderFactory::CreatePrecompileShader(TextVisualShaderFeature::Fe
   }
 }
 
-bool TextVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix)
+bool TextVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string&& vertexPrefix, std::string&& fragmentPrefix)
 {
   for(uint32_t i = 0u; i < PREDEFINED_SHADER_TYPE_COUNT; i++)
   {
@@ -289,9 +293,9 @@ bool TextVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTyp
 
   RequestShaderInfo info;
   info.type           = shader;
-  info.vertexPrefix   = vertexPrefix;
-  info.fragmentPrefix = fragmentPrefix;
-  mRequestedPrecompileShader.push_back(info);
+  info.vertexPrefix   = std::move(vertexPrefix);
+  info.fragmentPrefix = std::move(fragmentPrefix);
+  mRequestedPrecompileShader.emplace_back(std::move(info));
   DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(shader, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
   return true;
 }

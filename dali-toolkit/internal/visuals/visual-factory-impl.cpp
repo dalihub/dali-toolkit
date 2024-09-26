@@ -43,7 +43,7 @@
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/internal/visuals/mesh/mesh-visual.h>
-#include <dali-toolkit/internal/visuals/npatch-shader-factory.h>
+#include <dali-toolkit/internal/visuals/npatch/npatch-shader-factory.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
@@ -440,36 +440,39 @@ void VisualFactory::UsePreCompiledShader()
   }
   mPrecompiledShaderRequested = true;
 
-  ShaderPreCompiler::Get().Enable();
+  ShaderPreCompiler::Get().Enable(true);
 
   // Get image shader
-  std::vector<RawShaderData> rawShaderList;
-  RawShaderData              imageShaderData;
+  ShaderPreCompiler::RawShaderDataList rawShaderList;
+  ShaderPreCompiler::RawShaderData     imageShaderData;
   GetImageVisualShaderFactory().GetPreCompiledShader(imageShaderData);
-  rawShaderList.push_back(imageShaderData);
+  rawShaderList.emplace_back(std::move(imageShaderData));
 
   // Get text shader
-  RawShaderData textShaderData;
+  ShaderPreCompiler::RawShaderData textShaderData;
   GetTextVisualShaderFactory().GetPreCompiledShader(textShaderData);
-  rawShaderList.push_back(textShaderData);
+  rawShaderList.emplace_back(std::move(textShaderData));
 
   // Get color shader
-  RawShaderData colorShaderData;
+  ShaderPreCompiler::RawShaderData colorShaderData;
   GetColorVisualShaderFactory().GetPreCompiledShader(colorShaderData);
-  rawShaderList.push_back(colorShaderData);
+  rawShaderList.emplace_back(std::move(colorShaderData));
 
-  RawShaderData npatchShaderData;
+  // Get npatch shader
+  ShaderPreCompiler::RawShaderData npatchShaderData;
   GetNpatchShaderFactory().GetPreCompiledShader(npatchShaderData);
-  rawShaderList.push_back(npatchShaderData);
+  rawShaderList.emplace_back(std::move(npatchShaderData));
 
   // Get 3D shader
+  // TODO
+
   // Get Custom shader
-  RawShaderData customShaderData;
+  ShaderPreCompiler::RawShaderData customShaderData;
   GetCustomShaderFactory().GetPreCompiledShader(customShaderData);
-  rawShaderList.push_back(customShaderData);
+  rawShaderList.emplace_back(std::move(customShaderData));
 
   // Save all shader
-  ShaderPreCompiler::Get().SavePreCompileShaderList(rawShaderList);
+  ShaderPreCompiler::Get().SavePreCompileShaderList(std::move(rawShaderList));
 }
 
 Internal::TextureManager& VisualFactory::GetTextureManager()

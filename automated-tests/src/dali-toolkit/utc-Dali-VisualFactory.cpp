@@ -2884,7 +2884,7 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactoryUsePreCompiledShader: Test a UsePreCompiledShader fucntion");
 
-  std::vector<RawShaderData> precompiledShaderList;
+  ShaderPreCompiler::RawShaderDataList precompiledShaderList;
   DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // before Get Shader
   ShaderPreCompiler::Get().GetPreCompileShaderList(precompiledShaderList);
   DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // after Get Shader
@@ -3001,7 +3001,7 @@ int UtcDaliVisualFactoryUsePreCompiledShaderN(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactoryUsePreCompiledShader: Test a UsePreCompiledShader fucntion with invalid options");
 
-  std::vector<RawShaderData> precompiledShaderList;
+  ShaderPreCompiler::RawShaderDataList precompiledShaderList;
   DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // before Get Shader
   ShaderPreCompiler::Get().GetPreCompileShaderList(precompiledShaderList);
   DALI_TEST_CHECK(precompiledShaderList.size() == 0u); // after Get Shader

@@ -31,7 +31,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 /**
  * NpatchShaderFactory is an object that provides custom shader
  */
@@ -57,7 +56,7 @@ public: // Implementation of VisualShaderFactoryInterface
   /**
    * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::GetPreCompiledShader
    */
-  void GetPreCompiledShader(RawShaderData& shaders) override;
+  void GetPreCompiledShader(ShaderPreCompiler::RawShaderData& shaders) override;
 
 private:
   /**
@@ -73,7 +72,7 @@ private:
   /**
    * @brief Save the npatch shader
    */
-  bool SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix);
+  bool SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string&& vertexPrefix, std::string&& fragmentPrefix);
 
 protected:
   /**

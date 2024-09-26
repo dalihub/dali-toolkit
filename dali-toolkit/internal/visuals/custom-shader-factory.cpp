@@ -41,44 +41,50 @@ bool CustomShaderFactory::AddPrecompiledShader(PrecompileShaderOption& option)
   auto shaderName     = option.GetShaderName();
   auto vertexShader   = option.GetVertexShader();
   auto fragmentShader = option.GetFragmentShader();
-  return SavePrecompileShader(shaderName, vertexShader, fragmentShader);
+  return SavePrecompileShader(std::move(shaderName), std::move(vertexShader), std::move(fragmentShader));
 }
 
-void CustomShaderFactory::GetPreCompiledShader(RawShaderData& shaders)
+void CustomShaderFactory::GetPreCompiledShader(ShaderPreCompiler::RawShaderData& shaders)
 {
-  std::vector<std::string_view> vertexPrefix;
-  std::vector<std::string_view> fragmentPrefix;
-  std::vector<std::string_view> shaderName;
-  int                           shaderCount = 0;
-  shaders.shaderCount                       = 0;
+  std::vector<std::string> vertexPrefix;
+  std::vector<std::string> fragmentPrefix;
+  std::vector<std::string> shaderName;
+
+  uint32_t shaderCount = 0;
+
+  shaders.shaderCount = 0;
 
   // precompile requested shader first
   for(uint32_t i = 0; i < mRequestedPrecompileShader.size(); i++)
   {
-    vertexPrefix.push_back(mRequestedPrecompileShader[i].vertexPrefix);
-    fragmentPrefix.push_back(mRequestedPrecompileShader[i].fragmentPrefix);
-    shaderName.push_back(mRequestedPrecompileShader[i].name);
+    vertexPrefix.push_back(std::move(mRequestedPrecompileShader[i].vertexPrefix));
+    fragmentPrefix.push_back(std::move(mRequestedPrecompileShader[i].fragmentPrefix));
+    shaderName.push_back(std::move(mRequestedPrecompileShader[i].name));
     shaderCount++;
   }
+
+  // Clean up requested precompile shader list
+  mRequestedPrecompileShader.clear();
 
   shaders.vertexPrefix   = std::move(vertexPrefix);
   shaders.fragmentPrefix = std::move(fragmentPrefix);
   shaders.shaderName     = std::move(shaderName);
   shaders.vertexShader   = ""; // Custom shader use prefix shader only. No need to set vertexShader and fragmentShader.
   shaders.fragmentShader = ""; // Custom shader use prefix shader only. No need to set vertexShader and fragmentShader.
-  shaders.shaderCount    = std::move(shaderCount);
+  shaders.shaderCount    = shaderCount;
   shaders.custom         = true;
 }
 
-bool CustomShaderFactory::SavePrecompileShader(std::string& shaderName, std::string& vertexShader, std::string& fragmentShader)
+bool CustomShaderFactory::SavePrecompileShader(std::string&& shaderName, std::string&& vertexShader, std::string&& fragmentShader)
 {
+  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)", shaderName.c_str());
+
   RequestShaderInfo info;
   info.type           = VisualFactoryCache::SHADER_TYPE_MAX; ///< Not be used
-  info.name           = shaderName;
-  info.vertexPrefix   = vertexShader;
-  info.fragmentPrefix = fragmentShader;
-  mRequestedPrecompileShader.push_back(info);
-  DALI_LOG_RELEASE_INFO("Add precompile shader success!!(%s)", shaderName.c_str());
+  info.name           = std::move(shaderName);
+  info.vertexPrefix   = std::move(vertexShader);
+  info.fragmentPrefix = std::move(fragmentShader);
+  mRequestedPrecompileShader.emplace_back(std::move(info));
   return true;
 }
 
