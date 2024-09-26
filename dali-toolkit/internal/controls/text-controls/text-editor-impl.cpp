@@ -632,8 +632,7 @@ void TextEditor::OnInitialize()
   self.Add(mStencil);
 
   // Accessibility
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::ENTRY);
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::ENTRY);
 
   Accessibility::Bridge::EnabledSignal().Connect(this, &TextEditor::OnAccessibilityStatusChanged);
   Accessibility::Bridge::DisabledSignal().Connect(this, &TextEditor::OnAccessibilityStatusChanged);
