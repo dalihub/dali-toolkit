@@ -61,7 +61,12 @@ WebView WebView::New(const std::string& locale, const std::string& timezoneId)
 
 WebView WebView::New(uint32_t argc, char** argv)
 {
-  return Internal::WebView::New(argc, argv);
+  return Internal::WebView::New(argc, argv, -1);
+}
+
+WebView WebView::New(uint32_t argc, char** argv, int32_t type)
+{
+  return Internal::WebView::New(argc, argv, type);
 }
 
 Toolkit::WebView WebView::FindWebView(Dali::WebEnginePlugin* plugin)
