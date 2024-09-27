@@ -38,6 +38,7 @@
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/control/control-visual-data.h>
 #include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
@@ -77,7 +78,7 @@ void CreateClippingRenderer(Control& controlImpl)
   {
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(controlImpl);
 
-    if(clippingMode == ClippingMode::CLIP_CHILDREN && controlDataImpl.mVisuals.Empty() && self.GetRendererCount() == 0u)
+    if(clippingMode == ClippingMode::CLIP_CHILDREN && controlDataImpl.mVisualData->mVisuals.Empty() && self.GetRendererCount() == 0u)
     {
       controlImpl.SetBackgroundColor(Color::TRANSPARENT);
     }
@@ -573,11 +574,11 @@ void Control::EmitKeyInputFocusSignal(bool focusGained)
 
 void Control::OnSceneConnection(int depth)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection number of registered visuals(%d)\n", mImpl->mVisuals.Size());
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection number of registered visuals(%d)\n", mImpl->mVisualData->mVisuals.Size());
 
   Actor self(Self());
 
-  for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter != mImpl->mVisuals.End(); iter++)
+  for(RegisteredVisualContainer::Iterator iter = mImpl->mVisualData->mVisuals.Begin(); iter != mImpl->mVisualData->mVisuals.End(); iter++)
   {
     // Check whether the visual is empty and enabled
     if((*iter)->visual && (*iter)->enabled)
