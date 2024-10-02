@@ -43,6 +43,7 @@
 #include <string.h>
 #include <toolkit-application.h>
 #include <memory>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-user-media-permission-request.h>
 
 namespace Dali
 {
@@ -1508,6 +1509,18 @@ public:
   void GetPlainTextAsynchronously(PlainTextReceivedCallback callback) override
   {
   }
+  void WebAuthenticationCancel() override
+  {
+  }
+  void RegisterWebAuthDisplayQRCallback(WebEngineWebAuthDisplayQRCallback callback) override
+  {
+  }
+  void RegisterWebAuthResponseCallback(WebEngineWebAuthResponseCallback callback) override
+  {
+  }
+  void RegisterUserMediaPermissionRequestCallback(WebEngineUserMediaPermissionRequestCallback callback) override
+  {
+  }
 
 private:
   MockWebEngineSettings        settings;
@@ -1997,6 +2010,26 @@ public:
     mTextFoundCallback = callback;
   }
 
+  void WebAuthenticationCancel()
+  {
+    mWebAuthenticationCancel = true;
+  }
+
+  void RegisterWebAuthDisplayQRCallback(Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback callback)
+  {
+    mWebAuthDisplayQRCallback = callback;
+  }
+
+  void RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback)
+  {
+    mWebAuthResponseCallback = callback;
+  }
+
+  void RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback)
+  {
+    mUserMediaPermissionRequestCallback = callback;
+  }
+
   std::string              mUrl;
   std::vector<std::string> mHistory;
   size_t                   mCurrentPlusOnePos;
@@ -2046,6 +2079,25 @@ public:
   Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback       mFullscreenEnteredCallback;
   Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback        mFullscreenExitedCallback;
   Dali::WebEnginePlugin::WebEngineTextFoundCallback               mTextFoundCallback;
+  bool                                                            mWebAuthenticationCancel;
+  Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback        mWebAuthDisplayQRCallback;
+  Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback         mWebAuthResponseCallback;
+  Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback mUserMediaPermissionRequestCallback;
+};
+
+class MockUserMediaPermissionRequest : public Dali::WebEngineUserMediaPermissionRequest
+{
+public:
+  MockUserMediaPermissionRequest()
+  {
+  }
+  void Set(bool allowed) const override
+  {
+  }
+  bool Suspend() const override
+  {
+    return true;
+  }
 };
 
 namespace
@@ -2175,6 +2227,19 @@ bool OnLoadUrl()
     if(gInstance->mTextFoundCallback)
     {
       gInstance->mTextFoundCallback(1);
+    }
+    if(gInstance->mWebAuthDisplayQRCallback)
+    {
+      gInstance->mWebAuthDisplayQRCallback("test-string");
+    }
+    if(gInstance->mWebAuthResponseCallback)
+    {
+      gInstance->mWebAuthResponseCallback();
+    }
+    if(gInstance->mUserMediaPermissionRequestCallback)
+    {
+      std::unique_ptr<Dali::WebEngineUserMediaPermissionRequest> request(new MockUserMediaPermissionRequest());
+      gInstance->mUserMediaPermissionRequestCallback(std::move(request), "message");
     }
   }
   return false;
@@ -2956,6 +3021,26 @@ void WebEngine::RegisterFullscreenExitedCallback(Dali::WebEnginePlugin::WebEngin
 void WebEngine::RegisterTextFoundCallback(Dali::WebEnginePlugin::WebEngineTextFoundCallback callback)
 {
   Internal::Adaptor::GetImplementation(*this).RegisterTextFoundCallback(callback);
+}
+
+void WebEngine::WebAuthenticationCancel()
+{
+  Internal::Adaptor::GetImplementation(*this).WebAuthenticationCancel();
+}
+
+void WebEngine::RegisterWebAuthDisplayQRCallback(Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterWebAuthDisplayQRCallback(callback);
+}
+
+void WebEngine::RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterWebAuthResponseCallback(callback);
+}
+
+void WebEngine::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterUserMediaPermissionRequestCallback(callback);
 }
 
 

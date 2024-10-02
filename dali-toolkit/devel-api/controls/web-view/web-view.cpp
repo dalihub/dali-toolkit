@@ -454,6 +454,27 @@ void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceive
   Dali::Toolkit::GetImpl(*this).GetPlainTextAsynchronously(callback);
 }
 
+void WebView::WebAuthenticationCancel()
+{
+  Dali::Toolkit::GetImpl(*this).WebAuthenticationCancel();
+}
+
+void WebView::RegisterWebAuthDisplayQRCallback(Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterWebAuthDisplayQRCallback(callback);
+}
+
+void WebView::RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterWebAuthResponseCallback(callback);
+}
+
+void WebView::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterUserMediaPermissionRequestCallback(callback);
+}
+
+
 WebView::WebView(Internal::WebView& implementation)
 : Control(implementation)
 {
