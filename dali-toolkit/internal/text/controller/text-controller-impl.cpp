@@ -1675,8 +1675,8 @@ bool Controller::Impl::IsScrollable(const Vector2& displacement)
     const bool isVerticalScrollEnabled   = mEventData->mDecorator->IsVerticalScrollEnabled();
     if(isHorizontalScrollEnabled || isVerticalScrollEnabled)
     {
-      const Vector2& targetSize     = mModel->mVisualModel->mControlSize;
-      const Vector2& layoutSize     = mModel->mVisualModel->GetLayoutSize();
+      const Vector2& targetSize = mModel->mVisualModel->mControlSize;
+      const Vector2& layoutSize = mModel->mVisualModel->GetLayoutSize();
 
       if(isHorizontalScrollEnabled)
       {
@@ -1766,6 +1766,26 @@ int32_t Controller::Impl::GetAnchorIndex(size_t characterOffset) const
   }
 
   return it == mModel->mLogicalModel->mAnchors.End() ? -1 : it - mModel->mLogicalModel->mAnchors.Begin();
+}
+
+bool Controller::Impl::ShouldClearFocusOnEscape() const
+{
+  if(DALI_UNLIKELY(mShouldClearFocusOnEscape == ClearFocusOnEscapeState::UNKNOWN))
+  {
+    mShouldClearFocusOnEscape = ClearFocusOnEscapeState::ENABLE;
+
+    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+    if(styleManager)
+    {
+      const auto clearFocusOnEscapeValue = Toolkit::DevelStyleManager::GetConfigurations(styleManager).Find("clearFocusOnEscape", Property::Type::BOOLEAN);
+
+      // Default is ENABLE. If config don't have "clearFocusOnEscape" property, make it ENABLE.
+      mShouldClearFocusOnEscape = (!clearFocusOnEscapeValue || clearFocusOnEscapeValue->Get<bool>()) ? ClearFocusOnEscapeState::ENABLE : ClearFocusOnEscapeState::DISABLE;
+    }
+  }
+  DALI_ASSERT_DEBUG(mShouldClearFocusOnEscape != ClearFocusOnEscapeState::UNKNOWN && "mShouldClearFocusOnEscape Should be set now");
+
+  return (mShouldClearFocusOnEscape == ClearFocusOnEscapeState::ENABLE);
 }
 
 void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearPreUnderlineRuns)

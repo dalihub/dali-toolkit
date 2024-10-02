@@ -316,6 +316,15 @@ struct OutlineDefaults
 
 struct Controller::Impl
 {
+public:
+  enum class ClearFocusOnEscapeState
+  {
+    UNKNOWN = -1, ///< Unknown state
+    ENABLE  = 0,
+    DISABLE = 1,
+  };
+
+public:
   Impl(ControlInterface*           controlInterface,
        EditableControlInterface*   editableControlInterface,
        SelectableControlInterface* selectableControlInterface,
@@ -360,7 +369,7 @@ struct Controller::Impl
     mOutlineSetByString(false),
     mFontStyleSetByString(false),
     mStrikethroughSetByString(false),
-    mShouldClearFocusOnEscape(true),
+    mShouldClearFocusOnEscape(ClearFocusOnEscapeState::UNKNOWN),
     mLayoutDirection(LayoutDirection::LEFT_TO_RIGHT),
     mCurrentLineSize(0.f),
     mTextFitMinSize(DEFAULT_TEXTFIT_MIN),
@@ -397,15 +406,6 @@ struct Controller::Impl
     // Set the text properties to default
     mModel->mVisualModel->SetUnderlineEnabled(false);
     mModel->mVisualModel->SetUnderlineHeight(0.0f);
-
-    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
-    if(styleManager)
-    {
-      const auto clearFocusOnEscapeValue = Toolkit::DevelStyleManager::GetConfigurations(styleManager).Find("clearFocusOnEscape", Property::Type::BOOLEAN);
-
-      // Default is true. If config don't have "clearFocusOnEscape" property, make it true.
-      mShouldClearFocusOnEscape = (!clearFocusOnEscapeValue || clearFocusOnEscapeValue->Get<bool>());
-    }
   }
 
   ~Impl()
@@ -1012,6 +1012,16 @@ struct Controller::Impl
    */
   Toolkit::TextAnchor CreateAnchorActor(Anchor anchor);
 
+  /**
+   * @brief Return true when text control should clear key input focus when escape key is pressed.
+   *
+   * @note We ask to style manager configurations, and store the option.
+   * @note Default is true. Mean, without any options, text control should clear key input focus when escape key is pressed.
+   *
+   * @return Whether text control should clear key input focus or not when escape key is pressed.
+   */
+  bool ShouldClearFocusOnEscape() const;
+
 public:
   /**
    * @brief Gets implementation from the controller handle.
@@ -1080,21 +1090,25 @@ public:
 
   std::vector<Toolkit::DevelTextLabel::FitOption> mTextFitArray; ///< List of FitOption for TextFitArray operation.
 
-  bool               mRecalculateNaturalSize : 1;         ///< Whether the natural size needs to be recalculated.
-  bool               mMarkupProcessorEnabled : 1;         ///< Whether the mark-up procesor is enabled.
-  bool               mClipboardHideEnabled : 1;           ///< Whether the ClipboardHide function work or not
-  bool               mIsAutoScrollEnabled : 1;            ///< Whether auto text scrolling is enabled.
-  bool               mIsAutoScrollMaxTextureExceeded : 1; ///< Whether auto text scrolling is exceed max texture size.
-  bool               mUpdateTextDirection : 1;            ///< Whether the text direction needs to be updated.
-  CharacterDirection mIsTextDirectionRTL : 1;             ///< Whether the text direction is right to left or not
+  bool mRecalculateNaturalSize : 1;         ///< Whether the natural size needs to be recalculated.
+  bool mMarkupProcessorEnabled : 1;         ///< Whether the mark-up procesor is enabled.
+  bool mClipboardHideEnabled : 1;           ///< Whether the ClipboardHide function work or not
+  bool mIsAutoScrollEnabled : 1;            ///< Whether auto text scrolling is enabled.
+  bool mIsAutoScrollMaxTextureExceeded : 1; ///< Whether auto text scrolling is exceed max texture size.
+  bool mUpdateTextDirection : 1;            ///< Whether the text direction needs to be updated.
 
-  bool                  mUnderlineSetByString : 1;     ///< Set when underline is set by string (legacy) instead of map
-  bool                  mShadowSetByString : 1;        ///< Set when shadow is set by string (legacy) instead of map
-  bool                  mOutlineSetByString : 1;       ///< Set when outline is set by string (legacy) instead of map
-  bool                  mFontStyleSetByString : 1;     ///< Set when font style is set by string (legacy) instead of map
-  bool                  mStrikethroughSetByString : 1; ///< Set when strikethrough is set by string (legacy) instead of map
-  bool                  mShouldClearFocusOnEscape : 1; ///< Whether text control should clear key input focus
-  LayoutDirection::Type mLayoutDirection;              ///< Current system language direction
+  CharacterDirection mIsTextDirectionRTL : 1; ///< Whether the text direction is right to left or not
+
+  bool mUnderlineSetByString : 1;     ///< Set when underline is set by string (legacy) instead of map
+  bool mShadowSetByString : 1;        ///< Set when shadow is set by string (legacy) instead of map
+  bool mOutlineSetByString : 1;       ///< Set when outline is set by string (legacy) instead of map
+  bool mFontStyleSetByString : 1;     ///< Set when font style is set by string (legacy) instead of map
+  bool mStrikethroughSetByString : 1; ///< Set when strikethrough is set by string (legacy) instead of map
+
+  mutable ClearFocusOnEscapeState mShouldClearFocusOnEscape : 3; ///< Whether text control should clear key input focus.
+                                                                 ///< Make it mutable so we can update it at const method.
+
+  LayoutDirection::Type mLayoutDirection; ///< Current system language direction
 
   Shader mShaderBackground; ///< The shader for text background.
 
