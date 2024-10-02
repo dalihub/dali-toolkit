@@ -472,6 +472,11 @@ bool UsdLoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::Loa
 {
   // Open the stage of the USD scene from the specified URL
   mImpl->mUsdStage = UsdStage::Open(url);
+  if(!mImpl->mUsdStage)
+  {
+    DALI_LOG_ERROR("Failed to open %s\n", url.c_str());
+    return false;
+  }
 
   mImpl->mMeshCount       = 0;
   mImpl->mNodeIndex       = INVALID_INDEX;
