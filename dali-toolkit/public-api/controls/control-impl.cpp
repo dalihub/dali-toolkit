@@ -665,6 +665,7 @@ void Control::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool
   if(mImpl->mRenderEffect)
   {
     Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(mImpl->mRenderEffect.GetObjectPtr());
+    DALI_ASSERT_ALWAYS(object && "Not a valid RenderEffect. we can't GetOffScreenRenderTasks");
     object->GetOffScreenRenderTasks(tasks, isForward);
   }
 }
