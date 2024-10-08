@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ class ControlAccessible;
 
 namespace Internal
 {
+
 /**
  * @brief This is the internal base class for all controls.
  *
@@ -131,7 +132,7 @@ public:
    *
    * @see CreateAccessibleObject()
    */
-  std::shared_ptr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
+  Toolkit::DevelControl::ControlAccessible* GetAccessibleObject();
 
   // Gesture Detection
 
@@ -277,6 +278,7 @@ public:
   DALI_INTERNAL void KeyboardEnter();
   /// @endcond
 
+
   // Signals
 
   /**
@@ -405,6 +407,7 @@ protected: // From CustomActorImpl
   void OnLayoutNegotiated(float size, Dimension::Type dimension) override;
 
 public: // Helpers for deriving classes
+
   /**
    * @brief Flags for the constructor.
    * @SINCE_1_0.0
@@ -686,7 +689,8 @@ public: // API for derived classes to override
    * @param[in] destination Destination control of the animation.
    * @param[in] visualIndex Property::Index to make animation.
    */
-  void MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali::Property::Map& destinationPropertyMap, Dali::Toolkit::Control source, Dali::Toolkit::Control destination, Dali::Property::Index visualIndex);
+  void MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali::Property::Map& destinationPropertyMap,
+                            Dali::Toolkit::Control source, Dali::Toolkit::Control destination, Dali::Property::Index visualIndex);
 
   /**
    * @brief Retrieves source and destination visual properties for the Transition of this Control.

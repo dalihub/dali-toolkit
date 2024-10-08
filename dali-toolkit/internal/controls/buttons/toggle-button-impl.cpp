@@ -404,7 +404,7 @@ void ToggleButton::OnStateChange(State newState)
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
   if((Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor()) && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
-    auto accessible = GetAccessibleObject();
+    auto* accessible = GetAccessibleObject();
     if(DALI_LIKELY(accessible))
     {
       accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);

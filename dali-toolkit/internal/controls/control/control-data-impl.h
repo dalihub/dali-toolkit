@@ -413,7 +413,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Internal::Control::GetAccessibleObject()
    */
-  std::shared_ptr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
+  Toolkit::DevelControl::ControlAccessible* GetAccessibleObject();
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::IsAccessibleCreated()
@@ -566,7 +566,8 @@ public:
     bool                                                                              isModal{false};
   } mAccessibilityProps;
 
-  bool mAccessibleCreatable = true;
+  bool                                                      mAccessibleCreatable = true;
+  std::unique_ptr<Toolkit::DevelControl::ControlAccessible> mAccessibleObject;
 
   // Gesture Detection
   PinchGestureDetector     mPinchGestureDetector;

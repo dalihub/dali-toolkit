@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
-#include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
+#include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
@@ -173,7 +173,7 @@ void Control::SetResourceReady(bool relayoutRequest)
   controlDataImpl.ResourceReady(relayoutRequest);
 }
 
-std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::GetAccessibleObject()
+Toolkit::DevelControl::ControlAccessible* Control::GetAccessibleObject()
 {
   return mImpl->GetAccessibleObject();
 }
@@ -513,7 +513,7 @@ void Control::EmitKeyInputFocusSignal(bool focusGained)
       auto parent = accessible->GetParent();
       if(parent && !accessible->GetStates()[Dali::Accessibility::State::MANAGES_DESCENDANTS])
       {
-        parent->EmitActiveDescendantChanged(accessible.get());
+        parent->EmitActiveDescendantChanged(accessible);
       }
     }
   }
@@ -596,7 +596,7 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
     }
     case Actor::Property::VISIBLE:
     {
-      auto accessible = GetAccessibleObject();
+      auto* accessible = GetAccessibleObject();
       if(DALI_LIKELY(accessible))
       {
         accessible->EmitVisible(Self().GetProperty<bool>(Actor::Property::VISIBLE));
@@ -606,7 +606,7 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
     case DevelActor::Property::USER_INTERACTION_ENABLED:
     {
       const bool enabled = propertyValue.Get<bool>();
-      if(!enabled && Self() == Dali::Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor())
+      if (!enabled && Self() == Dali::Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor())
       {
         Dali::Toolkit::KeyboardFocusManager::Get().ClearFocus();
       }
@@ -750,7 +750,8 @@ void Control::SignalDisconnected(SlotObserver* slotObserver, CallbackBase* callb
   mImpl->SignalDisconnected(slotObserver, callback);
 }
 
-void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali::Property::Map& destinationPropertyMap, Dali::Toolkit::Control source, Dali::Toolkit::Control destination, Dali::Property::Index visualIndex)
+void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali::Property::Map& destinationPropertyMap,
+                                   Dali::Toolkit::Control source, Dali::Toolkit::Control destination, Dali::Property::Index visualIndex)
 {
   sourcePropertyMap.Clear();
   destinationPropertyMap.Clear();
@@ -769,7 +770,8 @@ void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali:
   sourceVisual.CreatePropertyMap(sourceMap);
   destinationVisual.CreatePropertyMap(destinationMap);
 
-  static auto findValueVector4 = [](const Property::Map& map, Property::Index index, const Vector4& defaultValue = Vector4()) -> Vector4 {
+  static auto findValueVector4 = [](const Property::Map& map, Property::Index index, const Vector4& defaultValue = Vector4()) -> Vector4
+  {
     Property::Value* propertyValue = map.Find(index);
     if(propertyValue)
     {
@@ -778,7 +780,8 @@ void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali:
     return defaultValue;
   };
 
-  static auto findValueFloat = [](const Property::Map& map, Property::Index index, const float& defaultValue = 0.0f) -> float {
+  static auto findValueFloat = [](const Property::Map& map, Property::Index index, const float& defaultValue = 0.0f) -> float
+  {
     Property::Value* propertyValue = map.Find(index);
     if(propertyValue)
     {

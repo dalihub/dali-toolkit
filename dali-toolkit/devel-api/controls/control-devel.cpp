@@ -39,14 +39,14 @@ Dali::Toolkit::Internal::Control::Impl& GetControlImplementation(Dali::Toolkit::
 
 Dali::Toolkit::DevelControl::ControlAccessible* GetControlAccessible(Dali::Toolkit::Control control)
 {
-  auto controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  auto* controlAccessible = GetControlImplementation(control).GetAccessibleObject();
 
   if(DALI_UNLIKELY(!controlAccessible))
   {
     DALI_LOG_ERROR("Accessibility API used on Control without an Accessible");
   }
 
-  return controlAccessible.get();
+  return controlAccessible;
 }
 
 } // unnamed namespace
@@ -294,7 +294,7 @@ Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType(Toolkit::C
 
 bool ClearAccessibilityHighlight(Toolkit::Control control)
 {
-  auto controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  auto* controlAccessible = GetControlAccessible(control);
   if(DALI_LIKELY(controlAccessible))
   {
     return controlAccessible->ClearHighlight();
@@ -304,7 +304,7 @@ bool ClearAccessibilityHighlight(Toolkit::Control control)
 
 bool GrabAccessibilityHighlight(Toolkit::Control control)
 {
-  auto controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  auto* controlAccessible = GetControlAccessible(control);
   if(DALI_LIKELY(controlAccessible))
   {
     return controlAccessible->GrabHighlight();
@@ -314,7 +314,7 @@ bool GrabAccessibilityHighlight(Toolkit::Control control)
 
 Dali::Accessibility::States GetAccessibilityStates(Toolkit::Control control)
 {
-  auto controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  auto* controlAccessible = GetControlAccessible(control);
   if(DALI_LIKELY(controlAccessible))
   {
     return controlAccessible->GetStates();
@@ -324,7 +324,7 @@ Dali::Accessibility::States GetAccessibilityStates(Toolkit::Control control)
 
 void NotifyAccessibilityStateChange(Toolkit::Control control, Dali::Accessibility::States states, bool recurse)
 {
-  auto controlAccessible = GetControlImplementation(control).GetAccessibleObject();
+  auto* controlAccessible = GetControlAccessible(control);
   if(DALI_LIKELY(controlAccessible))
   {
     controlAccessible->NotifyAccessibilityStateChange(std::move(states), recurse);
@@ -348,7 +348,7 @@ bool IsCreateAccessibleEnabled(Toolkit::Control control)
 
 void EmitAccessibilityStateChanged(Dali::Actor actor, Accessibility::State state, int newValue)
 {
-  auto accessible = Accessibility::Accessible::GetOwningPtr(actor);
+  auto accessible = Accessibility::Accessible::Get(actor);
   if(DALI_LIKELY(accessible))
   {
     auto control = Toolkit::Control::DownCast(actor);

@@ -507,6 +507,19 @@ static bool IsShowingGeometryOnScreen(Dali::Rect<> rect)
   return rect.width > 0 && rect.height > 0;
 }
 
+Dali::Accessibility::Accessible* ExternalAccessibleGetter(Dali::Actor actor)
+{
+  auto control = Toolkit::Control::DownCast(actor);
+  if(!control)
+  {
+    return nullptr;
+  }
+
+  auto& controlImpl = Toolkit::Internal::GetImplementation(control);
+
+  return controlImpl.GetAccessibleObject();
+}
+
 } // unnamed namespace
 
 // clang-format off
@@ -578,21 +591,7 @@ Control::Impl::Impl(Control& controlImpl)
   mNeedToEmitResourceReady(false),
   mDispatchKeyEvents(true)
 {
-  Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::pair<std::shared_ptr<Accessibility::Accessible>, bool> {
-    auto control = Toolkit::Control::DownCast(actor);
-    if(!control)
-    {
-      return {nullptr, true};
-    }
-
-    auto& controlImpl = Toolkit::Internal::GetImplementation(control);
-    if(controlImpl.mImpl->IsCreateAccessibleEnabled())
-    {
-      return {std::shared_ptr<DevelControl::ControlAccessible>(controlImpl.CreateAccessibleObject()), true};
-    }
-
-    return {nullptr, false};
-  });
+  Dali::Accessibility::Accessible::RegisterExternalAccessibleGetter(&ExternalAccessibleGetter);
   mAccessibilityProps.states[DevelControl::AccessibilityState::ENABLED] = true;
 }
 
@@ -635,7 +634,7 @@ void Control::Impl::CheckHighlightedObjectGeometry()
   {
     auto lastPosition   = accessible->GetLastPosition();
     auto accessibleRect = accessible->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
-    auto rect           = GetShowingGeometry(accessibleRect, accessible.get());
+    auto rect           = GetShowingGeometry(accessibleRect, accessible);
 
     switch(mAccessibilityLastScreenRelativeMoveType)
     {
@@ -1477,7 +1476,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         {
           controlImpl.mImpl->mAccessibilityProps.isHidden = hidden;
 
-          auto accessible = controlImpl.GetAccessibleObject();
+          auto* accessible = controlImpl.GetAccessibleObject();
           if(DALI_LIKELY(accessible))
           {
             auto* parent = dynamic_cast<Dali::Accessibility::ActorAccessible*>(accessible->GetParent());
@@ -2179,14 +2178,19 @@ void Control::Impl::OnIdleCallback()
   mIdleCallback = nullptr;
 }
 
-std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::Impl::GetAccessibleObject()
+Toolkit::DevelControl::ControlAccessible* Control::Impl::GetAccessibleObject()
 {
-  return std::dynamic_pointer_cast<DevelControl::ControlAccessible>(Accessibility::Accessible::GetOwningPtr(mControlImpl.Self()));
+  if(mAccessibleCreatable && !mAccessibleObject)
+  {
+    mAccessibleObject.reset(mControlImpl.CreateAccessibleObject());
+  }
+
+  return mAccessibleObject.get();
 }
 
 bool Control::Impl::IsAccessibleCreated() const
 {
-  return !!Accessibility::Bridge::GetCurrentBridge()->GetAccessible(mControlImpl.Self());
+  return !!mAccessibleObject;
 }
 
 void Control::Impl::EnableCreateAccessible(bool enable)
