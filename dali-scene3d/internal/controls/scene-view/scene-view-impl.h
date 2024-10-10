@@ -339,6 +339,66 @@ public:
   bool IsEnabledCropToMask();
 
   /**
+   * @brief Sets the radius value of each corner.
+   * @param[in] cornerRadius Radius value of each corner.
+   */
+  void SetCornerRadius(Vector4 cornerRadius);
+
+  /**
+   * @brief Retrieves the radius value of each corner.
+   * @return The radius value of each corner.
+   */
+  Vector4 GetCornerRadius() const;
+
+  /**
+   * @brief Sets the policy of corner radius value.
+   * @param[in] cornerRadiusPolicy Policy of corner radius value.
+   */
+  void SetCornerRadiusPolicy(int cornerRadiusPolicy);
+
+  /**
+   * @brief Retrieves the policy of corner radius value.
+   * @return The policy of corner radius value.
+   */
+  int GetCornerRadiusPolicy() const;
+
+  /**
+   * @brief Sets the width of borderline.
+   * @param[in] borderlineWidth The width of borderline.
+   */
+  void SetBorderlineWidth(float borderlineWidth);
+
+  /**
+   * @brief Retrieves the width of borderline.
+   * @return The width of borderline.
+   */
+  float GetBorderlineWidth() const;
+
+  /**
+   * @brief Sets the color of borderline.
+   * @param[in] borderlineColor The color of borderline.
+   */
+  void SetBorderlineColor(Vector4 borderlineColor);
+
+  /**
+   * @brief Retrieves the color of borderline.
+   * @return The color of borderline.
+   */
+  Vector4 GetBorderlineColor() const;
+
+  /**
+   * @brief Sets the offset of borderline.
+   * @param[in] borderlineOffset The offset of borderline.
+   */
+  void SetBorderlineOffset(float borderlineOffset);
+
+  /**
+   * @brief Retrieves the offset of borderline.
+   * @return The offset of borderline.
+   */
+  float GetBorderlineOffset() const;
+
+  /**
    * @brief Gets current RenderTask
    */
   Dali::RenderTask GetRenderTask();
@@ -616,6 +676,17 @@ private: // Implementation of Processor
   float       mMaskContentScaleFactor{1.0f};
   bool        mCropToMask{true};
   bool        mMaskingPropertyChanged{false};
+
+  // Corner Radius
+  Vector4 mCornerRadius{Vector4::ZERO};
+  int     mCornerRadiusPolicy; ///< Should be initialize at .cpp
+
+  // Borderline
+  float   mBorderlineWidth{0.0f};
+  Vector4 mBorderlineColor{Color::BLACK};
+  float   mBorderlineOffset{0.0f};
+
+  bool mDecoratedVisualPropertyChanged{false};
 
   // Shader Factory
   Dali::Scene3D::Loader::ShaderManagerPtr mShaderManager;

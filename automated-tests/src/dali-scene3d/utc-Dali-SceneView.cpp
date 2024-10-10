@@ -27,7 +27,6 @@
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
 
-
 using namespace Dali;
 using namespace Dali::Toolkit;
 
@@ -1200,6 +1199,56 @@ int UtcDaliSceneViewMasking(void)
   END_TEST;
 }
 
+int UtcDaliSceneViewCornerRadius(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  application.GetScene().Add(view);
+
+  DALI_TEST_EQUALS(view.GetProperty<Vector4>(Dali::Scene3D::SceneView::Property::CORNER_RADIUS), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<int>(Dali::Scene3D::SceneView::Property::CORNER_RADIUS_POLICY), static_cast<int>(Visual::Transform::Policy::ABSOLUTE), TEST_LOCATION);
+
+  Vector4 expectCornerRadius       = Vector4(0.5f, 0.3f, 0.2f, 0.0f);
+  int     expectCornerRadiusPolicy = static_cast<int>(Visual::Transform::Policy::RELATIVE);
+
+  view.UseFramebuffer(true);
+  view.SetProperty(Dali::Scene3D::SceneView::Property::CORNER_RADIUS, expectCornerRadius);
+  view.SetProperty(Dali::Scene3D::SceneView::Property::CORNER_RADIUS_POLICY, expectCornerRadiusPolicy);
+
+  DALI_TEST_EQUALS(view.GetProperty<Vector4>(Dali::Scene3D::SceneView::Property::CORNER_RADIUS), expectCornerRadius, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<int>(Dali::Scene3D::SceneView::Property::CORNER_RADIUS_POLICY), expectCornerRadiusPolicy, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneViewBorderline(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  application.GetScene().Add(view);
+
+  DALI_TEST_EQUALS(view.GetProperty<float>(Dali::Scene3D::SceneView::Property::BORDERLINE_WIDTH), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<Vector4>(Dali::Scene3D::SceneView::Property::BORDERLINE_COLOR), Color::BLACK, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<float>(Dali::Scene3D::SceneView::Property::BORDERLINE_OFFSET), 0.0f, TEST_LOCATION);
+
+  float   expectBorderlineWidth  = 10.0f;
+  Vector4 expectBorderlineColor  = Vector4(0.5f, 0.3f, 0.2f, 0.1f);
+  float   expectBorderlineOffset = -1.0f;
+
+  view.UseFramebuffer(true);
+  view.SetProperty(Dali::Scene3D::SceneView::Property::BORDERLINE_WIDTH, expectBorderlineWidth);
+  view.SetProperty(Dali::Scene3D::SceneView::Property::BORDERLINE_COLOR, expectBorderlineColor);
+  view.SetProperty(Dali::Scene3D::SceneView::Property::BORDERLINE_OFFSET, expectBorderlineOffset);
+
+  DALI_TEST_EQUALS(view.GetProperty<float>(Dali::Scene3D::SceneView::Property::BORDERLINE_WIDTH), expectBorderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<Vector4>(Dali::Scene3D::SceneView::Property::BORDERLINE_COLOR), expectBorderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<float>(Dali::Scene3D::SceneView::Property::BORDERLINE_OFFSET), expectBorderlineOffset, TEST_LOCATION);
+
+  END_TEST;
+}
+
 namespace
 {
 static bool              gCaptureFinishedCalled{false};
@@ -1213,9 +1262,9 @@ void OnCaptureFinished(Scene3D::SceneView sceneView, int32_t captureId, const To
   gCapturedImageUrl      = capturedImageUrl;
 }
 
-static int32_t                                             gCapturedCount{0};
-static std::vector<int32_t>                                gCaptureIds;
-static std::vector<Toolkit::ImageUrl>                      gCapturedImageUrls;
+static int32_t                        gCapturedCount{0};
+static std::vector<int32_t>           gCaptureIds;
+static std::vector<Toolkit::ImageUrl> gCapturedImageUrls;
 
 void OnCaptureMultipleFinished(Scene3D::SceneView sceneView, int32_t captureId, const Toolkit::ImageUrl& capturedImageUrl)
 {
@@ -1259,7 +1308,7 @@ int UtcDaliSceneViewCapture01(void)
   view.Add(camera);
 
   gCaptureFinishedCalled = false;
-  gCaptureId = -1;
+  gCaptureId             = -1;
   gCapturedImageUrl.Reset();
   int32_t captureId = view.Capture(camera, Vector2(300, 300));
 
@@ -1277,7 +1326,7 @@ int UtcDaliSceneViewCapture01(void)
   Toolkit::ImageUrl tempImageUrl = gCapturedImageUrl;
 
   gCaptureFinishedCalled = false;
-  gCaptureId = -1;
+  gCaptureId             = -1;
   gCapturedImageUrl.Reset();
   int32_t captureId2 = view.Capture(camera, Vector2(400, 400));
 
@@ -1333,7 +1382,7 @@ int UtcDaliSceneViewCapture02(void)
   gCapturedCount = 0;
   gCaptureIds.clear();
   gCapturedImageUrls.clear();
-  int32_t captureId = view.Capture(camera, Vector2(300, 300));
+  int32_t captureId  = view.Capture(camera, Vector2(300, 300));
   int32_t captureId2 = view.Capture(camera, Vector2(300, 300));
 
   application.SendNotification();
@@ -1393,7 +1442,7 @@ int UtcDaliSceneViewCaptureCancel(void)
   view.Add(camera);
 
   gCaptureFinishedCalled = false;
-  gCaptureId = -1;
+  gCaptureId             = -1;
   gCapturedImageUrl.Reset();
   int32_t captureId = view.Capture(camera, Vector2(300, 300));
 
@@ -1403,9 +1452,8 @@ int UtcDaliSceneViewCaptureCancel(void)
   DALI_TEST_EQUALS(gCaptureId, captureId, TEST_LOCATION);
   DALI_TEST_EQUALS(!!gCapturedImageUrl, false, TEST_LOCATION);
 
-
   gCaptureFinishedCalled = false;
-  gCaptureId = -1;
+  gCaptureId             = -1;
   gCapturedImageUrl.Reset();
 
   application.SendNotification();
@@ -1453,7 +1501,7 @@ int UtcDaliSceneViewCaptureFailed(void)
   view.Add(camera);
 
   gCaptureFinishedCalled = false;
-  gCaptureId = -1;
+  gCaptureId             = -1;
   gCapturedImageUrl.Reset();
   int32_t captureId = view.Capture(camera, Vector2(300, 300));
 
@@ -1466,7 +1514,7 @@ int UtcDaliSceneViewCaptureFailed(void)
   DALI_TEST_EQUALS(!!gCapturedImageUrl, false, TEST_LOCATION);
 
   gCaptureFinishedCalled = false;
-  gCaptureId = -1;
+  gCaptureId             = -1;
   gCapturedImageUrl.Reset();
 
   application.SendNotification();
@@ -1505,7 +1553,7 @@ int UtcDaliSceneViewCaptureFailed2(void)
   view.Add(camera);
 
   gCaptureFinishedCalled = false;
-  gCaptureId = -1;
+  gCaptureId             = -1;
   gCapturedImageUrl.Reset();
   int32_t captureId = view.Capture(camera, Vector2(300, 300));
 
@@ -1577,10 +1625,10 @@ int UtcDaliSceneViewRenderTaskOrdering(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliPanelRenderTaskOrdering");
 
-  Integration::Scene scene = application.GetScene();
-  RenderTaskList taskList = scene.GetRenderTaskList();
+  Integration::Scene scene    = application.GetScene();
+  RenderTaskList     taskList = scene.GetRenderTaskList();
 
-  uint32_t defaultTaskCount = taskList.GetTaskCount();
+  uint32_t   defaultTaskCount  = taskList.GetTaskCount();
   RenderTask defaultRenderTask = taskList.GetTask(defaultTaskCount - 1);
   tet_printf("default Task Cnt : %d\n", defaultTaskCount);
 
@@ -1588,8 +1636,8 @@ int UtcDaliSceneViewRenderTaskOrdering(void)
   sceneView.UseFramebuffer(true);
   scene.Add(sceneView);
 
-  uint32_t afterSceneViewTaskCount = taskList.GetTaskCount();
-  RenderTask sceneViewRenderTask = taskList.GetTask(afterSceneViewTaskCount - 1);
+  uint32_t   afterSceneViewTaskCount = taskList.GetTaskCount();
+  RenderTask sceneViewRenderTask     = taskList.GetTask(afterSceneViewTaskCount - 1);
   tet_printf("after SceneView Task cnt : %d\n", afterSceneViewTaskCount);
   DALI_TEST_CHECK(afterSceneViewTaskCount == defaultTaskCount + 1);
 
@@ -1600,10 +1648,10 @@ int UtcDaliSceneViewRenderTaskOrdering(void)
 
   sceneView.Add(control1);
 
-  uint32_t afterBlurEffectTaskCount = taskList.GetTaskCount();
-  RenderTask blurSourceRenderTask = taskList.GetTask(afterBlurEffectTaskCount - 3);
+  uint32_t   afterBlurEffectTaskCount = taskList.GetTaskCount();
+  RenderTask blurSourceRenderTask     = taskList.GetTask(afterBlurEffectTaskCount - 3);
   RenderTask blurHorizontalRenderTask = taskList.GetTask(afterBlurEffectTaskCount - 2);
-  RenderTask blurVerticalRenderTask = taskList.GetTask(afterBlurEffectTaskCount - 1);
+  RenderTask blurVerticalRenderTask   = taskList.GetTask(afterBlurEffectTaskCount - 1);
   tet_printf("after blurEffect Task cnt : %d\n", afterBlurEffectTaskCount);
   DALI_TEST_CHECK(afterBlurEffectTaskCount == afterSceneViewTaskCount + 3);
 
