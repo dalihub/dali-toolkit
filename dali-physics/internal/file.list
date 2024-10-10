@@ -11,6 +11,11 @@ set(physics2d_src_files ${physics_src_files}
   ${physics_internal_dir}/physics-world-impl.cpp
 )
 
+set(physics2d_gles_src_files
+  ${physics2d_internal_dir}/chipmunk-physics-debug-renderer-gles.cpp
+  ${physics_internal_dir}/physics-debug-renderer-gles.cpp
+)
+
 set(physics3d_src_files ${physics_src_files}
   ${physics3d_internal_dir}/bullet-physics-actor-impl.cpp
   ${physics3d_internal_dir}/bullet-physics-adaptor-impl.cpp
@@ -18,4 +23,9 @@ set(physics3d_src_files ${physics_src_files}
   ${physics3d_internal_dir}/bullet-physics-world-impl.cpp
   ${physics_internal_dir}/physics-adaptor-impl.cpp
   ${physics_internal_dir}/physics-world-impl.cpp
+)
+
+set(physics3d_gles_src_files
+  ${physics3d_internal_dir}/bullet-physics-debug-renderer-gles.cpp
+  ${physics_internal_dir}/physics-debug-renderer-gles.cpp
 )

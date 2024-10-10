@@ -10,6 +10,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/controls/buttons/push-button.cpp
   ${public_api_src_dir}/controls/buttons/radio-button.cpp
   ${public_api_src_dir}/controls/flex-container/flex-container.cpp
+  ${public_api_src_dir}/controls/gl-view/gl-view.cpp
   ${public_api_src_dir}/controls/image-view/image-view.cpp
   ${public_api_src_dir}/controls/model3d-view/model3d-view.cpp
   ${public_api_src_dir}/controls/progress-bar/progress-bar.cpp
@@ -50,10 +51,6 @@ SET( public_api_src_files
   ${public_api_src_dir}/focus-manager/keyboard-focus-manager.cpp
   ${public_api_src_dir}/dali-toolkit-version.cpp
   ${public_api_src_dir}/enums.cpp
-)
-
-SET(public_api_egl_src_files
-  ${public_api_src_dir}/controls/gl-view/gl-view.cpp
 )
 
 # Add public header files here

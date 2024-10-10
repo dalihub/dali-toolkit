@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,14 @@
 #include <dali-physics/internal/bullet-impl/bullet-physics-debug-renderer.h>
 
 // External Includes
-#include <dali/dali.h>
+#include <dali/devel-api/common/addon-binder.h>
+#include <dali/public-api/adaptor-framework/graphics-backend.h>
+#include <dali/public-api/math/degree.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/radian.h>
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector4.h>
 
 // Internal Includes
 #include <dali-physics/internal/physics-adaptor-impl.h>
@@ -30,80 +37,32 @@ using Dali::Radian;
 using Dali::Vector3;
 using Dali::Vector4;
 
-namespace
-{
-GLuint LoadShader(GLenum shaderType, const char* shaderSource)
-{
-  GLuint shader = glCreateShader(shaderType);
-  if(shader != 0)
-  {
-    glShaderSource(shader, 1, &shaderSource, NULL);
-    glCompileShader(shader);
-    GLint compiled = 0;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-    if(compiled != GL_TRUE)
-    {
-      GLint infoLen = 0;
-      glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
-
-      if(infoLen > 0)
-      {
-        std::vector<char> logBuffer;
-        logBuffer.resize(infoLen + 1);
-        glGetShaderInfoLog(shader, infoLen, NULL, &logBuffer[0]);
-        fprintf(stderr, "%s\n", &logBuffer[0]);
-        fflush(stderr);
-
-        glDeleteShader(shader);
-        shader = 0;
-      }
-    }
-  }
-  return shader;
-}
-
-GLuint CreateProgram(const char* vertexSource, const char* fragmentSource)
-{
-  GLuint vertexShader = LoadShader(GL_VERTEX_SHADER, vertexSource);
-  if(!vertexShader)
-  {
-    return 0;
-  }
-  GLuint fragmentShader = LoadShader(GL_FRAGMENT_SHADER, fragmentSource);
-  if(!fragmentShader)
-  {
-    return 0;
-  }
-  GLuint program = glCreateProgram();
-  if(program)
-  {
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
-    GLint linkStatus = GL_FALSE;
-    glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
-    if(linkStatus != GL_TRUE)
-    {
-      GLint bufLength = 0;
-      glGetProgramiv(program, GL_INFO_LOG_LENGTH, &bufLength);
-      if(bufLength)
-      {
-        std::vector<char> logBuffer;
-        logBuffer.resize(bufLength + 1);
-        glGetProgramInfoLog(program, bufLength, NULL, &logBuffer[0]);
-        fprintf(stderr, "%s\n", &logBuffer[0]);
-        fflush(stderr);
-      }
-      glDeleteProgram(program);
-      program = 0;
-    }
-  }
-  return program;
-}
-} // namespace
-
 namespace Dali::Toolkit::Physics::Internal
 {
+namespace
+{
+const char* const DALI_PHYSICS_BULLET_GLES_SO("libdali2-physics-3d-gles.so");
+const char* const DALI_PHYSICS_BULLET_GLES_ADDON_NAME("PhysicsBulletGlesAddOn");
+
+struct PhysicsBulletGlesAddOn : public Dali::AddOn::AddOnBinder
+{
+  PhysicsBulletGlesAddOn()
+  : Dali::AddOn::AddOnBinder(DALI_PHYSICS_BULLET_GLES_ADDON_NAME, DALI_PHYSICS_BULLET_GLES_SO)
+  {
+  }
+
+  ~PhysicsBulletGlesAddOn() = default;
+
+  ADDON_BIND_FUNCTION(CreateGlesPhysicsDebugRenderer, Gles::DebugRenderer*());
+  ADDON_BIND_FUNCTION(DeleteGlesPhysicsDebugRenderer, void(Gles::DebugRenderer*));
+  ADDON_BIND_FUNCTION(SetViewport, void(int, int));
+  ADDON_BIND_FUNCTION(Setup, void(Gles::DebugRenderer&, int, int));
+  ADDON_BIND_FUNCTION(RenderLines, void(Gles::DebugRenderer&, const void*, std::size_t, int, const Dali::Matrix&, const Dali::Matrix&));
+};
+
+std::unique_ptr<PhysicsBulletGlesAddOn> gPhysicsBulletGlesAddOn;
+} // namespace
+
 std::unique_ptr<PhysicsDebugRenderer> PhysicsDebugRenderer::New(uint32_t width, uint32_t height, Dali::CameraActor camera, PhysicsAdaptor* adaptor)
 {
   auto renderer             = std::make_unique<PhysicsDebugRenderer>(width, height, camera, adaptor);
@@ -115,43 +74,43 @@ PhysicsDebugRenderer::PhysicsDebugRenderer(uint32_t width, uint32_t height, Dali
 : mCamera(camera),
   mWidth(width),
   mHeight(height),
-  mAdaptor(*adaptor),
-  mVertexLocation(-1),
-  mVertexColourLocation(-1),
-  mProjectionLocation(-1),
-  mModelViewLocation(-1),
-  mBufferId(0u),
-  mProgramId(0u)
+  mAdaptor(*adaptor)
 {
+  if(Graphics::GetCurrentGraphicsBackend() == Graphics::Backend::GLES)
+  {
+    if(!gPhysicsBulletGlesAddOn)
+    {
+      gPhysicsBulletGlesAddOn.reset(new PhysicsBulletGlesAddOn);
+    }
+    DALI_ASSERT_ALWAYS(gPhysicsBulletGlesAddOn && "Cannot load the Bullet Debug Renderer Gles Addon\n");
+    mImpl = gPhysicsBulletGlesAddOn->CreateGlesPhysicsDebugRenderer();
+  }
+}
+
+PhysicsDebugRenderer::~PhysicsDebugRenderer()
+{
+  if(gPhysicsBulletGlesAddOn)
+  {
+    gPhysicsBulletGlesAddOn->DeleteGlesPhysicsDebugRenderer(mImpl);
+    mImpl = nullptr;
+  }
 }
 
 bool PhysicsDebugRenderer::OnRender(const Dali::RenderCallbackInput& input)
 {
-  if(mState == State::INIT)
+  if(gPhysicsBulletGlesAddOn && mImpl)
   {
-    Setup();
-    mState = State::RENDER;
-  }
-  glViewport(0, 0, mWidth, mHeight);
+    if(mState == State::INIT)
+    {
+      gPhysicsBulletGlesAddOn->Setup(*mImpl, mWidth, mHeight);
+      mState = State::RENDER;
+    }
+    gPhysicsBulletGlesAddOn->SetViewport(mWidth, mHeight);
 
-  RenderLines(input);
+    Render(input);
+  }
 
   return false;
-}
-
-// Run on first invocation of callback
-void PhysicsDebugRenderer::Setup()
-{
-  PrepareShader();
-  mVertexLocation       = glGetAttribLocation(mProgramId, "vertexPosition");
-  mVertexColourLocation = glGetAttribLocation(mProgramId, "vertexColour");
-  mProjectionLocation   = glGetUniformLocation(mProgramId, "projection");
-  mModelViewLocation    = glGetUniformLocation(mProgramId, "modelView");
-
-  glEnable(GL_DEPTH_TEST);
-  glViewport(0, 0, mWidth, mHeight);
-
-  glGenBuffers(1, &mBufferId);
 }
 
 void PhysicsDebugRenderer::UpdateWindowSize(Dali::Vector2 size)
@@ -160,53 +119,27 @@ void PhysicsDebugRenderer::UpdateWindowSize(Dali::Vector2 size)
   mHeight = size.height;
 }
 
-void PhysicsDebugRenderer::PrepareShader()
-{
-  static const char glVertexShader[] =
-    "attribute vec4 vertexPosition;\n"
-    "attribute vec3 vertexColour;\n"
-    "varying vec3 fragColour;\n"
-    "uniform mat4 projection;\n"
-    "uniform mat4 modelView;\n"
-    "void main()\n"
-    "{\n"
-    "    gl_Position = projection * modelView * vertexPosition;\n"
-    "    fragColour = vertexColour;\n"
-    "}\n";
-
-  static const char glFragmentShader[] =
-    "precision mediump float;\n"
-    "varying vec3 fragColour;\n"
-    "void main()\n"
-    "{\n"
-    "    gl_FragColor = vec4(fragColour, 1.0);\n"
-    "}\n";
-
-  mProgramId = CreateProgram(glVertexShader, glFragmentShader);
-}
-
-void PhysicsDebugRenderer::RenderLines(const Dali::RenderCallbackInput& input)
+void PhysicsDebugRenderer::Render(const Dali::RenderCallbackInput& input)
 {
   mModelViewMatrix.SetIdentity();
   mProjectionMatrix = input.projection;
 
   Matrix::Multiply(mModelViewMatrix, mModelViewMatrix, input.view);
-  glUseProgram(mProgramId);
 
   // In theory, input.clippingBox should tell us the actor position in clip-space.
   // But, it appears to be bugged.
 
-  glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
-  glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(mLines.size() * sizeof(VertexLine)), &mLines[0], GL_STATIC_DRAW);
+  if(gPhysicsBulletGlesAddOn && mImpl)
+  {
+    gPhysicsBulletGlesAddOn->RenderLines(
+      *mImpl,
+      &mLines[0],
+      mLines.size() * sizeof(VertexLine),
+      mLines.size(),
+      mModelViewMatrix,
+      mProjectionMatrix);
+  }
 
-  glVertexAttribPointer(mVertexLocation, 3, GL_FLOAT, GL_FALSE, 24, 0);
-  glEnableVertexAttribArray(mVertexLocation);
-  glVertexAttribPointer(mVertexColourLocation, 3, GL_FLOAT, GL_FALSE, 24, reinterpret_cast<const void*>(12));
-  glEnableVertexAttribArray(mVertexColourLocation);
-  glUniformMatrix4fv(mProjectionLocation, 1, GL_FALSE, mProjectionMatrix.AsFloat());
-  glUniformMatrix4fv(mModelViewLocation, 1, GL_FALSE, mModelViewMatrix.AsFloat());
-
-  glDrawArrays(GL_LINES, 0, mLines.size());
   mLines.clear();
 }
 

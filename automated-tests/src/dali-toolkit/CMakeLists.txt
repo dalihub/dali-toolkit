@@ -131,6 +131,7 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/dummy-control.cpp
   dali-toolkit-test-utils/mesh-builder.cpp
   dali-toolkit-test-utils/test-actor-utils.cpp
+  dali-toolkit-test-utils/test-addon-manager.cpp
   dali-toolkit-test-utils/test-animation-data.cpp
   dali-toolkit-test-utils/test-application.cpp
   dali-toolkit-test-utils/test-button.cpp

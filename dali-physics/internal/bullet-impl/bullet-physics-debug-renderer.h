@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
  */
 
 // External includes
-#include <GLES3/gl3.h>
 #include <LinearMath/btIDebugDraw.h>
 #include <dali/dali.h>
 
@@ -30,6 +29,11 @@ using Dali::TextureSet;
 
 namespace Dali::Toolkit::Physics::Internal
 {
+namespace Gles
+{
+struct DebugRenderer;
+}
+
 class PhysicsAdaptor;
 
 class PhysicsDebugRenderer : public btIDebugDraw
@@ -55,6 +59,11 @@ public:
    */
   PhysicsDebugRenderer(uint32_t width, uint32_t height, Dali::CameraActor camera, PhysicsAdaptor* adaptor);
 
+  /**
+   * Destructor
+   */
+  ~PhysicsDebugRenderer() override;
+
 public: // Inherited from btIDebugDraw
   // Assume this is called during FrameCallback (i.e. in update manager, rather than during render...)
   // Generate stack of lines... render, then clear stack.
@@ -68,9 +77,7 @@ public: // Inherited from btIDebugDraw
 
 private:
   bool OnRender(const Dali::RenderCallbackInput& input);
-  void Setup();
-  void PrepareShader();
-  void RenderLines(const Dali::RenderCallbackInput& input);
+  void Render(const Dali::RenderCallbackInput& input);
 
 private:
   CameraActor                           mCamera;
@@ -90,18 +97,15 @@ private:
   };
   std::vector<VertexLine> mLines;
 
-  Dali::Matrix    mModelViewMatrix;
-  Dali::Matrix    mViewMatrix;
-  Dali::Matrix    mProjectionMatrix;
+  Dali::Matrix mModelViewMatrix;
+  Dali::Matrix mViewMatrix;
+  Dali::Matrix mProjectionMatrix;
+
   int             mWidth;
   int             mHeight;
   PhysicsAdaptor& mAdaptor;
-  GLint           mVertexLocation;
-  GLint           mVertexColourLocation;
-  GLint           mProjectionLocation;
-  GLint           mModelViewLocation;
-  GLuint          mBufferId;
-  GLuint          mProgramId;
+
+  Gles::DebugRenderer* mImpl{nullptr};
 };
 
 } // namespace Dali::Toolkit::Physics::Internal

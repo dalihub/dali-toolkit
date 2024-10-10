@@ -367,7 +367,7 @@ public: // Not intended for application developers
    *
    * @SINCE_2_0.45
    */
-  DALI_INTERNAL GlView(Internal::GlViewImpl& implementation);
+  GlView(Internal::GlViewImpl& implementation);
 
   /**
    * @brief Allows the creation of this GlView from an Internal::CustomActor pointer.
@@ -375,7 +375,7 @@ public: // Not intended for application developers
    *
    * @SINCE_2_0.45
    */
-  DALI_INTERNAL GlView(Dali::Internal::CustomActor* internal);
+  GlView(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

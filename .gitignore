@@ -79,3 +79,5 @@ dali-toolkit/internal/graphics/builtin-shader-extern-gen.h
 dali-scene3d/internal/graphics/generated/*
 dali-scene3d/internal/graphics/builtin-shader-extern-gen.h
 automated-tests/resources/overwritable-image.jpg
+dali-toolkit/internal/gles-addon/generated/*
+dali-toolkit/internal/gles-addon/builtin-shader-extern-gen.h

@@ -29,7 +29,7 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/gles-addon/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 
 namespace Dali
@@ -48,13 +48,7 @@ Dali::Toolkit::GlView GlView::New(Dali::Toolkit::GlView::ColorFormat colorFormat
 
 GlView::GlView(Dali::Toolkit::GlView::ColorFormat colorFormat)
 : Dali::Toolkit::Internal::GlViewImpl(Toolkit::GlView::BackendMode::EGL_IMAGE_OFFSCREEN_RENDERING),
-  mRenderThread(nullptr),
-  mNativeImageQueue(nullptr),
-  mRenderingMode(Toolkit::GlView::RenderingMode::CONTINUOUS),
-  mColorFormat(colorFormat),
-  mDepth(false),
-  mStencil(false),
-  mMSAA(0)
+  mColorFormat(colorFormat)
 {
 }
 
@@ -134,11 +128,6 @@ void GlView::SetRenderingMode(Dali::Toolkit::GlView::RenderingMode mode)
   }
 }
 
-Dali::Toolkit::GlView::RenderingMode GlView::GetRenderingMode() const
-{
-  return mRenderingMode;
-}
-
 void GlView::RenderOnce()
 {
   if(mRenderThread)
@@ -212,7 +201,8 @@ void GlView::OnControlInheritedVisibilityChanged(Dali::Actor actor, bool visible
   Actor self = Self();
   if(mRenderThread)
   {
-    if(visible && DevelWindow::Get(self).IsVisible())
+    auto window = DevelWindow::Get(self);
+    if(visible && window && window.IsVisible())
     {
       mRenderThread->Resume();
     }

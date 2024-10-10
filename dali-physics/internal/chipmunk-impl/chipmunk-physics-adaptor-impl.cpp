@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ void ChipmunkPhysicsAdaptor::SetTransformAndSize(const Dali::Matrix& transform, 
   GetRootActor()[Actor::Property::SIZE] = Vector3(worldSize.GetWidth(), worldSize.GetHeight(), 0);
 
   auto world = static_cast<ChipmunkPhysicsWorld*>(mPhysicsWorld.get());
-  if(world->HasDebugRenderer())
+  if(world->HasDebugRenderer() && mDebugActor)
   {
     Actor layer                  = mDebugActor.GetParent();
     layer[Actor::Property::SIZE] = Vector3(worldSize);

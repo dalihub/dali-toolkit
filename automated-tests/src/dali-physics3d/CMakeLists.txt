@@ -34,6 +34,7 @@ SET(TEST_HARNESS_SOURCES
   ${TEST_HARNESS_DIR}/dummy-control.cpp
   ${TEST_HARNESS_DIR}/mesh-builder.cpp
   ${TEST_HARNESS_DIR}/test-actor-utils.cpp
+  ${TEST_HARNESS_DIR}/test-addon-manager.cpp
   ${TEST_HARNESS_DIR}/test-animation-data.cpp
   ${TEST_HARNESS_DIR}/test-application.cpp
   ${TEST_HARNESS_DIR}/test-button.cpp

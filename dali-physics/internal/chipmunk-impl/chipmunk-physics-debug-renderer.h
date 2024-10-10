@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-#include <GLES3/gl3.h>
 #include <chipmunk/chipmunk.h>
 #include <dali/dali.h>
 
@@ -29,6 +28,11 @@ using Dali::TextureSet;
 
 namespace Dali::Toolkit::Physics::Internal
 {
+namespace Gles
+{
+struct DebugRenderer;
+}
+
 class PhysicsAdaptor;
 
 class PhysicsDebugRenderer
@@ -53,6 +57,11 @@ public:
    * @param[in] height Height of the renderer - viewport
    */
   PhysicsDebugRenderer(uint32_t width, uint32_t height, Dali::CameraActor camera, PhysicsAdaptor* adaptor);
+
+  /**
+   * Destructor
+   */
+  ~PhysicsDebugRenderer();
 
   /**
    * Get the drawing options struct ( construct only )
@@ -83,7 +92,7 @@ private:
   bool OnRender(const Dali::RenderCallbackInput& input);
   void Setup();
   void PrepareShader();
-  void RenderLines(const Dali::RenderCallbackInput& input);
+  void Render(const Dali::RenderCallbackInput& input);
 
   Vertex* PushVertices(uint32_t vertexCount, uint32_t indexCount, const uint16_t* indices);
   Vertex  MakeVertex(cpVect pos, float u, float v, float r, Vector4 fill, Vector4 outline);
@@ -110,17 +119,9 @@ private:
   int             mHeight;
   PhysicsAdaptor& mAdaptor;
 
-  float  mPointLineScale{2.0f};
-  GLint  mPositionLocation;
-  GLint  mUvsLocation;
-  GLint  mRadiusLocation;
-  GLint  mFillColourLocation;
-  GLint  mOutlineColourLocation;
-  GLint  mProjectionLocation;
-  GLint  mModelViewLocation;
-  GLuint mIndexBufferId;
-  GLuint mVertexBufferId;
-  GLuint mProgramId;
+  float mPointLineScale{2.0f};
+
+  Gles::DebugRenderer* mImpl{nullptr};
 };
 
 } // namespace Dali::Toolkit::Physics::Internal

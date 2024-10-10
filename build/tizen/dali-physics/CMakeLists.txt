@@ -87,21 +87,45 @@ include_directories(BEFORE
 include_directories(AFTER "${prefix_include_dir}")
 
 MESSAGE(STATUS "2D sources: ${physics2d_src_files}")
-MESSAGE(STATUS "3D sources: ${physics3d_src_files}")
+MESSAGE(STATUS "2D sources (GLES): ${physics2d_gles_src_files}")
 
-ADD_LIBRARY("${name}-2d" SHARED ${physics2d_src_files} )
-TARGET_LINK_LIBRARIES("${name}-2d" ${DALICORE_LDFLAGS}
+MESSAGE(STATUS "3D sources: ${physics3d_src_files}")
+MESSAGE(STATUS "3D sources (GLES): ${physics3d_gles_src_files}")
+
+ADD_LIBRARY("${name}-2d" SHARED ${physics2d_src_files})
+TARGET_LINK_LIBRARIES("${name}-2d"
+  ${DALICORE_LDFLAGS}
   dali2-toolkit
   chipmunk
   ${COVERAGE})
 TARGET_COMPILE_OPTIONS("${name}-2d" PUBLIC "-I${repo_root_dir}/dali-physics/third-party/chipmunk2d/include")
 
-ADD_LIBRARY("${name}-3d" SHARED ${physics3d_src_files} )
-TARGET_LINK_LIBRARIES("${name}-3d" ${DALICORE_LDFLAGS}
+ADD_LIBRARY("${name}-2d-gles" SHARED ${physics2d_gles_src_files})
+TARGET_LINK_LIBRARIES("${name}-2d-gles"
+  ${DALICORE_LDFLAGS}
+  ${DALIADAPTOR_LDFLAGS}
+  dali2-toolkit
+  chipmunk
+  ${COVERAGE})
+TARGET_COMPILE_OPTIONS("${name}-2d-gles" PUBLIC "-I${repo_root_dir}/dali-physics/third-party/chipmunk2d/include")
+
+ADD_LIBRARY("${name}-3d" SHARED ${physics3d_src_files})
+TARGET_LINK_LIBRARIES("${name}-3d"
+  ${DALICORE_LDFLAGS}
+  ${DALIADAPTOR_LDFLAGS}
   dali2-toolkit
   bullet3
   ${COVERAGE})
 TARGET_COMPILE_OPTIONS("${name}-3d" PUBLIC "-I${repo_root_dir}/dali-physics/third-party/bullet3/src")
+
+ADD_LIBRARY("${name}-3d-gles" SHARED ${physics3d_gles_src_files})
+TARGET_LINK_LIBRARIES("${name}-3d-gles"
+  ${DALICORE_LDFLAGS}
+  ${DALIADAPTOR_LDFLAGS}
+  dali2-toolkit
+  bullet3
+  ${COVERAGE})
+TARGET_COMPILE_OPTIONS("${name}-3d-gles" PUBLIC "-I${repo_root_dir}/dali-physics/third-party/bullet3/src")
 
 IF (ENABLE_PKG_CONFIGURE)
   INSTALL(FILES
@@ -113,35 +137,63 @@ ENDIF()
 
 IF( INSTALL_CMAKE_MODULES )
   MESSAGE(STATUS "Installing cmake modules & libs")
-  SET_TARGET_PROPERTIES( ${name}-2d
+  SET_TARGET_PROPERTIES(${name}-2d
     PROPERTIES
     VERSION ${DALI_PHYSICS_VERSION}
     SOVERSION ${${name}_VERSION_MAJOR}
     CLEAN_DIRECT_OUPUT 1
-    )
+  )
 
-  SET_TARGET_PROPERTIES( ${name}-3d
+  SET_TARGET_PROPERTIES(${name}-2d-gles
     PROPERTIES
     VERSION ${DALI_PHYSICS_VERSION}
     SOVERSION ${${name}_VERSION_MAJOR}
     CLEAN_DIRECT_OUPUT 1
-    )
+  )
 
-  IF( ENABLE_DEBUG )
+  SET_TARGET_PROPERTIES(${name}-3d
+    PROPERTIES
+    VERSION ${DALI_PHYSICS_VERSION}
+    SOVERSION ${${name}_VERSION_MAJOR}
+    CLEAN_DIRECT_OUPUT 1
+  )
+
+  SET_TARGET_PROPERTIES(${name}-3d-gles
+    PROPERTIES
+    VERSION ${DALI_PHYSICS_VERSION}
+    SOVERSION ${${name}_VERSION_MAJOR}
+    CLEAN_DIRECT_OUPUT 1
+  )
+
+  IF(ENABLE_DEBUG)
     SET( BIN_DIR "${BIN_DIR}/debug" )
     SET( LIB_DIR "${LIB_DIR}/debug" )
   ENDIF()
 
   # Install library
-  INSTALL( TARGETS ${name}-2d
+  INSTALL(TARGETS ${name}-2d
     EXPORT ${name}-2d-targets
     LIBRARY DESTINATION ${LIB_DIR}
     ARCHIVE DESTINATION ${LIB_DIR}
     RUNTIME DESTINATION ${BIN_DIR}
   )
 
-  INSTALL( TARGETS ${name}-3d
+  INSTALL(TARGETS ${name}-2d-gles
+    EXPORT ${name}-2d-gles-targets
+    LIBRARY DESTINATION ${LIB_DIR}
+    ARCHIVE DESTINATION ${LIB_DIR}
+    RUNTIME DESTINATION ${BIN_DIR}
+  )
+
+  INSTALL(TARGETS ${name}-3d
     EXPORT ${name}-3d-targets
+    LIBRARY DESTINATION ${LIB_DIR}
+    ARCHIVE DESTINATION ${LIB_DIR}
+    RUNTIME DESTINATION ${BIN_DIR}
+  )
+
+  INSTALL(TARGETS ${name}-3d-gles
+    EXPORT ${name}-3d-gles-targets
     LIBRARY DESTINATION ${LIB_DIR}
     ARCHIVE DESTINATION ${LIB_DIR}
     RUNTIME DESTINATION ${BIN_DIR}
@@ -177,8 +229,9 @@ IF( INSTALL_CMAKE_MODULES )
 ELSE()
   MESSAGE(STATUS "Installing libs")
   INSTALL( TARGETS ${name}-2d DESTINATION ${LIB_DIR} )
+  INSTALL( TARGETS ${name}-2d-gles DESTINATION ${LIB_DIR} )
   INSTALL( TARGETS ${name}-3d DESTINATION ${LIB_DIR} )
-
+  INSTALL( TARGETS ${name}-3d-gles DESTINATION ${LIB_DIR} )
 ENDIF()
 
 # Install headers
