@@ -38,7 +38,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/color/color-visual-shader-factory.cpp
    ${toolkit_src_dir}/visuals/color/color-visual.cpp
    ${toolkit_src_dir}/visuals/custom-shader-factory.cpp
-   ${toolkit_src_dir}/visuals/npatch-shader-factory.cpp
    ${toolkit_src_dir}/visuals/gradient/gradient-visual.cpp
    ${toolkit_src_dir}/visuals/gradient/gradient.cpp
    ${toolkit_src_dir}/visuals/gradient/linear-gradient.cpp
@@ -52,6 +51,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/mesh/mesh-visual.cpp
    ${toolkit_src_dir}/visuals/npatch/npatch-data.cpp
    ${toolkit_src_dir}/visuals/npatch/npatch-loader.cpp
+   ${toolkit_src_dir}/visuals/npatch/npatch-shader-factory.cpp
    ${toolkit_src_dir}/visuals/npatch/npatch-visual.cpp
    ${toolkit_src_dir}/visuals/primitive/primitive-visual.cpp
    ${toolkit_src_dir}/visuals/svg/svg-loader-observer.cpp

@@ -179,7 +179,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   }
 }
 
-WebView::WebView(uint32_t argc, char** argv)
+WebView::WebView(uint32_t argc, char** argv, int32_t type)
 : Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
@@ -196,7 +196,7 @@ WebView::WebView(uint32_t argc, char** argv)
   mCornerRadius(Vector4::ZERO),
   mCornerRadiusPolicy(1.0f)
 {
-  mWebEngine = Dali::WebEngine::New();
+  mWebEngine = Dali::WebEngine::New(type);
 
   // WebEngine is empty when it is not properly initialized.
   if(mWebEngine)
@@ -247,9 +247,9 @@ Toolkit::WebView WebView::New(const std::string& locale, const std::string& time
   return handle;
 }
 
-Toolkit::WebView WebView::New(uint32_t argc, char** argv)
+Toolkit::WebView WebView::New(uint32_t argc, char** argv, int32_t type)
 {
-  WebView*         impl   = new WebView(argc, argv);
+  WebView*         impl   = new WebView(argc, argv, type);
   Toolkit::WebView handle = Toolkit::WebView(*impl);
   if(impl->GetPlugin())
   {
@@ -913,6 +913,38 @@ void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceive
   }
 }
 
+void WebView::WebAuthenticationCancel()
+{
+  if(mWebEngine)
+  {
+    mWebEngine.WebAuthenticationCancel();
+  }
+}
+
+void WebView::RegisterWebAuthDisplayQRCallback(Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterWebAuthDisplayQRCallback(std::move(callback));
+  }
+}
+
+void WebView::RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterWebAuthResponseCallback(std::move(callback));
+  }
+}
+
+void WebView::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterUserMediaPermissionRequestCallback(std::move(callback));
+  }
+}
+
 void WebView::OnFrameRendered()
 {
   if(mFrameRenderedCallback)
@@ -921,55 +953,49 @@ void WebView::OnFrameRendered()
   }
 
   // Make sure that mVisual is created only once.
-  if (mVisual)
+  if(!mVisualChangeRequired && mVisual)
+  {
     return;
+  }
 
   // Get webVisual for checking corner radius
   Toolkit::Visual::Base webVisual = Dali::Toolkit::DevelControl::GetVisual(*this, Toolkit::WebView::Property::URL);
-  Property::Map webMap;
+  Property::Map         webMap;
   webVisual.CreatePropertyMap(webMap);
-  Property::Value* cornerRadiusValue =  webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
+  Property::Value* cornerRadiusValue = webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
   if(cornerRadiusValue)
   {
     mCornerRadius = cornerRadiusValue->Get<Vector4>();
   }
-  Property::Value* cornerRadiusValuePolicy =  webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY);
+  Property::Value* cornerRadiusValuePolicy = webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY);
   if(cornerRadiusValuePolicy)
   {
     mCornerRadiusPolicy = cornerRadiusValuePolicy->Get<int>();
   }
 
-  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(mWebEngine.GetNativeImageSource());
-  Property::Map propertyMap;
-  propertyMap.Insert(Dali::Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::IMAGE);
-  propertyMap.Insert(Dali::Toolkit::ImageVisual::Property::URL, nativeImageUrl.GetUrl());
-  propertyMap.Insert(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS, mCornerRadius);
-  propertyMap.Insert(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, mCornerRadiusPolicy);
-  mVisual = Toolkit::VisualFactory::Get().CreateVisual(propertyMap);
+  // Reset flag
+  mVisualChangeRequired = false;
+
+  auto nativeImageSourcePtr = mWebEngine.GetNativeImageSource();
+
+  mLastRenderedNativeImageWidth  = nativeImageSourcePtr->GetWidth();
+  mLastRenderedNativeImageHeight = nativeImageSourcePtr->GetHeight();
+
+  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImageSourcePtr);
+
+  mVisual = Toolkit::VisualFactory::Get().CreateVisual(
+    {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
+     {Toolkit::ImageVisual::Property::URL, nativeImageUrl.GetUrl()},
+     {Toolkit::ImageVisual::Property::PIXEL_AREA, FULL_TEXTURE_RECT},
+     {Toolkit::ImageVisual::Property::WRAP_MODE_U, Dali::WrapMode::CLAMP_TO_EDGE},
+     {Toolkit::ImageVisual::Property::WRAP_MODE_V, Dali::WrapMode::CLAMP_TO_EDGE},
+     {Toolkit::DevelVisual::Property::CORNER_RADIUS, mCornerRadius},
+     {Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, mCornerRadiusPolicy}});
+
   if(mVisual)
   {
-    // Reset flag
-    mVisualChangeRequired = false;
-
-    auto nativeImageSourcePtr = mWebEngine.GetNativeImageSource();
-
-    mLastRenderedNativeImageWidth  = nativeImageSourcePtr->GetWidth();
-    mLastRenderedNativeImageHeight = nativeImageSourcePtr->GetHeight();
-
-    Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImageSourcePtr);
-
-    mVisual = Toolkit::VisualFactory::Get().CreateVisual(
-      {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
-       {Toolkit::ImageVisual::Property::URL, nativeImageUrl.GetUrl()},
-       {Toolkit::ImageVisual::Property::PIXEL_AREA, FULL_TEXTURE_RECT},
-       {Toolkit::ImageVisual::Property::WRAP_MODE_U, Dali::WrapMode::CLAMP_TO_EDGE},
-       {Toolkit::ImageVisual::Property::WRAP_MODE_V, Dali::WrapMode::CLAMP_TO_EDGE}});
-
-    if(mVisual)
-    {
-      DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual, DepthIndex::CONTENT);
-      EnableBlendMode(!mVideoHoleEnabled);
-    }
+    DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual, DepthIndex::CONTENT);
+    EnableBlendMode(!mVideoHoleEnabled);
   }
 }
 

@@ -61,7 +61,12 @@ WebView WebView::New(const std::string& locale, const std::string& timezoneId)
 
 WebView WebView::New(uint32_t argc, char** argv)
 {
-  return Internal::WebView::New(argc, argv);
+  return Internal::WebView::New(argc, argv, -1);
+}
+
+WebView WebView::New(uint32_t argc, char** argv, int32_t type)
+{
+  return Internal::WebView::New(argc, argv, type);
 }
 
 Toolkit::WebView WebView::FindWebView(Dali::WebEnginePlugin* plugin)
@@ -448,6 +453,27 @@ void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceive
 {
   Dali::Toolkit::GetImpl(*this).GetPlainTextAsynchronously(callback);
 }
+
+void WebView::WebAuthenticationCancel()
+{
+  Dali::Toolkit::GetImpl(*this).WebAuthenticationCancel();
+}
+
+void WebView::RegisterWebAuthDisplayQRCallback(Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterWebAuthDisplayQRCallback(callback);
+}
+
+void WebView::RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterWebAuthResponseCallback(callback);
+}
+
+void WebView::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterUserMediaPermissionRequestCallback(callback);
+}
+
 
 WebView::WebView(Internal::WebView& implementation)
 : Control(implementation)

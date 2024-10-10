@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_DLI_LOADER_IMPL_H
 #define DALI_SCENE3D_LOADER_DLI_LOADER_IMPL_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@
 #include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/loader/model-loader-impl.h>
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/loader/animation-definition.h>
 #include <dali-scene3d/public-api/loader/customization.h>
 #include <dali-scene3d/public-api/loader/dli-input-parameter.h>
 #include <dali-scene3d/public-api/loader/index.h>
+#include <dali-scene3d/public-api/loader/model-loader-impl.h>
 #include <dali-scene3d/public-api/loader/node-definition.h>
 #include <dali-scene3d/public-api/loader/string-callback.h>
 
@@ -56,7 +56,7 @@ public:
   void SetErrorCallback(StringCallback onError);
 
   /**
-   * @copydoc Dali::Scene3D::Loader::Internal::ModelLoaderImpl::LoadMode()
+   * @copydoc Dali::Scene3D::Loader::ModelLoaderImpl::LoadMode()
    */
   bool LoadModel(const std::string& uri, Dali::Scene3D::Loader::LoadResult& result) override;
 

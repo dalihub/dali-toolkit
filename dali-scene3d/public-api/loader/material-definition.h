@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_MATERIAL_DEFINITION_H
 #define DALI_SCENE3D_LOADER_MATERIAL_DEFINITION_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,8 +151,8 @@ struct DALI_SCENE3D_API MaterialDefinition
     METALLIC       = NthBit(1),
     ROUGHNESS      = NthBit(2),
     NORMAL         = NthBit(3),
-    EMISSIVE       = NthBit(4),
-    OCCLUSION      = NthBit(5),
+    OCCLUSION      = NthBit(4),
+    EMISSIVE       = NthBit(5),
     SPECULAR       = NthBit(6),
     SPECULAR_COLOR = NthBit(7),
     SUBSURFACE     = NthBit(8), // Note: dli-only
@@ -260,9 +260,11 @@ public: // DATA
   float   mSpecularFactor      = 1.0f;
   Vector3 mSpecularColorFactor = Vector3::ONE;
 
-  // For the glTF, each of albedo, metallicRoughness, normal textures are not essential.
+  // For the glTF or USD models, each of albedo, metallic, roughness, normal textures are not essential.
   bool mNeedAlbedoTexture            = true;
   bool mNeedMetallicRoughnessTexture = true;
+  bool mNeedMetallicTexture          = false;
+  bool mNeedRoughnessTexture         = false;
   bool mNeedNormalTexture            = true;
   bool mDoubleSided                  = false;
 
