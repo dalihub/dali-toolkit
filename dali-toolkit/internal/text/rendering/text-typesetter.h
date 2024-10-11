@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_TYPESETTER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,13 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
-#include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/object/ref-object.h>
+#include <memory> ///< for std::unique_ptr
 
 namespace Dali
 {
@@ -190,28 +191,6 @@ private:
   Typesetter& operator=(const Typesetter& handle);
 
   /**
-   * @brief Create & draw the image buffer for the given range of the glyphs in the given style.
-   *
-   * Does the following operations:
-   * - Retrieves the data buffers from the text model.
-   * - Creates the pixel data used to generate the final image with the given size.
-   * - Traverse the visible glyphs, retrieve their bitmaps and compose the final pixel data.
-   *
-   * @param[in] bufferWidth The width of the image buffer.
-   * @param[in] bufferHeight The height of the image buffer.
-   * @param[in] style The style of the text.
-   * @param[in] ignoreHorizontalAlignment Whether to ignore the horizontal alignment, not ignored by default.
-   * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
-   * @param[in] horizontalOffset The horizontal offset to be added to the glyph's position.
-   * @param[in] verticalOffset The vertical offset to be added to the glyph's position.
-   * @param[in] fromGlyphIndex The index of the first glyph within the text to be drawn
-   * @param[in] toGlyphIndex The index of the last glyph within the text to be drawn
-   *
-   * @return An image buffer with the text.
-   */
-  Devel::PixelBuffer CreateImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Typesetter::Style style, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset, const TextAbstraction::GlyphIndex fromGlyphIndex, const TextAbstraction::GlyphIndex toGlyphIndex);
-
-  /**
    * @brief Apply markup underline tags.
    *
    * The properties on TextLabel override the behavior of Markup.
@@ -262,8 +241,8 @@ protected:
   virtual ~Typesetter();
 
 private:
-  ViewModel*                  mModel;
-  TextAbstraction::FontClient mFontClient;
+  struct Impl;
+  std::unique_ptr<Impl> mImpl;
 };
 
 } // namespace Text

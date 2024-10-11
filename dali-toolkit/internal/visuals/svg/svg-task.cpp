@@ -203,7 +203,8 @@ void SvgRasterizingTask::Process()
     DALI_LOG_ERROR("Rasterize is failed!\n");
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
       mEndTimeNanoSceonds = GetNanoseconds();
-      oss << "[";
+      oss << std::fixed << std::setprecision(3);
+      oss << "[failed/";
       oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
       oss << "s:" << mWidth << "x" << mHeight << " ";
       oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
@@ -220,6 +221,10 @@ void SvgRasterizingTask::Process()
     oss << "[";
     oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
     oss << "s:" << mWidth << "x" << mHeight << " ";
+    if(mPixelData.GetWidth() != mWidth || mPixelData.GetHeight() != mHeight)
+    {
+      oss << "p:" << mPixelData.GetWidth() << "x" << mPixelData.GetHeight() << " ";
+    }
     oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
   });
 }
