@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 
-#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
@@ -512,11 +512,11 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
         auto mode = map->Find(Toolkit::HiddenInput::Property::MODE);
         if(mode && (mode->Get<int>() != Toolkit::HiddenInput::Mode::HIDE_NONE))
         {
-          textField.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::PASSWORD_TEXT);
+          textField.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::PASSWORD_TEXT);
         }
         else
         {
-          textField.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::ENTRY);
+          textField.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::ENTRY);
         }
       }
       break;

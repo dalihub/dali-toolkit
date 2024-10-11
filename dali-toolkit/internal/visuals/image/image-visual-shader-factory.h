@@ -32,6 +32,7 @@ namespace Toolkit
 {
 namespace Internal
 {
+
 /**
  * ImageVisualShaderFactory is an object that provides and shares shaders between image visuals
  */
@@ -76,7 +77,7 @@ public: // Implementation of VisualShaderFactoryInterface
   /**
    * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::GetPreCompiledShader
    */
-  void GetPreCompiledShader(ShaderPreCompiler::RawShaderData& shaders) override;
+  void GetPreCompiledShader(RawShaderData& shaders) override;
 
 private:
   /**
@@ -86,7 +87,7 @@ private:
   /**
    * @brief Check if cached hash value is valid or not.
    */
-  bool SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string&& vertexPrefix, std::string&& fragmentPrefix);
+  bool SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix);
 
 protected:
   /**

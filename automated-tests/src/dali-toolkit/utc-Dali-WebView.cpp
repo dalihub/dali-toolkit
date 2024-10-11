@@ -46,7 +46,6 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/public-api/images/pixel-data.h>
-#include <dali/devel-api/adaptor-framework/web-engine/web-engine-user-media-permission-request.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -108,9 +107,6 @@ static int                                                                gNewWi
 static int                                                                gFullscreenEnteredCallbackCalled        = 0;
 static int                                                                gFullscreenExitedCallbackCalled         = 0;
 static int                                                                gTextFoundCallbackCalled                = 0;
-static int                                                                gWebAuthDisplayQRCalled                 = 0;
-static int                                                                gWebAuthDisplayResponseCalled           = 0;
-static int                                                                gUserMediaPermissionRequestCalled       = 0;
 
 struct CallbackFunctor
 {
@@ -351,21 +347,6 @@ static void OnFullscreenExited()
 static void OnTextFound(uint32_t arg)
 {
   gTextFoundCallbackCalled++;
-}
-
-static void OnWebAuthDisplayQR(const std::string&)
-{
-  gWebAuthDisplayQRCalled++;
-}
-
-static void OnWebAuthResponse()
-{
-  gWebAuthDisplayResponseCalled++;
-}
-
-static void OnUserMediaPermissionRequest(std::unique_ptr<Dali::WebEngineUserMediaPermissionRequest> request, const std::string& msg)
-{
-  gUserMediaPermissionRequestCalled++;
 }
 
 } // namespace
@@ -1230,7 +1211,7 @@ int UtcDaliWebViewGetScreenshotSyncAndAsync(void)
   ToolkitTestApplication application;
 
   char    argv[] = "--test";
-  WebView view   = WebView::New(1, (char**)&argv, 0);
+  WebView view   = WebView::New(1, (char**)&argv);
   DALI_TEST_CHECK(view);
 
   // Check GetScreenshot
@@ -2561,75 +2542,5 @@ int UtcDaliWebViewRegisterTextFoundCallback(void)
   view.LoadUrl(TEST_URL1);
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS(gTextFoundCallbackCalled, 1, TEST_LOCATION);
-  END_TEST;
-}
-
-int UtcDaliWebViewRegisterWebAuthDisplayQRCallback(void)
-{
-  ToolkitTestApplication application;
-
-  WebView view = WebView::New();
-  DALI_TEST_CHECK(view);
-
-  view.RegisterWebAuthDisplayQRCallback(&OnWebAuthDisplayQR);
-  DALI_TEST_EQUALS(gWebAuthDisplayQRCalled, 0, TEST_LOCATION);
-
-  view.LoadUrl(TEST_URL1);
-  Test::EmitGlobalTimerSignal();
-  DALI_TEST_EQUALS(gWebAuthDisplayQRCalled, 1, TEST_LOCATION);
-  END_TEST;
-}
-
-int UtcDaliWebViewRegisterWebAuthResponseCallback(void)
-{
-  ToolkitTestApplication application;
-
-  WebView view = WebView::New();
-  DALI_TEST_CHECK(view);
-
-  view.RegisterWebAuthResponseCallback(&OnWebAuthResponse);
-  DALI_TEST_EQUALS(gWebAuthDisplayResponseCalled, 0, TEST_LOCATION);
-
-  view.LoadUrl(TEST_URL1);
-  Test::EmitGlobalTimerSignal();
-  DALI_TEST_EQUALS(gWebAuthDisplayResponseCalled, 1, TEST_LOCATION);
-  END_TEST;
-}
-
-int UtcDaliWebViewRegisterUserMediaPermissionRequestCallback(void)
-{
-  ToolkitTestApplication application;
-
-  WebView view = WebView::New();
-  DALI_TEST_CHECK(view);
-
-  view.RegisterUserMediaPermissionRequestCallback(&OnUserMediaPermissionRequest);
-  DALI_TEST_EQUALS(gUserMediaPermissionRequestCalled, 0, TEST_LOCATION);
-
-  view.LoadUrl(TEST_URL1);
-  Test::EmitGlobalTimerSignal();
-  DALI_TEST_EQUALS(gUserMediaPermissionRequestCalled, 1, TEST_LOCATION);
-  END_TEST;
-}
-
-int UtcDaliWebViewWebAuthenticationCancel(void)
-{
-  ToolkitTestApplication application;
-
-  WebView view = WebView::New();
-  DALI_TEST_CHECK(view);
-
-  try
-  {
-    // Just call API and exception check.
-    view.WebAuthenticationCancel();
-    tet_result(TET_PASS);
-  }
-  catch(...)
-  {
-    // Should not throw exception
-    tet_result(TET_FAIL);
-  }
-
   END_TEST;
 }

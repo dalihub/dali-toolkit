@@ -747,12 +747,7 @@ bool VectorAnimationTask::Rasterize()
     oss << "[";
     oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
     oss << "s:" << mWidth << "x" << mHeight << " ";
-    oss << "f:" << mCurrentFrame;
-    if(mDroppedFrames > 0)
-    {
-      oss << "(+" << mDroppedFrames << ")";
-    }
-    oss << " ";
+    oss << "f:" << mCurrentFrame << " ";
     oss << "l:" << mCurrentLoop << " ";
     oss << "p:" << mPlayState << " ";
     oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
@@ -809,12 +804,13 @@ VectorAnimationTask::TimePoint VectorAnimationTask::CalculateNextFrameTime(bool 
   }
   else
   {
-    uint32_t   droppedFrames        = 0;
     const auto durationMicroSeconds = std::chrono::microseconds(mFrameDurationMicroSeconds);
 
     mNextFrameStartTime = std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + durationMicroSeconds);
     if(mNextFrameStartTime < current)
     {
+      uint32_t droppedFrames = 0;
+
       while(current > std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + durationMicroSeconds) && droppedFrames < mTotalFrame)
       {
         droppedFrames++;
@@ -822,8 +818,8 @@ VectorAnimationTask::TimePoint VectorAnimationTask::CalculateNextFrameTime(bool 
       }
 
       mNextFrameStartTime = current;
+      mDroppedFrames      = droppedFrames;
     }
-    mDroppedFrames = droppedFrames;
   }
 
   return mNextFrameStartTime;

@@ -62,14 +62,6 @@ public:
     return handle;
   }
 
-  OffScreenRenderable::Type GetOffScreenRenderableType() override
-  {
-    return OffScreenRenderable::Type::NONE;
-  }
-
-  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
-  {}
-
 protected:
   TestRenderEffectImpl()
   : mOnActivated(false)

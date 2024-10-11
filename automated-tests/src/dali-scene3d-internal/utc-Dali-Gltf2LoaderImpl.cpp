@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -232,8 +232,6 @@ int UtcDaliGltfLoaderSuccess1(void)
      Vector3(0, 0, 1),
      true,
      false,
-     false,
-     false,
      true,
      false,
      Scene3D::Material::AlphaModeType::MASK,
@@ -316,8 +314,6 @@ int UtcDaliGltfLoaderSuccess1(void)
       Vector3::ONE,
       true,
       true,
-      false,
-      false,
       true,
       false,
       Scene3D::Material::AlphaModeType::OPAQUE,
@@ -396,8 +392,6 @@ int UtcDaliGltfLoaderSuccess1(void)
     DALI_TEST_EQUAL(md.mSpecularColorFactor, m.mSpecularColorFactor);
     DALI_TEST_EQUAL(md.mNeedAlbedoTexture, m.mNeedAlbedoTexture);
     DALI_TEST_EQUAL(md.mNeedMetallicRoughnessTexture, m.mNeedMetallicRoughnessTexture);
-    DALI_TEST_EQUAL(md.mNeedMetallicTexture, m.mNeedMetallicTexture);
-    DALI_TEST_EQUAL(md.mNeedRoughnessTexture, m.mNeedRoughnessTexture);
     DALI_TEST_EQUAL(md.mNeedNormalTexture, m.mNeedNormalTexture);
     DALI_TEST_EQUAL(md.mAlphaModeType, m.mAlphaModeType);
     DALI_TEST_EQUAL(md.mIsOpaque, m.mIsOpaque);

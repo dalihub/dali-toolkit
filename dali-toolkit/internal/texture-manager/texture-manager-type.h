@@ -270,8 +270,8 @@ struct TextureInfo
   float                      scaleFactor;          ///< The scale factor to apply to the Texture when masking
   int32_t                    referenceCount;       ///< The reference count of clients using this Texture
   LoadState                  loadState;            ///< The load state showing the load progress of the Texture
-  Dali::FittingMode::Type    fittingMode : 4;      ///< The requested FittingMode
-  Dali::SamplingMode::Type   samplingMode : 5;     ///< The requested SamplingMode
+  Dali::FittingMode::Type    fittingMode : 3;      ///< The requested FittingMode
+  Dali::SamplingMode::Type   samplingMode : 3;     ///< The requested SamplingMode
   StorageType                storageType;          ///< CPU storage / GPU upload;
   Dali::AnimatedImageLoading animatedImageLoading; ///< AnimatedImageLoading that contains animated image information.
   uint32_t                   frameIndex;           ///< Frame index that be loaded, in case of animated image

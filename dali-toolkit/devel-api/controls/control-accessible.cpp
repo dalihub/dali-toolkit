@@ -163,7 +163,7 @@ Dali::Accessibility::Role ConvertV2RoleToAtspiRole(AccessibilityRole role)
     TO_SAME_ROLE_TYPE(SPIN_BUTTON)
     TO_V1_ROLE_TYPE(TAB, PAGE_TAB)
     TO_V1_ROLE_TYPE(TAB_LIST, PAGE_TAB_LIST)
-    TO_V1_ROLE_TYPE(TEXT, LABEL)
+    TO_SAME_ROLE_TYPE(TEXT)
     TO_SAME_ROLE_TYPE(TOGGLE_BUTTON)
     TO_SAME_ROLE_TYPE(TOOL_BAR)
     default:
@@ -199,26 +199,6 @@ bool IsModalRole(int32_t rawRole)
 bool IsHighlightableRole(int32_t rawRole)
 {
   return IsRoleV2(rawRole) && static_cast<AccessibilityRole>(rawRole) != AccessibilityRole::NONE;
-}
-
-using Dali::Toolkit::Internal::TriStateProperty;
-bool IsHighlightable(TriStateProperty highlightable, int32_t rawRole)
-{
-  switch(highlightable)
-  {
-    case TriStateProperty::AUTO:
-    {
-      return IsHighlightableRole(rawRole);
-    }
-    case TriStateProperty::TRUE:
-    {
-      return true;
-    }
-    default:
-    {
-      return false;
-    }
-  }
 }
 
 } // unnamed namespace
@@ -352,7 +332,7 @@ void ControlAccessible::ApplyAccessibilityProps(Dali::Accessibility::States& sta
 
   // Apply traits
   states[State::MODAL]         = props.isModal || IsModalRole(props.role);
-  states[State::HIGHLIGHTABLE] = IsHighlightable(props.isHighlightable, props.role);
+  states[State::HIGHLIGHTABLE] = props.isHighlightable || IsHighlightableRole(props.role);
 }
 
 Dali::Accessibility::States ControlAccessible::CalculateStates()

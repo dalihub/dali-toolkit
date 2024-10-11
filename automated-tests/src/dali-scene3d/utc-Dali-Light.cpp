@@ -1219,7 +1219,7 @@ int UtcDaliLightShadowRenderTask(void)
   sceneView.UseFramebuffer(true);
 
   DALI_TEST_EQUALS(baseRenderTaskCount + 1u, taskList.GetTaskCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(INT32_MIN, taskList.GetTask(baseRenderTaskCount - 1u).GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, taskList.GetTask(baseRenderTaskCount - 1u).GetOrderIndex(), TEST_LOCATION);
   DALI_TEST_EQUALS(SCENE_ORDER_INDEX, taskList.GetTask(baseRenderTaskCount).GetOrderIndex(), TEST_LOCATION);
 
   Scene3D::Light light = Scene3D::Light::New();
@@ -1227,30 +1227,29 @@ int UtcDaliLightShadowRenderTask(void)
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   light.EnableShadow(true);
 
-  tet_printf("Do not create rendertask until light is scene on\n");
+  tet_printf("Do not create rendertask until light is scene on");
   DALI_TEST_EQUALS(baseRenderTaskCount + 1u, taskList.GetTaskCount(), TEST_LOCATION);
 
   sceneView.Add(light);
 
-  tet_printf("Create shadowmap rendertask after light is scene on\n");
+  tet_printf("Create shadowmap rendertask after light is scene on");
   DALI_TEST_EQUALS(baseRenderTaskCount + 2u, taskList.GetTaskCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(INT32_MIN, taskList.GetTask(baseRenderTaskCount - 1u).GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, taskList.GetTask(baseRenderTaskCount - 1u).GetOrderIndex(), TEST_LOCATION);
   DALI_TEST_EQUALS(SCENE_ORDER_INDEX, taskList.GetTask(baseRenderTaskCount).GetOrderIndex(), TEST_LOCATION);
-  DALI_TEST_EQUALS(0, taskList.GetTask(baseRenderTaskCount + 1u).GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(SHADOW_ORDER_INDEX, taskList.GetTask(baseRenderTaskCount + 1u).GetOrderIndex(), TEST_LOCATION);
 
   application.SendNotification();
 
-  tet_printf("Check render task list sorted\n");
-  DALI_TEST_EQUALS(INT32_MIN, taskList.GetTask(baseRenderTaskCount).GetOrderIndex(), TEST_LOCATION);
-  DALI_TEST_EQUALS(INT32_MIN + 1, taskList.GetTask(baseRenderTaskCount + 1u).GetOrderIndex(), TEST_LOCATION);
+  tet_printf("Check render task list sorted");
+  DALI_TEST_EQUALS(SHADOW_ORDER_INDEX, taskList.GetTask(baseRenderTaskCount).GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(SCENE_ORDER_INDEX, taskList.GetTask(baseRenderTaskCount + 1u).GetOrderIndex(), TEST_LOCATION);
 
   light.EnableShadow(false);
 
-  tet_printf("Check shadowmap rendertask removed\n");
-
+  tet_printf("Check shadowmap rendertask removed");
   DALI_TEST_EQUALS(baseRenderTaskCount + 1u, taskList.GetTaskCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(INT32_MIN, taskList.GetTask(baseRenderTaskCount - 1u).GetOrderIndex(), TEST_LOCATION);
-  DALI_TEST_EQUALS(INT32_MIN + 1, taskList.GetTask(baseRenderTaskCount).GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, taskList.GetTask(baseRenderTaskCount - 1u).GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(SCENE_ORDER_INDEX, taskList.GetTask(baseRenderTaskCount).GetOrderIndex(), TEST_LOCATION);
 
   END_TEST;
 }

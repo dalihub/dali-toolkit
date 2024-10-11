@@ -1588,7 +1588,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         bool highlightable;
         if(value.Get(highlightable))
         {
-          controlImpl.mImpl->mAccessibilityProps.isHighlightable = highlightable ? TriStateProperty::TRUE : TriStateProperty::FALSE;
+          controlImpl.mImpl->mAccessibilityProps.isHighlightable = highlightable;
         }
         break;
       }
@@ -1835,7 +1835,7 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE:
       {
-        value = controlImpl.mImpl->mAccessibilityProps.isHighlightable == TriStateProperty::TRUE ? true : false;
+        value = controlImpl.mImpl->mAccessibilityProps.isHighlightable;
         break;
       }
 

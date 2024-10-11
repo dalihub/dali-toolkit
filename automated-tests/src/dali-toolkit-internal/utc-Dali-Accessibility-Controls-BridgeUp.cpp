@@ -225,13 +225,11 @@ int UtcDaliControlAccessibilityRole(void)
 {
   ToolkitTestApplication application;
 
-  auto control = Control::New();
-
-  auto role_none       = DevelControl::AccessibilityRole::NONE;
+  auto control         = Control::New();
   auto role_unknown    = Dali::Accessibility::Role::UNKNOWN;
   auto role_pushbutton = Dali::Accessibility::Role::PUSH_BUTTON;
 
-  DALI_TEST_EQUALS(role_none, control.GetProperty(DevelControl::Property::ACCESSIBILITY_ROLE).Get<DevelControl::AccessibilityRole>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(role_unknown, control.GetProperty(DevelControl::Property::ACCESSIBILITY_ROLE).Get<Dali::Accessibility::Role>(), TEST_LOCATION);
 
   auto accessible = Dali::Accessibility::Accessible::Get(control);
   DALI_TEST_EQUALS(role_unknown, accessible->GetRole(), TEST_LOCATION);
@@ -324,7 +322,7 @@ int UtcDaliControlAccessibilityRole(void)
   DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::PAGE_TAB_LIST), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::TEXT);
-  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::LABEL), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::TEXT), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::TOGGLE_BUTTON);
   DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::TOGGLE_BUTTON), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
@@ -613,57 +611,30 @@ int UtcDaliControlAccessibilityHighlightable(void)
   highlightable = control.GetProperty<bool>(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE);
   DALI_TEST_EQUALS(highlightable, false, TEST_LOCATION);
 
-  auto accessible = Dali::Accessibility::Accessible::Get(control);
+  auto q = Dali::Accessibility::Accessible::Get(control);
 
   Dali::Accessibility::TestEnableSC(true);
 
-  auto states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
+  auto states_by_bridge = Dali::Accessibility::States{TestGetStates(q->GetAddress())};
   DALI_TEST_CHECK(!states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
   DALI_TEST_EQUALS(Property::BOOLEAN, control.GetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(true, control.GetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).Get<bool>(), TEST_LOCATION);
 
-  states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
+  states_by_bridge = Dali::Accessibility::States{TestGetStates(q->GetAddress())};
   DALI_TEST_CHECK(states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false);
   DALI_TEST_EQUALS(Property::BOOLEAN, control.GetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(false, control.GetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).Get<bool>(), TEST_LOCATION);
 
-  states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
+  states_by_bridge = Dali::Accessibility::States{TestGetStates(q->GetAddress())};
   DALI_TEST_CHECK(!states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
 
-  Dali::Accessibility::TestEnableSC(false);
-
-  END_TEST;
-}
-
-int UtcDaliControlAccessibilityHighlightableV2(void)
-{
-  ToolkitTestApplication application;
-  auto                   control    = Control::New();
-  auto                   accessible = Dali::Accessibility::Accessible::Get(control);
-
-  Dali::Accessibility::TestEnableSC(true);
-
-  auto states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
-  // Is not highlightable if no role is set
-  DALI_TEST_CHECK(!states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
-
-  // Is highlightable by default if V2 role is set and is not Role::None
+  // Highlightable state is set if V2 role is set and is not Role::None
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::CONTAINER);
-  states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
-  DALI_TEST_CHECK(states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
-
-  // Returns explicitly set highlightable property: false
-  control.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false);
-  states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
-  DALI_TEST_CHECK(!states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
-
-  // Returns explicitly set highlightable property: true
-  control.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
-  states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
+  states_by_bridge = Dali::Accessibility::States{TestGetStates(q->GetAddress())};
   DALI_TEST_CHECK(states_by_bridge[Dali::Accessibility::State::HIGHLIGHTABLE]);
 
   Dali::Accessibility::TestEnableSC(false);
@@ -2084,188 +2055,6 @@ int UtcDaliIncludeHidden(void)
   TestSetIncludeHidden(appAddress, false);
   DALI_TEST_CHECK(!TestGetIncludeHidden(appAddress));
   DALI_TEST_CHECK(rootAccessible->GetChildCount() == 1); // hidden control is excluded after setting includeHidden to false
-
-  Dali::Accessibility::TestEnableSC(false);
-
-  END_TEST;
-}
-
-enum class MatchType : int32_t
-{
-  INVALID,
-  ALL,
-  ANY,
-  NONE,
-  EMPTY
-};
-
-enum class SortOrder : uint32_t
-{
-  INVALID,
-  CANONICAL,
-  FLOW,
-  TAB,
-  REVERSE_CANONICAL,
-  REVERSE_FLOW,
-  REVERSE_TAB,
-  LAST_DEFINED
-};
-
-static bool TestTouchCallback(Actor, const TouchEvent&)
-{
-  return true;
-}
-
-class TestMatcheableView
-{
-private:
-  Actor MakeClickableActor()
-  {
-    auto actor = Control::New();
-    actor.SetProperty(Actor::Property::SENSITIVE, true);
-    actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
-    actor.TouchedSignal().Connect(TestTouchCallback);
-    return actor;
-  }
-
-  Actor MakeNonClickableActor()
-  {
-    auto actor = Control::New();
-    actor.SetProperty(Actor::Property::SENSITIVE, false);
-    return actor;
-  }
-
-  Actor MakeContainer(bool isClickable, std::string label)
-  {
-    Actor   container = isClickable ? MakeClickableActor() : MakeNonClickableActor();
-    Vector4 color(0.5f, 0.6f, 0.5f, 1.0f);
-    container.SetProperty(Actor::Property::COLOR, color);
-    container.SetProperty(Actor::Property::VISIBLE, true);
-
-    // button
-    auto button = PushButton::New();
-    button.SetProperty(Actor::Property::POSITION, Vector2(0.f, 0.f));
-    button.SetProperty(Actor::Property::SIZE, Vector2(10.f, 10.f));
-    button.SetProperty(Actor::Property::VISIBLE, true);
-    container.Add(button);
-
-    // text label
-    auto text = TextLabel::New(label);
-    text.SetProperty(Actor::Property::VISIBLE, true);
-    container.Add(text);
-
-    return container;
-  };
-
-public:
-  TestMatcheableView()
-  {
-    view = TableView::New(N, N);                                      // N by N grid.
-    view.SetProperty(Actor::Property::SIZE, Vector2(480.0f, 800.0f)); // full screen
-
-    for(int i = 0; i < N; ++i)
-    {
-      for(int j = 0; j < N; ++j)
-      {
-        bool        isClickable = (i * N + j) % 2;
-        std::string label       = "test_" + std::to_string(i) + "_" + std::to_string(j);
-        view.AddChild(MakeContainer(isClickable, std::move(label)), TableView::CellPosition(i, j));
-      }
-    }
-  }
-
-  TableView        view;
-  static const int N{48};
-};
-
-static Accessibility::Collection::MatchRule GetMatchRule(std::vector<Accessibility::State> states, std::vector<Accessibility::Role> roles)
-{
-  Accessibility::States  statesRule;
-  MatchType              stateMatchType = MatchType::INVALID;
-  std::array<int32_t, 2> statesConverted{0, 0};
-  if(!states.empty())
-  {
-    for(auto state : states)
-    {
-      statesRule[state] = true;
-    }
-    const auto statesRaw = statesRule.GetRawData();
-    statesConverted      = {static_cast<int32_t>(statesRaw[0]), static_cast<int32_t>(statesRaw[1])};
-    stateMatchType       = MatchType::ALL;
-  }
-
-  Accessibility::EnumBitSet<Accessibility::Role, Accessibility::Role::MAX_COUNT> rolesRule;
-  MatchType                                                                      roleMatchType = MatchType::INVALID;
-  std::array<int32_t, 4>                                                         rolesConverted{0, 0, 0, 0};
-  if(!roles.empty())
-  {
-    for(auto role : roles)
-    {
-      rolesRule[role] = true;
-    }
-    const auto rolesRaw = rolesRule.GetRawData();
-    rolesConverted      = {static_cast<int32_t>(rolesRaw[0]), static_cast<int32_t>(rolesRaw[1]), static_cast<int32_t>(rolesRaw[2]), static_cast<int32_t>(rolesRaw[3])};
-    roleMatchType       = MatchType::ALL;
-  }
-
-  return {
-    std::move(statesConverted),
-    static_cast<int32_t>(stateMatchType),
-    {},
-    static_cast<int32_t>(MatchType::INVALID),
-    std::move(rolesConverted),
-    static_cast<int32_t>(roleMatchType),
-    {},
-    static_cast<int32_t>(MatchType::INVALID),
-    false};
-}
-
-int UtcDaliGetMatches(void)
-{
-  ToolkitTestApplication application;
-
-  Dali::Accessibility::TestEnableSC(true);
-
-  application.GetScene().Add(TestMatcheableView().view);
-  application.SendNotification();
-  application.Render();
-
-  auto appAccessible = Accessibility::Bridge::GetCurrentBridge()->GetApplication();
-  DALI_TEST_CHECK(appAccessible);
-  auto collection = dynamic_cast<Accessibility::Collection*>(appAccessible);
-  DALI_TEST_CHECK(collection);
-
-  auto       rule          = GetMatchRule({Accessibility::State::SENSITIVE, Accessibility::State::SHOWING}, {});
-  auto       results       = collection->GetMatches(std::move(rule), static_cast<uint32_t>(SortOrder::CANONICAL), 0);
-  const auto numContainers = TestMatcheableView::N * TestMatcheableView::N;
-  DALI_TEST_CHECK(results.size() == 1 + numContainers / 2 + numContainers); // 1 (root) + num(half of containers) + num(buttons);
-
-  Dali::Accessibility::TestEnableSC(false);
-
-  END_TEST;
-}
-
-int UtcDaliGetMatchesInMatches(void)
-{
-  ToolkitTestApplication application;
-
-  Dali::Accessibility::TestEnableSC(true);
-
-  application.GetScene().Add(TestMatcheableView().view);
-  application.SendNotification();
-  application.Render();
-
-  auto appAccessible = Accessibility::Bridge::GetCurrentBridge()->GetApplication();
-  DALI_TEST_CHECK(appAccessible);
-  auto collection = dynamic_cast<Accessibility::Collection*>(appAccessible);
-  DALI_TEST_CHECK(collection);
-
-  auto rule1   = GetMatchRule({Accessibility::State::SENSITIVE, Accessibility::State::SHOWING}, {});
-  auto rule2   = GetMatchRule({Accessibility::State::SHOWING}, {Accessibility::Role::LABEL});
-  auto results = collection->GetMatchesInMatches(std::move(rule1), std::move(rule2), static_cast<uint32_t>(SortOrder::CANONICAL), 0, 0);
-
-  const auto numLabels = TestMatcheableView::N * TestMatcheableView::N;
-  DALI_TEST_CHECK(results.size() == numLabels); // text labels
 
   Dali::Accessibility::TestEnableSC(false);
 

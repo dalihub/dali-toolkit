@@ -22,15 +22,16 @@
 #include <dali/integration-api/adaptor-framework/shader-precompiler.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali-toolkit/devel-api/visual-factory/precompile-shader-option.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
-using HashType       = uint64_t;
+
+using HashType = uint64_t;
 using ShaderFlagList = std::vector<PrecompileShaderOption::Flag>;
 
 namespace Internal
@@ -41,18 +42,19 @@ namespace Internal
 class VisualShaderFactoryInterface
 {
 public:
+
   /**
    * @brief Structure to request shader info from visual shader factory.
    */
   struct RequestShaderInfo
   {
-    VisualFactoryCache::ShaderType type{VisualFactoryCache::ShaderType::SHADER_TYPE_MAX};
-    std::string                    name{};
-    std::string                    vertexPrefix{};
-    std::string                    fragmentPrefix{};
+    VisualFactoryCache::ShaderType type;
+    std::string name;
+    std::string vertexPrefix;
+    std::string fragmentPrefix;
   };
 
-  VisualShaderFactoryInterface()          = default;
+  VisualShaderFactoryInterface() = default;
   virtual ~VisualShaderFactoryInterface() = default;
 
   /**
@@ -65,7 +67,7 @@ public:
    * @brief Get precompiled shader for precompile
    * @param[out] shaders shaderList for precompile
    */
-  virtual void GetPreCompiledShader(ShaderPreCompiler::RawShaderData& shaders) = 0;
+  virtual void GetPreCompiledShader(RawShaderData& shaders) = 0;
 
 protected:
   std::vector<RequestShaderInfo> mRequestedPrecompileShader;

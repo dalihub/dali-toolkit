@@ -37,29 +37,6 @@ OPTION(CONFIGURE_AUTOMATED_TESTS "Configure automated tests" ON)
 OPTION(USE_DEFAULT_RESOURCE_DIR  "Whether to use the default resource folders. Otherwise set environment variables for DALI_IMAGE_DIR, DALI_SOUND_DIR, DALI_STYLE_DIR, DALI_STYLE_IMAGE_DIR and DALI_DATA_READ_ONLY_DIR" ON)
 OPTION(BUILD_SCENE3D             "Whether to build dali-scene3d." ON)
 OPTION(BUILD_PHYSICS             "Whether to build dali-physics." ON)
-OPTION(BUILD_USD_LOADER          "Whether to build dali-usd-loader." OFF)
-
-# Search for OpenUSD headers and libraries
-find_path(OpenUSD_INCLUDE_DIR pxr/usd/usd/stage.h
-          PATHS ${CMAKE_INSTALL_PREFIX}/ /usr/local/USD /usr/USD
-          PATH_SUFFIXES include)
-
-find_library(OpenUSD_LIB usd_usd
-             PATHS ${CMAKE_INSTALL_PREFIX}/ /usr/local/USD /usr/USD
-             PATH_SUFFIXES lib)
-
-# Check if both include and library are found
-if(OpenUSD_INCLUDE_DIR AND OpenUSD_LIB)
-    SET( BUILD_USD_LOADER ON )
-    get_filename_component(USD_ROOT_DIR ${OpenUSD_INCLUDE_DIR} DIRECTORY)
-    message(STATUS "OpenUSD found at: ${USD_ROOT_DIR}")
-else()
-    message(WARNING "OpenUSD not found. Skipping the compilation of usd-loader files.")
-endif()
-
-if( BUILD_USD_LOADER )
-    OPTION(USD_LOADER_ENABLED "Whether dali-usd-loader is enabled." ON)
-endif()
 
 IF( ENABLE_PKG_CONFIGURE )
   FIND_PACKAGE( PkgConfig REQUIRED )
@@ -601,10 +578,6 @@ IF ( BUILD_PHYSICS )
   ADD_SUBDIRECTORY( ${CMAKE_CURRENT_SOURCE_DIR}/dali-physics )
 ENDIF()
 
-IF ( BUILD_USD_LOADER )
-  ADD_SUBDIRECTORY( ${CMAKE_CURRENT_SOURCE_DIR}/dali-usd-loader )
-ENDIF()
-
 # Build documentation if doxygen tool is available
 SET( doxygenEnabled OFF )
 IF( DOXYGEN_FOUND )
@@ -700,7 +673,6 @@ MESSAGE( STATUS "Enable link test:              " ${ENABLE_LINK_TEST} )
 MESSAGE( STATUS "Configure automated tests:     " ${CONFIGURE_AUTOMATED_TESTS} )
 MESSAGE( STATUS "Build Dali Scene3D:            " ${BUILD_SCENE3D} )
 MESSAGE( STATUS "Build Dali Physics:            " ${BUILD_PHYSICS} )
-MESSAGE( STATUS "Build Dali USD Loader:         " ${BUILD_USD_LOADER} )
 MESSAGE( STATUS "CXXFLAGS:                      " ${CMAKE_CXX_FLAGS} )
 MESSAGE( STATUS "LDFLAGS:                       " ${CMAKE_SHARED_LINKER_FLAGS_INIT}${CMAKE_SHARED_LINKER_FLAGS} )
 

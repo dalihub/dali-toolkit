@@ -76,9 +76,6 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(SAMPLING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX_THEN_LINEAR)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, NO_FILTER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, DONT_CARE)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, LANCZOS)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX_THEN_LANCZOS)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, DEFAULT)
 DALI_ENUM_TO_STRING_TABLE_END(SAMPLING_MODE)
 
 // wrap modes
@@ -105,8 +102,6 @@ DALI_ENUM_TO_STRING_TABLE_END(RELEASE_POLICY)
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 constexpr uint32_t TEXTURE_COUNT_FOR_GPU_ALPHA_MASK = 2u;
-
-constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_UNIFIED_YUV_AND_RGB = 300;
 
 struct NameIndexMatch
 {
@@ -686,14 +681,13 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
        !mUseSynchronousSizing &&
        !atlasing &&
        !mImpl->mCustomShader &&
-       !(mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()) &&
-       !(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_UNIFIED_YUV_AND_RGB)))
+       !(mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()))
     {
       return true;
     }
     else if(mUseFastTrackUploading)
     {
-      DALI_LOG_DEBUG_INFO("FastTrack : Fail to load fast track. mUrl : [%s]%s%s%s%s%s%s%s%s%s%s\n",
+      DALI_LOG_DEBUG_INFO("FastTrack : Fail to load fast track. mUrl : [%s]%s%s%s%s%s%s%s%s%s\n",
                           mImageUrl.GetEllipsedUrl().c_str(),
                           (mLoadPolicy != Toolkit::ImageVisual::LoadPolicy::ATTACHED) ? "/ mLoadPolicy != ATTACHED" : "",
                           (mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::DETACHED) ? "/ mReleasePolicy != DETACHED" : "",
@@ -703,8 +697,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
                           (mUseSynchronousSizing) ? "/ useSynchronousSizing " : "",
                           (atlasing) ? "/ atlasing" : "",
                           (mImpl->mCustomShader) ? "/ use customs shader" : "",
-                          (mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()) ? "/ use masking url" : "",
-                          (Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_UNIFIED_YUV_AND_RGB) ? "/ gles version is low" : "");
+                          (mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()) ? "/ use masking url" : "");
     }
     return false;
   };
@@ -1558,13 +1551,12 @@ Geometry ImageVisual::GenerateGeometry(TextureManager::TextureId textureId, bool
           }
         }
       }
+      else if(createForce)
+      {
+        // Create default quad geometry now
+        geometry = CreateGeometry(mFactoryCache, ImageDimensions(1, 1));
+      }
     }
-  }
-
-  if(!geometry && createForce)
-  {
-    // Create default quad geometry now
-    geometry = CreateGeometry(mFactoryCache, ImageDimensions(1, 1));
   }
 
   return geometry;

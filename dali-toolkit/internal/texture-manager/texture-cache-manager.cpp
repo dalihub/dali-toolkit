@@ -525,8 +525,8 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
     *hashTargetPtr++ = (size.GetHeight() >> 8u) & 0xff;
 
     // Bit-pack the FittingMode, SamplingMode.
-    // FittingMode=3bits, SamplingMode=4bits
-    *hashTargetPtr = (fittingMode << 4u) | (samplingMode);
+    // FittingMode=2bits, SamplingMode=3bits
+    *hashTargetPtr = (fittingMode << 3u) | (samplingMode);
   }
 
   // Append whether we will not correction orientation. We don't do additional job when it is true, the general cases.
