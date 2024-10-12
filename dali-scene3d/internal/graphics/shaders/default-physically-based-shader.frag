@@ -328,7 +328,7 @@ void main()
       exposureFactor *= kInvSampleCount;
 
       // Blend filtered shadow and shadow from fragment normal to allow soft filtering nearby where the NdotL is zero.
-      highp float shadowFactor = clamp((NdotL + 0.5) * 2.0, 0.0f, 1.0);
+      highp float shadowFactor = clamp((NdotL + 0.5) * 2.0, 0.0, 1.0);
       exposureFactor = mix(0.0, exposureFactor, shadowFactor);
     }
     else

@@ -29,7 +29,7 @@ namespace Toolkit
 {
 const unsigned int TOOLKIT_MAJOR_VERSION = 2;
 const unsigned int TOOLKIT_MINOR_VERSION = 3;
-const unsigned int TOOLKIT_MICRO_VERSION = 42;
+const unsigned int TOOLKIT_MICRO_VERSION = 44;
 const char* const  TOOLKIT_BUILD_DATE    = __DATE__ " " __TIME__;
 
 #ifdef DEBUG_ENABLED

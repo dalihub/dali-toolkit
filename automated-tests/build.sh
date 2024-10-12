@@ -41,6 +41,13 @@ function build
     (cd build ; cmake .. -DMODULE=$1 -G "$BUILDSYSTEM" ; $BUILDCMD -j7 )
 }
 
+# Query main build to determine if we are enabling USD loader
+USD_LOADER_ENABLED=0
+(cd ../build/tizen ; cmake -LA -N 2>/dev/null | grep USD_LOADER_ENABLED | grep "\=ON")
+if [ $? -eq 0 ] ; then
+    USD_LOADER_ENABLED=1
+fi
+
 if [ -n "$1" ] ; then
   echo BUILDING ONLY $1
   build $1
@@ -48,9 +55,11 @@ else
   for mod in `ls -1 src/ | grep -v CMakeList `
   do
     if [ $mod != 'common' ] && [ $mod != 'manual' ]; then
-        echo BUILDING $mod
-        build $mod
-        if [ $? -ne 0 ]; then echo "Build failed" ; exit 1; fi
+        if [ $mod != 'dali-usd-loader' ] || [[ $mod == 'dali-usd-loader' && $USD_LOADER_ENABLED == 1 ]]; then
+            echo BUILDING $mod
+            build $mod
+            if [ $? -ne 0 ]; then echo "Build failed" ; exit 1; fi
+        fi
     fi
   done
 fi

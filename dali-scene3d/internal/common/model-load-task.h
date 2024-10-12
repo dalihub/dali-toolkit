@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_LOAD_TASK_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,12 +118,14 @@ private:
   // Undefined
   ModelLoadTask& operator=(const ModelLoadTask& task) = delete;
 
-  std::string                                         mModelUrl;
-  std::string                                         mResourceDirectoryUrl;
-  std::shared_ptr<Dali::Scene3D::Loader::ModelLoader> mModelLoader;
-  ModelCacheManager                                   mModelCacheManager;
-  Dali::Scene3D::Loader::LoadResult                   mLoadResult;
-  bool                                                mHasSucceeded;
+  using ModelLoaderUniquePtr = std::unique_ptr<Dali::Scene3D::Loader::ModelLoader>;
+
+  std::string                       mModelUrl;
+  std::string                       mResourceDirectoryUrl;
+  ModelLoaderUniquePtr              mModelLoader;
+  ModelCacheManager                 mModelCacheManager;
+  Dali::Scene3D::Loader::LoadResult mLoadResult;
+  bool                              mHasSucceeded;
 };
 
 } // namespace Internal
