@@ -315,30 +315,34 @@ bool IsCreateAccessibleEnabled(Toolkit::Control control)
 
 void EmitAccessibilityStateChanged(Dali::Actor actor, Accessibility::State state, int newValue)
 {
-  auto accessible = Accessibility::Accessible::GetOwningPtr(actor);
-  if(DALI_LIKELY(accessible))
+  auto bridge  = Accessibility::Bridge::GetCurrentBridge();
+  auto control = Toolkit::Control::DownCast(actor);
+  if(DALI_LIKELY(control))
   {
-    auto control = Toolkit::Control::DownCast(actor);
-    if(DALI_LIKELY(control))
+    if(state == Accessibility::State::SHOWING)
     {
-      if(state == Accessibility::State::SHOWING)
+      bool isModal = ControlAccessible::IsModal(control);
+      if(isModal)
       {
-        bool isModal = ControlAccessible::IsModal(control);
-        if(isModal)
+        if(newValue == 1)
         {
-          if(newValue == 1)
-          {
-            Accessibility::Bridge::GetCurrentBridge()->RegisterDefaultLabel(accessible);
-          }
-          else
-          {
-            Accessibility::Bridge::GetCurrentBridge()->UnregisterDefaultLabel(accessible);
-          }
+          bridge->RegisterDefaultLabel(actor);
+        }
+        else
+        {
+          bridge->UnregisterDefaultLabel(actor);
         }
       }
     }
+  }
 
-    accessible->EmitStateChanged(state, newValue, 0);
+  if(bridge->IsUp())
+  {
+    auto accessible = Accessibility::Accessible::Get(actor);
+    if(DALI_LIKELY(accessible))
+    {
+      accessible->EmitStateChanged(state, newValue, 0);
+    }
   }
 }
 

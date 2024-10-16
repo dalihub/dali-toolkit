@@ -2015,6 +2015,67 @@ int UtcDaliEmitAccessibilityStateChanged(void)
   END_TEST;
 }
 
+int UtcDaliAccessibleDefaultLabel(void)
+{
+  ToolkitTestApplication application;
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  auto root           = Control::New();
+  auto rootAccessible = Accessibility::Accessible::Get(root);
+
+  auto control1 = Control::New();
+  auto control2 = Control::New();
+
+  application.GetScene().Add(root);
+  application.SendNotification();
+  application.Render();
+
+  auto bridge = Accessibility::Bridge::GetCurrentBridge();
+
+  // control1 is off scene: not registered as default label
+  bridge->RegisterDefaultLabel(control1);
+  DALI_TEST_CHECK(bridge->GetDefaultLabel(rootAccessible) == rootAccessible);
+
+  // Add control1 and control2 to the scene
+  root.Add(control1);
+  root.Add(control2);
+  application.SendNotification();
+  application.Render();
+
+  // control1 is on scene; registered as default label
+  bridge->RegisterDefaultLabel(control1);
+  DALI_TEST_CHECK(bridge->GetDefaultLabel(rootAccessible) == Accessibility::Accessible::Get(control1));
+
+  // control2 is on scene; registered as default label; GetDefaultLabel returns the last added default label.
+  bridge->RegisterDefaultLabel(control2);
+  DALI_TEST_CHECK(bridge->GetDefaultLabel(rootAccessible) == Accessibility::Accessible::Get(control2));
+
+  // Remove and Reset control2
+  root.Remove(control2);
+  control2.Reset();
+  application.SendNotification();
+  application.Render();
+
+  // GetDefaultLabel returns control1 as control2 becomes unavailable.
+  DALI_TEST_CHECK(bridge->GetDefaultLabel(rootAccessible) == Accessibility::Accessible::Get(control1));
+
+  // UnregisterDefaultLabel immediately remove the control1 from the list.
+  bridge->UnregisterDefaultLabel(control1);
+  DALI_TEST_CHECK(bridge->GetDefaultLabel(rootAccessible) == rootAccessible);
+
+  // Does not crash when unregistering already unregistered actors.
+  bridge->UnregisterDefaultLabel(control1);
+  bridge->UnregisterDefaultLabel(control2);
+
+  // GetDefaultLabel returns nullptr if nullptr is passed.
+  DALI_TEST_CHECK(bridge->GetDefaultLabel(nullptr) == nullptr);
+
+  Dali::Accessibility::TestEnableSC(false);
+
+  END_TEST;
+}
+
 int UtcDaliAccessibleRemovalOnActorDestoyed(void)
 {
   ToolkitTestApplication application;
