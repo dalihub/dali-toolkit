@@ -95,6 +95,8 @@ typedef IntrusivePtr<ImageVisual> ImageVisualPtr;
  *   "BOX_THEN_LINEAR"
  *   "NO_FILTER"
  *   "DONT_CARE"
+ *   "LANCZOS"
+ *   "BOX_THEN_LANCZOS"
  *   "DEFAULT"
  *
  * where loadPolicy should be one of the following image loading modes
@@ -386,8 +388,8 @@ private:
 
   ImageVisualShaderFactory& mImageVisualShaderFactory;
 
-  Dali::FittingMode::Type                         mFittingMode : 3;
-  Dali::SamplingMode::Type                        mSamplingMode : 4;
+  Dali::FittingMode::Type                         mFittingMode : 4;
+  Dali::SamplingMode::Type                        mSamplingMode : 5;
   Dali::WrapMode::Type                            mWrapModeU : 3;
   Dali::WrapMode::Type                            mWrapModeV : 3;
   Dali::Toolkit::ImageVisual::LoadPolicy::Type    mLoadPolicy;

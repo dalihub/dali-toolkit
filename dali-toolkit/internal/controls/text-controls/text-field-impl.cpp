@@ -540,8 +540,7 @@ void TextField::OnInitialize()
   }
 
   // Accessibility
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::ENTRY);
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::ENTRY);
 
   Accessibility::Bridge::EnabledSignal().Connect(this, &TextField::OnAccessibilityStatusChanged);
   Accessibility::Bridge::DisabledSignal().Connect(this, &TextField::OnAccessibilityStatusChanged);
@@ -863,7 +862,8 @@ bool TextField::OnKeyEvent(const KeyEvent& event)
 
     return true;
   }
-  else if(Dali::DevelKey::DALI_KEY_RETURN == event.GetKeyCode() && KEY_RETURN_NAME == event.GetKeyName())
+  else if((Dali::DevelKey::DALI_KEY_RETURN == event.GetKeyCode() && KEY_RETURN_NAME == event.GetKeyName()) ||
+          Dali::DevelKey::DALI_KEY_KP_ENTER == event.GetKeyCode())
   {
     // Do nothing when enter is comming.
     return false;

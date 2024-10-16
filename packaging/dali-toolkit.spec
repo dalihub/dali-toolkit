@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.3.41
+Version:    2.3.44
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -20,6 +20,10 @@ BuildRequires:  pkgconfig(egl)
 
 BuildRequires:  gettext
 BuildRequires:  pkgconfig(libtzplatform-config)
+
+%if 0%{?enable_usd_loader}
+BuildRequires:  openusd-devel
+%endif
 
 # For ASAN test
 %if "%{vd_asan}" == "1" || "%{asan}" == "1"
@@ -166,6 +170,31 @@ Requires:   %{dali2_physics3d} = %{version}-%{release}
 
 %description -n %{dali2_physics3d}-devel
 Development components for dali2-physics-3d.
+
+%if 0%{?enable_usd_loader}
+##############################
+# dali-usd-loader
+##############################
+%define dali2_usdloader dali2-usd-loader
+%package -n %{dali2_usdloader}
+Summary:    USD model loading library
+Group:      System/Libraries
+License:    Apache-2.0
+Requires:   %{dali2_scene3d}
+Requires:   openusd
+
+%description -n %{dali2_usdloader}
+Provides functionality for loading and rendering USD models. See README.md for more details.
+
+%package -n %{dali2_usdloader}-devel
+Summary:    Development components for dali-usd-loader
+Group:      Development/Building
+Requires:   %{dali2_usdloader} = %{version}-%{release}
+Requires:   %{dali2_scene3d}-devel
+
+%description -n %{dali2_usdloader}-devel
+Development components for dali-usd-loader.
+%endif
 
 %define dali_data_rw_dir            %TZ_SYS_SHARE/dali/
 %define dali_data_ro_dir            %TZ_SYS_RO_SHARE/dali/
@@ -361,6 +390,12 @@ pushd %{dali_toolkit_style_files}/1920x1080_rpi
 for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
 popd
 
+%if 0%{?enable_usd_loader}
+%post -n %{dali2_usdloader}
+/sbin/ldconfig
+exit 0
+%endif
+
 ##############################
 # Pre Uninstall
 ##############################
@@ -471,6 +506,12 @@ case "$1" in
     popd
   ;;
 esac
+
+%if 0%{?enable_usd_loader}
+%postun -n %{dali2_usdloader}
+/sbin/ldconfig
+exit 0
+%endif
 
 ##############################
 # Files in Binary Packages
@@ -596,3 +637,19 @@ esac
 %{_includedir}/bullet/*
 %{_libdir}/pkgconfig/dali2-physics-3d.pc
 %{_libdir}/pkgconfig/bullet3.pc
+
+%if 0%{?enable_usd_loader}
+%files -n %{dali2_usdloader}
+%if 0%{?enable_dali_smack_rules}
+%manifest dali-usd-loader.manifest-smack
+%else
+%manifest dali-usd-loader.manifest
+%endif
+%defattr(-,root,root,-)
+%{_libdir}/lib%{dali2_usdloader}.so
+%license LICENSE
+
+%files -n %{dali2_usdloader}-devel
+%defattr(-,root,root,-)
+%{_libdir}/pkgconfig/dali2-usd-loader.pc
+%endif

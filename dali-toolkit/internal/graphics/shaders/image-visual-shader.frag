@@ -238,9 +238,9 @@ lowp vec4 ConvertYuvToRgba(mediump vec2 texCoord)
   }
 #endif
 
-  lowp float y = texture(sTexture, texCoord).r;
-  lowp float u = texture(sTextureU, texCoord).r - 0.5;
-  lowp float v = texture(sTextureV, texCoord).r - 0.5;
+  lowp float y = TEXTURE(sTexture, texCoord).r;
+  lowp float u = TEXTURE(sTextureU, texCoord).r - 0.5;
+  lowp float v = TEXTURE(sTextureV, texCoord).r - 0.5;
   lowp vec4 rgba;
   rgba.r = y + (1.403 * v);
   rgba.g = y - (0.344 * u) - (0.714 * v);

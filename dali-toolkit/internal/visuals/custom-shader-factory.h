@@ -31,7 +31,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 /**
  * CustomShaderFactory is an object that provides custom shader
  */
@@ -57,13 +56,13 @@ public: // Implementation of VisualShaderFactoryInterface
   /**
    * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::GetPreCompiledShader
    */
-  void GetPreCompiledShader(RawShaderData& shaders) override;
+  void GetPreCompiledShader(ShaderPreCompiler::RawShaderData& shaders) override;
 
 private:
   /**
    * @brief Save the custom shader
    */
-  bool SavePrecompileShader(std::string& shaderName, std::string& vertexPrefix, std::string& fragmentPrefix);
+  bool SavePrecompileShader(std::string&& shaderName, std::string&& vertexPrefix, std::string&& fragmentPrefix);
 
 protected:
   /**

@@ -181,6 +181,8 @@ void Control::SetRenderEffect(Toolkit::RenderEffect effect)
 
       Dali::Toolkit::Control ownerControl(GetOwner());
       object->SetOwnerControl(ownerControl);
+
+      SetOffScreenRenderableType(object->GetOffScreenRenderableType());
     }
   }
 }
@@ -197,12 +199,24 @@ void Control::ClearRenderEffect()
     }
     mImpl->mRenderEffect.Reset();
   }
+  SetOffScreenRenderableType(OffScreenRenderable::NONE);
 }
 
 void Control::SetResourceReady()
 {
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
   controlDataImpl.ResourceReady();
+}
+
+Dali::Actor Control::GetOffScreenRenderableSourceActor()
+{
+  // Need to override this in FORWARD OffScreenRenderable
+  return Dali::Actor();
+}
+
+bool Control::IsOffScreenRenderTaskExclusive()
+{
+  return false;
 }
 
 std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::GetAccessibleObject()
@@ -615,15 +629,6 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
       }
       break;
     }
-    case Actor::Property::VISIBLE:
-    {
-      auto accessible = GetAccessibleObject();
-      if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
-      {
-        accessible->EmitVisible(Self().GetProperty<bool>(Actor::Property::VISIBLE));
-      }
-      break;
-    }
     case DevelActor::Property::USER_INTERACTION_ENABLED:
     {
       const bool enabled = propertyValue.Get<bool>();
@@ -653,6 +658,19 @@ void Control::OnSizeSet(const Vector3& targetSize)
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 {
   // @todo size negotiate background to new size, animate as well?
+}
+
+void Control::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+{
+  if(mImpl->mRenderEffect)
+  {
+    Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(mImpl->mRenderEffect.GetObjectPtr());
+
+    if(object)
+    {
+      object->GetOffScreenRenderTasks(tasks, isForward);
+    }
+  }
 }
 
 bool Control::OnKeyEvent(const KeyEvent& event)
