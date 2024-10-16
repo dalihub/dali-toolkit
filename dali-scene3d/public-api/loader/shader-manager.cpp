@@ -69,7 +69,7 @@ ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinit
       option.AddOption(ShaderOption::Type::BASE_COLOR_TEXTURE);
     }
 
-    if(MaskMatch(materialDef.mFlags, MaterialDefinition::METALLIC) || MaskMatch(materialDef.mFlags, MaterialDefinition::ROUGHNESS))
+    if(materialDef.CheckTextures(MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS))
     {
       option.AddOption(ShaderOption::Type::METALLIC_ROUGHNESS_TEXTURE);
     }

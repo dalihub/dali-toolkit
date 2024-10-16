@@ -1,6 +1,0 @@
-set(usd_loader_internal_dir ${usd_loader_dir}/internal)
-
-set(usd_loader_src_files ${usd_loader_src_files}
-	${usd_loader_internal_dir}/usd-loader-impl.cpp
-	${usd_loader_internal_dir}/create-usd-loader.cpp
-)

@@ -1411,7 +1411,7 @@ int UtcDaliTextLabelLocaleChange02(void)
   float expectedHeight = 100.0f;
 
   label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
-  label.SetProperty(TextLabel::Property::TEXT, "H");
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world");
   label.SetProperty(Actor::Property::SIZE, Vector2(expectedWidth, expectedHeight));
   label.SetProperty(TextLabel::Property::POINT_SIZE, 12);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
@@ -1478,7 +1478,7 @@ int UtcDaliTextLabelLocaleChange02(void)
   expectedHeight  = 50.0f;
   float dummySize = 100.0f;
 
-  std::string text = "L";
+  std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
   dummy1.SetProperty(TextLabel::Property::TEXT, text);
   dummy2.SetProperty(TextLabel::Property::TEXT, text);
   label.SetProperty(TextLabel::Property::TEXT, text);

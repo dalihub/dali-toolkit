@@ -60,29 +60,6 @@ public:
    */
   bool IsActivated() const;
 
-  /**
-   * @brief Retrieves OffScreenRenderableType of this RenderEffect.
-   *
-   * @return OffScreenRenderableType for this RenderEffect.
-   */
-  virtual OffScreenRenderable::Type GetOffScreenRenderableType() = 0;
-
-  /**
-   * @brief Retrieves the off-screen RenderTasks associated with the RenderEffect.
-   * This method returns the internal RenderTasks held by the RenderEffect. This tasks are
-   * used for off-screen rendering, and the system will assign order index to each
-   * tasks based on the render order.
-   *
-   * RenderEffect with a non-NONE OffScreenRenderableType should override this method to
-   * provide their render tasks.
-   *
-   * @param[out] tasks A list of RenderTasks to be populated with the RenderEffect's forward
-   * or backward off-screen RenderTask.
-   * @param[in] isForward Indicates whether to retrieve forward (true) or backward (false)
-   * RenderTasks.
-   */
-  virtual void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) = 0;
-
 protected:
   /**
    * @copydoc Dali::Toolkit::RenderEffect::RenderEffect

@@ -217,15 +217,6 @@ public:
   static WebView New(uint32_t argc, char** argv);
 
   /**
-   * @brief Create an initialized WebView with web engine type.
-   *
-   * @param [in] argc The count of arguments of Applications
-   * @param [in] argv The string array of arguments of Applications
-   * @param [in] type The web engine type (0: Chromium, 1: LWE, otherwise: depend on system environment)
-   */
-  static WebView New(uint32_t argc, char** argv, int32_t type);
-
-  /**
    * @brief Find web view by web engine plugin.
    */
   static Toolkit::WebView FindWebView(Dali::WebEnginePlugin* plugin);
@@ -812,32 +803,6 @@ public:
    * @param[in] callback The callback function called asynchronously.
    */
   void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback);
-
-  /**
-   * @brief Cancel WebAuthentication(cancel in progress passkey operation).
-   */
-  void WebAuthenticationCancel();
-
-  /**
-   * @brief Register WebAuthDisplayQR callback.
-   *
-   * @param[in] callback The callback informs browser app to display QR code popup for passkey scenario.
-   */
-  void RegisterWebAuthDisplayQRCallback(Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback callback);
-
-  /**
-   * @brief Register WebAuthResponse callback.
-   *
-   * @param[in] callback The callback informs browser app that the passkey registration and authentication has been successful and app can close QR popup.
-   */
-  void RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback);
-
-  /**
-   * @brief Register UserMediaPermissionRequest callback.
-   *
-   * @param[in] callback The callback to be called for handling user media permission.
-   */
-  void RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback);
 
 public: // Not intended for application developers
   /// @cond internal

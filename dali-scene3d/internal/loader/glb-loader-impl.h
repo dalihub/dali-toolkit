@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_GLB_LOADER_IMPL_H
 #define DALI_SCENE3D_LOADER_GLB_LOADER_IMPL_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/internal/loader/model-loader-impl.h>
 #include <dali-scene3d/public-api/api.h>
-#include <dali-scene3d/public-api/loader/model-loader-impl.h>
 
 namespace Dali::Scene3D::Loader::Internal
 {
@@ -31,7 +31,7 @@ class GlbLoaderImpl : public ModelLoaderImpl
 {
 public:
   /**
-   * @copydoc Dali::Scene3D::Loader::ModelLoaderImpl::LoadMode()
+   * @copydoc Dali::Scene3D::Loader::Internal::ModelLoaderImpl::LoadMode()
    */
   bool LoadModel(const std::string& url, Dali::Scene3D::Loader::LoadResult& result) override;
 };

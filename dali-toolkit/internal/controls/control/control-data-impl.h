@@ -71,13 +71,6 @@ struct RegisteredVisual
 
 typedef Dali::OwnerContainer<RegisteredVisual*> RegisteredVisualContainer;
 
-enum class TriStateProperty
-{
-  AUTO = 0,
-  TRUE,
-  FALSE
-};
-
 /**
  * @brief Holds the Implementation for the internal control class
  */
@@ -638,11 +631,11 @@ public:
     std::string                                                                       description{};
     std::string                                                                       value{};
     std::string                                                                       automationId{};
-    int32_t                                                                           role{static_cast<int32_t>(DevelControl::AccessibilityRole::NONE)};
+    int32_t                                                                           role{static_cast<int32_t>(Dali::Accessibility::Role::UNKNOWN)};
     DevelControl::AccessibilityStates                                                 states{};
     std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> relations;
     Property::Map                                                                     extraAttributes{};
-    TriStateProperty                                                                  isHighlightable{TriStateProperty::AUTO};
+    bool                                                                              isHighlightable{false};
     bool                                                                              isHidden{false};
     bool                                                                              isScrollable{false};
     bool                                                                              isModal{false};

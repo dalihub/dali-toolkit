@@ -43,7 +43,7 @@
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/internal/visuals/mesh/mesh-visual.h>
-#include <dali-toolkit/internal/visuals/npatch/npatch-shader-factory.h>
+#include <dali-toolkit/internal/visuals/npatch-shader-factory.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
@@ -425,7 +425,7 @@ bool VisualFactory::AddPrecompileShader(const Property::Map& map)
   auto                   type = shaderOption.GetShaderType();
   if(type == PrecompileShaderOption::ShaderType::UNKNOWN)
   {
-    DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader type\n");
+    DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader type");
     return false;
   }
 
@@ -440,39 +440,36 @@ void VisualFactory::UsePreCompiledShader()
   }
   mPrecompiledShaderRequested = true;
 
-  ShaderPreCompiler::Get().Enable(true);
+  ShaderPreCompiler::Get().Enable();
 
   // Get image shader
-  ShaderPreCompiler::RawShaderDataList rawShaderList;
-  ShaderPreCompiler::RawShaderData     imageShaderData;
+  std::vector<RawShaderData> rawShaderList;
+  RawShaderData              imageShaderData;
   GetImageVisualShaderFactory().GetPreCompiledShader(imageShaderData);
-  rawShaderList.emplace_back(std::move(imageShaderData));
+  rawShaderList.push_back(imageShaderData);
 
   // Get text shader
-  ShaderPreCompiler::RawShaderData textShaderData;
+  RawShaderData textShaderData;
   GetTextVisualShaderFactory().GetPreCompiledShader(textShaderData);
-  rawShaderList.emplace_back(std::move(textShaderData));
+  rawShaderList.push_back(textShaderData);
 
   // Get color shader
-  ShaderPreCompiler::RawShaderData colorShaderData;
+  RawShaderData colorShaderData;
   GetColorVisualShaderFactory().GetPreCompiledShader(colorShaderData);
-  rawShaderList.emplace_back(std::move(colorShaderData));
+  rawShaderList.push_back(colorShaderData);
 
-  // Get npatch shader
-  ShaderPreCompiler::RawShaderData npatchShaderData;
+  RawShaderData npatchShaderData;
   GetNpatchShaderFactory().GetPreCompiledShader(npatchShaderData);
-  rawShaderList.emplace_back(std::move(npatchShaderData));
+  rawShaderList.push_back(npatchShaderData);
 
   // Get 3D shader
-  // TODO
-
   // Get Custom shader
-  ShaderPreCompiler::RawShaderData customShaderData;
+  RawShaderData customShaderData;
   GetCustomShaderFactory().GetPreCompiledShader(customShaderData);
-  rawShaderList.emplace_back(std::move(customShaderData));
+  rawShaderList.push_back(customShaderData);
 
   // Save all shader
-  ShaderPreCompiler::Get().SavePreCompileShaderList(std::move(rawShaderList));
+  ShaderPreCompiler::Get().SavePreCompileShaderList(rawShaderList);
 }
 
 Internal::TextureManager& VisualFactory::GetTextureManager()
@@ -605,7 +602,7 @@ bool VisualFactory::AddPrecompileShader(PrecompileShaderOption& option)
     }
     default:
     {
-      DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader factory type:%d\n", type);
+      DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader factory type:%d", type);
       break;
     }
   }

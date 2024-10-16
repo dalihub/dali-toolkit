@@ -31,6 +31,7 @@ namespace Toolkit
 {
 namespace Internal
 {
+
 namespace ColorVisualShaderFeature
 {
 namespace RoundedCorner
@@ -91,8 +92,8 @@ public:
   FeatureBuilder& EnableCutout(bool enableCutout);
 
   VisualFactoryCache::ShaderType GetShaderType() const;
-  void                           GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const;
-  void                           GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const;
+  void GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const;
+  void GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const;
 
   bool IsEnabledRoundCorner() const
   {
@@ -153,7 +154,7 @@ public: // Implementation of VisualShaderFactoryInterface
   /**
    * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::GetPreCompiledShader
    */
-  void GetPreCompiledShader(ShaderPreCompiler::RawShaderData& shaders) override;
+  void GetPreCompiledShader(RawShaderData& shaders) override;
 
 private:
   /**
@@ -163,7 +164,7 @@ private:
   /**
    * @brief Check if cached hash value is valid or not.
    */
-  bool SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string&& vertexPrefix, std::string&& fragmentPrefix);
+  bool SavePrecompileShader(VisualFactoryCache::ShaderType shader, std::string& vertexPrefix, std::string& fragmentPrefix);
 
 protected:
   /**

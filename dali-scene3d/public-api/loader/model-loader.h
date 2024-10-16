@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_MODEL_LOADER_H
 #define DALI_SCENE3D_LOADER_MODEL_LOADER_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,10 @@
 
 namespace Dali::Scene3D::Loader
 {
+namespace Internal
+{
 class ModelLoaderImpl;
+}
 
 class DALI_SCENE3D_API ModelLoader
 {
@@ -44,12 +47,6 @@ public:
    * @param[out] loadResult Loaded result that includes scene tree and resources.
    */
   ModelLoader(const std::string& modelUrl, const std::string& resourceDirectoryUrl, Dali::Scene3D::Loader::LoadResult& loadResult);
-
-  /**
-   * @brief ModelLoader Destructor
-   * @SINCE_2_3.43
-   */
-  ~ModelLoader();
 
   /**
    * @brief Request to load model from model url.
@@ -127,8 +124,7 @@ private:
   Dali::Scene3D::Loader::LoadResult             mLoadResult;
   Dali::Scene3D::Loader::Customization::Choices mResourceChoices;
 
-  using ModelLoaderImplUniquePtr = std::unique_ptr<Dali::Scene3D::Loader::ModelLoaderImpl>;
-  ModelLoaderImplUniquePtr mImpl;
+  std::shared_ptr<Internal::ModelLoaderImpl> mImpl;
 };
 } // namespace Dali::Scene3D::Loader
 

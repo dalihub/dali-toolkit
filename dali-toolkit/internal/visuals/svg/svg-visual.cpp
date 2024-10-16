@@ -347,11 +347,6 @@ void SvgVisual::LoadComplete(int32_t loadId, Dali::VectorImageRenderer vectorIma
   if(DALI_LIKELY(vectorImageRenderer))
   {
     vectorImageRenderer.GetDefaultSize(mDefaultWidth, mDefaultHeight);
-    if(mImpl->mEventObserver && mImpl->mFittingMode != DevelVisual::FittingMode::DONT_CARE)
-    {
-      // Need teo call ApplyFittingMode once again, after load completed.
-      mImpl->mEventObserver->RelayoutRequest(*this);
-    }
   }
   else if(!mLoadFailed)
   {

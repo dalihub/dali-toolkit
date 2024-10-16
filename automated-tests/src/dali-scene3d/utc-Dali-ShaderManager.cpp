@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,6 @@ int UtcDaliShaderManagerProduceShader(void)
      {ShaderOption::Type::THREE_TEXTURE, ShaderOption::Type::BASE_COLOR_TEXTURE}},
     {//3
      [](ShaderParameters& p) {
-       p.materialDefinition.mFlags |= MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS;
        p.materialDefinition.mTextureStages.push_back({MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, {}});
      },
      {ShaderOption::Type::THREE_TEXTURE, ShaderOption::Type::METALLIC_ROUGHNESS_TEXTURE}},

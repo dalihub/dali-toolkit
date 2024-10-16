@@ -57,7 +57,6 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, SCALE_TO_FILL)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, FIT_WIDTH)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, FIT_HEIGHT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, VISUAL_FITTING)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, DEFAULT)
 DALI_ENUM_TO_STRING_TABLE_END(FITTING_MODE)
 
@@ -70,9 +69,6 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(SAMPLING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX_THEN_LINEAR)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, NO_FILTER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, DONT_CARE)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, LANCZOS)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX_THEN_LANCZOS)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, DEFAULT)
 DALI_ENUM_TO_STRING_TABLE_END(SAMPLING_MODE)
 
 // stop behavior
@@ -286,9 +282,9 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mActionStatus(DevelAnimatedImageVisual::Action::PLAY),
   mWrapModeU(WrapMode::DEFAULT),
   mWrapModeV(WrapMode::DEFAULT),
-  mStopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
   mFittingMode(FittingMode::VISUAL_FITTING),
   mSamplingMode(SamplingMode::BOX_THEN_LINEAR),
+  mStopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
   mStartFirstFrame(false),
   mIsJumpTo(false)
 {

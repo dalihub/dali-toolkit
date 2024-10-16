@@ -509,12 +509,9 @@ void VectorAnimationThread::SleepThread::SleepUntil(std::chrono::time_point<std:
 
   if(DALI_LIKELY(!mDestroyThread))
   {
-    if(mSleepTimePoint != timeToSleepUntil) ///< Trigger only if new time point is changed.
-    {
-      mSleepTimePoint = timeToSleepUntil;
-      mNeedToSleep    = true;
-      mConditionalWait.Notify(lock);
-    }
+    mSleepTimePoint = timeToSleepUntil;
+    mNeedToSleep    = true;
+    mConditionalWait.Notify(lock);
   }
 }
 
@@ -540,58 +537,42 @@ void VectorAnimationThread::SleepThread::Run()
   {
     bool needToSleep = false;
 
+    std::chrono::time_point<std::chrono::steady_clock> sleepTimePoint;
+
     {
       ConditionalWait::ScopedLock lock(mConditionalWait);
-
-      ConditionalWait::TimePoint sleepTimePoint;
-
-      {
-        Mutex::ScopedLock sleepLock(mSleepRequestMutex);
-
-        if(DALI_LIKELY(!mDestroyThread))
-        {
-          needToSleep    = mNeedToSleep;
-          sleepTimePoint = mSleepTimePoint;
-          mNeedToSleep   = false;
-        }
-      }
+      Mutex::ScopedLock           sleepLock(mSleepRequestMutex);
 
       if(DALI_LIKELY(!mDestroyThread))
       {
-        DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_SLEEP_THREAD", [&](std::ostringstream& oss) {
-          oss << "[";
-          if(needToSleep)
-          {
-            auto currentTime = std::chrono::steady_clock::now();
-            auto duration    = std::chrono::duration_cast<std::chrono::milliseconds>(sleepTimePoint - currentTime);
-            oss << duration.count() << " ms]";
-          }
-          else
-          {
-            oss << "until notify]";
-          }
-        });
+        needToSleep    = mNeedToSleep;
+        sleepTimePoint = mSleepTimePoint;
 
-        if(needToSleep)
-        {
-          mConditionalWait.WaitUntil(lock, sleepTimePoint);
-        }
-        else
-        {
-          mConditionalWait.Wait(lock);
-        }
-
-        DALI_TRACE_END(gTraceFilter, "VECTOR_ANIMATION_SLEEP_THREAD");
+        mNeedToSleep = false;
       }
     }
 
-    if(DALI_LIKELY(!mDestroyThread) && needToSleep)
+    if(needToSleep)
     {
-      Mutex::ScopedLock awakeLock(mAwakeCallbackMutex);
-      if(DALI_LIKELY(mAwakeCallback))
+      DALI_TRACE_SCOPE(gTraceFilter, "VECTOR_ANIMATION_SLEEP_THREAD");
+
+      std::this_thread::sleep_until(sleepTimePoint);
+
       {
-        // Awake out of ConditionalWait::ScopedLock to avoid deadlock.
-        CallbackBase::Execute(*mAwakeCallback);
+        Mutex::ScopedLock awakeLock(mAwakeCallbackMutex);
+        if(DALI_LIKELY(mAwakeCallback))
+        {
+          CallbackBase::Execute(*mAwakeCallback);
+        }
+      }
+    }
+
+    {
+      ConditionalWait::ScopedLock lock(mConditionalWait);
+      if(DALI_LIKELY(!mDestroyThread) && !mNeedToSleep)
+      {
+        DALI_TRACE_SCOPE(gTraceFilter, "VECTOR_ANIMATION_SLEEP_THREAD_WAIT");
+        mConditionalWait.Wait(lock);
       }
     }
   }

@@ -90,21 +90,28 @@ struct ImageInformation
 {
   ImageInformation(const std::string           url,
                    const Dali::ImageDimensions dimensions,
-                   Dali::SamplingMode::Type    samplingMode)
+                   Dali::FittingMode::Type     fittingMode,
+                   Dali::SamplingMode::Type    samplingMode,
+                   bool                        orientationCorrection)
   : mUrl(url),
     mDimensions(dimensions),
-    mSamplingMode(samplingMode)
+    mFittingMode(fittingMode),
+    mSamplingMode(samplingMode),
+    mOrientationCorrection(orientationCorrection)
   {
   }
 
   bool operator==(const ImageInformation& rhs) const
   {
-    return (mUrl == rhs.mUrl) && (mDimensions == rhs.mDimensions) && (mSamplingMode == rhs.mSamplingMode);
+    // Check url and orientation correction is enough.
+    return (mUrl == rhs.mUrl) && (mOrientationCorrection == rhs.mOrientationCorrection);
   }
 
   std::string              mUrl;
   Dali::ImageDimensions    mDimensions;
-  Dali::SamplingMode::Type mSamplingMode : 5;
+  Dali::FittingMode::Type  mFittingMode;
+  Dali::SamplingMode::Type mSamplingMode;
+  bool                     mOrientationCorrection;
 };
 
 // Hash functor list
@@ -127,8 +134,15 @@ std::size_t GenerateHash(const ImageInformation& info)
     *hashTargetPtr++ = info.mDimensions.GetHeight() & 0xff;
     *hashTargetPtr++ = (info.mDimensions.GetHeight() >> 8u) & 0xff;
 
-    // Bit-pack the SamplingMode.
-    *hashTargetPtr = (info.mSamplingMode);
+    // Bit-pack the FittingMode, SamplingMode and orientation correction.
+    // FittingMode=2bits, SamplingMode=3bits, orientationCorrection=1bit
+    *hashTargetPtr = (info.mFittingMode << 4u) | (info.mSamplingMode << 1) | (info.mOrientationCorrection ? 1 : 0);
+  }
+  else
+  {
+    // We are not including sizing information, but we still need an extra byte for orientationCorrection.
+    hashTarget.resize(1u);
+    hashTarget[0u] = info.mOrientationCorrection ? 't' : 'f';
   }
 
   return Dali::CalculateHash(info.mUrl) ^ Dali::CalculateHash(hashTarget);
@@ -151,11 +165,11 @@ Dali::PixelData CreatePixelDataFromImageInfo(const ImageInformation& info, bool 
     {
       oss << "d:" << info.mDimensions.GetWidth() << "x" << info.mDimensions.GetHeight() << " ";
     }
-    oss << "s:" << info.mSamplingMode << " ";
+    oss << "f:" << info.mFittingMode << " s:" << info.mSamplingMode << " c:" << info.mOrientationCorrection << " ";
     oss << "u:" << info.mUrl << "]";
   });
   // Load the image synchronously (block the thread here).
-  Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(info.mUrl, info.mDimensions, Dali::FittingMode::DEFAULT, info.mSamplingMode, true);
+  Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(info.mUrl, info.mDimensions, info.mFittingMode, info.mSamplingMode, info.mOrientationCorrection);
   if(pixelBuffer)
   {
     pixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffer, releasePixelData);
@@ -649,14 +663,16 @@ Dali::PixelData GetDefaultBrdfPixelData()
 
 Dali::PixelData GetCachedPixelData(const std::string& url)
 {
-  return GetCachedPixelData(url, ImageDimensions(), SamplingMode::BOX_THEN_LINEAR);
+  return GetCachedPixelData(url, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true);
 }
 
 Dali::PixelData GetCachedPixelData(const std::string& url,
                                    ImageDimensions    dimensions,
-                                   SamplingMode::Type samplingMode)
+                                   FittingMode::Type  fittingMode,
+                                   SamplingMode::Type samplingMode,
+                                   bool               orientationCorrection)
 {
-  ImageInformation info(url, dimensions, samplingMode);
+  ImageInformation info(url, dimensions, fittingMode, samplingMode, orientationCorrection);
   if(gCacheImpl == nullptr)
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "CacheImpl not prepared! load PixelData without cache.\n");

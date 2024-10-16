@@ -24,6 +24,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -275,16 +276,6 @@ Property::Value Panel::GetProperty(BaseObject* object, Property::Index index)
   return value;
 }
 
-Dali::Actor Panel::GetOffScreenRenderableSourceActor()
-{
-  return (mRootLayer) ? mRootLayer : Dali::Actor();
-}
-
-bool Panel::IsOffScreenRenderTaskExclusive()
-{
-  return (mRenderTask) ? mRenderTask.IsExclusive() : false;
-}
-
 ///////////////////////////////////////////////////////////
 //
 // Private methods
@@ -394,7 +385,6 @@ void Panel::OnInitialize()
   scaleConstraint.Apply();
 
   UpdateProperties();
-  SetOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
 }
 
 void Panel::OnSceneConnection(int depth)
@@ -465,18 +455,6 @@ void Panel::OnSceneDisconnection()
   mFrameBuffer.Reset();
 
   Control::OnSceneDisconnection();
-}
-
-void Panel::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
-{
-  tasks.clear();
-  if(isForward)
-  {
-    if(mRenderTask)
-    {
-      tasks.push_back(mRenderTask);
-    }
-  }
 }
 
 void Panel::SetTransparent(bool transparent)

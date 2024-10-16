@@ -314,9 +314,9 @@ private:
 
   Dali::WrapMode::Type                 mWrapModeU : 3;
   Dali::WrapMode::Type                 mWrapModeV : 3;
+  Dali::FittingMode::Type              mFittingMode : 3;
+  Dali::SamplingMode::Type             mSamplingMode : 4;
   DevelImageVisual::StopBehavior::Type mStopBehavior : 2;
-  Dali::FittingMode::Type              mFittingMode : 4;
-  Dali::SamplingMode::Type             mSamplingMode : 5;
   bool                                 mStartFirstFrame : 1;
   bool                                 mIsJumpTo : 1;
 };

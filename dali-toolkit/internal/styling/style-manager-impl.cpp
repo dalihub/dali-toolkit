@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -369,15 +369,7 @@ bool StyleManager::LoadJSON(Toolkit::Builder builder, const std::string& jsonFil
   std::string fileString;
   if(LoadFile(jsonFilePath, fileString))
   {
-    try
-    {
-      builder.LoadFromString(fileString);
-    }
-    catch(...)
-    {
-      DALI_LOG_WARNING("Error during parse JSON file '%s'\n", jsonFilePath.c_str());
-      return false;
-    }
+    builder.LoadFromString(fileString);
     return true;
   }
   else

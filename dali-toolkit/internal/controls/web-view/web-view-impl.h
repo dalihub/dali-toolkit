@@ -52,7 +52,7 @@ protected:
 
   WebView(const std::string& locale, const std::string& timezoneId);
 
-  WebView(uint32_t argc, char** argv, int32_t type);
+  WebView(uint32_t argc, char** argv);
 
   virtual ~WebView();
 
@@ -68,9 +68,9 @@ public:
   static Toolkit::WebView New(const std::string& locale, const std::string& timezoneId);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::New( uint32_t, char**, int32_t )
+   * @copydoc Dali::Toolkit::WebView::New( uint32_t, char** )
    */
-  static Toolkit::WebView New(uint32_t argc, char** argv, int32_t type);
+  static Toolkit::WebView New(uint32_t argc, char** argv);
 
   /**
    * @copydoc Dali::Toolkit::WebView::FindWebView()
@@ -446,26 +446,6 @@ public:
    * @copydoc Dali::Toolkit::WebView::GetPlainTextAsynchronously()
    */
   void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback);
-
-  /**
-   * @copydoc Dali::Toolkit::WebView::WebAuthenticationCancel()
-   */
-  void WebAuthenticationCancel();
-
-  /**
-   * @copydoc Dali::Toolkit::WebView::RegisterWebAuthDisplayQRCallback()
-   */
-  void RegisterWebAuthDisplayQRCallback(Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback callback);
-
-  /**
-   * @copydoc Dali::Toolkit::WebView::RegisterWebAuthResponseCallback()
-   */
-  void RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback);
-
-  /**
-   * @copydoc Dali::Toolkit::WebView::RegisterUserMediaPermissionRequestCallback()
-   */
-  void RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback);
 
 public: // Properties
   /**

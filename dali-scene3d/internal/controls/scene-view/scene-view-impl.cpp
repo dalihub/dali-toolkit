@@ -64,14 +64,9 @@ DALI_TYPE_REGISTRATION_BEGIN(Scene3D::SceneView, Toolkit::Control, Create);
 DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "AlphaMaskUrl", STRING, ALPHA_MASK_URL)
 DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "MaskContentScale", FLOAT, MASK_CONTENT_SCALE)
 DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CropToMask", BOOLEAN, CROP_TO_MASK)
-DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CornerRadius", VECTOR4, CORNER_RADIUS)
-DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CornerRadiusPolicy", FLOAT, CORNER_RADIUS_POLICY)
-DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "BorderlineWidth", FLOAT, BORDERLINE_WIDTH)
-DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "BorderlineColor", VECTOR4, BORDERLINE_COLOR)
-DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "BorderlineOffset", FLOAT, BORDERLINE_OFFSET)
 DALI_TYPE_REGISTRATION_END()
 
-Property::Index           RENDERING_BUFFER        = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
+Property::Index    RENDERING_BUFFER        = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
 static constexpr float    MIM_CAPTURE_SIZE        = 1.0f;
 static constexpr int32_t  DEFAULT_ORIENTATION     = 0;
 static constexpr int32_t  INVALID_INDEX           = -1;
@@ -176,7 +171,8 @@ void SetShadowLightConstraint(Dali::CameraActor selectedCamera, Dali::CameraActo
 
   // Compute ViewProjectionMatrix and store it to "tempViewProjectionMatrix" property
   auto       tempViewProjectionMatrixIndex = shadowLightCamera.RegisterProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
-  Constraint projectionMatrixConstraint    = Constraint::New<Matrix>(shadowLightCamera, tempViewProjectionMatrixIndex, [](Matrix& output, const PropertyInputContainer& inputs) {
+  Constraint projectionMatrixConstraint    = Constraint::New<Matrix>(shadowLightCamera, tempViewProjectionMatrixIndex, [](Matrix& output, const PropertyInputContainer& inputs)
+                                                                  {
     Matrix worldMatrix  = inputs[0]->GetMatrix();
     float  tangentFov_2 = tanf(inputs[4]->GetFloat());
     float  nearDistance = inputs[5]->GetFloat();
@@ -337,7 +333,6 @@ SceneView::SceneView()
   mSkyboxIntensity(1.0f),
   mFailedCaptureCallbacks(nullptr),
   mLightObservers(),
-  mCornerRadiusPolicy(static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE)),
   mShaderManager(new Scene3D::Loader::ShaderManager())
 {
 }
@@ -714,7 +709,8 @@ void SceneView::SetShadow(Scene3D::Light light)
     return;
   }
 
-  auto foundLight = std::find_if(mLights.begin(), mLights.end(), [light](std::pair<Scene3D::Light, bool> lightEntity) -> bool { return (lightEntity.second && lightEntity.first == light); });
+  auto foundLight = std::find_if(mLights.begin(), mLights.end(), [light](std::pair<Scene3D::Light, bool> lightEntity) -> bool
+                                 { return (lightEntity.second && lightEntity.first == light); });
 
   if(foundLight == mLights.end())
   {
@@ -800,9 +796,7 @@ void SceneView::UseFramebuffer(bool useFramebuffer)
   if(mUseFrameBuffer != useFramebuffer)
   {
     mUseFrameBuffer = useFramebuffer;
-    SetOffScreenRenderableType((mUseFrameBuffer) ? OffScreenRenderable::Type::FORWARD : OffScreenRenderable::Type::NONE);
     UpdateRenderTask();
-    RequestRenderTaskReorder();
   }
 }
 
@@ -931,7 +925,7 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
     capturePossible = false;
   }
 
-  uint32_t width  = std::max(1u, unsigned(size.width));
+  uint32_t width = std::max(1u, unsigned(size.width));
   uint32_t height = std::max(1u, unsigned(size.height));
   if(width > Dali::GetMaxTextureSize() || height > Dali::GetMaxTextureSize())
   {
@@ -1055,12 +1049,9 @@ void SceneView::SetAlphaMaskUrl(std::string& alphaMaskUrl)
 {
   if(mAlphaMaskUrl != alphaMaskUrl)
   {
-    mAlphaMaskUrl = alphaMaskUrl;
-    if(mUseFrameBuffer)
-    {
-      mMaskingPropertyChanged = true;
-      UpdateRenderTask();
-    }
+    mAlphaMaskUrl           = alphaMaskUrl;
+    mMaskingPropertyChanged = true;
+    UpdateRenderTask();
   }
 }
 
@@ -1074,11 +1065,8 @@ void SceneView::SetMaskContentScaleFactor(float maskContentScaleFactor)
   if(mMaskContentScaleFactor != maskContentScaleFactor)
   {
     mMaskContentScaleFactor = maskContentScaleFactor;
-    if(mUseFrameBuffer)
-    {
-      mMaskingPropertyChanged = true;
-      UpdateRenderTask();
-    }
+    mMaskingPropertyChanged = true;
+    UpdateRenderTask();
   }
 }
 
@@ -1091,108 +1079,15 @@ void SceneView::EnableCropToMask(bool enableCropToMask)
 {
   if(mCropToMask != enableCropToMask)
   {
-    mCropToMask = enableCropToMask;
-    if(mUseFrameBuffer)
-    {
-      mMaskingPropertyChanged = true;
-      UpdateRenderTask();
-    }
+    mCropToMask             = enableCropToMask;
+    mMaskingPropertyChanged = true;
+    UpdateRenderTask();
   }
 }
 
 bool SceneView::IsEnabledCropToMask()
 {
   return mCropToMask;
-}
-
-void SceneView::SetCornerRadius(Vector4 cornerRadius)
-{
-  if(mCornerRadius != cornerRadius)
-  {
-    mCornerRadius = cornerRadius;
-    if(mUseFrameBuffer)
-    {
-      mDecoratedVisualPropertyChanged = true;
-      UpdateRenderTask();
-    }
-  }
-}
-
-Vector4 SceneView::GetCornerRadius() const
-{
-  return mCornerRadius;
-}
-
-void SceneView::SetCornerRadiusPolicy(int cornerRadiusPolicy)
-{
-  if(mCornerRadiusPolicy != cornerRadiusPolicy)
-  {
-    mCornerRadiusPolicy = cornerRadiusPolicy;
-    if(mUseFrameBuffer)
-    {
-      mDecoratedVisualPropertyChanged = true;
-      UpdateRenderTask();
-    }
-  }
-}
-
-int SceneView::GetCornerRadiusPolicy() const
-{
-  return mCornerRadiusPolicy;
-}
-
-void SceneView::SetBorderlineWidth(float borderlineWidth)
-{
-  if(!Dali::Equals(mBorderlineWidth, borderlineWidth))
-  {
-    mBorderlineWidth = borderlineWidth;
-    if(mUseFrameBuffer)
-    {
-      mDecoratedVisualPropertyChanged = true;
-      UpdateRenderTask();
-    }
-  }
-}
-
-float SceneView::GetBorderlineWidth() const
-{
-  return mBorderlineWidth;
-}
-
-void SceneView::SetBorderlineColor(Vector4 borderlineColor)
-{
-  if(mBorderlineColor != borderlineColor)
-  {
-    mBorderlineColor = borderlineColor;
-    if(mUseFrameBuffer)
-    {
-      mDecoratedVisualPropertyChanged = true;
-      UpdateRenderTask();
-    }
-  }
-}
-
-Vector4 SceneView::GetBorderlineColor() const
-{
-  return mBorderlineColor;
-}
-
-void SceneView::SetBorderlineOffset(float borderlineOffset)
-{
-  if(!Dali::Equals(mBorderlineOffset, borderlineOffset))
-  {
-    mBorderlineOffset = borderlineOffset;
-    if(mUseFrameBuffer)
-    {
-      mDecoratedVisualPropertyChanged = true;
-      UpdateRenderTask();
-    }
-  }
-}
-
-float SceneView::GetBorderlineOffset() const
-{
-  return mBorderlineOffset;
 }
 
 Dali::RenderTask SceneView::GetRenderTask()
@@ -1226,31 +1121,6 @@ void SceneView::SetProperty(BaseObject* object, Property::Index index, const Pro
         sceneViewImpl.EnableCropToMask(value.Get<bool>());
         break;
       }
-      case Scene3D::SceneView::Property::CORNER_RADIUS:
-      {
-        sceneViewImpl.SetCornerRadius(value.Get<Vector4>());
-        break;
-      }
-      case Scene3D::SceneView::Property::CORNER_RADIUS_POLICY:
-      {
-        sceneViewImpl.SetCornerRadiusPolicy(value.Get<int>());
-        break;
-      }
-      case Scene3D::SceneView::Property::BORDERLINE_WIDTH:
-      {
-        sceneViewImpl.SetBorderlineWidth(value.Get<float>());
-        break;
-      }
-      case Scene3D::SceneView::Property::BORDERLINE_COLOR:
-      {
-        sceneViewImpl.SetBorderlineColor(value.Get<Vector4>());
-        break;
-      }
-      case Scene3D::SceneView::Property::BORDERLINE_OFFSET:
-      {
-        sceneViewImpl.SetBorderlineOffset(value.Get<float>());
-        break;
-      }
     }
   }
 }
@@ -1282,44 +1152,9 @@ Property::Value SceneView::GetProperty(BaseObject* object, Property::Index index
         value = sceneViewImpl.IsEnabledCropToMask();
         break;
       }
-      case Scene3D::SceneView::Property::CORNER_RADIUS:
-      {
-        value = sceneViewImpl.GetCornerRadius();
-        break;
-      }
-      case Scene3D::SceneView::Property::CORNER_RADIUS_POLICY:
-      {
-        value = sceneViewImpl.GetCornerRadiusPolicy();
-        break;
-      }
-      case Scene3D::SceneView::Property::BORDERLINE_WIDTH:
-      {
-        value = sceneViewImpl.GetBorderlineWidth();
-        break;
-      }
-      case Scene3D::SceneView::Property::BORDERLINE_COLOR:
-      {
-        value = sceneViewImpl.GetBorderlineColor();
-        break;
-      }
-      case Scene3D::SceneView::Property::BORDERLINE_OFFSET:
-      {
-        value = sceneViewImpl.GetBorderlineOffset();
-        break;
-      }
     }
   }
   return value;
-}
-
-Dali::Actor SceneView::GetOffScreenRenderableSourceActor()
-{
-  return (mRootLayer) ? mRootLayer : Dali::Actor();
-}
-
-bool SceneView::IsOffScreenRenderTaskExclusive()
-{
-  return (mRenderTask) ? mRenderTask.IsExclusive() : false;
 }
 
 ///////////////////////////////////////////////////////////
@@ -1360,13 +1195,14 @@ void SceneView::OnSceneConnection(int depth)
     mRenderTask.SetExclusive(true);
     mRenderTask.SetInputEnabled(true);
     mRenderTask.SetCullMode(false);
+    mRenderTask.SetOrderIndex(SCENE_ORDER_INDEX);
     mRenderTask.SetScreenToFrameBufferMappingActor(Self());
 
     UpdateRenderTask();
   }
 
   CameraActor selectedCamera = GetSelectedCamera();
-  selectedCamera             = selectedCamera ? selectedCamera : mDefaultCamera;
+  selectedCamera = selectedCamera ? selectedCamera : mDefaultCamera;
   if(selectedCamera)
   {
     UpdateCamera(selectedCamera);
@@ -1395,7 +1231,7 @@ void SceneView::OnSceneDisconnection()
   }
   tempContainer.clear();
 
-  for(auto&& capture : mCaptureContainer)
+  for(auto && capture : mCaptureContainer)
   {
     ResetCaptureData(capture.second);
   }
@@ -1433,22 +1269,6 @@ void SceneView::OnSceneDisconnection()
   Control::OnSceneDisconnection();
 }
 
-void SceneView::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
-{
-  tasks.clear();
-  if(isForward)
-  {
-    if(mShadowMapRenderTask)
-    {
-      tasks.push_back(mShadowMapRenderTask);
-    }
-    if(mRenderTask)
-    {
-      tasks.push_back(mRenderTask);
-    }
-  }
-}
-
 void SceneView::OnInitialize()
 {
   Actor self = Self();
@@ -1466,11 +1286,6 @@ void SceneView::OnInitialize()
   mDefaultCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
   AddCamera(mDefaultCamera);
   UpdateCamera(mDefaultCamera);
-
-  if(mUseFrameBuffer)
-  {
-    SetOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
-  }
 }
 
 void SceneView::OnChildAdd(Actor& child)
@@ -1564,7 +1379,6 @@ void SceneView::UpdateRenderTask()
          !Dali::Equals(currentFrameBuffer.GetColorTexture().GetWidth(), width) ||
          !Dali::Equals(currentFrameBuffer.GetColorTexture().GetHeight(), height) ||
          mMaskingPropertyChanged ||
-         mDecoratedVisualPropertyChanged ||
          mWindowSizeChanged)
       {
         mRootLayer.SetProperty(Dali::Actor::Property::COLOR_MODE, ColorMode::USE_OWN_COLOR);
@@ -1592,17 +1406,6 @@ void SceneView::UpdateRenderTask()
           imagePropertyMap.Insert(Toolkit::DevelImageVisual::Property::MASKING_TYPE, Toolkit::DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
           Self().RegisterProperty(Y_FLIP_MASK_TEXTURE, FLIP_MASK_TEXTURE);
         }
-        if(mCornerRadius != Vector4::ZERO)
-        {
-          imagePropertyMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, mCornerRadius);
-          imagePropertyMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, mCornerRadiusPolicy);
-        }
-        if(!Dali::EqualsZero(mBorderlineWidth))
-        {
-          imagePropertyMap.Insert(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, mBorderlineWidth);
-          imagePropertyMap.Insert(Toolkit::DevelVisual::Property::BORDERLINE_COLOR, mBorderlineColor);
-          imagePropertyMap.Insert(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, mBorderlineOffset);
-        }
 
         mVisual = Toolkit::VisualFactory::Get().CreateVisual(imagePropertyMap);
         Toolkit::DevelControl::RegisterVisual(*this, RENDERING_BUFFER, mVisual);
@@ -1611,15 +1414,12 @@ void SceneView::UpdateRenderTask()
         mRenderTask.SetClearEnabled(true);
         mRenderTask.SetClearColor(Color::TRANSPARENT);
 
-        mMaskingPropertyChanged         = false;
-        mDecoratedVisualPropertyChanged = false;
-        mWindowSizeChanged              = false;
+        mMaskingPropertyChanged = false;
+        mWindowSizeChanged      = false;
       }
     }
     else
     {
-      mRenderTask.SetOrderIndex(SCENE_ORDER_INDEX);
-
       mRenderTask.SetViewportGuideActor(Self());
       if(mRenderTask.GetFrameBuffer())
       {
@@ -1825,10 +1625,6 @@ void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
     mShadowMapRenderTask.SetClearColor(Color::WHITE);
     mShadowMapRenderTask.SetRenderPassTag(10);
     mShadowMapRenderTask.SetCameraActor(GetImplementation(mShadowLight).GetCamera());
-  }
-
-  if(!mUseFrameBuffer)
-  {
     mShadowMapRenderTask.SetOrderIndex(SHADOW_ORDER_INDEX);
   }
 
@@ -1855,7 +1651,8 @@ void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
 
 void SceneView::OnCaptureFinished(Dali::RenderTask& task)
 {
-  auto iter = std::find_if(mCaptureContainer.begin(), mCaptureContainer.end(), [task](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item) { return item.first == task; });
+  auto iter = std::find_if(mCaptureContainer.begin(), mCaptureContainer.end(), [task](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item)
+                           { return item.first == task; });
 
   if(iter != mCaptureContainer.end())
   {
@@ -1876,8 +1673,8 @@ void SceneView::OnCaptureFinished(Dali::RenderTask& task)
 bool SceneView::OnTimeOut()
 {
   mTimerTickCount++;
-  auto                                                                   self = Self();
-  Dali::Scene3D::SceneView                                               handle(Dali::Scene3D::SceneView::DownCast(self));
+  auto                     self = Self();
+  Dali::Scene3D::SceneView handle(Dali::Scene3D::SceneView::DownCast(self));
   std::vector<std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>>> tempContainer;
   for(auto&& capture : mCaptureContainer)
   {
@@ -1892,14 +1689,14 @@ bool SceneView::OnTimeOut()
     mCaptureFinishedSignal.Emit(handle, capture.second->mCaptureId, Dali::Toolkit::ImageUrl());
   }
 
-  for(auto&& capture : tempContainer)
+  for(auto && capture : tempContainer)
   {
     ResetCaptureData(capture.second);
   }
   tempContainer.clear();
 
   int32_t tickCount = mTimerTickCount;
-  auto    it        = std::remove_if(mCaptureContainer.begin(), mCaptureContainer.end(), [tickCount](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item) {
+  auto it = std::remove_if(mCaptureContainer.begin(), mCaptureContainer.end(), [tickCount](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item) {
     return item.second->mStartTick + 1 < tickCount;
   });
   mCaptureContainer.erase(it, mCaptureContainer.end());
@@ -1944,7 +1741,7 @@ void SceneView::RequestCameraTransition()
 {
   if(mTransitionSourceCamera && mTransitionDestinationCamera && !(mTransitionSourceCamera == mTransitionDestinationCamera))
   {
-    Vector3    sourceWorldPosition    = mTransitionSourceCamera.GetProperty<Vector3>(Dali::Actor::Property::WORLD_POSITION);
+    Vector3 sourceWorldPosition = mTransitionSourceCamera.GetProperty<Vector3>(Dali::Actor::Property::WORLD_POSITION);
     Quaternion sourceWorldOrientation = mTransitionSourceCamera.GetProperty<Quaternion>(Dali::Actor::Property::WORLD_ORIENTATION);
 
     if(!CheckInside(mRootLayer, mTransitionDestinationCamera))
@@ -1952,9 +1749,9 @@ void SceneView::RequestCameraTransition()
       mRootLayer.Add(mTransitionDestinationCamera);
     }
 
-    Vector3      destinationWorldPosition;
-    Quaternion   destinationWorldOrientation;
-    Vector3      destinationWorldScale;
+    Vector3 destinationWorldPosition;
+    Quaternion destinationWorldOrientation;
+    Vector3 destinationWorldScale;
     Dali::Matrix destinationWorldTransform = Dali::DevelActor::GetWorldTransform(mTransitionDestinationCamera);
     destinationWorldTransform.GetTransformComponents(destinationWorldPosition, destinationWorldOrientation, destinationWorldScale);
 
@@ -1989,7 +1786,7 @@ void SceneView::RequestCameraTransition()
     Dali::DevelCameraActor::ProjectionDirection destinationProjectionDirection = mTransitionDestinationCamera.GetProperty<Dali::DevelCameraActor::ProjectionDirection>(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION);
     if(mTransitionDestinationCamera.GetProjectionMode() == Dali::Camera::ProjectionMode::PERSPECTIVE_PROJECTION)
     {
-      float sourceFieldOfView      = mTransitionSourceCamera.GetFieldOfView();
+      float sourceFieldOfView = mTransitionSourceCamera.GetFieldOfView();
       float destinationFieldOfView = mTransitionDestinationCamera.GetFieldOfView();
 
       if(sourceProjectionDirection != destinationProjectionDirection)
@@ -2012,7 +1809,7 @@ void SceneView::RequestCameraTransition()
     }
     else
     {
-      float sourceOrthographicSize      = mTransitionSourceCamera.GetProperty<float>(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE);
+      float sourceOrthographicSize = mTransitionSourceCamera.GetProperty<float>(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE);
       float destinationOrthographicSize = mTransitionDestinationCamera.GetProperty<float>(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE);
 
       if(sourceProjectionDirection != destinationProjectionDirection)
@@ -2035,7 +1832,7 @@ void SceneView::RequestCameraTransition()
     }
 
     float destinationNearPlaneDistance = mTransitionDestinationCamera.GetNearClippingPlane();
-    float destinationFarPlaneDistance  = mTransitionDestinationCamera.GetFarClippingPlane();
+    float destinationFarPlaneDistance = mTransitionDestinationCamera.GetFarClippingPlane();
     mTransitionCamera.SetNearClippingPlane(std::min(mTransitionSourceCamera.GetNearClippingPlane(), destinationNearPlaneDistance));
     mTransitionCamera.SetFarClippingPlane(std::max(mTransitionSourceCamera.GetFarClippingPlane(), destinationFarPlaneDistance));
 

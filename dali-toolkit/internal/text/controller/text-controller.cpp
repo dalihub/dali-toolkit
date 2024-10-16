@@ -1961,7 +1961,7 @@ void Controller::SetAnchorControlInterface(AnchorControlInterface* anchorControl
 
 bool Controller::ShouldClearFocusOnEscape() const
 {
-  return mImpl->ShouldClearFocusOnEscape();
+  return mImpl->mShouldClearFocusOnEscape;
 }
 
 Actor Controller::CreateBackgroundActor()

@@ -36,11 +36,11 @@ ImageCache::ImageCache(TextureManager&                     textureManager,
   mObserver(observer),
   mMaskingData(maskingData),
   mDesiredSize(size),
+  mFittingMode(fittingMode),
+  mSamplingMode(samplingMode),
   mBatchSize(batchSize),
   mInterval(interval),
   mLoadState(TextureManager::LoadState::NOT_STARTED),
-  mFittingMode(fittingMode),
-  mSamplingMode(samplingMode),
   mRequestingLoad(false),
   mPreMultiplyOnLoad(preMultiplyOnLoad)
 {
