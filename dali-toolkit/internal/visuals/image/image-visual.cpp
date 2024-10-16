@@ -1558,12 +1558,13 @@ Geometry ImageVisual::GenerateGeometry(TextureManager::TextureId textureId, bool
           }
         }
       }
-      else if(createForce)
-      {
-        // Create default quad geometry now
-        geometry = CreateGeometry(mFactoryCache, ImageDimensions(1, 1));
-      }
     }
+  }
+
+  if(!geometry && createForce)
+  {
+    // Create default quad geometry now
+    geometry = CreateGeometry(mFactoryCache, ImageDimensions(1, 1));
   }
 
   return geometry;
