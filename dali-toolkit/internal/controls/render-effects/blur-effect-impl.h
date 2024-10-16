@@ -22,7 +22,6 @@
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/frame-buffer.h>
@@ -111,7 +110,7 @@ private:
    * @param[in] size Full size of input.
    * @param[in] downsampledSize Downsampled size for performance.
    */
-  void CreateFrameBuffers(const Vector2 size, const ImageDimensions downsampledSize);
+  void CreateFrameBuffers(const Size size, const Size downsampledSize);
 
   /**
    * @brief Sets blur render tasks.
@@ -134,7 +133,7 @@ private:
    * @param[in] downsampledWidth Downsized width of input texture.
    * @param[in] downsampledHeight Downsized height of input texture.
    */
-  void SetShaderConstants(uint32_t downsampledWidth, uint32_t downsampledHeight);
+  void SetShaderConstants(float downsampledWidth, float downsampledHeight);
 
   /**
    * @brief Get an offset property in std::string format
@@ -185,7 +184,6 @@ private:
   uint32_t mPixelRadius;
   float    mBellCurveWidth;
 
-  bool mSkipBlur : 1;
   bool mIsBackground : 1;
 };
 } // namespace Internal

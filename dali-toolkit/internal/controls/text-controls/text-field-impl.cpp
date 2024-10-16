@@ -863,8 +863,7 @@ bool TextField::OnKeyEvent(const KeyEvent& event)
 
     return true;
   }
-  else if((Dali::DevelKey::DALI_KEY_RETURN == event.GetKeyCode() && KEY_RETURN_NAME == event.GetKeyName()) ||
-           Dali::DevelKey::DALI_KEY_KP_ENTER == event.GetKeyCode())
+  else if(Dali::DevelKey::DALI_KEY_RETURN == event.GetKeyCode() && KEY_RETURN_NAME == event.GetKeyName())
   {
     // Do nothing when enter is comming.
     return false;
