@@ -143,7 +143,7 @@ public:
     WIREFRAME_SHADER,
     ARC_BUTT_CAP_SHADER,
     ARC_ROUND_CAP_SHADER,
-    SHADER_TYPE_MAX
+    SHADER_TYPE_MAX = ARC_ROUND_CAP_SHADER
   };
 
   /**
@@ -156,7 +156,7 @@ public:
     NINE_PATCH_GEOMETRY,
     NINE_PATCH_BORDER_GEOMETRY,
     WIREFRAME_GEOMETRY,
-    GEOMETRY_TYPE_MAX
+    GEOMETRY_TYPE_MAX = WIREFRAME_GEOMETRY
   };
 
 public:
@@ -368,8 +368,8 @@ private:
     uint32_t                 height;
   };
 
-  Geometry mGeometry[GEOMETRY_TYPE_MAX];
-  Shader   mShader[SHADER_TYPE_MAX];
+  Geometry mGeometry[GEOMETRY_TYPE_MAX + 1];
+  Shader   mShader[SHADER_TYPE_MAX + 1];
 
   bool mLoadYuvPlanes; ///< A global flag to specify if the image should be loaded as yuv planes
 

@@ -39,11 +39,11 @@
 #include <dali-toolkit/internal/visuals/color/color-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/custom-shader-factory.h>
+#include <dali-toolkit/internal/visuals/npatch-shader-factory.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/internal/visuals/mesh/mesh-visual.h>
-#include <dali-toolkit/internal/visuals/npatch-shader-factory.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
@@ -422,7 +422,7 @@ void VisualFactory::DiscardVisual(Toolkit::Visual::Base visual)
 bool VisualFactory::AddPrecompileShader(const Property::Map& map)
 {
   PrecompileShaderOption shaderOption(map);
-  auto                   type = shaderOption.GetShaderType();
+  auto type = shaderOption.GetShaderType();
   if(type == PrecompileShaderOption::ShaderType::UNKNOWN)
   {
     DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader type");
@@ -567,7 +567,7 @@ CustomShaderFactory& VisualFactory::GetCustomShaderFactory()
 bool VisualFactory::AddPrecompileShader(PrecompileShaderOption& option)
 {
   auto type = option.GetShaderType();
-  bool ret  = false;
+  bool ret = false;
   switch(type)
   {
     case PrecompileShaderOption::ShaderType::COLOR:
@@ -588,7 +588,6 @@ bool VisualFactory::AddPrecompileShader(PrecompileShaderOption& option)
     case PrecompileShaderOption::ShaderType::NPATCH:
     {
       ret = GetNpatchShaderFactory().AddPrecompiledShader(option);
-      break;
     }
     case PrecompileShaderOption::ShaderType::MODEL_3D:
     {
@@ -602,7 +601,7 @@ bool VisualFactory::AddPrecompileShader(PrecompileShaderOption& option)
     }
     default:
     {
-      DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader factory type:%d", type);
+      DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader factory type:%d",type);
       break;
     }
   }
