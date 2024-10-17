@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ enum Type
 
   /**
    * @brief The radius for the rounded corners of the visual.
-   * @details Name "cornerRadius", type Property::FLOAT or Prooperty::VECTOR4, animatable
+   * @details Name "cornerRadius", type Property::FLOAT or Property::VECTOR4, animatable
    * @note By default, it is Vector::ZERO.
    * @note Only Property::Vector4 can be animated.
    * @note Each radius will clamp internally to the half of smaller of the visual width and visual height.
@@ -118,6 +118,22 @@ enum Type
    * @note This value will clamp internally to [-1.0f to 1.0f].
    */
   BORDERLINE_OFFSET = OPACITY + 6,
+
+  /**
+   * @brief The squareness for the rounded corners of the visual.
+   * @details Name "cornerSquareness", type Property::FLOAT or Property::VECTOR4, animatable
+   * @note By default, it is Vector::ZERO.
+   * @note Each squareness will clamp internally as [0.0 1.0].
+   * @note If squareness is not zero, the width of borderline might not equal with it's real value.
+   * @note Squareness value are used in clockwise order from top-left-corner to bottom-left-corner.
+   *       When squareness is Vector4(x, y, z, w)
+   *       x    y
+   *        +--+
+   *        |  |
+   *        +--+
+   *       w    z
+   */
+  CORNER_SQUARENESS = OPACITY + 7,
 };
 
 } // namespace Property

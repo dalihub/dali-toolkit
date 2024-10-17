@@ -68,34 +68,44 @@ static constexpr std::string_view UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME("
 static constexpr float DEFAULT_OFFSET_MINIMUM = 0.0f;
 static constexpr float DEFAULT_OFFSET_MAXIMUM = 1.0f;
 
-VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[16] =
-  {
-    VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX,
-    VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_CORNER,
-    VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_BORDERLINE,
-    VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_BORDERLINE,
-    VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE,
-    VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_CORNER,
-    VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_BORDERLINE,
-    VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_BORDERLINE,
-    VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX,
-    VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_CORNER,
-    VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_BORDERLINE,
-    VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_BORDERLINE,
-    VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE,
-    VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_CORNER,
-    VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_BORDERLINE,
-    VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_BORDERLINE,
+VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_SQUIRCLE_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_SQUIRCLE_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_SQUIRCLE_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_SQUIRCLE_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_SQUIRCLE_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_SQUIRCLE_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_SQUIRCLE_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_SQUIRCLE_BORDERLINE,
 };
+constexpr uint32_t SHADER_TYPE_TABLE_COUNT = sizeof(SHADER_TYPE_TABLE) / sizeof(SHADER_TYPE_TABLE[0]);
 
 // enum of required list when we select shader
 enum GradientVisualRequireFlag
 {
-  DEFAULT        = 0,
-  ROUNDED_CORNER = 1 << 0,
-  BORDERLINE     = 1 << 1,
-  USER_SPACE     = 1 << 2,
-  RADIAL         = 1 << 3,
+  DEFAULT         = 0,
+  ROUNDED_CORNER  = 1,
+  SQUIRCLE_CORNER = 2,
+
+  BORDERLINE = (1 << 0) * 3,
+  USER_SPACE = (1 << 1) * 3,
+  RADIAL     = (1 << 2) * 3,
 };
 
 Dali::WrapMode::Type GetWrapMode(Toolkit::GradientVisual::SpreadMethod::Type spread)
@@ -369,26 +379,34 @@ Shader GradientVisual::GenerateShader() const
 {
   bool userspaceUnit  = (mGradient->GetGradientUnits() == Toolkit::GradientVisual::Units::USER_SPACE);
   bool roundedCorner  = IsRoundedCornerRequired();
+  bool squircleCorner = IsSquircleCornerRequired();
   bool borderline     = IsBorderlineRequired();
   bool radialGradient = (mGradientType == Type::RADIAL);
 
-  int shaderTypeFlag = GradientVisualRequireFlag::DEFAULT;
-  if(roundedCorner)
+  uint32_t shaderTypeFlag = GradientVisualRequireFlag::DEFAULT;
+  if(squircleCorner)
   {
-    shaderTypeFlag |= GradientVisualRequireFlag::ROUNDED_CORNER;
+    shaderTypeFlag += GradientVisualRequireFlag::SQUIRCLE_CORNER;
   }
+  else if(roundedCorner)
+  {
+    shaderTypeFlag += GradientVisualRequireFlag::ROUNDED_CORNER;
+  }
+
   if(borderline)
   {
-    shaderTypeFlag |= GradientVisualRequireFlag::BORDERLINE;
+    shaderTypeFlag += GradientVisualRequireFlag::BORDERLINE;
   }
   if(userspaceUnit)
   {
-    shaderTypeFlag |= GradientVisualRequireFlag::USER_SPACE;
+    shaderTypeFlag += GradientVisualRequireFlag::USER_SPACE;
   }
   if(radialGradient)
   {
-    shaderTypeFlag |= GradientVisualRequireFlag::RADIAL;
+    shaderTypeFlag += GradientVisualRequireFlag::RADIAL;
   }
+
+  DALI_ASSERT_DEBUG(shaderTypeFlag < SHADER_TYPE_TABLE_COUNT && "Invalid gradient shader type generated!");
 
   VisualFactoryCache::ShaderType shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
   Shader                         shader     = mFactoryCache.GetShader(shaderType);
@@ -401,6 +419,10 @@ Shader GradientVisual::GenerateShader() const
     {
       vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
       fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
+      if(squircleCorner)
+      {
+        fragmentShaderPrefixList += "#define IS_REQUIRED_SQUIRCLE_CORNER\n";
+      }
     }
     if(borderline)
     {

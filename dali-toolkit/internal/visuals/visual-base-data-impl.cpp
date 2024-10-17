@@ -129,6 +129,7 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Typ
   mType(type),
   mAlwaysUsingBorderline(false),
   mAlwaysUsingCornerRadius(false),
+  mAlwaysUsingCornerSquareness(false),
   mIgnoreFittingMode(false),
   mPixelAreaSetByFittingMode(false),
   mTransformMapSetForFittingMode(false)

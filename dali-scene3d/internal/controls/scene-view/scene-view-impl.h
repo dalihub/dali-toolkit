@@ -351,6 +351,18 @@ public:
   Vector4 GetCornerRadius() const;
 
   /**
+   * @brief Sets the squareness value of each corner.
+   * @param[in] cornerSquareness Squareness value of each corner.
+   */
+  void SetCornerSquareness(Vector4 cornerSquareness);
+
+  /**
+   * @brief Retrieves the squareness value of each corner.
+   * @return The squareness value of each corner.
+   */
+  Vector4 GetCornerSquareness() const;
+
+  /**
    * @brief Sets the policy of corner radius value.
    * @param[in] cornerRadiusPolicy Policy of corner radius value.
    */
@@ -679,6 +691,7 @@ private: // Implementation of Processor
 
   // Corner Radius
   Vector4 mCornerRadius{Vector4::ZERO};
+  Vector4 mCornerSquareness{Vector4::ZERO};
   int     mCornerRadiusPolicy; ///< Should be initialize at .cpp
 
   // Borderline

@@ -300,6 +300,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   float           borderlineWidth  = 2.0f;
   Vector4         borderlineColor  = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
   float           borderlineOffset = 0.1f;
+  float           cornerSquareness = 0.6f;
   Property::Array playRange;
   playRange.PushBack(startFrame);
   playRange.PushBack(endFrame);
@@ -319,6 +320,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
     .Add("borderlineWidth", borderlineWidth)
     .Add("borderlineColor", borderlineColor)
     .Add("borderlineOffset", borderlineOffset)
+    .Add("cornerSquareness", cornerSquareness)
     .Add("desiredWidth", desiredWidth)
     .Add("desiredHeight", desiredHeight);
 
@@ -417,6 +419,10 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), borderlineOffset, TEST_LOCATION);
 
+  value = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector4>(), Vector4(cornerSquareness, cornerSquareness, cornerSquareness, cornerSquareness), TEST_LOCATION);
+
   value = resultMap.Find(ImageVisual::Property::DESIRED_WIDTH, Property::INTEGER);
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<int>(), desiredWidth, TEST_LOCATION);
@@ -442,6 +448,7 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   float           borderlineWidth  = 2.3f;
   Vector4         borderlineColor  = Vector4(0.3f, 0.3f, 1.0f, 1.0f);
   float           borderlineOffset = 0.3f;
+  Vector4         cornerSquareness(0.1f, 0.4f, 0.2f, 0.3f);
   Property::Array playRange;
   playRange.PushBack(startFrame);
   playRange.PushBack(endFrame);
@@ -456,6 +463,7 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
     .Add(DevelVisual::Property::BORDERLINE_WIDTH, borderlineWidth)
     .Add(DevelVisual::Property::BORDERLINE_COLOR, borderlineColor)
     .Add(DevelVisual::Property::BORDERLINE_OFFSET, borderlineOffset)
+    .Add(DevelVisual::Property::CORNER_SQUARENESS, cornerSquareness)
     .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false)
     .Add(ImageVisual::Property::DESIRED_WIDTH, desiredWidth)
     .Add(ImageVisual::Property::DESIRED_HEIGHT, desiredHeight);
@@ -549,6 +557,10 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   value = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), borderlineOffset, TEST_LOCATION);
+
+  value = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector4>(), cornerSquareness, TEST_LOCATION);
 
   value = resultMap.Find(ImageVisual::Property::DESIRED_WIDTH, Property::INTEGER);
   DALI_TEST_CHECK(value);

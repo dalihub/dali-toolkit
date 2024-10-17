@@ -69,6 +69,7 @@ DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CornerRadiusPolicy", FLOAT, CORN
 DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "BorderlineWidth", FLOAT, BORDERLINE_WIDTH)
 DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "BorderlineColor", VECTOR4, BORDERLINE_COLOR)
 DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "BorderlineOffset", FLOAT, BORDERLINE_OFFSET)
+DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CornerSquareness", VECTOR4, CORNER_SQUARENESS)
 DALI_TYPE_REGISTRATION_END()
 
 Property::Index           RENDERING_BUFFER        = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
@@ -1123,6 +1124,24 @@ Vector4 SceneView::GetCornerRadius() const
   return mCornerRadius;
 }
 
+void SceneView::SetCornerSquareness(Vector4 cornerSquareness)
+{
+  if(mCornerSquareness != cornerSquareness)
+  {
+    mCornerSquareness = cornerSquareness;
+    if(mUseFrameBuffer)
+    {
+      mDecoratedVisualPropertyChanged = true;
+      UpdateRenderTask();
+    }
+  }
+}
+
+Vector4 SceneView::GetCornerSquareness() const
+{
+  return mCornerSquareness;
+}
+
 void SceneView::SetCornerRadiusPolicy(int cornerRadiusPolicy)
 {
   if(mCornerRadiusPolicy != cornerRadiusPolicy)
@@ -1251,6 +1270,11 @@ void SceneView::SetProperty(BaseObject* object, Property::Index index, const Pro
         sceneViewImpl.SetBorderlineOffset(value.Get<float>());
         break;
       }
+      case Scene3D::SceneView::Property::CORNER_SQUARENESS:
+      {
+        sceneViewImpl.SetCornerSquareness(value.Get<Vector4>());
+        break;
+      }
     }
   }
 }
@@ -1305,6 +1329,11 @@ Property::Value SceneView::GetProperty(BaseObject* object, Property::Index index
       case Scene3D::SceneView::Property::BORDERLINE_OFFSET:
       {
         value = sceneViewImpl.GetBorderlineOffset();
+        break;
+      }
+      case Scene3D::SceneView::Property::CORNER_SQUARENESS:
+      {
+        value = sceneViewImpl.GetCornerSquareness();
         break;
       }
     }
@@ -1596,6 +1625,10 @@ void SceneView::UpdateRenderTask()
         {
           imagePropertyMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, mCornerRadius);
           imagePropertyMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, mCornerRadiusPolicy);
+          if(mCornerSquareness != Vector4::ZERO)
+          {
+            imagePropertyMap.Insert(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, mCornerSquareness);
+          }
         }
         if(!Dali::EqualsZero(mBorderlineWidth))
         {

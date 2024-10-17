@@ -245,10 +245,10 @@ Shader ColorVisual::GenerateShader() const
   Shader shader = mColorVisualShaderFactory.GetShader(
     mFactoryCache,
     ColorVisualShaderFeature::FeatureBuilder()
-    .EnableBlur(IsBlurRequired())
-    .EnableBorderLine(IsBorderlineRequired())
-    .EnableRoundCorner(IsRoundedCornerRequired())
-    .EnableCutout(IsCutoutRequired()));
+      .EnableBlur(IsBlurRequired())
+      .EnableBorderLine(IsBorderlineRequired())
+      .EnableRoundCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
+      .EnableCutout(IsCutoutRequired()));
 
   return shader;
 }

@@ -142,7 +142,33 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
   return true;
 }
 
-void TestShaderCodeContainSubstrings(Control control, std::vector<std::pair<std::string, bool>> substringCheckList, const char* location)
+struct ShaderCodeCheckResult
+{
+  ShaderCodeCheckResult(bool expect)
+  : expectVertexResult{expect},
+    expectFragmentResult{expect}
+  {
+  }
+  ShaderCodeCheckResult(std::initializer_list<bool> list)
+  : expectVertexResult{false},
+    expectFragmentResult{false}
+  {
+    if(list.size() == 1)
+    {
+      expectVertexResult = expectFragmentResult = *list.begin();
+    }
+    else if(list.size() > 1)
+    {
+      expectVertexResult   = *list.begin();
+      expectFragmentResult = *(list.begin() + 1);
+    }
+  }
+
+  bool expectVertexResult{false};
+  bool expectFragmentResult{false};
+};
+
+void TestShaderCodeContainSubstrings(Control control, std::vector<std::pair<std::string, ShaderCodeCheckResult>> substringCheckList, const char* location)
 {
   Renderer        renderer = control.GetRendererAt(0);
   Shader          shader   = renderer.GetShader();
@@ -156,7 +182,7 @@ void TestShaderCodeContainSubstrings(Control control, std::vector<std::pair<std:
   for(const auto& checkPair : substringCheckList)
   {
     const auto& keyword = checkPair.first;
-    const auto& expect  = checkPair.second;
+    const auto& expect  = checkPair.second.expectVertexResult;
     tet_printf("check [%s] %s exist in vertex shader\n", keyword.c_str(), expect ? "is" : "is not");
     DALI_TEST_EQUALS((vertexShader.find(keyword.c_str()) != std::string::npos), expect, location);
   }
@@ -168,39 +194,7 @@ void TestShaderCodeContainSubstrings(Control control, std::vector<std::pair<std:
   for(const auto& checkPair : substringCheckList)
   {
     const auto& keyword = checkPair.first;
-    const auto& expect  = checkPair.second;
-    tet_printf("check [%s] %s exist in fragment shader\n", keyword.c_str(), expect ? "is" : "is not");
-    DALI_TEST_EQUALS((fragmentShader.find(keyword.c_str()) != std::string::npos), expect, location);
-  }
-}
-
-void TestShaderCodeContainSubstringsForEachShader(Control control, std::vector<std::pair<std::string, std::pair<bool, bool>>> substringCheckList, const char* location)
-{
-  Renderer        renderer = control.GetRendererAt(0);
-  Shader          shader   = renderer.GetShader();
-  Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
-  Property::Map*  map      = value.GetMap();
-  DALI_TEST_CHECK(map);
-
-  Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-  std::string      vertexShader;
-  DALI_TEST_CHECK(vertex->Get(vertexShader));
-  for(const auto& checkPair : substringCheckList)
-  {
-    const auto& keyword = checkPair.first;
-    const auto& expect  = checkPair.second.first;
-    tet_printf("check [%s] %s exist in vertex shader\n", keyword.c_str(), expect ? "is" : "is not");
-    DALI_TEST_EQUALS((vertexShader.find(keyword.c_str()) != std::string::npos), expect, location);
-  }
-
-  Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-  DALI_TEST_CHECK(fragment);
-  std::string fragmentShader;
-  DALI_TEST_CHECK(fragment->Get(fragmentShader));
-  for(const auto& checkPair : substringCheckList)
-  {
-    const auto& keyword = checkPair.first;
-    const auto& expect  = checkPair.second.second;
+    const auto& expect  = checkPair.second.expectFragmentResult;
     tet_printf("check [%s] %s exist in fragment shader\n", keyword.c_str(), expect ? "is" : "is not");
     DALI_TEST_EQUALS((fragmentShader.find(keyword.c_str()) != std::string::npos), expect, location);
   }
@@ -560,6 +554,7 @@ int UtcDaliVisualGetPropertyMap1(void)
   propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, 20.0f);
   propertyMap.Insert(DevelVisual::Property::BORDERLINE_COLOR, Color::RED);
   propertyMap.Insert(DevelVisual::Property::BORDERLINE_OFFSET, -1.0f);
+  propertyMap.Insert(DevelVisual::Property::CORNER_SQUARENESS, 1.0f);
   propertyMap.Insert(DevelColorVisual::Property::BLUR_RADIUS, 20.0f);
   propertyMap.Insert(DevelColorVisual::Property::CUTOUT_POLICY, DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS);
   Visual::Base colorVisual = factory.CreateVisual(propertyMap);
@@ -594,6 +589,10 @@ int UtcDaliVisualGetPropertyMap1(void)
   Property::Value* borderlineOffsetValue = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_CHECK(borderlineOffsetValue->Get<float>() == -1.0f);
+
+  Property::Value* cornerSqaurenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSqaurenessValue);
+  DALI_TEST_CHECK(cornerSqaurenessValue->Get<Vector4>() == Vector4::ONE);
 
   Property::Value* blurRadiusValue = resultMap.Find(DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT);
   DALI_TEST_CHECK(blurRadiusValue);
@@ -3931,6 +3930,7 @@ int UtcDaliVisualRoundedCorner(void)
     {
       UniformData("cornerRadius", Property::Type::VECTOR4),
       UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
     };
 
   // image visual
@@ -3941,11 +3941,13 @@ int UtcDaliVisualRoundedCorner(void)
 
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
-    float         cornerRadius = 30.0f;
+    float         cornerRadius     = 30.0f;
+    float         cornerSquareness = 0.5f;
 
-    properties[Visual::Property::TYPE]               = Visual::IMAGE;
-    properties[ImageVisual::Property::URL]           = TEST_IMAGE_FILE_NAME;
-    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius;
+    properties[Visual::Property::TYPE]                   = Visual::IMAGE;
+    properties[ImageVisual::Property::URL]               = TEST_IMAGE_FILE_NAME;
+    properties[DevelVisual::Property::CORNER_RADIUS]     = cornerRadius;
+    properties[DevelVisual::Property::CORNER_SQUARENESS] = cornerSquareness;
 
     Visual::Base visual = factory.CreateVisual(properties);
 
@@ -3969,6 +3971,7 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius)), true, TEST_LOCATION);
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4(cornerSquareness, cornerSquareness, cornerSquareness, cornerSquareness)), true, TEST_LOCATION);
   }
 
   // color visual 1
@@ -3979,12 +3982,14 @@ int UtcDaliVisualRoundedCorner(void)
 
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
-    float         cornerRadius = 30.0f;
+    float         cornerRadius     = 30.0f;
+    float         cornerSquareness = 0.5f;
 
     properties[Visual::Property::TYPE]           = Visual::COLOR;
     properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
     properties["cornerRadius"]                   = cornerRadius;
     properties["cornerRadiusPolicy"]             = Toolkit::Visual::Transform::Policy::ABSOLUTE;
+    properties["cornerSquareness"]               = cornerSquareness;
 
     Visual::Base visual = factory.CreateVisual(properties);
 
@@ -4006,6 +4011,7 @@ int UtcDaliVisualRoundedCorner(void)
     // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4(cornerSquareness, cornerSquareness, cornerSquareness, cornerSquareness)), true, TEST_LOCATION);
   }
 
   // color visual 2
@@ -4043,6 +4049,8 @@ int UtcDaliVisualRoundedCorner(void)
     // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", cornerRadius), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE), true, TEST_LOCATION);
+    // Default corner squareness is Vector4::ZERO.
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4::ZERO), true, TEST_LOCATION);
   }
 
   // color visual 3 - invalid value
@@ -4081,6 +4089,8 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", cornerRadius), true, TEST_LOCATION);
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
+    // Default corner squareness is Vector4::ZERO.
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4::ZERO), true, TEST_LOCATION);
   }
 
   // gradient visual
@@ -4092,10 +4102,12 @@ int UtcDaliVisualRoundedCorner(void)
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     float         cornerRadius = 30.0f;
+    Vector4       cornerSquareness(0.5f, 0.5f, 0.5f, 0.5f);
 
     properties[Visual::Property::TYPE]                   = Visual::GRADIENT;
     properties[ColorVisual::Property::MIX_COLOR]         = Color::BLUE;
     properties[DevelVisual::Property::CORNER_RADIUS]     = cornerRadius;
+    properties[DevelVisual::Property::CORNER_SQUARENESS] = cornerSquareness;
     properties[GradientVisual::Property::START_POSITION] = Vector2(0.5f, 0.5f);
     properties[GradientVisual::Property::END_POSITION]   = Vector2(-0.5f, -0.5f);
     properties[GradientVisual::Property::UNITS]          = GradientVisual::Units::USER_SPACE;
@@ -4132,6 +4144,7 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius)), true, TEST_LOCATION);
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", cornerSquareness), true, TEST_LOCATION);
   }
 
   // animated image visual
@@ -4143,11 +4156,13 @@ int UtcDaliVisualRoundedCorner(void)
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
     Vector4       cornerRadius(24.0f, 23.0f, 22.0f, 21.0f);
+    Vector4       cornerSquareness(0.3f, 0.2f, 0.5f, 0.6f);
 
     properties[Visual::Property::TYPE]               = Visual::ANIMATED_IMAGE;
     properties[ImageVisual::Property::URL]           = TEST_GIF_FILE_NAME;
     properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius.x + 10.0f; // Dummy Input
     properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius;
+    properties["cornerSquareness"]                   = cornerSquareness;
     properties["cornerRadiusPolicy"]                 = Toolkit::Visual::Transform::Policy::ABSOLUTE;
 
     Visual::Base visual = factory.CreateVisual(properties);
@@ -4171,6 +4186,7 @@ int UtcDaliVisualRoundedCorner(void)
 
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", cornerRadius), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", cornerSquareness), true, TEST_LOCATION);
   }
 
   // vector image visual
@@ -4210,6 +4226,8 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", cornerRadius), true, TEST_LOCATION);
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
+    // Default corner squareness is Vector4::ZERO.
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4::ZERO), true, TEST_LOCATION);
   }
 
   // animated vector image visual
@@ -4220,13 +4238,15 @@ int UtcDaliVisualRoundedCorner(void)
 
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
-    float         cornerRadius = 1.3f;
+    float         cornerRadius     = 1.3f;
+    float         cornerSquareness = 0.1f;
 
     properties[Visual::Property::TYPE]                      = DevelVisual::ANIMATED_VECTOR_IMAGE;
     properties[ImageVisual::Property::URL]                  = TEST_VECTOR_IMAGE_FILE_NAME;
     properties["cornerRadius"]                              = Vector4(1.0f, 100.0f, 10.0f, 0.1f); // Dummy Input
     properties["cornerRadius"]                              = cornerRadius;
     properties[DevelVisual::Property::CORNER_RADIUS_POLICY] = Toolkit::Visual::Transform::Policy::RELATIVE;
+    properties[DevelVisual::Property::CORNER_SQUARENESS]    = cornerSquareness;
     properties["synchronousLoading"]                        = false;
 
     Visual::Base visual = factory.CreateVisual(properties);
@@ -4251,6 +4271,7 @@ int UtcDaliVisualRoundedCorner(void)
 
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4(cornerSquareness, cornerSquareness, cornerSquareness, cornerSquareness)), true, TEST_LOCATION);
   }
 
   END_TEST;
@@ -4267,6 +4288,7 @@ int UtcDaliVisualBorderline(void)
       UniformData("borderlineWidth", Property::Type::FLOAT),
       UniformData("borderlineColor", Property::Type::VECTOR4),
       UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
     };
 
   // image visual
@@ -4281,6 +4303,7 @@ int UtcDaliVisualBorderline(void)
     float         borderlineWidth = 30.0f;
     Vector4       borderlineColor(1.0f, 0.0f, 0.0f, 1.0f);
     float         borderlineOffset = 1.0f;
+    float         cornerSquareness = 0.5f;
 
     properties[Visual::Property::TYPE]                   = Visual::IMAGE;
     properties[ImageVisual::Property::URL]               = TEST_IMAGE_FILE_NAME;
@@ -4288,6 +4311,7 @@ int UtcDaliVisualBorderline(void)
     properties[DevelVisual::Property::BORDERLINE_WIDTH]  = borderlineWidth;
     properties[DevelVisual::Property::BORDERLINE_COLOR]  = borderlineColor;
     properties[DevelVisual::Property::BORDERLINE_OFFSET] = borderlineOffset;
+    properties[DevelVisual::Property::CORNER_SQUARENESS] = cornerSquareness;
 
     Visual::Base visual = factory.CreateVisual(properties);
 
@@ -4314,6 +4338,7 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", borderlineWidth), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", borderlineColor), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", borderlineOffset), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4(cornerSquareness, cornerSquareness, cornerSquareness, cornerSquareness)), true, TEST_LOCATION);
   }
 
   // color visual 1
@@ -4328,6 +4353,7 @@ int UtcDaliVisualBorderline(void)
     float         borderlineWidth = 30.0f;
     Vector4       borderlineColor(0.5f, 0.4f, 0.3f, 0.2f);
     float         borderlineOffset = -0.4f;
+    Vector4       cornerSquareness(0.1f, 0.2f, 0.3f, 0.4f);
 
     properties[Visual::Property::TYPE]           = Visual::COLOR;
     properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
@@ -4335,6 +4361,7 @@ int UtcDaliVisualBorderline(void)
     properties["borderlineWidth"]                = borderlineWidth;
     properties["borderlineColor"]                = borderlineColor;
     properties["borderlineOffset"]               = borderlineOffset;
+    properties["cornerSquareness"]               = cornerSquareness;
 
     Visual::Base visual = factory.CreateVisual(properties);
 
@@ -4357,6 +4384,7 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", borderlineWidth), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", borderlineColor), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", borderlineOffset), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", cornerSquareness), true, TEST_LOCATION);
   }
 
   // color visual 2, default color, default offset
@@ -4446,13 +4474,15 @@ int UtcDaliVisualBorderline(void)
 
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
-    float         borderlineWidth = 30.0f;
-    float         cornerRadius    = 70.0f;
+    float         borderlineWidth  = 30.0f;
+    float         cornerRadius     = 70.0f;
+    float         cornerSquareness = 0.5f;
 
     properties[Visual::Property::TYPE]                   = Visual::GRADIENT;
     properties[ColorVisual::Property::MIX_COLOR]         = Color::BLUE;
     properties[DevelVisual::Property::CORNER_RADIUS]     = cornerRadius;
     properties[DevelVisual::Property::BORDERLINE_WIDTH]  = borderlineWidth;
+    properties[DevelVisual::Property::CORNER_SQUARENESS] = cornerSquareness;
     properties[GradientVisual::Property::START_POSITION] = Vector2(0.5f, 0.5f);
     properties[GradientVisual::Property::END_POSITION]   = Vector2(-0.5f, -0.5f);
     properties[GradientVisual::Property::UNITS]          = GradientVisual::Units::USER_SPACE;
@@ -4494,6 +4524,7 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", Color::BLACK), true, TEST_LOCATION);
     // Default borderline offset is 0.0f.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", 0.0f), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4(cornerSquareness, cornerSquareness, cornerSquareness, cornerSquareness)), true, TEST_LOCATION);
   }
 
   // animated image visual
@@ -4583,6 +4614,8 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", borderlineColor), true, TEST_LOCATION);
     // Default borderline offset is 0.0.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", 0.0f), true, TEST_LOCATION);
+    // Default corner squareness is Vector4::ZERO.
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4::ZERO), true, TEST_LOCATION);
   }
 
   // animated vector image visual
@@ -4597,6 +4630,7 @@ int UtcDaliVisualBorderline(void)
     float         borderlineWidth = 13.0f;
     Vector4       borderlineColor(0.3f, 0.3f, 0.3f, 1.0f);
     float         borderlineOffset = 13.0f;
+    Vector4       cornerSquareness(0.1f, 0.0f, 0.2f, 0.4f);
 
     properties[Visual::Property::TYPE]                      = DevelVisual::ANIMATED_VECTOR_IMAGE;
     properties[ImageVisual::Property::URL]                  = TEST_VECTOR_IMAGE_FILE_NAME;
@@ -4605,6 +4639,7 @@ int UtcDaliVisualBorderline(void)
     properties[DevelVisual::Property::BORDERLINE_WIDTH]     = borderlineWidth;
     properties["borderlineColor"]                           = borderlineColor;
     properties[DevelVisual::Property::BORDERLINE_OFFSET]    = borderlineOffset;
+    properties["cornerSquareness"]                          = cornerSquareness;
     properties[ImageVisual::Property::SYNCHRONOUS_LOADING]  = false;
 
     Visual::Base visual = factory.CreateVisual(properties);
@@ -4632,6 +4667,7 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", borderlineWidth), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", borderlineColor), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", borderlineOffset), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", cornerSquareness), true, TEST_LOCATION);
   }
 
   END_TEST;
@@ -5059,7 +5095,9 @@ int UtcDaliVisualGetVisualProperty01(void)
       UniformData("blurRadius", Property::Type::FLOAT),
       UniformData("borderlineWidth", Property::Type::FLOAT),
       UniformData("borderlineColor", Property::Type::VECTOR4),
-      UniformData("borderlineOffset", Property::Type::FLOAT)};
+      UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
@@ -5074,6 +5112,7 @@ int UtcDaliVisualGetVisualProperty01(void)
   propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, 20.0f);
   propertyMap.Insert(DevelVisual::Property::BORDERLINE_COLOR, Color::RED);
   propertyMap.Insert(DevelVisual::Property::BORDERLINE_OFFSET, 1.0f);
+  propertyMap.Insert(DevelVisual::Property::CORNER_SQUARENESS, Vector4(0.1f, 0.2f, 0.0f, 1.0f));
   Visual::Base colorVisual = factory.CreateVisual(propertyMap);
 
   DummyControl        dummyControl = DummyControl::New(true);
@@ -5093,6 +5132,7 @@ int UtcDaliVisualGetVisualProperty01(void)
   float   targetBorderlineWidth = 25.0f;
   Vector4 targetBorderlineColor(1.0f, 1.0f, 1.0f, 1.0f);
   float   targetBorderlineOffset = -1.0f;
+  Vector4 targetCornerSquareness(0.5f, 0.0f, 1.0f, 0.0f);
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::MIX_COLOR), targetColor);
@@ -5103,6 +5143,7 @@ int UtcDaliVisualGetVisualProperty01(void)
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), targetBorderlineWidth);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), targetBorderlineColor);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_OFFSET), targetBorderlineOffset);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_SQUARENESS), targetCornerSquareness);
   animation.Play();
 
   application.SendNotification();
@@ -5149,6 +5190,10 @@ int UtcDaliVisualGetVisualProperty01(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
+  Property::Value* cornerSqaurenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSqaurenessValue);
+  DALI_TEST_EQUALS(cornerSqaurenessValue->Get<Vector4>(), targetCornerSquareness, TEST_LOCATION);
+
   // Test uniform values
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("offset", targetOffset), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("size", targetSize), true, TEST_LOCATION);
@@ -5157,6 +5202,7 @@ int UtcDaliVisualGetVisualProperty01(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", targetCornerSquareness), true, TEST_LOCATION);
 
   // Test unregistered visual
   Property property3 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL2, Visual::Property::MIX_COLOR);
@@ -5180,6 +5226,7 @@ int UtcDaliVisualGetVisualProperty02(void)
       UniformData("borderlineCOlor", Property::Type::VECTOR4),
       UniformData("borderlineOffset", Property::Type::FLOAT),
       UniformData("blurRadius", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
     };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -5207,6 +5254,7 @@ int UtcDaliVisualGetVisualProperty02(void)
   Vector4 targetBorderlineColor(0.4f, 0.2f, 0.3f, 0.9f);
   float   targetBorderlineOffset = 1.0f;
   float   targetBlurRadius       = 10.0f;
+  Vector4 targetCornerSquareness(0.0f, 0.2f, 0.4f, 0.5f);
 
   // Should work when the properties are not set before
   Animation animation = Animation::New(1.0f);
@@ -5218,6 +5266,7 @@ int UtcDaliVisualGetVisualProperty02(void)
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "borderlineColor"), targetBorderlineColor);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "borderlineOffset"), targetBorderlineOffset);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "blurRadius"), targetBlurRadius);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "cornerSquareness"), targetCornerSquareness);
   animation.Play();
 
   application.SendNotification();
@@ -5264,11 +5313,16 @@ int UtcDaliVisualGetVisualProperty02(void)
   DALI_TEST_CHECK(blurRadiusValue);
   DALI_TEST_EQUALS(blurRadiusValue->Get<float>(), targetBlurRadius, TEST_LOCATION);
 
+  Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), targetCornerSquareness, TEST_LOCATION);
+
   // Test uniform values
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("offset", targetOffset), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("size", targetSize), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("blurRadius", targetBlurRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", targetCornerSquareness), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -5285,6 +5339,7 @@ int UtcDaliVisualGetVisualProperty03(void)
       UniformData("borderlineWidth", Property::Type::FLOAT),
       UniformData("borderlineColor", Property::Type::VECTOR4),
       UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
     };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -5315,6 +5370,7 @@ int UtcDaliVisualGetVisualProperty03(void)
   float   targetBorderlineWidth = 10.0f;
   Vector4 targetBorderlineColor(1.0f, 0.0f, 1.0f, 0.5f);
   float   targetBorderlineOffset = -1.5f;
+  Vector4 targetCornerSquareness(0.0f, 0.2f, 0.4f, 0.5f);
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
@@ -5323,6 +5379,7 @@ int UtcDaliVisualGetVisualProperty03(void)
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), targetBorderlineWidth);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), targetBorderlineColor);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_OFFSET), targetBorderlineOffset);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_SQUARENESS), targetCornerSquareness);
   animation.Play();
 
   application.SendNotification();
@@ -5357,12 +5414,17 @@ int UtcDaliVisualGetVisualProperty03(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
+  Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), targetCornerSquareness, TEST_LOCATION);
+
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", targetPixelArea), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", targetCornerSquareness), true, TEST_LOCATION);
 
   // Test non-animatable index, for coverage.
   DALI_TEST_EQUALS(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, ImageVisual::Property::URL).propertyIndex, Property::INVALID_INDEX, TEST_LOCATION);
@@ -5378,6 +5440,7 @@ int UtcDaliVisualGetVisualProperty04(void)
   static std::vector<UniformData> customUniforms =
     {
       UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
     };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -5410,10 +5473,12 @@ int UtcDaliVisualGetVisualProperty04(void)
 
   float   targetOpacity = 0.5f;
   Vector4 targetCornerRadius(20.0f, 30.0f, 10.0f, 20.0f);
+  Vector4 targetCornerSquareness(0.2f, 0.3f, 0.1f, 0.2f);
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_SQUARENESS), targetCornerSquareness);
   animation.Play();
 
   application.SendNotification();
@@ -5432,8 +5497,13 @@ int UtcDaliVisualGetVisualProperty04(void)
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
 
+  Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), targetCornerSquareness, TEST_LOCATION);
+
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", targetCornerSquareness), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -5449,6 +5519,7 @@ int UtcDaliVisualGetVisualProperty05(void)
       UniformData("borderlineWidth", Property::Type::FLOAT),
       UniformData("borderlineColor", Property::Type::VECTOR4),
       UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
     };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -5481,6 +5552,7 @@ int UtcDaliVisualGetVisualProperty05(void)
   float   targetBorderlineWidth = 10.0f;
   Vector4 targetBorderlineColor(1.0f, 0.0f, 1.0f, 0.5f);
   float   targetBorderlineOffset = -1.5f;
+  Vector4 targetCornerSquareness(0.2f, 0.3f, 0.1f, 0.2f);
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
@@ -5488,6 +5560,7 @@ int UtcDaliVisualGetVisualProperty05(void)
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), targetBorderlineWidth);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), targetBorderlineColor);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_OFFSET), targetBorderlineOffset);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_SQUARENESS), targetCornerSquareness);
   animation.Play();
 
   application.SendNotification();
@@ -5518,12 +5591,17 @@ int UtcDaliVisualGetVisualProperty05(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
+  Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), targetCornerSquareness, TEST_LOCATION);
+
   // Currently test with multiple program doesn't work well. will fix another day
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", targetCornerSquareness), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -5539,6 +5617,7 @@ int UtcDaliVisualGetVisualProperty06(void)
       UniformData("borderlineWidth", Property::Type::FLOAT),
       UniformData("borderlineColor", Property::Type::VECTOR4),
       UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
     };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -5571,6 +5650,7 @@ int UtcDaliVisualGetVisualProperty06(void)
   float   targetBorderlineWidth = 10.0f;
   Vector4 targetBorderlineColor(1.0f, 0.0f, 1.0f, 0.5f);
   float   targetBorderlineOffset = -1.5f;
+  Vector4 targetCornerSquareness(0.2f, 0.3f, 0.1f, 0.2f);
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
@@ -5578,6 +5658,7 @@ int UtcDaliVisualGetVisualProperty06(void)
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), targetBorderlineWidth);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), targetBorderlineColor);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_OFFSET), targetBorderlineOffset);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_SQUARENESS), targetCornerSquareness);
   animation.Play();
 
   application.SendNotification();
@@ -5608,12 +5689,17 @@ int UtcDaliVisualGetVisualProperty06(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
+  Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), targetCornerSquareness, TEST_LOCATION);
+
   // Currently test with multiple program doesn't work well. will fix another day
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", targetCornerSquareness), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -5629,6 +5715,7 @@ int UtcDaliVisualGetVisualProperty07(void)
       UniformData("borderlineWidth", Property::Type::FLOAT),
       UniformData("borderlineColor", Property::Type::VECTOR4),
       UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
     };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -5662,6 +5749,7 @@ int UtcDaliVisualGetVisualProperty07(void)
   float   targetBorderlineWidth = 10.0f;
   Vector4 targetBorderlineColor(1.0f, 0.0f, 1.0f, 0.5f);
   float   targetBorderlineOffset = -1.5f;
+  Vector4 targetCornerSquareness(0.2f, 0.3f, 0.1f, 0.2f);
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
@@ -5669,6 +5757,7 @@ int UtcDaliVisualGetVisualProperty07(void)
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), targetBorderlineWidth);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), targetBorderlineColor);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_OFFSET), targetBorderlineOffset);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_SQUARENESS), targetCornerSquareness);
   animation.Play();
 
   application.SendNotification();
@@ -5699,12 +5788,17 @@ int UtcDaliVisualGetVisualProperty07(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
+  Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), targetCornerSquareness, TEST_LOCATION);
+
   // Currently test with multiple program doesn't work well. will fix another day
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", targetCornerSquareness), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -5749,6 +5843,7 @@ int UtcDaliVisualUpdateProperty01(void)
   float                    targetBorderlineWidth    = 20.0f;
   Vector4                  targetBorderlineColor    = Color::RED;
   float                    targetBorderlineOffset   = 1.0f;
+  Vector4                  targetCornerSquareness   = Vector4(0.0f, 0.0f, 0.6f, 0.6f);
 
   Property::Map targetPropertyMap;
   targetPropertyMap[Visual::Property::OPACITY]                  = targetOpacity;
@@ -5760,6 +5855,7 @@ int UtcDaliVisualUpdateProperty01(void)
   targetPropertyMap[DevelVisual::Property::BORDERLINE_WIDTH]    = targetBorderlineWidth;
   targetPropertyMap[DevelVisual::Property::BORDERLINE_COLOR]    = targetBorderlineColor;
   targetPropertyMap[DevelVisual::Property::BORDERLINE_OFFSET]   = targetBorderlineOffset;
+  targetPropertyMap[DevelVisual::Property::CORNER_SQUARENESS]   = targetCornerSquareness;
 
   // Update Properties
   DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
@@ -5801,6 +5897,10 @@ int UtcDaliVisualUpdateProperty01(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
+  Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), targetCornerSquareness, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -5811,6 +5911,7 @@ int UtcDaliVisualUpdateProperty02(void)
 
   Vector4 borderlineColor  = Color::BLUE;
   float   borderlineOffset = 1.0f;
+  Vector4 cornerSquareness = Vector4::ZERO;
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
@@ -5823,6 +5924,7 @@ int UtcDaliVisualUpdateProperty02(void)
   propertyMap[DevelVisual::Property::BORDERLINE_WIDTH]     = 0.0f;
   propertyMap[DevelVisual::Property::BORDERLINE_COLOR]     = borderlineColor;
   propertyMap[DevelVisual::Property::BORDERLINE_OFFSET]    = borderlineOffset;
+  propertyMap[DevelVisual::Property::CORNER_SQUARENESS]    = cornerSquareness;
 
   Visual::Base imageVisual = factory.CreateVisual(propertyMap);
 
@@ -5877,6 +5979,10 @@ int UtcDaliVisualUpdateProperty02(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), borderlineOffset, TEST_LOCATION);
 
+  Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), cornerSquareness, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -5918,6 +6024,7 @@ int UtcDaliVisualUpdatePropertyInvalidType(void)
   float                    targetBorderlineWidth    = 20.0f;
   Vector4                  targetBorderlineColor    = Color::RED;
   float                    targetBorderlineOffset   = 1.0f;
+  Vector4                  targetCornerSquareness   = Vector4(0.2f, 0.4f, 0.6f, 0.8f);
 
   Property::Map targetPropertyMap;
   targetPropertyMap[Visual::Property::OPACITY]                  = targetOpacity;
@@ -5931,6 +6038,7 @@ int UtcDaliVisualUpdatePropertyInvalidType(void)
   targetPropertyMap[DevelVisual::Property::BORDERLINE_WIDTH]  = targetBorderlineWidth;
   targetPropertyMap[DevelVisual::Property::BORDERLINE_COLOR]  = targetBorderlineColor;
   targetPropertyMap[DevelVisual::Property::BORDERLINE_OFFSET] = targetBorderlineOffset;
+  targetPropertyMap[DevelVisual::Property::CORNER_SQUARENESS] = targetCornerSquareness;
 
   // Update Properties
   DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
@@ -5997,17 +6105,20 @@ int UtcDaliVisualUpdatePropertyChangeShader01(void)
     {
       {"#define IS_REQUIRED_BORDERLINE", false},
       {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
     },
     TEST_LOCATION);
 
   callStack.Reset();
   callStack.Enable(true);
 
-  Vector4 targetCornerRadius = Vector4(1.0f, 12.0f, 2.0f, 21.0f);
+  Vector4 targetCornerRadius     = Vector4(1.0f, 12.0f, 2.0f, 21.0f);
+  Vector4 targetCornerSquareness = Vector4(0.2f, 0.4f, 0.6f, 0.8f);
 
   Property::Map targetPropertyMap;
   targetPropertyMap[DevelVisual::Property::CORNER_RADIUS]        = targetCornerRadius;
   targetPropertyMap[DevelVisual::Property::CORNER_RADIUS_POLICY] = Toolkit::Visual::Transform::Policy::RELATIVE;
+  targetPropertyMap[DevelVisual::Property::CORNER_SQUARENESS]    = targetCornerSquareness;
 
   // Update Properties with CornerRadius
   DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
@@ -6024,11 +6135,16 @@ int UtcDaliVisualUpdatePropertyChangeShader01(void)
   DALI_TEST_CHECK(cornerRadiusPolicyValue);
   DALI_TEST_EQUALS(cornerRadiusPolicyValue->Get<int>(), static_cast<int>(Toolkit::Visual::Transform::Policy::RELATIVE), TEST_LOCATION);
 
+  Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), targetCornerSquareness, TEST_LOCATION);
+
   TestShaderCodeContainSubstrings(
     dummyControl,
     {
       {"#define IS_REQUIRED_BORDERLINE", false},
       {"#define IS_REQUIRED_ROUNDED_CORNER", true},
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", {false, true}},
     },
     TEST_LOCATION);
 
@@ -6052,6 +6168,7 @@ int UtcDaliVisualUpdatePropertyChangeShader01(void)
   targetPropertyMap2[DevelVisual::Property::BORDERLINE_WIDTH]     = targetBorderlineWidth;
   targetPropertyMap2[DevelVisual::Property::BORDERLINE_COLOR]     = targetBorderlineColor;
   targetPropertyMap2[DevelVisual::Property::BORDERLINE_OFFSET]    = targetBorderlineOffset;
+  targetPropertyMap2[DevelVisual::Property::CORNER_SQUARENESS]    = Vector4::ZERO;
 
   // Update Properties with Borderline
   DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap2);
@@ -6080,11 +6197,16 @@ int UtcDaliVisualUpdatePropertyChangeShader01(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), targetBorderlineOffset, TEST_LOCATION);
 
+  cornerSquarenessValue = resultMap2.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), Vector4::ZERO, TEST_LOCATION);
+
   TestShaderCodeContainSubstrings(
     dummyControl,
     {
       {"#define IS_REQUIRED_BORDERLINE", true},
-      {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true},           // Note : mAlwaysUsingCornerRadius is true.
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", {false, true}}, // Note : mAlwaysUsingCornerSquareness is true.
     },
     TEST_LOCATION);
 
@@ -6104,6 +6226,7 @@ int UtcDaliVisualUpdatePropertyChangeShader01(void)
   targetPropertyMap3[DevelVisual::Property::BORDERLINE_WIDTH]     = 0.0f;
   targetPropertyMap3[DevelVisual::Property::BORDERLINE_COLOR]     = Vector4::ZERO;
   targetPropertyMap3[DevelVisual::Property::BORDERLINE_OFFSET]    = 0.0f;
+  targetPropertyMap3[DevelVisual::Property::CORNER_SQUARENESS]    = Vector4::ZERO;
 
   // Update Properties into zero
   DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap3);
@@ -6132,11 +6255,16 @@ int UtcDaliVisualUpdatePropertyChangeShader01(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), 0.0f, TEST_LOCATION);
 
+  cornerSquarenessValue = resultMap3.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), Vector4::ZERO, TEST_LOCATION);
+
   TestShaderCodeContainSubstrings(
     dummyControl,
     {
-      {"#define IS_REQUIRED_BORDERLINE", true},     // Note : mAlwaysUsingBorderline is true.
-      {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
+      {"#define IS_REQUIRED_BORDERLINE", true},               // Note : mAlwaysUsingBorderline is true.
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true},           // Note : mAlwaysUsingCornerRadius is true.
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", {false, true}}, // Note : mAlwaysUsingCornerSquareness is true.
     },
     TEST_LOCATION);
 
@@ -6186,13 +6314,16 @@ int UtcDaliVisualUpdatePropertyChangeShader02(void)
     {
       {"#define IS_REQUIRED_BORDERLINE", false},
       {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
     },
     TEST_LOCATION);
 
-  Vector4 targetCornerRadius = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+  Vector4 targetCornerRadius     = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+  Vector4 targetCornerSquareness = Vector4(0.2f, 0.4f, 0.6f, 0.8f);
 
   Property::Map targetPropertyMap;
-  targetPropertyMap[DevelVisual::Property::CORNER_RADIUS] = targetCornerRadius;
+  targetPropertyMap[DevelVisual::Property::CORNER_RADIUS]     = targetCornerRadius;
+  targetPropertyMap[DevelVisual::Property::CORNER_SQUARENESS] = targetCornerSquareness;
 
   callStack.Reset();
   callStack.Enable(true);
@@ -6208,11 +6339,16 @@ int UtcDaliVisualUpdatePropertyChangeShader02(void)
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
 
+  Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), targetCornerSquareness, TEST_LOCATION);
+
   TestShaderCodeContainSubstrings(
     dummyControl,
     {
       {"#define IS_REQUIRED_BORDERLINE", false},
-      {"#define IS_REQUIRED_ROUNDED_CORNER", false}, // Note : corner radius is zero. so we don't change shader!
+      {"#define IS_REQUIRED_ROUNDED_CORNER", false},  // Note : corner radius is zero. so we don't change shader!
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", false}, // Note : corner radius is zero. so we don't change shader!
     },
     TEST_LOCATION);
 
@@ -6260,6 +6396,7 @@ int UtcDaliVisualUpdatePropertyChangeShader02(void)
     {
       {"#define IS_REQUIRED_BORDERLINE", false}, // Note : borderline width is zero. so we don't change shader!
       {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
     },
     TEST_LOCATION);
 
@@ -6308,6 +6445,7 @@ int UtcDaliVisualUpdatePropertyChangeShader03(void)
       {"#define IS_REQUIRED_BLUR", false},
       {"#define IS_REQUIRED_BORDERLINE", false},
       {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
     },
     TEST_LOCATION);
 
@@ -6343,6 +6481,7 @@ int UtcDaliVisualUpdatePropertyChangeShader03(void)
       {"#define IS_REQUIRED_BLUR", true},
       {"#define IS_REQUIRED_BORDERLINE", false}, // Note : We ignore borderline when blur radius occured
       {"#define IS_REQUIRED_ROUNDED_CORNER", true},
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
     },
     TEST_LOCATION);
 
@@ -6383,6 +6522,7 @@ int UtcDaliVisualUpdatePropertyChangeShader03(void)
       {"#define IS_REQUIRED_BLUR", true},           // Note : mAlwaysUsingBlurRadius is true.
       {"#define IS_REQUIRED_BORDERLINE", false},    // Note : We ignore borderline when blur radius occured
       {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
     },
     TEST_LOCATION);
 
@@ -6407,10 +6547,11 @@ int UtcDaliVisualUpdatePropertyChangeShader04(void)
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
+  Vector4       targetCornerSquareness = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
   // Case ImageVisual
-  propertyMap[Visual::Property::TYPE]               = Visual::Type::IMAGE;
-  propertyMap[ImageVisual::Property::URL]           = TEST_IMAGE_FILE_NAME;
-  propertyMap[DevelVisual::Property::CORNER_RADIUS] = 10.0f;
+  propertyMap[Visual::Property::TYPE]                   = Visual::Type::IMAGE;
+  propertyMap[ImageVisual::Property::URL]               = TEST_IMAGE_FILE_NAME;
+  propertyMap[DevelVisual::Property::CORNER_SQUARENESS] = targetCornerSquareness;
 
   Visual::Base imageVisual = factory.CreateVisual(propertyMap);
 
@@ -6433,7 +6574,8 @@ int UtcDaliVisualUpdatePropertyChangeShader04(void)
     dummyControl,
     {
       {"#define IS_REQUIRED_BORDERLINE", false},
-      {"#define IS_REQUIRED_ROUNDED_CORNER", true},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", false}, // Note : corner radius is zero. so we don't change shader!
     },
     TEST_LOCATION);
 
@@ -6454,13 +6596,14 @@ int UtcDaliVisualUpdatePropertyChangeShader04(void)
     dummyControl,
     {
       {"#define IS_REQUIRED_BORDERLINE", false},
-      {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true},           // Note : mAlwaysUsingCornerRadius is true.
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", {false, true}}, // Note : CornerSqureness is non-zero.
     },
     TEST_LOCATION);
 
   callStack.Enable(false);
-  // Shader not changed
-  DALI_TEST_CHECK(!callStack.FindMethod("CreateShader"));
+  // Shader changed
+  DALI_TEST_CHECK(callStack.FindMethod("CreateShader"));
   callStack.Reset();
   callStack.Enable(true);
 
@@ -6479,6 +6622,10 @@ int UtcDaliVisualUpdatePropertyChangeShader04(void)
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
 
+  Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), targetCornerSquareness, TEST_LOCATION);
+
   Property::Value* cornerRadiusPolicyValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS_POLICY, Property::INTEGER);
   DALI_TEST_CHECK(cornerRadiusPolicyValue);
   DALI_TEST_EQUALS(cornerRadiusPolicyValue->Get<int>(), static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE), TEST_LOCATION);
@@ -6491,7 +6638,8 @@ int UtcDaliVisualUpdatePropertyChangeShader04(void)
     dummyControl,
     {
       {"#define IS_REQUIRED_BORDERLINE", true},
-      {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true},           // Note : mAlwaysUsingCornerRadius is true.
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", {false, true}}, // Note : CornerSqureness is non-zero. mAlwaysUsingCornerSquareness become true.
     },
     TEST_LOCATION);
 
@@ -6502,6 +6650,53 @@ int UtcDaliVisualUpdatePropertyChangeShader04(void)
   callStack.Enable(false);
   // Shader changed
   DALI_TEST_CHECK(callStack.FindMethod("CreateShader"));
+  callStack.Reset();
+  callStack.Enable(true);
+
+  // Change CornerSquareness as Zero
+  targetCornerSquareness = Vector4::ZERO;
+  Property::Map targetPropertyMap2;
+  targetPropertyMap2[DevelVisual::Property::CORNER_SQUARENESS] = targetCornerSquareness;
+
+  // Update Properties with CornerRadius
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap2);
+
+  Property::Map resultMap2;
+  imageVisual.CreatePropertyMap(resultMap2);
+
+  // Test property values: they should be updated
+  cornerRadiusValue = resultMap2.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerRadiusValue);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
+
+  cornerSquarenessValue = resultMap2.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), targetCornerSquareness, TEST_LOCATION);
+
+  cornerRadiusPolicyValue = resultMap2.Find(DevelVisual::Property::CORNER_RADIUS_POLICY, Property::INTEGER);
+  DALI_TEST_CHECK(cornerRadiusPolicyValue);
+  DALI_TEST_EQUALS(cornerRadiusPolicyValue->Get<int>(), static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE), TEST_LOCATION);
+
+  borderlineWidthValue = resultMap2.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineWidthValue);
+  DALI_TEST_EQUALS(borderlineWidthValue->Get<float>(), targetBorderlineWidth, TEST_LOCATION);
+
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", true},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true},           // Note : mAlwaysUsingCornerRadius is true.
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", {false, true}}, // Note : mAlwaysUsingCornerSquareness is true.
+    },
+    TEST_LOCATION);
+
+  // Send shader compile signal
+  application.SendNotification();
+  application.Render();
+
+  callStack.Enable(false);
+  // Shader not changed
+  DALI_TEST_CHECK(!callStack.FindMethod("CreateShader"));
 
   END_TEST;
 }
@@ -6546,16 +6741,19 @@ int UtcDaliVisualUpdatePropertyChangeShader05(void)
         {"#define IS_REQUIRED_BLUR", false},
         {"#define IS_REQUIRED_BORDERLINE", false},
         {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+        {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
       },
       TEST_LOCATION);
 
-    float   targetBlurRadius   = 15.0f;
-    Vector4 targetCornerRadius = Vector4(1.0f, 0.1f, 1.1f, 0.0f);
+    float   targetBlurRadius       = 15.0f;
+    Vector4 targetCornerRadius     = Vector4(1.0f, 0.1f, 1.1f, 0.0f);
+    Vector4 targetCornerSquareness = Vector4(0.0f, 0.1f, 0.1f, 0.0f);
 
     Property::Map targetPropertyMap;
-    targetPropertyMap[DevelColorVisual::Property::BLUR_RADIUS] = targetBlurRadius;
-    targetPropertyMap[DevelVisual::Property::CORNER_RADIUS]    = targetCornerRadius;
-    targetPropertyMap[DevelVisual::Property::BORDERLINE_WIDTH] = 10.0f; // Don't care. just dummy
+    targetPropertyMap[DevelColorVisual::Property::BLUR_RADIUS]  = targetBlurRadius;
+    targetPropertyMap[DevelVisual::Property::CORNER_RADIUS]     = targetCornerRadius;
+    targetPropertyMap[DevelVisual::Property::CORNER_SQUARENESS] = targetCornerSquareness;
+    targetPropertyMap[DevelVisual::Property::BORDERLINE_WIDTH]  = 10.0f; // Don't care. just dummy
 
     callStack.Reset();
     callStack.Enable(true);
@@ -6575,12 +6773,13 @@ int UtcDaliVisualUpdatePropertyChangeShader05(void)
     DALI_TEST_CHECK(cornerRadiusValue);
     DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
 
-    TestShaderCodeContainSubstringsForEachShader(
+    TestShaderCodeContainSubstrings(
       dummyControl,
       {
-        {"#define IS_REQUIRED_BLUR", {true, true}},
-        {"#define IS_REQUIRED_BORDERLINE", {false, false}}, // Note : We ignore borderline when blur radius occured
-        {"#define IS_REQUIRED_ROUNDED_CORNER", {true, true}},
+        {"#define IS_REQUIRED_BLUR", true},
+        {"#define IS_REQUIRED_BORDERLINE", false}, // Note : We ignore borderline when blur radius occured
+        {"#define IS_REQUIRED_ROUNDED_CORNER", true},
+        {"#define IS_REQUIRED_SQUIRCLE_CORNER", {false, true}},
         {"#define SL_VERSION_LOW", {false, true}},
       },
       TEST_LOCATION);
@@ -6616,12 +6815,13 @@ int UtcDaliVisualUpdatePropertyChangeShader05(void)
     DALI_TEST_CHECK(cornerRadiusValue);
     DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), Vector4::ZERO, TEST_LOCATION);
 
-    TestShaderCodeContainSubstringsForEachShader(
+    TestShaderCodeContainSubstrings(
       dummyControl,
       {
-        {"#define IS_REQUIRED_BLUR", {true, true}},           // Note : mAlwaysUsingBlurRadius is true.
-        {"#define IS_REQUIRED_BORDERLINE", {false, false}},   // Note : We ignore borderline when blur radius occured
-        {"#define IS_REQUIRED_ROUNDED_CORNER", {true, true}}, // Note : mAlwaysUsingCornerRadius is true.
+        {"#define IS_REQUIRED_BLUR", true},                     // Note : mAlwaysUsingBlurRadius is true.
+        {"#define IS_REQUIRED_BORDERLINE", false},              // Note : We ignore borderline when blur radius occured
+        {"#define IS_REQUIRED_ROUNDED_CORNER", true},           // Note : mAlwaysUsingCornerRadius is true.
+        {"#define IS_REQUIRED_SQUIRCLE_CORNER", {false, true}}, // Note : mAlwaysUsingCornerSquareness is true.
         {"#define SL_VERSION_LOW", {false, true}},
       },
       TEST_LOCATION);
@@ -6681,6 +6881,7 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
     {
       propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS, 10.0f);
       propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::RELATIVE);
+      propertyMap.Insert(DevelVisual::Property::CORNER_SQUARENESS, 0.6f);
     }
     if(enableBorderline)
     {

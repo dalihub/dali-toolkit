@@ -33,28 +33,36 @@ namespace
 constexpr VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
   VisualFactoryCache::COLOR_SHADER,
   VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER,
+  VisualFactoryCache::COLOR_SHADER_SQUIRCLE_CORNER,
   VisualFactoryCache::COLOR_SHADER_BORDERLINE,
   VisualFactoryCache::COLOR_SHADER_ROUNDED_BORDERLINE,
+  VisualFactoryCache::COLOR_SHADER_SQUIRCLE_BORDERLINE,
   VisualFactoryCache::COLOR_SHADER_BLUR_EDGE,
   VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER_BLUR_EDGE,
-};
-
-constexpr VisualFactoryCache::ShaderType SHADER_TYPE_WITH_CUTOUT_TABLE[] = {
+  VisualFactoryCache::COLOR_SHADER_SQUIRCLE_CORNER_BLUR_EDGE,
   VisualFactoryCache::COLOR_SHADER_CUTOUT,
   VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_CORNER,
+  VisualFactoryCache::COLOR_SHADER_CUTOUT_SQUIRCLE_CORNER,
   VisualFactoryCache::COLOR_SHADER_CUTOUT_BORDERLINE,
   VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_BORDERLINE,
+  VisualFactoryCache::COLOR_SHADER_CUTOUT_SQUIRCLE_BORDERLINE,
   VisualFactoryCache::COLOR_SHADER_CUTOUT_BLUR_EDGE,
   VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_CORNER_BLUR_EDGE,
+  VisualFactoryCache::COLOR_SHADER_CUTOUT_SQUIRCLE_CORNER_BLUR_EDGE,
 };
+constexpr uint32_t SHADER_TYPE_TABLE_COUNT = sizeof(SHADER_TYPE_TABLE) / sizeof(SHADER_TYPE_TABLE[0]);
 
 // enum of required list when we select shader
 enum ColorVisualRequireFlag
 {
-  DEFAULT        = 0,
-  ROUNDED_CORNER = 1 << 0,
-  BORDERLINE     = 1 << 1,
-  BLUR           = 1 << 2,
+  DEFAULT         = 0,
+  ROUNDED_CORNER  = 1,
+  SQUIRCLE_CORNER = 2,
+
+  BORDERLINE = (1) * 3,
+  BLUR       = (2) * 3,
+
+  CUTOUT = (1) * 3 * 3,
 };
 
 constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_ROUNDED_BLUR = 300;
@@ -85,9 +93,9 @@ FeatureBuilder::FeatureBuilder()
 {
 }
 
-FeatureBuilder& FeatureBuilder::EnableRoundCorner(bool enableRoundedCorner)
+FeatureBuilder& FeatureBuilder::EnableRoundCorner(bool enableRoundedCorner, bool enableSquircleCorner)
 {
-  mColorRoundCorner = (enableRoundedCorner ? RoundedCorner::ENABLED : RoundedCorner::DISABLED);
+  mColorRoundCorner = (enableRoundedCorner ? (enableSquircleCorner ? RoundedCorner::SQUIRCLE_CORNER : RoundedCorner::ROUNDED_CORNER) : RoundedCorner::DISABLED);
   return *this;
 }
 
@@ -113,27 +121,41 @@ VisualFactoryCache::ShaderType FeatureBuilder::GetShaderType() const
 {
   VisualFactoryCache::ShaderType shaderType     = VisualFactoryCache::COLOR_SHADER;
   uint32_t                       shaderTypeFlag = ColorVisualRequireFlag::DEFAULT;
-  if(mColorBlur)
+
+  if(mColorRoundCorner == RoundedCorner::SQUIRCLE_CORNER)
   {
-    shaderTypeFlag |= ColorVisualRequireFlag::BLUR;
+    shaderTypeFlag += ColorVisualRequireFlag::SQUIRCLE_CORNER;
   }
-  if(mColorRoundCorner)
+  else if(mColorRoundCorner == RoundedCorner::ROUNDED_CORNER)
   {
-    shaderTypeFlag |= ColorVisualRequireFlag::ROUNDED_CORNER;
-  }
-  if(mColorBorderline && !mColorBlur)
-  {
-    shaderTypeFlag |= ColorVisualRequireFlag::BORDERLINE;
+    shaderTypeFlag += ColorVisualRequireFlag::ROUNDED_CORNER;
   }
 
-  shaderType = mColorCutout ? SHADER_TYPE_WITH_CUTOUT_TABLE[shaderTypeFlag] : SHADER_TYPE_TABLE[shaderTypeFlag];
+  if(mColorBorderline && !mColorBlur)
+  {
+    shaderTypeFlag += ColorVisualRequireFlag::BORDERLINE;
+  }
+
+  if(mColorBlur)
+  {
+    shaderTypeFlag += ColorVisualRequireFlag::BLUR;
+  }
+
+  if(mColorCutout)
+  {
+    shaderTypeFlag += ColorVisualRequireFlag::CUTOUT;
+  }
+
+  DALI_ASSERT_DEBUG(shaderTypeFlag < SHADER_TYPE_TABLE_COUNT && "Invalid color shader type generated!");
+
+  shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
 
   return shaderType;
 }
 
 void FeatureBuilder::GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const
 {
-  if(mColorRoundCorner == RoundedCorner::ENABLED)
+  if(mColorRoundCorner != RoundedCorner::DISABLED)
   {
     vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
   }
@@ -153,9 +175,13 @@ void FeatureBuilder::GetVertexShaderPrefixList(std::string& vertexShaderPrefixLi
 
 void FeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const
 {
-  if(mColorRoundCorner == RoundedCorner::ENABLED)
+  if(mColorRoundCorner != RoundedCorner::DISABLED)
   {
     fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
+    if(mColorRoundCorner == RoundedCorner::SQUIRCLE_CORNER)
+    {
+      fragmentShaderPrefixList += "#define IS_REQUIRED_SQUIRCLE_CORNER\n";
+    }
   }
   if(mColorBlur == Blur::ENABLED)
   {
@@ -269,7 +295,12 @@ void ColorVisualShaderFactory::CreatePrecompileShader(ColorVisualShaderFeature::
     {
       case PrecompileShaderOption::Flag::ROUNDED_CORNER:
       {
-        builder.EnableRoundCorner(true);
+        builder.EnableRoundCorner(true, false);
+        break;
+      }
+      case PrecompileShaderOption::Flag::SQUIRCLE_CORNER:
+      {
+        builder.EnableRoundCorner(true, true);
         break;
       }
       case PrecompileShaderOption::Flag::BORDERLINE:

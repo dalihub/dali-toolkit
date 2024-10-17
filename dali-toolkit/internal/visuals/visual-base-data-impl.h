@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_BASE_DATA_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,10 +53,10 @@ struct Base::Impl
 
   enum Flags
   {
-    IS_ON_SCENE                        = 1,
-    IS_ATLASING_APPLIED                = 1 << 1,
-    IS_PREMULTIPLIED_ALPHA             = 1 << 2,
-    IS_SYNCHRONOUS_RESOURCE_LOADING    = 1 << 3,
+    IS_ON_SCENE                     = 1,
+    IS_ATLASING_APPLIED             = 1 << 1,
+    IS_PREMULTIPLIED_ALPHA          = 1 << 2,
+    IS_SYNCHRONOUS_RESOURCE_LOADING = 1 << 3,
   };
 
   struct CustomShader
@@ -120,6 +120,7 @@ struct Base::Impl
     DecorationData()
     : mBorderlineColor(Color::BLACK),
       mCornerRadius(Vector4::ZERO),
+      mCornerSquareness(Vector4::ZERO),
       mBorderlineWidth(0.0f),
       mBorderlineOffset(0.0f),
       mCornerRadiusPolicy(static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE))
@@ -127,6 +128,7 @@ struct Base::Impl
     }
     Vector4 mBorderlineColor;
     Vector4 mCornerRadius;
+    Vector4 mCornerSquareness;
     float   mBorderlineWidth;
     float   mBorderlineOffset;
     int     mCornerRadiusPolicy;
@@ -241,6 +243,26 @@ struct Base::Impl
     EnsureDecorationData()->mCornerRadiusPolicy = value;
   }
 
+  /**
+   * @brief Get decoration data value : corner squareness
+   *
+   * Keep these API as inline function due to the performance.
+   */
+  Vector4 GetCornerSquareness()
+  {
+    return mDecorationData ? mDecorationData->mCornerSquareness : Vector4::ZERO;
+  }
+
+  /**
+   * @brief Set decoration data value : corner squareness
+   *
+   * Keep these API as inline function due to the performance.
+   */
+  void SetCornerSquareness(Vector4 value)
+  {
+    EnsureDecorationData()->mCornerSquareness = value;
+  }
+
   VisualRenderer                  mRenderer;
   CustomShader*                   mCustomShader;
   EventObserver*                  mEventObserver; ///< Allows controls to observe when the visual has events to notify
@@ -254,11 +276,12 @@ struct Base::Impl
   int                             mFlags;
   Toolkit::Visual::ResourceStatus mResourceStatus;
   const Toolkit::Visual::Type     mType;
-  bool                            mAlwaysUsingBorderline : 1;        ///< Whether we need the borderline in shader always.
-  bool                            mAlwaysUsingCornerRadius : 1;      ///< Whether we need the corner radius in shader always.
-  bool                            mIgnoreFittingMode : 1;            ///< Whether we need to ignore fitting mode.
-  bool                            mPixelAreaSetByFittingMode : 1;    ///< Whether the pixel area is set for fitting mode.
-  bool                            mTransformMapSetForFittingMode :1; ///< Whether the transformMap is set for fitting mode.
+  bool                            mAlwaysUsingBorderline : 1;         ///< Whether we need the borderline in shader always.
+  bool                            mAlwaysUsingCornerRadius : 1;       ///< Whether we need the corner radius in shader always.
+  bool                            mAlwaysUsingCornerSquareness : 1;   ///< Whether we need the corner squareness in shader always.
+  bool                            mIgnoreFittingMode : 1;             ///< Whether we need to ignore fitting mode.
+  bool                            mPixelAreaSetByFittingMode : 1;     ///< Whether the pixel area is set for fitting mode.
+  bool                            mTransformMapSetForFittingMode : 1; ///< Whether the transformMap is set for fitting mode.
 };
 
 } // namespace Visual

@@ -5,6 +5,7 @@ varying highp vec4 vCornerRadius;
 
 uniform lowp vec4 uColor;
 uniform highp vec3 uSize;
+uniform highp vec4 uCornerSquareness;
 uniform sampler2D sTexture;
 
 highp float nrand(const in vec2 uv)
@@ -22,12 +23,19 @@ vec3 applyDithering( vec3 inColor )
 }
 
 // from https://iquilezles.org/articles/distfunctions
-float roundedBoxSDF(vec2 PixelPositionFromCenter, vec2 RectangleEdgePositionFromCenter, float Radius) {
-    return length(max(PixelPositionFromCenter
-                      - RectangleEdgePositionFromCenter
-                      + Radius
-                      , 0.0))
-           - Radius;
+float roundedBoxSDF(vec2 PixelPositionFromCenter, vec2 RectangleEdgePositionFromCenter, float Radius, float Squareness) {
+  highp vec2 positiveDiff = max(PixelPositionFromCenter
+                                - RectangleEdgePositionFromCenter
+                                + Radius
+                                , 0.0);
+
+  highp float squrenessFactor = Squareness / max(1.0, Radius * Radius);
+
+  // make sqr to avoid duplicate codes.
+  positiveDiff *= positiveDiff;
+
+  return sqrt(positiveDiff.x + positiveDiff.y - squrenessFactor * positiveDiff.x * positiveDiff.y)
+         - Radius;
 }
 
 void main()
@@ -49,6 +57,12 @@ void main()
         mix(vCornerRadius.w, vCornerRadius.z, sign(location.x) * 0.5 + 0.5),
         sign(location.y) * 0.5 + 0.5
       );
+    float squareness =
+      mix(
+        mix(uCornerSquareness.x, uCornerSquareness.y, sign(location.x) * 0.5 + 0.5),
+        mix(uCornerSquareness.w, uCornerSquareness.z, sign(location.x) * 0.5 + 0.5),
+        sign(location.y) * 0.5 + 0.5
+      );
 
     float edgeSoftness = min(1.0, radius);
 
@@ -62,7 +76,7 @@ void main()
     }
     else
     {
-      float distance = roundedBoxSDF(location, halfSize, radius);
+      float distance = roundedBoxSDF(location, halfSize, radius, squareness);
 
       float smoothedAlpha = 1.0 - smoothstep(-edgeSoftness, edgeSoftness, distance);
 
