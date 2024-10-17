@@ -192,7 +192,7 @@ void CreateTextModel(const std::string&                text,
 
       Vector<bool> hyphens = GetWordHyphens(utf32Characters.Begin() + index, wordEnd - index, nullptr);
 
-      for(CharacterIndex i = 0; i < (wordEnd - index); i++)
+      for(CharacterIndex i = 0; i < (wordEnd - index) && i < hyphens.Count(); i++)
       {
         if(hyphens[i])
         {
