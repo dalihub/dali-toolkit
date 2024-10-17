@@ -79,7 +79,7 @@ int UtcDaliUsdLoaderFailedToLoad(void)
 {
   Context ctx;
 
-  ctx.loader = new Dali::Scene3D::Loader::ModelLoader(TEST_RESOURCE_DIR "non-existent.usdz", ctx.pathProvider(ResourceType::Mesh) + "/", ctx.loadResult);
+  ctx.loader = new Dali::Scene3D::Loader::ModelLoader(TEST_RESOURCE_DIR "/non-existent.usdz", ctx.pathProvider(ResourceType::Mesh) + "/", ctx.loadResult);
   DALI_TEST_EQUAL(ctx.loader->LoadModel(ctx.pathProvider, true), false);
 
   DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
@@ -259,67 +259,75 @@ int UtcDaliUsdLoaderSuccess2(void)
          * Donated by UX3D for glTF testing
          * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/AntiqueCamera
          */
-        "AntiqueCamera",
+        "AntiqueCamera.usdz",
         /**
          * Converted from the Avocado glTF file and its Assets
          * Donated by Microsoft for glTF testing
          * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/Avocado
          */
-        "Avocado",
+        "Avocado.usdz",
         /**
          * Converted from the BoomBox glTF file and its Assets
          * Donated by Microsoft for glTF testing
          * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/BoomBox
          */
-        "BoomBox",
+        "BoomBox.usdz",
         /**
          * Converted from the BarramundiFish glTF file and its Assets
          * Donated by Microsoft for glTF testing
          * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/BarramundiFish
          */
-        "BarramundiFish",
+        "BarramundiFish.usdz",
         /**
          * Converted from the CesiumMan glTF file and its Assets
          * Donated by Cesium for glTF testing
          * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/CesiumMan
          */
-        "CesiumMan",
+        "CesiumMan.usdz",
         /**
          * Converted from the CesiumMilkTruck glTF file and its Assets
          * Donated by Cesium for glTF testing
          * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/CesiumMilkTruck
          */
-        "CesiumMilkTruck",
+        "CesiumMilkTruck.usdz",
         /**
          * Converted from the DamagedHelmet glTF file and its Assets
          * By theblueturtle, published under a Creative Commons Attribution-NonCommercial license
          * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/DamagedHelmet
          */
-        "DamagedHelmet",
+        "DamagedHelmet.usdz",
         /**
          * Converted from the Fox glTF file and its Assets
          * By PixelMannen, published under CC-BY 4.0 license
          * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/Fox
          */
-        "Fox",
+        "Fox.usdz",
         /**
          * Converted from the Lantern glTF file and its Assets
          * Donated by Microsoft for glTF testing
          * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/Lantern
          */
-        "Lantern",
+        "Lantern.usdz",
         /**
          * Converted from the MetalRoughSpheresNoTextures glTF file and its Assets
          * Donated by Kirill Gavrilov for glTF testing
          * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/MetalRoughSpheresNoTextures
          */
-        "MetalRoughSpheresNoTextures",
+        "MetalRoughSpheresNoTextures.usdz",
         /**
          * Converted from the WaterBottle glTF file and its Assets
          * Donated by Microsoft for glTF testing
          * Take from https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/WaterBottle
          */
-        "WaterBottle",
+        "WaterBottle.usdz",
+        /**
+         * For testing USD materials and textures
+         */
+        "PreviewSurfaceTexture.usda",
+        /**
+         * For testing 2D transform attributes
+         */
+        "PreviewSurfaceTransform2d.usda",
       })
   {
     Context ctx;
@@ -329,7 +337,7 @@ int UtcDaliUsdLoaderSuccess2(void)
 
     const std::string resourcePath = TEST_RESOURCE_DIR "/usd/";
 
-    ctx.loader = new Dali::Scene3D::Loader::ModelLoader(resourcePath + modelName + ".usdz", ctx.pathProvider(ResourceType::Mesh) + "/", ctx.loadResult);
+    ctx.loader = new Dali::Scene3D::Loader::ModelLoader(resourcePath + modelName, ctx.pathProvider(ResourceType::Mesh) + "/", ctx.loadResult);
     DALI_TEST_EQUAL(ctx.loader->LoadModel(ctx.pathProvider, true), true);
 
     auto& scene = ctx.scene;
