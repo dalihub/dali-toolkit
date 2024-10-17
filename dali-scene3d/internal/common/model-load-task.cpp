@@ -62,10 +62,20 @@ ModelLoadTask::ModelLoadTask(const std::string& modelUrl, const std::string& res
   mHasSucceeded(false)
 {
   mModelCacheManager.ReferenceModelCache(mModelUrl);
+
+  if(mResourceDirectoryUrl.empty())
+  {
+    std::filesystem::path modelUrl(mModelUrl);
+    mResourceDirectoryUrl = std::string(modelUrl.parent_path()) + "/";
+  }
+
+  mModelLoader = std::make_unique<Dali::Scene3D::Loader::ModelLoader>(mModelUrl, mResourceDirectoryUrl, mLoadResult);
 }
 
 ModelLoadTask::~ModelLoadTask()
 {
+  mModelLoader.reset();
+
   mModelCacheManager.UnreferenceModelCache(mModelUrl);
 }
 
@@ -81,17 +91,9 @@ void ModelLoadTask::Process()
   }
 #endif
 
-  if(mResourceDirectoryUrl.empty())
-  {
-    std::filesystem::path modelUrl(mModelUrl);
-    mResourceDirectoryUrl = std::string(modelUrl.parent_path()) + "/";
-  }
-
   Dali::Scene3D::Loader::ResourceBundle::PathProvider pathProvider = [&](Dali::Scene3D::Loader::ResourceType::Value type) {
     return mResourceDirectoryUrl;
   };
-
-  mModelLoader = std::make_unique<Dali::Scene3D::Loader::ModelLoader>(mModelUrl, mResourceDirectoryUrl, mLoadResult);
 
   bool loadSucceeded = false;
 
