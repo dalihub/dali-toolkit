@@ -22,11 +22,11 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
-#include <dali/public-api/actors/custom-actor-impl.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -152,24 +152,11 @@ void BlurEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& task
   tasks.clear();
   if(!isForward && mIsBackground)
   {
-    bool isExclusiveRequired = false;
-    Dali::Actor sourceActor = GetOwnerControl();
-    while(sourceActor.GetParent())
-    {
-      sourceActor = sourceActor.GetParent();
-      Toolkit::Control control = Toolkit::Control::DownCast(sourceActor);
-      if(control && GetImplementation(control).GetOffScreenRenderableType() == OffScreenRenderable::Type::FORWARD)
-      {
-        sourceActor = GetImplementation(control).GetOffScreenRenderableSourceActor();
-        isExclusiveRequired = GetImplementation(control).IsOffScreenRenderTaskExclusive();
-        break;
-      }
-    }
-    mSourceRenderTask.SetSourceActor(sourceActor);
-    mSourceRenderTask.SetExclusive(isExclusiveRequired);
-
     if(mSourceRenderTask)
     {
+      // Re-initialize source actor of rendertask since it might be changed.
+      // TODO : Should it be required always? Couldn't we skip it?
+      ApplyRenderTaskSourceActor(mSourceRenderTask, GetOwnerControl());
       tasks.push_back(mSourceRenderTask);
     }
     if(mHorizontalBlurTask)
@@ -316,6 +303,10 @@ void BlurEffectImpl::OnActivate()
   SetRendererTexture(renderer, mSourceFrameBuffer);
 
   ownerControl.Add(mInternalRoot);
+
+  // Reorder render task
+  // TODO : Can we remove this GetImplementation?
+  GetImplementation(ownerControl).RequestRenderTaskReorder();
 }
 
 void BlurEffectImpl::OnDeactivate()
@@ -381,19 +372,11 @@ void BlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHolder, con
 
   // draw input texture
   mSourceRenderTask = taskList.CreateTask();
-  if(mIsBackground)
-  {
-    mSourceRenderTask.SetSourceActor(sceneHolder.GetRootLayer());
-    mSourceRenderTask.RenderUntil(sourceControl);
-  }
-  else
-  {
-    mSourceRenderTask.SetSourceActor(sourceControl);
-  }
   mSourceRenderTask.SetCameraActor(mRenderFullSizeCamera);
   mSourceRenderTask.SetFrameBuffer(mInputBackgroundFrameBuffer);
   mSourceRenderTask.SetInputEnabled(false);
-  mSourceRenderTask.SetExclusive(false);
+
+  ApplyRenderTaskSourceActor(mSourceRenderTask, sourceControl);
 
   // Clear inputBackgroundTexture as scene holder background.
   mSourceRenderTask.SetClearEnabled(true);
@@ -424,6 +407,38 @@ void BlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHolder, con
   // Clear sourceTexture as Transparent.
   mVerticalBlurTask.SetClearEnabled(true);
   mVerticalBlurTask.SetClearColor(Color::TRANSPARENT);
+}
+
+void BlurEffectImpl::ApplyRenderTaskSourceActor(RenderTask sourceRenderTask, const Toolkit::Control sourceControl)
+{
+  if(DALI_UNLIKELY(!sourceRenderTask || !sourceControl))
+  {
+    return;
+  }
+
+  bool        isExclusiveRequired = false;
+  Dali::Actor sourceActor         = sourceControl;
+  Dali::Actor stopperActor        = Dali::Actor(); // Give empty handle to invalidate previous render until option.
+
+  if(mIsBackground)
+  {
+    stopperActor = sourceControl;
+    while(sourceActor && sourceActor.GetParent())
+    {
+      sourceActor              = sourceActor.GetParent();
+      Toolkit::Control control = Toolkit::Control::DownCast(sourceActor);
+      if(control && GetImplementation(control).GetOffScreenRenderableType() == OffScreenRenderable::Type::FORWARD)
+      {
+        sourceActor         = GetImplementation(control).GetOffScreenRenderableSourceActor();
+        isExclusiveRequired = GetImplementation(control).IsOffScreenRenderTaskExclusive();
+        break;
+      }
+    }
+  }
+
+  sourceRenderTask.SetExclusive(isExclusiveRequired);
+  sourceRenderTask.SetSourceActor(sourceActor);
+  sourceRenderTask.RenderUntil(stopperActor);
 }
 
 Vector2 BlurEffectImpl::GetTargetSizeForValidTexture() const

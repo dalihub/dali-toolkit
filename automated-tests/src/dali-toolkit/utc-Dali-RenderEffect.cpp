@@ -531,8 +531,8 @@ int UtcDaliRenderEffectRenderTaskOrdering(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectRenderTaskOrdering");
 
-  Integration::Scene scene = application.GetScene();
-  RenderTaskList taskList = scene.GetRenderTaskList();
+  Integration::Scene scene    = application.GetScene();
+  RenderTaskList     taskList = scene.GetRenderTaskList();
 
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -551,9 +551,9 @@ int UtcDaliRenderEffectRenderTaskOrdering(void)
   tet_printf("render task cnt after add : %d\n", taskList.GetTaskCount());
   DALI_TEST_EQUALS(4, taskList.GetTaskCount(), TEST_LOCATION);
 
-  Dali::RenderTask sourceTaskControl1 = taskList.GetTask(taskList.GetTaskCount() - 3);
+  Dali::RenderTask sourceTaskControl1         = taskList.GetTask(taskList.GetTaskCount() - 3);
   Dali::RenderTask horizontalBlurTaskControl1 = taskList.GetTask(taskList.GetTaskCount() - 2);
-  Dali::RenderTask verticalBlurTaskControl1 = taskList.GetTask(taskList.GetTaskCount() - 1);
+  Dali::RenderTask verticalBlurTaskControl1   = taskList.GetTask(taskList.GetTaskCount() - 1);
 
   tet_printf("order : %d\n", sourceTaskControl1.GetOrderIndex());
   tet_printf("order : %d\n", horizontalBlurTaskControl1.GetOrderIndex());
@@ -562,7 +562,7 @@ int UtcDaliRenderEffectRenderTaskOrdering(void)
   DALI_TEST_EQUALS(0, sourceTaskControl1.GetOrderIndex(), TEST_LOCATION);
   DALI_TEST_EQUALS(0, horizontalBlurTaskControl1.GetOrderIndex(), TEST_LOCATION);
   DALI_TEST_EQUALS(0, verticalBlurTaskControl1.GetOrderIndex(), TEST_LOCATION);
-  
+
   application.SendNotification();
 
   tet_printf("order af : %d\n", sourceTaskControl1.GetOrderIndex());
@@ -590,10 +590,9 @@ int UtcDaliRenderEffectRenderTaskOrdering(void)
 
   tet_printf("render task cnt after add : %d\n", taskList.GetTaskCount());
 
-  Dali::RenderTask sourceTaskControl2 = taskList.GetTask(taskList.GetTaskCount() - 3);
+  Dali::RenderTask sourceTaskControl2         = taskList.GetTask(taskList.GetTaskCount() - 3);
   Dali::RenderTask horizontalBlurTaskControl2 = taskList.GetTask(taskList.GetTaskCount() - 2);
-  Dali::RenderTask verticalBlurTaskControl2 = taskList.GetTask(taskList.GetTaskCount() - 1);
-
+  Dali::RenderTask verticalBlurTaskControl2   = taskList.GetTask(taskList.GetTaskCount() - 1);
 
   tet_printf("order after1 : %d\n", sourceTaskControl1.GetOrderIndex());
   tet_printf("order after1 : %d\n", horizontalBlurTaskControl1.GetOrderIndex());
@@ -606,7 +605,7 @@ int UtcDaliRenderEffectRenderTaskOrdering(void)
   DALI_TEST_EQUALS(0, sourceTaskControl2.GetOrderIndex(), TEST_LOCATION);
   DALI_TEST_EQUALS(0, horizontalBlurTaskControl2.GetOrderIndex(), TEST_LOCATION);
   DALI_TEST_EQUALS(0, verticalBlurTaskControl2.GetOrderIndex(), TEST_LOCATION);
-  
+
   application.SendNotification();
 
   tet_printf("order after2 : %d\n", sourceTaskControl1.GetOrderIndex());
@@ -627,9 +626,9 @@ int UtcDaliRenderEffectRenderTaskOrdering(void)
 
   control2.Add(control1);
 
-  sourceTaskControl1 = taskList.GetTask(taskList.GetTaskCount() - 3);
+  sourceTaskControl1         = taskList.GetTask(taskList.GetTaskCount() - 3);
   horizontalBlurTaskControl1 = taskList.GetTask(taskList.GetTaskCount() - 2);
-  verticalBlurTaskControl1 = taskList.GetTask(taskList.GetTaskCount() - 1);
+  verticalBlurTaskControl1   = taskList.GetTask(taskList.GetTaskCount() - 1);
 
   tet_printf("order after3 : %d\n", sourceTaskControl1.GetOrderIndex());
   tet_printf("order after3 : %d\n", horizontalBlurTaskControl1.GetOrderIndex());
@@ -665,6 +664,105 @@ int UtcDaliRenderEffectRenderTaskOrdering(void)
   DALI_TEST_EQUALS(INT32_MIN + 1, horizontalBlurTaskControl2.GetOrderIndex(), TEST_LOCATION);
   DALI_TEST_EQUALS(INT32_MIN + 2, verticalBlurTaskControl2.GetOrderIndex(), TEST_LOCATION);
 
+  control1.SetProperty(Actor::Property::VISIBLE, false);
+  control2.Unparent();
+
+  tet_printf("render task cnt after unparent : %d\n", taskList.GetTaskCount());
+
+  // The order index is not defined now.
+  tet_printf("order after5 : %d\n", sourceTaskControl1.GetOrderIndex());
+  tet_printf("order after5 : %d\n", horizontalBlurTaskControl1.GetOrderIndex());
+  tet_printf("order after5 : %d\n", verticalBlurTaskControl1.GetOrderIndex());
+
+  tet_printf("order after5 : %d\n", sourceTaskControl2.GetOrderIndex());
+  tet_printf("order after5 : %d\n", horizontalBlurTaskControl2.GetOrderIndex());
+  tet_printf("order after5 : %d\n", verticalBlurTaskControl2.GetOrderIndex());
+
+  application.SendNotification();
+
+  tet_printf("order after6 : %d\n", sourceTaskControl1.GetOrderIndex());
+  tet_printf("order after6 : %d\n", horizontalBlurTaskControl1.GetOrderIndex());
+  tet_printf("order after6 : %d\n", verticalBlurTaskControl1.GetOrderIndex());
+
+  tet_printf("order after6 : %d\n", sourceTaskControl2.GetOrderIndex());
+  tet_printf("order after6 : %d\n", horizontalBlurTaskControl2.GetOrderIndex());
+  tet_printf("order after6 : %d\n", verticalBlurTaskControl2.GetOrderIndex());
+
+  scene.Add(control2);
+
+  tet_printf("render task cnt after re-add : %d\n", taskList.GetTaskCount());
+
+  sourceTaskControl2         = taskList.GetTask(taskList.GetTaskCount() - 3);
+  horizontalBlurTaskControl2 = taskList.GetTask(taskList.GetTaskCount() - 2);
+  verticalBlurTaskControl2   = taskList.GetTask(taskList.GetTaskCount() - 1);
+
+  tet_printf("order after7 : %d\n", sourceTaskControl1.GetOrderIndex());
+  tet_printf("order after7 : %d\n", horizontalBlurTaskControl1.GetOrderIndex());
+  tet_printf("order after7 : %d\n", verticalBlurTaskControl1.GetOrderIndex());
+
+  tet_printf("order after7 : %d\n", sourceTaskControl2.GetOrderIndex());
+  tet_printf("order after7 : %d\n", horizontalBlurTaskControl2.GetOrderIndex());
+  tet_printf("order after7 : %d\n", verticalBlurTaskControl2.GetOrderIndex());
+
+  DALI_TEST_EQUALS(0, sourceTaskControl2.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, horizontalBlurTaskControl2.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, verticalBlurTaskControl2.GetOrderIndex(), TEST_LOCATION);
+
+  application.SendNotification();
+
+  tet_printf("order after8 : %d\n", sourceTaskControl1.GetOrderIndex());
+  tet_printf("order after8 : %d\n", horizontalBlurTaskControl1.GetOrderIndex());
+  tet_printf("order after8 : %d\n", verticalBlurTaskControl1.GetOrderIndex());
+
+  tet_printf("order after8 : %d\n", sourceTaskControl2.GetOrderIndex());
+  tet_printf("order after8 : %d\n", horizontalBlurTaskControl2.GetOrderIndex());
+  tet_printf("order after8 : %d\n", verticalBlurTaskControl2.GetOrderIndex());
+
+  DALI_TEST_EQUALS(INT32_MIN, sourceTaskControl2.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(INT32_MIN + 1, horizontalBlurTaskControl2.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(INT32_MIN + 2, verticalBlurTaskControl2.GetOrderIndex(), TEST_LOCATION);
+
+  control1.SetProperty(Actor::Property::VISIBLE, true);
+
+  tet_printf("render task cnt after change visible : %d\n", taskList.GetTaskCount());
+
+  sourceTaskControl1         = taskList.GetTask(taskList.GetTaskCount() - 3);
+  horizontalBlurTaskControl1 = taskList.GetTask(taskList.GetTaskCount() - 2);
+  verticalBlurTaskControl1   = taskList.GetTask(taskList.GetTaskCount() - 1);
+
+  tet_printf("order after9 : %d\n", sourceTaskControl1.GetOrderIndex());
+  tet_printf("order after9 : %d\n", horizontalBlurTaskControl1.GetOrderIndex());
+  tet_printf("order after9 : %d\n", verticalBlurTaskControl1.GetOrderIndex());
+
+  tet_printf("order after9 : %d\n", sourceTaskControl2.GetOrderIndex());
+  tet_printf("order after9 : %d\n", horizontalBlurTaskControl2.GetOrderIndex());
+  tet_printf("order after9 : %d\n", verticalBlurTaskControl2.GetOrderIndex());
+
+  DALI_TEST_EQUALS(0, sourceTaskControl1.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, horizontalBlurTaskControl1.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, verticalBlurTaskControl1.GetOrderIndex(), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(INT32_MIN, sourceTaskControl2.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(INT32_MIN + 1, horizontalBlurTaskControl2.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(INT32_MIN + 2, verticalBlurTaskControl2.GetOrderIndex(), TEST_LOCATION);
+
+  application.SendNotification();
+
+  tet_printf("order after10 : %d\n", sourceTaskControl1.GetOrderIndex());
+  tet_printf("order after10 : %d\n", horizontalBlurTaskControl1.GetOrderIndex());
+  tet_printf("order after10 : %d\n", verticalBlurTaskControl1.GetOrderIndex());
+
+  tet_printf("order after10 : %d\n", sourceTaskControl2.GetOrderIndex());
+  tet_printf("order after10 : %d\n", horizontalBlurTaskControl2.GetOrderIndex());
+  tet_printf("order after10 : %d\n", verticalBlurTaskControl2.GetOrderIndex());
+
+  DALI_TEST_EQUALS(INT32_MIN + 3, sourceTaskControl1.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(INT32_MIN + 4, horizontalBlurTaskControl1.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(INT32_MIN + 5, verticalBlurTaskControl1.GetOrderIndex(), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(INT32_MIN, sourceTaskControl2.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(INT32_MIN + 1, horizontalBlurTaskControl2.GetOrderIndex(), TEST_LOCATION);
+  DALI_TEST_EQUALS(INT32_MIN + 2, verticalBlurTaskControl2.GetOrderIndex(), TEST_LOCATION);
+
   END_TEST;
 }
-
