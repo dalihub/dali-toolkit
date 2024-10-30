@@ -49,8 +49,9 @@ public:
    * @brief Constructor for MaterialProcessor.
    * @param stage The USD stage to traverse and process materials from.
    * @param materialMap The map of prim path and its corresponding material ID
+   * @param imageMetaDataMap The map of image files to their meta data
    */
-  UsdMaterialProcessor(const pxr::UsdStageRefPtr& stage, MaterialMap* materialMap);
+  UsdMaterialProcessor(const pxr::UsdStageRefPtr& stage, MaterialMap* materialMap, const ImageMetadataMap& imageMetaDataMap);
 
   /**
    * @brief Traverses the USD stage and processes all materials.
@@ -151,9 +152,10 @@ private:
   void ProcessSpecularColor(const pxr::UsdShadeInput& input, MaterialDefinition& materialDefinition, const pxr::UsdShadeMaterial& material, const pxr::UsdShadeShader& uvTexture);
 
 private:
-  pxr::UsdStageRefPtr mUsdStage;
-  MaterialMap*        mMaterialMap; ///< Maps prim paths to material IDs.
-  UsdTextureConverter mUsdTextureConverter;
+  pxr::UsdStageRefPtr     mUsdStage;
+  MaterialMap*            mMaterialMap;      ///< Maps prim paths to material IDs.
+  const ImageMetadataMap& mImageMetaDataMap; ///< Maps image files to their meta data
+  UsdTextureConverter     mUsdTextureConverter;
   using ShaderHandlerMap = std::unordered_map<MaterialDefinition::Flags, std::function<void(const pxr::UsdShadeInput&, MaterialDefinition&, const pxr::UsdShadeMaterial&, const pxr::UsdShadeShader&)>>;
   ShaderHandlerMap mShaderInputHandlers;
 };

@@ -24,11 +24,14 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/loader/load-scene-metadata.h>
 #include <dali-usd-loader/internal/utils.h>
 
 namespace Dali::Scene3D::Loader
 {
 class MaterialDefinition;
+
+using ImageMetadataMap = std::unordered_map<std::string, ImageMetadata>;
 
 /**
  * @class UsdTextureConverter
@@ -58,9 +61,10 @@ public:
    * @param usdUvTexture The USD shader representing the UV texture.
    * @param materialDefinition The material definition to which the texture will be added.
    * @param semantic The semantic value used to identify the type of texture (e.g., albedo, normal map).
+   * @param imageMetaDataMap The map of image files to their meta data
    * @return True if the texture was successfully converted and added to the material definition, false otherwise.
    */
-  bool ConvertTexture(const pxr::UsdShadeMaterial& usdMaterial, const pxr::UsdShadeShader& usdUvTexture, MaterialDefinition& materialDefinition, uint32_t semantic);
+  bool ConvertTexture(const pxr::UsdShadeMaterial& usdMaterial, const pxr::UsdShadeShader& usdUvTexture, MaterialDefinition& materialDefinition, const ImageMetadataMap& imageMetaDataMap, uint32_t semantic);
 
 private:
   /**
@@ -118,9 +122,10 @@ private:
    * @param shader The USD shader representing the texture attributes.
    * @param materialDefinition The material definition to which the texture properties will be applied.
    * @param semantic The semantic value identifying the texture type.
+   * @param imageMetaDataMap The map of image files to their meta data
    * @return True if texture attributes were successfully processed and added to the material definition, false otherwise.
    */
-  bool ProcessTextureAttributes(const pxr::UsdShadeShader& usdUvTexture, const pxr::UsdShadeShader& shader, MaterialDefinition& materialDefinition, uint32_t semantic);
+  bool ProcessTextureAttributes(const pxr::UsdShadeShader& usdUvTexture, const pxr::UsdShadeShader& shader, MaterialDefinition& materialDefinition, const ImageMetadataMap& imageMetaDataMap, uint32_t semantic);
 
   /**
    * @brief Processes the texture file input and retrieves the image path or buffer.
@@ -170,9 +175,10 @@ private:
    * @param semantic The semantic value used to identify the type of texture (e.g., albedo, normal map).
    * @param imagePath The file path of the texture image.
    * @param imageBuffer The image buffer of the texture.
+   * @param imageMetaDataMap The map of image files to their meta data
    * @return True if the texture was successfully processed, false otherwise.
    */
-  bool ProcessImageBuffer(MaterialDefinition& materialDefinition, uint32_t semantic, const std::string& imagePath, UsdAssetBuffer& imageBuffer);
+  bool ProcessImageBuffer(MaterialDefinition& materialDefinition, uint32_t semantic, const std::string& imagePath, UsdAssetBuffer& imageBuffer, const ImageMetadataMap& imageMetaDataMap);
 };
 } // namespace Dali::Scene3D::Loader
 
