@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,6 +185,11 @@ bool Model::IsShadowReceiving() const
 Model::MeshHitSignalType& Model::MeshHitSignal()
 {
   return GetImpl(*this).MeshHitSignal();
+}
+
+Model::LoadCompletedSignalType& Model::LoadCompletedSignal()
+{
+  return GetImpl(*this).LoadCompletedSignal();
 }
 
 } // namespace Dali::Scene3D

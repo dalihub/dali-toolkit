@@ -203,6 +203,27 @@ public:
   }
 
   /**
+   * @copydoc Scene3D::Model::LoadCompletedSignal()
+   */
+  Scene3D::Model::LoadCompletedSignalType& LoadCompletedSignal()
+  {
+    return mLoadCompletedSignal;
+  }
+
+  /**
+   * @brief Emits LoadCompletedSignal
+   * @param[in] succeeded Whether model loading has been successful
+   */
+  void EmitLoadCompletedSignal(bool succeeded)
+  {
+    if(!mLoadCompletedSignal.Empty())
+    {
+      Scene3D::Model handle(GetOwner());
+      mLoadCompletedSignal.Emit(handle, succeeded);
+    }
+  }
+
+  /**
    * @brief Emits MeshHitSignal
    * @param[in] modelNode ModelNode that has been hit
    * @return Result of hit handling.
@@ -416,7 +437,8 @@ private:
   Dali::PropertyNotification     mSizeNotification;
 
   // Signals
-  Scene3D::Model::MeshHitSignalType mMeshHitSignal;
+  Scene3D::Model::MeshHitSignalType       mMeshHitSignal;
+  Scene3D::Model::LoadCompletedSignalType mLoadCompletedSignal;
 
   Dali::Scene3D::Loader::ShaderManagerPtr mShaderManager;
 

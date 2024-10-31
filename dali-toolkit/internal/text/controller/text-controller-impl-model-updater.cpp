@@ -197,7 +197,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
 
         Vector<bool> hyphens = GetWordHyphens(hyphenation, utf32Characters.Begin() + index, wordEnd - index, nullptr);
 
-        for(CharacterIndex i = 0; i < (wordEnd - index); i++)
+        for(CharacterIndex i = 0; i < (wordEnd - index) && i < hyphens.Size(); i++)
         {
           if(hyphens[i])
           {

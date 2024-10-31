@@ -124,6 +124,12 @@ void        OnResourceReady(Control control)
   gResourceReadyCalled = true;
 }
 
+static bool gLoadCompletedCalled = false;
+void        OnLoadCompleted(Scene3D::Model model, bool succeeded)
+{
+  gLoadCompletedCalled = true;
+}
+
 void ApplyAllMaterialPropertyRecursively(Scene3D::ModelNode modelNode, const std::vector<KeyValuePair>& materialPropertyValues)
 {
   if(!modelNode)
@@ -2089,5 +2095,28 @@ int UtcDaliModelReceiveShadow(void)
   DALI_TEST_EQUALS(modelNode.GetProperty<int>(shadowReceivingIndex), 0, TEST_LOCATION);
 
   DALI_TEST_EQUALS(modelNode2.GetProperty<int>(shadowReceivingIndex2), 0, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliModelLoadComplete(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+
+  gLoadCompletedCalled = false;
+  model.LoadCompletedSignal().Connect(&OnLoadCompleted);
+
+  application.GetScene().Add(model);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gLoadCompletedCalled, true, TEST_LOCATION);
+
   END_TEST;
 }

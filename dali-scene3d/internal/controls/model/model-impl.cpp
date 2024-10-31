@@ -1086,6 +1086,8 @@ void Model::OnModelLoadComplete()
       ModelCacheManager::Get().UnreferenceModelCache(mModelUrl);
     }
 
+    EmitLoadCompletedSignal(false);
+
     return;
   }
 
@@ -1122,6 +1124,8 @@ void Model::OnModelLoadComplete()
   mModelResourceReady = true;
   ResetResourceTask(mModelLoadTask);
   NotifyResourceReady();
+
+  EmitLoadCompletedSignal(true);
 }
 
 void Model::OnIblDiffuseLoadComplete()

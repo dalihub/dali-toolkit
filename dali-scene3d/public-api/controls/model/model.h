@@ -80,6 +80,8 @@ public:
   using MeshHitSignalType = Signal<bool(Model, Scene3D::ModelNode)>; ///< Mesh hit signal type @SINCE_2_2.53
   using ColliderMeshPtr   = std::unique_ptr<Algorithm::NavigationMesh>;
 
+  using LoadCompletedSignalType = Signal<void(Model, bool)>; ///< Model load completed signal type @SINCE_2_3.46
+
   /**
    * @brief Create an initialized Model.
    *
@@ -430,6 +432,23 @@ public:
    * @return The signal to connect to
    */
   MeshHitSignalType& MeshHitSignal();
+
+  /**
+   * @brief This signal is emitted when the model loading is completed.
+   *
+   * Two  parameters are sent as part of this signal, the first being the model that is loaded,
+   * the second being whether the loading has been successful.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName(Model model, bool succeeded);
+   * @endcode
+   * Here the model is the one that has finifhed loading.
+   *
+   * @SINCE_2_3.46
+   * @return The signal to connect to
+   */
+  LoadCompletedSignalType& LoadCompletedSignal();
 
 public: // Not intended for application developers
   /// @cond internal

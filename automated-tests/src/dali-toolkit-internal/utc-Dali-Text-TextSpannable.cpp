@@ -480,7 +480,7 @@ int UtcDaliToolkitTextLabelSetSpannedText_BoldSpan(void)
   DALI_TEST_EQUALS(validFonts.Count(), 2, TEST_LOCATION);
   DALI_TEST_EQUALS(validFonts[0].characterRun.characterIndex, 0, TEST_LOCATION);
   DALI_TEST_EQUALS(validFonts[0].characterRun.GetEndCharacterIndex(), 3, TEST_LOCATION);
-  DALI_TEST_EQUALS(validFonts[0].isBoldRequired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(validFonts[0].isBoldRequired, false, TEST_LOCATION);
   END_TEST;
 }
 

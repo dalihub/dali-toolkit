@@ -39,10 +39,16 @@ void dali_textselectionpopupmirroringltr_startup(void)
 {
   // Keep the current locale environment.
   char* langPtr = getenv("LANG");
-  gLocaleLang   = std::string(langPtr);
+  if(langPtr)
+  {
+    gLocaleLang = std::string(langPtr);
+  }
 
   char* languagePtr = getenv("LANGUAGE");
-  gLocaleLanguage   = std::string(languagePtr);
+  if(languagePtr)
+  {
+    gLocaleLanguage = std::string(languagePtr);
+  }
 
   // Set the locale environment to Arabic.
   setenv("LANG", "en_GB.UTF-8", 1);
@@ -54,8 +60,22 @@ void dali_textselectionpopupmirroringltr_startup(void)
 void dali_textselectionpopupmirroringltr_cleanup(void)
 {
   // Restore the locale environment.
-  setenv("LANG", gLocaleLang.c_str(), 1);
-  setenv("LANGUAGE", gLocaleLanguage.c_str(), 1);
+  if(gLocaleLang.empty())
+  {
+    unsetenv("LANG");
+  }
+  else
+  {
+    setenv("LANG", gLocaleLang.c_str(), 1);
+  }
+  if(gLocaleLanguage.empty())
+  {
+    unsetenv("LANGUAGE");
+  }
+  else
+  {
+    setenv("LANGUAGE", gLocaleLanguage.c_str(), 1);
+  }
 
   test_return_value = TET_PASS;
 }

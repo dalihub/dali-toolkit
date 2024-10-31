@@ -132,6 +132,13 @@ private:
   void CreateRenderTasks(Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl);
 
   /**
+   * @brief Apply render tasks source actor, and some other options.
+   * @param[in] renderTask Target render task to change source actor and exclusiveness
+   * @param[in] sourceControl Input source control
+   */
+  void ApplyRenderTaskSourceActor(RenderTask sourceRenderTask, const Toolkit::Control sourceControl);
+
+  /**
    * @brief Gets or Calculates a valid target size for texture.
    * Invalid cases include: zero vector, minus numbers or large numbers(larger than the maximum).
    * @return A valid version of mTargetSize, Vector2::ZERO otherwise.
