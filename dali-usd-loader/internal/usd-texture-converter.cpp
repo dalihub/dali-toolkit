@@ -19,6 +19,9 @@
 // FILE HEADER
 #include <dali-usd-loader/internal/usd-texture-converter.h>
 
+// EXTERNAL INCLUDES
+#include <filesystem>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/material-definition.h>
 #include <dali-usd-loader/internal/utils.h>
@@ -38,7 +41,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_USD
 
 UsdTextureConverter::UsdTextureConverter() = default;
 
-bool UsdTextureConverter::ConvertTexture(const UsdShadeMaterial& usdMaterial, const UsdShadeShader& usdUvTexture, MaterialDefinition& materialDefinition, uint32_t semantic)
+bool UsdTextureConverter::ConvertTexture(const UsdShadeMaterial& usdMaterial, const UsdShadeShader& usdUvTexture, MaterialDefinition& materialDefinition, const ImageMetadataMap& imageMetaDataMap, uint32_t semantic)
 {
   bool    transformOffsetAuthored = false;
   GfVec2f uvTransformOffset(0.0f, 0.0f);
@@ -55,7 +58,7 @@ bool UsdTextureConverter::ConvertTexture(const UsdShadeMaterial& usdMaterial, co
   std::unordered_map<std::string, std::function<void(const UsdShadeShader&)>> shaderProcessors = {
     {"UsdPrimvarReader_float2", [&](const UsdShadeShader& d) { ProcessUvChannel(d); }},
     {"UsdTransform2d", [&](const UsdShadeShader& d) { transformOffsetAuthored = Process2DTransform(d, uvTransformOffset, uvTransformRotation, uvTransformScale); }},
-    {"UsdUVTexture", [&](const UsdShadeShader& d) { textureProcessed = ProcessTextureAttributes(usdUvTexture, d, materialDefinition, semantic); }}};
+    {"UsdUVTexture", [&](const UsdShadeShader& d) { textureProcessed = ProcessTextureAttributes(usdUvTexture, d, materialDefinition, imageMetaDataMap, semantic); }}};
 
   // Iterate over shader dependencies and process the shader IDs
   for(const auto& d : deps)
@@ -139,7 +142,7 @@ void UsdTextureConverter::ProcessTransformRotation(const UsdShadeInput& input, f
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "UV Transform Rotation: %.7f", uvTransformRotation);
 }
 
-bool UsdTextureConverter::ProcessTextureAttributes(const UsdShadeShader& usdUvTexture, const UsdShadeShader& shader, MaterialDefinition& materialDefinition, uint32_t semantic)
+bool UsdTextureConverter::ProcessTextureAttributes(const UsdShadeShader& usdUvTexture, const UsdShadeShader& shader, MaterialDefinition& materialDefinition, const ImageMetadataMap& imageMetaDataMap, uint32_t semantic)
 {
   std::string    imagePath;
   UsdAssetBuffer imageBuffer;
@@ -166,10 +169,10 @@ bool UsdTextureConverter::ProcessTextureAttributes(const UsdShadeShader& usdUvTe
   }
 
   // Process the image buffer or path after extracting the texture attributes
-  return ProcessImageBuffer(materialDefinition, semantic, imagePath, imageBuffer);
+  return ProcessImageBuffer(materialDefinition, semantic, imagePath, imageBuffer, imageMetaDataMap);
 }
 
-void UsdTextureConverter::ProcessTextureFile(const UsdShadeInput& input, std::string& imagePath, std::vector<uint8_t>& imageBuffer)
+void UsdTextureConverter::ProcessTextureFile(const UsdShadeInput& input, std::string& imagePath, UsdAssetBuffer& imageBuffer)
 {
   SdfAssetPath fileInput;
   input.Get<SdfAssetPath>(&fileInput);
@@ -219,12 +222,23 @@ void UsdTextureConverter::ProcessTextureFallback(const UsdShadeInput& input)
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "fallback: %.7f, %.7f, %.7f, %.7f, ", fallback[0], fallback[1], fallback[2], fallback[3]);
 }
 
-bool UsdTextureConverter::ProcessImageBuffer(MaterialDefinition& materialDefinition, uint32_t semantic, const std::string& imagePath, UsdAssetBuffer& imageBuffer)
+bool UsdTextureConverter::ProcessImageBuffer(MaterialDefinition& materialDefinition, uint32_t semantic, const std::string& imagePath, UsdAssetBuffer& imageBuffer, const ImageMetadataMap& imageMetaDataMap)
 {
+  std::string imageFileName = std::filesystem::path(imagePath).filename().string();
+
+  ImageMetadata metaData;
+  if(!imageFileName.empty())
+  {
+    if(auto search = imageMetaDataMap.find(imageFileName); search != imageMetaDataMap.end())
+    {
+      metaData = search->second;
+    }
+  }
+
   if(imageBuffer.size() > 0)
   {
     // If the image buffer is valid, push it to the material definition as a texture stage
-    materialDefinition.mTextureStages.push_back({semantic, TextureDefinition{std::move(imageBuffer)}});
+    materialDefinition.mTextureStages.push_back({semantic, TextureDefinition{std::move(imageBuffer), SamplerFlags::DEFAULT, metaData.mMinSize, metaData.mSamplingMode}});
     materialDefinition.mFlags |= semantic;
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Image Buffer Processed: semantic: %u", semantic);
     return true;
@@ -232,7 +246,7 @@ bool UsdTextureConverter::ProcessImageBuffer(MaterialDefinition& materialDefinit
   else if(!imagePath.empty())
   {
     // If we have a valid image path, push it to the material definition
-    materialDefinition.mTextureStages.push_back({semantic, TextureDefinition{std::move(imagePath)}});
+    materialDefinition.mTextureStages.push_back({semantic, TextureDefinition{std::move(imagePath), SamplerFlags::DEFAULT, metaData.mMinSize, metaData.mSamplingMode}});
     materialDefinition.mFlags |= semantic;
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Image Path Processed: semantic: %u, imagePath: %s", semantic, imagePath.c_str());
     return true;
