@@ -314,7 +314,8 @@ bool ControlAccessible::IsShowing()
     return false;
   }
 
-  Dali::Actor parent = self.GetParent();
+  auto* child  = this;
+  auto* parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(child->GetParent());
   if(!parent)
   {
     return true;
@@ -322,11 +323,12 @@ bool ControlAccessible::IsShowing()
 
   while(parent)
   {
-    if(!parent.GetProperty<bool>(Actor::Property::VISIBLE))
+    auto control = Dali::Toolkit::Control::DownCast(parent->Self());
+    if(!control.GetProperty<bool>(Actor::Property::VISIBLE))
     {
       return false;
     }
-    parent = parent.GetParent();
+    parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(parent->GetParent());
   }
 
   return true;
