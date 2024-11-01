@@ -141,6 +141,7 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
 
   return true;
 }
+
 void TestShaderCodeContainSubstrings(Control control, std::vector<std::pair<std::string, bool>> substringCheckList, const char* location)
 {
   Renderer        renderer = control.GetRendererAt(0);
@@ -203,6 +204,11 @@ void TestShaderCodeContainSubstringsForEachShader(Control control, std::vector<s
     tet_printf("check [%s] %s exist in fragment shader\n", keyword.c_str(), expect ? "is" : "is not");
     DALI_TEST_EQUALS((fragmentShader.find(keyword.c_str()) != std::string::npos), expect, location);
   }
+}
+
+Vector4 GetAlphaPreMultipliedColor(const Vector4& color)
+{
+  return Vector4(color.r * color.a, color.g * color.a, color.b * color.a, color.a);
 }
 
 } //namespace
@@ -2113,7 +2119,8 @@ int UtcDaliVisualAnimateColorVisual(void)
   Vector4 testColor = (Color::BLUE + Color::WHITE) * 0.5f;
   DALI_TEST_EQUALS(color, testColor, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", testColor), true, TEST_LOCATION);
+  // Note : uColor is alpha premultiplied when we use ColorVisual.
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", GetAlphaPreMultipliedColor(testColor)), true, TEST_LOCATION);
 
   application.Render(2000u); // halfway point between blue and white
 
@@ -3696,7 +3703,7 @@ int UtcDaliVisualPremultipliedAlpha(void)
     DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
   }
 
-  // color visual ( premultiplied alpha by default is false, and cannot change value )
+  // color visual ( premultiplied alpha by default is true, and cannot change value )
   {
     Visual::Base colorVisual = factory.CreateVisual(
       Property::Map()
@@ -3709,14 +3716,14 @@ int UtcDaliVisualPremultipliedAlpha(void)
 
     // test values
     DALI_TEST_CHECK(value);
-    DALI_TEST_EQUALS(value->Get<bool>(), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
   }
   {
     Visual::Base colorVisual = factory.CreateVisual(
       Property::Map()
         .Add(Toolkit::Visual::Property::TYPE, Visual::COLOR)
         .Add(ColorVisual::Property::MIX_COLOR, Color::AQUA)
-        .Add(Visual::Property::PREMULTIPLIED_ALPHA, true));
+        .Add(Visual::Property::PREMULTIPLIED_ALPHA, false));
 
     Dali::Property::Map visualMap;
     colorVisual.CreatePropertyMap(visualMap);
@@ -3724,7 +3731,7 @@ int UtcDaliVisualPremultipliedAlpha(void)
 
     // test values
     DALI_TEST_CHECK(value);
-    DALI_TEST_EQUALS(value->Get<bool>(), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
   }
 
   END_TEST;
@@ -4840,7 +4847,9 @@ int UtcDaliVisualBorderlineColorAnimateTest(void)
     Vector4 halfwayMixColor        = (INITIAL_MIX_COLOR + TARGET_MIX_COLOR) * 0.5f;
     Vector4 halfwayBorderlineColor = (INITIAL_BORDERLINE_COLOR + TARGET_BORDERLINE_COLOR) * 0.5f;
     float   halfwayActorOpacity    = (INITIAL_ACTOR_OPACITY + TARGET_ACTOR_OPACITY) * 0.5f;
-    DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, halfwayActorOpacity) * halfwayMixColor), true, TEST_LOCATION);
+
+    // Note : uColor is alpha premultiplied when we use ColorVisual.
+    DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uColor", GetAlphaPreMultipliedColor(Vector4(1.0f, 1.0f, 1.0f, halfwayActorOpacity) * halfwayMixColor)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uActorColor", Vector4(1.0f, 1.0f, 1.0f, halfwayActorOpacity)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("borderlineColor", halfwayBorderlineColor), true, TEST_LOCATION);
 
@@ -4848,7 +4857,7 @@ int UtcDaliVisualBorderlineColorAnimateTest(void)
     application.SendNotification(); // Trigger signals
 
     DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY), TEST_LOCATION);
-    DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY) * TARGET_MIX_COLOR), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uColor", GetAlphaPreMultipliedColor(Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY) * TARGET_MIX_COLOR)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uActorColor", Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("borderlineColor", TARGET_BORDERLINE_COLOR), true, TEST_LOCATION);
 

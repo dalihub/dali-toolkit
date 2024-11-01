@@ -136,7 +136,8 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 
   lowp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
   lowp float borderlineColorAlpha = borderlineColor.a * uActorColor.a;
-  // NOTE : color-visual is always not preMultiplied.
+  // NOTE : color-visual is always preMultiplied.
+  borderlineColorRGB *= borderlineColorAlpha;
 
   // Calculate inside of borderline when alpha is between (0.0  1.0). So we need to apply texture color.
   // If borderlineOpacity is exactly 0.0, we always use whole texture color. In this case, we don't need to run below code.
@@ -156,12 +157,12 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
       // potential is in texture range.
       lowp float textureAlphaScale = mix(1.0, 0.0, smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
       textureColor.a *= textureAlphaScale;
-      textureColor.rgb *= textureColor.a;
+      textureColor.rgb *= textureAlphaScale;
     }
 
-    // NOTE : color-visual is always not preMultiplied.
+    // NOTE : color-visual is always preMultiplied.
     borderlineColorAlpha *= borderlineOpacity;
-    borderlineColorRGB *= borderlineColorAlpha;
+    borderlineColorRGB *= borderlineOpacity;
     // We use pre-multiplied color to reduce operations.
     // In here, textureColor and borderlineColorRGB is pre-multiplied color now.
 
@@ -173,8 +174,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 
     lowp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
     lowp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
-    // TODO : Need to find some way without division
-    return vec4(finalMultipliedRGB / finalAlpha, finalAlpha);
+    return vec4(finalMultipliedRGB, finalAlpha);
   }
   return mix(textureColor, vec4(borderlineColorRGB, borderlineColorAlpha), borderlineOpacity);
 }
@@ -347,7 +347,7 @@ void main()
     OUT_COLOR = targetColor;
 
     mediump float opacity = calculateBlurOpacity();
-    OUT_COLOR.a *= opacity;
+    OUT_COLOR *= opacity;
 #else
 #if defined(IS_REQUIRED_ROUNDED_CORNER) && !defined(IS_REQUIRED_BORDERLINE)
     // skip rounded corner calculate for performance
@@ -376,7 +376,7 @@ void main()
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
       mediump float opacity = calculateCornerOpacity();
-      OUT_COLOR.a *= opacity;
+      OUT_COLOR *= opacity;
 #endif
     }
 #endif
@@ -386,6 +386,6 @@ void main()
 #endif
 
 #ifdef IS_REQUIRED_CUTOUT
-  OUT_COLOR.a *= discardOpacity;
+  OUT_COLOR *= discardOpacity;
 #endif
 }
