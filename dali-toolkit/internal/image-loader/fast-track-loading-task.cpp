@@ -246,7 +246,7 @@ void FastTrackLoadingTask::Load()
 
 void FastTrackLoadingTask::MultiplyAlpha(Dali::Devel::PixelBuffer pixelBuffer)
 {
-  if(mPreMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON && Pixel::HasAlpha(pixelBuffer.GetPixelFormat()))
+  if(mPreMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
   {
     pixelBuffer.MultiplyColorByAlpha();
     mPremultiplied = pixelBuffer.IsAlphaPreMultiplied();

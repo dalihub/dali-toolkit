@@ -66,6 +66,8 @@ const char* TEST_IMAGE_3_FILE_NAME = TEST_RESOURCE_DIR "/icon-edit.png";
 const char* TEST_IMAGE_4_FILE_NAME = TEST_RESOURCE_DIR "/application-icon-20.png";
 const char* TEST_MASK_FILE_NAME    = TEST_RESOURCE_DIR "/mask.png";
 
+const char* TEST_COMPRESSED_ALPHA_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/RGBA_ASTC_4x4.ktx";
+
 const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
 
@@ -2330,7 +2332,7 @@ int UtcTextureManagerCachingForDifferentMultiplyOnLoad(void)
   ToolkitTestApplication application;
   tet_infoline("UtcTextureManagerCachingForDifferentMultiplyOnLoad");
   tet_infoline("Observe1 multiply on load, and Observer2, 3 don't multiply on load.");
-  tet_infoline("We will use jpg image, with will not premultiply alpha even if we try to load without multiply.");
+  tet_infoline("We will use compressed image with alpha channel, with will not premultiply alpha even if we try to load without multiply.");
 
   tet_infoline("Let we request Observer1 and Observer2 sequencely.");
   tet_infoline("After Observer1 complete, we will cache -premultiplyOnLoad = true, premultiplied = false;");
@@ -2342,7 +2344,7 @@ int UtcTextureManagerCachingForDifferentMultiplyOnLoad(void)
   TestObserver observer1;
   TestObserver observer2;
   TestObserver observer3;
-  std::string  filename(TEST_IMAGE_FILE_NAME);
+  std::string  filename(TEST_COMPRESSED_ALPHA_IMAGE_FILE_NAME);
   auto         preMultiply = TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD;
   textureManager.RequestLoad(
     filename,
