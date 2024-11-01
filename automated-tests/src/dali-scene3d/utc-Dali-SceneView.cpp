@@ -1249,6 +1249,33 @@ int UtcDaliSceneViewBorderline(void)
   END_TEST;
 }
 
+int UtcDaliSceneViewCornerSquareness(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  application.GetScene().Add(view);
+
+  DALI_TEST_EQUALS(view.GetProperty<Vector4>(Dali::Scene3D::SceneView::Property::CORNER_RADIUS), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<Vector4>(Dali::Scene3D::SceneView::Property::CORNER_SQUARENESS), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<int>(Dali::Scene3D::SceneView::Property::CORNER_RADIUS_POLICY), static_cast<int>(Visual::Transform::Policy::ABSOLUTE), TEST_LOCATION);
+
+  Vector4 expectCornerRadius       = Vector4(0.5f, 0.3f, 0.2f, 0.0f);
+  Vector4 expectCornerSquareness   = Vector4(0.1f, 0.2f, 0.3f, 0.4f);
+  int     expectCornerRadiusPolicy = static_cast<int>(Visual::Transform::Policy::RELATIVE);
+
+  view.UseFramebuffer(true);
+  view.SetProperty(Dali::Scene3D::SceneView::Property::CORNER_RADIUS, expectCornerRadius);
+  view.SetProperty(Dali::Scene3D::SceneView::Property::CORNER_SQUARENESS, expectCornerSquareness);
+  view.SetProperty(Dali::Scene3D::SceneView::Property::CORNER_RADIUS_POLICY, expectCornerRadiusPolicy);
+
+  DALI_TEST_EQUALS(view.GetProperty<Vector4>(Dali::Scene3D::SceneView::Property::CORNER_RADIUS), expectCornerRadius, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<Vector4>(Dali::Scene3D::SceneView::Property::CORNER_SQUARENESS), expectCornerSquareness, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<int>(Dali::Scene3D::SceneView::Property::CORNER_RADIUS_POLICY), expectCornerRadiusPolicy, TEST_LOCATION);
+
+  END_TEST;
+}
+
 namespace
 {
 static bool              gCaptureFinishedCalled{false};

@@ -2925,6 +2925,13 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   imageShader5["shaderType"]   = "image";
   imageShader5["shaderOption"] = Property::Map().Add("ATLAS_CUSTOM", true);
 
+  Property::Map imageShader6;
+  imageShader6["shaderType"]   = "image";
+  imageShader6["shaderOption"] = Property::Map()
+                                   .Add("SQUIRCLE_CORNER", true)
+                                   .Add("BORDERLINE", true)
+                                   .Add("MASKING", true);
+
   Property::Map textShader;
   textShader["shaderType"]   = "text";
   textShader["shaderOption"] = Property::Map()
@@ -2949,6 +2956,12 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
                                    .Add("ROUNDED_CORNER,", true)
                                    .Add("BLUR_EDGE", true);
 
+  Property::Map colorShader3;
+  colorShader3["shaderType"]   = "color";
+  colorShader3["shaderOption"] = Property::Map()
+                                   .Add("SQUIRCLE_CORNER,", true)
+                                   .Add("BLUR_EDGE", true);
+
   Property::Map npatchShader;
   npatchShader["shaderType"] = "npatch";
 
@@ -2971,12 +2984,14 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   factory.AddPrecompileShader(imageShader4);
   factory.AddPrecompileShader(imageShader4); // use same shader, because check line coverage
   factory.AddPrecompileShader(imageShader5);
+  factory.AddPrecompileShader(imageShader6);
   factory.AddPrecompileShader(textShader);
   factory.AddPrecompileShader(textShader); // use same shader, because check line coverage
   factory.AddPrecompileShader(textShader2);
   factory.AddPrecompileShader(colorShader);
   factory.AddPrecompileShader(colorShader); // use same shader, because check line coverage
   factory.AddPrecompileShader(colorShader2);
+  factory.AddPrecompileShader(colorShader3);
   factory.AddPrecompileShader(npatchShader);
   factory.AddPrecompileShader(npatchShader2);
   factory.AddPrecompileShader(customShader);

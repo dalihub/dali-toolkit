@@ -71,6 +71,7 @@ extern const char* const BORDERLINE_OFFSET;
 // Corner radius
 extern const char* const CORNER_RADIUS;
 extern const char* const CORNER_RADIUS_POLICY;
+extern const char* const CORNER_SQUARENESS;
 
 // Color visual
 extern const char* const BLUR_RADIUS_NAME;

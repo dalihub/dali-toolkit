@@ -802,8 +802,8 @@ private:
   Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback mScreenshotCapturedCallback;
   Dali::WebEnginePlugin::WebEngineFrameRenderedCallback     mFrameRenderedCallback;
 
-  Vector4 mCornerRadius;                     /// < Corner radius
-  float   mCornerRadiusPolicy;               /// < Corner radius policy
+  Dali::Property::Map mVisualPropertyMap; ///< ImageVisual property map
+
   static std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>> mPluginWebViewMap;
 };
 

@@ -817,18 +817,21 @@ void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali:
   float   defaultBorderlineWidth(0.0f);
   Vector4 defaultBorderlineColor(0.0f, 0.0f, 0.0f, 1.0f);
   float   defaultBorderlineOffset(0.0f);
+  Vector4 defaultCornerSquareness(0.0f, 0.0f, 0.0f, 0.0f);
 
   Vector4 sourceMixColor         = findValueVector4(sourceMap, Dali::Toolkit::Visual::Property::MIX_COLOR, defaultMixColor);
   Vector4 sourceCornerRadius     = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::CORNER_RADIUS, defaultCornerRadius);
   float   sourceBorderlineWidth  = findValueFloat(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, defaultBorderlineWidth);
   Vector4 sourceBorderlineColor  = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_COLOR, defaultBorderlineColor);
   float   sourceBorderlineOffset = findValueFloat(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, defaultBorderlineOffset);
+  Vector4 sourceCornerSquareness = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::CORNER_SQUARENESS, defaultCornerSquareness);
 
   Vector4 destinationMixColor         = findValueVector4(destinationMap, Dali::Toolkit::Visual::Property::MIX_COLOR, defaultMixColor);
   Vector4 destinationCornerRadius     = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::CORNER_RADIUS, defaultCornerRadius);
   float   destinationBorderlineWidth  = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, defaultBorderlineWidth);
   Vector4 destinationBorderlineColor  = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_COLOR, defaultBorderlineColor);
   float   destinationBorderlineOffset = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, defaultBorderlineOffset);
+  Vector4 destinationCornerSquareness = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::CORNER_SQUARENESS, defaultCornerSquareness);
 
   // If the value of the source Control and that of destination Control is different, the property should be transitioned.
   if(sourceMixColor != destinationMixColor)
@@ -859,6 +862,12 @@ void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali:
   {
     sourcePropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, sourceBorderlineOffset);
     destinationPropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, destinationBorderlineOffset);
+  }
+
+  if(sourceCornerSquareness != destinationCornerSquareness)
+  {
+    sourcePropertyMap.Add(Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS, sourceCornerSquareness);
+    destinationPropertyMap.Add(Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS, destinationCornerSquareness);
   }
 }
 

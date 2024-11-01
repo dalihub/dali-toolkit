@@ -28,34 +28,44 @@ namespace
 // enum of required list when we select shader
 enum class ImageVisualRequireFlag : uint32_t
 {
-  DEFAULT          = 0,
-  ROUNDED_CORNER   = 1 << 0,
-  BORDERLINE       = 1 << 1,
-  ALPHA_MASKING    = 1 << 2,
-  COLOR_CONVERSION = 1 << 3,
+  DEFAULT         = 0,
+  ROUNDED_CORNER  = 1,
+  SQUIRCLE_CORNER = 2,
 
-  UNIFIED_YUV_AND_RGB = 1 << 2, // Special enum to trick unified YUV and RGB.
+  BORDERLINE       = (1 << 0) * 3,
+  ALPHA_MASKING    = (1 << 1) * 3,
+  COLOR_CONVERSION = (1 << 2) * 3,
+
+  UNIFIED_YUV_AND_RGB = (1 << 1) * 3, // Special enum to trick unified YUV and RGB.
 };
 
-static constexpr auto          SHADER_TYPE_COUNT = 16u;
-VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[SHADER_TYPE_COUNT] =
-  {
-    VisualFactoryCache::IMAGE_SHADER,
-    VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
-    VisualFactoryCache::IMAGE_SHADER_BORDERLINE,
-    VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE,
-    VisualFactoryCache::IMAGE_SHADER_MASKING,
-    VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_MASKING,
-    VisualFactoryCache::IMAGE_SHADER_BORDERLINE_MASKING,
-    VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING,
-    VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
-    VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
-    VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUV_TO_RGB,
-    VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_TO_RGB,
-    VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
-    VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
-    VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUV_AND_RGB,
-    VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_AND_RGB};
+VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
+  VisualFactoryCache::IMAGE_SHADER,
+  VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
+  VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_CORNER,
+  VisualFactoryCache::IMAGE_SHADER_BORDERLINE,
+  VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE,
+  VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_BORDERLINE,
+  VisualFactoryCache::IMAGE_SHADER_MASKING,
+  VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_MASKING,
+  VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_CORNER_MASKING,
+  VisualFactoryCache::IMAGE_SHADER_BORDERLINE_MASKING,
+  VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING,
+  VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_BORDERLINE_MASKING,
+  VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
+  VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
+  VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_CORNER_YUV_TO_RGB,
+  VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUV_TO_RGB,
+  VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_TO_RGB,
+  VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_BORDERLINE_YUV_TO_RGB,
+  VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
+  VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
+  VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_CORNER_YUV_AND_RGB,
+  VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUV_AND_RGB,
+  VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_AND_RGB,
+  VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_BORDERLINE_YUV_AND_RGB,
+};
+constexpr uint32_t SHADER_TYPE_TABLE_COUNT = sizeof(SHADER_TYPE_TABLE) / sizeof(SHADER_TYPE_TABLE[0]);
 } // unnamed namespace
 
 namespace ImageVisualShaderFeature
@@ -83,9 +93,9 @@ FeatureBuilder& FeatureBuilder::ApplyDefaultTextureWrapMode(bool applyDefaultTex
   return *this;
 }
 
-FeatureBuilder& FeatureBuilder::EnableRoundedCorner(bool enableRoundedCorner)
+FeatureBuilder& FeatureBuilder::EnableRoundedCorner(bool enableRoundedCorner, bool enableSquircleCorner)
 {
-  mRoundedCorner = (enableRoundedCorner ? RoundedCorner::ENABLED : RoundedCorner::DISABLED);
+  mRoundedCorner = (enableRoundedCorner ? (enableSquircleCorner ? RoundedCorner::SQUIRCLE_CORNER : RoundedCorner::ROUNDED_CORNER) : RoundedCorner::DISABLED);
   return *this;
 }
 
@@ -130,27 +140,36 @@ VisualFactoryCache::ShaderType FeatureBuilder::GetShaderType() const
   else
   {
     uint32_t shaderTypeFlag = static_cast<uint32_t>(ImageVisualRequireFlag::DEFAULT);
-    if(mRoundedCorner == RoundedCorner::ENABLED)
+    if(mRoundedCorner == RoundedCorner::SQUIRCLE_CORNER)
     {
-      shaderTypeFlag |= static_cast<uint32_t>(ImageVisualRequireFlag::ROUNDED_CORNER);
+      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::SQUIRCLE_CORNER);
     }
+    else if(mRoundedCorner == RoundedCorner::ROUNDED_CORNER)
+    {
+      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::ROUNDED_CORNER);
+    }
+
     if(mBorderline == Borderline::ENABLED)
     {
-      shaderTypeFlag |= static_cast<uint32_t>(ImageVisualRequireFlag::BORDERLINE);
+      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::BORDERLINE);
     }
+
     if(mAlphaMaskingOnRendering == AlphaMaskingOnRendering::ENABLED)
     {
-      shaderTypeFlag |= static_cast<uint32_t>(ImageVisualRequireFlag::ALPHA_MASKING);
+      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::ALPHA_MASKING);
     }
     else if(mColorConversion == ColorConversion::YUV_TO_RGB) // Not support gpu masking and color conversion at the same time now
     {
-      shaderTypeFlag |= static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
+      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
     }
     else if(mColorConversion == ColorConversion::UNIFIED_YUV_AND_RGB)
     {
-      shaderTypeFlag |= static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
-      shaderTypeFlag |= static_cast<uint32_t>(ImageVisualRequireFlag::UNIFIED_YUV_AND_RGB);
+      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
+      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::UNIFIED_YUV_AND_RGB);
     }
+
+    DALI_ASSERT_DEBUG(shaderTypeFlag < SHADER_TYPE_TABLE_COUNT && "Invalid image shader type generated!");
+
     shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
   }
 
@@ -168,7 +187,7 @@ void FeatureBuilder::GetVertexShaderPrefixList(std::string& vertexShaderPrefixLi
 {
   if(mTextureAtlas != TextureAtlas::ENABLED)
   {
-    if(mRoundedCorner == RoundedCorner::ENABLED)
+    if(mRoundedCorner != RoundedCorner::DISABLED)
     {
       vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
     }
@@ -198,9 +217,13 @@ void FeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPref
   }
   else
   {
-    if(mRoundedCorner == RoundedCorner::ENABLED)
+    if(mRoundedCorner != RoundedCorner::DISABLED)
     {
       fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
+      if(mRoundedCorner == RoundedCorner::SQUIRCLE_CORNER)
+      {
+        fragmentShaderPrefixList += "#define IS_REQUIRED_SQUIRCLE_CORNER\n";
+      }
     }
     if(mBorderline == Borderline::ENABLED)
     {

@@ -247,6 +247,7 @@ int UtcDaliRenderEffectSynchronizeBackgroundCornerRadius(void)
   blackDimmerMap.Insert(Toolkit::Visual::Property::MIX_COLOR, Color::BLACK);
   blackDimmerMap.Insert(Toolkit::Visual::Property::OPACITY, 0.2f);
   blackDimmerMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, 30.0f);
+  blackDimmerMap.Insert(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, 0.3f);
 
   RenderEffect effect = BackgroundBlurEffect::New(0.4f, 40);
 
@@ -265,6 +266,9 @@ int UtcDaliRenderEffectSynchronizeBackgroundCornerRadius(void)
   Vector4  radius   = Vector4::ZERO;
   renderer.GetProperty(renderer.GetPropertyIndex(std::string("uCornerRadius"))).Get(radius);
 
+  Vector4 squreness = Vector4::ZERO;
+  renderer.GetProperty(renderer.GetPropertyIndex(std::string("uCornerSquareness"))).Get(squreness);
+
   Toolkit::Visual::Transform::Policy::Type policy;
   renderer.GetProperty(renderer.GetPropertyIndex(std::string("uCornerRadiusPolicy"))).Get(policy);
   DALI_TEST_CHECK(policy == 1);
@@ -273,6 +277,11 @@ int UtcDaliRenderEffectSynchronizeBackgroundCornerRadius(void)
   DALI_TEST_CHECK(radius.y == 30.0f);
   DALI_TEST_CHECK(radius.z == 30.0f);
   DALI_TEST_CHECK(radius.w == 30.0f);
+
+  DALI_TEST_CHECK(squreness.x == 0.3f);
+  DALI_TEST_CHECK(squreness.y == 0.3f);
+  DALI_TEST_CHECK(squreness.z == 0.3f);
+  DALI_TEST_CHECK(squreness.w == 0.3f);
 
   END_TEST;
 }

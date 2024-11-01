@@ -114,6 +114,7 @@ public:
   {
     UNKNOWN = 0,
     ROUNDED_CORNER,
+    SQUIRCLE_CORNER,
     BORDERLINE,
     BLUR_EDGE,
     CUTOUT,

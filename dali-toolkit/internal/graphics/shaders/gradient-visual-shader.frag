@@ -21,11 +21,18 @@ uniform lowp vec4 borderlineColor;
 uniform lowp vec4 uActorColor;
 #endif
 
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+uniform highp vec4 cornerSquareness;
+#endif
+
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 // Global values both rounded corner and borderline use
 
 // radius of rounded corner on this quadrant
 highp float gRadius = 0.0;
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+highp float gSquareness = 0.0;
+#endif
 
 // fragment coordinate. NOTE : vec2(0.0, 0.0) is vRectSize, the corner of visual
 highp vec2 gFragmentPosition = vec2(0.0, 0.0);
@@ -54,6 +61,14 @@ void calculateCornerRadius()
     mix(vCornerRadius.w, vCornerRadius.z, sign(vPosition.x) * 0.5 + 0.5),
     sign(vPosition.y) * 0.5 + 0.5
   );
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+  gSquareness = clamp(
+  mix(
+    mix(cornerSquareness.x, cornerSquareness.y, sign(vPosition.x) * 0.5 + 0.5),
+    mix(cornerSquareness.w, cornerSquareness.z, sign(vPosition.x) * 0.5 + 0.5),
+    sign(vPosition.y) * 0.5 + 0.5
+  ), 0.0, 1.0);
+#endif
 #endif
 }
 
@@ -73,7 +88,36 @@ void calculatePosition()
 
 void calculatePotential()
 {
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+  // We need to found the r value s.t. x^2 + y^2 - s/r/r x^2y^2 = r^2
+  // and check this r is inside [gRadius - vAliasMargin, gRadius + vAliasMargin]
+
+  // If we make as A = x^2 + y^2, B = sx^2y^2
+  // r^2 = (A + sqrt(A^2 - 4B)) / 2
+  //     = ((x^2 + y^2) + sqrt(x^4 + (2 - 4s)x^2y^2 + y^4)) / 2
+
+  highp vec2 positiveDiff = max(gDiff, 0.0);
+
+  // If gSquareness is near 1.0, it make some numeric error. Let we avoid this situation by heuristic value.
+  if(gSquareness > 0.99)
+  {
+    gPotential = max(gDiff.x, gDiff.y);
+    return;
+  }
+
+  // make sqr to avoid duplicate codes.
+  positiveDiff *= positiveDiff;
+
+  // TODO : Could we remove this double-sqrt code?
+  gPotential = sqrt(((positiveDiff.x + positiveDiff.y)
+                     + sqrt(positiveDiff.x * positiveDiff.x
+                            + positiveDiff.y * positiveDiff.y
+                            + (2.0 - 4.0 * gSquareness) * positiveDiff.x * positiveDiff.y))
+                    * 0.5)
+               + min(0.0, max(gDiff.x, gDiff.y)); ///< Consider negative potential, to support borderline
+#else
   gPotential = length(max(gDiff, 0.0)) + min(0.0, max(gDiff.x, gDiff.y));
+#endif
 }
 
 void setupMinMaxPotential()
@@ -108,6 +152,8 @@ void setupMinMaxPotential()
 #ifdef IS_REQUIRED_BORDERLINE
 lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 {
+  // TODO : Need to consider squareness
+
   highp float potential = gPotential;
 
   // default opacity of borderline is 0.0

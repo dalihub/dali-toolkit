@@ -99,6 +99,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
       .Add(DevelVisual::Property::BORDERLINE_WIDTH, 33.3f)
       .Add(DevelVisual::Property::BORDERLINE_COLOR, Color::RED)
       .Add(DevelVisual::Property::BORDERLINE_OFFSET, 0.3f)
+      .Add(DevelVisual::Property::CORNER_SQUARENESS, 0.3f)
       .Add(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 2.0f));
 
   Property::Map resultMap;
@@ -155,6 +156,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   value = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), 0.3f, TEST_LOCATION);
+
+  value = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector4>(), Vector4(0.3f, 0.3f, 0.3f, 0.3f), TEST_LOCATION);
 
   // Check mask properties
   value = resultMap.Find(ImageVisual::Property::ALPHA_MASK_URL, Property::STRING);
@@ -236,6 +241,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
       .Add("borderlineWidth", 20.0f)
       .Add("borderlineColor", Vector4())
       .Add("borderlineOffset", -1.0f)
+      .Add("cornerSquareness", Vector4(1.0f, 0.5f, 0.25f, 0.0f))
       .Add("frameSpeedFactor", 0.5f));
 
   Property::Map resultMap;
@@ -314,6 +320,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   value = resultMap.Find(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, "borderlineOffset");
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), -1.0f, TEST_LOCATION);
+
+  value = resultMap.Find(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, "cornerSquareness");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector4>(), Vector4(1.0f, 0.5f, 0.25f, 0.0f), TEST_LOCATION);
 
   // Check mask properties
   value = resultMap.Find(ImageVisual::Property::ALPHA_MASK_URL, "alphaMaskUrl");
@@ -419,6 +429,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), 0.0f, TEST_LOCATION);
 
+  value = resultMap.Find(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, "cornerSquareness");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector4>(), Vector4::ZERO, TEST_LOCATION);
+
   // Check mask properties
   value = resultMap.Find(ImageVisual::Property::ALPHA_MASK_URL, "alphaMaskUrl");
   DALI_TEST_CHECK(value);
@@ -509,6 +523,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap04(void)
   value = resultMap.Find(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, "borderlineOffset");
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), 0.0f, TEST_LOCATION);
+
+  value = resultMap.Find(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, "cornerSquareness");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector4>(), Vector4::ZERO, TEST_LOCATION);
 
   END_TEST;
 }
