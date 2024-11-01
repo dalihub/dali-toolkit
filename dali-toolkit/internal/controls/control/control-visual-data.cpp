@@ -831,8 +831,7 @@ Dali::Property Control::Impl::VisualData::GetVisualProperty(Dali::Property::Inde
   Toolkit::Visual::Base visual = GetVisualByIndex(mVisuals, index);
   if(visual)
   {
-    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
-    return visualImpl.GetPropertyObject(std::move(visualPropertyKey));
+    return visual.GetPropertyObject(std::move(visualPropertyKey));
   }
 
   Handle handle;

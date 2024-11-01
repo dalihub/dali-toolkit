@@ -5082,6 +5082,109 @@ int UtcDaliVisualGetType(void)
   END_TEST;
 }
 
+int UtcDaliVisualGetPropertyObject01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualGetPropertyObject01 GetProperty by index");
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map properties;
+  properties[Visual::Property::TYPE] = Visual::IMAGE;
+  properties.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  Visual::Base visual = factory.CreateVisual(properties);
+
+  DALI_TEST_CHECK(visual.GetType() == Visual::IMAGE);
+
+  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect) {
+    {
+      std::ostringstream oss;
+      oss << "Test for key[" << key << "]";
+      tet_printf("%s\n", oss.str().c_str());
+    }
+
+    Dali::Property property = visual.GetPropertyObject(std::move(key));
+    tet_printf("Result object[%p] index of property[%d]\n", property.object.GetObjectPtr(), property.propertyIndex);
+
+    if(expect)
+    {
+      DALI_TEST_CHECK(property.object && property.propertyIndex != Property::INVALID_INDEX);
+    }
+    else
+    {
+      DALI_TEST_CHECK(!property.object && property.propertyIndex == Property::INVALID_INDEX);
+    }
+  };
+
+  // Test to get valid objects
+  propertyTest(visual, Visual::Property::MIX_COLOR, true);
+  propertyTest(visual, Visual::Property::OPACITY, true);
+  propertyTest(visual, Visual::Transform::Property::SIZE, true);
+  propertyTest(visual, DevelVisual::Property::CORNER_RADIUS, true);
+  propertyTest(visual, DevelVisual::Property::BORDERLINE_WIDTH, true);
+  propertyTest(visual, ImageVisual::Property::PIXEL_AREA, true);
+
+  // Test to get invalid objects
+  propertyTest(visual, ImageVisual::Property::URL, false);
+  propertyTest(visual, DevelImageVisual::Property::FAST_TRACK_UPLOADING, false);
+  propertyTest(visual, Visual::Property::TYPE, false);
+  propertyTest(visual, Visual::Property::TRANSFORM, false);
+  propertyTest(visual, Actor::Property::POSITION, false);
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetPropertyObject02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualGetPropertyObject02 GetProperty by string");
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map properties;
+  properties[Visual::Property::TYPE] = Visual::ANIMATED_IMAGE;
+  properties.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  Visual::Base visual = factory.CreateVisual(properties);
+
+  DALI_TEST_CHECK(visual.GetType() == Visual::IMAGE);
+
+  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect) {
+    {
+      std::ostringstream oss;
+      oss << "Test for key[" << key << "]";
+      tet_printf("%s\n", oss.str().c_str());
+    }
+
+    Dali::Property property = visual.GetPropertyObject(std::move(key));
+    tet_printf("Result object[%p] index of property[%d]\n", property.object.GetObjectPtr(), property.propertyIndex);
+
+    if(expect)
+    {
+      DALI_TEST_CHECK(property.object && property.propertyIndex != Property::INVALID_INDEX);
+    }
+    else
+    {
+      DALI_TEST_CHECK(!property.object && property.propertyIndex == Property::INVALID_INDEX);
+    }
+  };
+
+  // Test to get valid objects
+  propertyTest(visual, "mixColor", true);
+  propertyTest(visual, "opacity", true);
+  propertyTest(visual, "size", true);
+  propertyTest(visual, "cornerRadius", true);
+  propertyTest(visual, "borderlineOffset", true);
+  propertyTest(visual, "pixelArea", true);
+
+  // Test to get invalid objects
+  propertyTest(visual, "url", false);
+  propertyTest(visual, "type", false);
+  propertyTest(visual, "transform", false);
+  propertyTest(visual, "", false);
+
+  END_TEST;
+}
+
 int UtcDaliVisualGetVisualProperty01(void)
 {
   ToolkitTestApplication application;

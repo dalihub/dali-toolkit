@@ -109,6 +109,11 @@ Visual::Type Visual::Base::GetType() const
   return GetImplementation(*this).GetType();
 }
 
+Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
+{
+  return GetImplementation(*this).GetPropertyObject(std::move(key));
+}
+
 } // namespace Toolkit
 
 } // namespace Dali
