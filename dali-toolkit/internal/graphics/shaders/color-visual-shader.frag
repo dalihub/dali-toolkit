@@ -96,6 +96,13 @@ void calculatePosition(highp float currentBorderlineWidth)
 void calculatePotential()
 {
 #ifdef IS_REQUIRED_SQUIRCLE_CORNER
+  // If gSquareness is near 1.0, it make some numeric error. Let we avoid this situation by heuristic value.
+  if(gSquareness > 0.99)
+  {
+    gPotential = max(gDiff.x, gDiff.y);
+    return;
+  }
+
   // We need to found the r value s.t. x^2 + y^2 - s/r/r x^2y^2 = r^2
   // and check this r is inside [gRadius - vAliasMargin, gRadius + vAliasMargin]
 
@@ -104,13 +111,6 @@ void calculatePotential()
   //     = ((x^2 + y^2) + sqrt(x^4 + (2 - 4s)x^2y^2 + y^4)) / 2
 
   highp vec2 positiveDiff = max(gDiff, 0.0);
-
-  // If gSquareness is near 1.0, it make some numeric error. Let we avoid this situation by heuristic value.
-  if(gSquareness > 0.99)
-  {
-    gPotential = max(gDiff.x, gDiff.y);
-    return;
-  }
 
   // make sqr to avoid duplicate codes.
   positiveDiff *= positiveDiff;
@@ -161,8 +161,6 @@ void PreprocessPotential(highp vec4 cornerRadius, highp vec2 position, highp vec
 #elif defined(IS_REQUIRED_BORDERLINE)
 lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 {
-  // TODO : Need to consider squareness
-
   highp float potential = gPotential;
 
   // default opacity of borderline is 0.0

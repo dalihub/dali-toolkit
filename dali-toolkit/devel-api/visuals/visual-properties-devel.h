@@ -124,7 +124,6 @@ enum Type
    * @details Name "cornerSquareness", type Property::FLOAT or Property::VECTOR4, animatable
    * @note By default, it is Vector::ZERO.
    * @note Each squareness will clamp internally as [0.0 1.0].
-   * @note If squareness is not zero, the width of borderline might not equal with it's real value.
    * @note Squareness value are used in clockwise order from top-left-corner to bottom-left-corner.
    *       When squareness is Vector4(x, y, z, w)
    *       x    y
