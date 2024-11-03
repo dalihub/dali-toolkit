@@ -45,6 +45,8 @@ namespace
 {
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
+constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
+
 constexpr auto LOAD_IMAGE_YUV_PLANES_ENV = "DALI_LOAD_IMAGE_YUV_PLANES";
 
 bool NeedToLoadYuvPlanes()
@@ -456,6 +458,7 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
       {
         shader = GenerateAndSaveShader(IMAGE_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_FRAG.data());
         shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+        shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
       }
       renderer.SetGeometry(geometry);
       renderer.SetShader(shader);

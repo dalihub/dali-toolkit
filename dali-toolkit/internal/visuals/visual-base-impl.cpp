@@ -1132,6 +1132,13 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key)
     }
   }
 
+  // Fast-out for invalid key.
+  if((key.type == Property::Key::INDEX && key.indexKey == Property::INVALID_KEY) ||
+     (key.type == Property::Key::STRING && key.stringKey.empty()))
+  {
+    return Property::INVALID_INDEX;
+  }
+
   Property::Index index = mImpl->mRenderer.GetPropertyIndex(key);
 
   if(index == Property::INVALID_INDEX)

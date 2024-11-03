@@ -36,7 +36,7 @@ namespace
 {
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
-constexpr float ALPHA_PRE_MULTIPLIED(1.0f);
+constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
 
 constexpr int CUSTOM_PROPERTY_COUNT(2); // PixelArea, pre-multiplied alpha
 
@@ -154,7 +154,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
 
   // Most of image visual shader user (like svg, animated vector image visual) use pre-multiplied alpha.
   // If the visual dont want to using pre-multiplied alpha, it should be set as 0.0f as renderer side.
-  shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_PRE_MULTIPLIED);
+  shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
 
   if(featureBuilder.IsEnabledAlphaMaskingOnRendering())
   {
