@@ -4,7 +4,7 @@
 
 precision mediump float;
 
-INPUT vec2 aPosition;//Stuff, things
+INPUT vec2 aPosition; // Use position to calculate uvs
 
 UNIFORM_BLOCK VertBlock
 {
@@ -24,7 +24,7 @@ float timeDelta = 0.0167;
 
 
 // outputs
-OUTPUT vec2 vModelSpaceCenterToPos;
+OUTPUT vec2 vModelSpaceCenterToPos; // 2d, ignoring z
 OUTPUT vec2 vScreenSpaceVelocityVector;
 OUTPUT float vSpeed;
 OUTPUT vec2 vTexCoord;
