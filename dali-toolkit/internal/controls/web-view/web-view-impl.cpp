@@ -45,8 +45,8 @@
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
+#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali/integration-api/debug.h>
 
@@ -150,7 +150,7 @@ WebView::~WebView()
   if(mWebEngine)
   {
     auto iter = mPluginWebViewMap.find(mWebEngine.GetPlugin());
-    if (iter != mPluginWebViewMap.end())
+    if(iter != mPluginWebViewMap.end())
     {
       mPluginWebViewMap.erase(iter);
     }
@@ -162,7 +162,7 @@ Toolkit::WebView WebView::New()
 {
   WebView*         impl   = new WebView();
   Toolkit::WebView handle = Toolkit::WebView(*impl);
-  if (impl->GetPlugin())
+  if(impl->GetPlugin())
   {
     mPluginWebViewMap[impl->GetPlugin()] = handle;
   }
@@ -174,7 +174,7 @@ Toolkit::WebView WebView::New(const std::string& locale, const std::string& time
 {
   WebView*         impl   = new WebView(locale, timezoneId);
   Toolkit::WebView handle = Toolkit::WebView(*impl);
-  if (impl->GetPlugin())
+  if(impl->GetPlugin())
   {
     mPluginWebViewMap[impl->GetPlugin()] = handle;
   }
@@ -186,7 +186,7 @@ Toolkit::WebView WebView::New(uint32_t argc, char** argv)
 {
   WebView*         impl   = new WebView(argc, argv);
   Toolkit::WebView handle = Toolkit::WebView(*impl);
-  if (impl->GetPlugin())
+  if(impl->GetPlugin())
   {
     mPluginWebViewMap[impl->GetPlugin()] = handle;
   }
@@ -197,7 +197,7 @@ Toolkit::WebView WebView::New(uint32_t argc, char** argv)
 Toolkit::WebView WebView::FindWebView(Dali::WebEnginePlugin* plugin)
 {
   auto iter = mPluginWebViewMap.find(plugin);
-  if (iter != mPluginWebViewMap.end())
+  if(iter != mPluginWebViewMap.end())
   {
     return iter->second.GetHandle();
   }
@@ -361,6 +361,11 @@ void WebView::Resume()
   if(mWebEngine)
   {
     mWebEngine.Resume();
+
+    if(Dali::Accessibility::IsUp())
+    {
+      SetKeyInputFocus();
+    }
   }
 }
 
@@ -860,26 +865,26 @@ void WebView::OnFrameRendered()
   }
 
   // Make sure that mVisual is created only once.
-  if (mVisual)
+  if(mVisual)
     return;
 
   // Get webVisual for checking corner radius
   Toolkit::Visual::Base webVisual = Dali::Toolkit::DevelControl::GetVisual(*this, Toolkit::WebView::Property::URL);
-  Property::Map webMap;
+  Property::Map         webMap;
   webVisual.CreatePropertyMap(webMap);
-  Property::Value* cornerRadiusValue =  webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
+  Property::Value* cornerRadiusValue = webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
   if(cornerRadiusValue)
   {
     mCornerRadius = cornerRadiusValue->Get<Vector4>();
   }
-  Property::Value* cornerRadiusValuePolicy =  webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY);
+  Property::Value* cornerRadiusValuePolicy = webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY);
   if(cornerRadiusValuePolicy)
   {
     mCornerRadiusPolicy = cornerRadiusValuePolicy->Get<int>();
   }
 
   Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(mWebEngine.GetNativeImageSource());
-  Property::Map propertyMap;
+  Property::Map           propertyMap;
   propertyMap.Insert(Dali::Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::IMAGE);
   propertyMap.Insert(Dali::Toolkit::ImageVisual::Property::URL, nativeImageUrl.GetUrl());
   propertyMap.Insert(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS, mCornerRadius);
@@ -1365,7 +1370,9 @@ bool WebView::SetVisibility(bool visible)
 }
 
 WebView::WebViewAccessible::WebViewAccessible(Dali::Actor self, Dali::WebEngine& webEngine)
-: ControlAccessible(self), mRemoteChild{}, mWebEngine{webEngine}
+: ControlAccessible(self),
+  mRemoteChild{},
+  mWebEngine{webEngine}
 {
   mRemoteChild.SetParent(this);
 
@@ -1408,6 +1415,12 @@ void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::
 
   if(mRemoteChild.GetAddress())
   {
+    auto actor   = GetInternalActor();
+    auto control = Toolkit::Control::DownCast(actor);
+    if(DALI_LIKELY(control))
+    {
+      control.SetKeyInputFocus();
+    }
     // DoGetChildren is called at most once per every OnChildrenChanged.
     // We have only one OnChildrenChanged in this case, so EmbedSocket will be called only once.
     Accessibility::Bridge::GetCurrentBridge()->EmbedSocket(GetAddress(), mRemoteChild.GetAddress());
