@@ -46,6 +46,7 @@ enum
    * @note Optional.
    * @note The default is 0.
    * @note The visual size increases by the blur radius.
+   * @note If squareness is not zero, the width of borderline might not equal with it's real value.
    * @note We cannot use blur radius and borderline properties at the same time.
    */
   BLUR_RADIUS = MIX_COLOR + 2,

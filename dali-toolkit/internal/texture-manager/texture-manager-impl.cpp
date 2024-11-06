@@ -74,16 +74,14 @@ const Vector4 FULL_ATLAS_RECT(0.0f, 0.0f, 1.0f, 1.0f); ///< UV Rectangle that co
 
 void PreMultiply(Devel::PixelBuffer pixelBuffer, TextureManager::MultiplyOnLoad& preMultiplyOnLoad)
 {
-  if(Pixel::HasAlpha(pixelBuffer.GetPixelFormat()))
+  if(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD)
   {
-    if(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD)
+    pixelBuffer.MultiplyColorByAlpha();
+
+    if(!pixelBuffer.IsAlphaPreMultiplied())
     {
-      pixelBuffer.MultiplyColorByAlpha();
+      preMultiplyOnLoad = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
     }
-  }
-  else
-  {
-    preMultiplyOnLoad = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
   }
 }
 
@@ -1111,7 +1109,7 @@ void TextureManager::PostLoad(TextureManager::TextureInfo& textureInfo, std::vec
     else
     {
       // YUV case
-      textureInfo.preMultiplied = false;
+      textureInfo.preMultiplied = textureInfo.preMultiplyOnLoad;
 
       UploadTextures(pixelBuffers, textureInfo);
       NotifyObservers(textureInfo, true);

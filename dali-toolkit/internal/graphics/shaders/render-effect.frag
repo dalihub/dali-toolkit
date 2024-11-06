@@ -5,6 +5,7 @@ varying highp vec4 vCornerRadius;
 
 uniform lowp vec4 uColor;
 uniform highp vec3 uSize;
+uniform highp vec4 uCornerSquareness;
 uniform sampler2D sTexture;
 
 highp float nrand(const in vec2 uv)
@@ -22,12 +23,34 @@ vec3 applyDithering( vec3 inColor )
 }
 
 // from https://iquilezles.org/articles/distfunctions
-float roundedBoxSDF(vec2 PixelPositionFromCenter, vec2 RectangleEdgePositionFromCenter, float Radius) {
-    return length(max(PixelPositionFromCenter
-                      - RectangleEdgePositionFromCenter
-                      + Radius
-                      , 0.0))
-           - Radius;
+float roundedBoxSDF(vec2 pixelPositionFromCenter, vec2 rectangleEdgePositionFromCenter, float radius, float squareness) {
+  highp vec2 diff = pixelPositionFromCenter
+                    - rectangleEdgePositionFromCenter
+                    + radius;
+
+  // If squareness is near 1.0 or 0.0, it make some numeric error. Let we avoid this situation by heuristic value.
+  if(squareness < 0.01)
+  {
+    return length(max(diff, 0.0)) + min(0.0, max(diff.x, diff.y)) - radius;
+  }
+  if(squareness > 0.99)
+  {
+    return max(diff.x, diff.y) - radius;
+  }
+
+  highp vec2 positiveDiff = max(diff, 0.0);
+
+  // make sqr to avoid duplicate codes.
+  positiveDiff *= positiveDiff;
+
+  // TODO : Could we remove this double-sqrt code?
+  return sqrt(((positiveDiff.x + positiveDiff.y)
+               + sqrt(positiveDiff.x * positiveDiff.x
+                      + positiveDiff.y * positiveDiff.y
+                      + (2.0 - 4.0 * squareness) * positiveDiff.x * positiveDiff.y))
+              * 0.5)
+         + min(0.0, max(diff.x, diff.y)) ///< Consider negative potential, to avoid visual defect when radius is zero
+         - radius;
 }
 
 void main()
@@ -62,9 +85,16 @@ void main()
     }
     else
     {
-      float distance = roundedBoxSDF(location, halfSize, radius);
+      float squareness =
+        mix(
+          mix(uCornerSquareness.x, uCornerSquareness.y, sign(location.x) * 0.5 + 0.5),
+          mix(uCornerSquareness.w, uCornerSquareness.z, sign(location.x) * 0.5 + 0.5),
+          sign(location.y) * 0.5 + 0.5
+        );
 
-      float smoothedAlpha = 1.0 - smoothstep(-edgeSoftness, edgeSoftness, distance);
+      float signedDistance = roundedBoxSDF(location, halfSize, radius, squareness);
+
+      float smoothedAlpha = 1.0 - smoothstep(-edgeSoftness, edgeSoftness, signedDistance);
 
       // Premultiply alpha feature used.
       gl_FragColor *= smoothedAlpha;

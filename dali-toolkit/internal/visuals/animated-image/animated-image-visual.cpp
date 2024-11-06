@@ -945,7 +945,7 @@ Shader AnimatedImageVisual::GenerateShader() const
     mFactoryCache,
     ImageVisualShaderFeature::FeatureBuilder()
       .ApplyDefaultTextureWrapMode(defaultWrapMode)
-      .EnableRoundedCorner(IsRoundedCornerRequired())
+      .EnableRoundedCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
       .EnableBorderline(IsBorderlineRequired())
       .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering));
   return shader;

@@ -275,7 +275,7 @@ void LoadingTask::ApplyMask()
 
 void LoadingTask::MultiplyAlpha()
 {
-  if(!pixelBuffers.empty() && Pixel::HasAlpha(pixelBuffers[0].GetPixelFormat()))
+  if(!pixelBuffers.empty())
   {
     if(preMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
     {

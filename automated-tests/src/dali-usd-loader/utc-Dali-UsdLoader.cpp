@@ -193,14 +193,14 @@ int UtcDaliUsdLoaderSuccess1(void)
     DALI_TEST_EQUAL(iTexture->mSemantic, uint32_t(MaterialDefinition::ALBEDO));
     DALI_TEST_EQUAL(iTexture->mTexture.mImageUri, "");
     DALI_TEST_EQUAL(uint32_t(iTexture->mTexture.mSamplerFlags), uint32_t(SamplerFlags::DEFAULT)); // don't interpret it as a character
-    DALI_TEST_EQUAL(iTexture->mTexture.mMinImageDimensions, ImageDimensions());
+    DALI_TEST_EQUAL(iTexture->mTexture.mMinImageDimensions, ImageDimensions(512, 512));
     DALI_TEST_EQUAL(iTexture->mTexture.mSamplingMode, SamplingMode::BOX_THEN_LINEAR);
     DALI_TEST_EQUAL(iTexture->mTexture.mTextureBuffer.size(), 209908u);
 
     auto& ts = materials[0u].second;
     DALI_TEST_EQUAL(ts.GetTextureCount(), 5u);
-    DALI_TEST_EQUAL(ts.GetTexture(0).GetWidth(), 1024);
-    DALI_TEST_EQUAL(ts.GetTexture(0).GetHeight(), 1024);
+    DALI_TEST_EQUAL(ts.GetTexture(0).GetWidth(), 512);
+    DALI_TEST_EQUAL(ts.GetTexture(0).GetHeight(), 512);
     DALI_TEST_EQUAL(ts.GetTexture(1).GetWidth(), 1);
     DALI_TEST_EQUAL(ts.GetTexture(1).GetHeight(), 1);
     DALI_TEST_EQUAL(ts.GetTexture(2).GetWidth(), 256);

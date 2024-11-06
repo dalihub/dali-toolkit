@@ -1,0 +1,11 @@
+ {
+    "images": [
+        {
+            "uri": "CesiumMan_img0.jpg",
+            "minWidth": 512,
+            "minHeight": 512,
+            "samplingMode": "BOX_THEN_LINEAR"
+        }
+    ]
+}
+

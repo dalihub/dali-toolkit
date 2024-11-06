@@ -62,12 +62,13 @@ enum Type
 namespace RoundedCorner
 {
 /**
- * @brief Whether use rounded corner, or not
+ * @brief Whether use rounded corner, or squircle corner, or not
  */
 enum Type
 {
-  DISABLED = 0, ///< Image visual doesn't use rounded corner
-  ENABLED       ///< Image visual uses rounded corner
+  DISABLED = 0,   ///< Image visual doesn't use rounded corner
+  ROUNDED_CORNER, ///< Image visual uses rounded corner
+  SQUIRCLE_CORNER ///< Image visual use squircle corner
 };
 } // namespace RoundedCorner
 
@@ -133,7 +134,7 @@ public:
 
   FeatureBuilder& ApplyDefaultTextureWrapMode(bool applyDefaultTextureWrapMode);
 
-  FeatureBuilder& EnableRoundedCorner(bool enableRoundedCorner);
+  FeatureBuilder& EnableRoundedCorner(bool enableRoundedCorner, bool enableSquircleCorner = false);
 
   FeatureBuilder& EnableBorderline(bool enableBorderline);
 

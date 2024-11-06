@@ -535,15 +535,20 @@ void BlurEffectImpl::SynchronizeBackgroundCornerRadius()
 
   DALI_ASSERT_ALWAYS(GetOwnerControl() && "You should first SetRenderEffect(), then set its background property map");
 
-  Property::Map map    = GetOwnerControl().GetProperty<Property::Map>(Toolkit::Control::Property::BACKGROUND);
-  Vector4       radius = Vector4::ZERO;
+  Property::Map map = GetOwnerControl().GetProperty<Property::Map>(Toolkit::Control::Property::BACKGROUND);
+
+  Vector4 radius = Vector4::ZERO;
   map[Toolkit::DevelVisual::Property::CORNER_RADIUS].Get(radius);
+
+  Vector4 squareness = Vector4::ZERO;
+  map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS].Get(squareness);
 
   Visual::Transform::Policy::Type policy{Visual::Transform::Policy::ABSOLUTE};
   map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY].Get(policy);
 
   Renderer renderer = GetTargetRenderer();
   renderer.RegisterProperty("uCornerRadius", radius);
+  renderer.RegisterProperty("uCornerSquareness", squareness);
   renderer.RegisterProperty("uCornerRadiusPolicy", static_cast<float>(policy));
 }
 

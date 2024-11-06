@@ -152,7 +152,7 @@ public:
 
       /**
        * @brief The radius for the rounded corners of the scene view.
-       * @details Name "cornerRadius", type Prooperty::VECTOR4, The radius for the rounded corners of the scene view.
+       * @details Name "cornerRadius", type Property::VECTOR4.
        * @note By default, it is Vector::ZERO.
        * @note Corner radius is only available when framebuffer is used.
        * @note Each radius will clamp internally to the half of smaller of the SceneView width and height.
@@ -197,6 +197,23 @@ public:
        * @note This value will clamp internally to [-1.0f to 1.0f].
        */
       BORDERLINE_OFFSET,
+
+      /**
+       * @brief The squareness for the rounded corners of the scene view.
+       * @details Name "cornerSquareness", type Property::VECTOR4.
+       * @note By default, it is Vector::ZERO.
+       * @note Corner radius is only available when framebuffer is used.
+       * @note Each squareness will clamp internally as [0.0 1.0].
+       * @note If squareness is not zero, the width of borderline might not equal with it's real value.
+       * @note Squareness value are used in clockwise order from top-left-corner to bottom-left-corner.
+       *       When squareness is Vector4(x, y, z, w)
+       *       x    y
+       *        +--+
+       *        |  |
+       *        +--+
+       *       w    z
+       */
+      CORNER_SQUARENESS,
     };
   };
 

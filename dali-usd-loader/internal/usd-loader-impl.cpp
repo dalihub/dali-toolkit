@@ -324,7 +324,9 @@ bool UsdLoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::Loa
 
 void UsdLoaderImpl::Impl::TraverseMaterials(LoadResult& output)
 {
-  UsdMaterialProcessor materialProcessor(mUsdStage, &mMaterialMap);
+  auto& imageMetaData = output.mSceneMetadata.mImageMetadata;
+
+  UsdMaterialProcessor materialProcessor(mUsdStage, &mMaterialMap, imageMetaData);
   materialProcessor.TraverseMaterials(output);
 }
 

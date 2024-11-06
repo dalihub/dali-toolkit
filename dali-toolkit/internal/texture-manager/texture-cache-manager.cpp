@@ -615,7 +615,8 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
         {
           // 1. If preMultiplyOnLoad is MULTIPLY_ON_LOAD, then textureInfo.preMultiplyOnLoad should be true. The premultiplication result can be different.
           // 2. If preMultiplyOnLoad is LOAD_WITHOUT_MULTIPLY, then textureInfo.preMultiplied should be false.
-          if((preMultiplyOnLoad == MultiplyOnLoad::MULTIPLY_ON_LOAD && textureInfo.preMultiplyOnLoad) || (preMultiplyOnLoad == MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY && !textureInfo.preMultiplied))
+          if((preMultiplyOnLoad == MultiplyOnLoad::MULTIPLY_ON_LOAD && textureInfo.preMultiplyOnLoad) ||
+             (preMultiplyOnLoad == MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY && !textureInfo.preMultiplied))
           {
             // The found Texture is a match.
             return cacheIndex;

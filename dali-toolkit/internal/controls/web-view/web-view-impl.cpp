@@ -46,7 +46,9 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
@@ -135,6 +137,22 @@ Rect<int32_t> CalculateDisplayArea(Dali::Actor self, DisplayAreaCalculateOption 
 
 constexpr Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
+const Property::Map EMPTY_VISUAL_PROPERTIES{
+  {Dali::Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::COLOR},
+  {Dali::Toolkit::Visual::Property::MIX_COLOR, Color::TRANSPARENT},
+};
+
+const Property::Map DEFAULT_WEB_IMAGE_VISUAL_PROPERTIES{
+  {Dali::Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::IMAGE},
+  {Dali::Toolkit::ImageVisual::Property::URL, ""},
+  {Dali::Toolkit::ImageVisual::Property::PIXEL_AREA, FULL_TEXTURE_RECT},
+  {Dali::Toolkit::ImageVisual::Property::WRAP_MODE_U, Dali::WrapMode::CLAMP_TO_EDGE},
+  {Dali::Toolkit::ImageVisual::Property::WRAP_MODE_V, Dali::WrapMode::CLAMP_TO_EDGE},
+  {Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS, Vector4::ZERO},
+  {Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS, Vector4::ZERO},
+  {Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, Dali::Toolkit::Visual::Transform::Policy::ABSOLUTE},
+};
+
 /**
  * @brief Helper function to calculate exact pixel area value by view and texture size.
  * It will be useful when view size is not integer value, or view size is not matched with texture size.
@@ -167,8 +185,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mVisualChangeRequired(false),
   mScreenshotCapturedCallback{nullptr},
   mFrameRenderedCallback{nullptr},
-  mCornerRadius(Vector4::ZERO),
-  mCornerRadiusPolicy(1.0f)
+  mVisualPropertyMap{EMPTY_VISUAL_PROPERTIES}
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -193,8 +210,7 @@ WebView::WebView(uint32_t argc, char** argv, int32_t type)
   mVisualChangeRequired(false),
   mScreenshotCapturedCallback{nullptr},
   mFrameRenderedCallback{nullptr},
-  mCornerRadius(Vector4::ZERO),
-  mCornerRadiusPolicy(1.0f)
+  mVisualPropertyMap{EMPTY_VISUAL_PROPERTIES}
 {
   mWebEngine = Dali::WebEngine::New(type);
 
@@ -297,10 +313,7 @@ void WebView::OnInitialize()
   mScaleUpdateNotification.NotifySignal().Connect(this, &WebView::OnDisplayAreaUpdated);
 
   // Create WebVisual for WebView
-  Property::Map propertyMap;
-  propertyMap.Insert(Dali::Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::COLOR);
-  propertyMap.Insert(Dali::Toolkit::Visual::Property::MIX_COLOR, Color::TRANSPARENT);
-  Toolkit::Visual::Base webVisual = Toolkit::VisualFactory::Get().CreateVisual(propertyMap);
+  Toolkit::Visual::Base webVisual = Toolkit::VisualFactory::Get().CreateVisual(mVisualPropertyMap);
   if(webVisual)
   {
     Dali::Toolkit::DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, webVisual);
@@ -962,15 +975,23 @@ void WebView::OnFrameRendered()
   Toolkit::Visual::Base webVisual = Dali::Toolkit::DevelControl::GetVisual(*this, Toolkit::WebView::Property::URL);
   Property::Map         webMap;
   webVisual.CreatePropertyMap(webMap);
+
+  Property::Map newWebMap = DEFAULT_WEB_IMAGE_VISUAL_PROPERTIES;
+
   Property::Value* cornerRadiusValue = webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
   if(cornerRadiusValue)
   {
-    mCornerRadius = cornerRadiusValue->Get<Vector4>();
+    newWebMap[Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS] = cornerRadiusValue->Get<Vector4>();
+  }
+  Property::Value* cornerSquarenessValue = webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS);
+  if(cornerSquarenessValue)
+  {
+    newWebMap[Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS] = cornerSquarenessValue->Get<Vector4>();
   }
   Property::Value* cornerRadiusValuePolicy = webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY);
   if(cornerRadiusValuePolicy)
   {
-    mCornerRadiusPolicy = cornerRadiusValuePolicy->Get<int>();
+    newWebMap[Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = cornerRadiusValuePolicy->Get<int>();
   }
 
   // Reset flag
@@ -983,14 +1004,12 @@ void WebView::OnFrameRendered()
 
   Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImageSourcePtr);
 
-  mVisual = Toolkit::VisualFactory::Get().CreateVisual(
-    {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
-     {Toolkit::ImageVisual::Property::URL, nativeImageUrl.GetUrl()},
-     {Toolkit::ImageVisual::Property::PIXEL_AREA, FULL_TEXTURE_RECT},
-     {Toolkit::ImageVisual::Property::WRAP_MODE_U, Dali::WrapMode::CLAMP_TO_EDGE},
-     {Toolkit::ImageVisual::Property::WRAP_MODE_V, Dali::WrapMode::CLAMP_TO_EDGE},
-     {Toolkit::DevelVisual::Property::CORNER_RADIUS, mCornerRadius},
-     {Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, mCornerRadiusPolicy}});
+  newWebMap[Toolkit::ImageVisual::Property::URL] = nativeImageUrl.GetUrl();
+
+  // Store new visual property map now.
+  mVisualPropertyMap = std::move(newWebMap);
+
+  mVisual = Toolkit::VisualFactory::Get().CreateVisual(mVisualPropertyMap);
 
   if(mVisual)
   {
@@ -1042,6 +1061,8 @@ void WebView::SetDisplayArea(const Dali::Rect<int32_t>& displayArea)
     if(mVisual)
     {
       auto pixelArea = CalculatePixelArea(mWebViewSize, mLastRenderedNativeImageWidth, mLastRenderedNativeImageHeight);
+
+      mVisualPropertyMap[Toolkit::ImageVisual::Property::PIXEL_AREA] = pixelArea;
       Toolkit::GetImplementation(mVisual).DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, {{Toolkit::ImageVisual::Property::PIXEL_AREA, pixelArea}});
     }
 

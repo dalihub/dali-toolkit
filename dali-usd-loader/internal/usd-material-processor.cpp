@@ -51,9 +51,10 @@ std::unordered_map<std::string, MaterialDefinition::Flags> SHADER_INPUT_NAME_TO_
     {"specularColor", MaterialDefinition::Flags::SPECULAR_COLOR}};
 } // namespace
 
-UsdMaterialProcessor::UsdMaterialProcessor(const UsdStageRefPtr& stage, MaterialMap* materialMap)
+UsdMaterialProcessor::UsdMaterialProcessor(const UsdStageRefPtr& stage, MaterialMap* materialMap, const ImageMetadataMap& imageMetaDataMap)
 : mUsdStage(stage),
-  mMaterialMap(materialMap)
+  mMaterialMap(materialMap),
+  mImageMetaDataMap(imageMetaDataMap)
 {
   // Initialize the map of shader input handlers
   mShaderInputHandlers =
@@ -275,7 +276,7 @@ void UsdMaterialProcessor::ProcessDiffuseColor(const UsdShadeInput& input, Mater
     {
       // Convert the texture and associate it with the material
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "diffuseColorTexture: ");
-      materialDefinition.mNeedAlbedoTexture = mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, MaterialDefinition::ALBEDO);
+      materialDefinition.mNeedAlbedoTexture = mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, mImageMetaDataMap, MaterialDefinition::ALBEDO);
       if(materialDefinition.mNeedAlbedoTexture)
       {
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TraverseMaterials: MaterialDefinition::ALBEDO, ");
@@ -310,7 +311,7 @@ void UsdMaterialProcessor::ProcessMetallic(const UsdShadeInput& input, MaterialD
     {
       // Convert the texture and associate it with the material
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "metallicTexture: ");
-      materialDefinition.mNeedMetallicTexture = mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, MaterialDefinition::METALLIC);
+      materialDefinition.mNeedMetallicTexture = mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, mImageMetaDataMap, MaterialDefinition::METALLIC);
       if(materialDefinition.mNeedMetallicTexture)
       {
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TraverseMaterials: MaterialDefinition::METALLIC, ");
@@ -339,7 +340,7 @@ void UsdMaterialProcessor::ProcessRoughness(const UsdShadeInput& input, Material
     {
       // Convert the texture and associate it with the material
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "roughnessTexture: ");
-      materialDefinition.mNeedRoughnessTexture = mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, MaterialDefinition::ROUGHNESS);
+      materialDefinition.mNeedRoughnessTexture = mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, mImageMetaDataMap, MaterialDefinition::ROUGHNESS);
       if(materialDefinition.mNeedRoughnessTexture)
       {
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TraverseMaterials: MaterialDefinition::MaterialDefinition::ROUGHNESS, ");
@@ -368,7 +369,7 @@ void UsdMaterialProcessor::ProcessNormal(const UsdShadeInput& input, MaterialDef
     {
       // Convert the texture and associate it with the material
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "normalTexture: ");
-      materialDefinition.mNeedNormalTexture = mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, MaterialDefinition::NORMAL);
+      materialDefinition.mNeedNormalTexture = mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, mImageMetaDataMap, MaterialDefinition::NORMAL);
       if(materialDefinition.mNeedNormalTexture)
       {
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TraverseMaterials: MaterialDefinition::NORMAL, ");
@@ -394,7 +395,7 @@ void UsdMaterialProcessor::ProcessOcclusion(const UsdShadeInput& input, Material
     {
       // Convert the texture and associate it with the material
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "occlusionTexture: ");
-      if(mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, MaterialDefinition::OCCLUSION))
+      if(mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, mImageMetaDataMap, MaterialDefinition::OCCLUSION))
       {
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TraverseMaterials: MaterialDefinition::OCCLUSION, ");
       }
@@ -419,7 +420,7 @@ void UsdMaterialProcessor::ProcessEmissiveColor(const UsdShadeInput& input, Mate
     {
       // Convert the texture and associate it with the material
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "emissiveColorTexture: ");
-      if(mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, MaterialDefinition::EMISSIVE))
+      if(mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, mImageMetaDataMap, MaterialDefinition::EMISSIVE))
       {
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TraverseMaterials: MaterialDefinition::EMISSIVE, ");
         materialDefinition.mEmissiveFactor = Vector3::ONE;
@@ -458,7 +459,7 @@ void UsdMaterialProcessor::ProcessSpecularColor(const UsdShadeInput& input, Mate
     {
       // Convert the texture and associate it with the material
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "specularColorTexture: ");
-      if(mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, MaterialDefinition::SPECULAR_COLOR))
+      if(mUsdTextureConverter.ConvertTexture(material, uvTexture, materialDefinition, mImageMetaDataMap, MaterialDefinition::SPECULAR_COLOR))
       {
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TraverseMaterials: MaterialDefinition::SPECULAR_COLOR, ");
       }

@@ -148,7 +148,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
   shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
 
   shader.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT +
-                                 (featureBuilder.IsEnabledAlphaMaskingOnRendering() ? 1 : 0));
+                                 ((featureBuilder.IsEnabledAlphaMaskingOnRendering() ? 1 : 0)));
 
   shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
 
@@ -261,7 +261,12 @@ void ImageVisualShaderFactory::CreatePrecompileShader(ImageVisualShaderFeature::
       }
       case PrecompileShaderOption::Flag::ROUNDED_CORNER:
       {
-        builder.EnableRoundedCorner(true);
+        builder.EnableRoundedCorner(true, false);
+        break;
+      }
+      case PrecompileShaderOption::Flag::SQUIRCLE_CORNER:
+      {
+        builder.EnableRoundedCorner(true, true);
         break;
       }
       case PrecompileShaderOption::Flag::BORDERLINE:
