@@ -843,7 +843,7 @@ void TextEditor::OnKeyInputFocusGained()
 
     mInputMethodContext.StatusChangedSignal().Connect(this, &TextEditor::KeyboardStatusChanged);
 
-    mInputMethodContext.EventReceivedSignal().Connect(this, &TextEditor::OnInputMethodContextEvent);
+    mInputMethodContext.KeyboardEventReceivedSignal().Connect(this, &TextEditor::OnInputMethodContextEvent);
 
     // Notify that the text editing start.
     mInputMethodContext.Activate();
@@ -873,7 +873,7 @@ void TextEditor::OnKeyInputFocusLost()
     // Notify that the text editing finish.
     mInputMethodContext.Deactivate();
 
-    mInputMethodContext.EventReceivedSignal().Disconnect(this, &TextEditor::OnInputMethodContextEvent);
+    mInputMethodContext.KeyboardEventReceivedSignal().Disconnect(this, &TextEditor::OnInputMethodContextEvent);
   }
 
   mController->KeyboardFocusLostEvent();

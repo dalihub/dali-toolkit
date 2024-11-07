@@ -374,11 +374,28 @@ public:
   ActivatedSignalType& ActivatedSignal();
 
   /**
-   * @brief This is emitted when the input method context receives an event.
+   * @brief This is emitted when the InputMethodContext receives an event from the InputMethodContext.
+   * @note This signal is the same as KeyboardEventReceivedSignal().
+   * This signal is bound to dali-csharp-binder and can be used in external apps.
    *
    * @return The Event signal containing the event data.
    */
   KeyboardEventSignalType& EventReceivedSignal();
+
+  /**
+   * @brief This is emitted when the InputMethodContext receives an event from the InputMethodContext.
+   * @note This signal is the same as EventReceivedSignal().
+   * This signal is only used by dali.
+   *
+   * The EventReceivedSignal combines different kinds of events triggered by the IMF into a single signal, which it then emits.
+   * These events often happen during text entry through S/W keyboard and Applications depend on this signal to perform various actions.
+   * There exists a situation where further emissions take place inside the emitted signal.
+   * Unfortunately, these events are already exposed publicly and cannot be segregated separately.
+   * As a workaround, we keep the original signal intact but separate signals meant exclusively for usage within dali.
+   *
+   * @return The Event signal containing the event data.
+   */
+  KeyboardEventSignalType& KeyboardEventReceivedSignal();
 
   /**
    * @brief Connect to this signal to be notified when the virtual keyboard is shown or hidden.
