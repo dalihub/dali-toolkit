@@ -1686,7 +1686,7 @@ int utcDaliTextFieldTextChangedWithInputMethodContext(void)
   // input text
   gTextChangedCallBackCalled = false;
   imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "ㅎ", 0, 1);
-  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
@@ -1694,7 +1694,7 @@ int utcDaliTextFieldTextChangedWithInputMethodContext(void)
 
   gTextChangedCallBackCalled = false;
   imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "호", 0, 1);
-  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
@@ -1702,7 +1702,7 @@ int utcDaliTextFieldTextChangedWithInputMethodContext(void)
 
   gTextChangedCallBackCalled = false;
   imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "혿", 0, 1);
-  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
@@ -1710,15 +1710,15 @@ int utcDaliTextFieldTextChangedWithInputMethodContext(void)
 
   gTextChangedCallBackCalled = false;
   imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "", 0, 1);
-  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
   DALI_TEST_CHECK(!gTextChangedCallBackCalled);
 
   imfEvent = InputMethodContext::EventData(InputMethodContext::COMMIT, "호", 0, 1);
-  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
   DALI_TEST_CHECK(!gTextChangedCallBackCalled);
 
   imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "두", 1, 2);
-  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
   DALI_TEST_CHECK(!gTextChangedCallBackCalled);
 
   application.SendNotification();
@@ -1757,7 +1757,7 @@ int utcDaliTextFieldSelectionWithInputMethodContext(void)
   // input text
   gSelectionChangedCallbackCalled = false;
   imfEvent                        = InputMethodContext::EventData(InputMethodContext::SELECTION_SET, 1, 4);
-  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
@@ -1796,7 +1796,7 @@ int utcDaliTextFieldPositionWithInputMethodContext(void)
   // input text
   gCursorPositionChangedCallbackCalled = false;
   imfEvent                             = InputMethodContext::EventData(InputMethodContext::SELECTION_SET, 2, 2);
-  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
@@ -1839,7 +1839,7 @@ int utcDaliTextFieldInputFilterWithInputMethodContext(void)
   // input text
   gInputFilteredAcceptedCallbackCalled = false;
   imfEvent                             = InputMethodContext::EventData(InputMethodContext::COMMIT, "Hello1234", 0, 9);
-  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gInputFilteredAcceptedCallbackCalled);
@@ -1848,7 +1848,7 @@ int utcDaliTextFieldInputFilterWithInputMethodContext(void)
   inputFilteredSignal                  = false;
   gInputFilteredRejectedCallbackCalled = false;
   imfEvent                             = InputMethodContext::EventData(InputMethodContext::COMMIT, "1234567", 0, 7);
-  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gInputFilteredRejectedCallbackCalled);

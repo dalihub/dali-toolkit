@@ -65,6 +65,7 @@ public:
 public:  // Signals
   ActivatedSignalType& ActivatedSignal() { return mActivatedSignal; }
   KeyboardEventSignalType& EventReceivedSignal() { return mEventSignal; }
+  KeyboardEventSignalType& KeyboardEventReceivedSignal() { return mKeyboardEventSignal; }
   StatusSignalType& StatusChangedSignal() { return mKeyboardStatusSignal; }
   VoidSignalType& ResizedSignal() { return mKeyboardResizeSignal; }
   VoidSignalType& LanguageChangedSignal() { return mKeyboardLanguageChangedSignal; }
@@ -91,6 +92,7 @@ private:
 
   ActivatedSignalType      mActivatedSignal;
   KeyboardEventSignalType  mEventSignal;
+  KeyboardEventSignalType  mKeyboardEventSignal;
   StatusSignalType         mKeyboardStatusSignal;
   VoidSignalType           mKeyboardResizeSignal;
   VoidSignalType           mKeyboardLanguageChangedSignal;
@@ -342,6 +344,11 @@ InputMethodContext::ActivatedSignalType& InputMethodContext::ActivatedSignal()
 InputMethodContext::KeyboardEventSignalType& InputMethodContext::EventReceivedSignal()
 {
   return Internal::Adaptor::InputMethodContext::GetImplementation(*this).EventReceivedSignal();
+}
+
+InputMethodContext::KeyboardEventSignalType& InputMethodContext::KeyboardEventReceivedSignal()
+{
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).KeyboardEventReceivedSignal();
 }
 
 InputMethodContext::StatusSignalType& InputMethodContext::StatusChangedSignal()
