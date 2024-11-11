@@ -775,3 +775,40 @@ int UtcDaliRenderEffectRenderTaskOrdering(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderEffectReInitialize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRenderEffectReInitialize");
+
+  Integration::Scene scene = application.GetScene();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  scene.Add(control);
+
+  // Add render effect during scene on.
+  control.SetRenderEffect(BackgroundBlurEffect::New());
+
+  application.SendNotification();
+
+  RenderTaskList taskList = scene.GetRenderTaskList();
+
+  // Render effect activated.
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
+  DALI_TEST_EQUALS(INT32_MIN + 2, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
+
+  control.SetRenderEffect(BackgroundBlurEffect::New());
+
+  application.SendNotification();
+
+  // Render effect activated.
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
+  DALI_TEST_EQUALS(INT32_MIN + 2, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
+
+  END_TEST;
+}

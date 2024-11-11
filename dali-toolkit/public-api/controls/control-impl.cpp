@@ -180,10 +180,10 @@ void Control::SetRenderEffect(Toolkit::RenderEffect effect)
       Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(mImpl->mRenderEffect.GetObjectPtr());
       DALI_ASSERT_ALWAYS(object && "Not a valid RenderEffect set.");
 
+      SetOffScreenRenderableType(object->GetOffScreenRenderableType());
+
       Dali::Toolkit::Control ownerControl(GetOwner());
       object->SetOwnerControl(ownerControl);
-
-      SetOffScreenRenderableType(object->GetOffScreenRenderableType());
     }
   }
 }
