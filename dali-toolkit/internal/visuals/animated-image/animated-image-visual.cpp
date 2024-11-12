@@ -472,7 +472,7 @@ void AnimatedImageVisual::EnablePreMultipliedAlpha(bool preMultiplied)
     {
       // Register PREMULTIPLIED_ALPHA only if it become false.
       // Default PREMULTIPLIED_ALPHA value is 1.0f, at image-visual-shader-factory.cpp
-      mPreMultipliedAlphaIndex = mImpl->mRenderer.RegisterProperty(Toolkit::Visual::Property::PREMULTIPLIED_ALPHA, PREMULTIPLIED_ALPHA, preMultiplied ? 1.0f : 0.0f);
+      mPreMultipliedAlphaIndex = mImpl->mRenderer.RegisterProperty(Toolkit::Visual::Property::PREMULTIPLIED_ALPHA, PREMULTIPLIED_ALPHA, 0.0f);
     }
   }
 
