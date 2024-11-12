@@ -1,12 +1,19 @@
+//@name animated-gradient-visual-shader.frag
+
+//@version 100
+
 precision mediump float;
 
-uniform mediump vec4 start_color;
-uniform mediump vec4 end_color;
-uniform mediump float gradient_offset;
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM mediump vec4 start_color;
+  UNIFORM mediump vec4 end_color;
+  UNIFORM mediump float gradient_offset;
+};
 
-varying mediump vec2 vTexCoord;
-varying mediump vec2 vStart;
-varying mediump vec2 vEnd;
+INPUT mediump vec2 vTexCoord;
+INPUT mediump vec2 vStart;
+INPUT mediump vec2 vEnd;
 
 float get_position(vec2 x, vec2 s, vec2 e)
 {

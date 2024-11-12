@@ -1,12 +1,24 @@
-precision highp float;
-varying highp vec2 vTexCoord;
-varying highp vec2 vOptRectSize;
-varying highp vec4 vCornerRadius;
+//@name render-effect.frag
 
-uniform lowp vec4 uColor;
-uniform highp vec3 uSize;
-uniform highp vec4 uCornerSquareness;
-uniform sampler2D sTexture;
+//@version 100
+
+precision highp float;
+INPUT highp vec2 vTexCoord;
+INPUT highp vec2 vOptRectSize;
+INPUT highp vec4 vCornerRadius;
+
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uColor;
+  UNIFORM highp vec4 uCornerSquareness;
+};
+
+UNIFORM_BLOCK SharedBlock
+{
+  UNIFORM highp vec3 uSize;
+};
+
+UNIFORM sampler2D sTexture;
 
 highp float nrand(const in vec2 uv)
 {
@@ -55,7 +67,7 @@ float roundedBoxSDF(vec2 pixelPositionFromCenter, vec2 rectangleEdgePositionFrom
 
 void main()
 {
-  gl_FragColor = texture2D(sTexture, vTexCoord) * uColor;
+  gl_FragColor = TEXTURE(sTexture, vTexCoord) * uColor;
   gl_FragColor.rgb = applyDithering(gl_FragColor.rgb);
 
   highp vec2 location = (vTexCoord.xy - vec2(0.5)) * uSize.xy;

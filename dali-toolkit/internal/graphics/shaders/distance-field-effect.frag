@@ -1,24 +1,31 @@
-varying mediump vec2 vTexCoord;
+//@name distance-field-effect.frag
 
-uniform mediump float uGlowBoundary;
-uniform mediump vec2  uOutlineParams;
-uniform lowp    vec4  uOutlineColor;
-uniform lowp    vec4  uShadowColor;
-uniform mediump vec2  uShadowOffset;
-uniform lowp    vec4  uGlowColor;
-uniform lowp    float uDoOutline;
-uniform lowp    float uDoShadow;
-uniform lowp    float uDoGlow;
+//@version 100
 
-uniform sampler2D sTexture;
-uniform lowp vec4 uColor;
+INPUT mediump vec2 vTexCoord;
+
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM mediump float uGlowBoundary;
+  UNIFORM mediump vec2  uOutlineParams;
+  UNIFORM lowp    vec4  uOutlineColor;
+  UNIFORM lowp    vec4  uShadowColor;
+  UNIFORM mediump vec2  uShadowOffset;
+  UNIFORM lowp    vec4  uGlowColor;
+  UNIFORM lowp    float uDoOutline;
+  UNIFORM lowp    float uDoShadow;
+  UNIFORM lowp    float uDoGlow;
+  UNIFORM lowp    vec4 uColor;
+};
+
+UNIFORM sampler2D sTexture;
 
 void main()
 {
   // sample distance field
   mediump float smoothing = 0.5;
 
-  mediump float distance = texture2D(sTexture, vTexCoord).a;
+  mediump float distance = TEXTURE(sTexture, vTexCoord).a;
   mediump float smoothWidth = fwidth(distance);
   mediump float alphaFactor = smoothstep(smoothing - smoothWidth, smoothing + smoothWidth, distance);
   lowp    vec4  color;
@@ -48,7 +55,7 @@ void main()
 
   else // (uDoShadow > 0.0)
   {
-    mediump float shadowDistance = texture2D(sTexture, vTexCoord - uShadowOffset).a;
+    mediump float shadowDistance = TEXTURE(sTexture, vTexCoord - uShadowOffset).a;
     mediump float inText = alphaFactor;
     mediump float inShadow = smoothstep(smoothing - smoothWidth, smoothing + smoothWidth, shadowDistance);
 

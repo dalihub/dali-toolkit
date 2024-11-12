@@ -1,24 +1,33 @@
+//@name motion-stretch-effect.vert
+
+//@version 100
+
 precision mediump float;
 
-attribute vec2 aPosition;
+INPUT vec2 aPosition;//Stuff, things
 
-uniform mat4 uMvpMatrix;
-uniform mat4 uModelView;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjection;
-uniform vec3 uSize;
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM mat4 uMvpMatrix;
+  UNIFORM mat4 uModelView;
+  UNIFORM mat4 uViewMatrix;
+  UNIFORM mat4 uProjection;
+  UNIFORM vec3 uSize;
 
-uniform mat4  uModelLastFrame;
+  UNIFORM mat4  uModelLastFrame;
+
+  UNIFORM float uGeometryStretchFactor;
+  UNIFORM float uSpeedScalingFactor;
+};
+
 float timeDelta = 0.0167;
 
-uniform float uGeometryStretchFactor;
-uniform float uSpeedScalingFactor;
 
 // outputs
-varying vec2 vModelSpaceCenterToPos;
-varying vec2 vScreenSpaceVelocityVector;
-varying float vSpeed;
-varying vec2 vTexCoord;
+OUTPUT vec2 vModelSpaceCenterToPos;
+OUTPUT vec2 vScreenSpaceVelocityVector;
+OUTPUT float vSpeed;
+OUTPUT vec2 vTexCoord;
 
 void main()
 {

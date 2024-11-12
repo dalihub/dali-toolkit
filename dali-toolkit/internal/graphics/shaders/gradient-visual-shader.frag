@@ -1,24 +1,35 @@
+//@name gradient-visual-shader.frag
+
+//@version 100
+
 INPUT mediump vec2 vTexCoord;
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 INPUT highp vec2 vPosition;
-FLAT INPUT highp vec2 vRectSize;
-FLAT INPUT highp vec2 vOptRectSize;
-FLAT INPUT highp float vAliasMargin;
+INPUT flat highp vec2 vRectSize;
+INPUT flat highp vec2 vOptRectSize;
+INPUT flat highp float vAliasMargin;
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-FLAT INPUT highp vec4 vCornerRadius;
+INPUT flat highp vec4 vCornerRadius;
 #endif
 #endif
 
-// scale factor to fit start and end position of gradient.
-uniform mediump float uTextureCoordinateScaleFactor;
+UNIFORM sampler2D sTexture; // sampler1D?
 
-uniform sampler2D sTexture; // sampler1D?
-uniform lowp vec4 uColor;
+UNIFORM_BLOCK FragBlock
+{
+  // scale factor to fit start and end position of gradient.
+  UNIFORM mediump float uTextureCoordinateScaleFactor;
+  UNIFORM lowp vec4 uColor;
+};
+
 #ifdef IS_REQUIRED_BORDERLINE
-uniform highp float borderlineWidth;
-uniform highp float borderlineOffset;
-uniform lowp vec4 borderlineColor;
-uniform lowp vec4 uActorColor;
+UNIFORM_BLOCK SharedBlock
+{
+  UNIFORM highp float borderlineWidth;
+  UNIFORM highp float borderlineOffset;
+  UNIFORM lowp vec4   borderlineColor;
+  UNIFORM lowp vec4   uActorColor;
+};
 #endif
 
 #ifdef IS_REQUIRED_SQUIRCLE_CORNER
@@ -248,7 +259,7 @@ void main()
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    OUT_COLOR = textureColor;
+    gl_FragColor = textureColor;
   }
   else
   {
@@ -261,7 +272,7 @@ void main()
     if(gFragmentPosition.x + gFragmentPosition.y < -(gRadius + vAliasMargin) * 2.0)
     {
       // Do nothing.
-      OUT_COLOR = textureColor;
+      gl_FragColor = textureColor;
     }
     else
 #endif
@@ -275,11 +286,11 @@ void main()
 #ifdef IS_REQUIRED_BORDERLINE
       textureColor = convertBorderlineColor(textureColor);
 #endif
-      OUT_COLOR = textureColor;
+      gl_FragColor = textureColor;
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
       mediump float opacity = calculateCornerOpacity();
-      OUT_COLOR *= opacity;
+      gl_FragColor *= opacity;
 #endif
     }
 

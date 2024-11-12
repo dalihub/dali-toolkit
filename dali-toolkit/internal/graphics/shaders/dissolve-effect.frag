@@ -1,9 +1,15 @@
-varying float        vPercentage;
-varying mediump vec2 vTexCoord;
+//@name dissolve-effect.frag
 
-uniform sampler2D sTexture;
-uniform lowp vec4 uColor;
-uniform vec4 uTextureRect;
+//@version 100
+
+INPUT float        vPercentage;
+INPUT mediump vec2 vTexCoord;
+
+UNIFORM sampler2D sTexture;
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uColor;
+};
 
 float rand(vec2 co)
 {
@@ -16,6 +22,6 @@ void main()
   float  offsetS = rand(vTexCoord * vPercentage) - vTexCoord.s;
   float offsetT = rand(vec2(vTexCoord.t * vPercentage, vTexCoord.s * vPercentage)) - vTexCoord.t;
   vec2 lookupCoord = vTexCoord + vec2(offsetS, offsetT) * vPercentage;
-  gl_FragColor = texture2D(sTexture, lookupCoord) * uColor;
+  gl_FragColor = TEXTURE(sTexture, lookupCoord) * uColor;
   gl_FragColor.a *= 1.0 - vPercentage;
 }

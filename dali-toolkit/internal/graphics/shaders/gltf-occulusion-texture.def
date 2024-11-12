@@ -1,5 +1,8 @@
 #define TEXTURE_OCCLUSION
 
-uniform sampler2D uOcclusionSampler;
-uniform int uOcclusionTexCoordIndex;
-uniform float uOcclusionStrength;
+UNIFORM sampler2D uOcclusionSampler;
+UNIFORM_BLOCK     FragBlockOcclusion
+{
+  UNIFORM int   uOcclusionTexCoordIndex;
+  UNIFORM float uOcclusionStrength;
+};

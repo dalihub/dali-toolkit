@@ -1,6 +1,13 @@
+//@name model3d-view-simple-shader.frag
+
+//@version 100
+
 precision mediump float;
-varying mediump vec3 vIllumination;
-uniform lowp vec4 uColor;
+INPUT mediump vec3 vIllumination;
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uColor;
+};
 
 void main()
 {

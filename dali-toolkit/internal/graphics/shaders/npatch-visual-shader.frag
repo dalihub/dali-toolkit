@@ -1,8 +1,16 @@
-varying mediump vec2 vTexCoord;
-uniform sampler2D sTexture;
-uniform lowp vec4 uColor;
+//@name npatch-visual-shader.frag
+
+//@version 100
+
+INPUT mediump vec2 vTexCoord;
+UNIFORM sampler2D sTexture;
+
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uColor;
+};
 
 void main()
 {
-  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;
+  gl_FragColor = TEXTURE( sTexture, vTexCoord ) * uColor;
 }

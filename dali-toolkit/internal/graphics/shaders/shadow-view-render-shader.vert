@@ -1,11 +1,18 @@
-attribute mediump vec2 aPosition;
-uniform mediump mat4 uMvpMatrix;
-uniform mediump mat4 uModelMatrix;
-uniform vec3 uSize;
-varying vec2 vTexCoord;
+//@name shadow-view-render-shader.vert
 
-uniform mediump mat4 uLightCameraProjectionMatrix;
-uniform mediump mat4 uLightCameraViewMatrix;
+//@version 100
+
+INPUT mediump vec2 aPosition;
+OUTPUT vec2 vTexCoord;
+
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM mediump mat4 uMvpMatrix;
+  UNIFORM mediump mat4 uModelMatrix;
+  UNIFORM vec3 uSize;
+  UNIFORM mediump mat4 uLightCameraProjectionMatrix;
+  UNIFORM mediump mat4 uLightCameraViewMatrix;
+};
 
 void main()
 {

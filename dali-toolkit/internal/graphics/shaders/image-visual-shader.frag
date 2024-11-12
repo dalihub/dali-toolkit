@@ -1,11 +1,13 @@
+//@version 100
+
 INPUT mediump vec2 vTexCoord;
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 INPUT highp vec2 vPosition;
-FLAT INPUT highp vec2 vRectSize;
-FLAT INPUT highp vec2 vOptRectSize;
-FLAT INPUT highp float vAliasMargin;
+INPUT flat highp vec2 vRectSize;
+INPUT flat highp vec2 vOptRectSize;
+INPUT flat highp float vAliasMargin;
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-FLAT INPUT highp vec4 vCornerRadius;
+INPUT flat highp vec4 vCornerRadius;
 #endif
 #endif
 #ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
@@ -13,41 +15,54 @@ FLAT INPUT highp vec4 vCornerRadius;
 DEBUG_EXTRA_VARYINGS
 #endif
 
-uniform sampler2D sTexture;
+UNIFORM sampler2D sTexture;
 #if defined(IS_REQUIRED_YUV_TO_RGB) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
-uniform sampler2D sTextureU;
-uniform sampler2D sTextureV;
+UNIFORM sampler2D sTextureU;
+UNIFORM sampler2D sTextureV;
 #endif
 
 #ifdef IS_REQUIRED_ALPHA_MASKING
-uniform sampler2D sMaskTexture;
-uniform lowp float uYFlipMaskTexture;
+UNIFORM sampler2D sMaskTexture;
 INPUT mediump vec2 vMaskTexCoord;
 #endif
 
-#ifdef ATLAS_DEFAULT_WARP
-uniform mediump vec4 uAtlasRect;
-#elif defined(ATLAS_CUSTOM_WARP)
-// WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
-uniform lowp vec2 wrapMode;
+UNIFORM_BLOCK FragBlock
+{
+#ifdef IS_REQUIRED_ALPHA_MASKING
+  UNIFORM lowp float uYFlipMaskTexture;
 #endif
 
+#ifdef ATLAS_DEFAULT_WARP
+  UNIFORM mediump vec4 uAtlasRect;
+
+#elif defined(ATLAS_CUSTOM_WARP)
+  // WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
+  UNIFORM lowp vec2 wrapMode;
+#endif
 
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER)
-uniform highp vec3 uScale;
+  UNIFORM highp vec3 uScale;
 #endif
 
-uniform lowp vec4 uColor;
-uniform lowp float premultipliedAlpha;
+  UNIFORM lowp vec4  uColor;
+  UNIFORM lowp float premultipliedAlpha;
+
 #ifdef IS_REQUIRED_BORDERLINE
-uniform highp float borderlineWidth;
-uniform highp float borderlineOffset;
-uniform lowp vec4 borderlineColor;
-uniform lowp vec4 uActorColor;
+  UNIFORM lowp vec4   borderlineColor;
+  UNIFORM lowp vec4   uActorColor;
 #endif
 
 #ifdef IS_REQUIRED_SQUIRCLE_CORNER
-uniform highp vec4 cornerSquareness;
+  UNIFORM highp vec4 cornerSquareness;
+#endif
+};
+
+#ifdef IS_REQUIRED_BORDERLINE
+UNIFORM_BLOCK Borderline
+{
+  UNIFORM highp float borderlineWidth;
+  UNIFORM highp float borderlineOffset;
+};
 #endif
 
 #ifdef ATLAS_CUSTOM_WARP
@@ -282,9 +297,9 @@ lowp vec4 ConvertYuvToRgba(mediump vec2 texCoord)
   }
 #endif
 
-  lowp float y = TEXTURE(sTexture, texCoord).r;
-  lowp float u = TEXTURE(sTextureU, texCoord).r - 0.5;
-  lowp float v = TEXTURE(sTextureV, texCoord).r - 0.5;
+  lowp float y = texture(sTexture, texCoord).r;
+  lowp float u = texture(sTextureU, texCoord).r - 0.5;
+  lowp float v = texture(sTextureV, texCoord).r - 0.5;
   lowp vec4 rgba;
   rgba.r = y + (1.403 * v);
   rgba.g = y - (0.344 * u) - (0.714 * v);
@@ -448,7 +463,7 @@ void main()
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    OUT_COLOR = textureColor;
+    gl_FragColor = textureColor;
   }
   else
 #endif
@@ -462,7 +477,7 @@ void main()
     if(gFragmentPosition.x + gFragmentPosition.y < -(gRadius + vAliasMargin) * 2.0)
     {
       // Do nothing.
-      OUT_COLOR = textureColor;
+      gl_FragColor = textureColor;
     }
     else
 #endif
@@ -476,12 +491,12 @@ void main()
 #ifdef IS_REQUIRED_BORDERLINE
       textureColor = convertBorderlineColor(textureColor);
 #endif
-      OUT_COLOR = textureColor;
+      gl_FragColor = textureColor;
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
       mediump float opacity = calculateCornerOpacity();
-      OUT_COLOR.a *= opacity;
-      OUT_COLOR.rgb *= mix(1.0, opacity, premultipliedAlpha);
+      gl_FragColor.a *= opacity;
+      gl_FragColor.rgb *= mix(1.0, opacity, premultipliedAlpha);
 #endif
     }
 
@@ -490,6 +505,6 @@ void main()
 #endif
 
 #ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
-  OUT_COLOR.rgb = ApplyDebugMixColor(OUT_COLOR);
+  gl_FragColor.rgb = ApplyDebugMixColor(gl_FragColor);
 #endif
 }

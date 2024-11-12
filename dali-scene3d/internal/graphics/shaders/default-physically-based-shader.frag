@@ -1,3 +1,4 @@
+//@version 100
 
 // Original Code
 // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/glTF-WebGL-PBR/shaders/pbr-frag.glsl
@@ -30,97 +31,127 @@ precision mediump float;
 #define ROUGHNESS a
 #endif //GLTF_CHANNELS
 
-uniform lowp vec4 uColor; // Color from SceneGraph
-uniform lowp vec4 uColorFactor; // Color from material
-uniform lowp float uMetallicFactor;
-uniform lowp float uRoughnessFactor;
-uniform lowp float uDielectricSpecular;
-
 #ifdef THREE_TEX
 #ifdef BASECOLOR_TEX
-uniform sampler2D sAlbedoAlpha;
-uniform float uBaseColorTextureTransformAvailable;
-uniform mat3 uBaseColorTextureTransform;
-#endif // BASECOLOR_TEX
+UNIFORM sampler2D sAlbedoAlpha;
+#endif
 #ifdef METALLIC_ROUGHNESS_TEX
-uniform sampler2D sMetalRoughness;
-uniform float uMetalRoughnessTextureTransformAvailable;
-uniform mat3 uMetalRoughnessTextureTransform;
-#endif // METALLIC_ROUGHNESS_TEX
+UNIFORM sampler2D sMetalRoughness;
+#endif
 #ifdef NORMAL_TEX
-uniform sampler2D sNormal;
-uniform float uNormalTextureTransformAvailable;
-uniform mat3 uNormalTextureTransform;
-uniform float uNormalScale;
-#endif // NORMAL_TEX
-#else // THREE_TEX
-uniform sampler2D sAlbedoMetal;
-uniform float uBaseColorTextureTransformAvailable;
-uniform mat3 uBaseColorTextureTransform;
-uniform sampler2D sNormalRoughness;
-uniform float uNormalRoughnessTextureTransformAvailable;
-uniform mat3 uNormalRoughnessTextureTransform;
+UNIFORM sampler2D sNormal;
+#endif
+#else
+UNIFORM sampler2D sAlbedoMetal;
+UNIFORM sampler2D sNormalRoughness;
 #endif
 
-
-
 #ifdef OCCLUSION
-uniform sampler2D sOcclusion;
-uniform float uOcclusionTextureTransformAvailable;
-uniform mat3 uOcclusionTextureTransform;
-uniform float uOcclusionStrength;
+UNIFORM sampler2D sOcclusion;
 #endif
 
 #ifdef EMISSIVE_TEXTURE
-uniform sampler2D sEmissive;
-uniform float uEmissiveTextureTransformAvailable;
-uniform mat3 uEmissiveTextureTransform;
+UNIFORM sampler2D sEmissive;
 #endif
-uniform vec3 uEmissiveFactor;
 
-uniform float uSpecularFactor;
-uniform vec3  uSpecularColorFactor;
 #ifdef MATERIAL_SPECULAR_TEXTURE
-uniform sampler2D sSpecular;
+UNIFORM sampler2D sSpecular;
 #endif
 #ifdef MATERIAL_SPECULAR_COLOR_TEXTURE
-uniform sampler2D sSpecularColor;
+UNIFORM sampler2D sSpecularColor;
 #endif
+
+/// For shadowmap
+UNIFORM sampler2D sShadowMap;
+
+//// For IBL
+UNIFORM sampler2D sbrdfLUT;
+UNIFORM samplerCube sDiffuseEnvSampler;
+UNIFORM samplerCube sSpecularEnvSampler;
+
+UNIFORM_BLOCK FragBlock0
+{
+  UNIFORM lowp vec4 uColor;// Color from SceneGraph
+  UNIFORM lowp vec4 uColorFactor;// Color from material
+  UNIFORM lowp float uMetallicFactor;
+  UNIFORM lowp float uRoughnessFactor;
+  UNIFORM lowp float uDielectricSpecular;
+
+#ifdef THREE_TEX
+#ifdef BASECOLOR_TEX
+  UNIFORM float uBaseColorTextureTransformAvailable;
+  UNIFORM mat3 uBaseColorTextureTransform;
+#endif// BASECOLOR_TEX
+#ifdef METALLIC_ROUGHNESS_TEX
+  UNIFORM float uMetalRoughnessTextureTransformAvailable;
+  UNIFORM mat3 uMetalRoughnessTextureTransform;
+#endif// METALLIC_ROUGHNESS_TEX
+#ifdef NORMAL_TEX
+  UNIFORM float uNormalTextureTransformAvailable;
+  UNIFORM mat3 uNormalTextureTransform;
+  UNIFORM float uNormalScale;
+#endif// NORMAL_TEX
+#else// THREE_TEX
+  UNIFORM float uBaseColorTextureTransformAvailable;
+  UNIFORM mat3 uBaseColorTextureTransform;
+  UNIFORM float uNormalRoughnessTextureTransformAvailable;
+  UNIFORM mat3 uNormalRoughnessTextureTransform;
+#endif
+
+#ifdef OCCLUSION
+  UNIFORM float uOcclusionTextureTransformAvailable;
+  UNIFORM mat3 uOcclusionTextureTransform;
+  UNIFORM float uOcclusionStrength;
+#endif
+
+#ifdef EMISSIVE_TEXTURE
+  UNIFORM float uEmissiveTextureTransformAvailable;
+  UNIFORM mat3 uEmissiveTextureTransform;
+#endif
+  UNIFORM vec3 uEmissiveFactor;
+  UNIFORM float uSpecularFactor;
+  UNIFORM vec3  uSpecularColorFactor;
 
 // For Light (Currently Directional Only)
 #define MAX_LIGHTS 5
-uniform mediump int uLightCount;
-uniform mediump vec3 uLightDirection[MAX_LIGHTS];
-uniform mediump vec3 uLightColor[MAX_LIGHTS];
+  UNIFORM mediump int uLightCount;
+  UNIFORM mediump vec3 uLightDirection[MAX_LIGHTS];
+  UNIFORM mediump vec3 uLightColor[MAX_LIGHTS];
 
 // For Shadow Map
-uniform lowp int uIsShadowEnabled;
-uniform sampler2D sShadowMap;
-uniform lowp int uIsShadowReceiving;
+  UNIFORM lowp int uIsShadowReceiving;
 #ifdef SL_VERSION_LOW
-uniform int uShadowMapWidth;
-uniform int uShadowMapHeight;
+  UNIFORM int uShadowMapWidth;
+  UNIFORM int uShadowMapHeight;
 #endif
-INPUT highp vec3 positionFromLightView;
 
 //// For IBL
-uniform sampler2D sbrdfLUT;
-uniform samplerCube sDiffuseEnvSampler;
-uniform samplerCube sSpecularEnvSampler;
-uniform float uIblIntensity;
-uniform mediump vec3 uYDirection;
-uniform float uMaxLOD;
+  UNIFORM float uIblIntensity;
+  UNIFORM float uMaxLOD;
 
 // For Alpha Mode.
-uniform lowp float uOpaque;
-uniform lowp float uMask;
-uniform lowp float uAlphaThreshold;
+  UNIFORM lowp float uOpaque;
+  UNIFORM lowp float uMask;
+  UNIFORM lowp float uAlphaThreshold;
+};
+
+UNIFORM_BLOCK YDirection
+{
+  UNIFORM mediump vec3 uYDirection;
+};
+
+UNIFORM_BLOCK ShadowEnabled
+{
+  UNIFORM lowp int uIsShadowEnabled;
+};
+
 
 // TODO: Multiple texture coordinate will be supported.
 INPUT mediump vec2 vUV;
 INPUT lowp mat3 vTBN;
 INPUT lowp vec4 vColor;
 INPUT highp vec3 vPositionToCamera;
+INPUT highp vec3 positionFromLightView;
 
 const float c_MinRoughness = 0.04;
 const float M_PI = 3.141592653589793;
@@ -137,10 +168,10 @@ const float kSinPcfTheta = sin(kPcfTheta);
 const float kCosPcfTheta = cos(kPcfTheta);
 
 
-uniform mediump int uShadowLightIndex;
-uniform lowp int uEnableShadowSoftFiltering;
-uniform mediump float uShadowIntensity;
-uniform highp float uShadowBias;
+UNIFORM mediump int uShadowLightIndex;
+UNIFORM lowp int uEnableShadowSoftFiltering;
+UNIFORM mediump float uShadowIntensity;
+UNIFORM highp float uShadowBias;
 
 vec3 linear(vec3 color)
 {
@@ -357,5 +388,5 @@ void main()
 #endif // EMISSIVE_TEXTURE
   color += emissive;
 
-  OUT_COLOR = vec4(pow(color, vec3(1.0 / 2.2)), baseColor.a) * uColor;
+  gl_FragColor = vec4(pow(color, vec3(1.0 / 2.2)), baseColor.a) * uColor;
 }
