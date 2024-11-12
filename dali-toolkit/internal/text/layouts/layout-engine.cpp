@@ -1760,7 +1760,8 @@ struct Engine::Impl
 
     if(updateCurrentBuffer)
     {
-      newGlyphPositions.Resize(layoutParameters.numberOfGlyphs);
+      // Increase Vector size by 1 to prevent out-of-bounds access during Ellipsis calculation.
+      newGlyphPositions.Resize(layoutParameters.numberOfGlyphs + 1);
       glyphPositionsBuffer = newGlyphPositions.Begin();
 
       newLines.Resize(linesCapacity);
@@ -2070,9 +2071,11 @@ struct Engine::Impl
 
     if(updateCurrentBuffer)
     {
+      // Insert up to newGlyphPositions.Begin() + layoutParameters.numberOfGlyphs (not newGlyphPositions.End())
+      // to avoid duplicating the extra element added for Ellipsis calculation.
       glyphPositions.Insert(glyphPositions.Begin() + layoutParameters.startGlyphIndex,
                             newGlyphPositions.Begin(),
-                            newGlyphPositions.End());
+                            newGlyphPositions.Begin() + layoutParameters.numberOfGlyphs);
       glyphPositions.Resize(totalNumberOfGlyphs);
 
       newLines.Resize(numberOfLines);

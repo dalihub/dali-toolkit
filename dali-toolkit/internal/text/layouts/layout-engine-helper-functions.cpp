@@ -51,7 +51,13 @@ void CalculateGlyphPositionsLTR(const VisualModelPtr&  visualModel,
 
   float calculatedAdvance = 0.f;
 
-  for(GlyphIndex i = 0u; i < numberOfGlyphs; ++i)
+  unsigned int numberOfGlyphsToCalculate = numberOfGlyphs;
+  if(startIndexForGlyph + numberOfGlyphs < (unsigned int)visualModel->mGlyphs.Count())
+  {
+    ++numberOfGlyphsToCalculate;
+  }
+
+  for(GlyphIndex i = 0u; i < numberOfGlyphsToCalculate; ++i)
   {
     const GlyphInfo& glyph    = *(glyphsBuffer + startIndexForGlyph + i);
     Vector2&         position = *(glyphPositionsBuffer + startIndexForGlyphPositions + i);
