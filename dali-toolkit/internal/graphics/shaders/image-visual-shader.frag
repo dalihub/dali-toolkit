@@ -1,13 +1,15 @@
+//@name image-visual-shader.frag
+
 //@version 100
 
 INPUT mediump vec2 vTexCoord;
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 INPUT highp vec2 vPosition;
-INPUT flat highp vec2 vRectSize;
-INPUT flat highp vec2 vOptRectSize;
-INPUT flat highp float vAliasMargin;
+FLAT INPUT highp vec2 vRectSize;
+FLAT INPUT highp vec2 vOptRectSize;
+FLAT INPUT highp float vAliasMargin;
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-INPUT flat highp vec4 vCornerRadius;
+FLAT INPUT highp vec4 vCornerRadius;
 #endif
 #endif
 #ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
@@ -297,9 +299,9 @@ lowp vec4 ConvertYuvToRgba(mediump vec2 texCoord)
   }
 #endif
 
-  lowp float y = texture(sTexture, texCoord).r;
-  lowp float u = texture(sTextureU, texCoord).r - 0.5;
-  lowp float v = texture(sTextureV, texCoord).r - 0.5;
+  lowp float y = TEXTURE(sTexture, texCoord).r;
+  lowp float u = TEXTURE(sTextureU, texCoord).r - 0.5;
+  lowp float v = TEXTURE(sTextureV, texCoord).r - 0.5;
   lowp vec4 rgba;
   rgba.r = y + (1.403 * v);
   rgba.g = y - (0.344 * u) - (0.714 * v);

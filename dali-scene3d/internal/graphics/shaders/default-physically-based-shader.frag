@@ -148,7 +148,7 @@ UNIFORM_BLOCK ShadowEnabled
 
 // TODO: Multiple texture coordinate will be supported.
 INPUT mediump vec2 vUV;
-INPUT lowp mat3 vTBN;
+INPUT highp mat3 vTBN;
 INPUT lowp vec4 vColor;
 INPUT highp vec3 vPositionToCamera;
 INPUT highp vec3 positionFromLightView;
