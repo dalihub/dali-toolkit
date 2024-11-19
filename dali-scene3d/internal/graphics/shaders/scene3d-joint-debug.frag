@@ -5,7 +5,7 @@ UNIFORM_BLOCK FragBlock
 {
   UNIFORM lowp vec4 uColor;
 };
-INPUT flat float vColor;
+FLAT INPUT float vColor;
 
 void main()
 {

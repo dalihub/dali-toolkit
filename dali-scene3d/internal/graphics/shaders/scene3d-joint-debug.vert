@@ -7,7 +7,7 @@ UNIFORM_BLOCK VertBlock
 };
 INPUT vec3 aPosition;
 INPUT float aColor;
-OUTPUT flat float vColor;
+FLAT OUTPUT float vColor;
 
 void main()
 {

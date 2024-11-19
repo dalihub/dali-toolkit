@@ -6,11 +6,11 @@ INPUT mediump vec2 aPosition;
 OUTPUT mediump vec2 vTexCoord;
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 OUTPUT highp vec2 vPosition;
-OUTPUT flat highp vec2 vRectSize;
-OUTPUT flat highp vec2 vOptRectSize;
-OUTPUT flat highp float vAliasMargin;
+FLAT OUTPUT highp vec2 vRectSize;
+FLAT OUTPUT highp vec2 vOptRectSize;
+FLAT OUTPUT highp float vAliasMargin;
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-OUTPUT flat highp vec4 vCornerRadius;
+FLAT OUTPUT highp vec4 vCornerRadius;
 #endif
 #endif
 
