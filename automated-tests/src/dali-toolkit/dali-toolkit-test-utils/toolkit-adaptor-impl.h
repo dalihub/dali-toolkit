@@ -72,6 +72,7 @@ public:
   void RunIdles();
 
   void RequestUpdateOnce();
+  void RequestProcessEventsOnIdle();
 
   static Integration::Scene GetScene(Dali::Window window);
 

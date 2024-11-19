@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,6 +154,7 @@ private:
   Dali::Mutex mWaitingTasksMutex;   ///< Mutex for mWaitingTasks. We can lock mRunningTasksMutex and mCompletedTasksMutex under this scope.
   Dali::Mutex mRunningTasksMutex;   ///< Mutex for mRunningTasks. We can lock mCompletedTasksMutex under this scope.
   Dali::Mutex mCompletedTasksMutex; ///< Mutex for mCompletedTasks. We cannot lock any mutex under this scope.
+  Dali::Mutex mTasksMutex;          ///< Mutex for mTasks.        We cannot lock any mutex under this scope.
 
   std::unique_ptr<EventThreadCallback> mTrigger;
 
@@ -678,18 +679,23 @@ void AsyncTaskManager::AddTask(AsyncTaskPtr task)
     }
   }
 
-  size_t count = mTasks.GetElementCount();
-  size_t index = 0;
-  while(index++ < count)
   {
-    auto processHelperIt = mTasks.GetNext();
-    DALI_ASSERT_ALWAYS(processHelperIt != mTasks.End());
-    if(processHelperIt->Request())
+    Mutex::ScopedLock lock(mTasksMutex);
+    size_t            count = mTasks.GetElementCount();
+    size_t            index = 0;
+    while(index++ < count)
     {
-      break;
+      auto processHelperIt = mTasks.GetNext();
+      DALI_ASSERT_ALWAYS(processHelperIt != mTasks.End());
+      if(processHelperIt->Request())
+      {
+        break;
+      }
+      // If all threads are busy, then it's ok just to push the task because they will try to get the next job.
     }
-    // If all threads are busy, then it's ok just to push the task because they will try to get the next job.
   }
+
+  // Note : We will not use Processor for toolkit utc
 }
 
 void AsyncTaskManager::RemoveTask(AsyncTaskPtr task)
@@ -924,16 +930,32 @@ AsyncTaskPtr AsyncTaskManager::PopNextTaskToProcess()
   {
     if((*iter)->IsReady())
     {
-      nextTask = *iter;
+      bool taskAvaliable = true;
 
-      // Add Running queue
+      // Check whether we try to running same task at multiple threads.
       {
-        // Lock while popping task out from the queue
         Mutex::ScopedLock lock(mRunningTasksMutex); // We can lock this mutex under mWaitingTasksMutex.
+        auto              task = *iter;
+        auto              jter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element) { return element.first == task; });
+        if(jter != mRunningTasks.end())
+        {
+          taskAvaliable = false;
+        }
+      }
 
-        mRunningTasks.insert(mRunningTasks.end(), std::make_pair(nextTask, RunningTaskState::RUNNING));
+      if(taskAvaliable)
+      {
+        nextTask = *iter;
 
-        mWaitingTasks.erase(iter);
+        // Add Running queue
+        {
+          // Lock while popping task out from the queue
+          Mutex::ScopedLock lock(mRunningTasksMutex); // We can lock this mutex under mWaitingTasksMutex.
+
+          mRunningTasks.insert(mRunningTasks.end(), std::make_pair(nextTask, RunningTaskState::RUNNING));
+
+          mWaitingTasks.erase(iter);
+        }
       }
       break;
     }
@@ -945,14 +967,53 @@ AsyncTaskPtr AsyncTaskManager::PopNextTaskToProcess()
 /// Worker thread called
 void AsyncTaskManager::CompleteTask(AsyncTaskPtr&& task)
 {
-  bool notify = false;
-
   if(task)
   {
     bool needTrigger = false;
 
-    // Lock while check validation of task.
+    // Check now whether we need to execute callback or not, for worker thread cases.
+    if(task->GetCallbackInvocationThread() == AsyncTask::ThreadType::WORKER_THREAD)
     {
+      bool notify = false;
+
+      // Lock while check validation of task.
+      {
+        Mutex::ScopedLock lock(mRunningTasksMutex);
+
+        auto iter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element) { return element.first == task; });
+        if(iter != mRunningTasks.end())
+        {
+          if(iter->second == RunningTaskState::RUNNING)
+          {
+            // This task is valid.
+            notify = true;
+          }
+        }
+      }
+
+      // We should execute this tasks complete callback out of mutex
+      if(notify)
+      {
+        CallbackBase::Execute(*(task->GetCompletedCallback()), task);
+
+        // We need to remove task trace now.
+        if(mTasksCompletedImpl->IsTasksCompletedCallbackExist())
+        {
+          mTasksCompletedImpl->RemoveTaskTrace(task);
+
+          if(mTasksCompletedImpl->IsExecuteCallbackExist())
+          {
+            // We need to call EmitCompletedTasks(). Trigger main thread.
+            needTrigger = true;
+          }
+        }
+      }
+    }
+
+    // Lock while adding task to the queue
+    {
+      bool notify = false;
+
       Mutex::ScopedLock lock(mRunningTasksMutex);
 
       auto iter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element) { return element.first == task; });
@@ -963,34 +1024,7 @@ void AsyncTaskManager::CompleteTask(AsyncTaskPtr&& task)
           // This task is valid.
           notify = true;
         }
-      }
-    }
 
-    // We should execute this tasks complete callback out of mutex
-    if(notify && task->GetCallbackInvocationThread() == AsyncTask::ThreadType::WORKER_THREAD)
-    {
-      CallbackBase::Execute(*(task->GetCompletedCallback()), task);
-
-      // We need to remove task trace now.
-      if(mTasksCompletedImpl->IsTasksCompletedCallbackExist())
-      {
-        mTasksCompletedImpl->RemoveTaskTrace(task);
-
-        if(mTasksCompletedImpl->IsExecuteCallbackExist())
-        {
-          // We need to call EmitCompletedTasks(). Trigger main thread.
-          needTrigger = true;
-        }
-      }
-    }
-
-    // Lock while adding task to the queue
-    {
-      Mutex::ScopedLock lock(mRunningTasksMutex);
-
-      auto iter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element) { return element.first == task; });
-      if(iter != mRunningTasks.end())
-      {
         // Move task into completed, for ensure that AsyncTask destroy at main thread.
         {
           Mutex::ScopedLock lock(mCompletedTasksMutex); // We can lock this mutex under mRunningTasksMutex.
@@ -1098,13 +1132,13 @@ void DestroyAsyncTaskManager()
   Dali::Internal::Adaptor::gAsyncTaskManager.Reset();
 }
 
-void ProcessSingleCompletedTask()
+void ProcessSingleCompletedTasks()
 {
   auto asyncTaskManager = Dali::AsyncTaskManager::Get();
   Dali::Internal::Adaptor::GetImplementation(asyncTaskManager).TaskCompleted();
 }
 
-void ProcessAllCompletedTask()
+void ProcessAllCompletedTasks()
 {
   auto asyncTaskManager = Dali::AsyncTaskManager::Get();
   Dali::Internal::Adaptor::GetImplementation(asyncTaskManager).TaskAllCompleted();
