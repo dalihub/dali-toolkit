@@ -1,32 +1,24 @@
-//@name bubble-effect.vert
-
-//@version 100
-
-INPUT mediump float aIndex;
-INPUT mediump vec2  aPosition;
-INPUT highp   vec2  aTexCoord;
-OUTPUT   mediump vec2  vTexCoord;
-
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM   mediump mat4  uMvpMatrix;
+attribute mediump float aIndex;
+attribute mediump vec2  aPosition;
+attribute highp   vec2  aTexCoord;
+varying   mediump vec2  vTexCoord;
+uniform   mediump mat4  uMvpMatrix;
 // the gravity applied to the y direction
-  UNIFORM mediump float uGravity;
+uniform mediump float uGravity;
 // xy: the emit position of the bubble; zw: the destination of the bubble.
 // The bubble is moving from (xy) to (zw plus the y drop influenced by gravity).
-  UNIFORM vec4 uStartEndPosition[NUMBER_OF_BUBBLE];
+uniform vec4 uStartEndPosition[NUMBER_OF_BUBBLE];
 // The undergoing percentage of the bubble movement. 0.0: start from emit position, 1.0: reach the destination
-  UNIFORM float uPercentage[NUMBER_OF_BUBBLE];
-  UNIFORM vec2 uInvertedMovementArea;
-// The bubble number is restricted by the available UNIFORM num.
-// To increase the displayed bubble, every uStartEndPosition and uPercentage UNIFORM is applied to a small bunch of bubbles (9 here)
+uniform float uPercentage[NUMBER_OF_BUBBLE];
+uniform vec2 uInvertedMovementArea;
+// The bubble number is restricted by the available uniform num.
+// To increase the displayed bubble, every uStartEndPosition and uPercentage uniform is applied to a small bunch of bubbles (9 here)
 // The offset defines the random offset between bubbles within the bunch.
-  UNIFORM vec2 uOffset[9];
-// This UNIFORM is used to change the bubble size during running time
-  UNIFORM float uDynamicScale;
-};
-OUTPUT float vPercentage;
-OUTPUT vec2  vEffectTexCoord;
+uniform vec2 uOffset[9];
+// This uniform is used to change the bubble size during running time
+uniform float uDynamicScale;
+varying float vPercentage;
+varying vec2  vEffectTexCoord;
 
 void main()
 {

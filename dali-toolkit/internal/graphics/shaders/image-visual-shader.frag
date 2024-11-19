@@ -1,7 +1,3 @@
-//@name image-visual-shader.frag
-
-//@version 100
-
 INPUT mediump vec2 vTexCoord;
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 INPUT highp vec2 vPosition;
@@ -17,54 +13,41 @@ FLAT INPUT highp vec4 vCornerRadius;
 DEBUG_EXTRA_VARYINGS
 #endif
 
-UNIFORM sampler2D sTexture;
+uniform sampler2D sTexture;
 #if defined(IS_REQUIRED_YUV_TO_RGB) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
-UNIFORM sampler2D sTextureU;
-UNIFORM sampler2D sTextureV;
+uniform sampler2D sTextureU;
+uniform sampler2D sTextureV;
 #endif
 
 #ifdef IS_REQUIRED_ALPHA_MASKING
-UNIFORM sampler2D sMaskTexture;
+uniform sampler2D sMaskTexture;
+uniform lowp float uYFlipMaskTexture;
 INPUT mediump vec2 vMaskTexCoord;
 #endif
 
-UNIFORM_BLOCK FragBlock
-{
-#ifdef IS_REQUIRED_ALPHA_MASKING
-  UNIFORM lowp float uYFlipMaskTexture;
-#endif
-
 #ifdef ATLAS_DEFAULT_WARP
-  UNIFORM mediump vec4 uAtlasRect;
-
+uniform mediump vec4 uAtlasRect;
 #elif defined(ATLAS_CUSTOM_WARP)
-  // WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
-  UNIFORM lowp vec2 wrapMode;
+// WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
+uniform lowp vec2 wrapMode;
 #endif
+
 
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER)
-  UNIFORM highp vec3 uScale;
+uniform highp vec3 uScale;
 #endif
 
-  UNIFORM lowp vec4  uColor;
-  UNIFORM lowp float premultipliedAlpha;
-
+uniform lowp vec4 uColor;
+uniform lowp float premultipliedAlpha;
 #ifdef IS_REQUIRED_BORDERLINE
-  UNIFORM lowp vec4   borderlineColor;
-  UNIFORM lowp vec4   uActorColor;
+uniform highp float borderlineWidth;
+uniform highp float borderlineOffset;
+uniform lowp vec4 borderlineColor;
+uniform lowp vec4 uActorColor;
 #endif
 
 #ifdef IS_REQUIRED_SQUIRCLE_CORNER
-  UNIFORM highp vec4 cornerSquareness;
-#endif
-};
-
-#ifdef IS_REQUIRED_BORDERLINE
-UNIFORM_BLOCK Borderline
-{
-  UNIFORM highp float borderlineWidth;
-  UNIFORM highp float borderlineOffset;
-};
+uniform highp vec4 cornerSquareness;
 #endif
 
 #ifdef ATLAS_CUSTOM_WARP
@@ -465,7 +448,7 @@ void main()
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    gl_FragColor = textureColor;
+    OUT_COLOR = textureColor;
   }
   else
 #endif
@@ -479,7 +462,7 @@ void main()
     if(gFragmentPosition.x + gFragmentPosition.y < -(gRadius + vAliasMargin) * 2.0)
     {
       // Do nothing.
-      gl_FragColor = textureColor;
+      OUT_COLOR = textureColor;
     }
     else
 #endif
@@ -493,12 +476,12 @@ void main()
 #ifdef IS_REQUIRED_BORDERLINE
       textureColor = convertBorderlineColor(textureColor);
 #endif
-      gl_FragColor = textureColor;
+      OUT_COLOR = textureColor;
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
       mediump float opacity = calculateCornerOpacity();
-      gl_FragColor.a *= opacity;
-      gl_FragColor.rgb *= mix(1.0, opacity, premultipliedAlpha);
+      OUT_COLOR.a *= opacity;
+      OUT_COLOR.rgb *= mix(1.0, opacity, premultipliedAlpha);
 #endif
     }
 
@@ -507,6 +490,6 @@ void main()
 #endif
 
 #ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
-  gl_FragColor.rgb = ApplyDebugMixColor(gl_FragColor);
+  OUT_COLOR.rgb = ApplyDebugMixColor(OUT_COLOR);
 #endif
 }

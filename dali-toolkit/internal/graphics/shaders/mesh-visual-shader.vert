@@ -1,31 +1,24 @@
-//@name mesh-visual-shader.vert
-
-//@version 100
-
-INPUT highp vec3 aPosition;
-INPUT highp vec2 aTexCoord;
-INPUT highp vec3 aNormal;
-OUTPUT mediump vec2 vTexCoord;
-OUTPUT mediump vec3 vIllumination;
-OUTPUT mediump float vSpecular;
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM mediump vec3 uSize;
-  UNIFORM mediump mat4 uMvpMatrix;
-  UNIFORM mediump mat4 uModelView;
-  UNIFORM mediump mat4 uViewMatrix;
-  UNIFORM mediump mat3 uNormalMatrix;
-  UNIFORM mediump mat4 uObjectMatrix;
-  UNIFORM mediump vec3 lightPosition;
-  UNIFORM mediump vec2 uStageOffset;
+attribute highp vec3 aPosition;
+attribute highp vec2 aTexCoord;
+attribute highp vec3 aNormal;
+varying mediump vec2 vTexCoord;
+varying mediump vec3 vIllumination;
+varying mediump float vSpecular;
+uniform mediump vec3 uSize;
+uniform mediump mat4 uMvpMatrix;
+uniform mediump mat4 uModelView;
+uniform mediump mat4 uViewMatrix;
+uniform mediump mat3 uNormalMatrix;
+uniform mediump mat4 uObjectMatrix;
+uniform mediump vec3 lightPosition;
+uniform mediump vec2 uStageOffset;
 
 //Visual size and offset
-  UNIFORM mediump vec2 offset;
-  UNIFORM mediump vec2 size;
-  UNIFORM mediump vec4 offsetSizeMode;
-  UNIFORM mediump vec2 origin;
-  UNIFORM mediump vec2 anchorPoint;
-};
+uniform mediump vec2 offset;
+uniform mediump vec2 size;
+uniform mediump vec4 offsetSizeMode;
+uniform mediump vec2 origin;
+uniform mediump vec2 anchorPoint;
 
 vec4 ComputeVertexPosition()
 {

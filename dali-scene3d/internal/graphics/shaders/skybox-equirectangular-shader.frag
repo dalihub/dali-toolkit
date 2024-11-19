@@ -1,15 +1,12 @@
 // Fragment shader for a skybox in equirectangular projection
 precision mediump float;
 
-UNIFORM sampler2D uSkyBoxEquirectangularTexture;
+uniform sampler2D uSkyBoxEquirectangularTexture;
 
-UNIFORM_BLOCK FragBlock
-{
-    UNIFORM vec4  uColor;
-    UNIFORM float uIntensity;
-};
+uniform vec4  uColor;
+uniform float uIntensity;
 
-INPUT vec3 vTexCoord;
+varying vec3 vTexCoord;
 
 // Take the sample direction as interpolated from the cube's local position,
 // and use this direction vector and the spherical to cartesian coordinate
@@ -36,6 +33,6 @@ void main()
   // Flip the texture UVs vertically
   vec2 uvFlippped = vec2(uv.x, 1.0 - uv.y);
 
-  vec4 texColor = TEXTURE( uSkyBoxEquirectangularTexture, uvFlippped ) * uIntensity;
+  vec4 texColor = texture2D( uSkyBoxEquirectangularTexture, uvFlippped ) * uIntensity;
   gl_FragColor = texColor * uColor;
 }

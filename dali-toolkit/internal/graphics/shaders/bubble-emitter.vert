@@ -1,15 +1,8 @@
-//@name bubble-emitter.vert
-
-//@version 100
-
-INPUT mediump vec2 aPosition;
-INPUT mediump vec2 aTexCoord;
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM mediump vec3 uSize;
-  UNIFORM mediump mat4 uMvpMatrix;
-};
-OUTPUT mediump vec2 vTexCoord;
+attribute mediump vec2 aPosition;
+attribute mediump vec2 aTexCoord;
+uniform mediump vec3 uSize;
+uniform mediump mat4 uMvpMatrix;
+varying mediump vec2 vTexCoord;
 
 void main()
 {

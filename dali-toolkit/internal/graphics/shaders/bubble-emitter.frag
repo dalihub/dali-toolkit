@@ -1,16 +1,7 @@
-//@name bubble-emitter.frag
-
-//@version 100
-
 precision highp float;
-
-UNIFORM_BLOCK FragBlock
-{
-  UNIFORM vec3 uHSVDelta;
-};
-
-INPUT mediump vec2 vTexCoord;
-UNIFORM sampler2D sTexture;
+uniform vec3 uHSVDelta;
+varying mediump vec2 vTexCoord;
+uniform sampler2D sTexture;
 
 float rand(vec2 co)
 {
@@ -37,7 +28,7 @@ vec3 hsv2rgb(vec3 c)
 
 void main()
 {
-  vec4 color = TEXTURE(sTexture, vTexCoord);
+  vec4 color = texture2D(sTexture, vTexCoord);
   vec3 hsvColor = rgb2hsv( color.rgb );
   // modify the hsv Value
   hsvColor += uHSVDelta * rand(vTexCoord);

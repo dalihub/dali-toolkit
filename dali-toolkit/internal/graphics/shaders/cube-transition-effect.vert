@@ -1,15 +1,8 @@
-//@name cube-transition-effect.vert
-
-//@version 100
-
-INPUT mediump vec2 aPosition;
-OUTPUT mediump vec2 vTexCoord;
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM mediump mat4 uMvpMatrix;
-  UNIFORM mediump vec3 uSize;
-  UNIFORM mediump vec4 uTextureRect;
-};
+attribute mediump vec2 aPosition;
+varying mediump vec2 vTexCoord;
+uniform mediump mat4 uMvpMatrix;
+uniform mediump vec3 uSize;
+uniform mediump vec4 uTextureRect;
 
 void main()
 {

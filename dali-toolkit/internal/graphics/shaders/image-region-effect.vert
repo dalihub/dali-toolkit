@@ -1,19 +1,13 @@
-//@name image-region-effect.vert
+attribute mediump vec2 aPosition;
 
-//@version 100
+uniform mediump mat4 uMvpMatrix;
+uniform vec3 uSize;
+uniform vec4 uTextureRect;
 
-INPUT mediump vec2 aPosition;
+varying vec2 vTexCoord;
 
-OUTPUT vec2 vTexCoord;
-
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM mediump vec2 uTopLeft;
-  UNIFORM mediump vec2 uBottomRight;
-  UNIFORM mediump mat4 uMvpMatrix;
-  UNIFORM vec3 uSize;
-  UNIFORM vec4 uTextureRect;
-};
+uniform mediump vec2 uTopLeft;
+uniform mediump vec2 uBottomRight;
 
 void main()
 {

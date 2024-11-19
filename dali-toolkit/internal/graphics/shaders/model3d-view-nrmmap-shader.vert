@@ -1,24 +1,17 @@
-//@name model3d-view-nrmmap-shader.vert
-
-//@version 100
-
-INPUT highp vec3 aPosition;
-INPUT highp vec2 aTexCoord;
-INPUT highp vec3 aNormal;
-INPUT highp vec3 aTangent;
-INPUT highp vec3 aBiNormal;
-OUTPUT mediump vec2 vTexCoord;
-OUTPUT mediump vec3 vLightDirection;
-OUTPUT mediump vec3 vHalfVector;
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM mediump vec3 uSize;
-  UNIFORM mediump mat4 uMvpMatrix;
-  UNIFORM mediump mat4 uModelView;
-  UNIFORM mediump mat3 uNormalMatrix;
-  UNIFORM mediump mat4 uObjectMatrix;
-  UNIFORM mediump vec3 uLightPosition;
-};
+attribute highp vec3 aPosition;
+attribute highp vec2 aTexCoord;
+attribute highp vec3 aNormal;
+attribute highp vec3 aTangent;
+attribute highp vec3 aBiNormal;
+varying mediump vec2 vTexCoord;
+varying mediump vec3 vLightDirection;
+varying mediump vec3 vHalfVector;
+uniform mediump vec3 uSize;
+uniform mediump mat4 uMvpMatrix;
+uniform mediump mat4 uModelView;
+uniform mediump mat3 uNormalMatrix;
+uniform mediump mat4 uObjectMatrix;
+uniform mediump vec3 uLightPosition;
 
 void main()
 {
