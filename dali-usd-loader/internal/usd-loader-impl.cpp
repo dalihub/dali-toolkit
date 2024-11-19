@@ -124,6 +124,14 @@ private:
   void GetXformableTransformation(const UsdPrim& prim, Vector3& position, Quaternion& rotation, Vector3& scale, const UsdTimeCode time = UsdTimeCode::Default());
 
   /**
+   * @brief Convert transform animations for a node to the internal representation.
+   * @param[in, out] output The load result.
+   * @param[in] prim The USD prim representing the node.
+   * @param[in] nodeIndex The index of the node.
+   */
+  void ConvertTransformAnimation(LoadResult& output, const UsdPrim& prim, Index& nodeIndex);
+
+  /**
    * @brief Adds a node to the scene graph and optionally sets its transformation.
    *
    * This function creates a new node based on a USD primitive and adds it to the scene graph.
@@ -1009,7 +1017,8 @@ void UsdLoaderImpl::Impl::ConvertMesh(LoadResult& output, const UsdPrim& prim, I
   nodeIndex                = scene.GetNodeCount();
   NodeDefinition* weakNode = AddNodeToScene(scene, prim.GetName().GetString(), parentIndex, position, rotation, scale, isNonSkeletonMeshNode);
 
-  // @TODO: Handle xform animation (future work)
+  // Handle xform animation
+  ConvertTransformAnimation(output, prim, nodeIndex);
 
   // Start processing the mesh geometry
   UsdGeomMesh usdMesh = UsdGeomMesh(prim);
@@ -1204,7 +1213,8 @@ void UsdLoaderImpl::Impl::ConvertNode(LoadResult& output, const UsdPrim& prim, I
   nodeIndex = scene.GetNodeCount();
   AddNodeToScene(scene, prim.GetName().GetString(), parentIndex, position, rotation, scale, true);
 
-  // @TODO: Handle xform animation (future work)
+  // Handle xform animation
+  ConvertTransformAnimation(output, prim, nodeIndex);
 
   // Check whether the prim is a transformable camera
   if(prim.IsA<UsdGeomCamera>())
@@ -1274,6 +1284,114 @@ void UsdLoaderImpl::Impl::ConvertCamera(LoadResult& output, const UsdPrim& prim)
   // Apply the camera's transform matrix to the camera parameters
   GfMatrix4d matrix          = gfCamera.GetTransform();
   cameraParameters[0].matrix = ConvertUsdMatrix(matrix);
+}
+
+void UsdLoaderImpl::Impl::ConvertTransformAnimation(LoadResult& output, const UsdPrim& prim, Index& nodeIndex)
+{
+  auto xformable = UsdGeomXformable(prim);
+
+  std::vector<double> timeSamples;
+  xformable.GetTimeSamples(&timeSamples);
+
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "timeSamples: %lu, ", timeSamples.size());
+
+  float FPS = mUsdStage->GetFramesPerSecond();
+
+  // USD represents animation as time-sampled attribute values.
+  // https://openusd.org/release/tut_xforms.html
+  // https://openusd.org/release/glossary.html#usdglossary-timecode
+  // For any given composed scene, defined by its root layer, the TimeCode ordinates of the TimeSamples
+  // contained in the scene are scaled to seconds by the root layer’s timeCodesPerSecond metadata.
+  // USD’s default FPS is 24 frames per second, and time code from GetTimeSamples() is the frame number.
+  // e.g. if there are totally 192 frames, the duration of the animation is 8 seconds.
+
+  if(timeSamples.size() > 0)
+  {
+    AnimationDefinition animationDefinition;
+
+    // Times
+    // Each xform may have its own amount of time samples
+    float minTime = timeSamples[0] / FPS;
+    float maxTime = timeSamples[0] / FPS;
+
+    for(auto sample : timeSamples)
+    {
+      float gltfTime = sample / FPS;
+
+      minTime = std::min(minTime, gltfTime);
+      maxTime = std::max(maxTime, gltfTime);
+    }
+
+    float duration = maxTime - minTime;
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "minTime: %f, maxTime: %f, animation duration: %f, ", minTime, maxTime, duration);
+
+    animationDefinition.ReserveSize(3);
+
+    AnimatedProperty positionProperty;
+    positionProperty.mNodeIndex    = nodeIndex;
+    positionProperty.mPropertyName = "position";
+    positionProperty.mTimePeriod   = {0.f, duration};
+    positionProperty.mKeyFrames    = KeyFrames::New();
+
+    AnimatedProperty orientationProperty;
+    orientationProperty.mNodeIndex    = nodeIndex;
+    orientationProperty.mPropertyName = "orientation";
+    orientationProperty.mTimePeriod   = {0.f, duration};
+    orientationProperty.mKeyFrames    = KeyFrames::New();
+
+    AnimatedProperty scaleProperty;
+    scaleProperty.mNodeIndex    = nodeIndex;
+    scaleProperty.mPropertyName = "scale";
+    scaleProperty.mTimePeriod   = {0.f, duration};
+    scaleProperty.mKeyFrames    = KeyFrames::New();
+
+    std::vector<Vector3>    translations;
+    std::vector<Quaternion> rotations;
+    std::vector<Vector3>    scales;
+
+    // Iterate over each time sample to get the transform at each key frame
+    for(auto time : timeSamples)
+    {
+      // Get the local transformation matrix at this time
+      Vector3    position;
+      Quaternion rotation;
+      Vector3    scale;
+      GetXformableTransformation(prim, position, rotation, scale, time);
+
+      translations.push_back(position);
+      rotations.push_back(rotation);
+      scales.push_back(scale);
+
+      float progress = time / FPS / duration;
+
+      positionProperty.mKeyFrames.Add(progress, position);
+      orientationProperty.mKeyFrames.Add(progress, rotation);
+      scaleProperty.mKeyFrames.Add(progress, scale);
+    }
+
+    animationDefinition.SetProperty(0, std::move(positionProperty));
+    animationDefinition.SetProperty(1, std::move(orientationProperty));
+    animationDefinition.SetProperty(2, std::move(scaleProperty));
+
+    animationDefinition.SetDuration(std::max(duration, AnimationDefinition::MIN_DURATION_SECONDS));
+
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "translations: %lu, rotations: %lu, scales: %lu, ", translations.size(), rotations.size(), scales.size());
+
+    for(size_t i = 0; i < translations.size(); i++)
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "KeyFrame[%lu]: progress: %.7f, translations[%lu]: %.7f, %.7f, %.7f, scales[%lu]: %.7f, %.7f, %.7f, rotations[%lu]: %.7f, %.7f, %.7f, %.7f, ", i, timeSamples[i] / FPS / duration, i, translations[i].x, translations[i].y, translations[i].z, i, scales[i].x, scales[i].y, scales[i].z, i, rotations[i].AsVector().x, rotations[i].AsVector().y, rotations[i].AsVector().z, rotations[i].AsVector().w);
+    }
+
+    std::ostringstream oss;
+    oss << prim.GetName() << "_xform_anim";
+    std::string animationName = oss.str();
+
+    animationDefinition.SetName(animationName);
+
+    output.mAnimationDefinitions.push_back(std::move(animationDefinition));
+  }
+
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "\n");
 }
 
 } // namespace Dali::Scene3D::Loader

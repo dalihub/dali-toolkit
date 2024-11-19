@@ -396,3 +396,117 @@ int UtcDaliUsdLoaderSuccess2(void)
 
   END_TEST;
 }
+
+int UtcDaliUsdLoaderAnimation(void)
+{
+  TestApplication application;
+
+  Context ctx;
+
+  ctx.loader = new Dali::Scene3D::Loader::ModelLoader(TEST_RESOURCE_DIR "/usd/BoxAnimation.usda", ctx.pathProvider(ResourceType::Mesh) + "/", ctx.loadResult);
+  DALI_TEST_EQUAL(ctx.loader->LoadModel(ctx.pathProvider, true), true);
+
+  auto& resources = ctx.resources;
+  resources.GenerateResources();
+
+  auto& scene = ctx.scene;
+  auto& roots = scene.GetRoots();
+
+  DALI_TEST_EQUAL(1u, roots.size());
+  DALI_TEST_EQUAL(3u, scene.GetNodeCount());
+
+  DALI_TEST_EQUAL(0, ctx.animationGroups.size());
+
+  DALI_TEST_EQUAL(1, ctx.animations.size());
+  DALI_TEST_EQUAL("box_animation_xform_anim", ctx.animations[0].GetName());
+  DALI_TEST_EQUAL(4.95833f, ctx.animations[0].GetDuration());
+  DALI_TEST_EQUAL(1, ctx.animations[0].GetLoopCount());
+  DALI_TEST_EQUAL(3, ctx.animations[0].GetPropertyCount());
+  DALI_TEST_EQUAL(1.0f, ctx.animations[0].GetSpeedFactor());
+  DALI_TEST_EQUAL(Vector2(0.f, 1.f), ctx.animations[0].GetPlayRange());
+
+  DALI_TEST_EQUAL(1, ctx.animations[0].GetPropertyAt(0).mNodeIndex);
+  DALI_TEST_EQUAL("", ctx.animations[0].GetPropertyAt(0).mNodeName);
+  DALI_TEST_EQUAL("position", ctx.animations[0].GetPropertyAt(0).mPropertyName);
+  DALI_TEST_EQUAL(4.95833f, ctx.animations[0].GetPropertyAt(0).mTimePeriod.durationSeconds);
+  DALI_TEST_EQUAL(0.0f, ctx.animations[0].GetPropertyAt(0).mTimePeriod.delaySeconds);
+  DALI_TEST_CHECK(ctx.animations[0].GetPropertyAt(0).mKeyFrames);
+  DALI_TEST_EQUAL(1, ctx.animations[0].GetPropertyAt(0).mKeyFrames.GetBaseObject().ReferenceCount());
+  DALI_TEST_EQUAL(Property::Type::VECTOR3, ctx.animations[0].GetPropertyAt(0).mKeyFrames.GetType());
+
+  DALI_TEST_EQUAL(1, ctx.animations[0].GetPropertyAt(1).mNodeIndex);
+  DALI_TEST_EQUAL("", ctx.animations[0].GetPropertyAt(1).mNodeName);
+  DALI_TEST_EQUAL("orientation", ctx.animations[0].GetPropertyAt(1).mPropertyName);
+  DALI_TEST_EQUAL(4.95833f, ctx.animations[0].GetPropertyAt(1).mTimePeriod.durationSeconds);
+  DALI_TEST_EQUAL(0.0f, ctx.animations[0].GetPropertyAt(1).mTimePeriod.delaySeconds);
+  DALI_TEST_CHECK(ctx.animations[0].GetPropertyAt(1).mKeyFrames);
+  DALI_TEST_EQUAL(1, ctx.animations[0].GetPropertyAt(1).mKeyFrames.GetBaseObject().ReferenceCount());
+  DALI_TEST_EQUAL(Property::Type::ROTATION, ctx.animations[0].GetPropertyAt(1).mKeyFrames.GetType());
+
+  DALI_TEST_EQUAL(1, ctx.animations[0].GetPropertyAt(2).mNodeIndex);
+  DALI_TEST_EQUAL("", ctx.animations[0].GetPropertyAt(2).mNodeName);
+  DALI_TEST_EQUAL("scale", ctx.animations[0].GetPropertyAt(2).mPropertyName);
+  DALI_TEST_EQUAL(4.95833f, ctx.animations[0].GetPropertyAt(2).mTimePeriod.durationSeconds);
+  DALI_TEST_EQUAL(0.0f, ctx.animations[0].GetPropertyAt(2).mTimePeriod.delaySeconds);
+  DALI_TEST_CHECK(ctx.animations[0].GetPropertyAt(2).mKeyFrames);
+  DALI_TEST_EQUAL(1, ctx.animations[0].GetPropertyAt(2).mKeyFrames.GetBaseObject().ReferenceCount());
+  DALI_TEST_EQUAL(Property::Type::VECTOR3, ctx.animations[0].GetPropertyAt(2).mKeyFrames.GetType());
+
+  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
+  ViewProjection                    viewProjection;
+  Transforms                        xforms{
+    MatrixStack{},
+    viewProjection};
+  NodeDefinition::CreateParams nodeParams{
+    resources,
+    xforms,
+    shaderManager,
+  };
+
+  Customization::Choices choices;
+
+  // Create DALi actors
+  Actor root = Actor::New();
+  SetActorCentered(root);
+  for(auto iRoot : roots)
+  {
+    if(auto actor = scene.CreateNodes(iRoot, choices, nodeParams))
+    {
+      scene.ConfigureSkinningShaders(resources, actor, std::move(nodeParams.mSkinnables));
+      scene.ApplyConstraints(actor, std::move(nodeParams.mConstrainables));
+      root.Add(actor);
+    }
+  }
+
+  std::vector<Dali::Animation> generatedAnimations;
+
+  generatedAnimations.reserve(ctx.animations.size());
+  auto getActor = [&](const AnimatedProperty& property) {
+    Dali::Actor actor;
+    if(property.mNodeIndex != INVALID_INDEX)
+    {
+      auto* node = scene.GetNode(property.mNodeIndex);
+      if(node != nullptr)
+      {
+        actor = root.FindChildById(node->mNodeId);
+      }
+    }
+    else
+    {
+      actor = root.FindChildByName(property.mNodeName);
+    }
+    return actor;
+  };
+
+  for(auto& animationDefinition : ctx.animations)
+  {
+    generatedAnimations.push_back(animationDefinition.ReAnimate(getActor));
+  }
+
+  DALI_TEST_EQUAL(1u, generatedAnimations.size());
+  DALI_TEST_EQUAL(4.95833f, generatedAnimations[0].GetDuration());
+
+  delete ctx.loader;
+
+  END_TEST;
+}
