@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,17 +127,15 @@ void ParticleRenderer::CreateShader()
    * - ParticleSystem buffer is being updated every frame
    */
   std::string vertexShaderCode = streamAttributesStr + std::string(
-                                                         "//@version 100\n\
-      INPUT mediump vec2 aPosition;\n\
+
+                                                         "INPUT mediump vec2 aPosition;\n\
       INPUT mediump vec2 aTexCoords;\n\
       \n\
-      UNIFORM_BLOCK VertBlock \n\
-      {\n\
-      UNIFORM mediump mat4   uMvpMatrix;\n\
-      UNIFORM mediump vec3   uSize;\n\
-      UNIFORM lowp vec4      uColor;\n\
-      };\n\
-      OUTPUT mediump vec2 vTexCoord;\n\
+      uniform mediump mat4   uMvpMatrix;\n\
+      uniform mediump vec3   uSize;\n\
+      uniform lowp vec4      uColor;\n\
+      \
+      OUTPUT mediump vec2   vTexCoord;\n\
       OUTPUT mediump vec4 vColor;\n\
       \n\
       void main()\n\
@@ -150,17 +148,17 @@ void ParticleRenderer::CreateShader()
       }\n");
 
   std::string fragmentShaderCode =
-    {"//@version 100\n\
-      INPUT mediump vec2       vTexCoord;\n\
-      INPUT mediump vec4       vColor;\n\
-      UNIFORM sampler2D sTexture;\n\
-      \n\
-      void main()\n\
-      {\n\
-        lowp vec4 col = TEXTURE(sTexture, vTexCoord) * vColor;\n\
-        if(col.a < 0.1) { discard; }\
-        gl_FragColor = col;\n\
-      }\n"};
+    {
+      "INPUT mediump vec2       vTexCoord;\n\
+    INPUT mediump vec4       vColor;\n\
+    uniform sampler2D sTexture;\n\
+    \n\
+    void main()\n\
+    {\n\
+      lowp vec4 col = TEXTURE(sTexture, vTexCoord) * vColor;\n\
+      if(col.a < 0.1) { discard; }\
+      fragColor = col;\n\
+    }\n"};
 
   mShader   = Shader::New(Dali::Shader::GetVertexShaderPrefix() + vertexShaderCode, Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderCode);
   mGeometry = Geometry::New();

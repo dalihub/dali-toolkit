@@ -1,22 +1,15 @@
-//@name model3d-view-shader.vert
-
-//@version 100
-
-INPUT highp vec3 aPosition;
-INPUT highp vec2 aTexCoord;
-INPUT highp vec3 aNormal;
-OUTPUT mediump vec2 vTexCoord;
-OUTPUT mediump vec3 vIllumination;
-OUTPUT mediump float vSpecular;
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM mediump vec3 uSize;
-  UNIFORM mediump mat4 uMvpMatrix;
-  UNIFORM mediump mat4 uModelView;
-  UNIFORM mediump mat3 uNormalMatrix;
-  UNIFORM mediump mat4 uObjectMatrix;
-  UNIFORM mediump vec3 uLightPosition;
-};
+attribute highp vec3 aPosition;
+attribute highp vec2 aTexCoord;
+attribute highp vec3 aNormal;
+varying mediump vec2 vTexCoord;
+varying mediump vec3 vIllumination;
+varying mediump float vSpecular;
+uniform mediump vec3 uSize;
+uniform mediump mat4 uMvpMatrix;
+uniform mediump mat4 uModelView;
+uniform mediump mat3 uNormalMatrix;
+uniform mediump mat4 uObjectMatrix;
+uniform mediump vec3 uLightPosition;
 
 void main()
 {

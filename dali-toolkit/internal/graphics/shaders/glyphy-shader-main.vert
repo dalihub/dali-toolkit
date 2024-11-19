@@ -1,22 +1,18 @@
-//@name glyphy-shader-main.vert
-
-//@version 100
-
-UNIFORM   mediump mat4    uProjection;
-UNIFORM   mediump mat4    uModelView;
-UNIFORM   mediump mat4    uMvpMatrix;
-UNIFORM           bool    uTextureMapped;
-UNIFORM   mediump vec4    uCustomTextureCoords;
-INPUT highp   vec2    aTexCoord;
-OUTPUT   mediump vec2    vTexCoord;
-UNIFORM   mat3            uModelViewIT;
-INPUT mediump vec3    aNormal;
-OUTPUT   mediump vec3    vNormal;
-INPUT mediump vec2    aPosition;
-OUTPUT   mediump vec4    vVertex;
-INPUT mediump vec4    aColor;
-OUTPUT   mediump vec4    vColor;
-OUTPUT vec4 v_glyph;
+uniform   mediump mat4    uProjection;
+uniform   mediump mat4    uModelView;
+uniform   mediump mat4    uMvpMatrix;
+uniform           bool    uTextureMapped;
+uniform   mediump vec4    uCustomTextureCoords;
+attribute highp   vec2    aTexCoord;
+varying   mediump vec2    vTexCoord;
+uniform   mat3            uModelViewIT;
+attribute mediump vec3    aNormal;
+varying   mediump vec3    vNormal;
+attribute mediump vec2    aPosition;
+varying   mediump vec4    vVertex;
+attribute mediump vec4    aColor;
+varying   mediump vec4    vColor;
+varying vec4 v_glyph;
 
 vec4 glyph_vertex_transcode (vec2 v)
 {

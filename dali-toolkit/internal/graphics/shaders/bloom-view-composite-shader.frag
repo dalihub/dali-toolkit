@@ -1,20 +1,12 @@
-//@name bloom-view-composite-shader.frag
-
-//@version 100
-
 precision mediump float;
-INPUT mediump vec2 vTexCoord;
-UNIFORM sampler2D sTexture;
-UNIFORM sampler2D sEffect;
-
-UNIFORM_BLOCK FragBlock
-{
-  UNIFORM lowp vec4 uColor;
-  UNIFORM float uBloomIntensity;
-  UNIFORM float uImageIntensity;
-  UNIFORM float uBloomSaturation;
-  UNIFORM float uImageSaturation;
-};
+varying mediump vec2 vTexCoord;
+uniform sampler2D sTexture;
+uniform sampler2D sEffect;
+uniform lowp vec4 uColor;
+uniform float uBloomIntensity;
+uniform float uImageIntensity;
+uniform float uBloomSaturation;
+uniform float uImageSaturation;
 
 vec4 ChangeSaturation(vec4 col, float sat)
 {
@@ -26,8 +18,8 @@ void main()
 {
   mediump vec4 image;
   mediump vec4 bloom;
-  image = TEXTURE(sTexture, vTexCoord);
-  bloom = TEXTURE(sEffect, vTexCoord);
+  image = texture2D(sTexture, vTexCoord);
+  bloom = texture2D(sEffect, vTexCoord);
   image = ChangeSaturation(image, uImageSaturation) * uImageIntensity;
   bloom = ChangeSaturation(bloom, uBloomSaturation) * uBloomIntensity;
   image *= 1.0 - clamp(bloom, 0.0, 1.0); // darken base where bloom is strong, to prevent excessive burn-out of result

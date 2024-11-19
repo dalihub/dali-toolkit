@@ -1,21 +1,9 @@
-//@name page-turn-book-spine-effect.vert
-
-//@version 100
-
 precision mediump float;
-INPUT mediump vec2 aPosition;
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM mediump mat4 uMvpMatrix;
-  UNIFORM float uTextureWidth;
-};
-
-UNIFORM_BLOCK SharedBlock
-{
-UNIFORM vec3 uSize;
-};
-
-OUTPUT vec2 vTexCoord;
+attribute mediump vec2 aPosition;
+uniform mediump mat4 uMvpMatrix;
+uniform vec3 uSize;
+uniform float uTextureWidth;
+varying vec2 vTexCoord;
 
 void main()
 {

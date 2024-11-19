@@ -1,10 +1,6 @@
-//@version 100
 
 precision mediump float;
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM mat4 uMvpMatrix;
-};
+uniform mat4 uMvpMatrix;
 INPUT vec3 aPosition;
 INPUT float aColor;
 FLAT OUTPUT float vColor;
