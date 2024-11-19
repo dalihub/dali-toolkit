@@ -1,20 +1,32 @@
+//@name text-visual-shader.frag
+
+//@version 100
+
 INPUT mediump vec2 vTexCoord;
-uniform sampler2D sTexture;
+UNIFORM sampler2D sTexture;
 #ifdef IS_REQUIRED_STYLE
-uniform sampler2D sStyle;
+UNIFORM sampler2D sStyle;
 #endif
 #ifdef IS_REQUIRED_OVERLAY
-uniform sampler2D sOverlayStyle;
+UNIFORM sampler2D sOverlayStyle;
 #endif
+
 #ifdef IS_REQUIRED_MULTI_COLOR
 #elif defined(IS_REQUIRED_EMOJI)
 // Single color with emoji.
-uniform sampler2D sMask;
-uniform lowp float uHasMultipleTextColors;
+UNIFORM sampler2D sMask;
 #endif
-uniform lowp vec4 uTextColorAnimatable;
-uniform lowp vec4 uColor;
 
+UNIFORM_BLOCK FragBlock
+{
+  #ifdef IS_REQUIRED_MULTI_COLOR
+  #elif defined(IS_REQUIRED_EMOJI)
+  // Single color with emoji.
+  UNIFORM lowp float uHasMultipleTextColors;
+  #endif
+  UNIFORM lowp vec4 uTextColorAnimatable;
+  UNIFORM lowp vec4 uColor;
+};
 void main()
 {
 #ifdef IS_REQUIRED_STYLE
@@ -47,7 +59,7 @@ void main()
 #endif
 
   // Draw the text as overlay above the style
-  OUT_COLOR = uColor * (
+  gl_FragColor = uColor * (
 #ifdef IS_REQUIRED_OVERLAY
                    (
 #endif

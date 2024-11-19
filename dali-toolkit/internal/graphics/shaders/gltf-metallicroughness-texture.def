@@ -1,4 +1,8 @@
 #define TEXTURE_METALLICROUGHNESS
 
-uniform sampler2D uMetallicRoughnessSampler;
-uniform int uMetallicRoughnessTexCoordIndex;
+UNIFORM sampler2D uMetallicRoughnessSampler;
+
+UNIFORM_BLOCK FragBlockMetRough
+{
+  UNIFORM int uMetallicRoughnessTexCoordIndex;
+};

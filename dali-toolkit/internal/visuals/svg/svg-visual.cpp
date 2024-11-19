@@ -45,6 +45,8 @@ const int CUSTOM_PROPERTY_COUNT(1); // atlas
 
 constexpr Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
+constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
+
 } // namespace
 
 SvgVisualPtr SvgVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties)
@@ -423,7 +425,7 @@ void SvgVisual::RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureS
         if(DALI_UNLIKELY(mAtlasRect != FULL_TEXTURE_RECT))
         {
           // Register atlas rect property only if it's not full texture rect.
-          mAtlasRectIndex = mImpl->mRenderer.RegisterUniqueProperty(mAtlasRectIndex, ATLAS_RECT_UNIFORM_NAME, mAtlasRect);
+          mAtlasRectIndex = mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, mAtlasRect);
         }
       }
       else
@@ -546,6 +548,10 @@ Shader SvgVisual::GenerateShader() const
                          mImpl->mCustomShader->mHints);
 
     shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+
+    // Most of image visual shader user (like svg, animated vector image visual) use pre-multiplied alpha.
+    // If the visual dont want to using pre-multiplied alpha, it should be set as 0.0f as renderer side.
+    shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
   }
   return shader;
 }

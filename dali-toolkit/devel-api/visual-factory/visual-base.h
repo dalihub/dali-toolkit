@@ -217,6 +217,14 @@ public:
    */
   Visual::Type GetType() const;
 
+  /**
+   * @brief Retrieve the property object associated with the property key.
+   *
+   * @param[in] key The Property key of the visual.
+   * @return The Property object
+   */
+  Dali::Property GetPropertyObject(Dali::Property::Key key);
+
 public: // Not intended for application developers
   explicit DALI_INTERNAL Base(Internal::Visual::Base* impl);
 };

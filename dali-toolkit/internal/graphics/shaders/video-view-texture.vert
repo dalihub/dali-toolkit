@@ -1,8 +1,15 @@
-attribute mediump vec2 aPosition;
-varying mediump vec2 vTexCoord;
-uniform highp mat4 uMvpMatrix;
-uniform highp vec3 uSize;
-varying mediump vec2 sTexCoordRect;
+//@name video-view-texture.vert
+
+//@version 100
+
+INPUT mediump vec2 aPosition;
+OUTPUT mediump vec2 vTexCoord;
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp vec3 uSize;
+};
+OUTPUT mediump vec2 sTexCoordRect;
 
 void main()
 {

@@ -1,10 +1,17 @@
-varying mediump vec2 vTexCoord;
-uniform lowp vec4 uShadowColor;
-uniform sampler2D sTexture;
+//@name shadow-view-render-shader.frag
+
+//@version 100
+
+INPUT mediump vec2 vTexCoord;
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uShadowColor;
+};
+UNIFORM sampler2D sTexture;
 
 void main()
 {
   lowp float alpha;
-  alpha = texture2D(sTexture, vec2(vTexCoord.x, vTexCoord.y)).a;
+  alpha = TEXTURE(sTexture, vec2(vTexCoord.x, vTexCoord.y)).a;
   gl_FragColor = vec4(uShadowColor.rgb, uShadowColor.a * alpha);
 }

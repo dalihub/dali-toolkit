@@ -48,9 +48,11 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(1); // pixel area,
+const int CUSTOM_PROPERTY_COUNT(1); // PixelArea
 
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
+
+constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
 
 // stop behavior
 DALI_ENUM_TO_STRING_TABLE_BEGIN(STOP_BEHAVIOR)
@@ -899,6 +901,10 @@ Shader AnimatedVectorImageVisual::GenerateShader() const
                          mImpl->mCustomShader->mHints);
 
     shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+
+    // Most of image visual shader user (like svg, animated vector image visual) use pre-multiplied alpha.
+    // If the visual dont want to using pre-multiplied alpha, it should be set as 0.0f as renderer side.
+    shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
   }
   else
   {

@@ -1,19 +1,31 @@
+//@name page-turn-book-spine-effect.frag
+
+//@version 100
+
 precision mediump float;
-varying mediump vec2 vTexCoord;
-uniform vec3 uSize;
-uniform vec2 uSpineShadowParameter;
-uniform sampler2D sTexture;
-uniform lowp vec4 uColor;
+INPUT mediump vec2 vTexCoord;
+UNIFORM sampler2D sTexture;
+
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uColor;
+  UNIFORM vec2 uSpineShadowParameter;
+};
+
+UNIFORM_BLOCK SharedBlock
+{
+UNIFORM vec3 uSize;
+};
 
 void main()
 {
   if( gl_FrontFacing ) // display front side
   {
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;
+    gl_FragColor = TEXTURE( sTexture, vTexCoord ) * uColor;
   }
   else // display back side, flip the image horizontally by changing the x component of the texture coordinate
   {
-    gl_FragColor = texture2D( sTexture, vec2( 1.0 - vTexCoord.x, vTexCoord.y ) ) * uColor;
+    gl_FragColor = TEXTURE( sTexture, vec2( 1.0 - vTexCoord.x, vTexCoord.y ) ) * uColor;
   }
   // display book spine, a stripe of shadowed texture
   float pixelPos = vTexCoord.x * uSize.x;

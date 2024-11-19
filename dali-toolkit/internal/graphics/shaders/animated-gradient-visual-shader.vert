@@ -1,15 +1,21 @@
-attribute mediump vec2 aPosition;
-uniform highp mat4 uMvpMatrix;
-uniform highp vec3 uSize;
+//@name animated-gradient-visual-shader.vert
 
-uniform mediump vec2 start_point;
-uniform mediump vec2 end_point;
-uniform mediump vec2 rotate_center;
-uniform mediump float rotate_angle;
+//@version 100
 
-varying mediump vec2 vTexCoord;
-varying mediump vec2 vStart;
-varying mediump vec2 vEnd;
+INPUT mediump vec2 aPosition;
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp vec3 uSize;
+  UNIFORM mediump vec2 start_point;
+  UNIFORM mediump vec2 end_point;
+  UNIFORM mediump vec2 rotate_center;
+  UNIFORM mediump float rotate_angle;
+};
+
+OUTPUT mediump vec2 vTexCoord;
+OUTPUT mediump vec2 vStart;
+OUTPUT mediump vec2 vEnd;
 
 vec2 rotate(vec2 x, vec2 c, float a)
 {
@@ -28,11 +34,14 @@ vec2 rotate(vec2 x, vec2 c, float a)
 }
 
 //Visual size and offset
-uniform mediump vec2 offset;
-uniform highp vec2 size;
-uniform mediump vec4 offsetSizeMode;
-uniform mediump vec2 origin;
-uniform mediump vec2 anchorPoint;
+UNIFORM_BLOCK VisualBlock
+{
+  UNIFORM mediump vec2 offset;
+  UNIFORM highp vec2 size;
+  UNIFORM mediump vec4 offsetSizeMode;
+  UNIFORM mediump vec2 origin;
+  UNIFORM mediump vec2 anchorPoint;
+};
 
 vec4 ComputeVertexPosition()
 {

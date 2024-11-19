@@ -1,13 +1,25 @@
+//@name page-turn-effect.frag
+
+//@version 100
+
 precision mediump float;
 
-varying mediump vec2 vTexCoord;
+INPUT mediump vec2 vTexCoord;
 
-uniform sampler2D sTexture;
-uniform lowp vec4 uColor;
-uniform vec3 uSize;
-uniform vec2 uSpineShadowParameter;
-varying vec3 vNormal;
-varying vec4 vPosition;
+UNIFORM sampler2D sTexture;
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uColor;
+  UNIFORM vec2 uSpineShadowParameter;
+};
+
+UNIFORM_BLOCK SharedBlock
+{
+  UNIFORM vec3 uSize;
+};
+
+INPUT vec3 vNormal;
+INPUT vec4 vPosition;
 
 void main()
 {
@@ -16,9 +28,9 @@ void main()
   // display page content
   vec4 texel;
   // display back image of the page, flip the texture
-  if(  dot(vPosition.xyz, normal) > 0.0 ) texel = texture2D( sTexture, vec2( 1.0 - vTexCoord.x, vTexCoord.y ) );
+  if(  dot(vPosition.xyz, normal) > 0.0 ) texel = TEXTURE( sTexture, vec2( 1.0 - vTexCoord.x, vTexCoord.y ) );
   // display front image of the page
-  else texel = texture2D( sTexture, vTexCoord );
+  else texel = TEXTURE( sTexture, vTexCoord );
 
   // display book spine, a stripe of shadowed texture
   float pixelPos = vTexCoord.x * uSize.x;

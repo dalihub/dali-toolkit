@@ -1,9 +1,16 @@
-uniform lowp    vec4      uColor;
-uniform lowp    vec4      textColorAnimatable;
-uniform         sampler2D sTexture;
-varying mediump vec2      vTexCoord;
+//@name text-atlas-rgba-shader.frag
+
+//@version 100
+
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4      uColor;
+  UNIFORM lowp vec4      textColorAnimatable;
+};
+UNIFORM         sampler2D sTexture;
+INPUT mediump vec2      vTexCoord;
 
 void main()
 {
-  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * textColorAnimatable;
+  gl_FragColor = TEXTURE( sTexture, vTexCoord ) * uColor * textColorAnimatable;
 }

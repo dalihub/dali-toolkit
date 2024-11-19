@@ -1384,6 +1384,16 @@ int UtcDaliNPatchVisualAuxiliaryImage01(void)
   Renderer renderer = dummy.GetRendererAt(0);
   auto     textures = renderer.GetTextures();
   DALI_TEST_EQUALS(textures.GetTextureCount(), 2, TEST_LOCATION);
+
+  // SceneOff + SceneOn immediatly. Let we check cached texture still exist.
+  dummy.Unparent();
+  application.GetScene().Add(dummy);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
   UnparentAndReset(dummy);
 
   END_TEST;

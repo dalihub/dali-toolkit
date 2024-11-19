@@ -1,3 +1,7 @@
+//@name color-visual-shader.frag
+
+//@version 100
+
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
 INPUT highp vec2 vPosition;
 FLAT INPUT highp vec2 vRectSize;
@@ -14,24 +18,35 @@ FLAT INPUT highp vec4 vCutoutCornerRadius;
 #endif
 #endif
 
-uniform lowp vec4 uColor;
-#ifdef IS_REQUIRED_BLUR
-uniform highp float blurRadius;
-#elif defined(IS_REQUIRED_BORDERLINE)
-uniform highp float borderlineWidth;
-uniform highp float borderlineOffset;
-uniform lowp vec4 borderlineColor;
-uniform lowp vec4 uActorColor;
-#endif
-
-#ifdef IS_REQUIRED_SQUIRCLE_CORNER
-uniform highp vec4 cornerSquareness;
+UNIFORM_BLOCK FragBlock
+{
+    UNIFORM lowp vec4 uColor;
+#if defined(IS_REQUIRED_BORDERLINE)
+    UNIFORM lowp vec4 uActorColor;
 #endif
 
 #if defined(IS_REQUIRED_CUTOUT)
-uniform highp vec3 uSize;
-uniform lowp int uCutoutWithCornerRadius;
+    UNIFORM lowp int uCutoutWithCornerRadius;
 #endif
+
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+    UNIFORM highp vec4 cornerSquareness;
+#endif
+};
+
+UNIFORM_BLOCK SharedBlock
+{
+    UNIFORM highp vec3 uSize;
+
+#ifdef IS_REQUIRED_BLUR
+    UNIFORM highp float blurRadius;
+#elif defined(IS_REQUIRED_BORDERLINE)
+    UNIFORM highp float borderlineWidth;
+    UNIFORM highp float borderlineOffset;
+    UNIFORM lowp vec4 borderlineColor;
+#endif
+};
+
 
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
 // Global values both rounded corner and borderline use
@@ -370,7 +385,7 @@ void main()
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    OUT_COLOR = targetColor;
+    gl_FragColor = targetColor;
   }
   else
   {
@@ -388,17 +403,17 @@ void main()
     calculatePotential();
     setupMinMaxPotential(tempBorderlineWidth);
 
-    OUT_COLOR = targetColor;
+    gl_FragColor = targetColor;
 
     mediump float opacity = calculateBlurOpacity();
-    OUT_COLOR *= opacity;
+    gl_FragColor *= opacity;
 #else
 #if defined(IS_REQUIRED_ROUNDED_CORNER) && !defined(IS_REQUIRED_BORDERLINE)
     // skip rounded corner calculate for performance
     if(gFragmentPosition.x + gFragmentPosition.y < -(gRadius + vAliasMargin) * 2.0)
     {
       // Do nothing.
-      OUT_COLOR = targetColor;
+      gl_FragColor = targetColor;
     }
     else
 #endif
@@ -416,11 +431,11 @@ void main()
 #endif
 #endif
 
-      OUT_COLOR = targetColor;
+      gl_FragColor = targetColor;
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
       mediump float opacity = calculateCornerOpacity();
-      OUT_COLOR *= opacity;
+      gl_FragColor *= opacity;
 #endif
     }
 #endif
@@ -430,6 +445,6 @@ void main()
 #endif
 
 #ifdef IS_REQUIRED_CUTOUT
-  OUT_COLOR *= discardOpacity;
+  gl_FragColor *= discardOpacity;
 #endif
 }

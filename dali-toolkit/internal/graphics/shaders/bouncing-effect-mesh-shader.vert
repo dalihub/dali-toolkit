@@ -1,9 +1,16 @@
+//@name bouncing-effect-mesh-shader.vert
+
+//@version 100
+
 // Modify the vertex position according to the bounce coefficient
-attribute mediump vec3    aPosition1;
-attribute mediump vec3    aPosition2;
-uniform   mediump mat4    uMvpMatrix;
-uniform   mediump vec3    uSize;
-uniform   mediump float   uBounceCoefficient;
+INPUT mediump vec3    aPosition1;
+INPUT mediump vec3    aPosition2;
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM   mediump mat4    uMvpMatrix;
+  UNIFORM   mediump vec3    uSize;
+  UNIFORM   mediump float   uBounceCoefficient;
+};
 
 void main()
 {
