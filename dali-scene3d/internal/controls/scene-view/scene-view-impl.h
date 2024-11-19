@@ -29,7 +29,6 @@
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali/public-api/capture/capture.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/frame-buffer.h>
