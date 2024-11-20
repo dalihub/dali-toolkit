@@ -78,6 +78,8 @@ static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
 // resolution: 600*600, pixel format: RGB888
 static const char* gImage_600_RGB = TEST_RESOURCE_DIR "/test-image-600.jpg";
 
+const char* TEST_COMPRESSED_ALPHA_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/RGBA_ASTC_4x4.ktx";
+
 // resolution: 50*50, frame count: 4, frame delay: 0.2 second for each frame
 const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 
@@ -437,7 +439,97 @@ int UtcDaliImageViewPreMultipliedAlphaJpg(void)
 
   value = imageView1.GetProperty(ImageView::Property::PRE_MULTIPLIED_ALPHA);
   DALI_TEST_CHECK(value.Get(enable));
-  DALI_TEST_CHECK(!enable); // Should be false after loading
+  DALI_TEST_CHECK(enable); // Should be true after loading, Since RGB format works same as premuliplied alpha with 1.0.
+
+  // conventional alpha blending
+  Renderer renderer1 = imageView1.GetRendererAt(0);
+  value              = renderer1.GetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+  DALI_TEST_CHECK(value.Get(enable));
+  DALI_TEST_CHECK(enable);
+
+  int srcFactorRgb    = renderer1.GetProperty<int>(Renderer::Property::BLEND_FACTOR_SRC_RGB);
+  int destFactorRgb   = renderer1.GetProperty<int>(Renderer::Property::BLEND_FACTOR_DEST_RGB);
+  int srcFactorAlpha  = renderer1.GetProperty<int>(Renderer::Property::BLEND_FACTOR_SRC_ALPHA);
+  int destFactorAlpha = renderer1.GetProperty<int>(Renderer::Property::BLEND_FACTOR_DEST_ALPHA);
+  DALI_TEST_CHECK(srcFactorRgb == BlendFactor::ONE);
+  DALI_TEST_CHECK(destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA);
+  DALI_TEST_CHECK(srcFactorAlpha == BlendFactor::ONE);
+  DALI_TEST_CHECK(destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA);
+
+  DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION); // A new texture should be generated.
+  textureTrace.Reset();
+
+  ImageView imageView2 = ImageView::New();
+  imageView2.SetProperty(ImageView::Property::IMAGE, imageMap);
+
+  // Disable pre-multiplied alpha blending
+  imageView2.SetProperty(ImageView::Property::PRE_MULTIPLIED_ALPHA, false);
+
+  application.GetScene().Add(imageView2);
+
+  application.SendNotification();
+  application.Render();
+
+  // TODO : Could we use cached jpg image here? For now, just load again.
+  // Please remove this line if you impelemt cache for non-alpha channel image cases.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  value = imageView2.GetProperty(ImageView::Property::PRE_MULTIPLIED_ALPHA);
+  DALI_TEST_CHECK(value.Get(enable));
+  DALI_TEST_CHECK(!enable); // Should be false after loading, to match with old legacy behavior. TODO : Could we change this behavior?
+
+  // conventional alpha blending
+  Renderer renderer2 = imageView2.GetRendererAt(0);
+  value              = renderer2.GetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+  DALI_TEST_CHECK(value.Get(enable));
+  DALI_TEST_CHECK(!enable);
+
+  srcFactorRgb    = renderer2.GetProperty<int>(Renderer::Property::BLEND_FACTOR_SRC_RGB);
+  destFactorRgb   = renderer2.GetProperty<int>(Renderer::Property::BLEND_FACTOR_DEST_RGB);
+  srcFactorAlpha  = renderer2.GetProperty<int>(Renderer::Property::BLEND_FACTOR_SRC_ALPHA);
+  destFactorAlpha = renderer2.GetProperty<int>(Renderer::Property::BLEND_FACTOR_DEST_ALPHA);
+  DALI_TEST_CHECK(srcFactorRgb == BlendFactor::SRC_ALPHA);
+  DALI_TEST_CHECK(destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA);
+  DALI_TEST_CHECK(srcFactorAlpha == BlendFactor::ONE);
+  DALI_TEST_CHECK(destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA);
+
+  DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION); // The cached texture should be used.
+
+  END_TEST;
+}
+
+int UtcDaliImageViewPreMultipliedAlphaCompressed(void)
+{
+  ToolkitTestApplication application;
+
+  // Set up trace debug
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  Property::Map imageMap;
+  imageMap[ImageVisual::Property::URL]            = TEST_COMPRESSED_ALPHA_IMAGE_FILE_NAME;
+  imageMap[ImageVisual::Property::RELEASE_POLICY] = ImageVisual::ReleasePolicy::NEVER; // To keep the texture cache
+
+  ImageView imageView1 = ImageView::New();
+  imageView1.SetProperty(ImageView::Property::IMAGE, imageMap);
+
+  application.GetScene().Add(imageView1);
+
+  Property::Value value = imageView1.GetProperty(ImageView::Property::PRE_MULTIPLIED_ALPHA);
+  bool            enable;
+  DALI_TEST_CHECK(value.Get(enable));
+  DALI_TEST_CHECK(enable); // Default value is true
+
+  // loading started, this waits for the loader thread for max 30 seconds
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  value = imageView1.GetProperty(ImageView::Property::PRE_MULTIPLIED_ALPHA);
+  DALI_TEST_CHECK(value.Get(enable));
+  DALI_TEST_CHECK(!enable); // Should be false after loading, Since compressed format doesn't allow to premuliply alpha.
 
   // conventional alpha blending
   Renderer renderer1 = imageView1.GetRendererAt(0);

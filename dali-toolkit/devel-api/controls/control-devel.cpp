@@ -24,7 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/control/control-accessibility-data.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
@@ -142,59 +142,59 @@ Dali::Property GetVisualProperty(Control control, Dali::Property::Index index, D
 
 Toolkit::DevelControl::AccessibilityActivateSignalType& AccessibilityActivateSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityActivateSignal;
+  return GetControlImplementation(control).mAccessibilityData->mAccessibilityActivateSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingSkippedSignalType& AccessibilityReadingSkippedSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityReadingSkippedSignal;
+  return GetControlImplementation(control).mAccessibilityData->mAccessibilityReadingSkippedSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingPausedSignalType& AccessibilityReadingPausedSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityReadingPausedSignal;
+  return GetControlImplementation(control).mAccessibilityData->mAccessibilityReadingPausedSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingResumedSignalType& AccessibilityReadingResumedSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityReadingResumedSignal;
+  return GetControlImplementation(control).mAccessibilityData->mAccessibilityReadingResumedSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingCancelledSignalType& AccessibilityReadingCancelledSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityReadingCancelledSignal;
+  return GetControlImplementation(control).mAccessibilityData->mAccessibilityReadingCancelledSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingStoppedSignalType& AccessibilityReadingStoppedSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityReadingStoppedSignal;
+  return GetControlImplementation(control).mAccessibilityData->mAccessibilityReadingStoppedSignal;
 }
 
 Toolkit::DevelControl::AccessibilityGetNameSignalType& AccessibilityGetNameSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityGetNameSignal;
+  return GetControlImplementation(control).mAccessibilityData->mAccessibilityGetNameSignal;
 }
 
 Toolkit::DevelControl::AccessibilityGetDescriptionSignalType& AccessibilityGetDescriptionSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityGetDescriptionSignal;
+  return GetControlImplementation(control).mAccessibilityData->mAccessibilityGetDescriptionSignal;
 }
 
 Toolkit::DevelControl::AccessibilityDoGestureSignalType& AccessibilityDoGestureSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityDoGestureSignal;
+  return GetControlImplementation(control).mAccessibilityData->mAccessibilityDoGestureSignal;
 }
 
 Toolkit::DevelControl::AccessibilityActionSignalType& AccessibilityActionSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityActionSignal;
+  return GetControlImplementation(control).mAccessibilityData->mAccessibilityActionSignal;
 }
 
 void AppendAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation)
 {
   if(auto destinationAccessible = Accessibility::Accessible::Get(destination))
   {
-    GetControlImplementation(control).mAccessibilityProps.relations[relation].insert(destinationAccessible);
+    GetControlImplementation(control).mAccessibilityData->mAccessibilityProps.relations[relation].insert(destinationAccessible);
   }
 }
 
@@ -202,7 +202,7 @@ void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destinati
 {
   if(auto destinationAccessible = Accessibility::Accessible::Get(destination))
   {
-    auto& relations = GetControlImplementation(control).mAccessibilityProps.relations;
+    auto& relations = GetControlImplementation(control).mAccessibilityData->mAccessibilityProps.relations;
 
     relations[relation].erase(destinationAccessible);
 
@@ -215,7 +215,7 @@ void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destinati
 
 std::vector<Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control control)
 {
-  const auto&                          relations = GetControlImplementation(control).mAccessibilityProps.relations;
+  const auto&                          relations = GetControlImplementation(control).mAccessibilityData->mAccessibilityProps.relations;
   std::vector<Accessibility::Relation> result;
 
   for(auto& relation : relations)
@@ -231,7 +231,7 @@ std::vector<Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control 
 
 void ClearAccessibilityRelations(Toolkit::Control control)
 {
-  GetControlImplementation(control).mAccessibilityProps.relations.clear();
+  GetControlImplementation(control).mAccessibilityData->mAccessibilityProps.relations.clear();
 }
 
 void AppendAccessibilityAttribute(Toolkit::Control control, const std::string& key, const std::string& value)
@@ -315,30 +315,34 @@ bool IsCreateAccessibleEnabled(Toolkit::Control control)
 
 void EmitAccessibilityStateChanged(Dali::Actor actor, Accessibility::State state, int newValue)
 {
-  auto accessible = Accessibility::Accessible::GetOwningPtr(actor);
-  if(DALI_LIKELY(accessible))
+  auto bridge  = Accessibility::Bridge::GetCurrentBridge();
+  auto control = Toolkit::Control::DownCast(actor);
+  if(DALI_LIKELY(control))
   {
-    auto control = Toolkit::Control::DownCast(actor);
-    if(DALI_LIKELY(control))
+    if(state == Accessibility::State::SHOWING)
     {
-      if(state == Accessibility::State::SHOWING)
+      bool isModal = ControlAccessible::IsModal(control);
+      if(isModal)
       {
-        bool isModal = ControlAccessible::IsModal(control);
-        if(isModal)
+        if(newValue == 1)
         {
-          if(newValue == 1)
-          {
-            Accessibility::Bridge::GetCurrentBridge()->RegisterDefaultLabel(accessible);
-          }
-          else
-          {
-            Accessibility::Bridge::GetCurrentBridge()->UnregisterDefaultLabel(accessible);
-          }
+          bridge->RegisterDefaultLabel(actor);
+        }
+        else
+        {
+          bridge->UnregisterDefaultLabel(actor);
         }
       }
     }
+  }
 
-    accessible->EmitStateChanged(state, newValue, 0);
+  if(bridge->IsUp())
+  {
+    auto accessible = Accessibility::Accessible::Get(actor);
+    if(DALI_LIKELY(accessible))
+    {
+      accessible->EmitStateChanged(state, newValue, 0);
+    }
   }
 }
 

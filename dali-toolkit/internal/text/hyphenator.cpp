@@ -48,7 +48,8 @@ Vector<bool> GetWordHyphens(TextAbstraction::Hyphenation& hyphenation,
 
   // first get the needed encoding
   std::string text;
-  if(strcmp(hyphenation.GetDictionaryEncoding(lang), UTF8) == 0)
+  const char* dictionaryEncodingName = hyphenation.GetDictionaryEncoding(lang);
+  if(DALI_LIKELY(dictionaryEncodingName) && strcmp(dictionaryEncodingName, UTF8) == 0)
   {
     Utf32ToUtf8(word, wordSize, text);
   }

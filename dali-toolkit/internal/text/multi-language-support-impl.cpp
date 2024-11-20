@@ -681,6 +681,22 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
     FontId fontId = fontClient.GetFontId(currentFontDescription, currentFontPointSize);
     currentFontId = fontId;
 
+    // Prevent double-bolding from both markup and style
+    bool isFontChangedByBold = false;
+
+    if(currentFontDescription.weight == TextAbstraction::FontWeight::BOLD)
+    {
+      TextAbstraction::FontDescription currentFontDescriptionWithoutBold = TextAbstraction::FontDescription(currentFontDescription);
+      currentFontDescriptionWithoutBold.weight = TextAbstraction::FontWeight::NORMAL;
+
+      FontId fontIdWithoutBold = fontClient.GetFontId(currentFontDescriptionWithoutBold, currentFontPointSize);
+      if(fontId != fontIdWithoutBold)
+      {
+        // If a font is already changed by the bold feature, do not let Freetype further embolden it.
+        isFontChangedByBold = true;
+      }
+    }
+
     // Get the script for the current character.
     Script script = GetScript(index,
                               scriptRunIt,
@@ -825,7 +841,7 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
     }
 
     // Whether bols style is required.
-    isBoldRequired = (currentFontDescription.weight >= TextAbstraction::FontWeight::BOLD);
+    isBoldRequired = (!isFontChangedByBold && (currentFontDescription.weight >= TextAbstraction::FontWeight::BOLD));
 
     // Whether italic style is required.
     isItalicRequired = (currentFontDescription.slant >= TextAbstraction::FontSlant::ITALIC);

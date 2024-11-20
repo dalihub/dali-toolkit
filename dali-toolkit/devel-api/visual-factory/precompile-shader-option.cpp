@@ -36,6 +36,7 @@ const char* TOKEN_TYPE_CUSTOM("custom");
 // OPTION
 const char* TOKEN_OPTION("shaderOption");
 const char* TOKEN_OPTION_ROUNDED_CORNER("ROUNDED_CORNER");
+const char* TOKEN_OPTION_SQUIRCLE_CORNER("SQUIRCLE_CORNER");
 const char* TOKEN_OPTION_BORDERLINE("BORDERLINE");
 const char* TOKEN_OPTION_BLUR_EDGE("BLUR_EDGE");
 const char* TOKEN_OPTION_CUTOUT("CUTOUT");
@@ -68,19 +69,20 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(SHADER_TYPE)
 DALI_ENUM_TO_STRING_TABLE_END(SHADER_TYPE);
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN(SHADER_OPTION_FLAG)
-  {TOKEN_OPTION_ROUNDED_CORNER, static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::ROUNDED_CORNER)},
-  {TOKEN_OPTION_BORDERLINE,     static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::BORDERLINE)},
-  {TOKEN_OPTION_BLUR_EDGE,      static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::BLUR_EDGE)},
-  {TOKEN_OPTION_CUTOUT,         static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::CUTOUT)},
-  {TOKEN_OPTION_ATLAS_DEFAULT,  static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::ATLAS_DEFAULT)},
-  {TOKEN_OPTION_ATLAS_CUSTOM,   static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::ATLAS_CUSTOM)},
-  {TOKEN_OPTION_MASKING,        static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::MASKING)},
-  {TOKEN_OPTION_YUV_TO_RGB,     static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::YUV_TO_RGB)},
-  {TOKEN_OPTION_YUV_AND_RGB,    static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::YUV_AND_RGB)},
-  {TOKEN_OPTION_MULTI_COLOR,    static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::MULTI_COLOR)},
-  {TOKEN_OPTION_STYLES,         static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::STYLES)},
-  {TOKEN_OPTION_OVERLAY,        static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::OVERLAY)},
-  {TOKEN_OPTION_EMOJI,          static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::EMOJI)},
+  {TOKEN_OPTION_ROUNDED_CORNER,  static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::ROUNDED_CORNER)},
+  {TOKEN_OPTION_SQUIRCLE_CORNER, static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::SQUIRCLE_CORNER)},
+  {TOKEN_OPTION_BORDERLINE,      static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::BORDERLINE)},
+  {TOKEN_OPTION_BLUR_EDGE,       static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::BLUR_EDGE)},
+  {TOKEN_OPTION_CUTOUT,          static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::CUTOUT)},
+  {TOKEN_OPTION_ATLAS_DEFAULT,   static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::ATLAS_DEFAULT)},
+  {TOKEN_OPTION_ATLAS_CUSTOM,    static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::ATLAS_CUSTOM)},
+  {TOKEN_OPTION_MASKING,         static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::MASKING)},
+  {TOKEN_OPTION_YUV_TO_RGB,      static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::YUV_TO_RGB)},
+  {TOKEN_OPTION_YUV_AND_RGB,     static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::YUV_AND_RGB)},
+  {TOKEN_OPTION_MULTI_COLOR,     static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::MULTI_COLOR)},
+  {TOKEN_OPTION_STYLES,          static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::STYLES)},
+  {TOKEN_OPTION_OVERLAY,         static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::OVERLAY)},
+  {TOKEN_OPTION_EMOJI,           static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::EMOJI)},
 DALI_ENUM_TO_STRING_TABLE_END(SHADER_OPTION_FLAG);
 // clang-format on
 } // namespace

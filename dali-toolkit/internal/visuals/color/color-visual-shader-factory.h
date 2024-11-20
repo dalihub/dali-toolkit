@@ -36,12 +36,13 @@ namespace ColorVisualShaderFeature
 namespace RoundedCorner
 {
 /**
- * @brief Whether use RoundedCorner, or not
+ * @brief Whether use rounded corner, or squircle corner, or not
  */
 enum Type
 {
-  DISABLED = 0, ///< Color visual doesn't use rounded corner
-  ENABLED       ///< Color visual uses rounded corner
+  DISABLED = 0,   ///< Color visual doesn't use rounded corner
+  ROUNDED_CORNER, ///< Color visual uses rounded corner
+  SQUIRCLE_CORNER ///< Color visual use squircle corner
 };
 } // namespace RoundedCorner
 
@@ -85,7 +86,7 @@ class FeatureBuilder
 {
 public:
   FeatureBuilder();
-  FeatureBuilder& EnableRoundCorner(bool enableRoundCorner);
+  FeatureBuilder& EnableRoundCorner(bool enableRoundCorner, bool enableSquircleCorner = false);
   FeatureBuilder& EnableBorderLine(bool enableBorderLine);
   FeatureBuilder& EnableBlur(bool enableBlur);
   FeatureBuilder& EnableCutout(bool enableCutout);
@@ -93,23 +94,6 @@ public:
   VisualFactoryCache::ShaderType GetShaderType() const;
   void                           GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const;
   void                           GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const;
-
-  bool IsEnabledRoundCorner() const
-  {
-    return mColorRoundCorner == ColorVisualShaderFeature::RoundedCorner::ENABLED;
-  }
-  bool IsEnabledBorderLine() const
-  {
-    return mColorBorderline == ColorVisualShaderFeature::Borderline::ENABLED;
-  }
-  bool IsEnabledBlur() const
-  {
-    return mColorBlur == ColorVisualShaderFeature::Blur::ENABLED;
-  }
-  bool IsEnabledCutout() const
-  {
-    return mColorCutout == ColorVisualShaderFeature::Cutout::ENABLED;
-  }
 
 private:
   RoundedCorner::Type mColorRoundCorner : 2; ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED

@@ -1,5 +1,8 @@
 #define TEXTURE_NORMAL
 
-uniform sampler2D uNormalSampler;
-uniform float uNormalScale;
-uniform int uNormalTexCoordIndex;
+UNIFORM sampler2D uNormalSampler;
+UNIFORM_BLOCK     FragBlockNormal
+{
+  UNIFORM float uNormalScale;
+  UNIFORM int   uNormalTexCoordIndex;
+};

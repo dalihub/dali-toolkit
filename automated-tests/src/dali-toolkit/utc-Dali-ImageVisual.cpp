@@ -36,6 +36,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
 
@@ -71,6 +72,8 @@ const char* TEST_MASK_IMAGE_FILE_NAME     = TEST_RESOURCE_DIR "/mask.png";
 const char* TEST_ROTATED_IMAGE            = TEST_RESOURCE_DIR "/keyboard-Landscape.jpg";
 const char* TEST_YUV420_IMAGE_FILE_NAME   = TEST_RESOURCE_DIR "/gallery-small-1-yuv420.jpg";
 const char* TEST_N_PATCH_IMAGE_FILE_NAME  = TEST_RESOURCE_DIR "/heartsframe.9.png";
+
+const char* TEST_COMPRESSED_ALPHA_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/RGBA_ASTC_4x4.ktx";
 
 constexpr auto LOAD_IMAGE_YUV_PLANES_ENV         = "DALI_LOAD_IMAGE_YUV_PLANES";
 constexpr auto ENABLE_DECODE_JPEG_TO_YUV_420_ENV = "DALI_ENABLE_DECODE_JPEG_TO_YUV_420";
@@ -312,14 +315,14 @@ int UtcDaliImageVisualNoPremultipliedAlpha01(void)
 int UtcDaliImageVisualNoPremultipliedAlpha02(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("Request image visual with no alpha channel");
+  tet_infoline("Request image visual with alpha channel and compressed format");
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
-  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_COMPRESSED_ALPHA_IMAGE_FILE_NAME);
 
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -1572,7 +1575,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE);
-  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_COMPRESSED_ALPHA_IMAGE_FILE_NAME);
   propertyMap.Insert("mixColor", Color::BLUE);
   propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
   Visual::Base visual = factory.CreateVisual(propertyMap);
@@ -3719,7 +3722,9 @@ int UtcDaliImageVisualLoadImagePlanes01(void)
 
   Renderer renderer           = actor.GetRendererAt(0);
   auto     preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
-  DALI_TEST_EQUALS(preMultipliedAlpha, false, TEST_LOCATION);
+
+  // Let we allow to premultiply alpha for YUV case, since it doesn't have alpha channel.
+  DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -4503,6 +4508,88 @@ int UtcDaliImageVisualSynchronousSizing03(void)
   application.Render();
 
   DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualUpdatePixelAreaByAction(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("ImageVisual animate pixel area");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("pixelArea", Property::Type::VECTOR4),
+    };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  application.GetPlatform().SetClosestImageSize(Vector2(100, 100));
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  propertyMap.Insert("mixColor", Color::BLUE);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+
+  DummyControl        actor     = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(2000, 2000));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::COLOR, Color::BLACK);
+  application.GetScene().Add(actor);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = actor.GetRendererAt(0);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Default uniform is full-rect
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", Vector4(0.0f, 0.0f, 1.0f, 1.0f)), true, TEST_LOCATION);
+
+  Property::Map attributes;
+  Vector4       targetPixelArea = Vector4(0.0f, 1.0f, 1.0f, -1.0f);
+
+  attributes.Add(ImageVisual::Property::PIXEL_AREA, targetPixelArea);
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  Property::Map resultMap;
+  resultMap = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+
+  Property::Value* value = resultMap.Find(ImageVisual::Property::PIXEL_AREA);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(targetPixelArea, value->Get<Vector4>(), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Check uniform value updated
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", targetPixelArea), true, TEST_LOCATION);
+
+  targetPixelArea = Vector4(-1.0f, -1.0f, 3.0f, 3.0f);
+
+  attributes.Clear();
+  attributes.Add(ImageVisual::Property::PIXEL_AREA, targetPixelArea);
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  resultMap = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+
+  value = resultMap.Find(ImageVisual::Property::PIXEL_AREA);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(targetPixelArea, value->Get<Vector4>(), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Check uniform value updated
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", targetPixelArea), true, TEST_LOCATION);
 
   END_TEST;
 }

@@ -453,6 +453,13 @@ protected:
   bool IsRoundedCornerRequired() const;
 
   /**
+   * @brief Query whether the corners of the visual requires to be squircle.
+   *
+   * @return Returns true if the rounded corner is required, false otherwise.
+   */
+  bool IsSquircleCornerRequired() const;
+
+  /**
    * @brief Query whether the borderline of the visual requires to be rendered.
    *
    * @return Returns true if the outline is required, false otherwise.

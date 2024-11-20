@@ -1,7 +1,14 @@
-attribute mediump vec2 aPosition;
-uniform mediump mat4   uMvpMatrix;
-uniform mediump vec3   uSize;
-varying mediump vec2   vTexCoord;
+//@name gl-view.vert
+
+//@version 100
+
+INPUT mediump vec2 aPosition;
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM mediump mat4   uMvpMatrix;
+  UNIFORM mediump vec3   uSize;
+};
+OUTPUT mediump vec2   vTexCoord;
 
 void main()
 {

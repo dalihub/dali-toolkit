@@ -1,4 +1,11 @@
-uniform lowp vec4 uColor;
+//@name wireframe-visual-shader.frag
+
+//@version 100
+
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uColor;
+};
 
 void main()
 {

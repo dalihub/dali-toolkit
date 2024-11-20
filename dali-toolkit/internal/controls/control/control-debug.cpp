@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/control/control-debug.h>
+#include <dali-toolkit/internal/controls/control/control-visual-data.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/integration-api/debug.h>
@@ -292,9 +293,9 @@ std::string DumpControl(const Internal::Control& control)
   }
   oss << "\"id\":\"" << control.Self().GetProperty<int>(Actor::Property::ID) << "\",\n";
   oss << "\"registeredVisuals\":\n"
-      << controlData.mVisuals << ",\n";
+      << controlData.mVisualData->mVisuals << ",\n";
   oss << "\"removeVisuals\":\n"
-      << controlData.mRemoveVisuals << ",\n";
+      << controlData.mVisualData->mRemoveVisuals << ",\n";
   oss << "\"rendererCount\":" << control.Self().GetRendererCount() << ",\n";
   oss << "\"properties\":\n{\n";
   DumpProperties(oss, control.Self()) << "}\n";

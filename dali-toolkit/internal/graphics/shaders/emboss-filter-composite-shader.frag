@@ -1,9 +1,16 @@
-varying mediump vec2 vTexCoord;
-uniform sampler2D sTexture;
-uniform lowp vec4 uEffectColor;
+//@name emboss-filter-composite-shader.frag
+
+//@version 100
+
+INPUT mediump vec2 vTexCoord;
+UNIFORM sampler2D sTexture;
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uEffectColor;
+};
 
 void main()
 {
   gl_FragColor = uEffectColor;
-  gl_FragColor.a *= texture2D( sTexture, vTexCoord).a;
+  gl_FragColor.a *= TEXTURE( sTexture, vTexCoord).a;
 }

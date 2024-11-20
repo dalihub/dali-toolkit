@@ -122,6 +122,11 @@ void TestVisualAsynchronousRender(ToolkitTestApplication& application,
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 }
 
+Vector4 GetAlphaPreMultipliedColor(const Vector4& color)
+{
+  return Vector4(color.r * color.a, color.g * color.a, color.b * color.a, color.a);
+}
+
 int gResourceReadySignalCounter;
 
 void OnResourceReadySignal(Control control)
@@ -216,7 +221,9 @@ int UtcDaliVisualFactoryGetColorVisual1(void)
   Vector4            actualColor(Vector4::ZERO);
   TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualColor));
-  DALI_TEST_EQUALS(actualColor, testColor, TEST_LOCATION);
+
+  // Note : uColor is alpha premultiplied when we use ColorVisual.
+  DALI_TEST_EQUALS(actualColor, GetAlphaPreMultipliedColor(testColor), TEST_LOCATION);
 
   END_TEST;
 }
@@ -242,7 +249,9 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
   Vector4            actualColor;
   TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualColor));
-  DALI_TEST_EQUALS(actualColor, testColor, TEST_LOCATION);
+
+  // Note : uColor is alpha premultiplied when we use ColorVisual.
+  DALI_TEST_EQUALS(actualColor, GetAlphaPreMultipliedColor(testColor), TEST_LOCATION);
 
   application.GetScene().Remove(actor);
   DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
@@ -1375,6 +1384,16 @@ int UtcDaliNPatchVisualAuxiliaryImage01(void)
   Renderer renderer = dummy.GetRendererAt(0);
   auto     textures = renderer.GetTextures();
   DALI_TEST_EQUALS(textures.GetTextureCount(), 2, TEST_LOCATION);
+
+  // SceneOff + SceneOn immediatly. Let we check cached texture still exist.
+  dummy.Unparent();
+  application.GetScene().Add(dummy);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
   UnparentAndReset(dummy);
 
   END_TEST;
@@ -2916,6 +2935,13 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   imageShader5["shaderType"]   = "image";
   imageShader5["shaderOption"] = Property::Map().Add("ATLAS_CUSTOM", true);
 
+  Property::Map imageShader6;
+  imageShader6["shaderType"]   = "image";
+  imageShader6["shaderOption"] = Property::Map()
+                                   .Add("SQUIRCLE_CORNER", true)
+                                   .Add("BORDERLINE", true)
+                                   .Add("MASKING", true);
+
   Property::Map textShader;
   textShader["shaderType"]   = "text";
   textShader["shaderOption"] = Property::Map()
@@ -2940,6 +2966,12 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
                                    .Add("ROUNDED_CORNER,", true)
                                    .Add("BLUR_EDGE", true);
 
+  Property::Map colorShader3;
+  colorShader3["shaderType"]   = "color";
+  colorShader3["shaderOption"] = Property::Map()
+                                   .Add("SQUIRCLE_CORNER,", true)
+                                   .Add("BLUR_EDGE", true);
+
   Property::Map npatchShader;
   npatchShader["shaderType"] = "npatch";
 
@@ -2962,12 +2994,14 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   factory.AddPrecompileShader(imageShader4);
   factory.AddPrecompileShader(imageShader4); // use same shader, because check line coverage
   factory.AddPrecompileShader(imageShader5);
+  factory.AddPrecompileShader(imageShader6);
   factory.AddPrecompileShader(textShader);
   factory.AddPrecompileShader(textShader); // use same shader, because check line coverage
   factory.AddPrecompileShader(textShader2);
   factory.AddPrecompileShader(colorShader);
   factory.AddPrecompileShader(colorShader); // use same shader, because check line coverage
   factory.AddPrecompileShader(colorShader2);
+  factory.AddPrecompileShader(colorShader3);
   factory.AddPrecompileShader(npatchShader);
   factory.AddPrecompileShader(npatchShader2);
   factory.AddPrecompileShader(customShader);

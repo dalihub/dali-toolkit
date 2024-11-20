@@ -1,7 +1,14 @@
-attribute mediump vec2    aPosition;
-attribute mediump vec4    aColor;
-varying   mediump vec4    vColor;
-uniform   highp mat4      uMvpMatrix;
+//@name text-controller-background-shader.vert
+
+//@version 100
+
+INPUT mediump vec2    aPosition;
+INPUT mediump vec4    aColor;
+OUTPUT   mediump vec4    vColor;
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM   highp mat4      uMvpMatrix;
+};
 
 void main()
 {

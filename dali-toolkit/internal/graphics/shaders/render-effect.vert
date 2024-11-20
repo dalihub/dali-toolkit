@@ -1,15 +1,26 @@
+//@name render-effect.vert
+
+//@version 100
+
 precision highp float;
 
-attribute highp vec2 aPosition;
+INPUT highp vec2 aPosition;
 
-varying highp vec2 vTexCoord;
-varying highp vec2 vOptRectSize;
-varying highp vec4 vCornerRadius; //output
+OUTPUT highp vec2 vTexCoord;
+OUTPUT highp vec2 vOptRectSize;
+OUTPUT highp vec4 vCornerRadius; //output
 
-uniform highp mat4 uMvpMatrix;
-uniform highp vec4 uCornerRadius; //input
-uniform lowp float uCornerRadiusPolicy;
-uniform highp vec3 uSize;
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp vec4 uCornerRadius;//input
+  UNIFORM lowp float uCornerRadiusPolicy;
+};
+
+UNIFORM_BLOCK SharedBlock
+{
+UNIFORM highp vec3 uSize;
+};
 
 void main()
 {

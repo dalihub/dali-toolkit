@@ -113,6 +113,8 @@ static constexpr auto     FIRST_LOOP   = 0u;
 constexpr float MINIMUM_FRAME_SPEED_FACTOR(0.01f);
 constexpr float MAXIMUM_FRAME_SPEED_FACTOR(100.0f);
 
+constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
+
 constexpr uint32_t TEXTURE_COUNT_FOR_GPU_ALPHA_MASK = 2u;
 
 #if defined(DEBUG_ENABLED)
@@ -462,12 +464,15 @@ void AnimatedImageVisual::EnablePreMultipliedAlpha(bool preMultiplied)
 {
   if(mImpl->mRenderer)
   {
-    if(mPreMultipliedAlphaIndex != Property::INVALID_INDEX || !preMultiplied)
+    if(mPreMultipliedAlphaIndex != Property::INVALID_INDEX)
     {
-      // RegisterUniqueProperty call SetProperty internally.
+      mImpl->mRenderer.SetProperty(mPreMultipliedAlphaIndex, preMultiplied ? 1.0f : 0.0f);
+    }
+    else if(!preMultiplied)
+    {
       // Register PREMULTIPLIED_ALPHA only if it become false.
       // Default PREMULTIPLIED_ALPHA value is 1.0f, at image-visual-shader-factory.cpp
-      mPreMultipliedAlphaIndex = mImpl->mRenderer.RegisterUniqueProperty(mPreMultipliedAlphaIndex, PREMULTIPLIED_ALPHA, preMultiplied ? 1.0f : 0.0f);
+      mPreMultipliedAlphaIndex = mImpl->mRenderer.RegisterProperty(Toolkit::Visual::Property::PREMULTIPLIED_ALPHA, PREMULTIPLIED_ALPHA, 0.0f);
     }
   }
 
@@ -645,6 +650,20 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
     case Toolkit::ImageVisual::Property::PIXEL_AREA:
     {
       value.Get(mPixelArea);
+
+      if(DALI_UNLIKELY(mImpl->mRenderer))
+      {
+        // Unusual case. SetProperty called after OnInitialize().
+        // Assume that DoAction call UPDATE_PROPERTY.
+        if(mPixelAreaIndex != Property::INVALID_INDEX)
+        {
+          mImpl->mRenderer.SetProperty(mPixelAreaIndex, mPixelArea);
+        }
+        else if(mPixelArea != FULL_TEXTURE_RECT)
+        {
+          mPixelAreaIndex = mImpl->mRenderer.RegisterProperty(Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME, mPixelArea);
+        }
+      }
       break;
     }
     case Toolkit::ImageVisual::Property::WRAP_MODE_U:
@@ -938,17 +957,52 @@ void AnimatedImageVisual::UpdateShader()
 
 Shader AnimatedImageVisual::GenerateShader() const
 {
-  bool   defaultWrapMode                 = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
-  bool   requiredAlphaMaskingOnRendering = (mMaskingData && !mMaskingData->mMaskImageLoadingFailed) ? !mMaskingData->mPreappliedMasking : false;
   Shader shader;
-  shader = mImageVisualShaderFactory.GetShader(
-    mFactoryCache,
-    ImageVisualShaderFeature::FeatureBuilder()
-      .ApplyDefaultTextureWrapMode(defaultWrapMode)
-      .EnableRoundedCorner(IsRoundedCornerRequired())
-      .EnableBorderline(IsBorderlineRequired())
-      .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering));
+  if(mImpl->mCustomShader)
+  {
+    shader = Shader::New(mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->mCustomShader->mVertexShader,
+                         mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->mCustomShader->mFragmentShader,
+                         mImpl->mCustomShader->mHints);
+
+    shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+
+    // Most of image visual shader user (like svg, animated vector image visual) use pre-multiplied alpha.
+    // If the visual dont want to using pre-multiplied alpha, it should be set as 0.0f as renderer side.
+    shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
+  }
+  else
+  {
+    bool defaultWrapMode                 = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
+    bool requiredAlphaMaskingOnRendering = (mMaskingData && !mMaskingData->mMaskImageLoadingFailed) ? !mMaskingData->mPreappliedMasking : false;
+
+    shader = mImageVisualShaderFactory.GetShader(
+      mFactoryCache,
+      ImageVisualShaderFeature::FeatureBuilder()
+        .ApplyDefaultTextureWrapMode(defaultWrapMode)
+        .EnableRoundedCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
+        .EnableBorderline(IsBorderlineRequired())
+        .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering));
+  }
   return shader;
+}
+
+Dali::Property AnimatedImageVisual::OnGetPropertyObject(Dali::Property::Key key)
+{
+  if((key.type == Property::Key::INDEX && key.indexKey == Toolkit::ImageVisual::Property::PIXEL_AREA) ||
+     (key.type == Property::Key::STRING && key.stringKey == PIXEL_AREA_UNIFORM_NAME))
+  {
+    if(DALI_LIKELY(mImpl->mRenderer))
+    {
+      if(mPixelAreaIndex == Property::INVALID_INDEX)
+      {
+        mPixelAreaIndex = mImpl->mRenderer.RegisterProperty(Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME, mPixelArea);
+      }
+      return Dali::Property(mImpl->mRenderer, mPixelAreaIndex);
+    }
+  }
+
+  Handle handle;
+  return Dali::Property(handle, Property::INVALID_INDEX);
 }
 
 void AnimatedImageVisual::OnInitialize()
@@ -970,17 +1024,17 @@ void AnimatedImageVisual::OnInitialize()
   {
     Vector2 wrapMode(mWrapModeU - WrapMode::CLAMP_TO_EDGE, mWrapModeV - WrapMode::CLAMP_TO_EDGE);
     wrapMode.Clamp(Vector2::ZERO, Vector2(2.f, 2.f));
-    mImpl->mRenderer.RegisterProperty(WRAP_MODE_UNIFORM_NAME, wrapMode);
+    mImpl->mRenderer.RegisterUniqueProperty(WRAP_MODE_UNIFORM_NAME, wrapMode);
   }
 
   if(mPixelArea != FULL_TEXTURE_RECT)
   {
-    mPixelAreaIndex = mImpl->mRenderer.RegisterProperty(mPixelAreaIndex, PIXEL_AREA_UNIFORM_NAME, mPixelArea);
+    mPixelAreaIndex = mImpl->mRenderer.RegisterUniqueProperty(Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME, mPixelArea);
   }
 
   if(mMaskingData)
   {
-    mImpl->mRenderer.RegisterProperty(CROP_TO_MASK_NAME, static_cast<float>(mMaskingData->mCropToMask));
+    mImpl->mRenderer.RegisterUniqueProperty(Toolkit::ImageVisual::Property::CROP_TO_MASK, CROP_TO_MASK_NAME, static_cast<float>(mMaskingData->mCropToMask));
   }
 
   // Enable PreMultipliedAlpha if it need.

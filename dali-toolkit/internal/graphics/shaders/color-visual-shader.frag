@@ -1,3 +1,7 @@
+//@name color-visual-shader.frag
+
+//@version 100
+
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
 INPUT highp vec2 vPosition;
 FLAT INPUT highp vec2 vRectSize;
@@ -14,26 +18,42 @@ FLAT INPUT highp vec4 vCutoutCornerRadius;
 #endif
 #endif
 
-uniform lowp vec4 uColor;
-#ifdef IS_REQUIRED_BLUR
-uniform highp float blurRadius;
-#elif defined(IS_REQUIRED_BORDERLINE)
-uniform highp float borderlineWidth;
-uniform highp float borderlineOffset;
-uniform lowp vec4 borderlineColor;
-uniform lowp vec4 uActorColor;
+UNIFORM_BLOCK FragBlock
+{
+    UNIFORM lowp vec4 uColor;
+#if defined(IS_REQUIRED_BORDERLINE)
+    UNIFORM lowp vec4 uActorColor;
 #endif
 
 #if defined(IS_REQUIRED_CUTOUT)
-uniform highp vec3 uSize;
-uniform lowp int uCutoutWithCornerRadius;
+    UNIFORM lowp int uCutoutWithCornerRadius;
 #endif
+
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+    UNIFORM highp vec4 cornerSquareness;
+#endif
+};
+
+UNIFORM_BLOCK SharedBlock
+{
+    UNIFORM highp vec3 uSize;
+
+#ifdef IS_REQUIRED_BLUR
+    UNIFORM highp float blurRadius;
+#elif defined(IS_REQUIRED_BORDERLINE)
+    UNIFORM highp float borderlineWidth;
+    UNIFORM highp float borderlineOffset;
+    UNIFORM lowp vec4 borderlineColor;
+#endif
+};
+
 
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
 // Global values both rounded corner and borderline use
 
 // radius of rounded corner on this quadrant
 highp float gRadius = 0.0;
+highp float gSquareness = 0.0;
 
 // fragment coordinate. NOTE : vec2(0.0, 0.0) is vRectSize, the corner of visual
 highp vec2 gFragmentPosition = vec2(0.0, 0.0);
@@ -63,6 +83,14 @@ void calculateCornerRadius(highp vec4 cornerRadius, highp vec2 position)
     mix(cornerRadius.w, cornerRadius.z, sign(position.x) * 0.5 + 0.5),
     sign(position.y) * 0.5 + 0.5
   );
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+  gSquareness = clamp(
+  mix(
+    mix(cornerSquareness.x, cornerSquareness.y, sign(vPosition.x) * 0.5 + 0.5),
+    mix(cornerSquareness.w, cornerSquareness.z, sign(vPosition.x) * 0.5 + 0.5),
+    sign(vPosition.y) * 0.5 + 0.5
+  ), 0.0, 1.0);
+#endif
 #endif
 }
 void calculateFragmentPosition(highp vec2 position, highp vec2 halfSizeOfRect)
@@ -82,7 +110,36 @@ void calculatePosition(highp float currentBorderlineWidth)
 
 void calculatePotential()
 {
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+  // If gSquareness is near 1.0, it make some numeric error. Let we avoid this situation by heuristic value.
+  if(gSquareness > 0.99)
+  {
+    gPotential = max(gDiff.x, gDiff.y);
+    return;
+  }
+
+  // We need to found the r value s.t. x^2 + y^2 - s/r/r x^2y^2 = r^2
+  // and check this r is inside [gRadius - vAliasMargin, gRadius + vAliasMargin]
+
+  // If we make as A = x^2 + y^2, B = sx^2y^2
+  // r^2 = (A + sqrt(A^2 - 4B)) / 2
+  //     = ((x^2 + y^2) + sqrt(x^4 + (2 - 4s)x^2y^2 + y^4)) / 2
+
+  highp vec2 positiveDiff = max(gDiff, 0.0);
+
+  // make sqr to avoid duplicate codes.
+  positiveDiff *= positiveDiff;
+
+  // TODO : Could we remove this double-sqrt code?
+  gPotential = sqrt(((positiveDiff.x + positiveDiff.y)
+                     + sqrt(positiveDiff.x * positiveDiff.x
+                            + positiveDiff.y * positiveDiff.y
+                            + (2.0 - 4.0 * gSquareness) * positiveDiff.x * positiveDiff.y))
+                    * 0.5)
+               + min(0.0, max(gDiff.x, gDiff.y)); ///< Consider negative potential, to support borderline
+#else
   gPotential = length(max(gDiff, 0.0)) + min(0.0, max(gDiff.x, gDiff.y));
+#endif
 }
 
 void setupMinMaxPotential(highp float currentBorderlineWidth)
@@ -136,7 +193,8 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 
   lowp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
   lowp float borderlineColorAlpha = borderlineColor.a * uActorColor.a;
-  // NOTE : color-visual is always not preMultiplied.
+  // NOTE : color-visual is always preMultiplied.
+  borderlineColorRGB *= borderlineColorAlpha;
 
   // Calculate inside of borderline when alpha is between (0.0  1.0). So we need to apply texture color.
   // If borderlineOpacity is exactly 0.0, we always use whole texture color. In this case, we don't need to run below code.
@@ -156,12 +214,12 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
       // potential is in texture range.
       lowp float textureAlphaScale = mix(1.0, 0.0, smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
       textureColor.a *= textureAlphaScale;
-      textureColor.rgb *= textureColor.a;
+      textureColor.rgb *= textureAlphaScale;
     }
 
-    // NOTE : color-visual is always not preMultiplied.
+    // NOTE : color-visual is always preMultiplied.
     borderlineColorAlpha *= borderlineOpacity;
-    borderlineColorRGB *= borderlineColorAlpha;
+    borderlineColorRGB *= borderlineOpacity;
     // We use pre-multiplied color to reduce operations.
     // In here, textureColor and borderlineColorRGB is pre-multiplied color now.
 
@@ -173,8 +231,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 
     lowp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
     lowp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
-    // TODO : Need to find some way without division
-    return vec4(finalMultipliedRGB / finalAlpha, finalAlpha);
+    return vec4(finalMultipliedRGB, finalAlpha);
   }
   return mix(textureColor, vec4(borderlineColorRGB, borderlineColorAlpha), borderlineOpacity);
 }
@@ -204,7 +261,7 @@ mediump float calculateCornerOpacity()
 #endif
 
 #ifdef IS_REQUIRED_BLUR
-#ifdef SL_VERSION_LOW
+#if defined(SL_VERSION_LOW) || defined(IS_REQUIRED_SQUIRCLE_CORNER)
 // Legacy code for low version glsl
 mediump float calculateBlurOpacity()
 {
@@ -219,7 +276,9 @@ mediump float calculateBlurOpacity()
 #else
 mediump float calculateBlurOpacity()
 {
-// Don't use borderline!
+  // TODO : Need to consider squareness.
+
+  // Don't use borderline!
   highp vec2 v = gDiff;
   highp float cy = gRadius + blurRadius;
   highp float cr = gRadius + blurRadius;
@@ -326,7 +385,7 @@ void main()
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    OUT_COLOR = targetColor;
+    gl_FragColor = targetColor;
   }
   else
   {
@@ -344,17 +403,17 @@ void main()
     calculatePotential();
     setupMinMaxPotential(tempBorderlineWidth);
 
-    OUT_COLOR = targetColor;
+    gl_FragColor = targetColor;
 
     mediump float opacity = calculateBlurOpacity();
-    OUT_COLOR.a *= opacity;
+    gl_FragColor *= opacity;
 #else
 #if defined(IS_REQUIRED_ROUNDED_CORNER) && !defined(IS_REQUIRED_BORDERLINE)
     // skip rounded corner calculate for performance
     if(gFragmentPosition.x + gFragmentPosition.y < -(gRadius + vAliasMargin) * 2.0)
     {
       // Do nothing.
-      OUT_COLOR = targetColor;
+      gl_FragColor = targetColor;
     }
     else
 #endif
@@ -372,11 +431,11 @@ void main()
 #endif
 #endif
 
-      OUT_COLOR = targetColor;
+      gl_FragColor = targetColor;
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
       mediump float opacity = calculateCornerOpacity();
-      OUT_COLOR.a *= opacity;
+      gl_FragColor *= opacity;
 #endif
     }
 #endif
@@ -386,6 +445,6 @@ void main()
 #endif
 
 #ifdef IS_REQUIRED_CUTOUT
-  OUT_COLOR.a *= discardOpacity;
+  gl_FragColor *= discardOpacity;
 #endif
 }

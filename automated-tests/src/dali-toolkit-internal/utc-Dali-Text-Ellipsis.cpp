@@ -1052,7 +1052,7 @@ int UtcDaliTextFieldlElideTextLocation(void)
   float positions06[] = { 90.0f, 79.0f, 70.0f, 68.0f, 62.0f, 56.0f, 51.0f, 42.0f, 28.0f, 25.0f, 14.0f, 7.0f, 0.0f };
 
   Size  textSize07( 120.0f, 50.0f );
-  float positions07[] = { 0.0f, 12.0f, 22.0f, 32.0f, 42.0f, 55.0f };
+  float positions07[] = { 0.0f, 12.0f, 22.0f, 32.0f, 42.0f, 65.0f };
 
   Size  textSize08( 120.0f, 50.0f );
   float positions08[] = { 0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f };

@@ -68,6 +68,8 @@ ColorVisual::ColorVisual(VisualFactoryCache& factoryCache, ColorVisualShaderFact
   mAlwaysUsingBlurRadius(false),
   mColorVisualShaderFactory(shaderFactory)
 {
+  // Make we always use premultiplied alpha.
+  mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
 }
 
 ColorVisual::~ColorVisual()
@@ -188,10 +190,10 @@ void ColorVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 
 void ColorVisual::EnablePreMultipliedAlpha(bool preMultiplied)
 {
-  // Make always disable pre multiplied alpha whether preMultiplied value is true.
-  if(preMultiplied)
+  // Make always enable pre multiplied alpha whether preMultiplied value is false.
+  if(!preMultiplied)
   {
-    DALI_LOG_WARNING("Note : ColorVisual cannot enable PreMultipliedAlpha\n");
+    DALI_LOG_WARNING("Note : ColorVisual cannot disable PreMultipliedAlpha\n");
   }
 }
 
@@ -221,8 +223,6 @@ void ColorVisual::OnInitialize()
   mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
-  mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, Vector3(mImpl->mMixColor));
-
   if(mAlwaysUsingBlurRadius || !EqualsZero(mBlurRadius))
   {
     DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBlurRadiusUniform();
@@ -245,10 +245,10 @@ Shader ColorVisual::GenerateShader() const
   Shader shader = mColorVisualShaderFactory.GetShader(
     mFactoryCache,
     ColorVisualShaderFeature::FeatureBuilder()
-    .EnableBlur(IsBlurRequired())
-    .EnableBorderLine(IsBorderlineRequired())
-    .EnableRoundCorner(IsRoundedCornerRequired())
-    .EnableCutout(IsCutoutRequired()));
+      .EnableBlur(IsBlurRequired())
+      .EnableBorderLine(IsBorderlineRequired())
+      .EnableRoundCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
+      .EnableCutout(IsCutoutRequired()));
 
   return shader;
 }

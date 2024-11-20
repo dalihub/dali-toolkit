@@ -27,6 +27,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/animated-image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 
@@ -99,6 +100,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
       .Add(DevelVisual::Property::BORDERLINE_WIDTH, 33.3f)
       .Add(DevelVisual::Property::BORDERLINE_COLOR, Color::RED)
       .Add(DevelVisual::Property::BORDERLINE_OFFSET, 0.3f)
+      .Add(DevelVisual::Property::CORNER_SQUARENESS, 0.3f)
       .Add(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 2.0f));
 
   Property::Map resultMap;
@@ -155,6 +157,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   value = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), 0.3f, TEST_LOCATION);
+
+  value = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector4>(), Vector4(0.3f, 0.3f, 0.3f, 0.3f), TEST_LOCATION);
 
   // Check mask properties
   value = resultMap.Find(ImageVisual::Property::ALPHA_MASK_URL, Property::STRING);
@@ -236,6 +242,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
       .Add("borderlineWidth", 20.0f)
       .Add("borderlineColor", Vector4())
       .Add("borderlineOffset", -1.0f)
+      .Add("cornerSquareness", Vector4(1.0f, 0.5f, 0.25f, 0.0f))
       .Add("frameSpeedFactor", 0.5f));
 
   Property::Map resultMap;
@@ -314,6 +321,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   value = resultMap.Find(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, "borderlineOffset");
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), -1.0f, TEST_LOCATION);
+
+  value = resultMap.Find(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, "cornerSquareness");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector4>(), Vector4(1.0f, 0.5f, 0.25f, 0.0f), TEST_LOCATION);
 
   // Check mask properties
   value = resultMap.Find(ImageVisual::Property::ALPHA_MASK_URL, "alphaMaskUrl");
@@ -419,6 +430,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), 0.0f, TEST_LOCATION);
 
+  value = resultMap.Find(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, "cornerSquareness");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector4>(), Vector4::ZERO, TEST_LOCATION);
+
   // Check mask properties
   value = resultMap.Find(ImageVisual::Property::ALPHA_MASK_URL, "alphaMaskUrl");
   DALI_TEST_CHECK(value);
@@ -509,6 +524,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap04(void)
   value = resultMap.Find(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, "borderlineOffset");
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), 0.0f, TEST_LOCATION);
+
+  value = resultMap.Find(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, "cornerSquareness");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector4>(), Vector4::ZERO, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1983,6 +2002,58 @@ int UtcDaliAnimatedImageVisualPlayback(void)
   END_TEST;
 }
 
+int UtcDaliAnimatedImageVisualCustomShader(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualCustomShader Test custom shader");
+
+  VisualFactory     factory = VisualFactory::Get();
+  Property::Map     properties;
+  Property::Map     shader;
+  const std::string vertexShader                    = "Foobar";
+  const std::string fragmentShader                  = "Foobar sampler2D Foobar";
+  shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+  shader[Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
+
+  properties[Visual::Property::TYPE]     = Visual::IMAGE;
+  properties[Visual::Property::SHADER]   = shader;
+  properties[ImageVisual::Property::URL] = TEST_GIF_FILE_NAME;
+
+  Visual::Base visual = factory.CreateVisual(properties);
+
+  // trigger creation through setting on stage
+  DummyControl        dummy     = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  dummy.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  dummy.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  application.GetScene().Add(dummy);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  Renderer        renderer = dummy.GetRendererAt(0);
+  Shader          shader2  = renderer.GetShader();
+  Property::Value value    = shader2.GetProperty(Shader::Property::PROGRAM);
+  Property::Map*  map      = value.GetMap();
+  DALI_TEST_CHECK(map);
+
+  std::string      resultFragmentShader, resultVertexShader;
+  Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
+  fragment->Get(resultFragmentShader);
+  DALI_TEST_CHECK(resultFragmentShader.find(fragmentShader) != std::string::npos);
+
+  Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
+  vertex->Get(resultVertexShader);
+  DALI_TEST_CHECK(resultVertexShader.find(vertexShader) != std::string::npos);
+
+  END_TEST;
+}
+
 int UtcDaliAnimatedImageVisualWrapMode(void)
 {
   ToolkitTestApplication application;
@@ -2360,6 +2431,156 @@ int UtcDaliAnimatedImageVisualLoadNonRegularImage(void)
     int type = typeValue->Get<int>();
     DALI_TEST_EQUALS(type, static_cast<int>(urlAndExpectVisualTypePair.second), TEST_LOCATION);
   }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualAnimatePixelArea(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("AnimatedImageVisual animate pixel area");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("pixelArea", Property::Type::VECTOR4),
+    };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  application.GetPlatform().SetClosestImageSize(Vector2(100, 100));
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+  propertyMap.Insert("mixColor", Color::BLUE);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+
+  DummyControl        actor     = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(2000, 2000));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::COLOR, Color::BLACK);
+  application.GetScene().Add(actor);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = actor.GetRendererAt(0);
+
+  Animation animation = Animation::New(4.0f);
+  animation.AnimateTo(DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, ImageVisual::Property::PIXEL_AREA), Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+  animation.AnimateTo(Property(actor, Actor::Property::COLOR), Color::WHITE);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0);     // Ensure animation starts
+  application.Render(2000u); // Halfway point
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", Vector4(0.0f, 0.0f, 0.5f, 1.0f)), true, TEST_LOCATION);
+
+  application.Render(2000u); // End of animation
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", Vector4(0.0f, 0.0f, 0.0f, 1.0f)), true, TEST_LOCATION);
+
+  animation = Animation::New(4.0f);
+  animation.AnimateTo(DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, "pixelArea"), Vector4(1.0f, -1.0f, 2.0f, 2.0f));
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0);     // Ensure animation starts
+  application.Render(2000u); // Halfway point
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", Vector4(0.5f, -0.5f, 1.0f, 1.5f)), true, TEST_LOCATION);
+
+  application.Render(2000u); // End of animation
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", Vector4(1.0f, -1.0f, 2.0f, 2.0f)), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualUpdatePixelAreaByAction(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("AnimatedImageVisual update pixel area by action");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("pixelArea", Property::Type::VECTOR4),
+    };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  application.GetPlatform().SetClosestImageSize(Vector2(100, 100));
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+  propertyMap.Insert("mixColor", Color::BLUE);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+
+  DummyControl        actor     = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(2000, 2000));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::COLOR, Color::BLACK);
+  application.GetScene().Add(actor);
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = actor.GetRendererAt(0);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Default uniform is full-rect
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", Vector4(0.0f, 0.0f, 1.0f, 1.0f)), true, TEST_LOCATION);
+
+  Property::Map attributes;
+  Vector4       targetPixelArea = Vector4(0.0f, 1.0f, 1.0f, -1.0f);
+
+  attributes.Add(ImageVisual::Property::PIXEL_AREA, targetPixelArea);
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  Property::Map resultMap;
+  resultMap = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+
+  Property::Value* value = resultMap.Find(ImageVisual::Property::PIXEL_AREA);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(targetPixelArea, value->Get<Vector4>(), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Check uniform value updated
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", targetPixelArea), true, TEST_LOCATION);
+
+  targetPixelArea = Vector4(-1.0f, -1.0f, 3.0f, 3.0f);
+
+  attributes.Clear();
+  attributes.Add(ImageVisual::Property::PIXEL_AREA, targetPixelArea);
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes);
+
+  resultMap = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+
+  value = resultMap.Find(ImageVisual::Property::PIXEL_AREA);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(targetPixelArea, value->Get<Vector4>(), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Check uniform value updated
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", targetPixelArea), true, TEST_LOCATION);
 
   END_TEST;
 }

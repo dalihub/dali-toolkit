@@ -139,6 +139,7 @@ StringProperty PROPERTY_NAME_INDEX_TABLE[] =
     {BORDERLINE_OFFSET, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET},
     {CORNER_RADIUS, Toolkit::DevelVisual::Property::CORNER_RADIUS},
     {CORNER_RADIUS_POLICY, Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY},
+    {CORNER_SQUARENESS, Toolkit::DevelVisual::Property::CORNER_SQUARENESS},
 };
 const uint16_t PROPERTY_NAME_INDEX_TABLE_COUNT = sizeof(PROPERTY_NAME_INDEX_TABLE) / sizeof(PROPERTY_NAME_INDEX_TABLE[0]);
 
@@ -442,6 +443,63 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         }
         break;
       }
+      case Toolkit::DevelVisual::Property::CORNER_SQUARENESS:
+      {
+        if(value.GetType() == Property::VECTOR4)
+        {
+          // If CORNER_SQUARENESS Property is Vector4,
+          // Each values mean the squareness of
+          // (top-left, top-right, bottom-right, bottom-left)
+          Vector4 squareness;
+          if(value.Get(squareness) && (mImpl->mDecorationData != nullptr || squareness != Vector4::ZERO))
+          {
+            mImpl->SetCornerSquareness(squareness);
+          }
+        }
+        else
+        {
+          // If CORNER_RADIUS Property is float,
+          // Every corner radius have same value
+          float squareness;
+          if(value.Get(squareness) && (mImpl->mDecorationData != nullptr || !Dali::EqualsZero(squareness)))
+          {
+            mImpl->SetCornerSquareness(Vector4(squareness, squareness, squareness, squareness));
+          }
+        }
+
+        if(DALI_UNLIKELY(mImpl->mRenderer && IsTypeAvailableForCornerRadius(mImpl->mType)))
+        {
+          // Unusual case. SetProperty called after OnInitialize().
+          // Assume that DoAction call UPDATE_PROPERTY.
+          DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerSquarenessUniform();
+          mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, mImpl->GetCornerSquareness());
+
+          // Check whether we must update shader.
+          if(!mImpl->mAlwaysUsingCornerSquareness && IsSquircleCornerRequired())
+          {
+            // Required to change shader mean, we didn't setup CORNER_RADIUS_POLICY into mRenderer before. Set property now.
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, static_cast<Vector4>(mImpl->GetCornerRadius()));
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, static_cast<float>(mImpl->GetCornerRadiusPolicy()));
+
+            // Change the shader must not be occured many times. we always have to use corner squreness feature.
+            mImpl->mAlwaysUsingCornerSquareness = true;
+
+            if(!IsBorderlineRequired())
+            {
+              // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+              mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+            }
+
+            // Change shader
+            if(!mImpl->mCustomShader)
+            {
+              needUpdateShader = true;
+            }
+          }
+        }
+
+        break;
+      }
     }
   }
 
@@ -598,6 +656,10 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
     {
       mImpl->SetCornerRadius(mImpl->mRenderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS));
     }
+    if(IsSquircleCornerRequired())
+    {
+      mImpl->SetCornerSquareness(mImpl->mRenderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_SQUARENESS));
+    }
     if(IsBorderlineRequired())
     {
       mImpl->SetBorderlineWidth(mImpl->mRenderer.GetProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH));
@@ -640,6 +702,7 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
   {
     map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, mImpl->GetCornerRadius());
     map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, mImpl->GetCornerRadiusPolicy());
+    map.Insert(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, mImpl->GetCornerSquareness());
   }
 }
 
@@ -709,6 +772,30 @@ bool Visual::Base::IsRoundedCornerRequired() const
   return false;
 }
 
+bool Visual::Base::IsSquircleCornerRequired() const
+{
+  // If VisualType doesn't support rounded corner, always return false.
+  if(IsTypeAvailableForCornerRadius(mImpl->mType))
+  {
+    if(mImpl->mRenderer)
+    {
+      // Update values from Renderer
+      Property::Value value = mImpl->mRenderer.GetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS);
+
+      Vector4 retValue = Vector4::ZERO;
+      if(value.Get(retValue))
+      {
+        if(mImpl->mDecorationData != nullptr || retValue != Vector4::ZERO)
+        {
+          mImpl->SetCornerSquareness(retValue);
+        }
+      }
+    }
+    return IsRoundedCornerRequired() && (mImpl->mAlwaysUsingCornerSquareness || !(mImpl->GetCornerSquareness() == Vector4::ZERO));
+  }
+  return false;
+}
+
 bool Visual::Base::IsBorderlineRequired() const
 {
   // If VisualType doesn't support borderline, always return false.
@@ -765,6 +852,11 @@ void Visual::Base::RegisterDecoration()
         DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerRadiusUniform();
         mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, mImpl->GetCornerRadius());
         mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, static_cast<float>(mImpl->GetCornerRadiusPolicy()));
+      }
+      if(mImpl->mAlwaysUsingCornerSquareness || !(mImpl->GetCornerSquareness() == Vector4::ZERO))
+      {
+        DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerSquarenessUniform();
+        mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, mImpl->GetCornerSquareness());
       }
     }
     if(IsTypeAvailableForBorderline(mImpl->mType))
@@ -966,6 +1058,10 @@ Property::Index Visual::Base::GetIntKey(Property::Key key)
   {
     return Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY;
   }
+  else if(key.stringKey == CORNER_SQUARENESS)
+  {
+    return Toolkit::DevelVisual::Property::CORNER_SQUARENESS;
+  }
   else if(key.stringKey == BORDERLINE_WIDTH)
   {
     return Toolkit::DevelVisual::Property::BORDERLINE_WIDTH;
@@ -1018,6 +1114,10 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key)
     {
       return DecoratedVisualRenderer::Property::CORNER_RADIUS;
     }
+    case Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS:
+    {
+      return DecoratedVisualRenderer::Property::CORNER_SQUARENESS;
+    }
     case Dali::Toolkit::DevelVisual::Property::BORDERLINE_WIDTH:
     {
       return DecoratedVisualRenderer::Property::BORDERLINE_WIDTH;
@@ -1030,6 +1130,13 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key)
     {
       return DecoratedVisualRenderer::Property::BORDERLINE_OFFSET;
     }
+  }
+
+  // Fast-out for invalid key.
+  if((key.type == Property::Key::INDEX && key.indexKey == Property::INVALID_KEY) ||
+     (key.type == Property::Key::STRING && key.stringKey.empty()))
+  {
+    return Property::INVALID_INDEX;
   }
 
   Property::Index index = mImpl->mRenderer.GetPropertyIndex(key);
@@ -1285,6 +1392,14 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, mImpl->GetCornerRadius());
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, static_cast<float>(mImpl->GetCornerRadiusPolicy()));
 
+          if(IsSquircleCornerRequired())
+          {
+            // Change the shader must not be occured many times. we always have to use corner squreness feature.
+            mImpl->mAlwaysUsingCornerSquareness = true;
+
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, mImpl->GetCornerSquareness());
+          }
+
           // Change shader
           UpdateShader();
         }
@@ -1294,6 +1409,35 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
           mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
         }
         return Dali::Property(mImpl->mRenderer, DecoratedVisualRenderer::Property::CORNER_RADIUS);
+      }
+      break;
+    }
+    case Toolkit::DevelVisual::Property::CORNER_SQUARENESS:
+    {
+      if(IsTypeAvailableForCornerRadius(mImpl->mType))
+      {
+        const bool updateShader = !mImpl->mCustomShader && !IsSquircleCornerRequired();
+
+        // CornerSquareness is animated now. we always have to use corner squareness feature.
+        mImpl->mAlwaysUsingCornerSquareness = true;
+
+        if(updateShader)
+        {
+          // Update each values to renderer
+          DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerSquarenessUniform();
+          mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, mImpl->GetCornerRadius());
+          mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, static_cast<float>(mImpl->GetCornerRadiusPolicy()));
+          mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, mImpl->GetCornerSquareness());
+
+          // Change shader
+          UpdateShader();
+        }
+        if(!IsBorderlineRequired())
+        {
+          // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+          mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+        }
+        return Dali::Property(mImpl->mRenderer, DecoratedVisualRenderer::Property::CORNER_SQUARENESS);
       }
       break;
     }

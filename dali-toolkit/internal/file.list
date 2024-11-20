@@ -82,6 +82,8 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/canvas-view/canvas-view-impl.cpp
    ${toolkit_src_dir}/controls/canvas-view/canvas-view-rasterize-task.cpp
    ${toolkit_src_dir}/controls/control/control-data-impl.cpp
+   ${toolkit_src_dir}/controls/control/control-accessibility-data.cpp
+   ${toolkit_src_dir}/controls/control/control-visual-data.cpp
    ${toolkit_src_dir}/controls/control/control-debug.cpp
    ${toolkit_src_dir}/controls/control/control-renderers.cpp
    ${toolkit_src_dir}/controls/effects-view/effects-view-impl.cpp

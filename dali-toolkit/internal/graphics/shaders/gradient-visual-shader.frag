@@ -1,3 +1,7 @@
+//@name gradient-visual-shader.frag
+
+//@version 100
+
 INPUT mediump vec2 vTexCoord;
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 INPUT highp vec2 vPosition;
@@ -9,16 +13,27 @@ FLAT INPUT highp vec4 vCornerRadius;
 #endif
 #endif
 
-// scale factor to fit start and end position of gradient.
-uniform mediump float uTextureCoordinateScaleFactor;
+UNIFORM sampler2D sTexture; // sampler1D?
 
-uniform sampler2D sTexture; // sampler1D?
-uniform lowp vec4 uColor;
+UNIFORM_BLOCK FragBlock
+{
+  // scale factor to fit start and end position of gradient.
+  UNIFORM mediump float uTextureCoordinateScaleFactor;
+  UNIFORM lowp vec4 uColor;
+};
+
 #ifdef IS_REQUIRED_BORDERLINE
-uniform highp float borderlineWidth;
-uniform highp float borderlineOffset;
-uniform lowp vec4 borderlineColor;
-uniform lowp vec4 uActorColor;
+UNIFORM_BLOCK SharedBlock
+{
+  UNIFORM highp float borderlineWidth;
+  UNIFORM highp float borderlineOffset;
+  UNIFORM lowp vec4   borderlineColor;
+  UNIFORM lowp vec4   uActorColor;
+};
+#endif
+
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+uniform highp vec4 cornerSquareness;
 #endif
 
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
@@ -26,6 +41,9 @@ uniform lowp vec4 uActorColor;
 
 // radius of rounded corner on this quadrant
 highp float gRadius = 0.0;
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+highp float gSquareness = 0.0;
+#endif
 
 // fragment coordinate. NOTE : vec2(0.0, 0.0) is vRectSize, the corner of visual
 highp vec2 gFragmentPosition = vec2(0.0, 0.0);
@@ -54,6 +72,14 @@ void calculateCornerRadius()
     mix(vCornerRadius.w, vCornerRadius.z, sign(vPosition.x) * 0.5 + 0.5),
     sign(vPosition.y) * 0.5 + 0.5
   );
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+  gSquareness = clamp(
+  mix(
+    mix(cornerSquareness.x, cornerSquareness.y, sign(vPosition.x) * 0.5 + 0.5),
+    mix(cornerSquareness.w, cornerSquareness.z, sign(vPosition.x) * 0.5 + 0.5),
+    sign(vPosition.y) * 0.5 + 0.5
+  ), 0.0, 1.0);
+#endif
 #endif
 }
 
@@ -73,7 +99,36 @@ void calculatePosition()
 
 void calculatePotential()
 {
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+  // If gSquareness is near 1.0, it make some numeric error. Let we avoid this situation by heuristic value.
+  if(gSquareness > 0.99)
+  {
+    gPotential = max(gDiff.x, gDiff.y);
+    return;
+  }
+
+  // We need to found the r value s.t. x^2 + y^2 - s/r/r x^2y^2 = r^2
+  // and check this r is inside [gRadius - vAliasMargin, gRadius + vAliasMargin]
+
+  // If we make as A = x^2 + y^2, B = sx^2y^2
+  // r^2 = (A + sqrt(A^2 - 4B)) / 2
+  //     = ((x^2 + y^2) + sqrt(x^4 + (2 - 4s)x^2y^2 + y^4)) / 2
+
+  highp vec2 positiveDiff = max(gDiff, 0.0);
+
+  // make sqr to avoid duplicate codes.
+  positiveDiff *= positiveDiff;
+
+  // TODO : Could we remove this double-sqrt code?
+  gPotential = sqrt(((positiveDiff.x + positiveDiff.y)
+                     + sqrt(positiveDiff.x * positiveDiff.x
+                            + positiveDiff.y * positiveDiff.y
+                            + (2.0 - 4.0 * gSquareness) * positiveDiff.x * positiveDiff.y))
+                    * 0.5)
+               + min(0.0, max(gDiff.x, gDiff.y)); ///< Consider negative potential, to support borderline
+#else
   gPotential = length(max(gDiff, 0.0)) + min(0.0, max(gDiff.x, gDiff.y));
+#endif
 }
 
 void setupMinMaxPotential()
@@ -204,7 +259,7 @@ void main()
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    OUT_COLOR = textureColor;
+    gl_FragColor = textureColor;
   }
   else
   {
@@ -217,7 +272,7 @@ void main()
     if(gFragmentPosition.x + gFragmentPosition.y < -(gRadius + vAliasMargin) * 2.0)
     {
       // Do nothing.
-      OUT_COLOR = textureColor;
+      gl_FragColor = textureColor;
     }
     else
 #endif
@@ -231,11 +286,11 @@ void main()
 #ifdef IS_REQUIRED_BORDERLINE
       textureColor = convertBorderlineColor(textureColor);
 #endif
-      OUT_COLOR = textureColor;
+      gl_FragColor = textureColor;
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
       mediump float opacity = calculateCornerOpacity();
-      OUT_COLOR *= opacity;
+      gl_FragColor *= opacity;
 #endif
     }
 

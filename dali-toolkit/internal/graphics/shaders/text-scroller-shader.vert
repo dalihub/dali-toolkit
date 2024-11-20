@@ -1,21 +1,27 @@
-attribute mediump vec2 aPosition;
-varying highp vec2 vTexCoord;
-uniform highp vec3 uSize;
-uniform highp float uDelta;
-uniform mediump vec2 uTextureSize;
-uniform highp float uGap;
-uniform mediump float uHorizontalAlign;
-uniform mediump float uVerticalAlign;
+//@name text-scroller-shader.vert
 
-uniform highp mat4 uMvpMatrix;
+//@version 100
 
-//Visual size and offset
-uniform mediump vec2 offset;
-uniform highp vec2 size;
-uniform mediump vec4 offsetSizeMode;
-uniform mediump vec2 origin;
-uniform mediump vec2 anchorPoint;
+INPUT mediump vec2 aPosition;
+OUTPUT highp vec2 vTexCoord;
 
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM highp vec3 uSize;
+  UNIFORM highp float uDelta;
+  UNIFORM mediump vec2 uTextureSize;
+  UNIFORM highp float uGap;
+  UNIFORM mediump float uHorizontalAlign;
+  UNIFORM mediump float uVerticalAlign;
+  UNIFORM highp mat4 uMvpMatrix;
+
+  //Visual size and offset
+  UNIFORM mediump vec2 offset;
+  UNIFORM highp vec2 size;
+  UNIFORM mediump vec4 offsetSizeMode;
+  UNIFORM mediump vec2 origin;
+  UNIFORM mediump vec2 anchorPoint;
+};
 void main()
 {
   highp vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw);

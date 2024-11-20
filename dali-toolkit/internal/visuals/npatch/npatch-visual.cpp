@@ -94,8 +94,15 @@ void NPatchVisual::LoadImages()
                                ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                                : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-    // Register PREMULTIPLIED_ALPHA property here.
-    mPreMultipliedAlphaIndex = mImpl->mRenderer.RegisterUniqueProperty(mPreMultipliedAlphaIndex, PREMULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled() ? 1.0f : 0.0f);
+    if(mPreMultipliedAlphaIndex != Property::INVALID_INDEX)
+    {
+      mImpl->mRenderer.SetProperty(mPreMultipliedAlphaIndex, IsPreMultipliedAlphaEnabled() ? 1.0f : 0.0f);
+    }
+    else
+    {
+      // Register PREMULTIPLIED_ALPHA here.
+      mPreMultipliedAlphaIndex = mImpl->mRenderer.RegisterProperty(Toolkit::Visual::Property::PREMULTIPLIED_ALPHA, PREMULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled() ? 1.0f : 0.0f);
+    }
 
     TextureManager::MaskingDataPointer maskingDataPtr       = nullptr;
     ImageAtlasManagerPtr               imageAtlasManagerPtr = nullptr;

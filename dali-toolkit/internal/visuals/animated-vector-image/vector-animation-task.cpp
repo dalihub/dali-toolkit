@@ -52,7 +52,7 @@ constexpr auto MICROSECONDS_PER_SECOND(1e+6);
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VECTOR_ANIMATION");
 #endif
 
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_VECTOR_ANIMATION_PERFORMANCE_MARKER, false);
 
 #ifdef TRACE_ENABLED
 uint64_t GetNanoseconds()

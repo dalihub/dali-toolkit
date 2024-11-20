@@ -200,6 +200,11 @@ protected:
    */
   Shader GenerateShader() const override;
 
+  /**
+   * @copydoc Visual::Base::OnGetPropertyObject
+   */
+  Dali::Property OnGetPropertyObject(Dali::Property::Key key) override;
+
 private:
   /**
    * @brief Initialize the animated image variables.

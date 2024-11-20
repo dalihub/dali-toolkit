@@ -36,7 +36,7 @@ namespace
 {
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
-constexpr float ALPHA_PRE_MULTIPLIED(1.0f);
+constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
 
 constexpr int CUSTOM_PROPERTY_COUNT(2); // PixelArea, pre-multiplied alpha
 
@@ -148,13 +148,13 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
   shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
 
   shader.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT +
-                                 (featureBuilder.IsEnabledAlphaMaskingOnRendering() ? 1 : 0));
+                                 ((featureBuilder.IsEnabledAlphaMaskingOnRendering() ? 1 : 0)));
 
   shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
 
   // Most of image visual shader user (like svg, animated vector image visual) use pre-multiplied alpha.
   // If the visual dont want to using pre-multiplied alpha, it should be set as 0.0f as renderer side.
-  shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_PRE_MULTIPLIED);
+  shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
 
   if(featureBuilder.IsEnabledAlphaMaskingOnRendering())
   {
@@ -261,7 +261,12 @@ void ImageVisualShaderFactory::CreatePrecompileShader(ImageVisualShaderFeature::
       }
       case PrecompileShaderOption::Flag::ROUNDED_CORNER:
       {
-        builder.EnableRoundedCorner(true);
+        builder.EnableRoundedCorner(true, false);
+        break;
+      }
+      case PrecompileShaderOption::Flag::SQUIRCLE_CORNER:
+      {
+        builder.EnableRoundedCorner(true, true);
         break;
       }
       case PrecompileShaderOption::Flag::BORDERLINE:

@@ -1,10 +1,14 @@
-uniform float u_contrast;
-uniform float u_gamma_adjust;
-uniform float u_outline_thickness;
-uniform float u_outline;
-uniform float u_boldness;
+//@name glyphy-shader-main.frag
 
-varying vec4 v_glyph;
+//@version 100
+
+UNIFORM float u_contrast;
+UNIFORM float u_gamma_adjust;
+UNIFORM float u_outline_thickness;
+UNIFORM float u_outline;
+UNIFORM float u_boldness;
+
+INPUT vec4 v_glyph;
 
 #define SQRT2_2 0.70711 /* 1 / sqrt(2.) */
 #define SQRT2   1.41421

@@ -327,7 +327,7 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
 
       Vector<bool> hyphens = GetWordHyphens(mModule.GetHyphenation(), utf32Characters.Begin() + index, wordEnd - index, nullptr);
 
-      for(CharacterIndex i = 0; i < (wordEnd - index); i++)
+      for(CharacterIndex i = 0; i < (wordEnd - index) && i < hyphens.Size(); i++)
       {
         if(hyphens[i])
         {

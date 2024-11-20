@@ -1,3 +1,7 @@
+//@name image-visual-shader.frag
+
+//@version 100
+
 INPUT mediump vec2 vTexCoord;
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 INPUT highp vec2 vPosition;
@@ -13,37 +17,54 @@ FLAT INPUT highp vec4 vCornerRadius;
 DEBUG_EXTRA_VARYINGS
 #endif
 
-uniform sampler2D sTexture;
+UNIFORM sampler2D sTexture;
 #if defined(IS_REQUIRED_YUV_TO_RGB) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
-uniform sampler2D sTextureU;
-uniform sampler2D sTextureV;
+UNIFORM sampler2D sTextureU;
+UNIFORM sampler2D sTextureV;
 #endif
 
 #ifdef IS_REQUIRED_ALPHA_MASKING
-uniform sampler2D sMaskTexture;
-uniform lowp float uYFlipMaskTexture;
+UNIFORM sampler2D sMaskTexture;
 INPUT mediump vec2 vMaskTexCoord;
 #endif
 
-#ifdef ATLAS_DEFAULT_WARP
-uniform mediump vec4 uAtlasRect;
-#elif defined(ATLAS_CUSTOM_WARP)
-// WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
-uniform lowp vec2 wrapMode;
+UNIFORM_BLOCK FragBlock
+{
+#ifdef IS_REQUIRED_ALPHA_MASKING
+  UNIFORM lowp float uYFlipMaskTexture;
 #endif
 
+#ifdef ATLAS_DEFAULT_WARP
+  UNIFORM mediump vec4 uAtlasRect;
+
+#elif defined(ATLAS_CUSTOM_WARP)
+  // WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
+  UNIFORM lowp vec2 wrapMode;
+#endif
 
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER)
-uniform highp vec3 uScale;
+  UNIFORM highp vec3 uScale;
 #endif
 
-uniform lowp vec4 uColor;
-uniform lowp float premultipliedAlpha;
+  UNIFORM lowp vec4  uColor;
+  UNIFORM lowp float premultipliedAlpha;
+
 #ifdef IS_REQUIRED_BORDERLINE
-uniform highp float borderlineWidth;
-uniform highp float borderlineOffset;
-uniform lowp vec4 borderlineColor;
-uniform lowp vec4 uActorColor;
+  UNIFORM lowp vec4   borderlineColor;
+  UNIFORM lowp vec4   uActorColor;
+#endif
+
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+  UNIFORM highp vec4 cornerSquareness;
+#endif
+};
+
+#ifdef IS_REQUIRED_BORDERLINE
+UNIFORM_BLOCK Borderline
+{
+  UNIFORM highp float borderlineWidth;
+  UNIFORM highp float borderlineOffset;
+};
 #endif
 
 #ifdef ATLAS_CUSTOM_WARP
@@ -63,6 +84,9 @@ mediump float wrapCoordinate( mediump vec2 range, mediump float coordinate, lowp
 
 // radius of rounded corner on this quadrant
 highp float gRadius = 0.0;
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+highp float gSquareness = 0.0;
+#endif
 
 // fragment coordinate. NOTE : vec2(0.0, 0.0) is vRectSize, the corner of visual
 highp vec2 gFragmentPosition = vec2(0.0, 0.0);
@@ -91,6 +115,14 @@ void calculateCornerRadius()
     mix(vCornerRadius.w, vCornerRadius.z, sign(vPosition.x) * 0.5 + 0.5),
     sign(vPosition.y) * 0.5 + 0.5
   );
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+  gSquareness = clamp(
+  mix(
+    mix(cornerSquareness.x, cornerSquareness.y, sign(vPosition.x) * 0.5 + 0.5),
+    mix(cornerSquareness.w, cornerSquareness.z, sign(vPosition.x) * 0.5 + 0.5),
+    sign(vPosition.y) * 0.5 + 0.5
+  ), 0.0, 1.0);
+#endif
 #endif
 }
 
@@ -110,7 +142,36 @@ void calculatePosition()
 
 void calculatePotential()
 {
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+  // If gSquareness is near 1.0, it make some numeric error. Let we avoid this situation by heuristic value.
+  if(gSquareness > 0.99)
+  {
+    gPotential = max(gDiff.x, gDiff.y);
+    return;
+  }
+
+  // We need to found the r value s.t. x^2 + y^2 - s/r/r x^2y^2 = r^2
+  // and check this r is inside [gRadius - vAliasMargin, gRadius + vAliasMargin]
+
+  // If we make as A = x^2 + y^2, B = sx^2y^2
+  // r^2 = (A + sqrt(A^2 - 4B)) / 2
+  //     = ((x^2 + y^2) + sqrt(x^4 + (2 - 4s)x^2y^2 + y^4)) / 2
+
+  highp vec2 positiveDiff = max(gDiff, 0.0);
+
+  // make sqr to avoid duplicate codes.
+  positiveDiff *= positiveDiff;
+
+  // TODO : Could we remove this double-sqrt code?
+  gPotential = sqrt(((positiveDiff.x + positiveDiff.y)
+                     + sqrt(positiveDiff.x * positiveDiff.x
+                            + positiveDiff.y * positiveDiff.y
+                            + (2.0 - 4.0 * gSquareness) * positiveDiff.x * positiveDiff.y))
+                    * 0.5)
+               + min(0.0, max(gDiff.x, gDiff.y)); ///< Consider negative potential, to support borderline
+#else
   gPotential = length(max(gDiff, 0.0)) + min(0.0, max(gDiff.x, gDiff.y));
+#endif
 }
 
 void setupMinMaxPotential()
@@ -261,6 +322,11 @@ const bool IS_REQUIRED_ROUNDED_CORNER_BOOL = true;
 #else
 const bool IS_REQUIRED_ROUNDED_CORNER_BOOL = false;
 #endif
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+const bool IS_REQUIRED_SQUIRCLE_CORNER_BOOL = true;
+#else
+const bool IS_REQUIRED_SQUIRCLE_CORNER_BOOL = false;
+#endif
 #ifdef IS_REQUIRED_BORDERLINE
 const bool IS_REQUIRED_BORDERLINE_BOOL = true;
 #else
@@ -399,7 +465,7 @@ void main()
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    OUT_COLOR = textureColor;
+    gl_FragColor = textureColor;
   }
   else
 #endif
@@ -413,7 +479,7 @@ void main()
     if(gFragmentPosition.x + gFragmentPosition.y < -(gRadius + vAliasMargin) * 2.0)
     {
       // Do nothing.
-      OUT_COLOR = textureColor;
+      gl_FragColor = textureColor;
     }
     else
 #endif
@@ -427,12 +493,12 @@ void main()
 #ifdef IS_REQUIRED_BORDERLINE
       textureColor = convertBorderlineColor(textureColor);
 #endif
-      OUT_COLOR = textureColor;
+      gl_FragColor = textureColor;
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
       mediump float opacity = calculateCornerOpacity();
-      OUT_COLOR.a *= opacity;
-      OUT_COLOR.rgb *= mix(1.0, opacity, premultipliedAlpha);
+      gl_FragColor.a *= opacity;
+      gl_FragColor.rgb *= mix(1.0, opacity, premultipliedAlpha);
 #endif
     }
 
@@ -441,6 +507,6 @@ void main()
 #endif
 
 #ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
-  OUT_COLOR.rgb = ApplyDebugMixColor(OUT_COLOR);
+  gl_FragColor.rgb = ApplyDebugMixColor(gl_FragColor);
 #endif
 }
