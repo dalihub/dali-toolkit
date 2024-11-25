@@ -173,6 +173,7 @@ void VectorAnimationThread::AddEventTriggerCallback(CallbackBase* callback, uint
 
     if(!mEventTriggered)
     {
+      DALI_LOG_DEBUG_INFO("VectorAnimationThread::mEventTrigger Triggered!\n");
       mEventTrigger->Trigger();
       mEventTriggered = true;
     }
@@ -200,6 +201,7 @@ void VectorAnimationThread::RequestForceRenderOnce()
 
     if(!mEventTriggered)
     {
+      DALI_LOG_DEBUG_INFO("VectorAnimationThread::mEventTrigger Triggered!\n");
       mEventTrigger->Trigger();
       mEventTriggered = true;
     }
@@ -431,6 +433,8 @@ void VectorAnimationThread::Rasterize()
 /// Event thread called (Due to mTrigger triggered)
 void VectorAnimationThread::OnEventCallbackTriggered()
 {
+  DALI_TRACE_SCOPE(gTraceFilter, "VECTOR_ANIMATION_EVENT_CALLBACK_TRIGGERED");
+
   while(true)
   {
     auto callbackPair = GetNextEventCallback();
