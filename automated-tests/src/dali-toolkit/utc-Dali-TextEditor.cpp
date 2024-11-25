@@ -119,6 +119,7 @@ const char* const PROPERTY_NAME_INPUT_FILTER                    = "inputFilter";
 
 const char* const PROPERTY_NAME_REMOVE_FRONT_INSET    = "removeFrontInset";
 const char* const PROPERTY_NAME_REMOVE_BACK_INSET     = "removeBackInset";
+const char* const PROPERTY_NAME_FONT_VARIATIONS       = "fontVariations";
 
 const Vector4       PLACEHOLDER_TEXT_COLOR(0.8f, 0.8f, 0.8f, 0.8f);
 const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f); // The text highlight color.
@@ -639,6 +640,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_SELECTION_POPUP_STYLE) == DevelTextEditor::Property::SELECTION_POPUP_STYLE);
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_REMOVE_FRONT_INSET) == DevelTextEditor::Property::REMOVE_FRONT_INSET);
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_REMOVE_BACK_INSET) == DevelTextEditor::Property::REMOVE_BACK_INSET);
+  DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_FONT_VARIATIONS) == DevelTextEditor::Property::FONT_VARIATIONS);
 
   END_TEST;
 }
@@ -1280,6 +1282,31 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_CHECK(!editor.GetProperty<bool>(DevelTextEditor::Property::REMOVE_BACK_INSET));
   editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
   DALI_TEST_CHECK(editor.GetProperty<bool>(DevelTextEditor::Property::REMOVE_BACK_INSET));
+
+  // Check font variations property
+  Property::Map fontVariationsMapSet;
+  Property::Map fontVariationsMapGet;
+
+  fontVariationsMapSet.Insert("wght", 400.f);
+  fontVariationsMapSet.Insert("wdth", 100.f);
+  fontVariationsMapSet.Insert("slnt", 0.f);
+  editor.SetProperty(DevelTextEditor::Property::FONT_VARIATIONS, fontVariationsMapSet);
+
+  fontVariationsMapGet = editor.GetProperty<Property::Map>(DevelTextEditor::Property::FONT_VARIATIONS);
+  DALI_TEST_EQUALS(fontVariationsMapSet.Count(), fontVariationsMapGet.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DaliTestCheckMaps(fontVariationsMapSet, fontVariationsMapGet), true, TEST_LOCATION);
+
+  // Check font variations ignore invalid values
+  Property::Map invalidFontVariationsMapSet;
+  Property::Map invalidFontVariationsMapGet;
+
+  invalidFontVariationsMapSet.Insert("abcde", 0.f);    // invalid because key length is not 4.
+  invalidFontVariationsMapSet.Insert("abc", 0.f);     // invalid because key length is not 4.
+  invalidFontVariationsMapSet.Insert("abcd", "str");  // invalid because value is not float.
+  editor.SetProperty(DevelTextEditor::Property::FONT_VARIATIONS, invalidFontVariationsMapSet);
+
+  invalidFontVariationsMapGet = editor.GetProperty<Property::Map>(DevelTextEditor::Property::FONT_VARIATIONS);
+  DALI_TEST_EQUALS(invalidFontVariationsMapGet.Count(), 0u, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -6761,6 +6788,7 @@ int utcDaliTextEditorRemoveFrontInset(void)
 
   END_TEST;
 }
+
 int utcDaliTextEditorRemoveBackInset(void)
 {
   ToolkitTestApplication application;
@@ -6775,6 +6803,73 @@ int utcDaliTextEditorRemoveBackInset(void)
   DALI_TEST_CHECK(!DevelTextEditor::IsRemoveBackInset(editor)); // default value is false.
   DevelTextEditor::SetRemoveBackInset(editor, true);
   DALI_TEST_CHECK(DevelTextEditor::IsRemoveBackInset(editor));
+
+  END_TEST;
+}
+
+int utcDaliTextEditorFontVariationsRegister(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorFontVariationsRegister");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  application.GetScene().Add(editor);
+  application.SendNotification();
+  application.Render();
+
+  // Invalid key check
+  std::string INVALID_KEY = "invalid";
+  auto invalidFontVariationsIndex = DevelTextEditor::RegisterFontVariationProperty(editor, INVALID_KEY.data());
+  DALI_TEST_CHECK(invalidFontVariationsIndex == Property::INVALID_INDEX);
+
+  application.GetScene().Add(editor);
+  application.SendNotification();
+  application.Render();
+
+  std::string WGHT_KEY = "wght";
+  const float WGHT_VALUE = 100.f;
+  const float WGHT_VALUE_END = 900.f;
+
+  // Check with no previous variations.
+  auto fontVariationsIndex = DevelTextEditor::RegisterFontVariationProperty(editor, WGHT_KEY.data());
+  editor.SetProperty(fontVariationsIndex, WGHT_VALUE);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(editor.GetProperty(fontVariationsIndex).Get<float>() == WGHT_VALUE);
+
+  Property::Map fontVariationsGet;
+  fontVariationsGet = editor.GetProperty<Property::Map>(DevelTextEditor::Property::FONT_VARIATIONS);
+
+  DALI_TEST_CHECK(fontVariationsGet.Count() == 1u);
+
+  const KeyValuePair& keyvalue = fontVariationsGet.GetKeyValue(0);
+
+  std::string key = "";
+  if(keyvalue.first.type == Property::Key::STRING)
+  {
+    key = keyvalue.first.stringKey;
+  }
+
+  float value = keyvalue.second.Get<float>();
+
+  DALI_TEST_CHECK(key == WGHT_KEY);
+  DALI_TEST_CHECK(value = WGHT_VALUE);
+
+  application.SendNotification();
+  application.Render();
+
+  // Animation test
+
+  Animation anim = Animation::New(1);
+  anim.AnimateTo(Property(editor, fontVariationsIndex), WGHT_VALUE_END);
+  anim.Play();
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

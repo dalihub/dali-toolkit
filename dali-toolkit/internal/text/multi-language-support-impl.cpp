@@ -663,7 +663,8 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
                                          float                                   fontSizeScale,
                                          CharacterIndex                          startIndex,
                                          Length                                  numberOfCharacters,
-                                         Vector<FontRun>&                        fonts)
+                                         Vector<FontRun>&                        fonts,
+                                         Property::Map*                          variationsMapPtr)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "-->MultilanguageSupport::ValidateFonts\n");
 
@@ -744,7 +745,8 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
                           isDefaultFont);
 
     // Get the font for the current character.
-    FontId fontId = fontClient.GetFontId(currentFontDescription, currentFontPointSize);
+    FontId fontId = fontClient.GetFontId(currentFontDescription, currentFontPointSize, 0, variationsMapPtr);
+
     currentFontId = fontId;
 
     // Prevent double-bolding from both markup and style

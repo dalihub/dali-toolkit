@@ -19,6 +19,7 @@
  */
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
+#include <dali/public-api/object/property.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/input-filter-properties.h>
@@ -261,6 +262,13 @@ enum
    * @details Name "removeBackInset", type Property::BOOLEAN.
    */
   REMOVE_BACK_INSET,
+
+  /**
+   * @brief Enables customization of fonts with variations such as weight and slant.
+   * @details Name "fontVariations", type Property::MAP.
+   * @note This property can be used only when using variable fonts.
+   */
+  FONT_VARIATIONS,
 };
 
 } // namespace Property
@@ -517,6 +525,15 @@ DALI_TOOLKIT_API void SetRemoveBackInset(TextField textField, const bool remove)
  * @return True if the back inset of TextField is removed.
  */
 DALI_TOOLKIT_API bool IsRemoveBackInset(TextField textField);
+
+/**
+ * @brief Registers a new font variation property based on the provided tag.
+ *
+ * @param[in] textField The instance of TextField.
+ * @param[in] tag A 4-character string representing the variation property tag.
+ * @return The index of the registered variation property. Property::INVALID_INDEX if failed.
+ */
+DALI_TOOLKIT_API Dali::Property::Index RegisterFontVariationProperty(TextField textField, std::string tag);
 
 } // namespace DevelTextField
 

@@ -145,6 +145,14 @@ public:
    */
   DevelTextField::SelectionStartedSignalType& SelectionStartedSignal();
 
+  /**
+   * @brief Registers a new font variation property based on the provided tag.
+   *
+   * @param[in] tag A 4-character string representing the variation property tag.
+   * @return The index of the registered variation property. Property::INVALID_INDEX if failed.
+   */
+  Dali::Property::Index RegisterFontVariationProperty(std::string tag);
+
 private: // From Control
   /**
    * @copydoc Control::OnInitialize()
@@ -548,6 +556,11 @@ private: // Implementation
   // Needed to synchronize TextAnchor actors with Anchor objects in text's logical model
   void OnAccessibilityStatusChanged();
 
+  /**
+   * @brief Notifies when the font variation property changes to specific value.
+   */
+  void OnVariationPropertyNotify(PropertyNotification& source);
+
 private: // Data
   // Signals
   Toolkit::TextField::TextChangedSignalType                mTextChangedSignal;
@@ -559,6 +572,9 @@ private: // Data
   Toolkit::DevelTextField::SelectionChangedSignalType      mSelectionChangedSignal;
   Toolkit::DevelTextField::SelectionClearedSignalType      mSelectionClearedSignal;
   Toolkit::DevelTextField::SelectionStartedSignalType      mSelectionStartedSignal;
+
+  // for Font Variations
+  std::map<Dali::Property::Index, std::string> mVariationIndexMap;  // Stores [CustomPropertyIndex, tag].
 
   InputMethodContext               mInputMethodContext;
   Text::ControllerPtr              mController;

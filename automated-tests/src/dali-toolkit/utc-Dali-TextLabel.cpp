@@ -88,6 +88,7 @@ const char* const PROPERTY_NAME_RENDER_MODE           = "renderMode";
 const char* const PROPERTY_NAME_MANUAL_RENDERED       = "manualRendered";
 const char* const PROPERTY_NAME_ASYNC_LINE_COUNT      = "asyncLineCount";
 const char* const PROPERTY_NAME_ELLIPSIS_MODE         = "ellipsisMode";
+const char* const PROPERTY_NAME_FONT_VARIATIONS       = "fontVariations";
 
 const std::string  DEFAULT_FONT_DIR("/resources/fonts");
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
@@ -376,6 +377,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_MANUAL_RENDERED) == DevelTextLabel::Property::MANUAL_RENDERED);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ASYNC_LINE_COUNT) == DevelTextLabel::Property::ASYNC_LINE_COUNT);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ELLIPSIS_MODE) == DevelTextLabel::Property::ELLIPSIS_MODE);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_FONT_VARIATIONS) == DevelTextLabel::Property::FONT_VARIATIONS);
 
   END_TEST;
 }
@@ -1080,6 +1082,31 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   label.SetProperty(DevelTextLabel::Property::ELLIPSIS_MODE, Toolkit::DevelText::Ellipsize::AUTO_SCROLL);
   DALI_TEST_EQUALS(label.GetProperty<int>(DevelTextLabel::Property::ELLIPSIS_MODE), static_cast<int>(Toolkit::DevelText::Ellipsize::AUTO_SCROLL), TEST_LOCATION);
+
+  // Check font variations property
+  Property::Map fontVariationsMapSet;
+  Property::Map fontVariationsMapGet;
+
+  fontVariationsMapSet.Insert("wght", 400.f);
+  fontVariationsMapSet.Insert("wdth", 100.f);
+  fontVariationsMapSet.Insert("slnt", 0.f);
+  label.SetProperty(DevelTextLabel::Property::FONT_VARIATIONS, fontVariationsMapSet);
+
+  fontVariationsMapGet = label.GetProperty<Property::Map>(DevelTextLabel::Property::FONT_VARIATIONS);
+  DALI_TEST_EQUALS(fontVariationsMapSet.Count(), fontVariationsMapGet.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DaliTestCheckMaps(fontVariationsMapSet, fontVariationsMapGet), true, TEST_LOCATION);
+
+  // Check font variations ignore invalid values
+  Property::Map invalidFontVariationsMapSet;
+  Property::Map invalidFontVariationsMapGet;
+
+  invalidFontVariationsMapSet.Insert("abcde", 0.f);    // invalid because key length is not 4.
+  invalidFontVariationsMapSet.Insert("abc", 0.f);     // invalid because key length is not 4.
+  invalidFontVariationsMapSet.Insert("abcd", "str");  // invalid because value is not float.
+  label.SetProperty(DevelTextLabel::Property::FONT_VARIATIONS, invalidFontVariationsMapSet);
+
+  invalidFontVariationsMapGet = label.GetProperty<Property::Map>(DevelTextLabel::Property::FONT_VARIATIONS);
+  DALI_TEST_EQUALS(invalidFontVariationsMapGet.Count(), 0u, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -3525,6 +3552,73 @@ int utcDaliTextLabelRemoveBackInset(void)
   DALI_TEST_CHECK(!DevelTextLabel::IsRemoveBackInset(label)); // default value is false.
   DevelTextLabel::SetRemoveBackInset(label, true);
   DALI_TEST_CHECK(DevelTextLabel::IsRemoveBackInset(label));
+
+  END_TEST;
+}
+
+int utcDaliTextLabelFontVariationsRegister(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextLabelFontVariationsRegister");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+  application.SendNotification();
+  application.Render();
+
+  // Invalid key check
+  std::string INVALID_KEY = "invalid";
+  auto invalidFontVariationsIndex = DevelTextLabel::RegisterFontVariationProperty(label, INVALID_KEY.data());
+  DALI_TEST_CHECK(invalidFontVariationsIndex == Property::INVALID_INDEX);
+
+  application.GetScene().Add(label);
+  application.SendNotification();
+  application.Render();
+
+  std::string WGHT_KEY = "wght";
+  const float WGHT_VALUE = 100.f;
+  const float WGHT_VALUE_END = 900.f;
+
+  // Check with no previous variations.
+  auto fontVariationsIndex = DevelTextLabel::RegisterFontVariationProperty(label, WGHT_KEY.data());
+  label.SetProperty(fontVariationsIndex, WGHT_VALUE);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(label.GetProperty(fontVariationsIndex).Get<float>() == WGHT_VALUE);
+
+  Property::Map fontVariationsGet;
+  fontVariationsGet = label.GetProperty<Property::Map>(DevelTextLabel::Property::FONT_VARIATIONS);
+
+  DALI_TEST_CHECK(fontVariationsGet.Count() == 1u);
+
+  const KeyValuePair& keyvalue = fontVariationsGet.GetKeyValue(0);
+
+  std::string key = "";
+  if(keyvalue.first.type == Property::Key::STRING)
+  {
+    key = keyvalue.first.stringKey;
+  }
+
+  float value = keyvalue.second.Get<float>();
+
+  DALI_TEST_CHECK(key == WGHT_KEY);
+  DALI_TEST_CHECK(value = WGHT_VALUE);
+
+  application.SendNotification();
+  application.Render();
+
+  // Animation test
+
+  Animation anim = Animation::New(1);
+  anim.AnimateTo(Property(label, fontVariationsIndex), WGHT_VALUE_END);
+  anim.Play();
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

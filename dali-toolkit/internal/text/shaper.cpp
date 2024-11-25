@@ -62,7 +62,8 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
                Vector<GlyphInfo>&           glyphs,
                Vector<CharacterIndex>&      glyphToCharacterMap,
                Vector<Length>&              charactersPerGlyph,
-               Vector<GlyphIndex>&          newParagraphGlyphs)
+               Vector<GlyphIndex>&          newParagraphGlyphs,
+               Property::Map*               variationsMapPtr)
 {
   if(0u == numberOfCharacters)
   {
@@ -212,7 +213,8 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
                                                 textBuffer + previousIndex,
                                                 (currentIndex - previousIndex), // The number of characters to shape.
                                                 currentFontId,
-                                                currentScript);
+                                                currentScript,
+                                                variationsMapPtr);
 
 #if defined(TRACE_ENABLED)
     if(logEnabled)
@@ -260,6 +262,7 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
     {
       // Add the index of the new paragraph glyph to a vector.
       // Their metrics will be updated in a following step.
+      DALI_ASSERT_ALWAYS(glyphIndex > 0u);
       newParagraphGlyphs.PushBack(glyphIndex - 1u);
     }
 

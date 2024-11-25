@@ -124,6 +124,7 @@ public:
    * @param[in] startIndex The character from where the font info is set.
    * @param[in] numberOfCharacters The number of characters to set the font.
    * @param[out] fonts The validated fonts.
+   * @param[in] variationsMapPtr The variations used in variable fonts.
    */
   void ValidateFonts(TextAbstraction::FontClient&            fontClient,
                      const Vector<Character>&                text,
@@ -134,7 +135,8 @@ public:
                      float                                   fontSizeScale,
                      CharacterIndex                          startIndex,
                      Length                                  numberOfCharacters,
-                     Vector<FontRun>&                        fonts);
+                     Vector<FontRun>&                        fonts,
+                     Property::Map*                          variationsMapPtr = nullptr);
 
   /**
    * @brief Gets the locale.

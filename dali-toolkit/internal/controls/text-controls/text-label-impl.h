@@ -299,6 +299,13 @@ public:
    */
   void RequestAsyncHeightForWidth(float width);
 
+  /**
+   * @brief Registers a new font variation property based on the provided tag.
+   *
+   * @param[in] tag A 4-character string representing the variation property tag.
+   * @return The index of the registered variation property. Property::INVALID_INDEX if failed.
+   */
+  Dali::Property::Index RegisterFontVariationProperty(std::string tag);
 
 private: // From Control
   /**
@@ -476,6 +483,11 @@ private:
 
   void OnAccessibilityStatusChanged();
 
+  /**
+   * @brief Notifies when the font variation property changes to specific value.
+   */
+  void OnVariationPropertyNotify(PropertyNotification& source);
+
 private: // Data
   Text::ControllerPtr   mController;
   Text::TextScrollerPtr mTextScroller;
@@ -491,6 +503,8 @@ private: // Data
   Toolkit::DevelTextLabel::AsyncNaturalSizeComputedSignalType mAsyncNaturalSizeComputedSignal;
   Toolkit::DevelTextLabel::AsyncHeightForWidthComputedSignalType mAsyncHeightForWidthComputedSignal;
 
+  // for Font Variations
+  std::map<Dali::Property::Index, std::string> mVariationIndexMap;  // Stores [CustomPropertyIndex, tag].
 
   std::string mLocale;
   Vector2     mSize;
