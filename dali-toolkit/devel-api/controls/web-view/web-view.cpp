@@ -189,16 +189,6 @@ bool WebView::StopInspectorServer()
   return Dali::Toolkit::GetImpl(*this).StopInspectorServer();
 }
 
-bool WebView::SetImePositionAndAlignment(Dali::Vector2 position, int alignment)
-{
-  return Dali::Toolkit::GetImpl(*this).SetImePositionAndAlignment(position, alignment);
-}
-
-void WebView::SetCursorThemeName(const std::string themeName)
-{
-  Dali::Toolkit::GetImpl(*this).SetCursorThemeName(themeName);
-}
-
 void WebView::ScrollBy(int32_t deltaX, int32_t deltaY)
 {
   Dali::Toolkit::GetImpl(*this).ScrollBy(deltaX, deltaY);
