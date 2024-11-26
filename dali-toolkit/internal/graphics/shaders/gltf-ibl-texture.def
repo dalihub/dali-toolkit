@@ -1,11 +1,7 @@
 #define TEXTURE_IBL
 
-UNIFORM sampler2D ubrdfLUT;
-UNIFORM samplerCube uDiffuseEnvSampler;
-UNIFORM samplerCube uSpecularEnvSampler;
-
-UNIFORM_BLOCK FragBlockIBL
-{
-  UNIFORM vec4        uScaleIBLAmbient;
-  UNIFORM highp float uMipmapLevel;
-};
+uniform sampler2D ubrdfLUT;
+uniform samplerCube uDiffuseEnvSampler;
+uniform samplerCube uSpecularEnvSampler;
+uniform vec4 uScaleIBLAmbient;
+uniform highp float uMipmapLevel;

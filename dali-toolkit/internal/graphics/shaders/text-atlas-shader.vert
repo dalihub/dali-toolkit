@@ -1,18 +1,10 @@
-//@name text-atlas-shader.vert
-
-//@version 100
-
-INPUT   highp vec2    aPosition;
-INPUT mediump vec2    aTexCoord;
-INPUT mediump vec4    aColor;
-
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM mediump vec2    uOffset;
-  UNIFORM highp mat4    uMvpMatrix;
-};
-OUTPUT   mediump vec2    vTexCoord;
-OUTPUT   mediump vec4    vColor;
+attribute   highp vec2    aPosition;
+attribute mediump vec2    aTexCoord;
+attribute mediump vec4    aColor;
+uniform   mediump vec2    uOffset;
+uniform     highp mat4    uMvpMatrix;
+varying   mediump vec2    vTexCoord;
+varying   mediump vec4    vColor;
 
 void main()
 {

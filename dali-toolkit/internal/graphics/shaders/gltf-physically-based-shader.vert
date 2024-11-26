@@ -1,30 +1,23 @@
-//@name gltf-physically-based-shader.vert
+in highp vec3 aPosition;
+in mediump vec2 aTexCoord0;
+in mediump vec2 aTexCoord1;
+in lowp vec3 aNormal;
+in lowp vec4 aTangent;
+in lowp vec4 aVertexColor;
 
-//@version 100
+uniform mediump vec3 uSize;
+uniform mediump mat4 uModelMatrix;
+uniform mediump mat4 uViewMatrix;
+uniform mediump mat4 uProjection;
+uniform mediump vec3 uLightVector;
+uniform lowp float uIsPointLight;
+uniform lowp float uHasVertexColor;
 
-INPUT highp vec3 aPosition;
-INPUT mediump vec2 aTexCoord0;
-INPUT mediump vec2 aTexCoord1;
-INPUT lowp vec3 aNormal;
-INPUT lowp vec4 aTangent;
-INPUT lowp vec4 aVertexColor;
-
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM mediump vec3 uSize;
-  UNIFORM mediump mat4 uModelMatrix;
-  UNIFORM mediump mat4 uViewMatrix;
-  UNIFORM mediump mat4 uProjection;
-  UNIFORM mediump vec3 uLightVector;
-  UNIFORM lowp float uIsPointLight;
-  UNIFORM lowp float uHasVertexColor;
-};
-
-OUTPUT lowp vec2 vUV[2];
-OUTPUT lowp mat3 vTBN;
-OUTPUT lowp vec4 vColor;
-OUTPUT highp vec3 vLightDirection;
-OUTPUT highp vec3 vPositionToCamera;
+out lowp vec2 vUV[2];
+out lowp mat3 vTBN;
+out lowp vec4 vColor;
+out highp vec3 vLightDirection;
+out highp vec3 vPositionToCamera;
 
 void main()
 {

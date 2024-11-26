@@ -1,17 +1,10 @@
-//@name npatch-visual-mask-shader.frag
-
-//@version 100
-
-INPUT mediump vec2 vTexCoord;
-INPUT mediump vec2 vMaskTexCoord;
-UNIFORM sampler2D sTexture;
-UNIFORM sampler2D sMask;
-UNIFORM_BLOCK FragBlock
-{
-  UNIFORM lowp vec4 uColor;
-  UNIFORM lowp float premultipliedAlpha;
-  UNIFORM mediump float auxiliaryImageAlpha;
-};
+varying mediump vec2 vTexCoord;
+varying mediump vec2 vMaskTexCoord;
+uniform sampler2D sTexture;
+uniform sampler2D sMask;
+uniform lowp vec4 uColor;
+uniform lowp float premultipliedAlpha;
+uniform mediump float auxiliaryImageAlpha;
 
 void main()
 {
@@ -20,8 +13,8 @@ void main()
   // where mask is translucent, less of background should be shown.
   // auxiliaryImageAlpha controls how much of mask is visible
 
-  mediump vec4 color = TEXTURE(sTexture, vTexCoord);
-  mediump vec4 mask = TEXTURE(sMask, vMaskTexCoord);
+  mediump vec4 color = texture2D(sTexture, vTexCoord);
+  mediump vec4 mask = texture2D(sMask, vMaskTexCoord);
 
   mediump float maskAlpha = mask.a * auxiliaryImageAlpha;
 

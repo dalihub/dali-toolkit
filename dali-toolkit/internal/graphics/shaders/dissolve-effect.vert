@@ -1,25 +1,17 @@
-//@name dissolve-effect.vert
+attribute mediump vec2 aPosition;
 
-//@version 100
+uniform mediump mat4   uMvpMatrix;
+uniform vec3           uSize;
+uniform vec4           uTextureRect;
 
-INPUT mediump vec2 aPosition;
+uniform float          uPercentage;
+uniform vec3           uSaddleParam;
+uniform vec2           uTranslation;
+uniform vec2           uRotation;
+uniform float          uToNext;
 
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM mediump mat4   uMvpMatrix;
-  UNIFORM vec3           uSize;
-
-  UNIFORM float          uPercentage;
-  UNIFORM vec3           uSaddleParam;
-  UNIFORM vec2           uTranslation;
-  UNIFORM vec2           uRotation;
-  UNIFORM float          uToNext;
-};
-
-
-
-OUTPUT float          vPercentage;
-OUTPUT vec2           vTexCoord;
+varying float          vPercentage;
+varying vec2           vTexCoord;
 
 void main()
 {

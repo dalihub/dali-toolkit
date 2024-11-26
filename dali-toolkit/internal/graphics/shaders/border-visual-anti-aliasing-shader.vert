@@ -1,23 +1,10 @@
-//@name border-visual-anti-aliasing-shader.vert
-
-//@version 100
-
 INPUT mediump vec2 aPosition;
 INPUT mediump vec2 aDrift;
 OUTPUT mediump float vAlpha;
 
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM highp mat4 uMvpMatrix;
-  UNIFORM highp vec3 uSize;
-}
-
-UNIFORM_BLOCK FragBlock
-{
-  UNIFORM lowp vec4 uColor;
-  UNIFORM lowp vec4 borderColor;
-  UNIFORM mediump float borderSize;
-};
+uniform highp mat4 uMvpMatrix;
+uniform highp vec3 uSize;
+uniform mediump float borderSize;
 
 void main()
 {

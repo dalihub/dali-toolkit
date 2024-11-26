@@ -1,14 +1,7 @@
-//@name canvas-view.vert
-
-//@version 100
-
-INPUT mediump vec2 aPosition;
-OUTPUT mediump vec2 vTexCoord;
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM highp mat4 uMvpMatrix;
-  UNIFORM highp vec3 uSize;
-};
+attribute mediump vec2 aPosition;
+varying mediump vec2 vTexCoord;
+uniform highp mat4 uMvpMatrix;
+uniform highp vec3 uSize;
 
 void main()
 {

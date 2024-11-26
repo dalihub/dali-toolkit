@@ -1,23 +1,23 @@
-//@version 100
 
-UNIFORM_BLOCK FragBlock
-{
-  UNIFORM lowp vec4 uColorFactor;// Color from material
-  UNIFORM lowp float uMask;
-  UNIFORM lowp float uAlphaThreshold;
-  UNIFORM int uIsShadowCasting;
-};
+uniform lowp vec4 uColorFactor; // Color from material
+uniform lowp float uMask;
+uniform lowp float uAlphaThreshold;
 
 INPUT mediump vec2 vUV;
 INPUT lowp vec4 vColor;
 
+//INPUT highp float depth;
+//OUTPUT highp vec4 FragColor;
+
 #ifdef THREE_TEX
 #ifdef BASECOLOR_TEX
-UNIFORM sampler2D sAlbedoAlpha;
+uniform sampler2D sAlbedoAlpha;
 #endif // BASECOLOR_TEX
 #else // THREE_TEX
-UNIFORM sampler2D sAlbedoMetal;
+uniform sampler2D sAlbedoMetal;
 #endif
+
+uniform int uIsShadowCasting;
 
 lowp vec3 linear(lowp vec3 color)
 {

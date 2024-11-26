@@ -1,15 +1,10 @@
-//@version 100
-
-INPUT mediump vec3 aPosition;
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM   mediump mat4 uModelView;
-  UNIFORM   mediump mat4 uModelMatrix;
-  UNIFORM   mediump mat4 uViewMatrix;
-  UNIFORM   mediump mat4 uProjection;
-  UNIFORM   mediump mat4 uMvpMatrix;
-};
-OUTPUT   mediump vec3 vTexCoord;
+attribute mediump vec3 aPosition;
+uniform   mediump mat4 uModelView;
+uniform   mediump mat4 uModelMatrix;
+uniform   mediump mat4 uViewMatrix;
+uniform   mediump mat4 uProjection;
+uniform   mediump mat4 uMvpMatrix;
+varying   mediump vec3 vTexCoord;
 
 void main()
 {

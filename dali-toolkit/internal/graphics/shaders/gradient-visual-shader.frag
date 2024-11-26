@@ -1,7 +1,3 @@
-//@name gradient-visual-shader.frag
-
-//@version 100
-
 INPUT mediump vec2 vTexCoord;
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 INPUT highp vec2 vPosition;
@@ -13,23 +9,16 @@ FLAT INPUT highp vec4 vCornerRadius;
 #endif
 #endif
 
-UNIFORM sampler2D sTexture; // sampler1D?
+// scale factor to fit start and end position of gradient.
+uniform mediump float uTextureCoordinateScaleFactor;
 
-UNIFORM_BLOCK FragBlock
-{
-  // scale factor to fit start and end position of gradient.
-  UNIFORM mediump float uTextureCoordinateScaleFactor;
-  UNIFORM lowp vec4 uColor;
-};
-
+uniform sampler2D sTexture; // sampler1D?
+uniform lowp vec4 uColor;
 #ifdef IS_REQUIRED_BORDERLINE
-UNIFORM_BLOCK SharedBlock
-{
-  UNIFORM highp float borderlineWidth;
-  UNIFORM highp float borderlineOffset;
-  UNIFORM lowp vec4   borderlineColor;
-  UNIFORM lowp vec4   uActorColor;
-};
+uniform highp float borderlineWidth;
+uniform highp float borderlineOffset;
+uniform lowp vec4 borderlineColor;
+uniform lowp vec4 uActorColor;
 #endif
 
 #ifdef IS_REQUIRED_SQUIRCLE_CORNER
@@ -259,7 +248,7 @@ void main()
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    gl_FragColor = textureColor;
+    OUT_COLOR = textureColor;
   }
   else
   {
@@ -272,7 +261,7 @@ void main()
     if(gFragmentPosition.x + gFragmentPosition.y < -(gRadius + vAliasMargin) * 2.0)
     {
       // Do nothing.
-      gl_FragColor = textureColor;
+      OUT_COLOR = textureColor;
     }
     else
 #endif
@@ -286,11 +275,11 @@ void main()
 #ifdef IS_REQUIRED_BORDERLINE
       textureColor = convertBorderlineColor(textureColor);
 #endif
-      gl_FragColor = textureColor;
+      OUT_COLOR = textureColor;
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
       mediump float opacity = calculateCornerOpacity();
-      gl_FragColor *= opacity;
+      OUT_COLOR *= opacity;
 #endif
     }
 

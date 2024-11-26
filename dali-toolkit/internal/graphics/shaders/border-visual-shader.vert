@@ -1,23 +1,16 @@
-//@name border-visual-shader.vert
-
-//@version 100
-
 INPUT mediump vec2 aPosition;
 INPUT mediump vec2 aDrift;
 
-UNIFORM_BLOCK VertBlock
-{
-  UNIFORM highp mat4 uMvpMatrix;
-  UNIFORM highp vec3 uSize;
-  UNIFORM mediump float borderSize;
+uniform highp mat4 uMvpMatrix;
+uniform highp vec3 uSize;
+uniform mediump float borderSize;
 
 //Visual size and offset
-  UNIFORM mediump vec2 offset;
-  UNIFORM highp vec2 size;
-  UNIFORM mediump vec4 offsetSizeMode;
-  UNIFORM mediump vec2 origin;
-  UNIFORM mediump vec2 anchorPoint;
-};
+uniform mediump vec2 offset;
+uniform highp vec2 size;
+uniform mediump vec4 offsetSizeMode;
+uniform mediump vec2 origin;
+uniform mediump vec2 anchorPoint;
 
 vec2 ComputeVertexPosition()
 {
