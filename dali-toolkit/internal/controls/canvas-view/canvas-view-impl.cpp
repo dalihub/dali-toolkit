@@ -19,6 +19,7 @@
 #include "canvas-view-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -61,7 +62,8 @@ CanvasView::CanvasView(const Vector2& viewBox)
   mSize(viewBox),
   mIsSynchronous(true),
   mManualRasterization(false),
-  mProcessorRegistered(false)
+  mProcessorRegistered(false),
+  mLastCommitRasterized(false)
 {
 }
 
@@ -201,25 +203,42 @@ Property::Value CanvasView::GetProperty(BaseObject* object, Property::Index prop
 
 void CanvasView::Process(bool postProcessor)
 {
+  bool rasterizeRequired = false;
+
   mProcessorRegistered = false;
 
-  if(mCanvasRenderer && mCanvasRenderer.IsCanvasChanged() && mSize.width > 0 && mSize.height > 0)
+  if(mCanvasRenderer && mSize.width > 0 && mSize.height > 0)
   {
-    AddRasterizationTask();
+    const bool forcibleRasterization = (mIsSynchronous && !mLastCommitRasterized);
+    rasterizeRequired                = (forcibleRasterization) || (mCanvasRenderer.IsCanvasChanged());
+
+    if(rasterizeRequired)
+    {
+      AddRasterizationTask(forcibleRasterization);
+    }
   }
+
+  const bool isSynchronousRasterizationFailed = (rasterizeRequired && mIsSynchronous && !mLastCommitRasterized);
 
   // If we are not doing manual rasterization, register processor once again.
   // TODO : Could we reqest it only if IsCanvasChagned() is true?
-  if(!mManualRasterization)
+  if(!mManualRasterization || isSynchronousRasterizationFailed)
   {
     RequestRasterization();
+
+    if(isSynchronousRasterizationFailed && DALI_LIKELY(Adaptor::IsAvailable()))
+    {
+      // To make sure we will process next time.
+      Adaptor::Get().RequestProcessEventsOnIdle();
+    }
   }
 }
 
-void CanvasView::AddRasterizationTask()
+void CanvasView::AddRasterizationTask(bool forceProcess)
 {
-  if(mCanvasRenderer && mCanvasRenderer.Commit())
+  if(mCanvasRenderer && (mCanvasRenderer.Commit() || forceProcess))
   {
+    mLastCommitRasterized = false;
     if(mIsSynchronous)
     {
       CanvasRendererRasterizingTaskPtr rasterizingTask = new CanvasRendererRasterizingTask(mCanvasRenderer, MakeCallback(this, &CanvasView::ApplyRasterizedImage));
@@ -229,18 +248,24 @@ void CanvasView::AddRasterizationTask()
     }
     else
     {
-      if(!mRasterizingTask)
+      if(mRasterizingTask)
       {
-        mRasterizingTask = new CanvasRendererRasterizingTask(mCanvasRenderer, MakeCallback(this, &CanvasView::ApplyRasterizedImage));
-        AsyncTaskManager::Get().AddTask(mRasterizingTask);
+        // Cancel previous request task.
+        AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
+        mRasterizingTask.Reset();
       }
+
+      mRasterizingTask = new CanvasRendererRasterizingTask(mCanvasRenderer, MakeCallback(this, &CanvasView::ApplyRasterizedImage));
+      AsyncTaskManager::Get().AddTask(mRasterizingTask);
     }
   }
 }
 
 void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
 {
-  if(task->IsRasterized())
+  mLastCommitRasterized = task->IsRasterized();
+
+  if(mLastCommitRasterized)
   {
     Texture rasterizedTexture = task->GetRasterizedTexture();
     if(rasterizedTexture && rasterizedTexture.GetWidth() != 0 && rasterizedTexture.GetHeight() != 0)
@@ -268,10 +293,10 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
     mRasterizingTask.Reset(); // We don't need it anymore
   }
 
-  //If there are accumulated changes to CanvasRenderer during Rasterize, Rasterize once again.
-  if(!mIsSynchronous && !mManualRasterization && mCanvasRenderer && mCanvasRenderer.IsCanvasChanged())
+  //If there are accumulated changes to CanvasRenderer during Rasterize, or previous rasterization failed, Rasterize once again.
+  if(!mIsSynchronous && mCanvasRenderer && (!mLastCommitRasterized || (!mManualRasterization && mCanvasRenderer.IsCanvasChanged())))
   {
-    AddRasterizationTask();
+    AddRasterizationTask(!mLastCommitRasterized);
   }
 }
 
@@ -347,6 +372,12 @@ void CanvasView::SetRasterizationRequestManually(const bool isRasterizationManua
     if(!mManualRasterization)
     {
       RequestRasterization();
+
+      if(DALI_LIKELY(Adaptor::IsAvailable()))
+      {
+        // To make sure we will process next time.
+        Adaptor::Get().RequestProcessEventsOnIdle();
+      }
     }
   }
 }

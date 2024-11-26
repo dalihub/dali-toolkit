@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,33 @@
  *
  */
 
-#include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer.h>
 #include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer-drawable.h>
+#include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <sys/stat.h>
 #include <toolkit-application.h>
 #include <toolkit-event-thread-callback.h>
-#include <memory>
 #include <cstring>
-#include <sys/stat.h>
+#include <memory>
 
+namespace
+{
+bool gRasterizeCalled = false;
+bool gRasterizeResult = true; ///< Default rasterization result as success
+} // namespace
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace Adaptor
 {
-
-class CanvasRenderer: public Dali::BaseObject
+class CanvasRenderer : public Dali::BaseObject
 {
 public:
-  CanvasRenderer( const Vector2& size )
+  CanvasRenderer(const Vector2& size)
   : mDrawable(nullptr),
-    mTexture ( Dali::Texture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, size.width, size.height ) ),
+    mTexture(Dali::Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, size.width, size.height)),
     mSize(size),
     mViewBox(size)
   {
@@ -51,12 +53,12 @@ public:
 
   bool Commit()
   {
-     return true;
+    return true;
   }
 
   bool IsCanvasChanged() const
   {
-     return true;
+    return true;
   }
 
   Dali::Texture GetRasterizedTexture()
@@ -66,12 +68,13 @@ public:
 
   bool Rasterize()
   {
-     return true;
+    gRasterizeCalled = true;
+    return gRasterizeResult;
   }
 
   bool AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
   {
-    if (!drawable)
+    if(!drawable)
     {
       return false;
     }
@@ -81,11 +84,11 @@ public:
 
   bool RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
   {
-    if (!drawable)
+    if(!drawable)
     {
       return false;
     }
-    if (mDrawable == &drawable)
+    if(mDrawable == &drawable)
     {
       mDrawable = nullptr;
       return true;
@@ -95,7 +98,7 @@ public:
 
   bool RemoveAllDrawables()
   {
-    if (mDrawable)
+    if(mDrawable)
     {
       return true;
     }
@@ -106,7 +109,7 @@ public:
   {
     mSize = size;
     // For negative test
-    if ( size.width == -999 && size.height == -999 )
+    if(size.width == -999 && size.height == -999)
     {
       return false;
     }
@@ -122,7 +125,7 @@ public:
   {
     mViewBox = viewBox;
     // For negative test
-    if ( viewBox.width == -999 && viewBox.height == -999 )
+    if(viewBox.width == -999 && viewBox.height == -999)
     {
       return false;
     }
@@ -135,40 +138,39 @@ public:
   }
 
 public:
-   Dali::CanvasRenderer::Drawable* mDrawable;
-   Dali::Texture mTexture;
-   Vector2 mSize;
-   Vector2 mViewBox;
+  Dali::CanvasRenderer::Drawable* mDrawable;
+  Dali::Texture                   mTexture;
+  Vector2                         mSize;
+  Vector2                         mViewBox;
 };
 
-inline CanvasRenderer& GetImplementation( Dali::CanvasRenderer& renderer )
+inline CanvasRenderer& GetImplementation(Dali::CanvasRenderer& renderer)
 {
-  DALI_ASSERT_ALWAYS( renderer && "CanvasRenderer handle is empty." );
+  DALI_ASSERT_ALWAYS(renderer && "CanvasRenderer handle is empty.");
   BaseObject& handle = renderer.GetBaseObject();
-  return static_cast< Internal::Adaptor::CanvasRenderer& >( handle );
+  return static_cast<Internal::Adaptor::CanvasRenderer&>(handle);
 }
 
-inline const CanvasRenderer& GetImplementation( const Dali::CanvasRenderer& renderer )
+inline const CanvasRenderer& GetImplementation(const Dali::CanvasRenderer& renderer)
 {
-  DALI_ASSERT_ALWAYS( renderer && "CanvasRenderer handle is empty." );
+  DALI_ASSERT_ALWAYS(renderer && "CanvasRenderer handle is empty.");
   const BaseObject& handle = renderer.GetBaseObject();
-  return static_cast< const Internal::Adaptor::CanvasRenderer& >( handle );
+  return static_cast<const Internal::Adaptor::CanvasRenderer&>(handle);
 }
 
 } // namespace Adaptor
 
 } // namespace Internal
 
-
 /********************************************************************************/
 /*********************************  PUBLIC CLASS  *******************************/
 /********************************************************************************/
 
-CanvasRenderer CanvasRenderer::New( const Vector2& size )
+CanvasRenderer CanvasRenderer::New(const Vector2& size)
 {
   Internal::Adaptor::CanvasRenderer* imageRenderer = new Internal::Adaptor::CanvasRenderer(size);
 
-  return CanvasRenderer( imageRenderer );
+  return CanvasRenderer(imageRenderer);
 }
 
 CanvasRenderer::CanvasRenderer()
@@ -179,8 +181,8 @@ CanvasRenderer::~CanvasRenderer()
 {
 }
 
-CanvasRenderer::CanvasRenderer( Internal::Adaptor::CanvasRenderer* internal )
-: BaseHandle( internal )
+CanvasRenderer::CanvasRenderer(Internal::Adaptor::CanvasRenderer* internal)
+: BaseHandle(internal)
 {
 }
 
@@ -240,3 +242,21 @@ const Vector2& CanvasRenderer::GetViewBox()
 }
 
 } // namespace Dali
+
+namespace Test::CanvasRenderer
+{
+void MarkRasterizationResult(bool result)
+{
+  gRasterizeResult = result;
+}
+
+void ResetRasterizationFlag()
+{
+  gRasterizeCalled = false;
+}
+
+bool IsRasterizationCalled()
+{
+  return gRasterizeCalled;
+}
+} // namespace Test::CanvasRenderer
