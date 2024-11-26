@@ -114,11 +114,9 @@ bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
 
 void Adaptor::RemoveIdle(CallbackBase* callback)
 {
-  mCallbacks.Erase(std::remove_if(mCallbacks.Begin(), mCallbacks.End(), [&callback](CallbackBase* current)
-                                  { return callback == current; }),
+  mCallbacks.Erase(std::remove_if(mCallbacks.Begin(), mCallbacks.End(), [&callback](CallbackBase* current) { return callback == current; }),
                    mCallbacks.End());
-  mReturnCallbacks.Erase(std::remove_if(mReturnCallbacks.Begin(), mReturnCallbacks.End(), [&callback](CallbackBase* current)
-                                        { return callback == current; }),
+  mReturnCallbacks.Erase(std::remove_if(mReturnCallbacks.Begin(), mReturnCallbacks.End(), [&callback](CallbackBase* current) { return callback == current; }),
                          mReturnCallbacks.End());
 }
 
@@ -153,6 +151,19 @@ void Adaptor::RequestUpdateOnce()
       tet_printf("Adaptor::RequestUpdateOnce()\n");
       scene.KeepRendering(0.0f);
     }
+  }
+}
+
+void Adaptor::RequestProcessEventsOnIdle()
+{
+  if(mTestApplication)
+  {
+    tet_printf("Adaptor::RequestProcessEventsOnIdle()\n");
+
+    // Note that, toolkit-adaptor is not subclass of RenderController.
+    // So we should call this function directly.
+    auto& renderController = mTestApplication->GetRenderController();
+    renderController.RequestProcessEventsOnIdle();
   }
 }
 
@@ -411,6 +422,11 @@ void Adaptor::FeedKeyEvent(KeyEvent& keyEvent)
 
 void Adaptor::SceneCreated()
 {
+}
+
+void Adaptor::RequestProcessEventsOnIdle()
+{
+  mImpl->RequestProcessEventsOnIdle();
 }
 
 class LogFactory : public LogFactoryInterface

@@ -155,9 +155,9 @@ private: // From Control
   /**
    * @bried Rasterize the canvas, and add it to the view.
    *
-   * @param[in] size The target size of the canvas view rasterization.
+   * @param[in] forceProcess True if we need to rasterize forcibly without changeness check.
    */
-  void AddRasterizationTask();
+  void AddRasterizationTask(bool forceProcess);
 
 protected:
   /**
@@ -194,6 +194,7 @@ private:
   bool                             mIsSynchronous : 1;
   bool                             mManualRasterization : 1;
   bool                             mProcessorRegistered : 1;
+  bool                             mLastCommitRasterized : 1;
 };
 
 } // namespace Internal

@@ -675,6 +675,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
             impl.RequestTextRelayout();
           }
         }
+        break;
       }
     }
 

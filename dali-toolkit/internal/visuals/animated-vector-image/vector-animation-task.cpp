@@ -730,7 +730,7 @@ bool VectorAnimationTask::Rasterize()
   }
 
   // Forcely trigger render once if need.
-  if(mNotifyAfterRasterization || mNeedForceRenderOnceTrigger)
+  if(renderSuccess && (mNotifyAfterRasterization || mNeedForceRenderOnceTrigger))
   {
     mVectorAnimationThread.RequestForceRenderOnce();
     mNeedForceRenderOnceTrigger = false;
@@ -755,6 +755,9 @@ bool VectorAnimationTask::Rasterize()
     oss << " ";
     oss << "l:" << mCurrentLoop << " ";
     oss << "p:" << mPlayState << " ";
+    oss << "r:" << renderSuccess << " ";
+    oss << "s:" << stopped << " ";
+    oss << "k:" << mKeepAnimation << " ";
     oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
   });
 

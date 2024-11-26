@@ -598,6 +598,7 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
         mAnimationData.playState = DevelImageVisual::PlayState::PLAYING;
         mAnimationData.resendFlag |= VectorAnimationTask::RESEND_PLAY_STATE;
       }
+      DALI_LOG_DEBUG_INFO("[%p] Play request (url:%s)\n", this, mImageUrl.GetEllipsedUrl().c_str());
       mPlayState = DevelImageVisual::PlayState::PLAYING;
       break;
     }
@@ -608,6 +609,7 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
         mAnimationData.playState = DevelImageVisual::PlayState::PAUSED;
         mAnimationData.resendFlag |= VectorAnimationTask::RESEND_PLAY_STATE;
       }
+      DALI_LOG_DEBUG_INFO("[%p] Pause request (url:%s)\n", this, mImageUrl.GetEllipsedUrl().c_str());
       mPlayState = DevelImageVisual::PlayState::PAUSED;
       break;
     }
@@ -618,6 +620,7 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
         mAnimationData.playState = DevelImageVisual::PlayState::STOPPED;
         mAnimationData.resendFlag |= VectorAnimationTask::RESEND_PLAY_STATE;
       }
+      DALI_LOG_DEBUG_INFO("[%p] Stop request (url:%s)\n", this, mImageUrl.GetEllipsedUrl().c_str());
       mPlayState = DevelImageVisual::PlayState::STOPPED;
       break;
     }
@@ -628,6 +631,7 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
       {
         mAnimationData.currentFrame = frameNumber;
         mAnimationData.resendFlag |= VectorAnimationTask::RESEND_CURRENT_FRAME;
+        DALI_LOG_DEBUG_INFO("[%p] Jump to (%d) request (url:%s)\n", this, frameNumber, mImageUrl.GetEllipsedUrl().c_str());
       }
       break;
     }
@@ -635,6 +639,7 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
     {
       if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
       {
+        DALI_LOG_DEBUG_INFO("[%p] Flush request (url:%s)\n", this, mImageUrl.GetEllipsedUrl().c_str());
         SendAnimationData();
       }
       break;
@@ -662,6 +667,8 @@ void AnimatedVectorImageVisual::OnDoActionExtension(const Property::Index action
 
 void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceStatus status)
 {
+  DALI_LOG_DEBUG_INFO("[%p] OnResourceReady (status:%d) (url:%s)\n", this, static_cast<int>(status), mImageUrl.GetEllipsedUrl().c_str());
+
   AnimatedVectorImageVisualPtr self = this; // Keep reference until this API finished
 
   if(status == VectorAnimationTask::ResourceStatus::LOADED)
@@ -724,6 +731,8 @@ void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceSta
 
 void AnimatedVectorImageVisual::OnAnimationFinished(uint32_t playStateId)
 {
+  DALI_LOG_DEBUG_INFO("[%p] OnAnimationFinished (id : %u vs %u) (url:%s)\n", this, mLastSentPlayStateId, playStateId, mImageUrl.GetEllipsedUrl().c_str());
+
   // Only send event when animation is finished by the last Play/Pause/Stop request.
   if(mLastSentPlayStateId != playStateId)
   {
@@ -762,6 +771,7 @@ void AnimatedVectorImageVisual::SendAnimationData()
       // The OnAnimationFinished signal what before Play/Pause/Stop action send could be come after action sent.
       // To ensure the OnAnimationFinished signal comes belong to what we sent, we need to keep last sent playId.
       mAnimationData.playStateId = ++mLastSentPlayStateId;
+      DALI_LOG_DEBUG_INFO("[%p] Resend play state request (id:%u) (state:%d,%d) (url:%s)\n", this, mLastSentPlayStateId, static_cast<int>(mPlayState), static_cast<int>(mAnimationData.playState), mImageUrl.GetEllipsedUrl().c_str());
     }
     mVectorAnimationTask->SetAnimationData(mAnimationData);
 
