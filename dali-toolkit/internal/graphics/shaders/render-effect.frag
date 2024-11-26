@@ -47,7 +47,7 @@ float roundedBoxSDF(vec2 pixelPositionFromCenter, vec2 rectangleEdgePositionFrom
   return sqrt(((positiveDiff.x + positiveDiff.y)
                + sqrt(positiveDiff.x * positiveDiff.x
                       + positiveDiff.y * positiveDiff.y
-                      + (2.0 - 4.0 * squareness) * positiveDiff.x * positiveDiff.y))
+                      + (2.0 - 4.0 * squareness * squareness) * positiveDiff.x * positiveDiff.y))
               * 0.5)
          + min(0.0, max(diff.x, diff.y)) ///< Consider negative potential, to avoid visual defect when radius is zero
          - radius;
