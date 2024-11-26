@@ -1,18 +1,25 @@
-attribute mediump vec2 aPosition;
-varying mediump vec2 vTexCoord;
-varying mediump vec2 vMaskTexCoord;
-uniform highp mat4 uMvpMatrix;
-uniform highp vec3 uSize;
-uniform highp vec2 uNinePatchFactorsX[FACTOR_SIZE_X];
-uniform highp vec2 uNinePatchFactorsY[FACTOR_SIZE_Y];
+//@name npatch-visual-shader.vert
 
-// Visual size and offset
-uniform highp vec2 offset;
-uniform highp vec2 size;
-uniform mediump vec4 offsetSizeMode;
-uniform mediump vec2 origin;
-uniform mediump vec2 anchorPoint;
-uniform highp vec2 extraSize;
+//@version 100
+
+INPUT mediump vec2 aPosition;
+OUTPUT mediump vec2 vTexCoord;
+OUTPUT mediump vec2 vMaskTexCoord;
+
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp vec3 uSize;
+  UNIFORM highp vec2 uNinePatchFactorsX[FACTOR_SIZE_X];
+  UNIFORM highp vec2 uNinePatchFactorsY[FACTOR_SIZE_Y];
+  // Visual size and offset
+  UNIFORM highp vec2 offset;
+  UNIFORM highp vec2 size;
+  UNIFORM mediump vec4 offsetSizeMode;
+  UNIFORM mediump vec2 origin;
+  UNIFORM mediump vec2 anchorPoint;
+  UNIFORM highp vec2 extraSize;
+};
 
 void main()
 {

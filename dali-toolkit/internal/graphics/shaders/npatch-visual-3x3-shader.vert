@@ -1,19 +1,25 @@
-attribute mediump vec2 aPosition;
-varying mediump vec2 vTexCoord;
-varying mediump vec2 vMaskTexCoord;
+//@name npatch-visual-3x3-shader.vert
 
-uniform highp mat4 uMvpMatrix;
-uniform highp vec3 uSize;
-uniform highp vec2 uFixed[3];
-uniform highp vec2 uStretchTotal;
+//@version 100
 
-//Visual size and offset
-uniform highp vec2 offset;
-uniform highp vec2 size;
-uniform mediump vec4 offsetSizeMode;
-uniform mediump vec2 origin;
-uniform mediump vec2 anchorPoint;
-uniform highp vec2 extraSize;
+INPUT mediump vec2 aPosition;
+OUTPUT mediump vec2 vTexCoord;
+OUTPUT mediump vec2 vMaskTexCoord;
+
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp vec3 uSize;
+  UNIFORM highp vec2 uFixed[3];
+  UNIFORM highp vec2 uStretchTotal;
+  //Visual size and offset
+  UNIFORM highp   vec2 offset;
+  UNIFORM highp   vec2 size;
+  UNIFORM mediump vec4 offsetSizeMode;
+  UNIFORM mediump vec2 origin;
+  UNIFORM mediump vec2 anchorPoint;
+  UNIFORM highp vec2 extraSize;
+};
 
 void main()
 {

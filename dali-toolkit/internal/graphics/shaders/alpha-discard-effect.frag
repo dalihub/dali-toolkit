@@ -1,7 +1,14 @@
-varying mediump vec2 vTexCoord;
+//@version 100
 
-uniform sampler2D sTexture;
-uniform lowp vec4 uColor;
+INPUT mediump vec2 vTexCoord;
+
+UNIFORM sampler2D sTexture;
+
+UNIFORM_BLOCK FragBlock
+{
+UNIFORM lowp vec4 uColor;
+};
+
 
 void main()
 {

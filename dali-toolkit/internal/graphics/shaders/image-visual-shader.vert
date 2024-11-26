@@ -1,3 +1,7 @@
+//@name image-visual-shader.vert
+
+//@version 100
+
 INPUT mediump vec2 aPosition;
 OUTPUT mediump vec2 vTexCoord;
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
@@ -10,6 +14,10 @@ FLAT OUTPUT highp vec4 vCornerRadius;
 #endif
 #endif
 
+#ifdef IS_REQUIRED_ALPHA_MASKING
+OUTPUT  mediump vec2  vMaskTexCoord;
+#endif
+
 #ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
 #define DEBUG_EXTRA_ATTRIBUTES
 #define DEBUG_EXTRA_VARYINGS
@@ -18,35 +26,42 @@ DEBUG_EXTRA_ATTRIBUTES
 DEBUG_EXTRA_VARYINGS
 #endif
 
-uniform highp mat4 uMvpMatrix;
-uniform highp vec3 uSize;
-uniform highp vec4 pixelArea;
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp vec3 uSize;
+  UNIFORM highp vec4 pixelArea;
 
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
-// Be used when we calculate anti-alias range near 1 pixel.
-uniform highp vec3 uScale;
+  // Be used when we calculate anti-alias range near 1 pixel.
+  UNIFORM highp vec3 uScale;
 #endif
 
-//Visual size and offset
-uniform highp vec2 offset;
-uniform highp vec2 size;
-uniform mediump vec4 offsetSizeMode;
-uniform mediump vec2 origin;
-uniform mediump vec2 anchorPoint;
-#ifdef IS_REQUIRED_BORDERLINE
-uniform highp float borderlineWidth;
-uniform highp float borderlineOffset;
-#endif
+  // Visual size and offset
+  UNIFORM highp vec2   offset;
+  UNIFORM highp vec2   size;
+  UNIFORM mediump vec4 offsetSizeMode;
+  UNIFORM mediump vec2 origin;
+  UNIFORM mediump vec2 anchorPoint;
+
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-uniform highp vec4 cornerRadius;
-uniform mediump float cornerRadiusPolicy;
+  UNIFORM highp vec4    cornerRadius;
+  UNIFORM mediump float cornerRadiusPolicy;
 #endif
 #ifdef IS_REQUIRED_ALPHA_MASKING
-OUTPUT  mediump vec2  vMaskTexCoord;
-uniform lowp    float cropToMask;
-uniform mediump vec2  maskTextureRatio;
+  UNIFORM lowp float   cropToMask;
+  UNIFORM mediump vec2 maskTextureRatio;
 #endif
-uniform highp vec2 extraSize;
+  UNIFORM highp vec2 extraSize;
+};
+
+#ifdef IS_REQUIRED_BORDERLINE
+UNIFORM_BLOCK Borderline
+{
+  UNIFORM highp float borderlineWidth;
+  UNIFORM highp float borderlineOffset;
+};
+#endif
 
 vec4 ComputeVertexPosition()
 {

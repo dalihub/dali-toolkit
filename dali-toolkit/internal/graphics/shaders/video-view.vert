@@ -1,6 +1,13 @@
-attribute mediump vec2 aPosition;
-uniform highp mat4 uMvpMatrix;
-uniform highp vec3 uSize;
+//@name video-view.vert
+
+//@version 100
+
+INPUT mediump vec2 aPosition;
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp vec3 uSize;
+};
 
 void main()
 {

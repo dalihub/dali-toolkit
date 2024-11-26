@@ -1,17 +1,24 @@
+//@name motion-stretch-effect.frag
+
+//@version 100
+
 precision mediump float;
 
-uniform sampler2D sTexture;
-uniform vec4 uColor;
+UNIFORM sampler2D sTexture;
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM vec4 uColor;
 
-uniform vec2 uObjectFadeStart;
-uniform vec2 uObjectFadeEnd;
-uniform float uAlphaScale;
+  UNIFORM vec2 uObjectFadeStart;
+  UNIFORM vec2 uObjectFadeEnd;
+  UNIFORM float uAlphaScale; // Global alpha scale
+};
 
 // inputs
-varying vec2 vModelSpaceCenterToPos;
-varying vec2 vScreenSpaceVelocityVector;
-varying float vSpeed;
-varying vec2 vTexCoord;
+INPUT vec2 vModelSpaceCenterToPos; // 2d, ignoring z
+INPUT vec2 vScreenSpaceVelocityVector;
+INPUT float vSpeed;
+INPUT vec2 vTexCoord;
 
 void main()
 {
@@ -23,7 +30,7 @@ void main()
   fadeToEdgesScale = mix(1.0, fadeToEdgesScale, vSpeed);                // fade proportional to speed, so opaque when at rest
 
   // standard actor texel
-  vec4 colActor = texture2D(sTexture, vTexCoord);
+  vec4 colActor = TEXTURE(sTexture, vTexCoord);
   gl_FragColor = colActor;
   gl_FragColor.a *= fadeToEdgesScale; // fade actor to its edges based on speed of motion
   gl_FragColor *= uColor;

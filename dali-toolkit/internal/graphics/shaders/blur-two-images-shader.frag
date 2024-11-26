@@ -1,11 +1,20 @@
+//@name blur-two-images-shader.frag
+
+//@version 100
+
 precision highp float;
-uniform float uBlurStrength;
-uniform sampler2D sTexture;
-uniform sampler2D sEffect;
-varying mediump vec2 vTexCoord;
+
+UNIFORM_BLOCK FragBlock
+{
+    UNIFORM float uBlurStrength;
+};
+
+UNIFORM sampler2D sTexture;
+UNIFORM sampler2D sEffect;
+INPUT mediump vec2 vTexCoord;
 
 void main()
 {
-  gl_FragColor = texture2D( sTexture, vTexCoord ) * uBlurStrength
-               + texture2D( sEffect, vTexCoord )*(1.0-uBlurStrength);
+  gl_FragColor = TEXTURE( sTexture, vTexCoord ) * uBlurStrength
+               + TEXTURE( sEffect, vTexCoord )*(1.0-uBlurStrength);
 }

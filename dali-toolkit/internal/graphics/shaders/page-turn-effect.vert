@@ -1,3 +1,7 @@
+//@name page-turn-effect.vert
+
+//@version 100
+
 /*
  * The common parameters for all the vertices, calculate in CPU then pass into the shader as uniforms
  *
@@ -18,20 +22,28 @@
 
 precision mediump float;
 
-attribute mediump vec2 aPosition;
+INPUT mediump vec2 aPosition;
 
-uniform mediump mat4 uMvpMatrix;
-uniform mediump mat3 uNormalMatrix;
-uniform mediump mat4 uModelView;
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM mediump mat4 uMvpMatrix;
+  UNIFORM mediump mat3 uNormalMatrix;
+  UNIFORM mediump mat4 uModelView;
 
-uniform mat4 uCommonParameters;
+  UNIFORM mat4 uCommonParameters;
 
-uniform vec3 uSize;
-uniform float uIsTurningBack;
-uniform float uTextureWidth;
-varying vec3 vNormal;
-varying vec4 vPosition;
-varying mediump vec2 vTexCoord;
+  UNIFORM float uIsTurningBack;
+  UNIFORM float uTextureWidth;
+};
+
+UNIFORM_BLOCK SharedBlock
+{
+  UNIFORM vec3 uSize;
+};
+
+OUTPUT vec3 vNormal;
+OUTPUT vec4 vPosition;
+OUTPUT mediump vec2 vTexCoord;
 
 void main()
 {
@@ -156,7 +168,8 @@ void main()
   }
   vNormal =  uNormalMatrix * normal;
   gl_Position = uMvpMatrix * position;
-  // varying parameters for fragment shader
+
+  // out parameters for fragment shader
   vTexCoord = aPosition + vec2(0.5);
   vTexCoord.x /= uTextureWidth;
   vPosition = uModelView * position;

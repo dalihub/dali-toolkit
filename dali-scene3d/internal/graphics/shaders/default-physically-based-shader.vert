@@ -1,3 +1,4 @@
+//@version 100
 
 // Original Code
 // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/glTF-WebGL-PBR/shaders/pbr-vert.glsl
@@ -37,55 +38,75 @@ ADD_EXTRA_SKINNING_ATTRIBUTES
 #endif
 
 #ifdef MORPH
-uniform highp sampler2D sBlendShapeGeometry;
+UNIFORM highp sampler2D sBlendShapeGeometry;
+#endif
+
+UNIFORM_BLOCK VertBlock0
+{
+#ifdef MORPH
 #ifdef SL_VERSION_LOW
-uniform int uBlendShapeGeometryWidth;
-uniform int uBlendShapeGeometryHeight;
+    UNIFORM int uBlendShapeGeometryWidth;
+    UNIFORM int uBlendShapeGeometryHeight;
 #endif
 #endif
+
+    UNIFORM highp mat4 uViewMatrix;
+    UNIFORM highp mat3 uNormalMatrix;
+    UNIFORM highp mat4 uModelMatrix;
+    UNIFORM highp mat4 uProjection;
+
+#ifdef SKINNING
+
+#ifdef SL_VERSION_LOW
+    #define MAX_BONES 80
+    UNIFORM highp mat4 uBone[MAX_BONES];
+#endif
+#endif
+
+#ifdef MORPH
+#define MAX_BLEND_SHAPE_NUMBER 256
+UNIFORM int uNumberOfBlendShapes;///< Total number of blend shapes loaded.
+UNIFORM highp float uBlendShapeWeight[MAX_BLEND_SHAPE_NUMBER];///< The weight of each blend shape.
+#ifdef MORPH_VERSION_2_0
+UNIFORM highp float uBlendShapeUnnormalizeFactor;///< Factor used to unnormalize the geometry of the blend shape.
+#else
+UNIFORM highp float uBlendShapeUnnormalizeFactor[MAX_BLEND_SHAPE_NUMBER];///< Factor used to unnormalize the geometry of the blend shape.
+#endif
+UNIFORM highp int uBlendShapeComponentSize;///< The size in the texture of either the vertices, normals or tangents. Used to calculate the offset to address them.
+#endif
+
+// Shadow
+UNIFORM highp mat4 uShadowLightViewProjectionMatrix;
+};
+
+#ifdef SKINNING
+UNIFORM_BLOCK YDirection
+{
+    UNIFORM mediump vec3 uYDirection;
+};
+#endif
+
+UNIFORM_BLOCK ShadowEnabled
+{
+    UNIFORM lowp int uIsShadowEnabled;
+};
+
+// Additional uniform block if using more bones
+#ifdef SKINNING
+#ifndef SL_VERSION_LOW
+#define MAX_BONES 256
+UNIFORM_BLOCK Bones
+{
+  UNIFORM mat4 uBone[MAX_BONES];
+};
+#endif
+#endif
+OUTPUT highp vec3 positionFromLightView;
 
 OUTPUT mediump vec2 vUV;
 OUTPUT highp mat3 vTBN;
 OUTPUT lowp vec4 vColor;
 OUTPUT highp vec3 vPositionToCamera;
-
-uniform highp mat4 uViewMatrix;
-uniform highp mat3 uNormalMatrix;
-uniform highp mat4 uModelMatrix;
-uniform highp mat4 uProjection;
-
-#ifdef SKINNING
-
-#ifdef SL_VERSION_LOW
-#define MAX_BONES 80
-uniform highp mat4 uBone[MAX_BONES];
-#else
-#define MAX_BONES 256
-layout(std140) uniform Bones
-{
-  mat4 uBone[MAX_BONES];
-};
-#endif
-
-uniform mediump vec3 uYDirection;
-#endif
-
-#ifdef MORPH
-#define MAX_BLEND_SHAPE_NUMBER 256
-uniform int uNumberOfBlendShapes;                                         ///< Total number of blend shapes loaded.
-uniform highp float uBlendShapeWeight[MAX_BLEND_SHAPE_NUMBER];            ///< The weight of each blend shape.
-#ifdef MORPH_VERSION_2_0
-uniform highp float uBlendShapeUnnormalizeFactor;                         ///< Factor used to unnormalize the geometry of the blend shape.
-#else
-uniform highp float uBlendShapeUnnormalizeFactor[MAX_BLEND_SHAPE_NUMBER]; ///< Factor used to unnormalize the geometry of the blend shape.
-#endif
-uniform highp int uBlendShapeComponentSize;                               ///< The size in the texture of either the vertices, normals or tangents. Used to calculate the offset to address them.
-#endif
-
-// Shadow
-uniform lowp int uIsShadowEnabled;
-uniform highp mat4 uShadowLightViewProjectionMatrix;
-OUTPUT highp vec3 positionFromLightView;
 
 void main()
 {

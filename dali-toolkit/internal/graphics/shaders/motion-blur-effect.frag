@@ -1,21 +1,28 @@
+//@name motion-blur-effect.frag
+
+//@version 100
+
 precision mediump float;
 
-uniform sampler2D sTexture;
-uniform vec4 uColor;
+UNIFORM sampler2D sTexture;
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM vec4 uColor;
 
-uniform vec2 uObjectFadeStart;
-uniform vec2 uObjectFadeEnd;
-uniform float uAlphaScale;
-uniform float uBlurTexCoordScale;
-uniform float uNumSamples;
-uniform float uRecipNumSamples;
-uniform float uRecipNumSamplesMinusOne;
+  UNIFORM vec2 uObjectFadeStart;
+  UNIFORM vec2 uObjectFadeEnd;
+  UNIFORM float uAlphaScale;
+  UNIFORM float uBlurTexCoordScale;
+  UNIFORM float uNumSamples;
+  UNIFORM float uRecipNumSamples;
+  UNIFORM float uRecipNumSamplesMinusOne;
+};
 
 // inputs
-varying vec2 vModelSpaceCenterToPos;
-varying vec2 vScreenSpaceVelocityVector;
-varying float vSpeed;
-varying vec2 vTexCoord;
+INPUT vec2 vModelSpaceCenterToPos;
+INPUT vec2 vScreenSpaceVelocityVector;
+INPUT float vSpeed;
+INPUT vec2 vTexCoord;
 
 void main()
 {
@@ -30,14 +37,14 @@ void main()
   vec2 velocity = vScreenSpaceVelocityVector * uBlurTexCoordScale;
 
   // standard actor texel
-  vec4 colActor = texture2D(sTexture, vTexCoord);
+  vec4 colActor = TEXTURE(sTexture, vTexCoord);
 
   // blurred actor - gather texture samples from the actor texture in the direction of motion
   vec4 col = colActor * uRecipNumSamples;
   for(float i = 1.0; i < uNumSamples; i += 1.0)
   {
     float t = i * uRecipNumSamplesMinusOne;
-    col += texture2D(sTexture, vTexCoord + (velocity * t)) * uRecipNumSamples;
+    col += TEXTURE(sTexture, vTexCoord + (velocity * t)) * uRecipNumSamples;
   }
   gl_FragColor = mix(colActor, col, vSpeed); // lerp blurred and non-blurred actor based on speed of motion
   gl_FragColor.a = fadeToEdgesScale;//colActor.a * fadeToEdgesScale; // fade blurred actor to its edges based on speed of motion

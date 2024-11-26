@@ -1,10 +1,17 @@
-varying mediump vec2 vTexCoord;
-uniform sampler2D sTexture;
-uniform lowp vec4 uColor;
-uniform lowp float uAlpha;
+//@name super-blur-view.frag
+
+//@version 100
+
+INPUT mediump vec2 vTexCoord;
+UNIFORM sampler2D sTexture;
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uColor;
+  UNIFORM lowp float uAlpha;
+};
 
 void main()
 {
-  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;
+  gl_FragColor = TEXTURE( sTexture, vTexCoord ) * uColor;
   gl_FragColor.a *= uAlpha;
 }
