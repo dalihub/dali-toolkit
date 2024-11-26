@@ -297,6 +297,8 @@ Dali::WebEngineCookieManager* WebView::GetCookieManager()
 
 void WebView::OnInitialize()
 {
+  DALI_LOG_DEBUG_INFO("WebView[%p] OnInitialize()\n", this);
+
   Actor self = Self();
 
   self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
@@ -355,6 +357,7 @@ void WebView::ChangeOrientation(int orientation)
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] ChangeOrientation(%d)\n", this, orientation);
     mWebEngine.ChangeOrientation(orientation);
   }
 }
@@ -389,6 +392,7 @@ void WebView::LoadUrl(const std::string& url)
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] LoadUrl(%s)\n", this, url.c_str());
     mWebEngine.LoadUrl(url);
   }
 }
@@ -397,6 +401,7 @@ void WebView::LoadHtmlString(const std::string& htmlString)
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] LoadHtmlString(%s)\n", this, htmlString.substr(0, 30).c_str());
     mWebEngine.LoadHtmlString(htmlString);
   }
 }
@@ -421,12 +426,14 @@ void WebView::Reload()
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] Reload()\n", this);
     mWebEngine.Reload();
   }
 }
 
 bool WebView::ReloadWithoutCache()
 {
+  DALI_LOG_DEBUG_INFO("WebView[%p] ReloadWithoutCache()\n", this);
   return mWebEngine ? mWebEngine.ReloadWithoutCache() : false;
 }
 
@@ -434,6 +441,7 @@ void WebView::StopLoading()
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] StopLoading()\n", this);
     mWebEngine.StopLoading();
   }
 }
@@ -442,6 +450,7 @@ void WebView::Suspend()
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] Suspend()\n", this);
     mWebEngine.Suspend();
   }
 }
@@ -450,6 +459,7 @@ void WebView::Resume()
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] Resume()\n", this);
     mWebEngine.Resume();
   }
 }
@@ -458,6 +468,7 @@ void WebView::SuspendNetworkLoading()
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] SuspendNetworkLoading()\n", this);
     mWebEngine.SuspendNetworkLoading();
   }
 }
@@ -466,6 +477,7 @@ void WebView::ResumeNetworkLoading()
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] ResumeNetworkLoading()\n", this);
     mWebEngine.ResumeNetworkLoading();
   }
 }
@@ -639,6 +651,7 @@ void WebView::ClearHistory()
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] ClearHistory()\n", this);
     mWebEngine.ClearHistory();
   }
 }
@@ -647,6 +660,7 @@ void WebView::ClearAllTilesResources()
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] ClearAllTilesResources()\n", this);
     mWebEngine.ClearAllTilesResources();
   }
 }
@@ -655,6 +669,7 @@ void WebView::SetScaleFactor(float scaleFactor, Dali::Vector2 point)
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] SetScaleFactor(%f, %fx%f)\n", this, scaleFactor, point.x, point.y);
     mWebEngine.SetScaleFactor(scaleFactor, point);
   }
 }
@@ -668,6 +683,7 @@ void WebView::ActivateAccessibility(bool activated)
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] ActivateAccessibility(%d)\n", this, activated);
     mWebEngine.ActivateAccessibility(activated);
   }
 }
@@ -711,6 +727,7 @@ void WebView::ExitFullscreen()
 {
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] ExitFullscreen()\n", this);
     mWebEngine.ExitFullscreen();
   }
 }
@@ -739,6 +756,7 @@ void WebView::EnableVideoHole(bool enabled)
 
   if(mWebEngine)
   {
+    DALI_LOG_DEBUG_INFO("WebView[%p] EnableVideoHole(%d)\n", this, mVideoHoleEnabled);
     mWebEngine.EnableVideoHole(mVideoHoleEnabled);
   }
 }
@@ -1069,6 +1087,8 @@ void WebView::SetDisplayArea(const Dali::Rect<int32_t>& displayArea)
   {
     // WebEngine visual size changed. we have to re-create visual.
     mVisualChangeRequired = true;
+
+    DALI_LOG_DEBUG_INFO("WebView[%p] displayArea changed! (%d,%d)%dx%d -> (%d,%d)%dx%d\n", this, mWebViewArea.x, mWebViewArea.y, mWebViewArea.width, mWebViewArea.height, displayArea.x, displayArea.y, displayArea.width, displayArea.height);
 
     // Change old visual's pixel area matched as changed web view size
     if(mVisual)
@@ -1510,6 +1530,7 @@ float WebView::GetLoadProgressPercentage() const
 
 bool WebView::SetVisibility(bool visible)
 {
+  DALI_LOG_DEBUG_INFO("WebView[%p] SetVisibility(%d)\n", this, visible);
   return mWebEngine ? mWebEngine.SetVisibility(visible) : false;
 }
 
