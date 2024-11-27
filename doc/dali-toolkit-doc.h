@@ -50,6 +50,10 @@
  *    <td>@ref dali_toolkit</td>
  *    <td>DALi Toolkit provides UI components and various effects on top of the DALi Core.</td>
  * </tr>
+ * <tr>
+ *    <td>@ref dali_scene3d</td>
+ *    <td>DALi Scene3D provides functionalities for rendering 3D models and managing the 3D scene environment.</td>
+ * </tr>
  * </table>
  *
  * The layer diagram for DALi modules is shown below:
@@ -131,6 +135,14 @@
  * <tr>
  *    <td style="padding-left:1em">@ref dali_toolkit_controls_progress_bar</td>
  *    <td>ProgressBar is a control to give the user an indication of the progress of an operation.</td>
+ * </tr>
+ * <tr>
+ *    <td style="padding-left:1em">@ref dali_toolkit_controls_camera_view</td>
+ *    <td>CameraView is a control for camera display.</td>
+ * </tr>
+ * <tr>
+ *    <td style="padding-left:1em">@ref dali_toolkit_controls_web_view</td>
+ *    <td>WebView is a control for displaying web content.</td>
  * </tr>
  * <tr>
  *    <td>@ref dali_toolkit_managers</td>
@@ -218,6 +230,12 @@
  *     @defgroup dali_toolkit_controls_progress_bar Progress Bar
  *     @brief ProgressBar is a control to give the user an indication of the progress of an operation.
 
+ *     @defgroup dali_toolkit_controls_camera_view Camera View
+ *     @brief CameraView is a control for camera display.
+
+ *     @defgroup dali_toolkit_controls_web_view Web View
+ *     @brief WebView is a control for displaying web content.
+
  *   @}
 
  *   @defgroup dali_toolkit_managers Managers
@@ -230,6 +248,102 @@
  *   @brief The ImageLoader is used to load pixel data from a URL.
 
  * @}
+
+ * @defgroup dali_scene3d DALi Scene3D
+ *
+ * @brief DALi Scene3D provides functionalities for rendering 3D models and managing the 3D scene environment.
+ *
+ * @section dali_scene3d_overview Overview
+ *
+ * DALi Scene3D consists of the following groups of API:
+ *
+ * <table>
+ * <tr>
+ *    <th>API Group</th>
+ *    <th>Description</th>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_scene3d_model_components</td>
+ *    <td>Classes for manipulating 3D model objects.</td>
+ * </tr>
+ * <tr>
+ *    <td style="padding-left:1em">@ref dali_scene3d_model_node</td>
+ *    <td>ModelNode is a class for representing the Node of Model in Scene3D.</td>
+ * </tr>
+ * <tr>
+ *    <td style="padding-left:1em">@ref dali_scene3d_model_primitive</td>
+ *    <td>ModelPrimitive is required to draw the mesh geometry defined by the user.</td>
+ * </tr>
+ * <tr>
+ *    <td style="padding-left:1em">@ref dali_scene3d_material</td>
+ *    <td>Material is for setting material properties of 3D models.</td>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_scene3d_model_motion</td>
+ *    <td>Classes for controlling 3D model animations.</td>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_scene3d_light</td>
+ *    <td>Light defines a 3D light source.</td>
+ * </tr>
+ * <tr>
+ *    <td>@ref dali_scene3d_controls</td>
+ *    <td>Components for building the 3D scene.</td>
+ * </tr>
+ * <tr>
+ *    <td style="padding-left:1em">@ref dali_scene3d_controls_model</td>
+ *    <td>Model is a control to show 3D model objects.</td>
+ * </tr>
+ * <tr>
+ *    <td style="padding-left:1em">@ref dali_scene3d_controls_scene_view</td>
+ *    <td>SceneView is a control to show multiple 3D objects in a single 3D scene.</td>
+ * </tr>
+ * <tr>
+ *    <td style="padding-left:1em">@ref dali_scene3d_controls_panel</td>
+ *    <td>Panel is a control to show 2D UI on 3D Scene.</td>
+ * </tr>
+ * </table>
+
+ * @ingroup dali
+ * @{
+ *   @defgroup dali_scene3d_model_components Model Components
+ *   @brief Classes for manipulating 3D model objects.
+
+ *   @{
+ *     @defgroup dali_scene3d_model_node Model Node
+ *     @brief ModelNode is a class for representing the Node of Model in Scene3D.
+
+ *     @defgroup dali_scene3d_model_primitive Model Primitive
+ *     @brief ModelPrimitive is required to draw the mesh geometry defined by the user.
+
+ *     @defgroup dali_scene3d_material Material
+ *     @brief Material is for setting material properties of 3D models.
+
+ *   @}
+
+ *   @defgroup dali_scene3d_model_motion Model Motions
+ *   @brief Classes for controlling 3D model animations.
+
+ *   @defgroup dali_scene3d_light Light
+ *   @brief Light defines a 3D light source.
+
+ *   @defgroup dali_scene3d_controls Controls
+ *   @brief Components for building the 3D scene.
+
+ *   @{
+ *     @defgroup dali_scene3d_controls_model Model
+ *     @brief Model is a control to show 3D model objects.
+
+ *     @defgroup dali_scene3d_controls_scene_view Scene View
+ *     @brief SceneView is a control to show multiple 3D objects in a single 3D scene.
+
+ *     @defgroup dali_scene3d_controls_panel Panel
+ *     @brief Panel is a control to show 2D UI on 3D Scene.
+
+ *   @}
+
+ * @}
+
  */
 
 #endif // DALI_TOOLKIT_DOC_H

@@ -35,7 +35,7 @@ class Light;
 }
 
 /**
- * @addtogroup dali_toolkit_controls_light
+ * @addtogroup dali_scene3d_light
  * @{
  */
 

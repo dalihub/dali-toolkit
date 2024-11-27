@@ -38,7 +38,7 @@ namespace Internal
 class ModelNode;
 }
 /**
- * @addtogroup dali_scene3d_model_components_model_node
+ * @addtogroup dali_scene3d_model_node
  * @{
  */
 

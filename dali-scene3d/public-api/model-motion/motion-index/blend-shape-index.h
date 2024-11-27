@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_MOTION_BLEND_SHAPE_INDEX_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ class BlendShapeIndex;
 } // namespace Internal
 
 /**
- * @addtogroup dali_scene3d_model_motion_blend_shape_index
+ * @addtogroup dali_scene3d_model_motion
  * @{
  */
 

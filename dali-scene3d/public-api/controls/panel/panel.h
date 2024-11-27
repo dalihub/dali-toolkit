@@ -37,7 +37,7 @@ class Panel;
 }
 
 /**
- * @addtogroup dali_toolkit_controls_panel
+ * @addtogroup dali_scene3d_controls_panel
  * @{
  */
 

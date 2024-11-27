@@ -42,16 +42,16 @@ class Model;
 }
 
 /**
- * @addtogroup dali_toolkit_controls_model
+ * @addtogroup dali_scene3d_controls_model
  * @{
  */
 
 /**
  * @brief Model is a control to show 3D model objects.
- * Model supports to load glTF 2.0 and DLI models for the input format
+ * Model supports to load glTF 2.0, USD, and DLI models for the input format
  * and also supports Physically Based Rendering with Image Based Lighting.
  *
- * The Animations defined in the glTF or DLI models are also loaded and can be retrieved by using GetAnimation() method.
+ * The Animations defined in the glTF, USD or DLI models are also loaded and can be retrieved by using GetAnimation() method.
  * The number of animation is also retrieved by GetAnimationCount() method.
  *
  * By default, The loaded model has its own position and size which are defined in vertex buffer regardless of the Control size.
