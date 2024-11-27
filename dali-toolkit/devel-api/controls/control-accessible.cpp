@@ -25,10 +25,12 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
@@ -176,6 +178,44 @@ bool IsHighlightable(TriStateProperty highlightable, int32_t rawRole)
       return false;
     }
   }
+}
+
+std::string FetchImageSrcFromMap(const Dali::Property::Map& imageMap)
+{
+  auto urlVal = imageMap.Find(Toolkit::ImageVisual::Property::URL);
+  if(urlVal)
+  {
+    if(urlVal->GetType() == Dali::Property::STRING)
+    {
+      return urlVal->Get<std::string>();
+    }
+    else if(urlVal->GetType() == Dali::Property::ARRAY)
+    {
+      auto urlArray = urlVal->GetArray();
+      if(urlArray && !urlArray->Empty())
+      {
+        // Returns first element if url is an array
+        return (*urlArray)[0].Get<std::string>();
+      }
+    }
+  }
+  return {};
+}
+
+std::string FetchImageSrc(const Toolkit::ImageView& imageView)
+{
+  const auto imageUrl = imageView.GetProperty<std::string>(Toolkit::ImageView::Property::IMAGE);
+  if(!imageUrl.empty())
+  {
+    return imageUrl;
+  }
+
+  const auto imageMap = imageView.GetProperty<Dali::Property::Map>(Toolkit::ImageView::Property::IMAGE);
+  if(!imageMap.Empty())
+  {
+    return FetchImageSrcFromMap(imageMap);
+  }
+  return {};
 }
 
 } // unnamed namespace
@@ -353,6 +393,14 @@ void ControlAccessible::UpdateAttributes(Accessibility::Attributes& attributes) 
   else
   {
     attributes.insert_or_assign(automationIdKey, std::move(automationId));
+  }
+
+  static const std::string imgSrcKey = "imgSrc";
+
+  if(auto imageView = Toolkit::ImageView::DownCast(Self()))
+  {
+    auto imageSrc = FetchImageSrc(imageView);
+    attributes.insert_or_assign(imgSrcKey, std::move(imageSrc));
   }
 }
 
