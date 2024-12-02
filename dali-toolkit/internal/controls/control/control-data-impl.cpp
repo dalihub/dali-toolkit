@@ -372,6 +372,7 @@ const PropertyRegistration Control::Impl::PROPERTY_27(typeRegistration, "accessi
 const PropertyRegistration Control::Impl::PROPERTY_28(typeRegistration, "accessibilityScrollable",        Toolkit::DevelControl::Property::ACCESSIBILITY_SCROLLABLE,         Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_29(typeRegistration, "accessibilityStates",            Toolkit::DevelControl::Property::ACCESSIBILITY_STATES,             Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_30(typeRegistration, "accessibilityIsModal",           Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL,           Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_31(typeRegistration, "offScreenRendering",             Toolkit::DevelControl::Property::OFFSCREEN_RENDERING,              Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 // clang-format on
 
@@ -401,6 +402,8 @@ Control::Impl::Impl(Control& controlImpl)
   mPanGestureDetector(),
   mTapGestureDetector(),
   mLongPressGestureDetector(),
+  mOffScreenRenderingContext(nullptr),
+  mOffScreenRenderingType(DevelControl::OffScreenRenderingType::NONE),
   mTooltip(NULL),
   mInputMethodContext(),
   mIdleCallback(nullptr),
@@ -412,8 +415,8 @@ Control::Impl::Impl(Control& controlImpl)
   mDispatchKeyEvents(true),
   mProcessorRegistered(false)
 {
-  mAccessibilityData = new AccessibilityData(mControlImpl);
-  mVisualData        = new VisualData(*this);
+  mAccessibilityData = std::make_unique<AccessibilityData>(mControlImpl);
+  mVisualData        = std::make_unique<VisualData>(*this);
 }
 
 Control::Impl::~Impl()
@@ -434,9 +437,6 @@ Control::Impl::~Impl()
     // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
     Adaptor::Get().RemoveIdle(mIdleCallback);
   }
-
-  delete mAccessibilityData;
-  delete mVisualData;
 }
 
 Control::Impl& Control::Impl::Get(Internal::Control& internalControl)
@@ -520,10 +520,37 @@ bool Control::Impl::IsResourceReady() const
   return mVisualData->IsResourceReady();
 }
 
+void Control::Impl::OnSceneConnection()
+{
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection number of registered visuals(%d)\n", mVisualData->mVisuals.Size());
+
+  Actor self = mControlImpl.Self();
+
+  for(RegisteredVisualContainer::Iterator iter = mVisualData->mVisuals.Begin(); iter != mVisualData->mVisuals.End(); iter++)
+  {
+    // Check whether the visual is empty and enabled
+    if((*iter)->visual && (*iter)->enabled)
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection Setting visual(%d) on scene\n", (*iter)->index);
+      Toolkit::GetImplementation((*iter)->visual).SetOnScene(self);
+    }
+  }
+
+  if(mOffScreenRenderingContext) // mOffScreenRenderingType != NONE
+  {
+    mOffScreenRenderingContext->Enable(Toolkit::Control(mControlImpl.GetOwner()), mOffScreenRenderingType);
+  }
+}
+
 void Control::Impl::OnSceneDisconnection()
 {
   Actor self = mControlImpl.Self();
   mVisualData->ClearScene(self);
+
+  if(mOffScreenRenderingContext)
+  {
+    mOffScreenRenderingContext->Disable(Toolkit::Control(mControlImpl.GetOwner()));
+  }
 }
 
 void Control::Impl::EnableReadyTransitionOverriden(Toolkit::Visual::Base& visual, bool enable)
@@ -968,6 +995,16 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         }
         break;
       }
+
+      case Toolkit::DevelControl::Property::OFFSCREEN_RENDERING:
+      {
+        int32_t offscreenRenderingType;
+        if(value.Get(offscreenRenderingType))
+        {
+          controlImpl.mImpl->SetOffScreenRendering(offscreenRenderingType);
+        }
+        break;
+      }
     }
   }
 }
@@ -1164,6 +1201,12 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL:
       {
         value = controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.isModal;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::OFFSCREEN_RENDERING:
+      {
+        value = controlImpl.mImpl->mOffScreenRenderingType;
         break;
       }
     }
@@ -1498,6 +1541,46 @@ void Control::Impl::RegisterProcessorOnce()
   {
     Adaptor::Get().RegisterProcessorOnce(*this, true);
     mProcessorRegistered = true;
+  }
+}
+
+void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
+{
+  // Validate input
+  {
+    constexpr int32_t count = static_cast<int32_t>(DevelControl::OffScreenRenderingTypeCount);
+    if(0 > offScreenRenderingType || offScreenRenderingType >= count)
+    {
+      DALI_LOG_ERROR("Failed to set offscreen rendering. Type index is out of bound.\n");
+      return;
+    }
+  }
+
+  mOffScreenRenderingType = static_cast<DevelControl::OffScreenRenderingType>(offScreenRenderingType);
+  Dali::Toolkit::Control handle(mControlImpl.GetOwner());
+
+  // Disable
+  if(mOffScreenRenderingType == DevelControl::OffScreenRenderingType::NONE)
+  {
+    if(mOffScreenRenderingContext)
+    {
+      mOffScreenRenderingContext->Disable(handle);
+      mOffScreenRenderingContext.reset();
+    }
+  }
+  // Enable
+  else
+  {
+    if(mOffScreenRenderingContext)
+    {
+      mOffScreenRenderingContext->Disable(handle);
+    }
+    else
+    {
+      Dali::Toolkit::Control handle(mControlImpl.GetOwner());
+      mOffScreenRenderingContext = std::make_unique<OffScreenRenderingContext>();
+    }
+    mOffScreenRenderingContext->Enable(handle, mOffScreenRenderingType);
   }
 }
 

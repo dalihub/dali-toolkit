@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/internal/controls/render-effects/offscreen-rendering-context.h>
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/render-effects/render-effect.h>
@@ -230,6 +231,11 @@ public:
   bool IsResourceReady() const;
 
   /**
+   * @copydoc CustomActorImpl::OnSceneConnection()
+   */
+  void OnSceneConnection();
+
+  /**
    * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
   void OnSceneDisconnection();
@@ -390,6 +396,12 @@ public:
   */
   void RegisterProcessorOnce();
 
+  /**
+   * Set off-screen rendering.
+   * @param[in] offScreenRenderingType enum OffScreenRenderingType
+   */
+  void SetOffScreenRendering(int32_t offScreenRenderingType);
+
 protected: // From processor-interface
   /**
    * @copydoc Dali::Integration::Processor::Process()
@@ -455,8 +467,8 @@ public:
   DevelControl::State mState;
   std::string         mSubStateName;
 
-  AccessibilityData* mAccessibilityData;
-  VisualData*        mVisualData;
+  std::unique_ptr<AccessibilityData> mAccessibilityData;
+  std::unique_ptr<VisualData>        mVisualData;
 
   int mLeftFocusableActorId;             ///< Actor ID of Left focusable control.
   int mRightFocusableActorId;            ///< Actor ID of Right focusable control.
@@ -482,6 +494,10 @@ public:
   PanGestureDetector       mPanGestureDetector;
   TapGestureDetector       mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
+
+  // Off screen rendering context
+  std::unique_ptr<OffScreenRenderingContext> mOffScreenRenderingContext;
+  DevelControl::OffScreenRenderingType       mOffScreenRenderingType;
 
   // Tooltip
   TooltipPtr mTooltip;
@@ -528,6 +544,7 @@ public:
   static const PropertyRegistration PROPERTY_28;
   static const PropertyRegistration PROPERTY_29;
   static const PropertyRegistration PROPERTY_30;
+  static const PropertyRegistration PROPERTY_31;
 };
 
 } // namespace Internal
