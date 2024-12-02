@@ -40,7 +40,8 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_MULT
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_FONT_PERFORMANCE_MARKER, false);
 
-const Dali::Toolkit::Text::Character UTF32_A = 0x0041;
+const Dali::Toolkit::Text::Character UTF32_A     = 0x0041;
+const Dali::Toolkit::Text::Character UTF32_COLON = 0x3A;
 } // namespace
 
 namespace Text
@@ -333,8 +334,13 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
       isFirstScriptToBeSet = false;
     }
 
+    // If the current script run is ASCII_DIGITS and character is colon, include the colon in the same script run.
+    // TODO : Use the same script for all ASCII_DIGITS and ASCII_PS.
+    bool isColonCase = (character == UTF32_COLON) && (TextAbstraction::ASCII_DIGITS == currentScriptRun.script) && (TextAbstraction::COMMON != script);
+
     if((script != currentScriptRun.script) &&
-       (TextAbstraction::COMMON != script))
+       (TextAbstraction::COMMON != script) &&
+       !isColonCase)
     {
       // Current run needs to be stored and a new one initialized.
 
