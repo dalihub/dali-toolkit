@@ -546,7 +546,7 @@ void Control::EmitKeyInputFocusSignal(bool focusGained)
     if(DALI_LIKELY(accessible))
     {
       accessible->EmitFocused(focusGained);
-      auto parent = accessible->GetParent();
+      auto parent = dynamic_cast<Dali::Accessibility::ActorAccessible*>(accessible->GetParent());
       if(parent && !accessible->GetStates()[Dali::Accessibility::State::MANAGES_DESCENDANTS])
       {
         parent->EmitActiveDescendantChanged(accessible.get());

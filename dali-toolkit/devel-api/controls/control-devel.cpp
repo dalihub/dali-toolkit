@@ -338,7 +338,7 @@ void EmitAccessibilityStateChanged(Dali::Actor actor, Accessibility::State state
 
   if(bridge->IsUp())
   {
-    auto accessible = Accessibility::Accessible::Get(actor);
+    auto accessible = dynamic_cast<Accessibility::ActorAccessible*>(Accessibility::Accessible::Get(actor));
     if(DALI_LIKELY(accessible))
     {
       accessible->EmitStateChanged(state, newValue, 0);
