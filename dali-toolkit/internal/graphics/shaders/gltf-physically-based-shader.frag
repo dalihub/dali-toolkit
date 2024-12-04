@@ -1,17 +1,24 @@
-uniform lowp vec3 uLightColor;
-uniform lowp vec4 uBaseColorFactor;
-uniform lowp vec2 uMetallicRoughnessFactors;
-uniform lowp float alphaCutoff;
-uniform lowp float uAlphaMode;
-uniform lowp float uHasLightSource;
+//@name gltf-physically-based-shader.frag
 
-in lowp vec2 vUV[2];
-in lowp mat3 vTBN;
-in lowp vec4 vColor;
-in highp vec3 vLightDirection;
-in highp vec3 vPositionToCamera;
+//@version 100
 
-out vec4 FragColor;
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec3 uLightColor;
+  UNIFORM lowp vec4 uBaseColorFactor;
+  UNIFORM lowp vec2 uMetallicRoughnessFactors;
+  UNIFORM lowp float alphaCutoff;
+  UNIFORM lowp float uAlphaMode;
+  UNIFORM lowp float uHasLightSource;
+};
+
+INPUT lowp vec2 vUV[2];
+INPUT lowp mat3 vTBN;
+INPUT lowp vec4 vColor;
+INPUT highp vec3 vLightDirection;
+INPUT highp vec3 vPositionToCamera;
+
+OUTPUT vec4 FragColor;
 
 struct PBRInfo
 {
@@ -75,7 +82,7 @@ void main()
   lowp float perceptualRoughness = uMetallicRoughnessFactors.y;
 
   // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
-  // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
+  // This layOUTPUT intentionally reserves the 'r' channel for (optional) occlusion map data
 #ifdef TEXTURE_METALLICROUGHNESS
   lowp vec4 metrou = texture(uMetallicRoughnessSampler, vUV[uMetallicRoughnessTexCoordIndex]);
   metallic = metrou.b * metallic;

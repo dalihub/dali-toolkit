@@ -1,8 +1,16 @@
-uniform lowp vec4 uColor;
-varying mediump vec2 vTexCoord;
-uniform samplerExternalOES sTexture;
+//@name video-view-texture.frag
+
+//@version 100
+
+INPUT mediump vec2 vTexCoord;
+UNIFORM samplerExternalOES sTexture;
+
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uColor;
+};
 
 void main()
 {
-  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;
+  gl_FragColor = TEXTURE( sTexture, vTexCoord ) * uColor;
 }

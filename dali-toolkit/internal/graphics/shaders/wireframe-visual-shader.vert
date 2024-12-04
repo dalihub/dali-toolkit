@@ -1,13 +1,20 @@
-attribute mediump vec2  aPosition;
-uniform   highp   mat4  uMvpMatrix;
-uniform   highp   vec3  uSize;
+//@name wireframe-visual-shader.vert
+
+//@version 100
+
+INPUT mediump vec2  aPosition;
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM   highp   mat4  uMvpMatrix;
+  UNIFORM   highp   vec3  uSize;
 
 //Visual size and offset
-uniform mediump vec2 offset;
-uniform highp   vec2 size;
-uniform mediump vec4 offsetSizeMode;
-uniform mediump vec2 origin;
-uniform mediump vec2 anchorPoint;
+  UNIFORM mediump vec2 offset;
+  UNIFORM highp   vec2 size;
+  UNIFORM mediump vec4 offsetSizeMode;
+  UNIFORM mediump vec2 origin;
+  UNIFORM mediump vec2 anchorPoint;
+};
 
 vec4 ComputeVertexPosition()
 {

@@ -1,13 +1,21 @@
-varying highp vec2 vTexCoord;
-uniform sampler2D sTexture;
-uniform lowp vec4 uColor;
+//@name text-scroller-shader.frag
+
+//@version 100
+
+INPUT highp vec2 vTexCoord;
+UNIFORM sampler2D sTexture;
+
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uColor;
+};
 
 void main()
 {
   if ( vTexCoord.y > 1.0 )
     discard;
 
-  mediump vec4 textTexture = texture2D( sTexture, vTexCoord );
+  mediump vec4 textTexture = TEXTURE( sTexture, vTexCoord );
 
   gl_FragColor = textTexture * uColor;
 }

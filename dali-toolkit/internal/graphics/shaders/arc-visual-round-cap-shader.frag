@@ -1,10 +1,17 @@
+//@name arc-visual-round-cap-shader.frag
+
+//@version 100
+
 INPUT mediump vec2 vPosition;
 
-uniform lowp vec4 uColor;
-uniform mediump float thickness;
-uniform mediump float radius;
-uniform mediump float startAngle;
-uniform mediump float sweepAngle;
+UNIFORM_BLOCK FragBlock
+{
+  UNIFORM lowp vec4 uColor;
+  UNIFORM mediump float thickness;
+  UNIFORM mediump float radius;
+  UNIFORM mediump float startAngle;
+  UNIFORM mediump float sweepAngle;
+};
 
 const mediump float M_PI_OVER_2 = 1.57079632679;
 const mediump float M_PI_2 = 6.28318530718;
@@ -26,6 +33,6 @@ mediump float GetOpacity()
 
 void main()
 {
-  OUT_COLOR = uColor;
-  OUT_COLOR.a *= GetOpacity();
+  gl_FragColor = uColor;
+  gl_FragColor.a *= GetOpacity();
 }
