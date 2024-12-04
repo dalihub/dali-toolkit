@@ -38,9 +38,7 @@ uniform lowp int uCutoutWithCornerRadius;
 
 // radius of rounded corner on this quadrant
 highp float gRadius = 0.0;
-#ifdef IS_REQUIRED_SQUIRCLE_CORNER
 highp float gSquareness = 0.0;
-#endif
 
 // fragment coordinate. NOTE : vec2(0.0, 0.0) is vRectSize, the corner of visual
 highp vec2 gFragmentPosition = vec2(0.0, 0.0);
