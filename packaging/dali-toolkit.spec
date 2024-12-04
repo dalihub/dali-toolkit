@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.3.51
+Version:    2.3.52
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -246,7 +246,8 @@ cmake \
       -DCMAKE_INSTALL_PREFIX=%{_prefix} \
       -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir} \
-      -DENABLE_I18N=ON
+      -DENABLE_I18N=ON \
+      .
 
 make %{?jobs:-j%jobs}
 
@@ -511,6 +512,7 @@ exit 0
 %endif
 %defattr(-,root,root,-)
 %{_libdir}/libdali2-toolkit.so*
+%{_libdir}/libdali2-toolkit-gles.so*
 %license LICENSE
 
 %files devel
@@ -594,6 +596,7 @@ exit 0
 %defattr(-,root,root,-)
 %{_libdir}/libchipmunk.so*
 %{_libdir}/libdali2-physics-2d.so*
+%{_libdir}/libdali2-physics-2d-gles.so*
 %license LICENSE
 
 %files -n %{dali2_physics2d}-devel
@@ -614,6 +617,7 @@ exit 0
 %defattr(-,root,root,-)
 %{_libdir}/libbullet3.so*
 %{_libdir}/libdali2-physics-3d.so*
+%{_libdir}/libdali2-physics-3d-gles.so*
 %license LICENSE
 
 %files -n %{dali2_physics3d}-devel

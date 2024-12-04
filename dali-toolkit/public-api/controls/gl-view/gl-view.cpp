@@ -19,11 +19,44 @@
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/gl-view/drawable-view-impl.h>
 #include <dali-toolkit/internal/controls/gl-view/gl-view-impl.h>
+
+// EXTERNAL INCLUDES
+#include <dali/devel-api/common/addon-binder.h>
+#include <dali/integration-api/debug.h>
+#include <dali/public-api/adaptor-framework/graphics-backend.h>
+#include <dlfcn.h>
+#include <memory>
 
 namespace Dali::Toolkit
 {
+namespace
+{
+const char* const DALI_TOOLKIT_GLES_SO("libdali2-toolkit-gles.so");
+const char* const DALI_TOOLKIT_GLES_ADDON_NAME("ToolkitGlesAddOn");
+
+struct ToolkitGlesAddOn : public Dali::AddOn::AddOnBinder
+{
+  ToolkitGlesAddOn()
+  : Dali::AddOn::AddOnBinder(DALI_TOOLKIT_GLES_ADDON_NAME, DALI_TOOLKIT_GLES_SO)
+  {
+  }
+  ~ToolkitGlesAddOn() = default;
+
+  ADDON_BIND_FUNCTION(GlViewNew, GlView(GlView::BackendMode, GlView::ColorFormat));
+  ADDON_BIND_FUNCTION(GlViewRegisterGlCallbacks, void(Internal::GlViewImpl&, CallbackBase*, CallbackBase*, CallbackBase*));
+  ADDON_BIND_FUNCTION(GlViewSetResizeCallback, void(Internal::GlViewImpl&, CallbackBase*));
+  ADDON_BIND_FUNCTION(GlViewSetGraphicsConfig, bool(Internal::GlViewImpl&, bool, bool, int, GlView::GraphicsApiVersion));
+  ADDON_BIND_FUNCTION(GlViewSetRenderingMode, void(Internal::GlViewImpl&, GlView::RenderingMode));
+  ADDON_BIND_FUNCTION(GlViewGetRenderingMode, GlView::RenderingMode(const Internal::GlViewImpl&));
+  ADDON_BIND_FUNCTION(GlViewGetBackendMode, GlView::BackendMode(const Internal::GlViewImpl&));
+  ADDON_BIND_FUNCTION(GlViewRenderOnce, void(Internal::GlViewImpl&));
+  ADDON_BIND_FUNCTION(GlViewBindTextureResources, void(Internal::GlViewImpl&, std::vector<Dali::Texture>));
+};
+
+std::unique_ptr<ToolkitGlesAddOn> gToolkitGlesAddon;
+} // namespace
+
 GlView::GlView() = default;
 
 GlView::GlView(const GlView& GlView) = default;
@@ -38,31 +71,21 @@ GlView::~GlView() = default;
 
 GlView GlView::New(ColorFormat colorFormat)
 {
-  // This function is backward compatible and always returns
-  // backend based on NativeImage.
-  return Internal::GlView::New(colorFormat);
+  return New(BackendMode::EGL_IMAGE_OFFSCREEN_RENDERING, colorFormat);
 }
 
 GlView GlView::New(BackendMode backendMode, ColorFormat colorFormat)
 {
-  switch(backendMode)
+  if(Graphics::GetCurrentGraphicsBackend() == Graphics::Backend::GLES)
   {
-    case BackendMode::DIRECT_RENDERING:
-    case BackendMode::DIRECT_RENDERING_THREADED:
-    case BackendMode::UNSAFE_DIRECT_RENDERING:
+    if(!gToolkitGlesAddon)
     {
-      return Internal::DrawableView::New(backendMode);
+      gToolkitGlesAddon.reset(new ToolkitGlesAddOn);
     }
-    case BackendMode::EGL_IMAGE_OFFSCREEN_RENDERING:
-    {
-      return Internal::GlView::New(colorFormat);
-    }
-    default:
-    {
-      DALI_ASSERT_ALWAYS("Invalid BackendMode");
-    }
+    DALI_ASSERT_ALWAYS(gToolkitGlesAddon && "Cannot load the GlView Addon\n");
+    return gToolkitGlesAddon->GlViewNew(backendMode, colorFormat);
   }
-  return {};
+  DALI_ABORT("Current Graphics Backend does not support GlView\n");
 }
 
 GlView GlView::DownCast(BaseHandle handle)
@@ -72,42 +95,65 @@ GlView GlView::DownCast(BaseHandle handle)
 
 void GlView::RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
 {
-  Dali::Toolkit::GetImpl(*this).RegisterGlCallbacks(initCallback, renderFrameCallback, terminateCallback);
+  Internal::GlViewImpl& impl = GetImpl(*this); // Get Impl here to catch uninitialized usage
+  if(gToolkitGlesAddon)
+  {
+    gToolkitGlesAddon->GlViewRegisterGlCallbacks(impl, initCallback, renderFrameCallback, terminateCallback);
+  }
 }
 
 void GlView::SetResizeCallback(CallbackBase* resizeCallback)
 {
-  Dali::Toolkit::GetImpl(*this).SetResizeCallback(resizeCallback);
+  Internal::GlViewImpl& impl = GetImpl(*this); // Get Impl here to catch uninitialized usage
+  if(gToolkitGlesAddon)
+  {
+    gToolkitGlesAddon->GlViewSetResizeCallback(impl, resizeCallback);
+  }
 }
 
 bool GlView::SetGraphicsConfig(bool depth, bool stencil, int msaa, GraphicsApiVersion version)
 {
-  return Dali::Toolkit::GetImpl(*this).SetGraphicsConfig(depth, stencil, msaa, version);
+  Internal::GlViewImpl& impl = GetImpl(*this); // Get Impl here to catch uninitialized usage
+  return gToolkitGlesAddon ? gToolkitGlesAddon->GlViewSetGraphicsConfig(impl, depth, stencil, msaa, version) : false;
 }
 
 void GlView::SetRenderingMode(RenderingMode mode)
 {
-  Dali::Toolkit::GetImpl(*this).SetRenderingMode(mode);
+  Internal::GlViewImpl& impl = GetImpl(*this);
+  if(gToolkitGlesAddon)
+  {
+    gToolkitGlesAddon->GlViewSetRenderingMode(impl, mode);
+  }
 }
 
 Dali::Toolkit::GlView::RenderingMode GlView::GetRenderingMode() const
 {
-  return Dali::Toolkit::GetImpl(*this).GetRenderingMode();
+  const Internal::GlViewImpl& impl = GetImpl(*this); // Get Impl here to catch uninitialized usage
+  return gToolkitGlesAddon ? gToolkitGlesAddon->GlViewGetRenderingMode(impl) : RenderingMode::CONTINUOUS;
 }
 
 Dali::Toolkit::GlView::BackendMode GlView::GetBackendMode() const
 {
-  return Dali::Toolkit::GetImpl(*this).GetBackendMode();
+  const Internal::GlViewImpl& impl = GetImpl(*this); // Get Impl here to catch uninitialized usage
+  return gToolkitGlesAddon ? gToolkitGlesAddon->GlViewGetBackendMode(impl) : BackendMode::DEFAULT;
 }
 
 void GlView::RenderOnce()
 {
-  Dali::Toolkit::GetImpl(*this).RenderOnce();
+  Internal::GlViewImpl& impl = GetImpl(*this); // Get Impl here to catch uninitialized usage
+  if(gToolkitGlesAddon)
+  {
+    gToolkitGlesAddon->GlViewRenderOnce(impl);
+  }
 }
 
 void GlView::BindTextureResources(std::vector<Dali::Texture> textures)
 {
-  Dali::Toolkit::GetImpl(*this).BindTextureResources(std::move(textures));
+  Internal::GlViewImpl& impl = GetImpl(*this); // Get Impl here to catch uninitialized usage
+  if(gToolkitGlesAddon)
+  {
+    gToolkitGlesAddon->GlViewBindTextureResources(impl, std::move(textures));
+  }
 }
 
 GlView::GlView(Internal::GlViewImpl& implementation)

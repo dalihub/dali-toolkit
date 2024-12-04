@@ -39,7 +39,7 @@ class SceneView;
 }
 
 /**
- * @addtogroup dali_toolkit_controls_scene_view
+ * @addtogroup dali_scene3d_controls_scene_view
  * @{
  */
 

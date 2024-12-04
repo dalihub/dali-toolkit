@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 // test harness headers before dali headers.
 #include <dali-physics/dali-physics.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <test-addon-manager.h>
 #include <toolkit-event-thread-callback.h>
 
 #include <dali-toolkit/devel-api/controls/alignment/alignment.h>
@@ -281,7 +282,9 @@ int UtcDaliPhysics3DAdaptorGetRootActor(void)
 int UtcDaliPhysics3DAdaptorCreateDebugLayer(void)
 {
   ToolkitTestApplication application;
-  Matrix                 transform(true);
+  Test::AddOnManager::Initialize(); // DebugLayer requires GLES addon so initialize the manager
+
+  Matrix transform(true);
   transform.SetIdentityAndScale(Vector3(2.0f, 2.0f, 2.0f));
   Uint16Pair size(640, 480);
   auto       scene = application.GetScene();
@@ -311,6 +314,34 @@ int UtcDaliPhysics3DAdaptorCreateDebugLayer(void)
 
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliPhysics3DAdaptorCreateDebugLayerN(void)
+{
+  ToolkitTestApplication application;
+  // DebugLayer requires GLES addon so don't initialize the manager so it's not loaded. This should cause us to throw.
+
+  Matrix transform(true);
+  transform.SetIdentityAndScale(Vector3(2.0f, 2.0f, 2.0f));
+  Uint16Pair size(640, 480);
+  auto       scene = application.GetScene();
+
+  PhysicsAdaptor adaptor   = PhysicsAdaptor::New(transform, size);
+  Actor          rootActor = adaptor.GetRootActor();
+  scene.Add(rootActor);
+  Window window = DevelWindow::Get(rootActor);
+
+  try
+  {
+    Layer layer = adaptor.CreateDebugLayer(window);
+    DALI_TEST_CHECK(false); // Should not get here.
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
 
   END_TEST;
 }

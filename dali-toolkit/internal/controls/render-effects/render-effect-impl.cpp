@@ -82,6 +82,11 @@ void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
       {
         mRenderer = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
         mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
+
+        Shader shader = mRenderer.GetShader();
+        shader.RegisterProperty("uCornerRadius", Vector4::ZERO);
+        shader.RegisterProperty("uCornerSquareness", Vector4::ZERO);
+        shader.RegisterProperty("uCornerRadiusPolicy", static_cast<float>(1.0f));
       }
 
       ownerControl.InheritedVisibilityChangedSignal().Connect(this, &RenderEffectImpl::OnControlInheritedVisibilityChanged);

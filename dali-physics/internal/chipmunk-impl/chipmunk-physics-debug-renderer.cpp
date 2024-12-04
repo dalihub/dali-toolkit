@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,84 +14,41 @@
  * limitations under the License.
  */
 
+// External Includes
 #include <chipmunk/chipmunk.h>
+#include <dali/devel-api/common/addon-binder.h>
+#include <dali/public-api/adaptor-framework/graphics-backend.h>
+
+// Internal Includes
 #include <dali-physics/internal/chipmunk-impl/chipmunk-physics-adaptor-impl.h>
 #include <dali-physics/internal/chipmunk-impl/chipmunk-physics-debug-renderer.h>
 
-namespace
-{
-GLuint LoadShader(GLenum shaderType, const char* shaderSource)
-{
-  GLuint shader = glCreateShader(shaderType);
-  if(shader != 0)
-  {
-    glShaderSource(shader, 1, &shaderSource, NULL);
-    glCompileShader(shader);
-    GLint compiled = 0;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-    if(compiled != GL_TRUE)
-    {
-      GLint infoLen = 0;
-      glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
-
-      if(infoLen > 0)
-      {
-        std::vector<char> logBuffer;
-        logBuffer.resize(infoLen + 1);
-        glGetShaderInfoLog(shader, infoLen, NULL, &logBuffer[0]);
-        fprintf(stderr, "%s\n", &logBuffer[0]);
-        fflush(stderr);
-
-        glDeleteShader(shader);
-        shader = 0;
-      }
-    }
-  }
-  return shader;
-}
-
-GLuint CreateProgram(const char* vertexSource, const char* fragmentSource)
-{
-  GLuint vertexShader = LoadShader(GL_VERTEX_SHADER, vertexSource);
-  if(!vertexShader)
-  {
-    return 0;
-  }
-  GLuint fragmentShader = LoadShader(GL_FRAGMENT_SHADER, fragmentSource);
-  if(!fragmentShader)
-  {
-    return 0;
-  }
-  GLuint program = glCreateProgram();
-  if(program)
-  {
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
-    GLint linkStatus = GL_FALSE;
-    glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
-    if(linkStatus != GL_TRUE)
-    {
-      GLint bufLength = 0;
-      glGetProgramiv(program, GL_INFO_LOG_LENGTH, &bufLength);
-      if(bufLength)
-      {
-        std::vector<char> logBuffer;
-        logBuffer.resize(bufLength + 1);
-        glGetProgramInfoLog(program, bufLength, NULL, &logBuffer[0]);
-        fprintf(stderr, "%s\n", &logBuffer[0]);
-        fflush(stderr);
-      }
-      glDeleteProgram(program);
-      program = 0;
-    }
-  }
-  return program;
-}
-} // namespace
-
 namespace Dali::Toolkit::Physics::Internal
 {
+namespace
+{
+const char* const DALI_PHYSICS_CHIPMUNK_GLES_SO("libdali2-physics-2d-gles.so");
+const char* const DALI_PHYSICS_CHIPMUNK_GLES_ADDON_NAME("PhysicsChipmunkGlesAddOn");
+
+struct PhysicsChipmunkGlesAddOn : public Dali::AddOn::AddOnBinder
+{
+  PhysicsChipmunkGlesAddOn()
+  : Dali::AddOn::AddOnBinder(DALI_PHYSICS_CHIPMUNK_GLES_ADDON_NAME, DALI_PHYSICS_CHIPMUNK_GLES_SO)
+  {
+  }
+
+  ~PhysicsChipmunkGlesAddOn() = default;
+
+  ADDON_BIND_FUNCTION(CreateGlesPhysicsDebugRenderer, Gles::DebugRenderer*());
+  ADDON_BIND_FUNCTION(DeleteGlesPhysicsDebugRenderer, void(Gles::DebugRenderer*));
+  ADDON_BIND_FUNCTION(SetViewport, void(int, int));
+  ADDON_BIND_FUNCTION(Setup, void(Gles::DebugRenderer&, int, int));
+  ADDON_BIND_FUNCTION(RenderLines, void(Gles::DebugRenderer&, const void*, std::size_t, int, const void*, std::size_t, const Dali::Matrix&, const Dali::Matrix&));
+};
+
+std::unique_ptr<PhysicsChipmunkGlesAddOn> gPhysicsChipmunkGlesAddOn;
+} // namespace
+
 static void DebugDrawCircleImpl(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor, cpDataPointer data)
 {
   auto debugRenderer = static_cast<PhysicsDebugRenderer*>(data);
@@ -140,17 +97,7 @@ PhysicsDebugRenderer::PhysicsDebugRenderer(uint32_t width, uint32_t height, Dali
 : mCamera(camera),
   mWidth(width),
   mHeight(height),
-  mAdaptor(*adaptor),
-  mPositionLocation(-1),
-  mUvsLocation(-1),
-  mRadiusLocation(-1),
-  mFillColourLocation(-1),
-  mOutlineColourLocation(-1),
-  mProjectionLocation(-1),
-  mModelViewLocation(-1),
-  mIndexBufferId(0u),
-  mVertexBufferId(0u),
-  mProgramId(0u)
+  mAdaptor(*adaptor)
 {
   mDebugDrawOptions.drawCircle     = DebugDrawCircleImpl;
   mDebugDrawOptions.drawSegment    = DebugDrawSegmentImpl;
@@ -166,40 +113,45 @@ PhysicsDebugRenderer::PhysicsDebugRenderer(uint32_t width, uint32_t height, Dali
   mDebugDrawOptions.constraintColor     = cpSpaceDebugColor{0.5f, 0.5f, 0.5f, 0.9f};
   mDebugDrawOptions.collisionPointColor = cpSpaceDebugColor{1.0f, 0.0f, 0.0f, 1.0f};
   mDebugDrawOptions.data                = this;
+
+  if(Graphics::GetCurrentGraphicsBackend() == Graphics::Backend::GLES)
+  {
+    if(!gPhysicsChipmunkGlesAddOn)
+    {
+      gPhysicsChipmunkGlesAddOn.reset(new PhysicsChipmunkGlesAddOn);
+    }
+    DALI_ASSERT_ALWAYS(gPhysicsChipmunkGlesAddOn && "Cannot load the Chipmunk Debug Renderer Gles Addon\n");
+    mImpl = gPhysicsChipmunkGlesAddOn->CreateGlesPhysicsDebugRenderer();
+  }
+}
+
+PhysicsDebugRenderer::~PhysicsDebugRenderer()
+{
+  if(gPhysicsChipmunkGlesAddOn)
+  {
+    gPhysicsChipmunkGlesAddOn->DeleteGlesPhysicsDebugRenderer(mImpl);
+    mImpl = nullptr;
+  }
 }
 
 bool PhysicsDebugRenderer::OnRender(const Dali::RenderCallbackInput& input)
 {
   if(mState == State::INIT)
   {
-    Setup();
+    if(gPhysicsChipmunkGlesAddOn && mImpl)
+    {
+      gPhysicsChipmunkGlesAddOn->Setup(*mImpl, mWidth, mHeight);
+    }
     mState = State::RENDER;
   }
-  glViewport(0, 0, mWidth, mHeight);
 
-  RenderLines(input);
+  if(gPhysicsChipmunkGlesAddOn)
+  {
+    gPhysicsChipmunkGlesAddOn->SetViewport(mWidth, mHeight);
+  }
 
+  Render(input);
   return false;
-}
-
-// Run on first invocation of callback
-void PhysicsDebugRenderer::Setup()
-{
-  PrepareShader();
-  mPositionLocation      = glGetAttribLocation(mProgramId, "position");
-  mUvsLocation           = glGetAttribLocation(mProgramId, "uvs");
-  mRadiusLocation        = glGetAttribLocation(mProgramId, "radius");
-  mFillColourLocation    = glGetAttribLocation(mProgramId, "fillColor");
-  mOutlineColourLocation = glGetAttribLocation(mProgramId, "outlineColor");
-
-  mProjectionLocation = glGetUniformLocation(mProgramId, "projection");
-  mModelViewLocation  = glGetUniformLocation(mProgramId, "modelView");
-
-  glEnable(GL_DEPTH_TEST);
-  glViewport(0, 0, mWidth, mHeight);
-
-  glGenBuffers(1, &mIndexBufferId);
-  glGenBuffers(1, &mVertexBufferId);
 }
 
 void PhysicsDebugRenderer::UpdateWindowSize(Dali::Vector2 size)
@@ -208,88 +160,29 @@ void PhysicsDebugRenderer::UpdateWindowSize(Dali::Vector2 size)
   mHeight = size.height;
 }
 
-void PhysicsDebugRenderer::PrepareShader()
-{
-  static const char glVertexShader[] =
-    "#version 300 es\n"
-    "in vec2 position;\n"
-    "in vec2 uvs;\n"
-    "in float radius;\n"
-    "in vec4 fillColor;\n"
-    "in vec4 outlineColor;\n"
-    "out vec2 v_uvs;\n"
-    "out vec4 v_fill;\n"
-    "out vec4 v_outline;\n"
-    "uniform mat4 projection;\n"
-    "uniform mat4 modelView;\n"
-    "void main()\n"
-    "{\n"
-    "    gl_Position = projection * modelView * vec4(position.xy+radius*uvs, 0.0, 1.0);\n"
-    "    v_uvs=uvs;\n"
-    "    v_fill = fillColor;\n"
-    "    v_fill.rgb *= v_fill.a;\n"
-    "    v_outline = outlineColor;\n"
-    "    v_outline.a *= v_outline.a;\n"
-    "}\n";
-
-  static const char glFragmentShader[] =
-    "#version 300 es\n"
-    "precision mediump float;\n"
-    "in vec2 v_uvs;\n"
-    "in vec4 v_fill;\n"
-    "in vec4 v_outline;\n"
-    "out vec4 fragColor;\n"
-    "void main()\n"
-    "{\n"
-    "    float len=length(v_uvs);\n"
-    "    float fw = length(vec2(dFdx(len), dFdy(len)));\n"
-    "    float mask=smoothstep(-1.0, fw-1.0, -len);\n"
-    "    float outline=1.0-fw;\n"
-    "    float outline_mask=smoothstep(outline-fw, outline, len);\n"
-    "    vec4 color = v_fill + (v_outline - v_fill*v_outline.a)*outline_mask;\n"
-    "    fragColor = color*mask;\n"
-    "}\n";
-
-  mProgramId = CreateProgram(glVertexShader, glFragmentShader);
-}
-
-void PhysicsDebugRenderer::RenderLines(const Dali::RenderCallbackInput& input)
+void PhysicsDebugRenderer::Render(const Dali::RenderCallbackInput& input)
 {
   mModelViewMatrix.SetIdentity();
   mProjectionMatrix = input.projection;
 
   Matrix::Multiply(mModelViewMatrix, mModelViewMatrix, input.view);
-  glUseProgram(mProgramId);
 
   // In theory, input.clippingBox should tell us the actor position in clip-space.
   // But, it appears to be bugged.
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBufferId);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(mIndices.size() * sizeof(uint16_t)), &mIndices[0], GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, mVertexBufferId);
-  glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(mVertices.size() * sizeof(Vertex)), &mVertices[0], GL_STATIC_DRAW);
+  if(gPhysicsChipmunkGlesAddOn && mImpl)
+  {
+    gPhysicsChipmunkGlesAddOn->RenderLines(
+      *mImpl,
+      &mIndices[0],
+      mIndices.size() * sizeof(uint16_t),
+      mIndices.size(),
+      &mVertices[0],
+      mVertices.size() * sizeof(Vertex),
+      mModelViewMatrix,
+      mProjectionMatrix);
+  }
 
-  GLint stride = 52; // 4*(2 + 2 + 1 + 4 + 4) = 4*13=52
-  glVertexAttribPointer(mPositionLocation, 2, GL_FLOAT, GL_FALSE, stride, 0);
-  glEnableVertexAttribArray(mPositionLocation);
-
-  glVertexAttribPointer(mUvsLocation, 2, GL_FLOAT, GL_FALSE, stride, (const void*)8);
-  glEnableVertexAttribArray(mUvsLocation);
-
-  glVertexAttribPointer(mRadiusLocation, 1, GL_FLOAT, GL_FALSE, stride, (const void*)16);
-  glEnableVertexAttribArray(mRadiusLocation);
-
-  glVertexAttribPointer(mFillColourLocation, 4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const void*>(20));
-  glEnableVertexAttribArray(mFillColourLocation);
-  glVertexAttribPointer(mOutlineColourLocation, 4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const void*>(36));
-  glEnableVertexAttribArray(mOutlineColourLocation);
-
-  glUniformMatrix4fv(mProjectionLocation, 1, GL_FALSE, mProjectionMatrix.AsFloat());
-  glUniformMatrix4fv(mModelViewLocation, 1, GL_FALSE, mModelViewMatrix.AsFloat());
-
-  glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_SHORT, 0);
   mIndices.clear();
   mVertices.clear();
 }

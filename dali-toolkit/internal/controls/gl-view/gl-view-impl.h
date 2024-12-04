@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_GL_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,10 @@ public:
   /**
    * @copydoc Dali::Toolkit::GlView::GetRenderingMode()
    */
-  Dali::Toolkit::GlView::RenderingMode GetRenderingMode() const override;
+  Dali::Toolkit::GlView::RenderingMode GetRenderingMode() const override
+  {
+    return mRenderingMode;
+  }
 
   /**
    * @copydoc Dali::Toolkit::GlView::RenderOnce()
@@ -150,12 +153,11 @@ private:
 private:
   std::unique_ptr<GlViewRenderThread>  mRenderThread;
   Dali::NativeImageSourceQueuePtr      mNativeImageQueue;
-  Dali::Toolkit::GlView::RenderingMode mRenderingMode;
-  Dali::Toolkit::GlView::ColorFormat   mColorFormat;
-
-  bool mDepth;
-  bool mStencil;
-  int  mMSAA;
+  Dali::Toolkit::GlView::RenderingMode mRenderingMode{Toolkit::GlView::RenderingMode::CONTINUOUS};
+  Dali::Toolkit::GlView::ColorFormat   mColorFormat{Toolkit::GlView::ColorFormat::RGB888};
+  bool                                 mDepth{false};
+  bool                                 mStencil{false};
+  int                                  mMSAA{0};
 };
 
 } // namespace Internal

@@ -134,7 +134,7 @@ void calculatePotential()
   gPotential = sqrt(((positiveDiff.x + positiveDiff.y)
                      + sqrt(positiveDiff.x * positiveDiff.x
                             + positiveDiff.y * positiveDiff.y
-                            + (2.0 - 4.0 * gSquareness) * positiveDiff.x * positiveDiff.y))
+                            + (2.0 - 4.0 * gSquareness * gSquareness) * positiveDiff.x * positiveDiff.y))
                     * 0.5)
                + min(0.0, max(gDiff.x, gDiff.y)); ///< Consider negative potential, to support borderline
 #else

@@ -31,7 +31,6 @@ OPTION(ENABLE_I18N               "Turns on internationalisation" OFF)
 OPTION(ENABLE_COVERAGE           "Coverage" OFF)
 OPTION(ENABLE_PKG_CONFIGURE      "Use pkgconfig" ON)
 OPTION(ENABLE_LINK_TEST          "Enable the link test" ON)
-OPTION(ENABLE_VULKAN             "Enable Vulkan instead of GLES" OFF)
 OPTION(INSTALL_DOXYGEN_DOC       "Install doxygen doc" ON)
 OPTION(CONFIGURE_AUTOMATED_TESTS "Configure automated tests" ON)
 OPTION(USE_DEFAULT_RESOURCE_DIR  "Whether to use the default resource folders. Otherwise set environment variables for DALI_IMAGE_DIR, DALI_SOUND_DIR, DALI_STYLE_DIR, DALI_STYLE_IMAGE_DIR and DALI_DATA_READ_ONLY_DIR" ON)
@@ -300,10 +299,17 @@ ENDIF()
 SET(SHADER_SOURCE_DIR "${ROOT_SRC_DIR}/dali-toolkit/internal/graphics/shaders/")
 SET(SHADER_GENERATED_DIR "${ROOT_SRC_DIR}/dali-toolkit/internal/graphics/generated")
 
+# Shaders for GLES Addon
+SET(GLES_ADDON_DIR ${ROOT_SRC_DIR}/dali-toolkit/internal/gles-addon/)
+SET(GLES_ADDON_SHADER_SOURCE_DIR "${GLES_ADDON_DIR}/shaders/")
+SET(GLES_ADDON_SHADER_GENERATED_DIR "${GLES_ADDON_DIR}/generated/")
+
 SET(GENERATED_SHADER_DIR ${ROOT_SRC_DIR}/dali-toolkit/internal/graphics/)
 SET_PROPERTY(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
              "${GENERATED_SHADER_DIR}/generated/"
-             "${GENERATED_SHADER_DIR}/builtin-shader-extern-gen.h")
+             "${GENERATED_SHADER_DIR}/builtin-shader-extern-gen.h"
+             "${GLES_ADDON_SHADER_GENERATED_DIR}"
+             "${GLES_ADDON_DIR}/builtin-shader-extern-gen.h")
 
 SET(SHADER_GENERATOR_NAME dali-shader-generator)
 SET(SHADER_GENERATOR_SOURCES ${ROOT_SRC_DIR}/dali-toolkit/shader-generator/shader-generator.cpp)
@@ -347,6 +353,14 @@ ADD_CUSTOM_COMMAND(OUTPUT ${BUILT_IN_SHADER_GEN_CPP}
 
 SET(SOURCES ${SOURCES} ${BUILT_IN_SHADER_GEN_CPP})
 
+# Shaders for GLES Addon
+SET(GLES_ADDON_BUILT_IN_SHADER_GEN_CPP "${GLES_ADDON_SHADER_GENERATED_DIR}/builtin-shader-gen.cpp" )
+
+FILE(GLOB GLES_ADDON_SHADERS_SRC "${GLES_ADDON_SHADER_SOURCE_DIR}/*.vert" "${GLES_ADDON_SHADER_GENERATED_DIR}/*.frag" )
+ADD_CUSTOM_COMMAND(OUTPUT ${GLES_ADDON_BUILT_IN_SHADER_GEN_CPP}
+                   DEPENDS ${SHADER_GENERATOR_NAME} ${GLES_ADDON_SHADERS_SRC}
+                   COMMAND ${SHADER_GENERATOR_BINARY} ${GLES_ADDON_SHADER_SOURCE_DIR} ${GLES_ADDON_SHADER_GENERATED_DIR})
+
 IF( WIN32 OR APPLE )
   SET( DALICORE_LDFLAGS
         "${DALICORE_LDFLAGS}"
@@ -381,13 +395,6 @@ ENDIF()
 
 IF ( WIN32 )
   FIND_PACKAGE( pthreads REQUIRED )
-ENDIF()
-
-IF( NOT ENABLE_VULKAN)
-  SET(SOURCES ${SOURCES}
-    ${toolkit_internal_egl_src_files}
-    ${public_api_egl_src_files}
-  )
 ENDIF()
 
 ADD_LIBRARY( ${name} ${LIBTYPE} ${SOURCES} )
@@ -675,6 +682,22 @@ IF( CONFIGURE_AUTOMATED_TESTS )
                   ${ROOT_SRC_DIR}/automated-tests/CMakeLists.txt @ONLY )
 ENDIF()
 
+SET(TOOLKIT_GLES_NAME "dali2-toolkit-gles")
+PKG_CHECK_MODULES(OPENGLES glesv2 egl)
+ADD_LIBRARY(${TOOLKIT_GLES_NAME}
+            ${LIBTYPE}
+            ${toolkit_internal_egl_src_files}
+            ${GLES_ADDON_BUILT_IN_SHADER_GEN_CPP}
+)
+target_compile_options(${TOOLKIT_GLES_NAME} PRIVATE ${CUSTOM_COMPILE_OPTIONS})
+TARGET_LINK_LIBRARIES(${TOOLKIT_GLES_NAME}
+        ${name}
+        ${DALICORE_LDFLAGS}
+        ${DALIADAPTOR_LDFLAGS}
+        ${COVERAGE}
+        ${OPENGLES_LDFLAGS}
+)
+INSTALL(TARGETS ${TOOLKIT_GLES_NAME} DESTINATION ${LIB_DIR})
 
 # Configuration Messages
 MESSAGE( STATUS "Configuration:\n" )
@@ -685,7 +708,6 @@ MESSAGE( STATUS "Debug build:                   " ${ENABLE_DEBUG} )
 MESSAGE( STATUS "Export all symbols:            " ${ENABLE_EXPORTALL} )
 MESSAGE( STATUS "Coverage:                      " ${ENABLE_COVERAGE} )
 MESSAGE( STATUS "Trace:                         " ${ENABLE_TRACE} )
-MESSAGE( STATUS "Vulkan:                        " ${ENABLE_VULKAN} )
 MESSAGE( STATUS "Doxygen:                       " ${doxygenEnabled} )
 MESSAGE( STATUS "Data Dir (Read/Write):         " ${dataReadWriteDir} )
 MESSAGE( STATUS "Data Dir (Read Only):          " ${dataReadOnlyDir} )

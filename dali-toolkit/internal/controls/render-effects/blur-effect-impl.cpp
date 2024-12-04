@@ -275,7 +275,7 @@ void BlurEffectImpl::OnActivate()
   mHorizontalBlurActor.SetProperty(Actor::Property::SIZE, Vector2(downsampledWidth, downsampledHeight));
   mVerticalBlurActor.SetProperty(Actor::Property::SIZE, Vector2(downsampledWidth, downsampledHeight));
 
-  // Keep sceneHolder as week handle.
+  // Keep sceneHolder as weak handle.
   Integration::SceneHolder sceneHolder = Integration::SceneHolder::Get(ownerControl);
   if(DALI_UNLIKELY(!sceneHolder))
   {
@@ -293,7 +293,7 @@ void BlurEffectImpl::OnActivate()
   Renderer renderer = GetTargetRenderer();
   if(mIsBackground)
   {
-    renderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Dali::Toolkit::DepthIndex::BACKGROUND - 3);
+    renderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Dali::Toolkit::DepthIndex::BACKGROUND_EFFECT);
   }
   else
   {

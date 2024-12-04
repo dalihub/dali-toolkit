@@ -126,7 +126,7 @@ protected:
   /// For sub classes
 protected:
   /**
-   * @brief Initialize sub classes effect
+   * @brief Initializes sub classes effect
    */
   virtual void OnInitialize() = 0;
 

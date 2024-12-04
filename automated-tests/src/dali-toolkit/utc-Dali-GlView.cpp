@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <thread>
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <test-addon-manager.h>
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
@@ -27,20 +28,38 @@
 using namespace Dali;
 using namespace Dali::Toolkit;
 
-// Positive test case for a method
 int UtcDaliGlViewNew(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
   tet_infoline(" UtcDaliGlViewNew");
   GlView view = GlView::New(GlView::ColorFormat::RGBA8888);
   DALI_TEST_CHECK(view);
   END_TEST;
 }
 
-// Positive test case for a method
+int UtcDaliGlViewNewN(void)
+{
+  ToolkitTestApplication application;
+  // GlView requires GLES addon but don't initialize the manager which will mean the addon will not be loaded.
+  // We should throw
+
+  try
+  {
+    GlView view = GlView::New(GlView::ColorFormat::RGBA8888);
+    DALI_TEST_CHECK(false); // Should not get here!
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+  END_TEST;
+}
+
 int UtcDaliGlViewDownCast(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
   tet_infoline(" UtcDaliGlViewDownCast");
 
   GlView     view = GlView::New(GlView::ColorFormat::RGB888);
@@ -56,6 +75,7 @@ int UtcDaliGlViewDownCast(void)
 int UtcDaliGlViewCopyAndAssignment(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
   tet_infoline("UtcDaliGlViewCopyAndAssignment");
 
   GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
@@ -76,6 +96,7 @@ int UtcDaliGlViewCopyAndAssignment(void)
 int UtcDaliGlViewMoveAssignment(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
   tet_infoline("UtcDaliGlViewMoveAssignment");
 
   GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
@@ -93,6 +114,7 @@ int UtcDaliGlViewMoveAssignment(void)
 int UtcDaliGlViewSetGraphicsConfigGles20N(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
   tet_infoline("UtcDaliGlViewSetGraphicsConfigGles20");
   GlView view;
   try
@@ -110,6 +132,7 @@ int UtcDaliGlViewSetGraphicsConfigGles20N(void)
 int UtcDaliGlViewSetGraphicsConfigGles30(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
   tet_infoline("UtcDaliGlViewSetGraphicsConfigGles30");
   GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
 
@@ -128,6 +151,7 @@ int UtcDaliGlViewSetGraphicsConfigGles30(void)
 int UtcDaliGlViewRenderingMode(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
   tet_infoline("UtcDaliGlViewRenderingMode");
   GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
 
@@ -143,6 +167,7 @@ int UtcDaliGlViewRenderingMode(void)
 int UtcDaliGlViewOnSizeSet(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
   tet_infoline("UtcDaliGlViewOnSizeSet");
   GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
 
@@ -184,6 +209,7 @@ void resizeCB(Vector2 size)
 int UtcDaliGlViewRegisterGlCallbacksN(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
   tet_infoline("UtcDaliGlViewRegisterGlCallbacksN");
   GlView view;
 
@@ -202,6 +228,7 @@ int UtcDaliGlViewRegisterGlCallbacksN(void)
 int UtcDaliGlViewSetResizeCallbackN(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
   tet_infoline("UtcDaliGlViewSetResizeCallback");
   GlView view;
 
@@ -220,6 +247,7 @@ int UtcDaliGlViewSetResizeCallbackN(void)
 int UtcDaliGlViewRenderOnce(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
   tet_infoline("UtcDaliGlViewRenderOnce");
   GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
 
@@ -238,6 +266,7 @@ int UtcDaliGlViewRenderOnce(void)
 int UtcDaliGlViewWindowVisibilityChanged(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
   tet_infoline("UtcDaliGlViewWindowVisibilityChanged");
   GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
   application.GetScene().Add(view);
@@ -261,6 +290,7 @@ int UtcDaliGlViewWindowVisibilityChanged(void)
 int UtcDaliGlViewOnScene(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
 
   GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
 
@@ -286,6 +316,7 @@ int UtcDaliGlViewOnScene(void)
 int UtcDaliGlViewControlVisibilityChanged(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
 
   GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
   application.GetScene().Add(view);
@@ -309,6 +340,8 @@ int UtcDaliGlViewControlVisibilityChanged(void)
 int UtcDaliGlViewResize(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewResize");
   GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
 

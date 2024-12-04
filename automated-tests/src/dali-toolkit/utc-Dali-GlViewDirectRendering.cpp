@@ -19,6 +19,7 @@
 #include <thread>
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <test-addon-manager.h>
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
@@ -32,6 +33,8 @@ using namespace Dali::Toolkit;
 int UtcDaliGlViewDirectRenderingNew(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline(" UtcDaliGlViewDirectRenderingNew");
   GlView view = GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGBA8888);
   DALI_TEST_CHECK(view);
@@ -52,10 +55,19 @@ int UtcDaliGlViewDirectRenderingNew(void)
 int UtcDaliGlViewDirectRenderingNewN(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline(" UtcDaliGlViewDirectRenderingNewN");
   // Invalid backend mode
-  GlView view = GlView::New(GlView::BackendMode(11111), GlView::ColorFormat::RGBA8888);
-  DALI_TEST_CHECK(!view);
+  try
+  {
+    GlView view = GlView::New(GlView::BackendMode(11111), GlView::ColorFormat::RGBA8888);
+    DALI_TEST_CHECK(false); // Should not get here!
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
 
   END_TEST;
 }
@@ -64,6 +76,8 @@ int UtcDaliGlViewDirectRenderingNewN(void)
 int UtcDaliGlViewDirectRenderingDownCast(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline(" UtcDaliGlViewDirectRenderingDownCast");
 
   GlView     view = GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
@@ -79,6 +93,8 @@ int UtcDaliGlViewDirectRenderingDownCast(void)
 int UtcDaliGlViewDirectRenderingCopyAndAssignment(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingCopyAndAssignment");
 
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
@@ -99,6 +115,8 @@ int UtcDaliGlViewDirectRenderingCopyAndAssignment(void)
 int UtcDaliGlViewDirectRenderingMoveAssignment(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingMoveAssignment");
 
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
@@ -116,6 +134,8 @@ int UtcDaliGlViewDirectRenderingMoveAssignment(void)
 int UtcDaliGlViewDirectRenderingSetGraphicsConfigGles20N(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingSetGraphicsConfigGles20");
   GlView view;
   try
@@ -133,6 +153,8 @@ int UtcDaliGlViewDirectRenderingSetGraphicsConfigGles20N(void)
 int UtcDaliGlViewDirectRenderingSetGraphicsConfigGles30(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingSetGraphicsConfigGles30");
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
 
@@ -151,6 +173,8 @@ int UtcDaliGlViewDirectRenderingSetGraphicsConfigGles30(void)
 int UtcDaliGlViewDirectRenderingRenderingMode(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingRenderingMode");
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
 
@@ -166,6 +190,8 @@ int UtcDaliGlViewDirectRenderingRenderingMode(void)
 int UtcDaliGlViewDirectRenderingOnSizeSet(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingOnSizeSet");
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
 
@@ -236,6 +262,8 @@ void resizeCB(Vector2 size)
 int UtcDaliGlViewDirectRenderingRegisterGlCallbacksN(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingRegisterGlCallbacksN");
   GlView view;
 
@@ -254,6 +282,8 @@ int UtcDaliGlViewDirectRenderingRegisterGlCallbacksN(void)
 int UtcDaliGlViewDirectRenderingSetResizeCallbackN(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingSetResizeCallback");
   GlView view;
 
@@ -272,6 +302,8 @@ int UtcDaliGlViewDirectRenderingSetResizeCallbackN(void)
 int UtcDaliGlViewDirectRenderingRenderOnce(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingRenderOnce");
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
 
@@ -290,6 +322,8 @@ int UtcDaliGlViewDirectRenderingRenderOnce(void)
 int UtcDaliGlViewDirectRenderingWindowVisibilityChanged(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingWindowVisibilityChanged");
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
   application.GetScene().Add(view);
@@ -313,6 +347,7 @@ int UtcDaliGlViewDirectRenderingWindowVisibilityChanged(void)
 int UtcDaliGlViewDirectRenderingOnScene(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
 
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
 
@@ -338,6 +373,7 @@ int UtcDaliGlViewDirectRenderingOnScene(void)
 int UtcDaliGlViewDirectRenderingControlVisibilityChanged(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
 
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
   application.GetScene().Add(view);
@@ -361,6 +397,8 @@ int UtcDaliGlViewDirectRenderingControlVisibilityChanged(void)
 int UtcDaliGlViewDirectRenderingResize(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingResize");
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
 
@@ -387,6 +425,8 @@ int UtcDaliGlViewDirectRenderingResize(void)
 int UtcDaliGlViewDirectRenderingDirectResize(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingResize");
   GlView view = Toolkit::GlView::New(GlView::BackendMode::UNSAFE_DIRECT_RENDERING, GlView::ColorFormat::RGB888);
 
@@ -413,6 +453,8 @@ int UtcDaliGlViewDirectRenderingDirectResize(void)
 int UtcDaliGlViewDirectRenderingTerminateCallback(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline("UtcDaliGlViewDirectRenderingTerminateCallback");
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
 
@@ -439,6 +481,7 @@ int UtcDaliGlViewDirectRenderingTerminateCallback(void)
 int UtcDaliGlViewDirectRenderingTextureBinding(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
 
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
 
@@ -486,6 +529,8 @@ int UtcDaliGlViewDirectRenderingTextureBinding(void)
 int UtcDaliGlViewDirectRenderingThreadedNew(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
   tet_infoline(" UtcDaliGlViewDirectRenderingThreadedNew");
   GlView view = GlView::New(GlView::BackendMode::DIRECT_RENDERING_THREADED, GlView::ColorFormat::RGBA8888);
   DALI_TEST_CHECK(view);
@@ -500,6 +545,7 @@ int UtcDaliGlViewDirectRenderingThreadedNew(void)
 int UtcDaliGlViewDirectRenderingThreadedOnScene(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
 
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING_THREADED, GlView::ColorFormat::RGB888);
 
@@ -530,6 +576,7 @@ extern "C" bool gDirectRenderingFailCreateProgram;
 int UtcDaliGlViewDirectRenderingThreadedOnScene1(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
 
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING_THREADED, GlView::ColorFormat::RGB888);
 
@@ -560,6 +607,7 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene1(void)
 int UtcDaliGlViewDirectRenderingThreadedOnScene2(void)
 {
   ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
 
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING_THREADED, GlView::ColorFormat::RGB888);
 

@@ -272,6 +272,7 @@ SET(toolkit_internal_egl_src_files
    ${toolkit_src_dir}/controls/gl-view/drawable-view-native-renderer.cpp
    ${toolkit_src_dir}/controls/gl-view/gl-view-impl.cpp
    ${toolkit_src_dir}/controls/gl-view/gl-view-render-thread.cpp
+   ${toolkit_src_dir}/gles-addon/gles-addon.cpp
 )
 
 SET( SOURCES ${SOURCES}

@@ -87,6 +87,7 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/dummy-control.cpp
    ../dali-toolkit/dali-toolkit-test-utils/mesh-builder.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-actor-utils.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/test-addon-manager.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-animation-data.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-button.cpp
@@ -112,7 +113,6 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-native-image.cpp
    dali-toolkit-test-utils/toolkit-text-utils.cpp
    dali-toolkit-test-utils/dummy-visual.cpp
-   dali-toolkit-test-utils/test-addon-manager.cpp
 )
 
 IF(ELDBUS_AVAILABLE)
