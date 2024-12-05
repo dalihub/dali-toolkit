@@ -19,7 +19,13 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+
+// Some TBB/USD headers produce compile warnings
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
 #include <pxr/usd/usdShade/material.h>
+#pragma GCC diagnostic pop
+
 #include <string>
 
 // INTERNAL INCLUDES
