@@ -20,9 +20,14 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
 
+// Some TBB/USD headers produce compile warnings
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
 #include <pxr/usd/usd/attribute.h>
 #include <pxr/usd/usdGeom/primvar.h>
 #include <pxr/usd/usdShade/shader.h>
+#pragma GCC diagnostic pop
+
 #include <string>
 
 // INTERNAL INCLUDES
