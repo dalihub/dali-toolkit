@@ -19,6 +19,7 @@
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-array.h>
 #include <toolkit-application.h>
@@ -27,6 +28,7 @@
 #include <chrono>
 #include <memory>
 #include <thread>
+#include <utility>
 
 namespace Dali
 {
@@ -142,9 +144,12 @@ public:
       mNeedDroppedFrames = false;
     }
 
-    if(mDynamicPropertyCallback)
+    if(!mDynamicPropertyCallbacks.empty())
     {
-      CallbackBase::ExecuteReturn<Property::Value>(*mDynamicPropertyCallback, 0, 0, frameNumber);
+      for(auto&& dynamicPropertyCallbackPair : mDynamicPropertyCallbacks)
+      {
+        CallbackBase::ExecuteReturn<Property::Value>(*dynamicPropertyCallbackPair.second, dynamicPropertyCallbackPair.first, 0, frameNumber);
+      }
     }
 
     if(mNeedTrigger)
@@ -210,7 +215,7 @@ public:
 
   void AddPropertyValueCallback(const std::string& keyPath, Dali::VectorAnimationRenderer::VectorProperty property, CallbackBase* callback, int32_t id)
   {
-    mDynamicPropertyCallback = std::unique_ptr<CallbackBase>(callback);
+    mDynamicPropertyCallbacks.emplace_back(id, std::unique_ptr<CallbackBase>(callback));
   }
 
   void KeepRasterizedBuffer()
@@ -255,10 +260,10 @@ public:
 public:
   static uint32_t mCount;
 
-  std::string                   mUrl;
-  Dali::Renderer                mRenderer;
-  Dali::Mutex                   mMutex;
-  std::unique_ptr<CallbackBase> mDynamicPropertyCallback{nullptr};
+  std::string                                                    mUrl;
+  Dali::Renderer                                                 mRenderer;
+  Dali::Mutex                                                    mMutex;
+  std::vector<std::pair<int32_t, std::unique_ptr<CallbackBase>>> mDynamicPropertyCallbacks;
 
   uint32_t mWidth;
   uint32_t mHeight;

@@ -775,6 +775,12 @@ void AnimatedVectorImageVisual::SendAnimationData()
     }
     mVectorAnimationTask->SetAnimationData(mAnimationData);
 
+    if(mAnimationData.resendFlag & VectorAnimationTask::RESEND_DYNAMIC_PROPERTY)
+    {
+      // Remove applied dynamic properties
+      mAnimationData.dynamicProperties.clear();
+    }
+
     if(mImpl->mRenderer &&
        ((mAnimationData.resendFlag & VectorAnimationTask::RESEND_PLAY_STATE) ||
         (mAnimationData.resendFlag & VectorAnimationTask::RESEND_NOTIFY_AFTER_RASTERIZATION)))
