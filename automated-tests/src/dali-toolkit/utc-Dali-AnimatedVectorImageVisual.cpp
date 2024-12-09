@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <chrono>
 #include <iostream>
+#include <map>
 #include <thread>
 
 #include <dali-toolkit-test-suite-utils.h>
@@ -2082,11 +2083,11 @@ int UtcDaliAnimatedVectorImageVisualSize(void)
 
 namespace
 {
-bool gDynamicPropertyCallbackFired = false;
+std::map<int32_t, bool> gDynamicPropertyCallbackFiredMap;
 
 Property::Value FillColorCallback(int32_t id, VectorAnimationRenderer::VectorProperty property, uint32_t frameNumber)
 {
-  gDynamicPropertyCallbackFired = true;
+  gDynamicPropertyCallbackFiredMap[id] = true;
 
   if(frameNumber < 3)
   {
@@ -2097,12 +2098,39 @@ Property::Value FillColorCallback(int32_t id, VectorAnimationRenderer::VectorPro
     return Vector3(1, 0, 0);
   }
 }
+
+Property::Value FillOpacityCallback(int32_t id, VectorAnimationRenderer::VectorProperty property, uint32_t frameNumber)
+{
+  gDynamicPropertyCallbackFiredMap[id] = true;
+
+  if(frameNumber < 3)
+  {
+    return 1.0f;
+  }
+  else
+  {
+    return 0.5f;
+  }
+}
+Property::Value TransformScaleCallback(int32_t id, VectorAnimationRenderer::VectorProperty property, uint32_t frameNumber)
+{
+  gDynamicPropertyCallbackFiredMap[id] = true;
+
+  if(frameNumber < 3)
+  {
+    return Vector2(0.5f, 1.5f);
+  }
+  else
+  {
+    return Vector2(1.5f, 0.5f);
+  }
+}
 } // namespace
 
-int UtcDaliAnimatedVectorImageVisualDynamicProperty(void)
+int UtcDaliAnimatedVectorImageVisualDynamicProperty01(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliAnimatedVectorImageVisualDynamicProperty");
+  tet_infoline("UtcDaliAnimatedVectorImageVisualDynamicProperty01");
 
   VisualFactory factory = VisualFactory::Get();
   Visual::Base  visual  = factory.CreateVisual(
@@ -2118,7 +2146,7 @@ int UtcDaliAnimatedVectorImageVisualDynamicProperty(void)
 
   application.GetScene().Add(actor);
 
-  gDynamicPropertyCallbackFired = false;
+  gDynamicPropertyCallbackFiredMap.clear();
 
   // Set dynamic property
   DevelAnimatedVectorImageVisual::DynamicPropertyInfo info;
@@ -2139,7 +2167,77 @@ int UtcDaliAnimatedVectorImageVisualDynamicProperty(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // Test whether the property callback is called
-  DALI_TEST_EQUALS(gDynamicPropertyCallbackFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gDynamicPropertyCallbackFiredMap[1], true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualDynamicProperty02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualDynamicProperty02 Add dynamic property callback multiple times.");
+
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base  visual  = factory.CreateVisual(
+    Property::Map()
+      .Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+      .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+      .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false));
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.GetScene().Add(actor);
+
+  gDynamicPropertyCallbackFiredMap.clear();
+
+  // Set dynamic property
+  DevelAnimatedVectorImageVisual::DynamicPropertyInfo info1;
+  info1.id       = 1;
+  info1.keyPath  = "Test.Path";
+  info1.property = static_cast<int>(VectorAnimationRenderer::VectorProperty::FILL_COLOR);
+  info1.callback = MakeCallback(FillColorCallback);
+
+  DevelControl::DoActionExtension(actor, DummyControl::Property::TEST_VISUAL, DevelAnimatedVectorImageVisual::Action::SET_DYNAMIC_PROPERTY, Any(info1));
+
+  DevelAnimatedVectorImageVisual::DynamicPropertyInfo info2;
+  info2.id       = 2;
+  info2.keyPath  = "Test.Path";
+  info2.property = static_cast<int>(VectorAnimationRenderer::VectorProperty::FILL_OPACITY);
+  info2.callback = MakeCallback(FillOpacityCallback);
+
+  DevelControl::DoActionExtension(actor, DummyControl::Property::TEST_VISUAL, DevelAnimatedVectorImageVisual::Action::SET_DYNAMIC_PROPERTY, Any(info2));
+
+  application.SendNotification();
+  application.Render();
+
+  DevelAnimatedVectorImageVisual::DynamicPropertyInfo info3;
+  info3.id       = 3;
+  info3.keyPath  = "Test.Path";
+  info3.property = static_cast<int>(VectorAnimationRenderer::VectorProperty::TRANSFORM_SCALE);
+  info3.callback = MakeCallback(TransformScaleCallback);
+
+  // Add third property after Notification.
+  DevelControl::DoActionExtension(actor, DummyControl::Property::TEST_VISUAL, DevelAnimatedVectorImageVisual::Action::SET_DYNAMIC_PROPERTY, Any(info3));
+
+  Property::Map attributes;
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - load & render a frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  // Test whether the property callback is called
+  DALI_TEST_EQUALS(gDynamicPropertyCallbackFiredMap[1], true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gDynamicPropertyCallbackFiredMap[2], true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gDynamicPropertyCallbackFiredMap[3], true, TEST_LOCATION);
 
   END_TEST;
 }
