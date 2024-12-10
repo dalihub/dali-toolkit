@@ -414,6 +414,21 @@ public:
   bool StopInspectorServer();
 
   /**
+   * @brief Set the style of IME.
+   * @param[in] position Position of IME.
+   * @param[in] alignment Alignment of IME.
+   *
+   * @return true if succeeded, false otherwise
+   */
+  bool SetImePositionAndAlignment(Dali::Vector2 position, int alignment);
+
+  /**
+   * @brief Set the theme name of cursor.
+   * @param[in] themeName The name of theme of cursor.
+   */
+  void SetCursorThemeName(const std::string themeName);
+
+  /**
    * @brief Scroll web page of view by deltaX and deltaY.
    * @param[in] deltaX The delta x of scroll
    * @param[in] deltaY The delta y of scroll
