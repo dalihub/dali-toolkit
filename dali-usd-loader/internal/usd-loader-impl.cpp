@@ -21,6 +21,9 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
+// Some TBB/USD headers produce compile warnings
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
 #include <pxr/usd/usd/prim.h>
 #include <pxr/usd/usd/primRange.h>
 #include <pxr/usd/usd/stage.h>
@@ -34,6 +37,7 @@
 #include <pxr/usd/usdSkel/bindingAPI.h>
 #include <pxr/usd/usdSkel/root.h>
 #include <pxr/usd/usdSkel/skeleton.h>
+#pragma GCC diagnostic pop
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/load-result.h>
