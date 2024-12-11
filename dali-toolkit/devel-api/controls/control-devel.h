@@ -260,7 +260,7 @@ enum
 
   /**
    * @brief Whether to draw on offscreen of not.
-   * @details Name "offscreenRendering", type Property::BOOLEAN
+   * @details Name "offscreenRendering", type Property::INTEGER.
    * @note Default is false.
    */
   OFFSCREEN_RENDERING
