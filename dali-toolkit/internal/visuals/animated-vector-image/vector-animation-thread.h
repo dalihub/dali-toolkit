@@ -217,7 +217,6 @@ private:
 
   bool mNeedToSleep : 1;
   bool mDestroyThread : 1;
-  bool mEventTriggered : 1;
   bool mForceRenderOnce : 1;
 };
 
