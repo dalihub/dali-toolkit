@@ -1784,7 +1784,7 @@ TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
   mAsyncLineCount(0),
   mTextUpdateNeeded(false),
   mLastAutoScrollEnabled(false),
-  mControlBackgroundEnabeld(true),
+  mControlBackgroundEnabled(true),
   mIsAsyncRenderNeeded(false),
   mIsSizeChanged(false),
   mIsManualRender(false),
@@ -1882,9 +1882,14 @@ bool TextLabel::IsRemoveBackInset() const
 void TextLabel::EnableControlBackground(const bool enable)
 {
   // Avoid function calls if there is no change.
-  if(mControlBackgroundEnabeld != enable)
+  if(!DevelControl::GetVisual(*this, Toolkit::Control::Property::BACKGROUND))
   {
-    mControlBackgroundEnabeld = enable;
+    return;
+  }
+
+  if(mControlBackgroundEnabled != enable)
+  {
+    mControlBackgroundEnabled = enable;
     DevelControl::EnableVisual(*this, Toolkit::Control::Property::BACKGROUND, enable);
   }
 }

@@ -492,7 +492,7 @@ private: // Data
   int  mAsyncLineCount;
   bool mTextUpdateNeeded         : 1;
   bool mLastAutoScrollEnabled    : 1;
-  bool mControlBackgroundEnabeld : 1;
+  bool mControlBackgroundEnabled : 1;
 
   bool mIsAsyncRenderNeeded : 1; // true if a render request is required in ASYNC_AUTO mode, otherwise false.
   bool mIsSizeChanged       : 1; // whether the size has been changed or not.
