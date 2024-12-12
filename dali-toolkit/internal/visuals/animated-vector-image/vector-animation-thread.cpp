@@ -55,7 +55,6 @@ VectorAnimationThread::VectorAnimationThread()
   mTraceFactory(Dali::Adaptor::Get().GetTraceFactory()),
   mNeedToSleep(false),
   mDestroyThread(false),
-  mEventTriggered(false),
   mForceRenderOnce(false)
 {
   mAsyncTaskManager = Dali::AsyncTaskManager::Get();
@@ -169,13 +168,17 @@ void VectorAnimationThread::AddEventTriggerCallback(CallbackBase* callback, uint
   Mutex::ScopedLock lock(mEventTriggerMutex);
   if(DALI_LIKELY(!mDestroyThread))
   {
+    DALI_LOG_DEBUG_INFO("VectorAnimationThread::AddEventTriggerCallback [%p, %u]\n", callback, argument);
+
+    DALI_ASSERT_ALWAYS(callback && "Someone register null callback! Please check the callstack\n");
+
     mTriggerEventCallbacks.emplace_back(callback, argument);
 
-    if(!mEventTriggered)
+    // Note : Always trigger event since eventfd might not emit triggered callback sometimes.
+    // Let we keep this logic until fd relative bug fixed. 2024-12-16 eunkiki.hong
+    if(DALI_LIKELY(mEventTrigger))
     {
-      DALI_LOG_DEBUG_INFO("VectorAnimationThread::mEventTrigger Triggered!\n");
       mEventTrigger->Trigger();
-      mEventTriggered = true;
     }
   }
 }
@@ -199,11 +202,12 @@ void VectorAnimationThread::RequestForceRenderOnce()
   {
     mForceRenderOnce = true;
 
-    if(!mEventTriggered)
+    DALI_LOG_DEBUG_INFO("VectorAnimationThread::mEventTrigger Triggered!\n");
+    // Note : Always trigger event since eventfd might not emit triggered callback sometimes.
+    // Let we keep this logic until fd relative bug fixed. 2024-12-16 eunkiki.hong
+    if(DALI_LIKELY(mEventTrigger))
     {
-      DALI_LOG_DEBUG_INFO("VectorAnimationThread::mEventTrigger Triggered!\n");
       mEventTrigger->Trigger();
-      mEventTriggered = true;
     }
   }
 }
@@ -471,7 +475,6 @@ std::pair<CallbackBase*, uint32_t> VectorAnimationThread::GetNextEventCallback()
       mTriggerEventCallbacks.erase(iter);
       return callbackIdPair;
     }
-    mEventTriggered = false;
   }
   return std::make_pair(nullptr, 0u);
 }
