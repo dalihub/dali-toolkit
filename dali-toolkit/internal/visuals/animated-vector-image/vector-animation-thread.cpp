@@ -169,6 +169,10 @@ void VectorAnimationThread::AddEventTriggerCallback(CallbackBase* callback, uint
   Mutex::ScopedLock lock(mEventTriggerMutex);
   if(DALI_LIKELY(!mDestroyThread))
   {
+    DALI_LOG_DEBUG_INFO("VectorAnimationThread::AddEventTriggerCallback [%p, %u]\n", callback, argument);
+
+    DALI_ASSERT_ALWAYS(callback && "Someone register null callback! Please check the callstack\n");
+
     mTriggerEventCallbacks.emplace_back(callback, argument);
 
     if(!mEventTriggered)
@@ -469,6 +473,11 @@ std::pair<CallbackBase*, uint32_t> VectorAnimationThread::GetNextEventCallback()
       auto iter           = mTriggerEventCallbacks.begin();
       auto callbackIdPair = *iter;
       mTriggerEventCallbacks.erase(iter);
+      if(callbackIdPair.first == nullptr)
+      {
+        DALI_LOG_ERROR("Error! someone register null callback!\n");
+        mEventTriggered = false;
+      }
       return callbackIdPair;
     }
     mEventTriggered = false;
