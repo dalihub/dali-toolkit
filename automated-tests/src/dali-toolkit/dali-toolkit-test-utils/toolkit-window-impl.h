@@ -2,7 +2,7 @@
 #define TOOLKIT_WINDOW_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,41 +19,39 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
+#include <string>
 
 // INTERNAL INCLUDES
-#include <toolkit-window.h>
 #include <toolkit-scene-holder-impl.h>
+#include <toolkit-window.h>
 
 namespace Dali
 {
-
-using PositionSize   = Dali::Rect<int>;
+using PositionSize = Dali::Rect<int>;
 
 namespace Internal
 {
-
 namespace Adaptor
 {
-
 class Window : public SceneHolder
 {
 public:
-  Window( const PositionSize& positionSize );
+  Window(const PositionSize& positionSize);
   virtual ~Window() = default;
   static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent);
 
-  Dali::Window::WindowPosition           GetPosition() const;
-  PositionSize                           GetPositionSize() const;
-  Dali::Window::WindowSize               GetSize() const;
+  Dali::Window::WindowPosition GetPosition() const;
+  PositionSize                 GetPositionSize() const;
+  Dali::Window::WindowSize     GetSize() const;
+  std::string                  GetNativeResourceId() const;
 
   void SetPositionSize(PositionSize positionSize);
 
-  FocusChangeSignalType mFocusChangeSignal;
-  ResizeSignalType      mResizeSignal;
-  int                   mRotationAngle;
-  bool                  mVisible;
+  FocusChangeSignalType                    mFocusChangeSignal;
+  ResizeSignalType                         mResizeSignal;
+  int                                      mRotationAngle;
+  bool                                     mVisible;
   DevelWindow::VisibilityChangedSignalType mVisibilityChangedSignal;
 };
 
@@ -62,6 +60,5 @@ public:
 } // namespace Internal
 
 } // namespace Dali
-
 
 #endif // TOOLKIT_WINDOW_IMPL_H

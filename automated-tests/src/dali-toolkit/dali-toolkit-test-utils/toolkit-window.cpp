@@ -85,6 +85,11 @@ void Window::SetPositionSize(PositionSize positionSize)
   mResizeSignal.Emit(handle, newSize);
 }
 
+std::string Window::GetNativeResourceId() const
+{
+  return "123";
+}
+
 } // namespace Adaptor
 } // namespace Internal
 
