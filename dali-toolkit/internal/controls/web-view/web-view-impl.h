@@ -482,6 +482,11 @@ public:
    */
   void RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback);
 
+  /**
+   * @copydoc Dali::Toolkit::WebView::FeedMouseWheel()
+   */
+  void FeedMouseWheel(bool yDirection, int step, int x, int y);
+
 public: // Properties
   /**
    * @brief Called when a property of an object of this type is set.

@@ -989,6 +989,14 @@ void WebView::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::
   }
 }
 
+void WebView::FeedMouseWheel(bool yDirection, int step, int x, int y)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.FeedMouseWheel(yDirection, step, x, y);
+  }
+}
+
 void WebView::OnFrameRendered()
 {
   if(mFrameRenderedCallback)

@@ -854,6 +854,17 @@ public:
    */
   void RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback);
 
+  /**
+   * @brief Feed mouse wheel event forcefully.
+   *
+   * @param[in] yDirection wheel event's y direction.
+   * @param[in] step step of wheel event.
+   * @param[in] x x value of wheel event.
+   * @param[in] y y value of wheel event.
+   */
+  void FeedMouseWheel(bool yDirection, int step, int x, int y);
+
+
 public: // Not intended for application developers
   /// @cond internal
   /**

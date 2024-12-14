@@ -484,6 +484,11 @@ void WebView::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::
   Dali::Toolkit::GetImpl(*this).RegisterUserMediaPermissionRequestCallback(callback);
 }
 
+void WebView::FeedMouseWheel(bool yDirection, int step, int x, int y)
+{
+  Dali::Toolkit::GetImpl(*this).FeedMouseWheel(yDirection, step, x, y);
+}
+
 
 WebView::WebView(Internal::WebView& implementation)
 : Control(implementation)
