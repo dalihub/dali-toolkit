@@ -145,6 +145,13 @@ UNIFORM_BLOCK ShadowEnabled
   UNIFORM lowp int uIsShadowEnabled;
 };
 
+UNIFORM_BLOCK ShadowFragBlock
+{
+  UNIFORM mediump int uShadowLightIndex;
+  UNIFORM lowp int uEnableShadowSoftFiltering;
+  UNIFORM mediump float uShadowIntensity;
+  UNIFORM highp float uShadowBias;
+};
 
 // TODO: Multiple texture coordinate will be supported.
 INPUT mediump vec2 vUV;
@@ -153,25 +160,19 @@ INPUT lowp vec4 vColor;
 INPUT highp vec3 vPositionToCamera;
 INPUT highp vec3 positionFromLightView;
 
-const float c_MinRoughness = 0.04;
-const float M_PI = 3.141592653589793;
+const lowp float c_MinRoughness = 0.04;
+const highp float M_PI = 3.141592653589793;
 
 // These properties can be used for circular sampling for PCF
 
 // Percentage Closer Filtering to mitigate the banding artifacts.
 const int kPcfSampleCount = 9;
 
-const float kPi = 3.141592653589;
-const float kInvSampleCount = 1.0 / float(kPcfSampleCount);
-const float kPcfTheta = 2.0 * kPi * kInvSampleCount;
-const float kSinPcfTheta = sin(kPcfTheta);
-const float kCosPcfTheta = cos(kPcfTheta);
-
-
-UNIFORM mediump int uShadowLightIndex;
-UNIFORM lowp int uEnableShadowSoftFiltering;
-UNIFORM mediump float uShadowIntensity;
-UNIFORM highp float uShadowBias;
+const highp float kPi = 3.141592653589;
+const highp float kInvSampleCount = 1.0 / float(kPcfSampleCount);
+const highp float kPcfTheta = 2.0 * kPi * kInvSampleCount;
+const highp float kSinPcfTheta = sin(kPcfTheta);
+const highp float kCosPcfTheta = cos(kPcfTheta);
 
 vec3 linear(vec3 color)
 {

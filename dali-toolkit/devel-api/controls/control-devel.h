@@ -71,6 +71,14 @@ typedef Signal<void(std::pair<Dali::Accessibility::GestureInfo, bool>&)> Accessi
 /// @brief AccessibilityAction signal type.
 typedef Signal<bool(const Dali::Accessibility::ActionInfo&)> AccessibilityActionSignalType;
 
+enum OffScreenRenderingType
+{
+  NONE,
+  REFRESH_ONCE,
+  REFRESH_ALWAYS
+};
+constexpr unsigned int OffScreenRenderingTypeCount = 3u;
+
 enum State
 {
   NORMAL,
@@ -249,6 +257,13 @@ enum
    * @details Name "accessibilityIsModal", type Property::BOOLEAN.
    */
   ACCESSIBILITY_IS_MODAL,
+
+  /**
+   * @brief Whether to draw on offscreen of not.
+   * @details Name "offscreenRendering", type Property::INTEGER.
+   * @note Default is false.
+   */
+  OFFSCREEN_RENDERING
 };
 
 } // namespace Property

@@ -574,19 +574,7 @@ void Control::EmitKeyInputFocusSignal(bool focusGained)
 
 void Control::OnSceneConnection(int depth)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection number of registered visuals(%d)\n", mImpl->mVisualData->mVisuals.Size());
-
-  Actor self(Self());
-
-  for(RegisteredVisualContainer::Iterator iter = mImpl->mVisualData->mVisuals.Begin(); iter != mImpl->mVisualData->mVisuals.End(); iter++)
-  {
-    // Check whether the visual is empty and enabled
-    if((*iter)->visual && (*iter)->enabled)
-    {
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection Setting visual(%d) on scene\n", (*iter)->index);
-      Toolkit::GetImplementation((*iter)->visual).SetOnScene(self);
-    }
-  }
+  mImpl->OnSceneConnection();
 
   // The clipping renderer is only created if required.
   CreateClippingRenderer(*this);

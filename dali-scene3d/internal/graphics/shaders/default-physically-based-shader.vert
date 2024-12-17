@@ -45,38 +45,38 @@ UNIFORM_BLOCK VertBlock0
 {
 #ifdef MORPH
 #ifdef SL_VERSION_LOW
-    UNIFORM int uBlendShapeGeometryWidth;
-    UNIFORM int uBlendShapeGeometryHeight;
+  UNIFORM int uBlendShapeGeometryWidth;
+  UNIFORM int uBlendShapeGeometryHeight;
 #endif
 #endif
 
-    UNIFORM highp mat4 uViewMatrix;
-    UNIFORM highp mat3 uNormalMatrix;
-    UNIFORM highp mat4 uModelMatrix;
-    UNIFORM highp mat4 uProjection;
+  UNIFORM highp mat4 uViewMatrix;
+  UNIFORM highp mat3 uNormalMatrix;
+  UNIFORM highp mat4 uModelMatrix;
+  UNIFORM highp mat4 uProjection;
 
 #ifdef SKINNING
 
 #ifdef SL_VERSION_LOW
-    #define MAX_BONES 80
-    UNIFORM highp mat4 uBone[MAX_BONES];
+#define MAX_BONES 80
+  UNIFORM highp mat4 uBone[MAX_BONES];
 #endif
 #endif
 
 #ifdef MORPH
 #define MAX_BLEND_SHAPE_NUMBER 256
-UNIFORM int uNumberOfBlendShapes;///< Total number of blend shapes loaded.
-UNIFORM highp float uBlendShapeWeight[MAX_BLEND_SHAPE_NUMBER];///< The weight of each blend shape.
+  UNIFORM int uNumberOfBlendShapes;///< Total number of blend shapes loaded.
+  UNIFORM highp float uBlendShapeWeight[MAX_BLEND_SHAPE_NUMBER];///< The weight of each blend shape.
 #ifdef MORPH_VERSION_2_0
-UNIFORM highp float uBlendShapeUnnormalizeFactor;///< Factor used to unnormalize the geometry of the blend shape.
+  UNIFORM highp float uBlendShapeUnnormalizeFactor;///< Factor used to unnormalize the geometry of the blend shape.
 #else
-UNIFORM highp float uBlendShapeUnnormalizeFactor[MAX_BLEND_SHAPE_NUMBER];///< Factor used to unnormalize the geometry of the blend shape.
+  UNIFORM highp float uBlendShapeUnnormalizeFactor[MAX_BLEND_SHAPE_NUMBER];///< Factor used to unnormalize the geometry of the blend shape.
 #endif
-UNIFORM highp int uBlendShapeComponentSize;///< The size in the texture of either the vertices, normals or tangents. Used to calculate the offset to address them.
+  UNIFORM highp int uBlendShapeComponentSize;///< The size in the texture of either the vertices, normals or tangents. Used to calculate the offset to address them.
 #endif
 
-// Shadow
-UNIFORM highp mat4 uShadowLightViewProjectionMatrix;
+  // Shadow
+  UNIFORM highp mat4 uShadowLightViewProjectionMatrix;
 };
 
 #ifdef SKINNING
@@ -88,7 +88,7 @@ UNIFORM_BLOCK YDirection
 
 UNIFORM_BLOCK ShadowEnabled
 {
-    UNIFORM lowp int uIsShadowEnabled;
+  UNIFORM lowp int uIsShadowEnabled;
 };
 
 // Additional uniform block if using more bones

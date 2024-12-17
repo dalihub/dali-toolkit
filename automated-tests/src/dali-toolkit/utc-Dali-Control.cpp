@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1489,6 +1489,34 @@ int UtcDaliControlDoActionMultipleWhenNotStage03(void)
     tet_infoline("Exception occured!");
     tet_result(TET_FAIL);
   }
+
+  END_TEST;
+}
+
+int UtcDaliControlOffScreenRendering(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(control);
+  control.SetBackgroundColor(Color::RED);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::OFFSCREEN_RENDERING).Get<int>(), (int)DevelControl::OffScreenRenderingType::NONE, TEST_LOCATION);
+
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ALWAYS);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::OFFSCREEN_RENDERING).Get<int>(), (int)DevelControl::OffScreenRenderingType::REFRESH_ALWAYS, TEST_LOCATION);
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::OFFSCREEN_RENDERING).Get<int>(), (int)DevelControl::OffScreenRenderingType::REFRESH_ONCE, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::NONE);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::OFFSCREEN_RENDERING).Get<int>(), (int)DevelControl::OffScreenRenderingType::NONE, TEST_LOCATION);
+
+  control.Unparent(); // Disconnect fron scene.
+  application.GetScene().Add(control);
 
   END_TEST;
 }
