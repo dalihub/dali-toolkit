@@ -151,22 +151,23 @@ const Property::Map DEFAULT_WEB_IMAGE_VISUAL_PROPERTIES{
   {Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS, Vector4::ZERO},
   {Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS, Vector4::ZERO},
   {Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, Dali::Toolkit::Visual::Transform::Policy::ABSOLUTE},
+  {Dali::Toolkit::Visual::Property::TRANSFORM, {{Dali::Toolkit::Visual::Transform::Property::SIZE, Vector2::ONE}}},
 };
 
 /**
- * @brief Helper function to calculate exact pixel area value by view and texture size.
+ * @brief Helper function to calculate exact texture ratio value by view and texture size.
  * It will be useful when view size is not integer value, or view size is not matched with texture size.
  *
  * @param[in] viewSize The size of view.
  * @param[in] textureWidth The width of texture, that must be integer type.
  * @param[in] textureHeight The height of texture, that must be integer type.
- * @return PixelArea value that image visual can use.
+ * @return Ratio value for each width and height that image visual can use.
  */
-Vector4 CalculatePixelArea(const Size& viewSize, const uint32_t textureWidth, const uint32_t textureHeight)
+Vector2 CalculateTextureRatio(const Size& viewSize, const uint32_t textureWidth, const uint32_t textureHeight)
 {
   float widthRatio  = textureWidth == 0u ? 1.0f : viewSize.width / static_cast<float>(textureWidth);
   float heightRatio = textureHeight == 0u ? 1.0f : viewSize.height / static_cast<float>(textureHeight);
-  return Vector4(0.0f, 0.0f, widthRatio, heightRatio);
+  return Vector2(widthRatio, heightRatio);
 }
 
 } // namespace
@@ -1080,10 +1081,15 @@ void WebView::SetDisplayArea(const Dali::Rect<int32_t>& displayArea)
     // Change old visual's pixel area matched as changed web view size
     if(mVisual)
     {
-      auto pixelArea = CalculatePixelArea(mWebViewSize, mLastRenderedNativeImageWidth, mLastRenderedNativeImageHeight);
+      const Vector2 textureRatio = CalculateTextureRatio(mWebViewSize, mLastRenderedNativeImageWidth, mLastRenderedNativeImageHeight);
+
+      const Vector4 pixelArea(0.0f, 0.0f, std::min(1.0f, textureRatio.x), std::min(1.0f, textureRatio.y));
+      const Vector2 transformSize(DALI_UNLIKELY(Dali::EqualsZero(textureRatio.x)) ? 1.0f : std::min(1.0f, 1.0f / textureRatio.x), DALI_UNLIKELY(Dali::EqualsZero(textureRatio.y)) ? 1.0f : std::min(1.0f, 1.0f / textureRatio.y));
 
       mVisualPropertyMap[Toolkit::ImageVisual::Property::PIXEL_AREA] = pixelArea;
-      Toolkit::GetImplementation(mVisual).DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, {{Toolkit::ImageVisual::Property::PIXEL_AREA, pixelArea}});
+      mVisualPropertyMap[Toolkit::Visual::Property::TRANSFORM]       = {{Dali::Toolkit::Visual::Transform::Property::SIZE, transformSize}};
+
+      Toolkit::GetImplementation(mVisual).DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, {{Toolkit::ImageVisual::Property::PIXEL_AREA, pixelArea}, {Toolkit::Visual::Property::TRANSFORM, {{Dali::Toolkit::Visual::Transform::Property::SIZE, transformSize}}}});
     }
 
     mWebViewArea = displayArea;
