@@ -29,7 +29,18 @@ using namespace Dali::Toolkit::Internal;
 namespace
 {
 constexpr uint32_t URL_ELLIPSED_LENGTH = 20u;
+
+void TestLocationAsInteger(const char* url, int32_t expectValue, bool expectResult, const char* testLocation)
+{
+  int32_t result    = 0;
+  bool    successed = VisualUrl(url).GetLocationAsInteger(result);
+  DALI_TEST_EQUALS(successed, expectResult, testLocation);
+  if(successed)
+  {
+    DALI_TEST_EQUALS(result, expectValue, testLocation);
+  }
 }
+} // namespace
 
 int UtcDaliVisualUrlConstructor(void)
 {
@@ -433,6 +444,25 @@ int UtcDaliVisualUrlGetLocationWithoutExtensionP(void)
   DALI_TEST_EQUAL("", VisualUrl("ftp://.png").GetLocationWithoutExtension());
   DALI_TEST_EQUAL("http://a.jpg", VisualUrl("http://http://a.jpg.jpg").GetLocationWithoutExtension());
 
+  DALI_TEST_EQUAL("a", VisualUrl("a.jpg").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("12", VisualUrl("12.png").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("/usr/bin/hello", VisualUrl("/usr/bin/hello.txt").GetLocationWithoutExtension());
+
+  END_TEST;
+}
+
+int UtcDaliVisualUrlGetLocationAsIntegerP(void)
+{
+  tet_infoline("UtcDaliVisualUrl GetLocationAsInteger Positive");
+
+  TestLocationAsInteger("http://1.png", 1, true, TEST_LOCATION);
+  TestLocationAsInteger("dali://2", 2, true, TEST_LOCATION);
+  TestLocationAsInteger("enbuf://4.svg", 4, true, TEST_LOCATION);
+  TestLocationAsInteger("ftp://-2", -2, true, TEST_LOCATION);
+  TestLocationAsInteger("9.png", 9, true, TEST_LOCATION);
+  TestLocationAsInteger("2147483647", 2147483647, true, TEST_LOCATION);
+  TestLocationAsInteger("-2147483648.jpg", -2147483648, true, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -456,10 +486,25 @@ int UtcDaliVisualUrlGetLocationWithoutExtensionN(void)
 
   DALI_TEST_EQUAL("", VisualUrl("").GetLocationWithoutExtension());
   DALI_TEST_EQUAL("a", VisualUrl("a").GetLocationWithoutExtension());
-  DALI_TEST_EQUAL("dali:/1.jpg", VisualUrl("dali:/1.jpg").GetLocationWithoutExtension());
-  DALI_TEST_EQUAL("dali//1.jpg", VisualUrl("dali//1.jpg").GetLocationWithoutExtension());
-  DALI_TEST_EQUAL("enbuf:/2.png", VisualUrl("enbuf:/2.png").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("dali:/1", VisualUrl("dali:/1").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("dali//1", VisualUrl("dali//1").GetLocationWithoutExtension());
+  DALI_TEST_EQUAL("enbuf:/2", VisualUrl("enbuf:/2.png").GetLocationWithoutExtension());
   DALI_TEST_EQUAL("a.jpg", VisualUrl("http:/http://a.jpg.jpngif").GetLocationWithoutExtension());
+
+  END_TEST;
+}
+
+int UtcDaliVisualUrlGetLocationAsIntegerN(void)
+{
+  tet_infoline("UtcDaliVisualUrl GetLocationAsInteger Positive");
+
+  TestLocationAsInteger("http://abc.png", 0, false, TEST_LOCATION);
+  TestLocationAsInteger("dali://.png.png", 0, false, TEST_LOCATION);
+  TestLocationAsInteger("enbuf://.svg", 0, false, TEST_LOCATION);
+  TestLocationAsInteger("ftp://", 0, false, TEST_LOCATION);
+
+  TestLocationAsInteger("2147483648", 0, false, TEST_LOCATION);
+  TestLocationAsInteger("-2147483649", 0, false, TEST_LOCATION);
 
   END_TEST;
 }

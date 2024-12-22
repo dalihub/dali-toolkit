@@ -21,6 +21,9 @@
 #include <dali/devel-api/common/hash.h>
 #include <cstring> // for toupper()
 
+// INTERNAL HEADERS
+#include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -348,6 +351,52 @@ std::string VisualUrl::GetLocationWithoutExtension() const
   return GetLocationWithoutExtension(mUrl);
 }
 
+bool VisualUrl::GetLocationAsInteger(int32_t& integerLocation) const
+{
+  const auto& location = GetLocationWithoutExtension(mUrl);
+  if(!location.empty())
+  {
+    try
+    {
+      integerLocation = std::stoi(location);
+      return true;
+    }
+    catch(...)
+    {
+      return false;
+    }
+  }
+  return false;
+}
+
+void VisualUrl::IncreaseExternalResourceReference(TextureManager& textureManager) const
+{
+  if(IsValid() && (mLocation == VisualUrl::TEXTURE || mLocation == VisualUrl::BUFFER))
+  {
+    textureManager.UseExternalResource(*this);
+  }
+}
+
+void VisualUrl::DecreaseExternalResourceReference(TextureManager& textureManager) const
+{
+  if(IsValid() && (mLocation == VisualUrl::TEXTURE || mLocation == VisualUrl::BUFFER))
+  {
+    switch(mLocation)
+    {
+      case VisualUrl::TEXTURE:
+      {
+        textureManager.RemoveExternalTexture(*this);
+        break;
+      }
+      case VisualUrl::BUFFER:
+      {
+        textureManager.RemoveEncodedImageBuffer(*this);
+        break;
+      }
+    }
+  }
+}
+
 std::string VisualUrl::CreateTextureUrl(const std::string& location)
 {
   return "dali://" + location;
@@ -375,14 +424,13 @@ std::string VisualUrl::GetLocation(const std::string& url)
 
 std::string VisualUrl::GetLocationWithoutExtension(const std::string& url)
 {
-  const auto location = url.find("://");
-  if(std::string::npos != location)
-  {
-    const auto extension      = url.find_last_of("."); // Find last position of '.' keyword.
-    const auto locationLength = extension != std::string::npos ? extension - (location + 3u) : std::string::npos;
-    return url.substr(location + 3u, locationLength); // 3 characters forwards from the start of ://, and end of last '.' keyword.
-  }
-  return url;
+  const auto location  = url.find("://");
+  const auto extension = url.find_last_of("."); // Find last position of '.' keyword.
+
+  const auto locationOffset = location != std::string::npos ? location + 3u : 0u;
+  const auto locationLength = extension != std::string::npos ? extension - (locationOffset) : std::string::npos;
+
+  return url.substr(locationOffset, locationLength);
 }
 
 } // namespace Internal
