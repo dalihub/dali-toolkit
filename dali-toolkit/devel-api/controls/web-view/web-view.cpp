@@ -484,6 +484,16 @@ void WebView::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::
   Dali::Toolkit::GetImpl(*this).RegisterUserMediaPermissionRequestCallback(callback);
 }
 
+void WebView::RegisterDeviceConnectionChangedCallback(Dali::WebEnginePlugin::WebEngineDeviceConnectionChangedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterDeviceConnectionChangedCallback(callback);
+}
+
+void WebView::RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterDeviceListGetCallback(callback);
+}
+
 void WebView::FeedMouseWheel(bool yDirection, int step, int x, int y)
 {
   Dali::Toolkit::GetImpl(*this).FeedMouseWheel(yDirection, step, x, y);

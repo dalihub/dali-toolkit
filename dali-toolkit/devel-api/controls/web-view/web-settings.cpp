@@ -279,6 +279,12 @@ int WebSettings::GetImeStyle() const
   return mWebEngineSettings.GetImeStyle();
 }
 
+void WebSettings::SetDefaultAudioInputDevice(const std::string& deviceId) const
+{
+  mWebEngineSettings.SetDefaultAudioInputDevice(deviceId);
+}
+
+
 } // namespace Toolkit
 
 } // namespace Dali

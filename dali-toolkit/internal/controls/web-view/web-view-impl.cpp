@@ -990,6 +990,22 @@ void WebView::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::
   }
 }
 
+void WebView::RegisterDeviceConnectionChangedCallback(Dali::WebEnginePlugin::WebEngineDeviceConnectionChangedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterDeviceConnectionChangedCallback(std::move(callback));
+  }
+}
+
+void WebView::RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterDeviceListGetCallback(std::move(callback));
+  }
+}
+
 void WebView::FeedMouseWheel(bool yDirection, int step, int x, int y)
 {
   if(mWebEngine)

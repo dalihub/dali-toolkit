@@ -426,6 +426,14 @@ public:
    */
   int GetImeStyle() const;
 
+  /**
+   * @brief Sets default audio input device
+   *
+   * @param[in] deviceId default device ID
+   */
+  void SetDefaultAudioInputDevice(const std::string& deviceId) const;
+
+
 private:
   Dali::WebEngineSettings& mWebEngineSettings;
 };

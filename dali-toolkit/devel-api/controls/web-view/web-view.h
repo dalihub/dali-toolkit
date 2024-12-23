@@ -864,6 +864,20 @@ public:
    */
   void FeedMouseWheel(bool yDirection, int step, int x, int y);
 
+  /**
+   * @brief Register DeviceConnectionChanged callback.
+   *
+   * @param[in] callback The callback to be called for handling device connection changed event.
+   */
+  void RegisterDeviceConnectionChangedCallback(Dali::WebEnginePlugin::WebEngineDeviceConnectionChangedCallback callback);
+
+  /**
+   * @brief Register DeviceListGet callback.
+   *
+   * @param[in] callback The callback to be called for getting device list.
+   */
+  void RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback);
+
 
 public: // Not intended for application developers
   /// @cond internal
