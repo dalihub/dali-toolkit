@@ -2196,47 +2196,76 @@ private:
     return actor;
   }
 
+  Actor MakeInvisibleActor()
+  {
+    auto actor = Control::New();
+    actor.SetProperty(Actor::Property::VISIBLE, false);
+    actor.SetProperty(Actor::Property::SIZE, Vector2(10.f, 10.f));
+    return actor;
+  }
+
   Actor MakeContainer(bool isClickable, std::string label)
   {
     Actor   container = isClickable ? MakeClickableActor() : MakeNonClickableActor();
     Vector4 color(0.5f, 0.6f, 0.5f, 1.0f);
     container.SetProperty(Actor::Property::COLOR, color);
     container.SetProperty(Actor::Property::VISIBLE, true);
+    container.SetProperty(Actor::Property::SIZE, Vector2(480.f / N, 480.f / N));
 
     // button
     auto button = PushButton::New();
     button.SetProperty(Actor::Property::POSITION, Vector2(0.f, 0.f));
     button.SetProperty(Actor::Property::SIZE, Vector2(10.f, 10.f));
     button.SetProperty(Actor::Property::VISIBLE, true);
+    button.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+    button.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    button.SetProperty(DevelControl::Property::AUTOMATION_ID, label + "_0");
     container.Add(button);
 
     // text label
     auto text = TextLabel::New(label);
     text.SetProperty(Actor::Property::VISIBLE, true);
+    text.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    text.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    text.SetProperty(DevelControl::Property::AUTOMATION_ID, label + "_1");
     container.Add(text);
+
+    // invisible actor
+    auto invisibleActor = MakeInvisibleActor();
+    invisibleActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::RIGHT);
+    invisibleActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    invisibleActor.SetProperty(DevelControl::Property::AUTOMATION_ID, label + "_2");
+    container.Add(invisibleActor);
+
+    // add dummy attribute
+    DevelControl::AppendAccessibilityAttribute(Dali::Toolkit::Control::DownCast(container), "dummy", "i_am_dummy");
 
     return container;
   };
 
 public:
-  TestMatcheableView()
+  TestMatcheableView(int n)
+  : N{n}
   {
     view = TableView::New(N, N);                                      // N by N grid.
     view.SetProperty(Actor::Property::SIZE, Vector2(480.0f, 800.0f)); // full screen
+    //view.SetProperty(Actor::Property::POSITION, Vector2(0.f, 0.f));
+    view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+    view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
 
     for(int i = 0; i < N; ++i)
     {
       for(int j = 0; j < N; ++j)
       {
         bool        isClickable = (i * N + j) % 2;
-        std::string label       = "test_" + std::to_string(i) + "_" + std::to_string(j);
+        std::string label       = "test_\n" + std::to_string(i) + "_\t" + std::to_string(j);
         view.AddChild(MakeContainer(isClickable, std::move(label)), TableView::CellPosition(i, j));
       }
     }
   }
 
-  TableView        view;
-  static const int N{48};
+  TableView view;
+  const int N;
 };
 
 static Accessibility::Collection::MatchRule GetMatchRule(std::vector<Accessibility::State> states, std::vector<Accessibility::Role> roles)
@@ -2283,11 +2312,12 @@ static Accessibility::Collection::MatchRule GetMatchRule(std::vector<Accessibili
 
 int UtcDaliGetMatches(void)
 {
+  const int              N = 48;
   ToolkitTestApplication application;
 
   Dali::Accessibility::TestEnableSC(true);
 
-  application.GetScene().Add(TestMatcheableView().view);
+  application.GetScene().Add(TestMatcheableView(N).view);
   application.SendNotification();
   application.Render();
 
@@ -2296,9 +2326,9 @@ int UtcDaliGetMatches(void)
   auto collection = dynamic_cast<Accessibility::Collection*>(appAccessible);
   DALI_TEST_CHECK(collection);
 
-  auto       rule          = GetMatchRule({Accessibility::State::SENSITIVE, Accessibility::State::SHOWING}, {});
-  auto       results       = collection->GetMatches(std::move(rule), static_cast<uint32_t>(SortOrder::CANONICAL), 0);
-  const auto numContainers = TestMatcheableView::N * TestMatcheableView::N;
+  auto         rule          = GetMatchRule({Accessibility::State::SENSITIVE, Accessibility::State::SHOWING}, {});
+  auto         results       = collection->GetMatches(std::move(rule), static_cast<uint32_t>(SortOrder::CANONICAL), 0);
+  const size_t numContainers = N * N;
   DALI_TEST_CHECK(results.size() == 1 + numContainers / 2 + numContainers); // 1 (root) + num(half of containers) + num(buttons);
 
   Dali::Accessibility::TestEnableSC(false);
@@ -2308,11 +2338,12 @@ int UtcDaliGetMatches(void)
 
 int UtcDaliGetMatchesInMatches(void)
 {
+  const int              N = 48;
   ToolkitTestApplication application;
 
   Dali::Accessibility::TestEnableSC(true);
 
-  application.GetScene().Add(TestMatcheableView().view);
+  application.GetScene().Add(TestMatcheableView(N).view);
   application.SendNotification();
   application.Render();
 
@@ -2325,8 +2356,54 @@ int UtcDaliGetMatchesInMatches(void)
   auto rule2   = GetMatchRule({Accessibility::State::SHOWING}, {Accessibility::Role::LABEL});
   auto results = collection->GetMatchesInMatches(std::move(rule1), std::move(rule2), static_cast<uint32_t>(SortOrder::CANONICAL), 0, 0);
 
-  const auto numLabels = TestMatcheableView::N * TestMatcheableView::N;
+  const size_t numLabels = N * N;
   DALI_TEST_CHECK(results.size() == numLabels); // text labels
+
+  Dali::Accessibility::TestEnableSC(false);
+
+  END_TEST;
+}
+
+int UtcDaliDumpTree(void)
+{
+  ToolkitTestApplication application;
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  application.GetScene().Add(TestMatcheableView(2).view);
+  application.SendNotification();
+  application.Render();
+
+  auto appAccessible = Accessibility::Bridge::GetCurrentBridge()->GetApplication();
+  DALI_TEST_CHECK(appAccessible);
+
+  {
+    const std::string expected = R"({ "role": "application", "states": 1107296514, "text": "TestApp", "x": 0, "y": 0, "w": 480, "h": 800, "toolkit": "dali", "children": [ { "role": "window", "states": 1124073730, "text": "RootLayer", "type" : "Layer", "x": 0, "y": 0, "w": 480, "h": 800, "children": [ { "role": "redundant object", "states": 1107296256, "text": "DefaultCamera", "type" : "CameraActor", "x": 240, "y": 400, "w": 0, "h": 0 }, { "role": "table", "states": 1107298560, "type" : "TableView", "x": 0, "y": 0, "w": 480, "h": 800, "children": [ { "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 0, "w": 240, "h": 240, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t0_0", "x": 0, "y": 0, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n0_\t0", "type" : "TextLabel", "automationId" : "test_\n0_\t0_1", "x": 120, "y": 120, "w": 240, "h": 64 }, { "role": "unknown", "states": 256, "type" : "Control", "automationId" : "test_\n0_\t0_2", "x": 240, "y": 240, "w": 10, "h": 10 }] }, { "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 0, "w": 240, "h": 240, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t1_0", "x": 240, "y": 0, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n0_\t1", "type" : "TextLabel", "automationId" : "test_\n0_\t1_1", "x": 360, "y": 120, "w": 240, "h": 64 }, { "role": "unknown", "states": 256, "type" : "Control", "automationId" : "test_\n0_\t1_2", "x": 480, "y": 240, "w": 10, "h": 10 }] }, { "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 400, "w": 240, "h": 240, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t0_0", "x": 0, "y": 400, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n1_\t0", "type" : "TextLabel", "automationId" : "test_\n1_\t0_1", "x": 120, "y": 520, "w": 240, "h": 64 }, { "role": "unknown", "states": 256, "type" : "Control", "automationId" : "test_\n1_\t0_2", "x": 240, "y": 640, "w": 10, "h": 10 }] }, { "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 400, "w": 240, "h": 240, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t1_0", "x": 240, "y": 400, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n1_\t1", "type" : "TextLabel", "automationId" : "test_\n1_\t1_1", "x": 360, "y": 520, "w": 240, "h": 64 }, { "role": "unknown", "states": 256, "type" : "Control", "automationId" : "test_\n1_\t1_2", "x": 480, "y": 640, "w": 10, "h": 10 }] }] }] }] })";
+
+    auto result = appAccessible->DumpTree(Accessibility::Accessible::DumpDetailLevel::DUMP_SHORT);
+    DALI_TEST_EQUALS(result, expected, TEST_LOCATION);
+  }
+
+  {
+    const std::string expected = R"({ "role": "application", "states": 1107296514, "text": "TestApp", "x": 0, "y": 0, "w": 480, "h": 800, "toolkit": "dali", "children": [ { "role": "window", "states": 1124073730, "text": "RootLayer", "type" : "Layer", "x": 0, "y": 0, "w": 480, "h": 800, "children": [ { "role": "redundant object", "states": 1107296256, "text": "DefaultCamera", "type" : "CameraActor", "x": 240, "y": 400, "w": 0, "h": 0 }, { "role": "table", "states": 1107298560, "type" : "TableView", "x": 0, "y": 0, "w": 480, "h": 800, "children": [ { "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 0, "w": 240, "h": 240, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t0_0", "x": 0, "y": 0, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n0_\t0", "type" : "TextLabel", "automationId" : "test_\n0_\t0_1", "x": 120, "y": 120, "w": 240, "h": 64 }] }, { "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 0, "w": 240, "h": 240, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t1_0", "x": 240, "y": 0, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n0_\t1", "type" : "TextLabel", "automationId" : "test_\n0_\t1_1", "x": 360, "y": 120, "w": 240, "h": 64 }] }, { "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 400, "w": 240, "h": 240, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t0_0", "x": 0, "y": 400, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n1_\t0", "type" : "TextLabel", "automationId" : "test_\n1_\t0_1", "x": 120, "y": 520, "w": 240, "h": 64 }] }, { "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 400, "w": 240, "h": 240, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t1_0", "x": 240, "y": 400, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n1_\t1", "type" : "TextLabel", "automationId" : "test_\n1_\t1_1", "x": 360, "y": 520, "w": 240, "h": 64 }] }] }] }] })";
+
+    auto result = appAccessible->DumpTree(Accessibility::Accessible::DumpDetailLevel::DUMP_SHORT_SHOWING_ONLY);
+    DALI_TEST_EQUALS(result, expected, TEST_LOCATION);
+  }
+
+  {
+    const std::string expected = R"({ "role": "application", "states": 1107296514, "text": "TestApp", "x": 0, "y": 0, "w": 480, "h": 800, "toolkit": "dali", "children": [ { "role": "window", "states": 1124073730, "text": "RootLayer", "type" : "Layer", "x": 0, "y": 0, "w": 480, "h": 800, "attributes": { "resID": "123" }, "children": [ { "role": "redundant object", "states": 1107296256, "text": "DefaultCamera", "type" : "CameraActor", "x": 240, "y": 400, "w": 0, "h": 0 }, { "role": "table", "states": 1107298560, "type" : "TableView", "x": 0, "y": 0, "w": 480, "h": 800, "children": [ { "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t0_0", "x": 0, "y": 0, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n0_\t0", "type" : "TextLabel", "automationId" : "test_\n0_\t0_1", "x": 120, "y": 120, "w": 240, "h": 64 }, { "role": "unknown", "states": 256, "type" : "Control", "automationId" : "test_\n0_\t0_2", "x": 240, "y": 240, "w": 10, "h": 10 }] }, { "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t1_0", "x": 240, "y": 0, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n0_\t1", "type" : "TextLabel", "automationId" : "test_\n0_\t1_1", "x": 360, "y": 120, "w": 240, "h": 64 }, { "role": "unknown", "states": 256, "type" : "Control", "automationId" : "test_\n0_\t1_2", "x": 480, "y": 240, "w": 10, "h": 10 }] }, { "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t0_0", "x": 0, "y": 400, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n1_\t0", "type" : "TextLabel", "automationId" : "test_\n1_\t0_1", "x": 120, "y": 520, "w": 240, "h": 64 }, { "role": "unknown", "states": 256, "type" : "Control", "automationId" : "test_\n1_\t0_2", "x": 240, "y": 640, "w": 10, "h": 10 }] }, { "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t1_0", "x": 240, "y": 400, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n1_\t1", "type" : "TextLabel", "automationId" : "test_\n1_\t1_1", "x": 360, "y": 520, "w": 240, "h": 64 }, { "role": "unknown", "states": 256, "type" : "Control", "automationId" : "test_\n1_\t1_2", "x": 480, "y": 640, "w": 10, "h": 10 }] }] }] }] })";
+
+    auto result = appAccessible->DumpTree(Accessibility::Accessible::DumpDetailLevel::DUMP_FULL);
+    DALI_TEST_EQUALS(result, expected, TEST_LOCATION);
+  }
+
+  {
+    const std::string expected = R"({ "role": "application", "states": 1107296514, "text": "TestApp", "x": 0, "y": 0, "w": 480, "h": 800, "toolkit": "dali", "children": [ { "role": "window", "states": 1124073730, "text": "RootLayer", "type" : "Layer", "x": 0, "y": 0, "w": 480, "h": 800, "attributes": { "resID": "123" }, "children": [ { "role": "redundant object", "states": 1107296256, "text": "DefaultCamera", "type" : "CameraActor", "x": 240, "y": 400, "w": 0, "h": 0 }, { "role": "table", "states": 1107298560, "type" : "TableView", "x": 0, "y": 0, "w": 480, "h": 800, "children": [ { "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t0_0", "x": 0, "y": 0, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n0_\t0", "type" : "TextLabel", "automationId" : "test_\n0_\t0_1", "x": 120, "y": 120, "w": 240, "h": 64 }] }, { "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t1_0", "x": 240, "y": 0, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n0_\t1", "type" : "TextLabel", "automationId" : "test_\n0_\t1_1", "x": 360, "y": 120, "w": 240, "h": 64 }] }, { "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t0_0", "x": 0, "y": 400, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n1_\t0", "type" : "TextLabel", "automationId" : "test_\n1_\t0_1", "x": 120, "y": 520, "w": 240, "h": 64 }] }, { "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t1_0", "x": 240, "y": 400, "w": 10, "h": 10 }, { "role": "label", "states": 35185479385344, "text": "test_\n1_\t1", "type" : "TextLabel", "automationId" : "test_\n1_\t1_1", "x": 360, "y": 520, "w": 240, "h": 64 }] }] }] }] })";
+
+    auto result = appAccessible->DumpTree(Accessibility::Accessible::DumpDetailLevel::DUMP_FULL_SHOWING_ONLY);
+    DALI_TEST_EQUALS(result, expected, TEST_LOCATION);
+  }
 
   Dali::Accessibility::TestEnableSC(false);
 
