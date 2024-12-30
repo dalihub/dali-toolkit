@@ -379,7 +379,7 @@ void VisualUrl::IncreaseExternalResourceReference(TextureManager& textureManager
 
 void VisualUrl::DecreaseExternalResourceReference(TextureManager& textureManager) const
 {
-  if(IsValid() && (mLocation == VisualUrl::TEXTURE || mLocation == VisualUrl::BUFFER))
+  if(IsValid())
   {
     switch(mLocation)
     {
@@ -391,6 +391,11 @@ void VisualUrl::DecreaseExternalResourceReference(TextureManager& textureManager
       case VisualUrl::BUFFER:
       {
         textureManager.RemoveEncodedImageBuffer(*this);
+        break;
+      }
+      default:
+      {
+        // Do nothing
         break;
       }
     }
