@@ -22,6 +22,8 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/rendering/uniform-block.h>
+#include <dali/public-api/rendering/visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
@@ -221,16 +223,17 @@ public:
    * Request shader of the given type.
    * @return The shader of the required type if it exist in the cache. Otherwise, an empty handle is returned.
    */
-  Shader GetShader(ShaderType type);
+  Shader GetShader(ShaderType type, bool useDefaultUniforms = false);
 
   /**
    * Generate and cache the shader of the give type. The name of shader will be installed to shader.
    * @param[in] type The shder type.
    * @param[in] vertexShader The vertex shader code.
    * @param[in] fragmentShader The fragment shader code.
+   * @param[in] useDefaultUniforms Whether to use default uniforms or not.
    * @return The shader created by given vertex and fragment shader code.
    */
-  Shader GenerateAndSaveShader(ShaderType type, std::string_view vertexShader, std::string_view fragmentShader);
+  Shader GenerateAndSaveShader(ShaderType type, std::string_view vertexShader, std::string_view fragmentShader, bool useDefaultUniforms = false);
 
   /*
    * Greate the quad geometry.
@@ -269,7 +272,7 @@ public:
    *                            If true, we don't need to create new renderer when broken image is single image.
    *                            Most of user experience use normal images. So It can reduce runtime.
    */
-  void UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size, const bool rendererIsImage = true);
+  void UpdateBrokenImageRenderer(VisualRenderer& renderer, const Vector2& size, const bool rendererIsImage = true);
 
   /**
    * @brief Get whether we support YUV Planes load or not.
@@ -308,6 +311,12 @@ public:
    * @return A reference to the vector animation manager.
    */
   VectorAnimationManager& GetVectorAnimationManager();
+
+  /**
+   * @brief Get the default uniform block. This is used to share common uniforms between different visuals.
+   * @return The uniform block with default value registered.
+   */
+  Dali::UniformBlock& GetDefaultUniformBlock();
 
   /**
    * @brief Finalize vector animation manager.
@@ -402,6 +411,7 @@ private:
 
   Geometry mGeometry[GEOMETRY_TYPE_MAX];
   Shader   mShader[SHADER_TYPE_MAX];
+  Shader   mDefaultShader[SHADER_TYPE_MAX];
 
   bool mLoadYuvPlanes; ///< A global flag to specify if the image should be loaded as yuv planes
 
@@ -409,6 +419,8 @@ private:
   TextureManager       mTextureManager;
   NPatchLoader         mNPatchLoader;
   SvgLoader            mSvgLoader;
+
+  Dali::UniformBlock mDefaultUniformBlock;
 
   std::unique_ptr<VectorAnimationManager> mVectorAnimationManager;
   bool                                    mPreMultiplyOnLoad;

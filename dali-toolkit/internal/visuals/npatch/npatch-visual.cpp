@@ -274,7 +274,19 @@ void NPatchVisual::OnSetTransform()
 {
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
-    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+
+    // TODO : We many need to less call it.
+    UpdateShader();
+  }
+}
+
+void NPatchVisual::UpdateShader()
+{
+  if(mImpl->mRenderer)
+  {
+    Shader shader = CreateShader();
+    mImpl->mRenderer.SetShader(shader);
   }
 }
 
@@ -371,7 +383,7 @@ void NPatchVisual::OnInitialize()
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   //Register transform properties
-  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 Geometry NPatchVisual::CreateGeometry()
@@ -455,10 +467,10 @@ Shader NPatchVisual::CreateShader()
     if(DALI_LIKELY((xStretchCount == 1 && yStretchCount == 1) ||
                    (xStretchCount == 0 && yStretchCount == 0)))
     {
-      shader = mFactoryCache.GetShader(shaderType);
+      shader = mFactoryCache.GetShader(shaderType, mImpl->mTransformMapUsingDefault);
       if(DALI_UNLIKELY(!shader))
       {
-        shader = mFactoryCache.GenerateAndSaveShader(shaderType, SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, fragmentShader);
+        shader = mFactoryCache.GenerateAndSaveShader(shaderType, SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, fragmentShader, mImpl->mTransformMapUsingDefault);
       }
     }
     else if(xStretchCount > 0 || yStretchCount > 0)
@@ -472,6 +484,11 @@ Shader NPatchVisual::CreateShader()
                    << SHADER_NPATCH_VISUAL_SHADER_VERT;
 
       shader = Shader::New(vertexShader.str(), fragmentShader, Dali::Shader::Hint::NONE, shaderName.str());
+
+      if(DALI_LIKELY(mImpl->mRenderer))
+      {
+        mImpl->mRenderer.RegisterVisualTransformUniform();
+      }
     }
   }
   else
@@ -507,6 +524,11 @@ Shader NPatchVisual::CreateShader()
                    << SHADER_NPATCH_VISUAL_SHADER_VERT;
 
       shader = Shader::New(vertexShader.str(), fragmentShader, hints, shaderName.str());
+    }
+
+    if(DALI_LIKELY(mImpl->mRenderer))
+    {
+      mImpl->mRenderer.RegisterVisualTransformUniform();
     }
   }
 
@@ -555,7 +577,7 @@ void NPatchVisual::ApplyTextureAndUniforms()
   }
 
   // Register transform properties
-  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 Geometry NPatchVisual::GetNinePatchGeometry(VisualFactoryCache::GeometryType subType)

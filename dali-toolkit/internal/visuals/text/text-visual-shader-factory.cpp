@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,7 +167,7 @@ Shader TextVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, cons
 {
   Shader                         shader;
   VisualFactoryCache::ShaderType shaderType = featureBuilder.GetShaderType();
-  shader                                    = factoryCache.GetShader(shaderType);
+  shader                                    = factoryCache.GetShader(shaderType, false);
 
   if(!shader)
   {
@@ -179,7 +179,7 @@ Shader TextVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, cons
     std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_VERT.data());
     std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_FRAG.data());
 
-    shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
+    shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader, false);
   }
   return shader;
 }

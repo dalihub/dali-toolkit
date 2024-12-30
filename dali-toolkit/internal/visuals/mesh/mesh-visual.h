@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_MESH_VISUAL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,14 +99,19 @@ protected:
   void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
+   * @copydoc Visual::Base::DoSetOnScene
+   */
+  void DoSetOnScene(Actor& actor) override;
+
+  /**
    * @copydoc Visual::Base::OnSetTransform
    */
   void OnSetTransform() override;
 
   /**
-   * @copydoc Visual::Base::DoSetOnScene
+   * @copydoc Visual::Base::UpdateShader
    */
-  void DoSetOnScene(Actor& actor) override;
+  void UpdateShader() override;
 
 private:
   /**

@@ -116,6 +116,11 @@ void SvgVisual::OnInitialize()
   mImpl->mRenderer  = DecoratedVisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
+  if(mImpl->mCustomShader)
+  {
+    mImpl->mRenderer.RegisterVisualTransformUniform();
+  }
+
   Vector2 dpi     = Stage::GetCurrent().GetDpi();
   float   meanDpi = (dpi.height + dpi.width) * 0.5f;
 
@@ -214,7 +219,7 @@ void SvgVisual::DoSetOnScene(Actor& actor)
   mImpl->mRenderer.SetTextures(textureSet);
 
   // Register transform properties
-  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 
   // Defer the rasterisation task until we get given a size (by Size Negotiation algorithm)
 
@@ -491,7 +496,10 @@ void SvgVisual::OnSetTransform()
 {
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
-    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+
+    // TODO : We many need to less call it.
+    UpdateShader();
   }
 
   if(IsOnScene() && !mLoadFailed)
@@ -539,7 +547,8 @@ Shader SvgVisual::GenerateShader() const
       ImageVisualShaderFeature::FeatureBuilder()
         .EnableTextureAtlas(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED)
         .EnableRoundedCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
-        .EnableBorderline(IsBorderlineRequired()));
+        .EnableBorderline(IsBorderlineRequired())
+        .UseDefaultTransform(mImpl->mTransformMapUsingDefault));
   }
   else
   {
@@ -552,6 +561,11 @@ Shader SvgVisual::GenerateShader() const
     // Most of image visual shader user (like svg, animated vector image visual) use pre-multiplied alpha.
     // If the visual dont want to using pre-multiplied alpha, it should be set as 0.0f as renderer side.
     shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
+
+    if(mImpl->mRenderer)
+    {
+      mImpl->mRenderer.RegisterVisualTransformUniform();
+    }
   }
   return shader;
 }

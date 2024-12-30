@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/shader-integ.h>
 #include <dali/public-api/math/math-utils.h>
 
 // INTERNAL INCLUDES
@@ -89,15 +90,28 @@ void VisualFactoryCache::SaveGeometry(GeometryType type, Geometry geometry)
   mGeometry[type] = geometry;
 }
 
-Shader VisualFactoryCache::GetShader(ShaderType type)
+Shader VisualFactoryCache::GetShader(ShaderType type, bool useDefaultUniforms)
 {
+  if(useDefaultUniforms)
+  {
+    return mDefaultShader[type];
+  }
   return mShader[type];
 }
 
-Shader VisualFactoryCache::GenerateAndSaveShader(ShaderType type, std::string_view vertexShader, std::string_view fragmentShader)
+Shader VisualFactoryCache::GenerateAndSaveShader(ShaderType type, std::string_view vertexShader, std::string_view fragmentShader, bool useDefaultUniforms)
 {
-  Shader shader = Shader::New(vertexShader, fragmentShader, Shader::Hint::NONE, Scripting::GetLinearEnumerationName<ShaderType>(type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
-  mShader[type] = shader;
+  Shader shader;
+  if(useDefaultUniforms)
+  {
+    shader               = Integration::ShaderNewWithUniformBlock(vertexShader, fragmentShader, Shader::Hint::NONE, Scripting::GetLinearEnumerationName<ShaderType>(type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT), {GetDefaultUniformBlock()});
+    mDefaultShader[type] = shader;
+  }
+  else
+  {
+    shader        = Shader::New(vertexShader, fragmentShader, Shader::Hint::NONE, Scripting::GetLinearEnumerationName<ShaderType>(type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+    mShader[type] = shader;
+  }
   return shader;
 }
 
@@ -162,6 +176,23 @@ VectorAnimationManager& VisualFactoryCache::GetVectorAnimationManager()
     mVectorAnimationManager = std::unique_ptr<VectorAnimationManager>(new VectorAnimationManager());
   }
   return *mVectorAnimationManager;
+}
+
+Dali::UniformBlock& VisualFactoryCache::GetDefaultUniformBlock()
+{
+  if(!mDefaultUniformBlock)
+  {
+    // We should make default uniform block as overwritable.
+    mDefaultUniformBlock = Dali::UniformBlock::New("VisualVertBlock");
+
+    mDefaultUniformBlock.RegisterUniqueProperty("offset", Vector2::ZERO);
+    mDefaultUniformBlock.RegisterUniqueProperty("size", Vector2::ONE);
+    mDefaultUniformBlock.RegisterUniqueProperty("offsetSizeMode", Vector4::ZERO);
+    mDefaultUniformBlock.RegisterUniqueProperty("origin", -Vector2(0.5f, 0.5f));     ///< TOP_BEGIN for LTR
+    mDefaultUniformBlock.RegisterUniqueProperty("anchorPoint", Vector2(0.5f, 0.5f)); ///< TOP_BEGIN for LTR
+    mDefaultUniformBlock.RegisterUniqueProperty("extraSize", Vector2::ZERO);
+  }
+  return mDefaultUniformBlock;
 }
 
 void VisualFactoryCache::FinalizeVectorAnimationManager()
@@ -343,11 +374,11 @@ Shader VisualFactoryCache::GetNPatchShader(int index)
 
   if(DALI_LIKELY((xStretchCount == 0 && yStretchCount == 0) || (xStretchCount == 1 && yStretchCount == 1)))
   {
-    shader = GetShader(VisualFactoryCache::NINE_PATCH_SHADER);
+    shader = GetShader(VisualFactoryCache::NINE_PATCH_SHADER, false);
     if(DALI_UNLIKELY(!shader))
     {
       // Only cache vanilla 9 patch shaders
-      shader = GenerateAndSaveShader(VisualFactoryCache::NINE_PATCH_SHADER, SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, SHADER_NPATCH_VISUAL_SHADER_FRAG);
+      shader = GenerateAndSaveShader(VisualFactoryCache::NINE_PATCH_SHADER, SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, SHADER_NPATCH_VISUAL_SHADER_FRAG, false);
     }
   }
   else if(xStretchCount > 0 || yStretchCount > 0)
@@ -377,7 +408,7 @@ void VisualFactoryCache::ApplyTextureAndUniforms(Renderer& renderer, int index)
   }
 }
 
-void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size, const bool rendererIsImage)
+void VisualFactoryCache::UpdateBrokenImageRenderer(VisualRenderer& renderer, const Vector2& size, const bool rendererIsImage)
 {
   bool useDefaultBrokenImage = false;
   if(mBrokenImageInfoContainer.size() == 0)
@@ -443,6 +474,7 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
     // Set geometry and shader for npatch
     Geometry geometry = GetNPatchGeometry(brokenIndex);
     Shader   shader   = GetNPatchShader(brokenIndex);
+    renderer.RegisterVisualTransformUniform();
     renderer.SetGeometry(geometry);
     renderer.SetShader(shader);
     ApplyTextureAndUniforms(renderer, brokenIndex);
@@ -453,13 +485,14 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
     if(!rendererIsImage)
     {
       Geometry geometry = GetGeometry(QUAD_GEOMETRY);
-      Shader   shader   = GetShader(IMAGE_SHADER);
+      Shader   shader   = GetShader(IMAGE_SHADER, false);
       if(!shader)
       {
-        shader = GenerateAndSaveShader(IMAGE_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_FRAG.data());
+        shader = GenerateAndSaveShader(IMAGE_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_FRAG.data(), false);
         shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
         shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
       }
+      renderer.RegisterVisualTransformUniform();
       renderer.SetGeometry(geometry);
       renderer.SetShader(shader);
     }

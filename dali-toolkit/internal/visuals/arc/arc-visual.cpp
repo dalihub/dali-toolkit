@@ -189,7 +189,7 @@ void ArcVisual::OnSetTransform()
 
     if(mImpl->mTransformMapChanged)
     {
-      mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+      mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
     }
   }
 }
@@ -201,18 +201,18 @@ void ArcVisual::OnInitialize()
   Shader shader;
   if(mCapType == DevelArcVisual::Cap::BUTT)
   {
-    shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER);
+    shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER, mImpl->mTransformMapUsingDefault);
     if(!shader)
     {
-      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_BUTT_CAP_SHADER_FRAG.data());
+      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_BUTT_CAP_SHADER_FRAG.data(), mImpl->mTransformMapUsingDefault);
     }
   }
   else
   {
-    shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER);
+    shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER, mImpl->mTransformMapUsingDefault);
     if(!shader)
     {
-      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_ROUND_CAP_SHADER_FRAG.data());
+      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_ROUND_CAP_SHADER_FRAG.data(), mImpl->mTransformMapUsingDefault);
     }
   }
 
@@ -228,7 +228,7 @@ void ArcVisual::OnInitialize()
   mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
 
   // Register transform properties
-  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 } // namespace Internal
