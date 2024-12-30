@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -391,6 +391,13 @@ public:
    * @note Every effect inherits RenderEffect.
    */
   void SetRenderEffect(Toolkit::RenderEffect effect);
+
+  /*
+   * @brief Retrieves control's render effect
+   * @SINCE_2_4.1
+   * @return RenderEffect set on this control
+   */
+  Toolkit::RenderEffect GetRenderEffect() const;
 
   /**
    * @brief Clears RenderEffect of this control, if exists.

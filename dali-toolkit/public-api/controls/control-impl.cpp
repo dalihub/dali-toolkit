@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -170,34 +170,38 @@ void Control::ClearBackground()
 
 void Control::SetRenderEffect(Toolkit::RenderEffect effect)
 {
-  if(mImpl->mRenderEffect != effect)
+  if(effect)
   {
+    Internal::RenderEffectImpl* object = dynamic_cast<Internal::RenderEffectImpl*>(effect.GetObjectPtr());
+    DALI_ASSERT_ALWAYS(object && "Not a valid RenderEffect set.");
+
     ClearRenderEffect();
-    mImpl->mRenderEffect = effect;
 
-    if(effect)
-    {
-      Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(mImpl->mRenderEffect.GetObjectPtr());
-      DALI_ASSERT_ALWAYS(object && "Not a valid RenderEffect set.");
+    RenderEffectImplPtr clone = object->Clone();
 
-      SetOffScreenRenderableType(object->GetOffScreenRenderableType());
+    SetOffScreenRenderableType(clone->GetOffScreenRenderableType());
 
-      Dali::Toolkit::Control ownerControl(GetOwner());
-      object->SetOwnerControl(ownerControl);
-    }
+    Dali::Toolkit::Control ownerControl(GetOwner());
+    clone->SetOwnerControl(ownerControl);
+
+    mImpl->mRenderEffect = clone;
   }
+  else
+  {
+    mImpl->mRenderEffect.Reset();
+  }
+}
+
+RenderEffect Control::GetRenderEffect() const
+{
+  return RenderEffect(mImpl->mRenderEffect.Get());
 }
 
 void Control::ClearRenderEffect()
 {
   if(mImpl->mRenderEffect)
   {
-    Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(mImpl->mRenderEffect.GetObjectPtr());
-
-    if(object)
-    {
-      object->ClearOwnerControl();
-    }
+    mImpl->mRenderEffect.Get()->ClearOwnerControl();
     mImpl->mRenderEffect.Reset();
   }
   SetOffScreenRenderableType(OffScreenRenderable::NONE);
@@ -653,12 +657,7 @@ void Control::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool
 {
   if(mImpl->mRenderEffect)
   {
-    Toolkit::Internal::RenderEffectImpl* object = dynamic_cast<Toolkit::Internal::RenderEffectImpl*>(mImpl->mRenderEffect.GetObjectPtr());
-
-    if(object)
-    {
-      object->GetOffScreenRenderTasks(tasks, isForward);
-    }
+    mImpl->mRenderEffect->GetOffScreenRenderTasks(tasks, isForward);
   }
 }
 

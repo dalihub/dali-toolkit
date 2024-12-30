@@ -390,6 +390,7 @@ Control::Impl::Impl(Control& controlImpl)
   mCounterClockwiseFocusableActorId(-1),
   mStyleName(""),
   mBackgroundColor(Color::TRANSPARENT),
+  mRenderEffect(nullptr),
   mStartingPinchScale(nullptr),
   mMargin(0, 0, 0, 0),
   mPadding(0, 0, 0, 0),
