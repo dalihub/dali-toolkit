@@ -32,12 +32,14 @@ namespace Internal
 {
 namespace
 {
-const uint32_t                   DEFAULT_ATLAS_WIDTH(512u);
-const uint32_t                   DEFAULT_ATLAS_HEIGHT(512u);
-const uint32_t                   DEFAULT_BLOCK_WIDTH(16u);
-const uint32_t                   DEFAULT_BLOCK_HEIGHT(16u);
-const uint32_t                   SINGLE_PIXEL_PADDING(1u);
-const uint32_t                   DOUBLE_PIXEL_PADDING(SINGLE_PIXEL_PADDING << 1);
+constexpr uint32_t DEFAULT_ATLAS_WIDTH(512u);
+constexpr uint32_t DEFAULT_ATLAS_HEIGHT(512u);
+constexpr uint32_t DEFAULT_BLOCK_WIDTH(16u);
+constexpr uint32_t DEFAULT_BLOCK_HEIGHT(16u);
+constexpr uint32_t SINGLE_PIXEL_PADDING(1u);
+constexpr uint32_t DOUBLE_PIXEL_PADDING(SINGLE_PIXEL_PADDING << 1);
+constexpr uint32_t TRIPLE_PIXEL_PADDING(DOUBLE_PIXEL_PADDING + SINGLE_PIXEL_PADDING);
+
 Toolkit::AtlasManager::AtlasSize EMPTY_SIZE;
 
 bool IsBlockSizeSufficient(uint32_t width, uint32_t height, uint32_t requiredBlockWidth, uint32_t requiredBlockHeight)
@@ -269,45 +271,70 @@ void AtlasManager::UploadImage(const PixelData&           image,
 
   SizeType blockX       = desc.mBlock % atlasWidthInBlocks;
   SizeType blockY       = desc.mBlock / atlasWidthInBlocks;
-  SizeType blockOffsetX = (blockX * atlasBlockWidth) + 1u;
-  SizeType blockOffsetY = (blockY * atlasBlockHeight) + 1u;
+  SizeType blockOffsetX = (blockX * atlasBlockWidth);
+  SizeType blockOffsetY = (blockY * atlasBlockHeight);
 
   SizeType width  = image.GetWidth();
   SizeType height = image.GetHeight();
 
-  // Blit image 1 pixel to the right and down into the block to compensate for texture filtering
-  if(!mAtlasList[atlas].mAtlas.Upload(image, 0u, 0u, blockOffsetX + SINGLE_PIXEL_PADDING, blockOffsetY + SINGLE_PIXEL_PADDING, width, height))
+  // Blit image 2 pixel to the right and down into the block to compensate for texture filtering
+  if(!mAtlasList[atlas].mAtlas.Upload(image, 0u, 0u, blockOffsetX + DOUBLE_PIXEL_PADDING, blockOffsetY + DOUBLE_PIXEL_PADDING, width, height))
   {
     DALI_LOG_ERROR("Uploading image to Atlas Failed!.\n");
   }
 
-  // Blit top strip
-  if(!mAtlasList[atlas].mAtlas.Upload(mAtlasList[atlas].mHorizontalStrip, 0u, 0u, blockOffsetX, blockOffsetY, mAtlasList[atlas].mHorizontalStrip.GetWidth(), mAtlasList[atlas].mHorizontalStrip.GetHeight()))
+  // Blit top 2 strip (Note that we should not blit the first row since 0,0 pixel is special color for underline and strikethrough)
+  if(mAtlasList[atlas].mHorizontalStrip.GetWidth() > SINGLE_PIXEL_PADDING)
+  {
+    if(!mAtlasList[atlas].mAtlas.Upload(mAtlasList[atlas].mHorizontalStrip, 0u, 0u, blockOffsetX + SINGLE_PIXEL_PADDING, blockOffsetY, mAtlasList[atlas].mHorizontalStrip.GetWidth() - SINGLE_PIXEL_PADDING, mAtlasList[atlas].mHorizontalStrip.GetHeight()))
+    {
+      DALI_LOG_ERROR("Uploading top strip to Atlas Failed!\n");
+    }
+  }
+  if(!mAtlasList[atlas].mAtlas.Upload(mAtlasList[atlas].mHorizontalStrip, 0u, 0u, blockOffsetX, blockOffsetY + SINGLE_PIXEL_PADDING, mAtlasList[atlas].mHorizontalStrip.GetWidth(), mAtlasList[atlas].mHorizontalStrip.GetHeight()))
   {
     DALI_LOG_ERROR("Uploading top strip to Atlas Failed!\n");
   }
 
-  // Blit left strip
-  if(!mAtlasList[atlas].mAtlas.Upload(mAtlasList[atlas].mVerticalStrip, 0u, 0u, blockOffsetX, blockOffsetY + SINGLE_PIXEL_PADDING, mAtlasList[atlas].mVerticalStrip.GetWidth(), mAtlasList[atlas].mVerticalStrip.GetHeight()))
+  // Blit left 2 strip
+  if(!mAtlasList[atlas].mAtlas.Upload(mAtlasList[atlas].mVerticalStrip, 0u, 0u, blockOffsetX, blockOffsetY + DOUBLE_PIXEL_PADDING, mAtlasList[atlas].mVerticalStrip.GetWidth(), mAtlasList[atlas].mVerticalStrip.GetHeight()))
+  {
+    DALI_LOG_ERROR("Uploading left strip to Atlas Failed!\n");
+  }
+  if(!mAtlasList[atlas].mAtlas.Upload(mAtlasList[atlas].mVerticalStrip, 0u, 0u, blockOffsetX + SINGLE_PIXEL_PADDING, blockOffsetY + DOUBLE_PIXEL_PADDING, mAtlasList[atlas].mVerticalStrip.GetWidth(), mAtlasList[atlas].mVerticalStrip.GetHeight()))
   {
     DALI_LOG_ERROR("Uploading left strip to Atlas Failed!\n");
   }
 
-  // Blit bottom strip
-  if(blockOffsetY + height + DOUBLE_PIXEL_PADDING <= mAtlasList[atlas].mSize.mHeight)
+  // Blit bottom 2 strip
+  if(blockOffsetY + height + DOUBLE_PIXEL_PADDING < mAtlasList[atlas].mSize.mHeight)
   {
-    if(!mAtlasList[atlas].mAtlas.Upload(mAtlasList[atlas].mHorizontalStrip, 0u, 0u, blockOffsetX, blockOffsetY + height + SINGLE_PIXEL_PADDING, mAtlasList[atlas].mHorizontalStrip.GetWidth(), mAtlasList[atlas].mHorizontalStrip.GetHeight()))
+    if(!mAtlasList[atlas].mAtlas.Upload(mAtlasList[atlas].mHorizontalStrip, 0u, 0u, blockOffsetX, blockOffsetY + height + DOUBLE_PIXEL_PADDING, mAtlasList[atlas].mHorizontalStrip.GetWidth(), mAtlasList[atlas].mHorizontalStrip.GetHeight()))
     {
       DALI_LOG_ERROR("Uploading bottom strip to Atlas Failed!.\n");
     }
+    if(blockOffsetY + height + TRIPLE_PIXEL_PADDING < mAtlasList[atlas].mSize.mHeight)
+    {
+      if(!mAtlasList[atlas].mAtlas.Upload(mAtlasList[atlas].mHorizontalStrip, 0u, 0u, blockOffsetX, blockOffsetY + height + TRIPLE_PIXEL_PADDING, mAtlasList[atlas].mHorizontalStrip.GetWidth(), mAtlasList[atlas].mHorizontalStrip.GetHeight()))
+      {
+        DALI_LOG_ERROR("Uploading bottom strip to Atlas Failed!.\n");
+      }
+    }
   }
 
-  // Blit right strip
-  if(blockOffsetX + width + DOUBLE_PIXEL_PADDING <= mAtlasList[atlas].mSize.mWidth)
+  // Blit right 2 strip
+  if(blockOffsetX + width + DOUBLE_PIXEL_PADDING < mAtlasList[atlas].mSize.mWidth)
   {
-    if(!mAtlasList[atlas].mAtlas.Upload(mAtlasList[atlas].mVerticalStrip, 0u, 0u, blockOffsetX + width + SINGLE_PIXEL_PADDING, blockOffsetY + SINGLE_PIXEL_PADDING, mAtlasList[atlas].mVerticalStrip.GetWidth(), mAtlasList[atlas].mVerticalStrip.GetHeight()))
+    if(!mAtlasList[atlas].mAtlas.Upload(mAtlasList[atlas].mVerticalStrip, 0u, 0u, blockOffsetX + width + DOUBLE_PIXEL_PADDING, blockOffsetY + DOUBLE_PIXEL_PADDING, mAtlasList[atlas].mVerticalStrip.GetWidth(), mAtlasList[atlas].mVerticalStrip.GetHeight()))
     {
       DALI_LOG_ERROR("Uploading right strip to Atlas Failed!.\n");
+    }
+    if(blockOffsetX + width + TRIPLE_PIXEL_PADDING < mAtlasList[atlas].mSize.mWidth)
+    {
+      if(!mAtlasList[atlas].mAtlas.Upload(mAtlasList[atlas].mVerticalStrip, 0u, 0u, blockOffsetX + width + TRIPLE_PIXEL_PADDING, blockOffsetY + DOUBLE_PIXEL_PADDING, mAtlasList[atlas].mVerticalStrip.GetWidth(), mAtlasList[atlas].mVerticalStrip.GetHeight()))
+      {
+        DALI_LOG_ERROR("Uploading right strip to Atlas Failed!.\n");
+      }
     }
   }
 }
