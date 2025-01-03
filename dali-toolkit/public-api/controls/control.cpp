@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,6 +118,11 @@ void Control::ClearBackground()
 void Control::SetRenderEffect(Toolkit::RenderEffect effect)
 {
   Internal::GetImplementation(*this).SetRenderEffect(effect);
+}
+
+Toolkit::RenderEffect Control::GetRenderEffect() const
+{
+  return Internal::GetImplementation(*this).GetRenderEffect();
 }
 
 void Control::ClearRenderEffect()

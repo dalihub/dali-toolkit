@@ -28,9 +28,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/render-effects/offscreen-rendering-context.h>
+#include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/render-effects/render-effect.h>
 #include <dali/integration-api/debug.h>
 #include <map>
 #include <memory>
@@ -479,7 +479,7 @@ public:
 
   std::string                               mStyleName;
   Vector4                                   mBackgroundColor;    ///< The color of the background visual
-  RenderEffect                              mRenderEffect;       ///< The render effect on this control
+  RenderEffectImplPtr                       mRenderEffect;       ///< The render effect on this control
   Vector3*                                  mStartingPinchScale; ///< The scale when a pinch gesture starts, TODO: consider removing this
   Extents                                   mMargin;             ///< The margin values
   Extents                                   mPadding;            ///< The padding values

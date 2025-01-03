@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ const char* TEST_GLTF_FILE_NAME = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
  * These textures are based off version of Wave engine sample
  * Take from https://github.com/WaveEngine/Samples
  *
- * Copyright (c) 2024 Wave Coorporation
+ * Copyright (c) 2025 Wave Coorporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -1671,7 +1671,7 @@ int UtcDaliSceneViewRenderTaskOrdering(void)
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control1.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
-  control1.SetRenderEffect(BackgroundBlurEffect::New());
+  control1.SetRenderEffect(RenderEffect::CreateBackgroundBlurEffect());
 
   sceneView.Add(control1);
 

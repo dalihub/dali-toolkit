@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,13 +62,19 @@ public:
     return handle;
   }
 
+  RenderEffectImplPtr Clone() const override
+  {
+    return New();
+  }
+
   OffScreenRenderable::Type GetOffScreenRenderableType() override
   {
     return OffScreenRenderable::Type::NONE;
   }
 
   void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
-  {}
+  {
+  }
 
 protected:
   TestRenderEffectImpl()
@@ -148,11 +154,12 @@ int UtcDaliInternalRenderEffectGetOwnerControl01(void)
   Toolkit::TestRenderEffect testEffect = Toolkit::TestRenderEffect::New();
   DALI_TEST_CHECK(testEffect);
 
-  // Check that effect is not activate yet.
-  Toolkit::Internal::TestRenderEffectImpl& impl = Toolkit::Internal::GetImplementation(testEffect);
-  DALI_TEST_EQUALS(impl.IsActivated(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.mOnActivated, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
+  // Check that effect prototype is not activated.
+  Toolkit::Internal::TestRenderEffectImpl& prototype = Toolkit::Internal::GetImplementation(testEffect);
+  DALI_TEST_EQUALS(prototype.IsActivated(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(prototype.mOnActivated, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(prototype.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
+
   {
     ToolkitTestApplication application;
 
@@ -166,33 +173,50 @@ int UtcDaliInternalRenderEffectGetOwnerControl01(void)
     tet_printf("Test effect set, and activate due to control scene on.\n");
     control.SetRenderEffect(testEffect);
 
-    DALI_TEST_EQUALS(impl.IsActivated(), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(impl.mOnActivated, true, TEST_LOCATION);
-    DALI_TEST_EQUALS(impl.GetOwnerControl(), control, TEST_LOCATION);
+    Toolkit::Internal::TestRenderEffectImplPtr impl =
+      dynamic_cast<Toolkit::Internal::TestRenderEffectImpl*>(control.GetRenderEffect().GetObjectPtr());
+
+    { // Check that effect prototype is not activated,
+      DALI_TEST_EQUALS(impl == &prototype, false, TEST_LOCATION);
+
+      DALI_TEST_EQUALS(prototype.IsActivated(), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(prototype.mOnActivated, false, TEST_LOCATION);
+      DALI_TEST_EQUALS(prototype.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
+
+      // but the effect is set and activated.
+      DALI_TEST_EQUALS(impl->IsActivated(), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(impl->mOnActivated, true, TEST_LOCATION);
+      DALI_TEST_EQUALS(impl->GetOwnerControl(), control, TEST_LOCATION);
+    }
 
     control.Unparent();
 
-    DALI_TEST_EQUALS(impl.IsActivated(), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(impl.mOnActivated, false, TEST_LOCATION);
-    DALI_TEST_EQUALS(impl.GetOwnerControl(), control, TEST_LOCATION);
+    {
+      DALI_TEST_EQUALS(impl->IsActivated(), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(impl->mOnActivated, false, TEST_LOCATION);
+      DALI_TEST_EQUALS(impl->GetOwnerControl(), control, TEST_LOCATION);
+    }
 
     scene.Add(control);
 
-    DALI_TEST_EQUALS(impl.IsActivated(), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(impl.mOnActivated, true, TEST_LOCATION);
-    DALI_TEST_EQUALS(impl.GetOwnerControl(), control, TEST_LOCATION);
+    {
+      DALI_TEST_EQUALS(impl->IsActivated(), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(impl->mOnActivated, true, TEST_LOCATION);
+      DALI_TEST_EQUALS(impl->GetOwnerControl(), control, TEST_LOCATION);
+    }
 
     // Control released.
-
     control.Unparent();
     control.Reset();
 
     tet_printf("Test effect owner control is empty after control destructed.\n");
     DALI_TEST_CHECK(testEffect);
 
-    DALI_TEST_EQUALS(impl.IsActivated(), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(impl.mOnActivated, false, TEST_LOCATION);
-    DALI_TEST_EQUALS(impl.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
+    {
+      DALI_TEST_EQUALS(impl->IsActivated(), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(impl->mOnActivated, false, TEST_LOCATION);
+      DALI_TEST_EQUALS(impl->GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
+    }
 
     control = Control::New();
     control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -202,19 +226,21 @@ int UtcDaliInternalRenderEffectGetOwnerControl01(void)
     tet_printf("Test effect set again.\n");
     control.SetRenderEffect(testEffect);
 
-    DALI_TEST_EQUALS(impl.IsActivated(), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(impl.mOnActivated, true, TEST_LOCATION);
-    DALI_TEST_EQUALS(impl.GetOwnerControl(), control, TEST_LOCATION);
+    Toolkit::Internal::TestRenderEffectImplPtr impl2 =
+      dynamic_cast<Toolkit::Internal::TestRenderEffectImpl*>(control.GetRenderEffect().GetObjectPtr());
+    {
+      DALI_TEST_EQUALS(impl == impl2, false, TEST_LOCATION);
 
+      DALI_TEST_EQUALS(impl->IsActivated(), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(impl->mOnActivated, false, TEST_LOCATION);
+      DALI_TEST_EQUALS(impl->GetOwnerControl(), Toolkit::Control(), TEST_LOCATION); // may be false?
+
+      DALI_TEST_EQUALS(impl2->IsActivated(), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(impl2->mOnActivated, true, TEST_LOCATION);
+      DALI_TEST_EQUALS(impl2->GetOwnerControl(), control, TEST_LOCATION);
+    }
     // Terminate application.
   }
-
-  tet_printf("Test effect owner control is empty and deactivated after application destructed.\n");
-  DALI_TEST_CHECK(testEffect);
-
-  DALI_TEST_EQUALS(impl.IsActivated(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.mOnActivated, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -240,52 +266,73 @@ int UtcDaliInternalRenderEffectGetOwnerControl02(void)
   DALI_TEST_CHECK(testEffect);
 
   // Check that effect is not activate yet.
-  Toolkit::Internal::TestRenderEffectImpl& impl = Toolkit::Internal::GetImplementation(testEffect);
-  DALI_TEST_EQUALS(impl.IsActivated(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.mOnActivated, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
+  Toolkit::Internal::TestRenderEffectImpl& prototype = Toolkit::Internal::GetImplementation(testEffect);
+  DALI_TEST_EQUALS(prototype.IsActivated(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(prototype.mOnActivated, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(prototype.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
 
   tet_printf("Test effect set, and activate due to control scene on.\n");
   control1.SetRenderEffect(testEffect);
 
-  DALI_TEST_EQUALS(impl.IsActivated(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.mOnActivated, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.GetOwnerControl(), control1, TEST_LOCATION);
+  Toolkit::Internal::TestRenderEffectImpl& impl1 =
+    *(dynamic_cast<Toolkit::Internal::TestRenderEffectImpl*>(control1.GetRenderEffect().GetObjectPtr()));
+
+  DALI_TEST_EQUALS(&prototype == &impl1, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(prototype.IsActivated(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(prototype.mOnActivated, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(prototype.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(impl1.IsActivated(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl1.mOnActivated, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl1.GetOwnerControl(), control1, TEST_LOCATION);
 
   tet_printf("Test effect set to another control\n");
   control2.SetRenderEffect(testEffect);
 
-  DALI_TEST_EQUALS(impl.IsActivated(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.mOnActivated, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.GetOwnerControl(), control2, TEST_LOCATION);
+  Toolkit::Internal::TestRenderEffectImpl& impl2 =
+    *(dynamic_cast<Toolkit::Internal::TestRenderEffectImpl*>(control2.GetRenderEffect().GetObjectPtr()));
+  DALI_TEST_EQUALS(&impl1 == &impl2, false, TEST_LOCATION);
 
-  tet_printf("Test control1 call ClearRenderEffect don't have any effort to effect\n");
+  DALI_TEST_EQUALS(impl2.IsActivated(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl2.mOnActivated, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl2.GetOwnerControl(), control2, TEST_LOCATION);
+
+  tet_printf("Test control1 call ClearRenderEffect don't have any effort to control2's effect\n");
   control1.ClearRenderEffect();
 
-  DALI_TEST_EQUALS(impl.IsActivated(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.mOnActivated, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.GetOwnerControl(), control2, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl1.IsActivated(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl1.mOnActivated, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl1.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(impl2.IsActivated(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl2.mOnActivated, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl2.GetOwnerControl(), control2, TEST_LOCATION);
 
   tet_printf("Test control2 call ClearRenderEffect\n");
   control2.ClearRenderEffect();
 
-  DALI_TEST_EQUALS(impl.IsActivated(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.mOnActivated, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
+  DALI_TEST_EQUALS(impl2.IsActivated(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl2.mOnActivated, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl2.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
 
   tet_printf("Reset control1 effect\n");
   control1.SetRenderEffect(testEffect);
 
-  DALI_TEST_EQUALS(impl.IsActivated(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.mOnActivated, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.GetOwnerControl(), control1, TEST_LOCATION);
+  Toolkit::Internal::TestRenderEffectImpl& impl3 =
+    *(dynamic_cast<Toolkit::Internal::TestRenderEffectImpl*>(control1.GetRenderEffect().GetObjectPtr()));
+
+  DALI_TEST_EQUALS(&impl1 == &impl3, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl1.IsActivated(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl1.mOnActivated, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl1.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(impl3.IsActivated(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl3.mOnActivated, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl3.GetOwnerControl(), control1, TEST_LOCATION);
 
   tet_printf("Test control1 call SetRenderEffect with empty handle\n");
   control1.SetRenderEffect(Toolkit::RenderEffect());
-
-  DALI_TEST_EQUALS(impl.IsActivated(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.mOnActivated, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(impl.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
+  DALI_TEST_CHECK(!control1.GetRenderEffect());
 
   END_TEST;
 }
