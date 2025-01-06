@@ -183,7 +183,6 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       {
         impl.mController->SetDefaultColor(textColor);
         impl.mController->SetInputColor(textColor);
-        impl.mRenderer.Reset();
       }
       break;
     }
@@ -195,7 +194,6 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       if(impl.mController->GetPlaceholderTextColor() != textColor)
       {
         impl.mController->SetPlaceholderTextColor(textColor);
-        impl.mRenderer.Reset();
       }
       break;
     }
