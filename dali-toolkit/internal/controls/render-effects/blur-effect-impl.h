@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BLUR_EFFECT_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
-#include <dali-toolkit/public-api/controls/render-effects/background-blur-effect.h>
 
 namespace Dali
 {
@@ -68,6 +67,11 @@ public:
    * @return A handle to a newly allocated Dali resource
    */
   static BlurEffectImplPtr New(float downscaleFactor, uint32_t blurRadius, bool isBackground);
+
+  /**
+   * @copydoc Toolkit::Intenral::RenderEffectImpl::Clone
+   */
+  RenderEffectImplPtr Clone() const override;
 
   /**
    * @copydoc Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderableType
@@ -206,19 +210,6 @@ private:
   bool mIsBackground : 1;
 };
 } // namespace Internal
-
-inline Toolkit::Internal::BlurEffectImpl& GetImplementation(Toolkit::BackgroundBlurEffect& obj)
-{
-  BaseObject& handle = obj.GetBaseObject();
-  return static_cast<Toolkit::Internal::BlurEffectImpl&>(handle);
-}
-
-inline const Toolkit::Internal::BlurEffectImpl& GetImplementation(const Toolkit::BackgroundBlurEffect& obj)
-{
-  const BaseObject& handle = obj.GetBaseObject();
-  return static_cast<const Toolkit::Internal::BlurEffectImpl&>(handle);
-}
-
 } // namespace Toolkit
 } // namespace Dali
 

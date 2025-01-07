@@ -28,6 +28,8 @@ namespace Toolkit
 {
 namespace Internal
 {
+class TextureManager;
+
 class VisualUrl
 {
 public:
@@ -153,6 +155,34 @@ public:
    * @return the location part of the url without extension
    */
   std::string GetLocationWithoutExtension() const;
+
+  /**
+   * @brief Convert the location part of the url as single integer
+   *
+   * @param[out] integerLocation The result of conversion.
+   * @return True if the location can be converted to integer. Otherwise false.
+   */
+  bool GetLocationAsInteger(int32_t& integerLocation) const;
+
+  /**
+   * @brief Increase the external resource reference count.
+   * Only have effort if ProtocolType is TEXTURE or BUFFER.
+   * 
+   * @post DecreaseExternalResourceReference Should be called when the resource is no longer needed.
+   *
+   * @param[in] textureManager The texture manager who owns the external texture.
+   */
+  void IncreaseExternalResourceReference(TextureManager& textureManager) const;
+
+  /**
+   * @brief Decrease the external resource reference count.
+   * Only have effort if ProtocolType is TEXTURE or BUFFER.
+   *
+   * @pre IncreaseExternalResourceReference Should be called before calling this function.
+   *
+   * @param[in] textureManager The texture manager who owns the external texture.
+   */
+  void DecreaseExternalResourceReference(TextureManager& textureManager) const;
 
   /**
    * Helper to create a URL of type TEXTURE

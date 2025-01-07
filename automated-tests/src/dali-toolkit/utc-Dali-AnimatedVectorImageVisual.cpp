@@ -1759,6 +1759,7 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   application.Render();
 
   // Trigger count is 2 - load & render a frame
+  tet_printf("First upload. Check load + render\n");
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   propertyMap.Clear();
@@ -1772,8 +1773,9 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - animation finished
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - animation finished + force render request
+  tet_printf("Wait until animation finished. Check render finished + force render trigger\n");
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1792,8 +1794,9 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - animation finished
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - animation finished + force render request
+  tet_printf("Wait until animation finished again. Check render finished + force render trigger\n");
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   map = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
 
@@ -1826,6 +1829,8 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   application.SendNotification();
   application.Render();
 
+  // Trigger count is 1 - force render request due to pause
+  tet_printf("Check force render trigger due to pause action\n");
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map                    = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
@@ -1841,7 +1846,9 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - animation finished + force render request
+  tet_printf("Check animation stop + force render trigger\n");
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);

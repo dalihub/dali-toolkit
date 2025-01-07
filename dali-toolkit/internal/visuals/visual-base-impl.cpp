@@ -242,7 +242,19 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         Property::Map map;
         if(value.Get(map))
         {
-          mImpl->mTransform.SetPropertyMap(map);
+          if(DALI_UNLIKELY(mImpl->mRenderer))
+          {
+            // Unusual case. SetProperty called after OnInitialize().
+            // Assume that DoAction call UPDATE_PROPERTY.
+            mImpl->mTransform.UpdatePropertyMap(map);
+
+            // Set Renderer uniforms, and change logics for subclasses.
+            OnSetTransform();
+          }
+          else
+          {
+            mImpl->mTransform.SetPropertyMap(map);
+          }
         }
         break;
       }

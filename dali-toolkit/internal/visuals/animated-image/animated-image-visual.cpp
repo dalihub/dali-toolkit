@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <memory>
@@ -184,7 +185,14 @@ AnimatedImageVisualPtr AnimatedImageVisual::New(VisualFactoryCache& factoryCache
     ImageCache::UrlStore urlStore;
     urlStore.mTextureId = TextureManager::INVALID_TEXTURE_ID;
     urlStore.mUrl       = imageUrls[i].Get<std::string>();
-    visual->mImageUrls->push_back(urlStore);
+    if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+    {
+      // Increase reference count of External Resources :
+      // EncodedImageBuffer or ExternalTextures.
+      // Reference count will be decreased at destructor of the visual.
+      urlStore.mUrl.IncreaseExternalResourceReference(factoryCache.GetTextureManager());
+    }
+    visual->mImageUrls->push_back(std::move(urlStore));
   }
   visual->mFrameCount = imageUrls.Count();
   visual->SetProperties(properties);
@@ -220,7 +228,14 @@ void AnimatedImageVisual::InitializeAnimatedImage(const VisualUrl& imageUrl)
       ImageCache::UrlStore urlStore;
       urlStore.mTextureId = TextureManager::INVALID_TEXTURE_ID;
       urlStore.mUrl       = imageUrl;
-      mImageUrls->push_back(urlStore);
+      if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+      {
+        // Increase reference count of External Resources :
+        // EncodedImageBuffer or ExternalTextures.
+        // Reference count will be decreased at destructor of the visual.
+        urlStore.mUrl.IncreaseExternalResourceReference(mFactoryCache.GetTextureManager());
+      }
+      mImageUrls->push_back(std::move(urlStore));
     }
     mFrameCount = SINGLE_IMAGE_COUNT;
   }
@@ -243,6 +258,7 @@ void AnimatedImageVisual::CreateImageCache()
     uint16_t numUrls   = mImageUrls->size();
     uint16_t batchSize = std::max(std::min(mBatchSize, numUrls), MINIMUM_CACHESIZE);
     uint16_t cacheSize = std::max(std::min(std::max(batchSize, mCacheSize), numUrls), MINIMUM_CACHESIZE);
+
     if(cacheSize < numUrls)
     {
       mImageCache = new RollingImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, *mImageUrls, mMaskingData, *this, cacheSize, batchSize, mFrameDelay, IsPreMultipliedAlphaEnabled());
@@ -271,8 +287,8 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mAnimatedImageLoading(),
   mFrameIndexForJumpTo(0),
   mCurrentFrameIndex(FIRST_FRAME_INDEX),
-  mImageUrls(NULL),
-  mImageCache(NULL),
+  mImageUrls(nullptr),
+  mImageCache(nullptr),
   mCacheSize(2),
   mBatchSize(2),
   mFrameDelay(100),
@@ -306,6 +322,24 @@ AnimatedImageVisual::~AnimatedImageVisual()
     if(DALI_LIKELY(mImageCache))
     {
       mImageCache->ClearCache();
+    }
+  }
+
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+  {
+    TextureManager& textureManager = mFactoryCache.GetTextureManager();
+
+    if(mImageUrls != nullptr && !mImageUrls->empty())
+    {
+      for(const auto& urlStore : *mImageUrls)
+      {
+        urlStore.mUrl.DecreaseExternalResourceReference(textureManager);
+      }
+    }
+
+    if(mMaskingData)
+    {
+      mMaskingData->mAlphaMaskUrl.DecreaseExternalResourceReference(textureManager);
     }
   }
   delete mImageCache;
@@ -384,7 +418,7 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
   {
     map.Insert(Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl());
   }
-  if(mImageUrls != NULL && !mImageUrls->empty())
+  if(mImageUrls != nullptr && !mImageUrls->empty())
   {
     Property::Array urls;
     for(unsigned int i = 0; i < mImageUrls->size(); ++i)
@@ -783,6 +817,20 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
       {
         AllocateMaskData();
         mMaskingData->mAlphaMaskUrl = alphaUrl;
+        if(mMaskingData->mAlphaMaskUrl.IsValid())
+        {
+          if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+          {
+            // Increase reference count of External Resources :
+            // EncodedImageBuffer or ExternalTextures.
+            // Reference count will be decreased at destructor of the visual.
+            mMaskingData->mAlphaMaskUrl.IncreaseExternalResourceReference(mFactoryCache.GetTextureManager());
+          }
+          if(mMaskingData->mAlphaMaskUrl.GetProtocolType() == VisualUrl::TEXTURE)
+          {
+            mMaskingData->mPreappliedMasking = false;
+          }
+        }
       }
       break;
     }
@@ -815,7 +863,35 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
       if(value.Get(maskingType))
       {
         AllocateMaskData();
-        mMaskingData->mPreappliedMasking = Toolkit::DevelImageVisual::MaskingType::Type(maskingType) == Toolkit::DevelImageVisual::MaskingType::MASKING_ON_LOADING ? true : false;
+
+        bool externalTextureUsed = false;
+        if(mMaskingData->mAlphaMaskUrl.IsValid() && mMaskingData->mAlphaMaskUrl.GetProtocolType() == VisualUrl::TEXTURE)
+        {
+          externalTextureUsed = true;
+        }
+        else if(mImageUrls != nullptr && !mImageUrls->empty())
+        {
+          for(const auto& urlStore : *mImageUrls)
+          {
+            const auto& imageUrl = urlStore.mUrl;
+            if(imageUrl.IsValid() && imageUrl.GetProtocolType() == VisualUrl::TEXTURE)
+            {
+              externalTextureUsed = true;
+              break;
+            }
+          }
+        }
+
+        if(externalTextureUsed)
+        {
+          // For external textures, only gpu masking is available.
+          // Therefore, MASKING_TYPE is set to MASKING_ON_RENDERING forcelly.
+          mMaskingData->mPreappliedMasking = false;
+        }
+        else
+        {
+          mMaskingData->mPreappliedMasking = (Toolkit::DevelImageVisual::MaskingType::Type(maskingType) == Toolkit::DevelImageVisual::MaskingType::MASKING_ON_LOADING);
+        }
       }
       break;
     }
@@ -1032,16 +1108,16 @@ void AnimatedImageVisual::OnInitialize()
     mPixelAreaIndex = mImpl->mRenderer.RegisterUniqueProperty(Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME, mPixelArea);
   }
 
-  if(mMaskingData)
-  {
-    mImpl->mRenderer.RegisterUniqueProperty(Toolkit::ImageVisual::Property::CROP_TO_MASK, CROP_TO_MASK_NAME, static_cast<float>(mMaskingData->mCropToMask));
-  }
-
   // Enable PreMultipliedAlpha if it need.
   auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader
                              ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                              : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
   EnablePreMultipliedAlpha(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
+
+  if(mMaskingData)
+  {
+    mImpl->mRenderer.RegisterUniqueProperty(Toolkit::ImageVisual::Property::CROP_TO_MASK, CROP_TO_MASK_NAME, static_cast<float>(mMaskingData->mCropToMask));
+  }
 }
 
 void AnimatedImageVisual::StartFirstFrame(TextureSet& textureSet, uint32_t firstInterval)
@@ -1271,6 +1347,21 @@ void AnimatedImageVisual::AllocateMaskData()
   if(!mMaskingData)
   {
     mMaskingData.reset(new TextureManager::MaskingData());
+
+    // Note : If input url was TEXTURE protocol, it will fail to create AnimatedImageLoading.
+    // So it should be added at mImageUrls.
+    if(mImageUrls != nullptr && !mImageUrls->empty())
+    {
+      for(const auto& urlStore : *mImageUrls)
+      {
+        const auto& imageUrl = urlStore.mUrl;
+        if(imageUrl.IsValid() && imageUrl.GetProtocolType() == VisualUrl::TEXTURE)
+        {
+          mMaskingData->mPreappliedMasking = false;
+          break;
+        }
+      }
+    }
   }
 }
 

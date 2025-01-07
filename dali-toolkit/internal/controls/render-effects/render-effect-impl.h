@@ -1,8 +1,8 @@
-#ifndef DALI_TOOLKIT_INTERNAL_BACKGROUND_EFFECT_H
-#define DALI_TOOLKIT_INTERNAL_BACKGROUND_EFFECT_H
+#ifndef DALI_TOOLKIT_INTERNAL_RENDER_EFFECT_H
+#define DALI_TOOLKIT_INTERNAL_RENDER_EFFECT_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,12 @@ public:
    * @return True if effect is activated. False otherwise.
    */
   bool IsActivated() const;
+
+  /**
+   * @brief Clones current instance.
+   * @return Clone implementation
+   */
+  virtual RenderEffectImplPtr Clone() const = 0;
 
   /**
    * @brief Retrieves OffScreenRenderableType of this RenderEffect.
@@ -197,4 +203,4 @@ inline const Toolkit::Internal::RenderEffectImpl& GetImplementation(const Toolki
 
 } // namespace Toolkit
 } // namespace Dali
-#endif // DALI_TOOLKIT_INTERNAL_BACKGROUND_EFFECT_H
+#endif // DALI_TOOLKIT_INTERNAL_RENDER_EFFECT_H

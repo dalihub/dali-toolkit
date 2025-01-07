@@ -61,7 +61,6 @@
 
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
-#include <dali-toolkit/public-api/controls/render-effects/background-blur-effect.h>
 #include <dali-toolkit/public-api/controls/render-effects/render-effect.h>
 
 #include <dali-toolkit/public-api/text/text-enumerations.h>

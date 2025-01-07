@@ -232,13 +232,6 @@ public:
    */
   TextureSet GetTextureSet(const TextureManager::TextureId textureId);
 
-  /**
-   * @brief Returns the textureSet in texture manager.
-   * @param[in] textureInfo the information of the texture
-   * @return The textureSet in texture manager. These textures include YUV textures or images and masks.
-   */
-  TextureSet GetTextureSet(const TextureManager::TextureInfo& textureInfo);
-
 public:
   // API list that need to access TextureCacheManager.
 
@@ -622,6 +615,21 @@ private:
    * @param observer The observer wishing to remove.
    */
   void RemoveTextureObserver(TextureManager::TextureInfo& textureInfo, TextureUploadObserver* observer);
+
+private: // Internal methods
+  /**
+   * @brief Returns the textureSet in texture manager.
+   * @param[in] textureInfo the information of the texture
+   * @return The textureSet in texture manager. These textures include YUV textures or images and masks.
+   */
+  TextureSet GetTextureSetInternal(const TextureManager::TextureInfo& textureInfo);
+
+  /**
+   * @brief Update texture info from external texture info if url is external texture.
+   * @param[in,out] textureInfo the information of the texture
+   * @param[in,out] preMultiplyOnLoad True if the image color should be multiplied by it's alpha. Set to false if the image has no alpha channel
+   */
+  void UpdateExternalTextureInfo(TextureManager::TextureInfo& textureInfo, TextureManager::MultiplyOnLoad& preMultiplyOnLoad);
 
 public:
   /**

@@ -19,6 +19,7 @@
 #include <dali-toolkit/public-api/controls/render-effects/render-effect.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/render-effects/blur-effect-impl.h>
 #include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
 
 namespace Dali
@@ -35,6 +36,16 @@ RenderEffect::RenderEffect(Internal::RenderEffectImpl* renderEffectImpl)
 {
 }
 
-RenderEffect::~RenderEffect() = default;
+RenderEffect RenderEffect::CreateBackgroundBlurEffect()
+{
+  Internal::BlurEffectImplPtr internal = Internal::BlurEffectImpl::New(true);
+  return RenderEffect(internal.Get());
+}
+
+RenderEffect RenderEffect::CreateBackgroundBlurEffect(float downscaleFactor, uint32_t blurRadius)
+{
+  Internal::BlurEffectImplPtr internal = Internal::BlurEffectImpl::New(downscaleFactor, blurRadius, true);
+  return RenderEffect(internal.Get());
+}
 } // namespace Toolkit
 } // namespace Dali

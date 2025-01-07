@@ -309,12 +309,13 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
     }
   }
 
-  DALI_LOG_INFO(gLogFilter, Debug::Concise, "VisualFactory::CreateVisual( VisualType:%s %s%s)\n", Scripting::GetEnumerationName<Toolkit::DevelVisual::Type>(visualType, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT), (visualType == Toolkit::DevelVisual::IMAGE) ? "url:" : "", (visualType == Toolkit::DevelVisual::IMAGE) ? (([&]() {
-                  // Return URL if present in PropertyMap else return "not found message"
-                  Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
-                  return (imageURLValue) ? imageURLValue->Get<std::string>().c_str() : "url not found in PropertyMap";
-                })())
-                                                                                                                                                                                                                                                                                                                            : "");
+  DALI_LOG_INFO(gLogFilter, Debug::Concise, "VisualFactory::CreateVisual( VisualType:%s %s%s)\n", Scripting::GetEnumerationName<Toolkit::DevelVisual::Type>(visualType, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT), (visualType == Toolkit::DevelVisual::IMAGE) ? "url:" : "", ((visualType == Toolkit::DevelVisual::IMAGE) ? (([&]() {
+                                                                                                                                                                                                                                                                                  // Return URL if present in PropertyMap else return "not found message"
+                                                                                                                                                                                                                                                                                  Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
+                                                                                                                                                                                                                                                                                  return (imageURLValue) ? imageURLValue->Get<std::string>() : std::string("url not found in PropertyMap");
+                                                                                                                                                                                                                                                                                })())
+                                                                                                                                                                                                                                                                                                                             : std::string(""))
+                                                                                                                                                                                                                                                                                  .c_str());
 
   if(!visualPtr)
   {

@@ -709,7 +709,7 @@ void ControllerImplEventHandler::OnSelectAllEvent(Controller::Impl& impl)
   if(impl.mEventData)
   {
     EventData& eventData = *impl.mEventData;
-    if(eventData.mSelectionEnabled && eventData.mState != EventData::INACTIVE)
+    if(eventData.mSelectionEnabled && eventData.mState != EventData::INACTIVE && !eventData.mIsShowingPlaceholderText)
     {
       ModelPtr&      model          = impl.mModel;
       const Vector2& scrollPosition = model->mScrollPosition;
@@ -762,7 +762,7 @@ void ControllerImplEventHandler::OnSelectNoneEvent(Controller::Impl& impl)
 
 void ControllerImplEventHandler::OnSelectRangeEvent(Controller::Impl& impl, const Event& event)
 {
-  if(impl.mEventData && impl.mEventData->mSelectionEnabled && impl.mEventData->mState != EventData::INACTIVE)
+  if(impl.mEventData && impl.mEventData->mSelectionEnabled && impl.mEventData->mState != EventData::INACTIVE && !impl.mEventData->mIsShowingPlaceholderText)
   {
     ModelPtr&      model          = impl.mModel;
     const Vector2& scrollPosition = model->mScrollPosition;

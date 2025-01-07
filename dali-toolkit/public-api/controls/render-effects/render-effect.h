@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/render-tasks/render-task.h>
+#include <memory> // std::shared_ptr
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -34,7 +35,7 @@ namespace Internal DALI_INTERNAL
 {
 class Control;
 class RenderEffectImpl;
-} // namespace Internal DALI_INTERNAL
+} // namespace DALI_INTERNAL
 
 /**
  * @brief
@@ -58,17 +59,31 @@ public:
   RenderEffect() = default;
 
   /**
+   * @brief Destructor.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_2_3.28
+   */
+  ~RenderEffect() = default;
+
+  /**
    * @brief Copy constructor. Creates another handle that points to the same real object.
    * @SINCE_2_3.28
    */
   RenderEffect(const RenderEffect& handle);
 
   /**
-   * @brief Destructor.
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   * @SINCE_2_3.28
+   * @brief Creates background blur effect with default parameters.
+   * @SINCE_2_4.1
    */
-  ~RenderEffect();
+  static RenderEffect CreateBackgroundBlurEffect();
+
+  /**
+   * @brief Creates background blur effect.
+   * @param[in] downscaleFactor Input texture downscaler for better performance.
+   * @param[in] blurRadius Gaussian kernel size.
+   * @SINCE_2_4.1
+   */
+  static RenderEffect CreateBackgroundBlurEffect(float downscaleFactor, uint32_t blurRadius);
 
 public: // Not intended for Application developers
   ///@cond internal

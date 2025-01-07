@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,13 +199,12 @@ int UtcDaliPanelSetPanelResolution02(void)
 
 namespace
 {
-
 /**
  * For the diffuse and specular cube map texture.
  * These textures are based off version of Wave engine sample
  * Take from https://github.com/WaveEngine/Samples
  *
- * Copyright (c) 2024 Wave Coorporation
+ * Copyright (c) 2025 Wave Coorporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -237,10 +236,10 @@ void        OnResourceReady(Control control)
 Dali::Scene3D::ModelNode GetContentPlaneNode(Dali::Scene3D::Panel panel)
 {
   Dali::Scene3D::ModelNode contentPlaneNode;
-  Dali::Actor panelNode;
+  Dali::Actor              panelNode;
   for(uint32_t i = 0; i < panel.GetChildCount(); ++i)
   {
-    Dali::Actor actor = panel.GetChildAt(i);
+    Dali::Actor        actor     = panel.GetChildAt(i);
     Scene3D::ModelNode modelNode = Scene3D::ModelNode::DownCast(actor);
     if(modelNode)
     {
@@ -266,10 +265,10 @@ Dali::Scene3D::ModelNode GetContentPlaneNode(Dali::Scene3D::Panel panel)
 Dali::Scene3D::ModelNode GetBackPlaneNode(Dali::Scene3D::Panel panel)
 {
   Dali::Scene3D::ModelNode backPlaneNode;
-  Dali::Actor panelNode;
+  Dali::Actor              panelNode;
   for(uint32_t i = 0; i < panel.GetChildCount(); ++i)
   {
-    Dali::Actor actor = panel.GetChildAt(i);
+    Dali::Actor        actor     = panel.GetChildAt(i);
     Scene3D::ModelNode modelNode = Scene3D::ModelNode::DownCast(actor);
     if(modelNode)
     {
@@ -295,10 +294,10 @@ Dali::Scene3D::ModelNode GetBackPlaneNode(Dali::Scene3D::Panel panel)
 Dali::Scene3D::ModelNode GetDoubleSidedPlaneNode(Dali::Scene3D::Panel panel)
 {
   Dali::Scene3D::ModelNode backPlaneNode;
-  Dali::Actor panelNode;
+  Dali::Actor              panelNode;
   for(uint32_t i = 0; i < panel.GetChildCount(); ++i)
   {
-    Dali::Actor actor = panel.GetChildAt(i);
+    Dali::Actor        actor     = panel.GetChildAt(i);
     Scene3D::ModelNode modelNode = Scene3D::ModelNode::DownCast(actor);
     if(modelNode)
     {
@@ -364,7 +363,7 @@ Dali::Texture GetSpecularTexture(Dali::Scene3D::Panel panel)
 
   return texture;
 }
-}
+} // namespace
 
 int UtcDaliPanelIBLWithSceneView(void)
 {
@@ -459,7 +458,7 @@ int UtcDaliPanelSetGetProperty(void)
   bool                                   isBackPlaneVisible;
   bool                                   isDoubleSided;
 
-  isTransparent       = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
+  isTransparent         = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
   contentPlaneAlphaMode = contentPlaneMaterial.GetProperty<Dali::Scene3D::Material::AlphaModeType>(Dali::Scene3D::Material::Property::ALPHA_MODE);
   DALI_TEST_EQUALS(contentPlaneAlphaMode, isTransparent ? Dali::Scene3D::Material::AlphaModeType::BLEND : Dali::Scene3D::Material::AlphaModeType::OPAQUE, TEST_LOCATION);
   isUsingBackFacePlane = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE);
@@ -467,7 +466,6 @@ int UtcDaliPanelSetGetProperty(void)
   DALI_TEST_EQUALS(backPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), isBackPlaneVisible, TEST_LOCATION);
   isDoubleSided = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::DOUBLE_SIDED);
   DALI_TEST_EQUALS(doubleSidedPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), isDoubleSided && !isBackPlaneVisible, TEST_LOCATION);
-
 
   // Case 1. transparent false, double sided false, useBackFacePlane false;
   // Front Material Alpha Mode : Opaque, Back Plane Visible : false, Front Material Double Sided : false
@@ -475,11 +473,11 @@ int UtcDaliPanelSetGetProperty(void)
   panel.SetProperty(Dali::Scene3D::Panel::Property::DOUBLE_SIDED, false);
   panel.SetProperty(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE, false);
 
-  isTransparent       = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
+  isTransparent         = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
   contentPlaneAlphaMode = contentPlaneMaterial.GetProperty<Dali::Scene3D::Material::AlphaModeType>(Dali::Scene3D::Material::Property::ALPHA_MODE);
-  isUsingBackFacePlane = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE);
-  isBackPlaneVisible   = !isTransparent && isUsingBackFacePlane;
-  isDoubleSided = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::DOUBLE_SIDED);
+  isUsingBackFacePlane  = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE);
+  isBackPlaneVisible    = !isTransparent && isUsingBackFacePlane;
+  isDoubleSided         = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::DOUBLE_SIDED);
   DALI_TEST_EQUALS(contentPlaneAlphaMode, isTransparent ? Dali::Scene3D::Material::AlphaModeType::BLEND : Dali::Scene3D::Material::AlphaModeType::OPAQUE, TEST_LOCATION);
   DALI_TEST_EQUALS(backPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), isBackPlaneVisible, TEST_LOCATION);
   DALI_TEST_EQUALS(doubleSidedPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), isDoubleSided && !isBackPlaneVisible, TEST_LOCATION);
@@ -487,7 +485,6 @@ int UtcDaliPanelSetGetProperty(void)
   DALI_TEST_EQUALS(contentPlaneAlphaMode, Dali::Scene3D::Material::AlphaModeType::OPAQUE, TEST_LOCATION);
   DALI_TEST_EQUALS(backPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), false, TEST_LOCATION);
   DALI_TEST_EQUALS(doubleSidedPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), false, TEST_LOCATION);
-
 
   // Case 2. transparent false, double sided false, useBackFacePlane true;
   // Front Material Alpha Mode : Opaque, Back Plane Visible : true, Front Material Double Sided : false
@@ -495,7 +492,7 @@ int UtcDaliPanelSetGetProperty(void)
   panel.SetProperty(Dali::Scene3D::Panel::Property::DOUBLE_SIDED, false);
   panel.SetProperty(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE, true);
 
-  isTransparent       = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
+  isTransparent         = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
   contentPlaneAlphaMode = contentPlaneMaterial.GetProperty<Dali::Scene3D::Material::AlphaModeType>(Dali::Scene3D::Material::Property::ALPHA_MODE);
   DALI_TEST_EQUALS(contentPlaneAlphaMode, isTransparent ? Dali::Scene3D::Material::AlphaModeType::BLEND : Dali::Scene3D::Material::AlphaModeType::OPAQUE, TEST_LOCATION);
   isUsingBackFacePlane = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE);
@@ -507,7 +504,6 @@ int UtcDaliPanelSetGetProperty(void)
   DALI_TEST_EQUALS(contentPlaneAlphaMode, Dali::Scene3D::Material::AlphaModeType::OPAQUE, TEST_LOCATION);
   DALI_TEST_EQUALS(backPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), true, TEST_LOCATION);
   DALI_TEST_EQUALS(doubleSidedPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), false, TEST_LOCATION);
-
 
   // Case 2. transparent false, double sided true, useBackFacePlane false;
   // Front Material Alpha Mode : Opaque, Back Plane Visible : false, Front Material Double Sided : true
@@ -515,7 +511,7 @@ int UtcDaliPanelSetGetProperty(void)
   panel.SetProperty(Dali::Scene3D::Panel::Property::DOUBLE_SIDED, true);
   panel.SetProperty(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE, false);
 
-  isTransparent       = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
+  isTransparent         = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
   contentPlaneAlphaMode = contentPlaneMaterial.GetProperty<Dali::Scene3D::Material::AlphaModeType>(Dali::Scene3D::Material::Property::ALPHA_MODE);
   DALI_TEST_EQUALS(contentPlaneAlphaMode, isTransparent ? Dali::Scene3D::Material::AlphaModeType::BLEND : Dali::Scene3D::Material::AlphaModeType::OPAQUE, TEST_LOCATION);
   isUsingBackFacePlane = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE);
@@ -528,14 +524,13 @@ int UtcDaliPanelSetGetProperty(void)
   DALI_TEST_EQUALS(backPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), false, TEST_LOCATION);
   DALI_TEST_EQUALS(doubleSidedPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), true, TEST_LOCATION);
 
-
   // Case 2. transparent false, double sided true, useBackFacePlane true;
   // Front Material Alpha Mode : Opaque, Back Plane Visible : true, Front Material Double Sided : false
   panel.SetProperty(Dali::Scene3D::Panel::Property::TRANSPARENT, false);
   panel.SetProperty(Dali::Scene3D::Panel::Property::DOUBLE_SIDED, true);
   panel.SetProperty(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE, true);
 
-  isTransparent       = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
+  isTransparent         = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
   contentPlaneAlphaMode = contentPlaneMaterial.GetProperty<Dali::Scene3D::Material::AlphaModeType>(Dali::Scene3D::Material::Property::ALPHA_MODE);
   DALI_TEST_EQUALS(contentPlaneAlphaMode, isTransparent ? Dali::Scene3D::Material::AlphaModeType::BLEND : Dali::Scene3D::Material::AlphaModeType::OPAQUE, TEST_LOCATION);
   isUsingBackFacePlane = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE);
@@ -548,14 +543,13 @@ int UtcDaliPanelSetGetProperty(void)
   DALI_TEST_EQUALS(backPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), true, TEST_LOCATION);
   DALI_TEST_EQUALS(doubleSidedPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), false, TEST_LOCATION);
 
-
   // Case 1. transparent true, double sided false, useBackFacePlane false;
   // Front Material Alpha Mode : Blend, Back Plane Visible : false, Front Material Double Sided : false
   panel.SetProperty(Dali::Scene3D::Panel::Property::TRANSPARENT, true);
   panel.SetProperty(Dali::Scene3D::Panel::Property::DOUBLE_SIDED, false);
   panel.SetProperty(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE, false);
 
-  isTransparent       = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
+  isTransparent         = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
   contentPlaneAlphaMode = contentPlaneMaterial.GetProperty<Dali::Scene3D::Material::AlphaModeType>(Dali::Scene3D::Material::Property::ALPHA_MODE);
   DALI_TEST_EQUALS(contentPlaneAlphaMode, isTransparent ? Dali::Scene3D::Material::AlphaModeType::BLEND : Dali::Scene3D::Material::AlphaModeType::OPAQUE, TEST_LOCATION);
   isUsingBackFacePlane = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE);
@@ -567,7 +561,6 @@ int UtcDaliPanelSetGetProperty(void)
   DALI_TEST_EQUALS(contentPlaneAlphaMode, Dali::Scene3D::Material::AlphaModeType::BLEND, TEST_LOCATION);
   DALI_TEST_EQUALS(backPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), false, TEST_LOCATION);
   DALI_TEST_EQUALS(doubleSidedPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), false, TEST_LOCATION);
-
 
   // Case 2. transparent true, double sided false, useBackFacePlane true;
   // Front Material Alpha Mode : Blend, Back Plane Visible : false, Front Material Double Sided : false
@@ -575,7 +568,7 @@ int UtcDaliPanelSetGetProperty(void)
   panel.SetProperty(Dali::Scene3D::Panel::Property::DOUBLE_SIDED, false);
   panel.SetProperty(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE, true);
 
-  isTransparent       = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
+  isTransparent         = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
   contentPlaneAlphaMode = contentPlaneMaterial.GetProperty<Dali::Scene3D::Material::AlphaModeType>(Dali::Scene3D::Material::Property::ALPHA_MODE);
   DALI_TEST_EQUALS(contentPlaneAlphaMode, isTransparent ? Dali::Scene3D::Material::AlphaModeType::BLEND : Dali::Scene3D::Material::AlphaModeType::OPAQUE, TEST_LOCATION);
   isUsingBackFacePlane = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE);
@@ -588,14 +581,13 @@ int UtcDaliPanelSetGetProperty(void)
   DALI_TEST_EQUALS(backPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), false, TEST_LOCATION);
   DALI_TEST_EQUALS(doubleSidedPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), false, TEST_LOCATION);
 
-
   // Case 2. transparent true, double sided true, useBackFacePlane false;
   // Front Material Alpha Mode : Blend, Back Plane Visible : false, Front Material Double Sided : true
   panel.SetProperty(Dali::Scene3D::Panel::Property::TRANSPARENT, true);
   panel.SetProperty(Dali::Scene3D::Panel::Property::DOUBLE_SIDED, true);
   panel.SetProperty(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE, false);
 
-  isTransparent       = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
+  isTransparent         = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
   contentPlaneAlphaMode = contentPlaneMaterial.GetProperty<Dali::Scene3D::Material::AlphaModeType>(Dali::Scene3D::Material::Property::ALPHA_MODE);
   DALI_TEST_EQUALS(contentPlaneAlphaMode, isTransparent ? Dali::Scene3D::Material::AlphaModeType::BLEND : Dali::Scene3D::Material::AlphaModeType::OPAQUE, TEST_LOCATION);
   isUsingBackFacePlane = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE);
@@ -608,14 +600,13 @@ int UtcDaliPanelSetGetProperty(void)
   DALI_TEST_EQUALS(backPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), false, TEST_LOCATION);
   DALI_TEST_EQUALS(doubleSidedPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), true, TEST_LOCATION);
 
-
   // Case 2. transparent true, double sided true, useBackFacePlane true;
   // Front Material Alpha Mode : Blend, Back Plane Visible : false, Front Material Double Sided : true
   panel.SetProperty(Dali::Scene3D::Panel::Property::TRANSPARENT, true);
   panel.SetProperty(Dali::Scene3D::Panel::Property::DOUBLE_SIDED, true);
   panel.SetProperty(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE, true);
 
-  isTransparent       = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
+  isTransparent         = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::TRANSPARENT);
   contentPlaneAlphaMode = contentPlaneMaterial.GetProperty<Dali::Scene3D::Material::AlphaModeType>(Dali::Scene3D::Material::Property::ALPHA_MODE);
   DALI_TEST_EQUALS(contentPlaneAlphaMode, isTransparent ? Dali::Scene3D::Material::AlphaModeType::BLEND : Dali::Scene3D::Material::AlphaModeType::OPAQUE, TEST_LOCATION);
   isUsingBackFacePlane = panel.GetProperty<bool>(Dali::Scene3D::Panel::Property::USE_BACK_FACE_PLANE);
@@ -666,7 +657,7 @@ int UtcDaliPanelSetGetContent(void)
 
   for(uint32_t i = 0; i < panelRootLayer.GetChildCount(); ++i)
   {
-    Dali::Actor child = panelRootLayer.GetChildAt(i);
+    Dali::Actor            child        = panelRootLayer.GetChildAt(i);
     Dali::Toolkit::Control childControl = Dali::Toolkit::Control::DownCast(child);
     if(childControl)
     {
@@ -700,7 +691,7 @@ int UtcDaliPanelSetGetContent(void)
 
   for(uint32_t i = 0; i < panelRootLayer.GetChildCount(); ++i)
   {
-    Dali::Actor child = panelRootLayer.GetChildAt(i);
+    Dali::Actor            child        = panelRootLayer.GetChildAt(i);
     Dali::Toolkit::Control childControl = Dali::Toolkit::Control::DownCast(child);
     if(childControl)
     {
@@ -753,10 +744,10 @@ int UtcDaliPanelRenderTaskOrdering(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliPanelRenderTaskOrdering");
 
-  Integration::Scene scene = application.GetScene();
-  RenderTaskList taskList = scene.GetRenderTaskList();
+  Integration::Scene scene    = application.GetScene();
+  RenderTaskList     taskList = scene.GetRenderTaskList();
 
-  uint32_t defaultTaskCount = taskList.GetTaskCount();
+  uint32_t   defaultTaskCount  = taskList.GetTaskCount();
   RenderTask defaultRenderTask = taskList.GetTask(defaultTaskCount - 1);
   tet_printf("default Task Cnt : %d\n", defaultTaskCount);
 
@@ -764,30 +755,30 @@ int UtcDaliPanelRenderTaskOrdering(void)
   sceneView.UseFramebuffer(true);
   scene.Add(sceneView);
 
-  uint32_t afterSceneViewTaskCount = taskList.GetTaskCount();
-  RenderTask sceneViewRenderTask = taskList.GetTask(afterSceneViewTaskCount - 1);
+  uint32_t   afterSceneViewTaskCount = taskList.GetTaskCount();
+  RenderTask sceneViewRenderTask     = taskList.GetTask(afterSceneViewTaskCount - 1);
   tet_printf("after SceneView Task cnt : %d\n", afterSceneViewTaskCount);
   DALI_TEST_CHECK(afterSceneViewTaskCount == defaultTaskCount + 1);
 
   Scene3D::Panel panel = Scene3D::Panel::New();
   sceneView.Add(panel);
 
-  uint32_t afterPanelTaskCount = taskList.GetTaskCount();
-  RenderTask panelRenderTask = taskList.GetTask(afterPanelTaskCount - 1);
+  uint32_t   afterPanelTaskCount = taskList.GetTaskCount();
+  RenderTask panelRenderTask     = taskList.GetTask(afterPanelTaskCount - 1);
   tet_printf("after Panel Task cnt : %d\n", afterPanelTaskCount);
   DALI_TEST_CHECK(afterPanelTaskCount == afterSceneViewTaskCount + 1);
 
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control1.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
-  control1.SetRenderEffect(BackgroundBlurEffect::New());
+  control1.SetRenderEffect(RenderEffect::CreateBackgroundBlurEffect());
 
   panel.Add(control1);
 
-  uint32_t afterBlurEffectTaskCount = taskList.GetTaskCount();
-  RenderTask blurSourceRenderTask = taskList.GetTask(afterBlurEffectTaskCount - 3);
+  uint32_t   afterBlurEffectTaskCount = taskList.GetTaskCount();
+  RenderTask blurSourceRenderTask     = taskList.GetTask(afterBlurEffectTaskCount - 3);
   RenderTask blurHorizontalRenderTask = taskList.GetTask(afterBlurEffectTaskCount - 2);
-  RenderTask blurVerticalRenderTask = taskList.GetTask(afterBlurEffectTaskCount - 1);
+  RenderTask blurVerticalRenderTask   = taskList.GetTask(afterBlurEffectTaskCount - 1);
   tet_printf("after blurEffect Task cnt : %d\n", afterBlurEffectTaskCount);
   DALI_TEST_CHECK(afterBlurEffectTaskCount == afterPanelTaskCount + 3);
 

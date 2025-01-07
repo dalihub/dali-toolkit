@@ -510,31 +510,10 @@ int UtcTextureManagerEncodedImageBufferWithImageType(void)
 int UtcTextureManagerExternalTexture(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcTextureManagerExternalTexture check TextureManager using external texture works well");
+  tet_infoline("UtcTextureManagerExternalTexture check TextureManager using external texture as image, or masking, or both works well");
 
   auto  visualFactory  = Toolkit::VisualFactory::Get();
   auto& textureManager = GetImplementation(visualFactory).GetTextureManager(); // Use VisualFactory's texture manager
-
-  TestObserver observer1;
-  TestObserver observer2;
-
-  auto                               textureId1(TextureManager::INVALID_TEXTURE_ID);
-  auto                               textureId2(TextureManager::INVALID_TEXTURE_ID);
-  std::string                        maskname(TEST_MASK_FILE_NAME);
-  TextureManager::MaskingDataPointer maskInfo = nullptr;
-  maskInfo.reset(new TextureManager::MaskingData());
-  maskInfo->mAlphaMaskUrl       = maskname;
-  maskInfo->mAlphaMaskId        = TextureManager::INVALID_TEXTURE_ID;
-  maskInfo->mCropToMask         = true;
-  maskInfo->mContentScaleFactor = 1.0f;
-  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          synchronousLoading(false);
-  bool                          atlasingStatus(false);
-  bool                          loadingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
 
   uint32_t width(64);
   uint32_t height(64);
@@ -545,110 +524,181 @@ int UtcTextureManagerExternalTexture(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
-  std::string             url      = imageUrl.GetUrl();
+  Dali::Toolkit::ImageUrl imageUrl          = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  std::string             externalImageUrl  = imageUrl.GetUrl();
+  Dali::Toolkit::ImageUrl imageUrl2         = Dali::Toolkit::Image::GenerateUrl(pixelData, false);
+  std::string             externalImageUrl2 = imageUrl2.GetUrl();
 
-  TextureSet texture1 = textureManager.LoadTexture(
-    url,
-    ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
-    SamplingMode::BOX_THEN_LINEAR,
-    maskInfo,
-    synchronousLoading,
-    textureId1,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
-    loadingStatus,
-    &observer1,
-    atlasUploadObserver,
-    atlasManager,
-    true,
-    TextureManager::ReloadPolicy::CACHED,
-    preMultiply);
+  for(int testCase = 0; testCase < 6; testCase++)
+  {
+    // Test case config
+    // Note tat we don't need to test (!testExternalTexture && !testExternalMask) case.
+    const bool testSyncLoad        = ((testCase & 0x01) == 0);
+    const bool testExternalTexture = ((testCase & 0x02) == 0);
+    const bool testExternalMask    = ((testCase & 0x04) == 0);
 
-  TextureSet texture2 = textureManager.LoadTexture(
-    url,
-    ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
-    SamplingMode::BOX_THEN_LINEAR,
-    maskInfo,
-    synchronousLoading,
-    textureId2,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
-    loadingStatus,
-    &observer2,
-    atlasUploadObserver,
-    atlasManager,
-    true,
-    TextureManager::ReloadPolicy::CACHED,
-    preMultiply);
+    tet_printf("Testcase, syncload : %d, externalTexture : %d, externalMask : %d\n", testSyncLoad, testExternalTexture, testExternalMask);
 
-  DALI_TEST_EQUALS(observer1.mLoaded, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(observer1.mObserverCalled, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(observer2.mLoaded, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(observer2.mObserverCalled, false, TEST_LOCATION);
+    // texture loaded only if it is syncload, or both of textures are external.
+    const bool expectTextureLoadedResult = testSyncLoad || (testExternalTexture && testExternalMask);
+    const bool expectObserverNotified    = !testSyncLoad && (testExternalTexture && testExternalMask);
 
-  application.SendNotification();
-  application.Render();
+    auto textureId1(TextureManager::INVALID_TEXTURE_ID);
+    auto textureId2(TextureManager::INVALID_TEXTURE_ID);
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    TestObserver observer1;
+    TestObserver observer2;
 
-  DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(observer1.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+    std::string                        maskname(testExternalMask ? externalImageUrl2 : TEST_MASK_FILE_NAME);
+    TextureManager::MaskingDataPointer maskInfo = nullptr;
+    maskInfo.reset(new TextureManager::MaskingData());
+    maskInfo->mAlphaMaskUrl       = maskname;
+    maskInfo->mAlphaMaskId        = TextureManager::INVALID_TEXTURE_ID;
+    maskInfo->mCropToMask         = true;
+    maskInfo->mContentScaleFactor = 1.0f;
+    maskInfo->mPreappliedMasking  = false;
 
-  DALI_TEST_EQUALS(observer2.mLoaded, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(observer2.mObserverCalled, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(observer2.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+    Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
+    Dali::ImageDimensions         atlasRectSize(0, 0);
+    bool                          synchronousLoading(testSyncLoad);
+    bool                          atlasingStatus(false);
+    bool                          loadingStatus(false);
+    auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+    ImageAtlasManagerPtr          atlasManager        = nullptr;
+    Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
 
-  DALI_TEST_EQUALS(textureId1 == textureId2, true, TEST_LOCATION);
+    std::string url(testExternalTexture ? externalImageUrl : TEST_IMAGE_FILE_NAME);
 
-  texture1 = textureManager.LoadTexture(
-    url,
-    ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
-    SamplingMode::BOX_THEN_LINEAR,
-    maskInfo,
-    synchronousLoading,
-    textureId1,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
-    loadingStatus,
-    &observer1,
-    atlasUploadObserver,
-    atlasManager,
-    true,
-    TextureManager::ReloadPolicy::CACHED,
-    preMultiply);
+    TextureSet texture1 = textureManager.LoadTexture(
+      url,
+      ImageDimensions(),
+      FittingMode::SCALE_TO_FILL,
+      SamplingMode::BOX_THEN_LINEAR,
+      maskInfo,
+      synchronousLoading,
+      textureId1,
+      atlasRect,
+      atlasRectSize,
+      atlasingStatus,
+      loadingStatus,
+      &observer1,
+      atlasUploadObserver,
+      atlasManager,
+      true,
+      TextureManager::ReloadPolicy::CACHED,
+      preMultiply);
 
-  texture2 = textureManager.LoadTexture(
-    url,
-    ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
-    SamplingMode::BOX_THEN_LINEAR,
-    maskInfo,
-    synchronousLoading,
-    textureId2,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
-    loadingStatus,
-    &observer2,
-    atlasUploadObserver,
-    atlasManager,
-    true,
-    TextureManager::ReloadPolicy::CACHED,
-    preMultiply);
+    DALI_TEST_EQUALS(!!texture1, expectTextureLoadedResult, TEST_LOCATION);
 
-  application.SendNotification();
-  application.Render();
+    TextureSet texture2 = textureManager.LoadTexture(
+      url,
+      ImageDimensions(),
+      FittingMode::SCALE_TO_FILL,
+      SamplingMode::BOX_THEN_LINEAR,
+      maskInfo,
+      synchronousLoading,
+      textureId2,
+      atlasRect,
+      atlasRectSize,
+      atlasingStatus,
+      loadingStatus,
+      &observer2,
+      atlasUploadObserver,
+      atlasManager,
+      true,
+      TextureManager::ReloadPolicy::CACHED,
+      preMultiply);
 
-  DALI_TEST_EQUALS(textureId1 == textureId2, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(texture1 != texture2, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(!!texture2, expectTextureLoadedResult, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(observer1.mLoaded, expectObserverNotified, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer1.mObserverCalled, expectObserverNotified, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer2.mLoaded, expectObserverNotified, TEST_LOCATION);
+    DALI_TEST_EQUALS(observer2.mObserverCalled, expectObserverNotified, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(textureId1 == textureId2, true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    if(!expectTextureLoadedResult)
+    {
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    }
+
+    if(!testSyncLoad)
+    {
+      DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
+      DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
+      DALI_TEST_EQUALS(observer1.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+
+      DALI_TEST_EQUALS(observer2.mLoaded, true, TEST_LOCATION);
+      DALI_TEST_EQUALS(observer2.mObserverCalled, true, TEST_LOCATION);
+      DALI_TEST_EQUALS(observer2.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+    }
+
+    application.SendNotification();
+    application.Render();
+
+    texture1 = textureManager.LoadTexture(
+      url,
+      ImageDimensions(),
+      FittingMode::SCALE_TO_FILL,
+      SamplingMode::BOX_THEN_LINEAR,
+      maskInfo,
+      synchronousLoading,
+      textureId1,
+      atlasRect,
+      atlasRectSize,
+      atlasingStatus,
+      loadingStatus,
+      &observer1,
+      atlasUploadObserver,
+      atlasManager,
+      true,
+      TextureManager::ReloadPolicy::CACHED,
+      preMultiply);
+
+    DALI_TEST_CHECK(texture1); // texture is loaded.
+
+    texture2 = textureManager.LoadTexture(
+      url,
+      ImageDimensions(),
+      FittingMode::SCALE_TO_FILL,
+      SamplingMode::BOX_THEN_LINEAR,
+      maskInfo,
+      synchronousLoading,
+      textureId2,
+      atlasRect,
+      atlasRectSize,
+      atlasingStatus,
+      loadingStatus,
+      &observer2,
+      atlasUploadObserver,
+      atlasManager,
+      true,
+      TextureManager::ReloadPolicy::CACHED,
+      preMultiply);
+
+    DALI_TEST_CHECK(texture2); // texture is loaded.
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(textureId1 == textureId2, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(texture1 != texture2, true, TEST_LOCATION);
+
+    // Ensure to remove cache.
+    textureManager.RequestRemove(textureId1, nullptr);
+    textureManager.RequestRemove(textureId1, nullptr);
+    textureManager.RequestRemove(textureId1, nullptr);
+    textureManager.RequestRemove(textureId1, nullptr);
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+  }
 
   END_TEST;
 }
@@ -711,6 +761,14 @@ int UtcTextureManagerRemoveExternalTextureAndLoadAgain(void)
     preMultiply);
 
   DALI_TEST_CHECK(textureId1 != TextureManager::INVALID_TEXTURE_ID);
+
+  // Note that ExernalTexture will notify observer.
+  DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
+
+  // Reset flags for observer1.
+  observer1.mLoaded         = false;
+  observer1.mObserverCalled = false;
 
   // Step 2 : Request remove for external url
   textureManager.RequestRemove(textureId1, &observer1);
@@ -2415,6 +2473,299 @@ int UtcTextureManagerCachingForDifferentMultiplyOnLoad(void)
   DALI_TEST_EQUALS(observer3.mLoaded, true, TEST_LOCATION);
   DALI_TEST_EQUALS(observer3.mObserverCalled, true, TEST_LOCATION);
   DALI_TEST_EQUALS(observer3.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcTextureManagerMaskByExternalTexture01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcTextureManagerMaskByExternalTexture01 check TextureManager masking by external texture works well");
+
+  auto  visualFactory  = Toolkit::VisualFactory::Get();
+  auto& textureManager = GetImplementation(visualFactory).GetTextureManager(); // Use VisualFactory's texture manager
+
+  uint32_t width(64);
+  uint32_t height(64);
+  uint32_t bufferSize = width * height * Pixel::GetBytesPerPixel(Pixel::RGBA8888);
+
+  uint8_t*                buffer    = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData               pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
+  Dali::Toolkit::ImageUrl imageUrl  = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+
+  TestObserver observer1;
+  TestObserver observer2;
+
+  auto                               textureId1(TextureManager::INVALID_TEXTURE_ID);
+  auto                               textureId2(TextureManager::INVALID_TEXTURE_ID);
+  TextureManager::MaskingDataPointer maskInfo = nullptr;
+
+  maskInfo.reset(new TextureManager::MaskingData());
+  maskInfo->mAlphaMaskUrl       = imageUrl.GetUrl();
+  maskInfo->mAlphaMaskId        = TextureManager::INVALID_TEXTURE_ID;
+  maskInfo->mCropToMask         = true;
+  maskInfo->mContentScaleFactor = 1.0f;
+  maskInfo->mPreappliedMasking  = false;
+
+  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
+  Dali::ImageDimensions         atlasRectSize(0, 0);
+  bool                          synchronousLoading(false);
+  bool                          atlasingStatus(false);
+  bool                          loadingStatus(false);
+  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  ImageAtlasManagerPtr          atlasManager        = nullptr;
+  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+
+  DALI_TEST_CHECK(pixelData);
+
+  std::string url = TEST_IMAGE_FILE_NAME;
+
+  TextureSet texture1 = textureManager.LoadTexture(
+    url,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    synchronousLoading,
+    textureId1,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    &observer1,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  TextureSet texture2 = textureManager.LoadTexture(
+    url,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    synchronousLoading,
+    textureId2,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    &observer2,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  DALI_TEST_EQUALS(observer1.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mObserverCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mObserverCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(observer2.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(textureId1 == textureId2, true, TEST_LOCATION);
+
+  texture1 = textureManager.LoadTexture(
+    url,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    synchronousLoading,
+    textureId1,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    &observer1,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  texture2 = textureManager.LoadTexture(
+    url,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    synchronousLoading,
+    textureId2,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    &observer2,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(textureId1 == textureId2, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture1 != texture2, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcTextureManagerMaskByExternalTexture02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcTextureManagerMaskByExternalTexture02 check TextureManager masking external texture by external texture works well");
+
+  auto  visualFactory  = Toolkit::VisualFactory::Get();
+  auto& textureManager = GetImplementation(visualFactory).GetTextureManager(); // Use VisualFactory's texture manager
+
+  uint32_t width(64);
+  uint32_t height(64);
+  uint32_t bufferSize = width * height * Pixel::GetBytesPerPixel(Pixel::RGBA8888);
+
+  uint8_t*                buffer    = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData               pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
+  Dali::Toolkit::ImageUrl imageUrl  = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  Dali::Toolkit::ImageUrl imageUrl2 = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+
+  TestObserver observer1;
+  TestObserver observer2;
+
+  auto                               textureId1(TextureManager::INVALID_TEXTURE_ID);
+  auto                               textureId2(TextureManager::INVALID_TEXTURE_ID);
+  TextureManager::MaskingDataPointer maskInfo = nullptr;
+
+  maskInfo.reset(new TextureManager::MaskingData());
+  maskInfo->mAlphaMaskUrl       = imageUrl.GetUrl();
+  maskInfo->mAlphaMaskId        = TextureManager::INVALID_TEXTURE_ID;
+  maskInfo->mCropToMask         = true;
+  maskInfo->mContentScaleFactor = 1.0f;
+  maskInfo->mPreappliedMasking  = false;
+
+  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
+  Dali::ImageDimensions         atlasRectSize(0, 0);
+  bool                          synchronousLoading(false);
+  bool                          atlasingStatus(false);
+  bool                          loadingStatus(false);
+  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  ImageAtlasManagerPtr          atlasManager        = nullptr;
+  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+
+  DALI_TEST_CHECK(pixelData);
+
+  std::string url = imageUrl2.GetUrl();
+
+  TextureSet texture1 = textureManager.LoadTexture(
+    url,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    synchronousLoading,
+    textureId1,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    &observer1,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  TextureSet texture2 = textureManager.LoadTexture(
+    url,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    synchronousLoading,
+    textureId2,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    &observer2,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  tet_printf("url : %s, mask url : %s, textureid : %d %d\n", url.c_str(), maskInfo->mAlphaMaskUrl.GetUrl().c_str(), textureId1, textureId2);
+
+  // observer called synchronously. (Since external textures are already uploaded)
+  DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer1.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(observer2.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer2.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(textureId1 == textureId2, true, TEST_LOCATION);
+
+  texture1 = textureManager.LoadTexture(
+    url,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    synchronousLoading,
+    textureId1,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    &observer1,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  texture2 = textureManager.LoadTexture(
+    url,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    synchronousLoading,
+    textureId2,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    &observer2,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(textureId1 == textureId2, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture1 != texture2, true, TEST_LOCATION);
 
   END_TEST;
 }
