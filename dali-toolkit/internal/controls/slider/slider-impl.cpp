@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -862,16 +862,15 @@ float Slider::SnapToMark(float value)
   for(MarkList::SizeType i = 0; i < mMarks.Count(); ++i)
   {
     const Property::Value& propertyValue = mMarks[i];
-    if(propertyValue.Get(mark))
-    {
-      mark = MapValuePercentage(mark);
+    DALI_ASSERT_ALWAYS(propertyValue.Get(mark) && "Marker Property cannot get float!");
 
-      float dist = fabsf(mark - value);
-      if(dist < closestDist)
-      {
-        closestDist = dist;
-        closestMark = mark;
-      }
+    mark = MapValuePercentage(mark);
+
+    float dist = fabsf(mark - value);
+    if(dist < closestDist)
+    {
+      closestDist = dist;
+      closestMark = mark;
     }
   }
 
@@ -883,34 +882,34 @@ bool Slider::MarkReached(float value, int& outIndex)
   const float MARK_TOLERANCE = GetMarkTolerance();
 
   // Binary search
-  int head = 0,
-      tail = mMarks.Size() - 1;
-  int   current;
-  float mark;
+  MarkList::SizeType head = 0u;
+  MarkList::SizeType tail = mMarks.Size();
+  MarkList::SizeType current;
+  float              mark;
 
-  while(head <= tail)
+  // For each range [head tail) (right-opened)
+  while(head < tail)
   {
-    current = head + (tail - head) / 2;
+    current = head + ((tail - head) >> 1);
 
     const Property::Value& propertyValue = mMarks[current];
-    if(propertyValue.Get(mark))
+    DALI_ASSERT_ALWAYS(propertyValue.Get(mark) && "Marker Property cannot get float!");
+
+    mark = MapValuePercentage(mark);
+
+    if(fabsf(mark - value) < MARK_TOLERANCE)
     {
-      mark = MapValuePercentage(mark);
+      outIndex = static_cast<int>(static_cast<unsigned int>(current)); ///< Safety convertion from size type to integer.
+      return true;
+    }
 
-      if(fabsf(mark - value) < MARK_TOLERANCE)
-      {
-        outIndex = current;
-        return true;
-      }
-
-      if(value < mark)
-      {
-        tail = current - 1;
-      }
-      else
-      {
-        head = current + 1;
-      }
+    if(value < mark)
+    {
+      tail = current;
+    }
+    else
+    {
+      head = current + 1;
     }
   }
 
@@ -1444,7 +1443,9 @@ double Slider::SliderAccessible::GetMaximum() const
 bool Slider::SliderAccessible::SetCurrent(double current)
 {
   if(current < GetMinimum() || current > GetMaximum())
+  {
     return false;
+  }
 
   auto  self = Toolkit::Slider::DownCast(Self());
   auto& impl = Toolkit::GetImpl(self);
