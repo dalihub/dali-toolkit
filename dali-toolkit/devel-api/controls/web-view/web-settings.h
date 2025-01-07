@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_WEB_SETTINGS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -406,6 +406,25 @@ public:
    * @return @c true on enable or @c false on disable
    */
   bool IsExtraFeatureEnabled(const std::string& feature) const;
+
+  /**
+   * @brief Sets the style of IME.
+   *
+   * @param[in] style @c IME_STYLE_FULL       full IME style
+   *                  @c IME_STYLE_FLOATING   floating IME style
+   *                  @c IME_STYLE_DYNAMIC    dynamic IME style
+   *
+   */
+  void SetImeStyle(int style);
+
+  /**
+   * @brief Gets the style of IME.
+   *
+   * @return @c IME_STYLE_FULL       full IME style
+   *         @c IME_STYLE_FLOATING   floating IME style
+   *         @c IME_STYLE_DYNAMIC    dynamic IME style
+   */
+  int GetImeStyle() const;
 
 private:
   Dali::WebEngineSettings& mWebEngineSettings;
