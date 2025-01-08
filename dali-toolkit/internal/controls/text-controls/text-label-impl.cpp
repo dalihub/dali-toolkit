@@ -1231,6 +1231,8 @@ void TextLabel::SetUpAutoScrolling()
   mTextScroller->SetParameters(Self(), renderer, textureSet, controlSize, verifiedSize, wrapGap, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment());
   mController->SetTextElideEnabled(actualellipsis);
   mController->SetAutoScrollMaxTextureExceeded(false);
+
+  DevelControl::AppendAccessibilityAttribute(Toolkit::Control::DownCast(Self()), "isScrolling", "true");
 }
 
 void TextLabel::ScrollingFinished()
@@ -1239,6 +1241,8 @@ void TextLabel::ScrollingFinished()
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::ScrollingFinished\n");
   mController->SetAutoScrollEnabled(false);
   RequestTextRelayout();
+
+  DevelControl::AppendAccessibilityAttribute(Toolkit::Control::DownCast(Self()), "isScrolling", "false");
 }
 
 void TextLabel::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
