@@ -193,7 +193,7 @@ bool IsScriptChangedToFollowSequence(const TextAbstraction::Script&    currentRu
     currentCharacterScript = TextAbstraction::EMOJI;
   }
   // Emoji sequences
-  else if(IsEmojiSequence(currentRunScript, character, currentCharacterScript))
+  else if(IsEmojiSequence(currentRunScript, character, currentCharacterScript) && currentCharacterScript != TextAbstraction::EMOJI_TEXT)
   {
     // Emoji request an emoji presentation for an emoji character.
     isUpdated              = (currentCharacterScript != TextAbstraction::EMOJI_COLOR);
