@@ -132,9 +132,28 @@ bool IsNewVariationSelectorSequence(const Character* const         textBuffer,
           isNewVariationSelectorSequence = currentRunScript != TextAbstraction::EMOJI_TEXT;
           currentCharacterScript         = TextAbstraction::EMOJI_TEXT;
         }
-
+        else if(!TextAbstraction::IsZeroWidthJoiner(characterVS))
+        {
+          // Start of a new sequence if the next glyph is not a variation selector or zwj.
+          isNewVariationSelectorSequence = true;
+        }
       } // if(!isNewVariationSelectorSequence && currentCharacterIndex + 1 <= lastCharacterIndex)
     }   // if(TextAbstraction::IsEmojiVariationSequences(currentCharacter))
+    else if(!TextAbstraction::IsEmojiPresentationSelector(currentCharacter) &&
+            !TextAbstraction::IsTextPresentationSelector(currentCharacter) &&
+            !TextAbstraction::IsZeroWidthJoiner(currentCharacter) &&
+            !TextAbstraction::IsEmojiModifier(currentCharacter))
+    {
+      if(currentCharacterIndex > 0)
+      {
+        Character prevCharacter = *(textBuffer + currentCharacterIndex - 1);
+        if(TextAbstraction::IsEmojiVariationSequences(prevCharacter))
+        {
+          // The end of a variation sequence, start of a new sequence.
+          isNewVariationSelectorSequence = true;
+        }
+      }
+    }
   }     // if(currentCharacterIndex < lastCharacterIndex)
 
   return isNewVariationSelectorSequence;
