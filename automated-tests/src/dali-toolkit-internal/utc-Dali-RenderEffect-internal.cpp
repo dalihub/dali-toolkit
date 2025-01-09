@@ -99,6 +99,10 @@ protected:
     mOnActivated = false;
   }
 
+  void OnRefresh() override
+  {
+  }
+
 public:
   Dali::Toolkit::Control GetOwnerControl() const
   {

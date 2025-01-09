@@ -1518,6 +1518,11 @@ int UtcDaliControlOffScreenRendering(void)
   application.SendNotification();
   application.Render();
 
+  control.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+  tet_infoline("Size set");
+  application.SendNotification();
+  application.Render();
+
   control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::NONE);
   DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::OFFSCREEN_RENDERING).Get<int>(), (int)DevelControl::OffScreenRenderingType::NONE, TEST_LOCATION);
   tet_infoline("Turn off offscreen rendering");
