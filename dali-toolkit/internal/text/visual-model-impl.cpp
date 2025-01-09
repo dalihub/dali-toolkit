@@ -61,7 +61,7 @@ void VisualModel::CreateCharacterToGlyphTable(CharacterIndex startIndex,
   }
   else
   {
-    mCharactersToGlyph.Resize(numberOfCharacters);
+    mCharactersToGlyph.Resize(startIndex + numberOfCharacters);
     charactersToGlyphBuffer = mCharactersToGlyph.Begin() + startIndex;
   }
 
@@ -137,7 +137,7 @@ void VisualModel::CreateGlyphsPerCharacterTable(CharacterIndex startIndex,
   }
   else
   {
-    mGlyphsPerCharacter.Resize(numberOfCharacters);
+    mGlyphsPerCharacter.Resize(startIndex + numberOfCharacters);
     glyphsPerCharacterBuffer = mGlyphsPerCharacter.Begin() + startIndex;
   }
 
