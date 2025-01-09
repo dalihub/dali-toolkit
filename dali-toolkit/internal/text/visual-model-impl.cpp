@@ -17,6 +17,7 @@
 
 // CLASS HEADER
 #include <dali-toolkit/internal/text/visual-model-impl.h>
+#include <dali/integration-api/debug.h>
 
 // EXTERNAL INCLUDES
 #include <memory.h>
@@ -61,7 +62,14 @@ void VisualModel::CreateCharacterToGlyphTable(CharacterIndex startIndex,
   }
   else
   {
-    mCharactersToGlyph.Resize(numberOfCharacters);
+    if(startIndex != 0)
+    {
+      DALI_LOG_DEBUG_INFO("BEFORE: mGlyph2Char Size: %zu, mCharPerGlyph Size: %zu\n", mGlyphsToCharacters.Count(), mCharactersPerGlyph.Count());
+      DALI_LOG_DEBUG_INFO("mGlyphsPerCharacter Size: %zu, mCharactersToGlyph Size: %zu, startIndex: %u\n", mGlyphsPerCharacter.Size(), mCharactersToGlyph.Count(), startIndex);
+      DALI_LOG_DEBUG_INFO("startIndex is not zero when updateCurrentBuffer is false.\n");
+    }
+
+    mCharactersToGlyph.Resize(startIndex + numberOfCharacters);
     charactersToGlyphBuffer = mCharactersToGlyph.Begin() + startIndex;
   }
 
@@ -108,6 +116,13 @@ void VisualModel::CreateCharacterToGlyphTable(CharacterIndex startIndex,
                               newCharactersToGlyph.Begin(),
                               newCharactersToGlyph.End());
   }
+
+  if(mGlyphsPerCharacter.Size() != mCharactersToGlyph.Size())
+  {
+    DALI_LOG_ERROR("BEFORE: mGlyph2Char Size: %zu, mCharPerGlyph Size: %zu\n", mGlyphsToCharacters.Count(), mCharactersPerGlyph.Count());
+    DALI_LOG_ERROR("mGlyphsPerCharacter Size: %zu, mCharactersToGlyph Size: %zu, startIndex: %u\n", mGlyphsPerCharacter.Size(), mCharactersToGlyph.Count(), startIndex);
+    DALI_ASSERT_ALWAYS(false && "Size of mGlyphsPerCharacter is not equal to size of mCharactersToGlyph");
+  }
 }
 
 void VisualModel::CreateGlyphsPerCharacterTable(CharacterIndex startIndex,
@@ -137,7 +152,14 @@ void VisualModel::CreateGlyphsPerCharacterTable(CharacterIndex startIndex,
   }
   else
   {
-    mGlyphsPerCharacter.Resize(numberOfCharacters);
+    if(startIndex != 0)
+    {
+      DALI_LOG_DEBUG_INFO("BEFORE: mGlyph2Char Size: %zu, mCharPerGlyph Size: %zu\n", mGlyphsToCharacters.Count(), mCharactersPerGlyph.Count());
+      DALI_LOG_DEBUG_INFO("mGlyphsPerCharacter Size: %zu, mCharactersToGlyph Size: %zu, startIndex: %u\n", mGlyphsPerCharacter.Size(), mCharactersToGlyph.Count(), startIndex);
+      DALI_LOG_DEBUG_INFO("startIndex is not zero when updateCurrentBuffer is false.\n");
+    }
+
+    mGlyphsPerCharacter.Resize(startIndex + numberOfCharacters);
     glyphsPerCharacterBuffer = mGlyphsPerCharacter.Begin() + startIndex;
   }
 
