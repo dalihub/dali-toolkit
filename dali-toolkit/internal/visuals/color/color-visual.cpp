@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,7 +124,12 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
         // Change the shader must not be occured many times. we always have to use blur feature.
         mAlwaysUsingBlurRadius = true;
 
-        mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+        if(!IsBorderlineRequired())
+        {
+          // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+          mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+        }
+
         // Change shader
         if(!mImpl->mCustomShader)
         {
@@ -261,7 +266,8 @@ Dali::Property ColorVisual::OnGetPropertyObject(Dali::Property::Key key)
     return Dali::Property(handle, Property::INVALID_INDEX);
   }
 
-  if((key.type == Property::Key::INDEX && key.indexKey == DevelColorVisual::Property::BLUR_RADIUS) || (key.type == Property::Key::STRING && key.stringKey == BLUR_RADIUS_NAME))
+  if((key.type == Property::Key::INDEX && key.indexKey == DevelColorVisual::Property::BLUR_RADIUS) ||
+     (key.type == Property::Key::STRING && key.stringKey == BLUR_RADIUS_NAME))
   {
     const bool updateShader = !mImpl->mCustomShader && !IsBlurRequired();
 
@@ -277,7 +283,11 @@ Dali::Property ColorVisual::OnGetPropertyObject(Dali::Property::Key key)
       // Change shader
       UpdateShader();
     }
-    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+    if(!IsBorderlineRequired())
+    {
+      // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+    }
     return Dali::Property(mImpl->mRenderer, DecoratedVisualRenderer::Property::BLUR_RADIUS);
   }
 

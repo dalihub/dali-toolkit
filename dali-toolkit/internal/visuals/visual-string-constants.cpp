@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,9 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_SHADER_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_BLUR_EDGE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_ROUNDED_CORNER_BLUR_EDGE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_SQUIRCLE_CORNER_BLUR_EDGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_BORDERLINE_BLUR_EDGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_ROUNDED_BORDERLINE_BLUR_EDGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_SQUIRCLE_BORDERLINE_BLUR_EDGE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_ROUNDED_CORNER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_SQUIRCLE_CORNER)
@@ -65,6 +68,9 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_SHADER_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_BLUR_EDGE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_ROUNDED_CORNER_BLUR_EDGE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_SQUIRCLE_CORNER_BLUR_EDGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_BORDERLINE_BLUR_EDGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_ROUNDED_BORDERLINE_BLUR_EDGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, COLOR_SHADER_CUTOUT_SQUIRCLE_BORDERLINE_BLUR_EDGE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, BORDER_SHADER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, BORDER_SHADER_ANTI_ALIASING)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_LINEAR_BOUNDING_BOX)

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_COLOR_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,8 +46,7 @@ enum
    * @note Optional.
    * @note The default is 0.
    * @note The visual size increases by the blur radius.
-   * @note If squareness is not zero, the width of borderline might not equal with it's real value.
-   * @note We cannot use blur radius and borderline properties at the same time.
+   * @note If squareness is not zero, the width of blur radius might not equal with it's real value.
    */
   BLUR_RADIUS = MIX_COLOR + 2,
 

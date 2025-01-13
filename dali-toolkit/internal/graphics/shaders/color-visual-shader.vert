@@ -48,7 +48,8 @@ UNIFORM_BLOCK SharedBlock
 
 #ifdef IS_REQUIRED_BLUR
     UNIFORM highp float blurRadius;
-#elif defined(IS_REQUIRED_BORDERLINE)
+#endif
+#ifdef IS_REQUIRED_BORDERLINE
     UNIFORM highp float borderlineWidth;
     UNIFORM highp float borderlineOffset;
     UNIFORM lowp vec4 borderlineColor;
@@ -74,16 +75,13 @@ vec4 ComputeVertexPosition()
 #endif
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-#ifdef IS_REQUIRED_BLUR
-  highp float maxSize = max(visualSize.x, visualSize.y);
-  highp float minSize = min(visualSize.x, visualSize.y);
-#elif defined(IS_REQUIRED_BORDERLINE)
-  highp float maxSize = max(visualSize.x, visualSize.y) + (1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth;
-  highp float minSize = min(visualSize.x, visualSize.y) + (1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth;
-#else
-  highp float maxSize = max(visualSize.x, visualSize.y);
-  highp float minSize = min(visualSize.x, visualSize.y);
-#endif
+  #ifdef IS_REQUIRED_BORDERLINE
+    highp float maxSize = max(visualSize.x, visualSize.y) + (1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth;
+    highp float minSize = min(visualSize.x, visualSize.y) + (1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth;
+  #else
+    highp float maxSize = max(visualSize.x, visualSize.y);
+    highp float minSize = min(visualSize.x, visualSize.y);
+  #endif
   vCornerRadius = mix(cornerRadius * minSize, cornerRadius, cornerRadiusPolicy);
   vCornerRadius = min(vCornerRadius, minSize * 0.5);
   // Optimize fragment shader. 0.2929 ~= 1.0 - sqrt(0.5)
@@ -103,10 +101,15 @@ vec4 ComputeVertexPosition()
 #endif
 
 #ifdef IS_REQUIRED_BLUR
-  vPosition = aPosition * (visualSize + 2.0 * blurRadius + vertexMargin);
-  vOptRectSize -= blurRadius + 1.0;
+  #ifdef IS_REQUIRED_BORDERLINE
+    vPosition = aPosition * (visualSize + (1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth + 2.0 * blurRadius + vertexMargin);
+    vOptRectSize -= (1.0 - clamp(borderlineOffset, -1.0, 1.0)) * 0.5 * borderlineWidth + blurRadius + 1.0;
+  #else
+    vPosition = aPosition * (visualSize + 2.0 * blurRadius + vertexMargin);
+    vOptRectSize -= blurRadius + 1.0;
+  #endif
 #elif defined(IS_REQUIRED_BORDERLINE)
-  vPosition = aPosition * (visualSize + (1.0 + clamp(borderlineOffset, -1.0, 1.0))* borderlineWidth + vertexMargin);
+  vPosition = aPosition * (visualSize + (1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth + vertexMargin);
   vOptRectSize -= (1.0 - clamp(borderlineOffset, -1.0, 1.0)) * 0.5 * borderlineWidth + 1.0;
 #elif defined(IS_REQUIRED_ROUNDED_CORNER)
   vPosition = aPosition * (visualSize + vertexMargin);

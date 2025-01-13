@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_COLOR_VISUAL_SHADER_FACTORY_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ public:
   void                           GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const;
 
 private:
-  RoundedCorner::Type mColorRoundCorner : 2; ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED
+  RoundedCorner::Type mColorRoundCorner : 3; ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED
   Borderline::Type    mColorBorderline : 2;  ///< Whether use border line, or not. default as Borderline::DISABLED
   Blur::Type          mColorBlur : 2;        ///< Whether use blur, or not. default as Blur::DISABLED
   Cutout::Type        mColorCutout : 2;      ///< Whether use cutout, or not. default as Cutout::DISABLED
