@@ -49,6 +49,8 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(CUTOUT_POLICY)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, NONE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, CUTOUT_VIEW)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, CUTOUT_VIEW_WITH_CORNER_RADIUS)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, CUTOUT_OUTSIDE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, CUTOUT_OUTSIDE_WITH_CORNER_RADIUS)
 DALI_ENUM_TO_STRING_TABLE_END(CUTOUT_POLICY)
 
 } // unnamed namespace
@@ -237,8 +239,10 @@ void ColorVisual::OnInitialize()
 
   if(IsCutoutRequired())
   {
-    int cutoutWithCornerRadius = (mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS) ? 1 : 0;
+    int cutoutWithCornerRadius = ((mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS) || (mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS));
+    int cutoutOutside          = ((mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE) || (mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS));
     mImpl->mRenderer.RegisterUniqueProperty("uCutoutWithCornerRadius", cutoutWithCornerRadius);
+    mImpl->mRenderer.RegisterUniqueProperty("uCutoutOutside", cutoutOutside);
   }
 
   // Register transform properties
