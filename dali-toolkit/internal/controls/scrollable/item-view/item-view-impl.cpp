@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1781,7 +1781,11 @@ void ItemView::SetProperty(BaseObject* object, Property::Index index, const Prop
 
       case Toolkit::ItemView::Property::REFRESH_INTERVAL:
       {
-        itemViewImpl.SetRefreshInterval(value.Get<float>());
+        float valueInFloat = value.Get<float>();
+        if(valueInFloat > 0)
+        {
+          itemViewImpl.SetRefreshInterval(valueInFloat);
+        }
         break;
       }
 
