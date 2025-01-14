@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -328,6 +328,8 @@ void Magnifier::Update()
   // |./
   // |/ <--- fov/2 radians.
   //
+  DALI_ASSERT_ALWAYS(mDefaultCameraDistance > 0.0f && "Default camera distance should be bigger than zero.");
+  DALI_ASSERT_ALWAYS(mMagnificationFactor > 0.0f && "Magnification factor should be bigger than zero.");
   const float fov = atanf(0.5f * worldSize.height / mDefaultCameraDistance / mMagnificationFactor) * 2.0f;
   mCameraActor.SetFieldOfView(fov);
 
