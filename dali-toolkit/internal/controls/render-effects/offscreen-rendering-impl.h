@@ -1,8 +1,8 @@
-#ifndef DALI_TOOLKIT_INTERNAL_OFFSCREEN_RENDERING_CONTEXT
-#define DALI_TOOLKIT_INTERNAL_OFFSCREEN_RENDERING_CONTEXT
+#ifndef DALI_TOOLKIT_INTERNAL_OFFSCREEN_RENDERING_IMPL
+#define DALI_TOOLKIT_INTERNAL_OFFSCREEN_RENDERING_IMPL
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
@@ -39,25 +40,25 @@ namespace Toolkit
 {
 namespace Internal
 {
-class OffScreenRenderingContext
+class OffScreenRenderingImpl : public RenderEffectImpl
 {
 public:
-  OffScreenRenderingContext() = default;
-  void Enable(Toolkit::Control control, DevelControl::OffScreenRenderingType type);
-  void Disable(Toolkit::Control control);
+  OffScreenRenderingImpl(DevelControl::OffScreenRenderingType type);
+  RenderEffectImplPtr       Clone() const override;
+  OffScreenRenderable::Type GetOffScreenRenderableType() override;
+  void                      GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
+
+protected:
+  void OnInitialize() override;
+  void OnActivate() override;
+  void OnDeactivate() override;
 
 private:
-  bool IsEnabled();
-
-private:
-  RenderTask  mRenderTask;
-  CameraActor mCamera;
-  FrameBuffer mFrameBuffer;
-  Renderer    mRenderer;
-
-  WeakHandle<Integration::SceneHolder> mSceneHolder;
+  RenderTask                           mRenderTask;
+  FrameBuffer                          mFrameBuffer;
+  DevelControl::OffScreenRenderingType mType;
 };
 } // namespace Internal
 } // namespace Toolkit
 } // namespace Dali
-#endif //DALI_TOOLKIT_INTERNAL_OFFSCREEN_RENDERING_CONTEXT
+#endif //DALI_TOOLKIT_INTERNAL_OFFSCREEN_RENDERING_IMPL

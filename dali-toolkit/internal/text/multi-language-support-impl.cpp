@@ -63,10 +63,11 @@ void CheckFontSupportsCharacter(
   const FontId& cachedDefaultFontId,
   const TextAbstraction::FontDescription& currentFontDescription,
   const TextAbstraction::PointSize26Dot6& currentFontPointSize,
-  DefaultFonts**& defaultFontPerScriptCacheBuffer)
+  DefaultFonts**& defaultFontPerScriptCacheBuffer,
+  bool findFallbackFont)
 {
   // Need to check if the given font supports the current character.
-  if(!isValidFont) // (1)
+  if(!isValidFont && !findFallbackFont) // (1)
   {
     // Whether the current character is common for all scripts (i.e. white spaces, ...)
 
@@ -179,6 +180,20 @@ void CheckFontSupportsCharacter(
       } // !isValidFont (3)
     }   // !isValidFont (2)
   }     // !isValidFont (1)
+  else if(!isValidFont && findFallbackFont)
+  {
+    // Find a fallback-font.
+    fontId = fontClient.FindFallbackFont(character,
+                                         currentFontDescription,
+                                         currentFontPointSize,
+                                         false);
+
+    if(0u == fontId)
+    {
+      fontId = fontClient.FindDefaultFont(character, currentFontPointSize);
+    }
+    isValidFont = true;
+  }
 }
 } // unnamed namespace
 
@@ -200,7 +215,6 @@ bool ValidateFontsPerScript::IsValidFont(FontId fontId) const
 void ValidateFontsPerScript::Cache(FontId fontId)
 {
   mValidFonts.PushBack(fontId);
-
   return;
 }
 
@@ -419,7 +433,11 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
     }
     else if(IsScriptChangedToFollowSequence(currentScriptRun.script, character, script))
     {
-      currentScriptRun.script = script;
+      // To guarantee behavior of VARIATION_SELECTOR_15.
+      if(currentScriptRun.script != TextAbstraction::EMOJI_TEXT)
+      {
+        currentScriptRun.script = script;
+      }
     }
     else if(IsOneOfEmojiScripts(currentScriptRun.script) && (TextAbstraction::COMMON == script))
     {
@@ -774,6 +792,21 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
       isValidFont = true;
     }
 
+    bool findFallbackFont = false;
+    if(TextAbstraction::IsEmojiVariationSequences(character) && !TextAbstraction::IsASCIIDigits(character))
+    {
+      if(index + 1 <= lastCharacter)
+      {
+        const Character nextCharacter = *(textBuffer + index + 1);
+        findFallbackFont = (!TextAbstraction::IsEmojiPresentationSelector(nextCharacter) && !TextAbstraction::IsTextPresentationSelector(nextCharacter) &&
+                            !TextAbstraction::IsZeroWidthJoiner(nextCharacter) && !TextAbstraction::IsEmojiModifier(nextCharacter));
+      }
+      else if(index == lastCharacter)
+      {
+        findFallbackFont = true;
+      }
+    }
+
     // This is valid after CheckFontSupportsCharacter();
     bool isCommonScript = false;
 
@@ -784,7 +817,7 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
 
     // Need to check if the given font supports the current character.
     CheckFontSupportsCharacter(isValidFont, isCommonScript, character, validFontsPerScriptCacheBuffer, script, fontId, fontClient,
-                               isValidCachedDefaultFont, cachedDefaultFontId, currentFontDescription, currentFontPointSize, defaultFontPerScriptCacheBuffer);
+                               isValidCachedDefaultFont, cachedDefaultFontId, currentFontDescription, currentFontPointSize, defaultFontPerScriptCacheBuffer, findFallbackFont);
 
     if(isEmojiScript && (previousScript != script))
     {
@@ -813,7 +846,25 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
 
         if(isModifiedByVariationSelector)
         {
-          FontId requestedFontId = fontClient.FindDefaultFont(character, currentFontPointSize, IsEmojiColorScript(script));
+          FontId requestedFontId = 0u;
+          if(TextAbstraction::IsEmojiTextScript(script))
+          {
+            // Find a fallback-font.
+            requestedFontId = fontClient.FindFallbackFont(character,
+                                         currentFontDescription,
+                                         currentFontPointSize,
+                                         false);
+
+            if(fontClient.IsColorGlyph(requestedFontId, glyphIndexChar))
+            {
+              // Try to find text style glyph.
+              requestedFontId = 0;
+            }
+          }
+          if(0u == requestedFontId)
+          {
+            requestedFontId = fontClient.FindDefaultFont(character, currentFontPointSize, IsEmojiColorScript(script));
+          }
           if(0u != requestedFontId)
           {
             currentFontRun.fontId = fontId = requestedFontId;

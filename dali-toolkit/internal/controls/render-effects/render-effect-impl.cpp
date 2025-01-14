@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,12 @@
 #include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
@@ -44,6 +46,7 @@ Debug::Filter* gRenderEffectLogFilter = Debug::Filter::New(Debug::NoLogging, fal
 
 RenderEffectImpl::RenderEffectImpl()
 : mRenderer(),
+  mCamera(),
   mOwnerControl(),
   mSizeNotification(),
   mTargetSize(Vector2::ZERO),
@@ -58,6 +61,9 @@ RenderEffectImpl::~RenderEffectImpl()
 
   // Reset weak handle first. (Since it might not valid during destruction.)
   mOwnerControl.Reset();
+  mPlacementSceneHolder.Reset();
+
+  mSizeNotification.Reset();
 
   // Don't call Deactivate here, since we cannot call virtual function during destruction.
   // Deactivate already be called at Control's destructor, and InheritVisibilityChanged signal.
@@ -77,17 +83,7 @@ void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
 
     if(ownerControl)
     {
-      mTargetSize = ownerControl.GetProperty<Vector2>(Actor::Property::SIZE);
-      if(!mRenderer)
-      {
-        mRenderer = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
-        mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
-
-        Shader shader = mRenderer.GetShader();
-        shader.RegisterProperty("uCornerRadius", Vector4::ZERO);
-        shader.RegisterProperty("uCornerSquareness", Vector4::ZERO);
-        shader.RegisterProperty("uCornerRadiusPolicy", static_cast<float>(1.0f));
-      }
+      UpdateTargetSize();
 
       ownerControl.InheritedVisibilityChangedSignal().Connect(this, &RenderEffectImpl::OnControlInheritedVisibilityChanged);
 
@@ -114,6 +110,7 @@ void RenderEffectImpl::ClearOwnerControl()
 
     auto previousOwnerControl = ownerControl;
     mOwnerControl.Reset();
+    mPlacementSceneHolder.Reset();
 
     // Make previous owner don't have render effect, after make we don't have owner control now.
     previousOwnerControl.ClearRenderEffect();
@@ -127,12 +124,23 @@ bool RenderEffectImpl::IsActivated() const
 
 void RenderEffectImpl::Initialize()
 {
+  mCamera = CameraActor::New();
+  mCamera.SetInvertYAxis(true);
+  mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  mCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mCamera.SetType(Dali::Camera::FREE_LOOK);
+
   OnInitialize();
 }
 
 Toolkit::Control RenderEffectImpl::GetOwnerControl() const
 {
   return mOwnerControl.GetHandle();
+}
+
+Integration::SceneHolder RenderEffectImpl::GetSceneHolder() const
+{
+  return mPlacementSceneHolder.GetHandle();
 }
 
 Renderer RenderEffectImpl::GetTargetRenderer() const
@@ -145,16 +153,51 @@ Vector2 RenderEffectImpl::GetTargetSize() const
   return mTargetSize;
 }
 
+CameraActor RenderEffectImpl::GetCameraActor() const
+{
+  return mCamera;
+}
+
 void RenderEffectImpl::Activate()
 {
   if(!IsActivated() && IsActivateValid())
   {
-    Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
-    DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] Activated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
     mIsActivated = true;
 
-    // Activate logic for subclass.
-    OnActivate();
+    Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
+    DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] Activated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
+
+    // Keep sceneHolder as weak handle.
+    Integration::SceneHolder sceneHolder = Integration::SceneHolder::Get(ownerControl);
+    if(DALI_UNLIKELY(!sceneHolder))
+    {
+      DALI_LOG_ERROR("RenderEffect Could not be activated due to ownerControl's SceneHolder is not exist\n");
+      return;
+    }
+    mPlacementSceneHolder = sceneHolder;
+
+    if(!mRenderer)
+    {
+      mRenderer = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
+      mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
+
+      Shader shader = mRenderer.GetShader();
+      shader.RegisterProperty("uCornerRadius", Vector4::ZERO);
+      shader.RegisterProperty("uCornerSquareness", Vector4::ZERO);
+      shader.RegisterProperty("uCornerRadiusPolicy", static_cast<float>(1.0f));
+    }
+
+    Vector2 size = GetTargetSize();
+    if(size != Vector2::ZERO)
+    {
+      mCamera.SetPerspectiveProjection(size);
+      ownerControl.Add(mCamera);
+
+      // Activate logic for subclass.
+      OnActivate();
+
+      SynchronizeBackgroundCornerRadius();
+    }
   }
 }
 
@@ -162,12 +205,15 @@ void RenderEffectImpl::Deactivate()
 {
   if(IsActivated() || !IsActivateValid())
   {
+    mIsActivated = false;
+
     Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
     DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] Deactivated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
-    mIsActivated = false;
 
     // Deactivate logic for subclass.
     OnDeactivate();
+
+    mCamera.Unparent();
   }
 }
 
@@ -209,6 +255,29 @@ bool RenderEffectImpl::IsActivateValid() const
   return ret;
 }
 
+void RenderEffectImpl::UpdateTargetSize()
+{
+  Vector2 size = GetOwnerControl().GetProperty<Vector2>(Actor::Property::SIZE);
+  if(size == Vector2::ZERO)
+  {
+    size = GetOwnerControl().GetNaturalSize();
+  }
+
+  if(size == Vector2::ZERO || size.x < 0.0f || size.y < 0.0f)
+  {
+    mTargetSize = Vector2::ZERO;
+  }
+
+  const uint32_t maxTextureSize = Dali::GetMaxTextureSize();
+  if(uint32_t(size.x) > maxTextureSize || uint32_t(size.y) > maxTextureSize)
+  {
+    uint32_t denominator = std::max(size.x, size.y);
+    size.x               = (size.x * maxTextureSize / denominator);
+    size.y               = (size.y * maxTextureSize / denominator);
+  }
+  mTargetSize = size;
+}
+
 void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
 {
   Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
@@ -217,7 +286,7 @@ void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
     const auto targetSize = ownerControl.GetCurrentProperty<Vector2>(Actor::Property::SIZE);
     if(mTargetSize != targetSize && IsActivated())
     {
-      mTargetSize = targetSize;
+      UpdateTargetSize();
       Deactivate();
       Activate();
     }
@@ -236,6 +305,29 @@ void RenderEffectImpl::OnControlInheritedVisibilityChanged(Actor actor, bool vis
   {
     Deactivate();
   }
+}
+
+void RenderEffectImpl::SynchronizeBackgroundCornerRadius()
+{
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[BlurEffect:%p] Synchronize background corner radius\n", this);
+
+  DALI_ASSERT_ALWAYS(GetOwnerControl() && "You should first SetRenderEffect(), then set its background property map");
+
+  Property::Map map = GetOwnerControl().GetProperty<Property::Map>(Toolkit::Control::Property::BACKGROUND);
+
+  Vector4 radius = Vector4::ZERO;
+  map[Toolkit::DevelVisual::Property::CORNER_RADIUS].Get(radius);
+
+  Vector4 squareness = Vector4::ZERO;
+  map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS].Get(squareness);
+
+  Visual::Transform::Policy::Type policy{Visual::Transform::Policy::ABSOLUTE};
+  map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY].Get(policy);
+
+  Renderer renderer = GetTargetRenderer();
+  renderer.RegisterProperty("uCornerRadius", radius);
+  renderer.RegisterProperty("uCornerSquareness", squareness);
+  renderer.RegisterProperty("uCornerRadiusPolicy", static_cast<float>(policy));
 }
 
 } // namespace Internal

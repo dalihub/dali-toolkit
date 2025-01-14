@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -403,7 +403,7 @@ Control::Impl::Impl(Control& controlImpl)
   mPanGestureDetector(),
   mTapGestureDetector(),
   mLongPressGestureDetector(),
-  mOffScreenRenderingContext(nullptr),
+  mOffScreenRenderingImpl(nullptr),
   mOffScreenRenderingType(DevelControl::OffScreenRenderingType::NONE),
   mTooltip(NULL),
   mInputMethodContext(),
@@ -537,9 +537,9 @@ void Control::Impl::OnSceneConnection()
     }
   }
 
-  if(mOffScreenRenderingContext) // mOffScreenRenderingType != NONE
+  if(mOffScreenRenderingImpl) // mOffScreenRenderingType != NONE
   {
-    mOffScreenRenderingContext->Enable(Toolkit::Control(mControlImpl.GetOwner()), mOffScreenRenderingType);
+    mOffScreenRenderingImpl->SetOwnerControl(Toolkit::Control(mControlImpl.GetOwner()));
   }
 }
 
@@ -548,9 +548,9 @@ void Control::Impl::OnSceneDisconnection()
   Actor self = mControlImpl.Self();
   mVisualData->ClearScene(self);
 
-  if(mOffScreenRenderingContext)
+  if(mOffScreenRenderingImpl)
   {
-    mOffScreenRenderingContext->Disable(Toolkit::Control(mControlImpl.GetOwner()));
+    mOffScreenRenderingImpl->ClearOwnerControl();
   }
 }
 
@@ -1557,31 +1557,22 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
     }
   }
 
-  mOffScreenRenderingType = static_cast<DevelControl::OffScreenRenderingType>(offScreenRenderingType);
-  Dali::Toolkit::Control handle(mControlImpl.GetOwner());
+  DevelControl::OffScreenRenderingType newType = static_cast<DevelControl::OffScreenRenderingType>(offScreenRenderingType);
+  if(newType != mOffScreenRenderingType)
+  {
+    // update type
+    mOffScreenRenderingType = newType;
 
-  // Disable
-  if(mOffScreenRenderingType == DevelControl::OffScreenRenderingType::NONE)
-  {
-    if(mOffScreenRenderingContext)
+    // update effect
+    if(mOffScreenRenderingImpl)
     {
-      mOffScreenRenderingContext->Disable(handle);
-      mOffScreenRenderingContext.reset();
+      mOffScreenRenderingImpl->ClearOwnerControl();
+      mOffScreenRenderingImpl.reset();
     }
-  }
-  // Enable
-  else
-  {
-    if(mOffScreenRenderingContext)
-    {
-      mOffScreenRenderingContext->Disable(handle);
-    }
-    else
-    {
-      Dali::Toolkit::Control handle(mControlImpl.GetOwner());
-      mOffScreenRenderingContext = std::make_unique<OffScreenRenderingContext>();
-    }
-    mOffScreenRenderingContext->Enable(handle, mOffScreenRenderingType);
+    mOffScreenRenderingImpl = std::make_unique<OffScreenRenderingImpl>(mOffScreenRenderingType);
+
+    Dali::Toolkit::Control handle(mControlImpl.GetOwner());
+    mOffScreenRenderingImpl->SetOwnerControl(handle);
   }
 }
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DATA_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/internal/controls/render-effects/offscreen-rendering-context.h>
+#include <dali-toolkit/internal/controls/render-effects/offscreen-rendering-impl.h>
 #include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -496,8 +496,8 @@ public:
   LongPressGestureDetector mLongPressGestureDetector;
 
   // Off screen rendering context
-  std::unique_ptr<OffScreenRenderingContext> mOffScreenRenderingContext;
-  DevelControl::OffScreenRenderingType       mOffScreenRenderingType;
+  std::unique_ptr<OffScreenRenderingImpl> mOffScreenRenderingImpl;
+  DevelControl::OffScreenRenderingType    mOffScreenRenderingType;
 
   // Tooltip
   TooltipPtr mTooltip;

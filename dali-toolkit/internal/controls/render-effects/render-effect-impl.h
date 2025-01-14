@@ -19,6 +19,8 @@
  */
 
 // EXTERNAL INCLUDE
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
+#include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/base-object.h>
@@ -53,12 +55,6 @@ public:
    * @brief Clears owner Control.
    */
   void ClearOwnerControl();
-
-  /**
-   * @brief Get whether this effect activated or not.
-   * @return True if effect is activated. False otherwise.
-   */
-  bool IsActivated() const;
 
   /**
    * @brief Clones current instance.
@@ -124,10 +120,22 @@ protected:
   Vector2 GetTargetSize() const;
 
   /**
+   * @brief Get camera that captures full size texture of mOwnerControl
+   * @return mCamera
+   */
+  CameraActor GetCameraActor() const;
+
+  /**
    * @brief Get Owner control. It could be return empty handle if owner control is not set, or destroyed.
    * @return mOwnerControl
    */
   Toolkit::Control GetOwnerControl() const;
+
+  /**
+   * @brief Get scene holder of owner control.
+   * @return mPlacementSceneHolder
+   */
+  Integration::SceneHolder GetSceneHolder() const;
 
   /// For sub classes
 protected:
@@ -164,7 +172,19 @@ private:
    */
   bool IsActivateValid() const;
 
+  /**
+   * @brief Get whether this effect activated or not.
+   * @return True if effect is activated. False otherwise.
+   */
+  bool IsActivated() const;
+
 private:
+  /**
+   * @brief Calculates a valid target size for texture.
+   * Invalid cases include: zero vector, minus numbers or large numbers(larger than the maximum).
+   */
+  void UpdateTargetSize();
+
   /**
    * @brief Callback when the size changes.
    */
@@ -177,10 +197,17 @@ private:
    */
   void OnControlInheritedVisibilityChanged(Actor actor, bool visible);
 
+  /**
+   * @brief Synchronize mOwnerControl's background corner radius to the output.
+   */
+  void SynchronizeBackgroundCornerRadius();
+
 private:
   Dali::Renderer mRenderer; // An additional renderer for mOwnerControl
+  CameraActor    mCamera;   // A camera that captures full size texture of mOwnerControl
 
-  Dali::WeakHandle<Dali::Toolkit::Control> mOwnerControl; ///< Weakhandle of owner control.
+  Dali::WeakHandle<Dali::Toolkit::Control> mOwnerControl;         ///< Weakhandle of owner control.
+  WeakHandle<Integration::SceneHolder>     mPlacementSceneHolder; ///< Weakhandle of scene
 
   PropertyNotification mSizeNotification; // Resize/Relayout signal.
   Vector2              mTargetSize;       // The final size of mOwnerControl

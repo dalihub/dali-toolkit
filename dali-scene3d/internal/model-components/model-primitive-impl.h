@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_COMPONENTS_MODEL_PRIMITIVE_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,7 +160,7 @@ public:
    *
    * @param[in] data The blend shape data to set.
    */
-  void SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData& data);
+  void SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData&& data);
 
   /**
    * @brief Sets the blend shape geometry for this model primitive.
@@ -270,7 +270,7 @@ private:
   bool                                         mHasTangents       = false;
   Scene3D::Loader::BlendShapes::Version        mBlendShapeVersion = Scene3D::Loader::BlendShapes::Version::INVALID;
 
-  bool mIsMaterialChanged        = false;
+  bool mIsMaterialChanged = false;
 };
 
 } // namespace Internal

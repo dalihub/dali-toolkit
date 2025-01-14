@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,7 +128,7 @@ bool GlbLoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::Loa
   outBuffers.reserve(document.mBuffers.size());
   if(!binaryChunkData.empty())
   {
-    BufferDefinition dataBuffer(binaryChunkData);
+    BufferDefinition dataBuffer(std::move(binaryChunkData));
     outBuffers.emplace_back(std::move(dataBuffer));
   }
 
