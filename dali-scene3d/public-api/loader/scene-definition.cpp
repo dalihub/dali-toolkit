@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -874,7 +874,7 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&          
         data.version      = mesh.first.mBlendShapeVersion;
         data.bufferOffset = mesh.second.blendShapeBufferOffset;
         data.mActor       = actor;
-        Internal::GetImplementation(node).SetBlendShapeData(data, request.mPrimitive);
+        Internal::GetImplementation(node).SetBlendShapeData(std::move(data), request.mPrimitive);
       }
     }
   }

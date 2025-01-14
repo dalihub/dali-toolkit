@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -375,7 +375,7 @@ void ModelNode::UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManager)
   }
 }
 
-void ModelNode::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData& data, Scene3D::ModelPrimitive primitive)
+void ModelNode::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData&& data, Scene3D::ModelPrimitive primitive)
 {
   // Update mBlendShapeIndexMap
   mBlendShapeIndexMap.clear();
@@ -389,7 +389,7 @@ void ModelNode::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData& 
     }
   }
 
-  GetImplementation(primitive).SetBlendShapeData(data);
+  GetImplementation(primitive).SetBlendShapeData(std::move(data));
 }
 
 void ModelNode::SetBoneMatrix(const Matrix& inverseMatrix, Scene3D::ModelPrimitive primitive, Scene3D::Loader::Index& boneIndex)
