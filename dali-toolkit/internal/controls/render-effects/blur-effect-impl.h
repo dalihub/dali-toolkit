@@ -143,14 +143,6 @@ private:
   void ApplyRenderTaskSourceActor(RenderTask sourceRenderTask, const Toolkit::Control sourceControl);
 
   /**
-   * @brief Gets or Calculates a valid target size for texture.
-   * Invalid cases include: zero vector, minus numbers or large numbers(larger than the maximum).
-   * @return A valid version of mTargetSize, Vector2::ZERO otherwise.
-   * @note The return value is a copy, not mTargetSize itself.
-   */
-  Vector2 GetTargetSizeForValidTexture() const;
-
-  /**
    * @brief Sets shader constants, gaussian kernel weights and pixel offsets.
    * @param[in] downsampledWidth Downsized width of input texture.
    * @param[in] downsampledHeight Downsized height of input texture.
@@ -171,11 +163,6 @@ private:
    */
   std::string GetSampleWeightsPropertyName(unsigned int index) const;
 
-  /**
-   * @brief Synchronize mOwnerControl's background corner radius to the blurred output.
-   */
-  void SynchronizeBackgroundCornerRadius();
-
   BlurEffectImpl(const BlurEffectImpl&) = delete;
   BlurEffectImpl(BlurEffectImpl&&)      = delete;
   BlurEffectImpl& operator=(BlurEffectImpl&&) = delete;      // no move()
@@ -183,13 +170,10 @@ private:
 
 private:
   // Camera actors
-  CameraActor mRenderFullSizeCamera;
   CameraActor mRenderDownsampledCamera;
 
   // Resource
   FrameBuffer mInputBackgroundFrameBuffer; // Input. Background. What to blur.
-
-  WeakHandle<Integration::SceneHolder> mPlacementSceneHolder;
 
   Actor       mInternalRoot;
   Actor       mHorizontalBlurActor;
