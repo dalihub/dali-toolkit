@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_COMPONENTS_MODEL_NODE_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -280,7 +280,7 @@ public: // Public Method
    * @param[in] data The blend shape data.
    * @param[in] primitive The ModelPrimitive to set the blend shape data for.
    */
-  void SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData& data, Scene3D::ModelPrimitive primitive);
+  void SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData&& data, Scene3D::ModelPrimitive primitive);
 
   /**
    * @brief Sets the bone matrix for a ModelPrimitive and bone index.

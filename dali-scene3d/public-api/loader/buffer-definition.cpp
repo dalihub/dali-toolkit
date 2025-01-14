@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ struct BufferDefinition::Impl
   std::shared_ptr<Dali::FileStream> stream;
 };
 
-BufferDefinition::BufferDefinition(std::vector<uint8_t>& buffer)
+BufferDefinition::BufferDefinition(std::vector<uint8_t>&& buffer)
 : mImpl{new BufferDefinition::Impl}
 {
   mImpl.get()->buffer = std::move(buffer);
