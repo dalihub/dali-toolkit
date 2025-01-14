@@ -188,6 +188,21 @@ public:
   bool StopInspectorServer();
 
   /**
+   * @brief Set the style of IME.
+   * @param[in] position Position of IME.
+   * @param[in] alignment Alignment of IME.
+   *
+   * @return true if succeeded, false otherwise
+   */
+  bool SetImePositionAndAlignment(Dali::Vector2 position, int alignment);
+
+  /**
+   * @brief Set the theme name of cursor.
+   * @param[in] themeName The name of theme of cursor.
+   */
+  void SetCursorThemeName(const std::string themeName);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::ScrollBy()
    */
   void ScrollBy(int32_t deltaX, int32_t deltaY);
