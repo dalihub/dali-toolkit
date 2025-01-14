@@ -503,19 +503,6 @@ bool WebView::StopInspectorServer()
   return mWebEngine ? mWebEngine.StopInspectorServer() : false;
 }
 
-bool WebView::SetImePositionAndAlignment(Dali::Vector2 position, int alignment)
-{
-  return mWebEngine ? mWebEngine.SetImePositionAndAlignment(position, alignment) : false;
-}
-
-void WebView::SetCursorThemeName(const std::string themeName)
-{
-  if(mWebEngine)
-  {
-    mWebEngine.SetCursorThemeName(themeName);
-  }
-}
-
 void WebView::ScrollBy(int32_t deltaX, int32_t deltaY)
 {
   if(mWebEngine)
