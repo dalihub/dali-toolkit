@@ -183,8 +183,8 @@ private:
     const Dali::LogFactoryInterface&                   mLogFactory;
     const Dali::TraceFactoryInterface&                 mTraceFactory;
 
-    bool mNeedToSleep : 1;
-    bool mDestroyThread : 1;
+    bool mNeedToSleep;
+    bool mDestroyThread;
   };
 
 private:
@@ -215,9 +215,9 @@ private:
   const Dali::TraceFactoryInterface&              mTraceFactory;
   Dali::AsyncTaskManager                          mAsyncTaskManager;
 
-  bool mNeedToSleep : 1;
-  bool mDestroyThread : 1;
-  bool mForceRenderOnce : 1;
+  bool mNeedToSleep;
+  bool mDestroyThread;
+  bool mForceRenderOnce;
 };
 
 } // namespace Internal
