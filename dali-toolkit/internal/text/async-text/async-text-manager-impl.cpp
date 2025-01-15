@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,12 +116,14 @@ void AsyncTextManager::OnLocaleChanged(std::string locale)
     for(auto& loader : mAvailableLoaders)
     {
       loader.ClearModule();
+      loader.SetLocale(mLocale);
     }
 
     // When the Loader is in running state, just set the flag and clear it when it becomes available.
     for(auto& loader : mRunningLoaders)
     {
       loader.SetModuleClearNeeded(true);
+      loader.SetLocaleUpdateNeeded(true);
     }
   }
 }
@@ -138,6 +140,11 @@ Text::AsyncTextLoader AsyncTextManager::GetAvailableLoader()
   {
     loader.ClearModule();
     loader.SetModuleClearNeeded(false);
+  }
+  if(loader.IsLocaleUpdateNeeded())
+  {
+    loader.SetLocale(mLocale);
+    loader.SetLocaleUpdateNeeded(false);
   }
 
   mAvailableLoaders.pop_back();

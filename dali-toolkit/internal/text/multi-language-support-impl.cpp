@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/text/multi-language-support-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -42,6 +43,11 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_FONT_PERFORMANCE_MARKER, false);
 
 const Dali::Toolkit::Text::Character UTF32_A     = 0x0041;
 const Dali::Toolkit::Text::Character UTF32_COLON = 0x3A;
+
+const char* DALI_TEXT_ENABLE_ICU("DALI_TEXT_ENABLE_ICU");
+const int   DEFAULT_ENABLE_ICU   = 0;
+const char* THAILAND_LOCALE_CODE = "th_TH";
+
 } // namespace
 
 namespace Text
@@ -255,9 +261,12 @@ void DefaultFonts::Cache(const TextAbstraction::FontDescription& description, Fo
 }
 
 MultilanguageSupport::MultilanguageSupport(bool connectLocaleChangedSignal)
-: mDefaultFontPerScriptCache(),
+: mICU(),
+  mDefaultFontPerScriptCache(),
   mValidFontsPerScriptCache(),
-  mLocale()
+  mLocale(),
+  mIsICUEnabled(false),
+  mIsICULineBreakNeededForLocale(false)
 {
   // Initializes the default font cache to zero (invalid font).
   // Reserves space to cache the default fonts and access them with the script as an index.
@@ -268,6 +277,16 @@ MultilanguageSupport::MultilanguageSupport(bool connectLocaleChangedSignal)
   mValidFontsPerScriptCache.Resize(TextAbstraction::GetNumberOfScripts(), NULL);
 
   mLocale = TextAbstraction::GetLocaleFull();
+
+  // Check environment variable for DALI_TEXT_ENABLE_ICU.
+  auto enableICUstring = Dali::EnvironmentVariable::GetEnvironmentVariable(DALI_TEXT_ENABLE_ICU);
+  int  enableICU       = enableICUstring ? std::atoi(enableICUstring) : DEFAULT_ENABLE_ICU;
+  if(enableICU == 1)
+  {
+    mIsICUEnabled                  = true;
+    mIsICULineBreakNeededForLocale = IsICULineBreakNeededForLocale();
+    mICU                           = TextAbstraction::ICU::New();
+  }
 
   if(connectLocaleChangedSignal && Dali::Adaptor::IsAvailable())
   {
@@ -300,7 +319,7 @@ void MultilanguageSupport::OnLocaleChanged(std::string locale)
 {
   if(mLocale != locale)
   {
-    mLocale = locale;
+    SetLocale(locale);
     ClearCache();
   }
 }
@@ -314,9 +333,30 @@ void MultilanguageSupport::ClearCache()
   mValidFontsPerScriptCache.Resize(TextAbstraction::GetNumberOfScripts(), NULL);
 }
 
-std::string MultilanguageSupport::GetLocale()
+const std::string& MultilanguageSupport::GetLocale()
 {
   return mLocale;
+}
+
+void MultilanguageSupport::SetLocale(const std::string& locale)
+{
+  mLocale                        = locale;
+  mIsICULineBreakNeededForLocale = IsICULineBreakNeededForLocale();
+}
+
+bool MultilanguageSupport::IsICULineBreakNeeded()
+{
+  return mIsICUEnabled && mIsICULineBreakNeededForLocale;
+}
+
+void MultilanguageSupport::UpdateICULineBreak(const std::string&              text,
+                                              TextAbstraction::Length         numberOfCharacters,
+                                              TextAbstraction::LineBreakInfo* breakInfo)
+{
+  if(mIsICUEnabled && mICU)
+  {
+    mICU.UpdateLineBreakInfoByLocale(text, numberOfCharacters, mLocale.c_str(), breakInfo);
+  }
 }
 
 Text::MultilanguageSupport MultilanguageSupport::Get()
@@ -992,6 +1032,11 @@ void MultilanguageSupport::AddCurrentScriptAndCreatNewScript(const Script       
   numberOfAllScriptCharacters                      = 0u;
   // Initialize whether is right to left direction
   currentScriptRun.isRightToLeft = isRightToLeft;
+}
+
+bool MultilanguageSupport::IsICULineBreakNeededForLocale()
+{
+  return mLocale == THAILAND_LOCALE_CODE;
 }
 
 } // namespace Internal

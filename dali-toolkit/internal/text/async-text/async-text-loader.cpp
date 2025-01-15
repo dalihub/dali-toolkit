@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,21 @@ AsyncTextLoader::~AsyncTextLoader()
 AsyncTextLoader::AsyncTextLoader(Internal::AsyncTextLoader* implementation)
 : BaseHandle(implementation)
 {
+}
+
+void AsyncTextLoader::SetLocale(const std::string& locale)
+{
+  GetImplementation(*this).SetLocale(locale);
+}
+
+void AsyncTextLoader::SetLocaleUpdateNeeded(bool update)
+{
+  GetImplementation(*this).SetLocaleUpdateNeeded(update);
+}
+
+bool AsyncTextLoader::IsLocaleUpdateNeeded()
+{
+  return GetImplementation(*this).IsLocaleUpdateNeeded();
 }
 
 void AsyncTextLoader::ClearModule()

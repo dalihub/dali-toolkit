@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MULTI_LANGUAGE_SUPPORT_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/text-abstraction/icu.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/connection-tracker.h>
 
@@ -183,35 +184,55 @@ public:
   void OnLocaleChanged(std::string locale);
 
   /**
+   * @copydoc Dali::MultilanguageSupport::GetLocale()
+   */
+  const std::string& GetLocale();
+
+  /**
+   * @copydoc Dali::MultilanguageSupport::SetLocale()
+   */
+  void SetLocale(const std::string& locale);
+
+  /**
    * @copydoc Dali::MultilanguageSupport::ClearCache()
    */
   void ClearCache();
 
   /**
-   * @brief Gets the locale.
+   * @copydoc Dali::MultilanguageSupport::IsICULineBreakNeeded()
    */
-  std::string GetLocale();
+  bool IsICULineBreakNeeded();
+
+  /**
+   * @copydoc Dali::MultilanguageSupport::UpdateICULineBreak()
+   */
+  void UpdateICULineBreak(const std::string&              text,
+                          TextAbstraction::Length         numberOfCharacters,
+                          TextAbstraction::LineBreakInfo* breakInfo);
 
 private:
+  TextAbstraction::ICU            mICU;                       ///< Handle to the dali ICU.
   Vector<DefaultFonts*>           mDefaultFontPerScriptCache; ///< Caches default fonts for a script.
   Vector<ValidateFontsPerScript*> mValidFontsPerScriptCache;  ///< Caches valid fonts for a script.
 
   std::string mLocale;
+  bool        mIsICUEnabled                  : 1;
+  bool        mIsICULineBreakNeededForLocale : 1;
 
   //Methods
 
   /**
- * @brief Add the current script to scripts and create new script.
- *
- * @param[in] requestedScript The script of the new script run.
- * @param[in] isRightToLeft The direction of the new script run.
- * @param[in] addScriptCharactersToNewScript Whether to add the pending characters to the new script run or to the current script run.
- * @param[inout] currentScriptRun The current character script run and it will be updated it to the new script run.
- * @param[inout] numberOfAllScriptCharacters The pending characters.
- * @param[inout] scripts The list of scripts.
- * @param[inout] scriptIndex The current index of scripts.
- *
- */
+   * @brief Add the current script to scripts and create new script.
+   *
+   * @param[in] requestedScript The script of the new script run.
+   * @param[in] isRightToLeft The direction of the new script run.
+   * @param[in] addScriptCharactersToNewScript Whether to add the pending characters to the new script run or to the current script run.
+   * @param[inout] currentScriptRun The current character script run and it will be updated it to the new script run.
+   * @param[inout] numberOfAllScriptCharacters The pending characters.
+   * @param[inout] scripts The list of scripts.
+   * @param[inout] scriptIndex The current index of scripts.
+   *
+   */
   void AddCurrentScriptAndCreatNewScript(const Script       requestedScript,
                                          const bool         isRightToLeft,
                                          const bool         addScriptCharactersToNewScript,
@@ -219,6 +240,14 @@ private:
                                          Length&            numberOfAllScriptCharacters,
                                          Vector<ScriptRun>& scripts,
                                          ScriptRunIndex&    scriptIndex);
+
+  /**
+   * @brief Checks if an ICU-based line break update is required for the current locale.
+   * @note Use only when there is a change in locale to avoid useless calculations.
+   * @return If true, icu-based line breaks are required or possible.
+   */
+  bool IsICULineBreakNeededForLocale();
+
 };
 
 } // namespace Internal

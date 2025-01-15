@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -173,6 +173,16 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
 
     TextAbstraction::Segmentation segmentation = TextAbstraction::Segmentation::Get();
     SetLineBreakInfo(segmentation, utf32Characters, startIndex, requestedNumberOfCharacters, lineBreakInfo);
+
+    MultilanguageSupport multilanguageSupport = MultilanguageSupport::Get();
+
+    // Check if an ICU-based line break update is required.
+    if(multilanguageSupport.IsICULineBreakNeeded())
+    {
+      std::string currentText;
+      Utf32ToUtf8(impl.mModel->mLogicalModel->mText.Begin(), numberOfCharacters, currentText);
+      multilanguageSupport.UpdateICULineBreak(currentText, numberOfCharacters, lineBreakInfo.Begin());
+    }
 
     if(impl.mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
        impl.mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::MIXED))
